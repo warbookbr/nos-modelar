@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-183 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+185 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -124,6 +124,7 @@
 
 - `arvore-cartoon.js` — NÓS v3 — CONSTRUTOR de árvores CARTOON (D-63), o "carimbo" plantável. Porta o elenco aprovado no mostruário _arvformas pra uma fábrica reutilizável: criarArv…
 - `arvore.js` — motor/arvore.js — GERADOR DE ÁRVORES portado FIEL da V2 (D-59). growTree + dependências extraídos LITERALMENTE de nos-fps.html (não redigitados). Inclui a ha…
+- `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
 - `input.js` — input.js — teclado/mouse (desktop) + joystick touch, pro alicerce jogável do v3 (D-61). Os joysticks portam FIEL as 3 correções pagas caro na v2 (D-47/48/49)…
 - `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
@@ -272,6 +273,7 @@
 
 ## tools/oficina/
 
+- `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 
 ## tools/som/

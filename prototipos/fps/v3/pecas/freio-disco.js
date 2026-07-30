@@ -83,60 +83,39 @@ const CAMINHO_FLEXIVEL = {
 };
 
 /* ---------------------------------------------------------------------------
-   Medidas DERIVADAS — calculadas das independentes, nunca digitadas duas vezes.
-   Elas existem porque hoje um passo só aceita NOME de parâmetro ou número
-   literal: não há expressão como `-($discoEspessura/2)` dentro do passo
-   (ATRITOS-AUTORIA A-5). Enquanto isso, a derivação mora aqui, em JS puro e
-   determinístico, e o passo cita o nome derivado.
+   Medidas DERIVADAS — agora pertencem ao envelope salvo. `=` ativa a pequena
+   gramática aritmética da Oficina (nomes, parênteses e + - * /), nunca JS. Assim
+   reabrir a peça mostra a relação que garante cada encaixe, e não um número já
+   calculado fora do formato (ATRITOS-AUTORIA A-5).
    --------------------------------------------------------------------------- */
-const M = MEDIDAS;
-const discoMeia = M.discoEspessura / 2;                                      // meia espessura: a face do disco
-const pastilhaCostaX = discoMeia + M.folgaPastilha + M.pastilhaEspessura;    // costa da pastilha (onde o pistão/garra encostam)
-const pastilhaMeioX = discoMeia + M.folgaPastilha + M.pastilhaEspessura / 2; // centro da pastilha
-const garraMeioX = pastilhaCostaX + M.pincaParedeEspessura / 2;              // centro de cada garra
-
-/* O suporte é peça FIXA (parafusada na manga) e vive ao lado de duas peças que
-   GIRAM com a roda: o cubo (raio `cuboRaio`) e o chapéu do disco (raio
-   `chapeuRaio`, o maior dos dois). Peça fixa atravessando peça rotativa é
-   impossibilidade física, não simplificação didática — por isso a placa NÃO
-   começa num raio digitado à mão: ela começa acima do maior raio girante, com
-   `folgaSuporte`, e sobe o bastante para sustentar a garra interna inteira. As
-   duas restrições são as duas linhas abaixo, e não se pode satisfazer uma
-   quebrando a outra sem que o número mude. */
-const suporteBaseY = M.chapeuRaio + M.folgaSuporte;                          // livre do que gira
-const garraTopoY = M.pincaGarraBaseY + M.pincaGarraAltura;
-const suporteAltura = garraTopoY + M.suporteSobraGarra - suporteBaseY;       // cobre a garra inteira
-
 const DERIVADAS = {
-  discoX: -discoMeia,                                       // o disco fica centrado no plano da roda
-  chapeuX: -(discoMeia + M.chapeuProfundidade),
-  cuboX: -M.cuboRecuo,
+  discoX: '= -discoEspessura / 2',
+  chapeuX: '= -(discoEspessura / 2 + chapeuProfundidade)',
+  cuboX: '= -cuboRecuo',
 
-  pastilhaInternaX: -pastilhaMeioX,
-  pastilhaExternaX: pastilhaMeioX,
-  pastilhaMeioY: M.pastilhaBaseY + M.pastilhaAltura / 2,    // altura do centro da pastilha = eixo do pistão
+  pastilhaInternaX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2)',
+  pastilhaExternaX: '= discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2',
+  pastilhaMeioY: '= pastilhaBaseY + pastilhaAltura / 2',
 
-  pincaLargura: 2 * (pastilhaCostaX + M.pincaParedeEspessura),
-  pincaPonteY: M.discoRaio + M.folgaPonte,                  // a ponte passa POR CIMA do disco
-  pincaGarraInternaX: -garraMeioX,
-  pincaGarraExternaX: garraMeioX,
+  pincaLargura: '= 2 * (discoEspessura / 2 + folgaPastilha + pastilhaEspessura + pincaParedeEspessura)',
+  pincaPonteY: '= discoRaio + folgaPonte',
+  pincaGarraInternaX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura + pincaParedeEspessura / 2)',
+  pincaGarraExternaX: '= discoEspessura / 2 + folgaPastilha + pastilhaEspessura + pincaParedeEspessura / 2',
 
-  pistaoX: -(pastilhaCostaX + M.pistaoComprimento),         // nasce dentro da garra e termina na costa da pastilha
-  suportePlacaX: -(pastilhaCostaX + M.pincaParedeEspessura + M.suporteEspessura / 2),
-  suporteBaseY,
-  suporteAltura,
-  suporteOrelhaY: suporteBaseY + (suporteAltura - M.suporteOrelhaAltura) / 2,
-  suporteOrelhaZ: (M.suporteLargura + M.suporteOrelhaAvanco) / 2,
-  suporteOrelhaZNeg: -(M.suporteLargura + M.suporteOrelhaAvanco) / 2,
+  pistaoX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura + pistaoComprimento)',
+  suportePlacaX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura + pincaParedeEspessura + suporteEspessura / 2)',
+  suporteBaseY: '= chapeuRaio + folgaSuporte',
+  suporteAltura: '= pincaGarraBaseY + pincaGarraAltura + suporteSobraGarra - (chapeuRaio + folgaSuporte)',
+  suporteOrelhaY: '= (chapeuRaio + folgaSuporte) + ((pincaGarraBaseY + pincaGarraAltura + suporteSobraGarra - (chapeuRaio + folgaSuporte)) - suporteOrelhaAltura) / 2',
+  suporteOrelhaZ: '= (suporteLargura + suporteOrelhaAvanco) / 2',
+  suporteOrelhaZNeg: '= -(suporteLargura + suporteOrelhaAvanco) / 2',
 
-  /* pontas do flexível: os dois polos que fecham o tubo, recuados sobre a
-     própria tangente do caminho para não criar cúspide. */
-  flexivelPontaBocaX: CAMINHO_FLEXIVEL.flexivelBocaX + 0.006,
-  flexivelPontaBocaY: CAMINHO_FLEXIVEL.flexivelBocaY - 0.007,
-  flexivelPontaBocaZ: CAMINHO_FLEXIVEL.flexivelBocaZ - 0.009,
-  flexivelPontaUniaoX: CAMINHO_FLEXIVEL.flexivelUniaoX - 0.004,
-  flexivelPontaUniaoY: CAMINHO_FLEXIVEL.flexivelUniaoY + 0.010,
-  flexivelPontaUniaoZ: CAMINHO_FLEXIVEL.flexivelUniaoZ + 0.009,
+  flexivelPontaBocaX: '= flexivelBocaX + 0.006',
+  flexivelPontaBocaY: '= flexivelBocaY - 0.007',
+  flexivelPontaBocaZ: '= flexivelBocaZ - 0.009',
+  flexivelPontaUniaoX: '= flexivelUniaoX - 0.004',
+  flexivelPontaUniaoY: '= flexivelUniaoY + 0.010',
+  flexivelPontaUniaoZ: '= flexivelUniaoZ + 0.009',
 };
 
 /* Dimensionais: mudar qualquer valor aqui NÃO renumera a malha nem renomeia

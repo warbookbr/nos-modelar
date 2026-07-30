@@ -8,6 +8,7 @@
    de identidade depende só da POSIÇÃO do passo (bloco de BLOCO ids por índice),
    nunca dos valores de PARAMS — mudar `raio` não renumera; mudar `lados` (TOPO)
    renumera e os passos pendurados viram órfãos que GRITAM, nunca corrompem. */
+import { criarResolverNumerico } from './expressoes.js';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
 
@@ -2076,26 +2077,7 @@ export const OPS = {
 ---------------------------------------------------------------------------- */
 export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = []) {
   const dict = { ...PARAMS, ...TOPO };
-  const num = (v) => {
-    /* NaN/Infinity é LIXO, não número — e sem esta guarda vazava por TODA op
-       (achado adversarial do P4). Dois estragos, o segundo pior:
-       (a) num DIMENSIONAL vira coordenada NaN na malha com 0 órfãos (o
-           `lint-de-malha` do auditar ainda pega a jusante, mas sem dizer QUAL
-           passo errou);
-       (b) num TOPO degrada CALADO e NENHUM gate pega: `lados: NaN` -> `NaN|0`
-           = 0 -> `Math.max(3, 0)` = 3, então um cilindro de V=16/F=10 vira
-           V=6/F=5 com malha LIMPA — a peça salva muda de CONTAGEM (e todo id
-           de face dos passos seguintes passa a apontar pra outra face) sem
-           nada reclamar. Mesma classe do fail-open do D-115.
-       Throw (não grita) porque é a lei que o `num` já aplica pro resto do
-       lixo: valor que não é número não constrói "quase". */
-    if (typeof v === 'number') {
-      if (!Number.isFinite(v)) throw new Error(`oficina: valor numérico não-finito: ${v}`);
-      return v;
-    }
-    if (typeof v === 'string') { if (!(v in dict)) throw new Error(`oficina: parâmetro '${v}' não existe em PARAMS/TOPO`); return num(dict[v]); }
-    throw new Error(`oficina: valor numérico inválido: ${JSON.stringify(v)}`);
-  };
+  const { num } = criarResolverNumerico(dict);
   /* ponto 3D SEMPRE: sem a guarda de aridade, `[0,1]` passava e o z virava
      `undefined` -> NaN calado; não-array estourava `a.map is not a function`
      (throw cru, sem diagnóstico). Rede CENTRAL — a op ainda valida por conta

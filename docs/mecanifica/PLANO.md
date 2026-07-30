@@ -156,8 +156,7 @@ liberada: carroceria simplificada, registro de sistemas e galpão mínimo, sempr
 registrando os novos atritos de bancada e Oficina que ela revelar.
 
 Antes (ou junto) dela, as capacidades de autoria que a Rodada 1 justificou com
-evidência medida — em ordem de retrabalho observado: `derivarParametro` (A-5),
-`origem` para todo gerador (A-9), `encostar`/`alinhar` (A-4 e A-6), caixa por
-parte e escala na foto da bancada (A-13). Nenhuma delas é especulativa; todas
-saíram de dificuldade contada em
+evidência medida — `derivarParametro` (A-5) já está feito; seguem `origem` para
+todo gerador (A-9), `encostar`/`alinhar` (A-4 e A-6) e vetores autorais de
+explosão. Nenhuma delas é especulativa; todas saíram de dificuldade contada em
 [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).

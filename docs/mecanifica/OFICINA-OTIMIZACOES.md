@@ -294,7 +294,7 @@ pede rodada própria.
 (`num()`), nada mais. Passa a aceitar expressão aritmética sobre parâmetros
 nomeados.
 
-**Por que:** A-5. As 21 medidas derivadas do freio vivem num bloco JS no topo do
+**Por que:** A-5. As 23 medidas derivadas do freio vivem num bloco JS no topo do
 arquivo, isto é, **fora do envelope salvo** — quem reabrir pela Oficina vê 61
 números soltos e não sabe que 21 são consequência dos outros 40; mudar
 `folgaPastilha` pela interface não moveria a pastilha. No drone o sintoma é mais
@@ -307,6 +307,11 @@ deixa de ser comparável entre sistemas. É o preço de trazer a derivação par
 do formato.
 
 **Custo:** médio.
+
+**Estado (R3):** feito em `motor/expressoes.js`, com a forma explícita
+`'=nome / 2 + outro'`. O parser não executa JavaScript e recusa símbolo fora da
+gramática, referência ausente, ciclo e valor não-finito. O freio foi migrado sem
+mudar sua malha ou seus testes de encaixe.
 
 ### O-6 — `origem` em todo gerador
 
@@ -442,7 +447,7 @@ as anteriores continuam de pé.
 |---|---|---|---|
 | R1 | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
 | R2 | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito das 18 peças byte-idêntico |
-| R3 | O-5 | sim | as 21 derivadas do freio voltam para dentro do envelope |
+| R3 | O-5 | sim | concluída: as 23 derivadas do freio estão no envelope como expressões validadas |
 | R4 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade |
 | R5 | O-7 | sim | o freio perde os 16 passos de transporte |
 | R6 | O-13 | sim | prisioneiros do cubo e aletas do disco por arranjo radial, cada cópia endereçável por nome |

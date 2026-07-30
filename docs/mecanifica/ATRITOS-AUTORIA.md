@@ -86,7 +86,7 @@ navegador: só a Oficina para escrever e `npm run bancada` para olhar. Regra da
 rodada: **não consertar a ferramenta**, apenas contornar e registrar.
 
 Números da peça, para dar escala ao que vem abaixo: 52 passos, 13 primitivas,
-61 parâmetros (28 independentes, 12 nós do caminho da mangueira, 21 derivados),
+61 parâmetros (26 independentes, 12 nós do caminho da mangueira, 23 derivados),
 17 aliases, 8 partes, 180 faces, 0 órfãos, 0 faces sem identidade.
 
 ### Diário cru
@@ -142,7 +142,7 @@ existirem. Corrigi criando dois aliases por primitiva (`discoPistaInteira`,
 disso: 0 órfãos, 266 V, 180 F, contagem batendo com a conta feita no papel.
 
 **Coordenada chutada: quase nenhuma, e isso foi de propósito.** Não fiquei
-mexendo em número e conferindo na foto. Montei um bloco de 21 medidas
+mexendo em número e conferindo na foto. Montei um bloco de 23 medidas
 `DERIVADAS` em JS puro no topo do arquivo — `pastilhaInternaX =
 −(discoEspessura/2 + folgaPastilha + pastilhaEspessura/2)` — e deixei a
 aritmética garantir o encaixe. É o contorno para a falta de `encostar` e de
@@ -246,14 +246,14 @@ uma vez por primitiva. Vale para qualquer montagem mecânica, não só para frei
 
 **Onde dói:** linguagem da Oficina.
 
-**Evidência:** 21 dos 61 parâmetros da peça são derivados, e todos são
+**Evidência:** 23 dos 61 parâmetros da peça são derivados, e todos eram
 calculados em JS puro num bloco `DERIVADAS` no topo do arquivo, porque um passo
 só aceita nome de parâmetro ou número literal — não há como escrever
 `-($discoEspessura/2 + $folgaPastilha + $pastilhaEspessura/2)` onde ela é usada.
-O efeito colateral é sério: essas 21 medidas **não são editáveis pela Oficina**.
-Quem reabrir o arquivo pela ferramenta vê 61 números soltos e não sabe que 21
-deles são consequência dos outros 40 — e mudar `folgaPastilha` pela interface
-não moveria a pastilha.
+O efeito colateral era sério: essas 23 medidas **não eram editáveis pela
+Oficina**. Quem reabria o arquivo via 61 números soltos e não sabia quais eram
+consequência dos demais — e mudar `folgaPastilha` pela interface não moveria a
+pastilha.
 
 **Contorno:** o bloco `DERIVADAS`, com um comentário por linha dizendo qual
 encaixe cada derivada garante, e 7 testes que reprovam se a derivação romper.
@@ -262,6 +262,13 @@ encaixe cada derivada garante, e 7 testes que reprovam se a derivação romper.
 detectado (item 5 das regras do `AUTORIA-IA.md`), guardada no documento — de
 modo que a derivação seja formato salvo e não código de acompanhamento. É a
 capacidade mais reaproveitável desta rodada: nada nela sabe o que é um freio.
+
+**Estado (R3, O-5):** resolvido no núcleo com uma expressão explícita iniciada
+por `=`. Ela aceita somente números, nomes, parênteses e `+ - * /`; não usa
+`eval`, detecta ciclo e recusa valor não-finito. As 23 derivadas do freio agora
+estão no `PARAMS` salvo e os testes de integridade continuam verdes. O próximo
+atrito não é mais esconder aritmética: é conseguir expressar a intenção de
+contato (`encostar`, A-6).
 
 #### A-6 — `encostar` não existe, e a aritmética que o substitui é invisível
 

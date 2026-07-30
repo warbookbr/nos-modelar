@@ -78,6 +78,9 @@ Toda peça, de qualquer tipo, tem a mesma anatomia:
 
 Os passos citam os parâmetros por **nome** (`raio: 'troncoR'`, não `raio: 0.34`) —
 é isso que faz mudar um valor em `PARAMS` reconstruir o objeto inteiro.
+Quando a medida depende de outras, use expressão explícita com `=`:
+`raio: '=troncoR / 2 + folga'`. Só números, nomes, parênteses e `+ - * /` são
+aceitos; ciclos, nomes ausentes e resultado não-finito falham antes de construir.
 
 ## Onde está o resto
 

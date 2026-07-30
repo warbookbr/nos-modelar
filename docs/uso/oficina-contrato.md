@@ -213,6 +213,12 @@ Cinco coisas nesse formato merecem atenção.
 'troncoR'`, não `raio: 0.34`. É isso que faz mudar um valor em `PARAMS`
 reconstruir o objeto inteiro. Sem isso o arquivo seria só uma lista de números.
 
+Em qualquer argumento numérico, uma string que começa por `=` é uma expressão
+salva: `'=troncoR / 2 + folga'`. A gramática aceita somente números, nomes de
+`PARAMS`/`TOPO`, parênteses e `+ - * /`; não executa JavaScript, não acessa
+propriedades e recusa nome ausente, ciclo ou resultado não-finito. Nome sem `=`
+continua sendo a referência simples compatível (`'troncoR'`).
+
 **`PASSOS` é exportado.** Parece detalhe e não é: sem o export, a Oficina não
 consegue ler a lista de volta, e o arquivo salvo nunca mais reabre pra edição.
 
