@@ -81,6 +81,15 @@ verdade agora, `rumo/` é o que se pretende, `historico/` é o que se fez e o qu
 aprendeu). `CLAUDE.md`, na raiz, é o acordo de trabalho + as regras (jóias, determinismo,
 pt-BR) — sessão nova começa por ele e por este arquivo.
 
+### `docs/mecanifica/` — produto e integração
+
+- **`docs/mecanifica/VISAO.md`** — propósito do simulador mecânico e experiência pretendida para clientes.
+- **`docs/mecanifica/ARQUITETURA.md`** — fronteiras entre domínio, adaptador Three.js, cena e interação.
+- **`docs/mecanifica/PLANO.md`** — roteiro vigente e critérios de saída das fases da Mecanifica.
+- **`docs/mecanifica/AUTORIA-IA.md`** — contrato para a IA criar conteúdo com identidade semântica estável.
+- **`docs/mecanifica/UPSTREAM-NOS.md`** — separação das melhorias que podem voltar ao NÓS original.
+- **`docs/mecanifica/RELATORIO-PONTE-THREE.md`** — evidências e limites da primeira ponte entre a Oficina e Three.js.
+
 ### `docs/uso/` — verdade agora
 
 - **`docs/uso/RECURSOS.md`** — este arquivo: o índice único de comandos, bancadas, skills, agentes e docs.

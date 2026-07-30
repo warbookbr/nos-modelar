@@ -40,5 +40,5 @@ antecipação; um caso real dos freios escolherá o próximo trabalho.
 
 ## Veredito
 
-**APROVADA LOCALMENTE.** Falta apenas validar o artefato real no GitHub Pages
-depois que as mudanças forem publicadas.
+**APROVADA.** O mesmo artefato de produção foi publicado e validado no GitHub
+Pages em <https://warbookbr.github.io/nos-mecanifica/>.

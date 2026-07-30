@@ -36,7 +36,7 @@ próxima tarefa.
 - [x] validar desenvolvimento local e build;
 - [x] preparar o workflow do GitHub Pages;
 - [x] manter o Atelier acessível em `/legado/atelier/`;
-- [ ] validar a publicação real após o primeiro push.
+- [x] validar a publicação real após o primeiro push.
 
 **Critério de saída:** a mesma definição procedural produz um objeto visível,
 selecionável e identificável no Three.js sem depender de IDs do runtime.
@@ -106,5 +106,5 @@ reduza sua espessura” altera a definição existente sem regenerar o conjunto.
 
 ## Próximo passo
 
-Publicar e validar a Fase 1 no Pages. Em seguida, iniciar o galpão mínimo da
-Fase 2 sem ampliar o adaptador antes de um caso real exigir.
+Iniciar o galpão mínimo da Fase 2 sem ampliar o adaptador antes de um caso real
+exigir.

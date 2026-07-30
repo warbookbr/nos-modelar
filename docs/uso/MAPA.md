@@ -5,12 +5,14 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-142 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+155 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
+- `index.html` — index.html — entrada da nova aplicação Mecanifica; o Atelier herdado permanece em prototipos/fps/v3/.
+- `vite.config.js` — vite.config.js — build estático da Mecanifica para warbookbr/nos-mecanifica no GitHub Pages.
 - `vitest.config.ts` — Config do Vitest: cobre tools/** (núcleo do Atelier: som + oficina) — o gate npm test.
 
 ## .claude/agents/
@@ -72,6 +74,15 @@
 - `PORTALS_PROTOCOL.md` — Protocolo dos Portais — R6
 - `README.md` — Legado — os docs d'O Coração (o mundo 2D congelado)
 - `walkthrough_colaborador2.md` — Resumo de Alterações — Colaborador 2 (T5, T6, T8, T9)
+
+## docs/mecanifica/
+
+- `ARQUITETURA.md` — Arquitetura da Mecanifica
+- `AUTORIA-IA.md` — Autoria para IA
+- `PLANO.md` — Plano vigente da Mecanifica
+- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
+- `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
+- `VISAO.md` — Visão da Mecanifica
 
 ## docs/rumo/
 
@@ -160,6 +171,22 @@
 - `_passo.js` — PRESET-SOM _passo (Aba Som, S4) — a PISADA re-expressa como GRAFO de evento, com os NÚMEROS já tunados do `passo()`/`PISOS.grama` do motor/som.js. É o nível …
 - `_vento.js` — PRESET-SOM _vento (Aba Som, S4) — a RAJADA de vento re-expressa como GRAFO de evento, com os NÚMEROS tunados do vento do motor/som.js. Nível FÁCIL do vocabul…
 
+## src/
+
+- `main.js` — main.js — composição da prova Three.js: núcleo herdado -> adaptador neutro -> inspeção semântica.
+
+## src/autoria/
+
+- `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
+
+## src/cena/
+
+- `criar-cena.js` — criar-cena.js — cena industrial e infraestrutura Three.js da primeira prova da Mecanifica.
+
+## src/interacao/
+
+- `criar-inspecao.js` — criar-inspecao.js — seleção por raycast ligada à identidade semântica, nunca ao UUID do Three.js.
+
 ## tools/
 
 - `README.md` — tools/ — as ferramentas do Atelier
@@ -207,6 +234,10 @@
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
 - `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: a árvore do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
+
+## tools/mecanifica/
+
+- `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 
 ## tools/oficina/
 
