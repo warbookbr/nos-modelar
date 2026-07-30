@@ -66,16 +66,31 @@ imprecisa.
 
 **Objetivo:** criar o primeiro sistema mecânico por partes compreensíveis.
 
-- prancha de referência multivista;
-- disco, cubo, pinça, suporte, pistão, pastilhas e flexível;
-- hierarquia e encaixes semânticos;
-- materiais básicos;
-- vista montada e explodida;
-- revisão visual em vários ângulos;
-- medidas e testes de integridade.
+- [x] prancha de referência multivista
+  ([`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md));
+- [x] disco, cubo, pinça, suporte, pistão, pastilhas e flexível
+  (`prototipos/fps/v3/pecas/freio-disco.js`);
+- [x] encaixes semânticos — as quatro relações de contato são derivadas de
+  parâmetro e travadas por teste;
+- [ ] hierarquia — `f.parte` é uma lista PLANA; não há pai/filho
+  (ATRITOS-AUTORIA A-11);
+- [x] materiais básicos (7 materiais por parte);
+- [x] vista montada e explodida — a explodida só é legível até ≈0,12 e não
+  separa o miolo do freio (ATRITOS-AUTORIA A-12);
+- [x] revisão visual em vários ângulos (3 ortogonais + isométrica + seleções em
+  contexto);
+- [x] medidas e testes de integridade
+  (`tools/mecanifica/freio-disco-integridade.test.ts`, 7 casos).
 
 **Critério de saída:** outro agente localiza e altera qualquer componente pelo
 nome, sem procurar índices de vértices, faces ou objetos.
+
+**Estado:** ATENDIDO para localizar e alterar — 8 partes nomeadas, 17 aliases,
+180 faces com identidade, 0 órfãos, nenhum id de vértice/face/objeto no arquivo.
+A hierarquia navegável fica em aberto e depende de uma capacidade nova; ela não
+bloqueia a Fase 4, mas bloqueia a árvore de sistemas da apresentação. As
+dificuldades da rodada, com as capacidades que elas justificam, estão em
+[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) (A-4 a A-14).
 
 ## Fase 4 — contexto do veículo e galpão mínimo
 
@@ -127,6 +142,12 @@ reduza sua espessura” altera a definição existente sem regenerar o conjunto.
 
 ## Próximo passo
 
-Usar a bancada aprovada para criar a prancha multivista e o primeiro conjunto
-paramétrico do freio a disco. O galpão e a carroceria entram depois que houver
-um sistema real para contextualizar.
+O freio a disco existe e está validado na bancada, então a Fase 4 está
+liberada: carroceria simplificada, registro de sistemas e galpão mínimo.
+
+Antes (ou junto) dela, as capacidades de autoria que a Rodada 1 justificou com
+evidência medida — em ordem de retrabalho observado: `derivarParametro` (A-5),
+`origem` para todo gerador (A-9), `encostar`/`alinhar` (A-4 e A-6), caixa por
+parte e escala na foto da bancada (A-13). Nenhuma delas é especulativa; todas
+saíram de dificuldade contada em
+[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).

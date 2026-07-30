@@ -34,12 +34,18 @@ mudança para um fork verdadeiro de `brigsd/nos`.
 | ID | Capacidade | Estado | Evidência | Valor para o NÓS |
 |---|---|---|---|---|
 | UP-001 | Identidade semântica sem dependência de posição do passo | observada | O formato herdado ainda usa blocos `posição × 1000`; uma corrida registrou 234 órfãos | Inserir ou reordenar operações sem quebrar referências |
-| UP-002 | Relações espaciais declarativas (`alinhar`, `centralizar`, `encostar`) | observada | A autoria herdada não expressa “encoste A em B” | Compor objetos por intenção, sem calcular coordenadas manualmente |
-| UP-003 | Expressões validadas entre parâmetros | observada | Passos aceitam nomes simples, mas não relações gerais entre parâmetros | Reduzir números duplicados e permitir refinamento paramétrico |
+| UP-002 | Relações espaciais declarativas (`alinhar`, `centralizar`, `encostar`) | observada | A autoria herdada não expressa “encoste A em B”; no freio a disco os 4 contatos viraram soma de espessuras e só um teste guarda a intenção (ATRITOS-AUTORIA A-6) | Compor objetos por intenção, sem calcular coordenadas manualmente |
+| UP-003 | Expressões validadas entre parâmetros | observada | Passos aceitam nomes simples, mas não relações gerais entre parâmetros; 21 dos 61 parâmetros do freio são derivados em JS fora do envelope e ficam ineditáveis pela Oficina (ATRITOS-AUTORIA A-5) | Reduzir números duplicados e permitir refinamento paramétrico |
 | UP-004 | Verificação de cobertura de nomes agregados | observada | O drone mostrou que um nome pode resolver menos elementos do que promete sem falha técnica | Evitar semântica aparentemente válida, porém incompleta |
 | UP-005 | Adaptador neutro para grafos de cena | provada | O drone herdado foi convertido em 23 partes selecionáveis; teste headless e build passaram | Tornar explícita a separação entre autoria e renderizador |
 | UP-006 | Gate para faces sem identidade + seleções estruturais no drone | provada | A bancada encontrou 6 faces da lente sem nome e 6 classificadas como pouso; a correção por `origemId` zerou ambas | Impedir que seleções espaciais sobrepostas corrompam nomes sem gerar órfãos |
 | UP-007 | Mapa determinístico entre Windows e Linux | provada | Normalização CRLF/LF e ordenação por ponto de código fecharam o CI nos dois ambientes | Evitar mapas diferentes conforme o sistema operacional |
+| UP-008 | `origem` estrutural em TODO gerador | observada | O freio a disco mediu: só `cubo`, `cilindro`, `lathe` e `loft` publicam origem; `chamferBox` responde `op de origem 'chamferBox' desconhecida` e deixa 26 faces sem identidade (ATRITOS-AUTORIA A-9) | Metade do vocabulário de geradores hoje não é endereçável por nome, e a forma da peça passa a ser escolhida pela ferramenta |
+| UP-009 | Posicionar/orientar na criação da primitiva | observada | 16 dos 52 passos do freio a disco só transportam primitivas da origem até o lugar (ATRITOS-AUTORIA A-4) | Tirar 30% de burocracia de qualquer montagem com eixo diferente de Y |
+| UP-010 | Alias de conjunto resolvido tarde (ou diagnóstico de completude) | observada | 6 órfãos na 1ª execução do freio: alias citado antes da última primitiva que o compõe existir (ATRITOS-AUTORIA A-7) | O autor pensa em conjuntos; a ferramenta exige ordem de construção |
+| UP-011 | Parâmetro de tipo ponto (e caminho) | observada | 18 dos 61 parâmetros do freio existem só para nomear 6 pontos do caminho da mangueira (ATRITOS-AUTORIA A-8) | Qualquer peça com trajeto — cabo, tubo, correia, trilho |
+| UP-012 | Hierarquia pai/filho de partes | observada | O freio expõe 8 partes irmãs e não sabe dizer que a pastilha mora na pinça (ATRITOS-AUTORIA A-11) | Regra 3 do contrato de autoria; navegação de montagem em qualquer projeto |
+| UP-013 | Relato de caixa por parte e escala na inspeção headless | observada | 4 leituras de PNG do freio para responder "o eixo está em X?"; a resposta veio de medição feita fora da bancada (ATRITOS-AUTORIA A-13) | Inspeção headless sem escala obriga perícia de pixel; vale para qualquer inspetor 3D |
 
 ## UP-005 — fronteira de renderização provada
 

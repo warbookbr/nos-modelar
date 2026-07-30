@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-169 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+172 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -85,6 +85,7 @@
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `PLANO.md` — Plano vigente da Mecanifica
+- `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -164,6 +165,7 @@
 - `caixa-ferramentas.js` — CAIXA-FERRAMENTAS — peça nova (medição da linguagem da Oficina hoje, sessão de agente limpo): objeto pequeno de segurar na mão — corpo, tampa, alça em arco, …
 - `casa-toras.js` — PEÇA: casa-toras — a cabana de toras aprovada pelo ideador (D-54f). Toras VERTICAIS castanho-mel (tons reais, D-54f), janelas-ABERTURA com moldura+cruzeta+du…
 - `drone-inspecao.js` — PEÇA MÉDIA DA FASE 4 — drone quadricóptero compacto de inspeção. PASSOS é a fonte de verdade: o corpo, a tampa, os quatro braços, os quatro rotores, as pás, …
+- `freio-disco.js` — PRIMEIRO SISTEMA MECÂNICO DA MECANIFICA (Fase 3) — freio a disco dianteiro direito, paramétrico e por partes semânticas: `disco`, `cubo`, `pinca`, `suporte`,…
 - `ilha-chao.js` — PEÇA: ilha-chao — o primeiro retalho de CHÃO do v3 (port da natureza v2). Ilha flutuante NA ESCALA DA V2 (o mundo é uma grade 64×64 tiles; a ilha tem ~56 uni…
 - `lanterna.js` — PEÇA: uma LANTERNA DE MÃO — corpo cilíndrico (cabo), cabeça mais larga, lente (material emissivo), um interruptor (cubo embutido na lateral) e uma alça de pe…
 - `moto.js` — moto — MOTOCICLETA FUTURISTA ESTILIZADA, 100% em PASSOS (nenhuma linha de geometria em JS: `construir` é só `executar`).
@@ -254,6 +256,7 @@
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `drone-semantica.test.ts` — drone-semantica.test.ts — regressão do cilindro da lente e do trem de pouso do drone.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
+- `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `olhar-bancada.mjs` — olhar-bancada.mjs — o OLHO DA BANCADA: dirige `bancada.html` headless pela URL e salva PNG por vista, para que uma sessão sem navegador possa inspecionar o q…
 
 ## tools/oficina/

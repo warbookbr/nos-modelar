@@ -15,14 +15,17 @@ aplicação nova em Three.js.
 
 Estado atual:
 
-- as fases 0, 1 e 2 estão concluídas;
+- as fases 0, 1, 2 e 3 estão concluídas (a hierarquia navegável de partes ficou
+  em aberto na fase 3, por falta de capacidade no núcleo);
 - a ponte para Three.js e a bancada de inspeção estão publicadas;
 - a bancada provou seleção semântica, isolamento, contexto fantasma, vistas
   reproduzíveis e explosão automática;
 - o drone herdado foi usado para encontrar e corrigir um defeito real de
   identidade e forma no trem de pouso;
-- o próximo trabalho é a fase 3: referência multivista e conjunto paramétrico do
-  freio a disco.
+- o freio a disco dianteiro existe como conjunto paramétrico por partes
+  semânticas, com prancha multivista e testes de integridade;
+- o próximo trabalho é a fase 4 (contexto do veículo e galpão mínimo) e as
+  capacidades de autoria que a rodada do freio justificou.
 
 O estado detalhado e os critérios de saída ficam em
 [`docs/mecanifica/PLANO.md`](PLANO.md). Se este resumo divergir do plano, o
@@ -42,11 +45,13 @@ Use esta ordem para resolver dúvidas:
    autoria visual e experiência do cliente;
 5. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-6. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+6. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+   ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
+7. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-7. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+8. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-8. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+9. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
    evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -62,6 +67,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 | Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
 | Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
+| Mexer no freio a disco | [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
 | Trabalhar na bancada ou apresentação | [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
 | Alterar o núcleo herdado | [`docs/uso/oficina-contrato.md`](../uso/oficina-contrato.md) e [`docs/uso/oficina-referencia.md`](../uso/oficina-referencia.md) |
 | Preparar contribuição ao NÓS | [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) |
@@ -143,10 +149,13 @@ Algumas ferramentas específicas do Atelier estão catalogadas em
 
 ## Próxima entrega
 
-Criar a prancha de referência multivista do freio a disco e modelar o primeiro
-conjunto paramétrico por partes semânticas: disco, cubo, pinça, suporte, pistão,
-pastilhas e flexível. O galpão e a carroceria entram depois que esse sistema
-existir e estiver validado na bancada.
+Fase 4: carroceria externa simplificada, registro de sistemas selecionáveis e
+galpão mínimo, usando o freio a disco como primeiro sistema real a contextualizar.
+
+Em paralelo, as capacidades de autoria justificadas pela rodada do freio —
+`derivarParametro`, `origem` em todo gerador, `encostar`/`alinhar` e o relato de
+caixa por parte na bancada. A lista com evidência está em
+[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 ## Manutenção desta documentação
 
