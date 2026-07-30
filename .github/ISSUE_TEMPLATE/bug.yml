@@ -1,0 +1,30 @@
+name: Relatar problema
+description: Informe um erro na experiência, autoria, build ou documentação
+title: "Problema: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a melhorar a Mecanifica.
+  - type: textarea
+    id: ocorrido
+    attributes:
+      label: O que aconteceu?
+      description: Conte o que você viu e o que esperava que acontecesse.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Como reproduzir?
+      description: Inclua passos, página, navegador e dispositivo quando forem relevantes.
+    validations:
+      required: true
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: Evidências
+      description: Screenshots, vídeos, mensagens de erro ou outras informações úteis.
+    validations:
+      required: false

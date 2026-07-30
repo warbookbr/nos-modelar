@@ -1,31 +1,57 @@
-# NÓS — Harness do Projeto
+# Mecanifica — acordo de trabalho
 
-**Leitura obrigatória:** [`docs/rumo/NORTE.md`](docs/rumo/NORTE.md) define o objetivo maior do NÓS e o método para decidir sua evolução; [`docs/rumo/PLANO.md`](docs/rumo/PLANO.md) define as fases, critérios e sinais de parada vigentes. Leia ambos antes de propor, planejar ou executar uma rodada.
+Este repositório usa o Atelier v3 do NÓS como base experimental para construir a
+Mecanifica: uma oficina 3D interativa que explica sistemas automotivos a clientes.
 
-Você está trabalhando no **NÓS**: um metaverso que roda 100% dentro do GitHub (o código é o jogo, o Pages é o cliente). A frente ATIVA — e hoje a única deste repositório — é o **Atelier (v3)**.
+## Leitura obrigatória
 
-## O Atelier (v3) — a frente de desenvolvimento
+Antes de planejar ou implementar uma rodada, leia:
 
-O cliente em primeira pessoa (WebGL/GPU) + a **Oficina** (criar objeto e som), em `prototipos/fps/v3/`. **Autocontido** — não importa nada de fora de `v3/`. **Segue as skills `.claude/skills/nos-fluxo` + `oficina` (e `criar-peca` pra CRIAR conteúdo — objeto/som/animação) e os agents `game-builder`/`revisor-adversarial`.** O índice de TODAS as ferramentas/bancadas, com exemplos: `docs/uso/RECURSOS.md`. As DUAS jóias (`render.js` + `motor/som.js`) só mudam **aditivas / no-op quando desligadas**, provadas byte-idênticas; três camadas (núcleo → adaptador → interface); prova por **MEDIÇÃO**, não no olho; vai direto pra `main` (branch `wip/` → ff-merge). Roteiro vigente: `docs/rumo/PLANO.md` — o roteiro já mudou de arquivo antes (`docs/oficina.md` → `docs/historico/playground.md` → `docs/historico/TETO.md` → `docs/rumo/PLANO.md`); quem for atrás do histórico segue essa cadeia.
+1. `docs/mecanifica/VISAO.md`
+2. `docs/mecanifica/PLANO.md`
+3. `docs/mecanifica/ARQUITETURA.md`
+4. `docs/mecanifica/AUTORIA-IA.md`
+5. `docs/mecanifica/UPSTREAM-NOS.md`
 
-> **História:** o primeiro mundo foi **O Coração** — um metaverso 2D em pixel art que pulsava por tick (Actions) e recebia comandos por issue. Ele foi CONGELADO e migrou pro [`brigsd/nos-mentes`](https://github.com/brigsd/nos-mentes) — decisões D-109/D-110 —, e o 2D foi removido FISICAMENTE deste repo na D-111. **O 2D não está mais neste repositório, nem no histórico dele** (a `main` do `nos` tem zero commits tocando `site/`/`engine/`/`world/` — raiz diferente). Ele vive INTEIRO no `nos-mentes`, em dois níveis: as demos jogáveis na `main` de lá (Clareira + Miragem, no Pages), e o **código-fonte** — `site/`, `engine/`, `world/`, o tick, o `art-mcp` de pixel art, os sprites de origem e os 6 agents daquela frente — nas branches `era-2d/*` (D-141). Se um dia voltar, é de lá que se traz.
+Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
+à base herdada do NÓS. Consulte-os quando tocar no código legado, mas não os use
+como roteiro de produto da Mecanifica.
 
-## Acordo de trabalho
+## Fronteiras
 
-Tiago (`brigsd`) é o **ideador**: dono da visão, do rumo e do escopo. Você (Claude) é o **coder**: dono da integridade do código, das decisões técnicas e dos merges. Faça as chamadas técnicas e mescle o que estiver revisado e verde — não traga implementação nem merge para aprovação dele. Pare e consulte-o apenas em decisões de **produto** (o que o jogo deve ser, mudança de rumo/escopo, algo irreversível de verdade).
+- `prototipos/fps/v3/` é o Atelier legado e deve permanecer executável durante a
+  migração.
+- O novo produto nasce em módulos próprios, sem acrescentar mais responsabilidades
+  ao `jogo.html` legado.
+- O núcleo de autoria não pode importar Three.js nem conhecer freios, carros ou
+  interface. Renderização e domínio entram por adaptadores.
+- Regras automotivas não viram operações geométricas. Uma necessidade como
+  “encostar a pastilha no disco” deve produzir uma capacidade geral como
+  `encostar`, reutilizável fora da Mecanifica.
 
-## Regras
+## Regras de autoria
 
-- Tudo em **pt-BR**: texto de jogo, comentários de código, nomes de arquivo/símbolo e mensagens de commit (a prática real do repo — `esfera`, `_torno.js`, commits PT-BR). O ID do modelo NUNCA em commit/PR/artefato.
-- **Determinismo:** nada de `Date.now()`/`Math.random()` cru — tempo e semente vêm do contexto (a peça, no v3).
-- Toda decisão importante entra em `docs/historico/DECISIONS.md` (índice + detalhe; histórico em `docs/historico/DECISIONS-ARCHIVE.md`) — não re-discuta sem fato novo.
-- Textos de jogo seguem `docs/uso/LORE.md` — consistência narrativa é inegociável.
-- Nada de servidores fora do GitHub, nada de pay-to-win, nada de cripto/NFT (`docs/rumo/VISION.md`).
+- IDs internos do Three.js, índices de arrays e posição de passos nunca são
+  referências persistidas.
+- Toda parte relevante recebe identidade semântica estável.
+- Referência inválida, ambígua ou vazia falha com diagnóstico; nunca vira no-op
+  silencioso.
+- Conteúdo salvo deve ser determinístico, versionado, reexecutável e validável.
+- Uma crítica deve poder alterar a peça existente sem regenerá-la inteira.
+- `Date.now()` e `Math.random()` crus não entram em artefatos reproduzíveis.
 
-## Agentes — `.claude/agents/`
+## Trabalho que pode voltar ao NÓS
 
-**`game-builder`** (constrói o v3, em sonnet) e **`revisor-adversarial`** (quebra a mudança por risco antes do merge, em opus). Mantém o D-24 (coder sonnet, revisor opus); **D-106** reduziu de 6 pra 2 e pôs o DOMÍNIO (som/animação/geometria/pintura) nas **skills** que o builder carrega — não num agent por assunto (uma peça é modelada+pintada+animada+com som ao mesmo tempo). `docs/uso/RECURSOS.md` indexa scripts e bancadas.
+Mudanças gerais de autoria ficam isoladas de Three.js e da Mecanifica, com testes
+headless e commits próprios. Toda capacidade candidata é registrada em
+`docs/mecanifica/UPSTREAM-NOS.md`, incluindo dependências, provas e instruções de
+extração.
 
-## Ao encerrar
+## Qualidade
 
-Registre a decisão em `docs/historico/DECISIONS.md` + marque o checklist do roteiro (`docs/oficina.md`).
+- Texto, nomes de domínio e documentação em pt-BR.
+- Mudança de comportamento vem acompanhada de teste proporcional ao risco.
+- Trabalho visual é conferido no navegador em mais de um enquadramento.
+- Testes verdes não substituem inspeção visual; inspeção visual não substitui
+  determinismo e validação.
+- Atualize o roteiro e o registro upstream quando uma rodada mudar o estado real.

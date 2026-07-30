@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- index.html — entrada da nova aplicação Mecanifica; o Atelier herdado permanece em prototipos/fps/v3/. -->
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Mecanifica — simulador 3D interativo para explicar sistemas automotivos."
+    />
+    <meta name="theme-color" content="#07110f" />
+    <title>Mecanifica — oficina interativa</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="cena" aria-label="Visualização tridimensional interativa"></canvas>
+
+      <header class="barra">
+        <a class="marca" href="./" aria-label="Mecanifica — início">
+          <span class="marca-sinal" aria-hidden="true">M</span>
+          <span>
+            <strong>Mecanifica</strong>
+            <small>oficina interativa</small>
+          </span>
+        </a>
+        <span class="fase"><i></i> prova de arquitetura</span>
+      </header>
+
+      <main>
+        <section class="apresentacao" aria-labelledby="titulo">
+          <p class="sobretitulo">NÚCLEO PROCEDURAL × THREE.JS</p>
+          <h1 id="titulo">Uma peça que a IA consegue <em>entender</em>.</h1>
+          <p>
+            Esta primeira ponte traz o drone herdado do NÓS para a nova camada
+            visual. Cada componente nomeado continua selecionável sem depender
+            do ID interno do renderizador.
+          </p>
+          <div class="acoes">
+            <button id="btnExplorar" class="primaria" type="button">Explorar a peça</button>
+            <a id="linkLegado" class="secundaria" href="#">Abrir Atelier legado</a>
+          </div>
+        </section>
+
+        <aside class="inspetor" aria-live="polite">
+          <div class="inspetor-topo">
+            <span class="rotulo">COMPONENTE</span>
+            <button id="btnLimpar" type="button" aria-label="Limpar seleção">×</button>
+          </div>
+          <strong id="parteNome">Nenhuma peça selecionada</strong>
+          <p id="parteDescricao">Clique no modelo ou escolha uma parte abaixo.</p>
+          <div id="partes" class="partes" aria-label="Partes disponíveis"></div>
+        </aside>
+
+        <div class="ajuda">
+          <span><b>arraste</b> para girar</span>
+          <span><b>role</b> para aproximar</span>
+          <span><b>clique</b> para identificar</span>
+        </div>
+      </main>
+
+      <div id="erro" class="erro" role="alert" hidden></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

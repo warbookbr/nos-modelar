@@ -1,39 +1,71 @@
-# NÓS
+# Mecanifica
 
-## Jogar
+Simulador 3D interativo para explicar, de forma visual, como sistemas automotivos
+funcionam, por que falham e o que pode acontecer quando um reparo é adiado.
 
-- ▶ **[Atelier](https://brigsd.github.io/nos/fps/v3/jogo.html)** — o cliente em primeira pessoa (WebGL) + a **[Oficina](https://brigsd.github.io/nos/fps/v3/oficina.html)** (criar objeto e som — abre pelo menu do jogo, tecla ESC, ou direto no link). A frente viva, em construção.
+O primeiro módulo será um sistema de freio a disco dianteiro dentro de uma oficina
+navegável. A pessoa poderá inspecionar as peças, separar o conjunto, comparar
+estados de desgaste e acompanhar explicações orientadas ao cliente.
 
-Roda direto no navegador do **PC ou do celular**, sem instalar nada. 🌍
+## Estado
 
-> O mundo 2D que veio antes é um trabalho à parte, congelado, e mora em
-> **[`brigsd/nos-mentes`](https://github.com/brigsd/nos-mentes)**.
+O projeto está no início da transição. Este repositório nasceu como uma cópia do
+[`brigsd/nos`](https://github.com/brigsd/nos) e ainda contém o Atelier v3 completo
+em `prototipos/fps/v3/`. Essa base permanece executável enquanto construímos a
+nova aplicação em Three.js.
 
----
+O NÓS ainda é um projeto experimental. Seu núcleo de autoria procedural é uma
+fonte valiosa, mas não é tratado aqui como uma fundação pronta. Em especial, a
+identidade de partes e a dependência de IDs posicionais ainda precisam evoluir
+para que uma IA consiga criar e refinar modelos complexos com segurança.
 
-**NÓS** é um metaverso que roda **inteiramente dentro do GitHub**, sem servidor próprio: o repositório guarda o jogo e o GitHub Pages o publica. A frente em desenvolvimento é o **Atelier**: um cliente em primeira pessoa (WebGL) com a **Oficina**, onde se cria cada objeto e cada som direto no navegador. Um objeto não é salvo como malha pronta: o arquivo guarda a lista de operações que o constrói. Dá para ler essa lista, mudar qualquer passo dela e reconstruir o objeto.
+## Direção
 
-## História — O Coração
+- Three.js como camada visual e de interação.
+- Geometria e simulações descritas por dados estruturados.
+- Identidades semânticas persistentes, sem IDs internos como linguagem da IA.
+- Funcionamento inteiramente estático no GitHub Pages.
+- Núcleo de autoria independente do domínio automotivo e do renderizador.
+- Melhorias gerais preparadas para possível contribuição ao NÓS original.
 
-O primeiro mundo do NÓS foi **O Coração**: um metaverso 2D em pixel art que rodava sozinho dentro do GitHub —
+Leituras principais:
 
-- 🗄️ o repositório era o banco de dados (o mundo feito de commits),
-- ❤️ o GitHub Actions era o coração (a cada batida/tick o tempo passava, com ou sem jogadores),
-- 🖥️ o GitHub Pages era a janela, e
-- ✉️ as issues eram as cartas (os jogadores agiam sobre o mundo por elas).
+- [`docs/mecanifica/VISAO.md`](docs/mecanifica/VISAO.md)
+- [`docs/mecanifica/ARQUITETURA.md`](docs/mecanifica/ARQUITETURA.md)
+- [`docs/mecanifica/PLANO.md`](docs/mecanifica/PLANO.md)
+- [`docs/mecanifica/AUTORIA-IA.md`](docs/mecanifica/AUTORIA-IA.md)
+- [`docs/mecanifica/UPSTREAM-NOS.md`](docs/mecanifica/UPSTREAM-NOS.md)
 
-Ele pulsou por ~250 batidas e hoje está **congelado** no [`nos-mentes`](https://github.com/brigsd/nos-mentes), ao lado das mentes-IA d'A Clareira — as demos jogáveis (**Clareira** 2D + **Miragem** raycaster) e também o código-fonte daquela era, nas branches `era-2d/*`. A ideia de **federação** — cada criador com seu repo, tick e Pages próprios, entrando na rede por um pull request — fica guardada ali como visão.
+## Base herdada
 
-## Para quem quer mexer no projeto
+Para executar a nova aplicação:
 
-- [`docs/oficina.md`](docs/oficina.md) — o roteiro do Atelier: a Oficina de objeto + som, passo a passo.
-- [`CLAUDE.md`](CLAUDE.md) — as regras de trabalho: as duas jóias (`render.js` / `motor/som.js`), as três camadas e a prova por medição.
-- [`docs/historico/DECISIONS.md`](docs/historico/DECISIONS.md) — o registro de toda decisão do projeto.
+```bash
+npm ci
+npm run dev
+```
 
-## Como contribuir
+O endereço local é `http://localhost:5173/nos-mecanifica/`. Para gerar a versão
+estática usada pelo Pages:
 
-O NÓS é coletivo por natureza. A frente aberta é o Atelier; issues com ideias são bem-vindas.
+```bash
+npm run build
+```
 
-## Licença
+Para executar somente o Atelier herdado:
 
-Este projeto é [MIT](LICENSE) — use, copie e modifique à vontade. Se ele te ajudar em algo público, um crédito ao NÓS é bem-vindo.
+```bash
+npm run servir
+```
+
+Depois, abra `http://localhost:8080/jogo.html`.
+
+Os documentos em `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS
+herdado. Eles continuam úteis como referência técnica e histórica, mas não
+definem o rumo da Mecanifica.
+
+## Licença e origem
+
+O código herdado do NÓS e as mudanças deste projeto permanecem sob a licença
+[MIT](LICENSE). O histórico Git original foi preservado, e o remoto `source`
+acompanha `brigsd/nos` para facilitar comparação e contribuições futuras.

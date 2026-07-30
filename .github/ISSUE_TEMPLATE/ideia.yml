@@ -1,0 +1,31 @@
+name: Propor melhoria
+description: Sugira uma experiência, capacidade de autoria ou melhoria técnica
+title: "Ideia: "
+labels: ["melhoria"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Que problema isso resolve?
+      description: Descreva a necessidade antes da solução.
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: Explique a mudança e como alguém perceberia que ela funcionou.
+    validations:
+      required: true
+  - type: dropdown
+    id: alcance
+    attributes:
+      label: Alcance principal
+      options:
+        - Experiência para o cliente
+        - Conteúdo mecânico
+        - Autoria por IA
+        - Renderização e desempenho
+        - Ferramentas e documentação
+    validations:
+      required: true

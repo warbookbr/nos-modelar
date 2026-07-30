@@ -1,14 +1,16 @@
-name: Deploy Atelier to Pages
+name: Deploy Mecanifica no Pages
 
-# Publica SÓ o Atelier (o cliente v3 + a Oficina) em /fps/v3/, preservando a URL.
-# As demos (Clareira 2D + Miragem raycaster) migraram pro brigsd/nos-mentes (D-110);
-# o mundo 2D (site/, engine/, world/) não é mais publicado daqui.
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'prototipos/fps/v3/**'
-      - '.github/workflows/pages.yml'
+      - "index.html"
+      - "src/**"
+      - "prototipos/fps/v3/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.js"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 concurrency:
@@ -31,26 +33,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Montar o site (só o Atelier, em /fps/v3/)
-        run: |
-          mkdir -p _site/fps/v3
-          cp -R prototipos/fps/v3/. _site/fps/v3/
-          touch _site/.nojekyll
-          cat > _site/index.html <<'HTML'
-          <!doctype html>
-          <html lang="pt-BR"><head><meta charset="utf-8">
-          <meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>NÓS — Atelier</title>
-          <meta http-equiv="refresh" content="0; url=./fps/v3/jogo.html">
-          <style>body{background:#0b0e14;color:#cdd3e0;font:15px/1.6 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px}a{color:#a884f3}</style>
-          </head><body><p>NÓS — Atelier. Indo pro <a href="./fps/v3/jogo.html">jogo</a>… · <a href="https://brigsd.github.io/nos-mentes/">demos (Clareira / Miragem)</a></p></body></html>
-          HTML
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Upload Pages artifact
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Construir Mecanifica
+        run: npm run build
+
+      - name: Preservar Atelier legado
+        run: |
+          mkdir -p dist/legado/atelier
+          cp -R prototipos/fps/v3/. dist/legado/atelier/
+          touch dist/.nojekyll
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
 
-      - name: Deploy to GitHub Pages
+      - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
