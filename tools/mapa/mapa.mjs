@@ -98,7 +98,13 @@ function gerar() {
     if (!porPasta.has(pasta)) porPasta.set(pasta, []);
     porPasta.get(pasta).push({ nome: path.basename(rel), resumo });
   }
-  const pastas = [...porPasta.keys()].sort((a, b) => (a === '.' ? -1 : b === '.' ? 1 : a.localeCompare(b)));
+  // Ordem por pontos de código, não pela locale do SO: localeCompare colocava
+  // pastas em ordens diferentes no Windows local e no Linux do CI.
+  const pastas = [...porPasta.keys()].sort((a, b) => {
+    if (a === '.') return -1;
+    if (b === '.') return 1;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
   const L = [];
   L.push('# MAPA — a árvore do NÓS, arquivo por arquivo');
   L.push('');
