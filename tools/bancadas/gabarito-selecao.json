@@ -1,5 +1,5 @@
 {
-  "hashTotal": "1d4c75c748bb5450f8e986a672e375dc3ba74660bce7741aeb5a71dcabc5d500",
+  "hashTotal": "dbfd63afa582b7b85251958806f00262c6866d69dc9bf7c4ef5253b4873a5f74",
   "pecas": {
     "_corpo": {
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
@@ -82,7 +82,7 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "fa0bcc85bb9d135ffc1f182fb92196d5bb6cb5e1c7b2c005ac4a79b980ebe1d6",
+      "hash": "89981a6e2484d42e912ddcc8974a65c62a3edaec3517b016fb730e5dc08e4e13",
       "vertices": 266,
       "faces": 180
     },

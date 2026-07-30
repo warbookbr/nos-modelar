@@ -13,7 +13,7 @@ import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
-import { caixaDaParte } from '../../src/autoria/descrever-partes.js';
+import { caixaDaParte, corposDaParte, descreverPeca } from '../../src/autoria/descrever-partes.js';
 
 const PARTES = [
   'disco', 'cubo', 'pinca', 'suporte',
@@ -110,6 +110,68 @@ describe('integridade do freio a disco', () => {
     const pinca = caixa('pinca');
     perto(suporte.max[0], pinca.min[0]);
     expect(suporte.min[0]).toBeLessThan(pinca.min[0]);
+  });
+
+  /* As asserções acima afirmam COORDENADA (`perto(pistao.max[0], interna.min[0])`)
+     e por isso passam verdes por construção: elas repetem a fórmula da peça em
+     vez de julgar a montagem. As três abaixo afirmam RELAÇÃO, medida corpo a
+     corpo pela mesma régua do `npm run descrever`, e é essa régua que acusou
+     peça fixa atravessando peça rotativa em código já shipado. */
+  const relacoes = () => {
+    const { neutro } = montar();
+    const mapa = new Map<string, any>();
+    for (const r of descreverPeca(neutro).relacoes) mapa.set(`${r.a}~${r.b}`, r);
+    return mapa;
+  };
+
+  it('nenhuma peça FIXA atravessa peça que GIRA com a roda', () => {
+    const P = freio.PARAMS;
+    const r = relacoes();
+    /* o suporte é parafusado na manga de eixo; o cubo e o disco giram com a
+       roda. Interpenetração aqui não é montagem apertada, é impossibilidade
+       física — e uma demonstração que existe para ensinar o freio ensinaria
+       errado. A folga vem do parâmetro, não de um número digitado no teste. */
+    for (const par of ['cubo~suporte', 'disco~suporte']) {
+      expect([par, r.get(par).tipo]).toEqual([par, 'folga']);
+    }
+    /* o chapéu é o maior raio que gira ao lado da placa: é ele que decide */
+    perto(r.get('disco~suporte').distancia, P.folgaSuporte);
+    expect(r.get('cubo~suporte').distancia).toBeGreaterThan(P.folgaSuporte);
+  });
+
+  it('o suporte continua sustentando a garra interna inteira, e não só a evitando', () => {
+    const P = freio.PARAMS;
+    /* a placa é escolhida pelo que ela É — o único corpo do suporte que cruza o
+       plano central do eixo; as duas orelhas ficam nos lados. Nada de índice. */
+    const noPlanoCentral = corposDaParte(montar().neutro, 'suporte')
+      .filter((c: any) => c.min[2] <= 0 && c.max[2] >= 0);
+    expect(noPlanoCentral).toHaveLength(1);
+    const [placa] = noPlanoCentral;
+    const garraTopo = P.pincaGarraBaseY + P.pincaGarraAltura;
+
+    // afastar a placa do eixo não pode soltar a pinça no ar: a placa cobre toda
+    // a faixa radial da garra que ela ancora, nos dois extremos
+    expect(placa.min[1]).toBeLessThanOrEqual(P.pincaGarraBaseY);
+    expect(placa.max[1]).toBeGreaterThanOrEqual(garraTopo);
+    perto(placa.max[1] - garraTopo, P.suporteSobraGarra);
+    // e continua encostada atrás dela, sustentando de fato
+    expect(relacoes().get('pinca~suporte').tipo).toBe('encosta');
+  });
+
+  it('as sobreposições que RESTAM são montagem, e cada uma tem um porquê mecânico', () => {
+    const r = relacoes();
+    /* Registradas como intencionais para que a próxima rodada não as "conserte":
+       o pistão mora no alojamento da garra; a mangueira entra na pinça pelo
+       banjo; o cubo fica dentro do chapéu porque nem o chapéu tem cavidade nem
+       o disco tem furo central neste modelo — e o flange precisa atravessar o
+       plano do disco para chegar à roda. */
+    for (const par of ['pinca~pistao', 'flexivel~pinca', 'cubo~disco']) {
+      expect([par, r.get(par).tipo]).toEqual([par, 'interpenetra']);
+    }
+    // e nenhum outro par se invade
+    const invasores = [...r.values()].filter((x: any) => x.tipo === 'interpenetra')
+      .map((x: any) => `${x.a}~${x.b}`).sort();
+    expect(invasores).toEqual(['cubo~disco', 'flexivel~pinca', 'pinca~pistao']);
   });
 
   it('o conjunto é determinístico: a mesma entrada dá a mesma malha', () => {

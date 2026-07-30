@@ -62,9 +62,9 @@ const MEDIDAS = {
 
   // suporte: a placa de ancoragem que prende a pinça à manga de eixo
   suporteEspessura: 0.020,
-  suporteAltura: 0.112,
   suporteLargura: 0.100,
-  suporteBaseY: 0.046,
+  folgaSuporte: 0.006,         // vão entre a placa FIXA e o maior raio que GIRA ao lado dela (o chapéu)
+  suporteSobraGarra: 0.010,    // quanto a placa passa do topo da garra que ela sustenta
   suporteOrelhaAltura: 0.036,  // as duas orelhas parafusadas na manga
   suporteOrelhaAvanco: 0.046,
 
@@ -95,6 +95,18 @@ const pastilhaCostaX = discoMeia + M.folgaPastilha + M.pastilhaEspessura;    // 
 const pastilhaMeioX = discoMeia + M.folgaPastilha + M.pastilhaEspessura / 2; // centro da pastilha
 const garraMeioX = pastilhaCostaX + M.pincaParedeEspessura / 2;              // centro de cada garra
 
+/* O suporte é peça FIXA (parafusada na manga) e vive ao lado de duas peças que
+   GIRAM com a roda: o cubo (raio `cuboRaio`) e o chapéu do disco (raio
+   `chapeuRaio`, o maior dos dois). Peça fixa atravessando peça rotativa é
+   impossibilidade física, não simplificação didática — por isso a placa NÃO
+   começa num raio digitado à mão: ela começa acima do maior raio girante, com
+   `folgaSuporte`, e sobe o bastante para sustentar a garra interna inteira. As
+   duas restrições são as duas linhas abaixo, e não se pode satisfazer uma
+   quebrando a outra sem que o número mude. */
+const suporteBaseY = M.chapeuRaio + M.folgaSuporte;                          // livre do que gira
+const garraTopoY = M.pincaGarraBaseY + M.pincaGarraAltura;
+const suporteAltura = garraTopoY + M.suporteSobraGarra - suporteBaseY;       // cobre a garra inteira
+
 const DERIVADAS = {
   discoX: -discoMeia,                                       // o disco fica centrado no plano da roda
   chapeuX: -(discoMeia + M.chapeuProfundidade),
@@ -111,7 +123,9 @@ const DERIVADAS = {
 
   pistaoX: -(pastilhaCostaX + M.pistaoComprimento),         // nasce dentro da garra e termina na costa da pastilha
   suportePlacaX: -(pastilhaCostaX + M.pincaParedeEspessura + M.suporteEspessura / 2),
-  suporteOrelhaY: M.suporteBaseY + (M.suporteAltura - M.suporteOrelhaAltura) / 2,
+  suporteBaseY,
+  suporteAltura,
+  suporteOrelhaY: suporteBaseY + (suporteAltura - M.suporteOrelhaAltura) / 2,
   suporteOrelhaZ: (M.suporteLargura + M.suporteOrelhaAvanco) / 2,
   suporteOrelhaZNeg: -(M.suporteLargura + M.suporteOrelhaAvanco) / 2,
 

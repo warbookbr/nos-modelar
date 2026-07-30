@@ -112,9 +112,9 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `pistaoRaio` | 0,020 | raio do pistão |
 | `pistaoComprimento` | 0,016 | avanço do pistão |
 | `suporteEspessura` | 0,020 | espessura da placa de ancoragem |
-| `suporteAltura` | 0,112 | altura radial da placa |
 | `suporteLargura` | 0,100 | largura da placa em Z |
-| `suporteBaseY` | 0,046 | raio onde a placa começa |
+| `folgaSuporte` | 0,006 | vão entre a placa fixa e o maior raio que gira ao lado dela |
+| `suporteSobraGarra` | 0,010 | quanto a placa passa do topo da garra que sustenta |
 | `suporteOrelhaAltura` | 0,036 | altura das orelhas de parafuso |
 | `suporteOrelhaAvanco` | 0,046 | quanto cada orelha avança em Z |
 | `flexivelRaio` | 0,005 | raio da mangueira |
@@ -142,6 +142,8 @@ independente arrasta todas as dependentes:
 | `pincaPonteY` | `discoRaio` + `folgaPonte` | a ponte passa por cima do disco sem tocar |
 | `pistaoX` | −(costa da pastilha + `pistaoComprimento`) | o pistão termina exatamente na costa da pastilha interna |
 | `suportePlacaX` | −(costa da pastilha + `pincaParedeEspessura` + `suporteEspessura`/2) | a placa encosta atrás da garra interna |
+| `suporteBaseY` | `chapeuRaio` + `folgaSuporte` | a placa é FIXA e começa acima de tudo que GIRA com a roda |
+| `suporteAltura` | topo da garra + `suporteSobraGarra` − `suporteBaseY` | a placa cobre a garra interna inteira, sustentando-a |
 | `suporteOrelhaY`, `suporteOrelhaZ` | centralização da orelha na placa | as duas orelhas ficam simétricas |
 | `flexivelPontaBocaX/Y/Z`, `flexivelPontaUniaoX/Y/Z` | recuo sobre a tangente do caminho | os polos fecham o tubo sem criar cúspide no loft |
 
