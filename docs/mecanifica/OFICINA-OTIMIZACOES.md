@@ -130,8 +130,12 @@ uma pergunta geométrica trivial, e a resposta veio de uma medição em Node **f
 da bancada. Foto não tem escala nem gnômon de eixo. Julgar seleção relacional
 (O-8) por foto seria repetir o erro sobre uma mudança bem mais arriscada.
 
-**Trade-off:** nenhum relevante — é ferramenta, não formato. Exige apenas saída
-determinística, para virar teste.
+**Trade-off:** não altera formato, mas a leitura de relação tem escopo. Caixa,
+centro e dimensão servem para qualquer objeto; `folga`/`encosta`/`interpenetra`
+por caixa de corpo é uma régua para pares de uma montagem rígida. Não deve virar
+gate de qualidade para malha orgânica, deformável ou propositalmente sobreposta.
+Nesses casos ela é relatório de geometria, e a validade depende de uma métrica
+própria (continuidade, curvatura, silhueta ou pose), não de uma folga positiva.
 
 **Custo:** baixo, e menor do que parecia: a função `caixa(parte)` de
 `tools/mecanifica/freio-disco-integridade.test.ts` já faz a medição headless a
@@ -467,10 +471,12 @@ as anteriores continuam de pé.
 6. **Fechar o registro.** Ao terminar, mover o atrito correspondente para "Atritos
    resolvidos" em `ATRITOS-AUTORIA.md` com a evidência, e atualizar o estado da
    linha em `UPSTREAM-NOS.md`.
-7. **A peça de prova é o freio a disco.** É a fixture de referência: tem 8 partes,
-   0 id cru, 0 face sem identidade e 7 testes de integridade que medem contato por
-   nome de parte. Toda capacidade nova se prova reescrevendo um pedaço dele e
-   mostrando que os testes continuam verdes.
+7. **A peça de prova é o freio a disco.** É a fixture de referência para montagem
+   rígida: tem 8 partes, 0 id cru, 0 face sem identidade e testes de integridade
+   que medem contato por nome de parte. Toda capacidade nova de montagem se prova
+   reescrevendo um pedaço dele e mostrando que os testes continuam verdes. Antes
+   de extrair uma régua geométrica para uso geral, acrescente também uma prova não
+   mecânica ou documente que ela é opt-in para montagem rígida.
 
 ### Onde R2 encosta na bancada
 

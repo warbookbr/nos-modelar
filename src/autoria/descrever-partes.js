@@ -11,6 +11,14 @@
    Consumidores: o CLI `tools/mecanifica/descrever-peca.mjs` (`npm run descrever`)
    e o painel de diagnóstico da bancada — uma verdade só sobre a mesma medida.
 
+   ESCOPO: caixa, dimensão e componentes conexos são observações geométricas
+   gerais. Já os rótulos `folga`, `encosta` e `interpenetra` formam uma régua de
+   MONTAGEM RÍGIDA, calibrada no freio a disco: um par só pode ser reprovado se
+   sua relação funcional esperada estiver declarada. Não é gate universal para
+   objetos orgânicos, deformáveis ou propositalmente sobrepostos (pele, folhas,
+   pelos, roupas, músculos). Nesses casos a caixa ainda orienta inspeção, mas
+   contato exige regra própria de topologia, superfície, silhueta ou pose.
+
    UMA medida só de relação, medida entre CORPOS. Um corpo é um componente
    conexo da parte (faces ligadas por vértice compartilhado): o `disco` tem dois
    corpos — a pista e o chapéu que recua para dentro —, a `pinca` tem três — a

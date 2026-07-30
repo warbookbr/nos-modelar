@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /* id-cru.mjs — o gate do O-4 (docs/mecanifica/OFICINA-OTIMIZACOES.md): REPROVA
  * peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
  *
