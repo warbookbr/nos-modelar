@@ -28,6 +28,7 @@ Os números da rodada do freio a disco sustentam isso:
 | passos que só transportam primitiva da origem até o lugar | 16 de 52 (31%) |
 | parâmetros derivados calculados fora do envelope salvo | 21 de 61 |
 | geradores que publicam `origem` endereçável | 4 de 8 |
+| passos que repetem uma forma já escrita antes na lista | 43 de 52 (83%) |
 | leituras de PNG para responder "o eixo está em X?" | 4, nenhum defeito achado |
 | linhas do núcleo lidas antes da primeira linha da peça | ≈500 |
 | iterações gastas escrevendo a geometria em si | 1 |
@@ -57,6 +58,31 @@ Nenhum atrito de autoria fica sem plano:
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
+O-13 e O-14 saíram da validação deste plano contra o código, descrita abaixo.
+
+## Validação contra o código
+
+Este plano foi conferido linha por linha contra `motor/oficina.js` e as 18 peças
+do repositório. Resultado: os números se sustentam, com uma correção e dois itens
+novos.
+
+**Medido e confirmado.** 52 passos e 16 de transporte (31%) no freio, em medição
+de runtime — a contagem por texto acha 0 `rotaciona` porque um helper local os
+gera, e é a medição de runtime que vale. 61 parâmetros, 17 aliases.
+`CONTRATOS_ORIGEM` tem exatamente 4 geradores (`cubo`, `cilindro`, `lathe`,
+`loft`) mais a transformação `espelha`. `num()` aceita só número ou nome de
+parâmetro. Os 7 seletores. `f.parte` string plana. Alias sem encadeamento,
+resolvido na citação. A skill sem nenhuma menção a `ALIASES`, `sel:{alias}` ou
+`unir`.
+
+**Uma afirmação estava errada** e o O-1 abaixo já está corrigido: `adaptarThree`
+**não** calcula caixa por parte — ele calcula caixa por *malha*, via Three.js, que
+é o lado errado da fronteira para uma ferramenta headless. O bloco reaproveitável
+existe em outro lugar: a função `caixa(parte)` de
+`tools/mecanifica/freio-disco-integridade.test.ts` calcula a caixa a partir do
+neutro, sem Three. O O-1 é sobretudo **extração**, não construção.
+
+**Dois itens novos:** O-13 (repetição) e O-14 (ops fora da rede do gabarito).
 
 ---
 
@@ -107,7 +133,11 @@ da bancada. Foto não tem escala nem gnômon de eixo. Julgar seleção relaciona
 **Trade-off:** nenhum relevante — é ferramenta, não formato. Exige apenas saída
 determinística, para virar teste.
 
-**Custo:** baixo. O `adaptarThree` já calcula caixa por parte.
+**Custo:** baixo, e menor do que parecia: a função `caixa(parte)` de
+`tools/mecanifica/freio-disco-integridade.test.ts` já faz a medição headless a
+partir do neutro. O trabalho é **extrair** aquilo para um módulo neutro e
+consumi-lo do CLI e do painel da bancada. Não usar o `adaptarThree` para isso é
+deliberado: a caixa dele é por malha e depende de Three.js.
 
 ### O-2 — reatribuir `parte` passa a gritar
 
@@ -130,6 +160,13 @@ nunca é exercido, então o diagnóstico é de graça.
 **O que muda:** `sel.regiao` só seleciona face quando **todos** os vértices estão
 na caixa (`f.vs.every(dentro)`); face meio dentro é silenciosamente ignorada.
 Entra `modo`, com `contem` como padrão.
+
+**A validação achou o argumento mais forte:** o mesmo seletor já se comporta de
+duas maneiras. Vértice entra se estiver dentro; face só entra se **toda** ela
+estiver dentro. Ou seja, `regiao` já é `toca` para vértice e `contem` para face —
+uma op de vértice e uma op de face com a mesma caixa selecionam conjuntos
+diferentes, e nada no formato diz isso. `modo` não inventa comportamento novo:
+torna explícito o que já existe implícito.
 
 **Por que:** é a origem clássica do ciclo "alarga a caixa, refotografa". O efeito
 apareceu na rodada de forma indireta e pior: o freio não usa `regiao` **nenhuma
@@ -173,6 +210,27 @@ alias **tarde** (exigir completude apenas no fim da lista) é mudança de semân
 do formato salvo e fica para a Faixa 3, se a mensagem não bastar.
 
 **Custo:** baixo na versão diagnóstico.
+
+### O-14 — quatro ops ficam fora da rede do gabarito
+
+**O que muda:** `apagaFace`, `moveA`, `moveF` e `vira` não são usadas por
+**nenhuma** das 18 peças do repositório. Ou se prova cada uma numa peça, ou se
+remove do vocabulário.
+
+**Por que:** o `gabarito:selecao:check` é a rede que garante que mudança no núcleo
+não altera resultado de peça shipada — e ele só cobre o que as peças exercitam.
+Essas quatro ops têm teste unitário (`vira` tem bastante), mas nenhuma passa pela
+prova de byte-identidade. Numa rodada que mexe no núcleo, são o ponto cego — e as
+rodadas R3 a R9 mexem todas no núcleo.
+
+**Trade-off:** provar custa uma peça de exercício por op; remover é mais barato mas
+descarta capacidade útil (`apagaFace` é a única forma de abrir um vão, e `vira`
+conserta normal invertida). Recomendo **provar `apagaFace` e `vira`** — as duas têm
+uso mecânico previsível, e furo é justamente o que falta ao freio — e decidir sobre
+`moveA`/`moveF` depois, à luz do O-8: parte do que elas fazem à mão é o que a
+restrição relacional passa a fazer sozinha.
+
+**Custo:** baixo.
 
 ---
 
@@ -273,6 +331,34 @@ do plano: entra depois do O-1, validada por medição, e com revisão adversaria
 
 **Custo:** alto.
 
+### O-13 — repetição não existe, e mecânica é feita de repetição
+
+**O que muda:** não há nenhuma operação de arranjo. O único mecanismo de repetição
+do núcleo é `espelha`, que resolve simetria de duas vias e nada mais. Entram
+arranjo radial e linear, com identidade própria por cópia.
+
+**Por que:** foi o achado da validação, e não está no relato da rodada — nem eu
+nem o agente havíamos listado. Em toda peça substancial do repositório, entre 65% e
+89% dos passos repetem uma forma já escrita antes (drone: 90 de 101; freio: 43 de
+52). O número é limite superior, porque a medida compara op mais chaves de
+argumento e dois `pincel` diferentes contam como repetição — mas o padrão
+qualitativo é inequívoco: os 4 braços do drone são 4 blocos idênticos de 5 passos,
+e as 2 orelhas de parafuso do suporte do freio estão escritas duas vezes.
+
+O que isso custou de verdade aparece no que **não** foi modelado: o cubo do freio
+não tem prisioneiro de roda e o disco não tem aleta de ventilação. São círculo de
+parafusos e arranjo radial — a figura mais comum de peça mecânica, e a que sai
+mais caro à mão. Um freio didático sem prisioneiro é uma escolha da ferramenta,
+não do assunto, exatamente como em A-9.
+
+**Trade-off:** o risco é gerar cópia anônima. Cada instância precisa de identidade
+endereçável, senão o arranjo devolve faces sem nome e desfaz o que O-6 conquista.
+O molde já existe no próprio núcleo: `espelha` publica `origem` com `{op, id, de}`,
+apontando para a fonte. Um arranjo deve seguir esse contrato, com índice de cópia
+na identidade. **Por isso O-13 vem depois de O-6 e O-12**, não antes.
+
+**Custo:** médio-alto.
+
 ### O-9 — parâmetro de tipo ponto e caminho
 
 **O que muda:** só se nomeia escalar. 18 dos 61 parâmetros do freio existem para
@@ -306,13 +392,14 @@ as anteriores continuam de pé.
 | rodada | itens | toca formato salvo | prova de saída |
 |---|---|---|---|
 | R1 | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
-| R2 | O-1, O-2, O-3, O-4, O-11 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; gabarito byte-idêntico |
+| R2 | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito das 18 peças byte-idêntico |
 | R3 | O-5 | sim | as 21 derivadas do freio voltam para dentro do envelope |
 | R4 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade |
 | R5 | O-7 | sim | o freio perde os 16 passos de transporte |
-| R6 | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
-| R7 | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
-| R8 | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
+| R6 | O-13 | sim | prisioneiros do cubo e aletas do disco por arranjo radial, cada cópia endereçável por nome |
+| R7 | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
+| R8 | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
+| R9 | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
 
 ### Regras que valem para toda rodada
 
@@ -330,7 +417,7 @@ as anteriores continuam de pé.
 4. **Prova mensurável, não foto.** A partir de R2 existe `descrever`; de R2 em
    diante a prova de cada rodada é número, e a foto passa a ser conferência
    secundária.
-5. **Revisão adversarial** em R6 obrigatoriamente, e em qualquer rodada que mude a
+5. **Revisão adversarial** em R7 obrigatoriamente, e em qualquer rodada que mude a
    semântica de referência existente. Medição objetiva de interface dispensa.
 6. **Fechar o registro.** Ao terminar, mover o atrito correspondente para "Atritos
    resolvidos" em `ATRITOS-AUTORIA.md` com a evidência, e atualizar o estado da
@@ -359,3 +446,5 @@ de diagnóstico da bancada — evita duas verdades sobre a mesma medida.
   não da autoria — está em `BANCADA-E-APRESENTACAO.md`.
 - **Fazer O-7 e O-8 na mesma rodada.** Resolvem a mesma dor em níveis diferentes;
   juntos, a rodada não sabe qual dos dois provou o quê.
+- **Arranjo (O-13) antes de `origem` universal (O-6/O-12).** Repetir sem identidade
+  por cópia produz face anônima em escala — desfaria o ganho, em vez de somar.
