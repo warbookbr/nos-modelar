@@ -412,6 +412,58 @@ h2 {
 
 .rodape b { color: #26352e; }
 
+.referencia-metrica {
+  position: fixed;
+  z-index: 5;
+  bottom: 47px;
+  left: 50%;
+  display: grid;
+  gap: 5px;
+  min-width: 165px;
+  transform: translateX(-50%);
+  color: #33433b;
+  font: 650 8px/1.15 ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.referencia-metrica > span:first-child {
+  color: #53655d;
+}
+
+.regua-metrica {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 7px;
+}
+
+.regua-metrica i {
+  position: relative;
+  display: block;
+  width: 88px;
+  height: 6px;
+  border-right: 1px solid #33433b;
+  border-bottom: 1px solid #33433b;
+  border-left: 1px solid #33433b;
+}
+
+.regua-metrica i::before,
+.regua-metrica i::after {
+  position: absolute;
+  bottom: -1px;
+  width: 1px;
+  height: 4px;
+  background: #33433b;
+  content: '';
+}
+
+.regua-metrica i::before { left: 50%; }
+.regua-metrica i::after { right: 25%; }
+
+.regua-metrica output { color: #26352e; }
+
 .aviso,
 .erro {
   position: fixed;
@@ -518,6 +570,7 @@ h2 {
   .acoes-inspecao { grid-column: 1 / -1; margin: 0; }
   .diagnostico { display: none; }
   .rodape { display: none; }
+  .referencia-metrica { bottom: 46px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

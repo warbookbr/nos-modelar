@@ -5,6 +5,7 @@ import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
 import {
+  alvosDeEnquadramento,
   escreverEstadoNaUrl,
   lerEstadoDaUrl,
   VISTAS_BANCADA,
@@ -71,6 +72,10 @@ async function iniciar() {
   const explosao = document.getElementById('explosao');
   const valorExplosao = document.getElementById('valorExplosao');
   const btnFocar = document.getElementById('btnFocarSelecao');
+  const eixosReferencia = document.getElementById('eixosReferencia');
+  const barraReferencia = document.getElementById('barraReferencia');
+  const valorReferencia = document.getElementById('valorReferencia');
+  let quadroReferencia = 0;
 
   function salvarEstadoNaUrl(estado) {
     if (inicializando) return;
@@ -115,10 +120,29 @@ async function iniciar() {
     salvarEstadoNaUrl(estado);
   }
 
+  function atualizarReferenciaMetrica() {
+    const referencia = ambiente.referenciaMetrica();
+    const medidas = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1];
+    const metros = medidas.reduce((melhor, candidata) => (
+      Math.abs(candidata * referencia.pixelsPorMetro - 88)
+        < Math.abs(melhor * referencia.pixelsPorMetro - 88) ? candidata : melhor
+    ), medidas[0]);
+    const pixels = Math.round(metros * referencia.pixelsPorMetro);
+    eixosReferencia.textContent = referencia.eixos;
+    barraReferencia.style.width = `${Math.min(128, Math.max(42, pixels))}px`;
+    valorReferencia.textContent = `${referencia.aproximada ? '≈ ' : ''}${metros < 1 ? `${metros * 100} cm` : '1 m'} · ${Math.round(referencia.pixelsPorMetro)} px/m`;
+    quadroReferencia = requestAnimationFrame(atualizarReferenciaMetrica);
+  }
+
   controlador = criarControladorPartes({
     raiz: convertido.raiz,
     partes: convertido.partes,
     aoMudar: refletirEstado,
+    aoEstabilizarExplosao() {
+      /* A câmera da montagem fechada corta a explosão. Esperar a animação
+         terminar evita que ela persiga cada quadro e enquadra a caixa real. */
+      ambiente.enquadrar(controlador.gruposVisiveis());
+    },
   });
 
   for (const nome of controlador.nomes) {
@@ -161,7 +185,15 @@ async function iniciar() {
 
   function focarSelecao() {
     const grupos = controlador.gruposSelecionados();
-    ambiente.enquadrar(grupos.length ? grupos : [convertido.raiz]);
+    ambiente.enquadrar(alvosDeEnquadramento({
+      raiz: convertido.raiz,
+      selecionados: grupos,
+      modo: controlador.modo,
+    }));
+  }
+
+  function enquadrarMontagem() {
+    ambiente.enquadrar(alvosDeEnquadramento({ raiz: convertido.raiz, alvo: 'montagem' }));
   }
 
   const selecao3d = criarSelecaoBancada({
@@ -195,7 +227,7 @@ async function iniciar() {
     salvarEstadoNaUrl(controlador.estado());
   });
 
-  document.getElementById('btnEnquadrar').addEventListener('click', focarSelecao);
+  document.getElementById('btnEnquadrar').addEventListener('click', enquadrarMontagem);
   document.getElementById('btnFocarSelecao').addEventListener('click', focarSelecao);
   document.getElementById('btnLimpar').addEventListener('click', () => controlador.limpar());
   for (const [modo, botao] of Object.entries(botoesModo)) {
@@ -229,7 +261,7 @@ async function iniciar() {
       btnProjecao.click();
     } else if (evento.code === 'KeyF') {
       evento.preventDefault();
-      focarSelecao();
+      enquadrarMontagem();
     } else if (evento.code === 'KeyI' && controlador.selecionadas.length) {
       evento.preventDefault();
       controlador.definirModo('isolar');
@@ -256,6 +288,7 @@ async function iniciar() {
   inicializando = false;
   refletirEstado(controlador.estado());
   atualizarBotoesVista();
+  atualizarReferenciaMetrica();
 
   if (selecaoIgnorada.length) {
     mostrarAviso(
@@ -277,6 +310,7 @@ async function iniciar() {
     projecao: (projecao) => ambiente.definirProjecao(projecao),
     explosao: (valor) => controlador.definirExplosao(valor),
     focar: () => focarSelecao(),
+    enquadrar: () => enquadrarMontagem(),
     estado: () => ({
       peca: nomePeca,
       ...controlador.estado(),
@@ -291,6 +325,7 @@ async function iniciar() {
     selecao3d.destruir();
     controlador.destruir();
     ambiente.destruir();
+    cancelAnimationFrame(quadroReferencia);
   }, { once: true });
 }
 

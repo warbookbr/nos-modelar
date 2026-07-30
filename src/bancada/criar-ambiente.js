@@ -206,6 +206,33 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     perspectiva.updateProjectionMatrix();
     ajustarOrtografica();
   }
+
+  /* A régua da interface não tenta medir a perspectiva por pixel com precisão
+     metrológica; ela declara a escala local no plano do alvo. Em ortográfica ela
+     é exata, e em perspectiva é uma aproximação explícita e útil para revisão. */
+  function referenciaMetrica() {
+    const altura = Math.max(1, canvas.clientHeight);
+    const metrosPorPixel = projecaoAtual === 'ortografica'
+      ? (ortografica.top - ortografica.bottom) / altura
+      : (2 * camera.position.distanceTo(controls.target)
+        * Math.tan(THREE.MathUtils.degToRad(perspectiva.fov / 2))) / altura;
+    const eixos = {
+      frontal: 'X horizontal · Y vertical · Z profundidade',
+      traseira: 'X horizontal · Y vertical · Z profundidade',
+      direita: 'Z horizontal · Y vertical · X profundidade',
+      esquerda: 'Z horizontal · Y vertical · X profundidade',
+      superior: 'X horizontal · Z vertical · Y profundidade',
+      inferior: 'X horizontal · Z vertical · Y profundidade',
+      isometrica: 'X / Y / Z em perspectiva',
+      livre: 'X / Y / Z em perspectiva',
+    };
+    return {
+      metrosPorPixel,
+      pixelsPorMetro: 1 / Math.max(metrosPorPixel, 1e-9),
+      aproximada: projecaoAtual === 'perspectiva',
+      eixos: eixos[vistaAtual] ?? eixos.isometrica,
+    };
+  }
   const observador = new ResizeObserver(redimensionar);
   observador.observe(canvas);
   redimensionar();
@@ -241,6 +268,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     definirVista,
     definirProjecao,
     enquadrar,
+    referenciaMetrica,
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

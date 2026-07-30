@@ -42,7 +42,7 @@
         <button type="button" data-vista="inferior"><span>Inferior</span><kbd>⇧7</kbd></button>
         <button type="button" data-vista="isometrica" class="ativa"><span>Iso</span><kbd>0</kbd></button>
         <button id="btnProjecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
-        <button id="btnEnquadrar" type="button"><span>Enquadrar</span><kbd>F</kbd></button>
+        <button id="btnEnquadrar" type="button"><span>Enquadrar tudo</span><kbd>F</kbd></button>
       </nav>
 
       <aside class="painel painel-partes" aria-labelledby="tituloPartes">
@@ -103,6 +103,11 @@
         <span><b>Duplo clique</b> focar peça</span>
         <span><b>URL</b> preserva o estado</span>
       </footer>
+
+      <div class="referencia-metrica" aria-label="Referência espacial da vista">
+        <span id="eixosReferencia">Eixos X / Y / Z</span>
+        <span class="regua-metrica"><i id="barraReferencia"></i><output id="valorReferencia">Escala</output></span>
+      </div>
 
       <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
       <div id="erro" class="erro" role="alert" hidden></div>

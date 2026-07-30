@@ -185,7 +185,8 @@ try {
       }
       if (focar) {
         console.log(
-          'atenção: --focar aproxima a seleção, mas o enquadramento AINDA NÃO entra na URL.'
+          `atenção: --focar ${modo === 'contexto' ? 'preserva a montagem no enquadramento' : 'enquadra a seleção'},`
+          + ' mas o recorte AINDA NÃO entra na URL.'
           + '\n         quem abrir o endereço abaixo verá a peça inteira, não este recorte.',
         );
       }

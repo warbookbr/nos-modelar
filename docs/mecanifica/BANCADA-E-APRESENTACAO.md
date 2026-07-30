@@ -21,12 +21,18 @@ A bancada precisa oferecer, para qualquer peça ou montagem:
 2. vistas frontal, traseira, direita, esquerda, superior, inferior e
    isométrica;
 3. projeções perspectiva e ortográfica;
-4. enquadramento do conjunto ou apenas da seleção;
+4. enquadramento separado do conjunto e da seleção, sem apagar seleção;
 5. seleção múltipla pela árvore ou pela cena;
 6. montagem opaca, contexto fantasma e isolamento;
-7. explosão suave;
-8. diagnóstico de faces sem identidade;
-9. estado completo reproduzível pela URL.
+7. explosão suave e enquadrada pela caixa já explodida;
+8. régua de escala e legenda dos eixos da vista para a conferência visual;
+9. diagnóstico de faces sem identidade;
+10. estado completo reproduzível pela URL.
+
+No modo isolado, a árvore preserva qual parte está selecionada, mas a malha
+visível conserva o material original: tingir a única peça da tela sabotaria a
+inspeção de acabamento. No modo contexto, focar mantém a montagem no cálculo da
+caixa para que a aproximação não transforme o restante em névoa sem orientação.
 
 Atalhos:
 
@@ -37,7 +43,7 @@ Atalhos:
 | superior / inferior | `7` / `Shift+7` |
 | isométrica | `0` |
 | perspectiva / ortográfica | `5` |
-| enquadrar seleção | `F` |
+| enquadrar montagem | `F` |
 | isolar / contexto | `I` / `G` |
 | limpar seleção | `Esc` |
 
@@ -53,7 +59,9 @@ permite que outra pessoa ou IA veja exatamente a mesma composição.
 
 Na bancada, uma explosão radial determinística é um bom padrão de diagnóstico:
 funciona imediatamente para qualquer objeto e ajuda a descobrir peças
-sobrepostas.
+sobrepostas. Ao terminar a transição, a câmera enquadra a caixa das partes
+visíveis já afastadas; uma explosão não pode sair cortada só porque a câmera foi
+calculada para a montagem fechada.
 
 Na apresentação ao cliente, os vetores devem ser autorais. Uma pinça precisa
 afastar-se pelo eixo que libera o disco; uma pastilha deve sair pelo caminho de

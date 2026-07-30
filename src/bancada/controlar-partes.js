@@ -59,7 +59,7 @@ function aplicarEstadoMaterial(material, estado) {
   material.needsUpdate = true;
 }
 
-export function criarControladorPartes({ raiz, partes, aoMudar }) {
+export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExplosao }) {
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   const permitidos = new Set(nomes);
   const bases = new Map();
@@ -128,6 +128,7 @@ export function criarControladorPartes({ raiz, partes, aoMudar }) {
       explosao = explosaoAlvo;
       aplicarExplosao();
       aoMudar?.(estado());
+      aoEstabilizarExplosao?.(estado());
       return;
     }
     const quadro = () => {
@@ -136,6 +137,7 @@ export function criarControladorPartes({ raiz, partes, aoMudar }) {
       aplicarExplosao();
       aoMudar?.(estado());
       if (explosao !== explosaoAlvo) animacaoExplosao = requestAnimationFrame(quadro);
+      else aoEstabilizarExplosao?.(estado());
     };
     animacaoExplosao = requestAnimationFrame(quadro);
   }
@@ -179,6 +181,9 @@ export function criarControladorPartes({ raiz, partes, aoMudar }) {
     },
     gruposSelecionados() {
       return selecionadas.map((nome) => partes.get(nome)).filter(Boolean);
+    },
+    gruposVisiveis() {
+      return nomes.map((nome) => partes.get(nome)).filter((grupo) => grupo?.visible);
     },
     estado,
     destruir() {

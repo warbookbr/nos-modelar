@@ -175,6 +175,8 @@ Algumas ferramentas específicas do Atelier estão catalogadas em
 
 Fase 4: carroceria externa simplificada, registro de sistemas selecionáveis e
 galpão mínimo, usando o freio a disco como primeiro sistema real a contextualizar.
+Cada corte também registra dificuldades observadas na bancada ou na Oficina antes
+de propor novas capacidades gerais.
 
 Em paralelo, as capacidades de autoria justificadas pela rodada do freio —
 `derivarParametro`, `origem` em todo gerador, `encostar`/`alinhar` e o relato de

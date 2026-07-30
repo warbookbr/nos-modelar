@@ -56,11 +56,22 @@ export function estadoVisualDasPartes(partes, selecionadas, modo = 'todas') {
   const modoSeguro = MODOS.has(modo) ? modo : 'todas';
   return Object.fromEntries(partes.map((nome) => {
     if (!selecao.size) return [nome, 'normal'];
-    if (selecao.has(nome)) return [nome, 'destaque'];
+    /* No isolamento, a lista lateral já conserva a seleção. Tingir a única
+       geometria visível destrói justamente a cor e o acabamento que se quer
+       revisar. O realce material continua nos modos montagem e contexto. */
+    if (selecao.has(nome)) return [nome, modoSeguro === 'isolar' ? 'normal' : 'destaque'];
     if (modoSeguro === 'isolar') return [nome, 'oculto'];
     if (modoSeguro === 'contexto') return [nome, 'fantasma'];
     return [nome, 'normal'];
   }));
+}
+
+/* O enquadramento tem dois alvos deliberadamente diferentes: a montagem inteira
+   e a seleção. Em contexto, aproximar uma peça pequena sem incluir a montagem
+   desfaz o propósito do modo; por isso a raiz entra como margem espacial. */
+export function alvosDeEnquadramento({ raiz, selecionados = [], modo = 'todas', alvo = 'selecao' }) {
+  if (alvo === 'montagem' || !selecionados.length) return raiz ? [raiz] : [];
+  return modo === 'contexto' && raiz ? [raiz, ...selecionados] : selecionados;
 }
 
 function direcaoFallback(nome) {

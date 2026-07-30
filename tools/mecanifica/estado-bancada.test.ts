@@ -5,6 +5,7 @@ import * as estadoBancada from '../../src/bancada/estado-bancada.js';
 
 const {
   alternarSelecao,
+  alvosDeEnquadramento,
   calcularVetoresExplosao,
   escreverEstadoNaUrl,
   estadoVisualDasPartes,
@@ -53,9 +54,17 @@ describe('estado da bancada', () => {
     });
     expect(estadoVisualDasPartes(partes, ['pinca'], 'isolar')).toEqual({
       disco: 'oculto',
-      pinca: 'destaque',
+      pinca: 'normal',
       pastilha: 'oculto',
     });
+  });
+
+  it('separa enquadrar a montagem de focar seleção e preserva contexto', () => {
+    const raiz = { nome: 'montagem' };
+    const disco = { nome: 'disco' };
+    expect(alvosDeEnquadramento({ raiz, selecionados: [disco], alvo: 'montagem' })).toEqual([raiz]);
+    expect(alvosDeEnquadramento({ raiz, selecionados: [disco], modo: 'todas' })).toEqual([disco]);
+    expect(alvosDeEnquadramento({ raiz, selecionados: [disco], modo: 'contexto' })).toEqual([raiz, disco]);
   });
 
   it('gera vetores de explosão determinísticos, inclusive no centro da montagem', () => {

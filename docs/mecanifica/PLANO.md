@@ -106,6 +106,13 @@ navegável da demonstração.
 - caminhada e transição para inspeção orbital;
 - interface responsiva para mouse, teclado e toque.
 
+**Método da fase:** cada corte do carro, galpão ou sistema é também uma rodada de
+observação de autoria. Antes de propor capacidade nova, registrar em
+`ATRITOS-AUTORIA.md` onde a dificuldade ocorreu (bancada, Oficina ou domínio), a
+evidência reproduzível e o contorno usado. Melhorias gerais só entram quando um
+caso real da Fase 4 as justificar; melhorias de apresentação permanecem fora do
+núcleo de autoria.
+
 **Critério de saída:** o usuário entende onde o freio está no veículo, aproxima,
 isola e explode o sistema sem perder sua orientação espacial.
 
@@ -142,8 +149,11 @@ reduza sua espessura” altera a definição existente sem regenerar o conjunto.
 
 ## Próximo passo
 
-O freio a disco existe e está validado na bancada, então a Fase 4 está
-liberada: carroceria simplificada, registro de sistemas e galpão mínimo.
+O freio a disco existe e está validado na bancada. A rodada preparatória da
+bancada separou enquadrar montagem de focar seleção, preservou materiais no
+isolamento, reenquadrou a explosão e expôs régua/escala na imagem. A Fase 4 está
+liberada: carroceria simplificada, registro de sistemas e galpão mínimo, sempre
+registrando os novos atritos de bancada e Oficina que ela revelar.
 
 Antes (ou junto) dela, as capacidades de autoria que a Rodada 1 justificou com
 evidência medida — em ordem de retrabalho observado: `derivarParametro` (A-5),

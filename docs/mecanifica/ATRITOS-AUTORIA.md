@@ -36,33 +36,6 @@ fotografado não está no endereço que ele mesmo imprime.
 que qualquer enquadramento — não apenas os canônicos — seja reproduzível. Vale
 para qualquer inspetor 3D, não só para a Mecanifica.
 
-### A-2 — não há como reenquadrar o conjunto com algo selecionado
-
-**Onde dói:** bancada.
-
-**Evidência:** `btnEnquadrar` ("Enquadrar", `F`) e `btnFocarSelecao`
-("Focar seleção") chamam a mesma `focarSelecao()`. O contrato em
-`BANCADA-E-APRESENTACAO.md` pede enquadramento do conjunto **ou** da seleção;
-hoje é preciso limpar a seleção para rever o todo, e aí se perde a seleção.
-
-**Contorno:** anotar os nomes à mão antes de limpar.
-
-**Capacidade candidata:** separar "enquadrar tudo" de "enquadrar seleção", sem
-que uma ação destrua o estado da outra.
-
-### A-3 — destaque verde encobre o material da peça isolada
-
-**Onde dói:** bancada.
-
-**Evidência:** `bancada-drone-inspecao-direita-sel-lente-isolar-focado.png` — a
-lente isolada aparece inteira em verde, então a inspeção de forma e material
-acontece sobre uma cor que não é a da peça.
-
-**Contorno:** olhar a mesma vista sem isolamento para conferir cor.
-
-**Capacidade candidata:** quando a seleção é a única coisa visível, o destaque é
-redundante; o realce deveria virar contorno em vez de tingir a superfície.
-
 ### A-15 — a ferramenta de autoria do projeto salva peça que o gate do projeto reprova
 
 **Onde dói:** linguagem da Oficina.
@@ -446,6 +419,13 @@ vetores autorais de explosão por parte — a `APRESENTACAO` já desenhada em
 `BANCADA-E-APRESENTACAO.md`. O fallback radial é bom para descobrir peça
 sobreposta; é inútil para um conjunto co-radial.
 
+**Estado (rodada preparatória da Fase 4):** a primeira metade está resolvida:
+quando a explosão estabiliza, a bancada enquadra a caixa das partes visíveis já
+afastadas. A foto `bancada-freio-disco-isometrica-exp40.png` agora mantém todas
+as oito partes no quadro a 40%. Vetores autorais continuam abertos: são
+conhecimento de montagem e serão provados com o primeiro sistema no carro, não
+inferidos pelo fallback radial.
+
 #### A-13 — a foto não tem escala nem eixo, então a conferência vira perícia de pixel
 
 **Onde dói:** bancada.
@@ -481,6 +461,13 @@ com folga `0.006000` em y (= `folgaPonte`) sobre um vão x de `-0.024000`, isto 
 a pinça cobre a espessura inteira do disco. O atrito segue **parcialmente
 aberto**: falta o lado da FOTO — escala px/m, gnômon de eixo e régua na imagem
 ortográfica —, que é da bancada, não da autoria.
+
+**Estado (rodada preparatória da Fase 4):** a bancada agora desenha uma régua e
+imprime metros, px/m e o mapeamento dos eixos na própria imagem. Em projeção
+ortográfica a escala é exata; em perspectiva ela é marcada como aproximada. A
+caixa e as relações continuam no `npm run descrever`, que é a fonte numérica.
+Falta apenas um gnômon geométrico (a legenda não finge ser uma seta 3D), se uma
+rodada real ainda precisar de orientação além do texto.
 
 **Correção (revisão adversarial da R2, ALTA-1):** a primeira versão media a
 relação entre partes **face a face**, e face plana alinhada ao eixo tem espessura
@@ -519,6 +506,12 @@ signifique perder o contexto. Junto com A-2 (enquadrar tudo × enquadrar
 seleção), é o mesmo assunto: a bancada precisa de um controle de enquadramento
 com dois alvos e uma margem, em vez de um botão só.
 
+**Estado (rodada preparatória da Fase 4):** em contexto, `Focar seleção` calcula
+a caixa da montagem junto da seleção; a peça continua identificada, mas o freio
+inteiro permanece reconhecível. `F` passou a ser `Enquadrar tudo` e não limpa a
+seleção. A margem autoral ajustável ainda não existe, porém o conflito que
+destruía o contexto foi removido.
+
 ### O que NÃO doeu (para não consertar o lado errado)
 
 - **Seleção por nome + contexto fantasma.** `--selecionadas=suporte
@@ -539,5 +532,16 @@ com dois alvos e uma margem, em vez de um botão só.
 
 ## Atritos resolvidos
 
-Nada ainda. Uma entrada sai de "abertos" quando a mudança está no repositório e
-provada; a evidência da prova fica junto.
+### A-2 — enquadrar montagem e seleção eram a mesma ação
+
+**Correção:** `F` e o botão `Enquadrar tudo` agora usam a raiz da montagem,
+enquanto `Focar seleção` continua usando os componentes escolhidos. A seleção
+não é apagada em nenhum dos dois casos. A prova headless cobre os dois alvos em
+`tools/mecanifica/estado-bancada.test.ts`.
+
+### A-3 — destaque verde encobria material no isolamento
+
+**Correção:** o modo `isolar` conserva a seleção na árvore, mas renderiza as
+partes visíveis com seus materiais restaurados. A imagem
+`bancada-freio-disco-isometrica-sel-disco-isolar.png` confirma que o disco não é
+mais tingido de verde; montagem e contexto ainda usam realce para orientar.
