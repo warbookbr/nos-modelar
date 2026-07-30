@@ -139,6 +139,28 @@ describe('integridade do freio a disco', () => {
     expect(r.get('cubo~suporte').distancia).toBeGreaterThan(P.folgaSuporte);
   });
 
+  it('nada que GIRA encosta no que deveria estar livre dele em repouso', () => {
+    const P = freio.PARAMS;
+    const r = relacoes();
+    /* A conversão do suporte não bastava. `perto(faceInterna - interna.max[0],
+       P.folgaPastilha)` afirma que a peça obedece ao próprio parâmetro — é
+       verdade por construção e continua verde com `folgaPastilha: 0`, isto é,
+       com a pastilha ARRASTANDO no disco. Justamente a falha que esta
+       demonstração existe para explicar ao cliente.
+       A lei que faltava não é a igualdade, é a POSITIVIDADE: em repouso o disco
+       gira livre, então pastilha e ponte não podem tocá-lo. Afirmamos as duas —
+       o tipo e o sinal — para que nem a montagem nem o parâmetro possam mentir. */
+    for (const par of ['disco~pastilhaInterna', 'disco~pastilhaExterna']) {
+      expect([par, r.get(par).tipo]).toEqual([par, 'folga']);
+      expect([par, r.get(par).distancia > 0]).toEqual([par, true]);
+      perto(r.get(par).distancia, P.folgaPastilha);
+    }
+    /* a ponte passa POR FORA do raio do disco: se raspar, o freio trava */
+    expect(['disco~pinca', r.get('disco~pinca').tipo]).toEqual(['disco~pinca', 'folga']);
+    expect(r.get('disco~pinca').distancia).toBeGreaterThan(0);
+    perto(r.get('disco~pinca').distancia, P.folgaPonte);
+  });
+
   it('o suporte continua sustentando a garra interna inteira, e não só a evitando', () => {
     const P = freio.PARAMS;
     /* a placa é escolhida pelo que ela É — o único corpo do suporte que cruza o
