@@ -140,6 +140,17 @@ if (process.argv.includes('--check')) {
   if (atual !== texto) {
     falhou = true;
     console.error('mapa:check FALHOU — docs/uso/MAPA.md está desatualizado. Rode `npm run mapa` e commite junto.');
+    const atuais = atual.split('\n');
+    const esperadas = texto.split('\n');
+    const limite = Math.max(atuais.length, esperadas.length);
+    for (let i = 0; i < limite; i++) {
+      if (atuais[i] !== esperadas[i]) {
+        console.error(`  primeira divergência na linha ${i + 1}:`);
+        console.error(`  atual:    ${JSON.stringify(atuais[i])}`);
+        console.error(`  esperado: ${JSON.stringify(esperadas[i])}`);
+        break;
+      }
+    }
   }
   if (falhou) process.exit(1);
   console.log(`mapa:check ok — ${rastreados.length} arquivos, mapa em dia, todos com cabeçalho.`);
