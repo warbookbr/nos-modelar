@@ -12,6 +12,8 @@ import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
+// @ts-expect-error — módulo neutro de medição em JavaScript.
+import { caixaDaParte } from '../../src/autoria/descrever-partes.js';
 
 const PARTES = [
   'disco', 'cubo', 'pinca', 'suporte',
@@ -27,25 +29,11 @@ function montar() {
     null,
     freio.ALIASES,
   );
-  /* caixa delimitadora POR NOME de parte — é assim que um agente posterior
-     mede o conjunto sem tocar em índice de vértice ou de face. */
-  const caixa = (parte: string) => {
-    const min = [Infinity, Infinity, Infinity];
-    const max = [-Infinity, -Infinity, -Infinity];
-    let faces = 0;
-    for (const face of neutro.F.values()) {
-      if (face.parte !== parte) continue;
-      faces++;
-      for (const v of face.vs) {
-        const p = neutro.V.get(v);
-        for (let k = 0; k < 3; k++) {
-          if (p[k] < min[k]) min[k] = p[k];
-          if (p[k] > max[k]) max[k] = p[k];
-        }
-      }
-    }
-    return { faces, min, max };
-  };
+  /* caixa delimitadora POR NOME de parte — é assim que um agente posterior mede
+     o conjunto sem tocar em índice de vértice ou de face. A medição não mora
+     mais aqui: saiu para `src/autoria/descrever-partes.js` (módulo neutro, sem
+     Three.js), que o CLI `npm run descrever` e a bancada também consomem. */
+  const caixa = (parte: string) => caixaDaParte(neutro, parte);
   return { neutro, caixa };
 }
 

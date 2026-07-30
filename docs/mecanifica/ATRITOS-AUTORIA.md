@@ -415,6 +415,19 @@ e uma régua no canto da imagem ortográfica. Duas linhas de texto no relatório
 que ela já imprime resolveriam a maior parte disto — e valem para qualquer
 inspetor 3D headless, não só para a Mecanifica.
 
+**Estado (R2, item O-1):** a medição saiu do script à parte e virou ferramenta.
+`npm run descrever -- <peça>` imprime, por parte semântica, caixa/centro/
+dimensões/faces e a relação de cada par de partes em número, a partir do módulo
+neutro `src/autoria/descrever-partes.js` — o mesmo que alimenta a contagem do
+painel da bancada, para não haver duas verdades sobre a mesma medida. Os quatro
+encaixes do freio que custaram as 4 leituras de PNG agora saem assim, sem abrir
+imagem: pastilha interna e externa a `0.002000` do disco em x (= `folgaPastilha`),
+`pastilhaInterna ↔ pistao` em `encosta` com vão x `0.000000`, e `disco ↔ pinca`
+com folga `0.006000` em y (= `folgaPonte`) sobre um vão x de `-0.024000`, isto é,
+a pinça cobre a espessura inteira do disco. O atrito segue **parcialmente
+aberto**: falta o lado da FOTO — escala px/m, gnômon de eixo e régua na imagem
+ortográfica —, que é da bancada, não da autoria.
+
 #### A-14 — `--focar` numa parte pequena destrói o contexto que `--modo=contexto` promete
 
 **Onde dói:** bancada.

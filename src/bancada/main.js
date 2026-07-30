@@ -138,7 +138,11 @@ async function iniciar() {
   }
   document.getElementById('contagemPartes').textContent = String(controlador.nomes.length);
 
-  const semParte = convertido.diagnosticos.facesSemParte.length;
+  /* o painel de diagnóstico conta partes e faces sem identidade pelo módulo
+     neutro `descrever-partes.js` — a mesma medida que `npm run descrever`
+     imprime. O total de faces continua vindo das estatísticas do adaptador
+     porque lá ele já é `neutro.F.size`, e não uma segunda contagem. */
+  const semParte = convertido.medida.facesSemParte.length;
   const estadoSemantica = document.getElementById('estadoSemantica');
   const diagnostico = document.getElementById('diagnostico');
   if (semParte) {
@@ -152,7 +156,7 @@ async function iniciar() {
     estadoSemantica.querySelector('span').textContent = 'Semântica íntegra';
     diagnostico.classList.add('ok');
     diagnostico.querySelector('p').textContent =
-      `${convertido.estatisticas.partes} componentes e ${convertido.estatisticas.facesNeutras} faces: nenhuma superfície sem identidade.`;
+      `${convertido.medida.partes.size} componentes e ${convertido.estatisticas.facesNeutras} faces: nenhuma superfície sem identidade.`;
   }
 
   function focarSelecao() {

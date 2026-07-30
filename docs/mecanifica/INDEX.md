@@ -125,6 +125,15 @@ npm run bancada -- drone-inspecao --vistas=direita,frontal
 npm run bancada -- drone-inspecao --selecionadas=lente --modo=isolar --focar
 ```
 
+Conferência em número, sem foto — imprime caixa, centro, dimensões e faces por
+parte semântica, e a folga ou interpenetração entre pares de partes. Foto não
+tem escala nem eixo; esta é a régua:
+
+```bash
+npm run descrever -- freio-disco
+npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
+```
+
 Verificação completa:
 
 ```bash
