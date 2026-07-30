@@ -283,7 +283,7 @@ Sem o servidor no ar, cai pro download comum — funciona, mas você move o arqu
 | FEITO | `apagaFace` | `face` | FEITO (P8a do playground, D-121, só núcleo). Remove a face de `st.F`. Os VÉRTICES dela continuam existindo (podem estar em uso por outra face, ou não — um vértice sem face nenhuma não é erro, é normal ao abrir um buraco de propósito: porta, janela, ou preparo pra composição manual). Face inexistente GRITA. |
 | FEITO | `pincel` | `modo`, `cor`, e o alvo conforme o modo | `modo:'face'` aceita `faces:[ids]` (legado) OU `sel` uniforme. `modo:'livre'` recebe `raio`, `dureza` e `pontos:[{f,a,b}]`, nunca `sel`. |
 | FEITO | `liso` | `faces:[ids]` (legado) ou `sel` | Sombreado macio nas faces resolvidas. O padrão é chapado. |
-| FEITO | `parte` | `nome`, `faces:[ids]` (legado) ou `sel` | Dá nome às faces resolvidas; é o alvo de animação e de `sel.grupo`. |
+| FEITO | `parte` | `nome`, `faces:[ids]` (legado) ou `sel`, `substituir?` (só o literal `true`) | Dá nome às faces resolvidas; é o alvo de animação e de `sel.grupo`. Uma face pertence a NO MÁXIMO uma parte e reatribuir **GRITA** (O-2 do plano da Mecanifica): a face já pertencente a OUTRA parte é recusada, fica com o dono ANTIGO e o órfão nomeia quem a batizou; era "última atribuição vence" em silêncio, que roubava faces entre seleções sobrepostas. `substituir: true` transfere de propósito (outro valor GRITA e a op segue estrita); renomear para a MESMA parte segue mudo. |
 | FEITO | `material` | `faces:[ids]` (legado) ou `sel`, `usa` | Aplica um material declarado em `MATERIAIS`. |
 | FEITO | `solido` | `faces:[ids]` (legado) ou `sel` | Marca as faces resolvidas que entram na colisão. |
 | FEITO | `pesar` | `osso`, `vs?: [ids]` (ou `faces?: [ids]`), `peso` | FEITO (passo 14a, esqueleto/skinning). Soma `peso` de influência do OSSO aos vértices dados (diretamente por `vs` ou por `faces`, resolvidas pros vértices). Acumula por (vértice, osso); vértice sem osso nenhum some ORFÃO, não corrompe a malha. Achado da Rodada 3 da reorganização de docs: a op existe no núcleo (`OPS.pesar`) desde o passo 14a, mas não tinha linha nesta tabela — só prosa em "Passos propostos" mais abaixo (que é sobre outra coisa: esqueleto/hierarquia, não esta op). |
@@ -309,7 +309,7 @@ sel: { tudo: true }                       // a peça inteira — todos os vérti
 sel: { f: [ids] }                         // faces literais
 sel: { v: [ids] }                         // vértices literais
 sel: { grupo: 'nome-da-parte' }           // faces já nomeadas por `parte`
-sel: { regiao: { min:[x,y,z], max:[x,y,z] } }
+sel: { regiao: { min:[x,y,z], max:[x,y,z], modo?:'contem'|'toca' } }   // face: 'contem' (default) = inteira dentro; 'toca' = um canto basta
 sel: { origem: { op:'loft', id:1000, faixa?:2, lado?:1 } }
 sel: { origem: { op:'loft', id:1000, lado:{passo:2, fase:0} } }   // filtro de progressão (Rodada C)
 sel: { origem: { op:'lathe', id:1000, faixa?:2, lado?:1 } }       // MESMO contrato do loft (Fase 4)
@@ -347,8 +347,17 @@ campo desconhecido **e** pinta a peça inteira.
 Para uma op de VÉRTICE, `f`/`grupo` adicionam os cantos das faces e `regiao`
 adiciona cada vértice dentro da caixa inclusiva — é o comportamento histórico de
 `rotaciona`/`transladar`. Para uma op de FACE, `v` alcança toda face incidente a
-algum vértice citado; `regiao` alcança somente a face cujos **todos** os cantos
-estão dentro da caixa. Isso evita pintar/materializar meia face por acidente.
+algum vértice citado; `regiao` alcança a face conforme `modo`: `'contem'`
+(DEFAULT) exige **todos** os cantos dentro da caixa — evita pintar/materializar
+meia face por acidente — e `'toca'` basta **um** canto dentro. Qualquer outro
+valor de `modo` GRITA (O-3 do plano da Mecanifica).
+
+A assimetria entre os dois eixos é antiga e agora está dita: vértice sempre
+entrou por TOQUE, face só por CONTENÇÃO, de modo que a MESMA caixa selecionava
+conjuntos diferentes conforme a op. `modo` só nomeia a regra da FACE — **o eixo
+de VÉRTICE não muda com ele**: mesmo em `'toca'`, `rotaciona`/`transladar`
+movem apenas os cantos dentro da caixa, senão `modo` mudaria em silêncio o que
+uma peça já escrita desloca.
 
 `origemId` identifica uma origem no objeto inteiro e encontra o contrato local
 no índice interno reconstruído a cada `nucleo` (nunca no canônico); duplicata,

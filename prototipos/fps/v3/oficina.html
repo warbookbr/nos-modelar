@@ -2721,7 +2721,13 @@ try {
         if (!faces.length) return null;
         const ja = partesNomeadas().find((p) => p.nome === nm);
         if (ja && JSON.stringify(ja.faces) === JSON.stringify(faces)) return null;   // idêntica: sem passo fantasma
-        const passo = ['parte', { nome: nm, faces }];
+        /* O-2: a op `parte` passou a RECUSAR face que já é de OUTRA parte, salvo
+           `substituir: true`. Aqui a transferência é o gesto EXPLÍCITO do autor
+           (ele selecionou aquelas faces e digitou o nome), então a interface
+           escreve a palavra em vez de virar clique morto. Só quando há conflito
+           de verdade: sem sobreposição o passo gravado segue idêntico ao de antes. */
+        const rouba = faces.some((id) => { const p = neutro.F.get(id).parte; return p != null && p !== nm; });
+        const passo = rouba ? ['parte', { nome: nm, faces, substituir: true }] : ['parte', { nome: nm, faces }];
         PASSOS.push(passo);
         redo.length = 0;
         reexec(PASSOS);

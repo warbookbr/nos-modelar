@@ -603,7 +603,7 @@ describe('passo 13a — animação rígida por parte', () => {
     M[2] * p[0] + M[6] * p[1] + M[10] * p[2] + M[14],
   ];
 
-  it('1) op parte: seta f.parte; registra pivô; face inexistente GRITA sem corromper; reatribuir = última vence', () => {
+  it('1) op parte: seta f.parte; registra pivô; face inexistente GRITA sem corromper; reatribuir GRITA (O-2)', () => {
     const n = nucleo([cubo, ['parte', { nome: 'x', faces: [0, 1], pivo: [0.1, 0.2, 0.3] }]], {}, {});
     expect(n.orfaos).toHaveLength(0);
     expect(n.F.get(0).parte).toBe('x');
@@ -615,9 +615,10 @@ describe('passo 13a — animação rígida por parte', () => {
     expect(orf.orfaos.some((o: any) => o.op === 'parte' && o.ref === 999)).toBe(true);
     expect(orf.F.get(0).parte).toBe('x'); expect(orf.V.size).toBe(8); expect(orf.F.size).toBe(6);
     expect(orf.partes.x.pivo).toBe(null);                    // sem pivo -> null (adaptador usa centroide)
-    // reatribuir: a última parte que cita a face manda
+    // reatribuir (O-2): era "última vence" em silêncio; agora GRITA e a face fica com o dono ANTIGO
     const re = nucleo([cubo, ['parte', { nome: 'a', faces: [0] }], ['parte', { nome: 'b', faces: [0] }]], {}, {});
-    expect(re.F.get(0).parte).toBe('b');
+    expect(re.F.get(0).parte).toBe('a');
+    expect(re.orfaos.some((o: any) => o.op === 'parte' && o.passo === 2 && o.ref === 0 && /já pertence à parte 'a'.*passo 1.*'b'/.test(o.motivo))).toBe(true);
   });
 
   it('2) canon inclui f.parte (guardado); face SEM parte fica byte-idêntica (linha de 6); determinismo/replay', () => {
@@ -2311,7 +2312,9 @@ describe('D-129 — seleção semântica uniforme (atributos + espelha)', () => 
       ['material', { sel: { grupo: 'topo' }, usa: 'brilho' }],
       ['solido', { sel: { regiao: { min: [-1, 0.9, -1], max: [1, 1.1, 1] } } }],
       ['liso', { sel: { v: [4] } }],
-      ['parte', { nome: 'cantoTopo', sel: { v: [4] } }],
+      // `substituir` é obrigatório aqui desde o O-2: v4 é canto da face 1, que já é da parte 'topo'.
+      // Este fixture ERA o único ponto do repositório onde uma parte roubava face de outra em silêncio.
+      ['parte', { nome: 'cantoTopo', sel: { v: [4] }, substituir: true }],
     ] as any, {}, {}, { brilho: { cor: '#ffffff' } });
     expect(n.orfaos).toHaveLength(0);
     expect(n.F.get(1)).toMatchObject({ cor: '#ff0000', material: 'brilho', solido: true, liso: true });
@@ -3542,5 +3545,183 @@ describe('Fase 4 — sel.origem para cilindro (lado numérico + tampa nominal)',
     const chaveDesconhecida = nucleo([cil(0), ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 2000, faixa: 1 } as any }, cor: '#123456' }]], {}, {});
     expect(chaveDesconhecida.orfaos.some((o: any) => o.op === 'pincel')).toBe(true);
     expect(pintados(chaveDesconhecida)).toEqual([]);
+  });
+});
+
+/* O-2 (docs/mecanifica/OFICINA-OTIMIZACOES.md, Faixa 1) — reatribuir `parte`
+   passa a GRITAR. Era a pior classe de defeito do vocabulário: resultado errado
+   que PASSA. Duas seleções sobrepostas, a parte declarada antes perde faces sem
+   nada reclamar, e a bancada só mostra a contagem de faces SEM nome — nunca as
+   roubadas. A premissa de que a rede é ADITIVA foi MEDIDA antes de instalar
+   (instrumentando a op e construindo as 18 peças do repositório: 90 chamadas de
+   `parte`, 0 face reatribuída para outra parte, e 8 reatribuições para a MESMA
+   parte — 4 em `caixa-ferramentas` e 4 em `drone-inspecao`). Por isso o conflito
+   aqui é só entre nomes DIFERENTES: renomear para a mesma parte é seleção
+   redundante e segue mudo, senão essas duas peças shipadas passariam a ter
+   órfão e o `gabarito:selecao` cairia. */
+describe('O-2 — reatribuir parte GRITA (roubo silencioso de face)', () => {
+  const cubo: any = ['cubo', { id: 0, lado: 1 }];
+  const parte = (nome: string, faces: number[], extra: any = {}): any => ['parte', { nome, faces, ...extra }];
+  const conflitos = (n: any) => n.orfaos.filter((o: any) => o.op === 'parte' && /já pertence à parte/.test(o.motivo));
+
+  it('caminho feliz: partes disjuntas não gritam, e renomear para a MESMA parte segue mudo', () => {
+    const disjuntas = nucleo([cubo, parte('a', [0, 1]), parte('b', [2, 3])], {}, {});
+    expect(disjuntas.orfaos).toHaveLength(0);
+    expect(disjuntas.F.get(0).parte).toBe('a'); expect(disjuntas.F.get(2).parte).toBe('b');
+
+    // seleções sobrepostas com o MESMO nome: é redundância, não conflito (o caso medido nas 18 peças)
+    const mesma = nucleo([cubo, parte('a', [0, 1]), parte('a', [1, 2])], {}, {});
+    expect(mesma.orfaos).toHaveLength(0);
+    expect([...mesma.F.values()].filter((f: any) => f.parte === 'a').map((f: any) => f.id)).toEqual([0, 1, 2]);
+  });
+
+  it('conflito GRITA nomeando o passo que nomeou antes, o dono antigo e o nome novo; a face fica com o dono ANTIGO', () => {
+    const n = nucleo([cubo, parte('a', [0, 1]), parte('b', [1, 2])], {}, {});
+    const orf = conflitos(n);
+    expect(orf).toHaveLength(1);
+    expect(orf[0].passo).toBe(2);                        // o passo que TENTOU roubar
+    expect(orf[0].ref).toBe(1);                          // a face disputada
+    expect(orf[0].motivo).toMatch(/parte 'a'/);          // dono antigo
+    expect(orf[0].motivo).toMatch(/passo 1/);            // quem nomeou antes (procedência)
+    expect(orf[0].motivo).toMatch(/'b'/);                // o nome que teria vencido em silêncio
+    expect(orf[0].motivo).toMatch(/substituir: true/);   // a saída explícita
+    // a face disputada fica com quem chegou primeiro; a face livre da mesma seleção é atribuída normalmente
+    expect(n.F.get(1).parte).toBe('a');
+    expect(n.F.get(2).parte).toBe('b');
+    expect(n.partes.b).toBeDefined();
+  });
+
+  it('substituir: true transfere sem gritar; toda a seleção recusada não deixa parte fantasma', () => {
+    const transferiu = nucleo([cubo, parte('a', [0, 1]), parte('b', [1], { substituir: true })], {}, {});
+    expect(transferiu.orfaos).toHaveLength(0);
+    expect(transferiu.F.get(1).parte).toBe('b');
+    expect(transferiu.F.get(0).parte).toBe('a');
+
+    const fantasma = nucleo([cubo, parte('a', [0]), parte('b', [0])], {}, {});
+    expect(conflitos(fantasma)).toHaveLength(1);
+    expect(Object.keys(fantasma.partes)).toEqual(['a']);   // 'b' não roubou nada: não vira parte de mentira
+  });
+
+  it('substituir com valor inesperado GRITA e a op segue ESTRITA (fail-closed, como tudo:true)', () => {
+    for (const valor of ['sim', 1, false]) {
+      const n = nucleo([cubo, parte('a', [0]), parte('b', [0], { substituir: valor })], {}, {});
+      expect(n.orfaos.some((o: any) => o.op === 'parte' && o.ref === 'substituir' && /só aceita o literal true/.test(o.motivo))).toBe(true);
+      expect(conflitos(n)).toHaveLength(1);               // não desligou a rede
+      expect(n.F.get(0).parte).toBe('a');
+    }
+  });
+
+  it('parte herdada por espelha também é protegida (sem procedência de passo, o diagnóstico degrada mas não some)', () => {
+    const n = nucleo([cubo, parte('a', [0, 1, 2, 3, 4, 5]), ['espelha', { eixo: 'x', sel: { grupo: 'a' } }], ['parte', { nome: 'b', sel: { grupo: 'a' } }]], {}, {});
+    const orf = conflitos(n);
+    expect(orf.length).toBeGreaterThan(6);                                          // originais + cópias
+    expect(orf.some((o: any) => /nomeada no passo 1/.test(o.motivo))).toBe(true);    // original: procedência conhecida
+    expect(orf.some((o: any) => !/nomeada no passo/.test(o.motivo))).toBe(true);     // cópia do espelha: herdou o nome, não o passo
+    expect([...n.F.values()].every((f: any) => f.parte === 'a')).toBe(true);
+    expect(n.partes.b).toBeUndefined();
+  });
+});
+
+/* O-3 (Faixa 1) — `sel.regiao` ganha `modo`. O argumento não é conforto: o
+   seletor JÁ se comportava de duas maneiras e nada no formato dizia isso —
+   vértice entrava por "toca", face só por "contem" (`f.vs.every(dentro)`), de
+   modo que uma op de vértice e uma op de face com a MESMA caixa selecionavam
+   conjuntos diferentes. `modo` não inventa comportamento: torna explícito o que
+   já existia implícito, com `contem` de default para o gabarito seguir
+   byte-idêntico. */
+describe('O-3 — sel.regiao com modo contem|toca', () => {
+  const cubo: any = ['cubo', { id: 0, lado: 1 }];   // x,z em [-0.5,0.5], y em [0,1]; face 1 = topo
+  const caixaDoTopo = { min: [-1, 0.9, -1], max: [1, 1.1, 1] };   // contém o topo INTEIRO; toca as 4 paredes
+  const pinta = (regiao: any): any => ['pincel', { modo: 'face', sel: { regiao }, cor: '#123456' }];
+  const pintadas = (n: any) => [...n.F.values()].filter((f: any) => f.cor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+  const canon = (n: any) => JSON.stringify(neutroCanonico(n));
+
+  it('contem é o DEFAULT e é byte-idêntico à ausência de modo (a compat do gabarito)', () => {
+    const semModo = nucleo([cubo, pinta(caixaDoTopo)], {}, {});
+    const explicito = nucleo([cubo, pinta({ ...caixaDoTopo, modo: 'contem' })], {}, {});
+    expect(semModo.orfaos).toHaveLength(0);
+    expect(pintadas(semModo)).toEqual([1]);            // só a face INTEIRA na caixa
+    expect(canon(explicito)).toBe(canon(semModo));     // mesma canon, byte a byte
+  });
+
+  it('toca seleciona a face com PELO MENOS UM canto dentro', () => {
+    const n = nucleo([cubo, pinta({ ...caixaDoTopo, modo: 'toca' })], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(pintadas(n)).toEqual([1, 2, 3, 4, 5]);       // topo + as 4 paredes; o fundo (y=0) fica de fora
+  });
+
+  it('o eixo de VÉRTICE não muda com modo: transladar move os mesmos cantos nos dois modos', () => {
+    const move = (regiao: any) => nucleo([cubo, ['transladar', { d: [0, 2, 0], sel: { regiao } }]], {}, {});
+    const contem = move(caixaDoTopo), toca = move({ ...caixaDoTopo, modo: 'toca' });
+    expect(contem.orfaos).toHaveLength(0); expect(toca.orfaos).toHaveLength(0);
+    expect(JSON.stringify([...toca.V.entries()])).toBe(JSON.stringify([...contem.V.entries()]));
+    expect(toca.V.get(4)).toEqual([-0.5, 3, -0.5]);     // canto de cima subiu
+    expect(toca.V.get(0)).toEqual([-0.5, 0, -0.5]);     // canto de baixo, fora da caixa, ficou
+  });
+
+  it('modo inválido GRITA nomeando os dois valores aceitos e não seleciona nada', () => {
+    for (const modo of ['contido', 'TOCA', true, 1]) {
+      const n = nucleo([cubo, pinta({ ...caixaDoTopo, modo })], {}, {});
+      expect(n.orfaos.some((o: any) => o.ref === 'sel.regiao' && /modo só aceita 'contem'.*'toca'/.test(o.motivo))).toBe(true);
+      expect(pintadas(n)).toEqual([]);
+    }
+    // chave desconhecida dentro da região continua gritando (modo não abriu a porta pra qualquer chave)
+    const chaveRuim = nucleo([cubo, pinta({ ...caixaDoTopo, mode: 'toca' })], {}, {});
+    expect(chaveRuim.orfaos.some((o: any) => o.ref === 'sel.regiao' && /precisa ter min E max/.test(o.motivo))).toBe(true);
+    expect(pintadas(chaveRuim)).toEqual([]);
+  });
+});
+
+/* O-11 (Faixa 1, atrito A-7) — diagnóstico de completude de alias. Citar um
+   alias de conjunto antes de todas as suas primitivas existirem produzia órfão
+   CORRETO e confuso (`origem cilindro:303 inexistente ou ainda não criada`):
+   foi a única iteração perdida na escrita do freio a disco, porque o autor pensa
+   "o disco" como UMA coisa e o alias só é conjunto depois do último passo que o
+   compõe. A informação de QUANDO ele fecha já existia no núcleo (o mapa de
+   declarações que `mapearDeclaracoesOrigem` monta antes de executar). Só
+   MENSAGEM: a resolução do alias continua sendo na citação. */
+describe('O-11 — diagnóstico de completude de alias', () => {
+  const cil = (i: number, origemId: number): any => ['cilindro', { id: i * 1000, raio: 0.5, altura: 1, lados: 4, origemId }];
+  const metades: any = [['discoInteiro', { unir: [{ origem: { op: 'cilindro', id: 302 } }, { origem: { op: 'cilindro', id: 303 } }] }]];
+  const completude = (n: any) => n.orfaos.filter((o: any) => /fica completo no passo/.test(o.motivo));
+
+  it('citar antes de fechar diz em que passo o alias fica completo e o que falta; citar depois é o caminho feliz', () => {
+    const passos: any = [
+      cil(0, 302),                                                        // passo 0: primeira metade
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'discoInteiro' } }],   // passo 1: cita cedo demais
+      cil(2, 303),                                                        // passo 2: a segunda metade nasce aqui
+      ['parte', { nome: 'disco', sel: { alias: 'discoInteiro' } }],       // passo 3: agora sim
+    ];
+    const n = nucleo(passos, {}, {}, {}, null, metades);
+    const dica = completude(n);
+    expect(dica).toHaveLength(1);
+    expect(dica[0].passo).toBe(1); expect(dica[0].op).toBe('transladar'); expect(dica[0].ref).toBe('sel.alias');
+    expect(dica[0].motivo).toMatch(/alias 'discoInteiro' fica completo no passo 2/);
+    expect(dica[0].motivo).toMatch(/você citou no passo 1/);
+    expect(dica[0].motivo).toMatch(/cilindro:303 \(nasce no passo 2\)/);
+    // a CAUSA crua continua sendo relatada junto (o diagnóstico soma, não substitui)
+    expect(n.orfaos.some((o: any) => o.passo === 1 && /inexistente ou ainda não criada/.test(o.motivo))).toBe(true);
+    // e o passo 3, com o alias fechado, funciona: as faces das DUAS metades viram a parte
+    expect(n.orfaos.every((o: any) => o.passo !== 3)).toBe(true);
+    const daParte = [...n.F.values()].filter((f: any) => f.parte === 'disco').map((f: any) => f.id);
+    expect(daParte.length).toBe(8);                                        // 4 laterais por cilindro ({} da origem = laterais, sem tampa)
+    expect(daParte.some((id: number) => id >= 2000)).toBe(true);           // inclui a metade do passo 2
+  });
+
+  it('alias direto (sem unir) também ganha a dica', () => {
+    const n = nucleo([
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'metade' } }],
+      cil(1, 302),
+    ] as any, {}, {}, {}, null, [['metade', { origem: { op: 'cilindro', id: 302 } }]] as any);
+    expect(completude(n)[0].motivo).toMatch(/alias 'metade' fica completo no passo 1; você citou no passo 0/);
+  });
+
+  it('origem que NUNCA é declarada não ganha dica de completude (a causa é outra, e inventar passo seria mentira)', () => {
+    const n = nucleo([
+      cil(0, 302),
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'discoInteiro' } }],
+    ] as any, {}, {}, {}, null, metades);
+    expect(completude(n)).toHaveLength(0);
+    expect(n.orfaos.some((o: any) => /cilindro:303 inexistente ou ainda não criada/.test(o.motivo))).toBe(true);
   });
 });

@@ -389,6 +389,37 @@ function mapearDeclaracoesOrigem(PASSOS) {
   });
   return declaracoes;
 }
+/* COMPLETUDE DE ALIAS (A-7 / O-11) — só DIAGNÓSTICO, não muda resolução.
+   Um alias é resolvido no momento da CITAÇÃO, mas o autor pensa nele como
+   COISA: escreve `sel:{alias:'discoInteiro'}` num passo em que só metade do
+   disco nasceu e recebe `origem cilindro:302 inexistente ou ainda não criada`
+   — correto e inútil, porque não diz que basta ESPERAR. A informação já existe
+   no núcleo: `mapearDeclaracoesOrigem` varre a lista inteira ANTES de executar
+   e sabe em que passo cada origemId nasce. Daqui sai o passo em que o alias
+   fica completo (o MAIOR passo entre as origens que ele une e que ainda não
+   existem) e a lista do que falta. `null` = não é caso de completude (a origem
+   não é declarada em passo nenhum, ou já nasceu — aí o erro é outro, e a
+   mensagem genérica é a certa).
+
+   NÃO resolve tarde de propósito: exigir completude só no fim da lista é
+   mudança de SEMÂNTICA do formato salvo (Faixa 3 do plano), e mudar semântica
+   junto com diagnóstico esconderia qual dos dois resolveu a dor. */
+function completudeDoAlias(st, termos, i) {
+  let passoCompleto = -1;
+  const pendentes = [];
+  for (const termo of termos) {
+    const origem = termo && typeof termo === 'object' && !Array.isArray(termo) ? termo.origem : null;
+    if (!origem || typeof origem !== 'object' || !Number.isSafeInteger(origem.id)) continue;
+    if (st.origens.has(origem.id)) continue;   // essa já nasceu: não é ela que segura o alias
+    for (const d of st.declaracoesOrigem.get(origem.id) ?? []) {
+      if (d.passo <= i) continue;              // declarada antes e mesmo assim ausente: outra causa (op abortou), mensagem genérica basta
+      if (d.passo > passoCompleto) passoCompleto = d.passo;
+      pendentes.push(`${d.op}:${origem.id} (nasce no passo ${d.passo})`);
+    }
+  }
+  return passoCompleto < 0 ? null : { passo: passoCompleto, pendentes };
+}
+
 function resolverOrigem(st, origem) {
   const validacao = validarOrigem(origem);
   if (validacao.erro) return { erro: `origem inválida: ${validacao.erro}` };
@@ -417,10 +448,30 @@ function confereId(st, i, op, args) {
    não é `sel` ausente); `v` seleciona os vértices literais E toda face que
    toca algum deles; `f` seleciona as faces literais; `grupo` seleciona as
    faces cuja `f.parte` tem aquele nome; e `regiao` seleciona os vértices
-   dentro da caixa INCLUSIVA e as faces com TODOS os cantos dentro dela.
+   dentro da caixa INCLUSIVA e as faces segundo `modo` (abaixo).
    Campos presentes se UNEM. Assim uma região não vaza meia face para uma
    operação de atributo, mas rotaciona/transladar preservam exatamente a
    regra antiga: movem os vértices dentro da caixa.
+
+   ASSIMETRIA de `regiao`, agora dita em voz alta (era implícita e custava
+   caro; é o O-3 de docs/mecanifica/OFICINA-OTIMIZACOES.md): um VÉRTICE entra
+   se ELE estiver dentro da caixa — o eixo de vértice
+   sempre leu a região como "toca". Uma FACE, até aqui, só entrava com TODOS
+   os cantos dentro (`f.vs.every(dentro)`). A MESMA caixa selecionava, então,
+   conjuntos diferentes conforme a op fosse de vértice (`transladar`) ou de
+   face (`pincel`), e NADA no formato salvo dizia isso — é a origem clássica
+   do ciclo "alarga a caixa, refotografa". `modo` torna a regra da FACE
+   explícita: `contem` (DEFAULT — byte-compatível com toda peça já shipada) =
+   face inteira dentro; `toca` = pelo menos um canto dentro. Valor diferente
+   dos dois GRITA.
+
+   O eixo de VÉRTICE não muda com `modo`: em `toca` a face entra, mas só os
+   cantos DENTRO da caixa entram como vértice. É deliberado — se `toca`
+   arrastasse os cantos de fora, ele mudaria em silêncio o que
+   `transladar`/`rotaciona` movem, que é exatamente a classe de surpresa que
+   este item veio matar. Quem quer a face inteira como alvo de vértice usa
+   `sel:{f}`/`{origem}`/`{alias}`, que passam por `adicionaFace` e levam os
+   cantos junto.
 
    A seleção é formato salvo: nunca ignora uma chave, uma referência ou uma
    seleção vazia. `grita` leva op + tipo + causa; a lista continua executando
@@ -480,8 +531,13 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
   if (sel.regiao != null) {
     teveChave = true;
     const r = sel.regiao;
-    if (typeof r !== 'object' || Array.isArray(r) || r == null || Object.keys(r).some((k) => k !== 'min' && k !== 'max') || !Object.hasOwn(r, 'min') || !Object.hasOwn(r, 'max')) {
-      grita(st, i, op, 'sel.regiao', 'seleção regiao inválida: precisa ter min E max (e só eles), os dois [x,y,z] finitos');
+    if (typeof r !== 'object' || Array.isArray(r) || r == null || Object.keys(r).some((k) => k !== 'min' && k !== 'max' && k !== 'modo') || !Object.hasOwn(r, 'min') || !Object.hasOwn(r, 'max')) {
+      grita(st, i, op, 'sel.regiao', 'seleção regiao inválida: precisa ter min E max (e no máximo mais modo), os dois [x,y,z] finitos');
+    } else if (r.modo != null && r.modo !== 'contem' && r.modo !== 'toca') {
+      /* `modo` é chave do FORMATO SALVO: o conjunto de valores é fechado e
+         valor estranho GRITA — 'contido'/'dentro'/true aceitos em silêncio
+         cairiam no default e o autor juraria ter pedido `toca`. */
+      grita(st, i, op, 'sel.regiao', `seleção regiao inválida: modo só aceita 'contem' (face inteira dentro, default) ou 'toca' (pelo menos um canto dentro); recebido ${JSON.stringify(r.modo)}`);
     } else {
       let min, max;
       try { min = st.vec(r.min); max = st.vec(r.max); }
@@ -490,8 +546,10 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
         if (min.some((v, k) => v > max[k])) grita(st, i, op, 'sel.regiao', 'seleção regiao inválida: min não pode ser maior que max');
         else {
           const dentro = (p) => p[0] >= min[0] && p[0] <= max[0] && p[1] >= min[1] && p[1] <= max[1] && p[2] >= min[2] && p[2] <= max[2];
+          const toca = r.modo === 'toca';
           for (const [v, p] of st.V) if (dentro(p)) vertices.add(v);
-          for (const f of st.F.values()) if (f.vs.every((v) => dentro(st.V.get(v)))) faces.add(f.id);
+          // `contem` = every (regra histórica, o default); `toca` = some. O eixo de VÉRTICE acima é o mesmo nos dois.
+          for (const f of st.F.values()) if (toca ? f.vs.some((v) => dentro(st.V.get(v))) : f.vs.every((v) => dentro(st.V.get(v)))) faces.add(f.id);
         }
       }
     }
@@ -518,7 +576,13 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
           const r = resolverSelecao(st, termo, op, i);
           for (const v of r.vertices) vertices.add(v); for (const f of r.faces) faces.add(f);
         }
-        if (st.orfaos.length > antes) { vertices.clear(); faces.clear(); }
+        if (st.orfaos.length > antes) {
+          /* O-11: além da causa (que já gritou acima), dizer QUANDO o alias
+             fica citável. Uma mensagem por CITAÇÃO, não por termo. */
+          const completude = completudeDoAlias(st, termos, i);
+          if (completude) grita(st, i, op, 'sel.alias', `alias '${nome}' fica completo no passo ${completude.passo}; você citou no passo ${i} — falta ${completude.pendentes.join(', ')}. Espere o alias fechar (cite depois desse passo) ou use um alias por primitiva nas operações intermediárias.`);
+          vertices.clear(); faces.clear();
+        }
       }
     }
   }
@@ -1828,15 +1892,46 @@ export const OPS = {
      (passa por `st.vec`, então pode citar um PARAM, como os outros pontos); AUSENTE,
      o adaptarV3 usa o CENTROIDE da parte como default. Identidade posicional: face
      inexistente GRITA (órfão), como as outras ops — nunca corrompe (lei do envelope).
-     Uma face pertence a NO MÁXIMO uma parte: reatribuir sobrescreve `f.parte` — ÚLTIMA
-     VENCE (o último `parte` que cita a face manda). `neutroCanonico` anexa `f.parte`
-     (replay determinístico); o pivô é metadado de animação, não muda a MALHA. */
+
+     Uma face pertence a NO MÁXIMO uma parte. Até o O-2 (R2 do plano em
+     docs/mecanifica/OFICINA-OTIMIZACOES.md) reatribuir era SILENCIOSO
+     ("última atribuição vence"), e essa era a pior classe de defeito do
+     vocabulário: resultado ERRADO que PASSA. Duas seleções sobrepostas (duas
+     caixas de `regiao`, um alias que engloba outro) e a parte declarada antes
+     perde faces sem nada reclamar — a bancada mostra a contagem de faces SEM
+     nome, nunca as roubadas. Agora reatribuir para OUTRA parte GRITA e a face
+     fica com o dono ANTIGO (a op nova é a suspeita, não a lista já escrita),
+     salvo `substituir: true` explícito no passo. Renomear para a MESMA parte
+     segue mudo: é seleção redundante, não conflito (medido: as 18 peças do
+     repositório fazem isso 8 vezes e reatribuem 0 face para outra parte, então
+     o diagnóstico é ADITIVO — nenhuma peça shipada muda de hash).
+
+     `neutroCanonico` anexa `f.parte` (replay determinístico); o pivô é metadado
+     de animação, não muda a MALHA. */
   parte(st, a, i) {
     const nome = a.nome;
+    /* `substituir` é chave do FORMATO SALVO: só o literal `true` passa, como o
+       `tudo:true` do `sel` (D-129). `substituir:'sim'`/`1` aceito em silêncio
+       ensinaria a próxima IA a escrever besteira que passa — e ainda por cima
+       desligaria justamente a rede que este item instalou. Valor estranho GRITA
+       e a op segue ESTRITA (fail-closed). */
+    if (a.substituir != null && a.substituir !== true) grita(st, i, 'parte', 'substituir', `substituir inválido: só aceita o literal true (recebido ${JSON.stringify(a.substituir)})`);
+    const substituir = a.substituir === true;
     const alvos = resolverAlvosF(st, a, 'parte', i);
     if (!alvos.size) return;
-    st.partes[nome] = { pivo: a.pivo != null ? st.vec(a.pivo) : null };   // registro nome->{pivo}; pivo null => centroide (no adaptador)
-    for (const fid of alvos) st.F.get(fid).parte = nome;   // última atribuição vence
+    const pivo = a.pivo != null ? st.vec(a.pivo) : null;   // avaliado ANTES de atribuir: ponto malformado segue estourando alto, como antes
+    let atribuiu = false;
+    for (const fid of alvos) {
+      const f = st.F.get(fid);
+      if (f.parte != null && f.parte !== nome && !substituir) {
+        const antes = st.parteAtribuidaEm.get(fid);
+        grita(st, i, 'parte', fid, `face já pertence à parte '${f.parte}'${antes != null ? ` (nomeada no passo ${antes})` : ''} e viraria '${nome}': seleções sobrepostas roubam faces em silêncio — separe as seleções ou escreva substituir: true`);
+        continue;
+      }
+      f.parte = nome; st.parteAtribuidaEm.set(fid, i); atribuiu = true;
+    }
+    if (!atribuiu) return;   // toda a seleção foi recusada: não registra parte fantasma (nome sem nenhuma face)
+    st.partes[nome] = { pivo };   // registro nome->{pivo}; pivo null => centroide (no adaptador)
   },
 
   /* pesar (passo 14a): soma `peso` de influência do OSSO aos VÉRTICES dados (`vs`)
@@ -1923,7 +2018,10 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const motivo = textoDeclaracoes(origemId, declaracoes);
     for (const declaracao of declaracoes.slice(1)) orfaosIniciais.push({ passo: declaracao.passo, op: declaracao.op, ref: origemId, motivo });
   }
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), declaracoesOrigem, aliases, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map() };
+  /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
+     diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
+     dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), declaracoesOrigem, aliases, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;

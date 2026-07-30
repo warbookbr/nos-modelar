@@ -277,6 +277,15 @@ a marca do contorno.
 (quando citado, exigir apenas que ele esteja completo ao final da lista), ou uma
 mensagem que diga "este alias fica completo no passo N, você citou no passo M".
 
+**Estado (R2, item O-11):** a **mensagem** já está no núcleo — citar um alias
+incompleto continua gritando a causa e passa a gritar também
+`alias 'discoInteiro' fica completo no passo 2; você citou no passo 1 — falta
+cilindro:303 (nasce no passo 2)`, com o que falta listado. A **resolução tarde**
+não foi feita: mudaria a semântica do formato salvo e é Faixa 3. O atrito segue
+ABERTO até uma rodada de autoria escrever uma peça com alias de conjunto e
+medir se a mensagem, sozinha, evitou a iteração perdida — o defeito era de
+modelo mental, e só autoria real prova que o modelo mental foi corrigido.
+
 #### A-8 — só se nomeia escalar, nunca ponto
 
 **Onde dói:** linguagem da Oficina.
