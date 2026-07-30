@@ -1,70 +1,122 @@
 {
-  "formato": 1,
-  "herdadas": {
-    "_corpo": {
-      "faces": 3,
+  "formato": 2,
+  "herdadas": [
+    {
+      "peca": "_corpo",
+      "faces": 432,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_espelhado": {
-      "faces": 6,
+    {
+      "peca": "_espelhado",
+      "faces": 188,
       "selV": 1,
-      "selF": 1
+      "selF": 4,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 3
     },
-    "_oficina-anim": {
-      "faces": 6,
+    {
+      "peca": "_oficina-anim",
+      "faces": 50,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_oficina-esqueleto": {
-      "faces": 3,
+    {
+      "peca": "_oficina-esqueleto",
+      "faces": 19,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 24,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_oficina-materiais": {
-      "faces": 4,
+    {
+      "peca": "_oficina-materiais",
+      "faces": 32,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_oficina-toco": {
-      "faces": 6,
+    {
+      "peca": "_oficina-toco",
+      "faces": 31,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 1
     },
-    "_oficina-transp": {
-      "faces": 3,
+    {
+      "peca": "_oficina-transp",
+      "faces": 18,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_pedra": {
-      "faces": 3,
+    {
+      "peca": "_pedra",
+      "faces": 52,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_primitivas": {
-      "faces": 10,
+    {
+      "peca": "_primitivas",
+      "faces": 101,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_torno": {
-      "faces": 7,
+    {
+      "peca": "_torno",
+      "faces": 192,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "_viga": {
-      "faces": 3,
+    {
+      "peca": "_viga",
+      "faces": 32,
       "selV": 0,
-      "selF": 0
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "caixa-ferramentas": {
-      "faces": 17,
-      "selV": 11,
-      "selF": 0
+    {
+      "peca": "caixa-ferramentas",
+      "faces": 246,
+      "selV": 234,
+      "selF": 0,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     },
-    "moto": {
-      "faces": 37,
-      "selV": 3,
-      "selF": 7
+    {
+      "peca": "moto",
+      "faces": 6278,
+      "selV": 72,
+      "selF": 234,
+      "vs": 0,
+      "pontos": 0,
+      "mesclaDe": 0
     }
-  }
+  ]
 }

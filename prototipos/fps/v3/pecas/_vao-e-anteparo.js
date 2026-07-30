@@ -23,8 +23,9 @@
    `apagaFace` (que já aceita `sel:{...}`), ela não tem caminho semântico no
    núcleo atual, então provar a op custa exatamente uma referência posicional —
    registrada aqui como dívida conhecida, não como descuido. O gate
-   `npm run id-cru:check` cobre as formas de COLEÇÃO (`faces:[...]`,
-   `sel:{v}`, `sel:{f}`), que esta peça não usa.
+   `npm run id-cru:check` cobre as SEIS formas de COLEÇÃO (`faces:[...]`,
+   `sel:{v}`, `sel:{f}`, `vs:[...]` do `pesar`, `pontos:[{f}]` do pincel livre
+   e `de:[...]` do `mescla`), nenhuma delas usada por esta peça.
 
    ESTADO DE `moveA`/`moveF` (as outras duas ops sem peça): seguem fora do
    gabarito, DE PROPÓSITO. O plano manda decidir sobre elas à luz do O-8 —

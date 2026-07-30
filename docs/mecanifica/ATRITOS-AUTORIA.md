@@ -63,6 +63,49 @@ acontece sobre uma cor que não é a da peça.
 **Capacidade candidata:** quando a seleção é a única coisa visível, o destaque é
 redundante; o realce deveria virar contorno em vez de tingir a superfície.
 
+### A-15 — a ferramenta de autoria do projeto salva peça que o gate do projeto reprova
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** quem modela em `prototipos/fps/v3/oficina.html` e clica Salvar
+recebe passos endereçados por id posicional e nada mais — a interface emite
+`['parte',{nome,faces:[ids]}]`, `['pincel',{modo:'face',faces:[ids],cor}]`,
+`['solido',{faces:[ids]}]`, `['material',{faces:[ids],usa}]`,
+`['pesar',{osso,faces:[ids],peso}]`, `['pincel',{modo:'livre',pontos:[{f,a,b}]}]`,
+`['mescla',{de:[ids],para}]`, `['moveV',{v,d}]`, `['extruda',{face,dist}]` e, no
+único ponto em que escreve `sel`, escreve `sel:{f:[ids]}` (passo 17, espelhar).
+`sel:{alias|grupo|origem|regiao}` não aparece uma vez. O `tools/servir.mjs` grava
+o resultado em `prototipos/fps/v3/pecas/`, que é exatamente o diretório varrido
+pelo `npm run id-cru:check`. Reproduzido: uma peça de 4 passos com a forma que a
+interface produz sai com exit 1 no gate.
+
+A dor não é o gate reprovar — id posicional é referência proibida pelo
+`CLAUDE.md` e a catraca do O-4 está certa. A dor é o **ciclo fechado**: o
+projeto oferece uma ferramenta para autorar, a ferramenta produz a única saída
+que ela sabe produzir, e essa saída não passa no CI do mesmo projeto. Enquanto
+isso durar, a Oficina serve para explorar e não para entregar, e quem
+modela pela interface descobre isso só no gate.
+
+**Contorno:** converter a peça à mão depois de salvar (trocar `faces:[ids]` por
+`sel:{alias|grupo|origem|regiao}`), ou registrar a peça na lista herdada
+`tools/bancadas/id-cru-herdado.json` de propósito, assumindo a dívida no commit.
+Foi só o conselho da mensagem de erro que mudou nesta rodada: ele dizia
+"Endereçe por `sel:{alias|grupo|origem|regiao}`" sem dizer que isso é impossível
+pela interface — remediação que não existe é pior que remediação nenhuma, porque
+manda o autor procurar uma saída inexistente.
+
+**Capacidade candidata:** a Oficina precisa saber emitir referência semântica —
+nomear a seleção (alias) ou citar a `origem` da primitiva no momento em que
+grava o passo, em vez de despejar o id que ela tem na mão. É o mesmo assunto de
+O-6/O-12 (R4) e O-7 (R5), visto do lado da interface: enquanto o gerador não
+publica identidade endereçável, a interface não tem o que citar. Vale para
+qualquer editor que grave um script reexecutável, não só para a Mecanifica.
+
+Três formas que a interface emite (`vs:[ids]` do `pesar`, `pontos:[{f}]` do
+pincel macio e `de:[ids]` do `mescla`) não têm caminho semântico **no núcleo**,
+não só na interface: ali nem converter à mão resolve. Essas três só saem do id
+posicional com capacidade nova no próprio vocabulário.
+
 ## Rodada 1 — freio a disco
 
 Sessão de modelagem de `prototipos/fps/v3/pecas/freio-disco.js` (Fase 3), sem

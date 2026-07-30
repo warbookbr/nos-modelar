@@ -181,8 +181,8 @@ chave a mais no formato salvo.
 
 ### O-4 — gate contra id cru em peça nova
 
-**O que muda:** `faces: [...]` e `sel: {v|f}` continuam sendo lidos, mas um gate
-reprova **peça nova** que os use.
+**O que muda:** as formas de coleção de id continuam sendo lidas, mas um gate
+reprova **peça nova** que as use.
 
 **Por que:** o `CLAUDE.md` proíbe id posicional como referência persistida e o
 formato aceita — 108 usos em 11 peças legadas. A rodada provou que o caminho
@@ -192,6 +192,33 @@ semântico basta: o freio tem **0** ids crus.
 dívida herdada de dívida nova, sem migração forçada.
 
 **Custo:** baixo.
+
+**O que a revisão adversarial corrigiu depois.** A primeira versão do gate media
+a coisa errada duas vezes, e as duas com aparência de número exato:
+
+- cobria **três** formas de coleção e declarava que eram todas. O núcleo tem
+  **seis** — faltavam `vs:[ids]` do `pesar`, `pontos:[{f}]` do pincel macio e
+  `de:[ids]` do `mescla`, esta última declarada como forma *singular* sendo
+  coleção. `_oficina-esqueleto` já carregava 24 ids de vértice que a lista
+  congelada registrava como `selV: 0`: o gate deixava passar exatamente a classe
+  que veio proibir, em toda peça com esqueleto;
+- contava **passo**, não id, enquanto o cabeçalho prometia contagem exata nos
+  dois sentidos. `faces:[0,1]` e `faces:[0..19]` davam o mesmo número, então a
+  `moto` podia decuplicar a dívida sem sair dos 37 passos congelados.
+
+A correção conta id, cobre as seis formas, e trava o inventário com um teste que
+varre `a.<chave>` dentro de `OPS`: chave nova no núcleo quebra o teste e obriga a
+classificar a chave como coleção, singular ou não-id. A medida verdadeira é
+**8244 ids** em 13 peças, não 131 passos. As formas singulares (`face`, `v`,
+`a`/`b`, `para`) seguem fora de escopo, agora com a lista completa e verdadeira.
+
+**Onde o O-4 encosta na Oficina (A-15).** A interface só sabe salvar por id
+posicional e grava no diretório que o gate varre, então toda peça salva pela
+Oficina reprova. A decisão é não afrouxar o gate e não ensinar a interface a
+emitir referência semântica aqui — isso é R4/R5. O que se corrigiu foi a
+**mensagem**, que mandava endereçar por `sel:{alias|grupo|origem|regiao}` sem
+dizer que isso é impossível pela interface e impossível no núcleo para
+`vs`/`pontos`/`de`. Remediação inexistente é pior que remediação nenhuma.
 
 ### O-11 — diagnóstico de completude de alias
 

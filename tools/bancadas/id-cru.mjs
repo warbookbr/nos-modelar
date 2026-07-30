@@ -3,26 +3,62 @@
  * peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
  *
  * O `CLAUDE.md` proíbe id posicional como referência persistida, mas o formato
- * salvo aceita três formas de COLEÇÃO de id cru — `faces:[ids]` (legado),
- * `sel:{v:[ids]}` e `sel:{f:[ids]}`. Medido no repositório: 131 usos em 13
- * peças. Remover de vez quebraria as 13 e o gabarito; o freio a disco, escrito
- * já com o caminho semântico, tem 0 — prova de que `alias`/`grupo`/`origem`/
- * `regiao` bastam. Este gate separa dívida HERDADA de dívida NOVA.
+ * salvo aceita SEIS formas de COLEÇÃO de id cru. A lista abaixo não é opinião:
+ * saiu de varrer TODA leitura `a.<chave>` dentro de `OPS`
+ * (`prototipos/fps/v3/motor/oficina.js`) atrás de vértice ou face vindo do
+ * passo. Se uma op nova ler id de uma chave nova, ela entra aqui:
+ *
+ *   forma                  ops que leem                                        caminho semântico?
+ *   faces:[ids]            pincel/solido/liso/material/parte/espelha           SIM (resolverAlvosF -> sel:{...})
+ *                          pesar                                               NÃO (pesar lê a.faces cru)
+ *   sel:{v:[ids]}          displace/transladar/rotaciona (resolverAlvosV)      SIM
+ *   sel:{f:[ids]}          qualquer op com sel                                 SIM
+ *   vs:[ids]               pesar                                               NÃO
+ *   pontos:[{f:id}]        pincel modo:'livre'                                 NÃO
+ *   de:[ids]               mescla                                              NÃO
+ *
+ * As três últimas eram o BURACO que a revisão da R2 achou: o arquivo afirmava
+ * cobrir "as três formas de coleção" e deixava passar `pesar {vs}`, o pincel
+ * macio e o `de:[ids]` do `mescla` — que é COLEÇÃO, não singular, e estava
+ * declarado como singular. Medido no baseline: `_oficina-esqueleto` tem 6
+ * passos `pesar` com 24 ids de vértice que a lista congelada registrava como
+ * `selV: 0`. O gate deixava passar exatamente a classe que veio proibir.
+ *
+ * A CONTAGEM É DE ID, NÃO DE PASSO. Contar passo era a segunda cegueira: com
+ * `faces` medindo "quantos passos têm a chave", um `pincel` podia ir de 2 para
+ * 200 faces sem mexer no número, e o cabeçalho ainda prometia contagem exata.
+ * Regra: chave presente conta os ids que ela carrega, e NUNCA menos que 1 —
+ * `faces: []` e `faces: 'nada'` são a forma legada sendo usada (o núcleo grita
+ * nas duas), não ausência dela.
  *
  * A lista de exceções é EXPLÍCITA e VERSIONADA (`id-cru-herdado.json`): nome de
  * peça e contagem exata por forma. Nada de heurística de data ou de mtime — o
  * `CLAUDE.md` exige determinismo, e uma lista com nome ainda diz QUEM deve.
+ * `herdadas` é uma LISTA ORDENADA, não um objeto: nome de peça que parece
+ * inteiro (`9.js`, `10.js` são nomes legais) é reordenado numericamente pelo
+ * motor JS e pelo `JSON.parse`, então um objeto grava numa ordem e relê noutra
+ * — o arquivo salvo se autoinvalidava. Ordem é dado; array carrega ordem, mapa
+ * não.
  * A contagem é EXATA nos dois sentidos: cresceu, reprova (dívida nova
  * disfarçada de herdada); diminuiu, reprova pedindo que a lista encolha junto
  * (senão a lista mente e vira teto para regredir de graça). Peça que sai da
  * lista e continua usando id cru cai na regra da peça nova e reprova.
  *
- * FORA DE ESCOPO, de propósito e declarado: as formas SINGULARES de id cru
- * (`face:<id>` de `vira`/`moveF`/`extruda`/`apagaFace`, `v:<id>` de `moveV`,
- * `a`/`b` de `moveA`, `de`/`para` de `mescla`). Metade dessas ops não tem
- * caminho semântico nenhum no núcleo atual — `vira` só aceita `face:<id>` —,
- * então gatear isso hoje proibiria usar a op em vez de proibir o atalho. Fica
- * registrado como pendência do plano, não como omissão silenciosa.
+ * FORA DE ESCOPO, de propósito, declarado e COMPLETO — as formas SINGULARES,
+ * as únicas quatro que existem no núcleo:
+ *   `face:<id>`        `vira`, `moveF`, `extruda`, `apagaFace`
+ *   `v:<id>`           `moveV`
+ *   `a:<id>`/`b:<id>`  `moveA`
+ *   `para:<id>`        `mescla`
+ * Metade dessas ops não tem caminho semântico nenhum no núcleo atual — `vira`
+ * só aceita `face:<id>` —, então gatear isso hoje proibiria usar a op em vez de
+ * proibir o atalho. Fica registrado como pendência do plano, não como omissão
+ * silenciosa.
+ *
+ * NÃO SÃO ID POSICIONAL, e por isso não entram: `id` (a declaração da base do
+ * passo, que `confereId` já confere contra a POSIÇÃO), e `origemId`/`derivaDe`/
+ * `sel:{origem}` (identidade estável declarada pelo autor — o caminho semântico
+ * em pessoa).
  *
  *   node tools/bancadas/id-cru.mjs           # relata e ENCOLHE a lista herdada (nunca aumenta)
  *   node tools/bancadas/id-cru.mjs --check   # o gate: exit≠0 na primeira divergência
@@ -39,32 +75,60 @@ const REPO = resolve(HERE, '../..');
 const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
 
 export const LISTA_PADRAO = join(HERE, 'id-cru-herdado.json');
-export const FORMATO = 1;
+/* 2: `herdadas` virou lista ordenada e ganhou as três formas que faltavam. Ler
+   um arquivo `formato: 1` com esta ferramenta compararia contagem de PASSO com
+   contagem de ID — número contra número, sem nada estourar. Por isso o formato
+   é fechado: arquivo antigo GRITA em vez de mentir. */
+export const FORMATO = 2;
 
-/* As três formas de coleção que o gate cobre. A ordem é a da mensagem de erro
+/* As seis formas de coleção que o gate cobre. A ordem é a da mensagem de erro
    e a da serialização — determinismo antes de estética. */
-export const FORMAS = /** @type {const} */ (['faces', 'selV', 'selF']);
+export const FORMAS = /** @type {const} */ (['faces', 'selV', 'selF', 'vs', 'pontos', 'mesclaDe']);
 
-const ROTULO = { faces: 'faces:[ids]', selV: 'sel:{v:[ids]}', selF: 'sel:{f:[ids]}' };
+const ROTULO = {
+  faces: 'faces:[ids]',
+  selV: 'sel:{v:[ids]}',
+  selF: 'sel:{f:[ids]}',
+  vs: 'vs:[ids] (pesar)',
+  pontos: 'pontos:[{f}] (pincel livre)',
+  mesclaDe: 'de:[ids] (mescla)',
+};
+
+/* Quais formas têm para onde ir HOJE. O conselho de conserto precisa ser
+   verdadeiro por forma: mandar trocar `vs:[ids]` por `sel:{alias}` seria
+   mandar fazer o que o núcleo não aceita. */
+const TEM_CAMINHO_SEMANTICO = { faces: true, selV: true, selF: true, vs: false, pontos: false, mesclaDe: false };
 
 const objetoPlano = (x) => typeof x === 'object' && x !== null && !Array.isArray(x);
 
+/* Chave presente NUNCA conta 0: `faces: []` (o núcleo grita "seleção vazia") e
+   `faces: 'nada'` (grita "precisa ser uma lista de ids") são a forma legada
+   sendo usada, não ausência dela — o gate não pode ser mais permissivo que o
+   núcleo. Fora isso, conta ID: é o número que cresce quando a dívida cresce. */
+const contarIds = (x) => (Array.isArray(x) ? Math.max(1, x.length) : 1);
+/* `pontos` carrega o id dentro da entrada (`{f, a, b}`): conta as entradas que
+   trazem `f`, que é o que o `pincel` modo livre lê. */
+const contarPontos = (x) => (Array.isArray(x) ? Math.max(1, x.filter((p) => objetoPlano(p) && Object.hasOwn(p, 'f')).length) : 1);
+
 /* Conta id cru numa lista de PASSOS. Estrutural, não textual: um comentário
-   citando `faces:` não conta, e um passo montado por helper conta. Presença da
-   chave já é uso — `faces: 'nada'` é id cru MALFORMADO, não ausência (o núcleo
-   grita nele; o gate não pode ser mais permissivo que o núcleo). */
+   citando `faces:` não conta, e um passo montado por helper conta. Op-agnóstico
+   de propósito — a chave é o contrato, e um passo montado por helper local (o
+   `paraEixoX` do freio) não tem nome de op para consultar. */
 export function contarIdCru(passos) {
-  const uso = { faces: 0, selV: 0, selF: 0 };
+  const uso = { faces: 0, selV: 0, selF: 0, vs: 0, pontos: 0, mesclaDe: 0 };
   if (!Array.isArray(passos)) return uso;
   for (const passo of passos) {
     if (!Array.isArray(passo)) continue;
     const a = passo[1];
     if (!objetoPlano(a)) continue;
-    if (Object.hasOwn(a, 'faces')) uso.faces++;
+    if (Object.hasOwn(a, 'faces')) uso.faces += contarIds(a.faces);
+    if (Object.hasOwn(a, 'vs')) uso.vs += contarIds(a.vs);
+    if (Object.hasOwn(a, 'pontos')) uso.pontos += contarPontos(a.pontos);
+    if (Object.hasOwn(a, 'de')) uso.mesclaDe += contarIds(a.de);
     const sel = a.sel;
     if (objetoPlano(sel)) {
-      if (Object.hasOwn(sel, 'v')) uso.selV++;
-      if (Object.hasOwn(sel, 'f')) uso.selF++;
+      if (Object.hasOwn(sel, 'v')) uso.selV += contarIds(sel.v);
+      if (Object.hasOwn(sel, 'f')) uso.selF += contarIds(sel.f);
     }
   }
   return uso;
@@ -72,6 +136,29 @@ export function contarIdCru(passos) {
 
 export const totalDe = (uso) => FORMAS.reduce((s, k) => s + uso[k], 0);
 export const detalheDe = (uso) => FORMAS.filter((k) => uso[k] > 0).map((k) => `${uso[k]}× ${ROTULO[k]}`).join(', ');
+
+/* A remediação HONESTA. A mensagem antiga mandava "endereçe por
+   sel:{alias|grupo|origem|regiao}" para qualquer forma, e isso mentia duas
+   vezes: `vs`/`pontos`/`de` não têm caminho semântico no núcleo, e quem modela
+   em `oficina.html` e clica Salvar não tem como emitir referência semântica
+   nenhuma — a interface só sabe gravar id posicional, e grava justamente no
+   diretório que este gate varre. Conselho impossível é pior que conselho
+   nenhum: manda o autor procurar uma saída que não existe. */
+function comoConsertar(uso) {
+  const presentes = FORMAS.filter((k) => uso[k] > 0);
+  const semCaminho = presentes.filter((k) => !TEM_CAMINHO_SEMANTICO[k]);
+  const linhas = [];
+  if (presentes.some((k) => TEM_CAMINHO_SEMANTICO[k])) {
+    linhas.push('escrita à mão: troque por sel:{alias|grupo|origem|regiao} — o freio a disco prova que dá (0 id cru).');
+  }
+  if (semCaminho.length) {
+    const nomes = semCaminho.map((k) => ROTULO[k]);
+    const juntos = nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes.at(-1)}` : nomes[0];
+    linhas.push(`${juntos} ${nomes.length > 1 ? 'NÃO têm' : 'NÃO tem'} caminho semântico no núcleo — a op só aceita id ali. Ou a peça nova ainda não usa a op, ou entra na lista herdada de propósito.`);
+  }
+  linhas.push('salva pela Oficina (prototipos/fps/v3/oficina.html → Salvar → prototipos/fps/v3/pecas/): a interface AINDA NÃO sabe emitir referência semântica — ela só grava id posicional (R4/R5 do plano). Enquanto isso as saídas honestas são duas: converter a peça à mão, ou registrar a entrada em tools/bancadas/id-cru-herdado.json DE PROPÓSITO, assumindo a dívida no commit. Atrito A-15 em docs/mecanifica/ATRITOS-AUTORIA.md.');
+  return linhas.map((l) => `\n      · ${l}`).join('');
+}
 
 /* Validação da lista salva. Chave nova em formato salvo entra com validação que
    GRITA em valor inesperado: aqui nada é aceito por omissão nem por coerção. */
@@ -81,25 +168,42 @@ export function validarLista(dados) {
   const chaves = Object.keys(dados).sort();
   if (chaves.join(',') !== 'formato,herdadas') erros.push(`chaves de topo inesperadas: ${chaves.join(',') || '(nenhuma)'} — só formato e herdadas`);
   if (dados.formato !== FORMATO) erros.push(`formato ${JSON.stringify(dados.formato)} desconhecido — esta ferramenta lê só ${FORMATO}`);
-  if (!objetoPlano(dados.herdadas)) { erros.push('herdadas precisa ser um objeto nome->contagem'); return erros; }
+  if (!Array.isArray(dados.herdadas)) { erros.push('herdadas precisa ser uma LISTA de entradas {peca, ...contagens} — objeto não carrega ordem (nome que parece inteiro reordena)'); return erros; }
 
-  const nomes = Object.keys(dados.herdadas);
-  const ordenados = nomes.slice().sort();
-  if (nomes.some((n, k) => n !== ordenados[k])) erros.push('herdadas fora de ordem alfabética — o arquivo precisa ser determinístico');
-  for (const nome of nomes) {
-    if (!nome) { erros.push('entrada com nome vazio'); continue; }
-    const uso = dados.herdadas[nome];
-    if (!objetoPlano(uso)) { erros.push(`${nome}: contagem precisa ser um objeto com ${FORMAS.join(', ')}`); continue; }
-    const k = Object.keys(uso).sort();
-    if (k.join(',') !== FORMAS.slice().sort().join(',')) { erros.push(`${nome}: chaves ${k.join(',') || '(nenhuma)'} — precisa ter exatamente ${FORMAS.join(', ')}`); continue; }
+  const ESPERADAS = ['peca', ...FORMAS].slice().sort().join(',');
+  let anterior = null;
+  for (const entrada of dados.herdadas) {
+    if (!objetoPlano(entrada)) { erros.push(`entrada ${JSON.stringify(entrada)} não é um objeto {peca, ...contagens}`); continue; }
+    const nome = entrada.peca;
+    if (typeof nome !== 'string' || !nome) { erros.push(`entrada com peca ${JSON.stringify(nome)} — precisa ser um nome não-vazio`); continue; }
+    const k = Object.keys(entrada).sort();
+    if (k.join(',') !== ESPERADAS) { erros.push(`${nome}: chaves ${k.join(',') || '(nenhuma)'} — precisa ter exatamente peca, ${FORMAS.join(', ')}`); continue; }
+    /* Ordem ESTRITAMENTE crescente: pega desordem e nome repetido de uma vez
+       (repetido é a pior das duas — a segunda entrada venceria em silêncio). */
+    if (anterior !== null && !(anterior < nome)) {
+      erros.push(anterior === nome ? `${nome}: entrada duplicada — cada peça aparece uma vez` : `herdadas fora de ordem alfabética (${JSON.stringify(anterior)} antes de ${JSON.stringify(nome)}) — o arquivo precisa ser determinístico`);
+    }
+    anterior = nome;
     let ok = true;
     for (const forma of FORMAS) {
-      const n = uso[forma];
+      const n = entrada[forma];
       if (!Number.isSafeInteger(n) || n < 0) { erros.push(`${nome}.${forma}: ${JSON.stringify(n)} não é inteiro não-negativo`); ok = false; }
     }
-    if (ok && totalDe(uso) === 0) erros.push(`${nome}: entrada zerada — peça sem id cru não é dívida herdada, remova a entrada`);
+    if (ok && totalDe(entrada) === 0) erros.push(`${nome}: entrada zerada — peça sem id cru não é dívida herdada, remova a entrada`);
   }
   return erros;
+}
+
+/* A lista no disco é ORDENADA; a comparação quer acesso por nome. `indexar` faz
+   a ponte, e só depois de `validarLista` ter aprovado (duplicata já gritou). */
+export function indexar(herdadas) {
+  const mapa = {};
+  for (const e of herdadas ?? []) {
+    const uso = {};
+    for (const forma of FORMAS) uso[forma] = e[forma];
+    mapa[e.peca] = uso;
+  }
+  return mapa;
 }
 
 export function lerLista(caminho = LISTA_PADRAO) {
@@ -110,10 +214,17 @@ export function lerLista(caminho = LISTA_PADRAO) {
   return { ausente: false, dados, erros: validarLista(dados) };
 }
 
+/* Grava a partir do mapa nome->uso. A ordem sai de `Object.keys().sort()` e
+   SOBREVIVE ao disco porque o destino é um array — num objeto, "9" e "10"
+   voltariam antes de qualquer letra e o arquivo recém-gravado seria recusado
+   pelo próprio `--check` do comando seguinte. */
 export function gravarLista(herdadas, caminho = LISTA_PADRAO) {
-  const ordenado = {};
-  for (const nome of Object.keys(herdadas).sort()) ordenado[nome] = herdadas[nome];
-  writeFileSync(caminho, JSON.stringify({ formato: FORMATO, herdadas: ordenado }, null, 2) + '\n');
+  const lista = Object.keys(herdadas).sort().map((peca) => {
+    const e = { peca };
+    for (const forma of FORMAS) e[forma] = herdadas[peca][forma];
+    return e;
+  });
+  writeFileSync(caminho, JSON.stringify({ formato: FORMATO, herdadas: lista }, null, 2) + '\n');
 }
 
 /* Mede as peças do repositório. Mesmo escopo do `gabarito:selecao`: só peça com
@@ -139,20 +250,20 @@ export function conferir(usos, herdadas) {
   const problemas = [];
   for (const nome of Object.keys(usos).sort()) {
     if (!Object.hasOwn(herdadas, nome)) {
-      problemas.push(`${nome}: ID CRU em peça NOVA — ${totalDe(usos[nome])} uso(s) (${detalheDe(usos[nome])}). Endereçe por sel:{alias|grupo|origem|regiao}; o freio a disco prova que dá (0 id cru).`);
+      problemas.push(`${nome}: ID CRU em peça NOVA — ${totalDe(usos[nome])} id(s) posicional(is) (${detalheDe(usos[nome])}).${comoConsertar(usos[nome])}`);
     }
   }
   for (const nome of Object.keys(herdadas).sort()) {
     const esperado = herdadas[nome], medido = usos[nome];
     if (!medido) {
-      problemas.push(`${nome}: listada como herdada mas mede 0 uso de id cru (peça sumiu, perdeu PASSOS, ou a dívida foi paga) — remova a entrada com \`npm run id-cru\`.`);
+      problemas.push(`${nome}: listada como herdada mas mede 0 id cru (peça sumiu, perdeu PASSOS, ou a dívida foi paga) — remova a entrada com \`npm run id-cru\`.`);
       continue;
     }
     for (const forma of FORMAS) {
       if (medido[forma] === esperado[forma]) continue;
       const cresceu = medido[forma] > esperado[forma];
       problemas.push(
-        `${nome}.${forma}: ${medido[forma]} uso(s) de ${ROTULO[forma]}, a lista congelou ${esperado[forma]} — ` +
+        `${nome}.${forma}: ${medido[forma]} id(s) de ${ROTULO[forma]}, a lista congelou ${esperado[forma]} — ` +
         (cresceu ? 'dívida herdada NÃO cresce: a peça é antiga, o uso é novo.' : 'dívida paga: encolha a lista com `npm run id-cru`.'),
       );
     }
@@ -185,21 +296,23 @@ if (chamadoDireto) {
 
   if (ausente && checando) { console.error(`✗ lista herdada ausente: ${caminho} — rode \`npm run id-cru\` para fundá-la e COMMITE o arquivo.`); process.exit(2); }
 
+  const herdadas = ausente ? {} : indexar(dados.herdadas);
+
   if (checando) {
-    const problemas = conferir(usos, dados.herdadas);
+    const problemas = conferir(usos, herdadas);
     if (problemas.length) {
       console.error(`✗ id-cru — ${problemas.length} problema(s):`);
       for (const p of problemas) console.error(`  - ${p}`);
       console.error('\nid-cru FALHOU — id posicional é referência proibida pelo CLAUDE.md; a lista herdada é dívida congelada, não permissão.');
       process.exit(1);
     }
-    console.log(`✓ id-cru — 0 uso de id cru fora da lista herdada (${Object.keys(dados.herdadas).length} peça(s) herdada(s), ${totalMedido} uso(s) congelado(s))`);
+    console.log(`✓ id-cru — 0 id cru fora da lista herdada (${dados.herdadas.length} peça(s) herdada(s), ${totalMedido} id(s) congelado(s))`);
     process.exit(0);
   }
 
   if (ausente) {
     gravarLista(usos, caminho);
-    console.log(`lista herdada FUNDADA em ${caminho}: ${Object.keys(usos).length} peça(s), ${totalMedido} uso(s) de id cru.`);
+    console.log(`lista herdada FUNDADA em ${caminho}: ${Object.keys(usos).length} peça(s), ${totalMedido} id(s) cru(s).`);
     for (const nome of Object.keys(usos).sort()) console.log(`  ${nome}: ${detalheDe(usos[nome])}`);
     process.exit(0);
   }
@@ -207,7 +320,7 @@ if (chamadoDireto) {
   /* A lista só ENCOLHE por ferramenta. Entrar nela é decisão humana, escrita à
      mão e revisada no diff — senão bastaria rodar o comando para transformar
      dívida nova em herdada, e o gate não gatearia nada. */
-  const recusas = conferir(usos, dados.herdadas).filter((p) => p.includes('peça NOVA') || p.includes('NÃO cresce'));
+  const recusas = conferir(usos, herdadas).filter((p) => p.includes('peça NOVA') || p.includes('NÃO cresce'));
   if (recusas.length) {
     console.error(`✗ id-cru — ${recusas.length} caso(s) que esta ferramenta NÃO grava:`);
     for (const r of recusas) console.error(`  - ${r}`);
@@ -217,14 +330,15 @@ if (chamadoDireto) {
 
   const novo = {};
   const encolheu = [];
-  for (const nome of Object.keys(dados.herdadas).sort()) {
-    const antes = dados.herdadas[nome], medido = usos[nome];
-    if (!medido) { encolheu.push(`${nome}: saiu da lista (0 uso)`); continue; }
-    novo[nome] = { faces: medido.faces, selV: medido.selV, selF: medido.selF };
+  for (const nome of Object.keys(herdadas).sort()) {
+    const antes = herdadas[nome], medido = usos[nome];
+    if (!medido) { encolheu.push(`${nome}: saiu da lista (0 id cru)`); continue; }
+    novo[nome] = {};
+    for (const forma of FORMAS) novo[nome][forma] = medido[forma];
     for (const forma of FORMAS) if (medido[forma] !== antes[forma]) encolheu.push(`${nome}.${forma}: ${antes[forma]} → ${medido[forma]}`);
   }
   gravarLista(novo, caminho);
-  console.log(`id-cru — ${Object.keys(novo).length} peça(s) herdada(s), ${totalMedido} uso(s) de id cru congelado(s).`);
+  console.log(`id-cru — ${Object.keys(novo).length} peça(s) herdada(s), ${totalMedido} id(s) cru(s) congelado(s).`);
   if (encolheu.length) for (const e of encolheu) console.log(`  ${e}`);
   else console.log('  (nada mudou)');
   console.log(`gravado em ${caminho}`);

@@ -148,10 +148,15 @@ npm run docs:links:check
 ```
 
 `npm run id-cru:check` é o gate do O-4: peça **nova** que enderece geometria por
-id posicional (`faces:[ids]`, `sel:{v}`, `sel:{f}`) reprova. As peças herdadas
-ficam numa lista explícita e versionada em `tools/bancadas/id-cru-herdado.json`,
-com a contagem exata congelada — a dívida não cresce e, quando é paga,
-`npm run id-cru` encolhe a lista.
+id posicional reprova. Cobre as **seis** formas de coleção que o núcleo lê —
+`faces:[ids]`, `sel:{v}`, `sel:{f}`, `vs:[ids]` (`pesar`), `pontos:[{f}]`
+(pincel livre) e `de:[ids]` (`mescla`) —, contando **id**, não passo. As formas
+singulares (`face`, `v`, `a`/`b`, `para`) ficam fora, declarado no cabeçalho da
+ferramenta. As peças herdadas ficam numa lista explícita e versionada em
+`tools/bancadas/id-cru-herdado.json`, com a contagem exata congelada — a dívida
+não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
+salva só por id posicional, então peça salva pela interface reprova: ver A-15 em
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
 [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).
