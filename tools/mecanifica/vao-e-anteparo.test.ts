@@ -8,6 +8,8 @@ import { describe, expect, it } from 'vitest';
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — peça de exercício em JavaScript.
 import * as peca from '../../prototipos/fps/v3/pecas/_vao-e-anteparo.js';
+// @ts-expect-error — módulo neutro de medição em JavaScript.
+import { caixaDaParte, descreverPeca } from '../../src/autoria/descrever-partes.js';
 
 const NOOP = ['transladar', { d: [0, 0, 0], sel: { grupo: 'anteparo' } }];
 const PASSO_VIRA = 2;
@@ -79,5 +81,46 @@ describe('_vao-e-anteparo — as duas ops que faltavam ao gabarito', () => {
     expect(depois).toEqual(antes.map((c) => (c === 0 ? 0 : -c)));
     expect(antes[1]).toBeGreaterThan(0);   // `plano` nasce olhando para +y
     expect(depois[1]).toBeLessThan(0);     // e o anteparo é visto de baixo
+  });
+
+  it('o anteparo está SUSPENSO dentro da carcaça, com folga em toda a volta', () => {
+    const P = peca.PARAMS;
+    const neutro = construir();
+    const [relacao] = descreverPeca(neutro).relacoes;
+    const anteparo = caixaDaParte(neutro, 'anteparo');
+    const carcaca = caixaDaParte(neutro, 'carcaca');
+
+    /* A régua diz `encosta`, e é preciso ler o que isso significa AQUI: o
+       anteparo é uma chapa de espessura ZERO (uma face só, de `plano`), então
+       seu intervalo em y é um ponto. Contido na carcaça em x e z, o maior vão
+       dos três eixos é exatamente 0 — e vão 0 é, por definição da régua,
+       `encosta`. Não é contato mecânico: a chapa não toca parede nenhuma.
+       `encosta` é o TETO do que a régua consegue afirmar sobre um corpo sem
+       volume — ele nunca pode dar `interpenetra` (não há espessura para
+       invadir) nem `folga` (está contido). O que a peça de exercício afirma de
+       verdade é CONTENÇÃO, e é isso que as asserções abaixo prendem. */
+    expect(relacao.tipo).toBe('encosta');
+    expect([relacao.a, relacao.b]).toEqual(['anteparo', 'carcaca']);
+    expect(anteparo.dimensoes[1]).toBe(0);
+
+    /* a folga lateral vem dos parâmetros, não de um número digitado: a chapa é
+       menor que a carcaça nos dois eixos e fica centrada, logo sobra metade da
+       diferença de cada lado. Alargar o anteparo até a parede muda a peça de
+       "chapa suspensa" para "divisória colada", e este teste acusa. */
+    const folgaX = (P.carcacaLarg - P.anteparoLargura) / 2;
+    const folgaZ = (P.carcacaProf - P.anteparoProfundidade) / 2;
+    expect(folgaX).toBeGreaterThan(0);
+    expect(folgaZ).toBeGreaterThan(0);
+    expect(anteparo.min[0] - carcaca.min[0]).toBeCloseTo(folgaX, 12);
+    expect(carcaca.max[0] - anteparo.max[0]).toBeCloseTo(folgaX, 12);
+    expect(anteparo.min[2] - carcaca.min[2]).toBeCloseTo(folgaZ, 12);
+    expect(carcaca.max[2] - anteparo.max[2]).toBeCloseTo(folgaZ, 12);
+
+    /* e em altura ela fica ACIMA do vão do fundo e ABAIXO do teto — é essa
+       posição que faz sentido olhá-la de baixo, que é o motivo do `vira`. */
+    expect(anteparo.min[1]).toBeGreaterThan(carcaca.min[1]);
+    expect(anteparo.max[1]).toBeLessThan(carcaca.max[1]);
+    expect(anteparo.min[1] - carcaca.min[1]).toBeCloseTo(P.anteparoY, 12);
+    expect(carcaca.max[1] - carcaca.min[1]).toBeCloseTo(P.carcacaAlt, 12);
   });
 });
