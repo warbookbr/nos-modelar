@@ -23,24 +23,34 @@
             <small>oficina interativa</small>
           </span>
         </a>
-        <span class="fase"><i></i> prova de arquitetura</span>
+        <span class="fase"><i></i> marco 1 · primeiro sistema</span>
       </header>
 
       <main>
         <section class="apresentacao" aria-labelledby="titulo">
-          <p class="sobretitulo">NÚCLEO PROCEDURAL × THREE.JS</p>
-          <h1 id="titulo">Uma peça que a IA consegue <em>entender</em>.</h1>
+          <p class="sobretitulo">FREIO DIANTEIRO DIREITO</p>
+          <h1 id="titulo">Veja onde o <em>freio</em> trabalha.</h1>
           <p>
-            Esta primeira ponte traz o drone herdado do NÓS para a nova camada
-            visual. Cada componente nomeado continua selecionável sem depender
-            do ID interno do renderizador.
+            O carro é contexto. O conjunto real continua formado pelas mesmas
+            partes semânticas da bancada, agora no lugar em que atua.
           </p>
           <div class="acoes">
-            <button id="btnExplorar" class="primaria" type="button">Explorar a peça</button>
-            <a class="secundaria" href="./bancada.html">Abrir bancada</a>
-            <a id="linkLegado" class="terciaria" href="#">Atelier legado</a>
+            <button id="btnExplorar" class="primaria" type="button">Localizar freio</button>
+            <button id="btnFocarSistema" class="secundaria" type="button">Focar sistema</button>
+            <button id="btnExplodir" class="secundaria" type="button" aria-pressed="false">Explodir freio</button>
+            <a class="terciaria" href="./bancada.html?peca=freio-disco">Abrir bancada</a>
           </div>
         </section>
+
+        <aside class="modos" aria-label="Modo de visualização">
+          <span class="rotulo">VISUALIZAÇÃO</span>
+          <strong id="modoAtual">Carro completo</strong>
+          <div class="modo-acoes">
+            <button data-modo="carro" class="ativa" type="button">Carro</button>
+            <button data-modo="contexto" type="button">Contexto</button>
+            <button data-modo="isolar" type="button">Só freio</button>
+          </div>
+        </aside>
 
         <aside class="inspetor" aria-live="polite">
           <div class="inspetor-topo">
@@ -48,7 +58,7 @@
             <button id="btnLimpar" type="button" aria-label="Limpar seleção">×</button>
           </div>
           <strong id="parteNome">Nenhuma peça selecionada</strong>
-          <p id="parteDescricao">Clique no modelo ou escolha uma parte abaixo.</p>
+          <p id="parteDescricao">Clique no freio ou escolha uma parte abaixo.</p>
           <div id="partes" class="partes" aria-label="Partes disponíveis"></div>
         </aside>
 

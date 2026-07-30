@@ -36,30 +36,18 @@ function montarGalpao(scene) {
     scene.add(caixa({ tamanho: [16.2, 0.11, 0.3], posicao: [0, y, -5.76], material: metal }));
   }
 
-  const faixa = caixa({ tamanho: [5.8, 0.055, 1.35], posicao: [0.2, 0.036, 0.2], material: detalhe, sombra: false });
+  const faixa = caixa({ tamanho: [2.6, 0.055, 5.4], posicao: [0, 0.036, 0], material: detalhe, sombra: false });
   faixa.material = detalhe.clone();
   faixa.material.opacity = 0.12;
   faixa.material.transparent = true;
   scene.add(faixa);
 
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.72, 1.9, 0.32, 48),
-    new THREE.MeshStandardMaterial({ color: '#111b18', roughness: 0.4, metalness: 0.7 }),
-  );
-  base.position.set(1.5, 0.16, 0.15);
-  base.castShadow = true;
-  base.receiveShadow = true;
-  scene.add(base);
+  for (const x of [-2.8, 2.8]) {
+    scene.add(caixa({ tamanho: [0.2, 5.6, 0.2], posicao: [x, 2.8, 0], material: metal }));
+  }
+  scene.add(caixa({ tamanho: [5.8, 0.18, 0.24], posicao: [0, 5.55, 0], material: metal }));
 
-  const aro = new THREE.Mesh(
-    new THREE.TorusGeometry(1.62, 0.035, 12, 64),
-    new THREE.MeshStandardMaterial({ color: '#e1a53c', emissive: '#7b4b0c', emissiveIntensity: 0.25, roughness: 0.4 }),
-  );
-  aro.rotation.x = Math.PI / 2;
-  aro.position.set(1.5, 0.34, 0.15);
-  scene.add(aro);
-
-  return { base, centro: new THREE.Vector3(1.5, 1.3, 0.15) };
+  return { centro: new THREE.Vector3(0, 1.05, 0) };
 }
 
 export function criarCena(canvas) {
@@ -84,7 +72,7 @@ export function criarCena(canvas) {
   controls.minDistance = 2.4;
   controls.maxDistance = 12;
   controls.maxPolarAngle = Math.PI * 0.49;
-  controls.target.set(1.5, 1.35, 0.15);
+  controls.target.set(0, 1.05, 0);
 
   scene.add(new THREE.HemisphereLight('#b7d7ce', '#17231f', 1.65));
   const principal = new THREE.DirectionalLight('#fff1cf', 4.2);
@@ -124,12 +112,28 @@ export function criarCena(canvas) {
   }
   requestAnimationFrame(quadro);
 
+  function enquadrar(alvo, { margem = 1.35 } = {}) {
+    const caixaAlvo = new THREE.Box3();
+    for (const objeto of (Array.isArray(alvo) ? alvo : [alvo])) caixaAlvo.expandByObject(objeto);
+    if (caixaAlvo.isEmpty()) return;
+    const centro = caixaAlvo.getCenter(new THREE.Vector3());
+    const tamanho = caixaAlvo.getSize(new THREE.Vector3());
+    const raio = Math.max(tamanho.x, tamanho.y, tamanho.z, 0.5) * 0.5;
+    const direcao = camera.position.clone().sub(controls.target).normalize();
+    const distancia = Math.max(controls.minDistance, (raio * margem) / Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
+    controls.target.copy(centro);
+    camera.position.copy(centro).addScaledVector(direcao, distancia);
+    camera.updateProjectionMatrix();
+    controls.update();
+  }
+
   return {
     renderer,
     scene,
     camera,
     controls,
     galpao,
+    enquadrar,
     destruir() {
       ativo = false;
       observador.disconnect();

@@ -3,11 +3,33 @@
 Este é o roteiro ativo do projeto. Os planos em `docs/rumo/` descrevem o NÓS
 herdado e não comandam a Mecanifica.
 
+## Estado executivo
+
+**Ciclo de implementação 1: CONCLUÍDO em 30 de julho de 2026.**
+
+- fases 0 a 4: concluídas;
+- fase ativa: nenhuma;
+- fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
+- próxima recomendação técnica: abrir um ciclo finito de fundação semântica,
+  começando por O-6/O-12; ele ainda **não foi iniciado**.
+
+Uma fase concluída não volta a crescer. Descobertas posteriores entram no
+backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
+
 ## Regra de evolução
 
 Cada rodada deve entregar uma prova visível ou mensurável. Capacidades gerais de
 autoria nascem de dificuldades observadas na criação do galpão e dos freios, não
 de uma lista especulativa de operações.
+
+Para impedir um plano infinito:
+
+1. o critério de saída encerra a fase, mesmo que existam melhorias possíveis;
+2. item que não bloqueia esse critério sai da fase e vai para o backlog;
+3. nenhuma descoberta amplia silenciosamente o ciclo em execução;
+4. um novo ciclo começa somente com escopo incluído, escopo excluído e gate
+   objetivo;
+5. somente um ciclo fica ativo por vez.
 
 ## Fase 0 — separar rumo e legado
 
@@ -72,8 +94,8 @@ imprecisa.
   (`prototipos/fps/v3/pecas/freio-disco.js`);
 - [x] encaixes semânticos — as quatro relações de contato são derivadas de
   parâmetro e travadas por teste;
-- [ ] hierarquia — `f.parte` é uma lista PLANA; não há pai/filho
-  (ATRITOS-AUTORIA A-11);
+- hierarquia navegável não foi entregue — `f.parte` continua uma lista plana
+  (ATRITOS-AUTORIA A-11); foi adiada porque não bloqueia o critério desta fase;
 - [x] materiais básicos (7 materiais por parte);
 - [x] vista montada e explodida — a explodida só é legível até ≈0,12 e não
   separa o miolo do freio (ATRITOS-AUTORIA A-12);
@@ -97,14 +119,24 @@ dificuldades da rodada, com as capacidades que elas justificam, estão em
 **Objetivo:** localizar o primeiro sistema dentro do carro e criar o contexto
 navegável da demonstração.
 
-- carroceria externa simplificada e proporcional;
-- registro de sistemas selecionáveis;
-- carro fantasma com sistema realçado em verde;
-- foco contextual e isolamento do sistema;
-- explosão autoral por caminho de montagem;
-- piso, paredes, cobertura e iluminação do galpão;
-- caminhada e transição para inspeção orbital;
-- interface responsiva para mouse, teclado e toque.
+**Estado: CONCLUÍDA em 30 de julho de 2026.**
+
+- [x] carroceria externa simplificada e proporcional;
+- [x] registro de sistemas selecionáveis — `freioDianteiroDireito` em
+  `src/dominio/mecanica/freio-dianteiro-direito.js`, sem UUID ou índice de
+  Three.js;
+- [x] carro fantasma com sistema realçado em verde;
+- [x] foco contextual e isolamento do sistema;
+- [x] explosão autoral por caminho de montagem — vetores estáveis por parte,
+  aplicados como projeção animada em `controlar-apresentacao.js`;
+- [x] roda dianteira revisada isoladamente na bancada e composta no canto
+  dianteiro direito, sem duplicar o cubo do freio;
+- [x] experimento isolado de uma roda no perfil `realistaApresentacao`, sem
+  integração: a prova alcançou um `tecnicoDidatico` detalhado e mediu os limites
+  de repetição radial, perfis, cortes e transições;
+- [x] piso, paredes, cobertura e iluminação do galpão;
+- [x] interface responsiva para mouse, teclado e toque para a leitura atual;
+  no mobile, modos e explosão permanecem acessíveis em controles compactos.
 
 **Método da fase:** cada corte do carro, galpão ou sistema é também uma rodada de
 observação de autoria. Antes de propor capacidade nova, registrar em
@@ -113,10 +145,18 @@ evidência reproduzível e o contorno usado. Melhorias gerais só entram quando 
 caso real da Fase 4 as justificar; melhorias de apresentação permanecem fora do
 núcleo de autoria.
 
-**Critério de saída:** o usuário entende onde o freio está no veículo, aproxima,
-isola e explode o sistema sem perder sua orientação espacial.
+**Critério de saída: ATENDIDO.** A apresentação permite localizar o freio no
+carro, aproximar, alternar entre carro/contexto/isolar e explodir as oito partes
+por identidade semântica. O galpão e a carroceria preservam a orientação
+espacial; os controles essenciais continuam disponíveis em desktop e mobile.
+
+**Fora do escopo encerrado:** caminhada livre, outros sistemas, carro detalhado,
+substituição visual da roda, narrativa de desgaste e as melhorias futuras da
+linguagem. Nenhum desses itens reabre a Fase 4.
 
 ## Fase 5 — narrativa de desgaste
+
+**Estado:** horizonte futuro, não iniciado e fora do ciclo concluído.
 
 **Objetivo:** transformar o modelo em uma explicação útil para clientes.
 
@@ -134,6 +174,8 @@ explicação técnica externa.
 
 ## Fase 6 — autoria assistida por IA
 
+**Estado:** horizonte futuro, não iniciado e fora do ciclo concluído.
+
 **Objetivo:** provar criação e refinamento sem chuva de IDs.
 
 - formato versionado e schema;
@@ -147,16 +189,50 @@ explicação técnica externa.
 **Critério de saída:** uma crítica como “aproxime a pastilha interna do disco e
 reduza sua espessura” altera a definição existente sem regenerar o conjunto.
 
-## Próximo passo
+## Conclusão técnica do ciclo
 
-O freio a disco existe e está validado na bancada. A rodada preparatória da
-bancada separou enquadrar montagem de focar seleção, preservou materiais no
-isolamento, reenquadrou a explosão e expôs régua/escala na imagem. A Fase 4 está
-liberada: carroceria simplificada, registro de sistemas e galpão mínimo, sempre
-registrando os novos atritos de bancada e Oficina que ela revelar.
+A abordagem adotada daqui em diante é:
 
-Antes (ou junto) dela, as capacidades de autoria que a Rodada 1 justificou com
-evidência medida — `derivarParametro` (A-5) já está feito; seguem `origem` para
-todo gerador (A-9), `encostar`/`alinhar` (A-4 e A-6) e vetores autorais de
-explosão. Nenhuma delas é especulativa; todas saíram de dificuldade contada em
-[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+1. usar `tecnicoDidatico`, fidelidade `F2`, precisão mecânica e interação de
+   montagem como padrão;
+2. modelar um sistema por partes, nunca um carro detalhado em uma tacada;
+3. provar envelope, encaixes e identidade na bancada antes do acabamento;
+4. refinar em camadas e integrar somente depois dos gates;
+5. tratar `realistaApresentacao`/`F3` como trabalho futuro, pois a linguagem
+   atual ainda não sustenta esse resultado com custo autoral aceitável.
+
+O experimento da roda não será integrado. Ele serviu para medir o teto atual e
+confirmou que o próximo ganho vem da linguagem de autoria, não de insistir em
+mais uma rodada visual sobre a mesma peça.
+
+## Backlog priorizado — não está em execução
+
+| ordem | área | problema ou melhoria | condição para abrir |
+|---:|---|---|---|
+| 1 | correção de autoria | A-15: a Oficina pode salvar conteúdo que o próprio gate reprova | ciclo curto deve primeiro impedir entrega incompatível e dizer quando o fluxo é apenas exploratório |
+| 2 | fundação semântica | R4, O-6/O-12: todos os geradores precisam publicar origem e portas estáveis | próximo ciclo técnico recomendado; prova no freio e em objeto não automotivo |
+| 3 | eficiência | O-13: repetição radial/linear com identidade por instância | somente depois da fundação semântica; a roda deve perder as cem coordenadas |
+| 4 | realismo F3 | orientação de seção, curvas, cortes e filetes | abrir apenas quando uma peça próxima da câmera justificar cada capacidade |
+| 5 | produto | narrativa de desgaste da Fase 5 | plano próprio com um cenário de desgaste e uma linha do tempo |
+| 6 | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação | planos independentes; não pertencem à Fase 4 encerrada |
+
+### Candidato a ciclo 2 — ainda não aberto
+
+**Nome:** Fundação de autoria v1.
+
+**Inclui somente:**
+
+- impedir que a Oficina entregue silenciosamente um arquivo incompatível
+  (proteção mínima do A-15, sem prometer exportador completo);
+- O-6: `origem` nos geradores cobertos pelo contrato;
+- O-12: portas semânticas estáveis nesses geradores.
+
+**Exclui:** O-7, O-13, relações de montagem, hierarquia, realismo F3, novas
+peças e mudanças na apresentação.
+
+**Gate de encerramento:** a Oficina recusa antes de salvar quando não consegue
+representar semanticamente a edição; pinça e suporte podem usar `chamferBox` com
+zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
+
+O-13 recebe um ciclo próprio somente depois desse gate. Essa separação é a
+garantia de que o próximo plano também termina.

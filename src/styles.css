@@ -208,6 +208,47 @@ a:focus-visible {
   font-size: 10px;
 }
 
+.modos {
+  position: fixed;
+  z-index: 4;
+  left: clamp(20px, 4vw, 56px);
+  bottom: 28px;
+  width: 224px;
+  padding: 14px;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  background: var(--painel);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(18px);
+}
+
+.modos .rotulo { display: block; margin-bottom: 7px; }
+.modos strong { display: block; font-size: 13px; }
+
+.modo-acoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 11px;
+}
+
+.modo-acoes button {
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  padding: 7px 4px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #b8c7c0;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.modo-acoes button:hover,
+.modo-acoes button.ativa {
+  border-color: rgba(108, 211, 159, 0.72);
+  background: rgba(108, 211, 159, 0.13);
+  color: #b9f1d4;
+}
+
 .inspetor {
   position: fixed;
   z-index: 4;
@@ -349,6 +390,7 @@ a:focus-visible {
 
   #parteDescricao { min-height: 0; margin-bottom: 10px; }
   .partes { max-height: 68px; }
+  .modos { left: 16px; bottom: 18px; }
   .ajuda { display: none; }
 }
 
@@ -358,15 +400,36 @@ a:focus-visible {
   .marca-sinal { width: 36px; height: 36px; }
 
   .apresentacao {
-    top: 78px;
+    top: 132px;
     left: 16px;
     width: calc(100vw - 32px);
   }
 
   .sobretitulo { margin-bottom: 10px; }
   .apresentacao h1 { max-width: 330px; font-size: clamp(30px, 10.5vw, 44px); }
+  .acoes { gap: 10px; margin-top: 14px; }
   .secundaria,
   .terciaria { display: none; }
+  #btnExplodir {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(203, 216, 209, 0.35);
+    border-radius: 7px;
+    padding: 10px 12px;
+    background: rgba(10, 22, 19, 0.78);
+  }
+  .modos {
+    top: 70px;
+    right: 16px;
+    bottom: auto;
+    left: 16px;
+    display: block;
+    width: auto;
+    padding: 7px;
+  }
+  .modos .rotulo,
+  .modos strong { display: none; }
+  .modo-acoes { margin-top: 0; }
   .inspetor { bottom: max(12px, env(safe-area-inset-bottom)); }
 }
 

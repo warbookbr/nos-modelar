@@ -4,11 +4,21 @@ Análise e **plano de implementação** das mudanças na linguagem de autoria. A
 divisão de trabalho entre os documentos é:
 
 - [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) registra a **dor observada** (A-1 a
-  A-14) — é a evidência;
+  A-17) — é a evidência;
 - [`UPSTREAM-NOS.md`](UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
-  a UP-013) — é a portabilidade;
+  a UP-016) — é a portabilidade;
 - este documento decide **o que muda, em que ordem, a que custo e provado como**
   — é o plano.
+
+## Estado executivo
+
+**Primeira onda encerrada em 30 de julho de 2026:** R1, R2 e R3 estão
+concluídas. R4 a R9 são backlog técnico e não formam uma execução aberta.
+
+Este documento continua sendo a análise e a ordem de dependências da Oficina,
+mas não autoriza trabalhar automaticamente até R9. O
+[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. Hoje não há rodada ativa; a
+próxima recomendada começa pela fundação O-6/O-12.
 
 Escopo: o núcleo de autoria (`prototipos/fps/v3/motor/oficina.js`) e a
 documentação que ensina a usá-lo. Os atritos da bancada (A-1, A-2, A-3, A-12,
@@ -55,10 +65,12 @@ Nenhum atrito de autoria fica sem plano:
 | A-6 `encostar` não existe | O-8 | A-11 partes planas | O-10 |
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
+| A-17 repetição radial manual | O-13 | — | — |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
 O-13 e O-14 saíram da validação deste plano contra o código, descrita abaixo.
+Depois, a roda experimental confirmou O-13 em modelagem real e originou A-17.
 
 ## Validação contra o código
 
@@ -391,13 +403,18 @@ do plano: entra depois do O-1, validada por medição, e com revisão adversaria
 do núcleo é `espelha`, que resolve simetria de duas vias e nada mais. Entram
 arranjo radial e linear, com identidade própria por cópia.
 
-**Por que:** foi o achado da validação, e não está no relato da rodada — nem eu
-nem o agente havíamos listado. Em toda peça substancial do repositório, entre 65% e
-89% dos passos repetem uma forma já escrita antes (drone: 90 de 101; freio: 43 de
-52). O número é limite superior, porque a medida compara op mais chaves de
-argumento e dois `pincel` diferentes contam como repetição — mas o padrão
-qualitativo é inequívoco: os 4 braços do drone são 4 blocos idênticos de 5 passos,
-e as 2 orelhas de parafuso do suporte do freio estão escritas duas vezes.
+**Por que:** nasceu na validação do código e agora tem evidência direta no
+[`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md). Para declarar dez braços
+em cinco pares, a roda experimental precisou de cem parâmetros de coordenadas
+(`10 × 5 raios × Y/Z`) e terminou com 141 parâmetros. A intenção simples
+“cinco pares em torno do eixo X” ficou escondida em expansão JavaScript.
+
+O padrão já aparecia em toda peça substancial do repositório: entre 65% e 89%
+dos passos repetem uma forma escrita antes (drone: 90 de 101; freio: 43 de 52).
+O número é limite superior, porque a medida compara op mais chaves de argumento
+e dois `pincel` diferentes contam como repetição — mas o padrão qualitativo é
+inequívoco: os 4 braços do drone são 4 blocos idênticos de 5 passos, e as 2
+orelhas de parafuso do suporte do freio estão escritas duas vezes.
 
 O que isso custou de verdade aparece no que **não** foi modelado: o cubo do freio
 não tem prisioneiro de roda e o disco não tem aleta de ventilação. São círculo de
@@ -438,22 +455,23 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ---
 
-## Plano de implementação
+## Backlog de implementação
 
-Uma rodada por linha. Cada rodada é commit próprio e independente: se uma parar,
-as anteriores continuam de pé.
+Uma rodada por linha. As três primeiras estão encerradas; as demais só saem do
+backlog quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é
+commit próprio e independente: se uma parar, as anteriores continuam de pé.
 
-| rodada | itens | toca formato salvo | prova de saída |
-|---|---|---|---|
-| R1 | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
-| R2 | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito das 18 peças byte-idêntico |
-| R3 | O-5 | sim | concluída: as 23 derivadas do freio estão no envelope como expressões validadas |
-| R4 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade |
-| R5 | O-7 | sim | o freio perde os 16 passos de transporte |
-| R6 | O-13 | sim | prisioneiros do cubo e aletas do disco por arranjo radial, cada cópia endereçável por nome |
-| R7 | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
-| R8 | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
-| R9 | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
+| rodada | estado | itens | toca formato salvo | prova de saída |
+|---|---|---|---|---|
+| R1 | concluída | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
+| R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
+| R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
+| R4 | backlog, próxima recomendada | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade |
+| R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
+| R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
+| R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
+| R8 | backlog | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
+| R9 | backlog | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
 
 ### Regras que valem para toda rodada
 

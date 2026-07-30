@@ -1,5 +1,5 @@
 {
-  "hashTotal": "dbfd63afa582b7b85251958806f00262c6866d69dc9bf7c4ef5253b4873a5f74",
+  "hashTotal": "28d57c140bdabe005909fe5d9486b9867e3753e3301a2aa488ddc47a5002d7c7",
   "pecas": {
     "_corpo": {
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
@@ -95,6 +95,16 @@
       "hash": "13fdc7f2f507e237fcf63b793303ecc59f13fa7275d6fe97e3545215bdcb281a",
       "vertices": 1470,
       "faces": 1600
+    },
+    "roda-dianteira": {
+      "hash": "74a1e3fd317e2c6955cf71d1102639ee559c9a8ebf730881b7d8516ca1d418d2",
+      "vertices": 584,
+      "faces": 494
+    },
+    "roda-dianteira-realista-experimento": {
+      "hash": "cd7e7be40e54e46f3108107fe2258c24073a439c55ddf1bc38baf2c9c8711d39",
+      "vertices": 2184,
+      "faces": 2082
     }
   }
 }

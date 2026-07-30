@@ -21,6 +21,55 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-17 — repetição radial vira coordenada em massa
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a variante
+`prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` precisava
+declarar dez braços em cinco pares ao redor do eixo X. Como não existe
+repetição radial nem trigonometria na gramática de parâmetros, a peça gerou cem
+parâmetros de coordenadas (`10 braços × 5 raios × Y/Z`) e terminou com 141
+parâmetros. A malha passou nos gates, mas a intenção “cinco pares radiais” ficou
+escondida em expansão JavaScript e outro agente precisa reconstruí-la antes de
+refinar abertura ou quantidade.
+
+**Contorno:** calcular as coordenadas no módulo da peça e expandir dez passos
+`loft`, preservando `origemId` individual em cada braço. É determinístico e
+evita id cru, mas mistura um arranjo geométrico geral com a definição do objeto.
+
+**Capacidade candidata:** `repetirRadial` e `repetirLinear` declarativos, com
+eixo, quantidade, ângulo inicial, espaçamento e identidade semântica derivada por
+instância. O contrato deve permitir endereçar a coleção e cada cópia sem depender
+do índice do passo. É o O-13 de
+[`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) e serve igualmente para
+pétalas, colunas, pás, dentes ou elementos abstratos.
+
+### A-16 — a régua por envelopes não reconhece encaixe oco
+
+**Onde dói:** conferência headless da bancada.
+
+**Evidência:** a primeira roda revisada,
+`prototipos/fps/v3/pecas/roda-dianteira.js`, tem pneu, aro e tampa central como
+partes distintas. `npm run descrever -- roda-dianteira` mede `aro↔pneu` como
+`interpenetra`, pois as caixas de ambos necessariamente se sobrepõem. Isso não
+é defeito: o aro mora dentro da cavidade anular do pneu. A mesma régua também
+não consegue provar que a abertura de 0,128 m do aro, já escalada na cena,
+recebe o cubo do freio de 0,127 m sem invasão de sólido.
+
+**Contorno:** manter a relação dimensional explícita na
+[`PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md), revisar as três vistas
+ortogonais e travar o raio interno do aro por teste. Não marcar a invasão como
+“ignorada” no relatório, pois isso esconderia uma colisão verdadeira em outra
+montagem.
+
+**Capacidade candidata:** portas semânticas de volume e assento (por exemplo,
+`aro.cavidade` e `cubo.flange`) e uma relação declarada `encaixa`. A ferramenta
+continuaria reportando colisão entre sólidos, mas saberia medir a folga entre a
+porta interna de um componente oco e a porta externa do componente recebido.
+É geral: um rolamento no alojamento, uma tampa em carcaça ou uma tomada em
+conector têm o mesmo problema.
+
 ### A-1 — enquadramento livre não volta pela URL
 
 **Onde dói:** bancada.
@@ -400,6 +449,15 @@ exigir justamente o agrupamento que não existe.
 
 **Contorno:** convenção de nome (`pastilhaInterna`/`pastilhaExterna`,
 `pincaPonte`/`pincaGarraInterna` como aliases) — prefixo fazendo o papel de pai.
+
+**Evidência adicional (Fase 4, apresentação):** para registrar
+`freioDianteiroDireito` em
+`src/dominio/mecanica/freio-dianteiro-direito.js`, foi necessário repetir,
+fora da definição procedural, uma lista explícita das 8 partes (`disco`, `cubo`,
+pastilhas, `pinca`, `pistao`, `suporte`, `flexivel`). O registro permite foco e
+isolamento sem tocar em UUIDs do Three.js, mas a composição não consegue pedir
+ao núcleo “a subárvore do freio”: precisa manter essa associação em paralelo.
+É um contorno seguro para a apresentação, não uma solução de autoria.
 
 **Capacidade candidata:** parte com `pai` declarado e seleção por subárvore
 (`sel:{grupo:'pinca', comFilhos:true}`). Genérico: qualquer montagem quer isso.

@@ -61,6 +61,19 @@ seleção múltipla, isolamento, contexto fantasma e explosão diagnóstica.
 As duas consomem o mesmo grafo semântico. Estado de câmera, opacidade, realce e
 explosão são projeções temporárias; não modificam a definição da peça.
 
+Na primeira fatia da Fase 4, `src/dominio/mecanica/freio-dianteiro-direito.js`
+registra a identidade de domínio, as oito partes semânticas, o ponto de montagem
+e os vetores de explosão. `src/cena/criar-veiculo-contexto.js` cria apenas uma
+carroceria de leitura espacial; ela não é conteúdo persistido nem fonte de
+identidade. O controlador de apresentação projeta os modos carro completo,
+contexto fantasma e isolamento sem gravar em nenhum dos dois modelos.
+
+Na segunda fatia, `roda-dianteira.js` é outro ativo procedural, revisado antes
+da integração, e `src/dominio/mecanica/roda-dianteira-direita.js` declara sua
+identidade, escala e composição com o freio. A roda decorativa equivalente foi
+retirada somente daquele canto; as demais continuam contexto provisório e não
+são apresentadas como ativos autorados.
+
 O contrato detalhado está em
 [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md).
 

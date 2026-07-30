@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-185 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+197 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -83,10 +83,14 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PLANO.md` — Plano vigente da Mecanifica
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
+- `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
+- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -172,6 +176,8 @@
 - `ilha-chao.js` — PEÇA: ilha-chao — o primeiro retalho de CHÃO do v3 (port da natureza v2). Ilha flutuante NA ESCALA DA V2 (o mundo é uma grade 64×64 tiles; a ilha tem ~56 uni…
 - `lanterna.js` — PEÇA: uma LANTERNA DE MÃO — corpo cilíndrico (cabo), cabeça mais larga, lente (material emissivo), um interruptor (cubo embutido na lateral) e uma alça de pe…
 - `moto.js` — moto — MOTOCICLETA FUTURISTA ESTILIZADA, 100% em PASSOS (nenhuma linha de geometria em JS: `construir` é só `executar`).
+- `roda-dianteira-realista-experimento.js` — EXPERIMENTO DE AUTORIA — roda dianteira de apresentação feita somente com o vocabulário procedural atual da Oficina.
+- `roda-dianteira.js` — RODA DIANTEIRA DA MECANIFICA — pneu, aro e tampa central paramétricos, pensados para compor com `freio-disco`, nunca para duplicar seu `cubo`.
 - `vegetacao-cartoon.js` — PEÇA: vegetacao-cartoon — a PROVA da vegetação plantável (D-64). Planta um PRADO cartoon: tufos de grama (assados numa malha por variante -> poucos draws), f…
 
 ## prototipos/fps/v3/pecas-som/
@@ -183,7 +189,7 @@
 
 ## src/
 
-- `main.js` — main.js — composição da prova Three.js: núcleo herdado -> adaptador neutro -> inspeção semântica.
+- `main.js` — main.js — composição da apresentação: autoria neutra -> sistema semântico -> contexto Three.js.
 
 ## src/autoria/
 
@@ -202,9 +208,16 @@
 ## src/cena/
 
 - `criar-cena.js` — criar-cena.js — cena industrial e infraestrutura Three.js da primeira prova da Mecanifica.
+- `criar-veiculo-contexto.js` — criar-veiculo-contexto.js — carroceria proporcional de leitura espacial; não é um modelo salvo nem uma fonte de identidade.
+
+## src/dominio/mecanica/
+
+- `freio-dianteiro-direito.js` — freio-dianteiro-direito.js — registro declarativo do primeiro sistema da apresentação, sem dependência de Three.js.
+- `roda-dianteira-direita.js` — roda-dianteira-direita.js — identidade de domínio da roda que compõe com o freio, sem depender de Three.js.
 
 ## src/interacao/
 
+- `controlar-apresentacao.js` — controlar-apresentacao.js — modos temporários de leitura do sistema no carro, sem escrever na autoria.
 - `criar-inspecao.js` — criar-inspecao.js — seleção por raycast ligada à identidade semântica, nunca ao UUID do Three.js.
 
 ## tools/
@@ -269,6 +282,8 @@
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `olhar-bancada.mjs` — olhar-bancada.mjs — o OLHO DA BANCADA: dirige `bancada.html` headless pela URL e salva PNG por vista, para que uma sessão sem navegador possa inspecionar o q…
+- `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
+- `sistema-freio.test.mjs` — sistema-freio.test.mjs — contrato semântico do primeiro sistema apresentado no veículo.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
 
 ## tools/oficina/

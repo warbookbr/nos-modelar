@@ -1,5 +1,10 @@
 # Autoria para IA
 
+Os critérios de identidade e editabilidade ficam neste contrato. A escolha do
+fluxo visual — esquemático, low-poly intencional, técnico didático ou realista
+de apresentação — fica em
+[`PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md).
+
 ## Objetivo
 
 A linguagem de autoria deve permitir que humano e IA criem, compreendam e

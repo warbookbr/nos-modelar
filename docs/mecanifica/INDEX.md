@@ -15,8 +15,8 @@ aplicação nova em Three.js.
 
 Estado atual:
 
-- as fases 0, 1, 2 e 3 estão concluídas (a hierarquia navegável de partes ficou
-  em aberto na fase 3, por falta de capacidade no núcleo);
+- as fases 0 a 4 e o primeiro ciclo de implementação estão concluídos (a
+  hierarquia navegável de partes ficou adiada, sem bloquear o critério);
 - a ponte para Three.js e a bancada de inspeção estão publicadas;
 - a bancada provou seleção semântica, isolamento, contexto fantasma, vistas
   reproduzíveis e explosão automática;
@@ -24,8 +24,18 @@ Estado atual:
   identidade e forma no trem de pouso;
 - o freio a disco dianteiro existe como conjunto paramétrico por partes
   semânticas, com prancha multivista e testes de integridade;
-- o próximo trabalho é a fase 4 (contexto do veículo e galpão mínimo) e as
-  capacidades de autoria que a rodada do freio justificou.
+- a fase 4 foi encerrada: o freio dianteiro direito aparece em uma carroceria
+  contextual no galpão, com foco, carro fantasma, isolamento e explosão também
+  acessíveis em mobile;
+- a roda dianteira foi autorada e revisada separadamente na bancada; ela
+  substitui a roda decorativa do canto dianteiro direito sem duplicar o cubo;
+- um experimento isolado de roda mais realista provou que a Oficina atual passa
+  do low-poly, mas ainda entrega realismo técnico/procedural; ele não foi
+  integrado, e o fluxo resultante está documentado em perfis de autoria;
+- não há fase ativa; caminhada, novos sistemas, narrativa e realismo F3 estão em
+  backlog, sem reabrir o ciclo;
+- o próximo ciclo técnico recomendado, ainda não iniciado, é uma fundação
+  semântica curta começando por O-6/O-12.
 
 O estado detalhado e os critérios de saída ficam em
 [`docs/mecanifica/PLANO.md`](PLANO.md). Se este resumo divergir do plano, o
@@ -41,23 +51,30 @@ Use esta ordem para resolver dúvidas:
    e direção técnica;
 3. [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md) — contrato para criação e
    refinamento por IA;
-4. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
+4. [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) — escolha do
+   fluxo visual, fidelidade, precisão, interação e orçamento;
+5. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
    autoria visual e experiência do cliente;
-5. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+6. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-6. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+7. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-7. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+8. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-8. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
+9. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
    ordenado de mudanças na linguagem de autoria, com trade-off e custo;
-9. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+10. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-10. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+11. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
 regras de trabalho, mas não substituem os documentos acima.
+
+A prova isolada do novo fluxo está em
+[`EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md), com execução e
+limitações em [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md). Ela é
+evidência, não uma peça integrada nem um roteiro concorrente.
 
 Os conteúdos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem ao NÓS
 herdado. Eles são referência técnica ou histórica, não roteiro da Mecanifica.
@@ -68,8 +85,10 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 |---|---|
 | Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
-| Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
+| Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
+| Escolher realismo ou direção visual | [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) |
 | Mexer no freio a disco | [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
+| Mexer na roda dianteira | [`docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md); para a prova isolada, [`docs/mecanifica/EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) e [`docs/mecanifica/RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |
 | Trabalhar na bancada ou apresentação | [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
 | Alterar o núcleo herdado | [`docs/uso/oficina-contrato.md`](../uso/oficina-contrato.md) e [`docs/uso/oficina-referencia.md`](../uso/oficina-referencia.md) |
 | Melhorar a linguagem de autoria | [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) e [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) |
@@ -87,6 +106,7 @@ o plano e somente as referências da linha aplicável.
 | `src/autoria/` | adaptação neutra do núcleo procedural para renderização |
 | `src/bancada/` | estúdio, câmeras, seleção, isolamento, explosão e estado por URL |
 | `src/cena/` | composição visual da experiência principal |
+| `src/dominio/mecanica/` | registros estáveis de sistemas automotivos, independentes do runtime Three.js |
 | `src/interacao/` | interações semânticas da aplicação |
 | `prototipos/fps/v3/` | Atelier herdado do NÓS, preservado durante a migração |
 | `tools/mecanifica/` | testes headless dos contratos novos |
@@ -132,6 +152,7 @@ tem escala nem eixo; esta é a régua:
 ```bash
 npm run descrever -- freio-disco
 npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
+npm run descrever -- roda-dianteira
 ```
 
 Verificação completa:
@@ -171,17 +192,17 @@ Algumas ferramentas específicas do Atelier estão catalogadas em
 6. Rode os gates proporcionais ao risco.
 7. Atualize plano, índice e registro upstream quando o estado real mudar.
 
-## Próxima entrega
+## Estado e próximo ciclo
 
-Fase 4: carroceria externa simplificada, registro de sistemas selecionáveis e
-galpão mínimo, usando o freio a disco como primeiro sistema real a contextualizar.
-Cada corte também registra dificuldades observadas na bancada ou na Oficina antes
-de propor novas capacidades gerais.
+O ciclo 1 terminou na Fase 4. `index.html` contém a prova encerrada: carroceria
+simplificada, galpão mínimo, registro semântico, modos
+carro/contexto/isolar, seleção por parte e explosão autoral do freio. A roda
+experimental permanece somente como evidência de autoria.
 
-Em paralelo, as capacidades de autoria justificadas pela rodada do freio —
-`derivarParametro`, `origem` em todo gerador, `encostar`/`alinhar` e o relato de
-caixa por parte na bancada. A lista com evidência está em
-[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+Não existe entrega em andamento. O próximo ciclo recomendado — ainda não
+aberto — é “Fundação de autoria v1”: impedir entrega incompatível da Oficina,
+implementar O-6/O-12 e encerrar. O-13 fica para outro ciclo. Escopo, exclusões,
+ordem e gates estão no fim de [`PLANO.md`](PLANO.md).
 
 ## Manutenção desta documentação
 
