@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-172 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+173 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -84,6 +84,7 @@
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
+- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `PLANO.md` — Plano vigente da Mecanifica
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
