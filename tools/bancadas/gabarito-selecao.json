@@ -1,5 +1,5 @@
 {
-  "hashTotal": "87d7125cf325d9ca3dd3f40ce66f035e26839062c4043fd855691de44f2931ac",
+  "hashTotal": "1d4c75c748bb5450f8e986a672e375dc3ba74660bce7741aeb5a71dcabc5d500",
   "pecas": {
     "_corpo": {
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
@@ -55,6 +55,11 @@
       "hash": "c2d3cc983ff9828293534a75b88ef45b3b6d3425c2cf00f68a8cd9bb704b17d6",
       "vertices": 98,
       "faces": 108
+    },
+    "_vao-e-anteparo": {
+      "hash": "ba97e9832aed7e03f49ccc79c6b3c7663c645b44cf5149a76ddbaf36a319cbb6",
+      "vertices": 12,
+      "faces": 6
     },
     "_vazio": {
       "hash": "ea84606f0ade2558db13e8c5334df10bf16e9f297f2c4daddac7917fc8856f9b",

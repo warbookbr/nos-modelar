@@ -35,6 +35,9 @@ jobs:
       - name: Prova Zero — seleção de peças byte-idêntica ao gabarito
         run: npm run gabarito:selecao:check
 
+      - name: Nenhum id posicional em peça nova
+        run: npm run id-cru:check
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 

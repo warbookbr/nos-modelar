@@ -31,6 +31,8 @@
     "gabarito": "node tools/bancadas/gabarito.mjs",
     "gabarito:selecao": "node tools/bancadas/gabarito-selecao.mjs",
     "gabarito:selecao:check": "node tools/bancadas/gabarito-selecao.mjs --check",
+    "id-cru": "node tools/bancadas/id-cru.mjs",
+    "id-cru:check": "node tools/bancadas/id-cru.mjs --check",
     "criar": "node tools/bancadas/criar.mjs",
     "bench": "node tools/bancadas/bench/benchmark.mjs",
     "mapa": "node tools/mapa/mapa.mjs",

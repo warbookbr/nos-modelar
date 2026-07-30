@@ -141,10 +141,17 @@ npm test
 npm run typecheck
 npm run build
 npm run gabarito:selecao:check
+npm run id-cru:check
 npm run mapa:check
 npm run docs:toc:check
 npm run docs:links:check
 ```
+
+`npm run id-cru:check` é o gate do O-4: peça **nova** que enderece geometria por
+id posicional (`faces:[ids]`, `sel:{v}`, `sel:{f}`) reprova. As peças herdadas
+ficam numa lista explícita e versionada em `tools/bancadas/id-cru-herdado.json`,
+com a contagem exata congelada — a dívida não cresce e, quando é paga,
+`npm run id-cru` encolhe a lista.
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
 [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).

@@ -1,0 +1,70 @@
+{
+  "formato": 1,
+  "herdadas": {
+    "_corpo": {
+      "faces": 3,
+      "selV": 0,
+      "selF": 0
+    },
+    "_espelhado": {
+      "faces": 6,
+      "selV": 1,
+      "selF": 1
+    },
+    "_oficina-anim": {
+      "faces": 6,
+      "selV": 0,
+      "selF": 0
+    },
+    "_oficina-esqueleto": {
+      "faces": 3,
+      "selV": 0,
+      "selF": 0
+    },
+    "_oficina-materiais": {
+      "faces": 4,
+      "selV": 0,
+      "selF": 0
+    },
+    "_oficina-toco": {
+      "faces": 6,
+      "selV": 0,
+      "selF": 0
+    },
+    "_oficina-transp": {
+      "faces": 3,
+      "selV": 0,
+      "selF": 0
+    },
+    "_pedra": {
+      "faces": 3,
+      "selV": 0,
+      "selF": 0
+    },
+    "_primitivas": {
+      "faces": 10,
+      "selV": 0,
+      "selF": 0
+    },
+    "_torno": {
+      "faces": 7,
+      "selV": 0,
+      "selF": 0
+    },
+    "_viga": {
+      "faces": 3,
+      "selV": 0,
+      "selF": 0
+    },
+    "caixa-ferramentas": {
+      "faces": 17,
+      "selV": 11,
+      "selF": 0
+    },
+    "moto": {
+      "faces": 37,
+      "selV": 3,
+      "selF": 7
+    }
+  }
+}
