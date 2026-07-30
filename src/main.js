@@ -12,7 +12,8 @@ const descricoes = {
   camera: 'Módulo frontal usado para inspeção visual.',
   lente: 'Elemento óptico frontal do módulo de câmera.',
   suporteCamera: 'Ligação estrutural entre a câmera e o corpo.',
-  pouso: 'Base inferior que mantém o conjunto afastado do piso.',
+  pousoDireito: 'Esqui direito e seus dois suportes ligados ao corpo.',
+  pousoEsquerdo: 'Esqui esquerdo e seus dois suportes ligados ao corpo.',
   'estrutura-sem-nome': 'Superfícies que ainda não receberam uma identidade semântica própria.',
 };
 

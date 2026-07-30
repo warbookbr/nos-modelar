@@ -44,19 +44,23 @@ selecionável e identificável no Three.js sem depender de IDs do runtime.
 **Critério de parada:** se o núcleo precisar importar Three.js ou conhecer a cena,
 redesenhar a fronteira antes de avançar.
 
-## Fase 2 — galpão mínimo
+## Fase 2 — bancada de autoria e inspeção
 
-**Objetivo:** criar o contexto navegável da primeira demonstração.
+**Objetivo:** criar um ambiente reproduzível para modelar e revisar peças antes
+de colocá-las na experiência do cliente.
 
-- piso, paredes, cobertura e iluminação;
-- elevador ou bancada de demonstração;
-- caminhada por mouse, teclado e toque;
-- modo de inspeção orbital;
-- seleção e destaque de componentes;
-- interface responsiva mínima.
+- [x] estúdio neutro e iluminação previsível;
+- [x] vistas ortogonais, isométrica e alternância de projeção;
+- [x] seleção múltipla e enquadramento;
+- [x] contexto fantasma e isolamento;
+- [x] explosão automática suave;
+- [x] estado reproduzível pela URL;
+- [x] diagnóstico de superfícies sem identidade;
+- [x] provar o fluxo encontrando e corrigindo a lente e o pouso do drone.
 
-**Critério de saída:** o usuário entra no galpão, aproxima-se da demonstração e
-assume controle da câmera de inspeção.
+**Critério de saída:** outra sessão abre a mesma seleção e vista, isola peças
+conectadas e identifica defeitos de forma ou semântica sem manipulação manual
+imprecisa.
 
 ## Fase 3 — freio a disco paramétrico
 
@@ -73,7 +77,24 @@ assume controle da câmera de inspeção.
 **Critério de saída:** outro agente localiza e altera qualquer componente pelo
 nome, sem procurar índices de vértices, faces ou objetos.
 
-## Fase 4 — narrativa de desgaste
+## Fase 4 — contexto do veículo e galpão mínimo
+
+**Objetivo:** localizar o primeiro sistema dentro do carro e criar o contexto
+navegável da demonstração.
+
+- carroceria externa simplificada e proporcional;
+- registro de sistemas selecionáveis;
+- carro fantasma com sistema realçado em verde;
+- foco contextual e isolamento do sistema;
+- explosão autoral por caminho de montagem;
+- piso, paredes, cobertura e iluminação do galpão;
+- caminhada e transição para inspeção orbital;
+- interface responsiva para mouse, teclado e toque.
+
+**Critério de saída:** o usuário entende onde o freio está no veículo, aproxima,
+isola e explode o sistema sem perder sua orientação espacial.
+
+## Fase 5 — narrativa de desgaste
 
 **Objetivo:** transformar o modelo em uma explicação útil para clientes.
 
@@ -89,7 +110,7 @@ nome, sem procurar índices de vértices, faces ou objetos.
 **Critério de saída:** a demonstração comunica o problema sem depender de
 explicação técnica externa.
 
-## Fase 5 — autoria assistida por IA
+## Fase 6 — autoria assistida por IA
 
 **Objetivo:** provar criação e refinamento sem chuva de IDs.
 
@@ -106,5 +127,6 @@ reduza sua espessura” altera a definição existente sem regenerar o conjunto.
 
 ## Próximo passo
 
-Iniciar o galpão mínimo da Fase 2 sem ampliar o adaptador antes de um caso real
-exigir.
+Usar a bancada aprovada para criar a prancha multivista e o primeiro conjunto
+paramétrico do freio a disco. O galpão e a carroceria entram depois que houver
+um sistema real para contextualizar.

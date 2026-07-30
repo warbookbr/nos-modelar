@@ -38,6 +38,8 @@ mudança para um fork verdadeiro de `brigsd/nos`.
 | UP-003 | Expressões validadas entre parâmetros | observada | Passos aceitam nomes simples, mas não relações gerais entre parâmetros | Reduzir números duplicados e permitir refinamento paramétrico |
 | UP-004 | Verificação de cobertura de nomes agregados | observada | O drone mostrou que um nome pode resolver menos elementos do que promete sem falha técnica | Evitar semântica aparentemente válida, porém incompleta |
 | UP-005 | Adaptador neutro para grafos de cena | provada | O drone herdado foi convertido em 23 partes selecionáveis; teste headless e build passaram | Tornar explícita a separação entre autoria e renderizador |
+| UP-006 | Gate para faces sem identidade + seleções estruturais no drone | provada | A bancada encontrou 6 faces da lente sem nome e 6 classificadas como pouso; a correção por `origemId` zerou ambas | Impedir que seleções espaciais sobrepostas corrompam nomes sem gerar órfãos |
+| UP-007 | Mapa determinístico entre Windows e Linux | provada | Normalização CRLF/LF e ordenação por ponto de código fecharam o CI nos dois ambientes | Evitar mapas diferentes conforme o sistema operacional |
 
 ## UP-005 — fronteira de renderização provada
 
@@ -62,6 +64,28 @@ e documentar quais atributos todo adaptador deve suportar.
 **Limites:** a primeira ponte não cobre atlas pintável, suavização compartilhada,
 skinning nem animações do adaptador v3. Esses recursos só serão generalizados
 quando uma peça real da Mecanifica os exigir.
+
+## UP-006 — semântica do drone provada pela bancada
+
+**Problema observado:** a lente e o pouso eram nomeados por regiões sobrepostas
+na origem. O replay permanecia tecnicamente válido, mas seis laterais do
+cilindro viravam `pouso`, seis ficavam sem parte e apenas as tampas eram
+`lente`.
+
+**Solução geral:** cilindro, cubos e saídas de espelhamento são selecionados por
+origem estrutural. O adaptador também publica a contagem de faces sem parte como
+diagnóstico explícito.
+
+**Provas:** `tools/mecanifica/drone-semantica.test.ts` conta a cobertura de cada
+parte e exige zero faces sem identidade. A bancada reproduziu o defeito,
+isolou os lotes contaminados e validou a correção nas mesmas vistas.
+
+**Como aproveitar no NÓS:** a troca das seleções do
+`prototipos/fps/v3/pecas/drone-inspecao.js` e o teste de cobertura são
+candidatos diretos. O painel Three.js não é necessário para o cherry-pick.
+
+**Limites:** o gate atual detecta ausência de nome; ainda não prova sozinho que
+um nome existente significa o conjunto correto. UP-004 continua aberto.
 
 ## Modelo de entrada futura
 

@@ -9,7 +9,7 @@
    senão o check nunca bateria. Zero dependências (git ls-files + fs). */
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,8 +19,13 @@ const CODIGO = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.html']);
 const DOCS = new Set(['.md']);
 const IGNORAR = new Set(['docs/uso/MAPA.md']); // o mapa não se auto-lista
 
-const rastreados = execFileSync('git', ['ls-files'], { cwd: REPO, encoding: 'utf8' })
+const rastreados = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard'],
+  { cwd: REPO, encoding: 'utf8' },
+)
   .split('\n').filter(Boolean)
+  .filter((f) => existsSync(path.join(REPO, f)))
   .filter((f) => {
     if (IGNORAR.has(f)) return false;
     const ext = path.extname(f);

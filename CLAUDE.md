@@ -11,7 +11,8 @@ Antes de planejar ou implementar uma rodada, leia:
 2. `docs/mecanifica/PLANO.md`
 3. `docs/mecanifica/ARQUITETURA.md`
 4. `docs/mecanifica/AUTORIA-IA.md`
-5. `docs/mecanifica/UPSTREAM-NOS.md`
+5. `docs/mecanifica/BANCADA-E-APRESENTACAO.md`
+6. `docs/mecanifica/UPSTREAM-NOS.md`
 
 Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
 à base herdada do NÓS. Consulte-os quando tocar no código legado, mas não os use
@@ -39,6 +40,8 @@ como roteiro de produto da Mecanifica.
 - Conteúdo salvo deve ser determinístico, versionado, reexecutável e validável.
 - Uma crítica deve poder alterar a peça existente sem regenerá-la inteira.
 - `Date.now()` e `Math.random()` crus não entram em artefatos reproduzíveis.
+- Modele e revise na bancada neutra antes de levar a peça ao galpão; registre na
+  URL a seleção, vista e projeção usadas como evidência.
 
 ## Trabalho que pode voltar ao NÓS
 

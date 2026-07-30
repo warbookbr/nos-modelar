@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "bancada.html"
       - "src/**"
       - "prototipos/fps/v3/**"
       - "package.json"

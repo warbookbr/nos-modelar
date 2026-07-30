@@ -5,12 +5,13 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-155 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+164 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
+- `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
 - `index.html` — index.html — entrada da nova aplicação Mecanifica; o Atelier herdado permanece em prototipos/fps/v3/.
 - `vite.config.js` — vite.config.js — build estático da Mecanifica para warbookbr/nos-mecanifica no GitHub Pages.
 - `vitest.config.ts` — Config do Vitest: cobre tools/** (núcleo do Atelier: som + oficina) — o gate npm test.
@@ -79,6 +80,7 @@
 
 - `ARQUITETURA.md` — Arquitetura da Mecanifica
 - `AUTORIA-IA.md` — Autoria para IA
+- `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `PLANO.md` — Plano vigente da Mecanifica
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
@@ -179,6 +181,14 @@
 
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 
+## src/bancada/
+
+- `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
+- `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
+- `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
+- `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
+- `main.js` — main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível.
+
 ## src/cena/
 
 - `criar-cena.js` — criar-cena.js — cena industrial e infraestrutura Three.js da primeira prova da Mecanifica.
@@ -238,6 +248,8 @@
 ## tools/mecanifica/
 
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
+- `drone-semantica.test.ts` — drone-semantica.test.ts — regressão do cilindro da lente e do trem de pouso do drone.
+- `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 
 ## tools/oficina/
 

@@ -24,8 +24,8 @@ export function criarInspecao({ canvas, camera, raiz, partes, aoSelecionar }) {
         };
       }
       const base = objeto.userData.realceBase;
-      objeto.material.emissive.copy(ligado ? new THREE.Color('#f0a42e') : base.cor);
-      objeto.material.emissiveIntensity = ligado ? 0.75 : base.intensidade;
+      objeto.material.emissive.copy(ligado ? new THREE.Color('#35c98a') : base.cor);
+      objeto.material.emissiveIntensity = ligado ? 0.62 : base.intensidade;
     });
   }
 

@@ -175,7 +175,8 @@ a:focus-visible {
 }
 
 .primaria,
-.secundaria {
+.secundaria,
+.terciaria {
   border-radius: 7px;
   cursor: pointer;
   text-decoration: none;
@@ -199,6 +200,12 @@ a:focus-visible {
   font-size: 11px;
   border-bottom: 1px solid rgba(203, 216, 209, 0.35);
   border-radius: 0;
+}
+
+.terciaria {
+  padding: 10px 0;
+  color: var(--texto-fraco);
+  font-size: 10px;
 }
 
 .inspetor {
@@ -272,11 +279,16 @@ a:focus-visible {
   cursor: pointer;
 }
 
-.parte-btn:hover,
-.parte-btn.ativa {
+.parte-btn:hover {
   border-color: rgba(242, 181, 68, 0.7);
   background: rgba(242, 181, 68, 0.12);
   color: var(--amarelo-claro);
+}
+
+.parte-btn.ativa {
+  border-color: rgba(108, 211, 159, 0.75);
+  background: rgba(108, 211, 159, 0.13);
+  color: #b9f1d4;
 }
 
 .ajuda {
@@ -353,7 +365,8 @@ a:focus-visible {
 
   .sobretitulo { margin-bottom: 10px; }
   .apresentacao h1 { max-width: 330px; font-size: clamp(30px, 10.5vw, 44px); }
-  .secundaria { display: none; }
+  .secundaria,
+  .terciaria { display: none; }
   .inspetor { bottom: max(12px, env(safe-area-inset-bottom)); }
 }
 

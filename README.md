@@ -3,6 +3,11 @@
 Simulador 3D interativo para explicar, de forma visual, como sistemas automotivos
 funcionam, por que falham e o que pode acontecer quando um reparo é adiado.
 
+## Entrar na mecânica
+
+- 🔧 **[Abrir a Mecânica](https://warbookbr.github.io/nos-mecanifica/)** — entre direto pelo navegador, sem instalar nada.
+- 🧰 **[Abrir a bancada de inspeção](https://warbookbr.github.io/nos-mecanifica/bancada.html)** — examine, isole e exploda as peças do modelo.
+
 O primeiro módulo será um sistema de freio a disco dianteiro dentro de uma oficina
 navegável. A pessoa poderá inspecionar as peças, separar o conjunto, comparar
 estados de desgaste e acompanhar explicações orientadas ao cliente.
@@ -19,6 +24,11 @@ fonte valiosa, mas não é tratado aqui como uma fundação pronta. Em especial,
 identidade de partes e a dependência de IDs posicionais ainda precisam evoluir
 para que uma IA consiga criar e refinar modelos complexos com segurança.
 
+A primeira ferramenta nova já está disponível em `bancada.html`: um estúdio
+neutro com vistas previsíveis, seleção múltipla, isolamento, contexto fantasma,
+explosão e URLs reproduzíveis. Ela encontrou e provou a correção de um defeito
+semântico real no trem de pouso do drone herdado.
+
 ## Direção
 
 - Three.js como camada visual e de interação.
@@ -34,6 +44,7 @@ Leituras principais:
 - [`docs/mecanifica/ARQUITETURA.md`](docs/mecanifica/ARQUITETURA.md)
 - [`docs/mecanifica/PLANO.md`](docs/mecanifica/PLANO.md)
 - [`docs/mecanifica/AUTORIA-IA.md`](docs/mecanifica/AUTORIA-IA.md)
+- [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](docs/mecanifica/BANCADA-E-APRESENTACAO.md)
 - [`docs/mecanifica/UPSTREAM-NOS.md`](docs/mecanifica/UPSTREAM-NOS.md)
 
 ## Base herdada
@@ -45,8 +56,9 @@ npm ci
 npm run dev
 ```
 
-O endereço local é `http://localhost:5173/nos-mecanifica/`. Para gerar a versão
-estática usada pelo Pages:
+O endereço local é `http://localhost:5173/nos-mecanifica/`; a bancada fica em
+`http://localhost:5173/nos-mecanifica/bancada.html`. Para gerar a versão estática
+usada pelo Pages:
 
 ```bash
 npm run build

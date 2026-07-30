@@ -1,0 +1,112 @@
+<!doctype html>
+<!-- bancada.html — estúdio de inspeção multivista para autoria e validação de montagens. -->
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Bancada Mecanifica para inspecionar peças, montagens e identidades semânticas."
+    />
+    <meta name="theme-color" content="#111815" />
+    <title>Bancada de inspeção — Mecanifica</title>
+  </head>
+  <body>
+    <div id="bancadaApp">
+      <canvas id="cenaBancada" aria-label="Bancada tridimensional de inspeção"></canvas>
+
+      <header class="topo">
+        <a class="marca" href="./" aria-label="Voltar para a Mecanifica">
+          <span class="marca-sinal" aria-hidden="true">M</span>
+          <span>
+            <strong>Mecanifica</strong>
+            <small>bancada de inspeção</small>
+          </span>
+        </a>
+        <div class="objeto-atual">
+          <span>FIXTURE ATUAL</span>
+          <strong>Drone de inspeção</strong>
+        </div>
+        <div id="estadoSemantica" class="estado-semantica" role="status">
+          <i aria-hidden="true"></i>
+          <span>Analisando semântica…</span>
+        </div>
+      </header>
+
+      <nav class="vistas" aria-label="Vistas da câmera">
+        <button type="button" data-vista="frontal"><span>Frente</span><kbd>1</kbd></button>
+        <button type="button" data-vista="traseira"><span>Trás</span><kbd>⇧1</kbd></button>
+        <button type="button" data-vista="direita"><span>Direita</span><kbd>3</kbd></button>
+        <button type="button" data-vista="esquerda"><span>Esquerda</span><kbd>⇧3</kbd></button>
+        <button type="button" data-vista="superior"><span>Superior</span><kbd>7</kbd></button>
+        <button type="button" data-vista="inferior"><span>Inferior</span><kbd>⇧7</kbd></button>
+        <button type="button" data-vista="isometrica" class="ativa"><span>Iso</span><kbd>0</kbd></button>
+        <button id="btnProjecao" type="button"><span>Perspectiva</span><kbd>5</kbd></button>
+        <button id="btnEnquadrar" type="button"><span>Enquadrar</span><kbd>F</kbd></button>
+      </nav>
+
+      <aside class="painel painel-partes" aria-labelledby="tituloPartes">
+        <div class="painel-cabecalho">
+          <div>
+            <span class="rotulo">ESTRUTURA</span>
+            <h1 id="tituloPartes">Componentes</h1>
+          </div>
+          <span id="contagemPartes" class="contagem">0</span>
+        </div>
+        <p class="dica">Marque uma ou mais peças. Shift, Ctrl ou ⌘ também adicionam pela cena.</p>
+        <div id="listaPartes" class="lista-partes"></div>
+        <button id="btnLimpar" class="botao texto" type="button">Limpar seleção <kbd>Esc</kbd></button>
+      </aside>
+
+      <aside class="painel painel-inspecao" aria-labelledby="tituloInspecao">
+        <span class="rotulo">INSPEÇÃO</span>
+        <h2 id="tituloInspecao">Ver no contexto</h2>
+        <p id="selecaoResumo" class="resumo">Selecione componentes para inspecionar.</p>
+
+        <div class="modos" aria-label="Modo de visualização">
+          <button id="btnTodas" class="botao ativa" type="button">
+            <span>Montagem</span>
+            <small>Todas opacas</small>
+          </button>
+          <button id="btnContexto" class="botao" type="button" disabled>
+            <span>Contexto</span>
+            <small>Restante fantasma</small>
+          </button>
+          <button id="btnIsolar" class="botao" type="button" disabled>
+            <span>Isolar</span>
+            <small>Só a seleção</small>
+          </button>
+        </div>
+
+        <label class="controle-explosao" for="explosao">
+          <span>
+            <b>Explosão da montagem</b>
+            <output id="valorExplosao" for="explosao">0%</output>
+          </span>
+          <input id="explosao" type="range" min="0" max="100" value="0" step="1" />
+        </label>
+
+        <div class="acoes-inspecao">
+          <button id="btnFocarSelecao" class="botao primaria" type="button" disabled>Focar seleção</button>
+          <button id="btnCopiarEstado" class="botao" type="button">Copiar vista</button>
+        </div>
+
+        <div id="diagnostico" class="diagnostico">
+          <span class="rotulo">DIAGNÓSTICO</span>
+          <p>Preparando relatório da peça…</p>
+        </div>
+      </aside>
+
+      <footer class="rodape">
+        <span><b>Arraste</b> orbitar</span>
+        <span><b>Roda</b> aproximar</span>
+        <span><b>Duplo clique</b> focar peça</span>
+        <span><b>URL</b> preserva o estado</span>
+      </footer>
+
+      <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+      <div id="erro" class="erro" role="alert" hidden></div>
+    </div>
+    <script type="module" src="/src/bancada/main.js"></script>
+  </body>
+</html>

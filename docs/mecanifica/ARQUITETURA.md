@@ -35,6 +35,7 @@ Organização pretendida:
 src/
 ├── app/                  # ciclo da aplicação e composição
 ├── autoria/              # formato, schemas, operações e estado neutro
+├── bancada/              # inspeção neutra, vistas e validação de montagens
 ├── render/three/         # conversão e apresentação em Three.js
 ├── cena/galpao/          # ambiente e iluminação
 ├── dominio/mecanica/     # sistemas, estados e explicações automotivas
@@ -50,6 +51,18 @@ src/
 - `dominio/mecanica` combina partes e estados usando APIs públicas da autoria.
 - `interface` conversa com a simulação e seleção, sem editar malhas diretamente.
 - ferramentas headless usam o mesmo núcleo que o navegador.
+
+## Duas superfícies, um modelo
+
+`bancada.html` é a superfície de autoria: estúdio neutro, câmeras previsíveis,
+seleção múltipla, isolamento, contexto fantasma e explosão diagnóstica.
+`index.html` e o futuro galpão são superfícies de apresentação ao cliente.
+
+As duas consomem o mesmo grafo semântico. Estado de câmera, opacidade, realce e
+explosão são projeções temporárias; não modificam a definição da peça.
+
+O contrato detalhado está em
+[`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md).
 
 ## Three.js
 
@@ -87,6 +100,8 @@ não depende delas.
 1. Congelar uma referência executável do Atelier.
 2. Criar a aplicação Three.js ao lado dele.
 3. Provar a ponte com uma peça procedural existente.
-4. Criar o galpão e o freio na arquitetura nova.
-5. Migrar ferramentas de autoria somente quando houver um caso real.
-6. Remover código legado apenas depois de existir substituto provado.
+4. Provar a bancada corrigindo uma peça herdada.
+5. Criar o freio na arquitetura nova.
+6. Contextualizar o sistema em um carro simplificado e no galpão.
+7. Migrar ferramentas de autoria somente quando houver um caso real.
+8. Remover código legado apenas depois de existir substituto provado.

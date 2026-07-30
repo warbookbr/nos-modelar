@@ -39,8 +39,13 @@ const ALLOWLIST = new Map([
   ['docs/historico/DECISIONS-ARCHIVE.md:docs/R3_COMPARATIVO_RENDER.md', 'arquivo nunca existiu na main — citado como registro de branch descartada'],
 ]);
 
-const rastreados = execFileSync('git', ['ls-files'], { cwd: REPO, encoding: 'utf8' })
+const rastreados = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard'],
+  { cwd: REPO, encoding: 'utf8' },
+)
   .split('\n').filter(Boolean)
+  .filter((f) => existsSync(path.join(REPO, f)))
   .filter((f) => !IGNORAR.has(f) && EXTS.has(path.extname(f)));
 
 const todosDocsMd = rastreados.filter((f) => f.startsWith('docs/') && f.endsWith('.md'));

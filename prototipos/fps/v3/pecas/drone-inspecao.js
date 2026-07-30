@@ -14,12 +14,12 @@
    `origemId` não é índice de PASSO: é uma identidade estrutural estável.
 
    ESPÉCIME DA FASE 4, veredito PARCIAL — não é peça publicada. Tecnicamente
-   sã (replay provado, 228V/174F, 0 órfãos, 0 ids literais), mas o
-   `detector-de-banding` acusa faixa chapada e o `distancia-paleta` acusa
-   desvio sutil: `npm run auditar -- drone-inspecao` REPROVA, de propósito e
-   por escrito. Ela está aqui como registro medido da corrida de criação +
-   refino (relatórios em docs/historico/fase4-drone-inspecao-*.md), não como
-   modelo a copiar.
+   sã (replay provado, 246V/192F, 0 órfãos, 0 ids literais e 0 faces sem
+   identidade). A bancada da Mecanifica corrigiu a contaminação lente↔pouso e
+   acrescentou as ligações do trem de pouso; o `detector-de-banding` passou.
+   `npm run auditar -- drone-inspecao` ainda REPROVA pelo aviso de desvio sutil
+   em `distancia-paleta`, por escrito. Ela continua sendo registro medido, não
+   modelo final a copiar.
 */
 import { executar, colisaoDe } from '../motor/oficina.js';
 
@@ -60,12 +60,16 @@ export const PARAMS = {
   lenteRaio: 0.125,
   lenteProfundidade: 0.08,
   pousoX: 0.48,
-  pousoXNeg: -0.48,
-  pousoZ: 0.48,
-  pousoY: 0.05,
-  alturaPouso: 0.08,
-  larguraPouso: 0.06,
-  comprimentoPouso: 0.82,
+  pousoY: 0.04,
+  alturaPouso: 0.06,
+  larguraPouso: 0.07,
+  comprimentoPouso: 1.08,
+  pousoSuporteY: 0.09,
+  pousoSuporteZ: 0.30,
+  pousoSuporteZNeg: -0.30,
+  alturaSuportePouso: 0.24,
+  larguraSuportePouso: 0.07,
+  profundidadeSuportePouso: 0.08,
   corPrincipal: '#30343b',
   corDestaque: '#e87524',
   corLente: '#263e58',
@@ -81,6 +85,13 @@ export const TOPO = {
    tabela é declarativa: não contém IDs globais de vértices ou faces. */
 const facesCubo = (id) => ({ unir: ['fundo', 'topo', 'tras', 'direita', 'frente', 'esquerda'].map((face) => ({ origem: { op: 'cubo', id, face } })) });
 const facesCubos = (ids) => ids.flatMap((id) => ['fundo', 'topo', 'tras', 'direita', 'frente', 'esquerda'].map((face) => ({ origem: { op: 'cubo', id, face } })));
+const origemLente = { op: 'cilindro', id: 113 };
+const origemPousoBarraD = { op: 'cubo', id: 124 };
+const origemPousoBarraE = { op: 'espelha', id: 125, de: origemPousoBarraD };
+const origemPousoSuporteFrenteD = { op: 'cubo', id: 126 };
+const origemPousoSuporteFrenteE = { op: 'espelha', id: 128, de: origemPousoSuporteFrenteD };
+const origemPousoSuporteTrasD = { op: 'cubo', id: 127 };
+const origemPousoSuporteTrasE = { op: 'espelha', id: 129, de: origemPousoSuporteTrasD };
 export const ALIASES = [
   ['tampaBateria', facesCubo(102)],
   ['camera', facesCubo(114)],
@@ -104,7 +115,21 @@ export const ALIASES = [
   ['palaTraseiroDireitoB', facesCubo(121)],
   ['palaTraseiroEsquerdoA', facesCubo(122)],
   ['palaTraseiroEsquerdoB', facesCubo(123)],
-  ['pousoDireito', facesCubo(124)],
+  ['lente', { unir: [
+    { origem: origemLente },
+    { origem: { ...origemLente, tampa: 'fundo' } },
+    { origem: { ...origemLente, tampa: 'topo' } },
+  ] }],
+  ['pousoDireito', { unir: [
+    { origem: origemPousoBarraD },
+    { origem: origemPousoSuporteFrenteD },
+    { origem: origemPousoSuporteTrasD },
+  ] }],
+  ['pousoEsquerdo', { unir: [
+    { origem: origemPousoBarraE },
+    { origem: origemPousoSuporteFrenteE },
+    { origem: origemPousoSuporteTrasE },
+  ] }],
   ['detalhesLaranja', { unir: [
     { origem: { op: 'cubo', id: 102, face: 'topo' } },
     ...facesCubos([116, 117, 118, 119, 120, 121, 122, 123]),
@@ -116,9 +141,6 @@ export const ALIASES = [
 ];
 
 const corpoRegiao = { regiao: { min: [-0.61, 0.30, -0.70], max: [0.61, 0.61, 0.70] } };
-const pousoRegiaoD = { regiao: { min: [0.43, 0, -0.05], max: [0.53, 0.30, 0.05] } };
-const pousoRegiaoE = { regiao: { min: [-0.53, 0, -0.05], max: [-0.43, 0.30, 0.05] } };
-
 export const PASSOS = [
   // Corpo baixo e largo, com quinas técnicas.
   ['chamferBox', { larg: 'larguraCorpo', alt: 'alturaCorpo', prof: 'comprimentoCorpo', chanfro: 'chanfroCorpo' }],
@@ -193,18 +215,26 @@ export const PASSOS = [
   ['parte', { nome: 'camera', sel: { regiao: { min: [-1, 0, -1], max: [1, 0.20, 1] } } }],
   ['transladar', { d: [0, 'cameraY', 'avancoCamera'], sel: { grupo: 'camera' } }],
   ['pincel', { modo: 'face', sel: { grupo: 'camera' }, cor: PARAMS.corPrincipal }],
-  ['cilindro', { raio: 'lenteRaio', altura: 'lenteProfundidade', lados: 'ladosLente' }],
-  ['parte', { nome: 'lente', sel: { regiao: { min: [-0.11, 0, -0.11], max: [0.11, 0.10, 0.11] } } }],
+  ['cilindro', { origemId: 113, raio: 'lenteRaio', altura: 'lenteProfundidade', lados: 'ladosLente' }],
+  ['parte', { nome: 'lente', sel: { alias: 'lente' } }],
   ['rotaciona', { eixo: 'x', graus: -90, sel: { grupo: 'lente' } }],
   ['transladar', { d: [0, 'cameraY', 'avancoCamera'], sel: { grupo: 'lente' } }],
   ['pincel', { modo: 'face', sel: { grupo: 'lente' }, cor: PARAMS.corLente }],
 
-  // Esquis de pouso, duas barras claras que reforçam a leitura da base.
+  // Trem de pouso: esquis + duas ligações por lado, endereçados por origem.
   ['cubo', { origemId: 124, larg: 'larguraPouso', alt: 'alturaPouso', prof: 'comprimentoPouso' }],
-  ['parte', { nome: 'pouso', sel: { regiao: { min: [-1, 0, -1], max: [1, 0.25, 1] } } }],
-  ['transladar', { d: ['pousoX', 'pousoY', 0] , sel: { grupo: 'pouso' } }],
-  ['espelha', { eixo: 'x', pos: 0, sel: { grupo: 'pouso' } }],
-  ['pincel', { modo: 'face', sel: { grupo: 'pouso' }, cor: PARAMS.corPouso }],
+  ['transladar', { d: ['pousoX', 'pousoY', 0], sel: { origem: origemPousoBarraD } }],
+  ['cubo', { origemId: 126, larg: 'larguraSuportePouso', alt: 'alturaSuportePouso', prof: 'profundidadeSuportePouso' }],
+  ['transladar', { d: ['pousoX', 'pousoSuporteY', 'pousoSuporteZ'], sel: { origem: origemPousoSuporteFrenteD } }],
+  ['cubo', { origemId: 127, larg: 'larguraSuportePouso', alt: 'alturaSuportePouso', prof: 'profundidadeSuportePouso' }],
+  ['transladar', { d: ['pousoX', 'pousoSuporteY', 'pousoSuporteZNeg'], sel: { origem: origemPousoSuporteTrasD } }],
+  ['espelha', { eixo: 'x', pos: 0, origemId: 125, derivaDe: origemPousoBarraD, sel: { origem: origemPousoBarraD } }],
+  ['espelha', { eixo: 'x', pos: 0, origemId: 128, derivaDe: origemPousoSuporteFrenteD, sel: { origem: origemPousoSuporteFrenteD } }],
+  ['espelha', { eixo: 'x', pos: 0, origemId: 129, derivaDe: origemPousoSuporteTrasD, sel: { origem: origemPousoSuporteTrasD } }],
+  ['parte', { nome: 'pousoDireito', sel: { alias: 'pousoDireito' } }],
+  ['parte', { nome: 'pousoEsquerdo', sel: { alias: 'pousoEsquerdo' } }],
+  ['pincel', { modo: 'face', sel: { grupo: 'pousoDireito' }, cor: PARAMS.corPouso }],
+  ['pincel', { modo: 'face', sel: { grupo: 'pousoEsquerdo' }, cor: PARAMS.corPouso }],
 
   // O envelope de colisão usa o corpo principal; a frente fica evidente pela câmera.
   ['solido', { sel: { grupo: 'corpo' } }],
@@ -213,7 +243,7 @@ export const PASSOS = [
 export const meta = {
   nome: 'drone-inspecao',
   tipo: 'objeto',
-  desc: 'drone quadricóptero compacto de inspeção, hard-surface, com câmera frontal, quatro rotores e esquis de pouso',
+  desc: 'drone quadricóptero compacto de inspeção, hard-surface, com câmera frontal, quatro rotores e trem de pouso conectado',
   colisao: colisaoDe(PASSOS, PARAMS, TOPO, {}, ALIASES),
 };
 

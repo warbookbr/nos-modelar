@@ -71,7 +71,14 @@ for (const nome of nomes) {
   catch (e) { falhas.push(`${nome}: falhou ao importar — ${e.message}`); continue; }
   if (!Array.isArray(mod.PASSOS)) continue;   // peça JS-pura (sem envelope da Oficina) — fora do escopo desta prova
   try {
-    const neutro = nucleo(mod.PASSOS, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.MATERIAIS ?? {}, mod.ESQUELETO ?? null);
+    const neutro = nucleo(
+      mod.PASSOS,
+      mod.PARAMS ?? {},
+      mod.TOPO ?? {},
+      mod.MATERIAIS ?? {},
+      mod.ESQUELETO ?? null,
+      mod.ALIASES ?? [],
+    );
     if (neutro.orfaos.length) { falhas.push(`${nome}: ${neutro.orfaos.length} órfão(s) na peça shipável — a peça de referência não pode ter órfão`); continue; }
     const texto = serializar(neutroCanonico(neutro));
     resultado[nome] = { hash: hash(texto), vertices: neutro.V.size, faces: neutro.F.size };

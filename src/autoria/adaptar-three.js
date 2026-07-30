@@ -69,7 +69,9 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
   raiz.userData = { tipo: 'peca-procedural', nome };
 
   const grupos = new Map();
+  const facesSemParte = [];
   for (const face of [...neutro.F.values()].sort((a, b) => a.id - b.id)) {
+    if (!face.parte) facesSemParte.push(face.id);
     const parte = face.parte || 'estrutura-sem-nome';
     const material = materialDaFace(face, materiais);
     const chave = `${parte}\u0000${material.chave}`;
@@ -117,14 +119,22 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
   }
 
   raiz.userData.partes = [...partes.keys()].sort();
+  raiz.userData.diagnosticos = {
+    facesSemParte: facesSemParte.slice(),
+  };
   return {
     raiz,
     partes,
+    diagnosticos: {
+      facesSemParte,
+      semanticaIntegra: facesSemParte.length === 0,
+    },
     estatisticas: {
       verticesNeutros: neutro.V.size,
       facesNeutras: neutro.F.size,
       triangulos: [...grupos.values()].reduce((total, lote) => total + lote.posicoes.length / 9, 0),
       partes: partes.size,
+      facesSemParte: facesSemParte.length,
     },
   };
 }

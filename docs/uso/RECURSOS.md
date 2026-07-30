@@ -83,6 +83,7 @@ pt-BR) — sessão nova começa por ele e por este arquivo.
 
 ### `docs/mecanifica/` — produto e integração
 
+- **`docs/mecanifica/BANCADA-E-APRESENTACAO.md`** — contrato da bancada de autoria e da transição carro → sistema → peça.
 - **`docs/mecanifica/VISAO.md`** — propósito do simulador mecânico e experiência pretendida para clientes.
 - **`docs/mecanifica/ARQUITETURA.md`** — fronteiras entre domínio, adaptador Three.js, cena e interação.
 - **`docs/mecanifica/PLANO.md`** — roteiro vigente e critérios de saída das fases da Mecanifica.
