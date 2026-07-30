@@ -35,7 +35,10 @@ const rastreados = execFileSync('git', ['ls-files'], { cwd: REPO, encoding: 'utf
    frontmatter se houver (caso dos agents). Devolve null se não achou — e null
    é ERRO no --check, não silêncio. */
 function resumoDe(rel) {
-  const linhas = readFileSync(path.join(REPO, rel), 'utf8').split('\n', 40);
+  // A projeção precisa ser idêntica em checkouts CRLF (Windows) e LF (Linux).
+  const linhas = readFileSync(path.join(REPO, rel), 'utf8')
+    .replace(/\r\n?/g, '\n')
+    .split('\n', 40);
   if (DOCS.has(path.extname(rel))) {
     let i = 0;
     if (linhas[0]?.trim() === '---') {           // frontmatter: description vale mais que o H1
