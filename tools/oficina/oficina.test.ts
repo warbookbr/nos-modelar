@@ -7,6 +7,8 @@ import { describe, it, expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
 import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/fps/v3/motor/oficina.js';
+// @ts-expect-error — módulo .js neutro de medição (a régua que a bancada e o CLI compartilham)
+import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 
 const P = (extra: any[] = []) => [
   ['cilindro', { id: 0, raio: 'r', altura: 'h', lados: 'lados' }],
@@ -3622,6 +3624,85 @@ describe('O-2 — reatribuir parte GRITA (roubo silencioso de face)', () => {
   });
 });
 
+/* CONTRATO DE IDENTIDADE DE PARTE — a correção dos dois defeitos que a revisão
+   adversarial da R2 achou, e que têm a MESMA raiz: `parte.nome` entrava sem
+   contrato nenhum.
+
+   (1) A trava do O-2 perguntava `f.parte != null` e o `neutroCanonico`
+       perguntava `if (f.parte)`: identidade falsy-mas-não-nula (`''`) sumia do
+       formato salvo E mesmo assim bloqueava a nomeação seguinte — regressão
+       provada contra o núcleo de antes do O-2, que nomeava a face normalmente.
+   (2) `nome: 42`/`true`/`['a']` atravessava tudo (0 órfãos, canon gravando o
+       lixo, gabarito hasheando) e só estourava na régua da bancada; `nome`
+       AUSENTE registrava a chave literal `"undefined"` em `st.partes` — nomear
+       virava no-op silencioso, o que o CLAUDE.md proíbe.
+
+   O contrato é UM: nome de parte é string com pelo menos um caractere visível,
+   validado na ENTRADA, e a guarda, o canon e o adaptador perguntam todos por
+   `temNomeDeParte`. */
+describe('contrato de identidade de parte (nome)', () => {
+  const cubo: any = ['cubo', { id: 0, lado: 1 }];
+  const parte = (nome: any, faces: number[]): any => ['parte', { nome, faces }];
+  const canonF0 = (n: any) => neutroCanonico(n).F[0];
+  const nomeRuim = (n: any) => n.orfaos.filter((o: any) => o.op === 'parte' && o.ref === 'nome');
+
+  it('nome vazio não bloqueia a nomeação seguinte: quem grita é o passo do nome vazio (regressão do O-2)', () => {
+    // ANTES do O-2 esta lista dava F0.parte='disco'; a trava passou a ver '' como
+    // identidade e a face travava com um nome que o arquivo salvo nem registra.
+    const n = nucleo([cubo, parte('', [0]), parte('disco', [0])], {}, {});
+    expect(nomeRuim(n)).toHaveLength(1);                     // o grito é no passo 1, o do nome vazio
+    expect(nomeRuim(n)[0].passo).toBe(1);
+    expect(n.orfaos.some((o: any) => /já pertence à parte ''/.test(o.motivo))).toBe(false);   // a mensagem sem sentido morreu
+    expect(n.F.get(0).parte).toBe('disco');                  // o passo 2 nomeia normalmente
+    expect(Object.keys(n.partes)).toEqual(['disco']);        // '' nunca virou parte
+    expect(canonF0(n)[6]).toBe('disco');                     // e a cauda de parte está no canon
+  });
+
+  it('o que a GUARDA considera identidade é exatamente o que o CANON grava (as três fontes concordam)', () => {
+    // a peça nomeada de verdade: canon tem cauda E a face está travada contra roubo
+    const nomeada = nucleo([cubo, parte('a', [0]), parte('b', [0])], {}, {});
+    expect(canonF0(nomeada)[6]).toBe('a');
+    expect(nomeada.orfaos.some((o: any) => /já pertence à parte 'a'/.test(o.motivo))).toBe(true);
+    // a identidade recusada não grava cauda no canon...
+    const so = nucleo([cubo, parte('   ', [0])], {}, {});
+    expect(canonF0(so)).toHaveLength(6);
+    // ...e por isso também não pode travar a nomeação seguinte
+    const depois = nucleo([cubo, parte('   ', [0]), parte('b', [0])], {}, {});
+    expect(canonF0(depois)[6]).toBe('b');
+    expect(depois.F.get(0).parte).toBe('b');
+    expect(depois.orfaos.some((o: any) => /já pertence à parte/.test(o.motivo))).toBe(false);
+  });
+
+  it('nome não-string GRITA e a op é fail-closed: nada no neutro, nada no canon, nada em partes', () => {
+    for (const nome of [42, true, ['a'], { n: 1 }, null, undefined]) {
+      const n = nucleo([cubo, parte(nome, [0, 1])], {}, {});
+      expect(nomeRuim(n)).toHaveLength(1);
+      expect(nomeRuim(n)[0].motivo).toMatch(/nome de parte inválido/);
+      expect(n.F.get(0).parte).toBeNull();                   // nenhuma face tocada
+      expect(n.F.get(1).parte).toBeNull();
+      expect(Object.keys(n.partes)).toEqual([]);             // nem a chave literal "undefined"
+      expect(canonF0(n)).toHaveLength(6);                    // canon byte-idêntico ao de uma face sem parte
+    }
+  });
+
+  it('nome inválido não chega na régua: a medida headless da bancada segue abrindo a peça', () => {
+    // MEDIA-4 na prática: com `nome: 42` o núcleo entregava um neutro que fazia
+    // `caixasPorParte` LANÇAR, e a bancada deixava de abrir uma peça que abria antes.
+    const n = nucleo([cubo, parte(42, [0, 1])], {}, {});
+    expect(() => caixasPorParte(n)).not.toThrow();
+    const { caixas, facesSemParte } = caixasPorParte(n);
+    expect(caixas.size).toBe(0);
+    expect(facesSemParte).toHaveLength(6);                   // e a régua CONTA as 6 sem nome, em vez de mentir
+  });
+
+  it('sel:{grupo} usa o MESMO contrato: o que não pode ser criado não pode ser citado', () => {
+    for (const grupo of ['', '  ', 7 as any]) {
+      const n = nucleo([cubo, parte('a', [0]), ['pincel', { modo: 'face', sel: { grupo }, cor: '#123456' }]], {}, {});
+      expect(n.orfaos.some((o: any) => o.ref === 'sel.grupo' && /nome de parte/.test(o.motivo))).toBe(true);
+    }
+  });
+});
+
 /* O-3 (Faixa 1) — `sel.regiao` ganha `modo`. O argumento não é conforto: o
    seletor JÁ se comportava de duas maneiras e nada no formato dizia isso —
    vértice entrava por "toca", face só por "contem" (`f.vs.every(dentro)`), de
@@ -3650,13 +3731,42 @@ describe('O-3 — sel.regiao com modo contem|toca', () => {
     expect(pintadas(n)).toEqual([1, 2, 3, 4, 5]);       // topo + as 4 paredes; o fundo (y=0) fica de fora
   });
 
-  it('o eixo de VÉRTICE não muda com modo: transladar move os mesmos cantos nos dois modos', () => {
-    const move = (regiao: any) => nucleo([cubo, ['transladar', { d: [0, 2, 0], sel: { regiao } }]], {}, {});
-    const contem = move(caixaDoTopo), toca = move({ ...caixaDoTopo, modo: 'toca' });
-    expect(contem.orfaos).toHaveLength(0); expect(toca.orfaos).toHaveLength(0);
-    expect(JSON.stringify([...toca.V.entries()])).toBe(JSON.stringify([...contem.V.entries()]));
-    expect(toca.V.get(4)).toEqual([-0.5, 3, -0.5]);     // canto de cima subiu
-    expect(toca.V.get(0)).toEqual([-0.5, 0, -0.5]);     // canto de baixo, fora da caixa, ficou
+  it('sem modo, a op de VÉRTICE lê a caixa como sempre leu: entra o canto que está dentro', () => {
+    const n = nucleo([cubo, ['transladar', { d: [0, 2, 0], sel: { regiao: caixaDoTopo } }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(n.V.get(4)).toEqual([-0.5, 3, -0.5]);       // canto de cima subiu
+    expect(n.V.get(0)).toEqual([-0.5, 0, -0.5]);       // canto de baixo, fora da caixa, ficou
+  });
+
+  /* A revisão adversarial da R2 provou que `modo` era ENGOLIDO em op de vértice:
+     `toca`, `contem` e a AUSÊNCIA davam canon byte-idêntico em `transladar`,
+     enquanto no `pincel` a mesma caixa pinta 1 face contra 5. Chave do formato
+     salvo aceita em silêncio ensina a próxima IA a escrever besteira que passa —
+     e o cenário é concreto: copiar o `sel` de um exemplo de `pincel` para um
+     `transladar` e receber calado o comportamento antigo, com a malha rasgando.
+     A escolha foi GRITAR (fail-closed) em vez de fazer `modo` mover vértice:
+     arrastar canto de FORA da caixa mudaria em silêncio o que
+     `transladar`/`rotaciona` movem, que é a classe de surpresa que o O-3 veio
+     matar. */
+  it('modo numa op de VÉRTICE GRITA em vez de evaporar, nos DOIS valores, e é fail-closed', () => {
+    for (const modo of ['toca', 'contem']) {
+      for (const op of ['transladar', 'rotaciona', 'displace']) {
+        const args: any = op === 'transladar' ? { d: [0, 2, 0] } : op === 'rotaciona' ? { eixo: 'y', graus: 90 } : { amplitude: 0.1, frequencia: 2 };
+        const n = nucleo([cubo, [op, { ...args, sel: { regiao: { ...caixaDoTopo, modo } } }]], {}, {});
+        const grito = n.orfaos.filter((o: any) => o.ref === 'sel.regiao' && /modo só governa o eixo de FACE/.test(o.motivo));
+        expect(grito, `${op} com modo:${modo}`).toHaveLength(1);
+        expect(grito[0].op).toBe(op);
+        expect(grito[0].motivo).toMatch(/consome só vértices/);
+        // fail-closed: a região não seleciona nada, então a malha não se move (e nada muda em silêncio)
+        expect(JSON.stringify([...n.V.entries()])).toBe(JSON.stringify([...nucleo([cubo], {}, {}).V.entries()]));
+      }
+    }
+  });
+
+  it('a MESMA caixa com modo continua funcionando na op de FACE (o grito é sobre o eixo, não sobre a chave)', () => {
+    const n = nucleo([cubo, pinta({ ...caixaDoTopo, modo: 'toca' })], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(pintadas(n)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('modo inválido GRITA nomeando os dois valores aceitos e não seleciona nada', () => {
@@ -3723,5 +3833,74 @@ describe('O-11 — diagnóstico de completude de alias', () => {
     ] as any, {}, {}, {}, null, metades);
     expect(completude(n)).toHaveLength(0);
     expect(n.orfaos.some((o: any) => /cilindro:303 inexistente ou ainda não criada/.test(o.motivo))).toBe(true);
+  });
+
+  /* CONSELHO SÓ SE FOR VERDADE. A revisão adversarial da R2 provou o conselho
+     ERRADO: com um termo que aponta `{op:'cilindro'}` para uma origem declarada
+     por um `cubo`, o diagnóstico mandava "espere o alias fechar" — e seguir a
+     instrução não resolvia, porque a citação seguinte falhava com `origem 7 foi
+     declarada por 'cubo', não por 'cilindro'`. A causa era tratar "id
+     registrado" como "termo resolvido". */
+  const nunca = (n: any) => n.orfaos.filter((o: any) => /NUNCA fica completo/.test(o.motivo));
+
+  it('termo que falha em QUALQUER passo diz "nunca fecha" e o porquê, em vez de mandar esperar', () => {
+    const passos: any = [
+      ['cubo', { id: 0, lado: 1, origemId: 7 }],                          // o 7 nasce como CUBO
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'X' } }],              // passo 1: cita o alias
+      ['cubo', { id: 2000, lado: 1, origemId: 8 }],                       // passo 2: o outro termo nasce
+      ['parte', { nome: 'p', sel: { alias: 'X' } }],                      // passo 3: seguir "espere" não resolveria
+    ];
+    const aliases: any = [['X', { unir: [{ origem: { op: 'cilindro', id: 7 } }, { origem: { op: 'cubo', id: 8 } }] }]];
+    const n = nucleo(passos, {}, {}, {}, null, aliases);
+    expect(completude(n)).toHaveLength(0);                                // nada de "espere o alias fechar"
+    const aviso = nunca(n);
+    expect(aviso.length).toBeGreaterThan(0);
+    expect(aviso[0].passo).toBe(1); expect(aviso[0].ref).toBe('sel.alias');
+    expect(aviso[0].motivo).toMatch(/alias 'X' NUNCA fica completo/);
+    expect(aviso[0].motivo).toMatch(/a origem 7 foi declarada por 'cubo', não por 'cilindro'/);
+    expect(aviso[0].motivo).toMatch(/esperar não resolve/);
+    // e o conselho está certo: no passo 3, com TUDO já nascido, a citação continua falhando
+    expect(n.orfaos.some((o: any) => o.passo === 3 && /foi declarada por 'cubo'/.test(o.motivo))).toBe(true);
+  });
+
+  it('termo que vai NASCER com outra op também é insalvável (a declaração futura não casa)', () => {
+    const passos: any = [
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'Y' } }],              // passo 0: cita antes de tudo
+      ['cubo', { id: 1000, lado: 1, origemId: 9 }],                       // passo 1: o 9 vai nascer CUBO, não cilindro
+    ];
+    const n = nucleo(passos, {}, {}, {}, null, [['Y', { origem: { op: 'cilindro', id: 9 } }]] as any);
+    expect(completude(n)).toHaveLength(0);
+    expect(nunca(n)[0].motivo).toMatch(/o passo 1 declara a origem 9 por 'cubo', não por 'cilindro'/);
+  });
+
+  it('um termo insalvável contamina a dica do alias inteiro (nenhum "espere" ao lado de um termo morto)', () => {
+    const passos: any = [
+      ['cubo', { id: 0, lado: 1, origemId: 7 }],                          // termo A: nasce cubo, o alias pede cilindro
+      ['transladar', { d: [0, 1, 0], sel: { alias: 'Z' } }],              // passo 1: cita
+      cil(2, 303),                                                        // termo B: esse SIM só faltava esperar
+    ];
+    const aliases: any = [['Z', { unir: [{ origem: { op: 'cilindro', id: 7 } }, { origem: { op: 'cilindro', id: 303 } }] }]];
+    const n = nucleo(passos, {}, {}, {}, null, aliases);
+    expect(completude(n)).toHaveLength(0);                                // esperar o passo 2 não faria o alias fechar
+    expect(nunca(n)).toHaveLength(1);
+  });
+});
+
+/* BAIXA-13 — o núcleo ensinava SEIS seletores na mensagem de seleção vazia,
+   omitindo justamente `alias`: a mesma omissão que o O-0 corrigiu na skill,
+   impressa pela própria ferramenta, na hora em que o autor mais precisa da
+   lista certa. As três mensagens saem agora de uma lista só. */
+describe('as mensagens de seleção ensinam os SETE seletores', () => {
+  const cubo: any = ['cubo', { id: 0, lado: 1 }];
+  const SETE = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'alias'];
+
+  it('seleção vazia, chave desconhecida e sel não-objeto nomeiam todos os sete, alias incluído', () => {
+    const vazia = nucleo([cubo, ['transladar', { d: [0, 1, 0], sel: {} }]] as any, {}, {});
+    const desconhecida = nucleo([cubo, ['transladar', { d: [0, 1, 0], sel: { xyz: 1 } }]] as any, {}, {});
+    const naoObjeto = nucleo([cubo, ['transladar', { d: [0, 1, 0], sel: 'tudo' }]] as any, {}, {});
+    for (const [qual, n] of [['vazia', vazia], ['desconhecida', desconhecida], ['naoObjeto', naoObjeto]] as any[]) {
+      const msg = n.orfaos.map((o: any) => o.motivo).join(' | ');
+      for (const seletor of SETE) expect(msg, `${qual} omite '${seletor}'`).toMatch(new RegExp(`\\b${seletor}\\b`));
+    }
   });
 });

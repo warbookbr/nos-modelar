@@ -77,7 +77,7 @@ roteiro, ainda não existe — não use; o plano de fechar as lacunas é o épic
 | `pincel` | `modo:'face'` (`faces` legado OU `sel`, `cor`) ou `modo:'livre'` (`cor`,`raio`,`dureza`,`pontos:[{f,a,b}]`) | livre = dab face-local, acompanha a face; não aceita `sel` |
 | `liso` | `faces:[ids]` (legado) ou `sel` | sombreado macio (padrão: chapado) |
 | `material` | `faces` (legado) ou `sel`, `usa` | + `MATERIAIS = {mat1:{cor,emissivo,aspereza,semLuz,mistura:'transparente'}}` exportado |
-| `parte` | `nome`, `faces:[ids]` (legado) ou `sel`, `pivo?` (`[x,y,z]`, PARAM), `substituir?` (só o literal `true`) | nomeia pra animação/material/grupo. Uma face pertence a NO MÁXIMO uma parte, e desde o O-2 **reatribuir GRITA**: se a face já é de OUTRA parte, o passo é recusado por face, ela fica com o dono ANTIGO e o órfão nomeia quem a batizou primeiro. Duas seleções sobrepostas não roubam mais faces em silêncio. Escreva `substituir: true` só quando transferir for a INTENÇÃO (valor diferente de `true` grita e a op segue estrita). Renomear para a MESMA parte segue mudo (é redundância, não conflito). `pivo` ausente = centroide da parte (resolvido no adaptador) |
+| `parte` | `nome` (string com pelo menos um caractere visível), `faces:[ids]` (legado) ou `sel`, `pivo?` (`[x,y,z]`, PARAM), `substituir?` (só o literal `true`) | nomeia pra animação/material/grupo. O `nome` é a IDENTIDADE e é formato salvo: `''`, `'   '`, número, booleano, lista ou `nome` AUSENTE **GRITAM** e a op não toca em face nenhuma (fail-closed) — nomear nunca vira no-op silencioso, e `sel:{grupo}` cobra o mesmo contrato. Uma face pertence a NO MÁXIMO uma parte, e desde o O-2 **reatribuir GRITA**: se a face já é de OUTRA parte, o passo é recusado por face, ela fica com o dono ANTIGO e o órfão nomeia quem a batizou primeiro. Duas seleções sobrepostas não roubam mais faces em silêncio. Escreva `substituir: true` só quando transferir for a INTENÇÃO (valor diferente de `true` grita e a op segue estrita). Renomear para a MESMA parte segue mudo (é redundância, não conflito). `pivo` ausente = centroide da parte (resolvido no adaptador) |
 | `pesar` | `osso`, `vs:[ids]` e/ou `faces:[ids]`, `peso` | skinning (acumula por vértice, normaliza top-4); não aceita `sel` |
 | `solido` | `faces:[ids]` (legado) ou `sel` | o que entra na colisão |
 | `inflate` | `contornoLado:[[z,y],...]` (≥3 pontos, PARAM), `contornoTopo:[[z,x],...]` (idem), `divisoes` (TOPO, mín 2) | **não publica `origem`**. Dois contornos 2D (plano z×y e z×x) viram VOLUME por interseção de dois prismas — não é malha booleana geral, é uma GRADE DE VOXEL (watertight por construção, mas o resultado sai BLOCKY/facetado — não suave). Ponto com aridade ≠ 2 (alça de curva reservada) GRITA e aborta, igual ao `contorno` do loft; <3 pontos idem; contornos que não se cruzam em nenhum voxel GRITA (volume vazio nunca é o que você queria). Vale largura≠altura — o único gerador sem seção circular. Peça-exemplo `_corpo.js` |
@@ -241,10 +241,13 @@ faces segundo `modo` — `sel:{regiao:{min,max,modo?}}` aceita `'contem'`
 (DEFAULT: face inteiramente dentro da caixa inclusiva) ou `'toca'` (pelo menos
 um canto dentro), e qualquer outro valor GRITA (O-3). Em
 `rotaciona`/`transladar`/`displace`, região continua sendo os vértices dentro
-da caixa — o eixo de VÉRTICE lê a caixa como "toca" e **`modo` não o altera**:
-mesmo em `toca`, só os cantos dentro da caixa são movidos. Essa assimetria
-existia calada desde sempre (vértice por toque, face por contenção); `modo` só
-a tornou dizível. `faces:[ids]` é compatibilidade para arquivo salvo; nunca
+da caixa — o eixo de VÉRTICE lê a caixa como "toca" e `modo` **não governa esse
+eixo**, então escrever `modo` nessas três ops **GRITA** (fail-closed: a região
+não seleciona nada). Não copie o `sel` de um exemplo de `pincel` para um
+`transladar` sem tirar o `modo`. Essa assimetria existia calada desde sempre
+(vértice por toque, face por contenção); `modo` a tornou dizível na op de face,
+e o grito impede que ela volte a ser calada na op de vértice. Para arrastar a
+face inteira use `sel:{f}`/`{origem}`/`{alias}`, que levam os cantos junto. `faces:[ids]` é compatibilidade para arquivo salvo; nunca
 misture com `sel` (os dois juntos GRITAM). Nome errado, id inválido, chave desconhecida,
 região incompleta/invertida ou seleção sem alvo **GRITA** — pare e corrija a
 lista, não tente adivinhar. `sel` AUSENTE grita nas ops de face, mas em

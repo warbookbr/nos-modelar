@@ -135,6 +135,33 @@ function addF(st, id, vs) {
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
 
+/* CONTRATO DE IDENTIDADE DE PARTE — a ÚNICA definição de "esta face tem nome".
+   Existe porque a revisão da R2 achou TRÊS respostas diferentes para a mesma
+   pergunta no mesmo arquivo: a guarda de reatribuição perguntava
+   `f.parte != null`, o `neutroCanonico` perguntava `if (f.parte)` e a entrada
+   (`a.nome`) não perguntava nada. Um nome falsy-mas-não-nulo (`''`) sumia do
+   formato salvo E mesmo assim bloqueava a nomeação seguinte — a peça ficava com
+   parte que o arquivo salvo não registra; e um nome não-string (`42`, `true`,
+   `['a']`, ou AUSENTE) atravessava tudo até estourar na régua da bancada, ou
+   pior, virava a chave literal `"undefined"` em `st.partes` — nomear como no-op
+   silencioso, o que o CLAUDE.md proíbe.
+
+   O contrato: nome de parte é STRING com pelo menos um caractere visível.
+   `''` e `'   '` são a MESMA identidade vazia para um humano e nenhuma delas é
+   citável de volta por `sel:{grupo}` sem armadilha, então as duas são recusadas
+   na ENTRADA, com grito. Medido contra as 19 peças do repositório: os 60 nomes
+   em uso são todos strings visíveis (`'disco'`, `'faixa-da-alias'`,
+   `'palaTraseiroEsquerdoB'`), então o contrato é ADITIVO — nenhuma peça shipada
+   muda de hash. Quem valida a entrada é a op `parte`; quem pergunta "tem nome?"
+   depois (guarda, canon, adaptador, `sel.grupo`) usa `temNomeDeParte` — uma
+   definição só, sem chance de as três discordarem de novo. */
+function nomeDeParteInvalido(nome) {
+  if (typeof nome !== 'string') return `precisa ser uma string (recebido ${JSON.stringify(nome) ?? String(nome)}, do tipo ${nome === null ? 'null' : typeof nome})`;
+  if (nome.trim() === '') return `precisa ter pelo menos um caractere visível (recebido ${JSON.stringify(nome)})`;
+  return null;
+}
+function temNomeDeParte(nome) { return nomeDeParteInvalido(nome) === null; }
+
 /* Fase 2: a identidade é UMA só no objeto, independente do gerador. Cada
    contrato valida e resolve apenas sua coordenada local; o resolvedor comum
    nunca precisa saber qual gerador a publicou. */
@@ -403,21 +430,56 @@ function mapearDeclaracoesOrigem(PASSOS) {
 
    NÃO resolve tarde de propósito: exigir completude só no fim da lista é
    mudança de SEMÂNTICA do formato salvo (Faixa 3 do plano), e mudar semântica
-   junto com diagnóstico esconderia qual dos dois resolveu a dor. */
+   junto com diagnóstico esconderia qual dos dois resolveu a dor.
+
+   CONSELHO SÓ SE FOR VERDADE. "Espere o alias fechar" só está certo se TODO
+   termo do alias ou já resolve, ou nasce num passo à frente COM A MESMA op. O
+   primeiro desenho perguntava só `st.origens.has(origem.id)` — tratava "id
+   registrado" como "termo resolvido" — e por isso mandava esperar um alias que
+   nunca fecharia: `{op:'cilindro', id:7}` com o 7 declarado por um `cubo`
+   falha em QUALQUER passo (`origem 7 foi declarada por 'cubo', não por
+   'cilindro'`). Conselho errado ao lado do diagnóstico certo é pior que
+   silêncio, porque a próxima IA segue a instrução e perde a rodada inteira. O
+   termo permanentemente inválido agora tem mensagem PRÓPRIA: 'nunca fecha, e
+   por quê'. */
 function completudeDoAlias(st, termos, i) {
   let passoCompleto = -1;
   const pendentes = [];
+  const nunca = [];   // termos que falham em QUALQUER passo: esperar não resolve
   for (const termo of termos) {
-    const origem = termo && typeof termo === 'object' && !Array.isArray(termo) ? termo.origem : null;
-    if (!origem || typeof origem !== 'object' || !Number.isSafeInteger(origem.id)) continue;
-    if (st.origens.has(origem.id)) continue;   // essa já nasceu: não é ela que segura o alias
-    for (const d of st.declaracoesOrigem.get(origem.id) ?? []) {
+    const origem = origemDoTermoDeAlias(termo);
+    if (!origem) { nunca.push('um termo do alias não é {origem:{op,id}} (aliases não encadeiam)'); continue; }
+    const validacao = validarOrigem(origem);
+    if (validacao.erro) { nunca.push(`o termo ${JSON.stringify(origem)} é inválido em qualquer passo: ${validacao.erro}`); continue; }
+    const declaracoes = st.declaracoesOrigem.get(origem.id) ?? [];
+    if (declaracoes.length > 1) { nunca.push(`${origem.op}:${origem.id} — ${textoDeclaracoes(origem.id, declaracoes)}`); continue; }
+    const registros = st.origens.get(origem.id) ?? [];
+    if (registros.length) {
+      /* já nasceu — só continua segurando o alias se nasceu ERRADA (outra op, ou
+         mais de um gerador na mesma identidade); nesse caso nunca vai casar. */
+      if (registros.length !== 1) nunca.push(`${origem.op}:${origem.id} — a origem ${origem.id} tem ${registros.length} geradores declarando a mesma identidade`);
+      else if (registros[0].op !== origem.op) nunca.push(`${origem.op}:${origem.id} — a origem ${origem.id} foi declarada por '${registros[0].op}', não por '${origem.op}'`);
+      continue;
+    }
+    for (const d of declaracoes) {
       if (d.passo <= i) continue;              // declarada antes e mesmo assim ausente: outra causa (op abortou), mensagem genérica basta
+      if (d.op !== origem.op) { nunca.push(`${origem.op}:${origem.id} — o passo ${d.passo} declara a origem ${origem.id} por '${d.op}', não por '${origem.op}'`); continue; }
       if (d.passo > passoCompleto) passoCompleto = d.passo;
       pendentes.push(`${d.op}:${origem.id} (nasce no passo ${d.passo})`);
     }
   }
-  return passoCompleto < 0 ? null : { passo: passoCompleto, pendentes };
+  if (nunca.length) return { tipo: 'nunca', motivos: nunca };
+  return passoCompleto < 0 ? null : { tipo: 'espera', passo: passoCompleto, pendentes };
+}
+
+/* forma de um termo de alias: EXATAMENTE `{origem:{...}}`. Uma definição só,
+   usada pela resolução (que grita) e pelo diagnóstico de completude (que
+   precisa saber se o termo é insalvável antes de mandar esperar). */
+function origemDoTermoDeAlias(termo) {
+  if (!termo || typeof termo !== 'object' || Array.isArray(termo)) return null;
+  if (termo.alias != null || termo.origem == null) return null;
+  if (Object.keys(termo).some((k) => k !== 'origem')) return null;
+  return termo.origem;
 }
 
 function resolverOrigem(st, origem) {
@@ -476,15 +538,24 @@ function confereId(st, i, op, args) {
    A seleção é formato salvo: nunca ignora uma chave, uma referência ou uma
    seleção vazia. `grita` leva op + tipo + causa; a lista continua executando
    sem corromper o neutro. Só as ops que JÁ documentavam seleção vazia como
-   no-op (vértice) passam `vazioNoop`. */
-function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
+   no-op (vértice) passam `vazioNoop`.
+
+   Os SETE seletores vivem numa LISTA SÓ (`SELETORES`, logo abaixo). Eram três
+   listas escritas à mão e uma delas — a de seleção vazia — ensinava SEIS,
+   omitindo justamente `alias`: o núcleo imprimindo a mesma omissão que o O-0
+   tinha acabado de corrigir na skill, na hora em que o autor mais precisa da
+   lista certa. Com lista única, um oitavo seletor entra nas três mensagens de
+   uma vez e nenhuma pode envelhecer sozinha. */
+const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'alias'];
+const SELETOR = new Set(SELETORES);
+
+function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
   if (sel == null) return { vertices: new Set(st.V.keys()), faces: new Set(st.F.keys()) };
   if (typeof sel !== 'object' || Array.isArray(sel)) {
-    grita(st, i, op, 'sel', 'seleção inválida: sel precisa ser um objeto com tudo, v, f, grupo, regiao, origem e/ou alias');
+    grita(st, i, op, 'sel', `seleção inválida: sel precisa ser um objeto com ${SELETORES.join(', ')}`);
     return { vertices: new Set(), faces: new Set() };
   }
-  const conhecidas = new Set(['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'alias']);
-  for (const chave of Object.keys(sel)) if (!conhecidas.has(chave)) grita(st, i, op, `sel.${chave}`, `seleção desconhecida '${chave}' (só tudo, v, f, grupo, regiao, origem e alias)`);
+  for (const chave of Object.keys(sel)) if (!SELETOR.has(chave)) grita(st, i, op, `sel.${chave}`, `seleção desconhecida '${chave}' (só ${SELETORES.join(', ')})`);
 
   const vertices = new Set(), faces = new Set();
   const adicionaFace = (fid) => {
@@ -521,7 +592,10 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
   }
   if (sel.grupo != null) {
     teveChave = true;
-    if (typeof sel.grupo !== 'string' || !sel.grupo) grita(st, i, op, 'sel.grupo', 'seleção grupo inválida: precisa ser um nome não-vazio');
+    /* MESMO contrato da op `parte` (`temNomeDeParte`): o que não pode ser
+       criado como identidade também não pode ser citado como grupo. */
+    const erroGrupo = nomeDeParteInvalido(sel.grupo);
+    if (erroGrupo) grita(st, i, op, 'sel.grupo', `seleção grupo inválida: nome de parte ${erroGrupo}`);
     else {
       let achou = false;
       for (const f of st.F.values()) if (f.parte === sel.grupo) { achou = true; adicionaFace(f.id); }
@@ -538,6 +612,25 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
          valor estranho GRITA — 'contido'/'dentro'/true aceitos em silêncio
          cairiam no default e o autor juraria ter pedido `toca`. */
       grita(st, i, op, 'sel.regiao', `seleção regiao inválida: modo só aceita 'contem' (face inteira dentro, default) ou 'toca' (pelo menos um canto dentro); recebido ${JSON.stringify(r.modo)}`);
+    } else if (r.modo != null && soVertices) {
+      /* `modo` governa o eixo de FACE, e esta op consome só VÉRTICE: escrever
+         `modo` aqui não muda NADA. Era engolido em silêncio — `toca`, `contem`
+         e a ausência davam canon byte-idêntico em `transladar`, enquanto no
+         `pincel` a MESMA caixa pinta 1 face contra 5. Ou seja, a chave
+         funcionava numa op e evaporava na outra, e o autor que copiasse o
+         `sel` de um exemplo de `pincel` para um `transladar` recebia calado o
+         comportamento antigo — a malha rasgando de novo, que é justamente o
+         ciclo que este item veio matar.
+
+         Escolhi GRITAR em vez de fazer `modo` mover vértice: sob `toca` os
+         cantos de FORA da caixa entrariam no arrasto, o que muda em silêncio o
+         que `transladar`/`rotaciona` movem em toda peça futura — trocar um
+         no-op mudo por uma mudança SILENCIOSA de semântica não é conserto. E `contem`
+         também grita: o eixo de vértice sempre foi "toca" (um ponto ou está
+         dentro ou não está), então `contem` numa op de vértice é igualmente
+         inerte e igualmente mentiroso. Fail-closed como o `modo` inválido acima
+         — a região não seleciona nada e o diagnóstico diz a saída. */
+      grita(st, i, op, 'sel.regiao', `seleção regiao inválida: modo só governa o eixo de FACE, e '${op}' consome só vértices — um vértice entra sempre que estiver DENTRO da caixa, então modo:${JSON.stringify(r.modo)} aqui não teria efeito nenhum. Tire o modo (a seleção de vértice não muda), ou aplique a caixa numa op de face (pincel/parte/material/solido); para arrastar a face inteira use sel:{f}/{origem}/{alias}, que levam os cantos junto.`);
     } else {
       let min, max;
       try { min = st.vec(r.min); max = st.vec(r.max); }
@@ -572,26 +665,33 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false } = {}) {
       else {
         const antes = st.orfaos.length;
         for (const termo of termos) {
-          if (!termo || typeof termo !== 'object' || Array.isArray(termo) || termo.alias != null || termo.origem == null || Object.keys(termo).some((k) => k !== 'origem')) { grita(st, i, op, 'sel.alias', `alias '${nome}' inválido: aliases não encadeiam e só aceitam origem`); continue; }
-          const r = resolverSelecao(st, termo, op, i);
+          if (!origemDoTermoDeAlias(termo)) { grita(st, i, op, 'sel.alias', `alias '${nome}' inválido: aliases não encadeiam e só aceitam origem`); continue; }
+          const r = resolverSelecao(st, termo, op, i, { soVertices });
           for (const v of r.vertices) vertices.add(v); for (const f of r.faces) faces.add(f);
         }
         if (st.orfaos.length > antes) {
           /* O-11: além da causa (que já gritou acima), dizer QUANDO o alias
              fica citável. Uma mensagem por CITAÇÃO, não por termo. */
           const completude = completudeDoAlias(st, termos, i);
-          if (completude) grita(st, i, op, 'sel.alias', `alias '${nome}' fica completo no passo ${completude.passo}; você citou no passo ${i} — falta ${completude.pendentes.join(', ')}. Espere o alias fechar (cite depois desse passo) ou use um alias por primitiva nas operações intermediárias.`);
+          if (completude && completude.tipo === 'espera') grita(st, i, op, 'sel.alias', `alias '${nome}' fica completo no passo ${completude.passo}; você citou no passo ${i} — falta ${completude.pendentes.join(', ')}. Espere o alias fechar (cite depois desse passo) ou use um alias por primitiva nas operações intermediárias.`);
+          else if (completude && completude.tipo === 'nunca') grita(st, i, op, 'sel.alias', `alias '${nome}' NUNCA fica completo — esperar não resolve: ${completude.motivos.join('; ')}. Corrija a definição do alias.`);
           vertices.clear(); faces.clear();
         }
       }
     }
   }
-  if (!teveChave) grita(st, i, op, 'sel', 'seleção vazia: informe tudo, v, f, grupo, regiao ou origem');
+  /* a lista dos SETE, igual à da chave desconhecida logo acima: o núcleo estava
+     ensinando seis e escondendo justamente `alias` — a mesma omissão que o O-0
+     acabou de corrigir na skill, impressa pela própria ferramenta. */
+  if (!teveChave) grita(st, i, op, 'sel', `seleção vazia: informe ${SELETORES.join(', ')}`);
   if (!vertices.size && !faces.size && !vazioNoop) grita(st, i, op, 'sel', 'seleção vazia: nenhum alvo válido foi encontrado');
   return { vertices, faces };
 }
 
-function resolverAlvosV(st, sel, op, i) { return resolverSelecao(st, sel, op, i, { vazioNoop: true }).vertices; }
+/* `soVertices`: quem entra por aqui (displace/transladar/rotaciona) descarta as
+   faces resolvidas. É essa informação que deixa `sel.regiao.modo` — chave que só
+   governa o eixo de face — gritar em vez de evaporar. */
+function resolverAlvosV(st, sel, op, i) { return resolverSelecao(st, sel, op, i, { vazioNoop: true, soVertices: true }).vertices; }
 
 /* A assinatura histórica `faces:[ids]` continua igual. `faces` e `sel` na
    mesma op seriam duas fontes concorrentes, então GRITAM em vez de unir por
@@ -1910,6 +2010,18 @@ export const OPS = {
      de animação, não muda a MALHA. */
   parte(st, a, i) {
     const nome = a.nome;
+    /* A IDENTIDADE entra primeiro e FECHADA: `nome` é o que o canon anexa, o
+       que `sel:{grupo}` cita, o que a régua mede e o que a animação move. Sem
+       contrato, `nome: 42`/`true`/`['a']` atravessava tudo e só estourava na
+       bancada, e `nome` AUSENTE gravava a chave literal `"undefined"` em
+       `st.partes` — nomear virava no-op silencioso. Recusa aqui, com grito, e
+       NENHUMA face é tocada (fail-closed): meia atribuição com identidade
+       inválida seria pior que nenhuma. */
+    const erroNome = nomeDeParteInvalido(nome);
+    if (erroNome) {
+      grita(st, i, 'parte', 'nome', `nome de parte inválido: ${erroNome} — a identidade da parte é FORMATO SALVO (o canon a anexa, sel:{grupo} a cita, a régua mede por ela)`);
+      return;
+    }
     /* `substituir` é chave do FORMATO SALVO: só o literal `true` passa, como o
        `tudo:true` do `sel` (D-129). `substituir:'sim'`/`1` aceito em silêncio
        ensinaria a próxima IA a escrever besteira que passa — e ainda por cima
@@ -1923,7 +2035,10 @@ export const OPS = {
     let atribuiu = false;
     for (const fid of alvos) {
       const f = st.F.get(fid);
-      if (f.parte != null && f.parte !== nome && !substituir) {
+      // `temNomeDeParte`, não `!= null`: a guarda e o canon precisam concordar
+      // sobre o que é identidade, senão um nome invisível no arquivo salvo
+      // bloqueia a nomeação seguinte (a regressão que a revisão da R2 achou).
+      if (temNomeDeParte(f.parte) && f.parte !== nome && !substituir) {
         const antes = st.parteAtribuidaEm.get(fid);
         grita(st, i, 'parte', fid, `face já pertence à parte '${f.parte}'${antes != null ? ` (nomeada no passo ${antes})` : ''} e viraria '${nome}': seleções sobrepostas roubam faces em silêncio — separe as seleções ou escreva substituir: true`);
         continue;
@@ -2063,8 +2178,10 @@ export function neutroCanonico(neutro) {
          SEM parte => linha byte-idêntica ao de antes (peças/testes de 1..12b não mudam
          de canon). Vem DEPOIS do tinta (o outro opcional-de-cauda): tinta é array, parte
          é string — tipos disjuntos, sem ambiguidade. É f.parte (o nome) que entra na
-         canon do replay; o pivô é metadado de animação, não muda a MALHA. */
-      if (f.parte) row.push(f.parte);
+         canon do replay; o pivô é metadado de animação, não muda a MALHA.
+         `temNomeDeParte` é a MESMA pergunta que a guarda da op `parte` faz — o
+         canon e a trava não podem discordar sobre o que conta como identidade. */
+      if (temNomeDeParte(f.parte)) row.push(f.parte);
       return row;
     }),
     orfaos: neutro.orfaos.map((o) => ({ passo: o.passo, op: o.op, ref: o.ref ?? null, motivo: o.motivo })),
@@ -2304,7 +2421,8 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
      nem na canon; peça sem parte devolve {} (compat: nenhum consumidor de hoje lê isto). */
   const registro = neutro.partes || {};
   const vertsParte = new Map();   // nome -> Set(ids distintos)
-  for (const f of faces) if (f.parte) { let s = vertsParte.get(f.parte); if (!s) { s = new Set(); vertsParte.set(f.parte, s); } for (const v of f.vs) s.add(v); }
+  // `temNomeDeParte`: a mesma pergunta da guarda e do canon (uma definição só).
+  for (const f of faces) if (temNomeDeParte(f.parte)) { let s = vertsParte.get(f.parte); if (!s) { s = new Set(); vertsParte.set(f.parte, s); } for (const v of f.vs) s.add(v); }
   const partes = {};
   for (const nome of new Set([...Object.keys(registro), ...vertsParte.keys()])) {
     let pivo = registro[nome] && registro[nome].pivo;   // explícito (já passado por vec no núcleo)
