@@ -22,21 +22,20 @@
  * Sai ≠0 quando a peça não é nomeada ou não existe, quando ela não é escrita em
  * passos da Oficina, quando um nome de parte pedido não existe, quando a peça
  * tem órfão — e com `--estrito` quando alguma face está sem identidade.
+ *
+ * Sai 2 em erro de USO, e bandeira desconhecida É erro de uso: `--estrit` não
+ * some com o gate do `--estrito` em silêncio, `--parte=` não passa por
+ * `--partes=`, e duas peças de uma vez não medem a primeira calado. A leitura
+ * fica em `argumentos.mjs`, compartilhada com `olhar-bancada.mjs`.
  */
 import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { lerArgumentos } from './argumentos.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
-
-const args = process.argv.slice(2);
-function opcao(nome, padrao = null) {
-  const achado = args.find((a) => a.startsWith(`--${nome}=`));
-  return achado ? achado.slice(nome.length + 3) : padrao;
-}
-const bandeira = (nome) => args.includes(`--${nome}`);
 
 function erroDeUso(mensagem) {
   console.error(`descrever-peca: ${mensagem}`);
@@ -47,8 +46,25 @@ function falha(mensagem) {
   process.exit(1);
 }
 
-/* mesma escolha de peça por nome que `olhar-bancada.mjs`: o primeiro argumento
-   solto é a peça, e o nome é o do arquivo em prototipos/fps/v3/pecas/. */
+/* vocabulário DECLARADO: qualquer coisa fora dele para o comando com
+   diagnóstico. Um typo em `--estrito` fazia o gate sumir sem uma linha de
+   aviso, e `--parte=disco` imprimia a peça inteira como se tivesse filtrado. */
+let opcao;
+let bandeira;
+let peca;
+try {
+  const lido = lerArgumentos(process.argv.slice(2), {
+    opcoes: ['partes', 'casas'],
+    bandeiras: ['listar', 'estrito'],
+    posicional: { nome: 'a peça', obrigatorio: false },
+  });
+  ({ opcao, bandeira, posicional: peca } = lido);
+} catch (erro) {
+  erroDeUso(erro.message);
+}
+
+/* mesma escolha de peça por nome que `olhar-bancada.mjs`: o argumento solto é a
+   peça, e o nome é o do arquivo em prototipos/fps/v3/pecas/. */
 const disponiveis = readdirSync(PECAS)
   .filter((arquivo) => arquivo.endsWith('.js'))
   .map((arquivo) => arquivo.slice(0, -'.js'.length))
@@ -59,7 +75,6 @@ if (bandeira('listar')) {
   process.exit(0);
 }
 
-const peca = args.find((a) => !a.startsWith('--')) ?? null;
 const partes = opcao('partes', '').split(',').map((p) => p.trim()).filter(Boolean);
 const casas = parseInt(opcao('casas', '6'), 10);
 const estrito = bandeira('estrito');

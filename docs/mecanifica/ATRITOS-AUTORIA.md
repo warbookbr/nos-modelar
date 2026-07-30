@@ -428,6 +428,21 @@ a pinça cobre a espessura inteira do disco. O atrito segue **parcialmente
 aberto**: falta o lado da FOTO — escala px/m, gnômon de eixo e régua na imagem
 ortográfica —, que é da bancada, não da autoria.
 
+**Correção (revisão adversarial da R2, ALTA-1):** a primeira versão media a
+relação entre partes **face a face**, e face plana alinhada ao eixo tem espessura
+zero na sua normal — o vão naquele eixo nunca fica negativo, então `interpenetra`
+era **inalcançável** pelo caminho do CLI. Dois cubos encostados, 50% sobrepostos
+e um inteiramente dentro do outro saíam os três como `encosta`, e contenção total
+saía como `folga` — a régua dava o mesmo número para a montagem certa e para a
+errada. A relação passou a ser medida **corpo a corpo** (componente conexo contra
+componente conexo, que é o que resolve a peça oca sem mentir sobre invasão), com
+o mesmo classificador de `relacaoEntreCaixas` — uma verdade só. Os quatro números
+do parágrafo acima continuam idênticos; o que mudou é que as invasões deixaram de
+ser silenciadas: `pinca ↔ pistao` reporta `interpenetra 0.016000` (o pistão mora
+dentro da garra, de propósito) e o suporte aparece invadindo `cubo` em 6 mm e
+`disco` em 2 mm — dois encostes que a medida antiga escondia e que a peça pode
+querer revisar.
+
 #### A-14 — `--focar` numa parte pequena destrói o contexto que `--modo=contexto` promete
 
 **Onde dói:** bancada.

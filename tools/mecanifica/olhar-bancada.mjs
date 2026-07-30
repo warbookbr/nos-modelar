@@ -19,10 +19,16 @@
  *
  * Sai ≠0 quando a bancada não sobe, quando um nome de parte pedido não existe
  * na peça, ou com `--estrito` quando a peça tem face sem identidade semântica.
+ *
+ * Sai 2 em erro de USO, e bandeira desconhecida É erro de uso: `--vista=` não
+ * passa calado por `--vistas=` nem `--estrit` por `--estrito`. A leitura fica em
+ * `argumentos.mjs`, compartilhada com `descrever-peca.mjs` — dois CLIs irmãos
+ * com validações diferentes são armadilha.
  */
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { lerArgumentos } from './argumentos.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -32,14 +38,27 @@ const VISTAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'sup
 const MODOS = ['todas', 'contexto', 'isolar'];
 const PROJECOES = ['perspectiva', 'ortografica'];
 
-const args = process.argv.slice(2);
-function opcao(nome, padrao = null) {
-  const achado = args.find((a) => a.startsWith(`--${nome}=`));
-  return achado ? achado.slice(nome.length + 3) : padrao;
+function erroDeUso(mensagem) {
+  console.error(`olhar-bancada: ${mensagem}`);
+  process.exit(2);
 }
-const bandeira = (nome) => args.includes(`--${nome}`);
 
-const peca = args.find((a) => !a.startsWith('--')) ?? null;
+/* vocabulário DECLARADO — o mesmo contrato de `descrever-peca.mjs`: qualquer
+   nome fora dele para o comando em vez de virar no-op silencioso. */
+let opcao;
+let bandeira;
+let peca;
+try {
+  const lido = lerArgumentos(process.argv.slice(2), {
+    opcoes: ['vistas', 'selecionadas', 'modo', 'projecao', 'explosao', 'res', 'espera'],
+    bandeiras: ['listar', 'estrito', 'focar'],
+    posicional: { nome: 'a peça', obrigatorio: false },
+  });
+  ({ opcao, bandeira, posicional: peca } = lido);
+} catch (erro) {
+  erroDeUso(erro.message);
+}
+
 const vistas = opcao('vistas', 'isometrica,frontal,direita').split(',').map((v) => v.trim()).filter(Boolean);
 const selecionadas = opcao('selecionadas', '').split(',').map((s) => s.trim()).filter(Boolean);
 const modo = opcao('modo', 'todas');
@@ -51,16 +70,15 @@ const espera = parseInt(opcao('espera', '1200'), 10) || 1200;
 const estrito = bandeira('estrito');
 const focar = bandeira('focar');
 
-function erroDeUso(mensagem) {
-  console.error(`olhar-bancada: ${mensagem}`);
-  process.exit(2);
-}
 for (const vista of vistas) {
   if (!VISTAS.includes(vista)) erroDeUso(`vista '${vista}' não existe. Use: ${VISTAS.join(', ')}`);
 }
 if (!MODOS.includes(modo)) erroDeUso(`modo '${modo}' não existe. Use: ${MODOS.join(', ')}`);
 if (!PROJECOES.includes(projecao)) erroDeUso(`projeção '${projecao}' não existe. Use: ${PROJECOES.join(', ')}`);
 if (!Number.isFinite(explosao) || explosao < 0 || explosao > 1) erroDeUso('explosao precisa estar entre 0 e 1');
+/* antes de subir navegador e servidor: `process.exit` não roda o `finally` que
+   os fecha, então erro de uso tardio deixava Chromium e Vite pendurados. */
+if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) erroDeUso('Playwright não encontrado. Rode: npm ci');
@@ -174,10 +192,7 @@ try {
       console.log('');
     }
 
-    if (focar) {
-      if (!selecionadas.length) erroDeUso('--focar exige --selecionadas');
-      await page.evaluate(() => window.__mecanificaBancada.focar());
-    }
+    if (focar) await page.evaluate(() => window.__mecanificaBancada.focar());
 
     await page.waitForTimeout(espera);
     const arquivo = join(OUT, `bancada-${relato.peca}-${vista}${sufixo}.png`);

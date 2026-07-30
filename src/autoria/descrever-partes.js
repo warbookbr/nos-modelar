@@ -11,16 +11,32 @@
    Consumidores: o CLI `tools/mecanifica/descrever-peca.mjs` (`npm run descrever`)
    e o painel de diagnóstico da bancada — uma verdade só sobre a mesma medida.
 
-   Duas medidas, deliberadamente diferentes:
-   - a CAIXA de uma parte é o envelope da parte inteira;
-   - a RELAÇÃO entre duas partes é medida face a face (caixa de face contra caixa
-     de face), porque o envelope mente em peça oca: a caixa do disco inclui o
-     chapéu que recua para dentro, e mediria a pastilha interna como se estivesse
-     dentro do disco.
-   A relação é conservadora: a caixa de uma face é maior ou igual à face, então
-   `folga` é limite inferior da folga real e `interpenetra` pode ser das caixas
-   sem que os sólidos se cruzem. Ela responde "encosta? tem vão? de quanto?",
-   não substitui interseção de sólidos.
+   UMA medida só de relação, medida entre CORPOS. Um corpo é um componente
+   conexo da parte (faces ligadas por vértice compartilhado): o `disco` tem dois
+   corpos — a pista e o chapéu que recua para dentro —, a `pinca` tem três — a
+   ponte e as duas garras. A caixa de cada corpo é comparada com a de cada corpo
+   da outra parte, e vence o par que decide: se algum par se invade, a relação é
+   `interpenetra` pelo par MAIS invadido; senão, se algum encosta, `encosta`;
+   senão `folga`, pelo par mais próximo.
+
+   Por que corpo e não envelope da parte inteira: o envelope mente em peça oca —
+   a caixa do `disco` engloba pista e chapéu e acusaria a pastilha interna como
+   se estivesse dentro do disco. Por que corpo e não par de FACES: face plana
+   alinhada ao eixo tem espessura ZERO na sua normal, então o vão naquele eixo
+   nunca é negativo e `interpenetra` fica INALCANÇÁVEL — a medida por face dava
+   `encosta` para dois cubos 50% sobrepostos e `folga` para um cubo inteiramente
+   engolido por outro. Uma régua que dá o mesmo número para a montagem certa e
+   para a errada não é régua. Por isso a medida por par de faces foi removida em
+   vez de virar segunda coluna: duas verdades sobre a mesma pergunta é o defeito,
+   não a cura.
+
+   A medida é conservadora, e sempre para o MESMO lado: a caixa de um corpo é
+   maior ou igual ao corpo, então `folga` é limite inferior da folga real e
+   `interpenetra` pode ser das caixas sem que os sólidos se cruzem. A garantia
+   que importa é a inversa: `folga` e `encosta` NUNCA escondem invasão real —
+   se as caixas estão separadas, os sólidos também estão. Ela responde
+   "encosta? tem vão? se invadem? de quanto?", não substitui interseção de
+   sólidos.
 
    Determinismo: nomes ordenados por ponto de código (nunca `localeCompare`, que
    depende do ICU do sistema), faces varridas em ordem de id, pares em ordem
@@ -83,6 +99,13 @@ function vaosEntre(a, b) {
   return [0, 1, 2].map((k) => Math.max(a.min[k], b.min[k]) - Math.min(a.max[k], b.max[k]));
 }
 
+/* Distância euclidiana entre duas caixas a partir do trio de vãos: só os vãos
+   POSITIVOS separam. `Math.sqrt` em vez de `Math.hypot` — determinismo. */
+function distanciaDe(porEixo) {
+  const positivos = porEixo.map((v) => Math.max(v, 0));
+  return Math.sqrt(positivos.reduce((soma, v) => soma + v * v, 0));
+}
+
 /* Classifica um trio de vãos. O eixo relatado é sempre o do MAIOR vão: em
    `folga` é o que separa as caixas, em `interpenetra` é o de menor profundidade
    — o eixo pelo qual custa menos separá-las. */
@@ -90,16 +113,59 @@ function classificar(porEixo, tolerancia) {
   const maior = Math.max(porEixo[0], porEixo[1], porEixo[2]);
   const eixo = EIXOS[porEixo.indexOf(maior)];
   if (maior > tolerancia) {
-    const positivos = porEixo.map((v) => Math.max(v, 0));
-    return {
-      tipo: 'folga',
-      distancia: Math.sqrt(positivos.reduce((soma, v) => soma + v * v, 0)),
-      eixo,
-      porEixo,
-    };
+    return { tipo: 'folga', distancia: distanciaDe(porEixo), eixo, porEixo };
   }
   if (maior < -tolerancia) return { tipo: 'interpenetra', distancia: -maior, eixo, porEixo };
   return { tipo: 'encosta', distancia: 0, eixo, porEixo };
+}
+
+/* Corpos de uma parte: componentes conexos por VÉRTICE COMPARTILHADO, via
+   union-find. Cada primitiva do núcleo abre um bloco de ids próprio e não
+   compartilha vértice com outra, então um corpo é uma primitiva — ou um grupo
+   delas costurado de propósito por `unir`/`solda`.
+
+   Determinismo: as faces chegam em ordem de id, a união sempre adota como raiz
+   o MENOR índice, e os corpos saem em ordem do menor id de face que os compõe.
+   Nada aqui depende da ordem de iteração de Map nem de índice de array como
+   referência persistida — o índice existe só dentro desta função. */
+function corposDe(faces) {
+  const pai = faces.map((_, i) => i);
+  const raiz = (i) => {
+    let atual = i;
+    while (pai[atual] !== atual) { pai[atual] = pai[pai[atual]]; atual = pai[atual]; }
+    return atual;
+  };
+  const unir = (i, j) => {
+    const a = raiz(i);
+    const b = raiz(j);
+    if (a === b) return;
+    if (a < b) pai[b] = a; else pai[a] = b;
+  };
+  const primeiraFaceDoVertice = new Map();
+  faces.forEach((face, i) => {
+    for (const idVertice of face.vs) {
+      const outra = primeiraFaceDoVertice.get(idVertice);
+      if (outra === undefined) primeiraFaceDoVertice.set(idVertice, i);
+      else unir(i, outra);
+    }
+  });
+
+  const porRaiz = new Map();
+  faces.forEach((face, i) => {
+    const r = raiz(i);
+    let corpo = porRaiz.get(r);
+    if (!corpo) {
+      corpo = { faces: 0, min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
+      porRaiz.set(r, corpo);
+    }
+    corpo.faces++;
+    for (let k = 0; k < 3; k++) {
+      if (face.min[k] < corpo.min[k]) corpo.min[k] = face.min[k];
+      if (face.max[k] > corpo.max[k]) corpo.max[k] = face.max[k];
+    }
+  });
+  /* ordem estável: raiz é o menor índice do corpo, e o índice segue o id da face */
+  return [...porRaiz.keys()].sort((a, b) => a - b).map((r) => porRaiz.get(r));
 }
 
 /* Uma passada pelo estado neutro: envelope e caixa de cada face, por parte. */
@@ -126,7 +192,7 @@ function medirPartes(neutro, quem) {
         faces: 0,
         min: [Infinity, Infinity, Infinity],
         max: [-Infinity, -Infinity, -Infinity],
-        caixasDeFace: [],
+        facesMedidas: [],
       };
       acumulado.set(face.parte, parte);
     }
@@ -153,7 +219,7 @@ function medirPartes(neutro, quem) {
     }
 
     parte.faces++;
-    parte.caixasDeFace.push({ min, max });
+    parte.facesMedidas.push({ vs: face.vs, min, max });
     for (let k = 0; k < 3; k++) {
       if (min[k] < parte.min[k]) parte.min[k] = min[k];
       if (max[k] > parte.max[k]) parte.max[k] = max[k];
@@ -161,7 +227,11 @@ function medirPartes(neutro, quem) {
   }
 
   const partes = new Map();
-  for (const nome of [...acumulado.keys()].sort()) partes.set(nome, acumulado.get(nome));
+  for (const nome of [...acumulado.keys()].sort()) {
+    const parte = acumulado.get(nome);
+    parte.corpos = corposDe(parte.facesMedidas);
+    partes.set(nome, parte);
+  }
   return { partes, facesSemParte };
 }
 
@@ -169,6 +239,7 @@ function projetarCaixa(parte) {
   return {
     nome: parte.nome,
     faces: parte.faces,
+    corpos: parte.corpos.length,
     min: parte.min.slice(),
     max: parte.max.slice(),
     centro: parte.min.map((v, k) => (v + parte.max[k]) / 2),
@@ -179,8 +250,9 @@ function projetarCaixa(parte) {
 /**
  * Caixa alinhada aos eixos de TODAS as partes da peça, por nome.
  * Devolve `{ caixas, facesSemParte }`: `caixas` é um Map em ordem de nome (ponto
- * de código) de `{ nome, faces, min, max, centro, dimensoes }`; faces sem
- * `parte` não entram em nenhuma caixa e saem em `facesSemParte`, por id.
+ * de código) de `{ nome, faces, corpos, min, max, centro, dimensoes }`, onde
+ * `corpos` é quantos componentes conexos a parte tem; faces sem `parte` não
+ * entram em nenhuma caixa e saem em `facesSemParte`, por id.
  */
 export function caixasPorParte(neutro) {
   const quem = 'caixasPorParte';
@@ -210,6 +282,32 @@ export function caixaDaParte(neutro, nome) {
 }
 
 /**
+ * Caixa de cada CORPO de uma parte — os componentes conexos que a relação entre
+ * partes compara, em ordem estável (menor id de face primeiro). É a medida que
+ * explica o número: `disco` tem dois corpos (pista e chapéu) e é por isso que a
+ * pastilha interna aparece com folga em vez de dentro do disco.
+ * Nome ausente, vazio ou inexistente falha nomeando as partes disponíveis.
+ */
+export function corposDaParte(neutro, nome) {
+  const quem = 'corposDaParte';
+  exigirNeutro(neutro, quem);
+  exigirNome(nome, quem);
+  const { partes } = medirPartes(neutro, quem);
+  const parte = partes.get(nome);
+  if (!parte) {
+    throw new Error(
+      `${quem}: a peça não tem parte '${nome}'. Partes disponíveis: `
+      + `${[...partes.keys()].join(', ') || '(nenhuma)'}.`,
+    );
+  }
+  return parte.corpos.map((corpo) => ({
+    faces: corpo.faces,
+    min: corpo.min.slice(),
+    max: corpo.max.slice(),
+  }));
+}
+
+/**
  * Relação entre DUAS CAIXAS, eixo a eixo.
  * `porEixo[k]` é o vão no eixo: positivo é folga, negativo é sobreposição.
  * `tipo` é `folga` (separadas; `distancia` é a distância entre as caixas),
@@ -224,23 +322,27 @@ export function relacaoEntreCaixas(a, b, { tolerancia = TOLERANCIA_CONTATO } = {
   return { a: a.nome ?? null, b: b.nome ?? null, ...classificar(vaosEntre(a, b), tolerancia) };
 }
 
-/* Relação entre duas partes, medida FACE A FACE. Se algum par de faces se toca,
-   a relação é de contato e vence o par mais interpenetrado; senão vence o par
-   mais próximo. Empate é resolvido pela ordem de id das faces (a primeira vence,
-   por comparação estrita), então a saída não depende da ordem de iteração. */
+/* Relação entre duas partes, medida CORPO A CORPO (componente conexo contra
+   componente conexo) com o MESMO `classificar` de `relacaoEntreCaixas` — uma
+   verdade só sobre a mesma pergunta.
+
+   O par que decide: contato (`maior <= tolerância`) vence folga sempre, porque
+   invasão em qualquer par de corpos é invasão entre as partes; entre os de
+   contato vence o de menor `maior`, isto é, o MAIS interpenetrado; entre os de
+   folga vence o mais próximo. Empate é resolvido pela ordem dos corpos (o
+   primeiro vence, por comparação estrita), e essa ordem vem do menor id de
+   face — a saída não depende da ordem de iteração. */
 function relacaoEntrePartes(a, b, tolerancia) {
   let contato = null;
   let folga = null;
-  for (const caixaA of a.caixasDeFace) {
-    for (const caixaB of b.caixasDeFace) {
-      const porEixo = vaosEntre(caixaA, caixaB);
+  for (const corpoA of a.corpos) {
+    for (const corpoB of b.corpos) {
+      const porEixo = vaosEntre(corpoA, corpoB);
       const maior = Math.max(porEixo[0], porEixo[1], porEixo[2]);
       if (maior <= tolerancia) {
-        /* menor `maior` = mais profundo: o par mais interpenetrado define a relação. */
         if (!contato || maior < contato[0]) contato = [maior, porEixo];
-      } else if (!contato) {
-        const positivos = porEixo.map((v) => Math.max(v, 0));
-        const distancia = Math.sqrt(positivos.reduce((soma, v) => soma + v * v, 0));
+      } else {
+        const distancia = distanciaDe(porEixo);
         if (!folga || distancia < folga[0]) folga = [distancia, porEixo];
       }
     }
@@ -248,7 +350,7 @@ function relacaoEntrePartes(a, b, tolerancia) {
   const vencedor = contato ?? folga;
   if (!vencedor) {
     throw new Error(
-      `relacaoEntrePartes: '${a.nome}' ou '${b.nome}' não tem nenhuma face para comparar.`,
+      `relacaoEntrePartes: '${a.nome}' ou '${b.nome}' não tem nenhum corpo para comparar.`,
     );
   }
   return { a: a.nome, b: b.nome, ...classificar(vencedor[1], tolerancia) };
@@ -367,9 +469,11 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
   linhas.push('');
 
   linhas.push('CAIXA POR PARTE — envelope da parte inteira, alinhado aos eixos');
+  linhas.push('corpos: componentes conexos da parte — é corpo a corpo que a relação abaixo é medida.');
   const colunasCaixa = [
     { titulo: 'parte' },
     { titulo: 'faces', direita: true },
+    { titulo: 'corpos', direita: true },
     { titulo: 'eixo', direita: true },
     { titulo: 'min', direita: true },
     { titulo: 'max', direita: true },
@@ -380,7 +484,7 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
   for (const parte of descricao.partes) {
     for (let k = 0; k < 3; k++) {
       linhasCaixa.push([
-        parte.nome, parte.faces, EIXOS[k],
+        parte.nome, parte.faces, parte.corpos, EIXOS[k],
         n(parte.min[k]), n(parte.max[k]), n(parte.centro[k]), n(parte.dimensoes[k]),
       ]);
     }
@@ -388,12 +492,13 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
   linhas.push(...(linhasCaixa.length ? tabela(colunasCaixa, linhasCaixa) : ['(nenhuma parte)']));
   linhas.push('');
 
-  linhas.push('RELAÇÃO ENTRE PARTES — medida face a face, pelo par de faces que decide');
+  linhas.push('RELAÇÃO ENTRE PARTES — medida corpo a corpo, pelo par de corpos que decide');
   linhas.push(
     'vão por eixo: positivo é folga, negativo é sobreposição. distância: em '
-    + '`folga` é a distância entre as faces; em `interpenetra` é a menor '
-    + 'profundidade que separa as duas. Medida por caixa de face: `folga` é '
-    + 'limite inferior e `interpenetra` pode ser das caixas, não dos sólidos.',
+    + '`folga` é a distância entre os corpos; em `interpenetra` é a menor '
+    + 'profundidade que separa os dois. Medida por caixa de corpo: `folga` é '
+    + 'limite inferior e `interpenetra` pode ser das caixas, não dos sólidos — '
+    + 'mas `folga` e `encosta` nunca escondem invasão real.',
   );
   const colunasRelacao = [
     { titulo: 'a' },

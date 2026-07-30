@@ -15,7 +15,7 @@ import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
-import { caixaDaParte, caixasPorParte, descreverPeca, formatarDescricao, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
+import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const CLI = resolve(REPO, 'tools/mecanifica/descrever-peca.mjs');
@@ -44,6 +44,21 @@ function caixaManual(neutro: any, parte: string) {
     }
   }
   return { faces, min, max };
+}
+
+/* dois cubos endereçados por `origem`, para medir montagem certa contra
+   montagem errada com a mesma régua e sem depender de nenhuma peça do galpão. */
+function doisCubos({ dx = 0, dy = 0, ladoA = 0.1, ladoB = 0.1 } = {}) {
+  return nucleo(
+    [
+      ['cubo', { origemId: 1, lado: ladoA }],
+      ['parte', { nome: 'a', sel: { origem: { op: 'cubo', id: 1 } } }],
+      ['cubo', { origemId: 2, lado: ladoB }],
+      ['transladar', { d: [dx, dy, 0], sel: { origem: { op: 'cubo', id: 2 } } }],
+      ['parte', { nome: 'b', sel: { origem: { op: 'cubo', id: 2 } } }],
+    ],
+    {}, {}, {}, null, [],
+  );
 }
 
 function relacao(descricao: any, a: string, b: string) {
@@ -127,6 +142,75 @@ describe('descrever-partes: a medição headless de uma peça', () => {
     expect(relacaoEntreCaixas(cubo, quase, { tolerancia: 0 }).tipo).toBe('folga');
   });
 
+  /* ALTA-1: a régua dava o MESMO número para a montagem certa e para a errada.
+     A relação entre partes era medida face a face, e face plana alinhada ao
+     eixo tem espessura ZERO na sua normal — o vão naquele eixo nunca fica
+     negativo, então `interpenetra` era INALCANÇÁVEL pelo caminho que o CLI usa:
+     encostado, 50% sobreposto e engolido inteiro saíam os três como `encosta`,
+     e contenção total (nenhum par de faces sobreposto) saía como `folga`. */
+  it('distingue encostado de enterrado dentro, pelo caminho que o CLI usa', () => {
+    const rel = (opcoes: any) => descreverPeca(doisCubos(opcoes)).relacoes[0];
+
+    const encostado = rel({ dx: 0.10 });
+    expect(encostado.tipo).toBe('encosta');
+    expect(encostado.eixo).toBe('x');
+    expect(encostado.distancia).toBe(0);
+
+    const metade = rel({ dx: 0.05 });
+    expect(metade.tipo).toBe('interpenetra');
+    expect(metade.eixo).toBe('x');
+    expect(metade.distancia).toBeCloseTo(0.05, 12);
+
+    const sobreposto = rel({ dx: 0 });
+    expect(sobreposto.tipo).toBe('interpenetra');
+    expect(sobreposto.distancia).toBeCloseTo(0.1, 12);
+
+    /* engolido: NENHUM par de faces se sobrepõe, e a medida antiga afirmava
+       100 mm de VÃO entre duas partes onde uma está inteiramente dentro. */
+    const engolido = rel({ dy: 0.1, ladoA: 0.3, ladoB: 0.1 });
+    expect(engolido.tipo).toBe('interpenetra');
+    expect(engolido.distancia).toBeCloseTo(0.1, 12);
+
+    const separado = rel({ dx: 0.2 });
+    expect(separado.tipo).toBe('folga');
+    expect(separado.distancia).toBeCloseTo(0.1, 12);
+  });
+
+  it('a relação entre partes e a relação entre caixas nunca se contradizem', () => {
+    for (const dx of [0.2, 0.1, 0.05, 0]) {
+      const neutro = doisCubos({ dx });
+      const { caixas } = caixasPorParte(neutro);
+      const porParte = descreverPeca(neutro).relacoes[0];
+      const porCaixa = relacaoEntreCaixas(caixas.get('a'), caixas.get('b'));
+      expect(`${dx}:${porParte.tipo}`).toBe(`${dx}:${porCaixa.tipo}`);
+      expect(porParte.eixo).toBe(porCaixa.eixo);
+      expect(porParte.distancia).toBeCloseTo(porCaixa.distancia, 12);
+      for (let k = 0; k < 3; k++) expect(porParte.porEixo[k]).toBeCloseTo(porCaixa.porEixo[k], 12);
+    }
+  });
+
+  it('decompõe cada parte em corpos, e é o corpo que salva a medida da peça oca', () => {
+    const neutro = montar();
+    const { caixas } = caixasPorParte(neutro);
+    expect([...caixas.values()].map((c: any) => [c.nome, c.corpos])).toEqual([
+      ['cubo', 1], ['disco', 2], ['flexivel', 1], ['pastilhaExterna', 1],
+      ['pastilhaInterna', 1], ['pinca', 3], ['pistao', 1], ['suporte', 3],
+    ]);
+
+    /* o `disco` são dois corpos — a pista e o chapéu que recua para dentro —, e
+       é por isso que a pastilha interna aparece com folga em vez de dentro do
+       envelope do disco. Ordem estável: menor id de face primeiro. */
+    const P = freio.PARAMS;
+    const corpos = corposDaParte(neutro, 'disco');
+    expect(corpos.length).toBe(2);
+    expect(corpos[0].min[0]).toBeCloseTo(-P.discoEspessura / 2, 9);
+    expect(corpos[0].max[0]).toBeCloseTo(P.discoEspessura / 2, 9);
+    expect(corpos[1].max[0]).toBeCloseTo(-P.discoEspessura / 2, 9);
+    expect(corposDaParte(neutro, 'disco')).toEqual(corpos);
+    expect(() => corposDaParte(neutro, 'roda')).toThrow(/não tem parte 'roda'.*disco/s);
+    expect(() => corposDaParte(neutro, '')).toThrow(/texto não vazio/);
+  });
+
   it('os quatro encaixes do freio saem como NÚMERO, sem ler um pixel', () => {
     const P = freio.PARAMS;
     const descricao = descreverPeca(montar());
@@ -156,6 +240,14 @@ describe('descrever-partes: a medição headless de uma peça', () => {
     const caixaPinca = caixaDaParte(montar(), 'pinca');
     expect(caixaPinca.min[0]).toBeLessThan(-P.discoEspessura / 2);
     expect(caixaPinca.max[0]).toBeGreaterThan(P.discoEspessura / 2);
+
+    /* o pistão MORA dentro da garra interna — está inteiro dentro dela em x — e
+       a régua antiga chamava isso de `encosta`, escondendo os 16 mm de invasão
+       num par onde ela é de propósito. */
+    const pincaPistao = relacao(descricao, 'pinca', 'pistao');
+    expect(pincaPistao.tipo).toBe('interpenetra');
+    expect(pincaPistao.eixo).toBe('x');
+    expect(pincaPistao.distancia).toBeCloseTo(P.pistaoComprimento, 9);
   });
 
   it('o relatório é determinístico e o filtro por nome não muda a ordem', () => {
