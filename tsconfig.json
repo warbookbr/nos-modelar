@@ -7,9 +7,9 @@
     "types": ["node"],
 
     "strict": true,
-    // desligado de propósito (D-110, fase 2b): o gate agora cobre os testes .ts do Atelier
-    // (tools/som, tools/oficina) — harness sobre o motor .js SEM tipos; checar índice terso
-    // (arr[i]/Map.get) só geraria ruído. `strict` segue LIGADO (null-checks etc. valem).
+    // desligado de propósito (D-110, fase 2b): o gate cobre testes da Mecanifica
+    // e do Atelier herdado sobre módulos .js sem tipos. Checar todo acesso por
+    // índice (arr[i]/Map.get) só geraria ruído; `strict` continua ligado.
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true,
     "noImplicitReturns": true,

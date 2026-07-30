@@ -3,20 +3,17 @@
 Este repositório usa o Atelier v3 do NÓS como base experimental para construir a
 Mecanifica: uma oficina 3D interativa que explica sistemas automotivos a clientes.
 
-## Leitura obrigatória
+## Entrada de contexto
 
-Antes de planejar ou implementar uma rodada, leia:
-
-1. `docs/mecanifica/VISAO.md`
-2. `docs/mecanifica/PLANO.md`
-3. `docs/mecanifica/ARQUITETURA.md`
-4. `docs/mecanifica/AUTORIA-IA.md`
-5. `docs/mecanifica/BANCADA-E-APRESENTACAO.md`
-6. `docs/mecanifica/UPSTREAM-NOS.md`
+Antes de planejar ou implementar uma rodada, leia
+`docs/mecanifica/INDEX.md` e `docs/mecanifica/PLANO.md`. O índice informa quais
+outros documentos são necessários para cada tipo de tarefa; não carregue toda a
+documentação por padrão.
 
 Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
 à base herdada do NÓS. Consulte-os quando tocar no código legado, mas não os use
-como roteiro de produto da Mecanifica.
+como roteiro de produto da Mecanifica. Em caso de divergência,
+`docs/mecanifica/` prevalece.
 
 ## Fronteiras
 
@@ -58,3 +55,5 @@ extração.
 - Testes verdes não substituem inspeção visual; inspeção visual não substitui
   determinismo e validação.
 - Atualize o roteiro e o registro upstream quando uma rodada mudar o estado real.
+- Atualize `docs/mecanifica/INDEX.md` quando mudar a estrutura principal, a
+  hierarquia documental ou a próxima entrega.

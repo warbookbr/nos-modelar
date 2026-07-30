@@ -1,9 +1,13 @@
-# Recursos do coder — o índice único
+# Recursos técnicos do Atelier herdado
 
-O mapa de TUDO que ajuda a desenvolver o NÓS (hoje: o **Atelier**, `prototipos/fps/v3/`):
-scripts, bancadas, skills e agentes, cada um com *como invocar*. **Sessão nova? Comece
-por aqui e pelo `CLAUDE.md`.** Achou tooling que não está listado? Adicione — a próxima
-sessão agradece.
+Este é o catálogo detalhado das ferramentas e da documentação do NÓS herdado,
+especialmente o **Atelier** em `prototipos/fps/v3/`. Ele não é o roteiro da
+Mecanifica.
+
+**Sessão nova na Mecanifica? Comece por
+`docs/mecanifica/INDEX.md`.** Volte a este arquivo quando a tarefa tocar no
+núcleo, nas bancadas ou no histórico herdado. Achou tooling do Atelier que não
+está listado? Adicione — a próxima sessão agradece.
 
 ## Pré-requisito das bancadas visuais
 
@@ -16,10 +20,11 @@ o Chromium já vem no ambiente). Sem isso, as bancadas saem avisando.
 
 | Comando | O que faz |
 |---|---|
-| `npm run typecheck` | `tsc --noEmit` (strict) sobre os testes .ts de `tools/som` + `tools/oficina` |
+| `npm run typecheck` | `tsc --noEmit` sobre os contratos TypeScript em `tools/` |
 | `npm test` | Vitest — os testes de núcleo (`tools/**/*.test.ts`) |
 | `npm run mapa:check` | O mapa do repo está em dia? Falha se `docs/uso/MAPA.md` estiver velho ou se algum arquivo estiver SEM cabeçalho — criou arquivo? dê cabeçalho e rode `npm run mapa` |
 | `npm run docs:toc:check` | O índice de `docs/oficina.md` está em dia? (regenerar: `npm run docs:toc`) |
+| `npm run docs:links:check` | Referências resolvem e toda documentação está alcançável a partir de `docs/mecanifica/INDEX.md` |
 
 ### Bancadas — objeto / render
 
@@ -74,15 +79,16 @@ O DOMÍNIO (som/animação/geometria/pintura) mora nas **skills**, não num agen
 por assunto (D-106). Os 6 agents da era 2D e a skill `estruturas` (v2) foram
 aposentados — vivem no histórico do git.
 
-## Docs de orientação
+## Catálogo documental
 
-Índice de TODOS os docs de `docs/` — agrupados por status (a pasta é o critério: `uso/` é
-verdade agora, `rumo/` é o que se pretende, `historico/` é o que se fez e o que se
-aprendeu). `CLAUDE.md`, na raiz, é o acordo de trabalho + as regras (jóias, determinismo,
-pt-BR) — sessão nova começa por ele e por este arquivo.
+Este catálogo mantém todo documento herdado localizável. A hierarquia e a
+leitura progressiva da Mecanifica estão em `docs/mecanifica/INDEX.md`; as
+classificações “uso”, “rumo” e “histórico” abaixo se referem ao NÓS no estado em
+que foi clonado.
 
 ### `docs/mecanifica/` — produto e integração
 
+- **`docs/mecanifica/INDEX.md`** — porta de entrada: estado atual, fontes de verdade, estrutura e leitura por tarefa.
 - **`docs/mecanifica/BANCADA-E-APRESENTACAO.md`** — contrato da bancada de autoria e da transição carro → sistema → peça.
 - **`docs/mecanifica/VISAO.md`** — propósito do simulador mecânico e experiência pretendida para clientes.
 - **`docs/mecanifica/ARQUITETURA.md`** — fronteiras entre domínio, adaptador Three.js, cena e interação.
@@ -91,18 +97,18 @@ pt-BR) — sessão nova começa por ele e por este arquivo.
 - **`docs/mecanifica/UPSTREAM-NOS.md`** — separação das melhorias que podem voltar ao NÓS original.
 - **`docs/mecanifica/RELATORIO-PONTE-THREE.md`** — evidências e limites da primeira ponte entre a Oficina e Three.js.
 
-### `docs/uso/` — verdade agora
+### `docs/uso/` — contratos do Atelier herdado
 
-- **`docs/uso/RECURSOS.md`** — este arquivo: o índice único de comandos, bancadas, skills, agentes e docs.
+- **`docs/uso/RECURSOS.md`** — este arquivo: catálogo de comandos, bancadas, skills, agentes e documentos do Atelier.
 - **`docs/uso/MAPA.md`** — a árvore do repo com resumo por arquivo (gerada, sempre fresca — `npm run mapa`).
 - **`docs/uso/oficina-contrato.md`** — o que vale HOJE na Oficina: formato salvo, identidade de vértice, vocabulário de operações (gateado por `npm run criar`), camadas do código e o contrato de como a IA emite peça.
 - **`docs/uso/oficina-referencia.md`** — o manual de como cada elemento da Oficina funciona hoje.
 - **`docs/uso/LORE.md`** — a restrição viva: todo texto de jogo obedece a este documento.
 
-### `docs/rumo/` — o que se pretende
+### `docs/rumo/` — direção registrada do NÓS
 
-- **`docs/rumo/NORTE.md`** — leitura obrigatória: objetivo maior, método experimental e não negociáveis do NÓS.
-- **`docs/rumo/PLANO.md`** — leitura obrigatória, **o roteiro vigente**: fases da evolução, critérios de saída e sinais para redesenhar a arquitetura; a moto atual está congelada como **espécime de falha** — serve de régua de regressão, e não é referência nem de código (6.512 ids à mão) nem de forma (o pedido era o estilo de Tron Legacy; o resultado é rascunho).
+- **`docs/rumo/NORTE.md`** — objetivo maior, método experimental e não negociáveis do NÓS original; não governa a Mecanifica.
+- **`docs/rumo/PLANO.md`** — roteiro do NÓS no momento da clonagem; não é o plano vigente da Mecanifica. A moto está congelada como **espécime de falha** — serve de régua de regressão, e não é referência nem de código (6.512 ids à mão) nem de forma.
 - **`docs/rumo/oficina-roteiro.md`** — o que foi projetado pra Oficina e ainda NÃO existe, mais as decisões de escopo (booleano, UV manual e three.js ficam de fora por decisão).
 - **`docs/rumo/VISION.md`** — o que o NÓS é e nunca será.
 - **`docs/rumo/FERRAMENTAS.md`** — o plano de potência das ferramentas (visão de longo prazo, quase nada construído ainda).

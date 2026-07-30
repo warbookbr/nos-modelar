@@ -1,5 +1,9 @@
 # A Oficina — índice do design
 
+> **Documento do Atelier herdado.** Para o produto Mecanifica, comece em
+> [`docs/mecanifica/INDEX.md`](./mecanifica/INDEX.md). Os estados “atual” e
+> “planejado” abaixo se referem ao NÓS no momento da clonagem.
+>
 > **Este arquivo foi repartido.** Ele era um documento único de 2.001 linhas que
 > misturava três tempos verbais — o que existe, o que se planeja e o que se
 > decidiu —, abrindo com a frase "Nada disso está construído ainda" sobre um
@@ -23,4 +27,5 @@
 | [`docs/historico/oficina-projeto.md`](./historico/oficina-projeto.md) | o racional do que já foi construído + a Ordem de construção encerrada | 7 |
 
 A referência curta de uso diário é [`docs/uso/oficina-referencia.md`](./uso/oficina-referencia.md);
-o roteiro vigente do projeto é [`docs/rumo/PLANO.md`](./rumo/PLANO.md).
+o roteiro herdado do NÓS é [`docs/rumo/PLANO.md`](./rumo/PLANO.md). O roteiro
+vigente da Mecanifica é [`docs/mecanifica/PLANO.md`](./mecanifica/PLANO.md).

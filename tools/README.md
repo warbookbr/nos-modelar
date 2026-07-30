@@ -1,4 +1,4 @@
-# tools/ — as ferramentas do Atelier
+# tools/ — ferramentas da Mecanifica e do Atelier herdado
 
 ```
 tools/
@@ -20,8 +20,11 @@ tools/
                somexportar.mjs— round-trip do exportar de som (npm run somexportar)
                bench/         — benchmark dos críticos (defeitos plantados → placar F1)
                out/           — PNGs/saídas (gitignorado; evidência regenerável)
-  mapa/        mapa.mjs (docs/uso/MAPA.md gerado dos cabeçalhos + gate mapa:check) e
-               toc.mjs (índice de docs/oficina.md + gate docs:toc:check)
+  mapa/        mapa.mjs (docs/uso/MAPA.md gerado dos cabeçalhos + gate mapa:check),
+               links.mjs (referências + alcançabilidade a partir do índice da
+               Mecanifica) e toc.mjs (índice de docs/oficina.md)
+  mecanifica/  Testes vitest dos contratos novos: ponte Three.js, semântica do
+               drone e estado reproduzível da bancada
   som/         Testes vitest do núcleo de som (somnucleo/somanalise/somexport)
   oficina/     Testes vitest do núcleo da Oficina (motor/oficina.js)
   servir.mjs   Servidor de dev (npm run servir): serve o v3 com no-store + salvar
@@ -30,6 +33,7 @@ tools/
 
 **Pré-requisito das bancadas visuais:** `npm ci` na raiz, uma vez (o Playwright
 está nas devDependencies; o Chromium já vem no ambiente — as bancadas avisam se
-faltar). O índice único de comandos com exemplos: **`docs/uso/RECURSOS.md`**.
+faltar). O contexto da aplicação está em **`docs/mecanifica/INDEX.md`**; os
+comandos específicos do Atelier estão em **`docs/uso/RECURSOS.md`**.
 
 Regra: **ferramenta nova de coder (bancada/auditoria) nasce em `tools/bancadas/`**.

@@ -1,4 +1,4 @@
-/* Config do Vitest: cobre tools/** (núcleo do Atelier: som + oficina) — o gate npm test. */
+/* Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**. */
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({

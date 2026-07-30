@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* mapa.mjs — gera docs/uso/MAPA.md: a árvore do repositório com o resumo de cada
+/* mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada
    arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro
    comentário de cabeçalho; H1 nos .md) — este script só projeta. Assim o mapa
    não vira segunda verdade que apodrece: renomeou/criou/apagou arquivo ou
@@ -114,7 +114,7 @@ function gerar() {
     return a < b ? -1 : a > b ? 1 : 0;
   });
   const L = [];
-  L.push('# MAPA — a árvore do NÓS, arquivo por arquivo');
+  L.push('# MAPA — inventário da Mecanifica, arquivo por arquivo');
   L.push('');
   L.push('> **GERADO** por `npm run mapa` — não edite à mão. O resumo de cada arquivo');
   L.push('> mora no próprio arquivo (primeiro comentário; H1 nos `.md`); isto é a');

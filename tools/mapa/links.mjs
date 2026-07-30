@@ -10,12 +10,10 @@
    `npm run docs:links:check` sai ≠0 em qualquer falha. Zero dependências (git
    ls-files + fs).
 
-   Segunda checagem (Rodada 2 da reorg de docs): o MANIFESTO. Todo `.md` sob
-   `docs/` tem que ser citado (caminho `docs/<...>.md` completo) pelo
-   `docs/uso/RECURSOS.md` — a porta de entrada. Só duas exceções, o próprio
-   `RECURSOS.md` e `docs/uso/MAPA.md` (gerado, se auto-referenciaria em loop).
-   Trava em código o defeito que motivou esta rodada: o índice "de tudo" que
-   não indexava metade dos docs. */
+   Segunda checagem: a ALCANÇABILIDADE. Todo `.md` sob `docs/` precisa ser
+   alcançável, direta ou transitivamente, a partir de
+   `docs/mecanifica/INDEX.md`. Assim a porta de entrada pode ser curta e delegar
+   inventário e legado a índices especializados sem esconder documentação. */
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
@@ -88,42 +86,57 @@ for (const arquivo of rastreados) {
   }
 }
 
-/* --- manifesto: todo doc sob docs/ tem que ser citado pelo RECURSOS.md --- */
-const RECURSOS = 'docs/uso/RECURSOS.md';
-const MANIFESTO_EXCECOES = new Set([RECURSOS, 'docs/uso/MAPA.md']);
+/* --- alcançabilidade: todo doc parte do índice curado da Mecanifica --- */
+const PORTA_ENTRADA = 'docs/mecanifica/INDEX.md';
 
 /* Citar uma PASTA cobre o que está dentro dela. É o caso do
    `docs/historico/legado/`: são 11 docs de uma era encerrada, e enumerá-los
    um a um infla a porta de entrada com o que ninguém deve ler. O critério do
-   manifesto é "nada fica inalcançável", e um ponteiro pra pasta alcança.
+   gate é "nada fica inalcançável", e um ponteiro pra pasta alcança.
 
    É uma lista EXPLÍCITA, e não uma regra geral de "pasta citada cobre o
-   conteúdo", por duas armadilhas medidas: (1) o padrão de pasta casa o
-   prefixo de qualquer arquivo citado, então `docs/rumo/PLANO.md` isentaria
-   `docs/rumo/` inteira; (2) mesmo exigindo a pasta sozinha, o RECURSOS usa
-   `docs/uso/`, `docs/rumo/` e `docs/historico/` como TÍTULO de seção — e aí
-   as três se isentam e o manifesto vira no-op. Lista explícita não expande
-   sozinha. */
+   conteúdo", porque títulos de seção como `docs/rumo/` não podem isentar uma
+   árvore inteira por acidente. */
 const PASTAS_BLOCO = ['docs/historico/legado/'];
 
-const citadosNoRecursos = new Set();
-if (existsSync(path.join(REPO, RECURSOS))) {
-  const texto = readFileSync(path.join(REPO, RECURSOS), 'utf8');
+function referenciasDocsDe(arquivo) {
+  const refs = new Set();
+  const texto = readFileSync(path.join(REPO, arquivo), 'utf8');
   let m;
   PADRAO.lastIndex = 0;
-  while ((m = PADRAO.exec(texto))) citadosNoRecursos.add(m[0]);
+  while ((m = PADRAO.exec(texto))) {
+    if (todosDocsMd.includes(m[0])) refs.add(m[0]);
+  }
+  return refs;
 }
 
-const semManifesto = [];
-if (existsSync(path.join(REPO, RECURSOS))) {
-  for (const doc of todosDocsMd) {
-    if (MANIFESTO_EXCECOES.has(doc)) continue;
-    if (citadosNoRecursos.has(doc)) continue;
-    if (PASTAS_BLOCO.some((p) => doc.startsWith(p))) continue;
-    semManifesto.push(doc);
+const referenciasPorDoc = new Map(
+  todosDocsMd.map((doc) => [doc, referenciasDocsDe(doc)]),
+);
+const alcancados = new Set();
+
+if (existsSync(path.join(REPO, PORTA_ENTRADA))) {
+  const pendentes = [PORTA_ENTRADA];
+  while (pendentes.length) {
+    const atual = pendentes.pop();
+    if (alcancados.has(atual)) continue;
+    alcancados.add(atual);
+    for (const ref of referenciasPorDoc.get(atual) ?? []) {
+      if (!alcancados.has(ref)) pendentes.push(ref);
+    }
+  }
+
+  for (const pasta of PASTAS_BLOCO) {
+    const pastaFoiApontada = [...alcancados].some((doc) =>
+      readFileSync(path.join(REPO, doc), 'utf8').includes(pasta));
+    if (!pastaFoiApontada) continue;
+    for (const doc of todosDocsMd) {
+      if (doc.startsWith(pasta)) alcancados.add(doc);
+    }
   }
 }
 
+const inalcançaveis = todosDocsMd.filter((doc) => !alcancados.has(doc));
 const check = process.argv.includes('--check');
 
 if (falhas.length) {
@@ -140,12 +153,13 @@ if (falhas.length) {
   console.log(`docs:links ok — todas as referências docs/*.md resolvem (${rastreados.length} arquivos varridos).`);
 }
 
-if (semManifesto.length) {
-  console.error(`docs:links — ${semManifesto.length} doc(s) sob docs/ não citado(s) por ${RECURSOS}:`);
-  for (const doc of semManifesto) console.error(`  ${doc} → falta citar em ${RECURSOS}`);
+if (!existsSync(path.join(REPO, PORTA_ENTRADA))) {
+  console.error(`docs:links — porta de entrada ausente: ${PORTA_ENTRADA}`);
+} else if (inalcançaveis.length) {
+  console.error(`docs:links — ${inalcançaveis.length} doc(s) não alcançável(is) a partir de ${PORTA_ENTRADA}:`);
+  for (const doc of inalcançaveis) console.error(`  ${doc}`);
 } else {
-  const porPasta = todosDocsMd.filter((d) => !MANIFESTO_EXCECOES.has(d) && !citadosNoRecursos.has(d)).length;
-  console.log(`docs:links ok — todos os docs sob docs/ alcançáveis pelo ${RECURSOS} (${citadosNoRecursos.size} citados direto, ${porPasta} por pasta).`);
+  console.log(`docs:links ok — ${alcancados.size} docs alcançáveis a partir de ${PORTA_ENTRADA}.`);
 }
 
-if (check && (falhas.length || semManifesto.length)) process.exit(1);
+if (check && (falhas.length || inalcançaveis.length)) process.exit(1);

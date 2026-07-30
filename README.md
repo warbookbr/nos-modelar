@@ -38,14 +38,14 @@ semântico real no trem de pouso do drone herdado.
 - Núcleo de autoria independente do domínio automotivo e do renderizador.
 - Melhorias gerais preparadas para possível contribuição ao NÓS original.
 
-Leituras principais:
+Para entender ou continuar o projeto:
 
-- [`docs/mecanifica/VISAO.md`](docs/mecanifica/VISAO.md)
-- [`docs/mecanifica/ARQUITETURA.md`](docs/mecanifica/ARQUITETURA.md)
-- [`docs/mecanifica/PLANO.md`](docs/mecanifica/PLANO.md)
-- [`docs/mecanifica/AUTORIA-IA.md`](docs/mecanifica/AUTORIA-IA.md)
-- [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](docs/mecanifica/BANCADA-E-APRESENTACAO.md)
-- [`docs/mecanifica/UPSTREAM-NOS.md`](docs/mecanifica/UPSTREAM-NOS.md)
+- **[Comece pelo índice da Mecanifica](docs/mecanifica/INDEX.md)** — estado
+  atual, estrutura do repositório, fontes de verdade e leitura por tipo de tarefa.
+- [`docs/mecanifica/PLANO.md`](docs/mecanifica/PLANO.md) — roteiro vigente e
+  próximo passo.
+- [`docs/uso/MAPA.md`](docs/uso/MAPA.md) — inventário completo, gerado
+  automaticamente, com um resumo de cada arquivo.
 
 ## Base herdada
 
@@ -74,7 +74,8 @@ Depois, abra `http://localhost:8080/jogo.html`.
 
 Os documentos em `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS
 herdado. Eles continuam úteis como referência técnica e histórica, mas não
-definem o rumo da Mecanifica.
+definem o rumo da Mecanifica. Em caso de divergência, `docs/mecanifica/`
+prevalece para este produto.
 
 ## Licença e origem
 

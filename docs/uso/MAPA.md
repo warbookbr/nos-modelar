@@ -1,20 +1,21 @@
-# MAPA — a árvore do NÓS, arquivo por arquivo
+# MAPA — inventário da Mecanifica, arquivo por arquivo
 
 > **GERADO** por `npm run mapa` — não edite à mão. O resumo de cada arquivo
 > mora no próprio arquivo (primeiro comentário; H1 nos `.md`); isto é a
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-164 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+166 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
+- `AGENTS.md` — Mecanifica — instruções para agentes
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
 - `index.html` — index.html — entrada da nova aplicação Mecanifica; o Atelier herdado permanece em prototipos/fps/v3/.
 - `vite.config.js` — vite.config.js — build estático da Mecanifica para warbookbr/nos-mecanifica no GitHub Pages.
-- `vitest.config.ts` — Config do Vitest: cobre tools/** (núcleo do Atelier: som + oficina) — o gate npm test.
+- `vitest.config.ts` — Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**.
 
 ## .claude/agents/
 
@@ -81,6 +82,7 @@
 - `ARQUITETURA.md` — Arquitetura da Mecanifica
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `PLANO.md` — Plano vigente da Mecanifica
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
@@ -99,7 +101,7 @@
 ## docs/uso/
 
 - `LORE.md` — Lore — a bíblia do NÓS
-- `RECURSOS.md` — Recursos do coder — o índice único
+- `RECURSOS.md` — Recursos técnicos do Atelier herdado
 - `oficina-contrato.md` — Oficina — o contrato vigente
 - `oficina-referencia.md` — Oficina — referência de como cada coisa funciona
 
@@ -199,7 +201,7 @@
 
 ## tools/
 
-- `README.md` — tools/ — as ferramentas do Atelier
+- `README.md` — tools/ — ferramentas da Mecanifica e do Atelier herdado
 - `servir.mjs` — servir.mjs — servidor de DESENVOLVIMENTO da Oficina (passo 10). Faz duas coisas: (1) serve `prototipos/fps/v3/` ESTÁTICO com `Cache-Control: no-store` — mata…
 
 ## tools/bancadas/
@@ -242,7 +244,7 @@
 
 - `fatiar.mjs` — fatiar.mjs — a rede de segurança do fatiamento de um doc grande (o alvo hoje é docs/oficina.md). Dois modos, SÓ mecânica — a classificação de qual seção vai …
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
-- `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: a árvore do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
+- `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentá…
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
 ## tools/mecanifica/
