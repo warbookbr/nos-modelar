@@ -67,30 +67,97 @@ roteiro, ainda não existe — não use; o plano de fechar as lacunas é o épic
 | `moveF` | `face`, `d:[x,y,z]` | move TODOS os cantos da face, ADITIVO; canto compartilhado com outra face move junto (use `extruda` antes se não quiser afetar vizinho) |
 | `moveA` | `a`, `b`, `d:[x,y,z]` | move as duas pontas de uma aresta, ADITIVO — açúcar sobre dois `moveV`; não exige `a`/`b` ligados por face |
 | `vira` | `face` | inverte o winding (reverte `f.vs`) — SINGULAR, uma face por passo. Virar face JÁ consistente desalinha o pareamento com as vizinhas (não é bug — use pra consertar face já de costas, não como correção automática) |
-| `apagaFace` | `face` | remove a face; os vértices dela CONTINUAM existindo (buraco de propósito — porta, janela, preparo pra composição manual) |
+| `apagaFace` | `face` (legado) **ou `sel`** | remove a face; os vértices dela CONTINUAM existindo (buraco de propósito — porta, janela, preparo pra composição manual). **A ÚNICA das ops de edição que aceita `sel`** — e a única op do vocabulário que remove face, logo a única forma de abrir um VÃO: `['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } } }]` (`pecas/_vao-e-anteparo.js`). Contrato: **exatamente uma face**; 2+ GRITA (`seleção ambígua: apagaFace exige exatamente uma face`), seleção vazia GRITA, e `face` + `sel` no MESMO passo GRITA — nenhum dos três apaga nada (fail-closed). Furo não custa mais id posicional |
 | `displace` | `sel?` (o formato do `rotaciona`, default = malha inteira), `amplitude` (PARAM, 0.1), `frequencia` (PARAM, 1), `semente` (PARAM, 0) | desloca cada vértice ao longo da NORMAL MÉDIA (Newell das faces que o tocam) por ruído seedado determinístico (`ruido3` — value noise, [0,1) remapeado pra [−amplitude,+amplitude]). Vértice sem face nenhuma GRITA (sem normal pra seguir). Id-estável (não cria/apaga nada) — preserva manifold de malha já fechada. Peça-exemplo `_pedra.js` |
 | `extruda` | `face`, `dist` | só face única; anel novo nasce no bloco do passo |
 | `mescla` | `de:[ids]`, `para:id` | solda; face de área zero some quieta, mas face com canto repetido (bowtie) GRITA e é removida |
-| `rotaciona` | `eixo` (`'x'\|'y'\|'z'`), `graus` (PARAM), `sel?` (a seleção uniforme dos SETE campos — `tudo`/`v`/`f`/`grupo`/`regiao`/`origem`/`alias`, ver "Seleção semântica"; default = malha inteira), `pivo?` (`[x,y,z]`, default = centroide da seleção) | SIMPLES: só move posição (`p' = pivo + R_eixo(graus)·(p−pivo)`); NUNCA cria vértice/face nem renumera. `regiao` é caixa delimitadora (min/max os dois OBRIGATÓRIOS, sem `Infinity`); `grupo` são as faces daquele `f.parte`. **O default do pivô é armadilha:** centroide da seleção gira a peça em torno de si mesma — para pôr uma primitiva num eixo do conjunto, escreva `pivo` explícito |
+| `rotaciona` | `eixo` (`'x'\|'y'\|'z'`), `graus` (PARAM), `sel?` (a seleção uniforme dos SETE campos — `tudo`/`v`/`f`/`grupo`/`regiao`/`origem`/`alias`, ver "Seleção semântica"; default = malha inteira), `pivo?` (`[x,y,z]`, default = centroide da seleção) | SIMPLES: só move posição (`p' = pivo + R_eixo(graus)·(p−pivo)`, DESTRO nos três eixos — o sentido está em "O SENTIDO da rotação" logo abaixo da tabela, não deduza); NUNCA cria vértice/face nem renumera. `regiao` é caixa delimitadora (min/max os dois OBRIGATÓRIOS, sem `Infinity`); `grupo` são as faces daquele `f.parte`. **O default do pivô é armadilha:** centroide da seleção gira a peça em torno de si mesma — para pôr uma primitiva num eixo do conjunto, escreva `pivo` explícito |
 | `transladar` | `d` (`[x,y,z]`, PARAM, default `[0,0,0]`), `sel?` (o MESMO formato do `rotaciona`, default = malha inteira) | SIMPLES: `p' = p + d`, ADITIVO como o `moveV`; NUNCA cria vértice/face nem renumera; sem pivô (translação não usa). **É COMO SE POSICIONA UMA PRIMITIVA:** `cubo`/`cilindro`/`esfera`/`cone`/`plano`/`chamferBox` nascem PRESOS à origem e `lathe` sempre gira em torno de Y — nenhum aceita posição. Crie a primitiva e translade no passo seguinte (`sel` ausente = tudo que existe até ali; use `sel:{regiao}`/`{grupo}` pra mover só a peça nova quando já houver outra geometria) |
 | `espelha` | `eixo` (`'x'\|'y'\|'z'`), `pos?`, `sel?` uniforme; modo ESTRUTURAL: `origemId` + `derivaDe` juntos | DUPLICA faces; `sel:{f}`/`{grupo}` aponta faces, `{v}` alcança faces incidentes e `{regiao}` só faces inteiras na caixa. Weld no plano; ids novos do bloco; winding revertido; atributos herdados. **Modo ESTRUTURAL (é a 5ª fonte de `origem`):** com `origemId` + `derivaDe` a cópia vira endereçável por `sel:{origem:{op:'espelha',id,de}}`, onde `de` é a MESMA origem de `derivaDe`. Exige `sel:{origem:...}` direto — recusa `faces`, alias, região e ids literais — e aborta sem criar nada se alguma face-fonte estiver inteira no plano (a saída seria uma origem incompleta). Exemplo: `drone-inspecao.js`, trem de pouso |
 | `pincel` | `modo:'face'` (`faces` legado OU `sel`, `cor`) ou `modo:'livre'` (`cor`,`raio`,`dureza`,`pontos:[{f,a,b}]`) | livre = dab face-local, acompanha a face; não aceita `sel` |
 | `liso` | `faces:[ids]` (legado) ou `sel` | sombreado macio (padrão: chapado) |
 | `material` | `faces` (legado) ou `sel`, `usa` | + `MATERIAIS = {mat1:{cor,emissivo,aspereza,semLuz,mistura:'transparente'}}` exportado |
-| `parte` | `nome` (string com pelo menos um caractere visível), `faces:[ids]` (legado) ou `sel`, `pivo?` (`[x,y,z]`, PARAM), `substituir?` (só o literal `true`) | nomeia pra animação/material/grupo. O `nome` é a IDENTIDADE e é formato salvo: `''`, `'   '`, número, booleano, lista ou `nome` AUSENTE **GRITAM** e a op não toca em face nenhuma (fail-closed) — nomear nunca vira no-op silencioso, e `sel:{grupo}` cobra o mesmo contrato. Uma face pertence a NO MÁXIMO uma parte, e desde o O-2 **reatribuir GRITA**: se a face já é de OUTRA parte, o passo é recusado por face, ela fica com o dono ANTIGO e o órfão nomeia quem a batizou primeiro. Duas seleções sobrepostas não roubam mais faces em silêncio. Escreva `substituir: true` só quando transferir for a INTENÇÃO (valor diferente de `true` grita e a op segue estrita). Renomear para a MESMA parte segue mudo (é redundância, não conflito). `pivo` ausente = centroide da parte (resolvido no adaptador) |
+| `parte` | `nome` (string com pelo menos um caractere visível), `faces:[ids]` (legado) ou `sel`, `pivo?` (`[x,y,z]`, PARAM), `substituir?` (só o literal `true`) | nomeia pra animação/material/grupo. O `nome` é a IDENTIDADE e é formato salvo: `''`, `'   '`, número, booleano, lista ou `nome` AUSENTE **GRITAM** e a op não toca em face nenhuma (fail-closed) — nomear nunca vira no-op silencioso, e `sel:{grupo}` cobra o mesmo contrato. Uma face pertence a NO MÁXIMO uma parte, e desde o O-2 **reatribuir GRITA**: se a face já é de OUTRA parte, o passo é recusado por face, ela fica com o dono ANTIGO e o órfão nomeia quem a batizou primeiro. Duas seleções sobrepostas não roubam mais faces em silêncio. Escreva `substituir: true` só quando transferir for a INTENÇÃO (valor diferente de `true` grita e a op segue estrita). Renomear para a MESMA parte segue mudo (é redundância, não conflito). Se TODA a seleção for recusada, a parte **não é registrada** — o nome não vira parte fantasma sem face nenhuma, então trate o grito como "esta parte não existe", não como aviso. `pivo` ausente = centroide da parte (resolvido no adaptador) |
 | `pesar` | `osso`, `vs:[ids]` e/ou `faces:[ids]`, `peso` | skinning (acumula por vértice, normaliza top-4); não aceita `sel` |
 | `solido` | `faces:[ids]` (legado) ou `sel` | o que entra na colisão |
 | `inflate` | `contornoLado:[[z,y],...]` (≥3 pontos, PARAM), `contornoTopo:[[z,x],...]` (idem), `divisoes` (TOPO, mín 2) | **não publica `origem`**. Dois contornos 2D (plano z×y e z×x) viram VOLUME por interseção de dois prismas — não é malha booleana geral, é uma GRADE DE VOXEL (watertight por construção, mas o resultado sai BLOCKY/facetado — não suave). Ponto com aridade ≠ 2 (alça de curva reservada) GRITA e aborta, igual ao `contorno` do loft; <3 pontos idem; contornos que não se cruzam em nenhum voxel GRITA (volume vazio nunca é o que você queria). Vale largura≠altura — o único gerador sem seção circular. Peça-exemplo `_corpo.js` |
 
-**Sete ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
-`moveF`, `moveA`, `vira`, `apagaFace`, `extruda` e `mescla` (a oitava é
-`pesar`, mesma restrição, mas de skinning). Escolher uma delas é
-escolher escrever id posicional — a referência que o `CLAUDE.md` proíbe
-persistir. Não é acaso que a peça de referência sem id cru (`freio-disco.js`)
-não use nenhuma das sete: quem precisa de identidade estável compõe por
-primitiva + `transladar`/`rotaciona`/`espelha` endereçados por
-`origem`/`alias`. Se o assunto exigir uma delas (furo, correção de normal),
-use — e REPORTE, porque é lacuna de contrato, não estilo.
+**SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
+`moveF`, `moveA`, `vira`, `extruda` e `mescla` (a sétima é `pesar`, mesma
+restrição, mas de skinning). Escolher uma delas é escolher escrever id
+posicional — a referência que o `CLAUDE.md` proíbe persistir. Escrever `sel`
+nelas não é atalho e não vira silêncio: o argumento de id chega `undefined` e a
+op GRITA face/vértice inexistente (medido: 1 órfão em `moveV`/`moveF`/`vira`/
+`extruda`, 2 em `moveA` — uma por ponta). **A exceção que morde é o `mescla`:**
+com `para` válido e `de` ausente ele volta CALADO, 0 órfão e 0 mudança, então
+ali nem o grito te salva — confira o efeito, não a ausência de erro. Quem
+precisa de identidade estável compõe por primitiva +
+`transladar`/`rotaciona`/`espelha` endereçados por `origem`/`alias`: a peça de
+referência sem id cru (`freio-disco.js`) não usa nenhuma das seis. Se o assunto
+exigir uma delas (correção de normal, solda), use — e REPORTE, porque é lacuna
+de contrato, não estilo.
+
+**`apagaFace` NÃO está nessa lista, e é a que mais importa.** Ela é a única op
+que remove face — logo a única forma de abrir um furo, uma porta, um vão — e o
+núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos sete
+campos, exigindo **exatamente uma face**, gritando em ambiguidade e em seleção
+vazia. Abrir um vão **não custa id posicional**; escrever `['apagaFace',
+{ face: 4003 }]` é dívida escolhida, não imposta. A forma certa está na peça de
+exercício `pecas/_vao-e-anteparo.js`:
+
+```js
+// o vão: remove a tampa de fundo da carcaça, POR NOME, sem citar id
+['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } } }],
+```
+
+Cuidado com a assimetria: `vira` (a op irmã, que conserta normal invertida)
+continua sem caminho semântico — provar `vira` custa exatamente uma referência
+posicional, e o cabeçalho de `_vao-e-anteparo.js` declara essa dívida alto em
+vez de escondê-la.
+
+**O SENTIDO da rotação — DESTRO nos três eixos.** A fórmula `p' = pivo +
+R_eixo(graus)·(p−pivo)` não diz para que LADO, e este é o erro que nenhuma
+conferência visual pega: um conjunto espelhado em x parece o conjunto certo (um
+freio espelhado parece um freio), e o `descrever` também não denuncia, porque a
+caixa de uma peça espelhada continua simétrica e plausível. Regra única, sem
+exceção por eixo: **polegar da mão DIREITA no sentido POSITIVO do eixo; os dedos
+enrolam para onde `graus` positivo leva os pontos** — o ciclo X→Y→Z→X.
+
+A mão fica concreta porque os nomes de face do `cubo` fixam os eixos:
+`direita` = +X, `topo` = +Y, `frente` = +Z (e `esquerda`/`fundo`/`tras` os
+negativos). Então: polegar apontando para a `frente` (+Z, para você), dedos
+enrolando da `direita` (+X) para o `topo` (+Y) — isso é `rotaciona z 90`.
+
+| eixo | `graus` | leva | para |
+|---|---|---|---|
+| `x` | `+90` | `+Y` | `+Z` |
+| `x` | `-90` | `+Y` | `-Z` |
+| `y` | `+90` | `+X` | `-Z` |
+| `y` | `-90` | `+X` | `+Z` |
+| `z` | `+90` | `+Y` | `-X` |
+| `z` | `-90` | `+Y` | `+X` |
+
+Tabela MEDIDA (marca unitária girada pelo núcleo com `pivo:[0,0,0]`), não
+deduzida da matriz, e travada por `tools/bancadas/skill-criar-peca.test.ts`: se
+o núcleo trocar de convenção, o teste quebra em vez de a peça sair espelhada.
+
+**Caso canônico — primitiva de revolução do eixo Y para o eixo X.** `cilindro`,
+`lathe` e `esfera` nascem em torno de **Y**; toda peça mecânica de eixo
+horizontal (disco de freio, cubo de roda, pistão, polia, virabrequim) mora em
+**X**. O passo é `rotaciona z -90` com **pivô explícito na origem** — `-90`
+leva `+Y` para `+X`, e `+90` levaria para `-X`, espelhando o conjunto inteiro:
+
+```js
+// põe uma primitiva de revolução no eixo X (o helper `paraEixoX` do freio-disco)
+['rotaciona', { eixo: 'z', graus: -90, pivo: [0, 0, 0], sel: { origem: { op: 'cilindro', id } } }],
+```
+
+O `pivo` explícito é obrigatório aqui pelo motivo da linha do `rotaciona` acima:
+o default (centroide da seleção) giraria a primitiva em torno de si mesma, e ela
+ficaria deitada **no lugar onde já estava** em vez de no eixo do conjunto. Depois
+da rotação, o que era `tampa:'fundo'` (y=0) fica no **menor x** e `tampa:'topo'`
+no **maior x** — é assim que `freio-disco.js` chama `pistaInterna`/`pistaExterna`
+por alias, sendo `+X` o lado de FORA do carro.
 
 **Seleção semântica (`sel`, D-129/D-130/D-131):** os SETE campos são `tudo`,
 `v`, `f`, `grupo`, `regiao`, `origem` e `alias` — podem coexistir e se unem

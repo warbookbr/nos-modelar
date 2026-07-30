@@ -10,6 +10,8 @@ Uma peça é um envelope de `PASSOS` reexecutado deterministicamente pelo núcle
 
 O PASSO atual `parte` atribui um único valor a `f.parte` após a face existir; `grupo` consulta esse atributo. Ele é útil para macro-partes e animação, mas é tardio e hoje depende de uma lista de faces posicionais para nascer. A mesma face só tem uma `parte`: a última atribuição vence. Esse comportamento legado deve permanecer explícito e não será renomeado nem reinterpretado silenciosamente como a estrutura proposta abaixo.
 
+> **Desatualizado desde o O-2 da Mecanifica.** "A última atribuição vence" descreve o núcleo de quando esta proposta foi escrita. Hoje reatribuir uma face para OUTRA parte **GRITA** e a face fica com o dono ANTIGO, salvo `substituir: true` explícito; renomear para a mesma parte segue mudo. A referência corrente é [`../mecanifica/OFICINA-OTIMIZACOES.md`](../mecanifica/OFICINA-OTIMIZACOES.md) (item O-2) e a op `parte` em `prototipos/fps/v3/motor/oficina.js`. O parágrafo acima fica como registro do estado que a proposta enxergava.
+
 `sel.origem` é a prova mínima já implementada. Um `loft` pode declarar `origemId`; durante cada replay, o núcleo reconstrói `st.origens` e indexa as faces laterais por faixa e lado. Esse índice é efêmero e não entra no canônico. `sel:{origem:{op:'loft',id,faixa,lado?}}` sobrevive à inserção de geometria antes do `loft`, desde que `origemId` permaneça o mesmo. A prova mostrou equivalência byte a byte com quatro IDs literais e, ao inserir um cubo antes, acertou as faces locais `1008..1011` enquanto o literal antigo precisou ser recalculado.
 
 ### Problemas comprovados

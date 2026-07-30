@@ -148,6 +148,17 @@ código-fonte.
    o núcleo antes; o default silencioso é uma armadilha carregada.
 4. *`transladar` sem `sel` move a malha inteira.* Escopei os 12 `transladar`.
 
+**Estado das quatro.** O O-0 (R1) respondeu 1, 3 e 4 na skill `criar-peca`. A 2
+ficou aberta e foi fechada na correção da R2: a skill agora traz **"O SENTIDO da
+rotação"** — a regra da mão direita ancorada nos nomes de face do `cubo`
+(`direita`=+X, `topo`=+Y, `frente`=+Z), a tabela dos 3 eixos × ±90 e o caso
+canônico "primitiva de revolução do eixo Y para o eixo X" (`rotaciona z -90`
+leva `+Y` para `+X`). A tabela é **medida** contra o núcleo por
+`tools/bancadas/skill-criar-peca.test.ts`, não copiada da matriz: se a
+convenção do núcleo mudar, o teste quebra em vez de a próxima peça sair
+espelhada — que é justamente o defeito que nem a foto nem o `descrever`
+denunciam.
+
 **Escrita da peça (1 vez, sem reescrever nada).** Escrevi o arquivo inteiro de
 uma vez e ele rodou na primeira execução com **6 órfãos** — todos da mesma
 causa: o alias `discoInteiro` (pista + chapéu) foi citado num `transladar` que

@@ -259,6 +259,24 @@ restrição relacional passa a fazer sozinha.
 
 **Custo:** baixo.
 
+**O que a revisão adversarial corrigiu depois (ALTA-2).** A skill `criar-peca`
+afirmava, em negrito, que **sete** ops de geometria só aceitam id literal e que
+**nenhuma** aceita `sel` — listando `apagaFace` entre elas. Medição op por op
+contra o núcleo: **seis** das sete estavam certas (`moveV`, `moveF`, `moveA`,
+`vira`, `extruda`, `mescla`; `pesar` idem, no skinning) e **uma estava errada**.
+`apagaFace` implementa o ramo `sel` completo — resolve a seleção, exige
+exatamente uma face, grita em ambiguidade e em seleção vazia — e é justamente a
+op que este item mandou provar, pela razão de ser a única que abre um vão. O
+manual empurrava para `['apagaFace', { face: 4003 }]` exatamente onde o caminho
+semântico existe, e o gate do O-4 não pega porque `face` é forma SINGULAR,
+declarada fora de escopo. A skill foi reescrita com o que o código diz, com a
+forma semântica no lugar do id, e a afirmação passou a ser **medida**: o teste
+`tools/bancadas/skill-criar-peca.test.ts` executa cada op citada só com `sel` e
+cobra da prosa — doc que discordar do núcleo quebra o teste. Achado irmão, na
+mesma medição: `mescla` com `para` válido e `de` ausente volta **calado** (0
+órfão, 0 mudança), o único no-op silencioso das seis; registrado na skill como
+armadilha e candidato a grito numa rodada que toque o núcleo.
+
 ---
 
 ## Faixa 2 — muda a linguagem, alto retorno
