@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-166 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+169 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -80,6 +80,7 @@
 ## docs/mecanifica/
 
 - `ARQUITETURA.md` — Arquitetura da Mecanifica
+- `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
@@ -185,6 +186,7 @@
 
 ## src/bancada/
 
+- `carregar-peca.js` — carregar-peca.js — resolve a fixture da bancada por nome semântico e falha alto em nome inválido.
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
 - `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
@@ -252,6 +254,7 @@
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `drone-semantica.test.ts` — drone-semantica.test.ts — regressão do cilindro da lente e do trem de pouso do drone.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
+- `olhar-bancada.mjs` — olhar-bancada.mjs — o OLHO DA BANCADA: dirige `bancada.html` headless pela URL e salva PNG por vista, para que uma sessão sem navegador possa inspecionar o q…
 
 ## tools/oficina/
 

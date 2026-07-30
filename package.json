@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "bancada": "node tools/mecanifica/olhar-bancada.mjs",
     "peca": "node tools/bancadas/olhar-peca.mjs",
     "oficina": "node tools/bancadas/oficina.mjs",
     "servir": "node tools/servir.mjs",

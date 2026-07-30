@@ -1,8 +1,6 @@
 /* main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível. */
 import './styles.css';
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
-import * as drone from '../../prototipos/fps/v3/pecas/drone-inspecao.js';
-import { adaptarThree } from '../autoria/adaptar-three.js';
+import { carregarPeca, PECA_PADRAO, PECAS_DISPONIVEIS } from './carregar-peca.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -33,20 +31,12 @@ function mostrarAviso(texto) {
   mostrarAviso.timeout = setTimeout(() => { elemento.hidden = true; }, 2200);
 }
 
-try {
-  const materiais = {};
-  const neutro = nucleo(
-    drone.PASSOS,
-    drone.PARAMS,
-    drone.TOPO,
-    materiais,
-    null,
-    drone.ALIASES ?? [],
-  );
-  const convertido = adaptarThree(neutro, {
-    nome: drone.meta?.nome ?? 'drone-inspecao',
-    materiais,
-  });
+async function iniciar() {
+  const params = new URLSearchParams(location.search);
+  const pecaPedida = params.get('peca');
+  const nomePeca = pecaPedida ?? PECA_PADRAO;
+  const convertido = await carregarPeca(nomePeca);
+  document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
 
   const canvas = document.getElementById('cenaBancada');
   let vistaAtual = 'isometrica';
@@ -84,11 +74,17 @@ try {
 
   function salvarEstadoNaUrl(estado) {
     if (inicializando) return;
-    const query = escreverEstadoNaUrl({
+    /* `peca` vem antes do estado de vista: é a fixture, não uma opção de câmera.
+       Sem isto, a primeira mudança de estado apagaria a peça da URL. */
+    const saida = new URLSearchParams();
+    if (nomePeca !== PECA_PADRAO) saida.set('peca', nomePeca);
+    const estadoDaVista = escreverEstadoNaUrl({
       ...estado,
       vista: VISTAS_BANCADA[vistaAtual] ? vistaAtual : 'isometrica',
       projecao: ambiente.projecao,
     });
+    for (const [chave, valor] of new URLSearchParams(estadoDaVista)) saida.set(chave, valor);
+    const query = saida.toString();
     if (query === ultimaQuery) return;
     ultimaQuery = query;
     history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}`);
@@ -242,7 +238,10 @@ try {
   }
   addEventListener('keydown', atalhoVista);
 
-  const inicial = lerEstadoDaUrl(new URLSearchParams(location.search), controlador.nomes);
+  const inicial = lerEstadoDaUrl(params, controlador.nomes);
+  const selecaoIgnorada = (params.get('selecionadas') ?? '')
+    .split(',')
+    .filter((nome) => nome && !inicial.selecionadas.includes(nome));
   controlador.selecionarMuitas(inicial.selecionadas);
   controlador.definirModo(inicial.modo);
   controlador.definirExplosao(inicial.explosao);
@@ -254,8 +253,17 @@ try {
   refletirEstado(controlador.estado());
   atualizarBotoesVista();
 
+  if (selecaoIgnorada.length) {
+    mostrarAviso(
+      `Ignorei ${selecaoIgnorada.length} nome(s) que não existem nesta peça: ${selecaoIgnorada.join(', ')}.`,
+    );
+  }
+
   window.__mecanificaBancada = {
     ready: true,
+    peca: nomePeca,
+    pecasDisponiveis: PECAS_DISPONIVEIS,
+    selecaoIgnorada,
     diagnosticos: convertido.diagnosticos,
     estatisticas: convertido.estatisticas,
     partes: controlador.nomes,
@@ -264,11 +272,14 @@ try {
     vista: (vista) => ambiente.definirVista(vista),
     projecao: (projecao) => ambiente.definirProjecao(projecao),
     explosao: (valor) => controlador.definirExplosao(valor),
+    focar: () => focarSelecao(),
     estado: () => ({
+      peca: nomePeca,
       ...controlador.estado(),
       vista: vistaAtual,
       projecao: ambiente.projecao,
     }),
+    url: () => location.href,
   };
 
   addEventListener('pagehide', () => {
@@ -277,8 +288,10 @@ try {
     controlador.destruir();
     ambiente.destruir();
   }, { once: true });
-} catch (erro) {
+}
+
+iniciar().catch((erro) => {
   window.__mecanificaBancada = { ready: false, erro: String(erro?.message || erro) };
   mostrarErro(erro);
   console.error(erro);
-}
+});

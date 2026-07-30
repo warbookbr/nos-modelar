@@ -42,9 +42,11 @@ Use esta ordem para resolver dúvidas:
    autoria visual e experiência do cliente;
 5. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-6. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+6. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+   observadas ao modelar de verdade, e as capacidades que elas justificam;
+7. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-7. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+8. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
    evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -92,7 +94,8 @@ arquivo e cobre código e documentação sem manter uma segunda descrição manu
 ## Entradas executáveis
 
 - `index.html` — aplicação principal;
-- `bancada.html` — bancada neutra de autoria e inspeção;
+- `bancada.html` — bancada neutra de autoria e inspeção; aceita `?peca=<nome>`
+  para abrir qualquer peça de `prototipos/fps/v3/pecas/`;
 - `prototipos/fps/v3/jogo.html` — Atelier herdado;
 - `https://warbookbr.github.io/nos-mecanifica/` — publicação da aplicação;
 - `https://warbookbr.github.io/nos-mecanifica/bancada.html` — bancada publicada.
@@ -102,6 +105,15 @@ Desenvolvimento local:
 ```bash
 npm ci
 npm run dev
+```
+
+Inspeção sem navegador — dirige a bancada pela URL e salva PNG por vista, para
+que uma sessão headless possa ver o que está modelando:
+
+```bash
+npm run bancada -- --listar
+npm run bancada -- drone-inspecao --vistas=direita,frontal
+npm run bancada -- drone-inspecao --selecionadas=lente --modo=isolar --focar
 ```
 
 Verificação completa:
