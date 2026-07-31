@@ -5361,3 +5361,86 @@ describe('furo v2 — completude: a recusa vem antes do primeiro id, e a forma v
     expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
   });
 });
+
+/* ============================================================================
+   FURO V2 — A PARTIÇÃO EM FACE SIMÉTRICA (rodada "Flange de uma peça só")
+
+   Achado ao levar o `centros` para uma peça de PRODUTO: o flange do freio é a
+   tampa de um cilindro de 16 lados, com 4 anéis de 12 lados a 90°. 16, 12 e 4
+   são todos múltiplos de 4, e essa simetria põe vértices de um anel EXATAMENTE
+   em cima da aresta de uma orelha de outro. "Em cima" não é "dentro": o teste
+   de orelha só recusava o vértice ESTRITAMENTE interno, então a orelha era
+   cortada, engolia a lasca do outro lado da aresta e o resto do polígono
+   sobrava com orientação invertida.
+
+   O sintoma chegava longe da causa — "a partição criou um triângulo de área
+   nula ou invertida", uma das três provas de estado impossível, que o núcleo
+   declara não ter teste que as dispare. Ela tinha. Estas afirmações existem
+   para que a face simétrica seja ENTRADA VÁLIDA, e não um grito.
+============================================================================ */
+describe('furo v2 — face redonda com círculo de furos em simetria exata', () => {
+  /* a mesma figura do flange, sem vocabulário automotivo: tampa de um cilindro
+     de `ladosDaFace` lados, com `total` furos de `ladosDoFuro` lados. */
+  const FLANGE = (ladosDaFace: number, ladosDoFuro: number, total: number) => [
+    ['cilindro', { id: 0, origemId: 1, raio: 0.052, altura: 0.012, lados: ladosDaFace }],
+    ['furo', {
+      origemId: 9,
+      de: { op: 'cilindro', id: 1, tampa: 'topo' },
+      saida: { op: 'cilindro', id: 1, tampa: 'fundo' },
+      centros: { distancia: 0.038, total, volta: 360 },
+      raio: 0.0065,
+      lados: ladosDoFuro,
+      orientacao: [1, 0, 0],
+    }],
+  ];
+
+  it('16 lados, 4 furos de 12: a partição fecha, e é ESTE o caso que a peça usa', () => {
+    const n = nucleo(FLANGE(16, 12, 4) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    /* contagem fechada, dos dois lados: 3·L por furo mais o preenchimento
+       `n + 2M − 2` na entrada e na saída. */
+    expect([...n.F.keys()].filter((f: number) => f >= 1000))
+      .toHaveLength(3 * 12 * 4 + 2 * (16 + 2 * 4 - 2));
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 12 * 4);
+  });
+
+  /* a simetria não é um caso: é uma FAMÍLIA. Cada linha aqui põe pelo menos um
+     vértice em cima de uma aresta de orelha, e todas passavam a gritar sem a
+     recusa por `pontoNoSegmento`. */
+  const familia: [number, number, number][] = [
+    [16, 12, 4], [8, 12, 4], [10, 6, 6], [24, 6, 6], [32, 10, 6], [16, 12, 8], [20, 12, 4], [6, 8, 8],
+  ];
+  for (const [face, furo, total] of familia) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: zero órfão e malha fechada`, () => {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos).toEqual([]);
+      expect(arestasSoltas(n)).toBe(0);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000))
+        .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
+    });
+  }
+
+  it('a área da partição é a da face MENOS a dos furos — cobrir a lasca duas vezes morreria aqui', () => {
+    /* a prova que o sintoma dava de graça, agora dita como afirmação: a soma
+       das faces do lado de entrada (borda + preenchimento) é a área do
+       polígono da face menos a dos anéis. Uma orelha que engole a lasca de um
+       anel some com área e a conta não fecha. */
+    const n = nucleo(FLANGE(16, 12, 4) as any, {}, {});
+    const areaDe = (f: any) => {
+      let x = 0, y = 0, z = 0;
+      for (let k = 0; k < f.vs.length; k++) {
+        const a = n.V.get(f.vs[k]), b = n.V.get(f.vs[(k + 1) % f.vs.length]);
+        x += a[1] * b[2] - b[1] * a[2]; y += a[2] * b[0] - b[2] * a[0]; z += a[0] * b[1] - b[0] * a[1];
+      }
+      return Math.hypot(x, y, z) / 2;
+    };
+    const topo = [...n.F.values()].filter((f: any) => {
+      const ys = f.vs.map((v: number) => n.V.get(v)[1]);
+      return f.id >= 1000 && ys.every((v: number) => Math.abs(v - 0.012) < 1e-12);
+    });
+    const area = topo.reduce((s: number, f: any) => s + areaDe(f), 0);
+    const poligono = (raio: number, lados: number) => lados * raio * raio * Math.sin(2 * Math.PI / lados) / 2;
+    expect(area).toBeCloseTo(poligono(0.052, 16) - 4 * poligono(0.0065, 12), 12);
+  });
+});

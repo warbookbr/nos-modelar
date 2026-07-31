@@ -1444,12 +1444,16 @@ function areaPoligono(P) {
    e cada anel tem as suas `L` faces. Falhar qualquer uma GRITA.
 
    DITO NA CARA: essas três provas são de ESTADO IMPOSSÍVEL, e não têm teste
-   que as dispare. Não há entrada que o `furo` aceite (face plana, convexa,
-   anéis dentro do contorno e disjuntos) e que as faça falhar; desligar
-   qualquer uma delas não mata teste nenhum, e isso foi MEDIDO por mutação, não
-   suposto. Elas ficam porque o preço de uma partição errada é malha aberta
-   plausível na foto, mas ninguém deve lê-las como promessa conferida: se uma
-   disparar, o defeito é do núcleo, não do arquivo da peça. */
+   que as dispare — desligar qualquer uma delas não mata teste nenhum, e isso
+   foi MEDIDO por mutação. Elas ficam porque o preço de uma partição errada é
+   malha aberta plausível na foto, mas ninguém deve lê-las como promessa
+   conferida: se uma disparar, o defeito é do núcleo, não do arquivo da peça.
+
+   E JÁ DISPAROU UMA VEZ, o que vale mais que a frase acima: o flange do freio
+   (tampa de 16 lados, 4 anéis de 12 a 90°) fazia a prova de área gritar. A
+   causa era a orelha aceitar vértice EM CIMA de uma aresta sua — corrigido
+   abaixo, com a família de simetrias em teste. A afirmação de que "não há
+   entrada aceita que as faça falhar" era, na data em que foi escrita, falsa. */
 function triangularComAneis(contorno, aneis, escala) {
   const eps = 1e-12 * Math.max(1, escala * escala);
   const pts = [], tags = [];
@@ -1509,7 +1513,18 @@ function triangularComAneis(contorno, aneis, escala) {
       let livre = true;
       for (const v of c) {
         if (v === a || v === b || v === d) continue;
-        if (dentroEstrito(A, B, D, pts[v], eps)) { livre = false; break; }
+        /* DENTRO não basta, e a diferença é o defeito que o flange do freio
+           achou: um vértice EM CIMA de uma aresta da orelha não está DENTRO
+           dela, mas separa a região em duas do mesmo jeito. Cortar assim
+           engole a lasca do outro lado da aresta e deixa o resto do polígono
+           com orientação invertida — e o erro só aparece lá adiante, na prova
+           de área, sem dizer onde nasceu. Uma face de 16 lados com 4 anéis de
+           12 a 90° põe três desses vértices em cima da aresta, por simetria:
+           16, 12 e 4 são todos múltiplos de 4. */
+        if (dentroEstrito(A, B, D, pts[v], eps)
+          || pontoNoSegmento(A, B, pts[v], eps)
+          || pontoNoSegmento(B, D, pts[v], eps)
+          || pontoNoSegmento(D, A, pts[v], eps)) { livre = false; break; }
       }
       if (!livre) continue;
       tri.push([a, b, d]);
