@@ -1242,19 +1242,107 @@ describe('P2 — lathe (perfil de revolução)', () => {
     expect(J(neutroCanonico(nucleo(JSON.parse(J(passos)), {}, {})))).toBe(a);
   });
 
-  it('3º elemento do ponto GRITA e ABORTA o passo (a reserva da alça de curva é FAIL-CLOSED — D-115: não constrói malha "reservada" que mudaria quando a curva chegar)', () => {
-    const comAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, { tipo: 'curva' }], [1, 1], [0, 1]], lados: 4 }]], {}, {});
-    expect(comAlca.orfaos).toHaveLength(1);
-    expect(comAlca.orfaos[0]).toMatchObject({ op: 'lathe', ref: 1 });
-    expect(comAlca.orfaos[0].motivo).toMatch(/reservad/i);
-    // FAIL-CLOSED: NADA construído (0 V/0 F), como o raio<0 — impossível shipar hoje uma peça de 3º elemento
-    // que renderiza reta agora e mudaria pra curva depois (o fail-open que o revisor pegou no P2)
-    expect(comAlca.V.size).toBe(0);
-    expect(comAlca.F.size).toBe(0);
-    // um ponto NORMAL de 2 elementos nunca dispara a reserva (sem falso-positivo) e constrói de verdade
+  it('Ciclo 5: a alça de curva não é mais reservada — 3º elemento numérico é um RAIO DE CONCORDÂNCIA de verdade; 3º elemento não-numérico continua THROWANDO ALTO (mesma lei de todo campo dimensional, não mais um "reservado" macio)', () => {
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, { tipo: 'curva' }], [1, 1], [0, 1]], lados: 4 }]], {}, {})).toThrow(/valor numérico inválido/);
+    // um ponto NORMAL de 2 elementos segue construindo igual, sem falso-positivo
     const semAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 4 }]], {}, {});
     expect(semAlca.orfaos).toHaveLength(0);
     expect(semAlca.V.size).toBeGreaterThan(0);
+  });
+
+  it('concordância (raio de fillet) no perfil: raio:0 é BYTE-IDÊNTICO a um ponto sem 3º elemento (no-op quando desligado)', () => {
+    const comZero = neutroCanonico(nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {}));
+    const semAlca = neutroCanonico(nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {}));
+    expect(JSON.stringify(comZero)).toBe(JSON.stringify(semAlca));
+  });
+
+  it('concordância válida: nenhum órfão, malha construída, e cada ponto do arco fica a <1% do raio declarado do CENTRO analítico (condição 2 do gate do Ciclo 5) — testado em duas discretizações', () => {
+    for (const segmentosCurva of [4, 16]) {
+      const raio = 0.3;
+      const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, raio], [1, 1], [0, 1]], lados: 8, segmentosCurva }]], {}, {});
+      expect(n.orfaos).toHaveLength(0);
+      expect(n.V.size).toBeGreaterThan(0);
+      // reconstrói o centro do fillet do MESMO jeito que o gate pede: A=(0,0) — o ponto anterior — B=(1,0) o
+      // corner original, C=(1,1) o seguinte, no plano (raio,y) do perfil. Ângulo reto -> t=raio, bissetriz a 45°.
+      const t = raio; // tan(45°)=1
+      const centro = [1 - t, t]; // B + bissetriz*(raio/sin(45°)) simplifica pra isso num ângulo reto
+      // os pontos expandidos do arco viram vértices ANEL (lados=8) a partir do 2º ponto do perfil (id 8..) —
+      // em vez de recomputar índice exato, mede em TODOS os vértices e exige que os que não são as pontas
+      // originais (raio 0 ou raio 1 exato, y 0 ou 1 exato) caiam no raio certo.
+      let medidos = 0;
+      for (const [id, p] of n.V) {
+        const raioRev = Math.hypot(p[0], p[2]); // distância ao eixo Y = coordenada 'raio' do perfil, nesse anel
+        const y = p[1];
+        const naPontaOriginal = (Math.abs(raioRev - 0) < 1e-6 && Math.abs(y - 0) < 1e-6) || (Math.abs(raioRev - 1) < 1e-6 && Math.abs(y - 1) < 1e-6) || (Math.abs(raioRev - 0) < 1e-6 && Math.abs(y - 1) < 1e-6);
+        if (naPontaOriginal) continue;
+        const dCentro = Math.hypot(raioRev - centro[0], y - centro[1]);
+        expect(Math.abs(dCentro - raio) / raio).toBeLessThan(0.01);
+        medidos += 1;
+      }
+      expect(medidos).toBeGreaterThan(0); // a medição realmente tocou pontos do arco (não passou vazia)
+    }
+  });
+
+  it('concordância: os pontos de TANGÊNCIA (TA, TC) caem EXATAMENTE onde a geometria analítica prevê — não só "a alguma distância certa do centro" (a checagem de raio sozinha não pega uma troca cos/sin: cos²+sin²=1 preserva a distância mesmo com x/y trocados de lugar)', () => {
+    // ângulo reto em B=(1,0), A=(0,0), C=(1,1), raio=0.3 -> TA=(0.7,0), TC=(1,0.3) (bissetriz a 45°, t=raio)
+    // segmentosCurva=1: o arco vira EXATAMENTE 2 pontos, TA e TC, sem interior
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const acharAnel = (raioAlvo: number, yAlvo: number) => {
+      let achou = false;
+      for (const [, p] of n.V) {
+        const raioRev = Math.hypot(p[0], p[2]);
+        if (Math.abs(raioRev - raioAlvo) < 1e-9 && Math.abs(p[1] - yAlvo) < 1e-9) achou = true;
+      }
+      return achou;
+    };
+    expect(acharAnel(0.7, 0)).toBe(true);   // TA
+    expect(acharAnel(1, 0.3)).toBe(true);   // TC
+    // e o par TROCADO (o que uma mutação cos/sin produziria) NÃO existe
+    expect(acharAnel(0.4, 0.3)).toBe(false);
+  });
+
+  it('concordância: custo em vértices/faces é EXATO (soma fechada) — segmentosCurva=1 troca 1 ponto por 2 (TA,TC), então o perfil de 4 pontos vira 5', () => {
+    const semAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {});
+    const comAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
+    // sem alça: 2 polos (raio 0) + 2 anéis de 6 = 2 + 12 = 14 vértices
+    expect(semAlca.V.size).toBe(14);
+    // com alça (segmentosCurva=1): 2 polos + 3 anéis de 6 (o corner virou 2 pontos) = 2 + 18 = 20
+    expect(comAlca.V.size).toBe(20);
+    expect(comAlca.orfaos).toHaveLength(0);
+  });
+
+  it('concordância: raio negativo GRITA e ABORTA (fail-closed, mesma lei do raio<0 do lathe)', () => {
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, -0.1], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/negativo/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('concordância numa PONTA do perfil (caminho aberto, sem vizinho dos dois lados) GRITA e ABORTA', () => {
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0, 0.1], [1, 0], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/ponta/i);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('concordância grande demais (ultrapassa o segmento adjacente) GRITA e ABORTA, nunca constrói um arco errado', () => {
+    // segmento de comprimento 1 (de [1,0] a [1,1]); raio de 5 exige tangência de 5 — impossível
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 5], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/grande demais/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('duas concordâncias vizinhas dividindo o MESMO segmento: soma dos raios cabendo constrói, soma excedendo GRITA (checagem por segmento, não só por ponto)', () => {
+    // segmento [1,0]->[1,1] tem comprimento 1; ambos os pontos vizinhos concordam nesse segmento com t=raio (ângulo reto)
+    const cabe = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.4], [1, 1, 0.4], [0, 1]], lados: 4 }]], {}, {});
+    expect(cabe.orfaos).toHaveLength(0);
+    expect(cabe.V.size).toBeGreaterThan(0);
+    const excede = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.6], [1, 1, 0.6], [0, 1]], lados: 4 }]], {}, {});
+    expect(excede.orfaos).toHaveLength(1);
+    expect(excede.orfaos[0].motivo).toMatch(/mesmo segmento/);
+    expect(excede.V.size).toBe(0);
   });
 
   it('ponto malformado (aridade ≠ 2, ex. [1]) GRITA e ABORTA — não estoura com throw (NIT-3: fail-closed uniforme, não exceção crua)', () => {
@@ -1804,14 +1892,28 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
     expect(n.V.size).toBe(0);
   });
 
-  it.each([
-    ['3 elementos (alça de curva reservada)', [[1, 1], [-1, 1, 99], [-1, -1], [1, -1]]],
-    ['1 elemento', [[1, 1], [-1], [-1, -1], [1, -1]]],
-  ])('ponto do contorno malformado (%s) GRITA e ABORTA — a mesma lei do ponto do perfil no lathe (D-115)', (_nome, contorno) => {
-    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
+  it('ponto do contorno malformado (1 elemento) GRITA e ABORTA — a mesma lei do ponto do perfil no lathe', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno: [[1, 1], [-1], [-1, -1], [1, -1]] }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
     expect(n.orfaos).toHaveLength(1);
-    expect(n.orfaos[0].motivo).toMatch(/2 elementos/);
+    expect(n.orfaos[0].motivo).toMatch(/2 ou 3 elementos/);
     expect(n.V.size).toBe(0);
+  });
+
+  it('Ciclo 5: ponto do contorno com 3º elemento (concordância) grande demais GRITA e ABORTA — não é mais "reservado", mas continua fail-closed', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno: [[1, 1], [-1, 1, 99], [-1, -1], [1, -1]] }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/grande demais/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('Ciclo 5: contorno com concordância válida constrói — segmentosCurva=1 troca 1 corner por 2 pontos (TA,TC), então 3 pontos brutos (1 com raio) viram os 4 (`lados`) exigidos', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, segmentosCurva: 1, secoes: [
+      { pos: [0, 0, 0], raio: 0 },
+      { pos: [0, 1, 0], contorno: [[1, 1], [-1, 1, 0.3], [-1, -1]] },
+      { pos: [0, 2, 0], raio: 0 },
+    ] }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(n.V.size).toBeGreaterThan(0);
   });
 
   it.each([

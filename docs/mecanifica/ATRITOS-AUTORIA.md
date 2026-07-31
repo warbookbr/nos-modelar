@@ -21,6 +21,30 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-35 — `segmentosCurva` é um número por PASSO, não por concordância
+
+**Onde dói:** linguagem da Oficina, nos três lugares que aceitam a alça de
+curva (`lathe`, `contorno` do `loft`, contornos do `inflate`).
+
+**Como apareceu:** ao rodar o ombro do pneu (`roda-dianteira.js`), os dois
+cantos arredondados (flanco->banda de um lado, banda->flanco do outro) usam
+o MESMO `segmentosCurva` porque é um argumento do passo inteiro, não do
+ponto. Funcionou aqui porque os dois raios são iguais (simetria do pneu),
+mas um perfil com uma concordância GRANDE (que pede mais segmentos pra não
+facetar) e outra PEQUENA (que precisaria de menos, por custo) não tem como
+pedir dois números — o autor sobe os dois pro nível do maior, ou aceita
+faceta visível no menor.
+
+**Contorno usado hoje:** escolher um `segmentosCurva` único que sirva pra
+TODAS as concordâncias do passo (o caso do pneu, com raios simétricos,
+esconde o problema).
+
+**Capacidade candidata:** a alça vira `[raio, y, {raio: R, segmentos: N}]`
+(um 3º elemento OBJETO em vez de número puro) — quando o autor quer
+discretização diferente do padrão do passo, declara junto do raio. Objeto
+ausente ou raio puro continua valendo o `segmentosCurva` do passo (aditivo,
+sem quebrar peça existente).
+
 ### A-34 — a silhueta do furo continua poligonal, e isso é forma, não sombreado
 
 **Onde dói:** linguagem da Oficina, na op `furo`; e na leitura que o cliente faz.

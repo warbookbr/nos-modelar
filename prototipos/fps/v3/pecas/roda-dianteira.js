@@ -28,6 +28,12 @@ const MEDIDAS = {
   pneuRaioExterno: 0.340,
   pneuMeiaLargura: 0.110,
   pneuCoroaMeiaLargura: 0.075,
+  /* Ciclo 5 (Curva e filete v1): raio de concordância do OMBRO do pneu — a
+     passagem do flanco (lateral) pra banda de rodagem era uma quina de 135°
+     (vinco); a alça de curva do perfil (o 3º elemento do ponto do `lathe`)
+     arredonda os dois cantos simétricos (o ponto 1 e o ponto 5 do perfil
+     abaixo) por um arco tangente aos dois segmentos adjacentes. */
+  pneuOmbroConcordancia: 0.020,
 
   aroRaioInterno: 0.080,
   aroRaioBase: 0.215,
@@ -56,6 +62,11 @@ export const TOPO = {
   ladosPneu: 40,
   ladosAro: 32,
   ladosTampa: 20,
+  /* discretização da concordância do ombro (Ciclo 5) — TOPO porque muda a
+     CONTAGEM de vértices/faces do pneu (cada corner arredondado vira
+     segmentosCurva+1 pontos em vez de 1). segmentosCurva:3 troca os DOIS
+     cantos do ombro por 4 pontos cada (em vez de 1), custo medido no relato. */
+  pneuOmbroSegmentos: 3,
 };
 
 export const MATERIAIS = {
@@ -101,13 +112,16 @@ export const PASSOS = [
   /* Perfil fechado no plano raio×eixo. O último anel repete o primeiro para
      desenhar a parede interna do pneu; a costura fica dentro da cavidade, onde
      não interfere na leitura externa nem na inspeção por parte. */
-  ['lathe', { origemId: PNEU, lados: 'ladosPneu', perfil: [
+  ['lathe', { origemId: PNEU, lados: 'ladosPneu', segmentosCurva: 'pneuOmbroSegmentos', perfil: [
     ['pneuRaioInterno', 'pneuMeiaLarguraNeg'],
-    ['pneuRaioOmbro', 'pneuMeiaLarguraNeg'],
+    /* os dois pontos do OMBRO (flanco -> banda de rodagem) ganham a alça de
+       curva (Ciclo 5): sem ela, a quina de 135° aqui é o vinco que o gate
+       apontou. */
+    ['pneuRaioOmbro', 'pneuMeiaLarguraNeg', 'pneuOmbroConcordancia'],
     ['pneuRaioExterno', 'pneuCoroaMeiaLarguraNeg'],
     ['pneuRaioExterno', 0],
     ['pneuRaioExterno', 'pneuCoroaMeiaLargura'],
-    ['pneuRaioOmbro', 'pneuMeiaLargura'],
+    ['pneuRaioOmbro', 'pneuMeiaLargura', 'pneuOmbroConcordancia'],
     ['pneuRaioInterno', 'pneuMeiaLargura'],
     ['pneuRaioInterno', 'pneuMeiaLarguraNeg'],
   ] }],
