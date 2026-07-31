@@ -48,6 +48,12 @@ jobs:
       - name: A Oficina recusa salvar peça com id posicional
         run: npm run guarda:salvar
 
+      # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
+      # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
+      # verde nos outros gates. Mesmo motivo e mesmo navegador da linha acima.
+      - name: A bancada mostra as portas que a peça publica
+        run: npm run guarda:portas
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 

@@ -105,13 +105,24 @@ describe('as seis formas de coleção continuam todas cobertas', () => {
 });
 
 describe('uma regra só, de verdade', () => {
-  it('o gate id-cru mede exatamente o que o módulo mede', () => {
-    const passos = [
-      ['pincel', { modo: 'face', faces: [1, 2, 3] }],
-      ['publicarPorta', { nome: 'p', de: { op: 'cubo', id: 300 } }],
-      ['mescla', { de: [4, 5], para: 6 }],
-    ];
-    expect(contarIdCruDoGate(passos)).toEqual(contarIdCru(passos));
+  /* Este caso já foi `expect(contarIdCruDoGate(passos)).toEqual(contarIdCru(passos))`
+     sobre três passos de exemplo, e não podia falhar: `tools/bancadas/id-cru.mjs`
+     REEXPORTA `contarIdCru` deste módulo, então aquilo comparava `f(x)` com
+     `f(x)` para o mesmo `f`. Nenhuma mudança de produção o derrubava, e ele
+     ocupava a linha de um teste real.
+
+     O que ele queria afirmar é o degrau anterior: que não existe uma segunda
+     implementação. Isso se afirma por IDENTIDADE de referência, e não por
+     concordância em exemplos — uma cópia recém-escrita concorda em quase tudo.
+     Foi exatamente assim que as três cópias do A-22 conviveram por dois ciclos:
+     concordavam em tudo, menos na chave `de`. Uma comparação de saídas só
+     acusaria a divergência se o exemplo escolhido caísse justo nela; a
+     identidade acusa a cópia no instante em que ela nasce.
+
+     Se um dia o gate PRECISAR embrulhar a função, este caso fica vermelho e a
+     decisão vira explícita, que é o comportamento desejado. */
+  it('o gate id-cru não tem implementação própria: ele reexporta a MESMA função', () => {
+    expect(contarIdCruDoGate).toBe(contarIdCru);
   });
 
   /* O defeito do A-22 não foi uma regra errada: foi a MESMA regra escrita três
