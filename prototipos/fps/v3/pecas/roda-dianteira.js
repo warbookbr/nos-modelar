@@ -85,6 +85,11 @@ export const ALIASES = [
      para o cubo e para o disco. O núcleo ainda não publica uma porta de volume;
      este alias é a superfície interna do aro, estável para seleções visuais. */
   ['aroAbertura', { origem: { op: 'lathe', id: ARO, faixa: 5 } }],
+  /* as faixas curvas do aro: os dois ombros cônicos, a banda cilíndrica e o
+     furo interno. Ficam de fora as faixas 0 e 4, os anéis planos das laterais. */
+  ['aroBarrilInteiro', { unir: [1, 2, 3, 5].map((faixa) => (
+    { origem: { op: 'lathe', id: ARO, faixa } }
+  )) }],
 ];
 
 const PIVO_EIXO = [0, 0, 0];
@@ -131,7 +136,13 @@ export const PASSOS = [
   ['parte', { nome: 'tampaCentral', sel: { alias: 'tampaCentralInteira' } }],
 
   ['liso', { sel: { alias: 'pneuInteiro' } }],
-  ['liso', { sel: { alias: 'aroInteiro' } }],
+  /* Só as faixas REVOLVIDAS do aro. As faixas 0 e 4 do perfil são anéis planos
+     (mesmo X, raios diferentes): elas são chatas de verdade, e suavizar a normal
+     nelas inclina os cantos contra a faixa cônica vizinha, o que desenha um
+     leque de raios saindo do centro. Isso ficou invisível enquanto o adaptador
+     ignorava `liso`; quando ele passou a ler a marca, o defeito apareceu numa
+     peça que a aplicação põe em cena. Superfície plana não pede suavização. */
+  ['liso', { sel: { alias: 'aroBarrilInteiro' } }],
   ['liso', { sel: { origem: { op: 'cilindro', id: TAMPA_CENTRAL } } }],
 
   ['material', { sel: { grupo: 'pneu' }, usa: 'borracha' }],

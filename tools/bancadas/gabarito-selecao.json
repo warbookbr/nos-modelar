@@ -1,5 +1,5 @@
 {
-  "hashTotal": "3fdf96a0f1cb89bf22ca099a7979cbb40da08fbab71e2a8a483472aefd185765",
+  "hashTotal": "6e74fe5cfd486026bc5c87a91942d0821c4209ccf90c87b6867dfe0044067435",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -122,7 +122,7 @@
       "faces": 1600
     },
     "roda-dianteira": {
-      "hash": "74a1e3fd317e2c6955cf71d1102639ee559c9a8ebf730881b7d8516ca1d418d2",
+      "hash": "0e5b36a68ec1e42b6d5dc2e4cd563f41f4566311889d6d4735fad9ef2862606f",
       "vertices": 584,
       "faces": 494
     },
