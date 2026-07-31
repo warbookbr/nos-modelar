@@ -4617,3 +4617,342 @@ describe('extremidade de eixo x PARAM homônimo', () => {
     expect(n.orfaos.some((o: any) => /parâmetro declarado/.test(o.motivo))).toBe(true);
   });
 });
+
+/* ============================================================================
+   FURO — ciclo "Corte e orientação de seção v1", a primeira SUBTRAÇÃO do núcleo.
+   O risco do item não é geométrico, é de IDENTIDADE: um corte cria dezenas de
+   faces e destrói outras, e sem afirmação que morra o formato salvo passa a
+   depender de coisas que ninguém confere. Então tudo que entra no salvo tem
+   afirmação aqui: a numeração exata, a contagem por família, a orientação de
+   cada normal, a herança de atributo, o casamento angular da borda, e o grito
+   de toda face consumida.
+============================================================================ */
+const PLACA = (furo: any, extra: any[] = []) => [
+  ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+  ['furo', { origemId: 9, ...furo }],
+  ...extra,
+];
+const PASSANTE = { de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 };
+const CEGO = { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 };
+
+/* arestas com saldo ≠ 0 = malha aberta. Um corte que esquecesse a parede, ou
+   que orientasse a borda ao contrário, apareceria aqui e em lugar nenhum. */
+const arestasSoltas = (n: any) => {
+  const m = new Map<string, number>();
+  for (const f of n.F.values()) for (let k = 0; k < f.vs.length; k++) {
+    const a = f.vs[k], b = f.vs[(k + 1) % f.vs.length];
+    const chave = a < b ? `${a}_${b}` : `${b}_${a}`;
+    m.set(chave, (m.get(chave) ?? 0) + (a < b ? 1 : -1));
+  }
+  return [...m.entries()].filter(([, v]) => v !== 0).length;
+};
+const normalDe = (n: any, fid: number) => {
+  const f = n.F.get(fid);
+  let nx = 0, ny = 0, nz = 0;
+  for (let k = 0; k < f.vs.length; k++) {
+    const c = n.V.get(f.vs[k]), d = n.V.get(f.vs[(k + 1) % f.vs.length]);
+    nx += (c[1] - d[1]) * (c[2] + d[2]); ny += (c[2] - d[2]) * (c[0] + d[0]); nz += (c[0] - d[0]) * (c[1] + d[1]);
+  }
+  const l = Math.hypot(nx, ny, nz) || 1;
+  return [nx / l, ny / l, nz / l];
+};
+const pintadas = (n: any, cor: string) => [...n.F.values()].filter((f: any) => f.cor === cor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+describe('furo — numeração é formato salvo', () => {
+  it('passante: 2·lados vértices e 3·lados faces, nos ids exatos do bloco', () => {
+    const n = nucleo(PLACA(PASSANTE) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    // vértices novos: b+0..b+5 (anel de entrada), b+6..b+11 (anel de saída)
+    expect([...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011]);
+    // faces novas: borda b+0..b+5, parede b+6..b+11, borda de saída b+12..b+17
+    expect([...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017]);
+    // as DUAS faces cortadas sumiram da malha, e só elas
+    expect(n.F.has(1)).toBe(false);   // topo do cubo
+    expect(n.F.has(0)).toBe(false);   // fundo do cubo
+    expect([...n.F.keys()].filter((f: number) => f < 1000).sort((a: number, b: number) => a - b)).toEqual([2, 3, 4, 5]);
+    expect(n.V.size).toBe(8 + 12);
+    expect(n.F.size).toBe(4 + 18);
+  });
+
+  it('cego: mesmos 2·lados vértices, mas 2·lados+1 faces — o fundo mora em b+2·lados', () => {
+    const n = nucleo(PLACA(CEGO) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012]);
+    expect(n.F.get(1012).vs).toEqual([1006, 1007, 1008, 1009, 1010, 1011]);   // o fundo é o anel de baixo inteiro
+    expect(n.F.has(0)).toBe(true);    // o fundo do CUBO continua vivo: o furo cego não o toca
+    expect(n.F.has(1)).toBe(false);
+  });
+
+  it('mudar PARAM não renumera; mudar lados (TOPO) renumera', () => {
+    const ids = (n: any) => [...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b);
+    const base = nucleo(PLACA(PASSANTE) as any, {}, {});
+    const outroRaio = nucleo(PLACA({ ...PASSANTE, raio: 0.9 }) as any, {}, {});
+    const outroCentro = nucleo(PLACA({ ...PASSANTE, centro: [1, 0, -0.7] }) as any, {}, {});
+    expect(ids(outroRaio)).toEqual(ids(base));
+    expect(ids(outroCentro)).toEqual(ids(base));
+    expect(n0(outroRaio)).not.toEqual(n0(base));            // a FORMA mudou
+    const outrosLados = nucleo(PLACA({ ...PASSANTE, lados: 10 }) as any, {}, {});
+    expect(ids(outrosLados)).not.toEqual(ids(base));
+    expect(ids(outrosLados)).toHaveLength(30);
+  });
+
+  it('o mesmo passo roda duas vezes com o neutro idêntico', () => {
+    const a = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
+    const b = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+});
+const n0 = (n: any) => n.V.get(1000);
+
+describe('furo — a malha continua fechada e virada para o lado certo', () => {
+  it('passante numa placa: zero aresta solta', () => {
+    expect(arestasSoltas(nucleo(PLACA(PASSANTE) as any, {}, {}))).toBe(0);
+  });
+
+  it('cego numa placa: zero aresta solta', () => {
+    expect(arestasSoltas(nucleo(PLACA(CEGO) as any, {}, {}))).toBe(0);
+  });
+
+  it('a borda herda a normal da face cortada, a parede aponta PARA o eixo e o fundo para a boca', () => {
+    const n = nucleo(PLACA(PASSANTE) as any, {}, {});
+    for (let j = 0; j < 6; j++) {
+      expect(normalDe(n, 1000 + j)[1]).toBeCloseTo(1, 9);        // borda de entrada: +y, como o topo do cubo
+      expect(normalDe(n, 1012 + j)[1]).toBeCloseTo(-1, 9);       // borda de saída: -y, como o fundo do cubo
+      // parede j: a normal aponta do meio da parede PARA o eixo do furo
+      const nrm = normalDe(n, 1006 + j);
+      const a = n.V.get(1000 + j), b = n.V.get(1000 + (j + 1) % 6);
+      const radial = [(a[0] + b[0]) / 2, 0, (a[2] + b[2]) / 2];
+      const l = Math.hypot(radial[0], radial[2]);
+      expect(nrm[0] * radial[0] / l + nrm[2] * radial[2] / l).toBeCloseTo(-1, 6);
+    }
+    const cego = nucleo(PLACA(CEGO) as any, {}, {});
+    expect(normalDe(cego, 1012)[1]).toBeCloseTo(1, 9);           // o fundo olha para a boca do furo
+  });
+
+  it('toda face da borda sai CONVEXA no próprio plano — é para isso que o casamento é ANGULAR', () => {
+    // com casamento por ÍNDICE (floor(j·n/lados)) esta afirmação morre num
+    // quadrado com furo central e lados:8: aparecem quadriláteros reflexos.
+    const n = nucleo(PLACA({ ...PASSANTE, lados: 8 }) as any, {}, {});
+    for (let j = 0; j < 8; j++) for (const fid of [1000 + j, 1016 + j]) {
+      const vs = n.F.get(fid).vs.map((v: number) => n.V.get(v));
+      const nrm = normalDe(n, fid);
+      for (let k = 0; k < vs.length; k++) {
+        const p = vs[k], q = vs[(k + 1) % vs.length], r = vs[(k + 2) % vs.length];
+        const e1 = [q[0] - p[0], q[1] - p[1], q[2] - p[2]];
+        const e2 = [r[0] - q[0], r[1] - q[1], r[2] - q[2]];
+        const cr = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+        expect(cr[0] * nrm[0] + cr[1] * nrm[1] + cr[2] * nrm[2]).toBeGreaterThan(-1e-9);
+      }
+    }
+  });
+
+  it('a borda tem SEMPRE `lados` faces, tanto num quadrado de 4 cantos quanto numa tampa de 12', () => {
+    const tampa = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 1, lados: 12, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, tampa: 'topo' }, saida: { op: 'cilindro', id: 1, tampa: 'fundo' }, centro: [0, 0, 0], raio: 0.4, lados: 6 }],
+    ] as any, {}, {});
+    expect(tampa.orfaos).toEqual([]);
+    expect(arestasSoltas(tampa)).toBe(0);
+    expect([...tampa.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(18);
+  });
+});
+
+describe('furo — toda face nova é endereçável, e as famílias não se confundem', () => {
+  const furo = { op: 'furo', id: 9 };
+  const cores = (extra: any[]) => nucleo(PLACA(PASSANTE, extra) as any, {}, {});
+
+  it('cada família responde pelo que criou, e o furo inteiro pela soma', () => {
+    const n = cores([
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 0 } }, cor: '#100000' }],
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, parede: 'ultima' } }, cor: '#200000' }],
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, saida: { passo: 2, fase: 0 } } }, cor: '#300000' }],
+      ['pincel', { modo: 'face', sel: { origem: furo }, cor: '#400000' }],
+    ]);
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#400000')).toHaveLength(18);            // o furo INTEIRO
+    const so = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 0 } }, cor: '#100000' }]]);
+    expect(pintadas(so, '#100000')).toEqual([1000]);
+    const ult = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, parede: 'ultima' } }, cor: '#200000' }]]);
+    expect(pintadas(ult, '#200000')).toEqual([1011]);
+    const alt = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, saida: { passo: 2, fase: 0 } } }, cor: '#300000' }]]);
+    expect(pintadas(alt, '#300000')).toEqual([1012, 1014, 1016]);
+  });
+
+  it('citar saida num furo CEGO grita; citar tampa num furo PASSANTE grita', () => {
+    const cego = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { ...furo, saida: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(cego.orfaos.some((o: any) => /é um furo CEGO/.test(o.motivo))).toBe(true);
+    expect(pintadas(cego, '#f00')).toEqual([]);
+    const passante = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { ...furo, tampa: 'fundo' } }, cor: '#f00' }]]) as any, {}, {});
+    expect(passante.orfaos.some((o: any) => /é um furo PASSANTE/.test(o.motivo))).toBe(true);
+    expect(pintadas(passante, '#f00')).toEqual([]);
+    // e no cego a tampa RESOLVE, para a face única do fundo
+    const ok = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { ...furo, tampa: 'fundo' } }, cor: '#0f0' }]]) as any, {}, {});
+    expect(ok.orfaos).toEqual([]);
+    expect(pintadas(ok, '#0f0')).toEqual([1012]);
+  });
+
+  it('índice fora do limite grita nomeando a família, em vez de devolver nada', () => {
+    const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 6 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /borda 6 fora do limite da origem furo:9 \(0\.\.5\)/.test(o.motivo))).toBe(true);
+  });
+
+  it('a origem do furo é publicável como PORTA, e a porta entrega as mesmas faces', () => {
+    const n = nucleo(PLACA(PASSANTE, [
+      ['publicarPorta', { nome: 'bocaDoFuro', de: { ...furo, borda: 0 } }],
+      ['parte', { nome: 'boca', sel: { porta: 'bocaDoFuro' } }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.values()].filter((f: any) => f.parte === 'boca').map((f: any) => f.id)).toEqual([1000]);
+  });
+});
+
+describe('furo — face consumida GRITA, nunca some em silêncio', () => {
+  const topo = { op: 'cubo', id: 1, face: 'topo' };
+
+  it('citação EXPLÍCITA da face cortada diz QUEM a comeu e em que passo', () => {
+    const n = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: topo }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+  });
+
+  it('citação em UNIÃO para de PULAR a face consumida: a primitiva inteira vira ERRO', () => {
+    // sem o registro de consumo, `{op:'cubo',id:1}` devolveria 5 faces das 6 e
+    // pintaria "o cubo inteiro" sem a borda do furo — plausível na foto.
+    const n = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(pintadas(n, '#f00')).toEqual([]);
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi consumida pelo furo do passo 1 — a face virou a borda do corte/.test(o.motivo))).toBe(true);
+  });
+
+  it('o mesmo vale para a tampa de um cilindro e para o eixo numérico de uma família', () => {
+    const cil = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 1, lados: 8, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, tampa: 'topo' }, profundidade: 0.3, centro: [0, 0, 0], raio: 0.4, lados: 6 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 1, tampa: 'topo' } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(cil.orfaos.some((o: any) => /consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(cil, '#f00')).toEqual([]);
+    // e o furo numa LATERAL some do eixo numérico do cilindro, também gritando
+    const lateral = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 2, lados: 4, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, lado: 0 }, profundidade: 0.3, centro: [1, 1, 1], raio: 0.3, lados: 6 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 1 } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(lateral.orfaos.some((o: any) => /lado 0 da origem cilindro:1 foi consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(lateral, '#f00')).toEqual([]);
+  });
+
+  it('uma peça SEM furo nenhum continua pulando face removida em silêncio, como sempre', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+      ['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#f00')).toHaveLength(5);
+  });
+});
+
+describe('furo — herança de atributo', () => {
+  it('borda, parede e fundo herdam a face de ENTRADA; a borda de saída herda a de SAÍDA', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#aabbcc' }],
+      ['parte', { nome: 'tampoDaMesa', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['liso', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#112233' }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#aabbcc')).toEqual([5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011]);
+    expect(pintadas(n, '#112233')).toEqual([5012, 5013, 5014, 5015, 5016, 5017]);
+    expect([...n.F.values()].filter((f: any) => f.parte === 'tampoDaMesa').map((f: any) => f.id))
+      .toEqual([5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011]);
+    expect([...n.F.values()].filter((f: any) => f.liso).map((f: any) => f.id)).toHaveLength(12);
+    // no cego a herança da entrada chega ao FUNDO também
+    const cego = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#aabbcc' }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(pintadas(cego, '#aabbcc')).toHaveLength(13);
+    expect(cego.F.get(2012).cor).toBe('#aabbcc');
+  });
+});
+
+describe('furo — orientação declarada da fase do anel', () => {
+  it('o vértice 0 do anel fica na direção declarada, e sem a chave fica no quadro de sempre', () => {
+    const comX = nucleo(PLACA({ ...PASSANTE, orientacao: [1, 0, 0] }) as any, {}, {});
+    expect(comX.orfaos).toEqual([]);
+    expect(comX.V.get(1000)[0]).toBeCloseTo(0.5, 9);
+    expect(comX.V.get(1000)[2]).toBeCloseTo(0, 9);
+    const comZ = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 0, 1] }) as any, {}, {});
+    expect(comZ.V.get(1000)[2]).toBeCloseTo(0.5, 9);
+    expect(comZ.V.get(1000)[0]).toBeCloseTo(0, 9);
+    // a chave é PROJETADA no plano: uma referência oblíqua vale pela componente no plano
+    const obliqua = nucleo(PLACA({ ...PASSANTE, orientacao: [3, 7, 0] }) as any, {}, {});
+    expect(obliqua.V.get(1000)[0]).toBeCloseTo(0.5, 9);
+    // ausente: o quadro determinístico (para a normal +y, o +u é +z)
+    const sem = nucleo(PLACA(PASSANTE) as any, {}, {});
+    expect(sem.V.get(1000)[2]).toBeCloseTo(0.5, 9);
+    expect(JSON.stringify(neutroCanonico(sem))).not.toBe(JSON.stringify(neutroCanonico(comX)));
+  });
+
+  it('orientação paralela à normal da face GRITA e aborta — nunca desempata sozinha', () => {
+    const n = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 1, 0] }) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /é paralela à normal da face/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+    const nulo = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 0, 0] }) as any, {}, {});
+    expect(nulo.orfaos.some((o: any) => /vetor nulo/.test(o.motivo))).toBe(true);
+  });
+});
+
+describe('furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F', () => {
+  const semSaida = (n: any) => [...n.F.keys()].filter((f: number) => f >= 1000).length + [...n.V.keys()].filter((v: number) => v >= 1000).length;
+  const casos: Array<[string, any, RegExp]> = [
+    ['sem origemId', { ...CEGO, origemId: null }, /origemId é obrigatório/],
+    ['os dois modos juntos', { ...PASSANTE, profundidade: 0.4 }, /declare exatamente uma/],
+    ['modo nenhum', { de: { op: 'cubo', id: 1, face: 'topo' }, centro: [0, 0, 0], raio: 0.5 }, /exatamente uma/],
+    ['raio zero', { ...CEGO, raio: 0 }, /raio precisa ser > 0/],
+    ['profundidade zero', { ...CEGO, profundidade: 0 }, /profundidade precisa ser > 0/],
+    ['sem centro', { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, raio: 0.5 }, /furo exige centro/],
+    ['centro com aridade errada', { ...CEGO, centro: [0, 0] }, /centro precisa ser \[x,y,z\]/],
+    ['anel maior que a face', { ...CEGO, raio: 3 }, /não cabe dentro da face de entrada/],
+    ['anel encostando na borda', { ...CEGO, centro: [1.6, 0, 0], raio: 0.5 }, /não cabe dentro da face de entrada/],
+    ['entrada ambígua', { ...CEGO, de: { op: 'cubo', id: 1 } }, /precisa resolver para EXATAMENTE uma face/],
+    ['entrada inexistente', { ...CEGO, de: { op: 'cubo', id: 77 } }, /inexistente ou ainda não criada/],
+    ['saída igual à entrada', { ...PASSANTE, saida: { op: 'cubo', id: 1, face: 'topo' } }, /a saída é a MESMA face da entrada/],
+    ['saída que o eixo não atravessa', { ...PASSANTE, saida: { op: 'cubo', id: 1, face: 'frente' } }, /não ATRAVESSA a face de saída/],
+  ];
+  for (const [nome, furo, esperado] of casos) {
+    it(`${nome}: grita e não cria nada`, () => {
+      const n = nucleo(PLACA(furo) as any, {}, {});
+      expect(n.orfaos.some((o: any) => esperado.test(o.motivo))).toBe(true);
+      expect(semSaida(n)).toBe(0);
+      expect(n.F.has(1)).toBe(true);      // a face de entrada continua INTEIRA
+      expect(n.V.size).toBe(8);
+    });
+  }
+
+  it('face NÃO-PLANA grita: não existe plano de entrada para inventar', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 4, d: [0, 0.5, 0] }],   // levanta um canto do topo
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /não é plana/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 2000)).toEqual([]);
+  });
+
+  it('face CÔNCAVA grita: o furo só corta convexo, e isso é decisão declarada', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 4, d: [3, 0, 3] }],     // puxa um canto do topo para dentro
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0.5, 0, 0.5], raio: 0.2, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /CÔNCAVO/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 2000)).toEqual([]);
+  });
+});

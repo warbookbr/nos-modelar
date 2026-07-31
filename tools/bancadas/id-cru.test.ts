@@ -157,11 +157,18 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const COLECAO_DE_ID = ['faces', 'vs', 'pontos', 'de'];      // cobertas pelo gate
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
-    'alt', 'altura', 'amplitude', 'aneis', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
+    'alt', 'altura', 'amplitude', 'aneis', 'centro', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
-    'profundidade', 'raio', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
+    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
+  /* `saida` (op `furo`) entra aqui, e não em COLECAO_DE_ID, pela MESMA razão do
+     `derivaDe`: ela é uma ORIGEM ESTRUTURAL (`{op,id,…}`), não uma lista de ids.
+     O `furo` recusa qualquer outra forma — `faceUnicaEstrutural` passa por
+     `validarOrigem` antes de olhar para a malha —, então não existe caminho em
+     que essa chave carregue id cru. Se um dia ela aceitar `{f:[…]}`, este teste
+     não pega; o que pega é a linha acima deixar de descrever a chave, e por
+     isso a razão fica escrita aqui, junto da classificação. */
   const CONTAINER = ['sel'];
 
   it('as chaves lidas pelas OPS são exatamente as classificadas', () => {
