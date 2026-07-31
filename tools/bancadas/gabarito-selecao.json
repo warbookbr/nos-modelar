@@ -1,5 +1,5 @@
 {
-  "hashTotal": "a65acd51e534223580dc0739c81b14d58782fdb22e2c61f16e4ec362cf625a33",
+  "hashTotal": "167e6e0023e37eff0036576485dbeffdd562540ce38147b1de4e3002ed168bbf",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -55,6 +55,11 @@
       "hash": "aae80e62c42bad0a9a99cb1e29432f3f5b86f7828b4c6015ad71a740929202d6",
       "vertices": 24,
       "faces": 26
+    },
+    "_prateleira-furada": {
+      "hash": "7ae8205b9ce48970188134ec459c834165dbc3a244543f9f4610bb673d5732a5",
+      "vertices": 112,
+      "faces": 116
     },
     "_primitivas": {
       "hash": "91e77f82e01e417c96815c4b82d6f5e5552f626e921b1d72f810565b11185099",

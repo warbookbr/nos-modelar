@@ -4699,6 +4699,18 @@ describe('furo — numeração é formato salvo', () => {
     expect(ids(outrosLados)).toHaveLength(30);
   });
 
+  it('`lados` abaixo de 3 é preso em 3, a mesma convenção do cilindro/cone/esfera', () => {
+    const n = nucleo(PLACA({ ...PASSANTE, lados: 2 }) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(9);   // 3·3, não 3·2
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(6);
+    expect(arestasSoltas(n)).toBe(0);
+  });
+
+  it('um furo que estouraria o bloco de ids GRITA ALTO (throw), como as outras primitivas', () => {
+    expect(() => nucleo(PLACA({ ...PASSANTE, lados: BLOCO }) as any, {}, {})).toThrow(/estoura o bloco de ids/);
+  });
+
   it('o mesmo passo roda duas vezes com o neutro idêntico', () => {
     const a = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
     const b = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
@@ -4799,6 +4811,12 @@ describe('furo — toda face nova é endereçável, e as famílias não se confu
     expect(n.orfaos.some((o: any) => /borda 6 fora do limite da origem furo:9 \(0\.\.5\)/.test(o.motivo))).toBe(true);
   });
 
+  it('chave desconhecida na origem do furo GRITA com o vocabulário certo, em vez de ser ignorada', () => {
+    const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, lado: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /furo usa op, id, borda\/parede\/saida opcionais/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+  });
+
   it('a origem do furo é publicável como PORTA, e a porta entrega as mesmas faces', () => {
     const n = nucleo(PLACA(PASSANTE, [
       ['publicarPorta', { nome: 'bocaDoFuro', de: { ...furo, borda: 0 } }],
@@ -4842,6 +4860,23 @@ describe('furo — face consumida GRITA, nunca some em silêncio', () => {
     ] as any, {}, {});
     expect(lateral.orfaos.some((o: any) => /lado 0 da origem cilindro:1 foi consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
     expect(pintadas(lateral, '#f00')).toEqual([]);
+  });
+
+  it('num furo PASSANTE a face de SAÍDA também é registrada, não só a de entrada', () => {
+    const n = nucleo(PLACA(PASSANTE, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#f00' }],
+    ]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'fundo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+    // e na UNIÃO da primitiva inteira o grito também nomeia a saída
+    const uniao = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+      ['apagaFace', { sel: { origem: { op: 'furo', id: 9, borda: 0 } } }],   // some com a borda: a entrada some do caminho
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#0f0' }],
+    ] as any, {}, {});
+    expect(uniao.orfaos.some((o: any) => /da origem cubo:1 foi consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(uniao, '#0f0')).toEqual([]);
   });
 
   it('uma peça SEM furo nenhum continua pulando face removida em silêncio, como sempre', () => {
@@ -4935,6 +4970,21 @@ describe('furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F', (
       expect(n.V.size).toBe(8);
     });
   }
+
+  it('saída ATRÁS da entrada ao longo do eixo grita — o furo sairia antes de entrar', () => {
+    // a normal da saída atravessa (é -y, como o eixo), mas a face está ACIMA da
+    // entrada: sem o teste de distância, o furo se estenderia para trás.
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['cubo', { id: 1000, larg: 4, alt: 1, prof: 4, origemId: 2 }],
+      ['transladar', { d: [0, 2, 0], sel: { origem: { op: 'cubo', id: 2 } } }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 2, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /está ATRÁS da entrada ao longo do eixo/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+    expect(n.F.has(1)).toBe(true);
+    expect(n.F.has(1000)).toBe(true);
+  });
 
   it('face NÃO-PLANA grita: não existe plano de entrada para inventar', () => {
     const n = nucleo([
