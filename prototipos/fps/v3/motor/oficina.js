@@ -1571,6 +1571,135 @@ function triangularComAneis(contorno, aneis, escala) {
   return { bordas, preenchimento };
 }
 
+/* ----------------------------------------------------------------------------
+   CONCORDÂNCIA (curva de perfil) — Ciclo 5 "Curva e filete v1". A alça de
+   curva reservada no 3º elemento de um ponto 2D (perfil do lathe, contorno do
+   loft, contornos do inflate) é um RAIO DE CONCORDÂNCIA (fillet): substitui a
+   quina que aquele ponto faz entre o segmento anterior e o seguinte por um
+   ARCO analítico tangente aos dois, no MESMO plano 2D do ponto.
+
+   POR QUE ARCO (e não tangente solta, nem Bézier quadrática) — decidido por
+   MEDIÇÃO, não por gosto, porque é o próprio crivo do gate (condição 2: "sai
+   a menos de 1% do raio em toda amostra"): um arco de raio r é a ÚNICA das
+   três formas em que TODO ponto amostrado fica a distância EXATAMENTE r do
+   centro, por construção — o erro medido é só arredondamento de ponto
+   flutuante (~1e-13), não erro de método. Uma Bézier quadrática *aproxima*
+   um círculo mas não é um: o erro de raio cresce com o ângulo da curva, não
+   dá pra prometer <1% em qualquer amostra sem medir caso a caso. Uma
+   tangente sozinha não é uma curva, é só uma direção — não teria "raio" pra
+   medir contra. E nenhuma trigonometria entra no FORMATO SALVO: o autor
+   escreve só o número do raio (`[a, b, raio]` — "raio de concordância de
+   8 mm" é a frase, sem seno nem cosseno); todo cos/sin fica dentro do
+   núcleo, na hora de gerar a amostra.
+
+   FORMATO: ponto = [a,b] (2 elementos, canto reto — como sempre) ou
+   [a,b,raio] (3 elementos — a alça: `raio` no MESMO plano 2D do ponto,
+   resolvido por `st.num` como qualquer campo dimensional, então pode citar
+   PARAM). `raio` ausente ou `0` é reto — byte-idêntico ao comportamento sem
+   a alça. `raio<0` ou não-numérico GRITA e ABORTA (fail-closed).
+
+   SÓ FAZ SENTIDO num ponto com vizinho dos DOIS lados: num caminho ABERTO
+   (perfil do lathe), a alça na PRIMEIRA ou na ÚLTIMA posição GRITA — não há
+   segmento anterior/seguinte para concordar. Num polígono FECHADO (contorno
+   do loft, contornos do inflate), todo ponto tem os dois vizinhos (o
+   anterior e o seguinte ciclam), então qualquer ponto pode ter alça.
+
+   DISCRETIZAÇÃO: `segmentosCurva` (PARAM, inteiro >=1, default 8) no NÍVEL
+   DO PASSO — "a discretização que o autor pedir" do gate, uma frase só,
+   valendo para toda alça daquele passo.
+
+   GEOMETRIA (ponto B com vizinhos A,C, coordenadas [x,y] resolvidas):
+     u1 = norm(A-B), u2 = norm(C-B)            direções unitárias
+     theta = ângulo(u1,u2)                     ângulo interno em B
+     t = raio / tan(theta/2)                   distância de B às tangências
+     TA = B + u1*t, TC = B + u2*t               pontos de tangência
+     bis = norm(u1+u2)                          bissetriz interna
+     centro = B + bis * (raio / sin(theta/2))
+   O arco vai de TA a TC (o arco menor, do lado de B), amostrado em
+   `segmentosCurva` sub-segmentos ⇒ `segmentosCurva+1` pontos, incluindo as
+   duas pontas — TA exatamente no primeiro, TC exatamente no último. O ponto
+   B ORIGINAL é SUBSTITUÍDO pela sequência do arco (nunca aparece na saída).
+
+   VALIDAÇÃO (fail-closed — GRITA e ABORTA O PASSO, nunca escolhe sozinho):
+   segmento adjacente de comprimento ~zero; ângulo ~0 ou ~π (degenerado —
+   quina já reta, nada a arredondar); `t` não-finito, <=0, ou maior que o
+   comprimento do PRÓPRIO segmento adjacente; e — checagem por SEGMENTO, não
+   só por ponto — a SOMA dos `t` das duas concordâncias que dividem o mesmo
+   segmento (uma de cada ponta) não pode passar do comprimento dele, senão
+   as duas tangências se cruzariam em silêncio. */
+function normalizar2(dx, dy) { const l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; }
+
+function arcoDeConcordancia(A, B, C, raio) {
+  const len1 = Math.hypot(A[0] - B[0], A[1] - B[1]);
+  const len2 = Math.hypot(C[0] - B[0], C[1] - B[1]);
+  if (!(len1 > 1e-9) || !(len2 > 1e-9)) return { erro: 'segmento adjacente de comprimento zero — sem direção pra tangenciar' };
+  const u1 = normalizar2(A[0] - B[0], A[1] - B[1]);
+  const u2 = normalizar2(C[0] - B[0], C[1] - B[1]);
+  const cosT = Math.max(-1, Math.min(1, u1[0] * u2[0] + u1[1] * u2[1]));
+  const theta = Math.acos(cosT);
+  if (theta < 1e-6 || theta > Math.PI - 1e-6) return { erro: `ângulo degenerado (${(theta * 180 / Math.PI).toFixed(3)}°) — concordância não tem quina pra arredondar` };
+  const t = raio / Math.tan(theta / 2);
+  if (!(t > 0) || !Number.isFinite(t)) return { erro: `distância de tangência inválida (t=${t})` };
+  if (t > len1 || t > len2) return { erro: `raio de concordância (${raio}) grande demais: a tangência (${t.toFixed(6)}) ultrapassa o segmento adjacente (mín ${Math.min(len1, len2).toFixed(6)})` };
+  const bisLen = Math.hypot(u1[0] + u2[0], u1[1] + u2[1]);
+  if (!(bisLen > 1e-9)) return { erro: 'bissetriz degenerada' };
+  const bux = (u1[0] + u2[0]) / bisLen, buy = (u1[1] + u2[1]) / bisLen;
+  const distCentro = raio / Math.sin(theta / 2);
+  const centro = [B[0] + bux * distCentro, B[1] + buy * distCentro];
+  const TA = [B[0] + u1[0] * t, B[1] + u1[1] * t];
+  const TC = [B[0] + u2[0] * t, B[1] + u2[1] * t];
+  return { t, TA, TC, centro, raio };
+}
+
+/* Expande uma lista de pontos 2D (cada um `[a,b]` ou `[a,b,raio]`) numa lista
+   PLANA de `[a,b]` prontos para o algoritmo de cursor/faces existente — o
+   lathe/loft/inflate continuam com EXATAMENTE o mesmo código de numeração de
+   sempre, cego a se um ponto veio direto do autor ou de um arco. `fechado`
+   diz se os vizinhos do primeiro/último ponto se ciclam (contorno/polígono)
+   ou não (perfil aberto do lathe). Devolve `{pontos}` ou `{erro:true}` (já
+   gritado) — nunca os dois; erro aborta o passo inteiro, sem construir nada
+   (fail-closed, a mesma lei de todo ponto malformado no núcleo). */
+function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurva }) {
+  const n = pontosBrutos.length;
+  const arcos = new Array(n).fill(null);
+  for (let k = 0; k < n; k++) {
+    const pt = pontosBrutos[k];
+    const raio = pt.length === 3 ? pt[2] : 0;
+    if (!(raio >= 0)) { grita(st, i, op, k, `raio de concordância negativo ou inválido (${raio}) no ponto ${k}`); return { erro: true }; }
+    if (raio === 0) continue;
+    const temVizinhos = fechado || (k > 0 && k < n - 1);
+    if (!temVizinhos) { grita(st, i, op, k, `ponto ${k} tem raio de concordância mas é uma PONTA do caminho aberto (sem vizinho dos dois lados) — concordância só faz sentido num ponto interior`); return { erro: true }; }
+    const A = fechado ? pontosBrutos[(k - 1 + n) % n] : pontosBrutos[k - 1];
+    const C = fechado ? pontosBrutos[(k + 1) % n] : pontosBrutos[k + 1];
+    const arco = arcoDeConcordancia(A, pt, C, raio);
+    if (arco.erro) { grita(st, i, op, k, `concordância do ponto ${k}: ${arco.erro}`); return { erro: true }; }
+    arcos[k] = arco;
+  }
+  // soma de `t` por SEGMENTO (concordâncias vizinhas não podem se sobrepor)
+  const limite = fechado ? n : n - 1;
+  for (let k = 0; k < limite; k++) {
+    const k2 = (k + 1) % n;
+    const segLen = Math.hypot(pontosBrutos[k2][0] - pontosBrutos[k][0], pontosBrutos[k2][1] - pontosBrutos[k][1]);
+    const tA = arcos[k] ? arcos[k].t : 0, tB = arcos[k2] ? arcos[k2].t : 0;
+    if (tA + tB > segLen + 1e-9) { grita(st, i, op, k, `concordâncias dos pontos ${k} e ${k2} disputam o mesmo segmento (${(tA + tB).toFixed(6)} > ${segLen.toFixed(6)}) — reduza os raios`); return { erro: true }; }
+  }
+  const pontos = [];
+  for (let k = 0; k < n; k++) {
+    const arco = arcos[k];
+    if (!arco) { pontos.push([pontosBrutos[k][0], pontosBrutos[k][1]]); continue; }
+    const angA = Math.atan2(arco.TA[1] - arco.centro[1], arco.TA[0] - arco.centro[0]);
+    const angC = Math.atan2(arco.TC[1] - arco.centro[1], arco.TC[0] - arco.centro[0]);
+    let delta = angC - angA;
+    while (delta > Math.PI) delta -= Math.PI * 2;
+    while (delta < -Math.PI) delta += Math.PI * 2;
+    for (let s = 0; s <= segmentosCurva; s++) {
+      const ang = angA + delta * (s / segmentosCurva);
+      pontos.push([arco.centro[0] + Math.cos(ang) * arco.raio, arco.centro[1] + Math.sin(ang) * arco.raio]);
+    }
+  }
+  return { pontos };
+}
+
 /* exportado (P7 do playground, D-120): o MANIFESTO de capacidades da Oficina
    sai daqui — `Object.keys(OPS)` é a lista de ops IMPLEMENTADAS de verdade,
    nunca precisa ser copiada à mão num doc que pode desatualizar. A bancada
@@ -1889,21 +2018,36 @@ export const OPS = {
     if (perfil.length < 2) return grita(st, i, 'lathe', perfil.length, `perfil precisa de ao menos 2 pontos (tem ${perfil.length})`);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO (pra TODO o perfil): muda a CONTAGEM
 
-    /* resolve + valida CADA ponto ANTES de criar qualquer vértice (raio/y podem
-       citar PARAM, como os outros pontos dimensionais da Oficina). FAIL-CLOSED
-       (D-115): um ponto que não seja EXATAMENTE [raio, y] (2 elementos) — 3+
-       (a alça de curva RESERVADA, ainda não implementada) ou <2 (malformado) —
-       GRITA e ABORTA o passo inteiro (0 V/0 F), como o raio<0. Nunca constrói
-       malha "plausível-porém-reservada" que mudaria de figura quando a curva
-       chegar: reserva de formato salvo é fail-closed, não fail-open. */
+    /* resolve + valida CADA ponto ANTES de criar qualquer vértice (raio/y — e o
+       3º elemento opcional, a concordância — podem citar PARAM, como os outros
+       campos dimensionais da Oficina). FAIL-CLOSED (D-115): um ponto que não
+       seja [raio,y] (2 elementos, canto reto) ou [raio,y,concordancia]
+       (3 elementos — Ciclo 5, a alça de curva que era RESERVADA) — aridade
+       diferente, ou não-array — GRITA e ABORTA o passo inteiro (0 V/0 F), como
+       o raio<0. Nunca constrói malha "quase" que mudaria de figura depois. */
     let pontoInvalido = false;
-    const pontos = perfil.map((pt, j) => {
-      if (!Array.isArray(pt) || pt.length !== 2) { grita(st, i, 'lathe', j, `ponto ${j} do perfil precisa ser [raio, y] (2 elementos); recebido ${Array.isArray(pt) ? `${pt.length} elemento(s)` : 'não-array'} — a alça de curva (3º elemento) está RESERVADA, ainda não implementada`); pontoInvalido = true; return { raio: 0, y: 0, polo: true }; }
+    const brutos = perfil.map((pt, j) => {
+      if (!Array.isArray(pt) || (pt.length !== 2 && pt.length !== 3)) { grita(st, i, 'lathe', j, `ponto ${j} do perfil precisa ser [raio,y] (canto reto) ou [raio,y,concordancia] (2 ou 3 elementos); recebido ${Array.isArray(pt) ? `${pt.length} elemento(s)` : 'não-array'}`); pontoInvalido = true; return [0, 0]; }
+      // st.num NÃO é protegido por try/catch de propósito: valor não-finito ou
+      // não-numérico é a MESMA lei de todo campo dimensional da Oficina — THROW
+      // alto, mata a peça inteira (a rede central de `criarResolverNumerico`).
       const raio = st.num(pt[0]), y = st.num(pt[1]);
-      if (raio < 0) { grita(st, i, 'lathe', j, `raio negativo (${raio}) no ponto ${j} do perfil — não dá pra classificar polo/anel`); pontoInvalido = true; }
+      return pt.length === 3 ? [raio, y, st.num(pt[2])] : [raio, y];
+    });
+    if (pontoInvalido) return;   // algum ponto inválido (aridade errada) -> nada construído neste passo
+
+    const segmentosCurva = Math.max(1, st.num(a.segmentosCurva ?? 8) | 0);   // discretização das concordâncias deste passo
+    const exp = expandirConcordancias(st, i, 'lathe', brutos, { fechado: false, segmentosCurva });
+    if (exp.erro) return;   // concordância inválida -> nada construído neste passo (grita já registrado)
+
+    // classifica polo/anel SOBRE O EXPANDIDO (um arco pode expor raio<0 se a concordância vaza o eixo)
+    let pontoInvalido2 = false;
+    const pontos = exp.pontos.map((p, j) => {
+      const raio = p[0], y = p[1];
+      if (raio < 0) { grita(st, i, 'lathe', j, `raio negativo (${raio}) no ponto ${j} do perfil expandido — não dá pra classificar polo/anel`); pontoInvalido2 = true; }
       return { raio, y, polo: raio === 0 };
     });
-    if (pontoInvalido) return;   // algum ponto inválido (aridade ≠ 2, ou raio<0) -> nada construído neste passo (grita já registrado por ponto)
+    if (pontoInvalido2) return;
 
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de inserir
     let nV = 0; for (const p of pontos) nV += p.polo ? 1 : L;
@@ -1966,9 +2110,11 @@ export const OPS = {
      overflow, que só enxergam "polo ou anel de `lados` vértices", nunca a
      ORIGEM das coordenadas. `raio` e `contorno` são MUTUAMENTE EXCLUSIVOS
      numa seção (os dois juntos GRITA — ambíguo); nenhum dos dois GRITA
-     também. Cada ponto do contorno é `[u,w]` (2 elementos); a alça de curva
-     é RESERVADA no 3º elemento — GRITA e ABORTA, a mesma lei do ponto do
-     perfil no lathe (D-115). Contagem errada (≠ `lados`) GRITA e ABORTA.
+     também. Cada ponto do contorno é `[u,w]` (canto reto) ou
+     `[u,w,concordancia]` (Ciclo 5 — a alça de curva no 3º elemento, um raio
+     de fillet expandido ANTES de contar os `lados` pontos; ver
+     `expandirConcordancias`). Contagem, DEPOIS de expandir (≠ `lados`) GRITA
+     e ABORTA — sem concordância nenhuma é a mesma contagem de sempre.
      Winding OBRIGATORIAMENTE CCW (ângulo crescente no círculo já É CCW em
      u,w) — validado por ÁREA COM SINAL (shoelace): CW ou degenerado (área
      ~0) GRITA e ABORTA, porque silenciosamente produziria normal invertida
@@ -2078,6 +2224,7 @@ export const OPS = {
     const secoesArg = a.secoes ?? [];
     if (secoesArg.length < 2) return grita(st, i, 'loft', secoesArg.length, `secoes precisa de ao menos 2 (tem ${secoesArg.length})`);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO (pra TODA seção): muda a CONTAGEM
+    const segmentosCurva = Math.max(1, st.num(a.segmentosCurva ?? 8) | 0);   // discretização das concordâncias (Ciclo 5), uma vez por passo
 
     /* ORIENTAÇÃO DECLARADA DA SEÇÃO (`orientacao`, opcional, `[x,y,z]` via
        `st.vec` — pode citar PARAM, como `pos`/`d`/`pivo`). É a resposta ao
@@ -2140,21 +2287,31 @@ export const OPS = {
         return { pos, raio, contorno: null, polo: raio === 0 };
       }
 
-      /* CONTORNO explícito (P5): substitui o círculo por EXATAMENTE `lados`
-         pontos [u,w] no plano LOCAL do anel (os mesmos eixos fr.u/fr.w do
-         transporte paralelo) — a contagem/numeração/faces do anel não mudam
-         em NADA (só a origem das coordenadas de cada vértice), então toda a
-         guarda de overflow e o cursor de face seguem intactos. Nunca é polo
-         (polo é só raio:0 explícito). Ponto malformado (aridade ≠ 2 — a alça
-         de curva reservada seria o 3º elemento, mesma lei do lathe/D-115) e
-         contorno com contagem errada GRITAM e ABORTAM. */
-      if (!Array.isArray(s.contorno) || s.contorno.length !== L) { grita(st, i, 'loft', j, `contorno da seção ${j} precisa ter exatamente 'lados' (${L}) pontos [u,w] (tem ${Array.isArray(s.contorno) ? s.contorno.length : typeof s.contorno})`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+      /* CONTORNO explícito (P5): substitui o círculo por um polígono no plano
+         LOCAL do anel (os mesmos eixos fr.u/fr.w do transporte paralelo) que,
+         DEPOIS de expandir as concordâncias (Ciclo 5), tem EXATAMENTE `lados`
+         pontos [u,w] — a contagem/numeração/faces do anel não mudam em NADA
+         (só a origem das coordenadas de cada vértice), então toda a guarda de
+         overflow e o cursor de face seguem intactos. Nunca é polo (polo é só
+         raio:0 explícito). Ponto malformado (aridade ≠ 2 e ≠ 3 — o 3º elemento
+         é a alça de concordância, mesma lei do lathe) e contagem EXPANDIDA
+         errada GRITAM e ABORTAM. Autor sem concordância continua escrevendo
+         EXATAMENTE `lados` pontos de 2 elementos, byte a byte como antes
+         (nenhum ponto tem alça -> expansão é identidade). */
+      if (!Array.isArray(s.contorno) || s.contorno.length < 1) { grita(st, i, 'loft', j, `contorno da seção ${j} precisa ser uma lista de pontos [u,w] ou [u,w,concordancia] (recebido ${Array.isArray(s.contorno) ? `${s.contorno.length} ponto(s)` : typeof s.contorno})`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
       let pontoInvalido = false;
-      const pts = s.contorno.map((pt, k) => {
-        if (!Array.isArray(pt) || pt.length !== 2) { grita(st, i, 'loft', j, `ponto ${k} do contorno da seção ${j} precisa ser [u,w] (2 elementos); a alça de curva (3º elemento) está RESERVADA, ainda não implementada`); pontoInvalido = true; return [0, 0]; }
-        return [st.num(pt[0]), st.num(pt[1])];
+      const brutosContorno = s.contorno.map((pt, k) => {
+        if (!Array.isArray(pt) || (pt.length !== 2 && pt.length !== 3)) { grita(st, i, 'loft', j, `ponto ${k} do contorno da seção ${j} precisa ser [u,w] ou [u,w,concordancia] (2 ou 3 elementos); recebido ${Array.isArray(pt) ? `${pt.length} elemento(s)` : 'não-array'}`); pontoInvalido = true; return [0, 0]; }
+        // st.num sem try/catch de propósito — mesma lei do lathe: valor
+        // dimensional não-finito/inválido é THROW alto, nunca grita macia.
+        const u = st.num(pt[0]), w = st.num(pt[1]);
+        return pt.length === 3 ? [u, w, st.num(pt[2])] : [u, w];
       });
       if (pontoInvalido) { invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+      const expC = expandirConcordancias(st, i, 'loft', brutosContorno, { fechado: true, segmentosCurva });
+      if (expC.erro) { invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+      if (expC.pontos.length !== L) { grita(st, i, 'loft', j, `contorno da seção ${j}, depois de expandir as concordâncias, tem ${expC.pontos.length} pontos — precisa ter exatamente 'lados' (${L})`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+      const pts = expC.pontos;
 
       /* winding CCW obrigatório (shoelace) — a MESMA convenção do círculo
          (ângulo crescente = CCW em u,w): CW ou degenerado (área ~0) seria
@@ -2291,10 +2448,11 @@ export const OPS = {
      suave — a mesma classe do "lathe só reto por enquanto" (D-115): útil hoje,
      suavizar (ex. marching cubes) fica pra quando o caso real pedir.
 
-     ARGS: `contornoLado`/`contornoTopo`: `[[a,b],...]` (≥3 pontos cada, PARAM
-     via `st.num`) — a MESMA lei do `contorno` do loft (D-118): ponto com
-     aridade ≠ 2 é a alça de curva RESERVADA, GRITA e ABORTA o passo inteiro
-     (fail-closed, D-115). `divisoes` (TOPO, mín 2): subdivide o EIXO MAIS
+     ARGS: `contornoLado`/`contornoTopo`: `[[a,b],...]` ou `[[a,b,concordancia],
+     ...]` (≥3 pontos cada, PARAM via `st.num`) — a MESMA lei do `contorno` do
+     loft: cada ponto pode ter um raio de concordância no 3º elemento (Ciclo
+     5), expandido em arco ANTES do teste ponto-em-polígono; aridade ≠ 2 e ≠ 3
+     GRITA e ABORTA o passo inteiro (fail-closed, D-115). `divisoes` (TOPO, mín 2): subdivide o EIXO MAIS
      LONGO da caixa combinada em `divisoes` voxels; os outros dois eixos ganham
      a MESMA aresta de voxel (proporcional, não igual contagem) — um voxel
      cúbico, não um grid distorcido.
@@ -2324,14 +2482,27 @@ export const OPS = {
     const b = confereId(st, i, 'inflate', a);
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'inflate', 'origemId', 'origemId precisa ser inteiro não-negativo');
 
-    const validaContorno = (pontos, nome) => {
-      if (!Array.isArray(pontos) || pontos.length < 3) { grita(st, i, 'inflate', nome, `${nome} precisa de ao menos 3 pontos (tem ${Array.isArray(pontos) ? pontos.length : typeof pontos})`); return null; }
+    const segmentosCurva = Math.max(1, st.num(a.segmentosCurva ?? 8) | 0);   // discretização das concordâncias (Ciclo 5), uma vez por passo
+
+    /* pontos [a,b] (canto reto, como sempre) ou [a,b,concordancia] (Ciclo 5 —
+       a alça de curva que era RESERVADA): expande as concordâncias ANTES do
+       teste ponto-em-polígono — o contorno em si nunca vira vértice/face
+       (inflate não tem fórmula fechada, é a grade de voxel), então arredondar
+       um canto aqui é só melhorar a SILHUETA que `dentroPoligono` enxerga. Sem
+       concordância nenhuma, a expansão é identidade — byte a byte como antes. */
+    const validaContorno = (pontosBrutos, nome) => {
+      if (!Array.isArray(pontosBrutos) || pontosBrutos.length < 3) { grita(st, i, 'inflate', nome, `${nome} precisa de ao menos 3 pontos (tem ${Array.isArray(pontosBrutos) ? pontosBrutos.length : typeof pontosBrutos})`); return null; }
       let ruim = false;
-      const out = pontos.map((pt, k) => {
-        if (!Array.isArray(pt) || pt.length !== 2) { grita(st, i, 'inflate', `${nome}[${k}]`, `ponto ${k} de ${nome} precisa ser [a,b] (2 elementos); a alça de curva (3º elemento) está RESERVADA, ainda não implementada`); ruim = true; return [0, 0]; }
-        return [st.num(pt[0]), st.num(pt[1])];
+      const brutos = pontosBrutos.map((pt, k) => {
+        if (!Array.isArray(pt) || (pt.length !== 2 && pt.length !== 3)) { grita(st, i, 'inflate', `${nome}[${k}]`, `ponto ${k} de ${nome} precisa ser [a,b] ou [a,b,concordancia] (2 ou 3 elementos); recebido ${Array.isArray(pt) ? `${pt.length} elemento(s)` : 'não-array'}`); ruim = true; return [0, 0]; }
+        // st.num sem try/catch de propósito — mesma lei do lathe/loft: valor
+        // dimensional não-finito/inválido é THROW alto, nunca grita macia.
+        const x = st.num(pt[0]), y = st.num(pt[1]);
+        return pt.length === 3 ? [x, y, st.num(pt[2])] : [x, y];
       });
-      return ruim ? null : out;
+      if (ruim) return null;
+      const exp = expandirConcordancias(st, i, 'inflate', brutos, { fechado: true, segmentosCurva });
+      return exp.erro ? null : exp.pontos;
     };
     const lado = validaContorno(a.contornoLado, 'contornoLado');
     const topo = validaContorno(a.contornoTopo, 'contornoTopo');

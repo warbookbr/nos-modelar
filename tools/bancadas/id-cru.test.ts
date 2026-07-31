@@ -160,7 +160,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
     'alt', 'altura', 'amplitude', 'aneis', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
-    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
+    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
   /* `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
      do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
