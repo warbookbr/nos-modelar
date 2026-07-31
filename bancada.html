@@ -95,6 +95,14 @@
           <span class="rotulo">DIAGNÓSTICO</span>
           <p>Preparando relatório da peça…</p>
         </div>
+
+        <!-- A-20: a porta publicada precisa existir fora do núcleo. Fica FECHADA
+             e some quando a peça não publica nenhuma: uma linha quando há o que
+             dizer, zero linha quando não há. -->
+        <details id="portasPublicadas" class="portas" hidden>
+          <summary><span class="rotulo">PORTAS</span> <span id="resumoPortas">0 publicadas</span></summary>
+          <ul id="listaPortas" class="lista-portas"></ul>
+        </details>
       </aside>
 
       <footer class="rodape">

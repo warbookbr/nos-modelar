@@ -12,7 +12,9 @@
  * Prova os DOIS lados, senão a guarda seria só um bloqueio:
  *   - peça LIMPA (`_vao-e-anteparo`, sem referência posicional) salva normal;
  *   - depois de UMA edição posicional, o mesmo botão recusa;
- *   - Ctrl+Z desfaz a edição e o botão volta a salvar.
+ *   - Ctrl+Z desfaz a edição e o botão volta a salvar;
+ *   - a peça com PORTAS semânticas (`_jardineira`, 5 `publicarPorta`) salva
+ *     normal: `de:{op,id}` é origem estrutural, não coleção de id (A-22).
  *
  * E prova nos DOIS caminhos de saída, em servidores diferentes:
  *   - com a rota real do `servir.mjs` (pecas/ num dir TEMP, nunca o rastreado):
@@ -26,12 +28,18 @@
  * bancadas headless usam, passa pela mesma guarda que o botão. Antes do conserto
  * desta rodada ele escrevia o arquivo recusado em pecas/ sem passar por ela.
  *
- * O diagnóstico de "é posicional?" é recalculado AQUI, em Node, a partir dos
- * PASSOS lidos da página. A prova não pergunta à guarda se a guarda concorda
- * com ela mesma. O oráculo segue a mesma classificação do `id-cru:check`,
- * inclusive na distinção entre `de:[ids]` do `mescla` e `de:{op,id}` do
- * `publicarPorta`; divergir dele daria falso positivo em toda peça que use
- * porta semântica.
+ * O diagnóstico de "é posicional?" é calculado AQUI, em Node, sobre os PASSOS
+ * lidos da página — mas a partir de `motor/referencia-posicional.js`, o MESMO
+ * módulo que a Oficina e o gate `id-cru` leem (A-22). Era uma terceira cópia da
+ * lista de chaves, e a independência que ela prometia nunca existiu: as três
+ * cópias divergiram duas vezes na mesma chave, e na segunda esta aqui errou
+ * IGUAL à guarda, acusando 5 ids crus em `_jardineira` enquanto o CI acusava 0.
+ * Oráculo que erra igual à guarda concorda com ela em vez de vigiá-la.
+ *
+ * O que este harness prova, então, é a INSTALAÇÃO da guarda: que o botão real,
+ * o gancho, o POST e o download passam por ela. Que a REGRA classifica certo é
+ * prova de `tools/mecanifica/referencia-posicional.test.ts`, headless e barata.
+ * Cada prova no seu lugar, em vez de uma cópia fingindo ser a segunda opinião.
  *
  *   npm run guarda:salvar
  *
@@ -44,13 +52,16 @@ import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createServer } from 'node:http';
 import { criarServidor } from '../servir.mjs';
+import { ocorrenciasPosicionais, rotularOcorrencias } from '../../prototipos/fps/v3/motor/referencia-posicional.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const V3 = join(REPO, 'prototipos/fps/v3');
 const OUT = join(REPO, 'tools/bancadas/out');
-const TEMP = join(REPO, 'scratchpad/guarda-salvar');   // pecas/ de mentira: a rota real grava aqui, nunca no rastreado
+const TEMP = join(REPO, 'scratchpad/guarda-salvar');           // pecas/ de mentira: a rota real grava aqui, nunca no rastreado
+const TEMP_PORTAS = join(REPO, 'scratchpad/guarda-salvar-portas');   // idem, para o cenário A-22 — separado, senão (1d) deixaria de contar arquivos
 const PECA = '_vao-e-anteparo';                        // peça LIMPA e não automotiva: só `sel:{grupo|origem|regiao}`
+const PORTAS = '_jardineira';                          // A-22: peça LIMPA que publica 5 portas — `de:{op,id}` não é `de:[ids]`
 const FACE_ANTEPARO = 0;                               // a única face não-sólida da peça — marcar sólido grava faces:[0]
 const VW = 1100, VH = 620;
 
@@ -61,28 +72,9 @@ const ok = (nome, cond, detalhe = '') => {
   if (!cond) falhas.push(nome);
 };
 
-/* As SEIS formas de coleção por id que o `npm run id-cru:check` reprova, medidas
-   aqui de novo e à parte da página. Se esta lista e a da Oficina divergirem, a
-   prova acusa: é justamente o ponto onde uma guarda mente. */
-function referenciasPosicionais(passos) {
-  const achados = [];
-  for (const [indice, passo] of (passos || []).entries()) {
-    const a = Array.isArray(passo) && passo[1];
-    if (!a || typeof a !== 'object' || Array.isArray(a)) continue;
-    for (const chave of ['faces', 'vs', 'pontos']) if (Object.hasOwn(a, chave)) achados.push(`passo ${indice}: ${chave}`);
-    /* `de` tem DOIS contratos desde o O-12: `mescla` lê `de:[ids]`, que é
-       coleção posicional, e `publicarPorta` lê `de:{op,id}`, que é origem
-       estrutural — a referência mais semântica da linguagem. Contar a chave sem
-       olhar a forma foi o defeito do A-21 no `id-cru`, e este oráculo o herdou:
-       ele acusava 5 ids crus em `_jardineira` enquanto o gate do CI acusava 0.
-       Oráculo que erra igual à guarda concorda com ela em vez de vigiá-la. */
-    if (Array.isArray(a.de)) achados.push(`passo ${indice}: de:[ids]`);
-    if (a.sel && typeof a.sel === 'object' && !Array.isArray(a.sel)) {
-      for (const chave of ['f', 'v']) if (Object.hasOwn(a.sel, chave)) achados.push(`passo ${indice}: sel:{${chave}}`);
-    }
-  }
-  return achados;
-}
+/* A regra vem do módulo compartilhado — ver o cabeçalho. Medir aqui em Node
+   continua importando: a página pode ter a regra certa e não chamá-la. */
+const referenciasPosicionais = (passos) => rotularOcorrencias(ocorrenciasPosicionais(passos));
 
 /* ---- servidor estático mínimo (o padrão de tools/bancadas/oficina.mjs) ----- */
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
@@ -101,7 +93,9 @@ const pw = (await import(pathToFileURL(PW).href)).default;
 const browser = await pw.chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
 mkdirSync(OUT, { recursive: true });
 rmSync(TEMP, { recursive: true, force: true });
+rmSync(TEMP_PORTAS, { recursive: true, force: true });
 mkdirSync(TEMP, { recursive: true });
+mkdirSync(TEMP_PORTAS, { recursive: true });
 copyFileSync(join(V3, 'pecas', `${PECA}.js`), join(TEMP, `${PECA}.js`));
 
 /* uma página instrumentada: conta POST e download, guarda o texto do alerta e
@@ -209,6 +203,40 @@ try {
   await page.close();
   srv.close(); srv = null;
 
+  /* ===== A-22: porta semântica NÃO é id posicional ========================== */
+  /* A prova do outro lado da guarda. Até este ciclo, abrir `_jardineira` — a
+     peça que o CI aprova com 0 id cru — e clicar em Salvar SEM EDITAR NADA era
+     recusado por "5 referência(s) posicional(is)", que são os cinco
+     `publicarPorta` da peça. A ferramenta de autoria recusava exatamente a
+     capacidade que o ciclo anterior entregou.
+
+     Servidor e pecas/ PRÓPRIOS: `/pecas/*` sai do dir de destino, então a peça
+     precisa estar lá para abrir — e misturá-la no TEMP do cenário 1 afrouxaria
+     a afirmação (1d), que conta os arquivos do diretório para provar que a
+     recusa não gravou nada. */
+  console.log('\nA-22 — a peça com portas semânticas SALVA (a guarda não confunde de:{op,id} com de:[ids])');
+  copyFileSync(join(V3, 'pecas', `${PORTAS}.js`), join(TEMP_PORTAS, `${PORTAS}.js`));
+  srv = criarServidor({ raiz: V3, pecas: TEMP_PORTAS });
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const basePortas = `http://127.0.0.1:${srv.address().port}`;
+  const { page: pj, espia: ej } = await abrir(`${basePortas}/oficina.html?peca=${PORTAS}`);
+  const passosPortas = await passosDe(pj);
+  const quantasPortas = passosPortas.filter((p) => Array.isArray(p) && p[0] === 'publicarPorta').length;
+  ok('(1g) a peça de portas abre na Oficina e traz os passos `publicarPorta`',
+     (await pj.evaluate(() => window.__ready === true)) === true && quantasPortas === 5,
+     `${passosPortas.length} passos, ${quantasPortas} publicarPorta`);
+  ok('(1g) o oráculo em Node não vê referência posicional nela', referenciasPosicionais(passosPortas).length === 0);
+  const strPortas = await pj.evaluate(() => window.__oficina.serializar());
+  const msgPortas = await clicarSalvar(pj);
+  const arqPortas = join(TEMP_PORTAS, `${PORTAS}.js`);
+  ok('(1g ★) A-22: o clique real no Salvar ACEITA a peça de portas — 1 POST e o arquivo gravado',
+     ej.posts.length === 1 && msgPortas.erro === false && existsSync(arqPortas)
+     && readFileSync(arqPortas, 'utf8') === strPortas && ej.alertas.length === 0,
+     `${ej.posts.length} POST · msg "${msgPortas.txt}"`);
+  ok('(1g) nenhum erro de página na peça de portas', ej.erros.length === 0, ej.erros.join(' | '));
+  await pj.close();
+  srv.close(); srv = null;
+
   /* ===== cenário 2: servidor SEM a rota (o fallback de download) ============ */
   console.log('\ncenário 2 — servidor estático sem a rota: a recusa acontece ANTES do download');
   estatico = servidorEstatico();
@@ -241,6 +269,7 @@ try {
   if (srv) srv.close();
   if (estatico) estatico.close();
   rmSync(TEMP, { recursive: true, force: true });
+  rmSync(TEMP_PORTAS, { recursive: true, force: true });
 }
 
 console.log(`\n${falhas.length ? `${falhas.length} FALHA(S): ${falhas.join(' · ')}` : 'tudo verde — a guarda do A-15 cobre o botão real, o POST, o download e o gancho'}`);

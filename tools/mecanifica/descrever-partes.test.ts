@@ -15,7 +15,7 @@ import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
-import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
+import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const CLI = resolve(REPO, 'tools/mecanifica/descrever-peca.mjs');
@@ -284,12 +284,90 @@ describe('descrever-partes: a medição headless de uma peça', () => {
   });
 });
 
+/* A-20 — a porta publicada precisa existir FORA do núcleo. `nucleo()` passou a
+   devolver `portas`, mas quem CONFERE (a régua, a bancada) não as via: `npm run
+   descrever -- _jardineira` listava seis partes e nenhuma porta. O custo disso
+   foi medido — provar que `sel:{porta}` sobrevive a uma transformação exigiu
+   marcar cada porta com um material próprio e ler a marca de volta, afirmando
+   sobre `f.material` em vez de sobre a porta. */
+describe('portasPublicadas — o endereço semântico aparece onde se confere', () => {
+  const comPortas = () => nucleo(
+    [
+      ['cilindro', { origemId: 40, r: 0.2, h: 0.5, lados: 8 }],
+      ['parte', { nome: 'eixo', sel: { origem: { op: 'cilindro', id: 40 } } }],
+      ['publicarPorta', { nome: 'assentoDoEixo', de: { op: 'cilindro', id: 40, tampa: 'topo' } }],
+      ['cubo', { origemId: 41, lado: 0.3 }],
+      ['parte', { nome: 'bloco', sel: { origem: { op: 'cubo', id: 41 } } }],
+      ['publicarPorta', { nome: 'baseDoBloco', de: { op: 'cubo', id: 41 } }],
+    ] as any, {}, {},
+  );
+
+  it('lista nome, origem declarada e passo de publicação, em ordem de nome', () => {
+    expect(portasPublicadas(comPortas())).toEqual([
+      { nome: 'assentoDoEixo', op: 'cilindro', id: 40, recorte: 'tampa=topo', origem: 'cilindro:40 tampa=topo', passo: 2 },
+      { nome: 'baseDoBloco', op: 'cubo', id: 41, recorte: '', origem: 'cubo:41', passo: 5 },
+    ]);
+  });
+
+  /* o vocabulário é o do CONTRATO que já existe (`cubo`, `cilindro`, `tampa`),
+     não um nome novo: nome publicado vira formato salvo, e nome que promete
+     região e entrega primitiva é pior que nome nenhum. */
+  it('a origem é a DECLARADA, não as faces resolvidas', () => {
+    const porta = portasPublicadas(comPortas())[0];
+    expect(porta.origem).toBe('cilindro:40 tampa=topo');
+    expect(Object.keys(porta)).not.toContain('faces');
+  });
+
+  it('peça sem porta devolve lista vazia, e neutro sem `portas` também', () => {
+    expect(portasPublicadas(doisCubos())).toEqual([]);
+    const { V, F } = doisCubos();
+    expect(portasPublicadas({ V, F } as any)).toEqual([]);
+  });
+
+  it('`portas` com forma errada FALHA com diagnóstico, nunca vira no-op', () => {
+    const { V, F } = doisCubos();
+    expect(() => portasPublicadas({ V, F, portas: [] } as any)).toThrow(/Map devolvido por nucleo/);
+    expect(() => portasPublicadas({ V, F, portas: new Map([['p', { nome: 'p' }]]) } as any))
+      .toThrow(/sem contrato/);
+  });
+
+  it('a descrição e o relatório em texto carregam as portas', () => {
+    const descricao = descreverPeca(comPortas());
+    expect(descricao.totais.portas).toBe(2);
+    const texto = formatarDescricao(descricao);
+    expect(texto).toContain('PORTAS PUBLICADAS');
+    expect(texto).toMatch(/assentoDoEixo {2,}cilindro:40 tampa=topo/);
+    expect(texto).toContain('portas: 2');
+  });
+
+  /* filtrar o relatório por parte não pode esconder porta: porta endereça
+     ORIGEM, não parte semântica — a régua mentiria sobre o contrato da peça. */
+  it('o filtro por parte não esconde porta', () => {
+    expect(descreverPeca(comPortas(), { partes: ['eixo'] }).totais.portas).toBe(2);
+  });
+
+  it('peça sem porta imprime a seção dizendo que não há nenhuma', () => {
+    expect(formatarDescricao(descreverPeca(doisCubos()))).toContain('(nenhuma porta publicada)');
+  });
+});
+
 describe('descrever-peca: o CLI', () => {
   it('mede a peça pedida e sai 0', () => {
     const { saida, codigo } = cli(['freio-disco']);
     expect(codigo).toBe(0);
     expect(saida).toContain('peça: freio-disco');
     expect(saida).toMatch(/pastilhaInterna {2,}pistao {2,}encosta/);
+  });
+
+  /* A-20 pelo comando real: `npm run descrever -- _jardineira` mostra as cinco
+     portas da peça, com o que cada uma resolve. */
+  it('lista as portas publicadas da peça', () => {
+    const { saida, codigo } = cli(['_jardineira']);
+    expect(codigo).toBe(0);
+    expect(saida).toContain('portas: 5');
+    expect(saida).toContain('PORTAS PUBLICADAS');
+    expect(saida).toMatch(/peDoCaule {2,}cilindro:404 tampa=fundo/);
+    expect(saida).toMatch(/soleiraDaJardineira {2,}chamferBox:400/);
   });
 
   it('sai ≠0 com diagnóstico em peça ausente, peça inexistente e parte inexistente', () => {

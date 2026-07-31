@@ -547,6 +547,7 @@
    requestPointerLock; os passos futuros clicam em vértice/face. */
 import { criarVisor } from './motor/render.js';
 import { nucleo, executar, neutroCanonico, colisaoDe, adaptarV3, montarAnimar, BLOCO } from './motor/oficina.js';   // passo 3: o NEUTRO (V/F em números); passo 4: re-executa a lista ao vivo (executar/nucleo) e compara canônico; passo 10: colisaoDe (colisão sugerida no painel + a CHAMADA gravada no export); passo 11c: adaptarV3 pro ATLAS (mapa superfície→texel do raycast do pincel); passo 13b: montarAnimar pro gancho de matriz-em-T do preview (prova página==Node); passo 15: BLOCO pra achar as faces da forma recém-criada (ids [base, base+BLOCO))
+import { ocorrenciasPosicionais, rotularOcorrencias } from './motor/referencia-posicional.js';   // A-22: a REGRA ÚNICA de "isto é id posicional?", compartilhada com o gate id-cru e com o harness da guarda
 import { m4 } from './motor/mat4.js';
 import * as tex from './motor/tex.js';
 import * as geo from './motor/geo.js';
@@ -1083,22 +1084,17 @@ let ultimoDownload = null;
    suas ferramentas de seleção produzem as formas posicionais que o gate do
    projeto rejeita. Nunca deixa isso virar um arquivo salvo por acidente — nem
    pelo servidor, nem pelo fallback de download. A conversão semântica virá em
-   ciclo próprio; esta guarda não finge converter o que não sabe representar. */
+   ciclo próprio; esta guarda não finge converter o que não sabe representar.
+
+   A-22: a lista de formas MORAVA AQUI, copiada do gate, e as duas divergiram na
+   chave `de` — a Oficina recusava as cinco portas semânticas de `_jardineira`
+   como se fossem cinco ids posicionais, reprovando uma peça que o CI aprova. A
+   regra agora vem de `motor/referencia-posicional.js`, o mesmo módulo que o
+   gate `id-cru` e o harness da guarda leem. Ele fica dentro de v3 justamente
+   porque esta página é servida com raiz aqui (`tools/servir.mjs`): import que
+   suba para `src/` 404 no navegador. */
 function diagnosticarExportacaoIncompativel(passos) {
-  const achados = [];
-  for (const [indice, passo] of (passos || []).entries()) {
-    const a = Array.isArray(passo) && passo[1];
-    if (!a || typeof a !== 'object' || Array.isArray(a)) continue;
-    if (Object.hasOwn(a, 'faces')) achados.push(`passo ${indice}: faces:[ids]`);
-    if (Object.hasOwn(a, 'vs')) achados.push(`passo ${indice}: vs:[ids]`);
-    if (Object.hasOwn(a, 'pontos')) achados.push(`passo ${indice}: pontos:[{f,...}]`);
-    if (Object.hasOwn(a, 'de')) achados.push(`passo ${indice}: de:[ids]`);
-    if (a.sel && typeof a.sel === 'object' && !Array.isArray(a.sel)) {
-      if (Object.hasOwn(a.sel, 'f')) achados.push(`passo ${indice}: sel:{f:[ids]}`);
-      if (Object.hasOwn(a.sel, 'v')) achados.push(`passo ${indice}: sel:{v:[ids]}`);
-    }
-  }
-  return achados;
+  return rotularOcorrencias(ocorrenciasPosicionais(passos));
 }
 function baixar(nomeArq, conteudo) {
   const blob = new Blob([conteudo], { type: 'text/javascript' });
