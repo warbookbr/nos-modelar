@@ -87,6 +87,13 @@ Estado atual:
   fora do vocabulário automotivo, com a chapa em UM corpo. Nenhuma peça de
   PRODUTO usa a forma nova: o flange do `freio-disco` continua uma chapa por
   prisioneiro, agora por dívida de peça e não por limite da linguagem;
+- a rodada **"Borda do furo"** fechou em 31 de julho de 2026 e pagou A-31: a
+  serrilha no contorno do furo era do ADAPTADOR, não da peça. `liso` nunca
+  chegava ao renderizador (172 faces marcadas no freio, 100% dos triângulos com
+  normal chapada) e a triangulação em leque virava a normal nas 4 faces côncavas
+  da borda de cada furo. Agora a normal é posta, `liso` soma só entre faces
+  lisas, e a triangulação é por orelhas. A silhueta do furo continua o polígono
+  de `lados` arestas — isto consertou sombreado e forma da borda, não o contorno;
 - **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
   porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
   `centros` desarma o caso do círculo de furos, não o caso geral) e A-30 (um

@@ -670,6 +670,53 @@ destruía o contexto foi removido.
 
 ## Atritos resolvidos
 
+### A-31 — a peça declarava `liso` e a bancada mostrava chapado
+
+**Onde dói:** adaptador de renderização (`src/autoria/adaptar-three.js`).
+
+**Evidência:** a foto
+`tools/bancadas/out/bancada-freio-disco-direita-sel-cubo-isolar-focado.png`. O
+contorno dos quatro furos de prisioneiro serrilhava. A peça não tinha culpa: o
+`freio-disco` já usa 12 lados nesses furos e já marca a parede como `liso`.
+Medido no adaptador: das 540 faces do freio, 172 estão marcadas `liso`, e ainda
+assim 100% dos triângulos da malha saíam com normal CHAPADA.
+
+Foram duas causas independentes, as duas no adaptador e nenhuma no núcleo.
+
+1. **Sombreado.** O adaptador nunca leu `face.liso`. Ele montava uma geometria
+   NÃO INDEXADA e chamava `computeVertexNormals()`, que nesse caso devolve, por
+   definição, a normal do triângulo repetida nos três cantos. A marca mais antiga
+   do formato salvo não tinha efeito nenhum na bancada nem no galpão.
+
+2. **Geometria.** O adaptador triangulava todo n-gon em LEQUE a partir do canto
+   0, e leque só vale em polígono CONVEXO. A borda do furo não é: numa placa com
+   um furo de 12 lados, 4 das 12 faces da borda são quads CÔNCAVOS. Neles o
+   leque emitia um triângulo de área NEGATIVA — normal invertida, iluminada pelo
+   lado errado por causa do `DoubleSide` — que ainda cobria área FORA do polígono
+   e deixava o reflexo descoberto. Isso é defeito de forma, não de sombreado, e
+   atingia toda face côncava de qualquer peça, não só a borda do furo.
+
+**Correção:** a normal passou a ser POSTA em vez de recalculada. `liso` soma
+normal por vértice do núcleo, e a soma varre SÓ as faces lisas — é isso que
+impede a tampa do cilindro de entortar a lateral e é isso que dá à borda chapada
+uma quina limpa contra a parede lisa. A soma é do estado neutro inteiro, antes
+de partir em malhas por parte e material, para que troca de material não vire
+costura. E o leque virou triangulação por ORELHAS no plano da face, que falha
+alto quando o contorno não fecha.
+
+**Prova:** `tools/mecanifica/normais-lisas.test.ts`, 8 casos, mais os PNGs de
+antes e depois no mesmo enquadramento (vista direita e isométrica, furo de
+perto). Três mutações rodadas: ignorar `face.liso` derruba 3 casos; somar sobre
+TODAS as faces em vez de só as lisas derruba 2; voltar ao leque derruba 2. Uma
+quarta mutação SOBREVIVEU e virou conserto: havia uma conferência que endireitava
+a normal do triângulo contra a normal do plano, e ela mascarava o leque — a
+aparência ficava certa e a área errada continuava lá. A conferência foi removida.
+
+**O que isto NÃO conserta:** a SILHUETA. Normal suave é sombreado. O contorno do
+furo continua o polígono de `lados` arestas que a malha tem, e na vista direita
+de perto dá para contar as 12 quinas. Quem quiser mais volta pede mais `lados`,
+ou espera o filete do ciclo 5.
+
 ### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
 
 **Onde dói:** linguagem da Oficina.
