@@ -12,8 +12,10 @@ divisão de trabalho entre os documentos é:
 
 ## Estado executivo
 
-**Primeira onda encerrada em 30 de julho de 2026:** R1, R2 e R3 estão
-concluídas. R4 a R9 são backlog técnico e não formam uma execução aberta.
+**Estado em 30 de julho de 2026:** R1, R2 e R3 estão concluídas. R4 foi
+implementada e publicada na Fundação de autoria v1; permanece em verificação
+até os gates finitos de fechamento do [`PLANO.md`](PLANO.md). R5 a R9 continuam
+backlog e não formam uma execução aberta.
 
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
 mas não autoriza trabalhar automaticamente até R9. O
@@ -327,8 +329,10 @@ mudar sua malha ou seus testes de encaixe.
 
 ### O-6 — `origem` em todo gerador
 
-**O que muda:** dos 8 geradores, só `cubo`, `cilindro`, `lathe` e `loft` publicam
-`origem`. `chamferBox`, `esfera`, `cone` e `plano` não são endereçáveis por nome.
+**Estado (R4):** implementado. Além de `cubo`, `cilindro`, `lathe` e `loft`,
+`chamferBox`, `esfera`, `cone`, `plano` e `inflate` publicam `origem`. Quando a
+topologia não possui uma grade ou face nominal honesta, o contrato mínimo cita
+a primitiva inteira sem inventar nomes frágeis.
 
 **Por que:** A-9 é o achado mais incômodo da rodada. A pinça e o suporte são peças
 fundidas e `chamferBox` é literalmente o gerador do assunto; foram escritas com
@@ -358,6 +362,10 @@ justamente essa, promovida a recurso.
 Fazer separados duplica a decisão de nomenclatura.
 
 **Custo:** médio.
+
+**Estado (R4):** implementado. `publicarPorta` guarda uma origem estrutural sob
+um nome escolhido pelo autor; `sel:{porta}` resolve essa origem depois de
+transformações, sem persistir IDs de runtime.
 
 ### O-7 — posição e orientação na criação da primitiva
 
@@ -457,16 +465,16 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ## Backlog de implementação
 
-Uma rodada por linha. As três primeiras estão encerradas; as demais só saem do
-backlog quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é
-commit próprio e independente: se uma parar, as anteriores continuam de pé.
+Uma rodada por linha. R4 está em fechamento; as demais só saem do backlog quando
+`PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit próprio
+e independente: se uma parar, as anteriores continuam de pé.
 
 | rodada | estado | itens | toca formato salvo | prova de saída |
 |---|---|---|---|---|
 | R1 | concluída | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
 | R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
 | R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
-| R4 | backlog, próxima recomendada | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade |
+| R4 | implementada, em fechamento | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade; falta concluir os gates finitos do plano |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
 | R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |

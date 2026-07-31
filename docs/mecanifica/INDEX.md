@@ -53,19 +53,21 @@ Use esta ordem para resolver dúvidas:
    refinamento por IA;
 4. [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) — escolha do
    fluxo visual, fidelidade, precisão, interação e orçamento;
-5. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
+5. [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md)
+   — briefing por peça, revisão intermediária e critério para extrair uma skill;
+6. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
    autoria visual e experiência do cliente;
-6. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+7. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-7. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+8. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-8. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+9. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-9. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
+10. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
    ordenado de mudanças na linguagem de autoria, com trade-off e custo;
-10. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+11. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-11. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+12. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -85,8 +87,8 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 |---|---|
 | Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
-| Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
-| Escolher realismo ou direção visual | [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) |
+| Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md), [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
+| Escolher realismo ou direção visual | [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) e [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | Mexer no freio a disco | [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
 | Mexer na roda dianteira | [`docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md); para a prova isolada, [`docs/mecanifica/EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) e [`docs/mecanifica/RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |
 | Trabalhar na bancada ou apresentação | [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
@@ -176,8 +178,9 @@ singulares (`face`, `v`, `a`/`b`, `para`) ficam fora, declarado no cabeçalho da
 ferramenta. As peças herdadas ficam numa lista explícita e versionada em
 `tools/bancadas/id-cru-herdado.json`, com a contagem exata congelada — a dívida
 não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
-salva só por id posicional, então peça salva pela interface reprova: ver A-15 em
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+produz referências posicionais em ferramentas exploratórias, mas agora recusa
+salvá-las antes do POST ou download; o teste pelo botão real é a última pendência
+do A-15. Ver [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
 [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).
@@ -199,10 +202,11 @@ simplificada, galpão mínimo, registro semântico, modos
 carro/contexto/isolar, seleção por parte e explosão autoral do freio. A roda
 experimental permanece somente como evidência de autoria.
 
-Não existe entrega em andamento. O próximo ciclo recomendado — ainda não
-aberto — é “Fundação de autoria v1”: impedir entrega incompatível da Oficina,
-implementar O-6/O-12 e encerrar. O-13 fica para outro ciclo. Escopo, exclusões,
-ordem e gates estão no fim de [`PLANO.md`](PLANO.md).
+A entrega em andamento é o fechamento da “Fundação de autoria v1”. Depois dos
+quatro gates finitos descritos em [`PLANO.md`](PLANO.md), o próximo candidato é
+“Arranjos semânticos v1” para O-13. “Realismo geométrico v1” vem depois, usando
+o protocolo de [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md)
+para escolher no máximo duas capacidades justificadas pela roda.
 
 ## Manutenção desta documentação
 

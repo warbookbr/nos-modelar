@@ -204,16 +204,19 @@ O experimento da roda não será integrado. Ele serviu para medir o teto atual e
 confirmou que o próximo ganho vem da linguagem de autoria, não de insistir em
 mais uma rodada visual sobre a mesma peça.
 
-## Backlog priorizado — não está em execução
+## Sequência executiva
 
-| ordem | área | problema ou melhoria | condição para abrir |
+Somente a primeira linha está em execução. As demais são candidatas ordenadas,
+não autorização para começar ou agrupá-las no ciclo atual.
+
+| ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
-| 1 | correção de autoria | A-15: a Oficina pode salvar conteúdo que o próprio gate reprova | ciclo curto deve primeiro impedir entrega incompatível e dizer quando o fluxo é apenas exploratório |
-| 2 | fundação semântica | R4, O-6/O-12: todos os geradores precisam publicar origem e portas estáveis | próximo ciclo técnico recomendado; prova no freio e em objeto não automotivo |
-| 3 | eficiência | O-13: repetição radial/linear com identidade por instância | somente depois da fundação semântica; a roda deve perder as cem coordenadas |
-| 4 | realismo F3 | orientação de seção, curvas, cortes e filetes | abrir apenas quando uma peça próxima da câmera justificar cada capacidade |
-| 5 | produto | narrativa de desgaste da Fase 5 | plano próprio com um cenário de desgaste e uma linha do tempo |
-| 6 | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação | planos independentes; não pertencem à Fase 4 encerrada |
+| 1 | ativa, em fechamento | Fundação de autoria v1 | fechar A-15 e R4/O-6/O-12 pelos gates abaixo |
+| 2 | próxima candidata | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
+| 3 | candidata posterior | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
+| 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
+| 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
+| 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
 
 ### Ciclo 2 — em execução
 
@@ -233,5 +236,50 @@ peças e mudanças na apresentação.
 representar semanticamente a edição; pinça e suporte podem usar `chamferBox` com
 zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
+**Implementado e já publicado:**
+
+- [x] guarda mínima do A-15 antes de POST e download;
+- [x] `origem` em todos os geradores cobertos, incluindo `inflate`;
+- [x] `publicarPorta` e `sel:{porta}` preservados após transformação;
+- [x] pinça e suporte migrados para `chamferBox`, com zero face sem identidade;
+- [x] testes do núcleo, typecheck, gabarito, mapa e gate de id cru verdes.
+
+**Pendências finitas para encerrar:**
+
+- [ ] provar pelo botão real, no navegador, que o salvamento incompatível é
+  recusado antes do POST e do fallback;
+- [ ] consolidar uma fixture não automotiva explícita usando o mesmo contrato;
+- [x] reconciliar o estado de R4, A-15, O-6 e O-12 em índice, otimizações e
+  registro upstream;
+- [ ] rodar a verificação completa e marcar este ciclo como concluído.
+
 O-13 recebe um ciclo próprio somente depois desse gate. Essa separação é a
 garantia de que o próximo plano também termina.
+
+### Candidato a ciclo 3 — ainda não aberto
+
+**Nome:** Arranjos semânticos v1.
+
+**Inclui somente:** O-13, com repetição radial e linear, identidade estável por
+instância e diagnóstico de referência inválida ou ambígua.
+
+**Exclui:** curvas, cortes, filetes, auto polimento, alterações de material,
+relações de montagem, novas peças de produto e automação de crítica visual.
+
+**Gate proposto:** a roda experimental perde os cem parâmetros de coordenadas
+dos braços; cada cópia continua isolável por identidade; uma composição não
+automotiva prova o mesmo contrato; nenhum id runtime entra no arquivo salvo.
+
+### Candidato a ciclo 4 — ainda não aberto
+
+**Nome:** Realismo geométrico v1.
+
+O ciclo nasce do briefing e da crítica visual da roda, registrados em
+[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md). Antes de
+abri-lo, a análise deve escolher no máximo duas capacidades gerais entre perfil
+curvo ou afunilado, orientação de seção, transição local e filete/bevel seletivo.
+
+Ele não começa com uma lista de operações nem promete “polir” a peça inteira.
+Seu gate será escrito depois de comparar referência e renders canônicos,
+nomeando regiões e condições visuais de aceite. Uma skill de família só pode
+ser extraída depois de o protocolo funcionar em outra família de objeto.

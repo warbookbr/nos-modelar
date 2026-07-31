@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-197 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+198 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -90,6 +90,7 @@
 - `PLANO.md` — Plano vigente da Mecanifica
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
+- `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
