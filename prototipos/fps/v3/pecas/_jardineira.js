@@ -12,7 +12,7 @@
      SÓ por `sel:{origem}`/`sel:{alias}`: `chamferBox` (soleira e as quatro
      paredes), `plano` (terra), `esfera` (bulbo), `inflate` (folhagem) e `cone`
      (botão de flor);
-   - cinco portas com nome de AUTOR são publicadas ANTES das transformações e
+   - cinco portas com nome de AUTOR são publicadas antes das transformações e
      citadas por `sel:{porta}` DEPOIS delas — é a promessa do O-12: a porta
      sobrevive ao `rotaciona`/`transladar`;
    - zero id posicional, zero face sem identidade, zero órfão.

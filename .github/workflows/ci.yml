@@ -38,6 +38,16 @@ jobs:
       - name: Nenhum id posicional em peça nova
         run: npm run id-cru:check
 
+      # A guarda do A-15 vive na interface, não no núcleo: nenhum dos gates
+      # acima a exercita. Sem esta linha, apagar a guarda de `salvarPeca` passa
+      # verde nos oito outros e a Oficina volta a gravar peça que o gate ao lado
+      # reprova. Precisa de navegador, por isso instala o Chromium antes.
+      - name: Navegador para a prova de interface
+        run: npx playwright install --with-deps chromium
+
+      - name: A Oficina recusa salvar peça com id posicional
+        run: npm run guarda:salvar
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 

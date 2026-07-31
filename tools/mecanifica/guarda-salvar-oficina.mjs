@@ -27,8 +27,11 @@
  * desta rodada ele escrevia o arquivo recusado em pecas/ sem passar por ela.
  *
  * O diagnóstico de "é posicional?" é recalculado AQUI, em Node, a partir dos
- * PASSOS lidos da página — a prova não pergunta à guarda se a guarda concorda
- * com ela mesma.
+ * PASSOS lidos da página. A prova não pergunta à guarda se a guarda concorda
+ * com ela mesma. O oráculo segue a mesma classificação do `id-cru:check`,
+ * inclusive na distinção entre `de:[ids]` do `mescla` e `de:{op,id}` do
+ * `publicarPorta`; divergir dele daria falso positivo em toda peça que use
+ * porta semântica.
  *
  *   npm run guarda:salvar
  *
@@ -66,7 +69,14 @@ function referenciasPosicionais(passos) {
   for (const [indice, passo] of (passos || []).entries()) {
     const a = Array.isArray(passo) && passo[1];
     if (!a || typeof a !== 'object' || Array.isArray(a)) continue;
-    for (const chave of ['faces', 'vs', 'pontos', 'de']) if (Object.hasOwn(a, chave)) achados.push(`passo ${indice}: ${chave}`);
+    for (const chave of ['faces', 'vs', 'pontos']) if (Object.hasOwn(a, chave)) achados.push(`passo ${indice}: ${chave}`);
+    /* `de` tem DOIS contratos desde o O-12: `mescla` lê `de:[ids]`, que é
+       coleção posicional, e `publicarPorta` lê `de:{op,id}`, que é origem
+       estrutural — a referência mais semântica da linguagem. Contar a chave sem
+       olhar a forma foi o defeito do A-21 no `id-cru`, e este oráculo o herdou:
+       ele acusava 5 ids crus em `_jardineira` enquanto o gate do CI acusava 0.
+       Oráculo que erra igual à guarda concorda com ela em vez de vigiá-la. */
+    if (Array.isArray(a.de)) achados.push(`passo ${indice}: de:[ids]`);
     if (a.sel && typeof a.sel === 'object' && !Array.isArray(a.sel)) {
       for (const chave of ['f', 'v']) if (Object.hasOwn(a.sel, chave)) achados.push(`passo ${indice}: sel:{${chave}}`);
     }

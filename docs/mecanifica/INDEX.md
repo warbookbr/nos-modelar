@@ -37,7 +37,7 @@ Estado atual:
   semânticas, com as três condições do gate verificadas item por item;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
-  usa os cinco geradores novos e cinco portas semânticas, com 0 face sem
+  usa os cinco geradores novos e cinco portas semânticas (quatro sobrevivem a transformação), com 0 face sem
   identidade e 0 órfão, e mediu onde o contrato ainda para (A-18 a A-20);
 - **nenhum ciclo está em execução.** O ciclo 3 ("Arranjos semânticos v1", O-13)
   é o próximo candidato e ainda não foi aberto;
