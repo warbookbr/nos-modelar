@@ -4234,6 +4234,44 @@ describe('O-13 — arranja (arranjo radial e linear)', () => {
     for (const v of noEixo) expect(usadosNasCopias.has(v)).toBe(true);
   });
 
+  it('a mão da face é PRESERVADA: os cantos da cópia saem na mesma ordem da fonte, não revertidos', () => {
+    // rotação e translação preservam a orientação; só o espelho a troca. Reverter aqui
+    // viraria toda normal para dentro — invisível no teste de manifold e plausível na foto.
+    const newell = (V: any, vs: number[]) => {
+      let nx = 0, ny = 0, nz = 0;
+      for (let k = 0; k < vs.length; k++) { const c = V.get(vs[k]), d = V.get(vs[(k + 1) % vs.length]); nx += (c[1] - d[1]) * (c[2] + d[2]); ny += (c[2] - d[2]) * (c[0] + d[0]); nz += (c[0] - d[0]) * (c[1] + d[1]); }
+      const l = Math.hypot(nx, ny, nz) || 1; return [nx / l, ny / l, nz / l];
+    };
+    // LINEAR: a cópia é a fonte transladada, então a normal é IDÊNTICA à da fonte
+    const lin = nucleo([
+      ['cubo', { id: 0, lado: 0.4, origemId: 30 }],
+      ['arranja', { modo: 'linear', d: [1, 0, 0], total: 2, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(lin.orfaos).toHaveLength(0);
+    const fonteFaces = [...lin.F.values()].filter((f: any) => f.id < BLOCO).sort((a: any, b: any) => a.id - b.id);
+    fonteFaces.forEach((f: any, k: number) => {
+      const copia = lin.F.get(BLOCO + k) as any;
+      expect(copia.vs.length).toBe(f.vs.length);
+      // ordem dos cantos: a MESMA da fonte, canto a canto (não a revertida)
+      expect(copia.vs).not.toEqual(f.vs.map((v: number) => v).reverse());
+      expect(newell(lin.V, copia.vs).map((x) => +x.toFixed(9))).toEqual(newell(lin.V, f.vs).map((x) => +x.toFixed(9)));
+    });
+    // RADIAL a 180° em torno de Y: a normal da cópia é a da fonte GIRADA, nunca a oposta dela
+    const rad = nucleo([
+      ['cubo', { id: 0, lado: 0.4, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 2, graus: 180, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(rad.orfaos).toHaveLength(0);
+    const radFonte = [...rad.F.values()].filter((f: any) => f.id < BLOCO).sort((a: any, b: any) => a.id - b.id);
+    radFonte.forEach((f: any, k: number) => {
+      const n0 = newell(rad.V, f.vs);
+      const girada = [-n0[0], n0[1], -n0[2]];                              // 180° em torno de Y
+      const nc = newell(rad.V, (rad.F.get(2000 + k) as any).vs);
+      expect(nc.map((x) => +x.toFixed(6))).toEqual(girada.map((x) => +x.toFixed(6)));
+    });
+  });
+
   it('atributo da fonte é herdado pela cópia, e a fonte não é alterada', () => {
     const n = nucleo([
       ['cubo', { id: 0, lado: 0.2, origemId: 30 }],

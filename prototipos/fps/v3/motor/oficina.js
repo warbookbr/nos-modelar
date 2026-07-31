@@ -596,6 +596,14 @@ const CONTRATOS_ORIGEM = {
        `{op:'arranja', id, copia: {passo,fase}}` uma progressão (alternadas);
      e NENHUM deles cita id de face, índice de passo ou posição na lista.
 
+     ORDEM: as faces saem cópia a cópia e, dentro de cada uma, na ordem da
+     origem fonte. É construção determinística, e está dito aqui como o que é —
+     NENHUM consumidor do núcleo distingue hoje essa ordem (todo caminho de
+     `sel` deduplica num Set e a canon reordena por id), então ela não tem
+     afirmação em teste e não vale como promessa medida. Trocar a ordem hoje não
+     muda peça nenhuma; no dia em que uma op passar a depender dela, o teste
+     nasce junto com a op.
+
      A NUMERAÇÃO das cópias é 0..total−2 e conta CÓPIAS, não instâncias: a fonte
      NÃO é cópia (ela já tem a identidade dela, a origem citada em `de`), e o
      arranjo só responde pelo que ele criou — a mesma lei do `espelha`, que
