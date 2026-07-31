@@ -49,7 +49,9 @@ Estado atual:
   sempre estrutural, com cada cópia endereçável por identidade. A dívida A-23
   (palavra reservada de extremidade engolindo parâmetro homônimo) foi paga
   junto. A roda experimental **não** foi reescrita e nenhuma peça usa a op
-  ainda;
+  ainda. Depois dele, duas dívidas menores herdadas foram pagas: o painel de
+  portas da bancada ganhou prova de navegador (`npm run guarda:portas`, no CI) e
+  o teste que comparava uma função com ela mesma virou afirmação de identidade;
 - **nenhum ciclo está em execução.** O próximo candidato é "Realismo geométrico
   v1" e ainda não foi aberto;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
@@ -184,7 +186,14 @@ num caminho que o botão não percorre (foi o que aconteceu com o A-15):
 
 ```bash
 npm run guarda:salvar
+npm run guarda:portas
 ```
+
+`npm run guarda:portas` é a mesma ideia do outro lado da ferramenta: dirige a
+bancada pela URL e afirma sobre o DOM renderizado que a peça com portas mostra as
+oito portas e que a peça sem portas não mostra a seção. O painel do A-20 vive em
+`src/bancada/main.js`, que nenhum arquivo de teste importa; sem esta prova ele
+podia ser apagado inteiro com os outros gates verdes.
 
 Verificação completa:
 
@@ -194,6 +203,8 @@ npm run typecheck
 npm run build
 npm run gabarito:selecao:check
 npm run id-cru:check
+npm run guarda:salvar
+npm run guarda:portas
 npm run mapa:check
 npm run docs:toc:check
 npm run docs:links:check

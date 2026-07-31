@@ -411,7 +411,7 @@ relações de montagem, novas peças de produto e automação de crítica visual
 | cada cópia continua isolável por identidade | casos de coleção, índice, PARAM, extremidade e progressão, todos por `sel:{alias}`/`sel:{porta}` |
 | nenhum id runtime entra no arquivo salvo | `npm run id-cru:check` verde, `arranja` recusa `faces`/`sel:{f}`/alias/região |
 | peças existentes intactas | `npm run gabarito:selecao:check` — 22 peças byte-idênticas |
-| verificação completa | `npm test` (540), `typecheck`, `build`, `gabarito:selecao:check`, `id-cru:check`, `guarda:salvar`, `mapa`/`mapa:check`, `docs:links:check`, `docs:toc:check` |
+| verificação completa | `npm test` (540), `typecheck`, `build`, `gabarito:selecao:check`, `id-cru:check`, `guarda:salvar`, `guarda:portas`, `mapa`/`mapa:check`, `docs:links:check`, `docs:toc:check` |
 
 **Teste de mutação, o que ele achou.** Dez mutações no que a rodada acabou de
 escrever. Nove morreram (ângulo acumulado 1 caso; índice de cópia deslocado 4;
@@ -429,9 +429,41 @@ determinística, não como promessa medida.
 reescrita — os cem parâmetros de coordenada continuam no arquivo dela, e o que
 mudou é que agora existe a operação que os dispensa. Nenhuma peça de produto
 usa `arranja` ainda, então o contrato foi provado em teste e não em peça: o
-prisioneiro de roda e a aleta de ventilação continuam não modelados. As duas
-outras dívidas menores herdadas do ciclo anterior não foram tocadas. A-15 segue
+prisioneiro de roda e a aleta de ventilação continuam não modelados. A-15 segue
 aberto.
+
+**As duas dívidas menores, pagas depois.** Elas eram do mesmo tipo que a lição
+dos dois ciclos anteriores: verde pelo motivo errado.
+
+- **O painel de portas da bancada não tinha prova nenhuma.** Nenhum arquivo de
+  teste importa `src/bancada/main.js`. A revisão mediu duas mutações que passavam
+  todos os gates e os 540 testes: `convertido.medida.portas ?? []` virar `[]` em
+  `main.js`, e `portasPublicadas(neutro)` virar `[]` em `carregar-peca.js`. O
+  painel do A-20 podia ser apagado inteiro sem custo. Entrou
+  `tools/mecanifica/guarda-portas-bancada.mjs` (`npm run guarda:portas`), que
+  dirige a bancada **pela URL** e afirma sobre o **DOM renderizado**: a peça com
+  portas mostra o painel visível, o resumo `8 publicadas` e os oito pares
+  nome/origem; `_vao-e-anteparo` não mostra a seção; e uma afirmação compara os
+  dois lados na mesma execução, senão um painel constante passaria em metade
+  delas. O oráculo é **literal**, escrito à mão, não calculado por
+  `portasPublicadas()` — a régua que a página usa não pode ser a régua que a
+  mede (lição do A-22). Mutação: as duas trocas acima derrubam 5 afirmações cada;
+  trocar `porta.origem` por `op:id`, perdendo o recorte, derruba 1. Como precisa
+  de navegador, a prova entrou no `.github/workflows/ci.yml`, ao lado do
+  `guarda:salvar`. Limite declarado: o painel é `display:none` no breakpoint
+  mobile, e a prova roda em 1280×720; a lista rola dentro de 128 px, então nem
+  toda porta fica visível de uma vez, mas as oito existem no DOM.
+- **Um teste comparava uma função com ela mesma.** Em
+  `referencia-posicional.test.ts`, o caso "o gate id-cru mede exatamente o que o
+  módulo mede" comparava `contarIdCruDoGate(passos)` com `contarIdCru(passos)`,
+  e `tools/bancadas/id-cru.mjs` **reexporta** essa função do mesmo módulo: era
+  `f(x)` contra `f(x)` para o mesmo `f`. Ele foi **corrigido, não removido** — o
+  que queria afirmar é o degrau anterior, que não existe uma segunda
+  implementação, e isso se afirma por identidade de referência. Comparar saídas
+  não serve: uma cópia recém-escrita concorda em quase tudo, e foi assim que as
+  três cópias do A-22 conviveram por dois ciclos, divergindo só na chave `de`.
+  Mutação: um wrapper local no gate que **delega** ao módulo — portanto concorda
+  em toda entrada, e o teste antigo passaria — deixa o novo vermelho.
 
 ### Candidato a ciclo 4 — ainda não aberto
 
