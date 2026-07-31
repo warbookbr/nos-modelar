@@ -1,5 +1,5 @@
 {
-  "hashTotal": "7deeadf6a5ac8cb3b631d2ed206f138a511cd2be65c22bb7781de9673a0be27d",
+  "hashTotal": "21cda76200b85559878e23425f4d9a6b3d6fa5aee9a7719a9fe0f0854732fb32",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -70,6 +70,11 @@
       "hash": "91e77f82e01e417c96815c4b82d6f5e5552f626e921b1d72f810565b11185099",
       "vertices": 86,
       "faces": 85
+    },
+    "_tampa-de-caixa": {
+      "hash": "b810b45b5f062f89871ddd30efdaee38cb09832945026850a84c9971f2b16d6b",
+      "vertices": 184,
+      "faces": 253
     },
     "_torno": {
       "hash": "c2d3cc983ff9828293534a75b88ef45b3b6d3425c2cf00f68a8cd9bb704b17d6",
