@@ -108,7 +108,11 @@ que ela sabe produzir, e essa saída não passa no CI do mesmo projeto. Enquanto
 isso durar, a Oficina serve para explorar e não para entregar, e quem
 modela pela interface descobre isso só no gate.
 
-**Contorno:** converter a peça à mão depois de salvar (trocar `faces:[ids]` por
+**Estado (Fundação de autoria v1):** a Oficina agora recusa antes do POST ou do
+download qualquer uma das seis formas posicionais cobertas pelo gate. Ela segue
+como espaço exploratório; este ciclo não promete conversão automática.
+
+**Contorno histórico:** converter a peça à mão depois de salvar (trocar `faces:[ids]` por
 `sel:{alias|grupo|origem|regiao}`), ou registrar a peça na lista herdada
 `tools/bancadas/id-cru-herdado.json` de propósito, assumindo a dívida no commit.
 Foi só o conselho da mensagem de erro que mudou nesta rodada: ele dizia

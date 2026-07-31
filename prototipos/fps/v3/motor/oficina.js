@@ -172,6 +172,22 @@ function registraOrigem(st, i, op, origemId, contrato) {
   registros.push({ op, ...contrato });
   st.origens.set(origemId, registros);
 }
+/* Geradores cuja topologia não expõe uma grade ou faces nominais ainda assim
+   precisam publicar UMA origem citável. `faces` é o contrato mínimo: não
+   inventa nomes geométricos frágeis, mas torna cada face do resultado
+   semanticamente pertencente à primitiva. */
+function contratoFaces(op) {
+  return {
+    validar(origem) {
+      return Object.keys(origem).every((k) => k === 'op' || k === 'id')
+        ? null : `${op} usa somente op e id`;
+    },
+    resolver(st, registro, origem) {
+      const faces = registro.faces.filter((f) => st.F.has(f));
+      return faces.length ? { faces } : { erro: `origem ${op}:${origem.id} não tem nenhuma face viva` };
+    },
+  };
+}
 function origensIguais(a, b) {
   if (a === b) return true;
   if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) || Array.isArray(b)) return false;
@@ -375,6 +391,11 @@ const CONTRATOS_ORIGEM = {
       return { faces };
     },
   },
+  esfera: contratoFaixaLado('esfera'),
+  cone: contratoFaces('cone'),
+  plano: contratoFaces('plano'),
+  chamferBox: contratoFaces('chamferBox'),
+  inflate: contratoFaces('inflate'),
   espelha: {
     validar(origem) {
       const chaves = ['op', 'id', 'de'];
@@ -495,6 +516,13 @@ function resolverOrigem(st, origem) {
   return validacao.contrato.resolver(st, registros[0], origem);
 }
 
+function resolverPorta(st, nome) {
+  const porta = st.portas.get(nome);
+  if (!porta) return { erro: `porta '${nome}' inexistente ou ainda não publicada` };
+  const resultado = resolverOrigem(st, porta.de);
+  return resultado.erro ? { erro: `porta '${nome}' inválida: ${resultado.erro}` } : resultado;
+}
+
 /* valida o `id` opcional de uma primitiva contra a base posicional: se o
    arquivo escreveu um id que não bate com a posição, é um aviso alto (não muda
    a numeração — a POSIÇÃO manda sempre). */
@@ -547,7 +575,7 @@ function confereId(st, i, op, args) {
    tinha acabado de corrigir na skill, na hora em que o autor mais precisa da
    lista certa. Com lista única, um oitavo seletor entra nas três mensagens de
    uma vez e nenhuma pode envelhecer sozinha. */
-const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'alias'];
+const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias'];
 const SELETOR = new Set(SELETORES);
 
 function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
@@ -654,6 +682,15 @@ function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false
     const resultado = resolverOrigem(st, origem);
     if (resultado.erro) grita(st, i, op, 'sel.origem', resultado.erro);
     else for (const fid of resultado.faces) adicionaFace(fid);
+  }
+  if (sel.porta != null) {
+    teveChave = true;
+    if (nomeDeParteInvalido(sel.porta)) grita(st, i, op, 'sel.porta', "seleção porta inválida: precisa ser um nome semântico visível");
+    else {
+      const resultado = resolverPorta(st, sel.porta);
+      if (resultado.erro) grita(st, i, op, 'sel.porta', resultado.erro);
+      else for (const fid of resultado.faces) adicionaFace(fid);
+    }
   }
   if (sel.alias != null) {
     teveChave = true;
@@ -823,6 +860,7 @@ export const OPS = {
      Total: aneis·lados. */
   esfera(st, a, i) {
     const b = confereId(st, i, 'esfera', a);
+    if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'esfera', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const A = Math.max(2, st.num(a.aneis ?? 6) | 0);   // TOPO: muda a CONTAGEM
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
@@ -840,6 +878,7 @@ export const OPS = {
     for (let j = 0; j < L; j++) { const n = (j + 1) % L; addF(st, b + j, [b, anel(1, j), anel(1, n)]); }   // leque do sul
     for (let k = 1; k < A - 1; k++) for (let j = 0; j < L; j++) { const n = (j + 1) % L; addF(st, b + k * L + j, [anel(k, j), anel(k + 1, j), anel(k + 1, n), anel(k, n)]); }   // faixas de quads
     for (let j = 0; j < L; j++) { const n = (j + 1) % L; addF(st, b + (A - 1) * L + j, [norte, anel(A - 1, n), anel(A - 1, j)]); }   // leque do norte
+    if (a.origemId != null) registraOrigem(st, i, 'esfera', a.origemId, { faixas: Array.from({ length: A }, (_, k) => Array.from({ length: L }, (_, j) => b + k * L + j)) });
   },
 
   /* cone — base no chão como o cilindro: anel em y=0, ápice em y=altura. `raio` e
@@ -854,6 +893,7 @@ export const OPS = {
      Total: lados+1. */
   cone(st, a, i) {
     const b = confereId(st, i, 'cone', a);
+    if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'cone', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const h = st.num(a.altura ?? 1);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
@@ -862,6 +902,7 @@ export const OPS = {
     addV(st, b + L, [0, h, 0]);                                                                       // ápice
     for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, b + k, [b + k, b + L, b + n]); }    // laterais (normal pra fora)
     const fundo = []; for (let k = 0; k < L; k++) fundo.push(b + k); addF(st, b + L, fundo);          // tampa da base (-y, o winding do fundo do cilindro)
+    if (a.origemId != null) registraOrigem(st, i, 'cone', a.origemId, { faces: Array.from({ length: L + 1 }, (_, k) => b + k) });
   },
 
   /* plano — grade no plano XZ, y=0, CENTRADA na origem (o chão). `largura` (eixo x)
@@ -876,6 +917,7 @@ export const OPS = {
      da tampa de cima do cubo). Total: seg². */
   plano(st, a, i) {
     const b = confereId(st, i, 'plano', a);
+    if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'plano', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const lx = st.num(a.largura ?? 1), lz = st.num(a.profundidade ?? 1);
     const S = Math.max(1, st.num(a.seg ?? 1) | 0);     // TOPO: muda a CONTAGEM
     const nV = (S + 1) * (S + 1);
@@ -883,6 +925,7 @@ export const OPS = {
     const v = (ix, iz) => b + iz * (S + 1) + ix;
     for (let iz = 0; iz <= S; iz++) for (let ix = 0; ix <= S; ix++) addV(st, v(ix, iz), [(ix / S - 0.5) * lx, 0, (iz / S - 0.5) * lz]);
     for (let iz = 0; iz < S; iz++) for (let ix = 0; ix < S; ix++) addF(st, b + iz * S + ix, [v(ix, iz), v(ix, iz + 1), v(ix + 1, iz + 1), v(ix + 1, iz)]);
+    if (a.origemId != null) registraOrigem(st, i, 'plano', a.origemId, { faces: Array.from({ length: S * S }, (_, k) => b + k) });
   },
 
   /* chamferBox — P8b do playground: o `cubo` com CANTOS E ARESTAS chanfrados (o corte
@@ -927,6 +970,7 @@ export const OPS = {
      geometria decidir) — verificado por teste nas 26 faces, não numa amostra. */
   chamferBox(st, a, i) {
     const b = confereId(st, i, 'chamferBox', a);
+    if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'chamferBox', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const lx = st.num(a.larg ?? a.lado ?? 1) / 2;
     const ly = st.num(a.alt ?? a.lado ?? 1);
     const lz = st.num(a.prof ?? a.lado ?? 1) / 2;
@@ -970,6 +1014,7 @@ export const OPS = {
 
     loc.forEach((p, id) => addV(st, b + id, p));
     faces.forEach((vs, k) => addF(st, b + k, vs.map((id) => b + id)));
+    if (a.origemId != null) registraOrigem(st, i, 'chamferBox', a.origemId, { faces: Array.from({ length: faces.length }, (_, k) => b + k) });
   },
 
   /* lathe — P2 do playground: um perfil 2D `[[raio,y],...]` GIRADO em torno do
@@ -1422,6 +1467,7 @@ export const OPS = {
      `divisoes` absurdo travar a sessão, independente do bloco de ids. */
   inflate(st, a, i) {
     const b = confereId(st, i, 'inflate', a);
+    if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'inflate', 'origemId', 'origemId precisa ser inteiro não-negativo');
 
     const validaContorno = (pontos, nome) => {
       if (!Array.isArray(pontos) || pontos.length < 3) { grita(st, i, 'inflate', nome, `${nome} precisa de ao menos 3 pontos (tem ${Array.isArray(pontos) ? pontos.length : typeof pontos})`); return null; }
@@ -1504,6 +1550,21 @@ export const OPS = {
     // COMMIT: ids LOCAIS -> ids GLOBAIS (b + local), só agora toca st.V/st.F
     posLocal.forEach((p, id) => addV(st, b + id, p));
     facesLocais.forEach((ids, fid) => addF(st, b + fid, ids.map((id) => b + id)));
+    if (a.origemId != null) registraOrigem(st, i, 'inflate', a.origemId, { faces: Array.from({ length: nF }, (_, k) => b + k) });
+  },
+
+  /* Publica uma porta por nome do autor. Ela guarda a origem estrutural, nunca
+     faces resolvidas: por isso a mesma porta continua correta depois de mover,
+     rotacionar ou pintar a primitiva. */
+  publicarPorta(st, a, i) {
+    const erroNome = nomeDeParteInvalido(a.nome);
+    if (erroNome) return grita(st, i, 'publicarPorta', 'nome', `nome da porta ${erroNome}`);
+    if (st.portas.has(a.nome)) return grita(st, i, 'publicarPorta', 'nome', `porta '${a.nome}' já foi publicada no passo ${st.portas.get(a.nome).passo}`);
+    const validacao = validarOrigem(a.de);
+    if (validacao.erro) return grita(st, i, 'publicarPorta', 'de', `porta exige de:{op,id,...} estrutural válido: ${validacao.erro}`);
+    const resultado = resolverOrigem(st, a.de);
+    if (resultado.erro) return grita(st, i, 'publicarPorta', 'de', resultado.erro);
+    st.portas.set(a.nome, { de: a.de, passo: i });
   },
 
   /* ---- edição por id estável ---- */
@@ -2118,7 +2179,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), declaracoesOrigem, aliases, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;

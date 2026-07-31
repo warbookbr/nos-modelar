@@ -17,8 +17,8 @@ concluídas. R4 a R9 são backlog técnico e não formam uma execução aberta.
 
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
 mas não autoriza trabalhar automaticamente até R9. O
-[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. Hoje não há rodada ativa; a
-próxima recomendada começa pela fundação O-6/O-12.
+[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. A Fundação de autoria v1
+está ativa e cobre somente A-15, O-6 e O-12.
 
 Escopo: o núcleo de autoria (`prototipos/fps/v3/motor/oficina.js`) e a
 documentação que ensina a usá-lo. Os atritos da bancada (A-1, A-2, A-3, A-12,

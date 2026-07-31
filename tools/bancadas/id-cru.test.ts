@@ -157,7 +157,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
     expect(ini).toBeGreaterThan(0);
     const lidas = new Set<string>();
     for (const m of semComentario(fonte.slice(ini, fim)).matchAll(/\bsel\.([A-Za-z_][A-Za-z0-9_]*)/g)) lidas.add(m[1]);
-    expect([...lidas].sort()).toEqual(['alias', 'f', 'grupo', 'origem', 'regiao', 'tudo', 'v']);
+    expect([...lidas].sort()).toEqual(['alias', 'f', 'grupo', 'origem', 'porta', 'regiao', 'tudo', 'v']);
   });
 
   it('toda COLEÇÃO de id do núcleo tem uma forma no gate — nenhuma passa em branco', () => {

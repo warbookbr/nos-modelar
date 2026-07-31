@@ -8,10 +8,9 @@ herdado e não comandam a Mecanifica.
 **Ciclo de implementação 1: CONCLUÍDO em 30 de julho de 2026.**
 
 - fases 0 a 4: concluídas;
-- fase ativa: nenhuma;
+- fase ativa: Fundação de autoria v1;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- próxima recomendação técnica: abrir um ciclo finito de fundação semântica,
-  começando por O-6/O-12; ele ainda **não foi iniciado**.
+- ciclo técnico em execução: Fundação de autoria v1 (A-15, O-6 e O-12).
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -216,7 +215,7 @@ mais uma rodada visual sobre a mesma peça.
 | 5 | produto | narrativa de desgaste da Fase 5 | plano próprio com um cenário de desgaste e uma linha do tempo |
 | 6 | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação | planos independentes; não pertencem à Fase 4 encerrada |
 
-### Candidato a ciclo 2 — ainda não aberto
+### Ciclo 2 — em execução
 
 **Nome:** Fundação de autoria v1.
 

@@ -43,6 +43,49 @@ describe('numeração determinística', () => {
   });
 });
 
+/* Fundação de autoria v1 — toda primitiva publica origem e porta é uma
+   referência semântica à origem local, não à numeração runtime. */
+describe('Fundação de autoria v1 — origem universal e portas semânticas', () => {
+  const pintadas = (n: any, cor = '#20c997') => [...n.F.values()].filter((f: any) => f.cor === cor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+  it('os cinco geradores antes anônimos são citáveis por origem sem usar IDs de face', () => {
+    const casos: any[] = [
+      ['esfera', { id: 0, raio: 1, aneis: 3, lados: 4, origemId: 101 }, 12],
+      ['cone', { id: 0, raio: 1, altura: 2, lados: 4, origemId: 102 }, 5],
+      ['plano', { id: 0, seg: 2, origemId: 103 }, 4],
+      ['chamferBox', { id: 0, lado: 2, chanfro: 0.2, origemId: 104 }, 26],
+      ['inflate', { id: 0, contornoLado: [[-1, 0], [1, 0], [1, 1], [-1, 1]], contornoTopo: [[-1, 0], [1, 0], [1, 1], [-1, 1]], divisoes: 2, origemId: 105 }, null],
+    ];
+    for (const [op, args, esperado] of casos) {
+      const n = nucleo([[op, args], ['pincel', { modo: 'face', sel: { origem: { op, id: args.origemId } }, cor: '#20c997' }]] as any, {}, {});
+      expect(n.orfaos, op).toHaveLength(0);
+      expect(pintadas(n).length, op).toBe(esperado ?? n.F.size);
+    }
+  });
+
+  it('porta nomeada resolve a origem local após rotacionar, sem persistir face runtime', () => {
+    const n = nucleo([
+      ['cilindro', { id: 0, raio: 1, altura: 0.2, lados: 6, origemId: 201 }],
+      ['publicarPorta', { nome: 'pista-interna', de: { op: 'cilindro', id: 201, tampa: 'fundo' } }],
+      ['rotaciona', { eixo: 'z', graus: -90 }],
+      ['pincel', { modo: 'face', sel: { porta: 'pista-interna' }, cor: '#20c997' }],
+    ] as any, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(pintadas(n)).toEqual([6]);
+  });
+
+  it('porta inválida, duplicada ou ainda não publicada falha fechada', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, lado: 1, origemId: 301 }],
+      ['pincel', { modo: 'face', sel: { porta: 'ausente' }, cor: '#20c997' }],
+      ['publicarPorta', { nome: 'corpo', de: { op: 'cubo', id: 301 } }],
+      ['publicarPorta', { nome: 'corpo', de: { op: 'cubo', id: 301 } }],
+    ] as any, {}, {});
+    expect(n.orfaos.length).toBeGreaterThanOrEqual(2);
+    expect(n.orfaos.map((o: any) => o.motivo).join(' ')).toMatch(/ausente|já foi publicada/);
+  });
+});
+
 describe('Fase 3 - fixture de invalidacao estrutural por apagaFace', () => {
   const ctx = { tex: { texCanvas: (w: number, h: number) => ({ width: w, height: h }) }, m4: { ident: () => new Float32Array(16) } };
   const topo = { op: 'cubo', id: 70, face: 'topo' }, frente = { op: 'cubo', id: 70, face: 'frente' };
@@ -3890,9 +3933,9 @@ describe('O-11 — diagnóstico de completude de alias', () => {
    omitindo justamente `alias`: a mesma omissão que o O-0 corrigiu na skill,
    impressa pela própria ferramenta, na hora em que o autor mais precisa da
    lista certa. As três mensagens saem agora de uma lista só. */
-describe('as mensagens de seleção ensinam os SETE seletores', () => {
+describe('as mensagens de seleção ensinam os OITO seletores', () => {
   const cubo: any = ['cubo', { id: 0, lado: 1 }];
-  const SETE = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'alias'];
+  const SETE = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias'];
 
   it('seleção vazia, chave desconhecida e sel não-objeto nomeiam todos os sete, alias incluído', () => {
     const vazia = nucleo([cubo, ['transladar', { d: [0, 1, 0], sel: {} }]] as any, {}, {});

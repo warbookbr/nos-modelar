@@ -1079,6 +1079,27 @@ export function construir(ctx) { return executar(PASSOS, PARAMS, TOPO, ctx${argC
    afirmar que o fallback disparou sem quebrar. O fetch é RELATIVO à página, então
    resolve pra /oficina/salvar servido de v3 (servir.mjs) tanto quanto do repo. */
 let ultimoDownload = null;
+/* Fundação de autoria v1 (A-15): a Oficina ainda é um ambiente exploratório e
+   suas ferramentas de seleção produzem as formas posicionais que o gate do
+   projeto rejeita. Nunca deixa isso virar um arquivo salvo por acidente — nem
+   pelo servidor, nem pelo fallback de download. A conversão semântica virá em
+   ciclo próprio; esta guarda não finge converter o que não sabe representar. */
+function diagnosticarExportacaoIncompativel(passos) {
+  const achados = [];
+  for (const [indice, passo] of (passos || []).entries()) {
+    const a = Array.isArray(passo) && passo[1];
+    if (!a || typeof a !== 'object' || Array.isArray(a)) continue;
+    if (Object.hasOwn(a, 'faces')) achados.push(`passo ${indice}: faces:[ids]`);
+    if (Object.hasOwn(a, 'vs')) achados.push(`passo ${indice}: vs:[ids]`);
+    if (Object.hasOwn(a, 'pontos')) achados.push(`passo ${indice}: pontos:[{f,...}]`);
+    if (Object.hasOwn(a, 'de')) achados.push(`passo ${indice}: de:[ids]`);
+    if (a.sel && typeof a.sel === 'object' && !Array.isArray(a.sel)) {
+      if (Object.hasOwn(a.sel, 'f')) achados.push(`passo ${indice}: sel:{f:[ids]}`);
+      if (Object.hasOwn(a.sel, 'v')) achados.push(`passo ${indice}: sel:{v:[ids]}`);
+    }
+  }
+  return achados;
+}
 function baixar(nomeArq, conteudo) {
   const blob = new Blob([conteudo], { type: 'text/javascript' });
   const url = URL.createObjectURL(blob);
@@ -1744,7 +1765,16 @@ try {
        TOPO) e POSTa pro servidor de dev; sem servidor, baixa o .js (fallback). */
     { const bt = $('btSalvar'); if (bt) bt.addEventListener('click', async () => {
         bt.disabled = true;
-        try { await salvarPeca(mod.meta.nome, serializarPeca(mod.meta, PARAMS, TOPO, PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual)); }   // PASSO 14b: + ESQUELETO (round-trip)
+        try {
+          const incompatibilidades = diagnosticarExportacaoIncompativel(PASSOS);
+          if (incompatibilidades.length) {
+            const detalhe = incompatibilidades.slice(0, 6).join('\n');
+            msgSalvar(`não salvo: a Oficina ainda não consegue exportar esta edição semanticamente (${incompatibilidades.length} referência(s) posicional(is))`, true);
+            alert(`Não salvei a peça: esta edição contém referências por ID que o CI do projeto reprova.\n\n${detalhe}${incompatibilidades.length > 6 ? '\n…' : ''}\n\nA Oficina segue disponível para explorar. Para entregar, converta as seleções para origem/porta/alias fora dela.`);
+            return;
+          }
+          await salvarPeca(mod.meta.nome, serializarPeca(mod.meta, PARAMS, TOPO, PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual));
+        }   // PASSO 14b: + ESQUELETO (round-trip)
         finally { bt.disabled = false; }
       }); }
 

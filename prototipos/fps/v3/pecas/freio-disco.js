@@ -51,6 +51,7 @@ const MEDIDAS = {
   // pinça: ponte por cima do disco + uma garra descendo de cada lado
   pincaParedeEspessura: 0.030, // espessura de cada garra
   pincaProfundidade: 0.092,    // extensão da pinça em Z
+  pincaChanfro: 0.004,
   pincaPonteAltura: 0.038,     // altura radial da ponte
   pincaGarraAltura: 0.066,     // altura radial de cada garra
   pincaGarraBaseY: 0.082,      // raio onde as garras começam (0,59·discoRaio)
@@ -67,6 +68,7 @@ const MEDIDAS = {
   suporteSobraGarra: 0.010,    // quanto a placa passa do topo da garra que ela sustenta
   suporteOrelhaAltura: 0.036,  // as duas orelhas parafusadas na manga
   suporteOrelhaAvanco: 0.046,
+  suporteChanfro: 0.003,
 
   // flexível: mangueira de freio, do banjo da pinça até a linha rígida
   flexivelRaio: 0.005,
@@ -168,6 +170,7 @@ const cilindroInteiro = (id) => ({ unir: [
 const FACES_DO_CUBO = ['fundo', 'topo', 'tras', 'direita', 'frente', 'esquerda'];
 const cuboInteiro = (id) => ({ unir: FACES_DO_CUBO.map((face) => ({ origem: { op: 'cubo', id, face } })) });
 const cubosInteiros = (ids) => ids.flatMap((id) => FACES_DO_CUBO.map((face) => ({ origem: { op: 'cubo', id, face } })));
+const origensInteiras = (op, ids) => ids.map((id) => ({ origem: { op, id } }));
 
 /* ALIASES são NOMES DE SELEÇÃO, não partes: um agente pode dizer
    `sel:{alias:'pistaInterna'}` sem saber que a pista é a tampa `fundo` de um
@@ -186,13 +189,13 @@ export const ALIASES = [
   ['cuboInteiro', cilindroInteiro(CUBO)],
   ['pastilhaInternaInteira', cuboInteiro(PASTILHA_INTERNA)],
   ['pastilhaExternaInteira', cuboInteiro(PASTILHA_EXTERNA)],
-  ['pincaInteira', { unir: cubosInteiros([PINCA_PONTE, PINCA_GARRA_INTERNA, PINCA_GARRA_EXTERNA]) }],
-  ['pincaPonte', cuboInteiro(PINCA_PONTE)],
-  ['pincaGarraInterna', cuboInteiro(PINCA_GARRA_INTERNA)],
-  ['pincaGarraExterna', cuboInteiro(PINCA_GARRA_EXTERNA)],
+  ['pincaInteira', { unir: origensInteiras('chamferBox', [PINCA_PONTE, PINCA_GARRA_INTERNA, PINCA_GARRA_EXTERNA]) }],
+  ['pincaPonte', { origem: { op: 'chamferBox', id: PINCA_PONTE } }],
+  ['pincaGarraInterna', { origem: { op: 'chamferBox', id: PINCA_GARRA_INTERNA } }],
+  ['pincaGarraExterna', { origem: { op: 'chamferBox', id: PINCA_GARRA_EXTERNA } }],
   ['pistaoInteiro', cilindroInteiro(PISTAO)],
   ['pistaoFaceDeEmpurrar', { origem: { op: 'cilindro', id: PISTAO, tampa: 'topo' } }],
-  ['suporteInteiro', { unir: cubosInteiros([SUPORTE_PLACA, SUPORTE_ORELHA_FRENTE, SUPORTE_ORELHA_TRAS]) }],
+  ['suporteInteiro', { unir: origensInteiras('chamferBox', [SUPORTE_PLACA, SUPORTE_ORELHA_FRENTE, SUPORTE_ORELHA_TRAS]) }],
   ['flexivelInteiro', { origem: { op: 'loft', id: FLEXIVEL } }],
 ];
 
@@ -229,11 +232,11 @@ export const PASSOS = [
 
   // ---- pinça: a ponte passa por cima do disco e as duas garras descem, uma
   //      por fora de cada pastilha — é isso que "abraçar o disco" significa ----
-  ['cubo', { origemId: PINCA_PONTE, larg: 'pincaLargura', alt: 'pincaPonteAltura', prof: 'pincaProfundidade' }],
+  ['chamferBox', { origemId: PINCA_PONTE, larg: 'pincaLargura', alt: 'pincaPonteAltura', prof: 'pincaProfundidade', chanfro: 'pincaChanfro' }],
   ['transladar', { d: [0, 'pincaPonteY', 0], sel: { alias: 'pincaPonte' } }],
-  ['cubo', { origemId: PINCA_GARRA_INTERNA, larg: 'pincaParedeEspessura', alt: 'pincaGarraAltura', prof: 'pincaProfundidade' }],
+  ['chamferBox', { origemId: PINCA_GARRA_INTERNA, larg: 'pincaParedeEspessura', alt: 'pincaGarraAltura', prof: 'pincaProfundidade', chanfro: 'pincaChanfro' }],
   ['transladar', { d: ['pincaGarraInternaX', 'pincaGarraBaseY', 0], sel: { alias: 'pincaGarraInterna' } }],
-  ['cubo', { origemId: PINCA_GARRA_EXTERNA, larg: 'pincaParedeEspessura', alt: 'pincaGarraAltura', prof: 'pincaProfundidade' }],
+  ['chamferBox', { origemId: PINCA_GARRA_EXTERNA, larg: 'pincaParedeEspessura', alt: 'pincaGarraAltura', prof: 'pincaProfundidade', chanfro: 'pincaChanfro' }],
   ['transladar', { d: ['pincaGarraExternaX', 'pincaGarraBaseY', 0], sel: { alias: 'pincaGarraExterna' } }],
   ['parte', { nome: 'pinca', sel: { alias: 'pincaInteira' } }],
 
@@ -245,12 +248,12 @@ export const PASSOS = [
   ['parte', { nome: 'pistao', sel: { alias: 'pistaoInteiro' } }],
 
   // ---- suporte: placa de ancoragem atrás da pinça + duas orelhas de parafuso ----
-  ['cubo', { origemId: SUPORTE_PLACA, larg: 'suporteEspessura', alt: 'suporteAltura', prof: 'suporteLargura' }],
-  ['transladar', { d: ['suportePlacaX', 'suporteBaseY', 0], sel: { origem: { op: 'cubo', id: SUPORTE_PLACA } } }],
-  ['cubo', { origemId: SUPORTE_ORELHA_FRENTE, larg: 'suporteEspessura', alt: 'suporteOrelhaAltura', prof: 'suporteOrelhaAvanco' }],
-  ['transladar', { d: ['suportePlacaX', 'suporteOrelhaY', 'suporteOrelhaZ'], sel: { origem: { op: 'cubo', id: SUPORTE_ORELHA_FRENTE } } }],
-  ['cubo', { origemId: SUPORTE_ORELHA_TRAS, larg: 'suporteEspessura', alt: 'suporteOrelhaAltura', prof: 'suporteOrelhaAvanco' }],
-  ['transladar', { d: ['suportePlacaX', 'suporteOrelhaY', 'suporteOrelhaZNeg'], sel: { origem: { op: 'cubo', id: SUPORTE_ORELHA_TRAS } } }],
+  ['chamferBox', { origemId: SUPORTE_PLACA, larg: 'suporteEspessura', alt: 'suporteAltura', prof: 'suporteLargura', chanfro: 'suporteChanfro' }],
+  ['transladar', { d: ['suportePlacaX', 'suporteBaseY', 0], sel: { origem: { op: 'chamferBox', id: SUPORTE_PLACA } } }],
+  ['chamferBox', { origemId: SUPORTE_ORELHA_FRENTE, larg: 'suporteEspessura', alt: 'suporteOrelhaAltura', prof: 'suporteOrelhaAvanco', chanfro: 'suporteChanfro' }],
+  ['transladar', { d: ['suportePlacaX', 'suporteOrelhaY', 'suporteOrelhaZ'], sel: { origem: { op: 'chamferBox', id: SUPORTE_ORELHA_FRENTE } } }],
+  ['chamferBox', { origemId: SUPORTE_ORELHA_TRAS, larg: 'suporteEspessura', alt: 'suporteOrelhaAltura', prof: 'suporteOrelhaAvanco', chanfro: 'suporteChanfro' }],
+  ['transladar', { d: ['suportePlacaX', 'suporteOrelhaY', 'suporteOrelhaZNeg'], sel: { origem: { op: 'chamferBox', id: SUPORTE_ORELHA_TRAS } } }],
   ['parte', { nome: 'suporte', sel: { alias: 'suporteInteiro' } }],
 
   // ---- flexível: mangueira do banjo da pinça até a linha rígida. O loft é a

@@ -32,10 +32,10 @@ Estado atual:
 - um experimento isolado de roda mais realista provou que a Oficina atual passa
   do low-poly, mas ainda entrega realismo técnico/procedural; ele não foi
   integrado, e o fluxo resultante está documentado em perfis de autoria;
-- não há fase ativa; caminhada, novos sistemas, narrativa e realismo F3 estão em
-  backlog, sem reabrir o ciclo;
-- o próximo ciclo técnico recomendado, ainda não iniciado, é uma fundação
-  semântica curta começando por O-6/O-12.
+- a Fundação de autoria v1 está ativa: proteção mínima de salvamento da Oficina,
+  `origem` universal e portas semânticas;
+- caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
+  reabrir ciclos anteriores.
 
 O estado detalhado e os critérios de saída ficam em
 [`docs/mecanifica/PLANO.md`](PLANO.md). Se este resumo divergir do plano, o
