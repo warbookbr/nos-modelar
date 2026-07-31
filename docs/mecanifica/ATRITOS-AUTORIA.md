@@ -21,6 +21,92 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-18 — quatro geradores só sabem citar a primitiva inteira
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a fixture não automotiva
+`prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
+queria três portas que a topologia declarada do núcleo já conhece e que o
+contrato de `origem` não expõe:
+
+| porta que faltou | o que existe no núcleo | contrato publicado |
+|---|---|---|
+| a boca do botão de flor | `cone` documenta `laterais = b+j` e `tampa da base = b+lados` | `contratoFaces` — só a primitiva inteira |
+| a borda da soleira | `chamferBox` documenta 6 faces originais, 12 de aresta e 8 de canto | idem |
+| uma célula ou linha da terra | `plano` documenta a grade `b + iz·seg + ix` | idem |
+
+O O-6 justifica o contrato mínimo com "quando a topologia não possui uma grade
+ou face nominal honesta". Medido contra o próprio núcleo, isso vale para
+**um** dos quatro: só `inflate` sai de um scan de voxels sem fórmula fechada.
+`cone`, `plano` e `chamferBox` têm numeração fechada, documentada linha a linha
+e travada por teste — a grade honesta existe e não é endereçável.
+
+Isso não apareceu no freio porque pinça e suporte precisam da primitiva
+inteira: `chamferBox` entra lá como bloco maciço. É exatamente a hipótese que a
+prova não automotiva veio testar.
+
+**Contorno:** publicar a porta com o nome honesto do que o contrato alcança
+(`soleiraDaJardineira`, `leitoDaTerra`) e registrar no cabeçalho da peça o que
+não deu para nomear. Não inventar `bocaDoBotao` apontando para o cone inteiro —
+nome que promete região e entrega primitiva é pior que nome nenhum.
+
+**Capacidade candidata:** estender o contrato de `origem` desses três geradores
+para o eixo que a topologia já tem — `{tampa}`/`{lado}` no `cone` (a estrutura
+do `cilindro`), `{face}`/`{aresta}`/`{canto}` no `chamferBox` (a estrutura do
+`cubo`, mais duas famílias), `{linha,coluna}` no `plano` (a estrutura
+`faixa`×`lado` do `loft`). São as fábricas de contrato que já existem em
+`motor/oficina.js`, aplicadas a geradores que ficaram de fora. `inflate`
+continua legitimamente com o contrato mínimo.
+
+### A-19 — o eixo de uma origem não aceita expressão nem "o último"
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a mesma fixture quis publicar a porta `coloDoBulbo` sobre o
+leque do polo NORTE da esfera, que é `faixa: bulboAneis - 1`. Não dá:
+`validarEixo` exige `Number.isSafeInteger`, e o eixo não passa por `st.num` —
+então ele é o único campo dimensional da linguagem que **não** pode citar um
+parâmetro. Escrever `faixa: 3` funcionaria hoje e apontaria para uma faixa do
+meio no dia em que alguém mudasse `bulboAneis` para 6, **sem nenhum
+diagnóstico**: a referência continua válida e passa a estar errada. É a classe
+que o `CLAUDE.md` proíbe — "referência inválida, ambígua ou vazia falha com
+diagnóstico" — só que aqui a referência nem chega a ficar inválida.
+
+**Contorno:** a peça foi remodelada para que a porta caísse na `faixa: 0` (o
+leque do polo de ORIGEM, estável sob qualquer `aneis`) e a meia-volta do bulbo
+passou a ser o que põe esse leque para cima. O contorno é bom modelo — o colo
+do bulbo realmente é o polo de origem girado —, mas foi a ferramenta que
+escolheu a forma da peça, o mesmo sintoma do A-9.
+
+**Capacidade candidata:** o eixo aceitar nome de parâmetro (via `st.num`, como
+todo campo dimensional) e um literal de extremidade (`'ultima'`/`'primeira'`)
+resolvido contra a contagem real do gerador. Vale para qualquer grade: faixa de
+`loft`, anel de `lathe`, lado de `cilindro`.
+
+### A-20 — porta publicada é invisível fora do núcleo
+
+**Onde dói:** conferência headless e ferramental.
+
+**Evidência:** `nucleo()` devolve `{V, F, orfaos, merges, partes, esqueleto,
+pesos}` e **não** devolve `st.portas`. Uma porta só existe enquanto a lista de
+passos roda: nem `npm run descrever`, nem a bancada, nem `adaptarThree` sabem
+que a peça publicou `peDoCaule`. `npm run bancada -- _jardineira` lista seis
+componentes e nenhuma porta.
+
+Consequência medida: para provar que `sel:{porta}` resolve depois da
+transformação, `tools/mecanifica/jardineira-integridade.test.ts` teve que
+**marcar cada porta com um material próprio** e ler a marca de volta. A prova
+vale, mas é indireta — o teste afirma sobre `f.material`, não sobre a porta.
+
+**Contorno:** materiais dedicados (`terraUmida`, `corteFresco`, `peleDoColo`) e
+comentário explicando por que eles existem.
+
+**Capacidade candidata:** `nucleo` devolver as portas (nome -> origem e passo de
+publicação) e a régua/bancada listarem-nas ao lado das partes. É o mínimo para
+uma porta virar contrato entre peças — sem isso, `encostar` (O-8) não tem como
+nomear "a porta A encosta na porta B" a partir de fora da peça.
+
 ### A-17 — repetição radial vira coordenada em massa
 
 **Onde dói:** linguagem da Oficina.
@@ -44,6 +130,14 @@ instância. O contrato deve permitir endereçar a coleção e cada cópia sem de
 do índice do passo. É o O-13 de
 [`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) e serve igualmente para
 pétalas, colunas, pás, dentes ou elementos abstratos.
+
+**Confirmação fora do vocabulário mecânico:** as quatro paredes de
+`prototipos/fps/v3/pecas/_jardineira.js` são quatro passos `chamferBox` +
+`transladar` copiados, com quatro posições derivadas escritas uma a uma
+(`paredeFrenteZ`, `paredeTrasZ`, `paredeDireitaX`, `paredeEsquerdaX`). A
+intenção — "uma caixa de quatro paredes" — não está escrita em lugar nenhum. É
+o mesmo A-17 dos braços da roda, num objeto que não tem eixo nem cubo: a
+repetição linear dói igual em marcenaria.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
@@ -615,6 +709,39 @@ destruía o contexto foi removido.
 - **Nenhum id de vértice ou face.** Não contei vértice na mão em momento algum.
 
 ## Atritos resolvidos
+
+### A-21 — o gate de id cru reprovava a capacidade que a rodada acabara de shipar
+
+**Onde doeu:** gate do projeto (`tools/bancadas/id-cru.mjs`).
+
+**Evidência:** a primeira PEÇA a usar `publicarPorta`
+(`prototipos/fps/v3/pecas/_jardineira.js`) foi reprovada por
+`npm run id-cru:check` com "5 id(s) posicional(is) (5× de:[ids] (mescla))". A
+peça não tem um único id posicional: os cinco "ids" eram as cinco portas.
+
+Causa: desde o O-12 a chave `de` tem **dois** contratos — `mescla` lê
+`de:[ids]` (coleção de vértice) e `publicarPorta` lê `de:{op,id,...}` (origem
+estrutural, irmã de `sel:{origem}` e de `derivaDe`). O gate é op-agnóstico por
+projeto e contava a chave, não a forma. Ninguém viu na R4 porque `publicarPorta`
+só existia em teste unitário do núcleo: **nenhuma peça** usava a op, e o gate
+varre `prototipos/fps/v3/pecas/`.
+
+O contorno tentador era registrar `_jardineira` em
+`tools/bancadas/id-cru-herdado.json` "de propósito", que é o que a própria
+mensagem do gate sugere. Seria gravar como dívida a única peça do repositório
+que usa a referência mais semântica da linguagem.
+
+**Correção:** o discriminador passou a ser a FORMA, não o nome da op —
+`de` conta como id cru a menos que seja objeto plano com `op` **e** `id`. Lista,
+string, número e objeto sem esse contrato continuam contando, porque o gate não
+pode ser mais permissivo que o núcleo. Travado em `tools/bancadas/id-cru.test.ts`
+("de:{op,id} do publicarPorta é ORIGEM ESTRUTURAL, não id cru"), com as
+contagens herdadas intactas (13 peças, 8244 ids congelados).
+
+**Lição, que é a mesma do A-15:** capacidade provada só em teste de núcleo não
+está provada. O A-15 achou a guarda no ouvinte do clique em vez do funil quando
+o botão real foi acionado; aqui o gate do projeto reprovava a capacidade nova
+quando uma peça real a usou. Nos dois casos o teste unitário estava verde.
 
 ### A-2 — enquadrar montagem e seleção eram a mesma ação
 

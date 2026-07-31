@@ -236,6 +236,10 @@ peças e mudanças na apresentação.
 representar semanticamente a edição; pinça e suporte podem usar `chamferBox` com
 zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
+As três condições estão atendidas. A terceira é `_jardineira`: o contrato vale
+fora do vocabulário mecânico, e o que ele **não** alcança lá está medido e
+nomeado (A-18 a A-20), em vez de suposto.
+
 **Implementado e já publicado:**
 
 - [x] guarda mínima do A-15 antes de POST e download, no funil `salvarPeca` —
@@ -255,7 +259,19 @@ zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
   `['solido',{faces:[0]}]`) e clique real em "Salvar peça", contra o `servir.mjs`
   real e contra um servidor sem a rota. A medição achou a guarda no lugar errado
   — no ouvinte do clique, não no caminho — e o conserto a moveu para o funil;
-- [ ] consolidar uma fixture não automotiva explícita usando o mesmo contrato;
+- [x] consolidar uma fixture não automotiva explícita usando o mesmo contrato —
+  `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
+  usa os cinco geradores que só ganharam `origem` na R4 e publica cinco portas
+  antes das transformações, citando-as depois. Régua headless: 6 partes, 351
+  faces, 350 vértices, 0 face sem identidade, 0 órfão. A prova achou quatro
+  coisas, todas registradas em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) e
+  nenhuma contornada em silêncio: o gate `id-cru` reprovava `publicarPorta`
+  (A-21, corrigido aqui — nenhuma PEÇA usava a op, então o defeito ficou
+  invisível na R4); `cone`, `plano` e `chamferBox` só citam a primitiva inteira
+  apesar de terem grade documentada (A-18); o eixo de uma origem não aceita
+  parâmetro e reaponta em silêncio quando o `TOPO` muda (A-19); uma porta
+  publicada é invisível fora do núcleo (A-20). A-18 a A-20 **não** entram neste
+  ciclo;
 - [x] reconciliar o estado de R4, A-15, O-6 e O-12 em índice, otimizações e
   registro upstream;
 - [ ] rodar a verificação completa e marcar este ciclo como concluído.

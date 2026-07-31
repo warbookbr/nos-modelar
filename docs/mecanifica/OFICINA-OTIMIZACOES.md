@@ -67,12 +67,21 @@ Nenhum atrito de autoria fica sem plano:
 | A-6 `encostar` não existe | O-8 | A-11 partes planas | O-10 |
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
-| A-17 repetição radial manual | O-13 | — | — |
+| A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão) |
+| A-19 eixo de origem sem expressão | O-12 (extensão) | A-20 porta invisível fora do núcleo | sem item — backlog |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
 O-13 e O-14 saíram da validação deste plano contra o código, descrita abaixo.
 Depois, a roda experimental confirmou O-13 em modelagem real e originou A-17.
+
+A-18, A-19 e A-20 saíram da fixture não automotiva `_jardineira`, no fechamento
+da R4. **Nenhum dos três entra no ciclo em execução:** eles são extensões
+justificadas de O-6 e O-12, não pendências deles — o gate de encerramento da
+Fundação de autoria v1 pede que o contrato seja provado fora do caso
+automotivo, e foi. Quem abrir o ciclo seguinte decide se paga essa dívida antes
+ou depois de O-13. A-21 nasceu e morreu na mesma rodada: era o gate `id-cru`
+contando `de:{op,id}` do `publicarPorta` como id posicional.
 
 ## Validação contra o código
 
@@ -342,6 +351,23 @@ mudar sua malha ou seus testes de encaixe.
 topologia não possui uma grade ou face nominal honesta, o contrato mínimo cita
 a primitiva inteira sem inventar nomes frágeis.
 
+**Provado fora do vocabulário automotivo:**
+`prototipos/fps/v3/pecas/_jardineira.js` — jardineira de janela com uma muda —
+usa os cinco geradores novos e é endereçada só por `sel:{origem}`/`sel:{alias}`:
+6 partes, 351 faces, 350 vértices, 0 face sem identidade, 0 órfão
+(`npm run descrever -- _jardineira --estrito`). O teste
+`tools/mecanifica/jardineira-integridade.test.ts` amarra a contagem de cada
+parte à FÓRMULA do gerador e reconstrói a peça com outro `TOPO`, provando que a
+origem é topológica e não uma lista congelada de ids.
+
+**Limite que a prova não automotiva expôs (A-18):** a justificativa do contrato
+mínimo — "topologia sem grade ou face nominal honesta" — só se sustenta em
+`inflate`. `cone`, `plano` e `chamferBox` têm numeração fechada, documentada e
+travada por teste no próprio núcleo, e mesmo assim só publicam a primitiva
+inteira. A boca do cone, a célula do plano e as três famílias de face do
+`chamferBox` existem e não são endereçáveis. O freio não sentiu porque pinça e
+suporte usam `chamferBox` como bloco maciço.
+
 **Por que:** A-9 é o achado mais incômodo da rodada. A pinça e o suporte são peças
 fundidas e `chamferBox` é literalmente o gerador do assunto; foram escritas com
 `cilindro` e `cubo` porque sem `origem` só sobra caixa de coordenada chutada.
@@ -374,6 +400,30 @@ Fazer separados duplica a decisão de nomenclatura.
 **Estado (R4):** implementado. `publicarPorta` guarda uma origem estrutural sob
 um nome escolhido pelo autor; `sel:{porta}` resolve essa origem depois de
 transformações, sem persistir IDs de runtime.
+
+**Provado fora do vocabulário automotivo:** `_jardineira` publica cinco portas
+ANTES das transformações e cita todas DEPOIS. A relação que o teste trava é a
+prova em uma linha: o vértice comum do `coloDoBulbo` — estruturalmente o leque
+do polo de ORIGEM da esfera, que nasce embaixo e sobe com a meia-volta — cai
+exatamente sobre o centro do `peDoCaule`, e o par `peDoCaule`/`coroaDoCaule`
+continua medindo `cauleComprimento` depois de a haste pender 16°. Nenhuma das
+duas relações sobreviveria a uma porta reresolvida por posição.
+
+**Três achados da prova**, todos registrados em
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), nenhum contornado em silêncio:
+
+- **A-21 (corrigido nesta rodada).** O gate `id-cru` reprovava a peça por "5 ids
+  posicionais" que eram as cinco portas: a chave `de` passou a ter dois
+  contratos (`mescla` lê `de:[ids]`, `publicarPorta` lê `de:{op,id}`) e o gate
+  contava a chave, não a forma. Ninguém viu na R4 porque nenhuma PEÇA usava a
+  op — a capacidade estava provada só em teste de núcleo.
+- **A-19.** O eixo de uma origem (`faixa`/`lado`) não passa por `st.num`: é o
+  único campo dimensional da linguagem que não pode citar parâmetro. `faixa:
+  bulboAneis - 1` é impossível, e uma faixa escrita como literal passa a
+  apontar para outro lugar quando o `TOPO` muda, sem diagnóstico nenhum.
+- **A-20.** `nucleo()` não devolve `st.portas`: uma porta é invisível para a
+  régua, para a bancada e para o adaptador. O teste teve que marcar cada porta
+  com um material próprio para poder afirmar sobre ela.
 
 ### O-7 — posição e orientação na criação da primitiva
 
@@ -482,7 +532,7 @@ e independente: se uma parar, as anteriores continuam de pé.
 | R1 | concluída | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
 | R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
 | R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
-| R4 | implementada, em fechamento | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade; falta concluir os gates finitos do plano |
+| R4 | implementada, em fechamento | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade; `_jardineira` confirma o contrato fora do vocabulário automotivo (351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; falta concluir os gates finitos do plano |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
 | R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |

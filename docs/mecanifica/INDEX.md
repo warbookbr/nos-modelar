@@ -34,6 +34,10 @@ Estado atual:
   integrado, e o fluxo resultante está documentado em perfis de autoria;
 - a Fundação de autoria v1 está ativa: proteção mínima de salvamento da Oficina,
   `origem` universal e portas semânticas;
+- o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
+  `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
+  usa os cinco geradores novos e cinco portas semânticas, com 0 face sem
+  identidade e 0 órfão, e mediu onde o contrato ainda para (A-18 a A-20);
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -155,6 +159,7 @@ tem escala nem eixo; esta é a régua:
 npm run descrever -- freio-disco
 npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
 npm run descrever -- roda-dianteira
+npm run descrever -- _jardineira --estrito
 ```
 
 Prova de comportamento no navegador — dirige a Oficina headless e clica nos
@@ -183,7 +188,9 @@ id posicional reprova. Cobre as **seis** formas de coleção que o núcleo lê �
 `faces:[ids]`, `sel:{v}`, `sel:{f}`, `vs:[ids]` (`pesar`), `pontos:[{f}]`
 (pincel livre) e `de:[ids]` (`mescla`) —, contando **id**, não passo. As formas
 singulares (`face`, `v`, `a`/`b`, `para`) ficam fora, declarado no cabeçalho da
-ferramenta. As peças herdadas ficam numa lista explícita e versionada em
+ferramenta. A chave `de` tem dois contratos desde o O-12 e só um é id cru: o
+`de:{op,id,...}` do `publicarPorta` é origem estrutural, irmã de `sel:{origem}`,
+e o gate distingue pela FORMA — objeto plano com `op` e `id` não conta. As peças herdadas ficam numa lista explícita e versionada em
 `tools/bancadas/id-cru-herdado.json`, com a contagem exata congelada — a dívida
 não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
 produz referências posicionais em ferramentas exploratórias, mas agora recusa
