@@ -47,6 +47,18 @@ headless e commits próprios. Toda capacidade candidata é registrada em
 `docs/mecanifica/UPSTREAM-NOS.md`, incluindo dependências, provas e instruções de
 extração.
 
+## Como escrever no chat
+
+Isto vale para as respostas ao usuário, não para código nem documentação.
+
+- Frases curtas. Uma ideia por frase.
+- Palavras comuns. Nada de metáfora inventada nem termo poético.
+- Ordem direta: sujeito, verbo, objeto. Sem inversão para dar ênfase.
+- Sem travessão para comentário no meio da frase. Use ponto e comece outra.
+- Listas em vez de parágrafos longos com ponto e vírgula.
+- Sem frase de efeito e sem construção do tipo "não é X, é Y".
+- Números e nomes de arquivo direto, sem rodeio.
+
 ## Qualidade
 
 - Texto, nomes de domínio e documentação em pt-BR.
