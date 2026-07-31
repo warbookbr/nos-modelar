@@ -217,18 +217,30 @@ describe('integridade do freio a disco', () => {
 });
 
 /* ---------------------------------------------------------------------------
-   FLANGE DE RODA — o furo de prisioneiro (ciclo "Corte e orientação de seção
-   v1"). O plano registrava a omissão com estas palavras: "o cubo do freio
-   continua sem prisioneiro". Ela foi fechada com as duas capacidades do ciclo
-   juntas — o ARRANJO radial põe os assentos em volta do eixo da roda, o CORTE
-   abre o furo de cada um.
+   FLANGE DE RODA — UM disco com o círculo de prisioneiros furado nele
+   (rodada "Flange de uma peça só").
 
-   Estas afirmações existem para morrer quando o valor muda. Contar face não
-   basta: um furo no lugar errado, um furo cego no lugar de um passante ou um
-   assento sem furo dariam a MESMA contagem, e a foto do conjunto inteiro é
-   pequena demais para acusar 13 mm.
+   O QUE MUDOU. O ciclo "Corte e orientação de seção v1" fechou a omissão do
+   plano — "o cubo do freio continua sem prisioneiro" — com um RESSALTO quadrado
+   por prisioneiro, posto pelo `arranja` radial e furado um a um. Os ressaltos
+   não vinham do desenho mecânico: vinham de um passo de `furo` consumir a face
+   de entrada, então cada furo precisava de uma face só dele. Com o `centros` da
+   rodada "Furo v2" os quatro furos saem da MESMA face num passo só, e o flange
+   virou o que um flange de roda é.
+
+   ESTAS AFIRMAÇÕES AFIRMAM MAIS, NÃO MENOS. As de antes continuam todas, com o
+   nome novo do parâmetro: um furo por prisioneiro, cada um um corpo separado,
+   passante de lado a lado, no círculo declarado, com o diâmetro do parâmetro
+   que o nomeia e os anéis em fase. Entraram três: o flange é UM corpo (era um
+   por prisioneiro), cada furo continua endereçável SOZINHO, e a superfície de
+   apoio da roda passou a ser a borda MAIS o preenchimento — que só existe
+   porque há mais de um anel na face.
+
+   Contar face não basta: um furo no lugar errado, um furo cego no lugar de um
+   passante ou um assento sem furo dariam a MESMA contagem, e a foto do conjunto
+   inteiro é pequena demais para acusar 13 mm.
    --------------------------------------------------------------------------- */
-describe('flange de roda: os quatro furos de prisioneiro', () => {
+describe('flange de roda: um disco, um passo de corte, quatro prisioneiros', () => {
   /* as famílias do corte, endereçadas pelos ALIASES que a peça publica — nada
      de id de face. A sonda reatribui `parte`, por isso `substituir`. */
   const comSonda = () => nucleo(
@@ -244,22 +256,55 @@ describe('flange de roda: os quatro furos de prisioneiro', () => {
     const neutro = comSonda();
     expect(neutro.orfaos).toEqual([]);
     const paredes = [...neutro.F.values()].filter((f: any) => f.parte === 'paredesSonda');
-    /* uma parede por lado do anel, em cada furo: mudar `prisioneiros` sem
-       escrever o furo do assento novo derruba esta conta. */
+    /* uma parede por lado do anel, em cada furo. Mudar `prisioneiros` derruba
+       esta conta — e, ao contrário de antes, é a ÚNICA coisa que precisa
+       mudar na peça para o flange acompanhar. */
     expect(paredes.length).toBe(freio.TOPO.prisioneiros * freio.TOPO.ladosFuroPrisioneiro);
     expect(corposDaParte(neutro, 'paredesSonda').length).toBe(freio.TOPO.prisioneiros);
   });
 
-  it('cada furo ATRAVESSA o assento de lado a lado — é passante, não cego', () => {
-    const P = freio.PARAMS;
+  it('UM passo de corte abre os quatro: o flange deixou de ser uma chapa por prisioneiro', () => {
+    /* A afirmação central da rodada, e a que morre se alguém devolver os
+       ressaltos. Antes: 4 passos de `furo` e 5 corpos no `cubo` (o barril mais
+       um ressalto por prisioneiro). Agora: 1 passo e 2 corpos. */
+    const cortes = freio.PASSOS.filter((p: any) => p[0] === 'furo');
+    expect(cortes.length).toBe(1);
+    expect((cortes[0] as any)[1].centros.total).toBe('prisioneiros');
+    expect(corposDaParte(comSonda(), 'cubo').length).toBe(2);
+    // e nenhum `arranja` sobrou na peça: o círculo de furos não é mais cópia de sólido
+    expect(freio.PASSOS.some((p: any) => p[0] === 'arranja')).toBe(false);
+  });
+
+  it('cada furo continua endereçável SOZINHO, e não é um borrão de 48 paredes', () => {
+    /* sem o eixo `furo` na origem, `segundoPrisioneiro` pediria as 48 paredes e
+       receberia as 48 — o passo único teria custado a identidade individual,
+       que é exatamente o que a op se recusou a perder. */
+    const neutro = nucleo(
+      [...freio.PASSOS, ['parte', { nome: 'umSo', sel: { alias: 'segundoPrisioneiro' }, substituir: true }]],
+      freio.PARAMS, freio.TOPO, freio.MATERIAIS, null, freio.ALIASES,
+    );
+    expect(neutro.orfaos).toEqual([]);
+    const so = [...neutro.F.values()].filter((f: any) => f.parte === 'umSo');
+    expect(so.length).toBe(freio.TOPO.ladosFuroPrisioneiro);
+    expect(corposDaParte(neutro, 'umSo').length).toBe(1);
+    /* e é o SEGUNDO do círculo, não um qualquer: `volta:360` com `total:4`
+       começa em +Y (a `orientacao` declarada) e anda 90° por furo, então o
+       furo 1 está no eixo Z. Trocar `furo: 1` por outro índice mata isto. */
+    const caixa = corposDaParte(neutro, 'umSo')[0];
+    const y = (caixa.min[1] + caixa.max[1]) / 2, z = (caixa.min[2] + caixa.max[2]) / 2;
+    perto(Math.hypot(y, z), medida('prisioneiroOrbita'));
+    expect(Math.abs(y)).toBeLessThan(1e-9);
+    expect(Math.abs(z)).toBeCloseTo(medida('prisioneiroOrbita'), 9);
+  });
+
+  it('cada furo ATRAVESSA o flange de lado a lado — é passante, não cego', () => {
     for (const corpo of corposDaParte(comSonda(), 'paredesSonda')) {
       perto(corpo.min[0], medida('cuboFaceRodaX'));
-      perto(corpo.max[0], medida('cuboFaceRodaX') + P.prisioneiroSedeEspessura);
+      perto(corpo.max[0], medida('flangeFaceRodaX'));
     }
   });
 
   it('os furos ficam no círculo de prisioneiros, a 90° um do outro', () => {
-    const P = freio.PARAMS;
     const centros = corposDaParte(comSonda(), 'paredesSonda')
       .map((c: any) => [(c.min[1] + c.max[1]) / 2, (c.min[2] + c.max[2]) / 2]);
     // todos no MESMO raio, e é o raio que o parâmetro nomeia
@@ -272,81 +317,83 @@ describe('flange de roda: os quatro furos de prisioneiro', () => {
     );
   });
 
-  it('o furo tem o diâmetro do parâmetro que o nomeia, e sobra assento em volta', () => {
+  it('o furo tem o diâmetro do parâmetro que o nomeia, e sobra flange em volta', () => {
     const P = freio.PARAMS;
     for (const corpo of corposDaParte(comSonda(), 'paredesSonda')) {
       perto(corpo.max[1] - corpo.min[1], 2 * P.prisioneiroFuroRaio);
       perto(corpo.max[2] - corpo.min[2], 2 * P.prisioneiroFuroRaio);
     }
-    /* e o furo não come o assento inteiro: um furo que encosta na borda deixa
-       de ser furo e vira recorte de contorno. A relação é entre PARÂMETROS, não
-       entre o parâmetro e ele mesmo. */
-    expect(2 * P.prisioneiroFuroRaio)
-      .toBeLessThan(P.prisioneiroSedeLargura - 2 * P.prisioneiroSedeChanfro);
-    expect(2 * P.prisioneiroFuroRaio)
-      .toBeLessThan(P.prisioneiroSedeAltura - 2 * P.prisioneiroSedeChanfro);
+    /* e o furo não come o flange inteiro. Antes a folga era contra a largura do
+       ressalto; agora é contra o RAIO do flange, dos dois lados do círculo de
+       prisioneiros — é a relação que um flange de verdade tem. A conta usa o
+       apótema do polígono de `ladosCubo` lados, não o raio: é o apótema que a
+       malha entrega, e é nele que o anel encosta primeiro. */
+    const apotema = medida('flangeRaio') * Math.cos(Math.PI / freio.TOPO.ladosCubo);
+    expect(medida('prisioneiroOrbita') + P.prisioneiroFuroRaio).toBeLessThan(apotema);
+    expect(P.prisioneiroFuroRaio).toBeLessThan(medida('prisioneiroOrbita'));
   });
 
   it('os quatro anéis saem EM FASE: a parede 0 de cada furo é sempre a de cima', () => {
-    /* `orientacao:[0,1,0]` é a segunda capacidade do ciclo, e a única promessa
-       dela que se pode medir num furo de 12 lados: o CONJUNTO de vértices do
-       anel é o mesmo com qualquer fase, mas QUEM é a parede 0 muda. Com a
-       orientação declarada, o vértice 0 de todo anel aponta para +Y, então a
-       parede 0 é a mais alta do próprio furo — nos quatro assentos, inclusive
-       nos que o arranjo girou de 90°, 180° e 270°.
-       Sem a chave, a fase vem do quadro interno da face e a parede 0 cai em
-       outro lugar: aí `{op:'furo', id, parede:0}` deixa de nomear a mesma
-       região física em furos diferentes, que é exatamente o atrito do frame
-       implícito. */
-    const furos = freio.PASSOS
-      .filter((p: any) => p[0] === 'furo')
-      .map((p: any) => p[1].origemId);
-    expect(furos.length).toBe(freio.TOPO.prisioneiros);
-
-    /* uma sonda por citação: as duas famílias se sobrepõem (a parede 0 está
-       dentro de "todas as paredes"), e `substituir` faria a segunda apagar a
-       primeira no mesmo neutro. */
-    const alturaDe = (origem: Record<string, unknown>) => {
+    /* `orientacao:[0,1,0]` diz para onde aponta o vértice 0 de TODO anel do
+       passo. O CONJUNTO de vértices do anel é o mesmo com qualquer fase, mas
+       QUEM é a parede 0 muda: com a orientação declarada, o vértice 0 aponta
+       para +Y a partir do centro do próprio furo, então a parede 0 é a mais
+       distante do eixo naquela direção. Sem a chave, a fase vem do quadro
+       interno da face e `{op:'furo', id, furo:k, parede:0}` deixa de nomear a
+       mesma região física em furos diferentes. */
+    const centro = (i: number) => {
+      const passo = 2 * Math.PI * i / freio.TOPO.prisioneiros;
+      return [medida('prisioneiroOrbita') * Math.cos(passo), medida('prisioneiroOrbita') * Math.sin(passo)];
+    };
+    // a identidade do corte vem da peça, nunca copiada à mão para o teste
+    const idDoCorte = (freio.PASSOS.find((p: any) => p[0] === 'furo') as any)[1].origemId;
+    for (let k = 0; k < freio.TOPO.prisioneiros; k++) {
       const neutro = nucleo(
-        [...freio.PASSOS, ['parte', { nome: 'sonda', sel: { origem }, substituir: true }]],
+        [...freio.PASSOS, ['parte', { nome: 'sonda', sel: { origem: { op: 'furo', id: idDoCorte, furo: k, parede: 0 } }, substituir: true }]],
         freio.PARAMS, freio.TOPO, freio.MATERIAIS, null, freio.ALIASES,
       );
       expect(neutro.orfaos).toEqual([]);
-      const ys = [...neutro.F.values()]
-        .filter((f: any) => f.parte === 'sonda')
-        .flatMap((f: any) => f.vs.map((v: number) => neutro.V.get(v)![1]));
-      expect(ys.length).toBeGreaterThan(0);
-      return Math.max(...ys);
-    };
-
-    for (const id of furos) {
-      perto(
-        alturaDe({ op: 'furo', id, parede: 0 }),
-        alturaDe({ op: 'furo', id, parede: { passo: 1, fase: 0 } }),
-      );
+      const faces = [...neutro.F.values()].filter((f: any) => f.parte === 'sonda');
+      expect(faces).toHaveLength(1);
+      /* a parede 0 é a aresta 0→1 do anel, e o vértice 0 está a
+         `prisioneiroFuroRaio` do centro do furo NA DIREÇÃO +Y. */
+      const [cy, cz] = centro(k);
+      const pontos = faces[0].vs.map((v: number) => neutro.V.get(v)!);
+      const desloc = pontos.map((p: number[]) => [p[1] - cy, p[2] - cz]);
+      const topo = desloc.reduce((m: number[], p: number[]) => (p[0] > m[0] ? p : m), [-Infinity, 0]);
+      perto(topo[0], freio.PARAMS.prisioneiroFuroRaio);
+      expect(Math.abs(topo[1])).toBeLessThan(1e-9);
     }
   });
 
-  it('o assento não passa do raio do cubo: a roda ainda encosta no flange', () => {
+  it('o flange não passa do raio do cubo: a roda ainda entra por cima dele', () => {
     const P = freio.PARAMS;
     const neutro = comSonda();
     const cubo = caixaDaParte(neutro, 'cubo');
     // o flange avança PARA FORA do carro, além da face do cubo
-    perto(cubo.max[0], medida('cuboFaceRodaX') + P.prisioneiroSedeEspessura);
+    perto(cubo.max[0], medida('flangeFaceRodaX'));
     expect(cubo.max[0]).toBeGreaterThan(medida('cuboFaceRodaX'));
-    // e o assento termina rente ao cubo, sem crescer o envelope radial
+    /* e não cresce o envelope radial. Não é estética: o aro da roda entra por
+       cima do cubo com 0,6 mm de folga na escala da cena
+       (`roda-dianteira-integridade`), então um flange mais largo bateria nele. */
     perto(cubo.max[1], P.cuboRaio);
-    perto(medida('prisioneiroOrbita') + P.prisioneiroSedeAltura / 2, P.cuboRaio);
+    perto(medida('flangeRaio'), P.cuboRaio);
   });
 
-  it('a face em que a roda encosta continua existindo depois do corte', () => {
-    /* o corte CONSOME a face de entrada. O que sobra é a borda que o furo
-       publicou, e é ela que o alias `assentosDeRoda` endereça — se o alias
-       parasse de resolver, a peça perderia a superfície de apoio da roda sem
-       perder uma única face. */
+  it('a face em que a roda encosta é a borda MAIS o preenchimento', () => {
+    /* o corte CONSOME a face de entrada. Com UM furo por face o que sobrava era
+       só a borda, que dava a volta inteira; com quatro anéis na mesma face a
+       borda deixa de fechar a volta e o resto do flange é o PREENCHIMENTO. Os
+       dois juntos são a superfície de apoio da roda — se o alias esquecesse um
+       deles, a peça perderia superfície sem perder uma única face. */
     const neutro = comSonda();
     const assentos = [...neutro.F.values()].filter((f: any) => f.parte === 'assentosSonda');
-    expect(assentos.length).toBe(freio.TOPO.prisioneiros * freio.TOPO.ladosFuroPrisioneiro);
+    const bordas = freio.TOPO.prisioneiros * freio.TOPO.ladosFuroPrisioneiro;
+    // preenchimento: `n + 2M − 2` faces, com n cantos do contorno e M anéis
+    const preenchimento = freio.TOPO.ladosCubo + 2 * freio.TOPO.prisioneiros - 2;
+    expect(assentos.length).toBe(bordas + preenchimento);
     for (const f of assentos) expect(f.material).toBe('acoCubo');
+    // e é UMA superfície contínua, não quatro ilhas soltas
+    expect(corposDaParte(neutro, 'assentosSonda').length).toBe(1);
   });
 });

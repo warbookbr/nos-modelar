@@ -1,5 +1,5 @@
 {
-  "hashTotal": "21cda76200b85559878e23425f4d9a6b3d6fa5aee9a7719a9fe0f0854732fb32",
+  "hashTotal": "3fdf96a0f1cb89bf22ca099a7979cbb40da08fbab71e2a8a483472aefd185765",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -107,9 +107,9 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "410c683665142bbbf97224e3dcdb5436682a47a98c190af893a3ddc5d018dd52",
-      "vertices": 554,
-      "faces": 540
+      "hash": "95a3c94d953fc43111b25124dd8fe73c65946e14dee64f0110ff755d90e254e9",
+      "vertices": 490,
+      "faces": 504
     },
     "lanterna": {
       "hash": "711e2c57837371eb8559715b5a18c7f94cad8f1baa556d9bb3033731ab1e1b93",

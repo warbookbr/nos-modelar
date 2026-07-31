@@ -41,11 +41,14 @@ const MEDIDAS = {
   cuboComprimento: 0.090,
   cuboRecuo: 0.070,            // quanto o cubo entra para dentro a partir do plano do disco
 
-  // flange de roda: os assentos de prisioneiro na ponta do cubo, e o furo de cada um
-  prisioneiroSedeEspessura: 0.012,   // quanto o assento avança para fora, além da face do cubo
-  prisioneiroSedeAltura: 0.028,      // extensão RADIAL do assento
-  prisioneiroSedeLargura: 0.028,     // extensão do assento ao longo do arco
-  prisioneiroSedeChanfro: 0.002,
+  /* flange de roda: UM disco na ponta do cubo, com o círculo de prisioneiros
+     furado nele. Até a rodada "Furo v2" cada prisioneiro tinha um RESSALTO
+     quadrado próprio, e o motivo era a linguagem, não a mecânica: um passo de
+     `furo` consumia a face de entrada, então dois furos exigiam duas faces.
+     Com `centros`, os quatro furos saem da MESMA face num passo só, e o flange
+     volta a ser o que um flange de roda é. */
+  flangeEspessura: 0.012,            // quanto o flange avança para fora, além da face do cubo
+  prisioneiroOrbita: 0.038,          // raio do círculo de prisioneiros (o PCD dividido por 2)
   prisioneiroFuroRaio: 0.0065,       // furo passante do prisioneiro (M12)
 
   // pastilhas: uma de cada lado do disco, com folga de repouso
@@ -102,15 +105,14 @@ const DERIVADAS = {
   chapeuX: '= -(discoEspessura / 2 + chapeuProfundidade)',
   cuboX: '= -cuboRecuo',
 
-  /* A face do cubo em que a roda encosta, e o flange que nasce dela. O assento
-     termina RENTE ao cubo (`prisioneiroOrbita` é o raio do círculo de
-     prisioneiros), então mudar `cuboRaio` leva o círculo junto — a relação fica
-     escrita, não o número calculado fora. */
+  /* A face do cubo em que a roda encosta, e o flange que nasce dela. O flange
+     tem o RAIO DO CUBO, e isso é restrição de montagem, não estética: o aro da
+     roda entra por cima do cubo com 0,6 mm de folga na escala da cena
+     (`roda-dianteira-integridade`), então um flange mais largo bateria no aro.
+     A relação fica escrita, não o número calculado fora. */
   cuboFaceRodaX: '= cuboComprimento - cuboRecuo',
-  prisioneiroSedeX: '= cuboComprimento - cuboRecuo + prisioneiroSedeEspessura / 2',
-  prisioneiroSedeBaseY: '= cuboRaio - prisioneiroSedeAltura',
-  prisioneiroOrbita: '= cuboRaio - prisioneiroSedeAltura / 2',
-  prisioneiroOrbitaNeg: '= -(cuboRaio - prisioneiroSedeAltura / 2)',
+  flangeRaio: '= cuboRaio',
+  flangeFaceRodaX: '= cuboComprimento - cuboRecuo + flangeEspessura',
 
   pastilhaInternaX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2)',
   pastilhaExternaX: '= discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2',
@@ -149,11 +151,12 @@ export const TOPO = {
   ladosCubo: 16,
   ladosPistao: 12,
   ladosFlexivel: 8,
-  /* quantos assentos o flange tem, CONTANDO a sede fonte. Mudar este número
-     SEM escrever o furo do assento novo deixa o flange com assento cego, e é
-     por isso que `freio-disco-integridade` conta os furos contra ele. O passo
-     angular sai de `volta:360 / prisioneiros`: com 4, ele é de 90°, e o centro
-     de cada furo é ±`prisioneiroOrbita` em Y ou em Z. */
+  /* quantos prisioneiros o flange tem. Antes da rodada "Furo v2" este número
+     não bastava: cada furo precisava do RESSALTO dele e do PASSO de corte
+     dele, escritos à mão, e mudar 4 para 5 deixava o flange com assento cego.
+     Agora ele é a única coisa a mudar — `centros:{total:'prisioneiros'}` leva o
+     círculo junto, sem seno, sem cosseno e sem coordenada de furo no arquivo.
+     Com 4 o passo angular é de 90°; com 5 é de 72°, e nada mais muda. */
   prisioneiros: 4,
   ladosFuroPrisioneiro: 12,
 };
@@ -175,16 +178,11 @@ export const MATERIAIS = {
 const DISCO_PISTA = 301;
 const DISCO_CHAPEU = 302;
 const CUBO = 303;
-/* o flange de roda: UMA sede, o arranjo que a repete em volta do eixo, e o furo
-   de cada assento. O furo da FONTE vem por último de propósito — furar consome
-   a face de entrada, e o recorte que endereça a mesma face nas cópias é
-   resolvido contra a malha viva (ATRITOS-AUTORIA A-28). */
-const SEDE_PRISIONEIRO = 304;
-const FLANGE_PRISIONEIROS = 305;
-const FURO_PRISIONEIRO_COPIA_0 = 306;
-const FURO_PRISIONEIRO_COPIA_1 = 307;
-const FURO_PRISIONEIRO_COPIA_2 = 308;
-const FURO_PRISIONEIRO_FONTE = 309;
+/* o flange de roda: UM disco e UM passo de corte, porque `centros` abre os
+   quatro furos na mesma face. Os ids 306–309, que eram um furo por assento,
+   saíram junto com os ressaltos. */
+const FLANGE = 304;
+const FUROS_PRISIONEIRO = 305;
 const PASTILHA_INTERNA = 311;
 const PASTILHA_EXTERNA = 312;
 const PINCA_PONTE = 321;
@@ -211,32 +209,10 @@ const origensInteiras = (op, ids) => ids.map((id) => ({ origem: { op, id } }));
    ausente: ausente, numa origem sem eixo nenhum, quer dizer "a primitiva
    inteira" (ver `_prateleira-furada.js`). */
 const TODOS = { passo: 1, fase: 0 };
-const ORIGEM_SEDE = { op: 'chamferBox', id: SEDE_PRISIONEIRO };
-const SEDE_FACE_RODA = { ...ORIGEM_SEDE, face: 'direita' };    // +X: para fora do carro
-const SEDE_FACE_CUBO = { ...ORIGEM_SEDE, face: 'esquerda' };   // -X: contra o cubo
-/* o recorte do arranjo: UMA face da sede, na cópia `k`. É a composição que este
-   ciclo abriu — antes, a origem do arranjo só sabia responder pela cópia
-   INTEIRA, e `furo` exige que `de` resolva para uma face só. */
-const naCopia = (face, k) => ({ op: 'arranja', id: FLANGE_PRISIONEIROS, de: face, copia: k });
-const ORIGEM_FUROS_PRISIONEIRO = [
-  FURO_PRISIONEIRO_COPIA_0, FURO_PRISIONEIRO_COPIA_1,
-  FURO_PRISIONEIRO_COPIA_2, FURO_PRISIONEIRO_FONTE,
-].map((id) => ({ op: 'furo', id }));
-
-/* Os quatro assentos são a MESMA sede, girada de 90° em 90° em torno do eixo da
-   roda. `furo` pede o ponto do MUNDO por onde o furo passa, e a 90° esse ponto é
-   ±`prisioneiroOrbita` em Y ou em Z — nenhum seno, nenhum cosseno, nenhum
-   parâmetro de coordenada. É a mesma economia que o ciclo 3 fez na roda. Um
-   passo de 72° (cinco prisioneiros) exigiria o cosseno como PARAM: está medido
-   em ATRITOS-AUTORIA A-29.
-   ORDEM: as cópias primeiro, a fonte por último — furar a fonte consome a face
-   que endereça as cópias. */
-const ASSENTOS = [
-  { origemId: FURO_PRISIONEIRO_COPIA_0, entrada: naCopia(SEDE_FACE_RODA, 0), saida: naCopia(SEDE_FACE_CUBO, 0), centro: ['prisioneiroSedeX', 0, 'prisioneiroOrbita'] },
-  { origemId: FURO_PRISIONEIRO_COPIA_1, entrada: naCopia(SEDE_FACE_RODA, 1), saida: naCopia(SEDE_FACE_CUBO, 1), centro: ['prisioneiroSedeX', 'prisioneiroOrbitaNeg', 0] },
-  { origemId: FURO_PRISIONEIRO_COPIA_2, entrada: naCopia(SEDE_FACE_RODA, 2), saida: naCopia(SEDE_FACE_CUBO, 2), centro: ['prisioneiroSedeX', 0, 'prisioneiroOrbitaNeg'] },
-  { origemId: FURO_PRISIONEIRO_FONTE, entrada: SEDE_FACE_RODA, saida: SEDE_FACE_CUBO, centro: ['prisioneiroSedeX', 'prisioneiroOrbita', 0] },
-];
+const ORIGEM_FLANGE = { op: 'cilindro', id: FLANGE };
+const FLANGE_FACE_RODA = { ...ORIGEM_FLANGE, tampa: 'topo' };    // +X: para fora do carro
+const FLANGE_FACE_CUBO = { ...ORIGEM_FLANGE, tampa: 'fundo' };   // -X: contra o cubo
+const ORIGEM_FUROS_PRISIONEIRO = { op: 'furo', id: FUROS_PRISIONEIRO };
 
 /* ALIASES são NOMES DE SELEÇÃO, não partes: um agente pode dizer
    `sel:{alias:'pistaInterna'}` sem saber que a pista é a tampa `fundo` de um
@@ -253,19 +229,26 @@ export const ALIASES = [
   ['pistaExterna', { origem: { op: 'cilindro', id: DISCO_PISTA, tampa: 'topo' } }],
   ['discoBordo', { origem: { op: 'cilindro', id: DISCO_PISTA } }],
   ['cuboInteiro', cilindroInteiro(CUBO)],
-  /* o flange ANTES do corte: a sede fonte mais as cópias do arranjo. Este alias
-     é citado no `parte`, que roda antes dos furos — depois deles a citação da
-     sede inteira gritaria, com razão, porque duas faces dela foram consumidas. */
-  ['flangeInteiro', { unir: [
-    { origem: ORIGEM_SEDE },
-    { origem: { op: 'arranja', id: FLANGE_PRISIONEIROS, de: ORIGEM_SEDE } },
-  ] }],
+  /* o flange ANTES do corte: o disco inteiro. Este alias é citado no `parte`,
+     que roda antes do furo — depois dele a citação das duas tampas gritaria,
+     com razão, porque o corte as consumiu. */
+  ['flangeInteiro', cilindroInteiro(FLANGE)],
   /* a parede de cada furo de prisioneiro: é o cilindro por onde o prisioneiro
-     passa, e é ela que fica lisa. */
-  ['paredesDosPrisioneiros', { unir: ORIGEM_FUROS_PRISIONEIRO.map((o) => ({ origem: { ...o, parede: TODOS } })) }],
-  /* a face em que a roda encosta, depois do corte: o que sobrou da face de cada
-     assento é a BORDA que o furo publicou. */
-  ['assentosDeRoda', { unir: ORIGEM_FUROS_PRISIONEIRO.map((o) => ({ origem: { ...o, borda: TODOS } })) }],
+     passa, e é ela que fica lisa. Um passo só, quatro anéis. */
+  ['paredesDosPrisioneiros', { origem: { ...ORIGEM_FUROS_PRISIONEIRO, parede: TODOS } }],
+  /* o SEGUNDO prisioneiro, sozinho: é esta citação que prova que os quatro
+     furos do mesmo passo continuam distinguíveis entre si. Sem o eixo `furo`
+     ela pediria as 48 paredes e receberia as 48. */
+  ['segundoPrisioneiro', { origem: { ...ORIGEM_FUROS_PRISIONEIRO, furo: 1, parede: TODOS } }],
+  /* a face em que a roda encosta, depois do corte. Com UM furo por face ela era
+     só a borda; com quatro anéis na mesma face a borda deixa de dar a volta
+     inteira, e o resto do flange é o PREENCHIMENTO. Os dois juntos são a
+     superfície de apoio da roda. */
+  ['bocasDosPrisioneiros', { origem: { ...ORIGEM_FUROS_PRISIONEIRO, borda: TODOS } }],
+  ['assentosDeRoda', { unir: [
+    { origem: { ...ORIGEM_FUROS_PRISIONEIRO, borda: TODOS } },
+    { origem: { ...ORIGEM_FUROS_PRISIONEIRO, preenchimento: TODOS } },
+  ] }],
   ['pastilhaInternaInteira', cuboInteiro(PASTILHA_INTERNA)],
   ['pastilhaExternaInteira', cuboInteiro(PASTILHA_EXTERNA)],
   ['pincaInteira', { unir: origensInteiras('chamferBox', [PINCA_PONTE, PINCA_GARRA_INTERNA, PINCA_GARRA_EXTERNA]) }],
@@ -301,34 +284,37 @@ export const PASSOS = [
   ['transladar', { d: ['cuboX', 0, 0], sel: { alias: 'cuboInteiro' } }],
   ['parte', { nome: 'cubo', sel: { alias: 'cuboInteiro' } }],
 
-  /* ---- flange de roda: quatro assentos de prisioneiro, cada um furado.
-     É aqui que as duas capacidades deste ciclo se encontram numa peça de
-     produto: o ARRANJO radial põe os assentos em volta do eixo da roda, e o
-     CORTE abre o furo de cada um. Sem o arranjo seriam quatro declarações
-     iguais; sem o corte o cubo continuaria sem por onde o prisioneiro passa,
-     que era a omissão registrada no plano. ---- */
-  ['chamferBox', { origemId: SEDE_PRISIONEIRO, larg: 'prisioneiroSedeEspessura', alt: 'prisioneiroSedeAltura', prof: 'prisioneiroSedeLargura', chanfro: 'prisioneiroSedeChanfro' }],
-  ['transladar', { d: ['prisioneiroSedeX', 'prisioneiroSedeBaseY', 0], sel: { origem: ORIGEM_SEDE } }],
-  ['arranja', {
-    origemId: FLANGE_PRISIONEIROS,
-    derivaDe: ORIGEM_SEDE,
-    sel: { origem: ORIGEM_SEDE },
-    modo: 'radial', eixo: 'x', volta: 360, total: 'prisioneiros', pivo: PIVO_EIXO,
-  }],
+  /* ---- flange de roda: UM disco na ponta do cubo, com o círculo de
+     prisioneiros furado nele.
+
+     O QUE MUDOU E POR QUÊ. Até a rodada "Furo v2" este trecho era um ressalto
+     quadrado por prisioneiro, posto pelo `arranja` radial e furado um a um.
+     Os ressaltos não vinham do desenho mecânico: vinham de um passo de `furo`
+     consumir a face de entrada, então cada furo precisava de uma face só dele.
+     Com `centros`, os quatro furos saem da MESMA face num passo só, e o flange
+     é o que um flange de roda é — um disco liso com um círculo de furos.
+     O flange usa `ladosCubo` de propósito: ele é rente ao cubo, e uma silhueta
+     diferente da do cubo apareceria como degrau na vista frontal. ---- */
+  ['cilindro', { origemId: FLANGE, raio: 'flangeRaio', altura: 'flangeEspessura', lados: 'ladosCubo' }],
+  paraEixoX(FLANGE),
+  ['transladar', { d: ['cuboFaceRodaX', 0, 0], sel: { alias: 'flangeInteiro' } }],
   /* a identidade vem ANTES do corte: as faces que o furo cria herdam `parte` da
      face de entrada, então os quatro furos já nascem sendo cubo. */
   ['parte', { nome: 'cubo', sel: { alias: 'flangeInteiro' } }],
-  ...ASSENTOS.map(({ origemId, entrada, saida, centro }) => ['furo', {
-    origemId,
-    de: entrada,
-    saida,
-    centro,
+  /* a frase do desenho, inteira, num passo: quatro furos a 38 mm do centro,
+     dividindo a volta. Nenhuma coordenada de furo, nenhum seno, nenhum cosseno
+     no formato salvo. `orientacao` põe o vértice 0 de todo anel em +Y, então os
+     quatro anéis saem em fase e a `parede 0` nomeia a mesma região física em
+     todos eles. */
+  ['furo', {
+    origemId: FUROS_PRISIONEIRO,
+    de: FLANGE_FACE_RODA,
+    saida: FLANGE_FACE_CUBO,
+    centros: { distancia: 'prisioneiroOrbita', total: 'prisioneiros', volta: 360 },
     raio: 'prisioneiroFuroRaio',
     lados: 'ladosFuroPrisioneiro',
-    /* a MESMA orientação nos quatro: os anéis saem em fase, e o furo do assento
-       de cima é o mesmo desenho do furo do assento de baixo. */
     orientacao: [0, 1, 0],
-  }]),
+  }],
 
   // ---- pastilhas: uma de cada lado do disco, com a folga de repouso ----
   ['cubo', { origemId: PASTILHA_INTERNA, larg: 'pastilhaEspessura', alt: 'pastilhaAltura', prof: 'pastilhaLargura' }],
@@ -382,6 +368,7 @@ export const PASSOS = [
   ['liso', { sel: { alias: 'discoBordo' } }],
   ['liso', { sel: { origem: { op: 'cilindro', id: DISCO_CHAPEU } } }],
   ['liso', { sel: { origem: { op: 'cilindro', id: CUBO } } }],
+  ['liso', { sel: { origem: ORIGEM_FLANGE } }],
   ['liso', { sel: { alias: 'paredesDosPrisioneiros' } }],
   ['liso', { sel: { origem: { op: 'cilindro', id: PISTAO } } }],
   ['liso', { sel: { alias: 'flexivelInteiro' } }],
