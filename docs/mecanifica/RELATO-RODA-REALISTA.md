@@ -153,6 +153,21 @@ escuro sobre uma superfície não seria uma abertura e foi rejeitado.
 **Detalhe reduzido:** não há sulcos transversais, furos de fixação verdadeiros,
 válvula nem recortes de alívio no miolo.
 
+**Capacidade ausente — PARCIALMENTE ENTREGUE em 31 de julho de 2026** (ciclo
+"Corte e orientação de seção v1", ATRITOS-AUTORIA A-27, UPSTREAM-NOS UP-021): a
+op `furo` abre um furo cilíndrico numa face plana e convexa, PASSANTE (`saida`)
+ou CEGO (`profundidade`). Ela NÃO é uma booleana genérica, e isso é decisão:
+uma booleana destruiria a identidade de dezenas de faces de uma vez, em
+silêncio. O corte toca só as faces nomeadas, toda face criada é endereçável pela
+origem `furo` e toda face destruída grita quando alguém a cita depois.
+
+**O que continua ausente:** sulco transversal, bolsão, recorte de alívio, furo
+oblíquo e furo em face côncava — nenhum deles é a operação estreita que o `furo`
+entregou. E um SEGUNDO furo na mesma face não existe (A-26), então o círculo de
+prisioneiros ainda não cabe numa placa. **A peça não foi reescrita neste ciclo**
+— a roda experimental continua com os fixadores representados por porcas sobre o
+miolo.
+
 ### Perfil sem curvas
 
 Cada ponto do `lathe` é uma quina linear; alça de curva está reservada, mas não

@@ -59,9 +59,18 @@ Estado atual:
   inteira";
 - **o ciclo 4, "Corte e orientação de seção v1", está EM EXECUÇÃO.** Ele é o
   antigo candidato "Realismo geométrico v1", com escopo fechado em duas
-  capacidades gerais. A primeira já está de pé: `orientacao` no `loft` — o
-  autor declara a direção da seção em vez de herdar o frame implícito do
-  gerador (A-25, UP-020). Nenhuma peça usa a chave ainda;
+  capacidades gerais, e as DUAS já estão de pé no núcleo:
+  `orientacao` no `loft` — o autor declara a direção da seção em vez de herdar o
+  frame implícito do gerador (A-25, UP-020) —, e a op `furo` (A-27, UP-021), a
+  primeira SUBTRAÇÃO do núcleo: um furo cilíndrico numa face plana e convexa,
+  passante ou cego. `furo` não é uma booleana genérica, e isso é decisão: toda
+  face que ele cria é endereçável pela origem `furo` e toda face que ele destrói
+  entra num registro de consumo que faz a citação seguinte gritar. A peça de
+  exercício `prototipos/fps/v3/pecas/_prateleira-furada.js` prova a op fora do
+  vocabulário automotivo (prateleira com parafuso passante, cavilha cega e
+  puxador vazado), com 0 face sem identidade e 0 órfão. Nenhuma peça de PRODUTO
+  usa nenhuma das duas capacidades, e um segundo furo na mesma face ainda não
+  existe (A-26);
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -187,6 +196,7 @@ npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
 npm run descrever -- roda-dianteira
 npm run descrever -- _jardineira --estrito
 npm run descrever -- _cerca-e-flor --estrito
+npm run descrever -- _prateleira-furada --estrito
 ```
 
 Prova de comportamento no navegador — dirige a Oficina headless e clica nos
@@ -275,9 +285,10 @@ modelados.
 
 **Próxima entrega: o ciclo 4, “Corte e orientação de seção v1”, aberto no
 [`PLANO.md`](PLANO.md).** Ele substitui o candidato “Realismo geométrico v1” e
-carrega duas capacidades gerais escolhidas pela crítica da roda. A orientação
-declarada da seção do `loft` (`orientacao`) já está entregue no núcleo, com
-teste, mutação e leitura na bancada; ela não foi levada a nenhuma peça.
+carrega duas capacidades gerais escolhidas pela crítica da roda. As duas estão
+entregues no núcleo, com teste, mutação e conferência no navegador: a orientação
+declarada da seção do `loft` (`orientacao`) e a op `furo`, passante e cega. A
+segunda tem peça de exercício; nenhuma das duas foi levada a peça de PRODUTO.
 
 ## Manutenção desta documentação
 

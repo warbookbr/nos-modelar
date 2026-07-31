@@ -21,6 +21,40 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a peça de exercício
+`prototipos/fps/v3/pecas/_prateleira-furada.js`, escrita para provar a op `furo`
+fora do vocabulário automotivo. A op consome a face de entrada — ela deixa de
+ser um polígono e vira a borda anular do corte. Um SEGUNDO furo na MESMA face é
+impossível: a face que ele citaria não existe mais. Na prática o autor teria de
+descobrir em qual das `lados` faces da borda o segundo furo cai, o que é
+endereçamento por acaso.
+
+O custo é exatamente a figura mecânica mais comum que existe: um círculo de
+parafusos numa placa, ou uma fileira de furos numa cantoneira. Hoje eles só
+existem se cada furo cair numa face diferente. A peça de exercício foi desenhada
+em volta dessa limitação — três furos, três faces distintas —, e isso está dito
+nela em voz alta.
+
+O `arranja` também não resolve: ele COPIA faces, não repete o corte. Arranjar a
+origem de um furo daria seis cópias da geometria do furo flutuando, sem furar a
+placa seis vezes.
+
+**Contorno usado:** um furo por face, e o conjunto declarado por um ALIAS `unir`
+juntando as faces que sobraram com as origens que os cortes publicaram — o
+conserto que o próprio diagnóstico do núcleo recomenda.
+
+**Capacidade candidata:** o `furo` aceitar VÁRIOS centros num passo só (uma
+lista, ou um arranjo declarado como o do `arranja`), abrindo N furos na mesma
+face de uma vez, com a borda anular resolvida entre o contorno externo e os N
+anéis. A numeração continuaria fechada (`lados` faces por anel, mais a borda),
+mas a partição do polígono deixa de ser a volta simples de hoje. É geral: placa
+de móvel, flange, cantoneira, chapa de robô e cubo de roda têm todos círculo ou
+fileira de furos.
+
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
 **Onde dói:** conferência headless da bancada.
@@ -696,6 +730,54 @@ sustenta. A prova não automotiva do arranjo entrou em peça nova
 (`prototipos/fps/v3/pecas/_cerca-e-flor.js`). A ordem em que a coleção resolve
 as faces segue determinística e sem afirmação, porque nenhum consumidor do
 núcleo distingue essa ordem hoje.
+
+### A-27 — não havia subtração: a peça era montada EM VOLTA do vazio
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** a roda experimental, registrada em
+[`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md), seção "Sem subtração ou
+corte volumétrico". A linguagem não tinha nenhuma operação para abrir sulco
+transversal, perfurar o miolo ou recortar bolsão. Todo vazio era CONTORNADO: a
+abertura central saiu do perfil anular do miolo, as janelas entre raios saíram
+de deixar o espaço em branco, e os fixadores viraram porcas SOBRE o miolo em vez
+de furos. O custo aparece no que não foi modelado — o cubo do freio não tem furo
+de prisioneiro e a roda não tem furo de fixação de verdade.
+
+**Contorno usado:** material escuro sobre a superfície foi cogitado e recusado
+(não é abertura, é pintura); a peça foi montada em volta do vazio.
+
+**Correção (ciclo "Corte e orientação de seção v1"):** a op `furo` — um furo
+cilíndrico numa face plana e convexa, PASSANTE (`saida`, a face por onde ele
+sai) ou CEGO (`profundidade`, onde ele para).
+
+A decisão central foi NÃO construir uma booleana genérica. Uma booleana destrói
+a identidade de dezenas de faces de uma vez, em silêncio, que é exatamente o que
+O-6 e O-12 vieram matar. `furo` toca só as duas faces que o autor nomeou por
+origem estrutural; toda face criada nasce endereçável pela origem `furo`
+(famílias `borda`, `parede`, `saida` e a tampa `'fundo'`); e toda face destruída
+entra num registro de consumo que faz a citação seguinte GRITAR — inclusive a
+citação de UNIÃO (`{op:'cubo', id}`), que antes pulava id morto em silêncio e
+devolveria cinco faces das seis, plausível na foto.
+
+O casamento entre o anel e os cantos da face cortada é ANGULAR, não por índice:
+com índice a borda de um quadrado com furo central e `lados:8` sai com
+quadriláteros reflexos, planos mas côncavos, que o leque de triangulação do
+visor preenche torto. Isso tem afirmação em teste.
+
+**Prova fora do assunto automotivo:**
+`prototipos/fps/v3/pecas/_prateleira-furada.js` — tábua, parafuso passante,
+encaixe de cavilha cego e puxador redondo vazado. 5 partes, 116 faces, 0 face
+sem identidade, 0 órfão, 3 portas.
+
+**Limite declarado:** um furo por face (A-26, aberto). Só furo CILÍNDRICO, só
+face PLANA e CONVEXA, só na direção da normal — furo oblíquo, rasgo, bolsão e
+sulco transversal continuam sem operação. Nenhuma peça de PRODUTO usa a op: o
+cubo do freio continua sem prisioneiro.
+
+**Lição geral:** a operação estreita e correta chega antes da geral e
+traiçoeira. Cada caso real resolvido por ela é um caso a menos contornado no
+arquivo da peça, e nenhuma identidade se perde no caminho.
 
 ### A-25 — o frame do `loft` era implícito, e a peça remontava o contorno
 

@@ -228,7 +228,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
 | 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
-| 3 | **em execução** | Corte e orientação de seção v1 | duas capacidades escolhidas pela crítica da roda, cada uma útil fora do vocabulário automotivo; a orientação declarada da seção do `loft` já está de pé (A-25, UP-020) |
+| 3 | **em execução** | Corte e orientação de seção v1 | duas capacidades escolhidas pela crítica da roda, cada uma útil fora do vocabulário automotivo. As DUAS estão de pé: a orientação declarada da seção do `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). Nenhuma peça de PRODUTO usa nenhuma das duas |
 | 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
@@ -542,8 +542,54 @@ byte-idênticas no `gabarito:selecao:check`, sem regravar nenhuma. 10 casos em
 que propaga o frame a partir da referência declarada, que só morre em caminho
 com torção. Conferida no olho na bancada, em isométrica e superior.
 
-**O que ela NÃO fez:** nenhuma peça usa a chave. A roda experimental continua
-remontando o contorno em código auxiliar.
+**O que ela NÃO fez:** nenhuma peça de PRODUTO usa a chave. A roda experimental
+continua remontando o contorno em código auxiliar. A peça de exercício
+`_prateleira-furada` passou a usar a palavra `orientacao` na op `furo`, que é a
+mesma chave e a mesma regra, mas não é o `loft`.
+
+**Entregue — abrir vazio: a op `furo` (A-27, UP-021):** um furo cilíndrico numa
+face plana e convexa, PASSANTE (`saida`, a face por onde ele sai) ou CEGO
+(`profundidade`, onde ele para). É o furo de prisioneiro, o parafuso de móvel, o
+respiro de robô e o furo de eixo de carroça, com uma op só e sem palavra nova.
+
+A decisão central foi **não construir uma booleana genérica**. Uma booleana
+destrói a identidade de dezenas de faces de uma vez, em silêncio, que é o que
+O-6 e O-12 vieram matar. As três garantias que o ciclo exigiu, cada uma com
+afirmação que morre quando o valor muda:
+
+1. **toda face criada é endereçável** — a origem `furo` (a 7ª do núcleo) tem os
+   eixos numéricos `borda`, `parede` e `saida`, mais a tampa nominal `'fundo'`.
+   Numeração fechada: vértices `b+j` e `b+lados+j`; faces `b+j` borda,
+   `b+lados+j` parede, `b+2·lados+j` saída OU `b+2·lados` fundo. Mudar `raio` ou
+   `centro` muda a FORMA, nunca o id;
+2. **toda face destruída grita** — a face cortada entra em `st.consumidas`, e
+   citá-la depois vira erro nomeando o furo e o passo. Inclusive na citação de
+   UNIÃO (`{op:'cubo', id}`), que antes pulava id morto em silêncio e devolveria
+   cinco faces das seis — plausível na foto. `apagaFace` continua como sempre:
+   remover é uma coisa, ser substituída é outra;
+3. **completude** — face não-plana, face côncava, anel que encosta ou vaza o
+   contorno, saída igual à entrada, saída que o eixo não atravessa, raio ou
+   profundidade ≤ 0 e entrada ambígua abortam o passo inteiro com 0 V / 0 F.
+
+O casamento entre o anel e os cantos da face cortada é ANGULAR, não por índice:
+por índice a borda de um quadrado com furo central e `lados:8` sai com
+quadriláteros reflexos, que o leque de triangulação do visor preenche torto.
+
+**Prova:** 26 casos em `tools/oficina/oficina.test.ts`, 10 em
+`tools/mecanifica/prateleira-integridade.test.ts`. 34 mutações rodadas; 3
+sobreviveram e foram mortas com teste novo. Aditiva: `gabarito:selecao:check`
+verde, as 23 peças anteriores byte-idênticas. A peça de exercício
+`prototipos/fps/v3/pecas/_prateleira-furada.js` prova a op fora do vocabulário
+automotivo — tábua, parafuso passante, cavilha cega e puxador vazado, 5 partes,
+116 faces, 0 face sem identidade, 0 órfão, 3 portas — e foi conferida no
+navegador em três enquadramentos, mais o furo cego isolado e focado.
+
+**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usa a op. O cubo do
+freio continua sem prisioneiro e a roda sem furo de fixação. Só furo cilíndrico,
+só face plana e convexa, só na direção da normal — rasgo, bolsão, sulco
+transversal e furo oblíquo continuam sem operação. E **um furo por face**: um
+segundo furo na mesma face é impossível, então um círculo de parafusos numa
+placa ainda não existe (A-26, aberto).
 
 **Registro anterior deste ciclo, quando ainda era candidato:**
 
