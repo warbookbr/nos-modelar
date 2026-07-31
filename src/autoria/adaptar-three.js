@@ -204,12 +204,17 @@ function normaisSuaves(neutro, preparo) {
 function triangularFace(face, preparo, destino, destinoNormais, suaves) {
   const { pontos, normal, tris } = preparo.get(face.id);
   for (const cantos of tris) {
-    /* a normal chapada do triângulo, e não a do plano da face, para que um
-       n-gon TORTO continue com o mesmo relevo de sempre; se ela degenerar (ou
-       vier virada num sliver), quem manda é o plano da face. */
-    const propria = normalizar(normalDoTriangulo(pontos[cantos[0]], pontos[cantos[1]], pontos[cantos[2]]));
-    const chapada = propria && (propria[0] * normal[0] + propria[1] * normal[1] + propria[2] * normal[2]) > 0
-      ? propria : normal;
+    /* a normal chapada do TRIÂNGULO, e não a do plano da face, para que um
+       n-gon torto continue com o mesmo relevo de sempre. Só quando ela degenera
+       (triângulo de área nula) o plano da face assume.
+
+       Aqui NÃO existe uma conferência de sentido contra a normal do plano, e
+       isso é medido: com ela, a mutação que devolve a triangulação ao leque
+       SOBREVIVIA — o sentido era corrigido, a normal virada sumia, e o triângulo
+       continuava cobrindo área fora do polígono. Guarda que conserta a aparência
+       de uma geometria errada é o defeito silencioso que este arquivo veio
+       consertar. Quem garante o sentido é a orelha. */
+    const chapada = normalizar(normalDoTriangulo(pontos[cantos[0]], pontos[cantos[1]], pontos[cantos[2]])) ?? normal;
     for (const k of cantos) destino.push(...pontos[k]);
     for (const k of cantos) {
       const suave = face.liso ? suaves.get(face.vs[k]) : null;
