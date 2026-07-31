@@ -25,12 +25,23 @@ quem modelou é inesperado.
 
 **Onde dói:** linguagem da Oficina, ao compor `arranja` com `furo`.
 
-**Evidência:** o flange de roda de `prototipos/fps/v3/pecas/freio-disco.js`. A
-op `furo` exige `centro`, o ponto do MUNDO por onde o furo passa — e exige com
-razão: o centroide da face como default seria um furo que muda de lugar quando
-a face muda de forma. Só que o assento em que ele entra foi posto ali pelo
-`arranja`, que girou a fonte de `volta/total` graus. Para dizer onde está o
-centro da cópia `k`, o autor precisa do ponto girado.
+**A evidência ORIGINAL foi embora, e isto é registro, não conserto.** O flange
+de roda de `prototipos/fps/v3/pecas/freio-disco.js` era o caso desta entrada
+enquanto ele fosse um ressalto por prisioneiro, posto pelo `arranja` e furado um
+a um. A rodada "Flange de uma peça só" trocou os ressaltos por UM disco com
+`centros:{distancia, total, volta}`, e ali não existe mais cópia a localizar:
+`npm test` constrói o freio com 3, 5, 6 e 8 prisioneiros, e o de 5 (72°) sai com
+zero órfão e sem um cosseno no arquivo. O atrito continua ABERTO porque a forma
+de círculo do `centros` desarma o caso do CÍRCULO DE FUROS, não o caso geral de
+localizar a cópia `k` de um `arranja` radial — e é este que segue sem resposta,
+para qualquer op que precise apontar para uma cópia girada.
+
+**Evidência (a que motivou, preservada):** a op `furo` exige `centro`, o ponto
+do MUNDO por onde o furo passa — e exige com razão: o centroide da face como
+default seria um furo que muda de lugar quando a face muda de forma. Só que o
+assento em que ele entrava foi posto ali pelo `arranja`, que girou a fonte de
+`volta/total` graus. Para dizer onde está o centro da cópia `k`, o autor precisa
+do ponto girado.
 
 A gramática aritmética dos PARAMS tem `+ - * /`, parênteses e nomes. Não tem
 seno nem cosseno, e é decisão: fórmula transcendental no arquivo salvo é a porta
@@ -39,13 +50,14 @@ simples: com `total: 4` e `volta: 360` o passo é 90°, e o ponto girado é
 ±raio em Y ou em Z, ou zero — quatro nomes de parâmetro e nada mais. Com
 `total: 5` (72°), o centro de cada cópia precisaria de `cos 72°` e `sen 72°`
 como PARAM, isto é, oito números de coordenada digitados à mão. É exatamente a
-classe que o ciclo 3 tirou da roda experimental (A-17), e por isso o flange do
-freio tem QUATRO prisioneiros, não cinco.
+classe que o ciclo 3 tirou da roda experimental (A-17). Enquanto durou, ela
+prendeu o flange do freio em QUATRO prisioneiros.
 
-**Contorno usado:** quatro prisioneiros, com `volta: 360` e `total: 4`. É um
-padrão de furação real (4×100 é dos mais comuns em carro médio), então o
-contorno não deforma o assunto — mas ele foi escolhido pela linguagem, e isso
-está dito na peça.
+**Contorno usado, e por que ele caiu:** eram quatro prisioneiros com `volta:
+360` e `total: 4`, o único passo que a aritmética sem transcendental nomeia. O
+`centros` em círculo tornou o contorno desnecessário no freio; o freio continua
+com quatro porque 4×100 é um padrão real de carro médio, e agora é escolha de
+desenho, não da linguagem.
 
 **Capacidade candidata, em ordem de preferência:**
 
@@ -56,6 +68,35 @@ está dito na peça.
    furos já abertos na fonte). Resolve A-26 e A-29 de uma vez, e é bem maior;
 3. `cos`/`sen` na gramática de expressão. É o mais barato de escrever e o pior
    de todos: põe transcendental no formato salvo para consertar um sintoma.
+
+### A-32 — o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo que o barril
+
+**Onde dói:** o desenho da peça `freio-disco`, e a régua que confere a montagem.
+
+**Evidência:** a rodada "Flange de uma peça só", ao decidir o raio do flange. Um
+cubo de roda de verdade tem DOIS diâmetros na ponta: um cubo-piloto estreito,
+que centra a roda, e um flange mais largo, em que a roda se aperta. O
+`freio-disco` tem um só. O barril é `cuboRaio` de ponta a ponta, e a roda entra
+por cima DELE: `roda-dianteira-integridade` afirma que a abertura do aro, na
+escala da cena, passa do cubo por 0,6 mm. Um flange mais largo que `cuboRaio`
+bateria no aro em vez de receber a roda.
+
+O resultado está na foto
+`tools/bancadas/out/bancada-freio-disco-isometrica-sel-cubo-isolar-focado.png`:
+o cubo lê como um cilindro liso com um círculo de furos na tampa. Os ressaltos
+sumiram, que era o assunto da rodada, mas o degrau piloto/flange que faz um
+flange PARECER flange na silhueta lateral não existe — não porque a linguagem
+não saiba fazer, e sim porque a montagem, como está modelada hoje, não deixa.
+
+**Contorno usado:** `flangeRaio: '= cuboRaio'`, escrito como derivada, com o
+motivo no comentário e um teste que morre se ele sair. A peça não finge ter um
+degrau que não tem.
+
+**Capacidade candidata:** nada no núcleo — isto é DESENHO. O conserto é o cubo
+virar dois cilindros, um piloto de raio menor na ponta e o flange atrás dele, e
+a roda passar a citar a porta do piloto em vez do barril inteiro. Custa mexer em
+`roda-dianteira` e na relação declarada entre as duas peças, então fica
+registrado em vez de embutido de contrabando numa rodada sobre furos.
 
 ### A-30 — um passo de furo tem UM raio: a flange com furo central não cabe
 
@@ -802,10 +843,38 @@ O que a correção teve de resolver, e como:
 vocabulário automotivo — tampa de caixa de inspeção com círculo de quatro
 parafusos num passo e dois furos cegos de chave de pino em outro. A régua mede
 253 faces, 0 sem identidade, 0 órfão e a chapa com UM corpo, que é exatamente o
-custo que este atrito cobrava (o flange do freio, com a mesma figura, tem cinco
-corpos). O flange de `freio-disco.js` NÃO foi reescrito nesta rodada: ele
-continua sendo uma chapa por prisioneiro, e isso agora é dívida de peça, não
-limite de linguagem.
+custo que este atrito cobrava.
+
+**Prova em peça de PRODUTO (rodada "Flange de uma peça só"):** o flange de
+`freio-disco.js` deixou de ser uma chapa por prisioneiro. Ele é UM disco na
+ponta do cubo, com os quatro furos abertos da mesma face em UM passo. Medido:
+
+| | antes | depois |
+|---|---|---|
+| passos do trecho do flange | 7 | 4 |
+| parâmetros do trecho | 9 | 5 |
+| identidades estruturais | 6 (304–309) | 2 (304, 305) |
+| CORPOS da parte `cubo` | 5 | 2 |
+| faces da peça | 540 | 504 |
+| envelope do `cubo` | x −0,070..0,032, y e z ±0,052 | idêntico |
+
+E `prisioneiros` passou a bastar sozinho: a peça constrói com 3, 5, 6 e 8, com
+zero órfão e sem um cosseno no arquivo. Era isto que o atrito cobrava, e o custo
+tinha nome — cinco corpos onde deveria haver dois.
+
+**O que a prova em produto ACHOU no núcleo:** a partição por pontes e orelhas
+recusava a peça inteira. A face do flange é a tampa de um cilindro de 16 lados,
+com 4 anéis de 12 lados a 90°, e 16, 12 e 4 são todos múltiplos de 4 — a
+simetria põe o vértice de um anel EXATAMENTE em cima da aresta de uma orelha de
+outro (produto vetorial 2,2·10⁻¹⁹, contra um eps de 10⁻¹²). "Em cima" não é
+"dentro", então a orelha era cortada, engolia a lasca do outro lado da aresta e
+deixava o resto do polígono com orientação invertida. O sintoma chegava longe da
+causa: `a partição criou um triângulo de área nula ou invertida`, uma das três
+provas de estado impossível que o próprio núcleo declarava não ter entrada capaz
+de disparar. A orelha passou a recusar vértice em cima de qualquer uma das suas
+três arestas, com o `pontoNoSegmento` que a ponte já usava. Varrendo 240
+combinações de face × furo × total, 17 gritavam antes e 0 gritam depois. O
+cabeçalho das três provas agora diz que aquela afirmação já foi falsa uma vez.
 
 ### A-28 — a origem do arranjo só sabia responder pela cópia INTEIRA
 

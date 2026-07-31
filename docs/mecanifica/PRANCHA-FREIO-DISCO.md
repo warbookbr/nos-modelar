@@ -57,13 +57,38 @@ nos passos (`sel:{grupo:'<nome>'}`). 180 faces, nenhuma sem identidade.
 | parte | faces | caixa (x, y, z) | papel |
 |---|---:|---|---|
 | `disco` | 60 | −0,060…0,012 · ±0,140 · ±0,140 | pista de atrito + chapéu; gira com a roda |
-| `cubo` | 18 | −0,070…0,020 · ±0,052 · ±0,052 | flange de roda em que o disco monta |
+| `cubo` | 222 | −0,070…0,032 · ±0,052 · ±0,052 | barril do cubo + o flange de roda, com os quatro furos de prisioneiro |
 | `pastilhaInterna` | 6 | −0,028…−0,014 · 0,088…0,136 · ±0,038 | pastilha do lado do pistão |
 | `pastilhaExterna` | 6 | 0,014…0,028 · 0,088…0,136 · ±0,038 | pastilha do lado da roda |
 | `pinca` | 18 | ±0,058 · 0,082…0,184 · ±0,046 | ponte + duas garras; abraça o disco |
 | `pistao` | 14 | −0,044…−0,028 · 0,092…0,132 · ±0,020 | empurra a pastilha interna |
 | `suporte` | 18 | −0,078…−0,058 · 0,046…0,158 · ±0,096 | placa de ancoragem + duas orelhas |
 | `flexivel` | 40 | −0,109…−0,043 · 0,165…0,262 · 0,021…0,127 | mangueira, do banjo da pinça até a linha rígida |
+
+### Flange de roda
+
+O flange é UM disco na ponta do cubo, com o círculo de prisioneiros furado nele
+num passo só (`centros:{distancia:'prisioneiroOrbita', total:'prisioneiros',
+volta:360}`). Ele pertence à parte `cubo`, e a parte tem DOIS corpos: o barril e
+o flange.
+
+Até a rodada "Flange de uma peça só" cada prisioneiro tinha um ressalto quadrado
+próprio, e o motivo era a linguagem, não a mecânica: um passo de `furo` consumia
+a face de entrada, então dois furos exigiam duas faces. Com o `centros` os
+quatro saem da mesma face, e `TOPO.prisioneiros` é a única coisa a mudar para
+ter 5 ou 6 — a peça constrói com 3, 5, 6 e 8, e a prova está em
+`tools/mecanifica/freio-disco-integridade.test.ts`.
+
+Aliases do flange: `flangeInteiro` (o disco antes do corte),
+`paredesDosPrisioneiros` (o cilindro por onde cada prisioneiro passa),
+`segundoPrisioneiro` (um furo sozinho), `bocasDosPrisioneiros` (a borda de cada
+furo) e `assentosDeRoda` (a superfície de apoio da roda: a borda MAIS o
+preenchimento).
+
+O flange tem o RAIO DO CUBO, e isso é montagem, não estética: o aro da roda
+entra por cima do cubo com 0,6 mm de folga na escala da cena, então um flange
+mais largo bateria nele. O degrau piloto/flange de um cubo real não existe neste
+modelo, e está registrado em ATRITOS-AUTORIA A-32.
 
 A manga de eixo não faz parte deste sistema: as duas orelhas do `suporte`
 terminam onde ela começaria. Ela entra na Fase 4, junto com o contexto do
@@ -95,7 +120,10 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `discoEspessura` | 0,024 | espessura do disco; move as duas pistas ao mesmo tempo |
 | `chapeuRaio` | 0,072 | raio do chapéu (a panela central) |
 | `chapeuProfundidade` | 0,048 | quanto o chapéu recua para dentro do carro |
-| `cuboRaio` | 0,052 | raio do flange de roda |
+| `cuboRaio` | 0,052 | raio do barril do cubo, e também do flange |
+| `flangeEspessura` | 0,012 | quanto o flange avança para fora, além da face do cubo |
+| `prisioneiroOrbita` | 0,038 | raio do círculo de prisioneiros (o PCD dividido por 2) |
+| `prisioneiroFuroRaio` | 0,0065 | furo passante do prisioneiro (M12) |
 | `cuboComprimento` | 0,090 | comprimento axial do cubo |
 | `cuboRecuo` | 0,070 | onde o cubo começa, para dentro do plano do disco |
 | `folgaPastilha` | 0,002 | folga de repouso entre pastilha e disco |

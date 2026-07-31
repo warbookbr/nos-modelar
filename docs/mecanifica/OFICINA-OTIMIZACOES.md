@@ -33,7 +33,10 @@ provadas em peça, e é isso que fecha o ciclo:
 - `freio-disco.js` ganhou o flange de roda — quatro assentos de prisioneiro
   postos pelo `arranja` radial e furados de lado a lado pelo `furo`. É a
   omissão que o plano registrava ("o cubo do freio continua sem prisioneiro"),
-  e junta as duas capacidades numa peça de produto;
+  e junta as duas capacidades numa peça de produto. Os quatro assentos foram
+  substituídos depois, na rodada "Flange de uma peça só", por UM disco com os
+  quatro furos num passo — os ressaltos existiam por limite de linguagem, e o
+  limite foi pago pelo `centros` (A-26). O `arranja` saiu da peça;
 - `_corrimao.js` (peça de exercício, marcenaria de escada) prova a `orientacao`
   do `loft` fora do vocabulário automotivo: caminho com torção, perfil chato, e
   o eixo da largura horizontal do começo ao fim.
@@ -42,7 +45,10 @@ Compor as duas achou um atrito que nenhuma prova anterior tinha achado: a
 origem `arranja` só sabia responder pela cópia INTEIRA, e `furo` exige uma face
 só. O portão dela passou de igualdade de origem para pertinência de face
 (A-28, UP-022). Ficaram abertos A-26 (um furo por face) e A-29 (o passo do
-arranjo radial só dá centro nomeável em 90°).
+arranjo radial só dá centro nomeável em 90°). A-26 foi pago em seguida, na
+rodada "Furo v2" (UP-023), e levado ao produto na rodada "Flange de uma peça
+só"; A-29 continua aberto, mas perdeu a evidência original quando o flange
+deixou de compor `arranja` com `furo`.
 
 O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
 A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta

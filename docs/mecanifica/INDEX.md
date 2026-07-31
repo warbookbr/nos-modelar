@@ -87,6 +87,19 @@ Estado atual:
   fora do vocabulário automotivo, com a chapa em UM corpo. Nenhuma peça de
   PRODUTO usa a forma nova: o flange do `freio-disco` continua uma chapa por
   prisioneiro, agora por dívida de peça e não por limite da linguagem;
+- a rodada **"Flange de uma peça só"** fechou em 31 de julho de 2026 e pagou a
+  dívida de peça que a "Furo v2" deixou: o flange do `freio-disco` deixou de ser
+  uma chapa por prisioneiro e virou UM disco com os quatro furos num passo. Os
+  quatro ressaltos quadrados nunca foram desenho mecânico — existiam só porque
+  cada furo precisava de uma face própria. Medido: corpos da parte `cubo` 5 → 2,
+  faces da peça 540 → 504, envelope idêntico, e `prisioneiros` passou a bastar
+  sozinho (a peça constrói com 3, 5, 6 e 8, sem cosseno no arquivo). Levar a op
+  ao produto ACHOU um defeito no núcleo: a orelha da partição aceitava vértice
+  EM CIMA de uma aresta sua, e a face simétrica do flange (16 lados, 4 anéis de
+  12 a 90°) gritava. Corrigido; 17 de 240 combinações gritavam antes, 0 depois.
+  O que ela NÃO fez: a silhueta do furo continua o polígono de 12 arestas
+  (A-31), e o flange tem o raio do cubo, sem degrau piloto/flange, porque o aro
+  entra por cima do cubo com 0,6 mm de folga (A-32, novo);
 - a rodada **"Borda do furo"** fechou em 31 de julho de 2026 e pagou A-31: a
   serrilha no contorno do furo era do ADAPTADOR, não da peça. `liso` nunca
   chegava ao renderizador (172 faces marcadas no freio, 100% dos triângulos com
@@ -96,9 +109,11 @@ Estado atual:
   de `lados` arestas — isto consertou sombreado e forma da borda, não o contorno;
 - **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
   porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
-  `centros` desarma o caso do círculo de furos, não o caso geral) e A-30 (um
-  passo de furo tem UM raio, então a flange com furo central mais círculo de
-  parafusos ainda não é escrevível);
+  `centros` desarma o caso do círculo de furos, não o caso geral; o flange
+  deixou de ser a evidência dele), A-30 (um passo de furo tem UM raio, então a
+  flange com furo central mais círculo de parafusos ainda não é escrevível) e
+  A-32 (o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo
+  que o barril, porque o aro entra por cima dele com 0,6 mm de folga);
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -317,6 +332,10 @@ O ciclo 4, “Corte e orientação de seção v1”, fechou em 31 de julho de 20
 núcleo e na peça: `orientacao` no `loft`, a op `furo` passante e cega, o flange
 de roda furado do `freio-disco` e o corrimão de perfil chato. A dívida A-28,
 achada ao compor as duas, foi paga junto; A-26 e A-29 ficaram abertos.
+
+A rodada avulsa “Flange de uma peça só” fechou em 31 de julho de 2026 e levou o
+`centros` a uma peça de PRODUTO: o flange do freio virou um disco com quatro
+furos, e a prova em produto achou e pagou um defeito da partição do núcleo.
 
 **Próxima entrega: o ciclo 5, “Curva e filete v1”, escrito como CANDIDATO no
 [`PLANO.md`](PLANO.md) e ainda não aberto.** Ele carrega as duas capacidades que

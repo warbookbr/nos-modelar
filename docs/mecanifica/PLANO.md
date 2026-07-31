@@ -233,6 +233,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
 | 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
+| 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
 | 4 | **candidato, não aberto** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo e exclusões escritos abaixo; o GATE ainda não |
 | 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
@@ -799,11 +800,85 @@ portas, e a chapa com UM corpo. Conferida no navegador em dois enquadramentos
 (superior e isométrica). `gabarito:selecao:check` verde com as 25 peças
 anteriores byte-idênticas.
 
-**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usa a forma nova.
-O flange do `freio-disco` continua sendo uma chapa por prisioneiro — a
-linguagem já não obriga, mas a peça não foi reescrita. E um passo tem UM raio:
-a flange com furo central mais círculo de parafusos ainda não é escrevível
-(A-30, aberto).
+**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usava a forma nova
+no fechamento dela. O flange do `freio-disco` continuava sendo uma chapa por
+prisioneiro — a linguagem já não obrigava, mas a peça não tinha sido reescrita.
+Essa dívida foi paga em seguida, na rodada "Flange de uma peça só", abaixo. E um
+passo tem UM raio: a flange com furo central mais círculo de parafusos ainda não
+é escrevível (A-30, aberto).
+
+### Flange de uma peça só — CONCLUÍDA em 31 de julho de 2026
+
+**O que estava errado:** o flange do `freio-disco` tinha quatro ressaltos
+quadrados, um por prisioneiro. Eles nunca foram desenho mecânico. Existiam
+porque um passo de `furo` consome a face de entrada, então cada furo precisava
+de uma face só dele. Depois do `centros` da rodada "Furo v2" a linguagem já não
+obrigava, e a forma ficou como dívida de peça.
+
+**O que mudou na peça, medido:**
+
+| | antes | depois |
+|---|---|---|
+| passos do trecho do flange | 7 | 4 |
+| parâmetros do trecho | 9 | 5 |
+| identidades estruturais | 6 (304–309) | 2 (304, 305) |
+| CORPOS da parte `cubo` | 5 | 2 |
+| faces da peça / vértices | 540 / 554 | 504 / 490 |
+| envelope do `cubo` | x −0,070..0,032, y e z ±0,052 | idêntico |
+
+E `prisioneiros` passou a bastar sozinho: a peça constrói com 3, 5, 6 e 8, com
+zero órfão e sem um cosseno no arquivo. Antes, mudar 4 para 5 deixava o quinto
+assento sem furo até alguém escrever o corte à mão.
+
+**O defeito de NÚCLEO que a prova em produto achou:** a face do flange é a tampa
+de um cilindro de 16 lados, com 4 anéis de 12 a 90°. Como 16, 12 e 4 são todos
+múltiplos de 4, a simetria põe o vértice de um anel EXATAMENTE em cima da aresta
+de uma orelha de outro (2,2·10⁻¹⁹ contra um eps de 10⁻¹²). "Em cima" não é
+"dentro": a orelha era cortada, engolia a lasca do outro lado da aresta e
+deixava o resto do polígono com orientação invertida. O sintoma chegava longe da
+causa — `a partição criou um triângulo de área nula ou invertida`, uma das três
+provas de estado impossível que o núcleo declarava não ter entrada capaz de
+disparar. Tinha. Corrigido com o `pontoNoSegmento` que a ponte já usava: 17 de
+240 combinações de face × furo × total gritavam antes, 0 depois.
+
+**Mutações, 17 no total.** No núcleo: devolver a conferência a só
+`dentroEstrito` mata 3 dos 10 casos novos. Na peça, morrem — orientação +Y→+Z
+(2 casos), entrada trocada pela saída (9), órbita a 48 mm, que põe o furo fora
+do flange (9), flange com o dobro do raio (2), `flangeFaceRodaX` sem a espessura
+(2), flange no outro extremo do cubo (2), furo com 16 lados (3), flange com 32
+lados (1), `segundoPrisioneiro` virando o terceiro (1), `assentosDeRoda` sem o
+preenchimento (1), `total:'prisioneiros'` virando `total:4` (2). SOBREVIVEM, e é
+o certo: órbita 38→36 mm, espessura 12→14 mm e raio do furo 6,5→7,0 mm — são a
+superfície de refinamento dimensional, e as afirmações são relacionais.
+`volta:360` → `graus:90` e `flangeRaio` → `cuboRaio` também sobrevivem porque
+dizem literalmente o mesmo.
+
+**Prova na foto**, no mesmo enquadramento da imagem que abriu a rodada
+(`bancada-freio-disco-direita-sel-cubo-isolar-focado.png`, vista direita, cubo
+isolado e focado): os quatro ressaltos sumiram e o círculo de parafusos está no
+disco. Na ampliação de 3× o contorno do furo não tem mais a cunha escura nem a
+costura triangular que o A-31 mediu — a borda é um furo limpo.
+
+**O que ela NÃO fez, dito na cara:**
+
+- a SILHUETA do furo continua o polígono de 12 arestas. Na ampliação dá para
+  contar as quinas. Isso está registrado em A-31 e é assunto do ciclo 5;
+- o flange tem o RAIO DO CUBO, então não há degrau piloto/flange na silhueta
+  lateral. Não é limite de linguagem: o aro da roda entra por cima do cubo com
+  0,6 mm de folga na escala da cena, e um flange mais largo bateria nele. Aberto
+  como A-32, com o conserto (cubo em dois diâmetros) descrito lá;
+- A-30 continua aberto: um passo tem um raio só;
+- A-29 continua aberto, mas perdeu a evidência original — o flange não usa mais
+  `arranja` + `furo`, e o caso que resta é o geral de apontar para a cópia `k`
+  de um arranjo radial.
+
+**Registros alterados:** `descrever-partes.test.ts` afirmava
+`1 + TOPO.prisioneiros` corpos no `cubo` e passou a afirmar 2, com o motivo
+escrito. Ele continua afirmando o que afirmava — que o flange não compartilha
+vértice com o barril —, e quem prende os quatro furos ao TOPO da peça é
+`freio-disco-integridade`, que ganhou quatro afirmações e não afrouxou nenhuma.
+`gabarito:selecao:check` regravado com `freio-disco` como ÚNICA peça de hash
+novo, das 26.
 
 ### Ciclo 5 — Curva e filete v1 — CANDIDATO, NÃO ABERTO
 
