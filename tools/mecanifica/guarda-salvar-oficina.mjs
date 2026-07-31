@@ -32,8 +32,9 @@
  *
  *   npm run guarda:salvar
  *
- * Screenshot da recusa em tools/bancadas/out/. Sai 1 se qualquer afirmação
- * falhar; sai 1 também se a página emitir erro.
+ * Dois enquadramentos da mesma barra em tools/bancadas/out/ — o salvamento
+ * aceito e a recusa — para conferir no olho o que a afirmação diz em texto.
+ * Sai 1 se qualquer afirmação falhar; sai 1 também se a página emitir erro.
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
@@ -107,7 +108,9 @@ async function abrir(url) {
   return { page, espia };
 }
 
-const msgDe = (page) => page.$eval('#salvarMsg', (el) => ({ txt: el.textContent, erro: el.classList.contains('erro') }));
+/* `txt` é o que o elemento CONTÉM; a barra é estreita e corta com reticências,
+   então o `title` (o texto inteiro, no hover) faz parte do que fica visível. */
+const msgDe = (page) => page.$eval('#salvarMsg', (el) => ({ txt: el.textContent, title: el.title, erro: el.classList.contains('erro') }));
 const passosDe = (page) => page.evaluate(() => window.__oficina.passos());
 const parado = (page) => page.waitForTimeout(500);   // folga depois do clique: o que não saiu em meio segundo não saiu
 
@@ -154,6 +157,7 @@ try {
   ok('(1b ★) LEGÍTIMO: o clique real no Salvar emite 1 POST e o servidor GRAVA a peça',
      espia.posts.length === 1 && espia.posts[0].endsWith('/oficina/salvar') && gravado === strLimpa && msgAceito.erro === false,
      `${espia.posts.length} POST · msg "${msgAceito.txt}"`);
+  await page.screenshot({ path: join(OUT, 'oficina-guarda-salvar-aceito.png') });
 
   const edicao = await editarPosicional(page);
   const passosEditados = await passosDe(page);
@@ -168,8 +172,9 @@ try {
   ok('(1d ★) RECUSADO: o mesmo botão não emite POST nenhum e o arquivo em disco não muda',
      espia.posts.length === postsAntes && depois === gravado && readdirSync(TEMP).length === 1,
      `POST ${postsAntes} → ${espia.posts.length} · arquivo ${depois === gravado ? 'intacto' : 'REESCRITO'}`);
-  ok('(1d) a recusa é VISÍVEL para quem está usando: mensagem em destaque de erro + alerta com o passo culpado',
-     msgRecusa.erro === true && msgRecusa.txt.startsWith('não salvo:') && espia.alertas.length === 1 && /passo 10: faces/.test(espia.alertas[0]),
+  ok('(1d) a recusa é VISÍVEL para quem está usando: mensagem em destaque de erro (inteira no title, que a barra corta) + alerta com o passo culpado',
+     msgRecusa.erro === true && msgRecusa.txt.startsWith('não salvo:') && msgRecusa.title === msgRecusa.txt
+     && espia.alertas.length === 1 && /passo 10: faces/.test(espia.alertas[0]),
      `msg "${msgRecusa.txt}"`);
   ok('(1d) o botão volta a aceitar clique depois da recusa (não trava a sessão)',
      (await page.$eval('#btSalvar', (el) => el.disabled)) === false);

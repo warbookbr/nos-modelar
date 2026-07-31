@@ -238,7 +238,10 @@ zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
 **Implementado e já publicado:**
 
-- [x] guarda mínima do A-15 antes de POST e download;
+- [x] guarda mínima do A-15 antes de POST e download, no funil `salvarPeca` —
+  provada pelo **botão real** em `npm run guarda:salvar`, nos dois caminhos de
+  saída e também pelo gancho `window.__oficina.salvar()`, que até esta rodada
+  era uma porta dos fundos que gravava em `pecas/` o que o botão recusava;
 - [x] `origem` em todos os geradores cobertos, incluindo `inflate`;
 - [x] `publicarPorta` e `sel:{porta}` preservados após transformação;
 - [x] pinça e suporte migrados para `chamferBox`, com zero face sem identidade;
@@ -246,8 +249,12 @@ zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
 **Pendências finitas para encerrar:**
 
-- [ ] provar pelo botão real, no navegador, que o salvamento incompatível é
-  recusado antes do POST e do fallback;
+- [x] provar pelo botão real, no navegador, que o salvamento incompatível é
+  recusado antes do POST e do fallback — `tools/mecanifica/guarda-salvar-oficina.mjs`
+  dirige a interface: clique real em "marcar sólido" (que grava
+  `['solido',{faces:[0]}]`) e clique real em "Salvar peça", contra o `servir.mjs`
+  real e contra um servidor sem a rota. A medição achou a guarda no lugar errado
+  — no ouvinte do clique, não no caminho — e o conserto a moveu para o funil;
 - [ ] consolidar uma fixture não automotiva explícita usando o mesmo contrato;
 - [x] reconciliar o estado de R4, A-15, O-6 e O-12 em índice, otimizações e
   registro upstream;

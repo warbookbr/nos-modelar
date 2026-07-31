@@ -1110,7 +1110,10 @@ function baixar(nomeArq, conteudo) {
   ultimoDownload = { nome: `${nomeArq}.js`, tamanho: conteudo.length, ts: Date.now() };
   return ultimoDownload;
 }
-function msgSalvar(txt, erro) { const el = document.getElementById('salvarMsg'); if (!el) return; el.textContent = txt; el.classList.toggle('erro', !!erro); }
+/* a barra é estreita e a mensagem corta com reticências (`text-overflow`), então
+   o texto inteiro vai também no `title`: a recusa fica legível sem depender do
+   alerta, que o usuário já dispensou. */
+function msgSalvar(txt, erro) { const el = document.getElementById('salvarMsg'); if (!el) return; el.textContent = txt; el.title = txt; el.classList.toggle('erro', !!erro); }
 /* A guarda mora AQUI, no funil por onde passam os DOIS caminhos de saída (POST e
    fallback de download) e TODOS os chamadores — o botão e o gancho
    `window.__oficina.salvar()` que as bancadas headless usam. Guarda instalada só

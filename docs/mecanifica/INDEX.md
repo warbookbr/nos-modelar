@@ -157,6 +157,14 @@ npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
 npm run descrever -- roda-dianteira
 ```
 
+Prova de comportamento no navegador — dirige a Oficina headless e clica nos
+botões de verdade. Guarda escrita no código não é guarda provada: ela pode estar
+num caminho que o botão não percorre (foi o que aconteceu com o A-15):
+
+```bash
+npm run guarda:salvar
+```
+
 Verificação completa:
 
 ```bash
@@ -179,8 +187,10 @@ ferramenta. As peças herdadas ficam numa lista explícita e versionada em
 `tools/bancadas/id-cru-herdado.json`, com a contagem exata congelada — a dívida
 não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
 produz referências posicionais em ferramentas exploratórias, mas agora recusa
-salvá-las antes do POST ou download; o teste pelo botão real é a última pendência
-do A-15. Ver [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+salvá-las no funil `salvarPeca`, antes do POST e antes do fallback de download —
+provado pelo **botão real** com `npm run guarda:salvar`, que também fecha a porta
+dos fundos do gancho `window.__oficina.salvar()`. Ver
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
 [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).

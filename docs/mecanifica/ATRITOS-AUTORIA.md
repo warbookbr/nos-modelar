@@ -112,6 +112,21 @@ modela pela interface descobre isso só no gate.
 download qualquer uma das seis formas posicionais cobertas pelo gate. Ela segue
 como espaço exploratório; este ciclo não promete conversão automática.
 
+**Provado pelo botão real, e o que a prova achou.** `npm run guarda:salvar`
+(`tools/mecanifica/guarda-salvar-oficina.mjs`) dirige a interface de verdade —
+clique em "marcar sólido", que só sabe gravar `['solido',{faces:[ids]}]`, e
+clique em "Salvar peça" — contra o `servir.mjs` real (rota que grava em
+`pecas/`, apontada para um TEMP) e contra um servidor estático sem a rota, que
+força o fallback de download. A medição mostrou a guarda valendo **pelo botão**
+(nenhum POST, nenhum download, arquivo em disco intacto) e **não valendo pelo
+gancho** `window.__oficina.salvar()`, o caminho que as bancadas headless usam: a
+mesma edição recusada no clique saía em POST e o servidor gravava o arquivo. A
+guarda estava no ouvinte do clique, não no caminho; ela desceu para o funil
+`salvarPeca`, por onde passam os dois caminhos de saída e todos os chamadores.
+A prova cobre os dois lados — `_vao-e-anteparo` (peça limpa, não automotiva)
+salva pelo mesmo botão e volta a salvar depois de um `Ctrl+Z` —, senão seria
+bloqueio e não guarda.
+
 **Contorno histórico:** converter a peça à mão depois de salvar (trocar `faces:[ids]` por
 `sel:{alias|grupo|origem|regiao}`), ou registrar a peça na lista herdada
 `tools/bancadas/id-cru-herdado.json` de propósito, assumindo a dívida no commit.

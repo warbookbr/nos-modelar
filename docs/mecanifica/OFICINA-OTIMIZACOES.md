@@ -238,6 +238,14 @@ emitir referência semântica aqui — isso é R4/R5. O que se corrigiu foi a
 dizer que isso é impossível pela interface e impossível no núcleo para
 `vs`/`pontos`/`de`. Remediação inexistente é pior que remediação nenhuma.
 
+**O que a prova pelo botão real achou depois (R4).** A guarda que a R4 instalou
+existia no ouvinte do clique, não no caminho: medido em `npm run guarda:salvar`,
+o botão recusava e o gancho `window.__oficina.salvar()` — o caminho das bancadas
+headless — salvava a MESMA edição, POST e arquivo gravado em `pecas/`. A guarda
+desceu para o funil `salvarPeca`, antes do POST e antes do fallback de download.
+A lição é geral e vale para qualquer gate desta pasta: guarda afirmada em código
+só vira guarda depois de medida no caminho que a pessoa percorre.
+
 ### O-11 — diagnóstico de completude de alias
 
 **O que muda:** citar um alias de conjunto antes de todas as suas primitivas
