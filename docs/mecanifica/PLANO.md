@@ -228,7 +228,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
 | 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
-| 3 | próxima candidata, **não aberta** | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
+| 3 | **em execução** | Corte e orientação de seção v1 | duas capacidades escolhidas pela crítica da roda, cada uma útil fora do vocabulário automotivo; a orientação declarada da seção do `loft` já está de pé (A-25, UP-020) |
 | 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
@@ -521,9 +521,31 @@ dos dois ciclos anteriores: verde pelo motivo errado.
   Mutação: um wrapper local no gate que **delega** ao módulo — portanto concorda
   em toda entrada, e o teste antigo passaria — deixa o novo vermelho.
 
-### Candidato a ciclo 4 — ainda não aberto
+### Ciclo 4 — Corte e orientação de seção v1 — EM EXECUÇÃO
 
-**Nome:** Realismo geométrico v1.
+**Nome:** Corte e orientação de seção v1 (o ciclo antes chamado de candidato
+"Realismo geométrico v1"). Duas capacidades, escolhidas pelo critério de servir
+a QUALQUER família de objeto: móvel, robô, carroça, instrumento e carro têm
+todos furo e caminho.
+
+**Exclui:** curva de perfil, filete, afunilamento, relações de montagem,
+hierarquia e novas peças de produto.
+
+**Entregue até agora — orientação declarada da seção (A-25, UP-020):** o `loft`
+aceita `orientacao: [x,y,z]`, a direção do mundo para onde aponta o eixo `+u` de
+toda seção. Ela é projetada no plano de cada seção, aceita nome de PARAM e não
+propaga nada, então não há rotação acumulada ao longo do caminho. Referência
+paralela à tangente de alguma seção, vetor nulo e aridade errada gritam e
+abortam o passo inteiro. Ausente, o transporte paralelo de sempre: 23 peças
+byte-idênticas no `gabarito:selecao:check`, sem regravar nenhuma. 10 casos em
+`tools/oficina/oficina.test.ts`; 8 mutações rodadas, todas mortas — inclusive a
+que propaga o frame a partir da referência declarada, que só morre em caminho
+com torção. Conferida no olho na bancada, em isométrica e superior.
+
+**O que ela NÃO fez:** nenhuma peça usa a chave. A roda experimental continua
+remontando o contorno em código auxiliar.
+
+**Registro anterior deste ciclo, quando ainda era candidato:**
 
 O ciclo nasce do briefing e da crítica visual da roda, registrados em
 [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md). Antes de

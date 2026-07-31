@@ -697,6 +697,46 @@ sustenta. A prova não automotiva do arranjo entrou em peça nova
 as faces segue determinística e sem afirmação, porque nenhum consumidor do
 núcleo distingue essa ordem hoje.
 
+### A-25 — o frame do `loft` era implícito, e a peça remontava o contorno
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** a roda experimental, registrada em
+[`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md), seção "Frame implícito do
+`loft`". Uma seção RETANGULAR não conserva "largura tangencial" e "espessura
+axial" em caminhos de direções diferentes: quem decidia para onde apontava o
+eixo `+u` de cada anel era o TRANSPORTE PARALELO, isto é, o HISTÓRICO do
+caminho. Com dez braços em dez direções, a função `contornoChanfrado` da peça
+DETECTAVA a troca de eixo e REMONTAVA cada contorno, em código auxiliar dentro
+do arquivo da peça.
+
+O sintoma é o de sempre nesta série: a primeira rodada usou seção em DIAMANTE,
+que é simétrica e por isso escondia o problema — e fazia os braços parecerem
+hastes de bicicleta. A seção retangular, que era a certa para o assunto,
+revelou a limitação. A ferramenta escolhendo a forma da peça.
+
+**Contorno usado:** código auxiliar na peça, fora do formato salvo.
+
+**Correção (ciclo "Corte e orientação de seção v1"):** a chave `orientacao`
+(`[x,y,z]`, opcional) do `loft`. O AUTOR declara a direção do mundo para onde
+aponta o `+u` de toda seção; ela é PROJETADA no plano de cada seção, então não
+precisa ser perpendicular. Cada seção projeta a MESMA referência na PRÓPRIA
+tangente: não há rotação propagada, então caminho torcido não gira o perfil e
+duas seções com a mesma tangente têm a mesma seção — inclusive em caminhos
+diferentes. Referência PARALELA à tangente de alguma seção, vetor nulo e
+aridade ≠ 3 GRITAM e ABORTAM o passo inteiro (0 V/0 F); a chave nunca desempata
+sozinha. Ausente, o transporte paralelo de sempre, byte a byte
+(`gabarito:selecao:check` verde sem regravar).
+
+**Limite declarado:** a chave é do `loft`. O `lathe` gira em torno de um eixo
+fixo e não tem frame a declarar; `inflate` e as primitivas nascem alinhadas aos
+eixos do mundo. A roda experimental **não** foi reescrita neste ciclo — a peça
+continua com o contorno remontado em código, e quem a reescrever paga a dívida.
+
+**Lição geral:** quando o gerador escolhe sozinho um grau de liberdade que o
+autor consegue nomear, a escolha vaza para a peça como código auxiliar. Publicar
+a escolha como argumento é mais barato que documentá-la.
+
 ### A-24 — o arranjo copia UMA origem, e nem todo gerador sabe dizer "a primitiva inteira"
 
 **Onde doeu:** linguagem da Oficina.

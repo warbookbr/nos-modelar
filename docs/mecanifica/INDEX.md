@@ -57,8 +57,11 @@ Estado atual:
   os dois modos do arranjo fora do vocabulário automotivo. A reescrita achou
   A-24: `arranja` copia UMA origem, e o `cilindro` não sabe dizer "a primitiva
   inteira";
-- **nenhum ciclo está em execução.** O próximo candidato é "Realismo geométrico
-  v1" e ainda não foi aberto;
+- **o ciclo 4, "Corte e orientação de seção v1", está EM EXECUÇÃO.** Ele é o
+  antigo candidato "Realismo geométrico v1", com escopo fechado em duas
+  capacidades gerais. A primeira já está de pé: `orientacao` no `loft` — o
+  autor declara a direção da seção em vez de herdar o frame implícito do
+  gerador (A-25, UP-020). Nenhuma peça usa a chave ainda;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -270,12 +273,11 @@ automotivo. Ele **não** levou a op a nenhuma peça de produto: `freio-disco.js`
 não foi tocada, e o prisioneiro de roda e a aleta de ventilação continuam não
 modelados.
 
-**Próxima entrega: nenhuma em execução.** O candidato seguinte é
-“Realismo geométrico v1”, que precisa ser **aberto** no `PLANO.md` — com escopo
-incluído, escopo excluído e gate objetivo — antes de qualquer implementação,
-usando o protocolo de
-[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) para escolher
-no máximo duas capacidades justificadas pela roda.
+**Próxima entrega: o ciclo 4, “Corte e orientação de seção v1”, aberto no
+[`PLANO.md`](PLANO.md).** Ele substitui o candidato “Realismo geométrico v1” e
+carrega duas capacidades gerais escolhidas pela crítica da roda. A orientação
+declarada da seção do `loft` (`orientacao`) já está entregue no núcleo, com
+teste, mutação e leitura na bancada; ela não foi levada a nenhuma peça.
 
 ## Manutenção desta documentação
 

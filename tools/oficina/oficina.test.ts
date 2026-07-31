@@ -2031,6 +2031,170 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
   });
 });
 
+/* ---------------------------------------------------------------------------
+   `orientacao` do loft — ORIENTAÇÃO DECLARADA DA SEÇÃO.
+
+   O atrito medido (RELATO-RODA-REALISTA, "Frame implícito do `loft`"): quem
+   decidia para onde apontava o eixo +u de cada anel era o TRANSPORTE PARALELO,
+   isto é, o HISTÓRICO do caminho. Um contorno retangular não conservava
+   "largura" e "espessura" entre caminhos de direções diferentes, e a roda
+   experimental precisou detectar a troca de eixo e REMONTAR cada contorno em
+   código próprio dentro da peça.
+
+   `orientacao: [x,y,z]` é o autor declarando essa direção. Cada afirmação aqui
+   morre quando o valor muda — nenhuma repete a fórmula do núcleo:
+     - a promessa (extensão do contorno na direção declarada é a MESMA em dois
+       caminhos de direções diferentes) é medida na MALHA, e o mesmo caso SEM a
+       chave é medido junto, senão um ramo que não faz nada passaria;
+     - "sem acumular rotação" é medido por HISTÓRICO: dois caminhos diferentes
+       que chegam à mesma seção com a mesma tangente dão a MESMA seção;
+     - paralelismo GRITA e aborta o passo inteiro, nunca escolhe um desempate.
+--------------------------------------------------------------------------- */
+describe('loft — orientação declarada da seção (`orientacao`)', () => {
+  // retângulo CCW em [u,w]: meia-largura no eixo u, meia-espessura no eixo w
+  const retangulo = (u: number, w: number) => [[u, -w], [u, w], [-u, w], [-u, -w]];
+  const CONTORNO = retangulo(0.5, 0.05);
+  const extensao = (V: any, eixo: number) => {
+    const vs = [...V.values()] as number[][];
+    return +(Math.max(...vs.map((p) => p[eixo])) - Math.min(...vs.map((p) => p[eixo]))).toFixed(9);
+  };
+  // mesmo contorno, dois caminhos de DIREÇÕES diferentes (o caso da roda: dez braços, dez direções)
+  const aoLongoDe = (fim: number[], orientacao: number[] | null) => nucleo([['loft', {
+    id: 0, lados: 4, ...(orientacao ? { orientacao } : {}),
+    secoes: [{ pos: [0, 0, 0], contorno: CONTORNO }, { pos: fim, contorno: CONTORNO }],
+  }]], {}, {});
+
+  it('a espessura declarada sobrevive à troca de direção do caminho — e SEM a chave ela não sobrevive', () => {
+    // COM `orientacao: [1,0,0]`, o +u do contorno é o eixo X do MUNDO nos dois caminhos:
+    // a largura de 1 (2×0.5) fica em X, a espessura de 0.1 fica transversal — em qualquer direção.
+    const emY = aoLongoDe([0, 2, 0], [1, 0, 0]);
+    const emZ = aoLongoDe([0, 0, 2], [1, 0, 0]);
+    expect(emY.orfaos).toHaveLength(0);
+    expect(emZ.orfaos).toHaveLength(0);
+    expect(extensao(emY.V, 0)).toBe(1);
+    expect(extensao(emZ.V, 0)).toBe(1);
+
+    // SEM a chave, o MESMO par de caminhos troca os eixos: em Y o X fica com a ESPESSURA (0.1),
+    // em Z fica com a LARGURA (1). É o atrito, medido — e é o que impede esta prova de passar
+    // com um ramo `orientacao` que não faz nada.
+    expect(extensao(aoLongoDe([0, 2, 0], null).V, 0)).toBe(0.1);
+    expect(extensao(aoLongoDe([0, 0, 2], null).V, 0)).toBe(1);
+  });
+
+  /* As duas provas de "sem acumular rotação". Os dois caminhos abaixo têm
+     TORÇÃO (saem do plano e voltam) — sem isso a afirmação é vazia: num
+     caminho PLANO com a referência normal ao plano, o transporte paralelo
+     também não gira, e a prova passa com as duas implementações. Foi o que o
+     teste de mutação achou nesta rodada. */
+  it('não acumula rotação: a seção depende da PRÓPRIA tangente, não do histórico do caminho', () => {
+    // Dois caminhos terminam na MESMA `pos` [0,2,0] com a MESMA tangente [0,1,0]. O primeiro
+    // chega depois de uma TORÇÃO (passa fora do plano x=0); o segundo vem reto de baixo.
+    const secoes = (pontos: number[][]) => pontos.map((pos) => ({ pos, raio: 1 }));
+    const caminho = (pontos: number[][], o: number[] | null) => nucleo([['loft', { id: 0, lados: 6, ...(o ? { orientacao: o } : {}), secoes: secoes(pontos) }]], {}, {});
+    const TORCIDO = [[2, -4, 2], [0, -3, 1], [0, -1, 0], [0, 2, 0]];
+    const RETO = [[0, -3, 0], [0, -1, 0], [0, 2, 0]];
+    const ultimaSecao = (n: any, L: number) => [...n.V.keys()].sort((a: number, b: number) => a - b).slice(-L).map((id) => (n.V.get(id) as number[]).map((x) => +x.toFixed(9)));
+
+    // COM `orientacao`: as duas últimas seções são IDÊNTICAS ponto a ponto, apesar dos caminhos diferentes.
+    expect(ultimaSecao(caminho(TORCIDO, [0, 0, 1]), 6)).toEqual(ultimaSecao(caminho(RETO, [0, 0, 1]), 6));
+    // SEM: o transporte paralelo herdou a torção e a mesma seção sai girada — a diferença que a chave apaga.
+    expect(ultimaSecao(caminho(TORCIDO, null), 6)).not.toEqual(ultimaSecao(caminho(RETO, null), 6));
+  });
+
+  it('não acumula rotação DENTRO do mesmo caminho: duas seções com a mesma tangente têm a mesma seção', () => {
+    // Sobe em Y, desvia pra (1,·,1), volta a subir em Y: as seções 0 e 4 têm a MESMA tangente [0,1,0],
+    // com uma torção entre elas. Nenhum número de frame é repetido aqui — a afirmação compara a peça consigo.
+    const PONTOS = [[0, 0, 0], [0, 2, 0], [1, 4, 1], [1, 6, 1], [1, 8, 1]];
+    const peca = (o: number[] | null) => nucleo([['loft', { id: 0, lados: 6, ...(o ? { orientacao: o } : {}), secoes: PONTOS.map((pos) => ({ pos, raio: 1 })) }]], {}, {});
+    // seção s, em coordenadas LOCAIS (descontada a `pos`): só o frame sobra
+    const local = (n: any, s: number) => [...n.V.keys()].sort((a: number, b: number) => a - b).slice(s * 6, (s + 1) * 6)
+      .map((id) => (n.V.get(id) as number[]).map((x, k) => +(x - PONTOS[s][k]).toFixed(9)));
+
+    const declarado = peca([0, 0, 1]);
+    expect(local(declarado, 4)).toEqual(local(declarado, 0));
+    const implicito = peca(null);
+    expect(local(implicito, 4)).not.toEqual(local(implicito, 0));   // a torção acumulada, medida
+  });
+
+  it('a chave é DECLARATIVA: mudar a referência muda a fase do anel, e a ausência preserva a semente documentada', () => {
+    const anel = (o: number[] | null) => nucleo([['loft', { id: 0, lados: 4, ...(o ? { orientacao: o } : {}), secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {}).V.get(0).map((x: number) => +x.toFixed(9));
+    expect(anel([1, 0, 0])).toEqual([1, 0, 0]);     // +u declarado em X -> o vértice j=0 nasce em +X
+    expect(anel([0, 0, 1])).toEqual([0, 0, 1]);     // +u declarado em Z -> nasce em +Z
+    expect(anel([-1, 0, 0])).toEqual([-1, 0, 0]);   // referência oposta -> lado oposto (não é normalizada em módulo)
+    expect(anel(null)).toEqual([0, 0, 1]);          // AUSENTE: a semente do transporte paralelo (u0 = [0,0,1] no caminho vertical), intacta
+  });
+
+  it('a referência não precisa ser perpendicular: ela é PROJETADA no plano da seção', () => {
+    // [1,1,0] num caminho vertical projeta em [1,0,0]: o autor declara "para lá", não um eixo exato.
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [1, 1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(n.V.get(0).map((x: number) => +x.toFixed(9))).toEqual([1, 0, 0]);
+  });
+
+  it('a referência aceita nome de PARAM, como todo ponto do núcleo', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: ['eixoDoCubo', 0, 0], secoes: [{ pos: [0, 0, 0], contorno: CONTORNO }, { pos: [0, 2, 0], contorno: CONTORNO }] }]], { eixoDoCubo: 1 }, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(extensao(n.V, 0)).toBe(1);
+  });
+
+  it('winding continua PRA FORA com a orientação declarada (a lei D1 não depende do frame)', () => {
+    const { V, F } = nucleo([['loft', { id: 0, lados: 8, orientacao: [1, 0, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 3, 0], raio: 1 }] }]], {}, {});
+    const newell = (vs: number[]) => {
+      let nx = 0, nz = 0;
+      for (let k = 0; k < vs.length; k++) { const c = V.get(vs[k])!, n = V.get(vs[(k + 1) % vs.length])!; nx += (c[1] - n[1]) * (c[2] + n[2]); nz += (c[0] - n[0]) * (c[1] + n[1]); }
+      return [nx, nz];
+    };
+    for (const f of F.values()) {
+      const c = (f as any).vs.map((v: number) => V.get(v)!);
+      const cx = c.reduce((s: number, p: number[]) => s + p[0], 0) / c.length, cz = c.reduce((s: number, p: number[]) => s + p[2], 0) / c.length;
+      const [nx, nz] = newell((f as any).vs);
+      expect(nx * cx + nz * cz).toBeGreaterThan(0);   // normal aponta pra longe do eixo do caminho
+    }
+  });
+
+  it('referência PARALELA à tangente GRITA e aborta o passo inteiro — nunca desempata sozinha', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(n.V.size).toBe(0);
+    expect(n.F.size).toBe(0);
+    expect(n.orfaos).toHaveLength(2);   // uma queixa por seção, cada uma dizendo QUAL
+    expect(n.orfaos[0]).toMatchObject({ op: 'loft', ref: 0, motivo: expect.stringMatching(/paralela à tangente da seção 0/) });
+    expect(n.orfaos[1]).toMatchObject({ op: 'loft', ref: 1 });
+  });
+
+  it('paralelismo em UMA seção do meio do caminho também aborta tudo (fail-closed, não meia malha)', () => {
+    // caminho em L: reto em X, dobra pra Y. A referência [0,1,0] só fica paralela na ÚLTIMA seção.
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 1, 0], secoes: [
+      { pos: [0, 0, 0], raio: 1 }, { pos: [2, 0, 0], raio: 1 }, { pos: [2, 2, 0], raio: 1 },
+    ] }]], {}, {});
+    expect(n.V.size).toBe(0);
+    expect(n.F.size).toBe(0);
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0]).toMatchObject({ op: 'loft', ref: 2, motivo: expect.stringMatching(/paralela à tangente da seção 2/) });
+  });
+
+  it('vetor nulo e aridade errada GRITAM antes de qualquer vértice', () => {
+    const nulo = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 0, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(nulo.V.size).toBe(0);
+    expect(nulo.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao', motivo: expect.stringMatching(/vetor nulo/) });
+
+    const curto = nucleo([['loft', { id: 0, lados: 4, orientacao: [1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(curto.V.size).toBe(0);
+    expect(curto.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao', motivo: expect.stringMatching(/3 elementos/) });
+
+    const naoArray = nucleo([['loft', { id: 0, lados: 4, orientacao: 'x' as any, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(naoArray.V.size).toBe(0);
+    expect(naoArray.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao' });
+  });
+
+  it('a contagem de vértices e faces é a MESMA com e sem a chave — orientar não é gerar geometria', () => {
+    const com = aoLongoDe([0, 2, 0], [1, 0, 0]), sem = aoLongoDe([0, 2, 0], null);
+    expect(com.V.size).toBe(sem.V.size);
+    expect(com.F.size).toBe(sem.F.size);
+    expect([...com.V.keys()].sort()).toEqual([...sem.V.keys()].sort());
+    expect([...com.F.keys()].sort()).toEqual([...sem.F.keys()].sort());
+  });
+});
+
 describe('P6 — inflate (dois contornos 2D -> volume por interseção de prismas)', () => {
   const QUAD: number[][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
   const circ = (r: number, n = 24) => Array.from({ length: n }, (_, k) => { const a = (k / n) * Math.PI * 2; return [Math.cos(a) * r, Math.sin(a) * r]; });

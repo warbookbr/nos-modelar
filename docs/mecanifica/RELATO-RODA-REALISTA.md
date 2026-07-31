@@ -119,8 +119,13 @@ O contorno em diamante da primeira rodada escondia o problema por ser simétrico
 mas também fazia os raios parecerem hastes. A seção retangular revelou a
 limitação.
 
-**Capacidade ausente:** orientação declarada da seção, por exemplo uma normal
-axial ou um frame publicado, sem reproduzir a escolha interna do gerador.
+**Capacidade ausente — ENTREGUE em 31 de julho de 2026** (ciclo "Corte e
+orientação de seção v1", ATRITOS-AUTORIA A-25, UPSTREAM-NOS UP-020): o `loft`
+aceita `orientacao: [x,y,z]`, a direção do mundo para onde aponta o eixo `+u` de
+toda seção, projetada no plano de cada uma. Sem propagação, então sem rotação
+acumulada; referência paralela à tangente grita e aborta; ausente, o transporte
+paralelo de sempre. **A peça não foi reescrita neste ciclo** — ela continua
+remontando o contorno em código, e essa dívida fica aberta para quem voltar aqui.
 
 ### `chamferBox` sem origem
 

@@ -1527,6 +1527,42 @@ export const OPS = {
     if (secoesArg.length < 2) return grita(st, i, 'loft', secoesArg.length, `secoes precisa de ao menos 2 (tem ${secoesArg.length})`);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO (pra TODA seção): muda a CONTAGEM
 
+    /* ORIENTAÇÃO DECLARADA DA SEÇÃO (`orientacao`, opcional, `[x,y,z]` via
+       `st.vec` — pode citar PARAM, como `pos`/`d`/`pivo`). É a resposta ao
+       atrito "frame implícito do loft" (RELATO-RODA-REALISTA): sem ela, quem
+       decide para onde aponta o eixo +u de cada anel é o TRANSPORTE PARALELO,
+       isto é, o HISTÓRICO do caminho — então um contorno retangular não
+       conserva "largura" e "espessura" entre dois caminhos de direções
+       diferentes, e a peça acaba remontando o contorno caminho a caminho.
+       Com `orientacao`, o AUTOR declara essa direção uma vez:
+         u_i = norm(orientacao − t_i·(orientacao·t_i))   (projeção no plano da seção)
+         w_i = cross(u_i, t_i)
+       O `[u,w]` do `contorno` (e a fase do círculo do `raio`) passam a ser
+       lidos contra ESSA referência. Ex.: num raio de roda, `orientacao` = o
+       eixo do cubo faz o +u do contorno ser SEMPRE o axial, em qualquer
+       direção radial do braço. Serve igual a cabo, tubo, corrimão, correia e
+       trilho — a referência é uma direção do mundo, não um conceito de roda.
+       DETERMINISMO: cada seção projeta a MESMA referência na PRÓPRIA tangente.
+       Nada é propagado, então não há rotação acumulada ao longo do caminho e o
+       frame não depende de por onde o caminho passou (ao contrário do
+       transporte paralelo, ver D-128 mais acima). Caminho simétrico com
+       `orientacao` declarada dá anéis em fase.
+       DEGENERADO GRITA, nunca escolhe sozinho: referência PARALELA à tangente
+       de alguma seção deixa a projeção nula — não existe plano de seção, e
+       qualquer desempate seria a escolha interna voltando pela janela. GRITA
+       citando a seção e ABORTA o passo (0 V/0 F). Vetor nulo e aridade ≠ 3
+       idem. Conferido em TODAS as seções antes de montar frame ou inserir
+       vértice (fail-closed, a lei do lathe/D-115).
+       AUSENTE: o transporte paralelo de sempre, byte a byte — toda peça
+       gravada antes desta chave segue idêntica. */
+    let orientacao = null;
+    if (a.orientacao != null) {
+      if (!Array.isArray(a.orientacao) || a.orientacao.length !== 3) return grita(st, i, 'loft', 'orientacao', `orientacao precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.orientacao)}`);
+      const r = st.vec(a.orientacao);
+      if (!(Math.hypot(r[0], r[1], r[2]) > 1e-9)) return grita(st, i, 'loft', 'orientacao', `orientacao é o vetor nulo (${JSON.stringify(r)}) — não aponta direção nenhuma`);
+      orientacao = norm3(r[0], r[1], r[2]);
+    }
+
     /* resolve + valida CADA seção ANTES de criar qualquer vértice — a forma
        (objeto com pos + raio OU contorno) primeiro; FAIL-CLOSED (a mesma lei
        da alça de curva do lathe, D-115): qualquer problema ABORTA O PASSO
@@ -1610,10 +1646,30 @@ export const OPS = {
     }
     if (cusp) return;
 
-    // FRAME por TRANSPORTE PARALELO: semente em quadroLoft(tangente(0)), propaga com transportaLoft (a fórmula documentada acima)
-    let u = quadroLoft(tangente(0))[0];
+    /* FRAME — dois modos, escolhidos pela PRESENÇA de `orientacao`:
+       DECLARADO (`orientacao` presente): cada seção projeta a referência do
+       autor na própria tangente. Sem propagação, sem acumulação; paralelismo
+       GRITA e aborta, conferido em TODA seção ANTES de qualquer vértice.
+       IMPLÍCITO (ausente): o TRANSPORTE PARALELO de sempre — semente em
+       quadroLoft(tangente(0)), propaga com transportaLoft (a fórmula
+       documentada acima). Este ramo é literalmente o código anterior à chave,
+       por isso peça sem `orientacao` fica byte a byte igual. */
     const frames = [];
-    for (let idx = 0; idx <= ultimo; idx++) { const t = tangente(idx); u = idx === 0 ? u : transportaLoft(u, t); frames.push({ u, w: cross3(u, t) }); }
+    if (orientacao) {
+      let paralela = false;
+      for (let idx = 0; idx <= ultimo; idx++) {
+        const t = tangente(idx);
+        const dot = orientacao[0] * t[0] + orientacao[1] * t[1] + orientacao[2] * t[2];
+        const px = orientacao[0] - t[0] * dot, py = orientacao[1] - t[1] * dot, pz = orientacao[2] - t[2] * dot;
+        if (Math.hypot(px, py, pz) < 1e-4) { grita(st, i, 'loft', idx, `orientacao ${JSON.stringify(orientacao.map((n) => +n.toFixed(6)))} é paralela à tangente da seção ${idx} — a projeção no plano da seção é nula, não há orientação a declarar; escolha uma referência transversal ao caminho`); paralela = true; continue; }
+        const u = norm3(px, py, pz);
+        frames.push({ u, w: cross3(u, t) });
+      }
+      if (paralela) return;   // fail-closed: 0 V / 0 F, nenhum frame chutado
+    } else {
+      let u = quadroLoft(tangente(0))[0];
+      for (let idx = 0; idx <= ultimo; idx++) { const t = tangente(idx); u = idx === 0 ? u : transportaLoft(u, t); frames.push({ u, w: cross3(u, t) }); }
+    }
 
     // VÉRTICES — anda o cursor (a fórmula documentada acima)
     let cursor = 0;
