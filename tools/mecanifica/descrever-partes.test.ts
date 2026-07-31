@@ -359,15 +359,18 @@ describe('descrever-peca: o CLI', () => {
     expect(saida).toMatch(/pastilhaInterna {2,}pistao {2,}encosta/);
   });
 
-  /* A-20 pelo comando real: `npm run descrever -- _jardineira` mostra as cinco
-     portas da peça, com o que cada uma resolve. */
+  /* A-20 pelo comando real: `npm run descrever -- _jardineira` mostra as oito
+     portas da peça, com o que cada uma declara — inclusive os recortes que o
+     A-18 e o A-19 destravaram (`aresta`, `faixa='ultima'`). */
   it('lista as portas publicadas da peça', () => {
     const { saida, codigo } = cli(['_jardineira']);
     expect(codigo).toBe(0);
-    expect(saida).toContain('portas: 5');
+    expect(saida).toContain('portas: 8');
     expect(saida).toContain('PORTAS PUBLICADAS');
     expect(saida).toMatch(/peDoCaule {2,}cilindro:404 tampa=fundo/);
     expect(saida).toMatch(/soleiraDaJardineira {2,}chamferBox:400/);
+    expect(saida).toMatch(/bordaDaFrenteDaSoleira {2,}chamferBox:400 aresta=3/);
+    expect(saida).toMatch(/coloDoBulbo {2,}esfera:401 faixa=ultima/);
   });
 
   it('sai ≠0 com diagnóstico em peça ausente, peça inexistente e parte inexistente', () => {

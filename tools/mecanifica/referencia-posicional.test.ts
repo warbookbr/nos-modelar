@@ -51,14 +51,16 @@ describe('a chave `de` tem dois contratos, e só um é id posicional', () => {
 });
 
 describe('a peça real que o A-22 recusava', () => {
-  it('`_jardineira` publica 5 portas e mede 0 referência posicional', () => {
+  it('`_jardineira` publica 8 portas e mede 0 referência posicional', () => {
     const portas = (PASSOS_JARDINEIRA as unknown[])
       .filter((p) => Array.isArray(p) && p[0] === 'publicarPorta');
-    expect(portas.length).toBe(5);
+    expect(portas.length).toBe(8);
     expect(rotulos(PASSOS_JARDINEIRA as unknown[])).toEqual([]);
   });
 
-  /* a Oficina recusava a peça inteira por causa dessas cinco linhas; uma edição
+  /* a Oficina recusava a peça inteira por causa dessas linhas (cinco quando o
+     A-22 foi medido, oito desde que o A-18 e o A-19 destravaram os recortes);
+     uma edição
      posicional de verdade na MESMA peça continua sendo recusada. */
   it('a mesma peça com UMA edição posicional volta a ser recusada', () => {
     const editada = [...(PASSOS_JARDINEIRA as unknown[]), ['solido', { faces: [0] }]];

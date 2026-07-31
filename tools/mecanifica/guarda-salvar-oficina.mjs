@@ -13,7 +13,7 @@
  *   - peça LIMPA (`_vao-e-anteparo`, sem referência posicional) salva normal;
  *   - depois de UMA edição posicional, o mesmo botão recusa;
  *   - Ctrl+Z desfaz a edição e o botão volta a salvar;
- *   - a peça com PORTAS semânticas (`_jardineira`, 5 `publicarPorta`) salva
+ *   - a peça com PORTAS semânticas (`_jardineira`, 8 `publicarPorta`) salva
  *     normal: `de:{op,id}` é origem estrutural, não coleção de id (A-22).
  *
  * E prova nos DOIS caminhos de saída, em servidores diferentes:
@@ -61,7 +61,7 @@ const OUT = join(REPO, 'tools/bancadas/out');
 const TEMP = join(REPO, 'scratchpad/guarda-salvar');           // pecas/ de mentira: a rota real grava aqui, nunca no rastreado
 const TEMP_PORTAS = join(REPO, 'scratchpad/guarda-salvar-portas');   // idem, para o cenário A-22 — separado, senão (1d) deixaria de contar arquivos
 const PECA = '_vao-e-anteparo';                        // peça LIMPA e não automotiva: só `sel:{grupo|origem|regiao}`
-const PORTAS = '_jardineira';                          // A-22: peça LIMPA que publica 5 portas — `de:{op,id}` não é `de:[ids]`
+const PORTAS = '_jardineira';                          // A-22: peça LIMPA que publica 8 portas — `de:{op,id}` não é `de:[ids]`
 const FACE_ANTEPARO = 0;                               // a única face não-sólida da peça — marcar sólido grava faces:[0]
 const VW = 1100, VH = 620;
 
@@ -206,8 +206,8 @@ try {
   /* ===== A-22: porta semântica NÃO é id posicional ========================== */
   /* A prova do outro lado da guarda. Até este ciclo, abrir `_jardineira` — a
      peça que o CI aprova com 0 id cru — e clicar em Salvar SEM EDITAR NADA era
-     recusado por "5 referência(s) posicional(is)", que são os cinco
-     `publicarPorta` da peça. A ferramenta de autoria recusava exatamente a
+     recusado por "5 referência(s) posicional(is)", que eram os cinco
+     `publicarPorta` que a peça tinha então (hoje são oito). A ferramenta de autoria recusava exatamente a
      capacidade que o ciclo anterior entregou.
 
      Servidor e pecas/ PRÓPRIOS: `/pecas/*` sai do dir de destino, então a peça
@@ -223,7 +223,7 @@ try {
   const passosPortas = await passosDe(pj);
   const quantasPortas = passosPortas.filter((p) => Array.isArray(p) && p[0] === 'publicarPorta').length;
   ok('(1g) a peça de portas abre na Oficina e traz os passos `publicarPorta`',
-     (await pj.evaluate(() => window.__ready === true)) === true && quantasPortas === 5,
+     (await pj.evaluate(() => window.__ready === true)) === true && quantasPortas === 8,
      `${passosPortas.length} passos, ${quantasPortas} publicarPorta`);
   ok('(1g) o oráculo em Node não vê referência posicional nela', referenciasPosicionais(passosPortas).length === 0);
   const strPortas = await pj.evaluate(() => window.__oficina.serializar());

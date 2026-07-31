@@ -12,39 +12,60 @@
      SÓ por `sel:{origem}`/`sel:{alias}`: `chamferBox` (soleira e as quatro
      paredes), `plano` (terra), `esfera` (bulbo), `inflate` (folhagem) e `cone`
      (botão de flor);
-   - cinco portas com nome de AUTOR são publicadas antes das transformações e
-     citadas por `sel:{porta}` DEPOIS delas — é a promessa do O-12: a porta
-     sobrevive ao `rotaciona`/`transladar`;
+   - oito portas com nome de AUTOR são publicadas antes das transformações e
+     resolvidas DEPOIS delas — é a promessa do O-12: a porta sobrevive ao
+     `rotaciona`/`transladar`;
    - zero id posicional, zero face sem identidade, zero órfão.
 
    AS PORTAS, E O QUE O NOME GEOMÉTRICO ESCONDERIA:
 
-   | porta                 | origem estrutural            | o que o nome geométrico esconde |
-   |-----------------------|------------------------------|---------------------------------|
-   | `coloDoBulbo`         | `esfera:401 faixa 0`         | é o leque do polo de ORIGEM da esfera, que nasce EMBAIXO; a meia-volta o põe em cima, virando o colo por onde o caule sai |
-   | `peDoCaule`           | `cilindro:404 tampa 'fundo'` | depois da inclinação, `fundo` não é mais "o lado de baixo" — é o pé enterrado |
-   | `coroaDoCaule`        | `cilindro:404 tampa 'topo'`  | idem: é o corte de onde o botão brota |
-   | `leitoDaTerra`        | `plano:402` (inteiro)        | a grade nasce em y=0 e sobe para dentro da caixa |
-   | `soleiraDaJardineira` | `chamferBox:400` (inteiro)   | contrato mínimo: prova que a porta funciona também quando a origem só sabe citar a primitiva toda |
+   | porta                    | origem estrutural              | o que o nome geométrico esconde |
+   |--------------------------|--------------------------------|---------------------------------|
+   | `coloDoBulbo`            | `esfera:401 faixa 'ultima'`    | é o leque do polo NORTE da esfera; no bulbo enterrado ele é o colo, por onde o caule sai |
+   | `peDoCaule`              | `cilindro:404 tampa 'fundo'`   | depois da inclinação, `fundo` não é mais "o lado de baixo" — é o pé enterrado |
+   | `coroaDoCaule`           | `cilindro:404 tampa 'topo'`    | idem: é o corte de onde o botão brota |
+   | `assentoDoBotao`         | `cone:405 tampa 'fundo'`       | a base do cone é o que o botão apoia na coroa; o ápice não tem face, é vértice |
+   | `leitoDaTerra`           | `plano:402` (inteiro)          | a grade nasce em y=0 e sobe para dentro da caixa |
+   | `faixaDaFrenteDaTerra`   | `plano:402 faixa 'ultima'`     | a última LINHA em z da grade é a tira de terra encostada na parede da frente |
+   | `soleiraDaJardineira`    | `chamferBox:400` (inteiro)     | a soleira toda, do jeito que `{op,id}` já respondia antes de o chanfro virar citável |
+   | `bordaDaFrenteDaSoleira` | `chamferBox:400 aresta 3`      | a aresta 3 é o chanfro entre `topo` e `frente`, o rasgo comprido que pega a água da rega |
 
-   RELAÇÃO QUE A PEÇA AFIRMA (e o teste trava, em relação, não em coordenada):
+   Nenhum nome promete região que o contrato não alcance. `assentoDoBotao` é a
+   tampa da base, não "a boca da flor"; `bordaDaFrenteDaSoleira` é UMA das doze
+   arestas do chanfro, não "a borda da soleira"; `faixaDaFrenteDaTerra` é uma
+   linha da grade, não "a terra da frente".
+
+   RELAÇÕES QUE A PEÇA AFIRMA (e o teste trava, em relação, não em coordenada):
    o vértice comum do `coloDoBulbo` cai EXATAMENTE sobre o centro do
-   `peDoCaule` — o bulbo entrega o caule no ponto em que ele nasce. As duas
-   portas foram publicadas antes de o bulbo dar meia-volta e antes de a haste
-   inteira se inclinar; se `sel:{porta}` reresolvesse por posição, a relação
-   quebraria.
+   `peDoCaule` — o bulbo entrega o caule no ponto em que ele nasce —, e o centro
+   do `assentoDoBotao` cai sobre o centro da `coroaDoCaule` — o botão apoia
+   exatamente onde o caule termina. As quatro portas foram publicadas antes de a
+   haste inteira se inclinar e antes de os corpos irem para o lugar; se
+   `sel:{porta}` reresolvesse por posição, as duas relações quebrariam.
 
    INCLINAÇÃO SEM TRIGONOMETRIA: a gramática de parâmetros só tem + - * / e
    parênteses, então a muda é montada EM PÉ e só depois a haste inteira
    (caule + folhagem + botão) gira uma vez em torno do pé. É o mesmo motivo pelo
    qual o freio monta em torno de Y e depois vira: transporte é passo, não conta.
 
-   LIMITES QUE ESTA PEÇA ENCONTROU (registrados em ATRITOS-AUTORIA.md, A-18 a
-   A-20, não contornados em silêncio):
-   - `chamferBox`, `cone`, `plano` e `inflate` publicam origem de PRIMITIVA
-     INTEIRA. A boca do botão, a borda da soleira e a célula da terra existem na
-     topologia e estão documentadas no núcleo, mas não são endereçáveis — então
-     não viram porta;
+   O QUE MUDOU NO CICLO "ENDEREÇOS SEMÂNTICOS V1" (A-18 e A-19):
+   - as três portas que a peça QUERIA e não conseguia publicar existem agora:
+     `assentoDoBotao` (cone), `bordaDaFrenteDaSoleira` (chamferBox) e
+     `faixaDaFrenteDaTerra` (plano). Antes os três geradores só sabiam citar a
+     primitiva inteira;
+   - o `coloDoBulbo` deixou de ser `faixa: 0`. A intenção sempre foi "a última
+     faixa da esfera", o leque do polo NORTE, e ela está escrita assim. Antes o
+     eixo só aceitava inteiro literal, então a peça foi remodelada em volta da
+     limitação: o bulbo nascia com o polo de origem embaixo e levava uma
+     meia-volta em z só para pôr aquele leque para cima. A meia-volta SUMIU
+     junto com o parâmetro `bulboMeiaVolta` — era distorção de modelo para caber
+     na ferramenta, não decisão de jardinagem.
+
+   LIMITES QUE ESTA PEÇA CONTINUA ENCONTRANDO (registrados em
+   ATRITOS-AUTORIA.md, não contornados em silêncio):
+   - `inflate` (folhagem) publica origem de PRIMITIVA INTEIRA e continua assim
+     por decisão medida: a malha sai de um scan de voxels, sem grade nem face
+     nominal honesta para endereçar (A-18);
    - as quatro paredes são quatro passos copiados com a coordenada escrita à
      mão: o A-17 da roda aparece igual fora do vocabulário mecânico;
    - o bulbo é ENTERRADO de propósito (colo rente à terra, corpo abaixo dela) e
@@ -75,7 +96,6 @@ const MEDIDAS = {
 
   // bulbo: enterrado, com o colo rente à terra
   bulboRaio: 0.030,
-  bulboMeiaVolta: 180,        // graus em z que põem o colo (o polo de origem) para cima
 
   // caule: sai do colo do bulbo e atravessa a terra
   cauleRaio: 0.012,
@@ -115,8 +135,8 @@ const DERIVADAS = {
   terraProfundidade: '= caixaProfundidade - 2 * paredeEspessura',
   terraY: '= caixaAltura - terraRebaixo',
 
-  /* o bulbo desce 2·raio: depois da meia-volta é o COLO que está no topo local,
-     então é ele — e não o centro — que encosta na terra. */
+  /* o bulbo desce 2·raio: a esfera nasce apoiada no chão local, com o polo norte
+     — o colo — em y = 2·raio. É ele, e não o centro, que encosta na terra. */
   bulboY: '= terraY - 2 * bulboRaio',
 
   coroaY: '= terraY + cauleComprimento',
@@ -150,7 +170,11 @@ export const MATERIAIS = {
   cascaCaule: { cor: '#4f6b3a', aspereza: 0.78 },
   folhaVerde: { cor: '#5f8d43', aspereza: 0.74 },
   petalaBotao: { cor: '#b8455f', aspereza: 0.58 },
-  // materiais aplicados PELAS PORTAS, todos depois das transformações
+  /* materiais aplicados PELAS PORTAS, todos depois das transformações. Cada um
+     tem função de autoria, não de marcação para teste: dois aparecem na peça
+     montada (a borda molhada da soleira e a tira de terra da frente) e dois
+     aparecem quando se isola a parte na bancada, que é onde se confere o
+     encaixe (o colo pálido do bulbo e o corte fresco da coroa). */
   madeiraEncharcada: { cor: '#4c3925', aspereza: 1.0 },
   terraUmida: { cor: '#241c16', aspereza: 1.0 },
   corteFresco: { cor: '#d9e2b0', aspereza: 0.42 },
@@ -206,10 +230,15 @@ export const ALIASES = [
 ];
 
 export const PASSOS = [
-  // ---- caixa: soleira e quatro paredes. `chamferBox` só sabe citar a
-  //      primitiva inteira, então a porta publicada aqui é honesta com o limite ----
+  // ---- caixa: soleira e quatro paredes. A soleira publica DUAS portas: a
+  //      primitiva inteira e a aresta do chanfro que a rega molha ----
   ['chamferBox', { origemId: SOLEIRA, larg: 'caixaLargura', alt: 'paredeEspessura', prof: 'caixaProfundidade', chanfro: 'caixaChanfro' }],
   ['publicarPorta', { nome: 'soleiraDaJardineira', de: { op: 'chamferBox', id: SOLEIRA } }],
+  /* aresta 3 é o chanfro entre `topo` e `frente`: a ordem das 12 arestas (X, Y e
+     depois Z, quatro de cada) é topologia FIXA do `chamferBox` — 26 faces, sem
+     nenhum TOPO que possa mudar a contagem —, então o literal aqui não envelhece
+     como envelhecia o `faixa: 0` do bulbo. */
+  ['publicarPorta', { nome: 'bordaDaFrenteDaSoleira', de: { op: 'chamferBox', id: SOLEIRA, aresta: 3 } }],
   ['chamferBox', { origemId: PAREDE_FRENTE, larg: 'caixaLargura', alt: 'caixaAltura', prof: 'paredeEspessura', chanfro: 'caixaChanfro' }],
   ['transladar', { d: [0, 0, 'paredeFrenteZ'], sel: { alias: 'paredeFrente' } }],
   ['chamferBox', { origemId: PAREDE_TRAS, larg: 'caixaLargura', alt: 'caixaAltura', prof: 'paredeEspessura', chanfro: 'caixaChanfro' }],
@@ -223,13 +252,15 @@ export const PASSOS = [
   //      publicada antes da subida ----
   ['plano', { origemId: TERRA, largura: 'terraLargura', profundidade: 'terraProfundidade', seg: 'terraSeg' }],
   ['publicarPorta', { nome: 'leitoDaTerra', de: { op: 'plano', id: TERRA } }],
+  /* 'ultima' resolve contra a contagem REAL da grade: mudar `terraSeg` não move
+     a porta para o meio da terra, ela continua sendo a linha encostada na frente. */
+  ['publicarPorta', { nome: 'faixaDaFrenteDaTerra', de: { op: 'plano', id: TERRA, faixa: 'ultima' } }],
   ['transladar', { d: [0, 'terraY', 0], sel: { alias: 'terraInteira' } }],
 
-  // ---- bulbo: nasce com o polo de origem EMBAIXO; a porta `coloDoBulbo` sai
-  //      aí, e só depois a meia-volta põe o colo para cima ----
+  // ---- bulbo: a esfera nasce apoiada no chão local, com o polo NORTE em cima.
+  //      O colo é a última faixa, dita assim — sem meia-volta para contornar ----
   ['esfera', { origemId: BULBO, raio: 'bulboRaio', aneis: 'bulboAneis', lados: 'bulboLados' }],
-  ['publicarPorta', { nome: 'coloDoBulbo', de: { op: 'esfera', id: BULBO, faixa: 0 } }],
-  ['rotaciona', { eixo: 'z', graus: 'bulboMeiaVolta', pivo: [0, 'bulboRaio', 0], sel: { alias: 'bulboInteiro' } }],
+  ['publicarPorta', { nome: 'coloDoBulbo', de: { op: 'esfera', id: BULBO, faixa: 'ultima' } }],
   ['transladar', { d: ['cauleBaseX', 'bulboY', 0], sel: { alias: 'bulboInteiro' } }],
 
   // ---- caule: as duas portas saem antes de qualquer transporte ----
@@ -238,8 +269,10 @@ export const PASSOS = [
   ['publicarPorta', { nome: 'coroaDoCaule', de: { op: 'cilindro', id: CAULE, tampa: 'topo' } }],
   ['transladar', { d: ['cauleBaseX', 'terraY', 0], sel: { alias: 'cauleInteiro' } }],
 
-  // ---- botão: brota da coroa, ainda em pé ----
+  // ---- botão: brota da coroa, ainda em pé. A base do cone é o que ele apoia
+  //      lá; o ápice não vira porta porque não é face, é vértice ----
   ['cone', { origemId: BOTAO, raio: 'botaoRaio', altura: 'botaoComprimento', lados: 'botaoLados' }],
+  ['publicarPorta', { nome: 'assentoDoBotao', de: { op: 'cone', id: BOTAO, tampa: 'fundo' } }],
   ['transladar', { d: ['cauleBaseX', 'coroaY', 0], sel: { alias: 'botaoInteiro' } }],
 
   // ---- folhagem: massa irregular declarada por duas silhuetas (lado e topo);
@@ -286,12 +319,18 @@ export const PASSOS = [
   ['material', { sel: { grupo: 'folhagem' }, usa: 'folhaVerde' }],
   ['material', { sel: { grupo: 'botao' }, usa: 'petalaBotao' }],
 
-  // ---- e agora as PORTAS, todas citadas DEPOIS das transformações. Nenhuma
-  //      delas foi reescrita quando o bulbo deu meia-volta ou a haste pendeu ----
-  ['material', { sel: { porta: 'soleiraDaJardineira' }, usa: 'madeiraEncharcada' }],
+  /* ---- e agora as PORTAS, todas citadas DEPOIS das transformações. Nenhuma
+     delas foi reescrita quando a haste pendeu. A terra recebe primeiro o leito
+     inteiro e só depois a linha da frente, que é subconjunto dele: a ordem é a
+     regra, e a linha da frente ganha porque vem por último. Três portas
+     (`soleiraDaJardineira`, `peDoCaule` e `assentoDoBotao`) ficam publicadas sem
+     citação aqui — nenhuma delas apareceria, e material inventado só para o
+     teste ler de volta é marcação, não autoria. Quem as mede é
+     `tools/mecanifica/jardineira-integridade.test.ts`, citando `sel:{porta}`. */
+  ['material', { sel: { porta: 'bordaDaFrenteDaSoleira' }, usa: 'madeiraEncharcada' }],
   ['material', { sel: { porta: 'leitoDaTerra' }, usa: 'substrato' }],
+  ['material', { sel: { porta: 'faixaDaFrenteDaTerra' }, usa: 'terraUmida' }],
   ['material', { sel: { porta: 'coloDoBulbo' }, usa: 'peleDoColo' }],
-  ['material', { sel: { porta: 'peDoCaule' }, usa: 'terraUmida' }],
   ['material', { sel: { porta: 'coroaDoCaule' }, usa: 'corteFresco' }],
 
   // ---- colisão: o volume que a jardineira ocupa ----
