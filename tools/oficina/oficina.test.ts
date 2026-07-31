@@ -5114,6 +5114,20 @@ describe('furo v2 — um passo abre vários furos na mesma face', () => {
       for (let j = 0; j < 3 * L; j++) expect(n.F.has(1000 + 3 * L * k + j)).toBe(true);
       for (let j = 0; j < 2 * L; j++) expect(n.V.has(1000 + 2 * L * k + j)).toBe(true);
     }
+    /* e o bloco de ids do furo k responde pelo ANEL k: a borda j contém a
+       aresta j→j+1 daquele anel, e a parede j só tem vértices dele. Sem esta
+       afirmação, trocar a ordem dos blocos (dar ao furo 0 os ids do último)
+       passa por todos os outros testes, e toda peça já escrita passa a
+       endereçar outro furo. */
+    for (let k = 0; k < 4; k++) {
+      const meus = new Set(Array.from({ length: 2 * L }, (_, j) => 1000 + 2 * L * k + j));
+      for (let j = 0; j < L; j++) {
+        const borda = n.F.get(1000 + 3 * L * k + j).vs;
+        expect(borda).toContain(1000 + 2 * L * k + j);
+        expect(borda).toContain(1000 + 2 * L * k + (j + 1) % L);
+        for (const v of n.F.get(1000 + 3 * L * k + L + j).vs) expect(meus.has(v)).toBe(true);
+      }
+    }
     // o preenchimento começa exatamente em b + 3·lados·M
     const cheio = [...n.F.keys()].filter((f: number) => f >= 1000 + 3 * L * 4).sort((a: number, b: number) => a - b);
     expect(cheio[0]).toBe(1000 + 3 * L * 4);

@@ -1441,7 +1441,15 @@ function areaPoligono(P) {
    Nada aqui é aceito no escuro: a saída passa por três provas antes de virar
    face — a soma das áreas bate com contorno menos anéis, toda aresta de borda
    é usada uma vez e toda aresta interna exatamente duas (em direções opostas),
-   e cada anel tem as suas `L` faces. Falhar qualquer uma GRITA. */
+   e cada anel tem as suas `L` faces. Falhar qualquer uma GRITA.
+
+   DITO NA CARA: essas três provas são de ESTADO IMPOSSÍVEL, e não têm teste
+   que as dispare. Não há entrada que o `furo` aceite (face plana, convexa,
+   anéis dentro do contorno e disjuntos) e que as faça falhar; desligar
+   qualquer uma delas não mata teste nenhum, e isso foi MEDIDO por mutação, não
+   suposto. Elas ficam porque o preço de uma partição errada é malha aberta
+   plausível na foto, mas ninguém deve lê-las como promessa conferida: se uma
+   disparar, o defeito é do núcleo, não do arquivo da peça. */
 function triangularComAneis(contorno, aneis, escala) {
   const eps = 1e-12 * Math.max(1, escala * escala);
   const pts = [], tags = [];
