@@ -26,6 +26,9 @@ que só começa quando o `PLANO.md` abrir o ciclo "Arranjos semânticos v1".
 O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
 A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
 invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de`).
+**Estado depois do ciclo Endereços semânticos v1:** A-18 e A-19 resolvidos no
+núcleo; A-20 resolvido pela metade (`nucleo()` devolve as portas; a régua e a
+bancada ainda não as mostram).
 Nenhum deles é pendência da R4 — são extensões e vizinhanças que a prova
 descobriu ao empurrar o contrato para fora do vocabulário automotivo.
 
@@ -74,8 +77,8 @@ Nenhum atrito de autoria fica sem plano:
 | A-6 `encostar` não existe | O-8 | A-11 partes planas | O-10 |
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
-| A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão) |
-| A-19 eixo de origem sem expressão | O-12 (extensão) | A-20 porta invisível fora do núcleo | sem item — backlog |
+| A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
+| A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **metade entregue** |
 | A-22 guarda e gate discordam sobre `de` | sem item — backlog | | |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
@@ -381,6 +384,14 @@ travada por teste no próprio núcleo, e mesmo assim só publicam a primitiva
 inteira. A boca do cone, a célula do plano e as três famílias de face do
 `chamferBox` existem e não são endereçáveis. O freio não sentiu porque pinça e
 suporte usam `chamferBox` como bloco maciço.
+
+**Corrigido no ciclo Endereços semânticos v1.** `cone` ganhou a estrutura do
+`cilindro` (`lado` + `tampa:'fundo'`), `chamferBox` a do `cubo` mais `aresta` e
+`canto`, e `plano` a grade `faixa`×`lado` do `loft` — tudo reusando as fábricas
+de contrato que já existiam, sem vocabulário novo, e sem mudar o que `{op,id}`
+sem eixo já respondia. `inflate` fica no contrato mínimo por decisão medida,
+agora escrita no código. Detalhe em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md),
+A-18 (resolvidos).
 
 **Por que:** A-9 é o achado mais incômodo da rodada. A pinça e o suporte são peças
 fundidas e `chamferBox` é literalmente o gerador do assunto; foram escritas com

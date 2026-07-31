@@ -78,69 +78,6 @@ o ciclo cobria A-15, O-6 e O-12, e a regra do `PLANO.md` é que descoberta não
 amplia o ciclo em execução. O gate de encerramento pede que a Oficina **recuse**
 o que não sabe representar, e ela recusa; A-22 é o excesso, não a falha.
 
-### A-18 — quatro geradores só sabem citar a primitiva inteira
-
-**Onde dói:** linguagem da Oficina.
-
-**Evidência:** a fixture não automotiva
-`prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
-queria três portas que a topologia declarada do núcleo já conhece e que o
-contrato de `origem` não expõe:
-
-| porta que faltou | o que existe no núcleo | contrato publicado |
-|---|---|---|
-| a boca do botão de flor | `cone` documenta `laterais = b+j` e `tampa da base = b+lados` | `contratoFaces` — só a primitiva inteira |
-| a borda da soleira | `chamferBox` documenta 6 faces originais, 12 de aresta e 8 de canto | idem |
-| uma célula ou linha da terra | `plano` documenta a grade `b + iz·seg + ix` | idem |
-
-O O-6 justifica o contrato mínimo com "quando a topologia não possui uma grade
-ou face nominal honesta". Medido contra o próprio núcleo, isso vale para
-**um** dos quatro: só `inflate` sai de um scan de voxels sem fórmula fechada.
-`cone`, `plano` e `chamferBox` têm numeração fechada, documentada linha a linha
-e travada por teste — a grade honesta existe e não é endereçável.
-
-Isso não apareceu no freio porque pinça e suporte precisam da primitiva
-inteira: `chamferBox` entra lá como bloco maciço. É exatamente a hipótese que a
-prova não automotiva veio testar.
-
-**Contorno:** publicar a porta com o nome honesto do que o contrato alcança
-(`soleiraDaJardineira`, `leitoDaTerra`) e registrar no cabeçalho da peça o que
-não deu para nomear. Não inventar `bocaDoBotao` apontando para o cone inteiro —
-nome que promete região e entrega primitiva é pior que nome nenhum.
-
-**Capacidade candidata:** estender o contrato de `origem` desses três geradores
-para o eixo que a topologia já tem — `{tampa}`/`{lado}` no `cone` (a estrutura
-do `cilindro`), `{face}`/`{aresta}`/`{canto}` no `chamferBox` (a estrutura do
-`cubo`, mais duas famílias), `{linha,coluna}` no `plano` (a estrutura
-`faixa`×`lado` do `loft`). São as fábricas de contrato que já existem em
-`motor/oficina.js`, aplicadas a geradores que ficaram de fora. `inflate`
-continua legitimamente com o contrato mínimo.
-
-### A-19 — o eixo de uma origem não aceita expressão nem "o último"
-
-**Onde dói:** linguagem da Oficina.
-
-**Evidência:** a mesma fixture quis publicar a porta `coloDoBulbo` sobre o
-leque do polo NORTE da esfera, que é `faixa: bulboAneis - 1`. Não dá:
-`validarEixo` exige `Number.isSafeInteger`, e o eixo não passa por `st.num` —
-então ele é o único campo dimensional da linguagem que **não** pode citar um
-parâmetro. Escrever `faixa: 3` funcionaria hoje e apontaria para uma faixa do
-meio no dia em que alguém mudasse `bulboAneis` para 6, **sem nenhum
-diagnóstico**: a referência continua válida e passa a estar errada. É a classe
-que o `CLAUDE.md` proíbe — "referência inválida, ambígua ou vazia falha com
-diagnóstico" — só que aqui a referência nem chega a ficar inválida.
-
-**Contorno:** a peça foi remodelada para que a porta caísse na `faixa: 0` (o
-leque do polo de ORIGEM, estável sob qualquer `aneis`) e a meia-volta do bulbo
-passou a ser o que põe esse leque para cima. O contorno é bom modelo — o colo
-do bulbo realmente é o polo de origem girado —, mas foi a ferramenta que
-escolheu a forma da peça, o mesmo sintoma do A-9.
-
-**Capacidade candidata:** o eixo aceitar nome de parâmetro (via `st.num`, como
-todo campo dimensional) e um literal de extremidade (`'ultima'`/`'primeira'`)
-resolvido contra a contagem real do gerador. Vale para qualquer grade: faixa de
-`loft`, anel de `lathe`, lado de `cilindro`.
-
 ### A-20 — porta publicada é invisível fora do núcleo
 
 **Onde dói:** conferência headless e ferramental.
@@ -163,6 +100,15 @@ comentário explicando por que eles existem.
 publicação) e a régua/bancada listarem-nas ao lado das partes. É o mínimo para
 uma porta virar contrato entre peças — sem isso, `encostar` (O-8) não tem como
 nomear "a porta A encosta na porta B" a partir de fora da peça.
+
+**Metade resolvida no ciclo Endereços semânticos v1:** `nucleo()` passa a
+devolver `portas` — Map nome -> `{nome, de, passo}`, ordenado por nome, com
+`de` clonado. Só o que foi DECLARADO; a face resolvida não entra, porque
+depende do momento da citação. Fica fora do `neutroCanonico` de propósito:
+porta é contrato de autoria, não geometria, e o canônico é hash de peça
+(`tools/oficina/oficina.test.ts`, bloco "A-20"). **Continua aberto** o outro
+lado: régua, bancada e adaptador ainda não mostram as portas, então a prova de
+`sel:{porta}` em `jardineira-integridade.test.ts` segue lendo material.
 
 ### A-17 — repetição radial vira coordenada em massa
 
@@ -783,6 +729,73 @@ destruía o contexto foi removido.
 - **Nenhum id de vértice ou face.** Não contei vértice na mão em momento algum.
 
 ## Atritos resolvidos
+
+### A-18 — três geradores só sabiam citar a primitiva inteira
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** a fixture não automotiva `prototipos/fps/v3/pecas/_jardineira.js`
+queria três portas que a topologia declarada do núcleo já conhecia e que o
+contrato de `origem` não expunha: a boca do botão de flor (`cone`), a borda da
+soleira (`chamferBox`) e uma célula da terra (`plano`). Os três publicavam
+`origem` só da primitiva inteira, apesar de terem numeração fechada, documentada
+linha a linha e travada por teste. A justificativa do O-6 ("topologia sem grade
+ou face nominal honesta") foi medida contra o núcleo e vale para **um** gerador:
+`inflate`.
+
+**Contorno usado na época:** publicar a porta com o nome honesto do que o
+contrato alcançava (`soleiraDaJardineira`, `leitoDaTerra`) e registrar no
+cabeçalho da peça o que não deu para nomear.
+
+**Correção (ciclo Endereços semânticos v1):** cada um passou a citar o eixo que
+a topologia já tinha, reusando as fábricas de contrato que já existiam em
+`prototipos/fps/v3/motor/oficina.js`, sem vocabulário novo:
+
+| gerador | estrutura reusada | eixos publicados |
+|---|---|---|
+| `cone` | a do `cilindro` (a cópia inline virou a fábrica `contratoLadoTampa`) | `lado` (as L laterais) e `tampa` — só `'fundo'`, porque o ápice é vértice, não face |
+| `chamferBox` | a do `cubo` (a cópia inline virou a fábrica `contratoCaixa`) | `face` (as 6 nominais, mesma ordem do cubo) mais `aresta` (12) e `canto` (8) |
+| `plano` | a grade `faixa`×`lado` do `loft` | `faixa` = linha em z, `lado` = coluna em x, a numeração `b + iz·seg + ix` |
+
+`inflate` fica no contrato mínimo, e isso agora está escrito no código como
+DECISÃO medida — a malha dele sai de um scan de voxels, sem fórmula fechada de
+face. Publicar grade ali seria prometer região e entregar ordem de varredura.
+
+**Aditividade:** `{op,id}` sem eixo continua devolvendo a primitiva inteira nos
+três, e `gabarito:selecao:check` fica verde sem regravar (22 peças
+byte-idênticas). Por isso o `cone` responde a `{}` diferente do `cilindro`
+(que devolve só as laterais): trocar o padrão faria toda citação de cone já
+escrita apontar para outro conjunto sem diagnóstico nenhum — o erro que o A-19
+condena. Aditividade manda mais que simetria, e a divergência está dita no
+código.
+
+### A-19 — o eixo de uma origem não aceitava expressão nem "o último"
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** a mesma fixture quis publicar a porta `coloDoBulbo` sobre o leque
+do polo NORTE da esfera, que é `faixa: bulboAneis - 1`. `validarEixo` exigia
+`Number.isSafeInteger` e o eixo não passava por `st.num`, então ele era o único
+campo dimensional da linguagem que não podia citar um parâmetro. `faixa: 3`
+continuava **válida** apontando para outra faixa quando alguém mudava a
+contagem: a referência não ficava inválida, ficava errada. O contorno foi
+remodelar a peça para a porta cair na `faixa: 0` — foi a ferramenta que escolheu
+a forma da peça, o mesmo sintoma do A-9.
+
+**Correção (ciclo Endereços semânticos v1):** o eixo passou a aceitar, além do
+inteiro literal, as duas formas que faltavam:
+
+- **nome de PARAM/TOPO ou expressão `=…`**, pelo mesmo caminho `st.num` de todo
+  campo dimensional;
+- **palavra de extremidade**, `'primeira'` ou `'ultima'`, resolvida contra a
+  contagem REAL do gerador naquele passo — "a última faixa" continua sendo a
+  última quando a contagem muda.
+
+Vale para todo eixo de índice da linguagem: `faixa`/`lado` de loft, lathe,
+esfera e plano; `lado` de cilindro e cone; `aresta`/`canto` de chamferBox. As
+duas palavras são RESERVADAS: um PARAM chamado `ultima` não é alcançável por um
+eixo. Valor fora do contrato GRITA com a causa nomeada (não resolve / não é
+índice / fora do limite) e não seleciona nada pela metade.
 
 ### A-21 — o gate de id cru reprovava a capacidade que a rodada acabara de shipar
 
