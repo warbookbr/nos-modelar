@@ -659,12 +659,73 @@ da contagem e aplicado sempre à posição da fonte; acumular somaria erro de po
 flutuante dentro do arquivo salvo, e o teste mede exatamente a diferença entre os
 dois doubles para que a afirmação não passe com as duas implementações.
 
-**O que sobrou dito na cara:** o item foi entregue no NÚCLEO, com prova em teste.
-A roda experimental ainda **não** foi reescrita, então os cem parâmetros de
-coordenada continuam no arquivo dela; o que mudou é que agora existe a operação
-que os dispensa. A ordem em que a coleção resolve as faces é determinística mas
-não tem afirmação, porque nenhum consumidor do núcleo distingue essa ordem hoje —
-está declarado no comentário da op em vez de virar promessa não medida.
+**Correção na PEÇA (fechamento do mesmo ciclo, 31 de julho de 2026):** a roda
+experimental foi reescrita com o arranjo, e a medida é a prova do item:
+
+| medida | antes | depois |
+|---|---:|---:|
+| parâmetros (`PARAMS`) | 141 | 43 |
+| destes, coordenadas `r0_..r9_` de seno/cosseno | 100 | **0** |
+| passos (`PASSOS`) | 66 | 47 |
+| passos de geração de instância (`loft`/`cubo`/`cilindro` repetidos) | 20 | 3 |
+| partes nomeadas | 7 | 16 |
+| faces / vértices | 2082 / 2184 | 2132 / 2194 |
+
+Um braço é declarado no ângulo ZERO, onde Y é o raio nomeado e Z é zero — não
+há seno nem cosseno em lugar nenhum do arquivo. `rotaciona` abre meia abertura
+do par, um `arranja` cria o outro braço do par e dois `arranja` de volta fechada
+replicam os dois em `gruposDeRaios` grupos. Os cinco recessos e as cinco porcas
+seguem o mesmo caminho, um passo de arranjo cada.
+
+Some junto uma distorção que ninguém tinha nomeado: a função `contornoChanfrado`
+decidia, braço a braço, qual eixo do frame local do `loft` era o tangencial,
+porque havia dez caminhos com dez direções diferentes. Com um caminho só, a
+decisão deixou de existir.
+
+Cada cópia continua endereçável: os dez braços são dez PARTES nomeadas
+(`raioRecuadoDoGrupo3`), resolvidas por `{op:'arranja', id, copia}`. Recessos e
+porcas ficam AGREGADOS de propósito, para a peça exercitar as duas formas — a
+coleção inteira e a cópia isolada. Silhueta conferida na bancada em três
+enquadramentos, idêntica à de antes.
+
+**O que continua aberto, dito na cara:** a **confirmação em marcenaria acima
+não foi paga**. As quatro paredes da `_jardineira` continuam quatro passos
+copiados; elas formam um retângulo, então nenhum dos dois modos do `arranja`
+resolve as quatro de uma vez, e mexer nela arriscaria as provas que ela já
+sustenta. A prova não automotiva do arranjo entrou em peça nova
+(`prototipos/fps/v3/pecas/_cerca-e-flor.js`). A ordem em que a coleção resolve
+as faces segue determinística e sem afirmação, porque nenhum consumidor do
+núcleo distingue essa ordem hoje.
+
+### A-24 — o arranjo copia UMA origem, e nem todo gerador sabe dizer "a primitiva inteira"
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** ao reescrever as cinco porcas da roda experimental com `arranja`.
+O passo exige `sel:{origem:...}` direto — sem alias, sem união —, e a porca era
+um `cilindro`. No contrato do `cilindro`, `{op,id}` sem eixo são só as
+LATERAIS, por compatibilidade com peça já publicada; a primitiva inteira só
+existe como união de três origens (laterais, tampa `fundo`, tampa `topo`). O
+`cubo`, o `chamferBox`, o `cone`, o `lathe` e o `loft` têm o inteiro; o
+`cilindro` e o `plano`, não.
+
+O contorno óbvio — três `arranja`, um por família — passa em todo gate e é
+errado: cada cópia sai com as tampas SOLTAS do tubo, porque os dois arranjos
+alocam vértices próprios e nada os solda. A régua mediu **13 corpos no lugar de
+5** na parte `fixadores`. Na foto é invisível: as tampas ficam exatamente sobre
+a boca do tubo.
+
+**Contorno usado:** a porca virou um `lathe` de seis lados com o perfil fechado
+nos dois polos (`[[0,0],[r,0],[r,h],[0,h]]`). Uma origem, um arranjo, cinco
+corpos. A troca é decisão de modelagem forçada pela ferramenta, e está escrita
+no arquivo da peça como tal.
+
+**Capacidade candidata:** dar ao `cilindro` e ao `plano` uma forma de citar a
+primitiva inteira sem quebrar quem já cita `{op,id}` esperando as laterais —
+por exemplo uma palavra explícita no eixo `tampa`. Alternativa mais geral:
+`arranja` aceitar uma união de origens como fonte, criando UMA coleção com
+vértices compartilhados. As duas mudam formato salvo e nenhuma entra num ciclo
+já fechado. Não tem item em `OFICINA-OTIMIZACOES.md` ainda.
 
 ### A-23 — a palavra reservada de extremidade engolia um parâmetro homônimo
 

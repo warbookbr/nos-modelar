@@ -13,17 +13,17 @@ herdado e não comandam a Mecanifica.
 pagou a dívida medida no fechamento do ciclo 2 (A-18, A-19, A-20 e A-22) e não
 inventou capacidade nova.
 
-**Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO no núcleo em 31 de julho de
-2026.** Entregou a op `arranja` (radial e linear) e pagou a dívida A-23 do ciclo
-anterior. O que ele **não** fez está dito no fechamento abaixo, sem eufemismo: a
-roda experimental não foi reescrita, então os cem parâmetros de coordenada
-continuam no arquivo dela.
+**Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO em 31 de julho de 2026**, no
+núcleo **e** na peça. Entregou a op `arranja` (radial e linear), pagou a dívida
+A-23 e, no fechamento, as três dívidas menores que ele mesmo tinha declarado —
+inclusive a maior delas: a roda experimental foi reescrita e perdeu os cem
+parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaixo.
 
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
 - **nenhum ciclo técnico está em execução.** O ciclo 3 ("Arranjos semânticos
-  v1", O-13) foi aberto e fechado em 31 de julho de 2026, no núcleo; o próximo
-  candidato é o ciclo 4 ("Realismo geométrico v1"), que ainda **não** foi
+  v1", O-13) foi aberto e fechado em 31 de julho de 2026, no núcleo e na peça; o
+  próximo candidato é o ciclo 4 ("Realismo geométrico v1"), que ainda **não** foi
   aberto.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
@@ -220,15 +220,15 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-**Nenhuma linha está em execução.** As linhas 1 e 1b fecharam; as demais são candidatas
+**Nenhuma linha está em execução.** As linhas 1, 1b e 2 fecharam; as demais são candidatas
 ordenadas, não autorização para começar ou agrupá-las num ciclo.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
 | 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
 | 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
-| 2 | próxima candidata, **não aberta** | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
-| 3 | candidata posterior | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
+| 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
+| 3 | próxima candidata, **não aberta** | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
 | 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
@@ -373,7 +373,7 @@ tocado — a Oficina segue sem saber EMITIR referência semântica. `adaptarThre
 continua sem expor portas, por decisão declarada. `inflate` continua no contrato
 mínimo, por decisão medida.
 
-### Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO no núcleo (31/07/2026)
+### Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO (31/07/2026)
 
 **Incluiu:** O-13 (repetição radial e linear com identidade estável por
 instância e diagnóstico de referência inválida ou ambígua) e a dívida A-23 do
@@ -413,6 +413,44 @@ relações de montagem, novas peças de produto e automação de crítica visual
 | peças existentes intactas | `npm run gabarito:selecao:check` — 22 peças byte-idênticas |
 | verificação completa | `npm test` (540), `typecheck`, `build`, `gabarito:selecao:check`, `id-cru:check`, `guarda:salvar`, `guarda:portas`, `mapa`/`mapa:check`, `docs:links:check`, `docs:toc:check` |
 
+**Gate do fechamento, escrito antes e conferido item por item.** O gate deste
+ciclo era: "a roda experimental perde os cem parâmetros de coordenadas dos
+braços; cada cópia continua isolável por identidade; uma composição não
+automotiva prova o mesmo contrato; nenhum id runtime entra no arquivo salvo". As
+quatro condições estão **ATENDIDAS**:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | a roda perde os cem parâmetros de coordenada | **ATENDIDO** | `PARAMS` 141 → **43**, e os 100 nomes `r0_..r9_` de seno/cosseno são **0**. Passos 66 → 47; passos que geram instância repetida 20 → 3. Um braço é declarado no ângulo ZERO (Y é o raio nomeado, Z é zero) e não há seno nem cosseno no arquivo. A frase "cinco pares em torno do eixo X" está escrita: `rotaciona` de meia abertura, um `arranja` para o par, dois `arranja` de volta fechada para os grupos. Números completos, lado a lado com os antigos, em [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |
+| 2 | cada cópia continua isolável por identidade | **ATENDIDO** | os dez braços são dez PARTES nomeadas (`raioRecuadoDoGrupo3`), resolvidas por `{op:'arranja', id, copia}`. Na régua, `npm run descrever` dá caixa e corpo próprios a cada uma; na bancada, `--selecionadas=raioRecuadoDoGrupo3 --modo=isolar` mostra um braço só (PNG lido). Recessos e porcas ficam AGREGADOS de propósito, para a peça exercitar também a coleção inteira |
+| 3 | uma composição não automotiva prova o mesmo contrato | **ATENDIDO** | `prototipos/fps/v3/pecas/_cerca-e-flor.js` — sete tábuas por arranjo **linear**, seis pétalas por arranjo **radial**, cada instância uma parte nomeada, zero vocabulário mecânico. `npm run descrever -- _cerca-e-flor --estrito`: 16 partes, 138 faces, 158 vértices, 0 face sem identidade, 0 órfão. Peça NOVA: `_jardineira` não foi tocada, para não arriscar as provas que ela já sustenta |
+| 4 | nenhum id runtime entra no arquivo salvo | **ATENDIDO** | `npm run id-cru:check` verde com as duas peças; nenhuma delas aparece na lista herdada. Toda citação é `sel:{origem}` ou `sel:{alias}` |
+
+**O teste de integridade, e a mutação que cada afirmação mata.**
+`tools/mecanifica/arranjo-em-peca.test.ts`, 13 casos, cobrindo as duas peças.
+Nenhuma contagem está digitada nele: toda instância sai de `TOPO`. Cinco
+mutações rodadas no que esta rodada acabou de escrever, **todas mortas**:
+
+| mutação | casos que caíram |
+|---|---:|
+| trocar `raioRecuadoDoGrupo3` por `raioRecuadoDoGrupo4` (mesma malha, dois nomes trocados) | 2 |
+| `total: 'gruposDeRaios'` → `total: 5` (malha byte-idêntica) | 1 |
+| reverter os cantos da cópia no núcleo (`arranja`) | 1 |
+| tirar o pivô do arranjo da flor (cai no default `[0,0,0]`) | 1 |
+| trocar a expressão do comprimento da travessa | 1 |
+
+A segunda é a que responde à lição dos ciclos anteriores: ela produz geometria
+**byte-idêntica** e mesmo assim morre, porque a afirmação é sobre a PEÇA — o
+arranjo tem de contar por nome de `TOPO`, não por número digitado.
+
+**Aditividade:** `gabarito:selecao:check` verde com **duas** entradas mexidas e
+declaradas — `roda-dianteira-realista-experimento` regravada (V 2184 → 2194,
+F 2082 → 2132) e `_cerca-e-flor` nova. As outras 21 peças seguem byte-idênticas.
+
+**Inspeção visual:** bancada em `direita`, `frontal` e `isometrica`, ortográfica,
+mais o recorte isolando um braço; PNGs lidos e comparados com os enquadramentos
+que o relato antigo cita. **A silhueta não mudou.**
+
 **Teste de mutação, o que ele achou.** Dez mutações no que a rodada acabou de
 escrever. Nove morreram (ângulo acumulado 1 caso; índice de cópia deslocado 4;
 `total` contando cópias 13; origem não registrada 6; colisão de palavra
@@ -425,14 +463,32 @@ também sobreviveu e **não** virou teste: nenhum consumidor do núcleo distingu
 essa ordem hoje, então ela ficou declarada no comentário da op como construção
 determinística, não como promessa medida.
 
-**O que este ciclo NÃO fechou, dito na cara:** a roda experimental **não** foi
-reescrita — os cem parâmetros de coordenada continuam no arquivo dela, e o que
-mudou é que agora existe a operação que os dispensa. Nenhuma peça de produto
-usa `arranja` ainda, então o contrato foi provado em teste e não em peça: o
-prisioneiro de roda e a aleta de ventilação continuam não modelados. A-15 segue
-aberto.
+**O que este ciclo NÃO fechou, dito na cara:**
 
-**As duas dívidas menores, pagas depois.** Elas eram do mesmo tipo que a lição
+- nenhuma peça de **produto** usa `arranja`. As duas que usam são experimento e
+  exercício; `freio-disco.js` não foi tocada, então o prisioneiro de roda e a
+  aleta de ventilação continuam não modelados;
+- as quatro paredes da `_jardineira` continuam quatro passos copiados. Elas
+  formam um retângulo e nenhum dos dois modos resolve as quatro de uma vez; a
+  peça não foi tocada para não arriscar as provas que ela sustenta;
+- **A-24, novo**, achado na própria reescrita: `arranja` copia UMA origem, e o
+  contrato do `cilindro` não sabe dizer "a primitiva inteira" — `{op,id}` são só
+  as laterais. Copiar um cilindro custa três arranjos e devolve as tampas
+  SOLTAS do tubo: 13 corpos no lugar de 5, verde em todo gate e invisível na
+  foto. A régua achou. A porca da roda virou `lathe` por causa disso, e é a
+  única origem das +50 faces da peça;
+- A-15 segue aberto e não foi tocado.
+
+**As três dívidas menores do ciclo, pagas depois.** As duas primeiras saíram em
+commits próprios, antes deste fechamento; a terceira é a reescrita da roda,
+acima.
+
+1. o painel de portas da bancada não tinha prova nenhuma — pago;
+2. um teste comparava uma função com ela mesma — pago;
+3. nenhuma peça usava `arranja`, e a roda que originou o item continuava com os
+   cem parâmetros — pago neste fechamento, com o gate conferido item por item.
+
+Detalhe das duas primeiras: Elas eram do mesmo tipo que a lição
 dos dois ciclos anteriores: verde pelo motivo errado.
 
 - **O painel de portas da bancada não tinha prova nenhuma.** Nenhum arquivo de

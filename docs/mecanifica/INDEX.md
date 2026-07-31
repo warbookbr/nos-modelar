@@ -44,14 +44,19 @@ Estado atual:
   geradores com numeração fechada citam o eixo que já tinham, o eixo aceita
   parâmetro e as palavras `'primeira'`/`'ultima'`, o núcleo devolve as portas
   publicadas e a régua as mostra;
-- o ciclo "Arranjos semânticos v1" (ciclo 3, O-13) está **concluído no núcleo**
-  desde 31 de julho de 2026: entrou a op `arranja`, nos modos radial e linear,
-  sempre estrutural, com cada cópia endereçável por identidade. A dívida A-23
-  (palavra reservada de extremidade engolindo parâmetro homônimo) foi paga
-  junto. A roda experimental **não** foi reescrita e nenhuma peça usa a op
-  ainda. Depois dele, duas dívidas menores herdadas foram pagas: o painel de
-  portas da bancada ganhou prova de navegador (`npm run guarda:portas`, no CI) e
-  o teste que comparava uma função com ela mesma virou afirmação de identidade;
+- o ciclo "Arranjos semânticos v1" (ciclo 3, O-13) está **concluído**, núcleo e
+  peça, desde 31 de julho de 2026: entrou a op `arranja`, nos modos radial e
+  linear, sempre estrutural, com cada cópia endereçável por identidade. A dívida
+  A-23 (palavra reservada de extremidade engolindo parâmetro homônimo) foi paga
+  junto. As três dívidas menores do ciclo foram pagas depois: o painel de portas
+  da bancada ganhou prova de navegador (`npm run guarda:portas`, no CI); o teste
+  que comparava uma função com ela mesma virou afirmação de identidade; e a roda
+  experimental **foi reescrita** — 141 parâmetros → 43, os cem de coordenada →
+  zero, 66 passos → 47, com cada um dos dez braços virando uma parte nomeada e
+  isolável. A peça de exercício `prototipos/fps/v3/pecas/_cerca-e-flor.js` prova
+  os dois modos do arranjo fora do vocabulário automotivo. A reescrita achou
+  A-24: `arranja` copia UMA origem, e o `cilindro` não sabe dizer "a primitiva
+  inteira";
 - **nenhum ciclo está em execução.** O próximo candidato é "Realismo geométrico
   v1" e ainda não foi aberto;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
@@ -178,6 +183,7 @@ npm run descrever -- freio-disco
 npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
 npm run descrever -- roda-dianteira
 npm run descrever -- _jardineira --estrito
+npm run descrever -- _cerca-e-flor --estrito
 ```
 
 Prova de comportamento no navegador — dirige a Oficina headless e clica nos
@@ -256,10 +262,13 @@ verificação daquele fechamento tinha medido (A-18, A-19, A-20 e A-22). A
 conferência dos dois gates, condição por condição, e a lista de comandos da
 verificação completa estão em [`PLANO.md`](PLANO.md).
 
-O ciclo 3, “Arranjos semânticos v1”, fechou no núcleo em 31 de julho de 2026:
-`arranja` radial e linear, cada cópia endereçável por identidade, e a dívida
-A-23 paga junto. Ele não reescreveu a roda experimental nem levou a op a
-nenhuma peça de produto.
+O ciclo 3, “Arranjos semânticos v1”, fechou em 31 de julho de 2026, no núcleo e
+na peça: `arranja` radial e linear, cada cópia endereçável por identidade, a
+dívida A-23 paga junto e, no fechamento, a roda experimental reescrita e a peça
+de exercício `_cerca-e-flor` provando os dois modos fora do vocabulário
+automotivo. Ele **não** levou a op a nenhuma peça de produto: `freio-disco.js`
+não foi tocada, e o prisioneiro de roda e a aleta de ventilação continuam não
+modelados.
 
 **Próxima entrega: nenhuma em execução.** O candidato seguinte é
 “Realismo geométrico v1”, que precisa ser **aberto** no `PLANO.md` — com escopo

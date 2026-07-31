@@ -84,7 +84,7 @@ Nenhum atrito de autoria fica sem plano:
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
 | A-17 repetição radial manual | O-13 (**entregue**) | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
 | A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **entregue** |
-| A-22 guarda e gate discordam sobre `de` | sem item — **entregue** | | |
+| A-22 guarda e gate discordam sobre `de` | sem item — **entregue** | A-24 arranjo copia uma origem, e nem todo gerador tem "a primitiva inteira" | sem item — **aberto** |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
@@ -557,14 +557,28 @@ na identidade. **Por isso O-13 vem depois de O-6 e O-12**, não antes.
 
 **Custo:** médio-alto.
 
-**Estado: ENTREGUE no núcleo** em 31 de julho de 2026, no ciclo "Arranjos
+**Estado: ENTREGUE, núcleo e peça**, em 31 de julho de 2026, no ciclo "Arranjos
 semânticos v1". A op chama-se `arranja` (`modo:'radial'|'linear'`), e o risco do
 trade-off acima foi fechado por construção, não por disciplina: sem `origemId`,
-`derivaDe` e `sel:{origem:...}` o passo é recusado. O que continua devendo é o
-uso: nenhuma peça do repositório usa a op ainda, então o prisioneiro de roda e a
-aleta de ventilação seguem não modelados, e os cem parâmetros de coordenada
-continuam no arquivo da roda experimental. Ver A-17 e A-23 em
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+`derivaDe` e `sel:{origem:...}` o passo é recusado.
+
+O uso, que era a metade que faltava, entrou no fechamento do mesmo ciclo:
+
+- `prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` — a peça que
+  originou o item. 141 parâmetros → 43, sendo **zero** de coordenada
+  (`r0_..r9_`, os cem, sumiram); 66 passos → 47; 20 passos de geração de
+  instância → 3. Os dez braços, os cinco recessos e as cinco porcas viram cinco
+  passos `arranja`, e cada cópia é uma parte nomeada;
+- `prototipos/fps/v3/pecas/_cerca-e-flor.js` — a mesma capacidade fora do
+  vocabulário automotivo: tábuas por arranjo linear, pétalas por arranjo radial;
+- `tools/mecanifica/arranjo-em-peca.test.ts` — 13 casos, contagem sempre
+  derivada de `TOPO`, incluindo a afirmação de que nenhum `arranja` das duas
+  peças pode contar por número digitado.
+
+**O que continua devendo:** o prisioneiro de roda e a aleta de ventilação do
+freio seguem não modelados — a peça `freio-disco.js` não foi tocada neste ciclo,
+por escopo. A reescrita achou um limite novo do arranjo, registrado como A-24.
+Ver A-17, A-23 e A-24 em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 ### O-9 — parâmetro de tipo ponto e caminho
 
@@ -605,7 +619,7 @@ próprio e independente: se uma parar, as anteriores continuam de pé.
 | R4 | concluída em 31/07/2026 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox` (3+3 `chamferBox`), freio com 8 partes, 300 faces, 0 sem identidade, 0 órfão; `_jardineira` confirma o contrato fora do vocabulário automotivo (6 partes, 351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; verificação completa verde, incluindo `npm run guarda:salvar`, `npm run descrever` em todas as peças e quatro enquadramentos lidos na bancada |
 | R4b | concluída em 31/07/2026 | extensões de O-6 e O-12 (A-18, A-19, A-20, A-22) | sim | `cone`, `plano` e `chamferBox` citam o eixo que já tinham e o eixo passa a aceitar parâmetro e `'primeira'`/`'ultima'`; `nucleo()` devolve `portas` e a régua/bancada as mostram; a regra de referência posicional vira um módulo só. Prova em peça: `_jardineira` publica as três portas que faltavam, desfaz a meia-volta que existia só para contornar o eixo literal, e o teste dela troca 15 leituras de material por citação direta de `sel:{porta}` (22 casos). Único hash regravado: `_jardineira` |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
-| R6 | concluída em 31/07/2026 (no núcleo) | O-13 + A-23 | sim | a op `arranja` (radial e linear) é sempre estrutural, então cópia anônima não existe; a origem `{op:'arranja',id,de}` tem o eixo `copia` e endereça a coleção, um índice, um PARAM, `'primeira'`/`'ultima'` e `{passo,fase}`; ângulo derivado da contagem, com o teste medindo a diferença entre o double derivado e o acumulado; 10 mutações rodadas, 9 mortas, a sobrevivente (mão da face revertida) virou teste em commit próprio. **A roda experimental NÃO foi reescrita** — os cem parâmetros continuam no arquivo dela; o contrato foi provado em teste, não em peça |
+| R6 | concluída em 31/07/2026 (núcleo **e** peça) | O-13 + A-23 | sim | a op `arranja` (radial e linear) é sempre estrutural, então cópia anônima não existe; a origem `{op:'arranja',id,de}` tem o eixo `copia` e endereça a coleção, um índice, um PARAM, `'primeira'`/`'ultima'` e `{passo,fase}`; ângulo derivado da contagem, com o teste medindo a diferença entre o double derivado e o acumulado; 10 mutações rodadas, 9 mortas, a sobrevivente (mão da face revertida) virou teste em commit próprio. **a roda experimental FOI reescrita** no fechamento (141 parâmetros → 43, 100 de coordenada → 0, 66 passos → 47, cada braço uma parte nomeada), e `_cerca-e-flor` prova o mesmo contrato em marcenaria e jardinagem; a reescrita achou A-24 |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
 | R8 | backlog | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
 | R9 | backlog | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
