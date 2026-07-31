@@ -75,10 +75,23 @@ Estado atual:
   registro. Compor as duas capacidades achou e pagou A-28 (UP-022): a origem do
   `arranja` só sabia responder pela cópia INTEIRA, e `furo` exige uma face só —
   o portão dela passou de igualdade de origem para pertinência de face;
-- **abertos pelo ciclo 4:** A-26 (um furo por face — é por isso que o flange é
-  uma chapa por prisioneiro em vez de uma chapa com quatro furos) e A-29 (o
-  passo do arranjo radial só dá centro nomeável em 90°, porque a gramática de
-  PARAMS não tem seno nem cosseno);
+- a rodada **"Furo v2"** fechou em 31 de julho de 2026 e pagou A-26 (UP-023): a
+  chave `centros` da op `furo` abre VÁRIOS furos na mesma face num passo só, na
+  forma de lista `[[x,y,z], …]` e na de círculo
+  `{pivo, distancia, total, volta|graus}` — "quatro furos a 62 mm do centro" é
+  uma frase, e o passo se parece com ela, sem seno nem cosseno no formato
+  salvo. Cada furo do passo é endereçável sozinho pelo eixo `furo`, dois anéis
+  que se cruzam ou se encostam GRITAM, e a borda de vários anéis é uma
+  triangulação que não cria vértice nenhum. A peça de exercício
+  `prototipos/fps/v3/pecas/_tampa-de-caixa.js` prova o círculo de parafusos
+  fora do vocabulário automotivo, com a chapa em UM corpo. Nenhuma peça de
+  PRODUTO usa a forma nova: o flange do `freio-disco` continua uma chapa por
+  prisioneiro, agora por dívida de peça e não por limite da linguagem;
+- **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
+  porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
+  `centros` desarma o caso do círculo de furos, não o caso geral) e A-30 (um
+  passo de furo tem UM raio, então a flange com furo central mais círculo de
+  parafusos ainda não é escrevível);
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -206,6 +219,7 @@ npm run descrever -- _jardineira --estrito
 npm run descrever -- _cerca-e-flor --estrito
 npm run descrever -- _prateleira-furada --estrito
 npm run descrever -- _corrimao --estrito
+npm run descrever -- _tampa-de-caixa --estrito
 ```
 
 Prova de comportamento no navegador — dirige a Oficina headless e clica nos

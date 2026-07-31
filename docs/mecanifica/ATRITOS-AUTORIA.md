@@ -57,47 +57,28 @@ está dito na peça.
 3. `cos`/`sen` na gramática de expressão. É o mais barato de escrever e o pior
    de todos: põe transcendental no formato salvo para consertar um sintoma.
 
-### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
+### A-30 — um passo de furo tem UM raio: a flange com furo central não cabe
 
 **Onde dói:** linguagem da Oficina.
 
 **Evidência:** a peça de exercício
-`prototipos/fps/v3/pecas/_prateleira-furada.js`, escrita para provar a op `furo`
-fora do vocabulário automotivo. A op consome a face de entrada — ela deixa de
-ser um polígono e vira a borda anular do corte. Um SEGUNDO furo na MESMA face é
-impossível: a face que ele citaria não existe mais. Na prática o autor teria de
-descobrir em qual das `lados` faces da borda o segundo furo cai, o que é
-endereçamento por acaso.
+`prototipos/fps/v3/pecas/_tampa-de-caixa.js`, escrita para provar o círculo de
+parafusos do ciclo "Furo v2". Uma flange de tubulação de verdade tem o furo
+CENTRAL da passagem mais o círculo de parafusos em volta, e os dois têm
+diâmetros diferentes. O `furo` aceita vários CENTROS num passo, mas um `raio`
+só — e um segundo passo não acha mais a face, porque o primeiro a consumiu. A
+figura mais comum de flange continua fora da linguagem.
 
-O custo é exatamente a figura mecânica mais comum que existe: um círculo de
-parafusos numa placa, ou uma fileira de furos numa cantoneira. Hoje eles só
-existem se cada furo cair numa face diferente. A peça de exercício foi desenhada
-em volta dessa limitação — três furos, três faces distintas —, e isso está dito
-nela em voz alta.
+**Contorno usado:** a peça de exercício é uma tampa CHEIA, sem furo central,
+com o círculo de quatro parafusos e uma cabeça de aperto por cima. A limitação
+está dita em voz alta no cabeçalho dela, não escondida no desenho.
 
-O `arranja` também não resolve: ele COPIA faces, não repete o corte. Arranjar a
-origem de um furo daria seis cópias da geometria do furo flutuando, sem furar a
-placa seis vezes.
-
-**Contorno usado:** um furo por face, e o conjunto declarado por um ALIAS `unir`
-juntando as faces que sobraram com as origens que os cortes publicaram — o
-conserto que o próprio diagnóstico do núcleo recomenda.
-
-**Segunda evidência, agora numa peça de PRODUTO (ciclo 4, fechamento):** o
-flange de roda de `freio-disco.js`. Um flange de verdade é UMA chapa com quatro
-furos. Aqui ele é uma chapa por prisioneiro: quatro assentos, cada um uma
-primitiva própria, porque cada furo precisa de uma face de entrada só dele. A
-forma resultante existe em cubo de roda real (flange lobado), então a peça não
-ficou mentindo — mas a decisão foi da linguagem, não do desenho, e o custo é
-visível na régua: a parte `cubo` tem cinco CORPOS onde deveria ter dois.
-
-**Capacidade candidata:** o `furo` aceitar VÁRIOS centros num passo só (uma
-lista, ou um arranjo declarado como o do `arranja`), abrindo N furos na mesma
-face de uma vez, com a borda anular resolvida entre o contorno externo e os N
-anéis. A numeração continuaria fechada (`lados` faces por anel, mais a borda),
-mas a partição do polígono deixa de ser a volta simples de hoje. É geral: placa
-de móvel, flange, cantoneira, chapa de robô e cubo de roda têm todos círculo ou
-fileira de furos.
+**Capacidade candidata:** o `centros` aceitar RAIO por furo — a lista virando
+`[{centro, raio}]`, ou o círculo ganhando um raio próprio ao lado do central.
+É estritamente aditivo: a forma de hoje é o caso em que todos os raios são
+iguais. O que ele exige é que a conferência de sobreposição, que já é por
+polígono e não por número, passe a comparar anéis de tamanhos diferentes — ela
+já faz isso, porque compara os anéis, não os raios.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
@@ -688,6 +669,96 @@ destruía o contexto foi removido.
 - **Nenhum id de vértice ou face.** Não contei vértice na mão em momento algum.
 
 ## Atritos resolvidos
+
+### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a peça de exercício
+`prototipos/fps/v3/pecas/_prateleira-furada.js`, escrita para provar a op `furo`
+fora do vocabulário automotivo. A op consome a face de entrada — ela deixa de
+ser um polígono e vira a borda anular do corte. Um SEGUNDO furo na MESMA face é
+impossível: a face que ele citaria não existe mais. Na prática o autor teria de
+descobrir em qual das `lados` faces da borda o segundo furo cai, o que é
+endereçamento por acaso.
+
+O custo é exatamente a figura mecânica mais comum que existe: um círculo de
+parafusos numa placa, ou uma fileira de furos numa cantoneira. Hoje eles só
+existem se cada furo cair numa face diferente. A peça de exercício foi desenhada
+em volta dessa limitação — três furos, três faces distintas —, e isso está dito
+nela em voz alta.
+
+O `arranja` também não resolve: ele COPIA faces, não repete o corte. Arranjar a
+origem de um furo daria seis cópias da geometria do furo flutuando, sem furar a
+placa seis vezes.
+
+**Contorno usado:** um furo por face, e o conjunto declarado por um ALIAS `unir`
+juntando as faces que sobraram com as origens que os cortes publicaram — o
+conserto que o próprio diagnóstico do núcleo recomenda.
+
+**Segunda evidência, agora numa peça de PRODUTO (ciclo 4, fechamento):** o
+flange de roda de `freio-disco.js`. Um flange de verdade é UMA chapa com quatro
+furos. Aqui ele é uma chapa por prisioneiro: quatro assentos, cada um uma
+primitiva própria, porque cada furo precisa de uma face de entrada só dele. A
+forma resultante existe em cubo de roda real (flange lobado), então a peça não
+ficou mentindo — mas a decisão foi da linguagem, não do desenho, e o custo é
+visível na régua: a parte `cubo` tem cinco CORPOS onde deveria ter dois.
+
+**Capacidade candidata:** o `furo` aceitar VÁRIOS centros num passo só (uma
+lista, ou um arranjo declarado como o do `arranja`), abrindo N furos na mesma
+face de uma vez, com a borda anular resolvida entre o contorno externo e os N
+anéis. A numeração continuaria fechada (`lados` faces por anel, mais a borda),
+mas a partição do polígono deixa de ser a volta simples de hoje. É geral: placa
+de móvel, flange, cantoneira, chapa de robô e cubo de roda têm todos círculo ou
+fileira de furos.
+
+**Correção (ciclo "Furo v2"):** a chave `centros` da op `furo`, nas duas formas
+que o autor mecânico usa para dizer a mesma coisa:
+
+- `centros: [[x,y,z], …]` — a lista, um ponto do mundo por furo;
+- `centros: {pivo, distancia, total, volta|graus}` — o círculo dito como frase.
+  As palavras são as do `arranja` e significam a mesma coisa. "Quatro furos a
+  62 mm do centro" é `{distancia:'orbitaDoParafuso', total:'parafusos',
+  volta:360}`, e o arquivo se parece com a frase. Nenhum seno e nenhum cosseno
+  entram no formato salvo: o círculo nasce no quadro (u,w) da própria face, e
+  `orientacao` decide onde cai o furo 0. É por isso que esta forma também
+  desarma o A-29 no caso do círculo de furos, sem tocar na gramática de PARAMS.
+
+`centro` e `centros` dizem a mesma coisa em número diferente: as duas juntas
+gritam, nenhuma das duas grita. `centro` singular segue byte a byte o que era —
+`npm run gabarito:selecao:check` continua com as peças antigas idênticas.
+
+O que a correção teve de resolver, e como:
+
+- **a partição da face com vários anéis.** A borda anular de um anel só é a
+  volta simples entre o contorno e o anel; com dois anéis ela não existe. A
+  saída é uma triangulação por PONTES e ORELHAS, que não cria vértice nenhum —
+  nenhuma face vizinha fica com um canto no meio de uma aresta dela (junção em
+  T, que é fenda de malha). Contagem fechada: `n + M·L + 2M − 2` triângulos.
+  A partição por células (uma por furo, cortada pelos eixos radicais) foi
+  RECUSADA: além da junção em T, ela faz três células calcularem o mesmo ponto
+  por três contas diferentes, e costurar isso exige solda por tolerância;
+- **anéis que se cruzam.** Dois furos sobrepostos não são um furo em oito, e
+  malha aberta que passa é o pior resultado possível. O teorema do eixo
+  separador entre os dois polígonos decide, e ENCOSTAR conta como cruzar —
+  vértice pinçado é malha errada e plausível na foto. A conferência é UMA, na
+  entrada: a projeção do anel na face de saída é AFIM, então não pode aproximar
+  anéis que a entrada separou. Isso está medido no teste da saída oblíqua, em
+  vez de repetido como uma segunda conferência que nunca falharia;
+- **identidade por furo.** O eixo `furo` da origem endereça cada furo do passo
+  sozinho (`{op:'furo', id, furo:2, parede:0}`), e o eixo ausente continua
+  querendo dizer "todos" — é o que faz o furo de um centro só responder palavra
+  por palavra como sempre respondeu. A superfície da face que não toca anel
+  nenhum ganhou nome próprio: `preenchimento` e `preenchimentoDaSaida`.
+
+**Prova em peça:** `prototipos/fps/v3/pecas/_tampa-de-caixa.js`, fora do
+vocabulário automotivo — tampa de caixa de inspeção com círculo de quatro
+parafusos num passo e dois furos cegos de chave de pino em outro. A régua mede
+253 faces, 0 sem identidade, 0 órfão e a chapa com UM corpo, que é exatamente o
+custo que este atrito cobrava (o flange do freio, com a mesma figura, tem cinco
+corpos). O flange de `freio-disco.js` NÃO foi reescrito nesta rodada: ele
+continua sendo uma chapa por prisioneiro, e isso agora é dívida de peça, não
+limite de linguagem.
 
 ### A-28 — a origem do arranjo só sabia responder pela cópia INTEIRA
 

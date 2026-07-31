@@ -24,8 +24,10 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 - **nenhum ciclo técnico está em execução.** O ciclo 4 ("Corte e orientação de
   seção v1") foi fechado em 31 de julho de 2026, com as duas capacidades
   provadas em peça: o flange de roda furado do `freio-disco` e o corrimão de
-  perfil chato. O próximo candidato é o ciclo 5 ("Curva e filete v1"), escrito
-  abaixo e ainda **não** aberto.
+  perfil chato. Depois dele, uma rodada avulsa pagou A-26 — a chave `centros`
+  da op `furo`, vários furos na mesma face num passo só, provada na peça de
+  exercício `_tampa-de-caixa` e registrada como UP-023. O próximo candidato é
+  o ciclo 5 ("Curva e filete v1"), escrito abaixo e ainda **não** aberto.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -230,6 +232,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
 | 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
+| 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
 | 4 | **candidato, não aberto** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo e exclusões escritos abaixo; o GATE ainda não |
 | 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
@@ -725,9 +728,11 @@ novo `_corrimao` mudaram, e as duas foram declaradas), `id-cru:check`,
 `guarda:salvar`, `guarda:portas`, `mapa`, `mapa:check`, `docs:links:check` e
 `docs:toc:check`.
 
-**O que continua NÃO feito, dito na cara:** A-26 segue aberto — um furo por
-face, e é por isso que o flange é uma chapa por prisioneiro em vez de uma chapa
-com quatro furos. A-29 nasceu neste fechamento: o `furo` pede o ponto do MUNDO
+**O que continua NÃO feito, dito na cara:** A-26 seguia aberto no fechamento
+deste ciclo — um furo por face, e é por isso que o flange é uma chapa por
+prisioneiro em vez de uma chapa com quatro furos. Ele foi PAGO depois, numa
+rodada avulsa (ver "Furo v2", abaixo); o flange, porém, não foi reescrito, e a
+forma dele continua sendo dívida de peça. A-29 nasceu neste fechamento: o `furo` pede o ponto do MUNDO
 por onde ele passa, e a gramática de PARAMS não tem seno nem cosseno, então um
 arranjo radial só dá centro NOMEÁVEL em passos de 90° — o flange tem quatro
 prisioneiros por causa da linguagem, não do desenho. A roda experimental continua
@@ -746,6 +751,59 @@ Ele não começa com uma lista de operações nem promete “polir” a peça in
 Seu gate será escrito depois de comparar referência e renders canônicos,
 nomeando regiões e condições visuais de aceite. Uma skill de família só pode
 ser extraída depois de o protocolo funcionar em outra família de objeto.
+
+### Furo v2 — vários furos na mesma face — CONCLUÍDO em 31 de julho de 2026
+
+**O que estava errado:** a op `furo` consome a face de entrada. O segundo furo
+na mesma face citava uma face que já não existe, e gritava com razão. A figura
+mecânica mais comum que existe — o círculo de parafusos numa placa — só existia
+se cada furo caísse numa face diferente, e foi por isso que o flange do freio
+virou uma chapa por prisioneiro (A-26, com evidência em peça de exercício E em
+peça de produto).
+
+**O que entrou:** a chave `centros` da op `furo`, em duas formas, e nada além
+disso. A lista `[[x,y,z], …]` diz os pontos um a um; o círculo
+`{pivo, distancia, total, volta|graus}` diz a frase do desenho com as palavras
+que o `arranja` já tinha. "Quatro furos a 62 mm do centro" é um passo, e o
+arquivo se parece com a frase. Nenhum seno e nenhum cosseno entram no formato
+salvo: o círculo nasce no quadro (u,w) da própria face.
+
+As quatro exigências, cada uma com afirmação que morre:
+
+- **toda face criada é endereçável, e furos diferentes do mesmo passo são
+  distinguíveis.** O eixo `furo` da origem recorta um furo só; o eixo ausente
+  continua querendo dizer "todos", que é o que preserva o furo de um centro só.
+  A superfície da face que não toca anel nenhum ganhou nome:
+  `preenchimento` e `preenchimentoDaSaida`;
+- **toda face destruída grita.** O registro de consumo não mudou: citar a face
+  de entrada depois do corte continua gritando, com um anel ou com quatro;
+- **anéis que se cruzam gritam.** Teorema do eixo separador entre os dois
+  polígonos, com ENCOSTAR contando como cruzar, e o passo abortando com
+  0 V / 0 F. A conferência é UMA, na entrada: a projeção na saída é afim, então
+  não pode aproximar anéis disjuntos — e isso está MEDIDO no teste da saída
+  oblíqua, em vez de virar uma segunda conferência que nunca falharia;
+- **determinismo e numeração fechada.** O furo `k` ocupa `b+3·L·k`, e o
+  preenchimento vem depois de todos, com `n + 2M − 2` faces por lado.
+
+**A mutação achou o que a suíte não pegava:** trocar o bloco de ids entre os
+furos (`b+3·L·(M−1−k)`) passava pelos 680 testes. Nenhum ligava o bloco de ids
+ao ANEL que ele descreve, e o formato salvo passaria a endereçar outro furo em
+toda peça já escrita. Agora a borda `j` do furo `k` tem de conter a aresta
+`j → j+1` do anel `k`. Duas outras mutações sobreviveram e ficaram DECLARADAS
+no núcleo: as provas internas da partição (contagem, área, casamento de
+arestas) não têm caso que as dispare, e ninguém deve lê-las como conferidas.
+
+**Prova em peça:** `prototipos/fps/v3/pecas/_tampa-de-caixa.js`, fora do
+vocabulário automotivo — 253 faces, 4 partes, 0 face sem identidade, 0 órfão, 3
+portas, e a chapa com UM corpo. Conferida no navegador em dois enquadramentos
+(superior e isométrica). `gabarito:selecao:check` verde com as 25 peças
+anteriores byte-idênticas.
+
+**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usa a forma nova.
+O flange do `freio-disco` continua sendo uma chapa por prisioneiro — a
+linguagem já não obriga, mas a peça não foi reescrita. E um passo tem UM raio:
+a flange com furo central mais círculo de parafusos ainda não é escrevível
+(A-30, aberto).
 
 ### Ciclo 5 — Curva e filete v1 — CANDIDATO, NÃO ABERTO
 
