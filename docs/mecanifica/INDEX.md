@@ -57,20 +57,28 @@ Estado atual:
   os dois modos do arranjo fora do vocabulário automotivo. A reescrita achou
   A-24: `arranja` copia UMA origem, e o `cilindro` não sabe dizer "a primitiva
   inteira";
-- **o ciclo 4, "Corte e orientação de seção v1", está EM EXECUÇÃO.** Ele é o
-  antigo candidato "Realismo geométrico v1", com escopo fechado em duas
-  capacidades gerais, e as DUAS já estão de pé no núcleo:
-  `orientacao` no `loft` — o autor declara a direção da seção em vez de herdar o
-  frame implícito do gerador (A-25, UP-020) —, e a op `furo` (A-27, UP-021), a
-  primeira SUBTRAÇÃO do núcleo: um furo cilíndrico numa face plana e convexa,
-  passante ou cego. `furo` não é uma booleana genérica, e isso é decisão: toda
-  face que ele cria é endereçável pela origem `furo` e toda face que ele destrói
-  entra num registro de consumo que faz a citação seguinte gritar. A peça de
-  exercício `prototipos/fps/v3/pecas/_prateleira-furada.js` prova a op fora do
-  vocabulário automotivo (prateleira com parafuso passante, cavilha cega e
-  puxador vazado), com 0 face sem identidade e 0 órfão. Nenhuma peça de PRODUTO
-  usa nenhuma das duas capacidades, e um segundo furo na mesma face ainda não
-  existe (A-26);
+- o ciclo 4, **"Corte e orientação de seção v1", está CONCLUÍDO** desde 31 de
+  julho de 2026, no núcleo E na peça. Ele é o antigo candidato "Realismo
+  geométrico v1", com escopo fechado em duas capacidades gerais: `orientacao` no
+  `loft` — o autor declara a direção da seção em vez de herdar o frame implícito
+  do gerador (A-25, UP-020) — e a op `furo` (A-27, UP-021), a primeira SUBTRAÇÃO
+  do núcleo. `furo` não é uma booleana genérica, e isso é decisão: toda face que
+  ele cria é endereçável pela origem `furo` e toda face que ele destrói entra num
+  registro de consumo que faz a citação seguinte gritar.
+  As duas foram provadas em peça no fechamento: `freio-disco.js` ganhou o
+  **flange de roda** — quatro assentos de prisioneiro postos pelo `arranja`
+  radial e furados de lado a lado pelo `furo` —, que era a omissão registrada no
+  plano; e a peça de exercício `prototipos/fps/v3/pecas/_corrimao.js` (corrimão
+  de escada, perfil chato, caminho com torção) prova a orientação declarada fora
+  do vocabulário automotivo. A peça de exercício
+  `prototipos/fps/v3/pecas/_prateleira-furada.js` já provava o corte no mesmo
+  registro. Compor as duas capacidades achou e pagou A-28 (UP-022): a origem do
+  `arranja` só sabia responder pela cópia INTEIRA, e `furo` exige uma face só —
+  o portão dela passou de igualdade de origem para pertinência de face;
+- **abertos pelo ciclo 4:** A-26 (um furo por face — é por isso que o flange é
+  uma chapa por prisioneiro em vez de uma chapa com quatro furos) e A-29 (o
+  passo do arranjo radial só dá centro nomeável em 90°, porque a gramática de
+  PARAMS não tem seno nem cosseno);
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -197,6 +205,7 @@ npm run descrever -- roda-dianteira
 npm run descrever -- _jardineira --estrito
 npm run descrever -- _cerca-e-flor --estrito
 npm run descrever -- _prateleira-furada --estrito
+npm run descrever -- _corrimao --estrito
 ```
 
 Prova de comportamento no navegador — dirige a Oficina headless e clica nos
@@ -283,12 +292,17 @@ automotivo. Ele **não** levou a op a nenhuma peça de produto: `freio-disco.js`
 não foi tocada, e o prisioneiro de roda e a aleta de ventilação continuam não
 modelados.
 
-**Próxima entrega: o ciclo 4, “Corte e orientação de seção v1”, aberto no
-[`PLANO.md`](PLANO.md).** Ele substitui o candidato “Realismo geométrico v1” e
-carrega duas capacidades gerais escolhidas pela crítica da roda. As duas estão
-entregues no núcleo, com teste, mutação e conferência no navegador: a orientação
-declarada da seção do `loft` (`orientacao`) e a op `furo`, passante e cega. A
-segunda tem peça de exercício; nenhuma das duas foi levada a peça de PRODUTO.
+O ciclo 4, “Corte e orientação de seção v1”, fechou em 31 de julho de 2026, no
+núcleo e na peça: `orientacao` no `loft`, a op `furo` passante e cega, o flange
+de roda furado do `freio-disco` e o corrimão de perfil chato. A dívida A-28,
+achada ao compor as duas, foi paga junto; A-26 e A-29 ficaram abertos.
+
+**Próxima entrega: o ciclo 5, “Curva e filete v1”, escrito como CANDIDATO no
+[`PLANO.md`](PLANO.md) e ainda não aberto.** Ele carrega as duas capacidades que
+sobraram da crítica da roda — curva no perfil e filete seletivo. O gate dele
+está deliberadamente em branco: o próprio plano manda escrevê-lo depois de
+comparar referência e renders canônicos, e o ciclo 4 mudou o que existe para
+comparar.
 
 ## Manutenção desta documentação
 

@@ -202,3 +202,85 @@ describe('solda no eixo do arranja radial: igualdade EXATA, nunca tolerância', 
     }
   });
 });
+
+/* `de` É A FONTE, OU UM RECORTE DELA (ciclo "Corte e orientação de seção v1",
+   A-28). O portão era a IGUALDADE da origem declarada — `de` tinha de ser,
+   chave por chave, o `derivaDe` do passo. Isso tornava a origem do arranjo
+   incapaz de responder por UMA face de UMA cópia, e as duas capacidades deste
+   ciclo não compunham: `furo` exige que `de` resolva para uma face só.
+   O portão agora é a PERTINÊNCIA das faces. Estes casos afirmam as duas metades:
+   o recorte resolve para a cópia CERTA daquela face, e a origem que não pertence
+   ao arranjo continua gritando — sem eles, trocar o portão por "resolve o que
+   der" passaria despercebido, que é a classe que este repositório persegue. */
+describe('de na origem `arranja`: a fonte inteira ou um recorte dela', () => {
+  const FACE_DIREITA = { ...FONTE, face: 'direita' };
+
+  it('um recorte de UMA face resolve para UMA face por cópia', () => {
+    const { neutro, faces } = facesDe(PASSOS_BASE, { ...COLECAO, de: FACE_DIREITA, copia: 0 });
+    expect(neutro.orfaos).toEqual([]);
+    expect(faces.length).toBe(1);
+  });
+
+  it('e é a face CERTA: a cópia da direita, não uma qualquer das seis', () => {
+    /* o arranjo é linear em +x com passo 2, e a fonte é um cubo de lado 1
+       centrado em x=0 — então a face `direita` da cópia 0 está em x = 2 + 0,5.
+       Medir a POSIÇÃO é o que separa "resolveu a face pedida" de "resolveu
+       alguma face"; contar uma face só não separa. */
+    const { neutro, faces } = facesDe(PASSOS_BASE, { ...COLECAO, de: FACE_DIREITA, copia: 0 });
+    const xs = (faces[0] as any).vs.map((v: number) => neutro.V.get(v)![0]);
+    for (const x of xs) expect(x).toBeCloseTo(2.5, 9);
+  });
+
+  it('sem `copia`, o recorte dá aquela face em TODA cópia', () => {
+    const { neutro, faces } = facesDe(PASSOS_BASE, { ...COLECAO, de: FACE_DIREITA });
+    expect(neutro.orfaos).toEqual([]);
+    expect(faces.length).toBe(2);
+    const centros = faces.map((f: any) => f.vs.reduce((s: number, v: number) => s + neutro.V.get(v)![0], 0) / f.vs.length);
+    expect(centros.map((c: number) => +c.toFixed(9)).sort((a: number, b: number) => a - b)).toEqual([2.5, 4.5]);
+  });
+
+  it('a fonte INTEIRA continua sendo o que era: as seis faces de cada cópia', () => {
+    const { faces } = facesDe(PASSOS_BASE, { ...COLECAO, copia: 0 });
+    expect(faces.length).toBe(6);
+  });
+
+  it('origem que o arranjo NÃO copiou grita, nomeando a face e a fonte', () => {
+    /* uma segunda primitiva, fora do arranjo, citada como `de`: pertinência
+       negada. Antes a igualdade pegava isto; a afirmação existe para que o
+       portão novo continue pegando. */
+    const OUTRA = { op: 'cubo', id: 11 };
+    const passos = [
+      ...PASSOS_BASE,
+      ['cubo', { origemId: 11, larg: 1, alt: 1, prof: 1 }],
+    ];
+    const { neutro, faces } = facesDe(passos, { ...COLECAO, de: OUTRA, copia: 0 });
+    expect(faces.length).toBe(0);
+    expect(neutro.orfaos.length).toBeGreaterThan(0);
+    const texto = JSON.stringify(neutro.orfaos);
+    expect(texto).toContain('não pertence à fonte');
+  });
+
+  it('depois de a fonte ser FURADA, o recorte por aquela face grita: é por isso que a fonte se fura por último', () => {
+    /* o recorte é resolvido contra a malha viva, então uma face da fonte já
+       consumida por um corte derruba a citação da CÓPIA também. A regra que
+       isso impõe às peças está escrita no comentário da op ("a fonte é a
+       ÚLTIMA a ser furada"), e esta é a afirmação que morre se ela mudar. */
+    const semFuro = facesDe(PASSOS_BASE, { ...COLECAO, de: FACE_DIREITA, copia: 0 });
+    expect(semFuro.faces.length).toBe(1);
+
+    const comFuro = [
+      ...PASSOS_BASE,
+      ['furo', {
+        origemId: 60,
+        de: FACE_DIREITA,
+        saida: { ...FONTE, face: 'esquerda' },
+        centro: [0, 0.5, 0],
+        raio: 0.2,
+        lados: 8,
+      }],
+    ];
+    const { neutro, faces } = facesDe(comFuro, { ...COLECAO, de: FACE_DIREITA, copia: 0 });
+    expect(faces.length).toBe(0);
+    expect(neutro.orfaos.length).toBeGreaterThan(0);
+  });
+});

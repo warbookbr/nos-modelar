@@ -1,5 +1,5 @@
 {
-  "hashTotal": "167e6e0023e37eff0036576485dbeffdd562540ce38147b1de4e3002ed168bbf",
+  "hashTotal": "7deeadf6a5ac8cb3b631d2ed206f138a511cd2be65c22bb7781de9673a0be27d",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -10,6 +10,11 @@
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
       "vertices": 218,
       "faces": 216
+    },
+    "_corrimao": {
+      "hash": "15aac3c7e5a9970765150d913b6e7e6b93437453113c1fa1006d42cdd2d865af",
+      "vertices": 84,
+      "faces": 52
     },
     "_espelhado": {
       "hash": "992981953dafde8f3b8e8d473c2d8873349af0249a3332e80590a2d73d29c2a8",
@@ -97,9 +102,9 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "ca5b165565509ad8ccc4806c49d2d851b0f02268a10300e7ce9d5fd526dfb34f",
-      "vertices": 362,
-      "faces": 300
+      "hash": "410c683665142bbbf97224e3dcdb5436682a47a98c190af893a3ddc5d018dd52",
+      "vertices": 554,
+      "faces": 540
     },
     "lanterna": {
       "hash": "711e2c57837371eb8559715b5a18c7f94cad8f1baa556d9bb3033731ab1e1b93",

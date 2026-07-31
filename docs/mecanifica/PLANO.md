@@ -21,10 +21,11 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- **nenhum ciclo técnico está em execução.** O ciclo 3 ("Arranjos semânticos
-  v1", O-13) foi aberto e fechado em 31 de julho de 2026, no núcleo e na peça; o
-  próximo candidato é o ciclo 4 ("Realismo geométrico v1"), que ainda **não** foi
-  aberto.
+- **nenhum ciclo técnico está em execução.** O ciclo 4 ("Corte e orientação de
+  seção v1") foi fechado em 31 de julho de 2026, com as duas capacidades
+  provadas em peça: o flange de roda furado do `freio-disco` e o corrimão de
+  perfil chato. O próximo candidato é o ciclo 5 ("Curva e filete v1"), escrito
+  abaixo e ainda **não** aberto.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -228,10 +229,11 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
 | 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
-| 3 | **em execução** | Corte e orientação de seção v1 | duas capacidades escolhidas pela crítica da roda, cada uma útil fora do vocabulário automotivo. As DUAS estão de pé: a orientação declarada da seção do `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). Nenhuma peça de PRODUTO usa nenhuma das duas |
-| 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
-| 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
-| 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
+| 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
+| 4 | **candidato, não aberto** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo e exclusões escritos abaixo; o GATE ainda não |
+| 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
+| 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
+| 7 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
 
 ### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 
@@ -523,7 +525,7 @@ dos dois ciclos anteriores: verde pelo motivo errado.
   Mutação: um wrapper local no gate que **delega** ao módulo — portanto concorda
   em toda entrada, e o teste antigo passaria — deixa o novo vermelho.
 
-### Ciclo 4 — Corte e orientação de seção v1 — EM EXECUÇÃO
+### Ciclo 4 — Corte e orientação de seção v1 — CONCLUÍDO em 31 de julho de 2026
 
 **Nome:** Corte e orientação de seção v1 (o ciclo antes chamado de candidato
 "Realismo geométrico v1"). Duas capacidades, escolhidas pelo critério de servir
@@ -644,6 +646,95 @@ frase agora diz as duas coisas. Os números dentro de "verificação executada n
 fechamento" dos ciclos 2, 2b e 3 são fotografias daquele dia e continuam como
 estão, com o rótulo que já tinham.
 
+**FECHAMENTO — as duas capacidades provadas em PEÇA.** Até aqui as duas viviam
+no núcleo, com teste e mutação, e nenhuma peça de PRODUTO usava nenhuma delas.
+Era a mesma classe que a revisão adversarial acha desde o ciclo 1: promessa
+escrita, sem afirmação que morra quando ela é quebrada. O que entrou:
+
+**1. O flange de roda do freio — as duas capacidades juntas, numa peça de
+produto.** O plano registrava a omissão com estas palavras: "o cubo do freio
+continua sem prisioneiro". `freio-disco.js` agora tem um flange de quatro
+assentos: UMA sede (`chamferBox`), o `arranja` radial que a repete de 90° em 90°
+em torno do eixo da roda, e um `furo` PASSANTE em cada assento, de lado a lado.
+A peça foi de 300 para 540 faces e de 362 para 554 vértices, com **0 face sem
+identidade** e **0 órfão** (`npm run descrever -- freio-disco --estrito`), e os
+testes de integridade antigos continuam verdes SEM afrouxar nenhum: o conjunto
+de pares que se interpenetram é o mesmo de antes (`cubo~disco`, `flexivel~pinca`,
+`pinca~pistao`), e as folgas de repouso não mudaram.
+
+Uma afirmação antiga precisou mudar de número, e o motivo é geométrico, não
+cosmético: `descrever-partes.test.ts` fixava "a parte `cubo` é 1 corpo". Agora
+são **1 + `prisioneiros`** — cada assento é uma primitiva própria, sem vértice
+em comum com o cilindro. O teste passou a ler o número do TOPO da peça em vez de
+tê-lo digitado, então acrescentar assento sem acrescentar corpo continua sendo
+defeito.
+
+Sete casos novos em `tools/mecanifica/freio-disco-integridade.test.ts`
+(11 → 18): há um furo por prisioneiro declarado e cada um é um corpo separado; o
+furo atravessa o assento de lado a lado (é passante, não cego); os quatro estão
+no círculo de prisioneiros, nos quatro pontos cardeais; o diâmetro é o do
+parâmetro que o nomeia e sobra assento em volta; a parede 0 de todo furo é a de
+cima (a fase declarada por `orientacao`); o assento não passa do raio do cubo; e
+a superfície em que a roda encosta continua endereçável depois do corte.
+
+**2. `_corrimao.js` — a orientação declarada, fora do vocabulário automotivo.**
+Um corrimão de escada de perfil chato (60 mm × 24 mm) entre dois pilaretes, num
+caminho de cinco pontos com TORÇÃO. As três condições que tornam a chave
+mensurável numa peça estão nele de propósito, e duas delas são AFIRMADAS pelo
+teste para que ninguém as "simplifique" e deixe o resto passando por vácuo: o
+caminho não é coplanar (num caminho plano o transporte paralelo dá o mesmo
+resultado) e o perfil é chato (num perfil quadrado largura e espessura são a
+mesma medida). 6 casos em `tools/mecanifica/corrimao-orientacao.test.ts`. A peça
+tem 52 faces, 84 vértices, 2 partes, 0 face sem identidade, 0 órfão e 1 porta —
+`apoioDaMao`, que só é endereço ESTÁVEL porque a orientação é declarada: sem a
+chave, `lado:3` passeia pelas quatro faces ao longo do caminho, continuando a
+resolver e resolvendo para outra coisa.
+
+**3. A composição achou um atrito que nenhuma prova anterior tinha achado
+(A-28, UP-022).** `furo` exige que a face de entrada resolva para EXATAMENTE uma
+face; a origem `{op:'arranja', id, de, copia}` exigia que `de` fosse, chave por
+chave, o `derivaDe` do passo — e `derivaDe` de um sólido é o sólido inteiro.
+As duas capacidades do ciclo não compunham. O portão passou de IGUALDADE da
+origem declarada para PERTINÊNCIA das faces: `de` pode ser qualquer origem cujas
+faces sejam faces daquela fonte. É estritamente mais permissivo, então nenhuma
+citação já escrita mudou de significado — `gabarito:selecao:check` verde com as
+24 peças anteriores byte-idênticas. 6 casos novos em
+`tools/oficina/arranja-contrato.test.ts` (8 → 14).
+
+**Mutação, o gate deste ciclo.** 14 mutações rodadas contra as afirmações novas,
+12 mortas. As duas primeiras versões do teste do freio deixavam sobreviver a
+mutação que TIRA `orientacao` da peça — o conjunto de vértices de um anel de 12
+lados é o mesmo em qualquer fase, e a caixa não vê a diferença; só a pergunta
+"QUEM é a parede 0" separa as duas regras. A mesma classe apareceu no corrimão:
+a primeira versão do teste sobrevivia a trocar o perfil por um quadrado.
+Sobreviveu de propósito **uma** mutação, e ela não é defeito: mudar
+`prisioneiroFuroRaio` de 6,5 para 6,0 mm é mudança de projeto, e a afirmação
+segue o parâmetro por decisão. Trocar o `raio` do furo para OUTRO parâmetro
+(o chanfro) é pego.
+
+**Inspeção visual, lida:** `freio-disco` em `direita` e em isométrica com o cubo
+isolado e focado — os quatro assentos aparecem em volta do eixo, cada um com o
+furo aberto e a parede do furo visível; `_corrimao` em `frontal` (os dois
+pilaretes e o corrimão subindo, com espessura constante) e em `superior` (a
+largura constante do começo ao fim, que é a evidência de que a face larga
+continua para cima em todo o percurso).
+
+**Gates do fechamento, todos verdes:** `npm test` (646 casos, 24 arquivos),
+`typecheck`, `build`, `gabarito:selecao:check` (25 peças; só `freio-disco` e o
+novo `_corrimao` mudaram, e as duas foram declaradas), `id-cru:check`,
+`guarda:salvar`, `guarda:portas`, `mapa`, `mapa:check`, `docs:links:check` e
+`docs:toc:check`.
+
+**O que continua NÃO feito, dito na cara:** A-26 segue aberto — um furo por
+face, e é por isso que o flange é uma chapa por prisioneiro em vez de uma chapa
+com quatro furos. A-29 nasceu neste fechamento: o `furo` pede o ponto do MUNDO
+por onde ele passa, e a gramática de PARAMS não tem seno nem cosseno, então um
+arranjo radial só dá centro NOMEÁVEL em passos de 90° — o flange tem quatro
+prisioneiros por causa da linguagem, não do desenho. A roda experimental continua
+remontando o contorno em código auxiliar; a mangueira do freio continua com
+seção circular e sem `orientacao`, porque numa seção circular a chave não muda
+nada que se possa medir.
+
 **Registro anterior deste ciclo, quando ainda era candidato:**
 
 O ciclo nasce do briefing e da crítica visual da roda, registrados em
@@ -655,3 +746,36 @@ Ele não começa com uma lista de operações nem promete “polir” a peça in
 Seu gate será escrito depois de comparar referência e renders canônicos,
 nomeando regiões e condições visuais de aceite. Uma skill de família só pode
 ser extraída depois de o protocolo funcionar em outra família de objeto.
+
+### Ciclo 5 — Curva e filete v1 — CANDIDATO, NÃO ABERTO
+
+**Nome:** Curva e filete v1. São as duas capacidades que sobraram da lista que a
+crítica visual da roda levantou (perfil curvo ou afunilado, orientação de seção,
+transição local, filete/bevel seletivo) — as outras duas foram entregues no
+ciclo 4.
+
+**Escopo incluído:**
+
+- **curva no perfil.** Hoje todo contorno é uma poligonal: o `lathe` reserva o
+  terceiro elemento do ponto para a alça de curva e ainda não a implementa, e o
+  `contorno` do `loft` recusa o ponto de 3 elementos com essa mesma mensagem. A
+  capacidade é a alça de curva de verdade, no mesmo lugar em que já está
+  reservada, para que raio de concordância, barriga de perfil e gargalo deixem
+  de ser um pedaço de reta;
+- **filete seletivo.** Arredondar uma aresta ESCOLHIDA por identidade semântica,
+  não a caixa inteira como o `chamferBox`. É o que separa uma peça fundida de
+  uma peça de bloco, e é o que a crítica da roda pediu primeiro.
+
+**Escopo excluído:** subtração nova (booleana geral, rasgo, bolsão, furo
+oblíquo), relações de montagem, hierarquia de partes, posição na criação da
+primitiva, e novas peças de PRODUTO. A-26 e A-29 NÃO entram: eles são do corte,
+não da curva, e misturá-los reabriria o ciclo 4.
+
+**Gate: deliberadamente não escrito ainda.** Isto não é esquecimento. O próprio
+plano manda escrever o gate do realismo DEPOIS de comparar referência e renders
+canônicos, nomeando regiões e condições visuais de aceite — e o ciclo 4 acabou
+de mudar o que existe para comparar: o freio agora tem flange furado, e a
+primeira peça com perfil não circular declarado é o corrimão. A comparação tem
+de ser refeita sobre esse estado antes de o gate ser escrito. Quem abrir este
+ciclo escreve o gate como primeiro passo, no `PLANO.md`, antes de tocar em
+código.

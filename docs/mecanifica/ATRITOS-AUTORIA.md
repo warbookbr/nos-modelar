@@ -21,6 +21,42 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-29 — o passo do arranjo radial só dá centro NOMEÁVEL em 90°, 180° e 270°
+
+**Onde dói:** linguagem da Oficina, ao compor `arranja` com `furo`.
+
+**Evidência:** o flange de roda de `prototipos/fps/v3/pecas/freio-disco.js`. A
+op `furo` exige `centro`, o ponto do MUNDO por onde o furo passa — e exige com
+razão: o centroide da face como default seria um furo que muda de lugar quando
+a face muda de forma. Só que o assento em que ele entra foi posto ali pelo
+`arranja`, que girou a fonte de `volta/total` graus. Para dizer onde está o
+centro da cópia `k`, o autor precisa do ponto girado.
+
+A gramática aritmética dos PARAMS tem `+ - * /`, parênteses e nomes. Não tem
+seno nem cosseno, e é decisão: fórmula transcendental no arquivo salvo é a porta
+de entrada da divergência entre implementações. A consequência é aritmética
+simples: com `total: 4` e `volta: 360` o passo é 90°, e o ponto girado é
+±raio em Y ou em Z, ou zero — quatro nomes de parâmetro e nada mais. Com
+`total: 5` (72°), o centro de cada cópia precisaria de `cos 72°` e `sen 72°`
+como PARAM, isto é, oito números de coordenada digitados à mão. É exatamente a
+classe que o ciclo 3 tirou da roda experimental (A-17), e por isso o flange do
+freio tem QUATRO prisioneiros, não cinco.
+
+**Contorno usado:** quatro prisioneiros, com `volta: 360` e `total: 4`. É um
+padrão de furação real (4×100 é dos mais comuns em carro médio), então o
+contorno não deforma o assunto — mas ele foi escolhido pela linguagem, e isso
+está dito na peça.
+
+**Capacidade candidata, em ordem de preferência:**
+
+1. o `furo` aceitar centro em coordenada DA FACE de entrada, e não só do mundo
+   — explícito, nunca default. Aí o mesmo centro serve a fonte e a toda cópia,
+   e o ângulo some da conta. É o conserto certo e o mais estreito;
+2. uma op que repita o CORTE junto com a cópia (o `arranja` levar consigo os
+   furos já abertos na fonte). Resolve A-26 e A-29 de uma vez, e é bem maior;
+3. `cos`/`sen` na gramática de expressão. É o mais barato de escrever e o pior
+   de todos: põe transcendental no formato salvo para consertar um sintoma.
+
 ### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
 
 **Onde dói:** linguagem da Oficina.
@@ -46,6 +82,14 @@ placa seis vezes.
 **Contorno usado:** um furo por face, e o conjunto declarado por um ALIAS `unir`
 juntando as faces que sobraram com as origens que os cortes publicaram — o
 conserto que o próprio diagnóstico do núcleo recomenda.
+
+**Segunda evidência, agora numa peça de PRODUTO (ciclo 4, fechamento):** o
+flange de roda de `freio-disco.js`. Um flange de verdade é UMA chapa com quatro
+furos. Aqui ele é uma chapa por prisioneiro: quatro assentos, cada um uma
+primitiva própria, porque cada furo precisa de uma face de entrada só dele. A
+forma resultante existe em cubo de roda real (flange lobado), então a peça não
+ficou mentindo — mas a decisão foi da linguagem, não do desenho, e o custo é
+visível na régua: a parte `cubo` tem cinco CORPOS onde deveria ter dois.
 
 **Capacidade candidata:** o `furo` aceitar VÁRIOS centros num passo só (uma
 lista, ou um arranjo declarado como o do `arranja`), abrindo N furos na mesma
@@ -644,6 +688,46 @@ destruía o contexto foi removido.
 - **Nenhum id de vértice ou face.** Não contei vértice na mão em momento algum.
 
 ## Atritos resolvidos
+
+### A-28 — a origem do arranjo só sabia responder pela cópia INTEIRA
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a tentativa de compor as duas capacidades do ciclo 4 numa peça de
+produto. `furo` exige que `de` resolva para EXATAMENTE uma face — duas faces é
+endereço ambíguo, e ambiguidade grita. A origem `{op:'arranja', id, de, copia}`
+exigia que `de` fosse, chave por chave, o `derivaDe` declarado no passo
+(`origensIguais`), e `derivaDe` de um sólido é o sólido inteiro. Logo a cópia de
+um assento só sabia se apresentar com as 26 faces juntas, e não havia como
+dizer "a face de fora da terceira cópia".
+
+O efeito não estava escrito em lugar nenhum e nenhum teste o media, porque
+nenhuma peça tinha tentado. Sem o conserto, o furo de prisioneiro do freio só
+existiria com os quatro assentos declarados à mão, cada um com o seu par
+`chamferBox` + `transladar` — a repetição que o `arranja` veio matar — ou com o
+ângulo de cada cópia virando parâmetro de coordenada (A-29).
+
+**Correção:** o portão da origem `arranja` deixou de ser a IGUALDADE da origem
+declarada e passou a ser a PERTINÊNCIA das faces. `de` pode ser a fonte inteira
+(como sempre) ou qualquer origem cujas faces sejam faces daquela fonte:
+`{op:'arranja', id, de:{op:'chamferBox', id:S, face:'direita'}, copia:2}` é uma
+face só, na cópia pedida. Citar algo que este arranjo não copiou continua
+gritando, e o grito passou a nomear a face e a fonte.
+
+É estritamente mais permissivo do que a igualdade — origem igual resolve para
+todas as faces da fonte, todas no mapa —, então nenhuma citação já escrita mudou
+de significado: `gabarito:selecao:check` ficou verde com as 24 peças anteriores
+byte-idênticas.
+
+**O que ele NÃO afrouxou, e a regra que sobrou:** o recorte é resolvido contra a
+malha VIVA. Uma face da fonte já consumida por um corte derruba a citação da
+cópia também — então, numa peça que fura a fonte E as cópias, a fonte é a
+ÚLTIMA a ser furada. Isso está no comentário da op, na peça, e afirmado em
+`tools/oficina/arranja-contrato.test.ts`.
+
+**Prova:** 6 casos novos em `tools/oficina/arranja-contrato.test.ts` (8 → 14).
+Duas mutações rodadas: repor o portão de igualdade derruba 5 casos; trocar o
+grito de "não pertence à fonte" por um `continue` silencioso derruba 1.
 
 ### A-17 — repetição radial vira coordenada em massa
 

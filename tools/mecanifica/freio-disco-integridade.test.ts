@@ -14,6 +14,8 @@ import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
 import { caixaDaParte, corposDaParte, descreverPeca } from '../../src/autoria/descrever-partes.js';
+// @ts-expect-error — a mesma gramática aritmética que o núcleo usa para os PARAMS derivados.
+import { criarResolverNumerico } from '../../prototipos/fps/v3/motor/expressoes.js';
 
 const PARTES = [
   'disco', 'cubo', 'pinca', 'suporte',
@@ -38,6 +40,15 @@ function montar() {
 }
 
 const perto = (a: number, b: number) => expect(a).toBeCloseTo(b, 9);
+
+/* Medida DERIVADA em número. `PARAMS.cuboFaceRodaX` é a string '= …': a peça
+   guarda a RELAÇÃO, não o valor calculado fora (A-5). Reescrever a conta aqui
+   faria o teste repetir a fórmula da peça — o defeito que este arquivo já
+   nomeia mais abaixo —, então quem avalia é a mesma gramática do núcleo. */
+const medida = (() => {
+  const { num } = criarResolverNumerico({ ...freio.PARAMS, ...freio.TOPO });
+  return (nome: string): number => num(nome);
+})();
 
 describe('integridade do freio a disco', () => {
   it('não tem órfão e nenhuma face fica sem identidade', () => {
@@ -202,5 +213,140 @@ describe('integridade do freio a disco', () => {
     expect(a.V.size).toBe(b.V.size);
     expect(a.F.size).toBe(b.F.size);
     for (const [id, p] of a.V) expect(b.V.get(id)).toEqual(p);
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   FLANGE DE RODA — o furo de prisioneiro (ciclo "Corte e orientação de seção
+   v1"). O plano registrava a omissão com estas palavras: "o cubo do freio
+   continua sem prisioneiro". Ela foi fechada com as duas capacidades do ciclo
+   juntas — o ARRANJO radial põe os assentos em volta do eixo da roda, o CORTE
+   abre o furo de cada um.
+
+   Estas afirmações existem para morrer quando o valor muda. Contar face não
+   basta: um furo no lugar errado, um furo cego no lugar de um passante ou um
+   assento sem furo dariam a MESMA contagem, e a foto do conjunto inteiro é
+   pequena demais para acusar 13 mm.
+   --------------------------------------------------------------------------- */
+describe('flange de roda: os quatro furos de prisioneiro', () => {
+  /* as famílias do corte, endereçadas pelos ALIASES que a peça publica — nada
+     de id de face. A sonda reatribui `parte`, por isso `substituir`. */
+  const comSonda = () => nucleo(
+    [
+      ...freio.PASSOS,
+      ['parte', { nome: 'paredesSonda', sel: { alias: 'paredesDosPrisioneiros' }, substituir: true }],
+      ['parte', { nome: 'assentosSonda', sel: { alias: 'assentosDeRoda' }, substituir: true }],
+    ],
+    freio.PARAMS, freio.TOPO, freio.MATERIAIS, null, freio.ALIASES,
+  );
+
+  it('há um furo por prisioneiro declarado, e cada um é um corpo separado', () => {
+    const neutro = comSonda();
+    expect(neutro.orfaos).toEqual([]);
+    const paredes = [...neutro.F.values()].filter((f: any) => f.parte === 'paredesSonda');
+    /* uma parede por lado do anel, em cada furo: mudar `prisioneiros` sem
+       escrever o furo do assento novo derruba esta conta. */
+    expect(paredes.length).toBe(freio.TOPO.prisioneiros * freio.TOPO.ladosFuroPrisioneiro);
+    expect(corposDaParte(neutro, 'paredesSonda').length).toBe(freio.TOPO.prisioneiros);
+  });
+
+  it('cada furo ATRAVESSA o assento de lado a lado — é passante, não cego', () => {
+    const P = freio.PARAMS;
+    for (const corpo of corposDaParte(comSonda(), 'paredesSonda')) {
+      perto(corpo.min[0], medida('cuboFaceRodaX'));
+      perto(corpo.max[0], medida('cuboFaceRodaX') + P.prisioneiroSedeEspessura);
+    }
+  });
+
+  it('os furos ficam no círculo de prisioneiros, a 90° um do outro', () => {
+    const P = freio.PARAMS;
+    const centros = corposDaParte(comSonda(), 'paredesSonda')
+      .map((c: any) => [(c.min[1] + c.max[1]) / 2, (c.min[2] + c.max[2]) / 2]);
+    // todos no MESMO raio, e é o raio que o parâmetro nomeia
+    for (const [y, z] of centros) perto(Math.hypot(y, z), medida('prisioneiroOrbita'));
+    // e nos quatro pontos cardeais: é isso que `volta:360` com `total:4` promete
+    const chave = (p: number[]) => p.map((n) => +n.toFixed(9)).join(',');
+    const R = +medida('prisioneiroOrbita').toFixed(9);
+    expect(centros.map(chave).sort()).toEqual(
+      [[R, 0], [-R, 0], [0, R], [0, -R]].map(chave).sort(),
+    );
+  });
+
+  it('o furo tem o diâmetro do parâmetro que o nomeia, e sobra assento em volta', () => {
+    const P = freio.PARAMS;
+    for (const corpo of corposDaParte(comSonda(), 'paredesSonda')) {
+      perto(corpo.max[1] - corpo.min[1], 2 * P.prisioneiroFuroRaio);
+      perto(corpo.max[2] - corpo.min[2], 2 * P.prisioneiroFuroRaio);
+    }
+    /* e o furo não come o assento inteiro: um furo que encosta na borda deixa
+       de ser furo e vira recorte de contorno. A relação é entre PARÂMETROS, não
+       entre o parâmetro e ele mesmo. */
+    expect(2 * P.prisioneiroFuroRaio)
+      .toBeLessThan(P.prisioneiroSedeLargura - 2 * P.prisioneiroSedeChanfro);
+    expect(2 * P.prisioneiroFuroRaio)
+      .toBeLessThan(P.prisioneiroSedeAltura - 2 * P.prisioneiroSedeChanfro);
+  });
+
+  it('os quatro anéis saem EM FASE: a parede 0 de cada furo é sempre a de cima', () => {
+    /* `orientacao:[0,1,0]` é a segunda capacidade do ciclo, e a única promessa
+       dela que se pode medir num furo de 12 lados: o CONJUNTO de vértices do
+       anel é o mesmo com qualquer fase, mas QUEM é a parede 0 muda. Com a
+       orientação declarada, o vértice 0 de todo anel aponta para +Y, então a
+       parede 0 é a mais alta do próprio furo — nos quatro assentos, inclusive
+       nos que o arranjo girou de 90°, 180° e 270°.
+       Sem a chave, a fase vem do quadro interno da face e a parede 0 cai em
+       outro lugar: aí `{op:'furo', id, parede:0}` deixa de nomear a mesma
+       região física em furos diferentes, que é exatamente o atrito do frame
+       implícito. */
+    const furos = freio.PASSOS
+      .filter((p: any) => p[0] === 'furo')
+      .map((p: any) => p[1].origemId);
+    expect(furos.length).toBe(freio.TOPO.prisioneiros);
+
+    /* uma sonda por citação: as duas famílias se sobrepõem (a parede 0 está
+       dentro de "todas as paredes"), e `substituir` faria a segunda apagar a
+       primeira no mesmo neutro. */
+    const alturaDe = (origem: Record<string, unknown>) => {
+      const neutro = nucleo(
+        [...freio.PASSOS, ['parte', { nome: 'sonda', sel: { origem }, substituir: true }]],
+        freio.PARAMS, freio.TOPO, freio.MATERIAIS, null, freio.ALIASES,
+      );
+      expect(neutro.orfaos).toEqual([]);
+      const ys = [...neutro.F.values()]
+        .filter((f: any) => f.parte === 'sonda')
+        .flatMap((f: any) => f.vs.map((v: number) => neutro.V.get(v)![1]));
+      expect(ys.length).toBeGreaterThan(0);
+      return Math.max(...ys);
+    };
+
+    for (const id of furos) {
+      perto(
+        alturaDe({ op: 'furo', id, parede: 0 }),
+        alturaDe({ op: 'furo', id, parede: { passo: 1, fase: 0 } }),
+      );
+    }
+  });
+
+  it('o assento não passa do raio do cubo: a roda ainda encosta no flange', () => {
+    const P = freio.PARAMS;
+    const neutro = comSonda();
+    const cubo = caixaDaParte(neutro, 'cubo');
+    // o flange avança PARA FORA do carro, além da face do cubo
+    perto(cubo.max[0], medida('cuboFaceRodaX') + P.prisioneiroSedeEspessura);
+    expect(cubo.max[0]).toBeGreaterThan(medida('cuboFaceRodaX'));
+    // e o assento termina rente ao cubo, sem crescer o envelope radial
+    perto(cubo.max[1], P.cuboRaio);
+    perto(medida('prisioneiroOrbita') + P.prisioneiroSedeAltura / 2, P.cuboRaio);
+  });
+
+  it('a face em que a roda encosta continua existindo depois do corte', () => {
+    /* o corte CONSOME a face de entrada. O que sobra é a borda que o furo
+       publicou, e é ela que o alias `assentosDeRoda` endereça — se o alias
+       parasse de resolver, a peça perderia a superfície de apoio da roda sem
+       perder uma única face. */
+    const neutro = comSonda();
+    const assentos = [...neutro.F.values()].filter((f: any) => f.parte === 'assentosSonda');
+    expect(assentos.length).toBe(freio.TOPO.prisioneiros * freio.TOPO.ladosFuroPrisioneiro);
+    for (const f of assentos) expect(f.material).toBe('acoCubo');
   });
 });

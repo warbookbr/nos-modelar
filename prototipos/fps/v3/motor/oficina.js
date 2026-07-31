@@ -664,7 +664,29 @@ const CONTRATOS_ORIGEM = {
      arranjo só responde pelo que ele criou — a mesma lei do `espelha`, que
      resolve para a imagem e nunca para o original. A cópia `k` está a `k+1`
      passos da fonte; quem quer as duas coisas junta as duas origens num ALIAS
-     `unir`, que é o mecanismo que já existe para isso. */
+     `unir`, que é o mecanismo que já existe para isso.
+
+     `de` É A FONTE, OU UM RECORTE DELA (ciclo "Corte e orientação de seção
+     v1", A-28). Até esta rodada o portão era a IGUALDADE da origem declarada:
+     `de` tinha de ser, chave por chave, o `derivaDe` do passo. A consequência
+     não estava escrita em lugar nenhum e só apareceu ao compor as duas
+     capacidades do ciclo: `furo` exige que `de` resolva para UMA face, e a
+     origem do arranjo só sabia devolver a cópia INTEIRA — então um círculo de
+     furos sobre uma coleção arranjada era impossível, e a saída seria escrever
+     cada instância à mão, com o seno e o cosseno do ângulo virando parâmetro de
+     coordenada (exatamente o que o ciclo 3 tirou da roda).
+     Agora o portão é a PERTINÊNCIA: `de` pode ser qualquer origem cujas faces
+     sejam faces da fonte deste arranjo — `{op:'chamferBox', id:S, face:'direita'}`
+     recorta uma face só de cada cópia. Citar algo que este arranjo não copiou
+     continua GRITANDO, e o grito agora nomeia a face e a fonte, em vez de dizer
+     só "outra seleção estrutural". É estritamente mais permissivo do que a
+     igualdade (origem igual resolve para todas as faces da fonte, todas no
+     mapa), então nenhuma citação já escrita muda de significado.
+     O que ele NÃO afrouxa: as faces continuam sendo procuradas no mapa da
+     cópia, uma a uma. Uma face fora da fonte não vira cópia por acidente, e
+     face da fonte já CONSUMIDA por um corte faz o próprio `de` gritar antes,
+     pela regra de consumo do gerador dela — por isso, numa peça que fura a
+     fonte E as cópias, a fonte é a ÚLTIMA a ser furada. */
   arranja: {
     validar(origem) {
       const chaves = ['op', 'id', 'de', 'copia'];
@@ -675,9 +697,8 @@ const CONTRATOS_ORIGEM = {
       return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
     },
     resolver(st, registro, origem) {
-      if (!origensIguais(origem.de, registro.derivaDe)) return { erro: `origem arranja:${origem.id} foi derivada de outra seleção estrutural` };
       const fonte = resolverOrigem(st, origem.de);
-      if (fonte.erro) return { erro: `origem derivada inválida: ${fonte.erro}` };
+      if (fonte.erro) return { erro: `de da origem arranja:${origem.id} não resolve: ${fonte.erro}` };
       const nCopias = registro.copias.length;
       let indices;
       if (eixoDeIndiceUnico(origem.copia)) {
@@ -697,7 +718,10 @@ const CONTRATOS_ORIGEM = {
         const mapa = registro.copias[k];
         for (const original of fonte.faces) {
           const copia = mapa.get(original);
-          if (copia == null || !st.F.has(copia)) return { erro: `copia ${k} da face ${original} da origem derivada não existe` };
+          /* PERTINÊNCIA: a face citada por `de` tem de ser uma face da fonte
+             DESTE arranjo. `de` que aponta para outra primitiva cai aqui. */
+          if (copia == null) return { erro: `a face ${original}, citada por de, não pertence à fonte da origem arranja:${origem.id} (a fonte declarada é ${JSON.stringify(registro.derivaDe)}) — este arranjo não copiou face nenhuma dela` };
+          if (!st.F.has(copia)) return { erro: `copia ${k} da face ${original} da origem derivada não existe${consumoDe(st, copia)}` };
           faces.push(copia);
         }
       }

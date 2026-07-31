@@ -193,7 +193,11 @@ describe('descrever-partes: a medição headless de uma peça', () => {
     const neutro = montar();
     const { caixas } = caixasPorParte(neutro);
     expect([...caixas.values()].map((c: any) => [c.nome, c.corpos])).toEqual([
-      ['cubo', 1], ['disco', 2], ['flexivel', 1], ['pastilhaExterna', 1],
+      /* o `cubo` são o corpo do flange mais um assento de prisioneiro por
+         prisioneiro — cada assento é uma primitiva própria, sem vértice em
+         comum com o cilindro. O número vem do TOPO da peça, não digitado
+         aqui: acrescentar um assento sem acrescentar um corpo é defeito. */
+      ['cubo', 1 + freio.TOPO.prisioneiros], ['disco', 2], ['flexivel', 1], ['pastilhaExterna', 1],
       ['pastilhaInterna', 1], ['pinca', 3], ['pistao', 1], ['suporte', 3],
     ]);
 
