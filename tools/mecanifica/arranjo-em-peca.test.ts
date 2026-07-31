@@ -80,6 +80,34 @@ function girar(p: number[], ax: number, graus: number) {
 const chave = (ps: number[][]) => ps.map((p) => p.map((n) => (Math.abs(n) < 1e-9 ? 0 : n).toFixed(6)).join(' ')).sort();
 const normaisDaParte = (neutro: any, parte: string) => facesDaParte(neutro, parte).map((f: any) => normalDaFace(neutro, f));
 
+/* CORPOS de uma parte AGREGADA. `recessosRaios` e `fixadores` são uma parte só
+   com N sólidos soltos dentro — a forma "coleção inteira" do arranjo. A régua
+   por parte mede uma caixa só e não sabe dizer quantos corpos há lá dentro; sem
+   separar por conectividade, trocar a contagem do arranjo não muda nada
+   observável. Isto separa: dois vértices compartilhados = mesmo corpo. */
+function corposDaParte(neutro: any, parte: string) {
+  const faces = facesDaParte(neutro, parte);
+  const dono = new Map<number, number>();
+  const raiz = (x: number): number => (dono.get(x) === x ? x : raiz(dono.get(x) as number));
+  for (const f of faces) for (const v of f.vs) if (!dono.has(v)) dono.set(v, v);
+  for (const f of faces) for (const v of f.vs) dono.set(raiz(v), raiz(f.vs[0]));
+  const porRaiz = new Map<number, { faces: any[]; pontos: number[][] }>();
+  for (const f of faces) {
+    const r = raiz(f.vs[0]);
+    if (!porRaiz.has(r)) porRaiz.set(r, { faces: [], pontos: [] });
+    const corpo = porRaiz.get(r) as { faces: any[]; pontos: number[][] };
+    corpo.faces.push(f);
+    for (const v of f.vs) corpo.pontos.push(neutro.V.get(v) as number[]);
+  }
+  return [...porRaiz.values()];
+}
+
+/* ângulo do corpo em torno do eixo X, na convenção right-handed da peça, e o
+   raio dele no plano radial. */
+const anguloEmX = (c: number[]) => (Math.atan2(c[2], c[1]) * 180) / Math.PI;
+const raioEmX = (c: number[]) => Math.hypot(c[1], c[2]);
+const normalizarGraus = (g: number) => ((g + 540) % 360) - 180;
+
 /* toda origem `arranja` da peça precisa contar por NOME de TOPO. Isto é o item
    "contagem derivada do parâmetro, nunca número digitado": a afirmação vale
    sobre a PEÇA, então trocar `total:'gruposDeRaios'` por `total:5` — que produz
@@ -161,6 +189,65 @@ describe('arranjo semântico na peça — a roda que originou o item (A-17)', ()
     }
   });
 
+  /* As outras DUAS famílias de arranjo da roda. Elas são de propósito uma parte
+     AGREGADA cada, e por isso escapavam de tudo: nenhum teste do repositório
+     citava `fixadores` nem `recessosRaios`. Medido na revisão do ciclo 3:
+     trocar `total:'fixadoresNaRoda'` por `total:'ladosFixador'` — cinco porcas
+     viram seis — e deslocar o círculo de parafusos em 1 cm passavam a suíte
+     inteira. As afirmações abaixo contam CORPOS e medem o círculo pelo
+     parâmetro que o nomeia. */
+  it('as porcas são exatamente a contagem declarada, em corpos separados', () => {
+    const neutro = montar(roda);
+    const corpos = corposDaParte(neutro, 'fixadores');
+    expect(corpos.length).toBe(T.fixadoresNaRoda);
+    /* cada porca é o mesmo sólido: o lathe de `ladosFixador` lados, inteiro */
+    const faces = corpos.map((c) => c.faces.length);
+    expect(new Set(faces).size, `contagens de face: ${faces.join(',')}`).toBe(1);
+    /* e o sólido é o lathe de `ladosFixador` lados: uma faixa por lado, em cada
+       segmento do perfil. `ladosFixador` conta a POLIGONAL da porca; ele não é
+       a contagem de porcas, e o arranjo não pode contar por ele. */
+    expect(faces[0] % T.ladosFixador, `${faces[0]} faces por porca`).toBe(0);
+    expect(faces[0]).toBeGreaterThan(T.ladosFixador);
+  });
+
+  it('as porcas ficam NO círculo de parafusos, em passos iguais de volta fechada', () => {
+    const neutro = montar(roda);
+    const passo = 360 / T.fixadoresNaRoda;
+    const corpos = corposDaParte(neutro, 'fixadores')
+      .map((c) => centroide(c.pontos))
+      .sort((a, b) => normalizarGraus(anguloEmX(a)) - normalizarGraus(anguloEmX(b)));
+    /* o círculo é o parâmetro que o nomeia; deslocá-lo 1 cm mata isto */
+    for (const c of corpos) expect(raioEmX(c), 'raio do círculo de parafusos').toBeCloseTo(P.fixadorRaioOrbita, 9);
+    /* e a porca fica na face externa, entre a base e o comprimento declarados */
+    const xs = corposDaParte(neutro, 'fixadores').flatMap((c) => c.pontos.map((p) => p[0]));
+    expect(Math.min(...xs)).toBeCloseTo(P.fixadorBaseX, 9);
+    expect(Math.max(...xs)).toBeCloseTo(P.fixadorBaseX + P.fixadorComprimento, 9);
+    /* passos iguais, e a primeira porca no grupo 1 (Y+, ângulo zero) */
+    const graus = corpos.map((c) => normalizarGraus(anguloEmX(c)));
+    const esperados = Array.from({ length: T.fixadoresNaRoda }, (_, k) => normalizarGraus(k * passo)).sort((a, b) => a - b);
+    for (const [i, g] of graus.entries()) expect(g, `porca ${i}`).toBeCloseTo(esperados[i], 9);
+  });
+
+  it('há um ressalto por grupo de raios, atrás do par e no mesmo ângulo dele', () => {
+    const neutro = montar(roda);
+    const corpos = corposDaParte(neutro, 'recessosRaios');
+    expect(corpos.length).toBe(T.gruposDeRaios);
+    for (const corpo of corpos) expect(corpo.faces.length).toBe(6);   // um cubo inteiro
+    const centros = corpos.map((c) => centroide(c.pontos));
+    /* o ressalto vai da raiz declarada até ela mais o comprimento declarado, e
+       o centro dele é essa expressão — medida na malha, não recopiada */
+    for (const c of centros) {
+      expect(raioEmX(c), 'raio do ressalto').toBeCloseTo(P.recessoRaioInicio + P.recessoComprimento / 2, 9);
+      expect(c[0], 'x do ressalto').toBeCloseTo(P.recessoX, 9);
+    }
+    /* e cada ressalto fica no centro de um grupo de braços, não entre dois */
+    const centrosDeGrupo = Array.from({ length: T.gruposDeRaios }, (_, g) => normalizarGraus(g * passoDoGrupo)).sort((a, b) => a - b);
+    const graus = centros.map((c) => normalizarGraus(anguloEmX(c))).sort((a, b) => a - b);
+    for (const [i, g] of graus.entries()) expect(g, `ressalto ${i}`).toBeCloseTo(centrosDeGrupo[i], 9);
+    /* o ressalto fica ATRÁS do par: mais para dentro que a face dos braços */
+    expect(P.recessoX).toBeLessThan(P.raioFaceX);
+  });
+
   it('inserir um passo antes de tudo renumera a malha e não muda nada', () => {
     const antes = montar(roda);
     const depois = montar(roda, [['cubo', { lado: 0.01 }]]);
@@ -230,6 +317,42 @@ describe('arranjo semântico fora do vocabulário automotivo — _cerca-e-flor',
       expect(chave(desgirado), `petalaDaFlor${n}`).toEqual(daFonte);
       expect(facesDaParte(neutro, `petalaDaFlor${n}`).length).toBe(6);
     }
+  });
+
+  /* A OUTRA forma do endereço: a coleção INTEIRA. O cabeçalho da peça promete
+     que `{op:'arranja', id}` sem `copia` endereça o conjunto e que "é assim que
+     o material é aplicado" — e nada afirmava isso. Medido na revisão do ciclo
+     3: tirar a referência à coleção de `cercaInteira` ou de `corolaInteira`
+     deixava a suíte inteira verde, com seis tábuas e cinco pétalas SEM material
+     nenhum. A cópia isolada tem parte, então a régua e a bancada seguiam
+     mostrando tudo; só a pintura sumia. */
+  it('a coleção inteira pinta TODAS as instâncias, não só a fonte', () => {
+    const neutro = montar(cerca);
+    for (const n of TABUAS) {
+      const faces = facesDaParte(neutro, `tabuaDaCerca${n}`);
+      expect(faces.length, `tabuaDaCerca${n} sem face`).toBeGreaterThan(0);
+      for (const f of faces) expect(f.material, `tabuaDaCerca${n}`).toBe('madeiraTabua');
+    }
+    for (const n of PETALAS) {
+      const faces = facesDaParte(neutro, `petalaDaFlor${n}`);
+      expect(faces.length, `petalaDaFlor${n} sem face`).toBeGreaterThan(0);
+      for (const f of faces) expect(f.material, `petalaDaFlor${n}`).toBe('corolaPetala');
+    }
+    /* e nenhuma face da peça fica sem material: material ausente é o buraco
+       exato que a mutação abria, e ele não aparece em contagem de parte. */
+    const semMaterial = [...neutro.F.values()].filter((f: any) => !f.material);
+    expect(semMaterial.map((f: any) => f.parte)).toEqual([]);
+  });
+
+  it('a coleção inteira também é o endereço do `solido`, tábua por tábua', () => {
+    const neutro = montar(cerca);
+    for (const n of TABUAS) {
+      for (const f of facesDaParte(neutro, `tabuaDaCerca${n}`)) {
+        expect(f.solido, `tabuaDaCerca${n}`).toBe(true);
+      }
+    }
+    /* a marca é da cerca, não da peça toda: a flor não é sólida */
+    expect(facesDaParte(neutro, 'mioloDaFlor').every((f: any) => !f.solido)).toBe(true);
   });
 
   it('cada tábua tem a mesma mão de face da primeira', () => {

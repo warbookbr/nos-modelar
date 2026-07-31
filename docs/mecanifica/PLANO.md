@@ -427,7 +427,9 @@ quatro condições estão **ATENDIDAS**:
 | 4 | nenhum id runtime entra no arquivo salvo | **ATENDIDO** | `npm run id-cru:check` verde com as duas peças; nenhuma delas aparece na lista herdada. Toda citação é `sel:{origem}` ou `sel:{alias}` |
 
 **O teste de integridade, e a mutação que cada afirmação mata.**
-`tools/mecanifica/arranjo-em-peca.test.ts`, 13 casos, cobrindo as duas peças.
+`tools/mecanifica/arranjo-em-peca.test.ts`, 13 casos no fechamento (**18** hoje:
+o ciclo 4 acrescentou cinco, ver "As três promessas do ciclo 3 sem afirmação"),
+cobrindo as duas peças.
 Nenhuma contagem está digitada nele: toda instância sai de `TOPO`. Cinco
 mutações rodadas no que esta rodada acabou de escrever, **todas mortas**:
 
@@ -537,8 +539,10 @@ toda seção. Ela é projetada no plano de cada seção, aceita nome de PARAM e 
 propaga nada, então não há rotação acumulada ao longo do caminho. Referência
 paralela à tangente de alguma seção, vetor nulo e aridade errada gritam e
 abortam o passo inteiro. Ausente, o transporte paralelo de sempre: 23 peças
-byte-idênticas no `gabarito:selecao:check`, sem regravar nenhuma. 10 casos em
-`tools/oficina/oficina.test.ts`; 8 mutações rodadas, todas mortas — inclusive a
+byte-idênticas no `gabarito:selecao:check`, sem regravar nenhuma (o gate hoje
+confere **24**, com `_prateleira-furada`, que entrou depois). **11** casos em
+`tools/oficina/oficina.test.ts`, no describe `loft — orientação declarada da
+seção`; 8 mutações rodadas, todas mortas — inclusive a
 que propaga o frame a partir da referência declarada, que só morre em caminho
 com torção. Conferida no olho na bancada, em isométrica e superior.
 
@@ -575,7 +579,8 @@ O casamento entre o anel e os cantos da face cortada é ANGULAR, não por índic
 por índice a borda de um quadrado com furo central e `lados:8` sai com
 quadriláteros reflexos, que o leque de triangulação do visor preenche torto.
 
-**Prova:** 26 casos em `tools/oficina/oficina.test.ts`, 10 em
+**Prova:** **40** casos em `tools/oficina/oficina.test.ts`, somando os sete
+describes que começam por `furo —`, e **10** em
 `tools/mecanifica/prateleira-integridade.test.ts`. 34 mutações rodadas; 3
 sobreviveram e foram mortas com teste novo. Aditiva: `gabarito:selecao:check`
 verde, as 23 peças anteriores byte-idênticas. A peça de exercício
@@ -590,6 +595,54 @@ só face plana e convexa, só na direção da normal — rasgo, bolsão, sulco
 transversal e furo oblíquo continuam sem operação. E **um furo por face**: um
 segundo furo na mesma face é impossível, então um círculo de parafusos numa
 placa ainda não existe (A-26, aberto).
+
+**As três promessas do ciclo 3 sem afirmação, pagas aqui.** A revisão
+adversarial do ciclo 3 achou de novo a mesma classe dos quatro ciclos
+anteriores: promessa escrita no comentário, sem afirmação que morra quando ela é
+quebrada. Três casos, cada um medido antes com uma mutação que sobrevivia à
+suíte inteira:
+
+| promessa | onde ela morava | mutação que sobrevivia antes | casos que caem agora |
+|---|---|---|---:|
+| as famílias de arranjo da roda (`fixadores`, `recessosRaios`) | comentário de `roda-dianteira-realista-experimento.js` | `total:'fixadoresNaRoda'` → `total:'ladosFixador'` (cinco porcas viram seis) | 2 |
+| idem | idem | `total:'gruposDeRaios'` → `total:'ladosMiolo'` no arranjo dos ressaltos | 1 |
+| idem | idem | deslocar o círculo de parafusos 1 cm (`= fixadorRaioOrbita + 0.01`) | 1 |
+| a coleção INTEIRA é o endereço do material | cabeçalho de `_cerca-e-flor.js` | tirar `ORIGEM_TABUAS` do alias `cercaInteira` | 2 |
+| idem | idem | tirar `ORIGEM_PETALAS` do alias `corolaInteira` | 1 |
+| a solda no eixo é por igualdade EXATA, não tolerância | comentário da op `arranja` | trocar a igualdade por tolerância de `1e-6` | 1 |
+
+Nenhuma das três tinha teste: `fixadores` e `recessosRaios` não eram citados por
+arquivo de teste nenhum do repositório; a forma "coleção inteira" só era
+observável pelo material, que ninguém media; e a solda tinha afirmação só para o
+vértice EXATAMENTE no eixo, o lado fácil, então só desligá-la por completo era
+pego.
+
+O que entrou:
+
+- `tools/mecanifica/arranjo-em-peca.test.ts` ganhou cinco casos (13 → **18**).
+  Três separam a parte AGREGADA em CORPOS por conectividade — sem isso a régua
+  mede uma caixa só e a contagem do arranjo não é observável — e medem o círculo
+  de parafusos e a raiz do ressalto pelos parâmetros que os nomeiam. Dois afirmam
+  que a coleção inteira pinta TODAS as instâncias, e que nenhuma face da peça
+  fica sem material;
+- `tools/oficina/arranja-contrato.test.ts` ganhou dois casos (6 → **8**): o
+  vértice EXATAMENTE no eixo solda, e o vértice a `1e-9` do eixo **não** solda.
+  O segundo é o que decide a regra, e é feito deslocando o **pivô** do arranjo em
+  `1e-9`, sem tocar em peça nenhuma. Ele existe porque tolerância torna a
+  contagem de vértices do arquivo salvo dependente do ruído de ponto flutuante do
+  parâmetro; igualdade exata é reproduzível.
+
+**Números velhos no PLANO, conferidos contra runtime.** A revisão marcou o item
+como parcial. Medição desta rodada: `_prateleira-furada` 5 partes / 116 faces /
+112 vértices / 3 portas, `_cerca-e-flor` 16/138/158, `_jardineira` 6/351/350,
+`freio-disco` 8/300/362 e a roda experimental 2194 vértices — todos batem com o
+que o texto já dizia. Três não batiam e foram corrigidos: os casos do `loft`
+(10 → 11), os casos do `furo` (26 → 40) e a contagem de
+`arranjo-em-peca.test.ts` (13 → 18). O `gabarito:selecao:check` conta **24**
+peças hoje, não 23; onde o texto cita 23 ele fala do estado daquela entrega, e a
+frase agora diz as duas coisas. Os números dentro de "verificação executada no
+fechamento" dos ciclos 2, 2b e 3 são fotografias daquele dia e continuam como
+estão, com o rótulo que já tinham.
 
 **Registro anterior deste ciclo, quando ainda era candidato:**
 

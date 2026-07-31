@@ -134,3 +134,71 @@ describe('o portão da origem `arranja` recusa chave que não existe', () => {
     expect(x(quatro)).toBeGreaterThan(x(tres));
   });
 });
+
+/* A solda no eixo é decisão de FORMATO SALVO, declarada no comentário do
+   `arranja`: "o mesmo teste de igualdade EXATA (não tolerância) do weld do
+   `espelha` e do polo `raio===0` do `lathe`". Um teste já afirmava o lado fácil
+   — vértice EXATAMENTE no eixo é soldado. O lado que decide a regra não estava
+   afirmado: vértice QUASE no eixo NÃO solda. Medido na revisão do ciclo 3:
+   trocar a igualdade por uma tolerância de 1e-6 sobrevivia à suíte inteira; só
+   desligar a solda por completo era pego.
+
+   Por que importa: com tolerância, dois autores com a mesma peça e o mesmo
+   arquivo salvo podem sair com contagens de vértice diferentes conforme o ruído
+   de ponto flutuante do parâmetro. Igualdade exata é reproduzível; "perto o
+   bastante" não é. O pivô deslocado de 1e-9 abaixo é o menor deslocamento que
+   separa as duas regras sem tocar na peça. */
+describe('solda no eixo do arranja radial: igualdade EXATA, nunca tolerância', () => {
+  const CONE = { op: 'cone', id: 30 };
+  const passosCone = (pivo: number[]) => [
+    ['cone', { id: 0, raio: 0.5, altura: 1, lados: 4, origemId: 30 }],
+    ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, pivo, origemId: 50, derivaDe: CONE, sel: { origem: CONE } }],
+  ];
+  /* os vértices citados pelas faces que o arranjo criou — as que não existem
+     na peça sem o passo. Nada aqui depende do tamanho do bloco de ids. */
+  const verticesDasCopias = (n: Neutro, puro: Neutro) => {
+    const vs = new Set<number>();
+    for (const [id, f] of n.F.entries() as any) if (!puro.F.has(id)) for (const v of f.vs) vs.add(v);
+    return vs;
+  };
+  /* o ápice do cone: o único vértice do sólido sobre o eixo Y */
+  const apiceDe = (n: Neutro) => {
+    const nos = [...n.V.entries()].filter(([, p]) => Math.hypot(p[0], p[2]) < 1e-6).map(([id]) => id);
+    expect(nos.length, 'o cone precisa ter exatamente um ápice no eixo').toBe(1);
+    return nos[0];
+  };
+
+  it('vértice EXATAMENTE no eixo solda: as cópias reusam o id, sem vértice novo', () => {
+    const puro = montar([passosCone([0, 0, 0])[0]]);
+    const n = montar(passosCone([0, 0, 0]));
+    expect(n.orfaos).toEqual([]);
+    const apice = apiceDe(puro);
+    /* 2 cópias × (todos os vértices MENOS o ápice) */
+    expect(n.V.size).toBe(puro.V.size + (puro.V.size - 1) * 2);
+    expect(verticesDasCopias(n, puro).has(apice), 'as cópias citam o ápice ORIGINAL').toBe(true);
+  });
+
+  it('vértice a 1e-9 do eixo NÃO solda: tolerância mudaria a contagem do arquivo salvo', () => {
+    const pivo = [1e-9, 0, 0];
+    const puro = montar([passosCone(pivo)[0]]);
+    const n = montar(passosCone(pivo));
+    expect(n.orfaos).toEqual([]);
+    const apice = apiceDe(puro);
+    /* o ápice está a 1e-9 do eixo do arranjo: fora dele, por pouco. Toda cópia
+       ganha vértice novo — 2 cópias × TODOS os vértices. */
+    expect(n.V.size).toBe(puro.V.size * 3);
+    const nasCopias = verticesDasCopias(n, puro);
+    expect(nasCopias.has(apice), 'nenhuma cópia pode reusar o ápice: ele se moveu').toBe(false);
+    /* e ele realmente se moveu: a 120° de um pivô a 1e-9, o deslocamento é da
+       ordem de 1e-9 — pequeno, real, e o que a tolerância apagaria. */
+    const p0 = n.V.get(apice) as number[];
+    const copias = [...nasCopias].filter((v) => Math.abs((n.V.get(v) as number[])[1] - p0[1]) < 1e-12);
+    expect(copias.length, 'duas cópias do ápice').toBe(2);
+    for (const v of copias) {
+      const q = n.V.get(v) as number[];
+      const d = Math.hypot(q[0] - p0[0], q[2] - p0[2]);
+      expect(d).toBeGreaterThan(0);
+      expect(d).toBeLessThan(1e-8);
+    }
+  });
+});
