@@ -21,38 +21,6 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
-### A-17 — repetição radial vira coordenada em massa
-
-**Onde dói:** linguagem da Oficina.
-
-**Evidência:** a variante
-`prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` precisava
-declarar dez braços em cinco pares ao redor do eixo X. Como não existe
-repetição radial nem trigonometria na gramática de parâmetros, a peça gerou cem
-parâmetros de coordenadas (`10 braços × 5 raios × Y/Z`) e terminou com 141
-parâmetros. A malha passou nos gates, mas a intenção “cinco pares radiais” ficou
-escondida em expansão JavaScript e outro agente precisa reconstruí-la antes de
-refinar abertura ou quantidade.
-
-**Contorno:** calcular as coordenadas no módulo da peça e expandir dez passos
-`loft`, preservando `origemId` individual em cada braço. É determinístico e
-evita id cru, mas mistura um arranjo geométrico geral com a definição do objeto.
-
-**Capacidade candidata:** `repetirRadial` e `repetirLinear` declarativos, com
-eixo, quantidade, ângulo inicial, espaçamento e identidade semântica derivada por
-instância. O contrato deve permitir endereçar a coleção e cada cópia sem depender
-do índice do passo. É o O-13 de
-[`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) e serve igualmente para
-pétalas, colunas, pás, dentes ou elementos abstratos.
-
-**Confirmação fora do vocabulário mecânico:** as quatro paredes de
-`prototipos/fps/v3/pecas/_jardineira.js` são quatro passos `chamferBox` +
-`transladar` copiados, com quatro posições derivadas escritas uma a uma
-(`paredeFrenteZ`, `paredeTrasZ`, `paredeDireitaX`, `paredeEsquerdaX`). A
-intenção — "uma caixa de quatro paredes" — não está escrita em lugar nenhum. É
-o mesmo A-17 dos braços da roda, num objeto que não tem eixo nem cubo: a
-repetição linear dói igual em marcenaria.
-
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
 **Onde dói:** conferência headless da bancada.
@@ -642,6 +610,87 @@ destruía o contexto foi removido.
 - **Nenhum id de vértice ou face.** Não contei vértice na mão em momento algum.
 
 ## Atritos resolvidos
+
+### A-17 — repetição radial vira coordenada em massa
+
+**Onde dói:** linguagem da Oficina.
+
+**Evidência:** a variante
+`prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` precisava
+declarar dez braços em cinco pares ao redor do eixo X. Como não existe
+repetição radial nem trigonometria na gramática de parâmetros, a peça gerou cem
+parâmetros de coordenadas (`10 braços × 5 raios × Y/Z`) e terminou com 141
+parâmetros. A malha passou nos gates, mas a intenção “cinco pares radiais” ficou
+escondida em expansão JavaScript e outro agente precisa reconstruí-la antes de
+refinar abertura ou quantidade.
+
+**Contorno:** calcular as coordenadas no módulo da peça e expandir dez passos
+`loft`, preservando `origemId` individual em cada braço. É determinístico e
+evita id cru, mas mistura um arranjo geométrico geral com a definição do objeto.
+
+**Capacidade candidata:** `repetirRadial` e `repetirLinear` declarativos, com
+eixo, quantidade, ângulo inicial, espaçamento e identidade semântica derivada por
+instância. O contrato deve permitir endereçar a coleção e cada cópia sem depender
+do índice do passo. É o O-13 de
+[`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) e serve igualmente para
+pétalas, colunas, pás, dentes ou elementos abstratos.
+
+**Confirmação fora do vocabulário mecânico:** as quatro paredes de
+`prototipos/fps/v3/pecas/_jardineira.js` são quatro passos `chamferBox` +
+`transladar` copiados, com quatro posições derivadas escritas uma a uma
+(`paredeFrenteZ`, `paredeTrasZ`, `paredeDireitaX`, `paredeEsquerdaX`). A
+intenção — "uma caixa de quatro paredes" — não está escrita em lugar nenhum. É
+o mesmo A-17 dos braços da roda, num objeto que não tem eixo nem cubo: a
+repetição linear dói igual em marcenaria.
+
+**Correção (ciclo "Arranjos semânticos v1", O-13):** entrou a op `arranja`, nos
+modos `radial` e `linear`. Ela é sempre estrutural — `origemId`, `derivaDe` e
+`sel:{origem:...}` são obrigatórios —, então cópia anônima não é possível por
+construção. A saída publica a origem `{op:'arranja', id, de}` com o eixo `copia`,
+que aceita as mesmas formas dos outros eixos: ausente (a coleção inteira),
+inteiro, nome de parâmetro, `'primeira'`/`'ultima'` ou filtro `{passo,fase}`.
+Nenhuma dessas citações depende de id de face nem da posição do passo, e a prova
+disso é um caso que insere um passo antes do arranjo e cobra a mesma cópia.
+
+A contagem é `total`, contando a fonte — "cinco braços" é `total:5` —, porque
+contar cópias obrigaria a escrever 5 para dizer seis, que é a mesma aritmética
+escondida que o item veio matar. O ângulo da cópia `k` é `(k+1)·passo`, derivado
+da contagem e aplicado sempre à posição da fonte; acumular somaria erro de ponto
+flutuante dentro do arquivo salvo, e o teste mede exatamente a diferença entre os
+dois doubles para que a afirmação não passe com as duas implementações.
+
+**O que sobrou dito na cara:** o item foi entregue no NÚCLEO, com prova em teste.
+A roda experimental ainda **não** foi reescrita, então os cem parâmetros de
+coordenada continuam no arquivo dela; o que mudou é que agora existe a operação
+que os dispensa. A ordem em que a coleção resolve as faces é determinística mas
+não tem afirmação, porque nenhum consumidor do núcleo distingue essa ordem hoje —
+está declarado no comentário da op em vez de virar promessa não medida.
+
+### A-23 — a palavra reservada de extremidade engolia um parâmetro homônimo
+
+**Onde doeu:** linguagem da Oficina.
+
+**Evidência:** medido na revisão adversarial do ciclo "Endereços semânticos v1".
+Num `plano` com `seg: 3` e `PARAMS {ultima: 0}`, escrever `faixa: 'ultima'`
+devolvia a última linha da grade, não a linha 0. A palavra reservada ganhava do
+parâmetro do autor sem nenhum diagnóstico. Não era referência inválida, era
+referência que resolvia para OUTRA coisa em silêncio — a classe que o
+`CLAUDE.md` proíbe, e justamente a que o A-19 tinha acabado de fechar do outro
+lado.
+
+**Contorno:** nenhum, porque o autor não tinha como perceber. Nenhuma peça do
+repositório declara parâmetro com esse nome, então o defeito estava latente.
+
+**Correção (ciclo "Arranjos semânticos v1"):** a palavra continua reservada — ela
+ganha —, mas a COLISÃO grita, com a causa nomeada e o conserto dito ("renomeie o
+parâmetro"). Sem colisão nada muda: os dois caminhos seguem como estavam, e o
+gabarito das 22 peças ficou byte-idêntico. A prova cobre `PARAM` e `TOPO` (os
+dois entram no mesmo dicionário) e mais de um eixo, para a regra não valer só na
+`faixa` do `plano`.
+
+**Lição geral:** vocabulário fechado é decisão legítima; precedência silenciosa
+sobre o dicionário do autor não é. Quem reserva palavra precisa gritar na
+colisão, não vencer calado.
 
 ### A-18 — três geradores só sabiam citar a primitiva inteira
 

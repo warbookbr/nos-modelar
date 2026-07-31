@@ -13,12 +13,18 @@ herdado e não comandam a Mecanifica.
 pagou a dívida medida no fechamento do ciclo 2 (A-18, A-19, A-20 e A-22) e não
 inventou capacidade nova.
 
+**Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO no núcleo em 31 de julho de
+2026.** Entregou a op `arranja` (radial e linear) e pagou a dívida A-23 do ciclo
+anterior. O que ele **não** fez está dito no fechamento abaixo, sem eufemismo: a
+roda experimental não foi reescrita, então os cem parâmetros de coordenada
+continuam no arquivo dela.
+
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- **nenhum ciclo técnico está em execução.** O próximo candidato é o ciclo 3
-  ("Arranjos semânticos v1", O-13), que ainda **não** foi aberto: abrir exige
-  escopo incluído, escopo excluído e gate objetivo escritos antes da primeira
-  linha de código.
+- **nenhum ciclo técnico está em execução.** O ciclo 3 ("Arranjos semânticos
+  v1", O-13) foi aberto e fechado em 31 de julho de 2026, no núcleo; o próximo
+  candidato é o ciclo 4 ("Realismo geométrico v1"), que ainda **não** foi
+  aberto.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -367,23 +373,65 @@ tocado — a Oficina segue sem saber EMITIR referência semântica. `adaptarThre
 continua sem expor portas, por decisão declarada. `inflate` continua no contrato
 mínimo, por decisão medida.
 
-### Candidato a ciclo 3 — ainda não aberto
+### Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO no núcleo (31/07/2026)
 
-É ele o próximo, agora que a dívida do ciclo 2 está paga. Continua **fechado**:
-abrir exige escopo incluído, escopo excluído e gate objetivo escritos antes da
-primeira linha de código, e nada de O-13 foi implementado.
+**Incluiu:** O-13 (repetição radial e linear com identidade estável por
+instância e diagnóstico de referência inválida ou ambígua) e a dívida A-23 do
+ciclo anterior (palavra reservada de extremidade engolindo parâmetro homônimo).
 
-**Nome:** Arranjos semânticos v1.
-
-**Inclui somente:** O-13, com repetição radial e linear, identidade estável por
-instância e diagnóstico de referência inválida ou ambígua.
-
-**Exclui:** curvas, cortes, filetes, auto polimento, alterações de material,
+**Excluiu:** curvas, cortes, filetes, auto polimento, alterações de material,
 relações de montagem, novas peças de produto e automação de crítica visual.
 
-**Gate proposto:** a roda experimental perde os cem parâmetros de coordenadas
-dos braços; cada cópia continua isolável por identidade; uma composição não
-automotiva prova o mesmo contrato; nenhum id runtime entra no arquivo salvo.
+**O que ficou de pé:**
+
+- a op `arranja`, nos modos `radial` e `linear`. Sempre estrutural: sem
+  `origemId`, `derivaDe` e `sel:{origem:...}` o passo é recusado, então cópia
+  anônima não é possível por construção;
+- a origem `{op:'arranja', id, de}` com o eixo `copia`, que endereça a coleção
+  inteira, uma cópia por índice, por nome de parâmetro, por `'primeira'`/
+  `'ultima'` ou por filtro `{passo,fase}` — nenhuma citação depende de id de
+  face nem da posição do passo, e há um caso que insere um passo antes do
+  arranjo e cobra a mesma cópia;
+- determinismo declarado e medido: o ângulo da cópia `k` é `(k+1)·passo`,
+  derivado da contagem e aplicado sempre à posição da fonte. O teste compara os
+  dois doubles (derivado e acumulado) e prova que são diferentes, senão a
+  afirmação passaria com as duas implementações;
+- ambiguidade grita, nunca escolhe: `volta` e `graus` juntos ou nenhum dos dois,
+  `total < 2`, `d` nulo, campo do outro modo, e cópia que cai a múltiplo exato
+  de 360° da fonte. Cada recusa é conferida contra o neutro puro — meia coleção
+  endereçável nunca existe;
+- A-23: a palavra reservada continua ganhando, mas a colisão com um `PARAM`/
+  `TOPO` homônimo grita, com a causa nomeada e o conserto dito.
+
+**Gate, condição por condição:**
+
+| condição | resultado |
+|---|---|
+| repetição radial e linear existem no núcleo | `arranja`, 28 ops implementadas |
+| cada cópia continua isolável por identidade | casos de coleção, índice, PARAM, extremidade e progressão, todos por `sel:{alias}`/`sel:{porta}` |
+| nenhum id runtime entra no arquivo salvo | `npm run id-cru:check` verde, `arranja` recusa `faces`/`sel:{f}`/alias/região |
+| peças existentes intactas | `npm run gabarito:selecao:check` — 22 peças byte-idênticas |
+| verificação completa | `npm test` (540), `typecheck`, `build`, `gabarito:selecao:check`, `id-cru:check`, `guarda:salvar`, `mapa`/`mapa:check`, `docs:links:check`, `docs:toc:check` |
+
+**Teste de mutação, o que ele achou.** Dez mutações no que a rodada acabou de
+escrever. Nove morreram (ângulo acumulado 1 caso; índice de cópia deslocado 4;
+`total` contando cópias 13; origem não registrada 6; colisão de palavra
+reservada silenciosa 2; weld desligado 2; `volta`+`graus` escolhendo em vez de
+gritar 1; pivô default virando outro ponto 5). **Uma sobreviveu:** reverter os
+cantos de toda cópia — a mão da face, que é formato salvo — deixava os 356 casos
+verdes. O buraco foi fechado com afirmação de normal de Newell nos dois modos, em
+commit próprio. Uma décima mutação (inverter a ordem em que a coleção resolve)
+também sobreviveu e **não** virou teste: nenhum consumidor do núcleo distingue
+essa ordem hoje, então ela ficou declarada no comentário da op como construção
+determinística, não como promessa medida.
+
+**O que este ciclo NÃO fechou, dito na cara:** a roda experimental **não** foi
+reescrita — os cem parâmetros de coordenada continuam no arquivo dela, e o que
+mudou é que agora existe a operação que os dispensa. Nenhuma peça de produto
+usa `arranja` ainda, então o contrato foi provado em teste e não em peça: o
+prisioneiro de roda e a aleta de ventilação continuam não modelados. As duas
+outras dívidas menores herdadas do ciclo anterior não foram tocadas. A-15 segue
+aberto.
 
 ### Candidato a ciclo 4 — ainda não aberto
 

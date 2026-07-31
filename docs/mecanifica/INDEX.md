@@ -44,8 +44,14 @@ Estado atual:
   geradores com numeração fechada citam o eixo que já tinham, o eixo aceita
   parâmetro e as palavras `'primeira'`/`'ultima'`, o núcleo devolve as portas
   publicadas e a régua as mostra;
-- **nenhum ciclo está em execução.** O ciclo 3 ("Arranjos semânticos v1", O-13)
-  é o próximo candidato e ainda não foi aberto;
+- o ciclo "Arranjos semânticos v1" (ciclo 3, O-13) está **concluído no núcleo**
+  desde 31 de julho de 2026: entrou a op `arranja`, nos modos radial e linear,
+  sempre estrutural, com cada cópia endereçável por identidade. A dívida A-23
+  (palavra reservada de extremidade engolindo parâmetro homônimo) foi paga
+  junto. A roda experimental **não** foi reescrita e nenhuma peça usa a op
+  ainda;
+- **nenhum ciclo está em execução.** O próximo candidato é "Realismo geométrico
+  v1" e ainda não foi aberto;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
@@ -239,10 +245,15 @@ verificação daquele fechamento tinha medido (A-18, A-19, A-20 e A-22). A
 conferência dos dois gates, condição por condição, e a lista de comandos da
 verificação completa estão em [`PLANO.md`](PLANO.md).
 
-**Próxima entrega: nenhuma em execução.** O candidato seguinte é “Arranjos
-semânticos v1” (O-13), que precisa ser **aberto** no `PLANO.md` — com escopo
-incluído, escopo excluído e gate objetivo — antes de qualquer implementação.
-“Realismo geométrico v1” vem depois, usando o protocolo de
+O ciclo 3, “Arranjos semânticos v1”, fechou no núcleo em 31 de julho de 2026:
+`arranja` radial e linear, cada cópia endereçável por identidade, e a dívida
+A-23 paga junto. Ele não reescreveu a roda experimental nem levou a op a
+nenhuma peça de produto.
+
+**Próxima entrega: nenhuma em execução.** O candidato seguinte é
+“Realismo geométrico v1”, que precisa ser **aberto** no `PLANO.md` — com escopo
+incluído, escopo excluído e gate objetivo — antes de qualquer implementação,
+usando o protocolo de
 [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) para escolher
 no máximo duas capacidades justificadas pela roda.
 

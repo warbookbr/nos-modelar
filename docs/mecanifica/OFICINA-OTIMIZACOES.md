@@ -21,8 +21,9 @@ não formam uma execução aberta.
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
 mas não autoriza trabalhar automaticamente até R9. O
 [`PLANO.md`](PLANO.md) abre um ciclo finito por vez. **Nenhum ciclo está ativo**
-desde o fechamento da Fundação de autoria v1; a próxima candidata é a R6 (O-13),
-que só começa quando o `PLANO.md` abrir o ciclo "Arranjos semânticos v1".
+desde o fechamento de "Arranjos semânticos v1" (R6/O-13, 31 de julho de 2026); a
+próxima candidata é a R5 (O-7) ou a R7 (O-8), e nenhuma começa antes de o
+`PLANO.md` abrir o ciclo.
 
 O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
 A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
@@ -81,7 +82,7 @@ Nenhum atrito de autoria fica sem plano:
 | A-6 `encostar` não existe | O-8 | A-11 partes planas | O-10 |
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
-| A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
+| A-17 repetição radial manual | O-13 (**entregue**) | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
 | A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **entregue** |
 | A-22 guarda e gate discordam sobre `de` | sem item — **entregue** | | |
 
@@ -556,6 +557,15 @@ na identidade. **Por isso O-13 vem depois de O-6 e O-12**, não antes.
 
 **Custo:** médio-alto.
 
+**Estado: ENTREGUE no núcleo** em 31 de julho de 2026, no ciclo "Arranjos
+semânticos v1". A op chama-se `arranja` (`modo:'radial'|'linear'`), e o risco do
+trade-off acima foi fechado por construção, não por disciplina: sem `origemId`,
+`derivaDe` e `sel:{origem:...}` o passo é recusado. O que continua devendo é o
+uso: nenhuma peça do repositório usa a op ainda, então o prisioneiro de roda e a
+aleta de ventilação seguem não modelados, e os cem parâmetros de coordenada
+continuam no arquivo da roda experimental. Ver A-17 e A-23 em
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+
 ### O-9 — parâmetro de tipo ponto e caminho
 
 **O que muda:** só se nomeia escalar. 18 dos 61 parâmetros do freio existem para
@@ -595,7 +605,7 @@ próprio e independente: se uma parar, as anteriores continuam de pé.
 | R4 | concluída em 31/07/2026 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox` (3+3 `chamferBox`), freio com 8 partes, 300 faces, 0 sem identidade, 0 órfão; `_jardineira` confirma o contrato fora do vocabulário automotivo (6 partes, 351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; verificação completa verde, incluindo `npm run guarda:salvar`, `npm run descrever` em todas as peças e quatro enquadramentos lidos na bancada |
 | R4b | concluída em 31/07/2026 | extensões de O-6 e O-12 (A-18, A-19, A-20, A-22) | sim | `cone`, `plano` e `chamferBox` citam o eixo que já tinham e o eixo passa a aceitar parâmetro e `'primeira'`/`'ultima'`; `nucleo()` devolve `portas` e a régua/bancada as mostram; a regra de referência posicional vira um módulo só. Prova em peça: `_jardineira` publica as três portas que faltavam, desfaz a meia-volta que existia só para contornar o eixo literal, e o teste dela troca 15 leituras de material por citação direta de `sel:{porta}` (22 casos). Único hash regravado: `_jardineira` |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
-| R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
+| R6 | concluída em 31/07/2026 (no núcleo) | O-13 + A-23 | sim | a op `arranja` (radial e linear) é sempre estrutural, então cópia anônima não existe; a origem `{op:'arranja',id,de}` tem o eixo `copia` e endereça a coleção, um índice, um PARAM, `'primeira'`/`'ultima'` e `{passo,fase}`; ângulo derivado da contagem, com o teste medindo a diferença entre o double derivado e o acumulado; 10 mutações rodadas, 9 mortas, a sobrevivente (mão da face revertida) virou teste em commit próprio. **A roda experimental NÃO foi reescrita** — os cem parâmetros continuam no arquivo dela; o contrato foi provado em teste, não em peça |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
 | R8 | backlog | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
 | R9 | backlog | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |
