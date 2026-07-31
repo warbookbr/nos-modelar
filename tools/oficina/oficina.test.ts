@@ -4971,6 +4971,62 @@ describe('furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F', (
     });
   }
 
+  /* A revisão adversarial do ciclo mediu: a op valida a face de ENTRADA e a de
+     SAÍDA com as MESMAS regras, e só a entrada tinha afirmação. Desligar a
+     guarda de encaixe do anel na saída sobrevivia à suíte inteira — 646 de 646
+     verdes — e um furo cujo anel vaza pela saída construía as faces com o anel
+     atravessando o contorno, sem diagnóstico nenhum. Corte silencioso é
+     exatamente o que esta op existe para impedir.
+
+     Os treze casos da tabela acima citam entrada ou modo; os dois de anel usam
+     o modo CEGO, que nem chega no ramo da saída. Estes três fecham o outro lado.
+     A placa fina embaixo é o que torna as duas faces diferentes: numa caixa, a
+     saída é congruente com a entrada e o anel que cabe numa cabe na outra. */
+  const COM_TARUGO = (furo: any) => [
+    ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+    ['cubo', { larg: 0.6, alt: 1, prof: 0.6, origemId: 2 }],
+    ['transladar', { d: [0, -1, 0], sel: { origem: { op: 'cubo', id: 2 } } }],
+    ['furo', {
+      origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' },
+      saida: { op: 'cubo', id: 2, face: 'fundo' }, centro: [0, 0, 0], lados: 6, ...furo,
+    }],
+  ];
+
+  it('o anel que cabe na ENTRADA e não na SAÍDA grita, e não corta nada', () => {
+    /* raio 0.2 cabe nas duas faces; 0.5 cabe na placa de 4 e vaza no tarugo de
+       0.6. É a mesma peça, e a diferença é só o raio. */
+    const passa = nucleo(COM_TARUGO({ raio: 0.2 }) as any, {}, {});
+    expect(passa.orfaos).toEqual([]);
+
+    const vaza = nucleo(COM_TARUGO({ raio: 0.5 }) as any, {}, {});
+    expect(vaza.orfaos.some((o: any) => /não cabe dentro da face de saída/.test(o.motivo))).toBe(true);
+    /* aborta inteiro: a entrada continua íntegra e nenhuma face nova nasce */
+    expect([...vaza.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+    expect(vaza.F.has(1)).toBe(true);
+  });
+
+  it('o anel DESLOCADO que vaza pela borda da SAÍDA também grita', () => {
+    /* outra causa, mesma guarda: aqui o raio caberia, mas o centro fora do eixo
+       joga o anel para fora do tarugo. Uma guarda que só olhasse o raio passaria
+       neste caso. Em `centro: [0.11]` ainda cabe; em `[0.15]` sobra −0,023. */
+    const n = nucleo(COM_TARUGO({ raio: 0.2, centro: [0.15, 0, 0] }) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /não cabe dentro da face de saída/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+  });
+
+  it('saída NÃO-PLANA grita, com a mesma severidade da entrada não-plana', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 0, d: [0, -0.4, 0] }],          // torce um canto do fundo
+      ['furo', {
+        origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' },
+        saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6,
+      }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /saída: .*não é plana/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+  });
+
   it('saída ATRÁS da entrada ao longo do eixo grita — o furo sairia antes de entrar', () => {
     // a normal da saída atravessa (é -y, como o eixo), mas a face está ACIMA da
     // entrada: sem o teste de distância, o furo se estenderia para trás.
