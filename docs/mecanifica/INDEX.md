@@ -37,15 +37,17 @@ Estado atual:
   semânticas, com as três condições do gate verificadas item por item;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
-  usa os cinco geradores novos e cinco portas semânticas (quatro sobrevivem a transformação), com 0 face sem
+  usa os cinco geradores novos e **oito** portas semânticas, com 0 face sem
   identidade e 0 órfão, e mediu onde o contrato ainda para (A-18 a A-20);
+- o ciclo "Endereços semânticos v1" está **concluído** desde 31 de julho de
+  2026: A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real. Os
+  geradores com numeração fechada citam o eixo que já tinham, o eixo aceita
+  parâmetro e as palavras `'primeira'`/`'ultima'`, o núcleo devolve as portas
+  publicadas e a régua as mostra;
 - **nenhum ciclo está em execução.** O ciclo 3 ("Arranjos semânticos v1", O-13)
   é o próximo candidato e ainda não foi aberto;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
-  Oficina continua sem saber emitir referência semântica. O A-22, que a
-  verificação de fechamento achou, foi resolvido no ciclo Endereços semânticos
-  v1: a regra do id posicional é uma só, e a Oficina voltou a aceitar peça com
-  porta semântica;
+  Oficina continua sem saber emitir referência semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -231,9 +233,11 @@ simplificada, galpão mínimo, registro semântico, modos
 carro/contexto/isolar, seleção por parte e explosão autoral do freio. A roda
 experimental permanece somente como evidência de autoria.
 
-O ciclo 2, “Fundação de autoria v1”, fechou em 31 de julho de 2026. A
-conferência do gate, condição por condição, e a lista de comandos da verificação
-completa estão em [`PLANO.md`](PLANO.md).
+O ciclo 2, “Fundação de autoria v1”, fechou em 31 de julho de 2026. O ciclo 2b,
+“Endereços semânticos v1”, fechou no mesmo dia e pagou a dívida que a
+verificação daquele fechamento tinha medido (A-18, A-19, A-20 e A-22). A
+conferência dos dois gates, condição por condição, e a lista de comandos da
+verificação completa estão em [`PLANO.md`](PLANO.md).
 
 **Próxima entrega: nenhuma em execução.** O candidato seguinte é “Arranjos
 semânticos v1” (O-13), que precisa ser **aberto** no `PLANO.md` — com escopo

@@ -9,6 +9,10 @@ herdado e não comandam a Mecanifica.
 
 **Ciclo 2 — Fundação de autoria v1: CONCLUÍDO em 31 de julho de 2026.**
 
+**Ciclo 2b — Endereços semânticos v1: CONCLUÍDO em 31 de julho de 2026.** Ele
+pagou a dívida medida no fechamento do ciclo 2 (A-18, A-19, A-20 e A-22) e não
+inventou capacidade nova.
+
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
 - **nenhum ciclo técnico está em execução.** O próximo candidato é o ciclo 3
@@ -210,12 +214,13 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-**Nenhuma linha está em execução.** A linha 1 fechou; as demais são candidatas
+**Nenhuma linha está em execução.** As linhas 1 e 1b fecharam; as demais são candidatas
 ordenadas, não autorização para começar ou agrupá-las num ciclo.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
 | 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
+| 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
 | 2 | próxima candidata, **não aberta** | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
 | 3 | candidata posterior | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
 | 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
@@ -323,7 +328,50 @@ pendência deste ciclo; quem abrir o próximo decide a ordem.
 O-13 recebe um ciclo próprio somente depois desse gate. Essa separação é a
 garantia de que o próximo plano também termina.
 
+### Ciclo 2b — Endereços semânticos v1 — CONCLUÍDO em 31 de julho de 2026
+
+**Nome:** Endereços semânticos v1. Ele corrigiu dívida do ciclo anterior; não
+inventou capacidade nova.
+
+**Incluiu somente:** A-18, A-19, A-20 e A-22. A-20 e A-22 entraram declarados,
+não em silêncio: A-20 é o mecanismo que permite PROVAR o A-18 de forma direta, e
+A-22 era a mesma regra copiada em três lugares que este ciclo ia mexer.
+
+**Excluiu:** O-13 (arranjos), O-7, relações de montagem, hierarquia de partes,
+realismo e peças de produto novas. Nada disso foi tocado.
+
+**Gate de encerramento, condição por condição.** As quatro estão ATENDIDAS:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | A-18: os geradores com numeração fechada citam o eixo que já têm | **ATENDIDO** | `cone` reusa a estrutura do `cilindro` (`lado` + `tampa:'fundo'`), `chamferBox` a do `cubo` mais `aresta` (12) e `canto` (8), `plano` a grade `faixa`×`lado` do `loft` — sem vocabulário novo. `inflate` fica no contrato mínimo por decisão medida, escrita no código. **Provado na peça:** `_jardineira` publica `bordaDaFrenteDaSoleira` (`chamferBox:400 aresta 3`), `faixaDaFrenteDaTerra` (`plano:402 faixa 'ultima'`) e `assentoDoBotao` (`cone:405 tampa 'fundo'`), cada nome dizendo o que alcança de verdade |
+| 2 | A-19: o eixo acompanha a contagem, e a peça deixa de ser remodelada em volta da limitação | **ATENDIDO** | o eixo aceita nome de PARAM/TOPO, expressão `=…` e as palavras `'primeira'`/`'ultima'`, resolvidas contra a contagem real. A distorção foi DESFEITA: `coloDoBulbo` diz `faixa: 'ultima'`, e o `rotaciona` de meia-volta e o parâmetro `bulboMeiaVolta` saíram. Dois casos do teste remontam a peça com outro `TOPO` e medem que colo e faixa continuam onde o nome promete |
+| 3 | A-20: uma porta publicada é visível fora do núcleo, e o teste para de falar por procuração | **ATENDIDO** | `nucleo()` devolve `portas`; `src/autoria/descrever-partes.js` as mede para `npm run descrever` (`portas: 8`) e para a bancada. `tools/mecanifica/jardineira-integridade.test.ts`: 15 leituras de `f.material` como procuração viraram **0** — ele lê `neutro.portas` e cita `sel:{porta}` num passo de sonda próprio, 22 casos |
+| 4 | A-22: a regra de referência posicional vive num lugar só | **ATENDIDO** | `prototipos/fps/v3/motor/referencia-posicional.js`, importado pela Oficina, pelo gate `id-cru` e pelo harness. `npm run guarda:salvar` abre `_jardineira` na Oficina real, vê 8 `publicarPorta` e SALVA; a mesma peça com uma edição posicional de verdade continua recusada |
+
+**Aditividade:** `gabarito:selecao:check` verde com **uma** peça regravada —
+`_jardineira`, reescrita de propósito para provar a capacidade. As outras 21
+seguem byte-idênticas.
+
+**Verificação executada no fechamento:** `npm test` (502 casos, 18 arquivos),
+`npm run typecheck`, `npm run build`, `npm run gabarito:selecao:check`,
+`npm run id-cru:check`, `npm run guarda:salvar`, `npm run mapa` +
+`npm run mapa:check`, `npm run docs:links:check`, `npm run docs:toc:check`,
+`npm run descrever -- _jardineira --estrito` (6 partes, 351 faces, 350 vértices,
+0 face sem identidade, 0 órfão, 8 portas) e quatro enquadramentos lidos na
+bancada, incluindo o recorte `bulbo`+`caule` isolado, onde se vê o colo pálido
+no topo do bulbo entregando o caule.
+
+**O que este ciclo NÃO fechou, dito na cara:** A-15 continua aberto e não foi
+tocado — a Oficina segue sem saber EMITIR referência semântica. `adaptarThree`
+continua sem expor portas, por decisão declarada. `inflate` continua no contrato
+mínimo, por decisão medida.
+
 ### Candidato a ciclo 3 — ainda não aberto
+
+É ele o próximo, agora que a dívida do ciclo 2 está paga. Continua **fechado**:
+abrir exige escopo incluído, escopo excluído e gate objetivo escritos antes da
+primeira linha de código, e nada de O-13 foi implementado.
 
 **Nome:** Arranjos semânticos v1.
 

@@ -674,9 +674,24 @@ a topologia já tinha, reusando as fábricas de contrato que já existiam em
 DECISÃO medida — a malha dele sai de um scan de voxels, sem fórmula fechada de
 face. Publicar grade ali seria prometer região e entregar ordem de varredura.
 
+**Prova na peça, não só no núcleo (mesmo ciclo).** `_jardineira` foi reescrita e
+publica as três portas que ela queria e não conseguia — cada uma com o nome do
+que alcança de verdade:
+
+| porta | origem | o que alcança |
+|---|---|---|
+| `bordaDaFrenteDaSoleira` | `chamferBox:400 aresta 3` | UMA das 12 arestas do chanfro, a que fica entre `topo` e `frente`; o teste mede que ela corre a largura da soleira menos um chanfro em cada ponta |
+| `faixaDaFrenteDaTerra` | `plano:402 faixa 'ultima'` | a última LINHA em z da grade, a tira de terra encostada na parede da frente |
+| `assentoDoBotao` | `cone:405 tampa 'fundo'` | a tampa da base do cone. NÃO é "a boca da flor": o ápice é vértice, não face, e o teste trava que o assento cai exatamente sobre a `coroaDoCaule` |
+
+Nenhum nome promete região que o contrato não alcance. `aresta 3` é literal de
+propósito: a topologia do `chamferBox` é FIXA (26 faces, sem nenhum `TOPO`),
+então o índice não envelhece como envelhecia o `faixa: 0` do bulbo — o caso do
+A-19. A peça mudou de hash de propósito e o gabarito foi regravado só para ela.
+
 **Aditividade:** `{op,id}` sem eixo continua devolvendo a primitiva inteira nos
-três, e `gabarito:selecao:check` fica verde sem regravar (22 peças
-byte-idênticas). Por isso o `cone` responde a `{}` diferente do `cilindro`
+três, e `gabarito:selecao:check` ficou verde sem regravar quando a mudança foi
+só de núcleo (22 peças byte-idênticas). Por isso o `cone` responde a `{}` diferente do `cilindro`
 (que devolve só as laterais): trocar o padrão faria toda citação de cone já
 escrita apontar para outro conjunto sem diagnóstico nenhum — o erro que o A-19
 condena. Aditividade manda mais que simetria, e a divergência está dita no
@@ -709,6 +724,17 @@ esfera e plano; `lado` de cilindro e cone; `aresta`/`canto` de chamferBox. As
 duas palavras são RESERVADAS: um PARAM chamado `ultima` não é alcançável por um
 eixo. Valor fora do contrato GRITA com a causa nomeada (não resolve / não é
 índice / fora do limite) e não seleciona nada pela metade.
+
+**A distorção foi DESFEITA (mesmo ciclo).** Não bastava a capacidade existir: a
+peça continuava remodelada em volta da limitação. `coloDoBulbo` agora diz
+`faixa: 'ultima'` — o leque do polo NORTE, que é o que a intenção sempre foi —,
+e sumiram o `rotaciona` de meia-volta e o parâmetro `bulboMeiaVolta`, que
+existiam só para pôr a `faixa: 0` para cima. A forma final do bulbo não mudou; o
+que mudou é que a peça descreve a intenção em vez do contorno. Dois casos de
+`tools/mecanifica/jardineira-integridade.test.ts` montam a peça com outro `TOPO`
+(`bulboAneis` 5, `bulboLados` 16, `terraSeg` 6) e medem que o colo continua
+sendo o polo de cima e a `faixaDaFrenteDaTerra` continua sendo a linha da
+frente — é a contagem real resolvendo a palavra, não coincidência.
 
 ### A-21 — o gate de id cru reprovava a capacidade que a rodada acabara de shipar
 
@@ -781,9 +807,21 @@ mentir sobre os passos anteriores. O vocabulário é o dos contratos que já
 existem (`cubo`, `cilindro`, `tampa`) — nome publicado vira formato salvo, e
 nome que promete região e entrega primitiva é pior que nome nenhum.
 
-Medido: `npm run descrever -- _jardineira` imprime `portas: 5` e as cinco linhas,
-com o passo que publicou cada uma. Conferido no navegador em dois
+Medido: `npm run descrever -- _jardineira` imprime `portas: 8` e as oito linhas,
+com o passo que publicou cada uma (eram cinco quando o A-20 foi consertado; as
+outras três nasceram do A-18, no mesmo ciclo). Conferido no navegador em dois
 enquadramentos, e numa peça sem porta (`freio-disco`), onde o bloco não aparece.
+
+**A prova indireta acabou (mesmo ciclo).** O teste da fixture tinha 15 leituras
+de `f.material` como procuração de porta; agora tem 0. Ele afirma sobre porta de
+duas formas diretas: lê `neutro.portas` para checar o que a peça DECLARA (nome,
+origem clonada e o passo que publicou cada uma) e monta a peça com um passo de
+SONDA no fim da lista — `['material', {sel:{porta}}]` — para medir o que a porta
+ALCANÇA depois de todas as transformações. A citação passou a ser do teste, não
+uma marca deixada na peça. Consequência colhida: os materiais que sobraram na
+`_jardineira` foram conferidos um a um e nenhum é marcação — cada um é uma
+citação com função de autoria, e três portas ficam publicadas sem citação
+nenhuma, porque material inventado só para o teste ler de volta não é autoria.
 
 **Continua fora:** `adaptarThree` não expõe portas. Ele converte geometria para
 cena, e porta é contrato de autoria; quem precisa de porta lê o neutro. Se um dia

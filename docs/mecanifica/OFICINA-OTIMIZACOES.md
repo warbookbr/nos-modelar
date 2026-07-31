@@ -12,7 +12,8 @@ divisão de trabalho entre os documentos é:
 
 ## Estado executivo
 
-**Estado em 31 de julho de 2026:** R1, R2, R3 e **R4** estão concluídas. A R4
+**Estado em 31 de julho de 2026:** R1, R2, R3, **R4** e **R4b** (o ciclo
+Endereços semânticos v1) estão concluídas. A R4
 fechou junto com a Fundação de autoria v1, com as três condições do gate do
 [`PLANO.md`](PLANO.md) verificadas item por item. R5 a R9 continuam backlog e
 não formam uma execução aberta.
@@ -26,7 +27,8 @@ que só começa quando o `PLANO.md` abrir o ciclo "Arranjos semânticos v1".
 O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
 A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
 invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de`).
-**Estado depois do ciclo Endereços semânticos v1:** os quatro resolvidos —
+**Estado depois do ciclo Endereços semânticos v1 (concluído em 31 de julho de
+2026):** os quatro resolvidos, cada um com prova em peça real —
 A-18 e A-19 no núcleo; A-20 nas duas metades (`nucleo()` devolve as portas, e a
 régua e a bancada as mostram, pelo módulo neutro `descrever-partes.js`); A-22
 por uma regra só, em `prototipos/fps/v3/motor/referencia-posicional.js`,
@@ -397,6 +399,15 @@ sem eixo já respondia. `inflate` fica no contrato mínimo por decisão medida,
 agora escrita no código. Detalhe em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md),
 A-18 (resolvidos).
 
+**E PROVADO na peça, não só no núcleo.** `_jardineira` foi reescrita para
+publicar as três portas que ela queria e não conseguia:
+`bordaDaFrenteDaSoleira` (`chamferBox:400 aresta 3`, o chanfro entre `topo` e
+`frente`), `faixaDaFrenteDaTerra` (`plano:402 faixa 'ultima'`) e
+`assentoDoBotao` (`cone:405 tampa 'fundo'`). Nenhum nome promete mais do que
+alcança: o assento é a tampa da base, não "a boca da flor" — o ápice do cone é
+vértice, não face. A peça mudou de hash de propósito e regravou o gabarito;
+as outras 21 seguem byte-idênticas.
+
 **Por que:** A-9 é o achado mais incômodo da rodada. A pinça e o suporte são peças
 fundidas e `chamferBox` é literalmente o gerador do assunto; foram escritas com
 `cilindro` e `cubo` porque sem `origem` só sobra caixa de coordenada chutada.
@@ -430,13 +441,14 @@ Fazer separados duplica a decisão de nomenclatura.
 estrutural sob um nome escolhido pelo autor; `sel:{porta}` resolve essa origem
 depois de transformações, sem persistir IDs de runtime.
 
-**Provado fora do vocabulário automotivo:** `_jardineira` publica cinco portas
-ANTES das transformações e cita todas DEPOIS. A relação que o teste trava é a
-prova em uma linha: o vértice comum do `coloDoBulbo` — estruturalmente o leque
-do polo de ORIGEM da esfera, que nasce embaixo e sobe com a meia-volta — cai
-exatamente sobre o centro do `peDoCaule`, e o par `peDoCaule`/`coroaDoCaule`
-continua medindo `cauleComprimento` depois de a haste pender 16°. Nenhuma das
-duas relações sobreviveria a uma porta reresolvida por posição.
+**Provado fora do vocabulário automotivo:** `_jardineira` publica **oito** portas
+(cinco na R4) ANTES das transformações, e todas são resolvidas DEPOIS. As
+relações que o teste trava são a prova em duas linhas: o vértice comum do
+`coloDoBulbo` — o leque do polo norte da esfera — cai exatamente sobre o centro
+do `peDoCaule`; o centro do `assentoDoBotao` cai sobre o centro da
+`coroaDoCaule`; e o par `peDoCaule`/`coroaDoCaule` continua medindo
+`cauleComprimento` depois de a haste pender 16°. Nenhuma delas sobreviveria a
+uma porta reresolvida por posição.
 
 **Três achados da prova**, todos registrados em
 [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), nenhum contornado em silêncio:
@@ -450,12 +462,17 @@ duas relações sobreviveria a uma porta reresolvida por posição.
   único campo dimensional da linguagem que não pode citar parâmetro. `faixa:
   bulboAneis - 1` é impossível, e uma faixa escrita como literal passa a
   apontar para outro lugar quando o `TOPO` muda, sem diagnóstico nenhum.
+  **Resolvido** em Endereços semânticos v1, e a peça foi DESDISTORCIDA: o
+  `coloDoBulbo` diz `faixa: 'ultima'`, e a meia-volta em z que só existia para
+  pôr a `faixa: 0` para cima saiu, junto com o parâmetro `bulboMeiaVolta`.
 - **A-20.** `nucleo()` não devolve `st.portas`: uma porta é invisível para a
   régua, para a bancada e para o adaptador. O teste teve que marcar cada porta
   com um material próprio para poder afirmar sobre ela. **Resolvido nas duas
   metades** em Endereços semânticos v1: `nucleo()` devolve `portas`, e
   `src/autoria/descrever-partes.js` (neutro, sem Three.js) as mede para o
-  `npm run descrever` e para a bancada.
+  `npm run descrever` e para a bancada. O teste da fixture parou de falar por
+  procuração no mesmo ciclo: 15 leituras de `f.material` viraram 0, e ele agora
+  lê `neutro.portas` e cita `sel:{porta}` num passo de sonda próprio.
 
 **Um quarto achado, na verificação de fechamento (A-22).** O conserto do A-21
 desceu para o gate e não para a guarda de salvamento da Oficina: abrir
@@ -566,7 +583,7 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ## Backlog de implementação
 
-Uma rodada por linha. R1 a R4 estão concluídas; as demais só saem do backlog
+Uma rodada por linha. R1 a R4 e a R4b estão concluídas; as demais só saem do backlog
 quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit
 próprio e independente: se uma parar, as anteriores continuam de pé.
 
@@ -576,6 +593,7 @@ próprio e independente: se uma parar, as anteriores continuam de pé.
 | R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
 | R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
 | R4 | concluída em 31/07/2026 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox` (3+3 `chamferBox`), freio com 8 partes, 300 faces, 0 sem identidade, 0 órfão; `_jardineira` confirma o contrato fora do vocabulário automotivo (6 partes, 351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; verificação completa verde, incluindo `npm run guarda:salvar`, `npm run descrever` em todas as peças e quatro enquadramentos lidos na bancada |
+| R4b | concluída em 31/07/2026 | extensões de O-6 e O-12 (A-18, A-19, A-20, A-22) | sim | `cone`, `plano` e `chamferBox` citam o eixo que já tinham e o eixo passa a aceitar parâmetro e `'primeira'`/`'ultima'`; `nucleo()` devolve `portas` e a régua/bancada as mostram; a regra de referência posicional vira um módulo só. Prova em peça: `_jardineira` publica as três portas que faltavam, desfaz a meia-volta que existia só para contornar o eixo literal, e o teste dela troca 15 leituras de material por citação direta de `sel:{porta}` (22 casos). Único hash regravado: `_jardineira` |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
 | R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
