@@ -53,6 +53,30 @@ describe('contarIdCru — cobre TODAS as formas de coleção do núcleo', () => 
     expect(contarIdCru([['mescla', { de: [1, 2, 3], para: 0 }]])).toEqual(uso({ mesclaDe: 3 }));
   });
 
+  /* O-12: `de` passou a ter DOIS contratos. `mescla` lê `de:[ids]` (coleção de
+     vértice); `publicarPorta` lê `de:{op,id,...}` (origem estrutural, irmã de
+     `sel:{origem}`). Contar a segunda reprovava a capacidade que a R4 shipou —
+     achado na primeira peça a usar `publicarPorta`, `_jardineira`, acusada de 5
+     ids posicionais que não existem. O discriminador é a FORMA, e o gate segue
+     op-agnóstico: nem o nome `publicarPorta` nem o nome `mescla` aparecem aqui. */
+  it('de:{op,id} do publicarPorta é ORIGEM ESTRUTURAL, não id cru', () => {
+    expect(contarIdCru([
+      ['publicarPorta', { nome: 'peDoCaule', de: { op: 'cilindro', id: 404, tampa: 'fundo' } }],
+      ['publicarPorta', { nome: 'coloDoBulbo', de: { op: 'esfera', id: 401, faixa: 0 } }],
+      ['publicarPorta', { nome: 'soleira', de: { op: 'chamferBox', id: 400 } }],
+    ])).toEqual(zero);
+    // e a citação da porta também não é id posicional
+    expect(contarIdCru([['material', { sel: { porta: 'peDoCaule' }, usa: 'x' }]])).toEqual(zero);
+    // a forma do mescla continua contando, inclusive misturada na mesma lista
+    expect(contarIdCru([
+      ['publicarPorta', { nome: 'p', de: { op: 'cubo', id: 7 } }],
+      ['mescla', { de: [1, 2], para: 0 }],
+    ])).toEqual(uso({ mesclaDe: 2 }));
+    // objeto SEM o contrato {op,id} não vira isenção: continua id cru malformado
+    expect(contarIdCru([['x', { de: { op: 'cubo' } }]])).toEqual(uso({ mesclaDe: 1 }));
+    expect(contarIdCru([['x', { de: { id: 7 } }]])).toEqual(uso({ mesclaDe: 1 }));
+  });
+
   it('a peça de reprodução do MEDIA-5 inteira mede 13, não 0', () => {
     const u = contarIdCru([
       ['cubo', { lado: 1 }],

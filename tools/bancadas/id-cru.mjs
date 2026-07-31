@@ -16,6 +16,17 @@
  *   pontos:[{f:id}]        pincel modo:'livre'                                 NÃO
  *   de:[ids]               mescla                                              NÃO
  *
+ * `de` tem DOIS contratos desde o O-12, e só um deles é id cru: `mescla` lê
+ * `de:[ids]` (coleção de VÉRTICE, contada acima) e `publicarPorta` lê
+ * `de:{op,id,...}` — ORIGEM ESTRUTURAL, irmã de `sel:{origem}` e de `derivaDe`,
+ * a referência mais semântica que a linguagem tem. Contar a segunda reprovava
+ * justamente a capacidade que a R4 shipou: medido na primeira peça a usar
+ * `publicarPorta` (`_jardineira`), o gate acusou "5 ids posicionais" que não
+ * existem. O discriminador é a FORMA, não o nome da op — o gate continua
+ * op-agnóstico: objeto plano com `op` E `id` é origem; lista, string, número ou
+ * objeto sem esse contrato seguem contando, porque o gate não pode ser mais
+ * permissivo que o núcleo.
+ *
  * As três últimas eram o BURACO que a revisão da R2 achou: o arquivo afirmava
  * cobrir "as três formas de coleção" e deixava passar `pesar {vs}`, o pincel
  * macio e o `de:[ids]` do `mescla` — que é COLEÇÃO, não singular, e estava
@@ -56,8 +67,8 @@
  *
  * NÃO SÃO ID POSICIONAL, e por isso não entram: `id` (a declaração da base do
  * passo, que `confereId` já confere contra a POSIÇÃO), e `origemId`/`derivaDe`/
- * `sel:{origem}` (identidade estável declarada pelo autor — o caminho semântico
- * em pessoa).
+ * `de:{op,id}` (do `publicarPorta`)/`sel:{origem}`/`sel:{porta}` (identidade
+ * estável declarada pelo autor — o caminho semântico em pessoa).
  *
  *   node tools/bancadas/id-cru.mjs           # relata e ENCOLHE a lista herdada (nunca aumenta)
  *   node tools/bancadas/id-cru.mjs --check   # o gate: exit≠0 na primeira divergência
@@ -108,6 +119,10 @@ const contarIds = (x) => (Array.isArray(x) ? Math.max(1, x.length) : 1);
 /* `pontos` carrega o id dentro da entrada (`{f, a, b}`): conta as entradas que
    trazem `f`, que é o que o `pincel` modo livre lê. */
 const contarPontos = (x) => (Array.isArray(x) ? Math.max(1, x.filter((p) => objetoPlano(p) && Object.hasOwn(p, 'f')).length) : 1);
+/* O-12: `de:{op,id,...}` do `publicarPorta` é ORIGEM ESTRUTURAL, não coleção de
+   id — ver o cabeçalho. Contrato mínimo `{op,id}`, o mesmo que `validarOrigem`
+   exige no núcleo; `{}` e `de:'nada'` continuam contando como forma legada. */
+const origemEstrutural = (x) => objetoPlano(x) && Object.hasOwn(x, 'op') && Object.hasOwn(x, 'id');
 
 /* Conta id cru numa lista de PASSOS. Estrutural, não textual: um comentário
    citando `faces:` não conta, e um passo montado por helper conta. Op-agnóstico
@@ -123,7 +138,7 @@ export function contarIdCru(passos) {
     if (Object.hasOwn(a, 'faces')) uso.faces += contarIds(a.faces);
     if (Object.hasOwn(a, 'vs')) uso.vs += contarIds(a.vs);
     if (Object.hasOwn(a, 'pontos')) uso.pontos += contarPontos(a.pontos);
-    if (Object.hasOwn(a, 'de')) uso.mesclaDe += contarIds(a.de);
+    if (Object.hasOwn(a, 'de') && !origemEstrutural(a.de)) uso.mesclaDe += contarIds(a.de);
     const sel = a.sel;
     if (objetoPlano(sel)) {
       if (Object.hasOwn(sel, 'v')) uso.selV += contarIds(sel.v);

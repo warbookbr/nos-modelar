@@ -1,5 +1,5 @@
 {
-  "hashTotal": "f3969e8c8bc4fafefc9e9b777f367b6c91d33d4f1750941556817eb455254336",
+  "hashTotal": "2b0c3cfe181ade507900cbe0507d53d57a8080802d92528cc525f0ac29ffd5a3",
   "pecas": {
     "_corpo": {
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
@@ -15,6 +15,11 @@
       "hash": "d0011787414ec3871177ef3338f80c2019b760b94db4888b11c2ee6fd4857cac",
       "vertices": 52,
       "faces": 60
+    },
+    "_jardineira": {
+      "hash": "11f3989806e9fde4846efe5ba6670486c025d01d0b21127a513eac03a71ad41c",
+      "vertices": 350,
+      "faces": 351
     },
     "_oficina-anim": {
       "hash": "72577395fb636b8b68389ce4c97eefd09e8a782c1a388f89fbc0311b9b2c962c",
