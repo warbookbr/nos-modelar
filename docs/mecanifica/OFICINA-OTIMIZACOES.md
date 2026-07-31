@@ -12,15 +12,22 @@ divisão de trabalho entre os documentos é:
 
 ## Estado executivo
 
-**Estado em 30 de julho de 2026:** R1, R2 e R3 estão concluídas. R4 foi
-implementada e publicada na Fundação de autoria v1; permanece em verificação
-até os gates finitos de fechamento do [`PLANO.md`](PLANO.md). R5 a R9 continuam
-backlog e não formam uma execução aberta.
+**Estado em 31 de julho de 2026:** R1, R2, R3 e **R4** estão concluídas. A R4
+fechou junto com a Fundação de autoria v1, com as três condições do gate do
+[`PLANO.md`](PLANO.md) verificadas item por item. R5 a R9 continuam backlog e
+não formam uma execução aberta.
 
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
 mas não autoriza trabalhar automaticamente até R9. O
-[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. A Fundação de autoria v1
-está ativa e cobre somente A-15, O-6 e O-12.
+[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. **Nenhum ciclo está ativo**
+desde o fechamento da Fundação de autoria v1; a próxima candidata é a R6 (O-13),
+que só começa quando o `PLANO.md` abrir o ciclo "Arranjos semânticos v1".
+
+O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
+A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
+invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de`).
+Nenhum deles é pendência da R4 — são extensões e vizinhanças que a prova
+descobriu ao empurrar o contrato para fora do vocabulário automotivo.
 
 Escopo: o núcleo de autoria (`prototipos/fps/v3/motor/oficina.js`) e a
 documentação que ensina a usá-lo. Os atritos da bancada (A-1, A-2, A-3, A-12,
@@ -69,6 +76,7 @@ Nenhum atrito de autoria fica sem plano:
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
 | A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão) |
 | A-19 eixo de origem sem expressão | O-12 (extensão) | A-20 porta invisível fora do núcleo | sem item — backlog |
+| A-22 guarda e gate discordam sobre `de` | sem item — backlog | | |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
@@ -82,6 +90,11 @@ Fundação de autoria v1 pede que o contrato seja provado fora do caso
 automotivo, e foi. Quem abrir o ciclo seguinte decide se paga essa dívida antes
 ou depois de O-13. A-21 nasceu e morreu na mesma rodada: era o gate `id-cru`
 contando `de:{op,id}` do `publicarPorta` como id posicional.
+
+A-22 saiu da verificação de fechamento, um passo depois: o conserto do A-21
+desceu para o gate e **não** para a guarda de salvamento da Oficina, que segue
+recusando qualquer `de`. Também fica fora do ciclo, pela mesma regra — e é
+recusa a mais, nunca a menos, então não abre buraco no gate.
 
 ## Validação contra o código
 
@@ -346,7 +359,8 @@ mudar sua malha ou seus testes de encaixe.
 
 ### O-6 — `origem` em todo gerador
 
-**Estado (R4):** implementado. Além de `cubo`, `cilindro`, `lathe` e `loft`,
+**Estado (R4, concluída):** implementado. Além de `cubo`, `cilindro`, `lathe` e
+`loft`,
 `chamferBox`, `esfera`, `cone`, `plano` e `inflate` publicam `origem`. Quando a
 topologia não possui uma grade ou face nominal honesta, o contrato mínimo cita
 a primitiva inteira sem inventar nomes frágeis.
@@ -397,9 +411,9 @@ Fazer separados duplica a decisão de nomenclatura.
 
 **Custo:** médio.
 
-**Estado (R4):** implementado. `publicarPorta` guarda uma origem estrutural sob
-um nome escolhido pelo autor; `sel:{porta}` resolve essa origem depois de
-transformações, sem persistir IDs de runtime.
+**Estado (R4, concluída):** implementado. `publicarPorta` guarda uma origem
+estrutural sob um nome escolhido pelo autor; `sel:{porta}` resolve essa origem
+depois de transformações, sem persistir IDs de runtime.
 
 **Provado fora do vocabulário automotivo:** `_jardineira` publica cinco portas
 ANTES das transformações e cita todas DEPOIS. A relação que o teste trava é a
@@ -424,6 +438,13 @@ duas relações sobreviveria a uma porta reresolvida por posição.
 - **A-20.** `nucleo()` não devolve `st.portas`: uma porta é invisível para a
   régua, para a bancada e para o adaptador. O teste teve que marcar cada porta
   com um material próprio para poder afirmar sobre ela.
+
+**Um quarto achado, na verificação de fechamento (A-22).** O conserto do A-21
+desceu para o gate e não para a guarda de salvamento da Oficina: abrir
+`_jardineira` na Oficina e clicar em Salvar, sem editar nada, é recusado por
+"5 referência(s) posicional(is)" que são as cinco portas. A capacidade do O-12
+funciona; o que não funciona é salvá-la pela ferramenta. Recusa a mais, não a
+menos — o gate de encerramento continua atendido.
 
 ### O-7 — posição e orientação na criação da primitiva
 
@@ -523,16 +544,16 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ## Backlog de implementação
 
-Uma rodada por linha. R4 está em fechamento; as demais só saem do backlog quando
-`PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit próprio
-e independente: se uma parar, as anteriores continuam de pé.
+Uma rodada por linha. R1 a R4 estão concluídas; as demais só saem do backlog
+quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit
+próprio e independente: se uma parar, as anteriores continuam de pé.
 
 | rodada | estado | itens | toca formato salvo | prova de saída |
 |---|---|---|---|---|
 | R1 | concluída | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
 | R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
 | R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
-| R4 | implementada, em fechamento | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade; `_jardineira` confirma o contrato fora do vocabulário automotivo (351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; falta concluir os gates finitos do plano |
+| R4 | concluída em 31/07/2026 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox` (3+3 `chamferBox`), freio com 8 partes, 300 faces, 0 sem identidade, 0 órfão; `_jardineira` confirma o contrato fora do vocabulário automotivo (6 partes, 351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; verificação completa verde, incluindo `npm run guarda:salvar`, `npm run descrever` em todas as peças e quatro enquadramentos lidos na bancada |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
 | R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |

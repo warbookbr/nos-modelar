@@ -32,12 +32,18 @@ Estado atual:
 - um experimento isolado de roda mais realista provou que a Oficina atual passa
   do low-poly, mas ainda entrega realismo técnico/procedural; ele não foi
   integrado, e o fluxo resultante está documentado em perfis de autoria;
-- a Fundação de autoria v1 está ativa: proteção mínima de salvamento da Oficina,
-  `origem` universal e portas semânticas;
+- a Fundação de autoria v1 (ciclo 2) está **concluída** desde 31 de julho de
+  2026: proteção mínima de salvamento da Oficina, `origem` universal e portas
+  semânticas, com as três condições do gate verificadas item por item;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
   usa os cinco geradores novos e cinco portas semânticas, com 0 face sem
   identidade e 0 órfão, e mediu onde o contrato ainda para (A-18 a A-20);
+- **nenhum ciclo está em execução.** O ciclo 3 ("Arranjos semânticos v1", O-13)
+  é o próximo candidato e ainda não foi aberto;
+- A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
+  Oficina continua sem saber emitir referência semântica. A verificação de
+  fechamento ainda achou A-22 — a guarda recusa peça que o CI aprova;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -196,7 +202,9 @@ não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
 produz referências posicionais em ferramentas exploratórias, mas agora recusa
 salvá-las no funil `salvarPeca`, antes do POST e antes do fallback de download —
 provado pelo **botão real** com `npm run guarda:salvar`, que também fecha a porta
-dos fundos do gancho `window.__oficina.salvar()`. Ver
+dos fundos do gancho `window.__oficina.salvar()`. A guarda erra para o lado
+seguro: ela ainda recusa `de:{op,id}` do `publicarPorta`, que o gate aceita
+desde o A-21 — logo recusa peça que o CI aprova (A-22). Ver
 [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
@@ -219,11 +227,16 @@ simplificada, galpão mínimo, registro semântico, modos
 carro/contexto/isolar, seleção por parte e explosão autoral do freio. A roda
 experimental permanece somente como evidência de autoria.
 
-A entrega em andamento é o fechamento da “Fundação de autoria v1”. Depois dos
-quatro gates finitos descritos em [`PLANO.md`](PLANO.md), o próximo candidato é
-“Arranjos semânticos v1” para O-13. “Realismo geométrico v1” vem depois, usando
-o protocolo de [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md)
-para escolher no máximo duas capacidades justificadas pela roda.
+O ciclo 2, “Fundação de autoria v1”, fechou em 31 de julho de 2026. A
+conferência do gate, condição por condição, e a lista de comandos da verificação
+completa estão em [`PLANO.md`](PLANO.md).
+
+**Próxima entrega: nenhuma em execução.** O candidato seguinte é “Arranjos
+semânticos v1” (O-13), que precisa ser **aberto** no `PLANO.md` — com escopo
+incluído, escopo excluído e gate objetivo — antes de qualquer implementação.
+“Realismo geométrico v1” vem depois, usando o protocolo de
+[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) para escolher
+no máximo duas capacidades justificadas pela roda.
 
 ## Manutenção desta documentação
 

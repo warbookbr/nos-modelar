@@ -21,6 +21,63 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-22 — a guarda da Oficina e o gate do projeto discordam sobre a chave `de`
+
+**Onde dói:** linguagem da Oficina (o funil de salvamento).
+
+**Evidência:** medido na verificação de fechamento da Fundação de autoria v1,
+dirigindo a Oficina real com Playwright. Abrir
+`oficina.html?peca=_jardineira` e clicar em "Salvar peça" **sem editar nada**
+devolve:
+
+```
+não salvo: a Oficina ainda não consegue exportar esta edição semanticamente
+(5 referência(s) posicional(is))
+alerta: passo 1: de:[ids] | passo 11: de:[ids] | passo 14: de:[ids]
+        passo 18: de:[ids] | passo 19: de:[ids]
+```
+
+0 POST, 0 download, arquivo intacto. Os cinco passos acusados são os cinco
+`publicarPorta` da peça — `['publicarPorta',{nome:'soleiraDaJardineira',
+de:{op:'chamferBox',id:400}}]` —, que são origem **estrutural**, não coleção de
+id. A peça está no repositório, passa `npm run id-cru:check` e é justamente a
+prova não automotiva do O-12.
+
+É o A-21 do outro lado da mesma parede. O A-21 foi consertado em
+`tools/bancadas/id-cru.mjs`, que passou a discriminar pela FORMA
+(`origemEstrutural = objetoPlano(x) && hasOwn(x,'op') && hasOwn(x,'id')`); o
+mesmo conserto **não** desceu para `diagnosticarExportacaoIncompativel` em
+`prototipos/fps/v3/oficina.html:1095`, que segue acusando qualquer `de`. A
+mensagem ainda chama a origem de `de:[ids]`, nome de uma forma que ali não
+existe.
+
+O erro é conservador — a guarda recusa **a mais**, nunca a menos, e nenhuma das
+seis formas posicionais escapa —, então ele não deixa passar arquivo ruim. Mas
+fecha o ciclo do A-15 pelo avesso: a ferramenta de autoria do projeto recusa
+uma peça que o CI do projeto aprova, e recusa exatamente a capacidade que o
+ciclo acabou de entregar.
+
+`tools/mecanifica/guarda-salvar-oficina.mjs` não acusou porque sua recontagem
+independente (`referenciasPosicionais`) herdou a mesma lista de chaves. O
+cabeçalho dela promete "se esta lista e a da Oficina divergirem, a prova
+acusa" — as duas concordam no erro, então não há divergência para acusar. Prova
+duplicada não é prova independente quando as duas cópias saem da mesma fonte.
+
+**Contorno:** nenhum é necessário hoje — `_jardineira` foi escrita fora da
+Oficina, e a Oficina segue declarada como espaço exploratório. Quem precisar
+salvar por ela uma peça com portas tem de editar o arquivo à mão.
+
+**Capacidade candidata:** um único discriminador de "referência posicional",
+importado pelo gate, pela Oficina e pelo harness, em vez de três cópias da
+mesma lista de chaves. Enquanto a regra viver copiada, ela vai divergir de novo
+— já divergiu duas vezes na mesma chave. Vale para qualquer projeto que valide
+o mesmo artefato no editor e no CI.
+
+**Fora do ciclo:** descoberta na verificação de fechamento, não corrigida ali —
+o ciclo cobria A-15, O-6 e O-12, e a regra do `PLANO.md` é que descoberta não
+amplia o ciclo em execução. O gate de encerramento pede que a Oficina **recuse**
+o que não sabe representar, e ela recusa; A-22 é o excesso, não a falha.
+
 ### A-18 — quatro geradores só sabem citar a primitiva inteira
 
 **Onde dói:** linguagem da Oficina.
@@ -202,9 +259,26 @@ que ela sabe produzir, e essa saída não passa no CI do mesmo projeto. Enquanto
 isso durar, a Oficina serve para explorar e não para entregar, e quem
 modela pela interface descobre isso só no gate.
 
-**Estado (Fundação de autoria v1):** a Oficina agora recusa antes do POST ou do
-download qualquer uma das seis formas posicionais cobertas pelo gate. Ela segue
-como espaço exploratório; este ciclo não promete conversão automática.
+**Estado (Fundação de autoria v1 — CONTINUA ABERTO):** a Oficina agora recusa
+antes do POST ou do download qualquer uma das seis formas posicionais cobertas
+pelo gate. Ela segue como espaço exploratório; este ciclo não promete conversão
+automática.
+
+O atrito **não** foi para os resolvidos, e a razão é o que a própria prova
+mediu. A guarda resolve a metade "entrega silenciosa": nada incompatível sai da
+Oficina sem aviso. Ela não resolve — e o ciclo nunca prometeu resolver — a
+metade que dá nome ao atrito:
+
+- a Oficina continua sem saber **emitir** referência semântica: todo botão que
+  grava seleção grava id posicional, então modelar pela interface e entregar
+  seguem sendo coisas diferentes;
+- três das seis formas (`vs:[ids]`, `pontos:[{f}]`, `de:[ids]` do `mescla`) não
+  têm caminho semântico nem no núcleo — ali nem converter à mão resolve;
+- e a guarda passou a divergir do gate na direção oposta, recusando peça que o
+  CI aprova (A-22).
+
+O atrito fecha quando a interface souber gravar `sel:{alias|origem|porta|...}`
+no momento em que grava o passo — não antes.
 
 **Provado pelo botão real, e o que a prova achou.** `npm run guarda:salvar`
 (`tools/mecanifica/guarda-salvar-oficina.mjs`) dirige a interface de verdade —

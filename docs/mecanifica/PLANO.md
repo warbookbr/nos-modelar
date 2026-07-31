@@ -7,10 +7,14 @@ herdado e não comandam a Mecanifica.
 
 **Ciclo de implementação 1: CONCLUÍDO em 30 de julho de 2026.**
 
+**Ciclo 2 — Fundação de autoria v1: CONCLUÍDO em 31 de julho de 2026.**
+
 - fases 0 a 4: concluídas;
-- fase ativa: Fundação de autoria v1;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- ciclo técnico em execução: Fundação de autoria v1 (A-15, O-6 e O-12).
+- **nenhum ciclo técnico está em execução.** O próximo candidato é o ciclo 3
+  ("Arranjos semânticos v1", O-13), que ainda **não** foi aberto: abrir exige
+  escopo incluído, escopo excluído e gate objetivo escritos antes da primeira
+  linha de código.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -206,19 +210,19 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-Somente a primeira linha está em execução. As demais são candidatas ordenadas,
-não autorização para começar ou agrupá-las no ciclo atual.
+**Nenhuma linha está em execução.** A linha 1 fechou; as demais são candidatas
+ordenadas, não autorização para começar ou agrupá-las num ciclo.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
-| 1 | ativa, em fechamento | Fundação de autoria v1 | fechar A-15 e R4/O-6/O-12 pelos gates abaixo |
-| 2 | próxima candidata | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
+| 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
+| 2 | próxima candidata, **não aberta** | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
 | 3 | candidata posterior | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
 | 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
 
-### Ciclo 2 — em execução
+### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 
 **Nome:** Fundação de autoria v1.
 
@@ -236,9 +240,43 @@ peças e mudanças na apresentação.
 representar semanticamente a edição; pinça e suporte podem usar `chamferBox` com
 zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
-As três condições estão atendidas. A terceira é `_jardineira`: o contrato vale
-fora do vocabulário mecânico, e o que ele **não** alcança lá está medido e
-nomeado (A-18 a A-20), em vez de suposto.
+**Conferência do gate, condição por condição (31 de julho de 2026).** As três
+estão ATENDIDAS, cada uma com a medição que a sustenta:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | a Oficina recusa antes de salvar o que não sabe representar | **ATENDIDO** | `npm run guarda:salvar` verde, 17 afirmações. O clique real em "Salvar peça" depois de um clique real em "marcar sólido" (que grava `['solido',{faces:[0]}]`) não emite POST, não emite download e não muda o byte em disco — nos dois cenários: servidor de dev com a rota real e servidor estático que força o fallback. A recusa é visível (mensagem de erro + `title` + alerta com o passo culpado), não trava a sessão, e vale também pelo gancho `window.__oficina.salvar()`. Não é bloqueio: `Ctrl+Z` tira a edição e o mesmo botão volta a gravar. A guarda mora em `salvarPeca`, o funil por onde passam os dois caminhos de saída |
+| 2 | pinça e suporte usam `chamferBox` com zero face sem identidade | **ATENDIDO** | `freio-disco.js` monta a pinça com 3 `chamferBox` (ponte, garra interna, garra externa) e o suporte com 3 (placa e duas orelhas), endereçados por `origemId`/`sel:{origem}`/`sel:{alias}`. `npm run descrever -- freio-disco --estrito`: 8 partes, 300 faces, 362 vértices, **0 face sem identidade, 0 órfão**. Conferido também no olho, na bancada, com pinça e suporte selecionados em modo contexto |
+| 3 | uma prova não automotiva confirma o mesmo contrato | **ATENDIDO** | `prototipos/fps/v3/pecas/_jardineira.js` — jardineira de janela com uma muda, zero vocabulário mecânico. Usa os cinco geradores que só ganharam `origem` na R4 e publica cinco portas ANTES das transformações, citando-as DEPOIS. `npm run descrever -- _jardineira --estrito`: 6 partes, 351 faces, 350 vértices, **0 face sem identidade, 0 órfão**. `tools/mecanifica/jardineira-integridade.test.ts` amarra cada contagem à FÓRMULA do gerador e reconstrói a peça com outro `TOPO`. Quatro enquadramentos lidos na bancada (frontal, direita, superior, isométrica) mais um recorte isolando `bulbo`+`caule`, onde se vê o pé do caule pousando no colo do bulbo — a relação que o teste trava |
+
+**Verificação completa executada no fechamento:** `npm test` (461 casos, 17
+arquivos), `npm run typecheck`, `npm run build`, `npm run gabarito:selecao:check`
+(22 peças byte-idênticas), `npm run id-cru:check` (0 id cru fora da lista
+herdada), `npm run mapa` + `npm run mapa:check` (201 arquivos),
+`npm run docs:links:check`, `npm run docs:toc:check`, `npm run guarda:salvar` e
+`npm run descrever` em **todas** as 36 peças. Das 36, 8 passam `--estrito` com
+0/0 — as duas do ciclo (`freio-disco`, `_jardineira`) entre elas; 14 não têm
+envelope de `PASSOS` e a régua não as mede; 14 são fixtures herdadas com dívida
+anterior ao ciclo. O ciclo tocou exatamente duas peças, e as duas passam.
+
+O que o contrato **não** alcança está medido e nomeado (A-18 a A-20, e A-22
+achado na própria verificação), em vez de suposto.
+
+**O que este ciclo NÃO fechou, dito na cara:**
+
+- **A-15 continua aberto.** A guarda impede a entrega silenciosa, que era a
+  metade urgente; ela não faz a Oficina **emitir** referência semântica, e três
+  das seis formas posicionais não têm caminho semântico nem no núcleo. O ciclo
+  prometeu "proteção mínima, sem exportador completo" e entregou exatamente
+  isso — o atrito fecha quando a interface souber gravar
+  `sel:{alias|origem|porta}` no momento em que grava o passo;
+- **A-22, novo.** A guarda passou a divergir do gate na direção oposta: abrir
+  `_jardineira` na Oficina e clicar em Salvar, sem editar nada, é recusado por
+  "5 referência(s) posicional(is)" que são as cinco portas do `publicarPorta`. O
+  conserto do A-21 desceu para `tools/bancadas/id-cru.mjs` e não para
+  `diagnosticarExportacaoIncompativel`. É recusa **a mais**, nunca a menos — não
+  abre buraco na condição 1 —, e por isso ficou registrado em vez de corrigido
+  dentro de um ciclo já fechado.
 
 **Implementado e já publicado:**
 
@@ -274,7 +312,13 @@ nomeado (A-18 a A-20), em vez de suposto.
   ciclo;
 - [x] reconciliar o estado de R4, A-15, O-6 e O-12 em índice, otimizações e
   registro upstream;
-- [ ] rodar a verificação completa e marcar este ciclo como concluído.
+- [x] rodar a verificação completa e marcar este ciclo como concluído — feito em
+  31 de julho de 2026, com a conferência do gate acima e a lista de comandos
+  executados. A verificação achou A-22 e o registrou fora do ciclo, sem
+  corrigi-lo aqui.
+
+**Não entraram e continuam de fora:** A-18, A-19, A-20 e A-22. Nenhum é
+pendência deste ciclo; quem abrir o próximo decide a ordem.
 
 O-13 recebe um ciclo próprio somente depois desse gate. Essa separação é a
 garantia de que o próximo plano também termina.
