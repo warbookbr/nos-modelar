@@ -340,12 +340,13 @@ A rodada avulsa “Flange de uma peça só” fechou em 31 de julho de 2026 e le
 `centros` a uma peça de PRODUTO: o flange do freio virou um disco com quatro
 furos, e a prova em produto achou e pagou um defeito da partição do núcleo.
 
-**Próxima entrega: o ciclo 5, “Curva e filete v1”, escrito como CANDIDATO no
-[`PLANO.md`](PLANO.md) e ainda não aberto.** Ele carrega as duas capacidades que
-sobraram da crítica da roda — curva no perfil e filete seletivo. O gate dele
-está deliberadamente em branco: o próprio plano manda escrevê-lo depois de
-comparar referência e renders canônicos, e o ciclo 4 mudou o que existe para
-comparar.
+**Próxima entrega: o ciclo 5, “Curva e filete v1”, ABERTO, com gate escrito em
+[`PLANO.md`](PLANO.md).** Ele carrega as duas capacidades que sobraram da
+crítica da roda — curva no perfil e filete seletivo. O gate foi escrito na
+abertura, depois de refazer a comparação sobre o estado pós-ciclo 4: o freio é
+uma peça de bloco com aresta viva a 90°, o pneu tem vinco onde deveria ter
+ombro, e a silhueta do furo continua poligonal (A-34). Nove condições, todas
+medidas.
 
 ## Manutenção desta documentação
 

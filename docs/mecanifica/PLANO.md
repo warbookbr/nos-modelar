@@ -27,7 +27,7 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
   perfil chato. Depois dele, uma rodada avulsa pagou A-26 — a chave `centros`
   da op `furo`, vários furos na mesma face num passo só, provada na peça de
   exercício `_tampa-de-caixa` e registrada como UP-023. O próximo candidato é
-  o ciclo 5 ("Curva e filete v1"), escrito abaixo e ainda **não** aberto.
+  o ciclo 5 ("Curva e filete v1"), escrito abaixo, com gate, e **aberto**.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -234,7 +234,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
 | 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
-| 4 | **candidato, não aberto** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo e exclusões escritos abaixo; o GATE ainda não |
+| 4 | **ABERTO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
 | 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 7 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
@@ -880,7 +880,7 @@ vértice com o barril —, e quem prende os quatro furos ao TOPO da peça é
 `gabarito:selecao:check` regravado com `freio-disco` como ÚNICA peça de hash
 novo, das 26.
 
-### Ciclo 5 — Curva e filete v1 — CANDIDATO, NÃO ABERTO
+### Ciclo 5 — Curva e filete v1 — ABERTO
 
 **Nome:** Curva e filete v1. São as duas capacidades que sobraram da lista que a
 crítica visual da roda levantou (perfil curvo ou afunilado, orientação de seção,
@@ -904,11 +904,58 @@ oblíquo), relações de montagem, hierarquia de partes, posição na criação 
 primitiva, e novas peças de PRODUTO. A-26 e A-29 NÃO entram: eles são do corte,
 não da curva, e misturá-los reabriria o ciclo 4.
 
-**Gate: deliberadamente não escrito ainda.** Isto não é esquecimento. O próprio
-plano manda escrever o gate do realismo DEPOIS de comparar referência e renders
-canônicos, nomeando regiões e condições visuais de aceite — e o ciclo 4 acabou
-de mudar o que existe para comparar: o freio agora tem flange furado, e a
-primeira peça com perfil não circular declarado é o corrimão. A comparação tem
-de ser refeita sobre esse estado antes de o gate ser escrito. Quem abrir este
-ciclo escreve o gate como primeiro passo, no `PLANO.md`, antes de tocar em
-código.
+### Gate do ciclo 5 — escrito na abertura, sobre o estado de hoje
+
+A comparação foi refeita depois do ciclo 4, sobre `roda-dianteira`,
+`freio-disco` e `_corrimao` na bancada, em isométrica e em vista reta. O que se
+vê, dito sem eufemismo:
+
+- **o freio é uma peça de BLOCO.** Pinça, suporte e pistão são caixas de aresta
+  viva a 90°. Uma pinça de verdade é fundida: toda aresta dela tem raio. É a
+  diferença que a crítica da roda chamou de fundida contra bloco, e ela aparece
+  na isométrica sem precisar aproximar;
+- **o pneu tem VINCO onde deveria ter ombro.** O perfil do `lathe` é uma
+  poligonal, então a passagem da banda de rodagem para o flanco é uma quina, não
+  um raio. O mesmo vale para o barril do aro;
+- **o corrimão é um tubo reto que encontra o pilarete em ângulo vivo**, sem
+  concordância nenhuma entre os dois corpos;
+- **a silhueta do furo é o polígono de `lados` arestas** (A-34). Normal suave
+  não muda contorno.
+
+**Condições de aceite.** Todas medidas; nenhuma "ficou melhor".
+
+1. **A curva nasce onde já está reservada.** O terceiro elemento do ponto passa
+   a ser aceito no `perfil` do `lathe`, no `contorno` do `loft` e nos pontos do
+   `inflate` — os três lugares que hoje gritam "RESERVADA, ainda não
+   implementada" — com a MESMA palavra e o MESMO significado nos três. Aridade
+   fora do contrato continua gritando e abortando o passo.
+2. **A curva é conferida contra a forma analítica.** Um arco de raio declarado,
+   escrito com a alça, sai a menos de 1% do raio em toda amostra, com a
+   discretização que o autor pedir. Conta fechada de vértices e faces, como toda
+   op do núcleo.
+3. **O filete é endereçado por IDENTIDADE.** Arredondar uma aresta escolhida por
+   origem estrutural, não a caixa inteira como o `chamferBox`. As arestas não
+   escolhidas continuam exatamente como estavam, e as faces vizinhas continuam
+   existindo com a mesma identidade — a peça não é regenerada.
+4. **O que o filete cria é ENDEREÇÁVEL.** A superfície nova entra em
+   `CONTRATOS_ORIGEM` e se cita por família e faixa, como cubo, cilindro, lathe,
+   loft e furo. Referência inválida grita.
+5. **A silhueta muda, e isso é medido na MALHA.** Onde havia uma aresta a 90°
+   passa a haver `n` faces com ângulo de 90°/(n+1) entre vizinhas consecutivas.
+   Medido em graus, sobre o neutro. Mais a conferência no olho na bancada, em
+   pelo menos dois enquadramentos, antes e depois no mesmo quadro.
+6. **Custo declarado.** Faces e vértices por peça, antes e depois, escritos no
+   relato. Filete que dobra a malha de uma peça inteira é reprovação.
+7. **Aditivo.** `gabarito:selecao:check` verde, com todas as peças anteriores
+   byte-idênticas — exceto as que a rodada reescrever de propósito, nomeadas uma
+   a uma.
+8. **Provado em peça de PRODUTO e em peça NÃO automotiva.** Uma peça de
+   exercício de outra família (móvel, ferramenta, estrutura) usa as duas
+   capacidades, e o `freio-disco` ou a `roda-dianteira` usa pelo menos uma.
+9. **Mutação relatada.** Cada afirmação nova vem com a mutação que a mata, e o
+   sobrevivente que não morrer é dito em voz alta, não escondido.
+
+**O que este gate NÃO exige:** que a peça fique bonita, que o filete seja
+variável ao longo da aresta, que ele resolva encontro de três arestas num canto,
+nem que a concordância entre CORPOS diferentes (corrimão contra pilarete)
+exista. Filete de canto e transição entre corpos ficam fora, declarados.
