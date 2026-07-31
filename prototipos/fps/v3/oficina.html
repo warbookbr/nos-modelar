@@ -1111,7 +1111,21 @@ function baixar(nomeArq, conteudo) {
   return ultimoDownload;
 }
 function msgSalvar(txt, erro) { const el = document.getElementById('salvarMsg'); if (!el) return; el.textContent = txt; el.classList.toggle('erro', !!erro); }
-async function salvarPeca(nomeArq, conteudo) {
+/* A guarda mora AQUI, no funil por onde passam os DOIS caminhos de saída (POST e
+   fallback de download) e TODOS os chamadores — o botão e o gancho
+   `window.__oficina.salvar()` que as bancadas headless usam. Guarda instalada só
+   no ouvinte do botão deixava a porta dos fundos aberta: medido, o gancho
+   gravava em pecas/ a mesma edição que o botão recusava. Devolve
+   {via:'recusado'} em vez de lançar — recusa não é falha de rede. */
+async function salvarPeca(nomeArq, conteudo, passos) {
+  /* sem a lista, a guarda viraria no-op silencioso e o chamador novo passaria
+     reto: falha com diagnóstico, como toda referência ausente no projeto. */
+  if (!Array.isArray(passos)) throw new Error('salvarPeca: PASSOS obrigatório — sem a lista não há como decidir se a peça é exportável');
+  const incompatibilidades = diagnosticarExportacaoIncompativel(passos);
+  if (incompatibilidades.length) {
+    msgSalvar(`não salvo: a Oficina ainda não consegue exportar esta edição semanticamente (${incompatibilidades.length} referência(s) posicional(is))`, true);
+    return { via: 'recusado', incompatibilidades };
+  }
   try {
     const r = await fetch(new URL('oficina/salvar', location.href), {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nome: nomeArq, conteudo }),
@@ -1766,14 +1780,14 @@ try {
     { const bt = $('btSalvar'); if (bt) bt.addEventListener('click', async () => {
         bt.disabled = true;
         try {
-          const incompatibilidades = diagnosticarExportacaoIncompativel(PASSOS);
-          if (incompatibilidades.length) {
-            const detalhe = incompatibilidades.slice(0, 6).join('\n');
-            msgSalvar(`não salvo: a Oficina ainda não consegue exportar esta edição semanticamente (${incompatibilidades.length} referência(s) posicional(is))`, true);
-            alert(`Não salvei a peça: esta edição contém referências por ID que o CI do projeto reprova.\n\n${detalhe}${incompatibilidades.length > 6 ? '\n…' : ''}\n\nA Oficina segue disponível para explorar. Para entregar, converta as seleções para origem/porta/alias fora dela.`);
-            return;
+          /* a RECUSA em si é do `salvarPeca` (o funil, antes do POST e antes do
+             download); aqui só se acrescenta o que é do botão: o alerta que
+             mostra QUAIS passos são culpados a quem clicou. */
+          const r = await salvarPeca(mod.meta.nome, serializarPeca(mod.meta, PARAMS, TOPO, PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual), PASSOS);
+          if (r && r.via === 'recusado') {
+            const detalhe = r.incompatibilidades.slice(0, 6).join('\n');
+            alert(`Não salvei a peça: esta edição contém referências por ID que o CI do projeto reprova.\n\n${detalhe}${r.incompatibilidades.length > 6 ? '\n…' : ''}\n\nA Oficina segue disponível para explorar. Para entregar, converta as seleções para origem/porta/alias fora dela.`);
           }
-          await salvarPeca(mod.meta.nome, serializarPeca(mod.meta, PARAMS, TOPO, PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual));
         }   // PASSO 14b: + ESQUELETO (round-trip)
         finally { bt.disabled = false; }
       }); }
@@ -3470,7 +3484,7 @@ try {
     colisao: () => { try { return colisaoDe(mod.PASSOS, mod.PARAMS ?? {}, mod.TOPO ?? {}, materiaisAtual); } catch { return null; } },   // {forma,raio,altura,base} do estado atual (a MESMA função que o arquivo salvo chama no load)
     painelColisao: () => ({ forma: $('pcolForma').textContent, raio: $('pcolR').textContent, altura: $('pcolH').textContent, base: $('pcolB').textContent, aviso: !$('pcolAviso').hidden, btSolido: !$('btSolido').hidden }),   // leitura do bloco Colisão pra a bancada afirmar
     serializar: () => serializarPeca(mod.meta, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual),   // a STRING .js do export (do estado ATUAL, com MATERIAIS + ANIMACOES + ESQUELETO)
-    salvar: () => salvarPeca(mod.meta.nome, serializarPeca(mod.meta, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual)),   // dispara o salvar (POST → fallback download); devolve {via,...}
+    salvar: () => salvarPeca(mod.meta.nome, serializarPeca(mod.meta, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.PASSOS, materiaisAtual, animacoesAtual, esqueletoAtual), mod.PASSOS),   // dispara o salvar (guarda do A-15 → POST → fallback download); devolve {via:'servidor'|'download'|'recusado',...}
     ultimoDownload: () => (ultimoDownload ? { ...ultimoDownload } : null),            // o último download disparado pelo fallback (null = nenhum ainda)
     nomePeca: () => mod.meta.nome,                                                    // o nome do arquivo que o salvar usa
     /* ---- PASSO 11c: pincel macio — pintar arrastando (a bancada mede/afirma) ---- */

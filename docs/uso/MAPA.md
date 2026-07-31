@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-198 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+199 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -282,6 +282,7 @@
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
+- `guarda-salvar-oficina.mjs` — guarda-salvar-oficina.mjs — a PROVA PELO BOTÃO REAL do A-15: clicar em "Salvar peça" na Oficina com uma edição endereçada por id posicional não chega ao POST…
 - `olhar-bancada.mjs` — olhar-bancada.mjs — o OLHO DA BANCADA: dirige `bancada.html` headless pela URL e salva PNG por vista, para que uma sessão sem navegador possa inspecionar o q…
 - `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
 - `sistema-freio.test.mjs` — sistema-freio.test.mjs — contrato semântico do primeiro sistema apresentado no veículo.

@@ -1688,7 +1688,10 @@ await aoBaseline();
    replica; a segurança rejeita ../.., /etc, a/b, .., espaço e símbolo sem escrever
    fora; um GET serve com no-store; (sem-sólido) uma peça sem solido servida pelo
    servir.mjs mostra o AVISO e a colisão vira o objeto INTEIRO, e marcar uma face a
-   MUDA; (fallback) sem a rota, o Salvar cai no download sem quebrar. */
+   MUDA; (guarda A-15) o toco endereça faces/de por ID, então o Salvar RECUSA antes
+   do POST e antes do fallback de download — o lado ACEITO do salvar (POST que grava,
+   e fallback que baixa) é provado com uma peça semântica em `npm run guarda:salvar`,
+   que dirige o botão real. */
 mkdirSync(OUT10, { recursive: true });
 const T_MOTOR = join(OUT10, 'motor');   // shim: '../motor/oficina.js' das peças TEMP re-exporta o motor REAL (pro Node re-importar)
 const T_RT = join(OUT10, 'rt');         // round-trip: a string do editor gravada aqui, re-importada em Node
@@ -1855,14 +1858,22 @@ ok('(10 sem-sólido→marca) a colisão MUDOU (só o topo: altura 1→0, base 0�
 await page2.close();
 srvNS.close();
 
-// -------- (10 fallback) sem a rota (server estático da bancada), o Salvar baixa ---
+/* -------- (10 guarda A-15) o toco endereça por ID → salvar RECUSA ---------------
+   Fundação de autoria v1: a guarda mora no FUNIL `salvarPeca`, antes do POST e antes
+   do fallback de download, e vale para todo chamador — inclusive este gancho, que
+   até esta rodada era a porta dos fundos que gravava em pecas/ o que o botão
+   recusava. O toco tem `pincel/liso/solido{faces:[ids]}` e `mescla{de:[ids]}` no
+   baseline, então ele é justamente a peça que não passa. O caminho ACEITO (POST que
+   grava e fallback que baixa) é provado com uma peça semântica pelo botão real em
+   `npm run guarda:salvar` — aqui só se afirma que nada escapa. */
 await aoBaseline();
 const dlAntes = await page.evaluate(() => window.__oficina.ultimoDownload());
-const resSalvar = await page.evaluate(() => window.__oficina.salvar());   // POST → 404 (rota ausente aqui) → FALLBACK download
+const resSalvar = await page.evaluate(() => window.__oficina.salvar());
 const dlDepois = await page.evaluate(() => window.__oficina.ultimoDownload());
-ok('(10 fallback) sem a rota de salvar, o Salvar cai no DOWNLOAD sem quebrar (blob + <a download>)',
-   resSalvar && resSalvar.via === 'download' && dlAntes === null && dlDepois && dlDepois.nome.endsWith('.js') && dlDepois.tamanho > 200,
-   `via ${resSalvar && resSalvar.via} · download ${JSON.stringify(dlDepois)}`);
+ok('(10 guarda A-15) o toco endereça por ID: salvar RECUSA antes do POST e antes do fallback de download (nenhum download disparado)',
+   resSalvar && resSalvar.via === 'recusado' && Array.isArray(resSalvar.incompatibilidades) && resSalvar.incompatibilidades.length === 7   // 6 × faces:[ids] (4 pincel + liso + solido) + 1 × de:[ids] (mescla)
+   && dlAntes === null && dlDepois === null,
+   `via ${resSalvar && resSalvar.via} · ${resSalvar && resSalvar.incompatibilidades ? resSalvar.incompatibilidades.length : '?'} referência(s) posicional(is) · download ${JSON.stringify(dlDepois)}`);
 
 // screenshot do passo 10: painel de colisão + face marcada sólida na peça principal
 await page.evaluate((f) => window.__oficina.orbitar(f), F9); await rAF2();
