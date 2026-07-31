@@ -1283,6 +1283,25 @@ describe('P2 — lathe (perfil de revolução)', () => {
     }
   });
 
+  it('concordância: os pontos de TANGÊNCIA (TA, TC) caem EXATAMENTE onde a geometria analítica prevê — não só "a alguma distância certa do centro" (a checagem de raio sozinha não pega uma troca cos/sin: cos²+sin²=1 preserva a distância mesmo com x/y trocados de lugar)', () => {
+    // ângulo reto em B=(1,0), A=(0,0), C=(1,1), raio=0.3 -> TA=(0.7,0), TC=(1,0.3) (bissetriz a 45°, t=raio)
+    // segmentosCurva=1: o arco vira EXATAMENTE 2 pontos, TA e TC, sem interior
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const acharAnel = (raioAlvo: number, yAlvo: number) => {
+      let achou = false;
+      for (const [, p] of n.V) {
+        const raioRev = Math.hypot(p[0], p[2]);
+        if (Math.abs(raioRev - raioAlvo) < 1e-9 && Math.abs(p[1] - yAlvo) < 1e-9) achou = true;
+      }
+      return achou;
+    };
+    expect(acharAnel(0.7, 0)).toBe(true);   // TA
+    expect(acharAnel(1, 0.3)).toBe(true);   // TC
+    // e o par TROCADO (o que uma mutação cos/sin produziria) NÃO existe
+    expect(acharAnel(0.4, 0.3)).toBe(false);
+  });
+
   it('concordância: custo em vértices/faces é EXATO (soma fechada) — segmentosCurva=1 troca 1 ponto por 2 (TA,TC), então o perfil de 4 pontos vira 5', () => {
     const semAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {});
     const comAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
