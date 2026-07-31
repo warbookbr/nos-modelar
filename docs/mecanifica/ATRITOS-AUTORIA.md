@@ -21,95 +21,6 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
-### A-22 — a guarda da Oficina e o gate do projeto discordam sobre a chave `de`
-
-**Onde dói:** linguagem da Oficina (o funil de salvamento).
-
-**Evidência:** medido na verificação de fechamento da Fundação de autoria v1,
-dirigindo a Oficina real com Playwright. Abrir
-`oficina.html?peca=_jardineira` e clicar em "Salvar peça" **sem editar nada**
-devolve:
-
-```
-não salvo: a Oficina ainda não consegue exportar esta edição semanticamente
-(5 referência(s) posicional(is))
-alerta: passo 1: de:[ids] | passo 11: de:[ids] | passo 14: de:[ids]
-        passo 18: de:[ids] | passo 19: de:[ids]
-```
-
-0 POST, 0 download, arquivo intacto. Os cinco passos acusados são os cinco
-`publicarPorta` da peça — `['publicarPorta',{nome:'soleiraDaJardineira',
-de:{op:'chamferBox',id:400}}]` —, que são origem **estrutural**, não coleção de
-id. A peça está no repositório, passa `npm run id-cru:check` e é justamente a
-prova não automotiva do O-12.
-
-É o A-21 do outro lado da mesma parede. O A-21 foi consertado em
-`tools/bancadas/id-cru.mjs`, que passou a discriminar pela FORMA
-(`origemEstrutural = objetoPlano(x) && hasOwn(x,'op') && hasOwn(x,'id')`); o
-mesmo conserto **não** desceu para `diagnosticarExportacaoIncompativel` em
-`prototipos/fps/v3/oficina.html:1095`, que segue acusando qualquer `de`. A
-mensagem ainda chama a origem de `de:[ids]`, nome de uma forma que ali não
-existe.
-
-O erro é conservador — a guarda recusa **a mais**, nunca a menos, e nenhuma das
-seis formas posicionais escapa —, então ele não deixa passar arquivo ruim. Mas
-fecha o ciclo do A-15 pelo avesso: a ferramenta de autoria do projeto recusa
-uma peça que o CI do projeto aprova, e recusa exatamente a capacidade que o
-ciclo acabou de entregar.
-
-`tools/mecanifica/guarda-salvar-oficina.mjs` não acusou porque sua recontagem
-independente (`referenciasPosicionais`) herdou a mesma lista de chaves. O
-cabeçalho dela promete "se esta lista e a da Oficina divergirem, a prova
-acusa" — as duas concordam no erro, então não há divergência para acusar. Prova
-duplicada não é prova independente quando as duas cópias saem da mesma fonte.
-
-**Contorno:** nenhum é necessário hoje — `_jardineira` foi escrita fora da
-Oficina, e a Oficina segue declarada como espaço exploratório. Quem precisar
-salvar por ela uma peça com portas tem de editar o arquivo à mão.
-
-**Capacidade candidata:** um único discriminador de "referência posicional",
-importado pelo gate, pela Oficina e pelo harness, em vez de três cópias da
-mesma lista de chaves. Enquanto a regra viver copiada, ela vai divergir de novo
-— já divergiu duas vezes na mesma chave. Vale para qualquer projeto que valide
-o mesmo artefato no editor e no CI.
-
-**Fora do ciclo:** descoberta na verificação de fechamento, não corrigida ali —
-o ciclo cobria A-15, O-6 e O-12, e a regra do `PLANO.md` é que descoberta não
-amplia o ciclo em execução. O gate de encerramento pede que a Oficina **recuse**
-o que não sabe representar, e ela recusa; A-22 é o excesso, não a falha.
-
-### A-20 — porta publicada é invisível fora do núcleo
-
-**Onde dói:** conferência headless e ferramental.
-
-**Evidência:** `nucleo()` devolve `{V, F, orfaos, merges, partes, esqueleto,
-pesos}` e **não** devolve `st.portas`. Uma porta só existe enquanto a lista de
-passos roda: nem `npm run descrever`, nem a bancada, nem `adaptarThree` sabem
-que a peça publicou `peDoCaule`. `npm run bancada -- _jardineira` lista seis
-componentes e nenhuma porta.
-
-Consequência medida: para provar que `sel:{porta}` resolve depois da
-transformação, `tools/mecanifica/jardineira-integridade.test.ts` teve que
-**marcar cada porta com um material próprio** e ler a marca de volta. A prova
-vale, mas é indireta — o teste afirma sobre `f.material`, não sobre a porta.
-
-**Contorno:** materiais dedicados (`terraUmida`, `corteFresco`, `peleDoColo`) e
-comentário explicando por que eles existem.
-
-**Capacidade candidata:** `nucleo` devolver as portas (nome -> origem e passo de
-publicação) e a régua/bancada listarem-nas ao lado das partes. É o mínimo para
-uma porta virar contrato entre peças — sem isso, `encostar` (O-8) não tem como
-nomear "a porta A encosta na porta B" a partir de fora da peça.
-
-**Metade resolvida no ciclo Endereços semânticos v1:** `nucleo()` passa a
-devolver `portas` — Map nome -> `{nome, de, passo}`, ordenado por nome, com
-`de` clonado. Só o que foi DECLARADO; a face resolvida não entra, porque
-depende do momento da citação. Fica fora do `neutroCanonico` de propósito:
-porta é contrato de autoria, não geometria, e o canônico é hash de peça
-(`tools/oficina/oficina.test.ts`, bloco "A-20"). **Continua aberto** o outro
-lado: régua, bancada e adaptador ainda não mostram as portas, então a prova de
-`sel:{porta}` em `jardineira-integridade.test.ts` segue lendo material.
-
 ### A-17 — repetição radial vira coordenada em massa
 
 **Onde dói:** linguagem da Oficina.
@@ -220,8 +131,10 @@ metade que dá nome ao atrito:
   seguem sendo coisas diferentes;
 - três das seis formas (`vs:[ids]`, `pontos:[{f}]`, `de:[ids]` do `mescla`) não
   têm caminho semântico nem no núcleo — ali nem converter à mão resolve;
-- e a guarda passou a divergir do gate na direção oposta, recusando peça que o
-  CI aprova (A-22).
+- a guarda chegou a divergir do gate na direção oposta, recusando peça que o CI
+  aprova; isso era o A-22, **resolvido** no ciclo Endereços semânticos v1 — a
+  regra passou a viver num módulo só, importado pela Oficina, pelo gate e pelo
+  harness.
 
 O atrito fecha quando a interface souber gravar `sel:{alias|origem|porta|...}`
 no momento em que grava o passo — não antes.
@@ -829,6 +742,113 @@ contagens herdadas intactas (13 peças, 8244 ids congelados).
 está provada. O A-15 achou a guarda no ouvinte do clique em vez do funil quando
 o botão real foi acionado; aqui o gate do projeto reprovava a capacidade nova
 quando uma peça real a usou. Nos dois casos o teste unitário estava verde.
+
+### A-20 — porta publicada era invisível fora do núcleo
+
+**Onde doeu:** conferência headless e ferramental.
+
+**Evidência:** `nucleo()` devolvia `{V, F, orfaos, merges, partes, esqueleto,
+pesos}` e **não** devolvia `st.portas`. Uma porta só existia enquanto a lista de
+passos rodava: nem `npm run descrever`, nem a bancada, nem `adaptarThree` sabiam
+que a peça publicou `peDoCaule`. `npm run bancada -- _jardineira` listava seis
+componentes e nenhuma porta.
+
+Consequência medida: para provar que `sel:{porta}` resolve depois da
+transformação, `tools/mecanifica/jardineira-integridade.test.ts` teve que
+**marcar cada porta com um material próprio** e ler a marca de volta. A prova
+vale, mas é indireta — o teste afirma sobre `f.material`, não sobre a porta.
+
+**Contorno usado na época:** materiais dedicados (`terraUmida`, `corteFresco`,
+`peleDoColo`) e comentário explicando por que eles existem.
+
+**Correção (ciclo Endereços semânticos v1), em duas metades:**
+
+1. **o núcleo devolve** — `nucleo()` passa a devolver `portas`: Map nome ->
+   `{nome, de, passo}`, ordenado por nome, com `de` clonado. Só o que foi
+   DECLARADO. Fica fora do `neutroCanonico` de propósito: porta é contrato de
+   autoria, não geometria, e o canônico é hash de peça;
+2. **quem confere mostra** — `src/autoria/descrever-partes.js` ganha
+   `portasPublicadas(neutro)` e uma seção `PORTAS PUBLICADAS` no relatório. O
+   CLI `npm run descrever` e a bancada consomem DELE: uma verdade só sobre a
+   mesma medida, e o módulo continua sem importar Three.js. Na bancada é um
+   `<details>` fechado que some quando a peça não publica porta — uma linha
+   quando há o que dizer, zero linha quando não há.
+
+O que a régua mostra é a origem **declarada** (`cilindro:404 tampa=fundo`), não
+as faces resolvidas. É decisão, não omissão: a resolução depende de quais passos
+já rodaram quando a porta é citada, então congelar o fim da lista faria a porta
+mentir sobre os passos anteriores. O vocabulário é o dos contratos que já
+existem (`cubo`, `cilindro`, `tampa`) — nome publicado vira formato salvo, e
+nome que promete região e entrega primitiva é pior que nome nenhum.
+
+Medido: `npm run descrever -- _jardineira` imprime `portas: 5` e as cinco linhas,
+com o passo que publicou cada uma. Conferido no navegador em dois
+enquadramentos, e numa peça sem porta (`freio-disco`), onde o bloco não aparece.
+
+**Continua fora:** `adaptarThree` não expõe portas. Ele converte geometria para
+cena, e porta é contrato de autoria; quem precisa de porta lê o neutro. Se um dia
+a apresentação precisar citar porta, isso vira atrito próprio com evidência
+própria.
+
+### A-22 — a mesma regra copiada em três lugares, e as três divergiram
+
+**Onde doeu:** linguagem da Oficina (o funil de salvamento).
+
+**Evidência:** medido na verificação de fechamento da Fundação de autoria v1,
+dirigindo a Oficina real com Playwright. Abrir `oficina.html?peca=_jardineira` e
+clicar em "Salvar peça" **sem editar nada** devolvia:
+
+```
+não salvo: a Oficina ainda não consegue exportar esta edição semanticamente
+(5 referência(s) posicional(is))
+alerta: passo 1: de:[ids] | passo 11: de:[ids] | passo 14: de:[ids]
+        passo 18: de:[ids] | passo 19: de:[ids]
+```
+
+Os cinco passos acusados eram os cinco `publicarPorta` da peça, que são origem
+**estrutural**, não coleção de id. A peça está no repositório, passa
+`npm run id-cru:check` e é justamente a prova não automotiva do O-12. A
+ferramenta de autoria do projeto recusava uma peça que o CI do projeto aprova, e
+recusava exatamente a capacidade que o ciclo anterior tinha entregado.
+
+Causa: a mesma regra vivia copiada em TRÊS lugares — o gate
+`tools/bancadas/id-cru.mjs`, `diagnosticarExportacaoIncompativel` em
+`prototipos/fps/v3/oficina.html` e a recontagem "independente" de
+`tools/mecanifica/guarda-salvar-oficina.mjs`. O conserto do A-21 desceu só para
+o gate. E o oráculo do harness não acusou a divergência porque **errava igual à
+guarda**: prova duplicada não é prova independente quando as duas cópias saem da
+mesma fonte.
+
+**Correção (ciclo Endereços semânticos v1):** uma regra só, em
+`prototipos/fps/v3/motor/referencia-posicional.js`, importada pelos três.
+Consertar a terceira cópia teria funcionado até a próxima divergência; a chave
+`de` já tinha divergido duas vezes.
+
+**Onde o módulo mora, e por quê:** dentro de `prototipos/fps/v3/`, não em
+`src/autoria/`. A Oficina é uma página servida com RAIZ em `prototipos/fps/v3/`
+(`tools/servir.mjs`), e um import que suba para `src/` sai da raiz servida e
+404 no navegador — medido antes de escolher o caminho. Módulo compartilhado que
+a página não consegue carregar não é regra única: é a quarta cópia. O arquivo
+não importa nada, nem Three.js nem o núcleo, e roda igual em Node e no
+navegador.
+
+**O que o harness passou a ser:** ele prova a INSTALAÇÃO da guarda — que o botão
+real, o gancho `window.__oficina.salvar()`, o POST e o fallback de download
+passam por ela. Que a REGRA classifica certo é
+`tools/mecanifica/referencia-posicional.test.ts`, headless e barato. Cada prova
+no seu lugar, em vez de uma cópia fingindo ser a segunda opinião.
+
+**Prova, pelos dois lados e pelo botão real** (`npm run guarda:salvar`, 20
+afirmações): `_jardineira` abre na Oficina e Salvar grava (1 POST, arquivo em
+disco byte-idêntico ao serializado, 0 alerta); a mesma edição posicional de
+verdade (`['solido',{faces:[0]}]`, gravada pelo clique em "marcar sólido")
+continua recusada, sem POST e sem download. Um teste extra impede a quarta
+cópia de nascer: ele lê os três consumidores e reprova se algum voltar a
+declarar a lista de chaves na mão.
+
+**Lição geral:** a mesma regra escrita duas vezes é um defeito com data marcada,
+mesmo quando as duas cópias começam idênticas. Vale para qualquer projeto que
+valide o mesmo artefato no editor e no CI.
 
 ### A-2 — enquadrar montagem e seleção eram a mesma ação
 

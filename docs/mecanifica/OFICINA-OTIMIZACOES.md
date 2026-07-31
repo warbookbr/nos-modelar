@@ -26,9 +26,11 @@ que só começa quando o `PLANO.md` abrir o ciclo "Arranjos semânticos v1".
 O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
 A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
 invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de`).
-**Estado depois do ciclo Endereços semânticos v1:** A-18 e A-19 resolvidos no
-núcleo; A-20 resolvido pela metade (`nucleo()` devolve as portas; a régua e a
-bancada ainda não as mostram).
+**Estado depois do ciclo Endereços semânticos v1:** os quatro resolvidos —
+A-18 e A-19 no núcleo; A-20 nas duas metades (`nucleo()` devolve as portas, e a
+régua e a bancada as mostram, pelo módulo neutro `descrever-partes.js`); A-22
+por uma regra só, em `prototipos/fps/v3/motor/referencia-posicional.js`,
+importada pela Oficina, pelo gate `id-cru` e pelo harness da guarda.
 Nenhum deles é pendência da R4 — são extensões e vizinhanças que a prova
 descobriu ao empurrar o contrato para fora do vocabulário automotivo.
 
@@ -78,8 +80,8 @@ Nenhum atrito de autoria fica sem plano:
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
 | A-17 repetição radial manual | O-13 | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
-| A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **metade entregue** |
-| A-22 guarda e gate discordam sobre `de` | sem item — backlog | | |
+| A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **entregue** |
+| A-22 guarda e gate discordam sobre `de` | sem item — **entregue** | | |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
@@ -95,9 +97,11 @@ ou depois de O-13. A-21 nasceu e morreu na mesma rodada: era o gate `id-cru`
 contando `de:{op,id}` do `publicarPorta` como id posicional.
 
 A-22 saiu da verificação de fechamento, um passo depois: o conserto do A-21
-desceu para o gate e **não** para a guarda de salvamento da Oficina, que segue
-recusando qualquer `de`. Também fica fora do ciclo, pela mesma regra — e é
-recusa a mais, nunca a menos, então não abre buraco no gate.
+desceu para o gate e **não** para a guarda de salvamento da Oficina, que seguia
+recusando qualquer `de`. Ficou fora daquele ciclo, pela mesma regra — e era
+recusa a mais, nunca a menos, então não abriu buraco no gate. Resolvido em
+Endereços semânticos v1, e não consertando a terceira cópia: a regra passou a
+viver num módulo só. Ver ATRITOS-AUTORIA A-22.
 
 ## Validação contra o código
 
@@ -448,14 +452,21 @@ duas relações sobreviveria a uma porta reresolvida por posição.
   apontar para outro lugar quando o `TOPO` muda, sem diagnóstico nenhum.
 - **A-20.** `nucleo()` não devolve `st.portas`: uma porta é invisível para a
   régua, para a bancada e para o adaptador. O teste teve que marcar cada porta
-  com um material próprio para poder afirmar sobre ela.
+  com um material próprio para poder afirmar sobre ela. **Resolvido nas duas
+  metades** em Endereços semânticos v1: `nucleo()` devolve `portas`, e
+  `src/autoria/descrever-partes.js` (neutro, sem Three.js) as mede para o
+  `npm run descrever` e para a bancada.
 
 **Um quarto achado, na verificação de fechamento (A-22).** O conserto do A-21
 desceu para o gate e não para a guarda de salvamento da Oficina: abrir
 `_jardineira` na Oficina e clicar em Salvar, sem editar nada, é recusado por
 "5 referência(s) posicional(is)" que são as cinco portas. A capacidade do O-12
 funciona; o que não funciona é salvá-la pela ferramenta. Recusa a mais, não a
-menos — o gate de encerramento continua atendido.
+menos — o gate de encerramento continua atendido. **Resolvido** em Endereços
+semânticos v1 por uma regra única em
+`prototipos/fps/v3/motor/referencia-posicional.js`; a prova pelo botão real
+abre `_jardineira` e salva, e a mesma peça com uma edição posicional de verdade
+continua recusada.
 
 ### O-7 — posição e orientação na criação da primitiva
 

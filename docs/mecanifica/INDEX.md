@@ -42,8 +42,10 @@ Estado atual:
 - **nenhum ciclo está em execução.** O ciclo 3 ("Arranjos semânticos v1", O-13)
   é o próximo candidato e ainda não foi aberto;
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
-  Oficina continua sem saber emitir referência semântica. A verificação de
-  fechamento ainda achou A-22 — a guarda recusa peça que o CI aprova;
+  Oficina continua sem saber emitir referência semântica. O A-22, que a
+  verificação de fechamento achou, foi resolvido no ciclo Endereços semânticos
+  v1: a regra do id posicional é uma só, e a Oficina voltou a aceitar peça com
+  porta semântica;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -202,10 +204,12 @@ não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
 produz referências posicionais em ferramentas exploratórias, mas agora recusa
 salvá-las no funil `salvarPeca`, antes do POST e antes do fallback de download —
 provado pelo **botão real** com `npm run guarda:salvar`, que também fecha a porta
-dos fundos do gancho `window.__oficina.salvar()`. A guarda erra para o lado
-seguro: ela ainda recusa `de:{op,id}` do `publicarPorta`, que o gate aceita
-desde o A-21 — logo recusa peça que o CI aprova (A-22). Ver
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+dos fundos do gancho `window.__oficina.salvar()`. A regra de "o que é
+referência posicional" mora num módulo só,
+`prototipos/fps/v3/motor/referencia-posicional.js`, importado pela Oficina, pelo
+gate e pelo harness: ela viveu copiada em três lugares e divergiu duas vezes na
+chave `de`, e a última divergência fazia a Oficina recusar peça que o CI aprova
+(A-22, resolvido). Ver [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
 
 Algumas ferramentas específicas do Atelier estão catalogadas em
 [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).
