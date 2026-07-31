@@ -1,5 +1,5 @@
 {
-  "hashTotal": "6e74fe5cfd486026bc5c87a91942d0821c4209ccf90c87b6867dfe0044067435",
+  "hashTotal": "4bc9e143e29741d53e9e7c1c54861093fcf2db1722ee525e7538f1992eb23d63",
   "pecas": {
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
@@ -86,6 +86,11 @@
       "vertices": 12,
       "faces": 6
     },
+    "_vaso": {
+      "hash": "03770e1c46fc75c7b42c11ab8addbe880295b52d8af387c9cc0ed8885c235418",
+      "vertices": 530,
+      "faces": 552
+    },
     "_vazio": {
       "hash": "ea84606f0ade2558db13e8c5334df10bf16e9f297f2c4daddac7917fc8856f9b",
       "vertices": 0,
@@ -122,9 +127,9 @@
       "faces": 1600
     },
     "roda-dianteira": {
-      "hash": "0e5b36a68ec1e42b6d5dc2e4cd563f41f4566311889d6d4735fad9ef2862606f",
-      "vertices": 584,
-      "faces": 494
+      "hash": "306b3ee05797f1c6a6fa626b723c8c4c168f75ce03ebc91003559a43ac4c0b60",
+      "vertices": 824,
+      "faces": 734
     },
     "roda-dianteira-realista-experimento": {
       "hash": "030b46ca796c60e99002f7586448a8ad9e88a1a8fce953fabbbfc0dd702ec3fe",
