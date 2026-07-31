@@ -3947,3 +3947,146 @@ describe('as mensagens de seleção ensinam os OITO seletores', () => {
     }
   });
 });
+
+/* ---------------------------------------------------------------------------
+   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/mecanifica/ATRITOS-AUTORIA.md.
+   Cada bloco abaixo falha no código anterior a esta rodada: os três geradores
+   só sabiam citar a primitiva inteira (A-18), o eixo só aceitava inteiro
+   literal (A-19) e `nucleo` não devolvia as portas (A-20).
+--------------------------------------------------------------------------- */
+const pintaOrigemEm = (passos: any[], origem: any) => nucleo([...passos, ['pincel', { modo: 'face', sel: { origem }, cor: '#123456' }]] as any, {}, {});
+const idsPintados = (n: any) => [...n.F.values()].filter((f: any) => f.cor === '#123456').map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+describe('A-18 — cone, plano e chamferBox passam a citar o eixo que a topologia já tem', () => {
+  const cone: any = ['cone', { id: 0, lados: 6, origemId: 10 }];
+  const plano: any = ['plano', { id: 0, seg: 3, origemId: 11 }];
+  const caixa: any = ['chamferBox', { id: 0, lado: 2, chanfro: 0.3, origemId: 12 }];
+
+  it('cone: `lado` é a lateral, `tampa:fundo` é a base — e a primitiva inteira continua sendo lados+1 faces', () => {
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, lado: 2 }))).toEqual([2]);
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, tampa: 'fundo' }))).toEqual([6]);
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, lado: { passo: 2, fase: 0 } }))).toEqual([0, 2, 4]);
+    const inteiro = pintaOrigemEm([cone], { op: 'cone', id: 10 });   // ADITIVIDADE: o que já estava escrito não muda de alvo
+    expect(inteiro.orfaos).toHaveLength(0);
+    expect(idsPintados(inteiro)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it("cone não inventa um 'topo' que não existe: o ápice é vértice, e citá-lo GRITA", () => {
+    const n = pintaOrigemEm([cone], { op: 'cone', id: 10, tampa: 'topo' });
+    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /tampa opcional \('fundo'\)/.test(o.motivo))).toBe(true);
+    expect(idsPintados(n)).toEqual([]);
+  });
+
+  it('plano: `faixa` é a linha em z, `lado` é a coluna em x, e os dois juntos dão uma célula', () => {
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, faixa: 1 }))).toEqual([3, 4, 5]);
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, lado: 2 }))).toEqual([2, 5, 8]);
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, faixa: 1, lado: 2 }))).toEqual([5]);
+    const inteiro = pintaOrigemEm([plano], { op: 'plano', id: 11 });
+    expect(inteiro.orfaos).toHaveLength(0);
+    expect(idsPintados(inteiro)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it('chamferBox: as 6 faces nominais do cubo, mais as 12 arestas e os 8 cantos', () => {
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'topo' }))).toEqual([1]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'esquerda' }))).toEqual([5]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, aresta: 0 }))).toEqual([6]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, canto: 7 }))).toEqual([25]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'fundo', canto: 0 }))).toEqual([0, 18]);   // os campos UNEM
+    const inteira = pintaOrigemEm([caixa], { op: 'chamferBox', id: 12 });
+    expect(inteira.orfaos).toHaveLength(0);
+    expect(idsPintados(inteira)).toEqual(Array.from({ length: 26 }, (_, k) => k));
+  });
+
+  it('eixo fora do limite GRITA e não pinta nada pela metade, nas três famílias', () => {
+    for (const origem of [{ op: 'cone', id: 10, lado: 99 }, { op: 'plano', id: 11, faixa: 99 }, { op: 'chamferBox', id: 12, aresta: 12 }, { op: 'chamferBox', id: 12, canto: 8 }]) {
+      const passos: any[] = origem.op === 'cone' ? [cone] : origem.op === 'plano' ? [plano] : [caixa];
+      const n = pintaOrigemEm(passos, origem);
+      expect(n.orfaos.some((o: any) => o.op === 'pincel' && /fora do limite/.test(o.motivo)), JSON.stringify(origem)).toBe(true);
+      expect(idsPintados(n)).toEqual([]);
+    }
+  });
+
+  it('inflate continua no contrato mínimo, dito como decisão: citar eixo nele GRITA', () => {
+    const n = pintaOrigemEm([['cubo', { id: 0, lado: 1, origemId: 13 }]], { op: 'inflate', id: 13, faixa: 0 });
+    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /inflate usa somente op e id/.test(o.motivo))).toBe(true);
+  });
+});
+
+describe('A-19 — o eixo de uma origem aceita parâmetro e extremidade', () => {
+  // esfera com `lados: 4`: a faixa k são as faces [4k..4k+3]; `aneis` é TOPO, muda a CONTAGEM.
+  const esfera: any = ['esfera', { id: 0, aneis: 'aneis', lados: 4, origemId: 20 }];
+  const pinta = (origem: any, TOPO: any, PARAMS: any = {}) => nucleo([esfera, ['pincel', { modo: 'face', sel: { origem: { op: 'esfera', id: 20, ...origem } }, cor: '#123456' }]] as any, PARAMS, TOPO);
+
+  it("'ultima' continua sendo a última quando a contagem muda; o literal reaponta em silêncio", () => {
+    expect(idsPintados(pinta({ faixa: 'ultima' }, { aneis: 3 }))).toEqual([8, 9, 10, 11]);
+    expect(idsPintados(pinta({ faixa: 'ultima' }, { aneis: 4 }))).toEqual([12, 13, 14, 15]);
+    expect(idsPintados(pinta({ faixa: 'primeira' }, { aneis: 4 }))).toEqual([0, 1, 2, 3]);
+    // o mesmo endereço escrito como literal: era a última com aneis=3 e vira a do meio com aneis=4, sem erro nenhum
+    expect(idsPintados(pinta({ faixa: 2 }, { aneis: 3 }))).toEqual([8, 9, 10, 11]);
+    expect(idsPintados(pinta({ faixa: 2 }, { aneis: 4 }))).toEqual([8, 9, 10, 11]);
+  });
+
+  it('o eixo cita PARAM e expressão pelo mesmo caminho de todo campo dimensional', () => {
+    expect(idsPintados(pinta({ faixa: 'anelDaFlor' }, { aneis: 4 }, { anelDaFlor: 1 }))).toEqual([4, 5, 6, 7]);
+    expect(idsPintados(pinta({ faixa: '=aneis - 1' }, { aneis: 4 }))).toEqual([12, 13, 14, 15]);
+    expect(idsPintados(pinta({ faixa: 1, lado: '=2 + 1' }, { aneis: 4 }))).toEqual([7]);
+  });
+
+  it('valor fora do contrato GRITA com a causa nomeada, e não pinta nada', () => {
+    const casos: any[] = [
+      [{ faixa: 'naoExiste' }, {}, /não resolve/],
+      [{ faixa: 'meio' }, { meio: 1.5 }, /não é índice/],
+      [{ faixa: 'negativo' }, { negativo: -1 }, /não é índice/],
+      [{ faixa: 'aneis' }, {}, /fora do limite/],          // resolve para 4 numa esfera de 4 faixas (0..3)
+      [{ faixa: '' }, {}, /faixa opcional/],               // string vazia não é endereço nenhum
+    ];
+    for (const [origem, PARAMS, esperado] of casos) {
+      const n = pinta(origem, { aneis: 4 }, PARAMS);
+      expect(n.orfaos.some((o: any) => o.op === 'pincel' && esperado.test(o.motivo)), JSON.stringify(origem) + ' -> ' + n.orfaos.map((o: any) => o.motivo).join(' | ')).toBe(true);
+      expect(idsPintados(n)).toEqual([]);
+    }
+  });
+
+  it('os eixos novos do A-18 falam a mesma língua: extremidade e parâmetro no cilindro e no chamferBox', () => {
+    const cil: any = ['cilindro', { id: 0, raio: 0.5, altura: 1, lados: 'lados', origemId: 30 }];
+    const nCil = nucleo([cil, ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 30, lado: 'ultima' } }, cor: '#123456' }]] as any, {}, { lados: 5 });
+    expect(nCil.orfaos).toHaveLength(0);
+    expect(idsPintados(nCil)).toEqual([4]);
+    const caixa: any = ['chamferBox', { id: 0, lado: 2, chanfro: 0.3, origemId: 31 }];
+    const nCaixa = nucleo([caixa, ['pincel', { modo: 'face', sel: { origem: { op: 'chamferBox', id: 31, aresta: 'ultima', canto: 'qual' } }, cor: '#123456' }]] as any, { qual: 3 }, {});
+    expect(nCaixa.orfaos).toHaveLength(0);
+    expect(idsPintados(nCaixa)).toEqual([17, 21]);
+  });
+});
+
+describe('A-20 — o núcleo devolve as portas publicadas', () => {
+  const passos: any = [
+    ['cilindro', { id: 0, raio: 0.5, altura: 1, lados: 8, origemId: 40 }],
+    ['cone', { id: BLOCO, lados: 6, origemId: 41 }],
+    ['publicarPorta', { nome: 'zeladoria', de: { op: 'cone', id: 41, tampa: 'fundo' } }],
+    ['publicarPorta', { nome: 'assentoDoEixo', de: { op: 'cilindro', id: 40, tampa: 'topo' } }],
+  ];
+
+  it('nome, origem declarada e passo de publicação saem do núcleo, ordenados por nome', () => {
+    const n = nucleo(passos, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect([...n.portas.keys()]).toEqual(['assentoDoEixo', 'zeladoria']);   // ordem do NOME, não do passo
+    expect(n.portas.get('assentoDoEixo')).toEqual({ nome: 'assentoDoEixo', de: { op: 'cilindro', id: 40, tampa: 'topo' }, passo: 3 });
+    expect(n.portas.get('zeladoria').passo).toBe(2);
+  });
+
+  it('a porta devolvida é um CLONE: mexer nela não altera o passo da peça, e rodar de novo dá o mesmo', () => {
+    const n = nucleo(passos, {}, {});
+    n.portas.get('zeladoria').de.id = 999;
+    expect(passos[2][1].de.id).toBe(41);
+    const outra = nucleo(passos, {}, {});
+    expect(JSON.stringify([...outra.portas])).toBe(JSON.stringify([...nucleo(passos, {}, {}).portas]));
+  });
+
+  it('peça sem porta devolve mapa vazio, e porta recusada não entra no mapa', () => {
+    expect([...nucleo([['cubo', { id: 0, lado: 1 }]] as any, {}, {}).portas]).toEqual([]);
+    const recusada = nucleo([['cubo', { id: 0, lado: 1, origemId: 50 }], ['publicarPorta', { nome: 'fantasma', de: { op: 'cubo', id: 50, face: 'nenhuma' } }]] as any, {}, {});
+    expect(recusada.orfaos.some((o: any) => o.op === 'publicarPorta')).toBe(true);
+    expect([...recusada.portas]).toEqual([]);
+  });
+});

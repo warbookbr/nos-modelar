@@ -215,10 +215,33 @@ function origensIguais(a, b) {
    sobre ÍNDICE só é válida onde a conectividade é REGULAR. É o caso aqui e só
    aqui — os eixos de `sel.origem` SÃO a grade regular do próprio gerador
    (`faixa`/`lado` do loft). Não estender isto para `sel.f` (lista de ids
-   quaisquer, sem grade) nem para ids globais (que não têm eixo nenhum). */
+   quaisquer, sem grade) nem para ids globais (que não têm eixo nenhum).
+
+   A-19 (Endereços semânticos v1): um eixo passa a aceitar mais DUAS formas de
+   índice ÚNICO, além do inteiro literal. Antes desta rodada o eixo era o único
+   campo dimensional da linguagem que não passava por `st.num` — `faixa: 3`
+   continuava VÁLIDA quando alguém aumentava o número de anéis e passava a
+   apontar para outra faixa sem diagnóstico nenhum. A referência não ficava
+   inválida; ficava ERRADA, que é pior, e o CLAUDE.md proíbe justamente isso.
+   As duas formas novas:
+
+   1. STRING que é NOME de PARAM/TOPO (ou expressão `=…`): o MESMO caminho
+      `st.num` de `raio`, `altura` e todo campo dimensional. `faixa: 'bulboAneis'`
+      acompanha o parâmetro em vez de congelar o número dele;
+   2. PALAVRA DE EXTREMIDADE, `'primeira'` ou `'ultima'`, resolvida contra a
+      CONTAGEM REAL do gerador naquele passo. "A última faixa" continua sendo a
+      última quando a contagem muda — é o caso que motivou o atrito.
+
+   As duas palavras são RESERVADAS: um PARAM chamado `ultima` não é alcançável
+   por um eixo (a palavra ganha). É o preço de ter vocabulário fechado, e é
+   preferível a decidir por precedência silenciosa em cima do dicionário.
+
+   O eixo continua sem aceitar número negativo, fracionário ou fora do limite:
+   qualquer um deles GRITA com a causa nomeada, como o resto do núcleo. */
 function validarEixo(valor) {
   if (valor == null) return true;
   if (Number.isSafeInteger(valor) && valor >= 0) return true;
+  if (typeof valor === 'string') return valor.trim() !== '';   // nome de param, expressão ou extremidade — só resolve com st
   if (valor && typeof valor === 'object' && !Array.isArray(valor)) {
     const chaves = Object.keys(valor);
     if (chaves.length === 2 && chaves.includes('passo') && chaves.includes('fase')) {
@@ -228,6 +251,23 @@ function validarEixo(valor) {
   }
   return false;
 }
+const EXTREMIDADES_EIXO = { primeira: () => 0, ultima: (tamanho) => tamanho - 1 };
+/* um eixo já validado aponta para UM índice quando é inteiro (literal) ou string
+   (param, expressão, extremidade); `null` e `{passo,fase}` são conjuntos. */
+function eixoDeIndiceUnico(valor) { return typeof valor === 'number' || typeof valor === 'string'; }
+/* resolve a forma de índice ÚNICO contra o tamanho REAL do eixo. Devolve
+   `{idx}` ou `{erro}` — nunca lança: um param inexistente vira diagnóstico de
+   órfão (o caminho que as origens já usam) em vez de derrubar a peça inteira. */
+function indiceDeEixo(st, valor, tamanho) {
+  if (typeof valor === 'number') return { idx: valor };
+  if (Object.hasOwn(EXTREMIDADES_EIXO, valor)) return { idx: EXTREMIDADES_EIXO[valor](tamanho) };
+  let bruto;
+  try { bruto = st.num(valor); } catch (e) { return { erro: `não resolve: ${String(e.message).replace(/^oficina: /, '')}` }; }
+  if (!Number.isSafeInteger(bruto) || bruto < 0) return { erro: `resolveu ${bruto}, que não é índice (inteiro ≥ 0)` };
+  return { idx: bruto };
+}
+// como o eixo aparece no diagnóstico: literal cru; string com o índice que ela resolveu
+function textoDeEixo(valor, idx) { return typeof valor === 'number' ? String(valor) : `'${valor}' (=${idx})`; }
 // índices de 0..tamanho-1 que casam com um eixo já validado (null=todos, inteiro=um só, {passo,fase}=progressão)
 function indicesEixo(valor, tamanho) {
   if (valor == null) { const r = []; for (let k = 0; k < tamanho; k++) r.push(k); return r; }
@@ -258,29 +298,31 @@ function contratoFaixaLado(op) {
   return {
     validar(origem) {
       const chaves = ['op', 'id', 'faixa', 'lado'];
-      const msg = `${op} usa op, id, faixa opcional e lado opcional — cada eixo aceita inteiro não-negativo, ausente (todos), ou filtro de progressão {passo,fase} (passo inteiro ≥1, fase inteira em [0,passo), os dois obrigatórios juntos)`;
+      const msg = `${op} usa op, id, faixa opcional e lado opcional — cada eixo aceita inteiro não-negativo, nome de parâmetro ou expressão '=…', a extremidade 'primeira'/'ultima', ausente (todos), ou filtro de progressão {passo,fase} (passo inteiro ≥1, fase inteira em [0,passo), os dois obrigatórios juntos)`;
       if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
       if (!validarEixo(origem.faixa)) return msg;
       if (!validarEixo(origem.lado)) return msg;
       return null;
     },
-    resolver(_st, registro, origem) {
+    resolver(st, registro, origem) {
       const totalFaixas = registro.faixas.length;
       if (!totalFaixas) return { erro: `origem ${op}:${origem.id} não tem faixas` };
-      const faixaExplicita = typeof origem.faixa === 'number';
+      const faixaExplicita = eixoDeIndiceUnico(origem.faixa);
       let faixaIdx;
-      if (origem.faixa == null || typeof origem.faixa === 'object') {
+      if (!faixaExplicita) {
         faixaIdx = indicesEixo(origem.faixa, totalFaixas);
-        if (typeof origem.faixa === 'object' && !faixaIdx.length) {
+        if (typeof origem.faixa === 'object' && origem.faixa != null && !faixaIdx.length) {
           const { passo, fase } = origem.faixa;
           return { erro: `filtro de faixa {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${totalFaixas - 1} na origem ${op}:${origem.id}` };
         }
       } else {
-        if (origem.faixa >= totalFaixas) return { erro: `faixa ${origem.faixa} fora do limite da origem ${op}:${origem.id}` };
-        faixaIdx = [origem.faixa];
+        const r = indiceDeEixo(st, origem.faixa, totalFaixas);
+        if (r.erro) return { erro: `faixa '${origem.faixa}' da origem ${op}:${origem.id} ${r.erro}` };
+        if (r.idx >= totalFaixas) return { erro: `faixa ${textoDeEixo(origem.faixa, r.idx)} fora do limite da origem ${op}:${origem.id}` };
+        faixaIdx = [r.idx];
       }
 
-      const ladoExplicito = typeof origem.lado === 'number';
+      const ladoExplicito = eixoDeIndiceUnico(origem.lado);
       const faces = [];
       for (const fi of faixaIdx) {
         const faixa = registro.faixas[fi];
@@ -292,8 +334,10 @@ function contratoFaixaLado(op) {
         }
         if (origem.lado == null) { faces.push(...faixa); continue; }
         if (ladoExplicito) {
-          if (origem.lado >= faixa.length) return { erro: `lado ${origem.lado} fora do limite da faixa ${fi} da origem ${op}:${origem.id} (0..${faixa.length - 1})` };
-          faces.push(faixa[origem.lado]);
+          const r = indiceDeEixo(st, origem.lado, faixa.length);
+          if (r.erro) return { erro: `lado '${origem.lado}' da faixa ${fi} da origem ${op}:${origem.id} ${r.erro}` };
+          if (r.idx >= faixa.length) return { erro: `lado ${textoDeEixo(origem.lado, r.idx)} fora do limite da faixa ${fi} da origem ${op}:${origem.id} (0..${faixa.length - 1})` };
+          faces.push(faixa[r.idx]);
         } else {
           const idxLado = indicesEixo(origem.lado, faixa.length);
           if (!idxLado.length) {
@@ -304,6 +348,141 @@ function contratoFaixaLado(op) {
         }
       }
       if (!faces.length) return { erro: `origem ${op}:${origem.id} não tem nenhuma face lateral correspondente` };
+      return { faces };
+    },
+  };
+}
+
+/* Fase 4 / A-18: `cilindro` e `cone` compartilham a MESMA estrutura de origem —
+   um eixo NUMÉRICO `lado` sobre as faces laterais e um eixo NOMINAL `tampa` —,
+   então o contrato é uma FÁBRICA como a do loft/lathe, em vez de duas cópias.
+   Os dois eixos são INDEPENDENTES (não é uma grade faixa×lado) e UNEM: `lado`
+   presente contribui as laterais resolvidas, `tampa` presente contribui aquela
+   tampa.
+
+   `tampasValidas` é a lista NOMINAL do gerador (o cilindro tem 'fundo' e
+   'topo'; o cone tem só 'fundo', porque o ápice é um VÉRTICE, não uma face —
+   nomear um 'topo' que não existe seria prometer região e entregar nada).
+
+   `padraoSemEixo` é a resposta a `{op,id}` sem eixo nenhum, e as duas ops
+   respondem DIFERENTE de propósito:
+     - 'laterais' (cilindro) — a convenção `{}` do loft/lathe, e o que resolve o
+       BLOQUEADO 2 da lanterna ("só a lateral, não as tampas");
+     - 'tudo' (cone) — a primitiva INTEIRA, que é o que `{op:'cone',id}` já
+       significava antes desta rodada (o contrato mínimo `contratoFaces`
+       devolvia todas as faces). Trocar isso por 'laterais' faria toda citação
+       de cone já escrita passar a apontar para OUTRO conjunto sem nenhum
+       diagnóstico — exatamente a classe de erro que o A-19 condena. A
+       aditividade manda mais que a simetria. */
+function contratoLadoTampa(op, tampasValidas, padraoSemEixo) {
+  const listaTampas = tampasValidas.map((t) => `'${t}'`).join(' ou ');
+  return {
+    validar(origem) {
+      const chaves = ['op', 'id', 'lado', 'tampa'];
+      const msg = `${op} usa op, id, lado opcional (eixo numérico sobre as faces laterais: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todas, ou filtro de progressão {passo,fase}) e tampa opcional (${listaTampas})`;
+      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+      if (!validarEixo(origem.lado)) return msg;
+      if (origem.tampa != null && !tampasValidas.includes(origem.tampa)) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const ladoPresente = origem.lado != null;
+      const tampaPresente = origem.tampa != null;
+      const semEixo = !ladoPresente && !tampaPresente;
+      const faces = [];
+      if (ladoPresente || semEixo) {   // explícito, OU nenhum dos dois -> default = todas as laterais
+        const totalLaterais = registro.laterais.length;
+        if (eixoDeIndiceUnico(origem.lado)) {
+          // lado EXPLÍCITO (um índice só): fora do limite ou já removido nomeiam a causa,
+          // a mesma distinção do `face` do cubo (índice inválido != face que já existiu e sumiu).
+          const r = indiceDeEixo(st, origem.lado, totalLaterais);
+          if (r.erro) return { erro: `lado '${origem.lado}' da origem ${op}:${origem.id} ${r.erro}` };
+          if (r.idx >= totalLaterais) return { erro: `lado ${textoDeEixo(origem.lado, r.idx)} fora do limite da origem ${op}:${origem.id} (0..${totalLaterais - 1})` };
+          const f = registro.laterais[r.idx];
+          if (!st.F.has(f)) return { erro: `lado ${textoDeEixo(origem.lado, r.idx)} da origem ${op}:${origem.id} foi removido` };
+          faces.push(f);
+        } else {
+          // ausente (todas) ou filtro {passo,fase}: união silenciosa, pulando lado já removido
+          // (a mesma convenção do cubo pra `face` ausente — remover uma lateral é normal, não erro).
+          const idxLado = indicesEixo(origem.lado, totalLaterais);
+          if (typeof origem.lado === 'object' && origem.lado != null && !idxLado.length) {
+            const { passo, fase } = origem.lado;
+            return { erro: `filtro de lado {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${totalLaterais - 1} na origem ${op}:${origem.id}` };
+          }
+          for (const li of idxLado) { const f = registro.laterais[li]; if (st.F.has(f)) faces.push(f); }
+        }
+      }
+      if (tampaPresente) {
+        const f = registro.tampas[origem.tampa];
+        if (f == null || !st.F.has(f)) return { erro: `tampa '${origem.tampa}' da origem ${op}:${origem.id} foi removida` };
+        faces.push(f);
+      } else if (semEixo && padraoSemEixo === 'tudo') {
+        // a primitiva inteira: laterais acima + as tampas VIVAS, na ordem nominal declarada
+        for (const nome of tampasValidas) { const f = registro.tampas[nome]; if (f != null && st.F.has(f)) faces.push(f); }
+      }
+      if (!faces.length) return { erro: `origem ${op}:${origem.id} não tem nenhuma face correspondente` };
+      return { faces };
+    },
+  };
+}
+
+/* Fase 4 / A-18: `cubo` e `chamferBox` compartilham as MESMAS 6 faces nominais —
+   o chamferBox é o cubo com os cortes de aresta e canto, e as 6 faces originais
+   nascem na mesma ordem e com o mesmo significado. A fábrica cobre os dois; o
+   chamferBox só acrescenta as duas FAMÍLIAS que a topologia dele tem a mais,
+   `aresta` (12) e `canto` (8), cada uma um eixo NUMÉRICO como o `lado` do
+   cilindro. Nada de vocabulário novo: `face` continua sendo `face`.
+
+   Os campos presentes UNEM. NENHUM presente = a primitiva inteira, todas as
+   famílias que o gerador registrou (6 no cubo, 26 no chamferBox) — que é o que
+   as duas ops já respondiam antes desta rodada, então nenhuma peça shipada muda. */
+function contratoCaixa(op, familias) {
+  const nomesFamilias = Object.keys(familias);   // '' quando é só o cubo
+  return {
+    validar(origem) {
+      const chaves = ['op', 'id', 'face', ...nomesFamilias];
+      const extra = nomesFamilias.map((f) => `, ${f} opcional (eixo numérico 0..${familias[f].total - 1}: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todas, ou filtro de progressão {passo,fase})`).join('');
+      const msg = `${op} usa op, id e face opcional (fundo, topo, tras, direita, frente ou esquerda)${extra}`;
+      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+      if (origem.face != null && !FACES_CUBO.has(origem.face)) return msg;
+      for (const f of nomesFamilias) if (!validarEixo(origem[f])) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const faces = [];
+      const semEixo = origem.face == null && nomesFamilias.every((f) => origem[f] == null);
+      if (origem.face != null) {
+        const face = registro.faces[origem.face];
+        if (face == null) return { erro: `face '${origem.face}' não existe na origem ${op}:${origem.id}` };
+        if (!st.F.has(face)) return { erro: `face '${origem.face}' da origem ${op}:${origem.id} foi removida` };
+        faces.push(face);
+      } else if (semEixo) {
+        for (const nome of FACES_CUBO) {
+          const face = registro.faces[nome];
+          if (face != null && st.F.has(face)) faces.push(face);
+        }
+      }
+      for (const familia of nomesFamilias) {
+        const eixo = origem[familia];
+        if (eixo == null && !semEixo) continue;
+        const lista = registro[familias[familia].chave];
+        if (eixoDeIndiceUnico(eixo)) {
+          const r = indiceDeEixo(st, eixo, lista.length);
+          if (r.erro) return { erro: `${familia} '${eixo}' da origem ${op}:${origem.id} ${r.erro}` };
+          if (r.idx >= lista.length) return { erro: `${familia} ${textoDeEixo(eixo, r.idx)} fora do limite da origem ${op}:${origem.id} (0..${lista.length - 1})` };
+          const f = lista[r.idx];
+          if (!st.F.has(f)) return { erro: `${familia} ${textoDeEixo(eixo, r.idx)} da origem ${op}:${origem.id} foi removida` };
+          faces.push(f);
+        } else {
+          const idx = indicesEixo(eixo, lista.length);
+          if (typeof eixo === 'object' && eixo != null && !idx.length) {
+            const { passo, fase } = eixo;
+            return { erro: `filtro de ${familia} {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${lista.length - 1} na origem ${op}:${origem.id}` };
+          }
+          for (const k of idx) { const f = lista[k]; if (st.F.has(f)) faces.push(f); }
+        }
+      }
+      if (!faces.length) return { erro: `origem ${op}:${origem.id} não tem nenhuma face viva` };
       return { faces };
     },
   };
@@ -323,78 +502,31 @@ const CONTRATOS_ORIGEM = {
      contribui aquela tampa; NENHUM dos dois presente = todas as LATERAIS,
      sem tampa nenhuma (a convenção `{}` do loft/lathe, e o que resolve o
      BLOQUEADO 2 da lanterna — "só a lateral, não as tampas"). */
-  cilindro: {
-    validar(origem) {
-      const chaves = ['op', 'id', 'lado', 'tampa'];
-      const msg = "cilindro usa op, id, lado opcional (eixo numérico sobre as faces laterais: inteiro, ausente = todas, ou filtro de progressão {passo,fase}) e tampa opcional ('fundo' ou 'topo')";
-      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
-      if (!validarEixo(origem.lado)) return msg;
-      if (origem.tampa != null && origem.tampa !== 'fundo' && origem.tampa !== 'topo') return msg;
-      return null;
-    },
-    resolver(st, registro, origem) {
-      const ladoPresente = origem.lado != null;
-      const tampaPresente = origem.tampa != null;
-      const faces = [];
-      if (ladoPresente || !tampaPresente) {   // explícito, OU nenhum dos dois -> default = todas as laterais
-        const totalLaterais = registro.laterais.length;
-        if (typeof origem.lado === 'number') {
-          // lado EXPLÍCITO (um índice só): fora do limite ou já removido nomeiam a causa,
-          // a mesma distinção do `face` do cubo (índice inválido != face que já existiu e sumiu).
-          if (origem.lado >= totalLaterais) return { erro: `lado ${origem.lado} fora do limite da origem cilindro:${origem.id} (0..${totalLaterais - 1})` };
-          const f = registro.laterais[origem.lado];
-          if (!st.F.has(f)) return { erro: `lado ${origem.lado} da origem cilindro:${origem.id} foi removido` };
-          faces.push(f);
-        } else {
-          // ausente (todas) ou filtro {passo,fase}: união silenciosa, pulando lado já removido
-          // (a mesma convenção do cubo pra `face` ausente — remover uma lateral é normal, não erro).
-          const idxLado = indicesEixo(origem.lado, totalLaterais);
-          if (typeof origem.lado === 'object' && !idxLado.length) {
-            const { passo, fase } = origem.lado;
-            return { erro: `filtro de lado {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${totalLaterais - 1} na origem cilindro:${origem.id}` };
-          }
-          for (const li of idxLado) { const f = registro.laterais[li]; if (st.F.has(f)) faces.push(f); }
-        }
-      }
-      if (tampaPresente) {
-        const f = registro.tampas[origem.tampa];
-        if (f == null || !st.F.has(f)) return { erro: `tampa '${origem.tampa}' da origem cilindro:${origem.id} foi removida` };
-        faces.push(f);
-      }
-      if (!faces.length) return { erro: `origem cilindro:${origem.id} não tem nenhuma face correspondente` };
-      return { faces };
-    },
-  },
-  cubo: {
-    /* Fase 3.5, Rodada A: `face` era obrigatória — agora é opcional; ausente =
-       as 6 faces (pulando as já removidas por `apagaFace`). Simétrico ao
-       loft acima. */
-    validar(origem) {
-      const chaves = ['op', 'id', 'face'];
-      const msg = 'cubo usa op, id e face opcional (fundo, topo, tras, direita, frente ou esquerda)';
-      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
-      if (origem.face != null && !FACES_CUBO.has(origem.face)) return msg;
-      return null;
-    },
-    resolver(st, registro, origem) {
-      if (origem.face != null) {
-        const face = registro.faces[origem.face];
-        if (face != null && !st.F.has(face)) return { erro: `face '${origem.face}' da origem cubo:${origem.id} foi removida` };
-        return face == null ? { erro: `face '${origem.face}' não existe na origem cubo:${origem.id}` } : { faces: [face] };
-      }
-      const faces = [];
-      for (const nome of FACES_CUBO) {
-        const face = registro.faces[nome];
-        if (face != null && st.F.has(face)) faces.push(face);
-      }
-      if (!faces.length) return { erro: `origem cubo:${origem.id} não tem nenhuma face viva` };
-      return { faces };
-    },
-  },
+  cilindro: contratoLadoTampa('cilindro', ['fundo', 'topo'], 'laterais'),
+  cubo: contratoCaixa('cubo', {}),
   esfera: contratoFaixaLado('esfera'),
-  cone: contratoFaces('cone'),
-  plano: contratoFaces('plano'),
-  chamferBox: contratoFaces('chamferBox'),
+  /* cone — A-18: a MESMA estrutura do cilindro (lado + tampa), porque a
+     topologia é a mesma menos o anel de cima: `lado` são as L laterais
+     triangulares (b+0..b+L-1) e a única tampa é a base ('fundo', b+L). Não
+     existe 'topo': o ápice é um VÉRTICE. `{op,id}` sem eixo continua sendo a
+     primitiva inteira, como era com o contrato mínimo. */
+  cone: contratoLadoTampa('cone', ['fundo'], 'tudo'),
+  /* plano — A-18: a grade é literalmente `faixa` × `lado`, a MESMA estrutura do
+     loft/lathe/esfera, então reusa a fábrica sem vocabulário novo: a faixa é a
+     LINHA em z (iz, de -z pra +z) e o lado é a COLUNA em x (ix, de -x pra +x),
+     a numeração `b + iz·seg + ix` que a op já documenta linha a linha. */
+  plano: contratoFaixaLado('plano'),
+  /* chamferBox — A-18: as 6 faces originais são as MESMAS do cubo (mesma ordem,
+     mesmo significado), e o chanfro acrescenta duas famílias que a op já
+     documenta e trava por teste: 12 retângulos de aresta (b+6..b+17, na ordem
+     X,Y,Z) e 8 triângulos de canto (b+18..b+25, na ordem dos CANTOS). */
+  chamferBox: contratoCaixa('chamferBox', { aresta: { chave: 'arestas', total: 12 }, canto: { chave: 'cantos', total: 8 } }),
+  /* inflate — o ÚNICO gerador que fica no contrato mínimo, e isso é DECISÃO
+     medida, não omissão (A-18): a malha dele sai de um scan de voxels, sem
+     fórmula fechada de face — não existe grade nem face nominal honesta para
+     endereçar. Publicar `{linha,coluna}` aqui seria prometer região e entregar
+     ordem de varredura. Enquanto a topologia for essa, o contrato certo é
+     citar a primitiva inteira. */
   inflate: contratoFaces('inflate'),
   espelha: {
     validar(origem) {
@@ -902,7 +1034,10 @@ export const OPS = {
     addV(st, b + L, [0, h, 0]);                                                                       // ápice
     for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, b + k, [b + k, b + L, b + n]); }    // laterais (normal pra fora)
     const fundo = []; for (let k = 0; k < L; k++) fundo.push(b + k); addF(st, b + L, fundo);          // tampa da base (-y, o winding do fundo do cilindro)
-    if (a.origemId != null) registraOrigem(st, i, 'cone', a.origemId, { faces: Array.from({ length: L + 1 }, (_, k) => b + k) });
+    /* origemId (A-18): a MESMA forma do cilindro — `laterais[k]` é a face
+       lateral k (0..L-1, o eixo numérico `lado`) e `tampas` tem a única face
+       nominal do cone, a base ('fundo'). O ápice não entra: é vértice. */
+    if (a.origemId != null) registraOrigem(st, i, 'cone', a.origemId, { laterais: Array.from({ length: L }, (_, k) => b + k), tampas: { fundo: b + L } });
   },
 
   /* plano — grade no plano XZ, y=0, CENTRADA na origem (o chão). `largura` (eixo x)
@@ -925,7 +1060,10 @@ export const OPS = {
     const v = (ix, iz) => b + iz * (S + 1) + ix;
     for (let iz = 0; iz <= S; iz++) for (let ix = 0; ix <= S; ix++) addV(st, v(ix, iz), [(ix / S - 0.5) * lx, 0, (iz / S - 0.5) * lz]);
     for (let iz = 0; iz < S; iz++) for (let ix = 0; ix < S; ix++) addF(st, b + iz * S + ix, [v(ix, iz), v(ix, iz + 1), v(ix + 1, iz + 1), v(ix + 1, iz)]);
-    if (a.origemId != null) registraOrigem(st, i, 'plano', a.origemId, { faces: Array.from({ length: S * S }, (_, k) => b + k) });
+    /* origemId (A-18): a grade do plano É a estrutura faixa×lado do loft —
+       `faixas[iz][ix]` é o quad da célula (ix,iz), a numeração `b + iz·seg + ix`
+       documentada acima. Faixa = linha em z; lado = coluna em x. */
+    if (a.origemId != null) registraOrigem(st, i, 'plano', a.origemId, { faixas: Array.from({ length: S }, (_, iz) => Array.from({ length: S }, (_, ix) => b + iz * S + ix)) });
   },
 
   /* chamferBox — P8b do playground: o `cubo` com CANTOS E ARESTAS chanfrados (o corte
@@ -1014,7 +1152,15 @@ export const OPS = {
 
     loc.forEach((p, id) => addV(st, b + id, p));
     faces.forEach((vs, k) => addF(st, b + k, vs.map((id) => b + id)));
-    if (a.origemId != null) registraOrigem(st, i, 'chamferBox', a.origemId, { faces: Array.from({ length: faces.length }, (_, k) => b + k) });
+    /* origemId (A-18): as 6 primeiras faces são as MESMAS do cubo, na mesma
+       ordem e com o mesmo nome; as 12 seguintes são as arestas (X,Y,Z) e as 8
+       últimas os cantos. É a numeração que o cabeçalho desta op já documenta e
+       o teste já trava — aqui ela só passa a ser citável. */
+    if (a.origemId != null) registraOrigem(st, i, 'chamferBox', a.origemId, {
+      faces: { fundo: b, topo: b + 1, tras: b + 2, direita: b + 3, frente: b + 4, esquerda: b + 5 },
+      arestas: Array.from({ length: 12 }, (_, k) => b + 6 + k),
+      cantos: Array.from({ length: 8 }, (_, k) => b + 18 + k),
+    });
   },
 
   /* lathe — P2 do playground: um perfil 2D `[[raio,y],...]` GIRADO em torno do
@@ -2131,6 +2277,31 @@ export const OPS = {
   },
 };
 
+/* A-20 — uma porta publicada precisa existir FORA do núcleo. Até esta rodada
+   `st.portas` só vivia enquanto a lista de passos rodava: nem a régua, nem a
+   bancada, nem o adaptador sabiam que a peça publicou `peDoCaule`, e provar que
+   `sel:{porta}` sobrevive a uma transformação exigia marcar cada porta com um
+   material próprio e ler a marca de volta — prova indireta, sobre `f.material`.
+   O núcleo passa a DEVOLVER as portas.
+
+   Forma: Map nome -> {nome, de, passo}, ORDENADO por nome (comparação de
+   código de ponto, não `localeCompare`, que depende de locale — determinismo
+   antes de estética). `de` sai CLONADO, para que quem lê não consiga mexer nos
+   argumentos do passo por referência. Só o que foi DECLARADO: nome, origem e
+   passo de publicação. As faces resolvidas não entram — elas dependem do
+   momento da citação, e congelar o fim da lista faria a porta mentir sobre
+   passos anteriores.
+
+   Isto NÃO entra em `neutroCanonico`: a porta é contrato de autoria, não
+   geometria, e mexer no canônico mudaria o hash de peça já shipada. */
+function portasDoNucleo(portas) {
+  const nomes = [...portas.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return new Map(nomes.map((nome) => {
+    const porta = portas.get(nome);
+    return [nome, { nome, de: JSON.parse(JSON.stringify(porta.de)), passo: porta.passo }];
+  }));
+}
+
 /* ----------------------------------------------------------------------------
    NÚCLEO: roda a lista e devolve o NEUTRO em números. Não sabe desenhar.
    `dict` funde PARAMS e TOPO — os passos citam o NOME (raio: 'troncoR'), então
@@ -2188,7 +2359,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     fn(st, args, i);
   });
 
-  return { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos };
+  return { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas) };
 }
 
 /* forma canônica e ORDENADA do neutro — a base de toda comparação (replay da
