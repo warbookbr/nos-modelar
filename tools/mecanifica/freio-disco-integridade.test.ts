@@ -275,6 +275,27 @@ describe('flange de roda: um disco, um passo de corte, quatro prisioneiros', () 
     expect(freio.PASSOS.some((p: any) => p[0] === 'arranja')).toBe(false);
   });
 
+  it('trocar `prisioneiros` muda o desenho e MAIS NADA na peça', () => {
+    /* A promessa que o ressalto por prisioneiro não conseguia cumprir. Com ele,
+       mudar 4 para 5 deixava o quinto assento sem furo até alguém escrever à
+       mão o corte dele — e o corte a 72° exigia cosseno como PARAM (A-29). Com
+       `centros:{volta:360, total:'prisioneiros'}` o número é a única coisa a
+       mudar, e o passo angular sai da divisão. */
+    for (const total of [3, 5, 6, 8]) {
+      const neutro = nucleo(
+        [...freio.PASSOS, ['parte', { nome: 'paredesSonda', sel: { alias: 'paredesDosPrisioneiros' }, substituir: true }]],
+        freio.PARAMS, { ...freio.TOPO, prisioneiros: total }, freio.MATERIAIS, null, freio.ALIASES,
+      );
+      expect([total, neutro.orfaos]).toEqual([total, []]);
+      expect([total, corposDaParte(neutro, 'paredesSonda').length]).toEqual([total, total]);
+      // e todos no círculo declarado, sem uma coordenada de furo na peça
+      for (const corpo of corposDaParte(neutro, 'paredesSonda')) {
+        const y = (corpo.min[1] + corpo.max[1]) / 2, z = (corpo.min[2] + corpo.max[2]) / 2;
+        expect(Math.hypot(y, z)).toBeCloseTo(medida('prisioneiroOrbita'), 9);
+      }
+    }
+  });
+
   it('cada furo continua endereçável SOZINHO, e não é um borrão de 48 paredes', () => {
     /* sem o eixo `furo` na origem, `segundoPrisioneiro` pediria as 48 paredes e
        receberia as 48 — o passo único teria custado a identidade individual,
