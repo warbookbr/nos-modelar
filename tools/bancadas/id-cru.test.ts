@@ -160,7 +160,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
     'alt', 'altura', 'amplitude', 'aneis', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
-    'profundidade', 'raio', 'secoes', 'seg', 'semente', 'substituir', 'usa',
+    'profundidade', 'raio', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
   const CONTAINER = ['sel'];
 

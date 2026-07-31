@@ -4090,3 +4090,328 @@ describe('A-20 — o núcleo devolve as portas publicadas', () => {
     expect([...recusada.portas]).toEqual([]);
   });
 });
+
+/* ---------------------------------------------------------------------------
+   O-13 — `arranja` (arranjo radial e linear com identidade por cópia).
+
+   O que estes casos existem para matar, dito na cara, porque os dois ciclos
+   anteriores morreram do mesmo jeito (verde pelo motivo errado):
+
+   1. CÓPIA ANÔNIMA. Um arranjo que devolve faces sem nome desfaz O-6 e O-12.
+      Então nenhum caso aqui cita id de face para dizer QUEM é a cópia: todos
+      passam por `sel:{alias}`/`sel:{origem}` e só então conferem o id que saiu.
+   2. ÂNGULO ACUMULADO. Somar o passo N vezes e somar uma vez multiplicado por N
+      dão doubles DIFERENTES, e a diferença entra no arquivo salvo. Os casos de
+      determinismo comparam contra o valor DERIVADO e provam, no mesmo teste,
+      que o valor ACUMULADO seria outro — senão a afirmação passaria com as duas
+      implementações e não provaria nada.
+   3. NUMERAÇÃO SEM AFIRMAÇÃO. Toda chave nova do formato salvo (`total`,
+      `volta`, `graus`, `d`, `pivo`, `copia`) tem pelo menos um caso que troca o
+      valor e cobra outro resultado.
+--------------------------------------------------------------------------- */
+describe('O-13 — arranja (arranjo radial e linear)', () => {
+  const fonte = { op: 'cubo', id: 30 };
+  const colecao = { op: 'arranja', id: 50, de: fonte };
+  const braco = (extra: any = {}): any[] => [
+    ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+    ['transladar', { d: [1, 0, 0] }],
+    ['arranja', { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte }, ...extra }],
+  ];
+  const aliases: any = [
+    ['todasAsCopias', { origem: colecao }],
+    ['segundaCopia', { origem: { ...colecao, copia: 1 } }],
+    ['ultimaCopia', { origem: { ...colecao, copia: 'ultima' } }],
+    ['primeiraCopia', { origem: { ...colecao, copia: 'primeira' } }],
+    ['copiaPorParam', { origem: { ...colecao, copia: 'qual' } }],
+    ['copiasAlternadas', { origem: { ...colecao, copia: { passo: 2, fase: 0 } } }],
+    ['fonteMaisCopias', { unir: [{ origem: fonte }, { origem: colecao }] }],
+  ];
+  const idsCom = (n: any, chave: string, valor: any) => [...n.F.values()].filter((f: any) => f[chave] === valor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+  const nomear = (nome: string, alias: string) => ['parte', { nome, sel: { alias } }];
+
+  it('a coleção inteira e cada cópia são endereçáveis por identidade, sem citar id nem posição de passo', () => {
+    const n = nucleo([...braco(),
+      nomear('coroa', 'todasAsCopias'),
+      ['pincel', { modo: 'face', sel: { alias: 'segundaCopia' }, cor: '#f00' }],
+      ['liso', { sel: { alias: 'ultimaCopia' } }],
+      ['solido', { sel: { alias: 'primeiraCopia' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    // 3 cópias × 6 faces, base do passo 2 = 2000, cada cópia numa corrida contígua
+    expect(idsCom(n, 'parte', 'coroa')).toEqual([2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(n, 'cor', '#f00')).toEqual([2006, 2007, 2008, 2009, 2010, 2011]);       // cópia 1
+    expect(idsCom(n, 'liso', true)).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);        // 'ultima' = cópia 2
+    expect(idsCom(n, 'solido', true)).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);      // 'primeira' = cópia 0
+    // a fonte NÃO é cópia: nenhuma das citações acima pegou face dela
+    expect([...n.F.values()].filter((f: any) => f.id < BLOCO).every((f: any) => f.parte === null && f.cor === null && !f.liso && !f.solido)).toBe(true);
+    // e a união com a fonte é o mecanismo que já existe para querer as duas coisas
+    const comFonte = nucleo([...braco(), nomear('tudo', 'fonteMaisCopias')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(comFonte, 'parte', 'tudo')).toHaveLength(24);
+  });
+
+  it('a cópia citada por PARAM acompanha o parâmetro, e a citada por extremidade acompanha a contagem', () => {
+    const dois = nucleo([...braco(), nomear('alvo', 'copiaPorParam')] as any, { qual: 2 }, {}, {}, null, aliases);
+    const zero = nucleo([...braco(), nomear('alvo', 'copiaPorParam')] as any, { qual: 0 }, {}, {}, null, aliases);
+    expect(idsCom(dois, 'parte', 'alvo')).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(zero, 'parte', 'alvo')).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);
+    // 'ultima' com total 4 e com total 6 aponta para cópias DIFERENTES, sem tocar na citação
+    const quatro = nucleo([...braco(), nomear('alvo', 'ultimaCopia')] as any, {}, {}, {}, null, aliases);
+    const seis = nucleo([...braco({ total: 6 }), nomear('alvo', 'ultimaCopia')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(quatro, 'parte', 'alvo')).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(seis, 'parte', 'alvo')).toEqual([2024, 2025, 2026, 2027, 2028, 2029]);
+    // progressão sobre as cópias: 0 e 2 de três
+    const alt = nucleo([...braco(), nomear('alvo', 'copiasAlternadas')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(alt, 'parte', 'alvo')).toEqual([2000, 2001, 2002, 2003, 2004, 2005, 2012, 2013, 2014, 2015, 2016, 2017]);
+  });
+
+  it('a identidade não depende da posição do passo: inserir um passo antes não muda quem é a cópia', () => {
+    const semInserir = nucleo([...braco(), nomear('alvo', 'segundaCopia')] as any, {}, {}, {}, null, aliases);
+    const comInserir = nucleo([
+      ['cubo', { id: 0, lado: 0.05 }],
+      ['cubo', { id: BLOCO, lado: 0.2, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      nomear('alvo', 'segundaCopia'),
+    ] as any, {}, {}, {}, null, aliases);
+    expect(semInserir.orfaos).toHaveLength(0); expect(comInserir.orfaos).toHaveLength(0);
+    expect(idsCom(semInserir, 'parte', 'alvo')).toEqual([2006, 2007, 2008, 2009, 2010, 2011]);
+    expect(idsCom(comInserir, 'parte', 'alvo')).toEqual([3006, 3007, 3008, 3009, 3010, 3011]);   // só a base do passo mudou
+  });
+
+  it('o ângulo é DERIVADO da contagem, não acumulado — e o acumulado daria outro double', () => {
+    // 7 instâncias fechando 360°: o passo 360/7 é o caso em que somar 6 vezes != multiplicar por 6
+    const n = nucleo([...braco({ total: 7 })] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    const passo = 360 / 7;
+    const gira = (p: number[], graus: number) => { const r = (graus * Math.PI) / 180, c = Math.cos(r), s = Math.sin(r); return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c]; };
+    const origem = [...nucleo(braco({ total: 7 }).slice(0, 2) as any, {}, {}).V.entries()].sort((a: any, b: any) => a[0] - b[0]);
+    const nVporCopia = origem.length;
+    for (let k = 0; k < 6; k++) {
+      for (let j = 0; j < nVporCopia; j++) {
+        const esperado = gira(origem[j][1] as number[], (k + 1) * passo);
+        expect(n.V.get(2000 + k * nVporCopia + j)).toEqual(esperado);   // igualdade EXATA de double
+      }
+    }
+    // a afirmação acima não é vazia: o acumulado daria OUTRO valor na cópia 5
+    let acumulado = 0; for (let j = 0; j < 6; j++) acumulado += passo;
+    expect(acumulado).not.toBe(6 * passo);
+    expect(gira(origem[0][1] as number[], acumulado)).not.toEqual(gira(origem[0][1] as number[], 6 * passo));
+  });
+
+  it('linear: a cópia k fica em p+(k+1)·d, também derivado — o acumulado erraria o último passo', () => {
+    const passos: any[] = [
+      ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+      ['arranja', { modo: 'linear', d: [0.1, 0, 0], total: 8, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const puro = [...nucleo([passos[0]], {}, {}).V.entries()].sort((a: any, b: any) => a[0] - b[0]);
+    for (let k = 0; k < 7; k++) for (let j = 0; j < puro.length; j++) {
+      const p = puro[j][1] as number[];
+      expect(n.V.get(BLOCO + k * puro.length + j)).toEqual([p[0] + (k + 1) * 0.1, p[1], p[2]]);
+    }
+    let acumulado = 0; for (let j = 0; j < 7; j++) acumulado += 0.1;
+    expect(acumulado).not.toBe(7 * 0.1);   // 0.7 vs 0.7000000000000001 — a diferença entraria no arquivo salvo
+  });
+
+  it('vértice EXATAMENTE sobre o eixo é soldado: as cópias reusam o id original em vez de empilhar', () => {
+    // um cone tem o ápice em cima do eixo Y e o centro da base na origem
+    const fonteCone = { op: 'cone', id: 30 };
+    const passos: any[] = [
+      ['cone', { id: 0, raio: 0.5, altura: 1, lados: 4, origemId: 30 }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonteCone, sel: { origem: fonteCone } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    const puro = nucleo([passos[0]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const noEixo = [...puro.V.entries()].filter(([, p]: any) => p[0] === 0 && p[2] === 0).map(([id]: any) => id);
+    expect(noEixo).toEqual([4]);                          // só o ápice: o anel da base nasce com ±1e-17, e o weld é EXATO
+    const soltos = puro.V.size - noEixo.length;
+    expect(n.V.size).toBe(puro.V.size + soltos * 2);      // 2 cópias × só os vértices FORA do eixo
+    // e as faces das cópias realmente citam os vértices ORIGINAIS do eixo
+    const usadosNasCopias = new Set<number>();
+    for (const f of n.F.values() as any) if (f.id >= BLOCO) for (const v of f.vs) usadosNasCopias.add(v);
+    for (const v of noEixo) expect(usadosNasCopias.has(v)).toBe(true);
+  });
+
+  it('atributo da fonte é herdado pela cópia, e a fonte não é alterada', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 30, face: 'topo' } }, cor: '#0f0' }],
+      ['parte', { nome: 'braco', sel: { origem: fonte } }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(idsCom(n, 'cor', '#0f0')).toEqual([1, 4001, 4007]);           // topo da fonte + topo de cada cópia
+    expect(idsCom(n, 'parte', 'braco')).toHaveLength(18);
+  });
+
+  it('cada valor recusado GRITA e não deixa NADA para trás — meia coleção nunca existe', () => {
+    const base = ['cubo', { id: 0, lado: 0.2, origemId: 30 }];
+    const bom = { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } };
+    const casos: [string, any][] = [
+      ['modo ausente', { ...bom, modo: undefined }],
+      ['modo desconhecido', { ...bom, modo: 'grade' }],
+      ['total 1', { ...bom, total: 1 }],
+      ['total fracionário', { ...bom, total: 2.5 }],
+      ['volta e graus juntos', { ...bom, graus: 90 }],
+      ['nem volta nem graus', { ...bom, volta: undefined }],
+      ['radial com d', { ...bom, d: [1, 0, 0] }],
+      ['eixo desconhecido', { ...bom, eixo: 'w' }],
+      ['linear sem d', { modo: 'linear', total: 4, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['linear com d nulo', { modo: 'linear', total: 4, d: [0, 0, 0], origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['linear com eixo', { modo: 'linear', total: 4, d: [1, 0, 0], eixo: 'y', origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['cópia coincidente com a fonte', { ...bom, volta: undefined, graus: 180, total: 3 }],
+      ['sem origemId', { ...bom, origemId: undefined }],
+      ['sem derivaDe', { ...bom, derivaDe: undefined }],
+      ['sel por id literal', { ...bom, sel: { f: [1] } }],
+      ['sel por região', { ...bom, sel: { regiao: { min: [-9, -9, -9], max: [9, 9, 9] } } }],
+      ['sel de outra origem', { ...bom, sel: { origem: { op: 'cubo', id: 30, face: 'topo' } } }],
+      ['faces literais junto', { ...bom, faces: [1] }],
+      ['fonte inexistente', { ...bom, derivaDe: { op: 'cubo', id: 31 }, sel: { origem: { op: 'cubo', id: 31 } } }],
+    ];
+    const puro = nucleo([base] as any, {}, {});
+    for (const [nome, args] of casos) {
+      const n = nucleo([base, ['arranja', args], nomear('alvo', 'todasAsCopias')] as any, {}, {}, {}, null, aliases);
+      expect(n.orfaos.some((o: any) => o.op === 'arranja'), nome).toBe(true);
+      expect(neutroCanonico(n).V, nome).toEqual(neutroCanonico(puro).V);
+      expect(neutroCanonico(n).F, nome).toEqual(neutroCanonico(puro).F);
+      expect(idsCom(n, 'parte', 'alvo'), nome).toEqual([]);                 // a coleção não existe para citar
+    }
+  });
+
+  it('face inteiramente sobre o eixo aborta a coleção antes de alocar geometria', () => {
+    // um plano centrado na origem tem a face inteira atravessada pelo eixo Y? não —
+    // o caso real é uma face cujos 4 cantos estão TODOS no eixo, o que só acontece
+    // quando a face é degenerada no eixo. Usa-se um cubo achatado sobre o eixo Y.
+    const passos: any[] = [
+      ['cubo', { id: 0, lado: 1, origemId: 30 }],
+      ['moveV', { v: 0, d: [0.5, 0, 0.5] }], ['moveV', { v: 1, d: [-0.5, 0, 0.5] }],
+      ['moveV', { v: 2, d: [-0.5, 0, -0.5] }], ['moveV', { v: 3, d: [0.5, 0, -0.5] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    const puro = nucleo(passos.slice(0, 5), {}, {});
+    expect(n.orfaos.some((o: any) => o.op === 'arranja' && /sobre o eixo/.test(o.motivo))).toBe(true);
+    expect(n.V.size).toBe(puro.V.size); expect(n.F.size).toBe(puro.F.size);
+  });
+
+  it('citar uma cópia fora do limite GRITA em vez de escolher a mais próxima', () => {
+    const fora: any = [['sumida', { origem: { ...colecao, copia: 3 } }]];   // total 4 = cópias 0..2
+    const n = nucleo([...braco(), nomear('alvo', 'sumida')] as any, {}, {}, {}, null, fora);
+    expect(idsCom(n, 'parte', 'alvo')).toEqual([]);
+    expect(n.orfaos.some((o: any) => /fora do limite da origem arranja:50/.test(o.motivo))).toBe(true);
+  });
+
+  it('o bloco de ids do passo é conferido ANTES de inserir', () => {
+    const grande = (total: number): any[] => [
+      ['plano', { id: 0, largura: 1, profundidade: 1, seg: 9, origemId: 30 }],   // 100 vértices, 81 faces
+      ['arranja', { modo: 'linear', d: [2, 0, 0], total, origemId: 50, derivaDe: { op: 'plano', id: 30 }, sel: { origem: { op: 'plano', id: 30 } } }],
+    ];
+    expect(() => nucleo(grande(11), {}, {})).not.toThrow();     // 10 cópias × 100 vértices = 1000 = BLOCO
+    expect(() => nucleo(grande(12), {}, {})).toThrow(/arranja estoura o bloco/);
+  });
+
+  it('determinístico: re-rodar e ida-e-volta por JSON dão o mesmo neutro canônico', () => {
+    const passos = [...braco(), nomear('alvo', 'ultimaCopia')] as any;
+    const canon = JSON.stringify(neutroCanonico(nucleo(passos, {}, {}, {}, null, aliases)));
+    expect(JSON.stringify(neutroCanonico(nucleo(passos, {}, {}, {}, null, aliases)))).toBe(canon);
+    expect(JSON.stringify(neutroCanonico(nucleo(JSON.parse(JSON.stringify(passos)), {}, {}, {}, null, JSON.parse(JSON.stringify(aliases)))))).toBe(canon);
+  });
+
+  it('volta e graus dizem coisas diferentes, e a diferença aparece na malha', () => {
+    const posDaCopia = (extra: any) => {
+      const n = nucleo(braco(extra) as any, {}, {});
+      return (n.V.get(2000) as number[]).map((x) => +x.toFixed(9));
+    };
+    // total 4: volta 360 => passo 90; graus 90 => o MESMO passo (arco aberto de 270)
+    expect(posDaCopia({ total: 4, volta: 360 })).toEqual(posDaCopia({ total: 4, volta: undefined, graus: 90 }));
+    // total 5: volta 360 => passo 72; graus 60 => passo 60. Não são a mesma coisa.
+    expect(posDaCopia({ total: 5, volta: 360 })).not.toEqual(posDaCopia({ total: 5, volta: undefined, graus: 60 }));
+    // e o arco ABERTO com passo que fecha a volta é justamente o caso que grita:
+    // total 5 com graus 90 põe a quarta cópia a 360° da fonte, em cima dela
+    const fecha = nucleo(braco({ total: 5, volta: undefined, graus: 90 }) as any, {}, {});
+    expect(fecha.orfaos.some((o: any) => /múltiplo exato de 360/.test(o.motivo))).toBe(true);
+    expect(fecha.V.size).toBe(8);
+  });
+
+  it('o pivô ausente é [0,0,0] declarado, não o centroide da seleção', () => {
+    const semPivo = nucleo(braco({ total: 3 }) as any, {}, {});
+    const comPivoZero = nucleo(braco({ total: 3, pivo: [0, 0, 0] }) as any, {}, {});
+    const comOutroPivo = nucleo(braco({ total: 3, pivo: [1, 0, 0] }) as any, {}, {});
+    expect(neutroCanonico(semPivo).V).toEqual(neutroCanonico(comPivoZero).V);
+    expect(neutroCanonico(semPivo).V).not.toEqual(neutroCanonico(comOutroPivo).V);
+    // com o pivô no centro do próprio braço as cópias ficam EM CIMA dele — é por isso
+    // que o default não é o centroide: seria silenciosamente errado e plausível na foto
+    const caixa = (n: any) => { let min = Infinity, max = -Infinity; for (const p of n.V.values() as any) { min = Math.min(min, p[0]); max = Math.max(max, p[0]); } return +(max - min).toFixed(6); };
+    expect(caixa(semPivo)).toBeGreaterThan(caixa(comOutroPivo));
+  });
+
+  it('a origem do arranjo atravessa a API pública e nomeia só o que ela criou', () => {
+    const ctx = { tex: { texCanvas: (w: number, h: number) => ({ width: w, height: h }) }, m4: { ident: () => new Float32Array(16) } };
+    const viaApi: any = executar([...braco(), nomear('coroa', 'todasAsCopias')] as any, {}, {}, ctx, {}, {}, null, aliases);
+    const lote = viaApi.lotes.find((l: any) => l.parte === 'coroa');
+    expect(lote).toBeDefined();
+    expect(lote.mesh.v.length).toBe(18 * 6 * 8);   // 3 cópias × 6 faces × 2 triângulos × 3 vértices × 8 floats
+  });
+
+  it('publicarPorta aceita a coleção e uma cópia, e a porta sai do núcleo', () => {
+    const n = nucleo([...braco(),
+      ['publicarPorta', { nome: 'coroaDeBracos', de: colecao }],
+      ['publicarPorta', { nome: 'bracoDaFrente', de: { ...colecao, copia: 'primeira' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    expect([...n.portas.keys()]).toEqual(['bracoDaFrente', 'coroaDeBracos']);
+    const pintada = nucleo([...braco(),
+      ['publicarPorta', { nome: 'bracoDaFrente', de: { ...colecao, copia: 'primeira' } }],
+      ['parte', { nome: 'frente', sel: { porta: 'bracoDaFrente' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(pintada, 'parte', 'frente')).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   Dívida do ciclo anterior — a palavra reservada de extremidade engolia um
+   PARAM homônimo. Medido na revisão de "Endereços semânticos v1": num `plano`
+   com `seg:3` e `PARAMS {ultima: 0}`, `faixa:'ultima'` devolvia a ÚLTIMA linha,
+   não a linha 0, sem diagnóstico. Referência que resolve para outra coisa em
+   silêncio é o que o CLAUDE.md proíbe.
+--------------------------------------------------------------------------- */
+describe('extremidade de eixo x PARAM homônimo', () => {
+  const grade = { op: 'plano', id: 30 };
+  const passos = (eixo: any): any[] => [
+    ['plano', { id: 0, largura: 3, profundidade: 3, seg: 3, origemId: 30 }],
+    ['parte', { nome: 'linha', sel: { origem: { ...grade, faixa: eixo } } }],
+  ];
+  const ids = (n: any) => [...n.F.values()].filter((f: any) => f.parte === 'linha').map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+  it('sem colisão nada muda: a palavra resolve pela contagem e o PARAM resolve pelo valor', () => {
+    expect(ids(nucleo(passos('ultima'), {}, {}))).toEqual([6, 7, 8]);
+    expect(ids(nucleo(passos('primeira'), {}, {}))).toEqual([0, 1, 2]);
+    expect(ids(nucleo(passos('qual'), { qual: 0 }, {}))).toEqual([0, 1, 2]);
+    expect(ids(nucleo(passos('qual'), { qual: 2 }, {}))).toEqual([6, 7, 8]);
+  });
+
+  it('PARAM com o nome de uma extremidade GRITA na citação, em vez de a palavra ganhar calada', () => {
+    const n = nucleo(passos('ultima'), { ultima: 0 }, {});
+    expect(ids(n)).toEqual([]);                                   // não resolveu para a linha 0
+    expect(n.F.has(6)).toBe(true);                                // nem para a última: não resolveu para nada
+    expect(ids(nucleo(passos('ultima'), { ultima: 0 }, {}))).not.toEqual([6, 7, 8]);
+    expect(n.orfaos.some((o: any) => /palavra reservada de extremidade E também um parâmetro declarado/.test(o.motivo))).toBe(true);
+    // TOPO conta igual a PARAM: os dois entram no mesmo dicionário
+    const porTopo = nucleo(passos('primeira'), {}, { primeira: 2 });
+    expect(ids(porTopo)).toEqual([]);
+    expect(porTopo.orfaos.some((o: any) => /parâmetro declarado/.test(o.motivo))).toBe(true);
+  });
+
+  it('a colisão grita em todo eixo que usa extremidade, não só na faixa do plano', () => {
+    const cilindro = { op: 'cilindro', id: 40 };
+    const n = nucleo([
+      ['cilindro', { id: 0, raio: 1, altura: 1, lados: 6, origemId: 40 }],
+      ['parte', { nome: 'lado', sel: { origem: { ...cilindro, lado: 'ultima' } } }],
+    ] as any, { ultima: 1 }, {});
+    expect([...n.F.values()].filter((f: any) => f.parte === 'lado')).toHaveLength(0);
+    expect(n.orfaos.some((o: any) => /parâmetro declarado/.test(o.motivo))).toBe(true);
+  });
+});

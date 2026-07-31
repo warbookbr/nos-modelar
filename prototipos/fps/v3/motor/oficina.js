@@ -30,6 +30,28 @@ function baseDoPasso(i) { return i * BLOCO; }
 ---------------------------------------------------------------------------- */
 function norm3(x, y, z) { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; }
 
+/* eixo nominal -> índice de coordenada. UMA definição para `rotaciona`,
+   `espelha` e `arranja`, que faziam a mesma comparação de três jeitos. */
+function indiceDeAxi(eixo) { return eixo === 'x' ? 0 : eixo === 'y' ? 1 : eixo === 'z' ? 2 : -1; }
+
+/* ROTAÇÃO right-handed em torno do eixo `ax`, ao redor de `pivo`, com o cosseno
+   e o seno JÁ calculados (o chamador gira muitos pontos pelo mesmo ângulo).
+   `p' = pivo + R_eixo(θ)·(p − pivo)` — a MESMA convenção das matrizes de
+   animação `mRotX/mRotY/mRotZ` deste arquivo, e o FORMATO SALVO das ops
+   `rotaciona` e `arranja`, que dividem esta função exatamente para não poderem
+   divergir de sinal (o erro que a skill `criar-peca` já pagou uma vez):
+     eixo x: y' = y·cosθ − z·senθ ;  z' = y·senθ + z·cosθ
+     eixo y: x' = x·cosθ + z·senθ ;  z' = −x·senθ + z·cosθ
+     eixo z: x' = x·cosθ − y·senθ ;  y' = x·senθ + y·cosθ */
+function giraPonto(p, pivo, ax, c, s) {
+  const dx = p[0] - pivo[0], dy = p[1] - pivo[1], dz = p[2] - pivo[2];
+  let rx = dx, ry = dy, rz = dz;
+  if (ax === 0) { ry = dy * c - dz * s; rz = dy * s + dz * c; }
+  else if (ax === 1) { rx = dx * c + dz * s; rz = -dx * s + dz * c; }
+  else { rx = dx * c - dy * s; ry = dx * s + dy * c; }
+  return [pivo[0] + rx, pivo[1] + ry, pivo[2] + rz];
+}
+
 /* produto vetorial a×b — puro, usado só pela op `loft` (frame de transporte
    paralelo, mais abaixo). */
 function cross3(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
@@ -232,9 +254,21 @@ function origensIguais(a, b) {
       CONTAGEM REAL do gerador naquele passo. "A última faixa" continua sendo a
       última quando a contagem muda — é o caso que motivou o atrito.
 
-   As duas palavras são RESERVADAS: um PARAM chamado `ultima` não é alcançável
-   por um eixo (a palavra ganha). É o preço de ter vocabulário fechado, e é
-   preferível a decidir por precedência silenciosa em cima do dicionário.
+   As duas palavras são RESERVADAS. A primeira versão desta rodada dizia "um
+   PARAM chamado `ultima` não é alcançável por um eixo (a palavra ganha)", e
+   ISSO ERA O DEFEITO: num `plano` com `seg:3` e `PARAMS {ultima: 0}`, escrever
+   `faixa: 'ultima'` devolvia a ÚLTIMA linha, não a linha 0, sem diagnóstico
+   nenhum. A referência resolvia para OUTRA coisa em silêncio — exatamente a
+   classe que o CLAUDE.md proíbe, e a mesma que o A-19 tinha acabado de fechar
+   do outro lado. Vocabulário fechado é decisão legítima; precedência silenciosa
+   sobre o dicionário do autor não é.
+
+   A regra agora: a palavra continua RESERVADA (ela ganha), mas a COLISÃO GRITA.
+   Declarar um PARAM/TOPO com o nome de uma extremidade e citá-lo num eixo é
+   erro de referência ambígua, com a causa nomeada e o conserto dito (renomeie o
+   parâmetro). Sem colisão nada muda: os dois caminhos seguem como estavam. */
+/* Fase 2 (Arranjos semânticos v1): a colisão só é detectável com o dicionário
+   da peça em mãos, então ele viaja no `st` — leitura, nunca escrita.
 
    O eixo continua sem aceitar número negativo, fracionário ou fora do limite:
    qualquer um deles GRITA com a causa nomeada, como o resto do núcleo. */
@@ -260,7 +294,10 @@ function eixoDeIndiceUnico(valor) { return typeof valor === 'number' || typeof v
    órfão (o caminho que as origens já usam) em vez de derrubar a peça inteira. */
 function indiceDeEixo(st, valor, tamanho) {
   if (typeof valor === 'number') return { idx: valor };
-  if (Object.hasOwn(EXTREMIDADES_EIXO, valor)) return { idx: EXTREMIDADES_EIXO[valor](tamanho) };
+  if (Object.hasOwn(EXTREMIDADES_EIXO, valor)) {
+    if (st.dict && Object.hasOwn(st.dict, valor)) return { erro: `é a palavra reservada de extremidade E também um parâmetro declarado (=${JSON.stringify(st.dict[valor])}) — a palavra ganha, então a citação é ambígua; renomeie o parâmetro` };
+    return { idx: EXTREMIDADES_EIXO[valor](tamanho) };
+  }
   let bruto;
   try { bruto = st.num(valor); } catch (e) { return { erro: `não resolve: ${String(e.message).replace(/^oficina: /, '')}` }; }
   if (!Number.isSafeInteger(bruto) || bruto < 0) return { erro: `resolveu ${bruto}, que não é índice (inteiro ≥ 0)` };
@@ -544,6 +581,62 @@ const CONTRATOS_ORIGEM = {
         const copia = registro.copias.get(original);
         if (copia == null || !st.F.has(copia)) return { erro: `cópia da face ${original} da origem derivada não existe` };
         faces.push(copia);
+      }
+      return { faces };
+    },
+  },
+  /* arranja (O-13) — a MESMA forma de origem derivada do `espelha` (`{op,id,de}`,
+     com `de` apontando para a fonte), mais UM eixo: `copia`. É esse eixo que
+     impede a cópia anônima, o risco central do item: um arranjo de 5 cópias
+     publica UMA identidade endereçável de seis jeitos —
+       `{op:'arranja', id}`                  a COLEÇÃO inteira, na ordem de cópia;
+       `{op:'arranja', id, copia: 2}`        a terceira cópia;
+       `{op:'arranja', id, copia: 'nBracos'} o índice que acompanha o PARAM;
+       `{op:'arranja', id, copia: 'ultima'}` a última, mude a contagem que mudar;
+       `{op:'arranja', id, copia: {passo,fase}}` uma progressão (alternadas);
+     e NENHUM deles cita id de face, índice de passo ou posição na lista.
+
+     A NUMERAÇÃO das cópias é 0..total−2 e conta CÓPIAS, não instâncias: a fonte
+     NÃO é cópia (ela já tem a identidade dela, a origem citada em `de`), e o
+     arranjo só responde pelo que ele criou — a mesma lei do `espelha`, que
+     resolve para a imagem e nunca para o original. A cópia `k` está a `k+1`
+     passos da fonte; quem quer as duas coisas junta as duas origens num ALIAS
+     `unir`, que é o mecanismo que já existe para isso. */
+  arranja: {
+    validar(origem) {
+      const chaves = ['op', 'id', 'de', 'copia'];
+      const msg = "arranja usa op, id, de e copia opcional (eixo numérico sobre as cópias 0..total−2: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = a coleção inteira, ou filtro de progressão {passo,fase})";
+      if (!Object.keys(origem).every((k) => chaves.includes(k)) || !Object.hasOwn(origem, 'de')) return msg;
+      if (!validarEixo(origem.copia)) return msg;
+      const fonte = validarOrigem(origem.de);
+      return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
+    },
+    resolver(st, registro, origem) {
+      if (!origensIguais(origem.de, registro.derivaDe)) return { erro: `origem arranja:${origem.id} foi derivada de outra seleção estrutural` };
+      const fonte = resolverOrigem(st, origem.de);
+      if (fonte.erro) return { erro: `origem derivada inválida: ${fonte.erro}` };
+      const nCopias = registro.copias.length;
+      let indices;
+      if (eixoDeIndiceUnico(origem.copia)) {
+        const r = indiceDeEixo(st, origem.copia, nCopias);
+        if (r.erro) return { erro: `copia '${origem.copia}' da origem arranja:${origem.id} ${r.erro}` };
+        if (r.idx >= nCopias) return { erro: `copia ${textoDeEixo(origem.copia, r.idx)} fora do limite da origem arranja:${origem.id} (0..${nCopias - 1})` };
+        indices = [r.idx];
+      } else {
+        indices = indicesEixo(origem.copia, nCopias);
+        if (typeof origem.copia === 'object' && origem.copia != null && !indices.length) {
+          const { passo, fase } = origem.copia;
+          return { erro: `filtro de copia {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${nCopias - 1} na origem arranja:${origem.id}` };
+        }
+      }
+      const faces = [];
+      for (const k of indices) {
+        const mapa = registro.copias[k];
+        for (const original of fonte.faces) {
+          const copia = mapa.get(original);
+          if (copia == null || !st.F.has(copia)) return { erro: `copia ${k} da face ${original} da origem derivada não existe` };
+          faces.push(copia);
+        }
       }
       return { faces };
     },
@@ -1981,7 +2074,8 @@ export const OPS = {
      estrutural de bloco — é valor de argumento, como o `modo` do pincel). */
   rotaciona(st, a, i) {
     const eixo = a.eixo;
-    if (eixo !== 'x' && eixo !== 'y' && eixo !== 'z') return grita(st, i, 'rotaciona', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
+    const ax = indiceDeAxi(eixo);
+    if (ax < 0) return grita(st, i, 'rotaciona', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
     const graus = st.num(a.graus ?? 0);
 
     // seleção -> conjunto de ids de vértice afetados (AUSENTE = malha inteira) — resolverAlvosV, P8
@@ -2001,12 +2095,7 @@ export const OPS = {
     for (const v of alvos) {
       const p = st.V.get(v);
       if (!p) continue;   // defensivo (nunca deveria faltar — veio de st.V.keys() ou de um canto de face já validado)
-      const dx = p[0] - pivo[0], dy = p[1] - pivo[1], dz = p[2] - pivo[2];
-      let rx = dx, ry = dy, rz = dz;
-      if (eixo === 'x') { ry = dy * c - dz * s; rz = dy * s + dz * c; }
-      else if (eixo === 'y') { rx = dx * c + dz * s; rz = -dx * s + dz * c; }
-      else { rx = dx * c - dy * s; ry = dx * s + dy * c; }
-      st.V.set(v, [pivo[0] + rx, pivo[1] + ry, pivo[2] + rz]);   // in-place — NUNCA cria vértice novo
+      st.V.set(v, giraPonto(p, pivo, ax, c, s));   // in-place — NUNCA cria vértice novo
     }
   },
 
@@ -2065,7 +2154,7 @@ export const OPS = {
      `modo` do pincel — não é erro estrutural de bloco). */
   espelha(st, a, i) {
     const eixo = a.eixo;
-    const ax = eixo === 'x' ? 0 : eixo === 'y' ? 1 : eixo === 'z' ? 2 : -1;
+    const ax = indiceDeAxi(eixo);
     if (ax < 0) return grita(st, i, 'espelha', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
     const pos = st.num(a.pos ?? 0);
     const b = baseDoPasso(i);
@@ -2146,6 +2235,188 @@ export const OPS = {
       nf.cor = f.cor; nf.material = f.material; nf.parte = f.parte; nf.liso = f.liso; nf.solido = f.solido;
     }
     if (estrutural) registraOrigem(st, i, 'espelha', a.origemId, { derivaDe, copias });
+  },
+
+  /* arranja (O-13) — REPETE uma origem estrutural N vezes, em torno de um eixo
+     (`modo:'radial'`) ou ao longo de um deslocamento (`modo:'linear'`). MEATY
+     como o `espelha`: cria vértices e faces NOVOS, ids do BLOCO do passo, é
+     FORMATO SALVO.
+
+     POR QUE ELA EXISTE (O-13, medido em RELATO-RODA-REALISTA.md): o único
+     mecanismo de repetição do núcleo era o `espelha`, que resolve simetria de
+     duas vias e nada mais. Toda outra repetição era desenrolada à mão — para
+     declarar dez braços em cinco pares em torno do eixo X, a roda experimental
+     gerou CEM parâmetros de coordenada e terminou com 141, dos quais só uma
+     fração é decisão dimensional. A intenção "cinco pares em torno do eixo X"
+     não existia em lugar nenhum do arquivo; existia a expansão dela. O custo
+     aparece no que NÃO foi modelado: o cubo do freio não tem prisioneiro de
+     roda e o disco não tem aleta de ventilação — círculo de parafusos e arranjo
+     radial, as duas figuras mecânicas mais comuns que existem.
+
+     ESTRUTURAL SEMPRE, sem modo legado. O `espelha` tem um modo antigo que
+     copia sem publicar identidade, porque ele é anterior ao O-6; esta op nasce
+     depois e não repete o erro — `origemId`, `derivaDe` e `sel:{origem:…}` são
+     OBRIGATÓRIOS, e é por construção que não existe cópia anônima. Endereçar a
+     coleção e cada cópia é o contrato `CONTRATOS_ORIGEM.arranja`, acima.
+
+     CONTAGEM (`total`, dimensional — pode citar PARAM): quantas instâncias a
+     coleção tem CONTANDO A FONTE. "Cinco braços" é `total:5`, e a op cria 4
+     cópias. Escolhido assim porque `total` é a palavra que o autor mecânico já
+     usa ("seis prisioneiros", "doze aletas"); contar cópias obrigaria a
+     escrever 5 para dizer seis, que é a mesma aritmética escondida que o item
+     veio matar. `total` precisa ser inteiro ≥ 2 — `1` seria "arranjo de um
+     elemento", isto é, um passo que não faz nada, e no-op silencioso é o que o
+     CLAUDE.md proíbe.
+
+     PASSO ANGULAR (`modo:'radial'`), EXATAMENTE UMA das duas palavras — dar as
+     duas GRITA, não dar nenhuma GRITA:
+       `volta`  graus varridos pela coleção FECHADA; o passo é `volta/total`.
+                `volta:360, total:6` = seis a cada 60°, e a sexta NÃO volta em
+                cima da fonte. É a forma do círculo de parafusos;
+       `graus`  o passo entre instâncias consecutivas, direto, como no
+                `rotaciona`. A coleção varre `graus·(total−1)`. É a forma do
+                arco aberto ("cinco aletas a cada 15°").
+     As duas dizem coisas diferentes e nenhuma é derivável da outra sem eu
+     ADIVINHAR se o arco fecha; ambiguidade grita, nunca escolhe.
+
+     DETERMINISMO DO ÂNGULO (formato salvo): o ângulo da cópia `k` é
+     `(k+1)·passo`, DERIVADO da contagem — nunca acumulado somando o passo
+     sucessivamente, que faria o erro de ponto flutuante crescer com o índice e
+     entrar no arquivo salvo. Cada cópia é gerada da posição ORIGINAL da fonte,
+     não da cópia anterior: 359,99999° não existe aqui.
+
+     PIVÔ (`pivo`, opcional `[x,y,z]`, dimensional): AUSENTE = `[0,0,0]`, a
+     origem do mundo. É DIFERENTE do `rotaciona`, cujo default é o centroide dos
+     afetados, e a diferença é deliberada: um arranjo radial gira em torno do
+     EIXO DA PEÇA (onde toda primitiva deste núcleo nasce), e um default que
+     dependesse da seleção poria o centro do arranjo no meio do próprio braço —
+     silenciosamente errado, e plausível na foto. Default declarado ganha de
+     default esperto.
+
+     DESLOCAMENTO (`modo:'linear'`): `d` (`[x,y,z]`, dimensional) é o passo de
+     UMA instância, a mesma palavra e o mesmo significado do `transladar`; a
+     cópia `k` fica em `p + (k+1)·d`. `d` nulo GRITA (cópias coincidentes).
+
+     COINCIDÊNCIA GRITA: no radial, uma cópia cujo ângulo é múltiplo exato de
+     360° cai em cima da fonte (`graus:180, total:3` põe a segunda cópia de
+     volta na origem). Isso é geometria duplicada no mesmo lugar, invisível na
+     foto e cega para o teste de manifold — a mesma classe do degenerado do
+     `espelha`. Grita e NÃO cria nada.
+
+     SOLDA NO EIXO (radial, decisão fixa, formato salvo): um vértice cujas DUAS
+     coordenadas fora do eixo são EXATAMENTE as do pivô está SOBRE o eixo — a
+     rotação não o move —, então toda cópia REUSA o id original em vez de
+     empilhar N vértices no mesmo ponto. É o mesmo teste de igualdade EXATA (não
+     tolerância) do weld do `espelha` e do polo `raio===0` do `lathe`. No linear
+     não há ponto fixo, então não há solda.
+
+     NUMERAÇÃO (formato salvo, travada por teste): as faces da fonte em ordem
+     CRESCENTE de id; os vértices afetados (cantos dessas faces, deduplicados)
+     em ordem CRESCENTE de id. Um cursor de vértice e um cursor de face, os dois
+     começando em 0 e andando na ordem cópia 0, cópia 1, … — vértice soldado no
+     eixo não consome id. Cada cópia ocupa uma corrida contígua de faces. Os
+     cantos NÃO são revertidos (rotação e translação preservam a mão; só o
+     espelho a troca), e cor/material/parte/liso/solido são HERDADOS da face
+     fonte, como no `espelha`.
+
+     COMPLETUDE: como no `espelha` estrutural, a saída é uma origem INTEIRA ou
+     não é nada. Face sem posição, ou face inteiramente sobre o eixo, aborta o
+     passo ANTES de reservar qualquer id — nunca sobra meia coleção endereçável. */
+  arranja(st, a, i) {
+    const modo = a.modo;
+    if (modo !== 'radial' && modo !== 'linear') return grita(st, i, 'arranja', modo, `modo '${modo}' desconhecido (só 'radial' e 'linear')`);
+
+    const total = st.num(a.total ?? 0);
+    if (!Number.isSafeInteger(total) || total < 2) return grita(st, i, 'arranja', 'total', `total precisa ser inteiro ≥ 2 (a fonte conta como instância); recebido ${JSON.stringify(a.total ?? null)} = ${total}`);
+    const nCopias = total - 1;
+
+    // ---- parâmetros do modo: um GRITO por ambiguidade, um por ausência ----
+    let ax = -1, passoGraus = 0, pivo = [0, 0, 0], d = [0, 0, 0];
+    if (modo === 'radial') {
+      ax = indiceDeAxi(a.eixo);
+      if (ax < 0) return grita(st, i, 'arranja', a.eixo, `eixo '${a.eixo}' desconhecido (só 'x'/'y'/'z')`);
+      if (a.d != null) return grita(st, i, 'arranja', 'd', "modo 'radial' não usa d (deslocamento é do modo 'linear')");
+      const temVolta = a.volta != null, temGraus = a.graus != null;
+      if (temVolta && temGraus) return grita(st, i, 'arranja', 'volta+graus', "volta e graus dizem coisas diferentes (volta = o arco FECHADO da coleção, passo = volta/total; graus = o passo entre instâncias consecutivas) — declare exatamente uma");
+      if (!temVolta && !temGraus) return grita(st, i, 'arranja', 'volta+graus', "modo 'radial' exige volta (arco fechado, passo = volta/total) ou graus (passo entre instâncias consecutivas) — exatamente uma");
+      passoGraus = temVolta ? st.num(a.volta) / total : st.num(a.graus);
+      if (!Number.isFinite(passoGraus)) return grita(st, i, 'arranja', temVolta ? 'volta' : 'graus', 'passo angular não é um número finito');
+      for (let k = 1; k <= nCopias; k++) {
+        if (k * passoGraus % 360 === 0) return grita(st, i, 'arranja', 'passo', `a cópia ${k - 1} cairia a ${k * passoGraus}° da fonte, um múltiplo exato de 360° — geometria coincidente; nenhuma cópia foi criada`);
+      }
+      if (a.pivo != null) pivo = st.vec(a.pivo);
+    } else {
+      if (a.eixo != null || a.volta != null || a.graus != null || a.pivo != null) return grita(st, i, 'arranja', 'eixo/volta/graus/pivo', "modo 'linear' usa só d (eixo, volta, graus e pivo são do modo 'radial')");
+      if (a.d == null) return grita(st, i, 'arranja', 'd', "modo 'linear' exige d:[x,y,z], o deslocamento de UMA instância");
+      d = st.vec(a.d);
+      if (d[0] === 0 && d[1] === 0 && d[2] === 0) return grita(st, i, 'arranja', 'd', 'd nulo põe todas as cópias em cima da fonte — geometria coincidente; nenhuma cópia foi criada');
+    }
+
+    // ---- identidade estrutural: obrigatória, e conferida ANTES de tocar na malha ----
+    if (a.origemId == null || a.derivaDe == null) return grita(st, i, 'arranja', 'origemId+derivaDe', 'arranja é sempre estrutural: origemId e derivaDe são obrigatórios (sem eles a cópia seria anônima)');
+    if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, 'arranja', 'origemId', 'origemId precisa ser inteiro não-negativo');
+    const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
+    if (declaracoes.length > 1) return grita(st, i, 'arranja', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
+    const fonteValida = validarOrigem(a.derivaDe);
+    if (fonteValida.erro) return grita(st, i, 'arranja', 'derivaDe', `derivaDe inválida: ${fonteValida.erro}`);
+    if (a.faces != null || !a.sel || typeof a.sel !== 'object' || Array.isArray(a.sel) || Object.keys(a.sel).length !== 1 || !Object.hasOwn(a.sel, 'origem')) return grita(st, i, 'arranja', 'sel', 'arranja exige sel:{origem:...} direto, sem faces, alias, região ou ids literais');
+    const seletor = validarOrigem(a.sel.origem);
+    if (seletor.erro || !origensIguais(a.sel.origem, a.derivaDe)) return grita(st, i, 'arranja', 'sel.origem', 'sel.origem precisa ser a mesma origem estrutural declarada em derivaDe');
+    const resultado = resolverOrigem(st, a.derivaDe);
+    if (resultado.erro) return grita(st, i, 'arranja', 'derivaDe', resultado.erro);
+
+    const faceIds = [...resultado.faces].sort((x, y) => x - y);
+    if (!faceIds.length) return grita(st, i, 'arranja', 'derivaDe', 'origem fonte sem face nenhuma');
+
+    // no eixo? (só o radial tem ponto fixo; no linear nada fica parado)
+    const noEixo = (p) => modo === 'radial' && p[(ax + 1) % 3] === pivo[(ax + 1) % 3] && p[(ax + 2) % 3] === pivo[(ax + 2) % 3];
+
+    /* completude: a coleção inteira ou nada. Confere TODAS as faces antes de
+       reservar id — face sem posição não tem cópia, e face inteiramente sobre o
+       eixo teria cópia COINCIDENTE (todos os cantos parados). */
+    for (const fid of faceIds) {
+      const f = st.F.get(fid);
+      if (!f || f.vs.some((v) => !st.V.has(v))) return grita(st, i, 'arranja', fid, 'não foi possível criar a cópia: face ou vértice-fonte inexistente; nenhuma cópia foi criada');
+      if (f.vs.every((v) => noEixo(st.V.get(v)))) return grita(st, i, 'arranja', fid, 'face inteiramente sobre o eixo do arranjo — a cópia seria coincidente; nenhuma cópia foi criada');
+    }
+
+    const afetados = new Set();
+    for (const fid of faceIds) for (const v of st.F.get(fid).vs) afetados.add(v);
+    const vertsOrdenados = [...afetados].sort((x, y) => x - y);
+
+    // guarda de overflow (D3): conta ANTES de inserir — vértice no eixo não consome id
+    const nVPorCopia = vertsOrdenados.filter((v) => !noEixo(st.V.get(v))).length;
+    const nVNovos = nVPorCopia * nCopias, nFNovos = faceIds.length * nCopias;
+    if (nVNovos > BLOCO || nFNovos > BLOCO) throw new Error(`oficina: arranja estoura o bloco de ids (${BLOCO}): ${nVNovos} vértice(s) novo(s) / ${nFNovos} face(s) nova(s)`);
+
+    const b = baseDoPasso(i);
+    let cursorV = 0, cursorF = 0;
+    const copias = [];
+    for (let k = 0; k < nCopias; k++) {
+      // ângulo DERIVADO do índice, nunca acumulado: (k+1)·passo, sempre a partir da fonte
+      const rad = modo === 'radial' ? ((k + 1) * passoGraus * Math.PI) / 180 : 0;
+      const c = Math.cos(rad), s = Math.sin(rad);
+      const mapa = new Map();
+      for (const v of vertsOrdenados) {
+        const p = st.V.get(v);
+        if (noEixo(p)) { mapa.set(v, v); continue; }   // sobre o eixo: soldado, sem id novo
+        const q = modo === 'radial' ? giraPonto(p, pivo, ax, c, s) : [p[0] + (k + 1) * d[0], p[1] + (k + 1) * d[1], p[2] + (k + 1) * d[2]];
+        const novo = b + cursorV; cursorV++;
+        addV(st, novo, q);
+        mapa.set(v, novo);
+      }
+      const copiaDaFace = new Map();
+      for (const fid of faceIds) {
+        const f = st.F.get(fid);
+        const novo = b + cursorF; cursorF++;
+        addF(st, novo, f.vs.map((v) => mapa.get(v)));   // sem reverter: rotação e translação preservam a mão
+        copiaDaFace.set(fid, novo);
+        const nf = st.F.get(novo);
+        nf.cor = f.cor; nf.material = f.material; nf.parte = f.parte; nf.liso = f.liso; nf.solido = f.solido;
+      }
+      copias.push(copiaDaFace);
+    }
+    registraOrigem(st, i, 'arranja', a.origemId, { derivaDe: a.derivaDe, copias });
   },
 
   /* ---- atributos por face ---- */
@@ -2350,7 +2621,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
