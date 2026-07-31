@@ -5444,3 +5444,76 @@ describe('furo v2 — face redonda com círculo de furos em simetria exata', () 
     expect(area).toBeCloseTo(poligono(0.052, 16) - 4 * poligono(0.0065, 12), 12);
   });
 });
+
+/* ============================================================================
+   FURO V2 — ATÉ ONDE A PARTIÇÃO CHEGA, E ONDE ELA PARA (A-33)
+
+   A rodada do flange registrou "17 de 240 combinações gritavam antes, 0
+   depois". A frase é verdadeira DENTRO das 240 escolhidas e falsa fora delas.
+   Varredura de 14 212 combinações de `face × lados do furo × total`, com a
+   mesma figura do flange (raio 0,052, furos de raio 0,0065 a 0,038 do centro):
+
+     10 758  saem inteiras, sem órfão;
+      1 240  gritam porque dois anéis se cruzam ou se encostam — CORRETO;
+      1 165  gritam porque um anel não cabe na face — CORRETO;
+        904  estouram o bloco de ids do passo — LIMITE DECLARADO do núcleo;
+         37  travam a partição: "nenhuma orelha livre" — DEFEITO ABERTO (A-33).
+
+   As 37 são todas face de POUCOS lados (6, 7, 8, 10, 18) com muitos furos
+   raspando a borda: o polígono com pontes vira fracamente simples com folga na
+   casa de 5·10⁻⁴, e a orelha não acha corte livre. O importante, e é o que
+   estas afirmações fixam, é que o caso ruim GRITA e ABORTA — nunca sai peça
+   com malha rasgada. Quando A-33 for consertado, o segundo bloco fica vermelho
+   e quem consertar move a linha para o primeiro.
+============================================================================ */
+describe('furo v2 — a fronteira medida da partição (A-33)', () => {
+  const FLANGE = (ladosDaFace: number, ladosDoFuro: number, total: number) => [
+    ['cilindro', { id: 0, origemId: 1, raio: 0.052, altura: 0.012, lados: ladosDaFace }],
+    ['furo', {
+      origemId: 9,
+      de: { op: 'cilindro', id: 1, tampa: 'topo' },
+      saida: { op: 'cilindro', id: 1, tampa: 'fundo' },
+      centros: { distancia: 0.038, total, volta: 360 },
+      raio: 0.0065,
+      lados: ladosDoFuro,
+      orientacao: [1, 0, 0],
+    }],
+  ];
+
+  it('147 combinações da região sadia saem inteiras e com malha fechada', () => {
+    let contadas = 0;
+    for (let face = 8; face <= 20; face += 2) {
+      for (const furo of [6, 8, 12]) {
+        for (let total = 2; total <= 8; total++) {
+          const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+          expect(n.orfaos.map((o: any) => o.motivo), `face ${face}, furo ${furo}, total ${total}`).toEqual([]);
+          expect(arestasSoltas(n), `face ${face}, furo ${furo}, total ${total}`).toBe(0);
+          expect([...n.F.keys()].filter((f: number) => f >= 1000))
+            .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
+          contadas++;
+        }
+      }
+    }
+    /* a contagem existe para que uma varredura que deixe de varrer não passe
+       calada por não ter achado nada. */
+    expect(contadas).toBe(147);
+  });
+
+  /* a região que AINDA trava, dita na cara. Cada linha veio da varredura de
+     14 212 e é geometricamente válida: os anéis cabem na face e não se tocam. */
+  const AINDA_TRAVA: [number, number, number][] = [
+    [6, 3, 7], [6, 3, 9], [6, 4, 7], [6, 12, 7], [6, 24, 7],
+    [7, 3, 8], [7, 5, 8], [8, 3, 9], [8, 4, 10], [10, 4, 11], [18, 3, 11],
+  ];
+  for (const [face, furo, total] of AINDA_TRAVA) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: trava, e trava GRITANDO (A-33)`, () => {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos.length).toBeGreaterThan(0);
+      expect(n.orfaos[0].motivo).toMatch(/nenhuma orelha livre/);
+      /* e o passo ABORTA inteiro: o que não dá para particionar não vira meia
+         peça na tela. Nenhuma face nem vértice do bloco do furo sobrevive. */
+      expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(0);
+      expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(0);
+    });
+  }
+});

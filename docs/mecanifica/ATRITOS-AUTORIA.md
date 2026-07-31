@@ -21,6 +21,63 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-34 — a silhueta do furo continua poligonal, e isso é forma, não sombreado
+
+**Onde dói:** linguagem da Oficina, na op `furo`; e na leitura que o cliente faz.
+
+**Como apareceu:** dentro do A-31, que consertou o SOMBREADO da borda e disse na
+cara que não consertava o CONTORNO. Dito dentro de um atrito resolvido, o resto
+saiu da lista aberta sem nunca ter sido pago. Esta entrada é o resto, com nome
+próprio.
+
+**Evidência:** `tools/bancadas/out/bancada-freio-disco-direita-sel-cubo-isolar-focado.png`,
+vista direita de perto. Dá para contar as 12 quinas de cada furo de prisioneiro.
+Normal suave muda como a luz corre pela superfície; não muda por onde a
+superfície termina. Na silhueta, e só nela, a malha aparece como ela é.
+
+**Contorno usado hoje:** mais `lados`. Custa faces em toda peça que use o furo, e
+não distingue a borda vista de perto da vista de longe.
+
+**Capacidade candidata:** um filete (`chanfro`/`filete` seletivo) na aresta do
+contorno, que é o que quebra a silhueta reta sem multiplicar a malha inteira. É
+geral: vale para toda quina de toda peça, não só para a borda de furo. É o
+assunto do ciclo "curva de perfil + filete seletivo", já escrito como candidato.
+
+### A-33 — a partição do furo trava em face de poucos lados com furo raspando a borda
+
+**Onde dói:** núcleo da Oficina, na op `furo` com vários `centros`.
+
+**Como apareceu:** a rodada "Flange de uma peça só" registrou "17 de 240
+combinações gritavam antes, 0 depois". A frase vale DENTRO das 240 escolhidas.
+Varrendo 14 212 combinações da mesma figura (face de 3 a 36 lados, furo de 3 a
+24 lados, 2 a 20 furos; raio da face 0,052, furos de raio 0,0065 a 0,038 do
+centro):
+
+| resultado | casos | julgamento |
+| --- | ---: | --- |
+| sai inteira, sem órfão | 10 758 | — |
+| dois anéis se cruzam ou se encostam | 1 240 | grito CORRETO |
+| um anel não cabe na face | 1 165 | grito CORRETO |
+| estoura o bloco de ids do passo | 904 | limite DECLARADO do núcleo |
+| a partição trava: "nenhuma orelha livre" | 37 | **defeito, este atrito** |
+
+**Evidência:** as 37 são todas face de POUCOS lados (6, 7, 8, 10 e 18) com
+muitos furos raspando a borda — por exemplo face de 6 lados com 7 furos de 3
+lados, onde o anel fica a cerca de 5·10⁻⁴ da aresta da face. O polígono com as
+pontes para os buracos é fracamente simples, e com folga dessa ordem a busca de
+orelha não acha corte livre.
+
+**O que já está garantido:** o caso ruim GRITA e ABORTA o passo inteiro, com
+0 V e 0 F do bloco do furo. Não sai peça com malha rasgada. Está fixado em
+`tools/oficina/oficina.test.ts`, num bloco que também varre 147 combinações da
+região sadia. Quando o defeito for consertado, esse segundo bloco fica vermelho
+e quem consertar move as linhas para o primeiro.
+
+**Capacidade candidata:** triangulação de polígono com buracos que não dependa
+de ponte + orelha — ou uma ponte escolhida por critério de robustez em vez do
+primeiro corte visível. É geral: vale para qualquer face com mais de um buraco,
+em qualquer família de objeto.
+
 ### A-29 — o passo do arranjo radial só dá centro NOMEÁVEL em 90°, 180° e 270°
 
 **Onde dói:** linguagem da Oficina, ao compor `arranja` com `furo`.
@@ -745,18 +802,29 @@ de partir em malhas por parte e material, para que troca de material não vire
 costura. E o leque virou triangulação por ORELHAS no plano da face, que falha
 alto quando o contorno não fecha.
 
-**Prova:** `tools/mecanifica/normais-lisas.test.ts`, 8 casos, mais os PNGs de
+**Prova:** `tools/mecanifica/normais-lisas.test.ts`, 15 casos, mais os PNGs de
 antes e depois no mesmo enquadramento (vista direita e isométrica, furo de
-perto). Três mutações rodadas: ignorar `face.liso` derruba 3 casos; somar sobre
+perto). Três mutações rodadas na entrega: ignorar `face.liso` derruba 3 casos; somar sobre
 TODAS as faces em vez de só as lisas derruba 2; voltar ao leque derruba 2. Uma
 quarta mutação SOBREVIVEU e virou conserto: havia uma conferência que endireitava
 a normal do triângulo contra a normal do plano, e ela mascarava o leque — a
 aparência ficava certa e a área errada continuava lá. A conferência foi removida.
 
+**Segunda leva de provas, depois da revisão.** Quatro frases que o adaptador
+escrevia no comentário não tinham asserção nenhuma embaixo: com a suíte de 710
+casos, estragar a linha correspondente deixava tudo verde. As quatro ganharam
+fixture e mutação que as mata — a soma ser do estado NEUTRO inteiro (cilindro
+liso partido por material), o peso por ÁREA (barril de altura 10 contra abinha
+de 0,02), a queda para a normal CHAPADA quando a soma degenera (aba de
+espessura zero) e a normal do TRIÂNGULO em vez da do plano (loft entre dois
+quadrados a 45°). E o adaptador passou a ser atravessado pelo ACERVO INTEIRO em
+`tools/mecanifica/acervo-adaptador.test.ts`: antes só cinco peças chegavam nele
+em teste, e ele tinha ganhado três caminhos novos que LANÇAM.
+
 **O que isto NÃO conserta:** a SILHUETA. Normal suave é sombreado. O contorno do
 furo continua o polígono de `lados` arestas que a malha tem, e na vista direita
-de perto dá para contar as 12 quinas. Quem quiser mais volta pede mais `lados`,
-ou espera o filete do ciclo 5.
+de perto dá para contar as 12 quinas. Esse resto NÃO fica enterrado aqui: ele
+saiu com nome próprio como **A-34**, na lista de atritos ABERTOS.
 
 ### A-26 — um furo por face: um círculo de parafusos não cabe numa placa
 

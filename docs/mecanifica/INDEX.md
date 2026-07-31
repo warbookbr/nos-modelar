@@ -96,7 +96,10 @@ Estado atual:
   sozinho (a peça constrói com 3, 5, 6 e 8, sem cosseno no arquivo). Levar a op
   ao produto ACHOU um defeito no núcleo: a orelha da partição aceitava vértice
   EM CIMA de uma aresta sua, e a face simétrica do flange (16 lados, 4 anéis de
-  12 a 90°) gritava. Corrigido; 17 de 240 combinações gritavam antes, 0 depois.
+  12 a 90°) gritava. Corrigido; 17 de 240 combinações gritavam antes, 0 depois
+  — e essa conta vale DENTRO das 240. Varrendo 14 212, sobram 37 que travam a
+  partição, todas face de poucos lados com furo raspando a borda: é o A-33,
+  aberto, com a fronteira medida e fixada em teste.
   O que ela NÃO fez: a silhueta do furo continua o polígono de 12 arestas
   (A-31), e o flange tem o raio do cubo, sem degrau piloto/flange, porque o aro
   entra por cima do cubo com 0,6 mm de folga (A-32, novo);

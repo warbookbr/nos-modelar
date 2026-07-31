@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-215 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+216 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -280,6 +280,7 @@
 
 ## tools/mecanifica/
 
+- `acervo-adaptador.test.ts` — acervo-adaptador.test.ts — o ADAPTADOR passa por todo o acervo, e não só pelas cinco peças que outros testes usam de fixture.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — argumentos.test.ts — prova de que os CLIs da Mecanifica não engolem bandeira desconhecida em silêncio (MEDIA-7). O defeito: `--estrit` (uma letra a menos que…
