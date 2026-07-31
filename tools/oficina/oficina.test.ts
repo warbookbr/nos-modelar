@@ -4813,7 +4813,7 @@ describe('furo — toda face nova é endereçável, e as famílias não se confu
 
   it('chave desconhecida na origem do furo GRITA com o vocabulário certo, em vez de ser ignorada', () => {
     const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, lado: 0 } }, cor: '#f00' }]]) as any, {}, {});
-    expect(n.orfaos.some((o: any) => /furo usa op, id, borda\/parede\/saida opcionais/.test(o.motivo))).toBe(true);
+    expect(n.orfaos.some((o: any) => /furo usa op, id, furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
     expect(pintadas(n, '#f00')).toEqual([]);
   });
 
@@ -5060,5 +5060,290 @@ describe('furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F', (
     ] as any, {}, {});
     expect(n.orfaos.some((o: any) => /CÔNCAVO/.test(o.motivo))).toBe(true);
     expect([...n.F.keys()].filter((f: number) => f >= 2000)).toEqual([]);
+  });
+});
+
+/* ============================================================================
+   FURO v2 — VÁRIOS FUROS NA MESMA FACE (A-26). O que muda aqui não é geometria,
+   é o que o formato salvo passa a prometer: N anéis num passo, cada um com
+   identidade PRÓPRIA, uma partição que fecha a malha e um grito quando dois
+   anéis se cruzam. Cada uma dessas promessas tem afirmação abaixo, e cada
+   afirmação morre quando o valor muda.
+============================================================================ */
+const CIRCULO = (extra: any = {}) => ({
+  de: { op: 'cubo', id: 1, face: 'topo' },
+  saida: { op: 'cubo', id: 1, face: 'fundo' },
+  centros: { distancia: 1.2, total: 4, volta: 360 },
+  raio: 0.3, lados: 6, ...extra,
+});
+const QUATRO_PONTOS = (extra: any = {}) => ({
+  de: { op: 'cubo', id: 1, face: 'topo' },
+  saida: { op: 'cubo', id: 1, face: 'fundo' },
+  centros: [[0, 0, 1.2], [1.2, 0, 0], [0, 0, -1.2], [-1.2, 0, 0]],
+  raio: 0.3, lados: 6, ...extra,
+});
+
+describe('furo v2 — um passo abre vários furos na mesma face', () => {
+  it('quatro furos passantes numa placa: malha FECHADA, zero órfão, contagem fechada', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    // vértices: 2·lados por furo, nada mais — a partição não cria canto novo
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 6 * 4);
+    expect(n.V.size).toBe(8 + 48);
+    /* faces: 3·lados por furo (borda, parede, borda de saída) + o preenchimento
+       dos dois lados, `n + 2M − 2` cada um (n = 4 cantos do quadrado, M = 4). */
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 4 + 2 * (4 + 2 * 4 - 2));
+    expect(n.F.has(1)).toBe(false);   // topo consumido
+    expect(n.F.has(0)).toBe(false);   // fundo consumido
+    expect([...n.F.keys()].filter((f: number) => f < 1000).sort((a: number, b: number) => a - b)).toEqual([2, 3, 4, 5]);
+  });
+
+  it('quatro furos CEGOS: mesma partição na entrada, um fundo por furo e nenhum na saída', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS({ saida: undefined, profundidade: 0.4 })) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect(n.F.has(0)).toBe(true);    // o fundo do cubo continua vivo
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength((2 * 6 + 1) * 4 + (4 + 2 * 4 - 2));
+  });
+
+  it('a numeração é FORMATO SALVO: o furo k mora em b+3·lados·k, e o preenchimento vem depois de todos', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    const L = 6;
+    for (let k = 0; k < 4; k++) {
+      for (let j = 0; j < 3 * L; j++) expect(n.F.has(1000 + 3 * L * k + j)).toBe(true);
+      for (let j = 0; j < 2 * L; j++) expect(n.V.has(1000 + 2 * L * k + j)).toBe(true);
+    }
+    // o preenchimento começa exatamente em b + 3·lados·M
+    const cheio = [...n.F.keys()].filter((f: number) => f >= 1000 + 3 * L * 4).sort((a: number, b: number) => a - b);
+    expect(cheio[0]).toBe(1000 + 3 * L * 4);
+    expect(cheio).toHaveLength(2 * (4 + 2 * 4 - 2));
+  });
+
+  it('cada furo do passo é DISTINGUÍVEL dos outros: `furo:k` responde por um só, e o eixo ausente por todos', () => {
+    const furo = { op: 'furo', id: 9 };
+    const cor = (origem: any) => {
+      const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem }, cor: '#abc' }]]) as any, {}, {});
+      expect(n.orfaos).toEqual([]);
+      return pintadas(n, '#abc');
+    };
+    const p0 = cor({ ...furo, furo: 0, parede: 0 });
+    const p2 = cor({ ...furo, furo: 2, parede: 0 });
+    expect(p0).toHaveLength(1);
+    expect(p2).toHaveLength(1);
+    expect(p0).not.toEqual(p2);                              // dois furos, duas identidades
+    expect(cor({ ...furo, parede: 0 })).toEqual([...p0, ...p2, ...cor({ ...furo, furo: 1, parede: 0 }), ...cor({ ...furo, furo: 3, parede: 0 })].sort((a, b) => a - b));
+    expect(cor({ ...furo, furo: 'ultima' })).toEqual(cor({ ...furo, furo: 3 }));
+    expect(cor({ ...furo, furo: 1 })).toHaveLength(3 * 6);    // o furo inteiro: borda + parede + saída
+    expect(cor({ ...furo, furo: { passo: 2, fase: 0 } })).toEqual([...cor({ ...furo, furo: 0 }), ...cor({ ...furo, furo: 2 })].sort((a, b) => a - b));
+    expect(cor(furo)).toHaveLength(3 * 6 * 4 + 2 * (4 + 2 * 4 - 2));   // a origem nua: tudo, preenchimento incluído
+  });
+
+  it('`furo` fora do limite GRITA nomeando a faixa, e o diagnóstico das famílias nomeia o furo', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, furo: 4 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /furo 4 fora do limite da origem furo:9 \(0\.\.3\)/.test(o.motivo))).toBe(true);
+    const fam = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, furo: 2, parede: 9 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(fam.orfaos.some((o: any) => /parede 9 fora do limite do furo 2 da origem furo:9 \(0\.\.5\)/.test(o.motivo))).toBe(true);
+  });
+
+  it('o PREENCHIMENTO é endereçável, e citá-lo num furo de um anel só GRITA em vez de devolver vazio', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimento: 0 } }, cor: '#0f0' }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimentoDaSaida: 'ultima' } }, cor: '#00f' }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#0f0')).toHaveLength(1);
+    expect(pintadas(n, '#00f')).toHaveLength(1);
+    expect(normalDe(n, pintadas(n, '#0f0')[0])[1]).toBeCloseTo(1, 9);    // preenchimento da entrada: olha para +y
+    expect(normalDe(n, pintadas(n, '#00f')[0])[1]).toBeCloseTo(-1, 9);   // o da saída: para -y
+
+    const um = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimento: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(um.orfaos.some((o: any) => /abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento/.test(o.motivo))).toBe(true);
+    const cego = nucleo(PLACA(QUATRO_PONTOS({ saida: undefined, profundidade: 0.4 }), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimentoDaSaida: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(cego.orfaos.some((o: any) => /é um furo CEGO — não tem preenchimento de saída/.test(o.motivo))).toBe(true);
+  });
+
+  it('a herança segue a face de origem: entrada e saída pintam lados diferentes', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#111' }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#222' }],
+      ['furo', { origemId: 9, ...QUATRO_PONTOS() }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    // borda + parede + preenchimento da entrada herdam #111; borda e preenchimento da saída, #222
+    expect(pintadas(n, '#111')).toHaveLength(2 * 6 * 4 + (4 + 2 * 4 - 2));
+    expect(pintadas(n, '#222')).toHaveLength(6 * 4 + (4 + 2 * 4 - 2));
+  });
+
+  it('toda face da partição sai com área POSITIVA e virada para o mesmo lado da face cortada', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    for (const f of n.F.values() as any) {
+      if (f.id < 1000) continue;
+      const vs = f.vs.map((v: number) => n.V.get(v));
+      let area = 0;
+      for (let k = 0; k < vs.length; k++) {
+        const p = vs[k], q = vs[(k + 1) % vs.length];
+        area += Math.hypot((p[1] - q[1]) * (p[2] + q[2]), (p[2] - q[2]) * (p[0] + q[0]), (p[0] - q[0]) * (p[1] + q[1]));
+      }
+      expect(area).toBeGreaterThan(1e-9);
+    }
+    // a soma das áreas do lado de entrada bate com o quadrado menos os quatro discos
+    const soma = [...n.F.values()].filter((f: any) => normalDe(n, f.id)[1] > 0.999).reduce((s: number, f: any) => {
+      const vs = f.vs.map((v: number) => n.V.get(v));
+      let a = 0;
+      for (let k = 0; k < vs.length; k++) { const p = vs[k], q = vs[(k + 1) % vs.length]; a += p[0] * q[2] - q[0] * p[2]; }
+      return s + Math.abs(a) / 2;
+    }, 0);
+    const areaAnel = (6 / 2) * Math.sin((2 * Math.PI) / 6) * 0.3 * 0.3;
+    expect(soma).toBeCloseTo(4 * 4 - 4 * areaAnel, 9);
+  });
+});
+
+describe('furo v2 — dois anéis que se cruzam GRITAM, e o passo inteiro aborta', () => {
+  const dois = (c1: any, c2: any, extra: any = {}) => nucleo(PLACA({
+    de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' },
+    centros: [c1, c2], raio: 0.5, lados: 6, ...extra,
+  }) as any, {}, {});
+
+  it('anéis sobrepostos não viram um furo em oito: GRITA e nada é construído', () => {
+    const n = dois([0.4, 0, 0], [-0.4, 0, 0]);
+    expect(n.orfaos.some((o: any) => /os anéis 0 e 1 se cruzam ou se encostam na face de entrada/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);   // 0 F
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toEqual([]);   // 0 V
+    expect(n.F.has(1)).toBe(true);   // e a face de entrada continua VIVA
+    expect(arestasSoltas(n)).toBe(0);
+  });
+
+  it('anéis que só se ENCOSTAM também gritam — vértice pinçado é malha errada e plausível', () => {
+    // dois hexágonos de raio 0.5 com centros a exatamente 2·0.5·cos(30°) = √3/2
+    const n = dois([0, 0, 0], [Math.sqrt(3) / 2, 0, 0]);
+    expect(n.orfaos.some((o: any) => /se cruzam ou se encostam/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+  });
+
+  it('anéis separados por uma folga mínima PASSAM — a recusa é do cruzamento, não da vizinhança', () => {
+    const n = dois([0, 0, 0], [Math.sqrt(3) / 2 + 0.01, 0, 0]);
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 2 + 2 * (4 + 2 * 2 - 2));
+  });
+
+  it('saída OBLÍQUA: dois anéis quase encostados continuam separados do outro lado, e a malha fecha', () => {
+    /* a projeção do anel na face de saída é AFIM (`p ↦ p + eixo·t(p)`, com `t`
+       linear em `p`), então ela não pode aproximar dois anéis que a entrada
+       separou. É por isso que a sobreposição é conferida UMA vez, na entrada.
+       Este teste mede a afirmação em vez de confiar nela: a saída é inclinada,
+       os anéis passam a um centésimo de se encostar, e o resultado é malha
+       fechada com os anéis ainda separados do outro lado. */
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 6, alt: 2, prof: 6, origemId: 1 }],
+      ['moveV', { v: 0, d: [0, 0.8, 0] }], ['moveV', { v: 1, d: [0, 0.8, 0] }],   // inclina o FUNDO em torno do eixo x
+      ['furo', {
+        origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' },
+        centros: [[0, 0, -0.44], [0, 0, 0.44]], raio: 0.25, lados: 6,
+      }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 2 + 2 * (4 + 2 * 2 - 2));
+    // o furo é o passo 3, então b = 3000: os anéis do outro lado são b+6..b+11 e b+18..b+23
+    const anel = (base: number) => Array.from({ length: 6 }, (_, j) => n.V.get(base + j));
+    let menor = Infinity;
+    for (const p of anel(3006)) for (const q of anel(3018)) menor = Math.min(menor, Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]));
+    expect(menor).toBeGreaterThan(0);
+  });
+});
+
+describe('furo v2 — o círculo de parafusos é uma FRASE, e as duas formas dizem o mesmo', () => {
+  it('quatro furos a 1,2 do centro: a forma de círculo produz os mesmos anéis da lista escrita à mão', () => {
+    const porCirculo = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const porLista = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    expect(porCirculo.orfaos).toEqual([]);
+    const pos = (n: any) => [...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b).map((v: number) => n.V.get(v).map((x: number) => +x.toFixed(9)));
+    expect(pos(porCirculo)).toEqual(pos(porLista));
+    expect([...porCirculo.F.keys()].sort()).toEqual([...porLista.F.keys()].sort());
+  });
+
+  it('a distância e a contagem MANDAM: mudar `total` muda a contagem de furos e `distancia` afasta os centros', () => {
+    const seis = nucleo(PLACA(CIRCULO({ centros: { distancia: 1.2, total: 6, volta: 360 } })) as any, {}, {});
+    expect(seis.orfaos).toEqual([]);
+    expect([...seis.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 6 * 6);
+    const raioDe = (n: any) => {
+      const p = n.V.get(1000);   // vértice 0 do anel 0
+      return Math.hypot(p[0], p[2]);
+    };
+    expect(raioDe(nucleo(PLACA(CIRCULO()) as any, {}, {}))).toBeCloseTo(1.2 + 0.3, 9);
+    expect(raioDe(nucleo(PLACA(CIRCULO({ centros: { distancia: 1.5, total: 4, volta: 360 } })) as any, {}, {}))).toBeCloseTo(1.5 + 0.3, 9);
+  });
+
+  it('`graus` é o passo direto, e `volta` o arco fechado: 4 furos em volta 360 == 4 furos de 90 em 90', () => {
+    const porVolta = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const porGraus = nucleo(PLACA(CIRCULO({ centros: { distancia: 1.2, total: 4, graus: 90 } })) as any, {}, {});
+    const pos = (n: any) => [...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b).map((v: number) => n.V.get(v).map((x: number) => +x.toFixed(9)));
+    expect(pos(porGraus)).toEqual(pos(porVolta));
+  });
+
+  it('`orientacao` decide onde cai o furo 0 — é a mesma chave que já decidia a fase do anel', () => {
+    const padrao = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const girado = nucleo(PLACA(CIRCULO({ orientacao: [1, 0, 0] })) as any, {}, {});
+    expect(girado.orfaos).toEqual([]);
+    const centro = (n: any) => {
+      let x = 0, z = 0;
+      for (let j = 0; j < 6; j++) { const p = n.V.get(1000 + j); x += p[0] / 6; z += p[2] / 6; }
+      return [+x.toFixed(9), +z.toFixed(9)];
+    };
+    expect(centro(padrao)).not.toEqual(centro(girado));
+    expect(Math.hypot(...centro(girado))).toBeCloseTo(1.2, 9);
+  });
+
+  it('o `pivo` desloca o círculo inteiro, e ele é dimensional como todo ponto do núcleo', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['furo', { origemId: 9, ...CIRCULO({ centros: { pivo: [1, 0, 0], distancia: 0.6, total: 4, volta: 360 } }) }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    let x = 0, z = 0;
+    for (let j = 0; j < 6; j++) { x += n.V.get(1000 + j)[0] / 6; z += n.V.get(1000 + j)[2] / 6; }
+    expect(x).toBeCloseTo(1, 9);     // o pivô desloca o círculo inteiro em x
+    expect(z).toBeCloseTo(0.6, 9);   // e o furo 0 fica a `distancia` na direção do +u da face
+  });
+});
+
+describe('furo v2 — completude: a recusa vem antes do primeiro id, e a forma velha não muda', () => {
+  const casos: [string, any, RegExp][] = [
+    ['centro e centros juntos', { ...PASSANTE, centros: [[0, 0, 0]] }, /centro e centros dizem a mesma coisa em número diferente/],
+    ['nenhum dos dois', { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, raio: 0.3 }, /furo exige centro/],
+    ['lista vazia', { ...PASSANTE, centro: undefined, centros: [] }, /centros é uma lista vazia/],
+    ['ponto de aridade errada', { ...PASSANTE, centro: undefined, centros: [[0, 0]] }, /centros\[0\] precisa ser \[x,y,z\]/],
+    ['círculo sem total', { ...PASSANTE, centro: undefined, centros: { distancia: 1, volta: 360 } }, /precisa de total inteiro ≥ 2/],
+    ['círculo sem distância', { ...PASSANTE, centro: undefined, centros: { total: 4, volta: 360 } }, /precisa de distancia > 0/],
+    ['círculo com volta E graus', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4, volta: 360, graus: 90 } }, /volta e graus dizem coisas diferentes/],
+    ['círculo sem volta nem graus', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4 } }, /exige volta .* ou graus/],
+    ['círculo com palavra estranha', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4, volta: 360, eixo: [0, 1, 0] } }, /'eixo' não é palavra desta forma/],
+    ['círculo que empilha dois furos no mesmo lugar', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 3, graus: 360 } }, /múltiplo exato de 360° — dois furos no mesmo lugar/],
+    ['anel de fora do contorno', { ...PASSANTE, centro: undefined, centros: [[0, 0, 0], [1.9, 0, 0]], raio: 0.3 }, /o anel 1 de raio 0\.3 .* não cabe dentro da face de entrada/],
+    ['forma que não é lista nem círculo', { ...PASSANTE, centro: undefined, centros: 4 }, /centros é uma lista \[\[x,y,z\], …\] ou um círculo/],
+  ];
+  for (const [nome, furo, esperado] of casos) {
+    it(`${nome}: grita e o passo aborta com 0 V / 0 F`, () => {
+      const n = nucleo(PLACA(furo) as any, {}, {});
+      expect(n.orfaos.some((o: any) => esperado.test(o.motivo))).toBe(true);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+      expect([...n.V.keys()].filter((v: number) => v >= 1000)).toEqual([]);
+    });
+  }
+
+  it('`centros` com UM ponto é o `centro` de sempre, vértice por vértice e face por face', () => {
+    const singular = nucleo(PLACA(PASSANTE) as any, {}, {});
+    const plural = nucleo(PLACA({ ...PASSANTE, centro: undefined, centros: [[0, 0, 0]] }) as any, {}, {});
+    expect([...plural.F.keys()].sort()).toEqual([...singular.F.keys()].sort());
+    for (const [id, p] of plural.V) expect(p).toEqual(singular.V.get(id));
+    for (const [id, f] of plural.F) expect(f.vs).toEqual(singular.F.get(id).vs);
+  });
+
+  it('a face consumida por um furo de VÁRIOS anéis grita igual à de um anel só', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
   });
 });

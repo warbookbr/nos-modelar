@@ -157,12 +157,16 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const COLECAO_DE_ID = ['faces', 'vs', 'pontos', 'de'];      // cobertas pelo gate
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
-    'alt', 'altura', 'amplitude', 'aneis', 'centro', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
+    'alt', 'altura', 'amplitude', 'aneis', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
     'profundidade', 'raio', 'saida', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
-  /* `saida` (op `furo`) entra aqui, e não em COLECAO_DE_ID, pela MESMA razão do
+  /* `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
+     do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
+     forma de lista é `[[x,y,z], …]` e a de círculo é `{pivo, distancia, total,
+     volta|graus}`; nenhuma delas tem caminho para um id de face ou de vértice.
+     `saida` (op `furo`) entra aqui, e não em COLECAO_DE_ID, pela MESMA razão do
      `derivaDe`: ela é uma ORIGEM ESTRUTURAL (`{op,id,…}`), não uma lista de ids.
      O `furo` recusa qualquer outra forma — `faceUnicaEstrutural` passa por
      `validarOrigem` antes de olhar para a malha —, então não existe caminho em

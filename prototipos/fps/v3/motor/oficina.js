@@ -742,54 +742,120 @@ const CONTRATOS_ORIGEM = {
      As famílias UNEM, como no cubo e no cilindro. Citar `saida` num furo cego,
      ou `tampa:'fundo'` num passante, GRITA nomeando o modo — a família não
      existe naquele furo, e devolver vazio seria prometer região e entregar
-     nada. */
+     nada.
+
+     VÁRIOS FUROS NO MESMO PASSO (ciclo "Furo v2", A-26) — o eixo `furo`, que é
+     o que impede a segunda face anônima: um passo com quatro centros publica
+     quatro furos DISTINGUÍVEIS entre si, e não um borrão de 4·3·lados faces.
+       `{op:'furo', id, furo: 2}`            o TERCEIRO furo inteiro;
+       `{op:'furo', id, furo: 2, parede: 0}` a parede 0 daquele furo;
+       `{op:'furo', id, parede: 0}`          a parede 0 de TODOS os furos — o
+                                             eixo ausente é "todos", a mesma
+                                             lei das outras famílias, e é isso
+                                             que faz o furo de UM centro
+                                             continuar respondendo palavra por
+                                             palavra como sempre respondeu;
+       `{op:'furo', id, preenchimento: 0}`   a superfície da face que não toca
+                                             anel nenhum, só existe com DOIS
+                                             anéis ou mais (com um anel a borda
+                                             é a volta inteira, e citá-lo GRITA
+                                             em vez de devolver vazio);
+       `{op:'furo', id, preenchimentoDaSaida: 'ultima'}` o mesmo do outro lado.
+     `furo` fora do limite, como todo eixo daqui, nomeia a faixa e GRITA. */
   furo: {
     validar(origem) {
-      const chaves = ['op', 'id', 'borda', 'parede', 'saida', 'tampa'];
-      const msg = "furo usa op, id, borda/parede/saida opcionais (eixo numérico sobre os `lados` do anel: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todas, ou filtro de progressão {passo,fase}) e tampa opcional ('fundo', só no furo cego)";
+      const chaves = ['op', 'id', 'furo', 'borda', 'parede', 'saida', 'tampa', 'preenchimento', 'preenchimentoDaSaida'];
+      const msg = "furo usa op, id, furo/borda/parede/saida/preenchimento/preenchimentoDaSaida opcionais (eixo numérico: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todos, ou filtro de progressão {passo,fase}) e tampa opcional ('fundo', só no furo cego)";
       if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
-      for (const familia of ['borda', 'parede', 'saida']) if (!validarEixo(origem[familia])) return msg;
+      for (const familia of ['furo', 'borda', 'parede', 'saida', 'preenchimento', 'preenchimentoDaSaida']) if (!validarEixo(origem[familia])) return msg;
       if (origem.tampa != null && origem.tampa !== 'fundo') return msg;
       return null;
     },
     resolver(st, registro, origem) {
-      const passante = registro.saidas != null;
+      const furos = registro.furos;
+      const M = furos.length;
+      const passante = furos[0].saidas != null;
       if (origem.saida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem saída; o fundo dele é tampa:'fundo'` };
       if (origem.tampa != null && passante) return { erro: `origem furo:${origem.id} é um furo PASSANTE — não tem fundo; a borda do outro lado é o eixo 'saida'` };
-      const semEixo = origem.borda == null && origem.parede == null && origem.saida == null && origem.tampa == null;
-      const faces = [];
-      const familias = [['borda', registro.bordas], ['parede', registro.paredes], ['saida', registro.saidas]];
-      for (const [nome, lista] of familias) {
-        if (lista == null) continue;
-        const eixo = origem[nome];
-        if (eixo == null && !semEixo) continue;
-        if (eixoDeIndiceUnico(eixo)) {
-          const r = indiceDeEixo(st, eixo, lista.length);
-          if (r.erro) return { erro: `${nome} '${eixo}' da origem furo:${origem.id} ${r.erro}` };
-          if (r.idx >= lista.length) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} fora do limite da origem furo:${origem.id} (0..${lista.length - 1})` };
-          const f = lista[r.idx];
-          if (!st.F.has(f)) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} da origem furo:${origem.id} foi removida${consumoDe(st, f)}` };
-          faces.push(f);
-        } else {
-          const idx = indicesEixo(eixo, lista.length);
-          if (typeof eixo === 'object' && eixo != null && !idx.length) {
-            const { passo, fase } = eixo;
-            return { erro: `filtro de ${nome} {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${lista.length - 1} na origem furo:${origem.id}` };
-          }
-          for (const k of idx) {
-            const f = lista[k];
-            const consumo = conferirConsumo(st, f, `${nome} ${k} da origem furo:${origem.id}`);
-            if (consumo) return { erro: consumo };
-            if (st.F.has(f)) faces.push(f);
-          }
+      if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
+      if (origem.preenchimentoDaSaida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem preenchimento de saída; o outro lado dele é a tampa 'fundo'` };
+      if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
+
+      /* quais FUROS: o eixo `furo` ausente é "todos", como as famílias. */
+      let indicesFuro;
+      if (eixoDeIndiceUnico(origem.furo)) {
+        const r = indiceDeEixo(st, origem.furo, M);
+        if (r.erro) return { erro: `furo '${origem.furo}' da origem furo:${origem.id} ${r.erro}` };
+        if (r.idx >= M) return { erro: `furo ${textoDeEixo(origem.furo, r.idx)} fora do limite da origem furo:${origem.id} (0..${M - 1})` };
+        indicesFuro = [r.idx];
+      } else {
+        indicesFuro = indicesEixo(origem.furo, M);
+        if (typeof origem.furo === 'object' && origem.furo != null && !indicesFuro.length) {
+          const { passo, fase } = origem.furo;
+          return { erro: `filtro de furo {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${M - 1} na origem furo:${origem.id}` };
         }
       }
-      if (registro.fundo != null && (origem.tampa != null || semEixo)) {
-        const consumo = conferirConsumo(st, registro.fundo, `tampa 'fundo' da origem furo:${origem.id}`);
-        if (consumo) return { erro: consumo };
-        if (!st.F.has(registro.fundo)) {
-          if (origem.tampa != null) return { erro: `tampa 'fundo' da origem furo:${origem.id} foi removida` };
-        } else faces.push(registro.fundo);
+      const semFamilia = origem.borda == null && origem.parede == null && origem.saida == null && origem.tampa == null
+        && origem.preenchimento == null && origem.preenchimentoDaSaida == null;
+
+      const faces = [];
+      /* Um passo de UM furo não tem por que dizer "do furo 0" em cada
+         diagnóstico: com M = 1 o texto é o de sempre, palavra por palavra. */
+      const alvoDo = (k) => (M === 1 ? `da origem furo:${origem.id}` : `do furo ${k} da origem furo:${origem.id}`);
+      const colher = (nome, lista, eixo, alvo) => {
+        if (eixoDeIndiceUnico(eixo)) {
+          const r = indiceDeEixo(st, eixo, lista.length);
+          if (r.erro) return { erro: `${nome} '${eixo}' ${alvo} ${r.erro}` };
+          if (r.idx >= lista.length) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} fora do limite ${alvo} (0..${lista.length - 1})` };
+          const f = lista[r.idx];
+          if (!st.F.has(f)) return { erro: `${nome} ${textoDeEixo(eixo, r.idx)} ${alvo} foi removida${consumoDe(st, f)}` };
+          faces.push(f);
+          return null;
+        }
+        const idx = indicesEixo(eixo, lista.length);
+        if (typeof eixo === 'object' && eixo != null && !idx.length) {
+          const { passo, fase } = eixo;
+          return { erro: `filtro de ${nome} {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${lista.length - 1} na origem furo:${origem.id}` };
+        }
+        for (const k of idx) {
+          const f = lista[k];
+          const consumo = conferirConsumo(st, f, `${nome} ${k} ${alvo}`);
+          if (consumo) return { erro: consumo };
+          if (st.F.has(f)) faces.push(f);
+        }
+        return null;
+      };
+
+      for (const k of indicesFuro) {
+        const registroDoFuro = furos[k];
+        const alvo = alvoDo(k);
+        const familias = [['borda', registroDoFuro.bordas], ['parede', registroDoFuro.paredes], ['saida', registroDoFuro.saidas]];
+        for (const [nome, lista] of familias) {
+          if (lista == null) continue;
+          const eixo = origem[nome];
+          if (eixo == null && !semFamilia) continue;
+          const erro = colher(nome, lista, eixo, alvo);
+          if (erro) return erro;
+        }
+        if (registroDoFuro.fundo != null && (origem.tampa != null || semFamilia)) {
+          const consumo = conferirConsumo(st, registroDoFuro.fundo, `tampa 'fundo' ${alvo}`);
+          if (consumo) return { erro: consumo };
+          if (!st.F.has(registroDoFuro.fundo)) {
+            if (origem.tampa != null) return { erro: `tampa 'fundo' ${alvo} foi removida` };
+          } else faces.push(registroDoFuro.fundo);
+        }
+      }
+
+      /* O preenchimento é da FACE, não de um furo: ele entra quando a origem
+         cita a peça inteira (sem eixo nenhum) ou quando é citado por nome.
+         `{furo: k}` sozinho é "o furo k", e o furo k não tem preenchimento. */
+      const inteira = semFamilia && origem.furo == null;
+      for (const [nome, lista] of [['preenchimento', registro.preenchimento], ['preenchimentoDaSaida', registro.preenchimentoDaSaida]]) {
+        if (!lista.length) continue;
+        const eixo = origem[nome];
+        if (eixo == null && !inteira) continue;
+        const erro = colher(nome, lista, eixo, `da origem furo:${origem.id}`);
+        if (erro) return erro;
       }
       if (!faces.length) return { erro: `origem furo:${origem.id} não tem nenhuma face correspondente` };
       return { faces };
@@ -1296,6 +1362,190 @@ function bordaAnular(uv, anelUV) {
   }
   if (arestasUsadas !== n) return { erro: `a borda usaria ${arestasUsadas} aresta(s) do contorno de ${n} — o casamento angular não é uma volta` };
   return { faces };
+}
+
+/* SEPARAÇÃO ENTRE ANÉIS (ciclo "Furo v2") — dois anéis do MESMO passo não podem
+   se tocar. Teorema do eixo separador entre dois convexos: se existe um eixo
+   (normal de alguma aresta de um dos dois) em que as projeções não se
+   encostam, eles são disjuntos. Encostar conta como cruzar: dois furos que se
+   tocam num ponto produziriam uma borda com vértice pinçado, e o resultado é
+   plausível na foto e errado na malha. Sem tolerância cega: a folga exigida
+   acompanha a escala da face. */
+function aneisSeSobrepoem(A, B, escala) {
+  const folga = 1e-9 * Math.max(1, escala);
+  for (const [P, Q] of [[A, B], [B, A]]) {
+    for (let k = 0; k < P.length; k++) {
+      const p = P[k], q = P[(k + 1) % P.length];
+      const ex = q[0] - p[0], ey = q[1] - p[1];
+      const len = Math.hypot(ex, ey);
+      if (!(len > 0)) continue;
+      const nx = -ey / len, ny = ex / len;
+      let maxP = -Infinity, minP = Infinity, maxQ = -Infinity, minQ = Infinity;
+      for (const r of P) { const t = r[0] * nx + r[1] * ny; maxP = Math.max(maxP, t); minP = Math.min(minP, t); }
+      for (const r of Q) { const t = r[0] * nx + r[1] * ny; maxQ = Math.max(maxQ, t); minQ = Math.min(minQ, t); }
+      if (minQ - maxP > folga || minP - maxQ > folga) return false;
+    }
+  }
+  return true;
+}
+
+/* --- primitivas de triangulação, usadas só pela borda de VÁRIOS anéis --- */
+function cruz2(a, b, c) { return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]); }
+function dentroEstrito(A, B, C, P, eps) {
+  return cruz2(A, B, P) > eps && cruz2(B, C, P) > eps && cruz2(C, A, P) > eps;
+}
+/* Cruzamento PRÓPRIO de dois segmentos: os interiores se encontram. Tocar por
+   um extremo compartilhado não conta — é assim que uma ponte encosta no
+   contorno sem ser recusada por encostar nele. */
+function segmentosCruzam(a, b, c, d, eps) {
+  const d1 = cruz2(c, d, a), d2 = cruz2(c, d, b), d3 = cruz2(a, b, c), d4 = cruz2(a, b, d);
+  if (((d1 > eps && d2 < -eps) || (d1 < -eps && d2 > eps)) && ((d3 > eps && d4 < -eps) || (d3 < -eps && d4 > eps))) return true;
+  return false;
+}
+function pontoNoSegmento(a, b, p, eps) {
+  if (Math.abs(cruz2(a, b, p)) > eps) return false;
+  const t = ((p[0] - a[0]) * (b[0] - a[0]) + (p[1] - a[1]) * (b[1] - a[1])) / ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2 || 1);
+  return t > 1e-9 && t < 1 - 1e-9;
+}
+function areaPoligono(P) {
+  let a = 0;
+  for (let k = 0; k < P.length; k++) { const p = P[k], q = P[(k + 1) % P.length]; a += p[0] * q[1] - q[0] * p[1]; }
+  return a / 2;
+}
+
+/* A BORDA DE VÁRIOS ANÉIS (ciclo "Furo v2") — a partição do polígono quando o
+   passo abre MAIS DE UM furo na mesma face. A borda anular de um anel só (a
+   `bordaAnular` acima) é a volta simples entre um contorno e um anel; com dois
+   anéis ela não existe, e foi exatamente isso que A-26 registrou.
+
+   A REGRA, e por que ela é esta: triangular a região (contorno menos os anéis)
+   SEM CRIAR VÉRTICE NENHUM. Nenhum ponto novo aparece no contorno, então
+   nenhuma face vizinha da peça fica com um vértice no meio de uma aresta dela
+   (junção em T, que é fenda de malha). Foi por isso que a partição por células
+   (uma célula por furo, cortada pelos eixos radicais) foi RECUSADA: além da
+   junção em T no contorno, o centro radical de três furos é um ponto que três
+   células calculam por três contas diferentes, e costurar isso exige solda por
+   tolerância — a régua que este núcleo já recusou no `arranja`.
+
+   A saída é uma triangulação por PONTES e ORELHAS: cada anel é ligado ao
+   polígono corrente pela ponte mais curta que não cruza nada (empate desfeito
+   pelo menor índice, então é determinística), e o polígono simples resultante
+   é cortado por orelhas. Contagem FECHADA, derivada de Euler e conferida:
+   `n + M·L + 2M − 2` triângulos, com `n` cantos do contorno, `M` anéis de `L`
+   lados. Como toda aresta de anel é aresta de BORDA da região, ela cai em
+   EXATAMENTE um triângulo: é isso que dá ao anel `k` as suas `L` faces de
+   borda, indexadas pela aresta `j → j+1` do anel, do mesmo jeito que no furo
+   de um anel só. O que sobra é o PREENCHIMENTO, a superfície da face que não
+   toca anel nenhum.
+
+   Nada aqui é aceito no escuro: a saída passa por três provas antes de virar
+   face — a soma das áreas bate com contorno menos anéis, toda aresta de borda
+   é usada uma vez e toda aresta interna exatamente duas (em direções opostas),
+   e cada anel tem as suas `L` faces. Falhar qualquer uma GRITA. */
+function triangularComAneis(contorno, aneis, escala) {
+  const eps = 1e-12 * Math.max(1, escala * escala);
+  const pts = [], tags = [];
+  contorno.forEach((p, i) => { pts.push(p); tags.push({ tipo: 'contorno', i }); });
+  const baseAnel = [];
+  aneis.forEach((anel, k) => { baseAnel.push(pts.length); anel.forEach((p, j) => { pts.push(p); tags.push({ tipo: 'anel', k, j }); }); });
+
+  let ciclo = contorno.map((_, i) => i);
+  const pendentes = aneis.map((_, k) => k);
+  for (const k of pendentes.slice()) {
+    const L = aneis[k].length;
+    const noDoAnel = (m, j) => baseAnel[m] + ((j % aneis[m].length) + aneis[m].length) % aneis[m].length;
+    /* arestas que a ponte não pode cruzar: o polígono corrente e todo anel
+       ainda não fundido (inclusive o próprio, fora das duas incidentes) */
+    const arestas = [];
+    for (let t = 0; t < ciclo.length; t++) arestas.push([ciclo[t], ciclo[(t + 1) % ciclo.length]]);
+    for (const m of pendentes) if (m >= k) for (let j = 0; j < aneis[m].length; j++) arestas.push([noDoAnel(m, j), noDoAnel(m, j + 1)]);
+
+    let melhor = null;
+    for (let p = 0; p < ciclo.length; p++) {
+      for (let j = 0; j < L; j++) {
+        const a = ciclo[p], b = noDoAnel(k, j);
+        const A = pts[a], B = pts[b];
+        const comp = Math.hypot(B[0] - A[0], B[1] - A[1]);
+        if (melhor && comp >= melhor.comp) continue;
+        let livre = true;
+        for (const [x, y] of arestas) {
+          if (x === a || y === a || x === b || y === b) continue;
+          if (segmentosCruzam(A, B, pts[x], pts[y], eps)) { livre = false; break; }
+        }
+        if (livre) for (let v = 0; v < pts.length && livre; v++) { if (v !== a && v !== b && pontoNoSegmento(A, B, pts[v], eps)) livre = false; }
+        if (livre) {
+          const meio = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+          if (!(margemDentro(contorno, meio) > 0)) livre = false;
+          for (const m of pendentes) if (livre && m >= k && margemDentro(aneis[m], meio) > 0) livre = false;
+        }
+        if (livre) melhor = { p, j, comp };
+      }
+    }
+    if (!melhor) return { erro: `não há ponte livre entre o contorno e o anel ${k} — os anéis não repartem a face` };
+    const seq = [];
+    for (let t = 0; t <= L; t++) seq.push(noDoAnel(k, melhor.j - t));   // o anel percorrido AO CONTRÁRIO: buraco é borda horária
+    ciclo = [...ciclo.slice(0, melhor.p + 1), ...seq, ciclo[melhor.p], ...ciclo.slice(melhor.p + 1)];
+    pendentes.splice(pendentes.indexOf(k), 1);
+  }
+
+  // ---- orelhas ----
+  const tri = [];
+  const c = ciclo.slice();
+  while (c.length > 3) {
+    let cortou = false;
+    for (let i = 0; i < c.length; i++) {
+      const a = c[(i + c.length - 1) % c.length], b = c[i], d = c[(i + 1) % c.length];
+      if (a === d || a === b || b === d) continue;
+      const A = pts[a], B = pts[b], D = pts[d];
+      if (!(cruz2(A, B, D) > eps)) continue;
+      let livre = true;
+      for (const v of c) {
+        if (v === a || v === b || v === d) continue;
+        if (dentroEstrito(A, B, D, pts[v], eps)) { livre = false; break; }
+      }
+      if (!livre) continue;
+      tri.push([a, b, d]);
+      c.splice(i, 1);
+      cortou = true;
+      break;
+    }
+    if (!cortou) return { erro: `a partição do polígono travou com ${c.length} cantos por cortar — nenhuma orelha livre` };
+  }
+  tri.push([c[0], c[1], c[2]]);
+
+  // ---- as três provas ----
+  const esperado = contorno.length + aneis.reduce((s, r) => s + r.length, 0) + 2 * aneis.length - 2;
+  if (tri.length !== esperado) return { erro: `a partição saiu com ${tri.length} triângulo(s) e a contagem fechada é ${esperado}` };
+  let area = 0;
+  for (const [a, b, d] of tri) { const t = cruz2(pts[a], pts[b], pts[d]) / 2; if (!(t > 0)) return { erro: 'a partição criou um triângulo de área nula ou invertida' }; area += t; }
+  const alvo = areaPoligono(contorno) - aneis.reduce((s, r) => s + areaPoligono(r), 0);
+  if (Math.abs(area - alvo) > 1e-9 * Math.max(1, Math.abs(alvo))) return { erro: `a partição cobre ${area} de área e a região tem ${alvo}` };
+  const conta = new Map();
+  for (const [a, b, d] of tri) for (const [x, y] of [[a, b], [b, d], [d, a]]) conta.set(`${x}>${y}`, (conta.get(`${x}>${y}`) ?? 0) + 1);
+  const borda = new Set();
+  for (let i = 0; i < contorno.length; i++) borda.add(`${i}>${(i + 1) % contorno.length}`);
+  aneis.forEach((anel, k) => { for (let j = 0; j < anel.length; j++) borda.add(`${baseAnel[k] + (j + 1) % anel.length}>${baseAnel[k] + j}`); });
+  for (const [chave, n] of conta) {
+    const [x, y] = chave.split('>');
+    if (borda.has(chave)) { if (n !== 1) return { erro: `a aresta de borda ${chave} aparece ${n} vezes` }; continue; }
+    if (n !== 1 || (conta.get(`${y}>${x}`) ?? 0) !== 1) return { erro: `a aresta interna ${chave} não é compartilhada por exatamente dois triângulos` };
+  }
+  for (const chave of borda) if ((conta.get(chave) ?? 0) !== 1) return { erro: `a aresta de borda ${chave} ficou sem triângulo` };
+
+  // ---- famílias: uma borda por aresta de anel, o resto é preenchimento ----
+  const bordas = aneis.map((anel) => new Array(anel.length).fill(null));
+  const preenchimento = [];
+  tri.forEach((t) => {
+    const desc = { cantos: t.map((v) => tags[v]) };
+    let dono = null;
+    for (let e = 0; e < 3; e++) {
+      const x = tags[t[e]], y = tags[t[(e + 1) % 3]];
+      if (x.tipo === 'anel' && y.tipo === 'anel' && x.k === y.k && y.j === (x.j + aneis[x.k].length - 1) % aneis[x.k].length) { dono = { k: x.k, j: y.j }; break; }
+    }
+    if (dono) bordas[dono.k][dono.j] = desc; else preenchimento.push(desc);
+  });
+  for (let k = 0; k < bordas.length; k++) for (let j = 0; j < bordas[k].length; j++) if (!bordas[k][j]) return { erro: `a aresta ${j} do anel ${k} não caiu em triângulo nenhum` };
+  return { bordas, preenchimento };
 }
 
 /* exportado (P7 do playground, D-120): o MANIFESTO de capacidades da Oficina
@@ -2791,12 +3041,33 @@ export const OPS = {
                        (`{op:'cubo', id:1, face:'topo'}`), que precisa resolver
                        para EXATAMENTE uma face. Duas faces = endereço ambíguo,
                        e ambiguidade grita;
-       `centro`        OBRIGATÓRIO, `[x,y,z]` dimensional (pode citar PARAM). É
+       `centro`        `[x,y,z]` dimensional (pode citar PARAM), UM furo. É
                        PROJETADO no plano da entrada — o autor dá o ponto do
                        mundo onde o furo passa, não uma coordenada de face.
                        Sem default: o centroide da face seria um default
                        ESPERTO, e um furo que muda de lugar quando a face muda
                        de forma é a classe de surpresa que este núcleo recusa;
+       `centros`       VÁRIOS furos no mesmo passo (ciclo "Furo v2", A-26), nas
+                       duas formas que o autor mecânico usa para dizer isso:
+                         `centros: [[x,y,z], …]` — a lista, um ponto do mundo
+                           por furo, cada um projetado no plano da entrada;
+                         `centros: {pivo, distancia, total, volta|graus}` — o
+                           CÍRCULO de parafusos dito como frase: "quatro furos
+                           a 40 mm do centro" é `{distancia:'orbita',
+                           total:4, volta:360}`. As palavras são as MESMAS do
+                           `arranja` e significam a mesma coisa (`total` conta
+                           os furos, `volta` é o arco FECHADO e o passo é
+                           `volta/total`, `graus` é o passo direto, as duas
+                           juntas ou nenhuma GRITAM). O círculo mora no plano
+                           da entrada, em torno do `pivo` projetado (ausente =
+                           a origem do mundo), e o furo 0 fica na direção do
+                           `+u` da face — a mesma que `orientacao` declara.
+                           Esta forma é o que tira o seno e o cosseno do
+                           arquivo salvo (A-29): a peça diz quantos e a que
+                           distância, não onde cada um caiu.
+                       `centro` e `centros` dizem a mesma coisa em número
+                       diferente: as duas juntas GRITAM, nenhuma das duas
+                       GRITA. `centros` com UM ponto é idêntico a `centro`;
        `raio`          OBRIGATÓRIO, > 0, dimensional;
        `lados`         TOPO (padrão 8, mín 3): muda a CONTAGEM, logo renumera;
        `saida`         a origem estrutural da face de SAÍDA — furo PASSANTE;
@@ -2815,22 +3086,32 @@ export const OPS = {
      (`-N`). Não há chave de direção oblíqua — furo torto é outra operação, e
      inventá-la aqui seria a generalidade traiçoeira que o item excluiu.
 
-     NUMERAÇÃO (formato salvo, travada por teste). Com `L = lados` e `b` a base
-     do passo:
-       VÉRTICES  `b+j`      (j=0..L-1) o anel na face de ENTRADA;
-                 `b+L+j`    o anel do outro lado (a saída, ou o fundo do cego).
-                 Total 2L, sempre — nenhum vértice antigo é criado ou removido,
-                 e os cantos ORIGINAIS das faces cortadas continuam de pé (é o
-                 que impede fenda com as faces vizinhas).
-       FACES     `b+j`      a BORDA de entrada j (contém a aresta j→j+1 do anel);
-                 `b+L+j`    a PAREDE j (o cilindro do furo, normal para o eixo);
-                 `b+2L+j`   a BORDA de saída j — só PASSANTE;
-                 `b+2L`     o FUNDO — só CEGO (uma face só; as faixas `saida`
-                            e `fundo` nunca coexistem, por isso partilham a
-                            base sem colidir).
-     A borda tem SEMPRE L faces, independentemente de quantos cantos a face
-     cortada tinha: mudar `raio` ou `centro` muda a FORMA de cada face da borda,
-     nunca o id dela.
+     NUMERAÇÃO (formato salvo, travada por teste). Com `L = lados`, `M` anéis e
+     `b` a base do passo — o furo `k` ocupa uma corrida contígua, e com `M = 1`
+     a conta inteira colapsa na numeração de sempre:
+       VÉRTICES  `b+2Lk+j`     (j=0..L-1) o anel do furo k na face de ENTRADA;
+                 `b+2Lk+L+j`   o anel do outro lado (a saída, ou o fundo).
+                 Total 2LM — nenhum vértice antigo é criado ou removido, e os
+                 cantos ORIGINAIS das faces cortadas continuam de pé (é o que
+                 impede fenda com as faces vizinhas). A borda de vários anéis
+                 também não cria vértice: ela é triangulada sobre os cantos que
+                 já existem, para que nenhuma face vizinha fique com um vértice
+                 no meio de uma aresta dela.
+       FACES     `b+3Lk+j`     a BORDA de entrada j do furo k (contém a aresta
+                               j→j+1 do anel k);
+                 `b+3Lk+L+j`   a PAREDE j do furo k (normal para o eixo);
+                 `b+3Lk+2L+j`  a BORDA de saída j — só PASSANTE;
+                 `b+3Lk+2L`    o FUNDO do furo k — só CEGO (uma face só; as
+                               faixas `saida` e `fundo` nunca coexistem, por
+                               isso partilham a base sem colidir);
+                 `b+3LM+t`     o PREENCHIMENTO da entrada — só com M ≥ 2. São
+                               `n+2M−2` faces, com `n` cantos do contorno;
+                 depois dele, o PREENCHIMENTO DA SAÍDA, com a mesma conta sobre
+                 os cantos da face de saída — só PASSANTE com M ≥ 2.
+     A borda tem SEMPRE L faces por anel, independentemente de quantos cantos a
+     face cortada tinha: mudar `raio` ou `centro` muda a FORMA de cada face da
+     borda, nunca o id dela. O preenchimento é a superfície que não toca anel
+     nenhum; ele é família, e a posição dentro dela é a ordem da partição.
 
      HERANÇA: cor, material, parte, liso e solido da face de ENTRADA vão para a
      borda de entrada, para a parede e para o fundo; os da face de SAÍDA vão
@@ -2841,8 +3122,11 @@ export const OPS = {
      COMPLETUDE, a lei do `arranja`: TUDO é conferido antes de reservar um id.
      Face não-plana, face côncava, anel encostando ou saindo do contorno, saída
      que o eixo não atravessa, saída igual à entrada, raio ≤ 0, profundidade
-     ≤ 0 — cada um GRITA nomeando a causa e o passo inteiro aborta com 0 V/0 F.
-     Nunca sobra meio furo. */
+     ≤ 0, DOIS ANÉIS QUE SE CRUZAM OU SE ENCOSTAM (na entrada ou na saída, que
+     é onde a projeção oblíqua pode aproximá-los), lista de centros vazia,
+     centro de aridade errada e partição que não fecha — cada um GRITA nomeando
+     a causa e o passo inteiro aborta com 0 V/0 F. Nunca sobra meio furo, e
+     dois furos sobrepostos nunca viram um furo em oito. */
   furo(st, a, i) {
     const b = baseDoPasso(i);
 
@@ -2861,10 +3145,54 @@ export const OPS = {
     const raio = st.num(a.raio ?? 0);
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'furo', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio}); raio 0 seria um furo que não abre nada`);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
-    if (a.centro == null) return grita(st, i, 'furo', 'centro', 'furo exige centro:[x,y,z] — o ponto do mundo por onde ele passa, projetado no plano da entrada');
-    if (!Array.isArray(a.centro) || a.centro.length !== 3) return grita(st, i, 'furo', 'centro', `centro precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.centro)}`);
-    const centro = st.vec(a.centro);
-    if (!centro.every((n) => Number.isFinite(n))) return grita(st, i, 'furo', 'centro', `centro não é um ponto finito: ${JSON.stringify(centro)}`);
+
+    /* ---- QUANTOS furos: `centro` (um) ou `centros` (vários, lista ou círculo) ---- */
+    const temCentro = a.centro != null, temCentros = a.centros != null;
+    if (temCentro && temCentros) return grita(st, i, 'furo', 'centro+centros', 'centro e centros dizem a mesma coisa em número diferente (centro = UM furo; centros = vários no mesmo passo) — declare exatamente uma');
+    if (!temCentro && !temCentros) return grita(st, i, 'furo', 'centro', 'furo exige centro:[x,y,z] — o ponto do mundo por onde ele passa, projetado no plano da entrada — ou centros, para vários furos no mesmo passo');
+    const conferirPonto = (p, nome) => {
+      if (!Array.isArray(p) || p.length !== 3) return `${nome} precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(p)}`;
+      const v = st.vec(p);
+      if (!v.every((n) => Number.isFinite(n))) return `${nome} não é um ponto finito: ${JSON.stringify(v)}`;
+      return null;
+    };
+    let mundoCentros = null;   // a forma por LISTA: os pontos já resolvidos
+    let circulo = null;        // a forma por CÍRCULO: resolvida só depois do quadro da face
+    if (temCentro) {
+      const erro = conferirPonto(a.centro, 'centro');
+      if (erro) return grita(st, i, 'furo', 'centro', erro);
+      mundoCentros = [st.vec(a.centro)];
+    } else if (Array.isArray(a.centros)) {
+      if (!a.centros.length) return grita(st, i, 'furo', 'centros', 'centros é uma lista vazia — um passo que não abre furo nenhum é um no-op silencioso');
+      for (let k = 0; k < a.centros.length; k++) {
+        const erro = conferirPonto(a.centros[k], `centros[${k}]`);
+        if (erro) return grita(st, i, 'furo', 'centros', erro);
+      }
+      mundoCentros = a.centros.map((p) => st.vec(p));
+    } else if (a.centros && typeof a.centros === 'object') {
+      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus'];
+      const estranha = Object.keys(a.centros).find((k) => !chaves.includes(k));
+      if (estranha) return grita(st, i, 'furo', 'centros', `centros em círculo usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
+      const total = st.num(a.centros.total ?? 0);
+      if (!Number.isSafeInteger(total) || total < 2) return grita(st, i, 'furo', 'centros', `centros em círculo precisa de total inteiro ≥ 2 (um círculo de um furo é o próprio centro); recebido ${JSON.stringify(a.centros.total ?? null)} = ${total}`);
+      const distancia = st.num(a.centros.distancia ?? 0);
+      if (!(distancia > 0) || !Number.isFinite(distancia)) return grita(st, i, 'furo', 'centros', `centros em círculo precisa de distancia > 0 (o raio do círculo de furos, não o do furo); recebido ${JSON.stringify(a.centros.distancia ?? null)} = ${distancia}`);
+      const temVolta = a.centros.volta != null, temGraus = a.centros.graus != null;
+      if (temVolta && temGraus) return grita(st, i, 'furo', 'centros', "volta e graus dizem coisas diferentes (volta = o arco FECHADO do círculo, passo = volta/total; graus = o passo entre furos consecutivos) — declare exatamente uma");
+      if (!temVolta && !temGraus) return grita(st, i, 'furo', 'centros', 'centros em círculo exige volta (arco fechado, passo = volta/total) ou graus (passo entre furos consecutivos) — exatamente uma');
+      const passoGraus = temVolta ? st.num(a.centros.volta) / total : st.num(a.centros.graus);
+      if (!Number.isFinite(passoGraus)) return grita(st, i, 'furo', 'centros', 'o passo angular do círculo não é um número finito');
+      for (let k = 1; k < total; k++) if (k * passoGraus % 360 === 0) return grita(st, i, 'furo', 'centros', `o furo ${k} cairia a ${k * passoGraus}° do furo 0, um múltiplo exato de 360° — dois furos no mesmo lugar; nenhum furo foi aberto`);
+      let pivo = [0, 0, 0];
+      if (a.centros.pivo != null) {
+        const erro = conferirPonto(a.centros.pivo, 'pivo');
+        if (erro) return grita(st, i, 'furo', 'centros', erro);
+        pivo = st.vec(a.centros.pivo);
+      }
+      circulo = { pivo, distancia, total, passoGraus };
+    } else {
+      return grita(st, i, 'furo', 'centros', `centros é uma lista [[x,y,z], …] ou um círculo {pivo, distancia, total, volta|graus}; recebido ${JSON.stringify(a.centros)}`);
+    }
     let referencia = null;
     if (a.orientacao != null) {
       if (!Array.isArray(a.orientacao) || a.orientacao.length !== 3) return grita(st, i, 'furo', 'orientacao', `orientacao precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.orientacao)}`);
@@ -2885,24 +3213,56 @@ export const OPS = {
     const N = entrada.N;
     const eixo = [-N[0], -N[1], -N[2]];
 
-    // centro PROJETADO no plano da entrada, e o anel em torno dele
-    const dCentro = (centro[0] - entrada.centro[0]) * N[0] + (centro[1] - entrada.centro[1]) * N[1] + (centro[2] - entrada.centro[2]) * N[2];
-    const c0 = [centro[0] - N[0] * dCentro, centro[1] - N[1] * dCentro, centro[2] - N[2] * dCentro];
-    const anelEntrada = [];
-    for (let j = 0; j < L; j++) {
-      const t = (j / L) * Math.PI * 2;
-      const cu = Math.cos(t) * raio, cw = Math.sin(t) * raio;
-      anelEntrada.push([c0[0] + entrada.u[0] * cu + entrada.w[0] * cw, c0[1] + entrada.u[1] * cu + entrada.w[1] * cw, c0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+    /* centros PROJETADOS no plano da entrada. A forma por CÍRCULO nasce aqui,
+       no quadro (u,w) da face: é por isso que ela não precisa de seno nem
+       cosseno no arquivo salvo, e é por isso que `orientacao` decide onde fica
+       o furo 0 — a mesma direção que já decide a fase do anel. */
+    const projetarNoPlano = (p) => {
+      const d = (p[0] - entrada.centro[0]) * N[0] + (p[1] - entrada.centro[1]) * N[1] + (p[2] - entrada.centro[2]) * N[2];
+      return [p[0] - N[0] * d, p[1] - N[1] * d, p[2] - N[2] * d];
+    };
+    let centros;
+    if (circulo) {
+      const p0 = projetarNoPlano(circulo.pivo);
+      centros = [];
+      for (let k = 0; k < circulo.total; k++) {
+        const t = (circulo.passoGraus * k * Math.PI) / 180;
+        const cu = Math.cos(t) * circulo.distancia, cw = Math.sin(t) * circulo.distancia;
+        centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+      }
+    } else {
+      centros = mundoCentros.map(projetarNoPlano);
     }
-    // margem: o anel INTEIRO precisa caber estritamente dentro do contorno
-    const cUV = entrada.proj(c0);
-    const uvRelEntrada = entrada.uv.map((p) => [p[0] - cUV[0], p[1] - cUV[1]]);
-    const anelUVEntrada = anelEntrada.map((p) => { const q = entrada.proj(p); return [q[0] - cUV[0], q[1] - cUV[1]]; });
-    const folgaEntrada = Math.min(...anelUVEntrada.map((p) => margemDentro(uvRelEntrada, p)));
-    if (!(folgaEntrada > 1e-9 * Math.max(1, entrada.escala))) return grita(st, i, 'furo', 'raio', `o anel de raio ${raio} em ${JSON.stringify(centro)} não cabe dentro da face de entrada ${entradaId}: sobra ${folgaEntrada.toFixed(6)} até a borda (precisa ser > 0). Um furo que encosta ou vaza não é furo, é recorte de contorno`);
+    const M = centros.length;
+
+    // um anel por centro, e a margem de cada um conferida contra o contorno
+    const aneisEntrada = [], relEntrada = [], anelUVEntrada = [];
+    for (let k = 0; k < M; k++) {
+      const c0 = centros[k];
+      const anel = [];
+      for (let j = 0; j < L; j++) {
+        const t = (j / L) * Math.PI * 2;
+        const cu = Math.cos(t) * raio, cw = Math.sin(t) * raio;
+        anel.push([c0[0] + entrada.u[0] * cu + entrada.w[0] * cw, c0[1] + entrada.u[1] * cu + entrada.w[1] * cw, c0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+      }
+      const cUV = entrada.proj(c0);
+      const uvRel = entrada.uv.map((p) => [p[0] - cUV[0], p[1] - cUV[1]]);
+      const anelRel = anel.map((p) => { const q = entrada.proj(p); return [q[0] - cUV[0], q[1] - cUV[1]]; });
+      const folga = Math.min(...anelRel.map((p) => margemDentro(uvRel, p)));
+      if (!(folga > 1e-9 * Math.max(1, entrada.escala))) return grita(st, i, 'furo', 'raio', `o anel ${k} de raio ${raio} em ${JSON.stringify(c0.map((n) => +n.toFixed(6)))} não cabe dentro da face de entrada ${entradaId}: sobra ${folga.toFixed(6)} até a borda (precisa ser > 0). Um furo que encosta ou vaza não é furo, é recorte de contorno`);
+      aneisEntrada.push(anel); relEntrada.push({ uvRel, anelRel }); anelUVEntrada.push(anel.map(entrada.proj));
+    }
+    for (let k = 0; k < M; k++) for (let l = k + 1; l < M; l++) {
+      if (aneisSeSobrepoem(anelUVEntrada[k], anelUVEntrada[l], entrada.escala)) return grita(st, i, 'furo', 'centros', `os anéis ${k} e ${l} se cruzam ou se encostam na face de entrada ${entradaId} — dois furos sobrepostos não são um furo em oito`);
+    }
 
     // ---- o outro lado: face de SAÍDA (passante) ou plano de FUNDO (cego) ----
-    let saidaId = null, saida = null, anelOutro = [];
+    let saidaId = null, saida = null;
+    const aneisOutro = [];
+    /* a borda de SAÍDA percorre o anel ao CONTRÁRIO: ela é vista do outro lado,
+       e um anel que é anti-horário na entrada é horário na saída. `ordemSaida[k]`
+       é o índice do anel que ocupa a posição k na volta da saída. */
+    const ordemSaida = Array.from({ length: L }, (_, k) => (L - k) % L);
     if (temSaida) {
       saidaId = faceUnicaEstrutural(st, a.saida, 'furo', 'saida', i);
       if (saidaId == null) return;
@@ -2913,76 +3273,123 @@ export const OPS = {
       if (concavaSaida) return grita(st, i, 'furo', 'saida', `saída: ${concavaSaida} — o furo só corta face convexa`);
       const denom = saida.N[0] * eixo[0] + saida.N[1] * eixo[1] + saida.N[2] * eixo[2];
       if (!(denom > 1e-9)) return grita(st, i, 'furo', 'saida', `o eixo do furo (${eixo.map((n) => +n.toFixed(3))}) não ATRAVESSA a face de saída ${saidaId} (normal ${saida.N.map((n) => +n.toFixed(3))}): ele é paralelo a ela ou sai pelo lado de dentro`);
-      for (const p of anelEntrada) {
-        const t = ((saida.centro[0] - p[0]) * saida.N[0] + (saida.centro[1] - p[1]) * saida.N[1] + (saida.centro[2] - p[2]) * saida.N[2]) / denom;
-        if (!(t > 1e-9)) return grita(st, i, 'furo', 'saida', `a face de saída ${saidaId} está ATRÁS da entrada ao longo do eixo (distância ${t.toFixed(6)}) — o furo sairia antes de entrar`);
-        anelOutro.push([p[0] + eixo[0] * t, p[1] + eixo[1] * t, p[2] + eixo[2] * t]);
+      saida.rel = []; saida.anelUV = [];
+      for (let k = 0; k < M; k++) {
+        const anelOutro = [];
+        for (const p of aneisEntrada[k]) {
+          const t = ((saida.centro[0] - p[0]) * saida.N[0] + (saida.centro[1] - p[1]) * saida.N[1] + (saida.centro[2] - p[2]) * saida.N[2]) / denom;
+          if (!(t > 1e-9)) return grita(st, i, 'furo', 'saida', `a face de saída ${saidaId} está ATRÁS da entrada ao longo do eixo (distância ${t.toFixed(6)}) — o furo sairia antes de entrar`);
+          anelOutro.push([p[0] + eixo[0] * t, p[1] + eixo[1] * t, p[2] + eixo[2] * t]);
+        }
+        const cSaida = saida.proj(anelOutro.reduce((acc, p) => [acc[0] + p[0] / L, acc[1] + p[1] / L, acc[2] + p[2] / L], [0, 0, 0]));
+        const uvRel = saida.uv.map((p) => [p[0] - cSaida[0], p[1] - cSaida[1]]);
+        const anelRel = anelOutro.map((p) => { const q = saida.proj(p); return [q[0] - cSaida[0], q[1] - cSaida[1]]; });
+        const folga = Math.min(...anelRel.map((p) => margemDentro(uvRel, p)));
+        if (!(folga > 1e-9 * Math.max(1, saida.escala))) return grita(st, i, 'furo', 'saida', `o anel ${k} não cabe dentro da face de saída ${saidaId}: sobra ${folga.toFixed(6)} até a borda (precisa ser > 0)`);
+        aneisOutro.push(anelOutro);
+        saida.rel.push({ uvRel, anelRel });
+        saida.anelUV.push(anelOutro.map(saida.proj));
       }
-      const cSaida = saida.proj(anelOutro.reduce((acc, p) => [acc[0] + p[0] / L, acc[1] + p[1] / L, acc[2] + p[2] / L], [0, 0, 0]));
-      const uvRelSaida = saida.uv.map((p) => [p[0] - cSaida[0], p[1] - cSaida[1]]);
-      const anelUVSaida = anelOutro.map((p) => { const q = saida.proj(p); return [q[0] - cSaida[0], q[1] - cSaida[1]]; });
-      const folgaSaida = Math.min(...anelUVSaida.map((p) => margemDentro(uvRelSaida, p)));
-      if (!(folgaSaida > 1e-9 * Math.max(1, saida.escala))) return grita(st, i, 'furo', 'saida', `o anel não cabe dentro da face de saída ${saidaId}: sobra ${folgaSaida.toFixed(6)} até a borda (precisa ser > 0)`);
-      saida.uvRel = uvRelSaida; saida.anelUV = anelUVSaida;
+      /* NÃO existe uma segunda conferência de sobreposição aqui, e isso é
+         medido, não esquecido: `p ↦ p + eixo·((c·N − p·N)/denom)` é AFIM no
+         plano de entrada (linear mais constante) e invertível enquanto o eixo
+         atravessa a saída — as duas coisas que este passo já exigiu antes de
+         chegar aqui. Mapa afim preserva interseção nos dois sentidos, então
+         anéis disjuntos na entrada saem disjuntos do outro lado, por mais
+         oblíqua que a face de saída seja. Uma conferência que nunca pode falhar
+         é promessa sem afirmação que morra; o que fica no lugar dela é o teste
+         da saída OBLÍQUA, que mede a separação do outro lado. */
     } else {
       const prof = st.num(a.profundidade);
       if (!(prof > 0) || !Number.isFinite(prof)) return grita(st, i, 'furo', 'profundidade', `profundidade precisa ser > 0 (recebido ${JSON.stringify(a.profundidade)} = ${prof}); um furo cego sem profundidade não abre nada`);
-      for (const p of anelEntrada) anelOutro.push([p[0] + eixo[0] * prof, p[1] + eixo[1] * prof, p[2] + eixo[2] * prof]);
+      for (let k = 0; k < M; k++) aneisOutro.push(aneisEntrada[k].map((p) => [p[0] + eixo[0] * prof, p[1] + eixo[1] * prof, p[2] + eixo[2] * prof]));
     }
 
-    // ---- as bordas anulares, montadas ANTES de reservar id ----
-    const bordaE = bordaAnular(uvRelEntrada, anelUVEntrada);
-    if (bordaE.erro) return grita(st, i, 'furo', 'de', `entrada: ${bordaE.erro}`);
-    /* a borda de SAÍDA percorre o anel ao CONTRÁRIO: ela é vista do outro lado,
-       e um anel que é anti-horário na entrada é horário na saída. `ordemSaida[k]`
-       é o índice do anel que ocupa a posição k na volta da saída. */
-    const ordemSaida = Array.from({ length: L }, (_, k) => (L - k) % L);
-    let bordaS = null;
-    if (temSaida) {
-      bordaS = bordaAnular(saida.uvRel, ordemSaida.map((j) => saida.anelUV[j]));
-      if (bordaS.erro) return grita(st, i, 'furo', 'saida', `saída: ${bordaS.erro}`);
+    /* ---- as bordas, montadas ANTES de reservar id ----
+       UM anel: a volta simples de sempre, byte por byte. VÁRIOS: a partição
+       por pontes e orelhas, que devolve as mesmas `L` faces por anel mais o
+       preenchimento. */
+    let bordaE = null, bordaS = null, cheioE = [], cheioS = [];
+    if (M === 1) {
+      bordaE = bordaAnular(relEntrada[0].uvRel, relEntrada[0].anelRel);
+      if (bordaE.erro) return grita(st, i, 'furo', 'de', `entrada: ${bordaE.erro}`);
+      bordaE = [bordaE.faces];
+      if (temSaida) {
+        const r = bordaAnular(saida.rel[0].uvRel, ordemSaida.map((j) => saida.rel[0].anelRel[j]));
+        if (r.erro) return grita(st, i, 'furo', 'saida', `saída: ${r.erro}`);
+        bordaS = [r.faces];
+      }
+    } else {
+      const pE = triangularComAneis(entrada.uv, anelUVEntrada, entrada.escala);
+      if (pE.erro) return grita(st, i, 'furo', 'de', `entrada: ${pE.erro}`);
+      bordaE = pE.bordas; cheioE = pE.preenchimento;
+      if (temSaida) {
+        const pS = triangularComAneis(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala);
+        if (pS.erro) return grita(st, i, 'furo', 'saida', `saída: ${pS.erro}`);
+        bordaS = pS.bordas; cheioS = pS.preenchimento;
+      }
     }
 
     // guarda de overflow (D3), contada antes de inserir
-    const nV = 2 * L, nF = temSaida ? 3 * L : 2 * L + 1;
-    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: furo com ${L} lados estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+    const nV = 2 * L * M, nF = M * (temSaida ? 3 * L : 2 * L + 1) + cheioE.length + cheioS.length;
+    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: furo com ${M} anel(éis) de ${L} lados estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
     // ---- daqui pra baixo nada mais pode falhar: só construção ----
     const E = [], S = [];
-    for (let j = 0; j < L; j++) { addV(st, b + j, anelEntrada[j]); E.push(b + j); }
-    for (let j = 0; j < L; j++) { addV(st, b + L + j, anelOutro[j]); S.push(b + L + j); }
+    for (let k = 0; k < M; k++) {
+      const e = [], s = [];
+      for (let j = 0; j < L; j++) { addV(st, b + 2 * L * k + j, aneisEntrada[k][j]); e.push(b + 2 * L * k + j); }
+      for (let j = 0; j < L; j++) { addV(st, b + 2 * L * k + L + j, aneisOutro[k][j]); s.push(b + 2 * L * k + L + j); }
+      E.push(e); S.push(s);
+    }
 
     const fEntrada = entrada.face, fSaida = saida ? saida.face : null;
     const herda = (id, fonte) => { const nf = st.F.get(id); nf.cor = fonte.cor; nf.material = fonte.material; nf.parte = fonte.parte; nf.liso = fonte.liso; nf.solido = fonte.solido; };
+    /* a face da partição vem descrita por CANTOS SEMÂNTICOS (canto do contorno
+       ou vértice do anel k), nunca por posição de array na malha */
+    const cantoEntrada = (t) => (t.tipo === 'contorno' ? fEntrada.vs[t.i] : E[t.k][t.j]);
+    const cantoSaida = (t) => (t.tipo === 'contorno' ? fSaida.vs[t.i] : S[t.k][ordemSaida[t.j]]);
 
-    const bordas = [];
-    bordaE.faces.forEach((desc, j) => {
-      const vs = [...desc.externos.map((k) => fEntrada.vs[k]), ...desc.anel.map((k) => E[k])];
-      addF(st, b + j, vs); bordas.push(b + j); herda(b + j, fEntrada);
-    });
-    const paredes = [];
-    for (let j = 0; j < L; j++) {
-      const n = (j + 1) % L;
-      addF(st, b + L + j, [E[j], E[n], S[n], S[j]]); paredes.push(b + L + j); herda(b + L + j, fEntrada);
-    }
-    let saidas = null, fundo = null;
-    if (temSaida) {
-      saidas = [];
-      bordaS.faces.forEach((desc, k) => {
-        const vs = [...desc.externos.map((m) => fSaida.vs[m]), ...desc.anel.map((m) => S[ordemSaida[m]])];
-        addF(st, b + 2 * L + k, vs); saidas.push(b + 2 * L + k); herda(b + 2 * L + k, fSaida);
+    const furos = [];
+    for (let k = 0; k < M; k++) {
+      const base = b + 3 * L * k;
+      const bordas = [], paredes = [];
+      bordaE[k].forEach((desc, j) => {
+        const vs = M === 1
+          ? [...desc.externos.map((m) => fEntrada.vs[m]), ...desc.anel.map((m) => E[k][m])]
+          : desc.cantos.map(cantoEntrada);
+        addF(st, base + j, vs); bordas.push(base + j); herda(base + j, fEntrada);
       });
-    } else {
-      fundo = b + 2 * L;
-      addF(st, fundo, S.slice()); herda(fundo, fEntrada);
+      for (let j = 0; j < L; j++) {
+        const n = (j + 1) % L;
+        addF(st, base + L + j, [E[k][j], E[k][n], S[k][n], S[k][j]]); paredes.push(base + L + j); herda(base + L + j, fEntrada);
+      }
+      let saidas = null, fundo = null;
+      if (temSaida) {
+        saidas = [];
+        bordaS[k].forEach((desc, m) => {
+          const vs = M === 1
+            ? [...desc.externos.map((q) => fSaida.vs[q]), ...desc.anel.map((q) => S[k][ordemSaida[q]])]
+            : desc.cantos.map(cantoSaida);
+          addF(st, base + 2 * L + m, vs); saidas.push(base + 2 * L + m); herda(base + 2 * L + m, fSaida);
+        });
+      } else {
+        fundo = base + 2 * L;
+        addF(st, fundo, S[k].slice()); herda(fundo, fEntrada);
+      }
+      furos.push({ bordas, paredes, saidas, fundo });
     }
+    let cursor = b + 3 * L * M;
+    const preenchimento = [], preenchimentoDaSaida = [];
+    for (const desc of cheioE) { addF(st, cursor, desc.cantos.map(cantoEntrada)); preenchimento.push(cursor); herda(cursor, fEntrada); cursor++; }
+    for (const desc of cheioS) { addF(st, cursor, desc.cantos.map(cantoSaida)); preenchimentoDaSaida.push(cursor); herda(cursor, fSaida); cursor++; }
 
     // as faces cortadas SOMEM da malha e ENTRAM no registro de consumo
     st.F.delete(entradaId);
     st.consumidas.set(entradaId, { passo: i, op: 'furo' });
     if (saidaId != null) { st.F.delete(saidaId); st.consumidas.set(saidaId, { passo: i, op: 'furo' }); }
 
-    registraOrigem(st, i, 'furo', a.origemId, { bordas, paredes, saidas, fundo });
+    registraOrigem(st, i, 'furo', a.origemId, { furos, preenchimento, preenchimentoDaSaida });
   },
 
   /* ---- atributos por face ---- */
