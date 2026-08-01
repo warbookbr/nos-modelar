@@ -37,6 +37,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
+import { arestasSemPar, cantosSobreAresta } from '../oficina/conferir-malha.js';
 
 const PECAS = resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/fps/v3/pecas');
 const nomes = readdirSync(PECAS).filter((f) => f.endsWith('.js')).map((f) => f.replace(/\.js$/, '')).sort();
@@ -44,6 +45,15 @@ const nomes = readdirSync(PECAS).filter((f) => f.endsWith('.js')).map((f) => f.r
 describe('o adaptador atravessa o acervo inteiro', () => {
   it('o acervo não está vazio — uma varredura que não varre nada passaria calada', () => {
     expect(nomes.length).toBeGreaterThan(20);
+  });
+
+  it('a declaração `fechada` é usada por alguém — senão a conferência dela nunca roda', async () => {
+    let declaram = 0;
+    for (const nome of nomes) {
+      const mod: any = await import(pathToFileURL(join(PECAS, `${nome}.js`)).href);
+      if (mod.meta?.fechada) declaram += 1;
+    }
+    expect(declaram, 'nenhuma peça declara casca fechada: a conferência estaria dormindo').toBeGreaterThanOrEqual(6);
   });
 
   for (const nome of nomes) {
@@ -57,6 +67,19 @@ describe('o adaptador atravessa o acervo inteiro', () => {
         mod.ESQUELETO ?? null, mod.ALIASES ?? [],
       );
       expect(neutro.orfaos.map((o: any) => `${o.op}: ${o.motivo}`)).toEqual([]);
+
+      /* nenhum canto pode cair sobre uma aresta da própria face: é o bico de
+         espessura zero que fez a op `filete` passar por todos os testes do
+         núcleo e não desenhar. Vale para TODA peça — medido, as 28 passam. */
+      expect(cantosSobreAresta(neutro), `${nome}: polígono com bico de espessura zero`).toEqual([]);
+
+      /* casca fechada só é cobrada de quem DECLARA. 6 das 28 peças têm borda
+         solta de propósito (uma chapa, um anteparo, um perfil que encosta em
+         vez de colar), e entre elas está a `roda-dianteira`, que está no
+         produto. Quem escreve `fechada: true` no `meta` assina embaixo. */
+      if (mod.meta?.fechada) {
+        expect(arestasSemPar(neutro), `${nome}: declarada FECHADA no meta, mas tem borda solta`).toEqual([]);
+      }
 
       const { raiz, estatisticas } = adaptarThree(neutro, {
         nome, materiais: mod.MATERIAIS ?? {},

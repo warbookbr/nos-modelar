@@ -205,6 +205,12 @@ export const PASSOS = [
 ];
 
 export const meta = {
+  /* DECLARAÇÃO DE CASCA FECHADA. A peça afirma que a superfície dela não tem
+     borda solta — toda aresta é dividida por exatamente duas faces. Quem
+     declara é cobrado pelo gate do acervo; quem não declara não é. Casca
+     aberta é escolha legítima (uma chapa, um anteparo), e 6 peças do acervo
+     são assim de propósito. Buraco NÃO abre casca: furo passante tem parede. */
+  fechada: true,
   nome: '_tampa-de-caixa',
   tipo: 'objeto',
   desc: 'peça de exercício — tampa de caixa de inspeção com círculo de quatro parafusos num passo só e cabeça de chave de pino com dois furos cegos, cada furo endereçável sozinho',

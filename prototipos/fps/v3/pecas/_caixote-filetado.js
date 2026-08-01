@@ -107,6 +107,12 @@ export const PASSOS = [
 ];
 
 export const meta = {
+  /* DECLARAÇÃO DE CASCA FECHADA. A peça afirma que a superfície dela não tem
+     borda solta — toda aresta é dividida por exatamente duas faces. Quem
+     declara é cobrado pelo gate do acervo; quem não declara não é. Casca
+     aberta é escolha legítima (uma chapa, um anteparo), e 6 peças do acervo
+     são assim de propósito. Buraco NÃO abre casca: furo passante tem parede. */
+  fechada: true,
   nome: '_caixote-filetado',
   tipo: 'objeto',
   desc: 'peça de exercício do ciclo "Curva e filete v1" — caixote de madeira com a aresta de cima-da-frente cortada pela op `filete` e puxador torneado com raios de concordância no perfil, fora do vocabulário automotivo',

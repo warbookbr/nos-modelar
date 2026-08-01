@@ -4,6 +4,7 @@
    renumera E reporta órfãos (lei "órfão grita, nunca corrompe"), e a mescla
    de/para (a interação mais delicada, a primeira a ganhar teste de verdade). */
 import { describe, it, expect } from 'vitest';
+import { conferirMalha } from './conferir-malha.js';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
 import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/fps/v3/motor/oficina.js';
@@ -5767,32 +5768,19 @@ describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de
     expect([com.V.size, com.F.size]).toEqual([10, 7]);
   });
 
-  it('toda face do resultado é um polígono SIMPLES — a versão anterior passava aqui em silêncio e quebrava na tela', () => {
-    /* o primeiro desenho preservava v0/v1 DENTRO de faceA, e com isso a face
-       ficava com um canto EM CIMA da aresta seguinte: polígono que se toca,
-       área de pico nula. O neutro continuava fechado e a contagem batia, então
-       nenhum teste do núcleo caía. Quem gritava era o adaptador, ao triangular
-       em orelhas, e só quando a op chegou numa peça de verdade.
-       A afirmação: nenhum canto de nenhuma face cai sobre uma aresta que não
-       seja a dele. */
-    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
-    const dist = (p: number[], a: number[], b: number[]) => {
-      const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
-      const ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
-      const l2 = ab[0] ** 2 + ab[1] ** 2 + ab[2] ** 2;
-      const t = Math.max(0, Math.min(1, (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) / l2));
-      return Math.hypot(ap[0] - ab[0] * t, ap[1] - ab[1] * t, ap[2] - ab[2] * t);
-    };
-    for (const f of n.F.values()) {
-      const pts = f.vs.map((v: number) => n.V.get(v));
-      for (let k = 0; k < pts.length; k++) {
-        const a = pts[k], b = pts[(k + 1) % pts.length];
-        for (let j = 0; j < pts.length; j++) {
-          if (j === k || j === (k + 1) % pts.length) continue;
-          expect(dist(pts[j], a, b), `face ${f.id}: o canto ${j} cai sobre a aresta ${k}`).toBeGreaterThan(1e-9);
-        }
-      }
-    }
+  it('a malha inteira passa na conferência única: polígono simples, casca fechada e desenha', () => {
+    /* `conferirMalha` existe por causa desta op. O primeiro desenho dela
+       preservava os cantos antigos DENTRO da face de entrada, e com isso a face
+       ficava com um canto EM CIMA da aresta seguinte: um bico de espessura
+       zero. O neutro continuava FECHADO e a contagem BATIA, então nenhum teste
+       do núcleo caía. Quem gritou foi o adaptador, ao triangular em orelhas, e
+       só quando a op chegou numa peça de verdade, uma rodada depois.
+       Malha fechada e contagem certa não provam polígono simples, e nenhuma das
+       três prova que a peça desenha. São quatro coisas, e esta linha cobra as
+       quatro. */
+    conferirMalha(nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {}), {
+      fechada: true, rotulo: 'cubo com um filete',
+    });
   });
 
   it('a silhueta muda, medida na malha: 45°/45° — a condição 5 do gate (n=1, θ/(n+1) com θ=90°)', () => {

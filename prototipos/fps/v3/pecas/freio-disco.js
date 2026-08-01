@@ -415,6 +415,12 @@ export const PASSOS = [
 ];
 
 export const meta = {
+  /* DECLARAÇÃO DE CASCA FECHADA. A peça afirma que a superfície dela não tem
+     borda solta — toda aresta é dividida por exatamente duas faces. Quem
+     declara é cobrado pelo gate do acervo; quem não declara não é. Casca
+     aberta é escolha legítima (uma chapa, um anteparo), e 6 peças do acervo
+     são assim de propósito. Buraco NÃO abre casca: furo passante tem parede. */
+  fechada: true,
   nome: 'freio-disco',
   tipo: 'objeto',
   desc: 'freio a disco dianteiro paramétrico — disco, cubo, pinça, suporte, pistão, pastilhas e flexível, cada face com identidade semântica',
