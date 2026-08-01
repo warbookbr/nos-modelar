@@ -5619,3 +5619,126 @@ describe('furo v2 — a fronteira medida da partição (A-33)', () => {
     });
   }
 });
+
+/* ============================================================================
+   CICLO 5 — A CONDIÇÃO 2 DO GATE MEDIA A COISA ERRADA
+
+   O gate diz: "um arco de raio declarado, escrito com a alça, sai a menos de 1%
+   do raio em toda amostra". A afirmação que entrou com a curva media a
+   distância dos VÉRTICES ao centro analítico. Essa distância é exata POR
+   CONSTRUÇÃO — o núcleo põe cada vértice em `centro + raio·(cos,sin)`. Ela dá
+   0,000000% em qualquer discretização, inclusive `segmentosCurva: 1`, onde o
+   "arco" é uma corda reta a 29% do arco de verdade. Medido:
+
+     seg= 1  erro nos vértices 0,000000%   desvio da SUPERFÍCIE 29,289%
+     seg= 2  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  7,612%
+     seg= 3  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  3,407%
+     seg= 4  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  1,921%
+     seg= 8  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  0,482%
+     seg=16  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  0,120%
+
+   Uma afirmação que não pode falhar não é afirmação. O que a peça mostra, e o
+   que o cliente vê, é a SUPERFÍCIE: a poligonal que liga os vértices. O desvio
+   dela é a flecha da corda, `raio·(1 − cos(giro/2·segmentos))`, e é ELE que
+   precisa caber em 1%.
+============================================================================ */
+describe('ciclo 5 — a curva é medida na SUPERFÍCIE, não só nos vértices', () => {
+  /* pior desvio do MEIO de cada corda até o arco verdadeiro, em fração do raio.
+     Percorre os pontos do perfil expandido reconstruídos a partir do neutro. */
+  const desvioDaSuperficie = (segmentosCurva: number, raio = 0.3) => {
+    const n = nucleo([['lathe', {
+      id: 0, lados: 8, segmentosCurva,
+      perfil: [[0, 0], [1, 0, raio], [1, 1], [0, 1]],
+    }]] as any, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    /* canto reto em B=(1,0): t = raio, centro = (1−raio, raio). */
+    const centro = [1 - raio, raio];
+    const aneis = new Map<string, number[]>();
+    for (const [, p] of n.V) {
+      const r = Math.hypot(p[0], p[2]);
+      aneis.set(`${r.toFixed(9)},${p[1].toFixed(9)}`, [r, p[1]]);
+    }
+    const noArco = [...aneis.values()]
+      .filter(([r, y]) => Math.abs(Math.hypot(r - centro[0], y - centro[1]) - raio) < 1e-9)
+      .sort((a, b) => a[1] - b[1]);
+    expect(noArco.length, 'a medição não achou ponto nenhum do arco').toBe(segmentosCurva + 1);
+    let pior = 0;
+    for (let k = 0; k + 1 < noArco.length; k++) {
+      const meio = [(noArco[k][0] + noArco[k + 1][0]) / 2, (noArco[k][1] + noArco[k + 1][1]) / 2];
+      pior = Math.max(pior, Math.abs(Math.hypot(meio[0] - centro[0], meio[1] - centro[1]) - raio));
+    }
+    return pior / raio;
+  };
+
+  it('a discretização BAIXA não passa: com 1 segmento o arco é uma corda reta, a 29% do arco', () => {
+    /* esta afirmação existe para provar que a de baixo NÃO é vazia. Se alguém
+       trocar a medição de volta para a distância dos vértices, este caso passa
+       a dar 0% e o teste cai aqui. */
+    expect(desvioDaSuperficie(1)).toBeGreaterThan(0.25);
+    expect(desvioDaSuperficie(2)).toBeGreaterThan(0.05);
+  });
+
+  it('com 8 segmentos (o padrão do núcleo) num canto reto o desvio da superfície cabe em 1%', () => {
+    expect(desvioDaSuperficie(8)).toBeLessThan(0.01);
+    expect(desvioDaSuperficie(16)).toBeLessThan(0.01);
+  });
+
+  it('a flecha da corda bate com a conta analítica, então o autor pode escolher a discretização', () => {
+    /* giro do arco num canto reto = 90°. Flecha = raio·(1 − cos(giro/2n)). */
+    for (const seg of [2, 3, 4, 8, 16]) {
+      const previsto = 1 - Math.cos((Math.PI / 2) / (2 * seg));
+      expect(desvioDaSuperficie(seg)).toBeCloseTo(previsto, 9);
+    }
+  });
+});
+
+/* A mesma medição na peça de PRODUTO: o ombro do pneu da `roda-dianteira` usa
+   `segmentosCurva: 3` num giro de 45°, que é metade do canto reto acima — a
+   flecha cai junto e cabe em 1% com três segmentos em vez de oito. Isto é o que
+   justifica o custo escolhido na peça, e é medido, não estimado. */
+describe('ciclo 5 — o ombro do pneu cabe em 1% com a discretização que a peça pediu', () => {
+  it('o arco do ombro tem 4 pontos e desvio de superfície abaixo de 1% do raio', async () => {
+    // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
+    const P: any = await import('../../prototipos/fps/v3/pecas/roda-dianteira.js');
+    const n = nucleo(P.PASSOS, P.PARAMS, P.TOPO, P.MATERIAIS, null, P.ALIASES);
+    expect(n.orfaos).toHaveLength(0);
+    const raio = P.PARAMS.pneuOmbroConcordancia;
+    /* o pneu é girado para o eixo X: o "raio" do perfil é a distância ao eixo X
+       e o "y" do perfil é a coordenada X. O ombro de −X fica no canto entre o
+       flanco e a banda de rodagem. */
+    const aneis = new Map<string, number[]>();
+    for (const [, p] of n.V) {
+      const r = Math.hypot(p[1], p[2]);
+      aneis.set(`${r.toFixed(9)},${p[0].toFixed(9)}`, [r, p[0]]);
+    }
+    /* centro analítico do arco, reconstruído das MEDIDAS da peça, não do neutro. */
+    const B = [P.PARAMS.pneuRaioOmbro, -P.PARAMS.pneuMeiaLargura];
+    const A = [P.PARAMS.pneuRaioInterno, -P.PARAMS.pneuMeiaLargura];
+    const C = [P.PARAMS.pneuRaioExterno, -P.PARAMS.pneuCoroaMeiaLargura];
+    const unit = (p: number[]) => {
+      const d = [p[0] - B[0], p[1] - B[1]], l = Math.hypot(d[0], d[1]);
+      return [d[0] / l, d[1] / l];
+    };
+    const u1 = unit(A), u2 = unit(C);
+    const theta = Math.acos(Math.max(-1, Math.min(1, u1[0] * u2[0] + u1[1] * u2[1])));
+    const bl = Math.hypot(u1[0] + u2[0], u1[1] + u2[1]);
+    const centro = [
+      B[0] + ((u1[0] + u2[0]) / bl) * (raio / Math.sin(theta / 2)),
+      B[1] + ((u1[1] + u2[1]) / bl) * (raio / Math.sin(theta / 2)),
+    ];
+    const noArco = [...aneis.values()]
+      .filter(([r, x]) => Math.abs(Math.hypot(r - centro[0], x - centro[1]) - raio) < 1e-9)
+      .sort((a, b) => a[1] - b[1]);
+    expect(noArco.length, 'o ombro do pneu perdeu o arco').toBe(P.TOPO.pneuOmbroSegmentos + 1);
+
+    let pior = 0;
+    for (let k = 0; k + 1 < noArco.length; k++) {
+      const meio = [(noArco[k][0] + noArco[k + 1][0]) / 2, (noArco[k][1] + noArco[k + 1][1]) / 2];
+      pior = Math.max(pior, Math.abs(Math.hypot(meio[0] - centro[0], meio[1] - centro[1]) - raio));
+    }
+    expect(pior / raio).toBeLessThan(0.01);
+    /* e o giro é mesmo de 45°: se alguém mudar o perfil e o canto virar reto,
+       três segmentos deixam de bastar e este teste cai junto. */
+    expect((Math.PI - theta) * 180 / Math.PI).toBeCloseTo(45, 6);
+  });
+});
