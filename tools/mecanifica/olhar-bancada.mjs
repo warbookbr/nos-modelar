@@ -9,6 +9,7 @@
  *
  *   npm run bancada                                       # peça padrão, 3 vistas
  *   npm run bancada -- freio-disco --vistas=direita,frontal
+ *   npm run bancada -- roda-dianteira --revisar           # 4 vistas + gate de enquadramento
  *   npm run bancada -- freio-disco --selecionadas=disco,pinca --modo=contexto
  *   npm run bancada -- freio-disco --explosao=0.4 --projecao=ortografica
  *   npm run bancada -- freio-disco --selecionadas=pastilhaInterna --focar
@@ -18,7 +19,8 @@
  * seguinte é sempre LER os PNGs (screenshot que ninguém olha é ruído).
  *
  * Sai ≠0 quando a bancada não sobe, quando um nome de parte pedido não existe
- * na peça, ou com `--estrito` quando a peça tem face sem identidade semântica.
+ * na peça, com `--estrito` quando a peça tem face sem identidade semântica, ou
+ * em `--revisar` quando a geometria sai pequena/cortada em alguma vista.
  *
  * Sai 2 em erro de USO, e bandeira desconhecida É erro de uso: `--vista=` não
  * passa calado por `--vistas=` nem `--estrit` por `--estrito`. A leitura fica em
@@ -51,7 +53,7 @@ let peca;
 try {
   const lido = lerArgumentos(process.argv.slice(2), {
     opcoes: ['vistas', 'selecionadas', 'modo', 'projecao', 'explosao', 'res', 'espera'],
-    bandeiras: ['listar', 'estrito', 'focar'],
+    bandeiras: ['listar', 'estrito', 'focar', 'revisar'],
     posicional: { nome: 'a peça', obrigatorio: false },
   });
   ({ opcao, bandeira, posicional: peca } = lido);
@@ -59,15 +61,18 @@ try {
   erroDeUso(erro.message);
 }
 
-const vistas = opcao('vistas', 'isometrica,frontal,direita').split(',').map((v) => v.trim()).filter(Boolean);
+const revisar = bandeira('revisar');
+if (revisar && opcao('vistas') != null) erroDeUso('--revisar já define as vistas; não misture com --vistas');
+const vistas = (revisar ? 'isometrica,frontal,direita,superior' : opcao('vistas', 'isometrica,frontal,direita'))
+  .split(',').map((v) => v.trim()).filter(Boolean);
 const selecionadas = opcao('selecionadas', '').split(',').map((s) => s.trim()).filter(Boolean);
 const modo = opcao('modo', 'todas');
-const projecao = opcao('projecao', 'perspectiva');
+const projecao = opcao('projecao', revisar ? 'ortografica' : 'perspectiva');
 const explosao = Number(opcao('explosao', '0'));
 const largura = Math.max(640, parseInt(opcao('res', '1280'), 10) || 1280);
 const altura = Math.round(largura * 9 / 16);
 const espera = parseInt(opcao('espera', '1200'), 10) || 1200;
-const estrito = bandeira('estrito');
+const estrito = bandeira('estrito') || revisar;
 const focar = bandeira('focar');
 
 for (const vista of vistas) {
@@ -196,6 +201,16 @@ try {
     if (focar) await page.evaluate(() => window.__mecanificaBancada.focar());
 
     await page.waitForTimeout(espera);
+    const enquadramento = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
+    if (revisar) {
+      const medida = `ocupação ${(enquadramento.area * 100).toFixed(1)}% (${(enquadramento.largura * 100).toFixed(1)}% × ${(enquadramento.altura * 100).toFixed(1)}%)`;
+      if (!enquadramento.valida) {
+        console.error(`\nENQUADRAMENTO INÚTIL em ${vista}: ${medida}${enquadramento.cortado ? '; geometria cortada' : '; objeto pequeno'}`);
+        falhou = true;
+      } else {
+        console.log(`enquadramento ${vista}: ${medida}`);
+      }
+    }
     const arquivo = join(OUT, `bancada-${relato.peca}-${vista}${sufixo}.png`);
     await page.screenshot({ path: arquivo });
     console.log(`${vista.padEnd(11)} ${arquivo}\n            ${url}`);

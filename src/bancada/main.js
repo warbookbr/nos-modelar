@@ -336,6 +336,13 @@ async function iniciar() {
     explosao: (valor) => controlador.definirExplosao(valor),
     focar: () => focarSelecao(),
     enquadrar: () => enquadrarMontagem(),
+    enquadramento: () => ambiente.medirEnquadramento(
+      alvosDeEnquadramento({
+        raiz: convertido.raiz,
+        selecionados: controlador.gruposSelecionados(),
+        modo: controlador.modo,
+      }),
+    ),
     estado: () => ({
       peca: nomePeca,
       ...controlador.estado(),

@@ -19,6 +19,12 @@ function caixaValida(objetos) {
   return caixa.isEmpty() ? null : caixa;
 }
 
+/** Regra pura do gate visual; separada do renderer para poder provar os dois
+ * fracassos que importam à autoria: objeto minúsculo e silhueta cortada. */
+export function enquadramentoUtil({ largura, altura, cortado = false }) {
+  return !cortado && Math.max(largura, altura) >= 0.38 && largura * altura >= 0.035;
+}
+
 export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 } = {}) {
   objeto.position.set(0, 0, 0);
   objeto.scale.setScalar(1);
@@ -233,6 +239,52 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
       eixos: eixos[vistaAtual] ?? eixos.isometrica,
     };
   }
+
+  /* Mede o enquadramento pela geometria projetada, não pelo PNG (que também
+     contém painéis da interface, grade e sombras). É uma observação neutra da
+     bancada: serve tanto para uma roda quanto para uma peça de mobiliário.
+     `cortado` é propositalmente estrito — revisão automática não deve aceitar
+     uma vista que esconde uma parte da silhueta. */
+  function medirEnquadramento(objetos = alvosAtuais) {
+    scene.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    camera.updateProjectionMatrix();
+    const minimo = new THREE.Vector2(Infinity, Infinity);
+    const maximo = new THREE.Vector2(-Infinity, -Infinity);
+    let pontos = 0;
+    for (const objeto of objetos.filter(Boolean)) {
+      objeto.traverse((filho) => {
+        const posicao = filho.geometry?.getAttribute?.('position');
+        if (!posicao) return;
+        const p = new THREE.Vector3();
+        for (let i = 0; i < posicao.count; i++) {
+          p.fromBufferAttribute(posicao, i).applyMatrix4(filho.matrixWorld).project(camera);
+          minimo.min(p);
+          maximo.max(p);
+          pontos++;
+        }
+      });
+    }
+    if (!pontos) return { valida: false, motivo: 'sem geometria projetável' };
+    const larguraBruta = maximo.x - minimo.x;
+    const alturaBruta = maximo.y - minimo.y;
+    const largura = Math.max(0, Math.min(2, maximo.x) - Math.max(-2, minimo.x)) / 2;
+    const altura = Math.max(0, Math.min(2, maximo.y) - Math.max(-2, minimo.y)) / 2;
+    const cortado = minimo.x < -1.001 || minimo.y < -1.001 || maximo.x > 1.001 || maximo.y > 1.001;
+    return {
+      /* Peça alongada em vista de topo pode ocupar pouca área, mas ainda ser
+         legível. A régua rejeita só quando nem a maior dimensão alcança 38%
+         do viewport ou quando a silhueta total fica abaixo de 3,5%. */
+      valida: enquadramentoUtil({ largura, altura, cortado }),
+      pontos,
+      largura,
+      altura,
+      area: largura * altura,
+      larguraBruta: larguraBruta / 2,
+      alturaBruta: alturaBruta / 2,
+      cortado,
+    };
+  }
   const observador = new ResizeObserver(redimensionar);
   observador.observe(canvas);
   redimensionar();
@@ -269,6 +321,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     definirProjecao,
     enquadrar,
     referenciaMetrica,
+    medirEnquadramento,
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

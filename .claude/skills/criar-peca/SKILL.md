@@ -6,8 +6,12 @@ description: CRIAR conteúdo do jogo NÓS como IA — objeto 3D, som, animação
 # Criar peça — o manual de autoria da IA
 
 Você não clica na Oficina — você **escreve a peça direto** (o mesmo formato que
-a Oficina grava) e **vê/mede** pelas bancadas. O laço: escrever → `npm run peca`
-→ LER os PNGs → auditar → iterar. Peça de objeto mora em
+a Oficina grava) e **vê/mede** na bancada neutra. O laço oficial é: escrever →
+`npm run descrever` → `npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior`
+→ ler as quatro vistas → crítica → iterar. `npm run peca` permanece uma
+ferramenta herdada para diagnóstico de render, mas não é o laço visual principal
+da IA: pode enquadrar o objeto pequeno e não mostra o estado semântico da bancada.
+Peça de objeto mora em
 `prototipos/fps/v3/pecas/`, de som em `pecas-som/`. Prefixo `_` = exemplo/preset
 (o `auditar` sem argumento pula os `_`).
 
@@ -50,19 +54,20 @@ gates — `lados: NaN` vira `lados: 3` calado (`NaN|0` = 0), o cilindro cai de
 V=16/F=10 pra V=6/F=5 com malha limpa, e todo id de face dos passos seguintes
 passa a apontar pra outra face.
 
-**Vocabulário IMPLEMENTADO hoje** (o resto da tabela do `docs/oficina.md` é
-roteiro, ainda não existe — não use; o plano de fechar as lacunas é o épico
-`docs/historico/playground.md`, e esta tabela DEVE ser atualizada a cada op entregue):
+**Vocabulário IMPLEMENTADO hoje.** A referência canônica de capacidades é o
+núcleo `prototipos/fps/v3/motor/oficina.js`; a lista de operações que realmente
+aceitam `origemId`/publicam `sel:{origem}` é exportada como
+`OPERACOES_COM_ORIGEM`. Esta tabela ensina o uso, não deve virar uma cópia de
+contrato de faces.
+
+<!-- operacoes-com-origem: arranja, chamferBox, cilindro, cone, cubo, esfera, espelha, filete, furo, inflate, lathe, loft, plano -->
 
 | op | args | nota |
 |---|---|---|
-| `cubo` / `cilindro` | medidas (`larg`/`alt`/`prof` ou `lado`; `raio`/`altura`), `lados` (cilindro, TOPO), `origemId?` | geradores originais, e dois dos quatro que PUBLICAM `origem` (`origemId?` é a identidade estrutural que `sel:{origem}` endereça — você escolhe o número; **não confundir com `id`, que não se escreve**) |
-| `esfera` | `raio` (PARAM, 0.5), `aneis` (TOPO, 6, mín 2), `lados` (TOPO, 8, mín 3) | **não publica `origem`** (`origemId` aqui é ignorado em silêncio). UV-sphere apoiada no chão (polo sul y=0, norte y=2·raio); numeração no comentário da op |
-| `cone` | `raio` (PARAM, 0.5), `altura` (PARAM, 1), `lados` (TOPO, 8, mín 3) | **não publica `origem`**. Anel da base b+0..b+lados−1 (y=0), ápice b+lados; tampa −y como o fundo do cilindro |
-| `plano` | `largura` (PARAM, 1), `profundidade` (PARAM, 1), `seg` (TOPO, 1, mín 1) | **não publica `origem`**. Grade XZ centrada na origem, y=0, linha a linha; seg² quads +y — o chão |
-| `chamferBox` | `larg`/`alt`/`prof` (ou `lado`, PARAM — a convenção do cubo, chão embaixo), `chanfro` (PARAM, distância do corte) | **não publica `origem`** — e isso já decidiu a forma de uma peça real: a pinça e o suporte do freio a disco são fundidas, mas saíram em `cubo` de aresta viva porque `chamferBox` não é endereçável por nome. O cubo com CANTOS E ARESTAS chanfrados — corte FLAT (não arredonda). SEM parâmetro TOPO: sempre 24 vértices/26 faces, não tem como estourar o bloco. `chanfro` precisa ser `>0` e `<min(larg/2,prof/2,alt/2)` (cortes de pontas opostas da mesma aresta não podem se cruzar) — fora da faixa GRITA e aborta (0V/0F) |
-| `lathe` | `perfil:[[raio,y],...]` (≥2 pontos, PARAM), `lados` (TOPO, mín 3), `origemId?` | PUBLICA `origem` (grade faixa×lado). Perfil 2D girado no eixo Y — generaliza a esfera (polo↔anel↔polo). Ponto de 2 elementos = canto reto PRA SEMPRE; ponto ≠ 2 elementos (a alça de curva reservada num 3º elemento, ou malformado) GRITA e ABORTA o passo (fail-closed). `raio` resolvido `===0` vira polo (1 vértice), `>0` vira anel (`lados` vértices), `<0` GRITA e aborta. Sem tampas automáticas: fechar uma ponta é terminar no eixo (raio 0) |
-| `loft` | `secoes:[{pos:[x,y,z],raio} ou {pos,contorno:[[u,w],...]},...]` (≥2 seções, PARAM), `lados` (TOPO, mín 3), `orientacao?:[x,y,z]`, `origemId?` | PUBLICA `origem` (grade faixa×lado); é o único gerador que aceita POSIÇÃO explícita (`pos` por seção), então dispensa o `transladar` seguinte — o `inflate` também nasce onde os contornos mandam (medido), e todo o resto nasce preso à origem. Seções ao longo de um CAMINHO 3D arbitrário — generaliza o lathe (que é o caso degenerado de caminho reto no eixo Y). Cada anel é orientado por TRANSPORTE PARALELO (não torce numa curva — o mesmo `quadro`/`transporta` do `galhoSeca` de `arvore-cartoon.js`, reimplementado local ao núcleo), **a menos que você DECLARE `orientacao:[x,y,z]`** — a direção do mundo para onde aponta o eixo +u de TODA seção (ela é PROJETADA no plano de cada seção, então não precisa ser perpendicular). Use quando a seção não for simétrica e o mesmo perfil tiver de manter a mesma orientação em caminhos de DIREÇÕES diferentes: um raio de roda, uma pá, uma lâmina, uma correia, um trilho. Sem ela, quem escolhe o eixo é o HISTÓRICO do caminho, e um retângulo troca largura por espessura de um braço para o outro. Com ela não há rotação acumulada: cada seção projeta a MESMA referência na PRÓPRIA tangente, então caminho torcido não gira o perfil e duas seções com a mesma tangente têm a mesma seção. Referência PARALELA à tangente de alguma seção, vetor nulo e aridade ≠ 3 GRITAM e ABORTAM — a chave nunca desempata sozinha. Ausente, o comportamento é o de sempre, byte a byte. `raio` resolvido `===0` vira polo, `>0` vira anel, `<0` GRITA e aborta — igual ao lathe. `contorno` (P5) troca o círculo por EXATAMENTE `lados` pontos `[u,w]` explícitos (estrela, hexágono, retângulo — não-circular) no plano local do anel; `raio` e `contorno` são mutuamente exclusivos (os dois juntos, ou nenhum, GRITA); ponto com aridade ≠ 2 (a alça de curva reservada) e winding CW/degenerado também GRITAM e ABORTAM. Também GRITAM e ABORTAM: seção malformada, `pos` com aridade ≠ 3, segmento de comprimento zero (duas seções na mesma posição) e CUSP (caminho dobrando ~180°) — nos dois últimos a tangente fica indefinida. Sem tampas automáticas: fechar uma ponta é terminar a seção com raio 0 |
+| `cubo` / `cilindro` / `esfera` / `cone` / `plano` | dimensões PARAM, discretização TOPO quando houver, `origemId?` | todos publicam `origem`; use a origem inteira ou as famílias documentadas pelo núcleo. `origemId` é identidade estrutural escolhida pelo autor — nunca é o `id` posicional do passo. |
+| `chamferBox` | dimensões PARAM, `chanfro`, `origemId?` | publica `origem` (faces nominais, arestas e cantos). É corte plano: não é filete nem arredondamento. |
+| `lathe` | `perfil:[[raio,y,raioDeConcordancia?],...]`, `lados`, `segmentosCurva?`, `origemId?` | publica origem por faixas/lados. O terceiro valor arredonda a quina do perfil com arco tangente; resolução é TOPO. |
+| `loft` | seções circulares ou `contorno:[[u,w,raioDeConcordancia?],...]`, `lados`, `orientacao?`, `segmentosCurva?`, `origemId?` | publica origem por faixas/lados; `orientacao` fixa a direção de uma seção não circular e o terceiro ponto suaviza o contorno com arco tangente. |
 | `moveV` | `v`, `d:[x,y,z]` | ADITIVO (`p+d`), nunca posição absoluta |
 | `moveF` | `face`, `d:[x,y,z]` | move TODOS os cantos da face, ADITIVO; canto compartilhado com outra face move junto (use `extruda` antes se não quiser afetar vizinho) |
 | `moveA` | `a`, `b`, `d:[x,y,z]` | move as duas pontas de uma aresta, ADITIVO — açúcar sobre dois `moveV`; não exige `a`/`b` ligados por face |
@@ -83,7 +88,8 @@ roteiro, ainda não existe — não use; o plano de fechar as lacunas é o épic
 | `parte` | `nome` (string com pelo menos um caractere visível), `faces:[ids]` (legado) ou `sel`, `pivo?` (`[x,y,z]`, PARAM), `substituir?` (só o literal `true`) | nomeia pra animação/material/grupo. O `nome` é a IDENTIDADE e é formato salvo: `''`, `'   '`, número, booleano, lista ou `nome` AUSENTE **GRITAM** e a op não toca em face nenhuma (fail-closed) — nomear nunca vira no-op silencioso, e `sel:{grupo}` cobra o mesmo contrato. Uma face pertence a NO MÁXIMO uma parte, e desde o O-2 **reatribuir GRITA**: se a face já é de OUTRA parte, o passo é recusado por face, ela fica com o dono ANTIGO e o órfão nomeia quem a batizou primeiro. Duas seleções sobrepostas não roubam mais faces em silêncio. Escreva `substituir: true` só quando transferir for a INTENÇÃO (valor diferente de `true` grita e a op segue estrita). Renomear para a MESMA parte segue mudo (é redundância, não conflito). Se TODA a seleção for recusada, a parte **não é registrada** — o nome não vira parte fantasma sem face nenhuma, então trate o grito como "esta parte não existe", não como aviso. `pivo` ausente = centroide da parte (resolvido no adaptador) |
 | `pesar` | `osso`, `vs:[ids]` e/ou `faces:[ids]`, `peso` | skinning (acumula por vértice, normaliza top-4); não aceita `sel` |
 | `solido` | `faces:[ids]` (legado) ou `sel` | o que entra na colisão |
-| `inflate` | `contornoLado:[[z,y],...]` (≥3 pontos, PARAM), `contornoTopo:[[z,x],...]` (idem), `divisoes` (TOPO, mín 2) | **não publica `origem`**. Dois contornos 2D (plano z×y e z×x) viram VOLUME por interseção de dois prismas — não é malha booleana geral, é uma GRADE DE VOXEL (watertight por construção, mas o resultado sai BLOCKY/facetado — não suave). Ponto com aridade ≠ 2 (alça de curva reservada) GRITA e aborta, igual ao `contorno` do loft; <3 pontos idem; contornos que não se cruzam em nenhum voxel GRITA (volume vazio nunca é o que você queria). Vale largura≠altura — o único gerador sem seção circular. Peça-exemplo `_corpo.js` |
+| `inflate` | `contornoLado`/`contornoTopo` com pontos `[u,w,raioDeConcordancia?]`, `divisoes`, `segmentosCurva?`, `origemId?` | publica a origem inteira. É um volume voxelizado, fechado porém facetado; a alça de curva suaviza o contorno de entrada, não transforma o resultado em superfície orgânica lisa. |
+| `filete` | `origemId`, `de` (uma face estrutural), `aresta`, `raio` | estado atual: um único painel, portanto **chanfro**, não arredondamento. Funciona só em aresta manifold de ponta simples; `chamferBox` e cantos complexos ainda são recusados. O desenho do v2 fica em `docs/mecanifica/FILETE-V2.md`. |
 
 **SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
 `moveF`, `moveA`, `vira`, `extruda` e `mescla` (a sétima é `pesar`, mesma
@@ -337,7 +343,8 @@ completo); peça com `ALIASES` encaminhado: `freio-disco.js`, `drone-inspecao.js
 
 **Alcance honesto:** caixa+cilindro+esfera+cone+plano+lathe+loft+extruda+move
 cobrem arquitetura, móveis, props angulados, troncos, bolas, chão, perfil
-rotacionado (vaso, coluna, peão — lathe, só reto por enquanto) e forma
+rotacionado (vaso, coluna, peão, pneu — com concordâncias quando a silhueta
+pedir) e forma
 orgânica OU angular composta ao longo de um caminho (tubo/casco/galho/membro
 com seção `{pos,raio}`; viga/perfil-I/haste-de-estrela com seção `{pos,
 contorno}` — loft, frame por transporte paralelo, sem torcer numa curva).
@@ -358,6 +365,19 @@ chamferBox+displace: `_pedra.js`.
 
 ## O laço de VER (você tem olhos — use-os)
 
+**A bancada é a prova visual oficial da IA.** Depois de conferir números com
+`npm run descrever -- minha-peca --estrito`, rode:
+
+```bash
+npm run revisar -- minha-peca
+```
+
+Ele abre a bancada neutra em isométrica, frontal, direita e superior, salva as
+quatro vistas reproduzíveis e falha quando a geometria fica cortada ou pequena
+demais para uma crítica visual. Leia os PNGs; o gate confirma enquadramento,
+não decide se a forma atende à referência. Para encaixes, some
+`--selecionadas=parteA,parteB --modo=isolar --focar` ao `npm run bancada`.
+
 **`npm run criar -- minha-peca`** é o COMANDO PADRÃO (P7, D-120) — um laço
 único: estado do núcleo + manifesto de capacidades (cruzado contra a tabela
 acima — avisa se ela ficou pra trás) + `auditar` + `porteiro` + `gabarito`
@@ -374,13 +394,13 @@ defeito da peça; confirme pelo caminho que encaminha (`construir`/`colisaoDe`
 da própria peça, `npm run gabarito:selecao:check`, ou os testes da peça) antes
 de mexer em qualquer coisa.
 
-Comandos individuais (pra investigar um achado específico do `criar`, ou pra
-ângulo/resolução fora do padrão):
+Comandos individuais (para investigar um achado específico do `criar`, ou uma
+falha do laço oficial):
 
 ```bash
-npm run peca -- minha-peca --giro=8             # 8 ângulos (defeito de um lado só)
-npm run peca -- minha-peca --res=1400 --geo=normais   # SEM textura: emenda/faceta SALTAM
-npm run peca -- minha-peca --res=1400 --geo=flat      # silhueta/volume
+npm run peca -- minha-peca --giro=8             # diagnóstico herdado: 8 ângulos
+npm run peca -- minha-peca --res=1400 --geo=normais   # diagnóstico herdado: emenda/faceta
+npm run peca -- minha-peca --res=1400 --geo=flat      # diagnóstico herdado: silhueta/volume
 npm run auditar -- minha-peca && npm run porteiro -- minha-peca   # os mesmos gates do criar, isolados
 npm run executar                                # replay/determinismo do núcleo
 npm run gabarito -- minha-peca                  # o mesmo IoU do criar, isolado — mais ângulos que o CONTORNOS cobrir

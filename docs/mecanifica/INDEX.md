@@ -119,6 +119,13 @@ Estado atual:
   que o barril, porque o aro entra por cima dele com 0,6 mm de folga);
 - A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
   Oficina continua sem saber emitir referência semântica;
+- a revisão visual oficial de autoria agora é `npm run revisar -- <peça>`: ela
+  abre a bancada neutra nas quatro vistas canônicas e recusa geometria cortada
+  ou pequena demais; `npm run peca` ficou apenas como diagnóstico herdado;
+- o próximo desenho de linguagem é o filete real v2: o atual é explicitamente
+  um chanfro de um painel. O requisito de vários painéis e de canto composto
+  (inclusive `chamferBox`) está em [`FILETE-V2.md`](FILETE-V2.md), com gate de
+  descoberta ainda vermelho, sem fingir que a pinça já foi arredondada;
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -142,17 +149,19 @@ Use esta ordem para resolver dúvidas:
    — briefing por peça, revisão intermediária e critério para extrair uma skill;
 6. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
    autoria visual e experiência do cliente;
-7. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+7. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — desenho e gate pendente do
+   arredondamento real de aresta;
+8. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-8. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+9. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-9. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+10. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-10. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
+11. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
    ordenado de mudanças na linguagem de autoria, com trade-off e custo;
-11. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+12. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-12. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+13. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as

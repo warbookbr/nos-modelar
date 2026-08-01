@@ -906,6 +906,12 @@ const CONTRATOS_ORIGEM = {
     },
   },
 };
+
+/* Fonte canônica curta para ferramentas e documentação de autoria. A lista é
+   derivada dos contratos que `sel:{origem}` realmente resolve; não é uma
+   segunda tabela mantida à mão. */
+export const OPERACOES_COM_ORIGEM = Object.freeze(Object.keys(CONTRATOS_ORIGEM).sort());
+
 function validarOrigem(origem) {
   if (!origem || typeof origem !== 'object' || Array.isArray(origem) || !Object.hasOwn(origem, 'op') || !Object.hasOwn(origem, 'id')) return { erro: 'origem precisa ser um objeto com op e id' };
   const contrato = CONTRATOS_ORIGEM[origem.op];

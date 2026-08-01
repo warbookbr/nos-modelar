@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "bancada": "node tools/mecanifica/olhar-bancada.mjs",
+    "revisar": "node tools/mecanifica/olhar-bancada.mjs --revisar",
     "guarda:salvar": "node tools/mecanifica/guarda-salvar-oficina.mjs",
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",

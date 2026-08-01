@@ -22,12 +22,12 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
 - **nenhum ciclo técnico está em execução.** O ciclo 4 ("Corte e orientação de
-  seção v1") foi fechado em 31 de julho de 2026, com as duas capacidades
-  provadas em peça: o flange de roda furado do `freio-disco` e o corrimão de
-  perfil chato. Depois dele, uma rodada avulsa pagou A-26 — a chave `centros`
-  da op `furo`, vários furos na mesma face num passo só, provada na peça de
-  exercício `_tampa-de-caixa` e registrada como UP-023. O próximo candidato é
-  o ciclo 5 ("Curva e filete v1"), escrito abaixo, com gate, e **aberto**.
+  seção v1") e o ciclo 5 ("Curva e filete v1") estão concluídos. O v1 do
+  `filete` foi medido e recebeu seu nome honesto: um painel é chanfro, não raio.
+  A continuação necessária, `arredondarAresta` com vários painéis e canto
+  composto, está desenhada em [`FILETE-V2.md`](FILETE-V2.md) e ainda não foi
+  iniciada no núcleo; o gate de descoberta falha de propósito até esse contrato
+  existir (`node tools/oficina/filete-v2-aceitacao.mjs`).
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.

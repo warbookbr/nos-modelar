@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-219 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+222 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -84,6 +84,7 @@
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
+- `FILETE-V2.md` — Filete v2 — desenho antes de implementação
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
@@ -291,6 +292,7 @@
 - `descrever-partes.test.ts` — descrever-partes.test.ts — prova do O-1: a conferência de uma peça é NÚMERO, não leitura de PNG (ATRITOS-AUTORIA A-13). Mede três coisas: que o módulo neutro…
 - `descrever-peca.mjs` — descrever-peca.mjs — a RÉGUA DA BANCADA: constrói uma peça headless e imprime, por parte semântica, caixa (min/max), centro, dimensões e contagem de faces, e…
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
+- `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
@@ -310,6 +312,7 @@
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
+- `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 

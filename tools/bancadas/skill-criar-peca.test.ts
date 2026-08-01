@@ -26,7 +26,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 // @ts-expect-error — núcleo legado em JavaScript.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, OPERACOES_COM_ORIGEM } from '../../prototipos/fps/v3/motor/oficina.js';
 
 const SKILL = join(import.meta.dirname, '../../.claude/skills/criar-peca/SKILL.md');
 const texto = readFileSync(SKILL, 'utf8');
@@ -110,6 +110,29 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
     // a nota precisa ensinar a forma `sel: {...}` e o contrato de UMA face só
     expect(linha).toMatch(/sel:\s*\{/);
     expect(linha).toMatch(/exatamente uma face|uma face só|UMA face/i);
+  });
+});
+
+describe('SKILL criar-peca x núcleo — operações que publicam origem', () => {
+  const marca = /<!-- operacoes-com-origem: ([^>]+) -->/;
+
+  it('a lista documental é derivada do contrato que o núcleo resolve', () => {
+    const encontrado = texto.match(marca);
+    expect(encontrado, 'o SKILL.md precisa expor a marca canônica de operações com origem').not.toBeNull();
+    const documentadas = encontrado![1].split(',').map((op) => op.trim()).filter(Boolean).sort();
+    expect(documentadas).toEqual([...OPERACOES_COM_ORIGEM]);
+  });
+
+  it('não preserva a instrução antiga de que geradores atuais ignoram origem ou curva', () => {
+    expect(texto).not.toMatch(/dois dos quatro que PUBLICAM `origem`/);
+    expect(texto).not.toMatch(/origemId aqui é ignorado em silêncio/);
+    expect(texto).not.toMatch(/alça de curva reservada/);
+  });
+
+  it('declara a bancada como laço visual oficial e rebaixa o render herdado a diagnóstico', () => {
+    expect(texto).toMatch(/laço oficial/i);
+    expect(texto).toMatch(/npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior/);
+    expect(texto).toMatch(/`npm run peca` permanece uma\s+ferramenta herdada/i);
   });
 });
 

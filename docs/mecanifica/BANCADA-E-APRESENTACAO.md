@@ -29,6 +29,21 @@ A bancada precisa oferecer, para qualquer peça ou montagem:
 9. diagnóstico de faces sem identidade;
 10. estado completo reproduzível pela URL.
 
+## Laço oficial de revisão por IA
+
+A bancada é a porta visual de autoria. A Oficina visual herdada continua útil
+para compatibilidade e experimentação manual, mas não entra no ciclo de uma IA:
+tronco, som e abas do Atelier são ruído para quem está avaliando uma peça.
+
+```text
+fonte procedural → descrever (medidas/semântica) → revisar (4 vistas) → crítica → ajuste
+```
+
+`npm run revisar -- <peça>` produz isométrica, frontal, direita e superior em
+projeção ortográfica. Ele falha se a geometria estiver cortada ou ocupar pouco
+do quadro; a aprovação do enquadramento não é aprovação estética. `npm run peca`
+é mantido para diagnóstico herdado de render, nunca como prova visual principal.
+
 No modo isolado, a árvore preserva qual parte está selecionada, mas a malha
 visível conserva o material original: tingir a única peça da tela sabotaria a
 inspeção de acabamento. No modo contexto, focar mantém a montagem no cálculo da
