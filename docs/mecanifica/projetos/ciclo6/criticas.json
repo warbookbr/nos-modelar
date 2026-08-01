@@ -84,7 +84,7 @@
     "onde": "`docs/mecanifica/PRANCHA-FREIO-DISCO.md`; commits 26, 29 e 30",
     "oQue": "Duas coisas. Primeira: a prancha do freio afirma \"180 faces, nenhuma sem identidade\" (linha 55) e repete o número na régua de comandos (linha 211), mais uma tabela de faces por parte (linha 57). O commit 26 filete a ponte, as garras e as orelhas do suporte, o que muda a contagem de faces da pinça e do suporte. A prancha não está na lista de nenhuma frente. Segunda: o plano exige \"a prancha\" na condição 21 e nunca nomeia um arquivo; se ela for um documento novo, ele nasce no commit 30, DEPOIS do commit 29, que é o único que roda `docs:toc:check` e `docs:links:check`.",
     "porQueImporta": "O commit 26 cria um texto errado na mesma rodada que se propõe a corrigir quatro. E o documento que carrega a única prova de olho da rodada é o único que nenhum gate confere.",
-    "conserto": "Pôr `PRANCHA-FREIO-DISCO.md` na lista do F5 e nomear o arquivo da prancha nova (por exemplo `docs/mecanifica/PRANCHA-CICLO6.md`). Inverter a ordem: a prancha entra no commit 29, junto com INDEX.md e os três checks de documentação."
+    "conserto": "Pôr `PRANCHA-FREIO-DISCO.md` na lista do F5 e nomear o arquivo da prancha nova (por exemplo uma `PRANCHA-CICLO6.md` ao lado das outras pranchas). Inverter a ordem: a prancha entra no commit 29, junto com INDEX.md e os três checks de documentação."
    },
    {
     "gravidade": "media",
