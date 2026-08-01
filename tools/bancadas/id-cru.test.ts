@@ -157,12 +157,15 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const COLECAO_DE_ID = ['faces', 'vs', 'pontos', 'de'];      // cobertas pelo gate
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
-    'alt', 'altura', 'amplitude', 'aneis', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
+    'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
     'profundidade', 'raio', 'saida', 'secoes', 'seg', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
-  /* `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
+  /* `aresta` (op `filete`) é o ÍNDICE LOCAL da aresta dentro do polígono de
+     `de` — uma posição 0..cantos-1, a mesma classe de referência que `lado`
+     (cilindro) já é; nunca aponta pra um id de vértice ou de face.
+     `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
      do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
      forma de lista é `[[x,y,z], …]` e a de círculo é `{pivo, distancia, total,
      volta|graus}`; nenhuma delas tem caminho para um id de face ou de vértice.

@@ -5517,3 +5517,131 @@ describe('furo v2 — a fronteira medida da partição (A-33)', () => {
     });
   }
 });
+
+/* filete (ciclo "Curva e filete v1") — arredonda UMA aresta escolhida por
+   identidade estrutural. O precedente é o `furo`: `de` endereça a face, o
+   corte grita em toda referência ambígua/vazia/inválida, e o que ele cria
+   entra em CONTRATOS_ORIGEM. A diferença medida é a que mais importa aqui:
+   o filete NÃO consome as duas faces da aresta — ele preserva a identidade
+   delas (mesmo `f.id`), só muda a forma; as arestas vizinhas continuam de pé. */
+const CUBO_FILETE = (filete: any, extra: any[] = []) => [
+  ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+  ['filete', { origemId: 9, ...filete }],
+  ...extra,
+];
+const ARESTA_TOPO_TRAS = { de: { op: 'cubo', id: 1, face: 'topo' }, aresta: 0, raio: 0.1 };
+
+describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de pé', () => {
+  it('custo em faces/vértices: cubo 8V/6F -> 12V/9F (o painel + as 2 tampas de canto que fecham a malha, +4V/+3F)', () => {
+    const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1 }]], {}, {});
+    const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    expect(com.orfaos).toEqual([]);
+    expect([base.V.size, base.F.size]).toEqual([8, 6]);
+    expect([com.V.size, com.F.size]).toEqual([12, 9]);
+  });
+
+  it('a silhueta muda, medida na malha: 45°/45° — a condição 5 do gate (n=1, θ/(n+1) com θ=90°)', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    const nTopo = normalDe(n, 1);       // topo do cubo
+    const nPainel = normalDe(n, 1000);  // o painel novo
+    const nFrente = normalDe(n, 4);     // a outra face da aresta escolhida
+    const ang = (a: number[], b: number[]) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))) * 180 / Math.PI;
+    expect(ang(nTopo, nPainel)).toBeCloseTo(45, 6);
+    expect(ang(nPainel, nFrente)).toBeCloseTo(45, 6);
+  });
+
+  it('as arestas NÃO escolhidas ficam EXATAMENTE como estavam — as outras 4 faces do cubo, byte a byte', () => {
+    const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1, origemId: 1 }]], {}, {});
+    const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    for (const fid of [0, 2, 3, 5]) expect(com.F.get(fid).vs).toEqual(base.F.get(fid).vs);
+  });
+
+  it('faceA e faceB continuam vivas com a MESMA identidade — v0/v1 preservados, dois cantos novos inseridos entre eles', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    expect(n.F.has(1)).toBe(true);   // topo — mesmo id, não consumida como no furo
+    expect(n.F.has(4)).toBe(true);   // frente — idem
+    expect(n.F.get(1).vs).toContain(7);   // v0 original ainda no array
+    expect(n.F.get(1).vs).toContain(6);   // v1 original ainda no array
+    expect(n.F.get(1).vs).toHaveLength(6);   // quad -> hexágono (2 cantos a mais)
+    expect(n.F.get(4).vs).toHaveLength(6);
+  });
+
+  it('o painel novo é ENDEREÇÁVEL: sel.origem cita a origem filete', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'filete', id: 9 } }, cor: '#ff0000' }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(n.F.get(1000).cor).toBe('#ff0000');
+  });
+
+  it('painel fora do limite GRITA nomeando a causa', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'filete', id: 9, painel: 5 } }, cor: '#ff0000' }],
+    ]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /fora do limite/.test(o.motivo))).toBe(true);
+  });
+
+  it('replay: o mesmo passo produz o neutro canônico byte-idêntico', () => {
+    const PASSOS = CUBO_FILETE(ARESTA_TOPO_TRAS);
+    const a = neutroCanonico(nucleo(PASSOS as any, {}, {}));
+    const b = neutroCanonico(nucleo(PASSOS as any, {}, {}));
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+
+  it('sem origemId GRITA', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+      ['filete', { de: ARESTA_TOPO_TRAS.de, aresta: 0, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/origemId é obrigatório/);
+  });
+
+  it('origemId duplicado GRITA (ambíguo)', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 9 }],
+      ['filete', { origemId: 9, ...ARESTA_TOPO_TRAS }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /duplicado nas declarações/.test(o.motivo))).toBe(true);
+  });
+
+  it('sem de GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ origemId: 9, aresta: 0, raio: 0.1 } as any) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/origem estrutural/);
+  });
+
+  it('aresta fora do índice GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 99, raio: 0.1 }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/índice inteiro 0\.\.3/);
+  });
+
+  it('raio zero/negativo GRITA', () => {
+    for (const raio of [0, -1]) {
+      const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 0, raio }) as any, {}, {});
+      expect(n.orfaos[0]?.motivo, `raio=${raio}`).toMatch(/raio precisa ser > 0/);
+    }
+  });
+
+  it('raio NaN/Infinity — a mesma lei de TODA op: número tem que ser finito, e não-finito GRITA ALTO (throw)', () => {
+    for (const raio of [NaN, Infinity]) {
+      expect(() => nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 0, raio }) as any, {}, {}), `raio=${raio}`).toThrow(/não-finito/);
+    }
+  });
+
+  it('aresta que NÃO é manifold (face isolada, sem vizinha) GRITA', () => {
+    const n = nucleo([
+      ['plano', { id: 0, largura: 1, profundidade: 1, seg: 1, origemId: 1 }],
+      ['filete', { origemId: 9, de: { op: 'plano', id: 1 }, aresta: 0, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/não é compartilhada por nenhuma outra face/);
+  });
+
+  it('id de origem não-inteiro/negativo GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ origemId: -1, ...ARESTA_TOPO_TRAS }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/inteiro não-negativo/);
+  });
+
+  it('a malha continua fechada (watertight) depois do filete — nenhuma aresta solta', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    expect(arestasSoltas(n)).toBe(0);
+  });
+});
