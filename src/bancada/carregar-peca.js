@@ -1,7 +1,7 @@
 /* carregar-peca.js — resolve a fixture da bancada por nome semântico e falha alto em nome inválido. */
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
-import { caixasPorParte } from '../autoria/descrever-partes.js';
+import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
 
 const MODULOS = import.meta.glob('../../prototipos/fps/v3/pecas/*.js');
 
@@ -52,11 +52,14 @@ export async function carregarPeca(nome = PECA_PADRAO) {
      medição que `npm run descrever` imprime, para que a bancada e o CLI não
      digam números diferentes sobre a mesma peça. */
   const { caixas, facesSemParte } = caixasPorParte(neutro);
+  /* A-20: as portas vêm do MESMO módulo neutro que `npm run descrever` lê — a
+     bancada não reimplementa a leitura de `neutro.portas`. */
+  const portas = portasPublicadas(neutro);
 
   return {
     nome,
     rotulo: peca.meta?.nome ?? nome,
-    medida: { partes: caixas, facesSemParte },
+    medida: { partes: caixas, facesSemParte, portas },
     ...adaptarThree(neutro, { nome: peca.meta?.nome ?? nome, materiais }),
   };
 }

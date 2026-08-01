@@ -4,6 +4,7 @@
    renumera E reporta órfãos (lei "órfão grita, nunca corrompe"), e a mescla
    de/para (a interação mais delicada, a primeira a ganhar teste de verdade). */
 import { describe, it, expect } from 'vitest';
+import { conferirMalha } from './conferir-malha.js';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
 import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/fps/v3/motor/oficina.js';
@@ -1242,19 +1243,107 @@ describe('P2 — lathe (perfil de revolução)', () => {
     expect(J(neutroCanonico(nucleo(JSON.parse(J(passos)), {}, {})))).toBe(a);
   });
 
-  it('3º elemento do ponto GRITA e ABORTA o passo (a reserva da alça de curva é FAIL-CLOSED — D-115: não constrói malha "reservada" que mudaria quando a curva chegar)', () => {
-    const comAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, { tipo: 'curva' }], [1, 1], [0, 1]], lados: 4 }]], {}, {});
-    expect(comAlca.orfaos).toHaveLength(1);
-    expect(comAlca.orfaos[0]).toMatchObject({ op: 'lathe', ref: 1 });
-    expect(comAlca.orfaos[0].motivo).toMatch(/reservad/i);
-    // FAIL-CLOSED: NADA construído (0 V/0 F), como o raio<0 — impossível shipar hoje uma peça de 3º elemento
-    // que renderiza reta agora e mudaria pra curva depois (o fail-open que o revisor pegou no P2)
-    expect(comAlca.V.size).toBe(0);
-    expect(comAlca.F.size).toBe(0);
-    // um ponto NORMAL de 2 elementos nunca dispara a reserva (sem falso-positivo) e constrói de verdade
+  it('Ciclo 5: a alça de curva não é mais reservada — 3º elemento numérico é um RAIO DE CONCORDÂNCIA de verdade; 3º elemento não-numérico continua THROWANDO ALTO (mesma lei de todo campo dimensional, não mais um "reservado" macio)', () => {
+    expect(() => nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, { tipo: 'curva' }], [1, 1], [0, 1]], lados: 4 }]], {}, {})).toThrow(/valor numérico inválido/);
+    // um ponto NORMAL de 2 elementos segue construindo igual, sem falso-positivo
     const semAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 4 }]], {}, {});
     expect(semAlca.orfaos).toHaveLength(0);
     expect(semAlca.V.size).toBeGreaterThan(0);
+  });
+
+  it('concordância (raio de fillet) no perfil: raio:0 é BYTE-IDÊNTICO a um ponto sem 3º elemento (no-op quando desligado)', () => {
+    const comZero = neutroCanonico(nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {}));
+    const semAlca = neutroCanonico(nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {}));
+    expect(JSON.stringify(comZero)).toBe(JSON.stringify(semAlca));
+  });
+
+  it('concordância válida: nenhum órfão, malha construída, e cada ponto do arco fica a <1% do raio declarado do CENTRO analítico (condição 2 do gate do Ciclo 5) — testado em duas discretizações', () => {
+    for (const segmentosCurva of [4, 16]) {
+      const raio = 0.3;
+      const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, raio], [1, 1], [0, 1]], lados: 8, segmentosCurva }]], {}, {});
+      expect(n.orfaos).toHaveLength(0);
+      expect(n.V.size).toBeGreaterThan(0);
+      // reconstrói o centro do fillet do MESMO jeito que o gate pede: A=(0,0) — o ponto anterior — B=(1,0) o
+      // corner original, C=(1,1) o seguinte, no plano (raio,y) do perfil. Ângulo reto -> t=raio, bissetriz a 45°.
+      const t = raio; // tan(45°)=1
+      const centro = [1 - t, t]; // B + bissetriz*(raio/sin(45°)) simplifica pra isso num ângulo reto
+      // os pontos expandidos do arco viram vértices ANEL (lados=8) a partir do 2º ponto do perfil (id 8..) —
+      // em vez de recomputar índice exato, mede em TODOS os vértices e exige que os que não são as pontas
+      // originais (raio 0 ou raio 1 exato, y 0 ou 1 exato) caiam no raio certo.
+      let medidos = 0;
+      for (const [id, p] of n.V) {
+        const raioRev = Math.hypot(p[0], p[2]); // distância ao eixo Y = coordenada 'raio' do perfil, nesse anel
+        const y = p[1];
+        const naPontaOriginal = (Math.abs(raioRev - 0) < 1e-6 && Math.abs(y - 0) < 1e-6) || (Math.abs(raioRev - 1) < 1e-6 && Math.abs(y - 1) < 1e-6) || (Math.abs(raioRev - 0) < 1e-6 && Math.abs(y - 1) < 1e-6);
+        if (naPontaOriginal) continue;
+        const dCentro = Math.hypot(raioRev - centro[0], y - centro[1]);
+        expect(Math.abs(dCentro - raio) / raio).toBeLessThan(0.01);
+        medidos += 1;
+      }
+      expect(medidos).toBeGreaterThan(0); // a medição realmente tocou pontos do arco (não passou vazia)
+    }
+  });
+
+  it('concordância: os pontos de TANGÊNCIA (TA, TC) caem EXATAMENTE onde a geometria analítica prevê — não só "a alguma distância certa do centro" (a checagem de raio sozinha não pega uma troca cos/sin: cos²+sin²=1 preserva a distância mesmo com x/y trocados de lugar)', () => {
+    // ângulo reto em B=(1,0), A=(0,0), C=(1,1), raio=0.3 -> TA=(0.7,0), TC=(1,0.3) (bissetriz a 45°, t=raio)
+    // segmentosCurva=1: o arco vira EXATAMENTE 2 pontos, TA e TC, sem interior
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const acharAnel = (raioAlvo: number, yAlvo: number) => {
+      let achou = false;
+      for (const [, p] of n.V) {
+        const raioRev = Math.hypot(p[0], p[2]);
+        if (Math.abs(raioRev - raioAlvo) < 1e-9 && Math.abs(p[1] - yAlvo) < 1e-9) achou = true;
+      }
+      return achou;
+    };
+    expect(acharAnel(0.7, 0)).toBe(true);   // TA
+    expect(acharAnel(1, 0.3)).toBe(true);   // TC
+    // e o par TROCADO (o que uma mutação cos/sin produziria) NÃO existe
+    expect(acharAnel(0.4, 0.3)).toBe(false);
+  });
+
+  it('concordância: custo em vértices/faces é EXATO (soma fechada) — segmentosCurva=1 troca 1 ponto por 2 (TA,TC), então o perfil de 4 pontos vira 5', () => {
+    const semAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0], [1, 1], [0, 1]], lados: 6 }]], {}, {});
+    const comAlca = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.3], [1, 1], [0, 1]], lados: 6, segmentosCurva: 1 }]], {}, {});
+    // sem alça: 2 polos (raio 0) + 2 anéis de 6 = 2 + 12 = 14 vértices
+    expect(semAlca.V.size).toBe(14);
+    // com alça (segmentosCurva=1): 2 polos + 3 anéis de 6 (o corner virou 2 pontos) = 2 + 18 = 20
+    expect(comAlca.V.size).toBe(20);
+    expect(comAlca.orfaos).toHaveLength(0);
+  });
+
+  it('concordância: raio negativo GRITA e ABORTA (fail-closed, mesma lei do raio<0 do lathe)', () => {
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, -0.1], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/negativo/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('concordância numa PONTA do perfil (caminho aberto, sem vizinho dos dois lados) GRITA e ABORTA', () => {
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0, 0.1], [1, 0], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/ponta/i);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('concordância grande demais (ultrapassa o segmento adjacente) GRITA e ABORTA, nunca constrói um arco errado', () => {
+    // segmento de comprimento 1 (de [1,0] a [1,1]); raio de 5 exige tangência de 5 — impossível
+    const n = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 5], [1, 1], [0, 1]], lados: 4 }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/grande demais/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('duas concordâncias vizinhas dividindo o MESMO segmento: soma dos raios cabendo constrói, soma excedendo GRITA (checagem por segmento, não só por ponto)', () => {
+    // segmento [1,0]->[1,1] tem comprimento 1; ambos os pontos vizinhos concordam nesse segmento com t=raio (ângulo reto)
+    const cabe = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.4], [1, 1, 0.4], [0, 1]], lados: 4 }]], {}, {});
+    expect(cabe.orfaos).toHaveLength(0);
+    expect(cabe.V.size).toBeGreaterThan(0);
+    const excede = nucleo([['lathe', { id: 0, perfil: [[0, 0], [1, 0, 0.6], [1, 1, 0.6], [0, 1]], lados: 4 }]], {}, {});
+    expect(excede.orfaos).toHaveLength(1);
+    expect(excede.orfaos[0].motivo).toMatch(/mesmo segmento/);
+    expect(excede.V.size).toBe(0);
   });
 
   it('ponto malformado (aridade ≠ 2, ex. [1]) GRITA e ABORTA — não estoura com throw (NIT-3: fail-closed uniforme, não exceção crua)', () => {
@@ -1804,14 +1893,28 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
     expect(n.V.size).toBe(0);
   });
 
-  it.each([
-    ['3 elementos (alça de curva reservada)', [[1, 1], [-1, 1, 99], [-1, -1], [1, -1]]],
-    ['1 elemento', [[1, 1], [-1], [-1, -1], [1, -1]]],
-  ])('ponto do contorno malformado (%s) GRITA e ABORTA — a mesma lei do ponto do perfil no lathe (D-115)', (_nome, contorno) => {
-    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
+  it('ponto do contorno malformado (1 elemento) GRITA e ABORTA — a mesma lei do ponto do perfil no lathe', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno: [[1, 1], [-1], [-1, -1], [1, -1]] }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
     expect(n.orfaos).toHaveLength(1);
-    expect(n.orfaos[0].motivo).toMatch(/2 elementos/);
+    expect(n.orfaos[0].motivo).toMatch(/2 ou 3 elementos/);
     expect(n.V.size).toBe(0);
+  });
+
+  it('Ciclo 5: ponto do contorno com 3º elemento (concordância) grande demais GRITA e ABORTA — não é mais "reservado", mas continua fail-closed', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, secoes: [{ pos: [0, 0, 0], raio: 0 }, { pos: [0, 1, 0], contorno: [[1, 1], [-1, 1, 99], [-1, -1], [1, -1]] }, { pos: [0, 2, 0], raio: 0 }] }]], {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toMatch(/grande demais/);
+    expect(n.V.size).toBe(0);
+  });
+
+  it('Ciclo 5: contorno com concordância válida constrói — segmentosCurva=1 troca 1 corner por 2 pontos (TA,TC), então 3 pontos brutos (1 com raio) viram os 4 (`lados`) exigidos', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, segmentosCurva: 1, secoes: [
+      { pos: [0, 0, 0], raio: 0 },
+      { pos: [0, 1, 0], contorno: [[1, 1], [-1, 1, 0.3], [-1, -1]] },
+      { pos: [0, 2, 0], raio: 0 },
+    ] }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(n.V.size).toBeGreaterThan(0);
   });
 
   it.each([
@@ -2028,6 +2131,170 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
     const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx);
     expect(obj.lotes).toHaveLength(1);
     expect(obj.lotes[0].mesh.v.length % 8).toBe(0);
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   `orientacao` do loft — ORIENTAÇÃO DECLARADA DA SEÇÃO.
+
+   O atrito medido (RELATO-RODA-REALISTA, "Frame implícito do `loft`"): quem
+   decidia para onde apontava o eixo +u de cada anel era o TRANSPORTE PARALELO,
+   isto é, o HISTÓRICO do caminho. Um contorno retangular não conservava
+   "largura" e "espessura" entre caminhos de direções diferentes, e a roda
+   experimental precisou detectar a troca de eixo e REMONTAR cada contorno em
+   código próprio dentro da peça.
+
+   `orientacao: [x,y,z]` é o autor declarando essa direção. Cada afirmação aqui
+   morre quando o valor muda — nenhuma repete a fórmula do núcleo:
+     - a promessa (extensão do contorno na direção declarada é a MESMA em dois
+       caminhos de direções diferentes) é medida na MALHA, e o mesmo caso SEM a
+       chave é medido junto, senão um ramo que não faz nada passaria;
+     - "sem acumular rotação" é medido por HISTÓRICO: dois caminhos diferentes
+       que chegam à mesma seção com a mesma tangente dão a MESMA seção;
+     - paralelismo GRITA e aborta o passo inteiro, nunca escolhe um desempate.
+--------------------------------------------------------------------------- */
+describe('loft — orientação declarada da seção (`orientacao`)', () => {
+  // retângulo CCW em [u,w]: meia-largura no eixo u, meia-espessura no eixo w
+  const retangulo = (u: number, w: number) => [[u, -w], [u, w], [-u, w], [-u, -w]];
+  const CONTORNO = retangulo(0.5, 0.05);
+  const extensao = (V: any, eixo: number) => {
+    const vs = [...V.values()] as number[][];
+    return +(Math.max(...vs.map((p) => p[eixo])) - Math.min(...vs.map((p) => p[eixo]))).toFixed(9);
+  };
+  // mesmo contorno, dois caminhos de DIREÇÕES diferentes (o caso da roda: dez braços, dez direções)
+  const aoLongoDe = (fim: number[], orientacao: number[] | null) => nucleo([['loft', {
+    id: 0, lados: 4, ...(orientacao ? { orientacao } : {}),
+    secoes: [{ pos: [0, 0, 0], contorno: CONTORNO }, { pos: fim, contorno: CONTORNO }],
+  }]], {}, {});
+
+  it('a espessura declarada sobrevive à troca de direção do caminho — e SEM a chave ela não sobrevive', () => {
+    // COM `orientacao: [1,0,0]`, o +u do contorno é o eixo X do MUNDO nos dois caminhos:
+    // a largura de 1 (2×0.5) fica em X, a espessura de 0.1 fica transversal — em qualquer direção.
+    const emY = aoLongoDe([0, 2, 0], [1, 0, 0]);
+    const emZ = aoLongoDe([0, 0, 2], [1, 0, 0]);
+    expect(emY.orfaos).toHaveLength(0);
+    expect(emZ.orfaos).toHaveLength(0);
+    expect(extensao(emY.V, 0)).toBe(1);
+    expect(extensao(emZ.V, 0)).toBe(1);
+
+    // SEM a chave, o MESMO par de caminhos troca os eixos: em Y o X fica com a ESPESSURA (0.1),
+    // em Z fica com a LARGURA (1). É o atrito, medido — e é o que impede esta prova de passar
+    // com um ramo `orientacao` que não faz nada.
+    expect(extensao(aoLongoDe([0, 2, 0], null).V, 0)).toBe(0.1);
+    expect(extensao(aoLongoDe([0, 0, 2], null).V, 0)).toBe(1);
+  });
+
+  /* As duas provas de "sem acumular rotação". Os dois caminhos abaixo têm
+     TORÇÃO (saem do plano e voltam) — sem isso a afirmação é vazia: num
+     caminho PLANO com a referência normal ao plano, o transporte paralelo
+     também não gira, e a prova passa com as duas implementações. Foi o que o
+     teste de mutação achou nesta rodada. */
+  it('não acumula rotação: a seção depende da PRÓPRIA tangente, não do histórico do caminho', () => {
+    // Dois caminhos terminam na MESMA `pos` [0,2,0] com a MESMA tangente [0,1,0]. O primeiro
+    // chega depois de uma TORÇÃO (passa fora do plano x=0); o segundo vem reto de baixo.
+    const secoes = (pontos: number[][]) => pontos.map((pos) => ({ pos, raio: 1 }));
+    const caminho = (pontos: number[][], o: number[] | null) => nucleo([['loft', { id: 0, lados: 6, ...(o ? { orientacao: o } : {}), secoes: secoes(pontos) }]], {}, {});
+    const TORCIDO = [[2, -4, 2], [0, -3, 1], [0, -1, 0], [0, 2, 0]];
+    const RETO = [[0, -3, 0], [0, -1, 0], [0, 2, 0]];
+    const ultimaSecao = (n: any, L: number) => [...n.V.keys()].sort((a: number, b: number) => a - b).slice(-L).map((id) => (n.V.get(id) as number[]).map((x) => +x.toFixed(9)));
+
+    // COM `orientacao`: as duas últimas seções são IDÊNTICAS ponto a ponto, apesar dos caminhos diferentes.
+    expect(ultimaSecao(caminho(TORCIDO, [0, 0, 1]), 6)).toEqual(ultimaSecao(caminho(RETO, [0, 0, 1]), 6));
+    // SEM: o transporte paralelo herdou a torção e a mesma seção sai girada — a diferença que a chave apaga.
+    expect(ultimaSecao(caminho(TORCIDO, null), 6)).not.toEqual(ultimaSecao(caminho(RETO, null), 6));
+  });
+
+  it('não acumula rotação DENTRO do mesmo caminho: duas seções com a mesma tangente têm a mesma seção', () => {
+    // Sobe em Y, desvia pra (1,·,1), volta a subir em Y: as seções 0 e 4 têm a MESMA tangente [0,1,0],
+    // com uma torção entre elas. Nenhum número de frame é repetido aqui — a afirmação compara a peça consigo.
+    const PONTOS = [[0, 0, 0], [0, 2, 0], [1, 4, 1], [1, 6, 1], [1, 8, 1]];
+    const peca = (o: number[] | null) => nucleo([['loft', { id: 0, lados: 6, ...(o ? { orientacao: o } : {}), secoes: PONTOS.map((pos) => ({ pos, raio: 1 })) }]], {}, {});
+    // seção s, em coordenadas LOCAIS (descontada a `pos`): só o frame sobra
+    const local = (n: any, s: number) => [...n.V.keys()].sort((a: number, b: number) => a - b).slice(s * 6, (s + 1) * 6)
+      .map((id) => (n.V.get(id) as number[]).map((x, k) => +(x - PONTOS[s][k]).toFixed(9)));
+
+    const declarado = peca([0, 0, 1]);
+    expect(local(declarado, 4)).toEqual(local(declarado, 0));
+    const implicito = peca(null);
+    expect(local(implicito, 4)).not.toEqual(local(implicito, 0));   // a torção acumulada, medida
+  });
+
+  it('a chave é DECLARATIVA: mudar a referência muda a fase do anel, e a ausência preserva a semente documentada', () => {
+    const anel = (o: number[] | null) => nucleo([['loft', { id: 0, lados: 4, ...(o ? { orientacao: o } : {}), secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {}).V.get(0).map((x: number) => +x.toFixed(9));
+    expect(anel([1, 0, 0])).toEqual([1, 0, 0]);     // +u declarado em X -> o vértice j=0 nasce em +X
+    expect(anel([0, 0, 1])).toEqual([0, 0, 1]);     // +u declarado em Z -> nasce em +Z
+    expect(anel([-1, 0, 0])).toEqual([-1, 0, 0]);   // referência oposta -> lado oposto (não é normalizada em módulo)
+    expect(anel(null)).toEqual([0, 0, 1]);          // AUSENTE: a semente do transporte paralelo (u0 = [0,0,1] no caminho vertical), intacta
+  });
+
+  it('a referência não precisa ser perpendicular: ela é PROJETADA no plano da seção', () => {
+    // [1,1,0] num caminho vertical projeta em [1,0,0]: o autor declara "para lá", não um eixo exato.
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [1, 1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(n.V.get(0).map((x: number) => +x.toFixed(9))).toEqual([1, 0, 0]);
+  });
+
+  it('a referência aceita nome de PARAM, como todo ponto do núcleo', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: ['eixoDoCubo', 0, 0], secoes: [{ pos: [0, 0, 0], contorno: CONTORNO }, { pos: [0, 2, 0], contorno: CONTORNO }] }]], { eixoDoCubo: 1 }, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(extensao(n.V, 0)).toBe(1);
+  });
+
+  it('winding continua PRA FORA com a orientação declarada (a lei D1 não depende do frame)', () => {
+    const { V, F } = nucleo([['loft', { id: 0, lados: 8, orientacao: [1, 0, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 3, 0], raio: 1 }] }]], {}, {});
+    const newell = (vs: number[]) => {
+      let nx = 0, nz = 0;
+      for (let k = 0; k < vs.length; k++) { const c = V.get(vs[k])!, n = V.get(vs[(k + 1) % vs.length])!; nx += (c[1] - n[1]) * (c[2] + n[2]); nz += (c[0] - n[0]) * (c[1] + n[1]); }
+      return [nx, nz];
+    };
+    for (const f of F.values()) {
+      const c = (f as any).vs.map((v: number) => V.get(v)!);
+      const cx = c.reduce((s: number, p: number[]) => s + p[0], 0) / c.length, cz = c.reduce((s: number, p: number[]) => s + p[2], 0) / c.length;
+      const [nx, nz] = newell((f as any).vs);
+      expect(nx * cx + nz * cz).toBeGreaterThan(0);   // normal aponta pra longe do eixo do caminho
+    }
+  });
+
+  it('referência PARALELA à tangente GRITA e aborta o passo inteiro — nunca desempata sozinha', () => {
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(n.V.size).toBe(0);
+    expect(n.F.size).toBe(0);
+    expect(n.orfaos).toHaveLength(2);   // uma queixa por seção, cada uma dizendo QUAL
+    expect(n.orfaos[0]).toMatchObject({ op: 'loft', ref: 0, motivo: expect.stringMatching(/paralela à tangente da seção 0/) });
+    expect(n.orfaos[1]).toMatchObject({ op: 'loft', ref: 1 });
+  });
+
+  it('paralelismo em UMA seção do meio do caminho também aborta tudo (fail-closed, não meia malha)', () => {
+    // caminho em L: reto em X, dobra pra Y. A referência [0,1,0] só fica paralela na ÚLTIMA seção.
+    const n = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 1, 0], secoes: [
+      { pos: [0, 0, 0], raio: 1 }, { pos: [2, 0, 0], raio: 1 }, { pos: [2, 2, 0], raio: 1 },
+    ] }]], {}, {});
+    expect(n.V.size).toBe(0);
+    expect(n.F.size).toBe(0);
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0]).toMatchObject({ op: 'loft', ref: 2, motivo: expect.stringMatching(/paralela à tangente da seção 2/) });
+  });
+
+  it('vetor nulo e aridade errada GRITAM antes de qualquer vértice', () => {
+    const nulo = nucleo([['loft', { id: 0, lados: 4, orientacao: [0, 0, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(nulo.V.size).toBe(0);
+    expect(nulo.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao', motivo: expect.stringMatching(/vetor nulo/) });
+
+    const curto = nucleo([['loft', { id: 0, lados: 4, orientacao: [1, 0], secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(curto.V.size).toBe(0);
+    expect(curto.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao', motivo: expect.stringMatching(/3 elementos/) });
+
+    const naoArray = nucleo([['loft', { id: 0, lados: 4, orientacao: 'x' as any, secoes: [{ pos: [0, 0, 0], raio: 1 }, { pos: [0, 2, 0], raio: 1 }] }]], {}, {});
+    expect(naoArray.V.size).toBe(0);
+    expect(naoArray.orfaos[0]).toMatchObject({ op: 'loft', ref: 'orientacao' });
+  });
+
+  it('a contagem de vértices e faces é a MESMA com e sem a chave — orientar não é gerar geometria', () => {
+    const com = aoLongoDe([0, 2, 0], [1, 0, 0]), sem = aoLongoDe([0, 2, 0], null);
+    expect(com.V.size).toBe(sem.V.size);
+    expect(com.F.size).toBe(sem.F.size);
+    expect([...com.V.keys()].sort()).toEqual([...sem.V.keys()].sort());
+    expect([...com.F.keys()].sort()).toEqual([...sem.F.keys()].sort());
   });
 });
 
@@ -3945,5 +4212,1712 @@ describe('as mensagens de seleção ensinam os OITO seletores', () => {
       const msg = n.orfaos.map((o: any) => o.motivo).join(' | ');
       for (const seletor of SETE) expect(msg, `${qual} omite '${seletor}'`).toMatch(new RegExp(`\\b${seletor}\\b`));
     }
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   Endereços semânticos v1 — A-18, A-19 e A-20 de docs/mecanifica/ATRITOS-AUTORIA.md.
+   Cada bloco abaixo falha no código anterior a esta rodada: os três geradores
+   só sabiam citar a primitiva inteira (A-18), o eixo só aceitava inteiro
+   literal (A-19) e `nucleo` não devolvia as portas (A-20).
+--------------------------------------------------------------------------- */
+const pintaOrigemEm = (passos: any[], origem: any) => nucleo([...passos, ['pincel', { modo: 'face', sel: { origem }, cor: '#123456' }]] as any, {}, {});
+const idsPintados = (n: any) => [...n.F.values()].filter((f: any) => f.cor === '#123456').map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+describe('A-18 — cone, plano e chamferBox passam a citar o eixo que a topologia já tem', () => {
+  const cone: any = ['cone', { id: 0, lados: 6, origemId: 10 }];
+  const plano: any = ['plano', { id: 0, seg: 3, origemId: 11 }];
+  const caixa: any = ['chamferBox', { id: 0, lado: 2, chanfro: 0.3, origemId: 12 }];
+
+  it('cone: `lado` é a lateral, `tampa:fundo` é a base — e a primitiva inteira continua sendo lados+1 faces', () => {
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, lado: 2 }))).toEqual([2]);
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, tampa: 'fundo' }))).toEqual([6]);
+    expect(idsPintados(pintaOrigemEm([cone], { op: 'cone', id: 10, lado: { passo: 2, fase: 0 } }))).toEqual([0, 2, 4]);
+    const inteiro = pintaOrigemEm([cone], { op: 'cone', id: 10 });   // ADITIVIDADE: o que já estava escrito não muda de alvo
+    expect(inteiro.orfaos).toHaveLength(0);
+    expect(idsPintados(inteiro)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it("cone não inventa um 'topo' que não existe: o ápice é vértice, e citá-lo GRITA", () => {
+    const n = pintaOrigemEm([cone], { op: 'cone', id: 10, tampa: 'topo' });
+    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /tampa opcional \('fundo'\)/.test(o.motivo))).toBe(true);
+    expect(idsPintados(n)).toEqual([]);
+  });
+
+  it('plano: `faixa` é a linha em z, `lado` é a coluna em x, e os dois juntos dão uma célula', () => {
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, faixa: 1 }))).toEqual([3, 4, 5]);
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, lado: 2 }))).toEqual([2, 5, 8]);
+    expect(idsPintados(pintaOrigemEm([plano], { op: 'plano', id: 11, faixa: 1, lado: 2 }))).toEqual([5]);
+    const inteiro = pintaOrigemEm([plano], { op: 'plano', id: 11 });
+    expect(inteiro.orfaos).toHaveLength(0);
+    expect(idsPintados(inteiro)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it('chamferBox: as 6 faces nominais do cubo, mais as 12 arestas e os 8 cantos', () => {
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'topo' }))).toEqual([1]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'esquerda' }))).toEqual([5]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, aresta: 0 }))).toEqual([6]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, canto: 7 }))).toEqual([25]);
+    expect(idsPintados(pintaOrigemEm([caixa], { op: 'chamferBox', id: 12, face: 'fundo', canto: 0 }))).toEqual([0, 18]);   // os campos UNEM
+    const inteira = pintaOrigemEm([caixa], { op: 'chamferBox', id: 12 });
+    expect(inteira.orfaos).toHaveLength(0);
+    expect(idsPintados(inteira)).toEqual(Array.from({ length: 26 }, (_, k) => k));
+  });
+
+  it('eixo fora do limite GRITA e não pinta nada pela metade, nas três famílias', () => {
+    for (const origem of [{ op: 'cone', id: 10, lado: 99 }, { op: 'plano', id: 11, faixa: 99 }, { op: 'chamferBox', id: 12, aresta: 12 }, { op: 'chamferBox', id: 12, canto: 8 }]) {
+      const passos: any[] = origem.op === 'cone' ? [cone] : origem.op === 'plano' ? [plano] : [caixa];
+      const n = pintaOrigemEm(passos, origem);
+      expect(n.orfaos.some((o: any) => o.op === 'pincel' && /fora do limite/.test(o.motivo)), JSON.stringify(origem)).toBe(true);
+      expect(idsPintados(n)).toEqual([]);
+    }
+  });
+
+  it('inflate continua no contrato mínimo, dito como decisão: citar eixo nele GRITA', () => {
+    const n = pintaOrigemEm([['cubo', { id: 0, lado: 1, origemId: 13 }]], { op: 'inflate', id: 13, faixa: 0 });
+    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /inflate usa somente op e id/.test(o.motivo))).toBe(true);
+  });
+});
+
+describe('A-19 — o eixo de uma origem aceita parâmetro e extremidade', () => {
+  // esfera com `lados: 4`: a faixa k são as faces [4k..4k+3]; `aneis` é TOPO, muda a CONTAGEM.
+  const esfera: any = ['esfera', { id: 0, aneis: 'aneis', lados: 4, origemId: 20 }];
+  const pinta = (origem: any, TOPO: any, PARAMS: any = {}) => nucleo([esfera, ['pincel', { modo: 'face', sel: { origem: { op: 'esfera', id: 20, ...origem } }, cor: '#123456' }]] as any, PARAMS, TOPO);
+
+  it("'ultima' continua sendo a última quando a contagem muda; o literal reaponta em silêncio", () => {
+    expect(idsPintados(pinta({ faixa: 'ultima' }, { aneis: 3 }))).toEqual([8, 9, 10, 11]);
+    expect(idsPintados(pinta({ faixa: 'ultima' }, { aneis: 4 }))).toEqual([12, 13, 14, 15]);
+    expect(idsPintados(pinta({ faixa: 'primeira' }, { aneis: 4 }))).toEqual([0, 1, 2, 3]);
+    // o mesmo endereço escrito como literal: era a última com aneis=3 e vira a do meio com aneis=4, sem erro nenhum
+    expect(idsPintados(pinta({ faixa: 2 }, { aneis: 3 }))).toEqual([8, 9, 10, 11]);
+    expect(idsPintados(pinta({ faixa: 2 }, { aneis: 4 }))).toEqual([8, 9, 10, 11]);
+  });
+
+  it('o eixo cita PARAM e expressão pelo mesmo caminho de todo campo dimensional', () => {
+    expect(idsPintados(pinta({ faixa: 'anelDaFlor' }, { aneis: 4 }, { anelDaFlor: 1 }))).toEqual([4, 5, 6, 7]);
+    expect(idsPintados(pinta({ faixa: '=aneis - 1' }, { aneis: 4 }))).toEqual([12, 13, 14, 15]);
+    expect(idsPintados(pinta({ faixa: 1, lado: '=2 + 1' }, { aneis: 4 }))).toEqual([7]);
+  });
+
+  it('valor fora do contrato GRITA com a causa nomeada, e não pinta nada', () => {
+    const casos: any[] = [
+      [{ faixa: 'naoExiste' }, {}, /não resolve/],
+      [{ faixa: 'meio' }, { meio: 1.5 }, /não é índice/],
+      [{ faixa: 'negativo' }, { negativo: -1 }, /não é índice/],
+      [{ faixa: 'aneis' }, {}, /fora do limite/],          // resolve para 4 numa esfera de 4 faixas (0..3)
+      [{ faixa: '' }, {}, /faixa opcional/],               // string vazia não é endereço nenhum
+    ];
+    for (const [origem, PARAMS, esperado] of casos) {
+      const n = pinta(origem, { aneis: 4 }, PARAMS);
+      expect(n.orfaos.some((o: any) => o.op === 'pincel' && esperado.test(o.motivo)), JSON.stringify(origem) + ' -> ' + n.orfaos.map((o: any) => o.motivo).join(' | ')).toBe(true);
+      expect(idsPintados(n)).toEqual([]);
+    }
+  });
+
+  it('os eixos novos do A-18 falam a mesma língua: extremidade e parâmetro no cilindro e no chamferBox', () => {
+    const cil: any = ['cilindro', { id: 0, raio: 0.5, altura: 1, lados: 'lados', origemId: 30 }];
+    const nCil = nucleo([cil, ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 30, lado: 'ultima' } }, cor: '#123456' }]] as any, {}, { lados: 5 });
+    expect(nCil.orfaos).toHaveLength(0);
+    expect(idsPintados(nCil)).toEqual([4]);
+    const caixa: any = ['chamferBox', { id: 0, lado: 2, chanfro: 0.3, origemId: 31 }];
+    const nCaixa = nucleo([caixa, ['pincel', { modo: 'face', sel: { origem: { op: 'chamferBox', id: 31, aresta: 'ultima', canto: 'qual' } }, cor: '#123456' }]] as any, { qual: 3 }, {});
+    expect(nCaixa.orfaos).toHaveLength(0);
+    expect(idsPintados(nCaixa)).toEqual([17, 21]);
+  });
+});
+
+describe('A-20 — o núcleo devolve as portas publicadas', () => {
+  const passos: any = [
+    ['cilindro', { id: 0, raio: 0.5, altura: 1, lados: 8, origemId: 40 }],
+    ['cone', { id: BLOCO, lados: 6, origemId: 41 }],
+    ['publicarPorta', { nome: 'zeladoria', de: { op: 'cone', id: 41, tampa: 'fundo' } }],
+    ['publicarPorta', { nome: 'assentoDoEixo', de: { op: 'cilindro', id: 40, tampa: 'topo' } }],
+  ];
+
+  it('nome, origem declarada e passo de publicação saem do núcleo, ordenados por nome', () => {
+    const n = nucleo(passos, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect([...n.portas.keys()]).toEqual(['assentoDoEixo', 'zeladoria']);   // ordem do NOME, não do passo
+    expect(n.portas.get('assentoDoEixo')).toEqual({ nome: 'assentoDoEixo', de: { op: 'cilindro', id: 40, tampa: 'topo' }, passo: 3 });
+    expect(n.portas.get('zeladoria').passo).toBe(2);
+  });
+
+  it('a porta devolvida é um CLONE: mexer nela não altera o passo da peça, e rodar de novo dá o mesmo', () => {
+    const n = nucleo(passos, {}, {});
+    n.portas.get('zeladoria').de.id = 999;
+    expect(passos[2][1].de.id).toBe(41);
+    const outra = nucleo(passos, {}, {});
+    expect(JSON.stringify([...outra.portas])).toBe(JSON.stringify([...nucleo(passos, {}, {}).portas]));
+  });
+
+  it('peça sem porta devolve mapa vazio, e porta recusada não entra no mapa', () => {
+    expect([...nucleo([['cubo', { id: 0, lado: 1 }]] as any, {}, {}).portas]).toEqual([]);
+    const recusada = nucleo([['cubo', { id: 0, lado: 1, origemId: 50 }], ['publicarPorta', { nome: 'fantasma', de: { op: 'cubo', id: 50, face: 'nenhuma' } }]] as any, {}, {});
+    expect(recusada.orfaos.some((o: any) => o.op === 'publicarPorta')).toBe(true);
+    expect([...recusada.portas]).toEqual([]);
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   O-13 — `arranja` (arranjo radial e linear com identidade por cópia).
+
+   O que estes casos existem para matar, dito na cara, porque os dois ciclos
+   anteriores morreram do mesmo jeito (verde pelo motivo errado):
+
+   1. CÓPIA ANÔNIMA. Um arranjo que devolve faces sem nome desfaz O-6 e O-12.
+      Então nenhum caso aqui cita id de face para dizer QUEM é a cópia: todos
+      passam por `sel:{alias}`/`sel:{origem}` e só então conferem o id que saiu.
+   2. ÂNGULO ACUMULADO. Somar o passo N vezes e somar uma vez multiplicado por N
+      dão doubles DIFERENTES, e a diferença entra no arquivo salvo. Os casos de
+      determinismo comparam contra o valor DERIVADO e provam, no mesmo teste,
+      que o valor ACUMULADO seria outro — senão a afirmação passaria com as duas
+      implementações e não provaria nada.
+   3. NUMERAÇÃO SEM AFIRMAÇÃO. Toda chave nova do formato salvo (`total`,
+      `volta`, `graus`, `d`, `pivo`, `copia`) tem pelo menos um caso que troca o
+      valor e cobra outro resultado.
+--------------------------------------------------------------------------- */
+describe('O-13 — arranja (arranjo radial e linear)', () => {
+  const fonte = { op: 'cubo', id: 30 };
+  const colecao = { op: 'arranja', id: 50, de: fonte };
+  const braco = (extra: any = {}): any[] => [
+    ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+    ['transladar', { d: [1, 0, 0] }],
+    ['arranja', { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte }, ...extra }],
+  ];
+  const aliases: any = [
+    ['todasAsCopias', { origem: colecao }],
+    ['segundaCopia', { origem: { ...colecao, copia: 1 } }],
+    ['ultimaCopia', { origem: { ...colecao, copia: 'ultima' } }],
+    ['primeiraCopia', { origem: { ...colecao, copia: 'primeira' } }],
+    ['copiaPorParam', { origem: { ...colecao, copia: 'qual' } }],
+    ['copiasAlternadas', { origem: { ...colecao, copia: { passo: 2, fase: 0 } } }],
+    ['fonteMaisCopias', { unir: [{ origem: fonte }, { origem: colecao }] }],
+  ];
+  const idsCom = (n: any, chave: string, valor: any) => [...n.F.values()].filter((f: any) => f[chave] === valor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+  const nomear = (nome: string, alias: string) => ['parte', { nome, sel: { alias } }];
+
+  it('a coleção inteira e cada cópia são endereçáveis por identidade, sem citar id nem posição de passo', () => {
+    const n = nucleo([...braco(),
+      nomear('coroa', 'todasAsCopias'),
+      ['pincel', { modo: 'face', sel: { alias: 'segundaCopia' }, cor: '#f00' }],
+      ['liso', { sel: { alias: 'ultimaCopia' } }],
+      ['solido', { sel: { alias: 'primeiraCopia' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    // 3 cópias × 6 faces, base do passo 2 = 2000, cada cópia numa corrida contígua
+    expect(idsCom(n, 'parte', 'coroa')).toEqual([2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(n, 'cor', '#f00')).toEqual([2006, 2007, 2008, 2009, 2010, 2011]);       // cópia 1
+    expect(idsCom(n, 'liso', true)).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);        // 'ultima' = cópia 2
+    expect(idsCom(n, 'solido', true)).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);      // 'primeira' = cópia 0
+    // a fonte NÃO é cópia: nenhuma das citações acima pegou face dela
+    expect([...n.F.values()].filter((f: any) => f.id < BLOCO).every((f: any) => f.parte === null && f.cor === null && !f.liso && !f.solido)).toBe(true);
+    // e a união com a fonte é o mecanismo que já existe para querer as duas coisas
+    const comFonte = nucleo([...braco(), nomear('tudo', 'fonteMaisCopias')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(comFonte, 'parte', 'tudo')).toHaveLength(24);
+  });
+
+  it('a cópia citada por PARAM acompanha o parâmetro, e a citada por extremidade acompanha a contagem', () => {
+    const dois = nucleo([...braco(), nomear('alvo', 'copiaPorParam')] as any, { qual: 2 }, {}, {}, null, aliases);
+    const zero = nucleo([...braco(), nomear('alvo', 'copiaPorParam')] as any, { qual: 0 }, {}, {}, null, aliases);
+    expect(idsCom(dois, 'parte', 'alvo')).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(zero, 'parte', 'alvo')).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);
+    // 'ultima' com total 4 e com total 6 aponta para cópias DIFERENTES, sem tocar na citação
+    const quatro = nucleo([...braco(), nomear('alvo', 'ultimaCopia')] as any, {}, {}, {}, null, aliases);
+    const seis = nucleo([...braco({ total: 6 }), nomear('alvo', 'ultimaCopia')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(quatro, 'parte', 'alvo')).toEqual([2012, 2013, 2014, 2015, 2016, 2017]);
+    expect(idsCom(seis, 'parte', 'alvo')).toEqual([2024, 2025, 2026, 2027, 2028, 2029]);
+    // progressão sobre as cópias: 0 e 2 de três
+    const alt = nucleo([...braco(), nomear('alvo', 'copiasAlternadas')] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(alt, 'parte', 'alvo')).toEqual([2000, 2001, 2002, 2003, 2004, 2005, 2012, 2013, 2014, 2015, 2016, 2017]);
+  });
+
+  it('a identidade não depende da posição do passo: inserir um passo antes não muda quem é a cópia', () => {
+    const semInserir = nucleo([...braco(), nomear('alvo', 'segundaCopia')] as any, {}, {}, {}, null, aliases);
+    const comInserir = nucleo([
+      ['cubo', { id: 0, lado: 0.05 }],
+      ['cubo', { id: BLOCO, lado: 0.2, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      nomear('alvo', 'segundaCopia'),
+    ] as any, {}, {}, {}, null, aliases);
+    expect(semInserir.orfaos).toHaveLength(0); expect(comInserir.orfaos).toHaveLength(0);
+    expect(idsCom(semInserir, 'parte', 'alvo')).toEqual([2006, 2007, 2008, 2009, 2010, 2011]);
+    expect(idsCom(comInserir, 'parte', 'alvo')).toEqual([3006, 3007, 3008, 3009, 3010, 3011]);   // só a base do passo mudou
+  });
+
+  it('o ângulo é DERIVADO da contagem, não acumulado — e o acumulado daria outro double', () => {
+    // 7 instâncias fechando 360°: o passo 360/7 é o caso em que somar 6 vezes != multiplicar por 6
+    const n = nucleo([...braco({ total: 7 })] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    const passo = 360 / 7;
+    const gira = (p: number[], graus: number) => { const r = (graus * Math.PI) / 180, c = Math.cos(r), s = Math.sin(r); return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c]; };
+    const origem = [...nucleo(braco({ total: 7 }).slice(0, 2) as any, {}, {}).V.entries()].sort((a: any, b: any) => a[0] - b[0]);
+    const nVporCopia = origem.length;
+    for (let k = 0; k < 6; k++) {
+      for (let j = 0; j < nVporCopia; j++) {
+        const esperado = gira(origem[j][1] as number[], (k + 1) * passo);
+        expect(n.V.get(2000 + k * nVporCopia + j)).toEqual(esperado);   // igualdade EXATA de double
+      }
+    }
+    // a afirmação acima não é vazia: o acumulado daria OUTRO valor na cópia 5
+    let acumulado = 0; for (let j = 0; j < 6; j++) acumulado += passo;
+    expect(acumulado).not.toBe(6 * passo);
+    expect(gira(origem[0][1] as number[], acumulado)).not.toEqual(gira(origem[0][1] as number[], 6 * passo));
+  });
+
+  it('linear: a cópia k fica em p+(k+1)·d, também derivado — o acumulado erraria o último passo', () => {
+    const passos: any[] = [
+      ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+      ['arranja', { modo: 'linear', d: [0.1, 0, 0], total: 8, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const puro = [...nucleo([passos[0]], {}, {}).V.entries()].sort((a: any, b: any) => a[0] - b[0]);
+    for (let k = 0; k < 7; k++) for (let j = 0; j < puro.length; j++) {
+      const p = puro[j][1] as number[];
+      expect(n.V.get(BLOCO + k * puro.length + j)).toEqual([p[0] + (k + 1) * 0.1, p[1], p[2]]);
+    }
+    let acumulado = 0; for (let j = 0; j < 7; j++) acumulado += 0.1;
+    expect(acumulado).not.toBe(7 * 0.1);   // 0.7 vs 0.7000000000000001 — a diferença entraria no arquivo salvo
+  });
+
+  it('vértice EXATAMENTE sobre o eixo é soldado: as cópias reusam o id original em vez de empilhar', () => {
+    // um cone tem o ápice em cima do eixo Y e o centro da base na origem
+    const fonteCone = { op: 'cone', id: 30 };
+    const passos: any[] = [
+      ['cone', { id: 0, raio: 0.5, altura: 1, lados: 4, origemId: 30 }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonteCone, sel: { origem: fonteCone } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    const puro = nucleo([passos[0]], {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    const noEixo = [...puro.V.entries()].filter(([, p]: any) => p[0] === 0 && p[2] === 0).map(([id]: any) => id);
+    expect(noEixo).toEqual([4]);                          // só o ápice: o anel da base nasce com ±1e-17, e o weld é EXATO
+    const soltos = puro.V.size - noEixo.length;
+    expect(n.V.size).toBe(puro.V.size + soltos * 2);      // 2 cópias × só os vértices FORA do eixo
+    // e as faces das cópias realmente citam os vértices ORIGINAIS do eixo
+    const usadosNasCopias = new Set<number>();
+    for (const f of n.F.values() as any) if (f.id >= BLOCO) for (const v of f.vs) usadosNasCopias.add(v);
+    for (const v of noEixo) expect(usadosNasCopias.has(v)).toBe(true);
+  });
+
+  it('a mão da face é PRESERVADA: os cantos da cópia saem na mesma ordem da fonte, não revertidos', () => {
+    // rotação e translação preservam a orientação; só o espelho a troca. Reverter aqui
+    // viraria toda normal para dentro — invisível no teste de manifold e plausível na foto.
+    const newell = (V: any, vs: number[]) => {
+      let nx = 0, ny = 0, nz = 0;
+      for (let k = 0; k < vs.length; k++) { const c = V.get(vs[k]), d = V.get(vs[(k + 1) % vs.length]); nx += (c[1] - d[1]) * (c[2] + d[2]); ny += (c[2] - d[2]) * (c[0] + d[0]); nz += (c[0] - d[0]) * (c[1] + d[1]); }
+      const l = Math.hypot(nx, ny, nz) || 1; return [nx / l, ny / l, nz / l];
+    };
+    // LINEAR: a cópia é a fonte transladada, então a normal é IDÊNTICA à da fonte
+    const lin = nucleo([
+      ['cubo', { id: 0, lado: 0.4, origemId: 30 }],
+      ['arranja', { modo: 'linear', d: [1, 0, 0], total: 2, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(lin.orfaos).toHaveLength(0);
+    const fonteFaces = [...lin.F.values()].filter((f: any) => f.id < BLOCO).sort((a: any, b: any) => a.id - b.id);
+    fonteFaces.forEach((f: any, k: number) => {
+      const copia = lin.F.get(BLOCO + k) as any;
+      expect(copia.vs.length).toBe(f.vs.length);
+      // ordem dos cantos: a MESMA da fonte, canto a canto (não a revertida)
+      expect(copia.vs).not.toEqual(f.vs.map((v: number) => v).reverse());
+      expect(newell(lin.V, copia.vs).map((x) => +x.toFixed(9))).toEqual(newell(lin.V, f.vs).map((x) => +x.toFixed(9)));
+    });
+    // RADIAL a 180° em torno de Y: a normal da cópia é a da fonte GIRADA, nunca a oposta dela
+    const rad = nucleo([
+      ['cubo', { id: 0, lado: 0.4, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 2, graus: 180, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(rad.orfaos).toHaveLength(0);
+    const radFonte = [...rad.F.values()].filter((f: any) => f.id < BLOCO).sort((a: any, b: any) => a.id - b.id);
+    radFonte.forEach((f: any, k: number) => {
+      const n0 = newell(rad.V, f.vs);
+      const girada = [-n0[0], n0[1], -n0[2]];                              // 180° em torno de Y
+      const nc = newell(rad.V, (rad.F.get(2000 + k) as any).vs);
+      expect(nc.map((x) => +x.toFixed(6))).toEqual(girada.map((x) => +x.toFixed(6)));
+    });
+  });
+
+  it('atributo da fonte é herdado pela cópia, e a fonte não é alterada', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, lado: 0.2, origemId: 30 }],
+      ['transladar', { d: [1, 0, 0] }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 30, face: 'topo' } }, cor: '#0f0' }],
+      ['parte', { nome: 'braco', sel: { origem: fonte } }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ] as any, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    expect(idsCom(n, 'cor', '#0f0')).toEqual([1, 4001, 4007]);           // topo da fonte + topo de cada cópia
+    expect(idsCom(n, 'parte', 'braco')).toHaveLength(18);
+  });
+
+  it('cada valor recusado GRITA e não deixa NADA para trás — meia coleção nunca existe', () => {
+    const base = ['cubo', { id: 0, lado: 0.2, origemId: 30 }];
+    const bom = { modo: 'radial', eixo: 'y', total: 4, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } };
+    const casos: [string, any][] = [
+      ['modo ausente', { ...bom, modo: undefined }],
+      ['modo desconhecido', { ...bom, modo: 'grade' }],
+      ['total 1', { ...bom, total: 1 }],
+      ['total fracionário', { ...bom, total: 2.5 }],
+      ['volta e graus juntos', { ...bom, graus: 90 }],
+      ['nem volta nem graus', { ...bom, volta: undefined }],
+      ['radial com d', { ...bom, d: [1, 0, 0] }],
+      ['eixo desconhecido', { ...bom, eixo: 'w' }],
+      ['linear sem d', { modo: 'linear', total: 4, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['linear com d nulo', { modo: 'linear', total: 4, d: [0, 0, 0], origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['linear com eixo', { modo: 'linear', total: 4, d: [1, 0, 0], eixo: 'y', origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+      ['cópia coincidente com a fonte', { ...bom, volta: undefined, graus: 180, total: 3 }],
+      ['sem origemId', { ...bom, origemId: undefined }],
+      ['sem derivaDe', { ...bom, derivaDe: undefined }],
+      ['sel por id literal', { ...bom, sel: { f: [1] } }],
+      ['sel por região', { ...bom, sel: { regiao: { min: [-9, -9, -9], max: [9, 9, 9] } } }],
+      ['sel de outra origem', { ...bom, sel: { origem: { op: 'cubo', id: 30, face: 'topo' } } }],
+      ['faces literais junto', { ...bom, faces: [1] }],
+      ['fonte inexistente', { ...bom, derivaDe: { op: 'cubo', id: 31 }, sel: { origem: { op: 'cubo', id: 31 } } }],
+    ];
+    const puro = nucleo([base] as any, {}, {});
+    for (const [nome, args] of casos) {
+      const n = nucleo([base, ['arranja', args], nomear('alvo', 'todasAsCopias')] as any, {}, {}, {}, null, aliases);
+      expect(n.orfaos.some((o: any) => o.op === 'arranja'), nome).toBe(true);
+      expect(neutroCanonico(n).V, nome).toEqual(neutroCanonico(puro).V);
+      expect(neutroCanonico(n).F, nome).toEqual(neutroCanonico(puro).F);
+      expect(idsCom(n, 'parte', 'alvo'), nome).toEqual([]);                 // a coleção não existe para citar
+    }
+  });
+
+  it('face inteiramente sobre o eixo aborta a coleção antes de alocar geometria', () => {
+    // um plano centrado na origem tem a face inteira atravessada pelo eixo Y? não —
+    // o caso real é uma face cujos 4 cantos estão TODOS no eixo, o que só acontece
+    // quando a face é degenerada no eixo. Usa-se um cubo achatado sobre o eixo Y.
+    const passos: any[] = [
+      ['cubo', { id: 0, lado: 1, origemId: 30 }],
+      ['moveV', { v: 0, d: [0.5, 0, 0.5] }], ['moveV', { v: 1, d: [-0.5, 0, 0.5] }],
+      ['moveV', { v: 2, d: [-0.5, 0, -0.5] }], ['moveV', { v: 3, d: [0.5, 0, -0.5] }],
+      ['arranja', { modo: 'radial', eixo: 'y', total: 3, volta: 360, origemId: 50, derivaDe: fonte, sel: { origem: fonte } }],
+    ];
+    const n = nucleo(passos, {}, {});
+    const puro = nucleo(passos.slice(0, 5), {}, {});
+    expect(n.orfaos.some((o: any) => o.op === 'arranja' && /sobre o eixo/.test(o.motivo))).toBe(true);
+    expect(n.V.size).toBe(puro.V.size); expect(n.F.size).toBe(puro.F.size);
+  });
+
+  it('citar uma cópia fora do limite GRITA em vez de escolher a mais próxima', () => {
+    const fora: any = [['sumida', { origem: { ...colecao, copia: 3 } }]];   // total 4 = cópias 0..2
+    const n = nucleo([...braco(), nomear('alvo', 'sumida')] as any, {}, {}, {}, null, fora);
+    expect(idsCom(n, 'parte', 'alvo')).toEqual([]);
+    expect(n.orfaos.some((o: any) => /fora do limite da origem arranja:50/.test(o.motivo))).toBe(true);
+  });
+
+  it('o bloco de ids do passo é conferido ANTES de inserir', () => {
+    const grande = (total: number): any[] => [
+      ['plano', { id: 0, largura: 1, profundidade: 1, seg: 9, origemId: 30 }],   // 100 vértices, 81 faces
+      ['arranja', { modo: 'linear', d: [2, 0, 0], total, origemId: 50, derivaDe: { op: 'plano', id: 30 }, sel: { origem: { op: 'plano', id: 30 } } }],
+    ];
+    expect(() => nucleo(grande(11), {}, {})).not.toThrow();     // 10 cópias × 100 vértices = 1000 = BLOCO
+    expect(() => nucleo(grande(12), {}, {})).toThrow(/arranja estoura o bloco/);
+  });
+
+  it('determinístico: re-rodar e ida-e-volta por JSON dão o mesmo neutro canônico', () => {
+    const passos = [...braco(), nomear('alvo', 'ultimaCopia')] as any;
+    const canon = JSON.stringify(neutroCanonico(nucleo(passos, {}, {}, {}, null, aliases)));
+    expect(JSON.stringify(neutroCanonico(nucleo(passos, {}, {}, {}, null, aliases)))).toBe(canon);
+    expect(JSON.stringify(neutroCanonico(nucleo(JSON.parse(JSON.stringify(passos)), {}, {}, {}, null, JSON.parse(JSON.stringify(aliases)))))).toBe(canon);
+  });
+
+  it('volta e graus dizem coisas diferentes, e a diferença aparece na malha', () => {
+    const posDaCopia = (extra: any) => {
+      const n = nucleo(braco(extra) as any, {}, {});
+      return (n.V.get(2000) as number[]).map((x) => +x.toFixed(9));
+    };
+    // total 4: volta 360 => passo 90; graus 90 => o MESMO passo (arco aberto de 270)
+    expect(posDaCopia({ total: 4, volta: 360 })).toEqual(posDaCopia({ total: 4, volta: undefined, graus: 90 }));
+    // total 5: volta 360 => passo 72; graus 60 => passo 60. Não são a mesma coisa.
+    expect(posDaCopia({ total: 5, volta: 360 })).not.toEqual(posDaCopia({ total: 5, volta: undefined, graus: 60 }));
+    // e o arco ABERTO com passo que fecha a volta é justamente o caso que grita:
+    // total 5 com graus 90 põe a quarta cópia a 360° da fonte, em cima dela
+    const fecha = nucleo(braco({ total: 5, volta: undefined, graus: 90 }) as any, {}, {});
+    expect(fecha.orfaos.some((o: any) => /múltiplo exato de 360/.test(o.motivo))).toBe(true);
+    expect(fecha.V.size).toBe(8);
+  });
+
+  it('o pivô ausente é [0,0,0] declarado, não o centroide da seleção', () => {
+    const semPivo = nucleo(braco({ total: 3 }) as any, {}, {});
+    const comPivoZero = nucleo(braco({ total: 3, pivo: [0, 0, 0] }) as any, {}, {});
+    const comOutroPivo = nucleo(braco({ total: 3, pivo: [1, 0, 0] }) as any, {}, {});
+    expect(neutroCanonico(semPivo).V).toEqual(neutroCanonico(comPivoZero).V);
+    expect(neutroCanonico(semPivo).V).not.toEqual(neutroCanonico(comOutroPivo).V);
+    // com o pivô no centro do próprio braço as cópias ficam EM CIMA dele — é por isso
+    // que o default não é o centroide: seria silenciosamente errado e plausível na foto
+    const caixa = (n: any) => { let min = Infinity, max = -Infinity; for (const p of n.V.values() as any) { min = Math.min(min, p[0]); max = Math.max(max, p[0]); } return +(max - min).toFixed(6); };
+    expect(caixa(semPivo)).toBeGreaterThan(caixa(comOutroPivo));
+  });
+
+  it('a origem do arranjo atravessa a API pública e nomeia só o que ela criou', () => {
+    const ctx = { tex: { texCanvas: (w: number, h: number) => ({ width: w, height: h }) }, m4: { ident: () => new Float32Array(16) } };
+    const viaApi: any = executar([...braco(), nomear('coroa', 'todasAsCopias')] as any, {}, {}, ctx, {}, {}, null, aliases);
+    const lote = viaApi.lotes.find((l: any) => l.parte === 'coroa');
+    expect(lote).toBeDefined();
+    expect(lote.mesh.v.length).toBe(18 * 6 * 8);   // 3 cópias × 6 faces × 2 triângulos × 3 vértices × 8 floats
+  });
+
+  it('publicarPorta aceita a coleção e uma cópia, e a porta sai do núcleo', () => {
+    const n = nucleo([...braco(),
+      ['publicarPorta', { nome: 'coroaDeBracos', de: colecao }],
+      ['publicarPorta', { nome: 'bracoDaFrente', de: { ...colecao, copia: 'primeira' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(n.orfaos).toHaveLength(0);
+    expect([...n.portas.keys()]).toEqual(['bracoDaFrente', 'coroaDeBracos']);
+    const pintada = nucleo([...braco(),
+      ['publicarPorta', { nome: 'bracoDaFrente', de: { ...colecao, copia: 'primeira' } }],
+      ['parte', { nome: 'frente', sel: { porta: 'bracoDaFrente' } }],
+    ] as any, {}, {}, {}, null, aliases);
+    expect(idsCom(pintada, 'parte', 'frente')).toEqual([2000, 2001, 2002, 2003, 2004, 2005]);
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   Dívida do ciclo anterior — a palavra reservada de extremidade engolia um
+   PARAM homônimo. Medido na revisão de "Endereços semânticos v1": num `plano`
+   com `seg:3` e `PARAMS {ultima: 0}`, `faixa:'ultima'` devolvia a ÚLTIMA linha,
+   não a linha 0, sem diagnóstico. Referência que resolve para outra coisa em
+   silêncio é o que o CLAUDE.md proíbe.
+--------------------------------------------------------------------------- */
+describe('extremidade de eixo x PARAM homônimo', () => {
+  const grade = { op: 'plano', id: 30 };
+  const passos = (eixo: any): any[] => [
+    ['plano', { id: 0, largura: 3, profundidade: 3, seg: 3, origemId: 30 }],
+    ['parte', { nome: 'linha', sel: { origem: { ...grade, faixa: eixo } } }],
+  ];
+  const ids = (n: any) => [...n.F.values()].filter((f: any) => f.parte === 'linha').map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+  it('sem colisão nada muda: a palavra resolve pela contagem e o PARAM resolve pelo valor', () => {
+    expect(ids(nucleo(passos('ultima'), {}, {}))).toEqual([6, 7, 8]);
+    expect(ids(nucleo(passos('primeira'), {}, {}))).toEqual([0, 1, 2]);
+    expect(ids(nucleo(passos('qual'), { qual: 0 }, {}))).toEqual([0, 1, 2]);
+    expect(ids(nucleo(passos('qual'), { qual: 2 }, {}))).toEqual([6, 7, 8]);
+  });
+
+  it('PARAM com o nome de uma extremidade GRITA na citação, em vez de a palavra ganhar calada', () => {
+    const n = nucleo(passos('ultima'), { ultima: 0 }, {});
+    expect(ids(n)).toEqual([]);                                   // não resolveu para a linha 0
+    expect(n.F.has(6)).toBe(true);                                // nem para a última: não resolveu para nada
+    expect(ids(nucleo(passos('ultima'), { ultima: 0 }, {}))).not.toEqual([6, 7, 8]);
+    expect(n.orfaos.some((o: any) => /palavra reservada de extremidade E também um parâmetro declarado/.test(o.motivo))).toBe(true);
+    // TOPO conta igual a PARAM: os dois entram no mesmo dicionário
+    const porTopo = nucleo(passos('primeira'), {}, { primeira: 2 });
+    expect(ids(porTopo)).toEqual([]);
+    expect(porTopo.orfaos.some((o: any) => /parâmetro declarado/.test(o.motivo))).toBe(true);
+  });
+
+  it('a colisão grita em todo eixo que usa extremidade, não só na faixa do plano', () => {
+    const cilindro = { op: 'cilindro', id: 40 };
+    const n = nucleo([
+      ['cilindro', { id: 0, raio: 1, altura: 1, lados: 6, origemId: 40 }],
+      ['parte', { nome: 'lado', sel: { origem: { ...cilindro, lado: 'ultima' } } }],
+    ] as any, { ultima: 1 }, {});
+    expect([...n.F.values()].filter((f: any) => f.parte === 'lado')).toHaveLength(0);
+    expect(n.orfaos.some((o: any) => /parâmetro declarado/.test(o.motivo))).toBe(true);
+  });
+});
+
+/* ============================================================================
+   FURO — ciclo "Corte e orientação de seção v1", a primeira SUBTRAÇÃO do núcleo.
+   O risco do item não é geométrico, é de IDENTIDADE: um corte cria dezenas de
+   faces e destrói outras, e sem afirmação que morra o formato salvo passa a
+   depender de coisas que ninguém confere. Então tudo que entra no salvo tem
+   afirmação aqui: a numeração exata, a contagem por família, a orientação de
+   cada normal, a herança de atributo, o casamento angular da borda, e o grito
+   de toda face consumida.
+============================================================================ */
+const PLACA = (furo: any, extra: any[] = []) => [
+  ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+  ['furo', { origemId: 9, ...furo }],
+  ...extra,
+];
+const PASSANTE = { de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 };
+const CEGO = { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 };
+
+/* arestas com saldo ≠ 0 = malha aberta. Um corte que esquecesse a parede, ou
+   que orientasse a borda ao contrário, apareceria aqui e em lugar nenhum. */
+const arestasSoltas = (n: any) => {
+  const m = new Map<string, number>();
+  for (const f of n.F.values()) for (let k = 0; k < f.vs.length; k++) {
+    const a = f.vs[k], b = f.vs[(k + 1) % f.vs.length];
+    const chave = a < b ? `${a}_${b}` : `${b}_${a}`;
+    m.set(chave, (m.get(chave) ?? 0) + (a < b ? 1 : -1));
+  }
+  return [...m.entries()].filter(([, v]) => v !== 0).length;
+};
+const normalDe = (n: any, fid: number) => {
+  const f = n.F.get(fid);
+  let nx = 0, ny = 0, nz = 0;
+  for (let k = 0; k < f.vs.length; k++) {
+    const c = n.V.get(f.vs[k]), d = n.V.get(f.vs[(k + 1) % f.vs.length]);
+    nx += (c[1] - d[1]) * (c[2] + d[2]); ny += (c[2] - d[2]) * (c[0] + d[0]); nz += (c[0] - d[0]) * (c[1] + d[1]);
+  }
+  const l = Math.hypot(nx, ny, nz) || 1;
+  return [nx / l, ny / l, nz / l];
+};
+const pintadas = (n: any, cor: string) => [...n.F.values()].filter((f: any) => f.cor === cor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
+
+describe('furo — numeração é formato salvo', () => {
+  it('passante: 2·lados vértices e 3·lados faces, nos ids exatos do bloco', () => {
+    const n = nucleo(PLACA(PASSANTE) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    // vértices novos: b+0..b+5 (anel de entrada), b+6..b+11 (anel de saída)
+    expect([...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011]);
+    // faces novas: borda b+0..b+5, parede b+6..b+11, borda de saída b+12..b+17
+    expect([...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017]);
+    // as DUAS faces cortadas sumiram da malha, e só elas
+    expect(n.F.has(1)).toBe(false);   // topo do cubo
+    expect(n.F.has(0)).toBe(false);   // fundo do cubo
+    expect([...n.F.keys()].filter((f: number) => f < 1000).sort((a: number, b: number) => a - b)).toEqual([2, 3, 4, 5]);
+    expect(n.V.size).toBe(8 + 12);
+    expect(n.F.size).toBe(4 + 18);
+  });
+
+  it('cego: mesmos 2·lados vértices, mas 2·lados+1 faces — o fundo mora em b+2·lados', () => {
+    const n = nucleo(PLACA(CEGO) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b))
+      .toEqual([1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012]);
+    expect(n.F.get(1012).vs).toEqual([1006, 1007, 1008, 1009, 1010, 1011]);   // o fundo é o anel de baixo inteiro
+    expect(n.F.has(0)).toBe(true);    // o fundo do CUBO continua vivo: o furo cego não o toca
+    expect(n.F.has(1)).toBe(false);
+  });
+
+  it('mudar PARAM não renumera; mudar lados (TOPO) renumera', () => {
+    const ids = (n: any) => [...n.F.keys()].filter((f: number) => f >= 1000).sort((a: number, b: number) => a - b);
+    const base = nucleo(PLACA(PASSANTE) as any, {}, {});
+    const outroRaio = nucleo(PLACA({ ...PASSANTE, raio: 0.9 }) as any, {}, {});
+    const outroCentro = nucleo(PLACA({ ...PASSANTE, centro: [1, 0, -0.7] }) as any, {}, {});
+    expect(ids(outroRaio)).toEqual(ids(base));
+    expect(ids(outroCentro)).toEqual(ids(base));
+    expect(n0(outroRaio)).not.toEqual(n0(base));            // a FORMA mudou
+    const outrosLados = nucleo(PLACA({ ...PASSANTE, lados: 10 }) as any, {}, {});
+    expect(ids(outrosLados)).not.toEqual(ids(base));
+    expect(ids(outrosLados)).toHaveLength(30);
+  });
+
+  it('`lados` abaixo de 3 é preso em 3, a mesma convenção do cilindro/cone/esfera', () => {
+    const n = nucleo(PLACA({ ...PASSANTE, lados: 2 }) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(9);   // 3·3, não 3·2
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(6);
+    expect(arestasSoltas(n)).toBe(0);
+  });
+
+  it('um furo que estouraria o bloco de ids GRITA ALTO (throw), como as outras primitivas', () => {
+    expect(() => nucleo(PLACA({ ...PASSANTE, lados: BLOCO }) as any, {}, {})).toThrow(/estoura o bloco de ids/);
+  });
+
+  it('o mesmo passo roda duas vezes com o neutro idêntico', () => {
+    const a = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
+    const b = neutroCanonico(nucleo(PLACA(PASSANTE) as any, {}, {}));
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+});
+const n0 = (n: any) => n.V.get(1000);
+
+describe('furo — a malha continua fechada e virada para o lado certo', () => {
+  it('passante numa placa: zero aresta solta', () => {
+    expect(arestasSoltas(nucleo(PLACA(PASSANTE) as any, {}, {}))).toBe(0);
+  });
+
+  it('cego numa placa: zero aresta solta', () => {
+    expect(arestasSoltas(nucleo(PLACA(CEGO) as any, {}, {}))).toBe(0);
+  });
+
+  it('a borda herda a normal da face cortada, a parede aponta PARA o eixo e o fundo para a boca', () => {
+    const n = nucleo(PLACA(PASSANTE) as any, {}, {});
+    for (let j = 0; j < 6; j++) {
+      expect(normalDe(n, 1000 + j)[1]).toBeCloseTo(1, 9);        // borda de entrada: +y, como o topo do cubo
+      expect(normalDe(n, 1012 + j)[1]).toBeCloseTo(-1, 9);       // borda de saída: -y, como o fundo do cubo
+      // parede j: a normal aponta do meio da parede PARA o eixo do furo
+      const nrm = normalDe(n, 1006 + j);
+      const a = n.V.get(1000 + j), b = n.V.get(1000 + (j + 1) % 6);
+      const radial = [(a[0] + b[0]) / 2, 0, (a[2] + b[2]) / 2];
+      const l = Math.hypot(radial[0], radial[2]);
+      expect(nrm[0] * radial[0] / l + nrm[2] * radial[2] / l).toBeCloseTo(-1, 6);
+    }
+    const cego = nucleo(PLACA(CEGO) as any, {}, {});
+    expect(normalDe(cego, 1012)[1]).toBeCloseTo(1, 9);           // o fundo olha para a boca do furo
+  });
+
+  it('toda face da borda sai CONVEXA no próprio plano — é para isso que o casamento é ANGULAR', () => {
+    // com casamento por ÍNDICE (floor(j·n/lados)) esta afirmação morre num
+    // quadrado com furo central e lados:8: aparecem quadriláteros reflexos.
+    const n = nucleo(PLACA({ ...PASSANTE, lados: 8 }) as any, {}, {});
+    for (let j = 0; j < 8; j++) for (const fid of [1000 + j, 1016 + j]) {
+      const vs = n.F.get(fid).vs.map((v: number) => n.V.get(v));
+      const nrm = normalDe(n, fid);
+      for (let k = 0; k < vs.length; k++) {
+        const p = vs[k], q = vs[(k + 1) % vs.length], r = vs[(k + 2) % vs.length];
+        const e1 = [q[0] - p[0], q[1] - p[1], q[2] - p[2]];
+        const e2 = [r[0] - q[0], r[1] - q[1], r[2] - q[2]];
+        const cr = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+        expect(cr[0] * nrm[0] + cr[1] * nrm[1] + cr[2] * nrm[2]).toBeGreaterThan(-1e-9);
+      }
+    }
+  });
+
+  it('a borda tem SEMPRE `lados` faces, tanto num quadrado de 4 cantos quanto numa tampa de 12', () => {
+    const tampa = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 1, lados: 12, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, tampa: 'topo' }, saida: { op: 'cilindro', id: 1, tampa: 'fundo' }, centro: [0, 0, 0], raio: 0.4, lados: 6 }],
+    ] as any, {}, {});
+    expect(tampa.orfaos).toEqual([]);
+    expect(arestasSoltas(tampa)).toBe(0);
+    expect([...tampa.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(18);
+  });
+});
+
+describe('furo — toda face nova é endereçável, e as famílias não se confundem', () => {
+  const furo = { op: 'furo', id: 9 };
+  const cores = (extra: any[]) => nucleo(PLACA(PASSANTE, extra) as any, {}, {});
+
+  it('cada família responde pelo que criou, e o furo inteiro pela soma', () => {
+    const n = cores([
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 0 } }, cor: '#100000' }],
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, parede: 'ultima' } }, cor: '#200000' }],
+      ['pincel', { modo: 'face', sel: { origem: { ...furo, saida: { passo: 2, fase: 0 } } }, cor: '#300000' }],
+      ['pincel', { modo: 'face', sel: { origem: furo }, cor: '#400000' }],
+    ]);
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#400000')).toHaveLength(18);            // o furo INTEIRO
+    const so = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 0 } }, cor: '#100000' }]]);
+    expect(pintadas(so, '#100000')).toEqual([1000]);
+    const ult = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, parede: 'ultima' } }, cor: '#200000' }]]);
+    expect(pintadas(ult, '#200000')).toEqual([1011]);
+    const alt = cores([['pincel', { modo: 'face', sel: { origem: { ...furo, saida: { passo: 2, fase: 0 } } }, cor: '#300000' }]]);
+    expect(pintadas(alt, '#300000')).toEqual([1012, 1014, 1016]);
+  });
+
+  it('citar saida num furo CEGO grita; citar tampa num furo PASSANTE grita', () => {
+    const cego = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { ...furo, saida: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(cego.orfaos.some((o: any) => /é um furo CEGO/.test(o.motivo))).toBe(true);
+    expect(pintadas(cego, '#f00')).toEqual([]);
+    const passante = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { ...furo, tampa: 'fundo' } }, cor: '#f00' }]]) as any, {}, {});
+    expect(passante.orfaos.some((o: any) => /é um furo PASSANTE/.test(o.motivo))).toBe(true);
+    expect(pintadas(passante, '#f00')).toEqual([]);
+    // e no cego a tampa RESOLVE, para a face única do fundo
+    const ok = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { ...furo, tampa: 'fundo' } }, cor: '#0f0' }]]) as any, {}, {});
+    expect(ok.orfaos).toEqual([]);
+    expect(pintadas(ok, '#0f0')).toEqual([1012]);
+  });
+
+  it('índice fora do limite grita nomeando a família, em vez de devolver nada', () => {
+    const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { ...furo, borda: 6 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /borda 6 fora do limite da origem furo:9 \(0\.\.5\)/.test(o.motivo))).toBe(true);
+  });
+
+  it('chave desconhecida na origem do furo GRITA com o vocabulário certo, em vez de ser ignorada', () => {
+    const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, lado: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /furo usa op, id, furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+  });
+
+  it('a origem do furo é publicável como PORTA, e a porta entrega as mesmas faces', () => {
+    const n = nucleo(PLACA(PASSANTE, [
+      ['publicarPorta', { nome: 'bocaDoFuro', de: { ...furo, borda: 0 } }],
+      ['parte', { nome: 'boca', sel: { porta: 'bocaDoFuro' } }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.values()].filter((f: any) => f.parte === 'boca').map((f: any) => f.id)).toEqual([1000]);
+  });
+});
+
+describe('furo — face consumida GRITA, nunca some em silêncio', () => {
+  const topo = { op: 'cubo', id: 1, face: 'topo' };
+
+  it('citação EXPLÍCITA da face cortada diz QUEM a comeu e em que passo', () => {
+    const n = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: topo }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+  });
+
+  it('citação em UNIÃO para de PULAR a face consumida: a primitiva inteira vira ERRO', () => {
+    // sem o registro de consumo, `{op:'cubo',id:1}` devolveria 5 faces das 6 e
+    // pintaria "o cubo inteiro" sem a borda do furo — plausível na foto.
+    const n = nucleo(PLACA(CEGO, [['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(pintadas(n, '#f00')).toEqual([]);
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi consumida pelo furo do passo 1 — a face virou a borda do corte/.test(o.motivo))).toBe(true);
+  });
+
+  it('o mesmo vale para a tampa de um cilindro e para o eixo numérico de uma família', () => {
+    const cil = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 1, lados: 8, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, tampa: 'topo' }, profundidade: 0.3, centro: [0, 0, 0], raio: 0.4, lados: 6 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 1, tampa: 'topo' } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(cil.orfaos.some((o: any) => /consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(cil, '#f00')).toEqual([]);
+    // e o furo numa LATERAL some do eixo numérico do cilindro, também gritando
+    const lateral = nucleo([
+      ['cilindro', { id: 0, raio: 2, altura: 2, lados: 4, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cilindro', id: 1, lado: 0 }, profundidade: 0.3, centro: [1, 1, 1], raio: 0.3, lados: 6 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cilindro', id: 1 } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(lateral.orfaos.some((o: any) => /lado 0 da origem cilindro:1 foi consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(lateral, '#f00')).toEqual([]);
+  });
+
+  it('num furo PASSANTE a face de SAÍDA também é registrada, não só a de entrada', () => {
+    const n = nucleo(PLACA(PASSANTE, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#f00' }],
+    ]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'fundo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
+    expect(pintadas(n, '#f00')).toEqual([]);
+    // e na UNIÃO da primitiva inteira o grito também nomeia a saída
+    const uniao = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+      ['apagaFace', { sel: { origem: { op: 'furo', id: 9, borda: 0 } } }],   // some com a borda: a entrada some do caminho
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#0f0' }],
+    ] as any, {}, {});
+    expect(uniao.orfaos.some((o: any) => /da origem cubo:1 foi consumida pelo furo do passo 1/.test(o.motivo))).toBe(true);
+    expect(pintadas(uniao, '#0f0')).toEqual([]);
+  });
+
+  it('uma peça SEM furo nenhum continua pulando face removida em silêncio, como sempre', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+      ['apagaFace', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1 } }, cor: '#f00' }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#f00')).toHaveLength(5);
+  });
+});
+
+describe('furo — herança de atributo', () => {
+  it('borda, parede e fundo herdam a face de ENTRADA; a borda de saída herda a de SAÍDA', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#aabbcc' }],
+      ['parte', { nome: 'tampoDaMesa', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['liso', { sel: { origem: { op: 'cubo', id: 1, face: 'topo' } } }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#112233' }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#aabbcc')).toEqual([5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011]);
+    expect(pintadas(n, '#112233')).toEqual([5012, 5013, 5014, 5015, 5016, 5017]);
+    expect([...n.F.values()].filter((f: any) => f.parte === 'tampoDaMesa').map((f: any) => f.id))
+      .toEqual([5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011]);
+    expect([...n.F.values()].filter((f: any) => f.liso).map((f: any) => f.id)).toHaveLength(12);
+    // no cego a herança da entrada chega ao FUNDO também
+    const cego = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#aabbcc' }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(pintadas(cego, '#aabbcc')).toHaveLength(13);
+    expect(cego.F.get(2012).cor).toBe('#aabbcc');
+  });
+});
+
+describe('furo — orientação declarada da fase do anel', () => {
+  it('o vértice 0 do anel fica na direção declarada, e sem a chave fica no quadro de sempre', () => {
+    const comX = nucleo(PLACA({ ...PASSANTE, orientacao: [1, 0, 0] }) as any, {}, {});
+    expect(comX.orfaos).toEqual([]);
+    expect(comX.V.get(1000)[0]).toBeCloseTo(0.5, 9);
+    expect(comX.V.get(1000)[2]).toBeCloseTo(0, 9);
+    const comZ = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 0, 1] }) as any, {}, {});
+    expect(comZ.V.get(1000)[2]).toBeCloseTo(0.5, 9);
+    expect(comZ.V.get(1000)[0]).toBeCloseTo(0, 9);
+    // a chave é PROJETADA no plano: uma referência oblíqua vale pela componente no plano
+    const obliqua = nucleo(PLACA({ ...PASSANTE, orientacao: [3, 7, 0] }) as any, {}, {});
+    expect(obliqua.V.get(1000)[0]).toBeCloseTo(0.5, 9);
+    // ausente: o quadro determinístico (para a normal +y, o +u é +z)
+    const sem = nucleo(PLACA(PASSANTE) as any, {}, {});
+    expect(sem.V.get(1000)[2]).toBeCloseTo(0.5, 9);
+    expect(JSON.stringify(neutroCanonico(sem))).not.toBe(JSON.stringify(neutroCanonico(comX)));
+  });
+
+  it('orientação paralela à normal da face GRITA e aborta — nunca desempata sozinha', () => {
+    const n = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 1, 0] }) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /é paralela à normal da face/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+    const nulo = nucleo(PLACA({ ...PASSANTE, orientacao: [0, 0, 0] }) as any, {}, {});
+    expect(nulo.orfaos.some((o: any) => /vetor nulo/.test(o.motivo))).toBe(true);
+  });
+});
+
+describe('furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F', () => {
+  const semSaida = (n: any) => [...n.F.keys()].filter((f: number) => f >= 1000).length + [...n.V.keys()].filter((v: number) => v >= 1000).length;
+  const casos: Array<[string, any, RegExp]> = [
+    ['sem origemId', { ...CEGO, origemId: null }, /origemId é obrigatório/],
+    ['os dois modos juntos', { ...PASSANTE, profundidade: 0.4 }, /declare exatamente uma/],
+    ['modo nenhum', { de: { op: 'cubo', id: 1, face: 'topo' }, centro: [0, 0, 0], raio: 0.5 }, /exatamente uma/],
+    ['raio zero', { ...CEGO, raio: 0 }, /raio precisa ser > 0/],
+    ['profundidade zero', { ...CEGO, profundidade: 0 }, /profundidade precisa ser > 0/],
+    ['sem centro', { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, raio: 0.5 }, /furo exige centro/],
+    ['centro com aridade errada', { ...CEGO, centro: [0, 0] }, /centro precisa ser \[x,y,z\]/],
+    ['anel maior que a face', { ...CEGO, raio: 3 }, /não cabe dentro da face de entrada/],
+    ['anel encostando na borda', { ...CEGO, centro: [1.6, 0, 0], raio: 0.5 }, /não cabe dentro da face de entrada/],
+    ['entrada ambígua', { ...CEGO, de: { op: 'cubo', id: 1 } }, /precisa resolver para EXATAMENTE uma face/],
+    ['entrada inexistente', { ...CEGO, de: { op: 'cubo', id: 77 } }, /inexistente ou ainda não criada/],
+    ['saída igual à entrada', { ...PASSANTE, saida: { op: 'cubo', id: 1, face: 'topo' } }, /a saída é a MESMA face da entrada/],
+    ['saída que o eixo não atravessa', { ...PASSANTE, saida: { op: 'cubo', id: 1, face: 'frente' } }, /não ATRAVESSA a face de saída/],
+  ];
+  for (const [nome, furo, esperado] of casos) {
+    it(`${nome}: grita e não cria nada`, () => {
+      const n = nucleo(PLACA(furo) as any, {}, {});
+      expect(n.orfaos.some((o: any) => esperado.test(o.motivo))).toBe(true);
+      expect(semSaida(n)).toBe(0);
+      expect(n.F.has(1)).toBe(true);      // a face de entrada continua INTEIRA
+      expect(n.V.size).toBe(8);
+    });
+  }
+
+  /* A revisão adversarial do ciclo mediu: a op valida a face de ENTRADA e a de
+     SAÍDA com as MESMAS regras, e só a entrada tinha afirmação. Desligar a
+     guarda de encaixe do anel na saída sobrevivia à suíte inteira — 646 de 646
+     verdes — e um furo cujo anel vaza pela saída construía as faces com o anel
+     atravessando o contorno, sem diagnóstico nenhum. Corte silencioso é
+     exatamente o que esta op existe para impedir.
+
+     Os treze casos da tabela acima citam entrada ou modo; os dois de anel usam
+     o modo CEGO, que nem chega no ramo da saída. Estes três fecham o outro lado.
+     A placa fina embaixo é o que torna as duas faces diferentes: numa caixa, a
+     saída é congruente com a entrada e o anel que cabe numa cabe na outra. */
+  const COM_TARUGO = (furo: any) => [
+    ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+    ['cubo', { larg: 0.6, alt: 1, prof: 0.6, origemId: 2 }],
+    ['transladar', { d: [0, -1, 0], sel: { origem: { op: 'cubo', id: 2 } } }],
+    ['furo', {
+      origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' },
+      saida: { op: 'cubo', id: 2, face: 'fundo' }, centro: [0, 0, 0], lados: 6, ...furo,
+    }],
+  ];
+
+  it('o anel que cabe na ENTRADA e não na SAÍDA grita, e não corta nada', () => {
+    /* raio 0.2 cabe nas duas faces; 0.5 cabe na placa de 4 e vaza no tarugo de
+       0.6. É a mesma peça, e a diferença é só o raio. */
+    const passa = nucleo(COM_TARUGO({ raio: 0.2 }) as any, {}, {});
+    expect(passa.orfaos).toEqual([]);
+
+    const vaza = nucleo(COM_TARUGO({ raio: 0.5 }) as any, {}, {});
+    expect(vaza.orfaos.some((o: any) => /não cabe dentro da face de saída/.test(o.motivo))).toBe(true);
+    /* aborta inteiro: a entrada continua íntegra e nenhuma face nova nasce */
+    expect([...vaza.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+    expect(vaza.F.has(1)).toBe(true);
+  });
+
+  it('o anel DESLOCADO que vaza pela borda da SAÍDA também grita', () => {
+    /* outra causa, mesma guarda: aqui o raio caberia, mas o centro fora do eixo
+       joga o anel para fora do tarugo. Uma guarda que só olhasse o raio passaria
+       neste caso. Em `centro: [0.11]` ainda cabe; em `[0.15]` sobra −0,023. */
+    const n = nucleo(COM_TARUGO({ raio: 0.2, centro: [0.15, 0, 0] }) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /não cabe dentro da face de saída/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+  });
+
+  it('saída NÃO-PLANA grita, com a mesma severidade da entrada não-plana', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 0, d: [0, -0.4, 0] }],          // torce um canto do fundo
+      ['furo', {
+        origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' },
+        saida: { op: 'cubo', id: 1, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6,
+      }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /saída: .*não é plana/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+  });
+
+  it('saída ATRÁS da entrada ao longo do eixo grita — o furo sairia antes de entrar', () => {
+    // a normal da saída atravessa (é -y, como o eixo), mas a face está ACIMA da
+    // entrada: sem o teste de distância, o furo se estenderia para trás.
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['cubo', { id: 1000, larg: 4, alt: 1, prof: 4, origemId: 2 }],
+      ['transladar', { d: [0, 2, 0], sel: { origem: { op: 'cubo', id: 2 } } }],
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 2, face: 'fundo' }, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /está ATRÁS da entrada ao longo do eixo/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 3000)).toEqual([]);
+    expect(n.F.has(1)).toBe(true);
+    expect(n.F.has(1000)).toBe(true);
+  });
+
+  it('face NÃO-PLANA grita: não existe plano de entrada para inventar', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 4, d: [0, 0.5, 0] }],   // levanta um canto do topo
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0, 0, 0], raio: 0.5, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /não é plana/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 2000)).toEqual([]);
+  });
+
+  it('face CÔNCAVA grita: o furo só corta convexo, e isso é decisão declarada', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['moveV', { v: 4, d: [3, 0, 3] }],     // puxa um canto do topo para dentro
+      ['furo', { origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, centro: [0.5, 0, 0.5], raio: 0.2, lados: 6 }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /CÔNCAVO/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 2000)).toEqual([]);
+  });
+});
+
+/* ============================================================================
+   FURO v2 — VÁRIOS FUROS NA MESMA FACE (A-26). O que muda aqui não é geometria,
+   é o que o formato salvo passa a prometer: N anéis num passo, cada um com
+   identidade PRÓPRIA, uma partição que fecha a malha e um grito quando dois
+   anéis se cruzam. Cada uma dessas promessas tem afirmação abaixo, e cada
+   afirmação morre quando o valor muda.
+============================================================================ */
+const CIRCULO = (extra: any = {}) => ({
+  de: { op: 'cubo', id: 1, face: 'topo' },
+  saida: { op: 'cubo', id: 1, face: 'fundo' },
+  centros: { distancia: 1.2, total: 4, volta: 360 },
+  raio: 0.3, lados: 6, ...extra,
+});
+const QUATRO_PONTOS = (extra: any = {}) => ({
+  de: { op: 'cubo', id: 1, face: 'topo' },
+  saida: { op: 'cubo', id: 1, face: 'fundo' },
+  centros: [[0, 0, 1.2], [1.2, 0, 0], [0, 0, -1.2], [-1.2, 0, 0]],
+  raio: 0.3, lados: 6, ...extra,
+});
+
+describe('furo v2 — um passo abre vários furos na mesma face', () => {
+  it('quatro furos passantes numa placa: malha FECHADA, zero órfão, contagem fechada', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    // vértices: 2·lados por furo, nada mais — a partição não cria canto novo
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 6 * 4);
+    expect(n.V.size).toBe(8 + 48);
+    /* faces: 3·lados por furo (borda, parede, borda de saída) + o preenchimento
+       dos dois lados, `n + 2M − 2` cada um (n = 4 cantos do quadrado, M = 4). */
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 4 + 2 * (4 + 2 * 4 - 2));
+    expect(n.F.has(1)).toBe(false);   // topo consumido
+    expect(n.F.has(0)).toBe(false);   // fundo consumido
+    expect([...n.F.keys()].filter((f: number) => f < 1000).sort((a: number, b: number) => a - b)).toEqual([2, 3, 4, 5]);
+  });
+
+  it('quatro furos CEGOS: mesma partição na entrada, um fundo por furo e nenhum na saída', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS({ saida: undefined, profundidade: 0.4 })) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect(n.F.has(0)).toBe(true);    // o fundo do cubo continua vivo
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength((2 * 6 + 1) * 4 + (4 + 2 * 4 - 2));
+  });
+
+  it('a numeração é FORMATO SALVO: o furo k mora em b+3·lados·k, e o preenchimento vem depois de todos', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    const L = 6;
+    for (let k = 0; k < 4; k++) {
+      for (let j = 0; j < 3 * L; j++) expect(n.F.has(1000 + 3 * L * k + j)).toBe(true);
+      for (let j = 0; j < 2 * L; j++) expect(n.V.has(1000 + 2 * L * k + j)).toBe(true);
+    }
+    /* e o bloco de ids do furo k responde pelo ANEL k: a borda j contém a
+       aresta j→j+1 daquele anel, e a parede j só tem vértices dele. Sem esta
+       afirmação, trocar a ordem dos blocos (dar ao furo 0 os ids do último)
+       passa por todos os outros testes, e toda peça já escrita passa a
+       endereçar outro furo. */
+    for (let k = 0; k < 4; k++) {
+      const meus = new Set(Array.from({ length: 2 * L }, (_, j) => 1000 + 2 * L * k + j));
+      for (let j = 0; j < L; j++) {
+        const borda = n.F.get(1000 + 3 * L * k + j).vs;
+        expect(borda).toContain(1000 + 2 * L * k + j);
+        expect(borda).toContain(1000 + 2 * L * k + (j + 1) % L);
+        for (const v of n.F.get(1000 + 3 * L * k + L + j).vs) expect(meus.has(v)).toBe(true);
+      }
+    }
+    // o preenchimento começa exatamente em b + 3·lados·M
+    const cheio = [...n.F.keys()].filter((f: number) => f >= 1000 + 3 * L * 4).sort((a: number, b: number) => a - b);
+    expect(cheio[0]).toBe(1000 + 3 * L * 4);
+    expect(cheio).toHaveLength(2 * (4 + 2 * 4 - 2));
+  });
+
+  it('cada furo do passo é DISTINGUÍVEL dos outros: `furo:k` responde por um só, e o eixo ausente por todos', () => {
+    const furo = { op: 'furo', id: 9 };
+    const cor = (origem: any) => {
+      const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem }, cor: '#abc' }]]) as any, {}, {});
+      expect(n.orfaos).toEqual([]);
+      return pintadas(n, '#abc');
+    };
+    const p0 = cor({ ...furo, furo: 0, parede: 0 });
+    const p2 = cor({ ...furo, furo: 2, parede: 0 });
+    expect(p0).toHaveLength(1);
+    expect(p2).toHaveLength(1);
+    expect(p0).not.toEqual(p2);                              // dois furos, duas identidades
+    expect(cor({ ...furo, parede: 0 })).toEqual([...p0, ...p2, ...cor({ ...furo, furo: 1, parede: 0 }), ...cor({ ...furo, furo: 3, parede: 0 })].sort((a, b) => a - b));
+    expect(cor({ ...furo, furo: 'ultima' })).toEqual(cor({ ...furo, furo: 3 }));
+    expect(cor({ ...furo, furo: 1 })).toHaveLength(3 * 6);    // o furo inteiro: borda + parede + saída
+    expect(cor({ ...furo, furo: { passo: 2, fase: 0 } })).toEqual([...cor({ ...furo, furo: 0 }), ...cor({ ...furo, furo: 2 })].sort((a, b) => a - b));
+    expect(cor(furo)).toHaveLength(3 * 6 * 4 + 2 * (4 + 2 * 4 - 2));   // a origem nua: tudo, preenchimento incluído
+  });
+
+  it('`furo` fora do limite GRITA nomeando a faixa, e o diagnóstico das famílias nomeia o furo', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, furo: 4 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /furo 4 fora do limite da origem furo:9 \(0\.\.3\)/.test(o.motivo))).toBe(true);
+    const fam = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, furo: 2, parede: 9 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(fam.orfaos.some((o: any) => /parede 9 fora do limite do furo 2 da origem furo:9 \(0\.\.5\)/.test(o.motivo))).toBe(true);
+  });
+
+  it('o PREENCHIMENTO é endereçável, e citá-lo num furo de um anel só GRITA em vez de devolver vazio', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimento: 0 } }, cor: '#0f0' }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimentoDaSaida: 'ultima' } }, cor: '#00f' }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#0f0')).toHaveLength(1);
+    expect(pintadas(n, '#00f')).toHaveLength(1);
+    expect(normalDe(n, pintadas(n, '#0f0')[0])[1]).toBeCloseTo(1, 9);    // preenchimento da entrada: olha para +y
+    expect(normalDe(n, pintadas(n, '#00f')[0])[1]).toBeCloseTo(-1, 9);   // o da saída: para -y
+
+    const um = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimento: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(um.orfaos.some((o: any) => /abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento/.test(o.motivo))).toBe(true);
+    const cego = nucleo(PLACA(QUATRO_PONTOS({ saida: undefined, profundidade: 0.4 }), [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, preenchimentoDaSaida: 0 } }, cor: '#f00' }]]) as any, {}, {});
+    expect(cego.orfaos.some((o: any) => /é um furo CEGO — não tem preenchimento de saída/.test(o.motivo))).toBe(true);
+  });
+
+  it('a herança segue a face de origem: entrada e saída pintam lados diferentes', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#111' }],
+      ['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'fundo' } }, cor: '#222' }],
+      ['furo', { origemId: 9, ...QUATRO_PONTOS() }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    // borda + parede + preenchimento da entrada herdam #111; borda e preenchimento da saída, #222
+    expect(pintadas(n, '#111')).toHaveLength(2 * 6 * 4 + (4 + 2 * 4 - 2));
+    expect(pintadas(n, '#222')).toHaveLength(6 * 4 + (4 + 2 * 4 - 2));
+  });
+
+  it('toda face da partição sai com área POSITIVA e virada para o mesmo lado da face cortada', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    for (const f of n.F.values() as any) {
+      if (f.id < 1000) continue;
+      const vs = f.vs.map((v: number) => n.V.get(v));
+      let area = 0;
+      for (let k = 0; k < vs.length; k++) {
+        const p = vs[k], q = vs[(k + 1) % vs.length];
+        area += Math.hypot((p[1] - q[1]) * (p[2] + q[2]), (p[2] - q[2]) * (p[0] + q[0]), (p[0] - q[0]) * (p[1] + q[1]));
+      }
+      expect(area).toBeGreaterThan(1e-9);
+    }
+    // a soma das áreas do lado de entrada bate com o quadrado menos os quatro discos
+    const soma = [...n.F.values()].filter((f: any) => normalDe(n, f.id)[1] > 0.999).reduce((s: number, f: any) => {
+      const vs = f.vs.map((v: number) => n.V.get(v));
+      let a = 0;
+      for (let k = 0; k < vs.length; k++) { const p = vs[k], q = vs[(k + 1) % vs.length]; a += p[0] * q[2] - q[0] * p[2]; }
+      return s + Math.abs(a) / 2;
+    }, 0);
+    const areaAnel = (6 / 2) * Math.sin((2 * Math.PI) / 6) * 0.3 * 0.3;
+    expect(soma).toBeCloseTo(4 * 4 - 4 * areaAnel, 9);
+  });
+});
+
+describe('furo v2 — dois anéis que se cruzam GRITAM, e o passo inteiro aborta', () => {
+  const dois = (c1: any, c2: any, extra: any = {}) => nucleo(PLACA({
+    de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' },
+    centros: [c1, c2], raio: 0.5, lados: 6, ...extra,
+  }) as any, {}, {});
+
+  it('anéis sobrepostos não viram um furo em oito: GRITA e nada é construído', () => {
+    const n = dois([0.4, 0, 0], [-0.4, 0, 0]);
+    expect(n.orfaos.some((o: any) => /os anéis 0 e 1 se cruzam ou se encostam na face de entrada/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);   // 0 F
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toEqual([]);   // 0 V
+    expect(n.F.has(1)).toBe(true);   // e a face de entrada continua VIVA
+    expect(arestasSoltas(n)).toBe(0);
+  });
+
+  it('anéis que só se ENCOSTAM também gritam — vértice pinçado é malha errada e plausível', () => {
+    // dois hexágonos de raio 0.5 com centros a exatamente 2·0.5·cos(30°) = √3/2
+    const n = dois([0, 0, 0], [Math.sqrt(3) / 2, 0, 0]);
+    expect(n.orfaos.some((o: any) => /se cruzam ou se encostam/.test(o.motivo))).toBe(true);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+  });
+
+  it('anéis separados por uma folga mínima PASSAM — a recusa é do cruzamento, não da vizinhança', () => {
+    const n = dois([0, 0, 0], [Math.sqrt(3) / 2 + 0.01, 0, 0]);
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 2 + 2 * (4 + 2 * 2 - 2));
+  });
+
+  it('saída OBLÍQUA: dois anéis quase encostados continuam separados do outro lado, e a malha fecha', () => {
+    /* a projeção do anel na face de saída é AFIM (`p ↦ p + eixo·t(p)`, com `t`
+       linear em `p`), então ela não pode aproximar dois anéis que a entrada
+       separou. É por isso que a sobreposição é conferida UMA vez, na entrada.
+       Este teste mede a afirmação em vez de confiar nela: a saída é inclinada,
+       os anéis passam a um centésimo de se encostar, e o resultado é malha
+       fechada com os anéis ainda separados do outro lado. */
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 6, alt: 2, prof: 6, origemId: 1 }],
+      ['moveV', { v: 0, d: [0, 0.8, 0] }], ['moveV', { v: 1, d: [0, 0.8, 0] }],   // inclina o FUNDO em torno do eixo x
+      ['furo', {
+        origemId: 9, de: { op: 'cubo', id: 1, face: 'topo' }, saida: { op: 'cubo', id: 1, face: 'fundo' },
+        centros: [[0, 0, -0.44], [0, 0, 0.44]], raio: 0.25, lados: 6,
+      }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(3 * 6 * 2 + 2 * (4 + 2 * 2 - 2));
+    // o furo é o passo 3, então b = 3000: os anéis do outro lado são b+6..b+11 e b+18..b+23
+    const anel = (base: number) => Array.from({ length: 6 }, (_, j) => n.V.get(base + j));
+    let menor = Infinity;
+    for (const p of anel(3006)) for (const q of anel(3018)) menor = Math.min(menor, Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]));
+    expect(menor).toBeGreaterThan(0);
+  });
+});
+
+describe('furo v2 — o círculo de parafusos é uma FRASE, e as duas formas dizem o mesmo', () => {
+  it('quatro furos a 1,2 do centro: a forma de círculo produz os mesmos anéis da lista escrita à mão', () => {
+    const porCirculo = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const porLista = nucleo(PLACA(QUATRO_PONTOS()) as any, {}, {});
+    expect(porCirculo.orfaos).toEqual([]);
+    const pos = (n: any) => [...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b).map((v: number) => n.V.get(v).map((x: number) => +x.toFixed(9)));
+    expect(pos(porCirculo)).toEqual(pos(porLista));
+    expect([...porCirculo.F.keys()].sort()).toEqual([...porLista.F.keys()].sort());
+  });
+
+  it('a distância e a contagem MANDAM: mudar `total` muda a contagem de furos e `distancia` afasta os centros', () => {
+    const seis = nucleo(PLACA(CIRCULO({ centros: { distancia: 1.2, total: 6, volta: 360 } })) as any, {}, {});
+    expect(seis.orfaos).toEqual([]);
+    expect([...seis.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 6 * 6);
+    const raioDe = (n: any) => {
+      const p = n.V.get(1000);   // vértice 0 do anel 0
+      return Math.hypot(p[0], p[2]);
+    };
+    expect(raioDe(nucleo(PLACA(CIRCULO()) as any, {}, {}))).toBeCloseTo(1.2 + 0.3, 9);
+    expect(raioDe(nucleo(PLACA(CIRCULO({ centros: { distancia: 1.5, total: 4, volta: 360 } })) as any, {}, {}))).toBeCloseTo(1.5 + 0.3, 9);
+  });
+
+  it('`graus` é o passo direto, e `volta` o arco fechado: 4 furos em volta 360 == 4 furos de 90 em 90', () => {
+    const porVolta = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const porGraus = nucleo(PLACA(CIRCULO({ centros: { distancia: 1.2, total: 4, graus: 90 } })) as any, {}, {});
+    const pos = (n: any) => [...n.V.keys()].filter((v: number) => v >= 1000).sort((a: number, b: number) => a - b).map((v: number) => n.V.get(v).map((x: number) => +x.toFixed(9)));
+    expect(pos(porGraus)).toEqual(pos(porVolta));
+  });
+
+  it('`orientacao` decide onde cai o furo 0 — é a mesma chave que já decidia a fase do anel', () => {
+    const padrao = nucleo(PLACA(CIRCULO()) as any, {}, {});
+    const girado = nucleo(PLACA(CIRCULO({ orientacao: [1, 0, 0] })) as any, {}, {});
+    expect(girado.orfaos).toEqual([]);
+    const centro = (n: any) => {
+      let x = 0, z = 0;
+      for (let j = 0; j < 6; j++) { const p = n.V.get(1000 + j); x += p[0] / 6; z += p[2] / 6; }
+      return [+x.toFixed(9), +z.toFixed(9)];
+    };
+    expect(centro(padrao)).not.toEqual(centro(girado));
+    expect(Math.hypot(...centro(girado))).toBeCloseTo(1.2, 9);
+  });
+
+  it('o `pivo` desloca o círculo inteiro, e ele é dimensional como todo ponto do núcleo', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 4, alt: 1, prof: 4, origemId: 1 }],
+      ['furo', { origemId: 9, ...CIRCULO({ centros: { pivo: [1, 0, 0], distancia: 0.6, total: 4, volta: 360 } }) }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    let x = 0, z = 0;
+    for (let j = 0; j < 6; j++) { x += n.V.get(1000 + j)[0] / 6; z += n.V.get(1000 + j)[2] / 6; }
+    expect(x).toBeCloseTo(1, 9);     // o pivô desloca o círculo inteiro em x
+    expect(z).toBeCloseTo(0.6, 9);   // e o furo 0 fica a `distancia` na direção do +u da face
+  });
+});
+
+describe('furo v2 — completude: a recusa vem antes do primeiro id, e a forma velha não muda', () => {
+  const casos: [string, any, RegExp][] = [
+    ['centro e centros juntos', { ...PASSANTE, centros: [[0, 0, 0]] }, /centro e centros dizem a mesma coisa em número diferente/],
+    ['nenhum dos dois', { de: { op: 'cubo', id: 1, face: 'topo' }, profundidade: 0.4, raio: 0.3 }, /furo exige centro/],
+    ['lista vazia', { ...PASSANTE, centro: undefined, centros: [] }, /centros é uma lista vazia/],
+    ['ponto de aridade errada', { ...PASSANTE, centro: undefined, centros: [[0, 0]] }, /centros\[0\] precisa ser \[x,y,z\]/],
+    ['círculo sem total', { ...PASSANTE, centro: undefined, centros: { distancia: 1, volta: 360 } }, /precisa de total inteiro ≥ 2/],
+    ['círculo sem distância', { ...PASSANTE, centro: undefined, centros: { total: 4, volta: 360 } }, /precisa de distancia > 0/],
+    ['círculo com volta E graus', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4, volta: 360, graus: 90 } }, /volta e graus dizem coisas diferentes/],
+    ['círculo sem volta nem graus', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4 } }, /exige volta .* ou graus/],
+    ['círculo com palavra estranha', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 4, volta: 360, eixo: [0, 1, 0] } }, /'eixo' não é palavra desta forma/],
+    ['círculo que empilha dois furos no mesmo lugar', { ...PASSANTE, centro: undefined, centros: { distancia: 1, total: 3, graus: 360 } }, /múltiplo exato de 360° — dois furos no mesmo lugar/],
+    ['anel de fora do contorno', { ...PASSANTE, centro: undefined, centros: [[0, 0, 0], [1.9, 0, 0]], raio: 0.3 }, /o anel 1 de raio 0\.3 .* não cabe dentro da face de entrada/],
+    ['forma que não é lista nem círculo', { ...PASSANTE, centro: undefined, centros: 4 }, /centros é uma lista \[\[x,y,z\], …\] ou um círculo/],
+  ];
+  for (const [nome, furo, esperado] of casos) {
+    it(`${nome}: grita e o passo aborta com 0 V / 0 F`, () => {
+      const n = nucleo(PLACA(furo) as any, {}, {});
+      expect(n.orfaos.some((o: any) => esperado.test(o.motivo))).toBe(true);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000)).toEqual([]);
+      expect([...n.V.keys()].filter((v: number) => v >= 1000)).toEqual([]);
+    });
+  }
+
+  it('`centros` com UM ponto é o `centro` de sempre, vértice por vértice e face por face', () => {
+    const singular = nucleo(PLACA(PASSANTE) as any, {}, {});
+    const plural = nucleo(PLACA({ ...PASSANTE, centro: undefined, centros: [[0, 0, 0]] }) as any, {}, {});
+    expect([...plural.F.keys()].sort()).toEqual([...singular.F.keys()].sort());
+    for (const [id, p] of plural.V) expect(p).toEqual(singular.V.get(id));
+    for (const [id, f] of plural.F) expect(f.vs).toEqual(singular.F.get(id).vs);
+  });
+
+  it('a face consumida por um furo de VÁRIOS anéis grita igual à de um anel só', () => {
+    const n = nucleo(PLACA(QUATRO_PONTOS(), [['pincel', { modo: 'face', sel: { origem: { op: 'cubo', id: 1, face: 'topo' } }, cor: '#f00' }]]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /face 'topo' da origem cubo:1 foi removida \(consumida pelo furo do passo 1\)/.test(o.motivo))).toBe(true);
+  });
+});
+
+/* ============================================================================
+   FURO V2 — A PARTIÇÃO EM FACE SIMÉTRICA (rodada "Flange de uma peça só")
+
+   Achado ao levar o `centros` para uma peça de PRODUTO: o flange do freio é a
+   tampa de um cilindro de 16 lados, com 4 anéis de 12 lados a 90°. 16, 12 e 4
+   são todos múltiplos de 4, e essa simetria põe vértices de um anel EXATAMENTE
+   em cima da aresta de uma orelha de outro. "Em cima" não é "dentro": o teste
+   de orelha só recusava o vértice ESTRITAMENTE interno, então a orelha era
+   cortada, engolia a lasca do outro lado da aresta e o resto do polígono
+   sobrava com orientação invertida.
+
+   O sintoma chegava longe da causa — "a partição criou um triângulo de área
+   nula ou invertida", uma das três provas de estado impossível, que o núcleo
+   declara não ter teste que as dispare. Ela tinha. Estas afirmações existem
+   para que a face simétrica seja ENTRADA VÁLIDA, e não um grito.
+============================================================================ */
+describe('furo v2 — face redonda com círculo de furos em simetria exata', () => {
+  /* a mesma figura do flange, sem vocabulário automotivo: tampa de um cilindro
+     de `ladosDaFace` lados, com `total` furos de `ladosDoFuro` lados. */
+  const FLANGE = (ladosDaFace: number, ladosDoFuro: number, total: number) => [
+    ['cilindro', { id: 0, origemId: 1, raio: 0.052, altura: 0.012, lados: ladosDaFace }],
+    ['furo', {
+      origemId: 9,
+      de: { op: 'cilindro', id: 1, tampa: 'topo' },
+      saida: { op: 'cilindro', id: 1, tampa: 'fundo' },
+      centros: { distancia: 0.038, total, volta: 360 },
+      raio: 0.0065,
+      lados: ladosDoFuro,
+      orientacao: [1, 0, 0],
+    }],
+  ];
+
+  it('16 lados, 4 furos de 12: a partição fecha, e é ESTE o caso que a peça usa', () => {
+    const n = nucleo(FLANGE(16, 12, 4) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSoltas(n)).toBe(0);
+    /* contagem fechada, dos dois lados: 3·L por furo mais o preenchimento
+       `n + 2M − 2` na entrada e na saída. */
+    expect([...n.F.keys()].filter((f: number) => f >= 1000))
+      .toHaveLength(3 * 12 * 4 + 2 * (16 + 2 * 4 - 2));
+    expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(2 * 12 * 4);
+  });
+
+  /* a simetria não é um caso: é uma FAMÍLIA. Cada linha aqui põe pelo menos um
+     vértice em cima de uma aresta de orelha, e todas passavam a gritar sem a
+     recusa por `pontoNoSegmento`. */
+  const familia: [number, number, number][] = [
+    [16, 12, 4], [8, 12, 4], [10, 6, 6], [24, 6, 6], [32, 10, 6], [16, 12, 8], [20, 12, 4], [6, 8, 8],
+  ];
+  for (const [face, furo, total] of familia) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: zero órfão e malha fechada`, () => {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos).toEqual([]);
+      expect(arestasSoltas(n)).toBe(0);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000))
+        .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
+    });
+  }
+
+  it('a área da partição é a da face MENOS a dos furos — cobrir a lasca duas vezes morreria aqui', () => {
+    /* a prova que o sintoma dava de graça, agora dita como afirmação: a soma
+       das faces do lado de entrada (borda + preenchimento) é a área do
+       polígono da face menos a dos anéis. Uma orelha que engole a lasca de um
+       anel some com área e a conta não fecha. */
+    const n = nucleo(FLANGE(16, 12, 4) as any, {}, {});
+    const areaDe = (f: any) => {
+      let x = 0, y = 0, z = 0;
+      for (let k = 0; k < f.vs.length; k++) {
+        const a = n.V.get(f.vs[k]), b = n.V.get(f.vs[(k + 1) % f.vs.length]);
+        x += a[1] * b[2] - b[1] * a[2]; y += a[2] * b[0] - b[2] * a[0]; z += a[0] * b[1] - b[0] * a[1];
+      }
+      return Math.hypot(x, y, z) / 2;
+    };
+    const topo = [...n.F.values()].filter((f: any) => {
+      const ys = f.vs.map((v: number) => n.V.get(v)[1]);
+      return f.id >= 1000 && ys.every((v: number) => Math.abs(v - 0.012) < 1e-12);
+    });
+    const area = topo.reduce((s: number, f: any) => s + areaDe(f), 0);
+    const poligono = (raio: number, lados: number) => lados * raio * raio * Math.sin(2 * Math.PI / lados) / 2;
+    expect(area).toBeCloseTo(poligono(0.052, 16) - 4 * poligono(0.0065, 12), 12);
+  });
+});
+
+/* ============================================================================
+   FURO V2 — ATÉ ONDE A PARTIÇÃO CHEGA, E ONDE ELA PARA (A-33)
+
+   A rodada do flange registrou "17 de 240 combinações gritavam antes, 0
+   depois". A frase é verdadeira DENTRO das 240 escolhidas e falsa fora delas.
+   Varredura de 14 212 combinações de `face × lados do furo × total`, com a
+   mesma figura do flange (raio 0,052, furos de raio 0,0065 a 0,038 do centro):
+
+     10 758  saem inteiras, sem órfão;
+      1 240  gritam porque dois anéis se cruzam ou se encostam — CORRETO;
+      1 165  gritam porque um anel não cabe na face — CORRETO;
+        904  estouram o bloco de ids do passo — LIMITE DECLARADO do núcleo;
+         37  travam a partição: "nenhuma orelha livre" — DEFEITO ABERTO (A-33).
+
+   As 37 são todas face de POUCOS lados (6, 7, 8, 10, 18) com muitos furos
+   raspando a borda: o polígono com pontes vira fracamente simples com folga na
+   casa de 5·10⁻⁴, e a orelha não acha corte livre. O importante, e é o que
+   estas afirmações fixam, é que o caso ruim GRITA e ABORTA — nunca sai peça
+   com malha rasgada. Quando A-33 for consertado, o segundo bloco fica vermelho
+   e quem consertar move a linha para o primeiro.
+============================================================================ */
+describe('furo v2 — a fronteira medida da partição (A-33)', () => {
+  const FLANGE = (ladosDaFace: number, ladosDoFuro: number, total: number) => [
+    ['cilindro', { id: 0, origemId: 1, raio: 0.052, altura: 0.012, lados: ladosDaFace }],
+    ['furo', {
+      origemId: 9,
+      de: { op: 'cilindro', id: 1, tampa: 'topo' },
+      saida: { op: 'cilindro', id: 1, tampa: 'fundo' },
+      centros: { distancia: 0.038, total, volta: 360 },
+      raio: 0.0065,
+      lados: ladosDoFuro,
+      orientacao: [1, 0, 0],
+    }],
+  ];
+
+  it('147 combinações da região sadia saem inteiras e com malha fechada', () => {
+    let contadas = 0;
+    for (let face = 8; face <= 20; face += 2) {
+      for (const furo of [6, 8, 12]) {
+        for (let total = 2; total <= 8; total++) {
+          const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+          expect(n.orfaos.map((o: any) => o.motivo), `face ${face}, furo ${furo}, total ${total}`).toEqual([]);
+          expect(arestasSoltas(n), `face ${face}, furo ${furo}, total ${total}`).toBe(0);
+          expect([...n.F.keys()].filter((f: number) => f >= 1000))
+            .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
+          contadas++;
+        }
+      }
+    }
+    /* a contagem existe para que uma varredura que deixe de varrer não passe
+       calada por não ter achado nada. */
+    expect(contadas).toBe(147);
+  });
+
+  /* a região que AINDA trava, dita na cara. Cada linha veio da varredura de
+     14 212 e é geometricamente válida: os anéis cabem na face e não se tocam. */
+  const AINDA_TRAVA: [number, number, number][] = [
+    [6, 3, 7], [6, 3, 9], [6, 4, 7], [6, 12, 7], [6, 24, 7],
+    [7, 3, 8], [7, 5, 8], [8, 3, 9], [8, 4, 10], [10, 4, 11], [18, 3, 11],
+  ];
+  for (const [face, furo, total] of AINDA_TRAVA) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: trava, e trava GRITANDO (A-33)`, () => {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos.length).toBeGreaterThan(0);
+      expect(n.orfaos[0].motivo).toMatch(/nenhuma orelha livre/);
+      /* e o passo ABORTA inteiro: o que não dá para particionar não vira meia
+         peça na tela. Nenhuma face nem vértice do bloco do furo sobrevive. */
+      expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(0);
+      expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(0);
+    });
+  }
+});
+
+/* ============================================================================
+   CICLO 5 — A CONDIÇÃO 2 DO GATE MEDIA A COISA ERRADA
+
+   O gate diz: "um arco de raio declarado, escrito com a alça, sai a menos de 1%
+   do raio em toda amostra". A afirmação que entrou com a curva media a
+   distância dos VÉRTICES ao centro analítico. Essa distância é exata POR
+   CONSTRUÇÃO — o núcleo põe cada vértice em `centro + raio·(cos,sin)`. Ela dá
+   0,000000% em qualquer discretização, inclusive `segmentosCurva: 1`, onde o
+   "arco" é uma corda reta a 29% do arco de verdade. Medido:
+
+     seg= 1  erro nos vértices 0,000000%   desvio da SUPERFÍCIE 29,289%
+     seg= 2  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  7,612%
+     seg= 3  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  3,407%
+     seg= 4  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  1,921%
+     seg= 8  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  0,482%
+     seg=16  erro nos vértices 0,000000%   desvio da SUPERFÍCIE  0,120%
+
+   Uma afirmação que não pode falhar não é afirmação. O que a peça mostra, e o
+   que o cliente vê, é a SUPERFÍCIE: a poligonal que liga os vértices. O desvio
+   dela é a flecha da corda, `raio·(1 − cos(giro/2·segmentos))`, e é ELE que
+   precisa caber em 1%.
+============================================================================ */
+describe('ciclo 5 — a curva é medida na SUPERFÍCIE, não só nos vértices', () => {
+  /* pior desvio do MEIO de cada corda até o arco verdadeiro, em fração do raio.
+     Percorre os pontos do perfil expandido reconstruídos a partir do neutro. */
+  const desvioDaSuperficie = (segmentosCurva: number, raio = 0.3) => {
+    const n = nucleo([['lathe', {
+      id: 0, lados: 8, segmentosCurva,
+      perfil: [[0, 0], [1, 0, raio], [1, 1], [0, 1]],
+    }]] as any, {}, {});
+    expect(n.orfaos).toHaveLength(0);
+    /* canto reto em B=(1,0): t = raio, centro = (1−raio, raio). */
+    const centro = [1 - raio, raio];
+    const aneis = new Map<string, number[]>();
+    for (const [, p] of n.V) {
+      const r = Math.hypot(p[0], p[2]);
+      aneis.set(`${r.toFixed(9)},${p[1].toFixed(9)}`, [r, p[1]]);
+    }
+    const noArco = [...aneis.values()]
+      .filter(([r, y]) => Math.abs(Math.hypot(r - centro[0], y - centro[1]) - raio) < 1e-9)
+      .sort((a, b) => a[1] - b[1]);
+    expect(noArco.length, 'a medição não achou ponto nenhum do arco').toBe(segmentosCurva + 1);
+    let pior = 0;
+    for (let k = 0; k + 1 < noArco.length; k++) {
+      const meio = [(noArco[k][0] + noArco[k + 1][0]) / 2, (noArco[k][1] + noArco[k + 1][1]) / 2];
+      pior = Math.max(pior, Math.abs(Math.hypot(meio[0] - centro[0], meio[1] - centro[1]) - raio));
+    }
+    return pior / raio;
+  };
+
+  it('a discretização BAIXA não passa: com 1 segmento o arco é uma corda reta, a 29% do arco', () => {
+    /* esta afirmação existe para provar que a de baixo NÃO é vazia. Se alguém
+       trocar a medição de volta para a distância dos vértices, este caso passa
+       a dar 0% e o teste cai aqui. */
+    expect(desvioDaSuperficie(1)).toBeGreaterThan(0.25);
+    expect(desvioDaSuperficie(2)).toBeGreaterThan(0.05);
+  });
+
+  it('com 8 segmentos (o padrão do núcleo) num canto reto o desvio da superfície cabe em 1%', () => {
+    expect(desvioDaSuperficie(8)).toBeLessThan(0.01);
+    expect(desvioDaSuperficie(16)).toBeLessThan(0.01);
+  });
+
+  it('a flecha da corda bate com a conta analítica, então o autor pode escolher a discretização', () => {
+    /* giro do arco num canto reto = 90°. Flecha = raio·(1 − cos(giro/2n)). */
+    for (const seg of [2, 3, 4, 8, 16]) {
+      const previsto = 1 - Math.cos((Math.PI / 2) / (2 * seg));
+      expect(desvioDaSuperficie(seg)).toBeCloseTo(previsto, 9);
+    }
+  });
+});
+
+/* A mesma medição na peça de PRODUTO: o ombro do pneu da `roda-dianteira` usa
+   `segmentosCurva: 3` num giro de 45°, que é metade do canto reto acima — a
+   flecha cai junto e cabe em 1% com três segmentos em vez de oito. Isto é o que
+   justifica o custo escolhido na peça, e é medido, não estimado. */
+describe('ciclo 5 — o ombro do pneu cabe em 1% com a discretização que a peça pediu', () => {
+  it('o arco do ombro tem 4 pontos e desvio de superfície abaixo de 1% do raio', async () => {
+    // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
+    const P: any = await import('../../prototipos/fps/v3/pecas/roda-dianteira.js');
+    const n = nucleo(P.PASSOS, P.PARAMS, P.TOPO, P.MATERIAIS, null, P.ALIASES);
+    expect(n.orfaos).toHaveLength(0);
+    const raio = P.PARAMS.pneuOmbroConcordancia;
+    /* o pneu é girado para o eixo X: o "raio" do perfil é a distância ao eixo X
+       e o "y" do perfil é a coordenada X. O ombro de −X fica no canto entre o
+       flanco e a banda de rodagem. */
+    const aneis = new Map<string, number[]>();
+    for (const [, p] of n.V) {
+      const r = Math.hypot(p[1], p[2]);
+      aneis.set(`${r.toFixed(9)},${p[0].toFixed(9)}`, [r, p[0]]);
+    }
+    /* centro analítico do arco, reconstruído das MEDIDAS da peça, não do neutro. */
+    const B = [P.PARAMS.pneuRaioOmbro, -P.PARAMS.pneuMeiaLargura];
+    const A = [P.PARAMS.pneuRaioInterno, -P.PARAMS.pneuMeiaLargura];
+    const C = [P.PARAMS.pneuRaioExterno, -P.PARAMS.pneuCoroaMeiaLargura];
+    const unit = (p: number[]) => {
+      const d = [p[0] - B[0], p[1] - B[1]], l = Math.hypot(d[0], d[1]);
+      return [d[0] / l, d[1] / l];
+    };
+    const u1 = unit(A), u2 = unit(C);
+    const theta = Math.acos(Math.max(-1, Math.min(1, u1[0] * u2[0] + u1[1] * u2[1])));
+    const bl = Math.hypot(u1[0] + u2[0], u1[1] + u2[1]);
+    const centro = [
+      B[0] + ((u1[0] + u2[0]) / bl) * (raio / Math.sin(theta / 2)),
+      B[1] + ((u1[1] + u2[1]) / bl) * (raio / Math.sin(theta / 2)),
+    ];
+    const noArco = [...aneis.values()]
+      .filter(([r, x]) => Math.abs(Math.hypot(r - centro[0], x - centro[1]) - raio) < 1e-9)
+      .sort((a, b) => a[1] - b[1]);
+    expect(noArco.length, 'o ombro do pneu perdeu o arco').toBe(P.TOPO.pneuOmbroSegmentos + 1);
+
+    let pior = 0;
+    for (let k = 0; k + 1 < noArco.length; k++) {
+      const meio = [(noArco[k][0] + noArco[k + 1][0]) / 2, (noArco[k][1] + noArco[k + 1][1]) / 2];
+      pior = Math.max(pior, Math.abs(Math.hypot(meio[0] - centro[0], meio[1] - centro[1]) - raio));
+    }
+    expect(pior / raio).toBeLessThan(0.01);
+    /* e o giro é mesmo de 45°: se alguém mudar o perfil e o canto virar reto,
+       três segmentos deixam de bastar e este teste cai junto. */
+    expect((Math.PI - theta) * 180 / Math.PI).toBeCloseTo(45, 6);
+  });
+});
+
+/* filete (ciclo "Curva e filete v1") — arredonda UMA aresta escolhida por
+   identidade estrutural. O precedente é o `furo`: `de` endereça a face, o
+   corte grita em toda referência ambígua/vazia/inválida, e o que ele cria
+   entra em CONTRATOS_ORIGEM. A diferença medida é a que mais importa aqui:
+   o filete NÃO consome as duas faces da aresta — ele preserva a identidade
+   delas (mesmo `f.id`), só muda a forma; as arestas vizinhas continuam de pé. */
+const CUBO_FILETE = (filete: any, extra: any[] = []) => [
+  ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+  ['filete', { origemId: 9, ...filete }],
+  ...extra,
+];
+const ARESTA_TOPO_TRAS = { de: { op: 'cubo', id: 1, face: 'topo' }, aresta: 0, raio: 0.1 };
+
+describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de pé', () => {
+  it('custo em faces/vértices: cubo 8V/6F -> 10V/7F (+2V/+1F, sempre — só o painel)', () => {
+    const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1 }]], {}, {});
+    const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    expect(com.orfaos).toEqual([]);
+    expect([base.V.size, base.F.size]).toEqual([8, 6]);
+    /* v0 e v1 ANDAM para o lado de faceA em vez de virar órfãos; só o lado de
+       faceB precisa de canto novo. Um corte, um painel, dois vértices. */
+    expect([com.V.size, com.F.size]).toEqual([10, 7]);
+  });
+
+  it('a malha inteira passa na conferência única: polígono simples, casca fechada e desenha', () => {
+    /* `conferirMalha` existe por causa desta op. O primeiro desenho dela
+       preservava os cantos antigos DENTRO da face de entrada, e com isso a face
+       ficava com um canto EM CIMA da aresta seguinte: um bico de espessura
+       zero. O neutro continuava FECHADO e a contagem BATIA, então nenhum teste
+       do núcleo caía. Quem gritou foi o adaptador, ao triangular em orelhas, e
+       só quando a op chegou numa peça de verdade, uma rodada depois.
+       Malha fechada e contagem certa não provam polígono simples, e nenhuma das
+       três prova que a peça desenha. São quatro coisas, e esta linha cobra as
+       quatro. */
+    conferirMalha(nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {}), {
+      fechada: true, rotulo: 'cubo com um filete',
+    });
+  });
+
+  it('a silhueta muda, medida na malha: 45°/45° — a condição 5 do gate (n=1, θ/(n+1) com θ=90°)', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    const nTopo = normalDe(n, 1);       // topo do cubo
+    const nPainel = normalDe(n, 1000);  // o painel novo
+    const nFrente = normalDe(n, 4);     // a outra face da aresta escolhida
+    const ang = (a: number[], b: number[]) => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))) * 180 / Math.PI;
+    expect(ang(nTopo, nPainel)).toBeCloseTo(45, 6);
+    expect(ang(nPainel, nFrente)).toBeCloseTo(45, 6);
+  });
+
+  it('as faces LONGE do corte ficam EXATAMENTE como estavam — mesma lista de cantos', () => {
+    const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1, origemId: 1 }]], {}, {});
+    const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    /* das seis faces do cubo, quatro tocam o corte: as duas da aresta e as
+       duas das PONTAS dela. As outras duas não mudam de canto nenhum. */
+    for (const fid of [0, 2]) expect(com.F.get(fid).vs).toEqual(base.F.get(fid).vs);
+  });
+
+  it('as seis faces do cubo continuam VIVAS com a mesma identidade — o filete não consome face nenhuma', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    for (const fid of [0, 1, 2, 3, 4, 5]) expect(n.F.has(fid), `face ${fid} sumiu`).toBe(true);
+    /* faceA e faceB continuam quads: os cantos delas ANDARAM, não se
+       multiplicaram. Quem ganha canto é a terceira face de cada ponta, que é
+       onde a fresta do recuo se fecha. */
+    expect(n.F.get(1).vs).toHaveLength(4);
+    expect(n.F.get(4).vs).toHaveLength(4);
+    expect(n.F.get(3).vs).toHaveLength(5);
+    expect(n.F.get(5).vs).toHaveLength(5);
+  });
+
+  it('as três arestas do vértice que NÃO foram escolhidas continuam retas', () => {
+    /* o corte recua o canto, não arredonda o encontro das três arestas. As
+       arestas vizinhas continuam sendo segmentos únicos entre dois cantos. */
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    const v = (id: number) => n.V.get(id);
+    /* a aresta vertical da frente-esquerda: de (−0.5,−0.5,0.5) a (−0.5,0.35,0.5)
+       depois do recuo de 0.1 — continua UMA aresta, sem canto no meio. */
+    const face4 = n.F.get(4).vs.map(v);
+    expect(face4.filter((p: number[]) => Math.abs(p[0] + 0.5) < 1e-9)).toHaveLength(2);
+  });
+
+  it('o painel novo é ENDEREÇÁVEL: sel.origem cita a origem filete', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'filete', id: 9 } }, cor: '#ff0000' }],
+    ]) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(n.F.get(1000).cor).toBe('#ff0000');
+  });
+
+  it('painel fora do limite GRITA nomeando a causa', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS, [
+      ['pincel', { modo: 'face', sel: { origem: { op: 'filete', id: 9, painel: 5 } }, cor: '#ff0000' }],
+    ]) as any, {}, {});
+    expect(n.orfaos.some((o: any) => /fora do limite/.test(o.motivo))).toBe(true);
+  });
+
+  it('replay: o mesmo passo produz o neutro canônico byte-idêntico', () => {
+    const PASSOS = CUBO_FILETE(ARESTA_TOPO_TRAS);
+    const a = neutroCanonico(nucleo(PASSOS as any, {}, {}));
+    const b = neutroCanonico(nucleo(PASSOS as any, {}, {}));
+    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+  });
+
+  it('sem origemId GRITA', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 1 }],
+      ['filete', { de: ARESTA_TOPO_TRAS.de, aresta: 0, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/origemId é obrigatório/);
+  });
+
+  it('origemId duplicado GRITA (ambíguo)', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, larg: 1, alt: 1, prof: 1, origemId: 9 }],
+      ['filete', { origemId: 9, ...ARESTA_TOPO_TRAS }],
+    ] as any, {}, {});
+    expect(n.orfaos.some((o: any) => /duplicado nas declarações/.test(o.motivo))).toBe(true);
+  });
+
+  it('sem de GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ origemId: 9, aresta: 0, raio: 0.1 } as any) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/origem estrutural/);
+  });
+
+  it('aresta fora do índice GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 99, raio: 0.1 }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/índice inteiro 0\.\.3/);
+  });
+
+  it('aresta EXATAMENTE no limite (o cubo tem 4 cantos, 0..3) GRITA — não é "0..4"', () => {
+    const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 4, raio: 0.1 }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/índice inteiro 0\.\.3/);
+  });
+
+  it('raio zero/negativo GRITA', () => {
+    for (const raio of [0, -1]) {
+      const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 0, raio }) as any, {}, {});
+      expect(n.orfaos[0]?.motivo, `raio=${raio}`).toMatch(/raio precisa ser > 0/);
+    }
+  });
+
+  it('raio NaN/Infinity — a mesma lei de TODA op: número tem que ser finito, e não-finito GRITA ALTO (throw)', () => {
+    for (const raio of [NaN, Infinity]) {
+      expect(() => nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 0, raio }) as any, {}, {}), `raio=${raio}`).toThrow(/não-finito/);
+    }
+  });
+
+  it('aresta que NÃO é manifold (face isolada, sem vizinha) GRITA', () => {
+    const n = nucleo([
+      ['plano', { id: 0, largura: 1, profundidade: 1, seg: 1, origemId: 1 }],
+      ['filete', { origemId: 9, de: { op: 'plano', id: 1 }, aresta: 0, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/não é compartilhada por nenhuma outra face/);
+  });
+
+  it('duas faces QUASE COPLANARES na mesma aresta GRITA (canto degenerado — dA e dB apontam quase opostos)', () => {
+    // um `plano` com seg:2 é uma grade FLAT — os dois quads vizinhos (0,0) e
+    // (1,0) compartilham uma aresta e são, por construção, coplanares: `dA`/`dB`
+    // (perpendiculares à aresta, cada um pro centroide da própria face) saem
+    // quase OPOSTOS (θ≈180°), não quase iguais — é o canto degenerado, o
+    // outro lado da MESMA guarda que barra o "vira" acidental.
+    const n = nucleo([
+      ['plano', { id: 0, largura: 2, profundidade: 1, seg: 2, origemId: 1 }],
+      ['filete', { origemId: 9, de: { op: 'plano', id: 1, faixa: 0, lado: 0 }, aresta: 2, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/canto degenerado/);
+  });
+
+  it('id de origem não-inteiro/negativo GRITA', () => {
+    const n = nucleo(CUBO_FILETE({ origemId: -1, ...ARESTA_TOPO_TRAS }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/inteiro não-negativo/);
+  });
+
+  it('a malha continua fechada (watertight) depois do filete — nenhuma aresta solta', () => {
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    expect(arestasSoltas(n)).toBe(0);
   });
 });

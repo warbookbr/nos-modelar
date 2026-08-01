@@ -1,10 +1,25 @@
 {
-  "hashTotal": "f3969e8c8bc4fafefc9e9b777f367b6c91d33d4f1750941556817eb455254336",
+  "hashTotal": "a0b248e5b1cf7699c47778eba6cd0beba51dace917ae9a1ff87aae01aa8ee15e",
   "pecas": {
+    "_caixote-filetado": {
+      "hash": "715099157e4c8c6179e0920d1e9712a2ae5724d3618b9cd5afd2291e2d0b4ea2",
+      "vertices": 880,
+      "faces": 903
+    },
+    "_cerca-e-flor": {
+      "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
+      "vertices": 158,
+      "faces": 138
+    },
     "_corpo": {
       "hash": "7d27db600d985a54700b89303ab112dad9f72fa47e0ad45711c0d4508de63023",
       "vertices": 218,
       "faces": 216
+    },
+    "_corrimao": {
+      "hash": "15aac3c7e5a9970765150d913b6e7e6b93437453113c1fa1006d42cdd2d865af",
+      "vertices": 84,
+      "faces": 52
     },
     "_espelhado": {
       "hash": "992981953dafde8f3b8e8d473c2d8873349af0249a3332e80590a2d73d29c2a8",
@@ -15,6 +30,11 @@
       "hash": "d0011787414ec3871177ef3338f80c2019b760b94db4888b11c2ee6fd4857cac",
       "vertices": 52,
       "faces": 60
+    },
+    "_jardineira": {
+      "hash": "ca162894cf174d33140409233cbf05d3b7f7874122d69acdd3bd7cd679c83ac4",
+      "vertices": 350,
+      "faces": 351
     },
     "_oficina-anim": {
       "hash": "72577395fb636b8b68389ce4c97eefd09e8a782c1a388f89fbc0311b9b2c962c",
@@ -46,10 +66,20 @@
       "vertices": 24,
       "faces": 26
     },
+    "_prateleira-furada": {
+      "hash": "7ae8205b9ce48970188134ec459c834165dbc3a244543f9f4610bb673d5732a5",
+      "vertices": 112,
+      "faces": 116
+    },
     "_primitivas": {
       "hash": "91e77f82e01e417c96815c4b82d6f5e5552f626e921b1d72f810565b11185099",
       "vertices": 86,
       "faces": 85
+    },
+    "_tampa-de-caixa": {
+      "hash": "b810b45b5f062f89871ddd30efdaee38cb09832945026850a84c9971f2b16d6b",
+      "vertices": 184,
+      "faces": 253
     },
     "_torno": {
       "hash": "c2d3cc983ff9828293534a75b88ef45b3b6d3425c2cf00f68a8cd9bb704b17d6",
@@ -60,6 +90,11 @@
       "hash": "ba97e9832aed7e03f49ccc79c6b3c7663c645b44cf5149a76ddbaf36a319cbb6",
       "vertices": 12,
       "faces": 6
+    },
+    "_vaso": {
+      "hash": "03770e1c46fc75c7b42c11ab8addbe880295b52d8af387c9cc0ed8885c235418",
+      "vertices": 530,
+      "faces": 552
     },
     "_vazio": {
       "hash": "ea84606f0ade2558db13e8c5334df10bf16e9f297f2c4daddac7917fc8856f9b",
@@ -82,9 +117,9 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "ca5b165565509ad8ccc4806c49d2d851b0f02268a10300e7ce9d5fd526dfb34f",
-      "vertices": 362,
-      "faces": 300
+      "hash": "ecb4e2fe50ef428518becd223896d7923b26a3513a8157031e95d5fcd15064cb",
+      "vertices": 498,
+      "faces": 508
     },
     "lanterna": {
       "hash": "711e2c57837371eb8559715b5a18c7f94cad8f1baa556d9bb3033731ab1e1b93",
@@ -97,14 +132,14 @@
       "faces": 1600
     },
     "roda-dianteira": {
-      "hash": "74a1e3fd317e2c6955cf71d1102639ee559c9a8ebf730881b7d8516ca1d418d2",
-      "vertices": 584,
-      "faces": 494
+      "hash": "306b3ee05797f1c6a6fa626b723c8c4c168f75ce03ebc91003559a43ac4c0b60",
+      "vertices": 824,
+      "faces": 734
     },
     "roda-dianteira-realista-experimento": {
-      "hash": "cd7e7be40e54e46f3108107fe2258c24073a439c55ddf1bc38baf2c9c8711d39",
-      "vertices": 2184,
-      "faces": 2082
+      "hash": "030b46ca796c60e99002f7586448a8ad9e88a1a8fce953fabbbfc0dd702ec3fe",
+      "vertices": 2194,
+      "faces": 2132
     }
   }
 }

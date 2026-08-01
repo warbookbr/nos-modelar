@@ -19,6 +19,58 @@ function caixaValida(objetos) {
   return caixa.isEmpty() ? null : caixa;
 }
 
+/** Regra pura do gate visual; separada do renderer para poder provar os dois
+ * fracassos que importam à autoria: objeto minúsculo e silhueta cortada. */
+export function enquadramentoUtil({ largura, altura, cortado = false }) {
+  return !cortado && Math.max(largura, altura) >= 0.32 && largura * altura >= 0.035;
+}
+
+/** Converte o envelope projetado da vista em frustum ortográfico. Os alvos são
+ * menores na horizontal porque os painéis da bancada ocupam as laterais. Uma
+ * vista fina deixa de herdar o raio 3D das outras vistas, sem esticar a peça. */
+export function meiaAlturaParaVista({
+  larguraProjetada,
+  alturaProjetada,
+  aspecto,
+  ocupacaoHorizontal = 0.48,
+  ocupacaoVertical = 0.62,
+}) {
+  const larguraSegura = Math.max(0, larguraProjetada);
+  const alturaSegura = Math.max(0, alturaProjetada);
+  const aspectoSeguro = Math.max(0.001, aspecto);
+  return Math.max(
+    0.2,
+    alturaSegura / (2 * ocupacaoVertical),
+    larguraSegura / (2 * aspectoSeguro * ocupacaoHorizontal),
+  );
+}
+
+function envelopeProjetado(caixa, vista) {
+  if (!caixa || caixa.isEmpty()) return null;
+  const definicao = VISTAS_BANCADA[vista] ?? VISTAS_BANCADA.isometrica;
+  const direcaoCamera = new THREE.Vector3(...definicao.direcao).normalize();
+  const vertical = Math.abs(direcaoCamera.y) > 0.99;
+  const acima = vertical
+    ? new THREE.Vector3(0, 0, direcaoCamera.y > 0 ? -1 : 1)
+    : new THREE.Vector3(0, 1, 0);
+  const direcaoOlhar = direcaoCamera.clone().negate();
+  const direita = new THREE.Vector3().crossVectors(direcaoOlhar, acima).normalize();
+  const acimaDaTela = new THREE.Vector3().crossVectors(direita, direcaoOlhar).normalize();
+  const minimo = new THREE.Vector2(Infinity, Infinity);
+  const maximo = new THREE.Vector2(-Infinity, -Infinity);
+  for (const x of [caixa.min.x, caixa.max.x]) {
+    for (const y of [caixa.min.y, caixa.max.y]) {
+      for (const z of [caixa.min.z, caixa.max.z]) {
+        const ponto = new THREE.Vector3(x, y, z);
+        const projetado = new THREE.Vector2(ponto.dot(direita), ponto.dot(acimaDaTela));
+        minimo.min(projetado);
+        maximo.max(projetado);
+      }
+    }
+  }
+  return { largura: maximo.x - minimo.x, altura: maximo.y - minimo.y };
+}
+
 export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 } = {}) {
   objeto.position.set(0, 0, 0);
   objeto.scale.setScalar(1);
@@ -117,7 +169,14 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     const largura = Math.max(1, canvas.clientWidth);
     const altura = Math.max(1, canvas.clientHeight);
     const aspecto = largura / altura;
-    const meiaAltura = Math.max(0.2, raioAtual * 1.32);
+    const envelope = envelopeProjetado(caixaValida(alvosAtuais), vistaAtual);
+    const meiaAltura = envelope
+      ? meiaAlturaParaVista({
+        larguraProjetada: envelope.largura,
+        alturaProjetada: envelope.altura,
+        aspecto,
+      })
+      : Math.max(0.2, raioAtual * 1.32);
     ortografica.left = -meiaAltura * aspecto;
     ortografica.right = meiaAltura * aspecto;
     ortografica.top = meiaAltura;
@@ -162,6 +221,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
   function definirVista(vista, { instantaneo = false } = {}) {
     if (!VISTAS_BANCADA[vista]) return;
     vistaAtual = vista;
+    ajustarOrtografica();
     const direcao = VISTAS_BANCADA[vista].direcao;
     const vertical = Math.abs(direcao[1]) > 0.99;
     const up = vertical
@@ -180,7 +240,6 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
       raioAtual = Math.max(0.12, caixa.getBoundingSphere(new THREE.Sphere()).radius);
       alvosAtuais = objetos.slice();
     }
-    ajustarOrtografica();
     definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo });
   }
 
@@ -194,7 +253,6 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     camera.position.copy(posicao);
     camera.up.copy(up);
     controls.object = camera;
-    ajustarOrtografica();
     definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo: true });
   }
 
@@ -233,6 +291,52 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
       eixos: eixos[vistaAtual] ?? eixos.isometrica,
     };
   }
+
+  /* Mede o enquadramento pela geometria projetada, não pelo PNG (que também
+     contém painéis da interface, grade e sombras). É uma observação neutra da
+     bancada: serve tanto para uma roda quanto para uma peça de mobiliário.
+     `cortado` é propositalmente estrito — revisão automática não deve aceitar
+     uma vista que esconde uma parte da silhueta. */
+  function medirEnquadramento(objetos = alvosAtuais) {
+    scene.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    camera.updateProjectionMatrix();
+    const minimo = new THREE.Vector2(Infinity, Infinity);
+    const maximo = new THREE.Vector2(-Infinity, -Infinity);
+    let pontos = 0;
+    for (const objeto of objetos.filter(Boolean)) {
+      objeto.traverse((filho) => {
+        const posicao = filho.geometry?.getAttribute?.('position');
+        if (!posicao) return;
+        const p = new THREE.Vector3();
+        for (let i = 0; i < posicao.count; i++) {
+          p.fromBufferAttribute(posicao, i).applyMatrix4(filho.matrixWorld).project(camera);
+          minimo.min(p);
+          maximo.max(p);
+          pontos++;
+        }
+      });
+    }
+    if (!pontos) return { valida: false, motivo: 'sem geometria projetável' };
+    const larguraBruta = maximo.x - minimo.x;
+    const alturaBruta = maximo.y - minimo.y;
+    const largura = Math.max(0, Math.min(2, maximo.x) - Math.max(-2, minimo.x)) / 2;
+    const altura = Math.max(0, Math.min(2, maximo.y) - Math.max(-2, minimo.y)) / 2;
+    const cortado = minimo.x < -1.001 || minimo.y < -1.001 || maximo.x > 1.001 || maximo.y > 1.001;
+    return {
+      /* Peça alongada em vista de topo pode ocupar pouca área, mas ainda ser
+         legível. A régua rejeita só quando nem a maior dimensão alcança 32%
+         do viewport ou quando a silhueta total fica abaixo de 3,5%. */
+      valida: enquadramentoUtil({ largura, altura, cortado }),
+      pontos,
+      largura,
+      altura,
+      area: largura * altura,
+      larguraBruta: larguraBruta / 2,
+      alturaBruta: alturaBruta / 2,
+      cortado,
+    };
+  }
   const observador = new ResizeObserver(redimensionar);
   observador.observe(canvas);
   redimensionar();
@@ -269,6 +373,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     definirProjecao,
     enquadrar,
     referenciaMetrica,
+    medirEnquadramento,
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

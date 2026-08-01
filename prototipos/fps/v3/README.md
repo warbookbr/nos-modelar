@@ -1,14 +1,15 @@
-# v3 — o cliente GPU e A OFICINA (D-55)
+# v3 — núcleo e cliente GPU herdados (D-55)
 
 Rumo travado pelo ideador: **`v2` (branch) preserva o jogo atual (CPU raycaster)**;
 na `main` nasce o **v3 (WebGL/GPU)** — pixel art, render fixo (`?res=`) com upscale
 nítido, custo independente da tela (o conserto do "roda terrível no celular").
 
-## A OFICINA — o ambiente padrão de criação
+## Recorte mantido na Mecanifica
 
-Espaço ISOLADO e padronizado pra criar as coisas do mundo: objetos, texturas,
-animações — e, em breve, sons e reflexos. A regra de ouro: **o visor usa o MESMO
-motor que o cliente v3** — o que fica bom na oficina, fica bom no jogo.
+Este diretório conserva o núcleo procedural, as peças, o visor e o jogo de
+referência. A Oficina humana e a aba de som foram retiradas da Mecanifica; elas
+continuam no repositório original do NÓS. A bancada neutra atual vive em
+`/bancada.html` e usa Three.js por meio de um adaptador.
 
 ```
 v3/
@@ -17,7 +18,7 @@ v3/
     tex.js      paleta Resurrect64, ruído, dither, texCanvas (índice | [r,g,b] | -1)
     geo.js      Mesh/quad/quadUV/tri/box (8 floats/vértice)
     render.js   o VISOR: sol+sombra PCF (tier), luz de céu (tier), névoa, partículas
-                (tier), grama, blit — câmera ÓRBITA (Oficina) OU LIVRE (setCam, D-61)
+                (tier), grama, blit — câmera ÓRBITA (visor) OU LIVRE (setCam, D-61)
     input.js    teclado+mouse (pointer lock) + joystick touch (D-47/48/49 portado)
     som.js      Web Audio: ambiente (vento+água por proximidade) + passos (D-61)
   pecas/        cada peça é um módulo JS autocontido (contrato abaixo)

@@ -53,6 +53,30 @@ describe('contarIdCru — cobre TODAS as formas de coleção do núcleo', () => 
     expect(contarIdCru([['mescla', { de: [1, 2, 3], para: 0 }]])).toEqual(uso({ mesclaDe: 3 }));
   });
 
+  /* O-12: `de` passou a ter DOIS contratos. `mescla` lê `de:[ids]` (coleção de
+     vértice); `publicarPorta` lê `de:{op,id,...}` (origem estrutural, irmã de
+     `sel:{origem}`). Contar a segunda reprovava a capacidade que a R4 shipou —
+     achado na primeira peça a usar `publicarPorta`, `_jardineira`, acusada de 5
+     ids posicionais que não existem. O discriminador é a FORMA, e o gate segue
+     op-agnóstico: nem o nome `publicarPorta` nem o nome `mescla` aparecem aqui. */
+  it('de:{op,id} do publicarPorta é ORIGEM ESTRUTURAL, não id cru', () => {
+    expect(contarIdCru([
+      ['publicarPorta', { nome: 'peDoCaule', de: { op: 'cilindro', id: 404, tampa: 'fundo' } }],
+      ['publicarPorta', { nome: 'coloDoBulbo', de: { op: 'esfera', id: 401, faixa: 0 } }],
+      ['publicarPorta', { nome: 'soleira', de: { op: 'chamferBox', id: 400 } }],
+    ])).toEqual(zero);
+    // e a citação da porta também não é id posicional
+    expect(contarIdCru([['material', { sel: { porta: 'peDoCaule' }, usa: 'x' }]])).toEqual(zero);
+    // a forma do mescla continua contando, inclusive misturada na mesma lista
+    expect(contarIdCru([
+      ['publicarPorta', { nome: 'p', de: { op: 'cubo', id: 7 } }],
+      ['mescla', { de: [1, 2], para: 0 }],
+    ])).toEqual(uso({ mesclaDe: 2 }));
+    // objeto SEM o contrato {op,id} não vira isenção: continua id cru malformado
+    expect(contarIdCru([['x', { de: { op: 'cubo' } }]])).toEqual(uso({ mesclaDe: 1 }));
+    expect(contarIdCru([['x', { de: { id: 7 } }]])).toEqual(uso({ mesclaDe: 1 }));
+  });
+
   it('a peça de reprodução do MEDIA-5 inteira mede 13, não 0', () => {
     const u = contarIdCru([
       ['cubo', { lado: 1 }],
@@ -133,11 +157,27 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const COLECAO_DE_ID = ['faces', 'vs', 'pontos', 'de'];      // cobertas pelo gate
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
-    'alt', 'altura', 'amplitude', 'aneis', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
+    'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
-    'largura', 'modo', 'nome', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
-    'profundidade', 'raio', 'secoes', 'seg', 'semente', 'substituir', 'usa',
+    'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
+    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
+  /* `aresta` (ops `filete` e `arredondarAresta`) é o ÍNDICE LOCAL da aresta dentro do polígono de
+     `de` — uma posição 0..cantos-1, a mesma classe de referência que `lado`
+     (cilindro) já é; nunca aponta pra um id de vértice ou de face.
+     `paineis` é TOPO do arredondamento: conta a discretização do arco, nunca
+     um id de face (cada face criada recebe a identidade `painel:k`).
+     `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
+     do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
+     forma de lista é `[[x,y,z], …]` e a de círculo é `{pivo, distancia, total,
+     volta|graus}`; nenhuma delas tem caminho para um id de face ou de vértice.
+     `saida` (op `furo`) entra aqui, e não em COLECAO_DE_ID, pela MESMA razão do
+     `derivaDe`: ela é uma ORIGEM ESTRUTURAL (`{op,id,…}`), não uma lista de ids.
+     O `furo` recusa qualquer outra forma — `faceUnicaEstrutural` passa por
+     `validarOrigem` antes de olhar para a malha —, então não existe caminho em
+     que essa chave carregue id cru. Se um dia ela aceitar `{f:[…]}`, este teste
+     não pega; o que pega é a linha acima deixar de descrever a chave, e por
+     isso a razão fica escrita aqui, junto da classificação. */
   const CONTAINER = ['sel'];
 
   it('as chaves lidas pelas OPS são exatamente as classificadas', () => {
@@ -206,28 +246,25 @@ describe('conferir — dívida herdada é congelada, não permissão', () => {
   });
 });
 
-/* MEDIA-9: o gate NÃO afrouxa (peça salva pela Oficina segue reprovando), mas a
-   mensagem parou de mentir sobre a saída. `sel:{alias|grupo|origem|regiao}` é
-   impossível pela interface — ela só emite id posicional — e é impossível no
-   núcleo para `vs`/`pontos`/`de`. */
+/* MEDIA-9: retirar a Oficina humana não afrouxa o gate. A mensagem separa as
+   formas convertíveis por `sel` das formas ainda sem caminho semântico no
+   núcleo e explica por que a interface antiga não é uma saída. */
 describe('a mensagem de reprova diz a VERDADE sobre o conserto', () => {
-  const daOficina = () => conferir({ minha: uso({ faces: 5 }) }, {})[0];
+  const daPeca = () => conferir({ minha: uso({ faces: 5 }) }, {})[0];
 
-  it('peça salva pela Oficina continua reprovando — o gate não afrouxa', () => {
-    expect(daOficina()).toMatch(/ID CRU em peça NOVA/);
+  it('peça nova com id posicional continua reprovando — o gate não afrouxa', () => {
+    expect(daPeca()).toMatch(/ID CRU em peça NOVA/);
   });
 
-  it('a mensagem admite que a Oficina ainda salva por id posicional', () => {
-    const m = daOficina();
-    expect(m).toMatch(/oficina\.html/);
-    expect(m).toMatch(/AINDA NÃO sabe emitir referência semântica/);
-  });
-
-  it('a mensagem dá as duas saídas reais: converter à mão ou assumir a dívida na lista', () => {
-    const m = daOficina();
-    expect(m).toMatch(/converter a peça à mão/);
-    expect(m).toMatch(/id-cru-herdado\.json DE PROPÓSITO/);
+  it('a mensagem deixa claro que a Oficina humana foi retirada', () => {
+    const m = daPeca();
+    expect(m).toMatch(/Oficina humana.*foi retirada/);
     expect(m).toMatch(/A-15/);
+  });
+
+  it('a mensagem dá as duas saídas reais conforme a forma encontrada', () => {
+    expect(daPeca()).toMatch(/escrita à mão: troque por sel:/);
+    expect(conferir({ minha: uso({ vs: 2 }) }, {})[0]).toMatch(/entra na lista herdada de propósito/);
   });
 
   it('não manda usar sel:{...} para forma que não tem caminho semântico no núcleo', () => {

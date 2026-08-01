@@ -1,0 +1,67 @@
+{
+  "alvo": {
+    "caminho": "prototipos/fps/v3/pecas/freio-disco.js",
+    "modo": "refinamento",
+    "peca": "freio-disco"
+  },
+  "checklist": [
+    {
+      "criterio": "A silhueta permanece legível nas vistas ortogonais.",
+      "estado": "aberto",
+      "id": "silhueta",
+      "prioridade": 1
+    },
+    {
+      "criterio": "Transições relevantes têm intenção explícita, sem término seco involuntário.",
+      "estado": "aberto",
+      "id": "transicoes",
+      "prioridade": 2
+    },
+    {
+      "criterio": "O material é distinguível pela forma, acabamento e leitura nas vistas canônicas.",
+      "estado": "aberto",
+      "id": "material",
+      "prioridade": 3
+    },
+    {
+      "criterio": "Cada parte esperada continua identificável e mensurável pela descrição headless.",
+      "estado": "aberto",
+      "id": "semantica",
+      "prioridade": 4
+    }
+  ],
+  "formato": "mecanifica.pacote-modelagem",
+  "guias": [
+    "forma/silhueta-e-transicoes",
+    "material/leitura-de-material",
+    "processo/evidencia-e-iteracao"
+  ],
+  "id": "prova-freio",
+  "objetivo": "Revisar e refinar a peça 'freio-disco' por evidência observável.",
+  "partesEsperadas": [
+    "cubo",
+    "disco",
+    "flexivel",
+    "pastilhaExterna",
+    "pastilhaInterna",
+    "pinca",
+    "pistao",
+    "suporte"
+  ],
+  "perfil": {
+    "distanciaMinima": 0.5,
+    "fidelidade": "F2",
+    "interacao": "montagem",
+    "orcamento": {
+      "faces": 2000
+    },
+    "origem": "suposicao-canonica",
+    "precisao": "mecanica",
+    "visual": "tecnicoDidatico"
+  },
+  "provas": [
+    "descricao-headless",
+    "bancada-quatro-vistas"
+  ],
+  "versao": 1
+}

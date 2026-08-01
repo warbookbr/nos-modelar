@@ -5,19 +5,19 @@
    O replay é o coração de tudo (doc): "quando o arquivo de passos refizer o
    objeto igual, o resto é trabalho conhecido". Também prova, no mesmo neutro,
    que a mescla sumiu com `de` e manteve `para`, e imprime a colisão calculada.
-     node tools/bancadas/executar.mjs                 # peça _oficina-toco
-     node tools/bancadas/executar.mjs _oficina-toco   # outra peça-objeto */
+     node tools/bancadas/executar.mjs                    # peça _tampa-de-caixa
+     node tools/bancadas/executar.mjs _caixote-filetado  # outra peça-objeto */
 import { pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const nome = (process.argv.slice(2).find((a) => !a.startsWith('--')) || '_oficina-toco').replace(/[^a-z0-9_-]/gi, '');
+const nome = (process.argv.slice(2).find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
 
 const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
 const peca = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/pecas', `${nome}.js`)).href);
-/* MATERIAIS e ESQUELETO entram no núcleo junto com o resto do envelope. Ficaram
+/* MATERIAIS, ESQUELETO e ALIASES entram no núcleo junto com o resto do envelope. Ficaram
    de fora daqui até 2026-07-29, e o efeito era um ÓRFÃO FALSO: a op `material`
    procurava o nome em `{}` e gritava "material 'x' não existe em MATERIAIS" em
    TODA peça com material — inclusive nas duas peças-exemplo do próprio assunto,
@@ -25,15 +25,15 @@ const peca = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/pecas', `$
    desde que os materiais existem (D-93/D-94) e ninguém viu, porque ninguém
    rodou o replay nessas peças. O `criar.mjs` sempre passou os dois — eram duas
    bancadas discordando sobre a mesma peça. */
-const { PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null } = peca;
+const { PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = [] } = peca;
 if (!Array.isArray(PASSOS)) { console.error(`peça ${nome} não exporta PASSOS (é uma peça-objeto da Oficina?)`); process.exit(2); }
 
 /* 1 · executa */
-const n1 = neutroCanonico(nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO));
+const n1 = neutroCanonico(nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES));
 
 /* 2 · serializa os PASSOS (o que o arquivo salva), re-parseia, re-executa */
 const PASSOS2 = JSON.parse(JSON.stringify(PASSOS));
-const n2 = neutroCanonico(nucleo(PASSOS2, JSON.parse(JSON.stringify(PARAMS)), JSON.parse(JSON.stringify(TOPO)), MATERIAIS, ESQUELETO));
+const n2 = neutroCanonico(nucleo(PASSOS2, JSON.parse(JSON.stringify(PARAMS)), JSON.parse(JSON.stringify(TOPO)), MATERIAIS, ESQUELETO, ALIASES));
 
 /* 3 · afirma neutro IDÊNTICO */
 const s1 = JSON.stringify(n1), s2 = JSON.stringify(n2);
@@ -67,7 +67,7 @@ if (n1.merges.length) {
 /* órfão grita, não corrompe: se houver órfão, ainda assim há malha */
 ok(n1.orfaos.length === 0, `sem órfãos na peça shipável (grita ${n1.orfaos.length})`, n1.orfaos.length ? JSON.stringify(n1.orfaos) : '');
 
-const col = colisaoDe(PASSOS, PARAMS, TOPO);
+const col = colisaoDe(PASSOS, PARAMS, TOPO, MATERIAIS, ALIASES);
 console.log(`  colisão: forma=${col.forma} raio=${col.raio.toFixed(4)} altura=${col.altura.toFixed(4)} base=${col.base.toFixed(4)}`);
 
 console.log(falhas ? `\nexecutar: ${falhas} falha(s)` : '\nexecutar: replay PROVADO, tudo idêntico');

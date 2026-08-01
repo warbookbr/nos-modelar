@@ -12,7 +12,7 @@
       "tipo": "bloco",
       "inicio": "^<!-- TOC -->$",
       "fim": "^<!-- /TOC -->$",
-      "motivo": "o bloco do índice (TOC) é gerado por tools/mapa/toc.mjs a partir dos títulos H2 do PRÓPRIO arquivo (ver skill oficina); cada saída do fatiamento regenera o seu, com seus próprios títulos — o índice velho não precisa sobreviver linha a linha."
+      "motivo": "o bloco do índice (TOC) é gerado por tools/mapa/toc.mjs a partir dos títulos H2 do PRÓPRIO arquivo; cada saída do fatiamento regenera o seu, com seus próprios títulos — o índice velho não precisa sobreviver linha a linha."
     },
     {
       "arquivo": "docs/oficina.md",

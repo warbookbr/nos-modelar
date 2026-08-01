@@ -15,9 +15,9 @@ estados de desgaste e acompanhar explicações orientadas ao cliente.
 ## Estado
 
 O projeto está no início da transição. Este repositório nasceu como uma cópia do
-[`brigsd/nos`](https://github.com/brigsd/nos) e ainda contém o Atelier v3 completo
-em `prototipos/fps/v3/`. Essa base permanece executável enquanto construímos a
-nova aplicação em Three.js.
+[`brigsd/nos`](https://github.com/brigsd/nos), mas conserva somente o núcleo
+procedural, as peças e o jogo de referência necessários à migração. A Oficina
+humana do NÓS foi retirada; sua fonte permanece no repositório original.
 
 O NÓS ainda é um projeto experimental. Seu núcleo de autoria procedural é uma
 fonte valiosa, mas não é tratado aqui como uma fundação pronta. Em especial, a
@@ -47,7 +47,7 @@ Para entender ou continuar o projeto:
 - [`docs/uso/MAPA.md`](docs/uso/MAPA.md) — inventário completo, gerado
   automaticamente, com um resumo de cada arquivo.
 
-## Base herdada
+## Desenvolvimento
 
 Para executar a nova aplicação:
 
@@ -63,14 +63,6 @@ usada pelo Pages:
 ```bash
 npm run build
 ```
-
-Para executar somente o Atelier herdado:
-
-```bash
-npm run servir
-```
-
-Depois, abra `http://localhost:8080/jogo.html`.
 
 Os documentos em `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS
 herdado. Eles continuam úteis como referência técnica e histórica, mas não

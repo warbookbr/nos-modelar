@@ -119,8 +119,13 @@ O contorno em diamante da primeira rodada escondia o problema por ser simétrico
 mas também fazia os raios parecerem hastes. A seção retangular revelou a
 limitação.
 
-**Capacidade ausente:** orientação declarada da seção, por exemplo uma normal
-axial ou um frame publicado, sem reproduzir a escolha interna do gerador.
+**Capacidade ausente — ENTREGUE em 31 de julho de 2026** (ciclo "Corte e
+orientação de seção v1", ATRITOS-AUTORIA A-25, UPSTREAM-NOS UP-020): o `loft`
+aceita `orientacao: [x,y,z]`, a direção do mundo para onde aponta o eixo `+u` de
+toda seção, projetada no plano de cada uma. Sem propagação, então sem rotação
+acumulada; referência paralela à tangente grita e aborta; ausente, o transporte
+paralelo de sempre. **A peça não foi reescrita neste ciclo** — ela continua
+remontando o contorno em código, e essa dívida fica aberta para quem voltar aqui.
 
 ### `chamferBox` sem origem
 
@@ -147,6 +152,21 @@ escuro sobre uma superfície não seria uma abertura e foi rejeitado.
 
 **Detalhe reduzido:** não há sulcos transversais, furos de fixação verdadeiros,
 válvula nem recortes de alívio no miolo.
+
+**Capacidade ausente — PARCIALMENTE ENTREGUE em 31 de julho de 2026** (ciclo
+"Corte e orientação de seção v1", ATRITOS-AUTORIA A-27, UPSTREAM-NOS UP-021): a
+op `furo` abre um furo cilíndrico numa face plana e convexa, PASSANTE (`saida`)
+ou CEGO (`profundidade`). Ela NÃO é uma booleana genérica, e isso é decisão:
+uma booleana destruiria a identidade de dezenas de faces de uma vez, em
+silêncio. O corte toca só as faces nomeadas, toda face criada é endereçável pela
+origem `furo` e toda face destruída grita quando alguém a cita depois.
+
+**O que continua ausente:** sulco transversal, bolsão, recorte de alívio, furo
+oblíquo e furo em face côncava — nenhum deles é a operação estreita que o `furo`
+entregou. E um SEGUNDO furo na mesma face não existe (A-26), então o círculo de
+prisioneiros ainda não cabe numa placa. **A peça não foi reescrita neste ciclo**
+— a roda experimental continua com os fixadores representados por porcas sobre o
+miolo.
 
 ### Perfil sem curvas
 
@@ -201,6 +221,50 @@ O custo geométrico é aceitável para uma peça de inspeção. O custo autoral 
 alto: cem parâmetros existem somente para compensar a falta de repetição radial
 e trigonometria declarativa.
 
+### Custo depois da reescrita com `arranja` (31 de julho de 2026)
+
+A tabela acima é o estado que ORIGINOU o A-17 e o O-13. Ela fica onde está: a
+comparação é a prova. Depois que a op `arranja` passou a existir, a peça foi
+reescrita e medida de novo, com a mesma régua.
+
+| item | antes | depois | diferença |
+|---|---:|---:|---|
+| partes semânticas | 7 | 16 | +9 — cada braço virou parte |
+| parâmetros exportados | 141 | 43 | **−98** |
+| destes, coordenadas de braço (`r0_..r9_`) | 100 | 0 | **−100** |
+| parâmetros topológicos | 5 | 8 | +3 contagens do arranjo |
+| passos expandidos | 66 | 47 | −19 |
+| passos que geram instância repetida | 20 | 3 | −17 |
+| aliases | 10 | 20 | +10 — um por braço |
+| materiais | 8 | 8 | — |
+| faces | 2.082 | 2.132 | +50 |
+| vértices | 2.184 | 2.194 | +10 |
+| triângulos renderizados | 4.024 | 4.044 | +20 |
+
+O que sustenta cada linha:
+
+- os **cem parâmetros somem por inteiro**. Um braço é declarado no ângulo ZERO,
+  onde Y é o raio nomeado e Z é zero. Não há seno nem cosseno no arquivo;
+- os **19 passos a menos** são dez `loft`, cinco `cubo`+`rotaciona` e cinco
+  `cilindro`+`transladar` virando um gerador e cinco `arranja`. Em troca, dez
+  passos `parte` novos entraram, um por braço — é por isso que a queda de passos
+  (−19) é menor que a de instâncias (−17 geradores);
+- as **+50 faces e +10 vértices** têm uma causa só: a porca deixou de ser
+  `cilindro` e virou `lathe` de seis lados (8 faces → 18 por porca). A troca foi
+  forçada pelo A-24, e o motivo está escrito no arquivo da peça;
+- a **silhueta não mudou**. Conferida na bancada em `direita`, `frontal` e
+  `isometrica`, ortográfica, contra as imagens desta rodada.
+
+Também sumiu algo que a tabela antiga não media: a função `contornoChanfrado`
+decidia, braço a braço, qual eixo do frame local do `loft` era o tangencial,
+porque havia dez caminhos com dez direções. Com um caminho só, a decisão deixou
+de existir.
+
+O custo autoral que este relato media está pago: a intenção "cinco pares em
+torno do eixo X" está escrita no arquivo, e não a expansão dela. Os limites de
+perfil curvo, corte e filete continuam de pé e são o assunto do candidato a
+ciclo 4.
+
 ## Provas executadas
 
 ```bash
@@ -225,6 +289,26 @@ Imagens finais:
 - `tools/bancadas/out/bancada-roda-dianteira-realista-experimento-isometrica-orto.png`;
 - `tools/bancadas/out/bancada-roda-dianteira-realista-experimento-direita-sel-fixadores+mioloAro+raios-isolar-orto-focado.png`;
 - `tools/bancadas/out/bancada-roda-dianteira-realista-experimento-isometrica-sel-fixadores+mioloAro+raios-isolar-orto-focado.png`.
+
+### Provas da reescrita com `arranja`
+
+```bash
+npm run descrever -- roda-dianteira-realista-experimento --estrito
+npm run bancada -- roda-dianteira-realista-experimento --vistas=direita,frontal,isometrica --projecao=ortografica --estrito
+npm run bancada -- roda-dianteira-realista-experimento --selecionadas=raioRecuadoDoGrupo3 --modo=isolar --projecao=ortografica
+npx vitest run tools/mecanifica/arranjo-em-peca.test.ts
+```
+
+Resultados:
+
+- `descrever`: 16 partes, 2.132 faces, 2.194 vértices, 0 face sem identidade e 0
+  órfão; `fixadores` com **5 corpos** (a contagem que denunciou o A-24 quando
+  eram 13);
+- bancada: silhueta idêntica à das imagens acima nas três vistas;
+- isolamento de UM braço pelo nome, na bancada e na régua —
+  `bancada-roda-dianteira-realista-experimento-direita-sel-raioRecuadoDoGrupo3-isolar-orto.png`
+  mostra um braço só, e a régua lhe dá caixa e corpo próprios;
+- `arranjo-em-peca.test.ts`: 13 casos, contagem derivada de `TOPO`.
 
 ## Conclusão
 

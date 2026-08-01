@@ -7,10 +7,41 @@ herdado e não comandam a Mecanifica.
 
 **Ciclo de implementação 1: CONCLUÍDO em 30 de julho de 2026.**
 
+**Ciclo 2 — Fundação de autoria v1: CONCLUÍDO em 31 de julho de 2026.**
+
+**Ciclo 2b — Endereços semânticos v1: CONCLUÍDO em 31 de julho de 2026.** Ele
+pagou a dívida medida no fechamento do ciclo 2 (A-18, A-19, A-20 e A-22) e não
+inventou capacidade nova.
+
+**Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO em 31 de julho de 2026**, no
+núcleo **e** na peça. Entregou a op `arranja` (radial e linear), pagou a dívida
+A-23 e, no fechamento, as três dívidas menores que ele mesmo tinha declarado —
+inclusive a maior delas: a roda experimental foi reescrita e perdeu os cem
+parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaixo.
+
 - fases 0 a 4: concluídas;
-- fase ativa: Fundação de autoria v1;
-- fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- ciclo técnico em execução: Fundação de autoria v1 (A-15, O-6 e O-12).
+- fase 5: horizonte futuro, ainda sem plano executivo;
+- a fase 6 começou pelo recorte operacional **Fluxo de modelagem assistida por
+  IA v1**, **CONCLUÍDO em 1º de agosto de 2026**. Contrato, comandos, provas e
+  limites estão em [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- a avaliação A/B pós-ciclo também está **CONCLUÍDA**: a mediana cega empatou
+  em 14/16. O fluxo melhorou aderência, integração e evidência, mas exigiu mais
+  tentativas e não provou ganho líquido de modelagem. A peça, a rubrica e os
+  três pareceres estão em
+  [`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md);
+- **Revisão visual econômica v1 está CONCLUÍDA:** o atrito A-38 foi pago sem
+  mudar geometria. Enquadramento é calculado por vista, timeout de prontidão é
+  repetido uma vez, e toda recusa preserva evidência classificada por assinatura
+  do modelo. As duas dobradiças congeladas passaram em uma execução cada;
+- **Retirada da Oficina humana está CONCLUÍDA:** páginas de objeto e som,
+  servidor de salvamento, presets, harnesses e skills exclusivas saíram do
+  Mecanifica. O Pages publica apenas produto e bancada. O núcleo procedural,
+  as peças e os consumidores headless permanecem;
+- **nenhum ciclo novo está aberto:** o próximo recorte só começa depois de
+  escolher uma dificuldade observada pelo fluxo concluído;
+- Filete v2 está **pausado** depois do Escopo A. `arredondarAresta` já entrega
+  raio real numa aresta simples; o canto composto/`chamferBox` não começa até a
+  comparação com a frente paralela do repositório de origem.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -56,7 +87,8 @@ próxima tarefa.
 - [x] preservar identidade semântica na seleção;
 - [x] validar desenvolvimento local e build;
 - [x] preparar o workflow do GitHub Pages;
-- [x] manter o Atelier acessível em `/legado/atelier/`;
+- [x] manter o Atelier acessível em `/legado/atelier/` durante a prova inicial;
+- [x] retirar essa rota depois que produto e bancada passaram a cobrir o fluxo;
 - [x] validar a publicação real após o primeiro push.
 
 **Critério de saída:** a mesma definição procedural produz um objeto visível,
@@ -155,7 +187,9 @@ linguagem. Nenhum desses itens reabre a Fase 4.
 
 ## Fase 5 — narrativa de desgaste
 
-**Estado:** horizonte futuro, não iniciado e fora do ciclo concluído.
+**Estado:** iniciada. O primeiro recorte operacional, “Fluxo de modelagem
+assistida por IA v1”, foi concluído em 1º de agosto de 2026; os demais itens
+continuam como horizonte da fase e não pertencem retroativamente a esse ciclo.
 
 **Objetivo:** transformar o modelo em uma explicação útil para clientes.
 
@@ -206,19 +240,114 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-Somente a primeira linha está em execução. As demais são candidatas ordenadas,
-não autorização para começar ou agrupá-las no ciclo atual.
+**Nenhuma linha nova está em execução.** Fluxo de modelagem assistida por IA v1
+foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
-| 1 | ativa, em fechamento | Fundação de autoria v1 | fechar A-15 e R4/O-6/O-12 pelos gates abaixo |
-| 2 | próxima candidata | eficiência de autoria | O-13 em ciclo próprio: repetição radial/linear com identidade por instância |
-| 3 | candidata posterior | Realismo geométrico v1 | escolher somente uma ou duas capacidades justificadas pela crítica da roda |
-| 4 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
-| 5 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
-| 6 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
+| 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento foram verificadas; a dívida A-15 daquela interface foi retirada do produto junto com a Oficina humana |
+| 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; a regra única continua no gate `id-cru` |
+| 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
+| 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
+| 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
+| 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
+| 4 | **CONCLUÍDO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
+| 5 | **CONCLUÍDO em 01/08/2026** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; prova cega completa em `_caixote-filetado` e prova de compatibilidade em `freio-disco` |
+| 5a | **CONCLUÍDA em 01/08/2026** | medição A/B do fluxo | dois Sols, dois Terra e um árbitro cego; empate mediano 14/16. A condição assistida venceu envelope e gate 4/4, mas usou mais tentativas, portanto não demonstrou ganho líquido. Próximo candidato: retorno visual econômico, sem abrir ciclo automaticamente |
+| 5b | **CONCLUÍDA em 01/08/2026** | Revisão visual econômica v1 | A-38 pago: câmera por vista, repetição de prontidão, recusa preservada por assinatura e diagnóstico `camera`/`modelo`/`ferramenta`. As duas dobradiças congeladas passaram em uma chamada cada, sem alteração geométrica |
+| 5c | **CONCLUÍDA em 01/08/2026** | retirada da Oficina humana | páginas e ferramentas exclusivas removidas; rota `/legado/atelier/` encerrada; bancada neutra permanece como única superfície de autoria visual |
+| 6 | pausada | Filete v2, Escopo B | aguarda comparação com a frente paralela antes de atacar canto composto/`chamferBox`; o Escopo A está preservado e verde |
+| 7 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
+| 8 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
+| 9 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
 
-### Ciclo 2 — em execução
+### Ciclo 5 — CONCLUÍDO em 1º de agosto de 2026
+
+**Nome:** Fluxo de modelagem assistida por IA v1.
+
+**Resultado:** uma IA recebe um pacote limitado, trabalha sem abrir a Oficina
+legada, gera uma revisão reproduzível na bancada e entrega a outra IA somente o
+contexto necessário para uma crítica objetiva. A correção volta à mesma peça e
+uma comparação estrutural invalida observações feitas sobre geometria antiga.
+
+**Prova cega:** em `_caixote-filetado`, o primeiro crítico encontrou duas
+divergências — transição seca do puxador e leitura fraca do material. Um agente
+modelador alterou a definição procedural usando somente pacote, guias, revisão,
+crítica, imagens e a skill de autoria. A revisão passou de 679 para 903 faces,
+ainda abaixo do orçamento de 2.000; preservou duas partes, contato declarado,
+zero face sem identidade e zero órfão. Um segundo crítico, sem acesso ao código,
+à revisão anterior ou à primeira crítica, confirmou a transição, mas manteve a
+leitura de material como divergente. A tentativa inicial de declarar zero foi
+reprovada na revisão adversarial e virou uma regra: toda crítica cobre o
+checklist completo, mesmo sem correção. `freio-disco` atravessou o mesmo
+contrato como peça existente, sem ser remodelado.
+
+| # | condição do gate | estado | evidência |
+|---:|---|---|---|
+| 1 | pacote e relatórios determinísticos | **ATENDIDA** | testes repetem entrada e exigem JSON canônico byte-idêntico |
+| 2 | contexto frágil, posicional ou excessivo é recusado | **ATENDIDA** | validadores cobrem referência sem hash, arquivo `repo://` inexistente ou divergente, identidade runtime, parte/vista inexistente, caminho local, binário e limites do pacote |
+| 3 | quatro vistas úteis; zero identidade ausente e zero órfão | **ATENDIDA** | `revisar:modelagem` passa no caixote e no freio; o gate recusou enquadramentos realmente pequenos ou cortados e foi calibrado com a vista superior real do caixote |
+| 4 | IA nova trabalha com contexto limitado | **ATENDIDA** | os dois críticos Terra receberam somente briefing, referências, guias, `revisao.json` e quatro PNGs |
+| 5 | crítica objetiva e limitada | **ATENDIDA** | `critica.json` canônico cobre todos os itens e exige parte/região, vista, categoria, evidência, aceite e viabilidade para cada divergência; máximo de cinco |
+| 6 | segunda revisão mostra mudança estrutural | **ATENDIDA** | o diff `r001→r002` isolou a alteração no puxador; `r002→r003` mantém a geometria e introduz somente a aparência semântica v2; teste de mutação prova mudança só de cor/aspereza sem inferir pelos pixels |
+| 7 | contrato não automotivo e peça existente | **ATENDIDA** | `_caixote-filetado` prova o ciclo completo; `freio-disco` prova a compatibilidade do pacote e da revisão |
+
+**Limites declarados:** a crítica visual não mede continuidade matemática nem
+fotorealismo; material pode depender de iluminação e distância; o comparador
+descreve mudança estrutural e de aparência, mas não decide sozinho se ela é
+melhor. A divergência de material do caixote permanece aberta sem reabrir o
+ciclo: ela é evidência de que o fluxo conserva um problema em vez de fazê-lo
+sumir. Uma capacidade nova só será proposta quando uma tarefa real ficar
+bloqueada por um desses limites.
+
+**Medição posterior, sem reabrir o ciclo:** o A/B descrito em
+[`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) comparou um Sol com o
+pacote e outro sem ele. A mediana cega empatou em 14/16; a condição assistida
+ganhou aderência dimensional, portas e evidência reproduzível, mas gastou mais
+tentativas de revisão. O resultado limita a afirmação do ciclo: o fluxo melhora
+a qualidade da entrega para o próximo agente, mas ainda não demonstrou melhorar
+a habilidade visual nem o custo da modelagem.
+
+### Revisão visual econômica v1 — CONCLUÍDA em 1º de agosto de 2026
+
+**Incluiu somente:** A-38 — enquadrar cada vista pelo envelope projetado,
+preservar evidência recusada por assinatura semântica, classificar falha de
+câmera/modelo/ferramenta e repetir uma vez a prontidão expirada.
+
+**Excluiu:** nova geometria, crítica automática, colisão sólida, relações de
+montagem, novos guias de forma e nova rodada A/B.
+
+**Gate atendido:** a dobradiça assistida congelada produziu `r002` em uma
+execução e a crua produziu `r001` em uma execução; nenhuma geometria mudou. Uma
+falha injetada conserva quatro PNGs, relatório e `tentativa.json`, não publica
+revisão, não duplica o mesmo estado e permite promoção posterior. Caixote e
+freio continuam passando nas quatro vistas. O guia de iteração foi corrigido
+para não pedir micro-revisões durante a criação inicial.
+
+### Retirada da Oficina humana — CONCLUÍDA em 1º de agosto de 2026
+
+**Incluiu somente:** retirar `oficina.html`, a antiga aba de som, o servidor de
+salvamento, os presets e testes exclusivos dessas interfaces, os comandos
+públicos correspondentes e a cópia integral do Atelier no Pages. O botão do
+jogo de referência que apontava para a página removida também saiu.
+
+**Preservou:** `motor/oficina.js`, expressões, regra de referência posicional,
+peças procedurais, visor, jogo de referência, testes do núcleo, adaptador
+Three.js, bancada e todo o fluxo assistido por IA.
+
+**Decisão:** a Mecanifica não mantém editor visual para autoria humana. O fluxo
+oficial é arquivo procedural → medidas → revisão na bancada → crítica → ajuste.
+A interface completa continua no repositório original do NÓS. As menções à
+Oficina nas seções históricas abaixo registram o estado dos ciclos na época e
+não descrevem uma entrada executável atual.
+
+**Gate atendido:** 811 testes e typecheck verdes; build contém apenas
+`index.html`, `bancada.html` e seus assets; `id-cru:check` e
+`gabarito:selecao:check` verdes; a prova de portas da bancada passa no navegador;
+o jogo de referência abre com `ready=true` e zero erro depois da retirada do
+botão. Nenhum script público aponta para arquivo removido.
+
+### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 
 **Nome:** Fundação de autoria v1.
 
@@ -236,9 +365,50 @@ peças e mudanças na apresentação.
 representar semanticamente a edição; pinça e suporte podem usar `chamferBox` com
 zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
+**Conferência do gate, condição por condição (31 de julho de 2026).** As três
+estão ATENDIDAS, cada uma com a medição que a sustenta:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | a Oficina recusa antes de salvar o que não sabe representar | **ATENDIDO** | `npm run guarda:salvar` verde, 16 afirmações (10 no cenário do servidor real, 6 no estático), e no CI desde este ciclo. O clique real em "Salvar peça" depois de um clique real em "marcar sólido" (que grava `['solido',{faces:[0]}]`) não emite POST, não emite download e não muda o byte em disco — nos dois cenários: servidor de dev com a rota real e servidor estático que força o fallback. A recusa é visível (mensagem de erro + `title` + alerta com o passo culpado), não trava a sessão, e vale também pelo gancho `window.__oficina.salvar()`. Não é bloqueio: `Ctrl+Z` tira a edição e o mesmo botão volta a gravar. A guarda mora em `salvarPeca`, o funil por onde passam os dois caminhos de saída |
+| 2 | pinça e suporte usam `chamferBox` com zero face sem identidade | **ATENDIDO** | `freio-disco.js` monta a pinça com 3 `chamferBox` (ponte, garra interna, garra externa) e o suporte com 3 (placa e duas orelhas), endereçados por `origemId`/`sel:{origem}`/`sel:{alias}`. `npm run descrever -- freio-disco --estrito`: 8 partes, 300 faces, 362 vértices, **0 face sem identidade, 0 órfão**. Conferido também no olho, na bancada, com pinça e suporte selecionados em modo contexto |
+| 3 | uma prova não automotiva confirma o mesmo contrato | **ATENDIDO** | `prototipos/fps/v3/pecas/_jardineira.js` — jardineira de janela com uma muda, zero vocabulário mecânico. Usa os cinco geradores que só ganharam `origem` na R4 e publica cinco portas. Quatro delas sofrem `rotaciona`/`transladar` depois de publicadas e são citadas na sequência; a quinta (`soleiraDaJardineira`) nunca é transformada, então prova o contrato mínimo, não a sobrevivência à transformação. Porta de granularidade sub-primitiva, entre os geradores novos, só a `esfera` tem: `cone` e `inflate` não recebem porta nenhuma (A-18). `npm run descrever -- _jardineira --estrito`: 6 partes, 351 faces, 350 vértices, **0 face sem identidade, 0 órfão**. `tools/mecanifica/jardineira-integridade.test.ts` amarra cada contagem à FÓRMULA do gerador e reconstrói a peça com outro `TOPO`. Quatro enquadramentos lidos na bancada (frontal, direita, superior, isométrica) mais um recorte isolando `bulbo`+`caule`, onde se vê o pé do caule pousando no colo do bulbo — a relação que o teste trava |
+
+**Verificação completa executada no fechamento:** `npm test` (461 casos, 17
+arquivos), `npm run typecheck`, `npm run build`, `npm run gabarito:selecao:check`
+(22 peças byte-idênticas), `npm run id-cru:check` (0 id cru fora da lista
+herdada), `npm run mapa` + `npm run mapa:check` (201 arquivos),
+`npm run docs:links:check`, `npm run docs:toc:check`, `npm run guarda:salvar` e
+`npm run descrever` em **todas** as 36 peças. Das 36, 8 passam `--estrito` com
+0/0 — as duas do ciclo (`freio-disco`, `_jardineira`) entre elas; 14 não têm
+envelope de `PASSOS` e a régua não as mede; 14 são fixtures herdadas com dívida
+anterior ao ciclo. O ciclo tocou exatamente duas peças, e as duas passam.
+
+O que o contrato **não** alcança está medido e nomeado (A-18 a A-20, e A-22
+achado na própria verificação), em vez de suposto.
+
+**O que este ciclo NÃO fechou, dito na cara:**
+
+- **A-15 continua aberto.** A guarda impede a entrega silenciosa, que era a
+  metade urgente; ela não faz a Oficina **emitir** referência semântica, e três
+  das seis formas posicionais não têm caminho semântico nem no núcleo. O ciclo
+  prometeu "proteção mínima, sem exportador completo" e entregou exatamente
+  isso — o atrito fecha quando a interface souber gravar
+  `sel:{alias|origem|porta}` no momento em que grava o passo;
+- **A-22, novo.** A guarda passou a divergir do gate na direção oposta: abrir
+  `_jardineira` na Oficina e clicar em Salvar, sem editar nada, é recusado por
+  "5 referência(s) posicional(is)" que são as cinco portas do `publicarPorta`. O
+  conserto do A-21 desceu para `tools/bancadas/id-cru.mjs` e não para
+  `diagnosticarExportacaoIncompativel`. É recusa **a mais**, nunca a menos — não
+  abre buraco na condição 1 —, e por isso ficou registrado em vez de corrigido
+  dentro de um ciclo já fechado.
+
 **Implementado e já publicado:**
 
-- [x] guarda mínima do A-15 antes de POST e download;
+- [x] guarda mínima do A-15 antes de POST e download, no funil `salvarPeca` —
+  provada pelo **botão real** em `npm run guarda:salvar`, nos dois caminhos de
+  saída e também pelo gancho `window.__oficina.salvar()`, que até esta rodada
+  era uma porta dos fundos que gravava em `pecas/` o que o botão recusava;
 - [x] `origem` em todos os geradores cobertos, incluindo `inflate`;
 - [x] `publicarPorta` e `sel:{porta}` preservados após transformação;
 - [x] pinça e suporte migrados para `chamferBox`, com zero face sem identidade;
@@ -246,33 +416,440 @@ zero face sem identidade; uma prova não automotiva confirma o mesmo contrato.
 
 **Pendências finitas para encerrar:**
 
-- [ ] provar pelo botão real, no navegador, que o salvamento incompatível é
-  recusado antes do POST e do fallback;
-- [ ] consolidar uma fixture não automotiva explícita usando o mesmo contrato;
+- [x] provar pelo botão real, no navegador, que o salvamento incompatível é
+  recusado antes do POST e do fallback — `tools/mecanifica/guarda-salvar-oficina.mjs`
+  dirige a interface: clique real em "marcar sólido" (que grava
+  `['solido',{faces:[0]}]`) e clique real em "Salvar peça", contra o `servir.mjs`
+  real e contra um servidor sem a rota. A medição achou a guarda no lugar errado
+  — no ouvinte do clique, não no caminho — e o conserto a moveu para o funil;
+- [x] consolidar uma fixture não automotiva explícita usando o mesmo contrato —
+  `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
+  usa os cinco geradores que só ganharam `origem` na R4 e publica cinco portas, quatro delas sobrevivendo a transformação
+  antes das transformações, citando-as depois. Régua headless: 6 partes, 351
+  faces, 350 vértices, 0 face sem identidade, 0 órfão. A prova achou quatro
+  coisas, todas registradas em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) e
+  nenhuma contornada em silêncio: o gate `id-cru` reprovava `publicarPorta`
+  (A-21, corrigido aqui — nenhuma PEÇA usava a op, então o defeito ficou
+  invisível na R4); `cone`, `plano` e `chamferBox` só citam a primitiva inteira
+  apesar de terem grade documentada (A-18); o eixo de uma origem não aceita
+  parâmetro e reaponta em silêncio quando o `TOPO` muda (A-19); uma porta
+  publicada é invisível fora do núcleo (A-20). A-18 a A-20 **não** entram neste
+  ciclo;
 - [x] reconciliar o estado de R4, A-15, O-6 e O-12 em índice, otimizações e
   registro upstream;
-- [ ] rodar a verificação completa e marcar este ciclo como concluído.
+- [x] rodar a verificação completa e marcar este ciclo como concluído — feito em
+  31 de julho de 2026, com a conferência do gate acima e a lista de comandos
+  executados. A verificação achou A-22 e o registrou fora do ciclo, sem
+  corrigi-lo aqui.
+
+**Não entraram e continuam de fora:** A-18, A-19, A-20 e A-22. Nenhum é
+pendência deste ciclo; quem abrir o próximo decide a ordem.
 
 O-13 recebe um ciclo próprio somente depois desse gate. Essa separação é a
 garantia de que o próximo plano também termina.
 
-### Candidato a ciclo 3 — ainda não aberto
+### Ciclo 2b — Endereços semânticos v1 — CONCLUÍDO em 31 de julho de 2026
 
-**Nome:** Arranjos semânticos v1.
+**Nome:** Endereços semânticos v1. Ele corrigiu dívida do ciclo anterior; não
+inventou capacidade nova.
 
-**Inclui somente:** O-13, com repetição radial e linear, identidade estável por
-instância e diagnóstico de referência inválida ou ambígua.
+**Incluiu somente:** A-18, A-19, A-20 e A-22. A-20 e A-22 entraram declarados,
+não em silêncio: A-20 é o mecanismo que permite PROVAR o A-18 de forma direta, e
+A-22 era a mesma regra copiada em três lugares que este ciclo ia mexer.
 
-**Exclui:** curvas, cortes, filetes, auto polimento, alterações de material,
+**Excluiu:** O-13 (arranjos), O-7, relações de montagem, hierarquia de partes,
+realismo e peças de produto novas. Nada disso foi tocado.
+
+**Gate de encerramento, condição por condição.** As quatro estão ATENDIDAS:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | A-18: os geradores com numeração fechada citam o eixo que já têm | **ATENDIDO** | `cone` reusa a estrutura do `cilindro` (`lado` + `tampa:'fundo'`), `chamferBox` a do `cubo` mais `aresta` (12) e `canto` (8), `plano` a grade `faixa`×`lado` do `loft` — sem vocabulário novo. `inflate` fica no contrato mínimo por decisão medida, escrita no código. **Provado na peça:** `_jardineira` publica `bordaDaFrenteDaSoleira` (`chamferBox:400 aresta 3`), `faixaDaFrenteDaTerra` (`plano:402 faixa 'ultima'`) e `assentoDoBotao` (`cone:405 tampa 'fundo'`), cada nome dizendo o que alcança de verdade |
+| 2 | A-19: o eixo acompanha a contagem, e a peça deixa de ser remodelada em volta da limitação | **ATENDIDO** | o eixo aceita nome de PARAM/TOPO, expressão `=…` e as palavras `'primeira'`/`'ultima'`, resolvidas contra a contagem real. A distorção foi DESFEITA: `coloDoBulbo` diz `faixa: 'ultima'`, e o `rotaciona` de meia-volta e o parâmetro `bulboMeiaVolta` saíram. Dois casos do teste remontam a peça com outro `TOPO` e medem que colo e faixa continuam onde o nome promete |
+| 3 | A-20: uma porta publicada é visível fora do núcleo, e o teste para de falar por procuração | **ATENDIDO** | `nucleo()` devolve `portas`; `src/autoria/descrever-partes.js` as mede para `npm run descrever` (`portas: 8`) e para a bancada. `tools/mecanifica/jardineira-integridade.test.ts`: 15 leituras de `f.material` como procuração viraram **0** — ele lê `neutro.portas` e cita `sel:{porta}` num passo de sonda próprio, 22 casos |
+| 4 | A-22: a regra de referência posicional vive num lugar só | **ATENDIDO** | `prototipos/fps/v3/motor/referencia-posicional.js`, importado pela Oficina, pelo gate `id-cru` e pelo harness. `npm run guarda:salvar` abre `_jardineira` na Oficina real, vê 8 `publicarPorta` e SALVA; a mesma peça com uma edição posicional de verdade continua recusada |
+
+**Aditividade:** `gabarito:selecao:check` verde com **uma** peça regravada —
+`_jardineira`, reescrita de propósito para provar a capacidade. As outras 21
+seguem byte-idênticas.
+
+**Verificação executada no fechamento:** `npm test` (502 casos, 18 arquivos),
+`npm run typecheck`, `npm run build`, `npm run gabarito:selecao:check`,
+`npm run id-cru:check`, `npm run guarda:salvar`, `npm run mapa` +
+`npm run mapa:check`, `npm run docs:links:check`, `npm run docs:toc:check`,
+`npm run descrever -- _jardineira --estrito` (6 partes, 351 faces, 350 vértices,
+0 face sem identidade, 0 órfão, 8 portas) e quatro enquadramentos lidos na
+bancada, incluindo o recorte `bulbo`+`caule` isolado, onde se vê o colo pálido
+no topo do bulbo entregando o caule.
+
+**O que este ciclo NÃO fechou, dito na cara:** A-15 continua aberto e não foi
+tocado — a Oficina segue sem saber EMITIR referência semântica. `adaptarThree`
+continua sem expor portas, por decisão declarada. `inflate` continua no contrato
+mínimo, por decisão medida.
+
+### Ciclo 3 — Arranjos semânticos v1: CONCLUÍDO (31/07/2026)
+
+**Incluiu:** O-13 (repetição radial e linear com identidade estável por
+instância e diagnóstico de referência inválida ou ambígua) e a dívida A-23 do
+ciclo anterior (palavra reservada de extremidade engolindo parâmetro homônimo).
+
+**Excluiu:** curvas, cortes, filetes, auto polimento, alterações de material,
 relações de montagem, novas peças de produto e automação de crítica visual.
 
-**Gate proposto:** a roda experimental perde os cem parâmetros de coordenadas
-dos braços; cada cópia continua isolável por identidade; uma composição não
-automotiva prova o mesmo contrato; nenhum id runtime entra no arquivo salvo.
+**O que ficou de pé:**
 
-### Candidato a ciclo 4 — ainda não aberto
+- a op `arranja`, nos modos `radial` e `linear`. Sempre estrutural: sem
+  `origemId`, `derivaDe` e `sel:{origem:...}` o passo é recusado, então cópia
+  anônima não é possível por construção;
+- a origem `{op:'arranja', id, de}` com o eixo `copia`, que endereça a coleção
+  inteira, uma cópia por índice, por nome de parâmetro, por `'primeira'`/
+  `'ultima'` ou por filtro `{passo,fase}` — nenhuma citação depende de id de
+  face nem da posição do passo, e há um caso que insere um passo antes do
+  arranjo e cobra a mesma cópia;
+- determinismo declarado e medido: o ângulo da cópia `k` é `(k+1)·passo`,
+  derivado da contagem e aplicado sempre à posição da fonte. O teste compara os
+  dois doubles (derivado e acumulado) e prova que são diferentes, senão a
+  afirmação passaria com as duas implementações;
+- ambiguidade grita, nunca escolhe: `volta` e `graus` juntos ou nenhum dos dois,
+  `total < 2`, `d` nulo, campo do outro modo, e cópia que cai a múltiplo exato
+  de 360° da fonte. Cada recusa é conferida contra o neutro puro — meia coleção
+  endereçável nunca existe;
+- A-23: a palavra reservada continua ganhando, mas a colisão com um `PARAM`/
+  `TOPO` homônimo grita, com a causa nomeada e o conserto dito.
 
-**Nome:** Realismo geométrico v1.
+**Gate, condição por condição:**
+
+| condição | resultado |
+|---|---|
+| repetição radial e linear existem no núcleo | `arranja`, 28 ops implementadas |
+| cada cópia continua isolável por identidade | casos de coleção, índice, PARAM, extremidade e progressão, todos por `sel:{alias}`/`sel:{porta}` |
+| nenhum id runtime entra no arquivo salvo | `npm run id-cru:check` verde, `arranja` recusa `faces`/`sel:{f}`/alias/região |
+| peças existentes intactas | `npm run gabarito:selecao:check` — 22 peças byte-idênticas |
+| verificação completa | `npm test` (540), `typecheck`, `build`, `gabarito:selecao:check`, `id-cru:check`, `guarda:salvar`, `guarda:portas`, `mapa`/`mapa:check`, `docs:links:check`, `docs:toc:check` |
+
+**Gate do fechamento, escrito antes e conferido item por item.** O gate deste
+ciclo era: "a roda experimental perde os cem parâmetros de coordenadas dos
+braços; cada cópia continua isolável por identidade; uma composição não
+automotiva prova o mesmo contrato; nenhum id runtime entra no arquivo salvo". As
+quatro condições estão **ATENDIDAS**:
+
+| # | condição | estado | evidência |
+|---|---|---|---|
+| 1 | a roda perde os cem parâmetros de coordenada | **ATENDIDO** | `PARAMS` 141 → **43**, e os 100 nomes `r0_..r9_` de seno/cosseno são **0**. Passos 66 → 47; passos que geram instância repetida 20 → 3. Um braço é declarado no ângulo ZERO (Y é o raio nomeado, Z é zero) e não há seno nem cosseno no arquivo. A frase "cinco pares em torno do eixo X" está escrita: `rotaciona` de meia abertura, um `arranja` para o par, dois `arranja` de volta fechada para os grupos. Números completos, lado a lado com os antigos, em [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |
+| 2 | cada cópia continua isolável por identidade | **ATENDIDO** | os dez braços são dez PARTES nomeadas (`raioRecuadoDoGrupo3`), resolvidas por `{op:'arranja', id, copia}`. Na régua, `npm run descrever` dá caixa e corpo próprios a cada uma; na bancada, `--selecionadas=raioRecuadoDoGrupo3 --modo=isolar` mostra um braço só (PNG lido). Recessos e porcas ficam AGREGADOS de propósito, para a peça exercitar também a coleção inteira |
+| 3 | uma composição não automotiva prova o mesmo contrato | **ATENDIDO** | `prototipos/fps/v3/pecas/_cerca-e-flor.js` — sete tábuas por arranjo **linear**, seis pétalas por arranjo **radial**, cada instância uma parte nomeada, zero vocabulário mecânico. `npm run descrever -- _cerca-e-flor --estrito`: 16 partes, 138 faces, 158 vértices, 0 face sem identidade, 0 órfão. Peça NOVA: `_jardineira` não foi tocada, para não arriscar as provas que ela já sustenta |
+| 4 | nenhum id runtime entra no arquivo salvo | **ATENDIDO** | `npm run id-cru:check` verde com as duas peças; nenhuma delas aparece na lista herdada. Toda citação é `sel:{origem}` ou `sel:{alias}` |
+
+**O teste de integridade, e a mutação que cada afirmação mata.**
+`tools/mecanifica/arranjo-em-peca.test.ts`, 13 casos no fechamento (**18** hoje:
+o ciclo 4 acrescentou cinco, ver "As três promessas do ciclo 3 sem afirmação"),
+cobrindo as duas peças.
+Nenhuma contagem está digitada nele: toda instância sai de `TOPO`. Cinco
+mutações rodadas no que esta rodada acabou de escrever, **todas mortas**:
+
+| mutação | casos que caíram |
+|---|---:|
+| trocar `raioRecuadoDoGrupo3` por `raioRecuadoDoGrupo4` (mesma malha, dois nomes trocados) | 2 |
+| `total: 'gruposDeRaios'` → `total: 5` (malha byte-idêntica) | 1 |
+| reverter os cantos da cópia no núcleo (`arranja`) | 1 |
+| tirar o pivô do arranjo da flor (cai no default `[0,0,0]`) | 1 |
+| trocar a expressão do comprimento da travessa | 1 |
+
+A segunda é a que responde à lição dos ciclos anteriores: ela produz geometria
+**byte-idêntica** e mesmo assim morre, porque a afirmação é sobre a PEÇA — o
+arranjo tem de contar por nome de `TOPO`, não por número digitado.
+
+**Aditividade:** `gabarito:selecao:check` verde com **duas** entradas mexidas e
+declaradas — `roda-dianteira-realista-experimento` regravada (V 2184 → 2194,
+F 2082 → 2132) e `_cerca-e-flor` nova. As outras 21 peças seguem byte-idênticas.
+
+**Inspeção visual:** bancada em `direita`, `frontal` e `isometrica`, ortográfica,
+mais o recorte isolando um braço; PNGs lidos e comparados com os enquadramentos
+que o relato antigo cita. **A silhueta não mudou.**
+
+**Teste de mutação, o que ele achou.** Dez mutações no que a rodada acabou de
+escrever. Nove morreram (ângulo acumulado 1 caso; índice de cópia deslocado 4;
+`total` contando cópias 13; origem não registrada 6; colisão de palavra
+reservada silenciosa 2; weld desligado 2; `volta`+`graus` escolhendo em vez de
+gritar 1; pivô default virando outro ponto 5). **Uma sobreviveu:** reverter os
+cantos de toda cópia — a mão da face, que é formato salvo — deixava os 356 casos
+verdes. O buraco foi fechado com afirmação de normal de Newell nos dois modos, em
+commit próprio. Uma décima mutação (inverter a ordem em que a coleção resolve)
+também sobreviveu e **não** virou teste: nenhum consumidor do núcleo distingue
+essa ordem hoje, então ela ficou declarada no comentário da op como construção
+determinística, não como promessa medida.
+
+**O que este ciclo NÃO fechou, dito na cara:**
+
+- nenhuma peça de **produto** usa `arranja`. As duas que usam são experimento e
+  exercício; `freio-disco.js` não foi tocada, então o prisioneiro de roda e a
+  aleta de ventilação continuam não modelados;
+- as quatro paredes da `_jardineira` continuam quatro passos copiados. Elas
+  formam um retângulo e nenhum dos dois modos resolve as quatro de uma vez; a
+  peça não foi tocada para não arriscar as provas que ela sustenta;
+- **A-24, novo**, achado na própria reescrita: `arranja` copia UMA origem, e o
+  contrato do `cilindro` não sabe dizer "a primitiva inteira" — `{op,id}` são só
+  as laterais. Copiar um cilindro custa três arranjos e devolve as tampas
+  SOLTAS do tubo: 13 corpos no lugar de 5, verde em todo gate e invisível na
+  foto. A régua achou. A porca da roda virou `lathe` por causa disso, e é a
+  única origem das +50 faces da peça;
+- A-15 segue aberto e não foi tocado.
+
+**As três dívidas menores do ciclo, pagas depois.** As duas primeiras saíram em
+commits próprios, antes deste fechamento; a terceira é a reescrita da roda,
+acima.
+
+1. o painel de portas da bancada não tinha prova nenhuma — pago;
+2. um teste comparava uma função com ela mesma — pago;
+3. nenhuma peça usava `arranja`, e a roda que originou o item continuava com os
+   cem parâmetros — pago neste fechamento, com o gate conferido item por item.
+
+Detalhe das duas primeiras: Elas eram do mesmo tipo que a lição
+dos dois ciclos anteriores: verde pelo motivo errado.
+
+- **O painel de portas da bancada não tinha prova nenhuma.** Nenhum arquivo de
+  teste importa `src/bancada/main.js`. A revisão mediu duas mutações que passavam
+  todos os gates e os 540 testes: `convertido.medida.portas ?? []` virar `[]` em
+  `main.js`, e `portasPublicadas(neutro)` virar `[]` em `carregar-peca.js`. O
+  painel do A-20 podia ser apagado inteiro sem custo. Entrou
+  `tools/mecanifica/guarda-portas-bancada.mjs` (`npm run guarda:portas`), que
+  dirige a bancada **pela URL** e afirma sobre o **DOM renderizado**: a peça com
+  portas mostra o painel visível, o resumo `8 publicadas` e os oito pares
+  nome/origem; `_vao-e-anteparo` não mostra a seção; e uma afirmação compara os
+  dois lados na mesma execução, senão um painel constante passaria em metade
+  delas. O oráculo é **literal**, escrito à mão, não calculado por
+  `portasPublicadas()` — a régua que a página usa não pode ser a régua que a
+  mede (lição do A-22). Mutação: as duas trocas acima derrubam 5 afirmações cada;
+  trocar `porta.origem` por `op:id`, perdendo o recorte, derruba 1. Como precisa
+  de navegador, a prova entrou no `.github/workflows/ci.yml`, ao lado do
+  `guarda:salvar`. Limite declarado: o painel é `display:none` no breakpoint
+  mobile, e a prova roda em 1280×720; a lista rola dentro de 128 px, então nem
+  toda porta fica visível de uma vez, mas as oito existem no DOM.
+- **Um teste comparava uma função com ela mesma.** Em
+  `referencia-posicional.test.ts`, o caso "o gate id-cru mede exatamente o que o
+  módulo mede" comparava `contarIdCruDoGate(passos)` com `contarIdCru(passos)`,
+  e `tools/bancadas/id-cru.mjs` **reexporta** essa função do mesmo módulo: era
+  `f(x)` contra `f(x)` para o mesmo `f`. Ele foi **corrigido, não removido** — o
+  que queria afirmar é o degrau anterior, que não existe uma segunda
+  implementação, e isso se afirma por identidade de referência. Comparar saídas
+  não serve: uma cópia recém-escrita concorda em quase tudo, e foi assim que as
+  três cópias do A-22 conviveram por dois ciclos, divergindo só na chave `de`.
+  Mutação: um wrapper local no gate que **delega** ao módulo — portanto concorda
+  em toda entrada, e o teste antigo passaria — deixa o novo vermelho.
+
+### Ciclo 4 — Corte e orientação de seção v1 — CONCLUÍDO em 31 de julho de 2026
+
+**Nome:** Corte e orientação de seção v1 (o ciclo antes chamado de candidato
+"Realismo geométrico v1"). Duas capacidades, escolhidas pelo critério de servir
+a QUALQUER família de objeto: móvel, robô, carroça, instrumento e carro têm
+todos furo e caminho.
+
+**Exclui:** curva de perfil, filete, afunilamento, relações de montagem,
+hierarquia e novas peças de produto.
+
+**Entregue até agora — orientação declarada da seção (A-25, UP-020):** o `loft`
+aceita `orientacao: [x,y,z]`, a direção do mundo para onde aponta o eixo `+u` de
+toda seção. Ela é projetada no plano de cada seção, aceita nome de PARAM e não
+propaga nada, então não há rotação acumulada ao longo do caminho. Referência
+paralela à tangente de alguma seção, vetor nulo e aridade errada gritam e
+abortam o passo inteiro. Ausente, o transporte paralelo de sempre: 23 peças
+byte-idênticas no `gabarito:selecao:check`, sem regravar nenhuma (o gate hoje
+confere **24**, com `_prateleira-furada`, que entrou depois). **11** casos em
+`tools/oficina/oficina.test.ts`, no describe `loft — orientação declarada da
+seção`; 8 mutações rodadas, todas mortas — inclusive a
+que propaga o frame a partir da referência declarada, que só morre em caminho
+com torção. Conferida no olho na bancada, em isométrica e superior.
+
+**O que ela NÃO fez:** nenhuma peça de PRODUTO usa a chave. A roda experimental
+continua remontando o contorno em código auxiliar. A peça de exercício
+`_prateleira-furada` passou a usar a palavra `orientacao` na op `furo`, que é a
+mesma chave e a mesma regra, mas não é o `loft`.
+
+**Entregue — abrir vazio: a op `furo` (A-27, UP-021):** um furo cilíndrico numa
+face plana e convexa, PASSANTE (`saida`, a face por onde ele sai) ou CEGO
+(`profundidade`, onde ele para). É o furo de prisioneiro, o parafuso de móvel, o
+respiro de robô e o furo de eixo de carroça, com uma op só e sem palavra nova.
+
+A decisão central foi **não construir uma booleana genérica**. Uma booleana
+destrói a identidade de dezenas de faces de uma vez, em silêncio, que é o que
+O-6 e O-12 vieram matar. As três garantias que o ciclo exigiu, cada uma com
+afirmação que morre quando o valor muda:
+
+1. **toda face criada é endereçável** — a origem `furo` (a 7ª do núcleo) tem os
+   eixos numéricos `borda`, `parede` e `saida`, mais a tampa nominal `'fundo'`.
+   Numeração fechada: vértices `b+j` e `b+lados+j`; faces `b+j` borda,
+   `b+lados+j` parede, `b+2·lados+j` saída OU `b+2·lados` fundo. Mudar `raio` ou
+   `centro` muda a FORMA, nunca o id;
+2. **toda face destruída grita** — a face cortada entra em `st.consumidas`, e
+   citá-la depois vira erro nomeando o furo e o passo. Inclusive na citação de
+   UNIÃO (`{op:'cubo', id}`), que antes pulava id morto em silêncio e devolveria
+   cinco faces das seis — plausível na foto. `apagaFace` continua como sempre:
+   remover é uma coisa, ser substituída é outra;
+3. **completude** — face não-plana, face côncava, anel que encosta ou vaza o
+   contorno, saída igual à entrada, saída que o eixo não atravessa, raio ou
+   profundidade ≤ 0 e entrada ambígua abortam o passo inteiro com 0 V / 0 F.
+
+O casamento entre o anel e os cantos da face cortada é ANGULAR, não por índice:
+por índice a borda de um quadrado com furo central e `lados:8` sai com
+quadriláteros reflexos, que o leque de triangulação do visor preenche torto.
+
+**Prova:** **40** casos em `tools/oficina/oficina.test.ts`, somando os sete
+describes que começam por `furo —`, e **10** em
+`tools/mecanifica/prateleira-integridade.test.ts`. 34 mutações rodadas; 3
+sobreviveram e foram mortas com teste novo. Aditiva: `gabarito:selecao:check`
+verde, as 23 peças anteriores byte-idênticas. A peça de exercício
+`prototipos/fps/v3/pecas/_prateleira-furada.js` prova a op fora do vocabulário
+automotivo — tábua, parafuso passante, cavilha cega e puxador vazado, 5 partes,
+116 faces, 0 face sem identidade, 0 órfão, 3 portas — e foi conferida no
+navegador em três enquadramentos, mais o furo cego isolado e focado.
+
+**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usa a op. O cubo do
+freio continua sem prisioneiro e a roda sem furo de fixação. Só furo cilíndrico,
+só face plana e convexa, só na direção da normal — rasgo, bolsão, sulco
+transversal e furo oblíquo continuam sem operação. E **um furo por face**: um
+segundo furo na mesma face é impossível, então um círculo de parafusos numa
+placa ainda não existe (A-26, aberto).
+
+**As três promessas do ciclo 3 sem afirmação, pagas aqui.** A revisão
+adversarial do ciclo 3 achou de novo a mesma classe dos quatro ciclos
+anteriores: promessa escrita no comentário, sem afirmação que morra quando ela é
+quebrada. Três casos, cada um medido antes com uma mutação que sobrevivia à
+suíte inteira:
+
+| promessa | onde ela morava | mutação que sobrevivia antes | casos que caem agora |
+|---|---|---|---:|
+| as famílias de arranjo da roda (`fixadores`, `recessosRaios`) | comentário de `roda-dianteira-realista-experimento.js` | `total:'fixadoresNaRoda'` → `total:'ladosFixador'` (cinco porcas viram seis) | 2 |
+| idem | idem | `total:'gruposDeRaios'` → `total:'ladosMiolo'` no arranjo dos ressaltos | 1 |
+| idem | idem | deslocar o círculo de parafusos 1 cm (`= fixadorRaioOrbita + 0.01`) | 1 |
+| a coleção INTEIRA é o endereço do material | cabeçalho de `_cerca-e-flor.js` | tirar `ORIGEM_TABUAS` do alias `cercaInteira` | 2 |
+| idem | idem | tirar `ORIGEM_PETALAS` do alias `corolaInteira` | 1 |
+| a solda no eixo é por igualdade EXATA, não tolerância | comentário da op `arranja` | trocar a igualdade por tolerância de `1e-6` | 1 |
+
+Nenhuma das três tinha teste: `fixadores` e `recessosRaios` não eram citados por
+arquivo de teste nenhum do repositório; a forma "coleção inteira" só era
+observável pelo material, que ninguém media; e a solda tinha afirmação só para o
+vértice EXATAMENTE no eixo, o lado fácil, então só desligá-la por completo era
+pego.
+
+O que entrou:
+
+- `tools/mecanifica/arranjo-em-peca.test.ts` ganhou cinco casos (13 → **18**).
+  Três separam a parte AGREGADA em CORPOS por conectividade — sem isso a régua
+  mede uma caixa só e a contagem do arranjo não é observável — e medem o círculo
+  de parafusos e a raiz do ressalto pelos parâmetros que os nomeiam. Dois afirmam
+  que a coleção inteira pinta TODAS as instâncias, e que nenhuma face da peça
+  fica sem material;
+- `tools/oficina/arranja-contrato.test.ts` ganhou dois casos (6 → **8**): o
+  vértice EXATAMENTE no eixo solda, e o vértice a `1e-9` do eixo **não** solda.
+  O segundo é o que decide a regra, e é feito deslocando o **pivô** do arranjo em
+  `1e-9`, sem tocar em peça nenhuma. Ele existe porque tolerância torna a
+  contagem de vértices do arquivo salvo dependente do ruído de ponto flutuante do
+  parâmetro; igualdade exata é reproduzível.
+
+**Números velhos no PLANO, conferidos contra runtime.** A revisão marcou o item
+como parcial. Medição desta rodada: `_prateleira-furada` 5 partes / 116 faces /
+112 vértices / 3 portas, `_cerca-e-flor` 16/138/158, `_jardineira` 6/351/350,
+`freio-disco` 8/300/362 e a roda experimental 2194 vértices — todos batem com o
+que o texto já dizia. Três não batiam e foram corrigidos: os casos do `loft`
+(10 → 11), os casos do `furo` (26 → 40) e a contagem de
+`arranjo-em-peca.test.ts` (13 → 18). O `gabarito:selecao:check` conta **24**
+peças hoje, não 23; onde o texto cita 23 ele fala do estado daquela entrega, e a
+frase agora diz as duas coisas. Os números dentro de "verificação executada no
+fechamento" dos ciclos 2, 2b e 3 são fotografias daquele dia e continuam como
+estão, com o rótulo que já tinham.
+
+**FECHAMENTO — as duas capacidades provadas em PEÇA.** Até aqui as duas viviam
+no núcleo, com teste e mutação, e nenhuma peça de PRODUTO usava nenhuma delas.
+Era a mesma classe que a revisão adversarial acha desde o ciclo 1: promessa
+escrita, sem afirmação que morra quando ela é quebrada. O que entrou:
+
+**1. O flange de roda do freio — as duas capacidades juntas, numa peça de
+produto.** O plano registrava a omissão com estas palavras: "o cubo do freio
+continua sem prisioneiro". `freio-disco.js` agora tem um flange de quatro
+assentos: UMA sede (`chamferBox`), o `arranja` radial que a repete de 90° em 90°
+em torno do eixo da roda, e um `furo` PASSANTE em cada assento, de lado a lado.
+A peça foi de 300 para 540 faces e de 362 para 554 vértices, com **0 face sem
+identidade** e **0 órfão** (`npm run descrever -- freio-disco --estrito`), e os
+testes de integridade antigos continuam verdes SEM afrouxar nenhum: o conjunto
+de pares que se interpenetram é o mesmo de antes (`cubo~disco`, `flexivel~pinca`,
+`pinca~pistao`), e as folgas de repouso não mudaram.
+
+Uma afirmação antiga precisou mudar de número, e o motivo é geométrico, não
+cosmético: `descrever-partes.test.ts` fixava "a parte `cubo` é 1 corpo". Agora
+são **1 + `prisioneiros`** — cada assento é uma primitiva própria, sem vértice
+em comum com o cilindro. O teste passou a ler o número do TOPO da peça em vez de
+tê-lo digitado, então acrescentar assento sem acrescentar corpo continua sendo
+defeito.
+
+Sete casos novos em `tools/mecanifica/freio-disco-integridade.test.ts`
+(11 → 18): há um furo por prisioneiro declarado e cada um é um corpo separado; o
+furo atravessa o assento de lado a lado (é passante, não cego); os quatro estão
+no círculo de prisioneiros, nos quatro pontos cardeais; o diâmetro é o do
+parâmetro que o nomeia e sobra assento em volta; a parede 0 de todo furo é a de
+cima (a fase declarada por `orientacao`); o assento não passa do raio do cubo; e
+a superfície em que a roda encosta continua endereçável depois do corte.
+
+**2. `_corrimao.js` — a orientação declarada, fora do vocabulário automotivo.**
+Um corrimão de escada de perfil chato (60 mm × 24 mm) entre dois pilaretes, num
+caminho de cinco pontos com TORÇÃO. As três condições que tornam a chave
+mensurável numa peça estão nele de propósito, e duas delas são AFIRMADAS pelo
+teste para que ninguém as "simplifique" e deixe o resto passando por vácuo: o
+caminho não é coplanar (num caminho plano o transporte paralelo dá o mesmo
+resultado) e o perfil é chato (num perfil quadrado largura e espessura são a
+mesma medida). 6 casos em `tools/mecanifica/corrimao-orientacao.test.ts`. A peça
+tem 52 faces, 84 vértices, 2 partes, 0 face sem identidade, 0 órfão e 1 porta —
+`apoioDaMao`, que só é endereço ESTÁVEL porque a orientação é declarada: sem a
+chave, `lado:3` passeia pelas quatro faces ao longo do caminho, continuando a
+resolver e resolvendo para outra coisa.
+
+**3. A composição achou um atrito que nenhuma prova anterior tinha achado
+(A-28, UP-022).** `furo` exige que a face de entrada resolva para EXATAMENTE uma
+face; a origem `{op:'arranja', id, de, copia}` exigia que `de` fosse, chave por
+chave, o `derivaDe` do passo — e `derivaDe` de um sólido é o sólido inteiro.
+As duas capacidades do ciclo não compunham. O portão passou de IGUALDADE da
+origem declarada para PERTINÊNCIA das faces: `de` pode ser qualquer origem cujas
+faces sejam faces daquela fonte. É estritamente mais permissivo, então nenhuma
+citação já escrita mudou de significado — `gabarito:selecao:check` verde com as
+24 peças anteriores byte-idênticas. 6 casos novos em
+`tools/oficina/arranja-contrato.test.ts` (8 → 14).
+
+**Mutação, o gate deste ciclo.** 14 mutações rodadas contra as afirmações novas,
+12 mortas. As duas primeiras versões do teste do freio deixavam sobreviver a
+mutação que TIRA `orientacao` da peça — o conjunto de vértices de um anel de 12
+lados é o mesmo em qualquer fase, e a caixa não vê a diferença; só a pergunta
+"QUEM é a parede 0" separa as duas regras. A mesma classe apareceu no corrimão:
+a primeira versão do teste sobrevivia a trocar o perfil por um quadrado.
+Sobreviveu de propósito **uma** mutação, e ela não é defeito: mudar
+`prisioneiroFuroRaio` de 6,5 para 6,0 mm é mudança de projeto, e a afirmação
+segue o parâmetro por decisão. Trocar o `raio` do furo para OUTRO parâmetro
+(o chanfro) é pego.
+
+**Inspeção visual, lida:** `freio-disco` em `direita` e em isométrica com o cubo
+isolado e focado — os quatro assentos aparecem em volta do eixo, cada um com o
+furo aberto e a parede do furo visível; `_corrimao` em `frontal` (os dois
+pilaretes e o corrimão subindo, com espessura constante) e em `superior` (a
+largura constante do começo ao fim, que é a evidência de que a face larga
+continua para cima em todo o percurso).
+
+**Gates do fechamento, todos verdes:** `npm test` (646 casos, 24 arquivos),
+`typecheck`, `build`, `gabarito:selecao:check` (25 peças; só `freio-disco` e o
+novo `_corrimao` mudaram, e as duas foram declaradas), `id-cru:check`,
+`guarda:salvar`, `guarda:portas`, `mapa`, `mapa:check`, `docs:links:check` e
+`docs:toc:check`.
+
+**O que continua NÃO feito, dito na cara:** A-26 seguia aberto no fechamento
+deste ciclo — um furo por face, e é por isso que o flange é uma chapa por
+prisioneiro em vez de uma chapa com quatro furos. Ele foi PAGO depois, numa
+rodada avulsa (ver "Furo v2", abaixo); o flange, porém, não foi reescrito, e a
+forma dele continua sendo dívida de peça. A-29 nasceu neste fechamento: o `furo` pede o ponto do MUNDO
+por onde ele passa, e a gramática de PARAMS não tem seno nem cosseno, então um
+arranjo radial só dá centro NOMEÁVEL em passos de 90° — o flange tem quatro
+prisioneiros por causa da linguagem, não do desenho. A roda experimental continua
+remontando o contorno em código auxiliar; a mangueira do freio continua com
+seção circular e sem `orientacao`, porque numa seção circular a chave não muda
+nada que se possa medir.
+
+**Registro anterior deste ciclo, quando ainda era candidato:**
 
 O ciclo nasce do briefing e da crítica visual da roda, registrados em
 [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md). Antes de
@@ -283,3 +860,254 @@ Ele não começa com uma lista de operações nem promete “polir” a peça in
 Seu gate será escrito depois de comparar referência e renders canônicos,
 nomeando regiões e condições visuais de aceite. Uma skill de família só pode
 ser extraída depois de o protocolo funcionar em outra família de objeto.
+
+### Furo v2 — vários furos na mesma face — CONCLUÍDO em 31 de julho de 2026
+
+**O que estava errado:** a op `furo` consome a face de entrada. O segundo furo
+na mesma face citava uma face que já não existe, e gritava com razão. A figura
+mecânica mais comum que existe — o círculo de parafusos numa placa — só existia
+se cada furo caísse numa face diferente, e foi por isso que o flange do freio
+virou uma chapa por prisioneiro (A-26, com evidência em peça de exercício E em
+peça de produto).
+
+**O que entrou:** a chave `centros` da op `furo`, em duas formas, e nada além
+disso. A lista `[[x,y,z], …]` diz os pontos um a um; o círculo
+`{pivo, distancia, total, volta|graus}` diz a frase do desenho com as palavras
+que o `arranja` já tinha. "Quatro furos a 62 mm do centro" é um passo, e o
+arquivo se parece com a frase. Nenhum seno e nenhum cosseno entram no formato
+salvo: o círculo nasce no quadro (u,w) da própria face.
+
+As quatro exigências, cada uma com afirmação que morre:
+
+- **toda face criada é endereçável, e furos diferentes do mesmo passo são
+  distinguíveis.** O eixo `furo` da origem recorta um furo só; o eixo ausente
+  continua querendo dizer "todos", que é o que preserva o furo de um centro só.
+  A superfície da face que não toca anel nenhum ganhou nome:
+  `preenchimento` e `preenchimentoDaSaida`;
+- **toda face destruída grita.** O registro de consumo não mudou: citar a face
+  de entrada depois do corte continua gritando, com um anel ou com quatro;
+- **anéis que se cruzam gritam.** Teorema do eixo separador entre os dois
+  polígonos, com ENCOSTAR contando como cruzar, e o passo abortando com
+  0 V / 0 F. A conferência é UMA, na entrada: a projeção na saída é afim, então
+  não pode aproximar anéis disjuntos — e isso está MEDIDO no teste da saída
+  oblíqua, em vez de virar uma segunda conferência que nunca falharia;
+- **determinismo e numeração fechada.** O furo `k` ocupa `b+3·L·k`, e o
+  preenchimento vem depois de todos, com `n + 2M − 2` faces por lado.
+
+**A mutação achou o que a suíte não pegava:** trocar o bloco de ids entre os
+furos (`b+3·L·(M−1−k)`) passava pelos 680 testes. Nenhum ligava o bloco de ids
+ao ANEL que ele descreve, e o formato salvo passaria a endereçar outro furo em
+toda peça já escrita. Agora a borda `j` do furo `k` tem de conter a aresta
+`j → j+1` do anel `k`. Duas outras mutações sobreviveram e ficaram DECLARADAS
+no núcleo: as provas internas da partição (contagem, área, casamento de
+arestas) não têm caso que as dispare, e ninguém deve lê-las como conferidas.
+
+**Prova em peça:** `prototipos/fps/v3/pecas/_tampa-de-caixa.js`, fora do
+vocabulário automotivo — 253 faces, 4 partes, 0 face sem identidade, 0 órfão, 3
+portas, e a chapa com UM corpo. Conferida no navegador em dois enquadramentos
+(superior e isométrica). `gabarito:selecao:check` verde com as 25 peças
+anteriores byte-idênticas.
+
+**O que ela NÃO fez, dito na cara:** nenhuma peça de PRODUTO usava a forma nova
+no fechamento dela. O flange do `freio-disco` continuava sendo uma chapa por
+prisioneiro — a linguagem já não obrigava, mas a peça não tinha sido reescrita.
+Essa dívida foi paga em seguida, na rodada "Flange de uma peça só", abaixo. E um
+passo tem UM raio: a flange com furo central mais círculo de parafusos ainda não
+é escrevível (A-30, aberto).
+
+### Flange de uma peça só — CONCLUÍDA em 31 de julho de 2026
+
+**O que estava errado:** o flange do `freio-disco` tinha quatro ressaltos
+quadrados, um por prisioneiro. Eles nunca foram desenho mecânico. Existiam
+porque um passo de `furo` consome a face de entrada, então cada furo precisava
+de uma face só dele. Depois do `centros` da rodada "Furo v2" a linguagem já não
+obrigava, e a forma ficou como dívida de peça.
+
+**O que mudou na peça, medido:**
+
+| | antes | depois |
+|---|---|---|
+| passos do trecho do flange | 7 | 4 |
+| parâmetros do trecho | 9 | 5 |
+| identidades estruturais | 6 (304–309) | 2 (304, 305) |
+| CORPOS da parte `cubo` | 5 | 2 |
+| faces da peça / vértices | 540 / 554 | 504 / 490 |
+| envelope do `cubo` | x −0,070..0,032, y e z ±0,052 | idêntico |
+
+E `prisioneiros` passou a bastar sozinho: a peça constrói com 3, 5, 6 e 8, com
+zero órfão e sem um cosseno no arquivo. Antes, mudar 4 para 5 deixava o quinto
+assento sem furo até alguém escrever o corte à mão.
+
+**O defeito de NÚCLEO que a prova em produto achou:** a face do flange é a tampa
+de um cilindro de 16 lados, com 4 anéis de 12 a 90°. Como 16, 12 e 4 são todos
+múltiplos de 4, a simetria põe o vértice de um anel EXATAMENTE em cima da aresta
+de uma orelha de outro (2,2·10⁻¹⁹ contra um eps de 10⁻¹²). "Em cima" não é
+"dentro": a orelha era cortada, engolia a lasca do outro lado da aresta e
+deixava o resto do polígono com orientação invertida. O sintoma chegava longe da
+causa — `a partição criou um triângulo de área nula ou invertida`, uma das três
+provas de estado impossível que o núcleo declarava não ter entrada capaz de
+disparar. Tinha. Corrigido com o `pontoNoSegmento` que a ponte já usava: 17 de
+240 combinações de face × furo × total gritavam antes, 0 depois.
+
+**Mutações, 17 no total.** No núcleo: devolver a conferência a só
+`dentroEstrito` mata 3 dos 10 casos novos. Na peça, morrem — orientação +Y→+Z
+(2 casos), entrada trocada pela saída (9), órbita a 48 mm, que põe o furo fora
+do flange (9), flange com o dobro do raio (2), `flangeFaceRodaX` sem a espessura
+(2), flange no outro extremo do cubo (2), furo com 16 lados (3), flange com 32
+lados (1), `segundoPrisioneiro` virando o terceiro (1), `assentosDeRoda` sem o
+preenchimento (1), `total:'prisioneiros'` virando `total:4` (2). SOBREVIVEM, e é
+o certo: órbita 38→36 mm, espessura 12→14 mm e raio do furo 6,5→7,0 mm — são a
+superfície de refinamento dimensional, e as afirmações são relacionais.
+`volta:360` → `graus:90` e `flangeRaio` → `cuboRaio` também sobrevivem porque
+dizem literalmente o mesmo.
+
+**Prova na foto**, no mesmo enquadramento da imagem que abriu a rodada
+(`bancada-freio-disco-direita-sel-cubo-isolar-focado.png`, vista direita, cubo
+isolado e focado): os quatro ressaltos sumiram e o círculo de parafusos está no
+disco. Na ampliação de 3× o contorno do furo não tem mais a cunha escura nem a
+costura triangular que o A-31 mediu — a borda é um furo limpo.
+
+**O que ela NÃO fez, dito na cara:**
+
+- a SILHUETA do furo continua o polígono de 12 arestas. Na ampliação dá para
+  contar as quinas. Isso está registrado em A-31 e é assunto do ciclo 5;
+- o flange tem o RAIO DO CUBO, então não há degrau piloto/flange na silhueta
+  lateral. Não é limite de linguagem: o aro da roda entra por cima do cubo com
+  0,6 mm de folga na escala da cena, e um flange mais largo bateria nele. Aberto
+  como A-32, com o conserto (cubo em dois diâmetros) descrito lá;
+- A-30 continua aberto: um passo tem um raio só;
+- A-29 continua aberto, mas perdeu a evidência original — o flange não usa mais
+  `arranja` + `furo`, e o caso que resta é o geral de apontar para a cópia `k`
+  de um arranjo radial.
+
+**Registros alterados:** `descrever-partes.test.ts` afirmava
+`1 + TOPO.prisioneiros` corpos no `cubo` e passou a afirmar 2, com o motivo
+escrito. Ele continua afirmando o que afirmava — que o flange não compartilha
+vértice com o barril —, e quem prende os quatro furos ao TOPO da peça é
+`freio-disco-integridade`, que ganhou quatro afirmações e não afrouxou nenhuma.
+`gabarito:selecao:check` regravado com `freio-disco` como ÚNICA peça de hash
+novo, das 26.
+
+### Ciclo 5 — Curva e filete v1 — CONCLUÍDO
+
+**Nome:** Curva e filete v1. São as duas capacidades que sobraram da lista que a
+crítica visual da roda levantou (perfil curvo ou afunilado, orientação de seção,
+transição local, filete/bevel seletivo) — as outras duas foram entregues no
+ciclo 4.
+
+**Escopo incluído:**
+
+- **curva no perfil.** Hoje todo contorno é uma poligonal: o `lathe` reserva o
+  terceiro elemento do ponto para a alça de curva e ainda não a implementa, e o
+  `contorno` do `loft` recusa o ponto de 3 elementos com essa mesma mensagem. A
+  capacidade é a alça de curva de verdade, no mesmo lugar em que já está
+  reservada, para que raio de concordância, barriga de perfil e gargalo deixem
+  de ser um pedaço de reta;
+- **filete seletivo.** Arredondar uma aresta ESCOLHIDA por identidade semântica,
+  não a caixa inteira como o `chamferBox`. É o que separa uma peça fundida de
+  uma peça de bloco, e é o que a crítica da roda pediu primeiro.
+
+**Escopo excluído:** subtração nova (booleana geral, rasgo, bolsão, furo
+oblíquo), relações de montagem, hierarquia de partes, posição na criação da
+primitiva, e novas peças de PRODUTO. A-26 e A-29 NÃO entram: eles são do corte,
+não da curva, e misturá-los reabriria o ciclo 4.
+
+### Fechamento do ciclo 5 — o que passou e o que ficou aberto
+
+As nove condições, uma a uma:
+
+1. **Cumprida.** A alça de curva vale no `perfil` do `lathe`, no `contorno` do
+   `loft` e nos pontos do `inflate`, com a mesma palavra: o 3º elemento é um
+   raio de concordância. Aridade fora do contrato continua gritando.
+2. **Cumprida, depois de trocar a medição.** A afirmação que entrou media a
+   distância dos VÉRTICES ao centro do arco, que é exata por construção e dá
+   0,000000% em qualquer discretização — inclusive com um segmento, onde o
+   arco é uma corda reta a 29% do arco de verdade. Trocada pela flecha da
+   corda, que é o desvio da SUPERFÍCIE. Com 8 segmentos num canto reto: 0,482%.
+3. **Cumprida.** A op `filete` endereça a aresta por origem estrutural, não
+   consome face nenhuma e não regenera a peça.
+4. **Cumprida.** O painel entra em `CONTRATOS_ORIGEM` com o eixo `painel`.
+5. **Cumprida ao pé da letra, e a palavra é grande demais.** Com `n = 1` painel,
+   os dois cantos nascem a 45° exatos, medidos na malha. Dois cantos de 45° são
+   um CHANFRO, não um arredondamento. Está registrado como A-36, aberto.
+6. **Cumprida, com o custo na mesa.** Pneu 280F/320V → 520F/560V; roda inteira
+   494F → 734F (1,49×, não dobra). Freio 504F → 508F (quatro filetes, +1 F
+   cada). Cubo simples com um filete: 8V/6F → 10V/7F.
+7. **Cumprida.** `gabarito:selecao:check` verde, 26 das 28 peças byte-idênticas.
+   Mudaram só `roda-dianteira` e `freio-disco`, as duas reescritas de propósito,
+   mais as duas peças novas.
+8. **Cumprida.** `_caixote-filetado` (móvel, não automotivo) usa AS DUAS: o
+   filete na aresta de cima-da-frente e as concordâncias no perfil do puxador
+   torneado. Em produto, a `roda-dianteira` usa a curva (ombro do pneu) e o
+   `freio-disco` usa o filete (chanfro de entrada e saída das pastilhas).
+9. **Cumprida, com sobrevivente dito na cara.** A troca cos/sin na amostragem do
+   arco sobreviveu à conferência de raio, porque cos²+sin²=1 preserva a
+   distância; virou teste que fixa a tangência exata.
+
+**O defeito que a rodada achou em si mesma, e a lei que sai dele.** O primeiro
+desenho do filete preservava os vértices da aresta dentro das duas faces. O
+neutro continuava FECHADO e a contagem BATIA, então nenhum teste do núcleo caía
+— mas a face ficava com um canto EM CIMA da aresta seguinte. Quem gritou foi o
+adaptador, ao triangular em orelhas, e só quando a op chegou numa peça de
+verdade. **Malha fechada e contagem certa não provam polígono simples.**
+
+**Aberto ao fim do ciclo:** A-35 (`segmentosCurva` é por passo, não por
+concordância), A-36 (o filete de um painel é chanfro), A-37 (o filete não compõe
+com `chamferBox`, e era justo a pinça que precisava). A pinça, o suporte e o
+pistão do freio continuam peças de bloco.
+
+### Gate do ciclo 5 — escrito na abertura, sobre o estado de hoje
+
+A comparação foi refeita depois do ciclo 4, sobre `roda-dianteira`,
+`freio-disco` e `_corrimao` na bancada, em isométrica e em vista reta. O que se
+vê, dito sem eufemismo:
+
+- **o freio é uma peça de BLOCO.** Pinça, suporte e pistão são caixas de aresta
+  viva a 90°. Uma pinça de verdade é fundida: toda aresta dela tem raio. É a
+  diferença que a crítica da roda chamou de fundida contra bloco, e ela aparece
+  na isométrica sem precisar aproximar;
+- **o pneu tem VINCO onde deveria ter ombro.** O perfil do `lathe` é uma
+  poligonal, então a passagem da banda de rodagem para o flanco é uma quina, não
+  um raio. O mesmo vale para o barril do aro;
+- **o corrimão é um tubo reto que encontra o pilarete em ângulo vivo**, sem
+  concordância nenhuma entre os dois corpos;
+- **a silhueta do furo é o polígono de `lados` arestas** (A-34). Normal suave
+  não muda contorno.
+
+**Condições de aceite.** Todas medidas; nenhuma "ficou melhor".
+
+1. **A curva nasce onde já está reservada.** O terceiro elemento do ponto passa
+   a ser aceito no `perfil` do `lathe`, no `contorno` do `loft` e nos pontos do
+   `inflate` — os três lugares que hoje gritam "RESERVADA, ainda não
+   implementada" — com a MESMA palavra e o MESMO significado nos três. Aridade
+   fora do contrato continua gritando e abortando o passo.
+2. **A curva é conferida contra a forma analítica.** Um arco de raio declarado,
+   escrito com a alça, sai a menos de 1% do raio em toda amostra, com a
+   discretização que o autor pedir. Conta fechada de vértices e faces, como toda
+   op do núcleo.
+3. **O filete é endereçado por IDENTIDADE.** Arredondar uma aresta escolhida por
+   origem estrutural, não a caixa inteira como o `chamferBox`. As arestas não
+   escolhidas continuam exatamente como estavam, e as faces vizinhas continuam
+   existindo com a mesma identidade — a peça não é regenerada.
+4. **O que o filete cria é ENDEREÇÁVEL.** A superfície nova entra em
+   `CONTRATOS_ORIGEM` e se cita por família e faixa, como cubo, cilindro, lathe,
+   loft e furo. Referência inválida grita.
+5. **A silhueta muda, e isso é medido na MALHA.** Onde havia uma aresta a 90°
+   passa a haver `n` faces com ângulo de 90°/(n+1) entre vizinhas consecutivas.
+   Medido em graus, sobre o neutro. Mais a conferência no olho na bancada, em
+   pelo menos dois enquadramentos, antes e depois no mesmo quadro.
+6. **Custo declarado.** Faces e vértices por peça, antes e depois, escritos no
+   relato. Filete que dobra a malha de uma peça inteira é reprovação.
+7. **Aditivo.** `gabarito:selecao:check` verde, com todas as peças anteriores
+   byte-idênticas — exceto as que a rodada reescrever de propósito, nomeadas uma
+   a uma.
+8. **Provado em peça de PRODUTO e em peça NÃO automotiva.** Uma peça de
+   exercício de outra família (móvel, ferramenta, estrutura) usa as duas
+   capacidades, e o `freio-disco` ou a `roda-dianteira` usa pelo menos uma.
+9. **Mutação relatada.** Cada afirmação nova vem com a mutação que a mata, e o
+   sobrevivente que não morrer é dito em voz alta, não escondido.
+
+**O que este gate NÃO exige:** que a peça fique bonita, que o filete seja
+variável ao longo da aresta, que ele resolva encontro de três arestas num canto,
+nem que a concordância entre CORPOS diferentes (corrimão contra pilarete)
+exista. Filete de canto e transição entre corpos ficam fora, declarados.

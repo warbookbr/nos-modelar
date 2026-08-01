@@ -1,5 +1,9 @@
 # Otimizações da Oficina para autoria por IA
 
+Neste documento, “Oficina” nomeia a linguagem procedural herdada e seu núcleo.
+A interface humana homônima foi retirada da Mecanifica em 1º de agosto de 2026;
+itens específicos daquela UI permanecem apenas como histórico para upstream.
+
 Análise e **plano de implementação** das mudanças na linguagem de autoria. A
 divisão de trabalho entre os documentos é:
 
@@ -12,15 +16,55 @@ divisão de trabalho entre os documentos é:
 
 ## Estado executivo
 
-**Estado em 30 de julho de 2026:** R1, R2 e R3 estão concluídas. R4 foi
-implementada e publicada na Fundação de autoria v1; permanece em verificação
-até os gates finitos de fechamento do [`PLANO.md`](PLANO.md). R5 a R9 continuam
-backlog e não formam uma execução aberta.
+**Estado em 31 de julho de 2026:** R1, R2, R3, **R4** e **R4b** (o ciclo
+Endereços semânticos v1) estão concluídas. A R4
+fechou junto com a Fundação de autoria v1, com as três condições do gate do
+[`PLANO.md`](PLANO.md) verificadas item por item. R5 a R9 continuam backlog e
+não formam uma execução aberta.
 
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
 mas não autoriza trabalhar automaticamente até R9. O
-[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. A Fundação de autoria v1
-está ativa e cobre somente A-15, O-6 e O-12.
+[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. **Nenhum ciclo está ativo**
+desde o fechamento de "Corte e orientação de seção v1" (o ciclo 4, 31 de julho
+de 2026); a próxima candidata é a R5 (O-7) ou a R7 (O-8), e nenhuma começa antes
+de o `PLANO.md` abrir o ciclo.
+
+**Estado depois do ciclo Corte e orientação de seção v1 (concluído em 31 de
+julho de 2026):** o núcleo ganhou a primeira SUBTRAÇÃO (a op `furo`, passante e
+cega, A-27) e a orientação DECLARADA da seção do `loft` (A-25). As duas foram
+provadas em peça, e é isso que fecha o ciclo:
+
+- `freio-disco.js` ganhou o flange de roda — quatro assentos de prisioneiro
+  postos pelo `arranja` radial e furados de lado a lado pelo `furo`. É a
+  omissão que o plano registrava ("o cubo do freio continua sem prisioneiro"),
+  e junta as duas capacidades numa peça de produto. Os quatro assentos foram
+  substituídos depois, na rodada "Flange de uma peça só", por UM disco com os
+  quatro furos num passo — os ressaltos existiam por limite de linguagem, e o
+  limite foi pago pelo `centros` (A-26). O `arranja` saiu da peça;
+- `_corrimao.js` (peça de exercício, marcenaria de escada) prova a `orientacao`
+  do `loft` fora do vocabulário automotivo: caminho com torção, perfil chato, e
+  o eixo da largura horizontal do começo ao fim.
+
+Compor as duas achou um atrito que nenhuma prova anterior tinha achado: a
+origem `arranja` só sabia responder pela cópia INTEIRA, e `furo` exige uma face
+só. O portão dela passou de igualdade de origem para pertinência de face
+(A-28, UP-022). Ficaram abertos A-26 (um furo por face) e A-29 (o passo do
+arranjo radial só dá centro nomeável em 90°). A-26 foi pago em seguida, na
+rodada "Furo v2" (UP-023), e levado ao produto na rodada "Flange de uma peça
+só"; A-29 continua aberto, mas perdeu a evidência original quando o flange
+deixou de compor `arranja` com `furo`.
+
+O que a R4 deixou medido e **não** resolvido, para não virar promessa implícita:
+A-18 (origem só da primitiva inteira), A-19 (eixo sem expressão), A-20 (porta
+invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de`).
+**Estado depois do ciclo Endereços semânticos v1 (concluído em 31 de julho de
+2026):** os quatro resolvidos, cada um com prova em peça real —
+A-18 e A-19 no núcleo; A-20 nas duas metades (`nucleo()` devolve as portas, e a
+régua e a bancada as mostram, pelo módulo neutro `descrever-partes.js`); A-22
+por uma regra só, em `prototipos/fps/v3/motor/referencia-posicional.js`,
+importada pela Oficina, pelo gate `id-cru` e pelo harness da guarda.
+Nenhum deles é pendência da R4 — são extensões e vizinhanças que a prova
+descobriu ao empurrar o contrato para fora do vocabulário automotivo.
 
 Escopo: o núcleo de autoria (`prototipos/fps/v3/motor/oficina.js`) e a
 documentação que ensina a usá-lo. Os atritos da bancada (A-1, A-2, A-3, A-12,
@@ -67,12 +111,29 @@ Nenhum atrito de autoria fica sem plano:
 | A-6 `encostar` não existe | O-8 | A-11 partes planas | O-10 |
 | A-7 alias resolvido na citação | O-11 | A-13 foto sem escala | O-1 |
 | A-8 só se nomeia escalar | O-9 | documentação incompleta | O-0 |
-| A-17 repetição radial manual | O-13 | — | — |
+| A-17 repetição radial manual | O-13 (**entregue**) | A-18 origem só da primitiva inteira | O-6 (extensão, **entregue**) |
+| A-19 eixo de origem sem expressão | O-12 (extensão, **entregue**) | A-20 porta invisível fora do núcleo | sem item — **entregue** |
+| A-22 guarda e gate discordam sobre `de` | sem item — **entregue** | A-24 arranjo copia uma origem, e nem todo gerador tem "a primitiva inteira" | sem item — **aberto** |
 
 O-2, O-3 e O-4 não têm atrito correspondente: são defeitos achados no código que
 a rodada não exercitou. Ficam na Faixa 1 porque são redes de segurança baratas.
 O-13 e O-14 saíram da validação deste plano contra o código, descrita abaixo.
 Depois, a roda experimental confirmou O-13 em modelagem real e originou A-17.
+
+A-18, A-19 e A-20 saíram da fixture não automotiva `_jardineira`, no fechamento
+da R4. **Nenhum dos três entra no ciclo em execução:** eles são extensões
+justificadas de O-6 e O-12, não pendências deles — o gate de encerramento da
+Fundação de autoria v1 pede que o contrato seja provado fora do caso
+automotivo, e foi. Quem abrir o ciclo seguinte decide se paga essa dívida antes
+ou depois de O-13. A-21 nasceu e morreu na mesma rodada: era o gate `id-cru`
+contando `de:{op,id}` do `publicarPorta` como id posicional.
+
+A-22 saiu da verificação de fechamento, um passo depois: o conserto do A-21
+desceu para o gate e **não** para a guarda de salvamento da Oficina, que seguia
+recusando qualquer `de`. Ficou fora daquele ciclo, pela mesma regra — e era
+recusa a mais, nunca a menos, então não abriu buraco no gate. Resolvido em
+Endereços semânticos v1, e não consertando a terceira cópia: a regra passou a
+viver num módulo só. Ver ATRITOS-AUTORIA A-22.
 
 ## Validação contra o código
 
@@ -238,6 +299,14 @@ emitir referência semântica aqui — isso é R4/R5. O que se corrigiu foi a
 dizer que isso é impossível pela interface e impossível no núcleo para
 `vs`/`pontos`/`de`. Remediação inexistente é pior que remediação nenhuma.
 
+**O que a prova pelo botão real achou depois (R4).** A guarda que a R4 instalou
+existia no ouvinte do clique, não no caminho: medido em `npm run guarda:salvar`,
+o botão recusava e o gancho `window.__oficina.salvar()` — o caminho das bancadas
+headless — salvava a MESMA edição, POST e arquivo gravado em `pecas/`. A guarda
+desceu para o funil `salvarPeca`, antes do POST e antes do fallback de download.
+A lição é geral e vale para qualquer gate desta pasta: guarda afirmada em código
+só vira guarda depois de medida no caminho que a pessoa percorre.
+
 ### O-11 — diagnóstico de completude de alias
 
 **O que muda:** citar um alias de conjunto antes de todas as suas primitivas
@@ -329,10 +398,45 @@ mudar sua malha ou seus testes de encaixe.
 
 ### O-6 — `origem` em todo gerador
 
-**Estado (R4):** implementado. Além de `cubo`, `cilindro`, `lathe` e `loft`,
+**Estado (R4, concluída):** implementado. Além de `cubo`, `cilindro`, `lathe` e
+`loft`,
 `chamferBox`, `esfera`, `cone`, `plano` e `inflate` publicam `origem`. Quando a
 topologia não possui uma grade ou face nominal honesta, o contrato mínimo cita
 a primitiva inteira sem inventar nomes frágeis.
+
+**Provado fora do vocabulário automotivo:**
+`prototipos/fps/v3/pecas/_jardineira.js` — jardineira de janela com uma muda —
+usa os cinco geradores novos e é endereçada só por `sel:{origem}`/`sel:{alias}`:
+6 partes, 351 faces, 350 vértices, 0 face sem identidade, 0 órfão
+(`npm run descrever -- _jardineira --estrito`). O teste
+`tools/mecanifica/jardineira-integridade.test.ts` amarra a contagem de cada
+parte à FÓRMULA do gerador e reconstrói a peça com outro `TOPO`, provando que a
+origem é topológica e não uma lista congelada de ids.
+
+**Limite que a prova não automotiva expôs (A-18):** a justificativa do contrato
+mínimo — "topologia sem grade ou face nominal honesta" — só se sustenta em
+`inflate`. `cone`, `plano` e `chamferBox` têm numeração fechada, documentada e
+travada por teste no próprio núcleo, e mesmo assim só publicam a primitiva
+inteira. A boca do cone, a célula do plano e as três famílias de face do
+`chamferBox` existem e não são endereçáveis. O freio não sentiu porque pinça e
+suporte usam `chamferBox` como bloco maciço.
+
+**Corrigido no ciclo Endereços semânticos v1.** `cone` ganhou a estrutura do
+`cilindro` (`lado` + `tampa:'fundo'`), `chamferBox` a do `cubo` mais `aresta` e
+`canto`, e `plano` a grade `faixa`×`lado` do `loft` — tudo reusando as fábricas
+de contrato que já existiam, sem vocabulário novo, e sem mudar o que `{op,id}`
+sem eixo já respondia. `inflate` fica no contrato mínimo por decisão medida,
+agora escrita no código. Detalhe em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md),
+A-18 (resolvidos).
+
+**E PROVADO na peça, não só no núcleo.** `_jardineira` foi reescrita para
+publicar as três portas que ela queria e não conseguia:
+`bordaDaFrenteDaSoleira` (`chamferBox:400 aresta 3`, o chanfro entre `topo` e
+`frente`), `faixaDaFrenteDaTerra` (`plano:402 faixa 'ultima'`) e
+`assentoDoBotao` (`cone:405 tampa 'fundo'`). Nenhum nome promete mais do que
+alcança: o assento é a tampa da base, não "a boca da flor" — o ápice do cone é
+vértice, não face. A peça mudou de hash de propósito e regravou o gabarito;
+as outras 21 seguem byte-idênticas.
 
 **Por que:** A-9 é o achado mais incômodo da rodada. A pinça e o suporte são peças
 fundidas e `chamferBox` é literalmente o gerador do assunto; foram escritas com
@@ -363,9 +467,53 @@ Fazer separados duplica a decisão de nomenclatura.
 
 **Custo:** médio.
 
-**Estado (R4):** implementado. `publicarPorta` guarda uma origem estrutural sob
-um nome escolhido pelo autor; `sel:{porta}` resolve essa origem depois de
-transformações, sem persistir IDs de runtime.
+**Estado (R4, concluída):** implementado. `publicarPorta` guarda uma origem
+estrutural sob um nome escolhido pelo autor; `sel:{porta}` resolve essa origem
+depois de transformações, sem persistir IDs de runtime.
+
+**Provado fora do vocabulário automotivo:** `_jardineira` publica **oito** portas
+(cinco na R4) ANTES das transformações, e todas são resolvidas DEPOIS. As
+relações que o teste trava são a prova em duas linhas: o vértice comum do
+`coloDoBulbo` — o leque do polo norte da esfera — cai exatamente sobre o centro
+do `peDoCaule`; o centro do `assentoDoBotao` cai sobre o centro da
+`coroaDoCaule`; e o par `peDoCaule`/`coroaDoCaule` continua medindo
+`cauleComprimento` depois de a haste pender 16°. Nenhuma delas sobreviveria a
+uma porta reresolvida por posição.
+
+**Três achados da prova**, todos registrados em
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), nenhum contornado em silêncio:
+
+- **A-21 (corrigido nesta rodada).** O gate `id-cru` reprovava a peça por "5 ids
+  posicionais" que eram as cinco portas: a chave `de` passou a ter dois
+  contratos (`mescla` lê `de:[ids]`, `publicarPorta` lê `de:{op,id}`) e o gate
+  contava a chave, não a forma. Ninguém viu na R4 porque nenhuma PEÇA usava a
+  op — a capacidade estava provada só em teste de núcleo.
+- **A-19.** O eixo de uma origem (`faixa`/`lado`) não passa por `st.num`: é o
+  único campo dimensional da linguagem que não pode citar parâmetro. `faixa:
+  bulboAneis - 1` é impossível, e uma faixa escrita como literal passa a
+  apontar para outro lugar quando o `TOPO` muda, sem diagnóstico nenhum.
+  **Resolvido** em Endereços semânticos v1, e a peça foi DESDISTORCIDA: o
+  `coloDoBulbo` diz `faixa: 'ultima'`, e a meia-volta em z que só existia para
+  pôr a `faixa: 0` para cima saiu, junto com o parâmetro `bulboMeiaVolta`.
+- **A-20.** `nucleo()` não devolve `st.portas`: uma porta é invisível para a
+  régua, para a bancada e para o adaptador. O teste teve que marcar cada porta
+  com um material próprio para poder afirmar sobre ela. **Resolvido nas duas
+  metades** em Endereços semânticos v1: `nucleo()` devolve `portas`, e
+  `src/autoria/descrever-partes.js` (neutro, sem Three.js) as mede para o
+  `npm run descrever` e para a bancada. O teste da fixture parou de falar por
+  procuração no mesmo ciclo: 15 leituras de `f.material` viraram 0, e ele agora
+  lê `neutro.portas` e cita `sel:{porta}` num passo de sonda próprio.
+
+**Um quarto achado, na verificação de fechamento (A-22).** O conserto do A-21
+desceu para o gate e não para a guarda de salvamento da Oficina: abrir
+`_jardineira` na Oficina e clicar em Salvar, sem editar nada, é recusado por
+"5 referência(s) posicional(is)" que são as cinco portas. A capacidade do O-12
+funciona; o que não funciona é salvá-la pela ferramenta. Recusa a mais, não a
+menos — o gate de encerramento continua atendido. **Resolvido** em Endereços
+semânticos v1 por uma regra única em
+`prototipos/fps/v3/motor/referencia-posicional.js`; a prova pelo botão real
+abre `_jardineira` e salva, e a mesma peça com uma edição posicional de verdade
+continua recusada.
 
 ### O-7 — posição e orientação na criação da primitiva
 
@@ -438,6 +586,29 @@ na identidade. **Por isso O-13 vem depois de O-6 e O-12**, não antes.
 
 **Custo:** médio-alto.
 
+**Estado: ENTREGUE, núcleo e peça**, em 31 de julho de 2026, no ciclo "Arranjos
+semânticos v1". A op chama-se `arranja` (`modo:'radial'|'linear'`), e o risco do
+trade-off acima foi fechado por construção, não por disciplina: sem `origemId`,
+`derivaDe` e `sel:{origem:...}` o passo é recusado.
+
+O uso, que era a metade que faltava, entrou no fechamento do mesmo ciclo:
+
+- `prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` — a peça que
+  originou o item. 141 parâmetros → 43, sendo **zero** de coordenada
+  (`r0_..r9_`, os cem, sumiram); 66 passos → 47; 20 passos de geração de
+  instância → 3. Os dez braços, os cinco recessos e as cinco porcas viram cinco
+  passos `arranja`, e cada cópia é uma parte nomeada;
+- `prototipos/fps/v3/pecas/_cerca-e-flor.js` — a mesma capacidade fora do
+  vocabulário automotivo: tábuas por arranjo linear, pétalas por arranjo radial;
+- `tools/mecanifica/arranjo-em-peca.test.ts` — 13 casos, contagem sempre
+  derivada de `TOPO`, incluindo a afirmação de que nenhum `arranja` das duas
+  peças pode contar por número digitado.
+
+**O que continua devendo:** o prisioneiro de roda e a aleta de ventilação do
+freio seguem não modelados — a peça `freio-disco.js` não foi tocada neste ciclo,
+por escopo. A reescrita achou um limite novo do arranjo, registrado como A-24.
+Ver A-17, A-23 e A-24 em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+
 ### O-9 — parâmetro de tipo ponto e caminho
 
 **O que muda:** só se nomeia escalar. 18 dos 61 parâmetros do freio existem para
@@ -465,18 +636,19 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ## Backlog de implementação
 
-Uma rodada por linha. R4 está em fechamento; as demais só saem do backlog quando
-`PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit próprio
-e independente: se uma parar, as anteriores continuam de pé.
+Uma rodada por linha. R1 a R4 e a R4b estão concluídas; as demais só saem do backlog
+quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit
+próprio e independente: se uma parar, as anteriores continuam de pé.
 
 | rodada | estado | itens | toca formato salvo | prova de saída |
 |---|---|---|---|---|
 | R1 | concluída | O-0 | não | outra sessão escreve peça sem id cru só com o manual |
 | R2 | concluída | O-1, O-2, O-3, O-4, O-11, O-14 | só chave nova opcional | `descrever` mede os 4 encaixes do freio; `apagaFace` e `vira` entram no gabarito; gabarito preservado |
 | R3 | concluída | O-5 | sim | as 23 derivadas do freio estão no envelope como expressões validadas |
-| R4 | implementada, em fechamento | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox`, 0 face sem identidade; falta concluir os gates finitos do plano |
+| R4 | concluída em 31/07/2026 | O-6, O-12 | sim | pinça e suporte reescritos em `chamferBox` (3+3 `chamferBox`), freio com 8 partes, 300 faces, 0 sem identidade, 0 órfão; `_jardineira` confirma o contrato fora do vocabulário automotivo (6 partes, 351 faces, 0 sem identidade, 0 órfão) e originou A-18, A-19, A-20 e A-21; verificação completa verde, incluindo `npm run guarda:salvar`, `npm run descrever` em todas as peças e quatro enquadramentos lidos na bancada |
+| R4b | concluída em 31/07/2026 | extensões de O-6 e O-12 (A-18, A-19, A-20, A-22) | sim | `cone`, `plano` e `chamferBox` citam o eixo que já tinham e o eixo passa a aceitar parâmetro e `'primeira'`/`'ultima'`; `nucleo()` devolve `portas` e a régua/bancada as mostram; a regra de referência posicional vira um módulo só. Prova em peça: `_jardineira` publica as três portas que faltavam, desfaz a meia-volta que existia só para contornar o eixo literal, e o teste dela troca 15 leituras de material por citação direta de `sel:{porta}` (22 casos). Único hash regravado: `_jardineira` |
 | R5 | backlog | O-7 | sim | o freio perde os 16 passos de transporte |
-| R6 | backlog | O-13 | sim | roda experimental perde as cem coordenadas dos braços; cada cópia continua endereçável por nome e uma prova não automotiva confirma a generalidade |
+| R6 | concluída em 31/07/2026 (núcleo **e** peça) | O-13 + A-23 | sim | a op `arranja` (radial e linear) é sempre estrutural, então cópia anônima não existe; a origem `{op:'arranja',id,de}` tem o eixo `copia` e endereça a coleção, um índice, um PARAM, `'primeira'`/`'ultima'` e `{passo,fase}`; ângulo derivado da contagem, com o teste medindo a diferença entre o double derivado e o acumulado; 10 mutações rodadas, 9 mortas, a sobrevivente (mão da face revertida) virou teste em commit próprio. **a roda experimental FOI reescrita** no fechamento (141 parâmetros → 43, 100 de coordenada → 0, 66 passos → 47, cada braço uma parte nomeada), e `_cerca-e-flor` prova o mesmo contrato em marcenaria e jardinagem; a reescrita achou A-24 |
 | R7 | backlog | O-8 | sim | `encostar` substitui as derivadas de folga; mexer em um parâmetro não desencosta nada |
 | R8 | backlog | O-9 | sim | mangueira com 6 pontos nomeados em vez de 18 escalares |
 | R9 | backlog | O-10 | sim | bancada mostra `pastilhaInterna` dentro de `pinca` |

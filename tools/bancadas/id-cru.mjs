@@ -2,21 +2,17 @@
  * peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
  *
  * O `CLAUDE.md` proíbe id posicional como referência persistida, mas o formato
- * salvo aceita SEIS formas de COLEÇÃO de id cru. A lista abaixo não é opinião:
- * saiu de varrer TODA leitura `a.<chave>` dentro de `OPS`
- * (`prototipos/fps/v3/motor/oficina.js`) atrás de vértice ou face vindo do
- * passo. Se uma op nova ler id de uma chave nova, ela entra aqui:
+ * salvo aceita SEIS formas de COLEÇÃO de id cru. QUAIS são elas, e por que
+ * `de:{op,id}` do `publicarPorta` NÃO é uma delas, está escrito num lugar só:
+ * `prototipos/fps/v3/motor/referencia-posicional.js`. Este gate, a guarda de
+ * salvamento da Oficina e o oráculo do harness importam de lá — a regra copiada
+ * em três lugares divergiu duas vezes na mesma chave (ATRITOS-AUTORIA A-22), e
+ * na segunda a Oficina passou a recusar uma peça que este gate aprova.
  *
- *   forma                  ops que leem                                        caminho semântico?
- *   faces:[ids]            pincel/solido/liso/material/parte/espelha           SIM (resolverAlvosF -> sel:{...})
- *                          pesar                                               NÃO (pesar lê a.faces cru)
- *   sel:{v:[ids]}          displace/transladar/rotaciona (resolverAlvosV)      SIM
- *   sel:{f:[ids]}          qualquer op com sel                                 SIM
- *   vs:[ids]               pesar                                               NÃO
- *   pontos:[{f:id}]        pincel modo:'livre'                                 NÃO
- *   de:[ids]               mescla                                              NÃO
+ * O que continua sendo responsabilidade DESTE arquivo: a lista herdada, a
+ * comparação medido × congelado e o conselho de conserto.
  *
- * As três últimas eram o BURACO que a revisão da R2 achou: o arquivo afirmava
+ * As três últimas formas eram o BURACO que a revisão da R2 achou: o arquivo afirmava
  * cobrir "as três formas de coleção" e deixava passar `pesar {vs}`, o pincel
  * macio e o `de:[ids]` do `mescla` — que é COLEÇÃO, não singular, e estava
  * declarado como singular. Medido no baseline: `_oficina-esqueleto` tem 6
@@ -43,21 +39,9 @@
  * (senão a lista mente e vira teto para regredir de graça). Peça que sai da
  * lista e continua usando id cru cai na regra da peça nova e reprova.
  *
- * FORA DE ESCOPO, de propósito, declarado e COMPLETO — as formas SINGULARES,
- * as únicas quatro que existem no núcleo:
- *   `face:<id>`        `vira`, `moveF`, `extruda`, `apagaFace`
- *   `v:<id>`           `moveV`
- *   `a:<id>`/`b:<id>`  `moveA`
- *   `para:<id>`        `mescla`
- * Metade dessas ops não tem caminho semântico nenhum no núcleo atual — `vira`
- * só aceita `face:<id>` —, então gatear isso hoje proibiria usar a op em vez de
- * proibir o atalho. Fica registrado como pendência do plano, não como omissão
- * silenciosa.
- *
- * NÃO SÃO ID POSICIONAL, e por isso não entram: `id` (a declaração da base do
- * passo, que `confereId` já confere contra a POSIÇÃO), e `origemId`/`derivaDe`/
- * `sel:{origem}` (identidade estável declarada pelo autor — o caminho semântico
- * em pessoa).
+ * O escopo (seis formas de coleção) e o fora-de-escopo (as quatro formas
+ * SINGULARES do núcleo) estão declarados no módulo da regra, não aqui — duas
+ * declarações do mesmo escopo é como o A-22 começou.
  *
  *   node tools/bancadas/id-cru.mjs           # relata e ENCOLHE a lista herdada (nunca aumenta)
  *   node tools/bancadas/id-cru.mjs --check   # o gate: exit≠0 na primeira divergência
@@ -68,6 +52,13 @@
 import { readFileSync, existsSync, writeFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {
+  FORMAS, ROTULO, TEM_CAMINHO_SEMANTICO, contarIdCru, detalheDe, objetoPlano, totalDe,
+} from '../../prototipos/fps/v3/motor/referencia-posicional.js';
+
+/* reexportado para quem já importava daqui (os testes do gate e o harness da
+   guarda): a regra mudou de casa, não de contrato. */
+export { FORMAS, ROTULO, contarIdCru, detalheDe, totalDe };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -80,69 +71,12 @@ export const LISTA_PADRAO = join(HERE, 'id-cru-herdado.json');
    é fechado: arquivo antigo GRITA em vez de mentir. */
 export const FORMATO = 2;
 
-/* As seis formas de coleção que o gate cobre. A ordem é a da mensagem de erro
-   e a da serialização — determinismo antes de estética. */
-export const FORMAS = /** @type {const} */ (['faces', 'selV', 'selF', 'vs', 'pontos', 'mesclaDe']);
-
-const ROTULO = {
-  faces: 'faces:[ids]',
-  selV: 'sel:{v:[ids]}',
-  selF: 'sel:{f:[ids]}',
-  vs: 'vs:[ids] (pesar)',
-  pontos: 'pontos:[{f}] (pincel livre)',
-  mesclaDe: 'de:[ids] (mescla)',
-};
-
-/* Quais formas têm para onde ir HOJE. O conselho de conserto precisa ser
-   verdadeiro por forma: mandar trocar `vs:[ids]` por `sel:{alias}` seria
-   mandar fazer o que o núcleo não aceita. */
-const TEM_CAMINHO_SEMANTICO = { faces: true, selV: true, selF: true, vs: false, pontos: false, mesclaDe: false };
-
-const objetoPlano = (x) => typeof x === 'object' && x !== null && !Array.isArray(x);
-
-/* Chave presente NUNCA conta 0: `faces: []` (o núcleo grita "seleção vazia") e
-   `faces: 'nada'` (grita "precisa ser uma lista de ids") são a forma legada
-   sendo usada, não ausência dela — o gate não pode ser mais permissivo que o
-   núcleo. Fora isso, conta ID: é o número que cresce quando a dívida cresce. */
-const contarIds = (x) => (Array.isArray(x) ? Math.max(1, x.length) : 1);
-/* `pontos` carrega o id dentro da entrada (`{f, a, b}`): conta as entradas que
-   trazem `f`, que é o que o `pincel` modo livre lê. */
-const contarPontos = (x) => (Array.isArray(x) ? Math.max(1, x.filter((p) => objetoPlano(p) && Object.hasOwn(p, 'f')).length) : 1);
-
-/* Conta id cru numa lista de PASSOS. Estrutural, não textual: um comentário
-   citando `faces:` não conta, e um passo montado por helper conta. Op-agnóstico
-   de propósito — a chave é o contrato, e um passo montado por helper local (o
-   `paraEixoX` do freio) não tem nome de op para consultar. */
-export function contarIdCru(passos) {
-  const uso = { faces: 0, selV: 0, selF: 0, vs: 0, pontos: 0, mesclaDe: 0 };
-  if (!Array.isArray(passos)) return uso;
-  for (const passo of passos) {
-    if (!Array.isArray(passo)) continue;
-    const a = passo[1];
-    if (!objetoPlano(a)) continue;
-    if (Object.hasOwn(a, 'faces')) uso.faces += contarIds(a.faces);
-    if (Object.hasOwn(a, 'vs')) uso.vs += contarIds(a.vs);
-    if (Object.hasOwn(a, 'pontos')) uso.pontos += contarPontos(a.pontos);
-    if (Object.hasOwn(a, 'de')) uso.mesclaDe += contarIds(a.de);
-    const sel = a.sel;
-    if (objetoPlano(sel)) {
-      if (Object.hasOwn(sel, 'v')) uso.selV += contarIds(sel.v);
-      if (Object.hasOwn(sel, 'f')) uso.selF += contarIds(sel.f);
-    }
-  }
-  return uso;
-}
-
-export const totalDe = (uso) => FORMAS.reduce((s, k) => s + uso[k], 0);
-export const detalheDe = (uso) => FORMAS.filter((k) => uso[k] > 0).map((k) => `${uso[k]}× ${ROTULO[k]}`).join(', ');
-
 /* A remediação HONESTA. A mensagem antiga mandava "endereçe por
    sel:{alias|grupo|origem|regiao}" para qualquer forma, e isso mentia duas
-   vezes: `vs`/`pontos`/`de` não têm caminho semântico no núcleo, e quem modela
-   em `oficina.html` e clica Salvar não tem como emitir referência semântica
-   nenhuma — a interface só sabe gravar id posicional, e grava justamente no
-   diretório que este gate varre. Conselho impossível é pior que conselho
-   nenhum: manda o autor procurar uma saída que não existe. */
+   vezes: `vs`/`pontos`/`de` não têm caminho semântico no núcleo, e a antiga
+   Oficina humana não tinha como emitir referência semântica nenhuma. A página
+   foi retirada, mas o diagnóstico continua separando dívida herdada de forma
+   que já possui substituto semântico. */
 function comoConsertar(uso) {
   const presentes = FORMAS.filter((k) => uso[k] > 0);
   const semCaminho = presentes.filter((k) => !TEM_CAMINHO_SEMANTICO[k]);
@@ -155,7 +89,7 @@ function comoConsertar(uso) {
     const juntos = nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes.at(-1)}` : nomes[0];
     linhas.push(`${juntos} ${nomes.length > 1 ? 'NÃO têm' : 'NÃO tem'} caminho semântico no núcleo — a op só aceita id ali. Ou a peça nova ainda não usa a op, ou entra na lista herdada de propósito.`);
   }
-  linhas.push('salva pela Oficina (prototipos/fps/v3/oficina.html → Salvar → prototipos/fps/v3/pecas/): a interface AINDA NÃO sabe emitir referência semântica — ela só grava id posicional (R4/R5 do plano). Enquanto isso as saídas honestas são duas: converter a peça à mão, ou registrar a entrada em tools/bancadas/id-cru-herdado.json DE PROPÓSITO, assumindo a dívida no commit. Atrito A-15 em docs/mecanifica/ATRITOS-AUTORIA.md.');
+  linhas.push('A Oficina humana que produzia esse formato foi retirada; veja A-15 em docs/mecanifica/ATRITOS-AUTORIA.md.');
   return linhas.map((l) => `\n      · ${l}`).join('');
 }
 
