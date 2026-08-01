@@ -1,4 +1,4 @@
-# Filete v2 — desenho antes de implementação
+# Filete v2 — Escopo A implementado; canto composto pendente
 
 ## Decisão
 
@@ -43,7 +43,7 @@ Não reaproveitar `filete` para dois significados diferentes. A migração segur
 
 ## Algoritmo em dois escopos
 
-### Escopo A — aresta simples
+### Escopo A — aresta simples — IMPLEMENTADO
 
 Pré-condições: malha fechada, aresta compartilhada por duas faces, uma face de
 continuidade em cada ponta e essas quatro faces formando um anel simples.
@@ -54,6 +54,14 @@ continuidade em cada ponta e essas quatro faces formando um anel simples.
    ids principais;
 4. ligar pares de amostras em `paineis` quads; cada quad é `painel:k`;
 5. conferir manifold, polígonos simples, orientação, limite de raio e replay.
+
+Implementação entregue em `motor/oficina.js` como `arredondarAresta`, sem mudar
+o significado nem o formato salvo de `filete`. O custo é fechado para `n`
+painéis: `+2n` vértices e `+n` faces. A prova
+`tools/oficina/arredondar-aresta.test.ts` mede um arco de raio declarado, seus
+painéis `painel:0..n-1`, replay canônico, abortamento atômico e a passagem pelo
+adaptador Three com casca fechada. O caso de cubo com dois painéis sai de
+8V/6F para 12V/8F.
 
 O raio máximo não é a distância ao centroide: ele é limitado pelo primeiro
 encontro das linhas de recuo com as bordas vizinhas de cada face. Isso permite
@@ -70,18 +78,12 @@ arredondamento e provar que nenhum canto foi engolido.
 O primeiro alvo de produto é uma cópia pequena de `chamferBox`, não a pinça. Só
 depois de o caso composto ficar determinístico a pinça e o suporte podem mudar.
 
-## Testes de aceitação pendentes
+## Testes de aceitação restantes para o Escopo B
 
-O executável `node tools/oficina/filete-v2-aceitacao.mjs` falha hoje de
-propósito e enumera os dois bloqueios que a implementação deve remover. Ele só
-deve ficar verde junto com:
+O executável `node tools/oficina/filete-v2-aceitacao.mjs` ainda falha de
+propósito: ele cobra o canto composto, não o Escopo A. Só deve ficar verde junto
+com:
 
-- teste topológico: uma aresta de cubo vira dois ou mais painéis e cada
-  transição mede `ângulo/(paineis+1)`;
-- teste de raio: `r` excessivo aborta sem criar V/F; `r` válido mede o arco;
-- teste de identidade: cada `painel:k` resolve e painéis antigos não trocam de
-  identidade;
-- teste de determinismo: mesmo PASSOS dá neutro byte-idêntico;
 - teste composto: uma aresta de `chamferBox` deixa de gritar e permanece
   manifold, sem face autoencostada;
 - prova não automotiva antes da prova no freio;

@@ -122,10 +122,10 @@ Estado atual:
 - a revisão visual oficial de autoria agora é `npm run revisar -- <peça>`: ela
   abre a bancada neutra nas quatro vistas canônicas e recusa geometria cortada
   ou pequena demais; `npm run peca` ficou apenas como diagnóstico herdado;
-- o próximo desenho de linguagem é o filete real v2: o atual é explicitamente
-  um chanfro de um painel. O requisito de vários painéis e de canto composto
-  (inclusive `chamferBox`) está em [`FILETE-V2.md`](FILETE-V2.md), com gate de
-  descoberta ainda vermelho, sem fingir que a pinça já foi arredondada;
+- o filete real v2 está em progresso: `arredondarAresta` já cobre o anel simples
+  com vários painéis e raio medido; falta apenas o canto composto (inclusive
+  `chamferBox`), cujo gate permanece vermelho por honestidade. O contrato e a
+  fronteira estão em [`FILETE-V2.md`](FILETE-V2.md);
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -149,7 +149,7 @@ Use esta ordem para resolver dúvidas:
    — briefing por peça, revisão intermediária e critério para extrair uma skill;
 6. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
    autoria visual e experiência do cliente;
-7. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — desenho e gate pendente do
+7. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — contrato e gate do
    arredondamento real de aresta;
 8. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
@@ -364,10 +364,10 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Próxima entrega: ainda não escolhida.** Aberto ao fim do ciclo 5: A-35, A-36
-(o filete de um painel é chanfro, não arredondamento) e A-37 (o filete não compõe
-com `chamferBox`, e era justo a pinça que o gate nomeou). A-34 e A-36 são o mesmo
-assunto por dois lados: quebrar a quina sem multiplicar a malha.
+**Recorte técnico ativo: Filete v2.** O Escopo A resolveu A-36 para uma aresta
+de anel simples: `arredondarAresta` tem raio real, múltiplos painéis e
+identidade. O próximo passo estrito é A-37: canto composto em `chamferBox`, sem
+promover a pinça antes da prova não automotiva e do gate topológico.
 
 ## Manutenção desta documentação
 

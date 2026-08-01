@@ -905,6 +905,45 @@ const CONTRATOS_ORIGEM = {
       return { faces };
     },
   },
+  /* `arredondarAresta` é o sucessor do chanfro `filete`: o eixo mantém a
+     mesma gramática, mas cada face publicada é uma faixa da aproximação do
+     arco. A operação não reaproveita o nome do v1 justamente para não fazer
+     `painel:1` mudar de significado em conteúdo salvo. */
+  arredondarAresta: {
+    validar(origem) {
+      const chaves = ['op', 'id', 'painel'];
+      const msg = "arredondarAresta usa op, id e painel opcional (eixo numérico sobre os painéis do arco: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todos, ou filtro de progressão {passo,fase})";
+      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+      if (!validarEixo(origem.painel)) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const lista = registro.paineis;
+      if (!lista.length) return { erro: `origem arredondarAresta:${origem.id} não tem painéis` };
+      if (eixoDeIndiceUnico(origem.painel)) {
+        const r = indiceDeEixo(st, origem.painel, lista.length);
+        if (r.erro) return { erro: `painel '${origem.painel}' da origem arredondarAresta:${origem.id} ${r.erro}` };
+        if (r.idx >= lista.length) return { erro: `painel ${textoDeEixo(origem.painel, r.idx)} fora do limite da origem arredondarAresta:${origem.id} (0..${lista.length - 1})` };
+        const f = lista[r.idx];
+        if (!st.F.has(f)) return { erro: `painel ${textoDeEixo(origem.painel, r.idx)} da origem arredondarAresta:${origem.id} foi removido${consumoDe(st, f)}` };
+        return { faces: [f] };
+      }
+      const idx = indicesEixo(origem.painel, lista.length);
+      if (typeof origem.painel === 'object' && origem.painel != null && !idx.length) {
+        const { passo, fase } = origem.painel;
+        return { erro: `filtro de painel {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${lista.length - 1} na origem arredondarAresta:${origem.id}` };
+      }
+      const faces = [];
+      for (const k of idx) {
+        const f = lista[k];
+        const consumo = conferirConsumo(st, f, `painel ${k} da origem arredondarAresta:${origem.id}`);
+        if (consumo) return { erro: consumo };
+        if (st.F.has(f)) faces.push(f);
+      }
+      if (!faces.length) return { erro: `origem arredondarAresta:${origem.id} não tem nenhum painel vivo` };
+      return { faces };
+    },
+  },
 };
 
 /* Fonte canônica curta para ferramentas e documentação de autoria. A lista é
@@ -3634,6 +3673,176 @@ export const OPS = {
     if (saidaId != null) { st.F.delete(saidaId); st.consumidas.set(saidaId, { passo: i, op: 'furo' }); }
 
     registraOrigem(st, i, 'furo', a.origemId, { furos, preenchimento, preenchimentoDaSaida });
+  },
+
+  /* arredondarAresta (Escopo A do filete v2) — uma faixa de arco com dois ou
+     mais painéis, numa aresta manifold de ponta simples. `filete` continua
+     logo abaixo, intacto, como o chanfro v1 compatível.
+
+     O raio aqui é raio GEOMÉTRICO: a tangência recua `r/tan(θ/2)` em cada face
+     e o centro fica a `r/sin(θ/2)` no bissetor. Antes de escrever V/F a op
+     mede a primeira borda que cada recuo encontra nas duas faces; raio que não
+     cabe grita sem deixar meia malha. Canto composto ainda não entra aqui: o
+     leque de `chamferBox` será Escopo B, com uma partição própria. */
+  arredondarAresta(st, a, i) {
+    const b = baseDoPasso(i);
+    if (a.origemId == null) return grita(st, i, 'arredondarAresta', 'origemId', 'arredondarAresta é sempre estrutural: origemId é obrigatório');
+    if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, 'arredondarAresta', 'origemId', 'origemId precisa ser inteiro não-negativo');
+    const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
+    if (declaracoes.length > 1) return grita(st, i, 'arredondarAresta', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
+
+    const faceAId = faceUnicaEstrutural(st, a.de, 'arredondarAresta', 'de', i);
+    if (faceAId == null) return;
+    const faceA = st.F.get(faceAId);
+    const L = faceA.vs.length;
+    if (!Number.isSafeInteger(a.aresta) || a.aresta < 0 || a.aresta >= L) return grita(st, i, 'arredondarAresta', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos)`);
+    const paineis = st.num(a.paineis ?? 0);
+    if (!Number.isSafeInteger(paineis) || paineis < 2) return grita(st, i, 'arredondarAresta', 'paineis', 'paineis precisa ser inteiro >= 2 (um painel é o chanfro filete v1)');
+    if (paineis > Math.floor(BLOCO / 2)) return grita(st, i, 'arredondarAresta', 'paineis', `paineis ${paineis} estoura o bloco de ids (${BLOCO})`);
+    const raio = st.num(a.raio ?? 0);
+    if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'arredondarAresta', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
+
+    const v0 = faceA.vs[a.aresta], v1 = faceA.vs[(a.aresta + 1) % L];
+    let faceBId = null; let reversa = true;
+    for (const [fid, f] of st.F) {
+      if (fid === faceAId) continue;
+      for (let k = 0; k < f.vs.length; k++) {
+        const p = f.vs[k], q = f.vs[(k + 1) % f.vs.length];
+        if ((p === v1 && q === v0) || (p === v0 && q === v1)) {
+          if (faceBId != null) { faceBId = -2; break; }
+          faceBId = fid; reversa = p === v1 && q === v0;
+        }
+      }
+      if (faceBId === -2) break;
+    }
+    if (faceBId == null) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${a.aresta} da face ${faceAId} não é compartilhada por nenhuma outra face`);
+    if (faceBId === -2) return grita(st, i, 'arredondarAresta', 'de', `a aresta ${a.aresta} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold`);
+    if (!reversa) return grita(st, i, 'arredondarAresta', 'de', `a face ${faceBId} percorre a aresta ${a.aresta} no mesmo sentido de ${faceAId} — winding inválido para malha fechada`);
+    const faceB = st.F.get(faceBId);
+
+    const planoA = poligonoPlano(st, faceAId);
+    if (planoA.erro) return grita(st, i, 'arredondarAresta', 'de', planoA.erro);
+    const planoB = poligonoPlano(st, faceBId);
+    if (planoB.erro) return grita(st, i, 'arredondarAresta', 'de', planoB.erro);
+    const erroConvexoA = convexoCCW(planoA.uv);
+    const erroConvexoB = convexoCCW(planoB.uv);
+    if (erroConvexoA || erroConvexoB) return grita(st, i, 'arredondarAresta', 'de', `Escopo A exige duas faces convexas: ${erroConvexoA || erroConvexoB}`);
+
+    const P = st.V.get(v0), Q = st.V.get(v1);
+    const eBruto = [Q[0] - P[0], Q[1] - P[1], Q[2] - P[2]];
+    const elen = Math.hypot(...eBruto);
+    if (!(elen > 1e-9)) return grita(st, i, 'arredondarAresta', 'aresta', 'a aresta tem comprimento ~0');
+    const e = eBruto.map((n) => n / elen);
+    const centroide = (f) => f.vs.reduce((c, v) => {
+      const p = st.V.get(v); return [c[0] + p[0] / f.vs.length, c[1] + p[1] / f.vs.length, c[2] + p[2] / f.vs.length];
+    }, [0, 0, 0]);
+    const perpendicularInterna = (alvo, quem) => {
+      const d = [alvo[0] - P[0], alvo[1] - P[1], alvo[2] - P[2]];
+      const proj = d[0] * e[0] + d[1] * e[1] + d[2] * e[2];
+      const r = [d[0] - e[0] * proj, d[1] - e[1] * proj, d[2] - e[2] * proj];
+      const l = Math.hypot(...r);
+      if (!(l > 1e-9)) { grita(st, i, 'arredondarAresta', quem, 'face degenerada: centroide cai sobre a aresta'); return null; }
+      return r.map((n) => n / l);
+    };
+    const dA = perpendicularInterna(centroide(faceA), 'de'); if (!dA) return;
+    const dB = perpendicularInterna(centroide(faceB), 'de'); if (!dB) return;
+    const cosT = Math.max(-1, Math.min(1, dA[0] * dB[0] + dA[1] * dB[1] + dA[2] * dB[2]));
+    const theta = Math.acos(cosT);
+    if (!(theta > 1e-6) || !(theta < Math.PI - 1e-6)) return grita(st, i, 'arredondarAresta', 'aresta', 'as duas faces são coplanares ou dobram quase 180° — não há canto arredondável');
+
+    /* Até onde cada canto pode andar na direção de tangência antes de tocar a
+       próxima borda da própria face. A conta 2D também cobre o caso em que a
+       direção corre exatamente SOBRE a aresta vizinha (caso do cubo). */
+    const limiteNoPoligono = (plano, inicio, direcao) => {
+      const o = plano.proj(inicio);
+      const fim = plano.proj([inicio[0] + direcao[0], inicio[1] + direcao[1], inicio[2] + direcao[2]]);
+      const d = [fim[0] - o[0], fim[1] - o[1]];
+      const cruz = (u, v) => u[0] * v[1] - u[1] * v[0];
+      let limite = Infinity;
+      for (let k = 0; k < plano.uv.length; k++) {
+        const A = plano.uv[k], B = plano.uv[(k + 1) % plano.uv.length];
+        const s = [B[0] - A[0], B[1] - A[1]], w = [A[0] - o[0], A[1] - o[1]];
+        const den = cruz(d, s);
+        if (Math.abs(den) < 1e-9) {
+          if (Math.abs(cruz(w, d)) < 1e-8) for (const X of [A, B]) {
+            const t = (X[0] - o[0]) * d[0] + (X[1] - o[1]) * d[1];
+            if (t > 1e-8) limite = Math.min(limite, t);
+          }
+          continue;
+        }
+        const t = cruz(w, s) / den;
+        const u = cruz(w, d) / den;
+        if (t > 1e-8 && u >= -1e-8 && u <= 1 + 1e-8) limite = Math.min(limite, t);
+      }
+      return limite;
+    };
+    const recuo = raio / Math.tan(theta / 2);
+    const limites = [
+      limiteNoPoligono(planoA, P, dA), limiteNoPoligono(planoA, Q, dA),
+      limiteNoPoligono(planoB, P, dB), limiteNoPoligono(planoB, Q, dB),
+    ];
+    const maxRecuo = Math.min(...limites);
+    if (!(recuo < maxRecuo - 1e-8)) return grita(st, i, 'arredondarAresta', 'raio', `raio ${raio} não cabe nas faces vizinhas (máximo < ${(maxRecuo * Math.tan(theta / 2)).toFixed(6)})`);
+
+    const terceiraFace = (v, ponta) => {
+      const achadas = [];
+      for (const [fid, f] of st.F) if (fid !== faceAId && fid !== faceBId && f.vs.includes(v)) achadas.push(fid);
+      if (achadas.length !== 1) {
+        grita(st, i, 'arredondarAresta', 'aresta', `a ponta ${ponta} tem ${achadas.length} face(s) além das duas da aresta; canto composto é Escopo B`);
+        return null;
+      }
+      return achadas[0];
+    };
+    const faceCId = terceiraFace(v0, 'v0'); if (faceCId == null) return;
+    const faceDId = terceiraFace(v1, 'v1'); if (faceDId == null) return;
+    const faceC = st.F.get(faceCId), faceD = st.F.get(faceDId);
+    const idx = (f, v) => f.vs.indexOf(v);
+    const antes = (f, v) => f.vs[(idx(f, v) - 1 + f.vs.length) % f.vs.length];
+    const depois = (f, v) => f.vs[(idx(f, v) + 1) % f.vs.length];
+    const prevA = antes(faceA, v0), nextA = depois(faceA, v1), nextB = depois(faceB, v0), prevB = antes(faceB, v1);
+    if (antes(faceC, v0) !== nextB || depois(faceC, v0) !== prevA || antes(faceD, v1) !== nextA || depois(faceD, v1) !== prevB) {
+      return grita(st, i, 'arredondarAresta', 'aresta', 'as faces de ponta não percorrem a vizinhança no sentido de malha fechada');
+    }
+
+    const bissetor = norm3(dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]);
+    const distanciaCentro = raio / Math.sin(theta / 2);
+    const ponto = (base, d, escala) => [base[0] + d[0] * escala, base[1] + d[1] * escala, base[2] + d[2] * escala];
+    const centroP = ponto(P, bissetor, distanciaCentro), centroQ = ponto(Q, bissetor, distanciaCentro);
+    const tangA0 = ponto(P, dA, recuo), tangB0 = ponto(P, dB, recuo);
+    const tangA1 = ponto(Q, dA, recuo), tangB1 = ponto(Q, dB, recuo);
+    const rad = (tang, centro) => norm3(tang[0] - centro[0], tang[1] - centro[1], tang[2] - centro[2]);
+    const rAP = rad(tangA0, centroP), rBP = rad(tangB0, centroP), rAQ = rad(tangA1, centroQ), rBQ = rad(tangB1, centroQ);
+    const phi = Math.acos(Math.max(-1, Math.min(1, rAP[0] * rBP[0] + rAP[1] * rBP[1] + rAP[2] * rBP[2])));
+    const senoPhi = Math.sin(phi);
+    if (!(senoPhi > 1e-8)) return grita(st, i, 'arredondarAresta', 'aresta', 'arco degenerado entre as duas tangências');
+    const noArco = (inicio, fim, centro, k) => {
+      const t = k / paineis;
+      const a0 = Math.sin((1 - t) * phi) / senoPhi, a1 = Math.sin(t * phi) / senoPhi;
+      const r = norm3(inicio[0] * a0 + fim[0] * a1, inicio[1] * a0 + fim[1] * a1, inicio[2] * a0 + fim[2] * a1);
+      return [centro[0] + r[0] * raio, centro[1] + r[1] * raio, centro[2] + r[2] * raio];
+    };
+
+    const Pk = [v0], Qk = [v1];
+    for (let k = 1; k <= paineis; k++) {
+      const idP = b + (k - 1) * 2, idQ = idP + 1;
+      addV(st, idP, noArco(rAP, rBP, centroP, k));
+      addV(st, idQ, noArco(rAQ, rBQ, centroQ, k));
+      Pk.push(idP); Qk.push(idQ);
+    }
+    st.V.set(v0, tangA0); st.V.set(v1, tangA1);
+    const paineisIds = [];
+    for (let k = 1; k <= paineis; k++) {
+      const id = b + k - 1;
+      addF(st, id, [Pk[k], Qk[k], Qk[k - 1], Pk[k - 1]]);
+      const painel = st.F.get(id);
+      painel.cor = faceA.cor; painel.material = faceA.material; painel.parte = faceA.parte;
+      painel.liso = faceA.liso; painel.solido = faceA.solido;
+      paineisIds.push(id);
+    }
+    faceB.vs = faceB.vs.map((v) => (v === v0 ? Pk[paineis] : v === v1 ? Qk[paineis] : v));
+    faceC.vs = faceC.vs.flatMap((v) => (v === v0 ? [...Pk.slice(1).reverse(), v0] : [v]));
+    faceD.vs = faceD.vs.flatMap((v) => (v === v1 ? [v1, ...Qk.slice(1)] : [v]));
+    registraOrigem(st, i, 'arredondarAresta', a.origemId, { paineis: paineisIds });
   },
 
   /* filete (ciclo "Curva e filete v1") — arredonda UMA ARESTA escolhida por

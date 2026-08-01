@@ -159,12 +159,14 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const NAO_E_ID = [
     'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
-    'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'perfil', 'peso', 'pivo', 'pos', 'prof',
+    'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
     'profundidade', 'raio', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta',
   ];
-  /* `aresta` (op `filete`) é o ÍNDICE LOCAL da aresta dentro do polígono de
+  /* `aresta` (ops `filete` e `arredondarAresta`) é o ÍNDICE LOCAL da aresta dentro do polígono de
      `de` — uma posição 0..cantos-1, a mesma classe de referência que `lado`
      (cilindro) já é; nunca aponta pra um id de vértice ou de face.
+     `paineis` é TOPO do arredondamento: conta a discretização do arco, nunca
+     um id de face (cada face criada recebe a identidade `painel:k`).
      `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
      do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
      forma de lista é `[[x,y,z], …]` e a de círculo é `{pivo, distancia, total,

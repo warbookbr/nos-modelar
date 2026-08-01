@@ -60,7 +60,7 @@ aceitam `origemId`/publicam `sel:{origem}` é exportada como
 `OPERACOES_COM_ORIGEM`. Esta tabela ensina o uso, não deve virar uma cópia de
 contrato de faces.
 
-<!-- operacoes-com-origem: arranja, chamferBox, cilindro, cone, cubo, esfera, espelha, filete, furo, inflate, lathe, loft, plano -->
+<!-- operacoes-com-origem: arranja, arredondarAresta, chamferBox, cilindro, cone, cubo, esfera, espelha, filete, furo, inflate, lathe, loft, plano -->
 
 | op | args | nota |
 |---|---|---|
@@ -90,6 +90,7 @@ contrato de faces.
 | `solido` | `faces:[ids]` (legado) ou `sel` | o que entra na colisão |
 | `inflate` | `contornoLado`/`contornoTopo` com pontos `[u,w,raioDeConcordancia?]`, `divisoes`, `segmentosCurva?`, `origemId?` | publica a origem inteira. É um volume voxelizado, fechado porém facetado; a alça de curva suaviza o contorno de entrada, não transforma o resultado em superfície orgânica lisa. |
 | `filete` | `origemId`, `de` (uma face estrutural), `aresta`, `raio` | estado atual: um único painel, portanto **chanfro**, não arredondamento. Funciona só em aresta manifold de ponta simples; `chamferBox` e cantos complexos ainda são recusados. O desenho do v2 fica em `docs/mecanifica/FILETE-V2.md`. |
+| `arredondarAresta` | `origemId`, `de` (uma face estrutural), `aresta`, `raio`, `paineis` inteiro ≥ 2 | raio real aproximado por uma faixa de painéis, com cada painel citável como `sel:{origem:{op:'arredondarAresta',id,painel}}`. Por enquanto é o **Escopo A**: só anel simples, faces convexas e uma face de continuidade em cada ponta. Recusa canto composto — inclusive `chamferBox` — antes de alterar a malha. |
 
 **SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
 `moveF`, `moveA`, `vira`, `extruda` e `mescla` (a sétima é `pesar`, mesma

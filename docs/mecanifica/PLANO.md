@@ -21,13 +21,13 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 
 - fases 0 a 4: concluídas;
 - fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- **nenhum ciclo técnico está em execução.** O ciclo 4 ("Corte e orientação de
-  seção v1") e o ciclo 5 ("Curva e filete v1") estão concluídos. O v1 do
-  `filete` foi medido e recebeu seu nome honesto: um painel é chanfro, não raio.
-  A continuação necessária, `arredondarAresta` com vários painéis e canto
-  composto, está desenhada em [`FILETE-V2.md`](FILETE-V2.md) e ainda não foi
-  iniciada no núcleo; o gate de descoberta falha de propósito até esse contrato
-  existir (`node tools/oficina/filete-v2-aceitacao.mjs`).
+- **um recorte técnico está em execução:** Filete v2. O ciclo 4 ("Corte e
+  orientação de seção v1") e o ciclo 5 ("Curva e filete v1") permanecem
+  concluídos. O v1 do `filete` conserva seu nome honesto: um painel é chanfro,
+  não raio. O **Escopo A** de `arredondarAresta` já entrega raio real com vários
+  painéis, identidade e prova pelo adaptador; o **Escopo B** (canto composto,
+  inclusive `chamferBox`) ainda não começou. O gate composto continua vermelho
+  de propósito até esse contrato existir (`node tools/oficina/filete-v2-aceitacao.mjs`).
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
