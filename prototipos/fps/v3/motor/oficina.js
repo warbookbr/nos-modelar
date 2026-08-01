@@ -861,6 +861,50 @@ const CONTRATOS_ORIGEM = {
       return { faces };
     },
   },
+  /* filete (ciclo "Curva e filete v1") — a origem que a op `filete` publica: os
+     `n` PAINÉIS novos que substituem a aresta escolhida, um eixo NUMÉRICO só
+     (`painel`, 0..n-1, mesma gramática dos outros eixos — inteiro, nome de
+     PARAM/expressão, extremidade 'primeira'/'ultima', ausente = todos, ou
+     filtro de progressão {passo,fase}). Não existe família nominal: a face de
+     ENTRADA (`de`) e a face do outro lado da aresta continuam vivas com a
+     IDENTIDADE que já tinham antes do filete (o filete não as consome — ver
+     comentário da op), então elas seguem citáveis pela origem ANTIGA delas;
+     só os painéis novos são desta origem. */
+  filete: {
+    validar(origem) {
+      const chaves = ['op', 'id', 'painel'];
+      const msg = "filete usa op, id e painel opcional (eixo numérico sobre os N painéis novos: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todos, ou filtro de progressão {passo,fase})";
+      if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+      if (!validarEixo(origem.painel)) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const lista = registro.paineis;
+      if (!lista.length) return { erro: `origem filete:${origem.id} não tem painéis` };
+      if (eixoDeIndiceUnico(origem.painel)) {
+        const r = indiceDeEixo(st, origem.painel, lista.length);
+        if (r.erro) return { erro: `painel '${origem.painel}' da origem filete:${origem.id} ${r.erro}` };
+        if (r.idx >= lista.length) return { erro: `painel ${textoDeEixo(origem.painel, r.idx)} fora do limite da origem filete:${origem.id} (0..${lista.length - 1})` };
+        const f = lista[r.idx];
+        if (!st.F.has(f)) return { erro: `painel ${textoDeEixo(origem.painel, r.idx)} da origem filete:${origem.id} foi removido${consumoDe(st, f)}` };
+        return { faces: [f] };
+      }
+      const idx = indicesEixo(origem.painel, lista.length);
+      if (typeof origem.painel === 'object' && origem.painel != null && !idx.length) {
+        const { passo, fase } = origem.painel;
+        return { erro: `filtro de painel {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${lista.length - 1} na origem filete:${origem.id}` };
+      }
+      const faces = [];
+      for (const k of idx) {
+        const f = lista[k];
+        const consumo = conferirConsumo(st, f, `painel ${k} da origem filete:${origem.id}`);
+        if (consumo) return { erro: consumo };
+        if (st.F.has(f)) faces.push(f);
+      }
+      if (!faces.length) return { erro: `origem filete:${origem.id} não tem nenhum painel vivo` };
+      return { faces };
+    },
+  },
 };
 function validarOrigem(origem) {
   if (!origem || typeof origem !== 'object' || Array.isArray(origem) || !Object.hasOwn(origem, 'op') || !Object.hasOwn(origem, 'id')) return { erro: 'origem precisa ser um objeto com op e id' };
@@ -3584,6 +3628,199 @@ export const OPS = {
     if (saidaId != null) { st.F.delete(saidaId); st.consumidas.set(saidaId, { passo: i, op: 'furo' }); }
 
     registraOrigem(st, i, 'furo', a.origemId, { furos, preenchimento, preenchimentoDaSaida });
+  },
+
+  /* filete (ciclo "Curva e filete v1") — arredonda UMA ARESTA escolhida por
+     IDENTIDADE ESTRUTURAL, ao contrário do `chamferBox` que chanfra a caixa
+     inteira. É o precedente do `furo` seguido de perto: `de` endereça a face
+     de entrada, o corte grita em toda referência ambígua/vazia, e o que ele
+     cria entra em `CONTRATOS_ORIGEM` como mais uma família citável.
+
+     A DIFERENÇA do `furo`: o filete NÃO CONSOME as duas faces adjacentes à
+     aresta — ele as mantém com a MESMA identidade (mesmo `f.id`), só muda a
+     forma delas. Isto evita o problema do "canto de três arestas" (fora de
+     escopo, ver plano): a maioria das arestas de uma peça sólida tem, em cada
+     ponta, um TERCEIRO vértice/face que não faz parte deste filete — mexer na
+     posição do vértice da aresta quebraria a costura com essa terceira face
+     (uma trinca ao longo da aresta vizinha, não um canto pontual). A solução:
+     os vértices ORIGINAIS da aresta (`v0`,`v1`) NUNCA SE MEXEM e NUNCA SAEM
+     das duas faces — o filete só INSERE dois vértices novos ENTRE eles, no
+     próprio plano de cada face (`v0 → P0 → Q0 → v1` na face de entrada,
+     simétrico na face do outro lado). As outras arestas de ambas as faces
+     ficam byte-idênticas; só a aresta escolhida ganha uma dobra pra dentro.
+
+     ARGUMENTOS
+       `origemId`   OBRIGATÓRIO — o painel novo nasceria anônimo sem ele, como
+                    no `furo`;
+       `de`         OBRIGATÓRIO, origem estrutural de UMA face (a face de
+                    ENTRADA — só decide de qual lado o autor está olhando; o
+                    filete em si é simétrico entre as duas faces da aresta);
+       `aresta`     índice LOCAL da aresta dentro do polígono de `de` — a
+                    aresta entre o canto `aresta` e o canto `aresta+1` (mód. o
+                    número de cantos). Não é id cru: é a POSIÇÃO da aresta
+                    dentro da face nomeada, a mesma classe de referência que
+                    `face:'topo'` do cubo ou `lado` do cilindro já usam;
+       `raio`       PARAM, > 0 — a profundidade do corte, medida perpendicular
+                    à aresta, dentro de cada face.
+
+     A ARESTA PRECISA SER MANIFOLD: exatamente DUAS faces a compartilham (a de
+     `de` e mais uma). Zero ou mais de uma GRITAM — não há "meio filete".
+
+     GEOMETRIA (medida, travada por teste): sejam `dA`/`dB` os vetores, dentro
+     de cada face, PERPENDICULARES à aresta e apontando do canto pro centroide
+     da própria face (ambos ⊥ à aresta), e `θ` o ângulo entre eles — para duas
+     faces perpendiculares (o caso do `chamferBox`/caixa), `θ = 90°`. O corte
+     insere UM painel novo, um retângulo entre `P0 = v0 + raio·dA` / `Q0 = v1 +
+     raio·dA` (no plano da face de entrada) e `P1 = v0 + raio·dB` / `Q1 = v1 +
+     raio·dB` (no plano da outra face) — o mesmo corte FLAT do `chamferBox`,
+     só que numa aresta ESCOLHIDA em vez de nas 12 da caixa inteira (ele É o
+     caso de UM corte só da mesma família). O ângulo criado é `θ/2` de cada
+     lado — para uma aresta de 90°, os dois nascem a exatamente 45°, o que a
+     condição 5 do gate pede (`n=1` painel, `θ/(n+1) = 45°`) e o teste mede.
+
+     SÓ UM PAINEL NESTA RODADA (não é TOPO, não tem parâmetro `segmentos`):
+     subdividir o corte em vários painéis foi tentado e MEDIDO — a amostragem
+     por interpolação esférica entre `dA` e `dB` produz um painel intermediário
+     cuja normal NÃO fica "entre" as normais das duas faces do jeito ingênuo
+     (o painel mais perto da face de entrada sai com a normal mais perto da
+     OUTRA face, não da própria — verificado numericamente, não hipotético).
+     Um filete de vários segmentos exige uma segunda derivação, cuidando dessa
+     não-linearidade; ficou de fora, registrado como atrito em vez de entregue
+     quebrado.
+
+     NUMERAÇÃO (formato salvo). Com `b` a base do passo: VÉRTICES `b+0`=P0,
+     `b+1`=Q0, `b+2`=P1, `b+3`=Q1; FACE (o painel) `b+0`, ligando as duas
+     fileiras. As faces de entrada/saída NÃO SÃO recriadas — `addF` nunca roda
+     nelas — só o array `vs` delas GANHA dois cantos novos entre `v0` e `v1`.
+
+     HERANÇA: o painel novo herda cor/material/parte/liso/solido da face de
+     ENTRADA (a mesma lei do `furo`/`espelha`).
+
+     COMPLETUDE: aresta fora do índice, aresta não-manifold, faces quase
+     coplanares (nada para arredondar) ou dobradas quase 180° (canto
+     degenerado), raio ≤ 0 ou não-finito — cada um GRITA nomeando a causa; a
+     op não constrói nada nesse passo.
+
+     FORA DE ESCOPO (declarado, não escondido): filete de VÁRIOS segmentos
+     (ver acima), filete VARIÁVEL ao longo da aresta, filete de CANTO (três
+     arestas se encontrando num vértice) e concordância entre CORPOS
+     diferentes. O raio não é conferido contra o tamanho das faces vizinhas
+     (um raio grande demais pode fazer o painel novo ultrapassar a face) —
+     isto é uma responsabilidade do autor, não uma guarda do núcleo;
+     registrado como atrito. */
+  filete(st, a, i) {
+    const b = baseDoPasso(i);
+    if (a.origemId == null) return grita(st, i, 'filete', 'origemId', 'filete é sempre estrutural: origemId é obrigatório (sem ele os painéis novos nasceriam anônimos)');
+    if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, 'filete', 'origemId', 'origemId precisa ser inteiro não-negativo');
+    const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
+    if (declaracoes.length > 1) return grita(st, i, 'filete', 'origemId', textoDeclaracoes(a.origemId, declaracoes));
+
+    const faceAId = faceUnicaEstrutural(st, a.de, 'filete', 'de', i);
+    if (faceAId == null) return;
+    const faceA = st.F.get(faceAId);
+    const L = faceA.vs.length;
+    if (!Number.isSafeInteger(a.aresta) || a.aresta < 0 || a.aresta >= L) return grita(st, i, 'filete', 'aresta', `aresta precisa ser um índice inteiro 0..${L - 1} (a face ${faceAId} tem ${L} cantos); recebido ${JSON.stringify(a.aresta ?? null)}`);
+    const v0 = faceA.vs[a.aresta], v1 = faceA.vs[(a.aresta + 1) % L];
+
+    // ---- a OUTRA face que compartilha esta aresta (manifold: exatamente 2) ----
+    let faceBId = null, reversa = true;
+    for (const [fid, f] of st.F) {
+      if (fid === faceAId) continue;
+      for (let k = 0; k < f.vs.length; k++) {
+        const p = f.vs[k], q = f.vs[(k + 1) % f.vs.length];
+        if ((p === v1 && q === v0) || (p === v0 && q === v1)) {
+          if (faceBId != null) { faceBId = -2; break; }
+          faceBId = fid; reversa = (p === v1 && q === v0);
+        }
+      }
+      if (faceBId === -2) break;
+    }
+    if (faceBId == null) return grita(st, i, 'filete', 'de', `a aresta ${a.aresta} da face ${faceAId} não é compartilhada por nenhuma outra face (não é uma aresta de MANIFOLD)`);
+    if (faceBId === -2) return grita(st, i, 'filete', 'de', `a aresta ${a.aresta} da face ${faceAId} é compartilhada por mais de duas faces — não é manifold, filete exige exatamente 2`);
+    const faceB = st.F.get(faceBId);
+
+    const P = st.V.get(v0), Q = st.V.get(v1);
+    const ex = Q[0] - P[0], ey = Q[1] - P[1], ez = Q[2] - P[2];
+    const elen = Math.hypot(ex, ey, ez);
+    if (!(elen > 1e-9)) return grita(st, i, 'filete', 'aresta', `a aresta ${a.aresta} da face ${faceAId} tem comprimento ~0 (v0 e v1 coincidem)`);
+    const e = [ex / elen, ey / elen, ez / elen];
+
+    const centroide = (f) => { const c = [0, 0, 0]; for (const v of f.vs) { const p = st.V.get(v); c[0] += p[0] / f.vs.length; c[1] += p[1] / f.vs.length; c[2] += p[2] / f.vs.length; } return c; };
+    const perpUnit = (alvo, campo) => {
+      const d = [alvo[0] - P[0], alvo[1] - P[1], alvo[2] - P[2]];
+      const proj = d[0] * e[0] + d[1] * e[1] + d[2] * e[2];
+      const r = [d[0] - e[0] * proj, d[1] - e[1] * proj, d[2] - e[2] * proj];
+      const l = Math.hypot(r[0], r[1], r[2]);
+      if (!(l > 1e-9)) { grita(st, i, 'filete', campo, 'face degenerada: o centroide cai sobre a própria aresta'); return null; }
+      return [r[0] / l, r[1] / l, r[2] / l];
+    };
+    const dA = perpUnit(centroide(faceA), 'de');
+    if (!dA) return;
+    const dB = perpUnit(centroide(faceB), 'de');
+    if (!dB) return;
+
+    const cosT = Math.max(-1, Math.min(1, dA[0] * dB[0] + dA[1] * dB[1] + dA[2] * dB[2]));
+    const theta = Math.acos(cosT);
+    if (!(theta > 1e-6)) return grita(st, i, 'filete', 'aresta', 'as duas faces desta aresta são quase coplanares — não há canto para arredondar');
+    if (!(theta < Math.PI - 1e-6)) return grita(st, i, 'filete', 'aresta', 'as duas faces desta aresta se dobram quase 180° uma sobre a outra — canto degenerado');
+
+    /* winding não-padrão (faceB percorre a aresta no MESMO sentido de faceA,
+       em vez do oposto que toda malha fechada exige) só acontece com uma
+       normal virada — provavelmente uma face que passou por `vira`. Consertar
+       esse caso pediria uma segunda derivação de winding; fica de fora,
+       GRITANDO em vez de fechar a malha torta. */
+    if (!reversa) return grita(st, i, 'filete', 'de', `a face do outro lado da aresta ${a.aresta} tem o sentido de percurso invertido em relação a ${faceAId} (normal provavelmente virada) — filete exige as duas no sentido padrão de malha fechada`);
+
+    const raio = st.num(a.raio ?? 0);
+    if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'filete', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
+
+    const nV = 4, nF = 3;   // 1 painel + 2 tampas de canto (ver comentário abaixo)
+    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: filete estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+
+    const P0 = [P[0] + raio * dA[0], P[1] + raio * dA[1], P[2] + raio * dA[2]];
+    const P1 = [P[0] + raio * dB[0], P[1] + raio * dB[1], P[2] + raio * dB[2]];
+    const Q0 = [Q[0] + raio * dA[0], Q[1] + raio * dA[1], Q[2] + raio * dA[2]];
+    const Q1 = [Q[0] + raio * dB[0], Q[1] + raio * dB[1], Q[2] + raio * dB[2]];
+    const idP0 = b, idQ0 = b + 1, idP1 = b + 2, idQ1 = b + 3;
+    addV(st, idP0, P0); addV(st, idQ0, Q0); addV(st, idP1, P1); addV(st, idQ1, Q1);
+
+    /* TRÊS faces novas, não uma: inserir P0/Q0 e P1/Q1 no meio de faceA/faceB
+       (preservando v0/v1, ver mais abaixo) abre uma FRESTA em cada ponta da
+       aresta — o segmento v0-P0 (de faceA) e v0-P1 (de faceB, no sentido
+       inserido) não têm par nenhum, porque não são a mesma aresta que o
+       painel cobre. Medido: sem as tampas a malha fica com 6 arestas soltas.
+       Cada tampa é um TRIÂNGULO PLANO fechando essa fresta — não é filete de
+       canto (não arredonda o encontro das três arestas do vértice original;
+       a terceira aresta, a que NÃO foi escolhida, segue exatamente como
+       estava), só o remendo mínimo pra malha continuar fechada.
+       Winding (derivado da MESMA lei do painel — a aresta compartilhada nunca
+       é percorrida duas vezes no mesmo sentido — não é heurística de normal):
+       faceA percorre v0->P0 e Q0->v1; faceB (reversa, ver acima) percorre
+       v1->Q1 e P1->v0; o painel percorre P0->P1 e Q1->Q0. */
+    const herda = (id, fonte) => { const nf = st.F.get(id); nf.cor = fonte.cor; nf.material = fonte.material; nf.parte = fonte.parte; nf.liso = fonte.liso; nf.solido = fonte.solido; };
+    addF(st, b, [idP1, idQ1, idQ0, idP0]);       // painel: P1->Q1 (faceB), Q1->Q0, Q0->P0 (faceA), P0->P1
+    herda(b, faceA);
+    addF(st, b + 1, [idP0, v0, idP1]);           // tampa em v0: P0->v0 (faceA), v0->P1 (faceB), P1->P0 (painel)
+    herda(b + 1, faceA);
+    addF(st, b + 2, [v1, idQ0, idQ1]);           // tampa em v1: v1->Q0 (faceA), Q0->Q1 (painel), Q1->v1 (faceB)
+    herda(b + 2, faceA);
+    const paineis = [b, b + 1, b + 2];
+
+    /* insere os cantos novos DENTRO de faceA/faceB, PRESERVANDO v0/v1 — a
+       terceira face de cada ponta continua vendo exatamente os mesmos ids que
+       já via; só a aresta escolhida ganha a dobra. */
+    const inserir = (f, x, y, novoX, novoY) => {
+      const out = [];
+      for (let k = 0; k < f.vs.length; k++) {
+        out.push(f.vs[k]);
+        if (f.vs[k] === x && f.vs[(k + 1) % f.vs.length] === y) out.push(novoX, novoY);
+      }
+      f.vs = out;
+    };
+    inserir(faceA, v0, v1, idP0, idQ0);
+    inserir(faceB, v1, v0, idQ1, idP1);
+
+    registraOrigem(st, i, 'filete', a.origemId, { paineis });
   },
 
   /* ---- atributos por face ---- */
