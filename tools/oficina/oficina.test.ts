@@ -5757,12 +5757,42 @@ const CUBO_FILETE = (filete: any, extra: any[] = []) => [
 const ARESTA_TOPO_TRAS = { de: { op: 'cubo', id: 1, face: 'topo' }, aresta: 0, raio: 0.1 };
 
 describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de pé', () => {
-  it('custo em faces/vértices: cubo 8V/6F -> 12V/9F (o painel + as 2 tampas de canto que fecham a malha, +4V/+3F)', () => {
+  it('custo em faces/vértices: cubo 8V/6F -> 10V/7F (+2V/+1F, sempre — só o painel)', () => {
     const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1 }]], {}, {});
     const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
     expect(com.orfaos).toEqual([]);
     expect([base.V.size, base.F.size]).toEqual([8, 6]);
-    expect([com.V.size, com.F.size]).toEqual([12, 9]);
+    /* v0 e v1 ANDAM para o lado de faceA em vez de virar órfãos; só o lado de
+       faceB precisa de canto novo. Um corte, um painel, dois vértices. */
+    expect([com.V.size, com.F.size]).toEqual([10, 7]);
+  });
+
+  it('toda face do resultado é um polígono SIMPLES — a versão anterior passava aqui em silêncio e quebrava na tela', () => {
+    /* o primeiro desenho preservava v0/v1 DENTRO de faceA, e com isso a face
+       ficava com um canto EM CIMA da aresta seguinte: polígono que se toca,
+       área de pico nula. O neutro continuava fechado e a contagem batia, então
+       nenhum teste do núcleo caía. Quem gritava era o adaptador, ao triangular
+       em orelhas, e só quando a op chegou numa peça de verdade.
+       A afirmação: nenhum canto de nenhuma face cai sobre uma aresta que não
+       seja a dele. */
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    const dist = (p: number[], a: number[], b: number[]) => {
+      const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      const ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
+      const l2 = ab[0] ** 2 + ab[1] ** 2 + ab[2] ** 2;
+      const t = Math.max(0, Math.min(1, (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) / l2));
+      return Math.hypot(ap[0] - ab[0] * t, ap[1] - ab[1] * t, ap[2] - ab[2] * t);
+    };
+    for (const f of n.F.values()) {
+      const pts = f.vs.map((v: number) => n.V.get(v));
+      for (let k = 0; k < pts.length; k++) {
+        const a = pts[k], b = pts[(k + 1) % pts.length];
+        for (let j = 0; j < pts.length; j++) {
+          if (j === k || j === (k + 1) % pts.length) continue;
+          expect(dist(pts[j], a, b), `face ${f.id}: o canto ${j} cai sobre a aresta ${k}`).toBeGreaterThan(1e-9);
+        }
+      }
+    }
   });
 
   it('a silhueta muda, medida na malha: 45°/45° — a condição 5 do gate (n=1, θ/(n+1) com θ=90°)', () => {
@@ -5775,20 +5805,35 @@ describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de
     expect(ang(nPainel, nFrente)).toBeCloseTo(45, 6);
   });
 
-  it('as arestas NÃO escolhidas ficam EXATAMENTE como estavam — as outras 4 faces do cubo, byte a byte', () => {
+  it('as faces LONGE do corte ficam EXATAMENTE como estavam — mesma lista de cantos', () => {
     const base = nucleo([['cubo', { larg: 1, alt: 1, prof: 1, origemId: 1 }]], {}, {});
     const com = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
-    for (const fid of [0, 2, 3, 5]) expect(com.F.get(fid).vs).toEqual(base.F.get(fid).vs);
+    /* das seis faces do cubo, quatro tocam o corte: as duas da aresta e as
+       duas das PONTAS dela. As outras duas não mudam de canto nenhum. */
+    for (const fid of [0, 2]) expect(com.F.get(fid).vs).toEqual(base.F.get(fid).vs);
   });
 
-  it('faceA e faceB continuam vivas com a MESMA identidade — v0/v1 preservados, dois cantos novos inseridos entre eles', () => {
+  it('as seis faces do cubo continuam VIVAS com a mesma identidade — o filete não consome face nenhuma', () => {
     const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
-    expect(n.F.has(1)).toBe(true);   // topo — mesmo id, não consumida como no furo
-    expect(n.F.has(4)).toBe(true);   // frente — idem
-    expect(n.F.get(1).vs).toContain(7);   // v0 original ainda no array
-    expect(n.F.get(1).vs).toContain(6);   // v1 original ainda no array
-    expect(n.F.get(1).vs).toHaveLength(6);   // quad -> hexágono (2 cantos a mais)
-    expect(n.F.get(4).vs).toHaveLength(6);
+    for (const fid of [0, 1, 2, 3, 4, 5]) expect(n.F.has(fid), `face ${fid} sumiu`).toBe(true);
+    /* faceA e faceB continuam quads: os cantos delas ANDARAM, não se
+       multiplicaram. Quem ganha canto é a terceira face de cada ponta, que é
+       onde a fresta do recuo se fecha. */
+    expect(n.F.get(1).vs).toHaveLength(4);
+    expect(n.F.get(4).vs).toHaveLength(4);
+    expect(n.F.get(3).vs).toHaveLength(5);
+    expect(n.F.get(5).vs).toHaveLength(5);
+  });
+
+  it('as três arestas do vértice que NÃO foram escolhidas continuam retas', () => {
+    /* o corte recua o canto, não arredonda o encontro das três arestas. As
+       arestas vizinhas continuam sendo segmentos únicos entre dois cantos. */
+    const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
+    const v = (id: number) => n.V.get(id);
+    /* a aresta vertical da frente-esquerda: de (−0.5,−0.5,0.5) a (−0.5,0.35,0.5)
+       depois do recuo de 0.1 — continua UMA aresta, sem canto no meio. */
+    const face4 = n.F.get(4).vs.map(v);
+    expect(face4.filter((p: number[]) => Math.abs(p[0] + 0.5) < 1e-9)).toHaveLength(2);
   });
 
   it('o painel novo é ENDEREÇÁVEL: sel.origem cita a origem filete', () => {

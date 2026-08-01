@@ -21,6 +21,55 @@ quem modelou é inesperado.
 
 ## Atritos abertos
 
+### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
+
+**Onde dói:** linguagem da Oficina, ao compor `filete` com `chamferBox`.
+
+**Evidência:** o gate do ciclo 5 nomeou a pinça do `freio-disco` como o caso a
+resolver: "pinça, suporte e pistão são caixas de aresta viva a 90°; uma pinça de
+verdade é fundida". A pinça, o suporte e as orelhas são todos `chamferBox`. O
+`filete` exige que cada PONTA da aresta escolhida tenha exatamente UMA face além
+das duas da aresta — é assim que ele sabe onde fechar a fresta que o recuo abre.
+Numa face de `chamferBox`, cada ponta encosta em DUAS faces a mais (a tira de
+chanfro da aresta vizinha e a face de canto), então o passo grita:
+`a ponta v0 da aresta 0 da face 22001 tem 2 face(s) além das duas da aresta`.
+
+**Contorno usado:** a prova em peça de produto foi para as PASTILHAS, que são
+`cubo` simples. E não foi consolo: o chanfro de entrada e de saída da face de
+atrito existe numa pastilha de verdade por causa de ruído — a quina viva
+entrando no disco excita a vibração que vira o chiado. Quatro filetes, +8 V e
++4 F na peça inteira. A pinça continua uma peça de bloco.
+
+**Capacidade candidata:** o canto de três arestas, declarado fora de escopo no
+gate deste ciclo. Enquanto ele não existir, o `filete` só alcança aresta de
+canto simples — o que exclui toda peça que já passou por `chamferBox`. Vale
+para qualquer família de objeto, não só para pinça.
+
+### A-36 — o filete de UM painel é um chanfro, não um arredondamento
+
+**Onde dói:** linguagem da Oficina, e na leitura que o cliente faz.
+
+**Evidência:** a op `filete` corta a aresta com UM painel plano. Num canto de
+90° isso dá dois cantos de 45°, que é o que a condição 5 do gate pede com
+`n = 1`. A condição está cumprida ao pé da letra e a palavra continua grande
+demais para o que a op faz: dois cantos de 45° são um chanfro. Arredondar pede
+vários painéis.
+
+**Por que ficou assim, e isto foi medido, não suposto:** subdividir o corte por
+interpolação esférica entre as duas direções perpendiculares produz um painel
+intermediário cuja normal NÃO fica entre as normais das duas faces do jeito
+ingênuo — o painel mais perto da face de entrada sai com a normal mais perto da
+OUTRA face. Entregar isso seria entregar quebrado.
+
+**Capacidade candidata:** o filete de vários painéis, com a derivação certa da
+não-linearidade. É o que paga também o A-34 (a silhueta poligonal do furo), que
+é o mesmo assunto visto de outro lado: quebrar a quina sem multiplicar a malha
+inteira.
+
+**Junto, e menor:** o `raio` do filete não é conferido contra o tamanho das
+faces vizinhas. Um raio grande demais faz o painel novo ultrapassar a face, e o
+núcleo não impede. Hoje é responsabilidade declarada do autor.
+
 ### A-35 — `segmentosCurva` é um número por PASSO, não por concordância
 
 **Onde dói:** linguagem da Oficina, nos três lugares que aceitam a alça de

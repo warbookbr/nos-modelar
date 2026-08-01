@@ -340,13 +340,25 @@ A rodada avulsa “Flange de uma peça só” fechou em 31 de julho de 2026 e le
 `centros` a uma peça de PRODUTO: o flange do freio virou um disco com quatro
 furos, e a prova em produto achou e pagou um defeito da partição do núcleo.
 
-**Próxima entrega: o ciclo 5, “Curva e filete v1”, ABERTO, com gate escrito em
-[`PLANO.md`](PLANO.md).** Ele carrega as duas capacidades que sobraram da
-crítica da roda — curva no perfil e filete seletivo. O gate foi escrito na
-abertura, depois de refazer a comparação sobre o estado pós-ciclo 4: o freio é
-uma peça de bloco com aresta viva a 90°, o pneu tem vinco onde deveria ter
-ombro, e a silhueta do furo continua poligonal (A-34). Nove condições, todas
-medidas.
+**O ciclo 5, “Curva e filete v1”, está CONCLUÍDO.** As duas capacidades que
+sobraram da crítica da roda entraram: a alça de curva do 3º elemento do ponto
+virou raio de concordância no `lathe`, no `loft` e no `inflate`, e a op `filete`
+corta UMA aresta escolhida por identidade. As nove condições do gate estão
+conferidas uma a uma em [`PLANO.md`](PLANO.md). Provas: `_caixote-filetado`
+(móvel, usa as duas), o ombro do pneu da `roda-dianteira` e o chanfro de entrada
+e saída das pastilhas do `freio-disco`.
+
+Duas coisas achadas dentro do ciclo, ditas na cara: a condição 2 media a
+distância dos vértices ao arco, que é exata por construção e não podia falhar;
+e o primeiro desenho do filete deixava a face com um canto em cima da aresta
+seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptador,
+e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
+simples.**
+
+**Próxima entrega: ainda não escolhida.** Aberto ao fim do ciclo 5: A-35, A-36
+(o filete de um painel é chanfro, não arredondamento) e A-37 (o filete não compõe
+com `chamferBox`, e era justo a pinça que o gate nomeou). A-34 e A-36 são o mesmo
+assunto por dois lados: quebrar a quina sem multiplicar a malha.
 
 ## Manutenção desta documentação
 

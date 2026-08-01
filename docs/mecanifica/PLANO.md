@@ -234,7 +234,7 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
 | 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
-| 4 | **ABERTO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
+| 4 | **CONCLUÍDO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
 | 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 7 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
@@ -880,7 +880,7 @@ vértice com o barril —, e quem prende os quatro furos ao TOPO da peça é
 `gabarito:selecao:check` regravado com `freio-disco` como ÚNICA peça de hash
 novo, das 26.
 
-### Ciclo 5 — Curva e filete v1 — ABERTO
+### Ciclo 5 — Curva e filete v1 — CONCLUÍDO
 
 **Nome:** Curva e filete v1. São as duas capacidades que sobraram da lista que a
 crítica visual da roda levantou (perfil curvo ou afunilado, orientação de seção,
@@ -903,6 +903,50 @@ ciclo 4.
 oblíquo), relações de montagem, hierarquia de partes, posição na criação da
 primitiva, e novas peças de PRODUTO. A-26 e A-29 NÃO entram: eles são do corte,
 não da curva, e misturá-los reabriria o ciclo 4.
+
+### Fechamento do ciclo 5 — o que passou e o que ficou aberto
+
+As nove condições, uma a uma:
+
+1. **Cumprida.** A alça de curva vale no `perfil` do `lathe`, no `contorno` do
+   `loft` e nos pontos do `inflate`, com a mesma palavra: o 3º elemento é um
+   raio de concordância. Aridade fora do contrato continua gritando.
+2. **Cumprida, depois de trocar a medição.** A afirmação que entrou media a
+   distância dos VÉRTICES ao centro do arco, que é exata por construção e dá
+   0,000000% em qualquer discretização — inclusive com um segmento, onde o
+   arco é uma corda reta a 29% do arco de verdade. Trocada pela flecha da
+   corda, que é o desvio da SUPERFÍCIE. Com 8 segmentos num canto reto: 0,482%.
+3. **Cumprida.** A op `filete` endereça a aresta por origem estrutural, não
+   consome face nenhuma e não regenera a peça.
+4. **Cumprida.** O painel entra em `CONTRATOS_ORIGEM` com o eixo `painel`.
+5. **Cumprida ao pé da letra, e a palavra é grande demais.** Com `n = 1` painel,
+   os dois cantos nascem a 45° exatos, medidos na malha. Dois cantos de 45° são
+   um CHANFRO, não um arredondamento. Está registrado como A-36, aberto.
+6. **Cumprida, com o custo na mesa.** Pneu 280F/320V → 520F/560V; roda inteira
+   494F → 734F (1,49×, não dobra). Freio 504F → 508F (quatro filetes, +1 F
+   cada). Cubo simples com um filete: 8V/6F → 10V/7F.
+7. **Cumprida.** `gabarito:selecao:check` verde, 26 das 28 peças byte-idênticas.
+   Mudaram só `roda-dianteira` e `freio-disco`, as duas reescritas de propósito,
+   mais as duas peças novas.
+8. **Cumprida.** `_caixote-filetado` (móvel, não automotivo) usa AS DUAS: o
+   filete na aresta de cima-da-frente e as concordâncias no perfil do puxador
+   torneado. Em produto, a `roda-dianteira` usa a curva (ombro do pneu) e o
+   `freio-disco` usa o filete (chanfro de entrada e saída das pastilhas).
+9. **Cumprida, com sobrevivente dito na cara.** A troca cos/sin na amostragem do
+   arco sobreviveu à conferência de raio, porque cos²+sin²=1 preserva a
+   distância; virou teste que fixa a tangência exata.
+
+**O defeito que a rodada achou em si mesma, e a lei que sai dele.** O primeiro
+desenho do filete preservava os vértices da aresta dentro das duas faces. O
+neutro continuava FECHADO e a contagem BATIA, então nenhum teste do núcleo caía
+— mas a face ficava com um canto EM CIMA da aresta seguinte. Quem gritou foi o
+adaptador, ao triangular em orelhas, e só quando a op chegou numa peça de
+verdade. **Malha fechada e contagem certa não provam polígono simples.**
+
+**Aberto ao fim do ciclo:** A-35 (`segmentosCurva` é por passo, não por
+concordância), A-36 (o filete de um painel é chanfro), A-37 (o filete não compõe
+com `chamferBox`, e era justo a pinça que precisava). A pinça, o suporte e o
+pistão do freio continuam peças de bloco.
 
 ### Gate do ciclo 5 — escrito na abertura, sobre o estado de hoje
 

@@ -56,6 +56,9 @@ const MEDIDAS = {
   pastilhaEspessura: 0.014,    // fricção + placa de suporte
   pastilhaAltura: 0.048,       // altura RADIAL da faixa de atrito
   pastilhaLargura: 0.076,      // largura da pastilha ao longo do eixo Z
+  /* Ciclo 5: o chanfro de entrada/saída da face de atrito, medido no plano da
+     face. 2,5 mm é a ordem de grandeza de uma pastilha de carro de passeio. */
+  pastilhaChanfro: 0.0025,
   pastilhaBaseY: 0.088,        // raio interno da faixa de atrito
 
   // pinça: ponte por cima do disco + uma garra descendo de cada lado
@@ -184,6 +187,14 @@ const CUBO = 303;
 const FLANGE = 304;
 const FUROS_PRISIONEIRO = 305;
 const PASTILHA_INTERNA = 311;
+/* Ciclo 5: o CHANFRO de entrada e de saída da superfície de atrito. Numa
+   pastilha de verdade ele existe por ruído, não por estética: a quina viva
+   entrando no disco excita a vibração que vira o chiado. São as duas arestas
+   verticais da face de atrito, e cada uma é UM filete. */
+const PASTILHA_INTERNA_CHANFRO_ENTRA = 313;
+const PASTILHA_INTERNA_CHANFRO_SAI = 314;
+const PASTILHA_EXTERNA_CHANFRO_ENTRA = 315;
+const PASTILHA_EXTERNA_CHANFRO_SAI = 316;
 const PASTILHA_EXTERNA = 312;
 const PINCA_PONTE = 321;
 const PINCA_GARRA_INTERNA = 322;
@@ -249,8 +260,16 @@ export const ALIASES = [
     { origem: { ...ORIGEM_FUROS_PRISIONEIRO, borda: TODOS } },
     { origem: { ...ORIGEM_FUROS_PRISIONEIRO, preenchimento: TODOS } },
   ] }],
-  ['pastilhaInternaInteira', cuboInteiro(PASTILHA_INTERNA)],
-  ['pastilhaExternaInteira', cuboInteiro(PASTILHA_EXTERNA)],
+  ['pastilhaInternaInteira', { unir: [
+    ...cuboInteiro(PASTILHA_INTERNA).unir,
+    { origem: { op: 'filete', id: PASTILHA_INTERNA_CHANFRO_ENTRA } },
+    { origem: { op: 'filete', id: PASTILHA_INTERNA_CHANFRO_SAI } },
+  ] }],
+  ['pastilhaExternaInteira', { unir: [
+    ...cuboInteiro(PASTILHA_EXTERNA).unir,
+    { origem: { op: 'filete', id: PASTILHA_EXTERNA_CHANFRO_ENTRA } },
+    { origem: { op: 'filete', id: PASTILHA_EXTERNA_CHANFRO_SAI } },
+  ] }],
   ['pincaInteira', { unir: origensInteiras('chamferBox', [PINCA_PONTE, PINCA_GARRA_INTERNA, PINCA_GARRA_EXTERNA]) }],
   ['pincaPonte', { origem: { op: 'chamferBox', id: PINCA_PONTE } }],
   ['pincaGarraInterna', { origem: { op: 'chamferBox', id: PINCA_GARRA_INTERNA } }],
@@ -318,9 +337,16 @@ export const PASSOS = [
 
   // ---- pastilhas: uma de cada lado do disco, com a folga de repouso ----
   ['cubo', { origemId: PASTILHA_INTERNA, larg: 'pastilhaEspessura', alt: 'pastilhaAltura', prof: 'pastilhaLargura' }],
+  /* a face de atrito da pastilha INTERNA olha para +X (o disco); as arestas 1
+     e 3 dela são as duas verticais, por onde o disco entra e sai. */
+  ['filete', { origemId: PASTILHA_INTERNA_CHANFRO_ENTRA, de: { op: 'cubo', id: PASTILHA_INTERNA, face: 'direita' }, aresta: 3, raio: 'pastilhaChanfro' }],
+  ['filete', { origemId: PASTILHA_INTERNA_CHANFRO_SAI, de: { op: 'cubo', id: PASTILHA_INTERNA, face: 'direita' }, aresta: 1, raio: 'pastilhaChanfro' }],
   ['transladar', { d: ['pastilhaInternaX', 'pastilhaBaseY', 0], sel: { alias: 'pastilhaInternaInteira' } }],
   ['parte', { nome: 'pastilhaInterna', sel: { alias: 'pastilhaInternaInteira' } }],
   ['cubo', { origemId: PASTILHA_EXTERNA, larg: 'pastilhaEspessura', alt: 'pastilhaAltura', prof: 'pastilhaLargura' }],
+  /* a externa olha para −X: mesma figura espelhada, mesma escrita. */
+  ['filete', { origemId: PASTILHA_EXTERNA_CHANFRO_ENTRA, de: { op: 'cubo', id: PASTILHA_EXTERNA, face: 'esquerda' }, aresta: 3, raio: 'pastilhaChanfro' }],
+  ['filete', { origemId: PASTILHA_EXTERNA_CHANFRO_SAI, de: { op: 'cubo', id: PASTILHA_EXTERNA, face: 'esquerda' }, aresta: 1, raio: 'pastilhaChanfro' }],
   ['transladar', { d: ['pastilhaExternaX', 'pastilhaBaseY', 0], sel: { alias: 'pastilhaExternaInteira' } }],
   ['parte', { nome: 'pastilhaExterna', sel: { alias: 'pastilhaExternaInteira' } }],
 

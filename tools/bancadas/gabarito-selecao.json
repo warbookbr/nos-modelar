@@ -1,6 +1,11 @@
 {
-  "hashTotal": "4bc9e143e29741d53e9e7c1c54861093fcf2db1722ee525e7538f1992eb23d63",
+  "hashTotal": "09780967aa19405174f74619a78bc398ab2935cd7c49db68664cfcd64d6ffb79",
   "pecas": {
+    "_caixote-filetado": {
+      "hash": "be4a822ce0fa7fd3c0bc86b4f9c32efeead851237b04be2e5af8a07c27ad16cb",
+      "vertices": 656,
+      "faces": 679
+    },
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",
       "vertices": 158,
@@ -112,9 +117,9 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "95a3c94d953fc43111b25124dd8fe73c65946e14dee64f0110ff755d90e254e9",
-      "vertices": 490,
-      "faces": 504
+      "hash": "ecb4e2fe50ef428518becd223896d7923b26a3513a8157031e95d5fcd15064cb",
+      "vertices": 498,
+      "faces": 508
     },
     "lanterna": {
       "hash": "711e2c57837371eb8559715b5a18c7f94cad8f1baa556d9bb3033731ab1e1b93",

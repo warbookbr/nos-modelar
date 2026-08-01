@@ -3636,18 +3636,28 @@ export const OPS = {
      de entrada, o corte grita em toda referência ambígua/vazia, e o que ele
      cria entra em `CONTRATOS_ORIGEM` como mais uma família citável.
 
-     A DIFERENÇA do `furo`: o filete NÃO CONSOME as duas faces adjacentes à
-     aresta — ele as mantém com a MESMA identidade (mesmo `f.id`), só muda a
-     forma delas. Isto evita o problema do "canto de três arestas" (fora de
-     escopo, ver plano): a maioria das arestas de uma peça sólida tem, em cada
-     ponta, um TERCEIRO vértice/face que não faz parte deste filete — mexer na
-     posição do vértice da aresta quebraria a costura com essa terceira face
-     (uma trinca ao longo da aresta vizinha, não um canto pontual). A solução:
-     os vértices ORIGINAIS da aresta (`v0`,`v1`) NUNCA SE MEXEM e NUNCA SAEM
-     das duas faces — o filete só INSERE dois vértices novos ENTRE eles, no
-     próprio plano de cada face (`v0 → P0 → Q0 → v1` na face de entrada,
-     simétrico na face do outro lado). As outras arestas de ambas as faces
-     ficam byte-idênticas; só a aresta escolhida ganha uma dobra pra dentro.
+     A DIFERENÇA do `furo`: o filete NÃO CONSOME face nenhuma. Todas as faces
+     que ele toca continuam vivas com a MESMA identidade (mesmo `f.id`); só a
+     forma delas muda. São QUATRO: as duas da aresta e a terceira de cada
+     PONTA da aresta.
+
+     COMO O CORTE ANDA (e o erro que este parágrafo corrige). A primeira
+     versão tentou não tocar nas pontas: preservava `v0`/`v1` dentro das duas
+     faces da aresta e só inseria dois cantos entre eles. O neutro ficava
+     fechado e a contagem batia, então nenhum teste do núcleo caía — mas a
+     face ficava com um canto EM CIMA da aresta seguinte, um pico de área
+     nula. Polígono que se toca. Quem gritava era o ADAPTADOR, ao triangular
+     em orelhas, e só quando a op chegou numa peça de verdade. A lição, que
+     vale além daqui: malha fechada e contagem certa não provam polígono
+     simples.
+
+     O desenho certo é o mínimo que fecha: `v0` e `v1` ANDAM para o lado da
+     face de entrada (viram `P0` e `Q0`, mesmos ids — é o mesmo canto da peça,
+     recuado pelo corte), nascem `P1`/`Q1` do outro lado, e a TERCEIRA face de
+     cada ponta ganha um canto, que é onde a fresta do recuo se fecha, no
+     próprio plano dela. Sem triângulo avulso, sem junção em T, sem face
+     coplanar sobreposta. A face de entrada não muda de LISTA nenhuma: os
+     cantos dela andaram junto com os vértices.
 
      ARGUMENTOS
        `origemId`   OBRIGATÓRIO — o painel novo nasceria anônimo sem ele, como
@@ -3688,10 +3698,18 @@ export const OPS = {
      não-linearidade; ficou de fora, registrado como atrito em vez de entregue
      quebrado.
 
-     NUMERAÇÃO (formato salvo). Com `b` a base do passo: VÉRTICES `b+0`=P0,
-     `b+1`=Q0, `b+2`=P1, `b+3`=Q1; FACE (o painel) `b+0`, ligando as duas
-     fileiras. As faces de entrada/saída NÃO SÃO recriadas — `addF` nunca roda
-     nelas — só o array `vs` delas GANHA dois cantos novos entre `v0` e `v1`.
+     A ARESTA PRECISA TER PONTA SIMPLES: em cada ponta, EXATAMENTE UMA face
+     além das duas da aresta. Zero (borda aberta) ou duas ou mais (canto
+     complexo) GRITAM — o canto de três arestas está declarado fora de escopo
+     no gate deste ciclo, e o que está fora de escopo grita em vez de sair
+     torto. O sentido de percurso de cada terceira face também é DERIVADO da
+     lei da malha fechada, não adivinhado: se não bater, o passo grita.
+
+     NUMERAÇÃO (formato salvo). Com `b` a base do passo: VÉRTICES `b+0`=P1,
+     `b+1`=Q1 (os dois do lado da face de saída); FACE (o painel) `b+0`. `P0` e
+     `Q0` são os PRÓPRIOS `v0`/`v1`, recuados. Nenhuma face é recriada — `addF`
+     roda uma vez só, no painel. Custo fechado: +2 V e +1 F, seja qual for a
+     peça.
 
      HERANÇA: o painel novo herda cor/material/parte/liso/solido da face de
      ENTRADA (a mesma lei do `furo`/`espelha`).
@@ -3774,51 +3792,87 @@ export const OPS = {
     const raio = st.num(a.raio ?? 0);
     if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'filete', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio})`);
 
-    const nV = 4, nF = 3;   // 1 painel + 2 tampas de canto (ver comentário abaixo)
+    /* AS PONTAS DA ARESTA. Cada ponta (v0, v1) é um vértice onde chega uma
+       TERCEIRA face além das duas da aresta. Ela precisa entrar na conta: se
+       o corte só mexer em faceA/faceB, a terceira face continua com a
+       quina antiga e a malha fica com uma fresta — ou, pior, com um polígono
+       que se toca. MEDIDO, e foi assim que este arquivo saiu errado da
+       primeira vez: preservar v0/v1 dentro de faceA deixa a face com um pico
+       de área nula (o canto v1 fica EM CIMA da aresta seguinte). O neutro
+       continuava fechado e a contagem batia, então nenhum teste do núcleo
+       caía; quem gritava era o adaptador, ao tentar triangular a face em
+       orelhas — e só quando a op chegou numa peça de verdade.
+       Por isso o filete exige EXATAMENTE UMA terceira face em cada ponta.
+       Zero (borda aberta) ou duas ou mais (canto complexo) GRITAM: o canto de
+       três arestas está declarado fora de escopo no gate deste ciclo, e o que
+       está fora de escopo grita em vez de sair torto. */
+    const terceiraFace = (v, ponta) => {
+      const achadas = [];
+      for (const [fid, f] of st.F) {
+        if (fid === faceAId || fid === faceBId) continue;
+        if (f.vs.includes(v)) achadas.push(fid);
+      }
+      if (achadas.length !== 1) {
+        grita(st, i, 'filete', 'aresta', `a ponta ${ponta} da aresta ${a.aresta} da face ${faceAId} tem ${achadas.length} face(s) além das duas da aresta; o filete precisa de exatamente 1 (canto de três arestas está fora de escopo neste ciclo)`);
+        return null;
+      }
+      return achadas[0];
+    };
+    const faceCId = terceiraFace(v0, 'v0');
+    if (faceCId == null) return;
+    const faceDId = terceiraFace(v1, 'v1');
+    if (faceDId == null) return;
+    const faceC = st.F.get(faceCId), faceD = st.F.get(faceDId);
+
+    /* a ordem em que cada terceira face percorre a ponta é DERIVADA, não
+       adivinhada: numa malha fechada faceA vai v0->v1, faceB vai v1->v0, e
+       então faceC (na ponta v0) só pode ir `nextB -> v0 -> prevA`. Se não for
+       isso, a vizinhança não é a de uma malha fechada padrão e o passo grita
+       em vez de escolher um lado. */
+    const idx = (f, v) => f.vs.indexOf(v);
+    const antes = (f, v) => f.vs[(idx(f, v) - 1 + f.vs.length) % f.vs.length];
+    const depois = (f, v) => f.vs[(idx(f, v) + 1) % f.vs.length];
+    const prevA = antes(faceA, v0), nextA = depois(faceA, v1);
+    const nextB = depois(faceB, v0), prevB = antes(faceB, v1);
+    if (antes(faceC, v0) !== nextB || depois(faceC, v0) !== prevA) {
+      return grita(st, i, 'filete', 'aresta', `a face ${faceCId}, na ponta v0, não percorre a vizinhança no sentido de malha fechada (esperado ${nextB} -> ${v0} -> ${prevA})`);
+    }
+    if (antes(faceD, v1) !== nextA || depois(faceD, v1) !== prevB) {
+      return grita(st, i, 'filete', 'aresta', `a face ${faceDId}, na ponta v1, não percorre a vizinhança no sentido de malha fechada (esperado ${nextA} -> ${v1} -> ${prevB})`);
+    }
+
+    const nV = 2, nF = 1;   // P1 e Q1; 1 painel. v0/v1 são REAPROVEITADOS (ver abaixo)
     if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: filete estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
-    const P0 = [P[0] + raio * dA[0], P[1] + raio * dA[1], P[2] + raio * dA[2]];
-    const P1 = [P[0] + raio * dB[0], P[1] + raio * dB[1], P[2] + raio * dB[2]];
-    const Q0 = [Q[0] + raio * dA[0], Q[1] + raio * dA[1], Q[2] + raio * dA[2]];
-    const Q1 = [Q[0] + raio * dB[0], Q[1] + raio * dB[1], Q[2] + raio * dB[2]];
-    const idP0 = b, idQ0 = b + 1, idP1 = b + 2, idQ1 = b + 3;
-    addV(st, idP0, P0); addV(st, idQ0, Q0); addV(st, idP1, P1); addV(st, idQ1, Q1);
+    /* v0 ANDA para P0 e v1 anda para Q0, em vez de nascerem dois vértices
+       novos e os velhos virarem órfãos. A identidade do canto continua sendo
+       a mesma: é o MESMO canto da peça, recuado pelo corte. Só o lado de
+       faceB precisa de vértice novo (P1, Q1), porque ali o canto se desdobra
+       em dois. Custo do corte: +2 V e +1 F, sempre, seja qual for a peça. */
+    const idP1 = b, idQ1 = b + 1;
+    addV(st, idP1, [P[0] + raio * dB[0], P[1] + raio * dB[1], P[2] + raio * dB[2]]);
+    addV(st, idQ1, [Q[0] + raio * dB[0], Q[1] + raio * dB[1], Q[2] + raio * dB[2]]);
+    st.V.set(v0, [P[0] + raio * dA[0], P[1] + raio * dA[1], P[2] + raio * dA[2]]);
+    st.V.set(v1, [Q[0] + raio * dA[0], Q[1] + raio * dA[1], Q[2] + raio * dA[2]]);
 
-    /* TRÊS faces novas, não uma: inserir P0/Q0 e P1/Q1 no meio de faceA/faceB
-       (preservando v0/v1, ver mais abaixo) abre uma FRESTA em cada ponta da
-       aresta — o segmento v0-P0 (de faceA) e v0-P1 (de faceB, no sentido
-       inserido) não têm par nenhum, porque não são a mesma aresta que o
-       painel cobre. Medido: sem as tampas a malha fica com 6 arestas soltas.
-       Cada tampa é um TRIÂNGULO PLANO fechando essa fresta — não é filete de
-       canto (não arredonda o encontro das três arestas do vértice original;
-       a terceira aresta, a que NÃO foi escolhida, segue exatamente como
-       estava), só o remendo mínimo pra malha continuar fechada.
-       Winding (derivado da MESMA lei do painel — a aresta compartilhada nunca
-       é percorrida duas vezes no mesmo sentido — não é heurística de normal):
-       faceA percorre v0->P0 e Q0->v1; faceB (reversa, ver acima) percorre
-       v1->Q1 e P1->v0; o painel percorre P0->P1 e Q1->Q0. */
-    const herda = (id, fonte) => { const nf = st.F.get(id); nf.cor = fonte.cor; nf.material = fonte.material; nf.parte = fonte.parte; nf.liso = fonte.liso; nf.solido = fonte.solido; };
-    addF(st, b, [idP1, idQ1, idQ0, idP0]);       // painel: P1->Q1 (faceB), Q1->Q0, Q0->P0 (faceA), P0->P1
-    herda(b, faceA);
-    addF(st, b + 1, [idP0, v0, idP1]);           // tampa em v0: P0->v0 (faceA), v0->P1 (faceB), P1->P0 (painel)
-    herda(b + 1, faceA);
-    addF(st, b + 2, [v1, idQ0, idQ1]);           // tampa em v1: v1->Q0 (faceA), Q0->Q1 (painel), Q1->v1 (faceB)
-    herda(b + 2, faceA);
-    const paineis = [b, b + 1, b + 2];
+    /* O PAINEL. Winding derivado da lei de sempre — nenhuma aresta é
+       percorrida duas vezes no mesmo sentido: faceA percorre P0->Q0, então o
+       painel percorre Q0->P0; faceB percorre Q1->P1, então o painel percorre
+       P1->Q1. */
+    addF(st, b, [idP1, idQ1, v1, v0]);           // P1 -> Q1 -> Q0 -> P0
+    const nf = st.F.get(b);
+    nf.cor = faceA.cor; nf.material = faceA.material; nf.parte = faceA.parte;
+    nf.liso = faceA.liso; nf.solido = faceA.solido;
+    const paineis = [b];
 
-    /* insere os cantos novos DENTRO de faceA/faceB, PRESERVANDO v0/v1 — a
-       terceira face de cada ponta continua vendo exatamente os mesmos ids que
-       já via; só a aresta escolhida ganha a dobra. */
-    const inserir = (f, x, y, novoX, novoY) => {
-      const out = [];
-      for (let k = 0; k < f.vs.length; k++) {
-        out.push(f.vs[k]);
-        if (f.vs[k] === x && f.vs[(k + 1) % f.vs.length] === y) out.push(novoX, novoY);
-      }
-      f.vs = out;
-    };
-    inserir(faceA, v0, v1, idP0, idQ0);
-    inserir(faceB, v1, v0, idQ1, idP1);
+    /* faceA não muda de lista NENHUMA: os dois cantos dela já andaram junto
+       com v0/v1. faceB troca cada ponta pelo gêmeo do outro lado do corte, e
+       cada terceira face GANHA um canto — é ela que fecha a fresta que o
+       recuo abriu, no próprio plano dela, sem triângulo avulso e sem junção
+       em T com as vizinhas. */
+    faceB.vs = faceB.vs.map((v) => (v === v0 ? idP1 : v === v1 ? idQ1 : v));
+    faceC.vs = faceC.vs.flatMap((v) => (v === v0 ? [idP1, v0] : [v]));   // nextB -> P1 -> P0 -> prevA
+    faceD.vs = faceD.vs.flatMap((v) => (v === v1 ? [v1, idQ1] : [v]));   // nextA -> Q0 -> Q1 -> prevB
 
     registraOrigem(st, i, 'filete', a.origemId, { paineis });
   },
