@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-224 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+239 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -37,6 +37,18 @@
 ## .claude/skills/oficina/
 
 - `SKILL.md` — A Oficina — o editor de objetos in-game do NÓS (arquitetura, os 3 espaços de trabalho, ciclo de construção, verificação, armadilhas). Use SEMPRE que for cons…
+
+## autoria-assistida/guias/forma/
+
+- `silhueta-e-transicoes.md` — Silhueta e transições
+
+## autoria-assistida/guias/material/
+
+- `leitura-de-material.md` — Leitura de material
+
+## autoria-assistida/guias/processo/
+
+- `evidencia-e-iteracao.md` — Evidência e iteração
 
 ## docs/
 
@@ -289,6 +301,8 @@
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — argumentos.test.ts — prova de que os CLIs da Mecanifica não engolem bandeira desconhecida em silêncio (MEDIA-7). O defeito: `--estrit` (uma letra a menos que…
 - `arranjo-em-peca.test.ts` — arranjo-em-peca.test.ts — a prova do ciclo "Arranjos semânticos v1" NA PEÇA, não só no núcleo.
+- `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
+- `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `corrimao-orientacao.test.ts` — corrimao-orientacao.test.ts — a prova NÃO AUTOMOTIVA da `orientacao` do `loft`, o segundo item do ciclo "Corte e orientação de seção v1".
 - `descrever-partes.test.ts` — descrever-partes.test.ts — prova do O-1: a conferência de uma peça é NÚMERO, não leitura de PNG (ATRITOS-AUTORIA A-13). Mede três coisas: que o módulo neutro…
 - `descrever-peca.mjs` — descrever-peca.mjs — a RÉGUA DA BANCADA: constrói uma peça headless e imprime, por parte semântica, caixa (min/max), centro, dimensões e contagem de faces, e…
@@ -307,6 +321,19 @@
 - `sistema-freio.test.mjs` — sistema-freio.test.mjs — contrato semântico do primeiro sistema apresentado no veículo.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
+
+## tools/modelagem/
+
+- `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
+- `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
+- `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
+- `pacote-modelagem.test.mjs` — pacote-modelagem.test.mjs — marco 1: bytes reprodutíveis e recusa explícita para tudo que faria uma IA trabalhar com contexto frágil ou posicional.
+- `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
+- `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
+- `revisao-modelagem.test.mjs` — Prova determinismo, validação e comparação dos artefatos neutros de revisão e crítica.
+- `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
+- `revisar-pacote.test.mjs` — Prova a orquestração atômica entre pacote, descrição headless e vistas da bancada.
+- `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
 
 ## tools/oficina/
 

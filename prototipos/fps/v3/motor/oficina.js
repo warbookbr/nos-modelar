@@ -4303,7 +4303,11 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     fn(st, args, i);
   });
 
-  return { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas) };
+  /* `materiais` faz parte do estado neutro: a face só guarda o NOME, mas uma
+     revisão sem o dicionário não conseguiria dizer se uma alteração de cor ou
+     aspereza mudou a peça. O núcleo continua sem saber de renderizador; ele
+     apenas preserva a declaração já usada pela op `material`. */
+  return { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas), materiais: st.materiais };
 }
 
 /* forma canônica e ORDENADA do neutro — a base de toda comparação (replay da

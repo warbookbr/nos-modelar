@@ -58,12 +58,23 @@ autoria-assistida/
 ```
 
 O briefing usa o formato `mecanifica.pacote-modelagem`, versão 1. Ele declara
-alvo, objetivo, perfil de autoria, partes esperadas, guias, checklist e provas.
+alvo, modo (`refinamento` ou `criacao`), objetivo, perfil de autoria, partes
+esperadas, guias, checklist e provas. Refinamento deriva as partes da fonte
+existente; criação declara as partes antes de a fonte existir e passa a
+conferi-las assim que ela aparece.
 Identidade é sempre um nome semântico estável. São proibidos UUIDs, índices de
 face, corpo ou passo, caminhos absolutos, timestamps, `data:` URI e base64.
 
+`revisao.json` usa versão 2 para incluir aparência semântica. Revisões v1 já
+gravadas continuam legíveis e estritas, mas não ganham aparência retroativamente;
+uma revisão nova sempre nasce v2. Isso preserva evidência histórica sem fingir
+que sabemos reconstruir material a partir de PNG.
+
 As referências usam `https://` ou `repo://`. Hash SHA-256 é obrigatório quando
-a referência sustenta medida ou aceite. O pacote nunca copia o binário.
+a referência sustenta medida ou aceite. Em `repo://`, o validador exige arquivo
+regular interno e confere o conteúdo contra o hash; em `https://`, o hash é um
+compromisso externo, pois este fluxo deliberadamente não baixa a rede. O pacote
+nunca copia o binário.
 
 ## Limites de contexto
 
@@ -83,17 +94,21 @@ combinar `superficie-de-revolucao`, `repeticao-e-arranjo`, `borracha` e
 
 ```bash
 npm run preparar:modelagem -- <pacote> --peca=<peca>
+npm run preparar:modelagem -- <pacote> --peca=<peca-nova> --modo=criacao --partes=base,corpo
 npm run validar:modelagem -- <pacote>
 npm run revisar:modelagem -- <pacote> --revisao=r001
 npm run comparar:revisao -- <revisao-anterior> <revisao-atual>
+npm run validar:critica -- <critica.json> <revisao.json> <briefing.json>
 ```
 
-`preparar:modelagem` cria somente a estrutura mínima e nunca sobrescreve.
+`preparar:modelagem` cria somente a estrutura mínima e nunca sobrescreve; o
+modo padrão é refinamento, e criação exige a lista semântica de partes.
 `validar:modelagem` confere schema, canonicalização, limites, caminhos, hashes e
 nomes existentes. `revisar:modelagem` reutiliza a descrição neutra e a bancada;
-não mantém uma segunda régua geométrica. `comparar:revisao` compara assinaturas,
-partes, caixas, relações, portas e contagens; as imagens continuam sendo lidas
-por uma IA ou pessoa nas mesmas câmeras.
+não mantém uma segunda régua geométrica e recusa faces, partes ou materiais que
+ultrapassem o orçamento declarado. `comparar:revisao` compara assinaturas,
+partes, caixas, relações, portas, aparência e contagens; as imagens continuam
+sendo lidas por uma IA ou pessoa nas mesmas câmeras.
 
 ## Contrato da crítica
 
@@ -108,23 +123,29 @@ Cada observação cita:
 - condição objetiva de aceite;
 - viabilidade: `ajuste`, `remodelagem_local` ou `capacidade_ausente`.
 
+Além das divergências, `estadosChecklist` cobre **todos** os itens, na ordem do
+briefing. Cada estado `divergente` corresponde exatamente a uma observação e
+vice-versa; assim uma lista vazia não pode significar ao mesmo tempo “atendido”
+e “não revisei”. O arquivo inteiro é JSON canônico e todos os campos são
+obrigatórios.
+
 “Deixar mais realista” é inválido. “Na vista direita, a transição entre as
 partes A e B termina em uma quina; aceite quando houver continuidade sem mudar
 a folga declarada” é válido.
 
-Estados de checklist: `aberto`, `atendido`, `divergente`,
-`bloqueado_capacidade`, `adiado` e `obsoleto`. Uma crítica fica obsoleta quando
-a assinatura do modelo muda depois dela.
+O briefing nasce `aberto`. A crítica usa `atendido`, `divergente`,
+`bloqueado_capacidade` ou `adiado`. Uma crítica anterior fica `obsoleta` na
+comparação quando a assinatura semântica — geometria **ou aparência** — muda.
 
 ## Implementação em quatro marcos
 
-1. **Contrato e preparação:** schemas, canonicalização, guias mínimos, comandos
+1. **Concluído — contrato e preparação:** schemas, canonicalização, guias mínimos, comandos
    `preparar:modelagem` e `validar:modelagem`.
-2. **Revisão:** `revisao.json`, vistas canônicas, medidas e assinaturas sem
+2. **Concluído — revisão:** `revisao.json`, vistas canônicas, medidas e assinaturas sem
    estado do runtime.
-3. **Crítica e comparação:** validação de `critica.json`, obsolescência e diff
+3. **Concluído — crítica e comparação:** validação de `critica.json`, obsolescência e diff
    estrutural entre revisões.
-4. **Prova de fluxo:** agente modelador e agente crítico trabalham com pacotes
+4. **Concluído — prova de fluxo:** agente modelador e agente crítico trabalham com pacotes
    limitados, primeiro numa fixture não automotiva e depois numa peça existente,
    sem ler a Oficina legada.
 
@@ -148,3 +169,40 @@ O ciclo encerra quando:
 O filete v2 permanece pausado no Escopo A durante este ciclo. O trabalho do
 canto composto só volta depois da comparação com a frente paralela do
 repositório de origem.
+
+## Fechamento — 1º de agosto de 2026
+
+As sete condições foram atendidas. O ciclo completo foi executado sobre
+`_caixote-filetado`: revisão `r001`, crítica cega com duas divergências, ajuste
+por outro agente, comparação estrutural e revisão `r002`. O puxador passou de
+672 para 896 faces e a peça inteira de 679 para 903, dentro do orçamento de
+2.000 faces; duas partes, relação de contato, zero face sem identidade e zero
+órfão foram preservados. Um segundo crítico cego recebeu apenas o pacote e a
+`r002`: confirmou a transição como atendida, mas manteve honestamente a leitura
+de material como divergente. Esse falso “zero” encontrado pela revisão
+adversarial originou a cobertura obrigatória de todo checklist. `freio-disco`
+gerou quatro vistas e relatório pelo mesmo contrato, provando que o fluxo não
+ficou preso à fixture.
+
+As provas `r001`/`r002` permanecem v1 por serem evidência histórica. `r003` foi
+gerada pelo contrato v2 sobre a mesma geometria de `r002`: o diff acrescenta
+somente aparência semântica, e uma nova crítica cega v2 cobre 4/4 itens, mantendo
+material divergente. Testes de mutação provam ainda que trocar somente cor ou
+aspereza muda a assinatura e aparece no diff, sem recorrer a pixel ou ID de
+face.
+
+Artefatos de prova:
+
+- `autoria-assistida/pacotes/prova-caixote/` — três revisões, quatro vistas por
+  revisão e as críticas canônicas; `r003` prova o contrato atual v2;
+- `autoria-assistida/pacotes/prova-freio/` — pacote e revisão de compatibilidade
+  numa peça existente;
+- `tools/modelagem/` — CLIs e módulos puros do contrato;
+- `autoria-assistida/guias/` — três guias curtos, combináveis pelo briefing.
+
+O resultado não promete julgamento fotorealista, continuidade matemática por
+imagem nem correção automática. A ferramenta organiza contexto, evidência e
+iteração; conclusão do ciclo significa que o processo é executável e honesto,
+não que toda divergência da peça de prova foi corrigida. Quando a linguagem não
+consegue produzir a correção, a crítica deve marcar `capacidade_ausente` em vez
+de esconder o bloqueio.

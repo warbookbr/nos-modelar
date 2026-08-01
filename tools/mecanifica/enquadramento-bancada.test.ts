@@ -8,6 +8,10 @@ describe('gate de enquadramento da bancada', () => {
     expect(enquadramentoUtil({ largura: 0.137, altura: 0.41 })).toBe(true);
   });
 
+  it('aceita a vista superior real do caixote, sem afrouxar o limite de área', () => {
+    expect(enquadramentoUtil({ largura: 0.275, altura: 0.367 })).toBe(true);
+  });
+
   it('reprova uma peça minúscula mesmo inteiramente no quadro', () => {
     expect(enquadramentoUtil({ largura: 0.12, altura: 0.22 })).toBe(false);
   });

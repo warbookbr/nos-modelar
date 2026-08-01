@@ -42,6 +42,10 @@ export const PARAMS = {
   /* o puxador torneado, em metros. O perfil sobe do pé, engorda na barriga,
      afina no pescoço e abre no chapéu. As três passagens são CURVAS. */
   puxadorPeRaio: 0.030,
+  /* colar baixo: separa o puxador do tampo antes de ele afinar para o pé. */
+  puxadorBaseRaio: 0.046,
+  puxadorBaseY: 0.018,
+  puxadorPeTopoY: 0.030,
   puxadorBarrigaRaio: 0.052,
   puxadorPescocoRaio: 0.022,
   puxadorChapeuRaio: 0.044,
@@ -54,6 +58,7 @@ export const PARAMS = {
      elemento do ponto do perfil, e cada um é uma frase: "a barriga tem raio de
      concordância de 25 mm". */
   puxadorBarrigaCurva: 0.025,
+  puxadorBaseCurva: 0.008,
   puxadorPescocoCurva: 0.014,
   puxadorChapeuCurva: 0.010,
 };
@@ -64,6 +69,10 @@ export const TOPO = {
      Num giro de ~90° a flecha da corda com 6 segmentos fica em 0,086% do raio —
      bem dentro do 1% que a condição 2 do gate pede. */
   segmentosPuxador: 6,
+};
+
+export const MATERIAIS = {
+  madeiraAcabada: { cor: '#a9713f', aspereza: 0.72 },
 };
 
 const CAIXA = 1;
@@ -89,7 +98,9 @@ export const PASSOS = [
      levam a alça de curva; o pé e o topo são quinas de verdade, e ficam retos. */
   ['lathe', { origemId: PUXADOR, lados: 'ladosPuxador', segmentosCurva: 'segmentosPuxador', perfil: [
     [0, 'puxadorPeY'],
-    ['puxadorPeRaio', 'puxadorPeY'],
+    ['puxadorBaseRaio', 'puxadorPeY'],
+    ['puxadorBaseRaio', 'puxadorBaseY', 'puxadorBaseCurva'],
+    ['puxadorPeRaio', 'puxadorPeTopoY'],
     ['puxadorBarrigaRaio', 'puxadorBarrigaY', 'puxadorBarrigaCurva'],
     ['puxadorPescocoRaio', 'puxadorPescocoY', 'puxadorPescocoCurva'],
     ['puxadorChapeuRaio', 'puxadorChapeuY', 'puxadorChapeuCurva'],
@@ -101,6 +112,7 @@ export const PASSOS = [
 
   ['pincel', { modo: 'face', sel: { grupo: 'caixote' }, cor: PARAMS.corMadeira }],
   ['pincel', { modo: 'face', sel: { grupo: 'puxador' }, cor: PARAMS.corPuxador }],
+  ['material', { sel: { grupo: 'caixote' }, usa: 'madeiraAcabada' }],
   ['liso', { sel: { alias: 'puxadorInteiro' } }],
   ['solido', { sel: { grupo: 'caixote' } }],
   ['solido', { sel: { grupo: 'puxador' } }],
@@ -116,7 +128,7 @@ export const meta = {
   nome: '_caixote-filetado',
   tipo: 'objeto',
   desc: 'peça de exercício do ciclo "Curva e filete v1" — caixote de madeira com a aresta de cima-da-frente cortada pela op `filete` e puxador torneado com raios de concordância no perfil, fora do vocabulário automotivo',
-  colisao: colisaoDe(PASSOS, PARAMS, TOPO, {}, ALIASES),
+  colisao: colisaoDe(PASSOS, PARAMS, TOPO, MATERIAIS, ALIASES),
 };
 
-export function construir(ctx) { return executar(PASSOS, PARAMS, TOPO, ctx, {}, {}, null, ALIASES); }
+export function construir(ctx) { return executar(PASSOS, PARAMS, TOPO, ctx, MATERIAIS, {}, null, ALIASES); }

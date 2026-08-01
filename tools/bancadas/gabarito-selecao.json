@@ -1,10 +1,10 @@
 {
-  "hashTotal": "09780967aa19405174f74619a78bc398ab2935cd7c49db68664cfcd64d6ffb79",
+  "hashTotal": "a0b248e5b1cf7699c47778eba6cd0beba51dace917ae9a1ff87aae01aa8ee15e",
   "pecas": {
     "_caixote-filetado": {
-      "hash": "be4a822ce0fa7fd3c0bc86b4f9c32efeead851237b04be2e5af8a07c27ad16cb",
-      "vertices": 656,
-      "faces": 679
+      "hash": "715099157e4c8c6179e0920d1e9712a2ae5724d3618b9cd5afd2291e2d0b4ea2",
+      "vertices": 880,
+      "faces": 903
     },
     "_cerca-e-flor": {
       "hash": "7bec08b20e882e580c6da4229123b9a392924969a4aa648bebd23c84a313ac24",

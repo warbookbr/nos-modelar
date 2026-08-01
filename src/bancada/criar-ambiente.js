@@ -22,7 +22,7 @@ function caixaValida(objetos) {
 /** Regra pura do gate visual; separada do renderer para poder provar os dois
  * fracassos que importam à autoria: objeto minúsculo e silhueta cortada. */
 export function enquadramentoUtil({ largura, altura, cortado = false }) {
-  return !cortado && Math.max(largura, altura) >= 0.38 && largura * altura >= 0.035;
+  return !cortado && Math.max(largura, altura) >= 0.32 && largura * altura >= 0.035;
 }
 
 export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 } = {}) {
@@ -273,7 +273,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     const cortado = minimo.x < -1.001 || minimo.y < -1.001 || maximo.x > 1.001 || maximo.y > 1.001;
     return {
       /* Peça alongada em vista de topo pode ocupar pouca área, mas ainda ser
-         legível. A régua rejeita só quando nem a maior dimensão alcança 38%
+         legível. A régua rejeita só quando nem a maior dimensão alcança 32%
          do viewport ou quando a silhueta total fica abaixo de 3,5%. */
       valida: enquadramentoUtil({ largura, altura, cortado }),
       pontos,

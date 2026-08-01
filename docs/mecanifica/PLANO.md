@@ -22,10 +22,10 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 - fases 0 a 4: concluídas;
 - fase 5: horizonte futuro, ainda sem plano executivo;
 - a fase 6 começou pelo recorte operacional **Fluxo de modelagem assistida por
-  IA v1**, cujo contrato está em
-  [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
-- **um ciclo está em execução:** transformar briefing, referências, bancada e
-  crítica em artefatos curtos, determinísticos e reutilizáveis por outra IA;
+  IA v1**, **CONCLUÍDO em 1º de agosto de 2026**. Contrato, comandos, provas e
+  limites estão em [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- **nenhum ciclo novo está aberto:** o próximo recorte só começa depois de
+  escolher uma dificuldade observada pelo fluxo concluído;
 - Filete v2 está **pausado** depois do Escopo A. `arredondarAresta` já entrega
   raio real numa aresta simples; o canto composto/`chamferBox` não começa até a
   comparação com a frente paralela do repositório de origem.
@@ -173,7 +173,9 @@ linguagem. Nenhum desses itens reabre a Fase 4.
 
 ## Fase 5 — narrativa de desgaste
 
-**Estado:** horizonte futuro, não iniciado e fora do ciclo concluído.
+**Estado:** iniciada. O primeiro recorte operacional, “Fluxo de modelagem
+assistida por IA v1”, foi concluído em 1º de agosto de 2026; os demais itens
+continuam como horizonte da fase e não pertencem retroativamente a esse ciclo.
 
 **Objetivo:** transformar o modelo em uma explicação útil para clientes.
 
@@ -224,8 +226,8 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-**Uma linha está em execução:** Fluxo de modelagem assistida por IA v1. Filete
-v2 permanece pausado no Escopo A e não disputa o ciclo ativo.
+**Nenhuma linha nova está em execução.** Fluxo de modelagem assistida por IA v1
+foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
@@ -236,11 +238,50 @@ v2 permanece pausado no Escopo A e não disputa o ciclo ativo.
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
 | 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
 | 4 | **CONCLUÍDO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
-| 5 | **em execução** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; contrato e gate em [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) |
+| 5 | **CONCLUÍDO em 01/08/2026** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; prova cega completa em `_caixote-filetado` e prova de compatibilidade em `freio-disco` |
 | 6 | pausada | Filete v2, Escopo B | aguarda comparação com a frente paralela antes de atacar canto composto/`chamferBox`; o Escopo A está preservado e verde |
 | 7 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 8 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
 | 9 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
+
+### Ciclo 5 — CONCLUÍDO em 1º de agosto de 2026
+
+**Nome:** Fluxo de modelagem assistida por IA v1.
+
+**Resultado:** uma IA recebe um pacote limitado, trabalha sem abrir a Oficina
+legada, gera uma revisão reproduzível na bancada e entrega a outra IA somente o
+contexto necessário para uma crítica objetiva. A correção volta à mesma peça e
+uma comparação estrutural invalida observações feitas sobre geometria antiga.
+
+**Prova cega:** em `_caixote-filetado`, o primeiro crítico encontrou duas
+divergências — transição seca do puxador e leitura fraca do material. Um agente
+modelador alterou a definição procedural usando somente pacote, guias, revisão,
+crítica, imagens e a skill de autoria. A revisão passou de 679 para 903 faces,
+ainda abaixo do orçamento de 2.000; preservou duas partes, contato declarado,
+zero face sem identidade e zero órfão. Um segundo crítico, sem acesso ao código,
+à revisão anterior ou à primeira crítica, confirmou a transição, mas manteve a
+leitura de material como divergente. A tentativa inicial de declarar zero foi
+reprovada na revisão adversarial e virou uma regra: toda crítica cobre o
+checklist completo, mesmo sem correção. `freio-disco` atravessou o mesmo
+contrato como peça existente, sem ser remodelado.
+
+| # | condição do gate | estado | evidência |
+|---:|---|---|---|
+| 1 | pacote e relatórios determinísticos | **ATENDIDA** | testes repetem entrada e exigem JSON canônico byte-idêntico |
+| 2 | contexto frágil, posicional ou excessivo é recusado | **ATENDIDA** | validadores cobrem referência sem hash, arquivo `repo://` inexistente ou divergente, identidade runtime, parte/vista inexistente, caminho local, binário e limites do pacote |
+| 3 | quatro vistas úteis; zero identidade ausente e zero órfão | **ATENDIDA** | `revisar:modelagem` passa no caixote e no freio; o gate recusou enquadramentos realmente pequenos ou cortados e foi calibrado com a vista superior real do caixote |
+| 4 | IA nova trabalha com contexto limitado | **ATENDIDA** | os dois críticos Terra receberam somente briefing, referências, guias, `revisao.json` e quatro PNGs |
+| 5 | crítica objetiva e limitada | **ATENDIDA** | `critica.json` canônico cobre todos os itens e exige parte/região, vista, categoria, evidência, aceite e viabilidade para cada divergência; máximo de cinco |
+| 6 | segunda revisão mostra mudança estrutural | **ATENDIDA** | o diff `r001→r002` isolou a alteração no puxador; `r002→r003` mantém a geometria e introduz somente a aparência semântica v2; teste de mutação prova mudança só de cor/aspereza sem inferir pelos pixels |
+| 7 | contrato não automotivo e peça existente | **ATENDIDA** | `_caixote-filetado` prova o ciclo completo; `freio-disco` prova a compatibilidade do pacote e da revisão |
+
+**Limites declarados:** a crítica visual não mede continuidade matemática nem
+fotorealismo; material pode depender de iluminação e distância; o comparador
+descreve mudança estrutural e de aparência, mas não decide sozinho se ela é
+melhor. A divergência de material do caixote permanece aberta sem reabrir o
+ciclo: ela é evidência de que o fluxo conserva um problema em vez de fazê-lo
+sumir. Uma capacidade nova só será proposta quando uma tarefa real ficar
+bloqueada por um desses limites.
 
 ### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 

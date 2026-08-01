@@ -27,10 +27,11 @@
  * `argumentos.mjs`, compartilhada com `descrever-peca.mjs` — dois CLIs irmãos
  * com validações diferentes são armadilha.
  */
-import { existsSync, mkdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { existsSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
+import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -52,7 +53,7 @@ let bandeira;
 let peca;
 try {
   const lido = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['vistas', 'selecionadas', 'modo', 'projecao', 'explosao', 'res', 'espera'],
+    opcoes: ['vistas', 'selecionadas', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
     bandeiras: ['listar', 'estrito', 'focar', 'revisar'],
     posicional: { nome: 'a peça', obrigatorio: false },
   });
@@ -74,6 +75,34 @@ const altura = Math.round(largura * 9 / 16);
 const espera = parseInt(opcao('espera', '1200'), 10) || 1200;
 const estrito = bandeira('estrito') || revisar;
 const focar = bandeira('focar');
+
+/* `--saida` e `--relatorio` existem para o ciclo de modelagem assistida. A
+   bancada continua dona da câmera e do gate; o orquestrador apenas escolhe uma
+   pasta de artefatos. Nunca aceitamos que este CLI escreva fora do repositório. */
+function caminhoInterno(valor, nome) {
+  if (valor === null) return null;
+  if (!valor || valor.includes('\\') || valor.startsWith('/') || /^[A-Za-z]:/.test(valor)
+    || valor.split('/').includes('..')) {
+    erroDeUso(`--${nome} precisa ser caminho relativo canônico dentro do repositório.`);
+  }
+  const destino = resolve(REPO, valor);
+  const dentro = relative(REPO, destino);
+  if (dentro.startsWith('..') || dentro === '' || /^[A-Za-z]:/.test(dentro)) {
+    erroDeUso(`--${nome} precisa ficar dentro do repositório.`);
+  }
+  try {
+    /* lstat em cada ancestral existente: caminho lexical dentro do repo não
+       autoriza atravessar symlink/junction/reparse point para fora dele. */
+    verificarCaminhoConfinado(destino, { raiz: REPO });
+  } catch (erro) {
+    if (erro instanceof ErroDeConfinamento) erroDeUso(`--${nome} recusado: ${erro.message}`);
+    throw erro;
+  }
+  return destino;
+}
+const saidaDeclarada = caminhoInterno(opcao('saida'), 'saida');
+const relatorioDeclarado = caminhoInterno(opcao('relatorio'), 'relatorio');
+if (saidaDeclarada && !peca) erroDeUso('--saida exige o nome da peça.');
 
 for (const vista of vistas) {
   if (!VISTAS.includes(vista)) erroDeUso(`vista '${vista}' não existe. Use: ${VISTAS.join(', ')}`);
@@ -130,8 +159,28 @@ const partesDoSufixo = [
 ].filter(Boolean);
 const sufixo = partesDoSufixo.length ? `-${partesDoSufixo.join('-')}` : '';
 
-mkdirSync(OUT, { recursive: true });
+const diretorioSaida = saidaDeclarada ?? OUT;
+try {
+  criarDiretorioConfinado(diretorioSaida, { raiz: REPO });
+} catch (erro) {
+  if (erro instanceof ErroDeConfinamento) erroDeUso(`--saida recusado: ${erro.message}`);
+  throw erro;
+}
+const arquivosPlanejados = peca ? vistas.map((vista) => join(diretorioSaida, `bancada-${peca}-${vista}${sufixo}.png`)) : [];
+for (const arquivo of arquivosPlanejados) {
+  try {
+    verificarCaminhoConfinado(arquivo, { raiz: REPO });
+  } catch (erro) {
+    if (erro instanceof ErroDeConfinamento) erroDeUso(`--saida recusado: ${erro.message}`);
+    throw erro;
+  }
+}
+if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
+  erroDeUso('--saida já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão.');
+}
 let falhou = false;
+const vistasRelatadas = [];
+let pecaRelatada = null;
 
 try {
   for (const [indice, vista] of vistas.entries()) {
@@ -211,7 +260,28 @@ try {
         console.log(`enquadramento ${vista}: ${medida}`);
       }
     }
-    const arquivo = join(OUT, `bancada-${relato.peca}-${vista}${sufixo}.png`);
+    /* O runtime pode expor detalhes auxiliares de projeção (por exemplo,
+       pontos). O transporte para a revisão só leva o contrato público e
+       persistível de enquadramento. */
+    vistasRelatadas.push({
+      nome: vista,
+      enquadramento: {
+        valida: enquadramento.valida,
+        area: enquadramento.area,
+        largura: enquadramento.largura,
+        altura: enquadramento.altura,
+        cortado: enquadramento.cortado,
+      },
+    });
+    pecaRelatada = relato.peca;
+    const arquivo = join(diretorioSaida, `bancada-${relato.peca}-${vista}${sufixo}.png`);
+    try {
+      /* Confere outra vez imediatamente antes do escritor que Playwright usa. */
+      verificarCaminhoConfinado(arquivo, { raiz: REPO });
+    } catch (erro) {
+      if (erro instanceof ErroDeConfinamento) erroDeUso(`--saida recusado: ${erro.message}`);
+      throw erro;
+    }
     await page.screenshot({ path: arquivo });
     console.log(`${vista.padEnd(11)} ${arquivo}\n            ${url}`);
   }
@@ -223,5 +293,23 @@ try {
 if (errosDaPagina.length) {
   console.error(`\nerros de página:\n  ${errosDaPagina.join('\n  ')}`);
   falhou = true;
+}
+if (!falhou && relatorioDeclarado) {
+  if (existsSync(relatorioDeclarado)) {
+    console.error(`\nolhar-bancada: --relatorio não sobrescreve '${relative(REPO, relatorioDeclarado)}'.`);
+    falhou = true;
+  } else {
+    try {
+      criarDiretorioConfinado(dirname(relatorioDeclarado), { raiz: REPO });
+      verificarCaminhoConfinado(relatorioDeclarado, { raiz: REPO });
+    } catch (erro) {
+      if (erro instanceof ErroDeConfinamento) erroDeUso(`--relatorio recusado: ${erro.message}`);
+      throw erro;
+    }
+    /* Este é transporte efêmero para o orquestrador. Não leva URL com host,
+       caminho local ou estado do runtime; a revisão persistida gera a rota
+       relativa canônica no seu próprio contrato. */
+    writeFileSync(relatorioDeclarado, `${JSON.stringify({ peca: pecaRelatada, vistas: vistasRelatadas })}\n`, { encoding: 'utf8', flag: 'wx' });
+  }
 }
 process.exit(falhou ? 1 : 0);

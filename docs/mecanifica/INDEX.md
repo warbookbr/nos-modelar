@@ -122,9 +122,10 @@ Estado atual:
 - a revisão visual oficial de autoria agora é `npm run revisar -- <peça>`: ela
   abre a bancada neutra nas quatro vistas canônicas e recusa geometria cortada
   ou pequena demais; `npm run peca` ficou apenas como diagnóstico herdado;
-- o ciclo ativo é **Fluxo de modelagem assistida por IA v1**: pacote curto,
-  guias combináveis, revisão da bancada, crítica objetiva e comparação de
-  iterações. Contrato e gate em
+- o ciclo **Fluxo de modelagem assistida por IA v1** foi concluído em 1º de
+  agosto de 2026: pacote curto, guias combináveis, revisão da bancada, crítica
+  objetiva e comparação de iterações foram provados por agentes sem contexto
+  oculto. Contrato, comandos e limites em
   [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
 - o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
   simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
@@ -211,6 +212,8 @@ o plano e somente as referências da linha aplicável.
 | `src/interacao/` | interações semânticas da aplicação |
 | `prototipos/fps/v3/` | Atelier herdado do NÓS, preservado durante a migração |
 | `tools/mecanifica/` | testes headless dos contratos novos |
+| `tools/modelagem/` | preparação, validação, revisão, crítica e comparação do fluxo assistido por IA |
+| `autoria-assistida/` | guias curtos e pacotes de prova versionados para agentes modeladores e críticos |
 | `tools/bancadas/` | ferramentas visuais e gates herdados ou compartilhados |
 | `tools/mapa/` | geração do inventário e validação da documentação |
 | `docs/mecanifica/` | fontes de verdade do produto atual |
@@ -369,12 +372,15 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Ciclo ativo: Fluxo de modelagem assistida por IA v1.** O objetivo é uma IA
-receber um pacote curto, modelar, gerar revisão reproduzível e receber crítica
+**Último ciclo encerrado: Fluxo de modelagem assistida por IA v1.** Uma IA nova
+recebeu um pacote curto, modelou, gerou revisão reproduzível e recebeu crítica
 objetiva de outra IA sem abrir a Oficina legada nem ler o repositório inteiro.
-O contrato e o gate estão em
-[`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md). Filete v2 permanece pausado
-no Escopo A durante este ciclo.
+A prova não automotiva resolveu a transição e preservou explicitamente a
+divergência de material numa segunda crítica cega; `freio-disco` atravessou o
+mesmo contrato como peça existente. O contrato
+e o fechamento estão em
+[`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md). Nenhum ciclo novo está aberto;
+Filete v2 permanece pausado no Escopo A.
 
 ## Manutenção desta documentação
 

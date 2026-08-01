@@ -80,6 +80,10 @@ export const EIXOS = ['x', 'y', 'z'];
 /** Tipos possíveis de relação entre duas partes. */
 export const TIPOS_DE_RELACAO = ['folga', 'encosta', 'interpenetra'];
 
+function compararTexto(a, b) {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 function pareceMapa(valor) {
   return Boolean(valor)
     && typeof valor.get === 'function'
@@ -455,6 +459,96 @@ function selecionarNomes(partes, filtro, quem) {
   return [...partes.keys()].filter((nome) => vistos.has(nome));
 }
 
+const PROPRIEDADES_DE_MATERIAL = ['cor', 'emissivo', 'aspereza', 'semLuz', 'contorno', 'mistura', 'opacidade'];
+
+/* A revisão não precisa nem pode guardar uma face por id. Ela guarda a
+   DISTRIBUIÇÃO de acabamentos dentro de cada parte semântica: material
+   efetivamente aplicado, cor de pincel, sombreamento e pintura livre. Assim
+   duas execuções com outra ordem interna de faces dão a mesma descrição, mas
+   trocar só a aspereza, uma cor ou um dab continua sendo uma alteração visível
+   e rastreável. */
+function pinturaDaFace(face, quem) {
+  if (!Array.isArray(face.tinta)) return [];
+  return face.tinta.map((pintura) => {
+    if (!pintura || typeof pintura !== 'object' || Array.isArray(pintura)
+      || !Number.isFinite(pintura.a) || !Number.isFinite(pintura.b)
+      || !Number.isFinite(pintura.raio) || !Number.isFinite(pintura.dureza)
+      || (pintura.cor !== null && pintura.cor !== undefined && typeof pintura.cor !== 'string')) {
+      throw new Error(`${quem}: pintura da face não tem estado persistível.`);
+    }
+    return {
+      a: Object.is(pintura.a, -0) ? 0 : pintura.a,
+      b: Object.is(pintura.b, -0) ? 0 : pintura.b,
+      cor: pintura.cor ?? null,
+      raio: Object.is(pintura.raio, -0) ? 0 : pintura.raio,
+      dureza: Object.is(pintura.dureza, -0) ? 0 : pintura.dureza,
+    };
+  });
+}
+
+function propriedadesPersistiveisDoMaterial(material, nome, quem) {
+  if (!material || typeof material !== 'object' || Array.isArray(material)) {
+    throw new Error(`${quem}: material '${nome}' efetivamente usado não tem declaração persistível.`);
+  }
+  const propriedades = {};
+  for (const chave of PROPRIEDADES_DE_MATERIAL) {
+    if (!Object.hasOwn(material, chave)) continue;
+    const valor = material[chave];
+    if (chave === 'cor' || chave === 'mistura') {
+      if (typeof valor !== 'string' || valor === '') throw new Error(`${quem}: material '${nome}.${chave}' precisa ser texto não vazio.`);
+      propriedades[chave] = valor;
+    } else if (chave === 'semLuz') {
+      if (typeof valor !== 'boolean') throw new Error(`${quem}: material '${nome}.semLuz' precisa ser booleano.`);
+      propriedades[chave] = valor;
+    } else {
+      if (!Number.isFinite(valor)) throw new Error(`${quem}: material '${nome}.${chave}' precisa ser número finito.`);
+      propriedades[chave] = Object.is(valor, -0) ? 0 : valor;
+    }
+  }
+  return propriedades;
+}
+
+function aparenciaSemantica(neutro, nomes, quem) {
+  const catalogo = neutro.materiais ?? {};
+  if (!catalogo || typeof catalogo !== 'object' || Array.isArray(catalogo)) {
+    throw new Error(`${quem}: materiais do estado neutro precisam ser um dicionário.`);
+  }
+  const escolhidas = new Set(nomes);
+  const porParte = new Map(nomes.map((nome) => [nome, new Map()]));
+  const materiaisUsados = new Set();
+  for (const face of [...neutro.F.values()].sort((a, b) => a.id - b.id)) {
+    if (!escolhidas.has(face.parte)) continue;
+    const material = face.material ?? null;
+    if (material !== null && (typeof material !== 'string' || material === '' || !Object.hasOwn(catalogo, material))) {
+      throw new Error(`${quem}: face da parte '${face.parte}' cita material sem declaração persistível.`);
+    }
+    if (face.cor !== null && face.cor !== undefined && typeof face.cor !== 'string') {
+      throw new Error(`${quem}: cor da face da parte '${face.parte}' não é persistível.`);
+    }
+    const acabamento = {
+      material,
+      cor: face.cor ?? null,
+      liso: Boolean(face.liso),
+      pinturas: pinturaDaFace(face, quem),
+    };
+    const chave = JSON.stringify(acabamento);
+    const mapa = porParte.get(face.parte);
+    const anterior = mapa.get(chave);
+    mapa.set(chave, anterior ? { ...anterior, faces: anterior.faces + 1 } : { ...acabamento, faces: 1 });
+    if (material !== null) materiaisUsados.add(material);
+  }
+  return {
+    materiais: [...materiaisUsados].sort(compararTexto).map((nome) => ({
+      nome,
+      propriedades: propriedadesPersistiveisDoMaterial(catalogo[nome], nome, quem),
+    })),
+    partes: nomes.map((nome) => ({
+      nome,
+      coberturas: [...porParte.get(nome).values()].sort((a, b) => compararTexto(JSON.stringify(a), JSON.stringify(b))),
+    })),
+  };
+}
+
 /**
  * Descrição mensurável e determinística de uma peça: totais, caixa por parte
  * (em ordem de nome) e a relação de cada par de partes (em ordem estável).
@@ -480,6 +574,15 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
      não parte semântica, e esconder uma porta porque o autor filtrou o
      relatório por outra parte faria a régua mentir sobre o contrato da peça. */
   const portas = portasPublicadas(neutro);
+  /* Material também é uma propriedade semântica do estado neutro. A contagem
+     mede nomes efetivamente usados por faces (não o dicionário de possibilidades
+     do arquivo), para que um orçamento de revisão confira o que a peça entrega. */
+  const materiais = new Set(
+    [...neutro.F.values()]
+      .map((face) => face.material)
+      .filter((material) => typeof material === 'string' && material !== ''),
+  );
+  const aparencia = aparenciaSemantica(neutro, nomes, quem);
   return {
     totais: {
       partes: escolhidas.length,
@@ -489,12 +592,14 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
       facesSemParte: medido.facesSemParte.length,
       orfaos: orfaos.length,
       portas: portas.length,
+      materiais: materiais.size,
     },
     filtrado: partes !== null && partes !== undefined,
     facesSemParte: medido.facesSemParte.slice(),
     partes: escolhidas.map(projetarCaixa),
     relacoes,
     portas,
+    aparencia,
   };
 }
 
