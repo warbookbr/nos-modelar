@@ -306,6 +306,12 @@ export function modeloDaDescricao(descricao) {
   return { totais, partes, relacoes, portas, aparencia };
 }
 
+/** Identidade determinística do estado modelado, útil também quando uma
+ * tentativa visual é recusada antes de existir uma revisão publicável. */
+export function assinaturaModeloDaDescricao(descricao) {
+  return assinatura(modeloDaDescricao(descricao));
+}
+
 export function rotaCanonica(peca, vista) {
   texto(peca, 'rotaCanonica', 'peca', { semantico: true });
   if (!VISTAS_CANONICAS.includes(vista)) erro('rotaCanonica', `vista '${vista}' não é canônica.`);

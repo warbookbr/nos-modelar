@@ -15,7 +15,9 @@ import {
   ErroDePacote, RAIZ_PACOTES, RAIZ_REPOSITORIO, caminhoPacote,
 } from './formato-pacote.mjs';
 import { validarPacoteNoDisco } from './validar-pacote.mjs';
-import { construirRevisao, jsonCanonico, validarRevisao } from './revisao-modelagem.mjs';
+import {
+  assinaturaModeloDaDescricao, construirRevisao, jsonCanonico, validarRevisao,
+} from './revisao-modelagem.mjs';
 
 const VISTAS = ['isometrica', 'frontal', 'direita', 'superior'];
 const REVISAO = /^r[0-9]+$/;
@@ -44,7 +46,11 @@ function lerRelatorio(arquivo, peca) {
     || VISTAS.some((vista) => !nomes.includes(vista))) {
     falhar('a bancada não devolveu exatamente as quatro vistas canônicas.');
   }
-  return relato.vistas;
+  return {
+    falhas: Array.isArray(relato.falhas) ? relato.falhas : [],
+    resultado: relato.resultado === 'recusada' ? 'recusada' : 'aceita',
+    vistas: relato.vistas,
+  };
 }
 
 function executarBancadaPadrao({ peca, vistas, relatorio }) {
@@ -62,8 +68,117 @@ function executarBancadaPadrao({ peca, vistas, relatorio }) {
   });
   if (resultado.stdout) process.stdout.write(resultado.stdout);
   if (resultado.stderr) process.stderr.write(resultado.stderr);
-  if (resultado.error) falhar(`não consegui dirigir a bancada: ${resultado.error.message}`);
-  if (resultado.status !== 0) falhar(`a bancada recusou a revisão (saída ${resultado.status ?? 'nula'}).`);
+  if (resultado.error) {
+    return {
+      aceita: false,
+      falha: {
+        categoria: 'ferramenta',
+        codigo: resultado.error.code === 'ETIMEDOUT' ? 'bancada_timeout' : 'bancada_nao_executou',
+        vista: null,
+        mensagem: resultado.error.code === 'ETIMEDOUT'
+          ? 'A captura da bancada excedeu o limite de execução.'
+          : 'O processo da bancada não pôde ser executado.',
+        acao: 'Repita depois de corrigir a ferramenta; não remodele a peça.',
+      },
+    };
+  }
+  if (resultado.status !== 0) {
+    return {
+      aceita: false,
+      falha: {
+        categoria: 'ferramenta', codigo: 'bancada_recusou', vista: null,
+        mensagem: 'A bancada encerrou a captura sem aceitar a revisão.',
+        acao: 'Leia o relatório preservado para distinguir câmera, modelo e ferramenta.',
+      },
+    };
+  }
+  return { aceita: true, falha: null };
+}
+
+const FALHAS_CONHECIDAS = Object.freeze({
+  bancada_nao_executou: ['ferramenta', 'O processo da bancada não pôde ser executado.', 'Repita depois de corrigir a ferramenta; não remodele a peça.'],
+  bancada_recusou: ['ferramenta', 'A bancada encerrou a captura sem aceitar a revisão.', 'Leia o relatório preservado antes de alterar a peça.'],
+  bancada_timeout: ['ferramenta', 'A captura da bancada excedeu o limite de execução.', 'Repita depois de corrigir a ferramenta; não remodele a peça.'],
+  enquadramento_cortado: ['camera', 'A câmera cortou parte da silhueta.', 'Corrija o enquadramento desta vista sem alterar a geometria da peça.'],
+  enquadramento_pequeno: ['camera', 'A câmera deixou a peça pequena demais para revisão.', 'Corrija o enquadramento desta vista sem alterar a geometria da peça.'],
+  erro_da_pagina: ['ferramenta', 'A página da bancada emitiu erro durante a captura.', 'Corrija a ferramenta; não remodele a peça.'],
+  identidade_ausente: ['modelo', 'A peça contém face sem identidade semântica.', 'Nomeie a origem ou a parte responsável antes da revisão visual.'],
+  parte_inexistente: ['modelo', 'A seleção pediu parte que a peça não publica.', 'Corrija o nome semântico; não substitua por índice ou UUID.'],
+  revisao_sem_diagnostico: ['ferramenta', 'A tentativa falhou antes de produzir diagnóstico específico.', 'Inspecione a ferramenta; não altere a geometria sem evidência visual.'],
+});
+
+function falhaCanonica(codigo, vista = null) {
+  const conhecida = FALHAS_CONHECIDAS[codigo];
+  if (!conhecida) return null;
+  const [categoria, mensagem, acao] = conhecida;
+  return {
+    categoria,
+    codigo,
+    vista: VISTAS.includes(vista) ? vista : null,
+    mensagem,
+    acao,
+  };
+}
+
+function falhaDeEnquadramento(vista) {
+  return falhaCanonica(
+    vista.enquadramento?.cortado ? 'enquadramento_cortado' : 'enquadramento_pequeno',
+    vista.nome,
+  );
+}
+
+function falhasDaTentativa({ execucao, relatorio }) {
+  const declaradas = relatorio?.falhas
+    ?.map((falha) => falhaCanonica(falha?.codigo, falha?.vista))
+    .filter(Boolean) ?? [];
+  const enquadramento = relatorio?.vistas?.filter((vista) => !vista?.enquadramento?.valida)
+    .map(falhaDeEnquadramento) ?? [];
+  const vistasComFalha = new Set(declaradas.map((falha) => `${falha.codigo}\0${falha.vista ?? ''}`));
+  const combinadas = [...declaradas];
+  for (const falha of enquadramento) {
+    const chave = `${falha.codigo}\0${falha.vista ?? ''}`;
+    if (!vistasComFalha.has(chave)) combinadas.push(falha);
+  }
+  if (!combinadas.length && execucao?.falha) {
+    combinadas.push(falhaCanonica(execucao.falha.codigo, execucao.falha.vista)
+      ?? falhaCanonica('revisao_sem_diagnostico'));
+  }
+  if (!combinadas.length) {
+    combinadas.push(falhaCanonica('revisao_sem_diagnostico'));
+  }
+  return combinadas;
+}
+
+function preservarTentativa({
+  pastaPacote, temporaria, relato, peca, revisao, assinaturaModelo, relatorio, falhas,
+}) {
+  const pastaTentativas = join(pastaPacote, 'tentativas');
+  const idTentativa = assinaturaModelo.slice('sha256:'.length);
+  const destino = join(pastaTentativas, idTentativa);
+  mkdirSync(pastaTentativas, { recursive: true });
+  if (existsSync(destino)) {
+    rmSync(temporaria, { recursive: true, force: true });
+    return { destino, existente: true };
+  }
+  const evidencia = {
+    assinaturaModelo,
+    falhas,
+    formato: 'mecanifica.tentativa-revisao',
+    peca,
+    resultado: 'recusada',
+    revisaoSolicitada: revisao,
+    versao: 1,
+    vistas: relatorio?.vistas ?? [],
+  };
+  rmSync(join(temporaria, 'revisao.json'), { force: true });
+  writeFileSync(join(temporaria, 'tentativa.json'), `${jsonCanonico(evidencia)}\n`, { encoding: 'utf8', flag: 'wx' });
+  if (existsSync(relato)) renameSync(relato, join(temporaria, 'relatorio-bancada.json'));
+  if (existsSync(destino)) {
+    rmSync(temporaria, { recursive: true, force: true });
+    return { destino, existente: true };
+  }
+  renameSync(temporaria, destino);
+  return { destino, existente: false };
 }
 
 /* O briefing já passou pelo validador canônico antes desta leitura. Esta porta
@@ -113,6 +228,7 @@ export async function revisarPacote({
     falhar(`pacote '${id}' está em criação e o alvo '${validado.peca}' ainda não existe; crie a fonte canônica antes de revisar.`);
   }
   conferirOrcamento(pastaPacote, validado.alvo.descricao);
+  const assinaturaModelo = assinaturaModeloDaDescricao(validado.alvo.descricao);
   const pastaRevisoes = join(pastaPacote, 'revisoes');
   const destino = join(pastaRevisoes, nomeRevisao);
   if (existsSync(destino)) falhar(`revisão '${nomeRevisao}' já existe; revisar nunca sobrescreve diretório.`);
@@ -122,13 +238,24 @@ export async function revisarPacote({
   const vistas = join(temporaria, 'vistas');
   const relato = join(temporaria, '.relato-bancada.json');
   mkdirSync(vistas);
+  let execucao = null;
+  let relatorioLido = null;
   try {
-    await executarBancada({ peca: validado.alvo.peca, vistas, relatorio: relato });
-    const vistasDaBancada = lerRelatorio(relato, validado.alvo.peca);
+    execucao = await executarBancada({ peca: validado.alvo.peca, vistas, relatorio: relato });
+    if (!existsSync(relato)) {
+      falhar('a bancada não produziu relatório; a falha é da ferramenta, não evidência para remodelar a peça.');
+    }
+    relatorioLido = lerRelatorio(relato, validado.alvo.peca);
+    const invalidas = relatorioLido.vistas.filter((vista) => !vista?.enquadramento?.valida);
+    if (execucao?.aceita === false || relatorioLido.resultado === 'recusada' || invalidas.length) {
+      const categorias = [...new Set(falhasDaTentativa({ execucao, relatorio: relatorioLido })
+        .map((falha) => falha.categoria))].join(', ');
+      falhar(`a bancada recusou a revisão; classificação: ${categorias || 'ferramenta'}.`);
+    }
     const resultado = validarRevisao(construirRevisao({
       peca: validado.alvo.peca,
       descricao: validado.alvo.descricao,
-      vistas: vistasDaBancada,
+      vistas: relatorioLido.vistas,
     }));
     const esperado = VISTAS.map((vista) => join(vistas, `bancada-${validado.alvo.peca}-${vista}-orto.png`));
     const ausentes = esperado.filter((arquivo) => !existsSync(arquivo));
@@ -143,8 +270,29 @@ export async function revisarPacote({
     renameSync(temporaria, destino);
     return { destino, revisao: resultado };
   } catch (erro) {
-    rmSync(temporaria, { recursive: true, force: true });
-    throw erro;
+    const falhas = falhasDaTentativa({ execucao, relatorio: relatorioLido });
+    let preservada;
+    try {
+      preservada = preservarTentativa({
+        pastaPacote,
+        temporaria,
+        relato,
+        peca: validado.alvo.peca,
+        revisao: nomeRevisao,
+        assinaturaModelo,
+        relatorio: relatorioLido,
+        falhas,
+      });
+    } catch (erroDePreservacao) {
+      rmSync(temporaria, { recursive: true, force: true });
+      falhar(`a revisão falhou e a evidência não pôde ser preservada: ${erroDePreservacao.message}`);
+    }
+    const caminho = relative(pastaPacote, preservada.destino).replaceAll('\\', '/');
+    const categorias = [...new Set(falhas.map((falha) => falha.categoria))].join(', ');
+    falhar(
+      `${erro.message}\ntentativa ${preservada.existente ? 'já estava' : 'foi'} preservada em ${caminho}`
+      + `\nclassificação: ${categorias}; leia tentativa.json e as imagens antes de alterar a peça.`,
+    );
   }
 }
 

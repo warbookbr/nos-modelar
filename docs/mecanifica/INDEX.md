@@ -127,6 +127,16 @@ Estado atual:
   objetiva e comparação de iterações foram provados por agentes sem contexto
   oculto. Contrato, comandos e limites em
   [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- a medição A/B pós-ciclo está **concluída**: dois Sols modelaram a mesma peça,
+  dois Terra e um árbitro avaliaram às cegas, e a mediana terminou empatada em
+  14/16. O fluxo ajudou integração, aderência e rastreabilidade, mas não provou
+  ganho líquido de forma ou velocidade; protocolo, artefatos e próximo recorte
+  em [`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md);
+- **Revisão visual econômica v1 está concluída:** o A/B revelou que sete
+  capturas eram apagadas por enquadramento e a oitava expirou. Agora cada vista
+  é enquadrada pelo próprio envelope, a prontidão recebe uma repetição e toda
+  recusa conserva imagens e diagnóstico `camera`/`modelo`/`ferramenta`. As duas
+  dobradiças congeladas passaram em uma execução cada, sem mudar geometria;
 - o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
   simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
   A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
@@ -157,17 +167,19 @@ Use esta ordem para resolver dúvidas:
    arredondamento real de aresta;
 8. [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) — pacote,
    revisão e crítica do ciclo ativo de modelagem por IA;
-9. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+9. [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) —
+   medição cega do efeito real do fluxo sobre dois modeladores Sol;
+10. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-9. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+11. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-10. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+12. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-11. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
+13. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
    ordenado de mudanças na linguagem de autoria, com trade-off e custo;
-12. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+14. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-13. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+15. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -188,6 +200,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 | Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
 | Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md), [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
+| Avaliar se o fluxo ajuda uma IA a modelar | [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) |
 | Escolher realismo ou direção visual | [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) e [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | Mexer no freio a disco | [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
 | Mexer na roda dianteira | [`docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md); para a prova isolada, [`docs/mecanifica/EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) e [`docs/mecanifica/RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-239 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+247 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -37,6 +37,22 @@
 ## .claude/skills/oficina/
 
 - `SKILL.md` — A Oficina — o editor de objetos in-game do NÓS (arquitetura, os 3 espaços de trabalho, ciclo de construção, verificação, armadilhas). Use SEMPRE que for cons…
+
+## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/
+
+- `README.md` — A/B do fluxo de modelagem por IA
+
+## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/cego/
+
+- `RUBRICA.md` — Avaliação cega — dobradiça de portão
+- `arbitro.md` — Arbitragem cega final — dobradiça de portão
+- `avaliador-1.md` — Avaliação cega 1 — dobradiça de portão
+- `avaliador-2.md` — Avaliação cega 2 — dobradiça de portão
+
+## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/fontes/
+
+- `condicao-assistida.js` — PEÇA DE EXERCÍCIO — dobradiça vertical de portão para inspeção na bancada. Duas folhas de chapa compartilham o eixo Y: a folha fixa carrega o gomo central e …
+- `condicao-crua.js` — DOBRADIÇA DE PORTÃO — conjunto procedural técnico-didático F2 para inspeção e montagem. Duas folhas retangulares de 1,20 m × 0,65 m × 35 mm encontram-se num …
 
 ## autoria-assistida/guias/forma/
 
@@ -95,6 +111,7 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FILETE-V2.md` — Filete v2 — Escopo A implementado; canto composto pendente
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1

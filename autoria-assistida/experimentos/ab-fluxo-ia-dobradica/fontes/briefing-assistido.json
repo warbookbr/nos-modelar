@@ -1,0 +1,90 @@
+{
+  "alvo": {
+    "caminho": "prototipos/fps/v3/pecas/_dobradica-de-portao.js",
+    "modo": "criacao",
+    "peca": "_dobradica-de-portao"
+  },
+  "checklist": [
+    {
+      "criterio": "A descrição estrita confirma zero órfãos e zero face sem identidade.",
+      "estado": "aberto",
+      "id": "integridade",
+      "prioridade": 1
+    },
+    {
+      "criterio": "Existem exatamente as cinco partes esperadas, todas selecionáveis e com geometria não vazia.",
+      "estado": "aberto",
+      "id": "partes",
+      "prioridade": 2
+    },
+    {
+      "criterio": "A peça respeita 1200 faces, cinco partes, três materiais e altura total entre 1,14 m e 1,26 m.",
+      "estado": "aberto",
+      "id": "orcamento",
+      "prioridade": 3
+    },
+    {
+      "criterio": "Nas vistas frontal e superior, as duas folhas são chapas finas contíguas ao eixo, sem interpenetração visível.",
+      "estado": "aberto",
+      "id": "folhas",
+      "prioridade": 4
+    },
+    {
+      "criterio": "Na vista frontal há três gomos alternados, com dois gomos externos separados do central por vãos perceptíveis.",
+      "estado": "aberto",
+      "id": "gomos",
+      "prioridade": 5
+    },
+    {
+      "criterio": "Nas vistas direita e isométrica, gomos e pino compartilham um eixo vertical e o pino ultrapassa as duas extremidades.",
+      "estado": "aberto",
+      "id": "eixo-pino",
+      "prioridade": 6
+    },
+    {
+      "criterio": "As quatro vistas canônicas são úteis, sem corte, e distinguem folhas, gomos e pino.",
+      "estado": "aberto",
+      "id": "vistas",
+      "prioridade": 7
+    },
+    {
+      "criterio": "Ao isolar folhaFixa com barrilFixo e folhaMovel com barrisMoveis, cada subconjunto preserva somente sua folha e seus gomos.",
+      "estado": "aberto",
+      "id": "subconjuntos",
+      "prioridade": 8
+    }
+  ],
+  "formato": "mecanifica.pacote-modelagem",
+  "guias": [
+    "forma/silhueta-e-transicoes",
+    "material/leitura-de-material",
+    "processo/evidencia-e-iteracao"
+  ],
+  "id": "ab-dobradica",
+  "objetivo": "Criar uma dobradiça vertical de portão técnico-didática F2: duas folhas de 1,20 m por cerca de 0,65 m, três gomos cilíndricos alternados num eixo vertical e um pino passante visível além das extremidades.",
+  "partesEsperadas": [
+    "folhaFixa",
+    "folhaMovel",
+    "barrilFixo",
+    "barrisMoveis",
+    "pino"
+  ],
+  "perfil": {
+    "distanciaMinima": 0.5,
+    "fidelidade": "F2",
+    "interacao": "montagem",
+    "orcamento": {
+      "faces": 1200,
+      "materiais": 3,
+      "partes": 5
+    },
+    "origem": "declarado",
+    "precisao": "mecanica",
+    "visual": "tecnicoDidatico"
+  },
+  "provas": [
+    "descricao-headless",
+    "bancada-quatro-vistas"
+  ],
+  "versao": 1
+}

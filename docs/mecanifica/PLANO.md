@@ -24,6 +24,15 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
 - a fase 6 começou pelo recorte operacional **Fluxo de modelagem assistida por
   IA v1**, **CONCLUÍDO em 1º de agosto de 2026**. Contrato, comandos, provas e
   limites estão em [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- a avaliação A/B pós-ciclo também está **CONCLUÍDA**: a mediana cega empatou
+  em 14/16. O fluxo melhorou aderência, integração e evidência, mas exigiu mais
+  tentativas e não provou ganho líquido de modelagem. A peça, a rubrica e os
+  três pareceres estão em
+  [`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md);
+- **Revisão visual econômica v1 está CONCLUÍDA:** o atrito A-38 foi pago sem
+  mudar geometria. Enquadramento é calculado por vista, timeout de prontidão é
+  repetido uma vez, e toda recusa preserva evidência classificada por assinatura
+  do modelo. As duas dobradiças congeladas passaram em uma execução cada;
 - **nenhum ciclo novo está aberto:** o próximo recorte só começa depois de
   escolher uma dificuldade observada pelo fluxo concluído;
 - Filete v2 está **pausado** depois do Escopo A. `arredondarAresta` já entrega
@@ -239,6 +248,8 @@ foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
 | 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
 | 4 | **CONCLUÍDO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
 | 5 | **CONCLUÍDO em 01/08/2026** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; prova cega completa em `_caixote-filetado` e prova de compatibilidade em `freio-disco` |
+| 5a | **CONCLUÍDA em 01/08/2026** | medição A/B do fluxo | dois Sols, dois Terra e um árbitro cego; empate mediano 14/16. A condição assistida venceu envelope e gate 4/4, mas usou mais tentativas, portanto não demonstrou ganho líquido. Próximo candidato: retorno visual econômico, sem abrir ciclo automaticamente |
+| 5b | **CONCLUÍDA em 01/08/2026** | Revisão visual econômica v1 | A-38 pago: câmera por vista, repetição de prontidão, recusa preservada por assinatura e diagnóstico `camera`/`modelo`/`ferramenta`. As duas dobradiças congeladas passaram em uma chamada cada, sem alteração geométrica |
 | 6 | pausada | Filete v2, Escopo B | aguarda comparação com a frente paralela antes de atacar canto composto/`chamferBox`; o Escopo A está preservado e verde |
 | 7 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 8 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
@@ -282,6 +293,30 @@ melhor. A divergência de material do caixote permanece aberta sem reabrir o
 ciclo: ela é evidência de que o fluxo conserva um problema em vez de fazê-lo
 sumir. Uma capacidade nova só será proposta quando uma tarefa real ficar
 bloqueada por um desses limites.
+
+**Medição posterior, sem reabrir o ciclo:** o A/B descrito em
+[`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) comparou um Sol com o
+pacote e outro sem ele. A mediana cega empatou em 14/16; a condição assistida
+ganhou aderência dimensional, portas e evidência reproduzível, mas gastou mais
+tentativas de revisão. O resultado limita a afirmação do ciclo: o fluxo melhora
+a qualidade da entrega para o próximo agente, mas ainda não demonstrou melhorar
+a habilidade visual nem o custo da modelagem.
+
+### Revisão visual econômica v1 — CONCLUÍDA em 1º de agosto de 2026
+
+**Incluiu somente:** A-38 — enquadrar cada vista pelo envelope projetado,
+preservar evidência recusada por assinatura semântica, classificar falha de
+câmera/modelo/ferramenta e repetir uma vez a prontidão expirada.
+
+**Excluiu:** nova geometria, crítica automática, colisão sólida, relações de
+montagem, novos guias de forma e nova rodada A/B.
+
+**Gate atendido:** a dobradiça assistida congelada produziu `r002` em uma
+execução e a crua produziu `r001` em uma execução; nenhuma geometria mudou. Uma
+falha injetada conserva quatro PNGs, relatório e `tentativa.json`, não publica
+revisão, não duplica o mesmo estado e permite promoção posterior. Caixote e
+freio continuam passando nas quatro vistas. O guia de iteração foi corrigido
+para não pedir micro-revisões durante a criação inicial.
 
 ### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 

@@ -136,6 +136,24 @@ const page = await browser.newPage({ viewport: { width: largura, height: altura 
 const errosDaPagina = [];
 page.on('pageerror', (e) => errosDaPagina.push(e.message));
 
+async function abrirComRepeticao(url) {
+  for (let tentativa = 1; tentativa <= 2; tentativa++) {
+    try {
+      await page.goto(url, { waitUntil: 'load' });
+      await page.waitForFunction(
+        () => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null,
+        { timeout: 20000 },
+      );
+      return tentativa;
+    } catch (erro) {
+      const expirou = erro?.name === 'TimeoutError' || /Timeout/i.test(erro?.message ?? '');
+      if (!expirou || tentativa === 2) throw erro;
+      await page.goto('about:blank', { waitUntil: 'load' });
+    }
+  }
+  return 2;
+}
+
 function urlDa(vista) {
   const params = new URLSearchParams();
   if (peca) params.set('peca', peca);
@@ -180,16 +198,14 @@ if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo)))
 }
 let falhou = false;
 const vistasRelatadas = [];
+const falhasRelatadas = [];
 let pecaRelatada = null;
 
 try {
   for (const [indice, vista] of vistas.entries()) {
     const url = urlDa(vista);
-    await page.goto(url, { waitUntil: 'load' });
-    await page.waitForFunction(
-      () => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null,
-      { timeout: 20000 },
-    );
+    const tentativaDeAbertura = await abrirComRepeticao(url);
+    if (tentativaDeAbertura > 1) console.log(`ferramenta: ${vista} abriu após repetição automática`);
     const relato = await page.evaluate(() => {
       const b = window.__mecanificaBancada;
       return {
@@ -217,6 +233,7 @@ try {
         break;
       }
       const semParte = relato.diagnosticos?.facesSemParte?.length ?? 0;
+      pecaRelatada = relato.peca;
       console.log(`peça: ${relato.peca}`);
       console.log(`partes (${relato.partes.length}): ${relato.partes.join(', ')}`);
       console.log(
@@ -230,11 +247,21 @@ try {
           + `\n  a peça expõe: ${relato.partes.join(', ')}`,
         );
         falhou = true;
+        falhasRelatadas.push({
+          categoria: 'modelo', codigo: 'parte_inexistente', vista: null,
+          mensagem: 'A seleção pediu parte que a peça não publica.',
+          acao: 'Corrija o nome semântico; não substitua por índice ou UUID.',
+        });
         break;
       }
       if (semParte && estrito) {
         console.error(`\n${semParte} face(s) sem identidade semântica (--estrito)`);
         falhou = true;
+        falhasRelatadas.push({
+          categoria: 'modelo', codigo: 'identidade_ausente', vista: null,
+          mensagem: 'A peça contém face sem identidade semântica.',
+          acao: 'Nomeie a origem ou a parte responsável antes da revisão visual.',
+        });
         break;
       }
       if (focar) {
@@ -254,7 +281,19 @@ try {
     if (revisar) {
       const medida = `ocupação ${(enquadramento.area * 100).toFixed(1)}% (${(enquadramento.largura * 100).toFixed(1)}% × ${(enquadramento.altura * 100).toFixed(1)}%)`;
       if (!enquadramento.valida) {
-        console.error(`\nENQUADRAMENTO INÚTIL em ${vista}: ${medida}${enquadramento.cortado ? '; geometria cortada' : '; objeto pequeno'}`);
+        const codigo = enquadramento.cortado ? 'enquadramento_cortado' : 'enquadramento_pequeno';
+        console.error(
+          `\nFALHA DE CÂMERA em ${vista}: ${medida}`
+          + `${enquadramento.cortado ? '; silhueta cortada' : '; ocupação insuficiente após enquadramento automático'}`
+          + '\n  não altere a geometria apenas para preencher o quadro.',
+        );
+        falhasRelatadas.push({
+          categoria: 'camera', codigo, vista,
+          mensagem: enquadramento.cortado
+            ? 'A câmera cortou parte da silhueta.'
+            : 'A câmera deixou a peça pequena demais para revisão.',
+          acao: 'Corrija o enquadramento desta vista sem alterar a geometria da peça.',
+        });
         falhou = true;
       } else {
         console.log(`enquadramento ${vista}: ${medida}`);
@@ -292,9 +331,14 @@ try {
 
 if (errosDaPagina.length) {
   console.error(`\nerros de página:\n  ${errosDaPagina.join('\n  ')}`);
+  falhasRelatadas.push({
+    categoria: 'ferramenta', codigo: 'erro_da_pagina', vista: null,
+    mensagem: 'A página da bancada emitiu erro durante a captura.',
+    acao: 'Repita a captura depois de corrigir a ferramenta; não remodele a peça.',
+  });
   falhou = true;
 }
-if (!falhou && relatorioDeclarado) {
+if (relatorioDeclarado) {
   if (existsSync(relatorioDeclarado)) {
     console.error(`\nolhar-bancada: --relatorio não sobrescreve '${relative(REPO, relatorioDeclarado)}'.`);
     falhou = true;
@@ -309,7 +353,12 @@ if (!falhou && relatorioDeclarado) {
     /* Este é transporte efêmero para o orquestrador. Não leva URL com host,
        caminho local ou estado do runtime; a revisão persistida gera a rota
        relativa canônica no seu próprio contrato. */
-    writeFileSync(relatorioDeclarado, `${JSON.stringify({ peca: pecaRelatada, vistas: vistasRelatadas })}\n`, { encoding: 'utf8', flag: 'wx' });
+    writeFileSync(relatorioDeclarado, `${JSON.stringify({
+      peca: pecaRelatada,
+      resultado: falhou ? 'recusada' : 'aceita',
+      falhas: falhasRelatadas,
+      vistas: vistasRelatadas,
+    })}\n`, { encoding: 'utf8', flag: 'wx' });
   }
 }
 process.exit(falhou ? 1 : 0);

@@ -1,5 +1,7 @@
 // Prova a orquestração atômica entre pacote, descrição headless e vistas da bancada.
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
@@ -63,24 +65,88 @@ describe('revisar:modelagem', () => {
     }
   }, 20_000);
 
-  it('não publica revisão se a bancada aceitar uma vista inútil', async () => {
+  it('preserva imagens e diagnóstico de câmera sem publicar a revisão recusada', async () => {
     const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-revisao-'));
     try {
       await prepararPacote({ id: 'prova-jardineira', peca: '_jardineira', raizPacotes: raiz });
+      const bancadaComVistaInvalida = async ({ peca, vistas, relatorio }) => {
+        await bancadaFalsa({ peca, vistas, relatorio });
+        const dado = JSON.parse(readFileSync(relatorio, 'utf8'));
+        dado.resultado = 'recusada';
+        dado.falhas = [{
+          categoria: 'camera', codigo: 'enquadramento_pequeno', vista: 'direita',
+          mensagem: 'A câmera deixou a peça pequena demais para revisão.',
+          acao: 'Corrija o enquadramento sem alterar a geometria.',
+        }];
+        dado.vistas[2].enquadramento.valida = false;
+        writeFileSync(relatorio, `${JSON.stringify(dado)}\n`, 'utf8');
+        return { aceita: false, falha: null };
+      };
       await expect(revisarPacote({
         id: 'prova-jardineira', revisao: 'r002', raizPacotes: raiz,
-        executarBancada: async ({ peca, vistas, relatorio }) => {
-          await bancadaFalsa({ peca, vistas, relatorio });
-          const dado = JSON.parse(readFileSync(relatorio, 'utf8'));
-          dado.vistas[2].enquadramento.valida = false;
-          writeFileSync(relatorio, `${JSON.stringify(dado)}\n`, 'utf8');
-        },
-      })).rejects.toThrow(/gate de enquadramento/);
+        executarBancada: bancadaComVistaInvalida,
+      })).rejects.toThrow(/preservada.*classificação: camera/s);
       expect(existsSync(join(raiz, 'prova-jardineira', 'revisoes', 'r002'))).toBe(false);
+      const pastaTentativas = join(raiz, 'prova-jardineira', 'tentativas');
+      const ids = readdirSync(pastaTentativas);
+      expect(ids).toHaveLength(1);
+      expect(ids[0]).toMatch(/^[a-f0-9]{64}$/);
+      const tentativa = join(pastaTentativas, ids[0]);
+      const manifestoTexto = readFileSync(join(tentativa, 'tentativa.json'), 'utf8');
+      expect(manifestoTexto).not.toMatch(/[A-Za-z]:\\|127\.0\.0\.1|timestamp|em-preparo/i);
+      const manifesto = JSON.parse(manifestoTexto);
+      expect(manifesto).toMatchObject({
+        formato: 'mecanifica.tentativa-revisao', resultado: 'recusada', revisaoSolicitada: 'r002',
+        falhas: [{ categoria: 'camera', codigo: 'enquadramento_pequeno', vista: 'direita' }],
+      });
+      expect(manifesto.vistas).toHaveLength(4);
+      for (const vista of VISTAS) {
+        expect(existsSync(join(tentativa, 'vistas', `bancada-_jardineira-${vista}-orto.png`))).toBe(true);
+      }
+
+      const antes = readFileSync(join(tentativa, 'tentativa.json'), 'utf8');
+      await expect(revisarPacote({
+        id: 'prova-jardineira', revisao: 'r002', raizPacotes: raiz,
+        executarBancada: bancadaComVistaInvalida,
+      })).rejects.toThrow(/já estava preservada/);
+      expect(readdirSync(pastaTentativas)).toEqual(ids);
+      expect(readFileSync(join(tentativa, 'tentativa.json'), 'utf8')).toBe(antes);
+
+      await expect(revisarPacote({
+        id: 'prova-jardineira', revisao: 'r002', raizPacotes: raiz, executarBancada: bancadaFalsa,
+      })).resolves.toMatchObject({ destino: expect.stringMatching(/r002$/) });
     } finally {
       rmSync(raiz, { recursive: true, force: true });
     }
   }, 20_000);
+
+  it('classifica falha sem relatório como ferramenta e conserva a assinatura do modelo', async () => {
+    const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-revisao-'));
+    try {
+      await prepararPacote({ id: 'prova-jardineira', peca: '_jardineira', raizPacotes: raiz });
+      await expect(revisarPacote({
+        id: 'prova-jardineira', revisao: 'r001', raizPacotes: raiz,
+        executarBancada: async () => ({
+          aceita: false,
+          falha: {
+            categoria: 'ferramenta', codigo: 'bancada_timeout', vista: null,
+            mensagem: 'A captura excedeu o limite.', acao: 'Repita sem remodelar.',
+          },
+        }),
+      })).rejects.toThrow(/falha é da ferramenta.*classificação: ferramenta/s);
+      const [idTentativa] = readdirSync(join(raiz, 'prova-jardineira', 'tentativas'));
+      const tentativa = JSON.parse(readFileSync(
+        join(raiz, 'prova-jardineira', 'tentativas', idTentativa, 'tentativa.json'), 'utf8',
+      ));
+      expect(tentativa.assinaturaModelo).toBe(`sha256:${idTentativa}`);
+      expect(tentativa.falhas).toEqual([expect.objectContaining({
+        categoria: 'ferramenta', codigo: 'bancada_timeout',
+      })]);
+      expect(existsSync(join(raiz, 'prova-jardineira', 'revisoes', 'r001'))).toBe(false);
+    } finally {
+      rmSync(raiz, { recursive: true, force: true });
+    }
+  });
 
   it('bloqueia revisão de criação enquanto a fonte canônica ainda não existe', async () => {
     const raiz = mkdtempSync(join(tmpdir(), 'mecanifica-revisao-'));

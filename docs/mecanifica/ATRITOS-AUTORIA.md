@@ -841,6 +841,43 @@ destruía o contexto foi removido.
 
 ## Atritos resolvidos
 
+### A-38 — a revisão apagava a evidência e fazia a IA remodelar para a câmera
+
+**Onde doeu:** bancada e orquestração do fluxo assistido, não linguagem
+geométrica.
+
+**Evidência:** no A/B da dobradiça, o Sol assistido executou
+`revisar:modelagem` oito vezes. Sete execuções capturaram quatro PNGs, mas uma
+vista pequena fez o diretório temporário inteiro ser apagado; a oitava expirou
+esperando a página. Como todas as vistas herdavam o raio 3D da montagem, uma
+vista fina ficava pequena mesmo com a peça inteira no quadro. O agente abriu a
+dobradiça e repetiu a revisão para satisfazer a câmera.
+
+**Agravante documental:** o briefing combinou folhas de 1,20 m, altura total
+máxima de 1,26 m e pino claramente visível além das duas extremidades. Restavam
+no máximo 15 mm por lado. O guia de uma mudança por hipótese também não dizia
+que essa disciplina começa depois da primeira revisão. As instruções não
+causaram as sete recusas, mas transformaram a falha de câmera em pressão para
+alterar a geometria.
+
+**Correção — Revisão visual econômica v1:** o frustum ortográfico agora nasce do
+envelope projetado de cada vista; a prontidão da página recebe uma repetição
+automática; relatório e imagens de uma recusa são preservados em
+`tentativas/<assinatura-do-modelo>/`; `tentativa.json` classifica `camera`,
+`modelo` ou `ferramenta` e manda explicitamente não remodelar quando a falha não
+é da peça. O mesmo estado não duplica artefato e uma revisão válida posterior
+continua promovida atomicamente.
+
+**Prova:** sem mudar nenhum vértice, a dobradiça assistida gerou `r002` em uma
+execução e a crua gerou `r001` em uma execução; a vista superior antes recusada
+da condição crua passou. `_caixote-filetado` e `freio-disco` passaram nas quatro
+vistas. Testes cobrem enquadramento por vista, preservação, deduplicação,
+classificação e promoção posterior.
+
+**Lição geral:** gate visual que destrói a própria evidência não orienta
+iteração; ele fabrica tentativa e erro. Falha de câmera, falha da ferramenta e
+falha do modelo precisam de saídas diferentes antes de pedir outra alteração.
+
 ### A-31 — a peça declarava `liso` e a bancada mostrava chapado
 
 **Onde dói:** adaptador de renderização (`src/autoria/adaptar-three.js`).

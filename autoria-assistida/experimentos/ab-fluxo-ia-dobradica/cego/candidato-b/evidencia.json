@@ -1,0 +1,36 @@
+{
+  "formato": "mecanifica.evidencia-ab",
+  "versao": 1,
+  "candidato": "B",
+  "descricaoEstrita": {
+    "faces": 326,
+    "vertices": 384,
+    "triangulos": 740,
+    "facesSemIdentidade": 0,
+    "orfaos": 0,
+    "materiais": 3,
+    "portasSemanticas": 0
+  },
+  "partes": [
+    { "nome": "barrilFixo", "faces": 84, "corpos": 1, "dimensoes": [0.11, 0.35, 0.11] },
+    { "nome": "barrisMoveis", "faces": 168, "corpos": 2, "dimensoes": [0.11, 1.13, 0.11] },
+    { "nome": "folhaFixa", "faces": 12, "corpos": 2, "dimensoes": [0.65, 1.2, 0.035] },
+    { "nome": "folhaMovel", "faces": 18, "corpos": 3, "dimensoes": [0.355311, 1.2, 0.580417] },
+    { "nome": "pino", "faces": 44, "corpos": 2, "dimensoes": [0.068, 1.38, 0.068] }
+  ],
+  "alturaTotal": 1.38,
+  "vistas": [
+    { "nome": "isometrica", "valida": true, "cortada": false, "ocupacao": 0.083515 },
+    { "nome": "frontal", "valida": true, "cortada": false, "ocupacao": 0.135943 },
+    { "nome": "direita", "valida": true, "cortada": false, "ocupacao": 0.085556 },
+    { "nome": "superior", "valida": false, "cortada": false, "ocupacao": 0.065686 }
+  ],
+  "arquivos": {
+    "isometrica": "vistas/isometrica.png",
+    "frontal": "vistas/frontal.png",
+    "direita": "vistas/direita.png",
+    "superior": "vistas/superior.png",
+    "isolamentoFixo": "vistas/isolamento-fixo.png",
+    "isolamentoMovel": "vistas/isolamento-movel.png"
+  }
+}

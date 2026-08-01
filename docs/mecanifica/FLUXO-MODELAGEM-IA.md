@@ -51,9 +51,13 @@ autoria-assistida/
 └── pacotes/<id>/
     ├── briefing.json
     ├── referencias.json
-    └── revisoes/r001/
-        ├── revisao.json
-        ├── critica.json
+    ├── revisoes/r001/
+    │   ├── revisao.json
+    │   ├── critica.json
+    │   └── vistas/
+    └── tentativas/<assinatura-do-modelo>/
+        ├── tentativa.json
+        ├── relatorio-bancada.json
         └── vistas/
 ```
 
@@ -90,6 +94,11 @@ Guias são perguntas, sinais e armadilhas, não passo a passo. Uma roda pode
 combinar `superficie-de-revolucao`, `repeticao-e-arranjo`, `borracha` e
 `fundicao` sem ganhar uma skill exclusiva de roda.
 
+Antes de despachar o pacote, o orquestrador confere se dois itens do checklist
+não exigem resultados incompatíveis. Medida e legibilidade precisam caber ao
+mesmo tempo: uma altura máxima que deixa milímetros de saliência não pode exigir
+que essa saliência seja evidente numa vista distante.
+
 ## Comandos do ciclo
 
 ```bash
@@ -109,6 +118,13 @@ não mantém uma segunda régua geométrica e recusa faces, partes ou materiais 
 ultrapassem o orçamento declarado. `comparar:revisao` compara assinaturas,
 partes, caixas, relações, portas, aparência e contagens; as imagens continuam
 sendo lidas por uma IA ou pessoa nas mesmas câmeras.
+
+Uma revisão aceita continua nascendo por promoção atômica e nunca é
+sobrescrita. Uma recusa não some mais: fica em `tentativas/`, identificada pela
+assinatura semântica do modelo. `tentativa.json` separa `camera`, `modelo` e
+`ferramenta`; repetir o mesmo estado não duplica artefato. Falha de câmera manda
+reenquadrar, não alterar geometria. A bancada calcula o frustum por vista e
+repete uma vez a abertura que expirar antes de declarar falha de ferramenta.
 
 ## Contrato da crítica
 
@@ -206,3 +222,46 @@ iteração; conclusão do ciclo significa que o processo é executável e honest
 não que toda divergência da peça de prova foi corrigida. Quando a linguagem não
 consegue produzir a correção, a crítica deve marcar `capacidade_ausente` em vez
 de esconder o bloqueio.
+
+## Medição A/B posterior ao fechamento
+
+O ciclo provou que o processo funciona; não havia provado que ele fazia um
+modelador produzir forma melhor ou mais depressa. Em 1º de agosto de 2026, dois
+Sols modelaram a mesma dobradiça inédita, um com este fluxo e outro sem ele. Dois
+Terra e um árbitro avaliaram os resultados às cegas.
+
+A mediana empatou em 14/16. O fluxo assistido respeitou o envelope, publicou
+três portas e completou quatro vistas válidas, mas precisou de oito tentativas
+visuais contra três na condição crua. Pela regra fixada antes do teste, não há
+evidência de ganho líquido. A conclusão correta é mais estreita: o fluxo ajuda
+a IA a entregar algo verificável e retomável; ainda não demonstrou ajudá-la a
+modelar visualmente melhor ou com menos esforço.
+
+Protocolo, fontes congeladas, imagens e pareceres:
+[`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md).
+
+## Revisão visual econômica v1 — fechamento
+
+**Concluída em 1º de agosto de 2026.** O recorte nasceu das oito execuções da
+condição assistida no A/B. Sete tinham produzido quatro imagens, mas o gate as
+apagou por enquadramento; a última expirou. A correção não acrescentou instrução
+de forma nem operação geométrica.
+
+Entregas:
+
+- enquadramento ortográfico calculado para o envelope projetado de cada vista,
+  com área segura entre os painéis da bancada;
+- uma repetição automática quando a página não sinaliza prontidão no prazo;
+- relatório escrito também na recusa, com categoria, código, vista e ação;
+- tentativa recusada preservada por assinatura do modelo, sem timestamp,
+  caminho local ou duplicação do mesmo estado;
+- revisão válida continua separada e promovida atomicamente somente depois dos
+  quatro PNGs, relatório, orçamento e contrato passarem;
+- o guia de iteração agora vale “uma hipótese por mudança” somente depois da
+  primeira revisão, não durante cada microajuste da criação.
+
+Prova nas peças congeladas, sem mudar um vértice: a condição assistida passou
+`r002` em **uma execução**, e a condição crua, cuja vista superior era recusada,
+passou `r001` também em **uma execução**. `_caixote-filetado` e `freio-disco`
+continuam passando nas quatro vistas. Testes cobrem preservação, deduplicação,
+classificação, promoção posterior e enquadramento por vista.
