@@ -5614,6 +5614,11 @@ describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de
     expect(n.orfaos[0]?.motivo).toMatch(/índice inteiro 0\.\.3/);
   });
 
+  it('aresta EXATAMENTE no limite (o cubo tem 4 cantos, 0..3) GRITA — não é "0..4"', () => {
+    const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 4, raio: 0.1 }) as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/índice inteiro 0\.\.3/);
+  });
+
   it('raio zero/negativo GRITA', () => {
     for (const raio of [0, -1]) {
       const n = nucleo(CUBO_FILETE({ de: ARESTA_TOPO_TRAS.de, aresta: 0, raio }) as any, {}, {});
@@ -5633,6 +5638,19 @@ describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de
       ['filete', { origemId: 9, de: { op: 'plano', id: 1 }, aresta: 0, raio: 0.1 }],
     ] as any, {}, {});
     expect(n.orfaos[0]?.motivo).toMatch(/não é compartilhada por nenhuma outra face/);
+  });
+
+  it('duas faces QUASE COPLANARES na mesma aresta GRITA (canto degenerado — dA e dB apontam quase opostos)', () => {
+    // um `plano` com seg:2 é uma grade FLAT — os dois quads vizinhos (0,0) e
+    // (1,0) compartilham uma aresta e são, por construção, coplanares: `dA`/`dB`
+    // (perpendiculares à aresta, cada um pro centroide da própria face) saem
+    // quase OPOSTOS (θ≈180°), não quase iguais — é o canto degenerado, o
+    // outro lado da MESMA guarda que barra o "vira" acidental.
+    const n = nucleo([
+      ['plano', { id: 0, largura: 2, profundidade: 1, seg: 2, origemId: 1 }],
+      ['filete', { origemId: 9, de: { op: 'plano', id: 1, faixa: 0, lado: 0 }, aresta: 2, raio: 0.1 }],
+    ] as any, {}, {});
+    expect(n.orfaos[0]?.motivo).toMatch(/canto degenerado/);
   });
 
   it('id de origem não-inteiro/negativo GRITA', () => {
