@@ -1,5 +1,9 @@
 # Otimizações da Oficina para autoria por IA
 
+Neste documento, “Oficina” nomeia a linguagem procedural herdada e seu núcleo.
+A interface humana homônima foi retirada da Mecanifica em 1º de agosto de 2026;
+itens específicos daquela UI permanecem apenas como histórico para upstream.
+
 Análise e **plano de implementação** das mudanças na linguagem de autoria. A
 divisão de trabalho entre os documentos é:
 

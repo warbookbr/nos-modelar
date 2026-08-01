@@ -1,6 +1,6 @@
 # Mecanifica — acordo de trabalho
 
-Este repositório usa o Atelier v3 do NÓS como base experimental para construir a
+Este repositório usa o núcleo procedural v3 do NÓS como base experimental para construir a
 Mecanifica: uma oficina 3D interativa que explica sistemas automotivos a clientes.
 
 ## Entrada de contexto
@@ -11,14 +11,15 @@ outros documentos são necessários para cada tipo de tarefa; não carregue toda
 documentação por padrão.
 
 Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
-à base herdada do NÓS. Consulte-os quando tocar no código legado, mas não os use
+à base herdada do NÓS. Consulte-os quando tocar no núcleo legado, mas não os use
 como roteiro de produto da Mecanifica. Em caso de divergência,
 `docs/mecanifica/` prevalece.
 
 ## Fronteiras
 
-- `prototipos/fps/v3/` é o Atelier legado e deve permanecer executável durante a
-  migração.
+- O núcleo, as peças e o jogo de referência em `prototipos/fps/v3/` permanecem
+  executáveis durante a migração. A Oficina humana e a antiga aba de som foram
+  retiradas e não fazem parte da Mecanifica.
 - O novo produto nasce em módulos próprios, sem acrescentar mais responsabilidades
   ao `jogo.html` legado.
 - O núcleo de autoria não pode importar Three.js nem conhecer freios, carros ou

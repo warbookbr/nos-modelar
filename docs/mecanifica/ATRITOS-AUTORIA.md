@@ -295,7 +295,14 @@ para qualquer inspetor 3D, não só para a Mecanifica.
 
 **Onde dói:** linguagem da Oficina.
 
-**Evidência:** quem modela em `prototipos/fps/v3/oficina.html` e clica Salvar
+**Estado atual — RETIRADO DO PRODUTO:** a Oficina humana foi removida da
+Mecanifica. Não existe mais caminho de UI capaz de produzir e salvar esse
+artefato incompatível. O atrito não foi resolvido dentro do editor; ele deixou
+de pertencer ao produto. A evidência abaixo permanece como histórico e como
+material de contribuição ao NÓS. O gate `id-cru` continua ativo para as peças
+escritas diretamente por agentes.
+
+**Evidência histórica:** quem modelava em `prototipos/fps/v3/oficina.html` e clicava Salvar
 recebe passos endereçados por id posicional e nada mais — a interface emite
 `['parte',{nome,faces:[ids]}]`, `['pincel',{modo:'face',faces:[ids],cor}]`,
 `['solido',{faces:[ids]}]`, `['material',{faces:[ids],usa}]`,
@@ -314,7 +321,7 @@ que ela sabe produzir, e essa saída não passa no CI do mesmo projeto. Enquanto
 isso durar, a Oficina serve para explorar e não para entregar, e quem
 modela pela interface descobre isso só no gate.
 
-**Estado (Fundação de autoria v1 — CONTINUA ABERTO):** a Oficina agora recusa
+**Estado no fechamento da Fundação de autoria v1 — ABERTO À ÉPOCA:** a Oficina passou a recusar
 antes do POST ou do download qualquer uma das seis formas posicionais cobertas
 pelo gate. Ela segue como espaço exploratório; este ciclo não promete conversão
 automática.
@@ -334,10 +341,11 @@ metade que dá nome ao atrito:
   regra passou a viver num módulo só, importado pela Oficina, pelo gate e pelo
   harness.
 
-O atrito fecha quando a interface souber gravar `sel:{alias|origem|porta|...}`
-no momento em que grava o passo — não antes.
+No NÓS original, o atrito fecha quando a interface souber gravar
+`sel:{alias|origem|porta|...}` no momento em que grava o passo. Na Mecanifica,
+essa obrigação terminou com a retirada da interface.
 
-**Provado pelo botão real, e o que a prova achou.** `npm run guarda:salvar`
+**Prova histórica pelo botão real, e o que ela achou.** `npm run guarda:salvar`
 (`tools/mecanifica/guarda-salvar-oficina.mjs`) dirige a interface de verdade —
 clique em "marcar sólido", que só sabe gravar `['solido',{faces:[ids]}]`, e
 clique em "Salvar peça" — contra o `servir.mjs` real (rota que grava em
@@ -1538,20 +1546,24 @@ o gate. E o oráculo do harness não acusou a divergência porque **errava igual
 guarda**: prova duplicada não é prova independente quando as duas cópias saem da
 mesma fonte.
 
-**Correção (ciclo Endereços semânticos v1):** uma regra só, em
-`prototipos/fps/v3/motor/referencia-posicional.js`, importada pelos três.
+**Correção feita no ciclo Endereços semânticos v1:** uma regra só, em
+`prototipos/fps/v3/motor/referencia-posicional.js`, então importada pelos três.
 Consertar a terceira cópia teria funcionado até a próxima divergência; a chave
 `de` já tinha divergido duas vezes.
 
-**Onde o módulo mora, e por quê:** dentro de `prototipos/fps/v3/`, não em
-`src/autoria/`. A Oficina é uma página servida com RAIZ em `prototipos/fps/v3/`
+**Estado atual:** os dois consumidores da Oficina e o harness foram removidos.
+O módulo permanece porque o gate `id-cru` ainda o usa, e o teste headless cobra
+identidade de função em vez de manter uma segunda implementação.
+
+**Por que o módulo foi posto ali na época:** dentro de `prototipos/fps/v3/`, não em
+`src/autoria/`. A Oficina era uma página servida com RAIZ em `prototipos/fps/v3/`
 (`tools/servir.mjs`), e um import que suba para `src/` sai da raiz servida e
 404 no navegador — medido antes de escolher o caminho. Módulo compartilhado que
 a página não consegue carregar não é regra única: é a quarta cópia. O arquivo
 não importa nada, nem Three.js nem o núcleo, e roda igual em Node e no
 navegador.
 
-**O que o harness passou a ser:** ele prova a INSTALAÇÃO da guarda — que o botão
+**O que o harness passou a ser na época:** ele provava a INSTALAÇÃO da guarda — que o botão
 real, o gancho `window.__oficina.salvar()`, o POST e o fallback de download
 passam por ela. Que a REGRA classifica certo é
 `tools/mecanifica/referencia-posicional.test.ts`, headless e barato. Cada prova

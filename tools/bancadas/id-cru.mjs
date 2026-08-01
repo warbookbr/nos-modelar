@@ -73,11 +73,10 @@ export const FORMATO = 2;
 
 /* A remediação HONESTA. A mensagem antiga mandava "endereçe por
    sel:{alias|grupo|origem|regiao}" para qualquer forma, e isso mentia duas
-   vezes: `vs`/`pontos`/`de` não têm caminho semântico no núcleo, e quem modela
-   em `oficina.html` e clica Salvar não tem como emitir referência semântica
-   nenhuma — a interface só sabe gravar id posicional, e grava justamente no
-   diretório que este gate varre. Conselho impossível é pior que conselho
-   nenhum: manda o autor procurar uma saída que não existe. */
+   vezes: `vs`/`pontos`/`de` não têm caminho semântico no núcleo, e a antiga
+   Oficina humana não tinha como emitir referência semântica nenhuma. A página
+   foi retirada, mas o diagnóstico continua separando dívida herdada de forma
+   que já possui substituto semântico. */
 function comoConsertar(uso) {
   const presentes = FORMAS.filter((k) => uso[k] > 0);
   const semCaminho = presentes.filter((k) => !TEM_CAMINHO_SEMANTICO[k]);
@@ -90,7 +89,7 @@ function comoConsertar(uso) {
     const juntos = nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes.at(-1)}` : nomes[0];
     linhas.push(`${juntos} ${nomes.length > 1 ? 'NÃO têm' : 'NÃO tem'} caminho semântico no núcleo — a op só aceita id ali. Ou a peça nova ainda não usa a op, ou entra na lista herdada de propósito.`);
   }
-  linhas.push('salva pela Oficina (prototipos/fps/v3/oficina.html → Salvar → prototipos/fps/v3/pecas/): a interface AINDA NÃO sabe emitir referência semântica — ela só grava id posicional (R4/R5 do plano). Enquanto isso as saídas honestas são duas: converter a peça à mão, ou registrar a entrada em tools/bancadas/id-cru-herdado.json DE PROPÓSITO, assumindo a dívida no commit. Atrito A-15 em docs/mecanifica/ATRITOS-AUTORIA.md.');
+  linhas.push('A Oficina humana que produzia esse formato foi retirada; veja A-15 em docs/mecanifica/ATRITOS-AUTORIA.md.');
   return linhas.map((l) => `\n      · ${l}`).join('');
 }
 

@@ -33,6 +33,10 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
   mudar geometria. Enquadramento é calculado por vista, timeout de prontidão é
   repetido uma vez, e toda recusa preserva evidência classificada por assinatura
   do modelo. As duas dobradiças congeladas passaram em uma execução cada;
+- **Retirada da Oficina humana está CONCLUÍDA:** páginas de objeto e som,
+  servidor de salvamento, presets, harnesses e skills exclusivas saíram do
+  Mecanifica. O Pages publica apenas produto e bancada. O núcleo procedural,
+  as peças e os consumidores headless permanecem;
 - **nenhum ciclo novo está aberto:** o próximo recorte só começa depois de
   escolher uma dificuldade observada pelo fluxo concluído;
 - Filete v2 está **pausado** depois do Escopo A. `arredondarAresta` já entrega
@@ -83,7 +87,8 @@ próxima tarefa.
 - [x] preservar identidade semântica na seleção;
 - [x] validar desenvolvimento local e build;
 - [x] preparar o workflow do GitHub Pages;
-- [x] manter o Atelier acessível em `/legado/atelier/`;
+- [x] manter o Atelier acessível em `/legado/atelier/` durante a prova inicial;
+- [x] retirar essa rota depois que produto e bancada passaram a cobrir o fluxo;
 - [x] validar a publicação real após o primeiro push.
 
 **Critério de saída:** a mesma definição procedural produz um objeto visível,
@@ -240,8 +245,8 @@ foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
-| 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento verificadas item por item; A-15 segue aberto com o estado atualizado |
-| 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; A-15 continua aberto e não foi tocado |
+| 1 | concluída em 31/07/2026 | Fundação de autoria v1 | as três condições do gate de encerramento foram verificadas; a dívida A-15 daquela interface foi retirada do produto junto com a Oficina humana |
+| 1b | concluída em 31/07/2026 | Endereços semânticos v1 | A-18, A-19, A-20 e A-22 resolvidos, cada um com prova em peça real; a regra única continua no gate `id-cru` |
 | 2 | concluída em 31/07/2026 | Arranjos semânticos v1 | O-13 entregue no núcleo E na peça: `arranja` radial/linear, a roda experimental reescrita (141 parâmetros → 43) e `_cerca-e-flor` provando o mesmo contrato fora do vocabulário automotivo; A-24 achado e registrado |
 | 3 | concluída em 31/07/2026 | Corte e orientação de seção v1 | as duas capacidades entregues no núcleo E provadas em peça: `orientacao` no `loft` (A-25, UP-020) e a op `furo`, a primeira subtração do núcleo (A-27, UP-021). O `freio-disco` ganhou o flange de roda — quatro assentos postos pelo `arranja` radial e furados de lado a lado —, e a peça de exercício `_corrimao` prova a orientação declarada fora do vocabulário automotivo. Compor as duas achou e pagou A-28 (UP-022); A-26 e A-29 ficaram abertos, ditos na cara |
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
@@ -250,6 +255,7 @@ foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
 | 5 | **CONCLUÍDO em 01/08/2026** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; prova cega completa em `_caixote-filetado` e prova de compatibilidade em `freio-disco` |
 | 5a | **CONCLUÍDA em 01/08/2026** | medição A/B do fluxo | dois Sols, dois Terra e um árbitro cego; empate mediano 14/16. A condição assistida venceu envelope e gate 4/4, mas usou mais tentativas, portanto não demonstrou ganho líquido. Próximo candidato: retorno visual econômico, sem abrir ciclo automaticamente |
 | 5b | **CONCLUÍDA em 01/08/2026** | Revisão visual econômica v1 | A-38 pago: câmera por vista, repetição de prontidão, recusa preservada por assinatura e diagnóstico `camera`/`modelo`/`ferramenta`. As duas dobradiças congeladas passaram em uma chamada cada, sem alteração geométrica |
+| 5c | **CONCLUÍDA em 01/08/2026** | retirada da Oficina humana | páginas e ferramentas exclusivas removidas; rota `/legado/atelier/` encerrada; bancada neutra permanece como única superfície de autoria visual |
 | 6 | pausada | Filete v2, Escopo B | aguarda comparação com a frente paralela antes de atacar canto composto/`chamferBox`; o Escopo A está preservado e verde |
 | 7 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
 | 8 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
@@ -317,6 +323,29 @@ falha injetada conserva quatro PNGs, relatório e `tentativa.json`, não publica
 revisão, não duplica o mesmo estado e permite promoção posterior. Caixote e
 freio continuam passando nas quatro vistas. O guia de iteração foi corrigido
 para não pedir micro-revisões durante a criação inicial.
+
+### Retirada da Oficina humana — CONCLUÍDA em 1º de agosto de 2026
+
+**Incluiu somente:** retirar `oficina.html`, a antiga aba de som, o servidor de
+salvamento, os presets e testes exclusivos dessas interfaces, os comandos
+públicos correspondentes e a cópia integral do Atelier no Pages. O botão do
+jogo de referência que apontava para a página removida também saiu.
+
+**Preservou:** `motor/oficina.js`, expressões, regra de referência posicional,
+peças procedurais, visor, jogo de referência, testes do núcleo, adaptador
+Three.js, bancada e todo o fluxo assistido por IA.
+
+**Decisão:** a Mecanifica não mantém editor visual para autoria humana. O fluxo
+oficial é arquivo procedural → medidas → revisão na bancada → crítica → ajuste.
+A interface completa continua no repositório original do NÓS. As menções à
+Oficina nas seções históricas abaixo registram o estado dos ciclos na época e
+não descrevem uma entrada executável atual.
+
+**Gate atendido:** 811 testes e typecheck verdes; build contém apenas
+`index.html`, `bancada.html` e seus assets; `id-cru:check` e
+`gabarito:selecao:check` verdes; a prova de portas da bancada passa no navegador;
+o jogo de referência abre com `ready=true` e zero erro depois da retirada do
+botão. Nenhum script público aponta para arquivo removido.
 
 ### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 

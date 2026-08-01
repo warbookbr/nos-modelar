@@ -22,6 +22,12 @@ O remoto Git `source` aponta para o NÓS original. Antes de preparar uma
 contribuição, compare a implementação com o estado recente desse remoto e leve a
 mudança para um fork verdadeiro de `brigsd/nos`.
 
+A Oficina humana saiu da árvore atual da Mecanifica em 1º de agosto de 2026.
+Entradas que tratam dessa interface, especialmente UP-017, continuam válidas
+como registro de contribuição, mas seus arquivos-fonte devem ser obtidos no
+commit anterior à retirada ou diretamente no NÓS original. O núcleo das demais
+entradas continua presente.
+
 ## Estados
 
 - **observada:** problema confirmado, sem solução escolhida;

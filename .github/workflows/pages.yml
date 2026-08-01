@@ -46,11 +46,8 @@ jobs:
       - name: Construir Mecanifica
         run: npm run build
 
-      - name: Preservar Atelier legado
-        run: |
-          mkdir -p dist/legado/atelier
-          cp -R prototipos/fps/v3/. dist/legado/atelier/
-          touch dist/.nojekyll
+      - name: Desativar processamento Jekyll
+        run: touch dist/.nojekyll
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5

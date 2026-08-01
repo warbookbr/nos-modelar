@@ -31,9 +31,9 @@ A bancada precisa oferecer, para qualquer peça ou montagem:
 
 ## Laço oficial de revisão por IA
 
-A bancada é a porta visual de autoria. A Oficina visual herdada continua útil
-para compatibilidade e experimentação manual, mas não entra no ciclo de uma IA:
-tronco, som e abas do Atelier são ruído para quem está avaliando uma peça.
+A bancada é a única porta visual de autoria da Mecanifica. A Oficina humana
+herdada foi retirada porque tronco inicial, som e abas do Atelier eram ruído
+para agentes que precisam avaliar uma peça de forma reproduzível.
 
 ```text
 fonte procedural → descrever (medidas/semântica) → revisar (4 vistas) → crítica → ajuste

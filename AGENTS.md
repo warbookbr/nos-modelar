@@ -9,14 +9,15 @@ legado por padrão.
 - `docs/mecanifica/` governa o produto Mecanifica.
 - `docs/mecanifica/PLANO.md` é o único roteiro vigente.
 - `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS herdado. Use-os
-  somente quando a tarefa tocar no Atelier ou quando precisar de contexto
-  histórico.
+  somente quando a tarefa tocar no núcleo procedural ou exigir contexto histórico.
 - Se dois documentos divergirem, o material de `docs/mecanifica/` prevalece para
   este produto.
 
 ## Regras essenciais
 
-- Preserve `prototipos/fps/v3/` executável durante a migração.
+- Preserve o núcleo, as peças e o jogo de referência em `prototipos/fps/v3/`.
+  A Oficina humana (`oficina.html` e a antiga aba de som) foi removida de
+  propósito e não deve ser recriada no Mecanifica.
 - Mantenha o núcleo de autoria independente de Three.js e do domínio automotivo.
 - Nunca persista UUIDs do Three.js, índices de arrays ou posições de passos como
   identidade.

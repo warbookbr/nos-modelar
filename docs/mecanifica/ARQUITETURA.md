@@ -2,15 +2,16 @@
 
 ## Estado herdado
 
-O Atelier v3 do NÓS vive em `prototipos/fps/v3/`. Ele contém:
+O recorte herdado do NÓS vive em `prototipos/fps/v3/`. Ele contém:
 
 - um renderizador WebGL 2 próprio;
 - um núcleo procedural de geometria baseado em `PASSOS`;
 - adaptador do núcleo para o formato de malha do renderizador;
-- Oficina de objeto, material, animação e som;
-- síntese de áudio em dados;
-- bancadas Vitest e Playwright;
-- publicação estática pelo GitHub Pages.
+- peças e o jogo usados como referência de compatibilidade;
+- bancadas do núcleo e do renderizador.
+
+A Oficina humana de objeto/material/animação e sua aba de som foram removidas
+da Mecanifica. Elas continuam disponíveis no repositório original do NÓS.
 
 O núcleo procedural possui ideias reutilizáveis, mas a aplicação atual concentra
 cena, interface, navegação e configurações em `jogo.html`. A numeração de
@@ -102,7 +103,8 @@ fronteira será corrigida antes de modelar os freios.
 
 A nova aplicação usará Vite para desenvolvimento e build. O GitHub Actions
 executará testes, produzirá `dist/` e publicará esse diretório no GitHub Pages.
-Durante a migração, o Atelier legado continuará acessível em uma rota separada.
+O Pages publica somente a Mecanifica e sua bancada. A interface humana herdada
+não possui rota, cópia estática ou servidor neste repositório.
 
 O Pages hospeda apenas o produto compilado. O servidor local de autoria pode
 oferecer rotas de gravação durante desenvolvimento, mas a experiência pública
@@ -110,11 +112,12 @@ não depende delas.
 
 ## Estratégia de migração
 
-1. Congelar uma referência executável do Atelier.
+1. Congelar uma referência executável do núcleo e do cliente v3.
 2. Criar a aplicação Three.js ao lado dele.
 3. Provar a ponte com uma peça procedural existente.
 4. Provar a bancada corrigindo uma peça herdada.
 5. Criar o freio na arquitetura nova.
 6. Contextualizar o sistema em um carro simplificado e no galpão.
 7. Migrar ferramentas de autoria somente quando houver um caso real.
-8. Remover código legado apenas depois de existir substituto provado.
+8. Remover superfícies legadas quando a bancada ou o produto já cobrirem sua
+   responsabilidade; o núcleo só sai depois de existir substituto provado.

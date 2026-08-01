@@ -2,22 +2,18 @@
    posicional?", para o formato salvo da Oficina.
 
    Por que existe (ATRITOS-AUTORIA A-22): a mesma regra vivia copiada em três
-   lugares — o gate `tools/bancadas/id-cru.mjs`, a guarda de salvamento em
-   `prototipos/fps/v3/oficina.html` (`diagnosticarExportacaoIncompativel`) e o
-   oráculo do harness `tools/mecanifica/guarda-salvar-oficina.mjs`. As três
+   lugares — o gate `tools/bancadas/id-cru.mjs`, a antiga guarda de salvamento
+   da Oficina humana e o oráculo do harness. As três
    divergiram DUAS vezes na mesma chave (`de`), e na segunda o resultado foi a
    ferramenta de autoria do projeto recusando uma peça que o CI do projeto
    aprova, acusando de id posicional as cinco portas semânticas que o ciclo
    anterior tinha acabado de entregar. Enquanto a regra viver copiada ela
    diverge de novo; a cura é uma fonte só.
 
-   ONDE ELA MORA E POR QUÊ: aqui, dentro de `prototipos/fps/v3/`, e não em
-   `src/autoria/`. A Oficina é uma página servida com RAIZ em
-   `prototipos/fps/v3/` (`tools/servir.mjs`), então um import que suba para
-   `src/` sai da raiz servida e 404 no navegador. Módulo compartilhado que a
-   página não consegue carregar não é regra única, é a quarta cópia. Este
-   arquivo não importa nada — nem Three.js, nem o núcleo — e roda igual em Node
-   e no navegador.
+   ONDE ELA MORA: aqui, junto do formato que classifica. A Oficina humana e seu
+   harness foram retirados da Mecanifica; hoje o consumidor de produção é o
+   gate `id-cru`. Este arquivo não importa nada — nem Three.js, nem o núcleo —
+   e continua portátil para uma futura extração ao NÓS.
 
    O QUE A REGRA DIZ. O formato salvo aceita SEIS formas de COLEÇÃO de id cru.
    A lista não é opinião: saiu de varrer toda leitura `a.<chave>` dentro de
@@ -112,8 +108,8 @@ export function ocorrenciasDoPasso(passo) {
 
 /**
  * As ocorrências de uma LISTA de passos, cada uma já com o índice do passo:
- * `[{ passo, forma, rotulo, ids }]`. É o que a Oficina e o harness leem para
- * apontar o passo culpado; o gate soma a mesma medida.
+ * `[{ passo, forma, rotulo, ids }]`. O gate usa esta forma para apontar o passo
+ * culpado e somar a mesma medida.
  */
 export function ocorrenciasPosicionais(passos) {
   const achados = [];

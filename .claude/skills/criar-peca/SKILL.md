@@ -1,27 +1,27 @@
 ---
 name: criar-peca
-description: CRIAR conteúdo do jogo NÓS como IA — objeto 3D, som, animação, esqueleto — escrevendo a peça como lista de PASSOS (o formato da Oficina) e provando com as bancadas (ver PNGs, medir som). Use SEMPRE que o ideador pedir pra criar/editar uma peça, um objeto, um som, uma animação ou qualquer conteúdo do Atelier (v3) — este é o manual de autoria; a skill `oficina` é pra mexer NA ferramenta, não pra usá-la.
+description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objetiva.
 ---
 
 # Criar peça — o manual de autoria da IA
 
-Você não clica na Oficina — você **escreve a peça direto** (o mesmo formato que
-a Oficina grava) e **vê/mede** na bancada neutra. O laço oficial é: escrever →
+Você **escreve a peça direto** no formato procedural e **vê/mede** na bancada
+neutra. A Oficina humana herdada não existe neste repositório. O laço oficial é: escrever →
 `npm run descrever` → `npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior`
 → ler as quatro vistas → crítica → iterar. `npm run peca` permanece uma
 ferramenta herdada para diagnóstico de render, mas não é o laço visual principal
 da IA: pode enquadrar o objeto pequeno e não mostra o estado semântico da bancada.
 Peça de objeto mora em
-`prototipos/fps/v3/pecas/`, de som em `pecas-som/`. Prefixo `_` = exemplo/preset
+`prototipos/fps/v3/pecas/`. Prefixo `_` = exemplo/fixture
 (o `auditar` sem argumento pula os `_`).
 
-## Objeto 3D — o formato (copie de `pecas/_oficina-toco.js`)
+## Objeto 3D — o formato (comece por `pecas/_tampa-de-caixa.js`)
 
 `PARAMS` (dimensionais — citados por NOME nos passos, mudar NÃO renumera) +
 `TOPO` (topológicos — mudar RECONSTRÓI e pode deixar passo órfão) + `PASSOS`
 (a lista `[['op',{...}],...]`) + `meta` com `colisao: colisaoDe(PASSOS, PARAMS,
 TOPO)` (CHAMADA, não valor) + `construir = executar(...)`. **`PASSOS` exportado**,
-senão a Oficina nunca mais reabre o arquivo. Peça que usa `sel:{alias:...}`
+para que as ferramentas consigam inspecionar a definição. Peça que usa `sel:{alias:...}`
 exporta também `ALIASES` **e o ENCAMINHA nas duas chamadas** — `colisaoDe(PASSOS,
 PARAMS, TOPO, MATERIAIS, ALIASES)` e `executar(PASSOS, PARAMS, TOPO, ctx,
 MATERIAIS, ANIMACOES, ESQUELETO, ALIASES)`. Esquecer um dos dois não diz "faltou
@@ -415,35 +415,11 @@ calibrado) mas ainda depende de um `CONTORNOS` desenhado à mão em
 `prototipos/fps/v3/gabaritos/<peça>.js` (0..1, olhando o PNG) — sem gabarito
 pra peça, a bancada falha alto (nada foi medido), nunca finge que passou.
 
-## Som — o formato (copie de `pecas-som/_agua.js`)
-
-`PARAMS` + `semente` + `PASSOS` (grafo em dados: cada passo um NÓ com `id`,
-ligado por `de:`) + `meta` (com `duracao: duracaoDoGrafo(somNucleo(...))`) +
-`construir(ctx,quando) = construirGrafo(somNucleo(PASSOS,PARAMS,semente), ctx, quando)`.
-O nó de áudio LIVRE (sem consumidor) é a saída.
-
-**Nós implementados:** `oscilador` (forma/freq), `ruido` (cor/k), `filtro`
-(passa-baixa/alta/banda, freq, q), `envelope` (ataque/pico/decaimento/duracao),
-`ganho`, `lfo` (modula um param de outro nó), `soma`. Presets de referência com
-os números do jogo: `_passo` (estalo agudo ~3 kHz), `_vento` (sustentado 4,5 s),
-`_bolha` (tonal, varre), `_agua` (grave abafado ~350 Hz).
-
-**O ouvido (você não escuta — MEDE):**
-
-```bash
-npm run analisar -- minha-peca-som    # espectrograma (Read a imagem!) + tom/brilho/envelope/duração
-npm run sintetizar -- minha-peca-som  # amostras/hash offline (determinismo)
-npm run somab                         # A/B contra o som real do jogo, por eixo
-```
-
-Brilho alto ≈ estalo/agudo; centroide baixo ≈ abafado/grave; o espectrograma
-mostra varredura/harmônico/tremor. Compare SEMPRE com um preset vizinho.
-
-## O caminho JS-puro (fora da Oficina — fallback)
+## O caminho JS-puro (fallback)
 
 `construir(ctx)` direto com `ctx.{TS,tex,geo,m4}` (molde: `pecas/_modelo.js`;
 exemplos grandes: `arvore3d`, `casa-toras`, `ilha-chao`). Geometria ilimitada,
-MAS **não reabre na Oficina** nem tem replay canônico — é pra motor/paisagem e
+MAS **não tem replay canônico** — é para motor/paisagem e
 pro que o vocabulário ainda não cobre. Prefira PASSOS sempre que der; se cair
 aqui por falta de uma op, DIGA (é sinal de qual op construir em seguida).
 
@@ -452,4 +428,4 @@ aqui por falta de uma op, DIGA (é sinal de qual op construir em seguida).
 Peça nova precisa de CABEÇALHO (1º comentário — o `mapa:check` barra sem) e
 passa pelos gates (`npm run mapa` + os quatro de sempre). Determinismo:
 NENHUM `Date.now()`/`Math.random()` cru — semente escrita na peça. O fluxo de
-commit/decisão: skill `nos-fluxo`.
+commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.

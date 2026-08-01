@@ -38,15 +38,10 @@ jobs:
       - name: Nenhum id posicional em peça nova
         run: npm run id-cru:check
 
-      # A guarda do A-15 vive na interface, não no núcleo: nenhum dos gates
-      # acima a exercita. Sem esta linha, apagar a guarda de `salvarPeca` passa
-      # verde nos oito outros e a Oficina volta a gravar peça que o gate ao lado
-      # reprova. Precisa de navegador, por isso instala o Chromium antes.
+      # O painel de portas da bancada vive no navegador, por isso instala o
+      # Chromium antes da prova de interface.
       - name: Navegador para a prova de interface
         run: npx playwright install --with-deps chromium
-
-      - name: A Oficina recusa salvar peça com id posicional
-        run: npm run guarda:salvar
 
       # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
       # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
@@ -57,7 +52,7 @@ jobs:
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 
-      - name: Índice da oficina em dia
+      - name: Índices documentais em dia
         run: npm run docs:toc:check
 
       - name: Referências a docs/*.md resolvem

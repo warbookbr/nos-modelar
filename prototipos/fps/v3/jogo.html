@@ -104,7 +104,6 @@
   <div class="painel">
     <h2>N Ó S</h2>
     <button id="btnContinuar">continuar ▶</button>
-    <button id="btnOficina">Oficina ✎</button>
     <button id="btnAbrirConfig">configurações ⚙</button>
   </div>
 </div>
@@ -288,7 +287,6 @@ function abrirPausa() { paused = true; document.exitPointerLock?.(); telaConfig.
 function fecharTudo() { paused = false; telaPausa.classList.remove('show'); telaConfig.classList.remove('show'); }
 document.getElementById('pauseBtn').addEventListener('click', () => (paused ? fecharTudo() : abrirPausa()));
 document.getElementById('btnContinuar').addEventListener('click', fecharTudo);
-document.getElementById('btnOficina').addEventListener('click', () => { location.href = 'oficina.html'; });   // abre a Oficina (criar objeto e som)
 document.getElementById('btnAbrirConfig').addEventListener('click', () => { telaPausa.classList.remove('show'); telaConfig.classList.add('show'); });
 document.getElementById('btnVoltar').addEventListener('click', () => { telaConfig.classList.remove('show'); telaPausa.classList.add('show'); });
 document.getElementById('btnFecharX').addEventListener('click', fecharTudo);   // X fecha E resume direto

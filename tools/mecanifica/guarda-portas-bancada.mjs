@@ -33,7 +33,7 @@
  * texto. Sai 1 se qualquer afirmação falhar ou se a página emitir erro.
  *
  * Precisa de navegador, por isso não entra em `npm test`; entra no
- * `.github/workflows/ci.yml`, ao lado de `guarda:salvar`. Prova fora do CI é
+ * `.github/workflows/ci.yml`. Prova fora do CI é
  * prova que ninguém é obrigado a rodar.
  */
 import { existsSync, mkdirSync } from 'node:fs';

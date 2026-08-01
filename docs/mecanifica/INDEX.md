@@ -29,12 +29,12 @@ Estado atual:
   acessíveis em mobile;
 - a roda dianteira foi autorada e revisada separadamente na bancada; ela
   substitui a roda decorativa do canto dianteiro direito sem duplicar o cubo;
-- um experimento isolado de roda mais realista provou que a Oficina atual passa
+- um experimento isolado de roda mais realista provou que o núcleo procedural passa
   do low-poly, mas ainda entrega realismo técnico/procedural; ele não foi
   integrado, e o fluxo resultante está documentado em perfis de autoria;
 - a Fundação de autoria v1 (ciclo 2) está **concluída** desde 31 de julho de
-  2026: proteção mínima de salvamento da Oficina, `origem` universal e portas
-  semânticas, com as três condições do gate verificadas item por item;
+  2026: `origem` universal e portas semânticas permanecem; a proteção da antiga
+  Oficina humana virou evidência histórica quando essa interface foi retirada;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
   usa os cinco geradores novos e **oito** portas semânticas, com 0 face sem
@@ -117,8 +117,9 @@ Estado atual:
   flange com furo central mais círculo de parafusos ainda não é escrevível) e
   A-32 (o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo
   que o barril, porque o aro entra por cima dele com 0,6 mm de folga);
-- A-15 **não** foi resolvido: a guarda impede a entrega silenciosa, mas a
-  Oficina continua sem saber emitir referência semântica;
+- A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
+  humana que emitia referências posicionais não existe mais na Mecanifica. O
+  gate `id-cru` permanece protegendo as peças escritas por IA;
 - a revisão visual oficial de autoria agora é `npm run revisar -- <peça>`: ela
   abre a bancada neutra nas quatro vistas canônicas e recusa geometria cortada
   ou pequena demais; `npm run peca` ficou apenas como diagnóstico herdado;
@@ -137,6 +138,9 @@ Estado atual:
   é enquadrada pelo próprio envelope, a prontidão recebe uma repetição e toda
   recusa conserva imagens e diagnóstico `camera`/`modelo`/`ferramenta`. As duas
   dobradiças congeladas passaram em uma execução cada, sem mudar geometria;
+- a Oficina humana herdada, sua aba de som e os harnesses exclusivos foram
+  removidos. O Pages publica somente o produto e a bancada; núcleo, peças,
+  visor e jogo de referência continuam locais enquanto forem dependências reais;
 - o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
   simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
   A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
@@ -223,7 +227,7 @@ o plano e somente as referências da linha aplicável.
 | `src/cena/` | composição visual da experiência principal |
 | `src/dominio/mecanica/` | registros estáveis de sistemas automotivos, independentes do runtime Three.js |
 | `src/interacao/` | interações semânticas da aplicação |
-| `prototipos/fps/v3/` | Atelier herdado do NÓS, preservado durante a migração |
+| `prototipos/fps/v3/` | núcleo, peças, visor e jogo de referência herdados; sem Oficina humana |
 | `tools/mecanifica/` | testes headless dos contratos novos |
 | `tools/modelagem/` | preparação, validação, revisão, crítica e comparação do fluxo assistido por IA |
 | `autoria-assistida/` | guias curtos e pacotes de prova versionados para agentes modeladores e críticos |
@@ -242,7 +246,6 @@ arquivo e cobre código e documentação sem manter uma segunda descrição manu
 - `index.html` — aplicação principal;
 - `bancada.html` — bancada neutra de autoria e inspeção; aceita `?peca=<nome>`
   para abrir qualquer peça de `prototipos/fps/v3/pecas/`;
-- `prototipos/fps/v3/jogo.html` — Atelier herdado;
 - `https://warbookbr.github.io/nos-mecanifica/` — publicação da aplicação;
 - `https://warbookbr.github.io/nos-mecanifica/bancada.html` — bancada publicada.
 
@@ -277,12 +280,10 @@ npm run descrever -- _corrimao --estrito
 npm run descrever -- _tampa-de-caixa --estrito
 ```
 
-Prova de comportamento no navegador — dirige a Oficina headless e clica nos
-botões de verdade. Guarda escrita no código não é guarda provada: ela pode estar
-num caminho que o botão não percorre (foi o que aconteceu com o A-15):
+Prova de comportamento no navegador — dirige a bancada real e confere as portas
+semânticas renderizadas no DOM:
 
 ```bash
-npm run guarda:salvar
 npm run guarda:portas
 ```
 
@@ -300,7 +301,6 @@ npm run typecheck
 npm run build
 npm run gabarito:selecao:check
 npm run id-cru:check
-npm run guarda:salvar
 npm run guarda:portas
 npm run mapa:check
 npm run docs:toc:check
@@ -316,19 +316,13 @@ ferramenta. A chave `de` tem dois contratos desde o O-12 e só um é id cru: o
 `de:{op,id,...}` do `publicarPorta` é origem estrutural, irmã de `sel:{origem}`,
 e o gate distingue pela FORMA — objeto plano com `op` e `id` não conta. As peças herdadas ficam numa lista explícita e versionada em
 `tools/bancadas/id-cru-herdado.json`, com a contagem exata congelada — a dívida
-não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A Oficina ainda
-produz referências posicionais em ferramentas exploratórias, mas agora recusa
-salvá-las no funil `salvarPeca`, antes do POST e antes do fallback de download —
-provado pelo **botão real** com `npm run guarda:salvar`, que também fecha a porta
-dos fundos do gancho `window.__oficina.salvar()`. A regra de "o que é
-referência posicional" mora num módulo só,
-`prototipos/fps/v3/motor/referencia-posicional.js`, importado pela Oficina, pelo
-gate e pelo harness: ela viveu copiada em três lugares e divergiu duas vezes na
-chave `de`, e a última divergência fazia a Oficina recusar peça que o CI aprova
-(A-22, resolvido). Ver [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
-
-Algumas ferramentas específicas do Atelier estão catalogadas em
-[`docs/uso/RECURSOS.md`](../uso/RECURSOS.md).
+não cresce e, quando é paga, `npm run id-cru` encolhe a lista. A regra de "o que
+é referência posicional" mora num módulo só,
+`prototipos/fps/v3/motor/referencia-posicional.js`, importado pelo gate. Ela
+viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
+`de`; essa história e a extração para o NÓS estão preservadas em
+[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) e
+[`UPSTREAM-NOS.md`](UPSTREAM-NOS.md).
 
 ## Fluxo para uma sessão nova
 
@@ -387,7 +381,7 @@ simples.**
 
 **Último ciclo encerrado: Fluxo de modelagem assistida por IA v1.** Uma IA nova
 recebeu um pacote curto, modelou, gerou revisão reproduzível e recebeu crítica
-objetiva de outra IA sem abrir a Oficina legada nem ler o repositório inteiro.
+objetiva de outra IA sem uma interface humana nem leitura do repositório inteiro.
 A prova não automotiva resolveu a transição e preservou explicitamente a
 divergência de material numa segunda crítica cega; `freio-disco` atravessou o
 mesmo contrato como peça existente. O contrato

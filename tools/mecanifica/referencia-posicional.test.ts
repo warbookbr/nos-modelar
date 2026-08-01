@@ -2,18 +2,14 @@
    por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de`
    carrega desde o O-12.
 
-   Por que este arquivo existe: a regra vivia copiada no gate `id-cru`, na guarda
-   de salvamento da Oficina e no oráculo do harness. As três divergiram DUAS
+   Por que este arquivo existe: a regra vivia copiada no gate `id-cru`, na antiga
+   interface humana e no oráculo do harness. As três divergiram DUAS
    vezes na mesma chave. Na segunda divergência a Oficina passou a recusar
    `_jardineira` — peça que o CI aprova com 0 id cru — acusando de id posicional
    as cinco portas semânticas que o ciclo anterior tinha acabado de entregar.
 
-   O harness `guarda-salvar-oficina.mjs` prova que a guarda está INSTALADA no
-   funil de salvamento (botão real, gancho, POST e download). Este arquivo prova
-   que a regra que ela chama CLASSIFICA certo — headless, sem navegador. */
-import { readFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+   A interface humana foi retirada da Mecanifica. Este arquivo conserva a prova
+   que ainda importa aqui: o gate usa a regra única e ela classifica certo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo do motor v3, em JS sem tipos.
 import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/fps/v3/motor/referencia-posicional.js';
@@ -21,9 +17,6 @@ import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrenci
 import { contarIdCru as contarIdCruDoGate } from '../../tools/bancadas/id-cru.mjs';
 // @ts-expect-error — peça em JS sem tipos.
 import { PASSOS as PASSOS_JARDINEIRA } from '../../prototipos/fps/v3/pecas/_jardineira.js';
-
-const AQUI = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(AQUI, '../..');
 
 const rotulos = (passos: unknown[]) => rotularOcorrencias(ocorrenciasPosicionais(passos));
 
@@ -123,23 +116,5 @@ describe('uma regra só, de verdade', () => {
      decisão vira explícita, que é o comportamento desejado. */
   it('o gate id-cru não tem implementação própria: ele reexporta a MESMA função', () => {
     expect(contarIdCruDoGate).toBe(contarIdCru);
-  });
-
-  /* O defeito do A-22 não foi uma regra errada: foi a MESMA regra escrita três
-     vezes. Este teste é o que impede a quarta cópia de nascer — se alguém
-     reescrever a lista de chaves dentro da Oficina, do gate ou do harness, ela
-     aparece aqui em vez de divergir em silêncio dois ciclos depois. */
-  it('a Oficina, o gate e o harness IMPORTAM a regra, nenhum redeclara a lista', () => {
-    const consumidores = [
-      'prototipos/fps/v3/oficina.html',
-      'tools/bancadas/id-cru.mjs',
-      'tools/mecanifica/guarda-salvar-oficina.mjs',
-    ];
-    for (const caminho of consumidores) {
-      const fonte = readFileSync(join(REPO, caminho), 'utf8');
-      expect(fonte, `${caminho} precisa importar a regra`).toContain('referencia-posicional.js');
-      /* a assinatura da cópia: contar/testar as chaves na mão. */
-      expect(fonte, `${caminho} redeclara a lista de chaves`).not.toMatch(/hasOwn\(\s*a\s*,\s*'(faces|vs|pontos|de)'\s*\)/);
-    }
   });
 });

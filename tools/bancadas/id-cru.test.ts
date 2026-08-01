@@ -246,28 +246,25 @@ describe('conferir — dívida herdada é congelada, não permissão', () => {
   });
 });
 
-/* MEDIA-9: o gate NÃO afrouxa (peça salva pela Oficina segue reprovando), mas a
-   mensagem parou de mentir sobre a saída. `sel:{alias|grupo|origem|regiao}` é
-   impossível pela interface — ela só emite id posicional — e é impossível no
-   núcleo para `vs`/`pontos`/`de`. */
+/* MEDIA-9: retirar a Oficina humana não afrouxa o gate. A mensagem separa as
+   formas convertíveis por `sel` das formas ainda sem caminho semântico no
+   núcleo e explica por que a interface antiga não é uma saída. */
 describe('a mensagem de reprova diz a VERDADE sobre o conserto', () => {
-  const daOficina = () => conferir({ minha: uso({ faces: 5 }) }, {})[0];
+  const daPeca = () => conferir({ minha: uso({ faces: 5 }) }, {})[0];
 
-  it('peça salva pela Oficina continua reprovando — o gate não afrouxa', () => {
-    expect(daOficina()).toMatch(/ID CRU em peça NOVA/);
+  it('peça nova com id posicional continua reprovando — o gate não afrouxa', () => {
+    expect(daPeca()).toMatch(/ID CRU em peça NOVA/);
   });
 
-  it('a mensagem admite que a Oficina ainda salva por id posicional', () => {
-    const m = daOficina();
-    expect(m).toMatch(/oficina\.html/);
-    expect(m).toMatch(/AINDA NÃO sabe emitir referência semântica/);
-  });
-
-  it('a mensagem dá as duas saídas reais: converter à mão ou assumir a dívida na lista', () => {
-    const m = daOficina();
-    expect(m).toMatch(/converter a peça à mão/);
-    expect(m).toMatch(/id-cru-herdado\.json DE PROPÓSITO/);
+  it('a mensagem deixa claro que a Oficina humana foi retirada', () => {
+    const m = daPeca();
+    expect(m).toMatch(/Oficina humana.*foi retirada/);
     expect(m).toMatch(/A-15/);
+  });
+
+  it('a mensagem dá as duas saídas reais conforme a forma encontrada', () => {
+    expect(daPeca()).toMatch(/escrita à mão: troque por sel:/);
+    expect(conferir({ minha: uso({ vs: 2 }) }, {})[0]).toMatch(/entra na lista herdada de propósito/);
   });
 
   it('não manda usar sel:{...} para forma que não tem caminho semântico no núcleo', () => {

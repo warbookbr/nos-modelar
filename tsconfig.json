@@ -8,7 +8,7 @@
 
     "strict": true,
     // desligado de propósito (D-110, fase 2b): o gate cobre testes da Mecanifica
-    // e do Atelier herdado sobre módulos .js sem tipos. Checar todo acesso por
+    // e do núcleo herdado sobre módulos .js sem tipos. Checar todo acesso por
     // índice (arr[i]/Map.get) só geraria ruído; `strict` continua ligado.
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true,
@@ -23,5 +23,5 @@
 
     "noEmit": true
   },
-  "include": ["tools/som/**/*.ts", "tools/oficina/**/*.ts", "tools/mecanifica/**/*.ts"]
+  "include": ["tools/oficina/**/*.ts", "tools/mecanifica/**/*.ts"]
 }
