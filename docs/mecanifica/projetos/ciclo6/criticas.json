@@ -1,0 +1,354 @@
+[
+ {
+  "veredito": "precisa de revisão grande",
+  "achados": [
+   {
+    "gravidade": "alta",
+    "onde": "Plano, seção \"as frentes de trabalho\" (risco 4) contra as fatias 14, 17, 21 e 24; peças `_cabo-sextavado.js` e `_mordente-de-morsa.js`",
+    "oQue": "Nenhuma figura da rodada cruza `segmentosCurva` >= 2 com ponta COMPOSTA. Medi as valências: `chamferBox` 1x1x1 chanfro 0,1 tem 24 V, todos de valência 4 (composta); `cilindro` de 6 lados tem 12 V, todos de valência 3 (simples). O `_cabo-sextavado` é cilindro de 6 lados, então os 3 painéis dele só rodam em ponta SIMPLES. O `_mordente-de-morsa` é chamferBox, mas o plano descreve \"painel de uma cor e as oito tampas de outra\" — 4 arestas x 1 painel, ou seja n=1. A pinça do commit 26 também é n=1. As condições 8, 13 e 14 do gate usam cubo (simples) ou n=1.",
+    "porQueImporta": "O próprio plano diz, no risco 4 e na colisão C2, que a colisão de slot `b+2`/`b+3` SÓ aparece com n>=2 sobre chamferBox, porque com n=1 as duas numerações coincidem e com ponta simples as tampas não existem. A rodada decide a numeração no F0b, declara que descobrir o erro depois custa reescrever formato salvo, e depois não constrói uma única figura que exponha a decisão. Se a numeração estiver errada, ela sai verde nos 30 commits.",
+    "conserto": "Acrescentar uma afirmação no F4 fatia 4 (commit 21): chamferBox 1x1x1, chanfro 0,1, `de` face 'topo', aresta 0, raio 0,03, `segmentosCurva: 3`, afirmando os CONJUNTOS de V e F novos — painéis em b+0..b+5, tampas em b+6 e b+7; faces painéis b+0..b+2, tampas b+3 e b+4 — mais `conferirMalha(fechada:true)` e o volume. E pôr `segmentosCurva` >= 2 em pelo menos duas das quatro arestas do `_mordente-de-morsa`."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, \"os três verdes\" e o gate dos commits 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 20, 21, 22 e 23; `tools/bancadas/gabarito-selecao.mjs`",
+    "oQue": "Medi: com uma peça nova no diretório, `npm run gabarito:selecao:check` imprime `✗ _zz-medida: peça NOVA desde o gabarito` e sai com EXIT 1. Não existe flag para a \"forma filtrada\". O commit 7 cria `_flange-de-tubulacao.js` e o gabarito só é regravado no commit 25. Entre os dois, 14 commits têm como gate \"os três verdes\", e o plano define os três verdes como `gabarito:selecao:check` com os 28 hashes antigos idênticos. Esses 14 commits não têm como passar no próprio gate. Os commits 12, 17 e 24 escapam porque dizem \"como a fatia 7\".",
+    "porQueImporta": "Ou o gate vira letra morta a partir do commit 8, ou a rodada para. E `tools/bancadas/gabarito-selecao.mjs` — o arquivo que precisaria mudar para o gate existir — não aparece na lista de arquivos de nenhuma das seis frentes. O plano cita o arquivo uma vez, ao falar das worktrees mortas, e nunca o atribui.",
+    "conserto": "Dar ao `gabarito-selecao.mjs` um modo que aceite peça nova NOMEADA (por exemplo `--check --novas=_flange-de-tubulacao`), sair 0 quando as 28 antigas batem e sair 1 quando aparece peça nova não nomeada. Isso é uma fatia do F0a, antes do commit 7. E pôr o arquivo na lista do F0a."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, linha do F3 na tabela de frentes (\"`oficina.js` … 3792-3794 …\") contra a fatia 16 (\"dentro do código já refatorado, não em 3794\")",
+    "oQue": "O plano diz as duas coisas sobre a guarda do recuo, e nenhuma das duas funciona. A tabela manda inserir em 3792-3794, que é exatamente a posição que o próprio plano mediu como CONFLICT de 67 linhas com o F4 e que ressuscita `terceiraFace`. A fatia 16 manda pôr \"dentro do código já refatorado\" e não diz em qual função. Li o corpo do filete: a guarda precisa de `faceA`, `faceB`, `st.V` e do contorno das duas faces. A assinatura que o F0b cria é `posicoesDoCorte(P, Q, dA, dB, theta, raio)`, que não recebe nada disso. E `planoDeCostura` é exclusiva do F4, que o F3 está proibido de tocar.",
+    "porQueImporta": "A fatia 16 não é implementável como escrita. Quem for escrevê-la escolhe: violar a fronteira do F4, ou reabrir o conflito de 67 linhas, ou mudar a assinatura que o F0b já commitou. As três decisões acontecem sozinhas, no meio de uma fatia, sem o plano.",
+    "conserto": "Decidir no F0b, junto com a numeração, onde a guarda mora e com qual assinatura. A forma mais barata é uma terceira função pura no F0b, `profundidadeDentro(st, face, origem, dir)`, chamada pela op antes de `posicoesDoCorte`, com a chamada escrita já no F0b como no-op e o corpo preenchido pelo F3. Aí o F3 edita só o corpo dela."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, condição 4 do gate (\"as 9 recusas novas do A-36, as 9 do A-34, as 21 do A-30 e as 11 do A-37\")",
+    "oQue": "A condição afirma que as 50 recusas abortam o passo com 0 V e 0 F no bloco. Pelo menos duas são THROW por projeto declarado. Medi no núcleo de hoje: `raio: NaN` e `raio: Infinity` num furo lançam `oficina: valor numérico não-finito: NaN`, sem órfão nenhum. É o grito 9 da seção 6 do veredito do A-30, que diz em voz alta \"NÃO é grito, é throw … Não mudar nesta rodada. Registrar\". O grito 6 da seção 6 do A-34 (`desvio: NaN`) é a mesma coisa e diz o mesmo. Um throw mata a peça inteira; não existe bloco com 0 V e 0 F para contar.",
+    "porQueImporta": "Quem escrever o teste da condição 4 vai escrever `n.orfaos.length === 1` para dois casos que lançam. O teste fica vermelho e a pessoa vai concluir que o núcleo está errado, quando o errado é o gate. E o A-30 registra que a rodada CRIA duas superfícies novas com o mesmo defeito (`raio` de grupo e `profundidade` de grupo), o que dobra o número de casos afetados.",
+    "conserto": "Reescrever a condição 4 separando as duas famílias: \"48 recusas abortam com 0 V / 0 F no bloco e texto casado por inteiro; 2 entradas (não-finito no `raio` do furo e no `desvio`) continuam THROW, com a string de hoje casada, e isso é declarado\". E acrescentar as duas superfícies novas do A-30 ao \"o que fica aberto\"."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "`docs/uso/MAPA.md`; nenhuma frente do plano",
+    "oQue": "O plano cria 13 arquivos novos (4 peças, 4 testes de integridade, 5 arquivos de teste de frente). Medi: criar um arquivo faz `npm run mapa:check` falhar com \"docs/uso/MAPA.md está desatualizado … atual 219 arquivos, esperado 220\"; com dois, 221. `docs/uso/MAPA.md` não aparece na lista de arquivos de nenhuma das seis frentes. Pior, ele tem a mesma forma de conflito que o plano mediu com tanto cuidado para o `gabarito-selecao.json`: a linha 8 é a contagem global, reescrita por toda frente, e `_flange-de-tubulacao` (F1) e `_gabarito-de-furacao` (F2) entram entre as linhas 156 e 158, com `_frondosa` sozinho no meio — dentro das 3 linhas de contexto do git.",
+    "porQueImporta": "`mapa:check` só é cobrado no commit 29. De commit 7 a commit 28 ele fica vermelho e ninguém olha. E quando o F5 rodar `npm run mapa`, ele vai regravar de uma vez o cabeçalho de 13 arquivos que nunca foram conferidos. O `mapa.mjs` também cobra cabeçalho em todo arquivo-fonte, e o plano não diz isso em lugar nenhum para as 13 peças e testes novos.",
+    "conserto": "Tratar `docs/uso/MAPA.md` exatamente como o `gabarito-selecao.json`: regravação única no F5, com o custo declarado (mapa:check vermelho de 7 a 28), ou `npm run mapa` na mesma fatia que cria o arquivo. E escrever na regra de cada frente que todo arquivo novo nasce com cabeçalho, porque `mapa:check` cobra."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, commit 28 (\"GATE: `npm run criar` sai do vermelho em que já está hoje\")",
+    "oQue": "Rodei. `npm run criar -- _caixote-filetado` reprova por CINCO motivos, não um: `✗ 25 órfão(s)` de alias inexistente (`caixaInteira`), `✗ op(s) no núcleo SEM doc na skill: filete`, `✗ op(s) no núcleo SEM linha FEITO em docs/uso/oficina-contrato.md: filete`, `✗ distancia-paleta` e `sem gabarito (IoU)`. Rodei em `_corrimao` para separar peça de ferramenta: 23 órfãos de alias, mesma reprovação. O defeito de alias é do `criar`, não da peça, e alcança todas.",
+    "porQueImporta": "O plano mediu um dos cinco motivos e escreveu o gate como se as duas linhas de documentação bastassem. Escrever a linha do `filete` no SKILL.md e no oficina-contrato.md conserta 2 de 5. O commit 28 não tem como fechar como escrito, e é o único commit da rodada cujo gate é uma ferramenta inteira.",
+    "conserto": "Trocar o gate do commit 28 pelo que ele de fato mede: \"os dois `✗` de manifesto somem de `npm run criar -- _caixote-filetado`\", com os outros três motivos nomeados e declarados fora de escopo. E abrir atrito para os 23-25 órfãos de alias do `criar`, que é defeito medido e sem registro."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, fatia 3 (\"`d2AoSegmento`, `ordensDePonte` e `particionar` ao lado\")",
+    "oQue": "O plano nunca diz quais são as três ordens de ponte. O veredito do A-30, seção 4.6, especifica: (1) a ordem escrita pelo autor; (2) o anel mais perto do contorno primeiro, com chave igual à menor distância AO QUADRADO entre vértice do anel e segmento do contorno, sem `sqrt` e sem `Math.hypot`, desempate por índice de declaração; (3) o menor raio DECLARADO, resolvido por `st.num`, comparado exato, desempate por índice. O plano cita só o nome das funções.",
+    "porQueImporta": "A proibição de `Math.hypot` é regra de determinismo, não estilo: o veredito diz que a precisão dele é definida pela implementação em ECMAScript, e o G12 do A-30 cobra \"nenhum `Math.hypot` na chave de ordenação\". Essa proibição desapareceu do plano inteiro — não está na fatia 3, não está na condição 12, não está na condição 16. Quem implementar a segunda ordem vai escrever `Math.hypot`, porque é o que o resto do arquivo usa, e o resultado passa em todos os gates numa máquina só.",
+    "conserto": "Copiar as três ordens para a fatia 3, com as chaves e os desempates. E acrescentar à condição 16 (determinismo) a frase do G12: nenhuma chave de ordenação usa `Math.hypot` nem `sqrt`."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, condição 20 e fatia 7; veredito A-30, T28 e G13",
+    "oQue": "O veredito do A-30 pede CINCO figuras não automotivas para o T28 (tampo de mesa, base de ferramenta, chapa de ligação, flange de robô cego com três profundidades, e placa com dois discos FORA do centro), e o G13 cobra as cinco. O plano entrega uma peça, `_flange-de-tubulacao`, e a fatia 7 fecha T1, T2, T15, T16, T17 e T26. T28 sumiu. Pior: a mutação que o T28 existe para matar é \"restringir a forma de disco ao caso em que o centro é a origem\", e o exemplo literal do próprio plano escreve `{ nome: 'passagem', centro: [0, 0, 0], … }`. A flange do plano tem o disco NA origem. Ela não mata a mutação.",
+    "porQueImporta": "O plano entrega a capacidade \"raio por grupo\" provada por uma figura em que o atalho errado passa. Um núcleo que só saiba abrir disco no centro sai verde nos 30 commits.",
+    "conserto": "Acrescentar à fatia 7 pelo menos a figura de disco FORA do centro (a placa do T28) e a de três profundidades diferentes, ainda que como figuras de teste em `furo-raio-por-grupo.test.ts`, sem virar peça de acervo. E dizer no plano que as outras três famílias caíram, com o motivo."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Plano, condição 11 do gate; veredito A-30, G7 e G8",
+    "oQue": "A condição 11 dá as cinco contagens de HOJE (10 866 / 2 405 / 904 / 37, soma 14 212) e manda conferir a soma. Ela nunca diz qual é o resultado que APROVA. O veredito mede o depois: OK 10 893, trava 10. E a varredura de ordem de ponte do G7 — 11 305 figuras válidas, faixa realista de 4 352 com 464 travas hoje e 0 depois — não aparece em nenhuma das 21 condições. O número 108 aparece uma vez, na prosa da seção de escopo.",
+    "porQueImporta": "Como está, uma implementação que conserte zero casos passa na condição 11: os 28 hashes ficam iguais, nenhuma combinação que hoje sai inteira passa a gritar, e a soma fecha em 14 212. A única condição que mede o valor entregue pelo A-30 não mede o valor entregue pelo A-30.",
+    "conserto": "Escrever os alvos na condição 11: travas caem de 37 para 10 nas 14 212, e de 464 para 0 nas 4 352 da faixa realista, com as cinco contagens fechadas declaradas no teste e a soma conferida nos dois lados."
+   },
+   {
+    "gravidade": "media",
+    "onde": "`prototipos/fps/v3/motor/oficina.js` linhas 7-10; nenhuma frente",
+    "oQue": "O cabeçalho do núcleo diz, literal: \"A numeração de identidade depende só da POSIÇÃO do passo … nunca dos valores de PARAMS — mudar `raio` não renumera; mudar `lados` (TOPO) renumera\". Com `lados: {desvio}`, mudar `raio` PASSA a renumerar. O G7 do A-34 cobra a reescrita desse cabeçalho. As linhas 7-10 não estão na lista de nenhuma frente: o F1 tem proibido \"tudo acima de 764\", o F2 só tem 1745-1752, 1780, 1857, 3385 e 3571-3573, e o F5 só tem 864-872. E a condição 19 lista quatro textos errados sem incluir este.",
+    "porQueImporta": "A rodada inteira existe para o repositório parar de mentir. Ela vai deixar a lei mais antiga do arquivo mentindo sobre a capacidade que ela mesma entregou, e é exatamente a lei que o autor lê para decidir o que vai em PARAMS e o que vai em TOPO.",
+    "conserto": "Pôr `oficina.js` 7-10 na lista do F5 (só comentário) e acrescentá-lo como quinto item da condição 19."
+   },
+   {
+    "gravidade": "media",
+    "onde": "`prototipos/fps/v3/pecas/_tampa-de-caixa.js`, linhas ~31-37; nenhuma frente",
+    "oQue": "Li o arquivo. O cabeçalho dele diz: \"O QUE ELA MEDIU E NÃO CONTORNOU EM SILÊNCIO: um passo tem UM raio … Por isso esta peça é uma tampa CHEIA, sem furo central\". A fatia 5(d) do veredito do A-30 manda corrigi-lo. O plano cita a peça duas vezes como \"ANTES\" e nunca a atribui a frente nenhuma. F1 não tem o arquivo na lista; F5 também não.",
+    "porQueImporta": "Mesma classe da condição 19: a peça vai continuar declarando como limitação da linguagem uma coisa que a linguagem passou a fazer. É o texto que qualquer um lê antes de escrever a próxima flange.",
+    "conserto": "Pôr `_tampa-de-caixa.js` na lista do F5, na fatia de texto, e acrescentá-lo à condição 19."
+   },
+   {
+    "gravidade": "media",
+    "onde": "`docs/mecanifica/PRANCHA-FREIO-DISCO.md`; commits 26, 29 e 30",
+    "oQue": "Duas coisas. Primeira: a prancha do freio afirma \"180 faces, nenhuma sem identidade\" (linha 55) e repete o número na régua de comandos (linha 211), mais uma tabela de faces por parte (linha 57). O commit 26 filete a ponte, as garras e as orelhas do suporte, o que muda a contagem de faces da pinça e do suporte. A prancha não está na lista de nenhuma frente. Segunda: o plano exige \"a prancha\" na condição 21 e nunca nomeia um arquivo; se ela for um documento novo, ele nasce no commit 30, DEPOIS do commit 29, que é o único que roda `docs:toc:check` e `docs:links:check`.",
+    "porQueImporta": "O commit 26 cria um texto errado na mesma rodada que se propõe a corrigir quatro. E o documento que carrega a única prova de olho da rodada é o único que nenhum gate confere.",
+    "conserto": "Pôr `PRANCHA-FREIO-DISCO.md` na lista do F5 e nomear o arquivo da prancha nova (por exemplo `docs/mecanifica/PRANCHA-CICLO6.md`). Inverter a ordem: a prancha entra no commit 29, junto com INDEX.md e os três checks de documentação."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, fatia 3; veredito A-30, G4 e T12",
+    "oQue": "O G4 do A-30 é uma condição inteira e sumiu do plano: o bloco `furo v2 — face redonda com círculo de furos em simetria exata` (oficina.test.ts:5484) continua verde E ganha uma afirmação nova de que o `neutroCanonico` de cada um dos 8 casos é byte-idêntico ao de hoje. Li o bloco em 5510: hoje ele afirma só `orfaos` vazio, `arestasSoltas` 0 e a contagem de faces. Nenhuma afirmação de canon. O plano cobra T12 na fatia 3, mas nunca diz que o canon \"de hoje\" precisa ser CAPTURADO antes do primeiro commit de comportamento.",
+    "porQueImporta": "O veredito mede que a segunda ordem de ponte aplicada sempre mantém as 28 peças byte-idênticas E regride `face de 6 lados com 8 furos de 8`. Ou seja, o gabarito não protege essa mudança, e o único gate que protege depende de um valor que deixa de existir assim que a fatia 3 é commitada. `neutroCanonico` guarda o double cru (li a função: `[id, p[0], p[1], p[2]]`, sem arredondamento), então a captura vale — mas tem de acontecer antes.",
+    "conserto": "Acrescentar ao F0a ou ao F0b uma fatia que grave os 8 canons da família de simetria como literais no arquivo de teste, com o commit dizendo que eles são a linha de base. Depois disso T12 vira uma comparação de verdade."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, gate; veredito A-30, G6",
+    "oQue": "O G6 do A-30 cobra a fórmula fechada do furo em cinco desenhos diferentes: `nV = 2·L·M` e `nF = 3·L·M + 2·(n + 2M − 2)` para (parafusos, ladosFace, ladosFuro) em {(3,12,8),(4,16,12),(5,16,12),(6,24,16),(8,32,16)}, mais a do cego `nF = M·(2L+1) + (n_e + 2M − 2)` conferida em 48 V / 59 F. O plano tem condição de custo fechado para o filete (condição 8: V = 8+2n, F = 6+n, tri = 12+4n) e nenhuma para o furo. A fatia 7 declara só um número, 120 V / 228 F.",
+    "porQueImporta": "A mutação que o T3 mata é calcular `nF` à mão em vez de somar os preenchimentos reais, e ela só aparece com M = 1. A flange do plano tem M = 5. Um número solto não separa a fórmula certa da errada.",
+    "conserto": "Acrescentar uma condição de custo fechado para o furo, com os cinco desenhos e o caso cego, no mesmo molde da condição 8."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, fatia 3 e condição 12; veredito A-30, gritos 5 e 22, e G11",
+    "oQue": "Duas recusas do A-30 não têm fatia. O grito 22 é o da partição: o texto de hoje ganha a frase \"o núcleo tentou 3 ordens de ponte e nenhuma fechou; o defeito é do núcleo, A-33, não do arquivo da peça\". A fatia 3 fecha T11 a T14 e não menciona o texto. O grito 5 é o único texto de hoje que MUDA: a lista de palavras do círculo passa a incluir `nome`, `raio` e `profundidade`. O G11 do A-30 cobra o texto novo casado por inteiro. O plano cita a regex de `oficina.test.ts:4919` (que é do `grupo`) e não cita nada disso.",
+    "porQueImporta": "A condição 4 do plano manda casar o texto inteiro de cada recusa. Duas recusas ficam sem dono e sem afirmação, e uma delas é a única mudança de mensagem existente da frente do furo.",
+    "conserto": "Somar o grito 22 ao FECHA da fatia 3 e o grito 5 ao FECHA da fatia 4, os dois com o texto novo casado por inteiro."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, fatia 22 e condição 4; projeto A-37, seção 7.1 item (k)",
+    "oQue": "O A-37 lista 11 recusas novas. A de número 11 é \"tampa citada depois de a face ser consumida por outro passo\", que reusa `conferirConsumo` com o texto \"tampa 'inicio' da origem filete:7\". Ela não tem afirmação nenhuma: a lista P1 a P19 do projeto não a cobre, e a fatia 22 fecha só P14 e P15. A condição 4 do plano promete \"as 11 do A-37\" com texto casado por inteiro.",
+    "porQueImporta": "Uma recusa sem afirmação é uma recusa que ninguém escreve. A face da tampa nasce citável, e a lei do consumo é a mesma do painel — se ela não for escrita, citar tampa comida devolve seleção vazia, que é o no-op silencioso que o CLAUDE.md proíbe.",
+    "conserto": "Acrescentar P20 à fatia 22: um passo que consome a face da tampa e uma citação `tampa:'inicio'` depois dele, com o texto de `conferirConsumo` casado e 0 V / 0 F no bloco."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, F0b (\"a NUMERAÇÃO do filete reescrita no comentário 3708-3712, com os slots do item 3\")",
+    "oQue": "A frase da numeração diz \"vértices dos painéis em b+0..b+2n−1, tampas em b+2n e b+2n+1; faces dos painéis em b+0..b+n−1, tampas em b+n e b+n+1\". Ela não diz o que o A-37 diz com todas as letras: os slots são FIXOS e com BURACO — `b+2n` só existe quando a ponta do canto `aresta` é composta, `b+2n+1` só quando a do canto `aresta+1` é. Sem essa frase, a leitura natural é numeração densa, e numeração densa é justamente a mutação M3 que o A-37 mediu: no cone de 6 lados, a aresta 0 (pontas 3 e 6) passa a ter face `b+1` como tampa do 'fim', e toda peça que cite `tampa:'fim'` endereça a tampa do 'inicio'.",
+    "porQueImporta": "O F0b é o commit que decide formato salvo antes de existir código. Se a frase dele for ambígua, a fatia 21 resolve a ambiguidade sozinha, que é exatamente o que o risco 4 manda evitar.",
+    "conserto": "Escrever na frase do F0b: \"os slots das tampas são fixos e podem ficar VAZIOS; `b+2n` e `b+n` são sempre a ponta 'inicio', `b+2n+1` e `b+n+1` sempre a 'fim'; numeração densa é proibida\". E citar o caso do cone como a prova."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Plano, condição 12 do gate",
+    "oQue": "É a única das 21 condições sem número de linha de base. Ela diz \"`grupo:'parafusos'` numa flange com 4 e com 6 parafusos resolve o conjunto certo\" e não diz qual é o conjunto certo. Os números existem — o plano os escreve na prosa da seção de escopo (36 faces para `passagem`, 144 para `parafusos` com 4, 216 com 6) e o T16 do veredito acrescenta que a interseção é vazia e que `{grupo:'parafusos', parede:0}` devolve 4.",
+    "porQueImporta": "A mutação que o T16 mata é montar `grupos` com o índice do ITEM antes da expansão do círculo, o que faz `grupo:'parafusos'` devolver 36 em vez de 144. \"Resolve o conjunto certo\" não distingue 36 de 144. Sem os números, a condição não reprova nada.",
+    "conserto": "Trazer 36 / 144 / 216 / 4 e a interseção vazia para dentro da condição 12."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Plano, \"o que fica aberto ao fim\"; veredito A-34, furos 1 e 2",
+    "oQue": "Dois furos registrados do A-34 sumiram. O primeiro: o L derivado não aparece em lugar nenhum, e quando o raio muda para um L MAIOR, uma citação `borda: 12` que apontava para uma face continua dentro da faixa e passa a apontar para OUTRA face, sem grito. Só a citação que SAI da faixa grita. O segundo: `oficina.js:4040` faz `const dict = { ...PARAMS, ...TOPO }`, então o núcleo não tem como cobrar que o `desvio` seja declarado em TOPO; um autor que puser `acabamento` em PARAMS renumera o passo sem a disciplina de TOPO.",
+    "porQueImporta": "O primeiro é uma referência que muda de alvo em silêncio, que é a classe que o CLAUDE.md proíbe por escrito. O plano leva o remédio (`npm run descrever` mostrar o L) para fora de escopo sem registrar o problema. O segundo é a razão pela qual o primeiro é fácil de disparar.",
+    "conserto": "Acrescentar os dois ao \"o que a rodada não mediu, e é declarado\", com o número da linha (4040) e a frase da citação que desliza."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Plano, fatia 3 e \"o que fica aberto\"; veredito A-30, furos 5 e 6",
+    "oQue": "Dois furos do A-30 sumiram. O furo 5 diz que a ordem do PREENCHIMENTO passa a depender de qual das três tentativas venceu, e que \"o comentário da op tem de dizer em voz alta que a posição dentro do preenchimento não é endereço estável\". Esse comentário obrigatório não está em fatia nenhuma; a fatia 3 só lista código e T11-T14. O furo 6 diz que a rodada acrescenta duas superfícies novas (`raio` de grupo e `profundidade` de grupo) com o mesmo defeito de `raio: NaN` lançar em vez de gritar.",
+    "porQueImporta": "O furo 5 é promessa de formato salvo por omissão: sem o comentário, o autor supõe que `preenchimento: 3` é endereço, e ele deixa de ser quando outra ordem vence. O furo 6 é o que torna a condição 4 falsa.",
+    "conserto": "Pôr o comentário da instabilidade do preenchimento no ENTRA da fatia 3, e as duas superfícies novas de não-finito no \"o que fica aberto\"."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Plano, F5 commit C e \"o que fica aberto ao fim\"",
+    "oQue": "A rodada aloca A-38 a A-42 e deixa duas divergências medidas sem número: o padrão de `segmentosCurva` (1 no filete, 8 em `lathe`, `loft` e `inflate`) e o sentido de `raio` (RECUO no filete, raio do arco em `arcoDeConcordancia` na linha 1676; com φ=60° o autor escreve 0,012 e o arco tem R = 0,0208). As duas ficam só num comentário de código e na prosa do PLANO.md. O commit C escreve A-38 a A-42 em ATRITOS-AUTORIA.md e nenhuma das duas.",
+    "porQueImporta": "ATRITOS-AUTORIA.md é o registro que a próxima rodada varre. Defeito de vocabulário que só existe em comentário não é encontrado por ninguém. E o A-34 nasceu apontando para a superfície errada exatamente porque a medição estava no código e a lenda no documento.",
+    "conserto": "Alocar A-43 e A-44 para as duas, ou dizer no plano, com uma frase, por que elas ficam fora do registro."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Plano, condição 2 do gate; A-30 fatia 4 e A-34 fatia 9",
+    "oQue": "A condição 2 pede literais gravados com `toEqual` para exatamente uma figura: o cubo com filete de raio 0,1. As duas fatias que reescrevem o caminho do furo — a troca de `raio` por `raiosPorFuro[k]` e a descida do `resolverLados` de 3385 para antes de 3477 — apoiam a aditividade no gabarito. Medi o que o gabarito enxerga: no `freio-disco`, das 1 436 coordenadas não-nulas, 1 436 (100%) ficam com a MESMA string de `toFixed(9)` depois de mudar 1 ulp.",
+    "porQueImporta": "A própria condição 2 diz que o hash não prova. Ela conserta o problema num caminho e deixa o outro exposto, no atrito que o plano chama de \"o maior dos quatro\". O A-34 tem a afirmação 5 (`neutroCanonico` de `PLACA({...PASSANTE, lados: 6})` idêntico \"antes e depois\") e o A-30 tem o T4, mas nenhum dos dois diz que o valor \"antes\" precisa estar gravado no arquivo de teste — e depois do commit ele não existe mais.",
+    "conserto": "Estender a condição 2: a afirmação 5 do A-34 e o T4 do A-30 usam `neutroCanonico` GRAVADO como literal, capturado antes do commit 3. `neutroCanonico` guarda o double cru, então essa captura é prova de verdade."
+   }
+  ],
+  "oQueEstaBom": [
+   "A distribuição das 21 afirmações do A-36 (A1 a A21) está completa: A1-A14, A19 e A20 na fatia 14; A15 e A16 na 15; A17 e A18 na 16; A21 na 17. Nenhuma se perdeu.",
+   "A distribuição das 15 afirmações do A-34 também está completa: 2, 4, 11 e 15 na fatia 8; 1, 3, 5, 6, 7, 8, 9, 10, 12 e 13 na fatia 9; 14 na fatia 11.",
+   "A ordem F0a (a régua) antes de tudo está certa e o motivo é medido: trocar a conferência no meio invalida prova já dada, e o acervo passa hoje com folga.",
+   "A alocação prévia de A-38 a A-42 resolve uma colisão que o git nunca pegaria. Três projetos reivindicavam A-38 e A-39 com significados diferentes.",
+   "A linha de base é real, e conferi cinco números dela: 27 arquivos e 806 testes em 4,93 s; `id-cru:check` com 13 peças herdadas e 8 244 ids congelados; `mapa:check` com 219 arquivos; cubo lado 1 com filete raio 0,1 em 10 V / 7 F com V1000 = [-0.5, 0.9, 0.5], V6 = [0.5, 1, 0.4] e V7 = [-0.5, 1, 0.4]; e o filete no chamferBox abortando com 1 órfão e 0 V / 0 F no bloco.",
+   "A regra de nunca aplicar trabalho com `patch` ou `git apply`, com o estrago reproduzido, é o tipo de decisão que só se aprende perdendo trabalho. Ela vale por si.",
+   "A condição 17 (as medidas que não podem falhar) é o melhor item do gate. Ela ataca a forma de erro que o ciclo 5 já cometeu e não se contenta em nomeá-la."
+  ]
+ },
+ {
+  "veredito": "precisa de revisão grande",
+  "achados": [
+   {
+    "gravidade": "alta",
+    "onde": "Gate, condição 7 contra condição 5 — o teste A17 do A-36 e a quinta propriedade em /home/user/nos-mecanifica/tools/oficina/conferir-malha.ts",
+    "oQue": "As duas condições não podem ficar verdes juntas. A condição 7 exige que `raio: 0.99999999` num cubo de lado 1 CONSTRUA e PASSE em `conferirMalha`. A condição 5 instala dentro de `conferirMalha` a quinta propriedade: nenhum triângulo do adaptador abaixo de 1e-9·escala². Medido nesse mesmo raio: o adaptador emite triângulo de área EXATAMENTE 0 (relativo 0.000e+0). Medi a fronteira dos dois lados. A quinta propriedade reprova a partir de raio 0,99999998509883881. A guarda do A-36 (`prof > raio·(1+1e-9)`, com prof = 1,0) só grita a partir de 0,999999999. Entre os dois números existe uma banda em que a guarda ACEITA e a conferência REPROVA. O valor que a condição 7 escolheu, 0,99999999, cai dentro dela.",
+    "porQueImporta": "O plano manda a quinta propriedade no commit 1 e o teste da guarda no commit 16. Quem escrever o commit 16 encontra um teste impossível quinze commits depois de a régua ter sido trocada, e o caminho mais curto será afrouxar a quinta propriedade. Além disso a condição 7 afirma que a guarda pega o caso que nenhum gate pega hoje, e a banda medida mostra que ela não pega: existe raio que a guarda deixa passar e que produz triângulo de área zero.",
+    "conserto": "Trocar o valor da fronteira na condição 7 de 0,99999999 para 0,9999999. Medido: nesse raio o menor triângulo relativo é 2,980e-8, quase 30x acima do limite, e o passo continua construindo 10V/7F com 0 órfão. E escrever a banda no gate como limite declarado da guarda: entre 0,99999998509883881 e 0,999999999 a guarda aceita e a conferência reprova, no cubo de lado 1."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Escopo da rodada — F3 (A-36, n painéis) cruzando com F4 (A-37, ponta composta), em /home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+    "oQue": "Nenhum dos 30 commits constrói filete com `segmentosCurva` ≥ 2 numa ponta de quatro ou mais arestas, e a tampa que o projeto do A-37 escreve abre a malha nesse caso. Simulei a topologia. Com a tampa literal `[P1, P0, v0]` e n painéis, sobram n+1 arestas sem par por ponta composta: n=2 dá 3, n=3 dá 4, n=4 dá 5, n=8 dá 9. A tampa certa é o (n+2)-gono `[v0, A_n, …, A_0]`, que dá 0 em todos. E a fórmula de área da tampa que o gate 6 do A-37 trava, 0,5·r²·senθ, só vale em n=1: medi 41,4% de erro em n=2, 50,0% em n=3 e 57,1% em n=64 a θ=90°, e 48,0% / 57,2% / 64,5% a θ=135°. As peças da rodada não alcançam o caso. `_cabo-sextavado` é prisma hexagonal, e todo vértice dele toca 3 faces, ponta simples. `_mordente-de-morsa` e a pinça do freio são n=1. A varredura de 408 pares roda com o padrão n=1: reproduzi 5 das 6 figuras e ela sai 84 construindo a 2V/1F, tudo em n=1.",
+    "porQueImporta": "O plano identificou o risco (risco 4), decidiu a numeração no F0b para resolvê-lo e não escreveu nenhuma condição que cobre a decisão. A rodada entrega duas capacidades na mesma op que não compõem, e o gate inteiro passa verde. É o defeito do ciclo 5 repetido um andar acima: cada metade prova a si mesma e ninguém prova a junção. Some-se que o teto de estouro muda com a topologia. Com ponta simples nV = 2n e 500 constrói; com as duas pontas compostas nV = 2n+2 e 500 já estoura. A condição 8 afirma 500 constrói e 501 lança sem dizer em que figura.",
+    "conserto": "Reescrever a tampa como o (n+2)-gono no mesmo commit que decide a numeração, com a série de área medida ao lado (raio 1, θ=90°): n=1 0,500000000; n=2 0,292893219; n=3 0,250000000; n=4 0,234633135; n=64 0,214680687. Acrescentar uma condição ao gate: `chamferBox` 1×1×1 de chanfro 0,1, filete na aresta 0 da face topo com `segmentosCurva` 3, `conferirMalha(fechada: true)` verde, e os conjuntos de V e F afirmados. É o único teste que mata a tampa triangular e custa um build. Declarar também o teto de estouro nas duas topologias."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "Gate, condição 9 — A-34: a derivação por desvio é exata, não estimada",
+    "oQue": "A condição é vazia com respeito à fórmula da flecha. Ela prova o laço de correção, não a flecha. O `desvio` do teste é gerado pela MESMA função que o laço consulta, então o round-trip fecha por construção para qualquer flecha monótona em L. Medi com três flechas erradas, nos mesmos 3 980 casos que a condição pede: `R(1−cos(π/2L))`, `R·sen(π/L)` e `R(π/L)²/2` saem todas com 0 erro de round-trip e 0 violação de minimalidade, igual à certa. O estrago escapa. Com `R·sen(π/L)`, a flange do freio pede desvio de 0,250 mm e recebe L=654 em vez de 33, 19,8 vezes mais lados. E a condição 10(a) (a ondulação medida é ≤ o desvio pedido) não pega, porque a peça fica mais redonda do que o autor pediu. Medi em cinco pares (raio, desvio): a fórmula da corda gasta de 6,8x a 21,8x mais lados e passa em 9 e em 10(a).",
+    "porQueImporta": "A condição 9 é a única que o plano apresenta como prova de que a derivação está certa, e ela não pode reprovar nada. A capacidade que o A-34 entrega é justamente trocar uma contagem por uma tolerância. Uma derivação que gasta 20x o orçamento de faces passa em toda a rodada e só aparece quando alguém olhar a contagem de uma peça.",
+    "conserto": "Trocar a condição por minimalidade MEDIDA NA MALHA, nos dois lados. Construir o anel com o L derivado e com L−1, medir a ondulação nos dois neutros e afirmar: ondulação(L) ≤ desvio E ondulação(L−1) > desvio. Medi que ela mata a flecha do meio ângulo em 5 de 5 casos pelo lado que cabe, e a flecha da corda em 5 de 5 pelo lado do mínimo. A flecha do triângulo continua sendo a fronteira do domínio, com o teste próprio que o plano já tem."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Gate, condição 10(c) e condição 17(a)",
+    "oQue": "A afirmação (c) — um anel externo concêntrico com o MESMO L tem ondulação MAIOR — é vazia. Ela não chama a derivação em lugar nenhum. É aritmética de polígono regular: R2 > R1 implica R2(1−cos(π/L)) > R1(1−cos(π/L)), para todo L. Medi 11 940 pares de (L, R1, fator) e deu 0 violações, e daria 0 para qualquer implementação. Pior: a condição 17(a) nomeia a flecha conferida na malha como medida que não pode falhar e aponta a condição 10 como substituta. A substituta herda o defeito.",
+    "porQueImporta": "O plano criou uma lente contra medidas exatas por construção e a própria substituta que ele indicou é uma delas. Fica sem afirmação executável cobrando o que o A-34 existe para cobrar: que o autor consiga comparar a rugosidade de duas superfícies da mesma peça. Foi essa incomparabilidade que fez o A-34 nascer apontando para a superfície errada.",
+    "conserto": "Trocar (c) pela ordenação dentro da peça de produto. Medi no `freio-disco` de hoje: o flange (R=0,052, L=16) tem flecha 0,9992 mm e o furo do prisioneiro (R=0,0065, L=12) tem 0,2215 mm, razão 4,511x. A afirmação passa a ser: o furo do prisioneiro NÃO é o anel mais facetado da peça, e a razão contra o mais facetado é ≥ 4x. Ela falha no dia em que alguém subir os `lados` do flange ou baixar os do furo, que é o evento que o registro do A-34 leu errado."
+   },
+   {
+    "gravidade": "media",
+    "onde": "F0b (a forma) contra a condição 8 do gate, em /home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+    "oQue": "A decisão do F0b de ler o custo derivado do plano (`const { nV, nF } = plano.custo;`) impede a condição 8 de acontecer. A condição 8 exige que `segmentosCurva: 4294967296` LANCE `estoura o bloco de ids`. Com `Math.trunc` o valor sobrevive, mas se o plano for construído antes de o custo ser lido, o núcleo tenta materializar 4 294 967 297 posições. Medi: ainda alocando depois de 2,5 s, sem lançar nada. E `new Array(2*segs)` lança `RangeError: Invalid array length`, que não é a mensagem que a condição pede. Com a guarda antes do plano a mensagem sai certa na hora.",
+    "porQueImporta": "A condição 8 é a que trava a troca de `| 0` por `Math.trunc`, e a troca é o que o plano usa para separar o filete das outras oito ocorrências. Uma suíte que trava em vez de lançar não é um teste vermelho, é um teste que não termina.",
+    "conserto": "Escrever no F0b que a guarda `2·segs > BLOCO` roda ANTES de `posicoesDoCorte` construir qualquer posição, e que `plano.custo` só é lido depois. Uma linha na especificação do F0b e uma na condição 8."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Frentes — F3 fatia 1 (commit 14) contra a lista do que o F3 não pode tocar",
+    "oQue": "O plano proíbe o F3 de tocar `planoDeCostura` e depois manda o F3 escrever a costura. A lista diz: F3 não toca `planoDeCostura` nem `oficina.test.ts`. O commit 14 diz: a costura com `[...anelP.slice(1).reverse(), v0]`. A costura É `planoDeCostura`. As duas frases não podem valer ao mesmo tempo.",
+    "porQueImporta": "Essa é a fronteira que o F0b existe para criar, e ela é a única defesa contra os 2 hunks em conflito que o plano mediu entre A-36 e A-37. Se o agente do F3 seguir o commit 14, ele edita a função do F4 e o conflito volta. Se seguir a lista, ele não tem onde escrever a costura de n painéis.",
+    "conserto": "Pôr a genericidade no F0b, não no F3. O F0b escreve `planoDeCostura` já genérico no comprimento do anel: com anel de um elemento, `[...anelP.slice(1).reverse(), v0]` colapsa em `[idP1, v0]`, que é literalmente a linha de hoje, e o gabarito das 28 peças continua provando que nada mudou. Depois disso o F3 toca só `posicoesDoCorte` e o commit 14 perde a frase da costura."
+   },
+   {
+    "gravidade": "media",
+    "onde": "F0a (commit 1) — /home/user/nos-mecanifica/tools/oficina/conferir-malha.ts e /home/user/nos-mecanifica/src/autoria/adaptar-three.js",
+    "oQue": "O F0a instala o detector e o conserto no mesmo commit, sobre um acervo que já passa com folga, então nenhum dos dois é observado funcionando. E o mecanismo que ele diz consertar não reproduz a partir da descrição. O recorte de orelhas de hoje já recusa orelha colinear (`if (!(area > 1e-18)) continue`, adaptar-three.js linha 133). Testei 12 configurações de canto EXATAMENTE colinear inserido em triângulo e em quadrado: todas triangulam limpo, menor triângulo 1,25e-1, nenhuma degenerada. O sliver aparece com canto QUASE colinear: com 1e-13 de desvio sai triângulo de área 5,0e-14. Um descarte de colinear exato não tira esse caso.",
+    "porQueImporta": "Uma régua nova que nunca foi vista vermelha é uma régua cuja fiação ninguém testou. O plano ainda a apresenta com folga de 7 109x, o que mede a distância do acervo ao limite, não a capacidade de o gate disparar.",
+    "conserto": "O F0a carrega um caso vermelho. Existe um disponível hoje, sem uma linha de código novo: cubo de lado 1 com filete de raio 2,0 na aresta topo/0 emite DOIS triângulos de área exatamente 0. A causa não é canto colinear (medi que nenhuma face tem canto de 0 ou 180 grau) e sim face auto-interseccionada, que o descarte de colinear não remove. A tabela de linha de base do próprio plano registra essa linha como 2,0 dá 2 bicos e o adaptador diz OK. Corrigir a tabela e usar o caso como o vermelho do F0a."
+   },
+   {
+    "gravidade": "media",
+    "onde": "Gate, condição 20 — prova em peça de produto",
+    "oQue": "Três das quatro capacidades saem da rodada sem nenhuma peça de produto usando. O A-30 não tem figura de produto. O A-34 declara que trocar os `lados` do `freio-disco` é rodada de desenho própria. O A-36 declara que o chanfro das pastilhas é chanfro de verdade e n=1 fica. Só o A-37 toca produto. A condição 20 nomeia o risco apenas para a hipótese de o A-37 cair, e não para a rodada como está escrita.",
+    "porQueImporta": "O CLAUDE.md manda a capacidade nascer de dificuldade observada. Três capacidades entram exercitadas só por peça de exercício escrita para elas. Isso é o inverso: a peça nasce da capacidade. E `lados: {desvio}` é a que mais precisa de produto, porque ela existe para mudar a leitura do cliente.",
+    "conserto": "Escrever no fechamento, com número, quantas capacidades saíram sem produto. Ou nomear uma peça de produto para o `{desvio}` e pagar a inspeção visual dela na mesma rodada. Se nenhuma das duas couber, dizer no gate que a condição 20 foi cumprida em 1 de 4."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Gate, condição 5 e a linha de base — o piso 7,1092e-6",
+    "oQue": "O número do piso é publicado sem a definição de `escala²`, e a condição 15 exige exatamente isso do número de planaridade. Medi o piso com `escala` = maior |v| da peça: dá 6,9885e-5 na `moto`, não 7,1092e-6 no `_corrimao`. Peça diferente e ordem de grandeza diferente. O que se confirma nas duas leituras é a direção: 0 de 28 peças abaixo de 1e-9.",
+    "porQueImporta": "O plano escreve que um número publicado sem a definição ao lado reprova, e depois publica o próprio piso assim. Quem for implementar a quinta propriedade tem duas escalas plausíveis e nenhum critério.",
+    "conserto": "Escrever a definição de `escala` ao lado do 7,1092e-6, do mesmo jeito que a condição 15 faz com a planaridade. As duas leituras que testei não mudam o veredito do acervo, então a escolha é livre, mas precisa ser escrita."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Gate, condição 4 — cada recusa aborta com 0 V e 0 F no bloco",
+    "oQue": "A metade 0 V e 0 F no bloco é quase sempre verdadeira por construção, e a condição mistura dois mecanismos. Todo `grita` da op `filete` de hoje fica antes do primeiro `addV`, então uma guarda inserida nessa região não tem como deixar V ou F no bloco. A metade viva é `n.orfaos.length === 1` mais o texto casado por inteiro. E das 9 recusas do A-36, 5 são THROW e não `grita`: um throw mata a construção inteira e não sobra neutro em que contar bloco nenhum.",
+    "porQueImporta": "A condição gasta a medida mais cara (filtrar as chaves de V e F por faixa) na parte que não pode falhar, e não separa os dois mecanismos. O caso que realmente pode falhar não está nomeado: a guarda do recuo lê `st.V`, e se ela for posta depois do `st.V.set(v0, …)` o bloco já terá vértice.",
+    "conserto": "Separar a condição em duas. Para as recusas por `grita`: `orfaos.length === 1`, texto inteiro, e a contagem no bloco só onde a guarda fica depois de alguma construção, nomeadamente a guarda do recuo. Para as recusas por THROW: a mensagem e o fato de o `nucleo` lançar, sem falar em bloco."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "Gate, condições 3 e 11 — a varredura de 14 212 fora da suíte",
+    "oQue": "A varredura sai do `vitest run` por custo (292,7 s) e nada a substitui em integração contínua. A condição 3 diz que o que entra na suíte é uma amostra com contagem fechada declarada, e a condição 11 nunca diz qual amostra, com quantas figuras, nem quais contagens. Medi que o orçamento existe: 5 arquivos de teste novos custam 0,04 s (a suíte vai de 5,26 s para 5,30 s), 408 builds de cubo com filete mais adaptador custam 22 ms, uma peça de 502 faces atravessa o adaptador em 50 ms, e 84 000 iterações da derivação por desvio custam 11 ms. O que falta é a amostra nomeada, não o tempo.",
+    "porQueImporta": "Depois da rodada, quem mexer em `ordensDePonte` não tem gate. A tabela publicada volta a envelhecer, que é o defeito que a condição 19 manda consertar nesta mesma rodada.",
+    "conserto": "Nomear a amostra dentro da condição 11: a lista fixa das 37 combinações que travam hoje mais as 8 que saem de `AINDA_TRAVA`, com a contagem fechada de quantas saem inteiras e quantas gritam. Medido: 45 figuras de furo cabem folgadas no teto de 8 s."
+   }
+  ],
+  "oQueEstaBom": [
+   "O orçamento de tempo da condição 3 tem folga real e eu medi cada parcela. A suíte de hoje é 806 testes em 5,26 s de duração e 6,09 s de relógio. Cinco arquivos de teste novos custam 0,04 s. Os 408 pares do filete custam 22 ms num proxy de cubo. Uma peça de 502 faces atravessa o adaptador em 50 ms. As 84 000 iterações de derivação por desvio que as fatias 8 e 18 pedem custam 11 ms. O teto de 8 s não é o risco desta rodada.",
+   "A linha de base do A-37 reproduz exatamente. Reconstruí 5 das 6 figuras com origem estrutural de verdade e saíram 84 construindo, todas a 2V/1F, e 220 gritando por ponta complexa, que fecha em 84/324 assim que se somam os 104 pares da placa com furo. Cubo 24 de 24, cilindro de 8 lados 48 de 48, cone de 6 lados 12 de 24, chamferBox 0 de 96, esfera 8x4 0 de 112. A condição 13 é a mais forte do conjunto.",
+   "A linha de base do cubo com filete reproduz até o último double: 10V/7F, V1000 = [-0.5, 0.9, 0.5], V1001 = [0.5, 0.9, 0.5], V7 = [-0.5, 1, 0.4], V6 = [0.5, 1, 0.4], F1000 = [1000, 1001, 6, 7], F5 = [0, 3, 1000, 7, 4]. E 0.5 - 0.1 dá 0.4 contra 0.5 - (0.1/tan) dando 0.39999999999999997, com toFixed(9) confirmado em tools/bancadas/gabarito-selecao.mjs linha 41. A condição 2 é uma boa condição e escolheu o raio certo.",
+   "A lei do ângulo da condição 6 é forte de verdade, e mais forte do que o plano afirma. Além do centro na aresta e do R = raio que o projeto já mediu, testei três mutações de AMOSTRAGEM sobre a derivação certa: phi*s/(n+1), easing por cosseno e easing quadrático. As três morrem, e morrem em θ = 90°, 60° e 120°. A lei não é uma reescrita da fórmula que gerou os pontos; ela é uma consequência independente da amostragem uniforme em ângulo.",
+   "O item que o cruzamento declarou não medido — a guarda do A-36 sobre as combinações que o A-37 destrava — resolve a favor do plano. Implementei o ray-cast com as quatro portas e rodei. Nos 84 pares que constroem hoje: 0 recusas, folga sobre raio mínima 19,134x com raio 0,02 e 7,654x com 0,05. Nos 208 pares de chamferBox e esfera que o A-37 destrava: 0 recusas, folga mínima 7,071x com 0,02 e 2,828x com 0,05. O teto chanfro·√2 reproduz: 0,02 × 7,071 = 0,1414. Um desconhecido a menos.",
+   "A numeração decidida no F0b é consistente com o gate 7 do A-37, e conferi no caso que o A-37 usa para justificá-la. Com painéis em b+0..b+2n−1 e tampas em b+2n / b+2n+1 nos vértices, e painéis em b+0..b+n−1 e tampas em b+n / b+n+1 nas faces, o cone de 6 lados na aresta 0 (pontas de valência 3 e 6) dá V {b, b+1, b+3} e F {b+0, b+2}, exatamente o P3 do A-37. A propriedade que importa (o id de uma tampa não desliza quando a outra ponta muda de tipo) está preservada.",
+   "A aritmética das tabelas fecha. A varredura nova do A-33 soma 10 866 + 2 405 + 904 + 37 = 14 212; a publicada soma 14 104 e a diferença de 108 bate com a diferença dos que saem inteiros. A condição 19 está certa em mandar reescrever a linha 131 de ATRITOS-AUTORIA.md."
+  ]
+ },
+ {
+  "veredito": "precisa ser partido",
+  "achados": [
+   {
+    "gravidade": "alta",
+    "onde": "docs/mecanifica/PLANO.md — a seção \"Ciclo 6 — a ordem, em fatias que se commitam verdes\" (30 commits) contra o ciclo 5 já medido no log (3315967..7c113e7)",
+    "oQue": "A rodada é 2,3× o ciclo 5 em volume e 3,3× em commits, e não cabe numa sessão. Medido no repositório: ciclo 5 entregou DUAS capacidades em 1348 inserções, 14 arquivos, 9 commits, entre 07-31 23:29 e 08-01 01:06 — 97 minutos, 10,8 min por commit. A rodada 6 pede 30 commits. Projeção: 30 × 10,8 = 324 min = 5h24. Com as duas fatias que o próprio plano declara acima de 30 minutos (a 14 e a 21): 372 min = 6h12. O teto de sobrevivência observado neste repositório é 2h48 (a reciclagem). A rodada pede 1,9× o teto. Tamanho medido do que ela toca: a op `filete` tem 152 linhas, 97 executáveis, e F3 e F4 ficam com metade cada; a op `furo` tem 361 linhas, 215 executáveis; o bloco disputado 3844-3877 tem 34 linhas, 16 executáveis. Testes: 133 afirmações novas (28+21 do A-30, 15+9 do A-34, 21+9 do A-36, 19+11 do A-37), e `oficina.test.ts` mede 15,0 linhas por `it()` (5923 linhas, 396 it()) — entre 1100 e 2000 linhas de teste novo, contra 448 do ciclo 5 inteiro.",
+    "porQueImporta": "O ciclo 5 tinha 97 minutos e um agente morreu dentro dele (a0e341d, \"resgatado do agente morto\"). A rodada 6 pede quatro vezes esse tempo com a mesma infraestrutura. Não é questão de o plano estar mal escrito; ele está bem escrito para um trabalho que não cabe no envelope.",
+    "conserto": "Partir em duas rodadas, pelo corte de trilha, e o FILETE vai primeiro.\n\nRODADA A — FILETE (A-36 + A-37), ~18 commits. Entra: F0a (a régua), F0b como refatoração PURA (sem `flechaDoArco` nem `contagemPorDesvio`), A-36 fatias 0 a 4, A-37 fatias 2 a 7, a pinça do `freio-disco`, documentação e o olho. Sai: A-36 fatia 5 (`segmentosCurva: {desvio}`), que o próprio plano já declara opcional. Ela fecha sozinha: tem a prova em produto (a pinça, que é a dívida que o gate do ciclo 5 nomeou por escrito) e as duas peças de exercício.\n\nRODADA B — FURO (A-30 + A-34), ~15 commits. Entra: A-30 fatias 1 a 5, A-34 fatias 1 a 5 (e A-34 passa a ser o dono de `flechaDoArco`/`contagemPorDesvio`), a documentação e o olho. E entra o que este plano exclui: trocar os `lados` do `freio-disco` por `{desvio}` — sem isso a rodada B não tem prova em produto (ver achado próprio).\n\nPor que o filete primeiro: o acoplamento é o que um contêiner morto converte em trabalho perdido, e todo o acoplamento mora na metade do filete (F0b travando três frentes, a colisão de slot b+2/b+3, o conflito de 67 linhas). O A-30 está medido a 61 linhas de qualquer outra frente — é a metade que atravessa interrupção, então ela vai onde a interrupção é mais provável.\n\nSe couber ser mais conservador, três rodadas: R1 filete (18 commits), R2 A-30 sozinho (8), R3 A-34 mais o flange do freio (7). R2 e R3 só colidem em oficina.js 3383-3385, e entre rodadas isso é de graça: R3 rebasa sobre a main já entregue."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "docs/mecanifica/PLANO.md — commit 26 (\"F5 commit B — a pinça do `freio-disco`\") e a condição 20 do gate da rodada",
+    "oQue": "A rodada tem UMA prova em peça de produto e ela é o commit 26 de 30. A própria condição 20 escreve o desfecho: \"se o A-37 cair da rodada, a rodada fica sem prova em produto e reprova pela condição 8 do gate do ciclo 5\". As outras três frentes não tocam peça de produto por exclusão declarada. Então 25 commits de trabalho ficam reféns dos 5 últimos, num plano cujo risco número 1 é o contêiner reciclar.",
+    "porQueImporta": "Interrupção em qualquer ponto antes do commit 26 entrega quatro capacidades e reprova formalmente. O trabalho não se perde no disco, mas se perde no gate, o que dá no mesmo para quem cobra a rodada. É um ponto único de falha colocado a 87% do caminho.",
+    "conserto": "Na rodada A do corte, subir a pinça do `freio-disco` para logo depois da fatia que faz a ponta composta construir (a fatia 21 do plano, o commit 21). Ela custa um passo de `filete` na peça e uma regravação de gabarito de 0,433 s (medido). Com `pincaQuebra` abaixo de 0,005657 (o teto `chanfro·√2` que o plano já mediu), o passo constrói. A partir daí a rodada tem prova em produto e todo commit seguinte é ganho, não resgate. A prancha de fotos continua no fim; o que sobe é a prova, não o olho."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "tools/bancadas/gabarito-selecao.mjs:116 e :123, contra o plano na colisão C8 e no gate \"os três verdes\"",
+    "oQue": "O gate `npm run gabarito:selecao:check` fica estruturalmente VERMELHO do commit 7 ao commit 24 — 18 dos 30 — e o gate substituto não é um comando. Medido no código: a linha 116 trata peça nova como `diverge = true`, e a 123 sai com `process.exit(1)`. Pior, a saída de falha imprime SÓ as linhas `✗`; ela não lista as 28 que bateram. Então a \"forma filtrada\" que o plano propõe — \"28 hashes antigos idênticos, 1 peça nova nomeada\" — é leitura de stderr à mão, sem código de saída. O conflito que essa escolha evita custa 0,433 s para desfazer: `npm run gabarito:selecao` regrava o arquivo inteiro (medido).",
+    "porQueImporta": "O plano repete \"os três verdes\" como gate de cada fatia e depois troca um dos três por uma conferência manual em mais da metade da rodada. Um agente que substitui outro morto vê exit 1 e não tem como distinguir vermelho esperado de regressão. É exatamente a deriva de \"o gate disse verde\" que o CLAUDE.md proíbe, e ela nasce para economizar 0,4 segundo.",
+    "conserto": "Duas saídas, e a primeira é melhor. (a) Na F0a, acrescentar a `gabarito-selecao.mjs` uma bandeira `--novas=<lista>`: peça cujo nome está na lista não marca `diverge`, e o script imprime quantas das antigas bateram. São ~6 linhas e transformam 18 leituras à mão em código de saída. (b) Se a bandeira não entrar, cada frente regrava o gabarito no MESMO commit da peça, e o conflito de `hashTotal` se resolve rodando o gerador. Conflito em arquivo gerado é a classe mais barata que existe; o plano trocou ela por 18 commits de gate falso."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "tools/bancadas/criar.mjs:57, contra o commit 28 do plano (\"F5 commit D — `SKILL.md` e `docs/uso/oficina-contrato.md`\")",
+    "oQue": "O gate do commit 28 é inalcançável como está escrito. O plano diz: \"GATE: `npm run criar` sai do vermelho em que já está hoje. Medido: já falha com 'op(s) no núcleo SEM doc na skill: filete'\". Rodei o comando. Ele falha por QUATRO motivos, não um: (1) `✗ 25 órfão(s)` — \"alias 'caixaInteira' inexistente\", \"seleção vazia\"; (2) op sem doc na skill: filete; (3) op sem linha FEITO em oficina-contrato.md: filete; (4) `distancia-paleta: 1 430 920 pixel(s) em 3 tons fora`. O motivo (1) é defeito da própria ferramenta: a linha 57 chama `nucleo(mod.PASSOS, mod.PARAMS, mod.TOPO, mod.MATERIAIS, mod.ESQUELETO)` com CINCO argumentos e deixa cair `mod.ALIASES`. Por isso ela vê 25 órfãos numa peça que o gabarito constrói com 0 (as 28 byte-idênticas passam).",
+    "porQueImporta": "Escrever as duas linhas de documentação não tira o `criar` do vermelho. O conserto de `criar.mjs` não aparece em nenhuma das sete frentes, em nenhuma lista de arquivos, e em nenhuma lista de \"o que esta frente não pode tocar\". É um pré-requisito não atribuído no gate de um commit que fecha a rodada. E é o mesmo erro de assinatura que eu mesmo cometi ao medir a peça — a ferramenta de conferência tem o defeito que ela deveria pegar.",
+    "conserto": "Antes de qualquer frente, um commit de uma linha: passar `mod.ALIASES ?? []` como sexto argumento em `criar.mjs:57`. Rodar `npm run criar -- _caixote-filetado` e escrever no corpo do commit quantos órfãos sobraram. Depois disso, reescrever o gate do commit 28 com o vermelho que RESTA nomeado: as duas linhas de doc mais a paleta e a ausência de gabarito de silhueta. Um gate que promete verde onde só duas de quatro causas são pagas é gate que vai ser afrouxado no fim da rodada, sob pressão."
+   },
+   {
+    "gravidade": "alta",
+    "onde": "docs/mecanifica/PLANO.md — a tabela de frentes (F0b) e o risco 2",
+    "oQue": "O F0b trava TRÊS frentes de quatro, não duas, e o plano o descreve como se fosse chão da trilha do filete. A tabela dele diz \"A-37 fatia 1, A-34 parte da 1, A-36 parte da 5\" e ele nasce dono de `flechaDoArco` e `contagemPorDesvio`. A fatia 8 (F2 fatia 1) escreve literalmente \"`flechaDoAnel(R,L) = flechaDoArco(R, 2π, L)` como apelidos finos sobre a função do F0b\". Então a trilha do FURO também depende dele. Só o A-30 é independente. E o próprio plano diz, no risco 2, que o F0b \"é a fatia mais fácil de perder inteira e a mais chata de refazer\", porque ninguém enxerga o valor dela no diff.",
+    "porQueImporta": "A frase \"duas trilhas, duas worktrees, sem coordenação diária\" só vale depois do F0b. Antes dele existe uma frente sozinha da qual três dependem. Se ela se perder, F3 e F4 voltam a 2 hunks em conflito e o F2 fica sem a derivação — e nada avisa, porque a perda de uma refatoração sem mudança de comportamento não deixa teste vermelho.",
+    "conserto": "No corte proposto, o problema some: `flechaDoArco` e `contagemPorDesvio` saem do F0b e vão para a rodada B, onde o A-34 é o dono natural delas e a única consumidora. O F0b encolhe para a refatoração pura de 3844-3877 e passa a travar só F3 e F4, dentro de uma rodada só. Se o plano seguir inteiro mesmo assim, o F0b tem de ser o primeiro commit COM PUSH, e a mensagem dele precisa carregar o número que justifica sua existência: \"o merge de A-36 com A-37 vai de 2 hunks em conflito para 0\"."
+   },
+   {
+    "gravidade": "media",
+    "onde": "prototipos/fps/v3/motor/oficina.js:3729-3880 (a op `filete`), contra \"o que pode correr em paralelo\"",
+    "oQue": "Duas trilhas paralelas sobre uma função de 97 linhas executáveis. Medido: a op `filete` vai de 3729 a 3880, 152 linhas, 97 executáveis, 85 no corpo. O plano põe F3 dentro de `posicoesDoCorte` e F4 dentro de `planoDeCostura` — as duas metades da MESMA função de 97 linhas — em worktrees separadas, \"sem coordenação diária\". E as duas reivindicam a mesma numeração de formato salvo (b+2/b+3 nos vértices, b+1 na face).",
+    "porQueImporta": "Isso não é paralelismo, é duas pessoas digitando na mesma função. O plano viu o risco e o pagou com a decisão de numeração antecipada no F0b, que está certa. Mas o resto do custo continua: toda dúvida de fronteira entre `posicoesDoCorte` e `planoDeCostura` vira uma pergunta que nenhuma das duas worktrees pode responder sozinha, e o custo de errar é reescrever formato salvo de uma capacidade entregue na mesma rodada.",
+    "conserto": "Na rodada A do corte, rodar F3 e F4 em SÉRIE, não em paralelo, na mesma worktree. Medido: o gate de linha de comando custa 6,8 s (vitest 6,01 s de relógio, gabarito 0,486 s, id-cru 0,344 s), então serializar não custa tempo de gate — custa só o fim do paralelismo, que nesta função nunca foi real. F3 antes de F4, como o próprio cruzamento recomenda: F3 enche a lista de posições e F4 só consome o comprimento dela."
+   },
+   {
+    "gravidade": "media",
+    "onde": "docs/mecanifica/PLANO.md — \"Ciclo 6 — escopo excluído, declarado\", o item \"Trocar os `lados` do `freio-disco` por `{desvio}`\"",
+    "oQue": "Dois dos quatro atritos saem sem prova em produto, por exclusão do próprio plano, e a exclusão do A-34 é justamente a mudança que provaria o A-34. O plano mede que o flange do freio tem flecha 0,9992 mm com 16 lados e 0,2355 mm com 33, e que essa é a superfície que o A-34 deveria ter apontado desde o começo. Depois exclui a troca por ser \"decisão de desenho, com inspeção visual própria\". O A-30 não tem figura de produto nenhuma. Sobram duas capacidades provadas só em peça de exercício.",
+    "porQueImporta": "A exclusão não é técnica, é de orçamento: a rodada está cheia demais para caber a linha que a prova. `export const TOPO = { acabamento: 0.00025 }` mais uma troca de `lados` é uma linha de peça. A rodada gastou uma sessão medindo pixel de foto para descobrir qual superfície é a errada, e depois não corrigiu a superfície. E o plano já pede exatamente essa foto na condição 21 (\"a foto que corrige o registro do A-34\").",
+    "conserto": "Na rodada B do corte, levantar a exclusão: o `freio-disco` com o flange por `{desvio}` entra como a peça de produto da rodada, nomeada no commit como reescrita de propósito, com a foto em vista direita ortográfica de perto que a condição 21 já descreve. Sem isso a rodada B reprova pela condição 8 do gate do ciclo 5, do mesmo jeito que este plano diz que a rodada inteira reprova se o A-37 cair. O A-30 continua sem produto, e isso se declara — ele é uma capacidade de linguagem que nenhuma peça de produto pede hoje."
+   },
+   {
+    "gravidade": "media",
+    "onde": "docs/mecanifica/PLANO.md — \"Antes de a rodada começar\"",
+    "oQue": "A limpeza de worktrees mira as duas branches que não têm nada e perde a única que tem. Medido com `git rev-list --count HEAD..<branch>`: `wip/filete-seletivo-v2` tem 0 commits fora do HEAD, `wip/curva-perfil` tem 0. As duas que o plano manda remover estão vazias. Existe uma terceira, `wip/filete-peca-inacabada`, com 1 commit fora do HEAD: 3d7baab, de 08-01 00:44, \"Trabalho solto quando o agente morreu: peça de exercício e freio (NÃO conferido)\" — 76 inserções em `_caixote-filetado.js` e `freio-disco.js`. O plano não a nomeia em lugar nenhum.",
+    "porQueImporta": "O risco número 1 do plano é perda de trabalho por contêiner reciclado, e o item de higiene que abre a rodada olha para o lado errado. Ou aquele commit já foi refeito na main e a branch deve morrer nomeada, ou ele tem alguma coisa e um `git worktree prune` distraído leva junto. As duas respostas são baratas; não saber qual é que custa.",
+    "conserto": "Antes de remover qualquer coisa: `git diff HEAD wip/filete-peca-inacabada -- prototipos/fps/v3/pecas/` e decidir em voz alta se 3d7baab morre ou é resgatado. Depois remover as três branches, não duas, e escrever no commit de limpeza que as duas primeiras estavam vazias e o que aconteceu com a terceira. E confirmar a regra de push do plano, que está certa e não está implementada: as três são LOCAIS, só existem `origin/main` e `origin/claude/clone-...`."
+   },
+   {
+    "gravidade": "media",
+    "onde": "docs/mecanifica/PLANO.md — riscos 9 e 11, e as fatias 14 e 21",
+    "oQue": "O que se perde por fatia não é o código, é a medição, e o plano só protege isso em duas fatias. Fatia a fatia, medido: commits 1-2 (F0a, F0b) são ~100 linhas, baratos de refazer, mas a perda do F0b devolve F3×F4 a 2 hunks em conflito sem nenhum teste vermelho para avisar. Commit 14 (o arco de n painéis) perde as quatro tabelas de ângulo medidas contra dois núcleos construídos à mão — o código volta em uma hora, a prova de que o diagnóstico gravado no núcleo estava errado volta em uma sessão. Commit 21 (a ponta composta) perde a enumeração dos 408 pares: a varredura roda em 0,15 s, mas montar o conjunto de figuras custou a sessão. Commits 7, 12, 17 e 24 (as quatro peças sem gabarito) morrem com `gabarito:selecao:check` vermelho e o substituto morre com o agente. Commit 26 perde a rodada inteira. Commit 30 perde a única prova que nenhum teste substitui.",
+    "porQueImporta": "A regra do plano — todo número medido no corpo do commit, no mesmo commit — está certa e é a coisa mais valiosa do documento. Mas ela só é cobrada nas duas fatias declaradas acima de 30 minutos. As outras 28 podem morrer com a medição só no chat, que é onde a medição já morreu uma vez.",
+    "conserto": "Manter a regra e estendê-la a todas as fatias: nenhuma fatia commita sem os números dela no corpo da mensagem. E aplicar a regra do teste vermelho commitado (`it.fails` mais o comentário do que ele espera) não só às fatias 14 e 21, mas a qualquer fatia que passe de 20 minutos — o teste vermelho é a parte que custa mais a refazer e é a que sobrevive a um agente morto."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "docs/mecanifica/PLANO.md — condição 3 do gate (\"Teto 8 s\")",
+    "oQue": "O teto de 8 s tem cerca de 1 s de folga, e a rodada gasta boa parte dela. Medido hoje: `npx vitest run` sai em 5,15 s de duração e 6,01 s de relógio, 27 arquivos, 806 testes. A rodada acrescenta 9 arquivos de teste (5 de frente mais 4 de integridade) e ~133 afirmações. Medi o custo marginal por arquivo rodando subconjuntos: 1 arquivo 1,287 s, 5 arquivos 1,471 s — ~0,05 s por arquivo, paralelizado. E `oficina.test.ts` faz 454 casos em 1,74 s, ou 3,8 ms por caso. Projeção: 6,01 + 0,45 (arquivos) + 0,50 (casos) + 0,15 (a varredura de 408) ≈ 7,1 s de relógio.",
+    "porQueImporta": "Passa, mas com 0,9 s de margem num teto que o plano cobra ao fim de cada uma das 30 fatias. Uma varredura pesada colocada no lugar errado estoura o teto no meio da rodada, e aí a decisão de onde ela mora é tomada sob pressão em vez de antes.",
+    "conserto": "O plano já manda medir toda varredura isolada antes de decidir onde ela mora. Manter isso e escrever a margem no gate, não só o teto: \"7,1 s projetados contra 8 s de teto, 0,9 s de folga\". Com o corte em duas rodadas o problema some sozinho: cada metade acrescenta ~4 ou 5 arquivos e metade das afirmações."
+   },
+   {
+    "gravidade": "baixa",
+    "onde": "docs/mecanifica/PLANO.md — \"O gate de linha de comando custa 5,7 s\"",
+    "oQue": "O gate custa 6,8 s, não 5,7 s. O plano somou a DURAÇÃO que o vitest reporta (5,20 s) em vez do relógio. Medido agora: `npx vitest run` 6,01 s de relógio (5,15 s de duração reportada), `gabarito:selecao:check` 0,486 s, `id-cru:check` 0,344 s. Soma 6,83 s.",
+    "porQueImporta": "Não muda a conclusão — commitar continua barato e não há motivo técnico para acumular trabalho entre commits. Mas é a única linha do plano em que um número medido está errado, e o argumento inteiro da rodada é que número medido vale mais que opinião. Um número errado no lugar onde se prega medição é o defeito que o A-34 já teve uma vez.",
+    "conserto": "Trocar 5,7 s por 6,8 s e dizer qual das duas medidas é (relógio, não duração reportada). Custa uma linha."
+   }
+  ],
+  "oQueEstaBom": [
+   "Todo número de linha de base que eu re-medi reproduz exatamente: `freio-disco` 498V/508F com 0 órfãos; o filete no `chamferBox` abortando com a mensagem inteira e 0 V / 0 F no bloco 1000; cubo de lado 1 com filete de raio 5 saindo 10V/7F e 0 órfão; V1000 = [-0.5, 0.9, 0.5], V1001 = [0.5, 0.9, 0.5], V6 = [0.5, 1, 0.4], V7 = [-0.5, 1, 0.4] e F1000 = [1000,1001,6,7], que são os literais da condição 2 do gate.",
+   "A contagem de pares da varredura do A-37 bate figura a figura: cubo 24, chamferBox 96, cilindro de 8 lados 48, cone de 6 lados 24, esfera 8×4 112 — 304, mais 104 da placa furada, 408.",
+   "A varredura de 408 pares cabe mesmo na suíte: medi `conferirMalha` sem os `expect` do vitest entre 0,088 e 0,370 ms por figura, então 376 conferências custam cerca de 0,11 s, coerente com os 0,15 s declarados.",
+   "Toda referência de linha em `tools/oficina/oficina.test.ts` está correta: 4919 é a regex do vocabulário do furo, 5607 é o `AINDA_TRAVA` com 11 entradas e as 8 nomeadas estão lá, 5761 é o `ARESTA_TOPO_TRAS`, 4805 é o clamp de `lados`, 4814 é o estouro do bloco.",
+   "Medir conflito com `git merge` de verdade em vez de estimar por leitura é o método certo, e foi ele que derrubou a frase do A-36 sobre \"sem hunk compartilhado\".",
+   "Decidir a numeração do filete UMA vez, no comentário, antes de qualquer código dos dois lados, é a decisão mais barata e mais valiosa do plano — a colisão b+2/b+3 é invisível em n=1 e em ponta simples, e só o cruzamento a expõe.",
+   "A regra de que todo número medido entra no corpo do commit no mesmo commit em que foi medido está certa e vale mais que qualquer fatia de código do plano.",
+   "A proibição de aplicar trabalho com `patch` ou `git apply` está provada, não suposta: o `--fuzz=3` saindo com exit 0 e offset de -229 linhas é o tipo de estrago que nenhum gate pega.",
+   "A quinta propriedade da conferência entrar sozinha e primeiro está certa: régua trocada no meio invalida prova já dada, e o acervo passa hoje com folga de 7 109× contra o limite proposto."
+  ]
+ }
+]

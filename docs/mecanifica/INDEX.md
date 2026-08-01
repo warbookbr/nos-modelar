@@ -355,10 +355,23 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Próxima entrega: ainda não escolhida.** Aberto ao fim do ciclo 5: A-35, A-36
-(o filete de um painel é chanfro, não arredondamento) e A-37 (o filete não compõe
-com `chamferBox`, e era justo a pinça que o gate nomeou). A-34 e A-36 são o mesmo
-assunto por dois lados: quebrar a quina sem multiplicar a malha.
+**Próxima entrega: o ciclo 6, “Furo por grupo, contagem por desvio e filete v2”,
+ABERTO, com plano completo em [`PLANO.md`](PLANO.md).** Ele paga A-30, A-34,
+A-36 e A-37 na mesma rodada: 7 frentes, 29 fatias que se commitam verdes, gate
+medido e linha de base tirada do repositório de hoje. Os projetos que o
+originaram estão em `docs/mecanifica/projetos/ciclo6/`, com o mapa de terreno,
+as oito propostas independentes, os quatro vereditos de júri, o cruzamento e as
+três críticas adversariais.
+
+Três medições feitas no projeto mudaram o rumo antes de qualquer código. A
+candidata registrada do A-34 estava errada: quebrar a quina da borda do furo
+PIORA a ondulação do contorno em 9,5%, e subir `lados` de 12 para 20 a reduz em
+64% pelo mesmo orçamento de faces — então o A-34 virou `lados` com unidade, e a
+quebra saiu como A-38. O diagnóstico do A-36 gravado no núcleo estava errado no
+motivo: a tentativa antiga não falhou pela interpolação esférica, falhou porque
+pôs o centro do arco na aresta em vez da bissetriz, e a lista de ângulos dela é a
+lista certa ao contrário. E o A-37 foi prototipado: dos 408 pares (face, aresta)
+varridos, 84 construíam e passaram a 376, com 0 regressões.
 
 ## Manutenção desta documentação
 

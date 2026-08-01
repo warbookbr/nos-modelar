@@ -1,0 +1,483 @@
+{
+ "ordem": {
+  "dependencias": [
+   {
+    "de": "A-36",
+    "depende": "A-37 fatia 1 (refatoração de 3844-3877)",
+    "natureza": "dura",
+    "evidencia": "As duas frentes substituem o MESMO bloco. A-36 fatia 1 diz literalmente 'Substituir o bloco oficina.js 3844-3877'; A-37 fatia 1 quebra 3844-3877 em posicoesDoCorte + costurarPontas. Sobreposição total de 34 linhas. Enquanto o bloco for um só, quem chegar depois reescreve o trabalho do primeiro."
+   },
+   {
+    "de": "A-36 (guarda do recuo)",
+    "depende": "A-37 fatia 3 (a região das pontas)",
+    "natureza": "dura",
+    "evidencia": "MEDIDO com merge de três vias de verdade, em repositório git montado sobre uma cópia byte-idêntica de oficina.js. Ramo A: guarda inserida depois de 3793 (a posição que o projeto do A-36 declara). Ramo B: 3795-3842 substituído pelo leque. `git merge` -> CONFLICT (content), bloco de conflito de 67 linhas (3795-3861), e o lado do A-36 traz de volta `terceiraFace` inteiro, que é justo a função que o A-37 apaga. A frase do projeto do A-36 ('o diff fica inteiramente ACIMA da região de A-37, sem hunk compartilhado') é falsa: 3793 e 3795 estão dentro das 3 linhas de contexto do git."
+   },
+   {
+    "de": "A-37 (numeração das tampas)",
+    "depende": "A-36 (numeração dos painéis)",
+    "natureza": "dura",
+    "evidencia": "Colisão de slot em formato salvo, e ela é alcançável. A-36: P_k = b+2(k−1), Q_k = b+2(k−1)+1 para k=1..n; painel k = b+k. A-37: b+2 = P0, b+3 = Q0; face b+1 = tampa 'inicio', b+2 = tampa 'fim'. Com n=2 e ponta composta, A-36 quer b+2/b+3 para o anel 2 e A-37 quer b+2/b+3 para as tampas; face b+1 é painel 1 num e tampa no outro. MEDIDO que a ponta composta é o caso normal, não a exceção: valências do chamferBox = {4: 24 vértices}, todas compostas; do cilindro de 6 lados = {3: 12}, todas simples. A fatia 8 do A-37 filete a pinça (chamferBox) da peça de produto, e a rodada inteira existe para essa aresta ficar redonda. Os dois travam a própria numeração por gate (A-36 G12, A-37 G7); os dois testes não podem ficar verdes juntos."
+   },
+   {
+    "de": "A-34",
+    "depende": "A-30",
+    "natureza": "dura",
+    "evidencia": "MEDIDO por merge git e por aritmética. (1) Merge: A-30 reescreve oficina.js 3383-3384 (`raio` vira padrão do passo) e A-34 substitui 3385 (`resolverLados(st, a.lados, raio, 'furo')`). `git merge` -> CONFLICT no mesmo hunk. (2) Semântica: A-34 lê `raio` na linha 3385; A-30 põe os raios por grupo na expansão de 3462-3474, 77 linhas depois. Na flange do próprio A-30 (passagem R=0,0125, parafuso R=0,0055), derivar L do raio do passo dá flecha da passagem 0,5063 mm contra desvio 0,250 mm pedido — excede 102,5%. Com desvio 0,100 mm excede 112,8%; com 0,050 mm, 113,9%. O `desvio` deixa de significar o que diz, sem grito. (3) O conserto é medido e barato: `L` é declarado em 3385 mas só é USADO em 3481, então a derivação pode descer para logo antes de 3477 sem custo estrutural; o único efeito visível é a ordem de grito."
+   },
+   {
+    "de": "A-36 fatia 5 (segmentosCurva {desvio})",
+    "depende": "A-34 fatia 1 (os helpers puros)",
+    "natureza": "branda",
+    "evidencia": "MEDIDO que as duas funções são a MESMA função. `flechaDoAnel(R,L) = R(1−cos(π/L))` do A-34 e `flechaDoArco(R,φ,n) = R(1−cos(φ/2n))` do A-36 têm diferença máxima 0 (zero, não epsilon) em 5 raios × L de 3 a 400, com φ=2π. E o defeito do `ceil` cru é o mesmo nos dois: 47,0% de erro em 3 184 round-trips na forma do anel, 49,1% em 9 600 na forma do arco. Cada projeto escreve o mesmo laço de correção por conta própria. Se A-34 fatia 1 escrever `flechaDoArco(R, φ, n)` geral e definir `flechaDoAnel(R,L) = flechaDoArco(R, 2π, L)`, A-36 fatia 5 só consome."
+   },
+   {
+    "de": "A-34 (clamp de contagem)",
+    "depende": "A-36 (decisão Math.trunc x | 0)",
+    "natureza": "branda",
+    "evidencia": "MEDIDO: existem 9 sítios com a forma da casa, não 4 como o A-40 do A-36 conta. `Math.max(3, st.num(a.lados ?? 8) | 0)` em 1780 (cilindro), 1824 (esfera), 1857 (cone), 2063 (lathe), 2270 (loft) e 3385 (furo); `Math.max(1, st.num(a.segmentosCurva ?? 8) | 0)` em 2083, 2271 e 2529. A-34 abre TRÊS deles (1780, 1857, 3385) e declara a expressão 'literalmente a mesma, palavra por palavra'; A-36 decide `Math.trunc` para o filete e trava por teste. Medido o custo de nivelar os três que A-34 já abre: troquei `| 0` por `Math.trunc` em 1780, 1857 e 3385 e rodei os gates — `gabarito:selecao:check` 28 peças byte-idênticas, `npx vitest run` 806 verdes. Custo ZERO. E conserta o defeito: hoje `cilindro lados: 4294967296` constrói com 3 lados em silêncio; com `Math.trunc` ele lança 'estoura o bloco de ids'."
+   },
+   {
+    "de": "A-30, A-34, A-36",
+    "depende": "A-37 fatia 0 (a quinta propriedade de conferirMalha)",
+    "natureza": "branda",
+    "evidencia": "A-37 fatia 0 acrescenta a cobrança de área mínima de triângulo do adaptador a `tools/oficina/conferir-malha.ts`, que TODA peça nova das outras três frentes chama. MEDIDO no acervo de hoje: piso 7,1092e-6 em `_corrimao` (reproduz o número do A-37 exatamente), 0 de 28 peças abaixo de 1e-9; `_prateleira-furada` 1,0657e-5, `freio-disco` 1,2072e-5. E MEDIDO que ela não bloqueia o L grande do A-34: furo L=79 com M=4 dá 7,17e-6; cilindro L=200 dá 3,10e-6; cilindro L=499 dá 1,996e-7, ainda 200× acima do piso de 1e-9. Se ela entrar depois, três peças de exercício já estarão commitadas sem nunca terem passado nela."
+   },
+   {
+    "de": "A-37 fatia 8 (a pinça do freio-disco)",
+    "depende": "A-36 (a guarda do recuo)",
+    "natureza": "dura",
+    "evidencia": "ACHADO MEU, e nenhum dos dois projetos tem. Reimplementei a guarda do A-36 (ray-cast no plano da face, 4 portas) e a rodei sobre a geometria real da pinça. No caso que dá nome ao A-37 (aresta 0 da face 'topo' de um chamferBox), a porta que manda é sempre faceB, a TIRA DE CHANFRO, e o teto é exatamente `chanfro·√2`: pinça ponte e garra do freio-disco (chanfro 0,004) -> teto 0,005657 m; suporte placa (chanfro 0,003) -> teto 0,004243 m. As portas da face principal dão 0,030 / 0,058 / 0,111, de 5× a 26× mais folga. O A-37 declara `pincaQuebra` como PARAM e nunca lhe dá valor; com a guarda instalada, qualquer valor acima de 5,657 mm faz o passo GRITAR e a peça de produto não constrói. Medido também que a guarda NÃO recusa a figura do próprio A-37: chamferBox 1×1×1 chanfro 0,1 com raio 0,03 tem teto 0,141421 — 0 de 96 pares recusados com raio 0,001 a 0,03."
+   },
+   {
+    "de": "A-36 (a lei do ângulo, A1)",
+    "depende": "A-37 (que destrava o chamferBox)",
+    "natureza": "branda",
+    "evidencia": "Presente, não dívida. A-36 precisa de aresta não-reta porque a mutação `R = raio` sobrevive a 90° (tan 45° = 1), e MEDIDO que as 5 chamadas de filete do acervo são todas a 90° (1 em `_caixote-filetado`, 4 em `freio-disco`). MEDIDO que a aresta topo/tira do chamferBox é θ = 135,0000° exatos, nas quatro figuras que testei (chamferBox 1×1×1 e as três da pinça real). A-37 entrega a A-36 uma testemunha de θ≠90° dentro de peça de PRODUTO, de graça. Sem A-37 a única testemunha é o cilindro sintético."
+   },
+   {
+    "de": "A-30 (a varredura de partição)",
+    "depende": "A-34 (o L derivado)",
+    "natureza": "branda",
+    "evidencia": "A-30 mede tudo na faixa face 3..36, furo 3..24, e o G8 dele grava esses números em ATRITOS-AUTORIA.md. A-34 destrava L até 79 (M=4) e até 333 (M=1). MEDIDO no núcleo de hoje, varrendo face 6..36 e furo 25..62 com total 2..12: 3 722 saem inteiras, 2 928 estouram o bloco e 38 TRAVAM com 'nenhuma orelha livre'. As 38 são todas de forma (face 6, total 7) — a mesma forma de [6,12,7] e [6,24,7], que o A-30 já promete consertar. Não é região nova, mas o número que o A-30 vai publicar fica preso a uma faixa que o A-34 torna escrevível."
+   },
+   {
+    "de": "A-30",
+    "depende": "A-36 / A-37",
+    "natureza": "nenhuma",
+    "evidencia": "MEDIDO que as regiões não se encostam. A edição mais baixa do A-30 no furo é `registraOrigem` em 3630; a mais alta do A-36 no filete é o comentário em 3691. 61 linhas de folga. A única fronteira apertada é o contrato: `CONTRATOS_ORIGEM.furo` fecha em 863 e o comentário de `.filete` abre em 864. Testei o merge git com a edição do A-30 descendo linha a linha contra uma edição do A-36 em 864: limpo em 856, 858, 860, 861, 862; CONFLITO só quando as duas caem em linhas adjacentes (863 x 864). Ou seja, paralelo seguro, com uma linha nomeada para vigiar."
+   },
+   {
+    "de": "A-34",
+    "depende": "A-37",
+    "natureza": "nenhuma",
+    "evidencia": "O mapa.json marca A-34 × A-37 como gravidade ALTA, mas essa nota foi escrita para o A-34 pelo caminho ANTIGO (filete de loop no contorno do furo, que batia em `terceiraFace` 3809-3824). O caminho aprovado (tolerância -> contagem derivada) não encosta em filete: ele muda só a resolução de `lados` em cilindro 1780, cone 1857 e furo 3385. Pelo mesmo motivo, a nota do mapa 'A-30 × A-34: só colidem se A-34 for argumento do furo' inverteu de sinal — o A-34 novo É argumento do furo, na linha 3385. As três notas de conflito do mapa que citam A-34 estão vencidas."
+   }
+  ],
+  "ordemRecomendada": [
+   "TRILHA FILETE, passo 1 — A-37 fatia 0. A quinta propriedade em `tools/oficina/conferir-malha.ts` (área mínima de triângulo do adaptador >= 1e-9·escala²) e o descarte de canto colinear em `src/autoria/adaptar-three.js`. Commita verde sozinha. Vai primeiro porque é o único item que muda a régua de TODA peça nova das quatro frentes. Medido: acervo passa com piso 7,1092e-6 em `_corrimao`, 0 de 28 abaixo do limite, e o L grande do A-34 também passa (cilindro L=499 -> 1,996e-7).",
+   "TRILHA FILETE, passo 2 — A-37 fatia 1. Refatorar oficina.js 3844-3877 em `posicoesDoCorte(P,Q,dA,dB,theta,raio)` e `costurarPontas(...)`, sem mudança de comportamento, com `gabarito:selecao:check` 28 byte-idênticas e 806 verdes. Depois disto A-36 vive na primeira função e A-37 na segunda.",
+   "TRILHA FILETE, passo 3 — A NUMERAÇÃO DO FILETE, decidida UMA VEZ, no comentário 3708-3712, no mesmo commit do passo 2 e antes de qualquer código novo dos dois. A única atribuição que colapsa na de hoje com n=1 e ponta simples e nunca colide: VÉRTICES painéis em b+0..b+2n−1 (P_k = b+2(k−1), Q_k = b+2(k−1)+1), tampas em b+2n e b+2n+1; FACES painéis em b+0..b+n−1, tampas em b+n e b+n+1. Sem este passo, A-36 G12 e A-37 G7 são dois testes que não ficam verdes juntos.",
+   "TRILHA FURO, passo 1 (pode correr junto do passo 1 da trilha filete) — A-34 fatia 1. `flechaDoArco(R, phi, n)` GERAL junto dos helpers puros, mais `flechaDoAnel(R,L) = flechaDoArco(R, 2π, L)`, `ladosPorDesvio` e `segmentosPorDesvio`, todos com o laço de correção do `ceil`. Nenhuma op chama nada. Medido que é uma função só: diferença 0 entre as duas formas em 5 raios × L 3..400.",
+   "TRILHA FILETE, passo 4 — A-36 fatias 0 a 4 (texto, o arco de n painéis dentro de `posicoesDoCorte`, a origem com n painéis, a guarda do recuo, o registro do defeito anterior e `_cabo-sextavado`). A guarda entra dentro do código já refatorado, não em 3794, e por isso não toca a região do A-37.",
+   "TRILHA FILETE, passo 5 — A-37 fatias 2 a 6 (leque neutro, ponta simples pelo leque, ponta composta, `tampa` no contrato, a varredura de 408 pares). As tampas já nascem nos slots b+2n / b+n decididos no passo 3.",
+   "TRILHA FURO, passo 2 — A-30 fatias 1 a 4 (três ordens de ponte; `centros` aceita grupos e `raio` do passo vira padrão; `profundidade` por furo; o grupo se nomeia). A-30 vem antes do A-34 no furo porque ele não renumera nada e porque é ele que produz `raiosPorFuro`.",
+   "TRILHA FURO, passo 3 — A-34 fatias 2 e 3, já sobre a expansão do A-30. `resolverLados` desce da linha 3385 para logo antes de 3477 e deriva L de `Math.max(...raiosPorFuro)`. Medido que a descida é grátis: `L` é declarado em 3385 e só é usado em 3481. Na mesma fatia, trocar `| 0` por `Math.trunc` nos três sítios que A-34 já reescreve (1780, 1857, 3385) — medido custo zero, 28 byte-idênticas e 806 verdes. A afirmação 15 do A-34 deixa de ser teste de função pura e vira teste da op.",
+   "TRILHA FILETE, passo 6 — A-36 fatia 5, `segmentosCurva: { desvio }`, consumindo `flechaDoArco` do passo 1 da trilha furo. Se não couber, cai sem quebrar a rodada, como o próprio projeto declara.",
+   "PEÇAS DE EXERCÍCIO, uma por vez e em série, nunca em paralelo — `_cabo-sextavado` (A-36), o mordente de morsa (A-37), `_flange-de-tubulacao` (A-30), `_gabarito-de-furacao` (A-34). Cada uma regrava `tools/bancadas/gabarito-selecao.json` e confere no diff que as linhas antigas ficaram idênticas e que existe exatamente uma linha nova.",
+   "PEÇA DE PRODUTO — A-37 fatia 8, a pinça do freio-disco, POR ÚLTIMO no código. `pincaQuebra` tem de nascer com valor <= 0,005657 (medido: o teto que a guarda do A-36 impõe é `chanfro·√2`, e `pincaChanfro` é 0,004). Se o desenho pedir mais, o que muda é `pincaChanfro`, não a guarda.",
+   "DOCUMENTAÇÃO E ATRITOS, um commit por frente, depois de o código estar todo verde — A-36 fatia 6, A-34 fatia 6, A-37 fatia 9, A-30 fatia 5(f). Aqui se decide de uma vez a lista de atritos novos, que hoje colide: A-34 abre A-38 (a `quebra` da quina) e A-39 (que ele não nomeia); A-37 abre A-38 (dependência de tesselação) e A-39 (volume ambíguo); A-36 abre A-39 (terceira face não-plana) e A-40 (clamp em silêncio). Três projetos, dois números, cinco atritos distintos.",
+   "BANCADA, por último e não opcional — `_cabo-sextavado` com `segmentosCurva` 1 e 3 no mesmo quadro, o mordente com as tampas citadas por nome, a flange de perto da boca da passagem, o `_gabarito-de-furacao` e a pinça filetada. Dois enquadramentos cada, URL de seleção, vista e projeção registrada."
+  ],
+  "porque": "A ordem sai de seis medições, não de gosto. Primeiro: A-37 fatia 0 muda a régua de todo mundo, então ela vai antes de qualquer peça nova nascer; medido que o acervo passa com folga de 3,5 ordens de grandeza (piso 7,1092e-6 em `_corrimao`) e que o L grande do A-34 também passa (cilindro L=499 dá 1,996e-7, ainda 200× acima de 1e-9). Segundo: A-36 e A-37 disputam o mesmo bloco 3844-3877 e, medido por merge git de verdade, também 3795-3861 — a guarda do A-36 na posição que o projeto dela declara produz 67 linhas de conflito e ressuscita `terceiraFace`, a função que o A-37 apaga. A refatoração do A-37 fatia 1 é o que separa as duas, então ela vem antes das duas. Terceiro: a numeração do filete é formato salvo e os dois projetos reivindicam os mesmos slots b+2/b+3 (vértice) e b+1 (face); medido que a colisão é alcançável, porque todo vértice de chamferBox tem valência 4 e a fatia 8 do A-37 filete a pinça. Escrever a numeração uma vez, antes do código, custa um comentário; descobrir depois custa reescrever formato salvo de uma feature já entregue na mesma rodada. Quarto: no furo, A-30 vem antes de A-34 porque A-34 lê `raio` na linha 3385 e A-30 põe os raios por grupo em 3462-3474; derivar do raio do passo faz a flecha da passagem da própria flange do A-30 exceder o desvio pedido em 102,5% a 113,9%, sem grito. Descer a derivação de 3385 para antes de 3477 é grátis, medido: `L` é declarado em 3385 e só é usado em 3481. Na ordem inversa, A-34 entrega uma semântica testada que A-30 quebra em silêncio na semana seguinte. Quinto: A-34 fatia 1 vira o dono do helper, porque medi que `flechaDoAnel(R,L)` e `flechaDoArco(R,2π,L)` são a mesma função com diferença 0, e que o defeito do `ceil` cru é o mesmo nas duas (47,0% e 49,1%). Sexto: a pinça do freio vai por último porque a guarda do A-36 lhe impõe um teto de raio que o A-37 não conhece — medido `chanfro·√2` = 0,005657 na ponte e na garra, 0,004243 no suporte.",
+  "oQuePodeIrEmParalelo": [
+   "DUAS TRILHAS, duas worktrees, sem coordenação diária. TRILHA FURO = A-30 + A-34 (op `furo`, `cilindro`, `cone`, `triangularComAneis`). TRILHA FILETE = A-37 + A-36 (op `filete`, `conferir-malha.ts`, `adaptar-three.js`). Medido que as regiões não se encostam: a edição mais baixa do A-30 no furo é `registraOrigem` em 3630; a mais alta do A-36 no filete é o comentário em 3691. 61 linhas de folga, muito além das 3 de contexto do git.",
+   "DENTRO DA TRILHA FURO, A-34 fatia 1 (os helpers puros `flechaDoArco`, `ladosPorDesvio`, `segmentosPorDesvio`) corre sozinha e antes de tudo. Ela não é chamada por nenhuma op, então commita verde e não conflita com nada — nem com A-30, nem com a trilha filete.",
+   "DENTRO DA TRILHA FILETE, A-37 fatia 0 (a quinta propriedade + o adaptador) corre sozinha, em arquivos que nenhuma outra frente toca (`tools/oficina/conferir-malha.ts` e `src/autoria/adaptar-three.js`). Medido que nenhum gate faz hash da saída do adaptador: `gabarito:selecao` mede o NEUTRO.",
+   "OS QUATRO TESTES DE INTEGRIDADE novos (`flange-integridade`, `gabarito-de-furacao`, `cabo-sextavado-integridade`, mordente) são arquivos distintos em `tools/mecanifica/` e não conflitam entre si.",
+   "O QUE NÃO PODE IR EM PARALELO, e é medido: as quatro regravações de `tools/bancadas/gabarito-selecao.json`. Montei quatro ramos, cada um gravando uma peça nova, e mergeei os seis pares: TODOS conflitam em `hashTotal` (linha 2), porque é uma linha só reescrita por todos. A-30 × A-34 conflita ainda no ponto de inserção da entrada, porque `_flange-de-tubulacao` e `_gabarito-de-furacao` são vizinhos alfabéticos. A resolução é trivial (regravar), mas obriga um passo serializado a cada merge.",
+   "TAMBÉM NÃO PODE IR EM PARALELO: os blocos de teste de `tools/oficina/oficina.test.ts`. A-30 fatia 1 move 8 linhas de `AINDA_TRAVA` (5607) para o bloco da região sadia e A-34 fatia 2 acrescenta casos a `furo — numeração e formato salvo` (4764), `furo — completude` (5050) e ao de estouro (4814). São blocos vizinhos do mesmo arquivo. Serializar as duas dentro da trilha furo já resolve.",
+   "E NÃO PODE IR EM PARALELO: a lista de atritos novos em `docs/mecanifica/ATRITOS-AUTORIA.md`. Os três projetos abrem A-38 e A-39 com significados diferentes. Quem escrever primeiro fixa a numeração; os outros dois rebaseiam."
+  ],
+  "armadilhas": [
+   "A FRASE DO A-36 SOBRE 'SEM HUNK COMPARTILHADO' É FALSA, E ELA É A BASE DA DECISÃO DE ONDE PÔR A GUARDA. Medido com merge git real: inserir a guarda depois de 3793 e reescrever 3795-3842 dá CONFLICT (content) com bloco de 67 linhas, e o lado do A-36 ressuscita `terceiraFace`. Um merge resolvido no automático ou no olho traz de volta o gate que o A-37 acabou de derrubar, e nenhum teste do repositório pega isso: medido que `grep 'além das duas' tools/ src/` dá 0.",
+   "A COLISÃO DE SLOT b+2/b+3 NÃO APARECE EM NENHUM TESTE DE UMA DAS DUAS FRENTES SOZINHA. Com n=1 as duas numerações coincidem; com ponta simples as tampas não existem. Só o cruzamento (n>=2 sobre chamferBox) a expõe, e é exatamente o que a fatia 8 do A-37 mais o A-36 produzem na peça de produto. Medido: chamferBox tem valência 4 em todos os 24 vértices.",
+   "`pincaQuebra` NÃO TEM VALOR EM LUGAR NENHUM DO PROJETO DO A-37, E A GUARDA DO A-36 LHE DÁ UM TETO. Medido na geometria real: teto 0,005657 na ponte e na garra (chanfro 0,004), 0,004243 no suporte (chanfro 0,003). Quem escrever a fatia 8 sem saber disso descobre no grito, com a peça de produto no meio do commit.",
+   "O `desvio` PODE MENTIR EM SILÊNCIO SE A ORDEM FOR INVERTIDA. Com A-34 antes de A-30, ou com o `resolverLados` deixado na linha 3385, o L é derivado do raio do passo e a flecha do furo maior excede o desvio declarado em 102,5% (desvio 0,250 mm), 112,8% (0,100 mm) e 113,9% (0,050 mm) na própria flange do A-30. A peça constrói, nenhum órfão, nenhum gate cai, e o número que o autor escreveu não significa o que diz.",
+   "AS TRÊS NOTAS DE CONFLITO DO mapa.json QUE CITAM A-34 ESTÃO VENCIDAS. Elas foram escritas para o A-34 pelo caminho antigo (filete de loop no contorno do furo). 'A-34 × A-37: gravidade alta' virou nenhuma — o A-34 novo não encosta em filete. 'A-30 × A-34: só colidem se A-34 for argumento do furo' inverteu de sinal — o A-34 novo É argumento do furo, na linha 3385, e é onde ele colide. Quem planejar pelo mapa sem reler o veredito planeja o ciclo errado.",
+   "O A-40 DO A-36 CONTA 4 SÍTIOS E SÃO 9. Medido: `Math.max(3, ...| 0)` para `lados` em 1780, 1824, 1857, 2063, 2270 e 3385; `Math.max(1, ...| 0)` para `segmentosCurva` em 2083, 2271 e 2529. O A-34 abre três deles e declara a expressão intocada, enquanto o A-36 decide `Math.trunc` para o filete e trava por teste. A rodada sai com duas leis para a mesma palavra, escritas na mesma semana. Medido que nivelar os três que o A-34 já abre custa zero: 28 peças byte-idênticas e 806 testes verdes.",
+   "O `{desvio}` SAI DA RODADA COBRINDO METADE DO VOCABULÁRIO, NAS DUAS PALAVRAS. `lados` aceita a frase em 3 de 6 ops (cilindro, cone, furo; ficam esfera, lathe, loft). `segmentosCurva` aceita em 1 de 4 (filete; ficam lathe, loft, inflate) — e só se a fatia 5 do A-36 couber. Se ela não couber, a rodada entrega `lados` com unidade e `segmentosCurva` sem, que é a incomparabilidade que fez o A-34 nascer.",
+   "O GABARITO NÃO PROVA IDENTIDADE EM DOUBLE, E A RODADA GRAVA QUATRO PEÇAS NOVAS POR ELE. `tools/bancadas/gabarito-selecao.mjs` serializa com `toFixed(9)`. Confirmei a construção no arquivo. A prova de que o caminho de hoje não mudou tem de ser afirmação sobre coordenada exata com `toEqual`, e ela só existe no projeto do A-36 (A6). A-30, A-34 e A-37 apoiam a aditividade no gabarito.",
+   "A VARREDURA DE PARTIÇÃO DO A-30 PARA EM furo 24 E O A-34 DESTRAVA ATÉ 79 COM M=4. Medido no núcleo de hoje na faixa furo 25..62: 38 travas, todas de forma (face 6, total 7). É a mesma forma das que o A-30 promete consertar, então o risco é baixo — mas o número que vai para ATRITOS-AUTORIA.md fica preso a uma faixa que a rodada torna escrevível.",
+   "A FRONTEIRA DOS CONTRATOS É UMA LINHA. `CONTRATOS_ORIGEM.furo` fecha em 863 e o comentário de `.filete` abre em 864. Medido linha a linha: o merge é limpo com 2 linhas de separação e conflita só com 1. Se a última edição do A-30 no `resolver` cair em 863, as duas trilhas param de ser paralelas.",
+   "O QUE NENHUM DOS QUATRO MEDIU, E EU TAMBÉM NÃO: a guarda do A-36 sobre as 292 combinações que o A-37 destrava (ela confere faceA e faceB, nunca faceC/faceD, e o A-37 troca a vizinhança das pontas); o comportamento do arco de n painéis dentro de `espelha`, `arranja` e `mescla`; se algum dos 32 sobreviventes da varredura do A-37 DEVERIA construir; e a inspeção visual de tudo — os quatro projetos são headless de ponta a ponta, e três deles existem por causa do que o cliente vê."
+  ]
+ },
+ "conflito": {
+  "colisoes": [
+   "C1 · oficina.js 3844-3877, o corpo do filete. F3 e F4 escrevem as MESMAS linhas: 3844 (nV/nF) e 3868-3877 (a costura). MEDIDO com git merge de verdade, num clone do arquivo: 2 hunks em conflito. Como se evita: F0b entra antes e a linha de custo vira `const { nV, nF } = plano.custo;` — derivada das duas funções, ninguém a edita. MEDIDO com a forma refatorada instalada e as duas frentes editando só a própria função: 0 hunks em conflito. As regiões exclusivas já não se encostam hoje (A-36 termina em 3793, A-37 começa em 3795, 12 linhas de folga), e isso se confirmou no teste: o insert da guarda e a troca do leque não conflitaram.",
+   "C2 · oficina.js 3383-3385, `raio` e `lados` do furo. Linhas adjacentes. MEDIDO com git merge: 1 hunk em conflito. E ela não é só textual, é SEMÂNTICA, e nenhum dos dois vereditos a nomeia: A-34 declara como condição de escopo 'tem um `raio` ESCALAR já resolvido no ponto onde `lados` é lido (3383)'; A-30 apaga esse escalar e põe `raiosPorFuro[k]` no lugar. A numeração do furo tem UM L por passo (2LM vértices, 3LM faces), então `lados:{desvio}` num passo de raio misto tem de escolher um L só. Como se resolve: F1 antes, F2 rebasada, e a regra passa a ser o MAIOR raio do passo. MEDIDO na flange do G5 do A-30 (passagem 0,025 + 4 parafusos 0,0055, face de 16 cantos): pelo MAIOR raio e desvio 1e-4 sai L=36 e a flange vai de 120V/228F para 360V/588F, com folga 1,1x no furo grande e 4,8x no pequeno; pelo MENOR raio sai L=17 e o furo grande fica com flecha 4,2567e-4, 4,3x ACIMA do teto que o autor escreveu. E o estouro do BLOCO chega em desvio 2e-5 (790V/1233F), antes do que o grito nº 8 do A-34 prevê para raio único.",
+   "C3 · oficina.js 864-872 contra 873-907, o contrato de origem do filete. F3 acrescenta uma frase no comentário (864-872); F4 acrescenta 'tampa' em `chaves` e `msg` (875-876). Gap de 2 linhas, e o git usa 3 de contexto: vira um hunk só. Como se evita: F3 NÃO escreve no comentário do contrato. A frase da ordem dos painéis vai inteira para o F5, com o resto da documentação. Custo zero: é comentário, não muda comportamento nem teste.",
+   "C4 · oficina.js 862 contra 864. F1 mexe no `resolver` do contrato `furo` (774-862, ~30 linhas) e F3 mexia em 864-872. Gap de 1 linha. Resolvida de graça por C3: com F3 fora de 864-872, sobra folga do fim do furo (863) até o começo de 873, que só F4 toca.",
+   "C5 · oficina.js ~1745-1752, os helpers puros antes de `export const OPS`. F2 quer `flechaDoAnel`/`ladosPorDesvio`; F3 fatia 5 quer `flechaDoArco`/`segmentosPorDesvio`. MEDIDO: são a MESMA função. `flechaDoAnel(R,L)` e `flechaDoArco(R,2π,L)` diferem em 0 (zero absoluto) sobre 2000 casos, com R de 0,0005 a 3,7 e L de 3 a 400. E as duas precisam da mesma correção: o `ceil` cru erra 48,3% no anel (φ=2π) e 49,0% no arco de 90°, em 4000 round-trips cada; o candidato corrigido erra 0 nos dois. Como se resolve: a derivação nasce UMA vez no F0b, com `phi` explícito. F2 escreve só o apelido `flechaDoAnel = (R,L) => flechaDoArco(R, 2*Math.PI, L)`. F3 fatia 5 chama a mesma função direto. Duas cópias da mesma lei no mesmo arquivo é o defeito que o próprio A-36 já registra como dívida em `arcoDeConcordancia`.",
+   "C6 · tools/oficina/oficina.test.ts, o fim do arquivo. REPRODUZI O ESTRAGO EXATO. Dois patches independentes que acrescentam no fim do arquivo, aplicados com `patch -p1 --fuzz=3`: saída 0, sem erro, sem conflito, hunk aplicado com 'succeeded at 5691 with fuzz 2 (offset -229 lines)' e o teste enfiado DENTRO do bloco `ciclo 5 — o ombro do pneu`, três vezes (linhas 5695, 5748, 5931). O bloco `filete` é o ÚLTIMO do arquivo (5760-5923), então A-36 e A-37 caem os dois ali. Como se evita: nenhuma frente acrescenta no fim de oficina.test.ts, e o orquestrador nunca usa `patch` nem `git apply`. `git merge` no mesmo par conflita alto (medido) e não deixa passar.",
+   "C7 · tools/oficina/oficina.test.ts, os dois pontos que SÓ o F1 pode tocar. A fatia 1 do A-30 tem de mover 8 linhas de `AINDA_TRAVA` (5600-5615) e a fatia 4 tem de reescrever a regex da linha 4919. Estão a 688 linhas uma da outra, e nenhuma no fim. Como se evita: F1 é a única frente com licença de escrever dentro de oficina.test.ts. F2 depende de 4805 e 4814 ficarem literais, F3 depende de 5761 ficar literal; nenhuma delas escreve ali.",
+   "C8 · tools/bancadas/gabarito-selecao.json. A linha 2 é `hashTotal`, e as quatro peças novas mais o freio-disco reescrito dão 5 regravações — as 5 reescrevem a linha 2. Pior: `_cabo-sextavado` (F3) entra na linha 4, a 1 linha do hashTotal, hunk fundido; e `_flange-de-tubulacao` (F1) e `_gabarito-de-furacao` (F2) entram no MESMO ponto, linha 29, entre `_espelhado` e `_galho`. Como se evita: NENHUMA frente commita a peça junto do gabarito. A peça é código e vai na frente; o gabarito é regravado UMA vez no F5, com um `npm run gabarito:selecao` só, e o diff conferido a olho. CUSTO MEDIDO E ACEITO: até o F5 entrar, `gabarito:selecao:check` fica vermelho em toda frente que já trouxe peça — confirmei pondo uma peça nova no diretório e rodando o check ('peça NOVA desde o gabarito'). O gate de cada frente passa a ser a forma filtrada: os 28 hashes ANTIGOS idênticos, e só peça nomeada como nova.",
+   "C9 · docs/mecanifica/ATRITOS-AUTORIA.md, seção 'Atritos abertos'. A-37 ocupa 24-47 e A-36 ocupa 48-72: adjacentes, gap 0, e as duas frentes apagam o próprio bloco. A-34 ocupa 97-118 e A-33 ocupa 119-153: adjacentes, gap 0, e A-34 reescreve o primeiro enquanto A-30 reescreve o segundo. Quatro frentes, dois pares colados. Como se evita: nenhuma frente edita ATRITOS-AUTORIA.md. Tudo no F5, num commit só.",
+   "C10 · o NÚMERO dos atritos novos, e esta é invisível para o git. F2 abre A-38. F4 abre A-38 e A-39. F3 abre A-39 e A-40. A-38 é reivindicado DUAS vezes e A-39 é reivindicado DUAS vezes. Um merge textual limpo entrega dois A-38 diferentes e dois A-39 diferentes, e nenhum gate pega isso. Como se resolve: o orquestrador aloca a faixa ANTES de as frentes começarem, e escreve o número no prompt de cada agente. Alocação sem colisão, 5 atritos novos: A-38 = a `quebra` de quina do furo (F2); A-39 = a terceira face não-plana do filete, 1,4642e-2 no prisma triangular (F3); A-40 = o clamp silencioso de contagem em 4 lugares, `4294967296 | 0` vira 1 (F3); A-41 = a resposta do filete depende da tesselação da vizinhança, 9,0436e-5 contra 1,9134e-7 (F4); A-42 = volume ambíguo em face entortada, amplitude 1,6692e-5 (F4).",
+   "C11 · .claude/skills/criar-peca/SKILL.md e docs/uso/oficina-contrato.md. F1 e F2 editam a MESMA linha 79 (a linha do `furo` na tabela). F3 e F4 precisam CRIAR a mesma linha nova do `filete`. E MEDIDO: `npm run criar -- _caixote-filetado` já sai VERMELHO hoje, com 'op(s) no núcleo SEM doc na skill: filete' e 'SEM linha FEITO em docs/uso/oficina-contrato.md: filete'. O gate da fatia 6 do A-36 ('npm run criar verde') não se paga acrescentando uma chave: exige escrever a linha inteira do filete em dois arquivos, e é dívida do ciclo 5, não desta rodada. Como se evita: os dois arquivos são exclusivos do F5.",
+   "C12 · tools/oficina/conferir-malha.ts. F4 acrescenta a quinta propriedade (piso de área de triângulo do adaptador) e TODA frente chama `conferirMalha`. Se ela entrar depois, F1, F2 e F3 provaram as peças delas com uma régua que a rodada já trocou. Como se evita: F0a entra primeira, sozinha, e commita verde. MEDI eu mesmo, sobre as 28 peças: piso relativo 7,1092e-6 em `_corrimao`, 0 triângulos degenerados no acervo inteiro, folga de 7109x contra o limite 1e-9 proposto. Segundo lugar `_prateleira-furada` 1,0657e-5, terceiro `freio-disco` 1,2072e-5.",
+   "C13 · as duas worktrees mortas ainda no disco. `git worktree list` mostra `.claude/worktrees/agent-a66976e63307ee497` em `wip/filete-seletivo-v2` (fce58dd) e `.claude/worktrees/agent-aea230c82fee86f8e` em `wip/curva-perfil` (d135c01). As duas carregam cópias próprias de `tools/bancadas/gabarito-selecao.json`, de `gabarito-selecao.mjs` e de `.claude/skills/criar-peca/SKILL.md` que não são as da main — um `find` ou um glob do orquestrador pega o arquivo errado. Como se evita: `git worktree remove` nas duas e `git worktree prune` antes de a rodada começar. Cada frente abre worktree com nome próprio e empurra a branch."
+  ],
+  "estrategiaDeMerge": "SEIS FRENTES, e duas delas são chão compartilhado que entra sozinho. O corte natural (uma frente por atrito) está medido como errado: A-36 x A-37 dá 2 hunks em conflito no filete e A-30 x A-34 dá 1 hunk em conflito no furo, com git merge de verdade.\n\nORDEM, com o motivo medido de cada posição.\n\n1. F0a — a régua. `conferir-malha.ts` ganha a quinta propriedade e `adaptar-three.js` descarta canto colinear. Sozinha, sem código de op. Ela é primeira porque troca a RÉGUA, e régua trocada no meio invalida prova já dada. MEDIDO que ela commita verde hoje: 28 peças, piso 7,1092e-6 em `_corrimao`, 0 degenerados, folga 7109x contra o limite 1e-9. Gate: 806 testes verdes, 28 byte-idênticas, id-cru verde.\n\n2. F0b — a forma. Quebra oficina.js 3844-3877 em `posicoesDoCorte` (perto de `arcoDeConcordancia`, ~1705) e `planoDeCostura` (perto de `aneisSeSobrepoem`, ~1418), com a linha de custo DERIVADA (`const { nV, nF } = plano.custo;`). E cria a derivação por desvio (`flechaDoArco(R, phi, n)`, `contagemPorDesvio(R, phi, desvio)`) antes de `OPS`. Sem mudança de comportamento. MEDIDO: sem ela o merge F3xF4 dá 2 hunks em conflito; com ela dá 0. E MEDIDO que a derivação é uma só: `flechaDoAnel(R,L)` e `flechaDoArco(R,2π,L)` diferem em 0 sobre 2000 casos. Gate: gabarito 28 byte-idênticas, 806 verdes.\n\n3. F1 (A-30). Primeiro dos quatro. Dois motivos medidos: não renumera nada, então o gabarito não se mexe; e F2 depende do `raio` que ele apaga. É também o maior, e o maior entra cedo para o rebase pesar nos outros e não nele.\n\n4. F2 (A-34), rebasada sobre F1. Entra com a regra do MAIOR raio do passo, medida na flange do G5: pelo maior, desvio 1e-4 dá L=36 e 360V/588F; pelo menor, o furo grande sai 4,3x acima do teto declarado.\n\n5. F3 (A-36) e F4 (A-37) em PARALELO sobre F0b. Depois da refatoração elas não compartilham uma linha executável — medido, 0 conflitos. Se for preciso serializar, F3 antes: ela enche `posicoesDoCorte` e F4 só consome o comprimento da lista.\n\n6. F5 — acervo e documentação. Sozinha, por último. É a ÚNICA que toca `gabarito-selecao.json`, `ATRITOS-AUTORIA.md`, `PLANO.md`, `INDEX.md`, `UPSTREAM-NOS.md`, `SKILL.md` e `oficina-contrato.md`. Um `npm run gabarito:selecao` só, e o diff conferido a olho: 28 hashes antigos idênticos, 4 linhas novas, 1 hashTotal, `freio-disco` nomeado se mudar.\n\nO QUE CADA FRENTE NÃO PODE TOCAR.\nF0a: nada dentro de `export const OPS`.\nF0b: nenhuma linha de comportamento; o gabarito é a prova.\nF1: oficina.js 3385 (é do F2), 3571-3573 (é do F2), tudo acima de 764, tudo de 3633 a 3880, `conferir-malha.ts`, `adaptar-three.js`, e qualquer arquivo de documentação.\nF2: oficina.js 3383-3384 (é do F1), CONTRATOS_ORIGEM inteiro (583-908), a op filete inteira, e oficina.test.ts (nenhuma linha).\nF3: oficina.js 3795-3842 (é do F4), 873-907 (é do F4), 864-872 (foi para o F5 por causa da C3), `planoDeCostura`, e oficina.test.ts.\nF4: oficina.js 864-872, 3691-3699, 3708-3712, 3722-3728 (os três comentários são do F3 e do F5), `posicoesDoCorte`, e oficina.test.ts. E o freio-disco reescrito NÃO entra aqui: vai para o F5, porque regrava gabarito.\nF5: nenhuma linha de `prototipos/fps/v3/motor/oficina.js` que mude comportamento. Só comentário, documento, gabarito e a peça `freio-disco`.\n\nA ARMADILHA DO FIM DO ARQUIVO DE TESTE, resolvida com uma regra só. Nenhuma frente acrescenta no fim de `tools/oficina/oficina.test.ts`. Cada frente abre arquivo próprio: `chao-do-ciclo6.test.ts` (F0), `furo-raio-por-grupo.test.ts` (F1), `lados-por-desvio.test.ts` (F2), `filete-paineis.test.ts` (F3), `filete-ponta-composta.test.ts` (F4). MEDIDO que isso funciona sozinho: o `include` do vitest é `tools/**/*.test.ts`, e um arquivo novo entrou com 27→28 arquivos e 806→807 testes, sem uma linha tocada em oficina.test.ts. Só o F1 escreve dentro de oficina.test.ts, em dois pontos cirúrgicos e a 688 linhas um do outro: a regex da linha 4919 e as 8 linhas de `AINDA_TRAVA` em 5600-5615. E o orquestrador nunca aplica trabalho com `patch` nem `git apply`: reproduzi o estrago, `patch --fuzz=3` saiu com exit 0, offset −229 linhas e enfiou o hunk três vezes no bloco errado, enquanto `git merge` no mesmo par conflitou alto.",
+  "frentes": [
+   {
+    "nome": "F0a — a régua: a quinta propriedade da conferência e o adaptador sem orelha degenerada",
+    "atritos": [
+     "A-37 (fatia 0)"
+    ],
+    "arquivos": [
+     "tools/oficina/conferir-malha.ts",
+     "src/autoria/adaptar-three.js",
+     "tools/oficina/chao-do-ciclo6.test.ts (NOVO)"
+    ],
+    "linhas": "conferir-malha.ts 79-107 (a função `conferirMalha`, que ganha a quinta cobrança). adaptar-three.js: o laço de recorte de orelhas, que passa a descartar canto colinear antes de triangular. Zero linha de oficina.js. MEDIDO por mim sobre as 28 peças: piso de área relativa 7,1092e-6 em `_corrimao`, 1,0657e-5 em `_prateleira-furada`, 1,2072e-5 no `freio-disco`; 0 triângulos degenerados no acervo inteiro; folga de 7109x contra o limite 1e-9 proposto. Ela commita verde hoje, sozinha."
+   },
+   {
+    "nome": "F0b — a forma: a refatoração do filete e a derivação por desvio, sem mudança de comportamento",
+    "atritos": [
+     "A-37 (fatia 1)",
+     "A-34 (parte da fatia 1)",
+     "A-36 (parte da fatia 5)"
+    ],
+    "arquivos": [
+     "prototipos/fps/v3/motor/oficina.js",
+     "tools/oficina/chao-do-ciclo6.test.ts"
+    ],
+    "linhas": "oficina.js 3844-3877 → substituído por seis linhas que chamam duas funções puras e leem o custo derivado. `planoDeCostura(...)` nasce perto de `aneisSeSobrepoem` (~1418). `posicoesDoCorte(...)` nasce perto de `arcoDeConcordancia` (~1705). `flechaDoArco(R, phi, n)` e `contagemPorDesvio(R, phi, desvio)` nascem antes de `export const OPS` (~1745-1752). MEDIDO: com essa forma, o merge de F3 com F4 dá 0 hunks em conflito; sem ela dá 2 (nV/nF em 3844 e a costura em 3868-3877). MEDIDO: `flechaDoAnel(R,L)` e `flechaDoArco(R,2π,L)` diferem em 0 sobre 2000 casos, e o `ceil` cru erra 48,3% no anel e 49,0% no arco de 90° em 4000 round-trips cada, com o candidato corrigido errando 0."
+   },
+   {
+    "nome": "F1 — A-30: um raio e uma profundidade por furo, e a partição que tenta três ordens de ponte",
+    "atritos": [
+     "A-30",
+     "A-33 (reescrito)"
+    ],
+    "arquivos": [
+     "prototipos/fps/v3/motor/oficina.js",
+     "tools/oficina/oficina.test.ts",
+     "tools/oficina/furo-raio-por-grupo.test.ts (NOVO)",
+     "prototipos/fps/v3/pecas/_flange-de-tubulacao.js (NOVO)",
+     "tools/mecanifica/flange-integridade.test.ts (NOVO)"
+    ],
+    "linhas": "oficina.js: 765-768 (`chaves` e `msg` do `validar` do contrato furo, mais `grupo`), 774-862 (~30 linhas no `resolver`), 1501-1600 (`triangularComAneis` ganha `ordem`; `d2AoSegmento`, `ordensDePonte` e `particionar` nascem ao lado, ~40 linhas), 3282-3309 (doc de `centro`/`centros`/`raio`), 3382-3433 (o parsing inteiro), 3462-3474 (a expansão, ~15 linhas), 3483 e 3543 (o raio no laço de anéis e no fundo do cego), ~3494 (o ramo de continência, 6 linhas), 3630 (`registraOrigem` com `grupos`, 4 linhas). oficina.test.ts: linha 4919 (a regex literal do vocabulário do furo) e 5600-5615 (mover 8 das 11 linhas de `AINDA_TRAVA`). É a ÚNICA frente com licença de escrever dentro de oficina.test.ts."
+   },
+   {
+    "nome": "F2 — A-34: `lados` ganha unidade, o autor declara a tolerância e o núcleo deriva a contagem",
+    "atritos": [
+     "A-34"
+    ],
+    "arquivos": [
+     "prototipos/fps/v3/motor/oficina.js",
+     "tools/oficina/lados-por-desvio.test.ts (NOVO)",
+     "prototipos/fps/v3/pecas/_gabarito-de-furacao.js (NOVO)",
+     "tools/mecanifica/gabarito-de-furacao-integridade.test.ts (NOVO)"
+    ],
+    "linhas": "oficina.js: ~1745-1752 (`flechaDoAnel` e `ladosPorDesvio` como apelidos finos sobre a derivação do F0b, mais `resolverLados(st, valor, raio, op)`), 1780-1781 (cilindro), 1857-1859 (cone), 3385 (furo — a linha do `lados`), 3571-3573 (a guarda de estouro roteada por `derivado`: grito quando a contagem é derivada, throw quando é digitada). REBASADA SOBRE F1: MEDIDO que 3383-3385 conflita, e que a condição de escopo do A-34 ('um `raio` ESCALAR já resolvido no ponto onde `lados` é lido') deixa de valer no furo depois do F1. A regra passa a ser o MAIOR raio do passo, e ela precisa de teste próprio."
+   },
+   {
+    "nome": "F3 — A-36: o filete ganha painéis, `segmentosCurva`, e a guarda do recuo",
+    "atritos": [
+     "A-36"
+    ],
+    "arquivos": [
+     "prototipos/fps/v3/motor/oficina.js",
+     "tools/oficina/filete-paineis.test.ts (NOVO)",
+     "prototipos/fps/v3/pecas/_cabo-sextavado.js (NOVO)",
+     "tools/mecanifica/cabo-sextavado-integridade.test.ts (NOVO)",
+     "prototipos/fps/v3/pecas/_caixote-filetado.js"
+    ],
+    "linhas": "oficina.js: 3691-3699 (sai o parágrafo `SÓ UM PAINEL NESTA RODADA`), 3708-3712 (a NUMERAÇÃO reescrita para n painéis), 3722-3728 (sai a frase de FORA DE ESCOPO sobre o raio não conferido), 3792-3794 (`profundidadeDentro` e as quatro portas, inseridas logo depois da resolução do `raio` e ANTES do comentário 3795, que é do F4), e o corpo de `posicoesDoCorte` inteiro (a função do F0b). `_caixote-filetado.js` linhas 22-23 (o cabeçalho diz 12V/9F e o medido é 10V/7F). NÃO toca 864-872 (foi para o F5), NÃO toca 3701-3706 nem 3795-3842 nem `planoDeCostura` (são do F4), NÃO toca oficina.test.ts."
+   },
+   {
+    "nome": "F4 — A-37: a ponta composta do filete, o leque do vértice e a tampa",
+    "atritos": [
+     "A-37"
+    ],
+    "arquivos": [
+     "prototipos/fps/v3/motor/oficina.js",
+     "tools/oficina/filete-ponta-composta.test.ts (NOVO)",
+     "prototipos/fps/v3/pecas/_mordente-de-morsa.js (NOVO)",
+     "tools/mecanifica/mordente-integridade.test.ts (NOVO)"
+    ],
+    "linhas": "oficina.js: ~1418 (`lequeDoVertice`, junto de `aneisSeSobrepoem` e `bordaAnular`), 873-907 (o `validar` e o `resolver` do contrato filete, que ganham `tampa`), 3701-3706 (o parágrafo `A ARESTA PRECISA TER PONTA SIMPLES`), 3795-3842 (o comentário das pontas, `terceiraFace` que sai, e a derivação de winding que vira leque), e o corpo de `planoDeCostura` inteiro (a função do F0b). NÃO toca 864-872, NÃO toca 3691-3699, 3708-3712 nem 3722-3728 (são do F3 e do F5), NÃO toca `posicoesDoCorte`, NÃO toca oficina.test.ts. O `freio-disco` com a pinça filetada NÃO entra aqui: vai para o F5, porque regrava gabarito."
+   },
+   {
+    "nome": "F5 — acervo e documentação: o único lugar onde o gabarito e os documentos são escritos",
+    "atritos": [
+     "A-30",
+     "A-33",
+     "A-34",
+     "A-36",
+     "A-37",
+     "A-38",
+     "A-39",
+     "A-40",
+     "A-41",
+     "A-42"
+    ],
+    "arquivos": [
+     "tools/bancadas/gabarito-selecao.json",
+     "docs/mecanifica/ATRITOS-AUTORIA.md",
+     "docs/mecanifica/PLANO.md",
+     "docs/mecanifica/INDEX.md",
+     "docs/mecanifica/UPSTREAM-NOS.md",
+     ".claude/skills/criar-peca/SKILL.md",
+     "docs/uso/oficina-contrato.md",
+     "prototipos/fps/v3/motor/oficina.js (só comentário)",
+     "prototipos/fps/v3/pecas/freio-disco.js"
+    ],
+    "linhas": "gabarito-selecao.json: linha 2 (`hashTotal`) mais 4 entradas novas (`_cabo-sextavado` na linha 4, `_flange-de-tubulacao` e `_gabarito-de-furacao` na 29, `_mordente-de-morsa` na 39) e `freio-disco` na 119. ATRITOS-AUTORIA.md 22-374 (A-37 em 24-47 e A-36 em 48-72 saem; A-34 em 97-118 e A-33 em 119-153 são reescritos; A-30 em 231-253 sai; A-38 a A-42 entram). SKILL.md linhas 59, 61 e 79 (as três linhas de `lados`) mais a linha nova do `filete`, que HOJE NÃO EXISTE. docs/uso/oficina-contrato.md: a linha FEITO do `filete`, que também não existe. MEDIDO: `npm run criar -- _caixote-filetado` já sai vermelho hoje com 'op(s) no núcleo SEM doc na skill: filete' e 'SEM linha FEITO em docs/uso/oficina-contrato.md: filete'. oficina.js 864-872: a frase da ordem dos painéis, tirada do F3 para não colidir com o F4."
+   }
+  ],
+  "ordemDeCommit": [
+   "1 · F0a, commit único e verde. `conferir-malha.ts` com a quinta propriedade e `adaptar-three.js` sem orelha degenerada. Gate: 806 testes, 28 byte-idênticas, id-cru verde. Números no corpo da mensagem: piso 7,1092e-6 em `_corrimao`, 0 degenerados, folga 7109x.",
+   "2 · F0b, commit único e verde, sem mudança de comportamento. As duas funções puras, a linha de custo derivada e a derivação por desvio. Gate: gabarito 28 byte-idênticas é a prova de que nada mudou. No corpo: 'o merge de A-36 com A-37 vai de 2 hunks em conflito para 0'.",
+   "3 · F1 fatia 1 — a partição com três ordens de ponte, mais o movimento das 8 linhas de `AINDA_TRAVA`. Verde.",
+   "4 · F1 fatia 2 — `centros` aceita grupos e o `raio` do passo vira padrão. Verde.",
+   "5 · F1 fatia 3 — profundidade por furo. Verde.",
+   "6 · F1 fatia 4 — o grupo se nomeia, mais a regex da linha 4919. Verde.",
+   "7 · F1 fatia 5a — só a peça `_flange-de-tubulacao.js` e o teste de integridade dela. O gabarito NÃO é regravado; o gate desta fatia é '28 hashes antigos idênticos, 1 peça nova nomeada'.",
+   "8 · F2 fatia 1 — a derivação, como apelido fino da função do F0b, com o round-trip e a minimalidade. Nenhuma op chama. Verde, gabarito intocado.",
+   "9 · F2 fatia 2 — `furo`, rebasado sobre F1, com a regra do MAIOR raio e o teste que a trava. Verde.",
+   "10 · F2 fatia 3 — `cilindro` e `cone`. Verde.",
+   "11 · F2 fatia 4 — a afirmação negativa (ondulação 0,2215 contra 0,0800 mm). Sem código. Verde.",
+   "12 · F2 fatia 5a — só a peça `_gabarito-de-furacao.js` e o teste dela. Gabarito não regravado.",
+   "13 · F3 fatia 0 — só comentário de oficina.js e o cabeçalho de `_caixote-filetado.js`. Diff sem uma linha executável. Verde. Ela existe para o arquivo parar de mentir antes de qualquer código.",
+   "14 · F3 fatia 1 — `segmentosCurva` e o arco, dentro de `posicoesDoCorte`. 16 afirmações novas em `filete-paineis.test.ts`. Verde. É a fatia mais gorda das 30; se passar de 30 minutos, parte em duas: primeiro o teste da lei do ângulo em aresta não-reta commitado vermelho com `.fails`, depois o código.",
+   "15 · F3 fatia 2 — a origem com n painéis. Só teste. Verde.",
+   "16 · F3 fatia 3 — a guarda do recuo, em commit próprio porque ela não é aditiva no sentido estrito. Gabarito conferido antes e depois, com a folga mínima do acervo (5,60x) no corpo da mensagem.",
+   "17 · F3 fatia 4a — o teste do defeito anterior (1,4642e-2 no prisma triangular) e a peça `_cabo-sextavado.js` com o teste dela. Gabarito não regravado.",
+   "18 · F3 fatia 5 — `segmentosCurva: { desvio }`, chamando a derivação do F0b. Opcional: se cair, vira atrito com o projeto pronto e a rodada continua fechada.",
+   "19 · F4 fatia 2 — `lequeDoVertice` sozinho, sem a op usar. Verde: a função é nova e ninguém a chama.",
+   "20 · F4 fatia 3 — a op usa o leque na ponta SIMPLES, e só nela. `terceiraFace` sai. É a fatia que prova a aditividade: `neutroCanonico` de cubo mais filete byte-idêntico.",
+   "21 · F4 fatia 4 — a ponta COMPOSTA constrói, com os slots fixos e as tampas. 9 afirmações. Verde.",
+   "22 · F4 fatia 5 — `tampa` no contrato, com os gritos. Verde.",
+   "23 · F4 fatia 6 — a varredura de 408 pares vira teste, com os números travados. Verde.",
+   "24 · F4 fatia 7a — só a peça `_mordente-de-morsa.js` e o teste dela. Gabarito não regravado.",
+   "25 · F5 commit A — o gabarito, uma vez só. `npm run gabarito:selecao`, e o diff conferido a olho: 28 linhas antigas idênticas, 4 linhas novas nomeadas, 1 hashTotal.",
+   "26 · F5 commit B — o `freio-disco` com a pinça filetada, nomeado como peça reescrita de propósito, e o gabarito regravado de novo. Foto de bancada em isométrica e em vista direita, antes e depois no mesmo quadro.",
+   "27 · F5 commit C — ATRITOS-AUTORIA.md, com A-30, A-36 e A-37 fechados, A-33 e A-34 reescritos, e A-38 a A-42 abertos nos números alocados.",
+   "28 · F5 commit D — SKILL.md e docs/uso/oficina-contrato.md, com a linha do `filete` escrita pela primeira vez, mais as três linhas de `lados`. `npm run criar` sai do vermelho em que já está hoje.",
+   "29 · F5 commit E — PLANO.md, INDEX.md, UPSTREAM-NOS.md, e os checks de documentação (`mapa:check`, `docs:toc:check`, `docs:links:check`).",
+   "30 · F5 commit F — a inspeção visual: `_cabo-sextavado`, `_mordente-de-morsa`, `_flange-de-tubulacao` e `_gabarito-de-furacao` na bancada, cada um em dois enquadramentos, com a URL de seleção, vista e projeção registrada. Testes verdes não substituem isto."
+  ],
+  "riscoDePerda": [
+   "JÁ ACONTECEU NESTE REPOSITÓRIO, e está no log: `a0e341d Ciclo 5, metade 2: o núcleo do filete seletivo (resgatado do agente morto)`. E as duas worktrees órfãs continuam no disco: `wip/filete-seletivo-v2` em fce58dd e `wip/curva-perfil` em d135c01. As duas são branches LOCAIS, sem push. Um contêiner reciclado leva as duas.",
+   "O GATE NÃO É O CUSTO DE COMMITAR. Medido nesta sessão: `npx vitest run` 4,87 s com 806 testes em 27 arquivos; `npm run gabarito:selecao:check` 0,46 s; `npm run id-cru:check` 0,36 s. Soma 5,7 s. Não existe motivo técnico para acumular trabalho entre commits. A única exceção é `npm run criar`, que renderiza e é caro, e por isso ele só é cobrado no F5.",
+   "A GRANULARIDADE É A FATIA, E ELAS JÁ ESTÃO ESCRITAS: 5 no A-30, 7 no A-34, 8 no A-36, 10 no A-37, mais 2 de chão, mais 6 de documentação. São 30 commits verdes. Nenhuma fatia é maior que um bloco de código contíguo mais os testes dele. A perda máxima com essa regra é uma fatia.",
+   "AS DUAS FATIAS QUE PASSAM DE 30 MINUTOS, e o que fazer com elas. A fatia 1 do A-36 (o laço de n anéis, 16 afirmações novas, o Gram-Schmidt e a costura) e a fatia 4 do A-37 (a ponta composta, 9 afirmações, os slots fixos e o espelho na outra ponta). Regra: quando a fatia não fecha em 30 minutos, ela se parte em dois commits. Primeiro o teste, commitado VERMELHO com `it.fails` e um comentário dizendo o que ele espera; depois o código que o torna verde. O teste vermelho commitado é trabalho salvo, e é a parte que custa mais a refazer.",
+   "COMMIT DE TRABALHO A CADA 20 MINUTOS, mesmo sem fatia fechada, com prefixo `wip:` na branch da frente, e PUSH junto. O orquestrador esmaga os wip no merge. Sem push, o commit não protege de nada: as duas worktrees mortas de hoje têm commits que ninguém mais vê.",
+   "O QUE NÃO SE RECUPERA DE JEITO NENHUM SÃO OS NÚMEROS. Uma fatia de código se reescreve em uma hora; a medição que a sustenta custa a sessão inteira. Os quatro projetos desta rodada carregam medições que ninguém vai refazer de graça: 408 pares varridos, 14 212 combinações do A-33, 24 000 round-trips de desvio, 60 000 amostras de minimalidade, a decodificação de pixel da foto do A-34. Regra: todo número medido entra no corpo da mensagem de commit ou no comentário do teste, NO MESMO COMMIT em que foi medido. Nunca só no relatório final, nunca só no chat.",
+   "O RISCO ESPECÍFICO DO F0b. Ele é uma refatoração sem mudança de comportamento, então é a fatia mais fácil de perder inteira e a mais chata de refazer: ninguém enxerga o valor dela olhando o diff. Se ela morrer, F3 e F4 voltam a colidir em 2 hunks e o orquestrador vai resolver conflito à mão exatamente no lugar onde o ciclo 5 já se queimou. Mitigação: F0b é a segunda coisa a entrar, ela é pequena, e ela commita com o gabarito das 28 peças como prova.",
+   "O RISCO ESPECÍFICO DO F1 DENTRO DE oficina.test.ts. As duas edições dele (a regex em 4919 e as 8 linhas de `AINDA_TRAVA` em 5600-5615) são as únicas escritas naquele arquivo na rodada inteira. Se o agente do F1 morrer entre elas, a suíte fica vermelha e um agente novo pode achar que a culpa é do código. Mitigação: as duas edições são as ÚLTIMAS linhas da fatia que as exige, e o veredito já mede quantos testes ficam vermelhos sem elas — 9, e são exatamente esses 9.",
+   "O RISCO DO GABARITO CONCENTRADO NO F5. Juntar as cinco regravações num commit só evita quatro conflitos de `hashTotal`, mas concentra o risco: se o F5 morrer no meio, `gabarito:selecao:check` fica vermelho com quatro peças novas de uma vez e ninguém sabe qual delas mudou o quê. Mitigação: o F5 regrava numa ordem fixa (commit A com as quatro peças novas, commit B com o `freio-disco`), e cada commit nomeia no corpo a lista exata de linhas que o diff pode ter.",
+   "O RISCO QUE NENHUM COMMIT COBRE: a inspeção visual. Os quatro projetos declaram, cada um, que ela não foi feita. O A-36 escreve na cara: 'todos os meus números são headless; nenhuma medida minha responde se um filete de 3 painéis com raio 12 mm continua lendo como chanfro na bancada'. Se a rodada acabar sem o commit 30, ela entrega quatro capacidades provadas por número e nenhuma provada por olho, contra o que o CLAUDE.md exige. O commit 30 é o único que não tem substituto automático."
+  ]
+ },
+ "gate": {
+  "condicoes": [
+   {
+    "numero": 1,
+    "texto": "ADITIVO EM HASH, AO FIM DE CADA FATIA. `npm run gabarito:selecao:check` sai verde com as 28 peças de hoje byte-idênticas em toda fatia que não cria peça. Nas fatias que criam peça de exercício o gabarito é regravado no MESMO commit, e o diff mostra as 28 linhas antigas intactas mais exatamente as linhas nomeadas na mensagem de commit. A rodada leva 4 peças de exercício (uma por atrito) e no máximo 1 peça de produto reescrita, então o gabarito termina em 32 ou 33 entradas, e cada uma tem commit próprio com nome próprio.",
+    "comoSeMede": "`npm run gabarito:selecao:check` (0,47 s hoje, exit 0, 28 peças) mais `git diff tools/bancadas/gabarito-selecao.json` lido linha a linha.",
+    "oQueAReprova": "Qualquer um dos 28 hashes de hoje mudar sem a peça ser nomeada no commit. Um commit que regrave o gabarito e mude 2 linhas quando declarou 1. Regravar o gabarito e a peça nova em commits diferentes."
+   },
+   {
+    "numero": 2,
+    "texto": "ADITIVO EM DOUBLE, PORQUE O HASH NÃO PROVA. O gabarito serializa com `toFixed(9)`. Medido agora: `0.5-0.1` dá `0.4` e `0.5-(0.1/Math.tan(Math.PI/4))` dá `0.39999999999999997`, e as duas viram a MESMA string `\"0.400000000\"`. Nos raios do acervo (0,05 e 0,0025) a subtração absorve o último bit e nem o double muda. Então cada caminho antigo que a rodada roteia por conta nova precisa de uma afirmação sobre COORDENADA EXATA, com `toEqual`, num valor que sabidamente distingue. Para o filete de um painel esse valor é `raio: 0.1` num cubo de lado 1.",
+    "comoSeMede": "Teste com literais gravados e `toEqual` (nunca `toBeCloseTo`): V1000=[-0.5,0.9,0.5], V1001=[0.5,0.9,0.5], V7=[-0.5,1,0.4], V6=[0.5,1,0.4]; F1=[7,6,5,4], F3=[2,1,5,6,1001], F4=[3,2,1001,1000], F5=[0,3,1000,7,4], F1000=[1000,1001,6,7]. Medido hoje: exatamente estes valores. O comentário do teste diz por que `raio: 0.1` e não `0.05`.",
+    "oQueAReprova": "Usar `toBeCloseTo` em qualquer afirmação de caminho antigo. Aceitar `gabarito verde` como prova de que o caminho de um painel não mudou. Medido: rotear n=1 pela fórmula do arco passa nas 28 peças do gabarito e nos 806 testes, e só cai neste teste."
+   },
+   {
+    "numero": 3,
+    "texto": "TEMPO, E AS VARREDURAS PESADAS FICAM FORA DA SUÍTE. `npx vitest run` continua abaixo de 8 s. Linha de base medida agora: 27 arquivos, 806 testes, 5,09 s de duração do vitest e 5,81 s de relógio; `oficina.test.ts` sozinho é 454 casos em 1,74 s. Medido também: a varredura de 408 pares do filete custa 0,15 s e CABE na suíte; a varredura de 14 212 figuras do A-33 custa 292,7 s e a de 8 075 figuras de furo custa 233,6 s, e NÃO cabem. Toda varredura de milhares de figuras de furo vira script de bancada próprio, com o número gravado no relato, e o que entra na suíte é uma amostra com contagem fechada declarada.",
+    "comoSeMede": "`time npx vitest run` ao fim de cada fatia, e o relatório por arquivo (`--reporter=json`). Para cada varredura nova, medir o tempo dela isolada antes de decidir onde ela mora.",
+    "oQueAReprova": "A suíte passar de 8 s. Uma varredura de mais de 2 000 construções de furo dentro de `vitest run`. Uma varredura de amostra sem a contagem fechada no `expect` — varredura que deixa de varrer e passa calada."
+   },
+   {
+    "numero": 4,
+    "texto": "CADA RECUSA ABORTA O PASSO INTEIRO, 0 V E 0 F NO BLOCO. Contado no BLOCO do passo, não na peça. Vale para todas as entradas inválidas novas das quatro frentes: as 9 do A-36 (segmentosCurva e as 4 portas da guarda de recuo), as 9 do A-34 (`lados` em frase), as 21 do A-30 (grupos, raio e profundidade por furo) e as 11 do A-37 (leque, tampa e winding). O texto de cada mensagem é casado por inteiro, não só a existência do grito.",
+    "comoSeMede": "Para cada entrada: `n.orfaos.length === 1`, `n.orfaos[0].motivo` casado com a string escrita, e `[...n.F.keys()].filter(f => f >= base && f < base+1000)` e o mesmo para V, ambos com length 0. Linha de base medida: o filete no `chamferBox` da ponte da pinça do freio-disco já se comporta assim hoje — 0 V e 0 F no bloco, peça inteira em 498V/508F.",
+    "oQueAReprova": "Qualquer recusa que vire clamp silencioso, no-op ou meia construção. Contar V e F na peça em vez de no bloco. Um `toMatch(/regex curta/)` no lugar do texto inteiro."
+   },
+   {
+    "numero": 5,
+    "texto": "AS QUATRO PROPRIEDADES, MAIS A QUINTA. `conferirMalha(n, { fechada: true, rotulo: … })` verde em todas as figuras novas e nas peças de exercício. E `tools/oficina/conferir-malha.ts` ganha a quinta propriedade: nenhum triângulo do adaptador com área abaixo de 1e-9 vezes a escala² da peça. Medido hoje: o acervo passa com folga de quase quatro ordens de grandeza — piso 7,1092e-6 em `_corrimao`, e nenhuma das 28 abaixo disso; sobre os 84 pares que o filete constrói hoje, o menor triângulo é 1,0541e-3 com raio 0,01 e 2,0516e-3 com raio 0,02.",
+    "comoSeMede": "A quinta propriedade entra em `conferir-malha.ts` e commita VERDE sozinha, antes de qualquer ramo novo do filete. Depois é cobrada em toda figura nova e no acervo inteiro.",
+    "oQueAReprova": "A quinta propriedade entrar DEPOIS do ramo que cria o triângulo degenerado — o commit fica com área 0 dentro e a conferência passa por cima. Malha fechada mais contagem certa serem apresentadas como cumprimento desta condição."
+   },
+   {
+    "numero": 6,
+    "texto": "A-36 — A LEI DO ÂNGULO É COBRADA EM ARESTA NÃO-RETA, ENDEREÇADA POR IDENTIDADE. O ângulo entre a normal do painel k e a normal da face de entrada é `(2k+1)·φ/(2n)`, medido a 4 casas, em pelo menos duas aberturas diferentes de 90°. A figura é a aresta VERTICAL de uma face lateral do `cilindro` (`{op:'cilindro', id:1, lado:0}`, `aresta: 0`), que é endereço por identidade e não id cru. Medido agora que essa figura CONSTRÓI hoje: L=3 dá 8V/6F, L=5 12V/8F, L=6 14V/9F, L=8 18V/11F, todas com 0 aresta solta, 0 bico e adaptador OK. Medido também que todo o acervo é 90,000000°: as 5 chamadas de filete (caixote passo 1; freio passos 17, 18, 22 e 23) saem todas em θ = 90,000000°.",
+    "comoSeMede": "Construir com `segmentosCurva: 4` em cilindro L=3 (φ=120°) e L=8 (φ=45°), medir a normal de cada painel contra a normal da face de `de`, e comparar com a lista fechada a 4 casas. As constantes do teste vêm da fórmula ESCRITA NO TESTE, nunca lidas do núcleo.",
+    "oQueAReprova": "Um gate que só olhe o cubo. Medido: `R = raio` em vez de `raio·tan(θ/2)` SOBREVIVE a 90° porque tan(45°)=1, e todo o acervo é 90°. Um teste que leia C e R do próprio núcleo em vez de recalculá-los vira tautologia e não mata nada."
+   },
+   {
+    "numero": 7,
+    "texto": "A-36 — A GUARDA DO RECUO PEGA O CASO QUE NENHUM GATE PEGA HOJE, E LÊ O ESTADO CORRENTE. Medido agora, cubo de lado 1, aresta topo/frente, sem guarda nenhuma: raio 5,0 sai com 0 órfão, 0 bico, 0 aresta solta, adaptador OK e 16 triângulos — passa em `conferirMalha` INTEIRA e a peça é lixo. A fronteira medida dos dois lados: 0,999 e 0,99999999 constroem limpos; 1,0 dá 16 bicos e o adaptador lança `face 1 é degenerada`; 1,001 e 1,1 o adaptador lança `face 3 não fecha em orelhas (5 cantos)`; 2,0 dá 2 bicos e o adaptador diz OK. A guarda também mede a face como ela está AGORA: medido no freio-disco, o passo 17 tem 0,076000 de profundidade e o passo 18, na MESMA face, tem 0,073500 — exatamente 0,0025 a menos, o recuo do passo anterior.",
+    "comoSeMede": "Teste que afirma que `raio: 5` num cubo de lado 1 GRITA, e que `raio: 0.99999999` constrói e passa em `conferirMalha`. Teste que compõe filete com filete na mesma face e afirma 0,073500 contra 0,076000. As 4 portas (faceA/faceB × ponta v0/v1) cobradas uma a uma, com 0 V / 0 F no bloco. A folga mínima do acervo (5,600× no freio, 8,000× no caixote) escrita no corpo da mensagem do commit da guarda.",
+    "oQueAReprova": "Uma guarda que recuse `raio: 0.6`, que hoje constrói limpo. Uma guarda que compare o raio contra o centroide em vez do contorno (no cubo o centroide dá 0,5 e o contorno dá 1,0). Uma guarda que leia a geometria original da primitiva em vez de `st.V` — o teste do freio cai. `raio: 1.1` voltar a construir."
+   },
+   {
+    "numero": 8,
+    "texto": "A-36 — A NUMERAÇÃO E O CUSTO SÃO COBRADOS NOS IDS, NÃO SÓ NAS CONTAGENS, E O CLAMP NÃO USA A FORMA DA CASA. Com `segmentosCurva: 3` o teste afirma os CONJUNTOS de vértice e face novos e o pareamento anel a anel, não só o tamanho. Medido hoje: cubo + filete é 10V/7F, bloco V {1000,1001}, bloco F {1000}, 16 triângulos. E `segmentosCurva: 4294967296` LANÇA o throw de estouro. Medido: `Math.max(1, 4294967296 | 0)` devolve 1 em silêncio, e o mesmo vale para 2147483648 e 1e21; `Math.max(1, Math.trunc(x))` devolve os três e eles chegam ao throw.",
+    "comoSeMede": "Afirmar os conjuntos `{1000..1005}` e `{1000,1001,1002}` com `segmentosCurva: 3`, mais o pareamento `P_k = b+2(k-1)`, `Q_k = b+2(k-1)+1`. Afirmar `V = 8+2n`, `F = 6+n`, `tri = 12+4n` em n ∈ {1,2,3,4,8,16}, com 500 construindo e 501 lançando. Afirmar que 4294967296 lança.",
+    "oQueAReprova": "Numerar por lado em vez de por anel. Medido: essa numeração sobrevive a n=1, ao custo, à lei do ângulo, a `conferirMalha` e aos 806 testes de hoje — só uma afirmação sobre os IDS com n ≥ 2 a mata. Copiar `Math.max(1, x | 0)` das outras três ops: o teste do 4294967296 fica vermelho."
+   },
+   {
+    "numero": 9,
+    "texto": "A-34 — A DERIVAÇÃO POR DESVIO É EXATA, NÃO ESTIMADA. Para `desvio = raio·(1−cos(π/L))` exato, a derivação devolve L. Medido agora: `Math.ceil(π/arccos(1−d/R))` cru erra em 1 871 de 3 980 casos (47,0%) — 10 raios de 0,0001 a 12,5 por L de 3 a 400; com os dois laços de correção contra o mesmo `Math.cos` do anel, 0 erro. Minimalidade `flecha(L) <= desvio < flecha(L−1)` sem violação. A fronteira do domínio é a flecha do TRIÂNGULO, não `raio/2`: medido, `flechaDoAnel(0.0065, 3) = 0.003249999999999999` contra `raio/2 = 0.00325`, um ulp acima.",
+    "comoSeMede": "Round-trip nos 3 980 casos, e o teste que prova que o `ceil` cru erra fica no repositório. Minimalidade em amostragem densa. Teste que afirma que `desvio` exatamente igual à flecha do triângulo dá L=3 em silêncio e um ulp acima GRITA.",
+    "oQueAReprova": "Usar a forma fechada crua. Comparar contra `raio/2`. Devolver L+1 no caso natural (o autor mede a flecha que a peça tem hoje, escreve como teto, e recebe um lado a mais)."
+   },
+   {
+    "numero": 10,
+    "texto": "A-34 — A AFIRMAÇÃO NEGATIVA EXISTE, É EXECUTÁVEL, E É ESCRITA DE MODO QUE POSSA FALHAR. Medido agora NA MALHA do freio-disco: a ondulação do contorno do furo é 0,2215 mm com `lados` 12 (peça 498V/508F), 0,1249 com 16 (530V/556F), 0,0800 com 20 (562V/604F), 0,0556 com 24 (594V/652F) e 0,0313 com 32 (658V/748F). Medido também que o flange, com R=0,052 e 16 lados, tem flecha 0,9992 mm — 4,5 vezes a do furo. O furo é a superfície mais redonda da peça. A afirmação que fica no repositório é a de que um anel externo concêntrico a raio maior com o MESMO L tem ondulação MAIOR, com o comentário dizendo por que ela existe.",
+    "comoSeMede": "Medir a ondulação no neutro (maior raio do anel menos a menor distância do centro ao meio das arestas) e afirmar três coisas SEPARADAS: (a) que ela é <= o desvio PEDIDO; (b) que a peça escrita por contagem e a escrita pela frase, com o mesmo raio e o mesmo acabamento, saem com a MESMA contagem de faces e a MESMA ondulação; (c) a desigualdade do anel externo.",
+    "oQueAReprova": "Escrever a condição como `ondulação medida == raio·(1−cos(π/L))`. Medido agora: isso bate a 4 casas em L = 12, 16, 20, 24 e 32, porque o anel É construído por essa fórmula. É a mesma armadilha da condição 2 do ciclo 5. Só (a), (b) e (c) podem falhar."
+   },
+   {
+    "numero": 11,
+    "texto": "A-30 — A PARTIÇÃO DESTRAVA SEM REGREDIR O QUE JÁ FECHA, E A TABELA PUBLICADA É CORRIGIDA. Linha de base medida agora, varredura completa de 14 212 combinações em 292,7 s (face de 3 a 36 lados, furo de 3 a 24, 2 a 20 furos; raio da face 0,052, furos de raio 0,0065 a 0,038 do centro): saem inteiras 10 866; gritam por anéis que se cruzam ou anel que não cabe 2 405; estouram o bloco 904; travam a partição com `nenhuma orelha livre` 37. Soma 14 212. A tabela de `docs/mecanifica/ATRITOS-AUTORIA.md` linha 131 diz 10 758 e as cinco linhas dela somam 14 104 — ela erra em 108 e a rodada tem de reescrevê-la com a varredura refeita.",
+    "comoSeMede": "Script de bancada próprio (não vitest — medido 292,7 s), rodado antes e depois, com as cinco contagens impressas e a soma conferida contra 14 212. As 37 travas de hoje ficam listadas no relato; a lista `AINDA_TRAVA` de `oficina.test.ts:5607` tem 11 delas e é movida linha a linha, com as que passam a sair inteiras indo para o bloco da região sadia no MESMO commit.",
+    "oQueAReprova": "Uma combinação que hoje sai inteira passar a gritar. A soma das cinco linhas não fechar em 14 212. Publicar a tabela nova sem dizer que a antiga estava errada. Deixar a varredura dentro de `vitest run`."
+   },
+   {
+    "numero": 12,
+    "texto": "A-30 — O GRUPO SE NOMEIA, E A CITAÇÃO POR NOME NÃO VIRA ÍNDICE. `nome:'parafusos'` no item e `grupo:'parafusos'` na origem. A chave de ordenação das ordens de ponte é o raio DECLARADO pelo autor, comparado exato, com desempate pelo índice de declaração — nunca um raio medido do polígono. E a mudança do diagnóstico de `validar` (oficina.js 767-768) vem junto da regex de `tools/oficina/oficina.test.ts:4919`, no mesmo commit.",
+    "comoSeMede": "Teste que cita `grupo:'parafusos'` numa flange com 4 e com 6 parafusos e resolve o conjunto certo sem trocar uma letra da citação. Teste que afirma que anéis de raio declarado igual mantêm a ordem de declaração. `npm run id-cru:check` verde: 13 peças herdadas, 8 244 ids congelados nas fatias que não criam peça.",
+    "oQueAReprova": "Endereçar grupo por índice — obrigar o autor a saber que a passagem ocupou a posição 0 é contar posição para achar identidade. Chave derivada de ponto flutuante: medido pelo júri que o raio MEDIDO do anel reordena anéis iguais por último bit e quebra [6,8,8] com bytes diferentes. Acrescentar `grupo` à lista `chaves` sem corrigir o `msg`: a suíte fica verde e o diagnóstico mente."
+   },
+   {
+    "numero": 13,
+    "texto": "A-37 — A VARREDURA DE 408 PARES, CONTRA A LINHA DE BASE MEDIDA AGORA. Sobre cubo, chamferBox de chanfro 0,1, cilindro de 8, cone de 6, esfera 8×4 e placa com furo passante de 8, todos os pares (face, aresta) endereçados por origem estrutural, com raio 0,02: HOJE 84 constroem e 324 gritam. Os 84 custam todos 2V/1F. Dos 324, 292 gritam `a ponta v0 da aresta 0 da face N tem N face(s) além das duas da aresta` e 32 gritam `as duas faces desta aresta se dobram quase 180°` — e os 32 estão TODOS na placa com furo. Por figura hoje: cubo 24 de 24, cilindro8 48 de 48, cone6 12 de 24, chamferBox 0 de 96, esfera 0 de 112, placa 0 de 104.",
+    "comoSeMede": "A varredura vira teste com as contagens fechadas declaradas (84 a 2V/1F, os 12 e os 280 dos casos mistos e compostos, os 32 gritos de dobra, 0 regressões) e `conferirMalha` com `fechada: true` em todos os que constroem. Medido: ela custa 0,15 s, então cabe na suíte.",
+    "oQueAReprova": "Qualquer um dos 84 que constroem hoje deixar de construir ou mudar de custo. Algum dos 292 continuar gritando por ponta complexa. Os 32 mudarem de mensagem sem que a rodada diga por quê. A varredura passar sem a contagem fechada."
+   },
+   {
+    "numero": 14,
+    "texto": "A-37 — O VOLUME TIRADO É A CUNHA, E NENHUM VÉRTICE ANTIGO SE MOVE. No caso que dá nome ao atrito (chamferBox 1×1×1 de chanfro 0,1, `de` = face 'topo', aresta 0, raio 0,03) o volume removido é 2,54558e-4 contra a cunha analítica 0,5·raio²·sen(135°)·0,8 = 2,545584e-4, com erro relativo abaixo de 1e-5. Nenhum vértice anterior muda de posição bit a bit, e as quatro faces do leque mudam de área EXATAMENTE 0.",
+    "comoSeMede": "Volume do neutro antes e depois, por soma de tetraedros sobre a triangulação. Comparação bit a bit da posição de todo vértice do neutro anterior. Área de cada face do leque antes e depois.",
+    "oQueAReprova": "Um desenho que tire 39% a mais (medido pelo júri no desenho da proposta rejeitada: 3,54558e-4). Uma face vizinha que o autor nunca nomeou CRESCER de área. Qualquer variante que mova `v0` no ramo composto."
+   },
+   {
+    "numero": 15,
+    "texto": "A-37 — O TETO DE PLANARIDADE NÃO SOBE. Linha de base medida agora sobre os 84 pares que o filete constrói hoje, medindo a maior distância de um canto ao plano do centroide dividida pelo raio máximo ao centroide: com raio 0,01, pior 6,5959e-3 e média 3,069e-3; com raio 0,02, pior 1,3178e-2 e média 6,127e-3. Em todos os 84: 0 bico, 0 aresta solta, adaptador não lança.",
+    "comoSeMede": "A mesma varredura da condição 13, com raio 0,01, sobre TODOS os pares que passam a construir. A definição da métrica fica escrita no teste, porque ela decide o número: medido no prisma triangular com filete, a mesma face dá 1,4642e-2 em metro, 1,8760e-2 por raio ao centroide, 1,3096e-2 por distância à origem e 3,9468e-3 por perímetro.",
+    "oQueAReprova": "Pior planaridade acima de 6,5959e-3 com raio 0,01. Média acima de 3,069e-3. Um número de planaridade publicado sem a definição da métrica ao lado — quatro definições dão quatro números para a mesma face."
+   },
+   {
+    "numero": 16,
+    "texto": "DETERMINISMO, E NADA DE TRANSCENDENTAL NO ARQUIVO SALVO. Cada forma nova roda duas vezes e dá `neutroCanonico` byte-idêntico: `segmentosCurva: 8`, `lados: {desvio}`, `centros` com raio por grupo, e o filete de ponta composta. Nenhum `Date.now()`, nenhum `Math.random()`. As peças escrevem a frase (uma distância em metro, uma contagem de painéis, um nome de grupo); `cos`, `sin`, `tan`, `acos` e `atan` ficam dentro do núcleo.",
+    "comoSeMede": "Replay comparado com `===` de string. `grep` por `Date.now`, `Math.random` e por literal transcendental nas peças novas.",
+    "oQueAReprova": "Uma peça de exercício com uma coordenada calculada à mão. Um cache de contagem por `origemId` entre execuções — mudar o raio deixaria de renumerar."
+   },
+   {
+    "numero": 17,
+    "texto": "AS MEDIDAS QUE NÃO PODEM FALHAR ESTÃO NOMEADAS, E CADA UMA TEM UMA SUBSTITUTA QUE PODE. O ciclo 5 mediu a distância dos vértices ao centro do arco, que é exata por construção e dá 0,000000% até com um segmento. Três condições dos projetos desta rodada repetem a forma, e as três são reescritas. (a) A-34, 'a flecha é conferida na malha': medido agora que a ondulação na malha bate com `raio·(1−cos(π/L))` a 4 casas em cinco valores de L, porque o anel É construído por essa fórmula — substituída pelas três afirmações da condição 10. (b) A-36 A4, 'todo ponto novo está no arco': o erro de 8,33e-17 é do próprio gerador contra a própria fórmula — só vale se C e R forem recalculados NO TESTE, de forma independente, e a afirmação forte é a de tangência exata contra os dois pontos que o corte de um painel já usa. (c) A-37 gate 6, 'a tampa é exata': `P0`, `P1` e `v0` estão no plano perpendicular à aresta por construção algébrica, então `normal·e = ±1` e `área = 0,5·r²·senθ` não podem falhar sozinhas — o que pode falhar é o SINAL (as duas tampas apontando para o mesmo lado, que `arestasSemPar` pega) e o canto deslizado pela aresta intermediária.",
+    "comoSeMede": "Antes de escrever cada afirmação, perguntar qual mutação a mata e conferir que ela não é a própria fórmula que gerou o dado. Toda constante de referência é recalculada no teste, nunca lida do núcleo.",
+    "oQueAReprova": "Uma afirmação nova cuja mutação de morte não esteja escrita ao lado. Uma afirmação que compare a saída do núcleo com a mesma fórmula que o núcleo usou para produzi-la."
+   },
+   {
+    "numero": 18,
+    "texto": "MUTAÇÃO RELATADA, E OS TRÊS BURACOS DE TESTE MEDIDOS SÃO FECHADOS. Cada afirmação nova vem com a mutação que a mata, e o sobrevivente que não morrer é dito em voz alta com número. E a rodada fecha os três buracos que o mapa mediu e que confirmei agora: (1) `grep 'além das duas' tools/ src/` dá 0 — nenhum teste dispara o grito de ponta complexa, então mexer em `terceiraFace` hoje não deixa nenhum teste vermelho; (2) nenhum teste compõe filete com filete, embora o `freio-disco` faça isso de verdade nos passos 17/18 e 22/23, e só o gabarito de bytes cobre; (3) `tools/mecanifica/freio-disco-integridade.test.ts` tem 21 casos e nenhuma asserção sobre os 4 filetes da peça — `grep filete|chanfro` dá 0.",
+    "comoSeMede": "Tabela de mutação por afirmação no relato. Os três buracos fechados por teste nomeado, no commit da fatia que toca a região.",
+    "oQueAReprova": "Entregar o código com os três buracos abertos. Esconder um sobrevivente. Dizer 'a suíte está verde' sobre uma região que medido não tem teste nenhum."
+   },
+   {
+    "numero": 19,
+    "texto": "O REPOSITÓRIO PARA DE MENTIR, NA MESMA RODADA. Quatro textos estão errados hoje e foram medidos: (a) `prototipos/fps/v3/pecas/_caixote-filetado.js` linhas 22-23 dizem `12V/9F (o painel + as 2 tampas de canto)` e o medido é 10V/7F; (b) `oficina.js` 3691-3699 diz `SÓ UM PAINEL NESTA RODADA` com o motivo errado, e 3722-3728 diz que o raio contra as faces vizinhas é responsabilidade do autor, que esta rodada paga; (c) `docs/mecanifica/ATRITOS-AUTORIA.md` linha 35 diz `face 22001` e o medido é 26001; (d) a tabela do A-33 na linha 131 diz 10 758 e o medido é 10 866. A-30, A-34, A-36 e A-37 são reescritos, e os atritos novos (A-38, A-39, A-40) abrem com número.",
+    "comoSeMede": "Diff de comentário conferido linha a linha, com `gabarito:selecao:check`, `vitest run` e `id-cru:check` verdes e nenhuma linha executável mudada na fatia de texto. `npm run mapa:check`, `docs:toc:check` e `docs:links:check` verdes (linha de base medida: 219 arquivos, 234 varridos, 58 docs alcançáveis, todos exit 0).",
+    "oQueAReprova": "Entregar o código sem reescrever o atrito. O repositório ficaria com a medição no código e a lenda no documento, que é exatamente como o A-34 nasceu apontando para a superfície errada."
+   },
+   {
+    "numero": 20,
+    "texto": "PROVADO EM PEÇA DE EXERCÍCIO NÃO AUTOMOTIVA E EM PEÇA DE PRODUTO, COM O AVISO NA CARA. Cada frente entrega a sua peça de exercício fora do vocabulário automotivo. E a rodada inteira tem UMA peça de produto tocada: o `freio-disco` com a pinça filetada, que é o A-37. As outras três frentes não mudam peça de produto por decisão medida — o A-34 declara que trocar os `lados` do freio é rodada de desenho própria, o A-36 declara que o chanfro das pastilhas é chanfro de verdade e n=1 fica, e o A-30 não tem figura de produto hoje. Se o A-37 cair da rodada, a rodada fica sem prova em produto e reprova pela condição 8 do gate do ciclo 5.",
+    "comoSeMede": "Ver o campo `provasEmPeca`. Cada peça nova com teste de integridade próprio em `tools/mecanifica/` e com `conferirMalha` chamado. O `freio-disco` reescrito é nomeado no commit e o diff do gabarito mostra só ele mudando.",
+    "oQueAReprova": "Quatro peças de exercício e nenhuma de produto. Uma peça de exercício com palavra automotiva no nome, na parte ou no grupo. Uma peça nova sem teste de integridade."
+   },
+   {
+    "numero": 21,
+    "texto": "O OLHO, EM DOIS ENQUADRAMENTOS POR PEÇA, E O ENQUADRAMENTO DE PERTO REGISTRADO PELO COMANDO. Testes verdes não substituem inspeção visual. Medido agora: `npm run bancada` roda headless e imprime a URL, mas AVISA que `--focar` não entra nela — `quem abrir o endereço abaixo verá a peça inteira, não este recorte`. Então a foto de perto é registrada pelo COMANDO completo, não só pela URL. Medido também: a seleção da bancada é por PARTE (`--selecionadas=pinca`), não por alias, e `--projecao` aceita `perspectiva` e `ortografica`; `--geo=flat` é da outra ferramenta, `npm run peca`. Duas vistas do freio com seleção e projeção custam 6,9 s.",
+    "comoSeMede": "Ver o campo `inspecaoVisual`. Cada foto entra na prancha com o comando inteiro, a URL, e uma frase dizendo o que se procurava e o que se viu.",
+    "oQueAReprova": "Uma frente entregue só com número. Uma URL registrada como evidência de um enquadramento de perto — medido que ela não carrega o recorte. Uma foto sem a frase do que se procurava."
+   }
+  ],
+  "medicoesDeLinhaDeBase": [
+   "SUÍTE. `npx vitest run` sai verde: 27 arquivos, 806 testes, 5,09 s de duração do vitest e 5,81 s de relógio. Por arquivo, os cinco mais caros: oficina.test.ts 454 casos em 1,74 s; acervo-adaptador.test.ts 44 em 1,13 s; descrever-partes.test.ts 20 em 0,82 s; argumentos.test.ts 9 em 0,74 s; freio-disco-integridade.test.ts 21 em 0,46 s. Teto da rodada: 8 s.",
+   "GATES DE LINHA DE COMANDO, todos exit 0 hoje: `gabarito:selecao:check` 28 peças byte-idênticas em 0,47 s; `id-cru:check` 0 id cru fora da lista, 13 peças herdadas e 8 244 ids congelados, em 0,40 s; `mapa:check` 219 arquivos em 0,24 s; `docs:toc:check` em 0,22 s; `docs:links:check` 234 arquivos varridos e 58 docs alcançáveis em 0,27 s.",
+   "ACERVO. 28 peças com PASSOS. Seis têm casca aberta e é escolha legítima: `_corrimao` 8 arestas sem par, `_jardineira` 16, `_primitivas` 16, `_vao-e-anteparo` 8, `roda-dianteira` 144, `roda-dianteira-realista-experimento` 264. As outras 22 fecham.",
+   "PEÇAS QUE A RODADA TOCA, hoje: `freio-disco` 498 V / 508 F / 956 triângulos; `_caixote-filetado` 656 V / 679 F / 1 304 tri; `_tampa-de-caixa` 184 V / 253 F / 376 tri; `_prateleira-furada` 112 V / 116 F / 224 tri.",
+   "PISO DE TRIÂNGULO DO ADAPTADOR NO ACERVO: 7,1092e-6 de área relativa à escala², em `_corrimao`. Nenhuma das 28 peças abaixo disso. É a régua da quinta propriedade.",
+   "FILETE NO ACERVO: 5 chamadas em 2 peças (`_caixote-filetado` passo 1; `freio-disco` passos 17, 18, 22 e 23). TODAS a θ = 90,000000°. Folga do recuo contra o contorno da face, medida por ray-cast: caixote 0,450000 / 0,400000 com raio 0,05, razão 8,000×; freio 0,076000 / 0,014000 com raio 0,0025, razão 5,600× nas quatro. O passo 18 mede 0,073500 na MESMA face que o passo 17 já recuou — exatamente 0,0025 a menos.",
+   "CUBO LADO 1 + FILETE RAIO 0,1, hoje: 10 V / 7 F, 16 triângulos, bloco V {1000, 1001}, bloco F {1000}. Coordenadas exatas: V1000 = [-0.5, 0.9, 0.5], V1001 = [0.5, 0.9, 0.5], V7 = [-0.5, 1, 0.4], V6 = [0.5, 1, 0.4]. Listas: F1 = [7,6,5,4], F3 = [2,1,5,6,1001], F4 = [3,2,1001,1000], F5 = [0,3,1000,7,4], F1000 = [1000,1001,6,7]. Ângulo do painel com a normal do topo: 45,000000°.",
+   "O RAIO SEM GUARDA, cubo de lado 1, aresta topo/frente: 0,1 / 0,5 / 0,6 / 0,999 / 0,99999999 constroem com 0 órfão, 0 bico, 0 aresta solta e adaptador OK; 1,0 dá 16 bicos e o adaptador lança `face 1 é degenerada`; 1,001 e 1,1 o adaptador lança `face 3 não fecha em orelhas (5 cantos)`; 2,0 dá 2 bicos e o adaptador diz OK; 5,0 passa em TUDO — 0 órfão, 0 bico, 0 solta, adaptador OK, 16 triângulos, e a peça é lixo.",
+   "ARESTA NÃO-RETA JÁ CONSTRÓI HOJE. Filete na aresta vertical de uma face lateral do `cilindro` (`{op:'cilindro', id:1, lado:0}`, `aresta: 0`, raio 0,05): L=3 sai 8V/6F, L=5 12V/8F, L=6 14V/9F, L=8 18V/11F. Todos com 0 aresta solta, 0 bico e adaptador OK. É a figura de φ ≠ 90° endereçada por identidade que o A-36 precisa, e ela não depende de `moveV`.",
+   "NÃO-PLANARIDADE ANTERIOR À RODADA. Prisma triangular (`cilindro` 3 lados, raio 0,5, altura 1) com filete na aresta 0 da tampa 'topo', raio 0,05: as duas faces laterais que ganham canto saem não-planas por 1,4642e-2 EM METRO. A mesma face dá 1,8760e-2 por raio ao centroide, 1,3096e-2 por distância à origem e 3,9468e-3 por perímetro. O número só vale com a definição escrita ao lado.",
+   "CLAMP DA CASA. `Math.max(1, x | 0)` transforma 2147483648, 4294967296 e 1e21 em 1, em silêncio. `Math.max(1, Math.trunc(x))` devolve os três, e eles chegam ao throw de estouro do bloco.",
+   "ARMADILHA DE DOUBLE. `Math.tan(Math.PI/4)` é 0.9999999999999999. `0.05/tan` e `0.1/tan` não são `===` a 0,05 e 0,1. Mas `0.5-0.05` e `0.5-(0.05/tan)` dão o MESMO double, e `0.5-0.1 = 0.4` contra `0.5-(0.1/tan) = 0.39999999999999997` diferem. O gabarito serializa com `toFixed(9)` e funde os dois em `\"0.400000000\"`. Numa varredura de 400 raios de 0,001 a 0,400, 239 diferem em double.",
+   "ONDULAÇÃO DO CONTORNO DO FURO DO FREIO, medida NA MALHA: 0,2215 mm com `lados` 12 (peça 498V/508F), 0,1249 com 16 (530V/556F), 0,0800 com 20 (562V/604F), 0,0556 com 24 (594V/652F), 0,0313 com 32 (658V/748F). A fórmula raio·(1−cos(π/L)) bate a 4 casas nos cinco. O flange, R=0,052 com 16 lados, tem flecha 0,9992 mm — 4,5× a do furo.",
+   "DERIVAÇÃO POR DESVIO. `Math.ceil(π / Math.acos(1 − d/R))` cru erra 1 871 de 3 980 casos (47,0%) quando `d` é exatamente a flecha de um L inteiro; com os dois laços de correção, 0 erro. `flechaDoAnel(0.0065, 3) = 0.003249999999999999` contra `raio/2 = 0.00325`.",
+   "`lados` FORA DA FORMA NUMÉRICA, hoje: `[]`, `[12]`, `{}` e `{desvio: 1e-4}` todos lançam `oficina: valor numérico inválido: …`, throw cru de expressoes.js, sem nomear passo nem op.",
+   "VARREDURA A-33 COMPLETA, 14 212 combinações em 292,7 s: saem inteiras 10 866; gritam por anéis que se cruzam ou anel que não cabe 2 405; estouram o bloco 904; travam a partição 37. Soma 14 212. A tabela publicada diz OK 10 758 e as cinco linhas dela somam 14 104 — erra em 108. As 37 travas medidas: [6,3,7..11], [6,4,7], [6,4,9], [6,5,7], [6,5,10], [6,k,7] para k de 6 a 24, [7,3,8], [7,3,9], [7,5,8], [8,3,9], [8,3,10], [8,4,10], [8,4,11], [10,4,11], [18,3,11]. A lista `AINDA_TRAVA` de oficina.test.ts:5607 cobre 11 das 37.",
+   "VARREDURA DE 408 PARES (face, aresta) sobre cubo, chamferBox de chanfro 0,1, cilindro de 8, cone de 6, esfera 8×4 e placa com furo passante de 8, endereçados por origem estrutural, raio 0,02: HOJE 84 constroem, todos a 2V/1F, e 324 gritam — 292 por `a ponta v0 da aresta 0 da face N tem N face(s) além das duas da aresta` e 32 por `as duas faces desta aresta se dobram quase 180°`, os 32 TODOS na placa com furo. Por figura: cubo 24 de 24, cilindro8 48 de 48, cone6 12 de 24, chamferBox 0 de 96, esfera 0 de 112, placa 0 de 104. Custo: 0,15 s.",
+   "PLANARIDADE E TRIÂNGULO SOBRE OS 84 QUE CONSTROEM HOJE: com raio 0,01, pior planaridade relativa 6,5959e-3 e média 3,069e-3, menor triângulo do adaptador 1,0541e-3; com raio 0,02, pior 1,3178e-2 e média 6,127e-3, menor triângulo 2,0516e-3. Em todos os 84: 0 bico, 0 aresta solta, adaptador não lança.",
+   "O CASO DO ATRITO A-37 NA PEÇA DE PRODUTO: `['filete', { de: {op:'chamferBox', id: PINCA_PONTE, face:'topo'}, aresta: 0, raio: 0.0025 }]` no `freio-disco` grita `a ponta v0 da aresta 0 da face 26001 tem 2 face(s) além das duas da aresta` e deixa 0 V e 0 F no bloco do passo; a peça sai 498V/508F, intacta. A face é 26001, não 22001 como ATRITOS-AUTORIA.md linha 35 escreve. O mesmo no chamferBox isolado: 24V/26F antes e depois, 0 V / 0 F no bloco 1000.",
+   "TEMPO DE CONSTRUÇÃO: cubo 0,030 ms; cubo + filete 0,046 ms; flange 16 lados / 4 furos de 12 (o caso da peça) 5,20 ms; flange 24 / 8 furos de 16 16,4 ms; flange 6 / 7 furos de 3 (o que trava) 0,955 ms; `freio-disco` inteiro, 63 passos, 5,80 ms.",
+   "CUSTO DAS VARREDURAS QUE OS GATES PEDEM: 408 pares do filete 0,15 s — cabe na suíte. 8 075 figuras de furo 233,6 s. 14 212 figuras do A-33 292,7 s. As duas últimas NÃO cabem em `vitest run` com teto de 8 s.",
+   "BURACOS DE TESTE, medidos agora: `grep 'além das duas' tools/ src/` dá 0 ocorrências — nenhum teste dispara o grito de ponta complexa. Nenhum teste compõe filete com filete. `tools/mecanifica/freio-disco-integridade.test.ts` tem 21 casos e `grep filete|chanfro` dá 0 — a peça de produto tem 4 filetes e nenhuma asserção sobre eles. `oficina.test.ts` tem UM bloco de filete, com 20 casos, começando na linha 5760.",
+   "TEXTOS ERRADOS HOJE: `_caixote-filetado.js` linhas 22-23 dizem 12V/9F e o medido é 10V/7F; `oficina.js` 3691-3699 (`SÓ UM PAINEL NESTA RODADA`) e 3722-3728 (o raio como responsabilidade do autor); `ATRITOS-AUTORIA.md` linha 35 (face 22001) e linha 131 (OK 10 758).",
+   "BANCADA: roda headless e gera PNG. Duas vistas do `freio-disco` com seleção e projeção custam 6,9 s. A ferramenta AVISA que `--focar` não entra na URL: `quem abrir o endereço abaixo verá a peça inteira, não este recorte` — é o A-1, aberto. A seleção é por PARTE, não por alias (`pincaPonte` é recusado, `pinca` é aceito). `--projecao` aceita `perspectiva` e `ortografica`. `--geo=flat` não existe na bancada; ela é de `npm run peca` (tools/bancadas/olhar-peca.mjs)."
+  ],
+  "oQueNaoSeMede": [
+   "SE O FILETE DE VÁRIOS PAINÉIS LÊ COMO ARREDONDAMENTO. O A-36 é um atrito de leitura do cliente, e nenhum número responde se 3 painéis com raio de 12 mm deixam de ler como chanfro. A condição 21 pede a foto; ela é a única prova prevista e foto não é medida.",
+   "A COMPOSIÇÃO DE `segmentosCurva ≥ 2` COM `espelha`, `arranja` E `mescla`. As 28 peças só exercitam n=1 nesses caminhos. Risco declarado, não medido.",
+   "`liso` SOBRE O ARCO E SOBRE A TAMPA. Não foi medido como a normal suave fica nas pontas do arco, onde o painel 0 encosta na face de entrada. E a tampa de canto herda `liso` da face de entrada por consistência, embora a normal dela seja perpendicular à do painel. Nenhuma peça do acervo com filete é `liso`, então isso não aparece hoje.",
+   "A GUARDA DE RECUO CONTRA A TERCEIRA FACE. Ela cobra faceA e faceB nas duas pontas. Um recuo que caiba nas duas faces da aresta e ainda assim atravesse a terceira fica sem grito. Declarado, não pago.",
+   "SE ALGUM DOS 32 GRITOS DE DOBRA DE 180° DEVERIA CONSTRUIR. Medi que os 32 abortam com 0 V / 0 F e que estão todos na placa com furo. Não medi se uma parede de furo com diedro quase raso é alvo legítimo de filete de raio pequeno. Se for, a rodada grita em caso bom e ninguém mediu.",
+   "A ESFERA, O `lathe` E O `loft` COM `lados: {desvio}`. Ficam de fora por decisão medida: a esfera tem dois eixos de discretização e uma frase só em `lados` consertaria metade da superfície; `lathe` e `loft` mudariam a ordem de grito.",
+   "ERRO DE UNIDADE DE 10×. O grito da flecha do triângulo pega o erro de 1000× (milímetro escrito como metro). `desvio: 0.002` num raio de 0,0065 dá L=4 sem grito nenhum. Visível na foto, invisível no teste.",
+   "O A-33 RESOLVIDO. As 37 travas de hoje encolhem, não somem. Nenhuma das propostas resolve triangulação de polígono com buracos sem ponte + orelha, e o gate não cobra isso.",
+   "A FRONTEIRA DO A-33 COM `lados` DERIVADO ALTO. A varredura do A-33 cobre furo de 3 a 24 lados; um L derivado por desvio sobe a 79 no freio e a 333 num furo de anel único. O defeito de partição mora em face de poucos lados com anéis raspando a borda, e ninguém varreu essa região com L derivado.",
+   "FIGURA COM QUATRO OU MAIS TAMANHOS DE FURO NO MESMO PASSO, e furos de raio com uma ordem de grandeza de diferença na mesma chapa. As famílias medidas param em três tamanhos.",
+   "O CUSTO DE TEMPO EM PEÇA GRANDE. `lequeDoVertice` é O(k·F) por ponta e a maior peça medida tem 1 600 faces (`moto`). Não sei o que acontece com muitos filetes numa peça de milhares de faces.",
+   "O VOLUME DA PEÇA FILETADA COMO GRANDEZA ÚNICA. Fica registrado como A-39: com face vizinha entortada, o volume desenhado varia com a triangulação. Medir volume de peça filetada passa a ser medida sem sentido no fundo de escala do corte.",
+   "O SEGUNDO PASSO DE `furo` NA MESMA FACE. Continua impossível: a primeira consome a face. A rodada contorna isso para a figura da flange; ela não resolve, e isso choca com a regra do CLAUDE.md de que uma crítica altera a peça sem regenerá-la.",
+   "O EFEITO DA RODADA SOBRE AS 6 PEÇAS DE CASCA ABERTA, PEÇA A PEÇA. O gabarito cobre bytes e `conferirMalha(fechada:true)` só é cobrado de quem declara. Que nenhuma delas seja alcançada é dedução, não medição por peça.",
+   "A INTERFACE DA OFICINA. Ela continua sem emitir `segmentosCurva`, `lados: {desvio}`, grupos com nome e `tampa`. O A-15 segue de pé e a rodada aumenta a distância entre o que a linguagem aceita e o que a ferramenta escreve.",
+   "O CANTO ONDE TRÊS FILETES SE ENCONTRAM. Cada filete fecha a própria ponta com a própria tampa; as tampas de dois filetes vizinhos não se fundem numa calota. Com a pinça filetada em várias arestas isso fica mais visível, e ninguém mediu como lê na foto.",
+   "FILETE VARIÁVEL AO LONGO DA ARESTA, FILETE DE LOOP NO CONTORNO DO FURO, E CONCORDÂNCIA ENTRE CORPOS DIFERENTES. Já estavam fora e continuam.",
+   "LOD POR DISTÂNCIA. O núcleo é independente de vista, por decisão: um passo que produzisse malha diferente conforme a câmera quebraria o determinismo e o gabarito. Perto e longe continuam indistinguíveis na linguagem."
+  ],
+  "provasEmPeca": [
+   "A-36, EXERCÍCIO NÃO AUTOMOTIVO: `prototipos/fps/v3/pecas/_cabo-sextavado.js`, família ferramenta. Cilindro de 6 lados, raio 0,09, altura 0,6, filete nas 6 arestas VERTICAIS endereçadas por `{op:'cilindro', id:BARRA, lado:k}` com `aresta: 0`, raio 0,012 e `segmentosCurva` 3. É a primeira aresta não-reta filetada do repositório: medido que as 5 chamadas de filete do acervo são todas a θ = 90,000000° e que a aresta vertical de um cilindro L=6 dá φ = 60° exato, e que essa figura já constrói hoje com 14V/9F em L=6. Contagem esperada: V = 12 + 12n, F = 8 + 6n. Zero palavra automotiva, zero id cru. Teste de integridade próprio em `tools/mecanifica/`.",
+   "A-34, EXERCÍCIO NÃO AUTOMOTIVO: `prototipos/fps/v3/pecas/_gabarito-de-furacao.js`, família ferramenta. Placa de furação com pino de centragem (`cone`) e bucha de guia (`cilindro`) escritos com `lados: {desvio}`, mais dois furos cegos de MESMO raio em DUAS faces distintas — um escrito por contagem e outro pela frase, com o mesmo acabamento. A afirmação central da peça é que os dois blocos saem com a mesma contagem de faces e a mesma ondulação medida. Duas faces distintas porque um passo consome a face de entrada, e a limitação fica dita no cabeçalho.",
+   "A-30, EXERCÍCIO NÃO AUTOMOTIVO: `prototipos/fps/v3/pecas/_flange-de-tubulacao.js`. Passagem central, círculo de parafusos e dois pinos de referência cegos, com raio e profundidade por grupo e grupos nomeados. Contagem esperada, medida pelo júri: 120 V e 228 F no bloco do passo, 320 triângulos, `conferirMalha(fechada:true)` verde. Junto vai a correção do cabeçalho de `_tampa-de-caixa.js` linhas 31-37, que hoje declara a limitação que esta rodada paga.",
+   "A-37, EXERCÍCIO NÃO AUTOMOTIVO: um mordente de morsa, família ferramenta. `chamferBox` com filete nas quatro arestas do topo, painel pintado de uma cor e as oito tampas de canto de outra, citadas por `tampa:'inicio'` e `tampa:'fim'`. É a peça que prova que a tampa é citável por nome e que ela existe.",
+   "PRODUTO, E É A ÚNICA DA RODADA: `freio-disco` com a pinça filetada. Medido agora que o passo escrito caractere por caractere hoje aborta com 0 V / 0 F e a mensagem nomeia a face 26001. A peça sai de 498V/508F e a rodada declara a contagem nova no commit, com o `freio-disco` nomeado como peça reescrita de propósito. A pinça, o suporte e as orelhas são todos `chamferBox`, e é por isso que o freio é uma peça de bloco desde o ciclo 5.",
+   "AVISO DO GATE: as outras três frentes não tocam peça de produto, por decisão medida de cada veredito. Se o A-37 cair da rodada, a rodada fica sem prova em produto e reprova pela condição 8 do gate do ciclo 5. Se isso acontecer, a saída é nomear qual peça de produto passa a usar `lados: {desvio}` ou grupo com raio próprio, e pagar a inspeção visual dela.",
+   "CONTABILIDADE DO GABARITO: hoje 28 peças. Com as quatro peças de exercício ele vai a 32, e o `freio-disco` reescrito muda 1 hash. Cada peça nova é um commit, e o diff do gabarito nesse commit tem exatamente 1 linha nova mais o `hashTotal`, com os hashes antigos intactos."
+  ],
+  "inspecaoVisual": [
+   "`_cabo-sextavado`, ISOMÉTRICA DE LONGE, com `segmentosCurva` 1 e 3 no mesmo quadro. O que se procura: se 3 painéis LEEM como arredondamento e 1 lê como chanfro. É a razão de existir do A-36, e nenhum teste responde isso. Se os dois quadros lerem igual, a rodada entregou custo sem leitura, e isso tem de estar escrito no relato mesmo com todos os testes verdes.",
+   "`_cabo-sextavado`, DE PERTO DA QUINA, com `--focar`. O que se procura: faceta entre os painéis e degrau nas pontas do arco, onde o painel 0 encosta na face de entrada e o painel n−1 na do outro lado. É o limite conhecido do `liso`, que só promedia entre faces marcadas, e ele não foi medido.",
+   "`_gabarito-de-furacao`, VISTA DIREITA E ISOMÉTRICA, de longe. O que se procura: se os dois furos de mesmo raio e mesmo acabamento — um escrito por contagem, outro pela frase — leem iguais na silhueta. A peça inteira existe para essa comparação.",
+   "`freio-disco --selecionadas=cubo --modo=isolar --focar --projecao=ortografica`, VISTA DIREITA DE PERTO. O que se procura: contar as 16 quinas do flange no mesmo quadro em que o furo do prisioneiro aparece. Medido: o flange tem 0,9992 mm de flecha e o furo 0,2215 mm, 4,5× menos. O A-34 nasceu apontando para o furo lendo a foto errado, e esta é a foto que corrige o registro.",
+   "`freio-disco --selecionadas=pinca --modo=isolar --focar`, ISOMÉTRICA E VISTA DIREITA, ANTES E DEPOIS NO MESMO QUADRO. O que se procura: se a pinça deixa de ler como caixa de aresta viva. É o caso que deu nome ao A-37 e a frase do gate do ciclo 5 (`uma pinça de verdade é fundida`) é o critério.",
+   "MORDENTE DE MORSA, DOIS ENQUADRAMENTOS, um deles em `npm run peca -- <peça> --geo=flat` (a bancada não tem `--geo`; ele é de `tools/bancadas/olhar-peca.mjs`). O que se procura: se a tampa de canto aparece. A área dela é 0,5·raio²·senθ, que com o raio da pinça fica na casa de 2e-6 na escala da cena; ela passa no piso relativo de triângulo e ainda assim pode sumir da tela. E se três tampas planas num canto leem como quina.",
+   "`_flange-de-tubulacao --vistas=superior,isometrica,frontal` mais um enquadramento de perto da boca da passagem. O que se procura: se a partição aparece como faceta na chapa entre a passagem e os parafusos, e se a ordem de ponte vencedora deixa marca visível. Medido no projeto que a ordem do preenchimento passa a depender de qual tentativa venceu, e que a posição dentro do preenchimento não é endereço estável.",
+   "COMO SE REGISTRA, E ISTO É MEDIDO: a ferramenta imprime a URL, mas AVISA que `--focar` não entra nela — `quem abrir o endereço abaixo verá a peça inteira, não este recorte`. Então toda foto de perto entra na prancha com o COMANDO completo, não só com a URL. A seleção é por PARTE (`--selecionadas=pinca`), não por alias; `pincaPonte` é recusado. `--projecao` aceita `perspectiva` e `ortografica`. Duas vistas do freio com seleção custam 6,9 s.",
+   "CADA FOTO ENTRA COM UMA FRASE DO QUE SE PROCURAVA E DO QUE SE VIU. Foto sem essa frase não conta como inspeção; ela vira ilustração. E inspeção visual não substitui determinismo e validação, como o CLAUDE.md escreve."
+  ]
+ }
+}
