@@ -20,14 +20,15 @@ inclusive a maior delas: a roda experimental foi reescrita e perdeu os cem
 parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaixo.
 
 - fases 0 a 4: concluídas;
-- fases 5 e 6: horizontes futuros, ainda sem autorização ou plano executivo;
-- **um recorte técnico está em execução:** Filete v2. O ciclo 4 ("Corte e
-  orientação de seção v1") e o ciclo 5 ("Curva e filete v1") permanecem
-  concluídos. O v1 do `filete` conserva seu nome honesto: um painel é chanfro,
-  não raio. O **Escopo A** de `arredondarAresta` já entrega raio real com vários
-  painéis, identidade e prova pelo adaptador; o **Escopo B** (canto composto,
-  inclusive `chamferBox`) ainda não começou. O gate composto continua vermelho
-  de propósito até esse contrato existir (`node tools/oficina/filete-v2-aceitacao.mjs`).
+- fase 5: horizonte futuro, ainda sem plano executivo;
+- a fase 6 começou pelo recorte operacional **Fluxo de modelagem assistida por
+  IA v1**, cujo contrato está em
+  [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- **um ciclo está em execução:** transformar briefing, referências, bancada e
+  crítica em artefatos curtos, determinísticos e reutilizáveis por outra IA;
+- Filete v2 está **pausado** depois do Escopo A. `arredondarAresta` já entrega
+  raio real numa aresta simples; o canto composto/`chamferBox` não começa até a
+  comparação com a frente paralela do repositório de origem.
 
 Uma fase concluída não volta a crescer. Descobertas posteriores entram no
 backlog ou abrem outro ciclo com escopo, exclusões e prova de saída próprios.
@@ -223,8 +224,8 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-**Nenhuma linha está em execução.** As linhas 1, 1b e 2 fecharam; as demais são candidatas
-ordenadas, não autorização para começar ou agrupá-las num ciclo.
+**Uma linha está em execução:** Fluxo de modelagem assistida por IA v1. Filete
+v2 permanece pausado no Escopo A e não disputa o ciclo ativo.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
@@ -235,9 +236,11 @@ ordenadas, não autorização para começar ou agrupá-las num ciclo.
 | 3b | concluída em 31/07/2026 | Furo v2 — vários furos na mesma face | A-26 pago (UP-023): a chave `centros` da op `furo`, na forma de lista e na de círculo, com identidade por furo dentro do passo, partição por pontes e orelhas e grito quando dois anéis se cruzam. Provada na peça de exercício `_tampa-de-caixa` (círculo de quatro parafusos numa chapa só, 0 face sem identidade, 0 órfão). NÃO tocou em peça de produto: o flange do `freio-disco` continua uma chapa por prisioneiro, e isso virou dívida de peça. Abriu A-30 (um raio por passo) |
 | 3c | concluída em 31/07/2026 | Flange de uma peça só — a forma nova numa peça de PRODUTO | a dívida de peça que a 3b deixou está paga: o flange do `freio-disco` é UM disco com os quatro furos num passo. Corpos da parte `cubo` 5 → 2, envelope idêntico, e `prisioneiros` passou a bastar sozinho (constrói com 3, 5, 6 e 8). Levar a op ao produto ACHOU um defeito no núcleo — a orelha aceitava vértice em cima da aresta dela, e a face simétrica gritava —, corrigido com 10 casos novos. A-29 perdeu a evidência original; A-32 abriu (o cubo não tem cubo-piloto, então o flange não pode ser mais largo que o barril) |
 | 4 | **CONCLUÍDO** | Curva e filete v1 | as duas capacidades que sobraram da crítica da roda: curva no perfil e filete seletivo. Escopo, exclusões e GATE escritos abaixo |
-| 5 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
-| 6 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
-| 7 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
+| 5 | **em execução** | Fluxo de modelagem assistida por IA v1 | pacote curto, guias combináveis, revisão determinística, crítica objetiva e comparação entre iterações; contrato e gate em [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) |
+| 6 | pausada | Filete v2, Escopo B | aguarda comparação com a frente paralela antes de atacar canto composto/`chamferBox`; o Escopo A está preservado e verde |
+| 7 | backlog | posição e relações | O-7 e O-8 continuam separados dos ciclos acima |
+| 8 | backlog | produto | narrativa de desgaste da Fase 5, com cenário e linha do tempo próprios |
+| 9 | backlog | apresentação | caminhada, carro detalhado, novos sistemas e árvore de navegação |
 
 ### Ciclo 2 — CONCLUÍDO em 31 de julho de 2026
 

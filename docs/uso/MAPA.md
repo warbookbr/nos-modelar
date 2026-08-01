@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-222 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+224 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -84,7 +84,8 @@
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
-- `FILETE-V2.md` — Filete v2 — desenho antes de implementação
+- `FILETE-V2.md` — Filete v2 — Escopo A implementado; canto composto pendente
+- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
@@ -310,6 +311,7 @@
 ## tools/oficina/
 
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
+- `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
 - `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…

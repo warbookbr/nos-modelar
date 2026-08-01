@@ -122,10 +122,13 @@ Estado atual:
 - a revisão visual oficial de autoria agora é `npm run revisar -- <peça>`: ela
   abre a bancada neutra nas quatro vistas canônicas e recusa geometria cortada
   ou pequena demais; `npm run peca` ficou apenas como diagnóstico herdado;
-- o filete real v2 está em progresso: `arredondarAresta` já cobre o anel simples
-  com vários painéis e raio medido; falta apenas o canto composto (inclusive
-  `chamferBox`), cujo gate permanece vermelho por honestidade. O contrato e a
-  fronteira estão em [`FILETE-V2.md`](FILETE-V2.md);
+- o ciclo ativo é **Fluxo de modelagem assistida por IA v1**: pacote curto,
+  guias combináveis, revisão da bancada, crítica objetiva e comparação de
+  iterações. Contrato e gate em
+  [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md);
+- o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
+  simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
+  A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 
@@ -151,7 +154,9 @@ Use esta ordem para resolver dúvidas:
    autoria visual e experiência do cliente;
 7. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — contrato e gate do
    arredondamento real de aresta;
-8. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+8. [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) — pacote,
+   revisão e crítica do ciclo ativo de modelagem por IA;
+9. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
 9. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
@@ -364,10 +369,12 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Recorte técnico ativo: Filete v2.** O Escopo A resolveu A-36 para uma aresta
-de anel simples: `arredondarAresta` tem raio real, múltiplos painéis e
-identidade. O próximo passo estrito é A-37: canto composto em `chamferBox`, sem
-promover a pinça antes da prova não automotiva e do gate topológico.
+**Ciclo ativo: Fluxo de modelagem assistida por IA v1.** O objetivo é uma IA
+receber um pacote curto, modelar, gerar revisão reproduzível e receber crítica
+objetiva de outra IA sem abrir a Oficina legada nem ler o repositório inteiro.
+O contrato e o gate estão em
+[`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md). Filete v2 permanece pausado
+no Escopo A durante este ciclo.
 
 ## Manutenção desta documentação
 
