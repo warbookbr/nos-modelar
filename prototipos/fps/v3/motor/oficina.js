@@ -1543,7 +1543,7 @@ function areaPoligono(P) {
    causa era a orelha aceitar vértice EM CIMA de uma aresta sua — corrigido
    abaixo, com a família de simetrias em teste. A afirmação de que "não há
    entrada aceita que as faça falhar" era, na data em que foi escrita, falsa. */
-function triangularComAneis(contorno, aneis, escala) {
+function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) => k)) {
   const eps = 1e-12 * Math.max(1, escala * escala);
   const pts = [], tags = [];
   contorno.forEach((p, i) => { pts.push(p); tags.push({ tipo: 'contorno', i }); });
@@ -1552,14 +1552,17 @@ function triangularComAneis(contorno, aneis, escala) {
 
   let ciclo = contorno.map((_, i) => i);
   const pendentes = aneis.map((_, k) => k);
-  for (const k of pendentes.slice()) {
+  /* `ordem` é a sequência de FUSÃO dos anéis, e não mexe em nada além disso: o
+     anel `k` continua sendo o anel `k` na saída. O padrão é a ordem declarada
+     pelo autor, que é a de sempre, byte por byte. */
+  for (const k of ordem) {
     const L = aneis[k].length;
     const noDoAnel = (m, j) => baseAnel[m] + ((j % aneis[m].length) + aneis[m].length) % aneis[m].length;
     /* arestas que a ponte não pode cruzar: o polígono corrente e todo anel
        ainda não fundido (inclusive o próprio, fora das duas incidentes) */
     const arestas = [];
     for (let t = 0; t < ciclo.length; t++) arestas.push([ciclo[t], ciclo[(t + 1) % ciclo.length]]);
-    for (const m of pendentes) if (m >= k) for (let j = 0; j < aneis[m].length; j++) arestas.push([noDoAnel(m, j), noDoAnel(m, j + 1)]);
+    for (const m of pendentes) for (let j = 0; j < aneis[m].length; j++) arestas.push([noDoAnel(m, j), noDoAnel(m, j + 1)]);
 
     let melhor = null;
     for (let p = 0; p < ciclo.length; p++) {
@@ -1577,7 +1580,7 @@ function triangularComAneis(contorno, aneis, escala) {
         if (livre) {
           const meio = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
           if (!(margemDentro(contorno, meio) > 0)) livre = false;
-          for (const m of pendentes) if (livre && m >= k && margemDentro(aneis[m], meio) > 0) livre = false;
+          for (const m of pendentes) if (livre && margemDentro(aneis[m], meio) > 0) livre = false;
         }
         if (livre) melhor = { p, j, comp };
       }
@@ -1658,6 +1661,102 @@ function triangularComAneis(contorno, aneis, escala) {
   });
   for (let k = 0; k < bordas.length; k++) for (let j = 0; j < bordas[k].length; j++) if (!bordas[k][j]) return { erro: `a aresta ${j} do anel ${k} não caiu em triângulo nenhum` };
   return { bordas, preenchimento };
+}
+
+/* ----------------------------------------------------------------------------
+   AS TRÊS ORDENS DE PONTE (A-30)
+
+   `triangularComAneis` liga cada anel ao polígono corrente pela ponte mais
+   curta que não cruza nada. Isso é determinístico, mas não é completo: a ordem
+   em que os anéis são fundidos MUDA quais pontes ainda existem depois, e uma
+   ordem pode travar onde outra fecha. Medido na varredura do A-30: com uma
+   ordem só, 2 981 de 11 305 figuras válidas gritam — 1 em cada 4. Com as três
+   ordens abaixo, 108.
+
+   As três são FIXAS, nesta sequência, e a primeira que fecha vence. Não há
+   quarta tentativa e não há aleatoriedade: a mesma entrada dá a mesma saída,
+   hoje e daqui a um ano.
+
+   1. a ordem ESCRITA pelo autor. É a de sempre, byte por byte. Enquanto ela
+      fechar, nada nesta seção muda o resultado de peça nenhuma — é isso que
+      `canon-linha-de-base.test.ts` cobra.
+   2. o anel mais PERTO do contorno primeiro. Um anel encostado na borda é o
+      que tem menos ponte livre disponível, então ele escolhe antes de os
+      outros gastarem o espaço.
+   3. o MENOR RAIO DECLARADO primeiro. Anel pequeno cabe em fresta que anel
+      grande não alcança.
+
+   Duas regras de chave que não são detalhe:
+
+   - a distância é AO QUADRADO, sem `sqrt` e sem `Math.hypot`. A precisão de
+     `Math.hypot` é definida pela implementação em ECMAScript, e chave de
+     ordenação não pode depender de motor: a mesma peça sairia diferente em
+     dois navegadores. Comparar quadrados dá a mesma ordem sem a raiz.
+   - o raio é o número que o AUTOR ESCREVEU, resolvido por `st.num`. Nunca um
+     raio recalculado da geometria, que traria erro de ponto flutuante para
+     dentro da chave.
+
+   Empate nas duas: pelo índice de declaração. */
+
+/** distância AO QUADRADO do ponto `p` ao SEGMENTO a→b, em 2D. Sem raiz. */
+function d2AoSegmento(p, a, b) {
+  const abx = b[0] - a[0], aby = b[1] - a[1];
+  const apx = p[0] - a[0], apy = p[1] - a[1];
+  const l2 = abx * abx + aby * aby;
+  if (l2 === 0) return apx * apx + apy * apy;
+  let t = (apx * abx + apy * aby) / l2;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const dx = apx - abx * t, dy = apy - aby * t;
+  return dx * dx + dy * dy;
+}
+
+/** as três ordens, na sequência fixa, já sem repetidas. */
+function ordensDePonte(contorno, aneis, raios) {
+  const declarada = aneis.map((_, k) => k);
+  if (aneis.length < 2) return [declarada];
+
+  const porChave = (chaveDe) => declarada
+    .map((k) => ({ k, chave: chaveDe(k) }))
+    .sort((x, y) => (x.chave - y.chave) || (x.k - y.k))
+    .map((o) => o.k);
+
+  const pertoDoContorno = porChave((k) => {
+    let menor = Infinity;
+    for (const ponto of aneis[k]) {
+      for (let t = 0; t < contorno.length; t++) {
+        const d2 = d2AoSegmento(ponto, contorno[t], contorno[(t + 1) % contorno.length]);
+        if (d2 < menor) menor = d2;
+      }
+    }
+    return menor;
+  });
+
+  /* sem raio declarado (o passo tem um raio só), esta ordem É a declarada. */
+  const menorRaio = porChave((k) => (raios ? raios[k] : 0));
+
+  const vistas = new Set(), fora = [];
+  for (const ordem of [declarada, pertoDoContorno, menorRaio]) {
+    const chave = ordem.join(',');
+    if (vistas.has(chave)) continue;
+    vistas.add(chave); fora.push(ordem);
+  }
+  return fora;
+}
+
+/**
+ * Reparte a face tentando as três ordens. A primeira que fecha vence. Se
+ * nenhuma fechar, devolve o erro da PRIMEIRA — a da ordem escrita pelo autor —
+ * para a mensagem continuar falando da figura que ele escreveu, e não de uma
+ * reordenação interna que ele nunca pediu.
+ */
+function particionar(contorno, aneis, escala, raios) {
+  let primeiro = null;
+  for (const ordem of ordensDePonte(contorno, aneis, raios)) {
+    const r = triangularComAneis(contorno, aneis, escala, ordem);
+    if (!r.erro) return r;
+    if (!primeiro) primeiro = r;
+  }
+  return primeiro;
 }
 
 /* ----------------------------------------------------------------------------
@@ -3603,11 +3702,15 @@ export const OPS = {
         bordaS = [r.faces];
       }
     } else {
-      const pE = triangularComAneis(entrada.uv, anelUVEntrada, entrada.escala);
+      /* cada LADO da chapa tenta por conta própria: a geometria da entrada e a
+         da saída não são a mesma, e uma ordem que fecha num lado pode travar no
+         outro. `raios` fica nulo enquanto o passo tem um raio só — aí a terceira
+         ordem é igual à declarada e some sozinha. */
+      const pE = particionar(entrada.uv, anelUVEntrada, entrada.escala, null);
       if (pE.erro) return grita(st, i, 'furo', 'de', `entrada: ${pE.erro}`);
       bordaE = pE.bordas; cheioE = pE.preenchimento;
       if (temSaida) {
-        const pS = triangularComAneis(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala);
+        const pS = particionar(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala, null);
         if (pS.erro) return grita(st, i, 'furo', 'saida', `saída: ${pS.erro}`);
         bordaS = pS.bordas; cheioS = pS.preenchimento;
       }
