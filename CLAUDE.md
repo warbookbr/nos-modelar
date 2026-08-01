@@ -47,6 +47,39 @@ headless e commits próprios. Toda capacidade candidata é registrada em
 `docs/mecanifica/UPSTREAM-NOS.md`, incluindo dependências, provas e instruções de
 extração.
 
+## Como escrever no chat
+
+Isto vale para as respostas ao usuário, não para código nem documentação.
+
+- Frases curtas. Uma ideia por frase.
+- Palavras comuns. Nada de metáfora inventada nem termo poético.
+- Ordem direta: sujeito, verbo, objeto. Sem inversão para dar ênfase.
+- Sem travessão para comentário no meio da frase. Use ponto e comece outra.
+- Listas em vez de parágrafos longos com ponto e vírgula.
+- Sem frase de efeito e sem construção do tipo "não é X, é Y".
+- Números e nomes de arquivo direto, sem rodeio.
+
+## Como provar uma op nova
+
+Uma malha pode estar fechada, com a contagem certa, e ainda assim não
+desenhar. Foi o que aconteceu com o `filete`: ele passou por todos os testes do
+núcleo e quebrou na primeira peça de verdade, porque uma face tinha um canto em
+cima da própria aresta. São quatro propriedades diferentes, não uma:
+
+1. o núcleo constrói sem órfão;
+2. toda face é um polígono que não se toca;
+3. a malha atravessa o adaptador e vira triângulo sadio;
+4. a casca é fechada — só para quem DECLARA que é.
+
+`tools/oficina/conferir-malha.ts` cobra as quatro numa linha. Todo teste de op
+nova chama ele:
+
+    conferirMalha(n, { fechada: true, rotulo: 'cubo com um filete' });
+
+Casca aberta é escolha legítima, e 6 das 28 peças do acervo são assim. A peça
+que é fechada escreve `fechada: true` no `meta`, e aí o gate do acervo cobra.
+Buraco não abre casca: furo passante tem parede.
+
 ## Qualidade
 
 - Texto, nomes de domínio e documentação em pt-BR.

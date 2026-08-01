@@ -392,6 +392,34 @@ h2 {
 .diagnostico.ok p { color: #a9d6be; }
 .diagnostico.alerta p { color: #f0c68f; }
 
+/* A-20 — portas publicadas. Fechado, ocupa UMA linha; a peça que não publica
+   porta nenhuma carrega o atributo `hidden` e não ocupa nada. */
+.portas { margin-top: 10px; }
+.portas summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--texto-fraco);
+  font-size: 9px;
+}
+.portas summary::-webkit-details-marker { display: none; }
+.portas summary::after { content: '▸'; margin-left: auto; font-size: 8px; }
+.portas[open] summary::after { content: '▾'; }
+.lista-portas {
+  margin: 7px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 5px;
+  max-height: 128px;
+  overflow-y: auto;
+}
+.lista-portas li { display: grid; gap: 1px; }
+.lista-portas b { font-size: 10px; font-weight: 600; color: #c7d3cd; }
+.lista-portas small { font-size: 9px; color: var(--texto-fraco); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
 .rodape {
   position: fixed;
   z-index: 5;
@@ -569,6 +597,7 @@ h2 {
   .controle-explosao > span { margin-bottom: 5px; }
   .acoes-inspecao { grid-column: 1 / -1; margin: 0; }
   .diagnostico { display: none; }
+  .portas { display: none; }
   .rodape { display: none; }
   .referencia-metrica { bottom: 46px; }
 }

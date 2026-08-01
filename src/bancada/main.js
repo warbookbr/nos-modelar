@@ -183,6 +183,31 @@ async function iniciar() {
       `${convertido.medida.partes.size} componentes e ${convertido.estatisticas.facesNeutras} faces: nenhuma superfície sem identidade.`;
   }
 
+  /* A-20: a porta publicada aparece aqui, no mesmo painel onde se confere a
+     identidade das faces, e vinda do mesmo módulo neutro. Peça sem porta não
+     mostra bloco nenhum — a régua não vira poluição nas peças que não publicam. */
+  const portas = convertido.medida.portas ?? [];
+  const blocoPortas = document.getElementById('portasPublicadas');
+  if (blocoPortas) {
+    blocoPortas.hidden = portas.length === 0;
+    if (portas.length) {
+      document.getElementById('resumoPortas').textContent =
+        `${portas.length} ${portas.length === 1 ? 'publicada' : 'publicadas'}`;
+      const listaPortas = document.getElementById('listaPortas');
+      listaPortas.replaceChildren(...portas.map((porta) => {
+        const item = document.createElement('li');
+        const nome = document.createElement('b');
+        nome.textContent = porta.nome;
+        /* a origem DECLARADA, não as faces resolvidas — a mesma coluna que
+           `npm run descrever` imprime, pelo mesmo motivo. */
+        const origem = document.createElement('small');
+        origem.textContent = porta.origem;
+        item.append(nome, origem);
+        return item;
+      }));
+    }
+  }
+
   function focarSelecao() {
     const grupos = controlador.gruposSelecionados();
     ambiente.enquadrar(alvosDeEnquadramento({

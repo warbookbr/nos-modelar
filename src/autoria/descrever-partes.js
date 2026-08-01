@@ -53,6 +53,24 @@
    resolvida por índice ou posição; nome inválido, vazio, repetido ou de tipo
    errado FALHA com diagnóstico, nunca vira no-op. */
 
+/* A-20 — PORTAS. `nucleo()` devolve `portas` (Map nome -> {nome, de, passo})
+   desde o ciclo "Endereços semânticos v1", mas uma porta que só existe dentro
+   do retorno do núcleo continua invisível para quem CONFERE: `npm run descrever`
+   e a bancada listavam seis partes e nenhuma porta. O custo disso foi medido —
+   para provar que `sel:{porta}` sobrevive a uma transformação,
+   `jardineira-integridade.test.ts` teve que marcar cada porta com um material
+   próprio e ler a marca de volta, afirmando sobre `f.material` em vez de sobre
+   a porta.
+
+   O que esta régua mostra é o que a porta DECLARA: nome, origem estrutural
+   (`op:id` mais as chaves de recorte do contrato do gerador) e o passo que a
+   publicou. NÃO mostra as faces resolvidas, e isso é decisão, não omissão: a
+   resolução depende do momento da citação — a mesma porta resolve conjuntos
+   diferentes conforme os passos que rodaram antes —, e o núcleo, de propósito,
+   não congela o fim da lista. Nome que promete região e entrega primitiva é
+   pior que nome nenhum; aqui a coluna se chama `origem` porque é exatamente
+   uma origem, a mesma de `sel:{origem}` e de `origemId`. */
+
 /** Vão abaixo do qual duas caixas são consideradas encostadas (erro de ponto flutuante). */
 export const TOLERANCIA_CONTATO = 1e-9;
 
@@ -255,6 +273,55 @@ function projetarCaixa(parte) {
   };
 }
 
+/* Serializa o resto do contrato da origem (tudo além de `op` e `id`) em ordem
+   de chave — `tampa=fundo`, `faixa=0`. Ordem por ponto de código, como o resto
+   do módulo: o relatório é determinístico e pode virar teste. */
+function recorteDe(de) {
+  return Object.keys(de)
+    .filter((chave) => chave !== 'op' && chave !== 'id')
+    .sort()
+    .map((chave) => `${chave}=${typeof de[chave] === 'string' ? de[chave] : JSON.stringify(de[chave])}`)
+    .join(' ');
+}
+
+/**
+ * As portas publicadas pela peça, em ordem de nome: `[{ nome, op, id, recorte,
+ * origem, passo }]`, onde `origem` é o texto `op:id` mais o recorte do contrato
+ * e `passo` é o índice do `publicarPorta` que a declarou.
+ *
+ * Peça que não publica porta nenhuma devolve lista vazia. `portas` ausente no
+ * estado neutro também: é o caso de um neutro montado à mão em teste, não um
+ * erro. Já `portas` presente com forma errada FALHA com diagnóstico — o módulo
+ * não adivinha formato de contrato.
+ */
+export function portasPublicadas(neutro) {
+  const quem = 'portasPublicadas';
+  exigirNeutro(neutro, quem);
+  const portas = neutro.portas;
+  if (portas === undefined || portas === null) return [];
+  if (!pareceMapa(portas)) {
+    throw new Error(`${quem}: 'portas' precisa ser o Map devolvido por nucleo(), recebi ${typeof portas}.`);
+  }
+  return [...portas.values()].map((porta) => {
+    if (typeof porta?.nome !== 'string' || !porta.nome
+      || typeof porta.de !== 'object' || porta.de === null || Array.isArray(porta.de)
+      || typeof porta.de.op !== 'string' || porta.de.id === undefined) {
+      throw new Error(
+        `${quem}: porta ${JSON.stringify(porta?.nome ?? null)} sem contrato {nome, de:{op,id}, passo}.`,
+      );
+    }
+    const recorte = recorteDe(porta.de);
+    return {
+      nome: porta.nome,
+      op: porta.de.op,
+      id: porta.de.id,
+      recorte,
+      origem: `${porta.de.op}:${porta.de.id}${recorte ? ` ${recorte}` : ''}`,
+      passo: porta.passo,
+    };
+  });
+}
+
 /**
  * Caixa alinhada aos eixos de TODAS as partes da peça, por nome.
  * Devolve `{ caixas, facesSemParte }`: `caixas` é um Map em ordem de nome (ponto
@@ -409,6 +476,10 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
   }
 
   const orfaos = Array.isArray(neutro.orfaos) ? neutro.orfaos : [];
+  /* as portas NÃO são filtradas por `partes`: elas endereçam origem estrutural,
+     não parte semântica, e esconder uma porta porque o autor filtrou o
+     relatório por outra parte faria a régua mentir sobre o contrato da peça. */
+  const portas = portasPublicadas(neutro);
   return {
     totais: {
       partes: escolhidas.length,
@@ -417,11 +488,13 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
       vertices: neutro.V.size,
       facesSemParte: medido.facesSemParte.length,
       orfaos: orfaos.length,
+      portas: portas.length,
     },
     filtrado: partes !== null && partes !== undefined,
     facesSemParte: medido.facesSemParte.slice(),
     partes: escolhidas.map(projetarCaixa),
     relacoes,
+    portas,
   };
 }
 
@@ -471,7 +544,8 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
   linhas.push(
     `partes: ${t.partes}${descricao.filtrado ? ` de ${t.partesNaPeca}` : ''}`
     + `   faces: ${t.faces}   vértices: ${t.vertices}`
-    + `   faces sem identidade: ${t.facesSemParte}   órfãos: ${t.orfaos}`,
+    + `   faces sem identidade: ${t.facesSemParte}   órfãos: ${t.orfaos}`
+    + `   portas: ${t.portas ?? 0}`,
   );
   linhas.push(`unidades do modelo, ${casas} casa(s) decimal(is)`);
   linhas.push('');
@@ -523,6 +597,24 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     n(relacao.porEixo[0]), n(relacao.porEixo[1]), n(relacao.porEixo[2]),
   ]);
   linhas.push(...(linhasRelacao.length ? tabela(colunasRelacao, linhasRelacao) : ['(nenhum par)']));
+  linhas.push('');
+
+  /* A-20: a porta publicada aparece onde se confere. Sem esta seção, a única
+     forma de saber que a peça publicou `peDoCaule` era ler o arquivo. */
+  linhas.push('PORTAS PUBLICADAS — endereço semântico que a peça oferece a quem a cita');
+  linhas.push(
+    'origem: o que a porta DECLARA (op:id e o recorte do contrato do gerador), não as '
+    + 'faces resolvidas — a resolução depende de quais passos já rodaram quando a porta é '
+    + 'citada, então congelar o fim da lista faria a porta mentir sobre os passos anteriores.',
+  );
+  const portas = Array.isArray(descricao.portas) ? descricao.portas : [];
+  const colunasPorta = [
+    { titulo: 'porta' },
+    { titulo: 'origem' },
+    { titulo: 'passo', direita: true },
+  ];
+  const linhasPorta = portas.map((porta) => [porta.nome, porta.origem, porta.passo]);
+  linhas.push(...(linhasPorta.length ? tabela(colunasPorta, linhasPorta) : ['(nenhuma porta publicada)']));
 
   return `${linhas.join('\n')}\n`;
 }
