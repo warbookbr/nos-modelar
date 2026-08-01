@@ -4,6 +4,11 @@ Comece por `docs/mecanifica/INDEX.md`. Ele informa o estado atual, a hierarquia
 das fontes e quais documentos ler para cada tipo de tarefa. Não leia todo o
 legado por padrão.
 
+Antes de alterar núcleo procedural, plano, atritos ou identidades enquanto houver
+trabalho paralelo em `brigsd/nos-mecanifica`, leia
+`docs/mecanifica/COORDENACAO-REPOS.md` e a issue viva indicada ali. Declare sua
+intenção antes do primeiro commit de comportamento.
+
 ## Fonte de verdade
 
 - `docs/mecanifica/` governa o produto Mecanifica.
