@@ -1,15 +1,19 @@
-/* roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada. */
+/* roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
+
+   O quarto caso deste arquivo — a folga entre a abertura do aro e o cubo do
+   freio — saiu daqui e virou `testes/composicao.test.mjs` em
+   warbookbr/mecanica. Ele dependia de `src/dominio/mecanica/`, que é registro
+   de PRODUTO: onde cada sistema fica no veículo e em que escala. Isto aqui é
+   oficina, e oficina não sabe onde o freio mora no carro.
+
+   Lá ele ficou melhor: em vez de ler `PARAMS.aroRaioInterno`, mede o raio
+   interno do aro na malha resolvida. Parâmetro declarado e malha construída
+   podem divergir, e é essa distância que a op `furo` já cobrou caro aqui. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
 import * as roda from '../../prototipos/fps/v3/pecas/roda-dianteira.js';
-// @ts-expect-error — primeiro conjunto mecânico, comparado pela API declarada.
-import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
-// @ts-expect-error — registros de domínio em JavaScript.
-import { FREIO_DIANTEIRO_DIREITO } from '../../src/dominio/mecanica/freio-dianteiro-direito.js';
-// @ts-expect-error — registros de domínio em JavaScript.
-import { RODA_DIANTEIRA_DIREITA } from '../../src/dominio/mecanica/roda-dianteira-direita.js';
 
 function montar() {
   return nucleo(roda.PASSOS, roda.PARAMS, roda.TOPO, roda.MATERIAIS, null, roda.ALIASES);
@@ -42,11 +46,19 @@ describe('roda dianteira', () => {
     expect(JSON.stringify(roda.PASSOS)).not.toMatch(/"faces"\s*:\s*\[/);
   });
 
-  it('compõe com o cubo existente, com folga declarada em escala de apresentação', () => {
-    const aberturaNaCena = roda.PARAMS.aroRaioInterno * RODA_DIANTEIRA_DIREITA.posicaoNoVeiculo.escala;
-    const cuboNaCena = freio.PARAMS.cuboRaio * FREIO_DIANTEIRO_DIREITO.posicaoNoVeiculo.escala;
-    expect(RODA_DIANTEIRA_DIREITA.compoeCom).toEqual(['freioDianteiroDireito']);
-    expect(aberturaNaCena).toBeGreaterThan(cuboNaCena);
-    expect(aberturaNaCena - cuboNaCena).toBeCloseTo(0.0006, 8);
+  it('a abertura do aro continua onde o freio a espera', () => {
+    /* o que sobrou aqui da composição: a oficina não sabe a escala da cena nem
+       onde o freio mora no carro, mas sabe que a abertura do aro é a medida que
+       o outro lado usa. Se ela mudar sem intenção, o produto descobre tarde.
+       A folga em escala de apresentação é cobrada em
+       `testes/composicao.test.mjs` de warbookbr/mecanica. */
+    const neutro = montar();
+    const aro = [...neutro.F.values()].filter((face: any) => face.parte === 'aro');
+    const ids = new Set(aro.flatMap((face: any) => face.vs));
+    const menor = Math.min(...[...ids].map((id) => {
+      const [, y, z] = neutro.V.get(id);
+      return Math.hypot(y, z);
+    }));
+    expect(menor, 'a abertura do aro mudou; o produto compõe com ela').toBeCloseTo(0.08, 8);
   });
 });
