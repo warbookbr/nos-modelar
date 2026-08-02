@@ -40,9 +40,10 @@ explícito manda mais que a posição no arquivo:
 
 ### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
 
-**Estado atual — ABERTO, SEM PLANO ATIVO:** o contrato convergido não amplia
-`filete`. O caso pertence ao Escopo B de `arredondarAresta`, descrito em
-[`FILETE-V2.md`](FILETE-V2.md), e só começa com plano próprio.
+**Estado atual — EM EXECUÇÃO:** o contrato convergido não amplia `filete`. O
+caso pertence ao Escopo B de `arredondarAresta`, descrito em
+[`FILETE-V2.md`](FILETE-V2.md) e no plano curto
+[`AUT-2026-04`](planos/2026-08-02-canto-composto.md).
 
 **Onde dói:** linguagem da Oficina, ao compor `filete` com `chamferBox`.
 
