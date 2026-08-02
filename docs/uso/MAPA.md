@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-249 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+250 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -106,7 +106,7 @@
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
-- `FILETE-V2.md` — Filete v2 — Escopo A implementado; canto composto pendente
+- `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
@@ -177,6 +177,7 @@
 
 - `_arvformas-mosqueado.js` — scratch: variações de FORMATO de árvore (não versionar/publicar). Builder paramétrico: tronco + copa (oval / cone / multi-blob), rampa de cor por espécie. 6 …
 - `_arvformas.js` — scratch: variações de FORMATO de árvore (não versionar/publicar). Builder paramétrico: tronco + copa (oval / cone / multi-blob), rampa de cor por espécie. 6 …
+- `_bloco-arredondado-composto.js` — PEÇA DE EXERCÍCIO — prova não automotiva do A-37. Um bloco com chanfros recebe uma faixa de raio numa aresta cuja ponta encontra canto composto. Ela existe p…
 - `_caixote-filetado.js` — PEÇA DE EXERCÍCIO do ciclo "Curva e filete v1": só existe por causa da op `filete` (motor/oficina.js), a metade "filete" do gate desse ciclo — a metade "curv…
 - `_cerca-e-flor.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA do ciclo "Arranjos semânticos v1" (O-13): um trecho de cerca de tábuas com uma flor plantada na frente. Nenhum eix…
 - `_corpo.js` — PEÇA-EXEMPLO do P6 do playground: um CORPO — o volume que só `inflate` faz hoje (dois contornos 2D, lado e topo, virando um sólido por interseção de prismas)…

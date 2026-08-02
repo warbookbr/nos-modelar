@@ -31,7 +31,7 @@
     "auditar": "node tools/bancadas/auditar.mjs",
     "gabarito": "node tools/bancadas/gabarito.mjs",
     "gabarito:selecao": "node tools/bancadas/gabarito-selecao.mjs",
-    "gabarito:selecao:check": "node tools/bancadas/gabarito-selecao.mjs --check --novas=_flange-de-tubulacao,_gabarito-de-furacao,_gabarito-triangulacao-de-furos",
+    "gabarito:selecao:check": "node tools/bancadas/gabarito-selecao.mjs --check --novas=_flange-de-tubulacao,_gabarito-de-furacao,_gabarito-triangulacao-de-furos,_bloco-arredondado-composto",
     "id-cru": "node tools/bancadas/id-cru.mjs",
     "id-cru:check": "node tools/bancadas/id-cru.mjs --check",
     "criar": "node tools/bancadas/criar.mjs",

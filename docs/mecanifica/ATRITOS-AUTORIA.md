@@ -26,7 +26,7 @@ explícito manda mais que a posição no arquivo:
 
 | Atrito | Estado atual |
 |---|---|
-| A-37 | aberto; canto composto de `arredondarAresta`, candidato `AUT-02` |
+| A-37 | resolvido: `arredondarAresta` costura canto composto de `chamferBox` |
 | A-36 | resolvido para aresta simples por `arredondarAresta`; o restante é A-37 |
 | A-35 | resolvido: discretização local por concordância |
 | A-34 | resolvido por `lados:{desvio}` em `cilindro`, `cone` e `furo` |
@@ -40,10 +40,11 @@ explícito manda mais que a posição no arquivo:
 
 ### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
 
-**Estado atual — EM EXECUÇÃO:** o contrato convergido não amplia `filete`. O
-caso pertence ao Escopo B de `arredondarAresta`, descrito em
-[`FILETE-V2.md`](FILETE-V2.md) e no plano curto
-[`AUT-2026-04`](planos/2026-08-02-canto-composto.md).
+**Estado atual — RESOLVIDO:** o contrato convergido não amplia `filete`. O
+Escopo B de `arredondarAresta` percorre o leque composto do `chamferBox` e
+mantém o triângulo de canto como a face existente que recebe a sequência do
+arco. O resultado e os limites estão em [`FILETE-V2.md`](FILETE-V2.md) e no
+plano concluído [`AUT-2026-04`](planos/2026-08-02-canto-composto.md).
 
 **Onde dói:** linguagem da Oficina, ao compor `filete` com `chamferBox`.
 
@@ -62,10 +63,14 @@ atrito existe numa pastilha de verdade por causa de ruído — a quina viva
 entrando no disco excita a vibração que vira o chiado. Quatro filetes, +8 V e
 +4 F na peça inteira. A pinça continua uma peça de bloco.
 
-**Capacidade candidata:** o canto de três arestas, declarado fora de escopo no
-gate deste ciclo. Enquanto ele não existir, o `filete` só alcança aresta de
-canto simples — o que exclui toda peça que já passou por `chamferBox`. Vale
-para qualquer família de objeto, não só para pinça.
+**Capacidade entregue:** a mesma `arredondarAresta` aceita agora as 24 arestas
+nominais do `chamferBox`, com dois ou mais painéis. O caminho simples continua
+literal; no canto composto o triângulo já existente vira um polígono que cobre
+todas as divisões da faixa, sem face nova anônima. O teste varre as 24 arestas,
+o gate executável mede 28 V/28 F em dois painéis, e a fixture neutra
+`_bloco-arredondado-composto` prova 30 V/29 F, 0 órfão e 0 face sem identidade.
+A pinça do freio ficou fora desta rodada por decisão de escopo, não por limite
+da operação.
 
 ### A-36 — o filete de UM painel é um chanfro, não um arredondamento
 

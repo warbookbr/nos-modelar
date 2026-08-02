@@ -9,7 +9,7 @@ escopo, exclusões, gate e decisão explícita.
 | Candidato | Evidência | Estado de preparação |
 |---|---|---|
 | `AUT-01` — contagem por desvio (`lados: { desvio }`) | A-34; silhueta e custo usavam números incomparáveis | concluído em [`AUT-2026-01`](2026-08-02-contagem-por-desvio.md) |
-| `AUT-02` — canto composto de `arredondarAresta` | A-37 e [`FILETE-V2.md`](../FILETE-V2.md), Escopo B | ativo em [`AUT-2026-04`](2026-08-02-canto-composto.md) |
+| `AUT-02` — canto composto de `arredondarAresta` | A-37 e [`FILETE-V2.md`](../FILETE-V2.md), Escopo B | concluído em [`AUT-2026-04`](2026-08-02-canto-composto.md) |
 | `AUT-03` — triangulação robusta de face com buracos | A-33; 37 casos válidos históricos abortavam | concluído em [`AUT-2026-03`](2026-08-02-triangulacao-de-furos.md) |
 | `AUT-04` — discretização por concordância | A-35 | concluído em [`AUT-2026-02`](2026-08-02-concordancia-por-ponto.md) |
 | `AUT-05` — posição, encaixe e hierarquia semânticos | O-7, O-8, O-10, A-16 e A-29 | tema grande; deve ser dividido por uma montagem real |

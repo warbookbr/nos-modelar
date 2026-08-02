@@ -157,9 +157,11 @@ Estado atual:
 - o produto do cliente foi separado para [`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
   Este repositório executa o núcleo e exporta peças resolvidas, determinísticas
   e versionadas; o produto lê esses dados sem carregar a linguagem de autoria;
-- o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
-  simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
-  A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
+- `arredondarAresta` agora cobre também o canto composto de `chamferBox`: o
+  caminho simples permanece byte-idêntico e o triângulo de canto preserva sua
+  identidade ao receber a sequência do arco. A fixture neutra e as 24 arestas
+  nominais ficaram provadas; produto continua separado em backlog. A fronteira
+  e os limites estão em [`FILETE-V2.md`](FILETE-V2.md);
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
 - o plano mestre de 2.417 linhas foi encerrado. O novo índice de planos não

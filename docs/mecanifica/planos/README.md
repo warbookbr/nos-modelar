@@ -5,9 +5,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 ## Estado atual
 
-**Plano ativo:** [AUT-2026-04](2026-08-02-canto-composto.md).
+**Plano ativo:** nenhum.
 
-O plano ativo implementa `AUT-02`/A-37. Caminho canônico:
+`AUT-02`/A-37 foi concluído em
+[`AUT-2026-04`](2026-08-02-canto-composto.md), caminho canônico
 `docs/mecanifica/planos/2026-08-02-canto-composto.md`.
 
 `AUT-03`/A-33 foi concluído em

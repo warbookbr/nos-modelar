@@ -1,4 +1,4 @@
-# Filete v2 — Escopo A implementado; canto composto pendente
+# Filete v2 — Escopos A e B implementados
 
 ## Decisão
 
@@ -37,9 +37,8 @@ Não reaproveitar `filete` para dois significados diferentes. A migração segur
   `filete`/chanfro e não entra no novo contrato.
 - a origem nova publica `painel: 0..paineis-1`; cada painel tem identidade
   estável e citações inválidas falham antes de alterar a malha.
-- as faces antigas permanecem vivas quando isso for topologicamente possível;
-  faces de canto que precisarem ser particionadas preservam o mesmo id na
-  região original e recebem subfaces derivadas pela origem nova.
+- as faces antigas permanecem vivas; no canto composto, a face triangular já
+  existente preserva o próprio id e recebe os vértices intermediários do arco.
 
 ## Algoritmo em dois escopos
 
@@ -67,27 +66,23 @@ O raio máximo não é a distância ao centroide: ele é limitado pelo primeiro
 encontro das linhas de recuo com as bordas vizinhas de cada face. Isso permite
 gritar antes de escrever metade da geometria.
 
-### Escopo B — canto composto / `chamferBox`
+### Escopo B — canto composto / `chamferBox` — IMPLEMENTADO
 
-Em cada ponta, coletar o leque ordenado de faces. Em vez de exigir uma terceira
-face, construir a interseção das faixas de arredondamento dentro do leque e
-triangular a região restante. Esse é um operador de canto, não uma exceção ao
-`if` atual. Ele precisa declarar quais subfaces pertencem à origem do
-arredondamento e provar que nenhum canto foi engolido.
+Em cada ponta, a operação coleta o leque ordenado de faces. O caso composto
+aceito tem duas faces além das duas da aresta: a tira vizinha e o triângulo de
+canto. Em vez de criar uma subface, preserva o id do triângulo e substitui o
+vértice comum pela sequência inteira do arco; assim, cada painel compartilha
+uma aresta com a faixa e o canto continua costurado às duas faces vizinhas.
 
-O primeiro alvo de produto é uma cópia pequena de `chamferBox`, não a pinça. Só
-depois de o caso composto ficar determinístico a pinça e o suporte podem mudar.
+O caminho de ponta simples continua literal. A varredura de todas as 24 arestas
+das seis faces nominais de `chamferBox` prova casca fechada e painéis citáveis.
+O alvo de produto continua deliberadamente fora: `_bloco-arredondado-composto`
+é a prova geral, e pinça/suporte só mudam quando houver necessidade de produto.
 
-## Testes de aceitação restantes para o Escopo B
+## Aceite do Escopo B
 
-O executável `node tools/oficina/filete-v2-aceitacao.mjs` ainda falha de
-propósito: ele cobra o canto composto, não o Escopo A. Só deve ficar verde junto
-com:
-
-- teste composto: uma aresta de `chamferBox` deixa de gritar e permanece
-  manifold, sem face autoencostada;
-- prova não automotiva antes da prova no freio;
-- custo medido: V/F antes/depois e limite explícito por número de painéis.
-
-Até esses testes existirem, a pinça e o suporte do freio não devem tentar usar
-o v1: a recusa atual é a proteção correta.
+`node tools/oficina/filete-v2-aceitacao.mjs` passa com uma aresta de
+`chamferBox` em 28 V/28 F e sem órfãos. O teste de núcleo cobre as 24 arestas,
+manifold, polígono simples, painéis, replay e recusa atômica; a fixture neutra
+confere a leitura visual. A pinça e o suporte do freio não foram alterados: o
+resultado fecha a capacidade geral sem ampliar esta rodada para produto.

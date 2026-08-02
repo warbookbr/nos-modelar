@@ -4202,25 +4202,40 @@ export const OPS = {
     const maxRecuo = Math.min(...limites);
     if (!(recuo < maxRecuo - 1e-8)) return grita(st, i, 'arredondarAresta', 'raio', `raio ${raio} não cabe nas faces vizinhas (máximo < ${(maxRecuo * Math.tan(theta / 2)).toFixed(6)})`);
 
-    const terceiraFace = (v, ponta) => {
-      const achadas = [];
-      for (const [fid, f] of st.F) if (fid !== faceAId && fid !== faceBId && f.vs.includes(v)) achadas.push(fid);
-      if (achadas.length !== 1) {
-        grita(st, i, 'arredondarAresta', 'aresta', `a ponta ${ponta} tem ${achadas.length} face(s) além das duas da aresta; canto composto é Escopo B`);
-        return null;
-      }
-      return achadas[0];
-    };
-    const faceCId = terceiraFace(v0, 'v0'); if (faceCId == null) return;
-    const faceDId = terceiraFace(v1, 'v1'); if (faceDId == null) return;
-    const faceC = st.F.get(faceCId), faceD = st.F.get(faceDId);
     const idx = (f, v) => f.vs.indexOf(v);
     const antes = (f, v) => f.vs[(idx(f, v) - 1 + f.vs.length) % f.vs.length];
     const depois = (f, v) => f.vs[(idx(f, v) + 1) % f.vs.length];
     const prevA = antes(faceA, v0), nextA = depois(faceA, v1), nextB = depois(faceB, v0), prevB = antes(faceB, v1);
-    if (antes(faceC, v0) !== nextB || depois(faceC, v0) !== prevA || antes(faceD, v1) !== nextA || depois(faceD, v1) !== prevB) {
-      return grita(st, i, 'arredondarAresta', 'aresta', 'as faces de ponta não percorrem a vizinhança no sentido de malha fechada');
-    }
+    /* Uma ponta simples tem uma face ligando B a A. No chamferBox há duas:
+       uma tira de aresta e um canto triangular. A segunda continua com o seu
+       id, mas o vértice comum vira o polígono que costura as duas tangências.
+       Não é um atalho por valência: a caminhada inteira do leque é conferida. */
+    const ponta = (v, nome) => {
+      const achadas = [];
+      for (const [fid, f] of st.F) if (fid !== faceAId && fid !== faceBId && f.vs.includes(v)) achadas.push(f);
+      if (achadas.length === 1) {
+        const face = achadas[0];
+        const ok = nome === 'v0'
+          ? antes(face, v) === nextB && depois(face, v) === prevA
+          : antes(face, v) === nextA && depois(face, v) === prevB;
+        if (ok) return { tipo: 'simples', face };
+      }
+      if (achadas.length === 2) {
+        if (nome === 'v0') {
+          const canto = achadas.find((f) => antes(f, v) === nextB);
+          const lateral = achadas.find((f) => f !== canto);
+          if (canto && lateral && depois(canto, v) === antes(lateral, v) && depois(lateral, v) === prevA) return { tipo: 'composto', canto };
+        } else {
+          const canto = achadas.find((f) => depois(f, v) === prevB);
+          const lateral = achadas.find((f) => f !== canto);
+          if (canto && lateral && antes(canto, v) === depois(lateral, v) && antes(lateral, v) === nextA) return { tipo: 'composto', canto };
+        }
+      }
+      grita(st, i, 'arredondarAresta', 'aresta', `a ponta ${nome} não forma leque simples de costura (recebeu ${achadas.length} face(s) além das duas da aresta)`);
+      return null;
+    };
+    const ponta0 = ponta(v0, 'v0'); if (!ponta0) return;
+    const ponta1 = ponta(v1, 'v1'); if (!ponta1) return;
 
     const bissetor = norm3(dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]);
     const distanciaCentro = raio / Math.sin(theta / 2);
@@ -4258,8 +4273,16 @@ export const OPS = {
       paineisIds.push(id);
     }
     faceB.vs = faceB.vs.map((v) => (v === v0 ? Pk[paineis] : v === v1 ? Qk[paineis] : v));
-    faceC.vs = faceC.vs.flatMap((v) => (v === v0 ? [...Pk.slice(1).reverse(), v0] : [v]));
-    faceD.vs = faceD.vs.flatMap((v) => (v === v1 ? [v1, ...Qk.slice(1)] : [v]));
+    if (ponta0.tipo === 'simples') {
+      ponta0.face.vs = ponta0.face.vs.flatMap((v) => (v === v0 ? [...Pk.slice(1).reverse(), v0] : [v]));
+    } else {
+      ponta0.canto.vs = ponta0.canto.vs.flatMap((v) => (v === v0 ? [...Pk.slice(1).reverse(), v0] : [v]));
+    }
+    if (ponta1.tipo === 'simples') {
+      ponta1.face.vs = ponta1.face.vs.flatMap((v) => (v === v1 ? [v1, ...Qk.slice(1)] : [v]));
+    } else {
+      ponta1.canto.vs = ponta1.canto.vs.flatMap((v) => (v === v1 ? [v1, ...Qk.slice(1)] : [v]));
+    }
     registraOrigem(st, i, 'arredondarAresta', a.origemId, { paineis: paineisIds });
   },
 

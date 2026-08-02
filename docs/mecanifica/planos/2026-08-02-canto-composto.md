@@ -1,6 +1,6 @@
 # AUT-2026-04 — canto composto de aresta arredondada
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -66,4 +66,14 @@ semântica e sem mudar nenhuma peça que hoje já constrói.
 
 ## Fechamento
 
-A preencher somente depois dos gates.
+Concluído em 2 de agosto de 2026. A costura percorre o leque de cada ponta: a
+forma simples mantém seu caminho literal; no `chamferBox`, o canto triangular
+preserva o próprio id e recebe a sequência inteira de vértices do arco. Assim
+ele costura os painéis à tira de chanfro sem criar uma face anônima ou uma
+fresta. O custo continua `+2n` vértices e `+n` faces para `n` painéis.
+
+Evidência: as 24 arestas das seis faces nominais de `chamferBox` ficaram
+fechadas em teste, o gate executável passou com 28 V/28 F para dois painéis, e
+a fixture não automotiva `_bloco-arredondado-composto` passou em três vistas da
+bancada com 30 V, 29 F, 0 órfão e 0 face sem identidade. A suíte completa, o
+gabarito, IDs, build, portas e exportação ficaram verdes antes do commit.
