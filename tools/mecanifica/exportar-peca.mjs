@@ -15,7 +15,7 @@
        produto não sabe pintar;
      · `partes`    — a lista dos nomes, ordenada, para o produto montar o menu
        de isolar sem varrer 500 faces;
-     · `meta`      — nome, descrição, se a casca é fechada e a colisão.
+     · `meta`      — somente o nome que o produto usa para a raiz Three.js.
 
    E MAIS UMA, QUE É A RAZÃO DE O GATE EXISTIR. `receita` é a impressão digital
    do que ENTROU no núcleo: passos, parâmetros, topologia, materiais, esqueleto

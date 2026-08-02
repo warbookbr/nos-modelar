@@ -16,6 +16,7 @@
    experiência do gabarito ensinou — o arquivo tem de saber dizer que está
    VELHO, senão o produto mostra a peça de ontem e ninguém percebe. */
 import { describe, it, expect } from 'vitest';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +34,8 @@ const FONTE = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'exportar-peca.mjs'),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const CLI = join(dirname(fileURLToPath(import.meta.url)), 'exportar.mjs');
+const MANIFESTO = join(dirname(fileURLToPath(import.meta.url)), '../../pecas-resolvidas/manifesto.json');
 
 describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
   it('★ é DETERMINÍSTICO: exportar duas vezes dá o MESMO texto, byte a byte', async () => {
@@ -195,6 +198,14 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
   it('recusa peça inexistente com diagnóstico, e não devolve arquivo vazio', async () => {
     /* referência inválida falha com diagnóstico; nunca vira no-op silencioso. */
     await expect(exportarPeca('_nao-existe-esta-peca')).rejects.toThrow(/_nao-existe-esta-peca/);
+  });
+
+  it('★ a publicação é atômica: a CLI recusa subconjunto de peças', () => {
+    const antes = readFileSync(MANIFESTO, 'utf8');
+    const r = spawnSync(process.execPath, [CLI, 'freio-disco'], { encoding: 'utf8' });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/publicação parcial não é suportada/i);
+    expect(readFileSync(MANIFESTO, 'utf8'), 'a recusa não pode regravar o manifesto').toBe(antes);
   });
 
   it('★ recusa peça que o núcleo reprovou, repetindo o motivo dele', async () => {

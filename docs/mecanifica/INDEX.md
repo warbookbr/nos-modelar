@@ -147,8 +147,10 @@ Estado atual:
   recusa conserva imagens e diagnóstico `camera`/`modelo`/`ferramenta`. As duas
   dobradiças congeladas passaram em uma execução cada, sem mudar geometria;
 - a Oficina humana herdada, sua aba de som e os harnesses exclusivos foram
-  removidos. O Pages publica somente o produto e a bancada; núcleo, peças,
-  visor e jogo de referência continuam locais enquanto forem dependências reais;
+  removidos. A bancada é a única aplicação publicada por este repositório;
+- o produto do cliente foi separado para [`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
+  Este repositório executa o núcleo e exporta peças resolvidas, determinísticas
+  e versionadas; o produto lê esses dados sem carregar a linguagem de autoria;
 - o filete real v2 está pausado no Escopo A: `arredondarAresta` cobre o anel
   simples; canto composto/`chamferBox` aguarda comparação com a frente paralela.
   A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
@@ -234,12 +236,10 @@ o plano e somente as referências da linha aplicável.
 
 | Caminho | Responsabilidade |
 |---|---|
-| `src/` | aplicação nova da Mecanifica em Three.js |
-| `src/autoria/` | adaptação neutra do núcleo procedural para renderização |
+| `src/` | superfícies Three.js da autoria; o produto vive em `warbookbr/mecanica` |
+| `src/autoria/` | adaptação neutra do núcleo e leitor puro do formato de peça resolvida |
 | `src/bancada/` | estúdio, câmeras, seleção, isolamento, explosão e estado por URL |
-| `src/cena/` | composição visual da experiência principal |
-| `src/dominio/mecanica/` | registros estáveis de sistemas automotivos, independentes do runtime Three.js |
-| `src/interacao/` | interações semânticas da aplicação |
+| `pecas-resolvidas/` | artefatos versionados que atravessam para o produto; gerados, nunca editados à mão |
 | `prototipos/fps/v3/` | núcleo, peças, visor e jogo de referência herdados; sem Oficina humana |
 | `tools/mecanifica/` | testes headless dos contratos novos |
 | `tools/modelagem/` | preparação, validação, revisão, crítica e comparação do fluxo assistido por IA |
@@ -257,11 +257,11 @@ arquivo e cobre código e documentação sem manter uma segunda descrição manu
 
 ## Entradas executáveis
 
-- `index.html` — aplicação principal;
 - `bancada.html` — bancada neutra de autoria e inspeção; aceita `?peca=<nome>`
   para abrir qualquer peça de `prototipos/fps/v3/pecas/`;
-- `https://warbookbr.github.io/nos-mecanifica/` — publicação da aplicação;
 - `https://warbookbr.github.io/nos-mecanifica/bancada.html` — bancada publicada.
+- `https://warbookbr.github.io/mecanica/` — produto do cliente, publicado pelo
+  repositório separado.
 
 Desenvolvimento local:
 
@@ -319,6 +319,7 @@ npm run guarda:portas
 npm run mapa:check
 npm run docs:toc:check
 npm run docs:links:check
+npm run exportar:check
 ```
 
 `npm run id-cru:check` é o gate do O-4: peça **nova** que enderece geometria por
@@ -350,10 +351,11 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Estado e próximo ciclo
 
-O ciclo 1 terminou na Fase 4. `index.html` contém a prova encerrada: carroceria
-simplificada, galpão mínimo, registro semântico, modos
-carro/contexto/isolar, seleção por parte e explosão autoral do freio. A roda
-experimental permanece somente como evidência de autoria.
+O ciclo 1 terminou na Fase 4. Sua prova — carroceria simplificada, galpão,
+registro semântico, modos carro/contexto/isolar, seleção e explosão — foi
+separada para `warbookbr/mecanica`. As receitas mecânicas permanecem aqui como
+provas da linguagem; a roda experimental continua somente como evidência de
+autoria.
 
 O ciclo 2, “Fundação de autoria v1”, fechou em 31 de julho de 2026. O ciclo 2b,
 “Endereços semânticos v1”, fechou no mesmo dia e pagou a dívida que a

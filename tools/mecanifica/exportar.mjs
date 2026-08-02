@@ -13,7 +13,20 @@ import { conferirPublicadas, gravarPublicadas, DESTINO, PUBLICADAS } from './exp
 const args = process.argv.slice(2);
 const conferir = args.includes('--check');
 const nomes = args.filter((a) => !a.startsWith('--'));
-const alvo = nomes.length ? nomes : PUBLICADAS;
+
+/* A publicação é um CONJUNTO ATÔMICO. O manifesto descreve todas as peças que
+   atravessam para o outro repositório; aceitar um nome posicional regravava o
+   manifesto com um subconjunto e deixava a pasta real deliberadamente
+   inconsistente. Quando houver necessidade medida de publicação parcial, ela
+   precisa preservar o manifesto inteiro e ganhar contrato próprio. */
+if (nomes.length > 0) {
+  console.error(
+    `exportar: publicação parcial não é suportada (recebi: ${nomes.join(', ')}). `
+    + 'Rode sem nomes para gravar ou conferir o conjunto PUBLICADAS inteiro.',
+  );
+  process.exit(2);
+}
+const alvo = PUBLICADAS;
 
 const curto = (p) => relative(process.cwd(), p).replace(/\\/g, '/');
 
