@@ -35,7 +35,7 @@ explícito manda mais que a posição no arquivo:
 | A-32 | dívida de desenho da peça, candidato `PEC-01` |
 | A-30 | resolvido pela F1 do antigo Ciclo 6 |
 | A-16 | candidato dentro de relações semânticas, sem plano ativo |
-| A-1 | candidato de bancada `AUT-06` |
+| A-1 | em execução no plano `AUT-2026-05` |
 | A-15 | retirado da Mecanifica com a Oficina humana |
 
 ### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
@@ -309,6 +309,9 @@ porta interna de um componente oco e a porta externa do componente recebido.
 conector têm o mesmo problema.
 
 ### A-1 — enquadramento livre não volta pela URL
+
+**Estado atual — EM EXECUÇÃO:** `AUT-2026-05` delimita a câmera livre
+reproduzível sem ampliar a navegação da bancada.
 
 **Onde dói:** bancada.
 

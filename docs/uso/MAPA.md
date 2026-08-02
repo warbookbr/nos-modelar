@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-250 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+251 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -122,6 +122,7 @@
 
 ## docs/mecanifica/planos/
 
+- `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
 - `2026-08-02-canto-composto.md` — AUT-2026-04 — canto composto de aresta arredondada
 - `2026-08-02-concordancia-por-ponto.md` — AUT-2026-02 — discretização por concordância
 - `2026-08-02-contagem-por-desvio.md` — AUT-2026-01 — contagem circular por desvio

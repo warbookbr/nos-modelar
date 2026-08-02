@@ -5,7 +5,7 @@ histórico para que um roteiro não cresça indefinidamente.
 
 ## Estado atual
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [`AUT-2026-05 — câmera livre reproduzível`](2026-08-02-camera-livre-reproduzivel.md).
 
 `AUT-02`/A-37 foi concluído em
 [`AUT-2026-04`](2026-08-02-canto-composto.md), caminho canônico

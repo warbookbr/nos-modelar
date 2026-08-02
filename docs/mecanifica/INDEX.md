@@ -375,6 +375,10 @@ seu resultado está sintetizado em
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
 pagou A-34 com contagem circular por tolerância e também foi encerrado.
 
+O plano ativo [`AUT-2026-05`](planos/2026-08-02-camera-livre-reproduzivel.md)
+trata A-1: tornar qualquer órbita da bancada reproduzível pela URL, sem mudar
+as vistas canônicas existentes.
+
 O plano curto seguinte [`AUT-2026-02`](planos/2026-08-02-concordancia-por-ponto.md)
 pagou A-35 com discretização local de concordâncias e também foi encerrado.
 
