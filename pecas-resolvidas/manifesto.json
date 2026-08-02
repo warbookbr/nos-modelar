@@ -3,7 +3,7 @@
   "versao": 1,
   "leitor": {
     "arquivo": "src/autoria/ler-peca-resolvida.js",
-    "sha256": "ecf326c2a79f33e888f31f3de8fe41f474a7237593c8d9ab316abc34ae97efc5"
+    "sha256": "5c3436415dc9ae0fc54d365d5ca596d63a9c97f4e71294ee0eed608876e44125"
   },
   "pecas": [
     "freio-disco",

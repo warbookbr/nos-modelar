@@ -159,6 +159,18 @@ export const PASSOS = [
   ['liso', { sel: { alias: 'aroBarrilInteiro' } }],
   ['liso', { sel: { origem: { op: 'cilindro', id: TAMPA_CENTRAL } } }],
 
+  /* A abertura não é uma seleção visual genérica: ela oferece uma cavidade
+     cilíndrica declarada para o piloto do cubo. As medidas continuam locais à
+     roda; a montagem informa a escala e a pose já existente, sem mover nada. */
+  ['publicarPorta', {
+    nome: 'cavidadeDoCubo',
+    de: { op: 'lathe', id: ARO, faixa: 5 },
+    interface: {
+      forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [0, 0, 0],
+      raio: 'aroRaioInterno', inicio: 'aroMeiaLarguraNeg', fim: 'aroMeiaLargura',
+    },
+  }],
+
   ['material', { sel: { grupo: 'pneu' }, usa: 'borracha' }],
   ['material', { sel: { grupo: 'aro' }, usa: 'ligaAro' }],
   ['material', { sel: { grupo: 'tampaCentral' }, usa: 'tampaMetal' }],

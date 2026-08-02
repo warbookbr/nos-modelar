@@ -193,7 +193,7 @@ describe('descrever-partes: a medição headless de uma peça', () => {
     const neutro = montar();
     const { caixas } = caixasPorParte(neutro);
     expect([...caixas.values()].map((c: any) => [c.nome, c.corpos])).toEqual([
-      /* o `cubo` são DOIS corpos: o barril e o flange de roda, cada um uma
+      /* o `cubo` são TRÊS corpos: barril, flange e piloto de roda, cada um uma
          primitiva própria, sem vértice em comum. Este número era
          `1 + freio.TOPO.prisioneiros` enquanto cada prisioneiro tinha um
          ressalto quadrado só dele; a rodada "Flange de uma peça só" trocou os
@@ -201,7 +201,7 @@ describe('descrever-partes: a medição headless de uma peça', () => {
          prisioneiro sumiu com eles. Continua contando o que contava — que o
          flange não é vértice do barril —, e é `freio-disco-integridade` que
          prende os quatro furos ao TOPO da peça. */
-      ['cubo', 2], ['disco', 2], ['flexivel', 1], ['pastilhaExterna', 1],
+      ['cubo', 3], ['disco', 2], ['flexivel', 1], ['pastilhaExterna', 1],
       ['pastilhaInterna', 1], ['pinca', 3], ['pistao', 1], ['suporte', 3],
     ]);
 

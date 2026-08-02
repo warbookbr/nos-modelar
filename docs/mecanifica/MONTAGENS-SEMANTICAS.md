@@ -6,9 +6,9 @@ fechem, por acidente, o caminho para montagens maiores — e para que a visão d
 longo prazo não autorize a construção prematura de um CAD ou solucionador
 universal.
 
-**Estado deste documento:** o Recorte A está em execução por
+**Estado deste documento:** o Recorte A foi concluído por
 [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). O documento continua
-um mapa de teto: nenhum item abaixo substitui o plano curto ativo em
+um mapa de teto: nenhum item abaixo substitui um plano curto ativo em
 `planos/README.md`.
 
 ## Índice — a visão abstraída
@@ -311,17 +311,17 @@ como oráculo de cavidade.
 **Estado**
 
 - [ ] NÃO INICIADO
-- [x] EM DESENVOLVIMENTO
-- [ ] CONCLUÍDO
+- [ ] EM DESENVOLVIMENTO
+- [x] CONCLUÍDO
 
 **Checklist**
 
-- [ ] corrigir e medir cubo-piloto/flange sem esconder a folga atual;
-- [ ] nomear as interfaces do aro, piloto, flange, pneu, disco e pastilha;
-- [ ] registrar quais peças são referência e quais poderiam mover;
-- [ ] congelar pose, medidas, contatos válidos e colisões que devem reprovar;
-- [ ] criar caso não automotivo com as mesmas relações;
-- [ ] decidir o primeiro plano curto sem ativar os níveis seguintes.
+- [x] corrigir e medir cubo-piloto/flange sem esconder a folga atual;
+- [x] nomear as interfaces mínimas do aro e do piloto, sem inventar as demais;
+- [x] registrar referência (`freio`) e móvel (`roda`) da primeira relação;
+- [x] congelar pose, escalas, folga válida e mutações que devem reprovar;
+- [x] criar caso não automotivo com as mesmas relações (pino e luva);
+- [x] decidir o primeiro plano curto sem ativar os níveis seguintes.
 
 ## Nível 1 — portas com quadro e interface semânticos
 
@@ -351,8 +351,8 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 - [ ] definir convenção de quadro local, mão, unidade e transformação;
 - [ ] separar identidade da porta, rótulo e dados derivados;
 - [ ] declarar comportamento sob espelho e `arranja`;
-- [ ] validar vetores nulos, paralelos, não finitos e medidas negativas;
-- [ ] expor portas completas no `descrever` e na bancada;
+- [x] validar vetores nulos, não finitos e medidas negativas na interface cilíndrica;
+- [x] expor a interface cilíndrica no `descrever`; a bancada ainda só lista a porta;
 - [ ] provar replay e round-trip fora do domínio automotivo.
 
 ## Nível 2 — relações dirigidas sem reposicionamento
@@ -390,12 +390,12 @@ compatibilidade entre naturezas, direção e tolerância. `encosta` entre planos
 
 **Checklist**
 
-- [ ] escolher duas ou três relações exigidas pelo piloto;
-- [ ] definir referência, móvel e graus de liberdade afetados;
+- [x] escolher `encaixaCilindrico` exigido pelo piloto;
+- [x] definir referência, móvel e graus de liberdade que continuam intocados;
 - [ ] definir estado satisfeito, divergente, ambíguo e impossível;
 - [ ] produzir diagnóstico estruturado e ordenado;
 - [ ] testar relações invertidas e portas incompatíveis;
-- [ ] manter o modo estritamente read-only neste nível.
+- [x] manter o modo estritamente read-only neste nível.
 
 ## Nível 3 — posicionamento derivado de uma relação
 
@@ -776,9 +776,9 @@ também em estado neutro e headless.
 
 ## Primeiro recorte recomendado
 
-O pré-início sugeriu dois planos curtos consecutivos. O Recorte A agora é o
-plano ativo [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md); o
-Recorte B permanece apenas candidato.
+O pré-início sugeriu dois planos curtos consecutivos. O Recorte A foi concluído
+por [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md); o Recorte B
+permanece apenas candidato.
 
 ### Recorte A — interfaces mensuráveis, sem movimento automático
 

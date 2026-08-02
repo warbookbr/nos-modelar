@@ -52,12 +52,12 @@ reenquadra ao explodir (ATRITOS-AUTORIA A-12).
 ## Partes semânticas
 
 Oito partes, todas endereçáveis pelo nome na bancada (`--selecionadas=<nome>`) e
-nos passos (`sel:{grupo:'<nome>'}`). 180 faces, nenhuma sem identidade.
+nos passos (`sel:{grupo:'<nome>'}`). São 526 faces, nenhuma sem identidade.
 
 | parte | faces | caixa (x, y, z) | papel |
 |---|---:|---|---|
 | `disco` | 60 | −0,060…0,012 · ±0,140 · ±0,140 | pista de atrito + chapéu; gira com a roda |
-| `cubo` | 222 | −0,070…0,032 · ±0,052 · ±0,052 | barril do cubo + o flange de roda, com os quatro furos de prisioneiro |
+| `cubo` | 240 | −0,070…0,044 · ±0,052 · ±0,052 | barril, flange furado e piloto que centraliza a roda |
 | `pastilhaInterna` | 6 | −0,028…−0,014 · 0,088…0,136 · ±0,038 | pastilha do lado do pistão |
 | `pastilhaExterna` | 6 | 0,014…0,028 · 0,088…0,136 · ±0,038 | pastilha do lado da roda |
 | `pinca` | 18 | ±0,058 · 0,082…0,184 · ±0,046 | ponte + duas garras; abraça o disco |
@@ -69,8 +69,8 @@ nos passos (`sel:{grupo:'<nome>'}`). 180 faces, nenhuma sem identidade.
 
 O flange é UM disco na ponta do cubo, com o círculo de prisioneiros furado nele
 num passo só (`centros:{distancia:'prisioneiroOrbita', total:'prisioneiros',
-volta:360}`). Ele pertence à parte `cubo`, e a parte tem DOIS corpos: o barril e
-o flange.
+volta:360}`). Ele pertence à parte `cubo`, que agora tem TRÊS corpos: o barril,
+o flange e o piloto.
 
 Até a rodada "Flange de uma peça só" cada prisioneiro tinha um ressalto quadrado
 próprio, e o motivo era a linguagem, não a mecânica: um passo de `furo` consumia
@@ -85,16 +85,18 @@ Aliases do flange: `flangeInteiro` (o disco antes do corte),
 furo) e `assentosDeRoda` (a superfície de apoio da roda: a borda MAIS o
 preenchimento).
 
-O flange tem o RAIO DO CUBO, e isso é montagem, não estética: o aro da roda
-entra por cima do cubo com 0,6 mm de folga na escala da cena, então um flange
-mais largo bateria nele. O degrau piloto/flange de um cubo real não existe neste
-modelo, e está registrado em ATRITOS-AUTORIA A-32.
+O flange continua com `cuboRaio` (0,052), mas o piloto novo usa
+`pilotoRaio` (0,051) e avança de `pilotoInicioX` (0,032) até
+`pilotoFimX` (0,044). Assim a roda entra primeiro no piloto menor e só depois
+apoia no flange. Na pose declarada da montagem, as escalas 2,45 (freio) e 1,60
+(roda) deixam 3,05 mm de folga radial entre piloto e cavidade do aro; o comando
+`npm run descrever:montagem -- roda-no-freio` mede e explica esse número.
 
 A manga de eixo não faz parte deste sistema: as duas orelhas do `suporte`
 terminam onde ela começaria. Ela entra na Fase 4, junto com o contexto do
 veículo.
 
-### Portas semânticas (aliases)
+### Portas semânticas e aliases
 
 Além das partes, a peça publica nomes de **seleção** para superfícies que outras
 regras vão precisar citar — o que `AUTORIA-IA.md` chama de porta. Não são
@@ -109,6 +111,7 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `discoInteiro`, `cuboInteiro`, `pincaInteira`, `suporteInteiro`, `flexivelInteiro` | o conjunto de faces de cada parte |
 | `pincaPonte`, `pincaGarraInterna`, `pincaGarraExterna` | as três peças fundidas da pinça, separadas |
 | `pastilhaInternaInteira`, `pastilhaExternaInteira`, `pistaoInteiro` | idem, por primitiva |
+| `pilotoDaRoda` | porta cilíndrica externa: eixo X, raio e intervalo axial declarados para receber a roda |
 
 ## Medidas nomeadas
 
@@ -121,6 +124,8 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `chapeuRaio` | 0,072 | raio do chapéu (a panela central) |
 | `chapeuProfundidade` | 0,048 | quanto o chapéu recua para dentro do carro |
 | `cuboRaio` | 0,052 | raio do barril do cubo, e também do flange |
+| `pilotoRaio` | 0,051 | raio do ressalto que centraliza a roda |
+| `pilotoComprimento` | 0,012 | avanço axial do piloto além do flange |
 | `flangeEspessura` | 0,012 | quanto o flange avança para fora, além da face do cubo |
 | `prisioneiroOrbita` | 0,038 | raio do círculo de prisioneiros (o PCD dividido por 2) |
 | `prisioneiroFuroRaio` | 0,0065 | furo passante do prisioneiro (M12) |
@@ -163,6 +168,7 @@ independente arrasta todas as dependentes:
 |---|---|---|
 | `discoX` | −`discoEspessura`/2 | o disco fica centrado no plano da roda |
 | `chapeuX` | −(`discoEspessura`/2 + `chapeuProfundidade`) | o chapéu encosta na face interna do disco |
+| `pilotoInicioX` / `pilotoFimX` | face externa do flange; + `pilotoComprimento` | o piloto nasce depois do flange e termina dentro da cavidade da roda |
 | `pastilhaInternaX` / `pastilhaExternaX` | ∓(`discoEspessura`/2 + `folgaPastilha` + `pastilhaEspessura`/2) | a folga de repouso existe nos dois lados |
 | `pastilhaMeioY` | `pastilhaBaseY` + `pastilhaAltura`/2 | o eixo do pistão bate com o centro da pastilha |
 | `pincaGarraInternaX` / `pincaGarraExternaX` | ∓(costa da pastilha + `pincaParedeEspessura`/2) | cada garra encosta na costa da sua pastilha |

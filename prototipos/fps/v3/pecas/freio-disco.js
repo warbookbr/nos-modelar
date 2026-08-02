@@ -41,6 +41,10 @@ const MEDIDAS = {
   cuboComprimento: 0.090,
   cuboRecuo: 0.070,            // quanto o cubo entra para dentro a partir do plano do disco
 
+  // piloto: ressalto menor que centraliza a roda antes de ela encostar no flange
+  pilotoRaio: 0.051,
+  pilotoComprimento: 0.012,
+
   /* flange de roda: UM disco na ponta do cubo, com o círculo de prisioneiros
      furado nele. Até a rodada "Furo v2" cada prisioneiro tinha um RESSALTO
      quadrado próprio, e o motivo era a linguagem, não a mecânica: um passo de
@@ -116,6 +120,8 @@ const DERIVADAS = {
   cuboFaceRodaX: '= cuboComprimento - cuboRecuo',
   flangeRaio: '= cuboRaio',
   flangeFaceRodaX: '= cuboComprimento - cuboRecuo + flangeEspessura',
+  pilotoInicioX: '= cuboComprimento - cuboRecuo + flangeEspessura',
+  pilotoFimX: '= cuboComprimento - cuboRecuo + flangeEspessura + pilotoComprimento',
 
   pastilhaInternaX: '= -(discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2)',
   pastilhaExternaX: '= discoEspessura / 2 + folgaPastilha + pastilhaEspessura / 2',
@@ -186,6 +192,7 @@ const CUBO = 303;
    saíram junto com os ressaltos. */
 const FLANGE = 304;
 const FUROS_PRISIONEIRO = 305;
+const PILOTO = 306;
 const PASTILHA_INTERNA = 311;
 /* Ciclo 5: o CHANFRO de entrada e de saída da superfície de atrito. Numa
    pastilha de verdade ele existe por ruído, não por estética: a quina viva
@@ -240,6 +247,7 @@ export const ALIASES = [
   ['pistaExterna', { origem: { op: 'cilindro', id: DISCO_PISTA, tampa: 'topo' } }],
   ['discoBordo', { origem: { op: 'cilindro', id: DISCO_PISTA } }],
   ['cuboInteiro', cilindroInteiro(CUBO)],
+  ['pilotoInteiro', cilindroInteiro(PILOTO)],
   /* o flange ANTES do corte: o disco inteiro. Este alias é citado no `parte`,
      que roda antes do furo — depois dele a citação das duas tampas gritaria,
      com razão, porque o corte as consumiu. */
@@ -333,6 +341,24 @@ export const PASSOS = [
     raio: 'prisioneiroFuroRaio',
     lados: 'ladosFuroPrisioneiro',
     orientacao: [0, 1, 0],
+  }],
+
+  /* O piloto é uma segunda peça de revolução, menor que o flange e depois dele
+     no eixo X. A diferença é pequena mas física: a roda centraliza no piloto;
+     só então sua face apoia no flange furado. Não é uma escala decorativa nem
+     uma transformação de runtime. */
+  ['cilindro', { origemId: PILOTO, raio: 'pilotoRaio', altura: 'pilotoComprimento', lados: 'ladosCubo' }],
+  paraEixoX(PILOTO),
+  ['transladar', { d: ['pilotoInicioX', 0, 0], sel: { alias: 'pilotoInteiro' } }],
+  ['parte', { nome: 'cubo', sel: { alias: 'pilotoInteiro' } }],
+
+  ['publicarPorta', {
+    nome: 'pilotoDaRoda',
+    de: { op: 'cilindro', id: PILOTO },
+    interface: {
+      forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [0, 0, 0],
+      raio: 'pilotoRaio', inicio: 'pilotoInicioX', fim: 'pilotoFimX',
+    },
   }],
 
   // ---- pastilhas: uma de cada lado do disco, com a folga de repouso ----

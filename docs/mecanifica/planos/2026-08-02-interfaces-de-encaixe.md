@@ -1,6 +1,6 @@
 # AUT-2026-06 — interfaces mensuráveis de encaixe
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -76,5 +76,21 @@ já existente, explicando por dados por que passa ou reprova — sem mover peça
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar: estado final, commits, gates,
-evidência visual e as sobras devolvidas ao backlog.
+Concluído em 2 de agosto de 2026. O piloto do `freio-disco` foi separado do
+flange e a roda/cubo agora publicam interfaces cilíndricas. A montagem
+`roda-no-freio` mede 3,05 mm de folga radial e distingue mutações radial, axial,
+direção e descentro; `pino-e-luva` prova o mesmo contrato fora do automotivo.
+O escopo continuou read-only: nenhuma peça recebeu pose derivada, hierarquia,
+solver ou regra global que esconda colisão.
+
+O gate de exportação revelou que `freio-disco` já é peça publicada. Em vez de
+remover a interface ou deixar o produto recebê-la muda, as portas passaram a
+viajar como campo opcional e compatível do artefato v1; o leitor as preserva e
+continua recusando esqueleto. Isso não exporta uma montagem nem altera a UI do
+produto, mas mantém a fronteira verificável.
+
+Gates verdes: 978 testes, tipos, build, gabarito de seleção, ID cru, guardas de
+portas e câmera, revisão ortográfica de freio/roda, exportação, mapa, links,
+TOC e planos. As sobras são o quadro completo, rotação/espelho/instância,
+detector de colisão, pose derivada, hierarquia e solver; permanecem no Recorte
+B e nos níveis seguintes de `MONTAGENS-SEMANTICAS.md`.

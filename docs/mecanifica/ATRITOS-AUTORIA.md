@@ -32,9 +32,9 @@ explícito manda mais que a posição no arquivo:
 | A-34 | resolvido por `lados:{desvio}` em `cilindro`, `cone` e `furo` |
 | A-33 | resolvido: triangulação completa depois do caminho compatível |
 | A-29 | candidato dentro de relações semânticas, sem plano ativo |
-| A-32 | dívida de desenho da peça, candidato `PEC-01` |
+| A-32 | resolvido por `PEC-01` no `AUT-2026-06`: piloto e flange separados |
 | A-30 | resolvido pela F1 do antigo Ciclo 6 |
-| A-16 | em execução por `AUT-2026-06`: interfaces mensuráveis de encaixe |
+| A-16 | Recorte A concluído por `AUT-2026-06`; limite geral de cavidades permanece |
 | A-1 | resolvido: câmera livre reproduzível por URL validada |
 | A-15 | retirado da Mecanifica com a Oficina humana |
 
@@ -228,6 +228,13 @@ desenho, não da linguagem.
 
 ### A-32 — o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo que o barril
 
+**Estado atual — RESOLVIDO:** `PEC-01` separou o piloto (raio 0,051) do flange
+(raio 0,052). O piloto aparece como terceiro corpo da parte `cubo`, publica a
+porta `pilotoDaRoda`, e a roda publica `cavidadeDoCubo`. A montagem read-only
+`roda-no-freio` mede 3,05 mm de folga radial; não reposiciona nem cria
+hierarquia. A evidência está em `tools/mecanifica/interfaces-montagem.test.ts`
+e no comando `npm run descrever:montagem -- roda-no-freio`.
+
 **Onde dói:** o desenho da peça `freio-disco`, e a régua que confere a montagem.
 
 **Evidência:** a rodada "Flange de uma peça só", ao decidir o raio do flange. Um
@@ -285,10 +292,12 @@ raio declarado e o grupo nomeado permanece estável quando a quantidade muda.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
-**Estado atual:** em execução no Recorte A de `AUT-05`, por
-[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). O escopo está
-limitado a interfaces cilíndricas e diagnóstico read-only; não autoriza solver,
-reposicionamento ou exceção silenciosa na régua global.
+**Estado atual:** o Recorte A de `AUT-05` foi concluído por
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). Interfaces
+cilíndricas e diagnóstico read-only explicam a cavidade do aro e o piloto do
+cubo; não autorizam solver, reposicionamento nem exceção silenciosa na régua
+global. O encaixe aro↔pneu e outras cavidades continuam exigindo contrato
+próprio nos níveis seguintes.
 
 **Onde dói:** conferência headless da bancada.
 

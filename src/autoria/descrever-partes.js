@@ -322,6 +322,7 @@ export function portasPublicadas(neutro) {
       recorte,
       origem: `${porta.de.op}:${porta.de.id}${recorte ? ` ${recorte}` : ''}`,
       passo: porta.passo,
+      ...(porta.interface === undefined ? {} : { interface: JSON.parse(JSON.stringify(porta.interface)) }),
     };
   });
 }
@@ -717,8 +718,16 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     { titulo: 'porta' },
     { titulo: 'origem' },
     { titulo: 'passo', direita: true },
+    { titulo: 'interface' },
   ];
-  const linhasPorta = portas.map((porta) => [porta.nome, porta.origem, porta.passo]);
+  const linhasPorta = portas.map((porta) => [
+    porta.nome,
+    porta.origem,
+    porta.passo,
+    porta.interface
+      ? `${porta.interface.forma} ${porta.interface.papel} r=${n(porta.interface.raio)} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
+      : '—',
+  ]);
   linhas.push(...(linhasPorta.length ? tabela(colunasPorta, linhasPorta) : ['(nenhuma porta publicada)']));
 
   return `${linhas.join('\n')}\n`;

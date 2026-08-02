@@ -13,10 +13,12 @@ Usa a mesma convenção da prancha do freio:
 | X | eixo da roda; `+X` é a face externa, do lado do cliente |
 | Y, Z | plano radial; `[0, 0, 0]` é o centro do cubo |
 
-A peça nasce em tamanho de componente (pneu de raio 0,340 m). Na cena, a roda
-usa escala 1,60 e o freio usa 2,45: isso faz a abertura interna do aro medir
-0,128 m e o cubo do freio medir 0,127 m de raio. É uma relação de montagem
-declarada nos registros de domínio, não uma coincidência de `Object3D`.
+A peça nasce em tamanho de componente (pneu de raio 0,340 m). Na pose manual
+congelada, a roda usa escala 1,60 e o freio usa 2,45: a cavidade do aro mede
+0,128 m, o piloto mede 0,12495 m e a folga radial declarada é 0,00305 m. A
+relação está em `prototipos/fps/v3/montagens/roda-no-freio.js`, não é uma
+coincidência de `Object3D`: `npm run descrever:montagem -- roda-no-freio` a
+valida sem mover nenhuma peça.
 
 Não acrescente `cubo`, prisioneiros ou manga de eixo a esta peça. Cada um é uma
 identidade física distinta e deverá ser autorado no seu próprio ativo quando o
@@ -29,6 +31,7 @@ segunda decide proporção e acabamento.
 
 ```bash
 npm run descrever -- roda-dianteira
+npm run descrever:montagem -- roda-no-freio
 npm run bancada -- roda-dianteira --vistas=direita,frontal,superior --projecao=ortografica --estrito
 npm run bancada -- roda-dianteira --selecionadas=aro,tampaCentral --modo=contexto --focar
 ```
@@ -47,16 +50,18 @@ npm run bancada -- roda-dianteira --selecionadas=aro,tampaCentral --modo=context
 | `aro` | 192 | `±0,095 · ±0,245 · ±0,245` | estrutura metálica que recebe o pneu e deixa o centro para o cubo |
 | `tampaCentral` | 22 | `0,095…0,115 · ±0,078 · ±0,078` | acabamento da face externa |
 
-São 494 faces e nenhuma face sem identidade. `pneuInteiro`, `aroInteiro` e
+São 734 faces e nenhuma face sem identidade. `pneuInteiro`, `aroInteiro` e
 `tampaCentralInteira` são aliases de seleção; `aroAbertura` nomeia a face
-interna estável para futuras regras visuais.
+interna estável para regras visuais. A porta `cavidadeDoCubo` declara, além da
+origem dessa face, uma interface cilíndrica interna: eixo X, raio interno e
+intervalo axial. Ela é o par dirigido de `pilotoDaRoda` no freio.
 
 ## Limite conhecido da régua
 
 O relatório atual mede relações corpo a corpo por envelopes. Assim, ele chama
 `aro↔pneu` de interpenetração mesmo quando o aro está corretamente assentado
-dentro da cavidade do pneu. Isso é aceitável para esta primeira composição,
-mas não deve virar uma exceção silenciosa: está registrado como A-16 em
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md). Uma futura porta de volume/assento
-semântico permitirá declarar o encaixe sem ensinar a ferramenta a ignorar
-interpenetrações reais.
+dentro da cavidade do pneu. Isso continua sendo um limite da régua global e não
+vira exceção silenciosa. O Recorte A de A-16 resolve apenas outra pergunta: a
+porta `cavidadeDoCubo` mede o encaixe do piloto sem esconder colisão global. A
+porta ainda não é detector universal de cavidade, deformação de borracha ou
+contato entre sólidos.

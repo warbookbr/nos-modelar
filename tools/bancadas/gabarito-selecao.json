@@ -1,6 +1,11 @@
 {
-  "hashTotal": "a0b248e5b1cf7699c47778eba6cd0beba51dace917ae9a1ff87aae01aa8ee15e",
+  "hashTotal": "3776c524b45c3b885c1523b5271ef2c80bb6d79810c83ed8c5d20a8919fd9c6e",
   "pecas": {
+    "_bloco-arredondado-composto": {
+      "hash": "9b062a92491d13fc8f13c873b1ac5352f2e76029addbfbc042fdbe15386a4e88",
+      "vertices": 30,
+      "faces": 29
+    },
     "_caixote-filetado": {
       "hash": "715099157e4c8c6179e0920d1e9712a2ae5724d3618b9cd5afd2291e2d0b4ea2",
       "vertices": 880,
@@ -25,6 +30,21 @@
       "hash": "992981953dafde8f3b8e8d473c2d8873349af0249a3332e80590a2d73d29c2a8",
       "vertices": 58,
       "faces": 68
+    },
+    "_flange-de-tubulacao": {
+      "hash": "313ad0580242953b0cb490e23bbd1882a2176be3b91a18de33e7f8886b661a2b",
+      "vertices": 152,
+      "faces": 244
+    },
+    "_gabarito-de-furacao": {
+      "hash": "f1cec73bebec2382f208bd57fe433f27b978dc18df3f75ee0e1fc4aff7d32544",
+      "vertices": 88,
+      "faces": 69
+    },
+    "_gabarito-triangulacao-de-furos": {
+      "hash": "aaaaaf1fd5c92b557ac7dc907f6cafd9b21177d5408fb1aef8b6bd18e97c1107",
+      "vertices": 72,
+      "faces": 144
     },
     "_galho": {
       "hash": "d0011787414ec3871177ef3338f80c2019b760b94db4888b11c2ee6fd4857cac",
@@ -117,9 +137,9 @@
       "faces": 192
     },
     "freio-disco": {
-      "hash": "ecb4e2fe50ef428518becd223896d7923b26a3513a8157031e95d5fcd15064cb",
-      "vertices": 498,
-      "faces": 508
+      "hash": "8b81129ae342683663872cbed2131bac0ec6f181c90ee212fcca27f0f00ba5d2",
+      "vertices": 530,
+      "faces": 526
     },
     "lanterna": {
       "hash": "711e2c57837371eb8559715b5a18c7f94cad8f1baa556d9bb3033731ab1e1b93",

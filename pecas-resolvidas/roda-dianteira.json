@@ -2,7 +2,7 @@
   "formato": "mecanifica.peca-resolvida",
   "versao": 1,
   "peca": "roda-dianteira",
-  "receita": "71a7e2e16943990a",
+  "receita": "1e610d79eb13e5fb",
   "meta": {
     "nome": "roda-dianteira"
   },
@@ -26,6 +26,34 @@
     "aro",
     "pneu",
     "tampaCentral"
+  ],
+  "portas": [
+    {
+      "nome": "cavidadeDoCubo",
+      "de": {
+        "op": "lathe",
+        "id": 402,
+        "faixa": 5
+      },
+      "passo": 13,
+      "interface": {
+        "forma": "cilindro",
+        "papel": "interna",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          0,
+          0,
+          0
+        ],
+        "raio": 0.08,
+        "inicio": -0.095,
+        "fim": 0.095
+      }
+    }
   ],
   "V": [
     [

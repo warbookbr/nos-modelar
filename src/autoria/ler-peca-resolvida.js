@@ -30,6 +30,24 @@ export function parteDaFace(linha) {
   return null;
 }
 
+function lerPortas(dado) {
+  if (dado.portas === undefined) return new Map();
+  if (!Array.isArray(dado.portas)) throw new Error('ler-peca: portas precisa ser lista quando presente');
+  const portas = new Map();
+  for (const porta of dado.portas) {
+    if (!porta || typeof porta !== 'object' || Array.isArray(porta)
+      || typeof porta.nome !== 'string' || !porta.nome
+      || !porta.de || typeof porta.de !== 'object' || Array.isArray(porta.de)
+      || typeof porta.de.op !== 'string' || porta.de.id === undefined
+      || !Number.isSafeInteger(porta.passo) || porta.passo < 0) {
+      throw new Error('ler-peca: porta inválida');
+    }
+    if (portas.has(porta.nome)) throw new Error(`ler-peca: porta duplicada '${porta.nome}'`);
+    portas.set(porta.nome, JSON.parse(JSON.stringify(porta)));
+  }
+  return portas;
+}
+
 /* devolve a forma que `adaptarThree` aceita: Mapas, e faces com id, vs e parte.
    Recusa formato ou versão desconhecidos com diagnóstico — um arquivo que este
    código não entende não pode virar peça pela metade na tela. */
@@ -61,5 +79,5 @@ export function lerPecaResolvida(dado) {
 
   /* `orfaos` vazio não é otimismo: o escritor RECUSA gravar peça com órfão,
      então todo arquivo que chega aqui já passou por aquela guarda. */
-  return { V, F, orfaos: [], merges: [], partes: {}, materiais: dado.materiais ?? {} };
+  return { V, F, orfaos: [], merges: [], partes: {}, portas: lerPortas(dado), materiais: dado.materiais ?? {} };
 }

@@ -377,10 +377,10 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-O plano ativo é [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md):
-interfaces mensuráveis de encaixe. Ele inicia o Recorte A de `AUT-05` com roda,
-cubo e uma fixture neutra, mas não autoriza posicionamento automático,
-hierarquia ou solver. O caminho canônico do plano é
+Não há plano ativo. O Recorte A de `AUT-05` foi concluído por
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md): interfaces
+cilíndricas mensuráveis para roda/cubo e pino/luva, ainda sem posicionamento
+automático, hierarquia ou solver. O caminho canônico do plano é
 `docs/mecanifica/planos/2026-08-02-interfaces-de-encaixe.md`. O plano mestre foi
 encerrado em 2 de agosto de 2026 e seu
 resultado está sintetizado em

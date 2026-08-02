@@ -99,9 +99,11 @@ export function conferirSemOrfaos(nome, orfaos) {
   );
 }
 
-/* O FORMATO LEVA V, F, materiais, partes e meta. Ele NÃO leva `portas` nem
-   `esqueleto`, e enquanto não levar, peça que publique uma dessas capacidades é
-   recusada na cara.
+/* O FORMATO LEVA V, F, materiais, partes, meta e portas opcionais. A porta é
+   dado de autoria, mas transportá-la de forma ADITIVA mantém o artefato útil
+   para uma bancada/cliente que já conhece esse contrato e inofensivo para o
+   leitor antigo que só usa geometria. `esqueleto` ainda não viaja e continua
+   recusado na cara.
 
    O motivo é o modo de falhar, não a falta em si. Uma peça com porta exportada
    hoje não daria erro: `lerPecaResolvida` devolve `partes: {}` e nenhum osso,
@@ -113,8 +115,6 @@ export function conferirSemOrfaos(nome, orfaos) {
    isso que isto passou despercebido até alguém perguntar. */
 export function conferirCapacidadesTransportaveis(nome, bruto) {
   const faltantes = [];
-  const portas = bruto.portas?.size ?? bruto.portas?.length ?? 0;
-  if (portas > 0) faltantes.push(`${portas} porta(s)`);
   if (bruto.esqueleto) faltantes.push('esqueleto');
   if (bruto.pesos?.size) faltantes.push(`peso de osso em ${bruto.pesos.size} vértice(s)`);
   if (faltantes.length === 0) return;
@@ -125,6 +125,11 @@ export function conferirCapacidadesTransportaveis(nome, bruto) {
     + 'Exportar assim entregaria ao produto uma peça muda, sem erro. '
     + 'Ou a peça sai da lista de publicadas, ou o formato cresce e a versão sobe.',
   );
+}
+
+function portasParaArtefato(portas) {
+  if (!(portas instanceof Map)) return [];
+  return [...portas.values()].map((porta) => JSON.parse(JSON.stringify(porta)));
 }
 
 export async function exportarPeca(nome, { paramsExtra = null } = {}) {
@@ -187,6 +192,7 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
     meta: { nome: mod.meta?.nome ?? nome },
     materiais: entrada.MATERIAIS,
     partes,
+    portas: portasParaArtefato(bruto.portas),
     V: canon.V,
     F: canon.F,
   };

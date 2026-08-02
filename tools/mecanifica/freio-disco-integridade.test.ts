@@ -266,11 +266,12 @@ describe('flange de roda: um disco, um passo de corte, quatro prisioneiros', () 
   it('UM passo de corte abre os quatro: o flange deixou de ser uma chapa por prisioneiro', () => {
     /* A afirmação central da rodada, e a que morre se alguém devolver os
        ressaltos. Antes: 4 passos de `furo` e 5 corpos no `cubo` (o barril mais
-       um ressalto por prisioneiro). Agora: 1 passo e 2 corpos. */
+       um ressalto por prisioneiro). Agora: 1 passo, flange único e o terceiro
+       corpo do cubo é o piloto declarado pelo AUT-2026-06. */
     const cortes = freio.PASSOS.filter((p: any) => p[0] === 'furo');
     expect(cortes.length).toBe(1);
     expect((cortes[0] as any)[1].centros.total).toBe('prisioneiros');
-    expect(corposDaParte(comSonda(), 'cubo').length).toBe(2);
+    expect(corposDaParte(comSonda(), 'cubo').length).toBe(3);
     // e nenhum `arranja` sobrou na peça: o círculo de furos não é mais cópia de sólido
     expect(freio.PASSOS.some((p: any) => p[0] === 'arranja')).toBe(false);
   });
@@ -387,16 +388,17 @@ describe('flange de roda: um disco, um passo de corte, quatro prisioneiros', () 
     }
   });
 
-  it('o flange não passa do raio do cubo: a roda ainda entra por cima dele', () => {
+  it('o piloto é menor que o flange: a roda centraliza antes de apoiar', () => {
     const P = freio.PARAMS;
     const neutro = comSonda();
     const cubo = caixaDaParte(neutro, 'cubo');
-    // o flange avança PARA FORA do carro, além da face do cubo
-    perto(cubo.max[0], medida('flangeFaceRodaX'));
-    expect(cubo.max[0]).toBeGreaterThan(medida('cuboFaceRodaX'));
-    /* e não cresce o envelope radial. Não é estética: o aro da roda entra por
-       cima do cubo com 0,6 mm de folga na escala da cena
-       (`roda-dianteira-integridade`), então um flange mais largo bateria nele. */
+    // piloto avança para fora do flange, mas é radialmente menor.
+    perto(cubo.max[0], medida('pilotoFimX'));
+    expect(medida('pilotoInicioX')).toBeCloseTo(medida('flangeFaceRodaX'), 9);
+    expect(medida('pilotoFimX')).toBeGreaterThan(medida('flangeFaceRodaX'));
+    expect(P.pilotoRaio).toBeLessThan(P.cuboRaio);
+    /* O flange continua no raio do barril para sustentar a face da roda; agora
+       isso não é o mesmo diâmetro que a centraliza. */
     perto(cubo.max[1], P.cuboRaio);
     perto(medida('flangeRaio'), P.cuboRaio);
   });

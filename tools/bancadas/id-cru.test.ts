@@ -160,7 +160,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
     'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
-    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta',
+    'profundidade', 'raio', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta', 'interface',
   ];
   /* `aresta` (ops `filete` e `arredondarAresta`) é o ÍNDICE LOCAL da aresta dentro do polígono de
      `de` — uma posição 0..cantos-1, a mesma classe de referência que `lado`

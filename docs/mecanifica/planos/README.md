@@ -5,10 +5,12 @@ histórico para que um roteiro não cresça indefinidamente.
 
 ## Estado atual
 
-**Plano ativo:** [`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md) —
-interfaces mensuráveis de encaixe. Ele executa somente o Recorte A de `AUT-05`:
-mede e diagnostica um encaixe cilíndrico já posado; não reposiciona peça, não
-abre hierarquia e não cria solucionador.
+**Plano ativo:** nenhum.
+
+`AUT-06`/A-16 e `PEC-01` foram concluídos em
+[`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md): interfaces cilíndricas
+mensuráveis e `encaixaCilindrico` dirigido, apenas read-only. Pose derivada,
+hierarquia e solucionador continuam fora do recorte.
 
 `AUT-06`/A-1 foi concluído em
 [`AUT-2026-05`](2026-08-02-camera-livre-reproduzivel.md), caminho canônico
