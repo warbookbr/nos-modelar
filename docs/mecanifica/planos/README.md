@@ -7,12 +7,17 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+A próxima melhoria técnica precisa ganhar um plano curto antes de começar.
+
+`AUT-03`/A-33 foi concluído em
+[`AUT-2026-03`](2026-08-02-triangulacao-de-furos.md), caminho canônico
+`docs/mecanifica/planos/2026-08-02-triangulacao-de-furos.md`.
+
 `AUT-04`/A-35 foi concluído em
 [`AUT-2026-02`](2026-08-02-concordancia-por-ponto.md), caminho canônico
 `docs/mecanifica/planos/2026-08-02-concordancia-por-ponto.md`. O `AUT-01` já foi
 concluído em [`AUT-2026-01`](2026-08-02-contagem-por-desvio.md), caminho
-`docs/mecanifica/planos/2026-08-02-contagem-por-desvio.md`. A próxima melhoria
-técnica precisa receber outro plano curto antes de começar.
+`docs/mecanifica/planos/2026-08-02-contagem-por-desvio.md`.
 
 O plano mestre anterior foi encerrado em
 [`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

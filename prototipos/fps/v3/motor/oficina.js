@@ -11,6 +11,7 @@
    O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
    mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
 import { criarResolverNumerico } from './expressoes.js';
+import earcut from 'earcut';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
 
@@ -1592,6 +1593,59 @@ function areaPoligono(P) {
   return a / 2;
 }
 
+/* Fallback completo para polígono com buracos. Ele recebe somente anéis já
+   validados por `furo`, não cria pontos e ainda passa pelas mesmas provas de
+   área, borda e famílias semânticas que protegem o caminho de pontes. */
+function triangularComEarcut(contorno, aneis) {
+  const pts = [], tags = [], plano = [], indicesDosAneis = [], baseAnel = [];
+  const incluir = (p, tag) => { pts.push(p); tags.push(tag); plano.push(p[0], p[1]); };
+  contorno.forEach((p, i) => incluir(p, { tipo: 'contorno', i }));
+  aneis.forEach((anel, k) => {
+    indicesDosAneis.push(pts.length); baseAnel.push(pts.length);
+    anel.forEach((p, j) => incluir(p, { tipo: 'anel', k, j }));
+  });
+  const saida = earcut(plano, indicesDosAneis, 2);
+  if (saida.length % 3) return { erro: 'o fallback de triangulação devolveu uma lista incompleta de triângulos' };
+  const tri = [];
+  for (let i = 0; i < saida.length; i += 3) {
+    const t = [saida[i], saida[i + 1], saida[i + 2]];
+    if (cruz2(pts[t[0]], pts[t[1]], pts[t[2]]) < 0) [t[1], t[2]] = [t[2], t[1]];
+    tri.push(t);
+  }
+
+  const esperado = contorno.length + aneis.reduce((s, r) => s + r.length, 0) + 2 * aneis.length - 2;
+  if (tri.length !== esperado) return { erro: `a partição saiu com ${tri.length} triângulo(s) e a contagem fechada é ${esperado}` };
+  let area = 0;
+  for (const [a, b, d] of tri) { const t = cruz2(pts[a], pts[b], pts[d]) / 2; if (!(t > 0)) return { erro: 'a partição criou um triângulo de área nula ou invertida' }; area += t; }
+  const alvo = areaPoligono(contorno) - aneis.reduce((s, r) => s + areaPoligono(r), 0);
+  if (Math.abs(area - alvo) > 1e-9 * Math.max(1, Math.abs(alvo))) return { erro: `a partição cobre ${area} de área e a região tem ${alvo}` };
+  const conta = new Map();
+  for (const [a, b, d] of tri) for (const [x, y] of [[a, b], [b, d], [d, a]]) conta.set(`${x}>${y}`, (conta.get(`${x}>${y}`) ?? 0) + 1);
+  const borda = new Set();
+  for (let i = 0; i < contorno.length; i++) borda.add(`${i}>${(i + 1) % contorno.length}`);
+  aneis.forEach((anel, k) => { for (let j = 0; j < anel.length; j++) borda.add(`${baseAnel[k] + (j + 1) % anel.length}>${baseAnel[k] + j}`); });
+  for (const [chave, n] of conta) {
+    const [x, y] = chave.split('>');
+    if (borda.has(chave)) { if (n !== 1) return { erro: `a aresta de borda ${chave} aparece ${n} vezes` }; continue; }
+    if (n !== 1 || (conta.get(`${y}>${x}`) ?? 0) !== 1) return { erro: `a aresta interna ${chave} não é compartilhada por exatamente dois triângulos` };
+  }
+  for (const chave of borda) if ((conta.get(chave) ?? 0) !== 1) return { erro: `a aresta de borda ${chave} ficou sem triângulo` };
+
+  const bordas = aneis.map((anel) => new Array(anel.length).fill(null));
+  const preenchimento = [];
+  tri.forEach((t) => {
+    const desc = { cantos: t.map((v) => tags[v]) };
+    let dono = null;
+    for (let e = 0; e < 3; e++) {
+      const x = tags[t[e]], y = tags[t[(e + 1) % 3]];
+      if (x.tipo === 'anel' && y.tipo === 'anel' && x.k === y.k && y.j === (x.j + aneis[x.k].length - 1) % aneis[x.k].length) { dono = { k: x.k, j: y.j }; break; }
+    }
+    if (dono) bordas[dono.k][dono.j] = desc; else preenchimento.push(desc);
+  });
+  for (let k = 0; k < bordas.length; k++) for (let j = 0; j < bordas[k].length; j++) if (!bordas[k][j]) return { erro: `a aresta ${j} do anel ${k} não caiu em triângulo nenhum` };
+  return { bordas, preenchimento };
+}
+
 /* A BORDA DE VÁRIOS ANÉIS (ciclo "Furo v2") — a partição do polígono quando o
    passo abre MAIS DE UM furo na mesma face. A borda anular de um anel só (a
    `bordaAnular` acima) é a volta simples entre um contorno e um anel; com dois
@@ -1633,7 +1687,7 @@ function areaPoligono(P) {
    causa era a orelha aceitar vértice EM CIMA de uma aresta sua — corrigido
    abaixo, com a família de simetrias em teste. A afirmação de que "não há
    entrada aceita que as faça falhar" era, na data em que foi escrita, falsa. */
-function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) => k)) {
+function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) => k), desvioDePonte = null) {
   const eps = 1e-12 * Math.max(1, escala * escala);
   const pts = [], tags = [];
   contorno.forEach((p, i) => { pts.push(p); tags.push({ tipo: 'contorno', i }); });
@@ -1645,7 +1699,8 @@ function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) =>
   /* `ordem` é a sequência de FUSÃO dos anéis, e não mexe em nada além disso: o
      anel `k` continua sendo o anel `k` na saída. O padrão é a ordem declarada
      pelo autor, que é a de sempre, byte por byte. */
-  for (const k of ordem) {
+  for (let etapaDaPonte = 0; etapaDaPonte < ordem.length; etapaDaPonte++) {
+    const k = ordem[etapaDaPonte];
     const L = aneis[k].length;
     const noDoAnel = (m, j) => baseAnel[m] + ((j % aneis[m].length) + aneis[m].length) % aneis[m].length;
     /* arestas que a ponte não pode cruzar: o polígono corrente e todo anel
@@ -1654,13 +1709,12 @@ function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) =>
     for (let t = 0; t < ciclo.length; t++) arestas.push([ciclo[t], ciclo[(t + 1) % ciclo.length]]);
     for (const m of pendentes) for (let j = 0; j < aneis[m].length; j++) arestas.push([noDoAnel(m, j), noDoAnel(m, j + 1)]);
 
-    let melhor = null;
+    const candidatas = [];
     for (let p = 0; p < ciclo.length; p++) {
       for (let j = 0; j < L; j++) {
         const a = ciclo[p], b = noDoAnel(k, j);
         const A = pts[a], B = pts[b];
         const comp = Math.hypot(B[0] - A[0], B[1] - A[1]);
-        if (melhor && comp >= melhor.comp) continue;
         let livre = true;
         for (const [x, y] of arestas) {
           if (x === a || y === a || x === b || y === b) continue;
@@ -1672,9 +1726,12 @@ function triangularComAneis(contorno, aneis, escala, ordem = aneis.map((_, k) =>
           if (!(margemDentro(contorno, meio) > 0)) livre = false;
           for (const m of pendentes) if (livre && margemDentro(aneis[m], meio) > 0) livre = false;
         }
-        if (livre) melhor = { p, j, comp };
+        if (livre) candidatas.push({ p, j, comp });
       }
     }
+    candidatas.sort((x, y) => (x.comp - y.comp) || (x.p - y.p) || (x.j - y.j));
+    const rank = desvioDePonte && desvioDePonte.etapa === etapaDaPonte ? desvioDePonte.rank : 0;
+    const melhor = candidatas[rank];
     if (!melhor) return { erro: `não há ponte livre entre o contorno e o anel ${k} — os anéis não repartem a face` };
     const seq = [];
     for (let t = 0; t <= L; t++) seq.push(noDoAnel(k, melhor.j - t));   // o anel percorrido AO CONTRÁRIO: buraco é borda horária
@@ -1841,12 +1898,31 @@ function ordensDePonte(contorno, aneis, raios) {
  */
 function particionar(contorno, aneis, escala, raios) {
   let primeiro = null;
-  for (const ordem of ordensDePonte(contorno, aneis, raios)) {
+  const ordens = ordensDePonte(contorno, aneis, raios);
+  for (const ordem of ordens) {
     const r = triangularComAneis(contorno, aneis, escala, ordem);
     if (!r.erro) return r;
     if (!primeiro) primeiro = r;
   }
-  return primeiro;
+  /* A poda não era o único ponto guloso: a ponte mais curta pode fechar uma
+     fresta que só outro anel alcançaria. Depois de preservar todas as escolhas
+     históricas, tente UMA ponte alternativa por vez, nas oito próximas posições
+     da ordem estável de candidatas. A árvore completa cresce exponencialmente;
+     este orçamento fixo é explícito e determinístico. Se ele não bastar, o passo
+     continua falhando fechado em vez de transformar uma peça em travamento. */
+  for (const ordem of ordens) {
+    for (let etapa = 0; etapa < ordem.length; etapa++) {
+      for (let rank = 1; rank <= 8; rank++) {
+        const r = triangularComAneis(contorno, aneis, escala, ordem, { etapa, rank });
+        if (!r.erro) return r;
+      }
+    }
+  }
+  /* Só depois de esgotar todas as escolhas legadas e o orçamento explícito de
+     pontes, use um triangulador completo. A guarda de entrada continua sendo
+     nossa e a saída atravessa as mesmas provas antes de virar face. */
+  const fallback = triangularComEarcut(contorno, aneis);
+  return fallback.erro ? primeiro : fallback;
 }
 
 /* ----------------------------------------------------------------------------

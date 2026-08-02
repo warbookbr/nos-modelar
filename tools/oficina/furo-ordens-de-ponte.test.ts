@@ -107,20 +107,13 @@ describe('A-30 — as três ordens de ponte', () => {
     }
   });
 
-  it('a figura que AINDA trava aborta o passo inteiro, sem deixar meia peça', () => {
-    const n = nucleo(FLANGE(7, 5, 8) as any, {}, {});
-    expect(n.orfaos.length, 'esta é uma das três que as três ordens não resolvem').toBeGreaterThan(0);
-    expect(n.orfaos[0].motivo).toMatch(/nenhuma orelha livre/);
-    expect([...n.F.keys()].filter((f: number) => f >= 1000), 'nenhuma face do bloco do furo sobreviveu').toHaveLength(0);
-    /* o que sobrou no estado é o cilindro inteiro, e ele está fechado: o furo
-       não deixou buraco pela metade. */
-    expect(arestasSemPar(n), 'o cilindro sem o furo continua sendo uma casca fechada').toEqual([]);
-
-    /* e mesmo assim a peça NÃO chega na tela. Escrevi primeiro o contrário —
-       que o adaptador aceitaria o que sobrou — e estava errado: ele recusa
-       qualquer peça com referência inválida, de propósito. Meia peça na tela é
-       pior do que peça nenhuma, porque parece que deu certo. */
-    expect(() => adaptarThree(n, { nome: 'travada' }))
-      .toThrow(/referência\(s\) inválida\(s\).*nenhuma orelha livre/s);
+  it('as três figuras antes bloqueadas agora fecham nos dois lados, sem mudar o contrato de faces', () => {
+    for (const [face, furo, total] of [[6, 3, 9], [7, 3, 8], [7, 5, 8]]) {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos, `face ${face}, ${total} furos de ${furo}`).toEqual([]);
+      conferirMalha(n, { fechada: true, rotulo: `fallback ${face}/${furo}/${total}` });
+      expect(arestasSemPar(n), 'a casca não pode abrir entre entrada e saída').toEqual([]);
+      expect(() => adaptarThree(n, { nome: `fallback-${face}-${furo}-${total}` })).not.toThrow();
+    }
   });
 });

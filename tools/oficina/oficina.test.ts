@@ -5556,18 +5556,16 @@ describe('furo v2 — face redonda com círculo de furos em simetria exata', () 
    Varredura de 14 212 combinações de `face × lados do furo × total`, com a
    mesma figura do flange (raio 0,052, furos de raio 0,0065 a 0,038 do centro):
 
-     10 758  saem inteiras, sem órfão;
-      1 240  gritam porque dois anéis se cruzam ou se encostam — CORRETO;
-      1 165  gritam porque um anel não cabe na face — CORRETO;
-        904  estouram o bloco de ids do passo — LIMITE DECLARADO do núcleo;
-         37  travam a partição: "nenhuma orelha livre" — DEFEITO ABERTO (A-33).
+   10 866  saem inteiras, sem órfão;
+    2 405  gritam porque anéis se cruzam ou um anel não cabe — CORRETO;
+      904  estouram o bloco de ids do passo — LIMITE DECLARADO do núcleo;
+       37  travavam a partição antes do fallback determinístico do A-33.
 
-   As 37 são todas face de POUCOS lados (6, 7, 8, 10, 18) com muitos furos
-   raspando a borda: o polígono com pontes vira fracamente simples com folga na
-   casa de 5·10⁻⁴, e a orelha não acha corte livre. O importante, e é o que
-   estas afirmações fixam, é que o caso ruim GRITA e ABORTA — nunca sai peça
-   com malha rasgada. Quando A-33 for consertado, o segundo bloco fica vermelho
-   e quem consertar move a linha para o primeiro.
+   As 37 são todas face de POUCOS lados (6, 7, 8, 10 e 18) com muitos furos
+   raspando a borda. O caminho histórico de ponte curta travava a orelha; o
+   fallback tenta uma ponte alternativa limitada, sem mudar o caminho de quem
+   já passava. Os três exemplos que representavam a fronteira agora precisam
+   construir casca fechada.
 ============================================================================ */
 describe('furo v2 — a fronteira medida da partição (A-33)', () => {
   const FLANGE = (ladosDaFace: number, ladosDoFuro: number, total: number) => [
@@ -5625,21 +5623,24 @@ describe('furo v2 — a fronteira medida da partição (A-33)', () => {
     });
   }
 
-  /* a região que AINDA trava, dita na cara. Cada linha veio da varredura de
-     14 212 e é geometricamente válida: os anéis cabem na face e não se tocam.
-     Sobraram três: as três ordens não são completude, e isso fica escrito. */
-  const AINDA_TRAVA: [number, number, number][] = [
-    [6, 3, 9], [7, 3, 8], [7, 5, 8],
+  /* A fronteira inteira antes bloqueada. Cada linha é geometricamente válida:
+     os anéis cabem na face e não se tocam. A lista fixa custa pouco e impede
+     que a medição cara de 14 212 casos envelheça fora da suíte. */
+  const FRONTEIRA_RESOLVIDA: [number, number, number][] = [
+    [6, 3, 7], [6, 3, 8], [6, 3, 9], [6, 3, 10], [6, 3, 11],
+    [6, 4, 7], [6, 4, 9], [6, 5, 7], [6, 5, 10],
+    ...Array.from({ length: 19 }, (_, k) => [6, k + 6, 7] as [number, number, number]),
+    [7, 3, 8], [7, 3, 9], [7, 5, 8],
+    [8, 3, 9], [8, 3, 10], [8, 4, 10], [8, 4, 11],
+    [10, 4, 11], [18, 3, 11],
   ];
-  for (const [face, furo, total] of AINDA_TRAVA) {
-    it(`face de ${face} lados com ${total} furos de ${furo}: trava, e trava GRITANDO (A-33)`, () => {
+  for (const [face, furo, total] of FRONTEIRA_RESOLVIDA) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: o fallback fecha a partição (A-33)`, () => {
       const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
-      expect(n.orfaos.length).toBeGreaterThan(0);
-      expect(n.orfaos[0].motivo).toMatch(/nenhuma orelha livre/);
-      /* e o passo ABORTA inteiro: o que não dá para particionar não vira meia
-         peça na tela. Nenhuma face nem vértice do bloco do furo sobrevive. */
-      expect([...n.F.keys()].filter((f: number) => f >= 1000)).toHaveLength(0);
-      expect([...n.V.keys()].filter((v: number) => v >= 1000)).toHaveLength(0);
+      expect(n.orfaos.map((o: any) => o.motivo)).toEqual([]);
+      expect(arestasSoltas(n), 'a casca não pode abrir entre entrada e saída').toBe(0);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000), 'a contagem fechada continua valendo')
+        .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
     });
   }
 });

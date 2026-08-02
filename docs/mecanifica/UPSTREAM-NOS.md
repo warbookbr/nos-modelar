@@ -103,6 +103,8 @@ semântica e seus limites sejam declarados.
 O limite de silhueta registrado historicamente em UP-024 foi pago por UP-030;
 ele permanece naquela linha apenas como fronteira da entrega original.
 
+| UP-032 | Triangulação completa de face plana com vários furos, compatível com o caminho já salvo | provada em núcleo e fixture neutra | A-33 revelou 37 figuras válidas que passavam pelas guardas de `furo`, mas travavam na ponte gulosa + orelhas. O caminho antigo permanece primeiro, com três ordens e orçamento fixo de alternativas, preservando byte a byte toda peça que já fechava. Só depois entra Earcut (dependência ISC, sem Three.js), que usa exclusivamente os vértices originais. A saída não é aceita por confiança na biblioteca: atravessa as mesmas provas de contagem de Euler, área, borda orientada e família semântica antes de gerar faces. As 37 assinaturas históricas são regressão de casca fechada e contagem em `tools/oficina/oficina.test.ts`; três atravessam o adaptador; `_gabarito-triangulacao-de-furos` prova o último caso na bancada com 144 faces, 0 órfão e 0 face sem identidade | Capacidade geométrica geral, independente de Three.js e de domínio automotivo. Para extrair, leve a chamada a Earcut, o portão de provas e a lista de regressão; não copie apenas a biblioteca. Limite: entradas inválidas continuam recusadas pelas guardas de `furo`, e uma saída que não passar nas provas volta ao erro fechado do caminho histórico |
+
 ## UP-005 — fronteira de renderização provada
 
 **Problema observado:** `oficina.js` já separava `nucleo()` de `adaptarV3()`,

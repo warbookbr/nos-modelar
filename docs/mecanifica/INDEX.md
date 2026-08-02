@@ -98,9 +98,11 @@ Estado atual:
   ao produto ACHOU um defeito no núcleo: a orelha da partição aceitava vértice
   EM CIMA de uma aresta sua, e a face simétrica do flange (16 lados, 4 anéis de
   12 a 90°) gritava. Corrigido; 17 de 240 combinações gritavam antes, 0 depois
-  — e essa conta vale DENTRO das 240. Varrendo 14 212, sobram 37 que travam a
-  partição, todas face de poucos lados com furo raspando a borda: é o A-33,
-  aberto, com a fronteira medida e fixada em teste.
+  — e essa conta vale DENTRO das 240. A varredura histórica de 14 212 encontrou
+  37 que travavam a partição, todas face de poucos lados com furo raspando a
+  borda. O A-33 fechou depois: o caminho de pontes antigo fica intacto, e o
+  fallback completo só entra quando ele esgota; as 37 assinaturas viraram
+  regressão fixa de casca fechada e contagem exata.
   O que ela NÃO fez naquele momento: a silhueta continuou com a contagem escrita
   e o flange tem o raio do cubo, sem degrau piloto/flange, porque o aro
   entra por cima do cubo com 0,6 mm de folga (A-32, novo);

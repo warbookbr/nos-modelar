@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-246 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+248 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -124,6 +124,7 @@
 
 - `2026-08-02-concordancia-por-ponto.md` — AUT-2026-02 — discretização por concordância
 - `2026-08-02-contagem-por-desvio.md` — AUT-2026-01 — contagem circular por desvio
+- `2026-08-02-triangulacao-de-furos.md` — AUT-2026-03 — triangulação robusta de vários furos
 - `BACKLOG.md` — Backlog de candidatos
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
 - `MODELO.md` — [ID] — resultado curto
@@ -184,6 +185,7 @@
 - `_flange-de-tubulacao.js` — PEÇA DE EXERCÍCIO — prova geral da F1/A-30: uma flange de tubulação abre, em UM passo, a passagem central e o círculo de fixação com raios diferentes. Os gru…
 - `_frondosa.js` — scratch: prova de 'seca'/'raiz' (malhas separadas, afiadas) + 'frondosa' (copa fundida). Fila: seca | raiz | 4× frondosa.
 - `_gabarito-de-furacao.js` — PEÇA DE EXERCÍCIO — prova geral do A-34. Um gabarito de bancada combina cilindro, cone e furo escritos pela mesma tolerância geométrica. O objeto não sabe na…
+- `_gabarito-triangulacao-de-furos.js` — PEÇA DE EXERCÍCIO — prova geral do A-33. Um disco hexagonal recebe dez furos triangulares muito próximos da borda: é a fronteira que a ponte gulosa não repar…
 - `_galho.js` — PEÇA-EXEMPLO do P4 do playground: um GALHO — o objeto que SÓ o `loft` faz hoje (uma sequência de SEÇÕES circulares encadeada ao longo de um CAMINHO 3D). É o …
 - `_jardineira.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA da Fundação de autoria v1: uma jardineira de janela com uma muda plantada (caixa, terra, bulbo, caule, folhagem e …
 - `_modelo.js` — _modelo — o "olá mundo" da OFICINA (D-55): copie este arquivo pra criar uma peça nova. Mostra o contrato inteiro: textura procedural, geometria e ANIMAÇÃO (m…

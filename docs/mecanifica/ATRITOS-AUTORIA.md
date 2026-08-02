@@ -30,7 +30,7 @@ explícito manda mais que a posição no arquivo:
 | A-36 | resolvido para aresta simples por `arredondarAresta`; o restante é A-37 |
 | A-35 | resolvido: discretização local por concordância |
 | A-34 | resolvido por `lados:{desvio}` em `cilindro`, `cone` e `furo` |
-| A-33 | aberto, falha fechada; candidato `AUT-03` |
+| A-33 | resolvido: triangulação completa depois do caminho compatível |
 | A-29 | candidato dentro de relações semânticas, sem plano ativo |
 | A-32 | dívida de desenho da peça, candidato `PEC-01` |
 | A-30 | resolvido pela F1 do antigo Ciclo 6 |
@@ -147,34 +147,30 @@ problema e não volta acoplada a este atrito.
 
 **Como apareceu:** a rodada "Flange de uma peça só" registrou "17 de 240
 combinações gritavam antes, 0 depois". A frase vale DENTRO das 240 escolhidas.
-Varrendo 14 212 combinações da mesma figura (face de 3 a 36 lados, furo de 3 a
-24 lados, 2 a 20 furos; raio da face 0,052, furos de raio 0,0065 a 0,038 do
-centro):
+A varredura histórica de 14 212 combinações da mesma figura (face de 3 a 36
+lados, furo de 3 a 24 lados, 2 a 20 furos; raio da face 0,052, furos de raio
+0,0065 a 0,038 do centro) encontrou:
 
 | resultado | casos | julgamento |
 | --- | ---: | --- |
-| sai inteira, sem órfão | 10 758 | — |
-| dois anéis se cruzam ou se encostam | 1 240 | grito CORRETO |
-| um anel não cabe na face | 1 165 | grito CORRETO |
+| sai inteira, sem órfão | 10 866 | — |
+| anéis se cruzam ou um anel não cabe | 2 405 | grito CORRETO |
 | estoura o bloco de ids do passo | 904 | limite DECLARADO do núcleo |
-| a partição trava: "nenhuma orelha livre" | 37 | **defeito, este atrito** |
+| a partição trava: "nenhuma orelha livre" | 37 | **defeito, resolvido** |
 
-**Evidência:** as 37 são todas face de POUCOS lados (6, 7, 8, 10 e 18) com
-muitos furos raspando a borda — por exemplo face de 6 lados com 7 furos de 3
-lados, onde o anel fica a cerca de 5·10⁻⁴ da aresta da face. O polígono com as
-pontes para os buracos é fracamente simples, e com folga dessa ordem a busca de
-orelha não acha corte livre.
+**Evidência e resolução:** as 37 têm face de POUCOS lados (6, 7, 8, 10 e 18)
+e muitos furos raspando a borda. O caminho de ponte curta preserva cada saída
+que já fechava; só quando suas três ordens e o orçamento determinístico de
+pontes alternativas não fecham entra Earcut, que triangula os mesmos vértices
+sem criar junção em T. A saída ainda atravessa as provas próprias de contagem,
+área, bordas e famílias semânticas antes de alterar a face.
 
-**O que já está garantido:** o caso ruim GRITA e ABORTA o passo inteiro, com
-0 V e 0 F do bloco do furo. Não sai peça com malha rasgada. Está fixado em
-`tools/oficina/oficina.test.ts`, num bloco que também varre 147 combinações da
-região sadia. Quando o defeito for consertado, esse segundo bloco fica vermelho
-e quem consertar move as linhas para o primeiro.
-
-**Capacidade candidata:** triangulação de polígono com buracos que não dependa
-de ponte + orelha — ou uma ponte escolhida por critério de robustez em vez do
-primeiro corte visível. É geral: vale para qualquer face com mais de um buraco,
-em qualquer família de objeto.
+`tools/oficina/oficina.test.ts` mantém as 37 assinaturas como regressão de
+casca fechada e contagem exata; `tools/oficina/furo-ordens-de-ponte.test.ts`
+leva três casos até o adaptador. A fixture neutra
+`_gabarito-triangulacao-de-furos` exercita o último caso (hexágono, dez furos
+triangulares) e saiu com 144 faces, 0 órfão e 0 face sem identidade na bancada.
+Casos geometricamente inválidos continuam abortando antes de qualquer malha.
 
 ### A-29 — o passo do arranjo radial só dá centro NOMEÁVEL em 90°, 180° e 270°
 
