@@ -3429,28 +3429,26 @@ export const OPS = {
                        Sem default: o centroide da face seria um default
                        ESPERTO, e um furo que muda de lugar quando a face muda
                        de forma é a classe de surpresa que este núcleo recusa;
-       `centros`       VÁRIOS furos no mesmo passo (ciclo "Furo v2", A-26), nas
-                       duas formas que o autor mecânico usa para dizer isso:
-                         `centros: [[x,y,z], …]` — a lista, um ponto do mundo
-                           por furo, cada um projetado no plano da entrada;
-                         `centros: {pivo, distancia, total, volta|graus}` — o
-                           CÍRCULO de parafusos dito como frase: "quatro furos
-                           a 40 mm do centro" é `{distancia:'orbita',
-                           total:4, volta:360}`. As palavras são as MESMAS do
-                           `arranja` e significam a mesma coisa (`total` conta
-                           os furos, `volta` é o arco FECHADO e o passo é
-                           `volta/total`, `graus` é o passo direto, as duas
-                           juntas ou nenhuma GRITAM). O círculo mora no plano
-                           da entrada, em torno do `pivo` projetado (ausente =
-                           a origem do mundo), e o furo 0 fica na direção do
-                           `+u` da face — a mesma que `orientacao` declara.
-                           Esta forma é o que tira o seno e o cosseno do
-                           arquivo salvo (A-29): a peça diz quantos e a que
-                           distância, não onde cada um caiu.
+       `centros`       VÁRIOS furos no mesmo passo (F1/A-30), como lista de
+                       grupos na ordem escrita. Cada item é:
+                         `[x,y,z]` — um ponto que herda o raio do passo;
+                         `{centro:[x,y,z], raio?}` — um DISCO com raio próprio
+                           opcional;
+                         `{pivo?, distancia, total, volta|graus, raio?}` — um
+                           CÍRCULO de discos, cujo raio opcional vale para cada
+                           um dos `total` furos. O círculo de topo continua
+                           aceito com a mesma gramática. `total`, `volta` e
+                           `graus` significam o mesmo que em `arranja`; o
+                           círculo mora no plano da entrada e o furo 0 segue a
+                           direção `+u` (ou `orientacao`). Assim a peça diz
+                           quantos furos há e a que distância, sem seno nem
+                           cosseno no formato salvo (A-29).
                        `centro` e `centros` dizem a mesma coisa em número
                        diferente: as duas juntas GRITAM, nenhuma das duas
                        GRITA. `centros` com UM ponto é idêntico a `centro`;
-       `raio`          OBRIGATÓRIO, > 0, dimensional;
+       `raio`          PARAM dimensional > 0, padrão do passo. Pode faltar
+                       somente se TODO furo vindo de `centros` declarar o seu
+                       próprio raio; `centro` singular sempre usa o padrão;
        `lados`         TOPO (padrão 8, mín 3): muda a CONTAGEM, logo renumera;
        `saida`         a origem estrutural da face de SAÍDA — furo PASSANTE;
        `profundidade`  distância > 0 ao longo do eixo — furo CEGO;
@@ -3524,11 +3522,9 @@ export const OPS = {
     if (!temSaida && !temProfundidade) return grita(st, i, 'furo', 'saida+profundidade', "furo exige saida (a face por onde ele sai, passante) ou profundidade (onde ele para, cego) — exatamente uma");
 
     // ---- dimensões ----
-    const raio = st.num(a.raio ?? 0);
-    if (!(raio > 0) || !Number.isFinite(raio)) return grita(st, i, 'furo', 'raio', `raio precisa ser > 0 (recebido ${JSON.stringify(a.raio ?? null)} = ${raio}); raio 0 seria um furo que não abre nada`);
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
 
-    /* ---- QUANTOS furos: `centro` (um) ou `centros` (vários, lista ou círculo) ---- */
+    /* ---- QUANTOS furos: `centro` (um) ou `centros` (vários grupos) ---- */
     const temCentro = a.centro != null, temCentros = a.centros != null;
     if (temCentro && temCentros) return grita(st, i, 'furo', 'centro+centros', 'centro e centros dizem a mesma coisa em número diferente (centro = UM furo; centros = vários no mesmo passo) — declare exatamente uma');
     if (!temCentro && !temCentros) return grita(st, i, 'furo', 'centro', 'furo exige centro:[x,y,z] — o ponto do mundo por onde ele passa, projetado no plano da entrada — ou centros, para vários furos no mesmo passo');
@@ -3538,40 +3534,66 @@ export const OPS = {
       if (!v.every((n) => Number.isFinite(n))) return `${nome} não é um ponto finito: ${JSON.stringify(v)}`;
       return null;
     };
-    let mundoCentros = null;   // a forma por LISTA: os pontos já resolvidos
-    let circulo = null;        // a forma por CÍRCULO: resolvida só depois do quadro da face
+
+    /* Cada item vira uma FONTE. A expansão só acontece depois de conhecer o
+       quadro da face, mas a ordem das fontes já é a ordem semântica dos furos:
+       ponto, disco ou os `total` pontos de um círculo ocupam k=0,1,2… exatamente
+       como eram antes. `raio` do item é PARAM; L continua único no passo porque
+       é TOPO e decide a numeração do bloco. */
+    const fontes = [];
+    const lerCirculo = (item, nome) => {
+      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus', 'raio'];
+      const estranha = Object.keys(item).find((k) => !chaves.includes(k));
+      if (estranha) return { erro: `${nome} em círculo usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma` };
+      const total = st.num(item.total ?? 0);
+      if (!Number.isSafeInteger(total) || total < 2) return { erro: `${nome} em círculo precisa de total inteiro ≥ 2 (um círculo de um furo é o próprio centro); recebido ${JSON.stringify(item.total ?? null)} = ${total}` };
+      const distancia = st.num(item.distancia ?? 0);
+      if (!(distancia > 0) || !Number.isFinite(distancia)) return { erro: `${nome} em círculo precisa de distancia > 0 (o raio do círculo de furos, não o do furo); recebido ${JSON.stringify(item.distancia ?? null)} = ${distancia}` };
+      const temVolta = item.volta != null, temGraus = item.graus != null;
+      if (temVolta && temGraus) return { erro: 'volta e graus dizem coisas diferentes (volta = o arco FECHADO do círculo, passo = volta/total; graus = o passo entre furos consecutivos) — declare exatamente uma' };
+      if (!temVolta && !temGraus) return { erro: `${nome} em círculo exige volta (arco fechado, passo = volta/total) ou graus (passo entre furos consecutivos) — exatamente uma` };
+      const passoGraus = temVolta ? st.num(item.volta) / total : st.num(item.graus);
+      if (!Number.isFinite(passoGraus)) return { erro: 'o passo angular do círculo não é um número finito' };
+      for (let k = 1; k < total; k++) if (k * passoGraus % 360 === 0) return { erro: `o furo ${k} cairia a ${k * passoGraus}° do furo 0, um múltiplo exato de 360° — dois furos no mesmo lugar; nenhum furo foi aberto` };
+      let pivo = [0, 0, 0];
+      if (item.pivo != null) {
+        const erro = conferirPonto(item.pivo, 'pivo');
+        if (erro) return { erro };
+        pivo = st.vec(item.pivo);
+      }
+      return { fonte: { tipo: 'circulo', pivo, distancia, total, passoGraus, raio: item.raio } };
+    };
     if (temCentro) {
       const erro = conferirPonto(a.centro, 'centro');
       if (erro) return grita(st, i, 'furo', 'centro', erro);
-      mundoCentros = [st.vec(a.centro)];
+      fontes.push({ tipo: 'ponto', ponto: st.vec(a.centro), raio: undefined });
     } else if (Array.isArray(a.centros)) {
       if (!a.centros.length) return grita(st, i, 'furo', 'centros', 'centros é uma lista vazia — um passo que não abre furo nenhum é um no-op silencioso');
       for (let k = 0; k < a.centros.length; k++) {
-        const erro = conferirPonto(a.centros[k], `centros[${k}]`);
-        if (erro) return grita(st, i, 'furo', 'centros', erro);
+        const item = a.centros[k];
+        if (Array.isArray(item)) {
+          const erro = conferirPonto(item, `centros[${k}]`);
+          if (erro) return grita(st, i, 'furo', 'centros', erro);
+          fontes.push({ tipo: 'ponto', ponto: st.vec(item), raio: undefined });
+        } else if (item && typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'centro')) {
+          const chaves = ['centro', 'raio'];
+          const estranha = Object.keys(item).find((nome) => !chaves.includes(nome));
+          if (estranha) return grita(st, i, 'furo', 'centros', `centros[${k}] como disco usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
+          const erro = conferirPonto(item.centro, `centros[${k}].centro`);
+          if (erro) return grita(st, i, 'furo', 'centros', erro);
+          fontes.push({ tipo: 'ponto', ponto: st.vec(item.centro), raio: item.raio });
+        } else if (item && typeof item === 'object') {
+          const r = lerCirculo(item, `centros[${k}]`);
+          if (r.erro) return grita(st, i, 'furo', 'centros', r.erro);
+          fontes.push(r.fonte);
+        } else {
+          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {centro, raio?} ou um círculo {pivo, distancia, total, volta|graus, raio?}; recebido ${JSON.stringify(item)}`);
+        }
       }
-      mundoCentros = a.centros.map((p) => st.vec(p));
     } else if (a.centros && typeof a.centros === 'object') {
-      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus'];
-      const estranha = Object.keys(a.centros).find((k) => !chaves.includes(k));
-      if (estranha) return grita(st, i, 'furo', 'centros', `centros em círculo usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
-      const total = st.num(a.centros.total ?? 0);
-      if (!Number.isSafeInteger(total) || total < 2) return grita(st, i, 'furo', 'centros', `centros em círculo precisa de total inteiro ≥ 2 (um círculo de um furo é o próprio centro); recebido ${JSON.stringify(a.centros.total ?? null)} = ${total}`);
-      const distancia = st.num(a.centros.distancia ?? 0);
-      if (!(distancia > 0) || !Number.isFinite(distancia)) return grita(st, i, 'furo', 'centros', `centros em círculo precisa de distancia > 0 (o raio do círculo de furos, não o do furo); recebido ${JSON.stringify(a.centros.distancia ?? null)} = ${distancia}`);
-      const temVolta = a.centros.volta != null, temGraus = a.centros.graus != null;
-      if (temVolta && temGraus) return grita(st, i, 'furo', 'centros', "volta e graus dizem coisas diferentes (volta = o arco FECHADO do círculo, passo = volta/total; graus = o passo entre furos consecutivos) — declare exatamente uma");
-      if (!temVolta && !temGraus) return grita(st, i, 'furo', 'centros', 'centros em círculo exige volta (arco fechado, passo = volta/total) ou graus (passo entre furos consecutivos) — exatamente uma');
-      const passoGraus = temVolta ? st.num(a.centros.volta) / total : st.num(a.centros.graus);
-      if (!Number.isFinite(passoGraus)) return grita(st, i, 'furo', 'centros', 'o passo angular do círculo não é um número finito');
-      for (let k = 1; k < total; k++) if (k * passoGraus % 360 === 0) return grita(st, i, 'furo', 'centros', `o furo ${k} cairia a ${k * passoGraus}° do furo 0, um múltiplo exato de 360° — dois furos no mesmo lugar; nenhum furo foi aberto`);
-      let pivo = [0, 0, 0];
-      if (a.centros.pivo != null) {
-        const erro = conferirPonto(a.centros.pivo, 'pivo');
-        if (erro) return grita(st, i, 'furo', 'centros', erro);
-        pivo = st.vec(a.centros.pivo);
-      }
-      circulo = { pivo, distancia, total, passoGraus };
+      const r = lerCirculo(a.centros, 'centros');
+      if (r.erro) return grita(st, i, 'furo', 'centros', r.erro);
+      fontes.push(r.fonte);
     } else {
       return grita(st, i, 'furo', 'centros', `centros é uma lista [[x,y,z], …] ou um círculo {pivo, distancia, total, volta|graus}; recebido ${JSON.stringify(a.centros)}`);
     }
@@ -3603,24 +3625,36 @@ export const OPS = {
       const d = (p[0] - entrada.centro[0]) * N[0] + (p[1] - entrada.centro[1]) * N[1] + (p[2] - entrada.centro[2]) * N[2];
       return [p[0] - N[0] * d, p[1] - N[1] * d, p[2] - N[2] * d];
     };
-    let centros;
-    if (circulo) {
-      const p0 = projetarNoPlano(circulo.pivo);
-      centros = [];
-      for (let k = 0; k < circulo.total; k++) {
-        const t = (circulo.passoGraus * k * Math.PI) / 180;
-        const cu = Math.cos(t) * circulo.distancia, cw = Math.sin(t) * circulo.distancia;
-        centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+    const centros = [], raiosBrutos = [];
+    for (const fonte of fontes) {
+      if (fonte.tipo === 'ponto') {
+        centros.push(projetarNoPlano(fonte.ponto));
+        raiosBrutos.push(fonte.raio);
+        continue;
       }
-    } else {
-      centros = mundoCentros.map(projetarNoPlano);
+      const p0 = projetarNoPlano(fonte.pivo);
+      for (let q = 0; q < fonte.total; q++) {
+        const t = (fonte.passoGraus * q * Math.PI) / 180;
+        const cu = Math.cos(t) * fonte.distancia, cw = Math.sin(t) * fonte.distancia;
+        centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+        raiosBrutos.push(fonte.raio);
+      }
     }
     const M = centros.length;
+    const raiosPorFuro = [];
+    for (let k = 0; k < M; k++) {
+      const bruto = raiosBrutos[k] ?? a.raio;
+      if (bruto == null) return grita(st, i, 'furo', 'raio', `o furo ${k} não tem raio: nem ele declara um, nem o passo declara o raio padrão`);
+      const r = st.num(bruto);
+      if (!(r > 0) || !Number.isFinite(r)) return grita(st, i, 'furo', 'raio', `o furo ${k} tem raio inválido (recebido ${JSON.stringify(bruto)} = ${r}); raio precisa ser > 0`);
+      raiosPorFuro.push(r);
+    }
 
     // um anel por centro, e a margem de cada um conferida contra o contorno
     const aneisEntrada = [], relEntrada = [], anelUVEntrada = [];
     for (let k = 0; k < M; k++) {
       const c0 = centros[k];
+      const raio = raiosPorFuro[k];
       const anel = [];
       for (let j = 0; j < L; j++) {
         const t = (j / L) * Math.PI * 2;
@@ -3635,6 +3669,12 @@ export const OPS = {
       aneisEntrada.push(anel); relEntrada.push({ uvRel, anelRel }); anelUVEntrada.push(anel.map(entrada.proj));
     }
     for (let k = 0; k < M; k++) for (let l = k + 1; l < M; l++) {
+      const kDentroDeL = anelUVEntrada[k].every((p) => margemDentro(anelUVEntrada[l], p) > 1e-9 * Math.max(1, entrada.escala));
+      const lDentroDeK = anelUVEntrada[l].every((p) => margemDentro(anelUVEntrada[k], p) > 1e-9 * Math.max(1, entrada.escala));
+      if (kDentroDeL || lDentroDeK) {
+        const dentro = kDentroDeL ? k : l, fora = kDentroDeL ? l : k;
+        return grita(st, i, 'furo', 'centros', `o anel ${dentro} (raio ${raiosPorFuro[dentro]}) está DENTRO do anel ${fora} (raio ${raiosPorFuro[fora]}) na face de entrada ${entradaId} — furo dentro de furo não é uma superfície que esta operação sabe escrever`);
+      }
       if (aneisSeSobrepoem(anelUVEntrada[k], anelUVEntrada[l], entrada.escala)) return grita(st, i, 'furo', 'centros', `os anéis ${k} e ${l} se cruzam ou se encostam na face de entrada ${entradaId} — dois furos sobrepostos não são um furo em oito`);
     }
 
@@ -3704,13 +3744,13 @@ export const OPS = {
     } else {
       /* cada LADO da chapa tenta por conta própria: a geometria da entrada e a
          da saída não são a mesma, e uma ordem que fecha num lado pode travar no
-         outro. `raios` fica nulo enquanto o passo tem um raio só — aí a terceira
-         ordem é igual à declarada e some sozinha. */
-      const pE = particionar(entrada.uv, anelUVEntrada, entrada.escala, null);
+         outro. `raiosPorFuro` preserva a ordem declarada; se todos os raios
+         empatam, a terceira ordem é igual à declarada e some sozinha. */
+      const pE = particionar(entrada.uv, anelUVEntrada, entrada.escala, raiosPorFuro);
       if (pE.erro) return grita(st, i, 'furo', 'de', `entrada: ${pE.erro}`);
       bordaE = pE.bordas; cheioE = pE.preenchimento;
       if (temSaida) {
-        const pS = particionar(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala, null);
+        const pS = particionar(saida.uv, saida.anelUV.map((anel) => ordemSaida.map((j) => anel[j])), saida.escala, raiosPorFuro);
         if (pS.erro) return grita(st, i, 'furo', 'saida', `saída: ${pS.erro}`);
         bordaS = pS.bordas; cheioS = pS.preenchimento;
       }

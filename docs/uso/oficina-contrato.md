@@ -305,6 +305,12 @@ Sem o servidor no ar, cai pro download comum — funciona, mas você move o arqu
 | FEITO | `solido` | `faces:[ids]` (legado) ou `sel` | Marca as faces resolvidas que entram na colisão. |
 | FEITO | `pesar` | `osso`, `vs?: [ids]` (ou `faces?: [ids]`), `peso` | FEITO (passo 14a, esqueleto/skinning). Soma `peso` de influência do OSSO aos vértices dados (diretamente por `vs` ou por `faces`, resolvidas pros vértices). Acumula por (vértice, osso); vértice sem osso nenhum some ORFÃO, não corrompe a malha. Achado da Rodada 3 da reorganização de docs: a op existe no núcleo (`OPS.pesar`) desde o passo 14a, mas não tinha linha nesta tabela — só prosa em "Passos propostos" mais abaixo (que é sobre outra coisa: esqueleto/hierarquia, não esta op). |
 
+**Atualização F1/A-30 — raio por grupo:** `furo.centros` também aceita uma lista
+que mistura pontos `[x,y,z]`, discos `{centro:[x,y,z], raio?}` e círculos
+`{pivo?, distancia, total, volta|graus, raio?}`. O `raio` do passo é o padrão;
+ele só pode faltar se cada furo expandido declarar o próprio raio. `lados`
+continua único no passo, pois é TOPO e preserva a numeração das famílias.
+
 ### Seleção uniforme (`sel`) — D-129 / D-131
 
 > **Experimental — não é formato definitivo.** `origemId`, `sel.origem` e

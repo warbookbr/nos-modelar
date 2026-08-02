@@ -114,10 +114,13 @@ Estado atual:
 - **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
   porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
   `centros` desarma o caso do círculo de furos, não o caso geral; o flange
-  deixou de ser a evidência dele), A-30 (um passo de furo tem UM raio, então a
-  flange com furo central mais círculo de parafusos ainda não é escrevível) e
-  A-32 (o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo
-  que o barril, porque o aro entra por cima dele com 0,6 mm de folga);
+  deixou de ser a evidência dele) e A-32 (o cubo do freio não tem cubo-piloto:
+  o flange não pode ser mais largo que o barril, porque o aro entra por cima
+  dele com 0,6 mm de folga);
+- a primeira fatia de A-30 já permite raios diferentes na mesma face: pontos,
+  discos e círculos expandem em ordem estável, `raio` do passo é padrão e o
+  furo dentro de outro recebe diagnóstico próprio. Profundidade e seleção por
+  nome ainda pertencem às próximas duas fatias;
 - A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
   humana que emitia referências posicionais não existe mais na Mecanifica. O
   gate `id-cru` permanece protegendo as peças escritas por IA;

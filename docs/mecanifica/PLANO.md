@@ -1598,6 +1598,11 @@ comportamento em `oficina.js`:
   por raio fica declarada para quando os grupos de A-30 chegarem. O primeiro
   caminho continua byte-idêntico, oito figuras antes recusadas fecham nos dois
   lados e as três que restam abortam de modo atômico.
+- **P5**: `centros` agora aceita pontos, discos e círculos na mesma lista, cada
+  qual podendo declarar um raio próprio; o `raio` do passo virou padrão. A
+  expansão preserva a identidade `furo:k`, a terceira ordem de ponte usa o raio
+  declarado e a contenção recebe recusa própria. Profundidade e nome de grupo
+  permanecem explicitamente para as fatias seguintes.
 
 Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
 comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
@@ -1661,7 +1666,7 @@ de prosseguir.
    `AINDA_TRAVA` (`oficina.test.ts` 5607) para o bloco da região sadia, que são
    [6,3,7], [6,4,7], [6,12,7], [6,24,7], [8,3,9], [8,4,10], [10,4,11] e
    [18,3,11]. GATE: os três verdes.
-5. **F1 fatia 2 — `centros` aceita grupos.** ENTRA: o parsing dos três formatos de
+5. **F1 fatia 2 — `centros` aceita grupos — CONCLUÍDA no warbook.** ENTRA: o parsing dos três formatos de
    item; `raiosPorFuro`; `raio` do passo vira o padrão; `raiosPorFuro[k]` no laço
    de anéis (3483); `raiosPorFuro` como chave da 3ª ordem; o ramo de continência
    antes do de cruzamento. FECHA: T1 a T10 e T24; as recusas 1 a 8 e 15 a 17.
