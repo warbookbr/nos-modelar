@@ -47,6 +47,42 @@ export const PUBLICADAS = ['freio-disco', 'roda-dianteira'];
 
 export const DESTINO = join(REPO, 'pecas-resolvidas');
 export const arquivoDaPeca = (nome) => join(DESTINO, `${nome}.json`);
+export const arquivoDoManifesto = () => join(DESTINO, 'manifesto.json');
+
+/* O LEITOR É UMA CÓPIA, E O MANIFESTO É A TRAVA DISSO.
+
+   `src/autoria/ler-peca-resolvida.js` existe neste repositório e, idêntico, no
+   do produto. O teste de ida-e-volta prova que escritor e leitor concordam
+   AQUI; ele não diz nada sobre a cópia que roda no navegador do cliente.
+
+   Sem trava, o modo de falhar é silencioso: alguém muda o formato aqui,
+   atualiza as duas pontas daqui, todos os gates ficam verdes, a entrega passa.
+   A cópia do produto continua velha e desenha errado — sem exceção, porque as
+   duas regras são válidas, só não são a mesma.
+
+   O hash é do TEXTO do leitor, com `\r\n` normalizado antes. Sem normalizar,
+   um clone no Windows mudaria o hash sozinho e o produto reprovaria por causa
+   de um `\r` — que é exatamente o que já derrubou o `mapa:check` e o
+   `docs:toc:check` deste repositório sem uma linha de código ter mudado.
+
+   Hash e VERSÃO são barreiras diferentes e as duas ficam: o hash impede cópia
+   divergente, a versão impede interpretação incompatível. */
+export const LEITOR_RELATIVO = 'src/autoria/ler-peca-resolvida.js';
+export const CAMINHO_DO_LEITOR = join(REPO, LEITOR_RELATIVO);
+
+export function hashDoLeitor() {
+  const texto = readFileSync(CAMINHO_DO_LEITOR, 'utf8').replace(/\r\n/g, '\n');
+  return createHash('sha256').update(texto).digest('hex');
+}
+
+export function gerarManifesto(nomes = PUBLICADAS) {
+  return {
+    formato: FORMATO,
+    versao: VERSAO,
+    leitor: { arquivo: LEITOR_RELATIVO, sha256: hashDoLeitor() },
+    pecas: [...nomes].sort(),
+  };
+}
 
 const hash16 = (texto) => createHash('sha256').update(texto).digest('hex').slice(0, 16);
 
@@ -60,6 +96,34 @@ export function conferirSemOrfaos(nome, orfaos) {
   throw new Error(
     `exportar-peca: a peça '${nome}' tem ${orfaos.length} órfão(s) e não pode virar dado. `
     + `Primeiro: passo ${primeiro.passo}, op '${primeiro.op}', ${primeiro.ref} — ${primeiro.motivo}`,
+  );
+}
+
+/* O FORMATO LEVA V, F, materiais, partes e meta. Ele NÃO leva `portas` nem
+   `esqueleto`, e enquanto não levar, peça que publique uma dessas capacidades é
+   recusada na cara.
+
+   O motivo é o modo de falhar, não a falta em si. Uma peça com porta exportada
+   hoje não daria erro: `lerPecaResolvida` devolve `partes: {}` e nenhum osso,
+   então o produto carregaria uma peça muda — sem porta e sem esqueleto — com a
+   mesma aparência de uma peça inteira. Ninguém veria, e o defeito só apareceria
+   quando alguém tentasse usar a porta que sumiu.
+
+   As duas peças publicadas hoje não usam nenhuma das duas, e é exatamente por
+   isso que isto passou despercebido até alguém perguntar. */
+export function conferirCapacidadesTransportaveis(nome, bruto) {
+  const faltantes = [];
+  const portas = bruto.portas?.size ?? bruto.portas?.length ?? 0;
+  if (portas > 0) faltantes.push(`${portas} porta(s)`);
+  if (bruto.esqueleto) faltantes.push('esqueleto');
+  if (bruto.pesos?.size) faltantes.push(`peso de osso em ${bruto.pesos.size} vértice(s)`);
+  if (faltantes.length === 0) return;
+
+  throw new Error(
+    `exportar-peca: a peça '${nome}' publica ${faltantes.join(' e ')}, `
+    + `e o formato ${FORMATO} v${VERSAO} não transporta isso. `
+    + 'Exportar assim entregaria ao produto uma peça muda, sem erro. '
+    + 'Ou a peça sai da lista de publicadas, ou o formato cresce e a versão sobe.',
   );
 }
 
@@ -93,6 +157,7 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
     entrada.MATERIAIS, entrada.ESQUELETO, entrada.ALIASES,
   );
   conferirSemOrfaos(nome, bruto.orfaos);
+  conferirCapacidadesTransportaveis(nome, bruto);
 
   const canon = neutroCanonico(bruto);
 
@@ -141,11 +206,36 @@ export async function gravarPublicadas(nomes = PUBLICADAS) {
     writeFileSync(arquivoDaPeca(nome), texto, 'utf8');
     feitas.push({ nome, arquivo: arquivoDaPeca(nome), bytes: Buffer.byteLength(texto) });
   }
+  /* o manifesto vem por ULTIMO, depois de todas as peças terem sido gravadas.
+     Se uma peça for recusada no meio, ele não chega a existir com a lista
+     errada. */
+  const texto = `${JSON.stringify(gerarManifesto(nomes), null, 2)}\n`;
+  writeFileSync(arquivoDoManifesto(), texto, 'utf8');
+  feitas.push({ nome: 'manifesto', arquivo: arquivoDoManifesto(), bytes: Buffer.byteLength(texto) });
   return feitas;
 }
 
 export async function conferirPublicadas(nomes = PUBLICADAS) {
   const problemas = [];
+
+  /* o MANIFESTO primeiro. Se o leitor mudou e ele ficou velho, a cópia do outro
+     repositório está divergente, e isso vale mais que qualquer peça estar em
+     dia: um arquivo perfeito lido com a regra errada desenha errado. */
+  const alvoManifesto = arquivoDoManifesto();
+  if (!existsSync(alvoManifesto)) {
+    problemas.push({ nome: 'manifesto', motivo: 'o manifesto não existe; rode `npm run exportar`' });
+  } else {
+    const gravado = readFileSync(alvoManifesto, 'utf8').replace(/\r\n/g, '\n');
+    const esperado = `${JSON.stringify(gerarManifesto(nomes), null, 2)}\n`;
+    if (gravado !== esperado) {
+      const antigo = (() => { try { return JSON.parse(gravado); } catch { return null; } })();
+      const motivo = antigo && antigo.leitor?.sha256 !== hashDoLeitor()
+        ? `o LEITOR (${LEITOR_RELATIVO}) mudou e o manifesto ficou velho; a cópia do produto está divergente. Rode \`npm run exportar\` e leve o leitor e o manifesto juntos`
+        : 'o manifesto está desatualizado; rode `npm run exportar`';
+      problemas.push({ nome: 'manifesto', motivo });
+    }
+  }
+
   for (const nome of nomes) {
     const alvo = arquivoDaPeca(nome);
     const { texto } = await exportarPeca(nome);

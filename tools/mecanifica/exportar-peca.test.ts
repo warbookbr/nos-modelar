@@ -130,6 +130,35 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect(texto).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
   });
 
+  it('★ recusa peça que publica CAPACIDADE que o formato não transporta', async () => {
+    /* o formato leva V, F, materiais, partes e meta. Ele NÃO leva `portas` nem
+       `esqueleto`. As duas peças publicadas hoje não usam nenhum dos dois, e é
+       por isso que ninguém percebeu.
+
+       A peça que usasse não daria erro: `lerPecaResolvida` devolve
+       `partes: {}` e nenhum esqueleto, então o produto carregaria uma peça
+       muda — sem porta e sem osso — com a mesma cara de uma peça inteira.
+       Quebra silenciosa é o que este projeto proíbe em primeiro lugar.
+
+       Enquanto o formato não transportar, o exportador recusa na cara. */
+    await expect(exportarPeca('_jardineira'), 'esta peça publica 8 portas')
+      .rejects.toThrow(/porta/i);
+    await expect(exportarPeca('_oficina-esqueleto'), 'esta peça tem esqueleto')
+      .rejects.toThrow(/esqueleto/i);
+
+    /* e a recusa diz QUAL capacidade, senão obriga quem recebe a descobrir. */
+    await expect(exportarPeca('_jardineira')).rejects.toThrow(/o formato .* não transporta/i);
+  });
+
+  it('as duas peças publicadas continuam exportando: a recusa não é geral', async () => {
+    /* sem este caso, a guarda acima passaria com um exportador que recusa
+       tudo — a condição que não pode falhar, ao contrário. */
+    for (const nome of ['freio-disco', 'roda-dianteira']) {
+      const { dado } = await exportarPeca(nome);
+      expect(dado.peca).toBe(nome);
+    }
+  });
+
   it('recusa peça inexistente com diagnóstico, e não devolve arquivo vazio', async () => {
     /* referência inválida falha com diagnóstico; nunca vira no-op silencioso. */
     await expect(exportarPeca('_nao-existe-esta-peca')).rejects.toThrow(/_nao-existe-esta-peca/);
