@@ -34,7 +34,7 @@ explícito manda mais que a posição no arquivo:
 | A-29 | candidato dentro de relações semânticas, sem plano ativo |
 | A-32 | dívida de desenho da peça, candidato `PEC-01` |
 | A-30 | resolvido pela F1 do antigo Ciclo 6 |
-| A-16 | candidato dentro de relações semânticas, sem plano ativo |
+| A-16 | em execução por `AUT-2026-06`: interfaces mensuráveis de encaixe |
 | A-1 | resolvido: câmera livre reproduzível por URL validada |
 | A-15 | retirado da Mecanifica com a Oficina humana |
 
@@ -284,6 +284,11 @@ padrões. A conferência compara os anéis reais, a terceira ordem de ponte usa 
 raio declarado e o grupo nomeado permanece estável quando a quantidade muda.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
+
+**Estado atual:** em execução no Recorte A de `AUT-05`, por
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). O escopo está
+limitado a interfaces cilíndricas e diagnóstico read-only; não autoriza solver,
+reposicionamento ou exceção silenciosa na régua global.
 
 **Onde dói:** conferência headless da bancada.
 

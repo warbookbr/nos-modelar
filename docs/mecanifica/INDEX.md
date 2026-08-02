@@ -377,8 +377,13 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-**Não há plano ativo.** O plano mestre foi encerrado em 2 de agosto de 2026 e
-seu resultado está sintetizado em
+O plano ativo é [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md):
+interfaces mensuráveis de encaixe. Ele inicia o Recorte A de `AUT-05` com roda,
+cubo e uma fixture neutra, mas não autoriza posicionamento automático,
+hierarquia ou solver. O caminho canônico do plano é
+`docs/mecanifica/planos/2026-08-02-interfaces-de-encaixe.md`. O plano mestre foi
+encerrado em 2 de agosto de 2026 e seu
+resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)

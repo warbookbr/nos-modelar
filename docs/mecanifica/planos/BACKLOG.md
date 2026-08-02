@@ -12,14 +12,14 @@ escopo, exclusões, gate e decisão explícita.
 | `AUT-02` — canto composto de `arredondarAresta` | A-37 e [`FILETE-V2.md`](../FILETE-V2.md), Escopo B | concluído em [`AUT-2026-04`](2026-08-02-canto-composto.md) |
 | `AUT-03` — triangulação robusta de face com buracos | A-33; 37 casos válidos históricos abortavam | concluído em [`AUT-2026-03`](2026-08-02-triangulacao-de-furos.md) |
 | `AUT-04` — discretização por concordância | A-35 | concluído em [`AUT-2026-02`](2026-08-02-concordancia-por-ponto.md) |
-| `AUT-05` — posição, encaixe e hierarquia semânticos | O-7, O-8, O-10, A-16, A-29 e [`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md) | visão macro mapeada; deve começar por interfaces mensuráveis numa montagem real, sem solver |
+| `AUT-05` — posição, encaixe e hierarquia semânticos | O-7, O-8, O-10, A-16, A-29 e [`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md) | Recorte A em execução por [`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md); os degraus seguintes continuam sem autorização |
 | `AUT-06` — câmera livre reproduzível | A-1 | concluído em [`AUT-2026-05`](2026-08-02-camera-livre-reproduzivel.md) |
 
 ## Peças e produto
 
 | Candidato | Evidência | Dono provável |
 |---|---|---|
-| `PEC-01` — cubo-piloto e flange do freio | A-32 | autoria + contrato de montagem com `warbookbr/mecanica` |
+| `PEC-01` — cubo-piloto e flange do freio | A-32 | incluído em [`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md), sem contrato de produto nesta rodada |
 | `PROD-01` — narrativa de desgaste do freio | antiga Fase 5 e [`VISAO.md`](../VISAO.md) | repositório `warbookbr/mecanica`; não pertence a este núcleo |
 | `PROD-02` — caminhada, carro detalhado e novos sistemas | visão de longo prazo | produto; dividir por experiência observável |
 

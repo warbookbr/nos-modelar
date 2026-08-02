@@ -6,8 +6,10 @@ fechem, por acidente, o caminho para montagens maiores — e para que a visão d
 longo prazo não autorize a construção prematura de um CAD ou solucionador
 universal.
 
-**Estado deste documento:** visão pré-início. Nenhum nível está em execução e
-nenhum item abaixo substitui um plano curto ativo em `planos/README.md`.
+**Estado deste documento:** o Recorte A está em execução por
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). O documento continua
+um mapa de teto: nenhum item abaixo substitui o plano curto ativo em
+`planos/README.md`.
 
 ## Índice — a visão abstraída
 
@@ -71,13 +73,15 @@ do anterior; não é apenas uma tela nova.
 
 Cada nível usa um estado exclusivo:
 
-- `[x] NÃO INICIADO` — hipótese mapeada, sem plano ativo;
-- `[ ] EM DESENVOLVIMENTO` — há um plano curto ativo e um gate congelado;
+- `[x] NÃO INICIADO` — hipótese mapeada, sem fatia executada;
+- `[ ] EM DESENVOLVIMENTO` — há ao menos uma fatia em curso ou comprovada, mas o
+  gate inteiro do nível ainda não foi atendido;
 - `[ ] CONCLUÍDO` — o gate foi atendido e a evidência permanente foi vinculada.
 
-Ao iniciar um nível, mova o `[x]` para `EM DESENVOLVIMENTO`; ao concluir, mova-o
-para `CONCLUÍDO`. Checklists internos mostram entregas, não porcentagem. Uma
-caixa marcada não promove o nível se o gate observável continuar vermelho.
+Ao iniciar uma fatia, mova o `[x]` para `EM DESENVOLVIMENTO`; ao concluir o gate
+inteiro do nível, mova-o para `CONCLUÍDO`. O plano ativo é controlado somente
+por `planos/README.md`. Checklists internos mostram entregas, não porcentagem.
+Uma caixa marcada não promove o nível se o gate observável continuar vermelho.
 
 Descoberta grande não aumenta o plano em curso: volta para este mapa ou para o
 backlog. Um nível pode exigir vários planos curtos, cada um com um resultado.
@@ -306,8 +310,8 @@ como oráculo de cavidade.
 
 **Estado**
 
-- [x] NÃO INICIADO
-- [ ] EM DESENVOLVIMENTO
+- [ ] NÃO INICIADO
+- [x] EM DESENVOLVIMENTO
 - [ ] CONCLUÍDO
 
 **Checklist**
@@ -338,8 +342,8 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 
 **Estado**
 
-- [x] NÃO INICIADO
-- [ ] EM DESENVOLVIMENTO
+- [ ] NÃO INICIADO
+- [x] EM DESENVOLVIMENTO
 - [ ] CONCLUÍDO
 
 **Checklist**
@@ -380,8 +384,8 @@ compatibilidade entre naturezas, direção e tolerância. `encosta` entre planos
 
 **Estado**
 
-- [x] NÃO INICIADO
-- [ ] EM DESENVOLVIMENTO
+- [ ] NÃO INICIADO
+- [x] EM DESENVOLVIMENTO
 - [ ] CONCLUÍDO
 
 **Checklist**
@@ -772,7 +776,9 @@ também em estado neutro e headless.
 
 ## Primeiro recorte recomendado
 
-O pré-início sugere dois planos curtos consecutivos, ainda **não abertos**:
+O pré-início sugeriu dois planos curtos consecutivos. O Recorte A agora é o
+plano ativo [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md); o
+Recorte B permanece apenas candidato.
 
 ### Recorte A — interfaces mensuráveis, sem movimento automático
 
