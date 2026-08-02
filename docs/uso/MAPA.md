@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-238 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+234 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -13,8 +13,7 @@
 - `CLAUDE.md` — Mecanifica — acordo de trabalho
 - `README.md` — Mecanifica
 - `bancada.html` — bancada.html — estúdio de inspeção multivista para autoria e validação de montagens.
-- `index.html` — index.html — entrada da Mecanifica; o núcleo procedural herdado permanece isolado em prototipos/fps/v3/.
-- `vite.config.js` — vite.config.js — build estático da Mecanifica para warbookbr/nos-mecanifica no GitHub Pages.
+- `vite.config.js` — vite.config.js — build estático da BANCADA de autoria, publicada em warbookbr/nos-mecanifica no GitHub Pages. O produto que o cliente abre vive em warbookbr/…
 - `vitest.config.ts` — Config do Vitest: cobre os contratos da Mecanifica e os núcleos herdados em tools/**.
 
 ## .claude/agents/
@@ -209,14 +208,11 @@
 - `roda-dianteira.js` — RODA DIANTEIRA DA MECANIFICA — pneu, aro e tampa central paramétricos, pensados para compor com `freio-disco`, nunca para duplicar seu `cubo`.
 - `vegetacao-cartoon.js` — PEÇA: vegetacao-cartoon — a PROVA da vegetação plantável (D-64). Planta um PRADO cartoon: tufos de grama (assados numa malha por variante -> poucos draws), f…
 
-## src/
-
-- `main.js` — main.js — composição da apresentação: autoria neutra -> sistema semântico -> contexto Three.js.
-
 ## src/autoria/
 
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
+- `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 
 ## src/bancada/
 
@@ -226,21 +222,6 @@
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
 - `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
 - `main.js` — main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível.
-
-## src/cena/
-
-- `criar-cena.js` — criar-cena.js — cena industrial e infraestrutura Three.js da primeira prova da Mecanifica.
-- `criar-veiculo-contexto.js` — criar-veiculo-contexto.js — carroceria proporcional de leitura espacial; não é um modelo salvo nem uma fonte de identidade.
-
-## src/dominio/mecanica/
-
-- `freio-dianteiro-direito.js` — freio-dianteiro-direito.js — registro declarativo do primeiro sistema da apresentação, sem dependência de Three.js.
-- `roda-dianteira-direita.js` — roda-dianteira-direita.js — identidade de domínio da roda que compõe com o freio, sem depender de Three.js.
-
-## src/interacao/
-
-- `controlar-apresentacao.js` — controlar-apresentacao.js — modos temporários de leitura do sistema no carro, sem escrever na autoria.
-- `criar-inspecao.js` — criar-inspecao.js — seleção por raycast ligada à identidade semântica, nunca ao UUID do Three.js.
 
 ## tools/
 
@@ -310,6 +291,10 @@
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
+- `exportar-gate.test.ts` — exportar-gate.test.ts — A-60, segunda metade: o gate que acusa arquivo velho.
+- `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
+- `exportar-peca.test.ts` — exportar-peca.test.ts — A-60: a peça vira DADO.
+- `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
 - `flange-integridade.test.ts` — flange-integridade.test.ts — prova em peça da F1/A-30: uma passagem central e um círculo de parafusos, com raios distintos e nomes estáveis, no mesmo passo. …
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
@@ -319,7 +304,6 @@
 - `prateleira-integridade.test.ts` — Integridade da peça de exercício `_prateleira-furada` — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1".
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
-- `sistema-freio.test.mjs` — sistema-freio.test.mjs — contrato semântico do primeiro sistema apresentado no veículo.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
 

@@ -1,23 +1,26 @@
 # Mecanifica
 
-Simulador 3D interativo para explicar, de forma visual, como sistemas automotivos
-funcionam, por que falham e o que pode acontecer quando um reparo é adiado.
+Oficina de autoria procedural e bancada de inspeção usadas para criar as peças
+do simulador 3D Mecanifica com auxílio de IA.
 
 ## Entrar na mecânica
 
-- 🔧 **[Abrir a Mecânica](https://warbookbr.github.io/nos-mecanifica/)** — entre direto pelo navegador, sem instalar nada.
+- 🔧 **[Abrir a Mecânica](https://warbookbr.github.io/mecanica/)** — experiência do cliente, publicada pelo repositório [`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
 - 🧰 **[Abrir a bancada de inspeção](https://warbookbr.github.io/nos-mecanifica/bancada.html)** — examine, isole e exploda as peças do modelo.
 
-O primeiro módulo será um sistema de freio a disco dianteiro dentro de uma oficina
-navegável. A pessoa poderá inspecionar as peças, separar o conjunto, comparar
-estados de desgaste e acompanhar explicações orientadas ao cliente.
+O primeiro módulo do produto mostra um sistema de freio a disco dianteiro no
+contexto do veículo. Este repositório produz e valida as peças que ele consome.
 
 ## Estado
 
-O projeto está no início da transição. Este repositório nasceu como uma cópia do
+Este repositório nasceu como uma cópia do
 [`brigsd/nos`](https://github.com/brigsd/nos), mas conserva somente o núcleo
-procedural, as peças e o jogo de referência necessários à migração. A Oficina
-humana do NÓS foi retirada; sua fonte permanece no repositório original.
+procedural, as peças, a bancada e as ferramentas necessárias à autoria. A
+Oficina humana do NÓS foi retirada; sua fonte permanece no repositório original.
+Cena, domínio automotivo e interface do cliente vivem em
+[`warbookbr/mecanica`](https://github.com/warbookbr/mecanica). As duas peças
+publicadas atravessam essa fronteira como JSON determinístico em
+`pecas-resolvidas/`; o produto não executa o núcleo.
 
 O NÓS ainda é um projeto experimental. Seu núcleo de autoria procedural é uma
 fonte valiosa, mas não é tratado aqui como uma fundação pronta. Em especial, a
@@ -49,20 +52,22 @@ Para entender ou continuar o projeto:
 
 ## Desenvolvimento
 
-Para executar a nova aplicação:
+Para executar a bancada de autoria:
 
 ```bash
 npm ci
 npm run dev
 ```
 
-O endereço local é `http://localhost:5173/nos-mecanifica/`; a bancada fica em
-`http://localhost:5173/nos-mecanifica/bancada.html`. Para gerar a versão estática
-usada pelo Pages:
+Abra `http://localhost:5173/nos-mecanifica/bancada.html`. Para gerar a versão
+estática da bancada usada pelo Pages:
 
 ```bash
 npm run build
 ```
+
+Para executar a experiência do cliente, use o repositório
+[`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
 
 Os documentos em `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS
 herdado. Eles continuam úteis como referência técnica e histórica, mas não

@@ -18,59 +18,69 @@ cena, interface, navegação e configurações em `jogo.html`. A numeração de
 geometria também conserva dependências posicionais que ainda dificultam autoria
 por IA.
 
+## Fronteira atual entre repositórios
+
+O projeto tem duas entregas deliberadamente separadas:
+
+| Repositório | Responsabilidade |
+|---|---|
+| `warbookbr/nos-mecanifica` | linguagem procedural, receitas, bancada, diagnóstico, testes e exportação |
+| `warbookbr/mecanica` | cena, domínio automotivo, interação e interface do cliente |
+
+O produto não importa o núcleo nem `PASSOS`. A oficina resolve as receitas e
+grava `pecas-resolvidas/*.json` no formato `mecanifica.peca-resolvida`. O
+manifesto trava versão e cópia do leitor; `exportar:check` impede que uma receita
+mude sem regenerar seus dados.
+
 ## Arquitetura-alvo
 
 ```text
-definição estruturada
-        │
-        ▼
-núcleo de autoria ──► validação + diagnóstico + estado neutro
-        │
-        ├──────────► adaptador Three.js ──► cena interativa
-        └──────────► ferramentas headless ──► testes, medidas e descrição
+receita estruturada ─► núcleo ─► validação ─► peça resolvida versionada
+        │                                      │
+        ├─► bancada Three.js                    └─► produto Three.js
+        └─► testes, medidas e crítica               (outro repositório)
 ```
 
-Organização pretendida:
+Organização desta oficina:
 
 ```text
 src/
-├── app/                  # ciclo da aplicação e composição
-├── autoria/              # formato, schemas, operações e estado neutro
-├── bancada/              # inspeção neutra, vistas e validação de montagens
-├── render/three/         # conversão e apresentação em Three.js
-├── cena/galpao/          # ambiente e iluminação
-├── dominio/mecanica/     # sistemas, estados e explicações automotivas
-├── simulacao/            # linha do tempo e transições didáticas
-├── interacao/            # seleção, câmeras e controles
-└── interface/            # painéis e conteúdo para o cliente
+├── autoria/              # adaptador Three.js e leitor puro do formato exportado
+└── bancada/              # inspeção neutra, vistas e validação de montagens
+
+prototipos/fps/v3/        # núcleo procedural e receitas
+tools/mecanifica/         # medidas, gates, exportador e provas de integração
+pecas-resolvidas/         # saída gerada que o produto consome
 ```
 
 ## Dependências entre camadas
 
 - `autoria` não importa Three.js, DOM nem domínio automotivo.
-- `render/three` conhece o estado neutro e produz objetos visuais.
-- `dominio/mecanica` combina partes e estados usando APIs públicas da autoria.
-- `interface` conversa com a simulação e seleção, sem editar malhas diretamente.
+- `src/autoria` conhece o estado neutro e produz objetos visuais para a bancada.
+- o produto combina partes e estados a partir do arquivo resolvido, sem editar
+  receitas nem importar o núcleo;
 - ferramentas headless usam o mesmo núcleo que o navegador.
 
 ## Duas superfícies, um modelo
 
 `bancada.html` é a superfície de autoria: estúdio neutro, câmeras previsíveis,
 seleção múltipla, isolamento, contexto fantasma e explosão diagnóstica.
-`index.html` e o futuro galpão são superfícies de apresentação ao cliente.
+O produto publicado em `warbookbr/mecanica` é a superfície de apresentação ao
+cliente.
 
 As duas consomem o mesmo grafo semântico. Estado de câmera, opacidade, realce e
 explosão são projeções temporárias; não modificam a definição da peça.
 
-Na primeira fatia da Fase 4, `src/dominio/mecanica/freio-dianteiro-direito.js`
+Na primeira fatia da Fase 4, o atual `warbookbr/mecanica/src/dominio/mecanica/freio-dianteiro-direito.js`
 registra a identidade de domínio, as oito partes semânticas, o ponto de montagem
-e os vetores de explosão. `src/cena/criar-veiculo-contexto.js` cria apenas uma
+e os vetores de explosão. O módulo `src/cena/criar-veiculo-contexto.js` daquele
+repositório cria apenas uma
 carroceria de leitura espacial; ela não é conteúdo persistido nem fonte de
 identidade. O controlador de apresentação projeta os modos carro completo,
 contexto fantasma e isolamento sem gravar em nenhum dos dois modelos.
 
 Na segunda fatia, `roda-dianteira.js` é outro ativo procedural, revisado antes
-da integração, e `src/dominio/mecanica/roda-dianteira-direita.js` declara sua
+da integração, e o registro de domínio do produto declara sua
 identidade, escala e composição com o freio. A roda decorativa equivalente foi
 retirada somente daquele canto; as demais continuam contexto provisório e não
 são apresentadas como ativos autorados.
@@ -101,14 +111,13 @@ fronteira será corrigida antes de modelar os freios.
 
 ## Build e publicação
 
-A nova aplicação usará Vite para desenvolvimento e build. O GitHub Actions
-executará testes, produzirá `dist/` e publicará esse diretório no GitHub Pages.
-O Pages publica somente a Mecanifica e sua bancada. A interface humana herdada
-não possui rota, cópia estática ou servidor neste repositório.
+Os dois repositórios usam Vite e GitHub Actions, mas publicam alvos diferentes:
+`nos-mecanifica` constrói somente `bancada.html`; `mecanica` constrói somente o
+produto. A interface humana herdada do NÓS não possui rota em nenhum deles.
 
-O Pages hospeda apenas o produto compilado. O servidor local de autoria pode
-oferecer rotas de gravação durante desenvolvimento, mas a experiência pública
-não depende delas.
+A experiência pública nunca depende de servidor de gravação. A transferência
+de peças é explícita: exportar e conferir na oficina, copiar peça, leitor e
+manifesto juntos, conferir e construir no produto.
 
 ## Estratégia de migração
 

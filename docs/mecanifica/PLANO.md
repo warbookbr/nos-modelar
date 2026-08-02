@@ -35,8 +35,10 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
   do modelo. As duas dobradiças congeladas passaram em uma execução cada;
 - **Retirada da Oficina humana está CONCLUÍDA:** páginas de objeto e som,
   servidor de salvamento, presets, harnesses, skills exclusivas e a ponte
-  sonora de runtime saíram do Mecanifica. O Pages publica apenas produto e
-  bancada. O núcleo procedural, as peças e os consumidores headless permanecem;
+  sonora de runtime saíram do Mecanifica. O produto do cliente foi separado
+  para `warbookbr/mecanica`; este Pages publica apenas a bancada. O núcleo
+  procedural, as peças e os consumidores headless permanecem aqui, e o produto
+  recebe somente peças resolvidas, versionadas e validadas;
 - **Ciclo 6 está ABERTO como plano importado e medido:** “Furo por grupo,
   contagem por desvio e filete v2” paga A-30, A-34, A-36 e A-37 por meio da
   linguagem procedural e da bancada neutra; ele não reintroduz a Oficina humana.
