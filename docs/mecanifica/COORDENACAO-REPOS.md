@@ -1,34 +1,42 @@
 # Coordenação entre os repositórios Mecanifica
 
-## Canal vivo
+## Canais
 
-A comunicação assíncrona entre agentes de `warbookbr/nos-mecanifica` e
-`brigsd/nos-mecanifica` acontece na
+A comunicação operacional entre as cópias locais acontece pela caixa descrita
+em [`COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md). Intenções, entregas,
+bloqueios e reservas ficam nela. Mensagens novas aparecem primeiro e cada
+agente carrega somente o que ainda não confirmou.
+
+Decisões duráveis entre `warbookbr/nos-mecanifica` e
+`brigsd/nos-mecanifica` ficam na
 [issue de coordenação](https://github.com/warbookbr/nos-mecanifica/issues/3).
 
-Este arquivo define o protocolo estável. Ele não é um diário de mensagens nem
-substitui os comentários da issue. Decisões consolidadas podem ser registradas
-aqui; intenções, entregas e bloqueios transitórios ficam na issue.
+Este arquivo define o protocolo estável. Ele não é um diário de mensagens.
 
 Antes de alterar o núcleo procedural, o plano, o registro de atritos ou a
-numeração de identidades, leia o canal completo:
+numeração de identidades, consulte a caixa local e suas reservas:
 
 ```bash
-gh issue view 3 --repo warbookbr/nos-mecanifica --comments
+npm run coord -- inbox codex
+npm run coord -- claims
 ```
+
+Claude usa o mesmo programa por caminho absoluto e troca `codex` por `claude`.
+Consulte a issue completa somente quando a tarefa depender de uma decisão
+durável ainda não refletida neste documento.
 
 ## Regra de parada
 
-Se outro agente declarou intenção sobre os mesmos arquivos, a mesma capacidade
-ou a mesma faixa de identidades, pare antes do primeiro commit de comportamento.
-Publique um bloqueio e espere uma decisão. Não resolva a divergência presumindo
-que os dois repositórios têm o mesmo estado.
+Se a ferramenta recusar uma reserva porque outro agente já cobre os mesmos
+arquivos, capacidade ou identidades, pare antes da edição. Envie um bloqueio e
+espere uma decisão. Não resolva a divergência presumindo que os dois
+repositórios têm o mesmo estado.
 
 Enquanto a convergência não for decidida, informe sempre o repositório, o branch
 e o commit-base. Palavras como “aqui”, “atual” ou “já resolvido” não identificam
 uma base compartilhada.
 
-## Mensagens
+## Conteúdo das mensagens
 
 Antes de começar:
 
@@ -69,8 +77,9 @@ alternativas medidas:
 recomendação:
 ```
 
-Uma decisão do usuário recebe `[DECISÃO]`, data, consequências e a identidade de
-quem a registrou.
+Uma decisão do usuário recebe o tipo `decisao`, data, consequências e a
+identidade de quem a registrou. O manual de comandos e o uso econômico de
+commits e diffs estão em [`COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md).
 
 ## Decisões ainda abertas
 

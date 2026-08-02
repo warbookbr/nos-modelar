@@ -6,8 +6,9 @@ legado por padrão.
 
 Antes de alterar núcleo procedural, plano, atritos ou identidades enquanto houver
 trabalho paralelo em `brigsd/nos-mecanifica`, leia
-`docs/mecanifica/COORDENACAO-REPOS.md` e a issue viva indicada ali. Declare sua
-intenção antes do primeiro commit de comportamento.
+`docs/mecanifica/COORDENACAO-LOCAL.md` e consulte `inbox` para o seu agente.
+Reserve arquivos e identidades antes de editar. Use a issue indicada em
+`docs/mecanifica/COORDENACAO-REPOS.md` somente para decisões duráveis.
 
 ## Fonte de verdade
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-225 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+230 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -103,6 +103,7 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
@@ -247,7 +248,9 @@
 ## tools/bancadas/
 
 - `auditar.mjs` — auditar.mjs — o GATE de senso crítico [cpu] numa peça REAL (D-60). Roda os críticos validados pelo benchmark (lint-de-malha, distancia-paleta, seam, banding,…
+- `criar-aliases.test.mjs` — criar-aliases.test.mjs — impede que a bancada criar volte a diagnosticar como órfã uma peça válida por esquecer o sexto campo do envelope: ALIASES.
 - `criar.mjs` — criar.mjs — P7 do playground (D-120): A CAMADA IA, laço único.
+- `estado-peca.mjs` — estado-peca.mjs — executa o envelope completo de uma peça procedural para que bancadas distintas não percam MATERIAIS, ESQUELETO ou ALIASES.
 - `executar.mjs` — executar.mjs — a bancada do REPLAY da OFICINA (passo 1), sem browser. Roda a lista de PASSOS de uma peça, serializa a lista, re-parseia e re-executa, e afirm…
 - `gabarito-selecao.mjs` — gabarito-selecao.mjs — a PROVA ZERO da Fase 3.5 (docs/rumo/PLANO.md): mede, peça por peça, que uma mudança no núcleo (`motor/oficina.js`) não mudou o resulta…
 - `gabarito.mjs` — gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o gabarito, desenhado à…
@@ -276,6 +279,11 @@
 - `distancia-paleta.mjs` — distancia-paleta [paleta] — conformidade de cor à Resurrect64 em espaço perceptual (CIEDE2000 offline, sem libs). Cada pixel deve estar perto de alguma cor d…
 - `lint-malha.mjs` — lint-de-malha [malha] — checagem-CPU da geometria antes do render: triângulo degenerado, vértice NaN/Inf/gigante, normal zero/não-unitária, stride/contagem e…
 - `simetria.mjs` — simetria [malha] — a peça que DECLARA simetria de fato é simétrica? Opt-in pelo envelope: só roda se `meta.simetria` estiver declarado ('x', 'y' ou 'z' — o e…
+
+## tools/coordenacao/
+
+- `coord.mjs` — coord.mjs — caixa postal local, econômica e sem dependências para coordenar agentes em repositórios diferentes sem carregar histórico ou diffs inteiros.
+- `coord.test.mjs` — coord.test.mjs — prova mensagens imutáveis, leitura econômica, confirmações independentes e bloqueio de reservas sobrepostas do canal entre agentes.
 
 ## tools/mapa/
 

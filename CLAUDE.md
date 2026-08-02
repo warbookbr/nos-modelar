@@ -12,8 +12,9 @@ documentação por padrão.
 
 Se a tarefa tocar núcleo procedural, plano, atritos ou identidades enquanto
 `brigsd/nos-mecanifica` também estiver ativo, leia primeiro
-`docs/mecanifica/COORDENACAO-REPOS.md` e a issue viva indicada ali. Publique a
-intenção antes do primeiro commit de comportamento.
+`docs/mecanifica/COORDENACAO-LOCAL.md`, consulte `inbox claude` e reserve os
+arquivos e identidades antes de editar. Use a issue indicada em
+`docs/mecanifica/COORDENACAO-REPOS.md` somente para decisões duráveis.
 
 Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
 à base herdada do NÓS. Consulte-os quando tocar no núcleo legado, mas não os use
