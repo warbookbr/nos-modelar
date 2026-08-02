@@ -198,6 +198,25 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect(b, 'vértice a vértice, o arquivo desenha o mesmo que a receita').toEqual(a);
   });
 
+  it('★ o LEITOR é puro: nada de node:, Three.js ou DOM', async () => {
+    /* o leitor roda no navegador do cliente, num repositório que não tem a
+       oficina. Um `import ... from 'node:fs'` aqui não quebra nenhum teste
+       deste repositório — quebra o BUILD do outro, ou pior, entra empacotado
+       com um remendo e some. É o tipo de defeito que só aparece longe de quem
+       o causou, então a trava fica perto de quem o causaria. */
+    const leitor = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), '../../src/autoria/ler-peca-resolvida.js'),
+      'utf8',
+    );
+    const linhasDeImport = leitor.split('\n').filter((l) => /^\s*import\s/.test(l));
+    expect(linhasDeImport, 'o leitor não importa nada de ninguém').toEqual([]);
+    /* e não alcança global de plataforma por outro caminho. */
+    for (const proibido of ['node:', 'require(', 'process.', 'document.', 'window.', 'globalThis.']) {
+      const corpo = leitor.replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(corpo, `o leitor usa '${proibido}' e deixa de ser portátil`).not.toContain(proibido);
+    }
+  });
+
   it('o leitor recusa arquivo de formato ou versão que não conhece', async () => {
     const { dado } = await exportarPeca(PECA);
     expect(() => lerPecaResolvida({ ...dado, formato: 'outra-coisa' })).toThrow(/formato/);

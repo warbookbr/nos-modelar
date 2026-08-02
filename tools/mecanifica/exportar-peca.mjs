@@ -27,13 +27,16 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+/* a metade LEITORA mora em src/autoria/ler-peca-resolvida.js: ela roda no
+   navegador do cliente e não pode arrastar `node:fs` junto. Reexporto aqui
+   para quem já importava deste arquivo continuar funcionando, e para o teste
+   de ida-e-volta pegar as duas pontas de uma vez. */
+import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
+export { FORMATO, VERSAO, lerPecaResolvida, parteDaFace };
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
 const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
-
-export const FORMATO = 'mecanifica.peca-resolvida';
-export const VERSAO = 1;
 
 /* A LISTA É DECLARADA, e não "todas as peças". São 42 peças no acervo e o
    produto usa duas. Exportar as 42 encheria o repositório de arquivo que
@@ -47,16 +50,6 @@ export const arquivoDaPeca = (nome) => join(DESTINO, `${nome}.json`);
 
 const hash16 = (texto) => createHash('sha256').update(texto).digest('hex').slice(0, 16);
 
-/* a face guarda a parte na cauda opcional da linha canônica. `parteDaFace` faz
-   a mesma pergunta que o canon faz, num lugar só, para o produto e o gate não
-   discordarem sobre o que conta como parte. */
-export function parteDaFace(linha) {
-  for (let k = linha.length - 1; k >= 6; k--) {
-    if (typeof linha[k] === 'string') return linha[k];
-  }
-  return null;
-}
-
 /* exportar peça com órfão publica no produto uma peça que ESTE repositório sabe
    estar errada, e o produto não tem como perceber: o arquivo chega com a mesma
    cara de um arquivo bom. O motivo do núcleo viaja junto porque uma recusa que
@@ -68,44 +61,6 @@ export function conferirSemOrfaos(nome, orfaos) {
     `exportar-peca: a peça '${nome}' tem ${orfaos.length} órfão(s) e não pode virar dado. `
     + `Primeiro: passo ${primeiro.passo}, op '${primeiro.op}', ${primeiro.ref} — ${primeiro.motivo}`,
   );
-}
-
-/* a outra metade do contrato. O exportador escreve linhas; o adaptador quer
-   Mapas com face.id, face.vs e face.parte. Sem este leitor o formato seria
-   apenas um arquivo bonito que ninguém consegue desenhar.
-
-   Ele mora AQUI, junto do escritor, de propósito: quem muda o formato vê as
-   duas pontas no mesmo arquivo. Duas cópias em repositórios diferentes
-   divergem, e a divergência aparece como peça torta na tela do cliente. */
-export function lerPecaResolvida(dado) {
-  if (dado?.formato !== FORMATO) {
-    throw new Error(`ler-peca: formato desconhecido '${dado?.formato}' (esperado '${FORMATO}')`);
-  }
-  if (dado.versao !== VERSAO) {
-    throw new Error(`ler-peca: versão ${dado.versao} não suportada (esta ferramenta lê a ${VERSAO})`);
-  }
-
-  const V = new Map();
-  for (const linha of dado.V) V.set(linha[0], [linha[1], linha[2], linha[3]]);
-
-  const F = new Map();
-  for (const linha of dado.F) {
-    const face = {
-      id: linha[0],
-      vs: linha[1].slice(),
-      cor: linha[2] ?? null,
-      material: linha[3] ?? null,
-      liso: !!linha[4],
-      solido: !!linha[5],
-    };
-    const parte = parteDaFace(linha);
-    if (parte) face.parte = parte;
-    F.set(face.id, face);
-  }
-
-  /* `orfaos` vazio não é otimismo: o exportador RECUSA gravar peça com órfão,
-     então todo arquivo que chega aqui já passou por aquela guarda. */
-  return { V, F, orfaos: [], merges: [], partes: {}, materiais: dado.materiais ?? {} };
 }
 
 export async function exportarPeca(nome, { paramsExtra = null } = {}) {
