@@ -1,8 +1,8 @@
 # Atritos de autoria — o que dói ao modelar
 
 Registro das dificuldades observadas quando alguém — pessoa ou agente — modela
-de verdade. Existe porque o `PLANO.md` manda que capacidade nova nasça de
-dificuldade observada, não de lista especulativa de operações.
+de verdade. Existe para que capacidade nova nasça de dificuldade observada, não
+de lista especulativa de operações.
 
 ## Como registrar
 
@@ -19,9 +19,30 @@ Retrabalho é a medida. Chute de coordenada, ida e volta para achar um nome e
 foto que não mostra o defeito são todos contáveis, mesmo quando o método de
 quem modelou é inesperado.
 
-## Atritos abertos
+## Atritos em acompanhamento
+
+Esta seção preserva a ordem em que os atritos foram investigados. O estado
+explícito manda mais que a posição no arquivo:
+
+| Atrito | Estado atual |
+|---|---|
+| A-37 | aberto; canto composto de `arredondarAresta`, candidato `AUT-02` |
+| A-36 | resolvido para aresta simples por `arredondarAresta`; o restante é A-37 |
+| A-35 | candidato sem plano ativo |
+| A-34 | candidato `AUT-01`, contagem por desvio; sem plano ativo |
+| A-33 | aberto, falha fechada; candidato `AUT-03` |
+| A-29 | candidato dentro de relações semânticas, sem plano ativo |
+| A-32 | dívida de desenho da peça, candidato `PEC-01` |
+| A-30 | resolvido pela F1 do antigo Ciclo 6 |
+| A-16 | candidato dentro de relações semânticas, sem plano ativo |
+| A-1 | candidato de bancada `AUT-06` |
+| A-15 | retirado da Mecanifica com a Oficina humana |
 
 ### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
+
+**Estado atual — ABERTO, SEM PLANO ATIVO:** o contrato convergido não amplia
+`filete`. O caso pertence ao Escopo B de `arredondarAresta`, descrito em
+[`FILETE-V2.md`](FILETE-V2.md), e só começa com plano próprio.
 
 **Onde dói:** linguagem da Oficina, ao compor `filete` com `chamferBox`.
 
@@ -47,6 +68,10 @@ para qualquer família de objeto, não só para pinça.
 
 ### A-36 — o filete de UM painel é um chanfro, não um arredondamento
 
+**Estado atual — RESOLVIDO PARA ARESTA SIMPLES:** `filete` foi preservado como
+chanfro compatível e `arredondarAresta` implementa o arco multipainel no Escopo
+A. O canto composto não reabre A-36; ele continua registrado como A-37.
+
 **Onde dói:** linguagem da Oficina, e na leitura que o cliente faz.
 
 **Evidência:** a op `filete` corta a aresta com UM painel plano. Num canto de
@@ -61,10 +86,9 @@ intermediário cuja normal NÃO fica entre as normais das duas faces do jeito
 ingênuo — o painel mais perto da face de entrada sai com a normal mais perto da
 OUTRA face. Entregar isso seria entregar quebrado.
 
-**Capacidade candidata:** o filete de vários painéis, com a derivação certa da
-não-linearidade. É o que paga também o A-34 (a silhueta poligonal do furo), que
-é o mesmo assunto visto de outro lado: quebrar a quina sem multiplicar a malha
-inteira.
+**Capacidade entregue:** `arredondarAresta`, sem dar um segundo significado a
+`filete`. A derivação e o gate do Escopo A estão em
+[`FILETE-V2.md`](FILETE-V2.md).
 
 **Junto, e menor:** o `raio` do filete não é conferido contra o tamanho das
 faces vizinhas. Um raio grande demais faz o painel novo ultrapassar a face, e o
@@ -111,10 +135,10 @@ superfície termina. Na silhueta, e só nela, a malha aparece como ela é.
 **Contorno usado hoje:** mais `lados`. Custa faces em toda peça que use o furo, e
 não distingue a borda vista de perto da vista de longe.
 
-**Capacidade candidata:** um filete (`chanfro`/`filete` seletivo) na aresta do
-contorno, que é o que quebra a silhueta reta sem multiplicar a malha inteira. É
-geral: vale para toda quina de toda peça, não só para a borda de furo. É o
-assunto do ciclo "curva de perfil + filete seletivo", já escrito como candidato.
+**Capacidade candidata atual:** declarar tolerância geométrica como
+`lados: { desvio }`, deixando o núcleo derivar a menor contagem que atende a
+flecha pedida. A quebra da quina do aro é outro problema e não deve voltar
+acoplada a este atrito. O candidato é `AUT-01` no backlog de planos.
 
 ### A-33 — a partição do furo trava em face de poucos lados com furo raspando a borda
 
@@ -230,26 +254,31 @@ registrado em vez de embutido de contrabando numa rodada sobre furos.
 
 ### A-30 — um passo de furo tem UM raio: a flange com furo central não cabe
 
-**Onde dói:** linguagem da Oficina.
+**Estado atual — RESOLVIDO:** `centros` aceita pontos, discos e círculos com
+`raio`, `profundidade` e `nome` próprios; os valores do passo são padrões. A
+origem `furo` resolve o grupo por nome. `_flange-de-tubulacao` prova passagem
+central e círculo de parafusos no mesmo passo, e os testes cobrem raios e
+profundidades diferentes.
 
-**Evidência:** a peça de exercício
+**Onde doía:** linguagem da Oficina.
+
+**Evidência histórica:** a peça de exercício
 `prototipos/fps/v3/pecas/_tampa-de-caixa.js`, escrita para provar o círculo de
 parafusos do ciclo "Furo v2". Uma flange de tubulação de verdade tem o furo
 CENTRAL da passagem mais o círculo de parafusos em volta, e os dois têm
 diâmetros diferentes. O `furo` aceita vários CENTROS num passo, mas um `raio`
-só — e um segundo passo não acha mais a face, porque o primeiro a consumiu. A
-figura mais comum de flange continua fora da linguagem.
+só — e um segundo passo não achava mais a face, porque o primeiro a consumia. A
+figura mais comum de flange continuava fora da linguagem.
 
-**Contorno usado:** a peça de exercício é uma tampa CHEIA, sem furo central,
+**Contorno usado antes da correção:** a peça de exercício era uma tampa CHEIA,
+sem furo central,
 com o círculo de quatro parafusos e uma cabeça de aperto por cima. A limitação
-está dita em voz alta no cabeçalho dela, não escondida no desenho.
+ficava dita em voz alta no cabeçalho dela, não escondida no desenho.
 
-**Capacidade candidata:** o `centros` aceitar RAIO por furo — a lista virando
-`[{centro, raio}]`, ou o círculo ganhando um raio próprio ao lado do central.
-É estritamente aditivo: a forma de hoje é o caso em que todos os raios são
-iguais. O que ele exige é que a conferência de sobreposição, que já é por
-polígono e não por número, passe a comparar anéis de tamanhos diferentes — ela
-já faz isso, porque compara os anéis, não os raios.
+**Capacidade entregue:** `centros` aceita ponto, disco ou círculo; disco e
+círculo podem declarar `raio`, `profundidade` e `nome`, e o passo fornece os
+padrões. A conferência compara os anéis reais, a terceira ordem de ponte usa o
+raio declarado e o grupo nomeado permanece estável quando a quantidade muda.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 

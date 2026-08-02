@@ -4,30 +4,30 @@ Neste documento, “Oficina” nomeia a linguagem procedural herdada e seu núcl
 A interface humana homônima foi retirada da Mecanifica em 1º de agosto de 2026;
 itens específicos daquela UI permanecem apenas como histórico para upstream.
 
-Análise e **plano de implementação** das mudanças na linguagem de autoria. A
-divisão de trabalho entre os documentos é:
+Análise de dependências e backlog das mudanças na linguagem de autoria. Este
+arquivo não autoriza implementação; um candidato só começa quando ganha plano
+curto em [`planos/README.md`](planos/README.md). A divisão de trabalho entre os
+documentos é:
 
 - [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) registra a **dor observada** (A-1 a
   A-17) — é a evidência;
 - [`UPSTREAM-NOS.md`](UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
   a UP-016) — é a portabilidade;
-- este documento decide **o que muda, em que ordem, a que custo e provado como**
-  — é o plano.
+- este documento registra **dependências, custo e provas candidatas** — é a
+  análise que alimenta o backlog.
 
 ## Estado executivo
 
 **Estado em 31 de julho de 2026:** R1, R2, R3, **R4** e **R4b** (o ciclo
 Endereços semânticos v1) estão concluídas. A R4
 fechou junto com a Fundação de autoria v1, com as três condições do gate do
-[`PLANO.md`](PLANO.md) verificadas item por item. R5 a R9 continuam backlog e
+plano mestre da época verificadas item por item. R5 a R9 continuam backlog e
 não formam uma execução aberta.
 
 Este documento continua sendo a análise e a ordem de dependências da Oficina,
-mas não autoriza trabalhar automaticamente até R9. O
-[`PLANO.md`](PLANO.md) abre um ciclo finito por vez. **Nenhum ciclo está ativo**
-desde o fechamento de "Corte e orientação de seção v1" (o ciclo 4, 31 de julho
-de 2026); a próxima candidata é a R5 (O-7) ou a R7 (O-8), e nenhuma começa antes
-de o `PLANO.md` abrir o ciclo.
+mas não autoriza trabalhar automaticamente até R9. **Nenhum plano está ativo.**
+R5 (O-7) e R7 (O-8) são candidatos e só começam após decisão explícita e plano
+próprio no índice de planos.
 
 **Estado depois do ciclo Corte e orientação de seção v1 (concluído em 31 de
 julho de 2026):** o núcleo ganhou a primeira SUBTRAÇÃO (a op `furo`, passante e
@@ -636,9 +636,10 @@ das 18 peças, regravação do gabarito, e `adaptarThree` e bancada passam a ter
 
 ## Backlog de implementação
 
-Uma rodada por linha. R1 a R4 e a R4b estão concluídas; as demais só saem do backlog
-quando `PLANO.md` abrir explicitamente um ciclo. Cada rodada executada é commit
-próprio e independente: se uma parar, as anteriores continuam de pé.
+Uma rodada por linha. R1 a R4 e a R4b estão concluídas; as demais só saem do
+backlog quando o índice apontar um plano curto explicitamente ativo. Cada rodada
+executada é commit próprio e independente: se uma parar, as anteriores continuam
+de pé.
 
 | rodada | estado | itens | toca formato salvo | prova de saída |
 |---|---|---|---|---|

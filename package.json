@@ -42,6 +42,7 @@
     "docs:toc:check": "node tools/mapa/toc.mjs --check",
     "docs:links": "node tools/mapa/links.mjs",
     "docs:links:check": "node tools/mapa/links.mjs --check",
+    "planos:check": "node tools/mapa/planos.mjs --check",
     "exportar": "node tools/mecanifica/exportar.mjs",
     "exportar:check": "node tools/mecanifica/exportar.mjs --check"
   },

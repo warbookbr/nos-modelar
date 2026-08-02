@@ -5,10 +5,11 @@ Mecanifica: uma oficina 3D interativa que explica sistemas automotivos a cliente
 
 ## Entrada de contexto
 
-Antes de planejar ou implementar uma rodada, leia
-`docs/mecanifica/INDEX.md` e `docs/mecanifica/PLANO.md`. O índice informa quais
-outros documentos são necessários para cada tipo de tarefa; não carregue toda a
-documentação por padrão.
+Antes de planejar ou implementar uma rodada, leia `docs/mecanifica/INDEX.md` e
+`docs/mecanifica/planos/README.md`. O índice de planos informa se existe um
+plano ativo; se não existir, nenhum item de backlog autoriza implementação. O
+índice geral informa quais outros documentos são necessários para cada tipo de
+tarefa; não carregue toda a documentação por padrão.
 
 Se a tarefa tocar núcleo procedural, plano, atritos ou identidades enquanto
 `brigsd/nos-mecanifica` também estiver ativo, leia primeiro
@@ -94,6 +95,7 @@ Buraco não abre casca: furo passante tem parede.
 - Trabalho visual é conferido no navegador em mais de um enquadramento.
 - Testes verdes não substituem inspeção visual; inspeção visual não substitui
   determinismo e validação.
-- Atualize o roteiro e o registro upstream quando uma rodada mudar o estado real.
+- Atualize o plano ativo, o índice de planos e o registro upstream quando uma
+  rodada mudar o estado real. Plano concluído ou cancelado não volta a crescer.
 - Atualize `docs/mecanifica/INDEX.md` quando mudar a estrutura principal, a
-  hierarquia documental ou a próxima entrega.
+  hierarquia documental ou o plano ativo.

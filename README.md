@@ -45,8 +45,8 @@ Para entender ou continuar o projeto:
 
 - **[Comece pelo índice da Mecanifica](docs/mecanifica/INDEX.md)** — estado
   atual, estrutura do repositório, fontes de verdade e leitura por tipo de tarefa.
-- [`docs/mecanifica/PLANO.md`](docs/mecanifica/PLANO.md) — roteiro vigente e
-  próximo passo.
+- [`docs/mecanifica/planos/README.md`](docs/mecanifica/planos/README.md) — índice
+  dos planos curtos, plano ativo e backlog de candidatos.
 - [`docs/uso/MAPA.md`](docs/uso/MAPA.md) — inventário completo, gerado
   automaticamente, com um resumo de cada arquivo.
 

@@ -13,7 +13,9 @@ Reserve arquivos e identidades antes de editar. Use a issue indicada em
 ## Fonte de verdade
 
 - `docs/mecanifica/` governa o produto Mecanifica.
-- `docs/mecanifica/PLANO.md` é o único roteiro vigente.
+- `docs/mecanifica/planos/README.md` governa o planejamento e aponta o único
+  plano ativo, quando existir. `docs/mecanifica/PLANO.md` é somente a lápide do
+  plano mestre aposentado.
 - `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS herdado. Use-os
   somente quando a tarefa tocar no núcleo procedural ou exigir contexto histórico.
 - Se dois documentos divergirem, o material de `docs/mecanifica/` prevalece para
@@ -41,6 +43,6 @@ Reserve arquivos e identidades antes de editar. Use a issue indicada em
 - Rode testes proporcionais ao risco; para a verificação completa, use os
   comandos indicados em `docs/mecanifica/INDEX.md`.
 - Confira trabalho visual no navegador em mais de um enquadramento.
-- Atualize o plano quando uma fase mudar de estado e o índice quando mudar a
-  porta de entrada, a estrutura principal ou o próximo passo.
+- Atualize o índice de planos quando um plano for ativado ou encerrado e o índice
+  geral quando mudar a porta de entrada, a estrutura principal ou o plano ativo.
 - Não edite `docs/uso/MAPA.md` à mão; regenere com `npm run mapa`.

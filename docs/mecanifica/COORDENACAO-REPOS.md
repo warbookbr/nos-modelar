@@ -81,15 +81,20 @@ Uma decisão do usuário recebe o tipo `decisao`, data, consequências e a
 identidade de quem a registrou. O manual de comandos e o uso econômico de
 commits e diffs estão em [`COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md).
 
-## Decisões ainda abertas
+## Decisões consolidadas em 2 de agosto de 2026
 
-1. Os dois repositórios convergem ou permanecem separados?
-2. Em caso de convergência, qual é a base e qual é o enxerto?
-3. Quais faixas de IDs cada frente pode reservar durante o trabalho paralelo?
-4. Como comparar o plano do Ciclo 6 do brigsd com `arredondarAresta` e o fluxo de
-   IA já presentes no warbook?
+1. `warbookbr/nos-mecanifica` é a base de integração e a fonte de verdade da
+   autoria Mecanifica. `brigsd/nos-mecanifica` permanece uma frente upstream;
+   avanços entram no warbook por diff, revisão e PR, não por dois planos ativos.
+2. A convergência usa a `main` do warbook como base e traz enxertos pequenos do
+   brigsd. A integração A-60 encerrou a branch paralela anterior.
+3. IDs não usam faixas permanentes por agente. Cada frente reserva apenas os IDs
+   de que precisa na caixa local e os libera ao terminar.
+4. O Ciclo 6 importado foi comparado com `arredondarAresta`: a F1/A-30 foi aceita;
+   o restante foi cancelado porque daria a `filete` um segundo significado. Os
+   candidatos válidos foram separados no
+   [`BACKLOG.md`](planos/BACKLOG.md), sem plano ativo automático.
 
-Nenhuma resposta é implícita. Até serem decididas na issue, não crie novos IDs
-de atrito compartilhados nem comece mudanças sobrepostas em
-`prototipos/fps/v3/motor/oficina.js`, `docs/mecanifica/ATRITOS-AUTORIA.md` ou
-`docs/mecanifica/PLANO.md`.
+Antes de alterar `prototipos/fps/v3/motor/oficina.js`, o registro de atritos ou
+o índice de planos, continue reservando arquivos e identidades. Decisão
+consolidada não elimina coordenação operacional.

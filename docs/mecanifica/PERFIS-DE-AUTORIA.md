@@ -184,5 +184,5 @@ automotivo antes de serem tratadas como capacidade geral concluída.
 - a repetição radial O-13 é o ganho visual mais diretamente sustentado pelo
   experimento, mas não deve ser implementada antes da fundação de identidade
   O-6/O-12; repetir faces sem identidade só ampliaria o problema;
-- a ordem executiva e o backlog vigente ficam em
-  [`PLANO.md`](PLANO.md), não neste registro de perfis.
+- a ordem executiva e os candidatos ficam no índice de
+  [`planos`](planos/README.md), não neste registro de perfis.

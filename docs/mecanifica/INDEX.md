@@ -156,17 +156,24 @@ Estado atual:
   A fronteira está em [`FILETE-V2.md`](FILETE-V2.md);
 - caminhada, novos sistemas, narrativa e realismo F3 seguem em backlog, sem
   reabrir ciclos anteriores.
+- o plano mestre de 2.417 linhas foi encerrado. O novo índice de planos não
+  declara plano ativo; backlog não autoriza implementação automática.
 
-O estado detalhado e os critérios de saída ficam em
-[`docs/mecanifica/PLANO.md`](PLANO.md). Se este resumo divergir do plano, o
-plano prevalece.
+O estado do planejamento fica em [`planos/README.md`](planos/README.md). O antigo
+[`PLANO.md`](PLANO.md) é somente um ponto de compatibilidade para o encerramento.
 
 ## Hierarquia das fontes
 
 Use esta ordem para resolver dúvidas:
 
-1. [`docs/mecanifica/PLANO.md`](PLANO.md) — o que fazer agora e o que já foi
-   concluído;
+1. [`docs/mecanifica/planos/README.md`](planos/README.md) — plano ativo, contrato
+   dos planos curtos e backlog de candidatos; use
+   [`BACKLOG.md`](planos/BACKLOG.md) (`docs/mecanifica/planos/BACKLOG.md`) para
+   candidatos, [`MODELO.md`](planos/MODELO.md)
+   (`docs/mecanifica/planos/MODELO.md`) para abrir um plano e o
+   [`encerramento do plano mestre`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md)
+   (`docs/mecanifica/planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`)
+   somente para contexto da transição;
 2. [`docs/mecanifica/COORDENACAO-REPOS.md`](COORDENACAO-REPOS.md) — canal e
    protocolo para trabalho paralelo entre warbook e brigsd;
 3. [`docs/mecanifica/COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md) — caixa local,
@@ -184,7 +191,7 @@ Use esta ordem para resolver dúvidas:
 9. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — contrato e gate do
    arredondamento real de aresta;
 10. [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) — pacote,
-   revisão e crítica do ciclo ativo de modelagem por IA;
+   revisão e crítica do fluxo de modelagem por IA já entregue;
 11. [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) —
    medição cega do efeito real do fluxo sobre dois modeladores Sol;
 12. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
@@ -193,8 +200,8 @@ Use esta ordem para resolver dúvidas:
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
 14. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-15. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
-   ordenado de mudanças na linguagem de autoria, com trade-off e custo;
+15. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — análise
+   de dependências e candidatos da linguagem de autoria;
 16. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
 17. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
@@ -215,7 +222,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 
 | Tarefa | Leitura necessária |
 |---|---|
-| Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
+| Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/planos/README.md`](planos/README.md) |
 | Coordenar trabalho com o repositório do brigsd | [`docs/mecanifica/COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md) e [`docs/mecanifica/COORDENACAO-REPOS.md`](COORDENACAO-REPOS.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
 | Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md), [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
@@ -230,7 +237,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 | Investigar decisões antigas | [`docs/uso/RECURSOS.md`](../uso/RECURSOS.md) e [`docs/uso/MAPA.md`](../uso/MAPA.md) |
 
 Não é necessário ler todos os documentos antes de uma tarefa. Leia este índice,
-o plano e somente as referências da linha aplicável.
+o índice de planos e somente as referências da linha aplicável.
 
 ## Estrutura principal
 
@@ -319,6 +326,7 @@ npm run guarda:portas
 npm run mapa:check
 npm run docs:toc:check
 npm run docs:links:check
+npm run planos:check
 npm run exportar:check
 ```
 
@@ -341,84 +349,37 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Fluxo para uma sessão nova
 
-1. Leia este arquivo e `docs/mecanifica/PLANO.md`.
+1. Leia este arquivo e `docs/mecanifica/planos/README.md`.
 2. Confirme a árvore de trabalho antes de editar.
 3. Leia somente os documentos indicados para a tarefa.
 4. Preserve as fronteiras entre núcleo, Three.js, domínio automotivo e interface.
 5. Faça uma prova visível ou mensurável.
 6. Rode os gates proporcionais ao risco.
-7. Atualize plano, índice e registro upstream quando o estado real mudar.
+7. Atualize o plano ativo, o índice de planos e o registro upstream quando o
+   estado real mudar.
 
-## Estado e próximo ciclo
+## Planejamento atual
 
-O ciclo 1 terminou na Fase 4. Sua prova — carroceria simplificada, galpão,
-registro semântico, modos carro/contexto/isolar, seleção e explosão — foi
-separada para `warbookbr/mecanica`. As receitas mecânicas permanecem aqui como
-provas da linguagem; a roda experimental continua somente como evidência de
-autoria.
+**Não há plano ativo.** O plano mestre foi encerrado em 2 de agosto de 2026 e
+seu resultado está sintetizado em
+[`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
-O ciclo 2, “Fundação de autoria v1”, fechou em 31 de julho de 2026. O ciclo 2b,
-“Endereços semânticos v1”, fechou no mesmo dia e pagou a dívida que a
-verificação daquele fechamento tinha medido (A-18, A-19, A-20 e A-22). A
-conferência dos dois gates, condição por condição, e a lista de comandos da
-verificação completa estão em [`PLANO.md`](PLANO.md).
+A F1 do antigo Ciclo 6 foi aceita como entrega independente e pagou A-30. As
+demais fatias foram canceladas porque o desenho importado transformaria
+`filete` em arredondamento multipainel, em conflito com a decisão convergida de
+preservar `filete` como chanfro e usar `arredondarAresta` para arco real.
 
-O ciclo 3, “Arranjos semânticos v1”, fechou em 31 de julho de 2026, no núcleo e
-na peça: `arranja` radial e linear, cada cópia endereçável por identidade, a
-dívida A-23 paga junto e, no fechamento, a roda experimental reescrita e a peça
-de exercício `_cerca-e-flor` provando os dois modos fora do vocabulário
-automotivo. Ele **não** levou a op a nenhuma peça de produto: `freio-disco.js`
-não foi tocada, e o prisioneiro de roda e a aleta de ventilação continuam não
-modelados.
-
-O ciclo 4, “Corte e orientação de seção v1”, fechou em 31 de julho de 2026, no
-núcleo e na peça: `orientacao` no `loft`, a op `furo` passante e cega, o flange
-de roda furado do `freio-disco` e o corrimão de perfil chato. A dívida A-28,
-achada ao compor as duas, foi paga junto; A-26 e A-29 ficaram abertos.
-
-A rodada avulsa “Flange de uma peça só” fechou em 31 de julho de 2026 e levou o
-`centros` a uma peça de PRODUTO: o flange do freio virou um disco com quatro
-furos, e a prova em produto achou e pagou um defeito da partição do núcleo.
-
-**O ciclo 5, “Curva e filete v1”, está CONCLUÍDO.** As duas capacidades que
-sobraram da crítica da roda entraram: a alça de curva do 3º elemento do ponto
-virou raio de concordância no `lathe`, no `loft` e no `inflate`, e a op `filete`
-corta UMA aresta escolhida por identidade. As nove condições do gate estão
-conferidas uma a uma em [`PLANO.md`](PLANO.md). Provas: `_caixote-filetado`
-(móvel, usa as duas), o ombro do pneu da `roda-dianteira` e o chanfro de entrada
-e saída das pastilhas do `freio-disco`.
-
-Duas coisas achadas dentro do ciclo, ditas na cara: a condição 2 media a
-distância dos vértices ao arco, que é exata por construção e não podia falhar;
-e o primeiro desenho do filete deixava a face com um canto em cima da aresta
-seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptador,
-e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
-simples.**
-
-**Próxima entrega: F2 fatia 1 do ciclo 6, a derivação de contagem por desvio.**
-F1 está concluída; o ciclo “Furo por grupo, contagem por desvio e filete v2”
-permanece ABERTO, com plano completo em [`PLANO.md`](PLANO.md). Ele paga A-30,
-A-34, A-36 e A-37 na mesma rodada: 7 frentes, 29 fatias que se commitam verdes,
-gate medido e linha de base tirada do repositório de hoje. Os projetos que o
-originaram estão em `docs/mecanifica/projetos/ciclo6/`, com o mapa de terreno,
-as oito propostas independentes, os quatro vereditos de júri, o cruzamento e as
-três críticas adversariais.
-
-Três medições feitas no projeto mudaram o rumo antes de qualquer código. A
-candidata registrada do A-34 estava errada: quebrar a quina da borda do furo
-PIORA a ondulação do contorno em 9,5%, e subir `lados` de 12 para 20 a reduz em
-64% pelo mesmo orçamento de faces — então o A-34 virou `lados` com unidade, e a
-quebra saiu como A-38. O diagnóstico do A-36 gravado no núcleo estava errado no
-motivo: a tentativa antiga não falhou pela interpolação esférica, falhou porque
-pôs o centro do arco na aresta em vez da bissetriz, e a lista de ângulos dela é a
-lista certa ao contrário. E o A-37 foi prototipado: dos 408 pares (face, aresta)
-varridos, 84 construíam e passaram a 376, com 0 regressões.
+Capacidades ainda válidas, narrativa de desgaste, peças e melhorias de fluxo
+estão no [`BACKLOG.md`](planos/BACKLOG.md). Elas são candidatas sem ordem de
+execução. O próximo plano só nasce após escolha explícita, com um resultado,
+escopo excluído e gate próprios.
 
 ## Manutenção desta documentação
 
-- Mude `docs/mecanifica/PLANO.md` quando o estado das fases mudar.
+- Mude `docs/mecanifica/planos/README.md` quando um plano for ativado ou
+  encerrado. Não reabra o plano mestre aposentado.
 - Mude este índice quando mudar a estrutura principal, a hierarquia documental
-  ou a próxima entrega.
+  ou o plano ativo.
 - Dê a todo arquivo novo um cabeçalho que descreva sua responsabilidade.
 - Rode `npm run mapa` depois de criar, remover, renomear ou mudar o cabeçalho de
   um arquivo.

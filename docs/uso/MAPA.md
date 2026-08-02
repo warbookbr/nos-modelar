@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-234 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+240 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -111,7 +111,7 @@
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
-- `PLANO.md` — Plano vigente da Mecanifica
+- `PLANO.md` — Plano mestre da Mecanifica — aposentado
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
@@ -119,6 +119,13 @@
 - `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
 - `VISAO.md` — Visão da Mecanifica
+
+## docs/mecanifica/planos/
+
+- `BACKLOG.md` — Backlog de candidatos
+- `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
+- `MODELO.md` — [ID] — resultado curto
+- `README.md` — Planos da Mecanifica
 
 ## docs/rumo/
 
@@ -274,6 +281,8 @@
 - `fatiar.mjs` — fatiar.mjs — a rede de segurança do fatiamento de um doc grande (o alvo hoje é docs/oficina.md). Dois modos, SÓ mecânica — a classificação de qual seção vai …
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
 - `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentá…
+- `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
+- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente e mais de um plano ativo.
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
 ## tools/mecanifica/

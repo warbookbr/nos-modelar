@@ -66,3 +66,6 @@ jobs:
 
       - name: Referências a docs/*.md resolvem
         run: npm run docs:links:check
+
+      - name: Planejamento curto e com um único plano ativo
+        run: npm run planos:check
