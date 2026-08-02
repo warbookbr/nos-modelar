@@ -1593,6 +1593,11 @@ comportamento em `oficina.js`:
   entrou com caso vermelho e varredura do acervo.
 - **P3** (`e6e4c30`): os oito cânones da família simétrica de `furo` foram
   gravados antes de qualquer porte de ordem de ponte.
+- **P4** (`bc0fab1`, porte de `17241b0` do brigsd): `furo` tenta a ordem
+  declarada e, se necessário, a ordem do anel mais próximo do contorno; a ordem
+  por raio fica declarada para quando os grupos de A-30 chegarem. O primeiro
+  caminho continua byte-idêntico, oito figuras antes recusadas fecham nos dois
+  lados e as três que restam abortam de modo atômico.
 
 Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
 comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
@@ -1643,7 +1648,7 @@ de prosseguir.
 
 #### Trilha furo (F1 e F2) — mergeia primeiro
 
-4. **F1 fatia 1 — três ordens de ponte.** ENTRA:
+4. **F1 fatia 1 — três ordens de ponte — CONCLUÍDA no warbook (`bc0fab1`).** ENTRA:
    `triangularComAneis(contorno, aneis, escala, ordem)`; `d2AoSegmento`,
    `ordensDePonte` e `particionar` ao lado, com as TRÊS ordens exatamente como
    escritas no escopo do A-30, sem `sqrt` e sem `Math.hypot` na chave; o `furo`
