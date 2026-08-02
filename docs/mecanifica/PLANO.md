@@ -1581,6 +1581,22 @@ isso o commit 2 vem antes de qualquer peça.
 
 #### Chão (F0a e F0b)
 
+**Estado de porte no warbook, 1º de agosto de 2026.** A primeira parte do
+F0a já está fechada em três commits, antes de qualquer mudança de
+comportamento em `oficina.js`:
+
+- **P1** (`55acc93`): `criar.mjs` voltou a encaminhar `ALIASES`; o freio a
+  disco agora é medido com 0 órfãos pela mesma bancada que antes o acusava por
+  engano. O teste `criar-aliases.test.mjs` guarda a regressão.
+- **P2** (`1936fb5`): a quinta propriedade, área mínima relativa de triângulo,
+  entrou com caso vermelho e varredura do acervo.
+- **P3** (`e6e4c30`): os oito cânones da família simétrica de `furo` foram
+  gravados antes de qualquer porte de ordem de ponte.
+
+Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
+comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
+de prosseguir.
+
 1. **F0a — a régua, com o caso vermelho.** ENTRA: a quinta propriedade em
    `conferir-malha.ts` (área mínima de triângulo do adaptador ≥ 1e-9·escala², com
    `escala` = maior |v| da peça, escrita ao lado do número). FECHA: o teste que
