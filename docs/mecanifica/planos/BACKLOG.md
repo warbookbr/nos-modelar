@@ -13,7 +13,7 @@ escopo, exclusões, gate e decisão explícita.
 | `AUT-03` — triangulação robusta de face com buracos | A-33; 37 casos válidos históricos abortavam | concluído em [`AUT-2026-03`](2026-08-02-triangulacao-de-furos.md) |
 | `AUT-04` — discretização por concordância | A-35 | concluído em [`AUT-2026-02`](2026-08-02-concordancia-por-ponto.md) |
 | `AUT-05` — posição, encaixe e hierarquia semânticos | O-7, O-8, O-10, A-16 e A-29 | tema grande; deve ser dividido por uma montagem real |
-| `AUT-06` — câmera livre reproduzível | A-1 | em execução no [`AUT-2026-05`](2026-08-02-camera-livre-reproduzivel.md) |
+| `AUT-06` — câmera livre reproduzível | A-1 | concluído em [`AUT-2026-05`](2026-08-02-camera-livre-reproduzivel.md) |
 
 ## Peças e produto
 

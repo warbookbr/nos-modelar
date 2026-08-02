@@ -58,6 +58,11 @@ jobs:
       - name: A bancada mostra as portas que a peça publica
         run: npm run guarda:portas
 
+      # A câmera livre é estado de autoria: o único lugar que comprova a órbita
+      # e a recarga é a bancada real, não um import de helper.
+      - name: A bancada restaura a câmera livre pela URL
+        run: npm run guarda:camera
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 

@@ -1,6 +1,6 @@
 # AUT-2026-05 — câmera livre reproduzível
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -60,4 +60,16 @@ sessão e restaurado com a mesma posição, alvo, orientação, projeção e esc
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2 de agosto de 2026. A URL livre grava dez números explícitos:
+posição, alvo, vetor acima e zoom, todos com cinco casas. O leitor rejeita
+estado incompleto, longo, não finito, fora da faixa, sem orientação unitária ou
+com câmera sobre o alvo; nesses casos a bancada usa a isométrica segura. O dado
+não contém UUID, matriz, índice ou estado interno de `OrbitControls`.
+
+`tools/mecanifica/estado-bancada.test.ts` prova ida e volta, precisão, projeção,
+recusa e compatibilidade byte a byte das URLs canônicas. `npm run guarda:camera`
+dirige a bancada ortográfica real, orbita, recarrega o endereço e compara a
+câmera restaurada dentro da precisão declarada; o gate entrou no CI. A revisão
+visual confirmou a mesma vista livre antes e depois da recarga, sem erro no
+console. Restaurar explosão inicial deixou de reenquadrar a câmera, pois o
+endereço é a autoridade para os dois estados.

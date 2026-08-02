@@ -322,6 +322,10 @@ oito portas e que a peça sem portas não mostra a seção. O painel do A-20 viv
 `src/bancada/main.js`, que nenhum arquivo de teste importa; sem esta prova ele
 podia ser apagado inteiro com os outros gates verdes.
 
+`npm run guarda:camera` complementa a prova: orbita a bancada ortográfica,
+verifica `vista=livre` e a câmera explícita na URL, recarrega e compara o estado
+restaurado. O helper puro não basta para vigiar a ligação com a câmera real.
+
 Verificação completa:
 
 ```bash
@@ -331,6 +335,7 @@ npm run build
 npm run gabarito:selecao:check
 npm run id-cru:check
 npm run guarda:portas
+npm run guarda:camera
 npm run mapa:check
 npm run docs:toc:check
 npm run docs:links:check
@@ -375,9 +380,9 @@ seu resultado está sintetizado em
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
 pagou A-34 com contagem circular por tolerância e também foi encerrado.
 
-O plano ativo [`AUT-2026-05`](planos/2026-08-02-camera-livre-reproduzivel.md)
-trata A-1: tornar qualquer órbita da bancada reproduzível pela URL, sem mudar
-as vistas canônicas existentes.
+O plano curto [`AUT-2026-05`](planos/2026-08-02-camera-livre-reproduzivel.md)
+pagou A-1: qualquer órbita da bancada é reproduzível pela URL, sem mudar as
+vistas canônicas existentes.
 
 O plano curto seguinte [`AUT-2026-02`](planos/2026-08-02-concordancia-por-ponto.md)
 pagou A-35 com discretização local de concordâncias e também foi encerrado.

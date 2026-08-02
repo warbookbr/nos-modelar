@@ -23,6 +23,7 @@
     "comparar:revisao": "node tools/modelagem/comparar-revisao.mjs",
     "validar:critica": "node tools/modelagem/critica-modelagem.mjs",
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
+    "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "peca": "node tools/bancadas/olhar-peca.mjs",
     "executar": "node tools/bancadas/executar.mjs",

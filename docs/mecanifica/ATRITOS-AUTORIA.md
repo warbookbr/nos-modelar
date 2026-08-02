@@ -35,7 +35,7 @@ explícito manda mais que a posição no arquivo:
 | A-32 | dívida de desenho da peça, candidato `PEC-01` |
 | A-30 | resolvido pela F1 do antigo Ciclo 6 |
 | A-16 | candidato dentro de relações semânticas, sem plano ativo |
-| A-1 | em execução no plano `AUT-2026-05` |
+| A-1 | resolvido: câmera livre reproduzível por URL validada |
 | A-15 | retirado da Mecanifica com a Oficina humana |
 
 ### A-37 — o filete não compõe com o `chamferBox`, e era justo a pinça que precisava
@@ -310,8 +310,11 @@ conector têm o mesmo problema.
 
 ### A-1 — enquadramento livre não volta pela URL
 
-**Estado atual — EM EXECUÇÃO:** `AUT-2026-05` delimita a câmera livre
-reproduzível sem ampliar a navegação da bancada.
+**Estado atual — RESOLVIDO:** `AUT-2026-05` guarda posição, alvo, vetor acima e
+zoom com cinco casas na URL; a bancada restaura esse dado depois da projeção,
+sem UUID ou estado interno. Entrada inválida fecha para isométrica e as vistas
+canônicas permanecem byte-idênticas. A prova real `npm run guarda:camera` orbita
+em ortográfica, recarrega o endereço e compara os dados restaurados.
 
 **Onde dói:** bancada.
 

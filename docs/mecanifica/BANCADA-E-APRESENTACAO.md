@@ -62,13 +62,21 @@ Atalhos:
 | isolar / contexto | `I` / `G` |
 | limpar seleção | `Esc` |
 
-A URL é uma entrada de ferramenta, não apenas navegação. Um estado como:
+A URL é uma entrada de ferramenta, não apenas navegação. Um estado canônico como:
 
 ```text
 bancada.html?selecionadas=disco,pinca&modo=contexto&vista=direita&projecao=ortografica&explosao=0.35
 ```
 
 permite que outra pessoa ou IA veja exatamente a mesma composição.
+
+Depois de uma órbita livre, a URL troca `vista` por `livre` e acrescenta
+`camera`: posição, alvo, vetor acima e zoom, nessa ordem, cada valor com cinco
+casas decimais. Não há UUID, matriz, índice ou estado interno do controle. A
+leitura aceita somente dez números finitos dentro do estúdio, vetor acima quase
+unitário e zoom positivo; entrada ausente, longa ou inválida volta à isométrica.
+Assim uma IA pode guardar uma revisão não canônica sem transformar a URL em
+estado opaco de render. As vistas canônicas permanecem compactas e byte-idênticas.
 
 ## Explosão automática e explosão autoral
 
@@ -77,6 +85,10 @@ funciona imediatamente para qualquer objeto e ajuda a descobrir peças
 sobrepostas. Ao terminar a transição, a câmera enquadra a caixa das partes
 visíveis já afastadas; uma explosão não pode sair cortada só porque a câmera foi
 calculada para a montagem fechada.
+
+Ao restaurar uma URL, a explosão inicial não reenquadra a câmera: o endereço
+declara tanto a explosão quanto a vista. Reenquadrar continua sendo consequência
+somente de uma explosão alterada por quem está usando a bancada.
 
 Na apresentação ao cliente, os vetores devem ser autorais. Uma pinça precisa
 afastar-se pelo eixo que libera o disco; uma pastilha deve sair pelo caminho de

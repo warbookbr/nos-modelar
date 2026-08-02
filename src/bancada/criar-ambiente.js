@@ -86,7 +86,7 @@ export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 }
   objeto.updateMatrixWorld(true);
 }
 
-export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
+export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre } = {}) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -163,6 +163,9 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     transicao = null;
     vistaAtual = 'livre';
     aoMudarVista?.(vistaAtual);
+  });
+  controls.addEventListener('change', () => {
+    if (vistaAtual === 'livre') aoMudarCameraLivre?.();
   });
 
   function ajustarOrtografica() {
@@ -252,8 +255,41 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     camera = segura === 'ortografica' ? ortografica : perspectiva;
     camera.position.copy(posicao);
     camera.up.copy(up);
+    camera.zoom = segura === 'ortografica' ? camera.zoom : 1;
+    camera.updateProjectionMatrix();
     controls.object = camera;
+    if (vistaAtual === 'livre') {
+      ajustarOrtografica();
+      controls.update();
+      return;
+    }
     definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo: true });
+  }
+
+  function cameraLivre() {
+    if (vistaAtual !== 'livre') return null;
+    return {
+      posicao: camera.position.toArray(),
+      alvo: controls.target.toArray(),
+      acima: camera.up.toArray(),
+      zoom: camera.zoom,
+    };
+  }
+
+  function restaurarCameraLivre(estado) {
+    transicao = null;
+    controls.enabled = true;
+    camera.position.fromArray(estado.posicao);
+    camera.up.fromArray(estado.acima).normalize();
+    camera.zoom = estado.zoom;
+    camera.updateProjectionMatrix();
+    controls.target.fromArray(estado.alvo);
+    camera.lookAt(controls.target);
+    controls.update();
+    vistaAtual = 'livre';
+    piso.visible = true;
+    grade.visible = true;
+    aoMudarVista?.(vistaAtual);
   }
 
   function redimensionar() {
@@ -371,6 +407,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista } = {}) {
     get projecao() { return projecaoAtual; },
     definirVista,
     definirProjecao,
+    cameraLivre,
+    restaurarCameraLivre,
     enquadrar,
     referenciaMetrica,
     medirEnquadramento,

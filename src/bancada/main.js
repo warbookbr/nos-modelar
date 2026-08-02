@@ -8,7 +8,6 @@ import {
   alvosDeEnquadramento,
   escreverEstadoNaUrl,
   lerEstadoDaUrl,
-  VISTAS_BANCADA,
 } from './estado-bancada.js';
 
 function formatarNome(nome) {
@@ -57,6 +56,9 @@ async function iniciar() {
       atualizarBotoesVista();
       if (!inicializando && controlador) salvarEstadoNaUrl(controlador.estado());
     },
+    aoMudarCameraLivre() {
+      if (!inicializando && controlador) salvarEstadoNaUrl(controlador.estado());
+    },
   });
   posicionarNoEstudio(convertido.raiz);
   ambiente.scene.add(convertido.raiz);
@@ -85,8 +87,9 @@ async function iniciar() {
     if (nomePeca !== PECA_PADRAO) saida.set('peca', nomePeca);
     const estadoDaVista = escreverEstadoNaUrl({
       ...estado,
-      vista: VISTAS_BANCADA[vistaAtual] ? vistaAtual : 'isometrica',
+      vista: vistaAtual,
       projecao: ambiente.projecao,
+      cameraLivre: ambiente.cameraLivre(),
     });
     for (const [chave, valor] of new URLSearchParams(estadoDaVista)) saida.set(chave, valor);
     const query = saida.toString();
@@ -138,10 +141,10 @@ async function iniciar() {
     raiz: convertido.raiz,
     partes: convertido.partes,
     aoMudar: refletirEstado,
-    aoEstabilizarExplosao() {
+    aoEstabilizarExplosao(_estado, { enquadrar = true } = {}) {
       /* A câmera da montagem fechada corta a explosão. Esperar a animação
          terminar evita que ela persiga cada quadro e enquadra a caixa real. */
-      ambiente.enquadrar(controlador.gruposVisiveis());
+      if (enquadrar) ambiente.enquadrar(controlador.gruposVisiveis());
     },
   });
 
@@ -305,11 +308,12 @@ async function iniciar() {
     .filter((nome) => nome && !inicial.selecionadas.includes(nome));
   controlador.selecionarMuitas(inicial.selecionadas);
   controlador.definirModo(inicial.modo);
-  controlador.definirExplosao(inicial.explosao);
+  controlador.definirExplosao(inicial.explosao, { enquadrar: false });
   ambiente.definirProjecao(inicial.projecao);
   refletirProjecao();
   ambiente.definirVista(inicial.vista, { instantaneo: true });
-  vistaAtual = inicial.vista;
+  if (inicial.cameraLivre) ambiente.restaurarCameraLivre(inicial.cameraLivre);
+  vistaAtual = ambiente.vista;
   inicializando = false;
   refletirEstado(controlador.estado());
   atualizarBotoesVista();
@@ -348,6 +352,7 @@ async function iniciar() {
       ...controlador.estado(),
       vista: vistaAtual,
       projecao: ambiente.projecao,
+      cameraLivre: ambiente.cameraLivre(),
     }),
     url: () => location.href,
   };

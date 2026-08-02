@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-251 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+252 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -315,6 +315,7 @@
 - `flange-integridade.test.ts` — flange-integridade.test.ts — prova em peça da F1/A-30: uma passagem central e um círculo de parafusos, com raios distintos e nomes estáveis, no mesmo passo. …
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `gabarito-furacao-integridade.test.ts` — gabarito-furacao-integridade.test.ts — prova geral do A-34 nas três ops com raio escalar: cilindro, cone e furo usam a mesma tolerância em metros.
+- `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `jardineira-integridade.test.ts` — jardineira-integridade.test.ts — a prova NÃO AUTOMOTIVA do contrato de autoria: O-6 (`origem` universal), O-12 (portas semânticas) e, desde o ciclo Endereços…
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …

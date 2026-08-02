@@ -121,14 +121,14 @@ export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExp
     raiz.updateWorldMatrix(true, true);
   }
 
-  function animarExplosao() {
+  function animarExplosao(enquadrarAoEstabilizar = true) {
     cancelAnimationFrame(animacaoExplosao);
     const reduzirMovimento = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduzirMovimento) {
       explosao = explosaoAlvo;
       aplicarExplosao();
       aoMudar?.(estado());
-      aoEstabilizarExplosao?.(estado());
+      aoEstabilizarExplosao?.(estado(), { enquadrar: enquadrarAoEstabilizar });
       return;
     }
     const quadro = () => {
@@ -137,7 +137,7 @@ export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExp
       aplicarExplosao();
       aoMudar?.(estado());
       if (explosao !== explosaoAlvo) animacaoExplosao = requestAnimationFrame(quadro);
-      else aoEstabilizarExplosao?.(estado());
+      else aoEstabilizarExplosao?.(estado(), { enquadrar: enquadrarAoEstabilizar });
     };
     animacaoExplosao = requestAnimationFrame(quadro);
   }
@@ -175,9 +175,9 @@ export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExp
       modo = ['todas', 'contexto', 'isolar'].includes(novoModo) ? novoModo : 'todas';
       aplicarVisual();
     },
-    definirExplosao(valor) {
+    definirExplosao(valor, { enquadrar = true } = {}) {
       explosaoAlvo = Math.min(1, Math.max(0, Number(valor) || 0));
-      animarExplosao();
+      animarExplosao(enquadrar);
     },
     gruposSelecionados() {
       return selecionadas.map((nome) => partes.get(nome)).filter(Boolean);
