@@ -4,6 +4,12 @@ Comece por `docs/mecanifica/INDEX.md`. Ele informa o estado atual, a hierarquia
 das fontes e quais documentos ler para cada tipo de tarefa. Não leia todo o
 legado por padrão.
 
+Antes de alterar núcleo procedural, plano, atritos ou identidades enquanto houver
+trabalho paralelo em `brigsd/nos-mecanifica`, leia
+`docs/mecanifica/COORDENACAO-LOCAL.md` e consulte `inbox` para o seu agente.
+Reserve arquivos e identidades antes de editar. Use a issue indicada em
+`docs/mecanifica/COORDENACAO-REPOS.md` somente para decisões duráveis.
+
 ## Fonte de verdade
 
 - `docs/mecanifica/` governa o produto Mecanifica.
@@ -16,8 +22,9 @@ legado por padrão.
 ## Regras essenciais
 
 - Preserve o núcleo, as peças e o jogo de referência em `prototipos/fps/v3/`.
-  A Oficina humana (`oficina.html` e a antiga aba de som) foi removida de
-  propósito e não deve ser recriada no Mecanifica.
+  A Oficina humana (`oficina.html`), a antiga aba de som e sua ponte de runtime
+  foram removidas de propósito; não as recrie no Mecanifica sem uma nova decisão
+  de produto.
 - Mantenha o núcleo de autoria independente de Three.js e do domínio automotivo.
 - Nunca persista UUIDs do Three.js, índices de arrays ou posições de passos como
   identidade.

@@ -10,6 +10,12 @@ Antes de planejar ou implementar uma rodada, leia
 outros documentos são necessários para cada tipo de tarefa; não carregue toda a
 documentação por padrão.
 
+Se a tarefa tocar núcleo procedural, plano, atritos ou identidades enquanto
+`brigsd/nos-mecanifica` também estiver ativo, leia primeiro
+`docs/mecanifica/COORDENACAO-LOCAL.md`, consulte `inbox claude` e reserve os
+arquivos e identidades antes de editar. Use a issue indicada em
+`docs/mecanifica/COORDENACAO-REPOS.md` somente para decisões duráveis.
+
 Os documentos antigos em `docs/uso/`, `docs/rumo/` e `docs/historico/` pertencem
 à base herdada do NÓS. Consulte-os quando tocar no núcleo legado, mas não os use
 como roteiro de produto da Mecanifica. Em caso de divergência,
@@ -18,8 +24,8 @@ como roteiro de produto da Mecanifica. Em caso de divergência,
 ## Fronteiras
 
 - O núcleo, as peças e o jogo de referência em `prototipos/fps/v3/` permanecem
-  executáveis durante a migração. A Oficina humana e a antiga aba de som foram
-  retiradas e não fazem parte da Mecanifica.
+  executáveis durante a migração. A Oficina humana, a antiga aba de som e sua
+  ponte de runtime foram retiradas e não fazem parte da Mecanifica.
 - O novo produto nasce em módulos próprios, sem acrescentar mais responsabilidades
   ao `jogo.html` legado.
 - O núcleo de autoria não pode importar Three.js nem conhecer freios, carros ou

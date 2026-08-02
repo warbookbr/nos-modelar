@@ -4916,7 +4916,7 @@ describe('furo — toda face nova é endereçável, e as famílias não se confu
 
   it('chave desconhecida na origem do furo GRITA com o vocabulário certo, em vez de ser ignorada', () => {
     const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, lado: 0 } }, cor: '#f00' }]]) as any, {}, {});
-    expect(n.orfaos.some((o: any) => /furo usa op, id, furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
+    expect(n.orfaos.some((o: any) => /furo usa op, id, grupo opcional \(nome semântico visível\), furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
     expect(pintadas(n, '#f00')).toEqual([]);
   });
 
@@ -5602,11 +5602,34 @@ describe('furo v2 — a fronteira medida da partição (A-33)', () => {
     expect(contadas).toBe(147);
   });
 
+  /* A FRONTEIRA ANDOU (A-30). Onze linhas travavam aqui. Com as três ordens de
+     ponte, OITO passam a fechar e três continuam travando. As oito não saíram
+     da lista: elas mudaram de lado, e agora afirmam que fecham DIREITO — a
+     contagem fechada, a malha sem borda solta e o adaptador aceitando. Uma
+     figura que para de gritar e passa a sair torta seria pior do que travar.
+
+     Medido na mesma varredura, 1 760 combinações (face 5..24 × furo de 3 a 24 ×
+     total 2..12): com uma ordem, 1 658 inteiras e 23 travando; com as três,
+     1 671 e 10. */
+  const AGORA_FECHA: [number, number, number][] = [
+    [6, 3, 7], [6, 4, 7], [6, 12, 7], [6, 24, 7],
+    [8, 3, 9], [8, 4, 10], [10, 4, 11], [18, 3, 11],
+  ];
+  for (const [face, furo, total] of AGORA_FECHA) {
+    it(`face de ${face} lados com ${total} furos de ${furo}: travava, e agora FECHA inteira (A-30)`, () => {
+      const n = nucleo(FLANGE(face, furo, total) as any, {}, {});
+      expect(n.orfaos.map((o: any) => o.motivo)).toEqual([]);
+      expect(arestasSoltas(n), 'malha fechada').toBe(0);
+      expect([...n.F.keys()].filter((f: number) => f >= 1000), 'a contagem fechada continua valendo')
+        .toHaveLength(3 * furo * total + 2 * (face + 2 * total - 2));
+    });
+  }
+
   /* a região que AINDA trava, dita na cara. Cada linha veio da varredura de
-     14 212 e é geometricamente válida: os anéis cabem na face e não se tocam. */
+     14 212 e é geometricamente válida: os anéis cabem na face e não se tocam.
+     Sobraram três: as três ordens não são completude, e isso fica escrito. */
   const AINDA_TRAVA: [number, number, number][] = [
-    [6, 3, 7], [6, 3, 9], [6, 4, 7], [6, 12, 7], [6, 24, 7],
-    [7, 3, 8], [7, 5, 8], [8, 3, 9], [8, 4, 10], [10, 4, 11], [18, 3, 11],
+    [6, 3, 9], [7, 3, 8], [7, 5, 8],
   ];
   for (const [face, furo, total] of AINDA_TRAVA) {
     it(`face de ${face} lados com ${total} furos de ${furo}: trava, e trava GRITANDO (A-33)`, () => {

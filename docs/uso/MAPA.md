@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-224 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+238 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -103,6 +103,8 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
 - `AUTORIA-IA.md` — Autoria para IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
+- `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FILETE-V2.md` — Filete v2 — Escopo A implementado; canto composto pendente
@@ -133,7 +135,7 @@
 
 - `LORE.md` — Lore — a bíblia do NÓS
 - `RECURSOS.md` — Recursos técnicos do Atelier herdado
-- `oficina-contrato.md` — Oficina — o contrato vigente
+- `oficina-contrato.md` — Oficina — contrato histórico do núcleo
 - `oficina-referencia.md` — Oficina — referência de como cada coisa funciona
 
 ## prototipos/fps/v3/
@@ -171,6 +173,7 @@
 - `_corrimao.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA da segunda capacidade do ciclo "Corte e orientação de seção v1": `orientacao` no `loft`. Um corrimão de escada, de…
 - `_elenco.js` — scratch: ELENCO completo do carimbo — uma de cada espécie em fila, pro ideador ver tudo.
 - `_espelhado.js` — PEÇA-EXEMPLO do P3 do playground: uma CABEÇA com um PAR DE CHIFRES — o objeto BILATERAL modelado só de UM chifre e completado pela op `espelha` NOVA, waterti…
+- `_flange-de-tubulacao.js` — PEÇA DE EXERCÍCIO — prova geral da F1/A-30: uma flange de tubulação abre, em UM passo, a passagem central e o círculo de fixação com raios diferentes. Os gru…
 - `_frondosa.js` — scratch: prova de 'seca'/'raiz' (malhas separadas, afiadas) + 'frondosa' (copa fundida). Fila: seca | raiz | 4× frondosa.
 - `_galho.js` — PEÇA-EXEMPLO do P4 do playground: um GALHO — o objeto que SÓ o `loft` faz hoje (uma sequência de SEÇÕES circulares encadeada ao longo de um CAMINHO 3D). É o …
 - `_jardineira.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA da Fundação de autoria v1: uma jardineira de janela com uma muda plantada (caixa, terra, bulbo, caule, folhagem e …
@@ -246,8 +249,12 @@
 ## tools/bancadas/
 
 - `auditar.mjs` — auditar.mjs — o GATE de senso crítico [cpu] numa peça REAL (D-60). Roda os críticos validados pelo benchmark (lint-de-malha, distancia-paleta, seam, banding,…
+- `criar-aliases.test.mjs` — criar-aliases.test.mjs — impede que a bancada criar volte a diagnosticar como órfã uma peça válida por esquecer o sexto campo do envelope: ALIASES.
 - `criar.mjs` — criar.mjs — P7 do playground (D-120): A CAMADA IA, laço único.
+- `estado-peca.mjs` — estado-peca.mjs — executa o envelope completo de uma peça procedural para que bancadas distintas não percam MATERIAIS, ESQUELETO ou ALIASES.
 - `executar.mjs` — executar.mjs — a bancada do REPLAY da OFICINA (passo 1), sem browser. Roda a lista de PASSOS de uma peça, serializa a lista, re-parseia e re-executa, e afirm…
+- `gabarito-selecao-lib.mjs` — gabarito-selecao-lib.mjs — regras puras da Prova Zero: compara o acervo atual ao gabarito gravado e permite declarar SOMENTE peças novas nomeadas.
+- `gabarito-selecao-lib.test.mjs` — gabarito-selecao-lib.test.mjs — protege a exceção estreita para peça nova: `--novas` aceita presença nova, mas nunca esconde hash, remoção ou erro de nome.
 - `gabarito-selecao.mjs` — gabarito-selecao.mjs — a PROVA ZERO da Fase 3.5 (docs/rumo/PLANO.md): mede, peça por peça, que uma mudança no núcleo (`motor/oficina.js`) não mudou o resulta…
 - `gabarito.mjs` — gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o gabarito, desenhado à…
 - `id-cru.mjs` — id-cru.mjs — o gate do O-4 (docs/mecanifica/OFICINA-OTIMIZACOES.md): REPROVA peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
@@ -276,6 +283,11 @@
 - `lint-malha.mjs` — lint-de-malha [malha] — checagem-CPU da geometria antes do render: triângulo degenerado, vértice NaN/Inf/gigante, normal zero/não-unitária, stride/contagem e…
 - `simetria.mjs` — simetria [malha] — a peça que DECLARA simetria de fato é simétrica? Opt-in pelo envelope: só roda se `meta.simetria` estiver declarado ('x', 'y' ou 'z' — o e…
 
+## tools/coordenacao/
+
+- `coord.mjs` — coord.mjs — caixa postal local, econômica e sem dependências para coordenar agentes em repositórios diferentes sem carregar histórico ou diffs inteiros.
+- `coord.test.mjs` — coord.test.mjs — prova mensagens imutáveis, leitura econômica, confirmações independentes e bloqueio de reservas sobrepostas do canal entre agentes.
+
 ## tools/mapa/
 
 - `fatiar.mjs` — fatiar.mjs — a rede de segurança do fatiamento de um doc grande (o alvo hoje é docs/oficina.md). Dois modos, SÓ mecânica — a classificação de qual seção vai …
@@ -298,6 +310,7 @@
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
+- `flange-integridade.test.ts` — flange-integridade.test.ts — prova em peça da F1/A-30: uma passagem central e um círculo de parafusos, com raios distintos e nomes estáveis, no mesmo passo. …
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `jardineira-integridade.test.ts` — jardineira-integridade.test.ts — a prova NÃO AUTOMOTIVA do contrato de autoria: O-6 (`origem` universal), O-12 (portas semânticas) e, desde o ciclo Endereços…
@@ -327,8 +340,12 @@
 
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
 - `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
+- `canon-linha-de-base.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
+- `chao-do-ciclo6.test.ts` — chao-do-ciclo6.test.ts — caso vermelho da quinta propriedade: um triângulo emitido pode ter área zero mesmo com núcleo, adaptador e casca saudáveis.
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
 - `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…
+- `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
+- `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…

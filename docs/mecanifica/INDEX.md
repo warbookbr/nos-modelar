@@ -34,7 +34,8 @@ Estado atual:
   integrado, e o fluxo resultante está documentado em perfis de autoria;
 - a Fundação de autoria v1 (ciclo 2) está **concluída** desde 31 de julho de
   2026: `origem` universal e portas semânticas permanecem; a proteção da antiga
-  Oficina humana virou evidência histórica quando essa interface foi retirada;
+  Oficina humana, sua aba de som e a ponte sonora do runtime viraram evidência
+  histórica quando essas superfícies foram retiradas;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
   usa os cinco geradores novos e **oito** portas semânticas, com 0 face sem
@@ -113,10 +114,17 @@ Estado atual:
 - **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
   porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
   `centros` desarma o caso do círculo de furos, não o caso geral; o flange
-  deixou de ser a evidência dele), A-30 (um passo de furo tem UM raio, então a
-  flange com furo central mais círculo de parafusos ainda não é escrevível) e
-  A-32 (o cubo do freio não tem cubo-piloto: o flange não pode ser mais largo
-  que o barril, porque o aro entra por cima dele com 0,6 mm de folga);
+  deixou de ser a evidência dele) e A-32 (o cubo do freio não tem cubo-piloto:
+  o flange não pode ser mais largo que o barril, porque o aro entra por cima
+  dele com 0,6 mm de folga);
+- A-30 já permite raios diferentes na mesma face: pontos,
+  discos e círculos expandem em ordem estável, `raio` do passo é padrão e o
+  furo dentro de outro recebe diagnóstico próprio. Em furo cego, esses grupos
+  também podem declarar profundidades diferentes; mistura com passante continua
+  proibida. Disco e círculo podem receber nome único e ser selecionados pela
+  origem `furo` sem depender de posição. A peça `_flange-de-tubulacao` fecha a
+  prova: passagem central e círculo de parafusos têm endereços por grupo, e as
+  figuras gerais cobrem furos fora do centro e três profundidades cegas;
 - A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
   humana que emitia referências posicionais não existe mais na Mecanifica. O
   gate `id-cru` permanece protegendo as peças escritas por IA;
@@ -157,33 +165,37 @@ Use esta ordem para resolver dúvidas:
 
 1. [`docs/mecanifica/PLANO.md`](PLANO.md) — o que fazer agora e o que já foi
    concluído;
-2. [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) — fronteiras, dependências
+2. [`docs/mecanifica/COORDENACAO-REPOS.md`](COORDENACAO-REPOS.md) — canal e
+   protocolo para trabalho paralelo entre warbook e brigsd;
+3. [`docs/mecanifica/COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md) — caixa local,
+   mensagens econômicas, reservas e consulta de diffs por commit;
+4. [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) — fronteiras, dependências
    e direção técnica;
-3. [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md) — contrato para criação e
+5. [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md) — contrato para criação e
    refinamento por IA;
-4. [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) — escolha do
+6. [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) — escolha do
    fluxo visual, fidelidade, precisão, interação e orçamento;
-5. [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md)
+7. [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md)
    — briefing por peça, revisão intermediária e critério para extrair uma skill;
-6. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
+8. [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) —
    autoria visual e experiência do cliente;
-7. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — contrato e gate do
+9. [`docs/mecanifica/FILETE-V2.md`](FILETE-V2.md) — contrato e gate do
    arredondamento real de aresta;
-8. [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) — pacote,
+10. [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) — pacote,
    revisão e crítica do ciclo ativo de modelagem por IA;
-9. [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) —
+11. [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) —
    medição cega do efeito real do fluxo sobre dois modeladores Sol;
-10. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+12. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-11. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+13. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-12. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+14. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-13. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
+15. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — plano
    ordenado de mudanças na linguagem de autoria, com trade-off e custo;
-14. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+16. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-15. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+17. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -202,6 +214,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 | Tarefa | Leitura necessária |
 |---|---|
 | Entender produto ou decidir escopo | [`docs/mecanifica/VISAO.md`](VISAO.md) e [`docs/mecanifica/PLANO.md`](PLANO.md) |
+| Coordenar trabalho com o repositório do brigsd | [`docs/mecanifica/COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md) e [`docs/mecanifica/COORDENACAO-REPOS.md`](COORDENACAO-REPOS.md) |
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
 | Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md), [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
 | Avaliar se o fluxo ajuda uma IA a modelar | [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) |
@@ -230,6 +243,7 @@ o plano e somente as referências da linha aplicável.
 | `prototipos/fps/v3/` | núcleo, peças, visor e jogo de referência herdados; sem Oficina humana |
 | `tools/mecanifica/` | testes headless dos contratos novos |
 | `tools/modelagem/` | preparação, validação, revisão, crítica e comparação do fluxo assistido por IA |
+| `tools/coordenacao/` | caixa postal local, reservas e metadados Git entre agentes |
 | `autoria-assistida/` | guias curtos e pacotes de prova versionados para agentes modeladores e críticos |
 | `tools/bancadas/` | ferramentas visuais e gates herdados ou compartilhados |
 | `tools/mapa/` | geração do inventário e validação da documentação |
@@ -379,15 +393,24 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Último ciclo encerrado: Fluxo de modelagem assistida por IA v1.** Uma IA nova
-recebeu um pacote curto, modelou, gerou revisão reproduzível e recebeu crítica
-objetiva de outra IA sem uma interface humana nem leitura do repositório inteiro.
-A prova não automotiva resolveu a transição e preservou explicitamente a
-divergência de material numa segunda crítica cega; `freio-disco` atravessou o
-mesmo contrato como peça existente. O contrato
-e o fechamento estão em
-[`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md). Nenhum ciclo novo está aberto;
-Filete v2 permanece pausado no Escopo A.
+**Próxima entrega: F2 fatia 1 do ciclo 6, a derivação de contagem por desvio.**
+F1 está concluída; o ciclo “Furo por grupo, contagem por desvio e filete v2”
+permanece ABERTO, com plano completo em [`PLANO.md`](PLANO.md). Ele paga A-30,
+A-34, A-36 e A-37 na mesma rodada: 7 frentes, 29 fatias que se commitam verdes,
+gate medido e linha de base tirada do repositório de hoje. Os projetos que o
+originaram estão em `docs/mecanifica/projetos/ciclo6/`, com o mapa de terreno,
+as oito propostas independentes, os quatro vereditos de júri, o cruzamento e as
+três críticas adversariais.
+
+Três medições feitas no projeto mudaram o rumo antes de qualquer código. A
+candidata registrada do A-34 estava errada: quebrar a quina da borda do furo
+PIORA a ondulação do contorno em 9,5%, e subir `lados` de 12 para 20 a reduz em
+64% pelo mesmo orçamento de faces — então o A-34 virou `lados` com unidade, e a
+quebra saiu como A-38. O diagnóstico do A-36 gravado no núcleo estava errado no
+motivo: a tentativa antiga não falhou pela interpolação esférica, falhou porque
+pôs o centro do arco na aresta em vez da bissetriz, e a lista de ângulos dela é a
+lista certa ao contrário. E o A-37 foi prototipado: dos 408 pares (face, aresta)
+varridos, 84 construíam e passaram a 376, com 0 regressões.
 
 ## Manutenção desta documentação
 

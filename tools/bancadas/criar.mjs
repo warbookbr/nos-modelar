@@ -24,6 +24,7 @@ import { construirPeca, pixels } from './bench/sandbox.mjs';
 import { decodePng, pngStats } from './bench/pngstats.mjs';
 import { mascaraParaPng, sobreposicaoParaPng } from './bench/pngwrite.mjs';
 import { extrairSilhueta, rasterizarContorno, validarContorno, iou, areaMascara, LIMIAR_IOU } from './bench/gabarito-nucleo.mjs';
+import { executarNucleoDaPeca } from './estado-peca.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -54,7 +55,7 @@ const mod = await import(pathToFileURL(join(PECAS, `${nome}.js`)).href);
 const temPassos = Array.isArray(mod.PASSOS);
 if (temPassos) {
   try {
-    const n = neutroCanonico(nucleo(mod.PASSOS, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.MATERIAIS ?? {}, mod.ESQUELETO ?? null));
+    const n = neutroCanonico(executarNucleoDaPeca(nucleo, mod));
     // linha de V é [id, x, y, z, ...] (achatada — ver o comentário de neutroCanonico), não [id,[x,y,z]]
     const xs = n.V.map((v) => v[1]), ys = n.V.map((v) => v[2]), zs = n.V.map((v) => v[3]);
     const caixa = n.V.length ? { min: [Math.min(...xs), Math.min(...ys), Math.min(...zs)], max: [Math.max(...xs), Math.max(...ys), Math.max(...zs)] } : null;

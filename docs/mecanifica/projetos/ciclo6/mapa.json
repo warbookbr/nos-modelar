@@ -1,0 +1,374 @@
+{
+ "regioes": [
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3282,
+   "linhaFim": 3309,
+   "oQueFaz": "Documenta `centro`, `centros` (lista de pontos OU circulo) e declara na linha 3309 que `raio` e OBRIGATORIO e unico do passo — a frase que A-30 contradiz."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3383,
+   "linhaFim": 3384,
+   "oQueFaz": "Resolve UM `raio` por passo com st.num e recusa <=0 ou nao-finito; e o unico raio que o passo inteiro usa, do anel de entrada ao de saida."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3391,
+   "linhaFim": 3396,
+   "oQueFaz": "`conferirPonto` exige [x,y,z] com exatamente 3 elementos. MEDIDO: e a linha 3392 que recusa `centros:[{centro,raio}]` com 'centros[0] precisa ser [x,y,z] (3 elementos)'."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3403,
+   "linhaFim": 3409,
+   "oQueFaz": "Ramo LISTA de `centros`: recusa lista vazia, valida cada ponto por conferirPonto e resolve tudo em mundoCentros."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3410,
+   "linhaFim": 3430,
+   "oQueFaz": "Ramo CIRCULO de `centros`: fecha o vocabulario em pivo/distancia/total/volta/graus. MEDIDO: e a linha 3413 que grita \"'raio' nao e palavra desta forma\"."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3431,
+   "linhaFim": 3433,
+   "oQueFaz": "O else final que recusa qualquer forma de `centros` que nao seja lista nem circulo — a porta por onde uma terceira forma (lista de grupos, central + circulo) teria de entrar."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3462,
+   "linhaFim": 3474,
+   "oQueFaz": "Monta a lista `centros` no mundo (expande o circulo no quadro (u,w) da face ou projeta a lista dada) e fixa M, o numero de furos do passo."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3477,
+   "linhaFim": 3492,
+   "oQueFaz": "O laco que constroi UM anel de L lados por centro usando o `raio` unico (linha 3483) e confere a margem de cada anel contra o contorno da face."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3493,
+   "linhaFim": 3495,
+   "oQueFaz": "Confere sobreposicao par a par entre os aneis; ja compara POLIGONOS via aneisSeSobrepoem, nao raios — confirma a frase do A-30 de que essa parte ja esta pronta."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 1418,
+   "linhaFim": 1434,
+   "oQueFaz": "`aneisSeSobrepoem` — eixo separador entre dois convexos quaisquer, com folga proporcional a escala; agnostico a raio, serve aneis de tamanhos diferentes sem mudanca."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3515,
+   "linhaFim": 3530,
+   "oQueFaz": "Projeta cada anel de ENTRADA na face de saida ao longo do eixo e confere a margem la; herda a forma do anel de entrada, entao um raio por furo atravessa sozinho."
+  },
+  {
+   "atrito": "A-30",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3571,
+   "linhaFim": 3573,
+   "oQueFaz": "A guarda de estouro do bloco de ids: nV = 2LM e nF = M*(3L ou 2L+1) mais preenchimentos; nao depende do raio, entao A-30 e neutro aqui."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3327,
+   "linhaFim": 3352,
+   "oQueFaz": "O bloco NUMERACAO do furo, que e formato salvo: fixa 2LM vertices e as faixas b+3Lk+j (borda), +L+j (parede), +2L+j (saida) ou +2L (fundo), e o preenchimento a partir de b+3LM."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3477,
+   "linhaFim": 3492,
+   "oQueFaz": "O laco de aneis: hoje cria UM anel por furo na entrada; um chanfro de contorno pediria um segundo anel concentrico e recuado no mesmo plano."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3546,
+   "linhaFim": 3569,
+   "oQueFaz": "Monta as bordas ANTES de reservar id: bordaAnular quando M=1, triangularComAneis quando M>=2; e entre a borda e a parede que a tira de chanfro entraria."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3591,
+   "linhaFim": 3619,
+   "oQueFaz": "A construcao por furo: emite bordas, paredes, saidas ou fundo nos ids exatos, herda atributos da face cortada e monta o registro `furos` que vira a origem citavel."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 731,
+   "linhaFim": 863,
+   "oQueFaz": "O contrato de origem do furo (doc, validar, resolver): as familias sao borda, parede, saida, tampa, preenchimento e preenchimentoDaSaida; uma tira de chanfro seria familia nova aqui, com validacao e diagnostico proprios."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3809,
+   "linhaFim": 3824,
+   "oQueFaz": "`terceiraFace` do filete. MEDIDO: e ele que bloqueia o caminho que o proprio A-34 declara — o vertice do anel de um furo de 8 lados toca 4 faces (bordas 1000 e 1007, paredes 1008 e 1015) e o passo grita 'a ponta v0 da aresta 0 da face 1000 tem 3 face(s) alem das duas da aresta'."
+  },
+  {
+   "atrito": "A-34",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 1364,
+   "linhaFim": 1409,
+   "oQueFaz": "`bordaAnular`: a volta simples de L faces entre o contorno externo e o anel, com casamento angular; e a superficie cuja aresta interna forma a silhueta poligonal que o A-34 reclama."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3691,
+   "linhaFim": 3699,
+   "oQueFaz": "O paragrafo 'SO UM PAINEL NESTA RODADA': declara que subdividir foi tentado e medido, e que o painel de perto da entrada sai com a normal mais perto da OUTRA face."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3766,
+   "linhaFim": 3778,
+   "oQueFaz": "`centroide` e `perpUnit`, e o calculo de dA e dB: as duas direcoes unitarias perpendiculares a aresta, uma dentro de cada face, apontando para o centroide da propria face."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3780,
+   "linhaFim": 3783,
+   "oQueFaz": "Calcula theta = acos(dA . dB) e recusa quase-coplanar e dobra de 180 graus; e o unico angulo que a op mede hoje, e a entrada de qualquer derivacao de arco."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3792,
+   "linhaFim": 3793,
+   "oQueFaz": "Resolve `raio` como RECUO (distancia dentro de cada face, perpendicular a aresta) e nao como raio de arco; a distincao vira load-bearing assim que houver mais de um painel."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3844,
+   "linhaFim": 3845,
+   "oQueFaz": "Fixa nV = 2 e nF = 1 e confere contra o BLOCO; com n paineis vira nV = 2n e nF = n, entao esta linha muda em qualquer versao multi-painel."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3847,
+   "linhaFim": 3856,
+   "oQueFaz": "Cria P1/Q1 em b e b+1 com raio*dB e MOVE v0/v1 para raio*dA; e o unico lugar onde a geometria do corte nasce, e o caminho que precisa ficar literal para o acervo nao mudar de bytes."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3858,
+   "linhaFim": 3866,
+   "oQueFaz": "Emite o painel unico [P1,Q1,v1,v0] com winding derivado da lei de malha fechada e herda cor, material, parte, liso e solido da face de entrada."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3868,
+   "linhaFim": 3877,
+   "oQueFaz": "Reescreve faceB (troca as pontas pelos gemeos) e faceC/faceD (cada terceira face GANHA UM canto), e publica o registro `paineis` da origem."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3708,
+   "linhaFim": 3712,
+   "oQueFaz": "O bloco NUMERACAO do filete: b+0 = P1, b+1 = Q1, face b+0, custo fechado +2 V e +1 F; e formato salvo e a primeira coisa que muda com n paineis."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 1676,
+   "linhaFim": 1704,
+   "oQueFaz": "`arcoDeConcordancia`: a derivacao de arco CORRETA que o nucleo ja tem — recuo t = raio/tan(theta/2), centro em B + bissetriz*(raio/sin(theta/2)), tangencias TA e TC. E a conta que falta ao filete, ja escrita e ja testada no mesmo ciclo."
+  },
+  {
+   "atrito": "A-36",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 1706,
+   "linhaFim": 1752,
+   "oQueFaz": "`expandirConcordancias`: aplica arcoDeConcordancia numa poligonal, com `segmentosCurva` no nivel do passo e a conferencia por SEGMENTO de que dois recuos nao se cruzam; e o precedente de discretizacao que o filete de n paineis reusaria."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3701,
+   "linhaFim": 3706,
+   "oQueFaz": "O paragrafo 'A ARESTA PRECISA TER PONTA SIMPLES': declara que o canto de tres arestas esta fora de escopo e que o que esta fora de escopo grita em vez de sair torto."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3795,
+   "linhaFim": 3808,
+   "oQueFaz": "O comentario que explica por que a terceira face precisa entrar na conta, e registra o bico de area nula da primeira versao da op."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3809,
+   "linhaFim": 3824,
+   "oQueFaz": "`terceiraFace`: varre st.F e exige achadas.length === 1. MEDIDO: num chamferBox de chanfro 0.1, o filete na aresta 0 da face topo grita 'a ponta v0 da aresta 0 da face 1 tem 2 face(s) alem das duas da aresta' e aborta com 0 V e 0 F no bloco 1000."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3827,
+   "linhaFim": 3842,
+   "oQueFaz": "Deriva o sentido de percurso de faceC e faceD (nextB -> v0 -> prevA e nextA -> v1 -> prevB) e grita se a vizinhanca nao for a de malha fechada padrao; a derivacao inteira assume UMA terceira face por ponta."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3743,
+   "linhaFim": 3758,
+   "oQueFaz": "Acha a OUTRA face da aresta varrendo st.F inteiro e exige manifold (exatamente 2 faces); tambem devolve `reversa`, o winding relativo usado adiante."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3868,
+   "linhaFim": 3877,
+   "oQueFaz": "A costura final: faceB troca as pontas, faceC e faceD ganham UM canto cada. Com canto complexo a fresta se fecha de outro jeito (tampa de canto), e e aqui que isso entra."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 3844,
+   "linhaFim": 3845,
+   "oQueFaz": "nV = 2 e nF = 1: o custo fechado que so vale porque a ponta e simples; um canto complexo acrescenta vertice e tampa por ponta."
+  },
+  {
+   "atrito": "A-37",
+   "arquivo": "/home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+   "linhaInicio": 1935,
+   "linhaFim": 1990,
+   "oQueFaz": "A op `chamferBox`: emite 24 vertices, as 6 faces principais, 4 tiras de aresta-X, 4 de aresta-Y e as faces de canto — a topologia que faz toda ponta ter 2 faces extras e travar o filete."
+  }
+ ],
+ "conflitos": [
+  {
+   "atritoA": "A-36",
+   "atritoB": "A-37",
+   "gravidade": "alta",
+   "porque": "As duas frentes reescrevem o MESMO bloco de construcao do filete. Medido: as regioes exclusivas nao se encostam — A-36 termina em 3783 (theta) e A-37 comeca em 3795 (comentario da ponta), 12 linhas de folga, mais que os 3 de contexto do git, entao viram hunks separados. A colisao real e o trecho 3844-3877 (34 linhas). A linha 3844 (nV=2, nF=1) muda nas duas: A-36 quer nV=2n e nF=n, A-37 quer somar tampa de canto. O trecho 3868-3877 muda nas duas: A-36 precisa que faceC e faceD ganhem n cantos em vez de 1, A-37 precisa trocar 'a terceira face' por 'as terceiras faces'. O bloco de numeracao no comentario (3708-3712) tambem e escrito pelas duas.",
+   "comoSeparar": "Um commit de refatoracao ANTES das duas frentes, sem mudanca de comportamento, provado por npm run gabarito:selecao:check (28 pecas byte-identicas). Ele quebra 3844-3877 em duas funcoes puras: (1) posicoesDoCorte(P, Q, dA, dB, theta, raio), que devolve a lista de pares de pontos ao longo do corte — hoje devolve 1 par, e A-36 mexe so nela; (2) costurarPontas(st, faceA, faceB, terceiras, pares), que emite os paineis e reescreve as faces vizinhas — A-37 mexe so nela. Depois disso A-36 fica em 3766-3793 mais a funcao (1), e A-37 em 3795-3842 mais a funcao (2). Zero linha compartilhada, dois arquivos de teste distintos. Sem refatoracao tambem funciona: A-36 primeiro, porque ele nao precisa tocar em 3795-3842, e A-37 rebaseado por cima."
+  },
+  {
+   "atritoA": "A-30",
+   "atritoB": "A-34",
+   "gravidade": "media",
+   "porque": "So colidem se A-34 for implementado como ARGUMENTO DO FURO (um `chanfro` no contorno). Nesse caso os dois escrevem 3477-3492 (o laco de aneis: A-30 quer raio por furo, A-34 quer um segundo anel concentrico por furo), a linha 3572 (a conta nV=2LM e nF, que A-30 deixa igual e A-34 dobra) e o bloco de numeracao 3327-3352. Fora disso as regioes sao disjuntas: A-30 vive no parsing (3383-3433 e 3462-3474) e A-34 na construcao (3546-3623) e no contrato (731-863), com 54 linhas de folga entre a ultima de A-30 (3492) e a primeira de A-34 (3546).",
+   "comoSeparar": "Duas saidas, ambas medidas. (a) Ordenar: A-30 primeiro, porque ele nao renumera nada — nV e nF ficam identicos e o gabarito das 28 pecas nao se mexe; A-34 depois, ja sobre o laco com raio por furo. (b) Melhor: tirar A-34 do `furo` e leva-lo para o `filete`, e o conflito com A-30 vira zero. O proprio A-34 declara essa preferencia (filete/chanfro seletivo na aresta do contorno, geral para toda quina) e o CLAUDE.md manda a capacidade ser geral. O custo dessa escolha esta no conflito seguinte."
+  },
+  {
+   "atritoA": "A-34",
+   "atritoB": "A-37",
+   "gravidade": "alta",
+   "porque": "MEDIDO, e e o achado mais importante deste mapa: se A-34 seguir o caminho que ele mesmo declara (filete seletivo na aresta do contorno do furo), ele bate no mesmo gate do A-37. Um vertice do anel de um furo de 8 lados toca 4 faces (bordas 1000 e 1007, paredes 1008 e 1015), entao terceiraFace (3809-3824) acha 3 faces alem das duas da aresta e o passo aborta com 'a ponta v0 da aresta 0 da face 1000 tem 3 face(s) alem das duas da aresta'. A-34 e A-37 sao o mesmo bloqueio visto em duas pecas diferentes.",
+   "comoSeparar": "Nao separar: reconhecer que sao a mesma frente e orden-los. A-34 e mais barato e nao depende de A-37. O contorno do furo e um LOOP FECHADO de L arestas, e loop fechado nao tem PONTA, entao terceiraFace nunca e chamado. A ordem barata e: (1) filete de LOOP, em que `de` cita a familia borda inteira de uma origem furo e o corte da a volta — passa por fora de 3795-3842 e paga o A-34; (2) canto complexo (A-37), que e a generalizacao das PONTAS e paga a pinca do chamferBox. Cada um em seu commit, cada um com sua peca de exercicio fora do vocabulario automotivo."
+  },
+  {
+   "atritoA": "A-34",
+   "atritoB": "A-36",
+   "gravidade": "media",
+   "porque": "Pelo caminho do filete de loop, A-34 e A-36 compartilham a geracao das POSICOES do corte (o trecho 3847-3856 hoje, a funcao (1) da refatoracao proposta). A-34 com um painel so ja quebra a silhueta reta do furo; com varios paineis quebra melhor. Os dois querem o mesmo gerador de arco.",
+   "comoSeparar": "A-36 primeiro, porque ele entrega o gerador de n posicoes que A-34 consome. A-34 depois so acrescenta o percurso em loop e a costura ciclica, sem tocar na geometria do arco. Na ordem inversa tambem funciona: A-34 entra com n=1 fixo e A-36 generaliza depois. Nenhuma das duas ordens reescreve linha da outra."
+  },
+  {
+   "atritoA": "A-30",
+   "atritoB": "A-36",
+   "gravidade": "nenhuma",
+   "porque": "Ops diferentes, blocos disjuntos: A-30 fica em 3383-3495 (furo) e A-36 em 3766-3877 (filete). A distancia minima entre as regioes e de 271 linhas. Nenhuma funcao compartilhada — A-30 usa margemDentro e aneisSeSobrepoem, A-36 usaria arcoDeConcordancia.",
+   "comoSeparar": "Podem correr em paralelo, em branches separadas, sem coordenacao. O unico ponto comum e o gate final: npm run gabarito:selecao:check tem de sair verde nas duas antes do merge, e a segunda a mergear precisa reconferir depois do rebase."
+  },
+  {
+   "atritoA": "A-30",
+   "atritoB": "A-37",
+   "gravidade": "nenhuma",
+   "porque": "Ops diferentes e sem funcao compartilhada. A-30 termina em 3572 e A-37 comeca em 3743: 171 linhas de folga. `furo` e `filete` sao blocos vizinhos do mesmo objeto literal (furo fecha em 3631, o comentario do filete abre em 3633), mas nenhuma das duas mudancas projetadas toca esse par de trechos.",
+   "comoSeparar": "Paralelo direto. Unico cuidado teorico: se uma frente editar o fim do furo (3625-3630) e a outra o inicio do comentario do filete (3633-3640), os hunks ficam a 3 linhas e o git funde na fronteira. Nenhuma das mudancas projetadas cai ai."
+  }
+ ],
+ "tentativasAnteriores": [
+  "FILETE DE VARIOS PAINEIS POR INTERPOLACAO ESFERICA — registrado em oficina.js 3691-3699 e no A-36. REPRODUZIDO: com dA=[0,0,-1] (dentro do topo), dB=[0,-1,0] (dentro da frente), theta=90 graus, amostrando slerp(dA,dB,t) em torno da propria aresta, com n=4 o painel 0 (o que encosta na face de ENTRADA, o topo) sai com normal a 78.8 graus da normal do topo e a 11.3 graus da normal da frente. Com n=2: 67.5 contra 22.5. A ordem dos paineis fica invertida de ponta a ponta. O comentario do nucleo esta certo no FATO.",
+  "O DIAGNOSTICO DO COMENTARIO ESTA ERRADO, E ISSO E MEDICAO — nao e nao-linearidade da interpolacao. O centro do arco esta no lugar errado: a tentativa pos o centro na propria ARESTA (v) e interpolou dA para dB, o que produz um arco CONCAVO, escavado para dentro, com os endpoints certos e a curvatura ao contrario. Refeito com o centro correto C = v + bissetriz*(raio/sin(theta/2)) e interpolando entre (TA-C) e (TB-C): com n=4 o painel 0 sai a 11.3 graus da normal do topo e a 78.8 da frente, a ordem fica monotona, e o erro maximo de raio e 0.00e+0 em todo ponto amostrado. Essa e a conta que `arcoDeConcordancia` (oficina.js 1676-1704) ja faz para a curva de perfil, no mesmo ciclo e no mesmo arquivo. O A-36 nao precisa de uma segunda derivacao: precisa aplicar a que ja existe, no plano perpendicular a aresta.",
+  "ARMADILHA MEDIDA NA MESMA CONTA: `raio` hoje e o RECUO, nao o raio do arco. Na derivacao correta t = raio/tan(theta/2), e a 90 graus t e igual a raio em matematica mas NAO em ponto flutuante: 0.05/Math.tan(Math.PI/4) da 0.050000000000000009714 e 0.05 e 0.050000000000000002776; o === da falso. Todos os 5 filetes do acervo sao a 90 graus (_caixote-filetado passo 1 sobre cubo; freio-disco passos 17, 18, 22 e 23 sobre cubo). Logo: rotear o caso n=1 pela derivacao de arco QUEBRA a byte-identidade das 28 pecas. O caminho n=1 tem de continuar literalmente raio*dA e raio*dB (linhas 3853-3856).",
+  "FILETE PRESERVANDO v0/v1 DENTRO DAS FACES DA ARESTA — a primeira versao da op, registrada em oficina.js 3644-3652, repetida em 3795-3808 e no cabecalho de tools/oficina/conferir-malha.ts (linhas 1-24). Ela preservava os cantos antigos e so inseria dois cantos entre eles. O neutro ficava fechado e a contagem batia, entao nenhum teste do nucleo caiu. A face ficava com um canto EM CIMA da aresta seguinte, um bico de area nula. Quem gritou foi o ADAPTADOR, ao triangular em orelhas, e so quando a op chegou numa peca de verdade, uma rodada depois. E a origem da regra das quatro propriedades do CLAUDE.md.",
+  "PARTICAO DO FURO POR CELULAS (uma celula por furo, cortada pelos eixos radicais) — RECUSADA antes de ser escrita, oficina.js 1465-1473. Dois motivos ditos: juncao em T no contorno (vertice novo no meio da aresta de uma face vizinha) e o centro radical de tres furos, um ponto que tres celulas calculam por tres contas diferentes, exigindo solda por tolerancia — a regua que o nucleo ja recusou no `arranja`.",
+  "CASAMENTO DO CANTO EXTERNO POR INDICE, floor(j*n/lados), na borda anular — RECUSADO por medicao, oficina.js 1378-1381: produz quadrilateros REFLEXOS num quadrado com furo central e lados:8. Planos, mas concavos, e o leque de triangulacao do visor os preenche torto. Ficou o casamento por ANGULO.",
+  "ORELHA QUE ACEITA VERTICE EM CIMA DE UMA ARESTA SUA — defeito real, achado pelo flange do freio (tampa de 16 lados, 4 aneis de 12 a 90 graus; 16, 12 e 4 sao todos multiplos de 4, entao a simetria poe tres vertices em cima da aresta). A prova de area gritava sem dizer onde nasceu. Corrigido em oficina.js 3560-3571 (dentroEstrito mais os tres pontoNoSegmento). O registro em 1496-1500 diz na cara que a frase anterior, 'nao ha entrada aceita que as facam falhar', era falsa na data em que foi escrita.",
+  "O FLANGE DE RODA POR RESSALTOS, um furo por assento — a forma anterior do freio-disco, trocada por um disco unico com `centros` em circulo (freio-disco.js 47-52, 158-193 e 311-330). E a rodada que gerou o A-30: `centros` resolveu o numero de furos e nao resolveu o numero de raios.",
+  "AS DUAS PECAS DE EXERCICIO DESENHADAS EM VOLTA DA LIMITACAO — _prateleira-furada.js poe tres furos em TRES faces distintas porque um passo consumia a face; _tampa-de-caixa.js paga essa metade (quatro furos numa face so) mas continua uma tampa CHEIA, sem furo central, e diz isso no cabecalho, linhas 31-37. REPRODUZIDO: um segundo passo de furo na mesma face grita \"face 'topo' da origem cubo:1 foi removida (consumida pelo furo do passo 1)\".",
+  "A-37 NAO TEM TENTATIVA REGISTRADA — o canto de tres arestas foi declarado fora de escopo no gate do ciclo 5 e a prova em peca de produto foi DESVIADA das pincas (chamferBox) para as pastilhas (cubo). Medido que o desvio nao deixou rastro em teste: grep por 'alem das duas' em tools/ da 0 ocorrencias e nao existe teste que componha chamferBox com filete. O grito do A-37 e um caminho de codigo sem cobertura nenhuma."
+ ],
+ "invariantes": [
+  "NUMERACAO POSICIONAL POR BLOCO. BLOCO = 1000 (oficina.js 15-26); o passo de indice i possui [i*1000, i*1000+1000) em vertice E em face, dois espacos independentes. Estourar o bloco e throw, nao grito — furo linha 3573, filete linha 3845. Nenhuma mudanca pode deslocar o inicio do bloco de um passo.",
+  "A NUMERACAO DO FURO E FORMATO SALVO. Vertices b+2Lk+j (anel de entrada do furo k) e b+2Lk+L+j (o outro lado); faces b+3Lk+j (borda), b+3Lk+L+j (parede), b+3Lk+2L+j (borda de saida, so passante) ou b+3Lk+2L (fundo, so cego); preenchimento a partir de b+3LM e depois preenchimentoDaSaida (oficina.js 3327-3352). Travado por 6 casos em 'furo — numeracao e formato salvo' (oficina.test.ts 4764).",
+  "A NUMERACAO DO FILETE E FORMATO SALVO. b+0 = P1, b+1 = Q1, face b+0; custo fechado +2 V e +1 F seja qual for a peca (oficina.js 3708-3712). Travado por 'custo em faces/vertices: cubo 8V/6F -> 10V/7F' (oficina.test.ts 5761). Medido hoje: 10 V e 7 F.",
+  "MUDAR PARAM NAO RENUMERA; MUDAR TOPO RENUMERA E QUEM DEPENDE VIRA ORFAO QUE GRITA (oficina.js 7-10). Vale para `raio` e `centro` do furo contra `lados`; teste em oficina.test.ts 4791. Um raio por furo entra como PARAM, entao nao pode renumerar nada.",
+  "A BORDA DO FURO TEM SEMPRE L FACES POR ANEL, independentemente de quantos cantos a face cortada tinha; mudar raio ou centro muda a FORMA de cada face da borda, nunca o id (oficina.js 1368-1376 e 3349-3352).",
+  "TODA FACE CRIADA NASCE ENDERECAVEL. `origemId` e obrigatorio e a declaracao tem de ser unica — furo 3372-3375, filete 3731-3734 — e o registro publicado tem de casar com o contrato em CONTRATOS_ORIGEM (731-907). Familia nova exige validar e resolver novos, com diagnostico proprio e faixa nomeada no grito.",
+  "TODA FACE DESTRUIDA ENTRA NO REGISTRO DE CONSUMO. st.consumidas guarda {passo, op} e a citacao seguinte GRITA nomeando quem comeu, tanto na referencia explicita quanto na de uniao (oficina.js 217-243; furo 3625-3628). O filete NAO consome face nenhuma: as quatro faces que ele toca continuam vivas com o mesmo f.id (3639-3642; teste oficina.test.ts 5804). Se A-36 ou A-37 passarem a destruir face, o registro tem de passar a receber.",
+  "HERANCA DE ATRIBUTO. cor, material, parte, liso e solido da face de ENTRADA vao para a borda de entrada, a parede, o fundo e o painel do filete; os da face de SAIDA vao para a borda de saida. `tinta` (pincel livre) NUNCA e herdada, porque e ancorada em coordenada de face e a face mudou de forma (oficina.js 3354-3358, 3585, 3714-3715, 3863-3865).",
+  "FAIL-CLOSED SEM EXCECAO. Referencia invalida, ambigua ou vazia grita com diagnostico e o passo aborta com 0 V e 0 F — nunca meio corte, nunca no-op silencioso (oficina.js 3360-3367). Medido nos dois casos deste mapa: chamferBox mais filete deixa 0 vertice e 0 face no bloco 1000; furo sobre face consumida idem.",
+  "ZERO ARESTA SOLTA DEPOIS DO CORTE. A malha continua fechada e virada para o lado certo (oficina.test.ts 4825 e 5919, via arestasSoltas). Buraco nao abre casca: furo passante tem parede.",
+  "AS QUATRO PROPRIEDADES DE conferirMalha, e nao uma: (1) o nucleo constroi sem orfao; (2) toda face e poligono que nao se toca; (3) a malha atravessa o adaptador e vira triangulo sadio; (4) a casca e fechada, so para quem DECLARA. CLAUDE.md 62-81 e tools/oficina/conferir-malha.ts. Malha fechada e contagem certa nao provam poligono simples.",
+  "AS TRES PROVAS DA PARTICAO DE VARIOS ANEIS (oficina.js 1583-1600): contagem fechada n + M*L + 2M - 2, soma de areas igual a contorno menos aneis, e toda aresta de borda usada uma vez e toda interna exatamente duas em direcoes opostas. Sao provas de estado impossivel, sem teste que as dispare, mas ja dispararam de verdade uma vez (o flange do freio).",
+  "WINDING DERIVADO, NUNCA ADIVINHADO. O filete exige o sentido padrao de malha fechada em faceB (3785-3790) e deriva o percurso de faceC e faceD (3827-3842); se nao bater, grita em vez de escolher um lado. Qualquer costura nova tem de derivar do mesmo jeito.",
+  "NADA DE TRANSCENDENTAL NO ARQUIVO SALVO. cos e sin ficam dentro do nucleo; a peca escreve a frase ('quatro furos a 38 mm do centro') e nao a coordenada (oficina.js 3303-3305 e 1634-1637). Vale para qualquer forma nova de `centros` do A-30 e para qualquer alca de discretizacao do A-36.",
+  "SEM Date.now() NEM Math.random() CRUS em artefato reproduzivel; o mesmo passo roda duas vezes com o neutro canonico byte-identico (oficina.test.ts 4820 e 5842).",
+  "BYTE-IDENTIDADE DO ACERVO. npm run gabarito:selecao:check cobra 28 pecas; medido verde nesta sessao. Mais tools/mecanifica/acervo-adaptador.test.ts (44 casos), que leva todas ao adaptador e confere normal de modulo 1, posicao finita e contagem de triangulo dos dois lados.",
+  "ID POSICIONAL NUNCA E REFERENCIA PERSISTIDA. npm run id-cru:check varre prototipos/fps/v3/pecas/; 43 casos em tools/bancadas/id-cru.test.ts. O `aresta` do filete e indice LOCAL dentro do poligono nomeado, nao id cru — a mesma classe de face:'topo'; qualquer endereco novo tem de nascer nessa classe.",
+  "`lados` abaixo de 3 e preso em 3, a convencao do cilindro, cone e esfera (oficina.js 3385; teste oficina.test.ts 4805)."
+ ],
+ "testesQueCobrem": [
+  "/home/user/nos-mecanifica/tools/oficina/oficina.test.ts — 454 casos no total, 97 citando furo e 20 citando filete. Baseline verde medido nesta sessao: 538 casos em 5 arquivos, 3,65 s.",
+  "oficina.test.ts:4764 'furo — numeracao e formato salvo' — 6 casos (passante, cego, PARAM contra TOPO, lados abaixo de 3, estouro de bloco, replay canonico).",
+  "oficina.test.ts:4825 'furo — a malha continua fechada e virada para o lado certo' — 5 casos.",
+  "oficina.test.ts:4878 'furo — toda face nova e enderecavel, e as familias nao se confundem' — 5 casos.",
+  "oficina.test.ts:4933 'furo — face consumida GRITA, nunca some em silencio' — 5 casos.",
+  "oficina.test.ts:4996 'furo — heranca de atributo' — 1 caso.",
+  "oficina.test.ts:5023 'furo — orientacao declarada da fase do anel' — 2 casos.",
+  "oficina.test.ts:5050 'furo — completude: cada recusa aborta o passo inteiro, 0 V / 0 F' — 19 casos, em 7 blocos it com laco.",
+  "oficina.test.ts:5189 'furo v2 — um passo abre varios furos na mesma face' — 8 casos.",
+  "oficina.test.ts:5320 'furo v2 — dois aneis que se cruzam GRITAM, e o passo inteiro aborta' — 4 casos.",
+  "oficina.test.ts:5375 'furo v2 — o circulo de parafusos e uma FRASE, e as duas formas dizem o mesmo' — 5 casos.",
+  "oficina.test.ts:5430 'furo v2 — completude: a recusa vem antes do primeiro id, e a forma velha nao muda' — 14 casos (centro e centros juntos, lista vazia, circulo sem total, circulo sem distancia, circulo com volta e graus, circulo com palavra estranha, forma que nao e lista nem circulo, entre outros). E o bloco que A-30 mais mexe.",
+  "oficina.test.ts:5484 'furo v2 — face redonda com circulo de furos em simetria exata' — 10 casos.",
+  "oficina.test.ts:5572 'furo v2 — a fronteira medida da particao (A-33)' — 12 casos, com a regiao sadia e a regiao que trava; quem consertar A-33 move linhas de um bloco para o outro.",
+  "oficina.test.ts:5760 'filete — a aresta escolhida vira um painel; as outras cinco ficam de pe' — 20 casos, o UNICO bloco de filete do repositorio: custo 10V/7F, conferirMalha com fechada:true, os 45/45 graus da condicao 5 do gate, faces longe do corte identicas, as seis faces vivas, as tres arestas nao escolhidas retas, painel enderecavel, painel fora do limite, replay canonico, sem origemId, origemId duplicado, sem de, aresta fora do indice, aresta no limite, raio 0 e negativo, raio NaN e Infinity, aresta nao-manifold, faces quase coplanares, id de origem invalido, watertight.",
+  "/home/user/nos-mecanifica/tools/mecanifica/tampa-de-caixa-integridade.test.ts — 9 casos, 5 sobre furo: uma face de entrada e uma de saida consumidas, um corpo com quatro furos, a orbita e o raio declarados, mudar `parafusos` muda so o desenho, os dois furos cegos de pino.",
+  "/home/user/nos-mecanifica/tools/mecanifica/prateleira-integridade.test.ts — 10 casos, 6 sobre furo: parafuso passante, cavilha cega com fundo, puxador atravessando um cilindro, `orientacao` em fase, mudar `furoLados` (TOPO), as tres portas do corte.",
+  "/home/user/nos-mecanifica/tools/mecanifica/freio-disco-integridade.test.ts — 21 casos, 6 sobre furo (um furo por prisioneiro, cada um enderecavel sozinho, passante, no circulo a 90 graus, diametro do parametro, os quatro aneis em fase). BURACO MEDIDO: nenhum caso sobre os 4 filetes das pastilhas; grep por chanfro e por filete no arquivo nao acha assercao nenhuma.",
+  "/home/user/nos-mecanifica/tools/mecanifica/normais-lisas.test.ts — 15 casos, 4 sobre a borda e a parede do furo: a parede suaviza e a borda nao, a borda triangulada em orelhas com area conferida, a serrilha medida antes do conserto, a normal suave radial ao eixo.",
+  "/home/user/nos-mecanifica/tools/mecanifica/acervo-adaptador.test.ts — 44 casos; leva TODAS as pecas ao adaptador e confere sem-orfao, converte sem lancar, normal de modulo 1, posicao finita e contagem de triangulo dos dois lados.",
+  "/home/user/nos-mecanifica/tools/oficina/conferir-malha.ts — nao e arquivo de teste, e a conferencia unica de 4 propriedades que todo teste de op nova chama; nasceu por causa do defeito do filete.",
+  "/home/user/nos-mecanifica/tools/bancadas/id-cru.test.ts — 43 casos, o gate de referencia posicional sobre prototipos/fps/v3/pecas/.",
+  "npm run gabarito:selecao:check — 28 pecas byte-identicas ao gabarito gravado; verde medido nesta sessao. E o gate que as quatro mudancas tem de manter verde.",
+  "BURACO MEDIDO 1: zero teste dispara o grito de ponta complexa do filete, o caminho do A-37. grep por 'alem das duas' em tools/ da 0 ocorrencias, e nenhum teste compoe chamferBox com filete. Mexer em terceiraFace (3809-3824) hoje nao deixa nenhum teste vermelho.",
+  "BURACO MEDIDO 2: zero teste compoe filete com filete na mesma face. freio-disco.js faz isso de verdade (passos 17 e 18 na face 'direita' do cubo 311; passos 22 e 23 na 'esquerda' do 312) e so o gabarito de bytes cobra.",
+  "BURACO MEDIDO 3: o cabecalho de /home/user/nos-mecanifica/prototipos/fps/v3/pecas/_caixote-filetado.js afirma 'cubo simples 8V/6F -> com o filete 12V/9F (o painel + as 2 tampas de canto)'. Medido: e 10V/7F. O comentario descreve a PRIMEIRA versao da op, a que estava errada, e ficou para tras. Nenhum teste le esse comentario."
+ ]
+}

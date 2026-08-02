@@ -13,6 +13,21 @@
    das três prova que a peça desenha. São quatro propriedades, e um teste que
    olha só as duas primeiras passa verde sobre uma peça que não aparece na tela.
 
+   A QUINTA PROPRIEDADE: o triângulo que SAI não pode ser fino a ponto de não
+   ter área. Ela existe porque as quatro primeiras não a implicam. Medido: um
+   cubo de lado 1 com filete de raio 0,99999999 passa em TODAS as quatro — sem
+   órfão, sem bico, casca fechada, adaptador sem lançar — e ainda assim entrega
+   4 dos 16 triângulos com área EXATAMENTE 0. Na tela isso é aresta que
+   cintila e sombra que fura.
+
+   O piso é RELATIVO ao tamanho da peça, `1e-9 · escala²`, com `escala` = maior
+   |v| da peça. Tem de ser relativo porque a mesma malha num parafuso de 6 mm e
+   numa carroceria de 4 m tem áreas em ordens de grandeza diferentes. Medido
+   sobre o acervo inteiro: o menor triângulo relativo é 7,1092e-6, no
+   `_corrimao`, e nenhuma das 27 peças com geometria chega perto. A folga sobre
+   o piso é de 7 109 vezes, então o número não é apertado — ele caça o zero e o
+   quase-zero, não o triângulo pequeno legítimo.
+
    COMO USAR (uma linha por teste):
      conferirMalha(n);                        // o mínimo: polígonos + desenha
      conferirMalha(n, { fechada: true });      // e mais: casca sem borda solta
@@ -76,6 +91,37 @@ export function cantosSobreAresta(neutro: any) {
   return achados;
 }
 
+/** tamanho da peça: o maior |v|. É o denominador do piso de área. */
+export function escalaDaPeca(neutro: any) {
+  let escala = 0;
+  for (const p of neutro.V.values()) escala = Math.max(escala, Math.hypot(p[0], p[1], p[2]));
+  return escala;
+}
+
+/**
+ * Triângulos JÁ EMITIDOS com área abaixo do piso relativo. Recebe a raiz que
+ * saiu do adaptador, e não o estado neutro, porque o que importa é o que chega
+ * na placa de vídeo: uma face sadia pode virar sliver na triangulação.
+ */
+export function areasDeTriangulo(raiz: any, escala: number) {
+  const piso = 1e-9 * escala * escala;
+  const abaixo: string[] = [];
+  let menor = Infinity;
+  raiz.traverse((obj: any) => {
+    if (!obj.isMesh) return;
+    const p = obj.geometry.getAttribute('position');
+    for (let k = 0; k < p.count; k += 3) {
+      const ax = p.getX(k), ay = p.getY(k), az = p.getZ(k);
+      const ux = p.getX(k + 1) - ax, uy = p.getY(k + 1) - ay, uz = p.getZ(k + 1) - az;
+      const vx = p.getX(k + 2) - ax, vy = p.getY(k + 2) - ay, vz = p.getZ(k + 2) - az;
+      const area = 0.5 * Math.hypot(uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx);
+      if (area < menor) menor = area;
+      if (area < piso) abaixo.push(`${obj.name}: triângulo ${k / 3} com área ${area.toExponential(3)}`);
+    }
+  });
+  return { piso, menor, abaixo };
+}
+
 export function conferirMalha(neutro: any, { fechada = false, rotulo = 'a malha' } = {}) {
   expect(neutro.orfaos.map((o: any) => `${o.op}: ${o.motivo}`), `${rotulo}: órfãos`).toEqual([]);
   expect(cantosSobreAresta(neutro), `${rotulo}: polígono com bico de espessura zero`).toEqual([]);
@@ -104,4 +150,9 @@ export function conferirMalha(neutro: any, { fechada = false, rotulo = 'a malha'
   });
   expect(estatisticas.triangulos, `${rotulo}: a contagem de triângulos não bate com o buffer`).toBe(cantos / 3);
   if (neutro.F.size > 0) expect(cantos, `${rotulo}: não saiu triângulo nenhum`).toBeGreaterThan(0);
+
+  if (neutro.F.size > 0) {
+    const { abaixo } = areasDeTriangulo(raiz, escalaDaPeca(neutro));
+    expect(abaixo, `${rotulo}: triângulo(s) sem área — sliver que cintila na tela`).toEqual([]);
+  }
 }

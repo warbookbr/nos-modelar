@@ -37,7 +37,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
-import { arestasSemPar, cantosSobreAresta } from '../oficina/conferir-malha.js';
+import { areasDeTriangulo, arestasSemPar, cantosSobreAresta, escalaDaPeca } from '../oficina/conferir-malha.js';
 
 const PECAS = resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/fps/v3/pecas');
 const nomes = readdirSync(PECAS).filter((f) => f.endsWith('.js')).map((f) => f.replace(/\.js$/, '')).sort();
@@ -117,6 +117,11 @@ describe('o adaptador atravessa o acervo inteiro', () => {
         expect(cantos).toBe(0);
       } else {
         expect(cantos, `${nome}: o adaptador não emitiu triângulo nenhum`).toBeGreaterThan(0);
+
+        /* o piso é relativo: o menor triângulo do acervo fica muito acima de
+           1e-9 · escala², então esta régua caça degenerado, não detalhe fino. */
+        const { abaixo } = areasDeTriangulo(raiz, escalaDaPeca(neutro));
+        expect(abaixo, `${nome}: triângulo(s) sem área — sliver que cintila na tela`).toEqual([]);
       }
       expect(estatisticas.triangulos).toBe(cantos / 3);
     });

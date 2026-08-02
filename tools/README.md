@@ -17,6 +17,8 @@ tools/
   mapa/        mapa.mjs (docs/uso/MAPA.md gerado dos cabeçalhos + gate mapa:check),
                links.mjs (referências + alcançabilidade a partir do índice da
                Mecanifica) e toc.mjs (índice de docs/oficina.md)
+  coordenacao/ caixa postal local entre agentes: mensagens novas primeiro,
+               reservas contra sobreposição e contexto Git sem diffs inteiros
   mecanifica/  Testes vitest dos contratos novos: ponte Three.js, semântica do
                drone e estado reproduzível da bancada
   oficina/     Testes vitest do núcleo procedural (motor/oficina.js)
