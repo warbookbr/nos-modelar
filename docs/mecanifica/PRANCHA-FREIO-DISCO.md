@@ -111,7 +111,7 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `discoInteiro`, `cuboInteiro`, `pincaInteira`, `suporteInteiro`, `flexivelInteiro` | o conjunto de faces de cada parte |
 | `pincaPonte`, `pincaGarraInterna`, `pincaGarraExterna` | as três peças fundidas da pinça, separadas |
 | `pastilhaInternaInteira`, `pastilhaExternaInteira`, `pistaoInteiro` | idem, por primitiva |
-| `pilotoDaRoda` | porta cilíndrica externa: eixo X, raio e intervalo axial declarados para receber a roda |
+| `pilotoDaRoda` | porta cilíndrica externa: eixo X, referência Y, raio e intervalo axial declarados para receber a roda |
 
 ## Medidas nomeadas
 

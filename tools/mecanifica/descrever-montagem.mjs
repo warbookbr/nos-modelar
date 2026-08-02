@@ -6,6 +6,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   resolverPortasDeMontagem, validarEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
+  derivarPreviaDeEncaixeCilindrico, formatarPreviaDePose,
 } from '../../src/autoria/interfaces-montagem.js';
 
 const aqui = dirname(fileURLToPath(import.meta.url));
@@ -24,7 +25,10 @@ try {
   const modulo = await import(pathToFileURL(join(repo, 'prototipos/fps/v3/montagens', montagens.get(nome))).href);
   const montagem = modulo.montarRodaNoFreio();
   const portas = resolverPortasDeMontagem(montagem.instancias);
-  process.stdout.write(formatarDiagnosticoDeEncaixe(validarEncaixeCilindrico(montagem.relacao, portas)));
+  process.stdout.write(
+    formatarDiagnosticoDeEncaixe(validarEncaixeCilindrico(montagem.relacao, portas))
+    + formatarPreviaDePose(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)),
+  );
 } catch (erro) {
   console.error(`descrever-montagem: ${erro.message}`);
   process.exit(1);

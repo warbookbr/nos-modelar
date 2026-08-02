@@ -166,7 +166,7 @@ export const PASSOS = [
     nome: 'cavidadeDoCubo',
     de: { op: 'lathe', id: ARO, faixa: 5 },
     interface: {
-      forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], centro: [0, 0, 0],
+      forma: 'cilindro', papel: 'interna', eixo: [1, 0, 0], referencia: [0, 1, 0], centro: [0, 0, 0],
       raio: 'aroRaioInterno', inicio: 'aroMeiaLarguraNeg', fim: 'aroMeiaLargura',
     },
   }],

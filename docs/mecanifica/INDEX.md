@@ -377,14 +377,19 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-Não há plano ativo. O Recorte A de `AUT-05` foi concluído por
-[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md): interfaces
-cilíndricas mensuráveis para roda/cubo e pino/luva, ainda sem posicionamento
-automático, hierarquia ou solver. O caminho canônico do plano é
-`docs/mecanifica/planos/2026-08-02-interfaces-de-encaixe.md`. O plano mestre foi
+Não há plano ativo. Os Recortes A e B de `AUT-05` foram concluídos em
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
+[`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md): interfaces cilíndricas
+mensuráveis e prévia pura de pose para uma peça móvel, derivada de uma relação
+com quadro explícito. Hierarquia, múltiplas relações, persistência e solver
+continuam candidatos. O plano mestre foi
 encerrado em 2 de agosto de 2026 e seu
 resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+
+Os caminhos canônicos dos dois recortes são
+`docs/mecanifica/planos/2026-08-02-pose-derivada-roda.md` e
+`docs/mecanifica/planos/2026-08-02-interfaces-de-encaixe.md`.
 
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
 pagou A-34 com contagem circular por tolerância e também foi encerrado.

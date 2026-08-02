@@ -7,6 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-07`/Recorte B foi concluído em
+[`AUT-2026-07`](2026-08-02-pose-derivada-roda.md): prévia pura e única de pose
+para roda/cubo e pino/luva, por quadro e relação explicitamente declarados.
+
 `AUT-06`/A-16 e `PEC-01` foram concluídos em
 [`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md): interfaces cilíndricas
 mensuráveis e `encaixaCilindrico` dirigido, apenas read-only. Pose derivada,

@@ -17,6 +17,8 @@ export const RELACAO_RODA_NO_FREIO = {
   /* A folga é de projeto, não epsilon: 3,05 mm na pose/escalas declaradas. */
   folgaRadial: { min: 0.003, max: 0.0031 },
   tolerancia: 0.000001,
+  /* Os centros dos eixos congelam a pose já revisada, sem escolher profundidade implícita. */
+  poseCanonica: { referenciaAxial: 'centro', movelAxial: 'centro', giro: 0 },
 };
 
 export function montarRodaNoFreio() {

@@ -8,7 +8,7 @@ import { montarPinoELuva } from '../../prototipos/fps/v3/montagens/pino-e-luva.j
 // @ts-expect-error — montagem piloto em JavaScript, exercitada pela API pública.
 import { montarRodaNoFreio } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
-import { resolverPortasDeMontagem, validarEncaixeCilindrico, formatarDiagnosticoDeEncaixe } from '../../src/autoria/interfaces-montagem.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
 
 const resolver = (montagem: any) => resolverPortasDeMontagem(montagem.instancias);
 const clonarPortas = (portas: Map<string, any>) => new Map([...portas].map(([id, porta]) => [id, JSON.parse(JSON.stringify(porta))]));
@@ -88,5 +88,84 @@ describe('interfaces mensuráveis de encaixe — AUT-2026-06', () => {
     expect(validarEncaixeCilindrico(montagem.relacao, deslocada).diagnosticos.map((d: any) => d.codigo))
       .toContain('eixos-descentrados');
     expect(JSON.stringify([...portas])).toBe(antes);
+  });
+});
+
+describe('pose derivada de uma relação — AUT-2026-07', () => {
+  const derivarEAplicar = (montagem: any) => {
+    const previa = derivarPreviaDeEncaixeCilindrico(montagem.relacao, resolver(montagem));
+    expect(previa.aplicavel).toBe(true);
+    const instancias = aplicarPreviaDePose(montagem.instancias, previa);
+    return { previa, instancias, resultado: validarEncaixeCilindrico(montagem.relacao, resolverPortasDeMontagem(instancias)) };
+  };
+
+  it('normaliza o vetor de referência e recusa quadro degenerado no núcleo', () => {
+    const boa = nucleo([
+      ['cilindro', { origemId: 1, raio: 0.01, altura: 0.02, lados: 8 }],
+      ['publicarPorta', {
+        nome: 'quadro', de: { op: 'cilindro', id: 1 },
+        interface: { forma: 'cilindro', papel: 'externa', eixo: [2, 0, 0], referencia: [0, 3, 0], centro: [0, 0, 0], raio: 0.01, inicio: 0, fim: 0.02 },
+      }],
+    ] as any);
+    expect(boa.portas.get('quadro')?.interface.referencia).toEqual([0, 1, 0]);
+    const ruim = nucleo([
+      ['cilindro', { origemId: 1, raio: 0.01, altura: 0.02, lados: 8 }],
+      ['publicarPorta', {
+        nome: 'ruim', de: { op: 'cilindro', id: 1 },
+        interface: { forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], referencia: [1, 0, 0], centro: [0, 0, 0], raio: 0.01, inicio: 0, fim: 0.02 },
+      }],
+    ] as any);
+    expect(ruim.orfaos[0].motivo).toMatch(/referencia precisa ser perpendicular/);
+  });
+
+  it('três poses iniciais da luva chegam à mesma pose canônica e passam pela régua existente', () => {
+    const poses = [
+      {},
+      { deslocamento: [0.02, 0.03, -0.01] },
+      { rotacao: [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], deslocamento: [-0.04, 0.08, 0.06] },
+    ];
+    const finais = poses.map((pose) => {
+      const montagem = montarPinoELuva();
+      montagem.instancias[1] = { ...montagem.instancias[1], ...pose };
+      const pronto = derivarEAplicar(montagem);
+      expect(pronto.resultado.satisfeita).toBe(true);
+      return pronto.previa.previa;
+    });
+    for (const final of finais.slice(1)) {
+      expect(final.escala).toBe(finais[0].escala);
+      final.deslocamento.forEach((valor: number, i: number) => expect(valor).toBeCloseTo(finais[0].deslocamento[i], 9));
+      final.rotacao.flat().forEach((valor: number, i: number) => expect(valor).toBeCloseTo(finais[0].rotacao.flat()[i], 9));
+    }
+  });
+
+  it('repetir a prévia é idempotente e roda/cubo chega a uma pose validável', () => {
+    const baseline = derivarEAplicar(montarRodaNoFreio());
+    expect(baseline.previa.previa.deslocamento).toEqual([0, 0, 0]);
+    expect(baseline.previa.previa.rotacao).toEqual([[1, 0, 0], [0, 1, 0], [0, 0, 1]]);
+    const roda = montarRodaNoFreio();
+    roda.instancias[1] = { ...roda.instancias[1], deslocamento: [0.2, -0.1, 0.04] };
+    const primeira = derivarEAplicar(roda);
+    expect(primeira.resultado.satisfeita).toBe(true);
+    const segundaMontagem = { ...roda, instancias: primeira.instancias };
+    const segunda = derivarEAplicar(segundaMontagem);
+    expect(segunda.previa.previa).toEqual(primeira.previa.previa);
+  });
+
+  it('quadro ausente devolve recusa estruturada e não altera a montagem', () => {
+    const montagem = montarPinoELuva();
+    const portas = resolver(montagem);
+    delete (portas.get('luva.cavidade') as any).referencia;
+    const antes = JSON.stringify(montagem);
+    const previa = derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas);
+    expect(previa).toMatchObject({ aplicavel: false, diagnosticos: [{ codigo: 'quadro-incompleto' }] });
+    expect(JSON.stringify(montagem)).toBe(antes);
+  });
+
+  it('recusa reflexão e não oferece escala não uniforme como atalho de pose', () => {
+    const montagem = montarPinoELuva();
+    montagem.instancias[1] = { ...montagem.instancias[1], rotacao: [[-1, 0, 0], [0, 1, 0], [0, 0, 1]] };
+    expect(() => resolver(montagem)).toThrow(/rotação própria/);
+    montagem.instancias[1] = { ...montagem.instancias[1], escala: [1, 2, 1] };
+    expect(() => resolver(montagem)).toThrow(/número finito > 0/);
   });
 });

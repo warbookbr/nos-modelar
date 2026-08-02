@@ -2,7 +2,7 @@
   "formato": "mecanifica.peca-resolvida",
   "versao": 1,
   "peca": "roda-dianteira",
-  "receita": "1e610d79eb13e5fb",
+  "receita": "21848ba7dd46f5f3",
   "meta": {
     "nome": "roda-dianteira"
   },
@@ -51,7 +51,12 @@
         ],
         "raio": 0.08,
         "inicio": -0.095,
-        "fim": 0.095
+        "fim": 0.095,
+        "referencia": [
+          0,
+          1,
+          0
+        ]
       }
     }
   ],

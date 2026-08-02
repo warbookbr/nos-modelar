@@ -9,7 +9,7 @@ const PASSOS_PINO = [
   ['publicarPorta', {
     nome: 'piloto', de: { op: 'cilindro', id: 9101 },
     interface: {
-      forma: 'cilindro', papel: 'externa', eixo: [0, 1, 0], centro: [0, 0, 0],
+      forma: 'cilindro', papel: 'externa', eixo: [0, 1, 0], referencia: [1, 0, 0], centro: [0, 0, 0],
       raio: 'raioPino', inicio: 0, fim: 'comprimentoPino',
     },
   }],
@@ -24,7 +24,7 @@ const PASSOS_LUVA = [
   ['publicarPorta', {
     nome: 'cavidade', de: { op: 'lathe', id: 9102, faixa: 3 },
     interface: {
-      forma: 'cilindro', papel: 'interna', eixo: [0, 1, 0], centro: [0, 0, 0],
+      forma: 'cilindro', papel: 'interna', eixo: [0, 1, 0], referencia: [1, 0, 0], centro: [0, 0, 0],
       raio: 'raioInterno', inicio: 0, fim: 'comprimentoLuva',
     },
   }],
@@ -33,6 +33,7 @@ const PASSOS_LUVA = [
 export const RELACAO_PINO_NA_LUVA = {
   id: 'pinoNaLuva', tipo: 'encaixaCilindrico', referencia: 'pino.piloto', movel: 'luva.cavidade',
   folgaRadial: { min: 0.0019, max: 0.0021 }, tolerancia: 0.000001,
+  poseCanonica: { referenciaAxial: 'centro', movelAxial: 'centro', giro: 0 },
 };
 
 export function montarPinoELuva() {

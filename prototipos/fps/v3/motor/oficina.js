@@ -4681,32 +4681,34 @@ export const OPS = {
 
    Isto NÃO entra em `neutroCanonico`: a porta é contrato de autoria, não
    geometria, e mexer no canônico mudaria o hash de peça já shipada. */
-/* Interface de porta do Recorte A de AUT-05. Ela é deliberadamente menor que
-   um quadro geral: declara apenas o que um encaixe cilíndrico já posado precisa
-   MEDIR. `centro` é um ponto no eixo, `inicio`/`fim` são distâncias assinadas a
-   partir dele, na direção de `eixo`. Não há pose, matriz, Three.js, escolha de
-   face por proximidade nem posição de passo aqui. O nível seguinte poderá
-   introduzir quadro completo sem reinterpretar estes dados. */
+/* Interface de porta de AUT-05. O Recorte A usava eixo/centro para MEDIR; o
+   Recorte B admite `referencia` opcional, vetor perpendicular ao eixo que
+   completa o quadro quando uma relação precisa derivar pose. `centro` é um
+   ponto no eixo e `inicio`/`fim` são distâncias assinadas a partir dele. Não há
+   matriz, Three.js, escolha por proximidade nem posição de passo: a porta só
+   transporta dados declarados e o módulo neutro decide se o quadro é necessário. */
 function resolverInterfaceCilindricaDaPorta(st, interfaceDeclarada) {
   if (interfaceDeclarada === undefined) return { interface: undefined };
   if (!interfaceDeclarada || typeof interfaceDeclarada !== 'object' || Array.isArray(interfaceDeclarada)) {
-    return { erro: 'interface precisa ser objeto {forma, papel, eixo, centro, raio, inicio, fim}' };
+    return { erro: 'interface precisa ser objeto {forma, papel, eixo, centro, raio, inicio, fim, referencia?}' };
   }
-  const esperadas = new Set(['forma', 'papel', 'eixo', 'centro', 'raio', 'inicio', 'fim']);
-  const extras = Object.keys(interfaceDeclarada).filter((chave) => !esperadas.has(chave));
+  const obrigatorias = ['forma', 'papel', 'eixo', 'centro', 'raio', 'inicio', 'fim'];
+  const aceitas = new Set([...obrigatorias, 'referencia']);
+  const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
   if (extras.length) return { erro: `interface tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
-  for (const chave of esperadas) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface exige '${chave}'` };
+  for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface exige '${chave}'` };
   if (interfaceDeclarada.forma !== 'cilindro') return { erro: "interface.forma só aceita 'cilindro' neste recorte" };
   if (interfaceDeclarada.papel !== 'externa' && interfaceDeclarada.papel !== 'interna') {
     return { erro: "interface.papel precisa ser 'externa' ou 'interna'" };
   }
-  let eixo, centro, raio, inicio, fim;
+  let eixo, centro, raio, inicio, fim, referencia;
   try {
     eixo = st.vec(interfaceDeclarada.eixo);
     centro = st.vec(interfaceDeclarada.centro);
     raio = st.num(interfaceDeclarada.raio);
     inicio = st.num(interfaceDeclarada.inicio);
     fim = st.num(interfaceDeclarada.fim);
+    if (interfaceDeclarada.referencia !== undefined) referencia = st.vec(interfaceDeclarada.referencia);
   } catch (erro) {
     return { erro: `interface inválida: ${erro.message}` };
   }
@@ -4716,15 +4718,27 @@ function resolverInterfaceCilindricaDaPorta(st, interfaceDeclarada) {
   if (!Number.isFinite(inicio) || !Number.isFinite(fim) || !(fim > inicio)) {
     return { erro: 'interface.inicio e interface.fim precisam ser finitos, com fim > inicio' };
   }
+  const eixoUnitario = eixo.map((n) => n / comprimento);
+  if (referencia !== undefined) {
+    const tamanhoReferencia = Math.hypot(...referencia);
+    if (!(tamanhoReferencia > 0) || !Number.isFinite(tamanhoReferencia)) {
+      return { erro: 'interface.referencia precisa ter comprimento finito > 0' };
+    }
+    const referenciaUnitaria = referencia.map((n) => n / tamanhoReferencia);
+    const projecao = eixoUnitario.reduce((soma, n, indice) => soma + n * referenciaUnitaria[indice], 0);
+    if (Math.abs(projecao) > 1e-9) return { erro: 'interface.referencia precisa ser perpendicular ao eixo' };
+    referencia = referenciaUnitaria;
+  }
   return {
     interface: {
       forma: 'cilindro',
       papel: interfaceDeclarada.papel,
-      eixo: eixo.map((n) => n / comprimento),
+      eixo: eixoUnitario,
       centro,
       raio,
       inicio,
       fim,
+      ...(referencia === undefined ? {} : { referencia }),
     },
   };
 }

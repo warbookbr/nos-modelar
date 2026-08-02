@@ -2,7 +2,7 @@
   "formato": "mecanifica.peca-resolvida",
   "versao": 1,
   "peca": "freio-disco",
-  "receita": "5f7a087e66dff10a",
+  "receita": "8bd407ab0e8d85e3",
   "meta": {
     "nome": "freio-disco"
   },
@@ -69,7 +69,12 @@
         ],
         "raio": 0.051,
         "inicio": 0.03199999999999999,
-        "fim": 0.043999999999999984
+        "fim": 0.043999999999999984,
+        "referencia": [
+          0,
+          1,
+          0
+        ]
       }
     }
   ],

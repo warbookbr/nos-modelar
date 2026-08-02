@@ -6,8 +6,9 @@ fechem, por acidente, o caminho para montagens maiores — e para que a visão d
 longo prazo não autorize a construção prematura de um CAD ou solucionador
 universal.
 
-**Estado deste documento:** o Recorte A foi concluído por
-[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md). O documento continua
+**Estado deste documento:** os Recortes A e B foram concluídos por
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
+[`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md). O documento continua
 um mapa de teto: nenhum item abaixo substitui um plano curto ativo em
 `planos/README.md`.
 
@@ -43,10 +44,10 @@ do anterior; não é apenas uma tela nova.
 
 | Nível | Capacidade observável | Estado | Primeiro gate imaginado |
 |---|---|---|---|
-| 0 | piloto, vocabulário e baseline mensurável | não iniciado | roda, cubo e freio têm relações atuais congeladas |
-| 1 | portas com quadro e interface semânticos | não iniciado | portas sobrevivem a transformação e replay |
-| 2 | relações dirigidas, ainda sem mover peça | não iniciado | `encaixa`/`alinha` validam uma montagem existente |
-| 3 | posicionamento derivado de uma relação | não iniciado | uma peça móvel chega à pose única esperada |
+| 0 | piloto, vocabulário e baseline mensurável | concluído | roda, cubo e freio têm relações atuais congeladas |
+| 1 | portas com quadro e interface semânticos | em desenvolvimento | portas sobrevivem a transformação e replay |
+| 2 | relações dirigidas, ainda sem mover peça | em desenvolvimento | `encaixa`/`alinha` validam uma montagem existente |
+| 3 | posicionamento derivado de uma relação | em desenvolvimento | uma peça móvel chega à pose única esperada |
 | 4 | diagnóstico de folga, contato e colisão com intenção | não iniciado | encaixe oco deixa de ser falso positivo sem esconder colisão |
 | 5 | hierarquia de peças e submontagens | não iniciado | selecionar um pai alcança a subárvore correta |
 | 6 | grafo de dependências e propagação incremental | não iniciado | mudar uma medida recalcula só os dependentes |
@@ -99,11 +100,13 @@ O projeto não começa do zero:
 - a bancada seleciona, isola, contextualiza, explode e compartilha estado;
 - receitas são determinísticas, versionadas e reexecutáveis.
 
-Mas a porta atual ainda é, essencialmente, uma **seleção de faces com nome**.
-Ela não declara sozinha um quadro local completo, volume vazio, assento, eixo,
-cardinalidade ou compatibilidade. Partes continuam planas, e a montagem não
-guarda uma relação como `encaixa`; guarda coordenadas e testes que produzem esse
-efeito. É essa distância que os níveis abaixo percorrem.
+Uma porta ainda é, essencialmente, uma **seleção de faces com nome**, mas uma
+porta cilíndrica pode agora declarar eixo, centro, intervalo, raio e um vetor de
+referência perpendicular. Isso basta para o primeiro quadro rígido do piloto;
+não declara volume vazio geral, assento, cardinalidade, espelho ou
+compatibilidade universal. A montagem já guarda `encaixaCilindrico`, mas os
+demais tipos de relação continuam candidatos. É essa distância que os níveis
+abaixo percorrem.
 
 As evidências concretas são:
 
@@ -348,7 +351,9 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 
 **Checklist**
 
-- [ ] definir convenção de quadro local, mão, unidade e transformação;
+- [x] definir convenção mínima: eixo + referência perpendicular formam quadro
+  destro; metros locais passam por escala uniforme, rotação 3×3 própria e
+  deslocamento explícito;
 - [ ] separar identidade da porta, rótulo e dados derivados;
 - [ ] declarar comportamento sob espelho e `arranja`;
 - [x] validar vetores nulos, não finitos e medidas negativas na interface cilíndrica;
@@ -392,8 +397,9 @@ compatibilidade entre naturezas, direção e tolerância. `encosta` entre planos
 
 - [x] escolher `encaixaCilindrico` exigido pelo piloto;
 - [x] definir referência, móvel e graus de liberdade que continuam intocados;
-- [ ] definir estado satisfeito, divergente, ambíguo e impossível;
-- [ ] produzir diagnóstico estruturado e ordenado;
+- [ ] definir estado satisfeito, divergente, ambíguo e impossível para todos os
+  tipos de relação; o piloto só cobre encaixe cilíndrico e quadro incompleto;
+- [x] produzir diagnóstico estruturado e ordenado para o encaixe cilíndrico;
 - [ ] testar relações invertidas e portas incompatíveis;
 - [x] manter o modo estritamente read-only neste nível.
 
@@ -417,18 +423,18 @@ introduzem infinitas respostas equivalentes.
 
 **Estado**
 
-- [x] NÃO INICIADO
-- [ ] EM DESENVOLVIMENTO
+- [ ] NÃO INICIADO
+- [x] EM DESENVOLVIMENTO
 - [ ] CONCLUÍDO
 
 **Checklist**
 
-- [ ] congelar a regra “referência fixa, recebido móvel”;
-- [ ] implementar prévia pura e aplicação transacional;
+- [x] congelar a regra “referência fixa, recebido móvel”;
+- [x] implementar prévia pura e aplicação por cópia, sem persistência;
 - [ ] provar composição local/mundo e pai transformado;
-- [ ] testar idempotência, determinismo e rollback;
-- [ ] recusar escala/reflexão fora do contrato inicial;
-- [ ] comparar pose derivada com o baseline do nível 0.
+- [x] testar idempotência, determinismo e ausência de mutação/rollback;
+- [x] recusar reflexão e escala não uniforme fora do contrato inicial;
+- [x] comparar pose derivada com o baseline do nível 0.
 
 ## Nível 4 — validação explicável de encaixe e colisão
 
@@ -776,9 +782,11 @@ também em estado neutro e headless.
 
 ## Primeiro recorte recomendado
 
-O pré-início sugeriu dois planos curtos consecutivos. O Recorte A foi concluído
-por [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md); o Recorte B
-permanece apenas candidato.
+O pré-início sugeriu dois planos curtos consecutivos. Ambos foram concluídos:
+[`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) mede o encaixe e
+[`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md) deriva uma prévia pura
+de pose. O nível 3 permanece em desenvolvimento porque ainda não cobre pai,
+espelho, persistência nem rollback de estado salvo.
 
 ### Recorte A — interfaces mensuráveis, sem movimento automático
 

@@ -356,7 +356,7 @@ export const PASSOS = [
     nome: 'pilotoDaRoda',
     de: { op: 'cilindro', id: PILOTO },
     interface: {
-      forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], centro: [0, 0, 0],
+      forma: 'cilindro', papel: 'externa', eixo: [1, 0, 0], referencia: [0, 1, 0], centro: [0, 0, 0],
       raio: 'pilotoRaio', inicio: 'pilotoInicioX', fim: 'pilotoFimX',
     },
   }],

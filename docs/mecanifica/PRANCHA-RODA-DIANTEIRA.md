@@ -53,8 +53,11 @@ npm run bancada -- roda-dianteira --selecionadas=aro,tampaCentral --modo=context
 São 734 faces e nenhuma face sem identidade. `pneuInteiro`, `aroInteiro` e
 `tampaCentralInteira` são aliases de seleção; `aroAbertura` nomeia a face
 interna estável para regras visuais. A porta `cavidadeDoCubo` declara, além da
-origem dessa face, uma interface cilíndrica interna: eixo X, raio interno e
-intervalo axial. Ela é o par dirigido de `pilotoDaRoda` no freio.
+origem dessa face, uma interface cilíndrica interna: eixo X, vetor de referência
+Y, raio interno e intervalo axial. Ela é o par dirigido de `pilotoDaRoda` no
+freio. O eixo e a referência formam o quadro explícito que a prévia de montagem
+pode alinhar; a relação declara centro↔centro e giro zero, preservando esta pose
+revisada como baseline.
 
 ## Limite conhecido da régua
 
