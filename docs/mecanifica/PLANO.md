@@ -1612,9 +1612,13 @@ comportamento em `oficina.js`:
   `furo` aceita `grupo:'nome'` e, se houver `furo`, conta dentro desse grupo.
   Preenchimentos continuam sendo da face e não aceitam grupo. A peça de prova
   permanece para a próxima fatia.
+- **P8**: `gabarito:selecao --check --novas=<lista>` aceita exclusivamente a
+  peça nova nomeada, mas continua comparando hash, contagem e presença de cada
+  peça gravada. Nome ausente, repetido ou já gravado GRITA; a saída informa
+  separadamente quantas peças antigas bateram e quais novas foram aceitas.
 
-`gabarito:selecao --novas` e a fatia F1 de peça ainda não entraram. A primeira
-parte de F0a e as quatro primeiras fatias de F1 já entraram; os três gates do
+A ferramenta `gabarito:selecao --novas` e as quatro primeiras fatias de F1 já
+entraram. A fatia F1 de peça permanece como próximo passo; os três gates do
 roteiro continuam obrigatórios antes de prosseguir.
 
 1. **F0a — a régua, com o caso vermelho.** ENTRA: a quinta propriedade em
@@ -1630,7 +1634,7 @@ roteiro continuam obrigatórios antes de prosseguir.
    numa face de tamanho 1, e quem paga isso é a guarda do recuo do A-36. GATE:
    os três verdes. No corpo do commit: piso 7,1092e-6 em `_corrimao`, 0
    degenerados no acervo, folga de 7 109×.
-2. **F0a — as ferramentas do gate.** ENTRA: `gabarito-selecao.mjs` ganha
+2. **F0a — as ferramentas do gate — CONCLUÍDA no warbook.** ENTRA: `gabarito-selecao.mjs` ganha
    `--novas=<lista>`, e peça cujo nome está na lista não marca `diverge`; o
    script passa a imprimir quantas das antigas bateram. E `criar.mjs:57` passa a
    passar `mod.ALIASES ?? []` como sexto argumento para `nucleo`, que hoje ele

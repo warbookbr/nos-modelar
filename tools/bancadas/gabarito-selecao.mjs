@@ -12,6 +12,8 @@
  *
  *   node tools/bancadas/gabarito-selecao.mjs                 # mede e GRAVA gabarito-selecao.json
  *   node tools/bancadas/gabarito-selecao.mjs --check          # compara contra o gravado (exit≠0 na 1ª diferença)
+ *   node tools/bancadas/gabarito-selecao.mjs --check --novas=_flange-de-tubulacao
+ *                                                          # aceita SOMENTE a peça nova declarada
  *   node tools/bancadas/gabarito-selecao.mjs --check outro.json
  *
  *   npm run gabarito:selecao        # regrava (só depois de confirmar que a mudança é intencional)
@@ -22,6 +24,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { compararGabarito, hashDePecas, nomesNovos } from './gabarito-selecao-lib.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -29,7 +32,17 @@ const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
 
 const GABARITO_PADRAO = join(HERE, 'gabarito-selecao.json');
 const args = process.argv.slice(2);
-const checkPath = (() => { const i = args.indexOf('--check'); return i >= 0 ? (args[i + 1] || GABARITO_PADRAO) : null; })();
+const checkPath = (() => {
+  const i = args.indexOf('--check');
+  return i >= 0 ? (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : GABARITO_PADRAO) : null;
+})();
+let novas;
+try { novas = nomesNovos(args); }
+catch (e) { console.error(`✗ ${e.message}`); process.exit(2); }
+if (!checkPath && novas.size) {
+  console.error('✗ --novas só pode ser usado junto de --check');
+  process.exit(2);
+}
 
 const { nucleo, neutroCanonico } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
 
@@ -86,7 +99,7 @@ for (const nome of nomes) {
 }
 
 const nomesOrdenados = Object.keys(resultado).sort();
-const hashTotal = hash(nomesOrdenados.map((n) => `${n}:${resultado[n].hash}`).join('|'));
+const hashTotal = hashDePecas(resultado);
 const gabarito = { hashTotal, pecas: resultado };
 
 if (falhas.length) {
@@ -108,20 +121,13 @@ let gravado;
 try { gravado = JSON.parse(readFileSync(checkPath, 'utf8')); }
 catch (e) { console.error(`✗ não consegui ler o gabarito gravado ${checkPath}: ${e.message}`); process.exit(2); }
 
-let diverge = false;
-const nomesGravados = Object.keys(gravado.pecas ?? {}).sort();
-const todosNomes = [...new Set([...nomesOrdenados, ...nomesGravados])].sort();
-for (const nome of todosNomes) {
-  const atual = resultado[nome], antigo = gravado.pecas?.[nome];
-  if (!antigo) { console.error(`✗ ${nome}: peça NOVA desde o gabarito — não é regressão, mas o gabarito precisa ser regravado (npm run gabarito:selecao)`); diverge = true; continue; }
-  if (!atual) { console.error(`✗ ${nome}: peça SUMIU desde o gabarito (existia, não existe mais ou perdeu PASSOS)`); diverge = true; continue; }
-  if (atual.hash !== antigo.hash) {
-    console.error(`✗ ${nome}: HASH DIVERGE do gabarito — mudança não é aditiva (V=${atual.vertices} vs ${antigo.vertices}, F=${atual.faces} vs ${antigo.faces})`);
-    diverge = true;
-  }
+const comparacao = compararGabarito(resultado, gravado, novas);
+if (comparacao.erros.length) {
+  for (const erro of comparacao.erros) console.error(`✗ ${erro}`);
+  console.error('\ngabarito:selecao FALHOU — alguma peça mudou de resultado');
+  process.exit(1);
 }
-if (diverge) { console.error(`\ngabarito:selecao FALHOU — alguma peça mudou de resultado`); process.exit(1); }
-if (gravado.hashTotal !== hashTotal) { console.error(`✗ hash total diverge apesar de cada peça bater (achado impossível — investigar)`); process.exit(1); }
-
-console.log(`✓ gabarito:selecao — ${nomesOrdenados.length} peça(s) byte-idênticas ao gabarito gravado`);
+const novasAceitas = comparacao.novasAceitas;
+if (!novasAceitas.length) console.log(`✓ gabarito:selecao — ${comparacao.gravadasConformes} peça(s) byte-idênticas ao gabarito gravado`);
+else console.log(`✓ gabarito:selecao — ${comparacao.gravadasConformes} peça(s) gravada(s) byte-idênticas; ${novasAceitas.length} peça(s) nova(s) aceita(s): ${novasAceitas.join(', ')}`);
 process.exit(0);
