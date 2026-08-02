@@ -46,8 +46,8 @@ const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
 export const PUBLICADAS = ['freio-disco', 'roda-dianteira'];
 
 export const DESTINO = join(REPO, 'pecas-resolvidas');
-export const arquivoDaPeca = (nome) => join(DESTINO, `${nome}.json`);
-export const arquivoDoManifesto = () => join(DESTINO, 'manifesto.json');
+export const arquivoDaPeca = (nome, destino = DESTINO) => join(destino, `${nome}.json`);
+export const arquivoDoManifesto = (destino = DESTINO) => join(destino, 'manifesto.json');
 
 /* O LEITOR É UMA CÓPIA, E O MANIFESTO É A TRAVA DISSO.
 
@@ -171,7 +171,20 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
     versao: VERSAO,
     peca: nome,
     receita: hash16(JSON.stringify(entrada)),
-    meta: mod.meta ?? { nome },
+    /* `meta` por LISTA BRANCA. Medido: o produto lê um campo só, `meta.nome`,
+       para nomear a raiz do grupo Three.js. A peça publica mais — `tipo`,
+       `desc`, `fechada` e `colisao` — e nenhum atravessa.
+
+       Os quatro não são inofensivos por serem pequenos: são superfície de
+       formato que ninguém revisou cruzando a fronteira entre dois
+       repositórios. `colisao` é dado de AUTORIA, com float cru, nascido de
+       outro propósito; `desc` é a descrição do autor, e o texto que o cliente
+       lê pertence ao domínio do produto.
+
+       Campo que ganhar consumidor real entra numa versão NOVA do formato, com
+       teste próprio. Entrar "porque já estava lá" é como toda superfície de
+       compatibilidade começa. */
+    meta: { nome: mod.meta?.nome ?? nome },
     materiais: entrada.MATERIAIS,
     partes,
     V: canon.V,
@@ -198,30 +211,41 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
    marca igual com conteúdo diferente ainda é arquivo errado, e eu não quero
    depender de a marca estar correta para descobrir que a marca está correta. */
 
-export async function gravarPublicadas(nomes = PUBLICADAS) {
-  mkdirSync(DESTINO, { recursive: true });
+/* `destino` e argumento, e o padrao e a pasta de verdade.
+
+   POR QUE ISSO EXISTE. A primeira versao destes testes chamava
+   `gravarPublicadas()` sem argumento e reescrevia `pecas-resolvidas/` DE
+   VERDADE. O efeito era pior do que sujar a arvore de quem roda `npm test`:
+   no CI, `Unit Tests` roda ANTES de `exportar:check`, entao a suite
+   regenerava os arquivos e o gate nunca podia reprovar. Ele existia, rodava,
+   e passava sempre — a condicao que nao pode falhar.
+
+   Achei porque o gate devolveu 0 onde eu esperava 1, e fui atras em vez de
+   aceitar o verde. */
+export async function gravarPublicadas(nomes = PUBLICADAS, destino = DESTINO) {
+  mkdirSync(destino, { recursive: true });
   const feitas = [];
   for (const nome of nomes) {
     const { texto } = await exportarPeca(nome);
-    writeFileSync(arquivoDaPeca(nome), texto, 'utf8');
-    feitas.push({ nome, arquivo: arquivoDaPeca(nome), bytes: Buffer.byteLength(texto) });
+    writeFileSync(arquivoDaPeca(nome, destino), texto, 'utf8');
+    feitas.push({ nome, arquivo: arquivoDaPeca(nome, destino), bytes: Buffer.byteLength(texto) });
   }
   /* o manifesto vem por ULTIMO, depois de todas as peças terem sido gravadas.
      Se uma peça for recusada no meio, ele não chega a existir com a lista
      errada. */
   const texto = `${JSON.stringify(gerarManifesto(nomes), null, 2)}\n`;
-  writeFileSync(arquivoDoManifesto(), texto, 'utf8');
-  feitas.push({ nome: 'manifesto', arquivo: arquivoDoManifesto(), bytes: Buffer.byteLength(texto) });
+  writeFileSync(arquivoDoManifesto(destino), texto, 'utf8');
+  feitas.push({ nome: 'manifesto', arquivo: arquivoDoManifesto(destino), bytes: Buffer.byteLength(texto) });
   return feitas;
 }
 
-export async function conferirPublicadas(nomes = PUBLICADAS) {
+export async function conferirPublicadas(nomes = PUBLICADAS, destino = DESTINO) {
   const problemas = [];
 
   /* o MANIFESTO primeiro. Se o leitor mudou e ele ficou velho, a cópia do outro
      repositório está divergente, e isso vale mais que qualquer peça estar em
      dia: um arquivo perfeito lido com a regra errada desenha errado. */
-  const alvoManifesto = arquivoDoManifesto();
+  const alvoManifesto = arquivoDoManifesto(destino);
   if (!existsSync(alvoManifesto)) {
     problemas.push({ nome: 'manifesto', motivo: 'o manifesto não existe; rode `npm run exportar`' });
   } else {
@@ -237,7 +261,7 @@ export async function conferirPublicadas(nomes = PUBLICADAS) {
   }
 
   for (const nome of nomes) {
-    const alvo = arquivoDaPeca(nome);
+    const alvo = arquivoDaPeca(nome, destino);
     const { texto } = await exportarPeca(nome);
     if (!existsSync(alvo)) {
       problemas.push({ nome, motivo: 'arquivo não existe; rode `npm run exportar`' });

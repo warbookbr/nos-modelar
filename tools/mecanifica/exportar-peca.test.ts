@@ -74,6 +74,39 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect(dado.meta.nome).toBe(PECA);
   });
 
+  it('★ `meta` atravessa por LISTA BRANCA: só `nome`, e nada mais', async () => {
+    /* MEDIDO ANTES DE DECIDIR: o produto lê UM campo, `meta.nome`, em
+       `src/main.js`, para nomear a raiz do grupo Three.js. O arquivo carregava
+       cinco: nome, tipo, desc, fechada e colisao.
+
+       Os quatro extras não são inofensivos por serem pequenos. Eles são
+       superfície de formato que ninguém revisou, atravessando a fronteira entre
+       dois repositórios. `colisao` é dado de AUTORIA, com float cru, nascido de
+       outro propósito. `desc` é descrição do autor, e o texto que o cliente lê
+       pertence hoje ao domínio do produto.
+
+       Campo que ganhar consumidor real entra numa versão nova do formato, com
+       teste próprio. Entrar "porque já estava lá" é como toda superfície de
+       compatibilidade começa. */
+    const { dado } = await exportarPeca(PECA);
+    expect(Object.keys(dado.meta)).toEqual(['nome']);
+    expect(dado.meta.nome).toBe(PECA);
+
+    /* a receita desta peça publica os cinco. Se ela publicasse só o nome, este
+       caso passaria sem provar nada. */
+    // @ts-expect-error — peça em JavaScript, carregada em runtime pelo Vitest.
+    const receita: any = await import('../../prototipos/fps/v3/pecas/freio-disco.js');
+    expect(Object.keys(receita.meta).sort(), 'a peça de teste precisa publicar mais que o nome')
+      .toEqual(['colisao', 'desc', 'fechada', 'nome', 'tipo']);
+
+    /* e o texto gravado não leva os quatro por outro caminho. */
+    const { texto } = await exportarPeca(PECA);
+    const bloco = texto.slice(texto.indexOf('"meta"'), texto.indexOf('"materiais"'));
+    for (const campo of ['colisao', 'desc', 'fechada', 'tipo']) {
+      expect(bloco, `'${campo}' vazou para o meta exportado`).not.toContain(`"${campo}"`);
+    }
+  });
+
   it('★ é REEXECUTÁVEL: o arquivo bate com o que o núcleo produz agora', async () => {
     /* a promessa central. Se o arquivo e o núcleo divergirem, o produto mostra
        uma peça que este repositório não sabe mais construir. */
