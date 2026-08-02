@@ -4916,7 +4916,7 @@ describe('furo — toda face nova é endereçável, e as famílias não se confu
 
   it('chave desconhecida na origem do furo GRITA com o vocabulário certo, em vez de ser ignorada', () => {
     const n = nucleo(PLACA(PASSANTE, [['pincel', { modo: 'face', sel: { origem: { op: 'furo', id: 9, lado: 0 } }, cor: '#f00' }]]) as any, {}, {});
-    expect(n.orfaos.some((o: any) => /furo usa op, id, furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
+    expect(n.orfaos.some((o: any) => /furo usa op, id, grupo opcional \(nome semântico visível\), furo\/borda\/parede\/saida\/preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
     expect(pintadas(n, '#f00')).toEqual([]);
   });
 

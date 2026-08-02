@@ -1,6 +1,6 @@
 /* furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode
-   declarar raio e, em furo cego, profundidade próprios, sem mudar a numeração
-   nem a ordem semântica dos furos. Nome de grupo pertence à fatia seguinte. */
+   declarar raio e, em furo cego, profundidade próprios, e receber um nome
+   semântico para a origem citar sem depender de posição na expansão. */
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
 import { nucleo, neutroCanonico } from '../../prototipos/fps/v3/motor/oficina.js';
@@ -41,6 +41,7 @@ const idsDoFuro = (n: any) => ({
   V: [...n.V.keys()].filter((id: number) => id >= 1000).sort((a: number, b: number) => a - b),
   F: [...n.F.keys()].filter((id: number) => id >= 1000).sort((a: number, b: number) => a - b),
 });
+const pintadas = (n: any, cor: string) => [...n.F.values()].filter((f: any) => f.cor === cor).map((f: any) => f.id).sort((a: number, b: number) => a - b);
 
 describe('A-30/F1 — raio e profundidade por grupo de furo', () => {
   const misto = (raioCentral: any = 0.025) => [
@@ -166,5 +167,53 @@ describe('A-30/F1 — raio e profundidade por grupo de furo', () => {
     expect(n.orfaos).toHaveLength(1);
     expect(n.orfaos[0].motivo).toMatch(/o furo 0 tem profundidade inválida/);
     expect(idsDoFuro(n)).toEqual({ V: [], F: [] });
+  });
+
+  it('nome de grupo seleciona o conjunto semântico, e furo conta dentro dele', () => {
+    const centros = [
+      { nome: 'passagem', centro: [0, 0, 0], raio: 0.025 },
+      { nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 },
+    ];
+    const n = nucleo([
+      ...PASSANTE(centros),
+      ['pincel', { modo: 'face', cor: '#a00', sel: { origem: { op: 'furo', id: 9, grupo: 'passagem' } } }],
+      ['pincel', { modo: 'face', cor: '#0a0', sel: { origem: { op: 'furo', id: 9, grupo: 'parafusos' } } }],
+      ['pincel', { modo: 'face', cor: '#00a', sel: { origem: { op: 'furo', id: 9, grupo: 'parafusos', furo: 'ultima', parede: 0 } } }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#a00')).toHaveLength(3 * L);
+    expect(pintadas(n, '#0a0')).toHaveLength(4 * 3 * L - 1);
+    expect(pintadas(n, '#00a')).toHaveLength(1);
+  });
+
+  it('o círculo no topo aceita o mesmo nome de grupo da forma em lista', () => {
+    const n = nucleo([
+      ...PASSANTE({ nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 }),
+      ['pincel', { modo: 'face', cor: '#0aa', sel: { origem: { op: 'furo', id: 9, grupo: 'parafusos' } } }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(pintadas(n, '#0aa')).toHaveLength(4 * 3 * L);
+  });
+
+  it('grupo ausente, repetido ou sem nome visível recusa sem reservar o bloco', () => {
+    const ausente = nucleo([
+      ...PASSANTE([{ nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 }]),
+      ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 'inexistente' } } }],
+    ] as any, {}, {});
+    expect(ausente.orfaos.some((o: any) => /grupo 'inexistente' inexistente/.test(o.motivo))).toBe(true);
+    expect(pintadas(ausente, '#f00')).toEqual([]);
+
+    const repetido = nucleo(PASSANTE([
+      { nome: 'mesmo', centro: [0, 0, 0] },
+      { nome: 'mesmo', distancia: 0.044, total: 4, volta: 360 },
+    ]) as any, {}, {});
+    expect(repetido.orfaos).toHaveLength(1);
+    expect(repetido.orfaos[0].motivo).toMatch(/repete o nome de grupo 'mesmo'/);
+    expect(idsDoFuro(repetido)).toEqual({ V: [], F: [] });
+
+    const invisivel = nucleo(PASSANTE([{ nome: '  ', centro: [0, 0, 0] }]) as any, {}, {});
+    expect(invisivel.orfaos).toHaveLength(1);
+    expect(invisivel.orfaos[0].motivo).toMatch(/nome de grupo inválido/);
+    expect(idsDoFuro(invisivel)).toEqual({ V: [], F: [] });
   });
 });

@@ -1608,6 +1608,10 @@ comportamento em `oficina.js`:
   seu furo. Passante com profundidade de item recusa antes de reservar ids: a
   mistura de modos continua fora do contrato. Nome de grupo permanece para a
   próxima fatia.
+- **P7**: disco e círculo agora podem declarar `nome` único e visível; a origem
+  `furo` aceita `grupo:'nome'` e, se houver `furo`, conta dentro desse grupo.
+  Preenchimentos continuam sendo da face e não aceitam grupo. A peça de prova
+  permanece para a próxima fatia.
 
 Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
 comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
@@ -1679,7 +1683,7 @@ de prosseguir.
 6. **F1 fatia 3 — profundidade por furo — CONCLUÍDA no warbook.** ENTRA: `profundidade` opcional no item;
    `profsPorFuro`; profundidade em passo passante GRITA. FECHA: T22, T23; as
    recusas 10 a 12. GATE: os três verdes.
-7. **F1 fatia 4 — o grupo se nomeia.** ENTRA: `nome` no item; `grupos` no
+7. **F1 fatia 4 — o grupo se nomeia — CONCLUÍDA no warbook.** ENTRA: `nome` no item; `grupos` no
    `registraOrigem`; `'grupo'` em `chaves` E no `msg` do `validar` (767-768); a
    janela no `resolver`. Junto, e na MESMA fatia: a regex de `oficina.test.ts`
    4919. Sem ela a suíte fica verde e o diagnóstico mente. FECHA: T16 a T21; as

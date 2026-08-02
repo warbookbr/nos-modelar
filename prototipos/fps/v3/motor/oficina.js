@@ -761,12 +761,20 @@ const CONTRATOS_ORIGEM = {
                                              é a volta inteira, e citá-lo GRITA
                                              em vez de devolver vazio);
        `{op:'furo', id, preenchimentoDaSaida: 'ultima'}` o mesmo do outro lado.
-     `furo` fora do limite, como todo eixo daqui, nomeia a faixa e GRITA. */
+     `furo` fora do limite, como todo eixo daqui, nomeia a faixa e GRITA.
+
+     GRUPO (F1/A-30) é a identidade do autor sobre uma fonte de centros:
+       `{op:'furo', id, grupo:'parafusos'}`      todos os furos desse grupo;
+       `{op:'furo', id, grupo:'parafusos', furo:0}` o primeiro DELE.
+     O nome nunca é índice; com `grupo`, o eixo `furo` conta só o grupo. O
+     preenchimento fica de fora porque pertence à FACE, não a um anel. */
   furo: {
     validar(origem) {
-      const chaves = ['op', 'id', 'furo', 'borda', 'parede', 'saida', 'tampa', 'preenchimento', 'preenchimentoDaSaida'];
-      const msg = "furo usa op, id, furo/borda/parede/saida/preenchimento/preenchimentoDaSaida opcionais (eixo numérico: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todos, ou filtro de progressão {passo,fase}) e tampa opcional ('fundo', só no furo cego)";
+      const chaves = ['op', 'id', 'grupo', 'furo', 'borda', 'parede', 'saida', 'tampa', 'preenchimento', 'preenchimentoDaSaida'];
+      const msg = "furo usa op, id, grupo opcional (nome semântico visível), furo/borda/parede/saida/preenchimento/preenchimentoDaSaida opcionais (eixo numérico: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = todos, ou filtro de progressão {passo,fase}) e tampa opcional ('fundo', só no furo cego)";
       if (!Object.keys(origem).every((k) => chaves.includes(k))) return msg;
+      if (origem.grupo != null && nomeDeParteInvalido(origem.grupo)) return msg;
+      if (origem.grupo != null && (origem.preenchimento != null || origem.preenchimentoDaSaida != null)) return msg;
       for (const familia of ['furo', 'borda', 'parede', 'saida', 'preenchimento', 'preenchimentoDaSaida']) if (!validarEixo(origem[familia])) return msg;
       if (origem.tampa != null && origem.tampa !== 'fundo') return msg;
       return null;
@@ -775,6 +783,8 @@ const CONTRATOS_ORIGEM = {
       const furos = registro.furos;
       const M = furos.length;
       const passante = furos[0].saidas != null;
+      const grupo = origem.grupo == null ? null : (registro.grupos ?? []).find((g) => g.nome === origem.grupo);
+      if (origem.grupo != null && !grupo) return { erro: `grupo '${origem.grupo}' inexistente na origem furo:${origem.id}` };
       if (origem.saida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem saída; o fundo dele é tampa:'fundo'` };
       if (origem.tampa != null && passante) return { erro: `origem furo:${origem.id} é um furo PASSANTE — não tem fundo; a borda do outro lado é o eixo 'saida'` };
       if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
@@ -782,17 +792,19 @@ const CONTRATOS_ORIGEM = {
       if (origem.preenchimentoDaSaida != null && !registro.preenchimentoDaSaida.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda de saída dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
 
       /* quais FUROS: o eixo `furo` ausente é "todos", como as famílias. */
-      let indicesFuro;
+      const furosDoAlvo = grupo ? grupo.furos : Array.from({ length: M }, (_, k) => k);
+      const Q = furosDoAlvo.length;
+      let indicesLocais;
       if (eixoDeIndiceUnico(origem.furo)) {
-        const r = indiceDeEixo(st, origem.furo, M);
+        const r = indiceDeEixo(st, origem.furo, Q);
         if (r.erro) return { erro: `furo '${origem.furo}' da origem furo:${origem.id} ${r.erro}` };
-        if (r.idx >= M) return { erro: `furo ${textoDeEixo(origem.furo, r.idx)} fora do limite da origem furo:${origem.id} (0..${M - 1})` };
-        indicesFuro = [r.idx];
+        if (r.idx >= Q) return { erro: `furo ${textoDeEixo(origem.furo, r.idx)} fora do limite ${grupo ? `do grupo '${grupo.nome}' ` : ''}da origem furo:${origem.id} (0..${Q - 1})` };
+        indicesLocais = [r.idx];
       } else {
-        indicesFuro = indicesEixo(origem.furo, M);
-        if (typeof origem.furo === 'object' && origem.furo != null && !indicesFuro.length) {
+        indicesLocais = indicesEixo(origem.furo, Q);
+        if (typeof origem.furo === 'object' && origem.furo != null && !indicesLocais.length) {
           const { passo, fase } = origem.furo;
-          return { erro: `filtro de furo {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${M - 1} na origem furo:${origem.id}` };
+          return { erro: `filtro de furo {passo:${passo},fase:${fase}} não casa nenhum índice em 0..${Q - 1} ${grupo ? `no grupo '${grupo.nome}' ` : ''}na origem furo:${origem.id}` };
         }
       }
       const semFamilia = origem.borda == null && origem.parede == null && origem.saida == null && origem.tampa == null
@@ -801,7 +813,10 @@ const CONTRATOS_ORIGEM = {
       const faces = [];
       /* Um passo de UM furo não tem por que dizer "do furo 0" em cada
          diagnóstico: com M = 1 o texto é o de sempre, palavra por palavra. */
-      const alvoDo = (k) => (M === 1 ? `da origem furo:${origem.id}` : `do furo ${k} da origem furo:${origem.id}`);
+      const alvoDo = (k, local) => {
+        if (grupo) return `do furo ${local} do grupo '${grupo.nome}' da origem furo:${origem.id}`;
+        return M === 1 ? `da origem furo:${origem.id}` : `do furo ${k} da origem furo:${origem.id}`;
+      };
       const colher = (nome, lista, eixo, alvo) => {
         if (eixoDeIndiceUnico(eixo)) {
           const r = indiceDeEixo(st, eixo, lista.length);
@@ -826,9 +841,10 @@ const CONTRATOS_ORIGEM = {
         return null;
       };
 
-      for (const k of indicesFuro) {
+      for (const local of indicesLocais) {
+        const k = furosDoAlvo[local];
         const registroDoFuro = furos[k];
-        const alvo = alvoDo(k);
+        const alvo = alvoDo(k, local);
         const familias = [['borda', registroDoFuro.bordas], ['parede', registroDoFuro.paredes], ['saida', registroDoFuro.saidas]];
         for (const [nome, lista] of familias) {
           if (lista == null) continue;
@@ -849,7 +865,7 @@ const CONTRATOS_ORIGEM = {
       /* O preenchimento é da FACE, não de um furo: ele entra quando a origem
          cita a peça inteira (sem eixo nenhum) ou quando é citado por nome.
          `{furo: k}` sozinho é "o furo k", e o furo k não tem preenchimento. */
-      const inteira = semFamilia && origem.furo == null;
+      const inteira = semFamilia && origem.furo == null && origem.grupo == null;
       for (const [nome, lista] of [['preenchimento', registro.preenchimento], ['preenchimentoDaSaida', registro.preenchimentoDaSaida]]) {
         if (!lista.length) continue;
         const eixo = origem[nome];
@@ -3543,10 +3559,22 @@ export const OPS = {
        como eram antes. `raio` do item é PARAM; L continua único no passo porque
        é TOPO e decide a numeração do bloco. */
     const fontes = [];
+    const nomesDeGrupo = new Map();
+    const lerNomeDeGrupo = (item, onde) => {
+      if (item.nome == null) return { nome: null };
+      const erro = nomeDeParteInvalido(item.nome);
+      if (erro) return { erro: `${onde} tem nome de grupo inválido: ${erro}` };
+      const anterior = nomesDeGrupo.get(item.nome);
+      if (anterior != null) return { erro: `${onde} repete o nome de grupo '${item.nome}', já declarado em ${anterior}; grupo é identidade semântica, não posição` };
+      nomesDeGrupo.set(item.nome, onde);
+      return { nome: item.nome };
+    };
     const lerCirculo = (item, nome) => {
-      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus', 'raio', 'profundidade'];
+      const chaves = ['nome', 'pivo', 'distancia', 'total', 'volta', 'graus', 'raio', 'profundidade'];
       const estranha = Object.keys(item).find((k) => !chaves.includes(k));
       if (estranha) return { erro: `${nome} em círculo usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma` };
+      const grupo = lerNomeDeGrupo(item, nome);
+      if (grupo.erro) return grupo;
       const total = st.num(item.total ?? 0);
       if (!Number.isSafeInteger(total) || total < 2) return { erro: `${nome} em círculo precisa de total inteiro ≥ 2 (um círculo de um furo é o próprio centro); recebido ${JSON.stringify(item.total ?? null)} = ${total}` };
       const distancia = st.num(item.distancia ?? 0);
@@ -3563,12 +3591,12 @@ export const OPS = {
         if (erro) return { erro };
         pivo = st.vec(item.pivo);
       }
-      return { fonte: { tipo: 'circulo', pivo, distancia, total, passoGraus, raio: item.raio, profundidade: item.profundidade } };
+      return { fonte: { tipo: 'circulo', nome: grupo.nome, pivo, distancia, total, passoGraus, raio: item.raio, profundidade: item.profundidade } };
     };
     if (temCentro) {
       const erro = conferirPonto(a.centro, 'centro');
       if (erro) return grita(st, i, 'furo', 'centro', erro);
-      fontes.push({ tipo: 'ponto', ponto: st.vec(a.centro), raio: undefined, profundidade: undefined });
+      fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(a.centro), raio: undefined, profundidade: undefined });
     } else if (Array.isArray(a.centros)) {
       if (!a.centros.length) return grita(st, i, 'furo', 'centros', 'centros é uma lista vazia — um passo que não abre furo nenhum é um no-op silencioso');
       for (let k = 0; k < a.centros.length; k++) {
@@ -3576,20 +3604,22 @@ export const OPS = {
         if (Array.isArray(item)) {
           const erro = conferirPonto(item, `centros[${k}]`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', ponto: st.vec(item), raio: undefined, profundidade: undefined });
+          fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(item), raio: undefined, profundidade: undefined });
         } else if (item && typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'centro')) {
-          const chaves = ['centro', 'raio', 'profundidade'];
+          const chaves = ['nome', 'centro', 'raio', 'profundidade'];
           const estranha = Object.keys(item).find((nome) => !chaves.includes(nome));
           if (estranha) return grita(st, i, 'furo', 'centros', `centros[${k}] como disco usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
+          const grupo = lerNomeDeGrupo(item, `centros[${k}]`);
+          if (grupo.erro) return grita(st, i, 'furo', 'centros', grupo.erro);
           const erro = conferirPonto(item.centro, `centros[${k}].centro`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', ponto: st.vec(item.centro), raio: item.raio, profundidade: item.profundidade });
+          fontes.push({ tipo: 'ponto', nome: grupo.nome, ponto: st.vec(item.centro), raio: item.raio, profundidade: item.profundidade });
         } else if (item && typeof item === 'object') {
           const r = lerCirculo(item, `centros[${k}]`);
           if (r.erro) return grita(st, i, 'furo', 'centros', r.erro);
           fontes.push(r.fonte);
         } else {
-          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {centro, raio?, profundidade?} ou um círculo {pivo, distancia, total, volta|graus, raio?, profundidade?}; recebido ${JSON.stringify(item)}`);
+          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {nome?, centro, raio?, profundidade?} ou um círculo {nome?, pivo, distancia, total, volta|graus, raio?, profundidade?}; recebido ${JSON.stringify(item)}`);
         }
       }
     } else if (a.centros && typeof a.centros === 'object') {
@@ -3627,22 +3657,24 @@ export const OPS = {
       const d = (p[0] - entrada.centro[0]) * N[0] + (p[1] - entrada.centro[1]) * N[1] + (p[2] - entrada.centro[2]) * N[2];
       return [p[0] - N[0] * d, p[1] - N[1] * d, p[2] - N[2] * d];
     };
-    const centros = [], raiosBrutos = [], profsBrutos = [];
+    const centros = [], raiosBrutos = [], profsBrutos = [], grupos = [];
     for (const fonte of fontes) {
+      const inicioDoGrupo = centros.length;
       if (fonte.tipo === 'ponto') {
         centros.push(projetarNoPlano(fonte.ponto));
         raiosBrutos.push(fonte.raio);
         profsBrutos.push(fonte.profundidade);
-        continue;
+      } else {
+        const p0 = projetarNoPlano(fonte.pivo);
+        for (let q = 0; q < fonte.total; q++) {
+          const t = (fonte.passoGraus * q * Math.PI) / 180;
+          const cu = Math.cos(t) * fonte.distancia, cw = Math.sin(t) * fonte.distancia;
+          centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+          raiosBrutos.push(fonte.raio);
+          profsBrutos.push(fonte.profundidade);
+        }
       }
-      const p0 = projetarNoPlano(fonte.pivo);
-      for (let q = 0; q < fonte.total; q++) {
-        const t = (fonte.passoGraus * q * Math.PI) / 180;
-        const cu = Math.cos(t) * fonte.distancia, cw = Math.sin(t) * fonte.distancia;
-        centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
-        raiosBrutos.push(fonte.raio);
-        profsBrutos.push(fonte.profundidade);
-      }
+      if (fonte.nome != null) grupos.push({ nome: fonte.nome, furos: Array.from({ length: centros.length - inicioDoGrupo }, (_, q) => inicioDoGrupo + q) });
     }
     const M = centros.length;
     const raiosPorFuro = [];
@@ -3836,7 +3868,7 @@ export const OPS = {
     st.consumidas.set(entradaId, { passo: i, op: 'furo' });
     if (saidaId != null) { st.F.delete(saidaId); st.consumidas.set(saidaId, { passo: i, op: 'furo' }); }
 
-    registraOrigem(st, i, 'furo', a.origemId, { furos, preenchimento, preenchimentoDaSaida });
+    registraOrigem(st, i, 'furo', a.origemId, { furos, grupos, preenchimento, preenchimentoDaSaida });
   },
 
   /* arredondarAresta (Escopo A do filete v2) — uma faixa de arco com dois ou

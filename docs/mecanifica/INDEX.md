@@ -121,7 +121,9 @@ Estado atual:
   discos e círculos expandem em ordem estável, `raio` do passo é padrão e o
   furo dentro de outro recebe diagnóstico próprio. Em furo cego, esses grupos
   também podem declarar profundidades diferentes; mistura com passante continua
-  proibida. A seleção por nome pertence à próxima fatia;
+  proibida. Disco e círculo podem receber nome único e ser selecionados pela
+  origem `furo` sem depender de posição; a prova em peça pertence à próxima
+  fatia;
 - A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
   humana que emitia referências posicionais não existe mais na Mecanifica. O
   gate `id-cru` permanece protegendo as peças escritas por IA;

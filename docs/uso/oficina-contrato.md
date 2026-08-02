@@ -305,15 +305,18 @@ Sem o servidor no ar, cai pro download comum — funciona, mas você move o arqu
 | FEITO | `solido` | `faces:[ids]` (legado) ou `sel` | Marca as faces resolvidas que entram na colisão. |
 | FEITO | `pesar` | `osso`, `vs?: [ids]` (ou `faces?: [ids]`), `peso` | FEITO (passo 14a, esqueleto/skinning). Soma `peso` de influência do OSSO aos vértices dados (diretamente por `vs` ou por `faces`, resolvidas pros vértices). Acumula por (vértice, osso); vértice sem osso nenhum some ORFÃO, não corrompe a malha. Achado da Rodada 3 da reorganização de docs: a op existe no núcleo (`OPS.pesar`) desde o passo 14a, mas não tinha linha nesta tabela — só prosa em "Passos propostos" mais abaixo (que é sobre outra coisa: esqueleto/hierarquia, não esta op). |
 
-**Atualização F1/A-30 — medidas por grupo:** `furo.centros` também aceita uma
-lista que mistura pontos `[x,y,z]`, discos `{centro:[x,y,z], raio?,
-profundidade?}` e círculos `{pivo?, distancia, total, volta|graus, raio?,
-profundidade?}`. O `raio` do passo é o padrão; ele só pode faltar se cada furo
-expandido declarar o próprio raio. Num furo CEGO, `profundidade` do passo também
-é padrão e pode faltar somente se cada furo declarar a sua. Profundidade de item
-é proibida em passo PASSANTE: misturar furos cegos e passantes continua fora do
-contrato. `lados` continua único no passo, pois é TOPO e preserva a numeração das
-famílias.
+**Atualização F1/A-30 — medidas e identidade por grupo:** `furo.centros` aceita
+uma lista que mistura pontos `[x,y,z]`, discos `{nome?, centro:[x,y,z], raio?,
+profundidade?}` e círculos `{nome?, pivo?, distancia, total, volta|graus,
+raio?, profundidade?}`. O `raio` do passo é o padrão; ele só pode faltar se cada
+furo expandido declarar o próprio raio. Num furo CEGO, `profundidade` do passo
+também é padrão e pode faltar somente se cada furo declarar a sua. Profundidade
+de item é proibida em passo PASSANTE: misturar furos cegos e passantes continua
+fora do contrato. `nome` é único e visível no passo; a origem
+`{op:'furo', id, grupo:'nome'}` seleciona os furos do grupo, e `furo` passa a
+contar dentro dele. Pontos crus não recebem nome; preenchimentos pertencem à
+face e não aceitam `grupo`. `lados` continua único no passo, pois é TOPO e
+preserva a numeração das famílias.
 
 ### Seleção uniforme (`sel`) — D-129 / D-131
 
