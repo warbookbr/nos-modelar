@@ -135,7 +135,7 @@
 
 - `LORE.md` — Lore — a bíblia do NÓS
 - `RECURSOS.md` — Recursos técnicos do Atelier herdado
-- `oficina-contrato.md` — Oficina — o contrato vigente
+- `oficina-contrato.md` — Oficina — contrato histórico do núcleo
 - `oficina-referencia.md` — Oficina — referência de como cada coisa funciona
 
 ## prototipos/fps/v3/

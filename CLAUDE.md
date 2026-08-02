@@ -24,8 +24,8 @@ como roteiro de produto da Mecanifica. Em caso de divergência,
 ## Fronteiras
 
 - O núcleo, as peças e o jogo de referência em `prototipos/fps/v3/` permanecem
-  executáveis durante a migração. A Oficina humana e a antiga aba de som foram
-  retiradas e não fazem parte da Mecanifica.
+  executáveis durante a migração. A Oficina humana, a antiga aba de som e sua
+  ponte de runtime foram retiradas e não fazem parte da Mecanifica.
 - O novo produto nasce em módulos próprios, sem acrescentar mais responsabilidades
   ao `jogo.html` legado.
 - O núcleo de autoria não pode importar Three.js nem conhecer freios, carros ou

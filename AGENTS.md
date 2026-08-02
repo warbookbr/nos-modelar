@@ -22,8 +22,9 @@ Reserve arquivos e identidades antes de editar. Use a issue indicada em
 ## Regras essenciais
 
 - Preserve o núcleo, as peças e o jogo de referência em `prototipos/fps/v3/`.
-  A Oficina humana (`oficina.html` e a antiga aba de som) foi removida de
-  propósito e não deve ser recriada no Mecanifica.
+  A Oficina humana (`oficina.html`), a antiga aba de som e sua ponte de runtime
+  foram removidas de propósito; não as recrie no Mecanifica sem uma nova decisão
+  de produto.
 - Mantenha o núcleo de autoria independente de Three.js e do domínio automotivo.
 - Nunca persista UUIDs do Three.js, índices de arrays ou posições de passos como
   identidade.

@@ -34,9 +34,9 @@ parâmetros de coordenada. O que ele **não** fez está dito no fechamento abaix
   repetido uma vez, e toda recusa preserva evidência classificada por assinatura
   do modelo. As duas dobradiças congeladas passaram em uma execução cada;
 - **Retirada da Oficina humana está CONCLUÍDA:** páginas de objeto e som,
-  servidor de salvamento, presets, harnesses e skills exclusivas saíram do
-  Mecanifica. O Pages publica apenas produto e bancada. O núcleo procedural,
-  as peças e os consumidores headless permanecem;
+  servidor de salvamento, presets, harnesses, skills exclusivas e a ponte
+  sonora de runtime saíram do Mecanifica. O Pages publica apenas produto e
+  bancada. O núcleo procedural, as peças e os consumidores headless permanecem;
 - **Ciclo 6 está ABERTO como plano importado e medido:** “Furo por grupo,
   contagem por desvio e filete v2” paga A-30, A-34, A-36 e A-37 por meio da
   linguagem procedural e da bancada neutra; ele não reintroduz a Oficina humana.
@@ -324,10 +324,11 @@ para não pedir micro-revisões durante a criação inicial.
 
 ### Retirada da Oficina humana — CONCLUÍDA em 1º de agosto de 2026
 
-**Incluiu somente:** retirar `oficina.html`, a antiga aba de som, o servidor de
-salvamento, os presets e testes exclusivos dessas interfaces, os comandos
-públicos correspondentes e a cópia integral do Atelier no Pages. O botão do
-jogo de referência que apontava para a página removida também saiu.
+**Incluiu somente:** retirar `oficina.html`, a antiga aba de som, sua ponte de
+runtime, o servidor de salvamento, os presets e testes exclusivos dessas
+interfaces, os comandos públicos correspondentes e a cópia integral do Atelier
+no Pages. O botão do jogo de referência que apontava para a página removida
+também saiu.
 
 **Preservou:** `motor/oficina.js`, expressões, regra de referência posicional,
 peças procedurais, visor, jogo de referência, testes do núcleo, adaptador

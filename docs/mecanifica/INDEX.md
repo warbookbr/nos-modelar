@@ -34,7 +34,8 @@ Estado atual:
   integrado, e o fluxo resultante está documentado em perfis de autoria;
 - a Fundação de autoria v1 (ciclo 2) está **concluída** desde 31 de julho de
   2026: `origem` universal e portas semânticas permanecem; a proteção da antiga
-  Oficina humana virou evidência histórica quando essa interface foi retirada;
+  Oficina humana, sua aba de som e a ponte sonora do runtime viraram evidência
+  histórica quando essas superfícies foram retiradas;
 - o contrato de autoria já foi provado FORA do vocabulário automotivo: a fixture
   `prototipos/fps/v3/pecas/_jardineira.js` (jardineira de janela com uma muda)
   usa os cinco geradores novos e **oito** portas semânticas, com 0 face sem
