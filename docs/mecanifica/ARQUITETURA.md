@@ -88,6 +88,11 @@ são apresentadas como ativos autorados.
 O contrato detalhado está em
 [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md).
 
+O teto planejado para o grafo semântico — portas com quadro, relações,
+hierarquia, propagação, escala e cinemática — está mapeado em
+[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md). É uma visão de maturidade,
+não um plano ativo; cada degrau precisa preservar as fronteiras acima.
+
 ## Three.js
 
 Three.js será a camada visual da nova aplicação. Ele fornece grafo de cena,

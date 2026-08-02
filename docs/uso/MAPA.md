@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-252 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+253 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -109,6 +109,7 @@
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
+- `MONTAGENS-SEMANTICAS.md` — Montagens semânticas — visão, teto e mapa de maturidade
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado

@@ -146,6 +146,10 @@ fora, guiado por demonstrações reais.
 
 ## Hierarquia mínima
 
+A hierarquia abaixo é a necessidade do produto, ainda não o contrato de autoria.
+O caminho lógico para torná-la persistente e escalável está em
+[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md).
+
 ```text
 veiculo
 ├── carroceria-contexto
