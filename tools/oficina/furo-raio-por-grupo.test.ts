@@ -195,12 +195,15 @@ describe('A-30/F1 — raio e profundidade por grupo de furo', () => {
     expect(pintadas(n, '#0aa')).toHaveLength(4 * 3 * L);
   });
 
-  it('grupo ausente, repetido ou sem nome visível recusa sem reservar o bloco', () => {
+  it('grupo ausente enumera os disponíveis; grupo repetido ou invisível aborta antes de reservar o bloco', () => {
     const ausente = nucleo([
-      ...PASSANTE([{ nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 }]),
+      ...PASSANTE([
+        { nome: 'passagem', centro: [0, 0, 0], raio: 0.025 },
+        { nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 },
+      ]),
       ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 'inexistente' } } }],
     ] as any, {}, {});
-    expect(ausente.orfaos.some((o: any) => /grupo 'inexistente' inexistente/.test(o.motivo))).toBe(true);
+    expect(ausente.orfaos.some((o: any) => o.motivo === "origem furo:9 não tem grupo 'inexistente'; os grupos deste passo são 'passagem', 'parafusos'")).toBe(true);
     expect(pintadas(ausente, '#f00')).toEqual([]);
 
     const repetido = nucleo(PASSANTE([
@@ -215,5 +218,54 @@ describe('A-30/F1 — raio e profundidade por grupo de furo', () => {
     expect(invisivel.orfaos).toHaveLength(1);
     expect(invisivel.orfaos[0].motivo).toMatch(/nome de grupo inválido/);
     expect(idsDoFuro(invisivel)).toEqual({ V: [], F: [] });
+  });
+
+  it('o eixo furo respeita o limite local do grupo, inclusive para filtros vazios', () => {
+    const centros = [
+      { nome: 'passagem', centro: [0, 0, 0], raio: 0.025 },
+      { nome: 'parafusos', distancia: 0.044, total: 4, volta: 360 },
+    ];
+    const fora = nucleo([
+      ...PASSANTE(centros),
+      ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 'passagem', furo: 3, parede: 0 } } }],
+    ] as any, {}, {});
+    expect(fora.orfaos.some((o: any) => /furo 3 fora do limite do grupo 'passagem' da origem furo:9 \(0\.\.0\)/.test(o.motivo))).toBe(true);
+
+    const filtro = nucleo([
+      ...PASSANTE(centros),
+      ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 'passagem', furo: { passo: 2, fase: 1 }, parede: 0 } } }],
+    ] as any, {}, {});
+    expect(filtro.orfaos.some((o: any) => /filtro de furo \{passo:2,fase:1\} não casa nenhum índice em 0\.\.0 no grupo 'passagem'/.test(o.motivo))).toBe(true);
+  });
+
+  it('grupo não aceita preenchimento e pode selecionar o fundo de um furo cego', () => {
+    const invalido = nucleo([
+      ...PASSANTE([{ nome: 'passagem', centro: [0, 0, 0], raio: 0.025 }]),
+      ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 'passagem', preenchimento: 0 } } }],
+    ] as any, {}, {});
+    expect(invalido.orfaos.some((o: any) => /grupo opcional/.test(o.motivo) && /preenchimento\/preenchimentoDaSaida opcionais/.test(o.motivo))).toBe(true);
+    expect(pintadas(invalido, '#f00')).toEqual([]);
+
+    const tipoInvalido = nucleo([
+      ...PASSANTE([{ nome: 'passagem', centro: [0, 0, 0], raio: 0.025 }]),
+      ['pincel', { modo: 'face', cor: '#f00', sel: { origem: { op: 'furo', id: 9, grupo: 7 } } }],
+    ] as any, {}, {});
+    expect(tipoInvalido.orfaos.some((o: any) => /grupo opcional \(nome semântico visível\)/.test(o.motivo))).toBe(true);
+
+    const cego = nucleo([
+      ...CEGO([{ nome: 'pino', centro: [0, 0, 0], raio: 0.012 }]),
+      ['pincel', { modo: 'face', cor: '#0a0', sel: { origem: { op: 'furo', id: 9, grupo: 'pino', tampa: 'fundo' } } }],
+    ] as any, {}, {});
+    expect(cego.orfaos).toEqual([]);
+    expect(pintadas(cego, '#0a0')).toHaveLength(1);
+  });
+
+  it('o diagnóstico do círculo declara nome como palavra válida do grupo', () => {
+    const n = nucleo(PASSANTE([{
+      nome: 'parafusos', distancia: 0.044, total: 4, volta: 360, eixo: [0, 1, 0],
+    }]) as any, {}, {});
+    expect(n.orfaos).toHaveLength(1);
+    expect(n.orfaos[0].motivo).toContain('centros[0] em círculo usa nome, pivo, distancia, total, volta, graus, raio, profundidade');
+    expect(idsDoFuro(n)).toEqual({ V: [], F: [] });
   });
 });

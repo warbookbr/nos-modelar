@@ -784,7 +784,12 @@ const CONTRATOS_ORIGEM = {
       const M = furos.length;
       const passante = furos[0].saidas != null;
       const grupo = origem.grupo == null ? null : (registro.grupos ?? []).find((g) => g.nome === origem.grupo);
-      if (origem.grupo != null && !grupo) return { erro: `grupo '${origem.grupo}' inexistente na origem furo:${origem.id}` };
+      if (origem.grupo != null && !grupo) {
+        const nomes = (registro.grupos ?? []).map((g) => `'${g.nome}'`);
+        return { erro: nomes.length
+          ? `origem furo:${origem.id} não tem grupo '${origem.grupo}'; os grupos deste passo são ${nomes.join(', ')}`
+          : `origem furo:${origem.id} não tem grupos nomeados neste passo` };
+      }
       if (origem.saida != null && !passante) return { erro: `origem furo:${origem.id} é um furo CEGO — não tem saída; o fundo dele é tampa:'fundo'` };
       if (origem.tampa != null && passante) return { erro: `origem furo:${origem.id} é um furo PASSANTE — não tem fundo; a borda do outro lado é o eixo 'saida'` };
       if (origem.preenchimento != null && !registro.preenchimento.length) return { erro: `origem furo:${origem.id} abriu UM anel só — a borda dá a volta inteira e não sobra preenchimento; o preenchimento existe a partir de dois anéis no mesmo passo` };
@@ -3449,9 +3454,9 @@ export const OPS = {
                        grupos na ordem escrita. Cada item é:
                          `[x,y,z]` — um ponto que herda raio e profundidade do
                            passo;
-                         `{centro:[x,y,z], raio?, profundidade?}` — um DISCO
+                         `{nome?, centro:[x,y,z], raio?, profundidade?}` — um DISCO
                            com medidas próprias opcionais;
-                         `{pivo?, distancia, total, volta|graus, raio?,
+                         `{nome?, pivo?, distancia, total, volta|graus, raio?,
                            profundidade?}` — um CÍRCULO de discos, cujas
                            medidas opcionais valem para cada um dos `total`
                            furos. O círculo de topo continua aceito com a mesma

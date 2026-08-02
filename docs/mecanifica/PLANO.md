@@ -1613,9 +1613,9 @@ comportamento em `oficina.js`:
   Preenchimentos continuam sendo da face e não aceitam grupo. A peça de prova
   permanece para a próxima fatia.
 
-Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
-comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
-de prosseguir.
+`gabarito:selecao --novas` e a fatia F1 de peça ainda não entraram. A primeira
+parte de F0a e as quatro primeiras fatias de F1 já entraram; os três gates do
+roteiro continuam obrigatórios antes de prosseguir.
 
 1. **F0a — a régua, com o caso vermelho.** ENTRA: a quinta propriedade em
    `conferir-malha.ts` (área mínima de triângulo do adaptador ≥ 1e-9·escala², com
