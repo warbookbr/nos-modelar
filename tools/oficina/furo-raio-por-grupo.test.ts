@@ -268,4 +268,40 @@ describe('A-30/F1 — raio e profundidade por grupo de furo', () => {
     expect(n.orfaos[0].motivo).toContain('centros[0] em círculo usa nome, pivo, distancia, total, volta, graus, raio, profundidade');
     expect(idsDoFuro(n)).toEqual({ V: [], F: [] });
   });
+
+  it('figura geral: uma placa aceita dois discos fora do centro e outro no centro', () => {
+    const n = nucleo([
+      ['cubo', { id: 0, origemId: 1, larg: 0.18, alt: 0.012, prof: 0.12 }],
+      ['furo', {
+        origemId: 9,
+        de: { op: 'cubo', id: 1, face: 'topo' },
+        saida: { op: 'cubo', id: 1, face: 'fundo' },
+        lados: L,
+        orientacao: [1, 0, 0],
+        centros: [
+          { nome: 'central', centro: [0, 0, 0], raio: 0.012 },
+          { nome: 'esquerdo', centro: [-0.045, 0, 0], raio: 0.006 },
+          { nome: 'direito', centro: [0.045, 0, 0], raio: 0.006 },
+        ],
+      }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    conferirMalha(n, { fechada: true, rotulo: 'placa com três discos independentes' });
+    expect(raioDoAnel(n, 0)).toBeCloseTo(0.012, 12);
+    expect(raioDoAnel(n, 1)).toBeCloseTo(0.006, 12);
+    expect(raioDoAnel(n, 2)).toBeCloseTo(0.006, 12);
+  });
+
+  it('figura geral: flange cega de robô combina três grupos e três profundidades', () => {
+    const n = nucleo(CEGO([
+      { nome: 'passagem', centro: [0, 0, 0], raio: 0.012, profundidade: 0.008 },
+      { nome: 'fixacao', distancia: 0.038, total: 4, volta: 360, profundidade: 0.004 },
+      { nome: 'pinos', distancia: 0.024, total: 2, volta: 360, raio: 0.003, profundidade: 0.006 },
+    ], null) as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    conferirMalha(n, { fechada: true, rotulo: 'flange cega com três profundidades' });
+    expect(profundidadeDoFuro(n, 0)).toBeCloseTo(0.008, 12);
+    for (let k = 1; k <= 4; k++) expect(profundidadeDoFuro(n, k)).toBeCloseTo(0.004, 12);
+    for (let k = 5; k <= 6; k++) expect(profundidadeDoFuro(n, k)).toBeCloseTo(0.006, 12);
+  });
 });

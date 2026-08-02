@@ -117,13 +117,14 @@ Estado atual:
   deixou de ser a evidência dele) e A-32 (o cubo do freio não tem cubo-piloto:
   o flange não pode ser mais largo que o barril, porque o aro entra por cima
   dele com 0,6 mm de folga);
-- a primeira fatia de A-30 já permite raios diferentes na mesma face: pontos,
+- A-30 já permite raios diferentes na mesma face: pontos,
   discos e círculos expandem em ordem estável, `raio` do passo é padrão e o
   furo dentro de outro recebe diagnóstico próprio. Em furo cego, esses grupos
   também podem declarar profundidades diferentes; mistura com passante continua
   proibida. Disco e círculo podem receber nome único e ser selecionados pela
-  origem `furo` sem depender de posição; a prova em peça pertence à próxima
-  fatia;
+  origem `furo` sem depender de posição. A peça `_flange-de-tubulacao` fecha a
+  prova: passagem central e círculo de parafusos têm endereços por grupo, e as
+  figuras gerais cobrem furos fora do centro e três profundidades cegas;
 - A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
   humana que emitia referências posicionais não existe mais na Mecanifica. O
   gate `id-cru` permanece protegendo as peças escritas por IA;
@@ -392,10 +393,11 @@ seguinte, com o neutro fechado e a contagem certa — quem gritou foi o adaptado
 e só numa peça de verdade. **Malha fechada e contagem certa não provam polígono
 simples.**
 
-**Próxima entrega: o ciclo 6, “Furo por grupo, contagem por desvio e filete v2”,
-ABERTO, com plano completo em [`PLANO.md`](PLANO.md).** Ele paga A-30, A-34,
-A-36 e A-37 na mesma rodada: 7 frentes, 29 fatias que se commitam verdes, gate
-medido e linha de base tirada do repositório de hoje. Os projetos que o
+**Próxima entrega: F2 fatia 1 do ciclo 6, a derivação de contagem por desvio.**
+F1 está concluída; o ciclo “Furo por grupo, contagem por desvio e filete v2”
+permanece ABERTO, com plano completo em [`PLANO.md`](PLANO.md). Ele paga A-30,
+A-34, A-36 e A-37 na mesma rodada: 7 frentes, 29 fatias que se commitam verdes,
+gate medido e linha de base tirada do repositório de hoje. Os projetos que o
 originaram estão em `docs/mecanifica/projetos/ciclo6/`, com o mapa de terreno,
 as oito propostas independentes, os quatro vereditos de júri, o cruzamento e as
 três críticas adversariais.

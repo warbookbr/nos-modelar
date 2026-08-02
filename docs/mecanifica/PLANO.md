@@ -238,8 +238,9 @@ mais uma rodada visual sobre a mesma peça.
 
 ## Sequência executiva
 
-**Nenhuma linha nova está em execução.** Fluxo de modelagem assistida por IA v1
-foi encerrado com seu gate atendido. Filete v2 permanece pausado no Escopo A.
+**O ciclo 6 está em execução pela trilha de furo.** F1 foi encerrada com a peça
+de prova e as figuras gerais; F2 fatia 1, a derivação de contagem por desvio, é
+o próximo passo. Filete v2 permanece pausado no Escopo A.
 
 | ordem | estado | área | entrega ou condição |
 |---:|---|---|---|
@@ -1616,10 +1617,16 @@ comportamento em `oficina.js`:
   peça nova nomeada, mas continua comparando hash, contagem e presença de cada
   peça gravada. Nome ausente, repetido ou já gravado GRITA; a saída informa
   separadamente quantas peças antigas bateram e quais novas foram aceitas.
+- **P9**: F1 fechou na peça `_flange-de-tubulacao`: 3 partes, 244 faces, 0 sem
+  identidade, 0 órfão e 2 portas. A passagem central resolve 36 faces e o grupo
+  de quatro parafusos 144; seis parafusos resolvem 216 sem mudar o endereço. As
+  figuras gerais cobrem dois discos fora do centro mais um central e três
+  profundidades cegas. Revisão estrita, quatro vistas, 866 testes, `id-cru` e
+  gabarito com 28 peças antigas byte-idênticas passaram.
 
-A ferramenta `gabarito:selecao --novas` e as quatro primeiras fatias de F1 já
-entraram. A fatia F1 de peça permanece como próximo passo; os três gates do
-roteiro continuam obrigatórios antes de prosseguir.
+A ferramenta `gabarito:selecao --novas` e as cinco fatias de F1 já entraram. F1
+está concluída; F2 fatia 1 é o próximo passo, mantendo os três gates do roteiro
+obrigatórios antes de prosseguir.
 
 1. **F0a — a régua, com o caso vermelho.** ENTRA: a quinta propriedade em
    `conferir-malha.ts` (área mínima de triângulo do adaptador ≥ 1e-9·escala², com
@@ -1695,7 +1702,7 @@ roteiro continuam obrigatórios antes de prosseguir.
    MUDA, com o texto novo casado por inteiro (`centros em círculo usa nome,
    pivo, distancia, total, volta, graus, raio, profundidade — 'eixo' não é
    palavra desta forma`). GATE: os três verdes.
-8. **F1 fatia 5 — a peça e as figuras gerais.** ENTRA:
+8. **F1 fatia 5 — a peça e as figuras gerais — CONCLUÍDA no warbook.** ENTRA:
    `_flange-de-tubulacao.js`, `tools/mecanifica/flange-integridade.test.ts` e
    `npm run mapa`. O gabarito NÃO é regravado. FECHA: T1, T2, T15, T16, T17, T26;
    e o T28, com as quatro famílias que a flange não alcança escritas como figuras
@@ -1703,7 +1710,8 @@ roteiro continuam obrigatórios antes de prosseguir.
    pode faltar é a placa com dois DISCOS fora do centro mais um no centro, porque
    é ela que mata o atalho "furo central". A flange de robô cego com TRÊS
    profundidades é a segunda. As outras duas (tampo de mesa e base de ferramenta)
-   caem, e o motivo é orçamento de commit, não geometria. GATE: 806+ verdes,
+   caem, e o motivo é orçamento de commit, não geometria. MEDIDO: 866 verdes,
+   0 face sem identidade, 0 órfão, revisão estrita e quatro vistas. GATE:
    id-cru verde, e `gabarito:selecao:check --novas=_flange-de-tubulacao` exit 0
    com 28 antigas idênticas.
 9. **F2 fatia 1 — a derivação.** ENTRA: `flechaDoArco(R, phi, n)` e
