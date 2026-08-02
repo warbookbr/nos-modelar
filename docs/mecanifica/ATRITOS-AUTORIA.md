@@ -29,7 +29,7 @@ explícito manda mais que a posição no arquivo:
 | A-37 | aberto; canto composto de `arredondarAresta`, candidato `AUT-02` |
 | A-36 | resolvido para aresta simples por `arredondarAresta`; o restante é A-37 |
 | A-35 | candidato sem plano ativo |
-| A-34 | candidato `AUT-01`, contagem por desvio; sem plano ativo |
+| A-34 | resolvido por `lados:{desvio}` em `cilindro`, `cone` e `furo` |
 | A-33 | aberto, falha fechada; candidato `AUT-03` |
 | A-29 | candidato dentro de relações semânticas, sem plano ativo |
 | A-32 | dívida de desenho da peça, candidato `PEC-01` |
@@ -118,27 +118,28 @@ discretização diferente do padrão do passo, declara junto do raio. Objeto
 ausente ou raio puro continua valendo o `segmentosCurva` do passo (aditivo,
 sem quebrar peça existente).
 
-### A-34 — a silhueta do furo continua poligonal, e isso é forma, não sombreado
+### A-34 — contagens circulares sem unidade impediam comparar acabamento
 
-**Onde dói:** linguagem da Oficina, na op `furo`; e na leitura que o cliente faz.
+**Estado atual — RESOLVIDO:** `cilindro`, `cone` e `furo` aceitam
+`lados:{desvio: medida}`. O núcleo deriva a menor contagem cuja flecha do
+polígono inscrito atende à tolerância. No `furo` com raios mistos, usa o maior
+raio e conserva um único `L` no passo.
 
-**Como apareceu:** dentro do A-31, que consertou o SOMBREADO da borda e disse na
-cara que não consertava o CONTORNO. Dito dentro de um atrito resolvido, o resto
-saiu da lista aberta sem nunca ter sido pago. Esta entrada é o resto, com nome
-próprio.
+**Correção da evidência:** a foto original foi lida ao contrário. O furo de
+prisioneiro (R=6,5 mm, L=12) tinha flecha de 0,2215 mm; o flange (R=52 mm,
+L=16), 0,9992 mm. O contorno mais facetado era o flange, 4,51 vezes pior, não o
+furo. Normal suave continua sendo sombreado, nunca contorno.
 
-**Evidência:** `tools/bancadas/out/bancada-freio-disco-direita-sel-cubo-isolar-focado.png`,
-vista direita de perto. Dá para contar as 12 quinas de cada furo de prisioneiro.
-Normal suave muda como a luz corre pela superfície; não muda por onde a
-superfície termina. Na silhueta, e só nela, a malha aparece como ela é.
+**Prova:** `tools/oficina/lados-por-desvio.test.ts` fixa round-trip,
+minimalidade, maior raio, determinismo e recusas. `_gabarito-de-furacao` prova a
+mesma tolerância em furo, cilindro e cone fora do domínio automotivo, com zero
+órfão e zero face sem identidade. A revisão superior, frontal e isométrica
+achou e corrigiu a leitura ambígua do fundo do furo sem alterar geometria.
 
-**Contorno usado hoje:** mais `lados`. Custa faces em toda peça que use o furo, e
-não distingue a borda vista de perto da vista de longe.
-
-**Capacidade candidata atual:** declarar tolerância geométrica como
-`lados: { desvio }`, deixando o núcleo derivar a menor contagem que atende a
-flecha pedida. A quebra da quina do aro é outro problema e não deve voltar
-acoplada a este atrito. O candidato é `AUT-01` no backlog de planos.
+**Limites declarados:** o modo automático põe raio na topologia e pode
+renumerar dentro do bloco; o modo numérico permanece byte-idêntico. Esfera,
+`lathe` e `loft` precisam de derivação própria. A quina viva do aro é outro
+problema e não volta acoplada a este atrito.
 
 ### A-33 — a partição do furo trava em face de poucos lados com furo raspando a borda
 

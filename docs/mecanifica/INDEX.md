@@ -101,8 +101,8 @@ Estado atual:
   — e essa conta vale DENTRO das 240. Varrendo 14 212, sobram 37 que travam a
   partição, todas face de poucos lados com furo raspando a borda: é o A-33,
   aberto, com a fronteira medida e fixada em teste.
-  O que ela NÃO fez: a silhueta do furo continua o polígono de 12 arestas
-  (A-31), e o flange tem o raio do cubo, sem degrau piloto/flange, porque o aro
+  O que ela NÃO fez naquele momento: a silhueta continuou com a contagem escrita
+  e o flange tem o raio do cubo, sem degrau piloto/flange, porque o aro
   entra por cima do cubo com 0,6 mm de folga (A-32, novo);
 - a rodada **"Borda do furo"** fechou em 31 de julho de 2026 e pagou A-31: a
   serrilha no contorno do furo era do ADAPTADOR, não da peça. `liso` nunca
@@ -111,6 +111,10 @@ Estado atual:
   da borda de cada furo. Agora a normal é posta, `liso` soma só entre faces
   lisas, e a triangulação é por orelhas. A silhueta do furo continua o polígono
   de `lados` arestas — isto consertou sombreado e forma da borda, não o contorno;
+- o A-34 foi pago depois por `lados:{desvio}`: em `cilindro`, `cone` e `furo`,
+  a IA declara uma tolerância em metros e o núcleo deriva a menor contagem. A
+  fixture `_gabarito-de-furacao` prova as três operações; o modo numérico antigo
+  continua byte-idêntico;
 - **abertos:** A-29 (o passo do arranjo radial só dá centro nomeável em 90°,
   porque a gramática de PARAMS não tem seno nem cosseno — a forma de círculo do
   `centros` desarma o caso do círculo de furos, não o caso geral; o flange
@@ -363,6 +367,9 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 **Não há plano ativo.** O plano mestre foi encerrado em 2 de agosto de 2026 e
 seu resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+
+Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
+pagou A-34 com contagem circular por tolerância e também foi encerrado.
 
 A F1 do antigo Ciclo 6 foi aceita como entrega independente e pagou A-30. As
 demais fatias foram canceladas porque o desenho importado transformaria

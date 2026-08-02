@@ -8,7 +8,7 @@ escopo, exclusões, gate e decisão explícita.
 
 | Candidato | Evidência | Estado de preparação |
 |---|---|---|
-| `AUT-01` — contagem por desvio (`lados: { desvio }`) | A-34; silhueta e custo hoje usam números incomparáveis | candidato medido; precisa plano novo, sem acoplar a filete |
+| `AUT-01` — contagem por desvio (`lados: { desvio }`) | A-34; silhueta e custo usavam números incomparáveis | concluído em [`AUT-2026-01`](2026-08-02-contagem-por-desvio.md) |
 | `AUT-02` — canto composto de `arredondarAresta` | A-37 e [`FILETE-V2.md`](../FILETE-V2.md), Escopo B | pausado; Escopo A existe, aceite composto continua vermelho por decisão |
 | `AUT-03` — triangulação robusta de face com buracos | A-33; poucos casos seguros ainda abortam | candidato; falha fechada preserva integridade |
 | `AUT-04` — discretização por concordância | A-35 | candidato; não bloqueia as peças atuais |

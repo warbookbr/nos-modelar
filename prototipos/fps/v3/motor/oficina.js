@@ -5,9 +5,11 @@
    devolve NÚMEROS; o ADAPTADOR v3 converte esse neutro nos triângulos soltos do
    motor (8 floats/vértice, cor por face via textura-amostra + UV). SEM
    interface. Determinístico: mesma lista -> mesmo objeto, sempre. A numeração
-   de identidade depende só da POSIÇÃO do passo (bloco de BLOCO ids por índice),
-   nunca dos valores de PARAMS — mudar `raio` não renumera; mudar `lados` (TOPO)
-   renumera e os passos pendurados viram órfãos que GRITAM, nunca corrompem. */
+   de identidade depende só da POSIÇÃO do passo (bloco de BLOCO ids por índice).
+   Com `lados` numérico, mudar `raio` não renumera; mudar `lados` (TOPO)
+   renumera e os passos pendurados viram órfãos que GRITAM, nunca corrompem.
+   O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
+   mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
 import { criarResolverNumerico } from './expressoes.js';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
@@ -29,6 +31,73 @@ function baseDoPasso(i) { return i * BLOCO; }
    Vetores mínimos (puros, sem dependência do motor — o núcleo roda headless).
 ---------------------------------------------------------------------------- */
 function norm3(x, y, z) { const l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; }
+
+/* Flecha máxima entre um arco circular e cada corda de uma discretização
+   uniforme. A forma `2R·sen²(phi/4n)` é a mesma lei de
+   `R·(1-cos(phi/2n))`, mas não perde o desvio por cancelamento quando n cresce.
+   `phi` é o arco total; no anel completo vale 2π. */
+export function flechaDoArco(raio, phi, segmentos) {
+  if (!(raio > 0) || !Number.isFinite(raio)) throw new RangeError('raio precisa ser finito e > 0');
+  if (!(phi > 0) || !Number.isFinite(phi)) throw new RangeError('phi precisa ser finito e > 0');
+  if (!Number.isSafeInteger(segmentos) || segmentos < 1) throw new RangeError('segmentos precisa ser inteiro >= 1');
+  const s = Math.sin(phi / (4 * segmentos));
+  return 2 * raio * s * s;
+}
+
+/* Menor número de cordas cuja flecha atende ao desvio. A forma fechada dá a
+   estimativa; os dois laços vizinhos corrigem arredondamento exatamente na
+   fronteira, evitando o `ceil` devolver L+1 quando o desvio veio da flecha de L. */
+export function contagemPorDesvio(raio, phi, desvio, minimo = 1) {
+  if (!(raio > 0) || !Number.isFinite(raio)) throw new RangeError('raio precisa ser finito e > 0');
+  if (!(phi > 0) || !Number.isFinite(phi)) throw new RangeError('phi precisa ser finito e > 0');
+  if (!(desvio > 0) || !Number.isFinite(desvio)) throw new RangeError('desvio precisa ser finito e > 0');
+  if (!Number.isSafeInteger(minimo) || minimo < 1) throw new RangeError('minimo precisa ser inteiro >= 1');
+  if (flechaDoArco(raio, phi, minimo) <= desvio) return minimo;
+
+  const meioSeno = Math.sqrt(desvio / (2 * raio));
+  const angulo = Math.asin(Math.min(1, meioSeno));
+  if (!(angulo > 0)) return Infinity;
+  let n = Math.ceil(phi / (4 * angulo));
+  if (!Number.isSafeInteger(n)) return Infinity;
+  n = Math.max(minimo, n);
+  while (n > minimo && flechaDoArco(raio, phi, n - 1) <= desvio) n--;
+  while (flechaDoArco(raio, phi, n) > desvio) {
+    n++;
+    if (!Number.isSafeInteger(n)) return Infinity;
+  }
+  return n;
+}
+
+export function flechaDoAnel(raio, lados) {
+  return flechaDoArco(raio, 2 * Math.PI, lados);
+}
+
+export function ladosPorDesvio(raio, desvio) {
+  return contagemPorDesvio(raio, 2 * Math.PI, desvio, 3);
+}
+
+/* `lados` conserva o número antigo ou aceita a frase `{desvio}`. Não grita por
+   conta própria para poder ser usado antes de qualquer `addV`: devolve erro ao
+   chamador, que o registra no passo e mantém a operação fail-closed. */
+function resolverLados(st, valor, raio, padrao = 8) {
+  const automatico = valor && typeof valor === 'object' && !Array.isArray(valor);
+  if (!automatico) {
+    /* O modo numérico conserva a severidade histórica: parâmetro ausente,
+       valor não-finito ou tipo inválido lançam alto pelo resolver numérico. */
+    const bruto = st.num(valor ?? padrao);
+    return { lados: Math.max(3, Math.trunc(bruto)), derivado: false };
+  }
+
+  const chaves = Object.keys(valor);
+  if (chaves.length !== 1 || chaves[0] !== 'desvio') return { erro: `lados aceita um número ou {desvio}; recebido ${JSON.stringify(valor)}` };
+  if (!(raio > 0) || !Number.isFinite(raio)) return { erro: `lados:{desvio} exige raio finito e > 0; recebido ${raio}` };
+  let desvio;
+  try { desvio = st.num(valor.desvio); } catch (e) { return { erro: `desvio não resolve: ${String(e.message).replace(/^oficina: /, '')}` }; }
+  if (!(desvio > 0) || !Number.isFinite(desvio)) return { erro: `desvio precisa ser finito e > 0; recebido ${desvio}` };
+  const lados = ladosPorDesvio(raio, desvio);
+  if (!Number.isSafeInteger(lados)) return { erro: `o desvio ${desvio} é pequeno demais para produzir uma contagem inteira segura no raio ${raio}` };
+  return { lados, derivado: true, desvio };
+}
 
 /* eixo nominal -> índice de coordenada. UMA definição para `rotaciona`,
    `espelha` e `arranja`, que faziam a mesma comparação de três jeitos. */
@@ -1942,8 +2011,14 @@ export const OPS = {
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'cilindro', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const h = st.num(a.altura ?? 1);
-    const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // `lados` é TOPO: muda a CONTAGEM
-    if (2 * L > BLOCO) throw new Error(`oficina: cilindro com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${(BLOCO / 2) | 0}`);   // D3: guarda de overflow por-passo
+    const resolucao = resolverLados(st, a.lados, r);
+    if (resolucao.erro) return grita(st, i, 'cilindro', 'lados', resolucao.erro);
+    const L = resolucao.lados;   // TOPO: número explícito ou derivado de {desvio}
+    if (2 * L > BLOCO) {
+      const motivo = `cilindro com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${(BLOCO / 2) | 0}`;
+      if (resolucao.derivado) return grita(st, i, 'cilindro', 'lados', `${motivo} — aumente o desvio`);
+      throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
+    }
     for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + k, [Math.cos(t) * r, 0, Math.sin(t) * r]); }
     for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + L + k, [Math.cos(t) * r, h, Math.sin(t) * r]); }
     const laterais = [];
@@ -2019,8 +2094,14 @@ export const OPS = {
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'cone', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const h = st.num(a.altura ?? 1);
-    const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
-    if (L + 1 > BLOCO) throw new Error(`oficina: cone com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${BLOCO - 1}`);   // guarda de overflow (D3): lados+1 vértices E lados+1 faces
+    const resolucao = resolverLados(st, a.lados, r);
+    if (resolucao.erro) return grita(st, i, 'cone', 'lados', resolucao.erro);
+    const L = resolucao.lados;   // TOPO: número explícito ou derivado de {desvio}
+    if (L + 1 > BLOCO) {
+      const motivo = `cone com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${BLOCO - 1}`;
+      if (resolucao.derivado) return grita(st, i, 'cone', 'lados', `${motivo} — aumente o desvio`);
+      throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
+    }
     for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + k, [Math.cos(t) * r, 0, Math.sin(t) * r]); }
     addV(st, b + L, [0, h, 0]);                                                                       // ápice
     for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, b + k, [b + k, b + L, b + n]); }    // laterais (normal pra fora)
@@ -3472,7 +3553,10 @@ export const OPS = {
        `raio`          PARAM dimensional > 0, padrão do passo. Pode faltar
                        somente se TODO furo vindo de `centros` declarar o seu
                        próprio raio; `centro` singular sempre usa o padrão;
-       `lados`         TOPO (padrão 8, mín 3): muda a CONTAGEM, logo renumera;
+       `lados`         TOPO (padrão 8, mín 3): número explícito ou
+                       `{desvio: medida}`. A frase deriva a menor contagem pela
+                       flecha do MAIOR raio deste passo; muda a CONTAGEM, logo
+                       renumera quando raio ou desvio cruzam uma fronteira;
        `saida`         a origem estrutural da face de SAÍDA — furo PASSANTE;
        `profundidade`  PARAM dimensional > 0, padrão do passo para furo CEGO.
                        Pode faltar somente se TODO furo vindo de `centros`
@@ -3544,9 +3628,6 @@ export const OPS = {
     const temSaida = a.saida != null, temProfundidade = a.profundidade != null;
     if (temSaida && temProfundidade) return grita(st, i, 'furo', 'saida+profundidade', "saida e profundidade dizem coisas diferentes (saida = a face por onde o furo SAI, passante; profundidade = onde ele PARA, cego) — declare exatamente uma");
 
-    // ---- dimensões ----
-    const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
-
     /* ---- QUANTOS furos: `centro` (um) ou `centros` (vários grupos) ---- */
     const temCentro = a.centro != null, temCentros = a.centros != null;
     if (temCentro && temCentros) return grita(st, i, 'furo', 'centro+centros', 'centro e centros dizem a mesma coisa em número diferente (centro = UM furo; centros = vários no mesmo passo) — declare exatamente uma');
@@ -3562,7 +3643,8 @@ export const OPS = {
        quadro da face, mas a ordem das fontes já é a ordem semântica dos furos:
        ponto, disco ou os `total` pontos de um círculo ocupam k=0,1,2… exatamente
        como eram antes. `raio` do item é PARAM; L continua único no passo porque
-       é TOPO e decide a numeração do bloco. */
+       é TOPO e decide a numeração do bloco. No modo `{desvio}`, L só é resolvido
+       depois dos raios e usa o maior deles. */
     const fontes = [];
     const nomesDeGrupo = new Map();
     const lerNomeDeGrupo = (item, onde) => {
@@ -3683,12 +3765,25 @@ export const OPS = {
     }
     const M = centros.length;
     const raiosPorFuro = [];
+    let maiorRaio = -Infinity;
     for (let k = 0; k < M; k++) {
       const bruto = raiosBrutos[k] ?? a.raio;
       if (bruto == null) return grita(st, i, 'furo', 'raio', `o furo ${k} não tem raio: nem ele declara um, nem o passo declara o raio padrão`);
       const r = st.num(bruto);
       if (!(r > 0) || !Number.isFinite(r)) return grita(st, i, 'furo', 'raio', `o furo ${k} tem raio inválido (recebido ${JSON.stringify(bruto)} = ${r}); raio precisa ser > 0`);
       raiosPorFuro.push(r);
+      maiorRaio = Math.max(maiorRaio, r);
+    }
+    const resolucao = resolverLados(st, a.lados, maiorRaio);
+    if (resolucao.erro) return grita(st, i, 'furo', 'lados', resolucao.erro);
+    const L = resolucao.lados;
+    /* Uma tolerância microscópica não pode alocar arrays gigantes para só
+       depois descobrir o orçamento. Esta conta é um piso: a partição pode
+       acrescentar preenchimento, nunca reduzir estes vértices/faces. */
+    const nVMin = 2 * L * M;
+    const nFMin = M * (temSaida ? 3 * L : 2 * L + 1);
+    if (resolucao.derivado && (nVMin > BLOCO || nFMin > BLOCO)) {
+      return grita(st, i, 'furo', 'lados', `o desvio ${resolucao.desvio} deriva ${L} lados para o maior raio (${maiorRaio}): no mínimo ${nVMin} vértices / ${nFMin} faces estouram o bloco de ids (${BLOCO}) — aumente o desvio`);
     }
     const profsPorFuro = [];
     if (temSaida) {
@@ -3816,7 +3911,11 @@ export const OPS = {
 
     // guarda de overflow (D3), contada antes de inserir
     const nV = 2 * L * M, nF = M * (temSaida ? 3 * L : 2 * L + 1) + cheioE.length + cheioS.length;
-    if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: furo com ${M} anel(éis) de ${L} lados estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+    if (nV > BLOCO || nF > BLOCO) {
+      const motivo = `furo com ${M} anel(éis) de ${L} lados estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`;
+      if (resolucao.derivado) return grita(st, i, 'furo', 'lados', `${motivo} — aumente o desvio`);
+      throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
+    }
 
     // ---- daqui pra baixo nada mais pode falhar: só construção ----
     const E = [], S = [];

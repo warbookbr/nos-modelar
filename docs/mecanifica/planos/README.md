@@ -7,9 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
-O próximo trabalho deve nascer de uma escolha explícita do usuário entre os
-candidatos do [`BACKLOG.md`](BACKLOG.md), ou de uma necessidade nova com
-evidência. Não comece automaticamente o primeiro item da lista.
+O `AUT-01` foi concluído em
+[`AUT-2026-01`](2026-08-02-contagem-por-desvio.md), caminho canônico
+`docs/mecanifica/planos/2026-08-02-contagem-por-desvio.md`. A próxima melhoria
+técnica deve ganhar outro plano curto; este arquivo não autoriza executar o
+backlog inteiro como uma única rodada.
 
 O plano mestre anterior foi encerrado em
 [`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

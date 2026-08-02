@@ -17,7 +17,7 @@ Peça de objeto mora em
 
 ## Objeto 3D — o formato (comece por `pecas/_tampa-de-caixa.js`)
 
-`PARAMS` (dimensionais — citados por NOME nos passos, mudar NÃO renumera) +
+`PARAMS` (dimensionais — citados por NOME nos passos, em geral não renumeram) +
 `TOPO` (topológicos — mudar RECONSTRÓI e pode deixar passo órfão) + `PASSOS`
 (a lista `[['op',{...}],...]`) + `meta` com `colisao: colisaoDe(PASSOS, PARAMS,
 TOPO)` (CHAMADA, não valor) + `construir = executar(...)`. **`PASSOS` exportado**,
@@ -32,8 +32,10 @@ ALIASES": diz `alias 'X' inexistente` em CADA citação (medido no `freio-disco`
 `[i*1000, i*1000+1000)`. Um cilindro de `lados:8` no passo 0 cria vértices
 0..15 (anel de baixo 0..7, de cima 8..15 — SEM vértice de centro; as tampas são
 polígonos) e faces 0..9 (laterais 0..7, fundo 8, topo 9); um `extruda` no passo
-1 cria a partir de 1000. A numeração depende só da POSIÇÃO do passo — id que
-aponta pro nada GRITA (órfão), nunca corrompe.
+1 cria a partir de 1000. O BLOCO depende só da posição; a numeração DENTRO dele
+depende da topologia. `lados:{desvio}` é topológico: como deriva a contagem do
+raio, mudar esse raio pode renumerar. Id que aponta pro nada GRITA, nunca
+corrompe.
 
 **NÃO ESCREVA `id:` num passo.** O campo é opcional e o núcleo calcula sozinho
 pela posição; escrever só serve pra você errar. Se escrever um valor diferente
@@ -49,10 +51,9 @@ relação com a posição do passo.
 
 **Lei que vale pra TODA op:** número tem que ser FINITO e ponto tem que ser
 `[x,y,z]`. `NaN`/`Infinity` ou aridade errada = **throw** (a peça inteira morre,
-de propósito). Não é preciosismo: num TOPO o estrago é invisível a todos os
-gates — `lados: NaN` vira `lados: 3` calado (`NaN|0` = 0), o cilindro cai de
-V=16/F=10 pra V=6/F=5 com malha limpa, e todo id de face dos passos seguintes
-passa a apontar pra outra face.
+de propósito). Antes dessa guarda, `lados: NaN` podia virar 3 por coerção e
+trocar a topologia com malha aparentemente limpa. Hoje o núcleo recusa o valor
+antes de criar geometria.
 
 **Vocabulário IMPLEMENTADO hoje.** A referência canônica de capacidades é o
 núcleo `prototipos/fps/v3/motor/oficina.js`; a lista de operações que realmente
@@ -64,7 +65,7 @@ contrato de faces.
 
 | op | args | nota |
 |---|---|---|
-| `cubo` / `cilindro` / `esfera` / `cone` / `plano` | dimensões PARAM, discretização TOPO quando houver, `origemId?` | todos publicam `origem`; use a origem inteira ou as famílias documentadas pelo núcleo. `origemId` é identidade estrutural escolhida pelo autor — nunca é o `id` posicional do passo. |
+| `cubo` / `cilindro` / `esfera` / `cone` / `plano` | dimensões PARAM, discretização TOPO quando houver, `origemId?` | todos publicam `origem`; use a origem inteira ou as famílias documentadas pelo núcleo. Em `cilindro` e `cone`, `lados` aceita número ou `{desvio: medida}`. `origemId` é identidade estrutural escolhida pelo autor — nunca é o `id` posicional do passo. |
 | `chamferBox` | dimensões PARAM, `chanfro`, `origemId?` | publica `origem` (faces nominais, arestas e cantos). É corte plano: não é filete nem arredondamento. |
 | `lathe` | `perfil:[[raio,y,raioDeConcordancia?],...]`, `lados`, `segmentosCurva?`, `origemId?` | publica origem por faixas/lados. O terceiro valor arredonda a quina do perfil com arco tangente; resolução é TOPO. |
 | `loft` | seções circulares ou `contorno:[[u,w,raioDeConcordancia?],...]`, `lados`, `orientacao?`, `segmentosCurva?`, `origemId?` | publica origem por faixas/lados; `orientacao` fixa a direção de uma seção não circular e o terceiro ponto suaviza o contorno com arco tangente. |
@@ -81,7 +82,7 @@ contrato de faces.
 | `espelha` | `eixo` (`'x'\|'y'\|'z'`), `pos?`, `sel?` uniforme; modo ESTRUTURAL: `origemId` + `derivaDe` juntos | DUPLICA faces; `sel:{f}`/`{grupo}` aponta faces, `{v}` alcança faces incidentes e `{regiao}` só faces inteiras na caixa. Weld no plano; ids novos do bloco; winding revertido; atributos herdados. **Modo ESTRUTURAL (é a 5ª fonte de `origem`):** com `origemId` + `derivaDe` a cópia vira endereçável por `sel:{origem:{op:'espelha',id,de}}`, onde `de` é a MESMA origem de `derivaDe`. Exige `sel:{origem:...}` direto — recusa `faces`, alias, região e ids literais — e aborta sem criar nada se alguma face-fonte estiver inteira no plano (a saída seria uma origem incompleta). Exemplo: `drone-inspecao.js`, trem de pouso |
 | `publicarPorta` | `nome` (string visível, única na peça), `de:{op,id,...}` (origem estrutural — **não** é lista de id) | dá NOME de autor a uma origem estrutural e o publica no neutro (`nucleo().portas`), para citar depois com `sel:{porta:'nome'}` e para a régua/bancada mostrarem. Guarda a ORIGEM, nunca faces resolvidas: a porta continua certa depois de mover, girar ou pintar a primitiva. Nome repetido GRITA nomeando o passo que publicou antes; `de` inválida GRITA e a porta não entra no mapa |
 | `arranja` | `modo:'radial'\|'linear'`, `total` (PARAM, inteiro ≥2, **conta a fonte**), radial: `eixo`, **exatamente uma** de `volta` (arco fechado, passo=`volta/total`) ou `graus` (passo entre instâncias), `pivo?` (default `[0,0,0]`), linear: `d` (`[x,y,z]`, passo de UMA instância); SEMPRE estrutural: `origemId` + `derivaDe` + `sel:{origem:...}` | REPETE uma origem estrutural: cria `total−1` cópias, ids novos do bloco, atributos herdados, **winding preservado** (rotação e translação não trocam a mão — só o `espelha` troca). É a 6ª fonte de `origem`: a saída é `{op:'arranja',id,de}` com o eixo `copia` (0..total−2, e a fonte **não** é cópia) — cite a coleção inteira omitindo `copia`, ou uma cópia por inteiro, nome de PARAM, `'primeira'`/`'ultima'` ou `{passo,fase}`. Ângulo da cópia k = `(k+1)·passo`, DERIVADO da contagem, nunca acumulado. **Grita, nunca escolhe:** `volta`+`graus` juntos ou nenhum dos dois, `total<2`, `d` nulo, cópia que cai a múltiplo exato de 360° da fonte, `sel` com faces/alias/região/ids. Vértice EXATAMENTE sobre o eixo é soldado; face inteira sobre o eixo aborta a coleção sem criar nada. Ex.: círculo de prisioneiros, aletas de disco, braços de roda |
-| `furo` | `origemId` (OBRIGATÓRIO), `de` (origem estrutural de UMA face — a entrada), `centro:[x,y,z]` (OBRIGATÓRIO, PARAM), `raio` (PARAM, >0), `lados?` (TOPO, mín 3), **exatamente uma** de `saida` (origem de UMA face — PASSANTE) ou `profundidade` (PARAM, >0 — CEGO), `orientacao?:[x,y,z]` | PUBLICA `origem` (famílias `borda`, `parede`, `saida` + tampa `'fundo'`). ABRE VAZIO: o furo cilíndrico numa face plana e convexa, descendo pela normal da entrada. É o furo de prisioneiro, o parafuso do móvel, o respiro do robô e o furo de eixo da carroça. **Não é booleana genérica** — o corte toca só as faces nomeadas em `de`/`saida`, e é por isso que ele não destrói identidade em massa. Numeração (formato salvo): vértices `b+j` (anel de entrada) e `b+lados+j` (anel do outro lado); faces `b+j` borda de entrada, `b+lados+j` parede, `b+2·lados+j` borda de saída (passante) ou `b+2·lados` fundo (cego). A borda tem SEMPRE `lados` faces, num quadrado ou numa tampa de 12 cantos. A face cortada SOME e fica registrada: citá-la depois, sozinha ou dentro de `{op:'cubo',id}`, GRITA nomeando o furo e o passo — nunca devolve a peça pela metade. Herda cor/material/parte/liso/solido (da entrada para borda/parede/fundo, da saída para a borda de saída); `tinta` não. GRITAM e ABORTAM (0 V/0 F): face não-plana, face CÔNCAVA, anel que encosta ou vaza o contorno, `de` que resolve para mais de uma face, saída igual à entrada, saída que o eixo não atravessa, `saida`+`profundidade` juntas ou nenhuma das duas, `raio`/`profundidade` ≤ 0, `centro` ausente, `orientacao` paralela à normal. |
+| `furo` | `origemId` (OBRIGATÓRIO), `de` (origem estrutural de UMA face — a entrada), `centro` ou `centros`, `raio` padrão, `lados?` (TOPO: número ou `{desvio: medida}`), **exatamente uma** de `saida` ou profundidade, `orientacao?` | PUBLICA `origem` (famílias `borda`, `parede`, `saida` + tampa `'fundo'`). No modo `{desvio}`, um passo com raios diferentes deriva UM `lados` pelo maior raio; isso preserva a tolerância e a numeração uniforme das famílias. ABRE VAZIO numa face plana e convexa e aborta inteiro em ambiguidade, interseção, medida inválida ou estouro. Não é booleana genérica: toca só as faces nomeadas e registra as consumidas. Veja `_gabarito-de-furacao.js`. |
 | `pincel` | `modo:'face'` (`faces` legado OU `sel`, `cor`) ou `modo:'livre'` (`cor`,`raio`,`dureza`,`pontos:[{f,a,b}]`) | livre = dab face-local, acompanha a face; não aceita `sel` |
 | `liso` | `faces:[ids]` (legado) ou `sel` | sombreado macio (padrão: chapado) |
 | `material` | `faces` (legado) ou `sel`, `usa` | + `MATERIAIS = {mat1:{cor,emissivo,aspereza,semLuz,mistura:'transparente'}}` exportado |
@@ -185,21 +186,11 @@ ou de face**: id é posicional, e referência posicional persistida é proibida
 (`CLAUDE.md`). A op `pesar` ainda não aceita `sel` (só `vs:`/`faces:`), então
 não dá pra dizer `tudo` nela.
 
-**QUEM publica `origem` — 4 geradores de 8, mais uma transformação.** Só
-`cubo` (`face?` nominal), `cilindro` (`lado?` numérico + `tampa?` nominal),
-`lathe` e `loft` (grade `faixa?`×`lado?`) registram identidade estrutural, mais
-o `espelha` no modo estrutural (`sel:{origem:{op:'espelha',id,de}}`).
-**`chamferBox`, `esfera`, `cone`, `plano` e `inflate` NÃO são endereçáveis por
-nome** — e a armadilha é que escrever `origemId` neles **não grita na
-declaração**: a op ignora a chave em silêncio (medido: `chamferBox` com
-`origemId` = 26 faces, 0 órfãos) e o erro só aparece lá na frente, na citação
-(`op de origem 'chamferBox' desconhecida`). Isto MUDA A ESCOLHA DE GEOMETRIA,
-não é detalhe: no freio a disco, a pinça e o suporte são peças FUNDIDAS e
-`chamferBox` era literalmente o gerador do assunto — saíram em `cubo` de aresta
-viva porque a alternativa era endereçá-las por caixa de coordenada escrita à
-mão (medido: 3 órfãos e 26 faces sem identidade). Precisa endereçar por nome?
-Escolha entre os quatro. Precisa mesmo de um dos outros? Sobra `sel:{regiao}` —
-e REPORTE o limite, é sinal de qual contrato construir em seguida.
+**QUEM publica `origem`.** Não memorize uma contagem: consulte a marca
+`operacoes-com-origem` desta skill, derivada de `OPERACOES_COM_ORIGEM` no
+núcleo e travada por teste. Cada gerador tem famílias diferentes; leia a linha
+da operação ou o comentário canônico antes de citar e nunca suponha que
+`origemId` é o bloco posicional do passo.
 
 No loft **e no lathe** (o `lathe` reusa o MESMO contrato do loft, faixa×lado — é o
 TEMPLATE de que o loft generalizou), `sel:{origem:{op:'loft'|'lathe',id,
