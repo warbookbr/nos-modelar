@@ -28,7 +28,7 @@ explícito manda mais que a posição no arquivo:
 |---|---|
 | A-37 | aberto; canto composto de `arredondarAresta`, candidato `AUT-02` |
 | A-36 | resolvido para aresta simples por `arredondarAresta`; o restante é A-37 |
-| A-35 | candidato sem plano ativo |
+| A-35 | resolvido: discretização local por concordância |
 | A-34 | resolvido por `lados:{desvio}` em `cilindro`, `cone` e `furo` |
 | A-33 | aberto, falha fechada; candidato `AUT-03` |
 | A-29 | candidato dentro de relações semânticas, sem plano ativo |
@@ -108,15 +108,15 @@ facetar) e outra PEQUENA (que precisaria de menos, por custo) não tem como
 pedir dois números — o autor sobe os dois pro nível do maior, ou aceita
 faceta visível no menor.
 
-**Contorno usado hoje:** escolher um `segmentosCurva` único que sirva pra
-TODAS as concordâncias do passo (o caso do pneu, com raios simétricos,
-esconde o problema).
+**Estado atual — RESOLVIDO:** a alça aceita `[a,b,raio]` ou
+`[a,b,{raio,segmentos}]` nos três consumidores. Raio puro continua usando
+`segmentosCurva` do passo, sem mudar nenhuma peça existente; a forma objeto
+altera só aquela curva. `segmentos` é inteiro de 1 a 1000, por isso uma entrada
+malformada aborta antes de criar geometria ou gastar memória sem limite.
 
-**Capacidade candidata:** a alça vira `[raio, y, {raio: R, segmentos: N}]`
-(um 3º elemento OBJETO em vez de número puro) — quando o autor quer
-discretização diferente do padrão do passo, declara junto do raio. Objeto
-ausente ou raio puro continua valendo o `segmentosCurva` do passo (aditivo,
-sem quebrar peça existente).
+**Limite declarado:** isto dá ao autor uma contagem local explícita, não uma
+derivação de tolerância. Escolher a qualidade automaticamente por desvio para
+um arco exige uma regra própria para o ângulo e continua fora deste escopo.
 
 ### A-34 — contagens circulares sem unidade impediam comparar acabamento
 

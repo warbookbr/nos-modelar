@@ -1870,11 +1870,11 @@ function particionar(contorno, aneis, escala, raios) {
    8 mm" é a frase, sem seno nem cosseno); todo cos/sin fica dentro do
    núcleo, na hora de gerar a amostra.
 
-   FORMATO: ponto = [a,b] (2 elementos, canto reto — como sempre) ou
-   [a,b,raio] (3 elementos — a alça: `raio` no MESMO plano 2D do ponto,
-   resolvido por `st.num` como qualquer campo dimensional, então pode citar
-   PARAM). `raio` ausente ou `0` é reto — byte-idêntico ao comportamento sem
-   a alça. `raio<0` ou não-numérico GRITA e ABORTA (fail-closed).
+   FORMATO: ponto = [a,b] (canto reto), [a,b,raio] (alça com a discretização
+   do passo) ou [a,b,{raio,segmentos}] (alça com discretização local). `raio`
+   e `segmentos` resolvem por `st.num`, então podem citar PARAM. `raio` 0 é
+   reto — byte-idêntico ao comportamento sem alça. Forma, raio ou segmentos
+   inválidos GRITAM e ABORTAM (fail-closed).
 
    SÓ FAZ SENTIDO num ponto com vizinho dos DOIS lados: num caminho ABERTO
    (perfil do lathe), a alça na PRIMEIRA ou na ÚLTIMA posição GRITA — não há
@@ -1882,9 +1882,9 @@ function particionar(contorno, aneis, escala, raios) {
    do loft, contornos do inflate), todo ponto tem os dois vizinhos (o
    anterior e o seguinte ciclam), então qualquer ponto pode ter alça.
 
-   DISCRETIZAÇÃO: `segmentosCurva` (PARAM, inteiro >=1, default 8) no NÍVEL
-   DO PASSO — "a discretização que o autor pedir" do gate, uma frase só,
-   valendo para toda alça daquele passo.
+   DISCRETIZAÇÃO: `segmentosCurva` (PARAM, inteiro >=1, default 8) é o padrão
+   DO PASSO. A forma objeto pode substituí-lo só naquele ponto. O número local
+   é topológico: mudar a contagem pode renumerar o restante do passo.
 
    GEOMETRIA (ponto B com vizinhos A,C, coordenadas [x,y] resolvidas):
      u1 = norm(A-B), u2 = norm(C-B)            direções unitárias
@@ -1929,6 +1929,35 @@ function arcoDeConcordancia(A, B, C, raio) {
   return { t, TA, TC, centro, raio };
 }
 
+function resolverAlcaDeConcordancia(st, i, op, k, valor, segmentosPadrao) {
+  const objeto = valor && typeof valor === 'object' && !Array.isArray(valor);
+  if (!objeto) return { raio: st.num(valor), segmentos: segmentosPadrao };
+
+  const chaves = Object.keys(valor);
+  if (!Object.prototype.hasOwnProperty.call(valor, 'raio')) {
+    /* Antes da forma objeto, qualquer objeto no terceiro elemento era valor
+       dimensional inválido e lançava alto. Manter isso evita transformar uma
+       peça inválida antiga em órfão macio só porque a sintaxe nova existe. */
+    return { raio: st.num(valor), segmentos: segmentosPadrao };
+  }
+  const extras = chaves.filter((chave) => chave !== 'raio' && chave !== 'segmentos');
+  if (extras.length) {
+    grita(st, i, op, k, `forma da concordância no ponto ${k} tem chave(s) desconhecida(s): ${extras.join(', ')}; use {raio,segmentos}`);
+    return { erro: true };
+  }
+  const raio = st.num(valor.raio);
+  const segmentos = valor.segmentos == null ? segmentosPadrao : st.num(valor.segmentos);
+  if (!Number.isSafeInteger(segmentos) || segmentos < 1) {
+    grita(st, i, op, k, `segmentos da concordância no ponto ${k} precisa ser inteiro >= 1; recebido ${segmentos}`);
+    return { erro: true };
+  }
+  if (segmentos > BLOCO) {
+    grita(st, i, op, k, `segmentos da concordância no ponto ${k} (${segmentos}) estoura o orçamento de discretização (${BLOCO})`);
+    return { erro: true };
+  }
+  return { raio, segmentos };
+}
+
 /* Expande uma lista de pontos 2D (cada um `[a,b]` ou `[a,b,raio]`) numa lista
    PLANA de `[a,b]` prontos para o algoritmo de cursor/faces existente — o
    lathe/loft/inflate continuam com EXATAMENTE o mesmo código de numeração de
@@ -1942,7 +1971,11 @@ function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurv
   const arcos = new Array(n).fill(null);
   for (let k = 0; k < n; k++) {
     const pt = pontosBrutos[k];
-    const raio = pt.length === 3 ? pt[2] : 0;
+    const alca = pt.length === 3
+      ? resolverAlcaDeConcordancia(st, i, op, k, pt[2], segmentosCurva)
+      : { raio: 0, segmentos: segmentosCurva };
+    if (alca.erro) return { erro: true };
+    const { raio, segmentos } = alca;
     if (!(raio >= 0)) { grita(st, i, op, k, `raio de concordância negativo ou inválido (${raio}) no ponto ${k}`); return { erro: true }; }
     if (raio === 0) continue;
     const temVizinhos = fechado || (k > 0 && k < n - 1);
@@ -1951,7 +1984,7 @@ function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurv
     const C = fechado ? pontosBrutos[(k + 1) % n] : pontosBrutos[k + 1];
     const arco = arcoDeConcordancia(A, pt, C, raio);
     if (arco.erro) { grita(st, i, op, k, `concordância do ponto ${k}: ${arco.erro}`); return { erro: true }; }
-    arcos[k] = arco;
+    arcos[k] = { ...arco, segmentos };
   }
   // soma de `t` por SEGMENTO (concordâncias vizinhas não podem se sobrepor)
   const limite = fechado ? n : n - 1;
@@ -1970,8 +2003,8 @@ function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurv
     let delta = angC - angA;
     while (delta > Math.PI) delta -= Math.PI * 2;
     while (delta < -Math.PI) delta += Math.PI * 2;
-    for (let s = 0; s <= segmentosCurva; s++) {
-      const ang = angA + delta * (s / segmentosCurva);
+    for (let s = 0; s <= arco.segmentos; s++) {
+      const ang = angA + delta * (s / arco.segmentos);
       pontos.push([arco.centro[0] + Math.cos(ang) * arco.raio, arco.centro[1] + Math.sin(ang) * arco.raio]);
     }
   }
@@ -2322,7 +2355,10 @@ export const OPS = {
       // não-numérico é a MESMA lei de todo campo dimensional da Oficina — THROW
       // alto, mata a peça inteira (a rede central de `criarResolverNumerico`).
       const raio = st.num(pt[0]), y = st.num(pt[1]);
-      return pt.length === 3 ? [raio, y, st.num(pt[2])] : [raio, y];
+      const alca = pt[2];
+      return pt.length === 3
+        ? [raio, y, alca && typeof alca === 'object' && !Array.isArray(alca) ? alca : st.num(alca)]
+        : [raio, y];
     });
     if (pontoInvalido) return;   // algum ponto inválido (aridade errada) -> nada construído neste passo
 
@@ -2595,7 +2631,10 @@ export const OPS = {
         // st.num sem try/catch de propósito — mesma lei do lathe: valor
         // dimensional não-finito/inválido é THROW alto, nunca grita macia.
         const u = st.num(pt[0]), w = st.num(pt[1]);
-        return pt.length === 3 ? [u, w, st.num(pt[2])] : [u, w];
+        const alca = pt[2];
+        return pt.length === 3
+          ? [u, w, alca && typeof alca === 'object' && !Array.isArray(alca) ? alca : st.num(alca)]
+          : [u, w];
       });
       if (pontoInvalido) { invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
       const expC = expandirConcordancias(st, i, 'loft', brutosContorno, { fechado: true, segmentosCurva });
@@ -2788,7 +2827,10 @@ export const OPS = {
         // st.num sem try/catch de propósito — mesma lei do lathe/loft: valor
         // dimensional não-finito/inválido é THROW alto, nunca grita macia.
         const x = st.num(pt[0]), y = st.num(pt[1]);
-        return pt.length === 3 ? [x, y, st.num(pt[2])] : [x, y];
+        const alca = pt[2];
+        return pt.length === 3
+          ? [x, y, alca && typeof alca === 'object' && !Array.isArray(alca) ? alca : st.num(alca)]
+          : [x, y];
       });
       if (ruim) return null;
       const exp = expandirConcordancias(st, i, 'inflate', brutos, { fechado: true, segmentosCurva });

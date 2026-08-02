@@ -271,6 +271,19 @@ Sem o servidor no ar, cai pro download comum — funciona, mas você move o arqu
 
 ## Lista de operações
 
+### Atualização vigente — concordâncias em contornos 2D
+
+Em `lathe`, no `contorno` do `loft` e nos dois contornos de `inflate`, o
+terceiro elemento do ponto aceita `[a,b,raio]` ou
+`[a,b,{raio,segmentos}]`. A primeira forma usa `segmentosCurva` do passo; a
+segunda usa a contagem local apenas naquela concordância. `raio` e `segmentos`
+podem citar PARAM; `segmentos` precisa ser inteiro de 1 a 1000. A forma objeto
+sem `raio`, com chave desconhecida ou com contagem inválida grita antes de criar
+geometria. O número local é TOPO: mudá-lo pode renumerar o restante do passo.
+
+Esta atualização substitui a menção histórica à “alça reservada” nas linhas
+longas de `lathe`, `loft` e `inflate` abaixo.
+
 | Status | Operação | Argumentos | Observação |
 |---|---|---|---|
 | FEITO | `cubo`, `cilindro` | `id`, medidas, `lados` | Ponto de partida. Cria vértices numerados a partir de `id`. No cilindro, `lados` aceita contagem ou `{desvio: medida}`. |

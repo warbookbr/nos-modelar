@@ -371,6 +371,9 @@ seu resultado está sintetizado em
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
 pagou A-34 com contagem circular por tolerância e também foi encerrado.
 
+O plano curto seguinte [`AUT-2026-02`](planos/2026-08-02-concordancia-por-ponto.md)
+pagou A-35 com discretização local de concordâncias e também foi encerrado.
+
 A F1 do antigo Ciclo 6 foi aceita como entrega independente e pagou A-30. As
 demais fatias foram canceladas porque o desenho importado transformaria
 `filete` em arredondamento multipainel, em conflito com a decisão convergida de
