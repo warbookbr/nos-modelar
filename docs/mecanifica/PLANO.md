@@ -1603,6 +1603,11 @@ comportamento em `oficina.js`:
   expansão preserva a identidade `furo:k`, a terceira ordem de ponte usa o raio
   declarado e a contenção recebe recusa própria. Profundidade e nome de grupo
   permanecem explicitamente para as fatias seguintes.
+- **P6**: em furo CEGO, disco e círculo também podem declarar
+  `profundidade`; a do passo virou padrão e cada fundo segue a profundidade do
+  seu furo. Passante com profundidade de item recusa antes de reservar ids: a
+  mistura de modos continua fora do contrato. Nome de grupo permanece para a
+  próxima fatia.
 
 Ainda não entrou `gabarito:selecao --novas`, nem qualquer fatia de
 comportamento do F0b/F1. Os três gates do roteiro continuam obrigatórios antes
@@ -1671,7 +1676,7 @@ de prosseguir.
    de anéis (3483); `raiosPorFuro` como chave da 3ª ordem; o ramo de continência
    antes do de cruzamento. FECHA: T1 a T10 e T24; as recusas 1 a 8 e 15 a 17.
    GATE: os três verdes.
-6. **F1 fatia 3 — profundidade por furo.** ENTRA: `profundidade` opcional no item;
+6. **F1 fatia 3 — profundidade por furo — CONCLUÍDA no warbook.** ENTRA: `profundidade` opcional no item;
    `profsPorFuro`; profundidade em passo passante GRITA. FECHA: T22, T23; as
    recusas 10 a 12. GATE: os três verdes.
 7. **F1 fatia 4 — o grupo se nomeia.** ENTRA: `nome` no item; `grupos` no

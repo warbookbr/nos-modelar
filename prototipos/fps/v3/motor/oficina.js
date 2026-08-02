@@ -3431,18 +3431,20 @@ export const OPS = {
                        de forma é a classe de surpresa que este núcleo recusa;
        `centros`       VÁRIOS furos no mesmo passo (F1/A-30), como lista de
                        grupos na ordem escrita. Cada item é:
-                         `[x,y,z]` — um ponto que herda o raio do passo;
-                         `{centro:[x,y,z], raio?}` — um DISCO com raio próprio
-                           opcional;
-                         `{pivo?, distancia, total, volta|graus, raio?}` — um
-                           CÍRCULO de discos, cujo raio opcional vale para cada
-                           um dos `total` furos. O círculo de topo continua
-                           aceito com a mesma gramática. `total`, `volta` e
-                           `graus` significam o mesmo que em `arranja`; o
-                           círculo mora no plano da entrada e o furo 0 segue a
-                           direção `+u` (ou `orientacao`). Assim a peça diz
-                           quantos furos há e a que distância, sem seno nem
-                           cosseno no formato salvo (A-29).
+                         `[x,y,z]` — um ponto que herda raio e profundidade do
+                           passo;
+                         `{centro:[x,y,z], raio?, profundidade?}` — um DISCO
+                           com medidas próprias opcionais;
+                         `{pivo?, distancia, total, volta|graus, raio?,
+                           profundidade?}` — um CÍRCULO de discos, cujas
+                           medidas opcionais valem para cada um dos `total`
+                           furos. O círculo de topo continua aceito com a mesma
+                           gramática. `total`, `volta` e `graus` significam o
+                           mesmo que em `arranja`; o círculo mora no plano da
+                           entrada e o furo 0 segue a direção `+u` (ou
+                           `orientacao`). Assim a peça diz quantos furos há e a
+                           que distância, sem seno nem cosseno no formato salvo
+                           (A-29).
                        `centro` e `centros` dizem a mesma coisa em número
                        diferente: as duas juntas GRITAM, nenhuma das duas
                        GRITA. `centros` com UM ponto é idêntico a `centro`;
@@ -3451,10 +3453,11 @@ export const OPS = {
                        próprio raio; `centro` singular sempre usa o padrão;
        `lados`         TOPO (padrão 8, mín 3): muda a CONTAGEM, logo renumera;
        `saida`         a origem estrutural da face de SAÍDA — furo PASSANTE;
-       `profundidade`  distância > 0 ao longo do eixo — furo CEGO;
-                       `saida` e `profundidade` dizem coisas diferentes e
-                       nenhuma é derivável da outra: as duas juntas GRITAM,
-                       nenhuma das duas GRITA;
+       `profundidade`  PARAM dimensional > 0, padrão do passo para furo CEGO.
+                       Pode faltar somente se TODO furo vindo de `centros`
+                       declarar sua própria profundidade; é proibida no item
+                       de um passo PASSANTE. `saida` e a profundidade do passo
+                       dizem coisas diferentes e as duas juntas GRITAM;
        `orientacao`    opcional `[x,y,z]`: a direção do mundo para onde aponta o
                        vértice 0 do anel, projetada no plano da entrada — a
                        MESMA chave e a MESMA regra do `loft` deste ciclo. Serve
@@ -3519,7 +3522,6 @@ export const OPS = {
     // ---- modo: exatamente uma palavra, como volta/graus do arranja ----
     const temSaida = a.saida != null, temProfundidade = a.profundidade != null;
     if (temSaida && temProfundidade) return grita(st, i, 'furo', 'saida+profundidade', "saida e profundidade dizem coisas diferentes (saida = a face por onde o furo SAI, passante; profundidade = onde ele PARA, cego) — declare exatamente uma");
-    if (!temSaida && !temProfundidade) return grita(st, i, 'furo', 'saida+profundidade', "furo exige saida (a face por onde ele sai, passante) ou profundidade (onde ele para, cego) — exatamente uma");
 
     // ---- dimensões ----
     const L = Math.max(3, st.num(a.lados ?? 8) | 0);   // TOPO: muda a CONTAGEM
@@ -3542,7 +3544,7 @@ export const OPS = {
        é TOPO e decide a numeração do bloco. */
     const fontes = [];
     const lerCirculo = (item, nome) => {
-      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus', 'raio'];
+      const chaves = ['pivo', 'distancia', 'total', 'volta', 'graus', 'raio', 'profundidade'];
       const estranha = Object.keys(item).find((k) => !chaves.includes(k));
       if (estranha) return { erro: `${nome} em círculo usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma` };
       const total = st.num(item.total ?? 0);
@@ -3561,12 +3563,12 @@ export const OPS = {
         if (erro) return { erro };
         pivo = st.vec(item.pivo);
       }
-      return { fonte: { tipo: 'circulo', pivo, distancia, total, passoGraus, raio: item.raio } };
+      return { fonte: { tipo: 'circulo', pivo, distancia, total, passoGraus, raio: item.raio, profundidade: item.profundidade } };
     };
     if (temCentro) {
       const erro = conferirPonto(a.centro, 'centro');
       if (erro) return grita(st, i, 'furo', 'centro', erro);
-      fontes.push({ tipo: 'ponto', ponto: st.vec(a.centro), raio: undefined });
+      fontes.push({ tipo: 'ponto', ponto: st.vec(a.centro), raio: undefined, profundidade: undefined });
     } else if (Array.isArray(a.centros)) {
       if (!a.centros.length) return grita(st, i, 'furo', 'centros', 'centros é uma lista vazia — um passo que não abre furo nenhum é um no-op silencioso');
       for (let k = 0; k < a.centros.length; k++) {
@@ -3574,20 +3576,20 @@ export const OPS = {
         if (Array.isArray(item)) {
           const erro = conferirPonto(item, `centros[${k}]`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', ponto: st.vec(item), raio: undefined });
+          fontes.push({ tipo: 'ponto', ponto: st.vec(item), raio: undefined, profundidade: undefined });
         } else if (item && typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'centro')) {
-          const chaves = ['centro', 'raio'];
+          const chaves = ['centro', 'raio', 'profundidade'];
           const estranha = Object.keys(item).find((nome) => !chaves.includes(nome));
           if (estranha) return grita(st, i, 'furo', 'centros', `centros[${k}] como disco usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
           const erro = conferirPonto(item.centro, `centros[${k}].centro`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', ponto: st.vec(item.centro), raio: item.raio });
+          fontes.push({ tipo: 'ponto', ponto: st.vec(item.centro), raio: item.raio, profundidade: item.profundidade });
         } else if (item && typeof item === 'object') {
           const r = lerCirculo(item, `centros[${k}]`);
           if (r.erro) return grita(st, i, 'furo', 'centros', r.erro);
           fontes.push(r.fonte);
         } else {
-          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {centro, raio?} ou um círculo {pivo, distancia, total, volta|graus, raio?}; recebido ${JSON.stringify(item)}`);
+          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {centro, raio?, profundidade?} ou um círculo {pivo, distancia, total, volta|graus, raio?, profundidade?}; recebido ${JSON.stringify(item)}`);
         }
       }
     } else if (a.centros && typeof a.centros === 'object') {
@@ -3625,11 +3627,12 @@ export const OPS = {
       const d = (p[0] - entrada.centro[0]) * N[0] + (p[1] - entrada.centro[1]) * N[1] + (p[2] - entrada.centro[2]) * N[2];
       return [p[0] - N[0] * d, p[1] - N[1] * d, p[2] - N[2] * d];
     };
-    const centros = [], raiosBrutos = [];
+    const centros = [], raiosBrutos = [], profsBrutos = [];
     for (const fonte of fontes) {
       if (fonte.tipo === 'ponto') {
         centros.push(projetarNoPlano(fonte.ponto));
         raiosBrutos.push(fonte.raio);
+        profsBrutos.push(fonte.profundidade);
         continue;
       }
       const p0 = projetarNoPlano(fonte.pivo);
@@ -3638,6 +3641,7 @@ export const OPS = {
         const cu = Math.cos(t) * fonte.distancia, cw = Math.sin(t) * fonte.distancia;
         centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
         raiosBrutos.push(fonte.raio);
+        profsBrutos.push(fonte.profundidade);
       }
     }
     const M = centros.length;
@@ -3648,6 +3652,22 @@ export const OPS = {
       const r = st.num(bruto);
       if (!(r > 0) || !Number.isFinite(r)) return grita(st, i, 'furo', 'raio', `o furo ${k} tem raio inválido (recebido ${JSON.stringify(bruto)} = ${r}); raio precisa ser > 0`);
       raiosPorFuro.push(r);
+    }
+    const profsPorFuro = [];
+    if (temSaida) {
+      const kComProfundidade = profsBrutos.findIndex((prof) => prof != null);
+      if (kComProfundidade >= 0) return grita(st, i, 'furo', 'profundidade', `o furo ${kComProfundidade} declara profundidade, mas este passo tem saida: não misture furo CEGO e PASSANTE no mesmo passo`);
+    } else {
+      for (let k = 0; k < M; k++) {
+        const bruto = profsBrutos[k] ?? a.profundidade;
+        if (bruto == null) {
+          if (!temProfundidade && profsBrutos.every((prof) => prof == null)) return grita(st, i, 'furo', 'saida+profundidade', "furo exige saida (a face por onde ele sai, passante) ou profundidade (onde ele para, cego) — exatamente uma");
+          return grita(st, i, 'furo', 'profundidade', `o furo ${k} não tem profundidade: nem ele declara uma, nem o passo declara a profundidade padrão`);
+        }
+        const prof = st.num(bruto);
+        if (!(prof > 0) || !Number.isFinite(prof)) return grita(st, i, 'furo', 'profundidade', `o furo ${k} tem profundidade inválida (recebido ${JSON.stringify(bruto)} = ${prof}); profundidade precisa ser > 0`);
+        profsPorFuro.push(prof);
+      }
     }
 
     // um anel por centro, e a margem de cada um conferida contra o contorno
@@ -3722,9 +3742,10 @@ export const OPS = {
          é promessa sem afirmação que morra; o que fica no lugar dela é o teste
          da saída OBLÍQUA, que mede a separação do outro lado. */
     } else {
-      const prof = st.num(a.profundidade);
-      if (!(prof > 0) || !Number.isFinite(prof)) return grita(st, i, 'furo', 'profundidade', `profundidade precisa ser > 0 (recebido ${JSON.stringify(a.profundidade)} = ${prof}); um furo cego sem profundidade não abre nada`);
-      for (let k = 0; k < M; k++) aneisOutro.push(aneisEntrada[k].map((p) => [p[0] + eixo[0] * prof, p[1] + eixo[1] * prof, p[2] + eixo[2] * prof]));
+      for (let k = 0; k < M; k++) {
+        const prof = profsPorFuro[k];
+        aneisOutro.push(aneisEntrada[k].map((p) => [p[0] + eixo[0] * prof, p[1] + eixo[1] * prof, p[2] + eixo[2] * prof]));
+      }
     }
 
     /* ---- as bordas, montadas ANTES de reservar id ----

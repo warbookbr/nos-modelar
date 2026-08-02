@@ -119,8 +119,9 @@ Estado atual:
   dele com 0,6 mm de folga);
 - a primeira fatia de A-30 já permite raios diferentes na mesma face: pontos,
   discos e círculos expandem em ordem estável, `raio` do passo é padrão e o
-  furo dentro de outro recebe diagnóstico próprio. Profundidade e seleção por
-  nome ainda pertencem às próximas duas fatias;
+  furo dentro de outro recebe diagnóstico próprio. Em furo cego, esses grupos
+  também podem declarar profundidades diferentes; mistura com passante continua
+  proibida. A seleção por nome pertence à próxima fatia;
 - A-15 foi **retirado do produto**, não resolvido pela interface: a Oficina
   humana que emitia referências posicionais não existe mais na Mecanifica. O
   gate `id-cru` permanece protegendo as peças escritas por IA;
