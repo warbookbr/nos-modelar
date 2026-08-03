@@ -377,12 +377,11 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-O plano curto ativo é o
-[AUT-2026-16](planos/2026-08-03-hierarquia-semantica-minima.md): a menor
-hierarquia de partes possível, por pai nomeado, validada e observável sem
-mover, agrupar visualmente ou persistir uma montagem. O
-arquivo canônico do plano é
-`docs/mecanifica/planos/2026-08-03-hierarquia-semantica-minima.md`. O
+Não há plano curto ativo. O
+[AUT-2026-16](planos/2026-08-03-hierarquia-semantica-minima.md) concluiu o pai
+semântico mínimo de partes: uma árvore declarada, validada e observável, sem
+mover, agrupar visualmente ou persistir montagem. O arquivo canônico do plano
+é `docs/mecanifica/planos/2026-08-03-hierarquia-semantica-minima.md`. O
 [AUT-2026-15](planos/2026-08-02-portas-espelho-arranja.md)
 foi concluído: portas acompanham uma cópia única de `arranja` pelo endereço
 estrutural e espelho declara mão espelhada, que as relações atuais recusam antes

@@ -1,6 +1,6 @@
 # AUT-2026-16 — hierarquia semântica mínima de partes
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -69,5 +69,20 @@ são contratos posteriores e não serão disfarçados de metadado de peça.
 
 ## Fechamento
 
-Preencher ao concluir: commit, gates, resultado observado e candidatos que
-continuarem no backlog.
+**Concluído em 3 de agosto de 2026 — implementação `d7b7b55`.**
+
+`parte.pai` é validado ao fim da receita, portanto o autor não precisa ordenar
+os passos pela árvore. Pai inválido, ausente, auto-pai, troca e ciclo são
+recusados; diante de erro não se publica uma árvore parcial. A fixture
+`_freio-hierarquia` declara pastilha interna, pastilha externa e pistão como
+filhos da pinça. `npm run descrever` expõe a árvore completa mesmo quando a
+medição é filtrada, e a bancada acrescenta o contexto “de Pinça” sem reparentar
+o grafo Three.js.
+
+Gates: 1.013 testes, `typecheck`, build, gabarito de seleção (34 fixtures),
+`id-cru`, exportação, mapa, índices, links e planos passaram. Isolamento e
+explosão continuaram por componente; exportar uma peça com hierarquia falha de
+modo explícito até o formato resolvido ganhar versão e consumidor.
+
+Seleção por subárvore, pose herdada, reparenting, persistência, exportação de
+árvore e solver voltaram ao backlog como contratos separados.
