@@ -200,11 +200,11 @@ async function iniciar() {
       listaPortas.replaceChildren(...portas.map((porta) => {
         const item = document.createElement('li');
         const nome = document.createElement('b');
-        nome.textContent = porta.nome;
+        nome.textContent = porta.rotulo;
         /* a origem DECLARADA, não as faces resolvidas — a mesma coluna que
            `npm run descrever` imprime, pelo mesmo motivo. */
         const origem = document.createElement('small');
-        origem.textContent = porta.origem;
+        origem.textContent = `${porta.id} · ${porta.origem}`;
         item.append(nome, origem);
         return item;
       }));

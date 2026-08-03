@@ -7,6 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+[AUT-2026-14](2026-08-02-identidade-porta-estavel.md) foi concluído: portas
+novas agora separam `id` estável de `rotulo` exibido, preservando receitas,
+artefatos e relações históricos. Espelho e `arranja` permanecem como a próxima
+lacuna explícita do Nível 1.
+
 [AUT-2026-13](2026-08-02-recusa-estrutural-montagem.md) foi concluído: relação
 com forma ou direção incompatível agora termina antes de medir a dimensão errada
 ou oferecer prévia aplicável.

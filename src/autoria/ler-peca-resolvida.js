@@ -35,15 +35,20 @@ function lerPortas(dado) {
   if (!Array.isArray(dado.portas)) throw new Error('ler-peca: portas precisa ser lista quando presente');
   const portas = new Map();
   for (const porta of dado.portas) {
+    const nova = porta?.id !== undefined;
+    const legada = porta?.nome !== undefined;
     if (!porta || typeof porta !== 'object' || Array.isArray(porta)
-      || typeof porta.nome !== 'string' || !porta.nome
+      || nova === legada
+      || (nova && (typeof porta.id !== 'string' || !porta.id || typeof porta.rotulo !== 'string' || !porta.rotulo))
+      || (legada && (typeof porta.nome !== 'string' || !porta.nome))
       || !porta.de || typeof porta.de !== 'object' || Array.isArray(porta.de)
       || typeof porta.de.op !== 'string' || porta.de.id === undefined
       || !Number.isSafeInteger(porta.passo) || porta.passo < 0) {
       throw new Error('ler-peca: porta inválida');
     }
-    if (portas.has(porta.nome)) throw new Error(`ler-peca: porta duplicada '${porta.nome}'`);
-    portas.set(porta.nome, JSON.parse(JSON.stringify(porta)));
+    const id = nova ? porta.id : porta.nome;
+    if (portas.has(id)) throw new Error(`ler-peca: porta duplicada '${id}'`);
+    portas.set(id, JSON.parse(JSON.stringify(porta)));
   }
   return portas;
 }

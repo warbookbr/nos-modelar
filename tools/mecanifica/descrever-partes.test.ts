@@ -310,10 +310,10 @@ describe('portasPublicadas — o endereço semântico aparece onde se confere', 
     ] as any, {}, {},
   );
 
-  it('lista nome, origem declarada e passo de publicação, em ordem de nome', () => {
+  it('lista id estável, rótulo, origem declarada e passo de publicação', () => {
     expect(portasPublicadas(comPortas())).toEqual([
-      { nome: 'assentoDoEixo', op: 'cilindro', id: 40, recorte: 'tampa=topo', origem: 'cilindro:40 tampa=topo', passo: 2 },
-      { nome: 'baseDoBloco', op: 'cubo', id: 41, recorte: '', origem: 'cubo:41', passo: 5 },
+      { id: 'assentoDoEixo', rotulo: 'assentoDoEixo', op: 'cilindro', origemId: 40, recorte: 'tampa=topo', origem: 'cilindro:40 tampa=topo', passo: 2 },
+      { id: 'baseDoBloco', rotulo: 'baseDoBloco', op: 'cubo', origemId: 41, recorte: '', origem: 'cubo:41', passo: 5 },
     ]);
   });
 
@@ -344,7 +344,7 @@ describe('portasPublicadas — o endereço semântico aparece onde se confere', 
     expect(descricao.totais.portas).toBe(2);
     const texto = formatarDescricao(descricao);
     expect(texto).toContain('PORTAS PUBLICADAS');
-    expect(texto).toMatch(/assentoDoEixo {2,}cilindro:40 tampa=topo/);
+    expect(texto).toMatch(/assentoDoEixo {2,}assentoDoEixo {2,}cilindro:40 tampa=topo/);
     expect(texto).toContain('portas: 2');
   });
 
@@ -375,7 +375,7 @@ describe('descrever-peca: o CLI', () => {
     expect(codigo).toBe(0);
     expect(saida).toContain('portas: 8');
     expect(saida).toContain('PORTAS PUBLICADAS');
-    expect(saida).toMatch(/peDoCaule {2,}cilindro:404 tampa=fundo/);
+    expect(saida).toMatch(/Base enterrada do caule {2,}peDoCaule {2,}cilindro:404 tampa=fundo/);
     expect(saida).toMatch(/soleiraDaJardineira {2,}chamferBox:400/);
     expect(saida).toMatch(/bordaDaFrenteDaSoleira {2,}chamferBox:400 aresta=3/);
     expect(saida).toMatch(/coloDoBulbo {2,}esfera:401 faixa=ultima/);

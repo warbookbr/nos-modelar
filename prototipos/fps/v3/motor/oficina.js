@@ -2987,20 +2987,32 @@ export const OPS = {
     if (a.origemId != null) registraOrigem(st, i, 'inflate', a.origemId, { faces: Array.from({ length: nF }, (_, k) => b + k) });
   },
 
-  /* Publica uma porta por nome do autor. Ela guarda a origem estrutural, nunca
-     faces resolvidas: por isso a mesma porta continua correta depois de mover,
-     rotacionar ou pintar a primitiva. */
+  /* A forma antiga `{nome,...}` continua aceita e conserva exatamente sua
+     saída; a nova `{id,rotulo,...}` separa a chave citável do texto exibido. */
   publicarPorta(st, a, i) {
-    const erroNome = nomeDeParteInvalido(a.nome);
-    if (erroNome) return grita(st, i, 'publicarPorta', 'nome', `nome da porta ${erroNome}`);
-    if (st.portas.has(a.nome)) return grita(st, i, 'publicarPorta', 'nome', `porta '${a.nome}' já foi publicada no passo ${st.portas.get(a.nome).passo}`);
+    const usaNomeLegado = a.nome !== undefined;
+    const usaId = a.id !== undefined;
+    if (usaNomeLegado === usaId) return grita(st, i, 'publicarPorta', 'id', 'declare exatamente um identificador: nome (legado) ou id (estável)');
+    const chave = usaId ? a.id : a.nome;
+    const erroChave = nomeDeParteInvalido(chave);
+    if (erroChave) return grita(st, i, 'publicarPorta', usaId ? 'id' : 'nome', `${usaId ? 'id estável' : 'nome da porta'} ${erroChave}`);
+    if (usaNomeLegado && a.rotulo !== undefined) return grita(st, i, 'publicarPorta', 'rotulo', 'rotulo só acompanha a forma nova {id, rotulo, de}');
+    const rotulo = usaId ? (a.rotulo === undefined ? chave : a.rotulo) : null;
+    if (usaId) {
+      const erroRotulo = nomeDeParteInvalido(rotulo);
+      if (erroRotulo) return grita(st, i, 'publicarPorta', 'rotulo', `rótulo da porta ${erroRotulo}`);
+    }
+    if (st.portas.has(chave)) return grita(st, i, 'publicarPorta', usaId ? 'id' : 'nome', `porta '${chave}' já foi publicada no passo ${st.portas.get(chave).passo}`);
     const validacao = validarOrigem(a.de);
     if (validacao.erro) return grita(st, i, 'publicarPorta', 'de', `porta exige de:{op,id,...} estrutural válido: ${validacao.erro}`);
     const resultado = resolverOrigem(st, a.de);
     if (resultado.erro) return grita(st, i, 'publicarPorta', 'de', resultado.erro);
     const interfaceResolvida = resolverInterfaceCilindricaDaPorta(st, a.interface);
     if (interfaceResolvida.erro) return grita(st, i, 'publicarPorta', 'interface', interfaceResolvida.erro);
-    st.portas.set(a.nome, { de: a.de, passo: i, interface: interfaceResolvida.interface });
+    st.portas.set(chave, {
+      de: a.de, passo: i, interface: interfaceResolvida.interface,
+      ...(usaId ? { id: chave, rotulo } : {}),
+    });
   },
 
   /* ---- edição por id estável ---- */
@@ -4785,17 +4797,21 @@ function resolverInterfaceCilindricaDaPorta(st, interfaceDeclarada) {
 }
 
 function portasDoNucleo(portas) {
-  const nomes = [...portas.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-  return new Map(nomes.map((nome) => {
-    const porta = portas.get(nome);
+  const ids = [...portas.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  return new Map(ids.map((id) => {
+    const porta = portas.get(id);
     const interfaceResolvida = porta.interface === undefined
       ? undefined
       : JSON.parse(JSON.stringify(porta.interface));
-    return [nome, {
-      nome,
+    const publicada = {
       de: JSON.parse(JSON.stringify(porta.de)),
       passo: porta.passo,
       ...(interfaceResolvida === undefined ? {} : { interface: interfaceResolvida }),
+    };
+    /* A forma histórica não ganha campo novo: artefatos antigos permanecem
+       idênticos. A forma nova sempre expõe id e rótulo. */
+    return [id, porta.id === undefined ? { nome: id, ...publicada } : {
+      id: porta.id, rotulo: porta.rotulo, ...publicada,
     }];
   }));
 }

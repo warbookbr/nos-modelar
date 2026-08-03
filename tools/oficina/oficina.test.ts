@@ -4356,6 +4356,34 @@ describe('A-20 — o núcleo devolve as portas publicadas', () => {
     expect(recusada.orfaos.some((o: any) => o.op === 'publicarPorta')).toBe(true);
     expect([...recusada.portas]).toEqual([]);
   });
+
+  it('separa id estável de rótulo sem mudar a chave que sel:{porta} resolve', () => {
+    const n = nucleo([
+      ['cilindro', { id: 0, raio: 0.5, altura: 1, lados: 8, origemId: 40 }],
+      ['publicarPorta', { id: 'baseDoEixo', rotulo: 'Base inferior do eixo', de: { op: 'cilindro', id: 40, tampa: 'fundo' } }],
+      ['publicarPorta', { id: 'topoDoEixo', rotulo: 'Base inferior do eixo', de: { op: 'cilindro', id: 40, tampa: 'topo' } }],
+      ['parte', { nome: 'base', sel: { porta: 'baseDoEixo' } }],
+    ] as any, {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect([...n.portas.keys()]).toEqual(['baseDoEixo', 'topoDoEixo']);
+    expect(n.portas.get('baseDoEixo')).toEqual({
+      id: 'baseDoEixo', rotulo: 'Base inferior do eixo', de: { op: 'cilindro', id: 40, tampa: 'fundo' }, passo: 1,
+    });
+    expect([...n.F.values()].filter((face: any) => face.parte === 'base')).toHaveLength(1);
+  });
+
+  it('recusa id duplicado e as formas ambíguas de publicarPorta', () => {
+    const base: any[] = [['cubo', { id: 0, lado: 1, origemId: 50 }]];
+    const duplicada = nucleo([...base,
+      ['publicarPorta', { id: 'porta', de: { op: 'cubo', id: 50 } }],
+      ['publicarPorta', { id: 'porta', de: { op: 'cubo', id: 50 } }],
+    ] as any, {}, {});
+    expect(duplicada.orfaos.some((o: any) => o.op === 'publicarPorta' && /já foi publicada/.test(o.motivo))).toBe(true);
+    const ambigua = nucleo([...base,
+      ['publicarPorta', { nome: 'velha', id: 'nova', de: { op: 'cubo', id: 50 } }],
+    ] as any, {}, {});
+    expect(ambigua.orfaos.some((o: any) => o.op === 'publicarPorta' && /exatamente um identificador/.test(o.motivo))).toBe(true);
+  });
 });
 
 /* ---------------------------------------------------------------------------

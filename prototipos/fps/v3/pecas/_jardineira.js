@@ -265,7 +265,9 @@ export const PASSOS = [
 
   // ---- caule: as duas portas saem antes de qualquer transporte ----
   ['cilindro', { origemId: CAULE, raio: 'cauleRaio', altura: 'cauleComprimento', lados: 'cauleLados' }],
-  ['publicarPorta', { nome: 'peDoCaule', de: { op: 'cilindro', id: CAULE, tampa: 'fundo' } }],
+  /* ID é o endereço que a peça cita; rótulo é texto humano e pode evoluir sem
+     quebrar a montagem. A fixture não automotiva prova os dois separados. */
+  ['publicarPorta', { id: 'peDoCaule', rotulo: 'Base enterrada do caule', de: { op: 'cilindro', id: CAULE, tampa: 'fundo' } }],
   ['publicarPorta', { nome: 'coroaDoCaule', de: { op: 'cilindro', id: CAULE, tampa: 'topo' } }],
   ['transladar', { d: ['cauleBaseX', 'terraY', 0], sel: { alias: 'cauleInteiro' } }],
 

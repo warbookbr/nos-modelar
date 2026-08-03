@@ -55,14 +55,14 @@ const VW = 1280, VH = 720;
    coluna que `npm run descrever` imprime. Trocar um nome ou um recorte aqui tem
    que deixar a prova vermelha; é essa a única razão de a lista ser literal. */
 const PORTAS_JARDINEIRA = [
-  { nome: 'assentoDoBotao', origem: 'cone:405 tampa=fundo' },
-  { nome: 'bordaDaFrenteDaSoleira', origem: 'chamferBox:400 aresta=3' },
-  { nome: 'coloDoBulbo', origem: 'esfera:401 faixa=ultima' },
-  { nome: 'coroaDoCaule', origem: 'cilindro:404 tampa=topo' },
-  { nome: 'faixaDaFrenteDaTerra', origem: 'plano:402 faixa=ultima' },
-  { nome: 'leitoDaTerra', origem: 'plano:402' },
-  { nome: 'peDoCaule', origem: 'cilindro:404 tampa=fundo' },
-  { nome: 'soleiraDaJardineira', origem: 'chamferBox:400' },
+  { nome: 'assentoDoBotao', origem: 'assentoDoBotao · cone:405 tampa=fundo' },
+  { nome: 'bordaDaFrenteDaSoleira', origem: 'bordaDaFrenteDaSoleira · chamferBox:400 aresta=3' },
+  { nome: 'coloDoBulbo', origem: 'coloDoBulbo · esfera:401 faixa=ultima' },
+  { nome: 'coroaDoCaule', origem: 'coroaDoCaule · cilindro:404 tampa=topo' },
+  { nome: 'faixaDaFrenteDaTerra', origem: 'faixaDaFrenteDaTerra · plano:402 faixa=ultima' },
+  { nome: 'leitoDaTerra', origem: 'leitoDaTerra · plano:402' },
+  { nome: 'Base enterrada do caule', origem: 'peDoCaule · cilindro:404 tampa=fundo' },
+  { nome: 'soleiraDaJardineira', origem: 'soleiraDaJardineira · chamferBox:400' },
 ];
 
 /* ---- afirmações ---------------------------------------------------------- */

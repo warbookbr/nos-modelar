@@ -152,19 +152,23 @@ describe('_jardineira — A-20: as portas existem fora do núcleo', () => {
     const neutro = montar();
     expect([...neutro.portas.keys()]).toEqual(Object.keys(PORTAS).sort());
     for (const [nome, porta] of neutro.portas) {
-      expect(porta.nome).toBe(nome);
+      expect(porta.id ?? porta.nome).toBe(nome);
       // o passo apontado é MESMO o `publicarPorta` daquele nome
       const passo = (jardineira.PASSOS as any[])[porta.passo];
       expect(passo[0], nome).toBe('publicarPorta');
-      expect(passo[1].nome, nome).toBe(nome);
+      expect(passo[1].id ?? passo[1].nome, nome).toBe(nome);
       expect(porta.de, nome).toEqual(passo[1].de);
       expect(porta.de, `${nome}: 'de' precisa sair clonado`).not.toBe(passo[1].de);
     }
+    expect(neutro.portas.get('peDoCaule')).toMatchObject({
+      id: 'peDoCaule', rotulo: 'Base enterrada do caule',
+    });
   });
 
   it('a régua headless lê a origem declarada de cada porta', () => {
     const lidas = portasPublicadas(montar());
-    expect(Object.fromEntries(lidas.map((p: any) => [p.nome, p.origem]))).toEqual(PORTAS);
+    expect(Object.fromEntries(lidas.map((p: any) => [p.id, p.origem]))).toEqual(PORTAS);
+    expect(lidas.find((p: any) => p.id === 'peDoCaule')?.rotulo).toBe('Base enterrada do caule');
   });
 });
 

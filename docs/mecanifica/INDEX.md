@@ -378,6 +378,9 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 ## Planejamento atual
 
 Não há plano ativo. O plano curto
+[AUT-2026-14](planos/2026-08-02-identidade-porta-estavel.md) fechou a separação
+entre identidade estável e rótulo exibido das portas, mantendo a forma histórica
+reproduzível. O plano curto
 [AUT-2026-13](planos/2026-08-02-recusa-estrutural-montagem.md) fechou a recusa
 estrutural antes de qualquer medição ou prévia. Os Recortes A–G de `AUT-05`
 foram concluídos em
@@ -396,6 +399,10 @@ amplo de colisão exata. Hierarquia, múltiplas relações, persistência e solv
 encerrado em 2 de agosto de 2026 e seu
 resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+
+Os caminhos canônicos dos dois planos curtos mais recentes são
+`docs/mecanifica/planos/2026-08-02-identidade-porta-estavel.md` e
+`docs/mecanifica/planos/2026-08-02-recusa-estrutural-montagem.md`.
 
 Os caminhos canônicos dos sete recortes são
 `docs/mecanifica/planos/2026-08-02-pose-derivada-roda.md`,

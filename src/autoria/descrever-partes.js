@@ -289,8 +289,9 @@ function recorteDe(de) {
 }
 
 /**
- * As portas publicadas pela peça, em ordem de nome: `[{ nome, op, id, recorte,
- * origem, passo }]`, onde `origem` é o texto `op:id` mais o recorte do contrato
+ * As portas publicadas pela peça, em ordem de id estável: `[{ id, rotulo, op,
+ * origemId, recorte, origem, passo }]`. `rotulo` é texto humano independente;
+ * `origem` é o texto `op:origemId` mais o recorte do contrato
  * e `passo` é o índice do `publicarPorta` que a declarou.
  *
  * Peça que não publica porta nenhuma devolve lista vazia. `portas` ausente no
@@ -306,19 +307,24 @@ export function portasPublicadas(neutro) {
   if (!pareceMapa(portas)) {
     throw new Error(`${quem}: 'portas' precisa ser o Map devolvido por nucleo(), recebi ${typeof portas}.`);
   }
-  return [...portas.values()].map((porta) => {
-    if (typeof porta?.nome !== 'string' || !porta.nome
+  return [...portas.entries()].map(([chave, porta]) => {
+    const nova = porta?.id !== undefined;
+    const legada = porta?.nome !== undefined;
+    const id = nova ? porta.id : porta?.nome;
+    const rotulo = nova ? porta?.rotulo : porta?.nome;
+    if (nova === legada || typeof id !== 'string' || !id || typeof rotulo !== 'string' || !rotulo || chave !== id
       || typeof porta.de !== 'object' || porta.de === null || Array.isArray(porta.de)
       || typeof porta.de.op !== 'string' || porta.de.id === undefined) {
       throw new Error(
-        `${quem}: porta ${JSON.stringify(porta?.nome ?? null)} sem contrato {nome, de:{op,id}, passo}.`,
+        `${quem}: porta ${JSON.stringify(id ?? null)} sem contrato estável {id, rotulo, de:{op,id}, passo}.`,
       );
     }
     const recorte = recorteDe(porta.de);
     return {
-      nome: porta.nome,
+      id,
+      rotulo,
       op: porta.de.op,
-      id: porta.de.id,
+      origemId: porta.de.id,
       recorte,
       origem: `${porta.de.op}:${porta.de.id}${recorte ? ` ${recorte}` : ''}`,
       passo: porta.passo,
@@ -715,13 +721,15 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
   );
   const portas = Array.isArray(descricao.portas) ? descricao.portas : [];
   const colunasPorta = [
-    { titulo: 'porta' },
+    { titulo: 'rótulo' },
+    { titulo: 'id estável' },
     { titulo: 'origem' },
     { titulo: 'passo', direita: true },
     { titulo: 'interface' },
   ];
   const linhasPorta = portas.map((porta) => [
-    porta.nome,
+    porta.rotulo,
+    porta.id,
     porta.origem,
     porta.passo,
     porta.interface

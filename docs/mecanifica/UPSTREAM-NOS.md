@@ -112,6 +112,15 @@ a medição antes de acessar a dimensão de outra forma. O resultado preserva a
 causa e a especificação declarada, marca as medidas como indisponíveis e não
 oferece prévia cilíndrica; assim não serializa NaN nem inventa contato local.
 
+**Complemento do UP-034 (AUT-2026-14):** porta nova pode declarar
+`{id, rotulo, de}`. O `id` é a chave estável usada por `sel:{porta}`, relações,
+leitor e exportação; `rotulo` é apenas texto humano e pode mudar sem desconectar
+uma montagem. A forma histórica `{nome, de}` não recebe campo novo e continua
+reproduzível. A jardineira prova a forma nova fora do automotivo; o núcleo e o
+leitor recusam identificador duplicado ou a forma ambígua com `nome` e `id`.
+Ao extrair para o NÓS, leve as duas formas e suas provas; não migre arquivos
+salvos automaticamente sem uma versão e uma evidência próprias.
+
 ## UP-005 — fronteira de renderização provada
 
 **Problema observado:** `oficina.js` já separava `nucleo()` de `adaptarV3()`,

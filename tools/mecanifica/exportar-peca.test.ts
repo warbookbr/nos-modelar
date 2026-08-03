@@ -174,9 +174,18 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect(dado.portas.map((p: any) => p.nome)).toEqual(['pilotoDaRoda']);
     expect(lida.portas.get('pilotoDaRoda')?.interface).toMatchObject({ forma: 'cilindro', papel: 'externa' });
 
-    /* A peça com portas históricas também exporta; a compatibilidade não pode
-       ser uma exceção só para a roda. */
-    await expect(exportarPeca('_jardineira')).resolves.toMatchObject({ dado: { peca: '_jardineira' } });
+    /* A fixture neutra prova a forma nova: o rótulo pode ser humano sem mudar
+       o id que outras receitas citam. Exportar e ler preservam ambos. */
+    const jardineira = await exportarPeca('_jardineira');
+    expect(jardineira.dado).toMatchObject({ peca: '_jardineira' });
+    expect(jardineira.dado.portas).toContainEqual(expect.objectContaining({
+      id: 'peDoCaule', rotulo: 'Base enterrada do caule',
+    }));
+    expect(lerPecaResolvida(jardineira.dado).portas.get('peDoCaule')).toMatchObject({
+      id: 'peDoCaule', rotulo: 'Base enterrada do caule',
+    });
+    const reexecutada = await exportarPeca('_jardineira');
+    expect(reexecutada.texto).toBe(jardineira.texto);
     await expect(exportarPeca('_oficina-esqueleto'), 'esta peça tem esqueleto')
       .rejects.toThrow(/esqueleto/i);
 

@@ -11,9 +11,10 @@ import { createHash } from 'node:crypto';
 
 export const FORMATO_REVISAO = 'mecanifica.revisao-modelagem';
 export const FORMATO_CRITICA = 'mecanifica.critica-modelagem';
-/* v2 acrescenta aparência semântica ao modelo assinado. Leitura de v1 segue
-   estrita para que as evidências já gravadas permaneçam verificáveis. */
-export const VERSAO = 2;
+/* v2 acrescentou aparência; v3 separa id estável de rótulo das portas.
+   As duas versões anteriores seguem verificáveis como evidência histórica. */
+export const VERSAO = 3;
+export const VERSAO_APARENCIA = 2;
 export const VERSAO_LEGADA = 1;
 export const VISTAS_CANONICAS = ['isometrica', 'frontal', 'direita', 'superior'];
 export const CATEGORIAS_CRITICA = ['forma', 'proporcao', 'transicao', 'encaixe', 'material', 'apresentacao'];
@@ -157,7 +158,27 @@ function relacao(valor, partes, quem, campo) {
 
 function portaDaDescricao(valor, quem, campo) {
   objeto(valor, quem, campo);
-  /* A descrição ainda traz `passo` para leitura humana; a revisão o descarta. */
+  /* A descrição traz `passo` para leitura humana; a revisão o descarta. */
+  for (const chave of Object.keys(valor)) {
+    if (!['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem', 'passo'].includes(chave)) erro(quem, `'${campo}.${chave}' não é reconhecido.`);
+  }
+  const porta = {
+    id: texto(valor.id, quem, `${campo}.id`, { semantico: true }),
+    rotulo: texto(valor.rotulo, quem, `${campo}.rotulo`),
+    op: texto(valor.op, quem, `${campo}.op`, { semantico: true }),
+    origemId: idDeOrigem(valor.origemId, quem, `${campo}.origemId`),
+    recorte: typeof valor.recorte === 'string' ? valor.recorte : '',
+    origem: texto(valor.origem, quem, `${campo}.origem`),
+  };
+  if (temIdentidadeProibida(porta)) erro(quem, `${campo} contém identidade proibida.`);
+  return porta;
+}
+
+/* O formato de revisão até v2 chamava a chave da porta de `nome` e reutilizava
+   `id` para a origem geométrica. É ambíguo, mas permanece legível para que uma
+   revisão já assinada continue auditável exatamente como foi gravada. */
+function portaLegadaDaDescricao(valor, quem, campo) {
+  objeto(valor, quem, campo);
   for (const chave of Object.keys(valor)) {
     if (!['nome', 'op', 'id', 'recorte', 'origem', 'passo'].includes(chave)) erro(quem, `'${campo}.${chave}' não é reconhecido.`);
   }
@@ -287,11 +308,11 @@ export function modeloDaDescricao(descricao) {
     pares.add(chave);
   }
   const portas = descricao.portas.map((porta, i) => portaDaDescricao(porta, quem, `descrição.portas[${i}]`))
-    .sort((a, b) => compararTexto(a.nome, b.nome));
-  const nomesPorta = new Set();
+    .sort((a, b) => compararTexto(a.id, b.id));
+  const idsPorta = new Set();
   for (const porta of portas) {
-    if (nomesPorta.has(porta.nome)) erro(quem, `porta '${porta.nome}' foi declarada duas vezes.`);
-    nomesPorta.add(porta.nome);
+    if (idsPorta.has(porta.id)) erro(quem, `porta '${porta.id}' foi declarada duas vezes.`);
+    idsPorta.add(porta.id);
   }
   const totais = {
     partes: inteiro(totaisEntrada.partes, quem, 'descrição.totais.partes'),
@@ -383,9 +404,10 @@ function modeloPersistido(valor, quem, versao) {
     relacoes: valor.relacoes,
     portas: (valor.portas ?? []).map((porta) => ({ ...porta })),
   };
-  if (versao === VERSAO_LEGADA) {
-    /* v1 não assinava aparência. Ela continua válida como evidência histórica,
-       mas toda revisão nova nasce em v2. */
+  if (versao <= VERSAO_APARENCIA) {
+    /* v1 não assinava aparência; v2 ainda usava a porta ambígua nome/id.
+       Ambas permanecem válidas como evidência histórica, sem reescrever a
+       forma que sua assinatura original cobria. */
     if (!Array.isArray(valor.partes) || !Array.isArray(valor.relacoes) || !Array.isArray(valor.portas)) {
       erro(quem, 'modelo legado tem partes, relacoes ou portas fora de lista.');
     }
@@ -403,7 +425,7 @@ function modeloPersistido(valor, quem, versao) {
       if (pares.has(chave)) erro(quem, `a relação entre '${item.a}' e '${item.b}' aparece mais de uma vez.`);
       pares.add(chave);
     }
-    const portas = descricao.portas.map((porta) => portaDaDescricao(porta, quem, 'modelo.portas[]')).sort((a, b) => compararTexto(a.nome, b.nome));
+    const portas = descricao.portas.map((porta) => portaLegadaDaDescricao(porta, quem, 'modelo.portas[]')).sort((a, b) => compararTexto(a.nome, b.nome));
     const nomesPorta = new Set(portas.map((porta) => porta.nome));
     if (nomesPorta.size !== portas.length) erro(quem, 'modelo legado repete porta.');
     const totaisLegados = {
@@ -415,13 +437,18 @@ function modeloPersistido(valor, quem, versao) {
     if (totaisLegados.partes !== partes.length || totaisLegados.portas !== portas.length) {
       erro(quem, 'contagens de partes ou portas divergem da descrição detalhada.');
     }
-    return { totais: totaisLegados, partes, relacoes, portas };
+    if (versao === VERSAO_LEGADA) return { totais: totaisLegados, partes, relacoes, portas };
+    descricao.aparencia = valor.aparencia;
+    return {
+      totais: totaisLegados, partes, relacoes, portas,
+      aparencia: aparenciaDaDescricao(descricao.aparencia, partes, quem),
+    };
   }
   descricao.aparencia = valor.aparencia;
   /* A entrada persistida não aceita `passo`; ela é reidratada só para reutilizar
      a projeção da descrição e a validação detalhada. */
   for (const porta of descricao.portas) {
-    chavesExatas(porta, ['nome', 'op', 'id', 'recorte', 'origem'], quem, 'modelo.portas[]');
+    chavesExatas(porta, ['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem'], quem, 'modelo.portas[]');
   }
   return modeloDaDescricao(descricao);
 }
@@ -431,7 +458,7 @@ export function validarRevisao(revisao) {
   const quem = 'validarRevisao';
   objeto(revisao, quem, 'revisão');
   chavesExatas(revisao, ['formato', 'versao', 'peca', 'assinaturaModelo', 'modelo', 'vistas'], quem, 'revisão');
-  if (revisao.formato !== FORMATO_REVISAO || ![VERSAO_LEGADA, VERSAO].includes(revisao.versao)) erro(quem, 'formato ou versão não suportados.');
+  if (revisao.formato !== FORMATO_REVISAO || ![VERSAO_LEGADA, VERSAO_APARENCIA, VERSAO].includes(revisao.versao)) erro(quem, 'formato ou versão não suportados.');
   const peca = texto(revisao.peca, quem, 'peca', { semantico: true });
   const modelo = modeloPersistido(revisao.modelo, quem, revisao.versao);
   const assinaturaModelo = assinatura(modelo);
@@ -554,7 +581,7 @@ export function compararRevisoes(revisaoAnterior, revisaoAtual, criticaAnterior 
   if (anterior.peca !== atual.peca) throw new Error('compararRevisoes: só compara revisões da mesma peça.');
   const partes = mudarMapas(anterior.modelo.partes, atual.modelo.partes, (item) => item.nome);
   const relacoes = mudarMapas(anterior.modelo.relacoes, atual.modelo.relacoes, (item) => [item.a, item.b].sort(compararTexto).join('\u0000'));
-  const portas = mudarMapas(anterior.modelo.portas, atual.modelo.portas, (item) => item.nome);
+  const portas = mudarMapas(anterior.modelo.portas, atual.modelo.portas, (item) => item.id ?? item.nome);
   const aparencia = {
     materiais: mudarMapas(anterior.modelo.aparencia?.materiais ?? [], atual.modelo.aparencia?.materiais ?? [], (item) => item.nome),
     partes: mudarMapas(anterior.modelo.aparencia?.partes ?? [], atual.modelo.aparencia?.partes ?? [], (item) => item.nome),

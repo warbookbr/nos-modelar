@@ -172,12 +172,13 @@ export function resolverPortasDeMontagem(instancias) {
     vistos.add(id);
     const { local, referencial, mundo } = mundoDaInstancia(instancia, `${quem}.${id}`);
     if (!(instancia.neutro?.portas instanceof Map)) falhar(quem, `instância '${id}' não traz portas do núcleo.`);
-    for (const [nome, porta] of instancia.neutro.portas) {
+    for (const [idPorta, porta] of instancia.neutro.portas) {
       if (!porta?.interface) continue;
-      const base = interfaceDeMontagem(porta, `${quem}.${id}.${nome}`);
-      const chave = `${id}.${nome}`;
+      const base = interfaceDeMontagem(porta, `${quem}.${id}.${idPorta}`);
+      const chave = `${id}.${idPorta}`;
       const resolvida = {
-        id: chave, instancia: id, porta: nome,
+        id: chave, instancia: id, porta: idPorta,
+        rotulo: porta.rotulo ?? porta.nome ?? idPorta,
         ...base,
         eixo: multiplicar(aplicarMatriz(mundo.rotacao, base.eixo), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.eixo))),
         ...(base.referencia === undefined ? {} : {

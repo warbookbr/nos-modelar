@@ -19,7 +19,7 @@ import {
   VERSAO,
 } from './revisao-modelagem.mjs';
 
-function descricao({ raio = 10, faces = 12, porta = 'eixo', relacaoTipo = 'interpenetra' } = {}) {
+function descricao({ raio = 10, faces = 12, porta = 'eixo', rotulo = porta, relacaoTipo = 'interpenetra' } = {}) {
   return {
     totais: { partes: 2, faces, vertices: 16, facesSemParte: 0, orfaos: 0, portas: 1 },
     partes: [
@@ -31,7 +31,7 @@ function descricao({ raio = 10, faces = 12, porta = 'eixo', relacaoTipo = 'inter
     ],
     /* Forma real da jardineira: uma origem semântica pode ter id numérico,
        como `cone:405`; isso NÃO é a posição do passo 17, que sai da revisão. */
-    portas: [{ nome: porta, op: 'cone', id: 405, recorte: '', origem: 'cone:405', passo: 17 }],
+    portas: [{ id: porta, rotulo, op: 'cone', origemId: 405, recorte: '', origem: 'cone:405', passo: 17 }],
     aparencia: {
       materiais: [{ nome: 'metal', propriedades: { cor: '#808080', aspereza: 0.5 } }],
       partes: [
@@ -75,14 +75,14 @@ describe('revisão assistida por IA', () => {
     expect(a.vistas.map((vista) => vista.nome)).toEqual(['isometrica', 'frontal', 'direita', 'superior']);
     expect(jsonCanonico(a)).not.toContain('passo');
     expect(jsonCanonico(a)).not.toContain('127.0.0.1');
-    expect(a.modelo.portas[0]).toMatchObject({ nome: 'eixo', op: 'cone', id: 405, origem: 'cone:405' });
+    expect(a.modelo.portas[0]).toMatchObject({ id: 'eixo', rotulo: 'eixo', op: 'cone', origemId: 405, origem: 'cone:405' });
   });
 
   it('recusa UUID, identidade posicional persistida e enquadramento sem gate', () => {
     expect(() => construirRevisao({ peca: '550e8400-e29b-41d4-a716-446655440000', descricao: descricao(), vistas: vistas() })).toThrow(/UUID/);
     const adulterada = structuredClone(revisao());
     adulterada.modelo.portas[0].passo = 2;
-    expect(() => validarRevisao(adulterada)).toThrow(/posicional/);
+    expect(() => validarRevisao(adulterada)).toThrow(/não é reconhecido|posicional/);
     expect(() => construirRevisao({
       peca: 'rodaTeste', descricao: descricao(),
       vistas: vistas().map((vista) => vista.nome === 'direita' ? { ...vista, enquadramento: { ...vista.enquadramento, valida: false } } : vista),
@@ -96,7 +96,7 @@ describe('revisão assistida por IA', () => {
     );
     const resultado = construirRevisao({ peca: '_jardineira', descricao: descreverPeca(neutro), vistas: vistas() });
     expect(resultado.modelo.portas).toContainEqual(expect.objectContaining({
-      nome: 'assentoDoBotao', op: 'cone', id: 405, origem: 'cone:405 tampa=fundo',
+      id: 'assentoDoBotao', rotulo: 'assentoDoBotao', op: 'cone', origemId: 405, origem: 'cone:405 tampa=fundo',
     }));
     expect(jsonCanonico(resultado)).not.toContain('"passo"');
   });
@@ -200,5 +200,15 @@ describe('revisão assistida por IA', () => {
     expect(diff.relacoes.alteradas).toHaveLength(1);
     expect(diff.criticaAnterior.obsoleta).toBe(true);
     expect(marcarCriticaObsoleta(critica, anterior.assinaturaModelo).obsoleta).toBe(false);
+  });
+
+  it('trocar apenas o rótulo altera a mesma porta, sem removê-la ou recriá-la', () => {
+    const anterior = revisao({ porta: 'baseDoEixo', rotulo: 'Base do eixo' });
+    const atual = revisao({ porta: 'baseDoEixo', rotulo: 'Base inferior do eixo' });
+    const diff = compararRevisoes(anterior, atual);
+    expect(diff.portas.adicionadas).toEqual([]);
+    expect(diff.portas.removidas).toEqual([]);
+    expect(diff.portas.alteradas).toHaveLength(1);
+    expect(diff.portas.alteradas[0].chave).toBe('baseDoEixo');
   });
 });

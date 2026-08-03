@@ -356,11 +356,13 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 - [x] definir convenção mínima: eixo + referência perpendicular formam quadro
   destro; metros locais passam por escala uniforme, rotação 3×3 própria e
   deslocamento explícito;
-- [ ] separar identidade da porta, rótulo e dados derivados;
+- [x] separar identidade da porta, rótulo e dados derivados (`id` estável;
+  rótulo humano independente; dados de origem/interface continuam derivados);
 - [ ] declarar comportamento sob espelho e `arranja`;
 - [x] validar vetores nulos, não finitos e medidas negativas na interface cilíndrica;
-- [x] expor a interface cilíndrica no `descrever`; a bancada ainda só lista a porta;
-- [ ] provar replay e round-trip fora do domínio automotivo.
+- [x] expor a interface cilíndrica no `descrever` e id/rótulo/origem na bancada;
+- [x] provar replay e round-trip fora do domínio automotivo (`_jardineira`
+  exporta, lê e reexecuta sem perder id, rótulo ou origem).
 
 ## Nível 2 — relações dirigidas sem reposicionamento
 
