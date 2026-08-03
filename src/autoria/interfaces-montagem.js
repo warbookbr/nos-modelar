@@ -54,6 +54,42 @@ function matrizDeRotacao(valor, quem) {
   return matriz;
 }
 
+function transformacaoRigida(valor, quem, { aceitarEscala = true } = {}) {
+  if (valor === undefined) return { escala: 1, rotacao: identidade3(), deslocamento: [0, 0, 0] };
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto de transformação.');
+  const permitidas = new Set([...(aceitarEscala ? ['escala'] : []), 'rotacao', 'deslocamento']);
+  const extras = Object.keys(valor).filter((chave) => !permitidas.has(chave));
+  if (extras.length) falhar(quem, `tem chave(s) desconhecida(s): ${extras.sort().join(', ')}.`);
+  return {
+    escala: escalar(valor.escala ?? 1, `${quem}.escala`, { positivo: true }),
+    rotacao: matrizDeRotacao(valor.rotacao, `${quem}.rotacao`),
+    deslocamento: vetor(valor.deslocamento ?? [0, 0, 0], `${quem}.deslocamento`),
+  };
+}
+
+function comporTransformacoes(referencial, local) {
+  return {
+    escala: referencial.escala * local.escala,
+    rotacao: multiplicarMatrizes(referencial.rotacao, local.rotacao),
+    deslocamento: somar(
+      multiplicar(aplicarMatriz(referencial.rotacao, local.deslocamento), referencial.escala),
+      referencial.deslocamento,
+    ),
+  };
+}
+
+function localDaTransformacao(referencial, mundo) {
+  const inversa = transpor(referencial.rotacao);
+  return {
+    escala: mundo.escala / referencial.escala,
+    rotacao: multiplicarMatrizes(inversa, mundo.rotacao),
+    deslocamento: multiplicar(
+      aplicarMatriz(inversa, subtrair(mundo.deslocamento, referencial.deslocamento)),
+      1 / referencial.escala,
+    ),
+  };
+}
+
 function interfaceCilindrica(porta, quem) {
   const i = porta?.interface;
   if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
@@ -77,8 +113,9 @@ function interfaceCilindrica(porta, quem) {
 /**
  * Resolve portas de várias peças para uma montagem já posada. A transformação
  * suportada neste recorte é escala uniforme positiva, rotação própria 3×3 e
- * deslocamento explícitos. Espelho, pai e composição pertencem aos níveis
- * seguintes.
+ * deslocamento explícitos. Um `referencial` técnico opcional é composto antes
+ * da transformação local da instância; ele não tem id, filhos ou semântica de
+ * pai. Espelho e composição em árvore pertencem aos níveis seguintes.
  */
 export function resolverPortasDeMontagem(instancias) {
   const quem = 'resolverPortasDeMontagem';
@@ -90,9 +127,11 @@ export function resolverPortasDeMontagem(instancias) {
     if (typeof id !== 'string' || !id) falhar(quem, 'cada instância precisa de id não vazio.');
     if (vistos.has(id)) falhar(quem, `instância '${id}' duplicada.`);
     vistos.add(id);
-    const escala = escalar(instancia.escala ?? 1, `${quem}.${id}.escala`, { positivo: true });
-    const rotacao = matrizDeRotacao(instancia.rotacao, `${quem}.${id}.rotacao`);
-    const deslocamento = vetor(instancia.deslocamento ?? [0, 0, 0], `${quem}.${id}.deslocamento`);
+    const local = transformacaoRigida({
+      escala: instancia.escala, rotacao: instancia.rotacao, deslocamento: instancia.deslocamento,
+    }, `${quem}.${id}.local`);
+    const referencial = transformacaoRigida(instancia.referencial, `${quem}.${id}.referencial`, { aceitarEscala: false });
+    const mundo = comporTransformacoes(referencial, local);
     if (!(instancia.neutro?.portas instanceof Map)) falhar(quem, `instância '${id}' não traz portas do núcleo.`);
     for (const [nome, porta] of instancia.neutro.portas) {
       if (!porta?.interface) continue;
@@ -101,15 +140,19 @@ export function resolverPortasDeMontagem(instancias) {
       resultado.set(chave, {
         id: chave, instancia: id, porta: nome,
         ...base,
-        eixo: multiplicar(aplicarMatriz(rotacao, base.eixo), 1 / comprimento(aplicarMatriz(rotacao, base.eixo))),
+        eixo: multiplicar(aplicarMatriz(mundo.rotacao, base.eixo), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.eixo))),
         ...(base.referencia === undefined ? {} : {
-          referencia: multiplicar(aplicarMatriz(rotacao, base.referencia), 1 / comprimento(aplicarMatriz(rotacao, base.referencia))),
+          referencia: multiplicar(aplicarMatriz(mundo.rotacao, base.referencia), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.referencia))),
         }),
-        centro: somar(multiplicar(aplicarMatriz(rotacao, base.centro), escala), deslocamento),
-        raio: base.raio * escala,
-        inicio: base.inicio * escala,
-        fim: base.fim * escala,
-        transformacao: { escala, rotacao: rotacao.map((linha) => linha.slice()), deslocamento: deslocamento.slice() },
+        centro: somar(multiplicar(aplicarMatriz(mundo.rotacao, base.centro), mundo.escala), mundo.deslocamento),
+        raio: base.raio * mundo.escala,
+        inicio: base.inicio * mundo.escala,
+        fim: base.fim * mundo.escala,
+        transformacao: {
+          mundo: { escala: mundo.escala, rotacao: mundo.rotacao.map((linha) => linha.slice()), deslocamento: mundo.deslocamento.slice() },
+          local: { escala: local.escala, rotacao: local.rotacao.map((linha) => linha.slice()), deslocamento: local.deslocamento.slice() },
+          referencial: { escala: referencial.escala, rotacao: referencial.rotacao.map((linha) => linha.slice()), deslocamento: referencial.deslocamento.slice() },
+        },
       });
     }
   }
@@ -180,15 +223,20 @@ export function derivarPreviaDeEncaixeCilindrico(declaracao, portas) {
   const pontoMovel = pontoAxial(movel, pose.movelAxial, `${quem}.${id}.movelAxial`);
   const deltaRotacao = multiplicarMatrizes(quadroReferencia, transpor(quadroMovel));
   const deslocamentoDoDelta = subtrair(pontoReferencia, aplicarMatriz(deltaRotacao, pontoMovel));
-  const rotacao = multiplicarMatrizes(deltaRotacao, movel.transformacao.rotacao);
-  const deslocamento = somar(aplicarMatriz(deltaRotacao, movel.transformacao.deslocamento), deslocamentoDoDelta);
+  const mundo = {
+    escala: movel.transformacao.mundo.escala,
+    rotacao: multiplicarMatrizes(deltaRotacao, movel.transformacao.mundo.rotacao),
+    deslocamento: somar(aplicarMatriz(deltaRotacao, movel.transformacao.mundo.deslocamento), deslocamentoDoDelta),
+  };
+  const local = localDaTransformacao(movel.transformacao.referencial, mundo);
   return {
     id, tipo: 'encaixaCilindrico', aplicavel: true, diagnosticos: [],
     previa: {
       instancia: movel.instancia,
-      escala: movel.transformacao.escala,
-      rotacao,
-      deslocamento,
+      escala: local.escala,
+      rotacao: local.rotacao,
+      deslocamento: local.deslocamento,
+      mundo,
     },
   };
 }

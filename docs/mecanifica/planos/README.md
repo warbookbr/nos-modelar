@@ -7,6 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-08`/Recorte C foi concluído em
+[`AUT-2026-08`](2026-08-02-pose-em-referencial.md): composição local/mundo em
+referencial técnico rígido, sem abrir hierarquia.
+
 `AUT-07`/Recorte B foi concluído em
 [`AUT-2026-07`](2026-08-02-pose-derivada-roda.md): prévia pura e única de pose
 para roda/cubo e pino/luva, por quadro e relação explicitamente declarados.

@@ -6,9 +6,10 @@ fechem, por acidente, o caminho para montagens maiores — e para que a visão d
 longo prazo não autorize a construção prematura de um CAD ou solucionador
 universal.
 
-**Estado deste documento:** os Recortes A e B foram concluídos por
+**Estado deste documento:** os Recortes A, B e C foram concluídos por
 [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
-[`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md). O documento continua
+[`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md) e
+[`AUT-2026-08`](planos/2026-08-02-pose-em-referencial.md). O documento continua
 um mapa de teto: nenhum item abaixo substitui um plano curto ativo em
 `planos/README.md`.
 
@@ -431,7 +432,8 @@ introduzem infinitas respostas equivalentes.
 
 - [x] congelar a regra “referência fixa, recebido móvel”;
 - [x] implementar prévia pura e aplicação por cópia, sem persistência;
-- [ ] provar composição local/mundo e pai transformado;
+- [x] provar composição local/mundo em referencial técnico rígido; pai semântico
+  continua pertencendo à hierarquia do nível 5;
 - [x] testar idempotência, determinismo e ausência de mutação/rollback;
 - [x] recusar reflexão e escala não uniforme fora do contrato inicial;
 - [x] comparar pose derivada com o baseline do nível 0.

@@ -169,3 +169,48 @@ describe('pose derivada de uma relação — AUT-2026-07', () => {
     expect(() => resolver(montagem)).toThrow(/número finito > 0/);
   });
 });
+
+describe('pose local em referencial técnico — AUT-2026-08', () => {
+  const rotacaoY90 = [[0, 0, 1], [0, 1, 0], [-1, 0, 0]];
+  const referencial = { rotacao: rotacaoY90, deslocamento: [0.8, -0.3, 0.4] };
+
+  it('três poses locais no mesmo referencial chegam à mesma pose mundial do encaixe', () => {
+    const semReferencial = montarPinoELuva();
+    semReferencial.instancias[1] = { ...semReferencial.instancias[1], deslocamento: [0.02, -0.06, 0.04] };
+    const esperado = derivarPreviaDeEncaixeCilindrico(semReferencial.relacao, resolver(semReferencial));
+    expect(esperado.aplicavel).toBe(true);
+
+    const poses = [
+      {},
+      { deslocamento: [-0.1, 0.08, 0.04] },
+      { rotacao: rotacaoY90, deslocamento: [0.02, -0.05, 0.09] },
+    ];
+    const finais = poses.map((pose) => {
+      const montagem = montarPinoELuva();
+      montagem.instancias[1] = { ...montagem.instancias[1], ...pose, referencial };
+      const previa = derivarPreviaDeEncaixeCilindrico(montagem.relacao, resolver(montagem));
+      expect(previa.aplicavel).toBe(true);
+      const instancias = aplicarPreviaDePose(montagem.instancias, previa);
+      expect(instancias[1].referencial).toEqual(referencial);
+      expect(validarEncaixeCilindrico(montagem.relacao, resolverPortasDeMontagem(instancias)).satisfeita).toBe(true);
+      previa.previa.mundo.deslocamento.forEach((valor: number, i: number) => expect(valor).toBeCloseTo(esperado.previa.mundo.deslocamento[i], 9));
+      previa.previa.mundo.rotacao.flat().forEach((valor: number, i: number) => expect(valor).toBeCloseTo(esperado.previa.mundo.rotacao.flat()[i], 9));
+      return previa.previa;
+    });
+    for (const final of finais.slice(1)) {
+      final.deslocamento.forEach((valor: number, i: number) => expect(valor).toBeCloseTo(finais[0].deslocamento[i], 9));
+      final.rotacao.flat().forEach((valor: number, i: number) => expect(valor).toBeCloseTo(finais[0].rotacao.flat()[i], 9));
+    }
+  });
+
+  it('referencial inválido falha antes de produzir porta ou prévia parcial', () => {
+    const montagem = montarPinoELuva();
+    montagem.instancias[1] = {
+      ...montagem.instancias[1],
+      referencial: { rotacao: [[-1, 0, 0], [0, 1, 0], [0, 0, 1]] },
+    };
+    expect(() => resolver(montagem)).toThrow(/referencial\.rotacao.*rotação própria/);
+    montagem.instancias[1] = { ...montagem.instancias[1], referencial: { escala: 1.2 } };
+    expect(() => resolver(montagem)).toThrow(/referencial.*chave\(s\) desconhecida\(s\): escala/);
+  });
+});
