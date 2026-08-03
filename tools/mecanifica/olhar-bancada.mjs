@@ -13,6 +13,7 @@
  *   npm run bancada -- freio-disco --selecionadas=disco,pinca --modo=contexto
  *   npm run bancada -- freio-disco --explosao=0.4 --projecao=ortografica
  *   npm run bancada -- freio-disco --selecionadas=pastilhaInterna --focar
+ *   npm run bancada -- _freio-hierarquia --par=pastilhaInterna,pistao
  *   npm run bancada -- --listar                           # peças disponíveis
  *
  * Saída: tools/bancadas/out/bancada-<peça>-<vista>[-<estado>].png — e o passo
@@ -53,7 +54,7 @@ let bandeira;
 let peca;
 try {
   const lido = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['vistas', 'selecionadas', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
+    opcoes: ['vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
     bandeiras: ['listar', 'estrito', 'focar', 'revisar'],
     posicional: { nome: 'a peça', obrigatorio: false },
   });
@@ -63,12 +64,28 @@ try {
 }
 
 const revisar = bandeira('revisar');
+const parPedida = opcao('par');
 if (revisar && opcao('vistas') != null) erroDeUso('--revisar já define as vistas; não misture com --vistas');
-const vistas = (revisar ? 'isometrica,frontal,direita,superior' : opcao('vistas', 'isometrica,frontal,direita'))
+if (parPedida !== null && revisar) erroDeUso('--par é inspeção dirigida; não misture com --revisar.');
+if (parPedida !== null && opcao('vistas') !== null) erroDeUso('--par escolhe a vista legível; não misture com --vistas.');
+if (parPedida !== null && opcao('selecionadas') !== null) erroDeUso('--par já declara as duas partes; não misture com --selecionadas.');
+const selecionadas = (parPedida ?? opcao('selecionadas', ''))
+  .split(',').map((s) => s.trim()).filter(Boolean);
+const par = parPedida === null ? null : [...new Set(selecionadas)].sort();
+if (parPedida !== null && (par.length !== 2 || par.length !== selecionadas.length)) {
+  erroDeUso('--par exige exatamente duas partes semânticas diferentes, separadas por vírgula.');
+}
+if (parPedida !== null && bandeira('focar')) erroDeUso('--par já enquadra as duas partes; não misture com --focar.');
+if (parPedida !== null && opcao('modo') !== null && opcao('modo') !== 'isolar') {
+  erroDeUso('--par sempre isola o par; não misture com outro --modo.');
+}
+if (parPedida !== null && opcao('explosao') !== null && Number(opcao('explosao')) !== 0) {
+  erroDeUso('--par não aceita explosão: a inspeção não desloca geometria.');
+}
+const vistas = par ? ['inspecao-par'] : (revisar ? 'isometrica,frontal,direita,superior' : opcao('vistas', 'isometrica,frontal,direita'))
   .split(',').map((v) => v.trim()).filter(Boolean);
-const selecionadas = opcao('selecionadas', '').split(',').map((s) => s.trim()).filter(Boolean);
-const modo = opcao('modo', 'todas');
-const projecao = opcao('projecao', revisar ? 'ortografica' : 'perspectiva');
+const modo = par ? 'isolar' : opcao('modo', 'todas');
+const projecao = opcao('projecao', revisar || par ? 'ortografica' : 'perspectiva');
 const explosao = Number(opcao('explosao', '0'));
 const largura = Math.max(640, parseInt(opcao('res', '1280'), 10) || 1280);
 const altura = Math.round(largura * 9 / 16);
@@ -105,6 +122,7 @@ const relatorioDeclarado = caminhoInterno(opcao('relatorio'), 'relatorio');
 if (saidaDeclarada && !peca) erroDeUso('--saida exige o nome da peça.');
 
 for (const vista of vistas) {
+  if (vista === 'inspecao-par') continue;
   if (!VISTAS.includes(vista)) erroDeUso(`vista '${vista}' não existe. Use: ${VISTAS.join(', ')}`);
 }
 if (!MODOS.includes(modo)) erroDeUso(`modo '${modo}' não existe. Use: ${MODOS.join(', ')}`);
@@ -127,6 +145,7 @@ const vite = await createServer({
 await vite.listen();
 const { port } = vite.httpServer.address();
 const base = `http://127.0.0.1:${port}/nos-mecanifica/bancada.html`;
+const basePublicada = 'https://warbookbr.github.io/nos-mecanifica/bancada.html';
 
 const pw = (await import(pathToFileURL(PW).href)).default;
 const browser = await pw.chromium.launch({
@@ -158,12 +177,16 @@ function urlDa(vista) {
   const params = new URLSearchParams();
   if (peca) params.set('peca', peca);
   if (selecionadas.length) params.set('selecionadas', [...selecionadas].sort().join(','));
-  if (vista !== 'isometrica') params.set('vista', vista);
+  if (VISTAS.includes(vista) && vista !== 'isometrica') params.set('vista', vista);
   if (projecao === 'ortografica') params.set('projecao', 'ortografica');
   if (modo !== 'todas') params.set('modo', modo);
   if (explosao > 0) params.set('explosao', explosao.toFixed(2));
   const query = params.toString();
   return query ? `${base}?${query}` : base;
+}
+
+function urlPublicadaDa(urlLocal) {
+  return `${basePublicada}${new URL(urlLocal).search}`;
 }
 
 /* sufixo do arquivo: o estado não-padrão entra no nome, para que duas rodadas
@@ -173,6 +196,7 @@ const partesDoSufixo = [
   modo !== 'todas' ? modo : null,
   projecao === 'ortografica' ? 'orto' : null,
   explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
+  par ? 'par' : null,
   focar ? 'focado' : null,
 ].filter(Boolean);
 const sufixo = partesDoSufixo.length ? `-${partesDoSufixo.join('-')}` : '';
@@ -264,19 +288,48 @@ try {
         });
         break;
       }
-      if (focar) {
-        console.log(
-          `atenção: --focar ${modo === 'contexto' ? 'preserva a montagem no enquadramento' : 'enquadra a seleção'},`
-          + ' mas o recorte AINDA NÃO entra na URL.'
-          + '\n         quem abrir o endereço abaixo verá a peça inteira, não este recorte.',
-        );
-      }
       console.log('');
     }
 
-    if (focar) await page.evaluate(() => window.__mecanificaBancada.focar());
+    let resultadoPar = null;
+    let vistaRelatada = vista;
+    if (par) {
+      resultadoPar = await page.evaluate((partes) => window.__mecanificaBancada.inspecionarPar(partes), par);
+      if (!resultadoPar?.valida) {
+        console.error(`\nINSPEÇÃO DE PAR RECUSADA\n  ${resultadoPar?.motivo ?? 'a bancada não devolveu resultado válido.'}`);
+        falhou = true;
+        falhasRelatadas.push({
+          categoria: 'modelo', codigo: 'par_invalido', vista: null,
+          mensagem: 'A inspeção de par não recebeu duas partes semânticas válidas.',
+          acao: 'Passe exatamente dois nomes publicados pela peça.',
+        });
+        break;
+      }
+      vistaRelatada = resultadoPar.vistaEscolhida;
+      const leitura = resultadoPar.pixels.map((item) => `${item.nome}: ${item.pixels}px`).join(', ');
+      console.log(`inspeção de par: ${resultadoPar.partes.join(' + ')}`);
+      console.log(`vista escolhida: ${vistaRelatada} (${leitura})`);
+      console.log(`candidatas: ${resultadoPar.candidatas.map((item) => (
+        `${item.vista}=${item.menor}px/${item.total}px`
+      )).join(', ')}`);
+      if (!resultadoPar.legivel) {
+        console.error('  diagnóstico: nenhuma vista canônica deixou as duas partes legíveis (mínimo de 64px por parte).');
+        falhou = true;
+        falhasRelatadas.push({
+          categoria: 'camera', codigo: 'par_sem_vista_legivel', vista: vistaRelatada,
+          mensagem: 'Nenhuma vista canônica mostrou as duas partes com leitura suficiente.',
+          acao: 'Escolha uma vista explicitamente ou revise a peça; a ferramenta não moverá componentes.',
+        });
+      }
+    } else if (focar) {
+      await page.evaluate(() => window.__mecanificaBancada.focar());
+    }
 
     await page.waitForTimeout(espera);
+    /* A URL é lida DEPOIS do foco/da escolha automática. Antes deste ponto ela
+       descrevia a montagem carregada, não a câmera que foi efetivamente usada
+       na captura. */
+    const urlReproduzivel = await page.evaluate(() => window.__mecanificaBancada.url());
     const enquadramento = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
     if (revisar) {
       const medida = `ocupação ${(enquadramento.area * 100).toFixed(1)}% (${(enquadramento.largura * 100).toFixed(1)}% × ${(enquadramento.altura * 100).toFixed(1)}%)`;
@@ -303,7 +356,7 @@ try {
        pontos). O transporte para a revisão só leva o contrato público e
        persistível de enquadramento. */
     vistasRelatadas.push({
-      nome: vista,
+      nome: vistaRelatada,
       enquadramento: {
         valida: enquadramento.valida,
         area: enquadramento.area,
@@ -311,6 +364,14 @@ try {
         altura: enquadramento.altura,
         cortado: enquadramento.cortado,
       },
+      ...(resultadoPar ? {
+        inspecaoDePar: {
+          partes: resultadoPar.partes,
+          vistaEscolhida: resultadoPar.vistaEscolhida,
+          pixels: resultadoPar.pixels,
+          legivel: resultadoPar.legivel,
+        },
+      } : {}),
     });
     pecaRelatada = relato.peca;
     const arquivo = join(diretorioSaida, `bancada-${relato.peca}-${vista}${sufixo}.png`);
@@ -322,7 +383,9 @@ try {
       throw erro;
     }
     await page.screenshot({ path: arquivo });
-    console.log(`${vista.padEnd(11)} ${arquivo}\n            ${url}`);
+    console.log(`${vistaRelatada.padEnd(11)} ${arquivo}`);
+    console.log(`            local: ${urlReproduzivel}`);
+    console.log(`            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
   }
 } finally {
   await browser.close();

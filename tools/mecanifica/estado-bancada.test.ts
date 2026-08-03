@@ -99,6 +99,7 @@ describe('estado da bancada', () => {
       modo: 'contexto',
       explosao: 0.42,
       cameraLivre: null,
+      inspecao: null,
     });
   });
 
@@ -128,6 +129,7 @@ describe('estado da bancada', () => {
       vista: 'livre',
       projecao: 'ortografica',
       cameraLivre: lerCameraLivreDaUrl(escreverCameraLivreNaUrl(camera)),
+      inspecao: null,
     });
   });
 
@@ -140,5 +142,17 @@ describe('estado da bancada', () => {
     });
     expect(escreverEstadoNaUrl({ vista: 'direita', projecao: 'ortografica' }))
       .toBe('vista=direita&projecao=ortografica');
+  });
+
+  it('preserva a marca visual da inspeção de par sem alterar URLs anteriores', () => {
+    const query = escreverEstadoNaUrl({
+      selecionadas: ['pistao', 'pastilhaInterna'],
+      vista: 'livre',
+      cameraLivre: { posicao: [2, 1, 3], alvo: [0, 1, 0], acima: [0, 1, 0], zoom: 1 },
+      modo: 'isolar',
+      inspecao: 'par',
+    });
+    expect(query).toContain('inspecao=par');
+    expect(lerEstadoDaUrl(new URLSearchParams(query), ['pastilhaInterna', 'pistao']).inspecao).toBe('par');
   });
 });

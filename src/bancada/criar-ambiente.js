@@ -150,6 +150,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   let centroAtual = new THREE.Vector3(0, 0.9, 0);
   let raioAtual = 2;
   let transicao = null;
+  let publicarCameraLivreAoEstabilizar = false;
 
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -161,6 +162,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   controls.target.copy(centroAtual);
   controls.addEventListener('start', () => {
     transicao = null;
+    publicarCameraLivreAoEstabilizar = false;
     vistaAtual = 'livre';
     aoMudarVista?.(vistaAtual);
   });
@@ -223,6 +225,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
 
   function definirVista(vista, { instantaneo = false } = {}) {
     if (!VISTAS_BANCADA[vista]) return;
+    publicarCameraLivreAoEstabilizar = false;
     vistaAtual = vista;
     ajustarOrtografica();
     const direcao = VISTAS_BANCADA[vista].direcao;
@@ -236,7 +239,15 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     aoMudarVista?.(vistaAtual);
   }
 
-  function enquadrar(objetos = alvosAtuais, { instantaneo = false } = {}) {
+  /* Focar muda o alvo e a distância, portanto deixa de ser a vista canônica
+     que o iniciou. Só depois da transição a promovemos a `livre`: assim a URL
+     recebe a câmera que de fato apareceu na tela, não a posição intermediária. */
+  function promoverCameraAtualParaLivre() {
+    vistaAtual = 'livre';
+    aoMudarVista?.(vistaAtual);
+  }
+
+  function enquadrar(objetos = alvosAtuais, { instantaneo = false, reproduzivel = false } = {}) {
     const caixa = caixaValida(objetos);
     if (caixa) {
       centroAtual = caixa.getCenter(new THREE.Vector3());
@@ -244,6 +255,10 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       alvosAtuais = objetos.slice();
     }
     definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo });
+    if (reproduzivel) {
+      if (transicao) publicarCameraLivreAoEstabilizar = true;
+      else promoverCameraAtualParaLivre();
+    }
   }
 
   function definirProjecao(projecao) {
@@ -373,6 +388,68 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       cortado,
     };
   }
+
+  /* Não inferimos oclusão por caixa ou por nome. A prova de par usa um render
+     temporário de ID por parte, com depth buffer normal, e conta os pixels que
+     realmente chegaram à tela. Materiais, piso e cena voltam exatamente ao
+     estado anterior antes do próximo quadro visível. */
+  function medirPixelsVisiveisPorParte(objetos) {
+    const grupos = objetos.filter(Boolean);
+    const tamanho = renderer.getDrawingBufferSize(new THREE.Vector2());
+    const largura = Math.max(1, Math.min(1024, tamanho.x));
+    const altura = Math.max(1, Math.min(1024, tamanho.y));
+    const alvo = new THREE.WebGLRenderTarget(largura, altura, { depthBuffer: true });
+    const leitura = new Uint8Array(largura * altura * 4);
+    const anterior = renderer.getRenderTarget();
+    const fundoAnterior = scene.background;
+    const pisoVisivel = piso.visible;
+    const gradeVisivel = grade.visible;
+    const trocas = [];
+    const materiais = [];
+    const cores = grupos.map((_, indice) => new THREE.Color(indice === 0 ? '#ff0000' : '#00ff00'));
+    const contagens = grupos.map(() => 0);
+
+    try {
+      piso.visible = false;
+      grade.visible = false;
+      scene.background = new THREE.Color('#000000');
+      grupos.forEach((grupo, indice) => {
+        grupo.traverse((filho) => {
+          if (!filho.isMesh) return;
+          const material = new THREE.MeshBasicMaterial({ color: cores[indice], toneMapped: false });
+          trocas.push([filho, filho.material]);
+          materiais.push(material);
+          filho.material = material;
+        });
+      });
+      scene.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+      camera.updateProjectionMatrix();
+      renderer.setRenderTarget(alvo);
+      renderer.clear();
+      renderer.render(scene, camera);
+      renderer.readRenderTargetPixels(alvo, 0, 0, largura, altura, leitura);
+      for (let indice = 0; indice < leitura.length; indice += 4) {
+        const vermelho = leitura[indice];
+        const verde = leitura[indice + 1];
+        const azul = leitura[indice + 2];
+        if (vermelho > 96 && vermelho > verde * 2 && vermelho > azul * 2) contagens[0]++;
+        if (contagens.length > 1 && verde > 96 && verde > vermelho * 2 && verde > azul * 2) contagens[1]++;
+      }
+    } finally {
+      for (const [malha, material] of trocas) malha.material = material;
+      for (const material of materiais) material.dispose();
+      piso.visible = pisoVisivel;
+      grade.visible = gradeVisivel;
+      scene.background = fundoAnterior;
+      renderer.setRenderTarget(anterior);
+      alvo.dispose();
+    }
+    return grupos.map((grupo, indice) => ({
+      nome: grupo.userData.identidadeParte ?? grupo.name ?? String(indice),
+      pixels: contagens[indice],
+    }));
+  }
   const observador = new ResizeObserver(redimensionar);
   observador.observe(canvas);
   redimensionar();
@@ -390,6 +467,10 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       if (t >= 1) {
         transicao = null;
         controls.enabled = true;
+        if (publicarCameraLivreAoEstabilizar) {
+          publicarCameraLivreAoEstabilizar = false;
+          promoverCameraAtualParaLivre();
+        }
       }
     }
     controls.update();
@@ -412,6 +493,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     enquadrar,
     referenciaMetrica,
     medirEnquadramento,
+    medirPixelsVisiveisPorParte,
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

@@ -296,7 +296,18 @@ que uma sessão headless possa ver o que está modelando:
 npm run bancada -- --listar
 npm run bancada -- drone-inspecao --vistas=direita,frontal
 npm run bancada -- drone-inspecao --selecionadas=lente --modo=isolar --focar
+npm run bancada -- _freio-hierarquia --par=pastilhaInterna,pistao
 ```
+
+`npm run bancada` **grava PNGs** por padrão em `tools/bancadas/out/`; eles são
+artefatos de revisão ignorados pelo Git e devem ser lidos antes de modelar de
+novo. `--focar` agora imprime o link com a câmera focada. `--par` aceita
+exatamente duas partes, isola sem movê-las e escolhe a melhor entre as vistas
+canônicas pela quantidade de pixels realmente visíveis de cada uma. Ele também
+desenha contornos de cores distintas apenas para o par, preservados no link e
+sem mudar a geometria ou os materiais da peça. A saída traz o link local usado
+na captura e o endereço equivalente do GitHub Pages, que passa a reproduzir a
+mesma revisão depois que o commit for publicado.
 
 Conferência em número, sem foto — imprime caixa, centro, dimensões e faces por
 parte semântica, e a folga ou interpenetração entre pares de partes. Foto não
@@ -379,10 +390,10 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 ## Planejamento atual
 
 Não há plano curto ativo. O
-[`AUT-2026-19`](planos/2026-08-03-inspecao-reproduzivel-de-par.md) está pronto e
-aguarda decisão explícita de início: ele fará a URL reproduzir a câmera de
-`--focar`, esclarecerá que a bancada grava PNGs e limitará a inspeção automática
-a exatamente duas partes, sem mover geometria. O arquivo canônico é
+[`AUT-2026-19`](planos/2026-08-03-inspecao-reproduzivel-de-par.md) concluiu a
+reprodução da câmera de `--focar` e a inspeção automática de exatamente duas
+partes por pixels visíveis, com contornos de leitura persistidos e sem mover
+geometria. O arquivo canônico é
 `docs/mecanifica/planos/2026-08-03-inspecao-reproduzivel-de-par.md`. O
 [`AUT-2026-18`](planos/2026-08-03-consulta-subarvore-ia.md) concluiu a consulta
 de raiz semântica por CLI, com conjunto, descrição filtrada e URL reproduzível

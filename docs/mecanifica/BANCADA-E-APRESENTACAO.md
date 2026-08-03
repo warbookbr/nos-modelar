@@ -44,6 +44,17 @@ projeção ortográfica. Ele falha se a geometria estiver cortada ou ocupar pouc
 do quadro; a aprovação do enquadramento não é aprovação estética. `npm run peca`
 é mantido para diagnóstico herdado de render, nunca como prova visual principal.
 
+`npm run bancada` grava seus PNGs em `tools/bancadas/out/`, salvo quando recebe
+`--saida=<pasta-relativa>`. O agente deve ler essas imagens: gerá-las sem olhar
+para elas não é revisão. Para duas partes já conhecidas, use
+`--par=parteA,parteB`; a ferramenta isola o par, não o desloca e escolhe a vista
+canônica onde ambas têm pixels realmente visíveis. A URL impressa conserva a
+câmera final, a seleção e o isolamento para outra sessão abrir o mesmo recorte.
+O par recebe contornos de duas cores apenas como camada de leitura: eles
+persistem nesse link, mas não alteram materiais, medidas ou geometria da peça.
+A saída mostra tanto o endereço local da captura quanto o endereço equivalente
+do GitHub Pages; este último representa a mesma revisão depois do deploy.
+
 No modo isolado, a árvore preserva qual parte está selecionada, mas a malha
 visível conserva o material original: tingir a única peça da tela sabotaria a
 inspeção de acabamento. No modo contexto, focar mantém a montagem no cálculo da

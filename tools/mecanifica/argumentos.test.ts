@@ -136,5 +136,17 @@ describe('os dois CLIs irmãos param no mesmo typo', () => {
     const focar = correr(BANCADA, ['freio-disco', '--focar']);
     expect(focar.codigo).toBe(2);
     expect(focar.saida).toMatch(/--focar exige --selecionadas/);
+
+    const parCurto = correr(BANCADA, ['freio-disco', '--par=disco']);
+    expect(parCurto.codigo).toBe(2);
+    expect(parCurto.saida).toMatch(/--par exige exatamente duas partes semânticas diferentes/);
+
+    const parAmbiguo = correr(BANCADA, ['freio-disco', '--par=disco,pinca', '--selecionadas=disco,pinca']);
+    expect(parAmbiguo.codigo).toBe(2);
+    expect(parAmbiguo.saida).toMatch(/não misture com --selecionadas/);
+
+    const parComExplosao = correr(BANCADA, ['freio-disco', '--par=disco,pinca', '--explosao=0.2']);
+    expect(parComExplosao.codigo).toBe(2);
+    expect(parComExplosao.saida).toMatch(/não aceita explosão/);
   });
 });

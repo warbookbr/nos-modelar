@@ -1,6 +1,6 @@
 # AUT-2026-19 — inspeção reproduzível de par
 
-**Estado:** pronto
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -78,5 +78,28 @@ enumeráveis e testáveis.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar: estado final, commit/PR, gates,
-resultado observado e candidatos devolvidos ao backlog.
+**Concluído em 3 de agosto de 2026.**
+
+`--focar` agora promove o enquadramento terminado a câmera livre e escreve os
+dez números já contratados pelo `AUT-2026-05`; o link reabre seleção, modo,
+projeção e recorte iguais. `npm run bancada` passou a avisar no índice que grava
+PNGs e a imprimir endereço local e endereço equivalente do GitHub Pages após o
+deploy.
+
+`npm run bancada -- <peça> --par=a,b` aceita somente duas identidades
+semânticas diferentes, força isolamento sem explosão e mede as sete vistas
+canônicas por render temporário de IDs com depth buffer. A vista vence pelo
+menor número de pixels realmente visíveis entre as duas partes, depois pelo
+total e por ordem declarada. O par recebe contornos coloridos persistidos como
+camada de leitura; eles não mudam geometria, material, pose ou montagem.
+
+No freio, `pastilhaInterna,pistao` escolhe esquerda (128.196 px e 62.700 px),
+superando a isométrica (2.588 px para a parte menos visível). A fixture neutra
+`_jardineira`, no par `caixa,terra`, também passou. Um Sol sem contexto leu o
+índice, consultou `pinca`, escolheu o mesmo par e concluiu consulta, inspeção e
+reabertura local em uma tentativa cada.
+
+Gates: testes, tipos, build, seleção, IDs crus, exportação, portas, câmera,
+novo `guarda:par`, mapa, índices, links e planos passaram. Não há candidato
+devolvido: rótulos, afastamento de peças, relações mecânicas e montagem seguem
+fora deste recorte.

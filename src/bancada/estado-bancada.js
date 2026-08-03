@@ -38,6 +38,7 @@ export const VISTAS_BANCADA = Object.freeze({
 });
 
 const MODOS = new Set(['todas', 'contexto', 'isolar']);
+const INSPECOES = new Set(['par']);
 const PRECISAO_CAMERA_LIVRE = 5;
 const LIMITE_COORDENADA_CAMERA = 100;
 const LIMITE_URL_CAMERA = 180;
@@ -175,6 +176,7 @@ export function lerEstadoDaUrl(params, nomesDisponiveis) {
     ? 'livre'
     : (VISTAS_BANCADA[params.get('vista')] ? params.get('vista') : 'isometrica');
   const modo = MODOS.has(params.get('modo')) ? params.get('modo') : 'todas';
+  const inspecao = INSPECOES.has(params.get('inspecao')) ? params.get('inspecao') : null;
   const projecao = params.get('projecao') === 'ortografica' ? 'ortografica' : 'perspectiva';
   const explosaoLida = Number(params.get('explosao'));
   const explosao = Number.isFinite(explosaoLida)
@@ -184,7 +186,7 @@ export function lerEstadoDaUrl(params, nomesDisponiveis) {
     (params.get('selecionadas') ?? '').split(',').filter(Boolean),
     nomesDisponiveis,
   );
-  return { vista, modo, projecao, explosao, selecionadas, cameraLivre };
+  return { vista, modo, projecao, explosao, selecionadas, cameraLivre, inspecao };
 }
 
 export function escreverEstadoNaUrl(estado) {
@@ -199,6 +201,7 @@ export function escreverEstadoNaUrl(estado) {
   }
   if (estado.projecao === 'ortografica') params.set('projecao', 'ortografica');
   if (estado.modo && estado.modo !== 'todas') params.set('modo', estado.modo);
+  if (INSPECOES.has(estado.inspecao)) params.set('inspecao', estado.inspecao);
   if (estado.explosao > 0) params.set('explosao', Number(estado.explosao).toFixed(2));
   return params.toString();
 }

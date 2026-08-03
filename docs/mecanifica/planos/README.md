@@ -7,10 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
-[`AUT-2026-19`](2026-08-03-inspecao-reproduzivel-de-par.md) está pronto e
-aguarda decisão explícita de início. Ele fecha a reprodução da câmera focada e
-uma inspeção determinística de exatamente duas partes, sem mover geometria ou
-criar montagem.
+[`AUT-2026-19`](2026-08-03-inspecao-reproduzivel-de-par.md) foi concluído:
+foco agora vira câmera reproduzível, e a inspeção de duas partes escolhe uma
+vista por pixels visíveis, marca as peças sem alterar geometria e conserva o
+resultado no link.
 
 [`AUT-2026-18`](2026-08-03-consulta-subarvore-ia.md) foi concluído: uma IA
 consulta a raiz pelo CLI e recebe descrição filtrada e URL reproduzível da

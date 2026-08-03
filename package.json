@@ -24,6 +24,7 @@
     "validar:critica": "node tools/modelagem/critica-modelagem.mjs",
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
     "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
+    "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "descrever:montagem": "node tools/mecanifica/descrever-montagem.mjs",
     "peca": "node tools/bancadas/olhar-peca.mjs",

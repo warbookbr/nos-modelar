@@ -63,6 +63,11 @@ jobs:
       - name: A bancada restaura a câmera livre pela URL
         run: npm run guarda:camera
 
+      # A inspeção de par mede pixels realmente visíveis com depth buffer e
+      # precisa do navegador real para provar a escolha e a recarga da URL.
+      - name: A bancada inspeciona duas partes com vista reproduzível
+        run: npm run guarda:par
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 

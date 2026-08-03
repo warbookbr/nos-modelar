@@ -1,5 +1,6 @@
 /* main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível. */
 import './styles.css';
+import * as THREE from 'three';
 import { carregarPeca, PECA_PADRAO, PECAS_DISPONIVEIS } from './carregar-peca.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
@@ -43,6 +44,47 @@ async function iniciar() {
   let inicializando = true;
   let ultimaQuery = null;
   let controlador;
+  let parInspecionado = null;
+  const marcadoresDoPar = [];
+
+  function mesmosNomes(a, b) {
+    return a.length === b.length && a.every((nome, indice) => nome === b[indice]);
+  }
+
+  function limparMarcadoresDoPar() {
+    for (const marcador of marcadoresDoPar.splice(0)) {
+      marcador.removeFromParent();
+      marcador.geometry.dispose();
+      marcador.material.dispose();
+    }
+    parInspecionado = null;
+  }
+
+  /* Contornos são uma camada de leitura, não material, transformação ou nova
+     geometria da peça. No par, duas superfícies parecidas podem ser visíveis e
+     ainda assim parecer uma forma só; as cores distintas tornam o limite entre
+     elas observável sem sacrificar o acabamento no isolamento comum. */
+  function marcarParInspecionado(nomes) {
+    limparMarcadoresDoPar();
+    const partes = [...new Set(nomes)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    const cores = ['#ffb000', '#39c6ff'];
+    partes.forEach((nome, indice) => {
+      const grupo = convertido.partes.get(nome);
+      grupo?.traverse((malha) => {
+        if (!malha.isMesh || !malha.geometry) return;
+        const geometria = new THREE.EdgesGeometry(malha.geometry, 28);
+        const material = new THREE.LineBasicMaterial({
+          color: cores[indice], transparent: true, opacity: 0.92, depthTest: false,
+        });
+        const contorno = new THREE.LineSegments(geometria, material);
+        contorno.name = '__contorno_inspecao_par__';
+        contorno.renderOrder = 3;
+        malha.add(contorno);
+        marcadoresDoPar.push(contorno);
+      });
+    });
+    parInspecionado = partes;
+  }
 
   function atualizarBotoesVista() {
     for (const botao of document.querySelectorAll('[data-vista]')) {
@@ -91,6 +133,7 @@ async function iniciar() {
       vista: vistaAtual,
       projecao: ambiente.projecao,
       cameraLivre: ambiente.cameraLivre(),
+      inspecao: parInspecionado ? 'par' : null,
     });
     for (const [chave, valor] of new URLSearchParams(estadoDaVista)) saida.set(chave, valor);
     const query = saida.toString();
@@ -100,6 +143,9 @@ async function iniciar() {
   }
 
   function refletirEstado(estado) {
+    if (parInspecionado && (estado.modo !== 'isolar' || !mesmosNomes(estado.selecionadas, parInspecionado))) {
+      limparMarcadoresDoPar();
+    }
     const selecionadas = new Set(estado.selecionadas);
     for (const linha of lista.querySelectorAll('.parte-linha')) {
       const ativa = selecionadas.has(linha.dataset.parte);
@@ -224,7 +270,55 @@ async function iniciar() {
       raiz: convertido.raiz,
       selecionados: grupos,
       modo: controlador.modo,
-    }));
+    }), { reproduzivel: true });
+  }
+
+  /* A inspeção de par é uma ferramenta de revisão, não uma relação de
+     montagem. Ela recebe duas identidades já declaradas, isola sem reposicionar
+     nada e compara somente as sete vistas canônicas. A medição vem de um render
+     de IDs com depth buffer; uma parte escondida não ganha pontos por ter caixa
+     projetada ou por parecer próxima pelo nome. */
+  function inspecionarPar(nomes) {
+    const pedidos = Array.isArray(nomes) ? nomes : controlador.selecionadas;
+    const partes = [...new Set(pedidos)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    if (partes.length !== 2 || partes.some((nome) => !controlador.nomes.includes(nome))) {
+      return {
+        valida: false,
+        motivo: 'A inspeção de par exige exatamente duas partes semânticas existentes.',
+      };
+    }
+    controlador.selecionarMuitas(partes);
+    controlador.definirModo('isolar');
+    const grupos = controlador.gruposSelecionados();
+    const candidatas = ['frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior', 'isometrica'];
+    const medidas = candidatas.map((vista, ordem) => {
+      ambiente.definirVista(vista, { instantaneo: true });
+      ambiente.enquadrar(grupos, { instantaneo: true });
+      const pixels = ambiente.medirPixelsVisiveisPorParte(grupos);
+      return {
+        vista,
+        ordem,
+        pixels,
+        menor: Math.min(...pixels.map((item) => item.pixels)),
+        total: pixels.reduce((soma, item) => soma + item.pixels, 0),
+      };
+    });
+    medidas.sort((a, b) => b.menor - a.menor || b.total - a.total || a.ordem - b.ordem);
+    const escolhida = medidas[0];
+    ambiente.definirVista(escolhida.vista, { instantaneo: true });
+    ambiente.enquadrar(grupos, { instantaneo: true, reproduzivel: true });
+    marcarParInspecionado(partes);
+    salvarEstadoNaUrl(controlador.estado());
+    return {
+      valida: true,
+      partes,
+      vistaEscolhida: escolhida.vista,
+      pixels: escolhida.pixels,
+      /* 64 pixels no buffer de prova evita chamar um ponto residual de leitura
+         legível, sem exigir que a ferramenta altere a peça para passar. */
+      legivel: escolhida.menor >= 64,
+      candidatas: medidas.map(({ vista, pixels, menor, total }) => ({ vista, pixels, menor, total })),
+    };
   }
 
   function enquadrarMontagem() {
@@ -322,6 +416,9 @@ async function iniciar() {
   ambiente.definirVista(inicial.vista, { instantaneo: true });
   if (inicial.cameraLivre) ambiente.restaurarCameraLivre(inicial.cameraLivre);
   vistaAtual = ambiente.vista;
+  if (inicial.inspecao === 'par' && inicial.modo === 'isolar' && inicial.selecionadas.length === 2) {
+    marcarParInspecionado(inicial.selecionadas);
+  }
   inicializando = false;
   refletirEstado(controlador.estado());
   atualizarBotoesVista();
@@ -350,6 +447,7 @@ async function iniciar() {
     projecao: (projecao) => ambiente.definirProjecao(projecao),
     explosao: (valor) => controlador.definirExplosao(valor),
     focar: () => focarSelecao(),
+    inspecionarPar: (nomes) => inspecionarPar(nomes),
     enquadrar: () => enquadrarMontagem(),
     enquadramento: () => ambiente.medirEnquadramento(
       alvosDeEnquadramento({
@@ -364,7 +462,9 @@ async function iniciar() {
       vista: vistaAtual,
       projecao: ambiente.projecao,
       cameraLivre: ambiente.cameraLivre(),
+      inspecao: parInspecionado ? 'par' : null,
     }),
+    marcadoresDePar: () => marcadoresDoPar.length,
     url: () => location.href,
   };
 
@@ -372,6 +472,7 @@ async function iniciar() {
     removeEventListener('keydown', atalhoVista);
     selecao3d.destruir();
     controlador.destruir();
+    limparMarcadoresDoPar();
     ambiente.destruir();
     cancelAnimationFrame(quadroReferencia);
   }, { once: true });
