@@ -364,6 +364,10 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 - [x] provar replay e round-trip fora do domínio automotivo (`_jardineira`
   exporta, lê e reexecuta sem perder id, rótulo ou origem).
 
+O roteiro ativo desse item é
+[`AUT-2026-15`](planos/2026-08-02-portas-espelho-arranja.md). Ele não autoriza
+hierarquia, persistência de montagem nem solver.
+
 ## Nível 2 — relações dirigidas sem reposicionamento
 
 **Resultado:** a intenção entra no documento e pode validar uma pose já pronta,

@@ -377,7 +377,9 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-Não há plano ativo. O plano curto
+O plano curto [AUT-2026-15](planos/2026-08-02-portas-espelho-arranja.md) está
+ativo para declarar portas sob espelho e `arranja`, antes de hierarquia ou
+persistência de montagem. O plano curto
 [AUT-2026-14](planos/2026-08-02-identidade-porta-estavel.md) fechou a separação
 entre identidade estável e rótulo exibido das portas, mantendo a forma histórica
 reproduzível. O plano curto
@@ -400,7 +402,8 @@ encerrado em 2 de agosto de 2026 e seu
 resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
-Os caminhos canônicos dos dois planos curtos mais recentes são
+Os caminhos canônicos dos três planos curtos mais recentes são
+`docs/mecanifica/planos/2026-08-02-portas-espelho-arranja.md`,
 `docs/mecanifica/planos/2026-08-02-identidade-porta-estavel.md` e
 `docs/mecanifica/planos/2026-08-02-recusa-estrutural-montagem.md`.
 
