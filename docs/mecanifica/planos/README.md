@@ -7,6 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+[`AUT-2026-18`](2026-08-03-consulta-subarvore-ia.md) foi concluído: uma IA
+consulta a raiz pelo CLI e recebe descrição filtrada e URL reproduzível da
+bancada, sem criar estado de montagem.
+
 [`AUT-2026-17`](2026-08-03-selecao-subarvore-semantica.md) foi concluído:
 raiz e descendentes declarados podem ser selecionados juntos na bancada, por
 consulta neutra e determinística. O grafo de cena, pose, explosão, artefato

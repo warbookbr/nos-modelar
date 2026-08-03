@@ -164,6 +164,11 @@ não reparenta Three.js nem move qualquer grupo. Para upstream, leve o helper e
 inspetor de destino. Limite: não é transformação herdada, persistência,
 exportação de árvore ou explosão por conjunto.
 
+**Complemento do UP-035 (AUT-2026-18):** o CLI da Mecanifica expõe a consulta
+por `--subarvore=<raiz>` e traduz seu resultado para uma URL de inspeção. A
+parte extraível é somente a consulta neutra e sua prova; o comando e a URL são
+adaptações da Mecanifica, não contrato do núcleo do NÓS.
+
 ## UP-005 — fronteira de renderização provada
 
 **Problema observado:** `oficina.js` já separava `nucleo()` de `adaptarV3()`,

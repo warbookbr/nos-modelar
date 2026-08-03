@@ -429,6 +429,27 @@ describe('descrever-peca: o CLI', () => {
     expect(saida).toMatch(/coloDoBulbo {2,}esfera:401 faixa=ultima/);
   });
 
+  it('resolve uma subárvore para a IA, filtra a régua e entrega a bancada reproduzível', () => {
+    const { saida, codigo } = cli(['_freio-hierarquia', '--subarvore=pinca']);
+    expect(codigo).toBe(0);
+    expect(saida).toContain('CONSULTA DE SUBÁRVORE');
+    expect(saida).toContain('raiz: pinca');
+    expect(saida).toContain('partes (4): pastilhaExterna, pastilhaInterna, pinca, pistao');
+    expect(saida).toContain(
+      'https://warbookbr.github.io/nos-mecanifica/bancada.html?peca=_freio-hierarquia&selecionadas=pastilhaExterna%2CpastilhaInterna%2Cpinca%2Cpistao',
+    );
+    expect(saida).toContain('partes: 4 de 8');
+    expect(saida).not.toMatch(/\n  disco {2,}/);
+  });
+
+  it('consulta uma folha sem arrastar um conjunto vizinho', () => {
+    const { saida, codigo } = cli(['_freio-hierarquia', '--subarvore=pistao']);
+    expect(codigo).toBe(0);
+    expect(saida).toContain('partes (1): pistao');
+    expect(saida).toContain('partes: 1 de 8');
+    expect(saida).not.toMatch(/\n  pinca {2,}/);
+  });
+
   it('sai ≠0 com diagnóstico em peça ausente, peça inexistente e parte inexistente', () => {
     const semPeca = cli([]);
     expect(semPeca.codigo).toBe(2);
@@ -445,5 +466,13 @@ describe('descrever-peca: o CLI', () => {
     const casasErradas = cli(['freio-disco', '--casas=abc']);
     expect(casasErradas.codigo).toBe(2);
     expect(casasErradas.saida).toMatch(/--casas/);
+
+    const subarvoreErrada = cli(['_freio-hierarquia', '--subarvore=ausente']);
+    expect(subarvoreErrada.codigo).toBe(1);
+    expect(subarvoreErrada.saida).toMatch(/não tem parte 'ausente'/);
+
+    const subarvoreVazia = cli(['_freio-hierarquia', '--subarvore=']);
+    expect(subarvoreVazia.codigo).toBe(2);
+    expect(subarvoreVazia.saida).toMatch(/--subarvore veio vazio/);
   });
 });

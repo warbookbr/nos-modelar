@@ -21,7 +21,7 @@ const DESCREVER = resolve(REPO, 'tools/mecanifica/descrever-peca.mjs');
 const BANCADA = resolve(REPO, 'tools/mecanifica/olhar-bancada.mjs');
 
 const VOCABULARIO = {
-  opcoes: ['partes', 'casas'],
+  opcoes: ['partes', 'subarvore', 'casas'],
   bandeiras: ['listar', 'estrito'],
   posicional: { nome: 'a peça', obrigatorio: false },
 };
@@ -52,7 +52,7 @@ describe('lerArgumentos: o vocabulário é declarado e nada passa fora dele', ()
       .toThrow(/não conheço '--parte'.*Você quis dizer '--partes'\?/s);
     /* o diagnóstico nomeia o vocabulário inteiro, não só o erro */
     expect(() => lerArgumentos(['--xyzabc'], VOCABULARIO))
-      .toThrow(/aceito: opções: --partes=<valor>, --casas=<valor>; bandeiras: --listar, --estrito/);
+      .toThrow(/aceito: opções: --partes=<valor>, --subarvore=<valor>, --casas=<valor>; bandeiras: --listar, --estrito/);
     expect(() => lerArgumentos(['-estrito'], VOCABULARIO)).toThrow(/dois traços/);
     expect(() => lerArgumentos(['--'], VOCABULARIO)).toThrow(/dois traços/);
     expect(() => lerArgumentos(['--=1'], VOCABULARIO)).toThrow(/sem nome/);
@@ -102,6 +102,13 @@ describe('os dois CLIs irmãos param no mesmo typo', () => {
     expect(typo.codigo).toBe(2);
     expect(typo.saida).toMatch(/não conheço '--parte'/);
     expect(typo.saida).not.toMatch(/CAIXA POR PARTE/);
+  });
+
+  it('descrever-peca: não combina duas formas de escolher partes silenciosamente', () => {
+    const ambigua = correr(DESCREVER, ['_freio-hierarquia', '--partes=pinca', '--subarvore=pinca']);
+    expect(ambigua.codigo).toBe(2);
+    expect(ambigua.saida).toMatch(/--partes e --subarvore são consultas diferentes/);
+    expect(ambigua.saida).not.toMatch(/CAIXA POR PARTE/);
   });
 
   it('descrever-peca: duas peças de uma vez não medem a primeira calado', () => {

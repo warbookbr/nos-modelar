@@ -12,6 +12,7 @@
  *
  *   npm run descrever -- freio-disco
  *   npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
+ *   npm run descrever -- _freio-hierarquia --subarvore=pinca
  *   npm run descrever -- freio-disco --casas=9
  *   npm run descrever -- --listar                          # peças disponíveis
  *
@@ -54,7 +55,7 @@ let bandeira;
 let peca;
 try {
   const lido = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['partes', 'casas'],
+    opcoes: ['partes', 'subarvore', 'casas'],
     bandeiras: ['listar', 'estrito'],
     posicional: { nome: 'a peça', obrigatorio: false },
   });
@@ -76,6 +77,7 @@ if (bandeira('listar')) {
 }
 
 const partes = opcao('partes', '').split(',').map((p) => p.trim()).filter(Boolean);
+const raizDaSubarvore = opcao('subarvore');
 const casas = parseInt(opcao('casas', '6'), 10);
 const estrito = bandeira('estrito');
 
@@ -99,10 +101,19 @@ if (!Number.isInteger(casas) || casas < 0 || casas > 12) {
 if (opcao('partes') !== null && partes.length === 0) {
   erroDeUso('--partes veio vazio; informe nomes de parte ou omita a opção');
 }
+if (raizDaSubarvore !== null && !raizDaSubarvore.trim()) {
+  erroDeUso('--subarvore veio vazio; informe a raiz semântica ou omita a opção');
+}
+if (opcao('partes') !== null && raizDaSubarvore !== null) {
+  erroDeUso('--partes e --subarvore são consultas diferentes; informe somente uma delas');
+}
 
 const { nucleo } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
 const { descreverPeca, formatarDescricao } = await import(
   pathToFileURL(join(REPO, 'src/autoria/descrever-partes.js')).href
+);
+const { nomesDaSubarvore } = await import(
+  pathToFileURL(join(REPO, 'src/autoria/hierarquia-partes.js')).href
 );
 
 let modulo;
@@ -134,12 +145,37 @@ try {
 }
 
 let descricao;
+let consultaDeSubarvore = null;
 try {
-  descricao = descreverPeca(neutro, { partes: partes.length ? partes : null });
+  if (raizDaSubarvore === null) {
+    descricao = descreverPeca(neutro, { partes: partes.length ? partes : null });
+  } else {
+    /* A primeira leitura pede somente a raiz para reaproveitar a mesma fonte
+       neutra que já publica a árvore. A segunda é a descrição REAL do conjunto;
+       não há lista manual de filhos nem dependência de cena Three.js. */
+    const raiz = raizDaSubarvore.trim();
+    const daRaiz = descreverPeca(neutro, { partes: [raiz] });
+    const nomes = nomesDaSubarvore(daRaiz.hierarquia, raiz);
+    descricao = descreverPeca(neutro, { partes: nomes });
+    consultaDeSubarvore = { raiz, nomes };
+  }
 } catch (erro) {
   falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}`);
 }
 
+if (consultaDeSubarvore) {
+  const selecionadas = [...consultaDeSubarvore.nomes].sort();
+  const params = new URLSearchParams({
+    peca,
+    selecionadas: selecionadas.join(','),
+  });
+  process.stdout.write(
+    `CONSULTA DE SUBÁRVORE\n`
+    + `  raiz: ${consultaDeSubarvore.raiz}\n`
+    + `  partes (${selecionadas.length}): ${selecionadas.join(', ')}\n`
+    + `  bancada: https://warbookbr.github.io/nos-mecanifica/bancada.html?${params}\n\n`,
+  );
+}
 process.stdout.write(formatarDescricao(descricao, { peca, casas }));
 
 let falhou = false;

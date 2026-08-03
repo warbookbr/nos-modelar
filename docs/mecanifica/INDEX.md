@@ -305,6 +305,7 @@ tem escala nem eixo; esta é a régua:
 ```bash
 npm run descrever -- freio-disco
 npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
+npm run descrever -- _freio-hierarquia --subarvore=pinca
 npm run descrever -- roda-dianteira
 npm run descrever -- _jardineira --estrito
 npm run descrever -- _cerca-e-flor --estrito
@@ -378,6 +379,10 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 ## Planejamento atual
 
 Não há plano curto ativo. O
+[`AUT-2026-18`](planos/2026-08-03-consulta-subarvore-ia.md) concluiu a consulta
+de raiz semântica por CLI, com conjunto, descrição filtrada e URL reproduzível
+da bancada. O arquivo canônico é
+`docs/mecanifica/planos/2026-08-03-consulta-subarvore-ia.md`. O
 [`AUT-2026-17`](planos/2026-08-03-selecao-subarvore-semantica.md) concluiu a
 seleção determinística de raiz e descendentes declarados na bancada, sem
 reparentar a cena ou abrir pose, exportação e solver. O arquivo canônico é

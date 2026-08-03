@@ -47,6 +47,24 @@ Portanto, o formato atual é entrada experimental, não contrato definitivo.
 9. O resultado é determinístico para a mesma entrada.
 10. O estado pode ser descrito e testado sem navegador.
 
+## Consultar um conjunto semântico
+
+Quando a IA precisa revisar um mecanismo já autorado, ela não deve recompor os
+filhos pelo nome ou pela imagem. Use uma consulta explícita:
+
+```bash
+npm run descrever -- _freio-hierarquia --subarvore=pinca
+```
+
+O comando devolve a raiz, seus descendentes em ordem estável, a descrição
+geométrica filtrada e uma URL da bancada com a mesma seleção. `--subarvore` e
+`--partes` não podem ser combinados: um escolhe uma árvore declarada; o outro é
+uma lista manual. Raiz ausente ou valor vazio falham sem produzir uma inspeção
+parcial.
+
+Isto é leitura e revisão. A consulta não move peças, não salva montagem e não
+altera a geometria.
+
 ## Vocabulário pretendido
 
 Exemplo ilustrativo, ainda não implementado:
