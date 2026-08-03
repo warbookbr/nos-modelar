@@ -379,6 +379,11 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 ## Planejamento atual
 
 Não há plano curto ativo. O
+[`AUT-2026-19`](planos/2026-08-03-inspecao-reproduzivel-de-par.md) está pronto e
+aguarda decisão explícita de início: ele fará a URL reproduzir a câmera de
+`--focar`, esclarecerá que a bancada grava PNGs e limitará a inspeção automática
+a exatamente duas partes, sem mover geometria. O arquivo canônico é
+`docs/mecanifica/planos/2026-08-03-inspecao-reproduzivel-de-par.md`. O
 [`AUT-2026-18`](planos/2026-08-03-consulta-subarvore-ia.md) concluiu a consulta
 de raiz semântica por CLI, com conjunto, descrição filtrada e URL reproduzível
 da bancada. O arquivo canônico é
