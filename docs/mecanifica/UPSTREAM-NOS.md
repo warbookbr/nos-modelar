@@ -153,8 +153,16 @@ posição, seleção, explosão, portas nem geometria. A fixture
 extraia o metadado do núcleo, a descrição e os testes; não leve a fixture de
 freio nem transforme a árvore em pai de cena. Limite explícito: o formato
 `peca-resolvida` recusa hierarquia enquanto não houver versão, leitor e
-consumidor do produto; reparenting, subárvore e pose herdada precisam de planos
-próprios.
+consumidor do produto; reparenting e pose herdada precisam de planos próprios.
+
+**Complemento do UP-035 (AUT-2026-17):** `nomesDaSubarvore` é uma consulta
+pura sobre `{nome, pai}`: devolve raiz e descendentes em ordem estável e recusa
+pai ausente, repetido ou cíclico antes de entregar uma seleção parcial. A
+bancada apenas consome o resultado para selecionar os grupos existentes; ela
+não reparenta Three.js nem move qualquer grupo. Para upstream, leve o helper e
+`tools/mecanifica/hierarquia-partes.test.ts`; a ação visual é adaptável ao
+inspetor de destino. Limite: não é transformação herdada, persistência,
+exportação de árvore ou explosão por conjunto.
 
 ## UP-005 — fronteira de renderização provada
 

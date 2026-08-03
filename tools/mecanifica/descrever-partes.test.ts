@@ -18,6 +18,8 @@ import * as freioHierarquia from '../../prototipos/fps/v3/pecas/_freio-hierarqui
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
 import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
+// @ts-expect-error — consulta pura de hierarquia em JavaScript.
+import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const CLI = resolve(REPO, 'tools/mecanifica/descrever-peca.mjs');
@@ -328,6 +330,13 @@ describe('AUT-2026-16 — a descrição expõe a hierarquia que o autor declarou
     expect(pistao.parent).toBe(convertido.raiz);
     expect(pinca.parent).toBe(convertido.raiz);
     expect(convertido.raiz.userData.hierarquia).toContainEqual({ nome: 'pistao', pai: 'pinca' });
+  });
+
+  it('a árvore exibida é consultável sem medição geométrica nem grafo Three.js', () => {
+    const descricao = descreverPeca(montarHierarquia());
+    expect(nomesDaSubarvore(descricao.hierarquia, 'pinca')).toEqual([
+      'pinca', 'pastilhaExterna', 'pastilhaInterna', 'pistao',
+    ]);
   });
 });
 

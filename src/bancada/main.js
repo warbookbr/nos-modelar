@@ -74,6 +74,7 @@ async function iniciar() {
   const explosao = document.getElementById('explosao');
   const valorExplosao = document.getElementById('valorExplosao');
   const btnFocar = document.getElementById('btnFocarSelecao');
+  const btnSelecionarConjunto = document.getElementById('btnSelecionarConjunto');
   const eixosReferencia = document.getElementById('eixosReferencia');
   const barraReferencia = document.getElementById('barraReferencia');
   const valorReferencia = document.getElementById('valorReferencia');
@@ -115,6 +116,7 @@ async function iniciar() {
     botoesModo.contexto.disabled = !temSelecao;
     botoesModo.isolar.disabled = !temSelecao;
     btnFocar.disabled = !temSelecao;
+    btnSelecionarConjunto.disabled = !temSelecao || !controlador.temDescendentesNaSelecao();
     for (const [nome, botao] of Object.entries(botoesModo)) {
       botao.classList.toggle('ativa', nome === estado.modo);
     }
@@ -140,6 +142,7 @@ async function iniciar() {
   controlador = criarControladorPartes({
     raiz: convertido.raiz,
     partes: convertido.partes,
+    hierarquia: convertido.raiz.userData.hierarquia,
     aoMudar: refletirEstado,
     aoEstabilizarExplosao(_estado, { enquadrar = true } = {}) {
       /* A câmera da montagem fechada corta a explosão. Esperar a animação
@@ -147,6 +150,9 @@ async function iniciar() {
       if (enquadrar) ambiente.enquadrar(controlador.gruposVisiveis());
     },
   });
+  /* Peça plana não ganha uma ação permanentemente desabilitada: a hierarquia
+     é ajuda contextual, não mais um controle para a IA ignorar. */
+  btnSelecionarConjunto.hidden = !controlador.temHierarquia();
 
   for (const nome of controlador.nomes) {
     const grupo = convertido.partes.get(nome);
@@ -258,6 +264,7 @@ async function iniciar() {
 
   document.getElementById('btnEnquadrar').addEventListener('click', enquadrarMontagem);
   document.getElementById('btnFocarSelecao').addEventListener('click', focarSelecao);
+  btnSelecionarConjunto.addEventListener('click', () => controlador.selecionarSubarvores());
   document.getElementById('btnLimpar').addEventListener('click', () => controlador.limpar());
   for (const [modo, botao] of Object.entries(botoesModo)) {
     botao.addEventListener('click', () => controlador.definirModo(modo));
@@ -335,6 +342,9 @@ async function iniciar() {
     estatisticas: convertido.estatisticas,
     partes: controlador.nomes,
     selecionar: (nomes) => controlador.selecionarMuitas(Array.isArray(nomes) ? nomes : [nomes]),
+    selecionarConjunto: (nomes) => controlador.selecionarSubarvores(
+      nomes === undefined ? undefined : (Array.isArray(nomes) ? nomes : [nomes]),
+    ),
     modo: (modo) => controlador.definirModo(modo),
     vista: (vista) => ambiente.definirVista(vista),
     projecao: (projecao) => ambiente.definirProjecao(projecao),

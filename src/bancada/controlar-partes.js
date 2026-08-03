@@ -6,6 +6,7 @@ import {
   estadoVisualDasPartes,
   normalizarSelecao,
 } from './estado-bancada.js';
+import { nomesDaSubarvore } from '../autoria/hierarquia-partes.js';
 
 const VERDE_DESTAQUE = new THREE.Color('#35c98a');
 
@@ -59,9 +60,14 @@ function aplicarEstadoMaterial(material, estado) {
   material.needsUpdate = true;
 }
 
-export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExplosao }) {
+export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar, aoEstabilizarExplosao }) {
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   const permitidos = new Set(nomes);
+  /* A seleção entende a árvore declarada, mas os grupos Three continuam irmãos.
+     Isso impede que escolher uma subárvore mude transformações, explosão ou a
+     fonte semântica da receita. */
+  const subarvore = (nome) => nomesDaSubarvore(hierarquia, nome)
+    .filter((item) => permitidos.has(item));
   const bases = new Map();
   let selecionadas = [];
   let modo = 'todas';
@@ -170,6 +176,19 @@ export function criarControladorPartes({ raiz, partes, aoMudar, aoEstabilizarExp
       definirSelecao(alternarSelecao(selecionadas, nome, aditiva));
     },
     selecionarMuitas: definirSelecao,
+    selecionarSubarvores(raizes = selecionadas) {
+      const nomesDaSelecao = new Set();
+      for (const raizDaSelecao of raizes) {
+        for (const nome of subarvore(raizDaSelecao)) nomesDaSelecao.add(nome);
+      }
+      definirSelecao([...nomesDaSelecao]);
+    },
+    temDescendentesNaSelecao() {
+      return selecionadas.some((nome) => subarvore(nome).length > 1);
+    },
+    temHierarquia() {
+      return hierarquia.some((item) => item?.pai !== null && item?.pai !== undefined);
+    },
     limpar() { definirSelecao([]); },
     definirModo(novoModo) {
       modo = ['todas', 'contexto', 'isolar'].includes(novoModo) ? novoModo : 'todas';

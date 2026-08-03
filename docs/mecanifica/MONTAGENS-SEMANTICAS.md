@@ -515,6 +515,8 @@ espaço local e exige migração de pose.
 
 - [x] declarar pai semântico por nome estável, somente como metadado, sem
   transformar filho nem inferir árvore pela geometria (`AUT-2026-16`);
+- [x] selecionar raiz e descendentes por consulta pura e adaptar a bancada sem
+  reparentar a cena (`AUT-2026-17`);
 - [ ] definir identidade de nó e caminho semântico sem usar nome de exibição;
 - [ ] decidir se peça e parte compartilham ou não o mesmo tipo de nó;
 - [ ] definir pose local, reparenting e preservação da pose mundial;

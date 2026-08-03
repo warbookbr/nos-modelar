@@ -7,6 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+[`AUT-2026-17`](2026-08-03-selecao-subarvore-semantica.md) foi concluído:
+raiz e descendentes declarados podem ser selecionados juntos na bancada, por
+consulta neutra e determinística. O grafo de cena, pose, explosão, artefato
+resolvido e solver continuam fora do recorte.
+
 [`AUT-2026-16`](2026-08-03-hierarquia-semantica-minima.md) foi concluído: o
 pai semântico de uma parte é dado estável, validado ao fim da receita e legível
 pela IA no descritor e na bancada. Transformação herdada, subárvore,

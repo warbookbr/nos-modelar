@@ -378,6 +378,10 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 ## Planejamento atual
 
 Não há plano curto ativo. O
+[`AUT-2026-17`](planos/2026-08-03-selecao-subarvore-semantica.md) concluiu a
+seleção determinística de raiz e descendentes declarados na bancada, sem
+reparentar a cena ou abrir pose, exportação e solver. O arquivo canônico é
+`docs/mecanifica/planos/2026-08-03-selecao-subarvore-semantica.md`. O
 [AUT-2026-16](planos/2026-08-03-hierarquia-semantica-minima.md) concluiu o pai
 semântico mínimo de partes: uma árvore declarada, validada e observável, sem
 mover, agrupar visualmente ou persistir montagem. O arquivo canônico do plano
