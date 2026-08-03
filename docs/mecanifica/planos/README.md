@@ -7,6 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-2026-12`/Recorte G foi concluído em
+[`AUT-2026-12`](2026-08-02-tolerancias-de-montagem.md): especificação nominal,
+variação de fabricação e tolerância numérica agora são dados distintos, com
+compatibilidade para relações antigas.
+
 `AUT-2026-11`/Recorte F foi concluído em
 [`AUT-2026-11`](2026-08-02-assentamento-anular.md): aro↔pneu passa a declarar
 e medir faixa anular local, mantendo o alerta amplo por caixa. Deformação,

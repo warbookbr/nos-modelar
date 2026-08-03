@@ -465,7 +465,7 @@ exigir métrica própria. Tolerância de fabricação não é epsilon numérico.
 
 **Checklist**
 
-- [x] separar, no cilindro, folga de projeto e tolerância numérica; tolerância de fabricação continua sem contrato;
+- [x] separar alvo de projeto, tolerância de fabricação e tolerância numérica no cilindro e no anel;
 - [x] definir métricas para cilindro externo↔cavidade e faixa anular recebe↔ocupa;
 - [x] manter alerta global por caixa visível ao lado do contato local;
 - [ ] testar falso positivo, falso negativo e limite exato para todas as naturezas;

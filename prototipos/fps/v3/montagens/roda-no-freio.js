@@ -14,9 +14,9 @@ export const RELACAO_RODA_NO_FREIO = {
   tipo: 'encaixaCilindrico',
   referencia: 'freio.pilotoDaRoda',
   movel: 'roda.cavidadeDoCubo',
-  /* A folga é de projeto, não epsilon: 3,05 mm na pose/escalas declaradas. */
-  folgaRadial: { min: 0.003, max: 0.0031 },
-  tolerancia: 0.000001,
+  /* Alvo de 3,05 mm; a faixa aceitável vem da fabricação, não do epsilon. */
+  folgaRadial: { nominal: 0.00305, toleranciaFabricacao: { menos: 0.00005, mais: 0.00005 } },
+  toleranciaNumerica: 0.000001,
   /* Os centros dos eixos congelam a pose já revisada, sem escolher profundidade implícita. */
   poseCanonica: { referenciaAxial: 'centro', movelAxial: 'centro', giro: 0 },
 };
@@ -27,9 +27,9 @@ export const RELACAO_ARO_NO_PNEU = {
   referencia: 'roda.assentoDoAroNoPneu',
   movel: 'roda.assentoDoPneuNoAro',
   /* Na escala 1,60, as faixas comuns são 40 mm radial e 233,6 mm axial. */
-  sobreposicaoRadial: { min: 0.0399, max: 0.0401 },
-  sobreposicaoAxial: { min: 0.2335, max: 0.2337 },
-  tolerancia: 0.000001,
+  sobreposicaoRadial: { nominal: 0.0400, toleranciaFabricacao: { menos: 0.0001, mais: 0.0001 } },
+  sobreposicaoAxial: { nominal: 0.2336, toleranciaFabricacao: { menos: 0.0001, mais: 0.0001 } },
+  toleranciaNumerica: 0.000001,
 };
 
 export function montarRodaNoFreio() {

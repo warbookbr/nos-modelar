@@ -390,12 +390,9 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   const id = declaracao.id;
   if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
   if (declaracao.tipo !== 'encaixaCilindrico') falhar(quem, "tipo precisa ser 'encaixaCilindrico'.");
-  const tolerancia = escalar(declaracao.tolerancia ?? 1e-6, `${quem}.${id}.tolerancia`, { naoNegativo: true });
-  const faixa = declaracao.folgaRadial;
-  if (!faixa || typeof faixa !== 'object' || Array.isArray(faixa)) falhar(quem, 'folgaRadial precisa ser {min,max}.');
-  const minimo = escalar(faixa.min, `${quem}.${id}.folgaRadial.min`, { naoNegativo: true });
-  const maximo = escalar(faixa.max, `${quem}.${id}.folgaRadial.max`, { naoNegativo: true });
-  if (maximo < minimo) falhar(quem, 'folgaRadial.max precisa ser >= min.');
+  const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
+  const especificacaoFolgaRadial = faixaDeEspecificacao(declaracao, 'folgaRadial', `${quem}.${id}`);
+  const { minimo, maximo } = especificacaoFolgaRadial;
 
   const referencia = portaDo(portas, declaracao.referencia, quem);
   const movel = portaDo(portas, declaracao.movel, quem);
@@ -438,7 +435,7 @@ export function validarEncaixeCilindrico(declaracao, portas) {
     referencia: referencia.id, movel: movel.id,
     medidas: {
       alinhamento, descentro, folgaRadial, folgaRadialMinima: minimo,
-      folgaRadialMaxima: maximo, tolerancia, inicioReferencia, fimReferencia, inicioMovel,
+      folgaRadialMaxima: maximo, tolerancia, toleranciaNumerica: tolerancia, especificacaoFolgaRadial, inicioReferencia, fimReferencia, inicioMovel,
       fimMovel, sobraInicio, sobraFim, sobreposicaoAxial, separacaoAxial,
     },
     diagnosticos,
@@ -496,13 +493,39 @@ export function diagnosticarEncaixeCilindrico(declaracao, instancias) {
   };
 }
 
-function faixaDeSobreposicao(declaracao, chave, quem) {
+function toleranciaNumericaDe(declaracao, quem) {
+  if (declaracao.toleranciaNumerica !== undefined && declaracao.tolerancia !== undefined) {
+    falhar(quem, "use 'toleranciaNumerica' ou o campo legado 'tolerancia', não os dois.");
+  }
+  return escalar(declaracao.toleranciaNumerica ?? declaracao.tolerancia ?? 1e-6, `${quem}.toleranciaNumerica`, { naoNegativo: true });
+}
+
+function faixaDeEspecificacao(declaracao, chave, quem) {
   const faixa = declaracao[chave];
   if (!faixa || typeof faixa !== 'object' || Array.isArray(faixa)) falhar(quem, `${chave} precisa ser {min,max}.`);
-  const minimo = escalar(faixa.min, `${quem}.${chave}.min`, { naoNegativo: true });
-  const maximo = escalar(faixa.max, `${quem}.${chave}.max`, { naoNegativo: true });
-  if (maximo < minimo) falhar(quem, `${chave}.max precisa ser >= min.`);
-  return { minimo, maximo };
+  const temFaixaLegada = Object.hasOwn(faixa, 'min') || Object.hasOwn(faixa, 'max');
+  if (temFaixaLegada) {
+    const extras = Object.keys(faixa).filter((chaveDaFaixa) => chaveDaFaixa !== 'min' && chaveDaFaixa !== 'max');
+    if (extras.length || !Object.hasOwn(faixa, 'min') || !Object.hasOwn(faixa, 'max')) falhar(quem, `${chave} legado precisa ser exatamente {min,max}.`);
+    const minimo = escalar(faixa.min, `${quem}.${chave}.min`, { naoNegativo: true });
+    const maximo = escalar(faixa.max, `${quem}.${chave}.max`, { naoNegativo: true });
+    if (maximo < minimo) falhar(quem, `${chave}.max precisa ser >= min.`);
+    return { minimo, maximo, nominal: null, toleranciaFabricacao: null, formato: 'faixa-legada' };
+  }
+  const extras = Object.keys(faixa).filter((chaveDaFaixa) => chaveDaFaixa !== 'nominal' && chaveDaFaixa !== 'toleranciaFabricacao');
+  if (extras.length || !Object.hasOwn(faixa, 'nominal') || !Object.hasOwn(faixa, 'toleranciaFabricacao')) {
+    falhar(quem, `${chave} precisa ser {min,max} legado ou {nominal,toleranciaFabricacao}.`);
+  }
+  const nominal = escalar(faixa.nominal, `${quem}.${chave}.nominal`, { naoNegativo: true });
+  const fabricacao = faixa.toleranciaFabricacao;
+  if (!fabricacao || typeof fabricacao !== 'object' || Array.isArray(fabricacao)) falhar(quem, `${chave}.toleranciaFabricacao precisa ser {menos,mais}.`);
+  const extrasFabricacao = Object.keys(fabricacao).filter((chaveDaFabricacao) => chaveDaFabricacao !== 'menos' && chaveDaFabricacao !== 'mais');
+  if (extrasFabricacao.length || !Object.hasOwn(fabricacao, 'menos') || !Object.hasOwn(fabricacao, 'mais')) falhar(quem, `${chave}.toleranciaFabricacao precisa ser exatamente {menos,mais}.`);
+  const menos = escalar(fabricacao.menos, `${quem}.${chave}.toleranciaFabricacao.menos`, { naoNegativo: true });
+  const mais = escalar(fabricacao.mais, `${quem}.${chave}.toleranciaFabricacao.mais`, { naoNegativo: true });
+  const minimo = nominal - menos;
+  if (minimo < 0) falhar(quem, `${chave}.nominal - toleranciaFabricacao.menos precisa ser >= 0.`);
+  return { minimo, maximo: nominal + mais, nominal, toleranciaFabricacao: { menos, mais }, formato: 'nominal-fabricacao' };
 }
 
 /** Mede uma faixa anular declarada; não infere borracha, pressão ou colisão de malha. */
@@ -512,9 +535,9 @@ export function validarAssentamentoAnular(declaracao, portas) {
   const id = declaracao.id;
   if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
   if (declaracao.tipo !== 'assentaAnular') falhar(quem, "tipo precisa ser 'assentaAnular'.");
-  const tolerancia = escalar(declaracao.tolerancia ?? 1e-6, `${quem}.${id}.tolerancia`, { naoNegativo: true });
-  const radialEsperado = faixaDeSobreposicao(declaracao, 'sobreposicaoRadial', `${quem}.${id}`);
-  const axialEsperado = faixaDeSobreposicao(declaracao, 'sobreposicaoAxial', `${quem}.${id}`);
+  const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
+  const radialEsperado = faixaDeEspecificacao(declaracao, 'sobreposicaoRadial', `${quem}.${id}`);
+  const axialEsperado = faixaDeEspecificacao(declaracao, 'sobreposicaoAxial', `${quem}.${id}`);
   const referencia = portaDo(portas, declaracao.referencia, quem);
   const movel = portaDo(portas, declaracao.movel, quem);
   const diagnosticos = [];
@@ -544,7 +567,7 @@ export function validarAssentamentoAnular(declaracao, portas) {
   return {
     id, tipo: 'assentaAnular', satisfeita: diagnosticos.length === 0,
     referencia: referencia.id, movel: movel.id,
-    medidas: { alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, radialEsperado, axialEsperado },
+    medidas: { alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado },
     diagnosticos,
   };
 }
@@ -577,6 +600,14 @@ export function formatarDiagnosticoDeAssentamentoAnular(resultado, casas = 6) {
     `faixa axial: sobreposição ${n(m.sobreposicaoAxial)} m, separação ${n(m.separacaoAxial)} m (esperada ${n(m.axialEsperado.minimo)}…${n(m.axialEsperado.maximo)})`,
     `eixos: alinhamento ${n(m.alinhamento)}, descentro ${n(m.descentro)} m`,
   ];
+  if (m.radialEsperado?.formato === 'nominal-fabricacao' || m.axialEsperado?.formato === 'nominal-fabricacao') {
+    const formato = (nome, especificacao) => especificacao.formato === 'nominal-fabricacao'
+      ? `${nome}: nominal ${n(especificacao.nominal)} m, fabricação -${n(especificacao.toleranciaFabricacao.menos)}/+${n(especificacao.toleranciaFabricacao.mais)} m`
+      : `${nome}: faixa legada ${n(especificacao.minimo)}…${n(especificacao.maximo)} m`;
+    linhas.push(`projeto ${formato('radial', m.radialEsperado)}`);
+    linhas.push(`projeto ${formato('axial', m.axialEsperado)}`);
+    linhas.push(`tolerância numérica: ${n(m.toleranciaNumerica)} m`);
+  }
   if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
   if (resultado.alertaGlobal) linhas.push(`alerta global por caixa: ${resultado.alertaGlobal.tipo} (${n(resultado.alertaGlobal.distancia)} m; não substitui contato local)`);
   return `${linhas.join('\n')}\n`;
@@ -636,6 +667,11 @@ export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
     `axial: sobreposição ${n(m.sobreposicaoAxial)}, sobras início/fim ${n(m.sobraInicio)}/${n(m.sobraFim)}`,
     `eixos: alinhamento ${n(m.alinhamento)}, descentro ${n(m.descentro)}`,
   ];
+  if (m.especificacaoFolgaRadial?.formato === 'nominal-fabricacao') {
+    const f = m.especificacaoFolgaRadial.toleranciaFabricacao;
+    linhas.push(`projeto radial: nominal ${n(m.especificacaoFolgaRadial.nominal)} m, fabricação -${n(f.menos)}/+${n(f.mais)} m`);
+    linhas.push(`tolerância numérica: ${n(m.toleranciaNumerica)} m`);
+  }
   if (typeof resultado.estado === 'string') {
     linhas.splice(3, 0, `estado do encaixe: ${resultado.estado}`);
     if (Array.isArray(resultado.grausDeLiberdade) && resultado.grausDeLiberdade.length) {

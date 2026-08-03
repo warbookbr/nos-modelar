@@ -300,6 +300,11 @@ o alerta amplo das partes continua exposto. Isso resolve a ambiguidade da roda
 sem transformar caixa em colisão exata. Solver, reposicionamento persistente,
 deformação de borracha e exceção silenciosa continuam fora do contrato.
 
+O Recorte G [`AUT-2026-12`](planos/2026-08-02-tolerancias-de-montagem.md)
+separa ainda a faixa de projeto: relações novas declaram um nominal e desvios
+de fabricação, enquanto `toleranciaNumerica` fica restrita ao cálculo. A forma
+histórica `{min,max}` segue aceita para replay e não recebe significado novo.
+
 **Onde dói:** conferência headless da bancada.
 
 **Evidência:** a primeira roda revisada,

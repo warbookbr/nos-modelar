@@ -350,3 +350,37 @@ describe('assentamento anular declarado — AUT-2026-11', () => {
     expect(neutro.portas.size).toBe(0);
   });
 });
+
+describe('tolerâncias de montagem explícitas — AUT-2026-12', () => {
+  it('separa nominal, fabricação e cálculo sem mudar a faixa aceita', () => {
+    const roda = montarRodaNoFreio();
+    const resultado = validarEncaixeCilindrico(roda.relacao, resolver(roda));
+    expect(resultado.medidas.especificacaoFolgaRadial).toMatchObject({
+      nominal: 0.00305, toleranciaFabricacao: { menos: 0.00005, mais: 0.00005 }, formato: 'nominal-fabricacao',
+    });
+    expect(resultado.medidas.especificacaoFolgaRadial.minimo).toBeCloseTo(0.003, 12);
+    expect(resultado.medidas.especificacaoFolgaRadial.maximo).toBeCloseTo(0.0031, 12);
+    expect(resultado.medidas.toleranciaNumerica).toBe(0.000001);
+    expect(formatarDiagnosticoDeEncaixe(resultado)).toContain('tolerância numérica: 0.000001 m');
+
+    const anel = montarAnelEFaixa();
+    const assentamento = validarAssentamentoAnular(anel.relacao, resolver(anel));
+    expect(assentamento.medidas.radialEsperado).toMatchObject({
+      minimo: 0.0099, maximo: 0.0101, nominal: 0.01, formato: 'nominal-fabricacao',
+    });
+    expect(formatarDiagnosticoDeAssentamentoAnular(assentamento)).toContain('projeto radial: nominal 0.010000 m');
+  });
+
+  it('mantém a relação legada e recusa fabricação ou epsilon ambíguos', () => {
+    const legado = montarPinoELuva();
+    const resultadoLegado = validarEncaixeCilindrico(legado.relacao, resolver(legado));
+    expect(resultadoLegado.medidas.especificacaoFolgaRadial.formato).toBe('faixa-legada');
+    expect(formatarDiagnosticoDeEncaixe(resultadoLegado)).not.toContain('tolerância numérica:');
+
+    const invalida = { ...montarRodaNoFreio().relacao, folgaRadial: { nominal: 0.00001, toleranciaFabricacao: { menos: 0.00002, mais: 0 } } };
+    expect(() => validarEncaixeCilindrico(invalida, resolver(montarRodaNoFreio()))).toThrow(/nominal - toleranciaFabricacao\.menos/);
+
+    const ambigua = { ...montarRodaNoFreio().relacao, tolerancia: 0.000001 };
+    expect(() => validarEncaixeCilindrico(ambigua, resolver(montarRodaNoFreio()))).toThrow(/toleranciaNumerica.*tolerancia/);
+  });
+});

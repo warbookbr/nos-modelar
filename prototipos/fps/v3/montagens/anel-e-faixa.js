@@ -23,9 +23,9 @@ const PASSOS_ANEL = [
 
 export const RELACAO_ANEL_NA_FAIXA = {
   id: 'anelNaFaixa', tipo: 'assentaAnular', referencia: 'faixa.recebeAnel', movel: 'anel.ocupaFaixa',
-  sobreposicaoRadial: { min: 0.0099, max: 0.0101 },
-  sobreposicaoAxial: { min: 0.0299, max: 0.0301 },
-  tolerancia: 0.000001,
+  sobreposicaoRadial: { nominal: 0.0100, toleranciaFabricacao: { menos: 0.0001, mais: 0.0001 } },
+  sobreposicaoAxial: { nominal: 0.0300, toleranciaFabricacao: { menos: 0.0001, mais: 0.0001 } },
+  toleranciaNumerica: 0.000001,
 };
 
 export function montarAnelEFaixa() {
