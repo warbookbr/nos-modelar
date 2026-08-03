@@ -8,8 +8,21 @@ describe('gate de enquadramento da bancada', () => {
     expect(enquadramentoUtil({ largura: 0.137, altura: 0.41 })).toBe(true);
   });
 
-  it('aceita a vista superior real do caixote, sem afrouxar o limite de área', () => {
+  it('aceita a vista superior real do caixote', () => {
     expect(enquadramentoUtil({ largura: 0.275, altura: 0.367 })).toBe(true);
+  });
+
+  it('aceita uma vista canônica naturalmente fina quando sua dimensão longa está enquadrada', () => {
+    expect(enquadramentoUtil({ largura: 0.48, altura: 0.064 })).toBe(true);
+  });
+
+  it('reprova projeção praticamente degenerada, mesmo com dimensão longa enquadrada', () => {
+    expect(enquadramentoUtil({ largura: 0.48, altura: 0.001 })).toBe(false);
+  });
+
+  it('reprova projeção vazia ou não finita', () => {
+    expect(enquadramentoUtil({ largura: 0.48, altura: 0 })).toBe(false);
+    expect(enquadramentoUtil({ largura: Number.NaN, altura: 0.48 })).toBe(false);
   });
 
   it('reprova uma peça minúscula mesmo inteiramente no quadro', () => {

@@ -6,7 +6,8 @@ zero, compreender os diagnósticos e deixar evidência retomável. O objeto cria
 
 ## Estado e pergunta
 
-**Estado:** Caso 1 repetido após correção localizada; Casos 2 e 3 não iniciados.
+**Estado:** Caso 1 repetido após correção localizada; Caso 2 concluído após um
+recorte de enquadramento; Caso 3 não iniciado.
 
 Pergunta principal: onde uma IA nova perde tempo, precisa descobrir contexto,
 interpreta mal uma ferramenta ou contorna uma capacidade ausente ao atravessar
@@ -116,6 +117,28 @@ contagens derivadas, identidade por grupo e orçamento de discretização.
 Uma abertura oblonga entra somente como pergunta de capacidade, não como gate.
 Se não for expressável sem booleana genérica ou contorno artificial, deve ser
 registrada como limite em vez de pintada ou construída com sobreposição.
+
+#### Resultado — correção localizada e `r001`
+
+O Caso 2 criou `_placa-adaptadora` com uma parte, um corpo, 528 faces, um
+material, envelope `0,240 × 0,018 × 0,180 m`, passagem central, seis furos em
+círculo e três em fileira. Descrição estrita e gate de ID cru passaram.
+
+A primeira tentativa de `r001` preservada foi recusada pelo ambiente antes de
+abrir a bancada. Na repetição, a frontal de uma chapa de 18 mm mediu
+`48,0% × 6,4%`: a câmera já enquadrava a dimensão longa, mas a regra pura ainda
+exigia área de 3,5%. O recorte posterior não mudou câmera, peça ou orientação:
+o gate passou a exigir dimensão longa de pelo menos 32% e dimensão curta de pelo
+menos 4%. A regressão cobre a vista fina, silhueta cortada, objeto pequeno e
+projeções vazia/quase degenerada.
+
+Com a mesma fonte, `revisar:modelagem` promoveu `homologacao-placa/r001` com
+quatro vistas válidas e não cortadas. Isométrica e superior deixam passagem,
+círculo e fileira legíveis; frontal e direita comprovam somente a espessura da
+chapa. O briefing que exigia os furos distinguíveis nas quatro vistas permanece
+divergente: esse não é um motivo para distorcer geometria ou câmera. A limitação
+de grupo linear nomeado e a pergunta sobre abertura oblonga seguem registradas,
+sem ampliação de linguagem neste recorte.
 
 ### Caso 3 — braçadeira bipartida de tubo
 

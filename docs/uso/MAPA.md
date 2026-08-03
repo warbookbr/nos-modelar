@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-283 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+285 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -60,6 +60,10 @@
 ## autoria-assistida/homologacoes/fluxo-ia-v2/caso-01-mancal/
 
 - `relato-processo.md` — Relato de processo — Caso 01: mancal de mesa
+
+## autoria-assistida/homologacoes/fluxo-ia-v2/caso-02-placa/
+
+- `relato-processo.md` — Relato de processo — Caso 02: placa adaptadora
 
 ## docs/
 
@@ -227,6 +231,7 @@
 - `_oficina-transp.js` — PEÇA-EXEMPLO da OFICINA (passo 12b): MATERIAL TRANSPARENTE. Um relicário — um NÚCLEO opaco que BRILHA (brasa: emissivo + semLuz) dentro de uma CASCA de VIDRO…
 - `_pedra.js` — PEÇA-EXEMPLO do P8b+P8c do playground: uma PEDRA — `chamferBox` (caixa cantelada: cantos e arestas chanfrados, analítica, uma fórmula fechada como cubo/esfer…
 - `_pinheiros.js` — scratch: variações do PINHEIRO (não versionar/publicar). Mesmo padrão que o ideador aprovou no _arvformas — saias empilhadas (escada) + agulha verde escuro "…
+- `_placa-adaptadora.js` — Placa adaptadora de exercício para o Caso 2 da homologação do fluxo de IA. Uma única chapa recebe três famílias de furação passante: passagem central, círcul…
 - `_portas-espelho-arranja.js` — PEÇA DE EXERCÍCIO — prova não automotiva de AUT-2026-15. Três placas de sinalização demonstram portas sob cópia: duas voltas de uma placa radial, uma fileira…
 - `_prateleira-furada.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1": uma prateleira de parede com furo de parafuso, encaixe de cavilha e um …
 - `_primitivas.js` — PEÇA-EXEMPLO do P1 do playground: as TRÊS primitivas novas lado a lado — `plano` como chão, `esfera` apoiada no centro e `cone` deslocado pra +x por moveV (p…

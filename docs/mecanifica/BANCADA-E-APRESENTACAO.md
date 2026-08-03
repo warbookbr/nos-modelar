@@ -40,9 +40,13 @@ fonte procedural → descrever (medidas/semântica) → revisar (4 vistas) → c
 ```
 
 `npm run revisar -- <peça>` produz isométrica, frontal, direita e superior em
-projeção ortográfica. Ele falha se a geometria estiver cortada ou ocupar pouco
-do quadro; a aprovação do enquadramento não é aprovação estética. `npm run peca`
-é mantido para diagnóstico herdado de render, nunca como prova visual principal.
+projeção ortográfica. Ele falha se a geometria estiver cortada, se nenhuma
+dimensão projetada alcançar 32% do quadro ou se a menor dimensão ficar abaixo de
+4%. Portanto uma vista canônica naturalmente fina — a espessura de uma chapa —
+continua válida quando a silhueta longa está enquadrada; projeção vazia ou quase
+unidimensional não passa. A aprovação do enquadramento não é aprovação estética.
+`npm run peca` é mantido para diagnóstico herdado de render, nunca como prova
+visual principal.
 
 `npm run bancada` grava seus PNGs em `tools/bancadas/out/`, salvo quando recebe
 `--saida=<pasta-relativa>`. O agente deve ler essas imagens: gerá-las sem olhar

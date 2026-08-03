@@ -1,0 +1,68 @@
+{
+  "alvo": {
+    "caminho": "prototipos/fps/v3/pecas/_placa-adaptadora.js",
+    "modo": "criacao",
+    "peca": "_placa-adaptadora"
+  },
+  "checklist": [
+    {
+      "criterio": "A descrição estrita informa zero órfãos, zero faces sem identidade e nenhuma referência posicional crua.",
+      "estado": "aberto",
+      "id": "identidade",
+      "prioridade": 1
+    },
+    {
+      "criterio": "Existe exatamente a parte placa e um corpo, ambos não vazios e semanticamente identificáveis.",
+      "estado": "aberto",
+      "id": "parte-e-corpo",
+      "prioridade": 2
+    },
+    {
+      "criterio": "A placa respeita o envelope 0,240 × 0,018 × 0,180 m, no máximo 1.200 faces e exatamente um material.",
+      "estado": "aberto",
+      "id": "envelope-e-orcamento",
+      "prioridade": 3
+    },
+    {
+      "criterio": "A passagem central, os seis furos do círculo e os três furos da fileira são distinguíveis nas quatro vistas canônicas.",
+      "estado": "aberto",
+      "id": "furacao-e-vistas",
+      "prioridade": 4
+    },
+    {
+      "criterio": "Passagem central, círculo de fixadores e fileira linear possuem nomes semânticos estáveis e revisáveis.",
+      "estado": "aberto",
+      "id": "grupos-semanticos",
+      "prioridade": 5
+    }
+  ],
+  "formato": "mecanifica.pacote-modelagem",
+  "guias": [
+    "forma/silhueta-e-transicoes",
+    "material/leitura-de-material",
+    "processo/evidencia-e-iteracao"
+  ],
+  "id": "homologacao-placa",
+  "objetivo": "Criar do zero uma placa adaptadora técnico-didática F2, de um corpo, com passagem central, círculo de seis fixadores e fileira linear de três furos semanticamente revisáveis.",
+  "partesEsperadas": [
+    "placa"
+  ],
+  "perfil": {
+    "distanciaMinima": 0.24,
+    "fidelidade": "F2",
+    "interacao": "montagem",
+    "orcamento": {
+      "faces": 1200,
+      "materiais": 1,
+      "partes": 1
+    },
+    "origem": "declarado",
+    "precisao": "mecanica",
+    "visual": "tecnicoDidatico"
+  },
+  "provas": [
+    "descricao-headless",
+    "bancada-quatro-vistas"
+  ],
+  "versao": 1
+}

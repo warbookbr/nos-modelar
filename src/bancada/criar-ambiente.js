@@ -19,10 +19,13 @@ function caixaValida(objetos) {
   return caixa.isEmpty() ? null : caixa;
 }
 
-/** Regra pura do gate visual; separada do renderer para poder provar os dois
- * fracassos que importam à autoria: objeto minúsculo e silhueta cortada. */
+/** Regra pura do gate visual. Uma vista canônica pode ser naturalmente fina
+ * (a espessura de uma chapa), mas não pode ser vazia/quase unidimensional: a
+ * dimensão longa sustenta a leitura da silhueta e a curta prova que há área
+ * projetável de fato. */
 export function enquadramentoUtil({ largura, altura, cortado = false }) {
-  return !cortado && Math.max(largura, altura) >= 0.32 && largura * altura >= 0.035;
+  if (cortado || !Number.isFinite(largura) || !Number.isFinite(altura)) return false;
+  return Math.max(largura, altura) >= 0.32 && Math.min(largura, altura) >= 0.04;
 }
 
 /** Converte o envelope projetado da vista em frustum ortográfico. Os alvos são
@@ -375,9 +378,9 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     const altura = Math.max(0, Math.min(2, maximo.y) - Math.max(-2, minimo.y)) / 2;
     const cortado = minimo.x < -1.001 || minimo.y < -1.001 || maximo.x > 1.001 || maximo.y > 1.001;
     return {
-      /* Peça alongada em vista de topo pode ocupar pouca área, mas ainda ser
-         legível. A régua rejeita só quando nem a maior dimensão alcança 32%
-         do viewport ou quando a silhueta total fica abaixo de 3,5%. */
+      /* Uma chapa pode projetar pouca área e ainda ser legível. A régua exige
+         32% no eixo longo e 4% no curto, para não confundir espessura real com
+         uma projeção vazia ou quase unidimensional. */
       valida: enquadramentoUtil({ largura, altura, cortado }),
       pontos,
       largura,
