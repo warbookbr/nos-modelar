@@ -13,8 +13,8 @@ O recorte herdado do NÓS vive em `prototipos/fps/v3/`. Ele contém:
 A Oficina humana de objeto/material/animação e sua aba de som foram removidas
 da Mecanifica. Elas continuam disponíveis no repositório original do NÓS.
 
-O núcleo procedural possui ideias reutilizáveis, mas a aplicação atual concentra
-cena, interface, navegação e configurações em `jogo.html`. A numeração de
+O núcleo procedural possui ideias reutilizáveis, e a superfície visual publicada
+é a bancada neutra. A antiga aplicação jogável v3 foi retirada. A numeração de
 geometria também conserva dependências posicionais que ainda dificultam autoria
 por IA.
 
@@ -126,7 +126,7 @@ manifesto juntos, conferir e construir no produto.
 
 ## Estratégia de migração
 
-1. Congelar uma referência executável do núcleo e do cliente v3.
+1. Congelar uma referência executável do núcleo e do visor de peças.
 2. Criar a aplicação Three.js ao lado dele.
 3. Provar a ponte com uma peça procedural existente.
 4. Provar a bancada corrigindo uma peça herdada.

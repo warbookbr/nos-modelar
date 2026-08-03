@@ -5,8 +5,9 @@
    arquivo fora de `docs/historico/`) exige resolução EXATA; ZONA HISTÓRICA
    (arquivos sob `docs/historico/`) aceita resolução por NOME de arquivo em
    qualquer lugar sob `docs/` — histórico é imutável por regra do repo, e
-   reescrever caminho ali seria editar registro. Allowlist de 2 exceções
-   conhecidas, com o motivo escrito abaixo. `npm run docs:links` imprime;
+   reescrever caminho ali seria editar registro. A allowlist registra
+   referências históricas a arquivos removidos, com o motivo escrito abaixo.
+   `npm run docs:links` imprime;
    `npm run docs:links:check` sai ≠0 em qualquer falha. Zero dependências (git
    ls-files + fs).
 
@@ -29,12 +30,24 @@ const IGNORAR = new Set(['tools/mapa/links.mjs']);
    capturar menção solta a nome de arquivo em prosa (ex.: "veja o LORE.md"). */
 const PADRAO = /\bdocs\/[A-Za-z0-9_.\-\/]+\.md\b/g;
 
-/* Allowlist: exatamente 2, com o motivo. Chave = "arquivo:caminho citado". */
+/* Allowlist fechada por par arquivo→referência, com o motivo. As entradas da
+   limpeza são históricas e específicas: o arquivo citado existiu no histórico
+   Git e foi removido intencionalmente. A exceção R3 é o registro anterior de
+   um arquivo que nunca existiu. Não há glob, prefixo ou exceção por diretório.
+   Chave = "arquivo:caminho citado". */
 const ALLOWLIST = new Map([
-  // caminho errado num doc arquivado; o arquivo real é CLAUDE.md na raiz.
-  ['docs/historico/legado/PORTALS_PROTOCOL.md:docs/CLAUDE.md', 'caminho errado herdado — o real é CLAUDE.md na raiz'],
   // arquivo genuinamente inexistente, citado pelo DECISIONS-ARCHIVE.md como registro histórico de uma branch já descartada.
   ['docs/historico/DECISIONS-ARCHIVE.md:docs/R3_COMPARATIVO_RENDER.md', 'arquivo nunca existiu na main — citado como registro de branch descartada'],
+  // referências preservadas em decisões e walkthroughs históricos; os documentos de origem foram removidos nesta limpeza.
+  ['docs/historico/DECISIONS-ARCHIVE.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS-ARCHIVE.md:docs/CIDADE.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS-ARCHIVE.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS-ARCHIVE.md:docs/CODER.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS.md:docs/FERRAMENTAS.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS.md:docs/AUDIO_E_CENAS.md', 'referência histórica preservada'],
+  ['docs/historico/DECISIONS.md:docs/HABITANTES.md', 'referência histórica preservada'],
+  ['docs/historico/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
+  ['docs/historico/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
 ]);
 
 const rastreados = execFileSync(
@@ -89,15 +102,10 @@ for (const arquivo of rastreados) {
 /* --- alcançabilidade: todo doc parte do índice curado da Mecanifica --- */
 const PORTA_ENTRADA = 'docs/mecanifica/INDEX.md';
 
-/* Citar uma PASTA cobre o que está dentro dela. É o caso do
-   `docs/historico/legado/`: são 11 docs de uma era encerrada, e enumerá-los
-   um a um infla a porta de entrada com o que ninguém deve ler. O critério do
-   gate é "nada fica inalcançável", e um ponteiro pra pasta alcança.
-
-   É uma lista EXPLÍCITA, e não uma regra geral de "pasta citada cobre o
-   conteúdo", porque títulos de seção como `docs/rumo/` não podem isentar uma
-   árvore inteira por acidente. */
-const PASTAS_BLOCO = ['docs/historico/legado/'];
+/* Citar uma PASTA cobre o que está dentro dela. A lista é EXPLÍCITA, e não
+   uma regra geral de "pasta citada cobre o conteúdo", porque títulos de seção
+   como `docs/rumo/` não podem isentar uma árvore inteira por acidente. */
+const PASTAS_BLOCO = [];
 
 function referenciasDocsDe(arquivo) {
   const refs = new Set();

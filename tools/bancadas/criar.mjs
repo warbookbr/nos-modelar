@@ -6,7 +6,7 @@
  * caixa/colisão, direto do núcleo — sem browser), o manifesto de capacidades
  * (as ops que EXISTEM de verdade, de `Object.keys(OPS)` — nunca hand-copiado,
  * cruzado contra a doc), os renders (3 ângulos texturizados + 3 geo=normais —
- * a evidência forçada) e os GATES (auditar + porteiro + gabarito, se houver
+ * a evidência forçada) e os GATES (porteiro + gabarito, se houver
  * referência) resumidos num VEREDITO AGREGADO. Fecha o "83%": nenhum destes
  * passos fica de fora por esquecimento — um comando só cobre todos.
  *
@@ -17,10 +17,9 @@
  */
 import { createServer } from 'node:http';
 import { pathToFileURL } from 'node:url';
-import { readFileSync, readdirSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { construirPeca, pixels } from './bench/sandbox.mjs';
 import { decodePng, pngStats } from './bench/pngstats.mjs';
 import { mascaraParaPng, sobreposicaoParaPng } from './bench/pngwrite.mjs';
 import { extrairSilhueta, rasterizarContorno, validarContorno, iou, areaMascara, LIMIAR_IOU } from './bench/gabarito-nucleo.mjs';
@@ -131,28 +130,7 @@ log('\n── manifesto (núcleo x docs/uso/oficina-contrato.md) ──');
   }
 }
 
-/* 3 · AUDITAR (headless — os críticos de senso crítico [cpu]) */
-log('\n── auditar (crítico [cpu]) ──');
-{
-  const { built, meta: metaAud, erro } = await construirPeca(nome);
-  if (erro) falha(`construir() lançou: ${erro.message}`);
-  else {
-    const tools = [];
-    for (const fn of readdirSync(join(HERE, 'bench/tools')).filter((f) => f.endsWith('.mjs'))) {
-      const m = await import(pathToFileURL(join(HERE, 'bench/tools', fn)));
-      if (m.analisar && m.dom) tools.push({ id: m.id || fn, analisar: m.analisar });
-    }
-    let total = 0;
-    for (const t of tools) {
-      // D-128: `meta` no ctx — o crítico de simetria é OPT-IN por `meta.simetria`
-      let fnd = []; try { fnd = t.analisar(built, { pixels, meta: metaAud }) || []; } catch (e) { fnd = [{ sev: 'erro', msg: 'ferramenta quebrou: ' + e.message }]; }
-      if (fnd.length) { total += fnd.length; falha(`${t.id}: ${fnd.map((x) => `[${x.sev}] ${x.msg}`).join(' | ')}`); }
-    }
-    if (total === 0) ok(`limpo nos ${tools.length} críticos`);
-  }
-}
-
-/* 4 · BROWSER (uma vez só) — porteiro, renders (evidência), gabarito */
+/* 3 · BROWSER (uma vez só) — porteiro, renders (evidência), gabarito */
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
 const server = createServer((req, res2) => {
   const p = join(REPO, decodeURIComponent(new URL(req.url, 'http://x').pathname));
@@ -247,5 +225,5 @@ if (!existsSync(gabaritoPath)) {
 
 /* 5 · VEREDITO AGREGADO */
 log(`\n═══ ${reprovado ? 'REPROVADO ✗' : 'APROVADO ✓'} — ${nome} ═══`);
-if (!existsSync(gabaritoPath)) log('  (sem gabarito: a forma não tem número — "aprovado" aqui é núcleo+auditar+porteiro, não silhueta)');
+if (!existsSync(gabaritoPath)) log('  (sem gabarito: a forma não tem número — "aprovado" aqui é núcleo+porteiro, não silhueta)');
 process.exit(reprovado ? 1 : 0);

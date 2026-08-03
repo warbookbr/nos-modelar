@@ -1,15 +1,13 @@
-# v3 — núcleo e cliente GPU herdados (D-55)
+# v3 — núcleo procedural, peças e visor
 
-Rumo travado pelo ideador: **`v2` (branch) preserva o jogo atual (CPU raycaster)**;
-na `main` nasce o **v3 (WebGL/GPU)** — pixel art, render fixo (`?res=`) com upscale
-nítido, custo independente da tela (o conserto do "roda terrível no celular").
+Este diretório mantém o núcleo procedural e o visor neutro usados pela
+Mecanifica. O antigo jogo v3 foi retirado; a bancada é a superfície visual ativa.
 
 ## Recorte mantido na Mecanifica
 
-Este diretório conserva o núcleo procedural, as peças, o visor e o jogo de
-referência. A Oficina humana e a aba de som foram retiradas da Mecanifica; elas
-continuam no repositório original do NÓS. A bancada neutra atual vive em
-`/bancada.html` e usa Three.js por meio de um adaptador.
+Este diretório conserva o núcleo procedural, as peças e o visor de referência.
+A bancada neutra atual vive em `/bancada.html` e usa Three.js por meio de um
+adaptador.
 
 ```
 v3/
@@ -17,19 +15,12 @@ v3/
     mat4.js     matrizes (persp/ortho/lookAt/rotY/translate)
     tex.js      paleta Resurrect64, ruído, dither, texCanvas (índice | [r,g,b] | -1)
     geo.js      Mesh/quad/quadUV/tri/box (8 floats/vértice)
-    render.js   o VISOR: sol+sombra PCF (tier), luz de céu (tier), névoa, partículas
-                (tier), grama, blit — câmera ÓRBITA (visor) OU LIVRE (setCam, D-61)
-    input.js    teclado+mouse (pointer lock) + joystick touch (D-47/48/49 portado)
-    som.js      Web Audio: ambiente (vento+água por proximidade) + passos (D-61)
+    render.js   o VISOR: sol+sombra PCF, luz de céu, névoa, partículas, grama e blit
+                — câmera de órbita no visor
   pecas/        cada peça é um módulo JS autocontido (contrato abaixo)
-    casa-toras.js   a cabana aprovada (D-54f) — a peça de referência
-    ilha-chao.js    o chão: ilha flutuante + ilhotas no horizonte (D-58)
-    arvore3d.js     árvore: tronco+copa 3D, respeita ctx.TS e ctx.seed (D-59/61)
+    freio-disco.js  conjunto mecânico de referência da Mecanifica
     _modelo.js      template comentado ("olá mundo": cubo animado)
   visor.html    abre uma peça ISOLADA: ?peca=nome&res=640&ts=4[&a=&e=&r=] — órbita
-  jogo.html     o ALICERCE jogável (D-61): ilha+árvores plantadas, câmera livre
-                (WASD/mouse/touch), pausa+configurações (som/gráficos/controles/
-                idioma). NÃO é o cliente v3 definitivo — é onde ele nasce.
 ```
 
 ## O contrato de peça
@@ -42,7 +33,7 @@ export function construir(ctx) {
   return {
     lotes: [{ mesh, tex, matriz? }],   // malha CPU + canvas; o visor sobe pra GPU
     animar?: (t, lotes) => {},          // anima trocando lotes[i].matriz
-    // opções de PAISAGEM (ilha-chao é o exemplo):
+    // opções de paisagem:
     palco?: false,        // a peça É o chão -> some a grama padrão do visor
     particulas?: false,   // sem pólen (em paisagem lia como enxame)
     fog?: [início, alcance],  // névoa própria (a padrão esmaga cenas grandes)
@@ -63,17 +54,5 @@ export function construir(ctx) {
 ## Limites honestos (hoje)
 
 - **Reflexos**: recurso do motor (passe planar/água), planejado, não feito.
-- **Sem colisão de verdade**: `jogo.html` só trava o jogador num raio (MAXR=25)
-  do centro da ilha — atravessa tronco de árvore, não cai na lagoa. O motor de
-  segmento/colisão da v2 (D-53) não foi portado ainda.
-- **As árvores plantadas em `jogo.html` são PLACEHOLDER**: 12 posições fixas,
-  4 variantes por seed — não é o "plantar árvores" definitivo (densidade,
-  espécie, relação com o terreno ainda em aberto).
-- **`ilha-chao.js` não respeita `ctx.TS`** (só `arvore3d.js` foi migrada) — o
-  tier de textura do menu não afeta grama/água/rocha, só as árvores.
-- **Sombra "Alto" (2048px) é PESADA**: medido em WebGL por software (sandbox)
-  caiu de ~20fps (Médio) pra ~10fps — trate como experimental até medir num
-  aparelho de verdade (a mesma ressalva do D-54 sobre swiftshader).
-- O cliente v3 em si (mundo, HUD, gameplay) é o PORT em andamento; `jogo.html`
-  é o primeiro alicerce jogável, não o jogo pronto — falta identidade/economia/
-  mago-guia (D-57) e a passagem de bastão do `/fps/` (v2) pro v3 (D-55).
+- O visor mostra peças isoladas. Câmera livre, jogo, áudio e benchmark antigo
+  pertencem ao legado removido nesta rodada.

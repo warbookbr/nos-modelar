@@ -27,8 +27,8 @@ como roteiro de produto da Mecanifica. Em caso de divergência,
 - O núcleo, as peças e o jogo de referência em `prototipos/fps/v3/` permanecem
   executáveis durante a migração. A Oficina humana, a antiga aba de som e sua
   ponte de runtime foram retiradas e não fazem parte da Mecanifica.
-- O novo produto nasce em módulos próprios, sem acrescentar mais responsabilidades
-  ao `jogo.html` legado.
+- O novo produto nasce em módulos próprios; o antigo jogo v3 não faz parte da
+  superfície publicada.
 - O núcleo de autoria não pode importar Three.js nem conhecer freios, carros ou
   interface. Renderização e domínio entram por adaptadores.
 - Regras automotivas não viram operações geométricas. Uma necessidade como

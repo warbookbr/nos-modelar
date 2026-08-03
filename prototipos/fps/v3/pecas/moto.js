@@ -52,13 +52,6 @@
        e vai pro lugar com `transladar` (D-128); a mesa é girada 25° com
        `rotaciona` pro mesmo eixo do garfo.
 
-   SIMETRIA em x=0, MEDIDA (crítico `simetria` do `auditar`, opt-in por
-   `meta.simetria`): 0 de 1376 posições sem par. Como ela é garantida — tudo que
-   é lateral vem de `espelha`; os lofts centrais têm o caminho no plano x=0 (aí
-   o frame do transporte paralelo fica exatamente u=(1,0,0), então contorno
-   simétrico em u dá malha simétrica) e `lados` PAR; as rodas têm tangente
-   (1,0,0) constante com as estações espelhadas em x.
-
    LIMITES DO VOCABULÁRIO QUE APARECERAM AQUI (detalhe no relatório):
      · `contorno` não aceita conta nem escala — cada estrela/seção/retângulo vai
        escrito por extenso (266 pontos = 532 números literais neste arquivo), e
@@ -927,11 +920,6 @@ export const meta = {
   nome: 'moto',
   tipo: 'objeto',
   desc: 'motocicleta futurista estilizada — rodas com aro/braços/pneu, garfo e braço tubulares, guidão espelhado, farol integrado; 100% em PASSOS',
-  /* SIMETRIA DECLARADA em x (D-128): cobrada pelo crítico `simetria` do
-     `auditar`. Na 1ª corrida REPROVAVA (12 de 492 posições sem par — os anéis do
-     guidão, que era um `loft` de caminho simétrico); aqui o guidão virou metade
-     + `espelha` e a medida é 0 de 1376. */
-  simetria: 'x',
   colisao: colisaoDe(PASSOS, PARAMS, TOPO, MATERIAIS),
 };
 

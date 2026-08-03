@@ -5,7 +5,7 @@
  * Screenshots de uma PEÇA do v3 no visor padrão, em 3 ângulos, sem rede:
  * server estático local (o visor usa ES modules) + Chromium do site.
  *
- *   npm run peca -- casa-toras            # 3 ângulos padrão
+ *   npm run peca -- freio-disco           # 3 ângulos padrão
  *   npm run peca -- _modelo --res=960     # template, outra resolução
  *
  * Saída: tools/bancadas/out/peca-<nome>-<ângulo>.png — e o passo seguinte é
@@ -22,7 +22,7 @@ const REPO = resolve(HERE, '../..');
 const OUT = join(HERE, 'out');
 
 const args = process.argv.slice(2);
-const nome = (args.find((a) => !a.startsWith('--')) || 'casa-toras').replace(/[^a-z0-9_-]/gi, '');
+const nome = (args.find((a) => !a.startsWith('--')) || 'freio-disco').replace(/[^a-z0-9_-]/gi, '');
 const res = /^--res=(\d+)$/.exec(args.find((a) => a.startsWith('--res=')) || '')?.[1] || '640';
 /* --e= / --r= sobrescrevem a altura/raio da câmera em TODOS os ângulos
    (peças de paisagem — chão, ilha — pedem câmera mais alta e afastada) */

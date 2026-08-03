@@ -19,7 +19,7 @@
 /* O VISOR da OFICINA (D-55): abre qualquer peça de pecas/ no ambiente padrão
    do motor v3 (sol+sombra, céu, grama, partículas, ?res=). É o MESMO motor
    que o cliente v3 usará — o que fica bom aqui, fica bom no jogo.
-     ?peca=casa-toras       qual peça (padrão: casa-toras)
+     ?peca=freio-disco      qual peça (padrão: freio-disco)
      ?res=640 &ts=4         resolução interna / escala de textura
      ?a=38 &e=1.15 &r=5.4   câmera fixa (senão: órbita lenta)                */
 import { criarVisor } from './motor/render.js';
@@ -28,7 +28,7 @@ import * as tex from './motor/tex.js';
 import * as geo from './motor/geo.js';
 
 const P = new URLSearchParams(location.search);
-const nome = (P.get('peca') || 'casa-toras').replace(/[^a-z0-9_-]/gi, '');
+const nome = (P.get('peca') || 'freio-disco').replace(/[^a-z0-9_-]/gi, '');
 const TS = Math.max(1, (parseInt(P.get('ts')) || 4) | 0);
 const res = Math.max(160, (parseInt(P.get('res')) || 640) | 0);
 const camOrbita = !P.has('a');

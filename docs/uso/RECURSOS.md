@@ -33,23 +33,10 @@ o Chromium já vem no ambiente). Sem isso, as bancadas saem avisando.
 | `npm run peca -- <nome>` | **O visor de peça**: renderiza uma peça de `prototipos/fps/v3/pecas/` em 3 ângulos → PNGs em `tools/bancadas/out/` (LEIA-os). `--res=1400`, `--giro=8` (8 ângulos), `--geo=normais\|flat` (SEM textura: emenda/faceta/silhueta saltam), `--e=<alt> --r=<raio>` (câmera) |
 | `npm run oficina` | **A bancada da Oficina**: prova cada passo do editor (câmera, arrasto, undo, gizmo, extrude, mescla, pincel, exportar, materiais, animação, esqueleto) com NÚMERO — Playwright com eventos reais |
 | `npm run guarda:salvar` | **A guarda do salvar pelo BOTÃO REAL** (A-15): edição por id posicional não chega ao POST nem ao fallback de download, peça semântica salva normal — dois servidores, um com a rota do `servir.mjs` e outro sem |
-| `npm run auditar -- <peca>` | **Gate de senso crítico [cpu]**: os 5 críticos (malha, paleta, costura, banding, órfãos) — exit≠0 em achado. Sem argumento roda em todas. Detalhe: skill `auditar-peca` |
 | `npm run porteiro -- <peca>` | **Gate de render**: pageerror / `__ready` / frame degenerado |
 | `npm run gabarito -- <peca>` | **FORMA COMO NÚMERO (P5)**: mede a silhueta renderizada × o contorno de referência de `prototipos/fps/v3/gabaritos/<peca>.js` — IoU + VEREDITO calibrado (exit≠0 = reprovado), evidência em PNG (`tools/bancadas/out/gabarito-*`). Sem gabarito pra peça, falha alto (nada medido) |
-| `npm run criar -- <peca>` | **O LAÇO ÚNICO (P7)**: um comando só — estado do núcleo (vértices/faces/caixa/colisão), o manifesto de capacidades (`OPS` do núcleo × a skill `criar-peca`, aponta deriva), `auditar`+`porteiro`+`gabarito` (se houver) e um VEREDITO AGREGADO (exit≠0 = reprovado). Renders em `tools/bancadas/out/criar-*` — LEIA-os. Prefira este comando a rodar peca/auditar/porteiro/gabarito em separado |
+| `npm run criar -- <peca>` | **O LAÇO ÚNICO (P7)**: um comando só — estado do núcleo (vértices/faces/caixa/colisão), o manifesto de capacidades (`OPS` do núcleo × a skill `criar-peca`, aponta deriva), `porteiro`+`gabarito` (se houver) e um VEREDITO AGREGADO (exit≠0 = reprovado). Renders em `tools/bancadas/out/criar-*` — LEIA-os. |
 | `npm run executar` | Replay headless do núcleo (`nucleo`/`neutroCanonico`) em Node — determinismo/replay |
-| `npm run jogar` | Screenshot do jogo (`jogo.html`): `-- --cam=x,y,alt,ang`, `-- --pausado --aba=graficos` |
-| `npm run bench` | Benchmark dos críticos (defeitos plantados → placar F1) — rode se mexer nos críticos |
-
-### Bancadas — som (o "ouvido": a IA não escuta, então mede)
-
-| Comando | O que faz |
-|---|---|
-| `npm run analisar -- <peca-som>` | **O ouvido**: espectrograma (imagem tempo×freq pra Read) + descritores (tom, brilho/centroide, envelope, duração) de uma peça de `pecas-som/` |
-| `npm run sintetizar -- <peca-som>` | Render offline (OfflineAudioContext) → amostras/hash — o `cmp` de amostra do determinismo |
-| `npm run somtela` | A bancada da aba Som (`som.html`): editor de grafo, presets, espectrograma, sem regressão |
-| `npm run somab` | **A/B**: o som REAL do jogo (`som.js`, offline) × o preset — distância por eixo medido |
-| `npm run somexportar` | Round-trip do exportar de som (reabre bit-a-bit) |
 
 ### Dev
 
@@ -104,16 +91,12 @@ que foi clonado.
 - **`docs/uso/MAPA.md`** — a árvore do repo com resumo por arquivo (gerada, sempre fresca — `npm run mapa`).
 - **`docs/uso/oficina-contrato.md`** — o que vale HOJE na Oficina: formato salvo, identidade de vértice, vocabulário de operações (gateado por `npm run criar`), camadas do código e o contrato de como a IA emite peça.
 - **`docs/uso/oficina-referencia.md`** — o manual de como cada elemento da Oficina funciona hoje.
-- **`docs/uso/LORE.md`** — a restrição viva: todo texto de jogo obedece a este documento.
 
 ### `docs/rumo/` — direção registrada do NÓS
 
 - **`docs/rumo/NORTE.md`** — objetivo maior, método experimental e não negociáveis do NÓS original; não governa a Mecanifica.
 - **`docs/rumo/PLANO.md`** — roteiro do NÓS no momento da clonagem; não é o plano vigente da Mecanifica. A moto está congelada como **espécime de falha** — serve de régua de regressão, e não é referência nem de código (6.512 ids à mão) nem de forma.
 - **`docs/rumo/oficina-roteiro.md`** — o que foi projetado pra Oficina e ainda NÃO existe, mais as decisões de escopo (booleano, UV manual e three.js ficam de fora por decisão).
-- **`docs/rumo/VISION.md`** — o que o NÓS é e nunca será.
-- **`docs/rumo/FERRAMENTAS.md`** — o plano de potência das ferramentas (visão de longo prazo, quase nada construído ainda).
-- **`docs/rumo/AUDIO_E_CENAS.md`** — direção de música/voz/cenas — documento de direção, nada construído ainda.
 - **`docs/rumo/arquitetura-identidade-estavel.md`** — proposta arquitetural de identidade estável de objetos e subpartes (origem + coordenada local + aliases), pra uma seleção sobreviver à edição da peça; é a hipótese que as fases do `PLANO.md` provam em fixture antes de mudar o núcleo.
 
 ### `docs/historico/` — o que se fez e o que se aprendeu (imutável)
@@ -136,7 +119,6 @@ que foi clonado.
 - **`docs/historico/fase4-drone-inspecao-criacao-relatorio.md`** — corrida de CRIAÇÃO da Fase 4: um agente limpo cria o drone do zero, 0 ids literais. Veredito PARCIAL.
 - **`docs/historico/fase4-drone-inspecao-refino-relatorio.md`** — corrida de REFINO da mesma peça por crítica, editando sem regenerar. Medições antes/depois. Veredito PARCIAL.
 - **`docs/historico/walkthrough_colaborador4.md`** — resumo de alterações de uma branch antiga de colaborador, sobre o protótipo FPS v3.
-- **`docs/historico/legado/`** — os 11 docs d'O Coração (o mundo 2D congelado, D-109/D-111) — leitura histórica; o `README.md` de lá é o ponto de entrada.
 
 ### Fora das três pastas — deliberadamente
 

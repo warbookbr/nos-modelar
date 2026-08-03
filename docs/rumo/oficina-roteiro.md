@@ -120,22 +120,19 @@ evita confusão depois:
 
 ### Três coisas que isso exige e hoje não existem
 
-**Objeto plantado precisa poder ter valores próprios.** Hoje `arvore3d.js` é uma
-peça só, `ARVORE_POS` é uma lista de posições, e quatro variantes nascem de
-sementes diferentes — nenhuma árvore tem dado próprio. Pra "aplicar só nesta",
+**Objeto composto precisa poder ter valores próprios.** Hoje uma peça é uma
+estrutura só e qualquer variação precisa ser declarada nela. Pra "aplicar só nesta",
 cada objeto plantado precisa carregar valores que substituem os do `PARAMS`.
 
-**O mapa precisa virar dado.** As posições estão escritas à mão dentro do
-`jogo.html`. Pra Oficina listar, marcar no mapa e gravar alteração em uma
-árvore, isso vira arquivo de posicionamento: posição, tipo e os valores próprios
+**O mapa precisa virar dado.** Posições de uma cena composta não devem ficar
+escritas à mão numa página. Pra Oficina listar, marcar no mapa e gravar alteração
+em um objeto, isso vira arquivo de posicionamento: posição, tipo e os valores próprios
 de cada objeto. É o `props.js` do `nos-Craft`. E é o que faz os botões de mapa
 anterior e próximo terem sentido — cada mapa é um desses arquivos.
 
-**Clicar na etiqueta com o ponteiro travado.** As etiquetas de hoje têm
-`pointer-events: none` e o jogo trava o cursor, então não há seta pra clicar.
-Solução sem quebrar o controle: a etiqueta mais próxima do centro da tela se
-destaca e o clique esquerdo abre o aviso. **Você mira, não aponta** — coerente
-com o resto do jogo, e o ponteiro continua travado.
+**Clicar na etiqueta com o ponteiro travado.** A bancada deve manter a seleção
+semântica mesmo quando a câmera está em modo de inspeção. A etiqueta mais
+próxima do centro da tela se destaca e o clique abre o aviso.
 
 ### Ao aplicar, refazer a colisão
 
@@ -379,16 +376,15 @@ de animação — é o **cérebro** (IA / máquina de estados) que **decide qual
 animação disparar. O sistema de animação é o vocabulário (as trilhas, o
 gatilho); o comportamento é quem consome esse vocabulário.
 
-Mesma separação que o `som.js` (a síntese) tem do código do jogo que chama
+Mesma separação que um adaptador de comportamento teria do código que chama
 `passo()` na hora certa. Misturar os dois faria a peça carregar lógica de
-jogo, e a Oficina deixaria de ser só sobre a FORMA da coisa. O comportamento
-mora no código do mundo, não na peça.
+execução, e a Oficina deixaria de ser só sobre a FORMA da coisa.
 
 ## Partículas e fluidos
 
 Terreno novo — nada disto está no formato de passos ainda. Partícula e fluido
-são **sistema** (parâmetros + atualização por quadro), não geometria de
-vértice — mesma distinção que separou o "comportamento contínuo" na Aba Som.
+ são **sistema** (parâmetros + atualização por quadro), não geometria de
+vértice.
 
 ### O que o motor já tem
 
@@ -397,8 +393,7 @@ derivam, sobem em laço e piscam, animados 100% no vertex shader a partir de
 sementes fixas — o buffer sobe uma vez, o tempo faz o resto. Contagem por tier
 (80/320/800), blend aditivo, desligável com `particulas:false` em paisagem.
 Barato e elegante, mas é UM efeito fixo, não um emissor configurável. De
-fluido, o motor não tem nada visual: a água hoje vive só no `som.js` (bolhas e
-lambidas); na tela é o chão chapado.
+fluido, o motor não tem nada visual nesta bancada.
 
 ### Partículas: generalizar o pólen num emissor
 
@@ -540,11 +535,11 @@ parte antes — a distinção que desfaz o nó é ONDE a Oficina está rodando.
 O jeito principal, e que já funciona hoje sem nenhuma feature nova. O
 ideador trabalha com uma IA por assinatura (Claude Code) em tempo real, do
 lado de FORA do navegador; a IA cria ou edita a peça e **publica no
-repositório** — hoje como peça de rascunho (as com prefixo `_` em `pecas/`,
-tipo `_raiz1.js` e `_elenco.js`), por PR ou direto na main. O ideador então
+repositório** — hoje como peça de rascunho (as com prefixo `_` em `pecas/`),
+por PR ou direto na main. O ideador então
 abre essa peça na Oficina e refina no mouse. O repositório é a caixa
 compartilhada entre os dois: a IA solta o arquivo lá, o ideador pega —
-inclusive de dentro do jogo, é só republicar e recarregar.
+inclusive de dentro da bancada, é só republicar e recarregar.
 
 **Isso não é uma feature da Oficina, e é por isso que é robusto.** Cai de
 graça de duas coisas que já existem por outro motivo: o formato de lista de
@@ -718,10 +713,9 @@ gerando tudo por código, zero arquivo, como o Nós faz. Os carregadores de `.gl
 e afins são capacidade disponível, não obrigação. A frase "precisaríamos do
 three.js pra trazer coisa de fora" era condicional, e a condição não se aplica.
 
-**Trazer objeto de fora já tem lugar previsto.** No `docs/historico/legado/PORTALS_PROTOCOL.md`,
-o campo `clientHint` existe pra um mundo federado avisar que precisa de outro
-cliente ou tem mecânica própria. Como cada repositório é um planeta com o
-cliente dele, **nosso renderizador nunca carrega `.glb` de estranho**.
+**Trazer objeto de fora é uma decisão de integração futura.** Cada repositório
+mantém seu próprio cliente e **nosso renderizador nunca carrega `.glb` de
+estranho**.
 
 ### O sinal pra reconsiderar
 
@@ -753,4 +747,3 @@ o trabalho todo.
 **Bancada sem interface pro `executar`.** O projeto já tem `tools/bancadas/`.
 Uma bancada que roda uma lista de passos e confere o resultado testa o replay —
 que é o coração de tudo — sem precisar abrir o editor nem clicar em nada.
-

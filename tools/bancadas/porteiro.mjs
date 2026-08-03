@@ -4,7 +4,7 @@
    DEGENERADO (tela chapada — render quebrado que "passou verde"). Pra CI e pro
    "shader quebrado nunca mais passa".
      node tools/bancadas/porteiro.mjs                 # todas as peças de pecas/
-     node tools/bancadas/porteiro.mjs arvore3d ilha-chao */
+     node tools/bancadas/porteiro.mjs freio-disco roda-dianteira */
 import { createServer } from 'node:http';
 import { pathToFileURL } from 'node:url';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';

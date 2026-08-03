@@ -107,10 +107,8 @@ evoluir.
   `import()`, então quem só joga nunca paga o custo dela; o `oficina.html`
   carrega o mesmo módulo direto. Condição: a Oficina **não lê estado do jogo**.
   Ela recebe o que precisa, não busca.
-- **1 unidade = 1 metro.** Já era assim sem estar escrito: no `jogo.html`,
-  `EYE = 1.7` é altura dos olhos, `SPEED = 5.2` é corrida em metros por segundo,
-  `JOGADOR_R = 0.35` dá uns 70cm de ombro a ombro. Escrever fecha a porta pra
-  alguém supor outra coisa.
+- **1 unidade = 1 metro.** O visor e a bancada usam esta escala diretamente.
+  Escrever fecha a porta pra alguém supor outra coisa.
 - **Objeto pode ser instanciado com parâmetros diferentes**, e desde o começo.
   O jogo já faz isso por tipo (`VARIANTES` com 4 sementes); o que falta é por
   objeto. Como os parâmetros já têm nome, basta `construir()` aceitar valores
@@ -123,8 +121,8 @@ evoluir.
   virava 3 por coerção binária e um cilindro de V=16/F=10 caía para V=6/F=5
   com malha LIMPA. Hoje `st.num` recusa o valor antes de criar geometria. Num
   valor dimensional o
-  estrago é menor (coordenada NaN, que o `lint-de-malha` do `auditar` ainda
-  pega a jusante — mas sem dizer QUAL passo errou). Cada op **também** valida
+  estrago é menor (coordenada NaN, que a validação de malha pega a jusante —
+  mas sem dizer QUAL passo errou). Cada op **também** valida
   por conta, pra GRITAR nomeando a seção/ponto (a lei do lathe, D-115): a
   rede central garante que nada vaza, a checagem local dá o diagnóstico.
 
@@ -166,7 +164,7 @@ grita" do envelope).
 ## Formato do arquivo gerado
 
 O arquivo tem que ser uma peça normal do jogo: exporta `meta` e `construir(ctx)`,
-igual `arvore3d.js` faz hoje — e segue **o envelope** acima (esta seção é o
+igual uma peça procedural de referência faz — e segue **o envelope** acima (esta seção é o
 envelope encarnado no tipo `objeto`). A diferença é que o corpo dele é **dados**.
 
 ```js
@@ -228,7 +226,7 @@ continua sendo a referência simples compatível (`'troncoR'`).
 **`PASSOS` é exportado.** Parece detalhe e não é: sem o export, a Oficina não
 consegue ler a lista de volta, e o arquivo salvo nunca mais reabre pra edição.
 
-**A colisão é calculada, não guardada.** O `jogo.html` lê `meta.colisao` no
+**A colisão é calculada, não guardada.** A bancada lê `meta.colisao` no
 carregamento do módulo, antes de `construir()` rodar. E o raio encaixado sai da
 malha final, depois das extrusões — quase nunca é igual a um parâmetro, então
 `raio: PARAMS.troncoR` estaria errado no caso geral. Por isso `colisaoDe` roda
@@ -439,7 +437,7 @@ eixo (`faixa` e `lado`) aceita, além de inteiro e de ausente, um filtro que
 seleciona vários índices de uma vez — o índice `k` do eixo entra se
 `k % passo === fase`. Nasceu de uma medição: 18,6% dos ids escritos à mão
 numa peça real (a moto) eram progressões de passo 2 (`0,2,4,…` /`1,3,5,…`)
-porque o `detector-de-banding` exige tom alternado entre faces vizinhas e a
+porque a antiga crítica de textura exigia tom alternado entre faces vizinhas e a
 linguagem não tinha como dizer "alternado" — a IA já fazia essa aritmética na
 mão; agora ela declara.
 
@@ -498,7 +496,7 @@ topologia. A identidade posicional `id` do PASSO permanece como sempre;
 |---|---|
 | `{}` (nem lado nem tampa) | todas as `L` faces LATERAIS, sem tampa nenhuma |
 | `{lado:1}` | uma face lateral só |
-| `{lado:{passo:2,fase:0}}` | os lados pares (o caso do `detector-de-banding`) |
+| `{lado:{passo:2,fase:0}}` | os lados pares |
 | `{tampa:'fundo'}` | só o fundo (não traz as laterais junto) |
 | `{lado:1, tampa:'topo'}` | união: a lateral 1 + o topo |
 
@@ -847,16 +845,13 @@ manter só o que é de fato do Modelar (extrudar pela seta / tecla E). A lição
 mover uma funcionalidade de lugar não é só mover o bloco — é caçar todo texto
 que apontava pra ela de onde ela morava.
 
-## Aba Som
+## Aba Som (histórico removido)
 
-O jogo já sintetiza 100% do áudio em código — `motor/som.js`, zero arquivo
-de som no repositório, mesma dieta zero-binário da textura (D-30 e D-61). O
-problema não é falta de síntese: é que ela é só código de mão, sem audição
-ao vivo nem parâmetro nomeado. Mudar o corte de um filtro é editar um
-número, salvar, recarregar o jogo e andar até ouvir — o mesmo atrito que a
-Oficina já resolveu do lado visual.
+Esta seção descrevia uma aba de som do jogo antigo. A aba, seus adaptadores e
+as bancadas exclusivas foram removidos. A capacidade futura de materiais e
+áudio não faz parte do contrato visual atual.
 
-**Nem tudo em `som.js` é a mesma coisa, e a distinção decide o escopo.**
+**Nem todo áudio de uma aplicação é a mesma coisa, e a distinção decidia o escopo.**
 
 - **Evento parametrizado** — um grão de passo, uma bolha, uma rajada de
   vento, um estalo. Constrói uma vez a partir de parâmetros, tem duração
@@ -899,7 +894,7 @@ Mesma regra da geometria vale aqui: **determinístico dado uma semente**, ou
 reabrir o arquivo muda o som. `Math.random()` cru no meio de um passo é
 proibido pela mesma razão de sempre.
 
-`motor/som.js` de hoje **não é jogado fora** — os parâmetros já tunados
+O adaptador antigo **não é parte do contrato atual** — os parâmetros já tunados
 (`PISOS.grama`, a rajada de vento, a bolha) viram o catálogo inicial de
 eventos, e o arquivo continua sendo o adaptador que liga os eventos gerados
 ao Web Audio, no mesmo papel que `motor/oficina.js` tem pro lado visual.
@@ -914,17 +909,17 @@ Decisão do ideador: a Aba Som tem os **dois** níveis, não um só —
 Os presets são feitos com os blocos por baixo, então não são sistemas
 concorrentes — o preset é o ponto de partida, o bloco é a liberdade (é a mesma
 relação de "partir de algo pronto" dos Presets de objeto). `[FEITO (S4/D-103): o
-catálogo é `_passo`/`_vento`/`_bolha`/`_agua`, semeados do `som.js`; nível fácil = preset, nível livre = blocos.]`
+catálogo era `_passo`/`_vento`/`_bolha`/`_agua`; nível fácil = preset, nível livre = blocos.]`
 
 Ordem de construção da Aba Som (paralela à da Oficina; estado `[x]/[~]/[ ]`):
 
-- S1 `[x]` **Núcleo do evento + adaptador Web Audio + bancada de replay** (D-99): `somnucleo.js` (grafo em dados, determinístico, `oscilador`/`ruido`/`filtro`/`envelope`/`ganho`/`soma` + `lfo` + `alturaEnv`, órfão/ciclo gritam, `somCanonico`) + `somweb.js` (grafo→Web Audio, `renderarOffline`) + a bancada `sintetizar` (replay byte-a-byte) + o evento-exemplo `_bolha`. O `som.js` do jogo intocado.
-- S2 `[x]` **Casca da aba Som** (D-100): a página nova `som.html` (forma de onda no centro + Play/loop/espaço), carrega e toca um evento (`_bolha`); desenha a onda de `renderarOffline` (determinística) e liga o grafo vivo no Play. O chip "Som" do editor navega pra cá. `som.js` do jogo intocado.
+- S1 `[x]` **Núcleo do evento + adaptador Web Audio + bancada de replay** (D-99): registro histórico, removido junto com a aba.
+- S2 `[x]` **Casca da aba Som** (D-100): registro histórico, removido.
 - S3 `[x]` **Blocos ao vivo** (D-101): o painel direito virou o EDITOR — cada nó um card com sliders/dropdowns, adicionar/ligar/remover blocos, e editar re-renderiza a onda na hora (o Play toca a versão editada). Validação surfada sem quebrar. Só `som.html`.
 - S3.5 `[x]` **Análise — o "ouvido"** (D-102): `somanalise.js` (espectrograma STFT + descritores: tom/brilho/ataque/duração) na aba (ao lado da onda, em linguagem de gente) + na bancada. Como a IA não escuta, som se prova por medida+imagem — seno vira linha reta, filtro derruba o brilho, tudo determinístico. Só `som.html` + módulo novo.
-- S4 `[x]` **Presets** (D-103): o catálogo curado de sons prontos, cada um semeado dos números já tunados do `som.js` e FEITO com os blocos do S3 — ao abrir já é editável (editor) e analisável (ouvido), peça inicial e não engrenagem à parte. `_passo` (grão de impacto + corpo grave), `_vento` (ruído filtrado largo/sustentado/ondulando), `_bolha` (glissando tonal), `_agua` (ruído grave abafado); o seletor lista o catálogo com nomes amigáveis (Passo/Vento/Bolha/Água). Provado PELO OUVIDO (S3.5), com duas medições que concordam: passo agudo/largo (brilho ~2994 Hz, estalo curto), vento sustentado 4.53 s com ondulação 2 Hz, bolha tonal (varre ~450→660), água grave (~352 Hz). Jóia `som.js` + `oficina.html` diff VAZIO. O A/B fiel byte-a-byte contra o `som.js` é o S5.
-- S5a `[x]` **Exportar** (D-104): a aba SALVA o evento num `.js` que REABRE bit-a-bit (o análogo sonoro do passo 10). `motor/somexport.js` (`serializarEvento` puro/headless) + botão "Exportar" em `som.html` → `POST /som/salvar` grava em `pecas-som/` (rota-irmã no `servir.mjs`; o `/oficina/salvar` do passo 10 fica intocado), com download como fallback. Número via `String(double)`, nunca arredondado — reabre exato (a lição do passo 10). Provado: os 4 presets round-trip bit-a-bit (página==Node), a neutralização `toFixed` diverge. Jóia `som.js` + `oficina.html` diff VAZIO.
-- S5b `[x]` **Amarrar no jogo + o A/B** (D-105): o `som.js` ganhou `tocarEvento` (ponte ADITIVA — 24 linhas, 0 removidas; monta o evento pelo núcleo+adaptador e liga no `eventosG`, jogo byte-idêntico quando off) e a bancada `somab` renderiza o passo REAL offline (N=20, isolado com `ambiente=0`) pra comparar com o `_passo` PELO OUVIDO: **dentro em 4/5 eixos** (brilho/ataque/pico/achatamento), só a **duração ~4× menor** (a simplificação, agora medida). **Fecha a aba Som — e o roteiro inteiro da Oficina (Objeto 0–14 + Som).** O A/B fiel (trocar um som do jogo por um evento) fica como decisão por-som do ideador, ouvindo — não um atacado.
+- S4 `[x]` **Presets** (D-103): registro histórico, removido.
+- S5a `[x]` **Exportar** (D-104): registro histórico, removido.
+- S5b `[x]` **Amarrar no jogo + o A/B** (D-105): registro histórico, removido.
 
 ## Espaço Material
 
@@ -984,7 +979,7 @@ Aqui tem uma armadilha que precisa ficar escrita, porque ela atinge justamente o
 caso que motivou tudo isto.
 
 **A Oficina só abre lista de passos.** Ela não interpreta código procedural. O
-`arvore3d.js` de hoje é JavaScript escrito à mão, com laços e condições — abrir
+Uma peça de hoje é JavaScript escrito à mão, com laços e condições — abrir
 aquilo exigiria executar código arbitrário e adivinhar o que virou o quê.
 
 Então, pra você conseguir auditar visualmente o que a IA gerar, **a IA tem que
