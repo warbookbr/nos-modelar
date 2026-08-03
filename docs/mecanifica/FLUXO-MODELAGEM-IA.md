@@ -19,6 +19,30 @@ crítica recebe referências, revisão atual e checklist; na primeira passada, n
 recebe a justificativa do modelador. A Oficina visual herdada e `npm run peca`
 não entram no caminho principal.
 
+## Avanço e homologação
+
+O objetivo deste fluxo não é apenas confirmar que as peças já existentes ainda
+passam. O produto desta oficina é uma capacidade melhor para a IA: criar,
+entender, revisar e alterar conteúdo de forma confiável. Peças, fixtures e
+pacotes são os meios reproduzíveis para medir esse avanço.
+
+Por isso, melhoria não precisa esperar uma falha espontânea em produção. Uma
+hipótese explícita pode justificar um cenário novo e pequeno — inclusive neutro
+e não automotivo — quando ele torna possível comparar o antes e o depois de uma
+ferramenta, guia, diagnóstico ou contrato. O cenário deve declarar qual ganho
+pretende medir e qual resultado o refutaria.
+
+Homologar é a outra metade desse movimento: atravessar as capacidades atuais em
+casos variados para revelar limites e regressões antes que virem surpresa. Não
+é congelamento nem exigência de "deixar doer". Um resultado verde preserva uma
+base; uma divergência ou uma prova deliberadamente falha vira evidência para o
+próximo plano curto, sem obrigar a ampliação automática do escopo.
+
+O protocolo executável dessa busca está em
+[`HOMOLOGACAO-FLUXO-IA.md`](HOMOLOGACAO-FLUXO-IA.md). Ele usa agentes sequenciais,
+observa o processo inteiro e distingue cobertura exploratória de média
+estatística.
+
 ## Escopo incluído
 
 - pacote de modelagem versionado e determinístico;
@@ -29,6 +53,8 @@ não entram no caminho principal.
 - crítica limitada a observações verificáveis;
 - comparação estrutural entre duas revisões;
 - uma prova não automotiva e uma prova numa peça existente.
+- cenários de homologação ou exploração com hipótese de ganho, baseline e
+  critério explícito de sucesso ou refutação.
 
 ## Escopo excluído
 
@@ -69,10 +95,14 @@ conferi-las assim que ela aparece.
 Identidade é sempre um nome semântico estável. São proibidos UUIDs, índices de
 face, corpo ou passo, caminhos absolutos, timestamps, `data:` URI e base64.
 
-`revisao.json` usa versão 2 para incluir aparência semântica. Revisões v1 já
-gravadas continuam legíveis e estritas, mas não ganham aparência retroativamente;
-uma revisão nova sempre nasce v2. Isso preserva evidência histórica sem fingir
-que sabemos reconstruir material a partir de PNG.
+`revisao.json` usa versão 4: além da aparência semântica, do id estável/rótulo
+e da `interface` publicada, cada parte traz uma assinatura SHA-256 da sua malha
+canônica. Ela é calculada por ciclos de coordenadas, ordenados sem ids de face
+ou vértice; portanto detecta mudança interna como centro de furo, mas ignora
+ordem de `Map`, rotação/inversão do ciclo e renumeração interna. O JSON persiste
+só o hash por parte — não listas cruas de vértices/faces, UUIDs ou estado de
+runtime. Revisões v1, v2 e v3 já gravadas continuam legíveis e estritas, sem
+ganhar campos retroativamente; uma revisão nova nasce v4.
 
 As referências usam `https://` ou `repo://`. Hash SHA-256 é obrigatório quando
 a referência sustenta medida ou aceite. Em `repo://`, o validador exige arquivo
@@ -116,8 +146,8 @@ modo padrão é refinamento, e criação exige a lista semântica de partes.
 nomes existentes. `revisar:modelagem` reutiliza a descrição neutra e a bancada;
 não mantém uma segunda régua geométrica e recusa faces, partes ou materiais que
 ultrapassem o orçamento declarado. `comparar:revisao` compara assinaturas,
-partes, caixas, relações, portas, aparência e contagens; as imagens continuam
-sendo lidas por uma IA ou pessoa nas mesmas câmeras.
+geometria por parte, caixas, relações, portas, aparência e contagens; as
+imagens continuam sendo lidas por uma IA ou pessoa nas mesmas câmeras.
 
 Uma revisão aceita continua nascendo por promoção atômica e nunca é
 sobrescrita. Uma recusa não some mais: fica em `tentativas/`, identificada pela

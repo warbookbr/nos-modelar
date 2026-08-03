@@ -71,6 +71,8 @@
    pior que nome nenhum; aqui a coluna se chama `origem` porque é exatamente
    uma origem, a mesma de `sel:{origem}` e de `origemId`. */
 
+import { sha256Hex } from './assinatura-geometria.js';
+
 /** Vão abaixo do qual duas caixas são consideradas encostadas (erro de ponto flutuante). */
 export const TOLERANCIA_CONTATO = 1e-9;
 
@@ -79,6 +81,7 @@ export const EIXOS = ['x', 'y', 'z'];
 
 /** Tipos possíveis de relação entre duas partes. */
 export const TIPOS_DE_RELACAO = ['folga', 'encosta', 'interpenetra'];
+export const ALGORITMO_GEOMETRIA = 'malha-canonica-v1';
 
 function compararTexto(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
@@ -274,6 +277,55 @@ function projetarCaixa(parte) {
     max: parte.max.slice(),
     centro: parte.min.map((v, k) => (v + parte.max[k]) / 2),
     dimensoes: parte.max.map((v, k) => v - parte.min[k]),
+  };
+}
+
+/* A impressão da malha não carrega ids, faces ou vértices para o artefato
+   persistido. Ela só resume cada parte por SHA-256 de ciclos de coordenadas:
+   a rotação/inversão de um ciclo, a ordem de Map e a renumeração dos ids têm a
+   mesma forma canônica; mover uma aresta, furo ou ponto interno a altera. */
+function numeroGeometrico(valor, quem) {
+  if (!Number.isFinite(valor)) throw new Error(`${quem}: coordenada não finita não entra na assinatura geométrica.`);
+  return JSON.stringify(Object.is(valor, -0) ? 0 : valor);
+}
+
+function cicloCanonicoDaFace(face, neutro, quem) {
+  if (!Array.isArray(face.vs) || face.vs.length < 3) {
+    throw new Error(`${quem}: face ${face.id} não tem ciclo geométrico válido.`);
+  }
+  const pontos = face.vs.map((id) => {
+    const ponto = neutro.V.get(id);
+    if (!ponto || ponto.length < 3) throw new Error(`${quem}: face ${face.id} cita vértice ausente.`);
+    return `[${numeroGeometrico(ponto[0], quem)},${numeroGeometrico(ponto[1], quem)},${numeroGeometrico(ponto[2], quem)}]`;
+  });
+  const variantes = [];
+  for (const sentido of [pontos, [...pontos].reverse()]) {
+    for (let inicio = 0; inicio < sentido.length; inicio++) {
+      variantes.push([...sentido.slice(inicio), ...sentido.slice(0, inicio)].join(','));
+    }
+  }
+  return variantes.sort(compararTexto)[0];
+}
+
+/** Resumo geométrico por parte, invariável a ids e à ordem interna de Map. */
+export function geometriaSemantica(neutro, nomes = null) {
+  const quem = 'geometriaSemantica';
+  exigirNeutro(neutro, quem);
+  const permitidas = nomes === null ? null : new Set(nomes);
+  const porParte = new Map();
+  for (const face of neutro.F.values()) {
+    if (typeof face.parte !== 'string' || !face.parte || (permitidas && !permitidas.has(face.parte))) continue;
+    const ciclos = porParte.get(face.parte) ?? [];
+    ciclos.push(cicloCanonicoDaFace(face, neutro, quem));
+    porParte.set(face.parte, ciclos);
+  }
+  const nomesOrdenados = permitidas ? [...permitidas].sort(compararTexto) : [...porParte.keys()].sort(compararTexto);
+  return {
+    algoritmo: ALGORITMO_GEOMETRIA,
+    partes: nomesOrdenados.map((nome) => ({
+      nome,
+      assinatura: `sha256:${sha256Hex((porParte.get(nome) ?? []).sort(compararTexto).join('\n'))}`,
+    })),
   };
 }
 
@@ -629,6 +681,7 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
     relacoes,
     portas,
     aparencia,
+    geometria: geometriaSemantica(neutro, nomes),
   };
 }
 

@@ -11,9 +11,10 @@ import { createHash } from 'node:crypto';
 
 export const FORMATO_REVISAO = 'mecanifica.revisao-modelagem';
 export const FORMATO_CRITICA = 'mecanifica.critica-modelagem';
-/* v2 acrescentou aparência; v3 separa id estável de rótulo das portas.
-   As duas versões anteriores seguem verificáveis como evidência histórica. */
-export const VERSAO = 3;
+/* v2 acrescentou aparência; v3 separou id estável de rótulo das portas; v4
+   acrescenta a impressão geométrica sem reescrever a evidência histórica. */
+export const VERSAO = 4;
+export const VERSAO_PORTAS = 3;
 export const VERSAO_APARENCIA = 2;
 export const VERSAO_LEGADA = 1;
 export const VISTAS_CANONICAS = ['isometrica', 'frontal', 'direita', 'superior'];
@@ -158,9 +159,11 @@ function relacao(valor, partes, quem, campo) {
 
 function portaDaDescricao(valor, quem, campo) {
   objeto(valor, quem, campo);
-  /* A descrição traz `passo` para leitura humana; a revisão o descarta. */
+  /* A descrição traz `passo` para leitura humana; a revisão o descarta.
+     `interface`, ao contrário, é contrato geométrico público já resolvido
+     pelo descritor e precisa continuar disponível para a revisão. */
   for (const chave of Object.keys(valor)) {
-    if (!['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem', 'passo'].includes(chave)) erro(quem, `'${campo}.${chave}' não é reconhecido.`);
+    if (!['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem', 'passo', 'interface'].includes(chave)) erro(quem, `'${campo}.${chave}' não é reconhecido.`);
   }
   const porta = {
     id: texto(valor.id, quem, `${campo}.id`, { semantico: true }),
@@ -169,9 +172,49 @@ function portaDaDescricao(valor, quem, campo) {
     origemId: idDeOrigem(valor.origemId, quem, `${campo}.origemId`),
     recorte: typeof valor.recorte === 'string' ? valor.recorte : '',
     origem: texto(valor.origem, quem, `${campo}.origem`),
+    ...(valor.interface === undefined ? {} : { interface: interfaceDaDescricao(valor.interface, quem, `${campo}.interface`) }),
   };
   if (temIdentidadeProibida(porta)) erro(quem, `${campo} contém identidade proibida.`);
   return porta;
+}
+
+/* A revisão não resolve nem interpreta a interface: essa transformação já foi
+   feita pelo núcleo antes de a descrição ser publicada. Aqui validamos o
+   contrato serializável oficial e o copiamos integralmente para que a
+   assinatura e a comparação detectem mudanças de encaixe. */
+function interfaceDaDescricao(valor, quem, campo) {
+  objeto(valor, quem, campo);
+  const forma = texto(valor.forma, quem, `${campo}.forma`, { semantico: true });
+  const camposPorForma = {
+    cilindro: ['forma', 'papel', 'eixo', 'centro', 'raio', 'inicio', 'fim', 'referencia', 'mao'],
+    anel: ['forma', 'papel', 'eixo', 'centro', 'raioInterno', 'raioExterno', 'inicio', 'fim', 'parte', 'mao'],
+  };
+  const permitidas = camposPorForma[forma];
+  if (!permitidas) erro(quem, `'${campo}.forma' não é reconhecida.`);
+  chavesExatas(valor, permitidas, quem, campo);
+  const eixo = vetor(valor.eixo, quem, `${campo}.eixo`);
+  if (eixo.every((n) => n === 0)) erro(quem, `'${campo}.eixo' não pode ser nulo.`);
+  const centro = vetor(valor.centro, quem, `${campo}.centro`);
+  const inicio = numero(valor.inicio, quem, `${campo}.inicio`);
+  const fim = numero(valor.fim, quem, `${campo}.fim`);
+  if (!(fim > inicio)) erro(quem, `'${campo}' exige fim > inicio.`);
+  const extras = {
+    ...(valor.referencia === undefined ? {} : { referencia: vetor(valor.referencia, quem, `${campo}.referencia`) }),
+    ...(valor.mao === undefined ? {} : { mao: valor.mao }),
+  };
+  if (extras.mao !== undefined && extras.mao !== 'espelhada') erro(quem, `'${campo}.mao' só aceita 'espelhada'.`);
+  if (forma === 'cilindro') {
+    if (!['interna', 'externa'].includes(valor.papel)) erro(quem, `'${campo}.papel' precisa ser interna ou externa.`);
+    const raio = numero(valor.raio, quem, `${campo}.raio`);
+    if (!(raio > 0)) erro(quem, `'${campo}.raio' precisa ser > 0.`);
+    return { forma, papel: valor.papel, eixo, centro, raio, inicio, fim, ...extras };
+  }
+  if (!['recebe', 'ocupa'].includes(valor.papel)) erro(quem, `'${campo}.papel' precisa ser recebe ou ocupa.`);
+  const raioInterno = numero(valor.raioInterno, quem, `${campo}.raioInterno`);
+  const raioExterno = numero(valor.raioExterno, quem, `${campo}.raioExterno`);
+  if (raioInterno < 0 || !(raioExterno > raioInterno)) erro(quem, `'${campo}' exige 0 <= raioInterno < raioExterno.`);
+  const parte = valor.parte === undefined ? {} : { parte: texto(valor.parte, quem, `${campo}.parte`, { semantico: true }) };
+  return { forma, papel: valor.papel, eixo, centro, raioInterno, raioExterno, inicio, fim, ...parte, ...extras };
 }
 
 /* O formato de revisão até v2 chamava a chave da porta de `nome` e reutilizava
@@ -278,11 +321,36 @@ function aparenciaDaDescricao(valor, partes, quem, campo = 'descrição.aparenci
   return resultado;
 }
 
+function geometriaDaDescricao(valor, partes, quem, campo = 'descrição.geometria') {
+  objeto(valor, quem, campo);
+  chavesObrigatorias(valor, ['algoritmo', 'partes'], quem, campo);
+  if (valor.algoritmo !== 'malha-canonica-v1') erro(quem, `'${campo}.algoritmo' não é suportado.`);
+  if (!Array.isArray(valor.partes)) erro(quem, `'${campo}.partes' precisa ser lista.`);
+  const porNome = new Set(partes.map((parte) => parte.nome));
+  const impressao = valor.partes.map((item, i) => {
+    objeto(item, quem, `${campo}.partes[${i}]`);
+    chavesObrigatorias(item, ['nome', 'assinatura'], quem, `${campo}.partes[${i}]`);
+    const nome = texto(item.nome, quem, `${campo}.partes[${i}].nome`, { semantico: true });
+    if (!porNome.has(nome)) erro(quem, `'${campo}.partes[${i}]' cita parte inexistente '${nome}'.`);
+    const assinaturaGeometrica = texto(item.assinatura, quem, `${campo}.partes[${i}].assinatura`);
+    if (!/^sha256:[a-f0-9]{64}$/.test(assinaturaGeometrica)) {
+      erro(quem, `'${campo}.partes[${i}].assinatura' precisa ser SHA-256 hexadecimal.`);
+    }
+    return { nome, assinatura: assinaturaGeometrica };
+  }).sort((a, b) => compararTexto(a.nome, b.nome));
+  if (impressao.length !== partes.length || new Set(impressao.map((item) => item.nome)).size !== partes.length) {
+    erro(quem, `'${campo}.partes' precisa cobrir cada parte semântica exatamente uma vez.`);
+  }
+  const resultado = { algoritmo: valor.algoritmo, partes: impressao };
+  if (temIdentidadeProibida(resultado)) erro(quem, `${campo} contém identidade proibida.`);
+  return resultado;
+}
+
 /** Projeta a descrição neutra para o contrato persistível da revisão. */
-export function modeloDaDescricao(descricao) {
+function projetarModeloDaDescricao(descricao, { incluirGeometria = true } = {}) {
   const quem = 'modeloDaDescricao';
   objeto(descricao, quem, 'descrição');
-  for (const campo of ['totais', 'partes', 'relacoes', 'portas', 'aparencia']) {
+  for (const campo of ['totais', 'partes', 'relacoes', 'portas', 'aparencia', ...(incluirGeometria ? ['geometria'] : [])]) {
     if (!(campo in descricao)) erro(quem, `descrição não tem '${campo}'. Use descreverPeca().`);
   }
   const totaisEntrada = objeto(descricao.totais, quem, 'descrição.totais');
@@ -324,7 +392,12 @@ export function modeloDaDescricao(descricao) {
     erro(quem, 'contagens de partes ou portas divergem da descrição detalhada.');
   }
   const aparencia = aparenciaDaDescricao(descricao.aparencia, partes, quem);
-  return { totais, partes, relacoes, portas, aparencia };
+  const modelo = { totais, partes, relacoes, portas, aparencia };
+  return incluirGeometria ? { ...modelo, geometria: geometriaDaDescricao(descricao.geometria, partes, quem) } : modelo;
+}
+
+export function modeloDaDescricao(descricao) {
+  return projetarModeloDaDescricao(descricao);
 }
 
 /** Identidade determinística do estado modelado, útil também quando uma
@@ -395,7 +468,12 @@ export function construirRevisao({ peca, descricao, vistas }) {
 
 function modeloPersistido(valor, quem, versao) {
   objeto(valor, quem, 'modelo');
-  chavesExatas(valor, versao === VERSAO_LEGADA ? ['totais', 'partes', 'relacoes', 'portas'] : ['totais', 'partes', 'relacoes', 'portas', 'aparencia'], quem, 'modelo');
+  const camposModelo = versao === VERSAO_LEGADA
+    ? ['totais', 'partes', 'relacoes', 'portas']
+    : versao === VERSAO
+      ? ['totais', 'partes', 'relacoes', 'portas', 'aparencia', 'geometria']
+      : ['totais', 'partes', 'relacoes', 'portas', 'aparencia'];
+  chavesExatas(valor, camposModelo, quem, 'modelo');
   const totais = objeto(valor.totais, quem, 'modelo.totais');
   chavesExatas(totais, ['partes', 'faces', 'vertices', 'portas'], quem, 'modelo.totais');
   const descricao = {
@@ -446,10 +524,13 @@ function modeloPersistido(valor, quem, versao) {
   }
   descricao.aparencia = valor.aparencia;
   /* A entrada persistida não aceita `passo`; ela é reidratada só para reutilizar
-     a projeção da descrição e a validação detalhada. */
+     a projeção da descrição e a validação detalhada. `interface` é a exceção:
+     trata-se do contrato público já resolvido e deve sobreviver ao ciclo. */
   for (const porta of descricao.portas) {
-    chavesExatas(porta, ['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem'], quem, 'modelo.portas[]');
+    chavesExatas(porta, ['id', 'rotulo', 'op', 'origemId', 'recorte', 'origem', 'interface'], quem, 'modelo.portas[]');
   }
+  if (versao === VERSAO_PORTAS) return projetarModeloDaDescricao(descricao, { incluirGeometria: false });
+  descricao.geometria = valor.geometria;
   return modeloDaDescricao(descricao);
 }
 
@@ -458,7 +539,7 @@ export function validarRevisao(revisao) {
   const quem = 'validarRevisao';
   objeto(revisao, quem, 'revisão');
   chavesExatas(revisao, ['formato', 'versao', 'peca', 'assinaturaModelo', 'modelo', 'vistas'], quem, 'revisão');
-  if (revisao.formato !== FORMATO_REVISAO || ![VERSAO_LEGADA, VERSAO_APARENCIA, VERSAO].includes(revisao.versao)) erro(quem, 'formato ou versão não suportados.');
+  if (revisao.formato !== FORMATO_REVISAO || ![VERSAO_LEGADA, VERSAO_APARENCIA, VERSAO_PORTAS, VERSAO].includes(revisao.versao)) erro(quem, 'formato ou versão não suportados.');
   const peca = texto(revisao.peca, quem, 'peca', { semantico: true });
   const modelo = modeloPersistido(revisao.modelo, quem, revisao.versao);
   const assinaturaModelo = assinatura(modelo);
@@ -586,6 +667,17 @@ export function compararRevisoes(revisaoAnterior, revisaoAtual, criticaAnterior 
     materiais: mudarMapas(anterior.modelo.aparencia?.materiais ?? [], atual.modelo.aparencia?.materiais ?? [], (item) => item.nome),
     partes: mudarMapas(anterior.modelo.aparencia?.partes ?? [], atual.modelo.aparencia?.partes ?? [], (item) => item.nome),
   };
+  const geometriaPartes = mudarMapas(
+    anterior.modelo.geometria?.partes ?? [], atual.modelo.geometria?.partes ?? [], (item) => item.nome,
+  );
+  const geometria = {
+    algoritmo: {
+      anterior: anterior.modelo.geometria?.algoritmo ?? null,
+      atual: atual.modelo.geometria?.algoritmo ?? null,
+    },
+    partes: geometriaPartes,
+    mudou: JSON.stringify(anterior.modelo.geometria ?? null) !== JSON.stringify(atual.modelo.geometria ?? null),
+  };
   const contagens = Object.keys(anterior.modelo.totais).sort(compararTexto)
     .filter((campo) => anterior.modelo.totais[campo] !== atual.modelo.totais[campo])
     .map((campo) => ({ campo, anterior: anterior.modelo.totais[campo], atual: atual.modelo.totais[campo] }));
@@ -607,6 +699,7 @@ export function compararRevisoes(revisaoAnterior, revisaoAtual, criticaAnterior 
     relacoes,
     portas,
     aparencia,
+    geometria,
     contagens,
     criticaAnterior: criticaAnterior === null ? null : marcarCriticaObsoleta(criticaAnterior, atual.assinaturaModelo),
   };

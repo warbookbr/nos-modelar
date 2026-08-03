@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+283 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -56,6 +56,10 @@
 ## autoria-assistida/guias/processo/
 
 - `evidencia-e-iteracao.md` — Evidência e iteração
+
+## autoria-assistida/homologacoes/fluxo-ia-v2/caso-01-mancal/
+
+- `relato-processo.md` — Relato de processo — Caso 01: mancal de mesa
 
 ## docs/
 
@@ -108,6 +112,7 @@
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1
+- `HOMOLOGACAO-FLUXO-IA.md` — Homologação orientada a avanço do fluxo de IA
 - `INDEX.md` — Comece aqui — contexto da Mecanifica
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas — visão, teto e mapa de maturidade
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
@@ -213,6 +218,7 @@
 - `_gabarito-triangulacao-de-furos.js` — PEÇA DE EXERCÍCIO — prova geral do A-33. Um disco hexagonal recebe dez furos triangulares muito próximos da borda: é a fronteira que a ponte gulosa não repar…
 - `_galho.js` — PEÇA-EXEMPLO do P4 do playground: um GALHO — o objeto que SÓ o `loft` faz hoje (uma sequência de SEÇÕES circulares encadeada ao longo de um CAMINHO 3D). É o …
 - `_jardineira.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA da Fundação de autoria v1: uma jardineira de janela com uma muda plantada (caixa, terra, bulbo, caule, folhagem e …
+- `_mancal-de-mesa.js` — _mancal-de-mesa.js — mancal de mesa simplificado para a homologação do fluxo de modelagem por IA. A receita fixa X como eixo do conjunto, Y como vertical e Z…
 - `_modelo.js` — _modelo — o "olá mundo" da OFICINA (D-55): copie este arquivo pra criar uma peça nova. Mostra o contrato inteiro: textura procedural, geometria e ANIMAÇÃO (m…
 - `_oficina-anim.js` — PEÇA-EXEMPLO da OFICINA (passo 13a): ANIMAÇÃO RÍGIDA POR PARTE (em laço). Prova o motor novo com movimento ÓBVIO no visor: uma ENGRENAGEM (`roda`) gira em to…
 - `_oficina-esqueleto.js` — PEÇA-EXEMPLO da OFICINA (passo 14a): ESQUELETO com DEFORMAÇÃO SUAVE (linear blend skinning). Uma CORRENTE/tentáculo de 3 segmentos (4 anéis de vértices) que …
@@ -249,6 +255,7 @@
 ## src/autoria/
 
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
+- `assinatura-geometria.js` — assinatura-geometria.js — SHA-256 síncrono e portátil para os contratos de autoria. Não usa `node:crypto`: a descrição também roda na bancada.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…

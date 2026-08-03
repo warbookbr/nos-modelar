@@ -65,6 +65,41 @@ function doisCubos({ dx = 0, dy = 0, ladoA = 0.1, ladoB = 0.1 } = {}) {
   );
 }
 
+function placaFurada(centroZ: number) {
+  return nucleo(
+    [
+      ['cubo', { origemId: 1, larg: 0.2, alt: 0.02, prof: 0.2 }],
+      ['parte', { nome: 'placa', sel: { origem: { op: 'cubo', id: 1 } } }],
+      ['furo', {
+        origemId: 2,
+        de: { op: 'cubo', id: 1, face: 'topo' },
+        saida: { op: 'cubo', id: 1, face: 'fundo' },
+        centros: [[0, 0.02, centroZ]], raio: 0.012, lados: 12, orientacao: [0, 0, 1],
+      }],
+      ['material', { sel: { grupo: 'placa' }, usa: 'metal' }],
+    ] as any,
+    {}, {}, { metal: { cor: '#808080', aspereza: 0.5 } }, null, [],
+  );
+}
+
+/* Exercita a invariância que importa ao artefato salvo: ids e ordem de Map são
+   detalhes do núcleo. A geometria canônica lê somente ciclos de coordenadas. */
+function reenumerarNeutro(neutro: any) {
+  const origemVertices = neutro.V as Map<number, number[]>;
+  const origemFaces = neutro.F as Map<number, any>;
+  const ids = new Map<number, number>([...origemVertices.keys()].map((id, indice) => [id, 50000 + indice * 7]));
+  const vertices = new Map<number, number[]>(
+    [...origemVertices.entries()].map(([id, ponto]) => [ids.get(id)!, ponto.slice()] as [number, number[]]).reverse(),
+  );
+  const faces = new Map<number, any>(
+    [...origemFaces.values()].map((face, indice) => {
+      const novoId = 90000 + indice * 11;
+      return [novoId, { ...face, id: novoId, vs: face.vs.map((id: number) => ids.get(id)!) }] as [number, any];
+    }).reverse(),
+  );
+  return { ...neutro, V: vertices, F: faces };
+}
+
 function relacao(descricao: any, a: string, b: string) {
   const achada = descricao.relacoes.find((r: any) => r.a === a && r.b === b);
   if (!achada) throw new Error(`o relatório não tem a relação ${a}↔${b}`);
@@ -280,6 +315,24 @@ describe('descrever-partes: a medição headless de uma peça', () => {
       'disco↔pastilhaInterna', 'disco↔pistao', 'pastilhaInterna↔pistao',
     ]);
     expect(filtrado.totais).toMatchObject({ partes: 3, partesNaPeca: 8 });
+  });
+
+  it('resume a malha por hash canônico: detecta furo movido, ignora Map e ids internos', () => {
+    const antes = descreverPeca(placaFurada(-0.04));
+    const depois = descreverPeca(placaFurada(0.04));
+    const renumerada = descreverPeca(reenumerarNeutro(placaFurada(-0.04)));
+    const semGeometria = (descricao: any) => {
+      const copia = structuredClone(descricao);
+      delete copia.geometria;
+      return copia;
+    };
+    expect(semGeometria(antes)).toEqual(semGeometria(depois));
+    expect(antes.geometria).not.toEqual(depois.geometria);
+    expect(renumerada.geometria).toEqual(antes.geometria);
+    expect(antes.geometria).toEqual({
+      algoritmo: 'malha-canonica-v1',
+      partes: [{ nome: 'placa', assinatura: expect.stringMatching(/^sha256:[a-f0-9]{64}$/) }],
+    });
   });
 
   it('conta partes e faces igual ao adaptador de Three.js: uma verdade só', () => {

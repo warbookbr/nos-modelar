@@ -1,5 +1,5 @@
 {
-  "hashTotal": "993f34088ce2a26edf7c8e5c10e9e80e4c6ebb0d555b0888b5b88851d3d93166",
+  "hashTotal": "1d0fe3068988247c31ade8c75de7c64eb0f404e017d60f227daa00de238e199e",
   "pecas": {
     "_bloco-arredondado-composto": {
       "hash": "9b062a92491d13fc8f13c873b1ac5352f2e76029addbfbc042fdbe15386a4e88",
@@ -60,6 +60,11 @@
       "hash": "ca162894cf174d33140409233cbf05d3b7f7874122d69acdd3bd7cd679c83ac4",
       "vertices": 350,
       "faces": 351
+    },
+    "_mancal-de-mesa": {
+      "hash": "f6527174dd6fd31bdf8ed3356b34306233655fbd71acd3ccfb458b40f7e7108a",
+      "vertices": 480,
+      "faces": 432
     },
     "_oficina-anim": {
       "hash": "72577395fb636b8b68389ce4c97eefd09e8a782c1a388f89fbc0311b9b2c962c",

@@ -205,17 +205,19 @@ Use esta ordem para resolver dúvidas:
    revisão e crítica do fluxo de modelagem por IA já entregue;
 12. [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) —
    medição cega do efeito real do fluxo sobre dois modeladores Sol;
-13. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
+13. [`docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md`](HOMOLOGACAO-FLUXO-IA.md) —
+   protocolo sequencial para testar criação do zero e observar o processo;
+14. [`docs/mecanifica/VISAO.md`](VISAO.md) — propósito, experiência e limites do
    produto;
-14. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
+15. [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) — vistas
    ortogonais, partes e medidas nomeadas do primeiro sistema mecânico;
-15. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
+16. [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) — dificuldades
    observadas ao modelar de verdade, e as capacidades que elas justificam;
-16. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — análise
+17. [`docs/mecanifica/OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) — análise
    de dependências e candidatos da linguagem de autoria;
-17. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
+18. [`docs/mecanifica/UPSTREAM-NOS.md`](UPSTREAM-NOS.md) — capacidades
    reaproveitáveis no NÓS;
-18. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
+19. [`docs/mecanifica/RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) —
     evidência da primeira integração.
 
 `README.md` apresenta o projeto ao público. `AGENTS.md` e `CLAUDE.md` resumem as
@@ -238,6 +240,7 @@ herdado. Eles são referência técnica ou histórica, não roteiro da Mecanific
 | Alterar módulos ou dependências | [`docs/mecanifica/ARQUITETURA.md`](ARQUITETURA.md) |
 | Criar ou refinar uma peça | [`docs/mecanifica/AUTORIA-IA.md`](AUTORIA-IA.md), [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md), [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) e [`docs/mecanifica/BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) |
 | Avaliar se o fluxo ajuda uma IA a modelar | [`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) |
+| Homologar criação do zero e observar o processo | [`docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md`](HOMOLOGACAO-FLUXO-IA.md) |
 | Escolher realismo ou direção visual | [`docs/mecanifica/PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md) e [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | Mexer no freio a disco | [`docs/mecanifica/PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
 | Mexer na roda dianteira | [`docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md); para a prova isolada, [`docs/mecanifica/EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) e [`docs/mecanifica/RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) |

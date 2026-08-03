@@ -1,11 +1,12 @@
 // Prova determinismo, validação e comparação dos artefatos neutros de revisão e crítica.
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 import * as jardineira from '../../prototipos/fps/v3/pecas/_jardineira.js';
+import * as mancal from '../../prototipos/fps/v3/pecas/_mancal-de-mesa.js';
 import { descreverPeca } from '../../src/autoria/descrever-partes.js';
 import {
   FORMATO_CRITICA,
@@ -39,6 +40,13 @@ function descricao({ raio = 10, faces = 12, porta = 'eixo', rotulo = porta, rela
         { nome: 'cubo', coberturas: [{ material: 'metal', cor: '#808080', liso: false, pinturas: [], faces: 4 }] },
       ],
     },
+    geometria: {
+      algoritmo: 'malha-canonica-v1',
+      partes: [
+        { nome: 'aro', assinatura: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' },
+        { nome: 'cubo', assinatura: 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' },
+      ],
+    },
   };
 }
 
@@ -60,6 +68,22 @@ function neutroComMaterial({ cor = '#808080', aspereza = 0.5, ordemInvertida = f
     ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 1 } } }],
     ['material', { sel: { grupo: 'corpo' }, usa: 'acabamento' }],
   ], {}, {}, { acabamento: propriedades });
+}
+
+/* Duas placas só diferem no centro interno do furo: caixa, faces, partes,
+   materiais e interfaces ficam iguais. É a regressão que a r002 revelou. */
+function placaFurada(centroZ) {
+  return nucleo([
+    ['cubo', { origemId: 1, larg: 0.2, alt: 0.02, prof: 0.2 }],
+    ['parte', { nome: 'placa', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ['furo', {
+      origemId: 2,
+      de: { op: 'cubo', id: 1, face: 'topo' },
+      saida: { op: 'cubo', id: 1, face: 'fundo' },
+      centros: [[0, 0.02, centroZ]], raio: 0.012, lados: 12, orientacao: [0, 0, 1],
+    }],
+    ['material', { sel: { grupo: 'placa' }, usa: 'metal' }],
+  ], {}, {}, { metal: { cor: '#808080', aspereza: 0.5 } });
 }
 
 describe('revisão assistida por IA', () => {
@@ -99,6 +123,72 @@ describe('revisão assistida por IA', () => {
       id: 'assentoDoBotao', rotulo: 'assentoDoBotao', op: 'cone', origemId: 405, origem: 'cone:405 tampa=fundo',
     }));
     expect(jsonCanonico(resultado)).not.toContain('"passo"');
+  });
+
+  it('preserva a interface publicada pelo descritor oficial e a inclui na assinatura', () => {
+    const neutro = nucleo(
+      mancal.PASSOS, mancal.PARAMS ?? {}, mancal.TOPO ?? {},
+      mancal.MATERIAIS ?? {}, mancal.ESQUELETO ?? null, mancal.ALIASES ?? [],
+    );
+    const descrita = descreverPeca(neutro);
+    const anterior = construirRevisao({ peca: '_mancal-de-mesa', descricao: descrita, vistas: vistas() });
+    const esperadas = descrita.portas.map(({ passo, ...porta }) => porta);
+    expect(anterior.modelo.portas).toEqual(esperadas);
+    expect(validarRevisao(JSON.parse(jsonCanonico(anterior))).modelo.portas).toEqual(esperadas);
+    expect(jsonCanonico(anterior)).not.toContain('"passo"');
+
+    const alterada = structuredClone(descrita);
+    alterada.portas.find((porta) => porta.id === 'superficieDoEixo').interface.raio += 0.01;
+    const atual = construirRevisao({ peca: '_mancal-de-mesa', descricao: alterada, vistas: vistas() });
+    const critica = { formato: FORMATO_CRITICA, versao: VERSAO, peca: '_mancal-de-mesa', assinaturaModelo: anterior.assinaturaModelo, itens: [] };
+    const diff = compararRevisoes(anterior, atual, critica);
+    expect(anterior.assinaturaModelo).not.toBe(atual.assinaturaModelo);
+    expect(diff.portas.alteradas).toHaveLength(1);
+    expect(diff.portas.alteradas[0].chave).toBe('superficieDoEixo');
+    expect(diff.criticaAnterior.obsoleta).toBe(true);
+
+    const invalida = structuredClone(descrita);
+    invalida.portas[0].interface.uuid = '550e8400-e29b-41d4-a716-446655440000';
+    expect(() => construirRevisao({ peca: '_mancal-de-mesa', descricao: invalida, vistas: vistas() })).toThrow(/não é permitido/);
+  });
+
+  it('assina mudança geométrica interna sem persistir ids, faces ou vértices crus', () => {
+    const antesDescricao = descreverPeca(placaFurada(-0.04));
+    const depoisDescricao = descreverPeca(placaFurada(0.04));
+    const semGeometria = (valor) => {
+      const copia = structuredClone(valor);
+      delete copia.geometria;
+      return copia;
+    };
+    expect(semGeometria(antesDescricao)).toEqual(semGeometria(depoisDescricao));
+    expect(antesDescricao.geometria).not.toEqual(depoisDescricao.geometria);
+    expect(antesDescricao.geometria.partes[0]).toEqual({
+      nome: 'placa', assinatura: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+    });
+
+    const anterior = construirRevisao({ peca: 'placaFurada', descricao: antesDescricao, vistas: vistas() });
+    const atual = construirRevisao({ peca: 'placaFurada', descricao: depoisDescricao, vistas: vistas() });
+    const diff = compararRevisoes(anterior, atual);
+    expect(anterior.assinaturaModelo).not.toBe(atual.assinaturaModelo);
+    expect(diff.modeloMudou).toBe(true);
+    expect(diff.geometria.mudou).toBe(true);
+    expect(diff.geometria.partes.alteradas).toHaveLength(1);
+    expect(diff.geometria.partes.alteradas[0].chave).toBe('placa');
+    expect(jsonCanonico(anterior.modelo.geometria)).not.toMatch(/"vs"|"vertices"|"faces"|"indice"|"id"/);
+  });
+
+  it('continua validando as revisões históricas v1, v2 e v3 sem reescrevê-las', () => {
+    const historicas = [
+      'autoria-assistida/pacotes/prova-caixote/revisoes/r001/revisao.json',
+      'autoria-assistida/pacotes/prova-caixote/revisoes/r003/revisao.json',
+      'autoria-assistida/pacotes/homologacao-mancal/revisoes/r001/revisao.json',
+    ];
+    for (const arquivo of historicas) {
+      const original = readFileSync(arquivo, 'utf8');
+      const revisaoHistorica = JSON.parse(original);
+      expect(validarRevisao(revisaoHistorica).versao).toBe(revisaoHistorica.versao);
+      expect(readFileSync(arquivo, 'utf8')).toBe(original);
+    }
   });
 
   it('assina aparência neutra: mudar só cor ou aspereza aparece no diff', () => {

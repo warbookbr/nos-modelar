@@ -50,6 +50,15 @@ girar a câmera, destacar partes, explodir o conjunto e comparar estados:
   instalação.
 - **Autoria nativa para IA.** A IA deve criar e refinar conteúdo estruturado,
   legível e verificável, não apenas despejar uma malha final.
+- **Capacidade antes da peça.** Nesta oficina, uma peça é evidência e bancada de
+  prova; o produto do repositório é a capacidade de uma IA criar, revisar e
+  evoluir conteúdo com segurança. Uma melhoria pode e deve nascer de um cenário
+  deliberadamente criado para medi-la — não precisa esperar uma falha dolorosa
+  em uma peça existente.
+- **Avanço comprovado, não inércia comprovada.** Homologar o que já existe serve
+  para descobrir limites, regressões e próximos ganhos. Um resultado verde não
+  encerra a busca por melhoria, e uma prova que falha é informação para escolher
+  o próximo recorte, não motivo para esconder a lacuna.
 
 ## Limites iniciais
 

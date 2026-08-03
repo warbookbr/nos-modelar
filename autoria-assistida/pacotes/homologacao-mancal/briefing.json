@@ -1,0 +1,88 @@
+{
+  "alvo": {
+    "caminho": "prototipos/fps/v3/pecas/_mancal-de-mesa.js",
+    "modo": "criacao",
+    "peca": "_mancal-de-mesa"
+  },
+  "checklist": [
+    {
+      "criterio": "A descrição estrita informa zero órfãos e zero face sem identidade.",
+      "estado": "aberto",
+      "id": "identidade",
+      "prioridade": 1
+    },
+    {
+      "criterio": "Existem exatamente as partes base, bucha e eixo, todas não vazias e isoláveis.",
+      "estado": "aberto",
+      "id": "partes",
+      "prioridade": 2
+    },
+    {
+      "criterio": "A peça respeita 1.800 faces, três partes, três materiais e o envelope das medidas declaradas.",
+      "estado": "aberto",
+      "id": "orcamento-e-envelope",
+      "prioridade": 3
+    },
+    {
+      "criterio": "Os dois furos passantes de fixação do pé são distinguíveis na vista superior.",
+      "estado": "aberto",
+      "id": "furos-de-fixacao",
+      "prioridade": 4
+    },
+    {
+      "criterio": "A bucha é realmente oca e o eixo permanece visível e concêntrico nas vistas direita e isométrica.",
+      "estado": "aberto",
+      "id": "bucha-e-eixo",
+      "prioridade": 5
+    },
+    {
+      "criterio": "As interfaces cilíndricas publicadas permitem diagnosticar a folga diametral nominal de 0,0004 m.",
+      "estado": "aberto",
+      "id": "interfaces",
+      "prioridade": 6
+    },
+    {
+      "criterio": "A revisão produz vistas isométrica, frontal, direita e superior válidas e todas são lidas.",
+      "estado": "aberto",
+      "id": "quatro-vistas",
+      "prioridade": 7
+    },
+    {
+      "criterio": "A inspeção isolada do par bucha/eixo é reproduzível sem deslocar a geometria.",
+      "estado": "aberto",
+      "id": "inspecao-do-par",
+      "prioridade": 8
+    }
+  ],
+  "formato": "mecanifica.pacote-modelagem",
+  "guias": [
+    "forma/silhueta-e-transicoes",
+    "material/leitura-de-material",
+    "processo/evidencia-e-iteracao"
+  ],
+  "id": "homologacao-mancal",
+  "objetivo": "Criar do zero um mancal de mesa simplificado, técnico-didático F2, mecanicamente mensurável e revisável em montagem.",
+  "partesEsperadas": [
+    "base",
+    "bucha",
+    "eixo"
+  ],
+  "perfil": {
+    "distanciaMinima": 0.35,
+    "fidelidade": "F2",
+    "interacao": "montagem",
+    "orcamento": {
+      "faces": 1800,
+      "materiais": 3,
+      "partes": 3
+    },
+    "origem": "declarado",
+    "precisao": "mecanica",
+    "visual": "tecnicoDidatico"
+  },
+  "provas": [
+    "descricao-headless",
+    "bancada-quatro-vistas"
+  ],
+  "versao": 1
+}

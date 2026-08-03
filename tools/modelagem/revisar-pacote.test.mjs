@@ -9,6 +9,7 @@ import { prepararPacote } from './preparar-pacote.mjs';
 import { revisarPacote } from './revisar-pacote.mjs';
 import { serializarCanonico } from './formato-pacote.mjs';
 import { validarPacoteNoDisco } from './validar-pacote.mjs';
+import { VERSAO } from './revisao-modelagem.mjs';
 
 const VISTAS = ['isometrica', 'frontal', 'direita', 'superior'];
 
@@ -47,7 +48,16 @@ describe('revisar:modelagem', () => {
       const arquivo = join(resultado.destino, 'revisao.json');
       const conteudo = readFileSync(arquivo, 'utf8');
       expect(conteudo).not.toMatch(/127\.0\.0\.1|[A-Za-z]:\\|"passo"|"host"|timestamp/i);
-      expect(JSON.parse(conteudo).vistas.map((vista) => vista.rota)).toEqual([
+      const revisao = JSON.parse(conteudo);
+      expect(revisao.versao).toBe(VERSAO);
+      expect(revisao.modelo.geometria).toMatchObject({
+        algoritmo: 'malha-canonica-v1',
+        partes: expect.arrayContaining([expect.objectContaining({ assinatura: expect.stringMatching(/^sha256:[a-f0-9]{64}$/) })]),
+      });
+      expect(revisao.modelo.geometria.partes[0]).toEqual({
+        nome: expect.any(String), assinatura: expect.any(String),
+      });
+      expect(revisao.vistas.map((vista) => vista.rota)).toEqual([
         'bancada.html?peca=_jardineira&projecao=ortografica',
         'bancada.html?peca=_jardineira&projecao=ortografica&vista=frontal',
         'bancada.html?peca=_jardineira&projecao=ortografica&vista=direita',
