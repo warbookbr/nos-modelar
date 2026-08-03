@@ -337,9 +337,11 @@ os dados mínimos para orientar e validar uma conexão.
 `eixo`, `contorno`, `volumeExterno`, `cavidade` ou `assento`; medidas citadas por
 parâmetro; cardinalidade e compatibilidade optativas.
 
-**Gate do nível:** transladar, rotacionar, espelhar e instanciar uma peça mantém
-a porta no lugar esperado; serialização e replay são canônicos; porta incompleta,
-degenerada ou duplicada é recusada antes da montagem.
+**Gate do nível:** transladar, rotacionar e instanciar uma peça mantém a porta
+no lugar esperado; espelho transporta o quadro, declara a mão resultante e é
+recusado antes de uma relação que ainda só sabe rotação; serialização e replay
+são canônicos; porta incompleta, degenerada ou duplicada é recusada antes da
+montagem.
 
 **Cuidados específicos:** eixo sem vetor “acima” deixa uma família infinita de
 poses; normal de face pode inverter com espelhamento; centroide pode mudar com a
@@ -348,8 +350,8 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
 **Estado**
 
 - [ ] NÃO INICIADO
-- [x] EM DESENVOLVIMENTO
-- [ ] CONCLUÍDO
+- [ ] EM DESENVOLVIMENTO
+- [x] CONCLUÍDO
 
 **Checklist**
 
@@ -358,15 +360,19 @@ topologia; interface vazia não pode ser confundida com o sólido que a envolve.
   deslocamento explícito;
 - [x] separar identidade da porta, rótulo e dados derivados (`id` estável;
   rótulo humano independente; dados de origem/interface continuam derivados);
-- [ ] declarar comportamento sob espelho e `arranja`;
+- [x] declarar comportamento sob espelho e `arranja`: cópia única transporta
+  quadro por origem estrutural; espelho marca `mao:'espelhada'` e relações
+  atuais recusam antes de medir ou derivar pose;
 - [x] validar vetores nulos, não finitos e medidas negativas na interface cilíndrica;
 - [x] expor a interface cilíndrica no `descrever` e id/rótulo/origem na bancada;
 - [x] provar replay e round-trip fora do domínio automotivo (`_jardineira`
-  exporta, lê e reexecuta sem perder id, rótulo ou origem).
+  preserva id/rótulo/origem e `_portas-espelho-arranja` prova cópia radial,
+  linear e espelhada).
 
-O roteiro ativo desse item é
-[`AUT-2026-15`](planos/2026-08-02-portas-espelho-arranja.md). Ele não autoriza
-hierarquia, persistência de montagem nem solver.
+O item foi fechado por
+[`AUT-2026-15`](planos/2026-08-02-portas-espelho-arranja.md). Relação que
+resolva reflexão, hierarquia, persistência de montagem e solver continuam em
+níveis próprios.
 
 ## Nível 2 — relações dirigidas sem reposicionamento
 

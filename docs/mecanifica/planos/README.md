@@ -5,11 +5,12 @@ histórico para que um roteiro não cresça indefinidamente.
 
 ## Estado atual
 
-**Plano ativo:** [AUT-2026-15](2026-08-02-portas-espelho-arranja.md) — portas
-de interface sob `espelha` e `arranja`, com identidade efetiva e orientação
-explícitas.
+**Plano ativo:** nenhum.
 
-O plano fecha a lacuna restante do Nível 1 sem abrir hierarquia ou solver.
+[AUT-2026-15](2026-08-02-portas-espelho-arranja.md) foi concluído: portas de
+interface acompanham cópias de `arranja` por identidade declarada, e espelho
+passa a publicar a mão espelhada para que relações atuais recusem antes de
+medir ou oferecer prévia. O Nível 1 foi fechado sem abrir hierarquia ou solver.
 
 [AUT-2026-14](2026-08-02-identidade-porta-estavel.md) foi concluído: portas
 novas agora separam `id` estável de `rotulo` exibido, preservando receitas,

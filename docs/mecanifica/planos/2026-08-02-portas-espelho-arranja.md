@@ -1,6 +1,6 @@
 # AUT-2026-15 — portas sob espelho e arranja
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -76,4 +76,25 @@ interface espelhada e registrar o suporte positivo como candidato futuro.
 
 ## Fechamento
 
-A preencher após os gates.
+Concluído em 2 de agosto de 2026.
+
+- `publicarPorta` transporta eixo, centro e referência pela cadeia estrutural de
+  `arranja` radial/linear e `espelha`; uma interface sobre `arranja` exige uma
+  cópia única, porque uma coleção não possui um quadro efetivo único.
+- a identidade efetiva continua sendo a porta estável declarada pelo autor,
+  ligada à origem `{op:'arranja', id, de, copia}`; duplicação de chave continua
+  recusada pelo núcleo e nenhuma receita depende de ordem de array ou de passo.
+- espelho muda a mão do quadro e publica `mao:'espelhada'`. As relações atuais
+  recusam esse caso antes de medir, classificar estado ou oferecer prévia, em
+  vez de convertê-lo silenciosamente em rotação.
+- a fixture neutra `_portas-espelho-arranja` cobre cópia radial, linear e
+  espelho; exporta, é lida e reexecuta deterministicamente. A bancada foi
+  conferida nas vistas isométrica e frontal, com 8 componentes, 48 faces e
+  nenhuma superfície sem identidade.
+
+Evidência executável: `tools/mecanifica/portas-espelho-arranja.test.ts`,
+`tools/mecanifica/interfaces-montagem.test.ts` e
+`tools/mecanifica/exportar-peca.test.ts`.
+
+Ficam fora do plano, sem bloqueá-lo: relação que sabe resolver reflexão,
+hierarquia, persistência de montagem, múltiplas relações e solver.

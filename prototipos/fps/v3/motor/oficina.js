@@ -122,6 +122,82 @@ function giraPonto(p, pivo, ax, c, s) {
   return [pivo[0] + rx, pivo[1] + ry, pivo[2] + rz];
 }
 
+/* Portas de montagem vivem nas coordenadas da geometria que lhes deu origem.
+   Quando `espelha` ou `arranja` cria essa geometria, a interface declarada no
+   original precisa acompanhá-la — e não ficar plausível, mas parada, no lugar
+   antigo. Não guardamos matriz nem id runtime: só a transformação explícita do
+   próprio passo estrutural, resolvida de novo a cada replay. */
+function normalizarVetorDaInterface(v) {
+  const tamanho = Math.hypot(...v);
+  return v.map((n) => {
+    const normalizado = n / tamanho;
+    return Math.abs(normalizado) < 1e-15 ? 0 : normalizado;
+  });
+}
+
+function transformarInterfaceDaPorta(interfaceResolvida, transformacoes) {
+  if (interfaceResolvida === undefined || !transformacoes.length) return interfaceResolvida;
+  let centro = interfaceResolvida.centro.slice();
+  let eixo = interfaceResolvida.eixo.slice();
+  let referencia = interfaceResolvida.referencia?.slice();
+  let mao = 'direta';
+  for (const transformacao of transformacoes) {
+    if (transformacao.tipo === 'espelho') {
+      centro[transformacao.eixo] = 2 * transformacao.pos - centro[transformacao.eixo];
+      eixo[transformacao.eixo] = -eixo[transformacao.eixo];
+      if (referencia) referencia[transformacao.eixo] = -referencia[transformacao.eixo];
+      mao = mao === 'direta' ? 'espelhada' : 'direta';
+    } else if (transformacao.modo === 'radial') {
+      const rad = transformacao.graus * Math.PI / 180;
+      const c = Math.cos(rad), s = Math.sin(rad);
+      centro = giraPonto(centro, transformacao.pivo, transformacao.eixo, c, s);
+      eixo = giraPonto(eixo, [0, 0, 0], transformacao.eixo, c, s);
+      if (referencia) referencia = giraPonto(referencia, [0, 0, 0], transformacao.eixo, c, s);
+    } else {
+      centro = centro.map((n, indice) => n + transformacao.d[indice]);
+    }
+  }
+  return {
+    ...interfaceResolvida,
+    centro: centro.map((n) => Math.abs(n) < 1e-15 ? 0 : n),
+    eixo: normalizarVetorDaInterface(eixo),
+    ...(referencia === undefined ? {} : { referencia: normalizarVetorDaInterface(referencia) }),
+    ...(mao === 'direta' ? {} : { mao }),
+  };
+}
+
+function registroDaOrigem(st, origem) {
+  const registros = st.origens.get(origem.id) ?? [];
+  return registros.length === 1 && registros[0].op === origem.op ? registros[0] : null;
+}
+
+/* A porta pode citar uma cópia de outra cópia. A sequência abaixo segue a
+   cadeia declarada (fonte -> derivação), em vez de tentar reconstruir posição
+   por ids de face, ordem de passos ou ordem de arrays. `arranja` só serve de
+   interface quando `copia` resolve UMA cópia; a coleção inteira não tem um
+   único quadro a publicar. */
+function transformacoesDaOrigemDaPorta(st, origem) {
+  if (origem.op !== 'espelha' && origem.op !== 'arranja') return { transformacoes: [] };
+  const registro = registroDaOrigem(st, origem);
+  if (!registro) return { erro: `origem ${origem.op}:${origem.id} não tem registro estrutural único` };
+  const fonte = transformacoesDaOrigemDaPorta(st, origem.de);
+  if (fonte.erro) return fonte;
+  if (origem.op === 'espelha') {
+    return { transformacoes: [...fonte.transformacoes, registro.transformacao] };
+  }
+  if (!eixoDeIndiceUnico(origem.copia)) {
+    return { erro: `interface sob arranja:${origem.id} exige copia única (inteiro, PARAM, expressão, 'primeira' ou 'ultima'); coleção ou filtro publicam mais de um quadro` };
+  }
+  const indice = indiceDeEixo(st, origem.copia, registro.copias.length);
+  if (indice.erro || indice.idx >= registro.copias.length) {
+    return { erro: indice.erro ?? `copia ${textoDeEixo(origem.copia, indice.idx)} fora do limite da origem arranja:${origem.id}` };
+  }
+  const transformacao = registro.transformacao.modo === 'radial'
+    ? { ...registro.transformacao, graus: (indice.idx + 1) * registro.transformacao.passoGraus }
+    : { ...registro.transformacao, d: registro.transformacao.d.map((n) => n * (indice.idx + 1)) };
+  return { transformacoes: [...fonte.transformacoes, transformacao] };
+}
+
 /* produto vetorial a×b — puro, usado só pela op `loft` (frame de transporte
    paralelo, mais abaixo). */
 function cross3(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
@@ -3009,8 +3085,13 @@ export const OPS = {
     if (resultado.erro) return grita(st, i, 'publicarPorta', 'de', resultado.erro);
     const interfaceResolvida = resolverInterfaceCilindricaDaPorta(st, a.interface);
     if (interfaceResolvida.erro) return grita(st, i, 'publicarPorta', 'interface', interfaceResolvida.erro);
+    const derivacao = interfaceResolvida.interface === undefined
+      ? { transformacoes: [] }
+      : transformacoesDaOrigemDaPorta(st, a.de);
+    if (derivacao.erro) return grita(st, i, 'publicarPorta', 'de', derivacao.erro);
     st.portas.set(chave, {
-      de: a.de, passo: i, interface: interfaceResolvida.interface,
+      de: a.de, passo: i,
+      interface: transformarInterfaceDaPorta(interfaceResolvida.interface, derivacao.transformacoes),
       ...(usaId ? { id: chave, rotulo } : {}),
     });
   },
@@ -3443,7 +3524,9 @@ export const OPS = {
       const nf = st.F.get(novo);
       nf.cor = f.cor; nf.material = f.material; nf.parte = f.parte; nf.liso = f.liso; nf.solido = f.solido;
     }
-    if (estrutural) registraOrigem(st, i, 'espelha', a.origemId, { derivaDe, copias });
+    if (estrutural) registraOrigem(st, i, 'espelha', a.origemId, {
+      derivaDe, copias, transformacao: { tipo: 'espelho', eixo: ax, pos },
+    });
   },
 
   /* arranja (O-13) — REPETE uma origem estrutural N vezes, em torno de um eixo
@@ -3625,7 +3708,13 @@ export const OPS = {
       }
       copias.push(copiaDaFace);
     }
-    registraOrigem(st, i, 'arranja', a.origemId, { derivaDe: a.derivaDe, copias });
+    registraOrigem(st, i, 'arranja', a.origemId, {
+      derivaDe: a.derivaDe,
+      copias,
+      transformacao: modo === 'radial'
+        ? { modo, eixo: ax, passoGraus, pivo: pivo.slice() }
+        : { modo, d: d.slice() },
+    });
   },
 
   /* furo (ciclo "Corte e orientação de seção v1") — ABRE VAZIO: um furo

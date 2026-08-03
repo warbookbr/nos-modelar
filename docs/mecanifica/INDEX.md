@@ -377,9 +377,11 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-O plano curto [AUT-2026-15](planos/2026-08-02-portas-espelho-arranja.md) está
-ativo para declarar portas sob espelho e `arranja`, antes de hierarquia ou
-persistência de montagem. O plano curto
+Não há plano curto ativo. O [AUT-2026-15](planos/2026-08-02-portas-espelho-arranja.md)
+foi concluído: portas acompanham uma cópia única de `arranja` pelo endereço
+estrutural e espelho declara mão espelhada, que as relações atuais recusam antes
+de medir ou oferecer prévia. Hierarquia, persistência de montagem e solver
+continuam candidatos separados. O plano curto
 [AUT-2026-14](planos/2026-08-02-identidade-porta-estavel.md) fechou a separação
 entre identidade estável e rótulo exibido das portas, mantendo a forma histórica
 reproduzível. O plano curto

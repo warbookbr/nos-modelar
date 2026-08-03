@@ -186,6 +186,19 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     });
     const reexecutada = await exportarPeca('_jardineira');
     expect(reexecutada.texto).toBe(jardineira.texto);
+
+    /* A fixture neutra do AUT-2026-15 atravessa o formato sem perder a origem
+       derivada da cópia nem esconder a mão espelhada. O arquivo continua dado
+       puro: releitura não reexecuta a receita para descobrir a porta. */
+    const derivada = await exportarPeca('_portas-espelho-arranja');
+    const derivadaLida = lerPecaResolvida(derivada.dado);
+    expect(derivadaLida.portas.get('encaixeLinearUltimo')).toMatchObject({
+      id: 'encaixeLinearUltimo', de: { op: 'arranja', id: 804, copia: 'ultima' },
+    });
+    expect(derivadaLida.portas.get('encaixeEspelhado')).toMatchObject({
+      id: 'encaixeEspelhado', interface: { mao: 'espelhada' },
+    });
+    expect((await exportarPeca('_portas-espelho-arranja')).texto).toBe(derivada.texto);
     await expect(exportarPeca('_oficina-esqueleto'), 'esta peça tem esqueleto')
       .rejects.toThrow(/esqueleto/i);
 

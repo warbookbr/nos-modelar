@@ -1,5 +1,5 @@
 {
-  "hashTotal": "3776c524b45c3b885c1523b5271ef2c80bb6d79810c83ed8c5d20a8919fd9c6e",
+  "hashTotal": "f016030f93ad6241924f3bfc544dcc7910b4cc20c6e660df26e2dceea9114a07",
   "pecas": {
     "_bloco-arredondado-composto": {
       "hash": "9b062a92491d13fc8f13c873b1ac5352f2e76029addbfbc042fdbe15386a4e88",
@@ -85,6 +85,11 @@
       "hash": "aae80e62c42bad0a9a99cb1e29432f3f5b86f7828b4c6015ad71a740929202d6",
       "vertices": 24,
       "faces": 26
+    },
+    "_portas-espelho-arranja": {
+      "hash": "22238853453533cca1be1db0ec454e1e5137ff29eaa006111ecfb7723ce8d139",
+      "vertices": 64,
+      "faces": 48
     },
     "_prateleira-furada": {
       "hash": "7ae8205b9ce48970188134ec459c834165dbc3a244543f9f4610bb673d5732a5",

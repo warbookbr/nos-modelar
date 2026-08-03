@@ -117,11 +117,13 @@ function interfaceCilindrica(porta, quem) {
   const inicio = escalar(i.inicio, `${quem}.inicio`);
   const fim = escalar(i.fim, `${quem}.fim`);
   if (!(fim > inicio)) falhar(quem, 'exige fim > inicio.');
+  if (i.mao !== undefined && i.mao !== 'espelhada') falhar(quem, "mao só aceita 'espelhada' quando declarada.");
   return {
     forma: 'cilindro', papel: i.papel, eixo: multiplicar(eixo, 1 / tamanho),
     centro: vetor(i.centro, `${quem}.centro`), raio: escalar(i.raio, `${quem}.raio`, { positivo: true }),
     inicio, fim,
     ...(i.referencia === undefined ? {} : { referencia: vetor(i.referencia, `${quem}.referencia`) }),
+    ...(i.mao === undefined ? {} : { mao: i.mao }),
   };
 }
 
@@ -141,10 +143,12 @@ function interfaceAnular(porta, quem) {
   if (!(fim > inicio)) falhar(quem, 'exige fim > inicio.');
   if (!(raioExterno > raioInterno)) falhar(quem, 'exige raioExterno > raioInterno.');
   if (i.parte !== undefined && (typeof i.parte !== 'string' || !i.parte)) falhar(quem, 'parte precisa ser nome não vazio quando declarada.');
+  if (i.mao !== undefined && i.mao !== 'espelhada') falhar(quem, "mao só aceita 'espelhada' quando declarada.");
   return {
     forma: 'anel', papel: i.papel, eixo: multiplicar(eixo, 1 / tamanho),
     centro: vetor(i.centro, `${quem}.centro`), raioInterno, raioExterno, inicio, fim,
     ...(i.parte === undefined ? {} : { parte: i.parte }),
+    ...(i.mao === undefined ? {} : { mao: i.mao }),
   };
 }
 
@@ -301,6 +305,8 @@ export function derivarPreviaDeEncaixeCilindrico(declaracao, portas) {
   if (referencia.papel !== 'externa' || movel.papel !== 'interna') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia externa e movel interna' });
   }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
   if (diagnosticos.length) return { id, tipo: 'encaixaCilindrico', aplicavel: false, diagnosticos };
   const quadroReferencia = quadroDaPorta(referencia);
   const quadroMovel = quadroDaPorta(movel);
@@ -375,6 +381,20 @@ function portaDo(mapa, chave, quem) {
   return porta;
 }
 
+/* Uma reflexão interna já foi aplicada à geometria e aos vetores da porta,
+   mas ela troca a mão do quadro. As relações atuais só sabem construir uma
+   rotação própria; medir ou derivar pose como se esse quadro fosse direto
+   produziria uma resposta convincente e falsa. A recusa é estruturada para a
+   IA saber que falta uma relação com contrato de espelho, não uma tolerância. */
+function diagnosticoDeMaoEspelhada(referencia, movel) {
+  const portas = [referencia, movel].filter((porta) => porta.mao === 'espelhada').map((porta) => porta.id);
+  return portas.length ? {
+    codigo: 'mao-espelhada',
+    observado: portas,
+    esperado: 'quadro de mão direta; relações sob espelho exigem contrato próprio',
+  } : null;
+}
+
 function intervaloNoEixo(porta, eixoReferencia) {
   const sinal = produto(porta.eixo, eixoReferencia) >= 0 ? 1 : -1;
   const centro = produto(porta.centro, eixoReferencia);
@@ -429,6 +449,8 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   if (referencia.papel !== 'externa' || movel.papel !== 'interna') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia externa e movel interna', observado: `${referencia.papel}->${movel.papel}` });
   }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
   if (diagnosticos.length) {
     return {
       id, tipo: 'encaixaCilindrico', satisfeita: false,
@@ -582,6 +604,8 @@ export function validarAssentamentoAnular(declaracao, portas) {
   if (referencia.papel !== 'recebe' || movel.papel !== 'ocupa') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel ocupa', observado: `${referencia.papel}->${movel.papel}` });
   }
+  const maoEspelhada = diagnosticoDeMaoEspelhada(referencia, movel);
+  if (maoEspelhada) diagnosticos.push(maoEspelhada);
   if (diagnosticos.length) {
     return {
       id, tipo: 'assentaAnular', satisfeita: false,
@@ -681,7 +705,7 @@ export function avaliarEstadoDeEncaixeCilindrico(declaracao, portas) {
   const referencia = portaDo(portas, declaracao.referencia, 'avaliarEstadoDeEncaixeCilindrico');
   const movel = portaDo(portas, declaracao.movel, 'avaliarEstadoDeEncaixeCilindrico');
   const diagnosticos = resultado.diagnosticos.map((diagnostico) => ({ ...diagnostico }));
-  const estruturais = new Set(['forma-incompativel', 'direcao-incompativel']);
+  const estruturais = new Set(['forma-incompativel', 'direcao-incompativel', 'mao-espelhada']);
   if (diagnosticos.some((diagnostico) => estruturais.has(diagnostico.codigo))) {
     return { ...resultado, estado: 'impossivel', grausDeLiberdade: [], diagnosticos };
   }

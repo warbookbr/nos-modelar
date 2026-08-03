@@ -121,6 +121,22 @@ leitor recusam identificador duplicado ou a forma ambígua com `nome` e `id`.
 Ao extrair para o NÓS, leve as duas formas e suas provas; não migre arquivos
 salvos automaticamente sem uma versão e uma evidência próprias.
 
+**Complemento do UP-034 (AUT-2026-15):** uma interface publicada sobre
+`{op:'arranja', id, de, copia}` acompanha a cópia única declarada: centro,
+eixo e referência passam pela transformação radial ou linear reexecutável do
+passo, sem UUID, índice de face, posição de passo ou ordem de array persistida.
+Uma coleção ou filtro de muitas cópias é recusado, pois não tem um quadro único
+para uma porta. Sob `espelha`, os mesmos vetores são refletidos e a interface
+recebe `mao:'espelhada'`; os validadores e a prévia atuais param com
+`mao-espelhada` antes de medir ou fabricar uma rotação falsa. A fixture neutra
+`pecas/_portas-espelho-arranja.js` e os testes
+`tools/mecanifica/portas-espelho-arranja.test.ts` provam os dois arranjos, o
+espelho, exportação e releitura. Para extrair, leve também o transporte em
+`motor/oficina.js`, a leitura/recusa de mão em
+`src/autoria/interfaces-montagem.js` e os testes; não leve a bancada. Limite
+declarado: resolver uma relação refletida é capacidade futura, não uma
+interpretação automática desta entrega.
+
 ## UP-005 — fronteira de renderização provada
 
 **Problema observado:** `oficina.js` já separava `nucleo()` de `adaptarV3()`,
