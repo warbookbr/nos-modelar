@@ -377,7 +377,10 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-Não há plano ativo. Os Recortes A–G de `AUT-05` foram concluídos em
+Não há plano ativo. O plano curto
+[AUT-2026-13](planos/2026-08-02-recusa-estrutural-montagem.md) fechou a recusa
+estrutural antes de qualquer medição ou prévia. Os Recortes A–G de `AUT-05`
+foram concluídos em
 [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
 [`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md): interfaces cilíndricas
 mensuráveis e prévia pura de pose para uma peça móvel, derivada de uma relação

@@ -1,8 +1,8 @@
-/* interfaces-montagem.js — resolve portas cilíndricas declaradas por peças e
-   mede uma relação dirigida de encaixe, sem Three.js, pose derivada, hierarquia
-   ou solver. É o contrato mínimo e deliberadamente read-only do Recorte A de
-   AUT-05: a montagem informa a escala/translação que JÁ usa; este módulo apenas
-   confere e explica. */
+/* interfaces-montagem.js — resolve portas declaradas por peças, mede relações
+   cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia
+   ou solver. É o contrato mínimo e deliberadamente read-only do AUT-05: a
+   montagem informa a escala/translação que JÁ usa; este módulo apenas confere,
+   explica e propõe uma pose não persistida quando o contrato a determina. */
 
 import { relacaoEntreCaixas } from './descrever-partes.js';
 
@@ -294,9 +294,13 @@ export function derivarPreviaDeEncaixeCilindrico(declaracao, portas) {
   const referencia = portaDo(portas, declaracao.referencia, quem);
   const movel = portaDo(portas, declaracao.movel, quem);
   const diagnosticos = [];
+  if (referencia.forma !== 'cilindro' || movel.forma !== 'cilindro') {
+    diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'cilindro' });
+  }
   if (referencia.papel !== 'externa' || movel.papel !== 'interna') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia externa e movel interna' });
   }
+  if (diagnosticos.length) return { id, tipo: 'encaixaCilindrico', aplicavel: false, diagnosticos };
   const quadroReferencia = quadroDaPorta(referencia);
   const quadroMovel = quadroDaPorta(movel);
   if (!quadroReferencia || !quadroMovel) diagnosticos.push({ codigo: 'quadro-incompleto', esperado: 'eixo e referencia perpendicular em ambas as portas' });
@@ -378,6 +382,27 @@ function intervaloNoEixo(porta, eixoReferencia) {
   return [centro + inicio, centro + fim];
 }
 
+function medidasIndisponiveisDeEncaixe(tolerancia, especificacaoFolgaRadial) {
+  return {
+    disponiveis: false,
+    alinhamento: null, descentro: null, folgaRadial: null,
+    folgaRadialMinima: especificacaoFolgaRadial.minimo,
+    folgaRadialMaxima: especificacaoFolgaRadial.maximo,
+    tolerancia, toleranciaNumerica: tolerancia, especificacaoFolgaRadial,
+    inicioReferencia: null, fimReferencia: null, inicioMovel: null, fimMovel: null,
+    sobraInicio: null, sobraFim: null, sobreposicaoAxial: null, separacaoAxial: null,
+  };
+}
+
+function medidasIndisponiveisDeAssentamento(tolerancia, radialEsperado, axialEsperado) {
+  return {
+    disponiveis: false,
+    alinhamento: null, descentro: null, sobreposicaoRadial: null,
+    sobreposicaoAxial: null, separacaoAxial: null,
+    tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado,
+  };
+}
+
 /**
  * Mede um encaixe externo -> interno numa pose já declarada. A função não muda
  * instância alguma: seu retorno é apenas diagnóstico estruturado e ordenado.
@@ -402,6 +427,14 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   }
   if (referencia.papel !== 'externa' || movel.papel !== 'interna') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia externa e movel interna', observado: `${referencia.papel}->${movel.papel}` });
+  }
+  if (diagnosticos.length) {
+    return {
+      id, tipo: 'encaixaCilindrico', satisfeita: false,
+      referencia: referencia.id, movel: movel.id,
+      medidas: medidasIndisponiveisDeEncaixe(tolerancia, especificacaoFolgaRadial),
+      diagnosticos,
+    };
   }
 
   const alinhamento = Math.abs(produto(referencia.eixo, movel.eixo));
@@ -434,7 +467,7 @@ export function validarEncaixeCilindrico(declaracao, portas) {
     id, tipo: 'encaixaCilindrico', satisfeita: diagnosticos.length === 0,
     referencia: referencia.id, movel: movel.id,
     medidas: {
-      alinhamento, descentro, folgaRadial, folgaRadialMinima: minimo,
+      disponiveis: true, alinhamento, descentro, folgaRadial, folgaRadialMinima: minimo,
       folgaRadialMaxima: maximo, tolerancia, toleranciaNumerica: tolerancia, especificacaoFolgaRadial, inicioReferencia, fimReferencia, inicioMovel,
       fimMovel, sobraInicio, sobraFim, sobreposicaoAxial, separacaoAxial,
     },
@@ -451,6 +484,9 @@ export function validarEncaixeCilindrico(declaracao, portas) {
 export function classificarContatoLocalCilindrico(resultado) {
   const quem = 'classificarContatoLocalCilindrico';
   const m = resultado?.medidas;
+  if (m?.disponiveis === false) {
+    falhar(quem, 'medidas estão indisponíveis para uma relação estruturalmente incompatível.');
+  }
   if (!m || !Number.isFinite(m.folgaRadial) || !Number.isFinite(m.tolerancia)
     || !Number.isFinite(m.sobreposicaoAxial) || !Number.isFinite(m.separacaoAxial)) {
     falhar(quem, 'esperava medidas de validarEncaixeCilindrico().');
@@ -488,7 +524,7 @@ export function diagnosticarEncaixeCilindrico(declaracao, instancias) {
   const caixaMovel = caixaAmplaDaInstancia(instanciaMovel, `${quem}.${movel.instancia}`);
   return {
     ...encaixe,
-    contatoLocal: classificarContatoLocalCilindrico(encaixe),
+    contatoLocal: encaixe.medidas.disponiveis === false ? null : classificarContatoLocalCilindrico(encaixe),
     alertaGlobal: relacaoEntreCaixas(caixaReferencia, caixaMovel),
   };
 }
@@ -545,6 +581,14 @@ export function validarAssentamentoAnular(declaracao, portas) {
   if (referencia.papel !== 'recebe' || movel.papel !== 'ocupa') {
     diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel ocupa', observado: `${referencia.papel}->${movel.papel}` });
   }
+  if (diagnosticos.length) {
+    return {
+      id, tipo: 'assentaAnular', satisfeita: false,
+      referencia: referencia.id, movel: movel.id,
+      medidas: medidasIndisponiveisDeAssentamento(tolerancia, radialEsperado, axialEsperado),
+      diagnosticos,
+    };
+  }
   const alinhamento = Math.abs(produto(referencia.eixo, movel.eixo));
   if (1 - alinhamento > EPSILON_ANGULAR) diagnosticos.push({ codigo: 'eixos-divergentes', observado: alinhamento, limite: 1 - EPSILON_ANGULAR });
   const entreCentros = subtrair(movel.centro, referencia.centro);
@@ -567,7 +611,7 @@ export function validarAssentamentoAnular(declaracao, portas) {
   return {
     id, tipo: 'assentaAnular', satisfeita: diagnosticos.length === 0,
     referencia: referencia.id, movel: movel.id,
-    medidas: { alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado },
+    medidas: { disponiveis: true, alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado },
     diagnosticos,
   };
 }
@@ -592,6 +636,17 @@ export function formatarDiagnosticoDeAssentamentoAnular(resultado, casas = 6) {
   if (!Number.isInteger(casas) || casas < 0 || casas > 12) falhar('formatarDiagnosticoDeAssentamentoAnular', 'casas precisa ser inteiro entre 0 e 12.');
   const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
   const m = resultado.medidas;
+  if (m?.disponiveis === false) {
+    const linhasIndisponiveis = [
+      'relação: ' + resultado.id + ' (' + resultado.tipo + ')',
+      'portas: referência ' + resultado.referencia + ' -> móvel ' + resultado.movel,
+      'medição: reprovada',
+      'medidas: indisponíveis (interfaces estruturalmente incompatíveis)',
+    ];
+    if (resultado.diagnosticos.length) linhasIndisponiveis.push('causas: ' + resultado.diagnosticos.map((d) => d.codigo).join(', '));
+    if (resultado.alertaGlobal) linhasIndisponiveis.push('alerta global por caixa: ' + resultado.alertaGlobal.tipo + ' (' + n(resultado.alertaGlobal.distancia) + ' m; não substitui contato local)');
+    return linhasIndisponiveis.join('\n') + '\n';
+  }
   const linhas = [
     `relação: ${resultado.id} (${resultado.tipo})`,
     `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
@@ -659,6 +714,17 @@ export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
   if (!Number.isInteger(casas) || casas < 0 || casas > 12) falhar('formatarDiagnosticoDeEncaixe', 'casas precisa ser inteiro entre 0 e 12.');
   const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
   const m = resultado.medidas;
+  if (m?.disponiveis === false) {
+    const linhasIndisponiveis = [
+      'relação: ' + resultado.id + ' (' + resultado.tipo + ')',
+      'portas: referência ' + resultado.referencia + ' -> móvel ' + resultado.movel,
+      'medição: reprovada',
+      'medidas: indisponíveis (interfaces estruturalmente incompatíveis)',
+    ];
+    if (resultado.diagnosticos.length) linhasIndisponiveis.push('causas: ' + resultado.diagnosticos.map((d) => d.codigo).join(', '));
+    if (resultado.alertaGlobal) linhasIndisponiveis.push('alerta global por caixa: ' + resultado.alertaGlobal.tipo + ' (' + n(resultado.alertaGlobal.distancia) + ' m; não substitui contato local)');
+    return linhasIndisponiveis.join('\n') + '\n';
+  }
   const linhas = [
     `relação: ${resultado.id} (${resultado.tipo})`,
     `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,

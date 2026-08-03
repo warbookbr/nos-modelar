@@ -437,6 +437,8 @@ introduzem infinitas respostas equivalentes.
   continua pertencendo à hierarquia do nível 5;
 - [x] testar idempotência, determinismo e ausência de mutação/rollback;
 - [x] recusar reflexão e escala não uniforme fora do contrato inicial;
+- [x] recusar prévia antes de ler quadro ou pose quando a forma/direção da
+  relação já for incompatível;
 - [x] comparar pose derivada com o baseline do nível 0.
 
 ## Nível 4 — validação explicável de encaixe e colisão
@@ -468,6 +470,8 @@ exigir métrica própria. Tolerância de fabricação não é epsilon numérico.
 - [x] separar alvo de projeto, tolerância de fabricação e tolerância numérica no cilindro e no anel;
 - [x] definir métricas para cilindro externo↔cavidade e faixa anular recebe↔ocupa;
 - [x] manter alerta global por caixa visível ao lado do contato local;
+- [x] encerrar incompatibilidade de forma ou direção com medidas explicitamente
+  indisponíveis, sem calcular a dimensão da natureza errada;
 - [ ] testar falso positivo, falso negativo e limite exato para todas as naturezas;
 - [x] explicar valor, unidade, tolerância e interfaces comparadas no relatório;
 - [ ] medir custo antes de aceitar malha contra malha como padrão.

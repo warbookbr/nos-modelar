@@ -384,3 +384,54 @@ describe('tolerâncias de montagem explícitas — AUT-2026-12', () => {
     expect(() => validarEncaixeCilindrico(ambigua, resolver(montarRodaNoFreio()))).toThrow(/toleranciaNumerica.*tolerancia/);
   });
 });
+
+describe('recusa estrutural antes da medição — AUT-2026-13', () => {
+  it('preserva byte a byte o diagnóstico essencial de pino e luva', () => {
+    const montagem = montarPinoELuva();
+    const resultado = validarEncaixeCilindrico(montagem.relacao, resolver(montagem));
+    expect(formatarDiagnosticoDeEncaixe(resultado)).toBe([
+      'relação: pinoNaLuva (encaixaCilindrico)',
+      'portas: referência pino.piloto -> móvel luva.cavidade',
+      'medição: aprovada',
+      'folga radial: 0.002000 (permitida 0.001900…0.002100)',
+      'axial: sobreposição 0.040000, sobras início/fim 0.000000/0.020000',
+      'eixos: alinhamento 1.000000, descentro 0.000000',
+    ].join('\n').concat('\n'));
+  });
+
+  it('não calcula medidas de outra forma nem classifica contato inexistente', () => {
+    const cilindros = montarPinoELuva();
+    const aneis = montarAnelEFaixa();
+    const relacaoAnularIncompativel = {
+      id: 'anelEmCilindros', tipo: 'assentaAnular', referencia: 'pino.piloto', movel: 'luva.cavidade',
+      sobreposicaoRadial: { min: 0, max: 1 }, sobreposicaoAxial: { min: 0, max: 1 },
+    };
+    const relacaoCilindricaIncompativel = {
+      id: 'cilindroEmAneis', tipo: 'encaixaCilindrico', referencia: 'faixa.recebeAnel', movel: 'anel.ocupaFaixa',
+      folgaRadial: { min: 0, max: 1 },
+    };
+
+    const anular = validarAssentamentoAnular(relacaoAnularIncompativel, resolver(cilindros));
+    expect(anular).toMatchObject({ satisfeita: false, medidas: { disponiveis: false, sobreposicaoRadial: null } });
+    expect(anular.diagnosticos.map((d: any) => d.codigo)).toEqual(['forma-incompativel', 'direcao-incompativel']);
+    expect(JSON.stringify(anular)).not.toContain('NaN');
+    expect(formatarDiagnosticoDeAssentamentoAnular(anular)).toContain('medidas: indisponíveis');
+
+    const cilindrico = diagnosticarEncaixeCilindrico(relacaoCilindricaIncompativel, aneis.instancias);
+    expect(cilindrico).toMatchObject({ satisfeita: false, medidas: { disponiveis: false, folgaRadial: null }, contatoLocal: null });
+    expect(cilindrico.diagnosticos.map((d: any) => d.codigo)).toEqual(['forma-incompativel', 'direcao-incompativel']);
+    expect(JSON.stringify(cilindrico)).not.toContain('NaN');
+    expect(formatarDiagnosticoDeEncaixe(cilindrico)).toContain('medidas: indisponíveis');
+  });
+
+  it('não oferece pose para uma porta que não é cilíndrica', () => {
+    const montagem = montarPinoELuva();
+    const portas = clonarPortas(resolver(montagem));
+    portas.get('pino.piloto').forma = 'plano';
+
+    expect(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)).toEqual({
+      id: 'pinoNaLuva', tipo: 'encaixaCilindrico', aplicavel: false,
+      diagnosticos: [{ codigo: 'forma-incompativel', esperado: 'cilindro' }],
+    });
+  });
+});

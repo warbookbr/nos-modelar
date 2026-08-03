@@ -7,6 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+[AUT-2026-13](2026-08-02-recusa-estrutural-montagem.md) foi concluído: relação
+com forma ou direção incompatível agora termina antes de medir a dimensão errada
+ou oferecer prévia aplicável.
+
 `AUT-2026-12`/Recorte G foi concluído em
 [`AUT-2026-12`](2026-08-02-tolerancias-de-montagem.md): especificação nominal,
 variação de fabricação e tolerância numérica agora são dados distintos, com
