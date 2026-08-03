@@ -3,6 +3,7 @@ dist/
 coverage/
 *.tsbuildinfo
 .DS_Store
+debug.log
 
 # Tick runtime artifacts (generated per run, never committed — see tick.yml)
 pending_commands.json
