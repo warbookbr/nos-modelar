@@ -201,6 +201,8 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect((await exportarPeca('_portas-espelho-arranja')).texto).toBe(derivada.texto);
     await expect(exportarPeca('_oficina-esqueleto'), 'esta peça tem esqueleto')
       .rejects.toThrow(/esqueleto/i);
+    await expect(exportarPeca('_freio-hierarquia'), 'hierarquia ainda não atravessa o formato resolvido')
+      .rejects.toThrow(/hierarquia de partes/i);
 
     /* e a recusa diz QUAL capacidade, senão obriga quem recebe a descobrir. */
     await expect(exportarPeca('_oficina-esqueleto')).rejects.toThrow(/o formato .* não transporta/i);

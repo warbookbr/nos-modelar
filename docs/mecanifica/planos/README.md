@@ -5,7 +5,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 ## Estado atual
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [`AUT-2026-16`](2026-08-03-hierarquia-semantica-minima.md) —
+hierarquia semântica mínima de partes. Ele registra o pai estável de uma parte,
+expõe a árvore para a IA na descrição e na bancada e recusa ambiguidade, sem
+abrir transformação herdada, submontagem, persistência ou solver.
 
 [AUT-2026-15](2026-08-02-portas-espelho-arranja.md) foi concluído: portas de
 interface acompanham cópias de `arranja` por identidade declarada, e espelho

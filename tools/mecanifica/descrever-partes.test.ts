@@ -12,6 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
 import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
+// @ts-expect-error — fixture em JavaScript, exercitada em runtime pelo Vitest.
+import * as freioHierarquia from '../../prototipos/fps/v3/pecas/_freio-hierarquia.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
@@ -289,6 +291,43 @@ describe('descrever-partes: a medição headless de uma peça', () => {
     for (const parte of descricao.partes) {
       expect(convertido.partes.get(parte.nome).userData.faces.length).toBe(parte.faces);
     }
+  });
+});
+
+describe('AUT-2026-16 — a descrição expõe a hierarquia que o autor declarou', () => {
+  function montarHierarquia() {
+    return nucleo(
+      freioHierarquia.PASSOS,
+      freioHierarquia.PARAMS,
+      freioHierarquia.TOPO,
+      freioHierarquia.MATERIAIS,
+      null,
+      freioHierarquia.ALIASES,
+    );
+  }
+
+  it('mostra a árvore completa, estável e independente do filtro geométrico', () => {
+    const descricao = descreverPeca(montarHierarquia(), { partes: ['pistao'] });
+    expect(descricao.partes.map((parte: any) => parte.nome)).toEqual(['pistao']);
+    expect(descricao.hierarquia).toContainEqual({ nome: 'pistao', pai: 'pinca' });
+    expect(descricao.hierarquia).toContainEqual({ nome: 'pastilhaInterna', pai: 'pinca' });
+    expect(descricao.hierarquia.find((item: any) => item.nome === 'pinca')).toEqual({ nome: 'pinca', pai: null });
+    expect(descricao.hierarquia.map((item: any) => item.nome)).toEqual(
+      [...descricao.hierarquia.map((item: any) => item.nome)].sort(),
+    );
+    const texto = formatarDescricao(descricao);
+    expect(texto).toContain('HIERARQUIA DE PARTES');
+    expect(texto).toMatch(/pistao {2,}pinca/);
+  });
+
+  it('a bancada conserva a mesma relação somente como metadado, sem reparenting de cena', () => {
+    const convertido = adaptarThree(montarHierarquia(), { nome: 'freio-hierarquia' });
+    const pistao = convertido.partes.get('pistao');
+    const pinca = convertido.partes.get('pinca');
+    expect(pistao.userData.paiSemantico).toBe('pinca');
+    expect(pistao.parent).toBe(convertido.raiz);
+    expect(pinca.parent).toBe(convertido.raiz);
+    expect(convertido.raiz.userData.hierarquia).toContainEqual({ nome: 'pistao', pai: 'pinca' });
   });
 });
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-271 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+273 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -138,6 +138,7 @@
 - `2026-08-02-recusa-estrutural-montagem.md` — AUT-2026-13 — recusa estrutural de montagem
 - `2026-08-02-tolerancias-de-montagem.md` — AUT-2026-12 — tolerâncias de montagem explícitas
 - `2026-08-02-triangulacao-de-furos.md` — AUT-2026-03 — triangulação robusta de vários furos
+- `2026-08-03-hierarquia-semantica-minima.md` — AUT-2026-16 — hierarquia semântica mínima de partes
 - `BACKLOG.md` — Backlog de candidatos
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
 - `MODELO.md` — [ID] — resultado curto
@@ -203,6 +204,7 @@
 - `_elenco.js` — scratch: ELENCO completo do carimbo — uma de cada espécie em fila, pro ideador ver tudo.
 - `_espelhado.js` — PEÇA-EXEMPLO do P3 do playground: uma CABEÇA com um PAR DE CHIFRES — o objeto BILATERAL modelado só de UM chifre e completado pela op `espelha` NOVA, waterti…
 - `_flange-de-tubulacao.js` — PEÇA DE EXERCÍCIO — prova geral da F1/A-30: uma flange de tubulação abre, em UM passo, a passagem central e o círculo de fixação com raios diferentes. Os gru…
+- `_freio-hierarquia.js` — Fixture de AUT-2026-16. Reusa a geometria real do freio a disco para provar somente a intenção estrutural: pistão e duas pastilhas pertencem à pinça. A ordem…
 - `_frondosa.js` — scratch: prova de 'seca'/'raiz' (malhas separadas, afiadas) + 'frondosa' (copa fundida). Fila: seca | raiz | 4× frondosa.
 - `_gabarito-de-furacao.js` — PEÇA DE EXERCÍCIO — prova geral do A-34. Um gabarito de bancada combina cilindro, cone e furo escritos pela mesma tolerância geométrica. O objeto não sabe na…
 - `_gabarito-triangulacao-de-furos.js` — PEÇA DE EXERCÍCIO — prova geral do A-33. Um disco hexagonal recebe dez furos triangulares muito próximos da borda: é a fronteira que a ponte gulosa não repar…

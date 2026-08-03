@@ -150,6 +150,7 @@ async function iniciar() {
 
   for (const nome of controlador.nomes) {
     const grupo = convertido.partes.get(nome);
+    const pai = grupo.userData.paiSemantico;
     const botao = document.createElement('button');
     botao.type = 'button';
     botao.className = 'parte-linha';
@@ -157,7 +158,7 @@ async function iniciar() {
     botao.setAttribute('aria-pressed', 'false');
     botao.innerHTML = `
       <span class="check" aria-hidden="true"></span>
-      <span class="nome">${formatarNome(nome)}</span>
+      <span class="nome">${formatarNome(nome)}${pai ? ` <small>de ${formatarNome(pai)}</small>` : ''}</span>
       <span class="faces">${grupo.userData.faces.length}F</span>
     `;
     botao.addEventListener('click', () => controlador.selecionar(nome, { aditiva: true }));

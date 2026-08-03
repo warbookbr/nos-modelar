@@ -507,17 +507,21 @@ espaço local e exige migração de pose.
 
 **Estado**
 
-- [x] NÃO INICIADO
-- [ ] EM DESENVOLVIMENTO
+- [ ] NÃO INICIADO
+- [x] EM DESENVOLVIMENTO
 - [ ] CONCLUÍDO
 
 **Checklist**
 
+- [x] declarar pai semântico por nome estável, somente como metadado, sem
+  transformar filho nem inferir árvore pela geometria (`AUT-2026-16`);
 - [ ] definir identidade de nó e caminho semântico sem usar nome de exibição;
 - [ ] decidir se peça e parte compartilham ou não o mesmo tipo de nó;
 - [ ] definir pose local, reparenting e preservação da pose mundial;
 - [ ] migrar lista plana com versão e prova byte/canônica apropriada;
-- [ ] adaptar bancada, descrição e exportação;
+- [ ] adaptar bancada, descrição e exportação como subárvore; a leitura
+  informativa de pai na bancada e na descrição já existe, mas o formato
+  resolvido ainda recusa hierarquia até ter versão e consumidor próprios;
 - [ ] testar subárvore, relação cruzada e nó removido.
 
 ## Nível 6 — grafo de dependências e propagação incremental

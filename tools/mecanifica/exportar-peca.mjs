@@ -117,6 +117,9 @@ export function conferirCapacidadesTransportaveis(nome, bruto) {
   const faltantes = [];
   if (bruto.esqueleto) faltantes.push('esqueleto');
   if (bruto.pesos?.size) faltantes.push(`peso de osso em ${bruto.pesos.size} vértice(s)`);
+  if (Object.values(bruto.partes ?? {}).some((parte) => parte?.pai)) {
+    faltantes.push('hierarquia de partes');
+  }
   if (faltantes.length === 0) return;
 
   throw new Error(

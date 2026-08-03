@@ -4013,6 +4013,52 @@ describe('contrato de identidade de parte (nome)', () => {
   });
 });
 
+describe('AUT-2026-16 — hierarquia semântica mínima de partes', () => {
+  const parte = (nome: string, origem: number, extra: any = {}) => ['parte', {
+    nome, sel: { origem: { op: 'cubo', id: origem } }, ...extra,
+  }] as any;
+  const doisCubos: any[] = [
+    ['cubo', { origemId: 1, lado: 1 }],
+    ['cubo', { origemId: 2, lado: 1 }],
+  ];
+  const quatroCubos: any[] = [
+    ...doisCubos,
+    ['cubo', { origemId: 3, lado: 1 }],
+    ['cubo', { origemId: 4, lado: 1 }],
+  ];
+
+  it('resolve pai por nome depois da receita: filho pode ser declarado antes da peça que o contém', () => {
+    const n = nucleo([...doisCubos, parte('pastilha', 1, { pai: 'pinca' }), parte('pinca', 2)], {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(n.partes.pastilha).toMatchObject({ pai: 'pinca' });
+    expect(n.partes.pinca).not.toHaveProperty('pai');
+  });
+
+  it('recusa pai inválido, ausente, auto-pai e reparenting sem publicar árvore parcial', () => {
+    const invalido = nucleo([...doisCubos, parte('filho', 1, { pai: '' }), parte('raiz', 2)], {}, {});
+    expect(invalido.orfaos.some((o: any) => o.ref === 'pai' && /pai de parte inválido/.test(o.motivo))).toBe(true);
+    expect(invalido.partes.filho).toBeUndefined();
+
+    const ausente = nucleo([['cubo', { origemId: 1, lado: 1 }], parte('filho', 1, { pai: 'fantasma' })], {}, {});
+    expect(ausente.orfaos.some((o: any) => o.ref === 'pai' && /não existe no fim da receita/.test(o.motivo))).toBe(true);
+    expect(ausente.partes.filho).not.toHaveProperty('pai');
+
+    const proprio = nucleo([['cubo', { origemId: 1, lado: 1 }], parte('filho', 1, { pai: 'filho' })], {}, {});
+    expect(proprio.orfaos.some((o: any) => /não pode ser pai de si mesma/.test(o.motivo))).toBe(true);
+
+    const troca = nucleo([...quatroCubos, parte('raizA', 1), parte('raizB', 2), parte('filho', 3, { pai: 'raizA' }), parte('filho', 4, { pai: 'raizB' })], {}, {});
+    expect(troca.orfaos.some((o: any) => /reparenting não faz parte/.test(o.motivo))).toBe(true);
+    expect(troca.partes.filho.pai).toBe('raizA');
+  });
+
+  it('recusa ciclo e não deixa uma árvore pela metade', () => {
+    const n = nucleo([...doisCubos, parte('a', 1, { pai: 'b' }), parte('b', 2, { pai: 'a' })], {}, {});
+    expect(n.orfaos.some((o: any) => /ciclo de hierarquia/.test(o.motivo))).toBe(true);
+    expect(n.partes.a).not.toHaveProperty('pai');
+    expect(n.partes.b).not.toHaveProperty('pai');
+  });
+});
+
 /* O-3 (Faixa 1) — `sel.regiao` ganha `modo`. O argumento não é conforto: o
    seletor JÁ se comportava de duas maneiras e nada no formato dizia isso —
    vértice entrava por "toca", face só por "contem" (`f.vs.every(dentro)`), de

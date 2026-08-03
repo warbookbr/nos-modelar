@@ -331,6 +331,39 @@ function nomeDeParteInvalido(nome) {
 }
 function temNomeDeParte(nome) { return nomeDeParteInvalido(nome) === null; }
 
+/* A geometria pode declarar filho antes de declarar o pai: a ordem dos passos
+   descreve a fabricação, não a árvore conceitual. Por isso `parte.pai` só é
+   aplicado depois de todos os passos. Se uma declaração não fecha, nenhuma
+   hierarquia parcial é publicada — uma árvore incompleta é ambígua para quem
+   vier depois, mesmo que a malha permaneça útil para diagnosticar o erro. */
+function aplicarHierarquiaDasPartes(st) {
+  const declaracoes = [...st.paisDasPartes.entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+  const invalidas = [];
+  for (const [filho, declaracao] of declaracoes) {
+    if (!st.partes[filho]) invalidas.push({ filho, ...declaracao, motivo: `parte '${filho}' não existe no fim da receita` });
+    else if (!st.partes[declaracao.pai]) invalidas.push({ filho, ...declaracao, motivo: `pai '${declaracao.pai}' não existe no fim da receita` });
+  }
+
+  const pais = new Map(declaracoes.map(([filho, declaracao]) => [filho, declaracao.pai]));
+  for (const [filho, declaracao] of declaracoes) {
+    const vistos = new Set([filho]);
+    let cursor = declaracao.pai;
+    while (pais.has(cursor)) {
+      if (vistos.has(cursor)) {
+        invalidas.push({ filho, ...declaracao, motivo: `pai '${declaracao.pai}' cria ciclo de hierarquia` });
+        break;
+      }
+      vistos.add(cursor);
+      cursor = pais.get(cursor);
+    }
+  }
+  if (invalidas.length) {
+    for (const invalida of invalidas) grita(st, invalida.passo, 'parte', 'pai', invalida.motivo);
+    return;
+  }
+  for (const [filho, declaracao] of declaracoes) st.partes[filho].pai = declaracao.pai;
+}
+
 /* Fase 2: a identidade é UMA só no objeto, independente do gerador. Cada
    contrato valida e resolve apenas sua coordenada local; o resolvedor comum
    nunca precisa saber qual gerador a publicou. */
@@ -4718,6 +4751,24 @@ export const OPS = {
       grita(st, i, 'parte', 'nome', `nome de parte inválido: ${erroNome} — a identidade da parte é FORMATO SALVO (o canon a anexa, sel:{grupo} a cita, a régua mede por ela)`);
       return;
     }
+    const declaraPai = Object.hasOwn(a, 'pai');
+    const pai = a.pai;
+    if (declaraPai) {
+      const erroPai = nomeDeParteInvalido(pai);
+      if (erroPai) {
+        grita(st, i, 'parte', 'pai', `pai de parte inválido: ${erroPai}`);
+        return;
+      }
+      if (pai === nome) {
+        grita(st, i, 'parte', 'pai', `parte '${nome}' não pode ser pai de si mesma`);
+        return;
+      }
+      const anterior = st.paisDasPartes.get(nome);
+      if (anterior && anterior.pai !== pai) {
+        grita(st, i, 'parte', 'pai', `parte '${nome}' já declarou pai '${anterior.pai}' no passo ${anterior.passo}; reparenting não faz parte deste contrato`);
+        return;
+      }
+    }
     /* `substituir` é chave do FORMATO SALVO: só o literal `true` passa, como o
        `tudo:true` do `sel` (D-129). `substituir:'sim'`/`1` aceito em silêncio
        ensinaria a próxima IA a escrever besteira que passa — e ainda por cima
@@ -4742,7 +4793,8 @@ export const OPS = {
       f.parte = nome; st.parteAtribuidaEm.set(fid, i); atribuiu = true;
     }
     if (!atribuiu) return;   // toda a seleção foi recusada: não registra parte fantasma (nome sem nenhuma face)
-    st.partes[nome] = { pivo };   // registro nome->{pivo}; pivo null => centroide (no adaptador)
+    st.partes[nome] = { ...st.partes[nome], pivo };   // registro nome->{pivo}; pivo null => centroide (no adaptador)
+    if (declaraPai) st.paisDasPartes.set(nome, { pai, passo: i });
   },
 
   /* pesar (passo 14a): soma `peso` de influência do OSSO aos VÉRTICES dados (`vs`)
@@ -4953,7 +5005,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
@@ -4961,6 +5013,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     if (!fn) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
     fn(st, args, i);
   });
+  aplicarHierarquiaDasPartes(st);
 
   /* `materiais` faz parte do estado neutro: a face só guarda o NOME, mas uma
      revisão sem o dicionário não conseguiria dizer se uma alteração de cor ou

@@ -137,6 +137,25 @@ espelho, exportação e releitura. Para extrair, leve também o transporte em
 declarado: resolver uma relação refletida é capacidade futura, não uma
 interpretação automática desta entrega.
 
+## UP-035 — pai semântico mínimo de partes
+
+`parte` aceita opcionalmente `pai` por nome estável. A receita pode declarar o
+filho antes do pai: ao terminar os passos, o núcleo valida pai inexistente,
+auto-pai, troca de pai e ciclo; se alguma declaração não fecha, não publica uma
+árvore parcial. O estado neutro, `npm run descrever` e a bancada carregam a
+mesma relação; a bancada mostra, por exemplo, “Pistão de Pinça”, mas preserva
+os dois grupos como irmãos no grafo Three.js. Assim, hierarquia ainda não muda
+posição, seleção, explosão, portas nem geometria. A fixture
+`pecas/_freio-hierarquia.js` prova três filhos da pinça, e
+`tools/oficina/oficina.test.ts` cobre as recusas.
+
+É uma capacidade geral para qualquer objeto composto. Para levá-la ao NÓS,
+extraia o metadado do núcleo, a descrição e os testes; não leve a fixture de
+freio nem transforme a árvore em pai de cena. Limite explícito: o formato
+`peca-resolvida` recusa hierarquia enquanto não houver versão, leitor e
+consumidor do produto; reparenting, subárvore e pose herdada precisam de planos
+próprios.
+
 ## UP-005 — fronteira de renderização provada
 
 **Problema observado:** `oficina.js` já separava `nucleo()` de `adaptarV3()`,

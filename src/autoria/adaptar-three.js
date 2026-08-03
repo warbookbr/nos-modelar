@@ -265,6 +265,7 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
       grupoParte.userData = {
         tipo: 'parte-semantica',
         identidadeParte: lote.parte,
+        paiSemantico: neutro.partes?.[lote.parte]?.pai ?? null,
         faces: [],
       };
       partes.set(lote.parte, grupoParte);
@@ -294,6 +295,10 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
   }
 
   raiz.userData.partes = [...partes.keys()].sort();
+  raiz.userData.hierarquia = raiz.userData.partes.map((nome) => ({
+    nome,
+    pai: neutro.partes?.[nome]?.pai ?? null,
+  }));
   raiz.userData.diagnosticos = {
     facesSemParte: facesSemParte.slice(),
   };

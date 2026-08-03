@@ -277,6 +277,26 @@ function projetarCaixa(parte) {
   };
 }
 
+/* A árvore vem do registro neutro da op `parte`, nunca da posição das caixas
+   nem de uma convenção de nome. Um neutro histórico, que só traz `F.parte`,
+   continua legível e expõe todas as partes como raízes. */
+function hierarquiaDasPartes(neutro, nomes, quem) {
+  const registro = neutro.partes ?? {};
+  if (!registro || typeof registro !== 'object' || Array.isArray(registro)) {
+    throw new Error(`${quem}: registro de partes inválido.`);
+  }
+  const existentes = new Set(nomes);
+  return nomes.map((nome) => {
+    const pai = registro[nome]?.pai;
+    if (pai === undefined) return { nome, pai: null };
+    exigirNome(pai, quem);
+    if (!existentes.has(pai)) {
+      throw new Error(`${quem}: parte '${nome}' declara pai inexistente '${pai}'.`);
+    }
+    return { nome, pai };
+  });
+}
+
 /* Serializa o resto do contrato da origem (tudo além de `op` e `id`) em ordem
    de chave — `tampa=fundo`, `faixa=0`. Ordem por ponto de código, como o resto
    do módulo: o relatório é determinístico e pode virar teste. */
@@ -568,6 +588,7 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
   const medido = medirPartes(neutro, quem);
   const nomes = selecionarNomes(medido.partes, partes, quem);
   const escolhidas = nomes.map((nome) => medido.partes.get(nome));
+  const hierarquia = hierarquiaDasPartes(neutro, [...medido.partes.keys()], quem);
 
   const relacoes = [];
   for (let i = 0; i < escolhidas.length; i++) {
@@ -604,6 +625,7 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
     filtrado: partes !== null && partes !== undefined,
     facesSemParte: medido.facesSemParte.slice(),
     partes: escolhidas.map(projetarCaixa),
+    hierarquia,
     relacoes,
     portas,
     aparencia,
@@ -660,6 +682,14 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     + `   portas: ${t.portas ?? 0}`,
   );
   linhas.push(`unidades do modelo, ${casas} casa(s) decimal(is)`);
+  linhas.push('');
+
+  linhas.push('HIERARQUIA DE PARTES — pai semântico declarado, não transformação herdada');
+  const hierarquia = Array.isArray(descricao.hierarquia) ? descricao.hierarquia : [];
+  const linhasHierarquia = hierarquia.map((item) => [item.nome, item.pai ?? '— raiz —']);
+  linhas.push(...(linhasHierarquia.length
+    ? tabela([{ titulo: 'parte' }, { titulo: 'pai' }], linhasHierarquia)
+    : ['(nenhuma parte)']));
   linhas.push('');
 
   linhas.push('CAIXA POR PARTE — envelope da parte inteira, alinhado aos eixos');
