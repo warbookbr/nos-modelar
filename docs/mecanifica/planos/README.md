@@ -7,6 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-2026-10`/Recorte E foi concluído em
+[`AUT-2026-10`](2026-08-02-contato-local-cilindrico.md): contato cilíndrico
+local e alerta amplo por caixa aparecem juntos, sem declarar colisão exata de
+sólidos. Cavidade anular aro/pneu e outras naturezas continuam no backlog.
+
 `AUT-09`/Recorte D foi concluído em
 [`AUT-2026-09`](2026-08-02-estados-de-encaixe.md): estados explícitos de encaixe
 cilíndrico para a IA, antes de ampliar a geometria de colisão.

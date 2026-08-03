@@ -5,7 +5,7 @@
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
-  resolverPortasDeMontagem, avaliarEstadoDeEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
+  resolverPortasDeMontagem, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
   derivarPreviaDeEncaixeCilindrico, formatarPreviaDePose,
 } from '../../src/autoria/interfaces-montagem.js';
 
@@ -13,7 +13,8 @@ const aqui = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(aqui, '../..');
 const nome = process.argv[2];
 const montagens = new Map([
-  ['roda-no-freio', 'roda-no-freio.js'],
+  ['pino-e-luva', { arquivo: 'pino-e-luva.js', fabrica: 'montarPinoELuva' }],
+  ['roda-no-freio', { arquivo: 'roda-no-freio.js', fabrica: 'montarRodaNoFreio' }],
 ]);
 
 if (!nome || !montagens.has(nome)) {
@@ -22,11 +23,12 @@ if (!nome || !montagens.has(nome)) {
 }
 
 try {
-  const modulo = await import(pathToFileURL(join(repo, 'prototipos/fps/v3/montagens', montagens.get(nome))).href);
-  const montagem = modulo.montarRodaNoFreio();
+  const escolha = montagens.get(nome);
+  const modulo = await import(pathToFileURL(join(repo, 'prototipos/fps/v3/montagens', escolha.arquivo)).href);
+  const montagem = modulo[escolha.fabrica]();
   const portas = resolverPortasDeMontagem(montagem.instancias);
   process.stdout.write(
-    formatarDiagnosticoDeEncaixe(avaliarEstadoDeEncaixeCilindrico(montagem.relacao, portas))
+    formatarDiagnosticoDeEncaixe(diagnosticarEncaixeCilindrico(montagem.relacao, montagem.instancias))
     + formatarPreviaDePose(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)),
   );
 } catch (erro) {

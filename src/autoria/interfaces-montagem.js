@@ -4,6 +4,8 @@
    AUT-05: a montagem informa a escala/translação que JÁ usa; este módulo apenas
    confere e explica. */
 
+import { relacaoEntreCaixas } from './descrever-partes.js';
+
 const EPSILON_ANGULAR = 1e-9;
 
 /** Estados estáveis do encaixe cilíndrico, em ordem de decisão. */
@@ -95,6 +97,14 @@ function localDaTransformacao(referencial, mundo) {
   };
 }
 
+function mundoDaInstancia(instancia, quem) {
+  const local = transformacaoRigida({
+    escala: instancia.escala, rotacao: instancia.rotacao, deslocamento: instancia.deslocamento,
+  }, `${quem}.local`);
+  const referencial = transformacaoRigida(instancia.referencial, `${quem}.referencial`, { aceitarEscala: false });
+  return { local, referencial, mundo: comporTransformacoes(referencial, local) };
+}
+
 function interfaceCilindrica(porta, quem) {
   const i = porta?.interface;
   if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
@@ -132,11 +142,7 @@ export function resolverPortasDeMontagem(instancias) {
     if (typeof id !== 'string' || !id) falhar(quem, 'cada instância precisa de id não vazio.');
     if (vistos.has(id)) falhar(quem, `instância '${id}' duplicada.`);
     vistos.add(id);
-    const local = transformacaoRigida({
-      escala: instancia.escala, rotacao: instancia.rotacao, deslocamento: instancia.deslocamento,
-    }, `${quem}.${id}.local`);
-    const referencial = transformacaoRigida(instancia.referencial, `${quem}.${id}.referencial`, { aceitarEscala: false });
-    const mundo = comporTransformacoes(referencial, local);
+    const { local, referencial, mundo } = mundoDaInstancia(instancia, `${quem}.${id}`);
     if (!(instancia.neutro?.portas instanceof Map)) falhar(quem, `instância '${id}' não traz portas do núcleo.`);
     for (const [nome, porta] of instancia.neutro.portas) {
       if (!porta?.interface) continue;
@@ -160,6 +166,35 @@ export function resolverPortasDeMontagem(instancias) {
         },
       });
     }
+  }
+  return resultado;
+}
+
+function caixaAmplaDaInstancia(instancia, quem) {
+  if (!(instancia?.neutro?.V instanceof Map)) falhar(quem, 'instância precisa trazer V do núcleo para alerta global.');
+  const { mundo } = mundoDaInstancia(instancia, quem);
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (const ponto of instancia.neutro.V.values()) {
+    const local = vetor(ponto, `${quem}.V`);
+    const transformado = somar(multiplicar(aplicarMatriz(mundo.rotacao, local), mundo.escala), mundo.deslocamento);
+    for (let i = 0; i < 3; i += 1) {
+      min[i] = Math.min(min[i], transformado[i]);
+      max[i] = Math.max(max[i], transformado[i]);
+    }
+  }
+  if (!Number.isFinite(min[0])) falhar(quem, 'instância não tem vértices para alerta global.');
+  return { nome: instancia.id, min, max };
+}
+
+function instanciasPorId(instancias, quem) {
+  if (!Array.isArray(instancias) || !instancias.length) falhar(quem, 'instancias precisa ser lista não vazia.');
+  const resultado = new Map();
+  for (const instancia of instancias) {
+    const id = instancia?.id;
+    if (typeof id !== 'string' || !id) falhar(quem, 'cada instância precisa de id não vazio.');
+    if (resultado.has(id)) falhar(quem, `instância '${id}' duplicada.`);
+    resultado.set(id, instancia);
   }
   return resultado;
 }
@@ -349,6 +384,7 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   const sobraInicio = inicioReferencia - inicioMovel;
   const sobraFim = fimMovel - fimReferencia;
   const sobreposicaoAxial = Math.max(0, Math.min(fimReferencia, fimMovel) - Math.max(inicioReferencia, inicioMovel));
+  const separacaoAxial = Math.max(0, Math.max(inicioReferencia, inicioMovel) - Math.min(fimReferencia, fimMovel));
   if (sobraInicio < -tolerancia || sobraFim < -tolerancia) {
     diagnosticos.push({ codigo: 'intervalo-axial-fora', sobraInicio, sobraFim, tolerancia });
   }
@@ -358,10 +394,61 @@ export function validarEncaixeCilindrico(declaracao, portas) {
     referencia: referencia.id, movel: movel.id,
     medidas: {
       alinhamento, descentro, folgaRadial, folgaRadialMinima: minimo,
-      folgaRadialMaxima: maximo, inicioReferencia, fimReferencia, inicioMovel,
-      fimMovel, sobraInicio, sobraFim, sobreposicaoAxial,
+      folgaRadialMaxima: maximo, tolerancia, inicioReferencia, fimReferencia, inicioMovel,
+      fimMovel, sobraInicio, sobraFim, sobreposicaoAxial, separacaoAxial,
     },
     diagnosticos,
+  };
+}
+
+/**
+ * Lê apenas o contato físico declarado pela interface. A folga de projeto
+ * continua em `folgaRadialMinima/Maxima`; a tolerância aqui é exclusivamente
+ * numérica. Portanto uma folga positiva pode estar fora do contrato de projeto
+ * sem virar "interferência" por acidente.
+ */
+export function classificarContatoLocalCilindrico(resultado) {
+  const quem = 'classificarContatoLocalCilindrico';
+  const m = resultado?.medidas;
+  if (!m || !Number.isFinite(m.folgaRadial) || !Number.isFinite(m.tolerancia)
+    || !Number.isFinite(m.sobreposicaoAxial) || !Number.isFinite(m.separacaoAxial)) {
+    falhar(quem, 'esperava medidas de validarEncaixeCilindrico().');
+  }
+  const radial = m.folgaRadial < -m.tolerancia
+    ? 'interferencia'
+    : Math.abs(m.folgaRadial) <= m.tolerancia ? 'encosta' : 'folga';
+  const axial = m.separacaoAxial > m.tolerancia
+    ? 'sem-alcance'
+    : m.sobreposicaoAxial > m.tolerancia ? 'alcanca' : 'encosta';
+  return {
+    radial: { estado: radial, medida: m.folgaRadial, unidade: 'm', toleranciaNumerica: m.tolerancia },
+    axial: {
+      estado: axial, sobreposicao: m.sobreposicaoAxial, separacao: m.separacaoAxial,
+      unidade: 'm', toleranciaNumerica: m.tolerancia,
+    },
+  };
+}
+
+/**
+ * Mostra lado a lado a relação de porta e o alerta amplo por caixa das duas
+ * instâncias que ela cita. A caixa não decide o contato local e nunca é
+ * removida quando o encaixe passa.
+ */
+export function diagnosticarEncaixeCilindrico(declaracao, instancias) {
+  const quem = 'diagnosticarEncaixeCilindrico';
+  const portas = resolverPortasDeMontagem(instancias);
+  const encaixe = avaliarEstadoDeEncaixeCilindrico(declaracao, portas);
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const porId = instanciasPorId(instancias, quem);
+  const instanciaReferencia = porId.get(referencia.instancia);
+  const instanciaMovel = porId.get(movel.instancia);
+  const caixaReferencia = caixaAmplaDaInstancia(instanciaReferencia, `${quem}.${referencia.instancia}`);
+  const caixaMovel = caixaAmplaDaInstancia(instanciaMovel, `${quem}.${movel.instancia}`);
+  return {
+    ...encaixe,
+    contatoLocal: classificarContatoLocalCilindrico(encaixe),
+    alertaGlobal: relacaoEntreCaixas(caixaReferencia, caixaMovel),
   };
 }
 
@@ -427,6 +514,14 @@ export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
   }
   if (resultado.diagnosticos.length) {
     linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+  }
+  if (resultado.contatoLocal) {
+    const local = resultado.contatoLocal;
+    linhas.push(`contato local radial: ${local.radial.estado} (${n(local.radial.medida)} m)`);
+    linhas.push(`contato local axial: ${local.axial.estado} (sobreposição ${n(local.axial.sobreposicao)} m, separação ${n(local.axial.separacao)} m)`);
+  }
+  if (resultado.alertaGlobal) {
+    linhas.push(`alerta global por caixa: ${resultado.alertaGlobal.tipo} (${n(resultado.alertaGlobal.distancia)} m; não substitui contato local)`);
   }
   return `${linhas.join('\n')}\n`;
 }

@@ -8,7 +8,7 @@ import { montarPinoELuva } from '../../prototipos/fps/v3/montagens/pino-e-luva.j
 // @ts-expect-error — montagem piloto em JavaScript, exercitada pela API pública.
 import { montarRodaNoFreio } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
-import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, classificarContatoLocalCilindrico, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
 
 const resolver = (montagem: any) => resolverPortasDeMontagem(montagem.instancias);
 const clonarPortas = (portas: Map<string, any>) => new Map([...portas].map(([id, porta]) => [id, JSON.parse(JSON.stringify(porta))]));
@@ -256,5 +256,55 @@ describe('estados explicáveis de encaixe — AUT-2026-09', () => {
     const resultado = avaliarEstadoDeEncaixeCilindrico(montagem.relacao, portas);
     expect(resultado).toMatchObject({ estado: 'impossivel', satisfeita: false });
     expect(resultado.diagnosticos.map((d: any) => d.codigo)).toEqual(['quadro-incompleto']);
+  });
+});
+
+describe('contato local cilíndrico e alerta global — AUT-2026-10', () => {
+  it('mostra folga e alcance locais sem ocultar o alerta amplo em pino/luva e roda/cubo', () => {
+    for (const montagem of [montarPinoELuva(), montarRodaNoFreio()]) {
+      const antes = JSON.stringify(montagem);
+      const diagnostico = diagnosticarEncaixeCilindrico(montagem.relacao, montagem.instancias);
+      expect(diagnosticarEncaixeCilindrico(montagem.relacao, montagem.instancias)).toEqual(diagnostico);
+      expect(diagnostico.contatoLocal).toMatchObject({
+        radial: { estado: 'folga', unidade: 'm' },
+        axial: { estado: 'alcanca', unidade: 'm', separacao: 0 },
+      });
+      expect(diagnostico.alertaGlobal).toMatchObject({ tipo: 'interpenetra' });
+      expect(formatarDiagnosticoDeEncaixe(diagnostico)).toContain('alerta global por caixa: interpenetra');
+      expect(JSON.stringify(montagem)).toBe(antes);
+    }
+  });
+
+  it('distingue encosta, interferência e falta de alcance pelas medidas locais', () => {
+    const montagem = montarPinoELuva();
+    const portas = resolver(montagem);
+
+    const encosta = clonarPortas(portas);
+    encosta.get('pino.piloto').raio = encosta.get('luva.cavidade').raio;
+    expect(classificarContatoLocalCilindrico(validarEncaixeCilindrico(montagem.relacao, encosta))).toMatchObject({
+      radial: { estado: 'encosta' }, axial: { estado: 'alcanca' },
+    });
+
+    const interfere = clonarPortas(portas);
+    interfere.get('pino.piloto').raio = interfere.get('luva.cavidade').raio + 0.01;
+    expect(classificarContatoLocalCilindrico(validarEncaixeCilindrico(montagem.relacao, interfere)).radial.estado)
+      .toBe('interferencia');
+
+    const semAlcance = clonarPortas(portas);
+    semAlcance.get('pino.piloto').centro[1] += 1;
+    expect(classificarContatoLocalCilindrico(validarEncaixeCilindrico(montagem.relacao, semAlcance)).axial.estado)
+      .toBe('sem-alcance');
+  });
+
+  it('uma interface inválida altera a leitura local, mas conserva o alerta amplo', () => {
+    const montagem = montarPinoELuva();
+    const pino = montagem.instancias[0];
+    const portas = new Map([...pino.neutro.portas].map(([nome, porta]) => [nome, JSON.parse(JSON.stringify(porta))]));
+    portas.get('piloto').interface.raio += 0.01;
+    const alterada = [{ ...pino, neutro: { ...pino.neutro, portas } }, montagem.instancias[1]];
+
+    const diagnostico = diagnosticarEncaixeCilindrico(montagem.relacao, alterada);
+    expect(diagnostico.contatoLocal.radial.estado).toBe('interferencia');
+    expect(diagnostico.alertaGlobal).toMatchObject({ tipo: 'interpenetra' });
   });
 });
