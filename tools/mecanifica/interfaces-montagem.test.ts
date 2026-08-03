@@ -6,9 +6,11 @@ import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
 // @ts-expect-error — fixture em JavaScript, exercitada pela API pública.
 import { montarPinoELuva } from '../../prototipos/fps/v3/montagens/pino-e-luva.js';
 // @ts-expect-error — montagem piloto em JavaScript, exercitada pela API pública.
-import { montarRodaNoFreio } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
+import { montarRodaNoFreio, montarAroNoPneu } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
+// @ts-expect-error — fixture neutra em JavaScript, exercitada pela API pública.
+import { montarAnelEFaixa } from '../../prototipos/fps/v3/montagens/anel-e-faixa.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
-import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, classificarContatoLocalCilindrico, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, classificarContatoLocalCilindrico, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, validarAssentamentoAnular, diagnosticarAssentamentoAnular, formatarDiagnosticoDeAssentamentoAnular, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
 
 const resolver = (montagem: any) => resolverPortasDeMontagem(montagem.instancias);
 const clonarPortas = (portas: Map<string, any>) => new Map([...portas].map(([id, porta]) => [id, JSON.parse(JSON.stringify(porta))]));
@@ -306,5 +308,45 @@ describe('contato local cilíndrico e alerta global — AUT-2026-10', () => {
     const diagnostico = diagnosticarEncaixeCilindrico(montagem.relacao, alterada);
     expect(diagnostico.contatoLocal.radial.estado).toBe('interferencia');
     expect(diagnostico.alertaGlobal).toMatchObject({ tipo: 'interpenetra' });
+  });
+});
+
+describe('assentamento anular declarado — AUT-2026-11', () => {
+  it('passa no piloto aro/pneu e na fixture neutra, preservando o alerta amplo', () => {
+    for (const montagem of [montarAroNoPneu(), montarAnelEFaixa()]) {
+      const antes = JSON.stringify(montagem);
+      const diagnostico = diagnosticarAssentamentoAnular(montagem.relacao, montagem.instancias);
+      expect(diagnostico).toMatchObject({ satisfeita: true, alertaGlobal: { tipo: 'interpenetra' } });
+      expect(diagnostico.medidas.sobreposicaoRadial).toBeGreaterThan(0);
+      expect(diagnostico.medidas.sobreposicaoAxial).toBeGreaterThan(0);
+      expect(formatarDiagnosticoDeAssentamentoAnular(diagnostico)).toContain('alerta global por caixa: interpenetra');
+      expect(JSON.stringify(montagem)).toBe(antes);
+    }
+  });
+
+  it('distingue faixa radial, eixo e alcance axial sem escolher correção', () => {
+    const montagem = montarAnelEFaixa();
+    const portas = resolver(montagem);
+
+    const radial = clonarPortas(portas);
+    radial.get('anel.ocupaFaixa').raioInterno = 0.041;
+    expect(validarAssentamentoAnular(montagem.relacao, radial).diagnosticos.map((d: any) => d.codigo)).toContain('faixa-radial-fora');
+
+    const eixo = clonarPortas(portas);
+    eixo.get('anel.ocupaFaixa').eixo = [1, 0, 0];
+    expect(validarAssentamentoAnular(montagem.relacao, eixo).diagnosticos.map((d: any) => d.codigo)).toContain('eixos-divergentes');
+
+    const axial = clonarPortas(portas);
+    axial.get('anel.ocupaFaixa').centro[1] += 1;
+    expect(validarAssentamentoAnular(montagem.relacao, axial).diagnosticos.map((d: any) => d.codigo)).toContain('faixa-axial-fora');
+  });
+
+  it('rejeita anel incompleto no núcleo antes de ele virar porta de montagem', () => {
+    const neutro = nucleo([
+      ['lathe', { origemId: 44, lados: 8, perfil: [[0.02, 0], [0.03, 0], [0.03, 0.01], [0.02, 0.01], [0.02, 0]] }],
+      ['publicarPorta', { nome: 'ruim', de: { op: 'lathe', id: 44 }, interface: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: 0.02, inicio: 0, fim: 0.01 } }],
+    ] as any);
+    expect(neutro.orfaos[0].motivo).toMatch(/interface exige 'raioExterno'/);
+    expect(neutro.portas.size).toBe(0);
   });
 });

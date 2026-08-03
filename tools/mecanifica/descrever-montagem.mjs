@@ -6,6 +6,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   resolverPortasDeMontagem, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
+  diagnosticarAssentamentoAnular, formatarDiagnosticoDeAssentamentoAnular,
   derivarPreviaDeEncaixeCilindrico, formatarPreviaDePose,
 } from '../../src/autoria/interfaces-montagem.js';
 
@@ -14,7 +15,9 @@ const repo = resolve(aqui, '../..');
 const nome = process.argv[2];
 const montagens = new Map([
   ['pino-e-luva', { arquivo: 'pino-e-luva.js', fabrica: 'montarPinoELuva' }],
-  ['roda-no-freio', { arquivo: 'roda-no-freio.js', fabrica: 'montarRodaNoFreio' }],
+  ['anel-e-faixa', { arquivo: 'anel-e-faixa.js', fabrica: 'montarAnelEFaixa', previa: false }],
+  ['roda-no-freio', { arquivo: 'roda-no-freio.js', fabrica: 'montarRodaNoFreio', previa: true }],
+  ['aro-no-pneu', { arquivo: 'roda-no-freio.js', fabrica: 'montarAroNoPneu', previa: false }],
 ]);
 
 if (!nome || !montagens.has(nome)) {
@@ -27,10 +30,14 @@ try {
   const modulo = await import(pathToFileURL(join(repo, 'prototipos/fps/v3/montagens', escolha.arquivo)).href);
   const montagem = modulo[escolha.fabrica]();
   const portas = resolverPortasDeMontagem(montagem.instancias);
-  process.stdout.write(
-    formatarDiagnosticoDeEncaixe(diagnosticarEncaixeCilindrico(montagem.relacao, montagem.instancias))
-    + formatarPreviaDePose(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)),
-  );
+  if (montagem.relacao.tipo === 'assentaAnular') {
+    process.stdout.write(formatarDiagnosticoDeAssentamentoAnular(diagnosticarAssentamentoAnular(montagem.relacao, montagem.instancias)));
+  } else {
+    process.stdout.write(
+      formatarDiagnosticoDeEncaixe(diagnosticarEncaixeCilindrico(montagem.relacao, montagem.instancias))
+      + (escolha.previa ? formatarPreviaDePose(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)) : ''),
+    );
+  }
 } catch (erro) {
   console.error(`descrever-montagem: ${erro.message}`);
   process.exit(1);

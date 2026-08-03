@@ -7,6 +7,11 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-2026-11`/Recorte F foi concluído em
+[`AUT-2026-11`](2026-08-02-assentamento-anular.md): aro↔pneu passa a declarar
+e medir faixa anular local, mantendo o alerta amplo por caixa. Deformação,
+pressão e colisão de sólidos continuam fora do backlog executável.
+
 `AUT-2026-10`/Recorte E foi concluído em
 [`AUT-2026-10`](2026-08-02-contato-local-cilindrico.md): contato cilíndrico
 local e alerta amplo por caixa aparecem juntos, sem declarar colisão exata de

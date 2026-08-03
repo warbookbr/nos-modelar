@@ -170,6 +170,25 @@ export const PASSOS = [
       raio: 'aroRaioInterno', inicio: 'aroMeiaLarguraNeg', fim: 'aroMeiaLargura',
     },
   }],
+  /* O pneu e o aro também declaram a faixa de assentamento entre si. Não é
+     colisão de malha nem borracha simulada: são dois envelopes locais que a
+     relação `assentaAnular` mede sem ocultar o alerta amplo entre as partes. */
+  ['publicarPorta', {
+    nome: 'assentoDoAroNoPneu',
+    de: { op: 'lathe', id: PNEU, faixa: 0 },
+    interface: {
+      forma: 'anel', papel: 'recebe', parte: 'pneu', eixo: [1, 0, 0], centro: [0, 0, 0],
+      raioInterno: 'pneuRaioInterno', raioExterno: 'aroRaioExterno', inicio: 'pneuMeiaLarguraNeg', fim: 'pneuMeiaLargura',
+    },
+  }],
+  ['publicarPorta', {
+    nome: 'assentoDoPneuNoAro',
+    de: { op: 'lathe', id: ARO, faixa: 2 },
+    interface: {
+      forma: 'anel', papel: 'ocupa', parte: 'aro', eixo: [1, 0, 0], centro: [0, 0, 0],
+      raioInterno: 'aroRaioBase', raioExterno: 'aroRaioExterno', inicio: 'aroOmbroMeiaLarguraNeg', fim: 'aroOmbroMeiaLargura',
+    },
+  }],
 
   ['material', { sel: { grupo: 'pneu' }, usa: 'borracha' }],
   ['material', { sel: { grupo: 'aro' }, usa: 'ligaAro' }],

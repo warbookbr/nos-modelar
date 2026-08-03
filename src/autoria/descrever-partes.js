@@ -725,7 +725,9 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     porta.origem,
     porta.passo,
     porta.interface
-      ? `${porta.interface.forma} ${porta.interface.papel} r=${n(porta.interface.raio)} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
+      ? `${porta.interface.forma} ${porta.interface.papel} ${porta.interface.forma === 'anel'
+        ? `r=${n(porta.interface.raioInterno)}…${n(porta.interface.raioExterno)}`
+        : `r=${n(porta.interface.raio)}`} axial=${n(porta.interface.inicio)}…${n(porta.interface.fim)}`
       : '—',
   ]);
   linhas.push(...(linhasPorta.length ? tabela(colunasPorta, linhasPorta) : ['(nenhuma porta publicada)']));

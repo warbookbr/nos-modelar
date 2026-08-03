@@ -377,7 +377,7 @@ viveu copiada em três lugares na antiga Oficina e divergiu duas vezes na chave
 
 ## Planejamento atual
 
-Não há plano ativo. Os Recortes A–E de `AUT-05` foram concluídos em
+Não há plano ativo. Os Recortes A–F de `AUT-05` foram concluídos em
 [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
 [`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md): interfaces cilíndricas
 mensuráveis e prévia pura de pose para uma peça móvel, derivada de uma relação
@@ -385,19 +385,21 @@ com quadro explícito; [`AUT-2026-08`](planos/2026-08-02-pose-em-referencial.md)
 completa a composição local/mundo em referencial rígido; e
 [`AUT-2026-09`](planos/2026-08-02-estados-de-encaixe.md) entrega estados
 explicáveis. [`AUT-2026-10`](planos/2026-08-02-contato-local-cilindrico.md)
-separa contato local cilíndrico de alerta amplo por caixa, sem chamar este
-último de colisão exata. Cavidade anular aro/pneu, hierarquia, múltiplas
-relações, persistência e solver continuam candidatos. O plano mestre foi
+separa contato local cilíndrico de alerta amplo por caixa;
+[`AUT-2026-11`](planos/2026-08-02-assentamento-anular.md) aplica a separação à
+faixa declarada aro↔pneu. Nenhum deles chama alerta amplo de colisão exata.
+Hierarquia, múltiplas relações, persistência e solver continuam candidatos. O plano mestre foi
 encerrado em 2 de agosto de 2026 e seu
 resultado está sintetizado em
 [`planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
-Os caminhos canônicos dos três recortes são
+Os caminhos canônicos dos seis recortes são
 `docs/mecanifica/planos/2026-08-02-pose-derivada-roda.md`,
 `docs/mecanifica/planos/2026-08-02-interfaces-de-encaixe.md`,
 `docs/mecanifica/planos/2026-08-02-pose-em-referencial.md`,
 `docs/mecanifica/planos/2026-08-02-estados-de-encaixe.md` e
-`docs/mecanifica/planos/2026-08-02-contato-local-cilindrico.md`.
+`docs/mecanifica/planos/2026-08-02-contato-local-cilindrico.md` e
+`docs/mecanifica/planos/2026-08-02-assentamento-anular.md`.
 
 Depois dele, o plano curto [`AUT-2026-01`](planos/2026-08-02-contagem-por-desvio.md)
 pagou A-34 com contagem circular por tolerância e também foi encerrado.

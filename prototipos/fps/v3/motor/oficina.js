@@ -4687,11 +4687,52 @@ export const OPS = {
    ponto no eixo e `inicio`/`fim` são distâncias assinadas a partir dele. Não há
    matriz, Three.js, escolha por proximidade nem posição de passo: a porta só
    transporta dados declarados e o módulo neutro decide se o quadro é necessário. */
+function resolverInterfaceAnularDaPorta(st, interfaceDeclarada) {
+  const obrigatorias = ['forma', 'papel', 'eixo', 'centro', 'raioInterno', 'raioExterno', 'inicio', 'fim'];
+  const aceitas = new Set([...obrigatorias, 'parte']);
+  const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));
+  if (extras.length) return { erro: `interface tem chave(s) desconhecida(s): ${extras.sort().join(', ')}` };
+  for (const chave of obrigatorias) if (!Object.hasOwn(interfaceDeclarada, chave)) return { erro: `interface exige '${chave}'` };
+  if (interfaceDeclarada.papel !== 'recebe' && interfaceDeclarada.papel !== 'ocupa') {
+    return { erro: "interface anel.papel precisa ser 'recebe' ou 'ocupa'" };
+  }
+  if (interfaceDeclarada.parte !== undefined && (typeof interfaceDeclarada.parte !== 'string' || !interfaceDeclarada.parte)) {
+    return { erro: 'interface anel.parte precisa ser nome não vazio quando declarada' };
+  }
+  let eixo, centro, raioInterno, raioExterno, inicio, fim;
+  try {
+    eixo = st.vec(interfaceDeclarada.eixo);
+    centro = st.vec(interfaceDeclarada.centro);
+    raioInterno = st.num(interfaceDeclarada.raioInterno);
+    raioExterno = st.num(interfaceDeclarada.raioExterno);
+    inicio = st.num(interfaceDeclarada.inicio);
+    fim = st.num(interfaceDeclarada.fim);
+  } catch (erro) {
+    return { erro: `interface anel inválida: ${erro.message}` };
+  }
+  const comprimento = Math.hypot(...eixo);
+  if (!(comprimento > 0) || !Number.isFinite(comprimento)) return { erro: 'interface anel.eixo precisa ter comprimento finito > 0' };
+  if (!(raioInterno >= 0) || !(raioExterno > raioInterno) || !Number.isFinite(raioExterno)) {
+    return { erro: 'interface anel exige 0 <= raioInterno < raioExterno finitos' };
+  }
+  if (!Number.isFinite(inicio) || !Number.isFinite(fim) || !(fim > inicio)) {
+    return { erro: 'interface anel.inicio e interface anel.fim precisam ser finitos, com fim > inicio' };
+  }
+  return {
+    interface: {
+      forma: 'anel', papel: interfaceDeclarada.papel, eixo: eixo.map((n) => n / comprimento), centro,
+      raioInterno, raioExterno, inicio, fim,
+      ...(interfaceDeclarada.parte === undefined ? {} : { parte: interfaceDeclarada.parte }),
+    },
+  };
+}
+
 function resolverInterfaceCilindricaDaPorta(st, interfaceDeclarada) {
   if (interfaceDeclarada === undefined) return { interface: undefined };
   if (!interfaceDeclarada || typeof interfaceDeclarada !== 'object' || Array.isArray(interfaceDeclarada)) {
     return { erro: 'interface precisa ser objeto {forma, papel, eixo, centro, raio, inicio, fim, referencia?}' };
   }
+  if (interfaceDeclarada.forma === 'anel') return resolverInterfaceAnularDaPorta(st, interfaceDeclarada);
   const obrigatorias = ['forma', 'papel', 'eixo', 'centro', 'raio', 'inicio', 'fim'];
   const aceitas = new Set([...obrigatorias, 'referencia']);
   const extras = Object.keys(interfaceDeclarada).filter((chave) => !aceitas.has(chave));

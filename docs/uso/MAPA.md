@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-263 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+265 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -123,6 +123,7 @@
 
 ## docs/mecanifica/planos/
 
+- `2026-08-02-assentamento-anular.md` — AUT-2026-11 — assentamento anular declarado
 - `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
 - `2026-08-02-canto-composto.md` — AUT-2026-04 — canto composto de aresta arredondada
 - `2026-08-02-concordancia-por-ponto.md` — AUT-2026-02 — discretização por concordância
@@ -167,6 +168,7 @@
 
 ## prototipos/fps/v3/montagens/
 
+- `anel-e-faixa.js` — anel-e-faixa.js — fixture neutra de assentamento anular. Dois corpos de revolução declaram zonas concêntricas, sem conhecer roda, pneu, freio ou Three.js; el…
 - `pino-e-luva.js` — pino-e-luva.js — fixture neutra do encaixe cilíndrico. Não conhece roda, freio ou Three.js: dois corpos rígidos simples publicam as mesmas interfaces que o p…
 - `roda-no-freio.js` — roda-no-freio.js — declaração de montagem do piloto AUT-05. Ela reúne duas receitas já existentes numa pose manual conhecida e declara UMA relação de encaixe…
 

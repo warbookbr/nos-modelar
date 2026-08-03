@@ -2,7 +2,7 @@
   "formato": "mecanifica.peca-resolvida",
   "versao": 1,
   "peca": "roda-dianteira",
-  "receita": "21848ba7dd46f5f3",
+  "receita": "7fa4c72aeb15665a",
   "meta": {
     "nome": "roda-dianteira"
   },
@@ -28,6 +28,62 @@
     "tampaCentral"
   ],
   "portas": [
+    {
+      "nome": "assentoDoAroNoPneu",
+      "de": {
+        "op": "lathe",
+        "id": 401,
+        "faixa": 0
+      },
+      "passo": 14,
+      "interface": {
+        "forma": "anel",
+        "papel": "recebe",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          0,
+          0,
+          0
+        ],
+        "raioInterno": 0.22,
+        "raioExterno": 0.245,
+        "inicio": -0.11,
+        "fim": 0.11,
+        "parte": "pneu"
+      }
+    },
+    {
+      "nome": "assentoDoPneuNoAro",
+      "de": {
+        "op": "lathe",
+        "id": 402,
+        "faixa": 2
+      },
+      "passo": 15,
+      "interface": {
+        "forma": "anel",
+        "papel": "ocupa",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          0,
+          0,
+          0
+        ],
+        "raioInterno": 0.215,
+        "raioExterno": 0.245,
+        "inicio": -0.073,
+        "fim": 0.073,
+        "parte": "aro"
+      }
+    },
     {
       "nome": "cavidadeDoCubo",
       "de": {

@@ -50,7 +50,7 @@ do anterior; não é apenas uma tela nova.
 | 1 | portas com quadro e interface semânticos | em desenvolvimento | portas sobrevivem a transformação e replay |
 | 2 | relações dirigidas, ainda sem mover peça | em desenvolvimento | `encaixa`/`alinha` validam uma montagem existente |
 | 3 | posicionamento derivado de uma relação | em desenvolvimento | uma peça móvel chega à pose única esperada |
-| 4 | diagnóstico de folga, contato e colisão com intenção | em desenvolvimento | contato cilíndrico local não esconde alerta amplo por caixa |
+| 4 | diagnóstico de folga, contato e colisão com intenção | em desenvolvimento | contato cilíndrico ou faixa anular local não esconde alerta amplo por caixa |
 | 5 | hierarquia de peças e submontagens | não iniciado | selecionar um pai alcança a subárvore correta |
 | 6 | grafo de dependências e propagação incremental | não iniciado | mudar uma medida recalcula só os dependentes |
 | 7 | múltiplas restrições e graus de liberdade limitados | não iniciado | conflito e ambiguidade gritam com causa mínima |
@@ -466,7 +466,7 @@ exigir métrica própria. Tolerância de fabricação não é epsilon numérico.
 **Checklist**
 
 - [x] separar, no cilindro, folga de projeto e tolerância numérica; tolerância de fabricação continua sem contrato;
-- [x] definir a métrica para o par cilindro externo↔cavidade cilíndrica;
+- [x] definir métricas para cilindro externo↔cavidade e faixa anular recebe↔ocupa;
 - [x] manter alerta global por caixa visível ao lado do contato local;
 - [ ] testar falso positivo, falso negativo e limite exato para todas as naturezas;
 - [x] explicar valor, unidade, tolerância e interfaces comparadas no relatório;

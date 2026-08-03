@@ -292,14 +292,13 @@ raio declarado e o grupo nomeado permanece estável quando a quantidade muda.
 
 ### A-16 — a régua por envelopes não reconhece encaixe oco
 
-**Estado atual:** os Recortes A–D de `AUT-05` medem e posicionam uma interface
-cilíndrica; o Recorte E [`AUT-2026-10`](planos/2026-08-02-contato-local-cilindrico.md)
-acrescenta leitura local explícita (`folga`, `encosta`, `interferência` e alcance
-axial) sem apagar o alerta amplo por caixa. Isto resolve a ambiguidade de
-piloto↔cavidade para roda/cubo e pino/luva, mas não transforma a caixa em colisão
-exata nem trata uma cavidade anular. Solver, reposicionamento persistente e
-exceção silenciosa continuam fora do contrato. O encaixe aro↔pneu exige porta e
-métrica próprias num recorte posterior.
+**Estado atual:** os Recortes A–E de `AUT-05` medem e posicionam uma interface
+cilíndrica, distinguindo contato local de alerta amplo. O Recorte F
+[`AUT-2026-11`](planos/2026-08-02-assentamento-anular.md) aplica a mesma regra ao
+aro↔pneu: duas faixas anulares declaradas medem sobreposição radial e axial, mas
+o alerta amplo das partes continua exposto. Isso resolve a ambiguidade da roda
+sem transformar caixa em colisão exata. Solver, reposicionamento persistente,
+deformação de borracha e exceção silenciosa continuam fora do contrato.
 
 **Onde dói:** conferência headless da bancada.
 

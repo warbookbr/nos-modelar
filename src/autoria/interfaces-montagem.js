@@ -125,6 +125,34 @@ function interfaceCilindrica(porta, quem) {
   };
 }
 
+function interfaceAnular(porta, quem) {
+  const i = porta?.interface;
+  if (!i || typeof i !== 'object' || Array.isArray(i)) falhar(quem, 'não publica interface.');
+  if (i.forma !== 'anel' || (i.papel !== 'recebe' && i.papel !== 'ocupa')) {
+    falhar(quem, 'interface precisa ser anel que recebe ou ocupa.');
+  }
+  const eixo = vetor(i.eixo, `${quem}.eixo`);
+  const tamanho = comprimento(eixo);
+  if (!(tamanho > 0)) falhar(`${quem}.eixo`, 'não pode ser nulo.');
+  const inicio = escalar(i.inicio, `${quem}.inicio`);
+  const fim = escalar(i.fim, `${quem}.fim`);
+  const raioInterno = escalar(i.raioInterno, `${quem}.raioInterno`, { naoNegativo: true });
+  const raioExterno = escalar(i.raioExterno, `${quem}.raioExterno`, { positivo: true });
+  if (!(fim > inicio)) falhar(quem, 'exige fim > inicio.');
+  if (!(raioExterno > raioInterno)) falhar(quem, 'exige raioExterno > raioInterno.');
+  if (i.parte !== undefined && (typeof i.parte !== 'string' || !i.parte)) falhar(quem, 'parte precisa ser nome não vazio quando declarada.');
+  return {
+    forma: 'anel', papel: i.papel, eixo: multiplicar(eixo, 1 / tamanho),
+    centro: vetor(i.centro, `${quem}.centro`), raioInterno, raioExterno, inicio, fim,
+    ...(i.parte === undefined ? {} : { parte: i.parte }),
+  };
+}
+
+function interfaceDeMontagem(porta, quem) {
+  if (porta?.interface?.forma === 'anel') return interfaceAnular(porta, quem);
+  return interfaceCilindrica(porta, quem);
+}
+
 /**
  * Resolve portas de várias peças para uma montagem já posada. A transformação
  * suportada neste recorte é escala uniforme positiva, rotação própria 3×3 e
@@ -146,9 +174,9 @@ export function resolverPortasDeMontagem(instancias) {
     if (!(instancia.neutro?.portas instanceof Map)) falhar(quem, `instância '${id}' não traz portas do núcleo.`);
     for (const [nome, porta] of instancia.neutro.portas) {
       if (!porta?.interface) continue;
-      const base = interfaceCilindrica(porta, `${quem}.${id}.${nome}`);
+      const base = interfaceDeMontagem(porta, `${quem}.${id}.${nome}`);
       const chave = `${id}.${nome}`;
-      resultado.set(chave, {
+      const resolvida = {
         id: chave, instancia: id, porta: nome,
         ...base,
         eixo: multiplicar(aplicarMatriz(mundo.rotacao, base.eixo), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.eixo))),
@@ -156,7 +184,6 @@ export function resolverPortasDeMontagem(instancias) {
           referencia: multiplicar(aplicarMatriz(mundo.rotacao, base.referencia), 1 / comprimento(aplicarMatriz(mundo.rotacao, base.referencia))),
         }),
         centro: somar(multiplicar(aplicarMatriz(mundo.rotacao, base.centro), mundo.escala), mundo.deslocamento),
-        raio: base.raio * mundo.escala,
         inicio: base.inicio * mundo.escala,
         fim: base.fim * mundo.escala,
         transformacao: {
@@ -164,18 +191,33 @@ export function resolverPortasDeMontagem(instancias) {
           local: { escala: local.escala, rotacao: local.rotacao.map((linha) => linha.slice()), deslocamento: local.deslocamento.slice() },
           referencial: { escala: referencial.escala, rotacao: referencial.rotacao.map((linha) => linha.slice()), deslocamento: referencial.deslocamento.slice() },
         },
-      });
+      };
+      if (base.forma === 'cilindro') resolvida.raio = base.raio * mundo.escala;
+      else {
+        resolvida.raioInterno = base.raioInterno * mundo.escala;
+        resolvida.raioExterno = base.raioExterno * mundo.escala;
+      }
+      resultado.set(chave, resolvida);
     }
   }
   return resultado;
 }
 
-function caixaAmplaDaInstancia(instancia, quem) {
-  if (!(instancia?.neutro?.V instanceof Map)) falhar(quem, 'instância precisa trazer V do núcleo para alerta global.');
+function caixaAmplaDaInstancia(instancia, quem, parte = null) {
+  if (!(instancia?.neutro?.V instanceof Map) || !(instancia?.neutro?.F instanceof Map)) {
+    falhar(quem, 'instância precisa trazer V e F do núcleo para alerta global.');
+  }
+  if (parte !== null && (typeof parte !== 'string' || !parte)) falhar(quem, 'parte precisa ser nome não vazio.');
   const { mundo } = mundoDaInstancia(instancia, quem);
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
-  for (const ponto of instancia.neutro.V.values()) {
+  const vertices = parte === null
+    ? instancia.neutro.V.values()
+    : [...new Set([...instancia.neutro.F.values()]
+      .filter((face) => face.parte === parte)
+      .flatMap((face) => face.vs)
+      .map((id) => instancia.neutro.V.get(id)))];
+  for (const ponto of vertices) {
     const local = vetor(ponto, `${quem}.V`);
     const transformado = somar(multiplicar(aplicarMatriz(mundo.rotacao, local), mundo.escala), mundo.deslocamento);
     for (let i = 0; i < 3; i += 1) {
@@ -183,8 +225,10 @@ function caixaAmplaDaInstancia(instancia, quem) {
       max[i] = Math.max(max[i], transformado[i]);
     }
   }
-  if (!Number.isFinite(min[0])) falhar(quem, 'instância não tem vértices para alerta global.');
-  return { nome: instancia.id, min, max };
+  if (!Number.isFinite(min[0])) falhar(quem, parte === null
+    ? 'instância não tem vértices para alerta global.'
+    : `instância não tem faces na parte '${parte}' para alerta global.`);
+  return { nome: parte === null ? instancia.id : `${instancia.id}.${parte}`, min, max };
 }
 
 function instanciasPorId(instancias, quem) {
@@ -450,6 +494,92 @@ export function diagnosticarEncaixeCilindrico(declaracao, instancias) {
     contatoLocal: classificarContatoLocalCilindrico(encaixe),
     alertaGlobal: relacaoEntreCaixas(caixaReferencia, caixaMovel),
   };
+}
+
+function faixaDeSobreposicao(declaracao, chave, quem) {
+  const faixa = declaracao[chave];
+  if (!faixa || typeof faixa !== 'object' || Array.isArray(faixa)) falhar(quem, `${chave} precisa ser {min,max}.`);
+  const minimo = escalar(faixa.min, `${quem}.${chave}.min`, { naoNegativo: true });
+  const maximo = escalar(faixa.max, `${quem}.${chave}.max`, { naoNegativo: true });
+  if (maximo < minimo) falhar(quem, `${chave}.max precisa ser >= min.`);
+  return { minimo, maximo };
+}
+
+/** Mede uma faixa anular declarada; não infere borracha, pressão ou colisão de malha. */
+export function validarAssentamentoAnular(declaracao, portas) {
+  const quem = 'validarAssentamentoAnular';
+  if (!declaracao || typeof declaracao !== 'object' || Array.isArray(declaracao)) falhar(quem, 'declaração precisa ser objeto.');
+  const id = declaracao.id;
+  if (typeof id !== 'string' || !id) falhar(quem, 'declaração precisa de id não vazio.');
+  if (declaracao.tipo !== 'assentaAnular') falhar(quem, "tipo precisa ser 'assentaAnular'.");
+  const tolerancia = escalar(declaracao.tolerancia ?? 1e-6, `${quem}.${id}.tolerancia`, { naoNegativo: true });
+  const radialEsperado = faixaDeSobreposicao(declaracao, 'sobreposicaoRadial', `${quem}.${id}`);
+  const axialEsperado = faixaDeSobreposicao(declaracao, 'sobreposicaoAxial', `${quem}.${id}`);
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const diagnosticos = [];
+  if (referencia.forma !== 'anel' || movel.forma !== 'anel') diagnosticos.push({ codigo: 'forma-incompativel', esperado: 'anel' });
+  if (referencia.papel !== 'recebe' || movel.papel !== 'ocupa') {
+    diagnosticos.push({ codigo: 'direcao-incompativel', esperado: 'referencia recebe e movel ocupa', observado: `${referencia.papel}->${movel.papel}` });
+  }
+  const alinhamento = Math.abs(produto(referencia.eixo, movel.eixo));
+  if (1 - alinhamento > EPSILON_ANGULAR) diagnosticos.push({ codigo: 'eixos-divergentes', observado: alinhamento, limite: 1 - EPSILON_ANGULAR });
+  const entreCentros = subtrair(movel.centro, referencia.centro);
+  const aoLongo = produto(entreCentros, referencia.eixo);
+  const descentro = comprimento(subtrair(entreCentros, multiplicar(referencia.eixo, aoLongo)));
+  if (descentro > tolerancia) diagnosticos.push({ codigo: 'eixos-descentrados', observado: descentro, limite: tolerancia });
+  const inicioRadial = Math.max(referencia.raioInterno, movel.raioInterno);
+  const fimRadial = Math.min(referencia.raioExterno, movel.raioExterno);
+  const sobreposicaoRadial = Math.max(0, fimRadial - inicioRadial);
+  if (sobreposicaoRadial < radialEsperado.minimo - tolerancia || sobreposicaoRadial > radialEsperado.maximo + tolerancia) {
+    diagnosticos.push({ codigo: 'faixa-radial-fora', observado: sobreposicaoRadial, ...radialEsperado, tolerancia });
+  }
+  const [inicioReferencia, fimReferencia] = intervaloNoEixo(referencia, referencia.eixo);
+  const [inicioMovel, fimMovel] = intervaloNoEixo(movel, referencia.eixo);
+  const sobreposicaoAxial = Math.max(0, Math.min(fimReferencia, fimMovel) - Math.max(inicioReferencia, inicioMovel));
+  const separacaoAxial = Math.max(0, Math.max(inicioReferencia, inicioMovel) - Math.min(fimReferencia, fimMovel));
+  if (sobreposicaoAxial < axialEsperado.minimo - tolerancia || sobreposicaoAxial > axialEsperado.maximo + tolerancia) {
+    diagnosticos.push({ codigo: 'faixa-axial-fora', observado: sobreposicaoAxial, ...axialEsperado, tolerancia });
+  }
+  return {
+    id, tipo: 'assentaAnular', satisfeita: diagnosticos.length === 0,
+    referencia: referencia.id, movel: movel.id,
+    medidas: { alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, radialEsperado, axialEsperado },
+    diagnosticos,
+  };
+}
+
+/** Junta a medida local do assentamento ao alerta amplo das partes declaradas. */
+export function diagnosticarAssentamentoAnular(declaracao, instancias) {
+  const quem = 'diagnosticarAssentamentoAnular';
+  const portas = resolverPortasDeMontagem(instancias);
+  const assentamento = validarAssentamentoAnular(declaracao, portas);
+  const referencia = portaDo(portas, declaracao.referencia, quem);
+  const movel = portaDo(portas, declaracao.movel, quem);
+  const porId = instanciasPorId(instancias, quem);
+  const caixaReferencia = caixaAmplaDaInstancia(porId.get(referencia.instancia), `${quem}.${referencia.instancia}`, referencia.parte ?? null);
+  const caixaMovel = caixaAmplaDaInstancia(porId.get(movel.instancia), `${quem}.${movel.instancia}`, movel.parte ?? null);
+  return { ...assentamento, alertaGlobal: relacaoEntreCaixas(caixaReferencia, caixaMovel) };
+}
+
+export function formatarDiagnosticoDeAssentamentoAnular(resultado, casas = 6) {
+  if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
+    falhar('formatarDiagnosticoDeAssentamentoAnular', 'esperava resultado de validarAssentamentoAnular().');
+  }
+  if (!Number.isInteger(casas) || casas < 0 || casas > 12) falhar('formatarDiagnosticoDeAssentamentoAnular', 'casas precisa ser inteiro entre 0 e 12.');
+  const n = (valor) => Number.isFinite(valor) ? valor.toFixed(casas).replace(/^-0(\.0+)?$/, '0') : String(valor);
+  const m = resultado.medidas;
+  const linhas = [
+    `relação: ${resultado.id} (${resultado.tipo})`,
+    `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
+    `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
+    `faixa radial: sobreposição ${n(m.sobreposicaoRadial)} m (esperada ${n(m.radialEsperado.minimo)}…${n(m.radialEsperado.maximo)})`,
+    `faixa axial: sobreposição ${n(m.sobreposicaoAxial)} m, separação ${n(m.separacaoAxial)} m (esperada ${n(m.axialEsperado.minimo)}…${n(m.axialEsperado.maximo)})`,
+    `eixos: alinhamento ${n(m.alinhamento)}, descentro ${n(m.descentro)} m`,
+  ];
+  if (resultado.diagnosticos.length) linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
+  if (resultado.alertaGlobal) linhas.push(`alerta global por caixa: ${resultado.alertaGlobal.tipo} (${n(resultado.alertaGlobal.distancia)} m; não substitui contato local)`);
+  return `${linhas.join('\n')}\n`;
 }
 
 /**

@@ -21,6 +21,17 @@ export const RELACAO_RODA_NO_FREIO = {
   poseCanonica: { referenciaAxial: 'centro', movelAxial: 'centro', giro: 0 },
 };
 
+export const RELACAO_ARO_NO_PNEU = {
+  id: 'aroNoPneu',
+  tipo: 'assentaAnular',
+  referencia: 'roda.assentoDoAroNoPneu',
+  movel: 'roda.assentoDoPneuNoAro',
+  /* Na escala 1,60, as faixas comuns são 40 mm radial e 233,6 mm axial. */
+  sobreposicaoRadial: { min: 0.0399, max: 0.0401 },
+  sobreposicaoAxial: { min: 0.2335, max: 0.2337 },
+  tolerancia: 0.000001,
+};
+
 export function montarRodaNoFreio() {
   return {
     instancias: [
@@ -28,5 +39,14 @@ export function montarRodaNoFreio() {
       { id: 'roda', neutro: resolver(roda), escala: 1.60, deslocamento: [0, 0, 0] },
     ],
     relacao: RELACAO_RODA_NO_FREIO,
+  };
+}
+
+export function montarAroNoPneu() {
+  return {
+    instancias: [
+      { id: 'roda', neutro: resolver(roda), escala: 1.60, deslocamento: [0, 0, 0] },
+    ],
+    relacao: RELACAO_ARO_NO_PNEU,
   };
 }

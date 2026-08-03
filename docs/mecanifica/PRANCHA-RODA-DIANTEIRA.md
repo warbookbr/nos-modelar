@@ -61,10 +61,12 @@ revisada como baseline.
 
 ## Limite conhecido da régua
 
-O relatório atual mede relações corpo a corpo por envelopes. Assim, ele chama
-`aro↔pneu` de interpenetração mesmo quando o aro está corretamente assentado
-dentro da cavidade do pneu. Isso continua sendo um limite da régua global e não
-vira exceção silenciosa. O Recorte A de A-16 resolve apenas outra pergunta: a
-porta `cavidadeDoCubo` mede o encaixe do piloto sem esconder colisão global. A
-porta ainda não é detector universal de cavidade, deformação de borracha ou
-contato entre sólidos.
+O relatório por partes ainda mede `aro↔pneu` por envelopes e, corretamente,
+mantém `interpenetra` como alerta amplo. A montagem
+`npm run descrever:montagem -- aro-no-pneu` acrescenta a outra leitura: as
+portas `assentoDoAroNoPneu` e `assentoDoPneuNoAro` declaram uma faixa anular e
+medem sua sobreposição radial/axial. Uma leitura não apaga a outra.
+
+Isto não é detector universal de cavidade, deformação de borracha, pressão ou
+contato de sólidos. A faixa existe porque o autor a declarou; outra natureza
+de contato precisa de porta e métrica próprias.
