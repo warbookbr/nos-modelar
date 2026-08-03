@@ -6,10 +6,11 @@ fechem, por acidente, o caminho para montagens maiores — e para que a visão d
 longo prazo não autorize a construção prematura de um CAD ou solucionador
 universal.
 
-**Estado deste documento:** os Recortes A, B e C foram concluídos por
+**Estado deste documento:** os Recortes A–D foram concluídos por
 [`AUT-2026-06`](planos/2026-08-02-interfaces-de-encaixe.md) e
 [`AUT-2026-07`](planos/2026-08-02-pose-derivada-roda.md) e
-[`AUT-2026-08`](planos/2026-08-02-pose-em-referencial.md). O documento continua
+[`AUT-2026-08`](planos/2026-08-02-pose-em-referencial.md) e
+[`AUT-2026-09`](planos/2026-08-02-estados-de-encaixe.md). O documento continua
 um mapa de teto: nenhum item abaixo substitui um plano curto ativo em
 `planos/README.md`.
 
@@ -398,10 +399,10 @@ compatibilidade entre naturezas, direção e tolerância. `encosta` entre planos
 
 - [x] escolher `encaixaCilindrico` exigido pelo piloto;
 - [x] definir referência, móvel e graus de liberdade que continuam intocados;
-- [ ] definir estado satisfeito, divergente, ambíguo e impossível para todos os
-  tipos de relação; o piloto só cobre encaixe cilíndrico e quadro incompleto;
+- [x] definir estado satisfeito, divergente, subdeterminado e impossível para
+  encaixe cilíndrico; outros tipos de relação continuam exigindo contrato;
 - [x] produzir diagnóstico estruturado e ordenado para o encaixe cilíndrico;
-- [ ] testar relações invertidas e portas incompatíveis;
+- [x] testar relação invertida, porta incompatível e quadro incompleto;
 - [x] manter o modo estritamente read-only neste nível.
 
 ## Nível 3 — posicionamento derivado de uma relação

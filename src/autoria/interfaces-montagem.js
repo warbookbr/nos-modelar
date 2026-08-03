@@ -6,6 +6,11 @@
 
 const EPSILON_ANGULAR = 1e-9;
 
+/** Estados estáveis do encaixe cilíndrico, em ordem de decisão. */
+export const ESTADOS_DE_ENCAIXE_CILINDRICO = [
+  'impossivel', 'divergente', 'subdeterminada', 'satisfeita',
+];
+
 function falhar(quem, mensagem) {
   throw new Error(`${quem}: ${mensagem}`);
 }
@@ -360,6 +365,44 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   };
 }
 
+/**
+ * Acrescenta a leitura de completude ao diagnóstico já mensurado. A função não
+ * tenta corrigir nada: "subdeterminada" quer dizer que ainda existem poses
+ * válidas, e não que a ferramenta escolheu uma delas. A precedência é fixa:
+ * incompatibilidade estrutural > divergência mensurável > liberdade restante >
+ * relação satisfeita.
+ */
+export function avaliarEstadoDeEncaixeCilindrico(declaracao, portas) {
+  const resultado = validarEncaixeCilindrico(declaracao, portas);
+  const referencia = portaDo(portas, declaracao.referencia, 'avaliarEstadoDeEncaixeCilindrico');
+  const movel = portaDo(portas, declaracao.movel, 'avaliarEstadoDeEncaixeCilindrico');
+  const diagnosticos = resultado.diagnosticos.map((diagnostico) => ({ ...diagnostico }));
+  const estruturais = new Set(['forma-incompativel', 'direcao-incompativel']);
+  if (diagnosticos.some((diagnostico) => estruturais.has(diagnostico.codigo))) {
+    return { ...resultado, estado: 'impossivel', grausDeLiberdade: [], diagnosticos };
+  }
+  if (diagnosticos.length) {
+    return { ...resultado, estado: 'divergente', grausDeLiberdade: [], diagnosticos };
+  }
+  if (!declaracao.poseCanonica) {
+    return {
+      ...resultado,
+      estado: 'subdeterminada',
+      grausDeLiberdade: ['giro-no-eixo', 'posicao-axial'],
+      diagnosticos,
+    };
+  }
+  contratoDePose(declaracao, `avaliarEstadoDeEncaixeCilindrico.${resultado.id}.poseCanonica`);
+  if (!quadroDaPorta(referencia) || !quadroDaPorta(movel)) {
+    diagnosticos.push({
+      codigo: 'quadro-incompleto',
+      esperado: 'eixo e referencia perpendicular em ambas as portas para poseCanonica',
+    });
+    return { ...resultado, satisfeita: false, estado: 'impossivel', grausDeLiberdade: [], diagnosticos };
+  }
+  return { ...resultado, estado: 'satisfeita', grausDeLiberdade: [], diagnosticos };
+}
+
 /** Texto curto, estável e utilizável por agente/CLI; não omite a causa numérica. */
 export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
   if (!resultado || typeof resultado !== 'object' || !Array.isArray(resultado.diagnosticos)) {
@@ -371,11 +414,17 @@ export function formatarDiagnosticoDeEncaixe(resultado, casas = 6) {
   const linhas = [
     `relação: ${resultado.id} (${resultado.tipo})`,
     `portas: referência ${resultado.referencia} -> móvel ${resultado.movel}`,
-    `estado: ${resultado.satisfeita ? 'satisfeita' : 'reprovada'}`,
+    `medição: ${resultado.satisfeita ? 'aprovada' : 'reprovada'}`,
     `folga radial: ${n(m.folgaRadial)} (permitida ${n(m.folgaRadialMinima)}…${n(m.folgaRadialMaxima)})`,
     `axial: sobreposição ${n(m.sobreposicaoAxial)}, sobras início/fim ${n(m.sobraInicio)}/${n(m.sobraFim)}`,
     `eixos: alinhamento ${n(m.alinhamento)}, descentro ${n(m.descentro)}`,
   ];
+  if (typeof resultado.estado === 'string') {
+    linhas.splice(3, 0, `estado do encaixe: ${resultado.estado}`);
+    if (Array.isArray(resultado.grausDeLiberdade) && resultado.grausDeLiberdade.length) {
+      linhas.push(`a declarar: ${resultado.grausDeLiberdade.join(', ')}`);
+    }
+  }
   if (resultado.diagnosticos.length) {
     linhas.push(`causas: ${resultado.diagnosticos.map((d) => d.codigo).join(', ')}`);
   }

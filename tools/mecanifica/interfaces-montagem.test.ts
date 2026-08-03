@@ -8,7 +8,7 @@ import { montarPinoELuva } from '../../prototipos/fps/v3/montagens/pino-e-luva.j
 // @ts-expect-error — montagem piloto em JavaScript, exercitada pela API pública.
 import { montarRodaNoFreio } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
-import { resolverPortasDeMontagem, validarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, formatarDiagnosticoDeEncaixe, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
 
 const resolver = (montagem: any) => resolverPortasDeMontagem(montagem.instancias);
 const clonarPortas = (portas: Map<string, any>) => new Map([...portas].map(([id, porta]) => [id, JSON.parse(JSON.stringify(porta))]));
@@ -59,7 +59,7 @@ describe('interfaces mensuráveis de encaixe — AUT-2026-06', () => {
     });
     expect(resultado.medidas.folgaRadial).toBeCloseTo(0.00305, 9);
     expect(resultado.medidas.sobreposicaoAxial).toBeGreaterThan(0);
-    expect(formatarDiagnosticoDeEncaixe(resultado)).toContain('estado: satisfeita');
+    expect(formatarDiagnosticoDeEncaixe(resultado)).toContain('medição: aprovada');
   });
 
   it('raio fora da faixa e piloto axialmente fora falham com causas diferentes', () => {
@@ -212,5 +212,49 @@ describe('pose local em referencial técnico — AUT-2026-08', () => {
     expect(() => resolver(montagem)).toThrow(/referencial\.rotacao.*rotação própria/);
     montagem.instancias[1] = { ...montagem.instancias[1], referencial: { escala: 1.2 } };
     expect(() => resolver(montagem)).toThrow(/referencial.*chave\(s\) desconhecida\(s\): escala/);
+  });
+});
+
+describe('estados explicáveis de encaixe — AUT-2026-09', () => {
+  it('distingue satisfeito, subdeterminado, divergente e impossível sem mutar portas', () => {
+    const montagem = montarPinoELuva();
+    const portas = resolver(montagem);
+    const antes = JSON.stringify([...portas]);
+
+    const satisfeito = avaliarEstadoDeEncaixeCilindrico(montagem.relacao, portas);
+    expect(satisfeito).toMatchObject({ estado: 'satisfeita', satisfeita: true, grausDeLiberdade: [] });
+    expect(formatarDiagnosticoDeEncaixe(satisfeito)).toContain('estado do encaixe: satisfeita');
+
+    const subdeterminada = avaliarEstadoDeEncaixeCilindrico({ ...montagem.relacao, poseCanonica: undefined }, portas);
+    expect(subdeterminada).toMatchObject({
+      estado: 'subdeterminada', satisfeita: true,
+      grausDeLiberdade: ['giro-no-eixo', 'posicao-axial'],
+    });
+    expect(formatarDiagnosticoDeEncaixe(subdeterminada)).toContain('a declarar: giro-no-eixo, posicao-axial');
+
+    const divergentes = clonarPortas(portas);
+    divergentes.get('luva.cavidade').centro[0] += 0.01;
+    const divergente = avaliarEstadoDeEncaixeCilindrico(montagem.relacao, divergentes);
+    expect(divergente).toMatchObject({ estado: 'divergente', satisfeita: false });
+    expect(divergente.diagnosticos.map((d: any) => d.codigo)).toContain('eixos-descentrados');
+
+    const impossivel = avaliarEstadoDeEncaixeCilindrico({ ...montagem.relacao, referencia: 'luva.cavidade', movel: 'pino.piloto' }, portas);
+    expect(impossivel).toMatchObject({ estado: 'impossivel', satisfeita: false });
+    expect(impossivel.diagnosticos.map((d: any) => d.codigo)).toContain('direcao-incompativel');
+
+    const incompativeis = clonarPortas(portas);
+    incompativeis.get('luva.cavidade').forma = 'plano';
+    expect(avaliarEstadoDeEncaixeCilindrico(montagem.relacao, incompativeis).diagnosticos.map((d: any) => d.codigo))
+      .toContain('forma-incompativel');
+    expect(JSON.stringify([...portas])).toBe(antes);
+  });
+
+  it('reprova quadro ausente como impossível e preserva a ordem do relatório', () => {
+    const montagem = montarPinoELuva();
+    const portas = resolver(montagem);
+    delete (portas.get('luva.cavidade') as any).referencia;
+    const resultado = avaliarEstadoDeEncaixeCilindrico(montagem.relacao, portas);
+    expect(resultado).toMatchObject({ estado: 'impossivel', satisfeita: false });
+    expect(resultado.diagnosticos.map((d: any) => d.codigo)).toEqual(['quadro-incompleto']);
   });
 });

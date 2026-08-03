@@ -7,6 +7,10 @@ histórico para que um roteiro não cresça indefinidamente.
 
 **Plano ativo:** nenhum.
 
+`AUT-09`/Recorte D foi concluído em
+[`AUT-2026-09`](2026-08-02-estados-de-encaixe.md): estados explícitos de encaixe
+cilíndrico para a IA, antes de ampliar a geometria de colisão.
+
 `AUT-08`/Recorte C foi concluído em
 [`AUT-2026-08`](2026-08-02-pose-em-referencial.md): composição local/mundo em
 referencial técnico rígido, sem abrir hierarquia.

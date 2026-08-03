@@ -5,7 +5,7 @@
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
-  resolverPortasDeMontagem, validarEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
+  resolverPortasDeMontagem, avaliarEstadoDeEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
   derivarPreviaDeEncaixeCilindrico, formatarPreviaDePose,
 } from '../../src/autoria/interfaces-montagem.js';
 
@@ -26,7 +26,7 @@ try {
   const montagem = modulo.montarRodaNoFreio();
   const portas = resolverPortasDeMontagem(montagem.instancias);
   process.stdout.write(
-    formatarDiagnosticoDeEncaixe(validarEncaixeCilindrico(montagem.relacao, portas))
+    formatarDiagnosticoDeEncaixe(avaliarEstadoDeEncaixeCilindrico(montagem.relacao, portas))
     + formatarPreviaDePose(derivarPreviaDeEncaixeCilindrico(montagem.relacao, portas)),
   );
 } catch (erro) {
