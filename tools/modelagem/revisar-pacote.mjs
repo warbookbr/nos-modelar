@@ -9,8 +9,8 @@
  * depois de tudo passar, portanto uma revisão já existente nunca é tocada.
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { dirname, join, relative, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
 import {
   ErroDePacote, RAIZ_PACOTES, RAIZ_REPOSITORIO, caminhoPacote,
 } from './formato-pacote.mjs';
@@ -18,10 +18,13 @@ import { validarPacoteNoDisco } from './validar-pacote.mjs';
 import {
   assinaturaModeloDaDescricao, construirRevisao, jsonCanonico, validarRevisao,
 } from './revisao-modelagem.mjs';
-
 const VISTAS = ['isometrica', 'frontal', 'direita', 'superior'];
 const REVISAO = /^r[0-9]+$/;
+const TEMPO_LIMITE_BANCADA = 90_000;
 const OLHAR_BANCADA = join(RAIZ_REPOSITORIO, 'tools/mecanifica/olhar-bancada.mjs');
+const PLATAFORMAS_POSIX = new Set([
+  'aix', 'android', 'darwin', 'freebsd', 'linux', 'netbsd', 'openbsd', 'sunos',
+]);
 
 function falhar(mensagem) {
   throw new ErroDePacote(mensagem);
@@ -53,42 +56,119 @@ function lerRelatorio(arquivo, peca) {
   };
 }
 
-function executarBancadaPadrao({ peca, vistas, relatorio }) {
-  const relativo = (caminho) => relative(RAIZ_REPOSITORIO, caminho).replaceAll('\\', '/');
-  const resultado = spawnSync(process.execPath, [
-    OLHAR_BANCADA,
-    peca,
-    '--revisar',
-    `--saida=${relativo(vistas)}`,
-    `--relatorio=${relativo(relatorio)}`,
-  ], {
-    cwd: RAIZ_REPOSITORIO,
-    encoding: 'utf8',
-    timeout: 90_000,
+function encerrarProcesso(child) {
+  if (!child?.pid) return;
+  try { process.kill(-child.pid, 'SIGKILL'); } catch { /* o processo pode já ter encerrado */ }
+}
+
+function executarFilho({ argumentos, timeoutMs, spawnProcess = spawn }) {
+  return new Promise((resolveExecucao) => {
+    let stdout = '';
+    let stderr = '';
+    let erroDeSpawn = null;
+    let expirou = false;
+    let resolvido = false;
+    let temporizador;
+    let child;
+    try {
+      child = spawnProcess(process.execPath, [OLHAR_BANCADA, ...argumentos], {
+        cwd: RAIZ_REPOSITORIO,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        detached: process.platform !== 'win32',
+      });
+    } catch (erro) {
+      resolveExecucao({ status: null, sinal: null, stdout, stderr, erroDeSpawn: erro, expirou });
+      return;
+    }
+    const capturarStdout = (chunk) => { stdout += chunk; };
+    const capturarStderr = (chunk) => { stderr += chunk; };
+    child.stdout?.setEncoding?.('utf8');
+    child.stderr?.setEncoding?.('utf8');
+    child.stdout?.on('data', capturarStdout);
+    child.stderr?.on('data', capturarStderr);
+    const erroDoFilho = (erro) => { erroDeSpawn = erro; };
+    const concluir = (status, sinal) => {
+      if (resolvido) return;
+      resolvido = true;
+      clearTimeout(temporizador);
+      child.stdout?.removeListener?.('data', capturarStdout);
+      child.stderr?.removeListener?.('data', capturarStderr);
+      child.removeListener?.('error', erroDoFilho);
+      child.removeListener?.('close', concluir);
+      resolveExecucao({ status, sinal, stdout, stderr, erroDeSpawn, expirou });
+    };
+    child.once('error', erroDoFilho);
+    child.once('close', concluir);
+    temporizador = setTimeout(() => {
+      expirou = true;
+      encerrarProcesso(child);
+    }, timeoutMs);
   });
-  if (resultado.stdout) process.stdout.write(resultado.stdout);
-  if (resultado.stderr) process.stderr.write(resultado.stderr);
-  if (resultado.error) {
+}
+
+export async function executarBancadaPadrao({
+  peca,
+  vistas,
+  relatorio,
+  tempoLimiteMs,
+  timeoutMs = TEMPO_LIMITE_BANCADA,
+  spawnProcess = spawn,
+} = {}) {
+  if (!PLATAFORMAS_POSIX.has(process.platform) || typeof process.kill !== 'function') {
     return {
       aceita: false,
       falha: {
-        categoria: 'ferramenta',
-        codigo: resultado.error.code === 'ETIMEDOUT' ? 'bancada_timeout' : 'bancada_nao_executou',
-        vista: null,
-        mensagem: resultado.error.code === 'ETIMEDOUT'
-          ? 'A captura da bancada excedeu o limite de execução.'
-          : 'O processo da bancada não pôde ser executado.',
+        categoria: 'ferramenta', codigo: 'bancada_nao_executou', vista: null,
+        mensagem: 'O piloto da bancada requer um ambiente POSIX para isolar o processo e seus descendentes.',
+        acao: 'Execute a revisão em um ambiente POSIX; o piloto não inicia a bancada nesta plataforma.',
+      },
+    };
+  }
+  const relativo = (caminho) => relative(RAIZ_REPOSITORIO, caminho).replaceAll('\\', '/');
+  const execucao = await executarFilho({
+    timeoutMs: tempoLimiteMs ?? timeoutMs,
+    spawnProcess,
+    argumentos: [
+      peca,
+      '--revisar',
+      `--saida=${relativo(vistas)}`,
+      `--relatorio=${relativo(relatorio)}`,
+    ],
+  });
+  if (execucao.expirou) {
+    return {
+      aceita: false,
+      falha: {
+        categoria: 'ferramenta', codigo: 'bancada_timeout', vista: null,
+        mensagem: 'A captura da bancada excedeu o limite de execução.',
         acao: 'Repita depois de corrigir a ferramenta; não remodele a peça.',
       },
     };
   }
-  if (resultado.status !== 0) {
+  if (execucao.erroDeSpawn) {
     return {
       aceita: false,
       falha: {
-        categoria: 'ferramenta', codigo: 'bancada_recusou', vista: null,
-        mensagem: 'A bancada encerrou a captura sem aceitar a revisão.',
-        acao: 'Leia o relatório preservado para distinguir câmera, modelo e ferramenta.',
+        categoria: 'ferramenta', codigo: 'bancada_nao_executou', vista: null,
+        mensagem: 'O processo da bancada não pôde ser executado.',
+        acao: 'Repita depois de corrigir a ferramenta; não remodele a peça.',
+      },
+    };
+  }
+  if (execucao.status !== 0) {
+    const produziuRelatorio = existsSync(relatorio);
+    return {
+      aceita: false,
+      falha: {
+        categoria: 'ferramenta',
+        codigo: produziuRelatorio ? 'bancada_recusou' : 'bancada_nao_executou',
+        vista: null,
+        mensagem: produziuRelatorio
+          ? 'A bancada encerrou a captura sem aceitar a revisão.'
+          : 'O processo da bancada não pôde ser executado.',
+        acao: produziuRelatorio
+          ? 'Leia o relatório preservado para distinguir câmera, modelo e ferramenta.'
+          : 'Repita depois de corrigir a ferramenta; não remodele a peça.',
       },
     };
   }
@@ -220,6 +300,8 @@ export async function revisarPacote({
   revisao,
   raizPacotes = RAIZ_PACOTES,
   executarBancada = executarBancadaPadrao,
+  tempoLimiteMs,
+  logger = null,
 } = {}) {
   const nomeRevisao = revisarId(revisao);
   const validado = await validarPacoteNoDisco(id, { raizPacotes });
@@ -241,7 +323,9 @@ export async function revisarPacote({
   let execucao = null;
   let relatorioLido = null;
   try {
-    execucao = await executarBancada({ peca: validado.alvo.peca, vistas, relatorio: relato });
+    execucao = await executarBancada({
+      peca: validado.alvo.peca, vistas, relatorio: relato, tempoLimiteMs, logger,
+    });
     if (!existsSync(relato)) {
       falhar('a bancada não produziu relatório; a falha é da ferramenta, não evidência para remodelar a peça.');
     }
@@ -315,7 +399,11 @@ function argumentos(argv) {
 if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))) {
   try {
     const { id, revisao } = argumentos(process.argv.slice(2));
-    const resultado = await revisarPacote({ id, revisao });
+    const resultado = await revisarPacote({
+      id,
+      revisao,
+      logger: (canal, mensagem) => process[canal].write(`${mensagem}\n`),
+    });
     console.log(`revisão criada: ${relative(RAIZ_REPOSITORIO, resultado.destino).replaceAll('\\', '/')}`);
   } catch (erro) {
     console.error(`revisar:modelagem: ${erro.message}`);

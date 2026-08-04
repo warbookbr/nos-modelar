@@ -1,11 +1,18 @@
 # MCP para agentes — reduzir contexto sem perder rastreabilidade
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Responsável:** a definir
 
-**Repositório e base:** `warbook`, `35e7761da05bb0abf4cd46b39261d0b0c17227cf`
+**Repositório e base:** `warbook`, `043081bab5bbeee49f154e7ae7c012c6108d0e3b`
 
+**Arquivos reservados nesta fatia:**
+
+- `tools/mecanifica/descrever-peca.mjs`
+- `tools/mecanifica/olhar-bancada.mjs`
+- `tools/modelagem/revisar-pacote.mjs`
+- `tools/mecanifica/mcp-degrau-1-preparacao.test.mjs`
+- `tools/modelagem/revisar-pacote.test.mjs`, este plano, `planos/README.md` e `planos/BACKLOG.md`
 ## Problema observado
 
 O Caso 1 exigiu, antes da primeira fonte, 10 documentos, 3 guias, 6 exemplos e
@@ -15,10 +22,10 @@ contexto, tentativas e ambiguidade para agentes, preservando rastreabilidade.
 
 ## Resultado e hipótese
 
-Um núcleo compartilhado, exposto por CLI e MCP, deve permitir revisão normal
-com até 3 recursos lidos antes da primeira revisão, sem fallback para shell e
-com as mesmas assinaturas e evidências do fluxo CLI. A hipótese só autoriza
-ampliação se o piloto medir redução de contexto ou de falhas contra a linha-base.
+Um núcleo compartilhado, exposto por CLI e MCP, deve permitir revisão normal com
+até 3 recursos lidos, sem fallback para shell e com as mesmas assinaturas e
+evidências do CLI. A hipótese só autoriza ampliação se o piloto medir redução de
+contexto ou de falhas contra a linha-base.
 
 ## Invariantes e fronteiras
 
@@ -123,11 +130,30 @@ Servidor remoto é decisão separada: o produto atual não exige servidor própr
 - tornar `descrever-peca` e `olhar-bancada` importáveis sem executar CLI;
 - substituir `process.exit` e logs diretos por resultados/erros estruturados;
 - impedir que `revisarPacote` encaminhe stdout de subprocessos para o protocolo;
+- chamar diretamente o serviço reutilizável da bancada quando a revisão padrão
+  for executada, mantendo promoção atômica, tentativas recusadas e artefatos;
+- provar importação silenciosa, limpeza de recursos, resultados estruturados e
+  paridade das CLIs nos testes focados e gates completos.
 - mapear, para correção durante a implementação, a referência documental
   incorreta a `adaptarThree.ts`, os exemplos removidos ainda citados pela skill
   `criar-peca` e a classificação ambígua de `peca`/`porteiro` como fluxo atual.
 
-Essas correções não fazem parte desta tarefa documental.
+Essas correções não fazem parte desta fatia.
+
+### Saída desta fatia
+
+O serviço compartilhado não conhece CLI nem MCP. A CLI continua responsável por
+argumentos, streams e código de saída; a bancada devolve caminhos, métricas,
+vistas e falhas estruturadas, com logger opcional. A revisão chama o serviço
+diretamente e não encaminha stdout comum. Não há schema MCP, servidor, recurso,
+dependência ou contrato de pacote novo.
+
+### Gate da fatia
+
+Importações não produzem saída nem iniciam Vite, Playwright ou escrita; funções
+reutilizáveis não encerram o processo. A CLI mantém diagnósticos, streams,
+códigos, revisão, tentativas, promoção atômica e assinaturas; falhas fecham
+navegador e servidor, e `git diff --check` permanece limpo.
 
 ## Testes planejados
 
@@ -168,7 +194,7 @@ câmera.
 
 ## Encerramento
 
-O plano permanece rascunho e não autoriza implementação. Só poderá ser aberto
-como plano ativo com escopo, arquivos reservados, contrato do SDK, evidências
-dos Casos 1 e 2, gates e decisão de saída registrados; ao concluir ou cancelar,
-registrar resultado, gates, medições e candidatos devolvidos ao backlog.
+O plano está ativo somente para esta fatia preparatória, com escopo e arquivos
+reservados acima. O próximo degrau só começa após evidências do piloto local,
+redução mensurável e decisão registrada; ao concluir ou cancelar, registrar
+resultado, gates, medições e candidatos devolvidos ao backlog.

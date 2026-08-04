@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-241 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+242 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -298,7 +298,7 @@
 - `corrimao-orientacao.test.ts` — corrimao-orientacao.test.ts — a prova NÃO AUTOMOTIVA da `orientacao` do `loft`, o segundo item do ciclo "Corte e orientação de seção v1".
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
 - `descrever-partes.test.ts` — descrever-partes.test.ts — prova do O-1: a conferência de uma peça é NÚMERO, não leitura de PNG (ATRITOS-AUTORIA A-13). Mede três coisas: que o módulo neutro…
-- `descrever-peca.mjs` — descrever-peca.mjs — a RÉGUA DA BANCADA: constrói uma peça headless e imprime, por parte semântica, caixa (min/max), centro, dimensões e contagem de faces, e…
+- `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
@@ -315,8 +315,9 @@
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `interfaces-montagem.test.ts` — interfaces-montagem.test.ts — provas do Recorte A de AUT-05: interfaces cilíndricas persistidas pelo núcleo e encaixe estritamente mensurável.
 - `jardineira-integridade.test.ts` — jardineira-integridade.test.ts — a prova NÃO AUTOMOTIVA do contrato de autoria: O-6 (`origem` universal), O-12 (portas semânticas) e, desde o ciclo Endereços…
+- `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
-- `olhar-bancada.mjs` — olhar-bancada.mjs — o OLHO DA BANCADA: dirige `bancada.html` headless pela URL e salva PNG por vista, para que uma sessão sem navegador possa inspecionar o q…
+- `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `prateleira-integridade.test.ts` — Integridade da peça de exercício `_prateleira-furada` — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1".
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…

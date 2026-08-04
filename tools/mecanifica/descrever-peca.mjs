@@ -1,198 +1,221 @@
 #!/usr/bin/env node
 /**
- * descrever-peca.mjs — a RÉGUA DA BANCADA: constrói uma peça headless e imprime,
- * por parte semântica, caixa (min/max), centro, dimensões e contagem de faces, e
- * entre pares de partes a folga ou a interpenetração — em NÚMERO.
+ * descrever-peca.mjs — serviço headless de medição e sua CLI fina.
  *
- * Existe porque foto não tem escala nem gnômon de eixo: responder "o eixo do
- * disco está em X?" custou 4 leituras de PNG e perícia de pixel, e a resposta
- * certa veio de uma medição em Node feita fora da bancada (ATRITOS-AUTORIA
- * A-13). A medida vem do módulo neutro `src/autoria/descrever-partes.js`, o
- * mesmo que alimenta o painel de diagnóstico da bancada — uma verdade só.
- *
- *   npm run descrever -- freio-disco
- *   npm run descrever -- freio-disco --partes=disco,pastilhaInterna,pistao
- *   npm run descrever -- _freio-hierarquia --subarvore=pinca
- *   npm run descrever -- freio-disco --casas=9
- *   npm run descrever -- --listar                          # peças disponíveis
- *
- * Saída determinística: precisão fixa, ordem de nome estável, nenhuma dependência
- * de relógio, sorteio ou índice de face. A mesma peça imprime sempre o mesmo
- * texto, então o relatório pode virar teste.
- *
- * Sai ≠0 quando a peça não é nomeada ou não existe, quando ela não é escrita em
- * passos da Oficina, quando um nome de parte pedido não existe, quando a peça
- * tem órfão — e com `--estrito` quando alguma face está sem identidade.
- *
- * Sai 2 em erro de USO, e bandeira desconhecida É erro de uso: `--estrit` não
- * some com o gate do `--estrito` em silêncio, `--parte=` não passa por
- * `--partes=`, e duas peças de uma vez não medem a primeira calado. A leitura
- * fica em `argumentos.mjs`, compartilhada com `olhar-bancada.mjs`.
+ * O serviço não lê argv, não escreve em streams e não encerra o processo. A
+ * CLI apenas traduz argumentos para a entrada explícita e imprime o resultado.
+ * A medição continua usando o mesmo núcleo neutro que alimenta a bancada.
  */
 import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
+import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
+import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
-
-function erroDeUso(mensagem) {
-  console.error(`descrever-peca: ${mensagem}`);
-  process.exit(2);
-}
-function falha(mensagem) {
-  console.error(`\n${mensagem}`);
-  process.exit(1);
-}
-
-/* vocabulário DECLARADO: qualquer coisa fora dele para o comando com
-   diagnóstico. Um typo em `--estrito` fazia o gate sumir sem uma linha de
-   aviso, e `--parte=disco` imprimia a peça inteira como se tivesse filtrado. */
-let opcao;
-let bandeira;
-let peca;
-try {
-  const lido = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['partes', 'subarvore', 'casas'],
-    bandeiras: ['listar', 'estrito'],
-    posicional: { nome: 'a peça', obrigatorio: false },
-  });
-  ({ opcao, bandeira, posicional: peca } = lido);
-} catch (erro) {
-  erroDeUso(erro.message);
-}
-
-/* mesma escolha de peça por nome que `olhar-bancada.mjs`: o argumento solto é a
-   peça, e o nome é o do arquivo em prototipos/fps/v3/pecas/. */
-const disponiveis = readdirSync(PECAS)
+const DISPONIVEIS = Object.freeze(readdirSync(PECAS)
   .filter((arquivo) => arquivo.endsWith('.js'))
   .map((arquivo) => arquivo.slice(0, -'.js'.length))
-  .sort();
+  .sort());
 
-if (bandeira('listar')) {
-  console.log(`peças disponíveis (${disponiveis.length}):\n  ${disponiveis.join('\n  ')}`);
-  process.exit(0);
-}
-
-const partes = opcao('partes', '').split(',').map((p) => p.trim()).filter(Boolean);
-const raizDaSubarvore = opcao('subarvore');
-const casas = parseInt(opcao('casas', '6'), 10);
-const estrito = bandeira('estrito');
-
-/* peça sem nome NÃO cai numa peça padrão: medir a peça errada em silêncio é
-   pior do que não medir. */
-if (!peca) {
-  erroDeUso(
-    'diga qual peça medir, pelo nome do arquivo em prototipos/fps/v3/pecas/.'
-    + '\n  ex.: npm run descrever -- freio-disco   (use --listar para ver todas)',
-  );
-}
-if (!disponiveis.includes(peca)) {
-  erroDeUso(
-    `peça '${peca}' não existe em prototipos/fps/v3/pecas/.`
-    + `\n  disponíveis: ${disponiveis.join(', ')}`,
-  );
-}
-if (!Number.isInteger(casas) || casas < 0 || casas > 12) {
-  erroDeUso(`--casas precisa ser inteiro entre 0 e 12, recebi '${opcao('casas', '6')}'`);
-}
-if (opcao('partes') !== null && partes.length === 0) {
-  erroDeUso('--partes veio vazio; informe nomes de parte ou omita a opção');
-}
-if (raizDaSubarvore !== null && !raizDaSubarvore.trim()) {
-  erroDeUso('--subarvore veio vazio; informe a raiz semântica ou omita a opção');
-}
-if (opcao('partes') !== null && raizDaSubarvore !== null) {
-  erroDeUso('--partes e --subarvore são consultas diferentes; informe somente uma delas');
+function resultadoDeErro({ codigo, categoria, mensagem, stderr }) {
+  return {
+    ok: false,
+    codigo,
+    erro: { categoria, codigo: categoria === 'uso' ? 'uso_invalido' : 'falha_descricao', mensagem },
+    stdout: '',
+    stderr,
+  };
 }
 
-const { nucleo } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
-const { descreverPeca, formatarDescricao } = await import(
-  pathToFileURL(join(REPO, 'src/autoria/descrever-partes.js')).href
-);
-const { nomesDaSubarvore } = await import(
-  pathToFileURL(join(REPO, 'src/autoria/hierarquia-partes.js')).href
-);
-
-let modulo;
-try {
-  modulo = await import(pathToFileURL(join(PECAS, `${peca}.js`)).href);
-} catch (erro) {
-  falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
-}
-
-if (!Array.isArray(modulo.PASSOS)) {
-  falha(
-    `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS.`
-    + '\n  esta régua só mede peça escrita como passos da Oficina.',
-  );
-}
-
-let neutro;
-try {
-  neutro = nucleo(
-    modulo.PASSOS,
-    modulo.PARAMS ?? {},
-    modulo.TOPO ?? {},
-    modulo.MATERIAIS ?? {},
-    modulo.ESQUELETO ?? null,
-    modulo.ALIASES ?? [],
-  );
-} catch (erro) {
-  falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
-}
-
-let descricao;
-let consultaDeSubarvore = null;
-try {
-  if (raizDaSubarvore === null) {
-    descricao = descreverPeca(neutro, { partes: partes.length ? partes : null });
-  } else {
-    /* A primeira leitura pede somente a raiz para reaproveitar a mesma fonte
-       neutra que já publica a árvore. A segunda é a descrição REAL do conjunto;
-       não há lista manual de filhos nem dependência de cena Three.js. */
-    const raiz = raizDaSubarvore.trim();
-    const daRaiz = descreverPeca(neutro, { partes: [raiz] });
-    const nomes = nomesDaSubarvore(daRaiz.hierarquia, raiz);
-    descricao = descreverPeca(neutro, { partes: nomes });
-    consultaDeSubarvore = { raiz, nomes };
-  }
-} catch (erro) {
-  falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}`);
-}
-
-if (consultaDeSubarvore) {
-  const selecionadas = [...consultaDeSubarvore.nomes].sort();
-  const params = new URLSearchParams({
-    peca,
-    selecionadas: selecionadas.join(','),
+function erroDeUso(mensagem) {
+  return resultadoDeErro({
+    codigo: 2,
+    categoria: 'uso',
+    mensagem,
+    stderr: `descrever-peca: ${mensagem}\n`,
   });
-  process.stdout.write(
-    `CONSULTA DE SUBÁRVORE\n`
-    + `  raiz: ${consultaDeSubarvore.raiz}\n`
-    + `  partes (${selecionadas.length}): ${selecionadas.join(', ')}\n`
-    + `  bancada: https://warbookbr.github.io/nos-mecanifica/bancada.html?${params}\n\n`,
-  );
 }
-process.stdout.write(formatarDescricao(descricao, { peca, casas }));
 
-let falhou = false;
-if (descricao.totais.orfaos) {
-  const amostra = neutro.orfaos.slice(0, 5)
+function falha(mensagem) {
+  return resultadoDeErro({
+    codigo: 1,
+    categoria: 'execucao',
+    mensagem,
+    stderr: `\n${mensagem}\n`,
+  });
+}
+
+function amostraDeOrfaos(neutro) {
+  return neutro.orfaos.slice(0, 5)
     .map((o) => `passo ${o.passo} (${o.op}): ${o.motivo}${o.ref === undefined ? '' : ` — ref ${JSON.stringify(o.ref)}`}`);
-  console.error(
-    `\n${descricao.totais.orfaos} ÓRFÃO(S): a peça tem referência inválida e as medidas acima`
-    + ' descrevem uma peça incompleta.\n  ' + amostra.join('\n  '),
-  );
-  falhou = true;
 }
-if (descricao.totais.facesSemParte && estrito) {
-  console.error(
-    `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica (--estrito)`
-    + `\n  ids: ${descricao.facesSemParte.slice(0, 20).join(', ')}`,
-  );
-  falhou = true;
+
+/**
+ * Mede uma peça sem depender de CLI, stdout, stderr ou estado global de
+ * processo. `partes` é uma lista explícita; `subarvore`, quando presente,
+ * continua usando a hierarquia publicada pelo mesmo neutro.
+ */
+export async function descreverPecaReutilizavel({
+  peca,
+  partes = [],
+  subarvore = null,
+  casas = 6,
+  estrito = false,
+  listar = false,
+} = {}) {
+  if (listar) {
+    return {
+      ok: true,
+      codigo: 0,
+      stdout: `peças disponíveis (${DISPONIVEIS.length}):\n  ${DISPONIVEIS.join('\n  ')}\n`,
+      stderr: '',
+      resultado: { disponiveis: [...DISPONIVEIS] },
+    };
+  }
+  if (!peca) {
+    return erroDeUso(
+      'diga qual peça medir, pelo nome do arquivo em prototipos/fps/v3/pecas/.'
+      + '\n  ex.: npm run descrever -- freio-disco   (use --listar para ver todas)',
+    );
+  }
+  if (!DISPONIVEIS.includes(peca)) {
+    return erroDeUso(
+      `peça '${peca}' não existe em prototipos/fps/v3/pecas/.`
+      + `\n  disponíveis: ${DISPONIVEIS.join(', ')}`,
+    );
+  }
+  if (!Number.isInteger(casas) || casas < 0 || casas > 12) {
+    return erroDeUso(`--casas precisa ser inteiro entre 0 e 12, recebi '${casas}'`);
+  }
+  if (!Array.isArray(partes) || partes.some((parte) => typeof parte !== 'string')) {
+    return erroDeUso('partes precisa ser uma lista de nomes de parte.');
+  }
+  const partesLidas = partes.filter(Boolean);
+  if (subarvore !== null && (typeof subarvore !== 'string' || !subarvore.trim())) {
+    return erroDeUso('--subarvore veio vazio; informe a raiz semântica ou omita a opção');
+  }
+  if (partesLidas.length && subarvore !== null) {
+    return erroDeUso('--partes e --subarvore são consultas diferentes; informe somente uma delas');
+  }
+
+  let modulo;
+  try {
+    modulo = await import(pathToFileURL(join(PECAS, `${peca}.js`)).href);
+  } catch (erro) {
+    return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
+  }
+  if (!Array.isArray(modulo.PASSOS)) {
+    return falha(
+      `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS.`
+      + '\n  esta régua só mede peça escrita como passos da Oficina.',
+    );
+  }
+
+  let neutro;
+  try {
+    neutro = nucleo(
+      modulo.PASSOS,
+      modulo.PARAMS ?? {},
+      modulo.TOPO ?? {},
+      modulo.MATERIAIS ?? {},
+      modulo.ESQUELETO ?? null,
+      modulo.ALIASES ?? [],
+    );
+  } catch (erro) {
+    return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
+  }
+
+  let descricao;
+  let consultaDeSubarvore = null;
+  try {
+    if (subarvore === null) {
+      descricao = medirPeca(neutro, { partes: partesLidas.length ? partesLidas : null });
+    } else {
+      const raiz = subarvore.trim();
+      const daRaiz = medirPeca(neutro, { partes: [raiz] });
+      const nomes = nomesDaSubarvore(daRaiz.hierarquia, raiz);
+      descricao = medirPeca(neutro, { partes: nomes });
+      consultaDeSubarvore = { raiz, nomes };
+    }
+  } catch (erro) {
+    return falha(`NÃO CONSEGUI MEDIR\n  ${erro.message}`);
+  }
+
+  let stdout = '';
+  if (consultaDeSubarvore) {
+    const selecionadas = [...consultaDeSubarvore.nomes].sort();
+    const params = new URLSearchParams({ peca, selecionadas: selecionadas.join(',') });
+    stdout += `CONSULTA DE SUBÁRVORE\n`
+      + `  raiz: ${consultaDeSubarvore.raiz}\n`
+      + `  partes (${selecionadas.length}): ${selecionadas.join(', ')}\n`
+      + `  bancada: https://warbookbr.github.io/nos-mecanifica/bancada.html?${params}\n\n`;
+  }
+  stdout += formatarDescricao(descricao, { peca, casas });
+
+  let stderr = '';
+  let falhou = false;
+  if (descricao.totais.orfaos) {
+    stderr += `\n${descricao.totais.orfaos} ÓRFÃO(S): a peça tem referência inválida e as medidas acima`
+      + ' descrevem uma peça incompleta.\n  ' + amostraDeOrfaos(neutro).join('\n  ') + '\n';
+    falhou = true;
+  }
+  if (descricao.totais.facesSemParte && estrito) {
+    stderr += `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica (--estrito)`
+      + `\n  ids: ${descricao.facesSemParte.slice(0, 20).join(', ')}\n`;
+    falhou = true;
+  }
+  return {
+    ok: !falhou,
+    codigo: falhou ? 1 : 0,
+    stdout,
+    stderr,
+    resultado: { peca, descricao, neutro },
+  };
 }
-process.exit(falhou ? 1 : 0);
+
+function comoCLI(argv) {
+  let lido;
+  try {
+    lido = lerArgumentos(argv, {
+      opcoes: ['partes', 'subarvore', 'casas'],
+      bandeiras: ['listar', 'estrito'],
+      posicional: { nome: 'a peça', obrigatorio: false },
+    });
+  } catch (erro) {
+    return erroDeUso(erro.message);
+  }
+  const partesDeclaradas = lido.opcao('partes');
+  const partes = partesDeclaradas === null
+    ? []
+    : partesDeclaradas.split(',').map((p) => p.trim()).filter(Boolean);
+  const raizDaSubarvore = lido.opcao('subarvore');
+  const casasTexto = lido.opcao('casas', '6');
+  const casas = parseInt(casasTexto, 10);
+  if (!Number.isInteger(casas) || casas < 0 || casas > 12) {
+    return erroDeUso(`--casas precisa ser inteiro entre 0 e 12, recebi '${casasTexto}'`);
+  }
+  if (partesDeclaradas !== null && partes.length === 0) return erroDeUso('--partes veio vazio; informe nomes de parte ou omita a opção');
+  if (raizDaSubarvore !== null && !raizDaSubarvore.trim()) return erroDeUso('--subarvore veio vazio; informe a raiz semântica ou omita a opção');
+  return descreverPecaReutilizavel({
+    peca: lido.posicional,
+    partes,
+    subarvore: raizDaSubarvore,
+    casas,
+    estrito: lido.bandeira('estrito'),
+    listar: lido.bandeira('listar'),
+  });
+}
+
+const executadoComoCLI = process.argv[1]
+  && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
+if (executadoComoCLI) {
+  const resultado = await comoCLI(process.argv.slice(2));
+  process.stdout.write(resultado.stdout);
+  process.stderr.write(resultado.stderr);
+  process.exitCode = resultado.codigo;
+}
