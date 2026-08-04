@@ -1,4 +1,4 @@
-/* id-cru.mjs — o gate do O-4 (docs/mecanifica/OFICINA-OTIMIZACOES.md): REPROVA
+/* id-cru.mjs — o gate do O-4 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): REPROVA
  * peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
  *
  * O `CLAUDE.md` proíbe id posicional como referência persistida, mas o formato

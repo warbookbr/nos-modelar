@@ -1,4 +1,4 @@
-/* PEÇA DE EXERCÍCIO do O-14 (docs/mecanifica/OFICINA-OTIMIZACOES.md): põe
+/* PEÇA DE EXERCÍCIO do O-14 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): põe
    `apagaFace` e `vira` dentro da rede do `gabarito:selecao` — até aqui as duas
    tinham teste unitário mas NENHUMA das 18 peças do repositório as exercitava,
    então a prova de byte-identidade que protege o núcleo era cega a elas.

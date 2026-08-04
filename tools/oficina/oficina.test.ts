@@ -3860,7 +3860,7 @@ describe('Fase 4 — sel.origem para cilindro (lado numérico + tampa nominal)',
   });
 });
 
-/* O-2 (docs/mecanifica/OFICINA-OTIMIZACOES.md, Faixa 1) — reatribuir `parte`
+/* O-2 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md, Faixa 1) — reatribuir `parte`
    passa a GRITAR. Era a pior classe de defeito do vocabulário: resultado errado
    que PASSA. Duas seleções sobrepostas, a parte declarada antes perde faces sem
    nada reclamar, e a bancada só mostra a contagem de faces SEM nome — nunca as

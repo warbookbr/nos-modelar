@@ -1,5 +1,7 @@
 # Oficina — o que ainda não existe
 
+> **Aviso:** documentação histórica do NÓS; não tem autoridade sobre a Mecanifica e não autoriza implementação nova.
+
 Recorte do antigo `docs/oficina.md` com **o que foi projetado e não foi
 construído**, mais as decisões de escopo (o que deliberadamente não se constrói:
 booleano, UV manual, three.js). Nada aqui é citável como se existisse.

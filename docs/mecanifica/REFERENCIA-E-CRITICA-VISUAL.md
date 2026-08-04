@@ -98,13 +98,9 @@ As imagens analisadas justificam observar:
 - profundidade comprovada nas vistas lateral e perspectiva;
 - equivalência entre instâncias radiais.
 
-Isso ainda não autoriza implementar todas as capacidades sugeridas. A ordem
-vigente é:
-
-1. encerrar a Fundação de autoria v1;
-2. executar O-13 em ciclo próprio, reduzindo a expansão radial manual;
-3. abrir Realismo geométrico v1 somente com uma ou duas capacidades escolhidas
-   a partir da crítica da roda.
+Isso não autoriza implementar capacidades novas. Arranjo radial, orientação,
+furos e revisão visual já têm contratos próprios. Qualquer lacuna restante deve
+entrar no backlog com uma prova e um limite explícito.
 
 “Auto polimento” global não é capacidade candidata. Se a prova exigir
 acabamento, a hipótese é filete ou bevel **seletivo**, endereçado semanticamente,

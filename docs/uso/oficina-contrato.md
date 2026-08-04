@@ -1,4 +1,4 @@
-# Oficina — contrato histórico do núcleo
+# Oficina — contrato procedural preservado
 
 > **Mecanifica:** a interface humana `oficina.html`, a aba de som e a ponte
 > sonora de runtime foram removidas no commit `be157c6`. Não use este documento
@@ -6,9 +6,9 @@
 > [`docs/mecanifica/INDEX.md`](../mecanifica/INDEX.md). A gramática procedural
 > que ele registra continua presente e é consumida pela bancada neutra.
 
-Recorte do antigo `docs/oficina.md` com **o que vale hoje** na Oficina: o formato
-salvo, a identidade de vértice, o vocabulário de operações, as camadas do código e
-a restrição de como a IA emite peça. É verificável contra o núcleo
+Recorte histórico de `docs/oficina.md` com o formato salvo, a identidade de
+vértice, o vocabulário de operações e a restrição de como a IA emite peça. É
+verificável contra o núcleo
 (`prototipos/fps/v3/motor/oficina.js`) — a tabela de operações é gateada por
 `npm run criar`.
 
@@ -18,12 +18,13 @@ o registro de projeto (por que cada coisa ficou assim, o que já foi construído
 ferramenta no dia a dia, [`oficina-referencia.md`](./oficina-referencia.md) é mais
 curto que isto.
 
-## O que é
+## Escopo atual
 
-Um editor 3D dentro do próprio jogo. Cena vazia, câmera livre, e você modela
-o objeto ali: move vértice, extruda face, pinta, escala, rotaciona. Na hora de
-salvar, não sai arquivo de modelo — sai **código**, um arquivo em `pecas/` como
-se tivesse sido escrito à mão.
+Não há editor humano publicado. O núcleo procedural e sua tabela de operações
+continuam sendo exercitados por `npm run criar`; a bancada neutra é a porta de
+inspeção atual. As descrições históricas de jogo, som e interface abaixo são
+mantidas apenas para preservar o contrato e não autorizam a recriação dessas
+interfaces.
 
 ## A decisão que define todo o resto
 

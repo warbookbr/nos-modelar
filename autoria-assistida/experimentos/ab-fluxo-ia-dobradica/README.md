@@ -2,7 +2,7 @@
 
 Experimento encerrado em 1º de agosto de 2026. A interpretação, o protocolo e a
 conclusão estão em
-[`docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md`](../../../docs/mecanifica/EXPERIMENTO-AB-FLUXO-IA.md).
+[`docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md`](../../../docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md).
 
 - `cego/`: material visto pelos avaliadores; A era a condição assistida e B, a
   condição crua. A pasta conserva a rubrica, as evidências equivalentes, seis

@@ -45,9 +45,7 @@ npm run bancada -- freio-disco --selecionadas=pastilhaInterna,pistao --modo=cont
 npm run bancada -- freio-disco --selecionadas=suporte --modo=contexto --vistas=direita
 ```
 
-Use explosão **baixa** (≈0,12). A partir de ≈0,2 as partes saem do
-enquadramento, porque a câmera é enquadrada na montagem fechada e não
-reenquadra ao explodir (ATRITOS-AUTORIA A-12).
+Use explosão **baixa** (≈0,12) para manter a leitura comparável entre vistas.
 
 ## Partes semânticas
 
@@ -58,11 +56,11 @@ nos passos (`sel:{grupo:'<nome>'}`). São 526 faces, nenhuma sem identidade.
 |---|---:|---|---|
 | `disco` | 60 | −0,060…0,012 · ±0,140 · ±0,140 | pista de atrito + chapéu; gira com a roda |
 | `cubo` | 240 | −0,070…0,044 · ±0,052 · ±0,052 | barril, flange furado e piloto que centraliza a roda |
-| `pastilhaInterna` | 6 | −0,028…−0,014 · 0,088…0,136 · ±0,038 | pastilha do lado do pistão |
-| `pastilhaExterna` | 6 | 0,014…0,028 · 0,088…0,136 · ±0,038 | pastilha do lado da roda |
-| `pinca` | 18 | ±0,058 · 0,082…0,184 · ±0,046 | ponte + duas garras; abraça o disco |
+| `pastilhaInterna` | 8 | −0,028…−0,014 · 0,088…0,136 · ±0,038 | pastilha do lado do pistão |
+| `pastilhaExterna` | 8 | 0,014…0,028 · 0,088…0,136 · ±0,038 | pastilha do lado da roda |
+| `pinca` | 78 | ±0,058 · 0,082…0,184 · ±0,046 | ponte + duas garras; abraça o disco |
 | `pistao` | 14 | −0,044…−0,028 · 0,092…0,132 · ±0,020 | empurra a pastilha interna |
-| `suporte` | 18 | −0,078…−0,058 · 0,046…0,158 · ±0,096 | placa de ancoragem + duas orelhas |
+| `suporte` | 78 | −0,078…−0,058 · 0,078…0,158 · ±0,096 | placa de ancoragem + duas orelhas |
 | `flexivel` | 40 | −0,109…−0,043 · 0,165…0,262 · 0,021…0,127 | mangueira, do banjo da pinça até a linha rígida |
 
 ### Flange de roda
@@ -153,10 +151,9 @@ saber) que ela é a tampa `fundo` de um cilindro.
 | `flexivelRaio` | 0,005 | raio da mangueira |
 | `flexivelBanjoRaio` | 0,008 | raio do banjo, na saída da pinça |
 
-Os quatro nós do caminho da mangueira são nomeados um por um
+Os quatro nós do caminho da mangueira são nomeados individualmente
 (`flexivelBocaX/Y/Z`, `flexivelCurvaX/Y/Z`, `flexivelSubidaX/Y/Z`,
-`flexivelUniaoX/Y/Z`) porque a linguagem de autoria só sabe nomear escalar, não
-ponto (ATRITOS-AUTORIA A-8).
+`flexivelUniaoX/Y/Z`) para manter a receita determinística.
 
 ### Derivadas — não edite, elas se recalculam
 
@@ -204,18 +201,12 @@ Depois de qualquer mudança, confira nas três ortogonais e rode
 `npm run bancada -- freio-disco --vistas=direita --estrito`, que sai ≠0 se
 alguma face perdeu identidade.
 
-## Verificação desta rodada
+## Verificação reproduzível
 
-| gate | resultado |
-|---|---|
-| `npm test` | 330 testes, 9 arquivos, aprovado (7 casos novos em `tools/mecanifica/freio-disco-integridade.test.ts`) |
-| `npm run typecheck` | aprovado |
-| `npm run build` | aprovado |
-| `npm run mapa` | 172 arquivos |
-| `npm run gabarito:selecao:check` | `freio-disco` acusada como peça NOVA; regravado, nenhuma peça existente mudou de hash |
-| `npm run docs:links:check` | aprovado — 52 docs alcançáveis a partir do `INDEX.md` |
-| `npm run bancada -- freio-disco --estrito` | 180 faces, 0 sem identidade |
-| órfãos do núcleo | 0 |
+`npm run descrever -- freio-disco` é a fonte atual das contagens: 8 partes,
+526 faces, 530 vértices, 0 faces sem identidade, 0 órfãos e 1 porta. As vistas
+ortogonais são regeneradas com o comando acima; os gates globais ficam em
+[`docs/mecanifica/INDEX.md`](INDEX.md), não nesta prancha.
 
 As dificuldades encontradas ao modelar estão em
 [`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), rodada 1.

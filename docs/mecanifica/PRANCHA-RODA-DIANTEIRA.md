@@ -46,11 +46,12 @@ npm run bancada -- roda-dianteira --selecionadas=aro,tampaCentral --modo=context
 
 | parte | faces | caixa esperada (x, y, z) | papel |
 |---|---:|---|---|
-| `pneu` | 280 | `±0,110 · ±0,340 · ±0,340` | contato com o solo e volume externo |
+| `pneu` | 520 | `±0,110 · ±0,340 · ±0,340` | contato com o solo e volume externo |
 | `aro` | 192 | `±0,095 · ±0,245 · ±0,245` | estrutura metálica que recebe o pneu e deixa o centro para o cubo |
 | `tampaCentral` | 22 | `0,095…0,115 · ±0,078 · ±0,078` | acabamento da face externa |
 
-São 734 faces e nenhuma face sem identidade. `pneuInteiro`, `aroInteiro` e
+São 734 faces, 824 vértices, 0 faces sem identidade e 0 órfãos, conforme
+`npm run descrever -- roda-dianteira`. `pneuInteiro`, `aroInteiro` e
 `tampaCentralInteira` são aliases de seleção; `aroAbertura` nomeia a face
 interna estável para regras visuais. A porta `cavidadeDoCubo` declara, além da
 origem dessa face, uma interface cilíndrica interna: eixo X, vetor de referência

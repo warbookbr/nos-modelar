@@ -1,126 +1,35 @@
-# Autoria para IA
+# Autoria assistida por IA
 
-Os critérios de identidade e editabilidade ficam neste contrato. A escolha do
-fluxo visual — esquemático, low-poly intencional, técnico didático ou realista
-de apresentação — fica em
-[`PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md).
+## Contrato atual
 
-## Objetivo
+Uma peça pode ser escrita como receita determinística. O núcleo resolve
+`PARAMS`, `TOPO`, `PASSOS`, `MATERIAIS`, `ALIASES`, partes, portas e origens.
+Cada parte relevante recebe nome semântico estável. A receita exporta `meta` e
+`construir`, e quando usa o formato procedural expõe os dados reexecutáveis.
 
-A linguagem de autoria deve permitir que humano e IA criem, compreendam e
-refinem uma peça sem conhecer detalhes internos do renderizador.
+Expressões nomeadas resolvem números e vetores sem seno, cosseno ou índices
+crus no arquivo salvo. Operações estruturais publicam origem e seleção. `parte`,
+`material`, `liso`, `solido`, `publicarPorta` e as seleções por grupo consultam
+essa identidade. `arranja`, `furo`, `espelha`, `loft`, `filete` e as primitivas
+existentes são capacidades do núcleo, cada uma com seus limites documentados no
+contrato procedural.
 
-O problema principal não é gerar triângulos. É preservar intenção:
+## Hierarquia mínima
 
-- qual peça é o disco;
-- qual superfície é a pista de frenagem;
-- onde a pastilha encosta;
-- o que pode ser alterado sem reconstruir o conjunto;
-- como uma referência continua válida após inserções e refinamentos.
+O caminho de leitura é: montagem ou peça, parte semântica, grupo/porta, origem
+estrutural e face. A bancada mostra a hierarquia e a consulta de subárvore. A
+seleção vazia, ambígua ou sem dono grita; nunca vira no-op silencioso.
 
-## Estado herdado
+## Forma do arquivo
 
-O NÓS já provou seleções por origem, aliases, partes nomeadas e peças sem
-referências literais a IDs globais. O drone herdado foi criado e refinado com
-zero IDs literais.
+Os exemplos de sintaxe nos documentos são ilustrativos até aparecerem em uma
+receita e passarem os gates. Capacidade existente significa: implementada no
+núcleo, coberta por teste e exercitada por peça. Proposta, backlog ou exemplo
+não autoriza adicionar uma operação.
 
-Isso ainda não encerrou o problema:
+## Limites
 
-- blocos internos continuam ligados à posição do passo;
-- algumas operações ainda exigem referências numéricas;
-- nomes podem esconder seleções incompletas;
-- faltam relações espaciais como alinhar, centralizar e encostar;
-- faltam expressões gerais entre parâmetros.
-
-Portanto, o formato atual é entrada experimental, não contrato definitivo.
-
-## Regras do novo contrato
-
-1. Identidade persistente é semântica e escolhida pelo autor.
-2. IDs de runtime, índices de arrays e posição de passos não são persistidos.
-3. Partes formam uma hierarquia navegável.
-4. Relações espaciais são declarativas e gerais.
-5. Parâmetros podem derivar de outros parâmetros por expressões validadas.
-6. Referência ausente, ambígua ou incompatível falha antes de renderizar.
-7. Toda operação informa quais identidades cria, preserva, deriva ou remove.
-8. O documento possui versão e migração explícita.
-9. O resultado é determinístico para a mesma entrada.
-10. O estado pode ser descrito e testado sem navegador.
-
-## Consultar um conjunto semântico
-
-Quando a IA precisa revisar um mecanismo já autorado, ela não deve recompor os
-filhos pelo nome ou pela imagem. Use uma consulta explícita:
-
-```bash
-npm run descrever -- _freio-hierarquia --subarvore=pinca
-```
-
-O comando devolve a raiz, seus descendentes em ordem estável, a descrição
-geométrica filtrada e uma URL da bancada com a mesma seleção. `--subarvore` e
-`--partes` não podem ser combinados: um escolhe uma árvore declarada; o outro é
-uma lista manual. Raiz ausente ou valor vazio falham sem produzir uma inspeção
-parcial.
-
-Isto é leitura e revisão. A consulta não move peças, não salva montagem e não
-altera a geometria.
-
-## Vocabulário pretendido
-
-Exemplo ilustrativo, ainda não implementado:
-
-```js
-export const FORMATO = { tipo: 'conjunto', versao: 1 };
-
-export const PARAMS = {
-  discoRaio: 0.14,
-  discoEspessura: 0.022,
-  pastilhaNova: 0.012,
-};
-
-export const PARTES = {
-  freio: { tipo: 'conjunto' },
-  disco: { pai: 'freio', tipo: 'disco' },
-  pinca: { pai: 'freio', tipo: 'pinca' },
-  'pastilha-interna': { pai: 'pinca', tipo: 'pastilha' },
-};
-
-export const PASSOS = [
-  ['criarDisco', { parte: 'disco', raio: '$discoRaio', espessura: '$discoEspessura' }],
-  ['criarPastilha', { parte: 'pastilha-interna', espessura: '$pastilhaNova' }],
-  ['alinhar', { parte: 'pastilha-interna', eixo: 'disco.eixo' }],
-  ['encostar', { de: 'pastilha-interna.face-atrito', em: 'disco.pista-interna' }],
-];
-```
-
-`disco.eixo`, `pastilha-interna.face-atrito` e `disco.pista-interna` são portas
-semânticas publicadas pelos geradores. Elas não são listas de faces disfarçadas.
-
-## Operações gerais antes de operações automotivas
-
-O domínio pode oferecer geradores convenientes como `criarDisco`, desde que o
-núcleo permaneça geral. Capacidades estruturais devem servir a outros projetos:
-
-- `alinhar`;
-- `centralizar`;
-- `encostar`;
-- `distanciar`;
-- `espelhar`;
-- `repetir`;
-- `agrupar`;
-- `derivarParametro`;
-- `publicarPorta`.
-
-Uma operação específica só entra quando representa conhecimento real de domínio,
-não quando contorna uma limitação geométrica.
-
-## Prova contra chuva de IDs
-
-Uma peça só passa quando:
-
-- não contém referências persistidas a IDs internos;
-- sobrevive à inserção de um passo anterior;
-- permite mudar um parâmetro sem renomear partes;
-- permite apagar uma parte e produz erro claro nas relações dependentes;
-- pode ser refinada por outro agente sem regeneração integral;
-- produz descrição semântica útil em modo headless.
+Não há contrato genérico de materiais, PBR, paleta aberta, montagem persistida
+ou solver de encaixe. A abertura oblonga não é expressável. O endereço único de
+um grupo linear ainda está aberto. Tarefas do produto cliente vão para
+`warbookbr/mecanica`.

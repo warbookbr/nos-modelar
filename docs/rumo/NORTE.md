@@ -1,5 +1,7 @@
 # NORTE — objetivo e método do NÓS
 
+> **Aviso:** documentação histórica do NÓS; não tem autoridade sobre a Mecanifica e não autoriza implementação nova.
+
 Este documento registra o objetivo maior do projeto e o método usado para decidir sua evolução. Ele existe para preservar o contexto entre pessoas, agentes e conversas. O plano de fases, critérios e sinais de parada vigentes está em [`PLANO.md`](PLANO.md) e também é leitura obrigatória antes de propor, planejar ou executar uma rodada.
 
 ## Objetivo

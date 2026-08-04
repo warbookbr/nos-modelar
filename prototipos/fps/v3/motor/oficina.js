@@ -1292,7 +1292,7 @@ function confereId(st, i, op, args) {
    regra antiga: movem os vértices dentro da caixa.
 
    ASSIMETRIA de `regiao`, agora dita em voz alta (era implícita e custava
-   caro; é o O-3 de docs/mecanifica/OFICINA-OTIMIZACOES.md): um VÉRTICE entra
+   caro; é o O-3 de docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): um VÉRTICE entra
    se ELE estiver dentro da caixa — o eixo de vértice
    sempre leu a região como "toca". Uma FACE, até aqui, só entrava com TODOS
    os cantos dentro (`f.vs.every(dentro)`). A MESMA caixa selecionava, então,
@@ -4723,7 +4723,7 @@ export const OPS = {
      inexistente GRITA (órfão), como as outras ops — nunca corrompe (lei do envelope).
 
      Uma face pertence a NO MÁXIMO uma parte. Até o O-2 (R2 do plano em
-     docs/mecanifica/OFICINA-OTIMIZACOES.md) reatribuir era SILENCIOSO
+     docs/mecanifica/historico/OFICINA-OTIMIZACOES.md) reatribuir era SILENCIOSO
      ("última atribuição vence"), e essa era a pior classe de defeito do
      vocabulário: resultado ERRADO que PASSA. Duas seleções sobrepostas (duas
      caixas de `regiao`, um alias que engloba outro) e a parte declarada antes

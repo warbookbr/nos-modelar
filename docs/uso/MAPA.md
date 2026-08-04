@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-240 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+241 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -92,31 +92,41 @@
 
 ## docs/mecanifica/
 
-- `ARQUITETURA.md` — Arquitetura da Mecanifica
-- `ATRITOS-AUTORIA.md` — Atritos de autoria — o que dói ao modelar
-- `AUTORIA-IA.md` — Autoria para IA
-- `BANCADA-E-APRESENTACAO.md` — Bancada de autoria e apresentação ao cliente
+- `ARQUITETURA.md` — Arquitetura atual
+- `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
+- `AUTORIA-IA.md` — Autoria assistida por IA
+- `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
-- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
-- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
-- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v1
-- `HOMOLOGACAO-FLUXO-IA.md` — Homologação orientada a avanço do fluxo de IA
-- `INDEX.md` — Comece aqui — contexto da Mecanifica
-- `MONTAGENS-SEMANTICAS.md` — Montagens semânticas — visão, teto e mapa de maturidade
-- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
+- `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
+- `INDEX.md` — Mecanifica — entrada atual
+- `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
-- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
-- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
-- `UPSTREAM-NOS.md` — Melhorias reaproveitáveis pelo NÓS
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
+## docs/mecanifica/historico/
+
+- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
+- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
+- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `README.md` — Histórico da Mecanifica
+- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
+- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
+
 ## docs/mecanifica/planos/
+
+- `BACKLOG.md` — Backlog aberto
+- `MODELO.md` — [ID] — resultado curto
+- `README.md` — Planos da Mecanifica
+
+## docs/mecanifica/planos/concluidos/
 
 - `2026-08-02-assentamento-anular.md` — AUT-2026-11 — assentamento anular declarado
 - `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
@@ -137,10 +147,7 @@
 - `2026-08-03-hierarquia-semantica-minima.md` — AUT-2026-16 — hierarquia semântica mínima de partes
 - `2026-08-03-inspecao-reproduzivel-de-par.md` — AUT-2026-19 — inspeção reproduzível de par
 - `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
-- `BACKLOG.md` — Backlog de candidatos
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
-- `MODELO.md` — [ID] — resultado curto
-- `README.md` — Planos da Mecanifica
 
 ## docs/rumo/
 
@@ -151,9 +158,9 @@
 
 ## docs/uso/
 
-- `RECURSOS.md` — Recursos técnicos do Atelier herdado
-- `oficina-contrato.md` — Oficina — contrato histórico do núcleo
-- `oficina-referencia.md` — Oficina — referência de como cada coisa funciona
+- `RECURSOS.md` — Recursos e portas de entrada
+- `oficina-contrato.md` — Oficina — contrato procedural preservado
+- `oficina-referencia.md` — Oficina — aviso de compatibilidade
 
 ## prototipos/fps/v3/
 
@@ -208,7 +215,7 @@
 - `_primitivas.js` — PEÇA-EXEMPLO do P1 do playground: as TRÊS primitivas novas lado a lado — `plano` como chão, `esfera` apoiada no centro e `cone` deslocado pra +x por moveV (p…
 - `_tampa-de-caixa.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": a tampa de uma caixa de inspeção, com o CÍRCULO DE QUATRO PARAFUSOS que o A-26 disse que não c…
 - `_torno.js` — PEÇA-EXEMPLO do P2 do playground: um PEÃO DE XADREZ — o objeto que SÓ o `lathe` faz hoje (um perfil 2D `[[raio,y],...]` girado em torno do eixo Y). O perfil …
-- `_vao-e-anteparo.js` — PEÇA DE EXERCÍCIO do O-14 (docs/mecanifica/OFICINA-OTIMIZACOES.md): põe `apagaFace` e `vira` dentro da rede do `gabarito:selecao` — até aqui as duas tinham t…
+- `_vao-e-anteparo.js` — PEÇA DE EXERCÍCIO do O-14 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): põe `apagaFace` e `vira` dentro da rede do `gabarito:selecao` — até aqui as dua…
 - `_vaso.js` — PEÇA-EXEMPLO do Ciclo 5 ("Curva e filete v1"): um VASO DE CERÂMICA — o objeto que só a CURVA no perfil do `lathe` faz bem. Família NÃO automotiva (louça), es…
 - `_vazio.js` — _vazio — fixture do P5 do playground: peça SEM geometria (0 passos), usada pela bancada de gabarito (tools/bancadas/gabarito.mjs) como a REFERÊNCIA DE FUNDO …
 - `_viga.js` — PEÇA-EXEMPLO do P5 do playground: uma VIGA — o objeto que só a chave `contorno` do `loft` faz hoje (uma seção RETANGULAR, não circular, no lugar do `raio`). …
@@ -252,7 +259,7 @@
 - `gabarito-selecao-lib.test.mjs` — gabarito-selecao-lib.test.mjs — protege a exceção estreita para peça nova: `--novas` aceita presença nova, mas nunca esconde hash, remoção ou erro de nome.
 - `gabarito-selecao.mjs` — gabarito-selecao.mjs — a PROVA ZERO da Fase 3.5 (docs/rumo/PLANO.md): mede, peça por peça, que uma mudança no núcleo (`motor/oficina.js`) não mudou o resulta…
 - `gabarito.mjs` — gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o gabarito, desenhado à…
-- `id-cru.mjs` — id-cru.mjs — o gate do O-4 (docs/mecanifica/OFICINA-OTIMIZACOES.md): REPROVA peça NOVA que enderece geometria por id posicional, sem quebrar as herdadas.
+- `id-cru.mjs` — id-cru.mjs — o gate do O-4 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): REPROVA peça NOVA que enderece geometria por id posicional, sem quebrar as her…
 - `id-cru.test.ts` — id-cru.test.ts — prova do gate do O-4: que ele ACHA id cru em peça nova, que a lista de exceções é uma dívida CONGELADA (não um teto para crescer) e que valo…
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — o GATE de render da OFICINA (D-60). Renderiza peça(s) do v3 e FALHA (exit≠0) se: houve pageerror, window.__ready ≠ true, ou o frame é DEGENERA…

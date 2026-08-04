@@ -1,137 +1,55 @@
 # Planos da Mecanifica
 
-Este é o índice de planejamento. Ele separa decisão de produto, execução e
-histórico para que um roteiro não cresça indefinidamente.
-
-## Estado atual
+## Estado
 
 **Plano ativo:** nenhum.
 
-[`AUT-2026-19`](2026-08-03-inspecao-reproduzivel-de-par.md) foi concluído:
-foco agora vira câmera reproduzível, e a inspeção de duas partes escolhe uma
-vista por pixels visíveis, marca as peças sem alterar geometria e conserva o
-resultado no link.
+Um backlog não autoriza implementação automática. Um plano
+só fica ativo quando tem objetivo, escopo, gates, arquivos reservados, critério
+de saída e encerramento registrado.
 
-[`AUT-2026-18`](2026-08-03-consulta-subarvore-ia.md) foi concluído: uma IA
-consulta a raiz pelo CLI e recebe descrição filtrada e URL reproduzível da
-bancada, sem criar estado de montagem.
+## Contrato de plano
 
-[`AUT-2026-17`](2026-08-03-selecao-subarvore-semantica.md) foi concluído:
-raiz e descendentes declarados podem ser selecionados juntos na bancada, por
-consulta neutra e determinística. O grafo de cena, pose, explosão, artefato
-resolvido e solver continuam fora do recorte.
+Todo plano curto deve declarar:
 
-[`AUT-2026-16`](2026-08-03-hierarquia-semantica-minima.md) foi concluído: o
-pai semântico de uma parte é dado estável, validado ao fim da receita e legível
-pela IA no descritor e na bancada. Transformação herdada, subárvore,
-persistência, exportação e solver permanecem candidatos independentes.
+1. objetivo verificável e fora de ambiguidade;
+2. hipótese ou pergunta que justifica o trabalho;
+3. arquivos e identidades em escopo;
+4. invariantes que não podem mudar;
+5. gates e evidências esperadas;
+6. limites e itens explicitamente fora;
+7. resultado, decisão e caminho de encerramento.
 
-[AUT-2026-15](2026-08-02-portas-espelho-arranja.md) foi concluído: portas de
-interface acompanham cópias de `arranja` por identidade declarada, e espelho
-passa a publicar a mão espelhada para que relações atuais recusem antes de
-medir ou oferecer prévia. O Nível 1 foi fechado sem abrir hierarquia ou solver.
+Estados permitidos: `candidato`, `ativo`, `bloqueado`, `concluído` e
+`cancelado`. Só existe um plano `ativo` por vez.
 
-[AUT-2026-14](2026-08-02-identidade-porta-estavel.md) foi concluído: portas
-novas agora separam `id` estável de `rotulo` exibido, preservando receitas,
-artefatos e relações históricos. Espelho e `arranja` permanecem como a próxima
-lacuna explícita do Nível 1.
+## Concluídos
 
-[AUT-2026-13](2026-08-02-recusa-estrutural-montagem.md) foi concluído: relação
-com forma ou direção incompatível agora termina antes de medir a dimensão errada
-ou oferecer prévia aplicável.
+Os planos datados e o encerramento do plano mestre estão em
+[`concluidos/`](concluidos/). A tabela é um índice curto; os detalhes continuam
+nos arquivos originais.
 
-`AUT-2026-12`/Recorte G foi concluído em
-[`AUT-2026-12`](2026-08-02-tolerancias-de-montagem.md): especificação nominal,
-variação de fabricação e tolerância numérica agora são dados distintos, com
-compatibilidade para relações antigas.
-
-`AUT-2026-11`/Recorte F foi concluído em
-[`AUT-2026-11`](2026-08-02-assentamento-anular.md): aro↔pneu passa a declarar
-e medir faixa anular local, mantendo o alerta amplo por caixa. Deformação,
-pressão e colisão de sólidos continuam fora do backlog executável.
-
-`AUT-2026-10`/Recorte E foi concluído em
-[`AUT-2026-10`](2026-08-02-contato-local-cilindrico.md): contato cilíndrico
-local e alerta amplo por caixa aparecem juntos, sem declarar colisão exata de
-sólidos. Cavidade anular aro/pneu e outras naturezas continuam no backlog.
-
-`AUT-09`/Recorte D foi concluído em
-[`AUT-2026-09`](2026-08-02-estados-de-encaixe.md): estados explícitos de encaixe
-cilíndrico para a IA, antes de ampliar a geometria de colisão.
-
-`AUT-08`/Recorte C foi concluído em
-[`AUT-2026-08`](2026-08-02-pose-em-referencial.md): composição local/mundo em
-referencial técnico rígido, sem abrir hierarquia.
-
-`AUT-07`/Recorte B foi concluído em
-[`AUT-2026-07`](2026-08-02-pose-derivada-roda.md): prévia pura e única de pose
-para roda/cubo e pino/luva, por quadro e relação explicitamente declarados.
-
-`AUT-06`/A-16 e `PEC-01` foram concluídos em
-[`AUT-2026-06`](2026-08-02-interfaces-de-encaixe.md): interfaces cilíndricas
-mensuráveis e `encaixaCilindrico` dirigido, apenas read-only. Pose derivada,
-hierarquia e solucionador continuam fora do recorte.
-
-`AUT-06`/A-1 foi concluído em
-[`AUT-2026-05`](2026-08-02-camera-livre-reproduzivel.md), caminho canônico
-`docs/mecanifica/planos/2026-08-02-camera-livre-reproduzivel.md`.
-
-`AUT-02`/A-37 foi concluído em
-[`AUT-2026-04`](2026-08-02-canto-composto.md), caminho canônico
-`docs/mecanifica/planos/2026-08-02-canto-composto.md`.
-
-`AUT-03`/A-33 foi concluído em
-[`AUT-2026-03`](2026-08-02-triangulacao-de-furos.md), caminho canônico
-`docs/mecanifica/planos/2026-08-02-triangulacao-de-furos.md`.
-
-`AUT-04`/A-35 foi concluído em
-[`AUT-2026-02`](2026-08-02-concordancia-por-ponto.md), caminho canônico
-`docs/mecanifica/planos/2026-08-02-concordancia-por-ponto.md`. O `AUT-01` já foi
-concluído em [`AUT-2026-01`](2026-08-02-contagem-por-desvio.md), caminho
-`docs/mecanifica/planos/2026-08-02-contagem-por-desvio.md`.
-
-O plano mestre anterior foi encerrado em
-[`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
-
-## Contrato de um plano
-
-Cada plano:
-
-1. resolve **um resultado**, não uma fase inteira do produto;
-2. tem escopo incluído, escopo excluído e gate de saída antes de ficar ativo;
-3. contém no máximo 10 fatias e 200 linhas;
-4. aponta para medições e registros existentes, sem copiá-los integralmente;
-5. não mistura backlog, diário de execução nem documentação permanente;
-6. não cresce depois de ativado: descoberta não bloqueante volta ao backlog;
-7. termina como `concluído` ou `cancelado`, com evidência e destino de sobras;
-8. nunca deixa mais de um plano ativo neste índice.
-
-Use [`MODELO.md`](MODELO.md) para abrir um plano. Nomeie o arquivo como
-`AAAA-MM-DD-resultado-curto.md` e use um identificador estável independente dos
-IDs de atrito, por exemplo `AUT-2026-01` ou `PROD-2026-01`.
-
-## Estados permitidos
-
-| Estado | Significado |
+| Grupo | Estado |
 |---|---|
-| `rascunho` | ainda pode mudar e não autoriza implementação |
-| `pronto` | escopo e gate revisados, aguardando decisão de início |
-| `ativo` | único plano que autoriza execução |
-| `concluído` | gate atendido; o arquivo não volta a crescer |
-| `cancelado` | premissa ou prioridade perdeu validade; motivo registrado |
+| Fundação, identidade e portas | concluído |
+| Arranjos, furos, filete e tolerâncias | concluído |
+| Câmera, pose e inspeção reproduzível | concluído |
+| Hierarquia, subárvore e interfaces | concluído |
+| Encerramento do plano mestre | concluído |
 
-## Fluxo
+Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
+[câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
+[concordância](concluidos/2026-08-02-concordancia-por-ponto.md), [contagem](concluidos/2026-08-02-contagem-por-desvio.md),
+[contato](concluidos/2026-08-02-contato-local-cilindrico.md), [encaixe](concluidos/2026-08-02-estados-de-encaixe.md),
+[identidade](concluidos/2026-08-02-identidade-porta-estavel.md), [interfaces](concluidos/2026-08-02-interfaces-de-encaixe.md),
+[espelho](concluidos/2026-08-02-portas-espelho-arranja.md), [pose derivada](concluidos/2026-08-02-pose-derivada-roda.md),
+[pose](concluidos/2026-08-02-pose-em-referencial.md), [recusa](concluidos/2026-08-02-recusa-estrutural-montagem.md),
+[tolerâncias](concluidos/2026-08-02-tolerancias-de-montagem.md), [triangulação](concluidos/2026-08-02-triangulacao-de-furos.md),
+[consulta](concluidos/2026-08-03-consulta-subarvore-ia.md), [hierarquia](concluidos/2026-08-03-hierarquia-semantica-minima.md),
+[inspeção](concluidos/2026-08-03-inspecao-reproduzivel-de-par.md), [seleção](concluidos/2026-08-03-selecao-subarvore-semantica.md),
+[encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
-1. escolher um candidato ou registrar evidência nova;
-2. preencher o modelo como `rascunho`;
-3. revisar dependências, risco e orçamento;
-4. obter decisão explícita e marcar um único plano como `ativo` aqui;
-5. executar apenas as fatias incluídas;
-6. validar o gate, registrar o fechamento e remover o plano da posição ativa;
-7. devolver descobertas futuras ao backlog sem reabrir o plano.
+## Abertura
 
-Planos concluídos ou cancelados permanecem versionados para explicar decisões,
-mas saem da leitura obrigatória de agentes novos.
-
-O CI executa `npm run planos:check`: ele recusa mais de um plano ativo, índice
-divergente, estado inválido e qualquer plano executivo acima de 200 linhas.
+Os únicos candidatos abertos estão em [`BACKLOG.md`](BACKLOG.md). Para abrir um
+plano, copie [`MODELO.md`](MODELO.md), preencha as provas e atualize esta tabela.

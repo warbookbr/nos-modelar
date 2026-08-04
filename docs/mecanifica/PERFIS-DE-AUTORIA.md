@@ -142,10 +142,10 @@ suposição. Essa escolha é reversível e não altera identidade nem medidas.
 ## Evidência: roda dianteira
 
 O contrato de
-[`EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) pediu
+[`historico/EXPERIMENTO-RODA-REALISTA.md`](historico/EXPERIMENTO-RODA-REALISTA.md) pediu
 `realistaApresentacao`, `F3`, precisão mecânica e montagem usando a linguagem
 procedural atual. O resultado e os contornos estão em
-[`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md).
+[`historico/RELATO-RODA-REALISTA.md`](historico/RELATO-RODA-REALISTA.md).
 
 Avaliação do agente principal, em que 10 é o melhor resultado:
 
@@ -181,8 +181,6 @@ automotivo antes de serem tratadas como capacidade geral concluída.
 - uma próxima peça de aproximação deve declarar o perfil antes da modelagem;
 - se ela exigir `realistaApresentacao`, a sessão deve conferir primeiro se as
   capacidades necessárias existem e registrar qualquer redução de escopo;
-- a repetição radial O-13 é o ganho visual mais diretamente sustentado pelo
-  experimento, mas não deve ser implementada antes da fundação de identidade
-  O-6/O-12; repetir faces sem identidade só ampliaria o problema;
-- a ordem executiva e os candidatos ficam no índice de
-  [`planos`](planos/README.md), não neste registro de perfis.
+- a repetição radial estrutural já existe e tem prova em fixture; limites que
+  continuam abertos ficam em [`planos/BACKLOG.md`](planos/BACKLOG.md);
+- este registro descreve perfis de autoria, não uma ordem executiva.

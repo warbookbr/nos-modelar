@@ -32,7 +32,7 @@ arquivo não há plano ativo.**
   visual econômica já resolvida.
 
 O detalhamento e a justificativa de cada destino estão em
-[`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+[`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
 ## Regra de compatibilidade
 

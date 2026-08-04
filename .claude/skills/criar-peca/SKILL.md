@@ -393,7 +393,7 @@ falha do laço oficial):
 npm run peca -- minha-peca --giro=8             # diagnóstico herdado: 8 ângulos
 npm run peca -- minha-peca --res=1400 --geo=normais   # diagnóstico herdado: emenda/faceta
 npm run peca -- minha-peca --res=1400 --geo=flat      # diagnóstico herdado: silhueta/volume
-npm run auditar -- minha-peca && npm run porteiro -- minha-peca   # os mesmos gates do criar, isolados
+npm run criar -- minha-peca                                      # fluxo atual: núcleo, porteiro e gabarito
 npm run executar                                # replay/determinismo do núcleo
 npm run gabarito -- minha-peca                  # o mesmo IoU do criar, isolado — mais ângulos que o CONTORNOS cobrir
 ```

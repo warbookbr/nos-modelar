@@ -1,48 +1,37 @@
 # Mecanifica — instruções para agentes
 
-Comece por `docs/mecanifica/INDEX.md`. Ele informa o estado atual, a hierarquia
-das fontes e quais documentos ler para cada tipo de tarefa. Não leia todo o
-legado por padrão.
+Comece por [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md). Ele define o
+estado atual, as fontes de verdade e a leitura necessária. Não leia todo o
+histórico por padrão.
 
-Antes de alterar núcleo procedural, plano, atritos ou identidades enquanto houver
-trabalho paralelo em `brigsd/nos-mecanifica`, leia
-`docs/mecanifica/COORDENACAO-LOCAL.md` e consulte `inbox` para o seu agente.
-Reserve arquivos e identidades antes de editar. Use a issue indicada em
-`docs/mecanifica/COORDENACAO-REPOS.md` somente para decisões duráveis.
+Antes de alterar núcleo procedural, planos, atritos ou identidades enquanto
+`brigsd/nos-mecanifica` estiver ativo, leia `docs/mecanifica/COORDENACAO-LOCAL.md`,
+consulte a inbox e reserve arquivos antes de editar. Use
+`docs/mecanifica/COORDENACAO-REPOS.md` para decisões duráveis.
 
 ## Fonte de verdade
 
-- `docs/mecanifica/` governa o produto Mecanifica.
-- `docs/mecanifica/planos/README.md` governa o planejamento e aponta o único
-  plano ativo, quando existir. `docs/mecanifica/PLANO.md` é somente a lápide do
-  plano mestre aposentado.
-- `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS herdado. Use-os
-  somente quando a tarefa tocar no núcleo procedural ou exigir contexto histórico.
-- Se dois documentos divergirem, o material de `docs/mecanifica/` prevalece para
-  este produto.
+- `docs/mecanifica/` governa o produto e seus contratos atuais.
+- `docs/mecanifica/planos/README.md` governa o planejamento.
+- `docs/uso/`, `docs/rumo/` e `docs/historico/` são documentação herdada ou
+  histórica. Não autorizam implementação.
+- Em divergência, `docs/mecanifica/` prevalece.
 
-## Regras essenciais
+## Fronteiras
 
-- Preserve o núcleo, as peças e o jogo de referência em `prototipos/fps/v3/`.
-  A Oficina humana (`oficina.html`), a antiga aba de som e sua ponte de runtime
-  foram removidas de propósito; não as recrie no Mecanifica sem uma nova decisão
-  de produto.
-- Mantenha o núcleo de autoria independente de Three.js e do domínio automotivo.
-- Nunca persista UUIDs do Three.js, índices de arrays ou posições de passos como
-  identidade.
-- Toda parte relevante recebe identidade semântica estável.
-- Conteúdo salvo deve ser determinístico, versionado, reexecutável e validável.
-- Modele e revise peças na bancada neutra antes de levá-las à experiência do
-  cliente.
-- Mudanças gerais que possam voltar ao NÓS devem permanecer isoladas e ser
-  registradas em `docs/mecanifica/UPSTREAM-NOS.md`.
+- Permanecem o núcleo procedural, as receitas, o visor compatível, a bancada e
+  as ferramentas de validação.
+- `bancada.html` é a única aplicação publicada deste repositório.
+- A aplicação jogável, a Oficina humana e o som foram removidos.
+- O produto do cliente vive em `warbookbr/mecanica`.
+- O núcleo não importa Three.js nem conhece o domínio automotivo.
+- Identidade salva é semântica. UUIDs, índices de arrays e posições de passos
+  não são identidade.
 
-## Qualidade e documentação
+## Qualidade
 
-- Use pt-BR para documentação e nomes de domínio.
-- Rode testes proporcionais ao risco; para a verificação completa, use os
-  comandos indicados em `docs/mecanifica/INDEX.md`.
-- Confira trabalho visual no navegador em mais de um enquadramento.
-- Atualize o índice de planos quando um plano for ativado ou encerrado e o índice
-  geral quando mudar a porta de entrada, a estrutura principal ou o plano ativo.
-- Não edite `docs/uso/MAPA.md` à mão; regenere com `npm run mapa`.
+- Use pt-BR em documentação e nomes de domínio.
+- Rode os gates de `docs/mecanifica/INDEX.md`.
+- Confira peças na bancada em mais de um enquadramento.
+- Não edite `docs/uso/MAPA.md` à mão; use `npm run mapa`.
+- Não altere comportamento, geometria, materiais ou câmera sem escopo explícito.

@@ -14,7 +14,6 @@ Regra transversal: **todo julgamento de peça cita ≥1 número destes**, não
 ## O gate (rode os dois; ambos offline/rápidos)
 
 ```bash
-node tools/bancadas/auditar.mjs <peca>     # críticos [cpu] em Node puro (ms) — geometria + texturas
 npm run porteiro -- <peca>                 # gate de RENDER (Playwright): pageerror / __ready / frame degenerado
 ```
 
@@ -23,7 +22,7 @@ não commite antes de resolver ou justificar.
 
 ## O que cada crítico pega (e o PISO — onde NÃO confiar)
 
-Medido pelo benchmark (`npm run bench`): 3 peças reais × defeitos plantados.
+Os críticos históricos foram removidos; a suíte atual (`npm test`) cobre o núcleo.
 Todos gateiam o defeito REAL com **F1=1.00 no núcleo e zero falso-alarme na
 arte de verdade**. Mas cada um tem um piso honesto:
 
@@ -76,7 +75,7 @@ Julgamento de FORMA (não de malha/paleta, que têm número objetivo):
 Rode o benchmark e confirme que nada regrediu:
 
 ```bash
-npm run bench            # placar núcleo/adversarial + limites por ferramenta
+    npm test                 # suíte atual do núcleo e das ferramentas
 ```
 
 Ao ADICIONAR um crítico novo: um arquivo em `tools/bancadas/bench/tools/` que

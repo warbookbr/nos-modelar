@@ -48,7 +48,7 @@ opaco ou chamar uma superfície pintada de abertura.
 ## Entregáveis do subagente
 
 - `prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js`;
-- `docs/mecanifica/RELATO-RODA-REALISTA.md`, com tentativas, contornos e
+- `docs/mecanifica/historico/RELATO-RODA-REALISTA.md`, com tentativas, contornos e
   capacidades ausentes;
 - prova `npm run descrever -- roda-dianteira-realista-experimento`;
 - vistas direita, frontal e isométrica na bancada;
