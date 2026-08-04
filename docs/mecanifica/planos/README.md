@@ -53,3 +53,6 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 Os únicos candidatos abertos estão em [`BACKLOG.md`](BACKLOG.md). Para abrir um
 plano, copie [`MODELO.md`](MODELO.md), preencha as provas e atualize esta tabela.
+
+Rascunho: [MCP para agentes](2026-08-04-mcp-para-agentes.md).
+Referência curada: `docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md`.
