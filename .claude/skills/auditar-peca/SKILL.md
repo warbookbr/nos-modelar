@@ -1,85 +1,77 @@
 ---
 name: auditar-peca
-description: Gate de senso crítico [cpu] pra peças do motor v3 (prototipos/fps/v3/pecas/*.js). Roda os críticos validados por benchmark (geometria, paleta, costura, banding, órfãos) + o gate de render, dando NÚMEROS objetivos no lugar de "achei que ficou bom". Use ANTES de commitar/publicar qualquer peça v3 nova ou alterada (árvore, ilha, casa, textura, malha), ou quando suspeitar de defeito que não salta no screenshot.
+description: Verificar uma peça da Mecanifica pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
 ---
 
-# Auditar peça — senso crítico com número, não opinião
+# Verificar peça
 
-A tese (D-56/D-60): eu erro mais justo quando julgo o que **acabei de criar**.
-A cura não é olhar com mais atenção — é **sinal externo objetivo**. Estas
-ferramentas movem o julgamento pra fora de mim, onde não dá pra me enganar.
-Regra transversal: **todo julgamento de peça cita ≥1 número destes**, não
-"ficou bom" e sim "malha limpa, paleta ok, sem costura".
+Use esta skill para obter evidência objetiva antes de publicar ou homologar uma
+peça. O fluxo atual é semântico e visual; não depende do jogo antigo nem de uma
+paleta fixa.
 
-## O gate (rode os dois; ambos offline/rápidos)
+## Fluxo oficial
 
-```bash
-npm run porteiro -- <peca>                 # gate de RENDER (Playwright): pageerror / __ready / frame degenerado
-```
+1. Gere a descrição estrita da peça:
 
-`auditar` sem argumento roda em TODAS as peças (não-`_`). Exit≠0 = achado →
-não commite antes de resolver ou justificar.
+   ```bash
+   npm run descrever -- <peca> --estrito
+   ```
 
-## O que cada crítico pega (e o PISO — onde NÃO confiar)
+   Confira contagens, órfãos, partes, portas, materiais e o envelope.
 
-Os críticos históricos foram removidos; a suíte atual (`npm test`) cobre o núcleo.
-Todos gateiam o defeito REAL com **F1=1.00 no núcleo e zero falso-alarme na
-arte de verdade**. Mas cada um tem um piso honesto:
+2. Abra a bancada neutra e leia as quatro vistas canônicas:
 
-| crítico | pega (núcleo) | PISO — o que passa |
-|---|---|---|
-| **lint-de-malha** | tri degenerado, vértice NaN/Inf/gigante, normal zero/não-unit, stride/contagem, lote vazio | nada medido — geometria é exata |
-| **distancia-paleta** | cor fora da paleta (CIEDE2000) + desvio multi-tom; allowlist da madeira D-54f | desvio SUTIL de 1 tom só; e faixa chapada off-palette é do banding (fronteira compartilhada) |
-| **detector-de-seam** | costura forte (borda chapada + salto vs interior) sem acusar textura que só não ladrilha | costura SUTIL (borda ainda texturada) passa |
-| **detector-de-banding** | faixa chapada interior + chuvisco RGB forte | ruído MODERADO (abaixo do chuvisco) passa |
-| **contador-de-pixels-orfaos** | pixel 1px isolado de cor rara e alto contraste | pode alarmar sob ruído pesado; pontilhismo intencional denso de cores únicas daria FP |
+   ```bash
+   npm run bancada -- <peca> --vistas=isometrica,frontal,direita,superior
+   ```
 
-**Tradução:** os críticos são gate de defeito REAL/óbvio (o que de fato
-acontece — foi um `[cpu]` que pegou o bug do `hash2`, D-58). Não são olho
-artístico nem pegam o sutil no limite; "bonito" continua sendo do ideador.
+   Leia as imagens produzidas. Verifique enquadramento, escala, cortes,
+   legibilidade das partes e coerência da forma. Não conclua apenas pela
+   existência de um PNG.
 
-## Visão de GEOMETRIA — pra julgar FORMA (D-65)
+3. Para um pacote de modelagem, rode a revisão oficial:
 
-Os críticos [cpu] pegam malha/paleta com número. Mas **forma** — costura,
-faceta, junção seca, silhueta — SOME sob a textura em 640px. Eu já concluí
-"ficou bom" olhando casca de baixa-res e **errei, repetido** (o ideador via o
-defeito, eu não). Mesma tese: sinal externo. Aqui o sinal é **tirar a textura
-e subir a resolução** — a bancada faz:
+   ```bash
+   npm run revisar:modelagem -- <pacote> --revisao=r001
+   ```
 
-```bash
-npm run peca -- <peca> --res=1400 --geo=normais    # normais em cor: EMENDA/FACETA saltam
-npm run peca -- <peca> --res=1400 --geo=flat       # cinza + luz: SILHUETA/volume (sem textura)
-npm run peca -- <peca> --res=1400 --giro=8         # 8 ângulos (defeito que só aparece de um lado)
-npm run peca -- <peca> --res=1600 --e=<h> --r=<d>  # CLOSE colado na junção
-```
+   A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-- **normais**: cada normal vira cor. Duas superfícies que se encontram mal (ex.
-  loft liso 24-lados × tubo 6-lados) dão um **salto de cor** na junção = a
-  costura que a textura escondia. Faceta grosseira = blocos de cor.
-- **flat**: cinza chapado + luz, sem textura — pra silhueta e volume (o pé
-  abre? o garfo lê natural? a junção é seca?).
+4. Rode os gates aplicáveis:
 
-## Regra de COMPORTAMENTO — forma é do ideador, e eu NÃO concluo
+   ```bash
+   npm test
+   npm run typecheck
+   npm run build
+   npm run porteiro
+   npm run gabarito:selecao:check
+   npm run id-cru:check
+   npm run guarda:portas
+   npm run guarda:camera
+   npm run guarda:par
+   npm run mapa:check
+   npm run docs:toc:check
+   npm run docs:links:check
+   npm run planos:check
+   npm run exportar:check
+   ```
 
-Julgamento de FORMA (não de malha/paleta, que têm número objetivo):
-1. **Nunca** dizer sozinho "ficou bom / tá no ponto / fechamos / resolvido".
-   Isso é me enganar — o histórico prova que erro pra otimista no que **acabei
-   de criar**. Concluir é do ideador.
-2. Antes de mostrar, rodar a **visão de geometria** (`--geo`) e **apontar os
-   defeitos que EU vejo** ("a junção loft→galho salta", "faceta no garfo",
-   "base do galho torcida") — não vender sucesso.
-3. Eu entrego + listo o que **ainda está ruim**; o ideador decide o "bonito".
+   `porteiro` e `npm run peca` ainda podem ajudar a diagnosticar o visor v3,
+   mas são compatibilidade legada, não o gate visual oficial da Mecanifica.
 
-## Se mexeu no MOTOR ou nas mutações
+## O que não é requisito
 
-Rode o benchmark e confirme que nada regrediu:
+- A paleta não é gate atual: Resurrect64, `distancia-paleta`, seam, banding,
+  contador de pixels órfãos e benchmark não fazem parte dos gates atuais.
+- A bancada Three não exige `meta.colisao`, `colisaoDe` nem que toda face seja
+  `solido`. Esses recursos permanecem disponíveis apenas para compatibilidade
+  com peças e ferramentas v3; use-os quando o formato legado exigir.
+- Não trate câmera, material, geometria ou identidade semântica como defeito
+  sem evidência correspondente no fluxo atual.
 
-```bash
-    npm test                 # suíte atual do núcleo e das ferramentas
-```
+## Relato
 
-Ao ADICIONAR um crítico novo: um arquivo em `tools/bancadas/bench/tools/` que
-exporta `id`, `dom` e `analisar(built, {pixels}) -> findings[]`. O runner o
-descobre sozinho e o pontua. Sem defeito plantado do seu domínio em
-`bench/mutacoes.mjs`, ele não tem como provar que ajuda — adicione a mutação
-junto.
+Registre comandos, medidas, vistas lidas, falhas e decisões. Diferencie um gate
+reprodutível de uma observação visual. Se o briefing exigir algo que as vistas
+não conseguem mostrar, registre a divergência honestamente em vez de alterar a
+peça ou simular a capacidade.

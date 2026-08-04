@@ -30,6 +30,8 @@ import { nucleo, OPERACOES_COM_ORIGEM } from '../../prototipos/fps/v3/motor/ofic
 
 const SKILL = join(import.meta.dirname, '../../.claude/skills/criar-peca/SKILL.md');
 const texto = readFileSync(SKILL, 'utf8');
+const AUDITORIA = readFileSync(join(import.meta.dirname, '../../.claude/skills/auditar-peca/SKILL.md'), 'utf8');
+const PACKAGE = JSON.parse(readFileSync(join(import.meta.dirname, '../../package.json'), 'utf8')) as { scripts: Record<string, string> };
 
 /* ---------------------------------------------------------------------------
    Bloco 1 — quem aceita `sel`, medido op por op.
@@ -113,6 +115,29 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
   });
 });
 
+describe('skills ativas x fluxo Mecanifica', () => {
+  it('não transforma paleta em requisito', () => {
+    expect(AUDITORIA).toMatch(/paleta não é gate atual/i);
+    expect(AUDITORIA).not.toMatch(/Resurrect64.*(?:obrigat|exig|gate)/i);
+    expect(AUDITORIA).not.toMatch(/distancia-paleta.*(?:rode|gate|obrigat|exig)/i);
+  });
+
+  it('não exige colisão legada em toda peça', () => {
+    expect(texto).toMatch(/meta\.colisao[\s\S]{0,180}compatibilidade opcionais/i);
+    expect(texto).not.toMatch(/meta\.colisao.*(?:obrigat|exig|deve exportar)/i);
+    expect(AUDITORIA).toMatch(/não exige `meta\.colisao`, `colisaoDe`/i);
+  });
+
+  it('não cita comandos removidos como parte do fluxo', () => {
+    for (const skill of [SKILL, join(import.meta.dirname, '../../.claude/skills/auditar-peca/SKILL.md')]) {
+      const conteudo = readFileSync(skill, 'utf8');
+      expect(conteudo).not.toMatch(/npm run (auditar|bench)\b/);
+    }
+    expect(PACKAGE.scripts.auditar).toBeUndefined();
+    expect(PACKAGE.scripts.bench).toBeUndefined();
+  });
+});
+
 describe('SKILL criar-peca x núcleo — operações que publicam origem', () => {
   const marca = /<!-- operacoes-com-origem: ([^>]+) -->/;
 
@@ -132,7 +157,7 @@ describe('SKILL criar-peca x núcleo — operações que publicam origem', () =>
   it('declara a bancada como laço visual oficial e rebaixa o render herdado a diagnóstico', () => {
     expect(texto).toMatch(/laço oficial/i);
     expect(texto).toMatch(/npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior/);
-    expect(texto).toMatch(/`npm run peca` permanece uma\s+ferramenta herdada/i);
+    expect(texto).toMatch(/`npm run peca` e `porteiro` permanecem[\s\S]{0,100}diagnóstico/i);
   });
 });
 

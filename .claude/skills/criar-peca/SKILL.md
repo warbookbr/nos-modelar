@@ -8,19 +8,19 @@ description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, esc
 Você **escreve a peça direto** no formato procedural e **vê/mede** na bancada
 neutra. A Oficina humana herdada não existe neste repositório. O laço oficial é: escrever →
 `npm run descrever` → `npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior`
-→ ler as quatro vistas → crítica → iterar. `npm run peca` permanece uma
-ferramenta herdada para diagnóstico de render, mas não é o laço visual principal
-da IA: pode enquadrar o objeto pequeno e não mostra o estado semântico da bancada.
-Peça de objeto mora em
-`prototipos/fps/v3/pecas/`. Prefixo `_` = exemplo/fixture
-(o `auditar` sem argumento pula os `_`).
+→ ler as quatro vistas → crítica → iterar. `npm run peca` e `porteiro` permanecem
+ferramentas herdadas para diagnóstico do visor v3, não gates visuais oficiais.
+Peça de objeto mora em `prototipos/fps/v3/pecas/`. Prefixo `_` = exemplo/fixture.
 
 ## Objeto 3D — o formato (comece por `pecas/_tampa-de-caixa.js`)
 
 `PARAMS` (dimensionais — citados por NOME nos passos, em geral não renumeram) +
 `TOPO` (topológicos — mudar RECONSTRÓI e pode deixar passo órfão) + `PASSOS`
-(a lista `[['op',{...}],...]`) + `meta` com `colisao: colisaoDe(PASSOS, PARAMS,
-TOPO)` (CHAMADA, não valor) + `construir = executar(...)`. **`PASSOS` exportado**,
+(a lista `[['op',{...}],...]`) + `construir = executar(...)`. `meta.colisao`
+e a marcação `solido` são compatibilidade opcionais para consumidores v3; a
+bancada Three e a revisão Mecanifica não as exigem. Quando uma peça precisar
+atender esse consumidor legado, use `colisaoDe(PASSOS, PARAMS, TOPO, ...)` como
+chamada, não como valor. **`PASSOS` exportado**,
 para que as ferramentas consigam inspecionar a definição. Peça que usa `sel:{alias:...}`
 exporta também `ALIASES` **e o ENCAMINHA nas duas chamadas** — `colisaoDe(PASSOS,
 PARAMS, TOPO, MATERIAIS, ALIASES)` e `executar(PASSOS, PARAMS, TOPO, ctx,
@@ -357,11 +357,11 @@ chamferBox+displace: `_pedra.js`.
 
 ## O laço de VER (você tem olhos — use-os)
 
-**A bancada é a prova visual oficial da IA.** Depois de conferir números com
-`npm run descrever -- minha-peca --estrito`, rode:
+**A bancada Three é a prova visual oficial da IA.** Depois de conferir números
+com `npm run descrever -- minha-peca --estrito`, rode:
 
 ```bash
-npm run revisar -- minha-peca
+npm run bancada -- minha-peca --vistas=isometrica,frontal,direita,superior
 ```
 
 Ele abre a bancada neutra em isométrica, frontal, direita e superior, salva as
@@ -370,13 +370,10 @@ demais para uma crítica visual. Leia os PNGs; o gate confirma enquadramento,
 não decide se a forma atende à referência. Para encaixes, some
 `--selecionadas=parteA,parteB --modo=isolar --focar` ao `npm run bancada`.
 
-**`npm run criar -- minha-peca`** é o COMANDO PADRÃO (P7, D-120) — um laço
-único: estado do núcleo + manifesto de capacidades (cruzado contra a tabela
-acima — avisa se ela ficou pra trás) + `auditar` + `porteiro` + `gabarito`
-(se houver referência) + VEREDITO AGREGADO, com os renders (3 ângulos + 3
-`geo=normais`) salvos em `tools/bancadas/out/criar-*` pra você LER. Prefira
-ele a rodar os comandos abaixo em separado — existe justamente pra nenhum
-gate ficar de fora por esquecimento.
+`npm run criar -- minha-peca` continua útil para estado do núcleo, manifesto,
+renderização e gabarito. `porteiro` e os renders do visor v3 que ele produz são
+diagnósticos de compatibilidade; não substituem a leitura das quatro vistas da
+bancada nem a revisão oficial do pacote.
 
 **Ressalva medida, peça com `ALIASES`:** hoje o `criar` chama o núcleo SEM
 encaminhar `ALIASES` (`tools/bancadas/criar.mjs`), então a seção "estado
@@ -390,16 +387,16 @@ Comandos individuais (para investigar um achado específico do `criar`, ou uma
 falha do laço oficial):
 
 ```bash
-npm run peca -- minha-peca --giro=8             # diagnóstico herdado: 8 ângulos
+npm run peca -- minha-peca --giro=8             # diagnóstico legado: 8 ângulos
 npm run peca -- minha-peca --res=1400 --geo=normais   # diagnóstico herdado: emenda/faceta
 npm run peca -- minha-peca --res=1400 --geo=flat      # diagnóstico herdado: silhueta/volume
-npm run criar -- minha-peca                                      # fluxo atual: núcleo, porteiro e gabarito
+npm run criar -- minha-peca                                      # núcleo, render legado e gabarito
 npm run executar                                # replay/determinismo do núcleo
 npm run gabarito -- minha-peca                  # o mesmo IoU do criar, isolado — mais ângulos que o CONTORNOS cobrir
 ```
 
 **LEIA os PNGs de verdade** (Read no arquivo, incluindo a sobreposição do
-`gabarito`). Regra de comportamento (skill `auditar-peca`): todo julgamento
+`gabarito`). Todo julgamento
 cita ≥1 número/gate; FORMA é do ideador — você aponta os defeitos que vê,
 entrega, e NUNCA conclui sozinho "ficou bom". O `gabarito` FORÇA o número (IoU
 calibrado) mas ainda depende de um `CONTORNOS` desenhado à mão em

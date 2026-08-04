@@ -23,7 +23,7 @@
 
 ## .claude/skills/auditar-peca/
 
-- `SKILL.md` — Gate de senso crítico [cpu] pra peças do motor v3 (prototipos/fps/v3/pecas/*.js). Roda os críticos validados por benchmark (geometria, paleta, costura, bandi…
+- `SKILL.md` — Verificar uma peça da Mecanifica pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
 
 ## .claude/skills/criar-peca/
 
