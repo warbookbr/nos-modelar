@@ -2,7 +2,7 @@
 
 Este arquivo coordena a evolução do MCP da Mecanifica. Ele é um painel de
 programa, não um plano executivo e não autoriza implementar todas as etapas.
-Somente o plano datado marcado como `ativo` em
+Somente um plano datado marcado como `ativo` em
 `docs/mecanifica/planos/README.md` abre trabalho.
 
 ## Visão macro do programa
@@ -31,7 +31,7 @@ não autoriza implementação até existir um plano executivo ativo.
 | Fatia 1A — piloto local somente leitura | concluído | preparação | piloto aprovado e encerramento em `docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md` |
 | Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 chamadas de ferramentas, zero fallback e encerramento no plano datado |
 | Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes/revisões na issue #18 |
-| Correção de descoberta de pacotes e revisões | ativo | avaliação consolidada | plano em `docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md`; recurso `mecanifica://pacotes` e prova MCP real |
+| Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; prova R07 com validação e comparação caixa-preta, sem fallback ou escrita |
 | Autoria controlada | candidato | Módulo 1 aprovado | escrita confinada, atômica, com dry-run e sem sobrescrita |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos clientes |
@@ -54,14 +54,18 @@ não autoriza implementação até existir um plano executivo ativo.
 `cancelado`. Planos executivos datados usam os estados aceitos por
 `npm run planos:check`.
 
-## Decisão em curso
+## Decisão atual
 
-A avaliação consolidada encerrou com decisão `corrigir`. O achado `AVAL-01`
-mostrou que um consumidor novo consegue descrever e renderizar peças, mas não
-consegue descobrir os ids oficiais exigidos por `validar_pacote` nem as revisões
-necessárias para `comparar_revisoes`.
+O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A
+[avaliação consolidada](../2026-08-05-mcp-avaliacao-consolidada.md) identificou
+`AVAL-01`, e o [plano corretivo](../2026-08-05-mcp-correcao-descoberta.md)
+adicionou o recurso `mecanifica://pacotes`, preservou as quatro ferramentas e
+seus schemas e passou pela prova caixa-preta pós-merge na rodada R07: um
+consumidor novo descobriu `homologacao-mancal` e `r001`/`r002`, executou
+`validar_pacote` e `comparar_revisoes` com sucesso e não usou fallback, leitura
+direta ou escrita.
 
-A etapa ativa adiciona somente o recurso `mecanifica://pacotes`, com catálogo
-mínimo e determinístico de ids e revisões. As quatro ferramentas permanecem
-inalteradas. Autoria, materiais e distribuição continuam bloqueados até a prova
-caixa-preta dessa correção e o encerramento explícito do Módulo 1.
+Não há plano executivo ativo. Autoria controlada, materiais e distribuição
+continuam apenas como candidatos. A dependência técnica do Módulo 1 foi
+satisfeita, mas qualquer próxima etapa exige decisão explícita, plano datado e
+nova reserva de escopo.

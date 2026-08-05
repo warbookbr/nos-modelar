@@ -1,16 +1,19 @@
 # MCP — correção de descoberta de pacotes e revisões
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (coordenação e revisão) e Claude/brigsd (implementação e prova)
 
-**Repositório e base:** `warbookbr/nos-mecanifica`, `ddfe96de77958d75b390e03be78acd7cdad3716b`
+**Repositório e base:** `warbookbr/nos-mecanifica`, base inicial
+`ddfe96de77958d75b390e03be78acd7cdad3716b`; correção mesclada em
+`725bd33caef79eadbee9f27703431a9abac1f86e`
 
 **Programa:** `docs/mecanifica/planos/mcp/INDEX.md`
 
 **Canal de evidências:** [issue #18](https://github.com/warbookbr/nos-mecanifica/issues/18)
 
-**Achado de origem:** `AVAL-01`, diagnosticado na rodada R02.
+**Achado de origem:** `AVAL-01`, diagnosticado na rodada R02 e resolvido na
+rodada R07.
 
 **Arquivos reservados:** este plano,
 `docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md`,
@@ -23,10 +26,10 @@
 ## Problema observado
 
 As ferramentas `validar_pacote` e `comparar_revisoes` exigem um `id` de pacote;
-a segunda também exige duas revisões. Os schemas informam apenas o formato dos
-valores, e os dois recursos atuais não publicam quais pacotes e revisões existem.
-Como o namespace de pacote não deriva do nome da peça, um consumidor novo só
-consegue prosseguir por adivinhação ou leitura direta do repositório.
+a segunda também exige duas revisões. Os schemas informavam apenas o formato dos
+valores, e os dois recursos anteriores não publicavam quais pacotes e revisões
+existiam. Como o namespace de pacote não deriva do nome da peça, um consumidor
+novo só conseguia prosseguir por adivinhação ou leitura direta do repositório.
 
 ## Resultado
 
@@ -76,11 +79,11 @@ Regras:
 
 ## Implementação incluída
 
-- extrair ou criar uma função reutilizável para listar o catálogo oficial sem
-  duplicar regras de confinamento e rotas;
+- extrair uma função reutilizável para listar o catálogo oficial sem duplicar
+  regras de confinamento e rotas;
 - registrar `mecanifica://pacotes` no servidor;
 - atualizar a capacidade publicada para indicar descoberta de pacotes/revisões;
-- testar ordenação, filtragem, confinamento e conteúdo mínimo;
+- testar ordenação, filtragem, contrato canônico, symlinks e confinamento;
 - provar por cliente MCP real o fluxo recurso → `validar_pacote` →
   `comparar_revisoes`;
 - atualizar documentação e mapa gerado estritamente quando exigido pelos gates.
@@ -99,8 +102,7 @@ Regras:
 
 - o recurso é somente leitura e não cria, modifica ou normaliza arquivos;
 - nenhuma descoberta depende de nomes conhecidos codificados no servidor;
-- a lista é derivada da raiz oficial em cada leitura ou por mecanismo igualmente
-  consistente com mudanças no disco;
+- a lista é derivada da raiz oficial em cada leitura;
 - resultados são determinísticos para o mesmo estado do repositório;
 - erros internos não revelam caminhos absolutos;
 - clientes que ignoram o novo recurso continuam funcionando;
@@ -112,8 +114,8 @@ Regras:
    `mecanifica://pacotes`;
 2. a leitura retorna `formato`, `versao` e `pacotes` no contrato aprovado;
 3. pacotes e revisões aparecem em ordem determinística;
-4. fixtures inválidas, caminhos escapando da raiz e revisões sem JSON oficial não
-   aparecem no catálogo;
+4. fixtures inválidas, symlinks, caminhos escapando da raiz e revisões sem JSON
+   oficial não aparecem no catálogo;
 5. um teste MCP real descobre um pacote pelo recurso e executa
    `validar_pacote` sem adivinhar;
 6. o mesmo teste descobre duas revisões do mesmo pacote e executa
@@ -135,7 +137,24 @@ achado e decisão separados.
 
 ## Fechamento
 
-Depois do merge e da prova caixa-preta, registrar decisão explícita de `aprovar`,
-`corrigir` ou `interromper`. Atualizar este plano, README e painel. Somente uma
-decisão positiva sobre o Módulo 1 pode permitir discutir a etapa seguinte; ela
-não fica autorizada por implicação.
+**Decisão:** `aprovar`.
+
+Evidências finais:
+
+- PR #21 revisado após três correções e mesclado em
+  `725bd33caef79eadbee9f27703431a9abac1f86e`;
+- CI #90 integralmente verde;
+- prova caixa-preta pós-merge registrada na rodada R07, a partir do mesmo commit;
+- `resources/list` anunciou exatamente `mecanifica://estado`,
+  `mecanifica://capacidades/modelagem` e `mecanifica://pacotes`;
+- o catálogo publicou o contrato `mecanifica.catalogo-pacotes` versão 1;
+- o consumidor descobriu `homologacao-mancal` e as revisões `r001`/`r002`
+  somente pelo MCP;
+- `validar_pacote` e `comparar_revisoes` concluíram com `ok:true`;
+- as quatro ferramentas e seus schemas permaneceram inalterados;
+- não houve fallback, tentativa combinatória, leitura direta dos dados ou
+  escrita observada.
+
+`AVAL-01` está resolvido. O Módulo 1 — modelagem e revisão somente leitura — fica
+aprovado no escopo entregue. Autoria, materiais e distribuição continuam sem
+plano ativo e não são autorizados por este encerramento.

@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [MCP — correção de descoberta de pacotes e revisões](2026-08-05-mcp-correcao-descoberta.md)
+**Plano ativo:** nenhum.
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,
@@ -12,15 +12,17 @@ critério de saída e encerramento registrado.
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | correção de descoberta de pacotes e revisões |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | Módulo 1 concluído e aprovado; nenhuma etapa ativa |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
 [`mcp/concluidos/01-fatia-1a-piloto-leitura.md`](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 a Fatia 1B visual foi encerrada em
-[`2026-08-05-mcp-fatia-1b-visual.md`](2026-08-05-mcp-fatia-1b-visual.md), e a
+[`2026-08-05-mcp-fatia-1b-visual.md`](2026-08-05-mcp-fatia-1b-visual.md), a
 avaliação consolidada foi concluída com decisão `corrigir` em
-[`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md).
+[`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md)
+e a correção de descoberta foi concluída com decisão `aprovar` em
+[`2026-08-05-mcp-correcao-descoberta.md`](2026-08-05-mcp-correcao-descoberta.md).
 
 ## Contrato de plano
 
@@ -53,6 +55,7 @@ nos arquivos originais.
 | MCP — Fatia 1A somente leitura | concluído |
 | MCP — Fatia 1B visual somente leitura | concluído |
 | MCP — avaliação consolidada por agente consumidor | concluído: corrigir |
+| MCP — correção de descoberta de pacotes e revisões | concluído: aprovar |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -66,15 +69,17 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [inspeção](concluidos/2026-08-03-inspecao-reproduzivel-de-par.md), [seleção](concluidos/2026-08-03-selecao-subarvore-semantica.md),
 [encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md),
 [MCP Fatia 1A](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
-[MCP Fatia 1B](2026-08-05-mcp-fatia-1b-visual.md) e
-[MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md).
+[MCP Fatia 1B](2026-08-05-mcp-fatia-1b-visual.md),
+[MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md) e
+[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md).
 
 ## Abertura
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
-do MCP permanecem somente no painel `mcp/INDEX.md` até que a etapa anterior
-produza evidência suficiente. Para abrir um plano executivo, copie
-[`MODELO.md`](MODELO.md), preencha as provas e atualize este índice.
+do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
+e um novo plano executivo ativo. A aprovação do Módulo 1 satisfaz a dependência
+técnica das etapas seguintes, mas não autoriza autoria, materiais ou distribuição
+por implicação. Para abrir um plano executivo, copie [`MODELO.md`](MODELO.md),
+preencha as provas e atualize este índice.
 
-Referência curada do plano ativo:
-`docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md`.
+Referência curada atual: nenhum plano executivo ativo.
