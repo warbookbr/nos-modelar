@@ -32,8 +32,8 @@ não autoriza implementação até existir um plano executivo ativo.
 | Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 chamadas de ferramentas, zero fallback e encerramento no plano datado |
 | Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes/revisões na issue #18 |
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; prova R07 com validação e comparação caixa-preta, sem fallback ou escrita |
-| Autoria controlada | candidato | Módulo 1 aprovado | escrita confinada, atômica, com dry-run e sem sobrescrita |
-| Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
+| Autoria controlada | ativo | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); perfil separado com planejamento e criação atômica de pacote em duas fases |
+| Contrato e ferramentas de materiais | candidato | contrato canônico prévio e autoria controlada aprovada | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos clientes |
 
 ## Regras do programa
@@ -56,16 +56,17 @@ não autoriza implementação até existir um plano executivo ativo.
 
 ## Decisão atual
 
-O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A
-[avaliação consolidada](../2026-08-05-mcp-avaliacao-consolidada.md) identificou
-`AVAL-01`, e o [plano corretivo](../2026-08-05-mcp-correcao-descoberta.md)
-adicionou o recurso `mecanifica://pacotes`, preservou as quatro ferramentas e
-seus schemas e passou pela prova caixa-preta pós-merge na rodada R07: um
-consumidor novo descobriu `homologacao-mancal` e `r001`/`r002`, executou
-`validar_pacote` e `comparar_revisoes` com sucesso e não usou fallback, leitura
-direta ou escrita.
+O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A primeira
+etapa autorizada do Módulo 2 é
+[autoria controlada de pacotes](../2026-08-05-mcp-autoria-controlada.md), com
+coordenação na issue #23.
 
-Não há plano executivo ativo. Autoria controlada, materiais e distribuição
-continuam apenas como candidatos. A dependência técnica do Módulo 1 foi
-satisfeita, mas qualquer próxima etapa exige decisão explícita, plano datado e
-nova reserva de escopo.
+A fatia ativa adiciona um perfil MCP separado, `autoria`, com exatamente duas
+ferramentas: uma planeja os bytes canônicos sem escrita e produz confirmação
+determinística; a outra recalcula o plano e cria um pacote novo por publicação
+atômica, sem sobrescrita. O perfil `revisao` e suas quatro ferramentas permanecem
+inalterados.
+
+Esta etapa não edita receitas JavaScript, não gera revisões, não cria contrato de
+materiais e não usa Git. Materiais e distribuição continuam candidatos e exigem
+planos próprios após o fechamento explícito desta fatia.
