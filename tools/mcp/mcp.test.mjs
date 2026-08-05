@@ -11,7 +11,7 @@ import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/desc
 import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
-import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
+import { listarCatalogoDePacotes, serializarCanonico } from '../modelagem/formato-pacote.mjs';
 import {
   comparar, conteudoRenderizacao, descrever, LIMITES_VISTAS, renderizar,
   resumoComparacao, resumoDescricao, resumoTotais, validar,
@@ -364,11 +364,37 @@ describe('servidor MCP local — perfil revisao', () => {
         rmSync(fora, { recursive: true, force: true });
       }
     }
+    /* Fixture mínima, mas realmente válida no contrato `mecanifica.pacote-
+       modelagem`/`mecanifica.referencias-modelagem` — as mesmas chaves e
+       formato de um pacote oficial real (ex.: homologacao-mancal), só que
+       reduzida a um item por lista onde o contrato permite. `guias` aponta
+       para um guia que de fato existe em `autoria-assistida/guias/`, porque
+       `validarPacote` confere isso contra a raiz real do repositório. */
+    function briefingValido(id) {
+      return {
+        alvo: { caminho: `prototipos/fps/v3/pecas/${id}.js`, modo: 'criacao', peca: id },
+        checklist: [{ criterio: 'critério mínimo de prova.', estado: 'aberto', id: 'unico', prioridade: 1 }],
+        formato: 'mecanifica.pacote-modelagem',
+        guias: ['forma/silhueta-e-transicoes'],
+        id,
+        objetivo: 'Fixture de teste mínima e válida para o catálogo de pacotes.',
+        partesEsperadas: ['parte'],
+        perfil: {
+          distanciaMinima: 0.1, fidelidade: 'F0', interacao: 'contexto',
+          orcamento: { faces: 10 }, origem: 'declarado', precisao: 'ilustrativa', visual: 'esquematico',
+        },
+        provas: ['prova'],
+        versao: 1,
+      };
+    }
+    function referenciasValidas() {
+      return { ausenciaDeclarada: true, formato: 'mecanifica.referencias-modelagem', referencias: [], versao: 1 };
+    }
     function pacoteValido(raizPacotes, id, revisoes = []) {
       const pasta = join(raizPacotes, id);
       mkdirSync(pasta, { recursive: true });
-      writeFileSync(join(pasta, 'briefing.json'), '{"ok":true}');
-      writeFileSync(join(pasta, 'referencias.json'), '{"ok":true}');
+      writeFileSync(join(pasta, 'briefing.json'), serializarCanonico(briefingValido(id)));
+      writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
       for (const revisao of revisoes) {
         const pastaRevisao = join(pasta, 'revisoes', revisao);
         mkdirSync(pastaRevisao, { recursive: true });
@@ -499,6 +525,39 @@ describe('servidor MCP local — perfil revisao', () => {
         symlinkSync(join(raiz, 'doador-de-briefing', 'briefing.json'), join(pasta, 'briefing.json'));
       });
       expect(catalogo).toEqual([{ id: 'doador-de-briefing', revisoes: [] }]);
+    });
+
+    it('ignora pacote com briefing.json sintaticamente válido mas que não satisfaz o contrato canônico', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'contrato-invalido');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), serializarCanonico({ ok: true }));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora pacote cujo briefing.id diverge do nome da pasta', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'pasta-com-id-divergente');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), serializarCanonico(briefingValido('outro-id')));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora pacote cujo briefing.json é válido mas não está serializado em bytes canônicos', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'nao-canonico');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), JSON.stringify(briefingValido('nao-canonico')));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
     });
 
     it('devolve lista vazia, sem lançar, quando a raiz de pacotes não existe', () => {

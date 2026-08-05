@@ -419,6 +419,39 @@ function jsonValidoOuNulo(arquivo) {
   try { return JSON.parse(readFileSync(arquivo, 'utf8')); } catch { return null; }
 }
 
+/* Um pacote só é oficial se satisfizer o mesmo contrato canônico que
+   `validar_pacote` exige: `briefing.json`/`referencias.json` com bytes
+   canônicos exatos (`conferirBytesCanonicos`), estrutura válida de
+   `mecanifica.pacote-modelagem`/`mecanifica.referencias-modelagem`
+   (`validarPacote`), e `briefing.id` igual ao nome da pasta. JSON
+   sintaticamente válido mas fora do contrato — ou com id divergente da pasta
+   — não é suficiente e não é publicado; caso contrário o catálogo poderia
+   anunciar um id que `validar_pacote` rejeitaria na hora. Fail-closed: só
+   `false` ou `true`, nunca lança. */
+function pacoteOficialValido(pastaPacoteReal, id) {
+  const briefingArquivo = arquivoRealConfinado(pastaPacoteReal, 'briefing.json');
+  if (briefingArquivo === null) return false;
+  const referenciasArquivo = arquivoRealConfinado(pastaPacoteReal, 'referencias.json');
+  if (referenciasArquivo === null) return false;
+  let briefingTexto;
+  let referenciasTexto;
+  let briefingValor;
+  let referenciasValor;
+  try {
+    briefingTexto = readFileSync(briefingArquivo, 'utf8');
+    referenciasTexto = readFileSync(referenciasArquivo, 'utf8');
+    briefingValor = JSON.parse(briefingTexto);
+    referenciasValor = JSON.parse(referenciasTexto);
+  } catch { return false; }
+  if (!objeto(briefingValor) || briefingValor.id !== id) return false;
+  try {
+    conferirBytesCanonicos(briefingTexto, briefingValor, 'briefing.json');
+    conferirBytesCanonicos(referenciasTexto, referenciasValor, 'referencias.json');
+    validarPacote(briefingValor, referenciasValor);
+  } catch { return false; }
+  return true;
+}
+
 function listarRevisoesValidas(pastaPacoteReal) {
   const pastaRevisoesReal = pastaRealConfinada(pastaPacoteReal, REVISOES);
   if (pastaRevisoesReal === null) return [];
@@ -439,14 +472,15 @@ function listarRevisoesValidas(pastaPacoteReal) {
 /**
  * Catálogo somente leitura de pacotes e revisões oficiais, derivado da raiz a
  * cada chamada. Ignora de forma fail-closed qualquer entrada que não seja um
- * slug confinado com `briefing.json`/`referencias.json` legíveis como JSON, e
- * qualquer revisão sem `revisao.json` legível na mesma rota que
+ * slug confinado com `briefing.json`/`referencias.json` que satisfaçam o
+ * mesmo contrato canônico que `validar_pacote` exige (`pacoteOficialValido`),
+ * e qualquer revisão sem `revisao.json` legível na mesma rota que
  * `comparar_revisoes` já consome. Cada pasta e cada arquivo (incluindo
  * `revisoes/` em si) é resolvido e confinado pelo caminho real antes de ser
  * lido, então um symlink em qualquer nível — a pasta do pacote, `revisoes/`,
- * uma pasta de revisão, ou qualquer dos três JSONs — que escape de
- * `RAIZ_PACOTES` é rejeitado, nunca seguido. Não expõe caminhos absolutos nem
- * conteúdo dos arquivos, só `id` e a lista ordenada de revisões.
+ * uma pasta de revisão, ou qualquer dos três JSONs — dentro ou fora de
+ * `RAIZ_PACOTES`, é rejeitado, nunca seguido. Não expõe caminhos absolutos
+ * nem conteúdo dos arquivos, só `id` e a lista ordenada de revisões.
  */
 export function listarCatalogoDePacotes({ raizPacotes = RAIZ_PACOTES } = {}) {
   let raizReal;
@@ -460,10 +494,7 @@ export function listarCatalogoDePacotes({ raizPacotes = RAIZ_PACOTES } = {}) {
     if (!SLUG.test(entrada.name)) continue;
     const pastaPacoteReal = pastaRealConfinada(raizReal, entrada.name);
     if (pastaPacoteReal === null) continue;
-    const briefing = arquivoRealConfinado(pastaPacoteReal, 'briefing.json');
-    if (briefing === null || jsonValidoOuNulo(briefing) === null) continue;
-    const referencias = arquivoRealConfinado(pastaPacoteReal, 'referencias.json');
-    if (referencias === null || jsonValidoOuNulo(referencias) === null) continue;
+    if (!pacoteOficialValido(pastaPacoteReal, entrada.name)) continue;
     pacotes.push({ id: entrada.name, revisoes: listarRevisoesValidas(pastaPacoteReal) });
   }
   return pacotes.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
