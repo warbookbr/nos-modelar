@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-249 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+250 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -123,6 +123,7 @@
 ## docs/mecanifica/planos/
 
 - `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
+- `2026-08-05-mcp-avaliacao-consolidada.md` — MCP — avaliação consolidada por agente consumidor
 - `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
