@@ -29,8 +29,8 @@ não autoriza implementação até existir um plano executivo ativo.
 |---|---|---|---|
 | Preparação do núcleo e das CLIs | concluído | — | serviços importáveis, resultados estruturados e paridade das CLIs |
 | Fatia 1A — piloto local somente leitura | concluído | preparação | piloto aprovado e encerramento em `docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md` |
-| Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 tools, zero fallback e encerramento no plano datado |
-| Avaliação consolidada do piloto visual | candidato | Fatia 1B | métricas comparativas e decisão de continuar, redesenhar ou parar |
+| Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 chamadas de ferramentas, zero fallback e encerramento no plano datado |
+| Avaliação consolidada do piloto visual | ativo | Fatia 1B | plano em `docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md` e evidências na issue #18 |
 | Autoria controlada | candidato | avaliação positiva | escrita confinada, atômica, com dry-run e sem sobrescrita |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos clientes |
@@ -53,10 +53,13 @@ não autoriza implementação até existir um plano executivo ativo.
 `cancelado`. Planos executivos datados usam os estados aceitos por
 `npm run planos:check`.
 
-## Próxima decisão
+## Decisão em curso
 
-A Fatia 1B foi aprovada: uma única ferramenta transportou as quatro vistas
-oficiais, sem escrita, fallback ou resíduo de Playwright/Vite. O programa agora
-não tem plano ativo. A próxima decisão é abrir ou não uma avaliação consolidada
-do piloto visual; autoria, materiais e distribuição continuam bloqueados até
-essa decisão separada.
+A avaliação consolidada está ativa e usa um agente consumidor em modo
+caixa-preta para provar descoberta, revisão de duas peças e comparação de
+revisões sem leitura direta, CLI paralela, fallback ou escrita. O resultado deve
+ser uma decisão explícita de aprovar, corrigir ou interromper o Módulo 1.
+
+Autoria, materiais e distribuição continuam bloqueados até o encerramento desse
+plano. Achados que exigirem mudança de código recebem decisão e plano separados;
+a avaliação não se expande implicitamente para implementação.
