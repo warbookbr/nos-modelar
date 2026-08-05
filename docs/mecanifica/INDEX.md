@@ -9,8 +9,8 @@ aqui; o produto do cliente vive em [warbookbr/mecanica](https://github.com/warbo
 ## Estado atual
 
 - Casos 1 e 2 da homologação estão concluídos; Caso 3 não foi iniciado.
-- A Fatia 1A do MCP foi aprovada e encerrada.
-- O único plano ativo é a Fatia 1B visual somente leitura.
+- As Fatias 1A e 1B do MCP foram aprovadas e encerradas.
+- Não há plano executivo ativo.
 - A ponte `adaptarThree` e a bancada publicada existem e são usadas pelos gates.
 - A hierarquia semântica mínima e a consulta de subárvore existem na bancada.
 - O import bare `earcut` falha no servidor estático local do visor/porteiro; isso
@@ -37,7 +37,7 @@ aqui; o produto do cliente vive em [warbookbr/mecanica](https://github.com/warbo
 3. `docs/mecanifica/AUTORIA-IA.md` para o contrato de autoria.
 4. `docs/mecanifica/BANCADA-E-APRESENTACAO.md` para revisão visual.
 5. `docs/mecanifica/planos/README.md`,
-   `docs/mecanifica/planos/mcp/INDEX.md` e o plano ativo para planejamento.
+   `docs/mecanifica/planos/mcp/INDEX.md` e qualquer futuro plano ativo para planejamento.
 6. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho paralelo.
 7. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
 8. `docs/uso/MAPA.md` para o inventário gerado.

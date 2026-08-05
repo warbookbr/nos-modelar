@@ -103,6 +103,12 @@ function urlPublicadaDa(url) {
   return `https://warbookbr.github.io/nos-mecanifica/bancada.html${new URL(url).search}`;
 }
 
+function erroDeTempo(timeoutMs) {
+  const erro = new Error(`A bancada excedeu o limite de ${timeoutMs} ms.`);
+  erro.codigo = 'tempo_esgotado';
+  return erro;
+}
+
 /**
  * Gera e inspeciona vistas da bancada. O retorno contém as vistas relatadas,
  * os caminhos dos PNGs, métricas de enquadramento e falhas estruturadas.
@@ -123,6 +129,8 @@ export async function olharBancada({
   estrito = false,
   focar = false,
   revisar = false,
+  capturarEmMemoria = false,
+  timeoutMs = null,
   logger = null,
   dependencias = {},
 } = {}) {
@@ -131,7 +139,25 @@ export async function olharBancada({
   let vite = null;
   let browser = null;
   let resposta = null;
+  let temporizador = null;
+  let encerramentoForcado = null;
+  let expirou = false;
   try {
+    if (capturarEmMemoria && (saidaDeclarada !== null || relatorioDeclarado !== null)) {
+      erroDeUso('captura em memória não aceita --saida ou --relatorio.');
+    }
+    if (timeoutMs !== null && (!Number.isFinite(Number(timeoutMs)) || Number(timeoutMs) <= 0)) {
+      erroDeUso('timeoutMs precisa ser um número positivo.');
+    }
+    if (timeoutMs !== null) {
+      temporizador = setTimeout(() => {
+        expirou = true;
+        encerramentoForcado = fecharRecursos({ browser, vite });
+      }, Number(timeoutMs));
+    }
+    const garantirPrazo = () => {
+      if (expirou) throw erroDeTempo(Number(timeoutMs));
+    };
     if (revisar && vistasDeclaradas !== null) erroDeUso('--revisar já define as vistas; não misture com --vistas');
     if (parPedida !== null && revisar) erroDeUso('--par é inspeção dirigida; não misture com --revisar.');
     if (parPedida !== null && vistasDeclaradas !== null) erroDeUso('--par escolhe a vista legível; não misture com --vistas.');
@@ -170,8 +196,8 @@ export async function olharBancada({
     if (!Number.isFinite(explosao) || explosao < 0 || explosao > 1) erroDeUso('explosao precisa estar entre 0 e 1');
     if (saidaDeclarada && !peca) erroDeUso('--saida exige o nome da peça.');
 
-    const saida = caminhoInterno(saidaDeclarada, 'saida') ?? OUT;
-    const relatorio = caminhoInterno(relatorioDeclarado, 'relatorio');
+    const saida = capturarEmMemoria ? null : (caminhoInterno(saidaDeclarada, 'saida') ?? OUT);
+    const relatorio = capturarEmMemoria ? null : caminhoInterno(relatorioDeclarado, 'relatorio');
     const sufixoPartes = [
       selecionadas.length ? `sel-${[...selecionadas].sort().join('+')}` : null,
       modo !== 'todas' ? modo : null,
@@ -181,8 +207,8 @@ export async function olharBancada({
       focar ? 'focado' : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
-    criarDiretorioConfinado(saida, { raiz: REPO });
-    const arquivosPlanejados = peca
+    if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
+    const arquivosPlanejados = !capturarEmMemoria && peca
       ? vistas.map((vista) => join(saida, `bancada-${peca}-${vista}${sufixo}.png`))
       : [];
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
@@ -198,6 +224,7 @@ export async function olharBancada({
       logLevel: 'error',
     });
     await vite.listen();
+    garantirPrazo();
     const { port } = vite.httpServer.address();
     const base = `http://127.0.0.1:${port}/nos-mecanifica/bancada.html`;
     const basePublicada = 'https://warbookbr.github.io/nos-mecanifica/bancada.html';
@@ -207,6 +234,7 @@ export async function olharBancada({
     browser = await pw.chromium.launch({
       args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'],
     });
+    garantirPrazo();
     const page = await browser.newPage({ viewport: { width: largura, height: altura } });
     const errosDaPagina = [];
     page.on('pageerror', (erro) => errosDaPagina.push(erro.message));
@@ -240,10 +268,12 @@ export async function olharBancada({
     };
     let falhou = false;
     const vistasRelatadas = [];
+    const capturas = [];
     let pecaRelatada = null;
     for (const [indice, vista] of vistas.entries()) {
       const url = urlDa(vista);
       const tentativaDeAbertura = await abrirComRepeticao(url);
+      garantirPrazo();
       if (tentativaDeAbertura > 1) registrar(relato, logger, 'stdout', `ferramenta: ${vista} abriu após repetição automática`);
       const dado = await page.evaluate(() => {
         const b = window.__mecanificaBancada;
@@ -307,6 +337,7 @@ export async function olharBancada({
         await page.evaluate(() => window.__mecanificaBancada.focar());
       }
       await page.waitForTimeout(espera);
+      garantirPrazo();
       const urlReproduzivel = await page.evaluate(() => window.__mecanificaBancada.url());
       const enquadramento = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
       if (revisar) {
@@ -327,12 +358,19 @@ export async function olharBancada({
         ...(resultadoPar ? { inspecaoDePar: { partes: resultadoPar.partes, vistaEscolhida: resultadoPar.vistaEscolhida, pixels: resultadoPar.pixels, legivel: resultadoPar.legivel } } : {}),
       });
       pecaRelatada = dado.peca;
-      const arquivo = join(saida, `bancada-${dado.peca}-${vista}${sufixo}.png`);
-      verificarCaminhoConfinado(arquivo, { raiz: REPO });
-      await page.screenshot({ path: arquivo });
-      registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
-      registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
-      registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
+      if (capturarEmMemoria) {
+        const dados = await page.screenshot({ type: 'png' });
+        garantirPrazo();
+        capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
+        registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
+      } else {
+        const arquivo = join(saida, `bancada-${dado.peca}-${vista}${sufixo}.png`);
+        verificarCaminhoConfinado(arquivo, { raiz: REPO });
+        await page.screenshot({ path: arquivo });
+        registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
+        registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
+        registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
+      }
     }
     if (errosDaPagina.length) {
       registrar(relato, logger, 'stderr', `\nerros de página:\n  ${errosDaPagina.join('\n  ')}`);
@@ -349,15 +387,25 @@ export async function olharBancada({
         writeFileSync(relatorio, `${JSON.stringify({ peca: pecaRelatada, resultado: falhou ? 'recusada' : 'aceita', falhas: falhasRelatadas, vistas: vistasRelatadas })}\n`, { encoding: 'utf8', flag: 'wx' });
       }
     }
-    const resultado = { peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados };
+    const resultado = {
+      peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
+      ...(capturarEmMemoria ? { capturas } : {}),
+    };
     resposta = {
       ok: !falhou, codigo: falhou ? 1 : 0, erro: falhou ? { categoria: 'bancada', codigo: 'bancada_recusou', mensagem: 'A bancada encerrou a captura sem aceitar a revisão.' } : null,
       stdout: relato.stdout.join(''), stderr: relato.stderr.join(''), resultado,
     };
   } catch (erro) {
-    resposta = erroEstruturado({ relato, erro, resultado: { falhas: falhasRelatadas } });
+    if (expirou || erro?.codigo === 'tempo_esgotado') {
+      resposta = erroEstruturado({ relato, erro: erroDeTempo(Number(timeoutMs)), resultado: { falhas: falhasRelatadas } });
+      resposta.erro.codigo = 'tempo_esgotado';
+    } else {
+      resposta = erroEstruturado({ relato, erro, resultado: { falhas: falhasRelatadas } });
+    }
   } finally {
-    const limpeza = await fecharRecursos({ browser, vite });
+    if (temporizador) clearTimeout(temporizador);
+    const limpezaForcada = encerramentoForcado ? await encerramentoForcado : [];
+    const limpeza = [...limpezaForcada, ...await fecharRecursos({ browser, vite })];
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;

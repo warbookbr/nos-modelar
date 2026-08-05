@@ -7,12 +7,14 @@ import { describe, expect, it } from 'vitest';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
+import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
 import {
-  comparar, descrever, resumoComparacao, resumoDescricao, resumoTotais, validar,
+  comparar, conteudoRenderizacao, descrever, LIMITES_VISTAS, renderizar,
+  resumoComparacao, resumoDescricao, resumoTotais, validar,
 } from './perfis/revisao.mjs';
-import { compararSaida, descreverSaida, validarSaida } from './contratos.mjs';
+import { compararSaida, descreverSaida, renderizarSaida, validarSaida } from './contratos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
@@ -108,7 +110,7 @@ describe('servidor MCP local — perfil revisao', () => {
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.1.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.2.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -118,18 +120,18 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia exatamente três tools e dois resources', async () => {
+  it('faz handshake bruto, anuncia exatamente quatro tools e dois resources', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.1.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.2.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
-        'descrever_peca', 'validar_pacote', 'comparar_revisoes',
+        'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(3);
+      expect(ferramentas.result.tools).toHaveLength(4);
       for (const tool of ferramentas.result.tools) expect(tool.outputSchema).toBeDefined();
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
@@ -257,6 +259,15 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(await descrever({ peca: '../segredo' })).toMatchObject({
         ok: false, erro: { codigo: 'entrada_recusada' },
       });
+      const visual = await cliente.enviar('tools/call', {
+        name: 'renderizar_vistas', arguments: { peca: '../segredo' },
+      });
+      expect(visual.result).toMatchObject({ isError: true });
+      expect(visual.result.structuredContent).toBeUndefined();
+      expect(visual.result.content[0].text).toMatch(/Input validation error/);
+      expect((await renderizar({ peca: '../segredo' })).resposta).toMatchObject({
+        ok: false, erro: { codigo: 'entrada_recusada' },
+      });
       const traversal = await cliente.enviar('tools/call', { name: 'validar_pacote', arguments: { id: '../segredo' } });
       expect(traversal.result).toMatchObject({ isError: true });
       expect(traversal.result.structuredContent).toBeUndefined();
@@ -277,8 +288,8 @@ describe('servidor MCP local — perfil revisao', () => {
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
-      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v1' });
-      expect(estadoValor.ferramentas).toEqual(['descrever_peca', 'validar_pacote', 'comparar_revisoes']);
+      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v2' });
+      expect(estadoValor.ferramentas).toEqual(['descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas']);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
     } finally {
       await cliente.fechar();
@@ -301,6 +312,196 @@ describe('servidor MCP local — perfil revisao', () => {
     cliente.processo.kill('SIGTERM');
     await expect(pendente).rejects.toThrow('servidor encerrou antes da resposta');
   });
+
+  it('captura quatro PNGs em memória e fecha navegador e Vite sem criar saída', async () => {
+    const fechamentos = { browser: 0, vite: 0 };
+    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    const page = {
+      on() {},
+      async goto() {},
+      async waitForFunction() {},
+      async waitForTimeout() {},
+      async evaluate(fn) {
+        const fonte = String(fn);
+        if (fonte.includes('const b =')) return {
+          ready: true, erro: null, peca: '_jardineira', partes: ['corpo'],
+          selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
+          estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
+        };
+        if (fonte.includes('.url()')) return 'http://127.0.0.1:4173/nos-mecanifica/bancada.html';
+        if (fonte.includes('.enquadramento()')) return { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
+        throw new Error(`evaluate inesperado: ${fonte}`);
+      },
+      async screenshot(opcoes) {
+        expect(opcoes).toEqual({ type: 'png' });
+        return png;
+      },
+    };
+    const browser = {
+      async newPage() { return page; },
+      async close() { fechamentos.browser += 1; },
+    };
+    const vite = {
+      httpServer: { address: () => ({ port: 4173 }) },
+      async listen() {},
+      async close() { fechamentos.vite += 1; },
+    };
+    const resultado = await olharBancada({
+      peca: '_jardineira', revisar: true, capturarEmMemoria: true, espera: 1,
+      dependencias: {
+        createServer: async () => vite,
+        carregarPlaywright: async () => ({ chromium: { launch: async () => browser } }),
+      },
+    });
+    expect(resultado.ok).toBe(true);
+    expect(resultado.resultado.arquivos).toEqual([]);
+    expect(resultado.resultado.capturas).toHaveLength(4);
+    expect(resultado.resultado.capturas.map(({ nome }) => nome)).toEqual(['isometrica', 'frontal', 'direita', 'superior']);
+    expect(fechamentos).toEqual({ browser: 1, vite: 1 });
+  });
+
+  it('fecha Browser e Vite quando o timeout é forçado', async () => {
+    const fechamentos = { browser: 0, vite: 0 };
+    let rejeitarEspera;
+    const espera = new Promise((_, reject) => { rejeitarEspera = reject; });
+    const page = {
+      on() {},
+      async goto() {},
+      async waitForFunction() {},
+      waitForTimeout() { return espera; },
+      async evaluate(fn) {
+        const fonte = String(fn);
+        if (fonte.includes('const b =')) return {
+          ready: true, erro: null, peca: '_jardineira', partes: ['corpo'],
+          selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
+          estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
+        };
+        throw new Error(`evaluate inesperado antes do timeout: ${fonte}`);
+      },
+    };
+    const browser = {
+      async newPage() { return page; },
+      async close() {
+        fechamentos.browser += 1;
+        rejeitarEspera?.(new Error('browser fechado'));
+      },
+    };
+    const vite = {
+      httpServer: { address: () => ({ port: 4173 }) },
+      async listen() {},
+      async close() { fechamentos.vite += 1; },
+    };
+    const resultado = await olharBancada({
+      peca: '_jardineira', revisar: true, capturarEmMemoria: true,
+      timeoutMs: 10, espera: 60_000,
+      dependencias: {
+        createServer: async () => vite,
+        carregarPlaywright: async () => ({ chromium: { launch: async () => browser } }),
+      },
+    });
+    expect(resultado).toMatchObject({ ok: false, erro: { codigo: 'tempo_esgotado' } });
+    expect(fechamentos.browser).toBeGreaterThanOrEqual(1);
+    expect(fechamentos.vite).toBeGreaterThanOrEqual(1);
+  });
+
+  it('estrutura manifesto e imagens sem repetir base64 no structuredContent', async () => {
+    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    let instante = 100;
+    const executado = await renderizar({ peca: '_jardineira' }, {
+      agora: () => (instante += 10),
+      olhar: async ({ capturarEmMemoria, revisar, timeoutMs }) => {
+        expect({ capturarEmMemoria, revisar, timeoutMs }).toEqual({
+          capturarEmMemoria: true, revisar: true, timeoutMs: LIMITES_VISTAS.timeoutMs,
+        });
+        return {
+          ok: true, codigo: 0,
+          resultado: {
+            peca: '_jardineira',
+            capturas: ['isometrica', 'frontal', 'direita', 'superior'].map((nome) => ({
+              nome, mimeType: 'image/png', largura: 1280, altura: 720, dados: png,
+            })),
+            vistas: ['isometrica', 'frontal', 'direita', 'superior'].map((nome) => ({
+              nome, enquadramento: { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false },
+            })),
+          },
+        };
+      },
+    });
+    renderizarSaida.parse(executado.resposta);
+    expect(executado.resposta.resultado.vistas).toHaveLength(4);
+    expect(JSON.stringify(executado.resposta)).not.toContain(png.toString('base64'));
+    const content = conteudoRenderizacao(executado);
+    expect(content.filter(({ type }) => type === 'image')).toHaveLength(4);
+    for (const imagem of content.slice(1)) {
+      expect(Buffer.from(imagem.data, 'base64').subarray(0, 8)).toEqual(png);
+    }
+  });
+
+  it('recusa payload e timeout sem devolver resultado parcial', async () => {
+    const nomes = ['isometrica', 'frontal', 'direita', 'superior'];
+    const enquadramento = { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
+    const excedido = await renderizar({ peca: '_jardineira' }, {
+      limites: { ...LIMITES_VISTAS, imagemBytes: 4 },
+      olhar: async () => ({
+        ok: true, codigo: 0, resultado: { peca: '_jardineira',
+          capturas: nomes.map((nome) => ({ nome, largura: 1280, altura: 720, dados: Buffer.alloc(5) })),
+          vistas: nomes.map((nome) => ({ nome, enquadramento })),
+        },
+      }),
+    });
+    expect(excedido.resposta).toMatchObject({ ok: false, erro: { codigo: 'payload_excedido' } });
+    expect(excedido.imagens).toEqual([]);
+    const expirado = await renderizar({ peca: '_jardineira' }, {
+      olhar: async () => ({ ok: false, codigo: 1, erro: { codigo: 'tempo_esgotado', mensagem: 'tempo' } }),
+    });
+    expect(expirado.resposta).toMatchObject({ ok: false, erro: { codigo: 'tempo_esgotado' } });
+    expect(expirado.imagens).toEqual([]);
+  });
+
+  const testeVisualReal = process.env.MCP_VISUAL_REAL === '1' ? it : it.skip;
+  testeVisualReal('consumidor zerado conclui os Casos 1 e 2 com quatro vistas e zero escrita', async () => {
+    const antes = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
+    const client = new Client({ name: 'consumidor-visual-mecanifica', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+    });
+    const metricas = { recursos: 0, ferramentas: 0, casos: [] };
+    try {
+      await client.connect(transport);
+      for (const uri of ['mecanifica://estado', 'mecanifica://capacidades/modelagem']) {
+        await client.readResource({ uri });
+        metricas.recursos += 1;
+      }
+      for (const id of ['homologacao-mancal', 'homologacao-placa']) {
+        const validado = await client.callTool({ name: 'validar_pacote', arguments: { id } });
+        metricas.ferramentas += 1;
+        const peca = validado.structuredContent.resultado.peca;
+        await client.callTool({ name: 'descrever_peca', arguments: { peca } });
+        metricas.ferramentas += 1;
+        const inicio = Date.now();
+        const vistas = await client.callTool({ name: 'renderizar_vistas', arguments: { peca } });
+        metricas.ferramentas += 1;
+        renderizarSaida.parse(vistas.structuredContent);
+        const imagens = vistas.content.filter(({ type }) => type === 'image');
+        expect(imagens).toHaveLength(4);
+        for (const imagem of imagens) {
+          expect(Buffer.from(imagem.data, 'base64').subarray(0, 8)).toEqual(Buffer.from('89504e470d0a1a0a', 'hex'));
+        }
+        metricas.casos.push({
+          id, peca, duracaoMs: Date.now() - inicio,
+          bytes: vistas.structuredContent.resultado.bytes,
+          vistas: vistas.structuredContent.resultado.vistas.map(({ nome, bytes }) => ({ nome, bytes })),
+          respostaBytes: Buffer.byteLength(JSON.stringify(vistas), 'utf8'),
+        });
+      }
+    } finally {
+      await client.close();
+    }
+    const depois = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
+    expect(depois).toBe(antes);
+    expect(metricas).toMatchObject({ recursos: 2, ferramentas: 6 });
+    console.log(`MCP_VISUAL_METRICAS ${JSON.stringify(metricas)}`);
+  }, 180_000);
 
   it('registra a linha-base de bytes das três respostas estruturadas', () => {
     expect(tamanhosStructured).toEqual({

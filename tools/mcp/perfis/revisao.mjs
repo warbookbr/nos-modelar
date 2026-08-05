@@ -1,7 +1,9 @@
 /* revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem. */
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { descreverPecaReutilizavel } from '../../mecanifica/descrever-peca.mjs';
+import { olharBancada } from '../../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../../modelagem/revisao-modelagem.mjs';
 import {
@@ -10,10 +12,18 @@ import {
 import { ErroDePacote } from '../../modelagem/formato-pacote.mjs';
 import {
   compararEntrada, compararSaida, descreverEntrada, descreverSaida,
-  erroAcionavel, respostaErro, respostaOk, validarEntrada, validarSaida,
+  erroAcionavel, renderizarEntrada, renderizarSaida, respostaErro, respostaOk,
+  validarEntrada, validarSaida,
 } from '../contratos.mjs';
 
 const REVISOES = 'revisoes';
+const VISTAS_OFICIAIS = Object.freeze(['isometrica', 'frontal', 'direita', 'superior']);
+export const LIMITES_VISTAS = Object.freeze({
+  imagemBytes: 2 * 1024 * 1024,
+  totalBytes: 8 * 1024 * 1024,
+  respostaBytes: 11 * 1024 * 1024,
+  timeoutMs: 45_000,
+});
 
 function textoCurto(valor, limite = 320) {
   const texto = String(valor ?? '').replace(/\s+/g, ' ').trim();
@@ -204,6 +214,126 @@ export function comparar(input) {
   }
 }
 
+function pacoteVisual(resposta, imagens = []) {
+  return { resposta, imagens };
+}
+
+export function conteudoRenderizacao({ resposta, imagens }) {
+  if (!resposta.ok) {
+    return [{ type: 'text', text: `renderizar_vistas: ${resposta.erro?.mensagem ?? 'operação recusada.'}` }];
+  }
+  return [
+    { type: 'text', text: 'renderizar_vistas: quatro vistas oficiais produzidas.' },
+    ...imagens.map(({ data, mimeType }) => ({ type: 'image', data, mimeType })),
+  ];
+}
+
+function erroVisual(codigo, mensagem, acao) {
+  return pacoteVisual(respostaErro(1, erroAcionavel(codigo, mensagem, acao)));
+}
+
+export async function renderizar(input, {
+  olhar = olharBancada,
+  limites = LIMITES_VISTAS,
+  agora = () => Date.now(),
+} = {}) {
+  let argumentos;
+  try { argumentos = renderizarEntrada.parse(input); } catch { return pacoteVisual(entradaRecusada()); }
+  const inicio = agora();
+  let capturado;
+  try {
+    capturado = await olhar({
+      peca: argumentos.peca,
+      revisar: true,
+      capturarEmMemoria: true,
+      timeoutMs: limites.timeoutMs,
+    });
+  } catch (erro) {
+    return pacoteVisual(falhaInterna('renderizar_vistas', erro));
+  }
+  if (!capturado.ok) {
+    const tempo = capturado.erro?.codigo === 'tempo_esgotado';
+    return erroVisual(
+      tempo ? 'tempo_esgotado' : (capturado.erro?.codigo ?? 'falha_bancada'),
+      textoCurto(capturado.erro?.mensagem ?? 'A bancada recusou a captura.'),
+      tempo
+        ? 'Reduza o custo da captura sem alterar as quatro vistas oficiais, ou pare a fatia.'
+        : 'Inspecione o diagnóstico da bancada antes de tentar novamente.',
+    );
+  }
+  const capturas = capturado.resultado?.capturas;
+  const vistasRelatadas = capturado.resultado?.vistas ?? [];
+  if (!Array.isArray(capturas) || capturas.length !== VISTAS_OFICIAIS.length
+    || capturas.some((captura, indice) => captura.nome !== VISTAS_OFICIAIS[indice])) {
+    return erroVisual(
+      'vistas_incompletas',
+      'A bancada não devolveu exatamente as quatro vistas oficiais na ordem contratada.',
+      'Corrija o serviço compartilhado; não complete a resposta com capturas sintéticas.',
+    );
+  }
+  const imagens = [];
+  const vistas = [];
+  let totalBytes = 0;
+  for (const captura of capturas) {
+    const dados = Buffer.isBuffer(captura.dados) ? captura.dados : Buffer.from(captura.dados ?? []);
+    if (dados.byteLength > limites.imagemBytes) {
+      return erroVisual(
+        'payload_excedido',
+        `A vista '${captura.nome}' excedeu o limite de ${limites.imagemBytes} bytes.`,
+        'Pare a fatia e decida outro transporte; não reduza a prova oficial silenciosamente.',
+      );
+    }
+    totalBytes += dados.byteLength;
+    const relato = vistasRelatadas.find(({ nome }) => nome === captura.nome);
+    if (!relato?.enquadramento) {
+      return erroVisual(
+        'vistas_incompletas',
+        `A vista '${captura.nome}' não trouxe métricas de enquadramento.`,
+        'Corrija a paridade com o serviço da bancada antes de publicar a ferramenta.',
+      );
+    }
+    const data = dados.toString('base64');
+    imagens.push({ nome: captura.nome, mimeType: 'image/png', data });
+    vistas.push({
+      nome: captura.nome,
+      mimeType: 'image/png',
+      largura: captura.largura,
+      altura: captura.altura,
+      bytes: dados.byteLength,
+      sha256: `sha256:${createHash('sha256').update(dados).digest('hex')}`,
+      enquadramento: relato.enquadramento,
+    });
+  }
+  if (totalBytes > limites.totalBytes) {
+    return erroVisual(
+      'payload_excedido',
+      `As quatro vistas somaram ${totalBytes} bytes; o limite é ${limites.totalBytes}.`,
+      'Pare a fatia e decida outro transporte; não omita nem recomprima vistas silenciosamente.',
+    );
+  }
+  const resposta = respostaOk(0, {
+    formato: 'mecanifica.vistas-oficiais',
+    versao: 1,
+    peca: capturado.resultado.peca,
+    duracaoMs: Math.max(0, Math.round(agora() - inicio)),
+    bytes: totalBytes,
+    vistas,
+  });
+  const pacote = pacoteVisual(resposta, imagens);
+  const respostaBytes = Buffer.byteLength(JSON.stringify({
+    content: conteudoRenderizacao(pacote),
+    structuredContent: resposta,
+  }), 'utf8');
+  if (respostaBytes > limites.respostaBytes) {
+    return erroVisual(
+      'payload_excedido',
+      `A resposta MCP serializada teria ${respostaBytes} bytes; o limite é ${limites.respostaBytes}.`,
+      'Pare a fatia e decida outro transporte; não altere as quatro vistas oficiais silenciosamente.',
+    );
+  }
+  return pacote;
+}
+
 export const ferramentasRevisao = Object.freeze([
   {
     nome: 'descrever_peca',
@@ -225,5 +355,14 @@ export const ferramentasRevisao = Object.freeze([
     inputSchema: compararEntrada,
     outputSchema: compararSaida,
     executar: comparar,
+  },
+  {
+    nome: 'renderizar_vistas',
+    descricao: 'Produz e transporta as quatro vistas oficiais sem escrever artefatos.',
+    inputSchema: renderizarEntrada,
+    outputSchema: renderizarSaida,
+    executar: renderizar,
+    estruturar: ({ resposta }) => resposta,
+    conteudo: conteudoRenderizacao,
   },
 ]);

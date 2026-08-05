@@ -9,7 +9,7 @@ import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.1.0' });
+const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.2.0' });
 
 const estado = Object.freeze({
   contrato: VERSAO_CONTRATO_MCP,
@@ -17,7 +17,6 @@ const estado = Object.freeze({
   transporte: TRANSPORTE,
   ferramentas: ferramentasRevisao.map(({ nome }) => nome),
   capacidadesAusentes: [
-    'renderizar_vistas',
     'promover_revisao',
     'autoria',
     'materiais',
@@ -32,9 +31,9 @@ const capacidadesModelagem = Object.freeze({
     'descrever uma peça pela régua neutra existente',
     'validar um pacote oficial somente leitura',
     'comparar duas revisões oficiais do mesmo pacote',
+    'produzir e transportar as quatro vistas oficiais sem escrita',
   ],
   aindaNaoConsegue: [
-    'renderizar ou capturar vistas',
     'promover ou escrever revisões',
     'editar autoria, materiais ou documentação',
   ],
@@ -80,10 +79,14 @@ function registrarPerfil(server) {
       },
       async (entrada) => {
         try {
-          const resposta = await ferramenta.executar(entrada);
+          const executado = await ferramenta.executar(entrada);
+          const resposta = ferramenta.estruturar ? ferramenta.estruturar(executado) : executado;
+          const content = ferramenta.conteudo
+            ? ferramenta.conteudo(executado)
+            : [{ type: 'text', text: textoDaResposta(ferramenta.nome, resposta) }];
           return {
             isError: !resposta.ok,
-            content: [{ type: 'text', text: textoDaResposta(ferramenta.nome, resposta) }],
+            content,
             structuredContent: resposta,
           };
         } catch (erro) {

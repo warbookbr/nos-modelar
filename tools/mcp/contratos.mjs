@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
 
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v1';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v2';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 
@@ -102,6 +102,8 @@ export const compararEntrada = z.object({
   posterior: revisao,
 }).strict();
 
+export const renderizarEntrada = z.object({ peca }).strict();
+
 export const descreverSaida = z.object({
   ...respostaBase,
   resultado: z.object({
@@ -133,6 +135,34 @@ export const compararSaida = z.object({
     anterior: revisao,
     posterior: revisao,
     comparacao: comparacaoPublica,
+  }).optional(),
+}).strict();
+
+const enquadramentoPublico = z.object({
+  valida: z.boolean(),
+  area: z.number(),
+  largura: z.number(),
+  altura: z.number(),
+  cortado: z.boolean(),
+}).strict();
+
+export const renderizarSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({
+    formato: z.literal('mecanifica.vistas-oficiais'),
+    versao: z.literal(1),
+    peca: z.string(),
+    duracaoMs: z.number().int().nonnegative(),
+    bytes: z.number().int().nonnegative(),
+    vistas: z.array(z.object({
+      nome: z.enum(['isometrica', 'frontal', 'direita', 'superior']),
+      mimeType: z.literal('image/png'),
+      largura: z.number().int().positive(),
+      altura: z.number().int().positive(),
+      bytes: z.number().int().nonnegative(),
+      sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      enquadramento: enquadramentoPublico,
+    }).strict()).length(4),
   }).optional(),
 }).strict();
 

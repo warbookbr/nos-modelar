@@ -11,7 +11,7 @@ Somente o plano datado marcado como `ativo` em
 |---|---|---|---|
 | Preparação do núcleo e das CLIs | concluído | — | serviços importáveis, resultados estruturados e paridade das CLIs |
 | Fatia 1A — piloto local somente leitura | concluído | preparação | piloto aprovado e encerramento em `docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md` |
-| Fatia 1B — quatro vistas oficiais | ativo | Fatia 1A | plano em `docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md` |
+| Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 tools, zero fallback e encerramento no plano datado |
 | Avaliação consolidada do piloto visual | candidato | Fatia 1B | métricas comparativas e decisão de continuar, redesenhar ou parar |
 | Autoria controlada | candidato | avaliação positiva | escrita confinada, atômica, com dry-run e sem sobrescrita |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
@@ -37,7 +37,8 @@ Somente o plano datado marcado como `ativo` em
 
 ## Próxima decisão
 
-A Fatia 1B deve provar que uma única ferramenta MCP somente leitura consegue
-produzir e transportar as quatro vistas oficiais sem duplicar a lógica da
-bancada, escrever artefatos ou deixar Playwright/Vite vivos. Qualquer ampliação
-fica bloqueada até a medição desse resultado.
+A Fatia 1B foi aprovada: uma única ferramenta transportou as quatro vistas
+oficiais, sem escrita, fallback ou resíduo de Playwright/Vite. O programa agora
+não tem plano ativo. A próxima decisão é abrir ou não uma avaliação consolidada
+do piloto visual; autoria, materiais e distribuição continuam bloqueados até
+essa decisão separada.

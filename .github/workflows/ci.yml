@@ -55,6 +55,11 @@ jobs:
       - name: Navegador para a prova de interface
         run: npx playwright install --with-deps chromium
 
+      - name: MCP transporta as quatro vistas oficiais
+        env:
+          MCP_VISUAL_REAL: '1'
+        run: npm run mcp:check
+
       # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
       # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
       # verde nos outros gates. Mesmo motivo e mesmo navegador da linha acima.
