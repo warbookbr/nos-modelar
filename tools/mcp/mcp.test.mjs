@@ -431,6 +431,43 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(catalogo).toEqual([{ id: 'legitimo', revisoes: [] }]);
     });
 
+    it('ignora revisões quando revisoes/ do pacote é symlink escapando da raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-revisoes-fora', ['r001']);
+        const pasta = join(raiz, 'pacote-com-revisoes-fora');
+        rmSync(join(pasta, 'revisoes'), { recursive: true, force: true });
+        const revisoesForaDaRaiz = join(fora, 'revisoes-secretas');
+        mkdirSync(join(revisoesForaDaRaiz, 'r999'), { recursive: true });
+        writeFileSync(join(revisoesForaDaRaiz, 'r999', 'revisao.json'), '{"segredo":true}');
+        symlinkSync(revisoesForaDaRaiz, join(pasta, 'revisoes'), 'dir');
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-com-revisoes-fora', revisoes: [] }]);
+    });
+
+    it('ignora o pacote inteiro quando briefing.json é symlink apontando para fora da raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-briefing-fora');
+        const pasta = join(raiz, 'pacote-com-briefing-fora');
+        const briefingSecreto = join(fora, 'briefing-secreto.json');
+        writeFileSync(briefingSecreto, '{"segredo":true}');
+        rmSync(join(pasta, 'briefing.json'));
+        symlinkSync(briefingSecreto, join(pasta, 'briefing.json'));
+      });
+      expect(catalogo).toEqual([]);
+    });
+
+    it('ignora só a revisão quando revisao.json é symlink apontando para fora da raiz, mantendo o pacote', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-revisao-json-fora', ['r001']);
+        const pasta = join(raiz, 'pacote-com-revisao-json-fora');
+        const revisaoSecreta = join(fora, 'revisao-secreta.json');
+        writeFileSync(revisaoSecreta, '{"segredo":true}');
+        rmSync(join(pasta, 'revisoes', 'r001', 'revisao.json'));
+        symlinkSync(revisaoSecreta, join(pasta, 'revisoes', 'r001', 'revisao.json'));
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-com-revisao-json-fora', revisoes: [] }]);
+    });
+
     it('devolve lista vazia, sem lançar, quando a raiz de pacotes não existe', () => {
       expect(listarCatalogoDePacotes({ raizPacotes: join(tmpdir(), 'mecanifica-raiz-inexistente-xyz') })).toEqual([]);
     });

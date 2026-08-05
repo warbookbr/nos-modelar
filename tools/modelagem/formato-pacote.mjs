@@ -378,36 +378,49 @@ export function caminhoDentro(raiz, candidato) {
   return relativo !== '' && !relativo.startsWith('..') && !isAbsolute(relativo);
 }
 
-/* Confina o candidato dentro da raiz por caminho literal e por caminho real
-   (resolvendo symlinks), fail-closed: qualquer falha de leitura ou escape vira
-   `false`, nunca lança. É a mesma regra de `validarReferenciaDoRepositorio`,
-   generalizada para não depender de o candidato já existir com certeza. */
-function pastaConfinada(raiz, candidato) {
-  if (!caminhoDentro(raiz, candidato)) return false;
-  let raizReal;
-  let candidatoReal;
-  try {
-    raizReal = realpathSync(raiz);
-    candidatoReal = realpathSync(candidato);
-  } catch { return false; }
-  if (!caminhoDentro(raizReal, candidatoReal)) return false;
-  try { return statSync(candidatoReal).isDirectory(); } catch { return false; }
+/* Resolve `nome` (componente simples, sem separador) dentro de `pastaReal` —
+   que já precisa ser um caminho real, sem symlinks — e devolve o caminho real
+   do resultado, ou `null` fail-closed se ele escapar de `pastaReal` (por
+   symlink, direto ou em qualquer segmento) ou não puder ser lido. Nunca
+   lança. Encadear esta função a partir de uma raiz já real, nunca da raiz
+   literal, é o que impede um symlink intermediário (ex.: `<pacote>/revisoes`)
+   de abrir uma nova "raiz real" alheia que passaria despercebida numa
+   checagem feita só contra o topo. */
+function resolverFilhoConfinado(pastaReal, nome) {
+  const candidato = join(pastaReal, nome);
+  let real;
+  try { real = realpathSync(candidato); } catch { return null; }
+  return caminhoDentro(pastaReal, real) ? real : null;
+}
+
+function pastaRealConfinada(pastaReal, nome) {
+  const real = resolverFilhoConfinado(pastaReal, nome);
+  if (real === null) return null;
+  try { return statSync(real).isDirectory() ? real : null; } catch { return null; }
+}
+
+function arquivoRealConfinado(pastaReal, nome) {
+  const real = resolverFilhoConfinado(pastaReal, nome);
+  if (real === null) return null;
+  try { return statSync(real).isFile() ? real : null; } catch { return null; }
 }
 
 function jsonValidoOuNulo(arquivo) {
   try { return JSON.parse(readFileSync(arquivo, 'utf8')); } catch { return null; }
 }
 
-function listarRevisoesValidas(pastaPacote) {
-  const pastaRevisoes = join(pastaPacote, REVISOES);
+function listarRevisoesValidas(pastaPacoteReal) {
+  const pastaRevisoesReal = pastaRealConfinada(pastaPacoteReal, REVISOES);
+  if (pastaRevisoesReal === null) return [];
   let entradas;
-  try { entradas = readdirSync(pastaRevisoes, { withFileTypes: true }); } catch { return []; }
+  try { entradas = readdirSync(pastaRevisoesReal, { withFileTypes: true }); } catch { return []; }
   const revisoes = [];
   for (const entrada of entradas) {
     if (!REVISAO_SLUG.test(entrada.name)) continue;
-    const pastaRevisao = join(pastaRevisoes, entrada.name);
-    if (!pastaConfinada(pastaRevisoes, pastaRevisao)) continue;
-    if (jsonValidoOuNulo(join(pastaRevisao, 'revisao.json')) === null) continue;
+    const pastaRevisaoReal = pastaRealConfinada(pastaRevisoesReal, entrada.name);
+    if (pastaRevisaoReal === null) continue;
+    const revisaoJson = arquivoRealConfinado(pastaRevisaoReal, 'revisao.json');
+    if (revisaoJson === null || jsonValidoOuNulo(revisaoJson) === null) continue;
     revisoes.push(entrada.name);
   }
   return revisoes.sort();
@@ -418,20 +431,30 @@ function listarRevisoesValidas(pastaPacote) {
  * cada chamada. Ignora de forma fail-closed qualquer entrada que não seja um
  * slug confinado com `briefing.json`/`referencias.json` legíveis como JSON, e
  * qualquer revisão sem `revisao.json` legível na mesma rota que
- * `comparar_revisoes` já consome. Não expõe caminhos absolutos nem conteúdo
- * dos arquivos, só `id` e a lista ordenada de revisões.
+ * `comparar_revisoes` já consome. Cada pasta e cada arquivo (incluindo
+ * `revisoes/` em si) é resolvido e confinado pelo caminho real antes de ser
+ * lido, então um symlink em qualquer nível — a pasta do pacote, `revisoes/`,
+ * uma pasta de revisão, ou qualquer dos três JSONs — que escape de
+ * `RAIZ_PACOTES` é rejeitado, nunca seguido. Não expõe caminhos absolutos nem
+ * conteúdo dos arquivos, só `id` e a lista ordenada de revisões.
  */
 export function listarCatalogoDePacotes({ raizPacotes = RAIZ_PACOTES } = {}) {
+  let raizReal;
   let entradas;
-  try { entradas = readdirSync(raizPacotes, { withFileTypes: true }); } catch { return []; }
+  try {
+    raizReal = realpathSync(raizPacotes);
+    entradas = readdirSync(raizPacotes, { withFileTypes: true });
+  } catch { return []; }
   const pacotes = [];
   for (const entrada of entradas) {
     if (!SLUG.test(entrada.name)) continue;
-    const pastaPacote = join(raizPacotes, entrada.name);
-    if (!pastaConfinada(raizPacotes, pastaPacote)) continue;
-    if (jsonValidoOuNulo(join(pastaPacote, 'briefing.json')) === null) continue;
-    if (jsonValidoOuNulo(join(pastaPacote, 'referencias.json')) === null) continue;
-    pacotes.push({ id: entrada.name, revisoes: listarRevisoesValidas(pastaPacote) });
+    const pastaPacoteReal = pastaRealConfinada(raizReal, entrada.name);
+    if (pastaPacoteReal === null) continue;
+    const briefing = arquivoRealConfinado(pastaPacoteReal, 'briefing.json');
+    if (briefing === null || jsonValidoOuNulo(briefing) === null) continue;
+    const referencias = arquivoRealConfinado(pastaPacoteReal, 'referencias.json');
+    if (referencias === null || jsonValidoOuNulo(referencias) === null) continue;
+    pacotes.push({ id: entrada.name, revisoes: listarRevisoesValidas(pastaPacoteReal) });
   }
   return pacotes.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
