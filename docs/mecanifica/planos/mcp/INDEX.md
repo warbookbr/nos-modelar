@@ -15,7 +15,7 @@ contrato, provas e critérios de parada próprios.
 
 | Módulo | Finalidade | Etapas deste painel |
 |---|---|---|
-| 1. Modelagem e revisão | Expor inspeção, validação, comparação e prova visual somente leitura sobre os serviços existentes. | preparação do núcleo e das CLIs; Fatias 1A e 1B; avaliação consolidada |
+| 1. Modelagem e revisão | Expor inspeção, validação, comparação e prova visual somente leitura sobre os serviços existentes. | preparação do núcleo e das CLIs; Fatias 1A e 1B; avaliação consolidada; correção de descoberta |
 | 2. Autoria e materiais | Permitir criação e alteração controladas, com `dry-run`, escrita confinada e contrato canônico de materiais. | autoria controlada; contrato e ferramentas de materiais |
 | 3. Orquestração e publicação | Empacotar, transportar e operar o MCP com autenticação e múltiplos consumidores quando o valor local estiver comprovado. | distribuição e orquestração |
 
@@ -30,8 +30,9 @@ não autoriza implementação até existir um plano executivo ativo.
 | Preparação do núcleo e das CLIs | concluído | — | serviços importáveis, resultados estruturados e paridade das CLIs |
 | Fatia 1A — piloto local somente leitura | concluído | preparação | piloto aprovado e encerramento em `docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md` |
 | Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 chamadas de ferramentas, zero fallback e encerramento no plano datado |
-| Avaliação consolidada do piloto visual | ativo | Fatia 1B | plano em `docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md` e evidências na issue #18 |
-| Autoria controlada | candidato | avaliação positiva | escrita confinada, atômica, com dry-run e sem sobrescrita |
+| Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes/revisões na issue #18 |
+| Correção de descoberta de pacotes e revisões | ativo | avaliação consolidada | plano em `docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md`; recurso `mecanifica://pacotes` e prova MCP real |
+| Autoria controlada | candidato | Módulo 1 aprovado | escrita confinada, atômica, com dry-run e sem sobrescrita |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos clientes |
 
@@ -55,11 +56,12 @@ não autoriza implementação até existir um plano executivo ativo.
 
 ## Decisão em curso
 
-A avaliação consolidada está ativa e usa um agente consumidor em modo
-caixa-preta para provar descoberta, revisão de duas peças e comparação de
-revisões sem leitura direta, CLI paralela, fallback ou escrita. O resultado deve
-ser uma decisão explícita de aprovar, corrigir ou interromper o Módulo 1.
+A avaliação consolidada encerrou com decisão `corrigir`. O achado `AVAL-01`
+mostrou que um consumidor novo consegue descrever e renderizar peças, mas não
+consegue descobrir os ids oficiais exigidos por `validar_pacote` nem as revisões
+necessárias para `comparar_revisoes`.
 
-Autoria, materiais e distribuição continuam bloqueados até o encerramento desse
-plano. Achados que exigirem mudança de código recebem decisão e plano separados;
-a avaliação não se expande implicitamente para implementação.
+A etapa ativa adiciona somente o recurso `mecanifica://pacotes`, com catálogo
+mínimo e determinístico de ids e revisões. As quatro ferramentas permanecem
+inalteradas. Autoria, materiais e distribuição continuam bloqueados até a prova
+caixa-preta dessa correção e o encerramento explícito do Módulo 1.
