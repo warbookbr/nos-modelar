@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-242 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+246 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -285,6 +285,16 @@
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente e mais de um plano ativo.
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
+
+## tools/mcp/
+
+- `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
+- `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
+- `servidor.mjs` — servidor.mjs — servidor MCP local stdio do perfil revisao, sem escrita.
+
+## tools/mcp/perfis/
+
+- `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.
 
 ## tools/mecanifica/
 

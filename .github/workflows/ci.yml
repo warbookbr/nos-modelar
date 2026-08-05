@@ -29,6 +29,9 @@ jobs:
       - name: Unit Tests
         run: npm run test
 
+      - name: Servidor MCP local
+        run: npm run mcp:check
+
       - name: Build da Mecanifica
         run: npm run build
 

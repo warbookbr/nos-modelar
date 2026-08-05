@@ -22,6 +22,8 @@ const DISPONIVEIS = Object.freeze(readdirSync(PECAS)
   .map((arquivo) => arquivo.slice(0, -'.js'.length))
   .sort());
 
+export const PECAS_DISPONIVEIS = DISPONIVEIS;
+
 function resultadoDeErro({ codigo, categoria, mensagem, stderr }) {
   return {
     ok: false,
