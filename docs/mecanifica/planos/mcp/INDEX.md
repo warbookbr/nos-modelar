@@ -56,10 +56,12 @@ não autoriza implementação até existir um plano executivo ativo.
 
 ## Decisão atual
 
-O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A correção
-de `AVAL-01` adicionou o recurso `mecanifica://pacotes`, preservou as quatro
-ferramentas e seus schemas e passou pela prova caixa-preta pós-merge na rodada
-R07: um consumidor novo descobriu `homologacao-mancal` e `r001`/`r002`, executou
+O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A
+[avaliação consolidada](../2026-08-05-mcp-avaliacao-consolidada.md) identificou
+`AVAL-01`, e o [plano corretivo](../2026-08-05-mcp-correcao-descoberta.md)
+adicionou o recurso `mecanifica://pacotes`, preservou as quatro ferramentas e
+seus schemas e passou pela prova caixa-preta pós-merge na rodada R07: um
+consumidor novo descobriu `homologacao-mancal` e `r001`/`r002`, executou
 `validar_pacote` e `comparar_revisoes` com sucesso e não usou fallback, leitura
 direta ou escrita.
 
