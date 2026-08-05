@@ -1,0 +1,71 @@
+name: Atualiza plano de autoria
+
+on:
+  push:
+    branches:
+      - agent/mcp-plano-autoria-controlada
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/mcp-plano-autoria-controlada
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Atualizar índice raiz
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          caminho = Path('docs/mecanifica/INDEX.md')
+          texto = caminho.read_text(encoding='utf-8')
+
+          antigo = '- Não há plano executivo ativo.'
+          novo = '- O plano executivo ativo é [MCP — autoria controlada de pacotes](planos/2026-08-05-mcp-autoria-controlada.md).'
+          if antigo in texto:
+              texto = texto.replace(antigo, novo, 1)
+          elif novo not in texto:
+              raise SystemExit('estado atual do índice raiz não encontrado')
+
+          antigo = '[Fatia 1B visual](planos/2026-08-05-mcp-fatia-1b-visual.md),\n[encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),'
+          novo = '[Fatia 1B visual](planos/2026-08-05-mcp-fatia-1b-visual.md),\n[avaliação consolidada](planos/2026-08-05-mcp-avaliacao-consolidada.md),\n[correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),\n[autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),\n[encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),'
+          if antigo in texto:
+              texto = texto.replace(antigo, novo, 1)
+          elif '[autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md)' not in texto:
+              raise SystemExit('inventário curado do índice raiz não encontrado')
+
+          antigo = 'docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/mcp/INDEX.md'
+          novo = ('docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md '
+                  'docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md '
+                  'docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md '
+                  'docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md '
+                  'docs/mecanifica/planos/mcp/INDEX.md')
+          if antigo in texto:
+              texto = texto.replace(antigo, novo, 1)
+          elif 'docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md' not in texto.split('<!-- Inventário explícito', 1)[-1]:
+              raise SystemExit('inventário explícito do índice raiz não encontrado')
+
+          caminho.write_text(texto, encoding='utf-8')
+          PY
+      - name: Regenerar mapa
+        run: npm run mapa
+      - name: Remover workflow temporário e publicar
+        run: |
+          rm .github/workflows/tmp-atualiza-plano-autoria.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/mecanifica/INDEX.md docs/uso/MAPA.md .github/workflows/tmp-atualiza-plano-autoria.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "docs: atualiza índices do plano de autoria"
+          git push origin HEAD:agent/mcp-plano-autoria-controlada
