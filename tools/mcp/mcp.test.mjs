@@ -1,7 +1,8 @@
 /* mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP. */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
@@ -10,6 +11,7 @@ import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/desc
 import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
+import { listarCatalogoDePacotes, serializarCanonico } from '../modelagem/formato-pacote.mjs';
 import {
   comparar, conteudoRenderizacao, descrever, LIMITES_VISTAS, renderizar,
   resumoComparacao, resumoDescricao, resumoTotais, validar,
@@ -120,7 +122,7 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia exatamente quatro tools e dois resources', async () => {
+  it('faz handshake bruto, anuncia exatamente quatro tools e três resources', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
       expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.2.0' });
@@ -135,9 +137,9 @@ describe('servidor MCP local — perfil revisao', () => {
       for (const tool of ferramentas.result.tools) expect(tool.outputSchema).toBeDefined();
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
-        'mecanifica://estado', 'mecanifica://capacidades/modelagem',
+        'mecanifica://estado', 'mecanifica://capacidades/modelagem', 'mecanifica://pacotes',
       ]);
-      expect(recursos.result.resources).toHaveLength(2);
+      expect(recursos.result.resources).toHaveLength(3);
     } finally {
       await cliente.fechar();
     }
@@ -281,19 +283,286 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('entrega os dois recursos e não expõe caminhos do runtime', async () => {
+  it('entrega os três recursos e não expõe caminhos do runtime', async () => {
     const { cliente } = await conectado();
     try {
       const estado = await cliente.enviar('resources/read', { uri: 'mecanifica://estado' });
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
+      const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
+      const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
       expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v2' });
       expect(estadoValor.ferramentas).toEqual(['descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas']);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
+      expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
+      expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
     } finally {
       await cliente.fechar();
     }
+  });
+
+  it('mecanifica://pacotes devolve o catálogo real no contrato aprovado, ordenado', async () => {
+    const { cliente } = await conectado();
+    try {
+      const resposta = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
+      const valor = JSON.parse(resposta.result.contents[0].text);
+      expect(valor).toEqual({
+        formato: 'mecanifica.catalogo-pacotes',
+        versao: 1,
+        pacotes: [
+          { id: 'homologacao-mancal', revisoes: ['r001', 'r002'] },
+          { id: 'homologacao-placa', revisoes: ['r001'] },
+          { id: 'prova-caixote', revisoes: ['r001', 'r002', 'r003'] },
+          { id: 'prova-freio', revisoes: ['r001'] },
+        ],
+      });
+      const ids = valor.pacotes.map((pacote) => pacote.id);
+      expect(ids).toEqual([...ids].sort());
+      for (const pacote of valor.pacotes) {
+        expect(pacote.revisoes).toEqual([...pacote.revisoes].sort());
+      }
+    } finally {
+      await cliente.fechar();
+    }
+  });
+
+  it('descobre um pacote e duas revisões só pelo recurso e chama validar_pacote/comparar_revisoes sem ler o repositório', async () => {
+    const client = new Client({ name: 'consumidor-descoberta', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+    });
+    try {
+      await client.connect(transport);
+      const catalogo = await client.readResource({ uri: 'mecanifica://pacotes' });
+      const { pacotes } = JSON.parse(catalogo.contents[0].text);
+      const descoberto = pacotes.find((pacote) => pacote.revisoes.length >= 2);
+      expect(descoberto).toBeDefined();
+      const validado = await client.callTool({ name: 'validar_pacote', arguments: { id: descoberto.id } });
+      expect(validado.isError).not.toBe(true);
+      expect(validado.structuredContent.resultado.id).toBe(descoberto.id);
+      const [anterior, posterior] = descoberto.revisoes;
+      const comparado = await client.callTool({
+        name: 'comparar_revisoes', arguments: { id: descoberto.id, anterior, posterior },
+      });
+      expect(comparado.isError).not.toBe(true);
+      expect(comparado.structuredContent.resultado).toMatchObject({ id: descoberto.id, anterior, posterior });
+    } finally {
+      await client.close();
+    }
+  });
+
+  describe('listarCatalogoDePacotes — ordenação, filtragem e confinamento (fixture isolada)', () => {
+    function comPacotesTemporarios(fabrica) {
+      const raizPacotes = mkdtempSync(join(tmpdir(), 'mecanifica-pacotes-'));
+      const fora = mkdtempSync(join(tmpdir(), 'mecanifica-fora-'));
+      try {
+        fabrica(raizPacotes, fora);
+        return listarCatalogoDePacotes({ raizPacotes });
+      } finally {
+        rmSync(raizPacotes, { recursive: true, force: true });
+        rmSync(fora, { recursive: true, force: true });
+      }
+    }
+    /* Fixture mínima, mas realmente válida no contrato `mecanifica.pacote-
+       modelagem`/`mecanifica.referencias-modelagem` — as mesmas chaves e
+       formato de um pacote oficial real (ex.: homologacao-mancal), só que
+       reduzida a um item por lista onde o contrato permite. `guias` aponta
+       para um guia que de fato existe em `autoria-assistida/guias/`, porque
+       `validarPacote` confere isso contra a raiz real do repositório. */
+    function briefingValido(id) {
+      return {
+        alvo: { caminho: `prototipos/fps/v3/pecas/${id}.js`, modo: 'criacao', peca: id },
+        checklist: [{ criterio: 'critério mínimo de prova.', estado: 'aberto', id: 'unico', prioridade: 1 }],
+        formato: 'mecanifica.pacote-modelagem',
+        guias: ['forma/silhueta-e-transicoes'],
+        id,
+        objetivo: 'Fixture de teste mínima e válida para o catálogo de pacotes.',
+        partesEsperadas: ['parte'],
+        perfil: {
+          distanciaMinima: 0.1, fidelidade: 'F0', interacao: 'contexto',
+          orcamento: { faces: 10 }, origem: 'declarado', precisao: 'ilustrativa', visual: 'esquematico',
+        },
+        provas: ['prova'],
+        versao: 1,
+      };
+    }
+    function referenciasValidas() {
+      return { ausenciaDeclarada: true, formato: 'mecanifica.referencias-modelagem', referencias: [], versao: 1 };
+    }
+    function pacoteValido(raizPacotes, id, revisoes = []) {
+      const pasta = join(raizPacotes, id);
+      mkdirSync(pasta, { recursive: true });
+      writeFileSync(join(pasta, 'briefing.json'), serializarCanonico(briefingValido(id)));
+      writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      for (const revisao of revisoes) {
+        const pastaRevisao = join(pasta, 'revisoes', revisao);
+        mkdirSync(pastaRevisao, { recursive: true });
+        writeFileSync(join(pastaRevisao, 'revisao.json'), '{"ok":true}');
+      }
+    }
+
+    it('ordena pacotes e revisões lexicograficamente, mesmo fora de ordem no disco', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'zebra', ['r002', 'r001', 'r010']);
+        pacoteValido(raiz, 'abelha', []);
+      });
+      expect(catalogo).toEqual([
+        { id: 'abelha', revisoes: [] },
+        { id: 'zebra', revisoes: ['r001', 'r002', 'r010'] },
+      ]);
+    });
+
+    it('ignora pastas sem briefing.json, sem referencias.json ou com JSON inválido', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        mkdirSync(join(raiz, 'sem-briefing'), { recursive: true });
+        writeFileSync(join(raiz, 'sem-briefing', 'referencias.json'), '{}');
+        mkdirSync(join(raiz, 'sem-referencias'), { recursive: true });
+        writeFileSync(join(raiz, 'sem-referencias', 'briefing.json'), '{}');
+        mkdirSync(join(raiz, 'json-quebrado'), { recursive: true });
+        writeFileSync(join(raiz, 'json-quebrado', 'briefing.json'), '{ isto não é json');
+        writeFileSync(join(raiz, 'json-quebrado', 'referencias.json'), '{}');
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora nomes que não são slug (maiúsculas, sublinhado, ponto)', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        pacoteValido(raiz, 'Invalido_Maiusculo');
+        pacoteValido(raiz, 'nome.com.ponto');
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora revisões sem revisao.json legível, mantendo as demais', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'pacote', ['r001']);
+        mkdirSync(join(raiz, 'pacote', 'revisoes', 'r002'), { recursive: true });
+        writeFileSync(join(raiz, 'pacote', 'revisoes', 'r002', 'revisao.json'), 'não é json');
+        mkdirSync(join(raiz, 'pacote', 'revisoes', 'r003'), { recursive: true });
+        mkdirSync(join(raiz, 'pacote', 'revisoes', 'nome-invalido'), { recursive: true });
+        writeFileSync(join(raiz, 'pacote', 'revisoes', 'nome-invalido', 'revisao.json'), '{}');
+      });
+      expect(catalogo).toEqual([{ id: 'pacote', revisoes: ['r001'] }]);
+    });
+
+    it('ignora pacote cujo diretório é symlink escapando da raiz de pacotes', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'legitimo');
+        pacoteValido(fora, 'segredo-fora-da-raiz');
+        symlinkSync(join(fora, 'segredo-fora-da-raiz'), join(raiz, 'escape'), 'dir');
+      });
+      expect(catalogo).toEqual([{ id: 'legitimo', revisoes: [] }]);
+    });
+
+    it('ignora revisões quando revisoes/ do pacote é symlink escapando da raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-revisoes-fora', ['r001']);
+        const pasta = join(raiz, 'pacote-com-revisoes-fora');
+        rmSync(join(pasta, 'revisoes'), { recursive: true, force: true });
+        const revisoesForaDaRaiz = join(fora, 'revisoes-secretas');
+        mkdirSync(join(revisoesForaDaRaiz, 'r999'), { recursive: true });
+        writeFileSync(join(revisoesForaDaRaiz, 'r999', 'revisao.json'), '{"segredo":true}');
+        symlinkSync(revisoesForaDaRaiz, join(pasta, 'revisoes'), 'dir');
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-com-revisoes-fora', revisoes: [] }]);
+    });
+
+    it('ignora o pacote inteiro quando briefing.json é symlink apontando para fora da raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-briefing-fora');
+        const pasta = join(raiz, 'pacote-com-briefing-fora');
+        const briefingSecreto = join(fora, 'briefing-secreto.json');
+        writeFileSync(briefingSecreto, '{"segredo":true}');
+        rmSync(join(pasta, 'briefing.json'));
+        symlinkSync(briefingSecreto, join(pasta, 'briefing.json'));
+      });
+      expect(catalogo).toEqual([]);
+    });
+
+    it('ignora só a revisão quando revisao.json é symlink apontando para fora da raiz, mantendo o pacote', () => {
+      const catalogo = comPacotesTemporarios((raiz, fora) => {
+        pacoteValido(raiz, 'pacote-com-revisao-json-fora', ['r001']);
+        const pasta = join(raiz, 'pacote-com-revisao-json-fora');
+        const revisaoSecreta = join(fora, 'revisao-secreta.json');
+        writeFileSync(revisaoSecreta, '{"segredo":true}');
+        rmSync(join(pasta, 'revisoes', 'r001', 'revisao.json'));
+        symlinkSync(revisaoSecreta, join(pasta, 'revisoes', 'r001', 'revisao.json'));
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-com-revisao-json-fora', revisoes: [] }]);
+    });
+
+    it('ignora pasta de pacote que é symlink para outro pacote válido dentro da mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'pacote-real', ['r001']);
+        symlinkSync(join(raiz, 'pacote-real'), join(raiz, 'alias'), 'dir');
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-real', revisoes: ['r001'] }]);
+    });
+
+    it('ignora revisoes/ quando é symlink para a pasta revisoes/ de outro pacote válido na mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'doador', ['r001']);
+        pacoteValido(raiz, 'receptor-com-alias-interno');
+        const pastaReceptor = join(raiz, 'receptor-com-alias-interno');
+        rmSync(join(pastaReceptor, 'revisoes'), { recursive: true, force: true });
+        symlinkSync(join(raiz, 'doador', 'revisoes'), join(pastaReceptor, 'revisoes'), 'dir');
+      });
+      expect(catalogo).toEqual([
+        { id: 'doador', revisoes: ['r001'] },
+        { id: 'receptor-com-alias-interno', revisoes: [] },
+      ]);
+    });
+
+    it('ignora briefing.json quando é symlink para o briefing.json de outro pacote válido na mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'doador-de-briefing');
+        pacoteValido(raiz, 'receptor-de-briefing-alias');
+        const pasta = join(raiz, 'receptor-de-briefing-alias');
+        rmSync(join(pasta, 'briefing.json'));
+        symlinkSync(join(raiz, 'doador-de-briefing', 'briefing.json'), join(pasta, 'briefing.json'));
+      });
+      expect(catalogo).toEqual([{ id: 'doador-de-briefing', revisoes: [] }]);
+    });
+
+    it('ignora pacote com briefing.json sintaticamente válido mas que não satisfaz o contrato canônico', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'contrato-invalido');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), serializarCanonico({ ok: true }));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora pacote cujo briefing.id diverge do nome da pasta', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'pasta-com-id-divergente');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), serializarCanonico(briefingValido('outro-id')));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('ignora pacote cujo briefing.json é válido mas não está serializado em bytes canônicos', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'valido');
+        const pasta = join(raiz, 'nao-canonico');
+        mkdirSync(pasta, { recursive: true });
+        writeFileSync(join(pasta, 'briefing.json'), JSON.stringify(briefingValido('nao-canonico')));
+        writeFileSync(join(pasta, 'referencias.json'), serializarCanonico(referenciasValidas()));
+      });
+      expect(catalogo).toEqual([{ id: 'valido', revisoes: [] }]);
+    });
+
+    it('devolve lista vazia, sem lançar, quando a raiz de pacotes não existe', () => {
+      expect(listarCatalogoDePacotes({ raizPacotes: join(tmpdir(), 'mecanifica-raiz-inexistente-xyz') })).toEqual([]);
+    });
   });
 
   it('mantém stderr fora do protocolo e encerra o processo stdio limpo', async () => {

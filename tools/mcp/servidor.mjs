@@ -8,6 +8,7 @@ import { ferramentasRevisao } from './perfis/revisao.mjs';
 import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
+import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 
 const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.2.0' });
 
@@ -32,6 +33,7 @@ const capacidadesModelagem = Object.freeze({
     'validar um pacote oficial somente leitura',
     'comparar duas revisões oficiais do mesmo pacote',
     'produzir e transportar as quatro vistas oficiais sem escrita',
+    'descobrir pacotes e revisões oficiais disponíveis',
   ],
   aindaNaoConsegue: [
     'promover ou escrever revisões',
@@ -114,6 +116,26 @@ function registrarRecursos(server) {
     'mecanifica://capacidades/modelagem',
     { title: 'Capacidades de modelagem', description: 'Limites do perfil revisao.', mimeType: 'application/json' },
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(capacidadesModelagem) }] }),
+  );
+  server.registerResource(
+    'catalogo-pacotes',
+    'mecanifica://pacotes',
+    {
+      title: 'Catálogo de pacotes',
+      description: 'Pacotes e revisões oficiais disponíveis, somente leitura.',
+      mimeType: 'application/json',
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        mimeType: 'application/json',
+        text: JSON.stringify({
+          formato: 'mecanifica.catalogo-pacotes',
+          versao: 1,
+          pacotes: listarCatalogoDePacotes(),
+        }),
+      }],
+    }),
   );
 }
 

@@ -1,7 +1,9 @@
 /* formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de
    modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de
    navegador: só o arquivo procedural, o núcleo neutro e a régua de partes. */
-import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import {
+  existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSync,
+} from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -10,12 +12,14 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 export const RAIZ_REPOSITORIO = resolve(AQUI, '../..');
 export const RAIZ_GUIAS = join(RAIZ_REPOSITORIO, 'autoria-assistida/guias');
 export const RAIZ_PACOTES = join(RAIZ_REPOSITORIO, 'autoria-assistida/pacotes');
+export const REVISOES = 'revisoes';
 export const LIMITE_PACOTE_BYTES = 24 * 1024;
 export const LIMITE_REFERENCIAS = 4;
 export const LIMITE_GUIAS = 4;
 export const LIMITE_CHECKLIST = 8;
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const REVISAO_SLUG = /^r[0-9]+$/;
 /* fixtures de prova herdadas começam por `_`; o sublinhado é nome, não índice. */
 const NOME_SEMANTICO = /^[A-Za-z_][A-Za-z0-9_-]*$/;
 const SHA256 = /^sha256:[a-f0-9]{64}$/;
@@ -374,4 +378,124 @@ export function conferirBytesCanonicos(conteudo, valor, onde) {
 export function caminhoDentro(raiz, candidato) {
   const relativo = relative(raiz, candidato);
   return relativo !== '' && !relativo.startsWith('..') && !isAbsolute(relativo);
+}
+
+/* Resolve `nome` (componente simples, sem separador) dentro de `pastaReal` —
+   que já precisa ser um caminho real, sem symlinks — e devolve o caminho
+   literal do resultado, ou `null` fail-closed. Duas checagens, nessa ordem:
+   (1) `lstatSync` no caminho literal rejeita symlink como categoria própria,
+   dentro ou fora da raiz — um pacote `alias` symlinkado para outro pacote
+   válido dentro de `RAIZ_PACOTES` não passa, mesmo sem escapar de nada;
+   (2) com o candidato confirmado não-symlink, `realpathSync` ainda confirma
+   confinamento contra escape (defesa em profundidade; num não-symlink o real
+   já é o próprio literal, mas manter a checagem cobre qualquer peculiaridade
+   de filesystem). Nunca lança. Encadear a partir de uma raiz já validada
+   neste mesmo nível, nunca da raiz literal do topo, é o que impede um
+   symlink intermediário (ex.: `<pacote>/revisoes`) de abrir uma nova "raiz"
+   alheia que passaria despercebida numa checagem feita só contra o topo. */
+function resolverFilhoConfinado(pastaReal, nome) {
+  const candidato = join(pastaReal, nome);
+  let literal;
+  try { literal = lstatSync(candidato); } catch { return null; }
+  if (literal.isSymbolicLink()) return null;
+  let real;
+  try { real = realpathSync(candidato); } catch { return null; }
+  return caminhoDentro(pastaReal, real) ? real : null;
+}
+
+function pastaRealConfinada(pastaReal, nome) {
+  const real = resolverFilhoConfinado(pastaReal, nome);
+  if (real === null) return null;
+  try { return statSync(real).isDirectory() ? real : null; } catch { return null; }
+}
+
+function arquivoRealConfinado(pastaReal, nome) {
+  const real = resolverFilhoConfinado(pastaReal, nome);
+  if (real === null) return null;
+  try { return statSync(real).isFile() ? real : null; } catch { return null; }
+}
+
+function jsonValidoOuNulo(arquivo) {
+  try { return JSON.parse(readFileSync(arquivo, 'utf8')); } catch { return null; }
+}
+
+/* Um pacote só é oficial se satisfizer o mesmo contrato canônico que
+   `validar_pacote` exige: `briefing.json`/`referencias.json` com bytes
+   canônicos exatos (`conferirBytesCanonicos`), estrutura válida de
+   `mecanifica.pacote-modelagem`/`mecanifica.referencias-modelagem`
+   (`validarPacote`), e `briefing.id` igual ao nome da pasta. JSON
+   sintaticamente válido mas fora do contrato — ou com id divergente da pasta
+   — não é suficiente e não é publicado; caso contrário o catálogo poderia
+   anunciar um id que `validar_pacote` rejeitaria na hora. Fail-closed: só
+   `false` ou `true`, nunca lança. */
+function pacoteOficialValido(pastaPacoteReal, id) {
+  const briefingArquivo = arquivoRealConfinado(pastaPacoteReal, 'briefing.json');
+  if (briefingArquivo === null) return false;
+  const referenciasArquivo = arquivoRealConfinado(pastaPacoteReal, 'referencias.json');
+  if (referenciasArquivo === null) return false;
+  let briefingTexto;
+  let referenciasTexto;
+  let briefingValor;
+  let referenciasValor;
+  try {
+    briefingTexto = readFileSync(briefingArquivo, 'utf8');
+    referenciasTexto = readFileSync(referenciasArquivo, 'utf8');
+    briefingValor = JSON.parse(briefingTexto);
+    referenciasValor = JSON.parse(referenciasTexto);
+  } catch { return false; }
+  if (!objeto(briefingValor) || briefingValor.id !== id) return false;
+  try {
+    conferirBytesCanonicos(briefingTexto, briefingValor, 'briefing.json');
+    conferirBytesCanonicos(referenciasTexto, referenciasValor, 'referencias.json');
+    validarPacote(briefingValor, referenciasValor);
+  } catch { return false; }
+  return true;
+}
+
+function listarRevisoesValidas(pastaPacoteReal) {
+  const pastaRevisoesReal = pastaRealConfinada(pastaPacoteReal, REVISOES);
+  if (pastaRevisoesReal === null) return [];
+  let entradas;
+  try { entradas = readdirSync(pastaRevisoesReal, { withFileTypes: true }); } catch { return []; }
+  const revisoes = [];
+  for (const entrada of entradas) {
+    if (!REVISAO_SLUG.test(entrada.name)) continue;
+    const pastaRevisaoReal = pastaRealConfinada(pastaRevisoesReal, entrada.name);
+    if (pastaRevisaoReal === null) continue;
+    const revisaoJson = arquivoRealConfinado(pastaRevisaoReal, 'revisao.json');
+    if (revisaoJson === null || jsonValidoOuNulo(revisaoJson) === null) continue;
+    revisoes.push(entrada.name);
+  }
+  return revisoes.sort();
+}
+
+/**
+ * Catálogo somente leitura de pacotes e revisões oficiais, derivado da raiz a
+ * cada chamada. Ignora de forma fail-closed qualquer entrada que não seja um
+ * slug confinado com `briefing.json`/`referencias.json` que satisfaçam o
+ * mesmo contrato canônico que `validar_pacote` exige (`pacoteOficialValido`),
+ * e qualquer revisão sem `revisao.json` legível na mesma rota que
+ * `comparar_revisoes` já consome. Cada pasta e cada arquivo (incluindo
+ * `revisoes/` em si) é resolvido e confinado pelo caminho real antes de ser
+ * lido, então um symlink em qualquer nível — a pasta do pacote, `revisoes/`,
+ * uma pasta de revisão, ou qualquer dos três JSONs — dentro ou fora de
+ * `RAIZ_PACOTES`, é rejeitado, nunca seguido. Não expõe caminhos absolutos
+ * nem conteúdo dos arquivos, só `id` e a lista ordenada de revisões.
+ */
+export function listarCatalogoDePacotes({ raizPacotes = RAIZ_PACOTES } = {}) {
+  let raizReal;
+  let entradas;
+  try {
+    raizReal = realpathSync(raizPacotes);
+    entradas = readdirSync(raizPacotes, { withFileTypes: true });
+  } catch { return []; }
+  const pacotes = [];
+  for (const entrada of entradas) {
+    if (!SLUG.test(entrada.name)) continue;
+    const pastaPacoteReal = pastaRealConfinada(raizReal, entrada.name);
+    if (pastaPacoteReal === null) continue;
+    if (!pacoteOficialValido(pastaPacoteReal, entrada.name)) continue;
+    pacotes.push({ id: entrada.name, revisoes: listarRevisoesValidas(pastaPacoteReal) });
+  }
+  return pacotes.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
