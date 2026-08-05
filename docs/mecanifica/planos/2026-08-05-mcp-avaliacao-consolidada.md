@@ -61,7 +61,8 @@ fallback fora do MCP.
 
 ## Invariantes
 
-- todos os cenários usam a `main` e registram o commit-base;
+- os cenários só começam depois do merge deste plano na `main`;
+- antes de cada cenário, o agente sincroniza a `main` e registra o commit-base;
 - o agente não lê diretamente arquivos ou dados das peças;
 - nenhuma CLI alternativa substitui uma ferramenta MCP;
 - nenhuma revisão, PNG ou outro artefato é gravado pelo teste;
