@@ -1,7 +1,9 @@
 /* formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de
    modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de
    navegador: só o arquivo procedural, o núcleo neutro e a régua de partes. */
-import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
+import {
+  existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSync,
+} from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -379,15 +381,23 @@ export function caminhoDentro(raiz, candidato) {
 }
 
 /* Resolve `nome` (componente simples, sem separador) dentro de `pastaReal` —
-   que já precisa ser um caminho real, sem symlinks — e devolve o caminho real
-   do resultado, ou `null` fail-closed se ele escapar de `pastaReal` (por
-   symlink, direto ou em qualquer segmento) ou não puder ser lido. Nunca
-   lança. Encadear esta função a partir de uma raiz já real, nunca da raiz
-   literal, é o que impede um symlink intermediário (ex.: `<pacote>/revisoes`)
-   de abrir uma nova "raiz real" alheia que passaria despercebida numa
-   checagem feita só contra o topo. */
+   que já precisa ser um caminho real, sem symlinks — e devolve o caminho
+   literal do resultado, ou `null` fail-closed. Duas checagens, nessa ordem:
+   (1) `lstatSync` no caminho literal rejeita symlink como categoria própria,
+   dentro ou fora da raiz — um pacote `alias` symlinkado para outro pacote
+   válido dentro de `RAIZ_PACOTES` não passa, mesmo sem escapar de nada;
+   (2) com o candidato confirmado não-symlink, `realpathSync` ainda confirma
+   confinamento contra escape (defesa em profundidade; num não-symlink o real
+   já é o próprio literal, mas manter a checagem cobre qualquer peculiaridade
+   de filesystem). Nunca lança. Encadear a partir de uma raiz já validada
+   neste mesmo nível, nunca da raiz literal do topo, é o que impede um
+   symlink intermediário (ex.: `<pacote>/revisoes`) de abrir uma nova "raiz"
+   alheia que passaria despercebida numa checagem feita só contra o topo. */
 function resolverFilhoConfinado(pastaReal, nome) {
   const candidato = join(pastaReal, nome);
+  let literal;
+  try { literal = lstatSync(candidato); } catch { return null; }
+  if (literal.isSymbolicLink()) return null;
   let real;
   try { real = realpathSync(candidato); } catch { return null; }
   return caminhoDentro(pastaReal, real) ? real : null;

@@ -468,6 +468,39 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(catalogo).toEqual([{ id: 'pacote-com-revisao-json-fora', revisoes: [] }]);
     });
 
+    it('ignora pasta de pacote que é symlink para outro pacote válido dentro da mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'pacote-real', ['r001']);
+        symlinkSync(join(raiz, 'pacote-real'), join(raiz, 'alias'), 'dir');
+      });
+      expect(catalogo).toEqual([{ id: 'pacote-real', revisoes: ['r001'] }]);
+    });
+
+    it('ignora revisoes/ quando é symlink para a pasta revisoes/ de outro pacote válido na mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'doador', ['r001']);
+        pacoteValido(raiz, 'receptor-com-alias-interno');
+        const pastaReceptor = join(raiz, 'receptor-com-alias-interno');
+        rmSync(join(pastaReceptor, 'revisoes'), { recursive: true, force: true });
+        symlinkSync(join(raiz, 'doador', 'revisoes'), join(pastaReceptor, 'revisoes'), 'dir');
+      });
+      expect(catalogo).toEqual([
+        { id: 'doador', revisoes: ['r001'] },
+        { id: 'receptor-com-alias-interno', revisoes: [] },
+      ]);
+    });
+
+    it('ignora briefing.json quando é symlink para o briefing.json de outro pacote válido na mesma raiz', () => {
+      const catalogo = comPacotesTemporarios((raiz) => {
+        pacoteValido(raiz, 'doador-de-briefing');
+        pacoteValido(raiz, 'receptor-de-briefing-alias');
+        const pasta = join(raiz, 'receptor-de-briefing-alias');
+        rmSync(join(pasta, 'briefing.json'));
+        symlinkSync(join(raiz, 'doador-de-briefing', 'briefing.json'), join(pasta, 'briefing.json'));
+      });
+      expect(catalogo).toEqual([{ id: 'doador-de-briefing', revisoes: [] }]);
+    });
+
     it('devolve lista vazia, sem lançar, quando a raiz de pacotes não existe', () => {
       expect(listarCatalogoDePacotes({ raizPacotes: join(tmpdir(), 'mecanifica-raiz-inexistente-xyz') })).toEqual([]);
     });
