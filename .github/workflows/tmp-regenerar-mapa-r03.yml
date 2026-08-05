@@ -1,0 +1,40 @@
+name: Regenerar mapa R03
+
+on:
+  push:
+    branches:
+      - agent/mcp-correcao-descoberta
+    paths:
+      - 'docs/mecanifica/planos/**'
+
+concurrency:
+  group: regenerar-mapa-r03-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  mapa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run mapa
+      - name: Publicar mapa atualizado
+        run: |
+          if git diff --quiet -- docs/uso/MAPA.md; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/uso/MAPA.md
+          git commit -m "Atualiza mapa gerado"
+          git push origin HEAD:${{ github.ref_name }}
