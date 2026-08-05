@@ -1,0 +1,6 @@
+[mcp_servers.mecanifica]
+command = "node"
+args = ["tools/mcp/servidor.mjs"]
+enabled = true
+required = true
+enabled_tools = ["descrever_peca", "validar_pacote", "comparar_revisoes"]
