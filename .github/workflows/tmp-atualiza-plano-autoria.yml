@@ -30,30 +30,30 @@ jobs:
           caminho = Path('docs/mecanifica/INDEX.md')
           texto = caminho.read_text(encoding='utf-8')
 
-          antigo = '- Não há plano executivo ativo.'
-          novo = '- O plano executivo ativo é [MCP — autoria controlada de pacotes](planos/2026-08-05-mcp-autoria-controlada.md).'
-          if antigo in texto:
-              texto = texto.replace(antigo, novo, 1)
-          elif novo not in texto:
-              raise SystemExit('estado atual do índice raiz não encontrado')
+          substituicoes = [
+              (
+                  '- Não há plano executivo ativo.',
+                  '- O plano executivo ativo é [MCP — autoria controlada de pacotes](planos/2026-08-05-mcp-autoria-controlada.md).',
+              ),
+              (
+                  '- Decidir explicitamente se será aberto um novo plano do MCP; autoria, materiais\n  e distribuição continuam apenas como candidatos.',
+                  '- Executar e fechar o plano de autoria controlada; materiais e distribuição\n  continuam apenas como candidatos.',
+              ),
+              (
+                  '[correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),\n[encerramento da Fatia 1A]',
+                  '[correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),\n[autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),\n[encerramento da Fatia 1A]',
+              ),
+              (
+                  'docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/mcp/INDEX.md',
+                  'docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md',
+              ),
+          ]
 
-          antigo = '[Fatia 1B visual](planos/2026-08-05-mcp-fatia-1b-visual.md),\n[encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),'
-          novo = '[Fatia 1B visual](planos/2026-08-05-mcp-fatia-1b-visual.md),\n[avaliação consolidada](planos/2026-08-05-mcp-avaliacao-consolidada.md),\n[correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),\n[autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),\n[encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),'
-          if antigo in texto:
-              texto = texto.replace(antigo, novo, 1)
-          elif '[autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md)' not in texto:
-              raise SystemExit('inventário curado do índice raiz não encontrado')
-
-          antigo = 'docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/mcp/INDEX.md'
-          novo = ('docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md '
-                  'docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md '
-                  'docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md '
-                  'docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md '
-                  'docs/mecanifica/planos/mcp/INDEX.md')
-          if antigo in texto:
-              texto = texto.replace(antigo, novo, 1)
-          elif 'docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md' not in texto.split('<!-- Inventário explícito', 1)[-1]:
-              raise SystemExit('inventário explícito do índice raiz não encontrado')
+          for antigo, novo in substituicoes:
+              if antigo in texto:
+                  texto = texto.replace(antigo, novo, 1)
+              elif novo not in texto:
+                  raise SystemExit(f'âncora não encontrada: {antigo[:80]}')
 
           caminho.write_text(texto, encoding='utf-8')
           PY
