@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-246 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+249 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -123,6 +123,7 @@
 ## docs/mecanifica/planos/
 
 - `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
+- `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -149,6 +150,14 @@
 - `2026-08-03-inspecao-reproduzivel-de-par.md` — AUT-2026-19 — inspeção reproduzível de par
 - `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
+
+## docs/mecanifica/planos/mcp/
+
+- `INDEX.md` — Programa MCP — índice de planos
+
+## docs/mecanifica/planos/mcp/concluidos/
+
+- `01-fatia-1a-piloto-leitura.md` — MCP — encerramento da Fatia 1A somente leitura
 
 ## docs/rumo/
 

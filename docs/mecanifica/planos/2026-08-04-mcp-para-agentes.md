@@ -1,6 +1,6 @@
 # MCP para agentes — reduzir contexto sem perder rastreabilidade
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** a definir
 
@@ -191,7 +191,9 @@ material ou câmera.
 
 ## Encerramento
 
-O plano está ativo somente para esta Fatia 1A, com escopo e arquivos
-reservados acima. O próximo degrau só começa após evidências do piloto local,
-redução mensurável e decisão registrada; ao concluir ou cancelar, registrar
-resultado, gates, medições e candidatos devolvidos ao backlog.
+A Fatia 1A foi aprovada e encerrada em 2026-08-05. O registro canônico das
+medições e limites está em
+`docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md`. A única
+continuação autorizada é o plano ativo
+`docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md`; autoria, materiais,
+Git e servidor remoto permanecem candidatos sem autorização de implementação.

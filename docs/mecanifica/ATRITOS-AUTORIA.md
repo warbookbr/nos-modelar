@@ -45,4 +45,4 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-38 | resolvido; revisão conserva evidência recusada |
 
 Pendências abertas adicionais: costuras topológicas de `lathe`, endereço único
-para grupo linear, abertura oblonga, materiais genéricos, Caso 3 e onboarding.
+para grupo linear, abertura oblonga, materiais genéricos e Caso 3. O onboarding está em medição pelo programa MCP.

@@ -16,7 +16,8 @@ ele não executa o núcleo procedural.
 
 ## Estado
 
-Casos 1 e 2 estão homologados. O Caso 3 ainda não começou. Não há plano ativo.
+Casos 1 e 2 estão homologados e a Fatia 1A do MCP foi aprovada e
+encerrada. A Fatia 1B visual é o único plano ativo; o Caso 3 ainda não começou.
 O núcleo, as receitas, o visor compatível, a bancada e as ferramentas continuam
 ativos. O contrato genérico de materiais ainda não existe. O servidor estático
 local ainda falha ao resolver o import bare `earcut`.

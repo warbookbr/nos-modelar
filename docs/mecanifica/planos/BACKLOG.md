@@ -6,7 +6,7 @@ Este arquivo lista candidatos. Nenhum item é autorização de implementação.
 |---|---|
 | Import `earcut` no servidor estático | reproduzir e corrigir na ferramenta apropriada |
 | Caso 3 da homologação | ainda não iniciado |
-| Onboarding e custo de contexto | medir antes de propor contrato novo |
+| Onboarding e custo de contexto | programa MCP ativo; Fatia 1B mede o recorte visual sem autoria ou materiais |
 | Costuras topológicas de `lathe` | investigação de núcleo, sem alterar receita |
 | Endereço único para grupo linear | capacidade semântica aberta |
 | Abertura oblonga | ainda não expressável; não simular com pintura |

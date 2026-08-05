@@ -2,11 +2,21 @@
 
 ## Estado
 
-**Plano ativo:** [MCP para agentes](2026-08-04-mcp-para-agentes.md) — fatia preparatória do Degrau 1.
+**Plano ativo:** [MCP — Fatia 1B visual somente leitura](2026-08-05-mcp-fatia-1b-visual.md)
 
-Um backlog não autoriza implementação automática. Um plano
-só fica ativo quando tem objetivo, escopo, gates, arquivos reservados, critério
-de saída e encerramento registrado.
+Um backlog, programa ou linha candidata não autoriza implementação automática.
+Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,
+critério de saída e encerramento registrado.
+
+## Programas
+
+| Programa | Painel | Execução atual |
+|---|---|---|
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | Fatia 1B visual |
+
+O painel de programa acompanha dependências e resultados, mas não conta como
+plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
+[`mcp/concluidos/01-fatia-1a-piloto-leitura.md`](mcp/concluidos/01-fatia-1a-piloto-leitura.md).
 
 ## Contrato de plano
 
@@ -20,8 +30,8 @@ Todo plano curto deve declarar:
 6. limites e itens explicitamente fora;
 7. resultado, decisão e caminho de encerramento.
 
-Estados permitidos: `candidato`, `ativo`, `bloqueado`, `concluído` e
-`cancelado`. Só existe um plano `ativo` por vez.
+Estados aceitos nos planos executivos datados: `rascunho`, `pronto`, `ativo`,
+`concluído` e `cancelado`. Só existe um plano `ativo` por vez.
 
 ## Concluídos
 
@@ -36,6 +46,7 @@ nos arquivos originais.
 | Câmera, pose e inspeção reproduzível | concluído |
 | Hierarquia, subárvore e interfaces | concluído |
 | Encerramento do plano mestre | concluído |
+| MCP — Fatia 1A somente leitura | concluído |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -47,12 +58,15 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [tolerâncias](concluidos/2026-08-02-tolerancias-de-montagem.md), [triangulação](concluidos/2026-08-02-triangulacao-de-furos.md),
 [consulta](concluidos/2026-08-03-consulta-subarvore-ia.md), [hierarquia](concluidos/2026-08-03-hierarquia-semantica-minima.md),
 [inspeção](concluidos/2026-08-03-inspecao-reproduzivel-de-par.md), [seleção](concluidos/2026-08-03-selecao-subarvore-semantica.md),
-[encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+[encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md) e
+[MCP Fatia 1A](mcp/concluidos/01-fatia-1a-piloto-leitura.md).
 
 ## Abertura
 
-Os únicos candidatos abertos estão em [`BACKLOG.md`](BACKLOG.md). Para abrir um
-plano, copie [`MODELO.md`](MODELO.md), preencha as provas e atualize esta tabela.
+Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
+do MCP permanecem somente no painel `mcp/INDEX.md` até que a etapa anterior
+produza evidência suficiente. Para abrir um plano executivo, copie
+[`MODELO.md`](MODELO.md), preencha as provas e atualize este índice.
 
-Plano ativo: [MCP para agentes](2026-08-04-mcp-para-agentes.md).
-Referência curada: `docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md`.
+Referência curada do plano ativo:
+`docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md`.
