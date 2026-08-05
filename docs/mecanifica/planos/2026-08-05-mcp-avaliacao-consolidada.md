@@ -1,6 +1,6 @@
 # MCP — avaliação consolidada por agente consumidor
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (coordenação e revisão) e Claude/brigsd (operação e teste)
 
@@ -123,8 +123,26 @@ uma ferramenta ou preencher uma entrada essencial.
 Achados que exigirem mudança de código não ampliam este plano. Eles recebem uma
 decisão separada e, quando aprovados, uma branch e um plano próprios.
 
-## Fechamento
+## Encerramento
 
-Ao concluir ou cancelar, registrar na issue #18 os cenários, métricas, atritos e
-a recomendação consolidada. Atualizar este arquivo com estado final, PR/commit,
-gates e decisão do programa. Nenhuma etapa de autoria abre automaticamente.
+**Decisão:** `corrigir`.
+
+A avaliação foi concluída na issue #18 com três cenários e diagnóstico limitado:
+
+- `descrever_peca` passou em `_mancal-de-mesa` e `_placa-adaptadora`;
+- `renderizar_vistas` passou nas duas peças, com 4/4 vistas oficiais, nenhuma
+  escrita e nenhum fallback;
+- `validar_pacote` não pôde ser usado de ponta a ponta por um consumidor novo;
+- `comparar_revisoes` não pôde ser chamado sem adivinhar pacote e revisões;
+- o achado `AVAL-01` foi classificado como contratual/de descoberta;
+- o diagnóstico da rodada R02 confirmou que os schemas aceitam slugs abertos,
+  enquanto nenhum recurso ou ferramenta publica os valores oficiais existentes.
+
+A hipótese foi parcialmente confirmada: inspeção e prova visual são utilizáveis,
+mas validação e comparação não são autodescobríveis. A correção aprovada como
+próxima etapa é um recurso somente leitura para catalogar pacotes e revisões,
+sem alterar as quatro ferramentas existentes.
+
+O trabalho corretivo não pertence a este plano. Ele está autorizado somente pelo
+plano separado `2026-08-05-mcp-correcao-descoberta.md`. Autoria, materiais e
+distribuição permanecem bloqueados.
