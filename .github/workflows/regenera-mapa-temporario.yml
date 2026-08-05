@@ -1,0 +1,33 @@
+name: Regenera mapa temporario
+
+on:
+  push:
+    branches:
+      - agent/mcp-avaliacao-consolidada
+
+permissions:
+  contents: write
+
+jobs:
+  mapa:
+    if: ${{ !contains(github.event.head_commit.message, '[mapa-gerado]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/mcp-avaliacao-consolidada
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run mapa
+      - name: Publica inventario gerado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/uso/MAPA.md
+          if git diff --cached --quiet; then
+            echo "Mapa ja estava em dia"
+          else
+            git commit -m "Atualiza mapa gerado [mapa-gerado]"
+            git push
+          fi
