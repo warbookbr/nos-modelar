@@ -1,15 +1,16 @@
 name: Atualiza plano de autoria
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/mcp-plano-autoria-controlada
+      - main
 
 permissions:
   contents: write
 
 jobs:
   atualizar:
+    if: github.head_ref == 'agent/mcp-plano-autoria-controlada'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
