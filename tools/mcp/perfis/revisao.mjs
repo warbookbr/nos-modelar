@@ -7,7 +7,7 @@ import { olharBancada } from '../../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../../modelagem/revisao-modelagem.mjs';
 import {
-  RAIZ_PACOTES, caminhoDentro, caminhoPacote,
+  RAIZ_PACOTES, REVISOES, caminhoDentro, caminhoPacote,
 } from '../../modelagem/formato-pacote.mjs';
 import { ErroDePacote } from '../../modelagem/formato-pacote.mjs';
 import {
@@ -16,7 +16,6 @@ import {
   validarEntrada, validarSaida,
 } from '../contratos.mjs';
 
-const REVISOES = 'revisoes';
 const VISTAS_OFICIAIS = Object.freeze(['isometrica', 'frontal', 'direita', 'superior']);
 export const LIMITES_VISTAS = Object.freeze({
   imagemBytes: 2 * 1024 * 1024,
