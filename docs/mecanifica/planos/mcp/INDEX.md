@@ -5,6 +5,24 @@ programa, não um plano executivo e não autoriza implementar todas as etapas.
 Somente o plano datado marcado como `ativo` em
 `docs/mecanifica/planos/README.md` abre trabalho.
 
+## Visão macro do programa
+
+O programa converte os serviços da Mecanifica em um MCP completo por três
+módulos. O resultado global esperado é um serviço MCP redondo: leitura e revisão
+determinísticas, autoria controlada com materiais canônicos e distribuição
+segura para consumidores, sem misturar essas capacidades antes de cada uma ter
+contrato, provas e critérios de parada próprios.
+
+| Módulo | Finalidade | Etapas deste painel |
+|---|---|---|
+| 1. Modelagem e revisão | Expor inspeção, validação, comparação e prova visual somente leitura sobre os serviços existentes. | preparação do núcleo e das CLIs; Fatias 1A e 1B; avaliação consolidada |
+| 2. Autoria e materiais | Permitir criação e alteração controladas, com `dry-run`, escrita confinada e contrato canônico de materiais. | autoria controlada; contrato e ferramentas de materiais |
+| 3. Orquestração e publicação | Empacotar, transportar e operar o MCP com autenticação e múltiplos consumidores quando o valor local estiver comprovado. | distribuição e orquestração |
+
+Os módulos são o mapa conceitual de longo prazo. As etapas abaixo continuam
+sendo a fonte de verdade para estado, dependência e evidência; uma linha futura
+não autoriza implementação até existir um plano executivo ativo.
+
 ## Estado
 
 | Etapa | Estado | Depende de | Evidência ou saída |
