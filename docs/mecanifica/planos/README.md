@@ -27,8 +27,8 @@ e a correção de descoberta foi concluída com decisão `aprovar` em
 A primeira etapa autorizada após o Módulo 1 é o plano
 [`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
 Ela abre somente planejamento e criação atômica de pacotes canônicos em duas
-fases. Edição de receita, revisões, materiais, Git e distribuição permanecem
-fora.
+fases. A revisão do preview e sua confirmação são obrigatórias antes da escrita.
+Edição de receita, revisões, materiais, Git e distribuição permanecem fora.
 
 ## Contrato de plano
 
