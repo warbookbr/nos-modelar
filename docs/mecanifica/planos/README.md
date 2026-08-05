@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [MCP — autoria controlada de pacotes](2026-08-05-mcp-autoria-controlada.md).
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,
@@ -12,7 +12,7 @@ critério de saída e encerramento registrado.
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | Módulo 1 concluído e aprovado; nenhuma etapa ativa |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | Módulo 2, primeira fatia: autoria controlada de pacotes |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -23,6 +23,12 @@ avaliação consolidada foi concluída com decisão `corrigir` em
 [`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md)
 e a correção de descoberta foi concluída com decisão `aprovar` em
 [`2026-08-05-mcp-correcao-descoberta.md`](2026-08-05-mcp-correcao-descoberta.md).
+
+A primeira etapa autorizada após o Módulo 1 é o plano
+[`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
+Ela abre somente planejamento e criação atômica de pacotes canônicos em duas
+fases. Edição de receita, revisões, materiais, Git e distribuição permanecem
+fora.
 
 ## Contrato de plano
 
@@ -77,9 +83,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
-e um novo plano executivo ativo. A aprovação do Módulo 1 satisfaz a dependência
-técnica das etapas seguintes, mas não autoriza autoria, materiais ou distribuição
-por implicação. Para abrir um plano executivo, copie [`MODELO.md`](MODELO.md),
-preencha as provas e atualize este índice.
+e um novo plano executivo ativo. A aprovação do Módulo 1 satisfez a dependência
+técnica da autoria controlada, mas não autoriza materiais ou distribuição por
+implicação. Para abrir outro plano executivo, encerre primeiro o plano ativo,
+copie [`MODELO.md`](MODELO.md), preencha as provas e atualize este índice.
 
-Referência curada atual: nenhum plano executivo ativo.
+Referência curada do plano ativo:
+`docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md`.
