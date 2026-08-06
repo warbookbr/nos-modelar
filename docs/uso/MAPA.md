@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-252 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -107,6 +107,7 @@
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
+- `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -127,6 +128,7 @@
 - `2026-08-05-mcp-avaliacao-consolidada.md` — MCP — avaliação consolidada por agente consumidor
 - `2026-08-05-mcp-correcao-descoberta.md` — MCP — correção de descoberta de pacotes e revisões
 - `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
+- `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica

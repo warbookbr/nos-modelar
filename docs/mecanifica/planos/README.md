@@ -2,11 +2,30 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [`2026-08-06-diagnostico-motor-procedural.md`](2026-08-06-diagnostico-motor-procedural.md).
+
+A etapa atual é um diagnóstico técnico do motor procedural existente. Ela
+autoriza leitura, rastreamento de dados, execução de provas e produção de
+relatório, mas não autoriza refatorar o motor, alterar receitas, implementar
+montagens ou acrescentar escrita ao MCP.
+
+O plano executivo permanece curto conforme o contrato desta pasta. O método,
+as perguntas de inspeção e o padrão de evidência estão detalhados em
+[`../PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../PROTOCOLO-DIAGNOSTICO-MOTOR.md).
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,
 critério de saída e encerramento registrado.
+
+## Execução atual
+
+O diagnóstico deve determinar o contrato real de entrada, execução e saída do
+motor, seu teto para peças mecânicas e sua fronteira com uma futura camada de
+montagem. O encerramento precisa classificar os achados em `PRESERVAR`,
+`DOCUMENTAR`, `REFATORAR` ou `ADIAR` e recomendar um único próximo plano:
+montagem mínima, correções localizadas ou redefinição do contrato do motor.
+
+Nenhum achado autoriza correção automática durante o estudo.
 
 ## Programas
 
@@ -85,10 +104,12 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
+O diagnóstico do motor é o único plano autorizado. Montagem persistida, mapa de
+dependências, escrita para IA, materiais e novas etapas do MCP permanecem no
+backlog até o diagnóstico ser encerrado e recomendar o próximo recorte.
+
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
-e um novo plano executivo ativo. A aprovação do Módulo 1 satisfez a dependência
-técnica da autoria controlada, mas o bloqueio de publicação atômica impede sua
-abertura por implicação. Materiais e distribuição também não estão autorizados.
-Para abrir outro plano executivo, copie [`MODELO.md`](MODELO.md), preencha as
-provas e atualize este índice.
+e um novo plano executivo ativo. Para abrir outro plano, primeiro conclua ou
+cancele o plano atual; depois copie [`MODELO.md`](MODELO.md), preencha as provas
+e atualize este índice.
