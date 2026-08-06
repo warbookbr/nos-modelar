@@ -2,74 +2,184 @@
 
 ## A frase
 
-Uma oficina 3D interativa que transforma um diagnóstico mecânico em algo que o
-cliente consegue ver, explorar e compreender.
+Uma oficina procedural para que uma IA construa e mantenha máquinas complexas
+como peças editáveis e montagens recursivas, com identidade, relações, medição e
+inspeção reproduzível.
 
 ## O problema
 
-Explicar um defeito automotivo costuma depender de vocabulário técnico, peças
-escondidas e confiança. Fotos isoladas e descrições verbais mostram o dano, mas
-raramente mostram o sistema funcionando, a progressão da falha ou a razão do
-reparo.
+Uma IA pode produzir uma peça ou uma imagem 3D sem produzir um sistema que
+continue compreensível, editável e verificável. Quanto maior o objeto, maior o
+risco de virar uma massa única, difícil de localizar, alterar, reutilizar,
+comparar e validar.
 
-A Mecanifica deve permitir que a oficina apresente:
+O projeto existe para reduzir esse problema. Tudo deve ser avaliado pela pergunta:
 
-- como o sistema funciona em condição normal;
-- qual componente apresentou problema;
-- como o defeito altera o funcionamento;
-- o que pode acontecer se o reparo for adiado;
-- o que a substituição ou manutenção corrige.
+> **Isto melhora ou facilita o trabalho da IA ao modelar, inspecionar, corrigir e
+> manter objetos 3D mecânicos?**
 
-## Primeira experiência
+Uma capacidade que ajuda apenas um operador humano, uma demonstração ou uma
+interface externa não é, por si só, objetivo deste repositório.
 
-O primeiro módulo é um freio a disco dianteiro genérico e didático dentro de um
-galpão de oficina. O conjunto inclui cubo, disco, pinça, suporte, pistão,
-pastilhas, flexível e uma roda simplificada.
+## O que a IA deve conseguir fazer
 
-A experiência deve permitir caminhar pelo galpão, aproximar-se da bancada,
-selecionar o conjunto e entrar em um modo de inspeção. Nesse modo, o usuário pode
-girar a câmera, destacar partes, explodir o conjunto e comparar estados:
+A Mecanifica deve permitir que a IA:
 
-1. funcionamento normal;
-2. desgaste progressivo da pastilha;
-3. limite de segurança;
-4. contato metal com metal;
-5. risco ao disco e perda de eficiência;
-6. resultado após o reparo.
+- entenda qual definição é responsável por uma forma;
+- crie uma nova peça sem depender apenas de moldes preparados;
+- altere parâmetros e também a lógica geométrica;
+- organize peças em montagens;
+- componha montagens dentro de montagens maiores;
+- selecione um alvo de edição sem carregar informação desnecessária;
+- escolha quais componentes precisa observar juntos;
+- isole visualmente uma peça sem perder seu contexto estrutural;
+- medir dimensões, eixos, centros, folgas, contatos e interferências;
+- comparar revisões e localizar regressões;
+- descobrir quais montagens dependem de uma alteração;
+- corrigir a peça, adaptar a montagem ou criar uma variante;
+- publicar somente estados completos, íntegros e reproduzíveis.
+
+## Horizonte
+
+A progressão desejada é:
+
+1. peças automotivas isoladas;
+2. pequenos conjuntos mecânicos;
+3. sistemas automotivos completos;
+4. um carro inteiro composto por sistemas e conjuntos;
+5. depois que esse modelo estiver maduro, robôs e outras máquinas compostas.
+
+O carro é o primeiro grande domínio de prova porque combina muitas peças,
+relações, movimentos, encaixes e escalas de inspeção. Robôs entram depois porque
+exigem os mesmos fundamentos e acrescentam articulação, cinemática e controle.
+
+## Peça e montagem
+
+Um carro não deve ser uma única receita. Um motor também não.
+
+A unidade geométrica editável é a **peça**. A unidade de composição é a
+**montagem**. Montagens podem conter outras montagens.
+
+```text
+carro
+├─ carroceria
+├─ conjunto dianteiro
+│  ├─ suspensão
+│  ├─ freio
+│  └─ roda
+│     ├─ pneu
+│     ├─ aro
+│     └─ fixadores
+└─ motor
+   ├─ bloco
+   ├─ cabeçote
+   └─ conjunto do virabrequim
+```
+
+A árvore de composição não basta sozinha. Relações podem atravessar ramos: roda,
+cubo, eixo, freio, suspensão e caixa de roda precisam ser entendidos em conjunto
+mesmo quando não pertencem ao mesmo ramo imediato.
+
+## Trabalho local com contexto preservado
+
+A IA não deve observar o carro inteiro em toda tarefa. Ela deve conseguir pedir
+contextos reduzidos como:
+
+```text
+somente a roda
+roda + cubo
+roda + eixo
+capô + dobradiças
+pistão + biela + virabrequim
+motor + cofre do motor
+suspensão + roda + caixa de roda
+```
+
+O contexto de trabalho separa:
+
+1. alvo que pode ser alterado;
+2. objetos mostrados somente para comparação;
+3. dependências que podem ter sido afetadas;
+4. validações obrigatórias antes de aceitar o resultado.
+
+Isolar reduz o ruído visual. Não apaga relações, dependências ou obrigações de
+validação.
+
+## Mapa como dado
+
+Composição, relações e dependências devem existir como dado estruturado e
+validável.
+
+Esse mapa precisa responder:
+
+- quais peças e montagens existem;
+- qual receita gera cada peça;
+- onde cada instância é usada;
+- o que contém o quê;
+- quais interfaces e relações ligam componentes;
+- quais montagens dependem de uma alteração;
+- quais verificações precisam ser repetidas;
+- quais objetos devem ser observados juntos.
+
+Documentos, árvores e diagramas podem ser gerados desse mapa. Eles não devem ser
+a única fonte de verdade.
+
+## Validação em camadas
+
+A IA precisa receber retorno por várias camadas:
+
+- **estrutural:** definição executável, referências válidas, identidade estável;
+- **geométrica:** dimensões, espessuras, centros, eixos, volumes e colisões;
+- **interfaces:** encaixe, alinhamento, fixação, contato e tolerância;
+- **montagem e movimento:** pose, curso, rotação, interferência e espaço varrido;
+- **visual:** proporção, leitura da forma, acabamento e coerência com referências.
+
+A inspeção visual é indispensável, mas não substitui medidas e contratos
+mecânicos básicos.
 
 ## Princípios
 
-- **Didático sem ser enganoso.** Simplificar a apresentação, não a causalidade.
-- **Interativo.** A pessoa explora, compara e controla o ritmo da explicação.
-- **Visual primeiro.** Texto apoia a demonstração; não tenta substituí-la.
-- **Sem diagnóstico inventado.** A aplicação comunica um diagnóstico fornecido
-  pela oficina; ela não diagnostica o veículo sozinha.
-- **Genérico antes de específico.** O primeiro freio ensina o sistema. Versões de
-  veículos reais exigirão medidas e fontes técnicas próprias.
-- **Acessível.** Deve funcionar no navegador, em computador e celular, sem
-  instalação.
-- **Autoria nativa para IA.** A IA deve criar e refinar conteúdo estruturado,
-  legível e verificável, não apenas despejar uma malha final.
-- **Capacidade antes da peça.** Nesta oficina, uma peça é evidência e bancada de
-  prova; o produto do repositório é a capacidade de uma IA criar, revisar e
-  evoluir conteúdo com segurança. Uma melhoria pode e deve nascer de um cenário
-  deliberadamente criado para medi-la — não precisa esperar uma falha dolorosa
-  em uma peça existente.
-- **Avanço comprovado, não inércia comprovada.** Homologar o que já existe serve
-  para descobrir limites, regressões e próximos ganhos. Um resultado verde não
-  encerra a busca por melhoria, e uma prova que falha é informação para escolher
-  o próximo recorte, não motivo para esconder a lacuna.
+- **IA primeiro.** O valor de uma capacidade é medido pelo ganho no trabalho da
+  IA.
+- **Autoria nativa.** A IA cria conteúdo estruturado e reexecutável, não apenas
+  uma malha final.
+- **Peça não é montagem.** Receitas geram peças; montagens organizam peças e
+  outras montagens.
+- **Controle amplo.** A IA pode alterar geometria, composição e relações, não
+  apenas parâmetros preparados.
+- **Escrita rigorosa.** Estado inválido ou parcial não é publicado.
+- **Identidade estável.** Alvos continuam encontráveis entre execuções e
+  revisões.
+- **Trabalho local, impacto global conhecido.** A IA trabalha em recortes, mas o
+  sistema descobre dependentes.
+- **Mapa como dado.** Relações não vivem apenas em prosa.
+- **Validação em camadas.** Medição e inspeção visual se complementam.
+- **Capacidade antes da peça.** Cada peça também prova e melhora uma capacidade
+  geral da oficina.
+- **MCP é uma porta.** MCP, CLI ou API podem expor capacidades; nenhuma dessas
+  opções define o núcleo ou o modelo de autoria.
+- **Avanço comprovado.** Testes medem ganhos e revelam lacunas; resultados verdes
+  não encerram a busca por melhoria.
 
-## Limites iniciais
+## Limites atuais
 
-- Não é um manual oficial de reparação.
-- Não substitui inspeção, medição ou responsabilidade do profissional.
-- Não promete física de engenharia em tempo real.
-- Não depende de servidor próprio; a experiência publicada roda no GitHub Pages.
-- Não exige um carro completo para provar o primeiro sistema.
+Ainda não existem:
 
-## Sinal de que a primeira etapa deu certo
+- montagem recursiva persistida;
+- mapa completo de composição e dependências;
+- contexto de trabalho derivado automaticamente;
+- camada completa de escrita para IA;
+- solver geral de encaixe;
+- validação geral de movimento e espaço varrido;
+- contrato genérico de materiais;
+- física de engenharia em tempo real.
 
-Um mecânico consegue abrir um link no celular, mostrar o conjunto de freio ao
-cliente e conduzir uma explicação clara de desgaste e consequência sem precisar
-traduzir mentalmente uma imagem técnica estática.
+## Sinal de progresso
+
+A direção está funcionando quando uma IA consegue criar uma peça, colocá-la em
+um conjunto, selecionar o alvo e o contexto relevante, medir as relações,
+alterar a definição e descobrir com clareza quais montagens continuaram válidas
+e quais precisam de correção.
+
+A definição detalhada está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
+[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md).

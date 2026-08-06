@@ -1,22 +1,51 @@
 # Mecanifica — entrada atual
 
-A Mecanifica é uma oficina 3D para explicar sistemas mecânicos a clientes. Este
-repositório mantém o núcleo procedural, receitas de peças, visor compatível,
-bancada de inspeção e ferramentas de validação. A aplicação jogável, a Oficina
-humana e o som foram removidos. `bancada.html` é a única aplicação publicada
-aqui; o produto do cliente vive em [warbookbr/mecanica](https://github.com/warbookbr/mecanica).
+Este repositório mantém a oficina procedural para IA: núcleo geométrico,
+receitas determinísticas de peças, bancada de inspeção e ferramentas de medição,
+revisão e validação.
+
+O objetivo é melhorar e facilitar o trabalho da IA ao criar, organizar,
+inspecionar, corrigir e manter objetos 3D mecânicos. Interface humana, jogo,
+narrativa e apresentação externa não definem o escopo. A Oficina humana, a
+aplicação jogável e o som foram removidos desta árvore. `bancada.html` é a única
+aplicação publicada aqui.
 
 ## Estado atual
 
-- Casos 1 e 2 da homologação estão concluídos; Caso 3 não foi iniciado.
-- O Módulo 1 do MCP — modelagem e revisão somente leitura — foi aprovado após as
+- Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
+- Não há plano executivo ativo.
+- O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
-- O plano executivo ativo é [MCP — autoria controlada de pacotes](planos/2026-08-05-mcp-autoria-controlada.md).
-- A ponte `adaptarThree` e a bancada publicada existem e são usadas pelos gates.
-- A hierarquia semântica mínima e a consulta de subárvore existem na bancada.
-- O import bare `earcut` falha no servidor estático local do visor/porteiro; isso
-  é uma pendência de infraestrutura, não uma mudança de peça.
-- Não existe contrato genérico de materiais. A validação de materiais é futura.
+- A primeira tentativa de autoria controlada foi encerrada com decisão
+  `interromper`; a issue #23 foi concluída e o PR #25 foi fechado sem merge.
+- O MCP atual continua sendo uma porta de leitura e auditoria. Ele não define o
+  núcleo, o formato de peça ou a futura arquitetura de montagem.
+- Os adaptadores de inspeção e a bancada publicada existem e são usados pelos
+  gates.
+- Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
+  visual existem para peças.
+- Ainda não existe formato canônico de montagem recursiva, mapa completo de
+  dependências, solver geral de encaixe ou camada completa de escrita para IA.
+- O import bare `earcut` falha no servidor estático local do visor e do
+  porteiro; isso é pendência de infraestrutura, não mudança de peça.
+- Não existe contrato genérico de materiais.
+
+## Direção estabelecida
+
+A unidade geométrica editável é a **peça**. A unidade de composição é a
+**montagem**. Montagens podem conter outras montagens e formar sistemas, carros
+completos e, depois que esse modelo estiver maduro, robôs.
+
+Carro e motor não são receitas monolíticas. A IA deve trabalhar em alvos
+reduzidos, escolher quais componentes observar juntos, manter o contexto
+estrutural e revalidar as montagens afetadas depois de uma alteração.
+
+Composição, relações e dependências devem existir como dado estruturado do
+sistema. Documentação e diagramas podem ser gerados desse mapa, mas não podem
+ser sua única fonte de verdade.
+
+MCP, CLI, API ou edição assistida são portas possíveis. Nenhuma delas substitui
+o núcleo nem define o modelo de autoria.
 
 ## Estrutura principal
 
@@ -24,38 +53,55 @@ aqui; o produto do cliente vive em [warbookbr/mecanica](https://github.com/warbo
 |---|---|
 | `prototipos/fps/v3/motor/` | núcleo procedural e adaptadores compatíveis |
 | `prototipos/fps/v3/pecas/` | receitas determinísticas de peças |
-| `bancada.html`, `src/` | bancada neutra e ponte de apresentação |
+| `bancada.html`, `src/` | bancada neutra e adaptadores de inspeção |
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
 | `tools/mecanifica/` | gates da bancada, revisão e contratos |
-| `autoria-assistida/` | pacotes e evidências de homologação |
-| `docs/mecanifica/planos/` | contrato de planos e backlog aberto |
+| `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
+| `autoria-assistida/` | pacotes e evidências de homologação de peças |
+| `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
+
+Montagem persistida e mapa de dependências ainda não possuem diretório ou
+formato canônico. Não invente uma localização por implicação.
 
 ## Fontes de verdade
 
 1. Este índice para a entrada e o estado atual.
-2. `docs/mecanifica/ARQUITETURA.md` para fronteiras técnicas.
-3. `docs/mecanifica/AUTORIA-IA.md` para o contrato de autoria.
-4. `docs/mecanifica/BANCADA-E-APRESENTACAO.md` para revisão visual.
-5. `docs/mecanifica/planos/README.md`,
-   `docs/mecanifica/planos/mcp/INDEX.md` e qualquer futuro plano ativo para planejamento.
-6. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho paralelo.
-7. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
-8. `docs/uso/MAPA.md` para o inventário gerado.
-9. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
+2. [`VISAO.md`](VISAO.md) para o objetivo centrado na IA e o horizonte de carros
+   e robôs.
+3. [`AUTORIA-IA.md`](AUTORIA-IA.md) para o modelo de autoria de peças e sistemas
+   compostos.
+4. [`ARQUITETURA.md`](ARQUITETURA.md) para fronteiras técnicas atuais e direção
+   arquitetural.
+5. [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) para composição
+   recursiva, relações, dependências e níveis de maturidade.
+6. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
+   e contexto de trabalho da IA.
+7. [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) para o fluxo operacional
+   atual de uma peça e seus limites.
+8. `docs/mecanifica/planos/README.md`, `docs/mecanifica/planos/mcp/INDEX.md` e
+   qualquer futuro plano ativo para planejamento.
+9. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho
+   paralelo.
+10. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
+11. `docs/uso/MAPA.md` para o inventário gerado.
+12. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
 ## Leitura por tarefa
 
-- Produto e escopo: `VISAO.md`, este índice e `planos/README.md`.
-- Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md`, o encerramento da Fatia
-  1A, `docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md`,
-  `docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md` e
-  `docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md`.
-- Núcleo ou dependência: `ARQUITETURA.md`, `AUTORIA-IA.md` e `oficina-contrato.md`.
+- Estado, objetivo e horizonte: `VISAO.md`, este índice e `planos/README.md`.
+- Princípios de autoria: `AUTORIA-IA.md`.
+- Peças versus montagens, carro, motor e dependências:
+  `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
+- Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md` e os planos datados
+  encerrados. O programa MCP não é o roteiro mestre da autoria.
+- Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
+  `docs/uso/oficina-contrato.md`.
 - Peça nova ou refinamento: `AUTORIA-IA.md`, `PERFIS-DE-AUTORIA.md`,
-  `REFERENCIA-E-CRITICA-VISUAL.md` e `BANCADA-E-APRESENTACAO.md`.
+  `REFERENCIA-E-CRITICA-VISUAL.md`, `FLUXO-MODELAGEM-IA.md` e
+  `BANCADA-E-APRESENTACAO.md`.
+- Contexto visual, isolamento e pares: `BANCADA-E-APRESENTACAO.md`.
 - Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
-- Montagens: `MONTAGENS-SEMANTICAS.md`.
 - Freio ou roda: a prancha correspondente e o protocolo visual.
 - Trabalho histórico: o README da zona histórica antes de abrir evidências.
 
@@ -96,14 +142,21 @@ npm run criar -- _viga
 
 - Resolver o import `earcut` no servidor estático local.
 - Iniciar e executar o Caso 3 da homologação.
-- Executar e fechar o plano de autoria controlada; materiais e distribuição
-  continuam apenas como candidatos.
+- Definir, em plano próprio, o primeiro recorte de montagem recursiva persistida.
+- Definir o mapa canônico de composição, relações e dependências.
+- Definir como alvo editável, contexto visual, dependentes e validações formam
+  um contexto de trabalho.
+- Definir uma camada de escrita transacional para receitas e montagens antes de
+  expô-la por MCP, CLI ou API.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
 - Criar contrato genérico de materiais.
-- Fechar as capacidades ainda abertas comprovadas em A-4, A-6, A-7, A-8, A-16 e A-29.
-- Tarefas do produto devem apontar para `warbookbr/mecanica`.
+- Fechar as capacidades ainda abertas comprovadas em A-4, A-6, A-7, A-8, A-16
+  e A-29.
+
+Nenhuma pendência desta lista autoriza implementação automática. Um recorte só
+abre quando existir plano executivo ativo.
 
 ## Histórico
 
