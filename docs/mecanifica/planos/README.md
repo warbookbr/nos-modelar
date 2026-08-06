@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [MCP — autoria controlada de pacotes](2026-08-05-mcp-autoria-controlada.md).
+**Plano ativo:** nenhum.
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,
@@ -12,7 +12,7 @@ critério de saída e encerramento registrado.
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | Módulo 2, primeira fatia: autoria controlada de pacotes |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | nenhuma; autoria controlada encerrada com decisão `interromper` |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -20,15 +20,17 @@ plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
 a Fatia 1B visual foi encerrada em
 [`2026-08-05-mcp-fatia-1b-visual.md`](2026-08-05-mcp-fatia-1b-visual.md), a
 avaliação consolidada foi concluída com decisão `corrigir` em
-[`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md)
-e a correção de descoberta foi concluída com decisão `aprovar` em
-[`2026-08-05-mcp-correcao-descoberta.md`](2026-08-05-mcp-correcao-descoberta.md).
+[`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md),
+a correção de descoberta foi concluída com decisão `aprovar` em
+[`2026-08-05-mcp-correcao-descoberta.md`](2026-08-05-mcp-correcao-descoberta.md)
+e a primeira fatia de autoria controlada foi concluída com decisão `interromper`
+em [`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
 
-A primeira etapa autorizada após o Módulo 1 é o plano
-[`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
-Ela abre somente planejamento e criação atômica de pacotes canônicos em duas
-fases. A revisão do preview e sua confirmação são obrigatórias antes da escrita.
-Edição de receita, revisões, materiais, Git e distribuição permanecem fora.
+A autoria não foi publicada. O PR #25 foi fechado sem merge porque a
+implementação portátil não demonstrou simultaneamente publicação do pacote
+completo em uma única transição e recusa atômica de sobrescrita contra destino
+concorrente. Uma retomada exige plano técnico separado. Edição de receita,
+revisões, materiais, Git e distribuição permanecem fora.
 
 ## Contrato de plano
 
@@ -62,6 +64,7 @@ nos arquivos originais.
 | MCP — Fatia 1B visual somente leitura | concluído |
 | MCP — avaliação consolidada por agente consumidor | concluído: corrigir |
 | MCP — correção de descoberta de pacotes e revisões | concluído: aprovar |
+| MCP — autoria controlada de pacotes | concluído: interromper |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -76,17 +79,16 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md),
 [MCP Fatia 1A](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [MCP Fatia 1B](2026-08-05-mcp-fatia-1b-visual.md),
-[MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md) e
-[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md).
+[MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md),
+[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md) e
+[MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md).
 
 ## Abertura
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
 e um novo plano executivo ativo. A aprovação do Módulo 1 satisfez a dependência
-técnica da autoria controlada, mas não autoriza materiais ou distribuição por
-implicação. Para abrir outro plano executivo, encerre primeiro o plano ativo,
-copie [`MODELO.md`](MODELO.md), preencha as provas e atualize este índice.
-
-Referência curada do plano ativo:
-`docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md`.
+técnica da autoria controlada, mas o bloqueio de publicação atômica impede sua
+abertura por implicação. Materiais e distribuição também não estão autorizados.
+Para abrir outro plano executivo, copie [`MODELO.md`](MODELO.md), preencha as
+provas e atualize este índice.

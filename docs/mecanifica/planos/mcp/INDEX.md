@@ -32,7 +32,7 @@ não autoriza implementação até existir um plano executivo ativo.
 | Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, 2 recursos, 6 chamadas de ferramentas, zero fallback e encerramento no plano datado |
 | Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes/revisões na issue #18 |
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; prova R07 com validação e comparação caixa-preta, sem fallback ou escrita |
-| Autoria controlada | ativo | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); perfil separado com planejamento e criação atômica de pacote em duas fases |
+| Autoria controlada | concluído: interromper | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio e autoria controlada aprovada | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos clientes |
 
@@ -56,17 +56,25 @@ não autoriza implementação até existir um plano executivo ativo.
 
 ## Decisão atual
 
-O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. A primeira
-etapa autorizada do Módulo 2 é
-[autoria controlada de pacotes](../2026-08-05-mcp-autoria-controlada.md), com
-coordenação na issue #23.
+O Módulo 1 — modelagem e revisão somente leitura — está **aprovado**. Não existe
+plano executivo ativo.
 
-A fatia ativa adiciona um perfil MCP separado, `autoria`, com exatamente duas
-ferramentas: uma planeja os bytes canônicos sem escrita e produz confirmação
-determinística; a outra recalcula o plano e cria um pacote novo por publicação
-atômica, sem sobrescrita. O perfil `revisao` e suas quatro ferramentas permanecem
-inalterados.
+A primeira tentativa de autoria controlada foi encerrada com decisão
+`interromper`. O protótipo do PR #25 demonstrou planejamento puro, confirmação
+determinística, paridade entre dry-run e aplicação e confinamento, mas não
+satisfez simultaneamente estas duas invariantes:
 
-Esta etapa não edita receitas JavaScript, não gera revisões, não cria contrato de
-materiais e não usa Git. Materiais e distribuição continuam candidatos e exigem
-planos próprios após o fechamento explícito desta fatia.
+1. o pacote completo aparece em uma única transição observável;
+2. um destino concorrente nunca é sobrescrito, inclusive quando é uma pasta vazia.
+
+A estratégia portátil `mkdir` exclusivo seguida de dois `rename` de arquivo
+protege o nome, mas cria uma janela com destino parcial e não resiste a término
+abrupto entre as movimentações. A estratégia de `rename` da pasta inteira é
+atômica, mas a API disponível não oferece semântica portátil `no-replace` para
+diretórios.
+
+Uma retomada da autoria exige plano técnico próprio para escolher e provar um
+primitivo nativo `no-replace`, um novo protocolo de commit/visibilidade com
+contrato revisado, ou uma redução explícita da garantia. Nenhuma opção está
+autorizada por implicação. Materiais e distribuição continuam candidatos e
+exigem planos próprios.

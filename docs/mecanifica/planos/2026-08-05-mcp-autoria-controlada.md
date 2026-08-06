@@ -1,6 +1,8 @@
 # MCP — autoria controlada de pacotes
 
-**Estado:** ativo
+**Estado:** concluído
+
+**Decisão:** interromper
 
 **Responsáveis:** GPT (estratégia, arquitetura, revisão e decisão) e Claude (implementação e prova como operador)
 
@@ -18,17 +20,19 @@ A ausência desse protocolo impede abrir escrita com segurança. Expor a CLI dir
 
 ## Resultado
 
-Um perfil MCP separado, `autoria`, permite a um agente planejar e depois criar um pacote canônico novo em duas fases verificáveis, com confirmação vinculada aos bytes planejados, escrita confinada e atômica, nenhuma sobrescrita e zero alteração de receita, revisão, material ou Git.
+Um perfil MCP separado, `autoria`, permitiria a um agente planejar e depois criar um pacote canônico novo em duas fases verificáveis, com confirmação vinculada aos bytes planejados, escrita confinada e atômica, nenhuma sobrescrita e zero alteração de receita, revisão, material ou Git.
+
+A implementação prototipada no PR #25 comprovou planejamento determinístico, confirmação, paridade de regras e confinamento, mas não comprovou simultaneamente publicação do diretório completo em uma única transição e recusa atômica de sobrescrita usando somente a API portátil de `fs` do Node. Por isso o resultado não foi publicado.
 
 ## Hipótese
 
-Separar planejamento e aplicação reduz o risco de escrita acidental sem inventar outro formato: o mesmo serviço compartilhado produz o preview canônico, calcula a confirmação e aplica exatamente aqueles bytes. A fatia só é aprovada se um consumidor novo concluir o fluxo sem shell, leitura interna ou correção manual dos JSONs.
+Separar planejamento e aplicação reduz o risco de escrita acidental sem inventar outro formato: o mesmo serviço compartilhado produz o preview canônico, calcula a confirmação e aplica exatamente aqueles bytes. A fatia só seria aprovada se um consumidor novo concluísse o fluxo sem shell, leitura interna ou correção manual dos JSONs.
 
 ## Contrato da fatia
 
 ### Perfil
 
-O perfil `revisao` permanece inalterado e somente leitura. O novo perfil `autoria` anuncia exatamente duas ferramentas:
+O perfil `revisao` permanece inalterado e somente leitura. O perfil proposto `autoria` anunciaria exatamente duas ferramentas:
 
 1. `planejar_pacote`
 2. `criar_pacote`
@@ -44,7 +48,7 @@ Entrada mínima:
 - `modo`: `refinamento` ou `criacao`;
 - `partesEsperadas` somente quando `modo=criacao`.
 
-Comportamento:
+Comportamento esperado:
 
 - não escreve nenhum arquivo ou diretório;
 - reutiliza integralmente validação, defaults, descrição do alvo e serialização canônica de `tools/modelagem/`;
@@ -58,7 +62,7 @@ A confirmação não é credencial secreta. Ela é prova determinística de que 
 
 Entrada: os mesmos campos de autoria mais a `confirmacao` produzida por `planejar_pacote`.
 
-Comportamento:
+Comportamento esperado:
 
 - recalcula o plano pelo mesmo serviço compartilhado;
 - recusa confirmação ausente, malformada ou divergente;
@@ -73,18 +77,9 @@ Uma segunda aplicação com o mesmo id deve falhar como `pacote_existente`; não
 
 ## Piloto
 
-A prova funcional usa um pacote novo de refinamento para `_mancal-de-mesa` em workspace descartável, com id estável escolhido pelo operador a partir do cenário. O agente deve:
+A prova funcional previa um pacote novo de refinamento para `_mancal-de-mesa` em workspace descartável. O workspace da prova não seria commitado e nenhum pacote piloto permanente entraria em `main`.
 
-1. descobrir o perfil e os schemas;
-2. executar `planejar_pacote`;
-3. registrar os dois previews, arquivos previstos e confirmação;
-4. executar `criar_pacote` com a mesma entrada e confirmação;
-5. validar o pacote criado pelo MCP de revisão;
-6. repetir a aplicação e observar recusa sem alteração;
-7. alterar um campo mantendo a confirmação antiga e observar recusa;
-8. confirmar ausência de escrita antes da aplicação e ausência de resíduo após falhas.
-
-O workspace da prova não é commitado. Nenhum pacote piloto permanente entra em `main` por esta fatia.
+O piloto pós-merge não foi executado porque o PR de implementação foi fechado sem merge.
 
 ## Incluído
 
@@ -134,6 +129,8 @@ O workspace da prova não é commitado. Nenhum pacote piloto permanente entra em
 10. testes focados, `npm test`, `npm run mcp:check`, build, mapa, índices, links e `planos:check` passam;
 11. prova caixa-preta pós-merge registra ferramentas, entradas, confirmação, bytes, recusa de repetição, falhas, fallback, escrita e duração.
 
+O gate 4 não foi satisfeito. Os demais resultados do protótipo não autorizam publicação parcial da fatia.
+
 ## Casos obrigatórios de teste
 
 - refinamento válido de peça existente;
@@ -151,7 +148,7 @@ O workspace da prova não é commitado. Nenhum pacote piloto permanente entra em
 ## Fatias
 
 1. baseline e testes de planejamento sem escrita;
-2. serviço compartilhado de plano/confirmacão;
+2. serviço compartilhado de plano/confirmação;
 3. aplicação atômica e paridade da CLI;
 4. perfil MCP `autoria`, schemas e testes reais;
 5. prova caixa-preta pós-merge;
@@ -168,4 +165,18 @@ O workspace da prova não é commitado. Nenhum pacote piloto permanente entra em
 
 ## Fechamento
 
-Preencher somente após a prova pós-merge: estado final, PR/commit, gates, resultado caixa-preta, decisão e candidatos devolvidos ao painel. A aprovação desta fatia não autoriza automaticamente edição de receitas, revisões ou materiais.
+**Estado final:** concluído.
+
+**Decisão:** `interromper`.
+
+**Implementação avaliada:** PR #25, commits `605557b996466e1efce98c6d38323d9a2608d8a9` e `1741827dcc0fe24e5abee2a4152bc099d702b51a`; PR fechado sem merge.
+
+**Evidências aceitas:**
+
+- planejamento puro, confirmação determinística e paridade entre dry-run e aplicação foram demonstrados no protótipo;
+- confinamento, recusa de symlinks, preservação do perfil `revisao` e CI #102 verde foram registrados;
+- nenhuma alteração do PR #25 entrou em `main`.
+
+**Bloqueio:** a API portátil de `fs` do Node não forneceu um primitivo demonstrado que combine, para diretórios, transição única do pacote completo e semântica `no-clobber` contra um destino concorrente vazio. A alternativa `mkdir` exclusivo seguida de dois `rename` de arquivo deixa janela observável e pode persistir parcialmente sob término abrupto. Isso viola a invariante e o gate 4.
+
+**Itens devolvidos ao painel:** autoria controlada volta a candidato bloqueado. Uma retomada exige plano técnico separado para escolher e provar uma destas famílias, sem autorização implícita: primitivo nativo `no-replace`; novo protocolo de commit/visibilidade com contrato de armazenamento revisado; ou redução explícita da garantia. Materiais e distribuição continuam candidatos separados.
