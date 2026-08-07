@@ -15,6 +15,16 @@ permanente; não copie um relatório inteiro.
 
 Uma frase verificável dizendo o que passa a ser possível.
 
+## Filtro Agent-First
+
+Aplique `docs/mecanifica/AGENT-FIRST.md` ao recorte. Para cada interface ou
+capacidade relevante, registre a decisão **USAR DIRETO**, **ENVOLVER**,
+**REFATORAR** ou **ADIAR**, com justificativa curta baseada em intenção, custo de
+contexto, determinismo/verificabilidade, diagnóstico, composição e identidade.
+
+Não amplie o plano apenas para corrigir todo atrito encontrado; devolva ao
+backlog o que não bloquear o resultado.
+
 ## Incluído
 
 - mudança estritamente necessária;
@@ -31,7 +41,8 @@ Uma frase verificável dizendo o que passa a ser possível.
 1. comportamento mensurável;
 2. compatibilidade e determinismo;
 3. prova visual quando a mudança afeta leitura visual;
-4. testes e documentação proporcionais ao risco.
+4. testes e documentação proporcionais ao risco;
+5. decisão Agent-First registrada para interfaces relevantes.
 
 ## Fatias
 
