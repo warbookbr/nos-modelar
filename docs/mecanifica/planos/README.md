@@ -2,15 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** [`2026-08-06-diagnostico-motor-procedural.md`](2026-08-06-diagnostico-motor-procedural.md).
+**Plano ativo:** nenhum.
 
-A etapa atual é um diagnóstico técnico do motor procedural existente. Ela
-autoriza leitura, rastreamento de dados, execução de provas e produção de
-relatório, mas não autoriza refatorar o motor, alterar receitas, implementar
-montagens ou acrescentar escrita ao MCP.
+O diagnóstico técnico do motor procedural foi concluído. O relatório está em
+[`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
+decisão final é **abrir Montagem Mínima Persistida v1** por plano executivo
+separado.
 
-O plano executivo permanece curto conforme o contrato desta pasta. O método,
-as perguntas de inspeção e o padrão de evidência estão detalhados em
+O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
+permanecem registrados em
 [`../PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../PROTOCOLO-DIAGNOSTICO-MOTOR.md).
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
@@ -19,13 +19,17 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-O diagnóstico deve determinar o contrato real de entrada, execução e saída do
-motor, seu teto para peças mecânicas e sua fronteira com uma futura camada de
-montagem. O encerramento precisa classificar os achados em `PRESERVAR`,
-`DOCUMENTAR`, `REFATORAR` ou `ADIAR` e recomendar um único próximo plano:
-montagem mínima, correções localizadas ou redefinição do contrato do motor.
+Não há execução autorizada neste momento. O diagnóstico concluiu que o motor de
+peça atual é adequado para servir de base à primeira montagem persistida, sem
+refatoração estrutural prévia.
 
-Nenhum achado autoriza correção automática durante o estudo.
+Os limites conhecidos que não bloqueiam esse próximo recorte são: catálogo
+semântico de materiais compartilhado por referência, validação incompleta de
+reflexão, hierarquia interna ainda não transportada pelo formato exportado e
+fragilidades de algumas receitas históricas.
+
+O próximo plano recomendado é **Montagem Mínima Persistida v1**. Ele ainda precisa
+ser aberto explicitamente antes de qualquer implementação.
 
 ## Programas
 
@@ -84,6 +88,7 @@ nos arquivos originais.
 | MCP — avaliação consolidada por agente consumidor | concluído: corrigir |
 | MCP — correção de descoberta de pacotes e revisões | concluído: aprovar |
 | MCP — autoria controlada de pacotes | concluído: interromper |
+| Diagnóstico do motor procedural | concluído: abrir Montagem Mínima Persistida v1 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -99,17 +104,18 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [MCP Fatia 1A](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [MCP Fatia 1B](2026-08-05-mcp-fatia-1b-visual.md),
 [MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md),
-[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md) e
-[MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md).
+[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md),
+[MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
+[diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
 
 ## Abertura
 
-O diagnóstico do motor é o único plano autorizado. Montagem persistida, mapa de
-dependências, escrita para IA, materiais e novas etapas do MCP permanecem no
-backlog até o diagnóstico ser encerrado e recomendar o próximo recorte.
+Nenhum plano está autorizado agora. A recomendação aprovada pelo diagnóstico é
+abrir **Montagem Mínima Persistida v1** como próximo plano executivo, sem misturar
+refatoração do motor, personalização de materiais, expansão do MCP ou limpeza de
+receitas históricas.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
-e um novo plano executivo ativo. Para abrir outro plano, primeiro conclua ou
-cancele o plano atual; depois copie [`MODELO.md`](MODELO.md), preencha as provas
-e atualize este índice.
+e um novo plano executivo ativo. Para abrir outro plano, copie [`MODELO.md`](MODELO.md),
+preencha objetivo, escopo, gates e encerramento esperado e atualize este índice.
