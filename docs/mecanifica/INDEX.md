@@ -13,13 +13,14 @@ aplicação publicada aqui.
 ## Estado atual
 
 - Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
-- Não há plano executivo ativo. O diagnóstico técnico do motor procedural foi
-  concluído; o relatório está em
-  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md` e a
-  autorização encerrada está em
-  `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`. A
-  decisão final foi `motor adequado → abrir Montagem Mínima Persistida v1`;
-  esse é o próximo plano recomendado, ainda não aberto.
+- O plano executivo ativo é a Montagem Mínima Persistida v1, autorizado em
+  `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md` após a
+  decisão `motor adequado → abrir Montagem Mínima Persistida v1` do diagnóstico
+  técnico do motor procedural (concluído; relatório em
+  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
+  `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
+  implementação ainda não está autorizada: a R00 fecha somente a abertura
+  documental do plano.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão

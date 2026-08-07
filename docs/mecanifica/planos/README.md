@@ -2,12 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Montagem Mínima Persistida v1](2026-08-07-montagem-minima-persistida-v1.md).
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
-decisão final é **abrir Montagem Mínima Persistida v1** por plano executivo
-separado.
+decisão final — **abrir Montagem Mínima Persistida v1** — já foi executada: o
+plano está aberto em
+[`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
+A implementação ainda não está autorizada; a rodada R00 fecha somente a
+abertura documental do plano antes do PR.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -19,17 +22,18 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-Não há execução autorizada neste momento. O diagnóstico concluiu que o motor de
-peça atual é adequado para servir de base à primeira montagem persistida, sem
-refatoração estrutural prévia.
+Não há execução de código autorizada neste momento. O diagnóstico concluiu que
+o motor de peça atual é adequado para servir de base à primeira montagem
+persistida, sem refatoração estrutural prévia, e o plano da Montagem Mínima
+Persistida v1 está aberto para revisão. A implementação começa somente depois
+que o plano for revisado, mergeado na `main` e uma rodada posterior autorizar
+código.
 
-Os limites conhecidos que não bloqueiam esse próximo recorte são: catálogo
-semântico de materiais compartilhado por referência, validação incompleta de
-reflexão, hierarquia interna ainda não transportada pelo formato exportado e
-fragilidades de algumas receitas históricas.
-
-O próximo plano recomendado é **Montagem Mínima Persistida v1**. Ele ainda precisa
-ser aberto explicitamente antes de qualquer implementação.
+Os limites conhecidos que não bloqueiam esse recorte são: catálogo semântico de
+materiais compartilhado por referência, validação incompleta de reflexão,
+hierarquia interna ainda não transportada pelo formato exportado e
+fragilidades de algumas receitas históricas. O plano aberto já declara esses
+limites como excluídos ou adiados.
 
 ## Programas
 
@@ -110,10 +114,9 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-Nenhum plano está autorizado agora. A recomendação aprovada pelo diagnóstico é
-abrir **Montagem Mínima Persistida v1** como próximo plano executivo, sem misturar
-refatoração do motor, personalização de materiais, expansão do MCP ou limpeza de
-receitas históricas.
+**Montagem Mínima Persistida v1** está aberta como plano executivo, sem
+misturar refatoração do motor, personalização de materiais, expansão do MCP ou
+limpeza de receitas históricas. Nenhum outro plano está autorizado agora.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
