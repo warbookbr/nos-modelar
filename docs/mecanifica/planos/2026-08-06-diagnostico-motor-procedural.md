@@ -1,5 +1,5 @@
 # Diagnóstico do motor procedural atual
-**Estado:** ativo
+**Estado:** concluído
 **Responsável:** IA revisora, com decisão final registrada pelo mantenedor
 **Repositório e base:** `warbookbr/nos-mecanifica`, a partir de `main`
 
@@ -168,5 +168,18 @@ começar a desenhar montagem/MCP ou o escopo impedir evidência útil.
 6. fechamento.
 
 ## Fechamento
-Preencher ao concluir ou cancelar: estado, relatório, commit/PR, receitas
-analisadas, gates, achados por classificação, decisão e próximo plano.
+
+**Relatório:** [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md).
+
+**Canal de evidências:** issue #30.
+
+**Decisão:** `motor adequado → abrir Montagem Mínima Persistida v1`.
+
+As quatro rodadas confirmaram contrato local e determinístico, independência entre
+instâncias, portas transformáveis externamente e capacidade geométrica suficiente
+para o próximo recorte. Nenhum bloqueio estrutural anterior à montagem foi
+comprovado. Limites de materiais compartilhados, reflexão, hierarquia exportada e
+receitas históricas foram classificados para documentação ou adiamento.
+
+Nenhum código, receita, teste, contrato geométrico ou ferramenta foi alterado por
+este plano. O próximo trabalho exige plano executivo separado.
