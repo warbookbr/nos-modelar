@@ -158,6 +158,9 @@ mecânicos básicos.
   geral da oficina.
 - **MCP é uma porta.** MCP, CLI ou API podem expor capacidades; nenhuma dessas
   opções define o núcleo ou o modelo de autoria.
+- **Agent-First.** Toda capacidade é avaliada pelo filtro de
+  [`AGENT-FIRST.md`](AGENT-FIRST.md): intenção, contexto, determinismo,
+  diagnóstico, composição e identidade, na ótica de quem opera como agente.
 - **Avanço comprovado.** Testes medem ganhos e revelam lacunas; resultados verdes
   não encerram a busca por melhoria.
 
@@ -181,5 +184,6 @@ um conjunto, selecionar o alvo e o contexto relevante, medir as relações,
 alterar a definição e descobrir com clareza quais montagens continuaram válidas
 e quais precisam de correção.
 
-A definição detalhada está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
-[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md).
+A definição detalhada está em [`AUTORIA-IA.md`](AUTORIA-IA.md),
+[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) e
+[`AGENT-FIRST.md`](AGENT-FIRST.md).
