@@ -12,10 +12,10 @@ describe('transformação rígida neutra', () => {
   });
 
   it('compõe e desfaz transformações na mesma ordem do contrato histórico', () => {
-    const referencial = validarTransformacaoRigida({ escala: 2, deslocamento: [10, 0, 0] }, 'referencial');
-    const local = validarTransformacaoRigida({ escala: 3, deslocamento: [1, 2, 0] }, 'local');
+    const referencial = validarTransformacaoRigida({ escala: 2, rotacao: [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], deslocamento: [10, 0, 0] }, 'referencial');
+    const local = validarTransformacaoRigida({ escala: 3, rotacao: [[0, -1, 0], [1, 0, 0], [0, 0, 1]], deslocamento: [1, 2, 0] }, 'local');
     const mundo = comporTransformacoesRigidas(referencial, local);
-    expect(mundo).toEqual({ escala: 6, rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [12, 4, 0] });
+    expect(mundo).toEqual({ escala: 6, rotacao: [[0, 0, 1], [1, 0, 0], [0, 1, 0]], deslocamento: [10, 4, -2] });
     expect(localDaTransformacaoRigida(referencial, mundo)).toEqual(local);
   });
 

@@ -79,6 +79,6 @@ export function lerMontagemPersistida(dado) {
     if (ids.has(instancia.id)) falhar('instancia-duplicada', `instancias[${indice}].id`, `ID '${instancia.id}' duplicado.`);
     ids.add(instancia.id);
   }
-  instancias.sort((a, b) => a.id.localeCompare(b.id));
+  instancias.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return { formato: FORMATO, versao: VERSAO, id, instancias };
 }
