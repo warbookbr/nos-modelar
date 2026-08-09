@@ -1,0 +1,15 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "raiz-com-subconjunto",
+  "instancias": [
+    {
+      "id": "conjunto",
+      "alvo": { "tipo": "montagem", "ref": "subconjunto-freio" },
+      "pose": {
+        "rotacao": [[0, 0, 1], [0, 1, 0], [-1, 0, 0]],
+        "deslocamento": [10, 0, 0]
+      }
+    }
+  ]
+}

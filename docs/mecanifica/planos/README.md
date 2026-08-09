@@ -10,8 +10,8 @@ decisão final — **abrir Montagem Mínima Persistida v1** — já foi executad
 plano está aberto em
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
 O PR #33 que abriu o plano foi mergeado na `main`. A execução passou pela R01 e
-está em R04, autorizada para a Fatia 4: montagem dentro de montagem, composição
-recursiva de pose e detecção de ciclo. O fechamento final do plano ainda não foi
+está em R05, autorizada para a Fatia 5: provas reais persistidas, determinismo e
+documentação curta do contrato v1. O fechamento final do plano ainda não foi
 declarado.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
@@ -24,11 +24,11 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-A R04 da Montagem Mínima Persistida v1 está autorizada na branch
-`implementacao/montagem-minima-persistida-v1`. Seu objetivo é resolver montagem
-dentro de montagem, composição recursiva de pose e detecção de ciclo. CLI, MCP,
-bancada, escrita, relações mecânicas, solver e mapa global permanecem fora desta
-rodada.
+A R05 da Montagem Mínima Persistida v1 está autorizada na branch
+`implementacao/montagem-minima-persistida-v1`. Seu objetivo é provar com fixtures
+persistidas reais o formato e o resolvedor v1, verificar determinismo e registrar
+o contrato curto. CLI, MCP, bancada, escrita, relações mecânicas, solver e mapa
+global permanecem fora desta rodada.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites

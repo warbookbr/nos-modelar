@@ -19,6 +19,9 @@ outras montagens. Ela registra identidade, posição e intenção mecânica entr
 componentes. Não deve copiar toda a geometria e todas as operações para dentro
 de uma receita gigante.
 
+O recorte executável da montagem persistida v1 está documentado em
+[`MONTAGEM-PERSISTIDA-V1.md`](MONTAGEM-PERSISTIDA-V1.md).
+
 A regra é:
 
 > **Peças são geradas por receitas. Conjuntos são organizados por montagens.

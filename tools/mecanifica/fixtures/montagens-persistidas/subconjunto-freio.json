@@ -1,0 +1,15 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "subconjunto-freio",
+  "instancias": [
+    {
+      "id": "freio",
+      "alvo": { "tipo": "peca", "ref": "freio-disco" },
+      "pose": {
+        "rotacao": [[0, -1, 0], [1, 0, 0], [0, 0, 1]],
+        "deslocamento": [1, 2, 3]
+      }
+    }
+  ]
+}
