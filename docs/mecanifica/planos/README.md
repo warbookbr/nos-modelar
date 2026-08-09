@@ -2,17 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** [Montagem Mínima Persistida v1](2026-08-07-montagem-minima-persistida-v1.md).
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
 decisão final — **abrir Montagem Mínima Persistida v1** — já foi executada: o
 plano está aberto em
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
-O PR #33 que abriu o plano foi mergeado na `main`. A execução passou pela R01 e
-está em R05, autorizada para a Fatia 5: provas reais persistidas, determinismo e
-documentação curta do contrato v1. O fechamento final do plano ainda não foi
-declarado.
+O PR #33 que abriu o plano foi mergeado na `main`. A Montagem Mínima Persistida
+v1 foi concluída no arquivo
+[`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
+Não há plano executivo ativo nem próximo plano autorizado automaticamente.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -24,11 +24,10 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-A R05 da Montagem Mínima Persistida v1 está autorizada na branch
-`implementacao/montagem-minima-persistida-v1`. Seu objetivo é provar com fixtures
-persistidas reais o formato e o resolvedor v1, verificar determinismo e registrar
-o contrato curto. CLI, MCP, bancada, escrita, relações mecânicas, solver e mapa
-global permanecem fora desta rodada.
+Não há execução de rodada ativa. A Montagem Mínima Persistida v1 foi encerrada
+com provas persistidas, determinismo e contrato v1 documentado; CLI, MCP,
+bancada, escrita, relações mecânicas, solver e mapa global permanecem fora do
+plano concluído.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
@@ -117,10 +116,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-**Montagem Mínima Persistida v1** é o único plano executivo ativo. Sua execução
-começou pela R01 de baseline e desenho; isso não autoriza antecipar as fatias de
-implementação seguintes nem misturar refatoração do motor, personalização de
-materiais, expansão do MCP ou limpeza de receitas históricas.
+**Montagem Mínima Persistida v1** está concluída. Nenhum próximo plano executivo
+é autorizado automaticamente; backlog, MCP, refatoração do motor,
+personalização de materiais e limpeza de receitas históricas permanecem fora do
+fechamento.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita

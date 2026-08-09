@@ -1,6 +1,6 @@
 # Montagem Mínima Persistida v1
 
-**Estado:** ativo
+**Estado:** concluído
 **Responsável:** GPT (coordenação e revisão) e agente local/brigsd (execução local)
 **Repositório e base:** `warbookbr/nos-mecanifica`, a partir de `main` após o encerramento do diagnóstico do motor
 
@@ -146,4 +146,21 @@ Parar e registrar antes de ampliar escopo se:
 Esses casos indicam que a fronteira precisa ser revista em plano próprio; não autorizam improvisar capacidades maiores dentro desta v1.
 
 ## Fechamento
-Preencher ao concluir ou cancelar: estado final, formato e versão adotados, fixtures/provas, testes, commit/PR, limites encontrados, itens devolvidos ao backlog e decisão sobre o próximo plano. O candidato natural posterior é mapa de composição e dependências, mas ele não é autorizado automaticamente por este plano.
+Estado final: concluído.
+
+Contrato adotado: `mecanifica.montagem`, versão 1. Fontes executáveis:
+`src/autoria/ler-montagem-persistida.js`,
+`src/autoria/resolver-montagem-persistida.js` e
+`src/autoria/transformacao-rigida.js`.
+
+Prova persistida: `tools/mecanifica/fixtures/montagens-persistidas/` e
+`tools/mecanifica/montagem-persistida-provas.test.ts`. As peças reais usadas
+foram `freio-disco` e `roda-dianteira`, sem alteração nelas. As Provas A, B, C
+e D foram aprovadas.
+
+Commits relevantes: `dd9b2f4`, `4673d73`, `c52daec`, `74ae226` e `9c3373f`.
+
+Ficam fora: mapa global de dependências, relações mecânicas gerais, solver,
+cinemática, writer/autoria de montagem, CLI/MCP e personalização de material por
+instância. O candidato natural posterior continua sendo o mapa de
+composição/dependências, mas não está autorizado por este fechamento.

@@ -13,15 +13,13 @@ aplicação publicada aqui.
 ## Estado atual
 
 - Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
-- O plano executivo ativo é a Montagem Mínima Persistida v1, autorizado em
-  `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md` após a
-  decisão `motor adequado → abrir Montagem Mínima Persistida v1` do diagnóstico
-  técnico do motor procedural (concluído; relatório em
-  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
-  `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
-  A R05 está em execução para a Fatia 5: provas reais persistidas, determinismo
-  e documentação curta do contrato v1. O fechamento final do plano ainda não
-  foi declarado.
+- A Montagem Mínima Persistida v1 foi concluída em
+  `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
+  contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. Não há plano
+  executivo ativo após este fechamento e nenhum próximo plano é autorizado
+  automaticamente.
+- O diagnóstico técnico que fundamentou o plano está registrado em
+  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
@@ -172,8 +170,8 @@ npm run criar -- _viga
 - Fechar as capacidades ainda abertas comprovadas em A-4, A-6, A-7, A-8, A-16
   e A-29.
 
-Nenhuma pendência desta lista autoriza implementação automática. Um recorte só
-abre quando existir plano executivo ativo.
+Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
+só abre após decisão e plano executivo explícitos.
 
 ## Histórico
 
