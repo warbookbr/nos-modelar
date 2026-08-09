@@ -13,14 +13,13 @@ aplicação publicada aqui.
 ## Estado atual
 
 - Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
-- O plano executivo ativo é a Montagem Mínima Persistida v1, autorizado em
-  `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md` após a
-  decisão `motor adequado → abrir Montagem Mínima Persistida v1` do diagnóstico
-  técnico do motor procedural (concluído; relatório em
-  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
-  `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
-  implementação ainda não está autorizada: a R00 fecha somente a abertura
-  documental do plano.
+- A Montagem Mínima Persistida v1 foi concluída em
+  `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
+  contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. Não há plano
+  executivo ativo após este fechamento e nenhum próximo plano é autorizado
+  automaticamente.
+- O diagnóstico técnico que fundamentou o plano está registrado em
+  `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
@@ -31,8 +30,9 @@ aplicação publicada aqui.
   gates.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
-- Ainda não existe formato canônico de montagem recursiva, mapa completo de
-  dependências, solver geral de encaixe ou camada completa de escrita para IA.
+- O contrato v1 e o resolvedor neutro de montagem recursiva existem nesta
+  implementação; ainda não existe mapa completo de dependências, relações
+  gerais, solver geral de encaixe ou camada completa de escrita para IA.
 - O import bare `earcut` falha no servidor estático local do visor e do
   porteiro; isso é pendência de infraestrutura, não mudança de peça.
 - Não existe contrato genérico de materiais.
@@ -68,8 +68,10 @@ o núcleo nem define o modelo de autoria.
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
 
-Montagem persistida e mapa de dependências ainda não possuem diretório ou
-formato canônico. Não invente uma localização por implicação.
+Montagem persistida v1 possui contrato e resolvedor em `src/autoria/` e provas
+persistidas em `tools/mecanifica/fixtures/montagens-persistidas/`; o mapa global
+de dependências ainda não possui contrato. Não invente uma localização por
+implicação.
 
 ## Fontes de verdade
 
@@ -83,18 +85,20 @@ formato canônico. Não invente uma localização por implicação.
 5. [`ARQUITETURA.md`](ARQUITETURA.md) para fronteiras técnicas atuais e direção
    arquitetural.
 6. [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) para composição
-   recursiva, relações, dependências e níveis de maturidade.
-7. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
-   e contexto de trabalho da IA.
-8. [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) para o fluxo operacional
-   atual de uma peça e seus limites.
-9. `docs/mecanifica/planos/README.md`, `docs/mecanifica/planos/mcp/INDEX.md` e
-   qualquer futuro plano ativo para planejamento.
-10. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho
-    paralelo.
-11. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
-12. `docs/uso/MAPA.md` para o inventário gerado.
-13. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
+  recursiva, relações, dependências e níveis de maturidade.
+7. [`MONTAGEM-PERSISTIDA-V1.md`](MONTAGEM-PERSISTIDA-V1.md) para o contrato
+   executável de montagem persistida v1.
+8. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
+  e contexto de trabalho da IA.
+9. [`FLUXO-MODELAGEM-IA.md`](FLUXO-MODELAGEM-IA.md) para o fluxo operacional
+  atual de uma peça e seus limites.
+10. `docs/mecanifica/planos/README.md`, `docs/mecanifica/planos/mcp/INDEX.md` e
+  qualquer futuro plano ativo para planejamento.
+11. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho
+  paralelo.
+12. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
+13. `docs/uso/MAPA.md` para o inventário gerado.
+14. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
 ## Leitura por tarefa
 
@@ -102,6 +106,9 @@ formato canônico. Não invente uma localização por implicação.
 - Princípios de autoria: `AUTORIA-IA.md`.
 - Peças versus montagens, carro, motor e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
+- Montagem persistida v1: `MONTAGEM-PERSISTIDA-V1.md` e as fontes executáveis
+  indicadas nesse contrato.
+  Inventário: `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`.
 - Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
@@ -151,7 +158,6 @@ npm run criar -- _viga
 
 - Resolver o import `earcut` no servidor estático local.
 - Iniciar e executar o Caso 3 da homologação.
-- Definir, em plano próprio, o primeiro recorte de montagem recursiva persistida.
 - Definir o mapa canônico de composição, relações e dependências.
 - Definir como alvo editável, contexto visual, dependentes e validações formam
   um contexto de trabalho.
@@ -164,8 +170,8 @@ npm run criar -- _viga
 - Fechar as capacidades ainda abertas comprovadas em A-4, A-6, A-7, A-8, A-16
   e A-29.
 
-Nenhuma pendência desta lista autoriza implementação automática. Um recorte só
-abre quando existir plano executivo ativo.
+Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
+só abre após decisão e plano executivo explícitos.
 
 ## Histórico
 

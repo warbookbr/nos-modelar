@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "ciclo-b",
+  "instancias": [
+    {
+      "id": "para-a",
+      "alvo": { "tipo": "montagem", "ref": "ciclo-a" }
+    }
+  ]
+}
