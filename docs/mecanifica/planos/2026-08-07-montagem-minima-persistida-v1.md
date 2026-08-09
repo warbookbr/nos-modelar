@@ -1,7 +1,7 @@
 # Montagem Mínima Persistida v1
 
 **Estado:** ativo
-**Responsável:** GPT (coordenação e revisão) e Claude/brigsd (execução local)
+**Responsável:** GPT (coordenação e revisão) e agente local/brigsd (execução local)
 **Repositório e base:** `warbookbr/nos-mecanifica`, a partir de `main` após o encerramento do diagnóstico do motor
 
 ## Problema observado

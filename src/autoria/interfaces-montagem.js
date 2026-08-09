@@ -5,6 +5,7 @@
    explica e propõe uma pose não persistida quando o contrato a determina. */
 
 import { relacaoEntreCaixas } from './descrever-partes.js';
+import { validarTransformacaoRigida, comporTransformacoesRigidas, localDaTransformacaoRigida } from './transformacao-rigida.js';
 
 const EPSILON_ANGULAR = 1e-9;
 
@@ -41,68 +42,15 @@ const vetorProduto = (a, b) => [
   a[2] * b[0] - a[0] * b[2],
   a[0] * b[1] - a[1] * b[0],
 ];
-const identidade3 = () => [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
 const aplicarMatriz = (matriz, valor) => matriz.map((linha) => produto(linha, valor));
 const transpor = (matriz) => matriz[0].map((_, coluna) => matriz.map((linha) => linha[coluna]));
 const multiplicarMatrizes = (a, b) => a.map((linha) => b[0].map((_, coluna) => produto(linha, b.map((outra) => outra[coluna]))));
-
-function matrizDeRotacao(valor, quem) {
-  if (valor === undefined) return identidade3();
-  if (!Array.isArray(valor) || valor.length !== 3) falhar(quem, 'precisa ser matriz 3×3.');
-  const matriz = valor.map((linha, indice) => vetor(linha, `${quem}[${indice}]`));
-  for (let i = 0; i < 3; i += 1) {
-    if (Math.abs(comprimento(matriz[i]) - 1) > 1e-9) falhar(quem, 'precisa ter linhas unitárias.');
-    for (let j = i + 1; j < 3; j += 1) {
-      if (Math.abs(produto(matriz[i], matriz[j])) > 1e-9) falhar(quem, 'precisa ter linhas perpendiculares.');
-    }
-  }
-  const determinante = produto(matriz[0], vetorProduto(matriz[1], matriz[2]));
-  if (Math.abs(determinante - 1) > 1e-9) falhar(quem, 'precisa ser rotação própria (determinante +1); reflexões não entram neste recorte.');
-  return matriz;
-}
-
-function transformacaoRigida(valor, quem, { aceitarEscala = true } = {}) {
-  if (valor === undefined) return { escala: 1, rotacao: identidade3(), deslocamento: [0, 0, 0] };
-  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, 'precisa ser objeto de transformação.');
-  const permitidas = new Set([...(aceitarEscala ? ['escala'] : []), 'rotacao', 'deslocamento']);
-  const extras = Object.keys(valor).filter((chave) => !permitidas.has(chave));
-  if (extras.length) falhar(quem, `tem chave(s) desconhecida(s): ${extras.sort().join(', ')}.`);
-  return {
-    escala: escalar(valor.escala ?? 1, `${quem}.escala`, { positivo: true }),
-    rotacao: matrizDeRotacao(valor.rotacao, `${quem}.rotacao`),
-    deslocamento: vetor(valor.deslocamento ?? [0, 0, 0], `${quem}.deslocamento`),
-  };
-}
-
-function comporTransformacoes(referencial, local) {
-  return {
-    escala: referencial.escala * local.escala,
-    rotacao: multiplicarMatrizes(referencial.rotacao, local.rotacao),
-    deslocamento: somar(
-      multiplicar(aplicarMatriz(referencial.rotacao, local.deslocamento), referencial.escala),
-      referencial.deslocamento,
-    ),
-  };
-}
-
-function localDaTransformacao(referencial, mundo) {
-  const inversa = transpor(referencial.rotacao);
-  return {
-    escala: mundo.escala / referencial.escala,
-    rotacao: multiplicarMatrizes(inversa, mundo.rotacao),
-    deslocamento: multiplicar(
-      aplicarMatriz(inversa, subtrair(mundo.deslocamento, referencial.deslocamento)),
-      1 / referencial.escala,
-    ),
-  };
-}
-
 function mundoDaInstancia(instancia, quem) {
-  const local = transformacaoRigida({
+  const local = validarTransformacaoRigida({
     escala: instancia.escala, rotacao: instancia.rotacao, deslocamento: instancia.deslocamento,
   }, `${quem}.local`);
-  const referencial = transformacaoRigida(instancia.referencial, `${quem}.referencial`, { aceitarEscala: false });
-  return { local, referencial, mundo: comporTransformacoes(referencial, local) };
+  const referencial = validarTransformacaoRigida(instancia.referencial, `${quem}.referencial`, { aceitarEscala: false });
+  return { local, referencial, mundo: comporTransformacoesRigidas(referencial, local) };
 }
 
 function interfaceCilindrica(porta, quem) {
@@ -323,7 +271,7 @@ export function derivarPreviaDeEncaixeCilindrico(declaracao, portas) {
     rotacao: multiplicarMatrizes(deltaRotacao, movel.transformacao.mundo.rotacao),
     deslocamento: somar(aplicarMatriz(deltaRotacao, movel.transformacao.mundo.deslocamento), deslocamentoDoDelta),
   };
-  const local = localDaTransformacao(movel.transformacao.referencial, mundo);
+  const local = localDaTransformacaoRigida(movel.transformacao.referencial, mundo);
   return {
     id, tipo: 'encaixaCilindrico', aplicavel: true, diagnosticos: [],
     previa: {

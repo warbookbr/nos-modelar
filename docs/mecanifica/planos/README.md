@@ -9,9 +9,9 @@ O diagnóstico técnico do motor procedural foi concluído. O relatório está e
 decisão final — **abrir Montagem Mínima Persistida v1** — já foi executada: o
 plano está aberto em
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
-O PR #33 que abriu o plano foi mergeado na `main`. A execução foi iniciada em
-R01, autorizada para baseline, inspeção e desenho da fronteira de implementação;
-R01 ainda não autoriza alterações de código de produção.
+O PR #33 que abriu o plano foi mergeado na `main`. A execução passou pela R01 e
+está em R02, autorizada para a Fatia 2: transformação neutra compartilhada e
+formato, leitor e validador persistido. Resolvedor e recursão ainda não existem.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -23,12 +23,11 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-A R01 da Montagem Mínima Persistida v1 está autorizada na branch
-`implementacao/montagem-minima-persistida-v1`. Seu objetivo é levantar o
-baseline dos contratos públicos de peça, transformação rígida e carregamento,
-aplicar o Filtro Agent-First às fronteiras candidatas e propor a menor API e os
-arquivos exatos para a implementação. Código de produção começa somente em uma
-rodada posterior, após revisão explícita do resultado da R01.
+A R02 da Montagem Mínima Persistida v1 está autorizada na branch
+`implementacao/montagem-minima-persistida-v1`. Seu objetivo é implementar a
+transformação rígida neutra compartilhada e o formato persistido v1 com leitor e
+validador fail-closed. Resolvedor de referências, carregamento, recursão, ciclo,
+CLI, MCP, bancada e escrita de montagem permanecem fora desta rodada.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
