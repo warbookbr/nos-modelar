@@ -10,8 +10,8 @@ decisão final — **abrir Montagem Mínima Persistida v1** — já foi executad
 plano está aberto em
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
 O PR #33 que abriu o plano foi mergeado na `main`. A execução passou pela R01 e
-está em R02, autorizada para a Fatia 2: transformação neutra compartilhada e
-formato, leitor e validador persistido. Resolvedor e recursão ainda não existem.
+está em R03, autorizada para a Fatia 3: resolução de instâncias de peça.
+Montagem filha, recursão e ciclo ainda não existem.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -23,11 +23,11 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-A R02 da Montagem Mínima Persistida v1 está autorizada na branch
-`implementacao/montagem-minima-persistida-v1`. Seu objetivo é implementar a
-transformação rígida neutra compartilhada e o formato persistido v1 com leitor e
-validador fail-closed. Resolvedor de referências, carregamento, recursão, ciclo,
-CLI, MCP, bancada e escrita de montagem permanecem fora desta rodada.
+A R03 da Montagem Mínima Persistida v1 está autorizada na branch
+`implementacao/montagem-minima-persistida-v1`. Seu objetivo é resolver instâncias
+de peça da montagem persistida com carregador injetado. Montagem filha, recursão,
+ciclo, CLI, MCP, bancada, escrita e relações mecânicas permanecem fora desta
+rodada.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites

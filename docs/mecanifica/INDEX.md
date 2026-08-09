@@ -19,8 +19,8 @@ aplicação publicada aqui.
   técnico do motor procedural (concluído; relatório em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
   `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
-  A R02 está ativa para a Fatia 2: transformação neutra compartilhada e formato,
-  leitor e validador persistido; resolvedor e recursão ainda não existem.
+  A R03 está ativa para a Fatia 3: resolução de instâncias de peça; montagem
+  filha, recursão e ciclo ainda não existem.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
