@@ -56,10 +56,11 @@ relatórios mensuráveis. O MCP atual expõe principalmente leitura, descrição
 validação, comparação e apresentação visual. Ele ainda não representa o ciclo
 completo de autoria definido neste documento.
 
-Também não existe ainda um formato canônico e persistido para montagens
-recursivas, um mapa completo de dependências, um solver geral de encaixe ou uma
-camada de escrita que permita à IA criar e alterar receitas e montagens com o
-mesmo nível de controle que já existe na leitura.
+O formato canônico e persistido `mecanifica.montagem` v1 já existe para
+montagens recursivas, incluindo pose rígida persistida. Ainda não existem
+relações persistidas gerais, um mapa completo de dependências, um solver geral
+de encaixe ou uma camada de escrita que permita à IA criar e alterar receitas e
+montagens com o mesmo nível de controle que já existe na leitura.
 
 ## A distinção central: peça não é montagem
 
@@ -609,7 +610,6 @@ Os seguintes caminhos contradizem esta definição:
 
 Esta definição não decide antecipadamente:
 
-- o formato canônico da montagem persistida;
 - como representar variantes e instâncias compartilhadas;
 - como versionar relações;
 - como declarar movimento e cinemática;

@@ -80,8 +80,10 @@ Carro e motor são montagens recursivas. Não são receitas monolíticas.
 
 ## Estado operacional
 
-Casos 1 e 2 estão homologados; o Caso 3 não foi iniciado. Não há plano
-executivo ativo.
+Casos 1 e 2 estão homologados; o Caso 3 não foi iniciado. O contrato
+`mecanifica.montagem` v1 e a pose rígida persistida já existem nesta
+implementação; o plano v2 de relações locais está ativo somente em R00
+documental.
 
 O Módulo 1 do MCP, somente leitura e auditoria, foi aprovado. A primeira
 tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
@@ -97,7 +99,7 @@ geometria.
 
 Ainda não existem:
 
-- formato canônico de montagem recursiva persistida;
+- relações persistidas gerais em montagens;
 - mapa completo de composição e dependências;
 - contexto de trabalho derivado automaticamente desse mapa;
 - camada de escrita de receitas e montagens para IA;

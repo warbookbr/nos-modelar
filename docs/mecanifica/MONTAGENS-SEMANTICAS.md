@@ -193,7 +193,7 @@ vizinhas.
 | 2 | grupos e portas publicáveis | painel de portas e `guarda:portas` |
 | 3 | hierarquia e consulta de subárvore | bancada e `guarda:par` |
 | 4 | contratos locais de pose, contato e interface | capacidades e provas específicas já existem, mas não formam uma montagem persistida geral |
-| 5 | formato canônico de montagem recursiva | não implementado |
+| 5 | montagem persistida recursiva v1 | `mecanifica.montagem` v1, pose rígida persistida e resolução recursiva já implementadas |
 | 6 | mapa de dependências e contexto derivado | não implementado |
 | 7 | validação integrada de montagem e movimento | não implementado |
 | 8 | autoria transacional de sistemas compostos pela IA | não implementado |
@@ -206,9 +206,8 @@ a direção estabelecida, não promessa de implementação imediata.
 
 Ainda não há:
 
-- arquivo canônico de montagem recursiva;
+- relações persistidas gerais;
 - mapa completo de dependências;
-- pose persistida geral;
 - resolução automática de contato;
 - solver geral de encaixe;
 - validação de espaço varrido;
@@ -221,7 +220,7 @@ matriz do Three.js ou documentação manual tratada como verdade executável.
 
 A direção não decide antecipadamente:
 
-- o formato canônico da montagem;
+- como ampliar a montagem persistida v1 com relações, variantes e instâncias compartilhadas;
 - como versionar instâncias e relações;
 - quando uma alteração modifica a origem ou cria uma variante;
 - como representar movimento e cinemática;

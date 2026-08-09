@@ -15,9 +15,10 @@ aplicação publicada aqui.
 - Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
-  contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. Não há plano
-  executivo ativo após este fechamento e nenhum próximo plano é autorizado
-  automaticamente.
+  contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. O plano
+  [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) está ativo em R00,
+  somente para abertura documental e baseline; nenhuma implementação v2 está
+  autorizada ainda.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
