@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-265 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+266 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -133,6 +133,7 @@
 - `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
 - `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
 - `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
+- `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica

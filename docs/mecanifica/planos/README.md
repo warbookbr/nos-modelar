@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md), em R00.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -12,7 +12,8 @@ plano está aberto em
 O PR #33 que abriu o plano foi mergeado na `main`. A Montagem Mínima Persistida
 v1 foi concluída no arquivo
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
-Não há plano executivo ativo nem próximo plano autorizado automaticamente.
+O plano ativo está restrito à abertura documental e ao baseline de R00; nenhuma
+implementação v2 está autorizada ainda.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -24,10 +25,10 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-Não há execução de rodada ativa. A Montagem Mínima Persistida v1 foi encerrada
-com provas persistidas, determinismo e contrato v1 documentado; CLI, MCP,
-bancada, escrita, relações mecânicas, solver e mapa global permanecem fora do
-plano concluído.
+R00 do plano de relações locais está em execução somente para abertura
+documental e baseline. A Montagem Mínima Persistida v1 foi encerrada com provas
+persistidas, determinismo e contrato v1 documentado; CLI, MCP, bancada,
+escrita, relações mecânicas, solver e mapa global permanecem fora desta rodada.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
