@@ -5,16 +5,17 @@ import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
-  constructor(codigo, caminho, mensagem) {
+  constructor(codigo, caminho, mensagem, trilha) {
     super(`${caminho}: ${mensagem}`);
     this.name = 'ErroResolucaoMontagemPersistida';
     this.codigo = codigo;
     this.caminho = caminho;
+    if (trilha !== undefined) this.trilha = trilha.slice();
   }
 }
 
-function falhar(codigo, caminho, mensagem) {
-  throw new ErroResolucaoMontagemPersistida(codigo, caminho, mensagem);
+function falhar(codigo, caminho, mensagem, trilha) {
+  throw new ErroResolucaoMontagemPersistida(codigo, caminho, mensagem, trilha);
 }
 
 function poseSemEscala(pose) {
@@ -34,57 +35,104 @@ function mensagemDoErro(erro, padrao) {
   return padrao;
 }
 
-export async function resolverMontagemPersistida(dado, { carregarPeca } = {}) {
-  const montagem = lerMontagemPersistida(dado);
-  if (typeof carregarPeca !== 'function') falhar('carregador-invalido', '$', 'carregarPeca precisa ser função.');
+export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {
+  const montagemRaiz = lerMontagemPersistida(dado);
+  const pecas = new Map();
+  const montagens = new Map();
 
-  const instancias = montagem.instancias.map((instancia, indice) => ({ ...instancia, indice }));
-  const montagemFilha = instancias.find((instancia) => instancia.alvo.tipo === 'montagem');
-  if (montagemFilha) {
-    falhar('alvo-nao-suportado', caminhoDaReferencia(montagemFilha), 'alvo montagem não é suportado nesta rodada.');
-  }
-
-  const referencias = new Map();
-  for (const instancia of instancias) {
-    if (!referencias.has(instancia.alvo.ref)) referencias.set(instancia.alvo.ref, instancia);
-  }
-  const definicoes = new Map();
-  for (const [ref, instancia] of referencias) {
+  async function obterPeca(ref, instancia, trilha) {
+    if (typeof carregarPeca !== 'function') {
+      falhar('carregador-invalido', caminhoDaReferencia(instancia), 'carregarPeca precisa ser função.', trilha);
+    }
+    if (pecas.has(ref)) return pecas.get(ref);
     let bruto;
     try {
       bruto = await carregarPeca(ref);
     } catch (erro) {
-      falhar('referencia-ausente', caminhoDaReferencia(instancia), mensagemDoErro(erro, `referência '${ref}' não foi carregada.`));
+      falhar('referencia-ausente', caminhoDaReferencia(instancia), mensagemDoErro(erro, `referência '${ref}' não foi carregada.`), trilha);
     }
     if (bruto === undefined || bruto === null) {
-      falhar('referencia-ausente', caminhoDaReferencia(instancia), `referência '${ref}' não foi carregada.`);
+      falhar('referencia-ausente', caminhoDaReferencia(instancia), `referência '${ref}' não foi carregada.`, trilha);
     }
     let neutro;
     try {
       neutro = lerPecaResolvida(bruto);
     } catch (erro) {
-      falhar('peca-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `peça '${ref}' inválida.`));
+      falhar('peca-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `peça '${ref}' inválida.`), trilha);
     }
-    definicoes.set(ref, { ref, neutro });
+    const definicao = { ref, neutro };
+    pecas.set(ref, definicao);
+    return definicao;
   }
 
-  const identidade = identidadeTransformacaoRigida();
-  return {
-    id: montagem.id,
-    instancias: instancias.map((instancia) => {
-      const poseLocal = poseSemEscala(instancia.pose);
-      const poseMundo = poseSemEscala(comporTransformacoesRigidas(
-        identidadeTransformacaoRigida(),
-        { escala: 1, ...poseLocal },
-      ));
-      return {
-        id: instancia.id,
-        caminho: [instancia.id],
-        alvo: { tipo: 'peca', ref: instancia.alvo.ref },
-        poseLocal,
-        poseMundo,
-        definicao: definicoes.get(instancia.alvo.ref),
-      };
-    }),
-  };
+  async function obterMontagem(ref, instancia, trilha, pilha) {
+    if (pilha.includes(ref)) {
+      const ciclo = [...pilha, ref];
+      falhar('ciclo', caminhoDaReferencia(instancia), `ciclo de montagens: ${ciclo.join(' -> ')}`, trilha);
+    }
+    if (typeof carregarMontagem !== 'function') {
+      falhar('carregador-invalido', caminhoDaReferencia(instancia), 'carregarMontagem precisa ser função.', trilha);
+    }
+    if (montagens.has(ref)) return montagens.get(ref);
+    let bruto;
+    try {
+      bruto = await carregarMontagem(ref);
+    } catch (erro) {
+      falhar('referencia-ausente', caminhoDaReferencia(instancia), mensagemDoErro(erro, `referência '${ref}' não foi carregada.`), trilha);
+    }
+    if (bruto === undefined || bruto === null) {
+      falhar('referencia-ausente', caminhoDaReferencia(instancia), `referência '${ref}' não foi carregada.`, trilha);
+    }
+    let validada;
+    try {
+      validada = lerMontagemPersistida(bruto);
+    } catch (erro) {
+      falhar('montagem-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `montagem '${ref}' inválida.`), trilha);
+    }
+    montagens.set(ref, validada);
+    return validada;
+  }
+
+  async function resolverMontagem(montagem, posePai, caminhoPai, pilha) {
+    const instancias = [];
+    for (const [indice, instanciaBase] of montagem.instancias.entries()) {
+      const instancia = { ...instanciaBase, indice };
+      const trilha = [...caminhoPai, instancia.id];
+      const poseLocalCompleta = { escala: 1, ...instancia.pose };
+      const poseMundoCompleta = comporTransformacoesRigidas(posePai, poseLocalCompleta);
+      const poseLocal = poseSemEscala(poseLocalCompleta);
+      const poseMundo = poseSemEscala(poseMundoCompleta);
+      const caminho = trilha.slice();
+      if (instancia.alvo.tipo === 'peca') {
+        const definicao = await obterPeca(instancia.alvo.ref, instancia, trilha);
+        instancias.push({
+          id: instancia.id,
+          caminho,
+          alvo: { tipo: 'peca', ref: instancia.alvo.ref },
+          poseLocal,
+          poseMundo,
+          definicao,
+        });
+      } else {
+        const filha = await obterMontagem(instancia.alvo.ref, instancia, trilha, pilha);
+        const resolvida = await resolverMontagem(
+          filha,
+          poseMundoCompleta,
+          caminho,
+          [...pilha, instancia.alvo.ref],
+        );
+        instancias.push({
+          id: instancia.id,
+          caminho,
+          alvo: { tipo: 'montagem', ref: instancia.alvo.ref },
+          poseLocal,
+          poseMundo,
+          montagem: resolvida,
+        });
+      }
+    }
+    return { id: montagem.id, instancias };
+  }
+
+  return resolverMontagem(montagemRaiz, identidadeTransformacaoRigida(), [], []);
 }

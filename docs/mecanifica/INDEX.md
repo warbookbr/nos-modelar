@@ -19,8 +19,9 @@ aplicação publicada aqui.
   técnico do motor procedural (concluído; relatório em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
   `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
-  A R03 está ativa para a Fatia 3: resolução de instâncias de peça; montagem
-  filha, recursão e ciclo ainda não existem.
+  A R04 está em execução para a Fatia 4: montagem dentro de montagem, composição
+  recursiva de pose e detecção de ciclo. O fechamento final do plano ainda não
+  foi declarado.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
