@@ -19,8 +19,8 @@ aplicação publicada aqui.
   técnico do motor procedural (concluído; relatório em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`, autorização encerrada em
   `docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md`). A
-  implementação ainda não está autorizada: a R00 fecha somente a abertura
-  documental do plano.
+  A R01 está ativa para baseline e desenho de implementação; código de produção
+  depende de rodada posterior.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
