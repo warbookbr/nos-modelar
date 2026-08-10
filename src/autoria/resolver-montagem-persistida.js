@@ -1,6 +1,6 @@
 /* resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo. */
 
-import { lerMontagemPersistida } from './ler-montagem-persistida.js';
+import { lerMontagemPersistida, VERSAO_ATUAL } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
 
@@ -35,8 +35,15 @@ function mensagemDoErro(erro, padrao) {
   return padrao;
 }
 
+function recusarV2(montagem, caminho, trilha) {
+  if (montagem.versao === VERSAO_ATUAL) {
+    falhar('versao-nao-resolvida', caminho, 'montagem v2 é legível, mas suas relações ainda não são resolvidas nesta rodada.', trilha);
+  }
+}
+
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {
   const montagemRaiz = lerMontagemPersistida(dado);
+  recusarV2(montagemRaiz, 'versao', []);
   const pecas = new Map();
   const montagens = new Map();
 
@@ -89,6 +96,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
     } catch (erro) {
       falhar('montagem-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `montagem '${ref}' inválida.`), trilha);
     }
+    recusarV2(validada, caminhoDaReferencia(instancia), trilha);
     montagens.set(ref, validada);
     return validada;
   }

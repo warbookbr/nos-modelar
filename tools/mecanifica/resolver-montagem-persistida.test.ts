@@ -21,10 +21,36 @@ const esperaErro = async (acao: Promise<unknown>, codigo: string, caminho: strin
   try { await acao; throw new Error('não falhou'); } catch (erro) {
     expect(erro).toBeInstanceOf(ErroResolucaoMontagemPersistida);
     expect(erro).toMatchObject({ codigo, caminho });
+    return erro as any;
   }
 };
 
+const v2 = (id = 'v2') => ({ formato: 'mecanifica.montagem', versao: 2, id, instancias: [], relacoes: [] });
+
 describe('resolvedor de montagem persistida — instâncias de peça', () => {
+  it('recusa raiz v2 antes de carregar qualquer definição', async () => {
+    let chamadasPeca = 0;
+    let chamadasMontagem = 0;
+    await esperaErro(resolverMontagemPersistida(v2(), {
+      carregarPeca: async () => { chamadasPeca += 1; return freio; },
+      carregarMontagem: async () => { chamadasMontagem += 1; return v2('filha'); },
+    }), 'versao-nao-resolvida', 'versao');
+    expect(chamadasPeca).toBe(0);
+    expect(chamadasMontagem).toBe(0);
+  });
+
+  it('recusa montagem filha v2 com referência e trilha semânticas', async () => {
+    const raiz = montagem([instancia('conjunto', 'filha', undefined, 'montagem')], 'raiz');
+    let chamadasPeca = 0;
+    const erro = await esperaErro(resolverMontagemPersistida(raiz, {
+      carregarPeca: async () => { chamadasPeca += 1; return freio; },
+      carregarMontagem: async () => v2('filha'),
+    }), 'versao-nao-resolvida', 'instancias[0].alvo.ref');
+    expect(chamadasPeca).toBe(0);
+    await expect(resolverMontagemPersistida(raiz, { carregarMontagem: async () => v2('filha') })).rejects.toMatchObject({ trilha: ['conjunto'] });
+    expect(erro.message).toMatch(/v2 é legível/);
+  });
+
   it('resolve duas instâncias da mesma peça real uma vez, compartilhando definição e separando poses', async () => {
     const chamadas: string[] = [];
     const dado = montagem([
