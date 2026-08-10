@@ -13,6 +13,12 @@ const montagem = (instancias: any[], id = 'm1') => ({ formato: 'mecanifica.monta
 const instancia = (id: string, ref: string, pose: any = undefined, tipo = 'peca') => ({
   id, alvo: { tipo, ref }, ...(pose === undefined ? {} : { pose }),
 });
+const relacao = (referencia: string[], movel: string[], id = 'relacao') => ({
+  id, tipo: 'encaixaCilindrico',
+  referencia: { caminho: referencia, porta: 'pilotoDaRoda' },
+  movel: { caminho: movel, porta: 'pilotoDaRoda' },
+  especificacao: { folgaRadial: { nominal: 0, toleranciaFabricacao: { menos: 0, mais: 0 } }, toleranciaNumerica: 0 },
+});
 const carregarDoMapa = (mapa: Record<string, any>, chamadas: string[]) => async (ref: string) => {
   chamadas.push(ref);
   return mapa[ref];
@@ -25,30 +31,32 @@ const esperaErro = async (acao: Promise<unknown>, codigo: string, caminho: strin
   }
 };
 
-const v2 = (id = 'v2') => ({ formato: 'mecanifica.montagem', versao: 2, id, instancias: [], relacoes: [] });
+const v2 = (instancias: any[] = [], relacoes: any[] = [], id = 'v2') => ({ formato: 'mecanifica.montagem', versao: 2, id, instancias, relacoes });
 
 describe('resolvedor de montagem persistida — instâncias de peça', () => {
-  it('recusa raiz v2 antes de carregar qualquer definição', async () => {
-    let chamadasPeca = 0;
-    let chamadasMontagem = 0;
-    await esperaErro(resolverMontagemPersistida(v2(), {
-      carregarPeca: async () => { chamadasPeca += 1; return freio; },
-      carregarMontagem: async () => { chamadasMontagem += 1; return v2('filha'); },
-    }), 'versao-nao-resolvida', 'versao');
-    expect(chamadasPeca).toBe(0);
-    expect(chamadasMontagem).toBe(0);
+  it('resolve v2 vazia sem chamar carregadores e devolve relacoes vazias', async () => {
+    let chamadas = 0;
+    const resultado: any = await resolverMontagemPersistida(v2(), {
+      carregarPeca: async () => { chamadas += 1; return freio; },
+      carregarMontagem: async () => { chamadas += 1; return v2(); },
+    });
+    expect(resultado).toEqual({ id: 'v2', instancias: [], relacoes: [] });
+    expect(chamadas).toBe(0);
   });
 
-  it('recusa montagem filha v2 com referência e trilha semânticas', async () => {
-    const raiz = montagem([instancia('conjunto', 'filha', undefined, 'montagem')], 'raiz');
-    let chamadasPeca = 0;
-    const erro = await esperaErro(resolverMontagemPersistida(raiz, {
-      carregarPeca: async () => { chamadasPeca += 1; return freio; },
-      carregarMontagem: async () => v2('filha'),
-    }), 'versao-nao-resolvida', 'instancias[0].alvo.ref');
-    expect(chamadasPeca).toBe(0);
-    await expect(resolverMontagemPersistida(raiz, { carregarMontagem: async () => v2('filha') })).rejects.toMatchObject({ trilha: ['conjunto'] });
-    expect(erro.message).toMatch(/v2 é legível/);
+  it('resolve relação direta e aponta endpoints por identidade para os nós da árvore', async () => {
+    const raiz = v2([instancia('a', 'freio-disco'), instancia('b', 'freio-disco')], [relacao(['a'], ['b'])], 'raiz');
+    const resultado: any = await resolverMontagemPersistida(raiz, { carregarPeca: async () => freio });
+    const relacaoResolvida = resultado.relacoes[0];
+    expect(relacaoResolvida).toEqual({
+      id: 'relacao', tipo: 'encaixaCilindrico',
+      referencia: { caminho: ['a'], porta: 'pilotoDaRoda', instancia: resultado.instancias[0] },
+      movel: { caminho: ['b'], porta: 'pilotoDaRoda', instancia: resultado.instancias[1] },
+      especificacao: raiz.relacoes[0].especificacao,
+    });
+    expect(relacaoResolvida.referencia.instancia).toBe(resultado.instancias[0]);
+    expect(relacaoResolvida.movel.instancia).toBe(resultado.instancias[1]);
+    expect(JSON.stringify(resultado)).not.toMatch(/satisfeita|medidas|diagnosticos/);
   });
 
   it('resolve duas instâncias da mesma peça real uma vez, compartilhando definição e separando poses', async () => {
@@ -233,5 +241,101 @@ describe('resolvedor de montagem persistida — instâncias de peça', () => {
     expect(JSON.stringify(raiz)).toBe(raizAntes);
     expect(JSON.stringify(filhaBruta)).toBe(filhaAntes);
     expect(JSON.stringify(pecaBruta)).toBe(pecaAntes);
+  });
+});
+
+describe('resolvedor de montagem persistida — relações v2 sem execução mecânica', () => {
+  it('resolve caminho recursivo raiz v2 -> montagem filha v1 -> peça', async () => {
+    const filha = montagem([instancia('freio', 'freio-disco')], 'filha');
+    const raiz = v2([
+      instancia('conjunto', 'filha', undefined, 'montagem'),
+      instancia('roda', 'freio-disco'),
+    ], [relacao(['conjunto', 'freio'], ['roda'])], 'raiz');
+    const resultado: any = await resolverMontagemPersistida(raiz, {
+      carregarPeca: async () => freio,
+      carregarMontagem: async () => filha,
+    });
+    const conjunto = resultado.instancias.find((instancia: any) => instancia.id === 'conjunto');
+    const pecaFilha = conjunto.montagem.instancias[0];
+    expect(resultado.relacoes[0].referencia.caminho).toEqual(['conjunto', 'freio']);
+    expect(resultado.relacoes[0].referencia.instancia).toBe(pecaFilha);
+    expect(resultado.relacoes[0].movel.instancia).toBe(resultado.instancias.find((instancia: any) => instancia.id === 'roda'));
+    expect(pecaFilha.caminho).toEqual(['conjunto', 'freio']);
+  });
+
+  it('mantém relação declarada em filha v2 relativa à filha e mistura raiz v1 -> filha v2', async () => {
+    const filha = v2([
+      instancia('a', 'freio-disco'), instancia('b', 'freio-disco'),
+    ], [relacao(['a'], ['b'], 'relacao-da-filha')], 'filha');
+    const raiz = montagem([instancia('conjunto', 'filha', undefined, 'montagem')], 'raiz');
+    const resultado: any = await resolverMontagemPersistida(raiz, {
+      carregarPeca: async () => freio,
+      carregarMontagem: async () => filha,
+    });
+    const conjunto = resultado.instancias[0];
+    expect(resultado.relacoes).toBeUndefined();
+    expect(conjunto.montagem.relacoes[0].id).toBe('relacao-da-filha');
+    expect(conjunto.montagem.relacoes[0].referencia.caminho).toEqual(['a']);
+    expect(conjunto.montagem.relacoes[0].referencia.instancia).toBe(conjunto.montagem.instancias[0]);
+    expect(conjunto.montagem.relacoes[0].movel.instancia).toBe(conjunto.montagem.instancias[1]);
+  });
+
+  it('resolve v2 -> v2 sem promover relações da filha para a raiz', async () => {
+    const neta = v2([instancia('p', 'freio-disco')], [], 'neta');
+    const filha = v2([instancia('conjunto', 'neta', undefined, 'montagem')], [], 'filha');
+    const raiz = v2([instancia('filha', 'filha', undefined, 'montagem')], [], 'raiz');
+    const resultado: any = await resolverMontagemPersistida(raiz, {
+      carregarPeca: async () => freio,
+      carregarMontagem: async (ref: string) => ref === 'filha' ? filha : neta,
+    });
+    expect(resultado.relacoes).toEqual([]);
+    expect(resultado.instancias[0].montagem.relacoes).toEqual([]);
+    expect(resultado.instancias[0].montagem.instancias[0].montagem.relacoes).toEqual([]);
+  });
+
+  it('reutiliza montagem v2 em ramos irmãos com endpoints e poses independentes', async () => {
+    const filha = v2([
+      instancia('a', 'freio-disco'), instancia('b', 'freio-disco'),
+    ], [relacao(['a'], ['b'], 'encaixe')], 'filha');
+    const raiz = montagem([
+      instancia('ramoA', 'filha', { deslocamento: [1, 0, 0] }, 'montagem'),
+      instancia('ramoB', 'filha', { deslocamento: [5, 0, 0] }, 'montagem'),
+    ], 'raiz');
+    const resultado: any = await resolverMontagemPersistida(raiz, {
+      carregarPeca: async () => freio,
+      carregarMontagem: async () => filha,
+    });
+    const relacaoA = resultado.instancias[0].montagem.relacoes[0];
+    const relacaoB = resultado.instancias[1].montagem.relacoes[0];
+    expect(relacaoA.referencia.instancia).toBe(resultado.instancias[0].montagem.instancias[0]);
+    expect(relacaoB.referencia.instancia).toBe(resultado.instancias[1].montagem.instancias[0]);
+    expect(relacaoA.referencia.instancia).not.toBe(relacaoB.referencia.instancia);
+    expect(relacaoA.referencia.instancia.poseMundo.deslocamento).toEqual([1, 0, 0]);
+    expect(relacaoB.referencia.instancia.poseMundo.deslocamento).toEqual([5, 0, 0]);
+    expect(relacaoA.referencia.instancia.definicao).toBe(relacaoB.referencia.instancia.definicao);
+  });
+
+  it('falha com caminho e trilha para endpoints semânticos inválidos', async () => {
+    const carregar = { carregarPeca: async () => freio, carregarMontagem: async () => montagem([instancia('freio', 'freio-disco')], 'filha') };
+    const falha = async (dado: any, codigo: string, caminho: string, trilha: string[]) => {
+      const erro = await esperaErro(resolverMontagemPersistida(dado, carregar), codigo, caminho);
+      expect(erro.trilha).toEqual(trilha);
+    };
+    await falha(v2([instancia('a', 'freio-disco')], [relacao(['ausente'], ['a'])]), 'endpoint-caminho-inexistente', 'relacoes[0].referencia.caminho[0]', ['ausente']);
+    await falha(v2([instancia('conjunto', 'filha', undefined, 'montagem')], [relacao(['conjunto', 'ausente'], ['conjunto'])]), 'endpoint-caminho-inexistente', 'relacoes[0].referencia.caminho[1]', ['conjunto', 'ausente']);
+    await falha(v2([instancia('a', 'freio-disco')], [relacao(['a', 'depois'], ['a'])]), 'endpoint-travessia-invalida', 'relacoes[0].referencia.caminho[0]', ['a']);
+    await falha(v2([instancia('conjunto', 'filha', undefined, 'montagem')], [relacao(['conjunto'], ['conjunto'])]), 'endpoint-nao-e-peca', 'relacoes[0].referencia.caminho[0]', ['conjunto']);
+    await falha(v2([instancia('a', 'freio-disco')], [relacao(['a'], ['a'])].map((valor) => ({ ...valor, referencia: { ...valor.referencia, porta: 'ausente' } }))), 'porta-ausente', 'relacoes[0].referencia.porta', ['a']);
+  });
+
+  it('preserva determinismo, não mutação e ausência de resultados mecânicos', async () => {
+    const raiz = v2([instancia('a', 'freio-disco'), instancia('b', 'freio-disco')], [relacao(['a'], ['b'])], 'raiz');
+    const antes = JSON.stringify(raiz);
+    const carregar = async () => freio;
+    const primeiro: any = await resolverMontagemPersistida(raiz, { carregarPeca: carregar });
+    const segundo: any = await resolverMontagemPersistida(raiz, { carregarPeca: carregar });
+    expect(primeiro).toEqual(segundo);
+    expect(JSON.stringify(raiz)).toBe(antes);
+    expect(JSON.stringify(primeiro)).not.toMatch(/satisfeita|medidas|diagnosticos/);
   });
 });

@@ -35,15 +35,91 @@ function mensagemDoErro(erro, padrao) {
   return padrao;
 }
 
-function recusarV2(montagem, caminho, trilha) {
-  if (montagem.versao === VERSAO_ATUAL) {
-    falhar('versao-nao-resolvida', caminho, 'montagem v2 é legível, mas suas relações ainda não são resolvidas nesta rodada.', trilha);
+function caminhoDaRelacao(indice, lado, campo = '') {
+  return `relacoes[${indice}].${lado}${campo ? `.${campo}` : ''}`;
+}
+
+function resolverEndpoint(montagemResolvida, endpoint, indiceRelacao, lado, trilhaMontagem) {
+  let instancias = montagemResolvida.instancias;
+  const caminhoBase = caminhoDaRelacao(indiceRelacao, lado, 'caminho');
+  const caminhoPercorrido = [];
+  let no;
+
+  for (const [indiceSegmento, segmento] of endpoint.caminho.entries()) {
+    no = instancias.find((instancia) => instancia.id === segmento);
+    caminhoPercorrido.push(segmento);
+    if (!no) {
+      falhar(
+        'endpoint-caminho-inexistente',
+        `${caminhoBase}[${indiceSegmento}]`,
+        `segmento '${segmento}' não existe neste nível da montagem.`,
+        [...trilhaMontagem, ...caminhoPercorrido],
+      );
+    }
+    const ultimo = indiceSegmento === endpoint.caminho.length - 1;
+    if (!ultimo && no.alvo.tipo !== 'montagem') {
+      falhar(
+        'endpoint-travessia-invalida',
+        `${caminhoBase}[${indiceSegmento}]`,
+        `segmento '${segmento}' aponta para peça e não pode ser atravessado.`,
+        [...trilhaMontagem, ...caminhoPercorrido],
+      );
+    }
+    if (!ultimo) {
+      if (!Array.isArray(no.montagem?.instancias)) {
+        falhar(
+          'endpoint-travessia-invalida',
+          `${caminhoBase}[${indiceSegmento}]`,
+          `montagem '${segmento}' não possui árvore resolvida para travessia.`,
+          [...trilhaMontagem, ...caminhoPercorrido],
+        );
+      }
+      instancias = no.montagem.instancias;
+    }
   }
+
+  if (no.alvo.tipo !== 'peca') {
+    falhar(
+      'endpoint-nao-e-peca',
+      `${caminhoBase}[${endpoint.caminho.length - 1}]`,
+      `endpoint final '${endpoint.caminho.at(-1)}' aponta para montagem.`,
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  const portas = no.definicao?.neutro?.portas;
+  if (!(portas instanceof Map)) {
+    falhar(
+      'portas-indisponiveis',
+      caminhoDaRelacao(indiceRelacao, lado, 'porta'),
+      'a peça resolvida não traz portas publicadas como Map.',
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  if (!portas.has(endpoint.porta)) {
+    falhar(
+      'porta-ausente',
+      caminhoDaRelacao(indiceRelacao, lado, 'porta'),
+      `porta '${endpoint.porta}' não foi publicada pela peça.`,
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  return { caminho: endpoint.caminho.slice(), porta: endpoint.porta, instancia: no };
+}
+
+function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
+  if (montagem.versao !== VERSAO_ATUAL) return montagemResolvida;
+  const relacoes = montagem.relacoes.map((relacao, indice) => ({
+    id: relacao.id,
+    tipo: relacao.tipo,
+    referencia: resolverEndpoint(montagemResolvida, relacao.referencia, indice, 'referencia', trilhaMontagem),
+    movel: resolverEndpoint(montagemResolvida, relacao.movel, indice, 'movel', trilhaMontagem),
+    especificacao: relacao.especificacao,
+  }));
+  return { ...montagemResolvida, relacoes };
 }
 
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {
   const montagemRaiz = lerMontagemPersistida(dado);
-  recusarV2(montagemRaiz, 'versao', []);
   const pecas = new Map();
   const montagens = new Map();
 
@@ -96,7 +172,6 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
     } catch (erro) {
       falhar('montagem-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `montagem '${ref}' inválida.`), trilha);
     }
-    recusarV2(validada, caminhoDaReferencia(instancia), trilha);
     montagens.set(ref, validada);
     return validada;
   }
@@ -139,7 +214,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
         });
       }
     }
-    return { id: montagem.id, instancias };
+    return resolverRelacoes(montagem, { id: montagem.id, instancias }, caminhoPai);
   }
 
   return resolverMontagem(montagemRaiz, identidadeTransformacaoRigida(), [], []);

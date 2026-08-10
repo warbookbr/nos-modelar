@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md), em R01.
+**Plano ativo:** [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md), em R02.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -12,8 +12,8 @@ plano está aberto em
 O PR #33 que abriu o plano foi mergeado na `main`. A Montagem Mínima Persistida
 v1 foi concluída no arquivo
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
-O plano ativo está em R01 para leitor v1/v2 e validação estrutural de relações;
-resolução e execução de relações continuam reservadas para rodadas posteriores.
+O plano ativo está em R02 para resolução recursiva de endpoints semânticos;
+execução mecânica de relações continua reservada para rodada posterior.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -25,11 +25,11 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-R01 do plano de relações locais está em execução para leitor v1/v2, validação
-estrutural de relações e trava fail-closed do resolvedor. A Montagem Mínima
-Persistida v1 foi encerrada com provas persistidas, determinismo e contrato v1
-documentado; resolução/execução de relações, CLI, MCP, bancada, escrita,
-solver e mapa global permanecem fora desta rodada.
+R02 do plano de relações locais está em execução para resolução recursiva de
+endpoints semânticos. A Montagem Mínima Persistida v1 foi encerrada com provas
+persistidas, determinismo e contrato v1 documentado; execução mecânica de
+relações, CLI, MCP, bancada, escrita, solver e mapa global permanecem fora desta
+rodada.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
