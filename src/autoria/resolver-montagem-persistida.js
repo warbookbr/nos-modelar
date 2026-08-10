@@ -3,7 +3,7 @@
 import { lerMontagemPersistida, VERSAO_ATUAL } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
-import { resolverPortasDeMontagem, validarEncaixeCilindrico } from './interfaces-montagem.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, validarAssentamentoAnular } from './interfaces-montagem.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem, trilha) {
@@ -131,23 +131,40 @@ function declararEncaixeCilindrico(relacao) {
   };
 }
 
-function validarRelacaoCilindrica(relacao, indice, trilhaMontagem) {
-  const referencia = resolverEndpoint(trilhaMontagem.montagem, relacao.referencia, indice, 'referencia', trilhaMontagem.trilha);
-  const movel = resolverEndpoint(trilhaMontagem.montagem, relacao.movel, indice, 'movel', trilhaMontagem.trilha);
+function declararAssentamentoAnular(relacao) {
+  return {
+    id: relacao.id,
+    tipo: 'assentaAnular',
+    referencia: `referencia.${relacao.referencia.porta}`,
+    movel: `movel.${relacao.movel.porta}`,
+    sobreposicaoRadial: relacao.especificacao.sobreposicaoRadial,
+    sobreposicaoAxial: relacao.especificacao.sobreposicaoAxial,
+    toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
+  };
+}
+
+function portasTecnicasDosEndpoints(referencia, movel) {
+  return resolverPortasDeMontagem([
+    instanciaTecnica('referencia', referencia),
+    instanciaTecnica('movel', movel),
+  ]);
+}
+
+function executarRelacao(relacao, indice, trilhaMontagem) {
   try {
-    const portas = resolverPortasDeMontagem([
-      instanciaTecnica('referencia', referencia),
-      instanciaTecnica('movel', movel),
-    ]);
-    const validada = validarEncaixeCilindrico(
-      declararEncaixeCilindrico({ ...relacao, referencia, movel }),
-      portas,
-    );
+    const portas = portasTecnicasDosEndpoints(relacao.referencia, relacao.movel);
+    const declarar = relacao.tipo === 'encaixaCilindrico'
+      ? declararEncaixeCilindrico
+      : declararAssentamentoAnular;
+    const validar = relacao.tipo === 'encaixaCilindrico'
+      ? validarEncaixeCilindrico
+      : validarAssentamentoAnular;
+    const validada = validar(declarar(relacao), portas);
     return {
       id: relacao.id,
       tipo: relacao.tipo,
-      referencia,
-      movel,
+      referencia: relacao.referencia,
+      movel: relacao.movel,
       especificacao: relacao.especificacao,
       satisfeita: validada.satisfeita,
       medidas: validada.medidas,
@@ -157,25 +174,25 @@ function validarRelacaoCilindrica(relacao, indice, trilhaMontagem) {
     falhar(
       'validacao-relacao-invalida',
       `relacoes[${indice}]`,
-      mensagemDoErro(erro, 'a validação da relação cilíndrica falhou.'),
-      trilhaMontagem.trilha,
+      mensagemDoErro(erro, 'a validação da relação falhou.'),
+      trilhaMontagem,
     );
   }
 }
 
 function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
   if (montagem.versao !== VERSAO_ATUAL) return montagemResolvida;
-  const relacoes = montagem.relacoes.map((relacao, indice) => ({
-    id: relacao.id,
-    tipo: relacao.tipo,
-    referencia: resolverEndpoint(montagemResolvida, relacao.referencia, indice, 'referencia', trilhaMontagem),
-    movel: resolverEndpoint(montagemResolvida, relacao.movel, indice, 'movel', trilhaMontagem),
-    especificacao: relacao.especificacao,
-  }));
-  const resolvidas = relacoes.map((relacao, indice) => relacao.tipo === 'encaixaCilindrico'
-    ? validarRelacaoCilindrica(relacao, indice, { montagem: montagemResolvida, trilha: trilhaMontagem })
-    : relacao);
-  return { ...montagemResolvida, relacoes: resolvidas };
+  const relacoes = montagem.relacoes.map((relacao, indice) => {
+    const resolvida = {
+      id: relacao.id,
+      tipo: relacao.tipo,
+      referencia: resolverEndpoint(montagemResolvida, relacao.referencia, indice, 'referencia', trilhaMontagem),
+      movel: resolverEndpoint(montagemResolvida, relacao.movel, indice, 'movel', trilhaMontagem),
+      especificacao: relacao.especificacao,
+    };
+    return executarRelacao(resolvida, indice, trilhaMontagem);
+  });
+  return { ...montagemResolvida, relacoes };
 }
 
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {

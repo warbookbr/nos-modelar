@@ -16,9 +16,10 @@ aplicação publicada aqui.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
   contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. O plano
-  [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) está ativo em R03:
-  execução de `encaixaCilindrico` sobre endpoints semânticos resolvidos.
-  `assentaAnular` permanece estrutural e reservado para R04.
+  [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) está ativo em R04:
+  os dois tipos locais persistidos, `encaixaCilindrico` e `assentaAnular`, são
+  executados sobre endpoints semânticos resolvidos. Provas finais e fixtures
+  v2 permanecem para R05.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
