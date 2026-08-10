@@ -3,6 +3,7 @@
 import { lerMontagemPersistida, VERSAO_ATUAL } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico } from './interfaces-montagem.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem, trilha) {
@@ -106,6 +107,62 @@ function resolverEndpoint(montagemResolvida, endpoint, indiceRelacao, lado, tril
   return { caminho: endpoint.caminho.slice(), porta: endpoint.porta, instancia: no };
 }
 
+function instanciaTecnica(id, endpoint) {
+  const pose = endpoint.instancia.poseMundo;
+  const referencial = identidadeTransformacaoRigida();
+  return {
+    id,
+    neutro: endpoint.instancia.definicao.neutro,
+    escala: 1,
+    rotacao: pose.rotacao.map((linha) => linha.slice()),
+    deslocamento: pose.deslocamento.slice(),
+    referencial: { rotacao: referencial.rotacao, deslocamento: referencial.deslocamento },
+  };
+}
+
+function declararEncaixeCilindrico(relacao) {
+  return {
+    id: relacao.id,
+    tipo: 'encaixaCilindrico',
+    referencia: `referencia.${relacao.referencia.porta}`,
+    movel: `movel.${relacao.movel.porta}`,
+    folgaRadial: relacao.especificacao.folgaRadial,
+    toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
+  };
+}
+
+function validarRelacaoCilindrica(relacao, indice, trilhaMontagem) {
+  const referencia = resolverEndpoint(trilhaMontagem.montagem, relacao.referencia, indice, 'referencia', trilhaMontagem.trilha);
+  const movel = resolverEndpoint(trilhaMontagem.montagem, relacao.movel, indice, 'movel', trilhaMontagem.trilha);
+  try {
+    const portas = resolverPortasDeMontagem([
+      instanciaTecnica('referencia', referencia),
+      instanciaTecnica('movel', movel),
+    ]);
+    const validada = validarEncaixeCilindrico(
+      declararEncaixeCilindrico({ ...relacao, referencia, movel }),
+      portas,
+    );
+    return {
+      id: relacao.id,
+      tipo: relacao.tipo,
+      referencia,
+      movel,
+      especificacao: relacao.especificacao,
+      satisfeita: validada.satisfeita,
+      medidas: validada.medidas,
+      diagnosticos: validada.diagnosticos,
+    };
+  } catch (erro) {
+    falhar(
+      'validacao-relacao-invalida',
+      `relacoes[${indice}]`,
+      mensagemDoErro(erro, 'a validação da relação cilíndrica falhou.'),
+      trilhaMontagem.trilha,
+    );
+  }
+}
+
 function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
   if (montagem.versao !== VERSAO_ATUAL) return montagemResolvida;
   const relacoes = montagem.relacoes.map((relacao, indice) => ({
@@ -115,7 +172,10 @@ function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
     movel: resolverEndpoint(montagemResolvida, relacao.movel, indice, 'movel', trilhaMontagem),
     especificacao: relacao.especificacao,
   }));
-  return { ...montagemResolvida, relacoes };
+  const resolvidas = relacoes.map((relacao, indice) => relacao.tipo === 'encaixaCilindrico'
+    ? validarRelacaoCilindrica(relacao, indice, { montagem: montagemResolvida, trilha: trilhaMontagem })
+    : relacao);
+  return { ...montagemResolvida, relacoes: resolvidas };
 }
 
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {

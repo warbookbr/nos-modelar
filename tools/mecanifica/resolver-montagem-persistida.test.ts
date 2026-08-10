@@ -5,7 +5,11 @@ import { ErroResolucaoMontagemPersistida, resolverMontagemPersistida } from '../
 // @ts-expect-error — leitor JavaScript, usado para verificar o erro estrutural preservado.
 import { ErroMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 // @ts-expect-error — matemática neutra JavaScript, usada para a prova numérica.
-import { comporTransformacoesRigidas } from '../../src/autoria/transformacao-rigida.js';
+import { comporTransformacoesRigidas, identidadeTransformacaoRigida } from '../../src/autoria/transformacao-rigida.js';
+// @ts-expect-error — interfaces públicas da montagem, usadas na comparação direta exigida pela rodada.
+import { resolverPortasDeMontagem, validarEncaixeCilindrico } from '../../src/autoria/interfaces-montagem.js';
+// @ts-expect-error — leitor neutro usado para montar a chamada direta do validador.
+import { lerPecaResolvida } from '../../src/autoria/ler-peca-resolvida.js';
 
 const freio = JSON.parse(readFileSync(new URL('../../pecas-resolvidas/freio-disco.json', import.meta.url), 'utf8'));
 const roda = JSON.parse(readFileSync(new URL('../../pecas-resolvidas/roda-dianteira.json', import.meta.url), 'utf8'));
@@ -18,6 +22,12 @@ const relacao = (referencia: string[], movel: string[], id = 'relacao') => ({
   referencia: { caminho: referencia, porta: 'pilotoDaRoda' },
   movel: { caminho: movel, porta: 'pilotoDaRoda' },
   especificacao: { folgaRadial: { nominal: 0, toleranciaFabricacao: { menos: 0, mais: 0 } }, toleranciaNumerica: 0 },
+});
+const relacaoReal = (referencia: string[], movel: string[], id = 'rodaNoFreio') => ({
+  id, tipo: 'encaixaCilindrico',
+  referencia: { caminho: referencia, porta: 'pilotoDaRoda' },
+  movel: { caminho: movel, porta: 'cavidadeDoCubo' },
+  especificacao: { folgaRadial: { nominal: 0.029, toleranciaFabricacao: { menos: 0.00005, mais: 0.00005 } }, toleranciaNumerica: 0.000001 },
 });
 const carregarDoMapa = (mapa: Record<string, any>, chamadas: string[]) => async (ref: string) => {
   chamadas.push(ref);
@@ -48,15 +58,16 @@ describe('resolvedor de montagem persistida — instâncias de peça', () => {
     const raiz = v2([instancia('a', 'freio-disco'), instancia('b', 'freio-disco')], [relacao(['a'], ['b'])], 'raiz');
     const resultado: any = await resolverMontagemPersistida(raiz, { carregarPeca: async () => freio });
     const relacaoResolvida = resultado.relacoes[0];
-    expect(relacaoResolvida).toEqual({
+    expect(relacaoResolvida).toMatchObject({
       id: 'relacao', tipo: 'encaixaCilindrico',
       referencia: { caminho: ['a'], porta: 'pilotoDaRoda', instancia: resultado.instancias[0] },
       movel: { caminho: ['b'], porta: 'pilotoDaRoda', instancia: resultado.instancias[1] },
       especificacao: raiz.relacoes[0].especificacao,
+      satisfeita: expect.any(Boolean), medidas: expect.any(Object), diagnosticos: expect.any(Array),
     });
     expect(relacaoResolvida.referencia.instancia).toBe(resultado.instancias[0]);
     expect(relacaoResolvida.movel.instancia).toBe(resultado.instancias[1]);
-    expect(JSON.stringify(resultado)).not.toMatch(/satisfeita|medidas|diagnosticos/);
+    expect(relacaoResolvida.referencia).not.toEqual(expect.any(String));
   });
 
   it('resolve duas instâncias da mesma peça real uma vez, compartilhando definição e separando poses', async () => {
@@ -328,7 +339,7 @@ describe('resolvedor de montagem persistida — relações v2 sem execução mec
     await falha(v2([instancia('a', 'freio-disco')], [relacao(['a'], ['a'])].map((valor) => ({ ...valor, referencia: { ...valor.referencia, porta: 'ausente' } }))), 'porta-ausente', 'relacoes[0].referencia.porta', ['a']);
   });
 
-  it('preserva determinismo, não mutação e ausência de resultados mecânicos', async () => {
+  it('preserva determinismo, não mutação e resultados mecânicos isolados', async () => {
     const raiz = v2([instancia('a', 'freio-disco'), instancia('b', 'freio-disco')], [relacao(['a'], ['b'])], 'raiz');
     const antes = JSON.stringify(raiz);
     const carregar = async () => freio;
@@ -336,6 +347,59 @@ describe('resolvedor de montagem persistida — relações v2 sem execução mec
     const segundo: any = await resolverMontagemPersistida(raiz, { carregarPeca: carregar });
     expect(primeiro).toEqual(segundo);
     expect(JSON.stringify(raiz)).toBe(antes);
-    expect(JSON.stringify(primeiro)).not.toMatch(/satisfeita|medidas|diagnosticos/);
+    expect(primeiro.relacoes[0]).toMatchObject({ satisfeita: expect.any(Boolean), medidas: expect.any(Object), diagnosticos: expect.any(Array) });
+  });
+});
+
+describe('resolvedor de montagem persistida — rodada R03 cilíndrica', () => {
+  const neutroFreio = lerPecaResolvida(freio);
+  const neutroRoda = lerPecaResolvida(roda);
+  const instanciaTecnica = (id: string, neutro: any, deslocamento = [0, 0, 0]) => ({
+    id, neutro, escala: 1, rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento,
+    referencial: { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 0, 0] },
+  });
+
+  it('valida relação real satisfeita e coincide com chamada direta do validador', async () => {
+    const dado = v2([instancia('freio', 'freio-disco'), instancia('roda', 'roda-dianteira')], [relacaoReal(['freio'], ['roda'])]);
+    const resultado: any = await resolverMontagemPersistida(dado, { carregarPeca: async (ref: string) => ref === 'freio-disco' ? freio : roda });
+    const declaracao = { id: 'rodaNoFreio', tipo: 'encaixaCilindrico', referencia: 'freio.pilotoDaRoda', movel: 'roda.cavidadeDoCubo', folgaRadial: dado.relacoes[0].especificacao.folgaRadial, toleranciaNumerica: 0.000001 };
+    const direto: any = validarEncaixeCilindrico(declaracao, resolverPortasDeMontagem([instanciaTecnica('freio', neutroFreio), instanciaTecnica('roda', neutroRoda)]));
+    expect(resultado.relacoes[0].satisfeita).toBe(true);
+    expect(resultado.relacoes[0].medidas).toEqual(direto.medidas);
+    expect(resultado.relacoes[0].diagnosticos).toEqual(direto.diagnosticos);
+  });
+
+  it('retorna falso e diagnóstico para falha mecânica, sem lançar', async () => {
+    const dado = v2([instancia('freio', 'freio-disco'), instancia('roda', 'roda-dianteira')], [relacaoReal(['freio'], ['roda'], 'falha')]);
+    dado.relacoes[0].especificacao.folgaRadial.nominal = 0.003;
+    const resultado: any = await resolverMontagemPersistida(dado, { carregarPeca: async (ref: string) => ref === 'freio-disco' ? freio : roda });
+    expect(resultado.relacoes[0].satisfeita).toBe(false);
+    expect(resultado.relacoes[0].diagnosticos).toEqual(expect.arrayContaining([expect.objectContaining({ codigo: 'folga-radial-fora' })]));
+  });
+
+  it('isola duas relações cilíndricas, uma satisfeita e outra falha', async () => {
+    const dado = v2([instancia('freioA', 'freio-disco'), instancia('rodaA', 'roda-dianteira'), instancia('freioB', 'freio-disco'), instancia('rodaB', 'roda-dianteira')], [relacaoReal(['freioA'], ['rodaA'], 'passa'), relacaoReal(['freioB'], ['rodaB'], 'falha')]);
+    dado.relacoes[1].especificacao.folgaRadial.nominal = 0.003;
+    const resultado: any = await resolverMontagemPersistida(dado, { carregarPeca: async (ref: string) => ref === 'roda-dianteira' ? roda : freio });
+    expect(resultado.relacoes.map((relacao: any) => relacao.satisfeita)).toEqual([false, true]);
+  });
+
+  it('usa poseMundo do endpoint filho e reage ao deslocamento do pai', async () => {
+    const filha = montagem([instancia('roda', 'roda-dianteira')], 'filha');
+    const base = v2([instancia('freio', 'freio-disco'), instancia('conjunto', 'filha', undefined, 'montagem')], [relacaoReal(['freio'], ['conjunto', 'roda'], 'mundo')]);
+    const deslocada = { ...base, instancias: [base.instancias[0], { ...base.instancias[1], pose: { deslocamento: [1, 0, 0] } }] };
+    const carregar = { carregarPeca: async (ref: string) => ref === 'roda-dianteira' ? roda : freio, carregarMontagem: async () => filha };
+    const passou: any = await resolverMontagemPersistida(base, carregar);
+    const falhou: any = await resolverMontagemPersistida(deslocada, carregar);
+    expect(passou.relacoes[0].satisfeita).toBe(true);
+    expect(falhou.relacoes[0].satisfeita).toBe(false);
+    expect(falhou.relacoes[0].movel.instancia.poseMundo.deslocamento).toEqual([1, 0, 0]);
+  });
+
+  it('mantém anular apenas estrutural e não executa seu validador', async () => {
+    const anular = { id: 'anel', tipo: 'assentaAnular', referencia: { caminho: ['a'], porta: 'pilotoDaRoda' }, movel: { caminho: ['b'], porta: 'pilotoDaRoda' }, especificacao: { sobreposicaoRadial: { nominal: 0, toleranciaFabricacao: { menos: 0, mais: 0 } }, sobreposicaoAxial: { nominal: 0, toleranciaFabricacao: { menos: 0, mais: 0 } }, toleranciaNumerica: 0 } };
+    const resultado: any = await resolverMontagemPersistida(v2([instancia('a', 'freio-disco'), instancia('b', 'freio-disco')], [anular]), { carregarPeca: async () => freio });
+    expect(resultado.relacoes[0]).toEqual({ id: 'anel', tipo: 'assentaAnular', referencia: expect.any(Object), movel: expect.any(Object), especificacao: anular.especificacao });
+    expect(resultado.relacoes[0]).not.toHaveProperty('satisfeita');
   });
 });
