@@ -16,9 +16,11 @@ aplicação publicada aqui.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
   contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. O plano
-  [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) está ativo em R05:
-  as provas A–F, fixtures persistidas v2 e o contrato v2 estão concluídos;
-  fechamento permanece reservado para R06.
+  [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) foi concluído
+  no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
+  arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. Não há plano
+  executivo ativo; mapa global, contexto de trabalho, revalidação automática,
+  writer, CLI, MCP e API de autoria permanecem sem autorização automática.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
