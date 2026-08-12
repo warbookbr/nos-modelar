@@ -1,0 +1,31 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 2,
+  "id": "v2-relacoes-isolamento",
+  "instancias": [
+    { "id": "freio", "alvo": { "tipo": "peca", "ref": "freio-disco" } },
+    { "id": "roda", "alvo": { "tipo": "peca", "ref": "roda-dianteira" } }
+  ],
+  "relacoes": [
+    {
+      "id": "passa",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["freio"], "porta": "pilotoDaRoda" },
+      "movel": { "caminho": ["roda"], "porta": "cavidadeDoCubo" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.029, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "falha",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["freio"], "porta": "pilotoDaRoda" },
+      "movel": { "caminho": ["roda"], "porta": "cavidadeDoCubo" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.003, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

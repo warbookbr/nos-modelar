@@ -1,8 +1,9 @@
 /* resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo. */
 
-import { lerMontagemPersistida } from './ler-montagem-persistida.js';
+import { lerMontagemPersistida, VERSAO_ATUAL } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
+import { resolverPortasDeMontagem, validarEncaixeCilindrico, validarAssentamentoAnular } from './interfaces-montagem.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem, trilha) {
@@ -33,6 +34,165 @@ function mensagemDoErro(erro, padrao) {
   if (erro instanceof Error && erro.message) return erro.message;
   if (typeof erro === 'string' && erro) return erro;
   return padrao;
+}
+
+function caminhoDaRelacao(indice, lado, campo = '') {
+  return `relacoes[${indice}].${lado}${campo ? `.${campo}` : ''}`;
+}
+
+function resolverEndpoint(montagemResolvida, endpoint, indiceRelacao, lado, trilhaMontagem) {
+  let instancias = montagemResolvida.instancias;
+  const caminhoBase = caminhoDaRelacao(indiceRelacao, lado, 'caminho');
+  const caminhoPercorrido = [];
+  let no;
+
+  for (const [indiceSegmento, segmento] of endpoint.caminho.entries()) {
+    no = instancias.find((instancia) => instancia.id === segmento);
+    caminhoPercorrido.push(segmento);
+    if (!no) {
+      falhar(
+        'endpoint-caminho-inexistente',
+        `${caminhoBase}[${indiceSegmento}]`,
+        `segmento '${segmento}' não existe neste nível da montagem.`,
+        [...trilhaMontagem, ...caminhoPercorrido],
+      );
+    }
+    const ultimo = indiceSegmento === endpoint.caminho.length - 1;
+    if (!ultimo && no.alvo.tipo !== 'montagem') {
+      falhar(
+        'endpoint-travessia-invalida',
+        `${caminhoBase}[${indiceSegmento}]`,
+        `segmento '${segmento}' aponta para peça e não pode ser atravessado.`,
+        [...trilhaMontagem, ...caminhoPercorrido],
+      );
+    }
+    if (!ultimo) {
+      if (!Array.isArray(no.montagem?.instancias)) {
+        falhar(
+          'endpoint-travessia-invalida',
+          `${caminhoBase}[${indiceSegmento}]`,
+          `montagem '${segmento}' não possui árvore resolvida para travessia.`,
+          [...trilhaMontagem, ...caminhoPercorrido],
+        );
+      }
+      instancias = no.montagem.instancias;
+    }
+  }
+
+  if (no.alvo.tipo !== 'peca') {
+    falhar(
+      'endpoint-nao-e-peca',
+      `${caminhoBase}[${endpoint.caminho.length - 1}]`,
+      `endpoint final '${endpoint.caminho.at(-1)}' aponta para montagem.`,
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  const portas = no.definicao?.neutro?.portas;
+  if (!(portas instanceof Map)) {
+    falhar(
+      'portas-indisponiveis',
+      caminhoDaRelacao(indiceRelacao, lado, 'porta'),
+      'a peça resolvida não traz portas publicadas como Map.',
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  if (!portas.has(endpoint.porta)) {
+    falhar(
+      'porta-ausente',
+      caminhoDaRelacao(indiceRelacao, lado, 'porta'),
+      `porta '${endpoint.porta}' não foi publicada pela peça.`,
+      [...trilhaMontagem, ...caminhoPercorrido],
+    );
+  }
+  return { caminho: endpoint.caminho.slice(), porta: endpoint.porta, instancia: no };
+}
+
+function instanciaTecnica(id, endpoint) {
+  const pose = endpoint.instancia.poseMundo;
+  const referencial = identidadeTransformacaoRigida();
+  return {
+    id,
+    neutro: endpoint.instancia.definicao.neutro,
+    escala: 1,
+    rotacao: pose.rotacao.map((linha) => linha.slice()),
+    deslocamento: pose.deslocamento.slice(),
+    referencial: { rotacao: referencial.rotacao, deslocamento: referencial.deslocamento },
+  };
+}
+
+function declararEncaixeCilindrico(relacao) {
+  return {
+    id: relacao.id,
+    tipo: 'encaixaCilindrico',
+    referencia: `referencia.${relacao.referencia.porta}`,
+    movel: `movel.${relacao.movel.porta}`,
+    folgaRadial: relacao.especificacao.folgaRadial,
+    toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
+  };
+}
+
+function declararAssentamentoAnular(relacao) {
+  return {
+    id: relacao.id,
+    tipo: 'assentaAnular',
+    referencia: `referencia.${relacao.referencia.porta}`,
+    movel: `movel.${relacao.movel.porta}`,
+    sobreposicaoRadial: relacao.especificacao.sobreposicaoRadial,
+    sobreposicaoAxial: relacao.especificacao.sobreposicaoAxial,
+    toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
+  };
+}
+
+function portasTecnicasDosEndpoints(referencia, movel) {
+  return resolverPortasDeMontagem([
+    instanciaTecnica('referencia', referencia),
+    instanciaTecnica('movel', movel),
+  ]);
+}
+
+function executarRelacao(relacao, indice, trilhaMontagem) {
+  try {
+    const portas = portasTecnicasDosEndpoints(relacao.referencia, relacao.movel);
+    const declarar = relacao.tipo === 'encaixaCilindrico'
+      ? declararEncaixeCilindrico
+      : declararAssentamentoAnular;
+    const validar = relacao.tipo === 'encaixaCilindrico'
+      ? validarEncaixeCilindrico
+      : validarAssentamentoAnular;
+    const validada = validar(declarar(relacao), portas);
+    return {
+      id: relacao.id,
+      tipo: relacao.tipo,
+      referencia: relacao.referencia,
+      movel: relacao.movel,
+      especificacao: relacao.especificacao,
+      satisfeita: validada.satisfeita,
+      medidas: validada.medidas,
+      diagnosticos: validada.diagnosticos,
+    };
+  } catch (erro) {
+    falhar(
+      'validacao-relacao-invalida',
+      `relacoes[${indice}]`,
+      mensagemDoErro(erro, 'a validação da relação falhou.'),
+      trilhaMontagem,
+    );
+  }
+}
+
+function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
+  if (montagem.versao !== VERSAO_ATUAL) return montagemResolvida;
+  const relacoes = montagem.relacoes.map((relacao, indice) => {
+    const resolvida = {
+      id: relacao.id,
+      tipo: relacao.tipo,
+      referencia: resolverEndpoint(montagemResolvida, relacao.referencia, indice, 'referencia', trilhaMontagem),
+      movel: resolverEndpoint(montagemResolvida, relacao.movel, indice, 'movel', trilhaMontagem),
+      especificacao: relacao.especificacao,
+    };
+    return executarRelacao(resolvida, indice, trilhaMontagem);
+  });
+  return { ...montagemResolvida, relacoes };
 }
 
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {
@@ -131,7 +291,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
         });
       }
     }
-    return { id: montagem.id, instancias };
+    return resolverRelacoes(montagem, { id: montagem.id, instancias }, caminhoPai);
   }
 
   return resolverMontagem(montagemRaiz, identidadeTransformacaoRigida(), [], []);
