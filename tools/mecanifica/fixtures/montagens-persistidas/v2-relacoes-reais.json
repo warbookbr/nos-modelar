@@ -1,0 +1,42 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 2,
+  "id": "v2-relacoes-reais",
+  "instancias": [
+    {
+      "id": "conjunto-freio",
+      "alvo": { "tipo": "montagem", "ref": "subconjunto-freio" },
+      "pose": {
+        "rotacao": [[0, 1, 0], [-1, 0, 0], [0, 0, 1]],
+        "deslocamento": [-2, 1, -3]
+      }
+    },
+    {
+      "id": "roda",
+      "alvo": { "tipo": "peca", "ref": "roda-dianteira" }
+    }
+  ],
+  "relacoes": [
+    {
+      "id": "rodaNoFreio",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["conjunto-freio", "freio"], "porta": "pilotoDaRoda" },
+      "movel": { "caminho": ["roda"], "porta": "cavidadeDoCubo" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.029, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "aroNoPneu",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["roda"], "porta": "assentoDoAroNoPneu" },
+      "movel": { "caminho": ["roda"], "porta": "assentoDoPneuNoAro" },
+      "especificacao": {
+        "sobreposicaoRadial": { "nominal": 0.025, "toleranciaFabricacao": { "menos": 0.0000625, "mais": 0.0000625 } },
+        "sobreposicaoAxial": { "nominal": 0.146, "toleranciaFabricacao": { "menos": 0.0000625, "mais": 0.0000625 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}
