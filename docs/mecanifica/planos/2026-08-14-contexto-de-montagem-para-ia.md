@@ -164,7 +164,7 @@ canônico; uso/diagnóstico fica em `stderr`. A CLI não replica regra do servi�
 ## Fatias
 
 1. R00 — concluído: baseline, contrato, bytes, ausências e erros;
-2. R01 — árvore, poses, caixas, portas, relações e cobertura;
+2. R01 — concluído: árvore, poses, caixas, portas, relações e cobertura;
 3. R02 — caminho, profundidade e relacionados;
 4. R03 — CLI confinada e diagnóstico;
 5. R04 — repetir R001/R002 e medir contexto;

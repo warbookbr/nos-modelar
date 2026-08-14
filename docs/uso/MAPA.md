@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-281 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+283 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -270,6 +270,7 @@
 
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `assinatura-geometria.js` — assinatura-geometria.js — SHA-256 síncrono e portátil para os contratos de autoria. Não usa `node:crypto`: a descrição também roda na bancada.
+- `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
@@ -348,6 +349,7 @@
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `corrimao-orientacao.test.ts` — corrimao-orientacao.test.ts — a prova NÃO AUTOMOTIVA da `orientacao` do `loft`, o segundo item do ciclo "Corte e orientação de seção v1".
+- `descrever-montagem-resolvida.test.ts` — Prova o contexto JSON puro derivado de uma montagem persistida resolvida.
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
 - `descrever-partes.test.ts` — descrever-partes.test.ts — prova do O-1: a conferência de uma peça é NÚMERO, não leitura de PNG (ATRITOS-AUTORIA A-13). Mede três coisas: que o módulo neutro…
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
