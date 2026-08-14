@@ -2,9 +2,7 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-14-contexto-visual-e-autoria-segura.md`](2026-08-14-contexto-visual-e-autoria-segura.md),
-em R00.
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -126,7 +124,7 @@ nos arquivos originais.
 | Montagem Persistida v2 — relações locais | concluído: R06, PR #41 |
 | Contexto de montagem para IA | concluído: R05, PR #42 |
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
-| Contexto visual e autoria segura de montagem | ativo: R00 |
+| Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),

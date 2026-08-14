@@ -29,6 +29,7 @@
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "descrever:montagem": "node tools/mecanifica/descrever-montagem.mjs",
     "descrever:montagem:persistida": "node tools/mecanifica/descrever-montagem-persistida.mjs",
+    "olhar:montagem": "node tools/mecanifica/olhar-montagem.mjs",
     "peca": "node tools/bancadas/olhar-peca.mjs",
     "executar": "node tools/bancadas/executar.mjs",
     "porteiro": "node tools/bancadas/porteiro.mjs",

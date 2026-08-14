@@ -10,10 +10,10 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | impacto local concluído; catálogo explícito entre raízes é R03 do plano ativo |
-| Contexto de trabalho da IA | contexto estrutural concluído; contexto visual e roteiro de revalidação são R01/R02 do plano ativo |
-| Revalidação de dependentes | roteiro assistido é R02; automação permanece fora |
-| Escrita transacional de receitas e montagens | contrato e prova de atomicidade são R04; MCP/API continuam fora |
+| Mapa de composição e dependências | impacto local e catálogo explícito entre raízes concluídos; descoberta implícita continua fora |
+| Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
+| Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
+| Escrita transacional de receitas e montagens | revisões imutáveis e commit visível provados localmente; materialização e MCP/API continuam fora |
 | Autoria por MCP | não definida; depende dos serviços internos de peça, montagem, contexto, transação e revalidação; não é continuação automática do plano de pacotes interrompido |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |

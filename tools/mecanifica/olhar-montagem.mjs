@@ -8,7 +8,7 @@ import { lerArgumentos } from './argumentos.mjs';
 import { verificarCaminhoConfinado } from './caminho-confinado.mjs';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const args = lerArgumentos(process.argv.slice(2), { opcoes: ['arquivo', 'raiz-montagens', 'raiz-pecas', 'saida', 'vistas'], bandeiras: [] });
+const args = lerArgumentos(process.argv.slice(2), { opcoes: ['arquivo', 'raiz-montagens', 'raiz-pecas', 'saida', 'vistas', 'caminho'], bandeiras: [] });
 const exigir = (nome) => { const valor = args.opcao(nome); if (!valor) throw new Error(`--${nome} é obrigatório.`); return valor; };
 const raizMontagens = resolve(exigir('raiz-montagens'));
 const raizPecas = resolve(exigir('raiz-pecas'));
@@ -21,12 +21,16 @@ const resolvida = await resolverMontagemPersistida(ler(arquivo, raizMontagens), 
   carregarMontagem: async (ref) => ler(resolve(raizMontagens, `${ref}.json`), raizMontagens),
   carregarPeca: async (ref) => ler(resolve(raizPecas, `${ref}.json`), raizPecas),
 });
+const foco = args.opcao('caminho')?.split('/').filter(Boolean) ?? [];
+const prefixo = (a, b) => a.length <= b.length && a.every((segmento, indice) => segmento === b[indice]);
+let encontrados = 0;
 const serializar = (montagem) => ({
   id: montagem.id,
-  instancias: montagem.instancias.map((i) => {
+  instancias: montagem.instancias.filter((i) => foco.length === 0 || prefixo(foco, i.caminho) || prefixo(i.caminho, foco)).map((i) => {
     if (i.alvo.tipo === 'montagem') {
       return { id: i.id, caminho: i.caminho, alvo: i.alvo, poseMundo: i.poseMundo, montagem: serializar(i.montagem) };
     }
+    encontrados += 1;
     return {
       id: i.id, caminho: i.caminho, alvo: i.alvo, poseMundo: i.poseMundo,
       definicao: { neutro: {
@@ -35,6 +39,8 @@ const serializar = (montagem) => ({
     };
   }),
 });
+const dadosVisuais = serializar(resolvida);
+if (foco.length > 0 && encontrados === 0) throw new Error(`--caminho '${foco.join('/')}' não encontrou peça.`);
 const vistas = (args.opcao('vistas') ?? 'isometrica,direita').split(',').filter(Boolean);
 mkdirSync(saida, { recursive: true });
 const vite = await (await import('vite')).createServer({ root: repo, configFile: join(repo, 'vite.config.js'), server: { host: '127.0.0.1', port: 0 }, logLevel: 'error' });
@@ -55,7 +61,7 @@ try {
   }
   const metadados = [];
   for (const vista of vistas) {
-    const meta = await page.evaluate(([dados, nome]) => window.__mecanificaVisorMontagem(dados, nome), [serializar(resolvida), vista]);
+    const meta = await page.evaluate(([dados, nome]) => window.__mecanificaVisorMontagem(dados, nome), [dadosVisuais, vista]);
     const destino = join(saida, `montagem-${resolvida.id}-${vista}.png`);
     if (existsSync(destino)) throw new Error(`recusa sobrescrever '${destino}'.`);
     await page.screenshot({ path: destino });

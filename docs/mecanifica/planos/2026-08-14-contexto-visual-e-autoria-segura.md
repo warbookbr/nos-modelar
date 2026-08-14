@@ -1,6 +1,6 @@
 # Contexto visual e autoria segura de montagem
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura, execução e revisão)
 
@@ -83,7 +83,7 @@ posterior, não definição de modelo.
 5. **R04 — concluído:** registrar contrato de
    destino, validação, lock/concorrência, troca atômica e recuperação. Implementar
    somente se a prova puder simular falha e concorrência sem estado parcial.
-6. **R05 — documentação e decisão:** atualizar fontes de verdade, repetir o
+6. **R05 — concluído:** atualizar fontes de verdade, repetir o
    conjunto de campo, medir contexto, rodar gates e decidir explicitamente se
    MCP pode consumir leitura, nunca escrita neste plano.
 
@@ -116,7 +116,8 @@ posterior, não definição de modelo.
 
 ## Fechamento
 
-Registrar cada fatia com commit, fixtures, bytes/metadados, imagens lidas,
-limitações e decisão sobre R04. Se writer não puder provar atomicidade, concluir
-o plano como leitura/revalidação e devolver autoria transacional ao backlog com
-o bloqueio concreto.
+R01–R04 foram concluídas com captura privada em duas vistas, roteiro assistido,
+catálogo explícito e armazenamento por revisões imutáveis. Concorrência vira
+conflito visível; queda antes do commit não publica revisão parcial. MCP,
+materialização no workspace, filesystem de rede, solver e colisão geral seguem
+fora.
