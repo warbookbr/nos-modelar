@@ -49,7 +49,8 @@ para a direção de composição.
 ## Estado
 
 - Casos 1 e 2 estão homologados; o Caso 3 ainda não começou.
-- Não há plano executivo ativo após o fechamento do contexto de montagem R05.
+- O plano executivo ativo generaliza separação direcional e impacto local de
+  montagem; disco–pinça é apenas sua fixture de aceitação.
 - O Módulo 1 do MCP, de leitura e auditoria, foi aprovado.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
   `interromper`; o PR #25 foi fechado sem merge.

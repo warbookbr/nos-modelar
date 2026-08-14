@@ -19,8 +19,9 @@ aplicação publicada aqui.
   [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) foi concluído
   no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
-  montagem para IA foi concluído no R05 com descritor puro e CLI confinada;
-  mapa global, revalidação automática, writer, MCP e API permanecem fora.
+  montagem para IA foi concluído no R05 com descritor puro e CLI confinada. O
+  plano de separação direcional e impacto local está ativo em R00; mapa global,
+  revalidação automática, writer, MCP e API permanecem fora.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -208,6 +209,7 @@ Planejamento: [planos/README](planos/README.md),
 [correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),
 [autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),
 [contexto de montagem para IA](planos/2026-08-14-contexto-de-montagem-para-ia.md),
+[separação direcional e impacto local](planos/2026-08-14-separacao-direcional-e-impacto-local.md),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
@@ -240,6 +242,8 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 é indexada em [historico/README](historico/README.md).
 
 <!-- Plano concluído alcançável: docs/mecanifica/planos/2026-08-14-contexto-de-montagem-para-ia.md -->
+
+<!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-separacao-direcional-e-impacto-local.md -->
 
 <!-- Evidência alcançável: docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md -->
 

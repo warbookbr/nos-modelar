@@ -7,9 +7,10 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 
 | Candidato | Estado / próximo recorte |
 |---|---|
+| Separação espacial e impacto local | ativo em plano próprio; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | definir dado validável que responda contenção, relações, usos e impacto de alterações |
+| Mapa de composição e dependências | recorte local ativo; catálogo global de usos permanece futuro |
 | Contexto de trabalho da IA | separar alvo editável, contexto visual, dependentes afetados e validações obrigatórias |
 | Revalidação de dependentes | localizar dependentes diretos e indiretos e relatar separadamente relações preservadas e quebradas |
 | Escrita transacional de receitas e montagens | definir serviço interno antes de escolher MCP, CLI ou API; exigir publicação completa, recusa de sobrescrita e estado anterior preservado |

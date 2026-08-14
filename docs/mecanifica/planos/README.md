@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-separacao-direcional-e-impacto-local.md`](2026-08-14-separacao-direcional-e-impacto-local.md),
+em R00.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -52,8 +54,12 @@ de montagem persistida arbitrária, com cobertura explícita do que foi e do que
 não foi verificado.
 
 O estudo completo mede 17.772 bytes e a consulta reduzida, 6.712 bytes.
-Renderização, folga/mapa de impacto, MCP e autoria transacional permanecem
-etapas posteriores e separadas, sem abertura automática.
+Renderização, MCP e autoria transacional permanecem etapas posteriores e
+separadas, sem abertura automática.
+
+Com autorização explícita de continuidade, a relação espacial direcional e o
+mapa de impacto local foram abertos como plano seguinte. Disco–pinça é fixture;
+o contrato permanece neutro e não promete colisão geral.
 
 ## Programas
 
