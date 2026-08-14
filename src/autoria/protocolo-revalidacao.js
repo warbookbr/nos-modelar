@@ -125,6 +125,10 @@ export function criarCampanhaRevalidacao({ mapa, impacto, causa, mapaSha256 } = 
     identidade: copiar(identidade),
     causa: copiar(causaObservada),
     itens,
+    alcance: {
+      raizesAfetadas: copiar(impacto.raizesAfetadas ?? []),
+      raizesNaoAfetadas: copiar(impacto.raizesNaoAfetadas ?? []),
+    },
     cobertura: copiar(impacto.cobertura),
   };
 }
@@ -177,6 +181,18 @@ export function validarCampanhaRevalidacao(campanha) {
   }
   if (!campanha.cobertura || typeof campanha.cobertura !== 'object' || Array.isArray(campanha.cobertura)) {
     falhar('campanha-invalida', 'campanha.cobertura', 'cobertura precisa ser objeto.');
+  }
+  if (campanha.alcance !== undefined) {
+    for (const campo of ['raizesAfetadas', 'raizesNaoAfetadas']) {
+      if (!Array.isArray(campanha.alcance[campo]) || campanha.alcance[campo].some((id) => typeof id !== 'string' || !id)) {
+        falhar('alcance-invalido', `campanha.alcance.${campo}`, 'raízes precisam ser IDs semânticos.');
+      }
+    }
+    const afetadas = new Set(campanha.alcance.raizesAfetadas);
+    if (afetadas.size !== campanha.alcance.raizesAfetadas.length
+      || campanha.alcance.raizesNaoAfetadas.some((id) => afetadas.has(id))) {
+      falhar('alcance-invalido', 'campanha.alcance', 'raízes não podem ser duplicadas ou afetadas e não afetadas ao mesmo tempo.');
+    }
   }
   return copiar(campanha);
 }
