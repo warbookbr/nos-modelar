@@ -38,6 +38,19 @@ interna ainda não transportada pelo formato exportado e fragilidades de algumas
 receitas históricas. O plano aberto já declara esses limites como excluídos ou
 adiados.
 
+## Candidato pós-estudo
+
+[`2026-08-14-contexto-de-montagem-para-ia.md`](2026-08-14-contexto-de-montagem-para-ia.md)
+está em `rascunho`. Ele transforma o principal achado do estudo de campo em uma
+primeira fatia vertical: descrição estruturada, compacta e consultável de uma
+montagem persistida arbitrária, com cobertura explícita do que foi e do que não
+foi verificado.
+
+O rascunho não compete com o plano ativo. Só pode escolher base, virar `pronto`
+ou ser ativado depois do R06 e do merge de Montagem Persistida v2. Renderização,
+folga/mapa de impacto, MCP e autoria transacional permanecem etapas posteriores
+e separadas.
+
 ## Programas
 
 | Programa | Painel | Execução atual |

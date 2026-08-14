@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-280 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -118,8 +118,6 @@
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
-- `INDEX.md` — Mecanifica — entrada atual
-- `INDEX.md` — Mecanifica — entrada atual
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
@@ -153,6 +151,7 @@
 - `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
 - `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
 - `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
+- `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica

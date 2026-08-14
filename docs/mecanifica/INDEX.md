@@ -201,6 +201,7 @@ Planejamento: [planos/README](planos/README.md),
 [avaliação consolidada](planos/2026-08-05-mcp-avaliacao-consolidada.md),
 [correção de descoberta](planos/2026-08-05-mcp-correcao-descoberta.md),
 [autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),
+[contexto de montagem para IA](planos/2026-08-14-contexto-de-montagem-para-ia.md),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
@@ -231,6 +232,8 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 [arquitetura-identidade-estavel](../rumo/arquitetura-identidade-estavel.md) e
 [oficina-roteiro](../rumo/oficina-roteiro.md). A própria zona histórica da Mecanifica
 é indexada em [historico/README](historico/README.md).
+
+<!-- Plano rascunho alcançável: docs/mecanifica/planos/2026-08-14-contexto-de-montagem-para-ia.md -->
 
 <!-- Evidência alcançável: docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md -->
 
