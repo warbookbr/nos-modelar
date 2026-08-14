@@ -27,11 +27,20 @@ import {
 import {
   carregarCatalogoMontagens, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
+import * as EIXO_AUTORIA from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
 const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
 const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/experimentos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
+const receitaEixo = (fim) => ({
+  formato: 'mecanifica.receita-declarativa', versao: 1, id: 'eixo-guia',
+  params: { ...EIXO_AUTORIA.PARAMS, fim, comprimento: fim - EIXO_AUTORIA.PARAMS.inicio },
+  topo: EIXO_AUTORIA.TOPO, passos: EIXO_AUTORIA.PASSOS,
+  materiais: EIXO_AUTORIA.MATERIAIS, aliases: EIXO_AUTORIA.ALIASES,
+  meta: { nome: 'eixo-guia', desc: 'eixo declarativo do experimento' },
+});
 const CATALOGO_MONTAGENS = carregarCatalogoMontagens(CONFIGURACAO_MONTAGENS);
 const tamanhosStructured = {};
 let configuracaoAnterior;
@@ -496,6 +505,7 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
         'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
+        'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);
       const id = 'gabarito-separacao-direcional';
       const observada = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
@@ -520,6 +530,50 @@ describe('servidor MCP local — perfil revisao', () => {
     } finally {
       await client.close();
       rmSync(repositorio, { recursive: true, force: true });
+    }
+  }, 180_000);
+
+  it('consumidor MCP recusa eixo inválido e publica a correção declarativa', async () => {
+    const temporario = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-r01-'));
+    const catalogoLocal = join(temporario, 'catalogo');
+    const repositorio = join(temporario, 'repositorio');
+    const preparado = spawnSync(process.execPath, [MATERIALIZAR_CATALOGO_AUTORIA, catalogoLocal], { cwd: RAIZ, encoding: 'utf8' });
+    expect(preparado.status).toBe(0);
+    const client = new Client({ name: 'consumidor-autoria-receita', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        ...process.env,
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
+        MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+        MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+      },
+    });
+    try {
+      await client.connect(transport);
+      const estado = await client.readResource({ uri: 'mecanifica://estado' });
+      const idReceita = JSON.parse(estado.contents[0].text).receitasAutorizadas[0];
+      expect(idReceita).toBe('eixo-guia');
+      const observada = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
+      expect(observada.structuredContent).toMatchObject({ ok: true, resultado: { revisao: null } });
+
+      const invalida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.035) } });
+      const { plano: planoInvalido, confirmacao: confirmacaoInvalida } = invalida.structuredContent.resultado;
+      const inspeçãoInválida = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: planoInvalido, confirmacao: confirmacaoInvalida } });
+      expect(inspeçãoInválida).toMatchObject({ isError: true, structuredContent: { ok: false, erro: { codigo: 'revalidacao_recusada' } } });
+
+      const corrigida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.015) } });
+      const proposta = corrigida.structuredContent.resultado;
+      const inspecionada = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: proposta.plano, confirmacao: proposta.confirmacao } });
+      expect(inspecionada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aprovada', revalidacao: { cobertura: 'catalogo-explicito' } } });
+      const aplicada = await client.callTool({ name: 'aplicar_autoria_receita', arguments: { plano: proposta.plano, confirmacao: proposta.confirmacao } });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aplicado' } });
+      const relida = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
+      expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
+      expect(JSON.stringify({ observada, invalida, inspeçãoInválida, corrigida, inspecionada, aplicada, relida })).not.toContain(temporario);
+    } finally {
+      await client.close();
+      rmSync(temporario, { recursive: true, force: true });
     }
   }, 180_000);
 

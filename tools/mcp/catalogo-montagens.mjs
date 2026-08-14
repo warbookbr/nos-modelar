@@ -92,6 +92,36 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes } = {}
         carregarPeca: async (ref) => lerJsonConfinado(pecas, ref, 'peça'),
       };
     },
+    async revalidarPeca(refPeca, candidata) {
+      if (typeof refPeca !== 'string' || !slug.test(refPeca)) {
+        falhar('peca-invalida', 'A peça candidata precisa de ID semântico.', 'Use um slug anunciado pela receita.');
+      }
+      const resultados = [];
+      for (const entrada of entradas) {
+        try {
+          const raiz = lerJsonConfinado(montagens, entrada.ref, 'montagem');
+          const base = this.carregadores();
+          const resolvida = await resolverMontagemPersistida(raiz, {
+            ...base,
+            carregarPeca: async (ref) => ref === refPeca ? candidata : base.carregarPeca(ref),
+          });
+          let usa = false;
+          const relacoes = [];
+          const percorrer = (atual) => {
+            for (const instancia of atual.instancias) {
+              if (instancia.alvo.tipo === 'peca' && instancia.alvo.ref === refPeca) usa = true;
+              if (instancia.montagem) percorrer(instancia.montagem);
+            }
+            for (const relacao of atual.relacoes ?? []) relacoes.push({ id: relacao.id, satisfeita: relacao.satisfeita, diagnosticos: relacao.diagnosticos });
+          };
+          percorrer(resolvida);
+          resultados.push({ id: entrada.id, usa, estado: relacoes.every((item) => item.satisfeita) ? 'aprovada' : 'falhou', relacoes });
+        } catch (erro) {
+          resultados.push({ id: entrada.id, usa: null, estado: 'falhou', diagnostico: { codigo: erro?.codigo ?? 'montagem-invalida' } });
+        }
+      }
+      return { cobertura: 'catalogo-explicito', peca: refPeca, raizes: resultados };
+    },
     async resolver(id) {
       if (!permitidas.has(id)) {
         falhar('montagem-nao-encontrada', 'A montagem pedida não consta no catálogo.', 'Leia mecanifica://montagens e escolha um ID anunciado.');
@@ -117,6 +147,7 @@ export function criarCatalogoMontagensVazio() {
     listar() { return []; },
     tem() { return false; },
     carregadores() { return {}; },
+    async revalidarPeca() { return { cobertura: 'catalogo-ausente', raizes: [] }; },
     async resolver() {
       falhar('catalogo-nao-configurado', 'O servidor não possui catálogo de montagens configurado.', `Defina ${VARIAVEL_CATALOGO_MCP_MONTAGENS} ao iniciar o servidor.`);
     },

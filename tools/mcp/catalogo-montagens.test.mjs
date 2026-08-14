@@ -1,5 +1,5 @@
 /* catalogo-montagens.test.mjs — confinamento e descoberta explícita do catálogo MCP. */
-import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
@@ -30,6 +30,17 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
     expect(catalogo.listar()).toEqual([]);
     await expect(catalogo.resolver('qualquer')).rejects.toMatchObject({ codigo: 'catalogo-nao-configurado' });
     expect(catalogoMontagensDoAmbiente({})).toMatchObject({ configurado: false });
+  });
+
+  it('revalida peça candidata somente nas raízes explicitamente autorizadas', async () => {
+    const catalogo = carregarCatalogoMontagens(CONFIGURACAO);
+    const candidata = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    const resultado = await catalogo.revalidarPeca('bloco-gabarito', candidata);
+    expect(resultado.cobertura).toBe('catalogo-explicito');
+    expect(resultado.raizes.map(({ id, usa, estado }) => ({ id, usa, estado }))).toEqual([
+      { id: 'gabarito-separacao-direcional', usa: true, estado: 'aprovada' },
+      { id: 'gabarito-unitario', usa: true, estado: 'aprovada' },
+    ]);
   });
 
   it('lê o caminho apenas da configuração confiável do processo', () => {
