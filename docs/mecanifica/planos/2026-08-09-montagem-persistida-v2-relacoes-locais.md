@@ -1,5 +1,5 @@
 # Montagem Persistida v2 — Relações Locais
-**Estado:** ativo
+**Estado:** concluído
 **Responsável:** GPT (arquitetura e revisão) e agente local (execução)
 **Repositório e base:** `warbookbr/nos-mecanifica`, `main` em `b8007f990f068fdbd5350127c0bb1c62457f3106`
 
@@ -153,6 +153,19 @@ posicional/runtime, duplicar matemática dos validadores, usar Three.js para
 endpoints, introduzir solver ou exigir mapa global para localizar relação local.
 
 ## Fechamento
-Preencher ao concluir/cancelar: estado final, versão, fixtures, provas, testes,
-commit/PR, limites e backlog. O mapa de composição/dependências só pode ser
-reconsiderado depois deste plano; não é autorizado automaticamente.
+- **Estado final:** concluído no R06.
+- **Versão e contrato:** `mecanifica.montagem` v2, documentado em
+  `docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md`, preservando a compatibilidade v1.
+- **Fixtures:** `ciclo-a.json`, `ciclo-b.json`,
+  `v2-relacoes-reais.json` e `v2-relacoes-isolamento.json` em
+  `tools/mecanifica/fixtures/montagens-persistidas/`.
+- **Provas e testes:** provas A–F concluídas; suíte registrada no fechamento
+  com 1126 testes aprovados e 1 ignorado, além dos gates documentais,
+  tipagem, exportação, mapa e links.
+- **Integração:** PR #41 mergeado na `main` no commit `e7b80ac`.
+- **Limites preservados:** solver, mapa global, contexto de trabalho,
+  revalidação automática, writer, CLI, MCP, API de autoria, alterações no
+  motor e alterações nas peças publicadas continuam fora.
+- **Próximo estado:** o mapa de composição/dependências volta ao backlog e não
+  autoriza implementação automática; um novo recorte exige decisão e plano
+  executivo explícitos.

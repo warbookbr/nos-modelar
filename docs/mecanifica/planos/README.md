@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md), em R05.
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -12,8 +12,10 @@ plano está aberto em
 O PR #33 que abriu o plano foi mergeado na `main`. A Montagem Mínima Persistida
 v1 foi concluída no arquivo
 [`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
-O plano ativo está em R05 para provas A–F, fixtures persistidas v2 e contrato
-canônico v2; o fechamento transversal permanece reservado para R06.
+O plano de relações locais foi concluído no R06 pelo PR #41, mergeado na `main`
+no commit `e7b80ac`. As provas A–F, fixtures persistidas v2, contrato v2 e o
+documento de continuidade arquitetural estão integrados. Não há novo plano
+executivo autorizado automaticamente.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -25,10 +27,11 @@ critério de saída e encerramento registrado.
 
 ## Execução atual
 
-R05 do plano de relações locais registra provas A–F com fixtures persistidas v2
-e contrato canônico v2. A Montagem Mínima Persistida v1 foi encerrada com provas
-persistidas, determinismo e contrato v1 documentado; CLI, MCP, bancada, escrita,
-solver e mapa global permanecem fora desta rodada.
+R05 do plano de relações locais registrou provas A–F com fixtures persistidas v2
+e contrato canônico v2; R06 encerrou e integrou o conjunto na `main`. A Montagem
+Mínima Persistida v1 foi encerrada com provas persistidas, determinismo e
+contrato v1 documentado. CLI, MCP, bancada, escrita, solver e mapa global
+permanecem fora do fechamento.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
@@ -46,10 +49,9 @@ primeira fatia vertical: descrição estruturada, compacta e consultável de uma
 montagem persistida arbitrária, com cobertura explícita do que foi e do que não
 foi verificado.
 
-O rascunho não compete com o plano ativo. Só pode escolher base, virar `pronto`
-ou ser ativado depois do R06 e do merge de Montagem Persistida v2. Renderização,
-folga/mapa de impacto, MCP e autoria transacional permanecem etapas posteriores
-e separadas.
+Com o R06 integrado, o rascunho pode escolher a base e ser promovido mediante
+decisão explícita. Renderização, folga/mapa de impacto, MCP e autoria
+transacional permanecem etapas posteriores e separadas.
 
 ## Programas
 
@@ -109,6 +111,7 @@ nos arquivos originais.
 | MCP — correção de descoberta de pacotes e revisões | concluído: aprovar |
 | MCP — autoria controlada de pacotes | concluído: interromper |
 | Diagnóstico do motor procedural | concluído: abrir Montagem Mínima Persistida v1 |
+| Montagem Persistida v2 — relações locais | concluído: R06, PR #41 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -130,10 +133,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-**Montagem Mínima Persistida v1** está concluída. Nenhum próximo plano executivo
-é autorizado automaticamente; backlog, MCP, refatoração do motor,
-personalização de materiais e limpeza de receitas históricas permanecem fora do
-fechamento.
+**Montagem Persistida v2 — relações locais** está concluída, assim como a
+Montagem Mínima Persistida v1. Nenhum próximo plano executivo é autorizado
+automaticamente; backlog, MCP, refatoração do motor, personalização de materiais
+e limpeza de receitas históricas permanecem fora do fechamento.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita

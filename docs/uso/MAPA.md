@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-280 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+281 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -112,6 +112,7 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
+- `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
@@ -305,7 +306,7 @@
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — o GATE de render da OFICINA (D-60). Renderiza peça(s) do v3 e FALHA (exit≠0) se: houve pageerror, window.__ready ≠ true, ou o frame é DEGENERA…
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
-- `visor-imports.test.mjs` — **SEM CABEÇALHO**
+- `visor-imports.test.mjs` — Prova a resolução de imports bare no visor legado servido sem transformação.
 
 ## tools/bancadas/bench/
 

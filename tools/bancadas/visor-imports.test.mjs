@@ -1,3 +1,4 @@
+/* Prova a resolução de imports bare no visor legado servido sem transformação. */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
