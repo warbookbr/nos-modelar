@@ -43,6 +43,63 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
     ]);
   });
 
+  it('compõe raiz e peça ativas sobre a base estática sem confundir ID com arquivo', async () => {
+    const base = carregarCatalogoMontagens(CONFIGURACAO);
+    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+    montagemAtiva.instancias.find(({ id }) => id === 'movel').pose.deslocamento[1] = 1.04;
+    const pecaAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    pecaAtiva.V = pecaAtiva.V.map(([id, x, y, z]) => [id, x, y * 0.5, z]);
+    const chamadas = [];
+    const catalogo = base.comProvedores({
+      async carregarMontagem(id) {
+        chamadas.push(['montagem', id]);
+        return id === 'gabarito-separacao-direcional' ? montagemAtiva : null;
+      },
+      async carregarPeca(id) {
+        chamadas.push(['peca', id]);
+        return id === 'bloco-gabarito' ? pecaAtiva : null;
+      },
+    });
+
+    const resolvida = await catalogo.resolver('gabarito-separacao-direcional');
+    expect(resolvida.relacoes[0].medidas.separacaoDirecional).toBeCloseTo(0.54);
+    expect(chamadas).toContainEqual(['montagem', 'gabarito-separacao-direcional']);
+    expect(chamadas).not.toContainEqual(['montagem', 'v3-separacao-direcional']);
+    expect(chamadas).toContainEqual(['peca', 'bloco-gabarito']);
+  });
+
+  it('preserva exatamente a base quando nenhum provedor possui revisão ativa', async () => {
+    const base = carregarCatalogoMontagens(CONFIGURACAO);
+    const catalogo = base.comProvedores({
+      async carregarMontagem() { return null; },
+      async carregarPeca() { return null; },
+    });
+    await expect(catalogo.resolver('gabarito-separacao-direcional'))
+      .resolves.toEqual(await base.resolver('gabarito-separacao-direcional'));
+  });
+
+  it('revalida a candidata contra a montagem ativa, não contra uma raiz obsoleta', async () => {
+    const base = carregarCatalogoMontagens(CONFIGURACAO);
+    const montagemAtiva = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+    montagemAtiva.instancias.find(({ id }) => id === 'movel').pose.deslocamento[1] = 1.01;
+    const candidata = JSON.parse(readFileSync(resolve('tools/mecanifica/fixtures/pecas-resolvidas/bloco-gabarito.json'), 'utf8'));
+    const catalogo = base.comProvedores({
+      async carregarMontagem(id) { return id === 'gabarito-separacao-direcional' ? montagemAtiva : null; },
+    });
+    const resultado = await catalogo.revalidarPeca('bloco-gabarito', candidata);
+    expect(resultado.raizes.find(({ id }) => id === 'gabarito-separacao-direcional')).toMatchObject({
+      usa: true, estado: 'falhou',
+    });
+  });
+
+  it('falha fechada quando um provedor ativo lança erro', async () => {
+    const base = carregarCatalogoMontagens(CONFIGURACAO);
+    const catalogo = base.comProvedores({
+      async carregarMontagem() { throw Object.assign(new Error('revisão corrompida'), { codigo: 'snapshot-invalido' }); },
+    });
+    await expect(catalogo.resolver('gabarito-unitario')).rejects.toMatchObject({ codigo: 'snapshot-invalido' });
+  });
+
   it('lê o caminho apenas da configuração confiável do processo', () => {
     const catalogo = catalogoMontagensDoAmbiente({ [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO });
     expect(catalogo).toMatchObject({ configurado: true });

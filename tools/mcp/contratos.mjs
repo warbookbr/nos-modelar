@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
 
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v3';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v4';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 

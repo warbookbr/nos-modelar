@@ -10,11 +10,14 @@ import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { catalogoMontagensDoAmbiente } from './catalogo-montagens.mjs';
 import {
+  criarProvedoresAutoriaAtiva, criarProvedoresAutoriaInativa,
+} from '../mecanifica/autoria-ativa.mjs';
+import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.3.0' });
+const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.4.0' });
 
 function estadoDo(ferramentas, catalogoMontagens, perfil = PERFIL, autoria = {}) {
   return {
@@ -23,10 +26,11 @@ function estadoDo(ferramentas, catalogoMontagens, perfil = PERFIL, autoria = {})
     transporte: TRANSPORTE,
     ferramentas: ferramentas.map(({ nome }) => nome),
     catalogoMontagensConfigurado: catalogoMontagens.configurado,
-    receitasAutorizadas: perfil === 'autoria' ? [...(autoria.receitasAutorizadas ?? [])].sort() : [],
+    autoriaAtivaConfigurada: autoria.configurado === true,
+    receitasAutorizadas: autoria.configurado ? [...(autoria.receitasAutorizadas ?? [])].sort() : [],
     capacidadesAusentes: [
       'promover_revisao',
-      ...(perfil === 'autoria' ? ['autoria_de_javascript_arbitrario'] : ['autoria']),
+      ...(perfil === 'autoria' ? ['autoria_de_javascript_arbitrario'] : ['escrita']),
       'materiais',
       'coordenacao',
       'servidor_http',
@@ -46,10 +50,10 @@ function capacidadesDo(catalogoMontagens, perfil = PERFIL) {
       'descobrir e descrever montagens explicitamente autorizadas',
       'derivar roteiro de revalidação e catálogo entre raízes escolhidas',
       'produzir vistas de montagem ou subárvore em memória',
-      ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas'] : []),
+      ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas', 'reler revisões ativas pelas ferramentas comuns'] : []),
     ],
     aindaNaoConsegue: perfil === 'autoria'
-      ? ['editar receitas, materiais ou documentação', 'usar shell, Git ou servidor HTTP']
+      ? ['executar JavaScript arbitrário, editar materiais genéricos ou documentação', 'usar shell, Git ou servidor HTTP']
       : ['promover ou escrever revisões', 'editar ou materializar autoria, materiais ou documentação'],
     limites: [
       'aceita identificadores semânticos, nunca caminhos do cliente',
@@ -121,7 +125,9 @@ function registrarPerfil(server, ferramentas) {
   }
 }
 
-function registrarRecursos(server, { ferramentas, catalogoMontagens, perfil, autoria }) {
+function registrarRecursos(server, {
+  ferramentas, catalogoMontagens, perfil, autoria, provedoresAutoria,
+}) {
   const estado = estadoDo(ferramentas, catalogoMontagens, perfil, autoria);
   const capacidadesModelagem = capacidadesDo(catalogoMontagens, perfil);
   server.registerResource(
@@ -177,6 +183,22 @@ function registrarRecursos(server, { ferramentas, catalogoMontagens, perfil, aut
       }],
     }),
   );
+  server.registerResource(
+    'autoria-ativa',
+    'mecanifica://autoria',
+    {
+      title: 'Estado da autoria ativa',
+      description: 'Revisões imutáveis que sobrepõem a base estática por identidade semântica.',
+      mimeType: 'application/json',
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        mimeType: 'application/json',
+        text: JSON.stringify(await provedoresAutoria.estado()),
+      }],
+    }),
+  );
 }
 
 function autoriaDoAmbiente(catalogoMontagens, ambiente = process.env) {
@@ -189,11 +211,30 @@ function autoriaDoAmbiente(catalogoMontagens, ambiente = process.env) {
 
 export function criarServidor({ catalogoMontagens = catalogoMontagensDoAmbiente(), perfil = process.env.MECANIFICA_PERFIL ?? PERFIL, autoria = autoriaDoAmbiente(catalogoMontagens) } = {}) {
   const server = new McpServer(IDENTIDADE);
-  const ferramentas = perfil === 'autoria' && autoria.configurado
-    ? [...criarFerramentasAutoria(autoria), ...criarFerramentasAutoriaReceitas(autoria)]
-    : [...ferramentasRevisao, ...criarFerramentasMontagem(catalogoMontagens)];
+  const provedoresAutoria = autoria.configurado
+    ? criarProvedoresAutoriaAtiva({
+      raizRepositorio: autoria.raizRepositorio,
+      montagensAutorizadas: catalogoMontagens.listar().map(({ id }) => id),
+      receitasAutorizadas: autoria.receitasAutorizadas,
+    })
+    : criarProvedoresAutoriaInativa();
+  const catalogoAtivo = autoria.configurado
+    ? catalogoMontagens.comProvedores(provedoresAutoria)
+    : catalogoMontagens;
+  const contextoAutoria = { ...autoria, catalogo: catalogoAtivo };
+  const leitura = [...ferramentasRevisao, ...criarFerramentasMontagem(catalogoAtivo)];
+  const perfilAutoria = perfil === 'autoria' && autoria.configurado;
+  const ferramentas = perfilAutoria
+    ? [...leitura, ...criarFerramentasAutoria(contextoAutoria), ...criarFerramentasAutoriaReceitas(contextoAutoria)]
+    : leitura;
   registrarPerfil(server, ferramentas);
-  registrarRecursos(server, { ferramentas, catalogoMontagens, autoria, perfil: perfil === 'autoria' && autoria.configurado ? 'autoria' : PERFIL });
+  registrarRecursos(server, {
+    ferramentas,
+    catalogoMontagens: catalogoAtivo,
+    autoria: contextoAutoria,
+    provedoresAutoria,
+    perfil: perfilAutoria ? 'autoria' : PERFIL,
+  });
   return server;
 }
 

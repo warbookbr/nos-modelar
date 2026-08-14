@@ -146,7 +146,7 @@ describe('servidor MCP local — perfil revisao', () => {
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.3.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.4.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -156,10 +156,10 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia oito tools e quatro resources somente leitura', async () => {
+  it('faz handshake bruto, anuncia oito tools e cinco resources somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.3.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.4.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
@@ -176,9 +176,9 @@ describe('servidor MCP local — perfil revisao', () => {
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
         'mecanifica://estado', 'mecanifica://capacidades/modelagem', 'mecanifica://pacotes',
-        'mecanifica://montagens',
+        'mecanifica://montagens', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(4);
+      expect(recursos.result.resources).toHaveLength(5);
     } finally {
       await cliente.fechar();
     }
@@ -348,7 +348,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
       const montagensValor = JSON.parse(montagens.result.contents[0].text);
-      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v3', catalogoMontagensConfigurado: true });
+      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v4', catalogoMontagensConfigurado: true });
       expect(estadoValor.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem',
@@ -504,16 +504,20 @@ describe('servidor MCP local — perfil revisao', () => {
       const publico = JSON.parse(estado.contents[0].text);
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
+        'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem',
         'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);
       const id = 'gabarito-separacao-direcional';
       const observada = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
       expect(observada.structuredContent).toMatchObject({ ok: true, resultado: { revisao: null } });
-      const planejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: MONTAGEM_AUTORIA } });
+      const publicada = JSON.parse(JSON.stringify(MONTAGEM_AUTORIA));
+      publicada.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.025, 0];
+      const planejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: publicada } });
       expect(planejada.structuredContent).toMatchObject({ ok: true });
       const { plano, confirmacao } = planejada.structuredContent.resultado;
-      const alternativa = JSON.parse(JSON.stringify(MONTAGEM_AUTORIA));
+      const alternativa = JSON.parse(JSON.stringify(publicada));
       alternativa.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.03, 0];
       const concorrentePlanejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: alternativa } });
       const concorrentePlano = concorrentePlanejada.structuredContent.resultado;
@@ -523,10 +527,16 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(aplicada.structuredContent).toMatchObject({ ok: true });
       const relida = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
       expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
+      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id } });
+      expect(descritaAtiva.structuredContent.resultado.contexto.relacoes[0].medidas.separacaoDirecional).toBeCloseTo(0.025);
+      const estadoAtivo = await client.readResource({ uri: 'mecanifica://autoria' });
+      expect(JSON.parse(estadoAtivo.contents[0].text).montagens).toContainEqual(expect.objectContaining({
+        id, revisao: aplicada.structuredContent.resultado.revisao, fonte: 'revisao-ativa',
+      }));
       const concorrente = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano: concorrentePlano.plano, confirmacao: concorrentePlano.confirmacao, alvo: ['movel'] } });
       expect(concorrente.isError).toBe(true);
       expect(concorrente.structuredContent).toMatchObject({ ok: false, erro: { codigo: 'revisao_desatualizada' } });
-      expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, concorrente })).not.toContain(repositorio);
+      expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, descritaAtiva, estadoAtivo, concorrente })).not.toContain(repositorio);
     } finally {
       await client.close();
       rmSync(repositorio, { recursive: true, force: true });
@@ -562,7 +572,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const inspeçãoInválida = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: planoInvalido, confirmacao: confirmacaoInvalida } });
       expect(inspeçãoInválida).toMatchObject({ isError: true, structuredContent: { ok: false, erro: { codigo: 'revalidacao_recusada' } } });
 
-      const corrigida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.015) } });
+      const corrigida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.010) } });
       const proposta = corrigida.structuredContent.resultado;
       const inspecionada = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: proposta.plano, confirmacao: proposta.confirmacao } });
       expect(inspecionada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aprovada', revalidacao: { cobertura: 'catalogo-explicito' } } });
@@ -570,7 +580,33 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aplicado' } });
       const relida = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
       expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
-      expect(JSON.stringify({ observada, invalida, inspeçãoInválida, corrigida, inspecionada, aplicada, relida })).not.toContain(temporario);
+      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+      const eixoAtivo = descritaAtiva.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
+      expect(eixoAtivo.caixaMundo.max[0]).toBeCloseTo(0.010);
+      const autoriaAtiva = await client.readResource({ uri: 'mecanifica://autoria' });
+      expect(JSON.parse(autoriaAtiva.contents[0].text).receitas).toEqual([expect.objectContaining({
+        id: idReceita, revisao: aplicada.structuredContent.resultado.revisao, fonte: 'revisao-ativa',
+      })]);
+
+      const clienteNovo = new Client({ name: 'consumidor-continuacao', version: '1' });
+      const transporteNovo = new StdioClientTransport({
+        command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+        env: {
+          ...process.env,
+          [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
+          MECANIFICA_PERFIL: 'revisao', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+          MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+        },
+      });
+      try {
+        await clienteNovo.connect(transporteNovo);
+        const estadoNovo = await clienteNovo.readResource({ uri: 'mecanifica://estado' });
+        expect(JSON.parse(estadoNovo.contents[0].text)).toMatchObject({ perfil: 'revisao', autoriaAtivaConfigurada: true });
+        const descritaNova = await clienteNovo.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+        const eixoNovo = descritaNova.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
+        expect(eixoNovo.caixaMundo.max[0]).toBeCloseTo(0.010);
+      } finally { await clienteNovo.close(); }
+      expect(JSON.stringify({ observada, invalida, inspeçãoInválida, corrigida, inspecionada, aplicada, relida, descritaAtiva, autoriaAtiva })).not.toContain(temporario);
     } finally {
       await client.close();
       rmSync(temporario, { recursive: true, force: true });
