@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+347 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -320,6 +320,7 @@
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
+- `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 
 ## src/bancada/
@@ -450,8 +451,10 @@
 - `resolver-montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
+- `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.

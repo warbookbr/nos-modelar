@@ -42,6 +42,24 @@ autoria. A validação aceita um carregador de montagens injetado pelo host; o
 carregador recebe somente `ref`. Caminhos, filesystem, Git, MCP e peças reais
 ficam fora desta camada.
 
+## Snapshot confinado da R01
+
+`mecanifica.snapshot-universo-autoria`, versão `1`, é produzido somente depois
+de carregar todas as peças e montagens enumeradas. Cada fonte informa apenas
+`id`, `ref`, `fonte` (`base-estatica` ou `revisao-ativa`), `revisao` e hash
+`sha256:` do documento canônico. O snapshot também preserva os documentos
+capturados para as etapas derivadas, mas nunca inclui caminhos locais.
+
+O serviço puro recebe carregadores e o hash do host por injeção. O adaptador da
+bancada confina referências a arquivos comuns sob as raízes declaradas e chama
+revisões ativas por ID antes do fallback estático por `ref`. A revisão ativa
+inválida não é escondida pelo fallback.
+
+Para provar consistência, o serviço captura duas visões completas. Ele recusa
+mudança de estado durante uma captura e compara hashes, fontes e revisões entre
+as duas visões; uma tentativa adicional pode ser feita antes do diagnóstico
+`universo-alterado`. Nenhuma visão parcial é publicada.
+
 ## Fixture de prova
 
 `tools/mecanifica/fixtures/mapa-dependencias/` contém:
@@ -60,7 +78,7 @@ duplicidade, identidade divergente e ciclo.
 
 ## Fronteira
 
-R00 valida o universo e suas referências de composição. R01 acrescentará
-snapshot de fontes, revisões ativas e hashes; R02 derivará arestas, relações e
-usos reversos. Este contrato não executa revalidação, não prova colisão e não
-altera autoria.
+R00 valida o universo e suas referências de composição. R01 acrescenta o
+snapshot de fontes, revisões ativas, hashes e recusa de concorrência. R02
+derivará arestas, relações e usos reversos. Este contrato não executa
+revalidação, não prova colisão e não altera autoria.

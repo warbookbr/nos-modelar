@@ -14,7 +14,9 @@ trabalho: uma revisão publicada não voltava ao catálogo usado para descriçã
 vista e revalidação, e o perfil de autoria perdia as ferramentas de leitura.
 Isso tornava a continuidade entre sessões mais fraca que a própria autoria.
 
-Esse gargalo foi corrigido pelo plano de continuidade de autoria ativa.
+Esse gargalo foi corrigido pelo plano de continuidade de autoria ativa. Em
+seguida, as R00/R01 do mapa canônico fixaram um universo declarativo e passaram
+a capturar suas fontes em uma visão completa, confinada e consistente.
 
 ## Leitura por capacidade
 
@@ -23,7 +25,7 @@ Esse gargalo foi corrigido pelo plano de continuidade de autoria ativa.
 | Gerar peça procedural | forte no contrato declarativo v1 | não cobre todo módulo JS histórico nem todas as formas desejadas |
 | Inspecionar peça | forte | diagnóstico visual ainda não liga toda crítica a uma ação semântica |
 | Compor montagens | forte no catálogo explícito e relações v1–v3 | não existe mapa global canônico |
-| Medir e revalidar | forte para relações e raízes conhecidas | cobertura depende da lista explícita do host |
+| Medir e revalidar | forte para relações e raízes conhecidas | cobertura depende da lista explícita do host; a derivação global ainda não existe |
 | Publicar com segurança | forte para receita e montagem autorizadas | não há rollback/promocão de revisão anterior nem variantes simultâneas |
 | Continuar em outra sessão | forte no catálogo configurado após este recorte | não atravessa catálogos ou hosts não declarados |
 | Escalar para carro completo | fundação correta, ainda incompleta | descoberta global, orçamento de contexto e revalidação em cascata faltam |
@@ -111,8 +113,10 @@ manter sistemas grandes sem exigir que a IA carregue ou conheça o carro inteiro
 
 Esse avanço já foi aberto em
 [`2026-08-14-mapa-canonico-dependencias.md`](planos/2026-08-14-mapa-canonico-dependencias.md).
-A R00 fixou o contrato do universo e provou as recusas estruturais; a derivação
-do mapa e a consulta global começam na R01/R02.
+A R00 fixou o contrato do universo e provou as recusas estruturais. A R01
+acrescentou snapshot confinado, hashes, fallback estático, revisões ativas e
+recusa de concorrência; a derivação do mapa e a consulta global começam na
+R02/R03.
 
 Novas operações geométricas continuam válidas quando um estudo de campo as
 colocar no caminho crítico; elas não devem competir automaticamente com a
@@ -120,7 +124,7 @@ continuidade e o controle de dependências.
 
 ## Evidência de fechamento
 
-Os gates completos passaram com 71 arquivos de teste, 1.221 testes aprovados e
+Os gates completos passaram com 73 arquivos de teste, 1.232 testes aprovados e
 2 ignorados. Também passaram typecheck, build, porteiro 7/7, gabarito de seleção
 para 36 peças, guardas de identidade, portas, câmera e pares, inventário, links,
 planos, exportação e criação de `_viga`. **Decisão do recorte: aprovar.**

@@ -17,9 +17,8 @@ do host.
 
 ## Resultado verificável
 
-Dado um universo explícito de peças, montagens e raízes, o sistema produz um
-mapa determinístico que informa usos, dependentes diretos e transitivos,
-relações atravessadas, caminhos desde cada raiz, conjunto mínimo a revalidar e
+Dado um universo explícito de peças, montagens e raízes, o sistema produz mapa
+determinístico de usos, dependentes, relações, caminhos, revalidação mínima e
 fontes/revisões que sustentam a cobertura.
 
 Uma consulta direcionada deve entregar somente o contexto necessário ao alvo.
@@ -32,8 +31,8 @@ declarado pelo host. Não significa procurar qualquer JSON existente na máquina
 
 O universo v1 enumera peças, montagens e raízes por ID. O mapa só declara
 cobertura completa quando todas as referências foram validadas no mesmo
-snapshot lógico. Ausência, duplicidade, ciclo, identidade divergente ou mudança
-concorrente impedem essa alegação.
+snapshot lógico; ausência, duplicidade, ciclo, divergência ou concorrência
+impedem essa alegação.
 
 ## Hipótese
 
@@ -90,10 +89,9 @@ mais segura e menor que carregar todas as montagens na sessão da IA.
 
 ## Arquivos previstos
 
-Previstos: contrato `MAPA-CANONICO-DEPENDENCIAS.md`; serviços e testes em
-`src/autoria/`; carregador em `tools/mecanifica/`; fixtures próprias;
-adaptadores/testes em `tools/mcp/`; índices e documentos de estado. A
-responsabilidade não pode migrar para o núcleo procedural.
+Previstos: contrato, serviços/testes em `src/autoria/`, carregadores/fixtures em
+`tools/mecanifica/`, adaptadores MCP e documentos de estado; a responsabilidade
+não pode migrar para o núcleo procedural.
 
 Cada fatia deve reservar os arquivos exatos antes da edição.
 
@@ -101,25 +99,26 @@ Cada fatia deve reservar os arquivos exatos antes da edição.
 
 ### R00 — contrato, baseline e fixture adversarial — concluída
 
-- fixar `mecanifica.universo-autoria` v1, mapa v1 e impacto v1;
-- materializar universo neutro com duas raízes, submontagem compartilhada, peça
-  usada em mais de um ramo e raiz não afetada;
-- registrar que o catálogo atual não consegue afirmar completude;
-- incluir duplicidade, referência ausente e ciclo como casos de recusa.
+- fixar `mecanifica.universo-autoria` v1, mapa/impacto v1 e universo neutro com
+  duas raízes, submontagem compartilhada, peça reutilizada e ramo isolado;
+- registrar o limite do catálogo atual e provar duplicidade, ausência e ciclo.
 
 **Saída:** contratos executáveis e baseline reproduzível, sem MCP.
 
 Evidência: contrato, validador, fixture compartilhada/isolada e recusas de
-ausência, duplicidade, divergência e ciclo; 1.228 testes aprovados e 2 ignorados.
+ausência, duplicidade, divergência e ciclo.
 
-### R01 — snapshot completo e confinado — próxima
+### R01 — snapshot completo e confinado — concluída
 
-- carregar somente entradas enumeradas pelo manifesto;
-- combinar fontes estáticas e revisões ativas pelo mesmo contrato já aprovado;
-- calcular hashes das fontes sem publicar caminhos;
-- reler identidades/revisões ao final e recusar mistura concorrente.
+- carregar somente entradas enumeradas, combinando fontes estáticas e revisões
+  ativas pelo contrato aprovado;
+- calcular hashes sem caminhos, reler identidade/revisão e recusar concorrência.
 
 **Saída:** snapshot lógico completo ou diagnóstico fail-closed.
+
+Evidência: serviço puro `snapshot-universo-autoria`, adaptador confinado,
+fallback estático/revisão ativa, hashes sem caminhos e oito entidades; provas
+cobrem completude, sobreposição, mutação e revisão. A derivação permanece na R02.
 
 ### R02 — derivação canônica
 
