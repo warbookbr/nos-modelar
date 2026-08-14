@@ -61,7 +61,7 @@ resolvedor e materialização de criação/alteração, com diagnóstico de refe
 ausente e revisão velha. Impacto, revalidação, MCP e consumo caixa-preta seguem
 nas fatias abaixo.
 
-R03 entrega promoção condicionada: relação falha ou vista ausente bloqueia; limitação fora do catálogo é declarada sem ser confundida com prova global.
+R03 condiciona promoção a relações e vistas; R04 expõe o mesmo serviço em MCP opt-in por IDs, sem paths nem escrita no perfil de leitura.
 
 ## Contrato da proposta
 

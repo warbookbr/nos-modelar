@@ -85,16 +85,20 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes } = {}
   return Object.freeze({
     configurado: true,
     listar() { return entradas.map(({ id }) => ({ id })); },
+    tem(id) { return permitidas.has(id); },
+    carregadores() {
+      return {
+        carregarMontagem: async (ref) => lerJsonConfinado(montagens, ref, 'montagem'),
+        carregarPeca: async (ref) => lerJsonConfinado(pecas, ref, 'peça'),
+      };
+    },
     async resolver(id) {
       if (!permitidas.has(id)) {
         falhar('montagem-nao-encontrada', 'A montagem pedida não consta no catálogo.', 'Leia mecanifica://montagens e escolha um ID anunciado.');
       }
       try {
         const raiz = lerJsonConfinado(montagens, permitidas.get(id), 'montagem');
-        const resolvida = await resolverMontagemPersistida(raiz, {
-          carregarMontagem: async (ref) => lerJsonConfinado(montagens, ref, 'montagem'),
-          carregarPeca: async (ref) => lerJsonConfinado(pecas, ref, 'peça'),
-        });
+        const resolvida = await resolverMontagemPersistida(raiz, this.carregadores());
         if (resolvida.id !== id) {
           falhar('identidade-divergente', 'O ID interno da montagem diverge do catálogo.', 'Corrija o documento ou a entrada explícita do catálogo.');
         }
@@ -111,6 +115,8 @@ export function criarCatalogoMontagensVazio() {
   return Object.freeze({
     configurado: false,
     listar() { return []; },
+    tem() { return false; },
+    carregadores() { return {}; },
     async resolver() {
       falhar('catalogo-nao-configurado', 'O servidor não possui catálogo de montagens configurado.', `Defina ${VARIAVEL_CATALOGO_MCP_MONTAGENS} ao iniciar o servidor.`);
     },
