@@ -56,8 +56,10 @@ simbólico, JSON inválido, filesystem sem hard link e hash adulterado. A limpez
 valida todas as transições, simula por padrão e só remove órfãos com
 `aplicar: true` explícito. As provas focadas cobrem criação, alteração, falha,
 concorrência, idempotência, symlink interno, adulteração e limpeza. R00/R01
-estão executáveis; autoria interna, impacto, revalidação, MCP e consumo
-caixa-preta continuam nas fatias abaixo.
+estão executáveis. R02 agora entrega planejamento, confirmação, validação pelo
+resolvedor e materialização de criação/alteração, com diagnóstico de referência
+ausente e revisão velha. Impacto, revalidação, MCP e consumo caixa-preta seguem
+nas fatias abaixo.
 
 ## Contrato da proposta
 
