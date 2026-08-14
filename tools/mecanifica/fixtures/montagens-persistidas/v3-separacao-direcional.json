@@ -3,8 +3,12 @@
   "versao": 3,
   "id": "gabarito-separacao-direcional",
   "instancias": [
-    { "id": "movel", "alvo": { "tipo": "peca", "ref": "bloco-movel" } },
-    { "id": "referencia", "alvo": { "tipo": "peca", "ref": "bloco-referencia" } }
+    {
+      "id": "movel",
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
+      "pose": { "deslocamento": [0, 1.02, 0], "rotacao": [[1, 0, 0], [0, 1, 0], [0, 0, 1]] }
+    },
+    { "id": "referencia", "alvo": { "tipo": "peca", "ref": "bloco-gabarito" } }
   ],
   "relacoes": [
     {

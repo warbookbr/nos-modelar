@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-289 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+291 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -279,6 +279,7 @@
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
+- `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 
 ## src/bancada/
@@ -386,6 +387,7 @@
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `resolver-montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
+- `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
