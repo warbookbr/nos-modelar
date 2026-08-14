@@ -2,7 +2,13 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-mapa-canonico-dependencias.md`](2026-08-14-mapa-canonico-dependencias.md).
+
+O plano define um universo explícito e deriva mapa, usos reversos e impacto
+global por identidade semântica. “Global” significa cobertura completa dentro
+desse universo autorizado, sem varredura arbitrária do disco. Revalidação em
+cascata e correção automática permanecem recortes posteriores.
 
 O plano de
 [`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
@@ -161,4 +167,5 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
 foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
 agente. A continuidade dessas revisões no catálogo foi concluída e aprovada;
-os demais candidatos permanecem no [`BACKLOG.md`](BACKLOG.md).
+o mapa canônico é agora o plano ativo e os demais candidatos permanecem no
+[`BACKLOG.md`](BACKLOG.md).

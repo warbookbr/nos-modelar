@@ -51,6 +51,10 @@ aplicação publicada aqui.
 - A análise consolidada de maturidade e próximas melhorias está em
   [`RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](RELATORIO-ANALISE-GRANDES-MELHORIAS.md)
   (`docs/mecanifica/RELATORIO-ANALISE-GRANDES-MELHORIAS.md`).
+- O plano ativo de [mapa canônico de dependências](planos/2026-08-14-mapa-canonico-dependencias.md)
+  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`) define
+  cobertura global dentro de um universo explícito, impacto direcionado e
+  proveniência, sem executar revalidação em cascata.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
@@ -194,9 +198,8 @@ npm run criar -- _viga
 ## Pendências atuais
 
 - Iniciar e executar o Caso 3 da homologação.
-- Definir o mapa canônico de composição, relações e dependências.
-- Escolher e abrir o próximo plano executivo; o mapa canônico global é a
-  recomendação técnica atual.
+- Executar e encerrar o plano ativo do mapa canônico de composição, relações e
+  dependências.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.

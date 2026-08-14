@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-340 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+341 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -185,6 +185,7 @@
 - `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
 - `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
 - `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
+- `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
 - `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
 - `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
