@@ -5,7 +5,7 @@
 **Responsável:** GPT (arquitetura, execução e revisão)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, branch do PR #44 em
-`f45e0c5`.
+`e169594`.
 
 ## Problema observado
 
@@ -45,6 +45,19 @@ todo o snapshot já existe. R01 deve provar o protocolo sob corrida e falha
 injetada antes de ampliar a autoria. Se o filesystem não garantir `link`
 atômico e exclusivo, parar e registrar outra fronteira de visibilidade; não
 reduzir silenciosamente a garantia.
+
+### Evidência executável de R00/R01
+
+O serviço interno recalcula os bytes antes de escrever e publica objeto, commit
+e transição por temporário sincronizado e hard link exclusivo. Ele recusa base
+velha, deixa apenas um vencedor em cem concorrentes e reaplica esse vencedor
+sem alterar bytes. Falha fechado para raiz, diretório, transição ou objeto
+simbólico, JSON inválido, filesystem sem hard link e hash adulterado. A limpeza
+valida todas as transições, simula por padrão e só remove órfãos com
+`aplicar: true` explícito. As provas focadas cobrem criação, alteração, falha,
+concorrência, idempotência, symlink interno, adulteração e limpeza. R00/R01
+estão executáveis; autoria interna, impacto, revalidação, MCP e consumo
+caixa-preta continuam nas fatias abaixo.
 
 ## Contrato da proposta
 

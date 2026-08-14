@@ -42,6 +42,10 @@ function registrar(telemetria, evento) {
   telemetria?.(evento);
 }
 
+function erroTransicao(mensagem, acao = 'Repare ou descarte a transição sem ativar bytes não verificados.') {
+  return new ErroRepositorioAutoria('transicao-invalida', mensagem, acao);
+}
+
 export function planejarRevisaoAutoria({ entidade, conteudo, pai = null }) {
   if (!slugValido(entidade)) throw new ErroRepositorioAutoria('entidade-invalida', 'entidade precisa ser slug canônico.', 'Use letras minúsculas, números, ponto, hífen ou sublinhado.');
   if (pai !== null && !/^[0-9a-f]{64}$/.test(pai)) throw new ErroRepositorioAutoria('pai-invalido', 'pai precisa ser hash de commit ou null.', 'Use o commit atualmente observado.');
@@ -135,6 +139,18 @@ async function prepararRaizLeitura(raiz, fs) {
   return diretorios;
 }
 
+async function lerArquivoSeguro(caminho, fs, codigo, acao) {
+  const estado = await fs.lstat(caminho).catch((erro) => {
+    if (erro?.code === 'ENOENT') return null;
+    throw erro;
+  });
+  if (!estado) return null;
+  if (estado.isSymbolicLink() || !estado.isFile()) {
+    throw new ErroRepositorioAutoria(codigo, `arquivo inseguro: ${caminho}`, acao);
+  }
+  return fs.readFile(caminho, 'utf8');
+}
+
 async function publicarSnapshot({ raiz, plano, falhaInjetada, fs: fsOpcoes, telemetria } = {}) {
   const fs = fsDe({ fs: fsOpcoes });
   const recalculado = await validarPlano(plano);
@@ -160,13 +176,43 @@ async function lerTransicao({ diretorios, entidade, pai, fs }) {
   if (!estadoPasta.isDirectory() || estadoPasta.isSymbolicLink()) throw new ErroRepositorioAutoria('raiz-insegura', `diretório inseguro: ${pasta}`, 'Use diretório local comum, sem symlink.');
   const caminho = join(pasta, `${nomePai(pai)}.json`);
   try {
-    const bytes = await fs.readFile(caminho, 'utf8');
-    const commit = JSON.parse(bytes);
+    const bytes = await lerArquivoSeguro(caminho, fs, 'transicao-insegura', 'Remova o symlink ou arquivo especial e repita em uma raiz local segura.');
+    if (bytes === null) return null;
+    let commit;
+    try { commit = JSON.parse(bytes); } catch (erro) { throw erroTransicao(`JSON inválido na transição ${caminho}.`); }
     return { caminho, bytes, commit: { ...commit, id: hash(bytes) } };
   } catch (erro) {
     if (erro?.code === 'ENOENT') return null;
     throw erro;
   }
+}
+
+function validarTransicao(transicao, entidade, pai) {
+  const commit = transicao?.commit;
+  if (!commit || typeof commit !== 'object' || Array.isArray(commit)
+    || commit.formato !== 'mecanifica.commit-autoria'
+    || commit.versao !== 1
+    || commit.entidade !== entidade
+    || commit.pai !== pai
+    || !/^[0-9a-f]{64}$/.test(commit.objeto)
+    || hash(transicao.bytes) !== commit.id) {
+    throw erroTransicao(`transição inválida para ${entidade}.`);
+  }
+  return commit;
+}
+
+async function lerObjetoSeguro(diretorios, objeto, fs) {
+  if (!/^[0-9a-f]{64}$/.test(objeto)) throw erroTransicao(`objeto inválido: ${objeto}.`);
+  const caminho = join(diretorios.objetos, `${objeto}.json`);
+  const bytes = await lerArquivoSeguro(caminho, fs, 'objeto-inseguro', 'Remova o symlink ou arquivo especial e repita em uma raiz local segura.');
+  if (bytes === null) throw new ErroRepositorioAutoria('objeto-ausente', `objeto ${objeto} não existe.`, 'Preserve o repositório e recupere o snapshot antes de ler a revisão.');
+  if (hash(bytes) !== objeto) throw new ErroRepositorioAutoria('objeto-adulterado', `objeto ${objeto} diverge do hash.`, 'Preserve o repositório para auditoria.');
+  let documento;
+  try { documento = JSON.parse(bytes); } catch (erro) { throw new ErroRepositorioAutoria('objeto-invalido', `objeto ${objeto} não contém JSON válido.`, 'Preserve o repositório e descarte o snapshot inválido.'); }
+  if (documento?.formato !== 'mecanifica.objeto-autoria' || documento?.versao !== 1 || !Object.hasOwn(documento, 'conteudo')) {
+    throw new ErroRepositorioAutoria('objeto-invalido', `objeto ${objeto} não respeita o contrato de autoria.`, 'Preserve o repositório e descarte o snapshot inválido.');
+  }
+  return { bytes, documento };
 }
 
 export async function lerRevisaoAtivaAutoria(raiz, entidade, { fs: fsOpcoes } = {}) {
@@ -182,12 +228,9 @@ export async function lerRevisaoAtivaAutoria(raiz, entidade, { fs: fsOpcoes } = 
     if (!transicao) break;
     if (vistos.has(transicao.commit.id)) throw new ErroRepositorioAutoria('transicao-ciclica', `transição cíclica para ${entidade}.`, 'Preserve a raiz e interrompa a leitura.');
     vistos.add(transicao.commit.id);
-    if (transicao.commit.formato !== 'mecanifica.commit-autoria' || transicao.commit.versao !== 1 || transicao.commit.entidade !== entidade || transicao.commit.pai !== pai || hash(transicao.bytes) !== transicao.commit.id) {
-      throw new ErroRepositorioAutoria('transicao-invalida', `transição inválida para ${entidade}.`, 'Repare ou descarte a transição sem ativar bytes não verificados.');
-    }
-    const objetoBytes = await fs.readFile(join(diretorios.objetos, `${transicao.commit.objeto}.json`), 'utf8');
-    if (hash(objetoBytes) !== transicao.commit.objeto) throw new ErroRepositorioAutoria('objeto-adulterado', `objeto ${transicao.commit.objeto} diverge do hash.`, 'Preserve o repositório para auditoria.');
-    ativa = { estado: 'aplicado', entidade, pai: transicao.commit.pai, commit: transicao.commit.id, objeto: transicao.commit.objeto, conteudo: JSON.parse(objetoBytes).conteudo };
+    const commit = validarTransicao(transicao, entidade, pai);
+    const objeto = await lerObjetoSeguro(diretorios, commit.objeto, fs);
+    ativa = { estado: 'aplicado', entidade, pai: commit.pai, commit: transicao.commit.id, objeto: commit.objeto, conteudo: objeto.documento.conteudo };
     pai = transicao.commit.id;
   }
   return ativa;
@@ -197,7 +240,12 @@ export async function materializarRevisaoAutoria({ raiz, plano, falhaInjetada, f
   const fs = fsDe({ fs: fsOpcoes });
   const inicio = Date.now();
   try {
+    await validarPlano(plano);
     const ativo = await lerRevisaoAtivaAutoria(raiz, plano?.entidade, { fs });
+    if (ativo?.commit === plano?.commit) {
+      registrar(telemetria, { tipo: 'idempotente', commit: plano.commit });
+      return { estado: 'aplicado', idempotente: true, entidade: plano.entidade, commit: plano.commit, objeto: plano.objeto };
+    }
     if ((ativo?.commit ?? null) !== (plano?.pai ?? null)) {
       throw new ErroRepositorioAutoria('revisao-desatualizada', `a revisão ativa é ${ativo?.commit ?? 'null'}, mas o plano usa ${plano?.pai ?? 'null'}.`, 'Leia a revisão ativa, planeje novamente e confirme os bytes atuais.');
     }
@@ -209,6 +257,62 @@ export async function materializarRevisaoAutoria({ raiz, plano, falhaInjetada, f
   } finally {
     registrar(telemetria, { tipo: 'duracao', ms: Math.max(0, Date.now() - inicio) });
   }
+}
+
+async function listarTransicoes(diretorios, fs) {
+  const entidades = await fs.readdir(diretorios.transicoes);
+  const referencias = { commits: new Set(), objetos: new Set() };
+  for (const entidade of entidades) {
+    if (!slugValido(entidade)) throw erroTransicao(`entidade inválida na árvore de transições: ${entidade}.`);
+    const pasta = join(diretorios.transicoes, entidade);
+    const estadoPasta = await fs.lstat(pasta);
+    if (!estadoPasta.isDirectory() || estadoPasta.isSymbolicLink()) throw new ErroRepositorioAutoria('raiz-insegura', `diretório inseguro: ${pasta}`, 'Use diretório local comum, sem symlink.');
+    for (const nome of await fs.readdir(pasta)) {
+      if (!/^raiz\.json$|^[0-9a-f]{64}\.json$/.test(nome)) continue;
+      const pai = nome === 'raiz.json' ? null : nome.slice(0, -5);
+      const transicao = await lerTransicao({ diretorios, entidade, pai, fs });
+      if (!transicao) throw erroTransicao(`transição desapareceu durante a limpeza: ${join(pasta, nome)}.`);
+      const commit = validarTransicao(transicao, entidade, pai);
+      await lerObjetoSeguro(diretorios, commit.objeto, fs);
+      referencias.commits.add(commit.id);
+      referencias.objetos.add(commit.objeto);
+    }
+  }
+  return referencias;
+}
+
+async function candidatosOrfaos(diretorio, referencias, fs) {
+  const candidatos = [];
+  for (const nome of await fs.readdir(diretorio)) {
+    if (!/^[0-9a-f]{64}\.json$/.test(nome)) continue;
+    const id = nome.slice(0, -5);
+    const caminho = join(diretorio, nome);
+    const estado = await fs.lstat(caminho);
+    if (estado.isSymbolicLink() || !estado.isFile()) throw new ErroRepositorioAutoria('raiz-insegura', `arquivo inseguro: ${caminho}`, 'Use somente arquivos regulares no repositório de autoria.');
+    if (!referencias.has(id)) candidatos.push(caminho);
+  }
+  return candidatos;
+}
+
+/**
+ * Lista snapshots não alcançáveis por nenhuma transição. A remoção é opt-in;
+ * mesmo ao aplicar, todas as transições e objetos referenciados são validados
+ * antes de qualquer unlink.
+ */
+export async function limparOrfaosAutoria({ raiz, aplicar = false, fs: fsOpcoes, telemetria } = {}) {
+  const fs = fsDe({ fs: fsOpcoes });
+  const diretorios = await prepararRaizLeitura(raiz, fs);
+  if (!diretorios) return { estado: 'vazio', aplicar, objetos: [], commits: [] };
+  const referencias = await listarTransicoes(diretorios, fs);
+  const objetos = await candidatosOrfaos(diretorios.objetos, referencias.objetos, fs);
+  const commits = await candidatosOrfaos(diretorios.commits, referencias.commits, fs);
+  if (aplicar) {
+    for (const caminho of [...objetos, ...commits]) {
+      await fs.unlink(caminho);
+      registrar(telemetria, { tipo: 'arquivo-removido', caminho });
+    }
+  }
+  return { estado: aplicar ? 'limpo' : 'simulado', aplicar, objetos, commits };
 }
 
 export async function lerHistoricoAutoria(raiz) {

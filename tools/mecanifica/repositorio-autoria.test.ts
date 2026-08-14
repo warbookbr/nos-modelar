@@ -1,10 +1,10 @@
 /* Prova publicação imutável, falha recuperável e conflito explícito. */
-import { mkdtemp, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, symlink, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço MJS exercitado pelo contrato de armazenamento.
-import { lerHistoricoAutoria, lerRevisaoAtivaAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria, publicarRevisaoAutoria } from './repositorio-autoria.mjs';
+import { lerHistoricoAutoria, lerRevisaoAtivaAutoria, limparOrfaosAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria, publicarRevisaoAutoria } from './repositorio-autoria.mjs';
 
 describe('repositório de autoria imutável', () => {
   it('planeja sem escrever e publica somente após o commit completo', async () => {
@@ -103,5 +103,54 @@ describe('repositório de autoria imutável', () => {
     await materializarRevisaoAutoria({ raiz: raizAdulterada, plano });
     await writeFile(join(raizAdulterada, 'objetos', `${plano.objeto}.json`), 'adulterado\n');
     await expect(lerRevisaoAtivaAutoria(raizAdulterada, 'montagem-a')).rejects.toMatchObject({ codigo: 'objeto-adulterado' });
+  });
+
+  it('reaplica o vencedor sem escrever e recusa proposta com pai antigo', async () => {
+    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-idempotente-'));
+    const inicial = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
+    await materializarRevisaoAutoria({ raiz, plano: inicial });
+    const antes = await Promise.all((await readdir(join(raiz, 'objetos'))).map(async (nome) => [nome, await readFile(join(raiz, 'objetos', nome), 'utf8')]));
+    const resultado = await materializarRevisaoAutoria({ raiz, plano: inicial });
+    expect(resultado).toMatchObject({ estado: 'aplicado', idempotente: true, commit: inicial.commit });
+    const depois = await Promise.all((await readdir(join(raiz, 'objetos'))).map(async (nome) => [nome, await readFile(join(raiz, 'objetos', nome), 'utf8')]));
+    expect(depois).toEqual(antes);
+
+    const concorrente = planejarRevisaoAutoria({ entidade: 'montagem-a', pai: null, conteudo: { valor: 2 } });
+    await expect(materializarRevisaoAutoria({ raiz, plano: concorrente })).rejects.toMatchObject({ codigo: 'revisao-desatualizada' });
+  });
+
+  it('falha fechado para transição malformada e symlink interno', async () => {
+    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-transicao-'));
+    const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
+    await materializarRevisaoAutoria({ raiz, plano });
+    const transicao = join(raiz, 'transicoes', 'montagem-a', 'raiz.json');
+    const copia = join(raiz, 'transicoes', 'montagem-a', 'copia.json');
+    await symlink(join(raiz, 'commits', `${plano.commit}.json`), copia);
+    await expect(lerRevisaoAtivaAutoria(raiz, 'montagem-a')).resolves.toMatchObject({ commit: plano.commit });
+    await unlink(transicao);
+    await symlink(copia, transicao);
+    await expect(lerRevisaoAtivaAutoria(raiz, 'montagem-a')).rejects.toMatchObject({ codigo: 'transicao-insegura' });
+    await unlink(transicao);
+    await writeFile(transicao, '{ quebrado');
+    await expect(lerRevisaoAtivaAutoria(raiz, 'montagem-a')).rejects.toMatchObject({ codigo: 'transicao-invalida' });
+  });
+
+  it('simula e remove apenas snapshots órfãos após validar as transições', async () => {
+    const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-limpeza-'));
+    const ativo = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
+    const orfao = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 2 } });
+    await materializarRevisaoAutoria({ raiz, plano: ativo });
+    await publicarRevisaoAutoria({ raiz, plano: orfao });
+    const simulado = await limparOrfaosAutoria({ raiz });
+    expect(simulado.estado).toBe('simulado');
+    expect(simulado.aplicar).toBe(false);
+    expect(simulado.objetos).toContain(join(raiz, 'objetos', `${orfao.objeto}.json`));
+    expect(simulado.commits).toContain(join(raiz, 'commits', `${orfao.commit}.json`));
+    expect(await readFile(join(raiz, 'objetos', `${orfao.objeto}.json`), 'utf8')).toBe(orfao.objetoBytes);
+    const limpo = await limparOrfaosAutoria({ raiz, aplicar: true });
+    expect(limpo.estado).toBe('limpo');
+    await expect(readFile(join(raiz, 'objetos', `${orfao.objeto}.json`))).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(readFile(join(raiz, 'commits', `${orfao.commit}.json`))).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(lerRevisaoAtivaAutoria(raiz, 'montagem-a')).resolves.toMatchObject({ commit: ativo.commit });
   });
 });
