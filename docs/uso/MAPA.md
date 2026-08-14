@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+280 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -305,6 +305,7 @@
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — o GATE de render da OFICINA (D-60). Renderiza peça(s) do v3 e FALHA (exit≠0) se: houve pageerror, window.__ready ≠ true, ou o frame é DEGENERA…
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
+- `visor-imports.test.mjs` — **SEM CABEÇALHO**
 
 ## tools/bancadas/bench/
 

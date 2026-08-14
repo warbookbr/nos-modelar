@@ -34,8 +34,8 @@ aplicação publicada aqui.
 - O contrato v1 e o resolvedor neutro de montagem recursiva existem nesta
   implementação; ainda não existe mapa completo de dependências, relações
   gerais, solver geral de encaixe ou camada completa de escrita para IA.
-- O import bare `earcut` falha no servidor estático local do visor e do
-  porteiro; isso é pendência de infraestrutura, não mudança de peça.
+- O visor legado resolve o import bare `earcut` por import map; `porteiro` e
+  `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
 
 ## Direção estabelecida
@@ -157,7 +157,6 @@ npm run criar -- _viga
 
 ## Pendências atuais
 
-- Resolver o import `earcut` no servidor estático local.
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
 - Definir como alvo editável, contexto visual, dependentes e validações formam

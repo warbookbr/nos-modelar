@@ -7,7 +7,6 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 
 | Candidato | Estado / próximo recorte |
 |---|---|
-| Import `earcut` no servidor estático | reproduzir e corrigir na ferramenta apropriada |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
 | Mapa de composição e dependências | definir dado validável que responda contenção, relações, usos e impacto de alterações |

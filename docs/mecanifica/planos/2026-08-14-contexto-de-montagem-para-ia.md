@@ -107,7 +107,7 @@ inexistente; preserva identidade sem posição de array ou runtime.
 - novo tipo de relação, colisão ou inferência por proximidade;
 - renderização, câmera, material ou publicação das receitas experimentais;
 - MCP, API remota, escrita, solver ou promoção de tentativa rejeitada;
-- corrigir `earcut`, vista naturalmente fina ou transporte de hierarquia.
+- corrigir vista naturalmente fina ou transporte de hierarquia.
 
 ## Superfícies previstas
 
@@ -176,15 +176,15 @@ Cada R termina verde e em commit próprio; falha não antecipa render ou MCP.
 
 | Ordem | Candidato | Dependência |
 |---:|---|---|
-| 1 | contexto visual de conjunto/par/subárvore | este descritor + `earcut` |
+| 1 | contexto visual de conjunto/par/subárvore | este descritor |
 | 2 | relação neutra de folga e mapa de dependentes | contexto estável |
 | 3 | MCP somente leitura para montagem | serviços descritivo/visual aprovados |
 | 4 | comparação de tentativas rejeitadas | contrato de tentativa |
 | 5 | autoria transacional | dependentes, revalidação e commit seguro |
 
-Correções independentes usam planos curtos: `earcut`; enquadramento de objetos
-finos; sintaxe/documentação de `comparar:revisao`; hierarquia somente quando
-houver consumidor real.
+Correções independentes usam planos curtos: enquadramento de objetos finos;
+sintaxe/documentação de `comparar:revisao`; hierarquia somente quando houver
+consumidor real.
 
 ## Riscos e parada
 

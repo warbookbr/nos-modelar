@@ -11,7 +11,7 @@ autoriza implementação ou alteração no repositório original.
 | arranjo radial/linear | entregue em fixture | `arranja`, `_cerca-e-flor.js` | origem copia uma fonte |
 | furo e centros | entregue em peças de prova | `_tampa-de-caixa.js`, `_flange-de-tubulacao.js` | não é booleana geral |
 | orientação de seção | entregue em `loft` | `_corrimao.js`, núcleo | costura de `lathe` continua aberta |
-| revisão visual | entregue em quatro vistas | `olhar-bancada.mjs` | `earcut` falha no servidor estático local |
+| revisão visual | entregue em quatro vistas | `olhar-bancada.mjs` | visor legado mantém import map para `earcut` |
 | exportação resolvida | entregue e gateada | `exportar.mjs` | produto lê dados, não receita |
 | consulta de subárvore | entregue na bancada | `descrever-peca.mjs`, testes | sem montagem persistida |
 | materiais genéricos | futuro | backlog | não há contrato PBR ou paleta aberta |

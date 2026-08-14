@@ -91,8 +91,8 @@ tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
 de plano próprio e deve respeitar o modelo de autoria e as garantias de
 transação descritos em [`AUTORIA-IA.md`](AUTORIA-IA.md).
 
-O servidor estático local ainda falha ao resolver o import bare `earcut`; esta é
-uma pendência da ferramenta de servir e inspecionar, não uma decisão de
+O visor legado declara um import map para resolver `earcut` quando servido sem
+transformação. A correção pertence à infraestrutura de inspeção e não altera a
 geometria.
 
 ## O que ainda não existe

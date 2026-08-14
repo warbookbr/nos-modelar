@@ -58,7 +58,7 @@ para a direção de composição.
 - Ainda não existem montagem recursiva persistida, mapa completo de dependências,
   solver geral de encaixe ou camada completa de escrita para IA.
 - O contrato genérico de materiais ainda não existe.
-- O servidor estático local ainda falha ao resolver o import bare `earcut`.
+- O visor legado resolve `earcut` também nos servidores estáticos locais.
 
 ## Desenvolvimento
 
