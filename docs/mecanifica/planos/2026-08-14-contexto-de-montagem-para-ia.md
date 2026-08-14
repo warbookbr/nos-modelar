@@ -6,13 +6,13 @@
 **Repositório e base:** `warbookbr/nos-mecanifica`; `main` em `5c5f1aa`, PR #42;
 diagnóstico em `2bbb739`.
 
-## Dependência de abertura
-
-O R06 de
-[`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md)
-foi integrado à `main` pelo PR #41. O usuário autorizou explicitamente a
-continuação em 2026-08-14; este plano inicia em R00 na branch do estudo de
-campo, já sincronizada com o fechamento.
+## Baseline R00
+O resolvedor v2 é puro e falha com código/campo, mas sua árvore interna contém
+`Map` e referências de instância: não é contrato JSON público. A CLI aceita só
+quatro pilotos e devolve texto. O estudo ad hoc mede 8.597 bytes completo e 926
+bytes resumido, sem caixa/partes/portas serializadas, consulta ou cobertura
+formal. R00 decide **ENVOLVER** o resolvedor sem refatorá-lo; seus erros de
+estrutura e referência permanecem a fonte das recusas anteriores ao descritor.
 
 ## Problema observado
 
@@ -163,7 +163,7 @@ canônico; uso/diagnóstico fica em `stderr`. A CLI não replica regra do servi�
 
 ## Fatias
 
-1. R00 — baseline, contrato, bytes, ausências e erros;
+1. R00 — concluído: baseline, contrato, bytes, ausências e erros;
 2. R01 — árvore, poses, caixas, portas, relações e cobertura;
 3. R02 — caminho, profundidade e relacionados;
 4. R03 — CLI confinada e diagnóstico;
