@@ -59,6 +59,10 @@ Com autorização explícita de continuidade, a relação espacial direcional e 
 mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o contrato
 permanece neutro e não promete colisão geral.
 
+Com autorização explícita de continuidade, o plano de contexto visual e autoria
+segura foi aberto em R00. Ele avança leitura visual, revalidação assistida,
+catálogo explícito entre raízes e somente então avalia escrita transacional.
+
 ## Programas
 
 | Programa | Painel | Execução atual |
@@ -120,6 +124,7 @@ nos arquivos originais.
 | Montagem Persistida v2 — relações locais | concluído: R06, PR #41 |
 | Contexto de montagem para IA | concluído: R05, PR #42 |
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
+| Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
