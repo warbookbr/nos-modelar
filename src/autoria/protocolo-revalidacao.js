@@ -129,6 +129,7 @@ export function criarCampanhaRevalidacao({ mapa, impacto, causa, mapaSha256 } = 
       raizesAfetadas: copiar(impacto.raizesAfetadas ?? []),
       raizesNaoAfetadas: copiar(impacto.raizesNaoAfetadas ?? []),
     },
+    historicoResultados: [],
     cobertura: copiar(impacto.cobertura),
   };
 }
@@ -236,6 +237,9 @@ export function registrarResultado(historico, resultado) {
   }
   const item = alvoValido(resultado.item, 'resultado.item');
   const revisao = provenienciaValida(resultado.revisaoValidada, 'resultado.revisaoValidada');
+  if (resultado.estado !== 'aprovado' && resultado.estado !== 'reprovado') {
+    falhar('estado-resultado-invalido', 'resultado.estado', 'um resultado final precisa ser aprovado ou reprovado.');
+  }
   const fato = {
     formato: FORMATO_RESULTADO,
     versao: VERSAO,

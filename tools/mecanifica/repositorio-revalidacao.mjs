@@ -7,6 +7,8 @@ import {
   planejarRevisaoAutoria,
 } from './repositorio-autoria.mjs';
 import {
+  registrarResultado,
+  transicionarItem,
   validarCampanhaRevalidacao,
 } from '../../src/autoria/protocolo-revalidacao.js';
 import { serializarCanonico } from '../../src/autoria/snapshot-universo-autoria.js';
@@ -115,4 +117,88 @@ export async function lerCampanhaRevalidacao(raiz, identidade, { fs } = {}) {
     objeto: ativa.objeto,
     campanha,
   };
+}
+
+function versaoEsperadaValida(versao) {
+  if (!Number.isSafeInteger(versao) || versao < 0) {
+    throw new ErroRepositorioRevalidacao('versao-invalida', 'versaoEsperada precisa ser contador inteiro não negativo.', 'Leia o item atual antes de tentar a transição.');
+  }
+}
+
+function itemDa(campanha, alvo) {
+  const chave = `${alvo?.tipo}:${alvo?.id}`;
+  const item = campanha.itens.find((entrada) => entrada.chave === chave);
+  if (!item) throw new ErroRepositorioRevalidacao('item-ausente', `o item '${chave}' não pertence à campanha.`, 'Use um alvo semântico derivado do impacto da campanha.');
+  return item;
+}
+
+export async function registrarResultadoRevalidacao({
+  raiz, identidade, resultado, versaoEsperada, pai = null, falhaInjetada, fs, telemetria,
+} = {}) {
+  const atual = await lerCampanhaRevalidacao(raiz, identidade, { fs });
+  if (!atual) throw new ErroRepositorioRevalidacao('campanha-ausente', 'a campanha não existe.', 'Derive e persista a campanha antes de registrar resultado.');
+  if (pai !== null && pai !== atual.revisao) throw new ErroRepositorioRevalidacao('revisao-desatualizada', 'a campanha mudou desde a revisão observada.', 'Leia a campanha atual e repita a operação.');
+  const campanha = atual.campanha;
+  const registro = registrarResultado(campanha.historicoResultados ?? [], resultado);
+  if (registro.idempotente) return { idempotente: true, persistida: atual };
+  const item = itemDa(campanha, resultado.item);
+  if (resultado.revisaoValidada.revisao !== item.revisaoObservada.revisao
+    || resultado.revisaoValidada.sha256 !== item.revisaoObservada.sha256) {
+    throw new ErroRepositorioRevalidacao('revisao-desatualizada', 'o resultado não corresponde à revisão observada pelo item.', 'Releia o mapa e valide a revisão atual antes de registrar o resultado.');
+  }
+  versaoEsperadaValida(versaoEsperada);
+  const emValidacao = item.estado === 'pendente'
+    ? transicionarItem(item, {
+      esperadoVersao: versaoEsperada,
+      proximoEstado: 'em-validacao',
+      revisaoAtual: resultado.revisaoValidada,
+    })
+    : item;
+  const itemAtualizado = transicionarItem(emValidacao, {
+    esperadoVersao: emValidacao.versao,
+    proximoEstado: resultado.estado,
+    revisaoAtual: resultado.revisaoValidada,
+    resultado: {
+      revisao: resultado.revisaoValidada.revisao,
+      sha256: resultado.revisaoValidada.sha256,
+    },
+  });
+  const novaCampanha = {
+    ...campanha,
+    itens: campanha.itens.map((entrada) => entrada.chave === itemAtualizado.chave ? itemAtualizado : entrada),
+    historicoResultados: registro.historico,
+  };
+  const persistida = await persistirCampanhaRevalidacao({
+    raiz, campanha: novaCampanha, pai: atual.revisao, falhaInjetada, fs, telemetria,
+  });
+  return { idempotente: false, persistida };
+}
+
+export async function obsoletarItemRevalidacao({
+  raiz, identidade, item: alvo, revisaoAtual, versaoEsperada, pai = null, falhaInjetada, fs, telemetria,
+} = {}) {
+  const atual = await lerCampanhaRevalidacao(raiz, identidade, { fs });
+  if (!atual) throw new ErroRepositorioRevalidacao('campanha-ausente', 'a campanha não existe.', 'Derive e persista a campanha antes de invalidar item.');
+  if (pai !== null && pai !== atual.revisao) throw new ErroRepositorioRevalidacao('revisao-desatualizada', 'a campanha mudou desde a revisão observada.', 'Leia a campanha atual e repita a operação.');
+  const campanha = atual.campanha;
+  const itemAtual = itemDa(campanha, alvo);
+  if (itemAtual.estado === 'obsoleto') return { idempotente: true, persistida: atual };
+  versaoEsperadaValida(versaoEsperada);
+  if (!revisaoAtual || revisaoAtual.revisao === itemAtual.revisaoObservada.revisao
+    && revisaoAtual.sha256 === itemAtual.revisaoObservada.sha256) {
+    throw new ErroRepositorioRevalidacao('revisao-nao-alterada', 'a revisão atual ainda é a mesma observada pelo item.', 'Só obsoleta o item depois de observar uma revisão diferente.');
+  }
+  const itemAtualizado = transicionarItem(itemAtual, {
+    esperadoVersao: versaoEsperada,
+    proximoEstado: 'obsoleto',
+    revisaoAtual,
+  });
+  const novaCampanha = {
+    ...campanha,
+    itens: campanha.itens.map((entrada) => entrada.chave === itemAtualizado.chave ? itemAtualizado : entrada),
+  };
+  const persistida = await persistirCampanhaRevalidacao({
+    raiz, campanha: novaCampanha, pai: atual.revisao, falhaInjetada, fs, telemetria,
+  });
+  return { idempotente: false, persistida };
 }

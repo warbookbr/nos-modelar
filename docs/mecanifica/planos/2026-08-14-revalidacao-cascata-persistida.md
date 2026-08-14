@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-R00, R01 e R02 concluídas com decisão `prosseguir`; R03 é o próximo passo.
+R00, R01, R02 e R03 concluídas com decisão `prosseguir`; R04 é o próximo passo.
 
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
@@ -155,7 +155,7 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 - registrar resultado vinculado à revisão efetivamente validada;
 - invalidar por mudança incompatível sem apagar histórico;
-- provar repetição idempotente e concorrência fail-closed.
+- provar repetição idempotente e concorrência fail-closed. **Resultado:** concluída; 14 provas acumuladas passaram.
 
 ### R04 — consumo Agent-First
 
