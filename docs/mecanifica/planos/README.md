@@ -2,13 +2,12 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-14-mapa-canonico-dependencias.md`](2026-08-14-mapa-canonico-dependencias.md).
+**Plano ativo:** nenhum.
 
-O plano define um universo explícito e deriva mapa, usos reversos e impacto
-global por identidade semântica. “Global” significa cobertura completa dentro
-desse universo autorizado, sem varredura arbitrária do disco. Revalidação em
-cascata e correção automática permanecem recortes posteriores.
+O [mapa canônico de dependências](2026-08-14-mapa-canonico-dependencias.md) foi
+concluído com decisão **aprovar**: universo explícito, mapa derivado, impacto
+global MCP, continuidade ativa e recusa concorrente estão provados. Revalidação
+em cascata persistida permanece um candidato separado no backlog.
 
 O plano de
 [`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
@@ -52,10 +51,10 @@ permanecem fora do fechamento.
 O contexto de montagem acrescentou serviço puro e CLI confinada sobre v1/v2.
 Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 
-O plano ativo do mapa canônico concluiu suas R00–R05: contrato de universo,
+O mapa canônico concluiu R00–R06 com decisão `aprovar`: contrato de universo,
 snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
 de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
-Resta o fechamento na R06.
+Não há plano executivo ativo até uma abertura explícita.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites

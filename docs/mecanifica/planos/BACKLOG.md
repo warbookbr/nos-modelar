@@ -10,9 +10,9 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | ativo em `2026-08-14-mapa-canonico-dependencias.md`: universo explícito, mapa derivado e impacto global direcionado |
+| Mapa de composição e dependências | concluído e aprovado: universo explícito, mapa derivado, impacto global MCP, continuidade ativa e recusa concorrente |
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
-| Revalidação de dependentes | raízes explícitas usam revisões ativas; cascata global e estado persistido permanecem fora |
+| Revalidação de dependentes | próximo candidato: cascata global persistida, derivada do impacto canônico; não executar, corrigir ou promover dependentes automaticamente |
 | Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v4 |
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
 | Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |

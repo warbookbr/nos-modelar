@@ -51,10 +51,11 @@ aplicação publicada aqui.
 - A análise consolidada de maturidade e próximas melhorias está em
   [`RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](RELATORIO-ANALISE-GRANDES-MELHORIAS.md)
   (`docs/mecanifica/RELATORIO-ANALISE-GRANDES-MELHORIAS.md`).
-- O plano ativo de [mapa canônico de dependências](planos/2026-08-14-mapa-canonico-dependencias.md)
-  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`) define
-  cobertura global dentro de um universo explícito, impacto direcionado e
-  proveniência, sem executar revalidação em cascata.
+- O [mapa canônico de dependências](planos/2026-08-14-mapa-canonico-dependencias.md)
+  foi concluído com decisão `aprovar`: cobertura global dentro de universo
+  explícito, impacto direcionado, proveniência, MCP e continuidade ativa. A
+  revalidação em cascata persistida permanece candidata, sem plano ativo
+  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
@@ -67,7 +68,7 @@ aplicação publicada aqui.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem. As R00–R04 do mapa canônico global fixaram
+  o mapa de impacto local existem. As R00–R06 do mapa canônico global fixaram
   universo, snapshot confinado, composição, ocorrências, relações, usos
   reversos, consulta direcionada, consumo MCP reduzido por ID, continuidade e
   escala estão provados; revalidação em cascata ainda está fora. Colisão geral,
@@ -201,8 +202,6 @@ npm run criar -- _viga
 ## Pendências atuais
 
 - Iniciar e executar o Caso 3 da homologação.
-- Executar e encerrar o plano ativo do mapa canônico de composição, relações e
-  dependências.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.

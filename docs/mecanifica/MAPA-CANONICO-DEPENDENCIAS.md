@@ -156,6 +156,14 @@ primeiro seja menor. A métrica é calculada na execução, não congelada como
 tamanho de protocolo: mudanças legítimas no contexto não tornam uma medida
 histórica uma restrição artificial.
 
+## Decisão de fechamento
+
+O plano foi encerrado com decisão **aprovar**. Universo explícito, derivação
+canônica, consulta reduzida, MCP, revisão ativa, recusa concorrente e orçamento
+de contexto foram provados sem expor paths, malha ou identidade posicional. O
+próximo candidato é uma cascata de revalidação persistida derivada deste mapa;
+ela exige plano próprio e não é autorizada por este fechamento.
+
 ## Fronteira
 
 R00 valida o universo e suas referências de composição. R01 acrescenta o

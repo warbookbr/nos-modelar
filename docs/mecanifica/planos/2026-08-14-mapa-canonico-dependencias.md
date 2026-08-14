@@ -1,6 +1,6 @@
 # Mapa canônico de dependências v1
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex (arquitetura, implementação, prova e revisão)
 
@@ -159,7 +159,7 @@ peça compartilhada sem shell, paths, documentos ou mapa; contrato v5.
 **Saída:** revisão ativa e nova sessão atualizam hash/impacto; concorrência
 recusa `universo-alterado`; impacto usa menos bytes que contextos completos.
 
-### R06 — fechamento
+### R06 — fechamento — concluída
 
 - revisar o contrato e documentação de estado;
 - executar gates completos;
@@ -195,6 +195,6 @@ recusa `universo-alterado`; impacto usa menos bytes que contextos completos.
 
 ## Encerramento
 
-O plano encerra somente com mapa e consulta provados sobre o universo
-adversarial, continuidade por revisão ativa, consistência concorrente, consumo
-caixa-preta e gates completos. Até lá, este é o único plano ativo.
+**Decisão: aprovar.** R00–R05 provam mapa e consulta sobre universo adversarial,
+continuidade ativa, consistência concorrente, consumo caixa-preta e gates.
+Próximo candidato: revalidação em cascata persistida, por plano separado.
