@@ -2,6 +2,8 @@
 
 **Estado:** ativo
 
+R00 concluída com decisão `prosseguir`; R01 é o próximo passo.
+
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, branch
@@ -9,21 +11,15 @@
 
 ## Problema observado
 
-O mapa canônico identifica dependentes e produz um roteiro mínimo depois de uma
-alteração, mas esse diagnóstico termina com a resposta. O sistema não preserva
-qual revisão causou o impacto, quais revisões dependentes ainda precisam ser
-verificadas nem se um resultado anterior continua aplicável.
-
-Sem estado persistido, uma IA precisa reconstruir e lembrar a campanha fora do
-produto. Isso aumenta contexto e permite confundir uma aprovação antiga com a
-revisão atual.
+O mapa canônico identifica dependentes e produz um roteiro mínimo, mas não
+preserva a revisão causadora, as pendências ou a validade de resultados antigos.
+Sem estado persistido, a IA reconstrói a campanha fora do produto e pode
+confundir uma aprovação antiga com a revisão atual.
 
 ## Resultado verificável
 
-Dada uma revisão causadora e um snapshot canônico completo, o sistema deriva
-uma campanha persistida de revalidação. Cada item vincula identidades semânticas,
-revisões e proveniência suficientes para decidir se está pendente, aprovado,
-reprovado ou obsoleto.
+Dada uma revisão causadora e um snapshot canônico completo, o sistema deriva uma
+campanha persistida cujos itens vinculam identidade, revisão e proveniência.
 
 Uma nova sessão deve retomar a campanha sem reconstituir memória de conversa.
 Nenhum resultado pode aprovar revisão diferente daquela efetivamente validada.
@@ -36,13 +32,9 @@ coordenação sem substituir mapa, autoria, validadores ou formatos de montagem.
 
 ## Autorização progressiva
 
-R00 é investigativa e fixa o contrato antes de persistência de produto. Ela
-precisa decidir `prosseguir`, `corrigir` ou `interromper`. R01 só começa se a
-identidade, as transições e a concorrência se sustentarem sem segunda fonte de
-verdade.
-
-Essa barreira não veta a capacidade: evita cristalizar um modelo ambíguo. Uma
-decisão `prosseguir` autoriza as fatias seguintes deste plano.
+R00 fixa o contrato antes de persistência e decide `prosseguir`, `corrigir` ou
+`interromper`. Uma decisão `prosseguir` autoriza as fatias seguintes sem criar
+segunda fonte de verdade.
 
 ## Incluído
 
@@ -96,6 +88,27 @@ decisão `prosseguir` autoriza as fatias seguintes deste plano.
 
 Os nomes e campos são hipóteses da R00, não contratos aprovados antecipadamente.
 
+## Decisão da R00 — prosseguir
+
+A R00 foi executada em `src/autoria/protocolo-revalidacao.js` e provada por
+`tools/mecanifica/revalidacao-cascata-r00.test.ts`, usando o mapa e o impacto
+globais reais da fixture de dependências. A decisão é `prosseguir` para R01.
+
+O contrato mínimo sustentado é:
+
+- identidade: causa, revisão/hash da causa, universo e hash canônico do mapa;
+  não usa UUID, relógio ou posição;
+- item: montagem com chave semântica; ordem é apenas execução derivada;
+- revisão/hash observado acompanha item e resultado final;
+- estados: `pendente`, `em-validacao`, `aprovado`, `reprovado`, `obsoleto`;
+- revisão diferente só pode concluir em `obsoleto`; `versao` é apenas CAS;
+- repetição idêntica é idempotente; outro resultado para a mesma revisão conflita.
+
+As provas também confirmaram as fronteiras: a R00 não persiste, não executa
+validadores, não corrige autoria e não promove dependentes. A R01 está autorizada
+a materializar esse contrato em armazenamento transacional, preservando o mapa,
+as revisões e os validadores como fontes de verdade separadas.
+
 ## Filtro Agent-First
 
 - **USAR DIRETO:** mapa/impacto v1, revisões ativas, validadores e transações.
@@ -119,6 +132,10 @@ em `docs/mecanifica/`. Cada fatia reserva arquivos exatos antes de editar.
 - decidir `prosseguir`, `corrigir` ou `interromper`.
 
 **Saída:** contrato mínimo sustentado ou parada explícita antes de produção.
+
+**Resultado:** concluída com decisão `prosseguir`. Cinco testes passaram:
+identidade semântica determinística, recusa de snapshot misto, transições e
+obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 ### R01 — modelo persistido e leitura pura
 

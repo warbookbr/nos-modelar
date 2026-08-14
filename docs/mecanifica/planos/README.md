@@ -6,8 +6,9 @@
 [`2026-08-14-revalidacao-cascata-persistida.md`](2026-08-14-revalidacao-cascata-persistida.md).
 
 O plano abre a revalidação em cascata como acréscimo sobre mapa, impacto,
-revisões e transações existentes. R00 é investigativa e precisa fixar identidade,
-estados, obsolescência e concorrência antes de autorizar persistência de produto.
+revisões e transações existentes. A R00 foi concluída com decisão `prosseguir`:
+identidade, estados, obsolescência e concorrência estão fixados em contrato puro.
+R01 é o próximo passo e pode introduzir persistência de produto com essa base.
 Correção e publicação automática de dependentes permanecem fora.
 
 O plano de
@@ -55,8 +56,10 @@ Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 O mapa canônico concluiu R00–R06 com decisão `aprovar`: contrato de universo,
 snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
 de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
-O plano de cascata persistida está ativo; sua R00 começa pelo contrato e pode
-interromper a implementação antes de persistência se as invariantes falharem.
+O plano de cascata persistida está ativo; a R00 foi aprovada para prosseguir após
+cinco provas focadas em contrato, snapshot misto, transições, obsolescência,
+repetição idempotente e concorrência. A R01 é a próxima fatia, ainda separada
+de derivação de impacto, consumo MCP e promoção automática.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
