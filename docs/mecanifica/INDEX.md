@@ -67,8 +67,10 @@ aplicação publicada aqui.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem; ainda não existe mapa global completo de
-  dependências, colisão geral, solver ou camada completa de escrita para IA.
+  o mapa de impacto local existem. A R00 do mapa canônico global já fixou o
+  contrato de universo e o validador estrutural; derivação completa,
+  descoberta de usos e consulta de impacto ainda estão por executar. Colisão
+  geral, solver e camada completa de escrita continuam fora.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
@@ -220,6 +222,8 @@ Resultados encerrados da própria Mecanifica ficam em
 
 Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.md),
 [AUTORIA-RECEITA-DECLARATIVA](AUTORIA-RECEITA-DECLARATIVA.md),
+[MAPA-CANONICO-DEPENDENCIAS](MAPA-CANONICO-DEPENDENCIAS.md)
+(`docs/mecanifica/MAPA-CANONICO-DEPENDENCIAS.md`),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
 [BANCADA-E-APRESENTACAO](BANCADA-E-APRESENTACAO.md), [CONTINUIDADE-ARQUITETURAL](CONTINUIDADE-ARQUITETURAL.md),
 [MONTAGEM-PERSISTIDA-V2](MONTAGEM-PERSISTIDA-V2.md), [MONTAGEM-PERSISTIDA-V3](MONTAGEM-PERSISTIDA-V3.md),

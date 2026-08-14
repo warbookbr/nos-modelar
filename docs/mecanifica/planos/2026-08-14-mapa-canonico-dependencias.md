@@ -99,7 +99,7 @@ Cada fatia deve reservar os arquivos exatos antes da edição.
 
 ## Fatias
 
-### R00 — contrato, baseline e fixture adversarial
+### R00 — contrato, baseline e fixture adversarial — concluída
 
 - fixar `mecanifica.universo-autoria` v1, mapa v1 e impacto v1;
 - materializar universo neutro com duas raízes, submontagem compartilhada, peça
@@ -109,7 +109,10 @@ Cada fatia deve reservar os arquivos exatos antes da edição.
 
 **Saída:** contratos executáveis e baseline reproduzível, sem MCP.
 
-### R01 — snapshot completo e confinado
+Evidência: contrato, validador, fixture compartilhada/isolada e recusas de
+ausência, duplicidade, divergência e ciclo; 1.228 testes aprovados e 2 ignorados.
+
+### R01 — snapshot completo e confinado — próxima
 
 - carregar somente entradas enumeradas pelo manifesto;
 - combinar fontes estáticas e revisões ativas pelo mesmo contrato já aprovado;

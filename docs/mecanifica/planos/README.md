@@ -52,6 +52,11 @@ permanecem fora do fechamento.
 O contexto de montagem acrescentou serviço puro e CLI confinada sobre v1/v2.
 Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 
+O plano ativo do mapa canônico concluiu sua R00: o contrato de universo,
+validador estrutural e fixture adversarial estão provados. R01 ainda precisa
+ligar fontes confiáveis, revisões ativas e snapshot consistente; o mapa global
+derivado e a consulta de impacto permanecem fora até essas fatias.
+
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
 conhecidos que não bloqueiam esse recorte são: catálogo semântico de materiais

@@ -109,6 +109,11 @@ impacto. Depois ligá-lo à revalidação persistida. Esse par é o que transfor
 base atual — excelente para um conjunto explícito — em infraestrutura capaz de
 manter sistemas grandes sem exigir que a IA carregue ou conheça o carro inteiro.
 
+Esse avanço já foi aberto em
+[`2026-08-14-mapa-canonico-dependencias.md`](planos/2026-08-14-mapa-canonico-dependencias.md).
+A R00 fixou o contrato do universo e provou as recusas estruturais; a derivação
+do mapa e a consulta global começam na R01/R02.
+
 Novas operações geométricas continuam válidas quando um estudo de campo as
 colocar no caminho crítico; elas não devem competir automaticamente com a
 continuidade e o controle de dependências.

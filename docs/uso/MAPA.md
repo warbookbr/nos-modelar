@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-341 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -144,6 +144,7 @@
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
+- `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
@@ -316,6 +317,7 @@
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
+- `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
@@ -450,6 +452,7 @@
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
