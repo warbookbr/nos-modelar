@@ -52,7 +52,7 @@ futura não autoriza implementação até existir um plano executivo ativo.
 | Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes e revisões na issue #18 |
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; validação e comparação caixa-preta sem fallback ou escrita |
 | Autoria controlada de pacotes | concluído: interromper | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
-| Leitura e auditoria de montagens | ativo | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); expõe somente leitura por IDs semânticos |
+| Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
 | Autoria de receitas e montagens | não definida | formato e serviços internos de autoria; alvo explícito; transação; mapa de dependências; revalidação | precisa de definição e plano próprios; não é continuação automática da autoria de pacotes |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos agentes |
@@ -85,7 +85,8 @@ Planos executivos datados usam os estados aceitos por `npm run planos:check`.
 ## Decisão atual
 
 O Módulo 1 — leitura e revisão somente leitura — está **aprovado**. A extensão
-somente leitura para montagens está ativa em plano executivo próprio.
+somente leitura para montagens também foi aprovada; não existe plano executivo
+ativo.
 
 A primeira tentativa de autoria controlada foi encerrada com decisão
 `interromper`. O protótipo do PR #25 demonstrou planejamento puro, confirmação

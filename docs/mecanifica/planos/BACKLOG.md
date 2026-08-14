@@ -14,7 +14,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
 | Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
 | Escrita transacional de receitas e montagens | revisões imutáveis e commit visível provados localmente; materialização e MCP/API continuam fora |
-| Leitura e auditoria de montagem por MCP | plano ativo; empacota descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
+| Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
 | Autoria por MCP | não definida; depende dos serviços internos de peça, montagem, contexto, transação e revalidação; não é continuação automática do plano de pacotes interrompido |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |

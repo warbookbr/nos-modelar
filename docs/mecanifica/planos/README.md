@@ -2,8 +2,7 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-14-mcp-montagens-leitura.md`](2026-08-14-mcp-montagens-leitura.md).
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -16,7 +15,9 @@ v1 foi concluída no arquivo
 O plano de relações locais foi concluído no R06 pelo PR #41, mergeado na `main`
 no commit `e7b80ac`. As provas A–F, fixtures persistidas v2, contrato v2 e o
 documento de continuidade arquitetural estão integrados. O contexto de
-montagem foi concluído no R05 na branch do PR #42. Não há plano ativo.
+montagem foi concluído no R05 na branch do PR #42. A leitura e auditoria de
+montagens por MCP foi aprovada no R04, com consumo caixa-preta e visão real.
+Não há plano ativo.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -68,7 +69,7 @@ as capacidades internas já provadas de montagem; escrita continua separada.
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura e auditoria de montagens ativa; autoria continua fora |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura e auditoria de montagens concluída: aprovar; autoria ainda exige plano próprio |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -126,6 +127,7 @@ nos arquivos originais.
 | Contexto de montagem para IA | concluído: R05, PR #42 |
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
 | Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
+| MCP — leitura e auditoria de montagens | concluído: aprovar, R04 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -147,10 +149,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-**MCP — leitura e auditoria de montagens** é o único plano ativo. Montagem
-Persistida v1/v2/v3, contexto estrutural, contexto visual, revalidação assistida
-e escrita interna imutável continuam concluídos. Escrita MCP, materialização,
-refatoração do motor e materiais permanecem fora deste recorte.
+Não há plano ativo. Montagem Persistida v1/v2/v3, contexto estrutural e visual,
+revalidação assistida, escrita interna imutável e leitura de montagens por MCP
+estão concluídos. Materialização/autoria segura é a continuidade recomendada;
+escrita MCP pode integrar esse avanço quando seus gates forem provados.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita

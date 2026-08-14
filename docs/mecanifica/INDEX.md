@@ -21,14 +21,14 @@ aplicação publicada aqui.
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
   montagem para IA foi concluído no R05 com descritor puro e CLI confinada. O
   plano de separação direcional e impacto local foi concluído no R04 com
-  montagem v3 e mapa derivado; mapa global, revalidação automática, writer, MCP
+  montagem v3 e mapa derivado; mapa global, revalidação automática, escrita MCP
   e API permanecem fora.
 - O plano de contexto visual e autoria segura foi concluído no R05: captura
   privada, revalidação assistida, catálogo explícito e revisões imutáveis foram
-  provados; MCP e materialização no workspace continuam fora.
-- O [plano ativo](planos/2026-08-14-mcp-montagens-leitura.md) expõe contexto,
-  revalidação, catálogo e vistas de montagem por MCP somente leitura. A
-  exclusão de escrita vale para esta fatia, não como veto arquitetural futuro.
+  provados; escrita MCP e materialização no workspace continuam fora.
+- O [plano de leitura MCP](planos/2026-08-14-mcp-montagens-leitura.md) foi
+  concluído e aprovado: contexto, revalidação, catálogo e vistas de montagem
+  são consumíveis por IDs semânticos. A ausência de escrita não é veto futuro.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -174,8 +174,6 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Integrar contexto visual, dependentes e validações na porta MCP somente
-  leitura atualmente ativa.
 - Definir materialização segura das revisões imutáveis antes de abrir escrita
   por MCP, CLI ou API.
 - Resolver costuras topológicas de `lathe`.

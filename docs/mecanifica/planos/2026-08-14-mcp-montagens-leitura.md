@@ -1,6 +1,6 @@
 # MCP — leitura e auditoria de montagens
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura, execução e revisão)
 
@@ -54,15 +54,15 @@ IDs e caminhos semânticos de instâncias.
 
 ## Fatias
 
-1. **R00 — ativo:** registrar o plano, corrigir estado documental e definir a
+1. **R00 — concluído:** registrar o plano, corrigir estado documental e definir a
    configuração explícita do catálogo.
-2. **R01 — pendente:** expor descoberta e descrição de montagem por ID, com
+2. **R01 — concluído:** expor descoberta e descrição de montagem por ID, com
    confinamento, schema público e erros acionáveis.
-3. **R02 — pendente:** expor roteiro de revalidação e catálogo entre raízes
+3. **R02 — concluído:** expor roteiro de revalidação e catálogo entre raízes
    explicitamente escolhidas pelo agente.
-4. **R03 — pendente:** extrair captura visual em memória e transportar vistas
+4. **R03 — concluído:** extrair captura visual em memória e transportar vistas
    solicitadas por MCP com limites de payload e enquadramento.
-5. **R04 — pendente:** executar consumo caixa-preta, medir respostas, rodar os
+5. **R04 — concluído:** executar consumo caixa-preta, medir respostas, rodar os
    gates completos, atualizar contratos e decidir o próximo recorte.
 
 ## Provas obrigatórias
@@ -92,3 +92,28 @@ disco, duplicação de regra do resolvedor ou escrita para transportar imagens.
 Concluir somente com cliente caixa-preta, documentação atualizada, plano sem
 itens ativos e decisão explícita entre: avançar para materialização/autoria,
 corrigir a leitura ou interromper a exposição MCP.
+
+## Fechamento
+
+A leitura de montagens por MCP foi aprovada. O contrato público v3 anuncia o
+recurso `mecanifica://montagens` e quatro ferramentas somente leitura. O host
+configura raízes e referências; o agente usa apenas IDs e caminhos semânticos.
+Catálogo ausente mantém as ferramentas de peça funcionais e anuncia lista vazia.
+
+O cliente caixa-preta descobriu as duas raízes de prova, descreveu montagem,
+derivou revalidação, catalogou usos e recebeu duas vistas PNG em memória sem
+alterar o worktree. As respostas textuais medidas ocuparam 1.728 bytes para
+descrição, 1.049 para revalidação e 984 para catálogo. As vistas isométrica e
+direita ficaram enquadradas e sem corte.
+
+`npm test` passou com 66 arquivos, 1.190 testes aprovados e 2 ignorados. A prova
+visual MCP passou com 41/41. Typecheck, build, porteiro 7/7, exportação,
+gabaritos, guardas de portas/câmera/par, mapa, links, planos e criação de
+`_viga` passaram. A varredura geométrica A-33 manteve as mesmas 147 combinações
+e asserções, mas recebeu orçamento explícito de 15 s após exceder repetidamente
+o default de 5 s sob carga.
+
+**Decisão:** avançar, em plano posterior, para materialização/autoria segura.
+Escrita MCP não está proibida: ela pode entrar quando o fluxo interno provar
+pré-validação, comparação com a revisão observada, revalidação e publicação sem
+estado parcial.

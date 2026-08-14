@@ -73,8 +73,8 @@ Não crie `revisao.json` ou imagens manualmente para simular promoção.
 
 Uma tarefa de sistema deve começar antes do pacote de peça. Os serviços atuais
 já derivam alvo consultado, contexto estrutural/visual e relações afetadas numa
-raiz explícita; o plano MCP ativo está tornando essa leitura diretamente
-consumível por agentes.
+raiz explícita; o MCP aprovado tornou essa leitura diretamente consumível por
+agentes.
 
 O sistema precisará derivar:
 

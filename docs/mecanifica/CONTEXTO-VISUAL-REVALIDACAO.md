@@ -15,10 +15,41 @@ neutros e separados:
 Nenhuma saída afirma colisão ou validade global. O catálogo não varre disco nem
 infere dependência por proximidade.
 
-O plano ativo de leitura de montagens por MCP expõe essas capacidades por IDs
-semânticos. A configuração confiável do servidor declara as raízes; o agente
-não fornece nem recebe caminhos locais. Escrita continua fora apenas dessa
-fatia e pode avançar depois com plano e provas próprios.
+A leitura de montagens por MCP expõe essas capacidades por IDs semânticos. A
+configuração confiável do servidor declara as raízes; o agente não fornece nem
+recebe caminhos locais. Escrita ficou fora dessa fatia e pode avançar depois
+com plano e provas próprios.
+
+## MCP somente leitura
+
+O host habilita montagens com a variável
+`MECANIFICA_CATALOGO_MONTAGENS`, apontando para um JSON local absoluto. Sem ela,
+o servidor continua funcional para peças e anuncia catálogo de montagens vazio.
+O arquivo de configuração usa este contrato:
+
+```json
+{
+  "formato": "mecanifica.catalogo-mcp-montagens",
+  "versao": 1,
+  "raizMontagens": "montagens",
+  "raizPecas": "pecas-resolvidas",
+  "raizes": [
+    { "id": "conjunto-dianteiro", "ref": "conjunto" }
+  ]
+}
+```
+
+Os dois diretórios resolvem relativamente ao arquivo de configuração. `ref` é
+usado somente pelo host; o cliente descobre apenas `id` em
+`mecanifica://montagens` e chama:
+
+- `descrever_montagem` para contexto inteiro ou recorte semântico;
+- `planejar_revalidacao_montagem` para relações e pendências do alvo;
+- `catalogar_montagens` para usos entre as raízes escolhidas;
+- `renderizar_montagem` para uma a quatro vistas em memória.
+
+As ferramentas não aceitam caminhos locais e mantêm as anotações MCP de leitura
+sem efeito destrutivo. O contrato público é `mecanifica.mcp.revisao.v3`.
 
 ## Captura confinada
 
