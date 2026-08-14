@@ -35,9 +35,9 @@ aplicação publicada aqui.
   aprovado: snapshots imutáveis, ativação por revisão observada, revalidação
   condicionante e perfil MCP de autoria opt-in foram provados no mesmo recorte.
 - O [experimento de autoria geométrica do zero](planos/2026-08-14-experimento-autoria-geometrica.md)
-  (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`) está
-  ativo: prova receitas confinadas, montagem, inspeção, alteração e correção por
-  autoria MCP sem mudar o núcleo ou o catálogo publicado.
+  (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`)
+  concluiu com `corrigir`: receitas, relações e vistas passaram, mas autoria MCP
+  de montagem não pode corrigir uma receita; o relatório define o próximo recorte.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -184,7 +184,7 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Executar o experimento de autoria geométrica do zero.
+- Escolher e abrir autoria segura de receitas; não há plano ativo.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
@@ -217,6 +217,9 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 [COORDENACAO-LOCAL](COORDENACAO-LOCAL.md), [COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](PLANO.md).
 
 Evidência atual: [estudo de campo do conjunto dianteiro](RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
+O [relatório de autoria geométrica](RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md)
+(`docs/mecanifica/RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md`) registra a
+decisão `corrigir` e a fronteira de autoria de receitas.
 O próximo experimento já tem [conjunto neutro definido](CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md)
 (`docs/mecanifica/CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md`), mas não possui plano ativo.
 

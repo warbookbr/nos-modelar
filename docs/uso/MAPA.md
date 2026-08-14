@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-323 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+330 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -52,6 +52,18 @@
 
 - `condicao-assistida.js` — PEÇA DE EXERCÍCIO — dobradiça vertical de portão para inspeção na bancada. Duas folhas de chapa compartilham o eixo Y: a folha fixa carrega o gomo central e …
 - `condicao-crua.js` — DOBRADIÇA DE PORTÃO — conjunto procedural técnico-didático F2 para inspeção e montagem. Duas folhas retangulares de 1,20 m × 0,65 m × 35 mm encontram-se num …
+
+## autoria-assistida/experimentos/autoria-geometrica-do-zero/
+
+- `auditar-visual.mjs` — Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada.
+- `executar-estudo.mjs` — Executor reproduzível da fixture, sem publicar receitas no catálogo.
+- `materializar-catalogo.mjs` — Materializa JSONs descartáveis para o catálogo MCP local do experimento.
+
+## autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/
+
+- `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
+- `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
+- `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
 
 ## autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/
 
@@ -143,6 +155,7 @@
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
+- `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 

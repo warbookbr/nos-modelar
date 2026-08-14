@@ -1,6 +1,6 @@
 # Experimento de autoria geométrica do zero
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura, execução e revisão)
 
@@ -80,4 +80,7 @@ autorizado por MCP sem caminho do consumidor.
 
 ## Fechamento
 
-Preencher com medidas, gates, decisão e candidatos devolvidos ao backlog.
+As receitas passaram sem órfãos; a base satisfez 3/3 relações e a alteração do
+eixo recusou somente a separação direcional (−0,010 m). Duas vistas reais foram
+válidas. **Decisão: corrigir.** MCP materializa montagens, não receitas; simular
+correção geométrica pela montagem seria prova falsa. Próximo recorte: receitas.

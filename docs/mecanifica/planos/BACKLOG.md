@@ -17,6 +17,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
 | Autoria por MCP | montagem concluída em perfil opt-in; receita permanece não definida |
 | Experimento de autoria geométrica do zero | conjunto definido: suporte de eixo, eixo-guia e anel-tampa; aguarda plano executivo |
+| Autoria segura de receitas | proposta, execução isolada, auditoria visual e publicação confirmada; contrato separado da autoria de montagem |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
 | Diagnóstico visual estruturado | ligar medidas e falhas a entidades visíveis por identidade semântica |
