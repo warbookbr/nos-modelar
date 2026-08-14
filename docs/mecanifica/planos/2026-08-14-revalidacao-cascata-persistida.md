@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-R00, R01, R02 e R03 concluídas com decisão `prosseguir`; R04 é o próximo passo.
+R00–R04 concluídas com decisão `prosseguir`; R05 é o próximo passo.
 
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
@@ -161,7 +161,7 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 - expor resumo, pendências e registro seguro por MCP usando IDs;
 - manter documentos internos e caminhos fora da resposta;
-- provar retomada por consumidor caixa-preta em nova sessão.
+- provar retomada por consumidor caixa-preta em nova sessão. **Resultado:** concluída; 19 provas acumuladas passaram.
 
 ### R05 — estudo de campo
 

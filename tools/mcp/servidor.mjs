@@ -9,6 +9,7 @@ import { criarFerramentasMontagem } from './perfis/montagens.mjs';
 import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
 import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
+import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
 import { catalogoMontagensDoAmbiente } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
@@ -259,10 +260,14 @@ export function criarServidor({
     ? universoDependencias.comProvedores(provedoresUniverso)
     : universoDependencias;
   const contextoAutoria = { ...autoria, catalogo: catalogoAtivo };
+  const ferramentasRevalidacao = autoria.configurado
+    ? criarFerramentasRevalidacao({ raizRepositorio: autoria.raizRepositorio, podeEscrever: perfil === 'autoria' })
+    : [];
   const leitura = [
     ...ferramentasRevisao,
     ...criarFerramentasMontagem(catalogoAtivo),
     ...criarFerramentasImpactoGlobal(universoAtivo),
+    ...ferramentasRevalidacao,
   ];
   const perfilAutoria = perfil === 'autoria' && autoria.configurado && catalogoMontagens.configurado;
   const ferramentas = perfilAutoria

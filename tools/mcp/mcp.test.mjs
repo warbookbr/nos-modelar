@@ -640,6 +640,7 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(publico.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+        'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao',
         'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);

@@ -136,6 +136,11 @@ A superfície MCP passou para `mecanifica.mcp.revisao.v5` e o servidor
 `mecanifica-mcp` 0.5.0. O contrato anterior v4 não anuncia essa ferramenta nem
 o recurso de dependências.
 
+O R04 acrescenta, quando o host configura uma raiz de autoria, consulta de
+campanha e item por identidade semântica no perfil de revisão. O perfil de
+autoria opt-in acrescenta registro de resultado e obsolescência com revisão e
+CAS; as respostas são resumos sem caminhos locais, documentos ou geometria.
+
 ## Continuidade e escala da R05
 
 A prova de continuidade publica, em repositório temporário de autoria, uma
