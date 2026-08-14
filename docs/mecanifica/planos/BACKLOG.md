@@ -13,7 +13,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Mapa de composição e dependências | concluído e aprovado: universo explícito, mapa derivado, impacto global MCP, continuidade ativa e recusa concorrente |
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
 | Revalidação de dependentes | próximo candidato: cascata global persistida, derivada do impacto canônico; não executar, corrigir ou promover dependentes automaticamente |
-| Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v4 |
+| Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v5 |
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
 | Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |
 | Experimento de autoria geométrica do zero | concluído: correção publicada por autoria declarativa; decisão final aprovar |
