@@ -15,8 +15,8 @@ vista e revalidação, e o perfil de autoria perdia as ferramentas de leitura.
 Isso tornava a continuidade entre sessões mais fraca que a própria autoria.
 
 Esse gargalo foi corrigido pelo plano de continuidade de autoria ativa. Em
-seguida, as R00/R01 do mapa canônico fixaram um universo declarativo e passaram
-a capturar suas fontes em uma visão completa, confinada e consistente.
+seguida, as R00–R02 do mapa canônico fixaram o universo, o snapshot consistente
+e a derivação global de composição, ocorrências e usos reversos.
 
 ## Leitura por capacidade
 
@@ -24,8 +24,8 @@ a capturar suas fontes em uma visão completa, confinada e consistente.
 |---|---|---|
 | Gerar peça procedural | forte no contrato declarativo v1 | não cobre todo módulo JS histórico nem todas as formas desejadas |
 | Inspecionar peça | forte | diagnóstico visual ainda não liga toda crítica a uma ação semântica |
-| Compor montagens | forte no catálogo explícito e relações v1–v3 | não existe mapa global canônico |
-| Medir e revalidar | forte para relações e raízes conhecidas | cobertura depende da lista explícita do host; a derivação global ainda não existe |
+| Compor montagens | forte no catálogo explícito e relações v1–v3 | consulta global ainda não existe |
+| Medir e revalidar | forte para relações e raízes conhecidas | cobertura depende da lista explícita do host; cascata ainda não existe |
 | Publicar com segurança | forte para receita e montagem autorizadas | não há rollback/promocão de revisão anterior nem variantes simultâneas |
 | Continuar em outra sessão | forte no catálogo configurado após este recorte | não atravessa catálogos ou hosts não declarados |
 | Escalar para carro completo | fundação correta, ainda incompleta | descoberta global, orçamento de contexto e revalidação em cascata faltam |
@@ -63,11 +63,9 @@ observou o mesmo máximo em X de 0,010 m.
 
 ### 1. Mapa canônico global de dependências
 
-É o próximo plano recomendado. Hoje a segurança é boa dentro das raízes que o
-host declarou, mas o sistema não responde globalmente quais montagens usam uma
-peça. O mapa deve ser derivado de documentos persistidos, guardar identidade e
-proveniência e produzir o conjunto mínimo de dependentes a revalidar. Não deve
-ser um Markdown manual nem uma busca implícita sem contrato.
+Está em execução e já possui derivação canônica. O próximo recorte é expor
+consulta direcionada sobre esse mapa, preservando identidade, proveniência e o
+universo declarado.
 
 ### 2. Revalidação em cascata com estado persistido
 
@@ -106,17 +104,16 @@ ou paleta por implicação.
 
 ## Direção recomendada
 
-Abrir em seguida o mapa canônico global com escopo somente leitura e geração de
-impacto. Depois ligá-lo à revalidação persistida. Esse par é o que transforma a
+Abrir em seguida a consulta de impacto global em escopo somente leitura e depois
+ligá-la à revalidação persistida. Esse par transforma a
 base atual — excelente para um conjunto explícito — em infraestrutura capaz de
 manter sistemas grandes sem exigir que a IA carregue ou conheça o carro inteiro.
 
 Esse avanço já foi aberto em
 [`2026-08-14-mapa-canonico-dependencias.md`](planos/2026-08-14-mapa-canonico-dependencias.md).
-A R00 fixou o contrato do universo e provou as recusas estruturais. A R01
-acrescentou snapshot confinado, hashes, fallback estático, revisões ativas e
-recusa de concorrência; a derivação do mapa e a consulta global começam na
-R02/R03.
+A R00 fixou o contrato, a R01 acrescentou snapshot confinado e a R02 derivou
+composição, ocorrências, relações e usos reversos; a consulta global começa na
+R03.
 
 Novas operações geométricas continuam válidas quando um estudo de campo as
 colocar no caminho crítico; elas não devem competir automaticamente com a
@@ -124,7 +121,7 @@ continuidade e o controle de dependências.
 
 ## Evidência de fechamento
 
-Os gates completos passaram com 73 arquivos de teste, 1.232 testes aprovados e
+Os gates completos passaram com 74 arquivos de teste, 1.237 testes aprovados e
 2 ignorados. Também passaram typecheck, build, porteiro 7/7, gabarito de seleção
 para 36 peças, guardas de identidade, portas, câmera e pares, inventário, links,
 planos, exportação e criação de `_viga`. **Decisão do recorte: aprovar.**

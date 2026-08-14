@@ -1,6 +1,6 @@
 # Mapa canônico de dependências
 
-Este documento fixa o contrato da R00. Ele não é o mapa gerado: a fonte de
+Este documento fixa o contrato das R00–R02. Ele não é o mapa gerado: a fonte de
 verdade continua sendo o manifesto e as montagens persistidas autorizadas.
 
 ## Universo de autoria v1
@@ -60,6 +60,21 @@ mudança de estado durante uma captura e compara hashes, fontes e revisões entr
 as duas visões; uma tentativa adicional pode ser feita antes do diagnóstico
 `universo-alterado`. Nenhuma visão parcial é publicada.
 
+## Mapa derivado da R02
+
+`mecanifica.mapa-dependencias`, versão `1`, é derivado somente de um snapshot
+completo. Ele contém `entidades` com proveniência, `composicao` para declarações
+diretas, `ocorrencias` para cada caminho semântico desde uma raiz, `usos` para
+o índice reverso e `relacoes` para declarações e suas ocorrências. `raizes` e
+`cobertura` preservam o universo ao qual a alegação de completude se refere.
+
+Uma montagem compartilhada aparece uma vez como entidade e declaração, mas cada
+instância e cada caminho desde uma raiz aparece como ocorrência. Endpoints de
+relação são convertidos para IDs e passos semânticos; nenhum índice de array,
+UUID, caminho local ou malha é exportado. Todas as listas são ordenadas por
+identidade e caminho, e a mesma autoria em ordem equivalente produz os mesmos
+bytes JSON.
+
 ## Fixture de prova
 
 `tools/mecanifica/fixtures/mapa-dependencias/` contém:
@@ -79,6 +94,6 @@ duplicidade, identidade divergente e ciclo.
 ## Fronteira
 
 R00 valida o universo e suas referências de composição. R01 acrescenta o
-snapshot de fontes, revisões ativas, hashes e recusa de concorrência. R02
-derivará arestas, relações e usos reversos. Este contrato não executa
-revalidação, não prova colisão e não altera autoria.
+snapshot de fontes, revisões ativas, hashes e recusa de concorrência. R02 deriva
+arestas, ocorrências, relações e usos reversos. R03 consultará esse mapa. Este
+contrato não executa revalidação, não prova colisão e não altera autoria.

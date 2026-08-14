@@ -120,14 +120,15 @@ Evidência: serviço puro `snapshot-universo-autoria`, adaptador confinado,
 fallback estático/revisão ativa, hashes sem caminhos e oito entidades; provas
 cobrem completude, sobreposição, mutação e revisão. A derivação permanece na R02.
 
-### R02 — derivação canônica
+### R02 — derivação canônica — concluída
 
 - construir entidades, composição, relações, usos reversos e proveniência;
-- ordenar e deduplicar deterministicamente;
-- distinguir montagem declarada, instância e ocorrência por caminho;
-- provar determinismo sob permutação do manifesto e instâncias repetidas.
+- ordenar deterministicamente e distinguir declaração, instância e ocorrência;
+- provar permutação equivalente, instâncias repetidas e endpoints semânticos.
 
-**Saída:** `mecanifica.mapa-dependencias` v1 puro e reproduzível.
+**Saída:** `mecanifica.mapa-dependencias` v1 puro e reproduzível. Evidência:
+derivador puro e cinco provas sobre a fixture da R01 cobrem duas
+raízes compartilhadas, ramo isolado, relações, proveniência e cobertura.
 
 ### R03 — consulta de impacto global
 

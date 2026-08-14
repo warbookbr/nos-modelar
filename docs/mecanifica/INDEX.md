@@ -67,10 +67,9 @@ aplicação publicada aqui.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem. As R00 e R01 do mapa canônico global fixaram
-  o contrato de universo, o validador estrutural e o snapshot confinado com
-  hashes, fallback estático e revisões ativas; derivação completa, descoberta
-  de usos e consulta de impacto ainda estão por executar. Colisão geral, solver
+  o mapa de impacto local existem. As R00–R02 do mapa canônico global fixaram
+  universo, snapshot confinado, composição, ocorrências, relações e usos
+  reversos; consulta de impacto ainda está por executar. Colisão geral, solver
   e camada completa de escrita continuam fora.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
