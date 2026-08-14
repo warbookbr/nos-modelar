@@ -31,6 +31,27 @@ function direcao(vista) {
   return ({ isometrica: [1, 0.8, 1], frontal: [0, 0, 1], direita: [1, 0, 0], superior: [0, 1, 0] })[vista] ?? [1, 0.8, 1];
 }
 
+function enquadramento(caixa) {
+  const xs = [caixa.min.x, caixa.max.x];
+  const ys = [caixa.min.y, caixa.max.y];
+  const zs = [caixa.min.z, caixa.max.z];
+  const pontos = xs.flatMap((x) => ys.flatMap((y) => zs.map((z) => new THREE.Vector3(x, y, z).project(camera))));
+  const minX = Math.min(...pontos.map((ponto) => ponto.x));
+  const maxX = Math.max(...pontos.map((ponto) => ponto.x));
+  const minY = Math.min(...pontos.map((ponto) => ponto.y));
+  const maxY = Math.max(...pontos.map((ponto) => ponto.y));
+  const largura = Math.max(0, maxX - minX) / 2;
+  const altura = Math.max(0, maxY - minY) / 2;
+  const cortado = minX < -1 || maxX > 1 || minY < -1 || maxY > 1;
+  return {
+    valida: !cortado && largura >= 0.05 && altura >= 0.05,
+    area: largura * altura,
+    largura,
+    altura,
+    cortado,
+  };
+}
+
 window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   while (scene.children.length > 2) scene.remove(scene.children.at(-1));
   const visual = adaptarMontagemThree(reconstituir(dados));
@@ -47,5 +68,10 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.render(scene, camera);
-  return { id: dados.id, vista, instancias: [...visual.instancias.values()].map((item) => item.caminho) };
+  return {
+    id: dados.id,
+    vista,
+    instancias: [...visual.instancias.values()].map((item) => item.caminho).sort(),
+    enquadramento: enquadramento(caixa),
+  };
 };

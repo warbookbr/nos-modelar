@@ -5,46 +5,58 @@ import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
 import { ferramentasRevisao } from './perfis/revisao.mjs';
+import { criarFerramentasMontagem } from './perfis/montagens.mjs';
+import { catalogoMontagensDoAmbiente } from './catalogo-montagens.mjs';
 import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.2.0' });
+const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.3.0' });
 
-const estado = Object.freeze({
-  contrato: VERSAO_CONTRATO_MCP,
-  perfil: PERFIL,
-  transporte: TRANSPORTE,
-  ferramentas: ferramentasRevisao.map(({ nome }) => nome),
-  capacidadesAusentes: [
-    'promover_revisao',
-    'autoria',
-    'materiais',
-    'coordenacao',
-    'servidor_http',
-  ],
-});
+function estadoDo(ferramentas, catalogoMontagens) {
+  return {
+    contrato: VERSAO_CONTRATO_MCP,
+    perfil: PERFIL,
+    transporte: TRANSPORTE,
+    ferramentas: ferramentas.map(({ nome }) => nome),
+    catalogoMontagensConfigurado: catalogoMontagens.configurado,
+    capacidadesAusentes: [
+      'promover_revisao',
+      'autoria',
+      'materiais',
+      'coordenacao',
+      'servidor_http',
+    ],
+  };
+}
 
-const capacidadesModelagem = Object.freeze({
-  perfil: PERFIL,
-  consegue: [
-    'descrever uma peça pela régua neutra existente',
-    'validar um pacote oficial somente leitura',
-    'comparar duas revisões oficiais do mesmo pacote',
-    'produzir e transportar as quatro vistas oficiais sem escrita',
-    'descobrir pacotes e revisões oficiais disponíveis',
-  ],
-  aindaNaoConsegue: [
-    'promover ou escrever revisões',
-    'editar autoria, materiais ou documentação',
-  ],
-  limites: [
-    'aceita identificadores, nunca caminhos do cliente',
-    'não executa shell, Git ou servidor HTTP',
-    'não escreve em pacotes, revisões, fontes ou documentação',
-  ],
-});
+function capacidadesDo(catalogoMontagens) {
+  return {
+    perfil: PERFIL,
+    consegue: [
+      'descrever uma peça pela régua neutra existente',
+      'validar um pacote oficial somente leitura',
+      'comparar duas revisões oficiais do mesmo pacote',
+      'produzir e transportar as quatro vistas oficiais de peça sem escrita',
+      'descobrir pacotes e revisões oficiais disponíveis',
+      'descobrir e descrever montagens explicitamente autorizadas',
+      'derivar roteiro de revalidação e catálogo entre raízes escolhidas',
+      'produzir vistas de montagem ou subárvore em memória',
+    ],
+    aindaNaoConsegue: [
+      'promover ou escrever revisões',
+      'editar ou materializar autoria, materiais ou documentação',
+    ],
+    limites: [
+      'aceita identificadores semânticos, nunca caminhos do cliente',
+      'catálogo de montagens depende de configuração explícita do host',
+      `catálogo de montagens configurado: ${catalogoMontagens.configurado ? 'sim' : 'não'}`,
+      'não executa shell, Git ou servidor HTTP',
+      'não escreve em pacotes, revisões, fontes ou documentação',
+    ],
+  };
+}
 
 function textoDaResposta(nome, resposta) {
   if (resposta.ok) return `${nome}: operação concluída.`;
@@ -68,8 +80,8 @@ function respostaFalhaInterna(nome, erro) {
   };
 }
 
-function registrarPerfil(server) {
-  for (const ferramenta of ferramentasRevisao) {
+function registrarPerfil(server, ferramentas) {
+  for (const ferramenta of ferramentas) {
     server.registerTool(
       ferramenta.nome,
       {
@@ -104,7 +116,9 @@ function registrarPerfil(server) {
   }
 }
 
-function registrarRecursos(server) {
+function registrarRecursos(server, { ferramentas, catalogoMontagens }) {
+  const estado = estadoDo(ferramentas, catalogoMontagens);
+  const capacidadesModelagem = capacidadesDo(catalogoMontagens);
   server.registerResource(
     'estado',
     'mecanifica://estado',
@@ -137,12 +151,34 @@ function registrarRecursos(server) {
       }],
     }),
   );
+  server.registerResource(
+    'catalogo-montagens',
+    'mecanifica://montagens',
+    {
+      title: 'Catálogo de montagens',
+      description: 'Raízes explicitamente autorizadas pelo host, sem caminhos locais.',
+      mimeType: 'application/json',
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        mimeType: 'application/json',
+        text: JSON.stringify({
+          formato: 'mecanifica.catalogo-mcp-montagens-publico',
+          versao: 1,
+          configurado: catalogoMontagens.configurado,
+          raizes: catalogoMontagens.listar(),
+        }),
+      }],
+    }),
+  );
 }
 
-export function criarServidor() {
+export function criarServidor({ catalogoMontagens = catalogoMontagensDoAmbiente() } = {}) {
   const server = new McpServer(IDENTIDADE);
-  registrarPerfil(server);
-  registrarRecursos(server);
+  const ferramentas = [...ferramentasRevisao, ...criarFerramentasMontagem(catalogoMontagens)];
+  registrarPerfil(server, ferramentas);
+  registrarRecursos(server, { ferramentas, catalogoMontagens });
   return server;
 }
 
