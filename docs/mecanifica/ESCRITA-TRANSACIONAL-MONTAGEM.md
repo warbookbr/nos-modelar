@@ -2,8 +2,8 @@
 
 ## Estado
 
-**Bloqueada por garantia de armazenamento.** Não existe writer publicado para
-montagens, receitas ou MCP.
+**Contrato local em prova.** Existe um repositório interno de revisões
+imutáveis; não existe escrita publicada por MCP, API ou Git remoto.
 
 ## Contrato necessário
 
@@ -15,7 +15,7 @@ devem preservar o estado anterior byte a byte. Sobrescrita nunca é implícita.
 O retorno precisa distinguir `planejado`, `aplicado`, `destino-existente` e
 `falha-recuperavel`; não pode chamar uma publicação parcial de sucesso.
 
-## Bloqueio comprovado
+## Limite anterior
 
 O experimento de autoria controlada (PR #25, não mergeado) demonstrou que a API
 portátil de `fs` do Node não prova, para diretórios, uma transição única de um
@@ -23,12 +23,25 @@ conjunto completo com `no-clobber` contra destino concorrente. Criar o destino
 exclusivamente e mover arquivos depois deixa uma janela observável e pode
 persistir estado parcial sob término abrupto.
 
-Portanto, este plano não implementa um writer que finja atomicidade. Retomar
-exige escolher e provar uma alternativa:
+## Decisão
 
-1. primitivo nativo de rename sem substituição, com plataforma suportada
-   explicitamente definida;
-2. protocolo de commit/visibilidade com contrato de armazenamento revisado;
-3. redução explícita da garantia, aprovada como mudança de produto.
+Foi escolhido um protocolo de commit/visibilidade com armazenamento revisado:
 
-MCP, API, Git remoto e edição de receitas continuam fora até essa decisão.
+1. o conteúdo completo vira um objeto canônico identificado por SHA-256;
+2. objeto e commit são escritos e sincronizados em temporários irmãos;
+3. `fs.link` publica cada arquivo completo sem substituir destino existente;
+4. somente o commit publicado torna a revisão visível aos leitores;
+5. revisões são imutáveis e nomeadas pelo próprio hash;
+6. dois filhos do mesmo pai são conflito explícito, nunca sobrescrita.
+
+Uma queda antes do commit pode deixar objeto órfão, mas nenhuma revisão parcial
+visível. Limpeza de órfãos pode ser feita depois sem afetar o histórico. A API
+oficial do Node confirma que `open` com `wx` recusa caminho existente e que
+`fsPromises.link` cria um novo nome para um arquivo já completo; o protocolo não
+depende de rename de diretório.
+
+O recorte suporta sistema de arquivos local comum. Filesystem de rede não é
+prometido porque exclusividade pode variar por implementação.
+
+MCP, API, Git remoto e materialização de arquivos de trabalho continuam fora
+até o contrato interno completar seus gates e ganhar uma porta separada.
