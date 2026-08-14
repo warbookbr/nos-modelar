@@ -124,7 +124,7 @@ quebraria seu fechamento e porque endpoint de região difere de endpoint porta.
 
 1. R00 — concluído: contrato v3 e fixture estrutural neutra;
 2. R01 — concluído: leitura/resolução de `mantemSeparacaoDirecional`;
-3. R02 — mapa de impacto direto e indireto;
+3. R02 — concluído: mapa de impacto direto e indireto;
 4. R03 — integração no contexto e estudo de campo;
 5. R04 — documentação, regressões e fechamento.
 
