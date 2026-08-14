@@ -1,6 +1,6 @@
 # Contexto de montagem persistida para IA
 
-**Estado:** ativo
+**Estado:** concluído
 **Responsável:** GPT (arquitetura e revisão) e agente local (execução)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`; `main` em `5c5f1aa`, PR #42;
@@ -168,9 +168,7 @@ canônico; uso/diagnóstico fica em `stderr`. A CLI não replica regra do servi�
 3. R02 — concluído: caminho, profundidade e relacionados;
 4. R03 — concluído: CLI confinada e diagnóstico;
 5. R04 — concluído: repetir R001/R002 e medir contexto;
-6. R05 — documentação, gates, decisão e fechamento.
-
-Cada R termina verde e em commit próprio; falha não antecipa render ou MCP.
+6. R05 — concluído: documentação, gates, decisão e fechamento.
 
 ## Sequência posterior
 
@@ -196,5 +194,7 @@ consumidor real.
 
 ## Fechamento
 
-Registrar estado, base, commits/PR, saída aceita, bytes completo/reduzido,
-provas, gates, limitações e decisão sobre abrir ou não a fatia visual.
+Concluído no PR #42: serviço puro, consulta e CLI nos commits `f3e171f`,
+`8b08ae2` e `4d84b04`; estudo em `2f7f191`. Saídas: 17.772/6.712 bytes.
+Provas 1–7 e gates passaram; colisão, dependentes, visual, MCP e escrita seguem
+fora. Decisão: aprovar o descritor; não abrir automaticamente a fatia visual.

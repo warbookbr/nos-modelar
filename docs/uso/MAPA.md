@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-286 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+287 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -112,6 +112,7 @@
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
+- `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
