@@ -80,7 +80,7 @@ posterior, não definição de modelo.
 4. **R03 — concluído:** ler somente raízes declaradas, indexar usos
    e relações por caminhos semânticos; provar ordem, duplicata, raiz inválida e
    ausência de inferência fora do conjunto.
-5. **R04 — autoria transacional local:** antes de código, registrar contrato de
+5. **R04 — bloqueada:** antes de código, registrar contrato de
    destino, validação, lock/concorrência, troca atômica e recuperação. Implementar
    somente se a prova puder simular falha e concorrência sem estado parcial.
 6. **R05 — documentação e decisão:** atualizar fontes de verdade, repetir o
