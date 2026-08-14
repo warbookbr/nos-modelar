@@ -43,5 +43,7 @@ depende de rename de diretório.
 O recorte suporta sistema de arquivos local comum. Filesystem de rede não é
 prometido porque exclusividade pode variar por implementação.
 
-MCP, API, Git remoto e materialização de arquivos de trabalho continuam fora
-até o contrato interno completar seus gates e ganhar uma porta separada.
+MCP, API, Git remoto e materialização de arquivos de trabalho ainda não estão
+publicados nesta etapa. O plano ativo prova a materialização e pode expor o
+serviço por MCP no mesmo recorte quando o contrato interno completar seus gates;
+isso não exige uma porta ou plano separado por princípio.
