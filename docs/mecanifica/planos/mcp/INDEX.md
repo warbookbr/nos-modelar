@@ -35,7 +35,7 @@ já comprovadas da Mecanifica.
 | Módulo | Finalidade | Etapas deste painel |
 |---|---|---|
 | 1. Leitura e revisão | Expor inspeção, validação, comparação e prova visual somente leitura sobre os serviços existentes. | preparação do núcleo e das CLIs; Fatias 1A e 1B; avaliação consolidada; correção de descoberta |
-| 2. Autoria | Expor criação e alteração reutilizando alvo, transação, formato e revalidação definidos no serviço neutro. | tentativa de pacotes encerrada; materialização e autoria segura de montagem ativas |
+| 2. Autoria | Expor criação e alteração reutilizando alvo, transação, formato e revalidação definidos no serviço neutro. | montagem, receita e continuidade ativa aprovadas |
 | 3. Materiais | Expor materiais somente depois de existir contrato canônico independente da porta de acesso. | candidato |
 | 4. Orquestração e distribuição | Transportar e operar o MCP com autenticação e múltiplos agentes quando o valor local estiver comprovado. | candidato |
 
@@ -55,6 +55,7 @@ futura não autoriza implementação até existir um plano executivo ativo.
 | Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
 | Autoria de montagem | concluído: aprovar | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../2026-08-14-materializacao-autoria-segura.md); perfil opt-in aprovado |
 | Autoria de receita | concluído: aprovar | contrato declarativo, revisão imutável, vistas e revalidação confinada | [plano datado](../2026-08-14-autoria-segura-receitas.md); JavaScript do agente permanece proibido |
+| Continuidade de autoria ativa | concluído: aprovar | autoria de montagem e receita aprovadas | [plano datado](../2026-08-14-continuidade-autoria-ativa.md); leitura e escrita compartilham revisões ativas autorizadas |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos agentes |
 
@@ -87,8 +88,9 @@ Planos executivos datados usam os estados aceitos por `npm run planos:check`.
 ## Decisão atual
 
 O Módulo 1 — leitura e revisão somente leitura — está **aprovado**. A extensão
-somente leitura para montagens e a autoria de montagem em perfil MCP opt-in
-também foram aprovadas; não há plano executivo ativo.
+para montagens e a autoria de montagem e receita em perfil opt-in também foram
+aprovadas. A continuidade das revisões publicadas no catálogo operacional foi
+aprovada; não há plano executivo ativo.
 
 A primeira tentativa de autoria controlada foi encerrada com decisão
 `interromper`. O protótipo do PR #25 demonstrou planejamento puro, confirmação

@@ -42,11 +42,15 @@ aplicação publicada aqui.
   (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
   receitas são dados JSON, passam por vistas e revalidação e não executam
   JavaScript fornecido pelo agente.
-- O plano ativo de [continuidade de autoria](planos/2026-08-14-continuidade-autoria-ativa.md)
-  fecha a quebra entre revisão publicada e catálogo operacional, sem alterar o
-  núcleo procedural ou descobrir dependências implícitas.
+- O plano de [continuidade de autoria](planos/2026-08-14-continuidade-autoria-ativa.md)
+  (`docs/mecanifica/planos/2026-08-14-continuidade-autoria-ativa.md`)
+  foi aprovado: revisão publicada e catálogo operacional agora compartilham o
+  mesmo estado, sem alterar o núcleo ou descobrir dependências implícitas.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
+- A análise consolidada de maturidade e próximas melhorias está em
+  [`RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](RELATORIO-ANALISE-GRANDES-MELHORIAS.md)
+  (`docs/mecanifica/RELATORIO-ANALISE-GRANDES-MELHORIAS.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
@@ -191,7 +195,8 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Executar e encerrar o plano ativo de continuidade de autoria.
+- Escolher e abrir o próximo plano executivo; o mapa canônico global é a
+  recomendação técnica atual.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.

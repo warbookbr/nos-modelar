@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-336 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+340 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -154,6 +154,7 @@
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
+- `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
@@ -182,6 +183,7 @@
 - `2026-08-14-autoria-segura-receitas.md` — Autoria segura de receitas declarativas
 - `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
 - `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
+- `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
 - `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
 - `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
 - `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
@@ -392,6 +394,8 @@
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — argumentos.test.ts — prova de que os CLIs da Mecanifica não engolem bandeira desconhecida em silêncio (MEDIA-7). O defeito: `--estrit` (uma letra a menos que…
 - `arranjo-em-peca.test.ts` — arranjo-em-peca.test.ts — a prova do ciclo "Arranjos semânticos v1" NA PEÇA, não só no núcleo.
+- `autoria-ativa.mjs` — autoria-ativa.mjs — provedores neutros para revisões imutáveis ativas.
+- `autoria-ativa.test.mjs` — autoria-ativa.test.mjs — continuidade autorizada e falha fechada.
 - `autoria-montagem.mjs` — autoria-montagem.mjs — planejamento e aplicação interna de montagens v1/v2/v3.
 - `autoria-montagem.test.ts` — Provas R02: planejar, confirmar, validar e materializar montagem persistida.
 - `autoria-receita.mjs` — autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript.

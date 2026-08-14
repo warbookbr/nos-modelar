@@ -2,10 +2,11 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-14-continuidade-autoria-ativa.md`](2026-08-14-continuidade-autoria-ativa.md).
+**Plano ativo:** nenhum.
 
-O recorte fecha a quebra entre publicar e reutilizar: revisões imutáveis
+O plano de
+[`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
+concluído e aprovado. Revisões imutáveis
 autorizadas passam a alimentar leitura, vistas e revalidação, e o perfil de
 autoria preserva as ferramentas de auditoria. Ele não abre mapa global,
 correção automática de dependentes nem publicação em fontes JavaScript.
@@ -159,5 +160,5 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
 foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
-agente. A continuidade dessas revisões no catálogo é tratada pelo plano ativo;
+agente. A continuidade dessas revisões no catálogo foi concluída e aprovada;
 os demais candidatos permanecem no [`BACKLOG.md`](BACKLOG.md).

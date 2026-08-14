@@ -52,15 +52,16 @@ contrato procedural.
 
 A bancada atual consegue mostrar peças, partes semânticas, hierarquia,
 subárvores, isolamento, contexto visual, vistas reproduzíveis e alguns
-relatórios mensuráveis. O MCP atual expõe principalmente leitura, descrição,
-validação, comparação e apresentação visual. Ele ainda não representa o ciclo
-completo de autoria definido neste documento.
+relatórios mensuráveis. O MCP v4 expõe leitura, descrição, validação, comparação
+e apresentação visual; no perfil opt-in, também planeja, inspeciona e publica
+montagens e receitas declarativas. Revisões ativas autorizadas alimentam o mesmo
+catálogo usado por leitura e revalidação, inclusive em uma nova sessão.
 
-O formato canônico e persistido `mecanifica.montagem` v1 já existe para
-montagens recursivas, incluindo pose rígida persistida. Ainda não existem
-relações persistidas gerais, um mapa completo de dependências, um solver geral
-de encaixe ou uma camada de escrita que permita à IA criar e alterar receitas e
-montagens com o mesmo nível de controle que já existe na leitura.
+Os formatos persistidos `mecanifica.montagem` v1, v2 e v3 cobrem composição
+recursiva, pose rígida e relações locais mensuráveis. Ainda não existem mapa
+global completo de dependências, revalidação automática em cascata, solver geral
+de encaixe, materiais canônicos ou autoria compatível com todo módulo JavaScript
+histórico.
 
 ## A distinção central: peça não é montagem
 

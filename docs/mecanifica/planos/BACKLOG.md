@@ -10,14 +10,16 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | impacto local e catálogo explícito entre raízes concluídos; descoberta implícita continua fora |
+| Mapa de composição e dependências | próximo plano recomendado: definir mapa canônico global; impacto local, catálogo explícito e revisões ativas já existem |
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
-| Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
-| Escrita transacional de receitas e montagens | montagem concluída: snapshot, transição, revalidação e MCP opt-in; receita continua candidata |
+| Revalidação de dependentes | raízes explícitas usam revisões ativas; cascata global e estado persistido permanecem fora |
+| Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v4 |
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
 | Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |
 | Experimento de autoria geométrica do zero | concluído: correção publicada por autoria declarativa; decisão final aprovar |
-| Autoria segura de receitas | concluída para contrato declarativo v1 e MCP opt-in; módulos JS históricos e publicação no catálogo permanecem fora |
+| Autoria segura de receitas | concluída para contrato declarativo v1 e MCP opt-in; revisão ativa já alimenta o catálogo, módulos JS históricos permanecem fora |
+| Alteração semântica compacta | candidato posterior ao mapa: mudar por ID/campo, recompor documento completo e confirmar bytes finais |
+| Histórico operacional e variantes | comparar, reativar como nova transição e ramificar sem mover estado ativo implicitamente |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
 | Diagnóstico visual estruturado | ligar medidas e falhas a entidades visíveis por identidade semântica |

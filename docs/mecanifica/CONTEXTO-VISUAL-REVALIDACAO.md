@@ -49,7 +49,9 @@ usado somente pelo host; o cliente descobre apenas `id` em
 - `renderizar_montagem` para uma a quatro vistas em memória.
 
 As ferramentas não aceitam caminhos locais e mantêm as anotações MCP de leitura
-sem efeito destrutivo. O contrato público é `mecanifica.mcp.revisao.v3`.
+sem efeito destrutivo. O contrato público atual é `mecanifica.mcp.revisao.v4`;
+quando o host configura autoria, revisões ativas autorizadas alimentam também a
+leitura e a revalidação.
 
 ## Captura confinada
 

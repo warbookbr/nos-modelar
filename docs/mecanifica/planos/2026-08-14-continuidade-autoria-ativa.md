@@ -1,6 +1,6 @@
 # Continuidade de autoria ativa
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex (análise, implementação e prova)
 
@@ -110,6 +110,14 @@ o núcleo ou executar código do agente.
 
 ## Encerramento
 
-O plano encerra em `aprovar`, `corrigir` ou `interromper`, com evidência
-caixa-preta e próximas prioridades registradas. Até lá, este é o único plano
-ativo.
+R00–R05 foram concluídos. O catálogo ganhou provedores de revisão ativa com
+fallback exato e falha fechada; o MCP v4 tornou autoria aditiva, anunciou o
+estado em `mecanifica://autoria` e usou a mesma visão em leitura, relações,
+vistas e revalidação.
+
+A prova caixa-preta publicou e releu uma montagem alterada pela ferramenta
+comum. Em seguida publicou uma receita com geometria diferente, verificou sua
+caixa pela montagem e abriu outro processo, que observou a mesma revisão e a
+mesma medida. Os gates completos fecharam com 71 arquivos de teste, 1.221 testes
+aprovados e 2 ignorados; typecheck, build, bancada, guardas, inventários,
+documentação, planos, exportação e criação passaram. **Decisão: aprovar.**
