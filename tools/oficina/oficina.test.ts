@@ -5672,7 +5672,7 @@ describe('furo v2 — a fronteira medida da partição (A-33)', () => {
     /* a contagem existe para que uma varredura que deixe de varrer não passe
        calada por não ter achado nada. */
     expect(contadas).toBe(147);
-  });
+  }, 15_000); // varredura geométrica completa; pode exceder o default de 5 s sob carga.
 
   /* A FRONTEIRA ANDOU (A-30). Onze linhas travavam aqui. Com as três ordens de
      ponte, OITO passam a fechar e três continuam travando. As oito não saíram

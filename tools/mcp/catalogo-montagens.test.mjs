@@ -1,3 +1,4 @@
+/* catalogo-montagens.test.mjs — confinamento e descoberta explícita do catálogo MCP. */
 import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
