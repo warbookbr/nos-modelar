@@ -1,0 +1,38 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 2,
+  "id": "estudo-conjunto-dianteiro",
+  "instancias": [
+    { "id": "eixo", "alvo": { "tipo": "peca", "ref": "_estudo-eixo-dianteiro" } },
+    { "id": "freio", "alvo": { "tipo": "montagem", "ref": "freio" } },
+    { "id": "roda", "alvo": { "tipo": "montagem", "ref": "roda" } }
+  ],
+  "relacoes": [
+    {
+      "id": "eixoNoCubo",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["eixo"], "porta": "coloDoCubo" },
+      "movel": { "caminho": ["freio", "cubo"], "porta": "cavidadeDoEixo" },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.0005,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "aroNoPiloto",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["freio", "cubo"], "porta": "pilotoDoAro" },
+      "movel": { "caminho": ["roda", "aro"], "porta": "cavidadeDoCubo" },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.001,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

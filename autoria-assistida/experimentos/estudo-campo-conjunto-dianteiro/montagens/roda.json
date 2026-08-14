@@ -1,0 +1,28 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 2,
+  "id": "estudo-roda-dianteira",
+  "instancias": [
+    { "id": "aro", "alvo": { "tipo": "peca", "ref": "_estudo-aro-dianteiro" } },
+    { "id": "pneu", "alvo": { "tipo": "peca", "ref": "_estudo-pneu-dianteiro" } }
+  ],
+  "relacoes": [
+    {
+      "id": "aroNoPneu",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["pneu"], "porta": "assentoDoAro" },
+      "movel": { "caminho": ["aro"], "porta": "assentoNoPneu" },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.025,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0.150,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}
