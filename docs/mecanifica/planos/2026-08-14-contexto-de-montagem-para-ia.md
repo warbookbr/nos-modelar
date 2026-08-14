@@ -167,7 +167,7 @@ canônico; uso/diagnóstico fica em `stderr`. A CLI não replica regra do servi�
 2. R01 — concluído: árvore, poses, caixas, portas, relações e cobertura;
 3. R02 — concluído: caminho, profundidade e relacionados;
 4. R03 — concluído: CLI confinada e diagnóstico;
-5. R04 — repetir R001/R002 e medir contexto;
+5. R04 — concluído: repetir R001/R002 e medir contexto;
 6. R05 — documentação, gates, decisão e fechamento.
 
 Cada R termina verde e em commit próprio; falha não antecipa render ou MCP.

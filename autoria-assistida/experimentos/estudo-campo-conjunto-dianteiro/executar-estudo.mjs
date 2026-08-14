@@ -5,6 +5,7 @@ import { nucleo, neutroCanonico } from '../../../prototipos/fps/v3/motor/oficina
 import {
   FORMATO, VERSAO, parteDaFace,
 } from '../../../src/autoria/ler-peca-resolvida.js';
+import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 
 const argumentos = new Map(process.argv.slice(2).map((item) => {
@@ -129,7 +130,7 @@ const resultado = {
     satisfeitas: relacoes.filter((item) => item.satisfeita).length,
   },
 };
-const saida = argumentos.has('--resumo')
+let saida = argumentos.has('--resumo')
   ? {
     estudo: resultado.estudo,
     discoRaio: resultado.discoRaio,
@@ -138,4 +139,17 @@ const saida = argumentos.has('--resumo')
     medidasExperimentais: resultado.medidasExperimentais,
   }
   : resultado;
+if (argumentos.has('--contexto')) {
+  const caminho = argumentos.get('--caminho');
+  const profundidadeTexto = argumentos.get('--profundidade');
+  const profundidade = profundidadeTexto === undefined ? undefined : Number(profundidadeTexto);
+  if (profundidadeTexto !== undefined && (!Number.isSafeInteger(profundidade) || profundidade < 0)) {
+    throw new Error('--profundidade precisa ser inteiro não negativo.');
+  }
+  saida = descreverMontagemResolvida(resolvida, {
+    ...(caminho !== undefined ? { caminho: caminho.split('/') } : {}),
+    ...(profundidade !== undefined ? { profundidade } : {}),
+    ...(argumentos.has('--incluir-relacionados') ? { incluirRelacionados: true } : {}),
+  });
+}
 process.stdout.write(`${JSON.stringify(saida, null, 2)}\n`);
