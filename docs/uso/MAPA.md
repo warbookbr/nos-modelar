@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-354 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+355 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -189,6 +189,7 @@
 - `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
 - `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
 - `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
+- `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto

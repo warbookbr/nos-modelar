@@ -56,6 +56,11 @@ aplicação publicada aqui.
   explícito, impacto direcionado, proveniência, MCP e continuidade ativa. A
   revalidação em cascata persistida permanece candidata, sem plano ativo
   (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`).
+- O plano ativo de [revalidação em cascata persistida](planos/2026-08-14-revalidacao-cascata-persistida.md)
+  começa por uma R00 investigativa de identidade, estados, obsolescência e
+  concorrência. Ele acrescenta coordenação persistida ao impacto aprovado, sem
+  correção ou promoção automática
+  (`docs/mecanifica/planos/2026-08-14-revalidacao-cascata-persistida.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão

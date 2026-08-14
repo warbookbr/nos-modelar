@@ -2,12 +2,13 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-revalidacao-cascata-persistida.md`](2026-08-14-revalidacao-cascata-persistida.md).
 
-O [mapa canônico de dependências](2026-08-14-mapa-canonico-dependencias.md) foi
-concluído com decisão **aprovar**: universo explícito, mapa derivado, impacto
-global MCP, continuidade ativa e recusa concorrente estão provados. Revalidação
-em cascata persistida permanece um candidato separado no backlog.
+O plano abre a revalidação em cascata como acréscimo sobre mapa, impacto,
+revisões e transações existentes. R00 é investigativa e precisa fixar identidade,
+estados, obsolescência e concorrência antes de autorizar persistência de produto.
+Correção e publicação automática de dependentes permanecem fora.
 
 O plano de
 [`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
@@ -54,7 +55,8 @@ Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 O mapa canônico concluiu R00–R06 com decisão `aprovar`: contrato de universo,
 snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
 de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
-Não há plano executivo ativo até uma abertura explícita.
+O plano de cascata persistida está ativo; sua R00 começa pelo contrato e pode
+interromper a implementação antes de persistência se as invariantes falharem.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
