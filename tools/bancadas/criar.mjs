@@ -31,6 +31,7 @@ const OUT = join(HERE, 'out');
 const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
 const GABARITOS = join(REPO, 'prototipos/fps/v3/gabaritos');
 const SKILL = join(REPO, '.claude/skills/criar-peca/SKILL.md');
+const OPERACOES_DOC = join(REPO, '.claude/skills/criar-peca/references/operacoes-procedurais.md');
 const OFICINA_DOC = join(REPO, 'docs/uso/oficina-contrato.md');
 
 const args = process.argv.slice(2);
@@ -74,10 +75,10 @@ const opsNucleo = new Set(Object.keys(OPS));
 log(`  ${opsNucleo.size} ops implementadas: ${[...opsNucleo].join(', ')}`);
 const opsDoc = new Set();
 {
-  const texto = readFileSync(SKILL, 'utf8').split('\n');
+  const texto = readFileSync(OPERACOES_DOC, 'utf8').split('\n');
   let dentro = false;
   for (const linha of texto) {
-    if (linha.startsWith('| op | args | nota |')) { dentro = true; continue; }
+    if (linha.startsWith('| op | args | nota |') || linha.startsWith('| operação | forma essencial | cuidado principal |')) { dentro = true; continue; }
     if (!dentro) continue;
     if (!linha.startsWith('|')) break;
     if (linha.startsWith('|---')) continue;

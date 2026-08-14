@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-315 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+317 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -18,8 +18,12 @@
 
 ## .claude/agents/
 
-- `game-builder.md` — Constrói features do cliente v3 (o motor GPU, a Oficina, o som, a animação, a interface do jogo). Recebe um brief fechado do orquestrador e entrega numa bran…
-- `revisor-adversarial.md` — Revisor adversarial POR RISCO do v3 — tenta QUEBRAR a mudança sob estresse antes do merge, com foco em fundação, formato salvo (irreversível) e conta de julg…
+- `game-builder.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
+- `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
+
+## .claude/skills/auditar-montagem/
+
+- `SKILL.md` — Auditar uma montagem persistida da Mecanifica por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composi…
 
 ## .claude/skills/auditar-peca/
 
@@ -28,6 +32,10 @@
 ## .claude/skills/criar-peca/
 
 - `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
+
+## .claude/skills/criar-peca/references/
+
+- `operacoes-procedurais.md` — Referência de operações procedurais
 
 ## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/
 
