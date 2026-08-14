@@ -22,16 +22,18 @@ import {
 } from './perfis/montagens.mjs';
 import {
   catalogarMontagensSaida, compararSaida, descreverMontagemSaida, descreverSaida,
-  renderizarMontagemSaida, renderizarSaida, revalidarMontagemSaida, validarSaida,
+  consultarImpactoGlobalSaida, renderizarMontagemSaida, renderizarSaida, revalidarMontagemSaida, validarSaida,
 } from './contratos.mjs';
 import {
   carregarCatalogoMontagens, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
+import { VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS } from './universo-dependencias.mjs';
 import * as EIXO_AUTORIA from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
 const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
+const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
 const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
 const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/experimentos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
 const receitaEixo = (fim) => ({
@@ -44,15 +46,20 @@ const receitaEixo = (fim) => ({
 const CATALOGO_MONTAGENS = carregarCatalogoMontagens(CONFIGURACAO_MONTAGENS);
 const tamanhosStructured = {};
 let configuracaoAnterior;
+let universoAnterior;
 
 beforeAll(() => {
   configuracaoAnterior = process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS];
+  universoAnterior = process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS];
   process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS] = CONFIGURACAO_MONTAGENS;
+  process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS] = CONFIGURACAO_UNIVERSO;
 });
 
 afterAll(() => {
   if (configuracaoAnterior === undefined) delete process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS];
   else process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS] = configuracaoAnterior;
+  if (universoAnterior === undefined) delete process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS];
+  else process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS] = universoAnterior;
 });
 
 function clienteStdio() {
@@ -142,11 +149,14 @@ describe('servidor MCP local — perfil revisao', () => {
     const client = new Client({ name: 'teste-mecanifica', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
-      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
+      env: {
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      },
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.4.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -156,29 +166,29 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia oito tools e cinco resources somente leitura', async () => {
+  it('faz handshake bruto, anuncia nove tools e seis resources somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.4.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(8);
+      expect(ferramentas.result.tools).toHaveLength(9);
       for (const tool of ferramentas.result.tools) {
         expect(tool.outputSchema).toBeDefined();
         expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
       }
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
-        'mecanifica://estado', 'mecanifica://capacidades/modelagem', 'mecanifica://pacotes',
-        'mecanifica://montagens', 'mecanifica://autoria',
+        'mecanifica://estado', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
+        'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(5);
+      expect(recursos.result.resources).toHaveLength(6);
     } finally {
       await cliente.fechar();
     }
@@ -337,25 +347,36 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('entrega os quatro recursos e não expõe caminhos do runtime', async () => {
+  it('entrega os recursos e não expõe caminhos do runtime', async () => {
     const { cliente } = await conectado();
     try {
       const estado = await cliente.enviar('resources/read', { uri: 'mecanifica://estado' });
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
       const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
+      const dependencias = await cliente.enviar('resources/read', { uri: 'mecanifica://dependencias' });
       const montagens = await cliente.enviar('resources/read', { uri: 'mecanifica://montagens' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
+      const dependenciasValor = JSON.parse(dependencias.result.contents[0].text);
       const montagensValor = JSON.parse(montagens.result.contents[0].text);
-      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v4', catalogoMontagensConfigurado: true });
+      expect(estadoValor).toMatchObject({
+        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v5',
+        catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
+      });
       expect(estadoValor.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
       ]);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
       expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
+      expect(dependenciasValor).toMatchObject({
+        formato: 'mecanifica.resumo-dependencias-global', configurado: true,
+        universo: { id: 'fixture-mapa-dependencias', entidades: 8 },
+        mapa: { sha256: expect.stringMatching(/^sha256:/) }, cobertura: { completa: true },
+      });
+      expect(JSON.stringify(dependenciasValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|documento|composicao|ocorrencias/);
       expect(montagensValor).toEqual({
         formato: 'mecanifica.catalogo-mcp-montagens-publico',
         versao: 1,
@@ -486,6 +507,40 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
+  it('consumidor caixa-preta descobre cobertura e consulta impacto sem ler o mapa ou caminhos', async () => {
+    const client = new Client({ name: 'consumidor-impacto-global', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      },
+    });
+    try {
+      await client.connect(transport);
+      const recurso = await client.readResource({ uri: 'mecanifica://dependencias' });
+      const resumo = JSON.parse(recurso.contents[0].text);
+      expect(resumo).toMatchObject({
+        configurado: true,
+        universo: { id: 'fixture-mapa-dependencias', entidades: 8 },
+        mapa: { sha256: expect.stringMatching(/^sha256:/) },
+      });
+      expect(JSON.stringify(resumo)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|composicao|ocorrencias|documento/);
+
+      const impacto = await client.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      expect(impacto.isError).not.toBe(true);
+      consultarImpactoGlobalSaida.parse(impacto.structuredContent);
+      expect(impacto.structuredContent.resultado.impacto).toMatchObject({
+        raizesAfetadas: ['sistema-a', 'sistema-b'], raizesNaoAfetadas: ['sistema-isolado'],
+      });
+      expect(JSON.stringify(impacto)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|\.json|documento|composicao|ocorrencias/);
+    } finally {
+      await client.close();
+    }
+  });
+
   it('consumidor caixa-preta conclui autoria por MCP sem shell nem paths', async () => {
     const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-r05-'));
     const client = new Client({ name: 'consumidor-autoria-caixa-preta', version: '1' });
@@ -505,7 +560,7 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
         'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);

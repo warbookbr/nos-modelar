@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-351 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+354 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -382,6 +382,8 @@
 - `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
 - `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
 - `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
+- `universo-dependencias.mjs` — universo-dependencias.mjs — universo canônico confiável para leitura MCP.
+- `universo-dependencias.test.mjs` — universo-dependencias.test.mjs — provas do adaptador MCP do mapa global.
 
 ## tools/mcp/perfis/
 
@@ -389,6 +391,7 @@
 - `autoria-montagens.test.mjs` — Provas R04: MCP de autoria só atua com escopo do host e sem paths públicos.
 - `autoria-receitas.mjs` — autoria-receitas.mjs — porta MCP fina para receitas declarativas.
 - `autoria-receitas.test.mjs` — Contrato fino da porta MCP de autoria declarativa.
+- `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
 - `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.
 

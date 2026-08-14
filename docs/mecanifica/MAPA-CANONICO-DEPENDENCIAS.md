@@ -100,9 +100,46 @@ As duas primeiras raízes compartilham uma submontagem e uma peça. A terceira �
 um ramo não afetado. Os testes derivados também cobrem referência ausente,
 duplicidade, identidade divergente e ciclo.
 
+## Consumo MCP da R04
+
+O servidor MCP anuncia sempre `mecanifica://dependencias`. Quando o host ainda
+não definiu um universo, o recurso responde apenas que ele não está
+configurado. Para habilitar a leitura global, o host define
+`MECANIFICA_UNIVERSO_DEPENDENCIAS` como caminho absoluto para um arquivo comum
+com este contrato local:
+
+```json
+{
+  "formato": "mecanifica.universo-mcp-dependencias",
+  "versao": 1,
+  "universo": "universo.json",
+  "raizMontagens": "montagens",
+  "raizPecas": "pecas-resolvidas"
+}
+```
+
+Os caminhos são resolvidos pelo host relativamente ao arquivo de configuração;
+nunca são recebidos do agente nem devolvidos pela interface. O recurso público
+retorna somente identidade do universo, contagens, raízes, hash `sha256:` do
+mapa derivado e cobertura. Ele não devolve documentos, composição, ocorrências
+ou o mapa completo.
+
+`consultar_impacto_global` recebe exclusivamente `{ "tipo": "peca" |
+"montagem", "id": "slug-semantico" }` e devolve
+`mecanifica.impacto-global` v1 reduzido. A ferramenta é somente leitura: ela
+reconstrói um snapshot consistente, não executa revalidação, não altera autoria
+e não promete aprovação. Com autoria ativa configurada pelo host, as revisões
+ativas autorizadas alimentam o mesmo snapshot; a ausência delas mantém o
+fallback estático.
+
+A superfície MCP passou para `mecanifica.mcp.revisao.v5` e o servidor
+`mecanifica-mcp` 0.5.0. O contrato anterior v4 não anuncia essa ferramenta nem
+o recurso de dependências.
+
 ## Fronteira
 
 R00 valida o universo e suas referências de composição. R01 acrescenta o
 snapshot de fontes, revisões ativas, hashes e recusa de concorrência. R02 deriva
-arestas, ocorrências, relações e usos reversos. R03 consulta esse mapa. Este
-contrato não executa revalidação, não prova colisão e não altera autoria.
+arestas, ocorrências, relações e usos reversos. R03 consulta esse mapa. R04 o
+expõe de forma reduzida no MCP. Este contrato não executa revalidação, não prova
+colisão e não altera autoria.

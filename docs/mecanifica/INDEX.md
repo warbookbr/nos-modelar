@@ -67,10 +67,11 @@ aplicação publicada aqui.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem. As R00–R03 do mapa canônico global fixaram
+  o mapa de impacto local existem. As R00–R04 do mapa canônico global fixaram
   universo, snapshot confinado, composição, ocorrências, relações, usos
-  reversos e consulta direcionada; MCP e revalidação ainda estão fora. Colisão geral, solver
-  e camada completa de escrita continuam fora.
+  reversos, consulta direcionada e consumo MCP reduzido por ID; continuidade,
+  escala e revalidação em cascata ainda estão fora. Colisão geral, solver e
+  camada completa de escrita continuam fora.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
@@ -108,8 +109,8 @@ o núcleo nem define o modelo de autoria.
 
 Montagem persistida v1 possui contrato e resolvedor em `src/autoria/` e provas
 persistidas em `tools/mecanifica/fixtures/montagens-persistidas/`; o mapa global
-de dependências ainda não possui contrato. Não invente uma localização por
-implicação.
+de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços em
+`src/autoria/`. Não invente uma localização por implicação.
 
 ## Fontes de verdade
 

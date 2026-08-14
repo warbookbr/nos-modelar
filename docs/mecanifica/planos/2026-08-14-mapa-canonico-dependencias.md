@@ -138,15 +138,15 @@ raízes compartilhadas, ramo isolado, relações, proveniência e cobertura.
 **Saída:** `mecanifica.impacto-global` v1 compacto e acionável. Evidência: cinco
 provas cobrem peça compartilhada/isolada, montagem, relações, limites e roteiro.
 
-### R04 — consumo Agent-First
+### R04 — consumo Agent-First — concluída
 
 - anunciar resumo, hash e cobertura do universo por recurso MCP;
 - expor consulta de impacto por ferramenta de leitura usando somente IDs;
 - manter mapa completo fora da resposta quando a consulta reduzida bastar;
 - versionar o contrato MCP se a superfície pública mudar.
 
-**Saída:** consumidor caixa-preta descobre e consulta impacto sem shell ou
-caminhos locais.
+**Saída:** consumidor MCP oficial descobre resumo/hash/cobertura e consulta a
+peça compartilhada sem shell, paths, documentos ou mapa; contrato v5.
 
 ### R05 — prova de continuidade e escala
 

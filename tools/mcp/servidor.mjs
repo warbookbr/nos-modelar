@@ -6,9 +6,11 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
 import { ferramentasRevisao } from './perfis/revisao.mjs';
 import { criarFerramentasMontagem } from './perfis/montagens.mjs';
+import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
 import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { catalogoMontagensDoAmbiente } from './catalogo-montagens.mjs';
+import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
   criarProvedoresAutoriaAtiva, criarProvedoresAutoriaInativa,
 } from '../mecanifica/autoria-ativa.mjs';
@@ -17,15 +19,16 @@ import {
 } from './contratos.mjs';
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.4.0' });
+const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.5.0' });
 
-function estadoDo(ferramentas, catalogoMontagens, perfil = PERFIL, autoria = {}) {
+function estadoDo(ferramentas, catalogoMontagens, universoDependencias, perfil = PERFIL, autoria = {}) {
   return {
     contrato: VERSAO_CONTRATO_MCP,
     perfil,
     transporte: TRANSPORTE,
     ferramentas: ferramentas.map(({ nome }) => nome),
     catalogoMontagensConfigurado: catalogoMontagens.configurado,
+    universoDependenciasConfigurado: universoDependencias.configurado,
     autoriaAtivaConfigurada: autoria.configurado === true,
     receitasAutorizadas: autoria.configurado ? [...(autoria.receitasAutorizadas ?? [])].sort() : [],
     capacidadesAusentes: [
@@ -38,7 +41,7 @@ function estadoDo(ferramentas, catalogoMontagens, perfil = PERFIL, autoria = {})
   };
 }
 
-function capacidadesDo(catalogoMontagens, perfil = PERFIL) {
+function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL) {
   return {
     perfil,
     consegue: [
@@ -49,6 +52,7 @@ function capacidadesDo(catalogoMontagens, perfil = PERFIL) {
       'descobrir pacotes e revisões oficiais disponíveis',
       'descobrir e descrever montagens explicitamente autorizadas',
       'derivar roteiro de revalidação e catálogo entre raízes escolhidas',
+      ...(universoDependencias.configurado ? ['consultar impacto global no universo canônico configurado'] : []),
       'produzir vistas de montagem ou subárvore em memória',
       ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas', 'reler revisões ativas pelas ferramentas comuns'] : []),
     ],
@@ -59,6 +63,7 @@ function capacidadesDo(catalogoMontagens, perfil = PERFIL) {
       'aceita identificadores semânticos, nunca caminhos do cliente',
       'catálogo de montagens depende de configuração explícita do host',
       `catálogo de montagens configurado: ${catalogoMontagens.configurado ? 'sim' : 'não'}`,
+      `universo canônico de dependências configurado: ${universoDependencias.configurado ? 'sim' : 'não'}`,
       'não executa shell, Git ou servidor HTTP',
       ...(perfil === 'autoria'
         ? ['autoria exige perfil e repositório local opt-in do host']
@@ -126,15 +131,31 @@ function registrarPerfil(server, ferramentas) {
 }
 
 function registrarRecursos(server, {
-  ferramentas, catalogoMontagens, perfil, autoria, provedoresAutoria,
+  ferramentas, catalogoMontagens, universoDependencias, perfil, autoria, provedoresAutoria,
 }) {
-  const estado = estadoDo(ferramentas, catalogoMontagens, perfil, autoria);
-  const capacidadesModelagem = capacidadesDo(catalogoMontagens, perfil);
+  const estado = estadoDo(ferramentas, catalogoMontagens, universoDependencias, perfil, autoria);
+  const capacidadesModelagem = capacidadesDo(catalogoMontagens, universoDependencias, perfil);
   server.registerResource(
     'estado',
     'mecanifica://estado',
     { title: 'Estado do servidor Mecanifica', description: 'Contrato e capacidades ativas.', mimeType: 'application/json' },
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(estado) }] }),
+  );
+  server.registerResource(
+    'resumo-dependencias-global',
+    'mecanifica://dependencias',
+    {
+      title: 'Resumo do universo de dependências',
+      description: 'Hash, cobertura e raízes do universo canônico configurado, sem mapa completo.',
+      mimeType: 'application/json',
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        mimeType: 'application/json',
+        text: JSON.stringify(await universoDependencias.resumo()),
+      }],
+    }),
   );
   server.registerResource(
     'capacidades-modelagem',
@@ -201,16 +222,22 @@ function registrarRecursos(server, {
   );
 }
 
-function autoriaDoAmbiente(catalogoMontagens, ambiente = process.env) {
+function autoriaDoAmbiente(catalogoMontagens, universoDependencias, ambiente = process.env) {
   const raizRepositorio = ambiente?.MECANIFICA_REPOSITORIO_AUTORIA;
-  if (!raizRepositorio || !catalogoMontagens.configurado) return { configurado: false };
+  if (!raizRepositorio || (!catalogoMontagens.configurado && !universoDependencias.configurado)) return { configurado: false };
   const receitasAutorizadas = new Set(String(ambiente?.MECANIFICA_RECEITAS_AUTORIZADAS ?? '')
     .split(',').map((item) => item.trim()).filter((item) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item)));
   return { configurado: true, raizRepositorio, catalogo: catalogoMontagens, receitasAutorizadas };
 }
 
-export function criarServidor({ catalogoMontagens = catalogoMontagensDoAmbiente(), perfil = process.env.MECANIFICA_PERFIL ?? PERFIL, autoria = autoriaDoAmbiente(catalogoMontagens) } = {}) {
+export function criarServidor({
+  catalogoMontagens = catalogoMontagensDoAmbiente(),
+  universoDependencias = universoDependenciasDoAmbiente(),
+  perfil = process.env.MECANIFICA_PERFIL ?? PERFIL,
+  autoria = autoriaDoAmbiente(catalogoMontagens, universoDependencias),
+} = {}) {
   const server = new McpServer(IDENTIDADE);
+  const idsUniverso = universoDependencias.ids();
   const provedoresAutoria = autoria.configurado
     ? criarProvedoresAutoriaAtiva({
       raizRepositorio: autoria.raizRepositorio,
@@ -218,12 +245,26 @@ export function criarServidor({ catalogoMontagens = catalogoMontagensDoAmbiente(
       receitasAutorizadas: autoria.receitasAutorizadas,
     })
     : criarProvedoresAutoriaInativa();
+  const provedoresUniverso = autoria.configurado
+    ? criarProvedoresAutoriaAtiva({
+      raizRepositorio: autoria.raizRepositorio,
+      montagensAutorizadas: idsUniverso.montagens,
+      receitasAutorizadas: idsUniverso.pecas,
+    })
+    : provedoresAutoria;
   const catalogoAtivo = autoria.configurado
     ? catalogoMontagens.comProvedores(provedoresAutoria)
     : catalogoMontagens;
+  const universoAtivo = autoria.configurado
+    ? universoDependencias.comProvedores(provedoresUniverso)
+    : universoDependencias;
   const contextoAutoria = { ...autoria, catalogo: catalogoAtivo };
-  const leitura = [...ferramentasRevisao, ...criarFerramentasMontagem(catalogoAtivo)];
-  const perfilAutoria = perfil === 'autoria' && autoria.configurado;
+  const leitura = [
+    ...ferramentasRevisao,
+    ...criarFerramentasMontagem(catalogoAtivo),
+    ...criarFerramentasImpactoGlobal(universoAtivo),
+  ];
+  const perfilAutoria = perfil === 'autoria' && autoria.configurado && catalogoMontagens.configurado;
   const ferramentas = perfilAutoria
     ? [...leitura, ...criarFerramentasAutoria(contextoAutoria), ...criarFerramentasAutoriaReceitas(contextoAutoria)]
     : leitura;
@@ -231,6 +272,7 @@ export function criarServidor({ catalogoMontagens = catalogoMontagensDoAmbiente(
   registrarRecursos(server, {
     ferramentas,
     catalogoMontagens: catalogoAtivo,
+    universoDependencias: universoAtivo,
     autoria: contextoAutoria,
     provedoresAutoria,
     perfil: perfilAutoria ? 'autoria' : PERFIL,

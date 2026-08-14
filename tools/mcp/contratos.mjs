@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
 
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v4';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v5';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 
@@ -129,6 +129,24 @@ export const renderizarMontagemEntrada = z.object({
   caminho: caminhoMontagem.optional(),
   vistas: z.array(vistaMontagem).min(1).max(4).optional(),
 }).strict();
+
+const alvoImpactoGlobal = z.object({
+  tipo: z.enum(['peca', 'montagem']),
+  id: slug,
+}).strict();
+
+const passoImpactoGlobal = z.object({ montagem: slug, instancia: nomeParte }).strict();
+const caminhoImpactoGlobal = z.object({
+  raiz: slug,
+  caminho: z.array(passoImpactoGlobal),
+}).strict();
+const provenienciaImpactoGlobal = z.object({
+  fonte: z.enum(['base-estatica', 'revisao-ativa']),
+  revisao: z.string().nullable(),
+  sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+}).strict();
+
+export const consultarImpactoGlobalEntrada = alvoImpactoGlobal;
 
 export const descreverSaida = z.object({
   ...respostaBase,
@@ -275,6 +293,38 @@ export const renderizarMontagemSaida = z.object({
       enquadramento: enquadramentoPublico,
     }).strict()).min(1).max(4),
   }).strict().optional(),
+}).strict();
+
+const impactoGlobal = z.object({
+  formato: z.literal('mecanifica.impacto-global'),
+  versao: z.literal(1),
+  alvo: alvoImpactoGlobal,
+  dependentesDiretos: z.array(alvoImpactoGlobal),
+  dependentesTransitivos: z.array(alvoImpactoGlobal.extend({ distancia: z.number().int().positive() }).strict()),
+  raizesAfetadas: z.array(slug),
+  raizesNaoAfetadas: z.array(slug),
+  caminhos: z.array(caminhoImpactoGlobal),
+  relacoes: z.array(z.json()),
+  roteiroRevalidacao: z.array(z.object({
+    ordem: z.number().int().positive(),
+    tipo: z.literal('montagem'),
+    id: slug,
+    motivo: z.enum(['alvo', 'dependente-direto', 'dependente-transitivo']),
+    proveniencia: provenienciaImpactoGlobal,
+    caminhos: z.array(caminhoImpactoGlobal),
+  }).strict()),
+  cobertura: z.object({
+    completa: z.literal(true),
+    universo: slug.nullable(),
+    entidadesConsideradas: z.number().int().nonnegative(),
+    entidadesAfetadas: z.number().int().nonnegative(),
+  }).strict(),
+  limitacoes: z.array(z.string()),
+}).strict();
+
+export const consultarImpactoGlobalSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({ impacto: impactoGlobal }).strict().optional(),
 }).strict();
 
 export function respostaOk(codigo, resultado) {

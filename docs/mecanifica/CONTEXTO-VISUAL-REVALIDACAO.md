@@ -49,9 +49,12 @@ usado somente pelo host; o cliente descobre apenas `id` em
 - `renderizar_montagem` para uma a quatro vistas em memória.
 
 As ferramentas não aceitam caminhos locais e mantêm as anotações MCP de leitura
-sem efeito destrutivo. O contrato público atual é `mecanifica.mcp.revisao.v4`;
+sem efeito destrutivo. O contrato público atual é `mecanifica.mcp.revisao.v5`;
 quando o host configura autoria, revisões ativas autorizadas alimentam também a
-leitura e a revalidação.
+leitura e a revalidação. O mapa canônico global usa o recurso separado
+`mecanifica://dependencias` e a ferramenta `consultar_impacto_global`; seu
+contrato, configuração explícita e limites estão em
+[`MAPA-CANONICO-DEPENDENCIAS.md`](MAPA-CANONICO-DEPENDENCIAS.md).
 
 ## Captura confinada
 
