@@ -34,6 +34,10 @@ aplicação publicada aqui.
   segura](planos/2026-08-14-materializacao-autoria-segura.md) foi concluído e
   aprovado: snapshots imutáveis, ativação por revisão observada, revalidação
   condicionante e perfil MCP de autoria opt-in foram provados no mesmo recorte.
+- O [experimento de autoria geométrica do zero](planos/2026-08-14-experimento-autoria-geometrica.md)
+  (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`) está
+  ativo: prova receitas confinadas, montagem, inspeção, alteração e correção por
+  autoria MCP sem mudar o núcleo ou o catálogo publicado.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -180,7 +184,7 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Escolher e abrir o próximo plano executivo; não há plano ativo.
+- Executar o experimento de autoria geométrica do zero.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.

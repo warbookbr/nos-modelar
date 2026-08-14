@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Experimento de autoria geométrica do zero](2026-08-14-experimento-autoria-geometrica.md).
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -18,7 +18,7 @@ documento de continuidade arquitetural estão integrados. O contexto de
 montagem foi concluído no R05 na branch do PR #42. A leitura e auditoria de
 montagens por MCP foi aprovada no R04, com consumo caixa-preta e visão real. O
 plano de materialização e autoria segura de montagens foi concluído com decisão
-`aprovar`.
+`aprovar`. O experimento de autoria geométrica do zero está ativo.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -149,8 +149,9 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
 [diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
 
-## Próxima abertura
+## Execução atual
 
-Não há plano executivo ativo. Os candidatos gerais permanecem em
-[`BACKLOG.md`](BACKLOG.md). Para abrir o próximo, copie [`MODELO.md`](MODELO.md),
-preencha objetivo, escopo, gates e encerramento esperado e atualize este índice.
+O [experimento de autoria geométrica do zero](2026-08-14-experimento-autoria-geometrica.md)
+testa três receitas confinadas, montagem, inspeção, alteração deliberadamente
+inválida, correção e autoria MCP. Os demais candidatos permanecem em
+[`BACKLOG.md`](BACKLOG.md).
