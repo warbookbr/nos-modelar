@@ -2,7 +2,13 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-continuidade-autoria-ativa.md`](2026-08-14-continuidade-autoria-ativa.md).
+
+O recorte fecha a quebra entre publicar e reutilizar: revisões imutáveis
+autorizadas passam a alimentar leitura, vistas e revalidação, e o perfil de
+autoria preserva as ferramentas de auditoria. Ele não abre mapa global,
+correção automática de dependentes nem publicação em fontes JavaScript.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -153,4 +159,5 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
 foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
-agente. Não há plano ativo; os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md).
+agente. A continuidade dessas revisões no catálogo é tratada pelo plano ativo;
+os demais candidatos permanecem no [`BACKLOG.md`](BACKLOG.md).
