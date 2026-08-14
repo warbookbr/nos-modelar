@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-R00 concluída com decisão `prosseguir`; R01 é o próximo passo.
+R00 e R01 concluídas com decisão `prosseguir`; R02 é o próximo passo.
 
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
@@ -141,6 +141,9 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 - persistir campanha completa com commit/revisão e conteúdo canônico;
 - reler por identidade, provar determinismo e recusar corrupção/conflito.
+
+**Resultado:** concluída com persistência transacional sobre o repositório de
+autoria existente; oito provas R00/R01 passaram.
 
 ### R02 — derivação da campanha
 

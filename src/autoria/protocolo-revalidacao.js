@@ -138,6 +138,49 @@ function validarItem(item) {
   return { ...item, alvo, revisaoObservada: revisao };
 }
 
+function identidadeValida(identidade, caminho = 'identidade') {
+  const causa = alvoValido(identidade?.causa, `${caminho}.causa`);
+  if ((identidade.causa.revisao !== null && typeof identidade.causa.revisao !== 'string')
+    || typeof identidade.causa.sha256 !== 'string' || !identidade.causa.sha256) {
+    falhar('identidade-invalida', `${caminho}.causa`, 'revisão e hash da causa precisam estar completos.');
+  }
+  if (identidade.universo !== null && typeof identidade.universo !== 'string') {
+    falhar('identidade-invalida', `${caminho}.universo`, 'universo precisa ser texto ou null.');
+  }
+  if (typeof identidade.mapaSha256 !== 'string' || !identidade.mapaSha256) {
+    falhar('identidade-invalida', `${caminho}.mapaSha256`, 'hash canônico do mapa é obrigatório.');
+  }
+  return { ...causa, revisao: identidade.causa.revisao ?? null, sha256: identidade.causa.sha256 };
+}
+
+/** Valida bytes relidos antes de entregá-los a um consumidor ou repositório. */
+export function validarCampanhaRevalidacao(campanha) {
+  if (!campanha || campanha.formato !== FORMATO_CAMPANHA || campanha.versao !== VERSAO) {
+    falhar('campanha-invalida', 'campanha', 'o contrato exige campanha-revalidacao v1.');
+  }
+  if (!campanha.identidade || typeof campanha.chave !== 'string') {
+    falhar('campanha-invalida', 'campanha', 'identidade e chave são obrigatórias.');
+  }
+  identidadeValida(campanha.identidade);
+  if (campanha.chave !== serializarCanonico(campanha.identidade)) {
+    falhar('identidade-divergente', 'campanha.chave', 'a chave não corresponde à identidade canônica.');
+  }
+  if (serializarCanonico(campanha.causa) !== serializarCanonico(campanha.identidade.causa)) {
+    falhar('identidade-divergente', 'campanha.causa', 'causa e identidade precisam ser iguais.');
+  }
+  if (!Array.isArray(campanha.itens)) falhar('campanha-invalida', 'campanha.itens', 'itens precisa ser lista.');
+  const vistos = new Set();
+  for (const [indice, item] of campanha.itens.entries()) {
+    const validado = validarItem(item);
+    if (vistos.has(validado.chave)) falhar('item-duplicado', `campanha.itens[${indice}]`, `o item '${validado.chave}' aparece mais de uma vez.`);
+    vistos.add(validado.chave);
+  }
+  if (!campanha.cobertura || typeof campanha.cobertura !== 'object' || Array.isArray(campanha.cobertura)) {
+    falhar('campanha-invalida', 'campanha.cobertura', 'cobertura precisa ser objeto.');
+  }
+  return copiar(campanha);
+}
+
 const transicoes = Object.freeze({
   pendente: ['em-validacao', 'obsoleto'],
   'em-validacao': ['aprovado', 'reprovado', 'obsoleto'],
