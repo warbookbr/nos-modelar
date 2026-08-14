@@ -1,11 +1,12 @@
-/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2. */
+/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3. */
 
 import { identidadeTransformacaoRigida, validarTransformacaoRigida } from './transformacao-rigida.js';
 
 export const FORMATO = 'mecanifica.montagem';
 export const VERSAO = 1;
-export const VERSAO_ATUAL = 2;
-export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_ATUAL]);
+export const VERSAO_RELACOES = 2;
+export const VERSAO_ATUAL = 3;
+export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_RELACOES, VERSAO_ATUAL]);
 
 export class ErroMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem) {
@@ -86,6 +87,19 @@ function lerEndpoint(valor, caminho) {
   return { caminho: caminhoSemantico, porta };
 }
 
+function lerEndpointRegiao(valor, caminho) {
+  if (!ehObjetoSimples(valor)) falhar('endpoint-invalido', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['caminho', 'parte'], caminho);
+  if (!Array.isArray(valor.caminho) || valor.caminho.length === 0) {
+    falhar('endpoint-invalido', `${caminho}.caminho`, 'precisa ser array não vazio.');
+  }
+  const caminhoSemantico = valor.caminho.map((id, indice) => textoNaoVazio(id, 'endpoint-invalido', `${caminho}.caminho[${indice}]`));
+  return {
+    caminho: caminhoSemantico,
+    ...(valor.parte !== undefined ? { parte: textoNaoVazio(valor.parte, 'endpoint-invalido', `${caminho}.parte`) } : {}),
+  };
+}
+
 function lerFaixa(valor, caminho) {
   if (!ehObjetoSimples(valor)) falhar('especificacao-invalida', caminho, 'precisa ser objeto simples.');
   chavesExatas(valor, ['nominal', 'toleranciaFabricacao'], caminho);
@@ -120,13 +134,38 @@ function lerEspecificacao(valor, tipo, caminho) {
   return especificacao;
 }
 
-function lerRelacao(valor, indice) {
+function lerEspecificacaoDirecional(valor, caminho) {
+  if (!ehObjetoSimples(valor)) falhar('especificacao-invalida', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['eixo', 'separacaoMinima', 'toleranciaNumerica'], caminho);
+  if (!Array.isArray(valor.eixo) || valor.eixo.length !== 3 || valor.eixo.some((numero) => !Number.isFinite(numero))) {
+    falhar('especificacao-invalida', `${caminho}.eixo`, 'precisa ter três números finitos.');
+  }
+  const eixo = valor.eixo.map((numero) => Object.is(numero, -0) ? 0 : numero);
+  if (Math.hypot(...eixo) === 0) falhar('especificacao-invalida', `${caminho}.eixo`, 'não pode ser vetor nulo.');
+  return {
+    eixo,
+    separacaoMinima: numeroFinitoNaoNegativo(valor.separacaoMinima, `${caminho}.separacaoMinima`),
+    toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`),
+  };
+}
+
+function lerRelacao(valor, indice, permitirDirecional = false) {
   const caminho = `relacoes[${indice}]`;
   if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
   chavesExatas(valor, ['id', 'tipo', 'referencia', 'movel', 'especificacao'], caminho);
   const id = textoNaoVazio(valor.id, 'id-invalido', `${caminho}.id`);
-  if (valor.tipo !== 'encaixaCilindrico' && valor.tipo !== 'assentaAnular') {
-    falhar('tipo-relacao-nao-suportado', `${caminho}.tipo`, 'aceita somente encaixaCilindrico ou assentaAnular.');
+  const tipos = ['encaixaCilindrico', 'assentaAnular', ...(permitirDirecional ? ['mantemSeparacaoDirecional'] : [])];
+  if (!tipos.includes(valor.tipo)) {
+    falhar('tipo-relacao-nao-suportado', `${caminho}.tipo`, `aceita somente ${tipos.join(', ')}.`);
+  }
+  if (valor.tipo === 'mantemSeparacaoDirecional') {
+    return {
+      id,
+      tipo: valor.tipo,
+      referencia: lerEndpointRegiao(valor.referencia, `${caminho}.referencia`),
+      movel: lerEndpointRegiao(valor.movel, `${caminho}.movel`),
+      especificacao: lerEspecificacaoDirecional(valor.especificacao, `${caminho}.especificacao`),
+    };
   }
   return {
     id,
@@ -162,7 +201,29 @@ function lerV2(dado) {
     ids.add(instancia.id);
   }
   if (!Array.isArray(dado.relacoes)) falhar('estrutura-invalida', 'relacoes', 'precisa ser array.');
-  const relacoes = dado.relacoes.map(lerRelacao);
+  const relacoes = dado.relacoes.map((relacao, indice) => lerRelacao(relacao, indice));
+  const relacaoIds = new Set();
+  for (const [indice, relacao] of relacoes.entries()) {
+    if (relacaoIds.has(relacao.id)) falhar('relacao-duplicada', `relacoes[${indice}].id`, `ID '${relacao.id}' duplicado.`);
+    relacaoIds.add(relacao.id);
+  }
+  instancias.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  relacoes.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return { formato: FORMATO, versao: VERSAO_RELACOES, id, instancias, relacoes };
+}
+
+function lerV3(dado) {
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes'], '$');
+  const id = textoNaoVazio(dado.id, 'id-invalido', 'id');
+  if (!Array.isArray(dado.instancias)) falhar('estrutura-invalida', 'instancias', 'precisa ser array.');
+  const instancias = dado.instancias.map(lerInstancia);
+  const ids = new Set();
+  for (const [indice, instancia] of instancias.entries()) {
+    if (ids.has(instancia.id)) falhar('instancia-duplicada', `instancias[${indice}].id`, `ID '${instancia.id}' duplicado.`);
+    ids.add(instancia.id);
+  }
+  if (!Array.isArray(dado.relacoes)) falhar('estrutura-invalida', 'relacoes', 'precisa ser array.');
+  const relacoes = dado.relacoes.map((relacao, indice) => lerRelacao(relacao, indice, true));
   const relacaoIds = new Set();
   for (const [indice, relacao] of relacoes.entries()) {
     if (relacaoIds.has(relacao.id)) falhar('relacao-duplicada', `relacoes[${indice}].id`, `ID '${relacao.id}' duplicado.`);
@@ -179,5 +240,6 @@ export function lerMontagemPersistida(dado) {
   if (!VERSOES_SUPORTADAS.includes(dado.versao)) {
     falhar('versao-nao-suportada', 'versao', `esperado uma de ${VERSOES_SUPORTADAS.join(', ')}.`);
   }
-  return dado.versao === VERSAO ? lerV1(dado) : lerV2(dado);
+  if (dado.versao === VERSAO) return lerV1(dado);
+  return dado.versao === VERSAO_RELACOES ? lerV2(dado) : lerV3(dado);
 }

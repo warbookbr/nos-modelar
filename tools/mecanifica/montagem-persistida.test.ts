@@ -42,7 +42,7 @@ describe('montagem persistida v1', () => {
 
   it('recusa todas as estruturas fora do contrato com erro estruturado', () => {
     esperaErro({ ...base(), formato: 'outro' }, 'formato-desconhecido', 'formato');
-    esperaErro({ ...base(), versao: 3 }, 'versao-nao-suportada', 'versao');
+    esperaErro({ ...base(), versao: 4 }, 'versao-nao-suportada', 'versao');
     esperaErro({ ...base(), id: '' }, 'id-invalido', 'id');
     esperaErro(base([instancia('a'), instancia('a')]), 'instancia-duplicada', 'instancias[1].id');
     esperaErro(base([instancia('a', 'outro')]), 'tipo-alvo-nao-suportado', 'instancias[0].alvo.tipo');
@@ -79,11 +79,11 @@ const relacaoAnular = (id = 'assentamento') => ({
   movel: { caminho: ['pneu'], porta: 'ocupa' },
   especificacao: { sobreposicaoRadial: faixa(), sobreposicaoAxial: faixa(0.02), toleranciaNumerica: 0.000001 },
 });
-const baseV2 = (relacoes: any[] = []) => ({ ...base(), versao: VERSAO_ATUAL, relacoes });
+const baseV2 = (relacoes: any[] = []) => ({ ...base(), versao: 2, relacoes });
 
 describe('montagem persistida v2 — leitura e validação estrutural', () => {
   it('expõe as versões suportadas sem compartilhar coleção mutável', () => {
-    expect(VERSOES_SUPORTADAS).toEqual([1, 2]);
+    expect(VERSOES_SUPORTADAS).toEqual([1, 2, VERSAO_ATUAL]);
     expect(Object.isFrozen(VERSOES_SUPORTADAS)).toBe(true);
   });
 

@@ -80,10 +80,11 @@ Carro e motor são montagens recursivas. Não são receitas monolíticas.
 
 ## Estado operacional
 
-Casos 1 e 2 estão homologados; o Caso 3 não foi iniciado. O contrato
-`mecanifica.montagem` v1 e a pose rígida persistida já existem nesta
-implementação; o plano v2 de relações locais está ativo somente em R00
-documental.
+Casos 1 e 2 estão homologados; o Caso 3 não foi iniciado. Os contratos
+`mecanifica.montagem` v1/v2, pose rígida e relações locais persistidas já
+existem. O descritor `mecanifica.contexto-montagem` projeta a árvore resolvida
+em JSON consultável, sem malha ou identidade de runtime; veja
+[`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md).
 
 O Módulo 1 do MCP, somente leitura e auditoria, foi aprovado. A primeira
 tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
@@ -91,17 +92,17 @@ tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
 de plano próprio e deve respeitar o modelo de autoria e as garantias de
 transação descritos em [`AUTORIA-IA.md`](AUTORIA-IA.md).
 
-O servidor estático local ainda falha ao resolver o import bare `earcut`; esta é
-uma pendência da ferramenta de servir e inspecionar, não uma decisão de
+O visor legado declara um import map para resolver `earcut` quando servido sem
+transformação. A correção pertence à infraestrutura de inspeção e não altera a
 geometria.
 
 ## O que ainda não existe
 
 Ainda não existem:
 
-- relações persistidas gerais em montagens;
+- relações persistidas além dos dois tipos locais v2;
 - mapa completo de composição e dependências;
-- contexto de trabalho derivado automaticamente desse mapa;
+- contexto visual e de impacto derivado de um mapa de dependências;
 - camada de escrita de receitas e montagens para IA;
 - solver geral de encaixe;
 - validação de movimento e espaço varrido de sistemas completos;

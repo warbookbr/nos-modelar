@@ -28,6 +28,7 @@
     "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "descrever:montagem": "node tools/mecanifica/descrever-montagem.mjs",
+    "descrever:montagem:persistida": "node tools/mecanifica/descrever-montagem-persistida.mjs",
     "peca": "node tools/bancadas/olhar-peca.mjs",
     "executar": "node tools/bancadas/executar.mjs",
     "porteiro": "node tools/bancadas/porteiro.mjs",

@@ -1,0 +1,26 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 3,
+  "id": "gabarito-separacao-direcional",
+  "instancias": [
+    {
+      "id": "movel",
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
+      "pose": { "deslocamento": [0, 1.02, 0], "rotacao": [[1, 0, 0], [0, 1, 0], [0, 0, 1]] }
+    },
+    { "id": "referencia", "alvo": { "tipo": "peca", "ref": "bloco-gabarito" } }
+  ],
+  "relacoes": [
+    {
+      "id": "vaoEntreBlocos",
+      "tipo": "mantemSeparacaoDirecional",
+      "referencia": { "caminho": ["referencia"], "parte": "superficie" },
+      "movel": { "caminho": ["movel"] },
+      "especificacao": {
+        "eixo": [0, 2, 0],
+        "separacaoMinima": 0.02,
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 3,
+  "id": "estudo-freio-dianteiro",
+  "instancias": [
+    { "id": "cubo", "alvo": { "tipo": "peca", "ref": "_estudo-cubo-dianteiro" } },
+    { "id": "disco", "alvo": { "tipo": "peca", "ref": "_estudo-disco-dianteiro" } },
+    { "id": "pinca", "alvo": { "tipo": "peca", "ref": "_estudo-pinca-dianteira" } }
+  ],
+  "relacoes": [
+    {
+      "id": "discoNoCubo",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["cubo"], "porta": "assentoDoDisco" },
+      "movel": { "caminho": ["disco"], "porta": "assentoNoCubo" },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.035,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0.008,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "discoPontePinca",
+      "tipo": "mantemSeparacaoDirecional",
+      "referencia": { "caminho": ["disco"] },
+      "movel": { "caminho": ["pinca"], "parte": "pinca" },
+      "especificacao": {
+        "eixo": [0, 1, 0],
+        "separacaoMinima": 0,
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

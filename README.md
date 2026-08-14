@@ -49,16 +49,17 @@ para a direção de composição.
 ## Estado
 
 - Casos 1 e 2 estão homologados; o Caso 3 ainda não começou.
-- Não há plano executivo ativo.
+- O plano executivo ativo generaliza separação direcional e impacto local de
+  montagem; disco–pinça é apenas sua fixture de aceitação.
 - O Módulo 1 do MCP, de leitura e auditoria, foi aprovado.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
   `interromper`; o PR #25 foi fechado sem merge.
 - O núcleo, as receitas, o visor compatível, a bancada e as ferramentas continuam
   ativos.
-- Ainda não existem montagem recursiva persistida, mapa completo de dependências,
-  solver geral de encaixe ou camada completa de escrita para IA.
+- Montagem persistida v1/v2 e contexto JSON consultável existem. Ainda não há
+  mapa completo de dependências, solver geral ou escrita para IA.
 - O contrato genérico de materiais ainda não existe.
-- O servidor estático local ainda falha ao resolver o import bare `earcut`.
+- O visor legado resolve `earcut` também nos servidores estáticos locais.
 
 ## Desenvolvimento
 
@@ -68,6 +69,7 @@ npm run dev
 npm run build
 npm test
 npm run criar -- _viga
+npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 
 Abra `http://localhost:5173/nos-mecanifica/bancada.html`.

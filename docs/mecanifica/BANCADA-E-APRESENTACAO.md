@@ -107,8 +107,9 @@ A bancada ainda não:
 - distingue formalmente alvo editável de contexto somente leitura;
 - publica alterações de receita ou montagem.
 
-O servidor estático local ainda não resolve o import bare `earcut`; não contorne
-isso alterando câmera ou peça.
+O visor legado resolve o import bare `earcut` por import map também nos
+servidores estáticos de `porteiro`, `criar`, `peca` e `gabarito`. Uma regressão
+nessa resolução deve ser corrigida na infraestrutura, nunca na câmera ou peça.
 
 ## Critério de saída atual
 
