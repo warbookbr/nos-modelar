@@ -15,9 +15,9 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
 | Escrita transacional de receitas e montagens | montagem concluída: snapshot, transição, revalidação e MCP opt-in; receita continua candidata |
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
-| Autoria por MCP | montagem concluída em perfil opt-in; receita permanece não definida |
-| Experimento de autoria geométrica do zero | conjunto definido: suporte de eixo, eixo-guia e anel-tampa; aguarda plano executivo |
-| Autoria segura de receitas | proposta, execução isolada, auditoria visual e publicação confirmada; contrato separado da autoria de montagem |
+| Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |
+| Experimento de autoria geométrica do zero | concluído: correção publicada por autoria declarativa; decisão final aprovar |
+| Autoria segura de receitas | concluída para contrato declarativo v1 e MCP opt-in; módulos JS históricos e publicação no catálogo permanecem fora |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
 | Diagnóstico visual estruturado | ligar medidas e falhas a entidades visíveis por identidade semântica |

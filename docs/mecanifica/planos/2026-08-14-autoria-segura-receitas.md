@@ -1,6 +1,6 @@
 # Autoria segura de receitas declarativas
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura, execução e revisão)
 
@@ -77,5 +77,9 @@ mas o artefato salvo e validado permanece declarativo.
 
 ## Fechamento
 
-Registrar contrato, provas, limites e decisão `aprovar`, `corrigir` ou
-`interromper`.
+O contrato declarativo, serviço interno, revalidação confinada e quatro tools
+MCP foram implementados. O cliente caixa-preta recusou o eixo longo, aprovou a
+correção após duas vistas, publicou e releu a revisão sem código ou paths do
+cliente. Os gates fecharam com 70 arquivos, 1.215 testes aprovados e 2
+ignorados. **Decisão: aprovar.** Módulos JS históricos, publicação no catálogo,
+Git, mapa implícito e execução hostil permanecem fora.

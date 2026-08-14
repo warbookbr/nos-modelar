@@ -1,7 +1,7 @@
 # Relatório — experimento de autoria geométrica do zero
 
 **Data:** 2026-08-14
-**Decisão:** `corrigir`
+**Decisão final:** `aprovar` após o recorte corretivo de autoria declarativa.
 
 ## Evidência
 
@@ -34,3 +34,12 @@ temporário confirmou que a fronteira é de contrato, não de localização.
 Abrir plano separado de autoria segura de receitas: proposta de bytes, execução
 isolada, descrição estrita, vistas, confirmação, revisão imutável e revalidação
 das montagens explicitamente catalogadas. Não ampliar o MCP de montagem por atalho.
+
+## Correção executada
+
+O recorte posterior implementou `mecanifica.receita-declarativa` v1 e quatro
+ferramentas MCP opt-in. Um consumidor caixa-preta descobriu `eixo-guia`, teve a
+versão longa recusada pela relação `ombroAntesDaTampa`, planejou a versão de
+0,015 m, recebeu duas vistas, revalidou a montagem, publicou e releu a revisão.
+Nenhum JavaScript ou caminho local cruzou a porta. A recomendação acima foi
+executada; por isso, a decisão consolidada passa de `corrigir` para `aprovar`.

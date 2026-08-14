@@ -33,6 +33,10 @@ function jsonPuro(valor, caminho = '$') {
 }
 function validarReceita(receita) {
   jsonPuro(receita);
+  const bytes = Buffer.byteLength(JSON.stringify(receita), 'utf8');
+  if (bytes > 512 * 1024 || receita?.passos?.length > 2048 || receita?.aliases?.length > 2048) {
+    falhar('limite-excedido', '$receita', 'a proposta excede 512 KiB ou 2.048 passos/aliases.', 'Divida a peça ou reduza a proposta antes de executar.');
+  }
   const chaves = Object.keys(receita ?? {}).sort().join(',');
   if (chaves !== 'aliases,formato,id,materiais,meta,params,passos,topo,versao'
     || receita.formato !== FORMATO_RECEITA_DECLARATIVA || receita.versao !== VERSAO_RECEITA_DECLARATIVA
@@ -52,6 +56,7 @@ export function executarReceitaDeclarativa(receita) {
   catch (erro) { falhar('execucao-recusada', '$receita.passos', erro instanceof Error ? erro.message : String(erro), 'Corrija os passos e execute novamente.', erro); }
   if (bruto.orfaos.length) falhar('execucao-recusada', '$receita.passos', `o núcleo produziu ${bruto.orfaos.length} órfão(s).`, 'Corrija operações, seleções, interfaces e identidades antes de confirmar.');
   const neutro = neutroCanonico(bruto);
+  if (neutro.V.length > 500_000 || neutro.F.length > 500_000) falhar('limite-excedido', '$receita.passos', 'a geometria excede 500.000 vértices ou faces.', 'Reduza a topologia antes de publicar.');
   const semParte = neutro.F.filter((face) => !parteDaFace(face));
   if (semParte.length) falhar('identidade-ausente', '$receita.passos', `${semParte.length} face(s) não possuem parte semântica.`, 'Nomeie todas as faces com operações parte antes de publicar.');
   const peca = {

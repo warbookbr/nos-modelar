@@ -53,8 +53,8 @@ futura não autoriza implementação até existir um plano executivo ativo.
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; validação e comparação caixa-preta sem fallback ou escrita |
 | Autoria controlada de pacotes | concluído: interromper | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
 | Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
-| Autoria de montagem | ativo | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../2026-08-14-materializacao-autoria-segura.md); MCP entra após os gates internos no mesmo recorte |
-| Autoria de receita | não definida | formato e serviços internos de autoria; execução confinada; revalidação | recorte posterior, sem proibição de usar MCP quando trouxer ganho comprovado |
+| Autoria de montagem | concluído: aprovar | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../2026-08-14-materializacao-autoria-segura.md); perfil opt-in aprovado |
+| Autoria de receita | concluído: aprovar | contrato declarativo, revisão imutável, vistas e revalidação confinada | [plano datado](../2026-08-14-autoria-segura-receitas.md); JavaScript do agente permanece proibido |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos agentes |
 
@@ -109,7 +109,7 @@ Uma retomada dessa fatia exige plano técnico próprio para escolher e provar um
 primitivo nativo `no-replace`, um novo protocolo de commit e visibilidade com
 contrato revisado, ou uma redução explícita da garantia.
 
-Essa decisão não define a futura autoria de carros ou receitas. A materialização
-segura e a autoria MCP de montagem foram aprovadas após o serviço interno e o
-consumo caixa-preta; materiais, receita e distribuição continuam candidatos,
-sem veto a avanço futuro que apresente contrato e evidência melhores.
+Essa decisão não define a futura autoria de carros. A materialização segura e a
+autoria MCP de montagem e receita declarativa foram aprovadas após serviço
+interno e consumo caixa-preta; materiais, módulos JavaScript históricos e
+distribuição continuam candidatos, sem veto a evidência melhor.

@@ -48,6 +48,7 @@ describe('autoria declarativa de receita', () => {
     const plano = planejarAutoriaReceita({ receita: receita() });
     expect(() => confirmarAutoriaReceita(plano, { formato: 'mecanifica.plano-autoria-receita', versao: 1, id: 'eixo-guia', pai: null, objeto: '0'.repeat(64), commit: '0'.repeat(64) })).toThrow(/confirmação/);
     expect(() => executarReceitaDeclarativa({ ...receita(), passos: [...receita().passos, ['parte', { nome: 'ausente', sel: { origem: { op: 'cilindro', id: 999999 } } }]] })).toThrow(/órfão/);
+    expect(() => executarReceitaDeclarativa({ ...receita(), passos: Array(2049).fill(receita().passos[0]) })).toThrow(/2.048/);
   });
 
   it('bloqueia publicação quando dependente falha', async () => {

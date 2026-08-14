@@ -39,8 +39,9 @@ aplicação publicada aqui.
   concluiu com `corrigir`: receitas, relações e vistas passaram, mas autoria MCP
   de montagem não pode corrigir uma receita; o relatório define o próximo recorte.
 - O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
-  (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) está ativo e
-  proíbe JavaScript arbitrário na entrada do agente.
+  (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
+  receitas são dados JSON, passam por vistas e revalidação e não executam
+  JavaScript fornecido pelo agente.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -187,7 +188,7 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Executar o plano ativo de autoria segura de receitas declarativas.
+- Escolher o próximo plano executivo; não há plano ativo.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
@@ -207,6 +208,7 @@ Resultados encerrados da própria Mecanifica ficam em
 ## Inventário curado
 
 Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.md),
+[AUTORIA-RECEITA-DECLARATIVA](AUTORIA-RECEITA-DECLARATIVA.md),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
 [BANCADA-E-APRESENTACAO](BANCADA-E-APRESENTACAO.md), [CONTINUIDADE-ARQUITETURAL](CONTINUIDADE-ARQUITETURAL.md),
 [MONTAGEM-PERSISTIDA-V2](MONTAGEM-PERSISTIDA-V2.md), [MONTAGEM-PERSISTIDA-V3](MONTAGEM-PERSISTIDA-V3.md),
@@ -218,6 +220,8 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 [PERFIS-DE-AUTORIA](PERFIS-DE-AUTORIA.md), [REFERENCIA-E-CRITICA-VISUAL](REFERENCIA-E-CRITICA-VISUAL.md),
 [FILETE-V2](FILETE-V2.md), [PRANCHA-FREIO-DISCO](PRANCHA-FREIO-DISCO.md), [PRANCHA-RODA-DIANTEIRA](PRANCHA-RODA-DIANTEIRA.md),
 [COORDENACAO-LOCAL](COORDENACAO-LOCAL.md), [COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](PLANO.md).
+
+O contrato declarativo está em `docs/mecanifica/AUTORIA-RECEITA-DECLARATIVA.md`.
 
 Evidência atual: [estudo de campo do conjunto dianteiro](RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
 O [relatório de autoria geométrica](RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md)

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-331 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+336 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -131,6 +131,7 @@
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
+- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
@@ -372,12 +373,14 @@
 - `catalogo-montagens.test.mjs` — catalogo-montagens.test.mjs — confinamento e descoberta explícita do catálogo MCP.
 - `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
 - `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
-- `servidor.mjs` — servidor.mjs — servidor MCP local stdio do perfil revisao, sem escrita.
+- `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
 
 ## tools/mcp/perfis/
 
 - `autoria-montagens.mjs` — autoria-montagens.mjs — porta MCP opt-in, fina sobre a autoria interna.
 - `autoria-montagens.test.mjs` — Provas R04: MCP de autoria só atua com escopo do host e sem paths públicos.
+- `autoria-receitas.mjs` — autoria-receitas.mjs — porta MCP fina para receitas declarativas.
+- `autoria-receitas.test.mjs` — Contrato fino da porta MCP de autoria declarativa.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
 - `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.
 
@@ -391,6 +394,8 @@
 - `arranjo-em-peca.test.ts` — arranjo-em-peca.test.ts — a prova do ciclo "Arranjos semânticos v1" NA PEÇA, não só no núcleo.
 - `autoria-montagem.mjs` — autoria-montagem.mjs — planejamento e aplicação interna de montagens v1/v2/v3.
 - `autoria-montagem.test.ts` — Provas R02: planejar, confirmar, validar e materializar montagem persistida.
+- `autoria-receita.mjs` — autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript.
+- `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.

@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** [Autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md).
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -71,7 +71,7 @@ campo repetido.
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura e autoria de montagem opt-in aprovadas; receita permanece fora |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura, autoria de montagem e receita declarativa opt-in aprovadas |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -85,7 +85,7 @@ a correção de descoberta foi concluída com decisão `aprovar` em
 e a primeira fatia de autoria controlada foi concluída com decisão `interromper`
 em [`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
 
-A autoria não foi publicada. O PR #25 foi fechado sem merge porque a
+A primeira autoria controlada de pacotes não foi publicada. O PR #25 foi fechado sem merge porque a
 implementação portátil não demonstrou simultaneamente publicação do pacote
 completo em uma única transição e recusa atômica de sobrescrita contra destino
 concorrente. Uma retomada exige plano técnico separado. Edição de receita,
@@ -149,9 +149,8 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
 [diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
 
-## Execução atual
+## Próxima abertura
 
-O plano de [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
-está ativo. Ele fecha a fronteira encontrada no experimento sem executar
-JavaScript fornecido pelo agente. Os demais candidatos permanecem no
-[`BACKLOG.md`](BACKLOG.md).
+A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
+foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
+agente. Não há plano ativo; os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md).
