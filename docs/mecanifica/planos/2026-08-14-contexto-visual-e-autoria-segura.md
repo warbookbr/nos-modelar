@@ -74,7 +74,7 @@ posterior, não definição de modelo.
 2. **R01 — em andamento:** projetar montagem resolvida em entrada compatível
    com capturador existente; prover vistas determinísticas, seleção de
    subárvore/par e relatório sem alterar a bancada publicada.
-3. **R02 — revalidação assistida:** derivar um roteiro a partir de impacto,
+3. **R02 — concluído:** derivar um roteiro a partir de impacto,
    relações resolvidas e limites; executar apenas validações explicitamente
    disponíveis e separar pendentes de não verificáveis.
 4. **R03 — catálogo entre raízes:** ler somente raízes declaradas, indexar usos
