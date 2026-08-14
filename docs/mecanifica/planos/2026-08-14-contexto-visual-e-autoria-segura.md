@@ -71,7 +71,7 @@ posterior, não definição de modelo.
 ## Fatias
 
 1. **R00 — concluído:** corrigir backlog, fixtures, métricas e plano.
-2. **R01 — em andamento:** projetar montagem resolvida em entrada compatível
+2. **R01 — concluído:** projetar montagem resolvida em entrada compatível
    com capturador existente; prover vistas determinísticas, seleção de
    subárvore/par e relatório sem alterar a bancada publicada.
 3. **R02 — concluído:** derivar um roteiro a partir de impacto,
