@@ -122,7 +122,7 @@ quebraria seu fechamento e porque endpoint de região difere de endpoint porta.
 
 ## Fatias
 
-1. R00 — contrato v3, fixture neutra e baseline R001/R002;
+1. R00 — concluído: contrato v3 e fixture estrutural neutra;
 2. R01 — leitura/resolução de `mantemSeparacaoDirecional`;
 3. R02 — mapa de impacto direto e indireto;
 4. R03 — integração no contexto e estudo de campo;

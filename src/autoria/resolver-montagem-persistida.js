@@ -1,6 +1,6 @@
 /* resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo. */
 
-import { lerMontagemPersistida, VERSAO_ATUAL } from './ler-montagem-persistida.js';
+import { lerMontagemPersistida, VERSAO_RELACOES } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
 import { resolverPortasDeMontagem, validarEncaixeCilindrico, validarAssentamentoAnular } from './interfaces-montagem.js';
@@ -181,7 +181,7 @@ function executarRelacao(relacao, indice, trilhaMontagem) {
 }
 
 function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem) {
-  if (montagem.versao !== VERSAO_ATUAL) return montagemResolvida;
+  if (montagem.versao < VERSAO_RELACOES) return montagemResolvida;
   const relacoes = montagem.relacoes.map((relacao, indice) => {
     const resolvida = {
       id: relacao.id,
