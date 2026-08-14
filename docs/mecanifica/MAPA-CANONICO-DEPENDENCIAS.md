@@ -75,6 +75,15 @@ UUID, caminho local ou malha é exportado. Todas as listas são ordenadas por
 identidade e caminho, e a mesma autoria em ordem equivalente produz os mesmos
 bytes JSON.
 
+## Consulta de impacto da R03
+
+`mecanifica.impacto-global`, versão `1`, recebe somente `{ tipo, id }` e um
+mapa completo. Retorna dependentes diretos e transitivos, raízes afetadas e não
+afetadas, caminhos do alvo, relações tocadas e `roteiroRevalidacao` ordenado.
+O roteiro aponta montagens e proveniência, mas não executa gates, altera autoria
+ou promete aprovação. Alvo ausente, mapa incompleto ou entidade fora do universo
+falham fechadamente. A consulta não infere dependência por geometria.
+
 ## Fixture de prova
 
 `tools/mecanifica/fixtures/mapa-dependencias/` contém:
@@ -95,5 +104,5 @@ duplicidade, identidade divergente e ciclo.
 
 R00 valida o universo e suas referências de composição. R01 acrescenta o
 snapshot de fontes, revisões ativas, hashes e recusa de concorrência. R02 deriva
-arestas, ocorrências, relações e usos reversos. R03 consultará esse mapa. Este
+arestas, ocorrências, relações e usos reversos. R03 consulta esse mapa. Este
 contrato não executa revalidação, não prova colisão e não altera autoria.

@@ -130,14 +130,13 @@ cobrem completude, sobreposição, mutação e revisão. A derivação permanece
 derivador puro e cinco provas sobre a fixture da R01 cobrem duas
 raízes compartilhadas, ramo isolado, relações, proveniência e cobertura.
 
-### R03 — consulta de impacto global
+### R03 — consulta de impacto global — concluída
 
-- consultar peça ou montagem por ID;
-- calcular dependentes diretos e transitivos, raízes, caminhos e relações;
-- derivar o roteiro mínimo de revalidação sem executar gates;
-- declarar ramo não afetado, limites e cobertura do universo.
+- consultar peça ou montagem por ID, dependentes, raízes, caminhos e relações;
+- derivar roteiro mínimo sem executar gates e declarar limites/cobertura.
 
-**Saída:** `mecanifica.impacto-global` v1 compacto e acionável.
+**Saída:** `mecanifica.impacto-global` v1 compacto e acionável. Evidência: cinco
+provas cobrem peça compartilhada/isolada, montagem, relações, limites e roteiro.
 
 ### R04 — consumo Agent-First
 

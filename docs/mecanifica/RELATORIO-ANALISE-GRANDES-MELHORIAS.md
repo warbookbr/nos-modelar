@@ -15,8 +15,8 @@ vista e revalidação, e o perfil de autoria perdia as ferramentas de leitura.
 Isso tornava a continuidade entre sessões mais fraca que a própria autoria.
 
 Esse gargalo foi corrigido pelo plano de continuidade de autoria ativa. Em
-seguida, as R00–R02 do mapa canônico fixaram o universo, o snapshot consistente
-e a derivação global de composição, ocorrências e usos reversos.
+seguida, as R00–R03 do mapa canônico fixaram universo, snapshot, derivação e
+consulta direcionada de impacto.
 
 ## Leitura por capacidade
 
@@ -24,7 +24,7 @@ e a derivação global de composição, ocorrências e usos reversos.
 |---|---|---|
 | Gerar peça procedural | forte no contrato declarativo v1 | não cobre todo módulo JS histórico nem todas as formas desejadas |
 | Inspecionar peça | forte | diagnóstico visual ainda não liga toda crítica a uma ação semântica |
-| Compor montagens | forte no catálogo explícito e relações v1–v3 | consulta global ainda não existe |
+| Compor montagens | forte no catálogo explícito e relações v1–v3 | consulta global direcionada provada; MCP ainda fora |
 | Medir e revalidar | forte para relações e raízes conhecidas | cobertura depende da lista explícita do host; cascata ainda não existe |
 | Publicar com segurança | forte para receita e montagem autorizadas | não há rollback/promocão de revisão anterior nem variantes simultâneas |
 | Continuar em outra sessão | forte no catálogo configurado após este recorte | não atravessa catálogos ou hosts não declarados |
@@ -63,9 +63,8 @@ observou o mesmo máximo em X de 0,010 m.
 
 ### 1. Mapa canônico global de dependências
 
-Está em execução e já possui derivação canônica. O próximo recorte é expor
-consulta direcionada sobre esse mapa, preservando identidade, proveniência e o
-universo declarado.
+Está provado até a consulta direcionada. O próximo recorte é consumir o mapa
+por MCP, preservando identidade, proveniência e o universo declarado.
 
 ### 2. Revalidação em cascata com estado persistido
 
@@ -104,16 +103,15 @@ ou paleta por implicação.
 
 ## Direção recomendada
 
-Abrir em seguida a consulta de impacto global em escopo somente leitura e depois
-ligá-la à revalidação persistida. Esse par transforma a
+Consumir em seguida a consulta de impacto global por MCP em escopo somente
+leitura e depois ligá-la à revalidação persistida. Esse par transforma a
 base atual — excelente para um conjunto explícito — em infraestrutura capaz de
 manter sistemas grandes sem exigir que a IA carregue ou conheça o carro inteiro.
 
 Esse avanço já foi aberto em
 [`2026-08-14-mapa-canonico-dependencias.md`](planos/2026-08-14-mapa-canonico-dependencias.md).
-A R00 fixou o contrato, a R01 acrescentou snapshot confinado e a R02 derivou
-composição, ocorrências, relações e usos reversos; a consulta global começa na
-R03.
+A R00 fixou o contrato, a R01 o snapshot, a R02 a derivação e a R03 a consulta;
+o consumo MCP começa na R04.
 
 Novas operações geométricas continuam válidas quando um estudo de campo as
 colocar no caminho crítico; elas não devem competir automaticamente com a
@@ -121,7 +119,7 @@ continuidade e o controle de dependências.
 
 ## Evidência de fechamento
 
-Os gates completos passaram com 74 arquivos de teste, 1.237 testes aprovados e
+Os gates completos passaram com 75 arquivos de teste, 1.242 testes aprovados e
 2 ignorados. Também passaram typecheck, build, porteiro 7/7, gabarito de seleção
 para 36 peças, guardas de identidade, portas, câmera e pares, inventário, links,
 planos, exportação e criação de `_viga`. **Decisão do recorte: aprovar.**
