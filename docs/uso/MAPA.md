@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-294 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+295 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -155,6 +155,7 @@
 - `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
 - `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
 - `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
+- `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto

@@ -7,13 +7,13 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 
 | Candidato | Estado / próximo recorte |
 |---|---|
-| Separação espacial e impacto local | ativo em plano próprio; relação direcional genérica + mapa derivado, sem colisão geral |
+| Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | recorte local ativo; catálogo global de usos permanece futuro |
-| Contexto de trabalho da IA | separar alvo editável, contexto visual, dependentes afetados e validações obrigatórias |
-| Revalidação de dependentes | localizar dependentes diretos e indiretos e relatar separadamente relações preservadas e quebradas |
-| Escrita transacional de receitas e montagens | definir serviço interno antes de escolher MCP, CLI ou API; exigir publicação completa, recusa de sobrescrita e estado anterior preservado |
+| Mapa de composição e dependências | impacto local concluído; catálogo explícito entre raízes é R03 do plano ativo |
+| Contexto de trabalho da IA | contexto estrutural concluído; contexto visual e roteiro de revalidação são R01/R02 do plano ativo |
+| Revalidação de dependentes | roteiro assistido é R02; automação permanece fora |
+| Escrita transacional de receitas e montagens | contrato e prova de atomicidade são R04; MCP/API continuam fora |
 | Autoria por MCP | não definida; depende dos serviços internos de peça, montagem, contexto, transação e revalidação; não é continuação automática do plano de pacotes interrompido |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |

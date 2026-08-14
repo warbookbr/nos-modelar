@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-contexto-visual-e-autoria-segura.md`](2026-08-14-contexto-visual-e-autoria-segura.md),
+em R00.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -58,6 +60,10 @@ separadas, sem abertura automática.
 Com autorização explícita de continuidade, a relação espacial direcional e o
 mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o contrato
 permanece neutro e não promete colisão geral.
+
+Com autorização explícita de continuidade, o plano de contexto visual e autoria
+segura foi aberto em R00. Ele avança leitura visual, revalidação assistida,
+catálogo explícito entre raízes e somente então avalia escrita transacional.
 
 ## Programas
 
@@ -120,6 +126,7 @@ nos arquivos originais.
 | Montagem Persistida v2 — relações locais | concluído: R06, PR #41 |
 | Contexto de montagem para IA | concluído: R05, PR #42 |
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
+| Contexto visual e autoria segura de montagem | ativo: R00 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),

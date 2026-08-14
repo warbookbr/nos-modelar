@@ -23,6 +23,9 @@ aplicação publicada aqui.
   plano de separação direcional e impacto local foi concluído no R04 com
   montagem v3 e mapa derivado; mapa global, revalidação automática, writer, MCP
   e API permanecem fora.
+- O plano de contexto visual e autoria segura está ativo em R00: começa por
+  leitura visual e revalidação assistida; escrita transacional só avança após
+  prova de atomicidade e MCP continua fora.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -213,6 +216,7 @@ Planejamento: [planos/README](planos/README.md),
 [autoria controlada](planos/2026-08-05-mcp-autoria-controlada.md),
 [contexto de montagem para IA](planos/2026-08-14-contexto-de-montagem-para-ia.md),
 [separação direcional e impacto local](planos/2026-08-14-separacao-direcional-e-impacto-local.md),
+[contexto visual e autoria segura](planos/2026-08-14-contexto-visual-e-autoria-segura.md),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
@@ -247,6 +251,8 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 <!-- Plano concluído alcançável: docs/mecanifica/planos/2026-08-14-contexto-de-montagem-para-ia.md -->
 
 <!-- Plano concluído alcançável: docs/mecanifica/planos/2026-08-14-separacao-direcional-e-impacto-local.md -->
+
+<!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-contexto-visual-e-autoria-segura.md -->
 
 <!-- Evidência alcançável: docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md -->
 
