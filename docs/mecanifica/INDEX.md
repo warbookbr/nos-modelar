@@ -20,8 +20,9 @@ aplicação publicada aqui.
   no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
   montagem para IA foi concluído no R05 com descritor puro e CLI confinada. O
-  plano de separação direcional e impacto local está ativo em R00; mapa global,
-  revalidação automática, writer, MCP e API permanecem fora.
+  plano de separação direcional e impacto local foi concluído no R04 com
+  montagem v3 e mapa derivado; mapa global, revalidação automática, writer, MCP
+  e API permanecem fora.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -34,9 +35,9 @@ aplicação publicada aqui.
   gates.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
-- Os contratos v1/v2, o resolvedor recursivo e o contexto JSON consultável de
-  montagem existem; ainda não existe mapa completo de dependências, relação
-  geral, solver geral de encaixe ou camada completa de escrita para IA.
+- Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
+  o mapa de impacto local existem; ainda não existe mapa global completo de
+  dependências, colisão geral, solver ou camada completa de escrita para IA.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
@@ -92,7 +93,8 @@ implicação.
   recursiva, relações, dependências e níveis de maturidade.
 7. [`MONTAGEM-PERSISTIDA-V1.md`](MONTAGEM-PERSISTIDA-V1.md) para o contrato
    executável de montagem persistida v1.
-8. [`MONTAGEM-PERSISTIDA-V2.md`](MONTAGEM-PERSISTIDA-V2.md) e
+8. [`MONTAGEM-PERSISTIDA-V2.md`](MONTAGEM-PERSISTIDA-V2.md),
+   [`MONTAGEM-PERSISTIDA-V3.md`](MONTAGEM-PERSISTIDA-V3.md) e
    [`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md) para relações locais e
    sua descrição compacta e consultável.
 9. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
@@ -114,7 +116,8 @@ implicação.
 - Peças versus montagens, carro, motor e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
 - Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA-V1.md`,
-  `MONTAGEM-PERSISTIDA-V2.md` e `CONTEXTO-MONTAGEM-IA.md`.
+  `MONTAGEM-PERSISTIDA-V2.md`, `MONTAGEM-PERSISTIDA-V3.md` e
+  `CONTEXTO-MONTAGEM-IA.md`.
 - Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
@@ -190,7 +193,7 @@ Resultados encerrados da própria Mecanifica ficam em
 Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.md),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
 [BANCADA-E-APRESENTACAO](BANCADA-E-APRESENTACAO.md), [CONTINUIDADE-ARQUITETURAL](CONTINUIDADE-ARQUITETURAL.md),
-[MONTAGEM-PERSISTIDA-V2](MONTAGEM-PERSISTIDA-V2.md),
+[MONTAGEM-PERSISTIDA-V2](MONTAGEM-PERSISTIDA-V2.md), [MONTAGEM-PERSISTIDA-V3](MONTAGEM-PERSISTIDA-V3.md),
 [FLUXO-MODELAGEM-IA](FLUXO-MODELAGEM-IA.md),
 [HOMOLOGACAO-FLUXO-IA](HOMOLOGACAO-FLUXO-IA.md), [MONTAGENS-SEMANTICAS](MONTAGENS-SEMANTICAS.md),
 [UPSTREAM-NOS](UPSTREAM-NOS.md), [ATRITOS-AUTORIA](ATRITOS-AUTORIA.md), [VISAO](VISAO.md),
@@ -243,12 +246,14 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 
 <!-- Plano concluído alcançável: docs/mecanifica/planos/2026-08-14-contexto-de-montagem-para-ia.md -->
 
-<!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-separacao-direcional-e-impacto-local.md -->
+<!-- Plano concluído alcançável: docs/mecanifica/planos/2026-08-14-separacao-direcional-e-impacto-local.md -->
 
 <!-- Evidência alcançável: docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md -->
 
 <!-- Documento de continuidade arquitetural incluído no inventário curado: docs/mecanifica/CONTINUIDADE-ARQUITETURAL.md -->
 
 <!-- Contrato de contexto alcançável: docs/mecanifica/CONTEXTO-MONTAGEM-IA.md -->
+
+<!-- Contrato v3 alcançável: docs/mecanifica/MONTAGEM-PERSISTIDA-V3.md -->
 
 <!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->

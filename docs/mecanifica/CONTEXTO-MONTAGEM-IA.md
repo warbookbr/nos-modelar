@@ -1,7 +1,7 @@
 # Contexto de montagem para IA
 
-Este contrato transforma uma árvore já resolvida de `mecanifica.montagem` v1
-ou v2 em JSON compacto, determinístico e consultável. Ele permite que a IA
+Este contrato transforma uma árvore já resolvida de `mecanifica.montagem` v1,
+v2 ou v3 em JSON compacto, determinístico e consultável. Ele permite que a IA
 compreenda composição, poses, caixas, partes, portas e relações sem receber a
 malha bruta nem objetos internos de runtime.
 
@@ -74,18 +74,17 @@ O novo comando não executa receitas, shell, renderizador ou escrita.
 ## Evidência aceita
 
 No estudo do conjunto dianteiro, a descrição completa contém 6 peças, 2
-submontagens e 4 relações em 17.772 bytes. A consulta `freio/disco` com seu
-relacionado usa 6.712 bytes. Ambas ficam abaixo do limite de 64 KiB.
+submontagens e 5 relações em 18.611 bytes. A consulta `freio/disco` com seus
+relacionados diretos usa 9.002 bytes. Ambas ficam abaixo do limite de 64 KiB.
 
-Na R002, o disco invade a ponte da pinça em 5 mm enquanto as quatro relações
-declaradas permanecem satisfeitas. O contexto preserva esse resultado local e
-nega explicitamente que colisão global ou dependências indiretas tenham sido
+Na R002, as quatro relações v2 permanecem satisfeitas e a relação v3 mede
+`−0,005 m` de separação direcional, sendo a única reprovada. O contexto nega
+explicitamente que colisão global ou dependências indiretas tenham sido
 verificadas; não publica um campo de “montagem válida”.
 
 ## Limites e próximos consumidores
 
-Este contrato não renderiza montagem, calcula colisão, cria relação genérica de
-folga, deriva mapa de dependentes, escreve autoria nem publica MCP. Contexto
-visual, revalidação por impacto e portas externas exigem planos próprios. O
-serviço puro deve continuar sendo a fonte caso algum desses consumidores seja
-aberto.
+Este contrato não renderiza montagem, calcula colisão, escreve autoria nem
+publica MCP. A v3 oferece separação direcional e um serviço separado deriva
+impacto local; nenhum deles prova colisão ou executa revalidação. Contexto
+visual, revalidação automática e portas externas exigem planos próprios.

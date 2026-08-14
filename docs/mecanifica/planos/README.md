@@ -2,9 +2,7 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-14-separacao-direcional-e-impacto-local.md`](2026-08-14-separacao-direcional-e-impacto-local.md),
-em R00.
+**Plano ativo:** nenhum.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -53,13 +51,13 @@ foi concluído no R05. Ele entrega descrição estruturada, compacta e consultá
 de montagem persistida arbitrária, com cobertura explícita do que foi e do que
 não foi verificado.
 
-O estudo completo mede 17.772 bytes e a consulta reduzida, 6.712 bytes.
+O estudo completo mede 18.611 bytes e a consulta reduzida, 9.002 bytes.
 Renderização, MCP e autoria transacional permanecem etapas posteriores e
 separadas, sem abertura automática.
 
 Com autorização explícita de continuidade, a relação espacial direcional e o
-mapa de impacto local foram abertos como plano seguinte. Disco–pinça é fixture;
-o contrato permanece neutro e não promete colisão geral.
+mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o contrato
+permanece neutro e não promete colisão geral.
 
 ## Programas
 
@@ -121,6 +119,7 @@ nos arquivos originais.
 | Diagnóstico do motor procedural | concluído: abrir Montagem Mínima Persistida v1 |
 | Montagem Persistida v2 — relações locais | concluído: R06, PR #41 |
 | Contexto de montagem para IA | concluído: R05, PR #42 |
+| Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),

@@ -1,4 +1,4 @@
-/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2. */
+/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3. */
 
 import { identidadeTransformacaoRigida, validarTransformacaoRigida } from './transformacao-rigida.js';
 

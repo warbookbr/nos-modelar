@@ -1,6 +1,6 @@
 # Separação direcional e impacto local de montagem
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura e revisão) e agente local (execução)
 
@@ -126,7 +126,7 @@ quebraria seu fechamento e porque endpoint de região difere de endpoint porta.
 2. R01 — concluído: leitura/resolução de `mantemSeparacaoDirecional`;
 3. R02 — concluído: mapa de impacto direto e indireto;
 4. R03 — concluído: integração no contexto e estudo de campo;
-5. R04 — documentação, regressões e fechamento.
+5. R04 — concluído: documentação, regressões e fechamento.
 
 ## Riscos e parada
 
@@ -138,5 +138,7 @@ quebraria seu fechamento e porque endpoint de região difere de endpoint porta.
 
 ## Fechamento
 
-Registrar versão, fixtures, medidas R001/R002, impacto observado, commits, gates,
-limitações e decisão sobre abrir ou não revalidação automática.
+V3 foi fechada com fixture neutra, separação direcional e impacto local. R001
+mede `+0.020 m`; R002 mede `-0.005 m` e reprova somente a relação nova. O mapa
+do disco encontra 2 relações diretas e 3 indiretas. Revalidação automática não
+foi aberta: exige política e transação próprias.

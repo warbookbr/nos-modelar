@@ -89,12 +89,13 @@ Na R001, o disco terminava em `y=0.140` e a ponte da pinça começava em
 externo do disco passou a `0.165 m`; a folga virou `-0.005 m`, isto é, invasão
 de 5 mm.
 
-As quatro relações persistidas continuaram satisfeitas nas duas rodadas. O
-resultado é correto para o contrato atual: nenhuma relação declara a folga
-disco–pinça. O resolvedor não pode diagnosticar uma intenção ausente.
-Classificação preliminar: `ADIAR` um mapa global enquanto o plano ativo estiver
-aberto, mas registrar como candidato prioritário um invariante neutro de folga
-e a descoberta/revalidação dos dependentes de uma alteração.
+Na rodada original, as quatro relações persistidas continuaram satisfeitas. O
+resolvedor não podia diagnosticar uma intenção ausente. Na continuidade, uma
+relação v3 genérica passou a medir separação direcional entre regiões
+semânticas: R001 mede `+0.020 m`; R002 mede `-0.005 m` e reprova somente essa
+relação. Um mapa local também classifica, para o disco, duas relações diretas e
+três indiretas. A projeção não é apresentada como colisão geral e usos fora da
+raiz permanecem explicitamente desconhecidos.
 
 ## Atrito 7 — comparação existe, descoberta por CLI diverge
 
