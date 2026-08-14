@@ -213,6 +213,8 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 [COORDENACAO-LOCAL](COORDENACAO-LOCAL.md), [COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](PLANO.md).
 
 Evidência atual: [estudo de campo do conjunto dianteiro](RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
+O próximo experimento já tem [conjunto neutro definido](CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md)
+(`docs/mecanifica/CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md`), mas não possui plano ativo.
 
 Planejamento: [planos/README](planos/README.md),
 [diagnóstico do motor](planos/2026-08-06-diagnostico-motor-procedural.md),
