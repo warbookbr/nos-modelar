@@ -165,7 +165,7 @@ canônico; uso/diagnóstico fica em `stderr`. A CLI não replica regra do servi�
 
 1. R00 — concluído: baseline, contrato, bytes, ausências e erros;
 2. R01 — concluído: árvore, poses, caixas, portas, relações e cobertura;
-3. R02 — caminho, profundidade e relacionados;
+3. R02 — concluído: caminho, profundidade e relacionados;
 4. R03 — CLI confinada e diagnóstico;
 5. R04 — repetir R001/R002 e medir contexto;
 6. R05 — documentação, gates, decisão e fechamento.
