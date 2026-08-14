@@ -1,11 +1,11 @@
 # Materialização e autoria segura de montagens
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** GPT (arquitetura, execução e revisão)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, branch do PR #44 em
-`e169594`.
+`3f90bbc`.
 
 ## Problema observado
 
@@ -192,9 +192,9 @@ fatia em que reduzir custo do agente sem duplicar regras, inclusive neste plano.
   estado oculto irrecuperável ou regra duplicada. Isso é decisão pela prova,
   não veto a uma retomada tecnicamente superior.
 
-## Fechamento esperado
+## Fechamento
 
-Registrar commits/PR, formato de armazenamento e transição, matriz de falhas,
-gates, consumo caixa-preta, limites observados e decisão final. Candidatos fora
-do recorte voltam ao backlog sem bloquear expansões que apresentem evidência
-melhor.
+R00–R05 provaram armazenamento, transição, autoria, promoção e consumidor MCP.
+R06 aprovou 5/5 relações na base, recusou a alteração direcional (−5 mm) e
+passou a prova MCP visual 42/42 e todos os gates (1.207 testes, 2 ignorados).
+**Decisão: aprovar.** A autoria MCP é opt-in, confinada e separada da leitura; receita, mapa global, revalidação automática, Git e rede voltam ao backlog.

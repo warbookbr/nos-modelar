@@ -102,3 +102,19 @@ precisam de contrato transacional e de política explícita para falhas.
 
 O registro cronológico, comandos, medidas e atritos completos estão em
 [`REGISTRO.md`](../../autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/REGISTRO.md).
+
+## Repetição R06 — autoria segura
+
+A repetição preservou a base R001: seis peças, duas montagens filhas e 5/5
+relações satisfeitas. A alteração localizada do disco para raio de 165 mm
+preservou os quatro encaixes e recusou a relação direcional disco–pinça com
+separação de −5 mm. O erro é mensurável e limitado à relação declarada; não é
+apresentado como colisão global.
+
+Sobre o mesmo contexto, o consumidor MCP caixa-preta descobriu o alvo, leu a
+revisão, planejou, inspecionou duas vistas reais, aplicou bytes confirmados,
+releu a revisão e teve proposta irmã recusada por revisão desatualizada. A prova
+visual real passou 42/42; não houve shell ou caminho local na interface do
+consumidor. A decisão do plano de materialização é **aprovar**. Isso habilita
+autoria de montagem no perfil opt-in, não autoria de receitas nem inferência de
+dependências fora do catálogo.

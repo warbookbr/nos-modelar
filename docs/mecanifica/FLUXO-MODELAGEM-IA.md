@@ -120,10 +120,10 @@ Depois da alteração local, o sistema deverá:
 7. permitir correção, adaptação da montagem ou criação de variante;
 8. publicar apenas estado completo e válido.
 
-Essa extensão está parcialmente implementada. Ainda faltam materialização
-segura, aplicação de alteração, reexecução e publicação condicionada à
-revalidação; esses pontos estão sendo tratados pelo plano ativo de
-materialização e autoria segura de montagens.
+Para montagem, materialização segura, aplicação de alteração e publicação
+condicionada à revalidação foram aprovadas em repositório local autorizado.
+Reexecução automática e descoberta de dependentes fora do catálogo continuam
+fora do recorte.
 
 ## Crítica e comparação
 
@@ -145,16 +145,15 @@ Para montagens futuras, a comparação também deverá distinguir:
 O MCP atual pode descrever, validar, comparar e renderizar evidências do fluxo.
 Ele não define o formato da peça nem o futuro formato de montagem.
 
-Uma escrita, via MCP ou outra porta, precisa ter alvo explícito,
-planejamento, confinamento, publicação atômica, nenhuma sobrescrita acidental e
-revalidação dos dependentes. A escrita ainda não está implementada; o plano
-ativo prova essas garantias e pode expor o serviço por MCP no mesmo recorte
-quando os gates fecharem.
+Uma escrita, via MCP ou outra porta, exige alvo explícito, planejamento,
+confinamento, publicação atômica, nenhuma sobrescrita acidental e revalidação.
+Para montagem, essas garantias foram provadas em perfil MCP opt-in; receita e
+outras portas ainda requerem plano e evidência próprios.
 
 ## Estado
 
-Os Casos 1 e 2 estão concluídos. O Caso 3 não foi iniciado. O plano executivo
-de materialização e autoria segura de montagens está ativo.
+Os Casos 1 e 2 estão concluídos. O Caso 3 não foi iniciado. Não há plano
+executivo ativo.
 
 O Módulo 1 do MCP foi aprovado para leitura e auditoria. A primeira tentativa de
 autoria controlada foi encerrada com decisão `interromper`; o PR #25 foi fechado

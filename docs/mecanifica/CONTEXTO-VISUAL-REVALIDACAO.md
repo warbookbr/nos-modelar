@@ -17,9 +17,8 @@ infere dependência por proximidade.
 
 A leitura de montagens por MCP expõe essas capacidades por IDs semânticos. A
 configuração confiável do servidor declara as raízes; o agente não fornece nem
-recebe caminhos locais. Escrita ficou fora dessa fatia de leitura; o plano ativo
-de materialização e autoria segura de montagens agora prova essa capacidade com
-seus próprios gates.
+recebe caminhos locais. A autoria de montagem foi aprovada em perfil MCP opt-in,
+mas permanece separada do perfil de leitura e reutiliza o serviço transacional.
 
 ## MCP somente leitura
 
@@ -77,6 +76,6 @@ mensuráveis, roteiro de revalidação ou diagnóstico estrutural.
 O armazenamento escolhido está em
 [`ESCRITA-TRANSACIONAL-MONTAGEM.md`](ESCRITA-TRANSACIONAL-MONTAGEM.md). Revisões
 são imutáveis, conteúdo e commits usam SHA-256, e o commit é a fronteira de
-visibilidade. Concorrência produz conflito explícito. MCP de escrita e
-materialização no workspace ainda não estão implementados; são o escopo do
-plano ativo, condicionado à prova do contrato interno.
+visibilidade. Concorrência produz conflito explícito. O perfil MCP de autoria e
+a materialização de montagem foram aprovados no repositório autorizado pelo
+host; API, Git remoto, receita e filesystem de rede continuam fora.

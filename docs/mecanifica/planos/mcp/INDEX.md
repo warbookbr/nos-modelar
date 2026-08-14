@@ -87,8 +87,8 @@ Planos executivos datados usam os estados aceitos por `npm run planos:check`.
 ## Decisão atual
 
 O Módulo 1 — leitura e revisão somente leitura — está **aprovado**. A extensão
-somente leitura para montagens também foi aprovada. O plano executivo de
-materialização e autoria segura de montagens está ativo.
+somente leitura para montagens e a autoria de montagem em perfil MCP opt-in
+também foram aprovadas; não há plano executivo ativo.
 
 A primeira tentativa de autoria controlada foi encerrada com decisão
 `interromper`. O protótipo do PR #25 demonstrou planejamento puro, confirmação
@@ -109,12 +109,7 @@ Uma retomada dessa fatia exige plano técnico próprio para escolher e provar um
 primitivo nativo `no-replace`, um novo protocolo de commit e visibilidade com
 contrato revisado, ou uma redução explícita da garantia.
 
-Essa decisão não define a futura autoria de carros, montagens ou receitas. O
-plano ativo prova serviço interno e porta MCP em sequência curta: a porta não
-duplica as regras, mas também não precisa esperar outro ciclo quando os gates do
-serviço fecharem.
-
-O limite de escrita anterior era temporal e baseado nas provas disponíveis. A
-materialização segura e a autoria MCP de montagem agora estão abertas pelo
-plano ativo. Materiais, receita e distribuição continuam candidatos, sem veto a
-um avanço futuro que apresente contrato e evidência melhores.
+Essa decisão não define a futura autoria de carros ou receitas. A materialização
+segura e a autoria MCP de montagem foram aprovadas após o serviço interno e o
+consumo caixa-preta; materiais, receita e distribuição continuam candidatos,
+sem veto a avanço futuro que apresente contrato e evidência melhores.

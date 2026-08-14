@@ -31,17 +31,18 @@ aplicação publicada aqui.
   concluído e aprovado: contexto, revalidação, catálogo e vistas de montagem
   são consumíveis por IDs semânticos. A ausência de escrita não é veto futuro.
 - O [plano de materialização e autoria
-  segura](planos/2026-08-14-materializacao-autoria-segura.md) está ativo. Ele
-  prova snapshot completo, ativação por revisão observada, revalidação e a
-  porta MCP no mesmo recorte quando os gates internos fecharem.
+  segura](planos/2026-08-14-materializacao-autoria-segura.md) foi concluído e
+  aprovado: snapshots imutáveis, ativação por revisão observada, revalidação
+  condicionante e perfil MCP de autoria opt-in foram provados no mesmo recorte.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
   `interromper`; a issue #23 foi concluída e o PR #25 foi fechado sem merge.
-- O MCP atual continua sendo uma porta de leitura e auditoria. Ele não define o
-  núcleo, o formato de peça ou a futura arquitetura de montagem.
+- O MCP padrão continua sendo uma porta de leitura e auditoria; o perfil de
+  autoria é opt-in do host e só materializa montagens no repositório autorizado.
+  Nenhum perfil define o núcleo, o formato de peça ou a futura arquitetura.
 - Os adaptadores de inspeção e a bancada publicada existem e são usados pelos
   gates.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
@@ -179,7 +180,7 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Executar o plano ativo de materialização e autoria segura de montagens.
+- Escolher e abrir o próximo plano executivo; não há plano ativo.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
