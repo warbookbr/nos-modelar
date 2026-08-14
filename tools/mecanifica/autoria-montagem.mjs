@@ -1,6 +1,8 @@
 /* autoria-montagem.mjs — planejamento e aplicação interna de montagens v1/v2/v3. */
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
+import { derivarImpactoMontagem } from '../../src/autoria/derivar-impacto-montagem.js';
+import { derivarRoteiroRevalidacao } from '../../src/autoria/derivar-roteiro-revalidacao.js';
 import { lerRevisaoAtivaAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria } from './repositorio-autoria.mjs';
 
 export const FORMATO_PLANO_AUTORIA_MONTAGEM = 'mecanifica.plano-autoria-montagem';
@@ -107,6 +109,14 @@ export function confirmarAutoriaMontagem(plano, confirmacao = confirmarEsperado(
   return { ...plano, confirmacao: esperada };
 }
 
+function exigirConfirmacao(plano, confirmacao) {
+  const observada = confirmacao ?? plano?.confirmacao;
+  if (!observada) {
+    falhar('confirmacao-ausente', '$confirmacao', 'a aplicação exige confirmação explícita do plano.', 'Confirme o plano com confirmarAutoriaMontagem antes de aplicar.');
+  }
+  return confirmarAutoriaMontagem(plano, observada);
+}
+
 export async function observarAutoriaMontagem({ raiz, entidade, fs } = {}) {
   const ativa = await lerRevisaoAtivaAutoria(raiz, entidade, { fs });
   if (!ativa) return { revisao: null, objeto: null, montagem: null };
@@ -138,7 +148,7 @@ export async function validarAutoriaMontagem(plano, { carregarPeca, carregarMont
 }
 
 export async function materializarAutoriaMontagem({ raiz, plano, confirmacao, carregarPeca, carregarMontagem, falhaInjetada, fs, telemetria } = {}) {
-  const confirmado = confirmarAutoriaMontagem(plano, confirmacao ?? plano?.confirmacao);
+  const confirmado = exigirConfirmacao(plano, confirmacao);
   const validacao = await validarAutoriaMontagem(confirmado, { carregarPeca, carregarMontagem });
   const resultado = await materializarRevisaoAutoria({
     raiz,
@@ -148,4 +158,126 @@ export async function materializarAutoriaMontagem({ raiz, plano, confirmacao, ca
     telemetria,
   });
   return { ...resultado, validacao: { estado: validacao.estado, resumo: validacao.resumo } };
+}
+
+function chaveRelacao(montagem, id) {
+  return `${JSON.stringify(montagem)}\0${id}`;
+}
+
+function relacoesDaArvore(montagem, caminho = [], resultado = new Map()) {
+  for (const relacao of montagem.relacoes ?? []) resultado.set(chaveRelacao(caminho, relacao.id), relacao);
+  for (const instancia of montagem.instancias ?? []) {
+    if (instancia.alvo.tipo === 'montagem') relacoesDaArvore(instancia.montagem, instancia.caminho, resultado);
+  }
+  return resultado;
+}
+
+function capturasSemanticas(capturas) {
+  return capturas
+    .map((captura) => JSON.stringify((captura.instancias ?? []).map((caminho) => caminho.slice()).sort((a, b) => canonico(a).localeCompare(canonico(b), 'pt-BR'))))
+    .filter(Boolean);
+}
+
+async function validarInspecaoVisual({ montagem, alvo, necessaria, capturarVistas, vistas }) {
+  if (!necessaria) return { estado: 'nao-necessaria', vistas: [] };
+  if (typeof capturarVistas !== 'function') {
+    return { estado: 'pendente', codigo: 'inspecao-visual-ausente', acao: 'Forneça duas vistas reais antes de promover a montagem.' };
+  }
+  const fases = {};
+  for (const fase of ['proposta', 'resultado']) {
+    let captura;
+    try {
+      captura = await capturarVistas({ montagem, caminho: alvo.caminho.slice(), vistas: vistas.slice(), fase });
+    } catch (erro) {
+      return { estado: 'falhou', fase, codigo: 'inspecao-visual-falhou', mensagem: erro instanceof Error ? erro.message : String(erro), acao: 'Corrija a captura e repita a inspeção antes de promover.' };
+    }
+    const capturas = captura?.resultado?.capturas ?? captura?.capturas;
+    if (captura?.ok === false || !Array.isArray(capturas) || capturas.length < 2) {
+      return { estado: 'falhou', fase, codigo: 'inspecao-visual-incompleta', acao: 'Cada fase precisa de pelo menos duas vistas válidas.' };
+    }
+    const duas = capturas.slice(0, 2);
+    const nomes = duas.map((item) => item.nome);
+    const semanticas = capturasSemanticas(duas);
+    if (new Set(nomes).size !== 2 || semanticas.length !== 2 || semanticas[0] !== semanticas[1]) {
+      return { estado: 'falhou', fase, codigo: 'inspecao-visual-inconsistente', acao: 'Capture duas vistas distintas do mesmo conjunto semântico.' };
+    }
+    fases[fase] = { vistas: nomes, instancias: JSON.parse(semanticas[0]) };
+  }
+  return { estado: 'aprovada', vistas: fases.proposta.vistas, instancias: fases.proposta.instancias, proposta: fases.proposta, resultado: fases.resultado };
+}
+
+function construirRevalidacao({ impacto, roteiro, candidato, anterior }) {
+  const atuais = relacoesDaArvore(candidato);
+  const anteriores = anterior ? relacoesDaArvore(anterior) : new Map();
+  const relacoes = [...impacto.relacoesDiretas, ...impacto.relacoesIndiretas].map((relacao) => {
+    const chave = chaveRelacao(relacao.montagem.caminho, relacao.id);
+    const atual = atuais.get(chave);
+    const antes = anteriores.get(chave);
+    return {
+      montagem: relacao.montagem,
+      id: relacao.id,
+      alcance: impacto.relacoesDiretas.includes(relacao) ? 'direta' : 'indireta',
+      antes: antes?.satisfeita ?? null,
+      depois: atual?.satisfeita ?? relacao.satisfeita,
+      estado: atual?.satisfeita === true ? 'aprovada' : atual?.satisfeita === false ? 'falhou' : 'pendente',
+    };
+  });
+  const foraDeCobertura = roteiro.pendencias.map((pendencia) => ({
+    codigo: pendencia.codigo,
+    estado: 'fora-de-cobertura',
+    acao: pendencia.acao,
+  }));
+  return {
+    formato: 'mecanifica.revalidacao-montagem',
+    versao: 1,
+    relacoes,
+    foraDeCobertura,
+    aprovadas: relacoes.filter((item) => item.estado === 'aprovada').length,
+    falhas: relacoes.filter((item) => item.estado === 'falhou').length,
+    pendentes: relacoes.filter((item) => item.estado === 'pendente').length,
+  };
+}
+
+export async function prepararPromocaoAutoriaMontagem({ plano, alvo, anterior, carregadores = {}, inspecaoVisual = {}, capturarVistas, vistas = ['isometrica', 'direita'] } = {}) {
+  const confirmado = exigirConfirmacao(plano);
+  const validacao = await validarAutoriaMontagem(confirmado, carregadores);
+  let impacto;
+  let roteiro;
+  try {
+    impacto = derivarImpactoMontagem(validacao.resolvida, alvo);
+    roteiro = derivarRoteiroRevalidacao(validacao.resolvida, alvo);
+  } catch (erro) {
+    falhar('impacto-invalido', '$alvo', erro instanceof Error ? erro.message : String(erro), 'Informe um alvo semântico existente na montagem candidata.', erro);
+  }
+  const revalidacao = construirRevalidacao({ impacto, roteiro, candidato: validacao.resolvida, anterior });
+  const visual = await validarInspecaoVisual({
+    montagem: validacao.resolvida,
+    alvo,
+    necessaria: inspecaoVisual.necessaria !== false,
+    capturarVistas: capturarVistas ?? inspecaoVisual.capturar,
+    vistas: inspecaoVisual.vistas ?? vistas,
+  });
+  const bloqueios = [
+    ...revalidacao.relacoes.filter((item) => item.estado === 'falhou' || item.estado === 'pendente').map((item) => ({ codigo: `relacao-${item.estado}`, id: item.id })),
+    ...(visual.estado !== 'aprovada' && visual.estado !== 'nao-necessaria' ? [{ codigo: visual.codigo } ] : []),
+  ];
+  return {
+    estado: bloqueios.length === 0 ? 'aprovado' : 'recusado',
+    plano: confirmado,
+    validacao: { estado: validacao.estado, resumo: validacao.resumo },
+    impacto,
+    roteiro,
+    revalidacao,
+    visual,
+    bloqueios,
+  };
+}
+
+export async function promoverAutoriaMontagem({ raiz, plano, alvo, anterior, carregadores = {}, inspecaoVisual = {}, capturarVistas, vistas, falhaInjetada, fs, telemetria } = {}) {
+  const promocao = await prepararPromocaoAutoriaMontagem({ plano, alvo, anterior, carregadores, inspecaoVisual, capturarVistas, vistas });
+  if (promocao.estado !== 'aprovado') {
+    falhar('promocao-recusada', '$promocao', 'a montagem não passou todos os gates de impacto, revalidação e inspeção.', 'Consulte bloqueios, corrija a proposta e repita a promoção.');
+  }
+  const resultado = await materializarRevisaoAutoria({ raiz, plano: promocao.plano.repositorio, falhaInjetada, fs, telemetria });
+  return { ...promocao, resultado };
 }

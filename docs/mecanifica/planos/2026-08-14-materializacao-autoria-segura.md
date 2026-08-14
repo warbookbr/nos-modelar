@@ -61,6 +61,8 @@ resolvedor e materialização de criação/alteração, com diagnóstico de refe
 ausente e revisão velha. Impacto, revalidação, MCP e consumo caixa-preta seguem
 nas fatias abaixo.
 
+R03 entrega promoção condicionada: relação falha ou vista ausente bloqueia; limitação fora do catálogo é declarada sem ser confundida com prova global.
+
 ## Contrato da proposta
 
 O planejamento é puro e recebe: montagem-alvo semântica, revisão observada ou
