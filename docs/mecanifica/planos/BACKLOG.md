@@ -13,9 +13,9 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Mapa de composição e dependências | impacto local e catálogo explícito entre raízes concluídos; descoberta implícita continua fora |
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
 | Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
-| Escrita transacional de receitas e montagens | revisões imutáveis e commit visível provados localmente; materialização e MCP/API continuam fora |
+| Escrita transacional de receitas e montagens | montagem em execução no plano ativo: snapshot, transição, revalidação e MCP condicionado; receita continua candidata |
 | Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
-| Autoria por MCP | não definida; depende dos serviços internos de peça, montagem, contexto, transação e revalidação; não é continuação automática do plano de pacotes interrompido |
+| Autoria por MCP | montagem em definição executiva no plano ativo; entra no mesmo recorte se os gates internos passarem; receita permanece não definida |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
 | Diagnóstico visual estruturado | ligar medidas e falhas a entidades visíveis por identidade semântica |
@@ -34,7 +34,8 @@ Algumas dependências já podem ser afirmadas sem abrir plano:
 2. mapa de dependências depende de composição e relações persistidas;
 3. contexto de trabalho depende do mapa;
 4. revalidação automática depende de relações mensuráveis;
-5. escrita por qualquer porta depende de serviço interno transacional;
-6. MCP só entra depois que a capacidade interna estiver definida e provada.
+5. escrita por qualquer porta reutiliza um serviço interno transacional;
+6. MCP pode avançar no mesmo plano assim que esse contrato for executável e
+   verificável, sem virar uma barreira temporal permanente.
 
 Essa ordem não escolhe o primeiro plano nem autoriza implementação automática.

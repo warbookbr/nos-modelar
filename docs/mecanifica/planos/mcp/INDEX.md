@@ -35,7 +35,7 @@ já comprovadas da Mecanifica.
 | Módulo | Finalidade | Etapas deste painel |
 |---|---|---|
 | 1. Leitura e revisão | Expor inspeção, validação, comparação e prova visual somente leitura sobre os serviços existentes. | preparação do núcleo e das CLIs; Fatias 1A e 1B; avaliação consolidada; correção de descoberta |
-| 2. Autoria | Expor criação e alteração somente depois que alvo, transação, formato e revalidação estiverem definidos fora do adaptador MCP. | tentativa de autoria controlada; futuras etapas exigem nova definição e plano |
+| 2. Autoria | Expor criação e alteração reutilizando alvo, transação, formato e revalidação definidos no serviço neutro. | tentativa de pacotes encerrada; materialização e autoria segura de montagem ativas |
 | 3. Materiais | Expor materiais somente depois de existir contrato canônico independente da porta de acesso. | candidato |
 | 4. Orquestração e distribuição | Transportar e operar o MCP com autenticação e múltiplos agentes quando o valor local estiver comprovado. | candidato |
 
@@ -53,7 +53,8 @@ futura não autoriza implementação até existir um plano executivo ativo.
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; validação e comparação caixa-preta sem fallback ou escrita |
 | Autoria controlada de pacotes | concluído: interromper | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
 | Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
-| Autoria de receitas e montagens | não definida | formato e serviços internos de autoria; alvo explícito; transação; mapa de dependências; revalidação | precisa de definição e plano próprios; não é continuação automática da autoria de pacotes |
+| Autoria de montagem | ativo | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../2026-08-14-materializacao-autoria-segura.md); MCP entra após os gates internos no mesmo recorte |
+| Autoria de receita | não definida | formato e serviços internos de autoria; execução confinada; revalidação | recorte posterior, sem proibição de usar MCP quando trouxer ganho comprovado |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos agentes |
 
@@ -62,8 +63,9 @@ futura não autoriza implementação até existir um plano executivo ativo.
 - Só existe um plano executivo `ativo` por vez.
 - Linhas `candidato` ou `não definida` registram dependências; não reservam
   arquivos nem autorizam implementação.
-- Um subplano nasce somente quando a capacidade interna já possui objetivo,
-  formato, serviços, gates e critério de parada suficientes.
+- Um subplano nasce quando capacidade interna, porta e gates têm definição
+  suficiente; serviço neutro e adaptador podem evoluir no mesmo plano em fatias
+  verificáveis.
 - O adaptador MCP não duplica validação, defaults, escrita ou cálculo que
   pertencem ao serviço interno.
 - Autoria, materiais, Git, publicação e servidor remoto nunca entram por
@@ -85,8 +87,8 @@ Planos executivos datados usam os estados aceitos por `npm run planos:check`.
 ## Decisão atual
 
 O Módulo 1 — leitura e revisão somente leitura — está **aprovado**. A extensão
-somente leitura para montagens também foi aprovada; não existe plano executivo
-ativo.
+somente leitura para montagens também foi aprovada. O plano executivo de
+materialização e autoria segura de montagens está ativo.
 
 A primeira tentativa de autoria controlada foi encerrada com decisão
 `interromper`. O protótipo do PR #25 demonstrou planejamento puro, confirmação
@@ -107,13 +109,12 @@ Uma retomada dessa fatia exige plano técnico próprio para escolher e provar um
 primitivo nativo `no-replace`, um novo protocolo de commit e visibilidade com
 contrato revisado, ou uma redução explícita da garantia.
 
-Essa decisão não define a futura autoria de carros, montagens ou receitas. Antes
-de discutir novas ferramentas MCP de escrita, o projeto precisa definir e
-provar os serviços internos correspondentes à peça, montagem recursiva, mapa de
-dependências, contexto de trabalho e revalidação. Nenhuma dessas capacidades
-está autorizada por implicação.
+Essa decisão não define a futura autoria de carros, montagens ou receitas. O
+plano ativo prova serviço interno e porta MCP em sequência curta: a porta não
+duplica as regras, mas também não precisa esperar outro ciclo quando os gates do
+serviço fecharem.
 
-O limite de escrita é temporal e baseado nas provas atuais, não uma restrição
-permanente. Materialização segura e autoria MCP podem avançar em planos próprios
-quando o fluxo interno correspondente satisfizer seus gates. Materiais e
-distribuição continuam candidatos e exigem planos próprios.
+O limite de escrita anterior era temporal e baseado nas provas disponíveis. A
+materialização segura e a autoria MCP de montagem agora estão abertas pelo
+plano ativo. Materiais, receita e distribuição continuam candidatos, sem veto a
+um avanço futuro que apresente contrato e evidência melhores.

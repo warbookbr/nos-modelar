@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Materialização e autoria segura de montagens](2026-08-14-materializacao-autoria-segura.md).
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -16,8 +16,8 @@ O plano de relações locais foi concluído no R06 pelo PR #41, mergeado na `mai
 no commit `e7b80ac`. As provas A–F, fixtures persistidas v2, contrato v2 e o
 documento de continuidade arquitetural estão integrados. O contexto de
 montagem foi concluído no R05 na branch do PR #42. A leitura e auditoria de
-montagens por MCP foi aprovada no R04, com consumo caixa-preta e visão real.
-Não há plano ativo.
+montagens por MCP foi aprovada no R04, com consumo caixa-preta e visão real. O
+plano de materialização e autoria segura de montagens está ativo.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -62,14 +62,15 @@ mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o con
 permanece neutro e não promete colisão geral.
 
 Com autorização explícita de continuidade, o plano de contexto visual e autoria
-segura foi concluído no R05. A próxima fatia ativa expõe por MCP somente leitura
-as capacidades internas já provadas de montagem; escrita continua separada.
+segura foi concluído no R05 e a leitura MCP foi aprovada no R04. A execução ativa
+agora prova materialização transacional, revalidação condicionante e, se os
+gates internos fecharem, autoria de montagem pela mesma porta MCP.
 
 ## Programas
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura e auditoria de montagens concluída: aprovar; autoria ainda exige plano próprio |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura aprovada; autoria de montagem integra o plano ativo após os gates internos |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -149,12 +150,14 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-Não há plano ativo. Montagem Persistida v1/v2/v3, contexto estrutural e visual,
-revalidação assistida, escrita interna imutável e leitura de montagens por MCP
-estão concluídos. Materialização/autoria segura é a continuidade recomendada;
-escrita MCP pode integrar esse avanço quando seus gates forem provados.
+O plano [Materialização e autoria segura de
+montagens](2026-08-14-materializacao-autoria-segura.md) está ativo. Ele parte de
+montagem v1/v2/v3, contexto estrutural/visual, revalidação assistida, revisões
+imutáveis e leitura MCP já concluídos. A porta MCP integra o mesmo recorte assim
+que o serviço interno fechar seus gates; essa sequência é critério de prova, não
+restrição permanente de arquitetura.
 
-Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
-do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
-e um novo plano executivo ativo. Para abrir outro plano, copie [`MODELO.md`](MODELO.md),
-preencha objetivo, escopo, gates e encerramento esperado e atualize este índice.
+Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Nenhum segundo
+plano pode ser ativado antes do encerramento deste. Para abrir outro plano,
+copie [`MODELO.md`](MODELO.md), preencha objetivo, escopo, gates e encerramento
+esperado e atualize este índice.
