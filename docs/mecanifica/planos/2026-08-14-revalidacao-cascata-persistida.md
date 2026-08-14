@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-R00–R04 concluídas com decisão `prosseguir`; R05 é o próximo passo.
+R00–R05 concluídas com decisão `prosseguir`; R06 é o próximo passo.
 
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
@@ -167,7 +167,7 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 - alterar uma entidade compartilhada e derivar campanha multi-raiz;
 - executar validadores existentes, registrar falha/aprovação e nova revisão;
-- medir contexto, retomada e ausência de promoção automática.
+- medir contexto, retomada e ausência de promoção automática. **Resultado:** concluída com estudo multi-raiz, troca de identidade, obsolescência de campanha e retomada MCP; relatório em `docs/mecanifica/RELATORIO-R05-REVALIDACAO-CAMPO.md`.
 
 ### R06 — fechamento
 

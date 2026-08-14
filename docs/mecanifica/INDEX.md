@@ -57,10 +57,10 @@ aplicação publicada aqui.
   revalidação em cascata persistida agora tem plano ativo
   (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`).
 - O plano ativo de [revalidação em cascata persistida](planos/2026-08-14-revalidacao-cascata-persistida.md)
-  concluiu R00–R04 com decisão `prosseguir`: identidade semântica, retomada
-  persistida, derivação multi-raiz, resultados, obsolescência e consumo
-  Agent-First foram provados. A R05 é o próximo passo, sem correção ou promoção
-  automática
+  concluiu R00–R05 com decisão `prosseguir`: identidade semântica, retomada
+  persistida, derivação multi-raiz, resultados, obsolescência, estudo de campo
+  multi-raiz e consumo Agent-First foram provados. A R06 é o próximo passo,
+  sem correção ou promoção automática
   (`docs/mecanifica/planos/2026-08-14-revalidacao-cascata-persistida.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.

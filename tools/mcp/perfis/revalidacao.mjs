@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import {
   lerCampanhaRevalidacao,
+  obsoletarCampanhaRevalidacao,
   obsoletarItemRevalidacao,
   registrarResultadoRevalidacao,
 } from '../../mecanifica/repositorio-revalidacao.mjs';
@@ -71,6 +72,7 @@ function falhaConhecida(erro) {
     resultado_conflitante: 'Já existe outro resultado para essa revisão.',
     campanha_corrompida: 'A campanha não passou na verificação de integridade.',
     revisao_nao_alterada: 'A revisão atual ainda não mudou.',
+    identidade_nao_alterada: 'A identidade substituta é igual à campanha atual.',
   };
   return resposta(false, null, {
     codigo,
@@ -155,6 +157,14 @@ async function obsoletarItem(input, { raiz }) {
   } catch (erro) { return erro?.name === 'ZodError' ? entradaRecusada() : falhaConhecida(erro); }
 }
 
+async function obsoletarCampanha(input, { raiz }) {
+  try {
+    const args = z.object({ identidade, identidadeSubstituta: identidade, motivo: z.string().min(1).max(120), pai: commit.nullable().optional() }).strict().parse(input);
+    const respostaInterna = await obsoletarCampanhaRevalidacao({ raiz, identidade: args.identidade, identidadeSubstituta: args.identidadeSubstituta, motivo: args.motivo, pai: args.pai ?? null });
+    return resposta(true, { identidade: args.identidade, revisao: respostaInterna.persistida.revisao, objeto: respostaInterna.persistida.objeto, idempotente: respostaInterna.idempotente });
+  } catch (erro) { return erro?.name === 'ZodError' ? entradaRecusada() : falhaConhecida(erro); }
+}
+
 export function criarFerramentasRevalidacao({ raizRepositorio, podeEscrever = false } = {}) {
   if (typeof raizRepositorio !== 'string' || !raizRepositorio) return Object.freeze([]);
   const leitura = [
@@ -165,5 +175,6 @@ export function criarFerramentasRevalidacao({ raizRepositorio, podeEscrever = fa
   return Object.freeze([...leitura,
     { nome: 'registrar_resultado_revalidacao', descricao: 'Registra resultado aprovado ou reprovado com revisão e versão esperadas.', inputSchema: z.object({ identidade, resultado: resultadoEntrada, versaoEsperada: z.number().int().nonnegative(), pai: commit.nullable().optional() }).strict(), outputSchema: saidaEscrita, anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }, executar: (entrada) => registrarResultado(entrada, { raiz: raizRepositorio }) },
     { nome: 'obsoletar_item_revalidacao', descricao: 'Marca item obsoleto depois de observar revisão diferente, com CAS.', inputSchema: z.object({ identidade, item: alvo, revisaoAtual: proveniencia, versaoEsperada: z.number().int().nonnegative(), pai: commit.nullable().optional() }).strict(), outputSchema: saidaEscrita, anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }, executar: (entrada) => obsoletarItem(entrada, { raiz: raizRepositorio }) },
+    { nome: 'obsoletar_campanha_revalidacao', descricao: 'Obsoleta campanha quando causa, mapa ou universo são substituídos, preservando resultados.', inputSchema: z.object({ identidade, identidadeSubstituta: identidade, motivo: z.string().min(1).max(120), pai: commit.nullable().optional() }).strict(), outputSchema: saidaEscrita, anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }, executar: (entrada) => obsoletarCampanha(entrada, { raiz: raizRepositorio }) },
   ]);
 }

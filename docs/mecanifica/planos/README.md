@@ -8,7 +8,8 @@
 O plano abre a revalidação em cascata como acréscimo sobre mapa, impacto,
 revisões e transações existentes. R00–R04 foram concluídas com decisão
 `prosseguir`: contrato, persistência, derivação multi-raiz, resultados,
-obsolescência e consumo Agent-First estão provados. R05 é o próximo passo.
+obsolescência, estudo de campo multi-raiz e consumo Agent-First estão provados.
+R06 é o próximo passo.
 Correção e publicação automática de dependentes permanecem fora.
 
 O plano de
@@ -56,10 +57,10 @@ Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 O mapa canônico concluiu R00–R06 com decisão `aprovar`: contrato de universo,
 snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
 de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
-O plano de cascata persistida está ativo; R00–R04 foram aprovadas após 19 provas
+O plano de cascata persistida está ativo; R00–R05 foram aprovadas após as provas
 focadas em contrato, persistência, retomada, compartilhamento, resultados,
-obsolescência, concorrência e MCP. R05 é a próxima fatia, ainda separada de
-promoção automática.
+obsolescência, concorrência, MCP e estudo de campo. R06 é a próxima fatia,
+ainda separada de promoção automática.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites

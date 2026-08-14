@@ -161,6 +161,9 @@ export async function registrarResultadoRevalidacao({
     resultado: {
       revisao: resultado.revisaoValidada.revisao,
       sha256: resultado.revisaoValidada.sha256,
+      estado: resultado.estado,
+      gates: [...(resultado.gates ?? [])],
+      diagnostico: resultado.diagnostico ?? null,
     },
   });
   const novaCampanha = {
@@ -196,6 +199,35 @@ export async function obsoletarItemRevalidacao({
   const novaCampanha = {
     ...campanha,
     itens: campanha.itens.map((entrada) => entrada.chave === itemAtualizado.chave ? itemAtualizado : entrada),
+  };
+  const persistida = await persistirCampanhaRevalidacao({
+    raiz, campanha: novaCampanha, pai: atual.revisao, falhaInjetada, fs, telemetria,
+  });
+  return { idempotente: false, persistida };
+}
+
+export async function obsoletarCampanhaRevalidacao({
+  raiz, identidade, identidadeSubstituta, motivo = 'identidade-substituida', pai = null, falhaInjetada, fs, telemetria,
+} = {}) {
+  const atual = await lerCampanhaRevalidacao(raiz, identidade, { fs });
+  if (!atual) throw new ErroRepositorioRevalidacao('campanha-ausente', 'a campanha não existe.', 'Leia a identidade da campanha antes de invalidar.');
+  if (pai !== null && pai !== atual.revisao) throw new ErroRepositorioRevalidacao('revisao-desatualizada', 'a campanha mudou desde a revisão observada.', 'Leia a campanha atual e repita a operação.');
+  const substituta = identidadeValida(identidadeSubstituta);
+  if (compararBytes(atual.campanha.identidade, substituta)) {
+    throw new ErroRepositorioRevalidacao('identidade-nao-alterada', 'a identidade substituta é igual à campanha atual.', 'Informe a nova revisão, hash ou mapa observados.');
+  }
+  if (atual.campanha.obsolescencia) return { idempotente: true, persistida: atual };
+  const itens = atual.campanha.itens.map((item) => item.estado === 'obsoleto'
+    ? item
+    : transicionarItem(item, {
+      esperadoVersao: item.versao,
+      proximoEstado: 'obsoleto',
+      revisaoAtual: item.revisaoObservada,
+    }));
+  const novaCampanha = {
+    ...atual.campanha,
+    itens,
+    obsolescencia: { motivo, identidadeSubstituta: substituta },
   };
   const persistida = await persistirCampanhaRevalidacao({
     raiz, campanha: novaCampanha, pai: atual.revisao, falhaInjetada, fs, telemetria,

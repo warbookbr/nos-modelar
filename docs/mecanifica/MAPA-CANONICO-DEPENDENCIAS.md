@@ -138,8 +138,10 @@ o recurso de dependências.
 
 O R04 acrescenta, quando o host configura uma raiz de autoria, consulta de
 campanha e item por identidade semântica no perfil de revisão. O perfil de
-autoria opt-in acrescenta registro de resultado e obsolescência com revisão e
-CAS; as respostas são resumos sem caminhos locais, documentos ou geometria.
+autoria opt-in acrescenta registro de resultado, obsolescência de item e, na
+R05, obsolescência de campanha quando causa, universo ou mapa são substituídos;
+as respostas são resumos sem caminhos locais, documentos ou geometria. A
+campanha substituta continua sendo derivada e registrada separadamente.
 
 ## Continuidade e escala da R05
 
