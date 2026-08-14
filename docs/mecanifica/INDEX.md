@@ -38,6 +38,9 @@ aplicação publicada aqui.
   (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`)
   concluiu com `corrigir`: receitas, relações e vistas passaram, mas autoria MCP
   de montagem não pode corrigir uma receita; o relatório define o próximo recorte.
+- O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
+  (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) está ativo e
+  proíbe JavaScript arbitrário na entrada do agente.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -184,7 +187,7 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Escolher e abrir autoria segura de receitas; não há plano ativo.
+- Executar o plano ativo de autoria segura de receitas declarativas.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
