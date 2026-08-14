@@ -2,7 +2,8 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-mcp-montagens-leitura.md`](2026-08-14-mcp-montagens-leitura.md).
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -60,14 +61,14 @@ mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o con
 permanece neutro e não promete colisão geral.
 
 Com autorização explícita de continuidade, o plano de contexto visual e autoria
-segura foi aberto em R00. Ele avança leitura visual, revalidação assistida,
-catálogo explícito entre raízes e somente então avalia escrita transacional.
+segura foi concluído no R05. A próxima fatia ativa expõe por MCP somente leitura
+as capacidades internas já provadas de montagem; escrita continua separada.
 
 ## Programas
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | nenhuma; autoria controlada encerrada com decisão `interromper` |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura e auditoria de montagens ativa; autoria continua fora |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -146,11 +147,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura
 
-**Montagem Persistida v2 — relações locais** está concluída, assim como a
-Montagem Mínima Persistida v1 e o contexto de montagem para IA. Nenhum próximo
-plano executivo é autorizado automaticamente; backlog, MCP, refatoração do
-motor, personalização de materiais e limpeza de receitas históricas permanecem
-fora do fechamento.
+**MCP — leitura e auditoria de montagens** é o único plano ativo. Montagem
+Persistida v1/v2/v3, contexto estrutural, contexto visual, revalidação assistida
+e escrita interna imutável continuam concluídos. Escrita MCP, materialização,
+refatoração do motor e materiais permanecem fora deste recorte.
 
 Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
 do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita

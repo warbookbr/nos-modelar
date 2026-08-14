@@ -5,9 +5,10 @@
 Este é o contrato operacional atual para criar ou revisar **uma peça**. O fluxo
 é determinístico, versionado e não depende de contexto oculto.
 
-Ele ainda não é o fluxo completo de um carro, motor ou montagem recursiva. Não
-há hoje formato canônico de montagem, mapa geral de dependências ou revalidação
-automática de conjuntos afetados.
+Ele ainda não é o fluxo completo de um carro, motor ou montagem recursiva.
+Montagens persistidas v1/v2/v3, contexto estrutural e visual, impacto local e
+roteiro assistido existem; mapa geral implícito, materialização e revalidação
+automática de conjuntos afetados ainda não existem.
 
 A direção de sistemas compostos está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md). Este documento não deve ser
@@ -68,10 +69,12 @@ Não crie `revisao.json` ou imagens manualmente para simular promoção.
 - O pacote de uma peça não deve absorver artificialmente todo um sistema para
   evitar definir montagens.
 
-## Extensão futura para sistemas compostos
+## Extensão em andamento para sistemas compostos
 
-Quando o formato de montagem e o mapa canônico existirem, uma tarefa de sistema
-deverá começar antes do pacote de peça.
+Uma tarefa de sistema deve começar antes do pacote de peça. Os serviços atuais
+já derivam alvo consultado, contexto estrutural/visual e relações afetadas numa
+raiz explícita; o plano MCP ativo está tornando essa leitura diretamente
+consumível por agentes.
 
 O sistema precisará derivar:
 
@@ -117,7 +120,9 @@ Depois da alteração local, o sistema deverá:
 7. permitir correção, adaptação da montagem ou criação de variante;
 8. publicar apenas estado completo e válido.
 
-Essa extensão ainda não está implementada e exige plano próprio.
+Essa extensão está parcialmente implementada. Ainda faltam materialização
+segura, aplicação de alteração, reexecução e publicação condicionada à
+revalidação; cada avanço pode abrir plano próprio quando for logicamente útil.
 
 ## Crítica e comparação
 

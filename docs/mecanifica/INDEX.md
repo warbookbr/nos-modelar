@@ -26,6 +26,9 @@ aplicação publicada aqui.
 - O plano de contexto visual e autoria segura foi concluído no R05: captura
   privada, revalidação assistida, catálogo explícito e revisões imutáveis foram
   provados; MCP e materialização no workspace continuam fora.
+- O [plano ativo](planos/2026-08-14-mcp-montagens-leitura.md) expõe contexto,
+  revalidação, catálogo e vistas de montagem por MCP somente leitura. A
+  exclusão de escrita vale para esta fatia, não como veto arquitetural futuro.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
@@ -171,10 +174,10 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Definir o mapa canônico de composição, relações e dependências.
-- Definir contexto visual de montagem e como dependentes e validações formam o
-  contexto de uma futura edição.
-- Definir uma camada de escrita transacional para receitas e montagens antes de
-  expô-la por MCP, CLI ou API.
+- Integrar contexto visual, dependentes e validações na porta MCP somente
+  leitura atualmente ativa.
+- Definir materialização segura das revisões imutáveis antes de abrir escrita
+  por MCP, CLI ou API.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
@@ -219,6 +222,8 @@ Planejamento: [planos/README](planos/README.md),
 [contexto de montagem para IA](planos/2026-08-14-contexto-de-montagem-para-ia.md),
 [separação direcional e impacto local](planos/2026-08-14-separacao-direcional-e-impacto-local.md),
 [contexto visual e autoria segura](planos/2026-08-14-contexto-visual-e-autoria-segura.md),
+[MCP — leitura e auditoria de montagens](planos/2026-08-14-mcp-montagens-leitura.md)
+(`docs/mecanifica/planos/2026-08-14-mcp-montagens-leitura.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

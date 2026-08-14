@@ -15,6 +15,11 @@ neutros e separados:
 Nenhuma saída afirma colisão ou validade global. O catálogo não varre disco nem
 infere dependência por proximidade.
 
+O plano ativo de leitura de montagens por MCP expõe essas capacidades por IDs
+semânticos. A configuração confiável do servidor declara as raízes; o agente
+não fornece nem recebe caminhos locais. Escrita continua fora apenas dessa
+fatia e pode avançar depois com plano e provas próprios.
+
 ## Captura confinada
 
 ```bash
