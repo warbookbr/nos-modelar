@@ -2,7 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-14-contexto-de-montagem-para-ia.md`](2026-08-14-contexto-de-montagem-para-ia.md),
+em R00.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -49,9 +51,9 @@ primeira fatia vertical: descrição estruturada, compacta e consultável de uma
 montagem persistida arbitrária, com cobertura explícita do que foi e do que não
 foi verificado.
 
-Com o R06 integrado, o rascunho pode escolher a base e ser promovido mediante
-decisão explícita. Renderização, folga/mapa de impacto, MCP e autoria
-transacional permanecem etapas posteriores e separadas.
+Com o R06 integrado e autorização explícita do usuário, o plano foi ativado em
+R00 sobre `main` em `5c5f1aa`. Renderização, folga/mapa de impacto, MCP e
+autoria transacional permanecem etapas posteriores e separadas.
 
 ## Programas
 

@@ -1,18 +1,18 @@
 # Contexto de montagem persistida para IA
 
-**Estado:** rascunho
-
+**Estado:** ativo
 **Responsável:** GPT (arquitetura e revisão) e agente local (execução)
 
-**Repositório e base:** `warbookbr/nos-mecanifica`; abrir sobre `main` depois
-do encerramento e merge de Montagem Persistida v2. Diagnóstico em `2bbb739`.
+**Repositório e base:** `warbookbr/nos-mecanifica`; `main` em `5c5f1aa`, PR #42;
+diagnóstico em `2bbb739`.
 
 ## Dependência de abertura
 
-Este plano não fica ativo enquanto
+O R06 de
 [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](2026-08-09-montagem-persistida-v2-relacoes-locais.md)
-estiver ativo. O R06 precisa encerrar o contrato v2. Ativar este rascunho exige
-decisão explícita, branch própria, atualização do índice e novas reservas.
+foi integrado à `main` pelo PR #41. O usuário autorizou explicitamente a
+continuação em 2026-08-14; este plano inicia em R00 na branch do estudo de
+campo, já sincronizada com o fechamento.
 
 ## Problema observado
 

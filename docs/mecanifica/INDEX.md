@@ -18,9 +18,9 @@ aplicação publicada aqui.
   contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. O plano
   [`2026-08-09-montagem-persistida-v2-relacoes-locais.md`](../../docs/mecanifica/planos/2026-08-09-montagem-persistida-v2-relacoes-locais.md) foi concluído
   no R06: provas A–F, fixtures persistidas v2, contrato v2 e continuidade
-  arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. Não há plano
-  executivo ativo; mapa global, contexto de trabalho, revalidação automática,
-  writer, CLI, MCP e API de autoria permanecem sem autorização automática.
+  arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O plano de
+  contexto de montagem para IA está ativo em R00; mapa global, revalidação
+  automática, writer, MCP e API de autoria permanecem fora desse recorte.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
