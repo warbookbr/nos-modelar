@@ -71,6 +71,7 @@ export function criarUniversoDependencias({
   raizMontagens,
   raizPecas,
   provedores = criarProvedoresAutoriaInativa(),
+  tentativas = 2,
 } = {}) {
   const documento = lerUniversoAutoria(universo);
   if (typeof raizMontagens !== 'string' || typeof raizPecas !== 'string') {
@@ -89,6 +90,7 @@ export function criarUniversoDependencias({
       universo: documento,
       ...carregadores,
       hash: sha256Canonico,
+      tentativas,
     });
     return derivarMapaDependencias(snapshot);
   }
@@ -107,6 +109,7 @@ export function criarUniversoDependencias({
         raizMontagens: montagens,
         raizPecas: pecas,
         provedores: novosProvedores,
+        tentativas,
       });
     },
     async resumo() { return resumoDoMapa(await mapa()); },

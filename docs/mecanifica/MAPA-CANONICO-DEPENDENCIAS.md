@@ -136,6 +136,26 @@ A superfície MCP passou para `mecanifica.mcp.revisao.v5` e o servidor
 `mecanifica-mcp` 0.5.0. O contrato anterior v4 não anuncia essa ferramenta nem
 o recurso de dependências.
 
+## Continuidade e escala da R05
+
+A prova de continuidade publica, em repositório temporário de autoria, uma
+revisão ativa de `sistema-a` que remove o uso compartilhado. Após encerrar o
+cliente MCP e abrir outro, o hash do mapa muda e a consulta de
+`peca-compartilhada` passa de `sistema-a` e `sistema-b` para somente
+`sistema-b`; a consulta de `sistema-a` preserva a proveniência
+`revisao-ativa`. Assim, a nova sessão não depende de cache do cliente.
+
+O adaptador permite fixar a quantidade de tentativas apenas para provas de
+concorrência. Quando o estado observado muda durante uma captura, ele propaga
+`universo-alterado` e não devolve resumo nem mapa parcial. Em operação normal,
+mantém as duas tentativas otimistas do snapshot v1.
+
+A mesma prova mede, em bytes UTF-8 serializados, o impacto direcionado da peça
+contra a soma dos três contextos completos das raízes do universo e exige que o
+primeiro seja menor. A métrica é calculada na execução, não congelada como
+tamanho de protocolo: mudanças legítimas no contexto não tornam uma medida
+histórica uma restrição artificial.
+
 ## Fronteira
 
 R00 valida o universo e suas referências de composição. R01 acrescenta o

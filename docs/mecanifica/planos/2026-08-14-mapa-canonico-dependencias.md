@@ -148,7 +148,7 @@ provas cobrem peça compartilhada/isolada, montagem, relações, limites e rotei
 **Saída:** consumidor MCP oficial descobre resumo/hash/cobertura e consulta a
 peça compartilhada sem shell, paths, documentos ou mapa; contrato v5.
 
-### R05 — prova de continuidade e escala
+### R05 — prova de continuidade e escala — concluída
 
 - publicar uma montagem ativa que acrescente ou remova um uso;
 - reconstruir o mapa e provar mudança de hash e impacto em nova sessão;
@@ -156,7 +156,8 @@ peça compartilhada sem shell, paths, documentos ou mapa; contrato v5.
   misto;
 - medir bytes do impacto direcionado contra a soma dos contextos completos.
 
-**Saída:** evidência de continuidade, consistência e economia de contexto.
+**Saída:** revisão ativa e nova sessão atualizam hash/impacto; concorrência
+recusa `universo-alterado`; impacto usa menos bytes que contextos completos.
 
 ### R06 — fechamento
 

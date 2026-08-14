@@ -52,10 +52,10 @@ permanecem fora do fechamento.
 O contexto de montagem acrescentou serviço puro e CLI confinada sobre v1/v2.
 Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
 
-O plano ativo do mapa canônico concluiu suas R00–R04: contrato de universo,
+O plano ativo do mapa canônico concluiu suas R00–R05: contrato de universo,
 snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
-de impacto e consumo MCP reduzido estão provados. Continuidade ativa, escala e
-fechamento permanecem nas R05–R06.
+de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
+Resta o fechamento na R06.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites

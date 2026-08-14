@@ -69,9 +69,9 @@ aplicação publicada aqui.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
   o mapa de impacto local existem. As R00–R04 do mapa canônico global fixaram
   universo, snapshot confinado, composição, ocorrências, relações, usos
-  reversos, consulta direcionada e consumo MCP reduzido por ID; continuidade,
-  escala e revalidação em cascata ainda estão fora. Colisão geral, solver e
-  camada completa de escrita continuam fora.
+  reversos, consulta direcionada, consumo MCP reduzido por ID, continuidade e
+  escala estão provados; revalidação em cascata ainda está fora. Colisão geral,
+  solver e camada completa de escrita continuam fora.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.

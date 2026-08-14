@@ -34,7 +34,9 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
 const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
 const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
+const CONFIGURACAO_CATALOGO_MAPA = join(RAIZ, 'tools/mcp/fixtures/catalogo-mapa-dependencias.json');
 const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
 const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/experimentos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
 const receitaEixo = (fim) => ({
   formato: 'mecanifica.receita-declarativa', versao: 1, id: 'eixo-guia',
@@ -540,6 +542,83 @@ describe('servidor MCP local — perfil revisao', () => {
       await client.close();
     }
   });
+
+  it('reconstrói impacto global em nova sessão após publicar uma revisão ativa e mede economia de contexto', async () => {
+    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-mapa-r05-'));
+    const ambiente = {
+      ...process.env,
+      [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_CATALOGO_MAPA,
+      [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+    };
+    const escritor = new Client({ name: 'consumidor-r05-escritor', version: '1' });
+    const transporteEscritor = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe', env: ambiente,
+    });
+    let antes;
+    let aplicada;
+    try {
+      await escritor.connect(transporteEscritor);
+      const recursoAntes = await escritor.readResource({ uri: 'mecanifica://dependencias' });
+      antes = JSON.parse(recursoAntes.contents[0].text);
+      const impactoAntes = await escritor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      expect(impactoAntes.structuredContent.resultado.impacto.raizesAfetadas).toEqual(['sistema-a', 'sistema-b']);
+      const contextos = await Promise.all(['sistema-a', 'sistema-b', 'sistema-isolado'].map((id) => escritor.callTool({
+        name: 'descrever_montagem', arguments: { id },
+      })));
+      const bytesImpacto = Buffer.byteLength(JSON.stringify(impactoAntes.structuredContent), 'utf8');
+      const bytesContextos = contextos.reduce((total, resposta) => total + Buffer.byteLength(JSON.stringify(resposta.structuredContent), 'utf8'), 0);
+      expect(bytesImpacto).toBeLessThan(bytesContextos);
+
+      const candidata = JSON.parse(JSON.stringify(MONTAGEM_SISTEMA_A));
+      candidata.instancias = candidata.instancias.filter((instancia) => instancia.id !== 'compartilhado');
+      const planejada = await escritor.callTool({
+        name: 'planejar_autoria_montagem', arguments: { id: 'sistema-a', revisaoObservada: null, montagem: candidata },
+      });
+      expect(planejada.isError).not.toBe(true);
+      aplicada = await escritor.callTool({
+        name: 'aplicar_autoria_montagem', arguments: {
+          plano: planejada.structuredContent.resultado.plano,
+          confirmacao: planejada.structuredContent.resultado.confirmacao,
+          alvo: ['exclusivo-a'],
+        },
+      });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { id: 'sistema-a' } });
+    } finally {
+      await escritor.close();
+    }
+
+    const leitor = new Client({ name: 'consumidor-r05-nova-sessao', version: '1' });
+    const transporteLeitor = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: { ...ambiente, MECANIFICA_PERFIL: 'revisao' },
+    });
+    try {
+      await leitor.connect(transporteLeitor);
+      const recursoDepois = await leitor.readResource({ uri: 'mecanifica://dependencias' });
+      const depois = JSON.parse(recursoDepois.contents[0].text);
+      expect(depois.mapa.sha256).not.toBe(antes.mapa.sha256);
+      const impactoDepois = await leitor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      consultarImpactoGlobalSaida.parse(impactoDepois.structuredContent);
+      expect(impactoDepois.structuredContent.resultado.impacto).toMatchObject({
+        raizesAfetadas: ['sistema-b'], raizesNaoAfetadas: ['sistema-a', 'sistema-isolado'],
+      });
+      const proveniencia = await leitor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'montagem', id: 'sistema-a' },
+      });
+      expect(proveniencia.structuredContent.resultado.impacto.roteiroRevalidacao[0].proveniencia).toMatchObject({
+        fonte: 'revisao-ativa', revisao: aplicada.structuredContent.resultado.revisao,
+      });
+      expect(JSON.stringify({ antes, depois, impactoDepois, proveniencia })).not.toContain(repositorio);
+    } finally {
+      await leitor.close();
+      rmSync(repositorio, { recursive: true, force: true });
+    }
+  }, 180_000);
 
   it('consumidor caixa-preta conclui autoria por MCP sem shell nem paths', async () => {
     const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-r05-'));
