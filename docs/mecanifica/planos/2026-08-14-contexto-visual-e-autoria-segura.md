@@ -77,7 +77,7 @@ posterior, não definição de modelo.
 3. **R02 — concluído:** derivar um roteiro a partir de impacto,
    relações resolvidas e limites; executar apenas validações explicitamente
    disponíveis e separar pendentes de não verificáveis.
-4. **R03 — catálogo entre raízes:** ler somente raízes declaradas, indexar usos
+4. **R03 — concluído:** ler somente raízes declaradas, indexar usos
    e relações por caminhos semânticos; provar ordem, duplicata, raiz inválida e
    ausência de inferência fora do conjunto.
 5. **R04 — autoria transacional local:** antes de código, registrar contrato de
