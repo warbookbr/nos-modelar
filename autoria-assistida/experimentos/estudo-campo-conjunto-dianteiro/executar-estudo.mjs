@@ -6,6 +6,7 @@ import {
   FORMATO, VERSAO, parteDaFace,
 } from '../../../src/autoria/ler-peca-resolvida.js';
 import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
+import { derivarImpactoMontagem } from '../../../src/autoria/derivar-impacto-montagem.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 
 const argumentos = new Map(process.argv.slice(2).map((item) => {
@@ -111,7 +112,7 @@ const pinca = nosDePeca.find((instancia) => instancia.caminho.join('/') === 'fre
 const caixaDisco = caixaDaInstancia(disco);
 const caixaPonte = caixaDaInstancia(pinca, 'pinca');
 const medidasExperimentais = {
-  aviso: 'medida derivada somente pelo estudo; não é relação persistida nem validação do núcleo',
+  aviso: 'medida independente do estudo para conferir a relação persistida de separação direcional',
   discoRaioMaximoY: caixaDisco.max[1],
   ponteMinimoY: caixaPonte.min[1],
   folgaRadialDiscoPonte: caixaPonte.min[1] - caixaDisco.max[1],
@@ -151,5 +152,10 @@ if (argumentos.has('--contexto')) {
     ...(profundidade !== undefined ? { profundidade } : {}),
     ...(argumentos.has('--incluir-relacionados') ? { incluirRelacionados: true } : {}),
   });
+}
+if (argumentos.has('--impacto')) {
+  const caminho = argumentos.get('--impacto');
+  if (!caminho) throw new Error('--impacto precisa receber um caminho semântico.');
+  saida = derivarImpactoMontagem(resolvida, { caminho: caminho.split('/') });
 }
 process.stdout.write(`${JSON.stringify(saida, null, 2)}\n`);

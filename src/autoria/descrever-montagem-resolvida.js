@@ -85,8 +85,9 @@ function descreverPeca(instancia) {
 
 function descreverRelacao(relacao, caminhoMontagem) {
   const endpoint = (valor) => ({
-    caminho: [...caminhoMontagem, ...valor.caminho],
-    porta: valor.porta,
+    caminho: valor.instancia?.caminho?.slice() ?? [...caminhoMontagem, ...valor.caminho],
+    ...(valor.porta !== undefined ? { porta: valor.porta } : {}),
+    ...(valor.parte !== undefined ? { parte: valor.parte } : {}),
   });
   return {
     montagem: caminhoMontagem.slice(),
