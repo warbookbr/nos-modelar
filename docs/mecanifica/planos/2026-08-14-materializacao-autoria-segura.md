@@ -61,7 +61,7 @@ resolvedor e materialização de criação/alteração, com diagnóstico de refe
 ausente e revisão velha. Impacto, revalidação, MCP e consumo caixa-preta seguem
 nas fatias abaixo.
 
-R03 condiciona promoção a relações e vistas; R04 expõe o mesmo serviço em MCP opt-in por IDs, sem paths nem escrita no perfil de leitura.
+R03 condiciona promoção; R04 expõe MCP opt-in; R05 prova criação, inspeção, aplicação, releitura e recusa concorrente só pela porta MCP.
 
 ## Contrato da proposta
 

@@ -31,6 +31,7 @@ import {
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
 const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
+const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
 const CATALOGO_MONTAGENS = carregarCatalogoMontagens(CONFIGURACAO_MONTAGENS);
 const tamanhosStructured = {};
 let configuracaoAnterior;
@@ -475,6 +476,52 @@ describe('servidor MCP local — perfil revisao', () => {
       await client.close();
     }
   });
+
+  it('consumidor caixa-preta conclui autoria por MCP sem shell nem paths', async () => {
+    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-r05-'));
+    const client = new Client({ name: 'consumidor-autoria-caixa-preta', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        ...process.env,
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        MECANIFICA_PERFIL: 'autoria',
+        MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+      },
+    });
+    try {
+      await client.connect(transport);
+      const estado = await client.readResource({ uri: 'mecanifica://estado' });
+      const publico = JSON.parse(estado.contents[0].text);
+      expect(publico).toMatchObject({ perfil: 'autoria' });
+      expect(publico.ferramentas).toEqual([
+        'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
+      ]);
+      const id = 'gabarito-separacao-direcional';
+      const observada = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
+      expect(observada.structuredContent).toMatchObject({ ok: true, resultado: { revisao: null } });
+      const planejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: MONTAGEM_AUTORIA } });
+      expect(planejada.structuredContent).toMatchObject({ ok: true });
+      const { plano, confirmacao } = planejada.structuredContent.resultado;
+      const alternativa = JSON.parse(JSON.stringify(MONTAGEM_AUTORIA));
+      alternativa.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.03, 0];
+      const concorrentePlanejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: alternativa } });
+      const concorrentePlano = concorrentePlanejada.structuredContent.resultado;
+      const inspecionada = await client.callTool({ name: 'inspecionar_proposta_montagem', arguments: { plano, confirmacao, alvo: ['movel'] } });
+      expect(inspecionada.structuredContent).toMatchObject({ ok: true, resultado: { promocao: { estado: 'aprovado' } } });
+      const aplicada = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano, confirmacao, alvo: ['movel'] } });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true });
+      const relida = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
+      expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
+      const concorrente = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano: concorrentePlano.plano, confirmacao: concorrentePlano.confirmacao, alvo: ['movel'] } });
+      expect(concorrente.isError).toBe(true);
+      expect(concorrente.structuredContent).toMatchObject({ ok: false, erro: { codigo: 'revisao_desatualizada' } });
+      expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, concorrente })).not.toContain(repositorio);
+    } finally {
+      await client.close();
+      rmSync(repositorio, { recursive: true, force: true });
+    }
+  }, 180_000);
 
   it('transporta vistas de montagem sem colocar base64 no structuredContent', async () => {
     const png = Buffer.from('89504e470d0a1a0a', 'hex');
