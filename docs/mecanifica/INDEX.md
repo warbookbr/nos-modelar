@@ -26,7 +26,7 @@ aplicação publicada aqui.
 - O plano de contexto visual e autoria segura foi concluído no R05: captura
   privada, revalidação assistida, catálogo explícito e revisões imutáveis foram
   provados; escrita MCP e materialização no workspace ficaram fora daquele
-  fechamento e são tratadas pelo plano ativo abaixo.
+  fechamento e foram tratadas por recortes próprios.
 - O [plano de leitura MCP](planos/2026-08-14-mcp-montagens-leitura.md) foi
   concluído e aprovado: contexto, revalidação, catálogo e vistas de montagem
   são consumíveis por IDs semânticos. A ausência de escrita não é veto futuro.
@@ -53,14 +53,14 @@ aplicação publicada aqui.
   (`docs/mecanifica/RELATORIO-ANALISE-GRANDES-MELHORIAS.md`).
 - O [mapa canônico de dependências](planos/2026-08-14-mapa-canonico-dependencias.md)
   foi concluído com decisão `aprovar`: cobertura global dentro de universo
-  explícito, impacto direcionado, proveniência, MCP e continuidade ativa. A
-  revalidação em cascata persistida agora tem plano ativo
-  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`).
-- O plano ativo de [revalidação em cascata persistida](planos/2026-08-14-revalidacao-cascata-persistida.md)
-  concluiu R00–R05 com decisão `prosseguir`: identidade semântica, retomada
+  explícito, impacto direcionado, proveniência, MCP e continuidade ativa
+  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`). A
+  revalidação em cascata persistida foi encerrada no plano próprio abaixo.
+- O plano de [revalidação em cascata persistida](planos/2026-08-14-revalidacao-cascata-persistida.md)
+  foi concluído no R06 com decisão `aprovar`: identidade semântica, retomada
   persistida, derivação multi-raiz, resultados, obsolescência, estudo de campo
-  multi-raiz e consumo Agent-First foram provados. A R06 é o próximo passo,
-  sem correção ou promoção automática
+  multi-raiz e consumo Agent-First foram provados. Evolução futura exige plano
+  próprio e não implica correção ou promoção automática
   (`docs/mecanifica/planos/2026-08-14-revalidacao-cascata-persistida.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.

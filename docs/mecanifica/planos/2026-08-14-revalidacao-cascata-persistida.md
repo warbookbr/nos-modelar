@@ -1,13 +1,13 @@
 # Revalidação em cascata persistida v1
 
-**Estado:** ativo
+**Estado:** concluído
 
-R00–R05 concluídas com decisão `prosseguir`; R06 é o próximo passo.
+R00–R06 concluídas; o recorte foi encerrado sem abrir promoção automática.
 
 **Responsável:** Codex (investigação, arquitetura, implementação e prova)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, branch
-`implementacao/mcp-montagens-leitura` em `b23d65a`.
+`implementacao/mcp-montagens-leitura` em `ff1ce71`.
 
 ## Problema observado
 
@@ -173,8 +173,7 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 - revisar contratos, documentação e gates completos;
 - decidir `aprovar`, `corrigir` ou `interromper`;
-- recomendar próximo recorte sem abri-lo por implicação.
-
+- recomendar próximo recorte sem abri-lo por implicação. **Resultado:** concluída com decisão `aprovar`; a revalidação persistida v1 fica encerrada e qualquer evolução futura exige plano próprio.
 ## Gates e evidências
 
 - IDs independem de ordem, relógio, UUID e posição;
@@ -196,5 +195,6 @@ obsolescência, concorrência fail-closed e resultado idempotente/conflitante.
 
 ## Encerramento
 
-O plano encerra somente com campanha retomável, concorrência e obsolescência
-provadas sobre revisões reais, ou com uma decisão explícita de parada na R00.
+O plano encerra com campanha retomável, concorrência e obsolescência provadas
+sobre revisões reais. A decisão `aprovar` não autoriza correção, publicação ou
+promoção automática; o próximo recorte deve ser decidido separadamente.
