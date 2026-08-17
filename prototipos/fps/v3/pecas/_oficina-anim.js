@@ -1,3 +1,16 @@
+/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+ *
+ * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
+ * engenharia, componente aprovado ou ponto de partida de produto.
+ *
+ * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+ * falhar, não para descrever um componente real. Esta geometria pode mudar ou
+ * ser removida a qualquer momento, sem aviso e sem migração.
+ *
+ * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
+ * a geometria daqui. Ver "Peças são exemplos" no README.md.
+ */
 /* PEÇA-EXEMPLO da OFICINA (passo 13a): ANIMAÇÃO RÍGIDA POR PARTE (em laço). Prova o
    motor novo com movimento ÓBVIO no visor: uma ENGRENAGEM (`roda`) gira em torno do
    PRÓPRIO centro (rotY, pivô = CENTROIDE default — sem `pivo` no arquivo) e um BRAÇO

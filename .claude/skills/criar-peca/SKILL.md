@@ -36,6 +36,13 @@ substitutos da descrição e das vistas da bancada. A peça mora em
 
 ## Contrato mínimo
 
+Comece copiando `prototipos/fps/v3/pecas/_modelo.js`. A peça precisa abrir com
+o selo de peça de exemplo, byte a byte igual ao dele — toda peça daqui é
+exemplo para provar capacidade do núcleo, nenhuma é referência de engenharia ou
+base de produto. Peça sem selo, ou com selo reescrito, reprova em
+`tools/bancadas/pecas-sao-exemplos.test.ts`. O texto longo está em
+"Peças são exemplos" no `README.md`.
+
 `PARAMS` guarda dimensões; `TOPO` guarda decisões que podem reconstruir a
 topologia; `PASSOS` é a lista `[['op', {...}], ...]`. Não escreva `id:` em um
 passo: o núcleo calcula o bloco pela posição (`BLOCO=1000`). `origemId` é uma

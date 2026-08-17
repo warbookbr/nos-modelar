@@ -61,6 +61,50 @@ para a direção de composição.
 - O contrato genérico de materiais ainda não existe.
 - O visor legado resolve `earcut` também nos servidores estáticos locais.
 
+## Peças são exemplos
+
+**Nenhuma peça deste repositório é homologada, e nenhuma serve de base.**
+
+Tudo em `prototipos/fps/v3/pecas/` é exemplo. Cada peça existe para exercitar e
+provar uma capacidade do núcleo, e nada mais. Nenhuma é referência de
+engenharia, componente aprovado ou ponto de partida de produto.
+
+Os nomes enganam de propósito pouco: `roda-dianteira`, `freio-disco`, `moto` e
+`drone-inspecao` soam definitivos, e não são. Medidas e proporções foram
+escolhidas para fazer uma capacidade passar ou falhar, não para descrever um
+componente real. Duas peças são exportadas para `pecas-resolvidas/` e lidas por
+outro repositório; isso as torna dado de integração, não geometria aprovada.
+
+O que este repositório sustenta é **o núcleo e as capacidades provadas**. A
+geometria das peças pode mudar ou ser removida a qualquer momento, sem aviso e
+sem migração. Se uma mudança boa no núcleo exigir refazer uma peça de exemplo,
+refaça a peça — ela nunca foi o contrato.
+
+Por isso toda peça abre com o mesmo selo, nestas palavras e nesta posição:
+
+```js
+/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+ *
+ * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
+ * engenharia, componente aprovado ou ponto de partida de produto.
+ *
+ * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+ * falhar, não para descrever um componente real. Esta geometria pode mudar ou
+ * ser removida a qualquer momento, sem aviso e sem migração.
+ *
+ * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
+ * a geometria daqui. Ver "Peças são exemplos" no README.md.
+ */
+```
+
+O selo é a primeira coisa do arquivo porque um aviso que aparece depois da
+receita não é aviso. Peça nova sem selo **reprova** em
+`tools/bancadas/pecas-sao-exemplos.test.ts`, que também recusa selo reescrito
+por conta própria — o padrão vale byte a byte, comparado com `_modelo.js`.
+
+Ao criar uma peça, copie `_modelo.js`: o selo vem junto.
+
 ## Desenvolvimento
 
 ```bash
