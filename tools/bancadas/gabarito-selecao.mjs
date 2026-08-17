@@ -28,10 +28,15 @@ import { compararGabarito, hashDePecas, nomesNovos } from './gabarito-selecao-li
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const args = process.argv.slice(2);
+const dirArg = args.find((a) => a.startsWith('--dir='));
+const PECAS = resolve(REPO, (dirArg ? dirArg.slice('--dir='.length) : 'prototipos/procedural/v3/pecas'));
+if (!dirArg) {
+  console.error('✗ gabarito:selecao exige --dir=...; o catálogo de receitas não é descoberto implicitamente.');
+  process.exit(2);
+}
 
 const GABARITO_PADRAO = join(HERE, 'gabarito-selecao.json');
-const args = process.argv.slice(2);
 const checkPath = (() => {
   const i = args.indexOf('--check');
   return i >= 0 ? (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : GABARITO_PADRAO) : null;

@@ -210,9 +210,16 @@ if (chamadoDireto) {
   const args = process.argv.slice(2);
   const iCheck = args.indexOf('--check');
   const checando = iCheck >= 0;
-  const caminho = resolve(REPO, (checando ? args[iCheck + 1] : args[0]) || LISTA_PADRAO);
+  const candidatoLista = checando ? args[iCheck + 1] : args[0];
+  const caminho = resolve(REPO, (candidatoLista && !candidatoLista.startsWith('--') ? candidatoLista : null) || LISTA_PADRAO);
+  const dirArg = args.find((a) => a.startsWith('--dir='));
+  if (!dirArg) {
+    console.error('✗ id-cru exige --dir=...; o catálogo de receitas não é descoberto implicitamente.');
+    process.exit(2);
+  }
+  const dir = resolve(REPO, dirArg.slice('--dir='.length));
 
-  const { usos, falhas } = await medirPecas();
+  const { usos, falhas } = await medirPecas(dir);
   if (falhas.length) {
     console.error(`✗ ${falhas.length} peça(s) não puderam ser medidas:`);
     for (const f of falhas) console.error(`  - ${f}`);
