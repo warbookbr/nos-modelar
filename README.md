@@ -48,10 +48,10 @@ para a direção de composição.
 
 ## Estado
 
-- O **fluxo de autoria** foi homologado nos Casos 1 e 2; o Caso 3 ainda não
-  começou. O que esses casos aprovam é o processo — briefing, execução na
-  bancada, medição e revisão. A peça usada em cada caso continua sendo exemplo,
-  como todas as outras: homologar o fluxo nunca homologou geometria.
+- O **fluxo de autoria** foi homologado nos Casos 1 e 2, e a série foi encerrada
+  aí. O que esses casos aprovam é o processo — briefing, execução na bancada,
+  medição e revisão. A peça usada em cada caso continua sendo exemplo, como
+  todas as outras: homologar o fluxo nunca homologou geometria.
 - O plano executivo ativo generaliza separação direcional e impacto local de
   montagem; disco–pinça é apenas sua fixture de aceitação.
 - O Módulo 1 do MCP, de leitura e auditoria, foi aprovado.

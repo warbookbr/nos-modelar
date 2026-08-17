@@ -80,7 +80,7 @@ Carro e motor são montagens recursivas. Não são receitas monolíticas.
 
 ## Estado operacional
 
-Casos 1 e 2 estão homologados; o Caso 3 não foi iniciado. Os contratos
+Casos 1 e 2 estão homologados e a série foi encerrada aí. Os contratos
 `mecanifica.montagem` v1/v2, pose rígida e relações locais persistidas já
 existem. O descritor `mecanifica.contexto-montagem` projeta a árvore resolvida
 em JSON consultável, sem malha ou identidade de runtime; veja

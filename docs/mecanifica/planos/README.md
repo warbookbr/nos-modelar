@@ -160,6 +160,7 @@ nos arquivos originais.
 | Alteração semântica compacta de montagem | concluído: aprovar |
 | Encostar — contato derivado | concluído: aprovar |
 | Ponto nomeado, e revisão dos atritos vizinhos | concluído: aprovar |
+| Histórico de revisão, e retirada do Caso 3 | concluído: aprovar |
 
 O plano da abertura oblonga está em
 [`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a

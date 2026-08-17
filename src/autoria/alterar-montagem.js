@@ -143,3 +143,65 @@ export function alterarMontagem(documento, alteracoes) {
 
   return { montagem: novo, diff };
 }
+
+/* ---- O CAMINHO INVERSO: a diferença entre duas revisões ----
+
+   Ler uma diferença e escrever uma alteração passam a falar a MESMA língua:
+   `{alvo, campo, de, para}`. Um agente que leu "instancia 'movel' ::
+   pose.deslocamento: de X para Y" já sabe escrever a alteração que desfaz isso,
+   sem traduzir formato nenhum no meio.
+
+   A HONESTIDADE QUE ESTA FUNÇÃO PRECISA TER. Nem toda diferença é expressável
+   como alteração: acrescentar ou remover uma instância muda a estrutura, e
+   `alterarMontagem` só troca valor de campo existente. Devolver tudo numa lista
+   só faria o agente acreditar que qualquer diferença pode ser desfeita com uma
+   alteração — e ele descobriria o contrário no meio de uma correção. Por isso as
+   duas saem separadas, e `estruturais` diz explicitamente o que a alteração não
+   alcança. */
+
+function ehFolha(v) { return !ehObjeto(v); }
+
+function comparar(antes, depois, prefixo, alvo, saida) {
+  const chaves = new Set([...Object.keys(antes ?? {}), ...Object.keys(depois ?? {})]);
+  for (const chave of chaves) {
+    const caminho = prefixo ? `${prefixo}.${chave}` : chave;
+    const a = antes?.[chave];
+    const b = depois?.[chave];
+    if (mesmoValor(a, b)) continue;
+    /* Lista é comparada INTEIRA, e não item a item, pela mesma razão que a
+       alteração recusa índice: posição não é endereço. */
+    if (ehFolha(a) || ehFolha(b)) { saida.push({ alvo, campo: caminho, de: copiaProfunda(a), para: copiaProfunda(b) }); continue; }
+    comparar(a, b, caminho, alvo, saida);
+  }
+}
+
+function porId(lista) {
+  const mapa = new Map();
+  for (const item of Array.isArray(lista) ? lista : []) if (item && typeof item.id === 'string') mapa.set(item.id, item);
+  return mapa;
+}
+
+/**
+ * Diferença semântica entre dois documentos de montagem.
+ * @returns {{alteracoes: Array<{alvo,campo,de,para}>, estruturais: Array<{tipo,alvo}>}}
+ */
+export function diferencaMontagem(antes, depois) {
+  if (!ehObjeto(antes) || !ehObjeto(depois)) {
+    falhar('documento-invalido', 'A comparação precisa de dois documentos de montagem', 'Leia as duas revisões antes de comparar.');
+  }
+  const alteracoes = [];
+  const estruturais = [];
+
+  const semListas = (d) => { const { instancias, relacoes, ...resto } = d; return resto; };
+  comparar(semListas(antes), semListas(depois), '', 'raiz', alteracoes);
+
+  for (const [tipo, chave] of [['instancia', 'instancias'], ['relacao', 'relacoes']]) {
+    const a = porId(antes[chave]);
+    const b = porId(depois[chave]);
+    for (const id of a.keys()) if (!b.has(id)) estruturais.push({ tipo: `${tipo}-removida`, alvo: `${tipo} '${id}'` });
+    for (const id of b.keys()) if (!a.has(id)) estruturais.push({ tipo: `${tipo}-acrescentada`, alvo: `${tipo} '${id}'` });
+    for (const [id, item] of a) if (b.has(id)) comparar(item, b.get(id), '', `${tipo} '${id}'`, alteracoes);
+  }
+
+  return { alteracoes, estruturais };
+}

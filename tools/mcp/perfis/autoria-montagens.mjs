@@ -2,10 +2,11 @@
 import { z } from 'zod';
 import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
 import {
-  confirmarAutoriaMontagem, observarAutoriaMontagem, planejarAutoriaMontagem,
+  ARQUIVO_MONTAGEM, confirmarAutoriaMontagem, observarAutoriaMontagem, planejarAutoriaMontagem,
   prepararPromocaoAutoriaMontagem, promoverAutoriaMontagem,
 } from '../../mecanifica/autoria-montagem.mjs';
-import { alterarMontagem } from '../../../src/autoria/alterar-montagem.js';
+import { alterarMontagem, diferencaMontagem } from '../../../src/autoria/alterar-montagem.js';
+import { lerCadeiaAutoria } from '../../mecanifica/repositorio-autoria.mjs';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
@@ -70,6 +71,75 @@ export async function planejarAlteracao(input, { autoria }) {
   } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
 }
 
+/* O documento vive como BYTES sob o nome do arquivo, e não como objeto: é o
+   mesmo caminho que a leitura da revisão ativa percorre, e desserializar aqui
+   de outro jeito faria a comparação enxergar um envelope onde o resto do
+   sistema enxerga a montagem. */
+function documentoDaRevisao(elo, papel) {
+  const bytes = elo?.conteudo?.[ARQUIVO_MONTAGEM];
+  if (typeof bytes !== 'string') {
+    throw Object.assign(new Error('Snapshot inválido.'), { codigo: 'snapshot-invalido', acao: `A revisão citada em ${papel} não contém ${ARQUIVO_MONTAGEM}.` });
+  }
+  return JSON.parse(bytes);
+}
+
+/* HISTÓRICO. A cadeia já era percorrida a cada leitura da revisão ativa, e
+   descartada; aqui ela é devolvida. Sem isto o agente publica e não consegue
+   olhar para trás — o conteúdo antigo fica guardado do lado, e inalcançável. */
+export async function historicoAutoria(input, { autoria }) {
+  try {
+    const { id } = z.object({ id: slug }).strict().parse(input); autorizado(autoria, id);
+    const cadeia = await lerCadeiaAutoria(autoria.raizRepositorio, id);
+    const revisoes = cadeia.map((elo, k) => ({
+      revisao: elo.commit, pai: elo.pai, ordem: k, ativa: k === cadeia.length - 1,
+    }));
+    return resposta(true, { id, total: revisoes.length, revisoes });
+  } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
+}
+
+/* COMPARAR. A diferença sai no MESMO vocabulário da alteração compacta, então
+   o agente que leu a diferença já sabe escrever a alteração que a desfaz.
+   `estruturais` sai separado de propósito: instância acrescentada ou removida
+   NÃO é expressável como alteração, e juntar as duas listas faria o agente
+   acreditar que qualquer diferença pode ser desfeita por um campo. */
+export async function compararRevisoes(input, { autoria }) {
+  try {
+    const args = z.object({ id: slug, anterior: hash, posterior: hash }).strict().parse(input);
+    autorizado(autoria, args.id);
+    const cadeia = await lerCadeiaAutoria(autoria.raizRepositorio, args.id);
+    const acha = (rev, papel) => {
+      const elo = cadeia.find((item) => item.commit === rev);
+      if (!elo) throw Object.assign(new Error('Revisão desconhecida.'), { codigo: 'revisao-nao-encontrada', acao: `A revisão citada em ${papel} não está na cadeia desta montagem; leia o histórico e use uma revisão anunciada.` });
+      return elo;
+    };
+    const a = acha(args.anterior, 'anterior');
+    const b = acha(args.posterior, 'posterior');
+    const { alteracoes, estruturais } = diferencaMontagem(documentoDaRevisao(a, 'anterior'), documentoDaRevisao(b, 'posterior'));
+    return resposta(true, { id: args.id, anterior: args.anterior, posterior: args.posterior, alteracoes, estruturais });
+  } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
+}
+
+/* RESTAURAR. Ela NÃO move o estado ativo: devolve um plano, e o plano segue
+   pelos mesmos gates de sempre — inspecionar, conferir, aplicar. Voltar a uma
+   revisão antiga é publicar uma revisão NOVA com aquele conteúdo, e não
+   reescrever a história; a cadeia continua sendo a verdade do que aconteceu. */
+export async function planejarRestauracao(input, { autoria }) {
+  try {
+    const args = z.object({ id: slug, revisaoObservada: hash.nullable(), revisao: hash }).strict().parse(input);
+    autorizado(autoria, args.id);
+    const cadeia = await lerCadeiaAutoria(autoria.raizRepositorio, args.id);
+    const ativa = cadeia.length ? cadeia[cadeia.length - 1] : null;
+    if ((ativa?.commit ?? null) !== args.revisaoObservada) throw Object.assign(new Error('Revisão observada divergente.'), { codigo: 'revisao-desatualizada', acao: 'Leia a revisão ativa e planeje novamente.' });
+    const alvo = cadeia.find((item) => item.commit === args.revisao);
+    if (!alvo) throw Object.assign(new Error('Revisão desconhecida.'), { codigo: 'revisao-nao-encontrada', acao: 'Leia o histórico e use uma revisão anunciada.' });
+    if (alvo.commit === ativa?.commit) throw Object.assign(new Error('Restauração sem efeito.'), { codigo: 'restauracao-sem-efeito', acao: 'A revisão pedida já é a ativa; restaurar publicaria uma revisão que não muda nada.' });
+    const montagem = documentoDaRevisao(alvo, 'revisao');
+    const { alteracoes, estruturais } = diferencaMontagem(documentoDaRevisao(ativa, 'ativa'), montagem);
+    const interno = planejarAutoriaMontagem({ entidade: args.id, montagem, pai: args.revisaoObservada });
+    return resposta(true, { id: args.id, restaurando: args.revisao, alteracoes, estruturais, plano: publicoPlano(interno), confirmacao: confirmarAutoriaMontagem(interno).confirmacao });
+  } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
+}
+
 export async function inspecionarAutoria(input, { autoria, capturar = capturarMontagem }) {
   try {
     const args = z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict().parse(input); autorizado(autoria, args.plano.entidade);
@@ -96,6 +166,9 @@ export function criarFerramentasAutoria(autoria) {
   return Object.freeze([
     ['observar_autoria_montagem', 'Lê a revisão ativa de uma montagem autorizada.', observarAutoria, z.object({ id: slug }).strict()],
     ['planejar_autoria_montagem', 'Planeja uma mudança por ID semântico, sem escrita.', planejarAutoria, z.object({ id: slug, revisaoObservada: hash.nullable(), montagem: z.json() }).strict()],
+    ['historico_autoria_montagem', 'Lista as revisões da montagem, da primeira à ativa.', historicoAutoria, z.object({ id: slug }).strict()],
+    ['comparar_revisoes_montagem', 'Compara duas revisões no vocabulário da alteração compacta.', compararRevisoes, z.object({ id: slug, anterior: hash, posterior: hash }).strict()],
+    ['planejar_restauracao_montagem', 'Planeja publicar o conteúdo de uma revisão anterior como revisão nova.', planejarRestauracao, z.object({ id: slug, revisaoObservada: hash.nullable(), revisao: hash }).strict()],
     ['planejar_alteracao_montagem', 'Planeja mudança por alvo e campo semântico, sem reenviar o documento inteiro.', planejarAlteracao, z.object({ id: slug, revisaoObservada: hash.nullable(), alteracoes: z.array(z.json()).min(1) }).strict()],
     ['inspecionar_proposta_montagem', 'Deriva impacto, revalidação e vistas da proposta sem escrita.', inspecionarAutoria, z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict()],
     ['aplicar_autoria_montagem', 'Aplica somente proposta confirmada que passou pelos gates.', aplicarAutoria, z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict()],

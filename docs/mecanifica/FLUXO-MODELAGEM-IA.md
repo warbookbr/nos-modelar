@@ -153,7 +153,7 @@ outras portas ainda requerem plano e evidência próprios.
 
 ## Estado
 
-Os Casos 1 e 2 estão concluídos. O Caso 3 não foi iniciado. Não há plano
+Os Casos 1 e 2 estão concluídos e a série foi encerrada aí. Não há plano
 executivo ativo.
 
 O Módulo 1 do MCP foi aprovado para leitura e auditoria. A primeira tentativa de

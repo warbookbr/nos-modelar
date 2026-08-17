@@ -23,7 +23,7 @@ expressável; vistas não cortadas nem pequenas; grupos semanticamente nomeávei
 |---|---|---|
 | 1 | concluído | pacote e revisão promovida pelo fluxo oficial |
 | 2 | concluído | `_placa-adaptadora`, revisão `r001` promovida; tentativa recusada preservada |
-| 3 | pendente | não iniciado |
+| 3 | retirado | a pergunta que ele faria foi respondida com evidência mais forte |
 
 No Caso 2, vistas frontal e direita são naturalmente finas e válidas, mas não
 mostram os furos de perfil. Essa divergência do briefing foi registrada, sem
