@@ -99,9 +99,16 @@ export function ocorrenciasDoPasso(passo) {
   if (Object.hasOwn(a, 'vs')) anotar('vs', contarIds(a.vs));
   if (Object.hasOwn(a, 'pontos')) anotar('pontos', contarPontos(a.pontos));
   if (Object.hasOwn(a, 'de') && !origemEstrutural(a.de)) anotar('mesclaDe', contarIds(a.de));
-  if (objetoPlano(a.sel)) {
-    if (Object.hasOwn(a.sel, 'v')) anotar('selV', contarIds(a.sel.v));
-    if (Object.hasOwn(a.sel, 'f')) anotar('selF', contarIds(a.sel.f));
+  /* TODA chave que carrega SELEÇÃO conta, não só `sel`. O `encostar` tem dois
+     lados — `sel` move e `referencia` fica parada —, e as duas falam a mesma
+     língua. Contar apenas `sel` deixaria `referencia:{f:[3,4]}` passar invisível,
+     que é exatamente a cegueira do MEDIA-5 reaberta por uma porta nova: o gate
+     afirmaria cobrir seleção e cobriria metade dela. */
+  for (const chave of ['sel', 'referencia']) {
+    const selecao = a[chave];
+    if (!objetoPlano(selecao)) continue;
+    if (Object.hasOwn(selecao, 'v')) anotar('selV', contarIds(selecao.v));
+    if (Object.hasOwn(selecao, 'f')) anotar('selF', contarIds(selecao.f));
   }
   return achados;
 }

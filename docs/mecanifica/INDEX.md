@@ -212,8 +212,9 @@ npm run criar -- _viga
 - Iniciar e executar o Caso 3 da homologação.
 - Resolver costuras topológicas de `lathe`.
 - Criar contrato genérico de materiais.
-- Fechar as capacidades ainda abertas comprovadas em A-6, A-7, A-8, A-16 e
-  A-29.
+- Fechar as capacidades ainda abertas comprovadas em A-7, A-8, A-16 e A-29.
+- Avaliar se `alinhar` e os seletores relacionais do O-8 são necessários agora
+  que `encostar` cobre o caso de direção declarada.
 
 Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
 só abre após decisão e plano executivo explícitos.
@@ -273,6 +274,8 @@ Planejamento: [planos/README](planos/README.md),
 (`docs/mecanifica/planos/2026-08-17-nome-de-copia.md`),
 [alteração compacta](planos/2026-08-17-alteracao-compacta.md)
 (`docs/mecanifica/planos/2026-08-17-alteracao-compacta.md`),
+[encostar](planos/2026-08-17-encostar.md)
+(`docs/mecanifica/planos/2026-08-17-encostar.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

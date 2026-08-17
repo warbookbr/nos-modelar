@@ -87,6 +87,22 @@ describe('contarIdCru — cobre TODAS as formas de coleção do núcleo', () => 
     expect(totalDe(u)).toBe(13);
   });
 
+  /* O `encostar` trouxe uma SEGUNDA chave de seleção. Contar só `sel` deixaria
+     a metade parada do contato invisível ao gate — a cegueira do MEDIA-5
+     reaberta por uma porta nova. */
+  it('conta id cru na referencia do encostar, não só no sel', () => {
+    expect(contarIdCru([['encostar', { sel: { f: [1, 2] }, referencia: { f: [3, 4, 5] }, direcao: [0, -1, 0] }]]))
+      .toEqual(uso({ selF: 5 }));
+    expect(contarIdCru([['encostar', { sel: { origem: { op: 'cubo', id: 1 } }, referencia: { v: [7, 8] }, direcao: [0, -1, 0] }]]))
+      .toEqual(uso({ selV: 2 }));
+  });
+
+  it('referencia por caminho semântico não conta', () => {
+    expect(contarIdCru([['encostar', {
+      sel: { alias: 'pastilhaInteira' }, referencia: { origem: { op: 'cubo', id: 1 } }, direcao: [0, -1, 0],
+    }]])).toEqual(zero);
+  });
+
   it('não conta caminho semântico — é isto que a peça nova deve usar', () => {
     expect(contarIdCru([
       ['pincel', { modo: 'face', sel: { grupo: 'disco' } }],
@@ -158,8 +174,9 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
     'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'ate', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
-    'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'id', 'lado', 'lados', 'larg',
+    'derivaDe', 'direcao', 'dist', 'divisoes', 'dureza', 'eixo', 'folga', 'frequencia', 'graus', 'id', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'nomes', 'orientacao', 'origemId', 'osso', 'pai', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
+    'referencia',
     'profundidade', 'raio', 'rotulo', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta', 'interface',
   ];
   /* `aresta` (ops `filete` e `arredondarAresta`) é o ÍNDICE LOCAL da aresta dentro do polígono de
@@ -167,6 +184,11 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
      (cilindro) já é; nunca aponta pra um id de vértice ou de face.
      `paineis` é TOPO do arredondamento: conta a discretização do arco, nunca
      um id de face (cada face criada recebe a identidade `painel:k`).
+     `direcao` e `folga` (op `encostar`) são DIMENSIONAIS: um vetor de direção e
+     uma distância em metros. `referencia` é o outro lado do contato, e carrega
+     uma SELEÇÃO (`{origem}`, `{alias}`, `{grupo}`…) — a mesma forma do `sel`,
+     resolvida pelo mesmo `resolverAlvosV`, que já recusa id cru fora das formas
+     legadas. Nenhuma das três alcança id de face ou de vértice por caminho novo.
      `nomes` (op `arranja`) é a lista de ENDEREÇOS SEMÂNTICOS das cópias, a
      mesma classe do `nome` da op `parte` e do `grupo` do `furo`: string
      declarada pelo autor, conferida contra duplicata, nunca id de face ou de

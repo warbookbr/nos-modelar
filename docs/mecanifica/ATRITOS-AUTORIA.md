@@ -10,7 +10,7 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-3 | resolvido; contexto preserva material |
 | A-4 | resolvido; geradores aceitam `em` e `eixo` na criação |
 | A-5 | resolvido; expressões nomeadas existem |
-| A-6 | aberto; `encostar` ainda não existe |
+| A-6 | resolvido no caso comum; `encostar` deriva contato na direção declarada |
 | A-7 | aberto; alias de conjuntos ainda exige decisão |
 | A-8 | aberto; ponto nomeável ainda não é contrato geral |
 | A-9 | resolvido; origens estruturais nos geradores provados |

@@ -3461,6 +3461,74 @@ export const OPS = {
      — mexer no PARAM remodela sem tocar em passo nenhum). Ausente = `[0,0,0]`,
      que é no-op silencioso, a mesma lei do `moveV`/`moveF`/`moveA`. Não tem
      PIVÔ de propósito: translação não depende de pivô. */
+  /* encostar (atrito A-6) — o contato deixa de ser um número digitado e passa a
+     ser DERIVADO da geometria, a cada execução.
+
+     O QUE ISSO CONSERTA. Até aqui, encostar uma peça na outra era calcular a
+     coordenada à mão e escrevê-la. O número não sabe de onde veio: quando uma
+     espessura muda, o contato se desfaz e NADA avisa — a peça continua válida,
+     os gates continuam verdes e a foto continua plausível.
+
+     POR QUE A DIREÇÃO É DECLARADA, E NÃO INFERIDA. O O-8 avisa que o difícil
+     aqui é determinismo: relação precisa de desempate estável, e ambiguidade
+     precisa gritar em vez de escolher. Exigir `direcao` ELIMINA esse risco em
+     vez de administrá-lo — sem busca de par de faces não há empate a desempatar,
+     e a operação vira aritmética pura sobre as posições, determinística por
+     construção.
+
+     O QUE ELA NÃO É, e isto fica escrito porque o nome é sugestivo: contato por
+     EXTENSÃO na direção declarada. Ela não descobre o que encosta em quê, não
+     resolve interpenetração lateral, não é solver de encaixe e não é colisão.
+
+       `sel`         o que se move (as mesmas seleções de sempre);
+       `referencia`  o lado que NÃO se move — o mesmo par de papéis que as
+                     relações de montagem já nomeiam por `movel`/`referencia`,
+                     e não `em`, que nos geradores já significa pose de criação;
+       `direcao`  para onde empurrar, `[x,y,z]`, não-nula;
+       `folga`    distância que sobra no fim (ausente = 0, encosta de fato).
+
+     A conta: com `u` a direção normalizada, leva a frente do que move até a
+     traseira da referência, menos a folga —
+       `t = min(ref·u) − max(mov·u) − folga`
+     e translada `sel` por `t·u`. `t` negativo é legítimo: a operação POSICIONA
+     em contato, não avança até o contato, então ela conserta tanto o corpo que
+     ficou longe quanto o que passou do ponto. */
+  encostar(st, a, i) {
+    if (a.direcao == null) return grita(st, i, 'encostar', 'direcao', 'encostar exige direcao:[x,y,z] — para onde empurrar. Inferir a direção é onde nasceria a ambiguidade que faria a peça deixar de ser reexecutável');
+    if (!Array.isArray(a.direcao) || a.direcao.length !== 3) return grita(st, i, 'encostar', 'direcao', `direcao precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.direcao)}`);
+    const bruta = st.vec(a.direcao);
+    const norma = Math.hypot(bruta[0], bruta[1], bruta[2]);
+    if (!(norma > 1e-9)) return grita(st, i, 'encostar', 'direcao', `direcao é o vetor nulo (${JSON.stringify(bruta)}) — não aponta para lado nenhum`);
+    const u = [bruta[0] / norma, bruta[1] / norma, bruta[2] / norma];
+
+    const folga = a.folga == null ? 0 : st.num(a.folga);
+    if (!(folga >= 0)) return grita(st, i, 'encostar', 'folga', `folga precisa ser ≥ 0 (recebido ${JSON.stringify(a.folga)} = ${folga}); folga negativa é interferência declarada, e este passo não a promete — use transladar para invadir de propósito`);
+
+    if (a.referencia == null) return grita(st, i, 'encostar', 'referencia', 'encostar exige referencia:{...} — o lado que NÃO se move, na mesma linguagem de seleção do sel');
+    const movidos = resolverAlvosV(st, a.sel, 'encostar', i);
+    if (!movidos.size) return grita(st, i, 'encostar', 'sel', 'sel não resolveu vértice nenhum: encostar sem alvo seria um no-op silencioso');
+    const referencia = resolverAlvosV(st, a.referencia, 'encostar', i);
+    if (!referencia.size) return grita(st, i, 'encostar', 'referencia', 'referencia não resolveu vértice nenhum: sem referência não existe contato a derivar');
+
+    /* Um vértice nos dois lados faria a peça encostar em si mesma: a conta
+       ainda daria um número, e o número seria mentira. */
+    for (const v of movidos) {
+      if (referencia.has(v)) return grita(st, i, 'encostar', 'referencia', `o vértice ${v} está em sel e em referencia ao mesmo tempo — um corpo não encosta em si mesmo; separe as duas seleções`);
+    }
+
+    const proj = (v) => { const p = st.V.get(v); return p[0] * u[0] + p[1] * u[1] + p[2] * u[2]; };
+    let frenteDoMovel = -Infinity;
+    for (const v of movidos) frenteDoMovel = Math.max(frenteDoMovel, proj(v));
+    let traseiraDaReferencia = Infinity;
+    for (const v of referencia) traseiraDaReferencia = Math.min(traseiraDaReferencia, proj(v));
+
+    const t = traseiraDaReferencia - frenteDoMovel - folga;
+    for (const v of movidos) {
+      const p = st.V.get(v);
+      st.V.set(v, [p[0] + u[0] * t, p[1] + u[1] * t, p[2] + u[2] * t]);
+    }
+  },
+
   transladar(st, a, i) {
     const d = st.vec(a.d ?? [0, 0, 0]);
 
