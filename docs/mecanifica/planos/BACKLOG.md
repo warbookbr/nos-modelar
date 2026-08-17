@@ -43,3 +43,27 @@ Algumas dependências já podem ser afirmadas sem abrir plano:
    verificável, sem virar uma barreira temporal permanente.
 
 Essa ordem não escolhe o primeiro plano nem autoriza implementação automática.
+
+## Candidatos medidos e recusados por falta de evidência
+
+Medido em 2026-08-17, no acervo inteiro. Os três apareciam como "candidatos sem
+plano" e foram testados pela mesma régua que retirou os seletores relacionais,
+o A-16 e o Caso 3: **capacidade entra quando há evidência de que ela está
+travando alguém, não quando é plausível**.
+
+| candidato | medida | decisão |
+|---|---|---|
+| `alinhar` (centragem derivada) | 3 de 95 `transladar` têm cara de centragem, e os três já usam parâmetro nomeado (`centroBuchaY`), não conta na mão | recusado |
+| `loft` fechado | 0 de 22 `loft` do acervo têm caminho fechado | recusado |
+| variantes nomeadas de revisão | nenhuma ramificação ocorreu; a cadeia de autoria é linear e a escrita concorrente é recusada, não ramificada | recusado |
+
+A comparação que decide: `em`/`eixo` entrou com **128 de 853 passos** (15%) em
+transporte puro, e o ponto nomeado com **18 de 61 parâmetros** do freio
+existindo só para nomear 6 pontos. Essa é a ordem de grandeza de um atrito real.
+Três ocorrências que já usam nome, e zero ocorrências, não são.
+
+Reabrir qualquer um dos três exige **evidência nova de campo** — uma peça ou uma
+sessão em que a falta atrapalhou —, não a lembrança de que já estiveram na
+lista. Enquanto isso, `alinhar` e `loft` fechado permanecem descritos aqui como
+forma conhecida, para que ninguém precise redescobri-los do zero quando a
+evidência aparecer.
