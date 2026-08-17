@@ -1,0 +1,35 @@
+{
+  "formato": "mecanifica.peca-resolvida",
+  "versao": 1,
+  "peca": "pino-guia",
+  "receita": "ensaio-pino-guia",
+  "meta": { "nome": "Pino guia de ensaio" },
+  "materiais": {},
+  "partes": ["pino"],
+  "portas": [
+    {
+      "id": "guiaInterna",
+      "rotulo": "Guia interna",
+      "de": { "op": "cilindro", "id": 30, "tampa": "fundo" },
+      "passo": 3,
+      "interface": {
+        "forma": "cilindro",
+        "papel": "interna",
+        "eixo": [0, 1, 0],
+        "centro": [0.2, 0.3, 0.2],
+        "raio": 0.1,
+        "inicio": 0,
+        "fim": 0.5,
+        "referencia": [1, 0, 0]
+      }
+    }
+  ],
+  "V": [
+    [0, 0, 0, 0], [1, 0.4, 0, 0], [2, 0.4, 0.6, 0], [3, 0, 0.6, 0],
+    [4, 0, 0, 0.4], [5, 0.4, 0, 0.4], [6, 0.4, 0.6, 0.4], [7, 0, 0.6, 0.4]
+  ],
+  "F": [
+    [0, [4, 5, 6, 7], null, null, false, true, "pino"],
+    [1, [0, 3, 2, 1], null, null, false, true, "pino"]
+  ]
+}

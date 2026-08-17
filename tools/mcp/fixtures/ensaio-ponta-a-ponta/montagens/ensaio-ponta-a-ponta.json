@@ -1,0 +1,31 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 3,
+  "id": "ensaio-ponta-a-ponta",
+  "instancias": [
+    { "id": "base", "alvo": { "tipo": "peca", "ref": "placa-base" } },
+    {
+      "id": "suporte",
+      "alvo": { "tipo": "peca", "ref": "suporte-portas" },
+      "pose": { "deslocamento": [0.4, 0.35, 0.25] }
+    },
+    {
+      "id": "pino",
+      "alvo": { "tipo": "peca", "ref": "pino-guia" },
+      "pose": { "deslocamento": [0.7, 1.65, 0.4] }
+    }
+  ],
+  "relacoes": [
+    {
+      "id": "vaoDoPino",
+      "tipo": "mantemSeparacaoDirecional",
+      "referencia": { "caminho": ["suporte"], "parte": "guia" },
+      "movel": { "caminho": ["pino"] },
+      "especificacao": {
+        "eixo": [0, 2, 0],
+        "separacaoMinima": 0.02,
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

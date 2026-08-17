@@ -1,0 +1,9 @@
+{
+  "formato": "mecanifica.catalogo-mcp-montagens",
+  "versao": 1,
+  "raizMontagens": "montagens",
+  "raizPecas": "pecas",
+  "raizes": [
+    { "id": "ensaio-ponta-a-ponta", "ref": "ensaio-ponta-a-ponta" }
+  ]
+}

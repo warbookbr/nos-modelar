@@ -1,0 +1,35 @@
+{
+  "formato": "mecanifica.peca-resolvida",
+  "versao": 1,
+  "peca": "suporte-portas",
+  "receita": "ensaio-suporte-portas",
+  "meta": { "nome": "Suporte com interface de ensaio" },
+  "materiais": {},
+  "partes": ["corpo", "guia"],
+  "portas": [
+    {
+      "id": "guiaExterna",
+      "rotulo": "Guia externa",
+      "de": { "op": "cilindro", "id": 20, "tampa": "topo" },
+      "passo": 4,
+      "interface": {
+        "forma": "cilindro",
+        "papel": "externa",
+        "eixo": [0, 1, 0],
+        "centro": [0.4, 0.6, 0.4],
+        "raio": 0.1,
+        "inicio": 0,
+        "fim": 0.4,
+        "referencia": [1, 0, 0]
+      }
+    }
+  ],
+  "V": [
+    [0, 0, 0, 0], [1, 0.8, 0, 0], [2, 0.8, 1.1, 0], [3, 0, 1.1, 0],
+    [4, 0, 0, 0.8], [5, 0.8, 0, 0.8], [6, 0.8, 1.1, 0.8], [7, 0, 1.1, 0.8]
+  ],
+  "F": [
+    [0, [4, 5, 6, 7], null, null, false, true, "corpo"],
+    [1, [0, 3, 2, 1], null, null, false, true, "guia"]
+  ]
+}

@@ -16,6 +16,7 @@
     "bancada:vazia:check": "node tools/mecanifica/guarda-bancada-vazia.mjs",
     "test": "vitest run",
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs",
+    "mcp:ensaio": "vitest run tools/mcp/ensaio-ponta-a-ponta.test.mjs",
     "test:watch": "vitest",
     "coord": "node tools/coordenacao/coord.mjs",
     "bancada": "node tools/mecanifica/olhar-bancada.mjs",

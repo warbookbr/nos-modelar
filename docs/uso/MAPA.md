@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-340 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+341 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -370,6 +370,7 @@
 - `catalogo-montagens.mjs` — catalogo-montagens.mjs — acesso MCP somente a raízes configuradas pelo host.
 - `catalogo-montagens.test.mjs` — catalogo-montagens.test.mjs — confinamento e descoberta explícita do catálogo MCP.
 - `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
+- `ensaio-ponta-a-ponta.test.mjs` — ensaio-ponta-a-ponta.test.mjs — três peças privadas exercitando o MCP real.
 - `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
 - `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
 - `universo-dependencias.mjs` — universo-dependencias.mjs — universo canônico confiável para leitura MCP.
