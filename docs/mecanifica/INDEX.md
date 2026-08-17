@@ -51,9 +51,13 @@ aplicação publicada aqui.
   `prototipos/procedural/v3/`, sem mudança geométrica ou de contrato.
 - O [plano de independência entre núcleo, validação e catálogo](planos/2026-08-17-desacoplamento-catalogo-validacao.md)
   (`docs/mecanifica/planos/2026-08-17-desacoplamento-catalogo-validacao.md`)
-  está pronto, mas não ativo. Ele define catálogo homologado vazio, fixtures
-  confinadas, validadores por entrada explícita e rollout coordenado com o
-  consumidor antes de remover as receitas não homologadas.
+  está ativo. Ele define catálogo homologado vazio, fixtures confinadas,
+  validadores por entrada explícita e rollout coordenado com o consumidor antes
+  de remover as receitas não homologadas.
+- A [matriz de testes acoplados ao acervo](MATRIZ-TESTES-ACOPLADOS.md)
+  (`docs/mecanifica/MATRIZ-TESTES-ACOPLADOS.md`) registra o
+  que é contrato genérico, integração, publicação ou conteúdo específico antes
+  da remoção das receitas.
 - O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
   (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
   receitas são dados JSON, passam por vistas e revalidação e não executam

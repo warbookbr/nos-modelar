@@ -1,14 +1,10 @@
 # Independência entre núcleo, validação e catálogo
-
 **Estado:** ativo
-
 **Responsável pela execução:** a definir
-
 **Base medida:** `warbookbr/nos-mecanifica` `main` em `2dd9fa1` e consumidor
 `warbookbr/mecanica` `main` em `9127321`.
 
 ## Objetivo verificável
-
 Permitir que o catálogo homologado esteja vazio, seja substituído ou tenha uma
 peça removida sem quebrar o núcleo, seus validadores, os testes fundamentais, a
 bancada ou o consumidor. Receitas de teste deixam de morar no catálogo e nenhum
@@ -18,34 +14,20 @@ O recorte entrega os ganhos prometidos: catálogo livremente substituível,
 receitas sem virar contratos acidentais, diagnóstico que separa falha do motor
 de falha do conteúdo, testes genéricos pequenos, migrações mais seguras e menor
 custo de homologação e remoção.
-
 ## Andamento da implementação
+R00, R01 e R03 estão na `main` até `0ca97a4`: execução pura, firewall,
+catálogo vazio, bancada sem fallback e harness privado. R04 avançou com gates
+de entrada explícita. A matriz está em
+[`MATRIZ-TESTES-ACOPLADOS.md`](../MATRIZ-TESTES-ACOPLADOS.md).
 
-R00, R01 e a parte estrutural de R03 estão implementados na `main` até
-`0ca97a4`: a baseline não depende da contagem de receitas, a execução pura
-recebe o módulo já carregado, há firewall arquitetural, o catálogo publicado é
-explícito e vazio, a bancada não escolhe peça padrão e o harness visual privado
-é o único lugar que injeta fixtures antigas. O CI agora prova também a página
-publicada vazia e o render de quatro fixtures explícitas.
-
-R04 está em andamento: o porteiro já deixou de varrer `pecas/` e usa o harness
-privado. Ainda faltam confinar os demais comandos de acervo e migrar/remover
-as suítes específicas antes do R06.
-
-No R05, o consumidor recebeu localmente os commits `c439f42` e `561211c`:
-carrega os JSONs pelo manifesto, aceita zero peças e testa os dois estados.
-O push para `warbookbr/mecanica` foi recusado pelo remoto com HTTP 403; por
-isso a retirada dos artefatos publicados permanece bloqueada até esse commit
-ser integrado naquele repositório.
-
+O consumidor tem os commits `c439f42` e `561211c` na branch remota
+`codex/catalogo-vazio`; a remoção do acervo aguarda a integração desse PR.
 ## Hipótese
-
 O motor não depende de peças: suas 32 operações recebem dados e nenhum módulo
 de `motor/` importa `pecas/`. O acoplamento está nas portas que descobrem
 arquivos, escolhem padrão, reutilizam receitas e publicam duas externamente.
 
 ## Evidência inicial
-
 - `pecas/` contém 39 módulos: 32 prefixados por `_` e 7 sem prefixo;
 - 34 arquivos em `src/`/`tools/` citam a raiz; 26 testes dependem de receita ou
   peça resolvida nomeada;
@@ -57,7 +39,6 @@ arquivos, escolhem padrão, reutilizam receitas e publicam duas externamente.
   espera 38 receitas, mas encontra 39. Trocar `38` por `39` é proibido.
 
 ## Arquitetura-alvo
-
 ```text
 motor puro <- serviço validar/executar receita <- entrada explícita
                                                ├─ catálogo homologado

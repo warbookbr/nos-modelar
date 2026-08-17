@@ -17,11 +17,12 @@
    VELHO, senão o produto mostra a peça de ontem e ninguém percebe. */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 // @ts-expect-error — ferramenta em JavaScript, exercitada pela API pública.
-import { conferirSemOrfaos, exportarPeca, lerPecaResolvida, FORMATO, VERSAO } from './exportar-peca.mjs';
+import { arquivoDoManifesto, conferirSemOrfaos, exportarPeca, gravarPublicadas, lerPecaResolvida, FORMATO, VERSAO } from './exportar-peca.mjs';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
 import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
@@ -233,6 +234,20 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     expect(r.status).toBe(2);
     expect(r.stderr).toMatch(/publicação parcial não é suportada/i);
     expect(readFileSync(MANIFESTO, 'utf8'), 'a recusa não pode regravar o manifesto').toBe(antes);
+  });
+
+  it('aceita publicação vazia e grava somente manifesto, sem descobrir receitas', async () => {
+    const destino = mkdtempSync(join(tmpdir(), 'mecanifica-exportar-vazio-'));
+    try {
+      await gravarPublicadas([], destino);
+      expect(readdirSync(destino)).toEqual(['manifesto.json']);
+      const manifesto = JSON.parse(readFileSync(arquivoDoManifesto(destino), 'utf8'));
+      expect(manifesto.pecas).toEqual([]);
+      expect(manifesto.formato).toBe(FORMATO);
+      expect(manifesto.versao).toBe(VERSAO);
+    } finally {
+      rmSync(destino, { recursive: true, force: true });
+    }
   });
 
   it('★ recusa peça que o núcleo reprovou, repetindo o motivo dele', async () => {

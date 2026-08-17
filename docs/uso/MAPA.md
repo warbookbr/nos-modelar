@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-398 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+408 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -158,6 +158,7 @@
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
+- `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
@@ -345,6 +346,7 @@
 - `derivar-roteiro-revalidacao.js` — derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas.
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
+- `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
@@ -358,16 +360,22 @@
 
 ## src/bancada/
 
-- `carregar-peca.js` — carregar-peca.js — resolve a fixture da bancada por nome semântico e falha alto em nome inválido.
+- `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
+- `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
 - `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
+- `entrada.js` — entrada.js — única entrada publicada da bancada; a aplicação não escolhe peça padrão e usa o catálogo homologado explícito, que hoje está vazio. /
 - `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
 - `main.js` — main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível.
 
 ## tools/
 
 - `README.md` — tools/ — ferramentas da Mecanifica e do núcleo herdado
+
+## tools/arquitetura/
+
+- `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
 
 ## tools/bancadas/
 
@@ -379,11 +387,13 @@
 - `gabarito-selecao-lib.test.mjs` — gabarito-selecao-lib.test.mjs — protege a exceção estreita para peça nova: `--novas` aceita presença nova, mas nunca esconde hash, remoção ou erro de nome.
 - `gabarito-selecao.mjs` — gabarito-selecao.mjs — a PROVA ZERO da Fase 3.5 (docs/rumo/PLANO.md): mede, peça por peça, que uma mudança no núcleo (`motor/oficina.js`) não mudou o resulta…
 - `gabarito.mjs` — gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o gabarito, desenhado à…
+- `harness-entry.js` — harness-entry.js — catálogo privado dos gates visuais. Este módulo só é carregado por harness.html; não participa da entrada publicada da bancada. /
+- `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
 - `id-cru.mjs` — id-cru.mjs — o gate do O-4 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): REPROVA peça NOVA que enderece geometria por id posicional, sem quebrar as her…
 - `id-cru.test.ts` — id-cru.test.ts — prova do gate do O-4: que ele ACHA id cru em peça nova, que a lista de exceções é uma dívida CONGELADA (não um teto para crescer) e que valo…
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `pecas-sao-exemplos.test.ts` — pecas-sao-exemplos.test.ts — o selo que impede a peça de exemplo de ser lida como base de projeto.
-- `porteiro.mjs` — porteiro.mjs — o GATE de render da OFICINA (D-60). Renderiza peça(s) do v3 e FALHA (exit≠0) se: houve pageerror, window.__ready ≠ true, ou o frame é DEGENERA…
+- `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
 - `visor-imports.test.mjs` — Prova a resolução de imports bare no visor legado servido sem transformação.
 
@@ -449,6 +459,7 @@
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz da Oficina é neutra e não volta a fps.
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
+- `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `corrimao-orientacao.test.ts` — corrimao-orientacao.test.ts — a prova NÃO AUTOMOTIVA da `orientacao` do `loft`, o segundo item do ciclo "Corte e orientação de seção v1".
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
@@ -467,6 +478,7 @@
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
+- `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exportar-gate.test.ts` — exportar-gate.test.ts — A-60, segunda metade: o gate que acusa arquivo velho.
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
 - `exportar-peca.test.ts` — exportar-peca.test.ts — A-60: a peça vira DADO.
@@ -474,6 +486,7 @@
 - `flange-integridade.test.ts` — flange-integridade.test.ts — prova em peça da F1/A-30: uma passagem central e um círculo de parafusos, com raios distintos e nomes estáveis, no mesmo passo. …
 - `freio-disco-integridade.test.ts` — freio-disco-integridade.test.ts — testes de integridade do primeiro sistema mecânico da Mecanifica (Fase 3). Não medem beleza: medem as relações que o domíni…
 - `gabarito-furacao-integridade.test.ts` — gabarito-furacao-integridade.test.ts — prova geral do A-34 nas três ops com raio escalar: cilindro, cone e furo usam a mesma tolerância em metros.
+- `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
