@@ -50,6 +50,9 @@ jobs:
       - name: Bancada publicada com catálogo vazio
         run: npm run bancada:vazia:check
 
+      - name: Harness privado prova render de fixtures
+        run: npm run porteiro
+
       - name: Prova Zero — seleção de peças byte-idêntica ao gabarito
         run: npm run gabarito:selecao:check
 

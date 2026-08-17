@@ -1,31 +1,29 @@
 #!/usr/bin/env node
-/* porteiro.mjs — o GATE de render da OFICINA (D-60). Renderiza peça(s) do v3 e
-   FALHA (exit≠0) se: houve pageerror, window.__ready ≠ true, ou o frame é
-   DEGENERADO (tela chapada — render quebrado que "passou verde"). Pra CI e pro
-   "shader quebrado nunca mais passa".
-     node tools/bancadas/porteiro.mjs                 # todas as peças de pecas/
-     node tools/bancadas/porteiro.mjs freio-disco roda-dianteira */
-import { createServer } from 'node:http';
+/* porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre
+   nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades
+   que precisa de navegador real. Conteúdo homologado, quando existir, ganha
+   gate próprio e não entra aqui por acidente.
+ */
 import { pathToFileURL } from 'node:url';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { dirname, join, resolve, extname } from 'node:path';
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pngStats } from './bench/pngstats.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 let alvos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-if (!alvos.length) alvos = readdirSync(PECAS).filter((f) => f.endsWith('.js') && !f.startsWith('_')).map((f) => f.replace(/\.js$/, ''));
+if (!alvos.length) alvos = ['freio-disco', '_freio-hierarquia', '_jardineira', '_vao-e-anteparo'];
 
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
-const server = createServer((req, res) => {
-  const p = join(REPO, decodeURIComponent(new URL(req.url, 'http://x').pathname));
-  if (!p.startsWith(REPO) || !existsSync(p)) { res.writeHead(404); res.end(); return; }
-  res.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' }); res.end(readFileSync(p));
+const { createServer } = await import('vite');
+const vite = await createServer({
+  root: REPO,
+  configFile: join(REPO, 'vite.config.js'),
+  server: { host: '127.0.0.1', port: 0 },
+  logLevel: 'error',
 });
-await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-const base = `http://127.0.0.1:${server.address().port}/prototipos/procedural/v3/visor.html`;
+await vite.listen();
+const base = `http://127.0.0.1:${vite.httpServer.address().port}/nos-mecanifica/tools/bancadas/harness.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }
@@ -42,8 +40,8 @@ for (const nome of alvos) {
   try {
     await page.goto(`${base}?peca=${nome}&res=640`, { waitUntil: 'load' });
     await page.waitForTimeout(1200);
-    const ready = await page.evaluate(() => window.__ready === true);
-    if (!ready) motivos.push('window.__ready ≠ true (peça não abriu)');
+    const ready = await page.evaluate(() => window.__mecanificaBancada?.ready === true);
+    if (!ready) motivos.push('window.__mecanificaBancada.ready ≠ true (fixture não abriu)');
     const buf = await page.screenshot();
     try {
       const s = pngStats(buf);
@@ -56,6 +54,7 @@ for (const nome of alvos) {
   if (motivos.length) { falhas++; console.log(`✗ ${nome}\n    ${motivos.join('\n    ')}`); }
   else console.log(`✓ ${nome}`);
 }
-await browser.close(); server.close();
+await browser.close();
+await vite.close();
 console.log(`\nporteiro: ${alvos.length - falhas}/${alvos.length} passaram`);
 process.exit(falhas ? 1 : 0);
