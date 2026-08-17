@@ -7,7 +7,7 @@ autoriza implementação ou alteração no repositório original.
 |---|---|---|---|
 | identidade semântica | entregue e exercitada em peças | `motor/oficina.js`, testes | não usa UUID ou índice salvo |
 | partes e grupos | entregue na bancada | `motor/oficina.js`, `bancada.html` | montagem persistida fora |
-| portas | entregue, 8 portas provadas | `guarda-portas-bancada.mjs` | grupo linear ainda sem endereço único |
+| portas | entregue, 8 portas provadas | `guarda-portas-bancada.mjs` | cópia de arranjo endereçável por `nomes` |
 | arranjo radial/linear | entregue em fixture | `arranja`, `_cerca-e-flor.js` | origem copia uma fonte |
 | furo e centros | entregue em peças de prova | `_tampa-de-caixa.js`, `_flange-de-tubulacao.js` | não é booleana geral |
 | orientação de seção | entregue em `loft` | `_corrimao.js`, núcleo | costura de `lathe` continua aberta |

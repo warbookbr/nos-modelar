@@ -98,7 +98,10 @@ evidência atual.
 A abertura oblonga foi a primeira a entrar, por
 [`planos/2026-08-17-abertura-oblonga.md`](planos/2026-08-17-abertura-oblonga.md):
 `furo` ganhou `ate` e o anel virou estádio, sem op nova e sem família de
-endereço nova. As outras duas continuam abertas e sem abertura automática.
+endereço nova. O endereço de grupo linear entrou em seguida por
+[`planos/2026-08-17-nome-de-copia.md`](planos/2026-08-17-nome-de-copia.md):
+`arranja` aceita `nomes` e a origem cita `nome`. A costura de `lathe` continua
+aberta, sem abertura automática.
 
 ### 6. Materiais canônicos
 

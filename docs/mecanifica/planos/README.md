@@ -156,6 +156,7 @@ nos arquivos originais.
 | MCP — leitura e auditoria de montagens | concluído: aprovar, R04 |
 | Abertura oblonga — rasgo no `furo` | concluído: aprovar |
 | Pose de criação — `em` e `eixo` nos geradores | concluído: aprovar |
+| Nome de cópia no `arranja` | concluído: aprovar |
 
 O plano da abertura oblonga está em
 [`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a

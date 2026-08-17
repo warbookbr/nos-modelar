@@ -952,9 +952,15 @@ const CONTRATOS_ORIGEM = {
      fonte E as cópias, a fonte é a ÚLTIMA a ser furada. */
   arranja: {
     validar(origem) {
-      const chaves = ['op', 'id', 'de', 'copia'];
-      const msg = "arranja usa op, id, de e copia opcional (eixo numérico sobre as cópias 0..total−2: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = a coleção inteira, ou filtro de progressão {passo,fase})";
+      const chaves = ['op', 'id', 'de', 'copia', 'nome'];
+      const msg = "arranja usa op, id, de, e depois copia OU nome (copia é o eixo numérico sobre as cópias 0..total−2: inteiro, nome de parâmetro ou expressão '=…', extremidade 'primeira'/'ultima', ausente = a coleção inteira, ou filtro de progressão {passo,fase}; nome é o endereço declarado em `nomes` no passo)";
       if (!Object.keys(origem).every((k) => chaves.includes(k)) || !Object.hasOwn(origem, 'de')) return msg;
+      /* `copia` e `nome` apontam para a mesma cópia por caminhos diferentes.
+         Aceitar os dois juntos obrigaria a decidir qual vence quando
+         discordassem, e a resposta certa não existe: um deles estaria errado e
+         a peça não diria qual. */
+      if (origem.copia != null && origem.nome != null) return "arranja usa copia (posição) ou nome (endereço declarado), nunca os dois — se discordassem, um dos dois estaria errado e a peça não diria qual";
+      if (origem.nome != null && nomeDeParteInvalido(origem.nome)) return `nome da origem arranja ${nomeDeParteInvalido(origem.nome)}`;
       if (!validarEixo(origem.copia)) return msg;
       const fonte = validarOrigem(origem.de);
       return fonte.erro ? `arranja exige de estrutural válido: ${fonte.erro}` : null;
@@ -964,7 +970,13 @@ const CONTRATOS_ORIGEM = {
       if (fonte.erro) return { erro: `de da origem arranja:${origem.id} não resolve: ${fonte.erro}` };
       const nCopias = registro.copias.length;
       let indices;
-      if (eixoDeIndiceUnico(origem.copia)) {
+      if (origem.nome != null) {
+        const nomes = registro.nomesDasCopias;
+        if (!nomes) return { erro: `origem arranja:${origem.id} não nomeou suas cópias; declare nomes no passo do arranjo ou cite copia` };
+        const idx = nomes.indexOf(origem.nome);
+        if (idx < 0) return { erro: `origem arranja:${origem.id} não tem cópia chamada '${origem.nome}'; os nomes deste passo são ${nomes.map((n) => `'${n}'`).join(', ')}` };
+        indices = [idx];
+      } else if (eixoDeIndiceUnico(origem.copia)) {
         const r = indiceDeEixo(st, origem.copia, nCopias);
         if (r.erro) return { erro: `copia '${origem.copia}' da origem arranja:${origem.id} ${r.erro}` };
         if (r.idx >= nCopias) return { erro: `copia ${textoDeEixo(origem.copia, r.idx)} fora do limite da origem arranja:${origem.id} (0..${nCopias - 1})` };
@@ -3755,6 +3767,30 @@ export const OPS = {
     if (!Number.isSafeInteger(total) || total < 2) return grita(st, i, 'arranja', 'total', `total precisa ser inteiro ≥ 2 (a fonte conta como instância); recebido ${JSON.stringify(a.total ?? null)} = ${total}`);
     const nCopias = total - 1;
 
+    /* ---- NOMES DAS CÓPIAS (atrito A-4 da família de identidade) ----
+       Sem isto, a única forma de citar uma cópia é `copia: 2`, uma POSIÇÃO — e
+       posição é exatamente o que o repositório proíbe como identidade, porque
+       inserir uma instância no meio faz `copia: 2` passar a apontar para outra
+       tábua sem erro nenhum. `nomes` dá endereço de autor a cada cópia, igual
+       ao `grupo` do `furo`, e é ele que sobrevive a uma inserção.
+
+       A lista é EXATA, não parcial: nomear metade das cópias produziria uma
+       peça em que metade dos alvos é estável e a outra metade não, e a receita
+       não teria como dizer qual é qual. */
+    let nomesDasCopias = null;
+    if (a.nomes != null) {
+      if (!Array.isArray(a.nomes)) return grita(st, i, 'arranja', 'nomes', `nomes é a lista de endereços das cópias, na ordem em que elas nascem; recebido ${JSON.stringify(a.nomes)}`);
+      if (a.nomes.length !== nCopias) return grita(st, i, 'arranja', 'nomes', `nomes tem ${a.nomes.length} entrada(s) e este arranjo cria ${nCopias} cópia(s) (total ${total} conta a fonte): nomear só uma parte deixaria o resto endereçável apenas por posição`);
+      const vistos = new Set();
+      for (let k = 0; k < a.nomes.length; k++) {
+        const erroNome = nomeDeParteInvalido(a.nomes[k]);
+        if (erroNome) return grita(st, i, 'arranja', 'nomes', `nomes[${k}] ${erroNome}`);
+        if (vistos.has(a.nomes[k])) return grita(st, i, 'arranja', 'nomes', `nomes[${k}] repete '${a.nomes[k]}'; nome é identidade, e duas cópias com o mesmo nome não são endereçáveis`);
+        vistos.add(a.nomes[k]);
+      }
+      nomesDasCopias = a.nomes.slice();
+    }
+
     // ---- parâmetros do modo: um GRITO por ambiguidade, um por ausência ----
     let ax = -1, passoGraus = 0, pivo = [0, 0, 0], d = [0, 0, 0];
     if (modo === 'radial') {
@@ -3844,6 +3880,7 @@ export const OPS = {
     registraOrigem(st, i, 'arranja', a.origemId, {
       derivaDe: a.derivaDe,
       copias,
+      nomesDasCopias,
       transformacao: modo === 'radial'
         ? { modo, eixo: ax, passoGraus, pivo: pivo.slice() }
         : { modo, d: d.slice() },

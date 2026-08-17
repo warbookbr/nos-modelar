@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-372 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+374 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -193,6 +193,7 @@
 - `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
+- `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -459,6 +460,7 @@
 - `montagem-persistida-provas.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `montagem-persistida-v2-provas.test.ts` — @ts-expect-error — leitor JavaScript, usado para verificar recusas estruturais.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
