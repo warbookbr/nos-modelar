@@ -1,14 +1,12 @@
 /* contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura. */
 import { z } from 'zod';
-import { PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
-
 export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v5';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const nomeParte = z.string().regex(/^[A-Za-z_][A-Za-z0-9_-]*$/);
-const peca = z.enum(PECAS_DISPONIVEIS);
+const peca = slug;
 const revisao = z.string().regex(/^r[0-9]+$/);
 const vetor = z.array(z.number()).length(3);
 const erro = z.object({
@@ -128,6 +126,13 @@ export const renderizarMontagemEntrada = z.object({
   id: idMontagem,
   caminho: caminhoMontagem.optional(),
   vistas: z.array(vistaMontagem).min(1).max(4).optional(),
+}).strict();
+
+export const revisarMontagemEntrada = z.object({
+  id: idMontagem,
+  caminho: caminhoMontagem.optional(),
+  vistas: z.array(vistaMontagem).min(1).max(4).optional(),
+  incluirRelacionados: z.boolean().optional(),
 }).strict();
 
 const alvoImpactoGlobal = z.object({
@@ -292,6 +297,43 @@ export const renderizarMontagemSaida = z.object({
       instancias: z.array(caminhoMontagem),
       enquadramento: enquadramentoPublico,
     }).strict()).min(1).max(4),
+  }).strict().optional(),
+}).strict();
+
+const verificacaoMontagem = z.object({
+  id: z.string(),
+  tipo: z.string(),
+  estado: z.enum(['passou', 'falhou']),
+  referencia: z.json(),
+  movel: z.json(),
+  medidas: z.json().optional(),
+  diagnosticos: z.array(z.json()),
+}).strict();
+
+const coberturaRevisaoMontagem = z.object({
+  verificadas: z.array(z.string()),
+  naoVerificadas: z.array(z.object({ codigo: z.string(), mensagem: z.string() }).strict()),
+}).strict();
+
+const visualRevisaoMontagem = z.object({
+  estado: z.enum(['produzida', 'indisponivel']),
+  instrucao: z.string(),
+  vistas: z.array(z.json()),
+}).strict();
+
+export const revisarMontagemSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({
+    formato: z.literal('mecanifica.revisao-montagem'),
+    versao: z.literal(1),
+    id: idMontagem,
+    caminho: caminhoMontagem,
+    estado: z.enum(['sem-falhas-declaradas', 'reprovada', 'incompleta']),
+    contexto: z.json(),
+    verificacoes: z.array(verificacaoMontagem),
+    cobertura: coberturaRevisaoMontagem,
+    visual: visualRevisaoMontagem,
+    recomendacoes: z.array(z.string()),
   }).strict().optional(),
 }).strict();
 

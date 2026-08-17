@@ -16,6 +16,7 @@ Esta matriz separa cobertura do motor de dependência acidental de receita.
 | Serviço puro | `executar-receita.test.ts`, `catalogo-pecas.test.ts` | inline e catálogo vazio | migrado |
 | Bancada visual | `guarda:camera`, `guarda:par`, `guarda:portas`, `porteiro` | harness privado | migrado |
 | Publicação | `exportar-peca`, `mcp/mcp` | manifesto vazio e serviços explícitos | migrado |
+| Revisão MCP | `mcp/ensaio-ponta-a-ponta` | peças privadas válidas, encaixe correto e caso desalinhado | migrado |
 | Integridade | provas nomeadas do acervo | conteúdo removido; capacidades gerais preservadas | removido |
 | Arranjo | `oficina/arranja-contrato`, `portas-espelho-arranja` | fixtures e contratos neutros | migrado |
 | Referência | `referencia-posicional`, aliases e oficina | regra única e provas inline | migrado |

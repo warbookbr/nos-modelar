@@ -73,6 +73,13 @@ function validarRaizes(raizes) {
   return entradas.sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
 
+function percorrerPecas(montagem, visitar) {
+  for (const instancia of montagem.instancias ?? []) {
+    if (instancia.alvo.tipo === 'peca') visitar(instancia);
+    else if (instancia.montagem) percorrerPecas(instancia.montagem, visitar);
+  }
+}
+
 export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes, provedores = {} } = {}) {
   if (typeof raizMontagens !== 'string' || typeof raizPecas !== 'string') {
     falhar('configuracao-invalida', 'As raízes de montagens e peças são obrigatórias.', 'Configure os dois diretórios no host MCP.');
@@ -102,9 +109,68 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes, prove
     };
   }
 
+  async function resolverRaiz(id) {
+    if (!permitidas.has(id)) {
+      falhar('montagem-nao-encontrada', 'A montagem pedida não consta no catálogo.', 'Leia mecanifica://montagens e escolha um ID anunciado.');
+    }
+    try {
+      const raizAtiva = await (typeof provedores?.carregarMontagem === 'function'
+        ? provedores.carregarMontagem(id) : null);
+      const raiz = raizAtiva ?? lerJsonConfinado(montagens, permitidas.get(id), 'montagem');
+      const resolvida = await resolverMontagemPersistida(raiz, carregadores());
+      if (resolvida.id !== id) {
+        falhar('identidade-divergente', 'O ID interno da montagem diverge do catálogo.', 'Corrija o documento ou a entrada explícita do catálogo.');
+      }
+      return resolvida;
+    } catch (erro) {
+      if (erro instanceof ErroCatalogoMcpMontagens) throw erro;
+      if (erro?.codigo) {
+        falhar(
+          erro.codigo,
+          'Uma revisão ativa autorizada não pôde ser resolvida.',
+          erro.acao ?? 'Inspecione e corrija a revisão ativa antes de continuar.',
+        );
+      }
+      falhar('montagem-invalida', 'A montagem autorizada não pôde ser resolvida.', 'Valide montagem, referências e relações antes de tentar novamente.');
+    }
+  }
+
+  async function listarPecas() {
+    const refs = new Set();
+    for (const entrada of entradas) {
+      const montagem = await resolverRaiz(entrada.id);
+      percorrerPecas(montagem, (instancia) => refs.add(instancia.alvo.ref));
+    }
+    return [...refs].sort();
+  }
+
+  async function resolverPeca(ref) {
+    if (typeof ref !== 'string' || !slug.test(ref)) {
+      falhar('peca-invalida', 'A peça precisa de um ID semântico.', 'Use um ID anunciado em mecanifica://pecas.');
+    }
+    const encontrados = [];
+    for (const entrada of entradas) {
+      const montagem = await resolverRaiz(entrada.id);
+      percorrerPecas(montagem, (instancia) => {
+        if (instancia.alvo.ref === ref) encontrados.push({ montagem: entrada.id, instancia });
+      });
+    }
+    if (encontrados.length === 0) {
+      falhar('peca-nao-encontrada', 'A peça pedida não está entre as peças das montagens autorizadas.', 'Leia mecanifica://pecas e escolha um ID anunciado.');
+    }
+    const primeiro = encontrados[0];
+    return {
+      id: ref,
+      neutro: primeiro.instancia.definicao.neutro,
+      montagens: [...new Set(encontrados.map(({ montagem }) => montagem))].sort(),
+    };
+  }
+
   return Object.freeze({
     configurado: true,
     listar() { return entradas.map(({ id }) => ({ id })); },
+    listarPecas,
+    resolverPeca,
     tem(id) { return permitidas.has(id); },
     carregadores,
     comProvedores(novosProvedores) {
@@ -148,29 +214,7 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes, prove
       return { cobertura: 'catalogo-explicito', peca: refPeca, raizes: resultados };
     },
     async resolver(id) {
-      if (!permitidas.has(id)) {
-        falhar('montagem-nao-encontrada', 'A montagem pedida não consta no catálogo.', 'Leia mecanifica://montagens e escolha um ID anunciado.');
-      }
-      try {
-        const raizAtiva = await (typeof provedores?.carregarMontagem === 'function'
-          ? provedores.carregarMontagem(id) : null);
-        const raiz = raizAtiva ?? lerJsonConfinado(montagens, permitidas.get(id), 'montagem');
-        const resolvida = await resolverMontagemPersistida(raiz, carregadores());
-        if (resolvida.id !== id) {
-          falhar('identidade-divergente', 'O ID interno da montagem diverge do catálogo.', 'Corrija o documento ou a entrada explícita do catálogo.');
-        }
-        return resolvida;
-      } catch (erro) {
-        if (erro instanceof ErroCatalogoMcpMontagens) throw erro;
-        if (erro?.codigo) {
-          falhar(
-            erro.codigo,
-            'Uma revisão ativa autorizada não pôde ser resolvida.',
-            erro.acao ?? 'Inspecione e corrija a revisão ativa antes de continuar.',
-          );
-        }
-        falhar('montagem-invalida', 'A montagem autorizada não pôde ser resolvida.', 'Valide montagem, referências e relações antes de tentar novamente.');
-      }
+      return resolverRaiz(id);
     },
   });
 }
@@ -179,6 +223,10 @@ export function criarCatalogoMontagensVazio() {
   return Object.freeze({
     configurado: false,
     listar() { return []; },
+    async listarPecas() { return []; },
+    async resolverPeca() {
+      falhar('peca-nao-encontrada', 'Não há peças disponíveis para inspeção.', `Configure ${VARIAVEL_CATALOGO_MCP_MONTAGENS} com uma montagem autorizada.`);
+    },
     tem() { return false; },
     carregadores() { return {}; },
     comProvedores() { return criarCatalogoMontagensVazio(); },

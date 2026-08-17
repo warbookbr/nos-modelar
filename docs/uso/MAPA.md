@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-341 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -375,6 +375,12 @@
 - `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
 - `universo-dependencias.mjs` — universo-dependencias.mjs — universo canônico confiável para leitura MCP.
 - `universo-dependencias.test.mjs` — universo-dependencias.test.mjs — provas do adaptador MCP do mapa global.
+
+## tools/mcp/fixtures/ensaio-ponta-a-ponta/receitas/
+
+- `pino-guia.mjs` — Receita procedural privada do pino usado no ensaio MCP.
+- `placa-base.mjs` — Receita procedural privada da placa base usada no ensaio MCP.
+- `suporte-portas.mjs` — Receita procedural privada do suporte usado no ensaio MCP.
 
 ## tools/mcp/perfis/
 

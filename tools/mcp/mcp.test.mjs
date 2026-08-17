@@ -168,7 +168,7 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia nove tools e seis resources somente leitura', async () => {
+  it('faz handshake bruto, anuncia dez tools e sete resources somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
       expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
@@ -178,9 +178,9 @@ describe('servidor MCP local — perfil revisao', () => {
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(9);
+      expect(ferramentas.result.tools).toHaveLength(10);
       for (const tool of ferramentas.result.tools) {
         expect(tool.outputSchema).toBeDefined();
         expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
@@ -188,9 +188,9 @@ describe('servidor MCP local — perfil revisao', () => {
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
         'mecanifica://estado', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
-        'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://autoria',
+        'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://pecas', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(6);
+      expect(recursos.result.resources).toHaveLength(7);
     } finally {
       await cliente.fechar();
     }
@@ -294,18 +294,20 @@ describe('servidor MCP local — perfil revisao', () => {
       const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
       const dependencias = await cliente.enviar('resources/read', { uri: 'mecanifica://dependencias' });
       const montagens = await cliente.enviar('resources/read', { uri: 'mecanifica://montagens' });
+      const pecas = await cliente.enviar('resources/read', { uri: 'mecanifica://pecas' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
       const dependenciasValor = JSON.parse(dependencias.result.contents[0].text);
       const montagensValor = JSON.parse(montagens.result.contents[0].text);
+      const pecasValor = JSON.parse(pecas.result.contents[0].text);
       expect(estadoValor).toMatchObject({
         perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v5',
         catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
       });
       expect(estadoValor.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
@@ -323,6 +325,13 @@ describe('servidor MCP local — perfil revisao', () => {
         raizes: [{ id: 'gabarito-separacao-direcional' }, { id: 'gabarito-unitario' }],
       });
       expect(JSON.stringify(montagensValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|raizMontagens|raizPecas/);
+      expect(pecasValor).toEqual({
+        formato: 'mecanifica.catalogo-pecas-montagens-publico',
+        versao: 1,
+        configurado: true,
+        pecas: [{ id: 'bloco-gabarito' }],
+      });
+      expect(JSON.stringify(pecasValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|raizMontagens|raizPecas/);
     } finally {
       await cliente.fechar();
     }
@@ -576,7 +585,7 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
-        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
         'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',
         'observar_autoria_montagem', 'planejar_autoria_montagem', 'historico_autoria_montagem', 'comparar_revisoes_montagem', 'planejar_restauracao_montagem', 'planejar_alteracao_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',

@@ -9,6 +9,7 @@ import {
   catalogarMontagensEntrada, catalogarMontagensSaida,
   descreverMontagemEntrada, descreverMontagemSaida,
   erroAcionavel, renderizarMontagemEntrada, renderizarMontagemSaida,
+  revisarMontagemEntrada, revisarMontagemSaida,
   respostaErro, respostaOk, revalidarMontagemEntrada, revalidarMontagemSaida,
 } from '../contratos.mjs';
 
@@ -98,6 +99,74 @@ export async function catalogarMontagens(input, { catalogo }) {
   });
 }
 
+export async function revisarMontagem(input, {
+  catalogo,
+  capturar = capturarMontagem,
+  agora = () => Date.now(),
+} = {}) {
+  let argumentos;
+  try { argumentos = revisarMontagemEntrada.parse(input); } catch {
+    return { resposta: entradaRecusada(), imagens: [] };
+  }
+  const descricao = await descreverMontagem({
+    id: argumentos.id,
+    ...(argumentos.caminho ? { caminho: argumentos.caminho } : {}),
+    ...(argumentos.incluirRelacionados !== undefined ? { incluirRelacionados: argumentos.incluirRelacionados } : {}),
+  }, { catalogo });
+  if (!descricao.ok) return { resposta: descricao, imagens: [] };
+
+  const contexto = descricao.resultado.contexto;
+  const verificacoes = contexto.relacoes.map((relacao) => ({
+    id: relacao.id,
+    tipo: relacao.tipo,
+    estado: relacao.satisfeita === true ? 'passou' : 'falhou',
+    referencia: relacao.referencia,
+    movel: relacao.movel,
+    ...(relacao.medidas !== undefined ? { medidas: relacao.medidas } : {}),
+    diagnosticos: relacao.diagnosticos ?? [],
+  }));
+  const visual = await renderizarMontagem({
+    id: argumentos.id,
+    ...(argumentos.caminho ? { caminho: argumentos.caminho } : {}),
+    ...(argumentos.vistas ? { vistas: argumentos.vistas } : {}),
+  }, { catalogo, capturar, agora });
+  const naoVerificadas = contexto.cobertura.limitacoes.map((codigo) => ({
+    codigo,
+    mensagem: mensagemDaLimitacao(codigo),
+  }));
+  const visualDisponivel = visual.resposta.ok;
+  const estado = verificacoes.some(({ estado: atual }) => atual === 'falhou')
+    ? 'reprovada'
+    : (!visualDisponivel || verificacoes.length === 0 || naoVerificadas.length > 0
+      ? 'incompleta' : 'sem-falhas-declaradas');
+  const resposta = respostaOk(0, {
+    formato: 'mecanifica.revisao-montagem',
+    versao: 1,
+    id: argumentos.id,
+    caminho: argumentos.caminho ?? [],
+    estado,
+    contexto,
+    verificacoes,
+    cobertura: {
+      verificadas: verificacoes.length > 0 ? ['relações declaradas nesta montagem'] : [],
+      naoVerificadas,
+    },
+    visual: {
+      estado: visualDisponivel ? 'produzida' : 'indisponivel',
+      instrucao: 'Use as imagens para avaliar proporção, forma, encaixe aparente e detalhes visíveis. A imagem não substitui as medidas.',
+      vistas: visualDisponivel ? visual.resposta.resultado.vistas : [],
+    },
+    recomendacoes: [
+      ...(verificacoes.some(({ estado: atual }) => atual === 'falhou')
+        ? ['Corrija as verificações reprovadas antes de aceitar a montagem.'] : []),
+      ...(naoVerificadas.length > 0
+        ? ['Não trate esta revisão como aprovação completa: há verificações fora do escopo atual.'] : []),
+      ...(visualDisponivel ? [] : ['Repita a revisão com um ambiente visual disponível.']),
+    ],
+  });
+  return { resposta, imagens: visual.imagens };
+}
+
 function pacoteVisual(resposta, imagens = []) {
   return { resposta, imagens };
 }
@@ -110,6 +179,32 @@ export function conteudoRenderizacaoMontagem({ resposta, imagens }) {
     { type: 'text', text: `renderizar_montagem: ${imagens.length} vista(s) produzida(s).` },
     ...imagens.map(({ data, mimeType }) => ({ type: 'image', data, mimeType })),
   ];
+}
+
+function mensagemDaLimitacao(codigo) {
+  const mensagens = {
+    'caixas-mundo-nao-provam-colisao-distancia-ou-folga': 'não foi provado se há colisão ou folga geral entre todas as peças',
+    'hierarquia-de-partes-nao-transportada': 'a hierarquia interna das peças não foi transportada nesta resposta',
+    'dependencias-indiretas-nao-verificadas': 'não foram procuradas dependências fora desta montagem',
+    'uso-global-fora-da-raiz-nao-verificado': 'não foram procurados usos desta peça em outras montagens',
+  };
+  return mensagens[codigo] ?? `a verificação '${codigo}' não foi executada`;
+}
+
+export function conteudoRevisaoMontagem({ resposta, imagens }) {
+  if (!resposta.ok) {
+    return [{ type: 'text', text: `revisar_montagem: ${resposta.erro?.mensagem ?? 'operação recusada.'}` }];
+  }
+  const resultado = resposta.resultado;
+  const falhas = resultado.verificacoes.filter(({ estado }) => estado === 'falhou').length;
+  const texto = [
+    `revisar_montagem: ${resultado.estado}.`,
+    `${resultado.verificacoes.length} verificação(ões) executada(s), ${falhas} falha(s).`,
+    resultado.visual.estado === 'produzida'
+      ? `${resultado.visual.vistas.length} vista(s) produzida(s); a análise visual cabe à IA consumidora.`
+      : 'As imagens não foram produzidas; a revisão está incompleta.',
+  ].join(' ');
+  return [{ type: 'text', text: texto }, ...imagens.map(({ data, mimeType }) => ({ type: 'image', data, mimeType }))];
 }
 
 function erroVisual(codigo, mensagem, acao) {
@@ -239,6 +334,15 @@ export function criarFerramentasMontagem(catalogo) {
       executar: (entrada) => renderizarMontagem(entrada, { catalogo }),
       estruturar: ({ resposta }) => resposta,
       conteudo: conteudoRenderizacaoMontagem,
+    },
+    {
+      nome: 'revisar_montagem',
+      descricao: 'Reúne verificações declaradas, cobertura, recomendações e vistas de uma montagem autorizada.',
+      inputSchema: revisarMontagemEntrada,
+      outputSchema: revisarMontagemSaida,
+      executar: (entrada) => revisarMontagem(entrada, { catalogo }),
+      estruturar: ({ resposta }) => resposta,
+      conteudo: conteudoRevisaoMontagem,
     },
   ]);
 }

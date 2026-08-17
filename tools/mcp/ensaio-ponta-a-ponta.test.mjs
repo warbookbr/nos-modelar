@@ -2,11 +2,18 @@
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+// @ts-expect-error — exportador MJS exercitado pela fixture privada.
+import { exportarPeca } from '../mecanifica/exportar-peca.mjs';
+import placaBase from './fixtures/ensaio-ponta-a-ponta/receitas/placa-base.mjs';
+import suportePortas from './fixtures/ensaio-ponta-a-ponta/receitas/suporte-portas.mjs';
+import pinoGuia from './fixtures/ensaio-ponta-a-ponta/receitas/pino-guia.mjs';
 import {
   catalogarMontagensSaida, descreverMontagemSaida,
-  renderizarMontagemSaida, revalidarMontagemSaida,
+  descreverSaida, renderizarSaida,
+  revisarMontagemSaida, revalidarMontagemSaida,
 } from './contratos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -15,6 +22,11 @@ const CONFIGURACAO = join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalog
 
 describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
   it('descobre, audita e renderiza três peças por um consumidor MCP', async () => {
+    for (const [id, receita] of Object.entries({ 'placa-base': placaBase, 'suporte-portas': suportePortas, 'pino-guia': pinoGuia })) {
+      const gerada = await exportarPeca(id, { modulo: receita });
+      const salva = JSON.parse(readFileSync(join(RAIZ, `tools/mcp/fixtures/ensaio-ponta-a-ponta/pecas/${id}.json`), 'utf8'));
+      expect(gerada.dado, `artefato desatualizado: ${id}`).toEqual(salva);
+    }
     const client = new Client({ name: 'ensaio-ponta-a-ponta', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath,
@@ -46,6 +58,34 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
         configurado: true,
         raizes: [{ id: 'ensaio-ponta-a-ponta' }],
       });
+
+      const pecas = await client.readResource({ uri: 'mecanifica://pecas' });
+      expect(JSON.parse(pecas.contents[0].text)).toEqual({
+        formato: 'mecanifica.catalogo-pecas-montagens-publico',
+        versao: 1,
+        configurado: true,
+        pecas: [
+          { id: 'pino-guia' },
+          { id: 'placa-base' },
+          { id: 'suporte-portas' },
+        ],
+      });
+
+      const pino = await client.callTool({
+        name: 'descrever_peca', arguments: { peca: 'pino-guia' },
+      });
+      expect(pino.isError).not.toBe(true);
+      descreverSaida.parse(pino.structuredContent);
+      expect(pino.structuredContent.resultado.descricao.totais).toMatchObject({
+        faces: 6, vertices: 8, portas: 1, orfaos: 0,
+      });
+
+      const pinoVisual = await client.callTool({
+        name: 'renderizar_vistas', arguments: { peca: 'pino-guia' },
+      });
+      expect(pinoVisual.isError).not.toBe(true);
+      renderizarSaida.parse(pinoVisual.structuredContent);
+      expect(pinoVisual.content.filter(({ type }) => type === 'image')).toHaveLength(4);
 
       const descrita = await client.callTool({
         name: 'descrever_montagem',
@@ -90,16 +130,60 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
       expect(catalogado.structuredContent.resultado.catalogo.raizes)
         .toEqual([{ id: 'ensaio-ponta-a-ponta' }]);
 
-      const visual = await client.callTool({
-        name: 'renderizar_montagem',
-        arguments: { id: 'ensaio-ponta-a-ponta', vistas: ['isometrica'] },
+      const revisao = await client.callTool({
+        name: 'revisar_montagem',
+        arguments: { id: 'ensaio-ponta-a-ponta', vistas: ['isometrica', 'direita'] },
       });
-      expect(visual.isError).not.toBe(true);
-      renderizarMontagemSaida.parse(visual.structuredContent);
-      expect(visual.structuredContent.resultado.vistas).toHaveLength(1);
-      expect(visual.content.filter(({ type }) => type === 'image')).toHaveLength(1);
-      expect(Buffer.from(visual.content.find(({ type }) => type === 'image').data, 'base64')
+      expect(revisao.isError).not.toBe(true);
+      revisarMontagemSaida.parse(revisao.structuredContent);
+      expect(revisao.structuredContent).toMatchObject({
+        ok: true,
+        resultado: {
+          estado: 'incompleta',
+          verificacoes: [{ id: 'encaixeDoPino', estado: 'passou' }],
+          visual: { estado: 'produzida' },
+        },
+      });
+      expect(revisao.content.filter(({ type }) => type === 'image')).toHaveLength(2);
+      expect(Buffer.from(revisao.content.find(({ type }) => type === 'image').data, 'base64')
         .subarray(0, 8)).toEqual(Buffer.from('89504e470d0a1a0a', 'hex'));
+    } finally {
+      await client.close();
+    }
+  }, 120_000);
+
+  it('reprova uma montagem com encaixe desalinhado e explica a causa', async () => {
+    const client = new Client({ name: 'ensaio-ponta-a-ponta-falha', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [SERVIDOR],
+      cwd: RAIZ,
+      stderr: 'pipe',
+      env: {
+        ...process.env,
+        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo-falha.json'),
+      },
+    });
+    try {
+      await client.connect(transport);
+      const revisao = await client.callTool({
+        name: 'revisar_montagem',
+        arguments: { id: 'ensaio-ponta-a-ponta-falha', vistas: ['isometrica'] },
+      });
+      expect(revisao.isError).not.toBe(true);
+      revisarMontagemSaida.parse(revisao.structuredContent);
+      expect(revisao.structuredContent).toMatchObject({
+        ok: true,
+        resultado: {
+          estado: 'reprovada',
+          verificacoes: [{
+            id: 'encaixeDoPino',
+            estado: 'falhou',
+            diagnosticos: [{ codigo: 'eixos-descentrados' }],
+          }],
+        },
+      });
+      expect(revisao.content.filter(({ type }) => type === 'image')).toHaveLength(1);
     } finally {
       await client.close();
     }

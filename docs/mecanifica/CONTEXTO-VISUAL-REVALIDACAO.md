@@ -47,6 +47,12 @@ usado somente pelo host; o cliente descobre apenas `id` em
 - `planejar_revalidacao_montagem` para relações e pendências do alvo;
 - `catalogar_montagens` para usos entre as raízes escolhidas;
 - `renderizar_montagem` para uma a quatro vistas em memória.
+- `mecanifica://pecas` para descobrir as peças que aparecem nessas montagens;
+- `descrever_peca` e `renderizar_vistas` para inspecionar uma dessas peças sem
+  retirá-la do escopo da montagem autorizada;
+- `revisar_montagem` para reunir verificações declaradas, cobertura,
+  recomendações e vistas em uma única resposta. A imagem continua sendo
+  evidência para a IA; o MCP não declara um veredito visual automático.
 
 As ferramentas não aceitam caminhos locais e mantêm as anotações MCP de leitura
 sem efeito destrutivo. O contrato público atual é `mecanifica.mcp.revisao.v5`;

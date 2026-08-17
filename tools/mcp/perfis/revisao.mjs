@@ -2,10 +2,13 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { descreverPecaReutilizavel } from '../../mecanifica/descrever-peca.mjs';
+import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../../mecanifica/descrever-peca.mjs';
 import { olharBancada } from '../../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../../modelagem/revisao-modelagem.mjs';
+import { descreverPeca as medirPeca } from '../../../src/autoria/descrever-partes.js';
+import { identidadeTransformacaoRigida } from '../../../src/autoria/transformacao-rigida.js';
+import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
 import {
   RAIZ_PACOTES, REVISOES, caminhoDentro, caminhoPacote,
 } from '../../modelagem/formato-pacote.mjs';
@@ -147,15 +150,59 @@ function lerRevisaoOficial(id, nome) {
   }
 }
 
-export async function descrever(input) {
+function erroDeCatalogo(erro) {
+  return respostaErro(1, erroAcionavel(
+    String(erro?.codigo ?? 'peca_nao_encontrada').replaceAll('-', '_'),
+    textoCurto(erro?.message ?? 'A peça não está disponível para inspeção.'),
+    erro?.acao ?? 'Leia mecanifica://pecas e escolha um ID anunciado.',
+  ));
+}
+
+function resumoDeNeutro(peca, neutro, argumentos) {
+  if (argumentos.subarvore !== undefined) {
+    return respostaErro(1, erroAcionavel(
+      'subarvore_indisponivel',
+      'Esta peça persistida não transporta uma árvore interna de partes.',
+      'Escolha uma parte pelo campo partes ou inspecione a montagem que contém a peça.',
+    ));
+  }
+  try {
+    const descricao = medirPeca(neutro, {
+      partes: argumentos.partes?.length ? argumentos.partes : null,
+    });
+    if (argumentos.estrito && descricao.totais.facesSemParte > 0) {
+      return respostaErro(1, erroAcionavel(
+        'faces_sem_parte',
+        'A peça possui faces sem identidade de parte.',
+        'Associe cada face a uma parte antes de usar a inspeção estrita.',
+      ));
+    }
+    return respostaOk(0, { peca, descricao: resumoDescricao(descricao) });
+  } catch (erro) {
+    return respostaErro(1, erroAcionavel(
+      'peca_invalida', textoCurto(erro.message), 'Corrija a peça persistida antes de inspecioná-la.',
+    ));
+  }
+}
+
+export async function descrever(input, { catalogo = null } = {}) {
   let argumentos;
   try { argumentos = descreverEntrada.parse(input); } catch { return entradaRecusada(); }
-  const resultado = await descreverPecaReutilizavel(argumentos);
-  if (!resultado.ok) return erroDeServico(resultado);
-  return respostaOk(resultado.codigo, {
-    peca: resultado.resultado.peca,
-    descricao: resumoDescricao(resultado.resultado.descricao),
-  });
+  if (PECAS_DISPONIVEIS.includes(argumentos.peca)) {
+    const resultado = await descreverPecaReutilizavel(argumentos);
+    if (!resultado.ok) return erroDeServico(resultado);
+    return respostaOk(resultado.codigo, {
+      peca: resultado.resultado.peca,
+      descricao: resumoDescricao(resultado.resultado.descricao),
+    });
+  }
+  if (!catalogo?.resolverPeca) return erroDeCatalogo();
+  try {
+    const resolvida = await catalogo.resolverPeca(argumentos.peca);
+    return resumoDeNeutro(argumentos.peca, resolvida.neutro, argumentos);
+  } catch (erro) {
+    return erroDeCatalogo(erro);
+  }
 }
 
 export async function validar(input) {
@@ -231,8 +278,25 @@ function erroVisual(codigo, mensagem, acao) {
   return pacoteVisual(respostaErro(1, erroAcionavel(codigo, mensagem, acao)));
 }
 
+function montagemVisualDePeca(peca, neutro) {
+  const pose = identidadeTransformacaoRigida();
+  return {
+    id: `inspecao-${peca}`,
+    instancias: [{
+      id: 'peca',
+      caminho: ['peca'],
+      alvo: { tipo: 'peca', ref: peca },
+      poseLocal: pose,
+      poseMundo: pose,
+      definicao: { neutro },
+    }],
+  };
+}
+
 export async function renderizar(input, {
   olhar = olharBancada,
+  capturar = capturarMontagem,
+  catalogo = null,
   limites = LIMITES_VISTAS,
   agora = () => Date.now(),
 } = {}) {
@@ -240,15 +304,33 @@ export async function renderizar(input, {
   try { argumentos = renderizarEntrada.parse(input); } catch { return pacoteVisual(entradaRecusada()); }
   const inicio = agora();
   let capturado;
-  try {
-    capturado = await olhar({
-      peca: argumentos.peca,
-      revisar: true,
-      capturarEmMemoria: true,
-      timeoutMs: limites.timeoutMs,
-    });
-  } catch (erro) {
-    return pacoteVisual(falhaInterna('renderizar_vistas', erro));
+  let pecaRelatada = argumentos.peca;
+  let vistasRelatadas;
+  if (!PECAS_DISPONIVEIS.includes(argumentos.peca)) {
+    if (!catalogo?.resolverPeca) return pacoteVisual(erroDeCatalogo());
+    try {
+      const resolvida = await catalogo.resolverPeca(argumentos.peca);
+      capturado = await capturar({
+        montagem: montagemVisualDePeca(argumentos.peca, resolvida.neutro),
+        vistas: VISTAS_OFICIAIS,
+        timeoutMs: limites.timeoutMs,
+      });
+      vistasRelatadas = capturado.resultado?.capturas?.map(({ nome, enquadramento }) => ({ nome, enquadramento })) ?? [];
+    } catch (erro) {
+      return pacoteVisual(erro?.codigo ? erroDeCatalogo(erro) : falhaInterna('renderizar_vistas', erro));
+    }
+  } else {
+    try {
+      capturado = await olhar({
+        peca: argumentos.peca,
+        revisar: true,
+        capturarEmMemoria: true,
+        timeoutMs: limites.timeoutMs,
+      });
+      vistasRelatadas = capturado.resultado?.vistas ?? [];
+    } catch (erro) {
+      return pacoteVisual(falhaInterna('renderizar_vistas', erro));
+    }
   }
   if (!capturado.ok) {
     const tempo = capturado.erro?.codigo === 'tempo_esgotado';
@@ -261,7 +343,6 @@ export async function renderizar(input, {
     );
   }
   const capturas = capturado.resultado?.capturas;
-  const vistasRelatadas = capturado.resultado?.vistas ?? [];
   if (!Array.isArray(capturas) || capturas.length !== VISTAS_OFICIAIS.length
     || capturas.some((captura, indice) => captura.nome !== VISTAS_OFICIAIS[indice])) {
     return erroVisual(
@@ -313,7 +394,7 @@ export async function renderizar(input, {
   const resposta = respostaOk(0, {
     formato: 'mecanifica.vistas-oficiais',
     versao: 1,
-    peca: capturado.resultado.peca,
+    peca: pecaRelatada,
     duracaoMs: Math.max(0, Math.round(agora() - inicio)),
     bytes: totalBytes,
     vistas,
@@ -333,35 +414,39 @@ export async function renderizar(input, {
   return pacote;
 }
 
-export const ferramentasRevisao = Object.freeze([
-  {
-    nome: 'descrever_peca',
-    descricao: 'Mede uma peça pela régua neutra existente, sem escrever no repositório.',
-    inputSchema: descreverEntrada,
-    outputSchema: descreverSaida,
-    executar: descrever,
-  },
-  {
-    nome: 'validar_pacote',
-    descricao: 'Valida um pacote oficial somente leitura.',
-    inputSchema: validarEntrada,
-    outputSchema: validarSaida,
-    executar: validar,
-  },
-  {
-    nome: 'comparar_revisoes',
-    descricao: 'Compara duas revisões oficiais do mesmo pacote.',
-    inputSchema: compararEntrada,
-    outputSchema: compararSaida,
-    executar: comparar,
-  },
-  {
-    nome: 'renderizar_vistas',
-    descricao: 'Produz e transporta as quatro vistas oficiais sem escrever artefatos.',
-    inputSchema: renderizarEntrada,
-    outputSchema: renderizarSaida,
-    executar: renderizar,
-    estruturar: ({ resposta }) => resposta,
-    conteudo: conteudoRenderizacao,
-  },
-]);
+export function criarFerramentasRevisao(catalogo = null) {
+  return Object.freeze([
+    {
+      nome: 'descrever_peca',
+      descricao: 'Mede uma peça oficial ou uma peça incluída em montagem autorizada, sem escrever no repositório.',
+      inputSchema: descreverEntrada,
+      outputSchema: descreverSaida,
+      executar: (entrada) => descrever(entrada, { catalogo }),
+    },
+    {
+      nome: 'validar_pacote',
+      descricao: 'Valida um pacote oficial somente leitura.',
+      inputSchema: validarEntrada,
+      outputSchema: validarSaida,
+      executar: validar,
+    },
+    {
+      nome: 'comparar_revisoes',
+      descricao: 'Compara duas revisões oficiais do mesmo pacote.',
+      inputSchema: compararEntrada,
+      outputSchema: compararSaida,
+      executar: comparar,
+    },
+    {
+      nome: 'renderizar_vistas',
+      descricao: 'Produz e transporta quatro vistas oficiais de uma peça autorizada sem escrever artefatos.',
+      inputSchema: renderizarEntrada,
+      outputSchema: renderizarSaida,
+      executar: (entrada) => renderizar(entrada, { catalogo }),
+      estruturar: ({ resposta }) => resposta,
+      conteudo: conteudoRenderizacao,
+    },
+  ]);
+}
+
+export const ferramentasRevisao = criarFerramentasRevisao();

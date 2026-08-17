@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { z } from 'zod';
-import { ferramentasRevisao } from './perfis/revisao.mjs';
+import { criarFerramentasRevisao } from './perfis/revisao.mjs';
 import { criarFerramentasMontagem } from './perfis/montagens.mjs';
 import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
 import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
@@ -50,9 +50,11 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
       'validar um pacote oficial somente leitura',
       'comparar duas revisões oficiais do mesmo pacote',
       'produzir e transportar as quatro vistas oficiais de peça sem escrita',
+      'descobrir, descrever e renderizar peças usadas por montagens autorizadas',
       'descobrir pacotes e revisões oficiais disponíveis',
       'descobrir e descrever montagens explicitamente autorizadas',
       'derivar roteiro de revalidação e catálogo entre raízes escolhidas',
+      'reunir verificações, cobertura e vistas de uma montagem em uma revisão',
       ...(universoDependencias.configurado ? ['consultar impacto global no universo canônico configurado'] : []),
       'produzir vistas de montagem ou subárvore em memória',
       ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas', 'reler revisões ativas pelas ferramentas comuns'] : []),
@@ -206,6 +208,27 @@ function registrarRecursos(server, {
     }),
   );
   server.registerResource(
+    'catalogo-pecas-de-montagens',
+    'mecanifica://pecas',
+    {
+      title: 'Peças das montagens autorizadas',
+      description: 'Peças que podem ser inspecionadas separadamente dentro do escopo escolhido pelo host.',
+      mimeType: 'application/json',
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.href,
+        mimeType: 'application/json',
+        text: JSON.stringify({
+          formato: 'mecanifica.catalogo-pecas-montagens-publico',
+          versao: 1,
+          configurado: catalogoMontagens.configurado,
+          pecas: (await catalogoMontagens.listarPecas()).map((id) => ({ id })),
+        }),
+      }],
+    }),
+  );
+  server.registerResource(
     'autoria-ativa',
     'mecanifica://autoria',
     {
@@ -264,7 +287,7 @@ export function criarServidor({
     ? criarFerramentasRevalidacao({ raizRepositorio: autoria.raizRepositorio, podeEscrever: perfil === 'autoria' })
     : [];
   const leitura = [
-    ...ferramentasRevisao,
+    ...criarFerramentasRevisao(catalogoAtivo),
     ...criarFerramentasMontagem(catalogoAtivo),
     ...criarFerramentasImpactoGlobal(universoAtivo),
     ...ferramentasRevalidacao,

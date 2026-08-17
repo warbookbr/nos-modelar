@@ -2,7 +2,7 @@
   "formato": "mecanifica.peca-resolvida",
   "versao": 1,
   "peca": "pino-guia",
-  "receita": "ensaio-pino-guia",
+  "receita": "2ca42445e9417c67",
   "meta": { "nome": "Pino guia de ensaio" },
   "materiais": {},
   "partes": ["pino"],
@@ -10,26 +10,24 @@
     {
       "id": "guiaInterna",
       "rotulo": "Guia interna",
-      "de": { "op": "cilindro", "id": 30, "tampa": "fundo" },
-      "passo": 3,
+      "de": { "op": "cubo", "id": 30, "face": "fundo" },
+      "passo": 2,
       "interface": {
-        "forma": "cilindro",
-        "papel": "interna",
-        "eixo": [0, 1, 0],
-        "centro": [0.2, 0.3, 0.2],
-        "raio": 0.1,
-        "inicio": 0,
-        "fim": 0.5,
-        "referencia": [1, 0, 0]
+        "forma": "cilindro", "papel": "interna", "eixo": [0, 1, 0], "centro": [0, 0, 0],
+        "raio": 0.1, "inicio": 0, "fim": 0.5, "referencia": [1, 0, 0]
       }
     }
   ],
   "V": [
-    [0, 0, 0, 0], [1, 0.4, 0, 0], [2, 0.4, 0.6, 0], [3, 0, 0.6, 0],
-    [4, 0, 0, 0.4], [5, 0.4, 0, 0.4], [6, 0.4, 0.6, 0.4], [7, 0, 0.6, 0.4]
+    [0, -0.2, 0, -0.2], [1, 0.2, 0, -0.2], [2, 0.2, 0, 0.2], [3, -0.2, 0, 0.2],
+    [4, -0.2, 0.5, -0.2], [5, 0.2, 0.5, -0.2], [6, 0.2, 0.5, 0.2], [7, -0.2, 0.5, 0.2]
   ],
   "F": [
-    [0, [4, 5, 6, 7], null, null, false, true, "pino"],
-    [1, [0, 3, 2, 1], null, null, false, true, "pino"]
+    [0, [0, 1, 2, 3], null, null, false, false, "pino"],
+    [1, [7, 6, 5, 4], null, null, false, false, "pino"],
+    [2, [1, 0, 4, 5], null, null, false, false, "pino"],
+    [3, [2, 1, 5, 6], null, null, false, false, "pino"],
+    [4, [3, 2, 6, 7], null, null, false, false, "pino"],
+    [5, [0, 3, 7, 4], null, null, false, false, "pino"]
   ]
 }
