@@ -210,9 +210,10 @@ npm run criar -- _viga
 
 ## Pendências atuais
 
-- Nenhuma capacidade em aberto. Os candidatos `alinhar`, `loft` fechado e
-  variantes nomeadas foram medidos e recusados por falta de evidência; a medida
-  e o critério de reabertura estão em `docs/mecanifica/planos/BACKLOG.md`.
+- Nenhuma capacidade em aberto. `alinhar` e variantes nomeadas foram medidos e
+  recusados; `loft` fechado foi implementado depois que a medida por uso se
+  mostrou inválida para capacidade ausente. A medida, o erro e o critério de
+  reabertura estão em `docs/mecanifica/planos/BACKLOG.md`.
 
 Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
 só abre após decisão e plano executivo explícitos.

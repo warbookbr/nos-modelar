@@ -54,7 +54,7 @@ travando alguém, não quando é plausível**.
 | candidato | medida | decisão |
 |---|---|---|
 | `alinhar` (centragem derivada) | 3 de 95 `transladar` têm cara de centragem, e os três já usam parâmetro nomeado (`centroBuchaY`), não conta na mão | recusado |
-| `loft` fechado | 0 de 22 `loft` do acervo têm caminho fechado | recusado |
+| `loft` fechado | 0 de 22 — **medida inválida**, ver abaixo | **implementado** |
 | variantes nomeadas de revisão | nenhuma ramificação ocorreu; a cadeia de autoria é linear e a escrita concorrente é recusada, não ramificada | recusado |
 
 A comparação que decide: `em`/`eixo` entrou com **128 de 853 passos** (15%) em
@@ -62,7 +62,22 @@ transporte puro, e o ponto nomeado com **18 de 61 parâmetros** do freio
 existindo só para nomear 6 pontos. Essa é a ordem de grandeza de um atrito real.
 Três ocorrências que já usam nome, e zero ocorrências, não são.
 
-Reabrir qualquer um dos três exige **evidência nova de campo** — uma peça ou uma
+**A medida por uso não serve para capacidade ausente, e isto foi um erro meu.**
+Contar quantas peças usam algo só mede ATRITO — o rastro que uma solução de
+contorno deixa. Capacidade que não existe não deixa rastro: ninguém escreve o
+que o motor recusa. O rasgo e o `lathe` fechado, entregues no mesmo dia, também
+tinham **zero** uso anterior, e não foram recusados por isso — a pergunta certa
+para eles foi "é forma mecânica real que hoje é impossível?".
+
+O `loft` fechado responde sim a essa pergunta: mangueira em anel, aro fechado e
+tubo em laço são formas reais, e o caminho que volta em si produzia uma costura
+não soldada. Ele foi implementado.
+
+`alinhar` continua recusado, e ali a medida **vale**: centrar já é possível hoje
+escrevendo a conta, então o atrito deixaria rastro — e o rastro é 3 em 95, já
+com nome. Variantes seguem sem evidência dos dois tipos.
+
+Reabrir os recusados exige **evidência nova de campo** — uma peça ou uma
 sessão em que a falta atrapalhou —, não a lembrança de que já estiveram na
 lista. Enquanto isso, `alinhar` e `loft` fechado permanecem descritos aqui como
 forma conhecida, para que ninguém precise redescobri-los do zero quando a
