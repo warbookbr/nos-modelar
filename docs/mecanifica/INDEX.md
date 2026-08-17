@@ -49,6 +49,11 @@ aplicação publicada aqui.
   (`docs/mecanifica/planos/2026-08-17-migracao-fps-para-procedural.md`) foi
   concluído e aprovado: a raiz canônica agora é
   `prototipos/procedural/v3/`, sem mudança geométrica ou de contrato.
+- O [plano de independência entre núcleo, validação e catálogo](planos/2026-08-17-desacoplamento-catalogo-validacao.md)
+  (`docs/mecanifica/planos/2026-08-17-desacoplamento-catalogo-validacao.md`)
+  está pronto, mas não ativo. Ele define catálogo homologado vazio, fixtures
+  confinadas, validadores por entrada explícita e rollout coordenado com o
+  consumidor antes de remover as receitas não homologadas.
 - O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
   (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
   receitas são dados JSON, passam por vistas e revalidação e não executam

@@ -4,6 +4,13 @@
 
 **Plano ativo:** Nenhum.
 
+**Plano pronto para execução:**
+[`2026-08-17-desacoplamento-catalogo-validacao.md`](2026-08-17-desacoplamento-catalogo-validacao.md).
+
+Ele separa núcleo, validadores, fixtures e catálogo homologado para permitir um
+catálogo vazio sem perder capacidade. A execução exige baseline verde e rollout
+coordenado com `warbookbr/mecanica`, que hoje importa duas peças resolvidas.
+
 **Plano concluído mais recente:**
 [`2026-08-17-migracao-fps-para-procedural.md`](2026-08-17-migracao-fps-para-procedural.md).
 

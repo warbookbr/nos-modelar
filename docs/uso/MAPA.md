@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-397 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+398 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -208,6 +208,7 @@
 - `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
 - `2026-08-17-alteracao-compacta.md` — Alteração semântica compacta de montagem
 - `2026-08-17-correcoes-fluxo-dobradica.md` — Correções do fluxo encontradas no estudo de dobradiça
+- `2026-08-17-desacoplamento-catalogo-validacao.md` — Independência entre núcleo, validação e catálogo
 - `2026-08-17-encostar.md` — Encostar — contato derivado no lugar de coordenada digitada
 - `2026-08-17-estudo-conjunto-dobradica.md` — Estudo de campo — autoria de um conjunto simples de três peças
 - `2026-08-17-historico-de-revisao.md` — Histórico de revisão — olhar para trás e voltar
