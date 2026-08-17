@@ -1,5 +1,10 @@
 # Homologação do fluxo de IA
 
+O que é homologado aqui é o **fluxo de autoria** — briefing, execução na bancada,
+medição e revisão. Nunca a geometria. A peça de cada caso é o veículo da prova e
+continua sendo exemplo, como todas as outras; ver "Peças são exemplos" no
+`README.md`.
+
 ## Protocolo
 
 Cada caso começa com briefing fechado, referências identificadas e uma parte

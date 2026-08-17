@@ -30,7 +30,7 @@ a autoridade final para argumentos e recusas.
 | `transladar` | `d`, `sel?` | aditivo; sem pivô |
 | `espelha` | eixo, `pos?`, `sel?`, ou modo estrutural | modo estrutural exige origem direta |
 | `publicarPorta` | `nome`, `de` | publica identidade semântica, não faces resolvidas |
-| `arranja` | radial/linear, `total`, `derivaDe`, `origemId` | conta a fonte; ângulo é derivado, não acumulado |
+| `arranja` | radial/linear, `total`, `derivaDe`, `origemId`, `nomes?` | conta a fonte; ângulo é derivado, não acumulado |
 | `furo` | `origemId`, `de`, centro(s), raio e saída/profundidade | não é booleana genérica |
 | `pincel` | modo face/livre e seus parâmetros | modo livre não aceita `sel` |
 | `liso` | `sel` ou `faces` legado | atributo de sombreado |
@@ -79,6 +79,28 @@ também: `cubo` não tem eixo para escolher.
 
 Isto não encosta uma peça na outra nem mede vizinho — não existe `alinhar`
 relacional no núcleo.
+
+## Nome de cópia no `arranja`
+
+`copia: 2` é POSIÇÃO, e posição não é identidade. Se o `total` mudar, a linha
+continua resolvendo e passa a apontar para uma cópia com outro papel, sem erro.
+
+Declare `nomes` no passo, um por cópia, e cite por nome:
+
+```js
+['arranja', { origemId: CERCA, derivaDe: TABUA, sel: { origem: TABUA },
+              modo: 'linear', d: ['passo', 0, 0], total: 'totalDeTabuas',
+              nomes: ['central', 'direita', 'ponta'] }],
+['parte', { nome: 'tabuaDaPonta',
+            sel: { origem: { op: 'arranja', id: CERCA, de: TABUA, nome: 'ponta' } } }],
+```
+
+A lista é exata: uma entrada por cópia (`total − 1`, porque a fonte não é
+cópia). Mexer no `total` sem revisar os nomes GRITA — é isso que obriga a olhar
+para a citação que talvez tenha mudado de sentido.
+
+`copia` e `nome` não convivem na mesma origem. `copia` continua certo quando
+você realmente quer falar de posição.
 
 ## Identidade estrutural
 

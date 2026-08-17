@@ -12,7 +12,9 @@ aplicação publicada aqui.
 
 ## Estado atual
 
-- Casos 1 e 2 da homologação estão concluídos; o Caso 3 não foi iniciado.
+- Os Casos 1 e 2 da homologação **do fluxo** estão concluídos; o Caso 3 não foi
+  iniciado. Eles aprovam o processo de autoria, não a geometria: a peça de cada
+  caso segue sendo exemplo, como todas as outras.
 - A Montagem Mínima Persistida v1 foi concluída em
   `docs/mecanifica/planos/2026-08-07-montagem-minima-persistida-v1.md`, com o
   contrato atual em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md`. O plano
@@ -209,7 +211,6 @@ npm run criar -- _viga
 
 - Iniciar e executar o Caso 3 da homologação.
 - Resolver costuras topológicas de `lathe`.
-- Dar endereço único a um grupo linear.
 - Criar contrato genérico de materiais.
 - Fechar as capacidades ainda abertas comprovadas em A-6, A-7, A-8, A-16 e
   A-29.
@@ -268,6 +269,8 @@ Planejamento: [planos/README](planos/README.md),
 (`docs/mecanifica/planos/2026-08-17-abertura-oblonga.md`),
 [pose de criação](planos/2026-08-17-pose-de-criacao.md)
 (`docs/mecanifica/planos/2026-08-17-pose-de-criacao.md`),
+[nome de cópia](planos/2026-08-17-nome-de-copia.md)
+(`docs/mecanifica/planos/2026-08-17-nome-de-copia.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

@@ -159,7 +159,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const NAO_E_ID = [
     'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'ate', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'id', 'lado', 'lados', 'larg',
-    'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'pai', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
+    'largura', 'modo', 'nome', 'nomes', 'orientacao', 'origemId', 'osso', 'pai', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
     'profundidade', 'raio', 'rotulo', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta', 'interface',
   ];
   /* `aresta` (ops `filete` e `arredondarAresta`) é o ÍNDICE LOCAL da aresta dentro do polígono de
@@ -167,6 +167,11 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
      (cilindro) já é; nunca aponta pra um id de vértice ou de face.
      `paineis` é TOPO do arredondamento: conta a discretização do arco, nunca
      um id de face (cada face criada recebe a identidade `painel:k`).
+     `nomes` (op `arranja`) é a lista de ENDEREÇOS SEMÂNTICOS das cópias, a
+     mesma classe do `nome` da op `parte` e do `grupo` do `furo`: string
+     declarada pelo autor, conferida contra duplicata, nunca id de face ou de
+     vértice. Ela existe justamente para que citar uma cópia deixe de exigir
+     índice — o oposto de carregar id.
      `ate` (op `furo`) é o SEGUNDO centro de um rasgo e entra aqui pela mesma
      razão do `centro`: ponto do mundo, dimensional, projetado no plano da
      entrada; nunca id de face ou de vértice.
