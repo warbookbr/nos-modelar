@@ -155,6 +155,7 @@ nos arquivos originais.
 | Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
 | MCP — leitura e auditoria de montagens | concluído: aprovar, R04 |
 | Abertura oblonga — rasgo no `furo` | concluído: aprovar |
+| Pose de criação — `em` e `eixo` nos geradores | concluído: aprovar |
 
 O plano da abertura oblonga está em
 [`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a
@@ -163,6 +164,10 @@ primeira das três lacunas geométricas listadas em
 `furo` passou a expressar rasgo por `ate`, sem operação nova e sem família de
 endereço nova. Costuras de `lathe` e endereço único de grupo linear continuam
 abertas, sem abertura automática.
+
+A [pose de criação](2026-08-17-pose-de-criacao.md) fechou o atrito A-4: os
+geradores aceitam `em` e `eixo`, e o trio criar/rotacionar/transladar vira um
+passo. O acervo gastava 128 dos 853 passos (15%) só em transporte.
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),

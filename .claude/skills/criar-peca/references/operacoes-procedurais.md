@@ -15,9 +15,9 @@ a autoridade final para argumentos e recusas.
 
 | operação | forma essencial | cuidado principal |
 |---|---|---|
-| `cubo`, `cilindro`, `esfera`, `cone`, `plano` | dimensões, `lados` quando aplicável, `origemId?` | nascem na origem; geradores de revolução usam Y |
-| `chamferBox` | dimensões, `chanfro`, `origemId?` | chanfro plano, não filete |
-| `lathe` | `perfil`, `lados`, `segmentosCurva?`, `origemId?` | gira em torno de Y |
+| `cubo`, `cilindro`, `esfera`, `cone`, `plano` | dimensões, `lados` quando aplicável, `em?`, `eixo?`, `origemId?` | sem `em` nascem na origem; `eixo` só nos de revolução |
+| `chamferBox` | dimensões, `chanfro`, `em?`, `origemId?` | chanfro plano, não filete |
+| `lathe` | `perfil`, `lados`, `segmentosCurva?`, `em?`, `eixo?`, `origemId?` | sem `eixo` gira em torno de Y |
 | `loft` | seções/`contorno`, `lados`, `orientacao?`, `origemId?` | contornos expandidos devem preservar `lados` |
 | `inflate` | dois contornos, `divisoes`, `segmentosCurva?`, `origemId?` | volume fechado, porém facetado |
 | `moveV`, `moveF`, `moveA` | IDs e `d` aditivo | não aceitam `sel` |
@@ -51,6 +51,34 @@ deslocamento tratam região como seleção de vértices e recusam esse modo.
 `faces:[ids]` existe para arquivos legados. Não o misture com `sel`. Nome
 errado, região incompleta, alvo ausente ou seleção ambígua devem gritar e não
 produzir alteração parcial.
+
+## Pose de criação: `em` e `eixo`
+
+Coloque a forma onde ela mora **no próprio passo do gerador**. Escrever
+`gerador` + `rotaciona` + `transladar` para isso é o caminho longo, e ele
+espalha a posição para longe da forma.
+
+```js
+['cilindro', { origemId: EIXO, raio: 'r', altura: 'h', eixo: 'x', em: [0.5, 0.1, 0] }]
+```
+
+- `em: [x,y,z]` translada a forma recém-criada. Vale em `cubo`, `cilindro`,
+  `esfera`, `cone`, `plano`, `chamferBox` e `lathe`.
+- `eixo: 'x' | 'y' | 'z'` escolhe a direção do eixo de revolução. Vale só em
+  `cilindro`, `cone` e `lathe`, que são os gerados por revolução. `'y'` é como
+  a forma já nasce.
+- A ordem é **gira e depois move**, e o giro é em torno da origem.
+
+O resultado é idêntico, vértice por vértice, a escrever os passos separados —
+é isso que `tools/mecanifica/pose-de-criacao.test.ts` afirma. Use os passos
+separados quando o pivô do giro **não** for a origem, ou quando precisar mover
+algo que já existe.
+
+`em` fora de um gerador GRITA, e `eixo` num gerador que não é de revolução
+também: `cubo` não tem eixo para escolher.
+
+Isto não encosta uma peça na outra nem mede vizinho — não existe `alinhar`
+relacional no núcleo.
 
 ## Identidade estrutural
 

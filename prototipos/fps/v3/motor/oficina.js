@@ -122,6 +122,90 @@ function giraPonto(p, pivo, ax, c, s) {
   return [pivo[0] + rx, pivo[1] + ry, pivo[2] + rz];
 }
 
+/* ---- POSE DE CRIAÇÃO (atrito A-4, otimização O-7) ----
+   O atrito medido: nenhum gerador aceitava posição ou orientação, então toda
+   primitiva que não morasse na origem custava um passo a mais, e toda peça de
+   revolução fora do eixo Y custava DOIS — o trio criar + `rotaciona` +
+   `transladar`. No acervo isso somava 128 dos 853 passos (15%), e 29% no freio
+   e no drone: quase um passo de encanamento por primitiva criada.
+
+   O custo não é só de tamanho. A posição ficava LONGE da forma (quem lê `cubo`
+   não sabe onde ele está), o `origemId` virava obrigatório só para poder
+   selecionar a primitiva de volta, e esquecer o passo de transporte deixava o
+   corpo silenciosamente empilhado na origem.
+
+   `em` é a translação e `eixo` é a direção do eixo de revolução. As duas são
+   transformações rígidas aplicadas aos vértices que o passo criou, na ordem
+   GIRA-DEPOIS-MOVE — exatamente o que a receita escrevia à mão:
+
+     ['cilindro', {…}]                                        ['cilindro', {…,
+     ['rotaciona', {eixo:'z', graus:-90, pivo:[0,0,0], sel}]  ≡    eixo: 'x',
+     ['transladar', {d:[dx,dy,dz], sel}]                           em: [dx,dy,dz]}]
+
+   `eixo:'x'` é −90° em torno de Z e `eixo:'z'` é +90° em torno de X: a mesma
+   convenção que as peças já escreviam em helpers locais como `girarParaEixoX`,
+   e a mesma `giraPonto` das ops `rotaciona` e `arranja`, para que os dois
+   caminhos não possam divergir de sinal.
+
+   Isto NÃO é um `alinhar` relacional (O-8): não encosta, não mede vizinho e não
+   resolve pivô por seleção. É o atalho barato do caso comum, e continua sendo
+   possível escrever os passos separados quando o pivô não é a origem. */
+const GERADORES_COLOCAVEIS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe']);
+/* Só faz sentido escolher eixo onde existe eixo: `cubo`, `plano`, `esfera` e
+   `chamferBox` não são gerados por revolução, e aceitar `eixo` neles seria
+   prometer uma orientação que a forma não tem. */
+const GERADORES_COM_EIXO = new Set(['cilindro', 'cone', 'lathe']);
+const GIRO_DO_EIXO = { x: { ax: 2, graus: -90 }, y: null, z: { ax: 0, graus: 90 } };
+
+/* devolve null (nada a fazer), undefined (inválida, já gritou) ou a pose. */
+function lerPoseDeCriacao(st, i, op, a) {
+  /* `eixo` é palavra ANTIGA de `rotaciona` e de `arranja`, onde significa o eixo
+     do GIRO. Aqui ela só vira pose quando o gerador é de revolução; em qualquer
+     outra op o nome continua pertencendo a quem já o usava, e por isso a saída
+     rápida testa `op` antes de olhar para o valor. */
+  const ehPose = a.em != null || (a.eixo != null && GERADORES_COLOCAVEIS.has(op));
+  if (!ehPose) return null;
+  if (a.em != null && !GERADORES_COLOCAVEIS.has(op)) {
+    grita(st, i, op, 'em', `em posiciona a forma no momento em que ela nasce e só existe nos geradores (${[...GERADORES_COLOCAVEIS].sort().join(', ')}); '${op}' já recebe as coordenadas de onde trabalha`);
+    return undefined;
+  }
+  if (a.eixo != null && GERADORES_COLOCAVEIS.has(op) && !GERADORES_COM_EIXO.has(op)) {
+    grita(st, i, op, 'eixo', `'${op}' não é gerado por revolução, então não tem eixo para escolher; use em para posicionar e rotaciona para orientar`);
+    return undefined;
+  }
+  let d = null;
+  if (a.em != null) {
+    if (!Array.isArray(a.em) || a.em.length !== 3) {
+      grita(st, i, op, 'em', `em precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.em)}`);
+      return undefined;
+    }
+    /* Sem conferência de finitude aqui, e isso é escolha: `st.vec` LANÇA em
+       valor não-finito, pela mesma rede central que protege `larg`, `raio` e o
+       `d` do `transladar`. Um segundo teste depois dela nunca dispararia, e
+       validação inalcançável é promessa que ninguém pode cobrar. */
+    d = st.vec(a.em);
+  }
+  let giro = null;
+  if (a.eixo != null && GERADORES_COM_EIXO.has(op)) {
+    if (!Object.hasOwn(GIRO_DO_EIXO, a.eixo)) {
+      grita(st, i, op, 'eixo', `eixo aceita 'x', 'y' ou 'z' (a direção do eixo de revolução da forma; 'y' é como ela já nasce); recebido ${JSON.stringify(a.eixo)}`);
+      return undefined;
+    }
+    giro = GIRO_DO_EIXO[a.eixo];
+  }
+  return (d || giro) ? { d, giro } : null;
+}
+
+function aplicarPoseDeCriacao(st, antes, { d, giro }) {
+  const c = giro ? Math.cos((giro.graus * Math.PI) / 180) : 1;
+  const s = giro ? Math.sin((giro.graus * Math.PI) / 180) : 0;
+  for (const [id, p] of st.V) {
+    if (antes.has(id)) continue;             // vértice de passo anterior não se mexe
+    const girado = giro ? giraPonto(p, [0, 0, 0], giro.ax, c, s) : p;
+    st.V.set(id, d ? [girado[0] + d[0], girado[1] + d[1], girado[2] + d[2]] : girado);
+  }
+}
+
 /* Portas de montagem vivem nas coordenadas da geometria que lhes deu origem.
    Quando `espelha` ou `arranja` cria essa geometria, a interface declarada no
    original precisa acompanhá-la — e não ficar plausível, mas parada, no lugar
@@ -5121,7 +5205,16 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const [op, args = {}] = passo;
     const fn = OPS[op];
     if (!fn) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
+       não dentro de cada gerador. Oito geradores implementando a mesma
+       translação seriam oito chances de divergir de sinal ou de ordem; o
+       despacho aplica a MESMA transformação rígida sobre os vértices que o
+       passo acabou de criar, seja qual for o gerador. */
+    const pose = lerPoseDeCriacao(st, i, op, args);
+    if (pose === undefined) return;          // inválida: já gritou, nada construído
+    const antes = pose ? new Set(st.V.keys()) : null;
     fn(st, args, i);
+    if (pose) aplicarPoseDeCriacao(st, antes, pose);
   });
   aplicarHierarquiaDasPartes(st);
 
