@@ -15,8 +15,15 @@ import { describe, expect, it } from 'vitest';
 import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/procedural/v3/motor/referencia-posicional.js';
 // @ts-expect-error — gate em .mjs sem tipos.
 import { contarIdCru as contarIdCruDoGate } from '../../tools/bancadas/id-cru.mjs';
-// @ts-expect-error — peça em JS sem tipos.
-import { PASSOS as PASSOS_JARDINEIRA } from '../../prototipos/procedural/v3/pecas/_jardineira.js';
+
+/* Fixture mínima: a prova precisa de oito portas com origem estrutural, não da
+   geometria ou do nome de uma jardineira. Oito entradas preserva o caso que
+   originalmente revelou a divergência sem manter uma receita de produto no
+   teste do contrato posicional. */
+const PASSOS_FIXTURE_PORTAS = Array.from({ length: 8 }, (_, indice) => [
+  'publicarPorta',
+  { nome: `porta${indice}`, de: { op: 'cilindro', id: 404, tampa: 'fundo' } },
+]);
 
 const rotulos = (passos: unknown[]) => rotularOcorrencias(ocorrenciasPosicionais(passos));
 
@@ -43,20 +50,16 @@ describe('a chave `de` tem dois contratos, e só um é id posicional', () => {
   });
 });
 
-describe('a peça real que o A-22 recusava', () => {
-  it('`_jardineira` publica 8 portas e mede 0 referência posicional', () => {
-    const portas = (PASSOS_JARDINEIRA as unknown[])
+describe('uma fixture com portas estruturais', () => {
+  it('publica 8 portas e mede 0 referência posicional', () => {
+    const portas = (PASSOS_FIXTURE_PORTAS as unknown[])
       .filter((p) => Array.isArray(p) && p[0] === 'publicarPorta');
     expect(portas.length).toBe(8);
-    expect(rotulos(PASSOS_JARDINEIRA as unknown[])).toEqual([]);
+    expect(rotulos(PASSOS_FIXTURE_PORTAS as unknown[])).toEqual([]);
   });
 
-  /* a Oficina recusava a peça inteira por causa dessas linhas (cinco quando o
-     A-22 foi medido, oito desde que o A-18 e o A-19 destravaram os recortes);
-     uma edição
-     posicional de verdade na MESMA peça continua sendo recusada. */
-  it('a mesma peça com UMA edição posicional volta a ser recusada', () => {
-    const editada = [...(PASSOS_JARDINEIRA as unknown[]), ['solido', { faces: [0] }]];
+  it('a mesma fixture com UMA edição posicional volta a ser recusada', () => {
+    const editada = [...PASSOS_FIXTURE_PORTAS, ['solido', { faces: [0] }]];
     expect(rotulos(editada)).toEqual([`passo ${editada.length - 1}: faces:[ids]`]);
   });
 });
