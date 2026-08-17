@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-366 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+369 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -192,6 +192,7 @@
 - `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
 - `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
+- `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -291,6 +292,7 @@
 - `_portas-espelho-arranja.js` — PEÇA DE EXERCÍCIO — prova não automotiva de AUT-2026-15. Três placas de sinalização demonstram portas sob cópia: duas voltas de uma placa radial, uma fileira…
 - `_prateleira-furada.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1": uma prateleira de parede com furo de parafuso, encaixe de cavilha e um …
 - `_primitivas.js` — PEÇA-EXEMPLO do P1 do playground: as TRÊS primitivas novas lado a lado — `plano` como chão, `esfera` apoiada no centro e `cone` deslocado pra +x por moveV (p…
+- `_rasgo-oblongo.js` — PEÇA DE EXERCÍCIO — prova da ABERTURA OBLONGA (rasgo). Uma cantoneira de fixação com os três casos que o rasgo precisa sustentar de uma vez:
 - `_tampa-de-caixa.js` — PEÇA DE EXERCÍCIO — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": a tampa de uma caixa de inspeção, com o CÍRCULO DE QUATRO PARAFUSOS que o A-26 disse que não c…
 - `_torno.js` — PEÇA-EXEMPLO do P2 do playground: um PEÃO DE XADREZ — o objeto que SÓ o `lathe` faz hoje (um perfil 2D `[[raio,y],...]` girado em torno do eixo Y). O perfil …
 - `_vao-e-anteparo.js` — PEÇA DE EXERCÍCIO do O-14 (docs/mecanifica/historico/OFICINA-OTIMIZACOES.md): põe `apagaFace` e `vira` dentro da rede do `gabarito:selecao` — até aqui as dua…
@@ -460,6 +462,7 @@
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `prateleira-integridade.test.ts` — Integridade da peça de exercício `_prateleira-furada` — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1".
+- `rasgo-oblongo.test.ts` — rasgo-oblongo.test.ts — a prova da ABERTURA OBLONGA no `furo`.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.

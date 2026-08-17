@@ -27,7 +27,8 @@ capacidade; não é simulada com pintura ou JavaScript.
 
 ## Limites e evidências
 
-O fluxo não cria contrato genérico de materiais, solver de montagem ou operação
-oblonga. Pacotes, imagens e relatos ficam em `autoria-assistida/`; experimentos
+O fluxo não cria contrato genérico de materiais nem solver de montagem. A
+abertura oblonga deixou de ser limite depois deste registro: `furo` passou a
+expressar rasgo por `ate`, sem operação nova. Pacotes, imagens e relatos ficam em `autoria-assistida/`; experimentos
 encerrados ficam em `docs/mecanifica/historico/`. Nenhum relato histórico governa
 um caso novo.
