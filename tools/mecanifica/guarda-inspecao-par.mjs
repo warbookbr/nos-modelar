@@ -67,8 +67,8 @@ try {
   const erros = [];
   page.on('pageerror', (erro) => erros.push(erro.message));
 
-  const freio = await provarPar(page, {
-    peca: '_freio-hierarquia', partes: ['pastilhaInterna', 'pistao'],
+  const hierarquia = await provarPar(page, {
+    peca: 'fixture-hierarquia', partes: ['pastilhaInterna', 'pistao'],
   });
   const urlFocada = page.url();
   const params = new URL(urlFocada).searchParams;
@@ -79,15 +79,15 @@ try {
     acima: componentes.slice(6, 9),
     zoom: componentes[9],
   };
-  ok('freio: a escolha evita a isométrica pouco visível', freio?.vistaEscolhida !== 'isometrica', freio?.vistaEscolhida);
-  ok('freio: a URL guarda a câmera escolhida',
+  ok('fixture de hierarquia: a escolha evita a isométrica pouco visível', hierarquia?.vistaEscolhida !== 'isometrica', hierarquia?.vistaEscolhida);
+  ok('fixture de hierarquia: a URL guarda a câmera escolhida',
     params.get('vista') === 'livre' && Boolean(params.get('camera')) && params.get('modo') === 'isolar', urlFocada);
   await page.screenshot({ path: join(SAIDA, 'bancada-inspecao-par-freio.png') });
 
-  ok('freio: o link de inspeção recarrega', await abrir(page, urlFocada));
+  ok('fixture de hierarquia: o link de inspeção recarrega', await abrir(page, urlFocada));
   const restaurado = await page.evaluate(() => window.__mecanificaBancada.estado());
   const marcadoresRestaurados = await page.evaluate(() => window.__mecanificaBancada.marcadoresDePar());
-  ok('freio: seleção, isolamento e câmera voltam iguais',
+  ok('fixture de hierarquia: seleção, isolamento e câmera voltam iguais',
     restaurado.vista === 'livre'
       && restaurado.modo === 'isolar'
       && restaurado.selecionadas.join(',') === 'pastilhaInterna,pistao'
@@ -96,7 +96,7 @@ try {
       && mesmaCamera(restaurado.cameraLivre, cameraDaUrl),
     `${JSON.stringify(restaurado)} · ${marcadoresRestaurados} contorno(s)`);
 
-  await provarPar(page, { peca: '_jardineira', partes: ['caixa', 'terra'] });
+  await provarPar(page, { peca: 'fixture-portas', partes: ['base', 'superficie'] });
   ok('nenhuma página emitiu erro', erros.length === 0, erros.join(' | '));
   await page.close();
 } catch (erro) {

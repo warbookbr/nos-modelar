@@ -3,25 +3,25 @@
 **Responsável pela execução:** a definir
 **Base medida:** `warbookbr/nos-mecanifica` `main` em `2dd9fa1` e consumidor
 `warbookbr/mecanica` `main` em `9127321`.
-
 ## Objetivo verificável
 Permitir que o catálogo homologado esteja vazio, seja substituído ou tenha uma
 peça removida sem quebrar o núcleo, seus validadores, os testes fundamentais, a
 bancada ou o consumidor. Receitas de teste deixam de morar no catálogo e nenhum
 contrato geral pode depender do nome ou da geometria de uma peça de produto.
-
 O recorte entrega os ganhos prometidos: catálogo livremente substituível,
 receitas sem virar contratos acidentais, diagnóstico que separa falha do motor
 de falha do conteúdo, testes genéricos pequenos, migrações mais seguras e menor
 custo de homologação e remoção.
 ## Andamento da implementação
-R00, R01 e R03 estão na `main` até `4e699f0`: execução pura, firewall,
-catálogo vazio, bancada sem fallback e harness privado. R04 avançou com gates
-de entrada explícita. A matriz está em
+R00–R05 estão implementados na `main`: execução pura, firewall, catálogo vazio,
+bancada sem fallback, harness privado e consumidor externo com manifesto vazio.
+R06 está aplicado no working tree: o acervo não homologado foi removido, os
+gates de dívida foram retirados e as provas de capacidade foram reduzidas a
+fixtures neutras. R07 está na validação final. A matriz está em
 [`MATRIZ-TESTES-ACOPLADOS.md`](../MATRIZ-TESTES-ACOPLADOS.md).
-
-O consumidor tem os commits `c439f42` e `561211c` na branch remota
-`codex/catalogo-vazio`; a remoção do acervo aguarda a integração desse PR.
+O consumidor está integrado na `main` por `c794633`; o escritório já publicou
+o harness e o manifesto vazio. A remoção do acervo precisa apenas dos gates
+finais e do commit coordenado desta rodada.
 ## Hipótese
 O motor não depende de peças: suas 32 operações recebem dados e nenhum módulo
 de `motor/` importa `pecas/`. O acoplamento está nas portas que descobrem
@@ -115,7 +115,7 @@ ninguém conseguiu reduzir impede avançar.
 
 ### R04 — ferramentas e gates independentes
 
-1. fazer `criar`, `descrever`, `gabarito`, `id-cru`, `porteiro` e exportação
+1. fazer `criar`, `descrever`, `gabarito`, `porteiro` e exportação
    aceitarem entrada/catálogo explícito conforme seu papel;
 2. trocar `gabarito-selecao.json` global por canons pequenos de capacidade;
 3. separar `bancada:check`, `fixtures:check` e `catalogo:check` no CI;
@@ -133,12 +133,12 @@ ninguém conseguiu reduzir impede avançar.
 
 ### R06 — remoção do acervo não homologado
 
-1. apagar os 39 módulos de `pecas/`, o gabarito `_viga`, a montagem concreta,
+1. apagar os 39 módulos de `pecas/`, o gabarito `_viga`, as montagens concretas,
    as peças resolvidas e listas de dívida que só descrevem esse acervo;
 2. mover apenas montagens genuinamente neutras para fixtures; não arquivar
    receitas executáveis em outra pasta;
 3. preservar estudos e histórico como evidência, sem fazê-los fonte operacional;
-4. atualizar comandos, skills, README, índice, workflows e mapa gerado;
+4. atualizar comandos, skills, índice, workflows e mapa gerado;
 5. auditar nomes removidos em código vivo e classificar cada resíduo documental.
 
 ### R07 — prova de substituição e encerramento
@@ -180,9 +180,9 @@ build e testes de warbookbr/mecanica antes e depois do manifesto vazio
 git diff --check
 ```
 
-Evidências obrigatórias: matriz antes/depois dos 26 testes acoplados, lista das
-32 operações, saída dos dois estados de catálogo, PNGs do harness em duas
-vistas, manifesto vazio, auditoria residual e commits coordenados.
+Evidências obrigatórias: matriz antes/depois dos 26 testes acoplados, lista das 32 operações,
+saída dos dois estados, PNGs do harness em duas vistas, manifesto vazio, auditoria residual
+e commits coordenados.
 
 ## Critério de saída
 

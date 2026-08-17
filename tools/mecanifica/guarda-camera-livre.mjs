@@ -51,7 +51,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const erros = [];
   page.on('pageerror', (erro) => erros.push(erro.message));
-  const base = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html?peca=freio-disco&vista=direita&projecao=ortografica`;
+  const base = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html?peca=fixture-visual&vista=direita&projecao=ortografica`;
   await page.goto(base, { waitUntil: 'load' });
   ok('(a) a bancada sobe pela URL canônica', await esperarBancada(page));
 
@@ -91,7 +91,7 @@ try {
     `${page.url()} · ${JSON.stringify(restaurado)}`);
   await page.screenshot({ path: join(SAIDA, 'bancada-camera-livre-recarregada.png') });
 
-  await page.goto(`http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html?peca=freio-disco&vista=livre&camera=NaN`, { waitUntil: 'load' });
+  await page.goto(`http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html?peca=fixture-visual&vista=livre&camera=NaN`, { waitUntil: 'load' });
   ok('(f) entrada inválida fecha para isométrica sem quebrar a bancada', await esperarBancada(page));
   const invalido = await page.evaluate(() => window.__mecanificaBancada.estado());
   ok('(g ★) entrada inválida não vira câmera parcial',

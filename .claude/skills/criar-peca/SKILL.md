@@ -117,8 +117,8 @@ npm test
 npm run typecheck
 npm run build
 npm run porteiro
-npm run gabarito:selecao:check
-npm run id-cru:check
+npm run typecheck
+npm run porteiro
 npm run guarda:portas
 npm run guarda:camera
 npm run guarda:par

@@ -53,12 +53,6 @@ jobs:
       - name: Harness privado prova render de fixtures
         run: npm run porteiro
 
-      - name: Prova Zero — seleção de peças byte-idêntica ao gabarito
-        run: npm run gabarito:selecao:check
-
-      - name: Nenhum id posicional em peça nova
-        run: npm run id-cru:check
-
       # A-60. Sem este passo o gate existiria e nunca rodaria, que é a mesma
       # armadilha que o comentário de `vitest.config.ts` já descreve: o arquivo
       # está lá, ninguém o executa, e a cobertura é impressão. Ele é o ÚNICO

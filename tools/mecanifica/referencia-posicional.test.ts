@@ -2,19 +2,15 @@
    por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de`
    carrega desde o O-12.
 
-   Por que este arquivo existe: a regra vivia copiada no gate `id-cru`, na antiga
-   interface humana e no oráculo do harness. As três divergiram DUAS
-   vezes na mesma chave. Na segunda divergência a Oficina passou a recusar
-   `_jardineira` — peça que o CI aprova com 0 id cru — acusando de id posicional
-   as cinco portas semânticas que o ciclo anterior tinha acabado de entregar.
+   Por que este arquivo existe: a regra já foi copiada por gates e oráculos
+   diferentes, que divergiram DUAS vezes na mesma chave. O contrato permanece
+   aqui em uma fixture mínima, sem depender de peça ou catálogo.
 
    A interface humana foi retirada da Mecanifica. Este arquivo conserva a prova
    que ainda importa aqui: o gate usa a regra única e ela classifica certo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo do motor v3, em JS sem tipos.
 import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/procedural/v3/motor/referencia-posicional.js';
-// @ts-expect-error — gate em .mjs sem tipos.
-import { contarIdCru as contarIdCruDoGate } from '../../tools/bancadas/id-cru.mjs';
 
 /* Fixture mínima: a prova precisa de oito portas com origem estrutural, não da
    geometria ou do nome de uma jardineira. Oito entradas preserva o caso que
@@ -34,7 +30,7 @@ describe('a chave `de` tem dois contratos, e só um é id posicional', () => {
   });
 
   it('`de:{op,id}` do publicarPorta NÃO é — é origem estrutural', () => {
-    const passos = [['publicarPorta', { nome: 'peDoCaule', de: { op: 'cilindro', id: 404, tampa: 'fundo' } }]];
+    const passos = [['publicarPorta', { nome: 'baseDoCilindro', de: { op: 'cilindro', id: 404, tampa: 'fundo' } }]];
     expect(rotulos(passos)).toEqual([]);
     expect(totalDe(contarIdCru(passos))).toBe(0);
     expect(origemEstrutural({ op: 'cilindro', id: 404 })).toBe(true);
@@ -85,7 +81,7 @@ describe('as seis formas de coleção continuam todas cobertas', () => {
 
   it('as referências SEMÂNTICAS não contam', () => {
     expect(rotulos([
-      ['material', { sel: { porta: 'peDoCaule' }, usa: 'x' }],
+      ['material', { sel: { porta: 'baseDoCilindro' }, usa: 'x' }],
       ['material', { sel: { alias: 'garraInterna' }, usa: 'x' }],
       ['rotaciona', { sel: { origem: { op: 'cilindro', id: 404 } }, eixo: 'y', ang: 1 }],
       ['cilindro', { id: 404, origemId: 404, r: 1, h: 2 }],
@@ -97,27 +93,5 @@ describe('as seis formas de coleção continuam todas cobertas', () => {
   it('chave presente com lista vazia ou lixo conta pelo menos 1', () => {
     expect(contarIdCru([['solido', { faces: [] }]]).faces).toBe(1);
     expect(contarIdCru([['pincel', { faces: 'nada' }]]).faces).toBe(1);
-  });
-});
-
-describe('uma regra só, de verdade', () => {
-  /* Este caso já foi `expect(contarIdCruDoGate(passos)).toEqual(contarIdCru(passos))`
-     sobre três passos de exemplo, e não podia falhar: `tools/bancadas/id-cru.mjs`
-     REEXPORTA `contarIdCru` deste módulo, então aquilo comparava `f(x)` com
-     `f(x)` para o mesmo `f`. Nenhuma mudança de produção o derrubava, e ele
-     ocupava a linha de um teste real.
-
-     O que ele queria afirmar é o degrau anterior: que não existe uma segunda
-     implementação. Isso se afirma por IDENTIDADE de referência, e não por
-     concordância em exemplos — uma cópia recém-escrita concorda em quase tudo.
-     Foi exatamente assim que as três cópias do A-22 conviveram por dois ciclos:
-     concordavam em tudo, menos na chave `de`. Uma comparação de saídas só
-     acusaria a divergência se o exemplo escolhido caísse justo nela; a
-     identidade acusa a cópia no instante em que ela nasce.
-
-     Se um dia o gate PRECISAR embrulhar a função, este caso fica vermelho e a
-     decisão vira explícita, que é o comportamento desejado. */
-  it('o gate id-cru não tem implementação própria: ele reexporta a MESMA função', () => {
-    expect(contarIdCruDoGate).toBe(contarIdCru);
   });
 });

@@ -5,12 +5,12 @@
   "instancias": [
     {
       "id": "freio",
-      "alvo": { "tipo": "peca", "ref": "freio-disco" },
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
       "pose": { "deslocamento": [0, 0, 0] }
     },
     {
       "id": "roda",
-      "alvo": { "tipo": "peca", "ref": "roda-dianteira" },
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
       "pose": { "deslocamento": [2, 0, 0] }
     }
   ]

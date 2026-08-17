@@ -5,8 +5,8 @@
  * Screenshots de uma PEÇA do v3 no visor padrão, em 3 ângulos, sem rede:
  * server estático local (o visor usa ES modules) + Chromium do site.
  *
- *   npm run peca -- freio-disco           # 3 ângulos padrão
- *   npm run peca -- _modelo --res=960     # template, outra resolução
+ *   npm run peca -- <id-da-peca>          # 3 ângulos padrão
+ *   npm run peca -- <id-da-peca> --res=960
  *
  * Saída: tools/bancadas/out/peca-<nome>-<ângulo>.png — e o passo seguinte é
  * sempre LER os PNGs (screenshot que ninguém olha é ruído).
@@ -22,7 +22,7 @@ const REPO = resolve(HERE, '../..');
 const OUT = join(HERE, 'out');
 
 const args = process.argv.slice(2);
-const nome = (args.find((a) => !a.startsWith('--')) || 'freio-disco').replace(/[^a-z0-9_-]/gi, '');
+const nome = (args.find((a) => !a.startsWith('--')) || '').replace(/[^a-z0-9_-]/gi, '');
 const res = /^--res=(\d+)$/.exec(args.find((a) => a.startsWith('--res=')) || '')?.[1] || '640';
 /* --e= / --r= sobrescrevem a altura/raio da câmera em TODOS os ângulos
    (peças de paisagem — chão, ilha — pedem câmera mais alta e afastada) */
@@ -35,6 +35,7 @@ const giro = parseInt(/^--giro=(\d+)$/.exec(args.find((a) => a.startsWith('--gir
 const RES = parseInt(res, 10), VW = Math.max(900, RES), VH = Math.round(VW * 9 / 16);   // viewport ACOMPANHA res -> foto nítida em alta
 
 const peçaPath = join(REPO, 'prototipos/procedural/v3/pecas', `${nome}.js`);
+if (!nome) { console.error('informe explicitamente o id da peça (veja prototipos/procedural/v3/pecas/)'); process.exit(2); }
 if (!existsSync(peçaPath)) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(1); }
 
 /* server estático mínimo (só o que o visor precisa) */

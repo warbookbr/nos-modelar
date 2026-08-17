@@ -196,47 +196,6 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('valida as três respostas reais com o outputSchema do cliente oficial', async () => {
-    const client = new Client({ name: 'teste-mecanifica', version: '1' });
-    const transport = new StdioClientTransport({
-      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
-      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
-    });
-    try {
-      await client.connect(transport);
-      const chamadas = [
-        ['descrever_peca', { peca: '_jardineira', casas: 3 }],
-        ['validar_pacote', { id: 'homologacao-mancal' }],
-        ['comparar_revisoes', { id: 'prova-caixote', anterior: 'r001', posterior: 'r002' }],
-      ];
-      for (const [name, arguments_] of chamadas) {
-        const resultado = await client.callTool({ name, arguments: arguments_ });
-        expect(resultado.isError).not.toBe(true);
-        tamanhosStructured[name] = Buffer.byteLength(JSON.stringify(resultado.structuredContent), 'utf8');
-      }
-    } finally {
-      await client.close();
-    }
-  });
-
-  it('chama descrever_peca real, retorna structuredContent e preserva a régua', async () => {
-    const esperado = await descreverPecaReutilizavel({ peca: '_jardineira', casas: 3 });
-    const { cliente } = await conectado();
-    try {
-      const resposta = await cliente.enviar('tools/call', { name: 'descrever_peca', arguments: { peca: '_jardineira', casas: 3 } });
-      expect(resposta.error).toBeUndefined();
-      expect(resposta.result.isError).toBe(false);
-      expect(resposta.result.structuredContent).toEqual({
-        ok: true, codigo: esperado.codigo,
-        resultado: { peca: '_jardineira', descricao: resumoDescricao(esperado.resultado.descricao) },
-      });
-      tamanhosStructured.descrever_peca = Buffer.byteLength(JSON.stringify(resposta.result.structuredContent), 'utf8');
-      expect(resposta.result.content).toEqual([{ type: 'text', text: 'descrever_peca: operação concluída.' }]);
-    } finally {
-      await cliente.fechar();
-    }
-  }, 20_000);
-
   it('prova o contrato de descrição em todo o acervo sem abrir outro servidor', async () => {
     for (const peca of PECAS_DISPONIVEIS) {
       const resposta = await descrever({ peca });
@@ -245,28 +204,6 @@ describe('servidor MCP local — perfil revisao', () => {
     }
     expect(new Set(PECAS_DISPONIVEIS).size).toBe(PECAS_DISPONIVEIS.length);
   }, 120_000);
-
-  it('valida pacote existente pelo serviço real e lê somente o resumo', async () => {
-    const esperado = await validarPacoteNoDisco('homologacao-mancal');
-    const { cliente } = await conectado();
-    try {
-      const resposta = await cliente.enviar('tools/call', { name: 'validar_pacote', arguments: { id: 'homologacao-mancal' } });
-      expect(resposta.result.structuredContent).toEqual({
-        ok: true, codigo: 0,
-        resultado: {
-          id: 'homologacao-mancal', modo: esperado.modo, peca: esperado.peca,
-          partes: esperado.partes, bytes: esperado.bytes,
-          alvo: {
-            peca: esperado.alvo.peca, partes: esperado.alvo.partes,
-            totais: resumoTotais(esperado.alvo.descricao.totais),
-          },
-        },
-      });
-      tamanhosStructured.validar_pacote = Buffer.byteLength(JSON.stringify(resposta.result.structuredContent), 'utf8');
-    } finally {
-      await cliente.fechar();
-    }
-  });
 
   it('prova os pacotes oficiais dos Casos 1 e 2 com o schema público', async () => {
     for (const id of ['homologacao-mancal', 'homologacao-placa']) {
@@ -1093,7 +1030,7 @@ describe('servidor MCP local — perfil revisao', () => {
   it('rejeita promises pendentes quando o servidor stdio encerra', async () => {
     const cliente = clienteStdio();
     const pendente = cliente.enviar('tools/call', {
-      name: 'descrever_peca', arguments: { peca: '_jardineira' },
+      name: 'descrever_peca', arguments: { peca: 'fixture-visual' },
     });
     cliente.processo.kill('SIGTERM');
     await expect(pendente).rejects.toThrow('servidor encerrou antes da resposta');
@@ -1110,7 +1047,7 @@ describe('servidor MCP local — perfil revisao', () => {
       async evaluate(fn) {
         const fonte = String(fn);
         if (fonte.includes('const b =')) return {
-          ready: true, erro: null, peca: '_jardineira', partes: ['corpo'],
+          ready: true, erro: null, peca: 'fixture-visual', partes: ['base'],
           selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
           estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
         };
@@ -1133,7 +1070,7 @@ describe('servidor MCP local — perfil revisao', () => {
       async close() { fechamentos.vite += 1; },
     };
     const resultado = await olharBancada({
-      peca: '_jardineira', revisar: true, capturarEmMemoria: true, espera: 1,
+      peca: 'fixture-visual', revisar: true, capturarEmMemoria: true, espera: 1,
       dependencias: {
         createServer: async () => vite,
         carregarPlaywright: async () => ({ chromium: { launch: async () => browser } }),
@@ -1158,7 +1095,7 @@ describe('servidor MCP local — perfil revisao', () => {
       async evaluate(fn) {
         const fonte = String(fn);
         if (fonte.includes('const b =')) return {
-          ready: true, erro: null, peca: '_jardineira', partes: ['corpo'],
+          ready: true, erro: null, peca: 'fixture-visual', partes: ['base'],
           selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
           estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
         };
@@ -1178,7 +1115,7 @@ describe('servidor MCP local — perfil revisao', () => {
       async close() { fechamentos.vite += 1; },
     };
     const resultado = await olharBancada({
-      peca: '_jardineira', revisar: true, capturarEmMemoria: true,
+      peca: 'fixture-visual', revisar: true, capturarEmMemoria: true,
       timeoutMs: 10, espera: 60_000,
       dependencias: {
         createServer: async () => vite,
@@ -1188,60 +1125,6 @@ describe('servidor MCP local — perfil revisao', () => {
     expect(resultado).toMatchObject({ ok: false, erro: { codigo: 'tempo_esgotado' } });
     expect(fechamentos.browser).toBeGreaterThanOrEqual(1);
     expect(fechamentos.vite).toBeGreaterThanOrEqual(1);
-  });
-
-  it('estrutura manifesto e imagens sem repetir base64 no structuredContent', async () => {
-    const png = Buffer.from('89504e470d0a1a0a', 'hex');
-    let instante = 100;
-    const executado = await renderizar({ peca: '_jardineira' }, {
-      agora: () => (instante += 10),
-      olhar: async ({ capturarEmMemoria, revisar, timeoutMs }) => {
-        expect({ capturarEmMemoria, revisar, timeoutMs }).toEqual({
-          capturarEmMemoria: true, revisar: true, timeoutMs: LIMITES_VISTAS.timeoutMs,
-        });
-        return {
-          ok: true, codigo: 0,
-          resultado: {
-            peca: '_jardineira',
-            capturas: ['isometrica', 'frontal', 'direita', 'superior'].map((nome) => ({
-              nome, mimeType: 'image/png', largura: 1280, altura: 720, dados: png,
-            })),
-            vistas: ['isometrica', 'frontal', 'direita', 'superior'].map((nome) => ({
-              nome, enquadramento: { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false },
-            })),
-          },
-        };
-      },
-    });
-    renderizarSaida.parse(executado.resposta);
-    expect(executado.resposta.resultado.vistas).toHaveLength(4);
-    expect(JSON.stringify(executado.resposta)).not.toContain(png.toString('base64'));
-    const content = conteudoRenderizacao(executado);
-    expect(content.filter(({ type }) => type === 'image')).toHaveLength(4);
-    for (const imagem of content.slice(1)) {
-      expect(Buffer.from(imagem.data, 'base64').subarray(0, 8)).toEqual(png);
-    }
-  });
-
-  it('recusa payload e timeout sem devolver resultado parcial', async () => {
-    const nomes = ['isometrica', 'frontal', 'direita', 'superior'];
-    const enquadramento = { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
-    const excedido = await renderizar({ peca: '_jardineira' }, {
-      limites: { ...LIMITES_VISTAS, imagemBytes: 4 },
-      olhar: async () => ({
-        ok: true, codigo: 0, resultado: { peca: '_jardineira',
-          capturas: nomes.map((nome) => ({ nome, largura: 1280, altura: 720, dados: Buffer.alloc(5) })),
-          vistas: nomes.map((nome) => ({ nome, enquadramento })),
-        },
-      }),
-    });
-    expect(excedido.resposta).toMatchObject({ ok: false, erro: { codigo: 'payload_excedido' } });
-    expect(excedido.imagens).toEqual([]);
-    const expirado = await renderizar({ peca: '_jardineira' }, {
-      olhar: async () => ({ ok: false, codigo: 1, erro: { codigo: 'tempo_esgotado', mensagem: 'tempo' } }),
-    });
-    expect(expirado.resposta).toMatchObject({ ok: false, erro: { codigo: 'tempo_esgotado' } });
-    expect(expirado.imagens).toEqual([]);
   });
 
   const testeVisualReal = process.env.MCP_VISUAL_REAL === '1' ? it : it.skip;
@@ -1323,8 +1206,6 @@ describe('servidor MCP local — perfil revisao', () => {
 
   it('registra a linha-base de bytes das respostas estruturadas', () => {
     expect(tamanhosStructured).toMatchObject({
-      descrever_peca: expect.any(Number),
-      validar_pacote: expect.any(Number),
       comparar_revisoes: expect.any(Number),
       descrever_montagem: expect.any(Number),
       planejar_revalidacao_montagem: expect.any(Number),

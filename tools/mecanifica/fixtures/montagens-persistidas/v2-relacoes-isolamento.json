@@ -3,8 +3,8 @@
   "versao": 2,
   "id": "v2-relacoes-isolamento",
   "instancias": [
-    { "id": "freio", "alvo": { "tipo": "peca", "ref": "freio-disco" } },
-    { "id": "roda", "alvo": { "tipo": "peca", "ref": "roda-dianteira" } }
+    { "id": "bloco-a", "alvo": { "tipo": "peca", "ref": "bloco-gabarito" } },
+    { "id": "bloco-b", "alvo": { "tipo": "peca", "ref": "bloco-gabarito" } }
   ],
   "relacoes": [
     {

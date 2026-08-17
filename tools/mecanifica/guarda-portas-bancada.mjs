@@ -20,10 +20,10 @@
  * `#listaPortas`, lidos da página depois que ela subiu.
  *
  * O ORÁCULO É LITERAL, de propósito. Os oito pares nome/origem estão escritos à
- * mão em `PORTAS_JARDINEIRA` abaixo, não calculados por `portasPublicadas()`. A
+ * mão em `PORTAS_FIXTURE` abaixo, não calculados por `portasPublicadas()`. A
  * lição do A-22 é que oráculo que chama o mesmo módulo do produto concorda com
  * ele em vez de vigiá-lo: a régua que a página usa não pode ser a régua que a
- * mede. Se a jardineira mudar de portas, este arquivo tem que mudar junto, e
+ * mede. Se a fixture mudar de portas, este arquivo tem que mudar junto, e
  * essa é a intenção — porta publicada é contrato, não detalhe.
  *
  *   npm run guarda:portas
@@ -44,8 +44,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const OUT = join(REPO, 'tools/bancadas/out');
 
-const COM_PORTAS = '_jardineira';        // peça não automotiva que publica 8 portas
-const SEM_PORTAS = '_vao-e-anteparo';    // peça limpa que não publica nenhuma
+const COM_PORTAS = 'fixture-portas';
+const SEM_PORTAS = 'fixture-sem-portas';
 const VW = 1280, VH = 720;
 
 /* O ORÁCULO — escrito à mão, na ordem em que a bancada os mostra: por nome, em
@@ -54,15 +54,15 @@ const VW = 1280, VH = 720;
    que a porta DECLARA (op:id mais o recorte do contrato do gerador), a mesma
    coluna que `npm run descrever` imprime. Trocar um nome ou um recorte aqui tem
    que deixar a prova vermelha; é essa a única razão de a lista ser literal. */
-const PORTAS_JARDINEIRA = [
-  { nome: 'assentoDoBotao', origem: 'assentoDoBotao · cone:405 tampa=fundo' },
-  { nome: 'bordaDaFrenteDaSoleira', origem: 'bordaDaFrenteDaSoleira · chamferBox:400 aresta=3' },
-  { nome: 'coloDoBulbo', origem: 'coloDoBulbo · esfera:401 faixa=ultima' },
-  { nome: 'coroaDoCaule', origem: 'coroaDoCaule · cilindro:404 tampa=topo' },
-  { nome: 'faixaDaFrenteDaTerra', origem: 'faixaDaFrenteDaTerra · plano:402 faixa=ultima' },
-  { nome: 'leitoDaTerra', origem: 'leitoDaTerra · plano:402' },
-  { nome: 'Base enterrada do caule', origem: 'peDoCaule · cilindro:404 tampa=fundo' },
-  { nome: 'soleiraDaJardineira', origem: 'soleiraDaJardineira · chamferBox:400' },
+const PORTAS_FIXTURE = [
+  { nome: 'Base do cilindro', origem: 'baseDoCilindro · cilindro:404 tampa=fundo' },
+  { nome: 'baseDoCone', origem: 'baseDoCone · cone:405 tampa=fundo' },
+  { nome: 'baseDoVolume', origem: 'baseDoVolume · esfera:401 faixa=ultima' },
+  { nome: 'basePrincipal', origem: 'basePrincipal · chamferBox:400' },
+  { nome: 'bordaDaBase', origem: 'bordaDaBase · chamferBox:400 aresta=3' },
+  { nome: 'faixaDoLeito', origem: 'faixaDoLeito · plano:402 faixa=ultima' },
+  { nome: 'superficieDoLeito', origem: 'superficieDoLeito · plano:402' },
+  { nome: 'topoDoCilindro', origem: 'topoDoCilindro · cilindro:404 tampa=topo' },
 ];
 
 /* ---- afirmações ---------------------------------------------------------- */
@@ -135,11 +135,11 @@ try {
      `hidden=${comPortas.painel?.hidden} · altura=${Math.round(comPortas.painel?.alturaVisivel ?? 0)}px`);
 
   ok('(c ★) o resumo conta as portas da peça, com a concordância certa',
-     comPortas.painel?.resumo === `${PORTAS_JARDINEIRA.length} publicadas`,
+     comPortas.painel?.resumo === `${PORTAS_FIXTURE.length} publicadas`,
      `resumo "${comPortas.painel?.resumo}"`);
 
   ok('(d ★) a LISTA mostra as oito portas: nome e origem declarada, no DOM, iguais ao oráculo literal',
-     igual(comPortas.painel?.itens, PORTAS_JARDINEIRA),
+     igual(comPortas.painel?.itens, PORTAS_FIXTURE),
      `${comPortas.painel?.itens.length} item(ns) · ${JSON.stringify(comPortas.painel?.itens)}`);
 
   /* o `<details>` nasce fechado de propósito; abrir é o gesto de quem confere, e
@@ -175,7 +175,7 @@ try {
      coisa passaria em metade das afirmações acima. O que se afirma é a
      DIFERENÇA: a mesma bancada, duas peças, dois resultados opostos. */
   ok('(h ★) a bancada responde à PEÇA, não a uma constante: mesma tela, uma mostra oito portas e a outra nenhuma',
-     comPortas.painel?.itens.length === PORTAS_JARDINEIRA.length
+     comPortas.painel?.itens.length === PORTAS_FIXTURE.length
      && semPortas.painel?.itens.length === 0
      && comPortas.painel?.hidden !== semPortas.painel?.hidden);
 } catch (erro) {

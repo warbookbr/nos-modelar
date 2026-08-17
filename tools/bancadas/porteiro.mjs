@@ -13,7 +13,7 @@ import { pngStats } from './bench/pngstats.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 let alvos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-if (!alvos.length) alvos = ['freio-disco', '_freio-hierarquia', '_jardineira', '_vao-e-anteparo'];
+if (!alvos.length) alvos = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas'];
 
 const { createServer } = await import('vite');
 const vite = await createServer({

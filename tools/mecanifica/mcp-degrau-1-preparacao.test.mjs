@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { olharBancada } from './olhar-bancada.mjs';
+import { visual } from '../bancadas/fixtures/catalogo-visual.js';
 
 const DESCRIBIR = new URL('./descrever-peca.mjs', import.meta.url);
 const OLHAR = new URL('./olhar-bancada.mjs', import.meta.url);
@@ -18,9 +19,9 @@ describe('fatia preparatória do Degrau 1', () => {
   });
 
   it('descreverPecaReutilizavel devolve dados e erros sem encerrar o processo', async () => {
-    const sucesso = await descreverPecaReutilizavel({ peca: 'freio-disco' });
+    const sucesso = await descreverPecaReutilizavel({ peca: 'fixture', modulo: visual });
     expect(sucesso).toMatchObject({ ok: true, codigo: 0, stderr: '' });
-    expect(sucesso.stdout).toContain('peça: freio-disco');
+    expect(sucesso.stdout).toContain('peça: fixture');
 
     const erro = await descreverPecaReutilizavel({ peca: 'nao-existe' });
     expect(erro).toMatchObject({ ok: false, codigo: 2, erro: { categoria: 'uso' } });
@@ -46,7 +47,7 @@ describe('fatia preparatória do Degrau 1', () => {
     };
     const logs = [];
     const resultado = await olharBancada({
-      peca: 'freio-disco',
+      peca: 'fixture-visual',
       vistas: ['isometrica'],
       logger: (canal, mensagem) => logs.push([canal, mensagem]),
       dependencias: {
@@ -67,7 +68,7 @@ describe('fatia preparatória do Degrau 1', () => {
       async close() { viteFechado = true; },
     };
     const resultado = await olharBancada({
-      peca: 'freio-disco', vistas: ['isometrica'],
+      peca: 'fixture-visual', vistas: ['isometrica'],
       dependencias: {
         createServer: async () => servidor,
         carregarPlaywright: async () => ({ chromium: { launch: async () => ({

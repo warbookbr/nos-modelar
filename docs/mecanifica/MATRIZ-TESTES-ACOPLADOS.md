@@ -15,15 +15,19 @@ Esta matriz separa cobertura do motor de dependência acidental de receita.
 |---|---|---|---|
 | Serviço puro | `executar-receita.test.ts`, `catalogo-pecas.test.ts` | inline e catálogo vazio | migrado |
 | Bancada visual | `guarda:camera`, `guarda:par`, `guarda:portas`, `porteiro` | harness privado | migrado |
-| Publicação | `exportar-peca`, `exportar-gate`, `mcp/mcp` | dois artefatos atuais | R05 |
-| Integridade | `freio-disco`, `roda-dianteira`, `jardineira`, `drone`, `flange`, `gabarito`, `prateleira`, `rasgo`, `tampa`, `vao`, `corrimao` | capacidade ou remoção | R06 |
-| Arranjo | `arranjo-em-peca` | fixture neutra de `arranja` | R02 |
-| Referência | `referencia-posicional`, `criar-aliases`, `oficina` | separar contratos das demos | R02 |
-| Modelagem | `modelagem/revisao`, `modelagem/pacote` | pacote explícito | R04 |
+| Publicação | `exportar-peca`, `mcp/mcp` | manifesto vazio e serviços explícitos | migrado |
+| Integridade | provas nomeadas do acervo | conteúdo removido; capacidades gerais preservadas | removido |
+| Arranjo | `oficina/arranja-contrato`, `portas-espelho-arranja` | fixtures e contratos neutros | migrado |
+| Referência | `referencia-posicional`, aliases e oficina | regra única e provas inline | migrado |
+| Modelagem | serviços e contratos sob `tools/modelagem` | pacote explícito; provas de conteúdo removidas | migrado |
 
 Testes de montagem persistida usam fixtures próprias em
 `tools/mecanifica/fixtures`; não são dependência das peças sem importar uma
 receita de `prototipos/procedural/v3/pecas`.
+
+Os testes que só afirmavam contagem, aparência ou medidas de receitas removidas
+foram apagados. O único teste condicional restante é a rodada visual real do
+MCP, que depende de navegador/ambiente externo e não é um gate de catálogo.
 
 ## Regra de saída
 

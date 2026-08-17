@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const CLI = resolve(REPO, 'tools/mecanifica/descrever-montagem-persistida.mjs');
 const MONTAGENS = resolve(REPO, 'tools/mecanifica/fixtures/montagens-persistidas');
-const PECAS = resolve(REPO, 'pecas-resolvidas');
+const PECAS = resolve(REPO, 'tools/mecanifica/fixtures/pecas-resolvidas');
 const temporarios: string[] = [];
 
 function correr(args: string[]) {
@@ -41,7 +41,7 @@ afterEach(() => {
 describe('descrever:montagem:persistida — R03', () => {
   it('escreve somente JSON canônico no stdout para montagem arbitrária', () => {
     const resultado = correr([
-      `--arquivo=${join(MONTAGENS, 'v2-relacoes-reais.json')}`,
+      `--arquivo=${join(MONTAGENS, 'v3-separacao-direcional.json')}`,
       `--raiz-montagens=${MONTAGENS}`,
       `--raiz-pecas=${PECAS}`,
     ]);
@@ -49,30 +49,30 @@ describe('descrever:montagem:persistida — R03', () => {
     expect(resultado.codigo).toBe(0);
     expect(resultado.stderr).toBe('');
     const contexto = JSON.parse(resultado.stdout);
-    expect(contexto).toMatchObject({ formato: 'mecanifica.contexto-montagem', totais: { pecas: 2, montagens: 1 } });
+    expect(contexto).toMatchObject({ formato: 'mecanifica.contexto-montagem', totais: { pecas: 2, montagens: 0 } });
     expect(resultado.stdout).not.toContain(REPO);
   });
 
   it('transporta caminho, profundidade e relacionados sem regra duplicada', () => {
     const resultado = correr([
-      `--arquivo=${join(MONTAGENS, 'v2-relacoes-reais.json')}`,
+      `--arquivo=${join(MONTAGENS, 'v3-separacao-direcional.json')}`,
       `--raiz-montagens=${MONTAGENS}`,
       `--raiz-pecas=${PECAS}`,
-      '--caminho=conjunto-freio',
+      '--caminho=movel',
       '--profundidade=1',
       '--incluir-relacionados',
     ]);
     const contexto = JSON.parse(resultado.stdout);
 
     expect(resultado.codigo).toBe(0);
-    expect(contexto.consulta).toMatchObject({ caminho: ['conjunto-freio'], profundidade: 1, incluirRelacionados: true });
+    expect(contexto.consulta).toMatchObject({ caminho: ['movel'], profundidade: 1, incluirRelacionados: true });
     expect(contexto.instancias.map((item: any) => item.caminho.join('/'))).toEqual([
-      'conjunto-freio', 'conjunto-freio/freio', 'roda',
+      'movel', 'referencia',
     ]);
   });
 
   it('recusa opção ausente e JSON inválido com diagnóstico somente no stderr', () => {
-    const semRaiz = correr([`--arquivo=${join(MONTAGENS, 'v2-relacoes-reais.json')}`, `--raiz-pecas=${PECAS}`]);
+    const semRaiz = correr([`--arquivo=${join(MONTAGENS, 'v3-separacao-direcional.json')}`, `--raiz-pecas=${PECAS}`]);
     expect(semRaiz).toMatchObject({ codigo: 1, stdout: '' });
     expect(JSON.parse(semRaiz.stderr.replace(/^descrever-montagem-persistida: /, '')).erro).toMatchObject({ codigo: 'opcao-obrigatoria' });
 

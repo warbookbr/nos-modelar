@@ -5,10 +5,10 @@ import { iniciar } from '../../src/bancada/main.js';
 import { hierarquia, portas, semPortas, visual } from './fixtures/catalogo-visual.js';
 
 const catalogo = [
-  { id: 'freio-disco', carregar: async () => visual },
-  { id: '_freio-hierarquia', carregar: async () => hierarquia },
-  { id: '_jardineira', carregar: async () => portas },
-  { id: '_vao-e-anteparo', carregar: async () => semPortas },
+  { id: 'fixture-visual', carregar: async () => visual },
+  { id: 'fixture-hierarquia', carregar: async () => hierarquia },
+  { id: 'fixture-portas', carregar: async () => portas },
+  { id: 'fixture-sem-portas', carregar: async () => semPortas },
 ];
 
 iniciar({ catalogo }).catch((erro) => {

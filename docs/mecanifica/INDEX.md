@@ -195,11 +195,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 npm test
 npm run typecheck
 npm run build
-npm run criar -- _viga
-npm run peca -- freio-disco
 npm run porteiro
 npm run exportar:check
-npm run gabarito:selecao:check
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 
@@ -210,8 +207,7 @@ npm test
 npm run typecheck
 npm run build
 npm run porteiro
-npm run gabarito:selecao:check
-npm run id-cru:check
+npm run bancada:vazia:check
 npm run guarda:portas
 npm run guarda:camera
 npm run guarda:par
@@ -220,7 +216,7 @@ npm run docs:toc:check
 npm run docs:links:check
 npm run planos:check
 npm run exportar:check
-npm run criar -- _viga
+npm run mcp:check
 ```
 
 ## Pendências atuais

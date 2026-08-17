@@ -45,7 +45,7 @@ const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
    ninguém lê e faria o gate reprovar por peça que o cliente nunca vê.
    Quem precisar de uma peça nova no produto acrescenta o nome aqui, e o gate
    passa a cobrar essa também. */
-export const PUBLICADAS = ['freio-disco', 'roda-dianteira'];
+export const PUBLICADAS = [];
 
 export const DESTINO = join(REPO, 'pecas-resolvidas');
 export const arquivoDaPeca = (nome, destino = DESTINO) => join(destino, `${nome}.json`);
@@ -137,14 +137,15 @@ function portasParaArtefato(portas) {
   return [...portas.values()].map((porta) => JSON.parse(JSON.stringify(porta)));
 }
 
-export async function exportarPeca(nome, { paramsExtra = null } = {}) {
+export async function exportarPeca(nome, { paramsExtra = null, modulo = null } = {}) {
   const caminho = join(PECAS, `${nome}.js`);
-  /* referência inválida falha com diagnóstico; nunca vira no-op silencioso. */
-  if (!existsSync(caminho)) {
+  /* A fronteira de disco é opcional: produção usa nome explícito do acervo;
+     testes e hosts podem fornecer uma receita já carregada. */
+  if (modulo === null && !existsSync(caminho)) {
     throw new Error(`exportar-peca: a peça '${nome}' não existe em ${PECAS}`);
   }
 
-  const mod = await import(pathToFileURL(caminho).href);
+  const mod = modulo ?? await import(pathToFileURL(caminho).href);
   if (!Array.isArray(mod.PASSOS)) {
     throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS; não é peça procedural`);
   }

@@ -83,7 +83,7 @@ export async function descreverPecaReutilizavel({
   if (!peca) {
     return erroDeUso(
       'diga qual peça medir, pelo nome do arquivo em prototipos/procedural/v3/pecas/.'
-      + '\n  ex.: npm run descrever -- freio-disco   (use --listar para ver todas)',
+      + '\n  ex.: npm run descrever -- <id-da-peca>   (use --listar para ver todas)',
     );
   }
   if (!moduloFornecido && !DISPONIVEIS.includes(peca)) {

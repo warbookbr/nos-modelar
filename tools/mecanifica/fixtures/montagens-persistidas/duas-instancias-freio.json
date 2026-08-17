@@ -1,11 +1,11 @@
 {
   "formato": "mecanifica.montagem",
   "versao": 1,
-  "id": "duas-instancias-freio",
+  "id": "duas-instancias-bloco",
   "instancias": [
     {
       "id": "freio-esquerdo",
-      "alvo": { "tipo": "peca", "ref": "freio-disco" },
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
       "pose": {
         "rotacao": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
         "deslocamento": [0, 0, 0]
@@ -13,7 +13,7 @@
     },
     {
       "id": "freio-direito",
-      "alvo": { "tipo": "peca", "ref": "freio-disco" },
+      "alvo": { "tipo": "peca", "ref": "bloco-gabarito" },
       "pose": {
         "rotacao": [[0, -1, 0], [1, 0, 0], [0, 0, 1]],
         "deslocamento": [1, 2, 0]

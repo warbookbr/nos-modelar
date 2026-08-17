@@ -286,19 +286,6 @@ describe('núcleo -> adaptador (fronteira) e colisão', () => {
   });
 });
 
-describe('peça-exemplo shipável', () => {
-  it('_oficina-toco monta sem órfãos e declara colisão sã', async () => {
-    const tocoUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-toco.js', import.meta.url);
-    const toco: any = await import(fileURLToPath(tocoUrl));
-    const n = nucleo(toco.PASSOS, toco.PARAMS, toco.TOPO);
-    expect(n.orfaos).toHaveLength(0);
-    expect(toco.meta.colisao.forma).toBe('cilindro');
-    // raio ENCAIXADO na malha final: maior que troncoR porque a extrusão do galho alargou a malha
-    expect(toco.meta.colisao.raio).toBeGreaterThan(toco.PARAMS.troncoR);
-    expect(toco.meta.colisao.altura).toBeCloseTo(toco.PARAMS.troncoH, 4);
-  });
-});
-
 describe('regressões do revisor adversarial (D1/D2/D3)', () => {
   // Newell inline (a do núcleo não é exportada) — testa a DIREÇÃO da normal, o que pegaria o D1
   const newellY = (V: any, vs: number[]) => {
@@ -427,25 +414,6 @@ describe('passo 11b — pincel macio (motor: op livre + rasterização)', () => 
     for (const f of neutro.F.values()) if (f.id !== 0) expect(f.tinta).toHaveLength(0);   // ninguém mais pintado
   });
 
-  it("4) compat 'face': o toco (só-'face') canoniza SEM tinta (linha F de 6) e a textura é BYTE-idêntica ao 11a", async () => {
-    const toco: any = await import(fileURLToPath(new URL('../../prototipos/procedural/v3/pecas/_oficina-toco.js', import.meta.url)));
-    const neutro = nucleo(toco.PASSOS, toco.PARAMS, toco.TOPO);
-    for (const row of neutroCanonico(neutro).F) expect((row as any[]).length).toBe(6);   // nenhuma face ganha 7º elemento -> byte-igual ao de antes
-    // a textura INTEIRA reproduz a fórmula do 11a (base chapada por célula) — sem dab, zero diferença
-    const { ctx, texel } = ctxTex();
-    const r: any = adaptarV3(neutro, ctx);
-    const faces = [...neutro.F.values()].sort((a: any, b: any) => a.id - b.id);
-    const corIlha = faces.map((f: any) => hx(f.cor ?? '#9a8f80'));
-    const { cols, tile, W, H } = r.atlas;
-    let dif = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = ((y / tile) | 0) * cols + ((x / tile) | 0);
-      const esp = i < corIlha.length ? corIlha[i] : BASE;   // exatamente o que o 11a produzia
-      const got = texel(x, y);
-      if (got[0] !== esp[0] || got[1] !== esp[1] || got[2] !== esp[2]) dif++;
-    }
-    expect(dif).toBe(0);
-  });
 
   it('5) raio e dureza têm efeito MEDÍVEL: raio maior tinge mais texels; dureza maior encurta a transição', () => {
     const dab = (raio: number, dureza: number) => nucleo([cubo, ['pincel', { modo: 'livre', cor: '#ff0000', raio, dureza, pontos: [{ f: 0, a: 0.5, b: 0.5 }] }]], {}, {});
@@ -620,17 +588,6 @@ describe('passo 12b — mistura transparente', () => {
     expect(semTransp.lotes.some((L: any) => L.transparente)).toBe(false);             // material opaco: nenhum lote transparente
   });
 
-  it('5) peça-exemplo _oficina-transp: sem órfãos, 1 lote transparente (opacidade 0.42), núcleo opaco', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-transp.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS);
-    expect(n.orfaos).toHaveLength(0);
-    const r: any = adaptarV3(n, fakeCtx, peca.MATERIAIS);
-    const transp = r.lotes.filter((L: any) => L.transparente);
-    expect(transp).toHaveLength(1);
-    expect(transp[0].opacidade).toBeCloseTo(0.42, 6);
-    expect(r.lotes.some((L: any) => L.emissivo && !L.transparente)).toBe(true);       // núcleo aceso é OPACO
-  });
 });
 
 /* PASSO 13a — ANIMAÇÃO RÍGIDA POR PARTE (motor headless; a prova de MOVIMENTO na tela
@@ -778,21 +735,6 @@ describe('passo 13a — animação rígida por parte', () => {
     expect(aplica(lotesR[0].matriz, [1, 0, 0])).toEqual([1, 0, 0]);
   });
 
-  it('7) peça-exemplo _oficina-anim: sem órfãos, 2 partes (roda centroide, braco pivô explícito), animar presente', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-anim.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS);
-    expect(n.orfaos).toHaveLength(0);
-    expect(n.partes.roda.pivo).toBe(null);                       // roda SEM pivo -> centroide no adaptador
-    expect(n.partes.braco.pivo).toEqual([peca.PARAMS.bracoX, 0, 0]);   // braco COM pivo explícito na base
-    const r: any = adaptarV3(n, fakeCtx, peca.MATERIAIS);
-    expect(r.lotes.map((L: any) => L.parte)).toEqual(['roda', 'roda', 'braco']);   // infoPorLote paralelo
-    expect(r.partes.braco.pivo).toEqual([peca.PARAMS.bracoX, 0, 0]);
-    expect(r.partes.roda.pivo[0]).toBeGreaterThan(0);             // centroide puxado pro dente (+x): prova o default
-    const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx, peca.MATERIAIS, peca.ANIMACOES);
-    expect(typeof obj.animar).toBe('function');
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-  });
 });
 
 /* PASSO 14a — ESQUELETO com DEFORMAÇÃO SUAVE (linear blend skinning; motor headless — a
@@ -958,25 +900,6 @@ describe('passo 14a — esqueleto com deformação suave', () => {
     expect(semEsq.lotes[0].mesh.v.length % 8).toBe(0);
   });
 
-  it('8) peça-exemplo _oficina-esqueleto: sem órfãos, 3 ossos encadeados, 16 vértices pesados, todos os lotes skinados, animar presente', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-esqueleto.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS, peca.ESQUELETO);
-    expect(n.orfaos).toHaveLength(0);
-    expect(n.esqueleto.ossos.map((o: any) => o.nome)).toEqual(['b0', 'b1', 'b2']);
-    expect(n.esqueleto.ossos[1].pai).toBe('b0');
-    expect(n.esqueleto.ossos[2].pai).toBe('b1');                       // cadeia b0<-b1<-b2
-    expect(n.pesos.size).toBe(16);                                     // 4 anéis × 4 cantos
-    const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx, peca.MATERIAIS, peca.ANIMACOES, peca.ESQUELETO);
-    expect(obj.lotes.every((L: any) => L.esqueleto)).toBe(true);       // peça skinada -> TODO lote é skinado
-    expect(obj.lotes.every((L: any) => L.mesh.v.length % 16 === 0)).toBe(true);
-    expect(typeof obj.animar).toBe('function');
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-    // anima de verdade: T=0 (bind) != T=1.5 (pico) nas matrizes de osso
-    const rodar = (T: number) => { const L = obj.lotes.map((l: any) => ({ matriz: l.matriz, ossos: new Float32Array(l.ossos) })); obj.animar(T, L); return J(Array.from(L[0].ossos)); };
-    expect(rodar(0)).not.toBe(rodar(1.5));
-    expect(rodar(1.5)).toBe(rodar(1.5));                               // determinístico
-  });
 });
 
 /* P1 do PLAYGROUND — PRIMITIVAS esfera/cone/plano (só o NÚCLEO; interface é onda
@@ -1149,23 +1072,6 @@ describe('P1 — primitivas esfera/cone/plano', () => {
     expect(r.lotes[0].mesh.v.length).toBe(146 * 3 * 8);               // 3504 floats (8/vértice, sem esqueleto)
   });
 
-  it('peça-exemplo _primitivas: sem órfãos, contagens certas, colisão = o chão (raio meia-diagonal, altura 0)', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_primitivas.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
-    expect(n.orfaos).toHaveLength(0);
-    expect(n.V.size).toBe(25 + 52 + 9);                 // plano seg4 + esfera 6×10 + cone 8
-    expect(n.F.size).toBe(16 + 60 + 9);
-    // o cone foi DESLOCADO por moveV usando a numeração documentada: ápice em x=1.0
-    expect(n.V.get(2008)).toEqual([1, peca.PARAMS.coneAlt, 0]);
-    // colisão calculada nas faces solido (o chão): meia-diagonal do plano, altura 0
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-    expect(peca.meta.colisao.raio).toBeCloseTo(Math.hypot(peca.PARAMS.chaoL / 2, peca.PARAMS.chaoP / 2), 6);
-    expect(peca.meta.colisao.altura).toBeCloseTo(0, 9);
-    const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx);
-    expect(obj.lotes).toHaveLength(1);
-    expect(obj.lotes[0].mesh.v.length % 8).toBe(0);
-  });
 });
 
 /* P2 do playground — `lathe` (perfil `[[raio,y],...]` girado em torno do eixo Y).
@@ -1420,50 +1326,6 @@ describe('P2 — lathe (perfil de revolução)', () => {
     expect(r.lotes[0].mesh.v.length).toBe(24 * 3 * 8);   // 24 triângulos × 3 vértices × 8 floats
   });
 
-  it('peça-exemplo _torno (peão de xadrez): sem órfãos, V/F exatos, watertight+winding por MANIFOLD (toda aresta a→b pareada com b→a 1×)', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_torno.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
-    expect(orfaos).toHaveLength(0);
-    // 10 pontos (2 polos + 8 anéis) × lados=12: V=2+8·12=98; 9 segmentos não-degenerados: F=9·12=108
-    expect(V.size).toBe(2 + 8 * peca.TOPO.lados);
-    expect(F.size).toBe(9 * peca.TOPO.lados);
-    expect(V.size).toBe(98);
-    expect(F.size).toBe(108);
-
-    // MANIFOLD: toda aresta DIRIGIDA a->b (cada canto de cada face) tem exatamente 1 par reverso b->a.
-    // Prova watertight (nenhuma aresta desemparelhada = nenhum buraco) E winding CONSISTENTE (nenhuma
-    // aresta duplicada no MESMO sentido = nenhuma face virada ao contrário da vizinha) — o mesmo método
-    // que o revisor adversarial usou no P1 (D-114) pra esfera/cone.
-    const dirigidas = new Map<string, number>();
-    let cantos = 0;
-    for (const f of F.values()) {
-      const vs = f.vs; cantos += vs.length;
-      for (let k = 0; k < vs.length; k++) {
-        const key = `${vs[k]}>${vs[(k + 1) % vs.length]}`;
-        dirigidas.set(key, (dirigidas.get(key) || 0) + 1);
-      }
-    }
-    expect(dirigidas.size).toBe(cantos);          // nenhuma aresta dirigida duplicada (não-manifold local)
-    let semPar = 0;
-    for (const key of dirigidas.keys()) {
-      const [a, b] = key.split('>');
-      if (!dirigidas.has(`${b}>${a}`)) semPar++;
-    }
-    expect(semPar).toBe(0);                        // nenhuma aresta sem par reverso -> ESTANQUE (watertight)
-
-    // semente de ORIENTAÇÃO: o leque da base (F0, achatado em y=0) aponta pra -y — como a tampa de
-    // baixo do cilindro (D1). Manifold consistente + esta semente pra fora => TODA face aponta pra fora.
-    expect(newell(V, F.get(0)!.vs)[1]).toBeLessThan(0);
-
-    // colisão sã (encaixa o peão inteiro via `solido`) e executar/adaptarV3 saem limpos
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-    expect(peca.meta.colisao.raio).toBeCloseTo(peca.PARAMS.pesR, 6);
-    expect(peca.meta.colisao.altura).toBeCloseTo(peca.PARAMS.topoY, 6);
-    const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx);
-    expect(obj.lotes).toHaveLength(1);
-    expect(obj.lotes[0].mesh.v.length % 8).toBe(0);
-  });
 });
 
 /* P3 do playground — `rotaciona` (gira uma seleção, SIMPLES: NUNCA cria id) +
@@ -1676,50 +1538,6 @@ describe('P3 — espelha + rotaciona (seleção transformada)', () => {
       expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 31 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).toThrow(/estoura o bloco/);
     });
 
-    it('peça-exemplo _espelhado (cabeça + par de chifres): sem órfãos, V/F exatos, MANIFOLD (costura soldada -> watertight)', async () => {
-      const pUrl = new URL('../../prototipos/procedural/v3/pecas/_espelhado.js', import.meta.url);
-      const peca: any = await import(fileURLToPath(pUrl));
-      const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
-      expect(orfaos).toHaveLength(0);
-      // esfera (6 aneis×10 lados: 52V/60F) + chifre original (5V: 4 base+1 ponta / 4F) + espelho (1V nova: só a ponta / 4F)
-      expect(V.size).toBe(52 + 5 + 1);
-      expect(F.size).toBe(60 + 4 + 4);
-      expect(V.size).toBe(58);
-      expect(F.size).toBe(68);
-
-      // a base do chifre soldou: os 4 cantos (1000..1003) são COMPARTILHADOS pelas 8 faces-triângulo
-      // dos dois lados (nenhum id novo pra base — só a ponta duplicou)
-      const usamBase = [...F.values()].filter((f: any) => f.vs.some((v: number) => v >= 1000 && v < 1004));
-      expect(usamBase.length).toBe(8);
-
-      // NUMERAÇÃO travada por MEDIÇÃO (formato salvo — D1 do revisor): o `espelha` é o passo 15,
-      // então baseDoPasso(15)=15000; a ponta espelhada (único vértice fora do plano) é 15000,
-      // e as 4 faces novas são 15000..15003. (Antes o comentário da peça dizia 10000, sem teste travando.)
-      expect([...V.keys()].filter((k: number) => k >= 15000 && k < 16000)).toEqual([15000]);
-      expect([...F.keys()].filter((k: number) => k >= 15000 && k < 16000).sort((a: number, b: number) => a - b)).toEqual([15000, 15001, 15002, 15003]);
-
-      // MANIFOLD: toda aresta dirigida a->b pareada com b->a exatamente 1× (mesmo método do P1/P2)
-      const dirigidas = new Map<string, number>();
-      let cantos = 0;
-      for (const f of F.values()) {
-        const vs = f.vs; cantos += vs.length;
-        for (let k = 0; k < vs.length; k++) {
-          const key = `${vs[k]}>${vs[(k + 1) % vs.length]}`;
-          dirigidas.set(key, (dirigidas.get(key) || 0) + 1);
-        }
-      }
-      expect(dirigidas.size).toBe(cantos);          // nenhuma aresta dirigida duplicada
-      let semPar = 0;
-      for (const key of dirigidas.keys()) { const [a, b] = key.split('>'); if (!dirigidas.has(`${b}>${a}`)) semPar++; }
-      expect(semPar).toBe(0);                        // watertight — a costura soldou de verdade, sem furo
-
-      // colisão sã e executar/adaptarV3 saem limpos
-      expect(peca.meta.colisao.forma).toBe('cilindro');
-      expect(peca.meta.colisao.raio).toBeCloseTo(peca.PARAMS.cabecaRaio, 6);
-      const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx);
-      expect(obj.lotes.length).toBeGreaterThan(0);
-      expect(obj.lotes[0].mesh.v.length % 8).toBe(0);
-    });
   });
 });
 
@@ -2084,54 +1902,6 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
     expect(() => nucleo([['loft', { id: 0, lados: 8, secoes: alternado(127) }]], {}, {})).toThrow(/estoura o bloco/);
   });
 
-  it('peça-exemplo _galho (galho curvo, afinando, fechado nas duas pontas): sem órfãos, V/F exatos, MANIFOLD (watertight+winding consistente) e volume assinado > 0', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_galho.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
-    expect(orfaos).toHaveLength(0);
-    // 7 seções (2 polos + 5 anéis) × lados=10: V=2+5·10=52; 6 segmentos não-degenerados: F=6·10=60
-    expect(V.size).toBe(2 + 5 * peca.TOPO.lados);
-    expect(F.size).toBe(6 * peca.TOPO.lados);
-    expect(V.size).toBe(52);
-    expect(F.size).toBe(60);
-
-    // MANIFOLD: toda aresta DIRIGIDA a->b (cada canto de cada face) tem exatamente 1 par reverso b->a.
-    // Prova watertight (nenhuma aresta desemparelhada = nenhum buraco — as duas pontas fecharam de
-    // verdade) E winding CONSISTENTE (nenhuma aresta duplicada no MESMO sentido) — o mesmo método do
-    // revisor adversarial no P1/P2/P3.
-    const dirigidas = new Map<string, number>();
-    let cantos = 0;
-    for (const f of F.values()) {
-      const vs = f.vs; cantos += vs.length;
-      for (let k = 0; k < vs.length; k++) {
-        const key = `${vs[k]}>${vs[(k + 1) % vs.length]}`;
-        dirigidas.set(key, (dirigidas.get(key) || 0) + 1);
-      }
-    }
-    expect(dirigidas.size).toBe(cantos);          // nenhuma aresta dirigida duplicada (não-manifold local)
-    let semPar = 0;
-    for (const key of dirigidas.keys()) { const [a, b] = key.split('>'); if (!dirigidas.has(`${b}>${a}`)) semPar++; }
-    expect(semPar).toBe(0);                        // nenhuma aresta sem par reverso -> ESTANQUE (watertight)
-
-    // volume assinado > 0 (soma de tetraedros a partir da origem, leque de cada face): nenhuma face invertida
-    let vol = 0;
-    for (const f of F.values()) {
-      const vs = f.vs, p0 = V.get(vs[0])!;
-      for (let k = 1; k < vs.length - 1; k++) {
-        const p1 = V.get(vs[k])!, p2 = V.get(vs[k + 1])!;
-        vol += (p0[0] * (p1[1] * p2[2] - p1[2] * p2[1]) - p0[1] * (p1[0] * p2[2] - p1[2] * p2[0]) + p0[2] * (p1[0] * p2[1] - p1[1] * p2[0])) / 6;
-      }
-    }
-    expect(vol).toBeGreaterThan(0);
-
-    // colisão sã (encaixa o galho inteiro via `solido`) e executar/adaptarV3 saem limpos
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-    expect(peca.meta.colisao.raio).toBeGreaterThan(0);
-    expect(peca.meta.colisao.altura).toBeCloseTo(peca.PARAMS.pontaY, 6);   // base(y=0) -> ponta(y=pontaY), medido: o caminho é monótono em Y
-    const obj: any = executar(peca.PASSOS, peca.PARAMS, peca.TOPO, fakeCtx);
-    expect(obj.lotes).toHaveLength(1);
-    expect(obj.lotes[0].mesh.v.length % 8).toBe(0);
-  });
 });
 
 /* ---------------------------------------------------------------------------
@@ -2678,23 +2448,6 @@ describe('D-129 — seleção semântica uniforme (atributos + espelha)', () => 
     expect(n.V.size).toBe(8); expect(n.F.size).toBe(5);  // espelho não chegou a alocar nada
   });
 
-  it('medição na moto: os 32 ids de farol/lanterna viram duas regiões sem mudar a forma canônica', async () => {
-    const url = new URL('../../prototipos/procedural/v3/pecas/moto.js', import.meta.url);
-    const moto: any = await import(fileURLToPath(url));
-    const regioes: any = {
-      farol: { min: [-0.058, 0.9499099168006007, 0.8691819833601201], max: [0.058, 1.0580900831993993, 0.914] },
-      lanterna: { min: [-0.078, 0.9520002755842918, -1.19], max: [0.078, 1.0299997244157082, -1.1298533865667473] },
-    };
-    const derivados = moto.PASSOS.map((p: any) => p[0] === 'material' && regioes[p[1].usa]
-      ? ['material', { sel: { regiao: regioes[p[1].usa] }, usa: p[1].usa }]
-      : p);
-    const original = nucleo(moto.PASSOS, moto.PARAMS, moto.TOPO, moto.MATERIAIS);
-    const semantica = nucleo(derivados, moto.PARAMS, moto.TOPO, moto.MATERIAIS);
-    expect(moto.PASSOS.find((p: any) => p[0] === 'material' && p[1].usa === 'farol')[1].faces.length).toBe(20);
-    expect(moto.PASSOS.find((p: any) => p[0] === 'material' && p[1].usa === 'lanterna')[1].faces.length).toBe(12);
-    expect(semantica.orfaos).toHaveLength(0);
-    expect(JSON.stringify(neutroCanonico(semantica))).toBe(JSON.stringify(neutroCanonico(original)));
-  });
 
   /* Rodada B da Fase 3.5: `sel.tudo` é a única forma EXPLÍCITA de "a peça
      inteira" — deliberadamente diferente de `sel` ausente, que continua
@@ -3520,18 +3273,6 @@ describe('P8c — displace (deslocamento por ruído seedado ao longo da normal)'
     }
   });
 
-  it('peça-exemplo _pedra (chamferBox + displace): sem órfãos, V/F exatos (24/26 — displace não cria/apaga), MANIFOLD intacto por cima do relevo, colisão calculada', async () => {
-    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_pedra.js', import.meta.url);
-    const peca: any = await import(fileURLToPath(pUrl));
-    const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
-    expect(n.orfaos).toHaveLength(0);
-    expect(n.V.size).toBe(24);
-    expect(n.F.size).toBe(26);
-    expect(manifoldRuim(n.F)).toBe(0);
-    expect([...n.V.values()].every((p: any) => p.every((c: number) => Number.isFinite(c)))).toBe(true);
-    expect(peca.meta.colisao.forma).toBe('cilindro');
-    expect(peca.meta.colisao.raio).toBeGreaterThan(0);
-  });
 });
 
 /* D-128 — `transladar` (soma um deslocamento a uma seleção). O IRMÃO do
@@ -5788,57 +5529,6 @@ describe('ciclo 5 — a curva é medida na SUPERFÍCIE, não só nos vértices',
       const previsto = 1 - Math.cos((Math.PI / 2) / (2 * seg));
       expect(desvioDaSuperficie(seg)).toBeCloseTo(previsto, 9);
     }
-  });
-});
-
-/* A mesma medição na peça de PRODUTO: o ombro do pneu da `roda-dianteira` usa
-   `segmentosCurva: 3` num giro de 45°, que é metade do canto reto acima — a
-   flecha cai junto e cabe em 1% com três segmentos em vez de oito. Isto é o que
-   justifica o custo escolhido na peça, e é medido, não estimado. */
-describe('ciclo 5 — o ombro do pneu cabe em 1% com a discretização que a peça pediu', () => {
-  it('o arco do ombro tem 4 pontos e desvio de superfície abaixo de 1% do raio', async () => {
-    // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-    const P: any = await import('../../prototipos/procedural/v3/pecas/roda-dianteira.js');
-    const n = nucleo(P.PASSOS, P.PARAMS, P.TOPO, P.MATERIAIS, null, P.ALIASES);
-    expect(n.orfaos).toHaveLength(0);
-    const raio = P.PARAMS.pneuOmbroConcordancia;
-    /* o pneu é girado para o eixo X: o "raio" do perfil é a distância ao eixo X
-       e o "y" do perfil é a coordenada X. O ombro de −X fica no canto entre o
-       flanco e a banda de rodagem. */
-    const aneis = new Map<string, number[]>();
-    for (const [, p] of n.V) {
-      const r = Math.hypot(p[1], p[2]);
-      aneis.set(`${r.toFixed(9)},${p[0].toFixed(9)}`, [r, p[0]]);
-    }
-    /* centro analítico do arco, reconstruído das MEDIDAS da peça, não do neutro. */
-    const B = [P.PARAMS.pneuRaioOmbro, -P.PARAMS.pneuMeiaLargura];
-    const A = [P.PARAMS.pneuRaioInterno, -P.PARAMS.pneuMeiaLargura];
-    const C = [P.PARAMS.pneuRaioExterno, -P.PARAMS.pneuCoroaMeiaLargura];
-    const unit = (p: number[]) => {
-      const d = [p[0] - B[0], p[1] - B[1]], l = Math.hypot(d[0], d[1]);
-      return [d[0] / l, d[1] / l];
-    };
-    const u1 = unit(A), u2 = unit(C);
-    const theta = Math.acos(Math.max(-1, Math.min(1, u1[0] * u2[0] + u1[1] * u2[1])));
-    const bl = Math.hypot(u1[0] + u2[0], u1[1] + u2[1]);
-    const centro = [
-      B[0] + ((u1[0] + u2[0]) / bl) * (raio / Math.sin(theta / 2)),
-      B[1] + ((u1[1] + u2[1]) / bl) * (raio / Math.sin(theta / 2)),
-    ];
-    const noArco = [...aneis.values()]
-      .filter(([r, x]) => Math.abs(Math.hypot(r - centro[0], x - centro[1]) - raio) < 1e-9)
-      .sort((a, b) => a[1] - b[1]);
-    expect(noArco.length, 'o ombro do pneu perdeu o arco').toBe(P.TOPO.pneuOmbroSegmentos + 1);
-
-    let pior = 0;
-    for (let k = 0; k + 1 < noArco.length; k++) {
-      const meio = [(noArco[k][0] + noArco[k + 1][0]) / 2, (noArco[k][1] + noArco[k + 1][1]) / 2];
-      pior = Math.max(pior, Math.abs(Math.hypot(meio[0] - centro[0], meio[1] - centro[1]) - raio));
-    }
-    expect(pior / raio).toBeLessThan(0.01);
-    /* e o giro é mesmo de 45°: se alguém mudar o perfil e o canto virar reto,
-       três segmentos deixam de bastar e este teste cai junto. */
-    expect((Math.PI - theta) * 180 / Math.PI).toBeCloseTo(45, 6);
   });
 });
 
