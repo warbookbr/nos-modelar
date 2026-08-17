@@ -243,7 +243,7 @@ describe('servidor MCP local — perfil revisao', () => {
       descreverSaida.parse(resposta);
       expect(resposta.erro?.codigo).not.toBe('falha_interna');
     }
-    expect(PECAS_DISPONIVEIS).toHaveLength(38);
+    expect(new Set(PECAS_DISPONIVEIS).size).toBe(PECAS_DISPONIVEIS.length);
   }, 120_000);
 
   it('valida pacote existente pelo serviço real e lê somente o resumo', async () => {

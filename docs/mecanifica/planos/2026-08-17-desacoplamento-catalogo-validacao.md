@@ -1,6 +1,6 @@
 # Independência entre núcleo, validação e catálogo
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável pela execução:** a definir
 

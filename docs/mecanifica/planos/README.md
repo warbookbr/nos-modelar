@@ -2,9 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
-
-**Plano pronto para execução:**
+**Plano ativo:**
 [`2026-08-17-desacoplamento-catalogo-validacao.md`](2026-08-17-desacoplamento-catalogo-validacao.md).
 
 Ele separa núcleo, validadores, fixtures e catálogo homologado para permitir um
