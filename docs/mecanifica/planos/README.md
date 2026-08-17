@@ -195,8 +195,9 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
-foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
-agente. A continuidade dessas revisões no catálogo foi concluída e aprovada;
-o mapa canônico é agora o plano ativo e os demais candidatos permanecem no
-[`BACKLOG.md`](BACKLOG.md).
+**Nenhuma.** O mapa canônico, que esta seção já chamou de plano ativo, foi
+concluído com decisão `aprovar`, e nenhum plano ocupou o lugar dele — o estado
+no topo desta página é a fonte, e esta seção existe para não contradizê-lo.
+
+Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md), que também registra
+quais foram medidos e recusados, e o que uma reabertura exige.
