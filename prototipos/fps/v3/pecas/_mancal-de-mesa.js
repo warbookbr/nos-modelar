@@ -1,3 +1,16 @@
+/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+ *
+ * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
+ * engenharia, componente aprovado ou ponto de partida de produto.
+ *
+ * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+ * falhar, não para descrever um componente real. Esta geometria pode mudar ou
+ * ser removida a qualquer momento, sem aviso e sem migração.
+ *
+ * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
+ * a geometria daqui. Ver "Peças são exemplos" no README.md.
+ */
 /* _mancal-de-mesa.js — mancal de mesa simplificado para a homologação do
    fluxo de modelagem por IA. A receita fixa X como eixo do conjunto, Y como
    vertical e Z como profundidade. Base, bucha e eixo são partes isoláveis; a

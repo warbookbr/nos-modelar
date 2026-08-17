@@ -1,3 +1,16 @@
+/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+ *
+ * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
+ * engenharia, componente aprovado ou ponto de partida de produto.
+ *
+ * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+ * falhar, não para descrever um componente real. Esta geometria pode mudar ou
+ * ser removida a qualquer momento, sem aviso e sem migração.
+ *
+ * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
+ * a geometria daqui. Ver "Peças são exemplos" no README.md.
+ */
 /* PEÇA-EXEMPLO da OFICINA (passo 14a): ESQUELETO com DEFORMAÇÃO SUAVE (linear blend
    skinning). Uma CORRENTE/tentáculo de 3 segmentos (4 anéis de vértices) que DOBRA
    SUAVE nas juntas — não articula em bloco (isso é o 13a). O esqueleto tem 3 ossos

@@ -1,3 +1,16 @@
+/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+ *
+ * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
+ * engenharia, componente aprovado ou ponto de partida de produto.
+ *
+ * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+ * falhar, não para descrever um componente real. Esta geometria pode mudar ou
+ * ser removida a qualquer momento, sem aviso e sem migração.
+ *
+ * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
+ * a geometria daqui. Ver "Peças são exemplos" no README.md.
+ */
 /* PEÇA MÉDIA DA FASE 4 — drone quadricóptero compacto de inspeção.
    PASSOS é a fonte de verdade: o corpo, a tampa, os quatro braços, os quatro
    rotores, as pás, a câmera e o pouso continuam reexecutáveis e editáveis.
