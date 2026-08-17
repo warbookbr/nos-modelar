@@ -226,7 +226,11 @@ export async function olharBancada({
     await vite.listen();
     garantirPrazo();
     const { port } = vite.httpServer.address();
-    const base = `http://127.0.0.1:${port}/nos-mecanifica/bancada.html`;
+    /* A entrada publicada pode estar legitimamente vazia. A ferramenta de
+       inspeção, porém, precisa de uma peça para provar geometria; por isso usa
+       o harness privado, que injeta um catálogo explícito de fixtures. A URL
+       pública continua sendo reportada como referência de produto. */
+    const base = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html`;
     const basePublicada = 'https://warbookbr.github.io/nos-mecanifica/bancada.html';
     const carregarPlaywright = dependencias.carregarPlaywright
       ?? (async () => (await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href)).default);

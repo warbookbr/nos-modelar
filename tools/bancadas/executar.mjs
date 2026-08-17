@@ -5,18 +5,27 @@
    O replay é o coração de tudo (doc): "quando o arquivo de passos refizer o
    objeto igual, o resto é trabalho conhecido". Também prova, no mesmo neutro,
    que a mescla sumiu com `de` e manteve `para`, e imprime a colisão calculada.
-     node tools/bancadas/executar.mjs                    # peça _tampa-de-caixa
-     node tools/bancadas/executar.mjs _caixote-filetado  # outra peça-objeto */
+     node tools/bancadas/executar.mjs                    # compatibilidade legada
+     node tools/bancadas/executar.mjs --arquivo=tools/mecanifica/fixture.js */
 import { pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const nome = (process.argv.slice(2).find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
+const args = process.argv.slice(2);
+const nome = (args.find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
+const arquivoArg = args.find((a) => a.startsWith('--arquivo='))?.slice('--arquivo='.length);
+const caminho = resolve(REPO, arquivoArg || `prototipos/procedural/v3/pecas/${nome}.js`);
+if (!existsSync(caminho) || !caminho.startsWith(`${REPO}/`)) {
+  console.error(`executar: arquivo de receita não encontrado ou fora do repositório: ${arquivoArg || nome}`);
+  process.exit(2);
+}
 
 const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
-const peca = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/pecas', `${nome}.js`)).href);
+const peca = await import(pathToFileURL(caminho).href);
 /* MATERIAIS, ESQUELETO e ALIASES entram no núcleo junto com o resto do envelope. Ficaram
    de fora daqui até 2026-07-29, e o efeito era um ÓRFÃO FALSO: a op `material`
    procurava o nome em `{}` e gritava "material 'x' não existe em MATERIAIS" em
@@ -29,7 +38,7 @@ const { PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASE
 if (!Array.isArray(PASSOS)) { console.error(`peça ${nome} não exporta PASSOS (é uma peça-objeto da Oficina?)`); process.exit(2); }
 
 /* 1 · executa */
-const n1 = neutroCanonico(nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES));
+const n1 = neutroCanonico(executarReceita(peca).neutro);
 
 /* 2 · serializa os PASSOS (o que o arquivo salva), re-parseia, re-executa */
 const PASSOS2 = JSON.parse(JSON.stringify(PASSOS));
