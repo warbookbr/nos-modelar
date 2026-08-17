@@ -10,9 +10,9 @@ import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
-import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -126,14 +126,7 @@ export async function descreverPecaReutilizavel({
 
   let neutro;
   try {
-    neutro = nucleo(
-      modulo.PASSOS,
-      modulo.PARAMS ?? {},
-      modulo.TOPO ?? {},
-      modulo.MATERIAIS ?? {},
-      modulo.ESQUELETO ?? null,
-      modulo.ALIASES ?? [],
-    );
+    ({ neutro } = executarReceita(modulo));
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }

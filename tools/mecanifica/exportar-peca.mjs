@@ -32,6 +32,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
    para quem já importava deste arquivo continuar funcionando, e para o teste
    de ida-e-volta pegar as duas pontas de uma vez. */
 import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
 export { FORMATO, VERSAO, lerPecaResolvida, parteDaFace };
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -142,28 +144,12 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
     throw new Error(`exportar-peca: a peça '${nome}' não existe em ${PECAS}`);
   }
 
-  const { nucleo, neutroCanonico } = await import(
-    pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href
-  );
   const mod = await import(pathToFileURL(caminho).href);
   if (!Array.isArray(mod.PASSOS)) {
     throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS; não é peça procedural`);
   }
 
-  const PARAMS = paramsExtra ? { ...(mod.PARAMS ?? {}), ...paramsExtra } : (mod.PARAMS ?? {});
-  const entrada = {
-    PASSOS: mod.PASSOS,
-    PARAMS,
-    TOPO: mod.TOPO ?? {},
-    MATERIAIS: mod.MATERIAIS ?? {},
-    ESQUELETO: mod.ESQUELETO ?? null,
-    ALIASES: mod.ALIASES ?? [],
-  };
-
-  const bruto = nucleo(
-    entrada.PASSOS, entrada.PARAMS, entrada.TOPO,
-    entrada.MATERIAIS, entrada.ESQUELETO, entrada.ALIASES,
-  );
+  const { entrada, neutro: bruto } = executarReceita(mod, { paramsExtra });
   conferirSemOrfaos(nome, bruto.orfaos);
   conferirCapacidadesTransportaveis(nome, bruto);
 
