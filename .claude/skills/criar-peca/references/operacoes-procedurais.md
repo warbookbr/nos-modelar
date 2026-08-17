@@ -81,6 +81,25 @@ também: `cubo` não tem eixo para escolher.
 Isto não encosta uma peça na outra nem mede vizinho — não existe `alinhar`
 relacional no núcleo.
 
+## Ponto nomeado
+
+Um nome pode guardar o ponto inteiro, e não só um escalar:
+
+```js
+export const PARAMS = { apoioDaPinca: [0.06, 0.02, 0], paraBaixo: [0, -1, 0] };
+...
+['transladar', { sel: { origem: FLEXIVEL }, d: 'apoioDaPinca' }],
+['arranja',    { …, pivo: 'centroDaRoda' }],
+```
+
+Vale em qualquer campo que aceita ponto — `d`, `pivo`, `em`, `direcao`. Cada
+componente continua aceitando PARAM e expressão. Um ponto nomeado **não** cita
+outro ponto nomeado: componente é escalar.
+
+Prefira isto a `apoioX`/`apoioY`/`apoioZ`: três nomes para um ponto é a mesma
+coisa escrita três vezes, e alterar dois e esquecer o terceiro produz um ponto
+que ninguém escreveu.
+
 ## Encostar em vez de digitar a coordenada
 
 Quando uma peça se apoia na outra, **derive** o contato em vez de calcular o

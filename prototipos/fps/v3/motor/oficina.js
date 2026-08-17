@@ -175,8 +175,10 @@ function lerPoseDeCriacao(st, i, op, a) {
   }
   let d = null;
   if (a.em != null) {
-    if (!Array.isArray(a.em) || a.em.length !== 3) {
-      grita(st, i, op, 'em', `em precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.em)}`);
+    /* aceita ponto nomeado: `em` é um ponto como qualquer outro, e recusar o
+       nome aqui obrigaria a peça a escrever três componentes só neste campo. */
+    if (typeof a.em !== 'string' && (!Array.isArray(a.em) || a.em.length !== 3)) {
+      grita(st, i, op, 'em', `em precisa ser [x,y,z] (3 elementos) ou o nome de um ponto declarado; recebido ${JSON.stringify(a.em)}`);
       return undefined;
     }
     /* Sem conferência de finitude aqui, e isso é escolha: `st.vec` LANÇA em
@@ -3495,7 +3497,7 @@ export const OPS = {
      ficou longe quanto o que passou do ponto. */
   encostar(st, a, i) {
     if (a.direcao == null) return grita(st, i, 'encostar', 'direcao', 'encostar exige direcao:[x,y,z] — para onde empurrar. Inferir a direção é onde nasceria a ambiguidade que faria a peça deixar de ser reexecutável');
-    if (!Array.isArray(a.direcao) || a.direcao.length !== 3) return grita(st, i, 'encostar', 'direcao', `direcao precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a.direcao)}`);
+    if (typeof a.direcao !== 'string' && (!Array.isArray(a.direcao) || a.direcao.length !== 3)) return grita(st, i, 'encostar', 'direcao', `direcao precisa ser [x,y,z] (3 elementos) ou o nome de um ponto declarado; recebido ${JSON.stringify(a.direcao)}`);
     const bruta = st.vec(a.direcao);
     const norma = Math.hypot(bruta[0], bruta[1], bruta[2]);
     if (!(norma > 1e-9)) return grita(st, i, 'encostar', 'direcao', `direcao é o vetor nulo (${JSON.stringify(bruta)}) — não aponta para lado nenhum`);
@@ -5268,8 +5270,33 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      `undefined` -> NaN calado; não-array estourava `a.map is not a function`
      (throw cru, sem diagnóstico). Rede CENTRAL — a op ainda valida por conta
      pra GRITAR dizendo QUAL seção/ponto errou (a lei do lathe, D-115). */
+  /* PONTO NOMEADO (atrito A-8, otimização O-9). Até aqui só se nomeava escalar,
+     e o preço estava medido: 18 dos 61 parâmetros do freio existiam só para
+     nomear 6 pontos do caminho da mangueira — três nomes por ponto, e o ponto
+     em si sem nome nenhum. Não dava para dizer "o apoio da pinça"; dava para
+     dizer "apoioX, apoioY, apoioZ", que é a mesma coisa escrita três vezes e
+     alterável em duas por engano.
+
+     Um nome pode agora guardar o ponto inteiro. O valor nomeado é uma lista de
+     três componentes, e cada componente continua passando por `num` — então
+     PARAM dentro de ponto nomeado, expressão e TOPO seguem valendo, sem regra
+     nova. Um ponto nomeado NÃO pode citar outro ponto nomeado: um nível é o que
+     resolve o atrito, e a recursão traria ciclo para dentro da rede central. */
   const vec = (a) => {
-    if (!Array.isArray(a) || a.length !== 3) throw new Error(`oficina: ponto precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(a)}`);
+    if (typeof a === 'string') {
+      if (!Object.hasOwn(dict, a)) {
+        throw new Error(`oficina: ponto '${a}' não está em PARAMS nem em TOPO; um ponto nomeado precisa existir no dicionário da peça`);
+      }
+      const valor = dict[a];
+      if (!Array.isArray(valor) || valor.length !== 3) {
+        throw new Error(`oficina: '${a}' foi citado como ponto, mas guarda ${JSON.stringify(valor)}; ponto nomeado guarda [x,y,z] (3 componentes)`);
+      }
+      if (valor.some((c) => typeof c === 'string' && Object.hasOwn(dict, c) && Array.isArray(dict[c]))) {
+        throw new Error(`oficina: o ponto nomeado '${a}' cita outro ponto nomeado como componente; um componente é escalar (número, nome de escalar ou expressão)`);
+      }
+      return valor.map(num);
+    }
+    if (!Array.isArray(a) || a.length !== 3) throw new Error(`oficina: ponto precisa ser [x,y,z] (3 elementos) ou o nome de um ponto declarado; recebido ${JSON.stringify(a)}`);
     return a.map(num);
   };
   /* materiais: o dicionário POR NOME (a peça declara em MATERIAIS) que a op

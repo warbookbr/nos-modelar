@@ -11,8 +11,8 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-4 | resolvido; geradores aceitam `em` e `eixo` na criação |
 | A-5 | resolvido; expressões nomeadas existem |
 | A-6 | resolvido no caso comum; `encostar` deriva contato na direção declarada |
-| A-7 | aberto; alias de conjuntos ainda exige decisão |
-| A-8 | aberto; ponto nomeável ainda não é contrato geral |
+| A-7 | resolvido no diagnóstico; o alias diz quando fica completo e o que falta |
+| A-8 | resolvido; um nome guarda o ponto inteiro |
 | A-9 | resolvido; origens estruturais nos geradores provados |
 | A-10 | resolvido; portas semânticas publicadas |
 | A-11 | resolvido parcialmente; hierarquia mínima e subárvore existem |
@@ -33,10 +33,10 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-26 | resolvido; `furo.centros` suporta grupos circulares |
 | A-27 | resolvido; `furo` subtrai e registra consumo |
 | A-28 | resolvido; origem do arranjo alcança faces pertinentes |
-| A-29 | aberto; centro geral do arranjo radial ainda não é nomeável |
+| A-29 | resolvido junto com A-8; `pivo` aceita ponto nomeado |
 | A-30 | resolvido; grupos de furos admitem raios distintos |
 | A-31 | resolvido; `liso` chega ao renderizador |
-| A-32 | aberto; freio ainda não tem cubo-piloto |
+| A-32 | retirado; é geometria de peça de exemplo, não capacidade da oficina |
 | A-33 | resolvido; partição tolera borda de furo provada |
 | A-34 | resolvido; contagem por desvio existe |
 | A-35 | resolvido; segmentos são declarados por passo |
