@@ -157,7 +157,7 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
   const COLECAO_DE_ID = ['faces', 'vs', 'pontos', 'de'];      // cobertas pelo gate
   const SINGULAR_DE_ID = ['face', 'v', 'a', 'b', 'para'];      // fora de escopo, DECLARADO no cabeçalho
   const NAO_E_ID = [
-    'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
+    'alt', 'altura', 'amplitude', 'aneis', 'aresta', 'ate', 'centro', 'centros', 'chanfro', 'contornoLado', 'contornoTopo', 'cor', 'd',
     'derivaDe', 'dist', 'divisoes', 'dureza', 'eixo', 'frequencia', 'graus', 'id', 'lado', 'lados', 'larg',
     'largura', 'modo', 'nome', 'orientacao', 'origemId', 'osso', 'pai', 'paineis', 'perfil', 'peso', 'pivo', 'pos', 'prof',
     'profundidade', 'raio', 'rotulo', 'saida', 'secoes', 'seg', 'segmentosCurva', 'semente', 'substituir', 'total', 'usa', 'volta', 'interface',
@@ -167,6 +167,9 @@ describe('inventário do núcleo — nenhuma chave de argumento fica sem classif
      (cilindro) já é; nunca aponta pra um id de vértice ou de face.
      `paineis` é TOPO do arredondamento: conta a discretização do arco, nunca
      um id de face (cada face criada recebe a identidade `painel:k`).
+     `ate` (op `furo`) é o SEGUNDO centro de um rasgo e entra aqui pela mesma
+     razão do `centro`: ponto do mundo, dimensional, projetado no plano da
+     entrada; nunca id de face ou de vértice.
      `centros` (op `furo`, vários furos num passo) entra aqui pela mesma razão
      do `centro`: os dois carregam PONTO DO MUNDO, dimensional, nunca id. A
      forma de lista é `[[x,y,z], …]` e a de círculo é `{pivo, distancia, total,

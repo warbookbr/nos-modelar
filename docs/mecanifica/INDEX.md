@@ -210,7 +210,6 @@ npm run criar -- _viga
 - Iniciar e executar o Caso 3 da homologação.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
-- Expressar abertura oblonga sem simulação visual.
 - Criar contrato genérico de materiais.
 - Fechar as capacidades ainda abertas comprovadas em A-4, A-6, A-7, A-8, A-16
   e A-29.
@@ -265,6 +264,8 @@ Planejamento: [planos/README](planos/README.md),
 [MCP — leitura e auditoria de montagens](planos/2026-08-14-mcp-montagens-leitura.md)
 (`docs/mecanifica/planos/2026-08-14-mcp-montagens-leitura.md`),
 [materialização e autoria segura de montagens](planos/2026-08-14-materializacao-autoria-segura.md),
+[abertura oblonga](planos/2026-08-17-abertura-oblonga.md)
+(`docs/mecanifica/planos/2026-08-17-abertura-oblonga.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

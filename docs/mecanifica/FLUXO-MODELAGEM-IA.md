@@ -62,8 +62,9 @@ Não crie `revisao.json` ou imagens manualmente para simular promoção.
 - O modelo deve passar sem órfãos, faces sem identidade, corpos inesperados,
   envelope excedido, orçamento excedido ou material não declarado.
 - Vistas cortadas ou pequenas são recusadas; vistas finas naturais podem passar.
-- O briefing não pode exigir capacidades que o núcleo não expressa. Abertura
-  oblonga, solver de montagem e materiais genéricos continuam fora.
+- O briefing não pode exigir capacidades que o núcleo não expressa. Solver de
+  montagem e materiais genéricos continuam fora; abertura oblonga passou a ser
+  expressável por `furo` com `ate`, e por isso saiu desta lista.
 - A câmera canônica não deve ser distorcida para esconder defeito.
 - Isolamento visual não prova sozinho encaixe, folga ou alinhamento.
 - O pacote de uma peça não deve absorver artificialmente todo um sistema para

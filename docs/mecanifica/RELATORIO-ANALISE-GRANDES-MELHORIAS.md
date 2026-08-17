@@ -95,6 +95,11 @@ reais. Devem entrar uma por vez, com peça de prova, identidade, topologia,
 determinismo e duas vistas. Uma reescrita ampla do núcleo não é recomendada pela
 evidência atual.
 
+A abertura oblonga foi a primeira a entrar, por
+[`planos/2026-08-17-abertura-oblonga.md`](planos/2026-08-17-abertura-oblonga.md):
+`furo` ganhou `ate` e o anel virou estádio, sem op nova e sem família de
+endereço nova. As outras duas continuam abertas e sem abertura automática.
+
 ### 6. Materiais canônicos
 
 Um contrato genérico permitiria editar aparência sem acoplar receita, bancada e

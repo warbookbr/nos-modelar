@@ -946,7 +946,23 @@ const CONTRATOS_ORIGEM = {
        `{op:'furo', id, grupo:'parafusos'}`      todos os furos desse grupo;
        `{op:'furo', id, grupo:'parafusos', furo:0}` o primeiro DELE.
      O nome nunca é índice; com `grupo`, o eixo `furo` conta só o grupo. O
-     preenchimento fica de fora porque pertence à FACE, não a um anel. */
+     preenchimento fica de fora porque pertence à FACE, não a um anel.
+
+     RASGO / ABERTURA OBLONGA — `ate` é o segundo centro, e o anel deixa de ser
+     um círculo para ser um ESTÁDIO: meia-volta de raio `raio` em cada extremo,
+     ligadas por dois lados retos. O rasgo NÃO é uma família nova de endereço:
+     ele gasta os mesmos `lados` pontos, então `borda`, `parede`, `saida`,
+     `tampa`, `preenchimento`, `furo` e `grupo` continuam valendo palavra por
+     palavra, e uma receita que endereçava furo redondo continua endereçando.
+       `{op:'furo', id, parede: 0}`   a parede 0 do rasgo, como em qualquer furo.
+     Duas formas declaram o rasgo:
+       `{op:'furo', …, centro:[…], ate:[…], raio}`               um rasgo;
+       `centros: [{nome:'guia', centro:[…], ate:[…], raio}]`     rasgo na lista.
+     `ate` acompanha `centro`; dentro de `centros` cada disco declara o seu.
+     A LARGURA do rasgo é exata (`2·raio`, os lados retos caem em ±raio); o
+     COMPRIMENTO é inscrito, como o diâmetro de um furo redondo. Comprimento
+     zero GRITA — seria um furo redondo com nome de rasgo — e `lados` abaixo de
+     4 GRITA, porque meia-volta precisa de dois pontos para existir. */
   furo: {
     validar(origem) {
       const chaves = ['op', 'id', 'grupo', 'furo', 'borda', 'parede', 'saida', 'tampa', 'preenchimento', 'preenchimentoDaSaida'];
@@ -3886,6 +3902,11 @@ export const OPS = {
     const temCentro = a.centro != null, temCentros = a.centros != null;
     if (temCentro && temCentros) return grita(st, i, 'furo', 'centro+centros', 'centro e centros dizem a mesma coisa em número diferente (centro = UM furo; centros = vários no mesmo passo) — declare exatamente uma');
     if (!temCentro && !temCentros) return grita(st, i, 'furo', 'centro', 'furo exige centro:[x,y,z] — o ponto do mundo por onde ele passa, projetado no plano da entrada — ou centros, para vários furos no mesmo passo');
+    /* `ate` é o segundo centro de UM rasgo, então ele acompanha `centro`. Em
+       `centros`, cada rasgo declara o próprio `ate` no seu disco: um `ate` de
+       passo alongaria todos os furos da lista de uma vez, e isso é alterar
+       geometria que a receita não pediu. */
+    if (a.ate != null && temCentros) return grita(st, i, 'furo', 'ate', 'ate alonga UM furo em rasgo e acompanha centro; com centros, declare ate dentro do disco que vira rasgo');
     const conferirPonto = (p, nome) => {
       if (!Array.isArray(p) || p.length !== 3) return `${nome} precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(p)}`;
       const v = st.vec(p);
@@ -3937,7 +3958,13 @@ export const OPS = {
     if (temCentro) {
       const erro = conferirPonto(a.centro, 'centro');
       if (erro) return grita(st, i, 'furo', 'centro', erro);
-      fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(a.centro), raio: undefined, profundidade: undefined });
+      let fim = null;
+      if (a.ate != null) {
+        const erroFim = conferirPonto(a.ate, 'ate');
+        if (erroFim) return grita(st, i, 'furo', 'ate', erroFim);
+        fim = st.vec(a.ate);
+      }
+      fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(a.centro), fim, raio: undefined, profundidade: undefined });
     } else if (Array.isArray(a.centros)) {
       if (!a.centros.length) return grita(st, i, 'furo', 'centros', 'centros é uma lista vazia — um passo que não abre furo nenhum é um no-op silencioso');
       for (let k = 0; k < a.centros.length; k++) {
@@ -3945,22 +3972,28 @@ export const OPS = {
         if (Array.isArray(item)) {
           const erro = conferirPonto(item, `centros[${k}]`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(item), raio: undefined, profundidade: undefined });
+          fontes.push({ tipo: 'ponto', nome: null, ponto: st.vec(item), fim: null, raio: undefined, profundidade: undefined });
         } else if (item && typeof item === 'object' && Object.prototype.hasOwnProperty.call(item, 'centro')) {
-          const chaves = ['nome', 'centro', 'raio', 'profundidade'];
+          const chaves = ['nome', 'centro', 'ate', 'raio', 'profundidade'];
           const estranha = Object.keys(item).find((nome) => !chaves.includes(nome));
           if (estranha) return grita(st, i, 'furo', 'centros', `centros[${k}] como disco usa ${chaves.join(', ')} — '${estranha}' não é palavra desta forma`);
           const grupo = lerNomeDeGrupo(item, `centros[${k}]`);
           if (grupo.erro) return grita(st, i, 'furo', 'centros', grupo.erro);
           const erro = conferirPonto(item.centro, `centros[${k}].centro`);
           if (erro) return grita(st, i, 'furo', 'centros', erro);
-          fontes.push({ tipo: 'ponto', nome: grupo.nome, ponto: st.vec(item.centro), raio: item.raio, profundidade: item.profundidade });
+          let fim = null;
+          if (item.ate != null) {
+            const erroFim = conferirPonto(item.ate, `centros[${k}].ate`);
+            if (erroFim) return grita(st, i, 'furo', 'centros', erroFim);
+            fim = st.vec(item.ate);
+          }
+          fontes.push({ tipo: 'ponto', nome: grupo.nome, ponto: st.vec(item.centro), fim, raio: item.raio, profundidade: item.profundidade });
         } else if (item && typeof item === 'object') {
           const r = lerCirculo(item, `centros[${k}]`);
           if (r.erro) return grita(st, i, 'furo', 'centros', r.erro);
           fontes.push(r.fonte);
         } else {
-          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {nome?, centro, raio?, profundidade?} ou um círculo {nome?, pivo, distancia, total, volta|graus, raio?, profundidade?}; recebido ${JSON.stringify(item)}`);
+          return grita(st, i, 'furo', 'centros', `centros[${k}] precisa ser [x,y,z], um disco {nome?, centro, ate?, raio?, profundidade?} ou um círculo {nome?, pivo, distancia, total, volta|graus, raio?, profundidade?}; recebido ${JSON.stringify(item)}`);
         }
       }
     } else if (a.centros && typeof a.centros === 'object') {
@@ -3998,11 +4031,15 @@ export const OPS = {
       const d = (p[0] - entrada.centro[0]) * N[0] + (p[1] - entrada.centro[1]) * N[1] + (p[2] - entrada.centro[2]) * N[2];
       return [p[0] - N[0] * d, p[1] - N[1] * d, p[2] - N[2] * d];
     };
-    const centros = [], raiosBrutos = [], profsBrutos = [], grupos = [];
+    const centros = [], fins = [], raiosBrutos = [], profsBrutos = [], grupos = [];
     for (const fonte of fontes) {
       const inicioDoGrupo = centros.length;
       if (fonte.tipo === 'ponto') {
         centros.push(projetarNoPlano(fonte.ponto));
+        /* o segundo centro do rasgo é projetado pelo MESMO plano: os dois
+           extremos precisam viver na face de entrada, senão o estádio nasceria
+           torto e a margem mediria uma sombra. */
+        fins.push(fonte.fim == null ? null : projetarNoPlano(fonte.fim));
         raiosBrutos.push(fonte.raio);
         profsBrutos.push(fonte.profundidade);
       } else {
@@ -4011,6 +4048,7 @@ export const OPS = {
           const t = (fonte.passoGraus * q * Math.PI) / 180;
           const cu = Math.cos(t) * fonte.distancia, cw = Math.sin(t) * fonte.distancia;
           centros.push([p0[0] + entrada.u[0] * cu + entrada.w[0] * cw, p0[1] + entrada.u[1] * cu + entrada.w[1] * cw, p0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+          fins.push(null);
           raiosBrutos.push(fonte.raio);
           profsBrutos.push(fonte.profundidade);
         }
@@ -4030,7 +4068,44 @@ export const OPS = {
     }
     const resolucao = resolverLados(st, a.lados, maiorRaio);
     if (resolucao.erro) return grita(st, i, 'furo', 'lados', resolucao.erro);
-    const L = resolucao.lados;
+    let L = resolucao.lados;
+
+    /* ---- RASGO (abertura oblonga): o comprimento entre os dois centros ----
+       O anel do rasgo é um ESTÁDIO: meia-volta em cada extremo, ligadas por
+       dois lados retos. Ele gasta os MESMOS `L` pontos do círculo, e é só por
+       isso que borda, parede, saída, tampa, preenchimento, margem, partição e
+       o bloco de ids seguem valendo sem exceção — a única coisa que muda é
+       ONDE os `L` pontos caem.
+
+       Duas recusas nascem aqui porque as duas produziriam uma promessa falsa:
+       um rasgo de comprimento zero é um furo redondo com nome de rasgo, e um
+       estádio com menos de dois pontos por extremo não fecha meia-volta —
+       viraria um losango se passasse calado. */
+    const comprimentosRasgo = [];
+    let temRasgo = false;
+    for (let k = 0; k < M; k++) {
+      const fim = fins[k];
+      if (fim == null) { comprimentosRasgo.push(0); continue; }
+      temRasgo = true;
+      const c0 = centros[k];
+      const comp = Math.hypot(fim[0] - c0[0], fim[1] - c0[1], fim[2] - c0[2]);
+      if (!(comp > 1e-9 * Math.max(1, entrada.escala))) {
+        return grita(st, i, 'furo', 'ate', `o rasgo ${k} tem comprimento ${comp.toFixed(9)} entre centro e ate depois de projetar os dois na face de entrada: um rasgo de comprimento zero é um furo redondo com outro nome — use só centro, ou afaste ate`);
+      }
+      comprimentosRasgo.push(comp);
+    }
+    if (temRasgo && L < 4) {
+      return grita(st, i, 'furo', 'lados', `o rasgo precisa de pelo menos 4 lados para fechar meia-volta em cada extremo (recebido ${L}): com menos que isso o estádio degenera e a parede deixa de acompanhar o raio`);
+    }
+    /* `desvio` é uma promessa em metros, e o estádio a cumpriria pela metade se
+       nada fosse feito aqui: um extremo com `n` pontos cobre meia-volta em
+       `n − 1` cordas, então um anel de `L` pontos erra como um círculo de
+       `L − 2`. Os dois pontos a mais devolvem exatamente o passo angular que o
+       desvio pediu — sem eles, pedir acabamento fino num rasgo entregaria
+       acabamento grosso em silêncio, que é a única falha que este passo não
+       pode ter. Contagem explícita não é tocada: quem escreve `lados: 16` pediu
+       dezesseis pontos, e recebe dezesseis. */
+    if (temRasgo && resolucao.derivado) L += 2;
     /* Uma tolerância microscópica não pode alocar arrays gigantes para só
        depois descobrir o orçamento. Esta conta é um piso: a partição pode
        acrescentar preenchimento, nunca reduzir estes vértices/faces. */
@@ -4062,16 +4137,51 @@ export const OPS = {
       const c0 = centros[k];
       const raio = raiosPorFuro[k];
       const anel = [];
-      for (let j = 0; j < L; j++) {
-        const t = (j / L) * Math.PI * 2;
-        const cu = Math.cos(t) * raio, cw = Math.sin(t) * raio;
-        anel.push([c0[0] + entrada.u[0] * cu + entrada.w[0] * cw, c0[1] + entrada.u[1] * cu + entrada.w[1] * cw, c0[2] + entrada.u[2] * cu + entrada.w[2] * cw]);
+      const pontoNoQuadro = (base, cu, cw) => [
+        base[0] + entrada.u[0] * cu + entrada.w[0] * cw,
+        base[1] + entrada.u[1] * cu + entrada.w[1] * cw,
+        base[2] + entrada.u[2] * cu + entrada.w[2] * cw,
+      ];
+      if (fins[k] == null) {
+        for (let j = 0; j < L; j++) {
+          const t = (j / L) * Math.PI * 2;
+          anel.push(pontoNoQuadro(c0, Math.cos(t) * raio, Math.sin(t) * raio));
+        }
+      } else {
+        /* ESTÁDIO. `d` é a direção do rasgo no quadro (u,w) da face e `p` é ela
+           girada +90° no mesmo quadro: girar no quadro, e não no mundo, é o que
+           mantém o sentido do anel IGUAL ao do círculo — o resto do passo
+           depende disso para orientar borda e saída.
+
+           A volta é contínua em θ: o extremo de `centro` varre de +90° a +270°
+           (bojo apontando para longe de `ate`) e o de `ate` varre de −90° a
+           +90° (bojo para o outro lado). As duas retas do rasgo não são pontos
+           extras; elas são as arestas que ligam um extremo ao outro. */
+        const fim = fins[k];
+        const dir = [fim[0] - c0[0], fim[1] - c0[1], fim[2] - c0[2]];
+        const bruta = [
+          dir[0] * entrada.u[0] + dir[1] * entrada.u[1] + dir[2] * entrada.u[2],
+          dir[0] * entrada.w[0] + dir[1] * entrada.w[1] + dir[2] * entrada.w[2],
+        ];
+        const norma = Math.hypot(bruta[0], bruta[1]);
+        const du = bruta[0] / norma, dw = bruta[1] / norma;
+        const pu = -dw, pw = du;
+        const nA = Math.ceil(L / 2), nB = L - nA;
+        const arco = (base, n, inicio) => {
+          for (let j = 0; j < n; j++) {
+            const t = inicio + (j / (n - 1)) * Math.PI;
+            const cos = Math.cos(t) * raio, sen = Math.sin(t) * raio;
+            anel.push(pontoNoQuadro(base, cos * du + sen * pu, cos * dw + sen * pw));
+          }
+        };
+        arco(c0, nA, Math.PI / 2);
+        arco(fim, nB, -Math.PI / 2);
       }
       const cUV = entrada.proj(c0);
       const uvRel = entrada.uv.map((p) => [p[0] - cUV[0], p[1] - cUV[1]]);
       const anelRel = anel.map((p) => { const q = entrada.proj(p); return [q[0] - cUV[0], q[1] - cUV[1]]; });
       const folga = Math.min(...anelRel.map((p) => margemDentro(uvRel, p)));
-      if (!(folga > 1e-9 * Math.max(1, entrada.escala))) return grita(st, i, 'furo', 'raio', `o anel ${k} de raio ${raio} em ${JSON.stringify(c0.map((n) => +n.toFixed(6)))} não cabe dentro da face de entrada ${entradaId}: sobra ${folga.toFixed(6)} até a borda (precisa ser > 0). Um furo que encosta ou vaza não é furo, é recorte de contorno`);
+      if (!(folga > 1e-9 * Math.max(1, entrada.escala))) return grita(st, i, 'furo', fins[k] == null ? 'raio' : 'ate', `o anel ${k} ${fins[k] == null ? `de raio ${raio}` : `é um rasgo de raio ${raio} e comprimento ${comprimentosRasgo[k].toFixed(6)}`} em ${JSON.stringify(c0.map((n) => +n.toFixed(6)))} não cabe dentro da face de entrada ${entradaId}: sobra ${folga.toFixed(6)} até a borda (precisa ser > 0). Um furo que encosta ou vaza não é furo, é recorte de contorno`);
       aneisEntrada.push(anel); relEntrada.push({ uvRel, anelRel }); anelUVEntrada.push(anel.map(entrada.proj));
     }
     for (let k = 0; k < M; k++) for (let l = k + 1; l < M; l++) {

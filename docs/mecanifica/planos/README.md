@@ -154,6 +154,15 @@ nos arquivos originais.
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
 | Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
 | MCP — leitura e auditoria de montagens | concluído: aprovar, R04 |
+| Abertura oblonga — rasgo no `furo` | concluído: aprovar |
+
+O plano da abertura oblonga está em
+[`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a
+primeira das três lacunas geométricas listadas em
+[`../RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](../RELATORIO-ANALISE-GRANDES-MELHORIAS.md):
+`furo` passou a expressar rasgo por `ate`, sem operação nova e sem família de
+endereço nova. Costuras de `lathe` e endereço único de grupo linear continuam
+abertas, sem abertura automática.
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
