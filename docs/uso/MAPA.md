@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-370 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+372 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -193,6 +193,7 @@
 - `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
+- `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -462,6 +463,7 @@
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
+- `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `prateleira-integridade.test.ts` — Integridade da peça de exercício `_prateleira-furada` — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1".
 - `rasgo-oblongo.test.ts` — rasgo-oblongo.test.ts — a prova da ABERTURA OBLONGA no `furo`.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…

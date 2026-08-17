@@ -8,7 +8,7 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-1 | resolvido; URL reproduz câmera livre |
 | A-2 | resolvido; enquadramento e seleção separados |
 | A-3 | resolvido; contexto preserva material |
-| A-4 | aberto; primitivas ainda nascem presas à origem |
+| A-4 | resolvido; geradores aceitam `em` e `eixo` na criação |
 | A-5 | resolvido; expressões nomeadas existem |
 | A-6 | aberto; `encostar` ainda não existe |
 | A-7 | aberto; alias de conjuntos ainda exige decisão |
