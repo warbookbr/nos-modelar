@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "arquitetura:check": "node tools/arquitetura/independencia-catalogo.mjs",
+    "bancada:vazia:check": "node tools/mecanifica/guarda-bancada-vazia.mjs",
     "test": "vitest run",
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs",
     "test:watch": "vitest",

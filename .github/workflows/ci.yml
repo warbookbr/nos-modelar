@@ -44,6 +44,12 @@ jobs:
       - name: Build da Mecanifica
         run: npm run build
 
+      - name: Firewall entre núcleo e catálogo
+        run: npm run arquitetura:check
+
+      - name: Bancada publicada com catálogo vazio
+        run: npm run bancada:vazia:check
+
       - name: Prova Zero — seleção de peças byte-idêntica ao gabarito
         run: npm run gabarito:selecao:check
 
