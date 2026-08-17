@@ -23,6 +23,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # O navegador é instalado antes de qualquer gate porque a inspeção visual
+      # deixou de ser exclusiva das guardas de bancada: a promoção de autoria
+      # só aprova uma proposta depois de capturar duas vistas reais, e essa
+      # captura acontece dentro da suíte de testes. Instalar o Chromium depois
+      # de `npm run test` reprova a promoção por `inspecao-visual-falhou` e
+      # transforma falta de navegador em falso defeito de autoria.
+      - name: Navegador para as provas visuais
+        run: npx playwright install --with-deps chromium
+
       - name: TypeScript Typecheck
         run: npm run typecheck
 
@@ -50,11 +59,6 @@ jobs:
       - name: Peças publicadas em dia com a receita
         run: npm run exportar:check
 
-      # O painel de portas da bancada vive no navegador, por isso instala o
-      # Chromium antes da prova de interface.
-      - name: Navegador para a prova de interface
-        run: npx playwright install --with-deps chromium
-
       - name: MCP transporta as quatro vistas oficiais
         env:
           MCP_VISUAL_REAL: '1'
@@ -62,7 +66,7 @@ jobs:
 
       # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
       # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
-      # verde nos outros gates. Mesmo motivo e mesmo navegador da linha acima.
+      # verde nos outros gates.
       - name: A bancada mostra as portas que a peça publica
         run: npm run guarda:portas
 

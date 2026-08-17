@@ -21,26 +21,64 @@ aplicação publicada aqui.
   arquitetural foram integrados pelo PR #41 no commit `e7b80ac`. O contexto de
   montagem para IA foi concluído no R05 com descritor puro e CLI confinada. O
   plano de separação direcional e impacto local foi concluído no R04 com
-  montagem v3 e mapa derivado; mapa global, revalidação automática, writer, MCP
+  montagem v3 e mapa derivado; mapa global, revalidação automática, escrita MCP
   e API permanecem fora.
 - O plano de contexto visual e autoria segura foi concluído no R05: captura
   privada, revalidação assistida, catálogo explícito e revisões imutáveis foram
-  provados; MCP e materialização no workspace continuam fora.
+  provados; escrita MCP e materialização no workspace ficaram fora daquele
+  fechamento e foram tratadas por recortes próprios.
+- O [plano de leitura MCP](planos/2026-08-14-mcp-montagens-leitura.md) foi
+  concluído e aprovado: contexto, revalidação, catálogo e vistas de montagem
+  são consumíveis por IDs semânticos. A ausência de escrita não é veto futuro.
+- O [plano de materialização e autoria
+  segura](planos/2026-08-14-materializacao-autoria-segura.md) foi concluído e
+  aprovado: snapshots imutáveis, ativação por revisão observada, revalidação
+  condicionante e perfil MCP de autoria opt-in foram provados no mesmo recorte.
+- O [experimento de autoria geométrica do zero](planos/2026-08-14-experimento-autoria-geometrica.md)
+  (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`)
+  concluiu com `corrigir`: receitas, relações e vistas passaram, mas autoria MCP
+  de montagem não pode corrigir uma receita; o relatório define o próximo recorte.
+- O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
+  (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
+  receitas são dados JSON, passam por vistas e revalidação e não executam
+  JavaScript fornecido pelo agente.
+- O plano de [continuidade de autoria](planos/2026-08-14-continuidade-autoria-ativa.md)
+  (`docs/mecanifica/planos/2026-08-14-continuidade-autoria-ativa.md`)
+  foi aprovado: revisão publicada e catálogo operacional agora compartilham o
+  mesmo estado, sem alterar o núcleo ou descobrir dependências implícitas.
 - O diagnóstico técnico que fundamentou o plano está registrado em
   `docs/mecanifica/RELATORIO-DIAGNOSTICO-MOTOR.md`.
+- A análise consolidada de maturidade e próximas melhorias está em
+  [`RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](RELATORIO-ANALISE-GRANDES-MELHORIAS.md)
+  (`docs/mecanifica/RELATORIO-ANALISE-GRANDES-MELHORIAS.md`).
+- O [mapa canônico de dependências](planos/2026-08-14-mapa-canonico-dependencias.md)
+  foi concluído com decisão `aprovar`: cobertura global dentro de universo
+  explícito, impacto direcionado, proveniência, MCP e continuidade ativa
+  (`docs/mecanifica/planos/2026-08-14-mapa-canonico-dependencias.md`). A
+  revalidação em cascata persistida foi encerrada no plano próprio abaixo.
+- O plano de [revalidação em cascata persistida](planos/2026-08-14-revalidacao-cascata-persistida.md)
+  foi concluído no R06 com decisão `aprovar`: identidade semântica, retomada
+  persistida, derivação multi-raiz, resultados, obsolescência, estudo de campo
+  multi-raiz e consumo Agent-First foram provados. Evolução futura exige plano
+  próprio e não implica correção ou promoção automática
+  (`docs/mecanifica/planos/2026-08-14-revalidacao-cascata-persistida.md`).
 - O Módulo 1 do MCP — leitura e revisão somente leitura — foi aprovado após as
   Fatias 1A e 1B, a avaliação consolidada e a correção de descoberta.
 - A primeira tentativa de autoria controlada foi encerrada com decisão
   `interromper`; a issue #23 foi concluída e o PR #25 foi fechado sem merge.
-- O MCP atual continua sendo uma porta de leitura e auditoria. Ele não define o
-  núcleo, o formato de peça ou a futura arquitetura de montagem.
+- O MCP padrão continua sendo uma porta de leitura e auditoria; o perfil de
+  autoria é opt-in do host e só materializa montagens no repositório autorizado.
+  Nenhum perfil define o núcleo, o formato de peça ou a futura arquitetura.
 - Os adaptadores de inspeção e a bancada publicada existem e são usados pelos
   gates.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
 - Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem; ainda não existe mapa global completo de
-  dependências, colisão geral, solver ou camada completa de escrita para IA.
+  o mapa de impacto local existem. As R00–R06 do mapa canônico global fixaram
+  universo, snapshot confinado, composição, ocorrências, relações, usos
+  reversos, consulta direcionada, consumo MCP reduzido por ID, continuidade e
+  escala estão provados; revalidação em cascata ainda está fora. Colisão geral,
+  solver e camada completa de escrita continuam fora.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
@@ -78,8 +116,8 @@ o núcleo nem define o modelo de autoria.
 
 Montagem persistida v1 possui contrato e resolvedor em `src/autoria/` e provas
 persistidas em `tools/mecanifica/fixtures/montagens-persistidas/`; o mapa global
-de dependências ainda não possui contrato. Não invente uma localização por
-implicação.
+de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços em
+`src/autoria/`. Não invente uma localização por implicação.
 
 ## Fontes de verdade
 
@@ -170,11 +208,6 @@ npm run criar -- _viga
 ## Pendências atuais
 
 - Iniciar e executar o Caso 3 da homologação.
-- Definir o mapa canônico de composição, relações e dependências.
-- Definir contexto visual de montagem e como dependentes e validações formam o
-  contexto de uma futura edição.
-- Definir uma camada de escrita transacional para receitas e montagens antes de
-  expô-la por MCP, CLI ou API.
 - Resolver costuras topológicas de `lathe`.
 - Dar endereço único a um grupo linear.
 - Expressar abertura oblonga sem simulação visual.
@@ -194,6 +227,9 @@ Resultados encerrados da própria Mecanifica ficam em
 ## Inventário curado
 
 Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.md),
+[AUTORIA-RECEITA-DECLARATIVA](AUTORIA-RECEITA-DECLARATIVA.md),
+[MAPA-CANONICO-DEPENDENCIAS](MAPA-CANONICO-DEPENDENCIAS.md)
+(`docs/mecanifica/MAPA-CANONICO-DEPENDENCIAS.md`),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
 [BANCADA-E-APRESENTACAO](BANCADA-E-APRESENTACAO.md), [CONTINUIDADE-ARQUITETURAL](CONTINUIDADE-ARQUITETURAL.md),
 [MONTAGEM-PERSISTIDA-V2](MONTAGEM-PERSISTIDA-V2.md), [MONTAGEM-PERSISTIDA-V3](MONTAGEM-PERSISTIDA-V3.md),
@@ -206,7 +242,14 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 [FILETE-V2](FILETE-V2.md), [PRANCHA-FREIO-DISCO](PRANCHA-FREIO-DISCO.md), [PRANCHA-RODA-DIANTEIRA](PRANCHA-RODA-DIANTEIRA.md),
 [COORDENACAO-LOCAL](COORDENACAO-LOCAL.md), [COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](PLANO.md).
 
+O contrato declarativo está em `docs/mecanifica/AUTORIA-RECEITA-DECLARATIVA.md`.
+
 Evidência atual: [estudo de campo do conjunto dianteiro](RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
+O [relatório de autoria geométrica](RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md)
+(`docs/mecanifica/RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md`) registra a
+decisão `corrigir` e a fronteira de autoria de receitas.
+O próximo experimento já tem [conjunto neutro definido](CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md)
+(`docs/mecanifica/CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md`), mas não possui plano ativo.
 
 Planejamento: [planos/README](planos/README.md),
 [diagnóstico do motor](planos/2026-08-06-diagnostico-motor-procedural.md),
@@ -219,6 +262,9 @@ Planejamento: [planos/README](planos/README.md),
 [contexto de montagem para IA](planos/2026-08-14-contexto-de-montagem-para-ia.md),
 [separação direcional e impacto local](planos/2026-08-14-separacao-direcional-e-impacto-local.md),
 [contexto visual e autoria segura](planos/2026-08-14-contexto-visual-e-autoria-segura.md),
+[MCP — leitura e auditoria de montagens](planos/2026-08-14-mcp-montagens-leitura.md)
+(`docs/mecanifica/planos/2026-08-14-mcp-montagens-leitura.md`),
+[materialização e autoria segura de montagens](planos/2026-08-14-materializacao-autoria-segura.md),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
@@ -267,5 +313,7 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 <!-- Contrato de escrita alcançável: docs/mecanifica/ESCRITA-TRANSACIONAL-MONTAGEM.md -->
 
 <!-- Contexto visual alcançável: docs/mecanifica/CONTEXTO-VISUAL-REVALIDACAO.md -->
+
+<!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-materializacao-autoria-segura.md -->
 
 <!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->

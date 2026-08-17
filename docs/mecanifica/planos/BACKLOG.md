@@ -10,11 +10,16 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Caso 3 da homologação | ainda não iniciado |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | impacto local e catálogo explícito entre raízes concluídos; descoberta implícita continua fora |
+| Mapa de composição e dependências | concluído e aprovado: universo explícito, mapa derivado, impacto global MCP, continuidade ativa e recusa concorrente |
 | Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
-| Revalidação de dependentes | roteiro assistido concluído; automação permanece fora |
-| Escrita transacional de receitas e montagens | revisões imutáveis e commit visível provados localmente; materialização e MCP/API continuam fora |
-| Autoria por MCP | não definida; depende dos serviços internos de peça, montagem, contexto, transação e revalidação; não é continuação automática do plano de pacotes interrompido |
+| Revalidação de dependentes | plano ativo em `2026-08-14-revalidacao-cascata-persistida.md`; R00 investigativa antes de persistência de produto |
+| Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v5 |
+| Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
+| Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |
+| Experimento de autoria geométrica do zero | concluído: correção publicada por autoria declarativa; decisão final aprovar |
+| Autoria segura de receitas | concluída para contrato declarativo v1 e MCP opt-in; revisão ativa já alimenta o catálogo, módulos JS históricos permanecem fora |
+| Alteração semântica compacta | candidato posterior ao mapa: mudar por ID/campo, recompor documento completo e confirmar bytes finais |
+| Histórico operacional e variantes | comparar, reativar como nova transição e ramificar sem mover estado ativo implicitamente |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
 | Diagnóstico visual estruturado | ligar medidas e falhas a entidades visíveis por identidade semântica |
@@ -33,7 +38,8 @@ Algumas dependências já podem ser afirmadas sem abrir plano:
 2. mapa de dependências depende de composição e relações persistidas;
 3. contexto de trabalho depende do mapa;
 4. revalidação automática depende de relações mensuráveis;
-5. escrita por qualquer porta depende de serviço interno transacional;
-6. MCP só entra depois que a capacidade interna estiver definida e provada.
+5. escrita por qualquer porta reutiliza um serviço interno transacional;
+6. MCP pode avançar no mesmo plano assim que esse contrato for executável e
+   verificável, sem virar uma barreira temporal permanente.
 
 Essa ordem não escolhe o primeiro plano nem autoriza implementação automática.

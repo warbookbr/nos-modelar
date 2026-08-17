@@ -2,7 +2,7 @@
 import { z } from 'zod';
 import { PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
 
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v2';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v5';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 
@@ -104,6 +104,50 @@ export const compararEntrada = z.object({
 
 export const renderizarEntrada = z.object({ peca }).strict();
 
+const caminhoMontagem = z.array(nomeParte).max(64);
+const idMontagem = slug;
+const vistaMontagem = z.enum(['isometrica', 'frontal', 'direita', 'superior']);
+
+export const descreverMontagemEntrada = z.object({
+  id: idMontagem,
+  caminho: caminhoMontagem.optional(),
+  profundidade: z.number().int().min(0).max(32).optional(),
+  incluirRelacionados: z.boolean().optional(),
+}).strict();
+
+export const revalidarMontagemEntrada = z.object({
+  id: idMontagem,
+  alvo: caminhoMontagem.min(1),
+}).strict();
+
+export const catalogarMontagensEntrada = z.object({
+  ids: z.array(idMontagem).min(1).max(32),
+}).strict();
+
+export const renderizarMontagemEntrada = z.object({
+  id: idMontagem,
+  caminho: caminhoMontagem.optional(),
+  vistas: z.array(vistaMontagem).min(1).max(4).optional(),
+}).strict();
+
+const alvoImpactoGlobal = z.object({
+  tipo: z.enum(['peca', 'montagem']),
+  id: slug,
+}).strict();
+
+const passoImpactoGlobal = z.object({ montagem: slug, instancia: nomeParte }).strict();
+const caminhoImpactoGlobal = z.object({
+  raiz: slug,
+  caminho: z.array(passoImpactoGlobal),
+}).strict();
+const provenienciaImpactoGlobal = z.object({
+  fonte: z.enum(['base-estatica', 'revisao-ativa']),
+  revisao: z.string().nullable(),
+  sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+}).strict();
+
+export const consultarImpactoGlobalEntrada = alvoImpactoGlobal;
+
 export const descreverSaida = z.object({
   ...respostaBase,
   resultado: z.object({
@@ -164,6 +208,123 @@ export const renderizarSaida = z.object({
       enquadramento: enquadramentoPublico,
     }).strict()).length(4),
   }).optional(),
+}).strict();
+
+const contextoMontagem = z.object({
+  formato: z.literal('mecanifica.contexto-montagem'),
+  versao: z.literal(1),
+  raiz: z.object({ id: z.string() }).strict(),
+  totais: z.object({
+    pecas: z.number().int().nonnegative(),
+    montagens: z.number().int().nonnegative(),
+    relacoesDeclaradas: z.number().int().nonnegative(),
+    satisfeitas: z.number().int().nonnegative(),
+    reprovadas: z.number().int().nonnegative(),
+  }).strict(),
+  instancias: z.array(z.json()),
+  relacoes: z.array(z.json()),
+  cobertura: z.object({
+    relacoesLocaisExecutadas: z.boolean(),
+    colisaoGlobalVerificada: z.boolean(),
+    dependenciasIndiretasVerificadas: z.boolean(),
+    limitacoes: z.array(z.string()),
+  }).strict(),
+  consulta: z.object({
+    caminho: caminhoMontagem,
+    profundidade: z.number().int().nonnegative().nullable(),
+    incluirRelacionados: z.boolean(),
+    instanciasOmitidas: z.number().int().nonnegative(),
+    relacoesOmitidas: z.number().int().nonnegative(),
+    incluidasPorRelacao: z.array(caminhoMontagem),
+  }).strict().optional(),
+}).strict();
+
+export const descreverMontagemSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({ id: idMontagem, contexto: contextoMontagem }).strict().optional(),
+}).strict();
+
+const roteiroRevalidacao = z.object({
+  formato: z.literal('mecanifica.roteiro-revalidacao'),
+  versao: z.literal(1),
+  alvo: z.object({ caminho: caminhoMontagem }).strict(),
+  montagensARevalidar: z.array(z.object({ caminho: caminhoMontagem }).strict()),
+  itens: z.array(z.json()),
+  pendencias: z.array(z.object({ codigo: z.string(), executavel: z.literal(false), acao: z.string() }).strict()),
+  limitacoes: z.array(z.string()),
+}).strict();
+
+export const revalidarMontagemSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({ id: idMontagem, roteiro: roteiroRevalidacao }).strict().optional(),
+}).strict();
+
+const catalogoMontagens = z.object({
+  formato: z.literal('mecanifica.catalogo-montagens'),
+  versao: z.literal(1),
+  raizes: z.array(z.object({ id: z.string() }).strict()),
+  usos: z.array(z.json()),
+  relacoes: z.array(z.json()),
+  limitacoes: z.array(z.string()),
+}).strict();
+
+export const catalogarMontagensSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({ ids: z.array(idMontagem), catalogo: catalogoMontagens }).strict().optional(),
+}).strict();
+
+export const renderizarMontagemSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({
+    formato: z.literal('mecanifica.vistas-montagem'),
+    versao: z.literal(1),
+    id: idMontagem,
+    caminho: caminhoMontagem,
+    duracaoMs: z.number().int().nonnegative(),
+    bytes: z.number().int().nonnegative(),
+    vistas: z.array(z.object({
+      nome: vistaMontagem,
+      mimeType: z.literal('image/png'),
+      largura: z.number().int().positive(),
+      altura: z.number().int().positive(),
+      bytes: z.number().int().nonnegative(),
+      sha256: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+      instancias: z.array(caminhoMontagem),
+      enquadramento: enquadramentoPublico,
+    }).strict()).min(1).max(4),
+  }).strict().optional(),
+}).strict();
+
+const impactoGlobal = z.object({
+  formato: z.literal('mecanifica.impacto-global'),
+  versao: z.literal(1),
+  alvo: alvoImpactoGlobal,
+  dependentesDiretos: z.array(alvoImpactoGlobal),
+  dependentesTransitivos: z.array(alvoImpactoGlobal.extend({ distancia: z.number().int().positive() }).strict()),
+  raizesAfetadas: z.array(slug),
+  raizesNaoAfetadas: z.array(slug),
+  caminhos: z.array(caminhoImpactoGlobal),
+  relacoes: z.array(z.json()),
+  roteiroRevalidacao: z.array(z.object({
+    ordem: z.number().int().positive(),
+    tipo: z.literal('montagem'),
+    id: slug,
+    motivo: z.enum(['alvo', 'dependente-direto', 'dependente-transitivo']),
+    proveniencia: provenienciaImpactoGlobal,
+    caminhos: z.array(caminhoImpactoGlobal),
+  }).strict()),
+  cobertura: z.object({
+    completa: z.literal(true),
+    universo: slug.nullable(),
+    entidadesConsideradas: z.number().int().nonnegative(),
+    entidadesAfetadas: z.number().int().nonnegative(),
+  }).strict(),
+  limitacoes: z.array(z.string()),
+}).strict();
+
+export const consultarImpactoGlobalSaida = z.object({
+  ...respostaBase,
+  resultado: z.object({ impacto: impactoGlobal }).strict().optional(),
 }).strict();
 
 export function respostaOk(codigo, resultado) {

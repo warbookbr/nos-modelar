@@ -1,0 +1,9 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "sistema-a",
+  "instancias": [
+    { "id": "compartilhado", "alvo": { "tipo": "montagem", "ref": "subconjunto-compartilhado" } },
+    { "id": "exclusivo-a", "alvo": { "tipo": "peca", "ref": "peca-a" } }
+  ]
+}

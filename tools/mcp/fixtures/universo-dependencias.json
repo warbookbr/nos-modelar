@@ -1,0 +1,7 @@
+{
+  "formato": "mecanifica.universo-mcp-dependencias",
+  "versao": 1,
+  "universo": "../../mecanifica/fixtures/mapa-dependencias/universo.json",
+  "raizMontagens": "../../mecanifica/fixtures/mapa-dependencias/montagens",
+  "raizPecas": "../../mecanifica/fixtures/mapa-dependencias/pecas"
+}

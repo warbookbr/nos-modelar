@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-308 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+366 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -18,8 +18,12 @@
 
 ## .claude/agents/
 
-- `game-builder.md` — Constrói features do cliente v3 (o motor GPU, a Oficina, o som, a animação, a interface do jogo). Recebe um brief fechado do orquestrador e entrega numa bran…
-- `revisor-adversarial.md` — Revisor adversarial POR RISCO do v3 — tenta QUEBRAR a mudança sob estresse antes do merge, com foco em fundação, formato salvo (irreversível) e conta de julg…
+- `game-builder.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
+- `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
+
+## .claude/skills/auditar-montagem/
+
+- `SKILL.md` — Auditar uma montagem persistida da Mecanifica por contexto semântico, relações, impacto de revalidação e vistas visuais. Use quando a tarefa envolver composi…
 
 ## .claude/skills/auditar-peca/
 
@@ -28,6 +32,10 @@
 ## .claude/skills/criar-peca/
 
 - `SKILL.md` — Criar ou refinar uma peça 3D procedural da Mecanifica como IA, escrevendo PASSOS e provando o resultado na bancada neutra com medidas, vistas e crítica objet…
+
+## .claude/skills/criar-peca/references/
+
+- `operacoes-procedurais.md` — Referência de operações procedurais
 
 ## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/
 
@@ -44,6 +52,18 @@
 
 - `condicao-assistida.js` — PEÇA DE EXERCÍCIO — dobradiça vertical de portão para inspeção na bancada. Duas folhas de chapa compartilham o eixo Y: a folha fixa carrega o gomo central e …
 - `condicao-crua.js` — DOBRADIÇA DE PORTÃO — conjunto procedural técnico-didático F2 para inspeção e montagem. Duas folhas retangulares de 1,20 m × 0,65 m × 35 mm encontram-se num …
+
+## autoria-assistida/experimentos/autoria-geometrica-do-zero/
+
+- `auditar-visual.mjs` — Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada.
+- `executar-estudo.mjs` — Executor reproduzível da fixture, sem publicar receitas no catálogo.
+- `materializar-catalogo.mjs` — Materializa JSONs descartáveis para o catálogo MCP local do experimento.
+
+## autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/
+
+- `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
+- `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
+- `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
 
 ## autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/
 
@@ -111,7 +131,9 @@
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
+- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
+- `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
@@ -122,6 +144,7 @@
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
+- `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
@@ -132,8 +155,11 @@
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
+- `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
+- `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
+- `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -156,8 +182,15 @@
 - `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
 - `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
 - `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
+- `2026-08-14-autoria-segura-receitas.md` — Autoria segura de receitas declarativas
 - `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
 - `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
+- `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
+- `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
+- `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
+- `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
+- `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
+- `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -277,8 +310,10 @@
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `assinatura-geometria.js` — assinatura-geometria.js — SHA-256 síncrono e portátil para os contratos de autoria. Não usa `node:crypto`: a descrição também roda na bancada.
+- `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
 - `derivar-catalogo-montagens.js` — derivar-catalogo-montagens.js — índice determinístico limitado às raízes dadas.
 - `derivar-impacto-montagem.js` — derivar-impacto-montagem.js — deriva dependências locais sem executar revalidação.
+- `derivar-mapa-dependencias.js` — derivar-mapa-dependencias.js — mapa global derivado de um snapshot estável.
 - `derivar-roteiro-revalidacao.js` — derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas.
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
@@ -286,8 +321,11 @@
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
+- `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
+- `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
+- `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 
 ## src/bancada/
@@ -342,12 +380,24 @@
 
 ## tools/mcp/
 
+- `catalogo-montagens.mjs` — catalogo-montagens.mjs — acesso MCP somente a raízes configuradas pelo host.
+- `catalogo-montagens.test.mjs` — catalogo-montagens.test.mjs — confinamento e descoberta explícita do catálogo MCP.
 - `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
 - `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
-- `servidor.mjs` — servidor.mjs — servidor MCP local stdio do perfil revisao, sem escrita.
+- `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
+- `universo-dependencias.mjs` — universo-dependencias.mjs — universo canônico confiável para leitura MCP.
+- `universo-dependencias.test.mjs` — universo-dependencias.test.mjs — provas do adaptador MCP do mapa global.
 
 ## tools/mcp/perfis/
 
+- `autoria-montagens.mjs` — autoria-montagens.mjs — porta MCP opt-in, fina sobre a autoria interna.
+- `autoria-montagens.test.mjs` — Provas R04: MCP de autoria só atua com escopo do host e sem paths públicos.
+- `autoria-receitas.mjs` — autoria-receitas.mjs — porta MCP fina para receitas declarativas.
+- `autoria-receitas.test.mjs` — Contrato fino da porta MCP de autoria declarativa.
+- `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
+- `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
+- `revalidacao.mjs` — revalidacao.mjs — porta MCP Agent-First sobre campanhas persistidas.
+- `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.
 - `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.
 
 ## tools/mecanifica/
@@ -358,10 +408,20 @@
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — argumentos.test.ts — prova de que os CLIs da Mecanifica não engolem bandeira desconhecida em silêncio (MEDIA-7). O defeito: `--estrit` (uma letra a menos que…
 - `arranjo-em-peca.test.ts` — arranjo-em-peca.test.ts — a prova do ciclo "Arranjos semânticos v1" NA PEÇA, não só no núcleo.
+- `autoria-ativa.mjs` — autoria-ativa.mjs — provedores neutros para revisões imutáveis ativas.
+- `autoria-ativa.test.mjs` — autoria-ativa.test.mjs — continuidade autorizada e falha fechada.
+- `autoria-montagem.mjs` — autoria-montagem.mjs — planejamento e aplicação interna de montagens v1/v2/v3.
+- `autoria-montagem.test.ts` — Provas R02: planejar, confirmar, validar e materializar montagem persistida.
+- `autoria-receita.mjs` — autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript.
+- `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
+- `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
+- `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `corrimao-orientacao.test.ts` — corrimao-orientacao.test.ts — a prova NÃO AUTOMOTIVA da `orientacao` do `loft`, o segundo item do ciclo "Corte e orientação de seção v1".
+- `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
+- `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.
 - `derivar-impacto-montagem.test.ts` — Prova mapa de impacto local, direto, indireto e determinístico.
 - `derivar-roteiro-revalidacao.test.ts` — Prova roteiro de revalidação assistida, sem correção ou veredito global.
@@ -374,6 +434,7 @@
 - `drone-semantica.test.ts` — drone-semantica.test.ts — identidade semântica do drone (lente ≠ pouso, nenhuma face órfã) e, desde a régua do O-1, a RELAÇÃO entre as partes.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
+- `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
 - `exportar-gate.test.ts` — exportar-gate.test.ts — A-60, segunda metade: o gate que acusa arquivo velho.
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
 - `exportar-peca.test.ts` — exportar-peca.test.ts — A-60: a peça vira DADO.
@@ -385,26 +446,35 @@
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
+- `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `interfaces-montagem.test.ts` — interfaces-montagem.test.ts — provas do Recorte A de AUT-05: interfaces cilíndricas persistidas pelo núcleo e encaixe estritamente mensurável.
 - `jardineira-integridade.test.ts` — jardineira-integridade.test.ts — a prova NÃO AUTOMOTIVA do contrato de autoria: O-6 (`origem` universal), O-12 (portas semânticas) e, desde o ciclo Endereços…
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
+- `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `montagem-persistida-provas.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `montagem-persistida-v2-provas.test.ts` — @ts-expect-error — leitor JavaScript, usado para verificar recusas estruturais.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
-- `olhar-montagem.mjs` — olhar-montagem.mjs — captura vistas confinadas de uma montagem persistida.
+- `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `prateleira-integridade.test.ts` — Integridade da peça de exercício `_prateleira-furada` — a prova NÃO AUTOMOTIVA do ciclo "Corte e orientação de seção v1".
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
+- `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.
+- `repositorio-revalidacao.test.ts` — Provas R01: persistência canônica, retomada, idempotência e conflito.
 - `resolver-montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `revalidacao-cascata-r00.test.ts` — Provas executáveis da R00: identidade, estados, obsolescência e concorrência.
+- `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
 - `roda-dianteira-integridade.test.ts` — roda-dianteira-integridade.test.ts — contratos semânticos da roda revisável na bancada.
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
+- `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `tampa-de-caixa-integridade.test.ts` — Integridade da peça de exercício `_tampa-de-caixa` — a prova NÃO AUTOMOTIVA do ciclo "Furo v2": vários furos na MESMA face, num passo só.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
+- `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.
+- `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `vao-e-anteparo.test.ts` — vao-e-anteparo.test.ts — prova de comportamento das duas ops que o O-14 tirou do ponto cego: `apagaFace` (abre o vão) e `vira` (corrige a normal). Cada asser…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.

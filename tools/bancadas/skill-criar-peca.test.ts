@@ -30,7 +30,10 @@ import { nucleo, OPERACOES_COM_ORIGEM } from '../../prototipos/fps/v3/motor/ofic
 
 const SKILL = join(import.meta.dirname, '../../.claude/skills/criar-peca/SKILL.md');
 const texto = readFileSync(SKILL, 'utf8');
+const OPERACOES_DOC = join(import.meta.dirname, '../../.claude/skills/criar-peca/references/operacoes-procedurais.md');
+const textoOperacoes = readFileSync(OPERACOES_DOC, 'utf8');
 const AUDITORIA = readFileSync(join(import.meta.dirname, '../../.claude/skills/auditar-peca/SKILL.md'), 'utf8');
+const MONTAGEM = readFileSync(join(import.meta.dirname, '../../.claude/skills/auditar-montagem/SKILL.md'), 'utf8');
 const PACKAGE = JSON.parse(readFileSync(join(import.meta.dirname, '../../package.json'), 'utf8')) as { scripts: Record<string, string> };
 
 /* ---------------------------------------------------------------------------
@@ -75,8 +78,8 @@ function paragrafoCom(marca: string) {
 }
 /* A linha da tabela de vocabulário daquela op (`| \`op\` | args | nota |`). */
 function linhaDaTabela(op: string) {
-  const linha = texto.split('\n').filter((l) => new RegExp(`^\\|\\s*\`${op}\``).test(l));
-  expect(linha.length, `esperava UMA linha de tabela para \`${op}\` no SKILL.md`).toBe(1);
+  const linha = textoOperacoes.split('\n').filter((l) => new RegExp(`^\\|\\s*\`${op}\``).test(l));
+  expect(linha.length, `esperava UMA linha de tabela para \`${op}\` na referência procedural`).toBe(1);
   return linha[0];
 }
 
@@ -129,12 +132,30 @@ describe('skills ativas x fluxo Mecanifica', () => {
   });
 
   it('não cita comandos removidos como parte do fluxo', () => {
-    for (const skill of [SKILL, join(import.meta.dirname, '../../.claude/skills/auditar-peca/SKILL.md')]) {
+    for (const skill of [SKILL, OPERACOES_DOC, join(import.meta.dirname, '../../.claude/skills/auditar-peca/SKILL.md'), join(import.meta.dirname, '../../.claude/skills/auditar-montagem/SKILL.md')]) {
       const conteudo = readFileSync(skill, 'utf8');
       expect(conteudo).not.toMatch(/npm run (auditar|bench)\b/);
     }
     expect(PACKAGE.scripts.auditar).toBeUndefined();
     expect(PACKAGE.scripts.bench).toBeUndefined();
+  });
+
+  it('cita somente scripts npm existentes', () => {
+    for (const conteudo of [texto, textoOperacoes, AUDITORIA, MONTAGEM]) {
+      for (const encontrado of conteudo.matchAll(/npm run ([a-z0-9:_-]+)/g)) {
+        expect(PACKAGE.scripts[encontrado[1]], `script npm ausente: ${encontrado[1]}`).toBeDefined();
+      }
+    }
+  });
+
+  it('mantém a skill de montagem alinhada à superfície MCP atual', () => {
+    expect(MONTAGEM).toMatch(/mecanifica:\/\/montagens/);
+    expect(MONTAGEM).toMatch(/descrever_montagem/);
+    expect(MONTAGEM).toMatch(/planejar_revalidacao_montagem/);
+    expect(MONTAGEM).toMatch(/catalogar_montagens/);
+    expect(MONTAGEM).toMatch(/renderizar_montagem/);
+    expect(MONTAGEM).toMatch(/somente leitura/i);
+    expect(MONTAGEM).toMatch(/não.*veto permanente ao MCP/i);
   });
 });
 

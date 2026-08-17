@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.catalogo-mcp-montagens",
+  "versao": 1,
+  "raizMontagens": "../../mecanifica/fixtures/mapa-dependencias/montagens",
+  "raizPecas": "../../mecanifica/fixtures/mapa-dependencias/pecas",
+  "raizes": [
+    { "id": "sistema-a", "ref": "sistema-a" },
+    { "id": "sistema-b", "ref": "sistema-b" },
+    { "id": "sistema-isolado", "ref": "sistema-isolado" }
+  ]
+}

@@ -2,7 +2,23 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** Nenhum.
+
+**Plano concluído mais recente:**
+[`2026-08-14-revalidacao-cascata-persistida.md`](2026-08-14-revalidacao-cascata-persistida.md).
+
+O plano abriu a revalidação em cascata como acréscimo sobre mapa, impacto,
+revisões e transações existentes. R00–R06 foram concluídas com decisão
+`aprovar`: contrato, persistência, derivação multi-raiz, resultados,
+obsolescência, estudo de campo multi-raiz e consumo Agent-First estão provados.
+Correção e publicação automática de dependentes permanecem fora.
+
+O plano de
+[`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
+concluído e aprovado. Revisões imutáveis
+autorizadas passam a alimentar leitura, vistas e revalidação, e o perfil de
+autoria preserva as ferramentas de auditoria. Ele não abre mapa global,
+correção automática de dependentes nem publicação em fontes JavaScript.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
 [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
@@ -15,7 +31,10 @@ v1 foi concluída no arquivo
 O plano de relações locais foi concluído no R06 pelo PR #41, mergeado na `main`
 no commit `e7b80ac`. As provas A–F, fixtures persistidas v2, contrato v2 e o
 documento de continuidade arquitetural estão integrados. O contexto de
-montagem foi concluído no R05 na branch do PR #42. Não há plano ativo.
+montagem foi concluído no R05 na branch do PR #42. A leitura e auditoria de
+montagens por MCP foi aprovada no R04, com consumo caixa-preta e visão real. O
+plano de materialização e autoria segura de montagens foi concluído com decisão
+`aprovar`. O experimento de autoria geométrica do zero concluiu com `corrigir`.
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
@@ -35,6 +54,14 @@ permanecem fora do fechamento.
 
 O contexto de montagem acrescentou serviço puro e CLI confinada sobre v1/v2.
 Ele não alterou o resolvedor, os validadores, o motor ou peças publicadas.
+
+O mapa canônico concluiu R00–R06 com decisão `aprovar`: contrato de universo,
+snapshot confinado, composição, ocorrências, relações, usos reversos, consulta
+de impacto, consumo MCP reduzido, continuidade ativa e escala estão provados.
+O plano de cascata persistida foi concluído no R06 após as provas
+focadas em contrato, persistência, retomada, compartilhamento, resultados,
+obsolescência, concorrência, MCP e estudo de campo, com decisão `aprovar`.
+Qualquer evolução permanece separada de promoção automática.
 
 O diagnóstico concluiu que o motor de peça atual é adequado para servir de base
 à primeira montagem persistida sem refatoração estrutural prévia. Os limites
@@ -59,15 +86,16 @@ Com autorização explícita de continuidade, a relação espacial direcional e 
 mapa de impacto local foram concluídos no R04. Disco–pinça é fixture; o contrato
 permanece neutro e não promete colisão geral.
 
-Com autorização explícita de continuidade, o plano de contexto visual e autoria
-segura foi aberto em R00. Ele avança leitura visual, revalidação assistida,
-catálogo explícito entre raízes e somente então avalia escrita transacional.
+Com autorização explícita de continuidade, o plano de materialização e autoria
+segura fechou em R06: a transação, a revalidação condicionante e a autoria MCP
+opt-in foram aprovadas pelas provas internas, consumidor caixa-preta e estudo de
+campo repetido.
 
 ## Programas
 
 | Programa | Painel | Execução atual |
 |---|---|---|
-| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | nenhuma; autoria controlada encerrada com decisão `interromper` |
+| MCP para agentes | [`mcp/INDEX.md`](mcp/INDEX.md) | leitura, autoria de montagem e receita declarativa opt-in aprovadas |
 
 O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
@@ -81,7 +109,7 @@ a correção de descoberta foi concluída com decisão `aprovar` em
 e a primeira fatia de autoria controlada foi concluída com decisão `interromper`
 em [`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
 
-A autoria não foi publicada. O PR #25 foi fechado sem merge porque a
+A primeira autoria controlada de pacotes não foi publicada. O PR #25 foi fechado sem merge porque a
 implementação portátil não demonstrou simultaneamente publicação do pacote
 completo em uma única transição e recusa atômica de sobrescrita contra destino
 concorrente. Uma retomada exige plano técnico separado. Edição de receita,
@@ -125,6 +153,7 @@ nos arquivos originais.
 | Contexto de montagem para IA | concluído: R05, PR #42 |
 | Montagem v3 — separação direcional e impacto local | concluído: R04, PR #42 |
 | Contexto visual e autoria segura de montagem | concluído: R05, PR #43 |
+| MCP — leitura e auditoria de montagens | concluído: aprovar, R04 |
 
 Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.md),
 [câmera](concluidos/2026-08-02-camera-livre-reproduzivel.md), [canto](concluidos/2026-08-02-canto-composto.md),
@@ -144,15 +173,10 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
 [diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
 
-## Abertura
+## Próxima abertura
 
-**Montagem Persistida v2 — relações locais** está concluída, assim como a
-Montagem Mínima Persistida v1 e o contexto de montagem para IA. Nenhum próximo
-plano executivo é autorizado automaticamente; backlog, MCP, refatoração do
-motor, personalização de materiais e limpeza de receitas históricas permanecem
-fora do fechamento.
-
-Os candidatos gerais permanecem em [`BACKLOG.md`](BACKLOG.md). Etapas futuras
-do MCP permanecem somente no painel `mcp/INDEX.md` até existir decisão explícita
-e um novo plano executivo ativo. Para abrir outro plano, copie [`MODELO.md`](MODELO.md),
-preencha objetivo, escopo, gates e encerramento esperado e atualize este índice.
+A [autoria segura de receitas declarativas](2026-08-14-autoria-segura-receitas.md)
+foi aprovada e fechou a fronteira do experimento sem executar JavaScript do
+agente. A continuidade dessas revisões no catálogo foi concluída e aprovada;
+o mapa canônico é agora o plano ativo e os demais candidatos permanecem no
+[`BACKLOG.md`](BACKLOG.md).

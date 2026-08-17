@@ -1,0 +1,8 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "sistema-isolado",
+  "instancias": [
+    { "id": "isolada", "alvo": { "tipo": "peca", "ref": "peca-isolada" } }
+  ]
+}

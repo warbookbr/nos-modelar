@@ -1,0 +1,18 @@
+{
+  "formato": "mecanifica.universo-autoria",
+  "versao": 1,
+  "id": "fixture-mapa-dependencias",
+  "pecas": [
+    { "id": "peca-compartilhada", "ref": "peca-compartilhada" },
+    { "id": "peca-a", "ref": "peca-a" },
+    { "id": "peca-b", "ref": "peca-b" },
+    { "id": "peca-isolada", "ref": "peca-isolada" }
+  ],
+  "montagens": [
+    { "id": "sistema-a", "ref": "sistema-a" },
+    { "id": "sistema-b", "ref": "sistema-b" },
+    { "id": "sistema-isolado", "ref": "sistema-isolado" },
+    { "id": "subconjunto-compartilhado", "ref": "subconjunto-compartilhado" }
+  ],
+  "raizes": ["sistema-a", "sistema-b", "sistema-isolado"]
+}

@@ -4,7 +4,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
@@ -16,11 +16,53 @@ import {
   comparar, conteudoRenderizacao, descrever, LIMITES_VISTAS, renderizar,
   resumoComparacao, resumoDescricao, resumoTotais, validar,
 } from './perfis/revisao.mjs';
-import { compararSaida, descreverSaida, renderizarSaida, validarSaida } from './contratos.mjs';
+import {
+  catalogarMontagens, conteudoRenderizacaoMontagem, descreverMontagem,
+  LIMITES_VISTAS_MONTAGEM, planejarRevalidacao, renderizarMontagem,
+} from './perfis/montagens.mjs';
+import {
+  catalogarMontagensSaida, compararSaida, descreverMontagemSaida, descreverSaida,
+  consultarImpactoGlobalSaida, renderizarMontagemSaida, renderizarSaida, revalidarMontagemSaida, validarSaida,
+} from './contratos.mjs';
+import {
+  carregarCatalogoMontagens, VARIAVEL_CATALOGO_MCP_MONTAGENS,
+} from './catalogo-montagens.mjs';
+import { VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS } from './universo-dependencias.mjs';
+import * as EIXO_AUTORIA from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
+const CONFIGURACAO_MONTAGENS = join(RAIZ, 'tools/mcp/fixtures/catalogo-montagens.json');
+const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependencias.json');
+const CONFIGURACAO_CATALOGO_MAPA = join(RAIZ, 'tools/mcp/fixtures/catalogo-mapa-dependencias.json');
+const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
+const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
+const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/experimentos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
+const receitaEixo = (fim) => ({
+  formato: 'mecanifica.receita-declarativa', versao: 1, id: 'eixo-guia',
+  params: { ...EIXO_AUTORIA.PARAMS, fim, comprimento: fim - EIXO_AUTORIA.PARAMS.inicio },
+  topo: EIXO_AUTORIA.TOPO, passos: EIXO_AUTORIA.PASSOS,
+  materiais: EIXO_AUTORIA.MATERIAIS, aliases: EIXO_AUTORIA.ALIASES,
+  meta: { nome: 'eixo-guia', desc: 'eixo declarativo do experimento' },
+});
+const CATALOGO_MONTAGENS = carregarCatalogoMontagens(CONFIGURACAO_MONTAGENS);
 const tamanhosStructured = {};
+let configuracaoAnterior;
+let universoAnterior;
+
+beforeAll(() => {
+  configuracaoAnterior = process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS];
+  universoAnterior = process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS];
+  process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS] = CONFIGURACAO_MONTAGENS;
+  process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS] = CONFIGURACAO_UNIVERSO;
+});
+
+afterAll(() => {
+  if (configuracaoAnterior === undefined) delete process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS];
+  else process.env[VARIAVEL_CATALOGO_MCP_MONTAGENS] = configuracaoAnterior;
+  if (universoAnterior === undefined) delete process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS];
+  else process.env[VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS] = universoAnterior;
+});
 
 function clienteStdio() {
   const processo = spawn(process.execPath, [SERVIDOR], { cwd: RAIZ, stdio: ['pipe', 'pipe', 'pipe'] });
@@ -109,10 +151,14 @@ describe('servidor MCP local — perfil revisao', () => {
     const client = new Client({ name: 'teste-mecanifica', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      },
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.2.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -122,24 +168,29 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia exatamente quatro tools e três resources', async () => {
+  it('faz handshake bruto, anuncia nove tools e seis resources somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.2.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(4);
-      for (const tool of ferramentas.result.tools) expect(tool.outputSchema).toBeDefined();
+      expect(ferramentas.result.tools).toHaveLength(9);
+      for (const tool of ferramentas.result.tools) {
+        expect(tool.outputSchema).toBeDefined();
+        expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
+      }
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
-        'mecanifica://estado', 'mecanifica://capacidades/modelagem', 'mecanifica://pacotes',
+        'mecanifica://estado', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
+        'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(3);
+      expect(recursos.result.resources).toHaveLength(6);
     } finally {
       await cliente.fechar();
     }
@@ -149,6 +200,7 @@ describe('servidor MCP local — perfil revisao', () => {
     const client = new Client({ name: 'teste-mecanifica', version: '1' });
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
     });
     try {
       await client.connect(transport);
@@ -278,25 +330,62 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(ausente.result).toMatchObject({ isError: true, structuredContent: {
         ok: false, erro: { codigo: 'pacote_nao_encontrado' },
       } });
+      const montagemTraversal = await cliente.enviar('tools/call', {
+        name: 'descrever_montagem', arguments: { id: '../segredo' },
+      });
+      expect(montagemTraversal.result).toMatchObject({ isError: true });
+      expect(montagemTraversal.result.structuredContent).toBeUndefined();
+      expect(montagemTraversal.result.content[0].text).toMatch(/Input validation error/);
+      const montagemAusente = await cliente.enviar('tools/call', {
+        name: 'descrever_montagem', arguments: { id: 'nao-catalogada' },
+      });
+      expect(montagemAusente.result).toMatchObject({
+        isError: true,
+        structuredContent: { ok: false, erro: { codigo: 'montagem_nao_encontrada' } },
+      });
+      expect(JSON.stringify(montagemAusente.result)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
     } finally {
       await cliente.fechar();
     }
   });
 
-  it('entrega os três recursos e não expõe caminhos do runtime', async () => {
+  it('entrega os recursos e não expõe caminhos do runtime', async () => {
     const { cliente } = await conectado();
     try {
       const estado = await cliente.enviar('resources/read', { uri: 'mecanifica://estado' });
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
       const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
+      const dependencias = await cliente.enviar('resources/read', { uri: 'mecanifica://dependencias' });
+      const montagens = await cliente.enviar('resources/read', { uri: 'mecanifica://montagens' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
-      expect(estadoValor).toMatchObject({ perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v2' });
-      expect(estadoValor.ferramentas).toEqual(['descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas']);
+      const dependenciasValor = JSON.parse(dependencias.result.contents[0].text);
+      const montagensValor = JSON.parse(montagens.result.contents[0].text);
+      expect(estadoValor).toMatchObject({
+        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v5',
+        catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
+      });
+      expect(estadoValor.ferramentas).toEqual([
+        'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+      ]);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
       expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
+      expect(dependenciasValor).toMatchObject({
+        formato: 'mecanifica.resumo-dependencias-global', configurado: true,
+        universo: { id: 'fixture-mapa-dependencias', entidades: 8 },
+        mapa: { sha256: expect.stringMatching(/^sha256:/) }, cobertura: { completa: true },
+      });
+      expect(JSON.stringify(dependenciasValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|documento|composicao|ocorrencias/);
+      expect(montagensValor).toEqual({
+        formato: 'mecanifica.catalogo-mcp-montagens-publico',
+        versao: 1,
+        configurado: true,
+        raizes: [{ id: 'gabarito-separacao-direcional' }, { id: 'gabarito-unitario' }],
+      });
+      expect(JSON.stringify(montagensValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|raizMontagens|raizPecas/);
     } finally {
       await cliente.fechar();
     }
@@ -350,6 +439,343 @@ describe('servidor MCP local — perfil revisao', () => {
     } finally {
       await client.close();
     }
+  });
+
+  it('mantém paridade entre os serviços de montagem e seus schemas públicos', async () => {
+    const descricao = await descreverMontagem({
+      id: 'gabarito-separacao-direcional', caminho: ['movel'], incluirRelacionados: true,
+    }, { catalogo: CATALOGO_MONTAGENS });
+    descreverMontagemSaida.parse(descricao);
+    expect(descricao.resultado.contexto).toMatchObject({
+      formato: 'mecanifica.contexto-montagem',
+      raiz: { id: 'gabarito-separacao-direcional' },
+      totais: { pecas: 2, relacoesDeclaradas: 1 },
+    });
+
+    const roteiro = await planejarRevalidacao({
+      id: 'gabarito-separacao-direcional', alvo: ['movel'],
+    }, { catalogo: CATALOGO_MONTAGENS });
+    revalidarMontagemSaida.parse(roteiro);
+    expect(roteiro.resultado.roteiro.itens).toEqual([
+      expect.objectContaining({ alcance: 'direta', revalidacao: expect.objectContaining({ executavel: true }) }),
+    ]);
+    expect(roteiro.resultado.roteiro.pendencias.map(({ codigo }) => codigo)).toContain('uso-global-fora-da-raiz-nao-verificado');
+
+    const catalogado = await catalogarMontagens({
+      ids: ['gabarito-unitario', 'gabarito-separacao-direcional'],
+    }, { catalogo: CATALOGO_MONTAGENS });
+    catalogarMontagensSaida.parse(catalogado);
+    expect(catalogado.resultado.catalogo.raizes).toEqual([
+      { id: 'gabarito-separacao-direcional' }, { id: 'gabarito-unitario' },
+    ]);
+    expect(catalogado.resultado.catalogo.limitacoes).toContain('somente-raizes-explicitamente-fornecidas');
+  });
+
+  it('consumidor caixa-preta descobre e audita montagem sem ler caminhos do repositório', async () => {
+    const client = new Client({ name: 'consumidor-montagens', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
+    });
+    try {
+      await client.connect(transport);
+      const recurso = await client.readResource({ uri: 'mecanifica://montagens' });
+      const publico = JSON.parse(recurso.contents[0].text);
+      const id = publico.raizes.find((raiz) => raiz.id === 'gabarito-separacao-direcional').id;
+
+      const descrita = await client.callTool({ name: 'descrever_montagem', arguments: { id } });
+      expect(descrita.isError).not.toBe(true);
+      descreverMontagemSaida.parse(descrita.structuredContent);
+
+      const roteiro = await client.callTool({
+        name: 'planejar_revalidacao_montagem', arguments: { id, alvo: ['movel'] },
+      });
+      expect(roteiro.isError).not.toBe(true);
+      revalidarMontagemSaida.parse(roteiro.structuredContent);
+
+      const catalogado = await client.callTool({
+        name: 'catalogar_montagens',
+        arguments: { ids: publico.raizes.map((raiz) => raiz.id) },
+      });
+      expect(catalogado.isError).not.toBe(true);
+      catalogarMontagensSaida.parse(catalogado.structuredContent);
+      const troca = JSON.stringify({ recurso: publico, descrita, roteiro, catalogado });
+      expect(troca).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|raizMontagens|raizPecas/);
+      tamanhosStructured.descrever_montagem = Buffer.byteLength(JSON.stringify(descrita.structuredContent), 'utf8');
+      tamanhosStructured.planejar_revalidacao_montagem = Buffer.byteLength(JSON.stringify(roteiro.structuredContent), 'utf8');
+      tamanhosStructured.catalogar_montagens = Buffer.byteLength(JSON.stringify(catalogado.structuredContent), 'utf8');
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('consumidor caixa-preta descobre cobertura e consulta impacto sem ler o mapa ou caminhos', async () => {
+    const client = new Client({ name: 'consumidor-impacto-global', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      },
+    });
+    try {
+      await client.connect(transport);
+      const recurso = await client.readResource({ uri: 'mecanifica://dependencias' });
+      const resumo = JSON.parse(recurso.contents[0].text);
+      expect(resumo).toMatchObject({
+        configurado: true,
+        universo: { id: 'fixture-mapa-dependencias', entidades: 8 },
+        mapa: { sha256: expect.stringMatching(/^sha256:/) },
+      });
+      expect(JSON.stringify(resumo)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|composicao|ocorrencias|documento/);
+
+      const impacto = await client.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      expect(impacto.isError).not.toBe(true);
+      consultarImpactoGlobalSaida.parse(impacto.structuredContent);
+      expect(impacto.structuredContent.resultado.impacto).toMatchObject({
+        raizesAfetadas: ['sistema-a', 'sistema-b'], raizesNaoAfetadas: ['sistema-isolado'],
+      });
+      expect(JSON.stringify(impacto)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\/|\.json|documento|composicao|ocorrencias/);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('reconstrói impacto global em nova sessão após publicar uma revisão ativa e mede economia de contexto', async () => {
+    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-mapa-r05-'));
+    const ambiente = {
+      ...process.env,
+      [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_CATALOGO_MAPA,
+      [VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS]: CONFIGURACAO_UNIVERSO,
+      MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+    };
+    const escritor = new Client({ name: 'consumidor-r05-escritor', version: '1' });
+    const transporteEscritor = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe', env: ambiente,
+    });
+    let antes;
+    let aplicada;
+    try {
+      await escritor.connect(transporteEscritor);
+      const recursoAntes = await escritor.readResource({ uri: 'mecanifica://dependencias' });
+      antes = JSON.parse(recursoAntes.contents[0].text);
+      const impactoAntes = await escritor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      expect(impactoAntes.structuredContent.resultado.impacto.raizesAfetadas).toEqual(['sistema-a', 'sistema-b']);
+      const contextos = await Promise.all(['sistema-a', 'sistema-b', 'sistema-isolado'].map((id) => escritor.callTool({
+        name: 'descrever_montagem', arguments: { id },
+      })));
+      const bytesImpacto = Buffer.byteLength(JSON.stringify(impactoAntes.structuredContent), 'utf8');
+      const bytesContextos = contextos.reduce((total, resposta) => total + Buffer.byteLength(JSON.stringify(resposta.structuredContent), 'utf8'), 0);
+      expect(bytesImpacto).toBeLessThan(bytesContextos);
+
+      const candidata = JSON.parse(JSON.stringify(MONTAGEM_SISTEMA_A));
+      candidata.instancias = candidata.instancias.filter((instancia) => instancia.id !== 'compartilhado');
+      const planejada = await escritor.callTool({
+        name: 'planejar_autoria_montagem', arguments: { id: 'sistema-a', revisaoObservada: null, montagem: candidata },
+      });
+      expect(planejada.isError).not.toBe(true);
+      aplicada = await escritor.callTool({
+        name: 'aplicar_autoria_montagem', arguments: {
+          plano: planejada.structuredContent.resultado.plano,
+          confirmacao: planejada.structuredContent.resultado.confirmacao,
+          alvo: ['exclusivo-a'],
+        },
+      });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { id: 'sistema-a' } });
+    } finally {
+      await escritor.close();
+    }
+
+    const leitor = new Client({ name: 'consumidor-r05-nova-sessao', version: '1' });
+    const transporteLeitor = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: { ...ambiente, MECANIFICA_PERFIL: 'revisao' },
+    });
+    try {
+      await leitor.connect(transporteLeitor);
+      const recursoDepois = await leitor.readResource({ uri: 'mecanifica://dependencias' });
+      const depois = JSON.parse(recursoDepois.contents[0].text);
+      expect(depois.mapa.sha256).not.toBe(antes.mapa.sha256);
+      const impactoDepois = await leitor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'peca', id: 'peca-compartilhada' },
+      });
+      consultarImpactoGlobalSaida.parse(impactoDepois.structuredContent);
+      expect(impactoDepois.structuredContent.resultado.impacto).toMatchObject({
+        raizesAfetadas: ['sistema-b'], raizesNaoAfetadas: ['sistema-a', 'sistema-isolado'],
+      });
+      const proveniencia = await leitor.callTool({
+        name: 'consultar_impacto_global', arguments: { tipo: 'montagem', id: 'sistema-a' },
+      });
+      expect(proveniencia.structuredContent.resultado.impacto.roteiroRevalidacao[0].proveniencia).toMatchObject({
+        fonte: 'revisao-ativa', revisao: aplicada.structuredContent.resultado.revisao,
+      });
+      expect(JSON.stringify({ antes, depois, impactoDepois, proveniencia })).not.toContain(repositorio);
+    } finally {
+      await leitor.close();
+      rmSync(repositorio, { recursive: true, force: true });
+    }
+  }, 180_000);
+
+  it('consumidor caixa-preta conclui autoria por MCP sem shell nem paths', async () => {
+    const repositorio = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-r05-'));
+    const client = new Client({ name: 'consumidor-autoria-caixa-preta', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        ...process.env,
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS,
+        MECANIFICA_PERFIL: 'autoria',
+        MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+      },
+    });
+    try {
+      await client.connect(transport);
+      const estado = await client.readResource({ uri: 'mecanifica://estado' });
+      const publico = JSON.parse(estado.contents[0].text);
+      expect(publico).toMatchObject({ perfil: 'autoria' });
+      expect(publico.ferramentas).toEqual([
+        'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
+        'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
+        'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',
+        'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
+        'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
+      ]);
+      const id = 'gabarito-separacao-direcional';
+      const observada = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
+      expect(observada.structuredContent).toMatchObject({ ok: true, resultado: { revisao: null } });
+      const publicada = JSON.parse(JSON.stringify(MONTAGEM_AUTORIA));
+      publicada.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.025, 0];
+      const planejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: publicada } });
+      expect(planejada.structuredContent).toMatchObject({ ok: true });
+      const { plano, confirmacao } = planejada.structuredContent.resultado;
+      const alternativa = JSON.parse(JSON.stringify(publicada));
+      alternativa.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.03, 0];
+      const concorrentePlanejada = await client.callTool({ name: 'planejar_autoria_montagem', arguments: { id, revisaoObservada: null, montagem: alternativa } });
+      const concorrentePlano = concorrentePlanejada.structuredContent.resultado;
+      const inspecionada = await client.callTool({ name: 'inspecionar_proposta_montagem', arguments: { plano, confirmacao, alvo: ['movel'] } });
+      expect(inspecionada.structuredContent).toMatchObject({ ok: true, resultado: { promocao: { estado: 'aprovado' } } });
+      const aplicada = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano, confirmacao, alvo: ['movel'] } });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true });
+      const relida = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
+      expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
+      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id } });
+      expect(descritaAtiva.structuredContent.resultado.contexto.relacoes[0].medidas.separacaoDirecional).toBeCloseTo(0.025);
+      const estadoAtivo = await client.readResource({ uri: 'mecanifica://autoria' });
+      expect(JSON.parse(estadoAtivo.contents[0].text).montagens).toContainEqual(expect.objectContaining({
+        id, revisao: aplicada.structuredContent.resultado.revisao, fonte: 'revisao-ativa',
+      }));
+      const concorrente = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano: concorrentePlano.plano, confirmacao: concorrentePlano.confirmacao, alvo: ['movel'] } });
+      expect(concorrente.isError).toBe(true);
+      expect(concorrente.structuredContent).toMatchObject({ ok: false, erro: { codigo: 'revisao_desatualizada' } });
+      expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, descritaAtiva, estadoAtivo, concorrente })).not.toContain(repositorio);
+    } finally {
+      await client.close();
+      rmSync(repositorio, { recursive: true, force: true });
+    }
+  }, 180_000);
+
+  it('consumidor MCP recusa eixo inválido e publica a correção declarativa', async () => {
+    const temporario = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-r01-'));
+    const catalogoLocal = join(temporario, 'catalogo');
+    const repositorio = join(temporario, 'repositorio');
+    const preparado = spawnSync(process.execPath, [MATERIALIZAR_CATALOGO_AUTORIA, catalogoLocal], { cwd: RAIZ, encoding: 'utf8' });
+    expect(preparado.status).toBe(0);
+    const client = new Client({ name: 'consumidor-autoria-receita', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: {
+        ...process.env,
+        [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
+        MECANIFICA_PERFIL: 'autoria', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+        MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+      },
+    });
+    try {
+      await client.connect(transport);
+      const estado = await client.readResource({ uri: 'mecanifica://estado' });
+      const idReceita = JSON.parse(estado.contents[0].text).receitasAutorizadas[0];
+      expect(idReceita).toBe('eixo-guia');
+      const observada = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
+      expect(observada.structuredContent).toMatchObject({ ok: true, resultado: { revisao: null } });
+
+      const invalida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.035) } });
+      const { plano: planoInvalido, confirmacao: confirmacaoInvalida } = invalida.structuredContent.resultado;
+      const inspeçãoInválida = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: planoInvalido, confirmacao: confirmacaoInvalida } });
+      expect(inspeçãoInválida).toMatchObject({ isError: true, structuredContent: { ok: false, erro: { codigo: 'revalidacao_recusada' } } });
+
+      const corrigida = await client.callTool({ name: 'planejar_autoria_receita', arguments: { id: idReceita, revisaoObservada: null, receita: receitaEixo(0.010) } });
+      const proposta = corrigida.structuredContent.resultado;
+      const inspecionada = await client.callTool({ name: 'inspecionar_proposta_receita', arguments: { plano: proposta.plano, confirmacao: proposta.confirmacao } });
+      expect(inspecionada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aprovada', revalidacao: { cobertura: 'catalogo-explicito' } } });
+      const aplicada = await client.callTool({ name: 'aplicar_autoria_receita', arguments: { plano: proposta.plano, confirmacao: proposta.confirmacao } });
+      expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aplicado' } });
+      const relida = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
+      expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
+      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+      const eixoAtivo = descritaAtiva.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
+      expect(eixoAtivo.caixaMundo.max[0]).toBeCloseTo(0.010);
+      const autoriaAtiva = await client.readResource({ uri: 'mecanifica://autoria' });
+      expect(JSON.parse(autoriaAtiva.contents[0].text).receitas).toEqual([expect.objectContaining({
+        id: idReceita, revisao: aplicada.structuredContent.resultado.revisao, fonte: 'revisao-ativa',
+      })]);
+
+      const clienteNovo = new Client({ name: 'consumidor-continuacao', version: '1' });
+      const transporteNovo = new StdioClientTransport({
+        command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+        env: {
+          ...process.env,
+          [VARIAVEL_CATALOGO_MCP_MONTAGENS]: join(catalogoLocal, 'catalogo.json'),
+          MECANIFICA_PERFIL: 'revisao', MECANIFICA_REPOSITORIO_AUTORIA: repositorio,
+          MECANIFICA_RECEITAS_AUTORIZADAS: 'eixo-guia',
+        },
+      });
+      try {
+        await clienteNovo.connect(transporteNovo);
+        const estadoNovo = await clienteNovo.readResource({ uri: 'mecanifica://estado' });
+        expect(JSON.parse(estadoNovo.contents[0].text)).toMatchObject({ perfil: 'revisao', autoriaAtivaConfigurada: true });
+        const descritaNova = await clienteNovo.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+        const eixoNovo = descritaNova.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
+        expect(eixoNovo.caixaMundo.max[0]).toBeCloseTo(0.010);
+      } finally { await clienteNovo.close(); }
+      expect(JSON.stringify({ observada, invalida, inspeçãoInválida, corrigida, inspecionada, aplicada, relida, descritaAtiva, autoriaAtiva })).not.toContain(temporario);
+    } finally {
+      await client.close();
+      rmSync(temporario, { recursive: true, force: true });
+    }
+  }, 180_000);
+
+  it('transporta vistas de montagem sem colocar base64 no structuredContent', async () => {
+    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    let instante = 100;
+    const executada = await renderizarMontagem({
+      id: 'gabarito-separacao-direcional', vistas: ['isometrica', 'direita'],
+    }, {
+      catalogo: CATALOGO_MONTAGENS,
+      agora: () => (instante += 10),
+      capturar: async ({ caminho, vistas, timeoutMs }) => {
+        expect({ caminho, vistas, timeoutMs }).toEqual({
+          caminho: [], vistas: ['isometrica', 'direita'], timeoutMs: LIMITES_VISTAS_MONTAGEM.timeoutMs,
+        });
+        return {
+          ok: true, codigo: 0,
+          resultado: {
+            capturas: vistas.map((nome) => ({
+              nome, mimeType: 'image/png', largura: 1280, altura: 720, dados: png,
+              instancias: [['movel'], ['referencia']],
+              enquadramento: { valida: true, area: 0.25, largura: 0.5, altura: 0.5, cortado: false },
+            })),
+          },
+        };
+      },
+    });
+    renderizarMontagemSaida.parse(executada.resposta);
+    expect(JSON.stringify(executada.resposta)).not.toContain(png.toString('base64'));
+    const conteudo = conteudoRenderizacaoMontagem(executada);
+    expect(conteudo.filter(({ type }) => type === 'image')).toHaveLength(2);
   });
 
   describe('listarCatalogoDePacotes — ordenação, filtragem e confinamento (fixture isolada)', () => {
@@ -772,11 +1198,46 @@ describe('servidor MCP local — perfil revisao', () => {
     console.log(`MCP_VISUAL_METRICAS ${JSON.stringify(metricas)}`);
   }, 180_000);
 
-  it('registra a linha-base de bytes das três respostas estruturadas', () => {
-    expect(tamanhosStructured).toEqual({
+  testeVisualReal('consumidor zerado descobre, consulta e vê uma montagem sem escrita', async () => {
+    const antes = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
+    const client = new Client({ name: 'consumidor-visual-montagem', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
+      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
+    });
+    try {
+      await client.connect(transport);
+      const recurso = await client.readResource({ uri: 'mecanifica://montagens' });
+      const { raizes } = JSON.parse(recurso.contents[0].text);
+      const id = raizes.find((raiz) => raiz.id === 'gabarito-separacao-direcional').id;
+      const descrita = await client.callTool({ name: 'descrever_montagem', arguments: { id } });
+      expect(descrita.isError).not.toBe(true);
+      const visual = await client.callTool({
+        name: 'renderizar_montagem', arguments: { id, vistas: ['isometrica', 'direita'] },
+      });
+      expect(visual.isError).not.toBe(true);
+      renderizarMontagemSaida.parse(visual.structuredContent);
+      expect(visual.content.filter(({ type }) => type === 'image')).toHaveLength(2);
+      for (const imagem of visual.content.filter(({ type }) => type === 'image')) {
+        expect(Buffer.from(imagem.data, 'base64').subarray(0, 8)).toEqual(Buffer.from('89504e470d0a1a0a', 'hex'));
+      }
+      expect(JSON.stringify(visual.structuredContent)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
+      tamanhosStructured.renderizar_montagem = Buffer.byteLength(JSON.stringify(visual.structuredContent), 'utf8');
+    } finally {
+      await client.close();
+    }
+    const depois = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
+    expect(depois).toBe(antes);
+  }, 120_000);
+
+  it('registra a linha-base de bytes das respostas estruturadas', () => {
+    expect(tamanhosStructured).toMatchObject({
       descrever_peca: expect.any(Number),
       validar_pacote: expect.any(Number),
       comparar_revisoes: expect.any(Number),
+      descrever_montagem: expect.any(Number),
+      planejar_revalidacao_montagem: expect.any(Number),
+      catalogar_montagens: expect.any(Number),
     });
     console.log(`structuredContent bytes: ${JSON.stringify(tamanhosStructured)}`);
   });

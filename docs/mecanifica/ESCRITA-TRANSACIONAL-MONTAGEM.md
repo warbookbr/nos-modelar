@@ -2,8 +2,8 @@
 
 ## Estado
 
-**Contrato local em prova.** Existe um repositório interno de revisões
-imutáveis; não existe escrita publicada por MCP, API ou Git remoto.
+**Contrato local aprovado.** Existe repositório interno de revisões imutáveis e
+perfil MCP de autoria opt-in para montagem; API e Git remoto não existem.
 
 ## Contrato necessário
 
@@ -43,5 +43,9 @@ depende de rename de diretório.
 O recorte suporta sistema de arquivos local comum. Filesystem de rede não é
 prometido porque exclusividade pode variar por implementação.
 
-MCP, API, Git remoto e materialização de arquivos de trabalho continuam fora
-até o contrato interno completar seus gates e ganhar uma porta separada.
+O perfil MCP `autoria` reutiliza este serviço quando o host fornece catálogo e
+repositório autorizados. Ele planeja, inspeciona e aplica por identidade
+semântica, confirmação e revisão observada; o cliente não recebe nem fornece
+caminhos locais. API, Git remoto, receita, múltiplos hosts e filesystem de rede
+permanecem fora. A existência dessa porta não restringe futuras interfaces que
+ofereçam garantia equivalente ou superior.

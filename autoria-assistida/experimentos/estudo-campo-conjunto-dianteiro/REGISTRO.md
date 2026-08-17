@@ -136,3 +136,17 @@ problema de contexto. O próximo ganho de empacotamento viria depois de existir
 um serviço interno de contexto de montagem, impacto e revalidação. A crítica
 visual subjetiva deve continuar com o agente consumindo imagens e métricas;
 não deve virar uma falsa regra determinística do servidor.
+
+## R06 — repetição após autoria segura
+
+As duas rodadas foram reexecutadas pelo script do experimento: R001 confirmou
+5/5 relações e R002 confirmou 4/5, recusando somente `discoPontePinca` com
+separação direcional de −0.005 m. A relação é persistida e generalizada; o
+conjunto continua não alegando colisão geral.
+
+O ciclo de autoria foi repetido pelo cliente MCP oficial em stdio, com catálogo e
+repositório explicitamente configurados pelo host. O consumidor descobriu o
+alvo, observou revisão `null`, planejou, inspecionou vistas reais, aplicou,
+releu e recebeu `revisao_desatualizada` ao tentar uma proposta irmã do mesmo
+pai. `MCP_VISUAL_REAL=1 npm run mcp:check` passou 42/42. A porta não recebeu
+caminho local nem invocou shell pelo consumidor.

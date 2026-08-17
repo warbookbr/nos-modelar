@@ -88,9 +88,9 @@ em JSON consultável, sem malha ou identidade de runtime; veja
 
 O Módulo 1 do MCP, somente leitura e auditoria, foi aprovado. A primeira
 tentativa de autoria controlada foi encerrada com decisão `interromper`; o PR
-#25 foi fechado sem merge. Uma futura escrita, via MCP ou outra porta, precisa
-de plano próprio e deve respeitar o modelo de autoria e as garantias de
-transação descritos em [`AUTORIA-IA.md`](AUTORIA-IA.md).
+#25 foi fechado sem merge. A autoria de montagem posterior foi aprovada em perfil
+MCP opt-in, com repositório e catálogo autorizados pelo host. Receita e outras
+portas exigem plano próprio e as garantias de [`AUTORIA-IA.md`](AUTORIA-IA.md).
 
 O visor legado declara um import map para resolver `earcut` quando servido sem
 transformação. A correção pertence à infraestrutura de inspeção e não altera a

@@ -5,9 +5,10 @@
 Este é o contrato operacional atual para criar ou revisar **uma peça**. O fluxo
 é determinístico, versionado e não depende de contexto oculto.
 
-Ele ainda não é o fluxo completo de um carro, motor ou montagem recursiva. Não
-há hoje formato canônico de montagem, mapa geral de dependências ou revalidação
-automática de conjuntos afetados.
+Ele ainda não é o fluxo completo de um carro, motor ou montagem recursiva.
+Montagens persistidas v1/v2/v3, contexto estrutural e visual, impacto local e
+roteiro assistido existem; mapa geral implícito, materialização e revalidação
+automática de conjuntos afetados ainda não existem.
 
 A direção de sistemas compostos está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md). Este documento não deve ser
@@ -68,10 +69,12 @@ Não crie `revisao.json` ou imagens manualmente para simular promoção.
 - O pacote de uma peça não deve absorver artificialmente todo um sistema para
   evitar definir montagens.
 
-## Extensão futura para sistemas compostos
+## Extensão em andamento para sistemas compostos
 
-Quando o formato de montagem e o mapa canônico existirem, uma tarefa de sistema
-deverá começar antes do pacote de peça.
+Uma tarefa de sistema deve começar antes do pacote de peça. Os serviços atuais
+já derivam alvo consultado, contexto estrutural/visual e relações afetadas numa
+raiz explícita; o MCP aprovado tornou essa leitura diretamente consumível por
+agentes.
 
 O sistema precisará derivar:
 
@@ -117,7 +120,10 @@ Depois da alteração local, o sistema deverá:
 7. permitir correção, adaptação da montagem ou criação de variante;
 8. publicar apenas estado completo e válido.
 
-Essa extensão ainda não está implementada e exige plano próprio.
+Para montagem, materialização segura, aplicação de alteração e publicação
+condicionada à revalidação foram aprovadas em repositório local autorizado.
+Reexecução automática e descoberta de dependentes fora do catálogo continuam
+fora do recorte.
 
 ## Crítica e comparação
 
@@ -139,10 +145,10 @@ Para montagens futuras, a comparação também deverá distinguir:
 O MCP atual pode descrever, validar, comparar e renderizar evidências do fluxo.
 Ele não define o formato da peça nem o futuro formato de montagem.
 
-Uma futura escrita, via MCP ou outra porta, precisa ter alvo explícito,
-planejamento, confinamento, publicação atômica, nenhuma sobrescrita acidental e
-revalidação dos dependentes. Acrescentar uma ferramenta de escrita sem essas
-garantias não completa este fluxo.
+Uma escrita, via MCP ou outra porta, exige alvo explícito, planejamento,
+confinamento, publicação atômica, nenhuma sobrescrita acidental e revalidação.
+Para montagem, essas garantias foram provadas em perfil MCP opt-in; receita e
+outras portas ainda requerem plano e evidência próprios.
 
 ## Estado
 

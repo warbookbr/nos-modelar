@@ -1,0 +1,8 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 1,
+  "id": "gabarito-unitario",
+  "instancias": [
+    { "id": "bloco", "alvo": { "tipo": "peca", "ref": "bloco-gabarito" } }
+  ]
+}

@@ -11,6 +11,10 @@ paleta fixa.
 
 ## Fluxo oficial
 
+Se o alvo for uma árvore de composição, relações entre peças ou impacto de
+revalidação, mude para `../auditar-montagem/SKILL.md`. Esta skill cobre uma
+peça isolada e não inventa validade global de uma montagem.
+
 1. Gere a descrição estrita da peça:
 
    ```bash
@@ -29,7 +33,7 @@ paleta fixa.
    legibilidade das partes e coerência da forma. Não conclua apenas pela
    existência de um PNG.
 
-3. Para um pacote de modelagem, rode a revisão oficial:
+3. Se existir um pacote de modelagem associado, rode a revisão oficial:
 
    ```bash
    npm run revisar:modelagem -- <pacote> --revisao=r001
@@ -54,6 +58,12 @@ paleta fixa.
    npm run docs:links:check
    npm run planos:check
    npm run exportar:check
+   ```
+
+   Para uma peça nova ou alterada, inclua também:
+
+   ```bash
+   npm run criar -- <peca>
    ```
 
    `porteiro` e `npm run peca` ainda podem ajudar a diagnosticar o visor v3,
