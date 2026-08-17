@@ -44,6 +44,25 @@ a:focus-visible {
   touch-action: none;
 }
 
+.estado-catalogo-vazio {
+  position: fixed;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  width: min(430px, calc(100vw - 36px));
+  padding: 26px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(24, 45, 35, 0.2);
+  border-radius: 14px;
+  background: rgba(245, 248, 246, 0.94);
+  color: #26352e;
+  box-shadow: 0 20px 60px rgba(20, 33, 27, 0.16);
+  text-align: center;
+}
+
+.estado-catalogo-vazio h1 { margin: 8px 0; font-size: 20px; }
+.estado-catalogo-vazio p { margin: 0; color: #5e6d65; line-height: 1.5; }
+
 .topo {
   position: fixed;
   z-index: 8;

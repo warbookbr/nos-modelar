@@ -1,36 +1,23 @@
-/* carregar-peca.js — resolve a fixture da bancada por nome semântico e falha alto em nome inválido. */
-import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+/* carregar-peca.js — resolve somente uma entrada explícita do catálogo. */
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
-
-const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/*.js');
-
-export const PECA_PADRAO = 'drone-inspecao';
-
-function nomeDoCaminho(caminho) {
-  return caminho.slice(caminho.lastIndexOf('/') + 1, -'.js'.length);
-}
-
-/** Nomes de peça que a bancada aceita em `?peca=`, em ordem estável. */
-export const PECAS_DISPONIVEIS = Object.keys(MODULOS)
-  .map(nomeDoCaminho)
-  .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+import { executarReceita } from '../autoria/executar-receita.js';
+import { CATALOGO_HOMOLOGADO, entradaDoCatalogo } from './catalogo-pecas.js';
 
 /**
  * Constrói uma peça da Oficina e a converte para Three.js.
  * Nome ausente, desconhecido ou sem `PASSOS` falha com diagnóstico — nunca cai
  * silenciosamente na peça padrão.
  */
-export async function carregarPeca(nome = PECA_PADRAO) {
-  const caminho = Object.keys(MODULOS).find((chave) => nomeDoCaminho(chave) === nome);
-  if (!caminho) {
+export async function carregarPeca(nome, { catalogo = CATALOGO_HOMOLOGADO } = {}) {
+  if (!nome) throw new Error('bancada: informe uma peça publicada; não existe peça padrão.');
+  const entrada = entradaDoCatalogo(catalogo, nome);
+  const peca = await entrada.carregar();
+  if (!peca) {
     throw new Error(
-      `bancada: peça '${nome}' não existe em prototipos/procedural/v3/pecas/. `
-      + `Disponíveis: ${PECAS_DISPONIVEIS.join(', ')}`,
+      `bancada: carregador da peça '${nome}' devolveu vazio.`,
     );
   }
-
-  const peca = await MODULOS[caminho]();
   if (!Array.isArray(peca.PASSOS)) {
     throw new Error(
       `bancada: peça '${nome}' não expõe PASSOS. `
@@ -39,14 +26,7 @@ export async function carregarPeca(nome = PECA_PADRAO) {
   }
 
   const materiais = peca.MATERIAIS ?? {};
-  const neutro = nucleo(
-    peca.PASSOS,
-    peca.PARAMS ?? {},
-    peca.TOPO ?? {},
-    materiais,
-    peca.ESQUELETO ?? null,
-    peca.ALIASES ?? [],
-  );
+  const { neutro } = executarReceita(peca);
 
   /* a MEDIDA da peça vem do módulo neutro, não do grafo de cena: é a mesma
      medição que `npm run descrever` imprime, para que a bancada e o CLI não

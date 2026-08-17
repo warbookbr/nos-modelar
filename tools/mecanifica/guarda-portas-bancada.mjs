@@ -85,7 +85,7 @@ const vite = await createServer({
 });
 await vite.listen();
 const { port } = vite.httpServer.address();
-const base = `http://127.0.0.1:${port}/nos-mecanifica/bancada.html`;
+const base = `http://127.0.0.1:${port}/nos-mecanifica/tools/bancadas/harness.html`;
 
 const pw = (await import(pathToFileURL(PW).href)).default;
 const browser = await pw.chromium.launch({

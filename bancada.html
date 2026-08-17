@@ -14,6 +14,11 @@
   <body>
     <div id="bancadaApp">
       <canvas id="cenaBancada" aria-label="Bancada tridimensional de inspeção"></canvas>
+      <section id="estadoCatalogoVazio" class="estado-catalogo-vazio" hidden>
+        <span class="rotulo">CATÁLOGO</span>
+        <h1>Nenhuma peça homologada</h1>
+        <p>A bancada está operacional, mas ainda não há conteúdo publicado para inspeção.</p>
+      </section>
 
       <header class="topo">
         <a class="marca" href="./" aria-label="Voltar para a Mecanifica">
@@ -121,6 +126,6 @@
       <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
       <div id="erro" class="erro" role="alert" hidden></div>
     </div>
-    <script type="module" src="/src/bancada/main.js"></script>
+    <script type="module" src="/src/bancada/entrada.js"></script>
   </body>
 </html>

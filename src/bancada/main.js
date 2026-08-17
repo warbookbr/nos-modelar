@@ -1,7 +1,8 @@
 /* main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível. */
 import './styles.css';
 import * as THREE from 'three';
-import { carregarPeca, PECA_PADRAO, PECAS_DISPONIVEIS } from './carregar-peca.js';
+import { carregarPeca } from './carregar-peca.js';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -32,11 +33,29 @@ function mostrarAviso(texto) {
   mostrarAviso.timeout = setTimeout(() => { elemento.hidden = true; }, 2200);
 }
 
-async function iniciar() {
+export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const params = new URLSearchParams(location.search);
   const pecaPedida = params.get('peca');
-  const nomePeca = pecaPedida ?? PECA_PADRAO;
-  const convertido = await carregarPeca(nomePeca);
+  const nomesDisponiveis = idsDoCatalogo(catalogo);
+  if (catalogo.length === 0) {
+    if (pecaPedida) throw new Error(`bancada: peça '${pecaPedida}' não está publicada; o catálogo está vazio.`);
+    document.getElementById('fixtureAtual').textContent = 'Nenhuma peça homologada';
+    document.getElementById('estadoSemantica').classList.add('ok');
+    document.getElementById('estadoSemantica').querySelector('span').textContent = 'Catálogo vazio';
+    document.getElementById('estadoCatalogoVazio').hidden = false;
+    window.__mecanificaBancada = {
+      ready: true,
+      catalogoVazio: true,
+      peca: null,
+      pecasDisponiveis: [],
+      estado: () => ({ peca: null, catalogo: 'vazio', selecionadas: [], modo: 'todas' }),
+      url: () => location.href,
+    };
+    return;
+  }
+  if (!pecaPedida) throw new Error(`bancada: informe ?peca=ID; não existe peça padrão. Disponíveis: ${nomesDisponiveis.join(', ')}`);
+  const nomePeca = pecaPedida;
+  const convertido = await carregarPeca(nomePeca, { catalogo });
   document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
 
   const canvas = document.getElementById('cenaBancada');
@@ -127,7 +146,7 @@ async function iniciar() {
     /* `peca` vem antes do estado de vista: é a fixture, não uma opção de câmera.
        Sem isto, a primeira mudança de estado apagaria a peça da URL. */
     const saida = new URLSearchParams();
-    if (nomePeca !== PECA_PADRAO) saida.set('peca', nomePeca);
+    saida.set('peca', nomePeca);
     const estadoDaVista = escreverEstadoNaUrl({
       ...estado,
       vista: vistaAtual,
@@ -433,7 +452,7 @@ async function iniciar() {
   window.__mecanificaBancada = {
     ready: true,
     peca: nomePeca,
-    pecasDisponiveis: PECAS_DISPONIVEIS,
+    pecasDisponiveis: nomesDisponiveis,
     selecaoIgnorada,
     diagnosticos: convertido.diagnosticos,
     estatisticas: convertido.estatisticas,
@@ -477,9 +496,3 @@ async function iniciar() {
     cancelAnimationFrame(quadroReferencia);
   }, { once: true });
 }
-
-iniciar().catch((erro) => {
-  window.__mecanificaBancada = { ready: false, erro: String(erro?.message || erro) };
-  mostrarErro(erro);
-  console.error(erro);
-});
