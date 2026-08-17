@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/_caixote-filetado.js",
+    "caminho": "prototipos/procedural/v3/pecas/_caixote-filetado.js",
     "modo": "refinamento",
     "peca": "_caixote-filetado"
   },

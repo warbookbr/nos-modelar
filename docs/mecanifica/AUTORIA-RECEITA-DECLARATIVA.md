@@ -51,6 +51,6 @@ base estática ou uma revisão ativa; revisão inválida falha fechada.
 ## Limites
 
 O formato não promete importar automaticamente todo módulo JavaScript histórico.
-Também não publica arquivos em `prototipos/fps/v3/pecas/`, não executa Git e não
+Também não publica arquivos em `prototipos/procedural/v3/pecas/`, não executa Git e não
 descobre dependentes fora do catálogo explícito. Um gerador de módulo pode consumir a
 revisão declarativa futuramente, desde que preserve os mesmos bytes e gates.

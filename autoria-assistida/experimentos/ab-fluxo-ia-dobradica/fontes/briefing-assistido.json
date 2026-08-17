@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/_dobradica-de-portao.js",
+    "caminho": "prototipos/procedural/v3/pecas/_dobradica-de-portao.js",
     "modo": "criacao",
     "peca": "_dobradica-de-portao"
   },

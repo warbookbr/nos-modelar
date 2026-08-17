@@ -48,7 +48,7 @@ autorizado por MCP sem caminho do consumidor.
 ## Invariantes
 
 1. Todas as identidades são semânticas e estáveis.
-2. As receitas não entram em `prototipos/fps/v3/pecas/`.
+2. As receitas não entram em `prototipos/procedural/v3/pecas/`.
 3. O consumidor MCP não fornece nem recebe caminhos locais.
 4. Alteração inválida não é ativada; correção usa nova confirmação.
 5. A montagem reutiliza os contratos v1/v2/v3 sem extensão ad hoc.

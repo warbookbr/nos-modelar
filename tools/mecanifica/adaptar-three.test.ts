@@ -1,7 +1,7 @@
 /* adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador novo em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 

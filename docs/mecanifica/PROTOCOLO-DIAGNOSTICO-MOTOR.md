@@ -28,7 +28,7 @@ preservar fragilidades por medo ou transportar problemas para uma nova camada.
 O objeto central é o motor de peça formado por:
 
 ```text
-prototipos/fps/v3/motor/oficina.js
+prototipos/procedural/v3/motor/oficina.js
 + auxiliares importados pelo núcleo
 + contratos de receita realmente consumidos
 + malha neutra emitida

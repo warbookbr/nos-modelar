@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Executa a montagem do estudo sem criar uma porta nova no produto. */
 import { readFileSync } from 'node:fs';
-import { nucleo, neutroCanonico } from '../../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico } from '../../../prototipos/procedural/v3/motor/oficina.js';
 import {
   FORMATO, VERSAO, parteDaFace,
 } from '../../../src/autoria/ler-peca-resolvida.js';

@@ -1,5 +1,5 @@
 {
-  "hashTotal": "1031ae9e24ca2b3f62a44396772d60ead3e4e08e891e4e3406083b401a692ab2",
+  "hashTotal": "722635cb2dbb6ee1b29f74e815f41d34226ccbbcba62135a36abcc77a83c5f76",
   "pecas": {
     "_bloco-arredondado-composto": {
       "hash": "9b062a92491d13fc8f13c873b1ac5352f2e76029addbfbc042fdbe15386a4e88",
@@ -65,6 +65,11 @@
       "hash": "18dd60e17671b22680a8f69a460b90365564a84d5bdfdcf46bf0ad5390a581db",
       "vertices": 416,
       "faces": 432
+    },
+    "_modelo-procedural": {
+      "hash": "f0512afd25933b35aa674610ea364848a3e6590a48de8c2c682cdb1e8011b5de",
+      "vertices": 8,
+      "faces": 6
     },
     "_oficina-anim": {
       "hash": "72577395fb636b8b68389ce4c97eefd09e8a782c1a388f89fbc0311b9b2c962c",

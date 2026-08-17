@@ -167,7 +167,7 @@ que este documento existe pra corrigir.
 ## 1ª corrida — o resultado (D-128)
 
 Relatório completo: [`teto-moto-relatorio.md`](./teto-moto-relatorio.md) ·
-artefato: `prototipos/fps/v3/pecas/moto.js`.
+artefato: `prototipos/procedural/v3/pecas/moto.js`.
 
 **A peça saiu**, e passou em todos os eixos objetivos (0 órfãos, manifold
 2052/2052, determinismo, round-trip, reabre na Oficina). **O achado foi o

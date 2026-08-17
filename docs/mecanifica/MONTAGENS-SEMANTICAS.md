@@ -194,24 +194,25 @@ vizinhas.
 | 3 | hierarquia e consulta de subárvore | bancada e `guarda:par` |
 | 4 | contratos locais de pose, contato e interface | capacidades e provas específicas já existem, mas não formam uma montagem persistida geral |
 | 5 | montagem persistida recursiva v1 | `mecanifica.montagem` v1, pose rígida persistida e resolução recursiva já implementadas |
-| 6 | mapa de dependências e contexto derivado | não implementado |
-| 7 | validação integrada de montagem e movimento | não implementado |
-| 8 | autoria transacional de sistemas compostos pela IA | não implementado |
+| 6 | mapa de dependências e contexto derivado | implementado para universo explícito: composição, ocorrências, relações, usos reversos, impacto e contexto consultável |
+| 7 | validação integrada de montagem e movimento | relações estáticas e revalidação em cascata persistida implementadas; movimento e espaço varrido continuam fora |
+| 8 | autoria transacional de sistemas compostos pela IA | implementada em perfil MCP opt-in para catálogo/repositório autorizados; não é escrita irrestrita nem promoção automática |
 
 Os níveis 0 a 3 são operacionais. O nível 4 possui vocabulário e provas locais,
-mas ainda não existe como capacidade geral de montagem. Os níveis seguintes são
-a direção estabelecida, não promessa de implementação imediata.
+mas ainda não existe como capacidade geral de montagem. Os níveis 6 a 8 possuem
+o recorte acima; seus limites permanecem direção estabelecida, não promessa de
+generalização automática.
 
 ## O que não existe
 
 Ainda não há:
 
 - relações persistidas gerais;
-- mapa completo de dependências;
+- descoberta de dependências fora de universo explícito;
 - resolução automática de contato;
 - solver geral de encaixe;
 - validação de espaço varrido;
-- autoria de montagem por MCP, CLI ou outra porta.
+- escrita irrestrita de montagem por MCP, CLI ou outra porta.
 
 Não simule essas capacidades com índices internos, posições de câmera, cópia de
 matriz do Three.js ou documentação manual tratada como verdade executável.

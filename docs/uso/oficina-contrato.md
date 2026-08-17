@@ -9,7 +9,7 @@
 Recorte histórico de `docs/oficina.md` com o formato salvo, a identidade de
 vértice, o vocabulário de operações e a restrição de como a IA emite peça. É
 verificável contra o núcleo
-(`prototipos/fps/v3/motor/oficina.js`) — a tabela de operações é gateada por
+(`prototipos/procedural/v3/motor/oficina.js`) — a tabela de operações é gateada por
 `npm run criar`.
 
 O que ainda NÃO existe está em [`docs/rumo/oficina-roteiro.md`](../rumo/oficina-roteiro.md);
@@ -308,6 +308,8 @@ longas de `lathe`, `loft` e `inflate` abaixo.
 | FEITO | `arredondarAresta` | `origemId`, `de:{op,id,face}`, `aresta`, `raio` (PARAM), `paineis` (TOPO, ≥2) | Arco estrutural de vários painéis, com cada painel publicável por origem. Escopo composto e `chamferBox` seguem documentados em [`FILETE-V2.md`](../mecanifica/FILETE-V2.md). |
 | FEITO | `rotaciona` | `eixo` (`'x'\|'y'\|'z'`), `graus` (PARAM), `sel?` (`{v:[ids]}` e/ou `{f:[ids]}` e/ou `{regiao:{min,max}}` e/ou `{grupo:'nome'}`, default = a malha inteira), `pivo?` (`[x,y,z]`, default = centroide da seleção) | FEITO (P3 do playground, só núcleo; seleção ampliada no P8a, D-121). Gira a seleção em torno do PIVÔ (`p' = pivo + R_eixo(graus)·(p−pivo)`, a mesma convenção right-handed das matrizes de animação `mRotX/mRotY/mRotZ`). SIMPLES: só desloca posições (`st.V.set` in-place) — NUNCA cria vértice/face nem renumera (o oposto do `espelha` acima). A seleção resolve por `resolverAlvosV` (helper compartilhado, P8a): `regiao` é uma caixa delimitadora INCLUSIVA — `min`/`max` os dois OBRIGATÓRIOS (`st.vec`, sem sentinela `Infinity` — o `st.num` já recusa não-finito por lei, D-118); `grupo` são as faces daquele `f.parte` (reusa a nomeação do passo 13a, D-95) — grupo sem nenhuma face GRITA. Id/grupo inexistente na seleção GRITA, nunca corrompe. |
 | FEITO | `transladar` | `d` (`[x,y,z]`, PARAM, default `[0,0,0]`), `sel?` (o MESMO formato do `rotaciona`, default = a malha inteira) | FEITO (D-128, achado pelo experimento do TETO — `docs/historico/TETO.md`; só núcleo). Soma `d` a cada vértice da seleção (`p' = p + d`), ADITIVO como o `moveV` — acompanha a base, então mexer no PARAM remodela sem tocar em passo. SIMPLES: nunca cria vértice/face nem renumera, e NÃO consome o bloco de ids. Sem pivô (translação não depende de pivô). **É O IRMÃO QUE FALTAVA DO `rotaciona`:** dava pra GIRAR a malha inteira mas não pra TRANSLADAR nada maior que uma face (`moveV`=1 vértice, `moveF`=1 face, `moveA`=1 aresta) — e como 7 das 9 primitivas nascem PRESAS à origem (`cubo`/`cilindro`/`esfera`/`cone`/`plano`/`chamferBox` centrados com a base em y=0; `lathe` sempre em torno de Y), posicionar uma delas custava um `moveV` POR VÉRTICE (32+ passos por roda). Medido: a moto do TETO usou 7 das 25 ops e virou 100% `loft` — o único gerador com `pos` por seção. **O jeito de compor:** crie a primitiva, translade no passo seguinte (`sel` ausente = tudo que existe até ali; com geometria anterior no caminho, mire só a nova por `sel:{regiao}`/`{grupo}`). |
+| FEITO | `encostar` | `sel`, `referencia`, `direcao`, `folga?` | Posiciona a seleção pela extensão projetada na direção declarada, contra a referência menos a folga. É contato determinístico, não solver: não infere eixo, não resolve colisão lateral nem valida encaixe completo. |
+| FEITO | `arranja` | modo radial ou linear, `total`, `derivaDe`, `origemId`, `nomes?` | Duplica a fonte por regra declarada; a fonte conta no total e o ângulo é derivado, nunca acumulado. `nomes` torna cada cópia endereçável por origem sem depender de índice. |
 | FEITO | `mescla` | `de: [ids]`, `para: id` | Some as faces de área zero que sobrarem. |
 | FEITO | `apagaFace` | `face` (legado) ou `sel` | FEITO (P8a do playground, D-121, só núcleo). Remove a face de `st.F`. Os VÉRTICES dela continuam existindo (podem estar em uso por outra face, ou não — um vértice sem face nenhuma não é erro, é normal ao abrir um buraco de propósito: porta, janela, ou preparo pra composição manual). Face inexistente GRITA. **Única das ops de edição por id que aceita `sel`** (`moveV`/`moveF`/`moveA`/`vira`/`extruda`/`mescla` não aceitam): resolve pela semântica uniforme e exige **exatamente uma face** — 2+ GRITA `seleção ambígua`, seleção vazia GRITA, e `face` junto com `sel` GRITA; nos três casos nada é apagado (fail-closed). É o que torna o VÃO escrevível sem id posicional (`pecas/_vao-e-anteparo.js`). |
 | FEITO | `pincel` | `modo`, `cor`, e o alvo conforme o modo | `modo:'face'` aceita `faces:[ids]` (legado) OU `sel` uniforme. `modo:'livre'` recebe `raio`, `dureza` e `pontos:[{f,a,b}]`, nunca `sel`. |
@@ -316,6 +318,23 @@ longas de `lathe`, `loft` e `inflate` abaixo.
 | FEITO | `material` | `faces:[ids]` (legado) ou `sel`, `usa` | Aplica um material declarado em `MATERIAIS`. |
 | FEITO | `solido` | `faces:[ids]` (legado) ou `sel` | Marca as faces resolvidas que entram na colisão. |
 | FEITO | `pesar` | `osso`, `vs?: [ids]` (ou `faces?: [ids]`), `peso` | FEITO (passo 14a, esqueleto/skinning). Soma `peso` de influência do OSSO aos vértices dados (diretamente por `vs` ou por `faces`, resolvidas pros vértices). Acumula por (vértice, osso); vértice sem osso nenhum some ORFÃO, não corrompe a malha. Achado da Rodada 3 da reorganização de docs: a op existe no núcleo (`OPS.pesar`) desde o passo 14a, mas não tinha linha nesta tabela — só prosa em "Passos propostos" mais abaixo (que é sobre outra coisa: esqueleto/hierarquia, não esta op). |
+
+### Pose de criação
+
+Os geradores `cubo`, `cilindro`, `esfera`, `cone`, `plano`, `chamferBox` e
+`lathe` aceitam `em: [x,y,z]` para transladar a forma recém-criada. Os
+geradores de revolução (`cilindro`, `esfera` e `lathe`) também aceitam
+`eixo: 'x' | 'y' | 'z'`; sem ele, nascem no eixo Y. A ordem é gira e depois
+move, sempre em torno da origem. `em` fora de um gerador e `eixo` em um gerador
+sem revolução falham de forma explícita.
+
+### Contato derivado e cópias nomeadas
+
+Use `encostar` quando a posição deve decorrer de outra geometria, em vez de
+repetir uma coordenada calculada. A direção é obrigatória e a operação só
+resolve a extensão nessa direção; contato lateral, interpenetração e mecanismo
+continuam fora. Em `arranja`, `nomes` nomeia as cópias para que seleções usem
+`{ op:'arranja', id, de, nome }`, não o índice incidental da repetição.
 
 **Atualização F1/A-30 — medidas e identidade por grupo:** `furo.centros` aceita
 uma lista que mistura pontos `[x,y,z]`, discos `{nome?, centro:[x,y,z], raio?,

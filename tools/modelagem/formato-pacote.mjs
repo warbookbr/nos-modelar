@@ -205,7 +205,7 @@ function validarBriefing(briefing, opcoes) {
   if (!['refinamento', 'criacao'].includes(modo)) {
     falhar('briefing.alvo.modo precisa ser refinamento ou criacao.');
   }
-  const esperado = `prototipos/fps/v3/pecas/${peca}.js`;
+  const esperado = `prototipos/procedural/v3/pecas/${peca}.js`;
   if (caminho !== esperado) falhar(`briefing.alvo.caminho precisa ser exatamente ${esperado}.`);
 
   lista(briefing.partesEsperadas, 'briefing.partesEsperadas');
@@ -331,14 +331,14 @@ export function validarPacote(briefing, referencias, opcoes = {}) {
 /** Carrega alvo procedural e o mede na mesma régua neutra da bancada. */
 export async function descreverAlvo(peca, { raizRepositorio = RAIZ_REPOSITORIO } = {}) {
   const nome = nomeSemantico(peca, 'alvo.peca');
-  const pasta = join(raizRepositorio, 'prototipos/fps/v3/pecas');
+  const pasta = join(raizRepositorio, 'prototipos/procedural/v3/pecas');
   const arquivo = join(pasta, `${nome}.js`);
   if (!existsSync(arquivo) || !readdirSync(pasta).includes(`${nome}.js`)) {
-    falhar(`alvo '${nome}' não existe em prototipos/fps/v3/pecas/.`);
+    falhar(`alvo '${nome}' não existe em prototipos/procedural/v3/pecas/.`);
   }
   const modulo = await import(pathToFileURL(arquivo).href);
   if (!Array.isArray(modulo.PASSOS)) falhar(`alvo '${nome}' não exporta PASSOS da Oficina.`);
-  const { nucleo } = await import(pathToFileURL(join(raizRepositorio, 'prototipos/fps/v3/motor/oficina.js')).href);
+  const { nucleo } = await import(pathToFileURL(join(raizRepositorio, 'prototipos/procedural/v3/motor/oficina.js')).href);
   const { descreverPeca } = await import(pathToFileURL(join(raizRepositorio, 'src/autoria/descrever-partes.js')).href);
   let neutro;
   try {
@@ -359,7 +359,7 @@ export async function descreverAlvo(peca, { raizRepositorio = RAIZ_REPOSITORIO }
  */
 export function alvoExiste(peca, { raizRepositorio = RAIZ_REPOSITORIO } = {}) {
   const nome = nomeSemantico(peca, 'alvo.peca');
-  const pasta = join(raizRepositorio, 'prototipos/fps/v3/pecas');
+  const pasta = join(raizRepositorio, 'prototipos/procedural/v3/pecas');
   const arquivo = join(pasta, `${nome}.js`);
   return existsSync(arquivo) && readdirSync(pasta).includes(`${nome}.js`);
 }

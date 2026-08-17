@@ -14,7 +14,7 @@ import { pngStats } from './bench/pngstats.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 let alvos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 if (!alvos.length) alvos = readdirSync(PECAS).filter((f) => f.endsWith('.js') && !f.startsWith('_')).map((f) => f.replace(/\.js$/, ''));
 
@@ -25,7 +25,7 @@ const server = createServer((req, res) => {
   res.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' }); res.end(readFileSync(p));
 });
 await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-const base = `http://127.0.0.1:${server.address().port}/prototipos/fps/v3/visor.html`;
+const base = `http://127.0.0.1:${server.address().port}/prototipos/procedural/v3/visor.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }

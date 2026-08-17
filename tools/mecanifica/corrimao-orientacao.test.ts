@@ -8,7 +8,7 @@
    morresse quando ela fosse quebrada — a mesma classe que a revisão adversarial
    achou nos quatro ciclos anteriores.
 
-   O QUE ESTE ARQUIVO PRENDE. `prototipos/fps/v3/pecas/_corrimao.js` tem as três
+   O QUE ESTE ARQUIVO PRENDE. `prototipos/procedural/v3/pecas/_corrimao.js` tem as três
    condições que tornam a chave MENSURÁVEL numa peça:
      - caminho com TORÇÃO (os cinco pontos não são coplanares). Num caminho
        plano o transporte paralelo dá o mesmo resultado, e o teste passaria com
@@ -20,9 +20,9 @@
    Tirar `orientacao` da peça derruba os dois primeiros casos abaixo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as corrimao from '../../prototipos/fps/v3/pecas/_corrimao.js';
+import * as corrimao from '../../prototipos/procedural/v3/pecas/_corrimao.js';
 
 type Face = { id: number; vs: number[]; parte: string | null };
 type Neutro = {

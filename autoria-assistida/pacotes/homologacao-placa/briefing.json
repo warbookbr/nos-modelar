@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/_placa-adaptadora.js",
+    "caminho": "prototipos/procedural/v3/pecas/_placa-adaptadora.js",
     "modo": "criacao",
     "peca": "_placa-adaptadora"
   },

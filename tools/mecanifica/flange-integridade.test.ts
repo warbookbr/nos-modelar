@@ -3,9 +3,9 @@
  * passo. A figura é de tubulação para não congelar vocabulário automotivo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça procedural em JavaScript.
-import * as flange from '../../prototipos/fps/v3/pecas/_flange-de-tubulacao.js';
+import * as flange from '../../prototipos/procedural/v3/pecas/_flange-de-tubulacao.js';
 import { conferirMalha } from '../oficina/conferir-malha.js';
 
 const montar = (topo: any = flange.TOPO) =>

@@ -95,6 +95,6 @@ commits e diffs estão em [`COORDENACAO-LOCAL.md`](COORDENACAO-LOCAL.md).
    candidatos válidos foram separados no
    [`BACKLOG.md`](planos/BACKLOG.md), sem plano ativo automático.
 
-Antes de alterar `prototipos/fps/v3/motor/oficina.js`, o registro de atritos ou
+Antes de alterar `prototipos/procedural/v3/motor/oficina.js`, o registro de atritos ou
 o índice de planos, continue reservando arquivos e identidades. Decisão
 consolidada não elimina coordenação operacional.

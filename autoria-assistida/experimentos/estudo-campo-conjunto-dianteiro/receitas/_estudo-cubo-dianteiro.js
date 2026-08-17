@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — cubo escalonado e vazado do conjunto dianteiro mínimo.
    A peça prova perfil de revolução e três interfaces semânticas. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   cavidadeRaio: 0.0280,

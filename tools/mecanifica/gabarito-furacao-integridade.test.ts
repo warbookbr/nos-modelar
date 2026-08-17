@@ -2,9 +2,9 @@
  * raio escalar: cilindro, cone e furo usam a mesma tolerância em metros. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { flechaDoAnel, ladosPorDesvio, nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { flechaDoAnel, ladosPorDesvio, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça procedural em JavaScript.
-import * as gabarito from '../../prototipos/fps/v3/pecas/_gabarito-de-furacao.js';
+import * as gabarito from '../../prototipos/procedural/v3/pecas/_gabarito-de-furacao.js';
 import { conferirMalha } from '../oficina/conferir-malha.js';
 
 const montar = (params: any = gabarito.PARAMS, topo: any = gabarito.TOPO) =>

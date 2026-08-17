@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é
    evidência descartável de autoria e montagem; não é ativo automotivo. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   raio: 0.0275,

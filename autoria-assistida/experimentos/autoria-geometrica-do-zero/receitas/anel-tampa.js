@@ -1,5 +1,5 @@
 /* Experimento confinado — anel que assenta no suporte e referencia a folga. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 export const PARAMS = { raioInterno: 0.040, raioExterno: 0.070, inicio: 0.025, fim: 0.040 };
 export const TOPO = { lados: 24 };
 export const MATERIAIS = { aluminio: { cor: '#b38a61', aspereza: 0.5, metalness: 0.42 } };

@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — aro simplificado, separado do pneu e do cubo para testar
    composição e relações entre peças independentes. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   cavidadeRaio: 0.050,

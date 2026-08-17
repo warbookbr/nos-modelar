@@ -41,7 +41,7 @@ Reserve arquivos, pastas ou identidades compartilhadas. Uma sobreposição ativa
 
 ```powershell
 node C:\Users\tiago\Desktop\Mecanifica\tools\coordenacao\coord.mjs claim codex `
-  --repo=warbook --files=prototipos/fps/v3/motor/oficina.js `
+  --repo=warbook --files=prototipos/procedural/v3/motor/oficina.js `
   --ids=A-40,A-41 --subject="objetivo curto"
 ```
 
@@ -52,7 +52,7 @@ sujo. `--base` também guarda um resumo do delta commitado, sem copiar o código
 node C:\Users\tiago\Desktop\Mecanifica\tools\coordenacao\coord.mjs send `
   --from=codex --to=claude --kind=intencao --subject="objetivo curto" `
   --repo-path=C:\Users\tiago\Desktop\Mecanifica `
-  --files=prototipos/fps/v3/motor/oficina.js --ids=A-40,A-41
+  --files=prototipos/procedural/v3/motor/oficina.js --ids=A-40,A-41
 ```
 
 ## Entrega econômica

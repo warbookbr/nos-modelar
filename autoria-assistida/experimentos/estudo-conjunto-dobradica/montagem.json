@@ -1,0 +1,42 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 3,
+  "id": "estudo-conjunto-dobradica",
+  "instancias": [
+    { "id": "folha-fixa", "alvo": { "tipo": "peca", "ref": "folha-fixa" } },
+    { "id": "folha-movel", "alvo": { "tipo": "peca", "ref": "folha-movel" } },
+    { "id": "pino", "alvo": { "tipo": "peca", "ref": "pino-dobradica" } }
+  ],
+  "relacoes": [
+    {
+      "id": "pinoNoOlhalInferior",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["pino"], "porta": "trechoInferior" },
+      "movel": { "caminho": ["folha-fixa"], "porta": "alojamentoInferiorDoPino" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "pinoNoOlhalCentral",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["pino"], "porta": "trechoCentral" },
+      "movel": { "caminho": ["folha-movel"], "porta": "alojamentoCentralDoPino" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "pinoNoOlhalSuperior",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["pino"], "porta": "trechoSuperior" },
+      "movel": { "caminho": ["folha-fixa"], "porta": "alojamentoSuperiorDoPino" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ]
+}

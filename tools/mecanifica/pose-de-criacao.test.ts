@@ -23,7 +23,7 @@
    vizinho e não resolve pivô por seleção. É o atalho barato do caso comum. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const ID = 7;
 const ORIGEM = (op: string) => ({ op, id: ID });

@@ -38,7 +38,7 @@ Cada achado será **PRESERVAR**, **DOCUMENTAR**, **REFATORAR** ou **ADIAR**.
 
 ## Escopo de leitura
 ### Núcleo
-- `prototipos/fps/v3/motor/oficina.js` e auxiliares;
+- `prototipos/procedural/v3/motor/oficina.js` e auxiliares;
 - expressões, parâmetros, topologia e referências;
 - criação, transformação e finalização da malha neutra;
 - identidade, partes, grupos, portas, materiais e diagnósticos.

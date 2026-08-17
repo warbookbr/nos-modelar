@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/_mancal-de-mesa.js",
+    "caminho": "prototipos/procedural/v3/pecas/_mancal-de-mesa.js",
     "modo": "criacao",
     "peca": "_mancal-de-mesa"
   },

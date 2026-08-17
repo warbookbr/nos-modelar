@@ -25,7 +25,7 @@
    endereço declarado pelo autor, conferido, e que nunca é índice. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const FONTE = { op: 'cubo', id: 1 };
 const ARRANJO = 2;

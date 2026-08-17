@@ -15,9 +15,9 @@
    Régua headless da mesma peça: `npm run descrever -- _prateleira-furada --estrito`. */
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos)
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça .js do Atelier
-import * as prateleira from '../../prototipos/fps/v3/pecas/_prateleira-furada.js';
+import * as prateleira from '../../prototipos/procedural/v3/pecas/_prateleira-furada.js';
 
 const montar = (topo: any = prateleira.TOPO) =>
   nucleo(prateleira.PASSOS, prateleira.PARAMS, topo, prateleira.MATERIAIS, null, prateleira.ALIASES);

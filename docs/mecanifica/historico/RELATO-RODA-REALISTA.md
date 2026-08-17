@@ -2,7 +2,7 @@
 
 Registro da tentativa de criar uma roda no perfil `realista-apresentacao` usando
 exclusivamente a linguagem procedural atual da Oficina. A peça produzida é
-`prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js`; ela permanece
+`prototipos/procedural/v3/pecas/roda-dianteira-realista-experimento.js`; ela permanece
 isolada e não substitui a roda vigente nem entra na apresentação.
 
 ## Resultado

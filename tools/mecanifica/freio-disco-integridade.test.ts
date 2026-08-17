@@ -7,15 +7,15 @@
    Referência das medidas: docs/mecanifica/PRANCHA-FREIO-DISCO.md. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
+import * as freio from '../../prototipos/procedural/v3/pecas/freio-disco.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
 import { caixaDaParte, corposDaParte, descreverPeca } from '../../src/autoria/descrever-partes.js';
 // @ts-expect-error — a mesma gramática aritmética que o núcleo usa para os PARAMS derivados.
-import { criarResolverNumerico } from '../../prototipos/fps/v3/motor/expressoes.js';
+import { criarResolverNumerico } from '../../prototipos/procedural/v3/motor/expressoes.js';
 
 const PARTES = [
   'disco', 'cubo', 'pinca', 'suporte',

@@ -12,11 +12,11 @@
    que ainda importa aqui: o gate usa a regra única e ela classifica certo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo do motor v3, em JS sem tipos.
-import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/fps/v3/motor/referencia-posicional.js';
+import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/procedural/v3/motor/referencia-posicional.js';
 // @ts-expect-error — gate em .mjs sem tipos.
 import { contarIdCru as contarIdCruDoGate } from '../../tools/bancadas/id-cru.mjs';
 // @ts-expect-error — peça em JS sem tipos.
-import { PASSOS as PASSOS_JARDINEIRA } from '../../prototipos/fps/v3/pecas/_jardineira.js';
+import { PASSOS as PASSOS_JARDINEIRA } from '../../prototipos/procedural/v3/pecas/_jardineira.js';
 
 const rotulos = (passos: unknown[]) => rotularOcorrencias(ocorrenciasPosicionais(passos));
 

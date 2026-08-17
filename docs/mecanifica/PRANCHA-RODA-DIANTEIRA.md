@@ -1,6 +1,6 @@
 # Prancha de referência — roda dianteira
 
-Referência multivista de `prototipos/fps/v3/pecas/roda-dianteira.js`. A roda é
+Referência multivista de `prototipos/procedural/v3/pecas/roda-dianteira.js`. A roda é
 um ativo de autoria separado do `freio-disco`: ela fornece o pneu, o aro e a
 tampa central; o cubo continua tendo uma única fonte de verdade no freio.
 
@@ -16,7 +16,7 @@ Usa a mesma convenção da prancha do freio:
 A peça nasce em tamanho de componente (pneu de raio 0,340 m). Na pose manual
 congelada, a roda usa escala 1,60 e o freio usa 2,45: a cavidade do aro mede
 0,128 m, o piloto mede 0,12495 m e a folga radial declarada é 0,00305 m. A
-relação está em `prototipos/fps/v3/montagens/roda-no-freio.js`, não é uma
+relação está em `prototipos/procedural/v3/montagens/roda-no-freio.js`, não é uma
 coincidência de `Object3D`: `npm run descrever:montagem -- roda-no-freio` a
 valida sem mover nenhuma peça.
 

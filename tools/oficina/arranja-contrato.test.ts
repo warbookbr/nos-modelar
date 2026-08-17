@@ -19,7 +19,7 @@
    O que este arquivo prende é o contrato, não a numeração. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos)
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 type Neutro = { V: Map<number, number[]>; F: Map<number, any>; orfaos: any[] };
 

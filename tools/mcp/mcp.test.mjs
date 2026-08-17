@@ -889,7 +889,7 @@ describe('servidor MCP local — perfil revisao', () => {
        `validarPacote` confere isso contra a raiz real do repositório. */
     function briefingValido(id) {
       return {
-        alvo: { caminho: `prototipos/fps/v3/pecas/${id}.js`, modo: 'criacao', peca: id },
+        alvo: { caminho: `prototipos/procedural/v3/pecas/${id}.js`, modo: 'criacao', peca: id },
         checklist: [{ criterio: 'critério mínimo de prova.', estado: 'aberto', id: 'unico', prioridade: 1 }],
         formato: 'mecanifica.pacote-modelagem',
         guias: ['forma/silhueta-e-transicoes'],

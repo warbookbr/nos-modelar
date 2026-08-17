@@ -94,7 +94,7 @@ O piloto pós-merge não foi executado porque o PR de implementação foi fechad
 
 ## Excluído
 
-- editar ou criar `prototipos/fps/v3/pecas/*.js`;
+- editar ou criar `prototipos/procedural/v3/pecas/*.js`;
 - aceitar código JavaScript, patches ou texto livre como entrada MCP;
 - gerar, promover ou comparar revisões novas;
 - renderização adicional;

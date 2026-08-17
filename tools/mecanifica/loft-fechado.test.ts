@@ -18,7 +18,7 @@
    vértices, em contagem de faces e em foto. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const LADOS = 8;
 const RAIO_ANEL = 0.2;

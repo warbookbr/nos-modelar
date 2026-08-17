@@ -4,9 +4,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
-import * as jardineira from '../../prototipos/fps/v3/pecas/_jardineira.js';
-import * as mancal from '../../prototipos/fps/v3/pecas/_mancal-de-mesa.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import * as jardineira from '../../prototipos/procedural/v3/pecas/_jardineira.js';
+import * as mancal from '../../prototipos/procedural/v3/pecas/_mancal-de-mesa.js';
 import { descreverPeca } from '../../src/autoria/descrever-partes.js';
 import {
   FORMATO_CRITICA,

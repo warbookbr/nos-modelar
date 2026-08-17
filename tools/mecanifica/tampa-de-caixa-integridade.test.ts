@@ -21,9 +21,9 @@
    Régua headless da mesma peça: `npm run descrever -- _tampa-de-caixa --estrito`. */
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos)
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça .js do Atelier
-import * as tampa from '../../prototipos/fps/v3/pecas/_tampa-de-caixa.js';
+import * as tampa from '../../prototipos/procedural/v3/pecas/_tampa-de-caixa.js';
 
 const montar = (topo: any = tampa.TOPO) =>
   nucleo(tampa.PASSOS, tampa.PARAMS, topo, tampa.MATERIAIS, null, tampa.ALIASES);

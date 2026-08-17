@@ -1,9 +1,9 @@
 /* expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5). */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — motor em JavaScript exercitado pela interface pública.
-import { criarResolverNumerico } from '../../prototipos/fps/v3/motor/expressoes.js';
+import { criarResolverNumerico } from '../../prototipos/procedural/v3/motor/expressoes.js';
 // @ts-expect-error — integração do resolvedor com o núcleo.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 describe('expressões da Oficina', () => {
   it('calcula precedência, parênteses e nomes sem executar JavaScript', () => {

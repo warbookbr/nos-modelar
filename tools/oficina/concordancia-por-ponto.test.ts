@@ -2,7 +2,7 @@
    declarar seu próprio custo sem obrigar todas as outras a usarem o maior. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { neutroCanonico, nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { neutroCanonico, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const canonico = (passos: any[]) => JSON.stringify(neutroCanonico(nucleo(passos, {}, {})));
 

@@ -28,8 +28,8 @@ import { executarNucleoDaPeca } from './estado-peca.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const OUT = join(HERE, 'out');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
-const GABARITOS = join(REPO, 'prototipos/fps/v3/gabaritos');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const GABARITOS = join(REPO, 'prototipos/procedural/v3/gabaritos');
 const SKILL = join(REPO, '.claude/skills/criar-peca/SKILL.md');
 const OPERACOES_DOC = join(REPO, '.claude/skills/criar-peca/references/operacoes-procedurais.md');
 const OFICINA_DOC = join(REPO, 'docs/uso/oficina-contrato.md');
@@ -38,7 +38,7 @@ const args = process.argv.slice(2);
 const nome = (args.find((a) => !a.startsWith('--')) || '').replace(/[^a-z0-9_-]/gi, '');
 const res = /^--res=(\d+)$/.exec(args.find((a) => a.startsWith('--res=')) || '')?.[1] || '900';
 if (!nome) { console.error('uso: node tools/bancadas/criar.mjs <peça> [--res=N]'); process.exit(2); }
-if (!existsSync(join(PECAS, `${nome}.js`))) { console.error(`peça desconhecida: ${nome} (veja prototipos/fps/v3/pecas/)`); process.exit(2); }
+if (!existsSync(join(PECAS, `${nome}.js`))) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(2); }
 
 const linhas = [];
 const log = (s = '') => { linhas.push(s); console.log(s); };
@@ -50,7 +50,7 @@ log(`═══ criar — ${nome} ═══`);
 
 /* 1 · ESTADO COMO DADO (headless, direto do núcleo — sem browser) */
 log('\n── estado (núcleo) ──');
-const { nucleo, neutroCanonico, colisaoDe, OPS } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
+const { nucleo, neutroCanonico, colisaoDe, OPS } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
 const mod = await import(pathToFileURL(join(PECAS, `${nome}.js`)).href);
 const temPassos = Array.isArray(mod.PASSOS);
 if (temPassos) {
@@ -139,7 +139,7 @@ const server = createServer((req, res2) => {
   res2.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' }); res2.end(readFileSync(p));
 });
 await new Promise((ok2) => server.listen(0, '127.0.0.1', ok2));
-const base = `http://127.0.0.1:${server.address().port}/prototipos/fps/v3/visor.html`;
+const base = `http://127.0.0.1:${server.address().port}/prototipos/procedural/v3/visor.html`;
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }
 const pw = (await import(pathToFileURL(PW).href)).default;
@@ -191,7 +191,7 @@ for (const a of ANGULOS) {
 /* 4c · gabarito (SÓ se existir referência — opcional, mas se existir é obrigatório passar) */
 log('\n── gabarito (IoU) ──');
 if (!existsSync(gabaritoPath)) {
-  log('  sem gabarito (prototipos/fps/v3/gabaritos/) — forma NÃO verificada numericamente; não é reprovação, mas também não é "aprovado" nesse eixo');
+  log('  sem gabarito (prototipos/procedural/v3/gabaritos/) — forma NÃO verificada numericamente; não é reprovação, mas também não é "aprovado" nesse eixo');
 } else {
   try {
     const { CONTORNOS } = await import(pathToFileURL(gabaritoPath).href);

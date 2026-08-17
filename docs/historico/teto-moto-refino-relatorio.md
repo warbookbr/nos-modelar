@@ -4,7 +4,7 @@
 **cria** o objeto; esta mede se ela **refina** um objeto que já existe, a partir
 das 6 críticas do ideador.
 
-Artefato: `prototipos/fps/v3/pecas/moto.js` · branch `wip/teto-moto-refino` ·
+Artefato: `prototipos/procedural/v3/pecas/moto.js` · branch `wip/teto-moto-refino` ·
 3 de 3 ciclos gastos.
 
 ---

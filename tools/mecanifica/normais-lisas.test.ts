@@ -44,7 +44,7 @@
      relevo some. */
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 

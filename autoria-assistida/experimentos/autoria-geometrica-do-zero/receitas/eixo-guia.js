@@ -1,5 +1,5 @@
 /* Experimento confinado — eixo cujo comprimento provoca a falha direcional. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 export const PARAMS = { raio: 0.019, inicio: -0.040, comprimento: 0.055, fim: 0.015 };
 export const TOPO = { lados: 24 };
 export const MATERIAIS = { aco: { cor: '#a3adb6', aspereza: 0.42, metalness: 0.76 } };

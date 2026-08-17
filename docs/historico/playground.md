@@ -76,7 +76,7 @@ formato de PASSOS. Não é uma ferramenta nova: é fechar o vocabulário da Ofic
       bancada: silhueta renderizada, extraída por diferença contra o fundo
       vazio — a peça `_vazio` — e filtrada por componente conexo pequeno
       contra o ruído de partículas/grama, × contorno de referência de
-      `prototipos/fps/v3/gabaritos/<peça>.js`, devolve IoU + VEREDITO
+      `prototipos/procedural/v3/gabaritos/<peça>.js`, devolve IoU + VEREDITO
       calibrado pelo método do bench/D-60 — `LIMIAR_IOU=0.55`, o vale entre 3
       traçados bons (0,65–0,88) e 5 errados (0,00–0,44) — com evidência em
       PNG). Forma vira número. Peça-exemplo `pecas/_viga.js`. (O canvas da

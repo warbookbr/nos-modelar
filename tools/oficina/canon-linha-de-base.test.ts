@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { createHash } from 'node:crypto';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const fixo = (n: number) => {
   const s = n.toFixed(9);

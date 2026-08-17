@@ -76,7 +76,7 @@ para a direção de composição.
 
 **Nenhuma peça deste repositório é homologada, e nenhuma serve de base.**
 
-Tudo em `prototipos/fps/v3/pecas/` é exemplo. Cada peça existe para exercitar e
+Tudo em `prototipos/procedural/v3/pecas/` é exemplo. Cada peça existe para exercitar e
 provar uma capacidade do núcleo, e nada mais. Nenhuma é referência de
 engenharia, componente aprovado ou ponto de partida de produto.
 
@@ -110,7 +110,7 @@ Por isso toda peça abre com o mesmo selo, nestas palavras e nesta posição:
 ```js
 /* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
  *
- * Todas as peças de `prototipos/fps/v3/pecas/` são exemplos. Elas existem para
+ * Todas as peças de `prototipos/procedural/v3/pecas/` são exemplos. Elas existem para
  * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
  * engenharia, componente aprovado ou ponto de partida de produto.
  *

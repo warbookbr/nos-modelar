@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { conferirMalha } from './conferir-malha.js';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
-import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — módulo .js neutro de medição (a régua que a bancada e o CLI compartilham)
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 
@@ -288,7 +288,7 @@ describe('núcleo -> adaptador (fronteira) e colisão', () => {
 
 describe('peça-exemplo shipável', () => {
   it('_oficina-toco monta sem órfãos e declara colisão sã', async () => {
-    const tocoUrl = new URL('../../prototipos/fps/v3/pecas/_oficina-toco.js', import.meta.url);
+    const tocoUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-toco.js', import.meta.url);
     const toco: any = await import(fileURLToPath(tocoUrl));
     const n = nucleo(toco.PASSOS, toco.PARAMS, toco.TOPO);
     expect(n.orfaos).toHaveLength(0);
@@ -428,7 +428,7 @@ describe('passo 11b — pincel macio (motor: op livre + rasterização)', () => 
   });
 
   it("4) compat 'face': o toco (só-'face') canoniza SEM tinta (linha F de 6) e a textura é BYTE-idêntica ao 11a", async () => {
-    const toco: any = await import(fileURLToPath(new URL('../../prototipos/fps/v3/pecas/_oficina-toco.js', import.meta.url)));
+    const toco: any = await import(fileURLToPath(new URL('../../prototipos/procedural/v3/pecas/_oficina-toco.js', import.meta.url)));
     const neutro = nucleo(toco.PASSOS, toco.PARAMS, toco.TOPO);
     for (const row of neutroCanonico(neutro).F) expect((row as any[]).length).toBe(6);   // nenhuma face ganha 7º elemento -> byte-igual ao de antes
     // a textura INTEIRA reproduz a fórmula do 11a (base chapada por célula) — sem dab, zero diferença
@@ -621,7 +621,7 @@ describe('passo 12b — mistura transparente', () => {
   });
 
   it('5) peça-exemplo _oficina-transp: sem órfãos, 1 lote transparente (opacidade 0.42), núcleo opaco', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_oficina-transp.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-transp.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS);
     expect(n.orfaos).toHaveLength(0);
@@ -779,7 +779,7 @@ describe('passo 13a — animação rígida por parte', () => {
   });
 
   it('7) peça-exemplo _oficina-anim: sem órfãos, 2 partes (roda centroide, braco pivô explícito), animar presente', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_oficina-anim.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-anim.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS);
     expect(n.orfaos).toHaveLength(0);
@@ -959,7 +959,7 @@ describe('passo 14a — esqueleto com deformação suave', () => {
   });
 
   it('8) peça-exemplo _oficina-esqueleto: sem órfãos, 3 ossos encadeados, 16 vértices pesados, todos os lotes skinados, animar presente', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_oficina-esqueleto.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_oficina-esqueleto.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO, peca.MATERIAIS, peca.ESQUELETO);
     expect(n.orfaos).toHaveLength(0);
@@ -1150,7 +1150,7 @@ describe('P1 — primitivas esfera/cone/plano', () => {
   });
 
   it('peça-exemplo _primitivas: sem órfãos, contagens certas, colisão = o chão (raio meia-diagonal, altura 0)', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_primitivas.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_primitivas.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
     expect(n.orfaos).toHaveLength(0);
@@ -1421,7 +1421,7 @@ describe('P2 — lathe (perfil de revolução)', () => {
   });
 
   it('peça-exemplo _torno (peão de xadrez): sem órfãos, V/F exatos, watertight+winding por MANIFOLD (toda aresta a→b pareada com b→a 1×)', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_torno.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_torno.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
     expect(orfaos).toHaveLength(0);
@@ -1677,7 +1677,7 @@ describe('P3 — espelha + rotaciona (seleção transformada)', () => {
     });
 
     it('peça-exemplo _espelhado (cabeça + par de chifres): sem órfãos, V/F exatos, MANIFOLD (costura soldada -> watertight)', async () => {
-      const pUrl = new URL('../../prototipos/fps/v3/pecas/_espelhado.js', import.meta.url);
+      const pUrl = new URL('../../prototipos/procedural/v3/pecas/_espelhado.js', import.meta.url);
       const peca: any = await import(fileURLToPath(pUrl));
       const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
       expect(orfaos).toHaveLength(0);
@@ -2085,7 +2085,7 @@ describe('P4 — loft (seções ao longo de um caminho 3D)', () => {
   });
 
   it('peça-exemplo _galho (galho curvo, afinando, fechado nas duas pontas): sem órfãos, V/F exatos, MANIFOLD (watertight+winding consistente) e volume assinado > 0', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_galho.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_galho.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const { V, F, orfaos } = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
     expect(orfaos).toHaveLength(0);
@@ -2679,7 +2679,7 @@ describe('D-129 — seleção semântica uniforme (atributos + espelha)', () => 
   });
 
   it('medição na moto: os 32 ids de farol/lanterna viram duas regiões sem mudar a forma canônica', async () => {
-    const url = new URL('../../prototipos/fps/v3/pecas/moto.js', import.meta.url);
+    const url = new URL('../../prototipos/procedural/v3/pecas/moto.js', import.meta.url);
     const moto: any = await import(fileURLToPath(url));
     const regioes: any = {
       farol: { min: [-0.058, 0.9499099168006007, 0.8691819833601201], max: [0.058, 1.0580900831993993, 0.914] },
@@ -3521,7 +3521,7 @@ describe('P8c — displace (deslocamento por ruído seedado ao longo da normal)'
   });
 
   it('peça-exemplo _pedra (chamferBox + displace): sem órfãos, V/F exatos (24/26 — displace não cria/apaga), MANIFOLD intacto por cima do relevo, colisão calculada', async () => {
-    const pUrl = new URL('../../prototipos/fps/v3/pecas/_pedra.js', import.meta.url);
+    const pUrl = new URL('../../prototipos/procedural/v3/pecas/_pedra.js', import.meta.url);
     const peca: any = await import(fileURLToPath(pUrl));
     const n = nucleo(peca.PASSOS, peca.PARAMS, peca.TOPO);
     expect(n.orfaos).toHaveLength(0);
@@ -5798,7 +5798,7 @@ describe('ciclo 5 — a curva é medida na SUPERFÍCIE, não só nos vértices',
 describe('ciclo 5 — o ombro do pneu cabe em 1% com a discretização que a peça pediu', () => {
   it('o arco do ombro tem 4 pontos e desvio de superfície abaixo de 1% do raio', async () => {
     // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-    const P: any = await import('../../prototipos/fps/v3/pecas/roda-dianteira.js');
+    const P: any = await import('../../prototipos/procedural/v3/pecas/roda-dianteira.js');
     const n = nucleo(P.PASSOS, P.PARAMS, P.TOPO, P.MATERIAIS, null, P.ALIASES);
     expect(n.orfaos).toHaveLength(0);
     const raio = P.PARAMS.pneuOmbroConcordancia;

@@ -30,7 +30,7 @@ registrada no protocolo. A branch local é `codex/homologacao-caso-2-placa`.
   `_gabarito-de-furacao` e `_prateleira-furada`.
 
 Também foram lidos, durante a execução, a gramática de `furo` em
-`prototipos/fps/v3/motor/oficina.js`, o schema de orçamento em
+`prototipos/procedural/v3/motor/oficina.js`, o schema de orçamento em
 `tools/modelagem/formato-pacote.mjs` e o revisor para confirmar a classificação
 da tentativa. Nenhum documento legado foi consultado.
 

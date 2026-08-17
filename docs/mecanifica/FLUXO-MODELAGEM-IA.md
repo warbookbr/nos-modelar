@@ -6,9 +6,10 @@ Este é o contrato operacional atual para criar ou revisar **uma peça**. O flux
 é determinístico, versionado e não depende de contexto oculto.
 
 Ele ainda não é o fluxo completo de um carro, motor ou montagem recursiva.
-Montagens persistidas v1/v2/v3, contexto estrutural e visual, impacto local e
-roteiro assistido existem; mapa geral implícito, materialização e revalidação
-automática de conjuntos afetados ainda não existem.
+Montagens persistidas v1/v2/v3, contexto estrutural e visual, mapa canônico em
+universo explícito, materialização opt-in e revalidação em cascata persistida
+existem. Descoberta implícita fora do universo e correção/publicação automática
+de conjuntos afetados não existem.
 
 A direção de sistemas compostos está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md). Este documento não deve ser
@@ -61,7 +62,10 @@ Não crie `revisao.json` ou imagens manualmente para simular promoção.
   semântico melhor.
 - O modelo deve passar sem órfãos, faces sem identidade, corpos inesperados,
   envelope excedido, orçamento excedido ou material não declarado.
-- Vistas cortadas ou pequenas são recusadas; vistas finas naturais podem passar.
+- Vistas cortadas ou pequenas são recusadas; vista naturalmente fina só passa
+  quando a dimensão longa sustenta a silhueta e a curta ainda prova área
+  projetável. A captura informa as duas medidas; ela não deve distorcer a
+  câmera nem aceitar uma projeção quase unidimensional.
 - O briefing não pode exigir capacidades que o núcleo não expressa. Solver de
   montagem e materiais genéricos continuam fora; abertura oblonga passou a ser
   expressável por `furo` com `ate`, e por isso saiu desta lista.

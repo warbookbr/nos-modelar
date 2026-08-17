@@ -14,9 +14,9 @@ A Oficina humana, a aplicação jogável e o som não existem nesta árvore.
 
 ## Camadas que existem hoje
 
-1. **Receita**: módulos em `prototipos/fps/v3/pecas/` exportam `meta` e
+1. **Receita**: módulos em `prototipos/procedural/v3/pecas/` exportam `meta` e
    `construir`, ou `PASSOS`, `PARAMS`, `TOPO` e contratos auxiliares.
-2. **Núcleo**: `prototipos/fps/v3/motor/oficina.js` resolve parâmetros,
+2. **Núcleo**: `prototipos/procedural/v3/motor/oficina.js` resolve parâmetros,
    topologia, identidades, portas, materiais declarados e malha neutra sem
    conhecer Three.js.
 3. **Adaptadores de inspeção**: convertem o neutro para visualização sem mudar o
@@ -28,9 +28,10 @@ A Oficina humana, a aplicação jogável e o som não existem nesta árvore.
 6. **Exportação resolvida**: `tools/mecanifica/exportar.mjs` valida e produz uma
    representação derivada da receita, útil para provas e consumidores sem
    carregar o núcleo procedural.
-7. **Acesso MCP atual**: o perfil disponível expõe principalmente leitura,
-   auditoria, comparação e vistas sobre os serviços existentes. Ele não é o
-   núcleo de autoria e ainda não oferece o ciclo completo de escrita.
+7. **Acesso MCP atual**: o perfil padrão expõe leitura, auditoria, comparação e
+   vistas; o perfil de autoria, opt-in do host, materializa receitas
+   declarativas e montagens em catálogo autorizado. Nenhum perfil é o núcleo
+   de autoria nem abre escrita irrestrita.
 
 ## Direção arquitetural
 
@@ -96,20 +97,15 @@ O visor legado declara um import map para resolver `earcut` quando servido sem
 transformação. A correção pertence à infraestrutura de inspeção e não altera a
 geometria.
 
-## O que ainda não existe
+## Limites que permanecem
 
-Ainda não existem:
-
-- relações persistidas além dos dois tipos locais v2;
-- mapa completo de composição e dependências;
-- contexto visual e de impacto derivado de um mapa de dependências;
-- camada de escrita de receitas e montagens para IA;
-- solver geral de encaixe;
-- validação de movimento e espaço varrido de sistemas completos;
-- contrato genérico de materiais.
-
-Esses itens são capacidades futuras da autoria. Não devem ser simulados por
-posições de câmera, UUIDs do Three.js, arquivos gigantes ou documentação manual.
+O mapa canônico, seu contexto derivado e a revalidação em cascata existem para
+um universo explícito e persistido. A escrita transacional opt-in materializa
+receitas declarativas e montagens autorizadas. Não existem descoberta fora desse
+universo, correção ou promoção automática de dependentes, solver geral de
+encaixe, validação de movimento/espaço varrido ou contrato genérico de
+materiais. Esses limites não devem ser simulados por posições de câmera, UUIDs
+do Three.js, arquivos gigantes ou documentação manual.
 
 ## Fora desta arquitetura
 

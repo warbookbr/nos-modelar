@@ -36,7 +36,7 @@ export { FORMATO, VERSAO, lerPecaResolvida, parteDaFace };
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 
 /* A LISTA É DECLARADA, e não "todas as peças". São 42 peças no acervo e o
    produto usa duas. Exportar as 42 encheria o repositório de arquivo que
@@ -143,7 +143,7 @@ export async function exportarPeca(nome, { paramsExtra = null } = {}) {
   }
 
   const { nucleo, neutroCanonico } = await import(
-    pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href
+    pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href
   );
   const mod = await import(pathToFileURL(caminho).href);
   if (!Array.isArray(mod.PASSOS)) {

@@ -11,9 +11,9 @@
    podem divergir, e é essa distância que a op `furo` já cobrou caro aqui. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as roda from '../../prototipos/fps/v3/pecas/roda-dianteira.js';
+import * as roda from '../../prototipos/procedural/v3/pecas/roda-dianteira.js';
 
 function montar() {
   return nucleo(roda.PASSOS, roda.PARAMS, roda.TOPO, roda.MATERIAIS, null, roda.ALIASES);

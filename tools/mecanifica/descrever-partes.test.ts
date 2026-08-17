@@ -9,17 +9,19 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
+import * as freio from '../../prototipos/procedural/v3/pecas/freio-disco.js';
 // @ts-expect-error — fixture em JavaScript, exercitada em runtime pelo Vitest.
-import * as freioHierarquia from '../../prototipos/fps/v3/pecas/_freio-hierarquia.js';
+import * as freioHierarquia from '../../prototipos/procedural/v3/pecas/_freio-hierarquia.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
 import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
 // @ts-expect-error — consulta pura de hierarquia em JavaScript.
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
+// @ts-expect-error — serviço JavaScript público, exercitado pela API reutilizável.
+import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const CLI = resolve(REPO, 'tools/mecanifica/descrever-peca.mjs');
@@ -461,6 +463,13 @@ describe('portasPublicadas — o endereço semântico aparece onde se confere', 
 });
 
 describe('descrever-peca: o CLI', () => {
+  it('mede módulo já carregado sem publicar receita confinada no catálogo', async () => {
+    const medida = await descreverPecaReutilizavel({ peca: 'receita-confinada', modulo: freio, estrito: true });
+    expect(medida).toMatchObject({ ok: true, codigo: 0 });
+    expect(medida.resultado?.peca).toBe('receita-confinada');
+    expect(medida.resultado?.neutro.orfaos).toEqual([]);
+  });
+
   it('mede a peça pedida e sai 0', () => {
     const { saida, codigo } = cli(['freio-disco']);
     expect(codigo).toBe(0);

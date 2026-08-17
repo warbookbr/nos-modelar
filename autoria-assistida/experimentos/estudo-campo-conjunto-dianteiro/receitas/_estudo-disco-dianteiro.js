@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — disco anular simplificado. O raio externo será alterado
    na segunda rodada para testar propagação de impacto até a pinça. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   raioInterno: 0.050,

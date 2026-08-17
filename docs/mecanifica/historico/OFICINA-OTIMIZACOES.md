@@ -61,12 +61,12 @@ invisível fora do núcleo) e A-22 (guarda da Oficina e gate discordam sobre `de
 2026):** os quatro resolvidos, cada um com prova em peça real —
 A-18 e A-19 no núcleo; A-20 nas duas metades (`nucleo()` devolve as portas, e a
 régua e a bancada as mostram, pelo módulo neutro `descrever-partes.js`); A-22
-por uma regra só, em `prototipos/fps/v3/motor/referencia-posicional.js`,
+por uma regra só, em `prototipos/procedural/v3/motor/referencia-posicional.js`,
 importada pela Oficina, pelo gate `id-cru` e pelo harness da guarda.
 Nenhum deles é pendência da R4 — são extensões e vizinhanças que a prova
 descobriu ao empurrar o contrato para fora do vocabulário automotivo.
 
-Escopo: o núcleo de autoria (`prototipos/fps/v3/motor/oficina.js`) e a
+Escopo: o núcleo de autoria (`prototipos/procedural/v3/motor/oficina.js`) e a
 documentação que ensina a usá-lo. Os atritos da bancada (A-1, A-2, A-3, A-12,
 A-14) ficam no registro de atritos; deste lado entra só o que a autoria precisa
 para **medir em vez de olhar** (A-13).
@@ -405,7 +405,7 @@ topologia não possui uma grade ou face nominal honesta, o contrato mínimo cita
 a primitiva inteira sem inventar nomes frágeis.
 
 **Provado fora do vocabulário automotivo:**
-`prototipos/fps/v3/pecas/_jardineira.js` — jardineira de janela com uma muda —
+`prototipos/procedural/v3/pecas/_jardineira.js` — jardineira de janela com uma muda —
 usa os cinco geradores novos e é endereçada só por `sel:{origem}`/`sel:{alias}`:
 6 partes, 351 faces, 350 vértices, 0 face sem identidade, 0 órfão
 (`npm run descrever -- _jardineira --estrito`). O teste
@@ -511,7 +511,7 @@ desceu para o gate e não para a guarda de salvamento da Oficina: abrir
 funciona; o que não funciona é salvá-la pela ferramenta. Recusa a mais, não a
 menos — o gate de encerramento continua atendido. **Resolvido** em Endereços
 semânticos v1 por uma regra única em
-`prototipos/fps/v3/motor/referencia-posicional.js`; a prova pelo botão real
+`prototipos/procedural/v3/motor/referencia-posicional.js`; a prova pelo botão real
 abre `_jardineira` e salva, e a mesma peça com uma edição posicional de verdade
 continua recusada.
 
@@ -593,12 +593,12 @@ trade-off acima foi fechado por construção, não por disciplina: sem `origemId
 
 O uso, que era a metade que faltava, entrou no fechamento do mesmo ciclo:
 
-- `prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js` — a peça que
+- `prototipos/procedural/v3/pecas/roda-dianteira-realista-experimento.js` — a peça que
   originou o item. 141 parâmetros → 43, sendo **zero** de coordenada
   (`r0_..r9_`, os cem, sumiram); 66 passos → 47; 20 passos de geração de
   instância → 3. Os dez braços, os cinco recessos e as cinco porcas viram cinco
   passos `arranja`, e cada cópia é uma parte nomeada;
-- `prototipos/fps/v3/pecas/_cerca-e-flor.js` — a mesma capacidade fora do
+- `prototipos/procedural/v3/pecas/_cerca-e-flor.js` — a mesma capacidade fora do
   vocabulário automotivo: tábuas por arranjo linear, pétalas por arranjo radial;
 - `tools/mecanifica/arranjo-em-peca.test.ts` — 13 casos, contagem sempre
   derivada de `TOPO`, incluindo a afirmação de que nenhum `arranja` das duas

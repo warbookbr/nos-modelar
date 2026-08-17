@@ -2,7 +2,7 @@
    o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { BLOCO, flechaDoAnel, ladosPorDesvio, neutroCanonico, nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { BLOCO, flechaDoAnel, ladosPorDesvio, neutroCanonico, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { conferirMalha } from './conferir-malha.js';
 
 const idsDoBloco = (mapa: Map<number, unknown>, passo: number) => {

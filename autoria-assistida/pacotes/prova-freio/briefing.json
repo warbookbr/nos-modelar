@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/freio-disco.js",
+    "caminho": "prototipos/procedural/v3/pecas/freio-disco.js",
     "modo": "refinamento",
     "peca": "freio-disco"
   },

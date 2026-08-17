@@ -15,8 +15,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const nome = (process.argv.slice(2).find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
 
-const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
-const peca = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/pecas', `${nome}.js`)).href);
+const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
+const peca = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/pecas', `${nome}.js`)).href);
 /* MATERIAIS, ESQUELETO e ALIASES entram no núcleo junto com o resto do envelope. Ficaram
    de fora daqui até 2026-07-29, e o efeito era um ÓRFÃO FALSO: a op `material`
    procurava o nome em `{}` e gritava "material 'x' não existe em MATERIAIS" em

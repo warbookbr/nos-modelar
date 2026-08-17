@@ -34,11 +34,11 @@
      npm run descrever -- _cerca-e-flor --estrito */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as roda from '../../prototipos/fps/v3/pecas/roda-dianteira-realista-experimento.js';
+import * as roda from '../../prototipos/procedural/v3/pecas/roda-dianteira-realista-experimento.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as cerca from '../../prototipos/fps/v3/pecas/_cerca-e-flor.js';
+import * as cerca from '../../prototipos/procedural/v3/pecas/_cerca-e-flor.js';
 
 type Peca = { PASSOS: any[]; PARAMS: any; TOPO: any; MATERIAIS: any; ALIASES: any[] };
 

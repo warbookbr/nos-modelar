@@ -27,7 +27,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-const PECAS = resolve(AQUI, '../../prototipos/fps/v3/pecas');
+const PECAS = resolve(AQUI, '../../prototipos/procedural/v3/pecas');
 
 /* A primeira linha é a assinatura do selo: curta, gritada e estável. As frases
    seguintes podem ser reescritas sem quebrar o gate; esta linha, não. */
@@ -59,7 +59,7 @@ describe('toda peça se identifica como exemplo, no topo do arquivo', () => {
     expect(
       texto.startsWith(ASSINATURA),
       `${nome} não começa com o selo de peça de exemplo.\n`
-      + `Copie o bloco que abre qualquer peça de ${'prototipos/fps/v3/pecas/'} — ou o de _modelo.js — `
+      + `Copie o bloco que abre qualquer peça de ${'prototipos/procedural/v3/pecas/'} — ou o de _modelo.js — `
       + 'para as primeiras linhas deste arquivo, antes do comentário próprio da peça.',
     ).toBe(true);
   });

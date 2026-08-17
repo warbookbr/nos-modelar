@@ -5,6 +5,28 @@
 **Plano ativo:** Nenhum.
 
 **Plano concluído mais recente:**
+[`2026-08-17-migracao-fps-para-procedural.md`](2026-08-17-migracao-fps-para-procedural.md).
+
+Ele moveu a raiz canônica para `prototipos/procedural/v3/`, preservando
+comportamento, geometria e contratos, após verificar o consumidor externo.
+
+**Plano concluído anterior:**
+[`2026-08-17-correcoes-fluxo-dobradica.md`](2026-08-17-correcoes-fluxo-dobradica.md).
+
+Ele corrigiu os atritos comprovados pelo estudo de dobradiça: referência
+procedural, template, descrição de receita confinada, estado dos contratos e
+enquadramento do visor privado. Materiais, união topológica e cinemática
+continuam fora.
+
+**Plano concluído anterior:**
+[`2026-08-17-estudo-conjunto-dobradica.md`](2026-08-17-estudo-conjunto-dobradica.md).
+
+O estudo criou três peças confinadas e uma montagem v3 válida, registrando nove
+achados com diagnóstico causal. A decisão foi `corrigir`: a fixture passou,
+mas documentação operacional e enquadramento de peças finas exigem recortes
+próprios.
+
+O plano concluído anterior foi
 [`2026-08-14-revalidacao-cascata-persistida.md`](2026-08-14-revalidacao-cascata-persistida.md).
 
 O plano abriu a revalidação em cascata como acréscimo sobre mapa, impacto,
@@ -162,6 +184,7 @@ nos arquivos originais.
 | Ponto nomeado, e revisão dos atritos vizinhos | concluído: aprovar |
 | Histórico de revisão, e retirada do Caso 3 | concluído: aprovar |
 | Perfil fechado no `lathe`, e limpeza da lista | concluído: aprovar |
+| Estudo de autoria — conjunto dobradiça | concluído: corrigir |
 
 O plano da abertura oblonga está em
 [`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a

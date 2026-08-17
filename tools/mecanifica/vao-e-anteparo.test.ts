@@ -5,9 +5,9 @@
    de ids, então a numeração fica idêntica e a diferença medida é só a da op. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça de exercício em JavaScript.
-import * as peca from '../../prototipos/fps/v3/pecas/_vao-e-anteparo.js';
+import * as peca from '../../prototipos/procedural/v3/pecas/_vao-e-anteparo.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.
 import { caixaDaParte, descreverPeca } from '../../src/autoria/descrever-partes.js';
 

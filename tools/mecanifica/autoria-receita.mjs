@@ -1,5 +1,5 @@
 /* autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript. */
-import { nucleo, neutroCanonico } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
 import { capturarMontagem } from './capturar-montagem.mjs';
 import { lerRevisaoAtivaAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria } from './repositorio-autoria.mjs';

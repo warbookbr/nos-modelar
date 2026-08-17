@@ -1,6 +1,6 @@
 # Resumo de Alterações — Colaborador 4 (branch `colaborador4`)
 
-Tudo aqui é do **protótipo FPS v3** (`prototipos/fps/v3/`), fora um conserto
+Tudo aqui é do **protótipo FPS v3** (`prototipos/procedural/v3/`), fora um conserto
 nas bancadas. Nada foi mexido no site, no engine ou no mundo.
 
 O foco desta branch foi **jogabilidade e áudio**, não gráficos. A única coisa
@@ -15,7 +15,7 @@ leitura mesmo pra quem só cuida do visual.
 então yaw crescente gira pra **esquerda**; somar o `dx` do mouse invertia o eixo.
 Trocado pra subtração no mouse e no stick direito. O strafe usa o mesmo yaw e
 continua coerente. O eixo vertical estava certo e não foi tocado.
-`prototipos/fps/v3/jogo.html`
+`prototipos/procedural/v3/jogo.html`
 
 **Shift corre.** `input.shiftHeld()` lê `ShiftLeft`/`ShiftRight` no mesmo `Set`
 de `e.code` das outras teclas. Velocidade ×1.8 só no plano — pulo, gravidade e

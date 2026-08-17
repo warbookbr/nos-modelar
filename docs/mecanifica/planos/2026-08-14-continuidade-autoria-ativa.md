@@ -52,7 +52,7 @@ o núcleo ou executar código do agente.
 
 - mapa global ou descoberta implícita de dependências;
 - edição automática de dependentes;
-- publicação em `prototipos/fps/v3/pecas/`, geração de módulo JavaScript ou Git;
+- publicação em `prototipos/procedural/v3/pecas/`, geração de módulo JavaScript ou Git;
 - alterações de geometria, materiais, câmera, relações ou núcleo procedural;
 - rollback, variantes simultâneas, HTTP e coordenação entre hosts.
 

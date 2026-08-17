@@ -5,7 +5,7 @@
 
    Toda evidência anterior de O-6 e O-12 era freio ou roda; o contrato podia ter
    sido desenhado em volta do caso automotivo sem ninguém perceber. A fixture
-   `prototipos/fps/v3/pecas/_jardineira.js` é jardinagem — caixa, terra, bulbo,
+   `prototipos/procedural/v3/pecas/_jardineira.js` é jardinagem — caixa, terra, bulbo,
    caule, folhagem e botão de flor — e este teste afirma o MESMO contrato lá.
 
    COMO ELE FALA DE PORTA (mudou neste ciclo). Antes o núcleo não devolvia as
@@ -36,9 +36,9 @@
    Régua headless da mesma peça: `npm run descrever -- _jardineira --estrito`. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as jardineira from '../../prototipos/fps/v3/pecas/_jardineira.js';
+import * as jardineira from '../../prototipos/procedural/v3/pecas/_jardineira.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo novo em JavaScript, neutro (não importa Three.js).

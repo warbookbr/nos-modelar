@@ -2,7 +2,7 @@
 /**
  * gabarito.mjs — P5 do playground (D-118): FORMA COMO NÚMERO. Mede a
  * silhueta RENDERIZADA de uma peça contra um CONTORNO de referência (o
- * gabarito, desenhado à mão — hoje sem canvas, ver prototipos/fps/v3/
+ * gabarito, desenhado à mão — hoje sem canvas, ver prototipos/procedural/v3/
  * gabaritos/) e devolve IoU + VEREDITO calibrado (exit≠0 = REPROVADO), nos
  * ângulos que o gabarito cobrir. Sai a EVIDÊNCIA (silhueta, contorno
  * rasterizado, sobreposição) em PNG — número sem imagem não é veredito.
@@ -24,8 +24,8 @@ import { extrairSilhueta, rasterizarContorno, validarContorno, iou, areaMascara,
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const OUT = join(HERE, 'out');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
-const GABARITOS = join(REPO, 'prototipos/fps/v3/gabaritos');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const GABARITOS = join(REPO, 'prototipos/procedural/v3/gabaritos');
 
 const args = process.argv.slice(2);
 const nome = (args.find((a) => !a.startsWith('--')) || '').replace(/[^a-z0-9_-]/gi, '');
@@ -33,11 +33,11 @@ const res = /^--res=(\d+)$/.exec(args.find((a) => a.startsWith('--res=')) || '')
 
 if (!nome) { console.error('uso: node tools/bancadas/gabarito.mjs <peça> [--res=N]'); process.exit(2); }
 const peçaPath = join(PECAS, `${nome}.js`);
-if (!existsSync(peçaPath)) { console.error(`peça desconhecida: ${nome} (veja prototipos/fps/v3/pecas/)`); process.exit(2); }
+if (!existsSync(peçaPath)) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(2); }
 const gabaritoPath = join(GABARITOS, `${nome}.js`);
 if (!existsSync(gabaritoPath)) {
-  console.error(`✗ ${nome}: SEM gabarito (prototipos/fps/v3/gabaritos/${nome}.js não existe) — nada foi medido, isto NÃO é um "passou"`);
-  console.error(`  crie o arquivo com: export const CONTORNOS = { '38': [[x,y],...], ... }  (0..1, ver prototipos/fps/v3/gabaritos/_viga.js)`);
+  console.error(`✗ ${nome}: SEM gabarito (prototipos/procedural/v3/gabaritos/${nome}.js não existe) — nada foi medido, isto NÃO é um "passou"`);
+  console.error(`  crie o arquivo com: export const CONTORNOS = { '38': [[x,y],...], ... }  (0..1, ver prototipos/procedural/v3/gabaritos/_viga.js)`);
   process.exit(1);
 }
 
@@ -58,7 +58,7 @@ const server = createServer((req, res2) => {
   res2.end(readFileSync(p));
 });
 await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-const base = `http://127.0.0.1:${server.address().port}/prototipos/fps/v3/visor.html`;
+const base = `http://127.0.0.1:${server.address().port}/prototipos/procedural/v3/visor.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(2); }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-385 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+397 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -79,6 +79,19 @@
 - `_estudo-eixo-dianteiro.js` — ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é evidência descartável de autoria e montagem; não é ativo automotivo.
 - `_estudo-pinca-dianteira.js` — ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a folga radial com o disco sem fingir um tipo de relação ainda inexistente.
 - `_estudo-pneu-dianteiro.js` — ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar assentamento anular e inspeção visual individual.
+
+## autoria-assistida/experimentos/estudo-conjunto-dobradica/
+
+- `REGISTRO.md` — Registro — estudo de autoria de um conjunto simples
+- `auditar-visual.mjs` — auditar-visual.mjs — captura cada peça e o conjunto em vistas reproduzíveis.
+- `carregar-estudo.mjs` — carregar-estudo.mjs — adaptador confinado das receitas para montagem resolvida.
+- `executar-estudo.mjs` — executar-estudo.mjs — mede as três receitas e valida as relações da fixture.
+
+## autoria-assistida/experimentos/estudo-conjunto-dobradica/receitas/
+
+- `folha-fixa.js` — Experimento confinado — folha fixa de uma dobradiça didática.
+- `folha-movel.js` — Experimento confinado — folha móvel de uma dobradiça didática.
+- `pino-dobradica.js` — Experimento confinado — pino passante de uma dobradiça didática.
 
 ## autoria-assistida/guias/forma/
 
@@ -194,9 +207,12 @@
 - `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
 - `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
 - `2026-08-17-alteracao-compacta.md` — Alteração semântica compacta de montagem
+- `2026-08-17-correcoes-fluxo-dobradica.md` — Correções do fluxo encontradas no estudo de dobradiça
 - `2026-08-17-encostar.md` — Encostar — contato derivado no lugar de coordenada digitada
+- `2026-08-17-estudo-conjunto-dobradica.md` — Estudo de campo — autoria de um conjunto simples de três peças
 - `2026-08-17-historico-de-revisao.md` — Histórico de revisão — olhar para trás e voltar
 - `2026-08-17-lathe-fechado.md` — Perfil fechado no `lathe` — e a limpeza da lista de pendências
+- `2026-08-17-migracao-fps-para-procedural.md` — Migração estrutural de `fps` para `procedural`
 - `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
@@ -248,22 +264,22 @@
 - `oficina-contrato.md` — Oficina — contrato procedural preservado
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 
-## prototipos/fps/v3/
+## prototipos/procedural/v3/
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
 
-## prototipos/fps/v3/gabaritos/
+## prototipos/procedural/v3/gabaritos/
 
 - `_viga.js` — GABARITO do P5 do playground: o contorno de referência da `_viga` (pecas/_viga.js) no ângulo padrão 38° — o formato do P5 (docs/ playground.md): pontos [x,y]…
 
-## prototipos/fps/v3/montagens/
+## prototipos/procedural/v3/montagens/
 
 - `anel-e-faixa.js` — anel-e-faixa.js — fixture neutra de assentamento anular. Dois corpos de revolução declaram zonas concêntricas, sem conhecer roda, pneu, freio ou Three.js; el…
 - `pino-e-luva.js` — pino-e-luva.js — fixture neutra do encaixe cilíndrico. Não conhece roda, freio ou Three.js: dois corpos rígidos simples publicam as mesmas interfaces que o p…
 - `roda-no-freio.js` — roda-no-freio.js — declaração de montagem do piloto AUT-05. Ela reúne duas receitas já existentes numa pose manual conhecida e declara UMA relação de encaixe…
 
-## prototipos/fps/v3/motor/
+## prototipos/procedural/v3/motor/
 
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
@@ -273,7 +289,7 @@
 - `render.js` — O VISOR do motor v3 (D-55) — o ambiente PADRÃO onde toda peça é criada e auditada: framebuffer fixo (?res) com upscale NEAREST (pixel art, custo independente…
 - `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
 
-## prototipos/fps/v3/pecas/
+## prototipos/procedural/v3/pecas/
 
 - `_bloco-arredondado-composto.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_caixote-filetado.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
@@ -288,6 +304,7 @@
 - `_galho.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_jardineira.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_mancal-de-mesa.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
+- `_modelo-procedural.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_modelo.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_oficina-anim.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
 - `_oficina-esqueleto.js` — PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
@@ -428,6 +445,7 @@
 - `autoria-receita.test.ts` — Provas da autoria declarativa de receita sem JavaScript do agente.
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
+- `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz da Oficina é neutra e não volta a fps.
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.

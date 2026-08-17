@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { conferirMalha } from './conferir-malha.js';
 // @ts-expect-error — núcleo herdado em JavaScript.
-import { nucleo, neutroCanonico } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const DE = { op: 'cubo', id: 1, face: 'topo' };
 const BASE = [['cubo', { larg: 1, alt: 1, prof: 1, origemId: 1 }]];

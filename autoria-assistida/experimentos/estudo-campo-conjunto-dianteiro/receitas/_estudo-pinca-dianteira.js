@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a
    folga radial com o disco sem fingir um tipo de relação ainda inexistente. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   garraLargura: 0.024,

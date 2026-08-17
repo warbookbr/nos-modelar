@@ -40,7 +40,7 @@ mas o artefato salvo e validado permanece declarativo.
 ## Excluído
 
 - executar JavaScript fornecido pelo agente;
-- publicar diretamente em `prototipos/fps/v3/pecas/`;
+- publicar diretamente em `prototipos/procedural/v3/pecas/`;
 - imports, plugins, materiais genéricos, Git, HTTP ou host remoto;
 - corrigir automaticamente montagens dependentes ou descobrir usos implícitos.
 

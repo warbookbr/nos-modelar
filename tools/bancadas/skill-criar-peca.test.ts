@@ -26,7 +26,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 // @ts-expect-error — núcleo legado em JavaScript.
-import { nucleo, OPERACOES_COM_ORIGEM } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, OPERACOES_COM_ORIGEM } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const SKILL = join(import.meta.dirname, '../../.claude/skills/criar-peca/SKILL.md');
 const texto = readFileSync(SKILL, 'utf8');

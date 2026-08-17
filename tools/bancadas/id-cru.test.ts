@@ -18,7 +18,7 @@ import { contarIdCru, validarLista, conferir, medirPecas, lerLista, gravarLista,
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
-const NUCLEO = join(REPO, 'prototipos/fps/v3/motor/oficina.js');
+const NUCLEO = join(REPO, 'prototipos/procedural/v3/motor/oficina.js');
 const TMP = join(REPO, 'node_modules/.tmp-id-cru');
 mkdirSync(TMP, { recursive: true });
 

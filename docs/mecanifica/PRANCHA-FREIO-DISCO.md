@@ -1,7 +1,7 @@
 # Prancha de referência — freio a disco dianteiro
 
 Prancha multivista do primeiro sistema mecânico da Mecanifica
-(`prototipos/fps/v3/pecas/freio-disco.js`). Existe para que outra sessão saiba
+(`prototipos/procedural/v3/pecas/freio-disco.js`). Existe para que outra sessão saiba
 **o que cada parâmetro controla** e **onde cada parte fica** antes de mexer na
 peça, sem precisar reabrir a bancada para descobrir a convenção de eixos.
 

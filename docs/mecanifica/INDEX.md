@@ -41,6 +41,14 @@ aplicação publicada aqui.
   (`docs/mecanifica/planos/2026-08-14-experimento-autoria-geometrica.md`)
   concluiu com `corrigir`: receitas, relações e vistas passaram, mas autoria MCP
   de montagem não pode corrigir uma receita; o relatório define o próximo recorte.
+- O [plano de correções do fluxo encontradas na dobradiça](planos/2026-08-17-correcoes-fluxo-dobradica.md)
+  (`docs/mecanifica/planos/2026-08-17-correcoes-fluxo-dobradica.md`) foi
+  concluído e aprovado: corrigiu documentação, descrição confinada e
+  enquadramento do visor; materiais, união topológica e cinemática seguem fora.
+- O [plano de migração estrutural de `fps` para `procedural`](planos/2026-08-17-migracao-fps-para-procedural.md)
+  (`docs/mecanifica/planos/2026-08-17-migracao-fps-para-procedural.md`) foi
+  concluído e aprovado: a raiz canônica agora é
+  `prototipos/procedural/v3/`, sem mudança geométrica ou de contrato.
 - O plano de [autoria segura de receitas declarativas](planos/2026-08-14-autoria-segura-receitas.md)
   (`docs/mecanifica/planos/2026-08-14-autoria-segura-receitas.md`) foi aprovado:
   receitas são dados JSON, passam por vistas e revalidação e não executam
@@ -76,12 +84,10 @@ aplicação publicada aqui.
   gates.
 - Hierarquia semântica mínima, consulta de subárvore, isolamento e contexto
   visual existem para peças.
-- Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável e
-  o mapa de impacto local existem. As R00–R06 do mapa canônico global fixaram
-  universo, snapshot confinado, composição, ocorrências, relações, usos
-  reversos, consulta direcionada, consumo MCP reduzido por ID, continuidade e
-  escala estão provados; revalidação em cascata ainda está fora. Colisão geral,
-  solver e camada completa de escrita continuam fora.
+- Os contratos v1/v2/v3, o resolvedor recursivo, o contexto JSON consultável,
+  o mapa canônico dentro de universo explícito e a revalidação em cascata
+  persistida existem. Não há descoberta fora desse universo, correção ou
+  promoção automática de dependentes, colisão geral nem solver.
 - O visor legado resolve o import bare `earcut` por import map; `porteiro` e
   `criar` voltaram a auditar as peças sem alteração geométrica.
 - Não existe contrato genérico de materiais.
@@ -107,8 +113,8 @@ o núcleo nem define o modelo de autoria.
 
 | Caminho | Papel |
 |---|---|
-| `prototipos/fps/v3/motor/` | núcleo procedural e adaptadores compatíveis |
-| `prototipos/fps/v3/pecas/` | receitas determinísticas de peças |
+| `prototipos/procedural/v3/motor/` | núcleo procedural e adaptadores compatíveis |
+| `prototipos/procedural/v3/pecas/` | receitas determinísticas de peças |
 | `bancada.html`, `src/` | bancada neutra e adaptadores de inspeção |
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
 | `tools/mecanifica/` | gates da bancada, revisão e contratos |
@@ -281,6 +287,8 @@ Planejamento: [planos/README](planos/README.md),
 (`docs/mecanifica/planos/2026-08-17-historico-de-revisao.md`),
 [lathe fechado](planos/2026-08-17-lathe-fechado.md)
 (`docs/mecanifica/planos/2026-08-17-lathe-fechado.md`),
+[estudo do conjunto dobradiça](planos/2026-08-17-estudo-conjunto-dobradica.md)
+(`docs/mecanifica/planos/2026-08-17-estudo-conjunto-dobradica.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

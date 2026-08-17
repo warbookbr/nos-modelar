@@ -10,13 +10,13 @@ import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 const DISPONIVEIS = Object.freeze(readdirSync(PECAS)
   .filter((arquivo) => arquivo.endsWith('.js'))
   .map((arquivo) => arquivo.slice(0, -'.js'.length))
@@ -64,6 +64,7 @@ function amostraDeOrfaos(neutro) {
  */
 export async function descreverPecaReutilizavel({
   peca,
+  modulo: moduloFornecido = null,
   partes = [],
   subarvore = null,
   casas = 6,
@@ -81,13 +82,13 @@ export async function descreverPecaReutilizavel({
   }
   if (!peca) {
     return erroDeUso(
-      'diga qual peça medir, pelo nome do arquivo em prototipos/fps/v3/pecas/.'
+      'diga qual peça medir, pelo nome do arquivo em prototipos/procedural/v3/pecas/.'
       + '\n  ex.: npm run descrever -- freio-disco   (use --listar para ver todas)',
     );
   }
-  if (!DISPONIVEIS.includes(peca)) {
+  if (!moduloFornecido && !DISPONIVEIS.includes(peca)) {
     return erroDeUso(
-      `peça '${peca}' não existe em prototipos/fps/v3/pecas/.`
+      `peça '${peca}' não existe em prototipos/procedural/v3/pecas/.`
       + `\n  disponíveis: ${DISPONIVEIS.join(', ')}`,
     );
   }
@@ -105,11 +106,16 @@ export async function descreverPecaReutilizavel({
     return erroDeUso('--partes e --subarvore são consultas diferentes; informe somente uma delas');
   }
 
-  let modulo;
-  try {
-    modulo = await import(pathToFileURL(join(PECAS, `${peca}.js`)).href);
-  } catch (erro) {
-    return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
+  let modulo = moduloFornecido;
+  if (modulo !== null && (typeof modulo !== 'object' || Array.isArray(modulo))) {
+    return erroDeUso('modulo precisa ser uma receita já carregada.');
+  }
+  if (modulo === null) {
+    try {
+      modulo = await import(pathToFileURL(join(PECAS, `${peca}.js`)).href);
+    } catch (erro) {
+      return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
+    }
   }
   if (!Array.isArray(modulo.PASSOS)) {
     return falha(

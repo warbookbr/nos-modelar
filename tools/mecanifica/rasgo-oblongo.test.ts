@@ -33,9 +33,9 @@
      npm run descrever -- _rasgo-oblongo --estrito */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — peça em JavaScript, exercitada em runtime pelo Vitest.
-import * as rasgoOblongo from '../../prototipos/fps/v3/pecas/_rasgo-oblongo.js';
+import * as rasgoOblongo from '../../prototipos/procedural/v3/pecas/_rasgo-oblongo.js';
 
 const CHAPA = 100;
 const CORTE = 101;

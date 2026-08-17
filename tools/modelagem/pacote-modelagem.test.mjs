@@ -19,7 +19,7 @@ function base() {
     formato: 'mecanifica.pacote-modelagem',
     versao: 1,
     id: 'prova-jardineira',
-    alvo: { modo: 'refinamento', peca: '_jardineira', caminho: 'prototipos/fps/v3/pecas/_jardineira.js' },
+    alvo: { modo: 'refinamento', peca: '_jardineira', caminho: 'prototipos/procedural/v3/pecas/_jardineira.js' },
     objetivo: 'Conferir volumes, transições e leitura da jardineira.',
     perfil: {
       visual: 'tecnicoDidatico',
@@ -115,7 +115,7 @@ describe('pacote de modelagem v1', () => {
       const a = await prepararPacote({ ...opcoes, raizPacotes: temporario });
       const b = await prepararPacote({ ...opcoes, raizPacotes: segunda });
       expect(a.briefing.alvo).toEqual({
-        caminho: 'prototipos/fps/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
+        caminho: 'prototipos/procedural/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
       });
       expect(a.briefing.partesEsperadas).toEqual(['base', 'braco', 'pino']);
       expect(readFileSync(join(a.destino, 'briefing.json'), 'utf8'))
@@ -139,7 +139,7 @@ describe('pacote de modelagem v1', () => {
 
     const criacao = base();
     criacao.alvo = {
-      caminho: 'prototipos/fps/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
+      caminho: 'prototipos/procedural/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
     };
     criacao.partesEsperadas = ['base', 'braco'];
     /* Sem fonte, a criação só valida o contrato; quando há descrição, a
@@ -296,7 +296,7 @@ describe('pacote de modelagem v1', () => {
       const briefing = base();
       briefing.id = 'criacao-com-referencia-local';
       briefing.alvo = {
-        caminho: 'prototipos/fps/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
+        caminho: 'prototipos/procedural/v3/pecas/suporte-inexistente.js', modo: 'criacao', peca: 'suporte-inexistente',
       };
       briefing.partesEsperadas = ['base', 'braco'];
       const pasta = join(raiz, 'pacotes', briefing.id);

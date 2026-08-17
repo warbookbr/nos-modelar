@@ -19,13 +19,13 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 import { arestasSemPar, conferirMalha } from './conferir-malha.js';
 
 const NUCLEO_FONTE = readFileSync(
-  resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/fps/v3/motor/oficina.js'),
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/procedural/v3/motor/oficina.js'),
   'utf8',
 );
 

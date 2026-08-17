@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Executor reproduzível da fixture, sem publicar receitas no catálogo. */
 import { readFileSync } from 'node:fs';
-import { nucleo, neutroCanonico } from '../../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico } from '../../../prototipos/procedural/v3/motor/oficina.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { derivarImpactoMontagem } from '../../../src/autoria/derivar-impacto-montagem.js';

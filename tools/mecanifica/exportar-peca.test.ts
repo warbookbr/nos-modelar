@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 // @ts-expect-error — ferramenta em JavaScript, exercitada pela API pública.
 import { conferirSemOrfaos, exportarPeca, lerPecaResolvida, FORMATO, VERSAO } from './exportar-peca.mjs';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — bancada em JavaScript.
@@ -98,7 +98,7 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
     /* a receita desta peça publica os cinco. Se ela publicasse só o nome, este
        caso passaria sem provar nada. */
     // @ts-expect-error — peça em JavaScript, carregada em runtime pelo Vitest.
-    const receita: any = await import('../../prototipos/fps/v3/pecas/freio-disco.js');
+    const receita: any = await import('../../prototipos/procedural/v3/pecas/freio-disco.js');
     expect(Object.keys(receita.meta).sort(), 'a peça de teste precisa publicar mais que o nome')
       .toEqual(['colisao', 'desc', 'fechada', 'nome', 'tipo']);
 
@@ -261,7 +261,7 @@ describe('A-60 — a peça exportada é dado, e o dado se defende', () => {
        Se os dois não derem o mesmo triângulo, a troca é uma regressão
        disfarçada de otimização. */
     // @ts-expect-error — peça em JavaScript, carregada em runtime pelo Vitest.
-    const mod: any = await import('../../prototipos/fps/v3/pecas/freio-disco.js');
+    const mod: any = await import('../../prototipos/procedural/v3/pecas/freio-disco.js');
 
     const pelaReceita = adaptarThree(executarNucleoDaPeca(nucleo, mod), {
       nome: 'freio-disco', materiais: mod.MATERIAIS,

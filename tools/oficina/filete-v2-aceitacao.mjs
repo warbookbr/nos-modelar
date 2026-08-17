@@ -2,7 +2,7 @@
 /* filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real.
    Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR,
    exibindo a lacuna que o contrato futuro deve fechar. */
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const passos = [
   ['chamferBox', { origemId: 1, larg: 2, alt: 2, prof: 2, chanfro: 0.2 }],

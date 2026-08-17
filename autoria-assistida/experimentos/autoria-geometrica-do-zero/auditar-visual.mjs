@@ -2,7 +2,7 @@
 /* Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { nucleo, neutroCanonico } from '../../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo, neutroCanonico } from '../../../prototipos/procedural/v3/motor/oficina.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { capturarMontagem } from '../../../tools/mecanifica/capturar-montagem.mjs';

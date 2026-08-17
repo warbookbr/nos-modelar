@@ -67,14 +67,14 @@
    },
    {
     "gravidade": "media",
-    "onde": "`prototipos/fps/v3/motor/oficina.js` linhas 7-10; nenhuma frente",
+    "onde": "`prototipos/procedural/v3/motor/oficina.js` linhas 7-10; nenhuma frente",
     "oQue": "O cabeçalho do núcleo diz, literal: \"A numeração de identidade depende só da POSIÇÃO do passo … nunca dos valores de PARAMS — mudar `raio` não renumera; mudar `lados` (TOPO) renumera\". Com `lados: {desvio}`, mudar `raio` PASSA a renumerar. O G7 do A-34 cobra a reescrita desse cabeçalho. As linhas 7-10 não estão na lista de nenhuma frente: o F1 tem proibido \"tudo acima de 764\", o F2 só tem 1745-1752, 1780, 1857, 3385 e 3571-3573, e o F5 só tem 864-872. E a condição 19 lista quatro textos errados sem incluir este.",
     "porQueImporta": "A rodada inteira existe para o repositório parar de mentir. Ela vai deixar a lei mais antiga do arquivo mentindo sobre a capacidade que ela mesma entregou, e é exatamente a lei que o autor lê para decidir o que vai em PARAMS e o que vai em TOPO.",
     "conserto": "Pôr `oficina.js` 7-10 na lista do F5 (só comentário) e acrescentá-lo como quinto item da condição 19."
    },
    {
     "gravidade": "media",
-    "onde": "`prototipos/fps/v3/pecas/_tampa-de-caixa.js`, linhas ~31-37; nenhuma frente",
+    "onde": "`prototipos/procedural/v3/pecas/_tampa-de-caixa.js`, linhas ~31-37; nenhuma frente",
     "oQue": "Li o arquivo. O cabeçalho dele diz: \"O QUE ELA MEDIU E NÃO CONTORNOU EM SILÊNCIO: um passo tem UM raio … Por isso esta peça é uma tampa CHEIA, sem furo central\". A fatia 5(d) do veredito do A-30 manda corrigi-lo. O plano cita a peça duas vezes como \"ANTES\" e nunca a atribui a frente nenhuma. F1 não tem o arquivo na lista; F5 também não.",
     "porQueImporta": "Mesma classe da condição 19: a peça vai continuar declarando como limitação da linguagem uma coisa que a linguagem passou a fazer. É o texto que qualquer um lê antes de escrever a próxima flange.",
     "conserto": "Pôr `_tampa-de-caixa.js` na lista do F5, na fatia de texto, e acrescentá-lo à condição 19."
@@ -179,7 +179,7 @@
    },
    {
     "gravidade": "alta",
-    "onde": "Escopo da rodada — F3 (A-36, n painéis) cruzando com F4 (A-37, ponta composta), em /home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+    "onde": "Escopo da rodada — F3 (A-36, n painéis) cruzando com F4 (A-37, ponta composta), em /home/user/nos-mecanifica/prototipos/procedural/v3/motor/oficina.js",
     "oQue": "Nenhum dos 30 commits constrói filete com `segmentosCurva` ≥ 2 numa ponta de quatro ou mais arestas, e a tampa que o projeto do A-37 escreve abre a malha nesse caso. Simulei a topologia. Com a tampa literal `[P1, P0, v0]` e n painéis, sobram n+1 arestas sem par por ponta composta: n=2 dá 3, n=3 dá 4, n=4 dá 5, n=8 dá 9. A tampa certa é o (n+2)-gono `[v0, A_n, …, A_0]`, que dá 0 em todos. E a fórmula de área da tampa que o gate 6 do A-37 trava, 0,5·r²·senθ, só vale em n=1: medi 41,4% de erro em n=2, 50,0% em n=3 e 57,1% em n=64 a θ=90°, e 48,0% / 57,2% / 64,5% a θ=135°. As peças da rodada não alcançam o caso. `_cabo-sextavado` é prisma hexagonal, e todo vértice dele toca 3 faces, ponta simples. `_mordente-de-morsa` e a pinça do freio são n=1. A varredura de 408 pares roda com o padrão n=1: reproduzi 5 das 6 figuras e ela sai 84 construindo a 2V/1F, tudo em n=1.",
     "porQueImporta": "O plano identificou o risco (risco 4), decidiu a numeração no F0b para resolvê-lo e não escreveu nenhuma condição que cobre a decisão. A rodada entrega duas capacidades na mesma op que não compõem, e o gate inteiro passa verde. É o defeito do ciclo 5 repetido um andar acima: cada metade prova a si mesma e ninguém prova a junção. Some-se que o teto de estouro muda com a topologia. Com ponta simples nV = 2n e 500 constrói; com as duas pontas compostas nV = 2n+2 e 500 já estoura. A condição 8 afirma 500 constrói e 501 lança sem dizer em que figura.",
     "conserto": "Reescrever a tampa como o (n+2)-gono no mesmo commit que decide a numeração, com a série de área medida ao lado (raio 1, θ=90°): n=1 0,500000000; n=2 0,292893219; n=3 0,250000000; n=4 0,234633135; n=64 0,214680687. Acrescentar uma condição ao gate: `chamferBox` 1×1×1 de chanfro 0,1, filete na aresta 0 da face topo com `segmentosCurva` 3, `conferirMalha(fechada: true)` verde, e os conjuntos de V e F afirmados. É o único teste que mata a tampa triangular e custa um build. Declarar também o teto de estouro nas duas topologias."
@@ -200,7 +200,7 @@
    },
    {
     "gravidade": "media",
-    "onde": "F0b (a forma) contra a condição 8 do gate, em /home/user/nos-mecanifica/prototipos/fps/v3/motor/oficina.js",
+    "onde": "F0b (a forma) contra a condição 8 do gate, em /home/user/nos-mecanifica/prototipos/procedural/v3/motor/oficina.js",
     "oQue": "A decisão do F0b de ler o custo derivado do plano (`const { nV, nF } = plano.custo;`) impede a condição 8 de acontecer. A condição 8 exige que `segmentosCurva: 4294967296` LANCE `estoura o bloco de ids`. Com `Math.trunc` o valor sobrevive, mas se o plano for construído antes de o custo ser lido, o núcleo tenta materializar 4 294 967 297 posições. Medi: ainda alocando depois de 2,5 s, sem lançar nada. E `new Array(2*segs)` lança `RangeError: Invalid array length`, que não é a mensagem que a condição pede. Com a guarda antes do plano a mensagem sai certa na hora.",
     "porQueImporta": "A condição 8 é a que trava a troca de `| 0` por `Math.trunc`, e a troca é o que o plano usa para separar o filete das outras oito ocorrências. Uma suíte que trava em vez de lançar não é um teste vermelho, é um teste que não termina.",
     "conserto": "Escrever no F0b que a guarda `2·segs > BLOCO` roda ANTES de `posicoesDoCorte` construir qualquer posição, e que `plano.custo` só é lido depois. Uma linha na especificação do F0b e uma na condição 8."
@@ -298,7 +298,7 @@
    },
    {
     "gravidade": "media",
-    "onde": "prototipos/fps/v3/motor/oficina.js:3729-3880 (a op `filete`), contra \"o que pode correr em paralelo\"",
+    "onde": "prototipos/procedural/v3/motor/oficina.js:3729-3880 (a op `filete`), contra \"o que pode correr em paralelo\"",
     "oQue": "Duas trilhas paralelas sobre uma função de 97 linhas executáveis. Medido: a op `filete` vai de 3729 a 3880, 152 linhas, 97 executáveis, 85 no corpo. O plano põe F3 dentro de `posicoesDoCorte` e F4 dentro de `planoDeCostura` — as duas metades da MESMA função de 97 linhas — em worktrees separadas, \"sem coordenação diária\". E as duas reivindicam a mesma numeração de formato salvo (b+2/b+3 nos vértices, b+1 na face).",
     "porQueImporta": "Isso não é paralelismo, é duas pessoas digitando na mesma função. O plano viu o risco e o pagou com a decisão de numeração antecipada no F0b, que está certa. Mas o resto do custo continua: toda dúvida de fronteira entre `posicoesDoCorte` e `planoDeCostura` vira uma pergunta que nenhuma das duas worktrees pode responder sozinha, e o custo de errar é reescrever formato salvo de uma capacidade entregue na mesma rodada.",
     "conserto": "Na rodada A do corte, rodar F3 e F4 em SÉRIE, não em paralelo, na mesma worktree. Medido: o gate de linha de comando custa 6,8 s (vitest 6,01 s de relógio, gabarito 0,486 s, id-cru 0,344 s), então serializar não custa tempo de gate — custa só o fim do paralelismo, que nesta função nunca foi real. F3 antes de F4, como o próprio cruzamento recomenda: F3 enche a lista de posições e F4 só consome o comprimento dela."
@@ -315,7 +315,7 @@
     "onde": "docs/mecanifica/PLANO.md — \"Antes de a rodada começar\"",
     "oQue": "A limpeza de worktrees mira as duas branches que não têm nada e perde a única que tem. Medido com `git rev-list --count HEAD..<branch>`: `wip/filete-seletivo-v2` tem 0 commits fora do HEAD, `wip/curva-perfil` tem 0. As duas que o plano manda remover estão vazias. Existe uma terceira, `wip/filete-peca-inacabada`, com 1 commit fora do HEAD: 3d7baab, de 08-01 00:44, \"Trabalho solto quando o agente morreu: peça de exercício e freio (NÃO conferido)\" — 76 inserções em `_caixote-filetado.js` e `freio-disco.js`. O plano não a nomeia em lugar nenhum.",
     "porQueImporta": "O risco número 1 do plano é perda de trabalho por contêiner reciclado, e o item de higiene que abre a rodada olha para o lado errado. Ou aquele commit já foi refeito na main e a branch deve morrer nomeada, ou ele tem alguma coisa e um `git worktree prune` distraído leva junto. As duas respostas são baratas; não saber qual é que custa.",
-    "conserto": "Antes de remover qualquer coisa: `git diff HEAD wip/filete-peca-inacabada -- prototipos/fps/v3/pecas/` e decidir em voz alta se 3d7baab morre ou é resgatado. Depois remover as três branches, não duas, e escrever no commit de limpeza que as duas primeiras estavam vazias e o que aconteceu com a terceira. E confirmar a regra de push do plano, que está certa e não está implementada: as três são LOCAIS, só existem `origin/main` e `origin/claude/clone-...`."
+    "conserto": "Antes de remover qualquer coisa: `git diff HEAD wip/filete-peca-inacabada -- prototipos/procedural/v3/pecas/` e decidir em voz alta se 3d7baab morre ou é resgatado. Depois remover as três branches, não duas, e escrever no commit de limpeza que as duas primeiras estavam vazias e o que aconteceu com a terceira. E confirmar a regra de push do plano, que está certa e não está implementada: as três são LOCAIS, só existem `origin/main` e `origin/claude/clone-...`."
    },
    {
     "gravidade": "media",

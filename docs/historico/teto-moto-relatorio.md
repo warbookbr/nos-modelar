@@ -3,7 +3,7 @@
 Execução do experimento descrito em `docs/TETO.md`: criar a motocicleta do
 enunciado **exclusivamente em `PASSOS`**, com orçamento de 3 ciclos.
 
-Artefato: `prototipos/fps/v3/pecas/moto.js` · branch `wip/teto-moto`.
+Artefato: `prototipos/procedural/v3/pecas/moto.js` · branch `wip/teto-moto`.
 
 ---
 

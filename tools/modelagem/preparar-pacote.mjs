@@ -67,7 +67,7 @@ export async function prepararPacote({
     formato: 'mecanifica.pacote-modelagem',
     versao: 1,
     id,
-    alvo: { peca: alvo.peca, caminho: `prototipos/fps/v3/pecas/${alvo.peca}.js`, modo },
+    alvo: { peca: alvo.peca, caminho: `prototipos/procedural/v3/pecas/${alvo.peca}.js`, modo },
     objetivo: modo === 'criacao'
       ? `Criar a peça '${alvo.peca}' por evidência observável.`
       : `Revisar e refinar a peça '${alvo.peca}' por evidência observável.`,

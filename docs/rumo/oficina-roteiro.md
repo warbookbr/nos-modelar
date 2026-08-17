@@ -170,7 +170,7 @@ Sai de "acho que ficou parecido" pra um número.
 
 **Já existe hoje (P5 do playground, D-118), sem canvas ainda** —
 `tools/bancadas/gabarito.mjs` (`npm run gabarito -- <peça>`): o formato do
-contorno de referência é `prototipos/fps/v3/gabaritos/<peça>.js` exportando
+contorno de referência é `prototipos/procedural/v3/gabaritos/<peça>.js` exportando
 `CONTORNOS: {ângulo: [[x,y],...]}` (0..1, a alça de curva reservada no 3º
 elemento, a mesma lei fail-closed do `lathe`/`loft`) — hoje escrito à mão
 olhando o PNG (o jeito real que uma IA autora sem canvas); o canvas da Aba

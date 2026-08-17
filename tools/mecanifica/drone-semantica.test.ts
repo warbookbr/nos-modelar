@@ -9,9 +9,9 @@
    `npm run descrever`, e falham quando a MONTAGEM se desmancha. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo e fixture legados em JavaScript.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — fixture legada em JavaScript.
-import * as drone from '../../prototipos/fps/v3/pecas/drone-inspecao.js';
+import * as drone from '../../prototipos/procedural/v3/pecas/drone-inspecao.js';
 // @ts-expect-error — adaptador novo em JavaScript.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 // @ts-expect-error — módulo neutro de medição em JavaScript.

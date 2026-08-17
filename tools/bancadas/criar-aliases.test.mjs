@@ -1,8 +1,8 @@
 /* criar-aliases.test.mjs — impede que a bancada criar volte a diagnosticar
    como órfã uma peça válida por esquecer o sexto campo do envelope: ALIASES. */
 import { describe, expect, it } from 'vitest';
-import { nucleo, neutroCanonico } from '../../prototipos/fps/v3/motor/oficina.js';
-import * as freio from '../../prototipos/fps/v3/pecas/freio-disco.js';
+import { nucleo, neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
+import * as freio from '../../prototipos/procedural/v3/pecas/freio-disco.js';
 import { executarNucleoDaPeca } from './estado-peca.mjs';
 
 describe('envelope da bancada criar', () => {

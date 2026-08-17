@@ -3,7 +3,7 @@
    copiada. Cobre cópia radial, linear, espelho e a recusa antes de medir/posar. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
 import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, derivarPreviaDeEncaixeCilindrico } from '../../src/autoria/interfaces-montagem.js';
 

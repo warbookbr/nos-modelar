@@ -20,7 +20,7 @@
    está provada abaixo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const CUBO = { op: 'cubo', id: 1 };
 const base = () => ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1 }];

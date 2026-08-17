@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* gabarito-selecao.mjs — a PROVA ZERO da Fase 3.5 (docs/rumo/PLANO.md): mede,
  * peça por peça, que uma mudança no núcleo (`motor/oficina.js`) não mudou o
- * resultado de NENHUMA peça já shipada. Percorre `prototipos/fps/v3/pecas/*.js`,
+ * resultado de NENHUMA peça já shipada. Percorre `prototipos/procedural/v3/pecas/*.js`,
  * constrói cada uma (headless, sem browser) e serializa o neutro de forma
  * DETERMINÍSTICA — ids ordenados, número com precisão fixa — pra um hash por
  * peça e um hash total. `--check <arquivo.json>` compara contra o gabarito
@@ -28,7 +28,7 @@ import { compararGabarito, hashDePecas, nomesNovos } from './gabarito-selecao-li
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 
 const GABARITO_PADRAO = join(HERE, 'gabarito-selecao.json');
 const args = process.argv.slice(2);
@@ -44,7 +44,7 @@ if (!checkPath && novas.size) {
   process.exit(2);
 }
 
-const { nucleo, neutroCanonico } = await import(pathToFileURL(join(REPO, 'prototipos/fps/v3/motor/oficina.js')).href);
+const { nucleo, neutroCanonico } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
 
 /* número com precisão fixa: 9 casas decimais, e "-0" normalizado pra "0" —
  * o mesmo epsilon estrutural que o resto do repo usa pra comparar posição

@@ -1,5 +1,5 @@
 /* Experimento confinado — suporte com alojamento, piloto e assento anular. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 export const PARAMS = { raioAlojamento: 0.020, raioCorpo: 0.050, raioFlange: 0.070, raioPiloto: 0.040, inicio: -0.050, fimCorpo: 0.020, fimFlange: 0.030, fimPiloto: 0.045 };
 export const TOPO = { lados: 24 };
 export const MATERIAIS = { aco: { cor: '#7c8791', aspereza: 0.52, metalness: 0.7 } };

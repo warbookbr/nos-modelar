@@ -19,7 +19,7 @@
    encaixe e não é colisão. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 
 const DISCO = { op: 'cubo', id: 1 };
 const PASTILHA = { op: 'cubo', id: 2 };

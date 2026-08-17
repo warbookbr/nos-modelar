@@ -58,10 +58,11 @@ montagens e receitas declarativas. Revisões ativas autorizadas alimentam o mesm
 catálogo usado por leitura e revalidação, inclusive em uma nova sessão.
 
 Os formatos persistidos `mecanifica.montagem` v1, v2 e v3 cobrem composição
-recursiva, pose rígida e relações locais mensuráveis. Ainda não existem mapa
-global completo de dependências, revalidação automática em cascata, solver geral
-de encaixe, materiais canônicos ou autoria compatível com todo módulo JavaScript
-histórico.
+recursiva, pose rígida e relações locais mensuráveis. O mapa canônico e a
+revalidação em cascata persistida cobrem o universo explícito autorizado; não
+descobrem dependências fora dele nem corrigem ou promovem dependentes
+automaticamente. Solver geral de encaixe, materiais canônicos, cinemática e
+autoria compatível com todo módulo JavaScript histórico continuam fora.
 
 ## A distinção central: peça não é montagem
 

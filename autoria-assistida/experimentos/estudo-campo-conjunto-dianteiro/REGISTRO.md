@@ -112,7 +112,7 @@ CLI e decidir separadamente se tentativas precisam de comparação própria.
 
 ## Atrito 8 — fixtures experimentais contaminam catálogos por localização
 
-Enquanto as seis receitas estavam em `prototipos/fps/v3/pecas/`, o catálogo
+Enquanto as seis receitas estavam em `prototipos/procedural/v3/pecas/`, o catálogo
 MCP passou de 37 para 43 peças e seu gate quebrou. O pacote rejeitado também
 apareceu em `mecanifica://pacotes` com zero revisões.
 

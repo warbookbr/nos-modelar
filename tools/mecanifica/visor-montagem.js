@@ -31,6 +31,37 @@ function direcao(vista) {
   return ({ isometrica: [1, 0.8, 1], frontal: [0, 0, 1], direita: [1, 0, 0], superior: [0, 1, 0] })[vista] ?? [1, 0.8, 1];
 }
 
+function eixosDaVista(vetor, vista) {
+  const olhar = vetor.clone().negate();
+  const acima = vista === 'superior' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0);
+  return {
+    direita: new THREE.Vector3().crossVectors(olhar, acima).normalize(),
+    acima,
+  };
+}
+
+function envelopeProjetado(caixa, vetor, vista) {
+  const { direita, acima } = eixosDaVista(vetor, vista);
+  const valoresX = [];
+  const valoresY = [];
+  for (const x of [caixa.min.x, caixa.max.x]) {
+    for (const y of [caixa.min.y, caixa.max.y]) {
+      for (const z of [caixa.min.z, caixa.max.z]) {
+        const ponto = new THREE.Vector3(x, y, z);
+        valoresX.push(ponto.dot(direita));
+        valoresY.push(ponto.dot(acima));
+      }
+    }
+  }
+  return { largura: Math.max(...valoresX) - Math.min(...valoresX), altura: Math.max(...valoresY) - Math.min(...valoresY) };
+}
+
+function distanciaParaEnquadrar(envelope) {
+  const vertical = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const horizontal = vertical * camera.aspect;
+  return Math.max(0.01, envelope.largura / (2 * horizontal * 0.58), envelope.altura / (2 * vertical * 0.62));
+}
+
 function enquadramento(caixa) {
   const xs = [caixa.min.x, caixa.max.x];
   const ys = [caixa.min.y, caixa.max.y];
@@ -44,7 +75,7 @@ function enquadramento(caixa) {
   const altura = Math.max(0, maxY - minY) / 2;
   const cortado = minX < -1 || maxX > 1 || minY < -1 || maxY > 1;
   return {
-    valida: !cortado && largura >= 0.05 && altura >= 0.05,
+    valida: !cortado && Math.max(largura, altura) >= 0.32 && Math.min(largura, altura) >= 0.04,
     area: largura * altura,
     largura,
     altura,
@@ -58,14 +89,14 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   scene.add(visual.raiz);
   const caixa = new THREE.Box3().setFromObject(visual.raiz);
   const centro = caixa.getCenter(new THREE.Vector3());
-  const raio = Math.max(0.1, caixa.getBoundingSphere(new THREE.Sphere()).radius);
   const vetor = new THREE.Vector3(...direcao(vista)).normalize();
-  camera.position.copy(centro).addScaledVector(vetor, raio / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.35);
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  const envelope = envelopeProjetado(caixa, vetor, vista);
+  camera.position.copy(centro).addScaledVector(vetor, distanciaParaEnquadrar(envelope));
   camera.up.set(0, 1, 0);
   if (vista === 'superior') camera.up.set(0, 0, -1);
   camera.lookAt(centro);
-  renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.render(scene, camera);
   return {

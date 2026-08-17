@@ -4,7 +4,7 @@
  * O `CLAUDE.md` proíbe id posicional como referência persistida, mas o formato
  * salvo aceita SEIS formas de COLEÇÃO de id cru. QUAIS são elas, e por que
  * `de:{op,id}` do `publicarPorta` NÃO é uma delas, está escrito num lugar só:
- * `prototipos/fps/v3/motor/referencia-posicional.js`. Este gate, a guarda de
+ * `prototipos/procedural/v3/motor/referencia-posicional.js`. Este gate, a guarda de
  * salvamento da Oficina e o oráculo do harness importam de lá — a regra copiada
  * em três lugares divergiu duas vezes na mesma chave (ATRITOS-AUTORIA A-22), e
  * na segunda a Oficina passou a recusar uma peça que este gate aprova.
@@ -54,7 +54,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   FORMAS, ROTULO, TEM_CAMINHO_SEMANTICO, contarIdCru, detalheDe, objetoPlano, totalDe,
-} from '../../prototipos/fps/v3/motor/referencia-posicional.js';
+} from '../../prototipos/procedural/v3/motor/referencia-posicional.js';
 
 /* reexportado para quem já importava daqui (os testes do gate e o harness da
    guarda): a regra mudou de casa, não de contrato. */
@@ -62,7 +62,7 @@ export { FORMAS, ROTULO, contarIdCru, detalheDe, totalDe };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/fps/v3/pecas');
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 
 export const LISTA_PADRAO = join(HERE, 'id-cru-herdado.json');
 /* 2: `herdadas` virou lista ordenada e ganhou as três formas que faltavam. Ler

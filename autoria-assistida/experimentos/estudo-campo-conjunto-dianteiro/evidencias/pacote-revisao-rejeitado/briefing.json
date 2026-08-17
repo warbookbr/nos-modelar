@@ -1,6 +1,6 @@
 {
   "alvo": {
-    "caminho": "prototipos/fps/v3/pecas/_estudo-disco-dianteiro.js",
+    "caminho": "prototipos/procedural/v3/pecas/_estudo-disco-dianteiro.js",
     "modo": "refinamento",
     "peca": "_estudo-disco-dianteiro"
   },

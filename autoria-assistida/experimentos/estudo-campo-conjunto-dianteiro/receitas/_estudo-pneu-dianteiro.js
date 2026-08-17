@@ -1,6 +1,6 @@
 /* ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar
    assentamento anular e inspeção visual individual. */
-import { executar, colisaoDe } from '../../../../prototipos/fps/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
 
 export const PARAMS = {
   raioInterno: 0.220,

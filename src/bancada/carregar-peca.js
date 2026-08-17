@@ -1,9 +1,9 @@
 /* carregar-peca.js — resolve a fixture da bancada por nome semântico e falha alto em nome inválido. */
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
 
-const MODULOS = import.meta.glob('../../prototipos/fps/v3/pecas/*.js');
+const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/*.js');
 
 export const PECA_PADRAO = 'drone-inspecao';
 
@@ -25,7 +25,7 @@ export async function carregarPeca(nome = PECA_PADRAO) {
   const caminho = Object.keys(MODULOS).find((chave) => nomeDoCaminho(chave) === nome);
   if (!caminho) {
     throw new Error(
-      `bancada: peça '${nome}' não existe em prototipos/fps/v3/pecas/. `
+      `bancada: peça '${nome}' não existe em prototipos/procedural/v3/pecas/. `
       + `Disponíveis: ${PECAS_DISPONIVEIS.join(', ')}`,
     );
   }

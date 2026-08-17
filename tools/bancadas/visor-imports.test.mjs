@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const VISOR = resolve(RAIZ, 'prototipos/fps/v3/visor.html');
+const VISOR = resolve(RAIZ, 'prototipos/procedural/v3/visor.html');
 
 function importMapDoVisor() {
   const html = readFileSync(VISOR, 'utf8');

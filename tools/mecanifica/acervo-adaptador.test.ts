@@ -34,12 +34,12 @@ import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — adaptador em JavaScript, exercitado em runtime pelo Vitest.
 import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 import { areasDeTriangulo, arestasSemPar, cantosSobreAresta, escalaDaPeca } from '../oficina/conferir-malha.js';
 
-const PECAS = resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/fps/v3/pecas');
+const PECAS = resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/procedural/v3/pecas');
 const nomes = readdirSync(PECAS).filter((f) => f.endsWith('.js')).map((f) => f.replace(/\.js$/, '')).sort();
 
 describe('o adaptador atravessa o acervo inteiro', () => {

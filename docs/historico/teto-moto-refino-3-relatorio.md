@@ -1,6 +1,6 @@
 # TETO — relatório da 3ª corrida de refino da moto
 
-Artefato: `prototipos/fps/v3/pecas/moto.js`. Esta corrida modifica a peça da
+Artefato: `prototipos/procedural/v3/pecas/moto.js`. Esta corrida modifica a peça da
 segunda corrida; não a reconstrói nem altera a geometria ou os atributos já
 existentes.
 

@@ -27,7 +27,7 @@ if (!nome || !montagens.has(nome)) {
 
 try {
   const escolha = montagens.get(nome);
-  const modulo = await import(pathToFileURL(join(repo, 'prototipos/fps/v3/montagens', escolha.arquivo)).href);
+  const modulo = await import(pathToFileURL(join(repo, 'prototipos/procedural/v3/montagens', escolha.arquivo)).href);
   const montagem = modulo[escolha.fabrica]();
   const portas = resolverPortasDeMontagem(montagem.instancias);
   if (montagem.relacao.tipo === 'assentaAnular') {

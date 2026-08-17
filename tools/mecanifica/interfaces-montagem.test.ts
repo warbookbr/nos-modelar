@@ -2,13 +2,13 @@
    cilíndricas persistidas pelo núcleo e encaixe estritamente mensurável. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/fps/v3/motor/oficina.js';
+import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — fixture em JavaScript, exercitada pela API pública.
-import { montarPinoELuva } from '../../prototipos/fps/v3/montagens/pino-e-luva.js';
+import { montarPinoELuva } from '../../prototipos/procedural/v3/montagens/pino-e-luva.js';
 // @ts-expect-error — montagem piloto em JavaScript, exercitada pela API pública.
-import { montarRodaNoFreio, montarAroNoPneu } from '../../prototipos/fps/v3/montagens/roda-no-freio.js';
+import { montarRodaNoFreio, montarAroNoPneu } from '../../prototipos/procedural/v3/montagens/roda-no-freio.js';
 // @ts-expect-error — fixture neutra em JavaScript, exercitada pela API pública.
-import { montarAnelEFaixa } from '../../prototipos/fps/v3/montagens/anel-e-faixa.js';
+import { montarAnelEFaixa } from '../../prototipos/procedural/v3/montagens/anel-e-faixa.js';
 // @ts-expect-error — módulo de autoria em JavaScript, exercitado pela API pública.
 import { resolverPortasDeMontagem, validarEncaixeCilindrico, avaliarEstadoDeEncaixeCilindrico, classificarContatoLocalCilindrico, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe, validarAssentamentoAnular, diagnosticarAssentamentoAnular, formatarDiagnosticoDeAssentamentoAnular, derivarPreviaDeEncaixeCilindrico, aplicarPreviaDePose } from '../../src/autoria/interfaces-montagem.js';
 

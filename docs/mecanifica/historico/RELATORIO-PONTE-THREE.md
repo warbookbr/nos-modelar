@@ -8,7 +8,7 @@ importar o renderizador nem persistir identidades do runtime.
 ## Implementação
 
 - Vite produz a aplicação estática na raiz.
-- `nucleo()` continua intacto em `prototipos/fps/v3/motor/oficina.js`.
+- `nucleo()` continua intacto em `prototipos/procedural/v3/motor/oficina.js`.
 - `src/autoria/adaptar-three.js` converte o estado neutro em
   `THREE.BufferGeometry` e agrupa superfícies por `face.parte`.
 - `src/interacao/criar-inspecao.js` usa raycast para encontrar a identidade
