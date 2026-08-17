@@ -210,10 +210,6 @@ npm run criar -- _viga
 
 ## Pendências atuais
 
-- Resolver costuras topológicas de `lathe`.
-- Criar contrato genérico de materiais.
-- Fechar a capacidade ainda aberta comprovada em A-16 (encaixe oco não é
-  reconhecido pela régua).
 - Avaliar `alinhar` (centragem derivada) quando houver evidência de campo; os
   seletores relacionais do O-8 foram retirados — ver o encerramento de
   `planos/2026-08-17-ponto-nomeado.md`.
@@ -282,6 +278,8 @@ Planejamento: [planos/README](planos/README.md),
 (`docs/mecanifica/planos/2026-08-17-ponto-nomeado.md`),
 [histórico de revisão](planos/2026-08-17-historico-de-revisao.md)
 (`docs/mecanifica/planos/2026-08-17-historico-de-revisao.md`),
+[lathe fechado](planos/2026-08-17-lathe-fechado.md)
+(`docs/mecanifica/planos/2026-08-17-lathe-fechado.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

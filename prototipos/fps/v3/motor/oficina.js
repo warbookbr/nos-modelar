@@ -2674,25 +2674,51 @@ export const OPS = {
     });
     if (pontoInvalido2) return;
 
+    /* PERFIL FECHADO — o último ponto no MESMO lugar do primeiro.
+       Uma receita que escreve isso está dizendo "a seção dá a volta e fecha":
+       é assim que se descreve anel de vedação, pneu e qualquer toroide. Até
+       aqui o passo tratava o perfil como polilinha SEMPRE aberta, e o ponto
+       repetido virava um segundo anel de vértices coincidentes com o primeiro —
+       colados no espaço, separados na topologia. Visualmente fechava; a malha
+       tinha uma costura, e `meta.fechada:false` era o único lugar onde isso
+       aparecia.
+
+       Agora o último ponto REUSA os vértices do primeiro. A superfície fecha de
+       verdade, e a última faixa liga o penúltimo anel de volta ao anel inicial.
+
+       A comparação é EXATA de propósito. Um limiar aproximado faria dois pontos
+       quase iguais fecharem o laço em silêncio, mudando a topologia de uma peça
+       cujo autor não pediu isso — e o autor que quer fechar consegue escrever a
+       mesma coordenada, porque ela vem do mesmo PARAM. */
+    const ultimo = pontos.length - 1;
+    const fechado = pontos.length >= 3
+      && pontos[0].raio === pontos[ultimo].raio
+      && pontos[0].y === pontos[ultimo].y;
+
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de inserir
     let nV = 0; for (const p of pontos) nV += p.polo ? 1 : L;
+    if (fechado) nV -= pontos[ultimo].polo ? 1 : L;   // o último ponto não aloca: ele reusa o primeiro
     let nF = 0; for (let idx = 0; idx < pontos.length - 1; idx++) if (!(pontos[idx].polo && pontos[idx + 1].polo)) nF += L;
     if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: lathe com ${perfil.length} pontos × lados=${L} estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
     // VÉRTICES — anda o cursor (a fórmula documentada acima)
     let cursor = 0;
-    const info = pontos.map((p) => {
+    const info = [];
+    for (let idx = 0; idx < pontos.length; idx++) {
+      if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
+      const p = pontos[idx];
       if (p.polo) {
         const id = b + cursor;
         addV(st, id, [0, p.y, 0]);
         cursor += 1;
-        return { polo: true, id };
+        info.push({ polo: true, id });
+        continue;
       }
       const ids = [];
       for (let j = 0; j < L; j++) { const t = (j / L) * Math.PI * 2; const id = b + cursor + j; addV(st, id, [Math.cos(t) * p.raio, p.y, Math.sin(t) * p.raio]); ids.push(id); }
       cursor += L;
-      return { polo: false, ids };
-    });
+      info.push({ polo: false, ids });
+    }
 
     // FACES — cursor de face análogo, por segmento consecutivo (i,i+1)
     let fCursor = 0;
