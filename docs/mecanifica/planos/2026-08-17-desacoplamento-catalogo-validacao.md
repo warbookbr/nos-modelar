@@ -1,5 +1,5 @@
 # Independência entre núcleo, validação e catálogo
-**Estado:** ativo
+**Estado:** concluído
 **Responsável pela execução:** a definir
 **Base medida:** `warbookbr/nos-mecanifica` `main` em `2dd9fa1` e consumidor
 `warbookbr/mecanica` `main` em `9127321`.
@@ -13,15 +13,14 @@ receitas sem virar contratos acidentais, diagnóstico que separa falha do motor
 de falha do conteúdo, testes genéricos pequenos, migrações mais seguras e menor
 custo de homologação e remoção.
 ## Andamento da implementação
-R00–R05 estão implementados na `main`: execução pura, firewall, catálogo vazio,
-bancada sem fallback, harness privado e consumidor externo com manifesto vazio.
-R06 está aplicado no working tree: o acervo não homologado foi removido, os
-gates de dívida foram retirados e as provas de capacidade foram reduzidas a
-fixtures neutras. R07 está na validação final. A matriz está em
+R00–R07 estão implementados na `main` até `c78961f`: execução pura, firewall,
+catálogo vazio, bancada sem fallback, harness privado, consumidor externo com
+manifesto vazio e remoção do acervo não homologado. Os gates de dívida foram
+retirados e as provas de capacidade foram reduzidas a fixtures neutras. A matriz está em
 [`MATRIZ-TESTES-ACOPLADOS.md`](../MATRIZ-TESTES-ACOPLADOS.md).
-O consumidor está integrado na `main` por `c794633`; o escritório já publicou
-o harness e o manifesto vazio. A remoção do acervo precisa apenas dos gates
-finais e do commit coordenado desta rodada.
+O consumidor está integrado na `main` por `c794633`; o escritório publicou o
+harness e o manifesto vazio. A suíte completa e os gates de documentação,
+arquitetura, exportação, build e bancada passaram após a remoção.
 ## Hipótese
 O motor não depende de peças: suas 32 operações recebem dados e nenhum módulo
 de `motor/` importa `pecas/`. O acoplamento está nas portas que descobrem
