@@ -20,7 +20,7 @@
    identidade persistida". */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço de autoria em JavaScript, exercitado pela API pública.
-import { alterarMontagem } from '../../src/autoria/alterar-montagem.js';
+import { alterarMontagem, diferencaMontagem } from '../../src/autoria/alterar-montagem.js';
 
 const DOC = Object.freeze({
   formato: 'mecanifica.montagem',
@@ -210,5 +210,76 @@ describe('o ganho de contexto é real, e medido', () => {
     const longo = partir();
     longo.instancias[0].pose.deslocamento = [0, 1.025, 0];
     expect(JSON.stringify(montagem)).toBe(JSON.stringify(longo));
+  });
+});
+
+/* A COMPARAÇÃO é o caminho inverso, e a razão de morar neste arquivo é que ela
+   fala a MESMA língua: `{alvo, campo, de, para}`. Quem leu a diferença já sabe
+   escrever a alteração que a desfaz, sem traduzir formato no meio. */
+describe('comparar duas revisões fala a língua da alteração', () => {
+  it('a diferença de um campo sai no formato exato de uma alteração', () => {
+    const depois = alterarMontagem(partir(), [
+      { alvo: { instancia: 'movel' }, campo: 'pose.deslocamento', valor: [0, 1.04, 0] },
+    ]).montagem;
+    const { alteracoes, estruturais } = diferencaMontagem(partir(), depois);
+    expect(estruturais).toEqual([]);
+    expect(alteracoes).toEqual([{
+      alvo: "instancia 'movel'", campo: 'pose.deslocamento', de: [0, 1.02, 0], para: [0, 1.04, 0],
+    }]);
+  });
+
+  /* O fecho do ciclo: a diferença lida REALIMENTA a alteração e desfaz a
+     mudança. É isto que torna o vocabulário único útil, e não só bonito. */
+  it('a diferença lida desfaz a mudança quando devolvida como alteração', () => {
+    const original = partir();
+    const depois = alterarMontagem(partir(), [
+      { alvo: { instancia: 'movel' }, campo: 'pose.deslocamento', valor: [0, 1.04, 0] },
+    ]).montagem;
+    const { alteracoes } = diferencaMontagem(depois, original);
+    const desfeito = alterarMontagem(depois, alteracoes.map((d: any) => ({
+      alvo: { instancia: 'movel' }, campo: d.campo, valor: d.para,
+    }))).montagem;
+    expect(JSON.stringify(desfeito)).toBe(JSON.stringify(original));
+  });
+
+  it('documentos iguais não têm diferença', () => {
+    expect(diferencaMontagem(partir(), partir())).toEqual({ alteracoes: [], estruturais: [] });
+  });
+
+  it('instância acrescentada e removida saem como ESTRUTURAIS, não como alteração', () => {
+    const comMais = partir();
+    comMais.instancias.push({ id: 'novo', alvo: { tipo: 'peca', ref: 'outro' } });
+    const { alteracoes, estruturais } = diferencaMontagem(partir(), comMais);
+    /* a separação é a honestidade da função: alteração não cria instância, e
+       juntar as duas listas faria o agente achar que dá para desfazer isso
+       trocando um campo. */
+    expect(alteracoes).toEqual([]);
+    expect(estruturais).toEqual([{ tipo: 'instancia-acrescentada', alvo: "instancia 'novo'" }]);
+
+    const inverso = diferencaMontagem(comMais, partir());
+    expect(inverso.estruturais).toEqual([{ tipo: 'instancia-removida', alvo: "instancia 'novo'" }]);
+  });
+
+  it('a ordem das instâncias não é diferença: o endereço é o id', () => {
+    const reordenado = partir();
+    reordenado.instancias.reverse();
+    expect(diferencaMontagem(partir(), reordenado)).toEqual({ alteracoes: [], estruturais: [] });
+  });
+
+  it('alcança raiz e relação, não só instância', () => {
+    const outro = partir();
+    outro.id = 'renomeado';
+    outro.relacoes[0].especificacao.separacaoMinima = 0.05;
+    const { alteracoes } = diferencaMontagem(partir(), outro);
+    expect(alteracoes).toContainEqual({ alvo: 'raiz', campo: 'id', de: 'gabarito-separacao-direcional', para: 'renomeado' });
+    expect(alteracoes).toContainEqual({ alvo: "relacao 'vaoEntreBlocos'", campo: 'especificacao.separacaoMinima', de: 0.02, para: 0.05 });
+  });
+
+  it('lista muda inteira, nunca por índice', () => {
+    const outro = partir();
+    outro.instancias[0].pose.rotacao = [[0, 1, 0], [1, 0, 0], [0, 0, 1]];
+    const { alteracoes } = diferencaMontagem(partir(), outro);
+    expect(alteracoes).toHaveLength(1);
+    expect(alteracoes[0].campo).toBe('pose.rotacao');
   });
 });

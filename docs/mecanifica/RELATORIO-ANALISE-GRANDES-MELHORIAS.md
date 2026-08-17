@@ -93,6 +93,10 @@ de autoria, restaurar conteúdo anterior como nova transição e manter variante
 nomeadas. A solução deve preservar revisão observada e nunca mover o estado
 ativo sem confirmação e revalidação atuais.
 
+Executado por [`planos/2026-08-17-historico-de-revisao.md`](planos/2026-08-17-historico-de-revisao.md),
+menos as variantes nomeadas: histórico, comparação no vocabulário da alteração e
+restauração como revisão nova, sem mover o estado ativo fora dos gates.
+
 ### 5. Fechar lacunas geométricas por experimentos
 
 Costuras de `lathe`, endereço de grupo linear e abertura oblonga limitam peças

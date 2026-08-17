@@ -215,13 +215,20 @@ async function lerObjetoSeguro(diretorios, objeto, fs) {
   return { bytes, documento };
 }
 
-export async function lerRevisaoAtivaAutoria(raiz, entidade, { fs: fsOpcoes } = {}) {
+/* A CADEIA inteira, da primeira revisão à ativa. `lerRevisaoAtivaAutoria`
+   sempre percorreu esta cadeia e jogava fora tudo menos o último elo — o
+   histórico já estava sendo lido, só não estava sendo devolvido. Extrair a
+   travessia, em vez de escrever uma segunda, mantém a detecção de ciclo, a
+   validação de transição e a leitura segura de objeto numa definição só: duas
+   travessias poderiam discordar sobre qual é a revisão ativa, e a que
+   discordasse silenciosamente seria a pior das duas. */
+export async function lerCadeiaAutoria(raiz, entidade, { fs: fsOpcoes } = {}) {
   if (!slugValido(entidade)) throw new ErroRepositorioAutoria('entidade-invalida', 'entidade precisa ser slug canônico.', 'Use letras minúsculas, números, ponto, hífen ou sublinhado.');
   const fs = fsDe({ fs: fsOpcoes });
   const diretorios = await prepararRaizLeitura(raiz, fs);
-  if (!diretorios) return null;
+  if (!diretorios) return [];
   let pai = null;
-  let ativa = null;
+  const cadeia = [];
   const vistos = new Set();
   while (true) {
     const transicao = await lerTransicao({ diretorios, entidade, pai, fs });
@@ -230,10 +237,15 @@ export async function lerRevisaoAtivaAutoria(raiz, entidade, { fs: fsOpcoes } = 
     vistos.add(transicao.commit.id);
     const commit = validarTransicao(transicao, entidade, pai);
     const objeto = await lerObjetoSeguro(diretorios, commit.objeto, fs);
-    ativa = { estado: 'aplicado', entidade, pai: commit.pai, commit: transicao.commit.id, objeto: commit.objeto, conteudo: objeto.documento.conteudo };
+    cadeia.push({ estado: 'aplicado', entidade, pai: commit.pai, commit: transicao.commit.id, objeto: commit.objeto, conteudo: objeto.documento.conteudo });
     pai = transicao.commit.id;
   }
-  return ativa;
+  return cadeia;
+}
+
+export async function lerRevisaoAtivaAutoria(raiz, entidade, opcoes = {}) {
+  const cadeia = await lerCadeiaAutoria(raiz, entidade, opcoes);
+  return cadeia.length ? cadeia[cadeia.length - 1] : null;
 }
 
 export async function materializarRevisaoAutoria({ raiz, plano, falhaInjetada, fs: fsOpcoes, telemetria } = {}) {

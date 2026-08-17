@@ -641,7 +641,7 @@ describe('servidor MCP local — perfil revisao', () => {
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
         'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',
-        'observar_autoria_montagem', 'planejar_autoria_montagem', 'planejar_alteracao_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
+        'observar_autoria_montagem', 'planejar_autoria_montagem', 'historico_autoria_montagem', 'comparar_revisoes_montagem', 'planejar_restauracao_montagem', 'planejar_alteracao_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);
       const id = 'gabarito-separacao-direcional';
@@ -698,16 +698,69 @@ describe('servidor MCP local — perfil revisao', () => {
         arguments: { plano: alterada.structuredContent.resultado.plano, confirmacao: alterada.structuredContent.resultado.confirmacao, alvo: ['movel'] },
       });
       expect(inspAlterada.structuredContent).toMatchObject({ ok: true, resultado: { promocao: { estado: 'aprovado' } } });
+      /* aplicada de fato: é ela que dá ao histórico uma segunda revisão, e sem
+         segunda revisão não existe comparação nem restauração para provar. */
+      const alteradaAplicada = await client.callTool({
+        name: 'aplicar_autoria_montagem',
+        arguments: { plano: alterada.structuredContent.resultado.plano, confirmacao: alterada.structuredContent.resultado.confirmacao, alvo: ['movel'] },
+      });
+      expect(alteradaAplicada.structuredContent).toMatchObject({ ok: true });
+      const revisaoDepoisDaAlteracao = alteradaAplicada.structuredContent.resultado.revisao;
       /* endereço posicional é recusado na porta, não só na função interna */
       const posicional = await client.callTool({
         name: 'planejar_alteracao_montagem',
         arguments: {
-          id, revisaoObservada: revisaoAtiva,
+          id, revisaoObservada: revisaoDepoisDaAlteracao,
           alteracoes: [{ alvo: { instancia: 'movel' }, campo: 'pose.deslocamento.1', valor: 1.05 }],
         },
       });
       expect(posicional.isError).toBe(true);
       expect(posicional.structuredContent.erro.codigo).toBe('campo_posicional');
+
+      /* HISTÓRICO, COMPARAÇÃO E RESTAURAÇÃO pela porta. Sem isto o agente
+         publica e não consegue olhar para trás: o conteúdo antigo fica guardado
+         do lado, e inalcançável. */
+      const historico = await client.callTool({ name: 'historico_autoria_montagem', arguments: { id } });
+      expect(historico.structuredContent).toMatchObject({ ok: true });
+      const revisoes = historico.structuredContent.resultado.revisoes;
+      expect(revisoes.length).toBeGreaterThanOrEqual(2);
+      expect(revisoes[revisoes.length - 1]).toMatchObject({ revisao: revisaoDepoisDaAlteracao, ativa: true });
+      expect(revisoes[0].pai).toBe(null);
+
+      /* a comparação sai no MESMO vocabulário da alteração compacta */
+      const comparada = await client.callTool({
+        name: 'comparar_revisoes_montagem',
+        arguments: { id, anterior: revisoes[0].revisao, posterior: revisaoDepoisDaAlteracao },
+      });
+      expect(comparada.structuredContent).toMatchObject({ ok: true });
+      expect(comparada.structuredContent.resultado.alteracoes).toContainEqual(
+        expect.objectContaining({ alvo: "instancia 'movel'", campo: 'pose.deslocamento' }),
+      );
+
+      /* restaurar NÃO move o estado ativo: devolve um plano, que segue pelos
+         gates de sempre. */
+      const restauracao = await client.callTool({
+        name: 'planejar_restauracao_montagem',
+        arguments: { id, revisaoObservada: revisaoDepoisDaAlteracao, revisao: revisoes[0].revisao },
+      });
+      expect(restauracao.structuredContent).toMatchObject({ ok: true });
+      const aindaAtiva = await client.callTool({ name: 'observar_autoria_montagem', arguments: { id } });
+      expect(aindaAtiva.structuredContent.resultado.revisao).toBe(revisaoDepoisDaAlteracao);
+      /* e o plano carrega o conteúdo da revisão pedida, não o atual */
+      const primeira = await client.callTool({
+        name: 'comparar_revisoes_montagem',
+        arguments: { id, anterior: revisaoDepoisDaAlteracao, posterior: revisoes[0].revisao },
+      });
+      expect(restauracao.structuredContent.resultado.alteracoes)
+        .toEqual(primeira.structuredContent.resultado.alteracoes);
+
+      /* restaurar a revisão que já é a ativa é recusado */
+      const semEfeito = await client.callTool({
+        name: 'planejar_restauracao_montagem',
+        arguments: { id, revisaoObservada: revisaoDepoisDaAlteracao, revisao: revisaoDepoisDaAlteracao },
+      });
+      expect(semEfeito.isError).toBe(true);
+      expect(semEfeito.structuredContent.erro.codigo).toBe('restauracao_sem_efeito');
       expect(concorrente.structuredContent).toMatchObject({ ok: false, erro: { codigo: 'revisao_desatualizada' } });
       expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, descritaAtiva, estadoAtivo, concorrente })).not.toContain(repositorio);
     } finally {
