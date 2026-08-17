@@ -2994,7 +2994,26 @@ export const OPS = {
     const ultimo = secoes.length - 1;
     const dirSeg = [];
     for (let idx = 0; idx < ultimo; idx++) { const A = secoes[idx].pos, B = secoes[idx + 1].pos; dirSeg.push(norm3(B[0] - A[0], B[1] - A[1], B[2] - A[2])); }
-    const tangente = (idx) => (idx === 0 ? dirSeg[0] : idx === ultimo ? dirSeg[ultimo - 1] : norm3(dirSeg[idx - 1][0] + dirSeg[idx][0], dirSeg[idx - 1][1] + dirSeg[idx][1], dirSeg[idx - 1][2] + dirSeg[idx][2]));
+    /* CAMINHO FECHADO — a última seção no MESMO lugar da primeira, com a mesma
+       forma. É assim que se descreve mangueira que volta em si, aro fechado e
+       qualquer tubo em laço; até aqui virava um anel coincidente e não soldado,
+       a mesma costura que o `lathe` tinha.
+
+       A detecção vem ANTES da tangente porque ela MUDA a tangente. Num caminho
+       aberto, a ponta só conhece o segmento que chega nela; num laço, a ponta é
+       um ponto interior como qualquer outro, e a tangente ali é a média do
+       segmento que fecha com o que abre. Sem isso, a emenda herdaria a direção
+       de um lado só e os dois anéis se encontrariam girados — no anel de 12
+       seções, exatamente os 30° de um segmento. */
+    const mesmaSecao = (a1, b1) => a1.pos.every((n, k) => n === b1.pos[k])
+      && !a1.polo && !b1.polo
+      && (a1.contorno ? JSON.stringify(a1.contorno) === JSON.stringify(b1.contorno) : a1.raio === b1.raio);
+    const fechado = secoes.length >= 3 && mesmaSecao(secoes[0], secoes[ultimo]);
+    const tangenteDaEmenda = fechado
+      ? norm3(dirSeg[ultimo - 1][0] + dirSeg[0][0], dirSeg[ultimo - 1][1] + dirSeg[0][1], dirSeg[ultimo - 1][2] + dirSeg[0][2])
+      : null;
+    const tangente = (idx) => (fechado && (idx === 0 || idx === ultimo) ? tangenteDaEmenda
+      : idx === 0 ? dirSeg[0] : idx === ultimo ? dirSeg[ultimo - 1] : norm3(dirSeg[idx - 1][0] + dirSeg[idx][0], dirSeg[idx - 1][1] + dirSeg[idx][1], dirSeg[idx - 1][2] + dirSeg[idx][2]));
 
     // CUSP (dobra ~180°): num interior, a soma dos dois segmentos vizinhos é ~zero -> a tangente
     // fica indefinida (norm3 devolve [0,0,0] pelo guarda `||1`) e w = cross(u,0) = 0 -> o anel
@@ -3034,14 +3053,38 @@ export const OPS = {
       for (let idx = 0; idx <= ultimo; idx++) { const t = tangente(idx); u = idx === 0 ? u : transportaLoft(u, t); frames.push({ u, w: cross3(u, t) }); }
     }
 
+    /* CAMINHO FECHADO — a última seção no MESMO lugar da primeira, com a mesma
+       forma. É assim que se descreve mangueira que volta em si, aro fechado e
+       qualquer tubo em laço; até aqui virava um anel coincidente e não soldado,
+       a mesma costura que o `lathe` tinha.
+
+       O `loft` tem uma condição que o `lathe` não tem: o quadro que orienta
+       cada anel é TRANSPORTADO ao longo do caminho, e num laço ele não volta
+       necessariamente igual ao inicial — sobra um giro (holonomia). Soldar sem
+       olhar para isso costuraria dois anéis girados um em relação ao outro, e a
+       superfície fecharia TORCIDA sem nada avisar. Por isso o giro residual é
+       medido, e passa do limiar GRITA em vez de entregar a torção calada. */
+    if (fechado) {
+      const f0 = frames[0], fn = frames[ultimo];
+      const cos = Math.max(-1, Math.min(1, f0.u[0] * fn.u[0] + f0.u[1] * fn.u[1] + f0.u[2] * fn.u[2]));
+      const giroResidual = Math.acos(cos) * 180 / Math.PI;
+      if (giroResidual > 1e-6) {
+        return grita(st, i, 'loft', 'secoes', `o caminho fecha, mas o quadro transportado volta girado ${giroResidual.toFixed(6)}° em relação ao inicial: soldar assim costuraria dois anéis torcidos um contra o outro e a superfície fecharia torcida sem avisar. Ajuste o caminho, ou declare orientacao para fixar o quadro`);
+      }
+    }
+
     // VÉRTICES — anda o cursor (a fórmula documentada acima)
     let cursor = 0;
-    const info = secoes.map((s, idx) => {
+    const info = [];
+    for (let idx = 0; idx < secoes.length; idx++) {
+      if (fechado && idx === ultimo) { info.push(info[0]); continue; }   // solda: nenhum id novo
+      const s = secoes[idx];
       if (s.polo) {
         const id = b + cursor;
         addV(st, id, s.pos);
         cursor += 1;
-        return { polo: true, id };
+        info.push({ polo: true, id });
+        continue;
       }
       const fr = frames[idx];
       const ids = [];
@@ -3055,8 +3098,8 @@ export const OPS = {
         ids.push(id);
       }
       cursor += L;
-      return { polo: false, ids };
-    });
+      info.push({ polo: false, ids });
+    }
 
     // FACES — cursor de face análogo, por segmento consecutivo (i,i+1) — idêntico ao lathe
     let fCursor = 0;

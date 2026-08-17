@@ -210,9 +210,10 @@ npm run criar -- _viga
 
 ## Pendências atuais
 
-- Avaliar `alinhar` (centragem derivada) quando houver evidência de campo; os
-  seletores relacionais do O-8 foram retirados — ver o encerramento de
-  `planos/2026-08-17-ponto-nomeado.md`.
+- Nenhuma capacidade em aberto. `alinhar` e variantes nomeadas foram medidos e
+  recusados; `loft` fechado foi implementado depois que a medida por uso se
+  mostrou inválida para capacidade ausente. A medida, o erro e o critério de
+  reabertura estão em `docs/mecanifica/planos/BACKLOG.md`.
 
 Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
 só abre após decisão e plano executivo explícitos.
