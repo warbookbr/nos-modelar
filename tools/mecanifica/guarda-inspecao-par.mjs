@@ -13,7 +13,8 @@ const ok = (nome, condicao, detalhe = '') => {
   console.log(`  ${condicao ? 'ok  ' : 'FALHA'} ${nome}${detalhe ? ` — ${detalhe}` : ''}`);
   if (!condicao) falhas.push(nome);
 };
-const proximo = (a, b) => Math.abs(a - b) <= 1e-7;
+const PRECISAO_CAMERA_URL = 5;
+const proximo = (a, b) => Math.abs(a - b) <= 0.5 * 10 ** -PRECISAO_CAMERA_URL;
 const mesmaCamera = (a, b) => Boolean(a && b)
   && ['posicao', 'alvo', 'acima'].every((chave) => a[chave]?.length === 3
     && b[chave]?.length === 3

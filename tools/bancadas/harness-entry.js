@@ -2,16 +2,13 @@
  * carregado por harness.html; não participa da entrada publicada da bancada.
  */
 import { iniciar } from '../../src/bancada/main.js';
-import * as freio from '../../prototipos/procedural/v3/pecas/freio-disco.js';
-import * as freioHierarquia from '../../prototipos/procedural/v3/pecas/_freio-hierarquia.js';
-import * as jardineira from '../../prototipos/procedural/v3/pecas/_jardineira.js';
-import * as vao from '../../prototipos/procedural/v3/pecas/_vao-e-anteparo.js';
+import { hierarquia, portas, semPortas, visual } from './fixtures/catalogo-visual.js';
 
 const catalogo = [
-  { id: 'freio-disco', carregar: async () => freio },
-  { id: '_freio-hierarquia', carregar: async () => freioHierarquia },
-  { id: '_jardineira', carregar: async () => jardineira },
-  { id: '_vao-e-anteparo', carregar: async () => vao },
+  { id: 'freio-disco', carregar: async () => visual },
+  { id: '_freio-hierarquia', carregar: async () => hierarquia },
+  { id: '_jardineira', carregar: async () => portas },
+  { id: '_vao-e-anteparo', carregar: async () => semPortas },
 ];
 
 iniciar({ catalogo }).catch((erro) => {
