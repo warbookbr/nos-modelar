@@ -158,6 +158,7 @@ nos arquivos originais.
 | Pose de criação — `em` e `eixo` nos geradores | concluído: aprovar |
 | Nome de cópia no `arranja` | concluído: aprovar |
 | Alteração semântica compacta de montagem | concluído: aprovar |
+| Encostar — contato derivado | concluído: aprovar |
 
 O plano da abertura oblonga está em
 [`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a

@@ -28,6 +28,7 @@ a autoridade final para argumentos e recusas.
 | `mescla` | `de`, `para` | ID literal; não deixe no-op fantasma |
 | `rotaciona` | eixo, graus, `sel?`, `pivo?` | sem pivô, usa centroide da seleção |
 | `transladar` | `d`, `sel?` | aditivo; sem pivô |
+| `encostar` | `sel`, `referencia`, `direcao`, `folga?` | contato por extensão na direção declarada; não é solver |
 | `espelha` | eixo, `pos?`, `sel?`, ou modo estrutural | modo estrutural exige origem direta |
 | `publicarPorta` | `nome`, `de` | publica identidade semântica, não faces resolvidas |
 | `arranja` | radial/linear, `total`, `derivaDe`, `origemId`, `nomes?` | conta a fonte; ângulo é derivado, não acumulado |
@@ -79,6 +80,31 @@ também: `cubo` não tem eixo para escolher.
 
 Isto não encosta uma peça na outra nem mede vizinho — não existe `alinhar`
 relacional no núcleo.
+
+## Encostar em vez de digitar a coordenada
+
+Quando uma peça se apoia na outra, **derive** o contato em vez de calcular o
+número. Coordenada digitada não sabe de onde veio: se a espessura da vizinha
+mudar, o encosto se desfaz e nada avisa.
+
+```js
+['encostar', { sel: { origem: PASTILHA }, referencia: { origem: DISCO },
+               direcao: [0, -1, 0], folga: 'folgaDePastilha' }],
+```
+
+- `sel` é o que se move; `referencia` é o lado que fica parado;
+- `direcao` é obrigatória. Ela **não** é inferida de propósito: inferir traria
+  ambiguidade e desempate, e a peça deixaria de ser reexecutável;
+- `folga` é a distância que sobra no fim (ausente = encosta de fato). Negativa é
+  recusada — interferência declarada é `transladar`.
+
+A conta leva a frente do que move até a traseira da referência, na direção
+declarada, menos a folga. Ela POSICIONA em contato, então também corrige o corpo
+que passou do ponto.
+
+**O que ela não é:** contato por extensão na direção declarada. Não descobre o
+que encosta em quê, não resolve interpenetração lateral, não é encaixe nem
+colisão. Para medir de verdade, continue medindo.
 
 ## Nome de cópia no `arranja`
 
