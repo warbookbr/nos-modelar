@@ -15,7 +15,7 @@ receitas sem virar contratos acidentais, diagnóstico que separa falha do motor
 de falha do conteúdo, testes genéricos pequenos, migrações mais seguras e menor
 custo de homologação e remoção.
 ## Andamento da implementação
-R00, R01 e R03 estão na `main` até `0ca97a4`: execução pura, firewall,
+R00, R01 e R03 estão na `main` até `4e699f0`: execução pura, firewall,
 catálogo vazio, bancada sem fallback e harness privado. R04 avançou com gates
 de entrada explícita. A matriz está em
 [`MATRIZ-TESTES-ACOPLADOS.md`](../MATRIZ-TESTES-ACOPLADOS.md).
