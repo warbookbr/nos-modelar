@@ -19,6 +19,25 @@ receitas sem virar contratos acidentais, diagnóstico que separa falha do motor
 de falha do conteúdo, testes genéricos pequenos, migrações mais seguras e menor
 custo de homologação e remoção.
 
+## Andamento da implementação
+
+R00, R01 e a parte estrutural de R03 estão implementados na `main` até
+`0ca97a4`: a baseline não depende da contagem de receitas, a execução pura
+recebe o módulo já carregado, há firewall arquitetural, o catálogo publicado é
+explícito e vazio, a bancada não escolhe peça padrão e o harness visual privado
+é o único lugar que injeta fixtures antigas. O CI agora prova também a página
+publicada vazia e o render de quatro fixtures explícitas.
+
+R04 está em andamento: o porteiro já deixou de varrer `pecas/` e usa o harness
+privado. Ainda faltam confinar os demais comandos de acervo e migrar/remover
+as suítes específicas antes do R06.
+
+No R05, o consumidor recebeu localmente os commits `c439f42` e `561211c`:
+carrega os JSONs pelo manifesto, aceita zero peças e testa os dois estados.
+O push para `warbookbr/mecanica` foi recusado pelo remoto com HTTP 403; por
+isso a retirada dos artefatos publicados permanece bloqueada até esse commit
+ser integrado naquele repositório.
+
 ## Hipótese
 
 O motor não depende de peças: suas 32 operações recebem dados e nenhum módulo
