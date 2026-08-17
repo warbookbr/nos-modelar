@@ -5,6 +5,7 @@ import {
   confirmarAutoriaMontagem, observarAutoriaMontagem, planejarAutoriaMontagem,
   prepararPromocaoAutoriaMontagem, promoverAutoriaMontagem,
 } from '../../mecanifica/autoria-montagem.mjs';
+import { alterarMontagem } from '../../../src/autoria/alterar-montagem.js';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
@@ -49,6 +50,26 @@ export async function planejarAutoria(input, { autoria }) {
   } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
 }
 
+/* Alteração compacta: o agente declara o que muda, e o documento completo é
+   reconstituído AQUI, a partir da revisão ativa. Tudo que não foi declarado
+   permanece idêntico por construção — o agente não reenvia, logo não pode
+   alterar por acidente. A saída é o mesmo plano de `planejar_autoria_montagem`,
+   mais o diff, porque daqui para a frente o caminho é o mesmo: inspecionar,
+   conferir os gates e só então aplicar. */
+export async function planejarAlteracao(input, { autoria }) {
+  try {
+    const args = z.object({ id: slug, revisaoObservada: hash.nullable(), alteracoes: z.array(z.json()).min(1) }).strict().parse(input);
+    autorizado(autoria, args.id);
+    const ativa = await observarAutoriaMontagem({ raiz: autoria.raizRepositorio, entidade: args.id });
+    if (ativa.revisao !== args.revisaoObservada) throw Object.assign(new Error('Revisão observada divergente.'), { codigo: 'revisao-desatualizada', acao: 'Leia a revisão ativa e planeje novamente.' });
+    if (!ativa.montagem) throw Object.assign(new Error('Sem documento ativo.'), { codigo: 'montagem-nao-encontrada', acao: 'Publique uma primeira revisão antes de alterar por campo.' });
+    const { montagem, diff } = alterarMontagem(ativa.montagem, args.alteracoes);
+    const interno = planejarAutoriaMontagem({ entidade: args.id, montagem, pai: args.revisaoObservada });
+    if (interno.montagem.id !== args.id) throw Object.assign(new Error('ID interno divergente.'), { codigo: 'identidade-divergente', acao: 'Não altere o id da raiz para um valor diferente do anunciado.' });
+    return resposta(true, { id: args.id, diff, plano: publicoPlano(interno), confirmacao: confirmarAutoriaMontagem(interno).confirmacao });
+  } catch (erro) { return erro?.name === 'ZodError' ? entrada() : falha(erro); }
+}
+
 export async function inspecionarAutoria(input, { autoria, capturar = capturarMontagem }) {
   try {
     const args = z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict().parse(input); autorizado(autoria, args.plano.entidade);
@@ -75,6 +96,7 @@ export function criarFerramentasAutoria(autoria) {
   return Object.freeze([
     ['observar_autoria_montagem', 'Lê a revisão ativa de uma montagem autorizada.', observarAutoria, z.object({ id: slug }).strict()],
     ['planejar_autoria_montagem', 'Planeja uma mudança por ID semântico, sem escrita.', planejarAutoria, z.object({ id: slug, revisaoObservada: hash.nullable(), montagem: z.json() }).strict()],
+    ['planejar_alteracao_montagem', 'Planeja mudança por alvo e campo semântico, sem reenviar o documento inteiro.', planejarAlteracao, z.object({ id: slug, revisaoObservada: hash.nullable(), alteracoes: z.array(z.json()).min(1) }).strict()],
     ['inspecionar_proposta_montagem', 'Deriva impacto, revalidação e vistas da proposta sem escrita.', inspecionarAutoria, z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict()],
     ['aplicar_autoria_montagem', 'Aplica somente proposta confirmada que passou pelos gates.', aplicarAutoria, z.object({ plano, confirmacao: confirmar, alvo: caminho }).strict()],
   ].map(([nome, descricao, executar, inputSchema]) => ({ nome, descricao, inputSchema, outputSchema: saida, executar: (entrada) => executar(entrada, { autoria }), anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false } })));

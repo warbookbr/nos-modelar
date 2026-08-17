@@ -81,6 +81,11 @@ desde que o serviço sempre reconstitua o documento completo, mostre o diff e
 confirme os bytes finais. Índice de array ou JSON Patch posicional não deve virar
 identidade persistida.
 
+Executado por [`planos/2026-08-17-alteracao-compacta.md`](planos/2026-08-17-alteracao-compacta.md):
+`planejar_alteracao_montagem` recebe alvo e campo semântico, reconstitui o
+documento a partir da revisão ativa e devolve o diff. Endereço posicional é
+recusado com código próprio. Montagem apenas; receita segue em aberto.
+
 ### 4. Histórico operacional: comparar, reativar e ramificar
 
 Snapshots são imutáveis, mas falta uma interface segura para comparar revisões

@@ -271,6 +271,8 @@ Planejamento: [planos/README](planos/README.md),
 (`docs/mecanifica/planos/2026-08-17-pose-de-criacao.md`),
 [nome de cópia](planos/2026-08-17-nome-de-copia.md)
 (`docs/mecanifica/planos/2026-08-17-nome-de-copia.md`),
+[alteração compacta](planos/2026-08-17-alteracao-compacta.md)
+(`docs/mecanifica/planos/2026-08-17-alteracao-compacta.md`),
 [encerramento da Fatia 1A](planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](planos/BACKLOG.md), [MODELO](planos/MODELO.md) e
 [concluídos](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).

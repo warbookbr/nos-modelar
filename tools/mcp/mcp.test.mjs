@@ -641,7 +641,7 @@ describe('servidor MCP local — perfil revisao', () => {
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'consultar_impacto_global',
         'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',
-        'observar_autoria_montagem', 'planejar_autoria_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
+        'observar_autoria_montagem', 'planejar_autoria_montagem', 'planejar_alteracao_montagem', 'inspecionar_proposta_montagem', 'aplicar_autoria_montagem',
         'observar_autoria_receita', 'planejar_autoria_receita', 'inspecionar_proposta_receita', 'aplicar_autoria_receita',
       ]);
       const id = 'gabarito-separacao-direcional';
@@ -670,6 +670,44 @@ describe('servidor MCP local — perfil revisao', () => {
       }));
       const concorrente = await client.callTool({ name: 'aplicar_autoria_montagem', arguments: { plano: concorrentePlano.plano, confirmacao: concorrentePlano.confirmacao, alvo: ['movel'] } });
       expect(concorrente.isError).toBe(true);
+
+      /* ALTERAÇÃO COMPACTA pela porta: o consumidor muda um campo sem devolver
+         o documento inteiro, e o serviço reconstitui o resto a partir da
+         revisão ativa. A prova mede as duas coisas que importam — o campo
+         citado mudou, e o documento resultante é idêntico ao que o caminho
+         longo produziria. */
+      const revisaoAtiva = aplicada.structuredContent.resultado.revisao;
+      const alterada = await client.callTool({
+        name: 'planejar_alteracao_montagem',
+        arguments: {
+          id, revisaoObservada: revisaoAtiva,
+          alteracoes: [{ alvo: { instancia: 'movel' }, campo: 'pose.deslocamento', valor: [0, 1.04, 0] }],
+        },
+      });
+      expect(alterada.structuredContent).toMatchObject({ ok: true });
+      expect(alterada.structuredContent.resultado.diff).toEqual([{
+        alvo: "instancia 'movel'", campo: 'pose.deslocamento', de: [0, 1.025, 0], para: [0, 1.04, 0],
+      }]);
+      /* o documento reconstituído bate byte a byte com o do caminho longo */
+      const longo = JSON.parse(JSON.stringify(relida.structuredContent.resultado.montagem));
+      longo.instancias.find((item) => item.id === 'movel').pose.deslocamento = [0, 1.04, 0];
+      expect(JSON.stringify(alterada.structuredContent.resultado.plano.montagem)).toBe(JSON.stringify(longo));
+      /* e ela segue pelo MESMO caminho de gates: inspecionar e só então aplicar */
+      const inspAlterada = await client.callTool({
+        name: 'inspecionar_proposta_montagem',
+        arguments: { plano: alterada.structuredContent.resultado.plano, confirmacao: alterada.structuredContent.resultado.confirmacao, alvo: ['movel'] },
+      });
+      expect(inspAlterada.structuredContent).toMatchObject({ ok: true, resultado: { promocao: { estado: 'aprovado' } } });
+      /* endereço posicional é recusado na porta, não só na função interna */
+      const posicional = await client.callTool({
+        name: 'planejar_alteracao_montagem',
+        arguments: {
+          id, revisaoObservada: revisaoAtiva,
+          alteracoes: [{ alvo: { instancia: 'movel' }, campo: 'pose.deslocamento.1', valor: 1.05 }],
+        },
+      });
+      expect(posicional.isError).toBe(true);
+      expect(posicional.structuredContent.erro.codigo).toBe('campo_posicional');
       expect(concorrente.structuredContent).toMatchObject({ ok: false, erro: { codigo: 'revisao_desatualizada' } });
       expect(JSON.stringify({ estado: publico, observada, planejada, inspecionada, aplicada, relida, descritaAtiva, estadoAtivo, concorrente })).not.toContain(repositorio);
     } finally {
