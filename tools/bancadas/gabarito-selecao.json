@@ -1,5 +1,5 @@
 {
-  "hashTotal": "4356aefb83e2ce1ef334494edd141fff43a84379107090b2b7c2fa95a862a5fa",
+  "hashTotal": "1031ae9e24ca2b3f62a44396772d60ead3e4e08e891e4e3406083b401a692ab2",
   "pecas": {
     "_bloco-arredondado-composto": {
       "hash": "9b062a92491d13fc8f13c873b1ac5352f2e76029addbfbc042fdbe15386a4e88",
@@ -62,8 +62,8 @@
       "faces": 351
     },
     "_mancal-de-mesa": {
-      "hash": "f6527174dd6fd31bdf8ed3356b34306233655fbd71acd3ccfb458b40f7e7108a",
-      "vertices": 480,
+      "hash": "18dd60e17671b22680a8f69a460b90365564a84d5bdfdcf46bf0ad5390a581db",
+      "vertices": 416,
       "faces": 432
     },
     "_oficina-anim": {
@@ -177,13 +177,13 @@
       "faces": 1600
     },
     "roda-dianteira": {
-      "hash": "306b3ee05797f1c6a6fa626b723c8c4c168f75ce03ebc91003559a43ac4c0b60",
-      "vertices": 824,
+      "hash": "7df7a5e05a935b2d77de2c7a3ff003386014d833a93be3f27f3c7b8f4a7611a9",
+      "vertices": 752,
       "faces": 734
     },
     "roda-dianteira-realista-experimento": {
-      "hash": "030b46ca796c60e99002f7586448a8ad9e88a1a8fce953fabbbfc0dd702ec3fe",
-      "vertices": 2194,
+      "hash": "9a462a6d40ab7ecaa1e88b6ae6baf50dcdc4b407a83d7e525eba3cbf2e50ea05",
+      "vertices": 2062,
       "faces": 2132
     }
   }

@@ -20,7 +20,7 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-13 | resolvido; vistas têm câmera e projeção reproduzíveis |
 | A-14 | resolvido; foco preserva contexto conforme modo |
 | A-15 | retirado do produto; Oficina humana não existe |
-| A-16 | aberto; encaixe oco ainda não é reconhecido pela régua |
+| A-16 | retirado; assento intencional já se declara na montagem, por relação |
 | A-17 | resolvido; repetição radial é estrutural |
 | A-18 | resolvido; origens citam geradores por grupo |
 | A-19 | resolvido; eixos aceitam expressão e extremidades |
@@ -44,7 +44,9 @@ Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 | A-37 | resolvido; filete compõe com chanfro nos casos provados |
 | A-38 | resolvido; revisão conserva evidência recusada |
 
-Pendências abertas adicionais: costuras topológicas de `lathe`, materiais
-genéricos. O endereço único de grupo linear saiu desta lista: `arranja`
+Pendência aberta adicional: nenhuma. As costuras de `lathe` foram fechadas: o
+perfil que repete o primeiro ponto solda, e o toroide passa a ser expressável. Materiais genéricos não é pendência: o
+`CLAUDE.md` proíbe inventar esse contrato, e ele consta como direção futura em
+`VISAO.md`. O endereço único de grupo linear saiu desta lista: `arranja`
 aceita `nomes` e a origem cita `nome`. A abertura oblonga saiu desta
 lista: `furo` expressa rasgo por `ate`, provado em `_rasgo-oblongo`. O onboarding está em medição pelo programa MCP.

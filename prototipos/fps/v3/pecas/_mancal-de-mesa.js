@@ -252,11 +252,11 @@ export function montarMancalParaInspecao() {
 }
 
 export const meta = {
-  /* A homologação congelou a geometria antes de uma r001 assistida. Os dois
-     perfis de lathe repetem o primeiro anel na mesma posição, mas não soldam
-     seus vértices: visualmente fecham e topologicamente mantêm uma costura.
-     O gate do acervo encontrou a divergência depois da execução cega. */
-  fechada: false,
+  /* Os dois perfis de lathe repetem o primeiro ponto no fim, dizendo "a seção
+     dá a volta e fecha". O núcleo passou a soldar esse caso, então a costura
+     que existia aqui — anéis coincidentes, colados no espaço e separados na
+     topologia — deixou de existir. */
+  fechada: true,
   nome: '_mancal-de-mesa',
   tipo: 'objeto',
   desc: 'mancal de mesa didático — base com dois furos passantes, bucha oca e eixo concêntrico com folga diametral nominal de 0,4 mm',
