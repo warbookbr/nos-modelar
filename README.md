@@ -72,13 +72,27 @@ engenharia, componente aprovado ou ponto de partida de produto.
 Os nomes enganam de propósito pouco: `roda-dianteira`, `freio-disco`, `moto` e
 `drone-inspecao` soam definitivos, e não são. Medidas e proporções foram
 escolhidas para fazer uma capacidade passar ou falhar, não para descrever um
-componente real. Duas peças são exportadas para `pecas-resolvidas/` e lidas por
-outro repositório; isso as torna dado de integração, não geometria aprovada.
+componente real.
 
 O que este repositório sustenta é **o núcleo e as capacidades provadas**. A
 geometria das peças pode mudar ou ser removida a qualquer momento, sem aviso e
 sem migração. Se uma mudança boa no núcleo exigir refazer uma peça de exemplo,
 refaça a peça — ela nunca foi o contrato.
+
+### O consumidor externo não governa este repositório
+
+Duas peças são exportadas para `pecas-resolvidas/` e lidas pelo repositório do
+produto. Isso as torna dado de integração, e **não** dá a elas poder de veto
+aqui.
+
+Nenhuma decisão deste repositório precisa ser adiada, reduzida ou recusada
+porque mudaria um arquivo exportado. O foco é o trabalho da IA ao criar,
+inspecionar e corrigir peças — melhorar o núcleo e as ferramentas de autoria
+vale mais do que manter estável uma geometria de exemplo.
+
+Quando uma mudança alterar o dado exportado, o procedimento é **avisar**, não
+pedir permissão: registre no PR o que mudou e siga. Compatibilidade com o
+consumidor é assunto dele, na hora em que ele decidir atualizar.
 
 Por isso toda peça abre com o mesmo selo, nestas palavras e nesta posição:
 
