@@ -7,6 +7,7 @@ import { verificarCaminhoConfinado } from '../mecanifica/caminho-confinado.mjs';
 export const FORMATO_CATALOGO_MCP_MONTAGENS = 'mecanifica.catalogo-mcp-montagens';
 export const VERSAO_CATALOGO_MCP_MONTAGENS = 1;
 export const VARIAVEL_CATALOGO_MCP_MONTAGENS = 'MECANIFICA_CATALOGO_MONTAGENS';
+export const REGRA_ESCOPO_CATALOGO = 'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP. Ela permite usar as ferramentas anunciadas pelo perfil atual; por si só, não comprova homologação, aprovação, validação completa nem ausência de falhas.';
 
 const slug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -48,7 +49,7 @@ function lerJsonConfinado(raiz, referencia, tipo) {
     if (erro instanceof ErroCatalogoMcpMontagens) throw erro;
     falhar(
       'referencia-indisponivel',
-      `Uma referência de ${tipo} autorizada não pôde ser carregada.`,
+      `Uma referência de ${tipo} pertencente ao escopo configurado não pôde ser carregada.`,
       'Revise o catálogo e os documentos persistidos sem alterar o ID pedido pelo agente.',
     );
   }
@@ -127,11 +128,11 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes, prove
       if (erro?.codigo) {
         falhar(
           erro.codigo,
-          'Uma revisão ativa autorizada não pôde ser resolvida.',
+          'Uma revisão ativa pertencente ao escopo configurado não pôde ser resolvida.',
           erro.acao ?? 'Inspecione e corrija a revisão ativa antes de continuar.',
         );
       }
-      falhar('montagem-invalida', 'A montagem autorizada não pôde ser resolvida.', 'Valide montagem, referências e relações antes de tentar novamente.');
+      falhar('montagem-invalida', 'A montagem incluída no catálogo não pôde ser resolvida.', 'Valide montagem, referências e relações antes de tentar novamente.');
     }
   }
 
@@ -156,7 +157,7 @@ export function criarCatalogoMontagens({ raizMontagens, raizPecas, raizes, prove
       });
     }
     if (encontrados.length === 0) {
-      falhar('peca-nao-encontrada', 'A peça pedida não está entre as peças das montagens autorizadas.', 'Leia mecanifica://pecas e escolha um ID anunciado.');
+      falhar('peca-nao-encontrada', 'A peça pedida não está entre as peças das montagens listadas pelo host.', 'Leia mecanifica://pecas e escolha um ID anunciado.');
     }
     const primeiro = encontrados[0];
     return {
@@ -225,7 +226,7 @@ export function criarCatalogoMontagensVazio() {
     listar() { return []; },
     async listarPecas() { return []; },
     async resolverPeca() {
-      falhar('peca-nao-encontrada', 'Não há peças disponíveis para inspeção.', `Configure ${VARIAVEL_CATALOGO_MCP_MONTAGENS} com uma montagem autorizada.`);
+      falhar('peca-nao-encontrada', 'Não há peças disponíveis para inspeção.', `Configure ${VARIAVEL_CATALOGO_MCP_MONTAGENS} com uma montagem que o host deseja expor ao MCP.`);
     },
     tem() { return false; },
     carregadores() { return {}; },

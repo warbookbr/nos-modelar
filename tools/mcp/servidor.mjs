@@ -10,7 +10,7 @@ import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
 import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
-import { catalogoMontagensDoAmbiente } from './catalogo-montagens.mjs';
+import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
   criarProvedoresAutoriaAtiva, criarProvedoresAutoriaInativa,
@@ -21,6 +21,11 @@ import {
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 
 const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.5.0' });
+export const INSTRUCOES_AGENTE = [
+  REGRA_ESCOPO_CATALOGO,
+  'Para avaliar uma montagem, use revisar_montagem e reporte separadamente o estado retornado, as verificações executadas e o que permaneceu não verificado.',
+  'Só declare que uma montagem está homologada quando uma fonte específica de homologação afirmar isso explicitamente.',
+].join(' ');
 
 function estadoDo(ferramentas, catalogoMontagens, universoDependencias, perfil = PERFIL, autoria = {}) {
   return {
@@ -50,9 +55,9 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
       'validar um pacote oficial somente leitura',
       'comparar duas revisões oficiais do mesmo pacote',
       'produzir e transportar as quatro vistas oficiais de peça sem escrita',
-      'descobrir, descrever e renderizar peças usadas por montagens autorizadas',
+      'descobrir, descrever e renderizar peças usadas por montagens listadas pelo host',
       'descobrir pacotes e revisões oficiais disponíveis',
-      'descobrir e descrever montagens explicitamente autorizadas',
+      'descobrir e descrever montagens listadas explicitamente pelo host',
       'derivar roteiro de revalidação e catálogo entre raízes escolhidas',
       'reunir verificações, cobertura e vistas de uma montagem em uma revisão',
       ...(universoDependencias.configurado ? ['consultar impacto global no universo canônico configurado'] : []),
@@ -65,6 +70,7 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
     limites: [
       'aceita identificadores semânticos, nunca caminhos do cliente',
       'catálogo de montagens depende de configuração explícita do host',
+      REGRA_ESCOPO_CATALOGO,
       `catálogo de montagens configurado: ${catalogoMontagens.configurado ? 'sim' : 'não'}`,
       `universo canônico de dependências configurado: ${universoDependencias.configurado ? 'sim' : 'não'}`,
       'não executa shell, Git ou servidor HTTP',
@@ -191,7 +197,7 @@ function registrarRecursos(server, {
     'mecanifica://montagens',
     {
       title: 'Catálogo de montagens',
-      description: 'Raízes explicitamente autorizadas pelo host, sem caminhos locais.',
+      description: 'Raízes incluídas explicitamente pelo host no escopo MCP. A listagem permite operações do perfil; não declara qualidade nem homologação.',
       mimeType: 'application/json',
     },
     async (uri) => ({
@@ -211,8 +217,8 @@ function registrarRecursos(server, {
     'catalogo-pecas-de-montagens',
     'mecanifica://pecas',
     {
-      title: 'Peças das montagens autorizadas',
-      description: 'Peças que podem ser inspecionadas separadamente dentro do escopo escolhido pelo host.',
+      title: 'Peças das montagens listadas pelo host',
+      description: 'Peças que podem ser inspecionadas dentro do escopo MCP. A listagem permite operações do perfil; não declara qualidade nem homologação.',
       mimeType: 'application/json',
     },
     async (uri) => ({
@@ -260,7 +266,7 @@ export function criarServidor({
   perfil = process.env.MECANIFICA_PERFIL ?? PERFIL,
   autoria = autoriaDoAmbiente(catalogoMontagens, universoDependencias),
 } = {}) {
-  const server = new McpServer(IDENTIDADE);
+  const server = new McpServer(IDENTIDADE, { instructions: INSTRUCOES_AGENTE });
   const idsUniverso = universoDependencias.ids();
   const provedoresAutoria = autoria.configurado
     ? criarProvedoresAutoriaAtiva({

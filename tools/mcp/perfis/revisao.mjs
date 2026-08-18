@@ -418,7 +418,7 @@ export function criarFerramentasRevisao(catalogo = null) {
   return Object.freeze([
     {
       nome: 'descrever_peca',
-      descricao: 'Mede uma peça oficial ou uma peça incluída em montagem autorizada, sem escrever no repositório.',
+      descricao: 'Mede uma peça oficial ou encontrada nas montagens listadas pelo host, sem escrever no repositório. A listagem concede escopo de operação, não aprovação.',
       inputSchema: descreverEntrada,
       outputSchema: descreverSaida,
       executar: (entrada) => descrever(entrada, { catalogo }),
@@ -439,7 +439,7 @@ export function criarFerramentasRevisao(catalogo = null) {
     },
     {
       nome: 'renderizar_vistas',
-      descricao: 'Produz e transporta quatro vistas oficiais de uma peça autorizada sem escrever artefatos.',
+      descricao: 'Produz e transporta quatro vistas oficiais de uma peça disponível no catálogo sem escrever artefatos.',
       inputSchema: renderizarEntrada,
       outputSchema: renderizarSaida,
       executar: (entrada) => renderizar(entrada, { catalogo }),

@@ -175,12 +175,20 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
+      expect(inicializacao.result.instructions).toContain(
+        'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP',
+      );
+      expect(inicializacao.result.instructions).toContain(
+        'Só declare que uma montagem está homologada quando uma fonte específica de homologação afirmar isso explicitamente.',
+      );
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
       expect(ferramentas.result.tools).toHaveLength(10);
+      expect(ferramentas.result.tools.find(({ name }) => name === 'revisar_montagem')?.description)
+        .toContain('A listagem não é aprovação nem homologação.');
       for (const tool of ferramentas.result.tools) {
         expect(tool.outputSchema).toBeDefined();
         expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false });
@@ -310,6 +318,9 @@ describe('servidor MCP local — perfil revisao', () => {
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
       expect(capacidadesValor.limites.join(' ')).not.toMatch(/\/workspaces|[A-Z]:\\/);
+      expect(capacidadesValor.limites).toContain(
+        'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP. Ela permite usar as ferramentas anunciadas pelo perfil atual; por si só, não comprova homologação, aprovação, validação completa nem ausência de falhas.',
+      );
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
       expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
       expect(dependenciasValor).toMatchObject({

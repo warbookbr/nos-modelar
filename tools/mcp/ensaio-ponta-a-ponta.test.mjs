@@ -144,6 +144,12 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
           visual: { estado: 'produzida' },
         },
       });
+      expect(revisao.structuredContent.resultado.recomendacoes[0]).toContain(
+        'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP',
+      );
+      expect(revisao.content.find(({ type }) => type === 'text')?.text).toContain(
+        'não comprova homologação, aprovação, validação completa nem ausência de falhas',
+      );
       expect(revisao.content.filter(({ type }) => type === 'image')).toHaveLength(2);
       expect(Buffer.from(revisao.content.find(({ type }) => type === 'image').data, 'base64')
         .subarray(0, 8)).toEqual(Buffer.from('89504e470d0a1a0a', 'hex'));

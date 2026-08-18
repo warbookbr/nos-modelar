@@ -4,7 +4,7 @@ import { derivarCatalogoMontagens } from '../../../src/autoria/derivar-catalogo-
 import { derivarRoteiroRevalidacao } from '../../../src/autoria/derivar-roteiro-revalidacao.js';
 import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
 import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
-import { ErroCatalogoMcpMontagens } from '../catalogo-montagens.mjs';
+import { ErroCatalogoMcpMontagens, REGRA_ESCOPO_CATALOGO } from '../catalogo-montagens.mjs';
 import {
   catalogarMontagensEntrada, catalogarMontagensSaida,
   descreverMontagemEntrada, descreverMontagemSaida,
@@ -157,6 +157,7 @@ export async function revisarMontagem(input, {
       vistas: visualDisponivel ? visual.resposta.resultado.vistas : [],
     },
     recomendacoes: [
+      `Interpretação obrigatória: ${REGRA_ESCOPO_CATALOGO}`,
       ...(verificacoes.some(({ estado: atual }) => atual === 'falhou')
         ? ['Corrija as verificações reprovadas antes de aceitar a montagem.'] : []),
       ...(naoVerificadas.length > 0
@@ -199,6 +200,7 @@ export function conteudoRevisaoMontagem({ resposta, imagens }) {
   const falhas = resultado.verificacoes.filter(({ estado }) => estado === 'falhou').length;
   const texto = [
     `revisar_montagem: ${resultado.estado}.`,
+    `Escopo: ${REGRA_ESCOPO_CATALOGO}`,
     `${resultado.verificacoes.length} verificação(ões) executada(s), ${falhas} falha(s).`,
     resultado.visual.estado === 'produzida'
       ? `${resultado.visual.vistas.length} vista(s) produzida(s); a análise visual cabe à IA consumidora.`
@@ -307,7 +309,7 @@ export function criarFerramentasMontagem(catalogo) {
   return Object.freeze([
     {
       nome: 'descrever_montagem',
-      descricao: 'Descreve uma montagem autorizada por ID e caminho semântico, sem escrita.',
+      descricao: 'Descreve por ID uma montagem listada no catálogo configurado pelo host, sem escrita. Estar listada concede escopo de operação, não aprovação.',
       inputSchema: descreverMontagemEntrada,
       outputSchema: descreverMontagemSaida,
       executar: (entrada) => descreverMontagem(entrada, { catalogo }),
@@ -321,14 +323,14 @@ export function criarFerramentasMontagem(catalogo) {
     },
     {
       nome: 'catalogar_montagens',
-      descricao: 'Cataloga usos e relações somente entre raízes autorizadas escolhidas explicitamente.',
+      descricao: 'Cataloga usos e relações somente entre raízes listadas explicitamente pelo host.',
       inputSchema: catalogarMontagensEntrada,
       outputSchema: catalogarMontagensSaida,
       executar: (entrada) => catalogarMontagens(entrada, { catalogo }),
     },
     {
       nome: 'renderizar_montagem',
-      descricao: 'Produz vistas em memória de uma montagem ou subárvore autorizada.',
+      descricao: 'Produz vistas em memória de uma montagem ou subárvore listada no catálogo do host.',
       inputSchema: renderizarMontagemEntrada,
       outputSchema: renderizarMontagemSaida,
       executar: (entrada) => renderizarMontagem(entrada, { catalogo }),
@@ -337,7 +339,7 @@ export function criarFerramentasMontagem(catalogo) {
     },
     {
       nome: 'revisar_montagem',
-      descricao: 'Reúne verificações declaradas, cobertura, recomendações e vistas de uma montagem autorizada.',
+      descricao: 'Avalia uma montagem listada no catálogo do host e separa verificações executadas, limitações e vistas. A listagem não é aprovação nem homologação.',
       inputSchema: revisarMontagemEntrada,
       outputSchema: revisarMontagemSaida,
       executar: (entrada) => revisarMontagem(entrada, { catalogo }),

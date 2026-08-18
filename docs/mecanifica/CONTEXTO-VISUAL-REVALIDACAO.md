@@ -62,6 +62,19 @@ leitura e a revalidação. O mapa canônico global usa o recurso separado
 contrato, configuração explícita e limites estão em
 [`MAPA-CANONICO-DEPENDENCIAS.md`](MAPA-CANONICO-DEPENDENCIAS.md).
 
+### Instrução entregue à IA
+
+O servidor usa o campo nativo `instructions` do handshake MCP para explicar
+automaticamente que estar no catálogo significa somente pertencer ao escopo
+configurado pelo host. Isso permite as operações do perfil atual, mas não é
+evidência de homologação, aprovação, validade completa ou ausência de falhas.
+
+`revisar_montagem` repete essa regra no texto e nas recomendações estruturadas,
+junto do estado, das verificações executadas e do que ficou sem verificação.
+Assim, um cliente não depende de skill, README ou conhecimento prévio para
+interpretar o resultado. Skills podem ensinar um fluxo mais amplo de trabalho,
+mas não são fonte de verdade para o significado do catálogo.
+
 ## Captura confinada
 
 ```bash
