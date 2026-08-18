@@ -8,9 +8,9 @@ próximas rodadas.
 
 - Fachada pública: `prototipos/procedural/v3/motor/oficina.js`.
 - Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
-- Foto após R05: 2.670 linhas no núcleo, SHA-256
+- Foto após R06: 2.670 linhas no núcleo, SHA-256
   `f82e4917089232bb5fbfd7d5b8a201d881cb542e31eb983716f05d0c15abbf8b`,
-  fachada de 15 linhas, 21 módulos no diretório e 57 consumidores de código.
+  fachada de 16 linhas, 22 módulos no diretório e 58 consumidores de código.
 - Separação R01: núcleo geométrico e canônico em `nucleo.js`; projeção visual
   em `adaptador.js`; animação/skinning em `animacao.js`; orquestração em
   `executor.js`. A fachada passou a expor 19 entradas: as 16 compatíveis e o
@@ -23,7 +23,10 @@ próximas rodadas.
 - R05 concluída: catálogo, busca e explicação são projeções puras do registro;
   schemas, índice e referência legível são gerados. O mapa de capacidades é
   hipergrafo direcionado, pois transformações preservam o tipo de malha.
-- Superfície pública: 29 exportações; `nucleo`, `neutroCanonico`, `executar` e
+- R06 concluída: composições declarativas versionadas expandem para os mesmos
+  passos do núcleo, com parâmetros, tipos, recursão sem ciclo, orçamento e
+  procedência semântica; nenhuma receita pública foi reintroduzida.
+- Superfície pública: 35 exportações; `nucleo`, `neutroCanonico`, `executar` e
   `adaptarV3` são as entradas mais usadas pelos consumidores atuais.
 - Capacidades: 32 operações publicadas por `OPS`.
 - Dependência externa direta do núcleo: `earcut`; seus serviços internos,

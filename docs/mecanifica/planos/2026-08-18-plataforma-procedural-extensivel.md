@@ -9,7 +9,8 @@
 **Execução:** R00: baseline em `BASELINE-MOTOR-R00.md`; R01: fachada e camadas;
 R02: registro explícito; R03: operações fora do núcleo; R04: artefato, efeitos,
 identidade, procedência e grafo, sem mudar receita ou canônico; R05: catálogo,
-busca, explicação, hipergrafo e projeções geradas do registro.
+busca, explicação, hipergrafo e projeções geradas do registro; R06: composições
+declarativas, reutilização, tipos, orçamento e procedência sem receita pública.
 
 ## Objetivo verificável
 
