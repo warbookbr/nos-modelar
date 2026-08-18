@@ -44,6 +44,21 @@ inspecionar → diagnosticar → corrigir → revalidar, reutilizável fora da
 dobradiça. O teto absoluto orienta a direção; a decisão continua baseada no que
 o repositório consegue provar hoje.
 
+## Horizonte aberto da 1.0
+
+Este ensaio é a primeira sonda, não uma enumeração do teto. O programa continua
+com um supercarro externo como prova de escala e uma armadura humanoide como
+prova de generalidade. Além dos atritos já conhecidos, cada sonda procura
+ativamente limites em intenção semântica, planejamento paramétrico, restrições,
+percepção visual multimodal, autoavaliação e correção iterativa, hierarquia,
+instâncias, materiais e LOD, interoperabilidade, transações, observabilidade,
+desempenho e memória de evidências. Categorias novas podem ser incorporadas no
+momento em que aparecerem; esta lista também não é fechada.
+
+A dobradiça só autoriza mudanças provadas neste recorte. Os ensaios seguintes
+terão planos executivos próprios, para que a busca ampla não enfraqueça gates,
+responsabilidade nem causalidade.
+
 ## Escopo
 
 - receitas privadas para duas folhas e um pino/parafuso;

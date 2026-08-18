@@ -1,0 +1,46 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "ensaio-ponta-a-ponta-dobradica",
+  "instancias": [
+    { "id": "folha-batente", "alvo": { "tipo": "peca", "ref": "folha-batente" } },
+    { "id": "folha-porta", "alvo": { "tipo": "peca", "ref": "folha-porta" } },
+    { "id": "parafuso-central", "alvo": { "tipo": "peca", "ref": "parafuso-central" } }
+  ],
+  "relacoes": [
+    {
+      "id": "parafusoNoOlhalInferior",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["parafuso-central"], "porta": "trechoInferior" },
+      "movel": { "caminho": ["folha-batente"], "porta": "alojamentoInferiorDoParafuso" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "parafusoNoOlhalCentral",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["parafuso-central"], "porta": "trechoCentral" },
+      "movel": { "caminho": ["folha-porta"], "porta": "alojamentoCentralDoParafuso" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "parafusoNoOlhalSuperior",
+      "tipo": "encaixaCilindrico",
+      "referencia": { "caminho": ["parafuso-central"], "porta": "trechoSuperior" },
+      "movel": { "caminho": ["folha-batente"], "porta": "alojamentoSuperiorDoParafuso" },
+      "especificacao": {
+        "folgaRadial": { "nominal": 0.0002, "toleranciaFabricacao": { "menos": 0.00005, "mais": 0.00005 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 0.000001,
+    "expectativas": []
+  }
+}

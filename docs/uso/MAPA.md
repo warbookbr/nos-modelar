@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-400 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+408 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -64,6 +64,19 @@
 - `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
 - `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
 - `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
+
+## autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/
+
+- `auditar-visual.mjs` — Captura isolada e do conjunto; imagens ficam confinadas ao experimento.
+- `carregar-estudo.mjs` — Adaptador privado que usa somente portas oficiais de autoria e leitura.
+- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
+- `executar-estudo.mjs` — Resumo causal e reproduzível da primeira sonda 1.0.
+
+## autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/receitas/
+
+- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
+- `folha-porta.js` — Receita privada: folha da porta com olhal central.
+- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
 
 ## autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/
 
@@ -557,6 +570,7 @@
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `corpus-motor-r00.mjs` — Corpus sintético da R00. Cada caso dá uma entrada mínima e independente a uma capacidade do núcleo; ele congela o resultado observável, não a sua implementaç…
 - `corpus-motor-r00.test.mjs` — Guarda determinismo e compatibilidade da linha de base R00 do núcleo.
+- `ensaio-ponta-a-ponta-dobradica.test.mjs` — Primeira sonda 1.0: autoria, composição, exportação, montagem e revisão.
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
 - `extensoes-nativas.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
 - `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…
