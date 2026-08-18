@@ -6,7 +6,8 @@ import { relative, resolve } from 'node:path';
 
 const raiz = resolve(import.meta.dirname, '../..');
 const rel = (arquivo) => relative(raiz, arquivo).replaceAll('\\', '/');
-const arquivoMotor = resolve(raiz, 'prototipos/procedural/v3/motor/oficina.js');
+const arquivoFachada = resolve(raiz, 'prototipos/procedural/v3/motor/oficina.js');
+const arquivoNucleo = resolve(raiz, 'prototipos/procedural/v3/motor/nucleo.js');
 const ignorados = new Set(['.git', 'node_modules', 'dist', 'coverage']);
 
 function arquivosSob(dir) {
@@ -42,16 +43,17 @@ function exportsDo(texto) {
 }
 
 export function mapearMotorProcedural() {
-  const fonte = readFileSync(arquivoMotor, 'utf8');
+  const fonte = readFileSync(arquivoNucleo, 'utf8');
   const moduloMotor = arquivosSob(resolve(raiz, 'prototipos/procedural/v3/motor')).map(rel).sort();
   const consumidores = arquivosSob(raiz)
-    .filter((arquivo) => arquivo !== arquivoMotor && /\.(?:[cm]?[jt]sx?)$/.test(arquivo))
+    .filter((arquivo) => arquivo !== arquivoNucleo && /\.(?:[cm]?[jt]sx?)$/.test(arquivo))
     .filter((arquivo) => readFileSync(arquivo, 'utf8').includes('motor/oficina.js'))
     .map((arquivo) => rel(arquivo)).sort();
   return {
     formato: 'mecanifica.mapa-motor-procedural',
     versao: 1,
-    fonte: { arquivo: rel(arquivoMotor), sha256: createHash('sha256').update(fonte).digest('hex'), linhas: fonte.split('\n').length },
+    fachada: { arquivo: rel(arquivoFachada), linhas: readFileSync(arquivoFachada, 'utf8').split('\n').length },
+    fonte: { arquivo: rel(arquivoNucleo), sha256: createHash('sha256').update(fonte).digest('hex'), linhas: fonte.split('\n').length },
     exportacoes: exportsDo(fonte),
     operacoes: operacoesDo(fonte),
     dependenciasDiretas: importsDo(fonte),
@@ -64,5 +66,5 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
   const mapa = mapearMotorProcedural();
   if (process.argv.includes('--json')) console.log(JSON.stringify(mapa, null, 2));
   else console.log(`${mapa.operacoes.length} operações; ${mapa.exportacoes.length} exportações; ${mapa.consumidores.length} consumidores.`);
-  if (process.argv.includes('--check') && (!mapa.operacoes.length || !mapa.consumidores.length || !existsSync(arquivoMotor))) process.exitCode = 1;
+  if (process.argv.includes('--check') && (!mapa.operacoes.length || !mapa.consumidores.length || !existsSync(arquivoFachada) || !existsSync(arquivoNucleo))) process.exitCode = 1;
 }

@@ -6,9 +6,11 @@ próximas rodadas.
 
 ## Evidência
 
-- Fonte: `prototipos/procedural/v3/motor/oficina.js`.
-- Foto R00: 5.949 linhas, SHA-256 `02e46214847607cc7051429d02765bff1165e6cfd160d4c30579508e22871a31`,
-  7 módulos no diretório e 53 consumidores de código.
+- Fachada pública: `prototipos/procedural/v3/motor/oficina.js`.
+- Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
+- Foto após R01: 5.949 linhas na implementação, SHA-256
+  `afb0ec3e898ef87af60884e37ca8c27a060637a7534cdd67bcd28f244af6cee9`,
+  8 módulos no diretório e 53 consumidores de código.
 - Superfície pública: 16 exportações; `nucleo`, `neutroCanonico`, `executar` e
   `adaptarV3` são as entradas mais usadas pelos consumidores atuais.
 - Capacidades: 32 operações publicadas por `OPS`.

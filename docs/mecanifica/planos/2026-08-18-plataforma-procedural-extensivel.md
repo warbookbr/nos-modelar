@@ -7,7 +7,8 @@
 **Base:** `warbookbr/nos-mecanifica`, `main` em `b9c3f64`.
 
 **Execução:** R00 concluída: mapa estático e baseline canônica em
-`BASELINE-MOTOR-R00.md`; a fachada ainda não foi movida.
+`BASELINE-MOTOR-R00.md`. R01 em execução: `oficina.js` é a fachada compatível
+e a implementação única foi movida para `nucleo.js`.
 
 ## Objetivo verificável
 
