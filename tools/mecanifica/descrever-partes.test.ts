@@ -2,7 +2,7 @@
  * O catálogo publicado pode estar vazio; a régua recebe um módulo explícito. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — serviço JavaScript exercitado pelo contrato headless.
 import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
 // @ts-expect-error — serviço JavaScript exercitado pelo contrato headless.
@@ -101,5 +101,33 @@ describe('descrever-partes — régua headless', () => {
     const resultado = await descreverPecaReutilizavel({ peca: 'fixture', modulo });
     expect(resultado).toMatchObject({ ok: true, codigo: 0, stderr: '' });
     expect(resultado.stdout).toContain('partes: 1   faces: 6');
+  });
+
+  it('o serviço reutilizável mede composição com registro explícito', async () => {
+    const composicao = {
+      formato: FORMATO_COMPOSICAO_PROCEDURAL,
+      id: 'mecanifica.composicao.fixture-medicao',
+      versao: '1.0.0',
+      parametros: {},
+      artefatos: { entra: [], sai: ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1'] },
+      nos: [
+        { id: 'volume', operacao: 'cubo', argumentos: { origemId: 70, lado: 1 } },
+        { id: 'identidade', operacao: 'parte', argumentos: { nome: 'corpo-composto', sel: { tudo: true } } },
+      ],
+    };
+    const registroComposicoes = criarRegistroComposicoes({
+      composicoes: [composicao],
+      resolverOperacao: REGISTRO_OPERACOES.resolver,
+    });
+    const resultado = await descreverPecaReutilizavel({
+      peca: 'fixture-composta',
+      modulo: {
+        CHAMADAS_COMPOSICOES: [{ id: 'corpo', composicao: composicao.id, argumentos: {} }],
+      },
+      registroComposicoes,
+      estrito: true,
+    });
+    expect(resultado).toMatchObject({ ok: true, codigo: 0, stderr: '' });
+    expect(resultado.stdout).toContain('corpo-composto');
   });
 });

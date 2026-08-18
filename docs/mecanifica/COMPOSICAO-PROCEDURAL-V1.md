@@ -83,3 +83,15 @@ arquivos, importa Three.js, inicia MCP ou muta registro global.
 As três composições neutras de prova vivem apenas no teste R06; o catálogo de
 peças publicado continua vazio. Elas demonstram reutilização sem transformar
 fixture em receita homologada.
+
+## Portas oficiais
+
+Uma receita pode exportar `PASSOS` ou `CHAMADAS_COMPOSICOES`, nunca os dois.
+No segundo caso, o chamador fornece `registroComposicoes` explicitamente a
+`executarReceita`, `descreverPecaReutilizavel` ou `exportarPeca`. As três portas
+expandem antes de executar e preservam o orçamento recebido. A entrada canônica
+registra a assinatura do registro e as chamadas; assim a impressão da receita
+exportada muda quando a composição ou sua configuração muda.
+
+Ausência do registro, envelope ambíguo e falha de expansão são recusados antes
+de o núcleo publicar geometria. O catálogo público não é consultado nem mutado.

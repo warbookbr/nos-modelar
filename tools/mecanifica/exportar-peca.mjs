@@ -137,7 +137,13 @@ function portasParaArtefato(portas) {
   return [...portas.values()].map((porta) => JSON.parse(JSON.stringify(porta)));
 }
 
-export async function exportarPeca(nome, { paramsExtra = null, modulo = null, registroOperacoes = null } = {}) {
+export async function exportarPeca(nome, {
+  paramsExtra = null,
+  modulo = null,
+  registroOperacoes = null,
+  registroComposicoes = null,
+  orcamentoComposicoes = null,
+} = {}) {
   const caminho = join(PECAS, `${nome}.js`);
   /* A fronteira de disco é opcional: produção usa nome explícito do acervo;
      testes e hosts podem fornecer uma receita já carregada. */
@@ -146,11 +152,16 @@ export async function exportarPeca(nome, { paramsExtra = null, modulo = null, re
   }
 
   const mod = modulo ?? await import(pathToFileURL(caminho).href);
-  if (!Array.isArray(mod.PASSOS)) {
-    throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS; não é peça procedural`);
+  if (!Array.isArray(mod.PASSOS) && !Array.isArray(mod.CHAMADAS_COMPOSICOES)) {
+    throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS nem CHAMADAS_COMPOSICOES; não é peça procedural`);
   }
 
-  const { entrada, neutro: bruto } = executarReceita(mod, { paramsExtra, registroOperacoes });
+  const { entrada, neutro: bruto, expansao } = executarReceita(mod, {
+    paramsExtra,
+    registroOperacoes,
+    registroComposicoes,
+    orcamentoComposicoes,
+  });
   conferirSemOrfaos(nome, bruto.orfaos);
   conferirCapacidadesTransportaveis(nome, bruto);
 
@@ -194,6 +205,7 @@ export async function exportarPeca(nome, { paramsExtra = null, modulo = null, re
     texto: `${JSON.stringify(dado, null, 2)}\n`,
     doNucleo: { V: canon.V, F: canon.F },
     orfaos: bruto.orfaos,
+    expansao,
   };
 }
 

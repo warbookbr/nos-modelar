@@ -71,6 +71,8 @@ export async function descreverPecaReutilizavel({
   estrito = false,
   listar = false,
   registroOperacoes = null,
+  registroComposicoes = null,
+  orcamentoComposicoes = null,
 } = {}) {
   if (listar) {
     return {
@@ -118,16 +120,21 @@ export async function descreverPecaReutilizavel({
       return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
     }
   }
-  if (!Array.isArray(modulo.PASSOS)) {
+  if (!Array.isArray(modulo.PASSOS) && !Array.isArray(modulo.CHAMADAS_COMPOSICOES)) {
     return falha(
-      `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS.`
-      + '\n  esta régua só mede peça escrita como passos da Oficina.',
+      `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS nem CHAMADAS_COMPOSICOES.`
+      + '\n  esta régua só mede peça escrita pelo contrato procedural da Oficina.',
     );
   }
 
   let neutro;
+  let expansao = null;
   try {
-    ({ neutro } = executarReceita(modulo, { registroOperacoes }));
+    ({ neutro, expansao } = executarReceita(modulo, {
+      registroOperacoes,
+      registroComposicoes,
+      orcamentoComposicoes,
+    }));
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }
@@ -176,7 +183,7 @@ export async function descreverPecaReutilizavel({
     codigo: falhou ? 1 : 0,
     stdout,
     stderr,
-    resultado: { peca, descricao, neutro },
+    resultado: { peca, descricao, neutro, expansao },
   };
 }
 

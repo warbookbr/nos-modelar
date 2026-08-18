@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 // @ts-expect-error — serviço MJS exercitado pelo contrato de exportação.
 import { conferirPublicadas, exportarPeca, gravarPublicadas, lerPecaResolvida, FORMATO, VERSAO } from './exportar-peca.mjs';
 // @ts-expect-error — SDK nativo de prova exercitado pela porta oficial.
-import { REGISTRO_OPERACOES, criarRegistroComExtensoes } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — extensão nativa de prova.
 import { MANIFESTO } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/manifesto.js';
 // @ts-expect-error — extensão nativa de prova.
@@ -54,6 +54,39 @@ describe('exportação e manifesto vazio', () => {
     await expect(exportarPeca('prisma-privado', { modulo: prisma })).rejects.toThrow(/órfão/);
     expect(comExtensao.dado.partes).toEqual(['cunha']);
     expect(comExtensao.dado.receita).not.toBe((await exportarPeca('fixture-exportacao', { modulo: receita })).dado.receita);
+  });
+
+  it('exporta composição pela porta oficial e vincula a impressão ao registro', async () => {
+    const composicao = {
+      formato: FORMATO_COMPOSICAO_PROCEDURAL,
+      id: 'mecanifica.composicao.fixture-exportacao',
+      versao: '1.0.0',
+      parametros: { lado: { tipo: 'numero' } },
+      artefatos: { entra: [], sai: ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1'] },
+      nos: [
+        { id: 'volume', operacao: 'cubo', argumentos: { origemId: 90, lado: { parametro: 'lado' } } },
+        { id: 'identidade', operacao: 'parte', argumentos: { nome: 'corpo-composto', sel: { tudo: true } } },
+      ],
+    };
+    const registroComposicoes = criarRegistroComposicoes({
+      composicoes: [composicao],
+      resolverOperacao: REGISTRO_OPERACOES.resolver,
+    });
+    const modulo = {
+      meta: { nome: 'fixture composta' },
+      CHAMADAS_COMPOSICOES: [{ id: 'corpo', composicao: composicao.id, argumentos: { lado: 1 } }],
+    };
+    const exportada = await exportarPeca('fixture-composta', { modulo, registroComposicoes });
+    expect(exportada.dado.partes).toEqual(['corpo-composto']);
+    await expect(exportarPeca('fixture-composta', { modulo })).rejects.toThrow(/registroComposicoes/);
+
+    const alterada = criarRegistroComposicoes({
+      composicoes: [{ ...composicao, versao: '1.0.1' }],
+      resolverOperacao: REGISTRO_OPERACOES.resolver,
+    });
+    const outra = await exportarPeca('fixture-composta', { modulo, registroComposicoes: alterada });
+    expect(outra.dado.F).toEqual(exportada.dado.F);
+    expect(outra.dado.receita).not.toBe(exportada.dado.receita);
   });
 
   it('grava catálogo vazio sem apagar nem inventar artefatos', async () => {
