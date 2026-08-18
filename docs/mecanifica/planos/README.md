@@ -2,13 +2,18 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-18-sonda-supercarro-1-0.md`](2026-08-18-sonda-supercarro-1-0.md).
+**Plano ativo:** nenhum.
 
-O plano usa um supercarro exterior ficcional e privado para testar escala:
-hierarquia, instâncias, materiais, orçamento geométrico, contexto progressivo,
-crítica visual, exportação e correções genéricas encontradas em execução. Não
-publica geometria, replica fabricante nem abre interior ou física veicular.
+A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
+foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,
+bilateralidade, quiralidade, estados estáticos, contexto progressivo, crítica
+visual estruturada e correções genéricas sem publicar geometria ou replicar
+franquia. A evidência está em
+[`../RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](../RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md).
+
+A [sonda do supercarro](2026-08-18-sonda-supercarro-1-0.md) foi concluída com
+decisão `aprovar`; a evidência está em
+[`../RELATORIO-SONDA-SUPERCARRO-1-0.md`](../RELATORIO-SONDA-SUPERCARRO-1-0.md).
 
 O [ensaio ponta a ponta da dobradiça](2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
 foi concluído com decisão `aprovar`; a evidência está em
@@ -236,7 +241,8 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-Não abra um segundo plano enquanto a sonda do supercarro estiver ativa. O
-estado no topo desta página é a fonte. A sonda seguinte será a armadura
-humanoide e só abre após decisão do plano atual; os demais candidatos
-permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização automática.
+Não há plano ativo. A continuidade seguinte será definida pela evidência do
+sistema articulado, sem roteiro fechado antecipadamente.
+Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
+automática; um novo plano deve nascer de ganho verificável, não da sequência
+das sondas encerradas.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-412 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+459 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -119,6 +119,65 @@
 - `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
 - `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
 
+## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/
+
+- `auditar-visual.mjs` — Capturas privadas por estado e alvo para crítica visual reexecutável.
+- `carregar-estudo.mjs` — Adaptador privado: peças oficiais, montagens recursivas e poses derivadas.
+- `executar-estudo.mjs` — Resumo mensurável de geometria, estados, contexto e auditoria estática.
+- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
+
+## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/familias/
+
+- `intencao.js` — Vocabulário de intenção da sonda: comum nos eixos, específico na função.
+- `mao.js` — Família privada: quiralidade é parâmetro explícito, não escala negativa.
+
+## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/receitas/
+
+- `abdomen.js` — Abdômen segmentado original: três lâminas articuláveis e faixa central emissiva.
+- `antebraco.js` — Antebraço local com origem no cotovelo e mão abaixo em Y.
+- `braco-superior.js` — Segmento superior local: origem na articulação do ombro, Y aponta para cima.
+- `canela.js` — Segmento inferior local com origem no joelho.
+- `capacete.js` — Cabeça modular original: casco facetado, visor contínuo e luz de leitura.
+- `coxa.js` — Segmento femoral simétrico; origem na articulação do quadril.
+- `junta-articulada.js` — Junta visual reutilizável em cotovelos e joelhos; eixo local X.
+- `mao-direita.js` — Variante quiral direita da família privada de mãos blindadas.
+- `mao-esquerda.js` — Variante quiral esquerda da família privada de mãos blindadas.
+- `ombreira.js` — Casca de ombro simétrica; o lado pertence à instância, não à geometria.
+- `pe.js` — Bota simplificada, com frente positiva em Z.
+- `pelve.js` — Pelve blindada original: placas de quadril, proteção central e sinalização baixa.
+- `torax.js` — Torso blindado original: envelope por loft, placas sobrepostas e núcleo luminoso.
+
+## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/referencias/
+
+- `README.md` — Referência visual privada
+
+## autoria-assistida/experimentos/sonda-supercarro-1-0/
+
+- `auditar-visual.mjs` — Capturas privadas, globais e isoladas, para crítica visual iterativa.
+- `carregar-estudo.mjs` — Adaptador privado pelas portas oficiais de autoria, exportação e montagem.
+- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
+- `executar-estudo.mjs` — Resumo mensurável da sonda, sem depender da bancada publicada.
+- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
+
+## autoria-assistida/experimentos/sonda-supercarro-1-0/receitas/
+
+- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
+- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
+- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
+- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
+- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
+- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
+- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
+- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
+- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
+- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
+- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
+- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
+
+## autoria-assistida/experimentos/sonda-supercarro-1-0/referencias/
+
+- `README.md` — Referência visual privada
+
 ## autoria-assistida/guias/forma/
 
 - `silhueta-e-transicoes.md` — Silhueta e transições
@@ -186,6 +245,7 @@
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
+- `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
@@ -207,6 +267,8 @@
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
+- `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
+- `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -260,6 +322,7 @@
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
 - `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
+- `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
 - `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -372,6 +435,7 @@
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
+- `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
@@ -523,6 +587,7 @@
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
+- `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
@@ -555,6 +620,7 @@
 
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
 - `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
+- `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
 - `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
 - `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
@@ -586,3 +652,5 @@
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 - `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.
 - `registro-operacoes.test.mjs` — registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02.
+- `sonda-armadura-humanoide-1-0.test.mjs` — Sonda 1.0: sistema humanoide original, hierárquico e multiestado.
+- `sonda-supercarro-1-0.test.mjs` — Sonda de escala 1.0: sistema exterior ficcional, privado e recursivo.

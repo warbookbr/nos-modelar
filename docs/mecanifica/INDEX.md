@@ -94,6 +94,24 @@ aplicação publicada aqui.
   com contratos executáveis. A evidência está em
   [`RELATORIO-ENSAIO-DOBRADICA-1-0.md`](RELATORIO-ENSAIO-DOBRADICA-1-0.md)
   (`docs/mecanifica/RELATORIO-ENSAIO-DOBRADICA-1-0.md`).
+- A [sonda de escala do supercarro 1.0](planos/2026-08-18-sonda-supercarro-1-0.md)
+  (`docs/mecanifica/planos/2026-08-18-sonda-supercarro-1-0.md`)
+  foi concluída e aprovada: 12 definições privadas, 27 peças-folha, quatro
+  submontagens compartilhadas, 13 vistas e auditoria global de 351/351 pares.
+  Ela integrou enquadramento por profundidade, sete vistas, foco interno,
+  impacto por definição compartilhada e material observável. Evidências,
+  métricas e limites estão em
+  [`RELATORIO-SONDA-SUPERCARRO-1-0.md`](RELATORIO-SONDA-SUPERCARRO-1-0.md)
+  (`docs/mecanifica/RELATORIO-SONDA-SUPERCARRO-1-0.md`).
+- A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
+  (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
+  foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
+  submontagens, duas poses estáticas e 16 vistas finais. Ela integrou crítica
+  visual reexecutável, bilateralidade quiral e intenção de peça como dados. A
+  auditoria decide 231/231 pares em cada estado; movimento contínuo permanece
+  explicitamente não verificado. Evidências e limites estão em
+  [`RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md)
+  (`docs/mecanifica/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
@@ -219,8 +237,12 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
     e planejar uma capacidade ausente sem criar extensão automaticamente.
 18. [`SERVICOS-PROCEDURAL-V1.md`](SERVICOS-PROCEDURAL-V1.md) para descoberta e
     exposição MCP do vocabulário procedural.
-19. `docs/uso/MAPA.md` para o inventário gerado.
-20. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
+19. [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) e
+    [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) para
+    registrar propósito e achados visuais sem identidade de runtime
+    (`docs/mecanifica/INTENCAO-PECA-V1.md`).
+20. `docs/uso/MAPA.md` para o inventário gerado.
+21. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
 ## Leitura por tarefa
 
@@ -243,8 +265,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 - Descoberta MCP: `SERVICOS-PROCEDURAL-V1.md`; leia o catálogo, combine e valide
   em memória antes de propor extensão ou registrar lacuna.
 - Peça nova ou refinamento: `AUTORIA-IA.md`, `PERFIS-DE-AUTORIA.md`,
-  `REFERENCIA-E-CRITICA-VISUAL.md`, `FLUXO-MODELAGEM-IA.md` e
-  `BANCADA-E-APRESENTACAO.md`.
+  `INTENCAO-PECA-V1.md`, `REFERENCIA-E-CRITICA-VISUAL.md`,
+  `FLUXO-MODELAGEM-IA.md` e `BANCADA-E-APRESENTACAO.md`.
 - Contexto visual, isolamento e pares: `BANCADA-E-APRESENTACAO.md`.
 - Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
 - Freio ou roda: a prancha correspondente e o protocolo visual.
@@ -284,11 +306,9 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é a [sonda de escala do supercarro 1.0](planos/2026-08-18-sonda-supercarro-1-0.md)
-  (`docs/mecanifica/planos/2026-08-18-sonda-supercarro-1-0.md`),
-  aberta após a dobradiça concluir com decisão `aprovar`. A fixture é privada,
-  ficcional e testa hierarquia, instâncias, contexto, materiais, orçamento e
-  crítica visual sem domínio automotivo no núcleo.
+- Não há plano ativo. As próximas linhas candidatas — cenário multi-documento,
+  envelope de movimento, subtração robusta, materiais/LOD e autoria por
+  intenção — dependem de recorte executivo próprio e ganho verificável.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
