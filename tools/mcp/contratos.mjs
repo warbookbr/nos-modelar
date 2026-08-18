@@ -6,7 +6,11 @@ export const TRANSPORTE = 'stdio';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const nomeParte = z.string().regex(/^[A-Za-z_][A-Za-z0-9_-]*$/);
-const peca = slug;
+/* Pacotes homologados existentes podem expor o identificador procedural
+   `_mancal-de-mesa`; ele é uma identidade válida de peça, embora não seja um
+   slug de montagem. Mantemos montagem/IDs de revisão estritos e aceitamos o
+   legado somente no campo que transporta peça. */
+const peca = z.string().regex(/^_?[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const revisao = z.string().regex(/^r[0-9]+$/);
 const vetor = z.array(z.number()).length(3);
 const erro = z.object({
