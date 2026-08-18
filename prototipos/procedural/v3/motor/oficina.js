@@ -4,8 +4,9 @@
 export {
   BLOCO, FORMATO, OPERACOES_COM_ORIGEM, OPS,
   contagemPorDesvio, flechaDoAnel, flechaDoArco, ladosPorDesvio,
-  neutroCanonico, nucleo,
+  neutroCanonico, nucleo, REGISTRO_OPERACOES,
 } from './nucleo.js';
+export { criarRegistroOperacoes, ErroRegistroOperacoes } from './registro.js';
 export { adaptarV3 } from './adaptador.js';
 export { avaliarChaves, bindPoseOssos, montarAnimar } from './animacao.js';
 export { colisaoDe, executar } from './executor.js';

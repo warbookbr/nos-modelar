@@ -10,7 +10,7 @@ describe('mapa estático do motor procedural', () => {
     expect(mapa.operacoes.map(({ nome }) => nome)).toEqual(Object.keys(OPS));
     expect(mapa.exportacoes).toContain('nucleo');
     expect(mapa.exportacoes).toContain('neutroCanonico');
-    expect(mapa.dependenciasDiretas).toEqual(['./expressoes.js', 'earcut']);
+    expect(mapa.dependenciasDiretas).toEqual(['./expressoes.js', './registro.js', 'earcut']);
     expect(mapa.consumidores).toContain('src/autoria/executar-receita.js');
   });
 });

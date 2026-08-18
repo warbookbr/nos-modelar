@@ -65,7 +65,9 @@ aplicação publicada aqui.
   extensão e descoberta Agent-First. A R00 já fixou a [linha de base
   executável](BASELINE-MOTOR-R00.md) e o mapa da fachada. A R01 foi concluída:
   `oficina.js` é a fachada compatível; núcleo, adaptador, animação e executor
-  têm implementação única separada. Não haverá cópia `legacy` nem segundo executor
+  têm implementação única separada. A R02 foi concluída: o despacho passa por
+  registro explícito, versionado e determinístico das 32 operações. Não haverá
+  cópia `legacy` nem segundo executor
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já

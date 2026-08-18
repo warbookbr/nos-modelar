@@ -11,6 +11,7 @@
    O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
    mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
 import { criarResolverNumerico } from './expressoes.js';
+import { criarRegistroOperacoes } from './registro.js';
 import earcut from 'earcut';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
@@ -5186,6 +5187,22 @@ export const OPS = {
   },
 };
 
+/* Configuração explícita do módulo que preserva os nomes curtos das receitas.
+   A lista é contrato do registro; o teste exige cobertura exata de `OPS`. */
+const NOMES_DAS_OPERACOES = [
+  'cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft',
+  'inflate', 'publicarPorta', 'moveV', 'extruda', 'mescla', 'moveF', 'moveA',
+  'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
+  'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'pincel',
+  'solido', 'liso', 'material', 'parte', 'pesar',
+];
+export const REGISTRO_OPERACOES = criarRegistroOperacoes({ modulos: [{
+  id: 'mecanifica.motor.nucleo', versao: '1.0.0', requer: [],
+  operacoes: NOMES_DAS_OPERACOES.map((nome) => ({
+    id: `mecanifica.operacao.${nome}`, nome, versao: '1.0.0', categoria: 'procedural', executar: OPS[nome],
+  })),
+}] });
+
 /* A-20 — uma porta publicada precisa existir FORA do núcleo. Até esta rodada
    `st.portas` só vivia enquanto a lista de passos rodava: nem a régua, nem a
    bancada, nem o adaptador sabiam que a peça publicou `peDoCaule`, e provar que
@@ -5403,8 +5420,9 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
-    const fn = OPS[op];
-    if (!fn) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    const registrada = REGISTRO_OPERACOES.resolver(op);
+    if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
        não dentro de cada gerador. Oito geradores implementando a mesma
        translação seriam oito chances de divergir de sinal ou de ordem; o

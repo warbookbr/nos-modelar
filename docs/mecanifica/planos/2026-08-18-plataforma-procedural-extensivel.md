@@ -9,6 +9,8 @@
 **Execução:** R00 concluída: mapa estático e baseline canônica em
 `BASELINE-MOTOR-R00.md`. R01 concluída: `oficina.js` é a fachada compatível;
 núcleo, adaptador, animação e executor têm implementação única separada.
+R02 concluída: as 32 operações são registradas por configuração explícita,
+versionada e assinada antes do despacho.
 
 ## Objetivo verificável
 
