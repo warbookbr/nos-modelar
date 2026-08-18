@@ -127,10 +127,11 @@ export async function descreverPecaReutilizavel({
     );
   }
 
+  let entrada;
   let neutro;
   let expansao = null;
   try {
-    ({ neutro, expansao } = executarReceita(modulo, {
+    ({ entrada, neutro, expansao } = executarReceita(modulo, {
       registroOperacoes,
       registroComposicoes,
       orcamentoComposicoes,
@@ -183,7 +184,13 @@ export async function descreverPecaReutilizavel({
     codigo: falhou ? 1 : 0,
     stdout,
     stderr,
-    resultado: { peca, descricao, neutro, expansao },
+    resultado: {
+      peca,
+      descricao: { ...descricao, intencao: entrada.INTENCAO ?? null },
+      intencao: entrada.INTENCAO ?? null,
+      neutro,
+      expansao,
+    },
   };
 }
 

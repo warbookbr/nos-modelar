@@ -538,7 +538,11 @@ function selecionarNomes(partes, filtro, quem) {
   return [...partes.keys()].filter((nome) => vistos.has(nome));
 }
 
-const PROPRIEDADES_DE_MATERIAL = ['cor', 'emissivo', 'aspereza', 'semLuz', 'contorno', 'mistura', 'opacidade'];
+/* `metalicidade` é opcional como as demais propriedades numéricas: receitas
+   antigas não a declaram e continuam com a aparência persistida que já tinham;
+   quando presente, porém, ela precisa entrar na descrição para que trocar
+   metal por plástico seja observável pela assinatura/diff. */
+const PROPRIEDADES_DE_MATERIAL = ['cor', 'emissivo', 'aspereza', 'metalicidade', 'semLuz', 'contorno', 'mistura', 'opacidade'];
 
 /* A revisão não precisa nem pode guardar uma face por id. Ela guarda a
    DISTRIBUIÇÃO de acabamentos dentro de cada parte semântica: material

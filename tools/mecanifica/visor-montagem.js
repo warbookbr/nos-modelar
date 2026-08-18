@@ -28,12 +28,22 @@ function reconstituir(montagem) {
 }
 
 function direcao(vista) {
-  return ({ isometrica: [1, 0.8, 1], frontal: [0, 0, 1], direita: [1, 0, 0], superior: [0, 1, 0] })[vista] ?? [1, 0.8, 1];
+  return ({
+    isometrica: [1, 0.8, 1],
+    frontal: [0, 0, 1],
+    traseira: [0, 0, -1],
+    direita: [1, 0, 0],
+    esquerda: [-1, 0, 0],
+    superior: [0, 1, 0],
+    inferior: [0, -1, 0],
+  })[vista] ?? [1, 0.8, 1];
 }
 
 function eixosDaVista(vetor, vista) {
   const olhar = vetor.clone().negate();
-  const acima = vista === 'superior' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, 1, 0);
+  const acima = vista === 'superior'
+    ? new THREE.Vector3(0, 0, -1)
+    : (vista === 'inferior' ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0));
   return {
     direita: new THREE.Vector3().crossVectors(olhar, acima).normalize(),
     acima,
@@ -42,24 +52,35 @@ function eixosDaVista(vetor, vista) {
 
 function envelopeProjetado(caixa, vetor, vista) {
   const { direita, acima } = eixosDaVista(vetor, vista);
+  const centro = caixa.getCenter(new THREE.Vector3());
   const valoresX = [];
   const valoresY = [];
+  const profundidades = [];
   for (const x of [caixa.min.x, caixa.max.x]) {
     for (const y of [caixa.min.y, caixa.max.y]) {
       for (const z of [caixa.min.z, caixa.max.z]) {
         const ponto = new THREE.Vector3(x, y, z);
         valoresX.push(ponto.dot(direita));
         valoresY.push(ponto.dot(acima));
+        profundidades.push(ponto.sub(centro).dot(vetor));
       }
     }
   }
-  return { largura: Math.max(...valoresX) - Math.min(...valoresX), altura: Math.max(...valoresY) - Math.min(...valoresY) };
+  return {
+    largura: Math.max(...valoresX) - Math.min(...valoresX),
+    altura: Math.max(...valoresY) - Math.min(...valoresY),
+    profundidadeDianteira: Math.max(...profundidades),
+  };
 }
 
 function distanciaParaEnquadrar(envelope) {
   const vertical = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   const horizontal = vertical * camera.aspect;
-  return Math.max(0.01, envelope.largura / (2 * horizontal * 0.58), envelope.altura / (2 * vertical * 0.62));
+  /* Em perspectiva, largura e altura são vistas a partir do canto mais perto
+     da câmera, não do centro da caixa. Somar essa profundidade mantém também
+     montagens longas inteiras no frustum sem trocar para uma margem arbitrária. */
+  return envelope.profundidadeDianteira
+    + Math.max(0.01, envelope.largura / (2 * horizontal * 0.58), envelope.altura / (2 * vertical * 0.62));
 }
 
 function enquadramento(caixa) {
@@ -96,6 +117,7 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   camera.position.copy(centro).addScaledVector(vetor, distanciaParaEnquadrar(envelope));
   camera.up.set(0, 1, 0);
   if (vista === 'superior') camera.up.set(0, 0, -1);
+  if (vista === 'inferior') camera.up.set(0, 0, 1);
   camera.lookAt(centro);
   camera.updateProjectionMatrix();
   renderer.render(scene, camera);

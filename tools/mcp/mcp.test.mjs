@@ -18,7 +18,7 @@ import {
 } from './perfis/revisao.mjs';
 import {
   catalogarMontagens, conteudoRenderizacaoMontagem, descreverMontagem,
-  LIMITES_VISTAS_MONTAGEM, planejarRevalidacao, renderizarMontagem,
+  LIMITES_VISTAS_MONTAGEM, planejarRevalidacao, renderizarMontagem, revisarMontagem,
 } from './perfis/montagens.mjs';
 import {
   catalogarMontagensSaida, compararSaida, descreverMontagemSaida, descreverSaida,
@@ -430,6 +430,20 @@ describe('servidor MCP local — perfil revisao', () => {
     ]);
     expect(roteiro.resultado.roteiro.pendencias.map(({ codigo }) => codigo)).toContain('uso-global-fora-da-raiz-nao-verificado');
 
+    const roteiroDefinicao = await planejarRevalidacao({
+      id: 'gabarito-separacao-direcional',
+      alvo: { tipo: 'peca', ref: 'bloco-gabarito' },
+    }, { catalogo: CATALOGO_MONTAGENS });
+    revalidarMontagemSaida.parse(roteiroDefinicao);
+    expect(roteiroDefinicao.resultado.roteiro).toMatchObject({
+      alvo: { tipo: 'peca', ref: 'bloco-gabarito' },
+      consumidoresDefinicao: [
+        { caminho: ['movel'], alvo: { tipo: 'peca', ref: 'bloco-gabarito' } },
+        { caminho: ['referencia'], alvo: { tipo: 'peca', ref: 'bloco-gabarito' } },
+      ],
+      caminhosIniciais: [['movel'], ['referencia']],
+    });
+
     const catalogado = await catalogarMontagens({
       ids: ['gabarito-unitario', 'gabarito-separacao-direcional'],
     }, { catalogo: CATALOGO_MONTAGENS });
@@ -438,6 +452,33 @@ describe('servidor MCP local — perfil revisao', () => {
       { id: 'gabarito-separacao-direcional' }, { id: 'gabarito-unitario' },
     ]);
     expect(catalogado.resultado.catalogo.limitacoes).toContain('somente-raizes-explicitamente-fornecidas');
+  });
+
+  it('expõe foco interno da auditoria pela porta MCP sem inferir cobertura global', async () => {
+    const png = Buffer.from('89504e470d0a1a0a', 'hex');
+    const revisada = await revisarMontagem({
+      id: 'gabarito-separacao-direcional', caminho: ['movel'], modoFoco: 'interno', vistas: ['traseira'],
+    }, {
+      catalogo: CATALOGO_MONTAGENS,
+      capturar: async ({ vistas }) => ({
+        ok: true,
+        resultado: { capturas: vistas.map((nome) => ({
+          nome, mimeType: 'image/png', largura: 1280, altura: 720, dados: png,
+          instancias: [['movel']],
+          enquadramento: { valida: true, area: 0.25, largura: 0.5, altura: 0.5, cortado: false },
+        })) },
+      }),
+    });
+    expect(revisada.resposta).toMatchObject({
+      ok: true,
+      resultado: {
+        auditoriaIntersecoes: {
+          escopo: { caminho: ['movel'], modoFoco: 'interno', paresOmitidosPorFoco: 1 },
+          cobertura: { paresTotais: 1, paresNoEscopo: 0, completa: false },
+        },
+        visual: { vistas: [expect.objectContaining({ nome: 'traseira' })] },
+      },
+    });
   });
 
   it('consumidor caixa-preta descobre e audita montagem sem ler caminhos do repositório', async () => {

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 // @ts-expect-error — serviço MJS exercitado pelo contrato visual.
-import { capturarMontagem, serializarMontagemVisual } from './capturar-montagem.mjs';
+import { capturarMontagem, serializarMontagemVisual, VISTAS_MONTAGEM } from './capturar-montagem.mjs';
 
 const MONTAGENS = join(process.cwd(), 'tools/mecanifica/fixtures/montagens-persistidas');
 const PECAS = join(process.cwd(), 'tools/mecanifica/fixtures/pecas-resolvidas');
@@ -18,6 +18,12 @@ async function resolvida() {
 }
 
 describe('captura importável de montagem', () => {
+  it('expõe frente, verso, laterais, topo e fundo para inspeção dirigida', () => {
+    expect(VISTAS_MONTAGEM).toEqual([
+      'isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior',
+    ]);
+  });
+
   it('serializa somente o caminho semântico escolhido sem identidade de runtime', async () => {
     const dados = serializarMontagemVisual(await resolvida(), ['movel']);
     expect(dados.instancias.map((item: { caminho: string[] }) => item.caminho)).toEqual([['movel']]);

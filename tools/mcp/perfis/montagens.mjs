@@ -78,7 +78,10 @@ export async function planejarRevalidacao(input, { catalogo }) {
     const resolvida = await catalogo.resolver(argumentos.id);
     return respostaOk(0, {
       id: argumentos.id,
-      roteiro: derivarRoteiroRevalidacao(resolvida, { caminho: argumentos.alvo }),
+      roteiro: derivarRoteiroRevalidacao(
+        resolvida,
+        Array.isArray(argumentos.alvo) ? { caminho: argumentos.alvo } : argumentos.alvo,
+      ),
     });
   });
 }
@@ -120,6 +123,7 @@ export async function revisarMontagem(input, {
   const resolvida = await catalogo.resolver(argumentos.id);
   const auditoriaIntersecoes = auditarIntersecoesMontagem(resolvida, {
     ...(argumentos.caminho ? { caminho: argumentos.caminho } : {}),
+    ...(argumentos.modoFoco ? { modoFoco: argumentos.modoFoco } : {}),
   });
   const colisaoCompleta = argumentos.caminho === undefined && auditoriaIntersecoes.cobertura.completa;
   const contextoRevisao = {
@@ -340,7 +344,7 @@ export function criarFerramentasMontagem(catalogo) {
     },
     {
       nome: 'planejar_revalidacao_montagem',
-      descricao: 'Deriva relações e pendências a revalidar depois de alterar um alvo semântico.',
+      descricao: 'Deriva relações e pendências a revalidar depois de alterar uma instância por caminho ou uma definição compartilhada por tipo/ref.',
       inputSchema: revalidarMontagemEntrada,
       outputSchema: revalidarMontagemSaida,
       executar: (entrada) => planejarRevalidacao(entrada, { catalogo }),
@@ -363,7 +367,7 @@ export function criarFerramentasMontagem(catalogo) {
     },
     {
       nome: 'revisar_montagem',
-      descricao: 'Avalia uma montagem listada no catálogo do host e separa verificações executadas, limitações e vistas. A listagem não é aprovação nem homologação.',
+      descricao: 'Avalia uma montagem listada no catálogo do host e separa verificações executadas, limitações e vistas. modoFoco interno reduz pares ao interior da subárvore e mantém omissões explícitas. A listagem não é aprovação nem homologação.',
       inputSchema: revisarMontagemEntrada,
       outputSchema: revisarMontagemSaida,
       executar: (entrada) => revisarMontagem(entrada, { catalogo }),

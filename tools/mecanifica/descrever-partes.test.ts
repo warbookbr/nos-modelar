@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
 // @ts-expect-error — serviço JavaScript exercitado pelo contrato headless.
 import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
+// @ts-expect-error — contrato JavaScript de revisão exercitado pela descrição pública.
+import { compararRevisoes, construirRevisao, rotaCanonica } from '../modelagem/revisao-modelagem.mjs';
 // @ts-expect-error — serviço JavaScript exercitado pelo contrato headless.
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 // @ts-expect-error — CLI MJS exercitada pelo contrato público.
@@ -33,6 +35,23 @@ const comPortas = () => nucleo([
   ['parte', { nome: 'bloco', sel: { origem: { op: 'cubo', id: 21 } } }],
   ['publicarPorta', { id: 'baseDoBloco', rotulo: 'Base do bloco', de: { op: 'cubo', id: 21 } }],
 ], {}, {}, {}, null, []);
+
+const comMaterial = (metalicidade?: number) => nucleo([
+  ['cubo', { origemId: 30, lado: 1 }],
+  ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 30 } } }],
+  ['material', { faces: [0, 1, 2, 3, 4, 5], usa: 'acabamento' }],
+], {}, {}, {
+  acabamento: {
+    cor: '#68727a',
+    ...(metalicidade === undefined ? {} : { metalicidade }),
+  },
+});
+
+const vistasDe = (peca: string) => ['isometrica', 'frontal', 'direita', 'superior'].map((nome) => ({
+  nome,
+  rota: rotaCanonica(peca, nome),
+  enquadramento: { valida: true, area: 0.5, largura: 0.8, altura: 0.8, cortado: false },
+}));
 
 describe('descrever-partes — régua headless', () => {
   it('mede faces, caixas e corpos da fixture, sem depender de catálogo', () => {
@@ -94,6 +113,35 @@ describe('descrever-partes — régua headless', () => {
       { id: 'baseDoBloco', rotulo: 'Base do bloco', op: 'cubo', origemId: 21, recorte: '', origem: 'cubo:21', passo: 5 },
     ]);
     expect(portasPublicadas(doisCubos())).toEqual([]);
+  });
+
+  it('persiste metalicidade quando declarada e mantém compatibilidade quando ausente', () => {
+    const comMetal = descreverPeca(comMaterial(0.9));
+    const semMetal = descreverPeca(comMaterial());
+    expect(comMetal.aparencia.materiais).toEqual([{ nome: 'acabamento', propriedades: { cor: '#68727a', metalicidade: 0.9 } }]);
+    expect(semMetal.aparencia.materiais).toEqual([{ nome: 'acabamento', propriedades: { cor: '#68727a' } }]);
+    expect(() => descreverPeca(comMaterial(Number.NaN))).toThrow(/metalicidade.*número finito/);
+  });
+
+  it('faz a troca metal-plástico aparecer na assinatura e no diff de revisão', () => {
+    const anterior = construirRevisao({
+      peca: 'material-fixture',
+      descricao: descreverPeca(comMaterial(0.9)),
+      vistas: vistasDe('material-fixture'),
+    });
+    const atual = construirRevisao({
+      peca: 'material-fixture',
+      descricao: descreverPeca(comMaterial(0.05)),
+      vistas: vistasDe('material-fixture'),
+    });
+    expect(atual.assinaturaModelo).not.toBe(anterior.assinaturaModelo);
+    const diff = compararRevisoes(anterior, atual);
+    expect(diff.modeloMudou).toBe(true);
+    expect(diff.aparencia.materiais.alteradas).toEqual([{
+      chave: 'acabamento',
+      anterior: { nome: 'acabamento', propriedades: { cor: '#68727a', metalicidade: 0.9 } },
+      atual: { nome: 'acabamento', propriedades: { cor: '#68727a', metalicidade: 0.05 } },
+    }]);
   });
 
   it('o serviço reutilizável mede módulo explícito sem consultar o acervo', async () => {

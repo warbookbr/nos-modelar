@@ -284,10 +284,12 @@ function expectativaDoPar(expectativas, a, b) {
 export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
   if (!montagemResolvida || !Array.isArray(montagemResolvida.instancias)) throw new TypeError('auditar interseções: montagem resolvida inválida.');
   if (!opcoes || typeof opcoes !== 'object' || Array.isArray(opcoes)) throw new TypeError('auditar interseções: opções inválidas.');
-  const extras = Object.keys(opcoes).filter((chave) => !['caminho', 'toleranciaNumerica'].includes(chave));
+  const extras = Object.keys(opcoes).filter((chave) => !['caminho', 'modoFoco', 'toleranciaNumerica'].includes(chave));
   if (extras.length) throw new Error(`auditar interseções: opção desconhecida '${extras[0]}'.`);
   const caminho = opcoes.caminho ?? [];
   if (!Array.isArray(caminho) || caminho.some((item) => typeof item !== 'string' || item === '')) throw new Error('auditar interseções: caminho precisa ser lista de IDs não vazios.');
+  const modoFoco = opcoes.modoFoco ?? 'incidente';
+  if (modoFoco !== 'incidente' && modoFoco !== 'interno') throw new Error("auditar interseções: modoFoco precisa ser 'incidente' ou 'interno'.");
   const tolerancia = exigirTolerancia(opcoes.toleranciaNumerica
     ?? montagemResolvida.auditoriaIntersecoes?.toleranciaNumerica
     ?? TOLERANCIA_INTERSECOES);
@@ -297,7 +299,10 @@ export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
   let filtrados = 0;
   for (let i = 0; i < folhas.length; i += 1) for (let j = i + 1; j < folhas.length; j += 1) {
     const a = folhas[i]; const b = folhas[j];
-    if (!dentroDoFoco(a.caminho, caminho) && !dentroDoFoco(b.caminho, caminho)) { filtrados += 1; continue; }
+    const aNoFoco = dentroDoFoco(a.caminho, caminho);
+    const bNoFoco = dentroDoFoco(b.caminho, caminho);
+    const incluido = modoFoco === 'interno' ? aNoFoco && bNoFoco : aNoFoco || bNoFoco;
+    if (!incluido) { filtrados += 1; continue; }
     const resultado = auditarPar(a, b, tolerancia);
     const expectativa = expectativaDoPar(expectativas, a.caminho, b.caminho);
     pares.push({
@@ -311,7 +316,7 @@ export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
   return {
     formato: FORMATO_AUDITORIA_INTERSECOES,
     versao: VERSAO_AUDITORIA_INTERSECOES,
-    escopo: { caminho: caminho.slice(), folhas: folhas.length, paresOmitidosPorFoco: filtrados },
+    escopo: { caminho: caminho.slice(), modoFoco, folhas: folhas.length, paresOmitidosPorFoco: filtrados },
     toleranciaNumerica: tolerancia,
     pares,
     cobertura: {

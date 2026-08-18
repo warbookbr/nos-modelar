@@ -39,15 +39,18 @@ auditado e continua aparecendo como `interpenetram`, `encostam`, `separadas` ou
 ```js
 auditarIntersecoesMontagem(montagemResolvida, {
   caminho: ['submontagem', 'peca'],
+  modoFoco: 'incidente',
   toleranciaNumerica: 0.000001,
 })
 ```
 
 O serviço expande submontagens até peças-folha. Sem `caminho`, testa todos os
-pares da raiz. Com foco, testa cada folha do foco contra todas as folhas da
-raiz e informa os pares externos omitidos. Caixas mundiais só eliminam pares
-seguramente separados; a decisão restante usa a malha final e teste de
-contenção.
+pares da raiz. Com foco, `modoFoco: 'incidente'` (padrão retrocompatível)
+testa cada folha do foco contra todas as folhas da raiz; `modoFoco: 'interno'`
+restringe o escopo a pares em que os dois lados pertencem ao foco. Em ambos os
+modos, `paresOmitidosPorFoco` informa os pares fora do escopo e a cobertura fica
+incompleta quando há omissões. Caixas mundiais só eliminam pares seguramente
+separados; a decisão restante usa a malha final e teste de contenção.
 
 A saída usa `formato: mecanifica.auditoria-intersecoes`, `versao: 1` e informa
 escopo, tolerância, pares ordenados, método, expectativas associadas e

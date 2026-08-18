@@ -9,6 +9,7 @@ import {
   expandirChamadasDeComposicao,
   nucleo,
 } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { normalizarIntencaoPeca } from './intencao-peca.js';
 
 export function validarReceita(modulo) {
   if (!modulo || typeof modulo !== 'object' || Array.isArray(modulo)) {
@@ -53,6 +54,11 @@ function prepararReceita(modulo, {
     ESQUELETO: modulo.ESQUELETO ?? null,
     ALIASES: modulo.ALIASES ?? [],
   };
+  const intencao = normalizarIntencaoPeca(modulo.INTENCAO);
+  /* Ausência não cria uma chave artificial: isso preserva a assinatura das
+     receitas históricas. Quando declarada, a forma já é canônica e entra na
+     impressão da entrada usada por exportação/revisão. */
+  if (intencao !== null) entrada.INTENCAO = intencao;
   if (expansao) {
     entrada.COMPOSICAO = {
       registro: registroComposicoes.assinatura,

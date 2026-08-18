@@ -69,6 +69,13 @@ topologia; `PASSOS` é a lista `[['op', {...}], ...]`. Não escreva `id:` em um
 passo: o núcleo calcula o bloco pela posição (`BLOCO=1000`). `origemId` é uma
 identidade estrutural diferente e pode ser escolhida pelo autor.
 
+Quando a função pretendida não for óbvia pela geometria, exporte o contrato
+opcional `INTENCAO` descrito em `docs/mecanifica/INTENCAO-PECA-V1.md`. Declare
+função, família, significado dos eixos locais, invariantes e critérios visuais.
+A descrição headless e a revisão preservam e comparam essa intenção; ela não
+substitui medidas, interfaces, relações nem inspeção das imagens. Não grave
+posição de passo, índice, UUID, caminho local ou estado de runtime nela.
+
 Números precisam ser finitos e pontos precisam ter exatamente `[x,y,z]`.
 `NaN`, `Infinity` e aridade errada devem lançar erro. Determinismo exige
 semente explícita; nunca use `Date.now()` ou `Math.random()` cru.
@@ -119,9 +126,16 @@ Rotação usa a regra destrógira medida pelo núcleo. Com pivô explícito em
 | `z` | `+90` | `+Y` | `-X` |
 | `z` | `-90` | `+Y` | `+X` |
 
-Primitivas de revolução nascem em torno de Y. Para pôr disco, cubo ou pistão
-no eixo X, use `rotaciona z -90` com pivô explícito; o pivô padrão é o
-centroide da seleção e pode girar a peça no próprio lugar.
+`cilindro`, `cone` e `lathe` nascem em torno de Y. Para pôr disco, eixo ou
+pistão no eixo X, prefira `eixo:'x'` no próprio gerador; quando o pivô não for
+a origem, use `rotaciona z -90` com pivô explícito. O pivô padrão é o centroide
+da seleção e pode girar a peça no próprio lugar.
+
+No `loft`, `orientacao` declara para onde aponta o eixo local `+u` de cada
+seção — não o eixo do caminho. Em caminho ao longo de Z, use `[1,0,0]` quando
+o primeiro componente do `contorno:[u,w]` deve ser a largura X. Sempre confira
+frente, lateral e superior: trocar `u` e `w` pode preservar a lateral e deixar
+a peça estreita ou alta nas outras vistas sem produzir órfão.
 
 Prefira `PASSOS` para peças determinísticas e editáveis. Use `construir(ctx)`
 com `ctx.{TS,tex,geo,m4}` apenas quando o vocabulário não cobrir a forma e

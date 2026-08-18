@@ -146,7 +146,7 @@ encaminhe-os a todas as chamadas do núcleo que recebem aliases.
 
 ## Detalhes de seleção, aliases e proveniência
 
-+**SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
+**SEIS ops de geometria só aceitam ID LITERAL, nenhuma aceita `sel`:** `moveV`,
 `moveF`, `moveA`, `vira`, `extruda` e `mescla` (a sétima é `pesar`, mesma
 restrição, mas de skinning). Escolher uma delas é escolher escrever id
 posicional — a referência que o `CLAUDE.md` proíbe persistir. Escrever `sel`
@@ -206,7 +206,7 @@ deduzida da matriz, e travada por `tools/bancadas/skill-criar-peca.test.ts`: se
 o núcleo trocar de convenção, o teste quebra em vez de a peça sair espelhada.
 
 **Caso canônico — primitiva de revolução do eixo Y para o eixo X.** `cilindro`,
-`lathe` e `esfera` nascem em torno de **Y**; toda peça mecânica de eixo
+`cone` e `lathe` nascem em torno de **Y**; toda peça mecânica de eixo
 horizontal (disco de freio, cubo de roda, pistão, polia, virabrequim) mora em
 **X**. O passo é `rotaciona z -90` com **pivô explícito na origem** — `-90`
 leva `+Y` para `+X`, e `+90` levaria para `-X`, espelhando o conjunto inteiro:

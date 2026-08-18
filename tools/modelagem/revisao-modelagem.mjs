@@ -8,11 +8,23 @@
  * enquadramento sempre produzem exatamente o mesmo JSON.
  */
 import { createHash } from 'node:crypto';
+import { compararIntencoes, normalizarIntencaoPeca } from '../../src/autoria/intencao-peca.js';
 
 export const FORMATO_REVISAO = 'mecanifica.revisao-modelagem';
 export const FORMATO_CRITICA = 'mecanifica.critica-modelagem';
+/* Achados visuais são a forma mínima, independente de peça ou montagem, de
+   registrar uma observação que outra execução consegue localizar e comparar.
+   A crítica histórica acima continua presa a checklist/revisão por
+   compatibilidade; este contrato não conhece esse pacote. */
+export const FORMATO_ACHADOS_VISUAIS = 'mecanifica.achados-critica-visual';
+export const VERSAO_ACHADOS_VISUAIS = 1;
+export const VISTAS_OFICIAIS_CRITICA = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
+export const SEVERIDADES_VISUAIS = ['informativa', 'baixa', 'media', 'alta', 'critica'];
+export const DECISOES_VISUAIS = ['corrigir', 'aceitar', 'investigar', 'bloquear', 'adiar'];
+export const ESTADOS_VISUAIS = ['aberto', 'resolvido', 'bloqueado', 'adiado'];
 /* v2 acrescentou aparência; v3 separou id estável de rótulo das portas; v4
-   acrescenta a impressão geométrica sem reescrever a evidência histórica. */
+   acrescenta a impressão geométrica e aceita intenção opcional sem reescrever
+   a evidência histórica — quando ausente, o modelo assinado não ganha chave. */
 export const VERSAO = 4;
 export const VERSAO_PORTAS = 3;
 export const VERSAO_APARENCIA = 2;
@@ -26,6 +38,7 @@ const UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a
 const CAMPO_PROIBIDO = /^(uuid|indice|index|passo|timestamp|createdat|updatedat|host)$/i;
 /* Fixtures públicas herdadas usam o prefixo `_` (por exemplo `_jardineira`). */
 const NOME_SEMANTICO = /^[\p{L}_][\p{L}\p{N}_-]*$/u;
+const HASH_SHA256 = /^sha256:[0-9a-f]{64}$/;
 
 function erro(quem, mensagem) {
   throw new Error(`${quem}: ${mensagem}`);
@@ -236,7 +249,10 @@ function portaLegadaDaDescricao(valor, quem, campo) {
   return porta;
 }
 
-const PROPRIEDADES_MATERIAL = ['cor', 'emissivo', 'aspereza', 'semLuz', 'contorno', 'mistura', 'opacidade'];
+/* Opcional para preservar revisões anteriores que não gravavam metalicidade;
+   quando declarada, participa do modelo canônico e portanto da assinatura e
+   do diff de aparência. */
+const PROPRIEDADES_MATERIAL = ['cor', 'emissivo', 'aspereza', 'metalicidade', 'semLuz', 'contorno', 'mistura', 'opacidade'];
 
 function propriedadesMaterial(valor, quem, campo) {
   objeto(valor, quem, campo);
@@ -392,7 +408,12 @@ function projetarModeloDaDescricao(descricao, { incluirGeometria = true } = {}) 
     erro(quem, 'contagens de partes ou portas divergem da descrição detalhada.');
   }
   const aparencia = aparenciaDaDescricao(descricao.aparencia, partes, quem);
+  const intencao = normalizarIntencaoPeca(descricao.intencao, { quem });
   const modelo = { totais, partes, relacoes, portas, aparencia };
+  /* Nulo/ausente não entra no modelo: revisões antigas conservam exatamente a
+     assinatura que já tinham. Uma intenção declarada, porém, é parte da
+     autoria observada e assina junto com a geometria/aparência. */
+  if (intencao !== null) modelo.intencao = intencao;
   return incluirGeometria ? { ...modelo, geometria: geometriaDaDescricao(descricao.geometria, partes, quem) } : modelo;
 }
 
@@ -471,7 +492,7 @@ function modeloPersistido(valor, quem, versao) {
   const camposModelo = versao === VERSAO_LEGADA
     ? ['totais', 'partes', 'relacoes', 'portas']
     : versao === VERSAO
-      ? ['totais', 'partes', 'relacoes', 'portas', 'aparencia', 'geometria']
+      ? ['totais', 'partes', 'relacoes', 'portas', 'aparencia', 'geometria', 'intencao']
       : ['totais', 'partes', 'relacoes', 'portas', 'aparencia'];
   chavesExatas(valor, camposModelo, quem, 'modelo');
   const totais = objeto(valor.totais, quem, 'modelo.totais');
@@ -523,6 +544,7 @@ function modeloPersistido(valor, quem, versao) {
     };
   }
   descricao.aparencia = valor.aparencia;
+  descricao.intencao = valor.intencao ?? null;
   /* A entrada persistida não aceita `passo`; ela é reidratada só para reutilizar
      a projeção da descrição e a validação detalhada. `interface` é a exceção:
      trata-se do contrato público já resolvido e deve sobreviver ao ciclo. */
@@ -554,6 +576,107 @@ function textoObjetivo(valor, quem, campo) {
     erro(quem, `'${campo}' não é uma observação verificável.`);
   }
   return resultado;
+}
+
+function hashVisual(valor, quem, campo) {
+  if (valor === null) return null;
+  texto(valor, quem, campo);
+  if (!HASH_SHA256.test(valor)) erro(quem, `'${campo}' precisa ser sha256 em hexadecimal minúsculo.`);
+  return valor;
+}
+
+function vistasOficiaisCritica(valor, quem) {
+  if (!Array.isArray(valor) || valor.length === 0) erro(quem, 'vistasOficiais precisa ser uma lista não vazia.');
+  const vistas = valor.map((vista, i) => texto(vista, quem, `vistasOficiais[${i}]`, { semantico: true }));
+  if (new Set(vistas).size !== vistas.length) erro(quem, 'vistasOficiais não pode repetir nomes.');
+  return new Set(vistas);
+}
+
+function alvoVisual(valor, quem, campo) {
+  objeto(valor, quem, campo);
+  chavesObrigatorias(valor, ['tipo', 'id'], quem, campo);
+  return {
+    tipo: texto(valor.tipo, quem, `${campo}.tipo`, { semantico: true }),
+    id: texto(valor.id, quem, `${campo}.id`, { semantico: true }),
+  };
+}
+
+function evidenciaVisual(valor, quem, campo) {
+  if (valor === undefined || valor === null) return null;
+  objeto(valor, quem, campo);
+  chavesExatas(valor, ['tipo', 'hash'], quem, campo);
+  if (!Object.hasOwn(valor, 'tipo')) erro(quem, `'${campo}' precisa declarar: tipo.`);
+  const tipo = texto(valor.tipo, quem, `${campo}.tipo`, { semantico: true });
+  if (!['imagem', 'render', 'referencia', 'comparacao'].includes(tipo)) {
+    erro(quem, `'${campo}.tipo' precisa ser imagem, render, referencia ou comparacao.`);
+  }
+  if (Object.hasOwn(valor, 'hash') && valor.hash === null) erro(quem, `'${campo}.hash' não pode ser nulo; omita o hash quando a evidência não o tiver.`);
+  return { tipo, ...(valor.hash === undefined ? {} : { hash: hashVisual(valor.hash, quem, `${campo}.hash`) }) };
+}
+
+function vinculoVisual(valor, quem, campo) {
+  objeto(valor, quem, campo);
+  chavesObrigatorias(valor, ['antes', 'depois'], quem, campo);
+  const antes = hashVisual(valor.antes, quem, `${campo}.antes`);
+  const depois = hashVisual(valor.depois, quem, `${campo}.depois`);
+  if (antes === null && depois === null) erro(quem, `'${campo}' precisa vincular antes ou depois a uma assinatura.`);
+  return { antes, depois };
+}
+
+/**
+ * Valida um achado visual sem abrir navegador, ler arquivo ou conhecer o
+ * domínio da peça. O resultado é canônico: campos opcionais ausentes viram
+ * ausência estável (e a lista de achados é ordenada por alvo/vista/texto).
+ */
+export function validarAchadoVisual(achado, { vistasOficiais = VISTAS_OFICIAIS_CRITICA } = {}) {
+  const quem = 'validarAchadoVisual';
+  const oficiais = vistasOficiaisCritica(vistasOficiais, quem);
+  objeto(achado, quem, 'achado');
+  chavesExatas(achado, ['alvo', 'vista', 'severidade', 'observacao', 'evidencia', 'decisao', 'estado', 'vinculo'], quem, 'achado');
+  for (const campo of ['alvo', 'vista', 'severidade', 'observacao', 'decisao', 'estado', 'vinculo']) {
+    if (!Object.hasOwn(achado, campo)) erro(quem, `'achado' precisa declarar: ${campo}.`);
+  }
+  const alvo = alvoVisual(achado.alvo, quem, 'achado.alvo');
+  const vista = texto(achado.vista, quem, 'achado.vista', { semantico: true });
+  if (!oficiais.has(vista)) erro(quem, `vista oficial desconhecida '${vista}'.`);
+  if (!SEVERIDADES_VISUAIS.includes(achado.severidade)) erro(quem, "'achado.severidade' é inválida.");
+  if (!DECISOES_VISUAIS.includes(achado.decisao)) erro(quem, "'achado.decisao' é inválida.");
+  if (!ESTADOS_VISUAIS.includes(achado.estado)) erro(quem, "'achado.estado' é inválido.");
+  return {
+    alvo,
+    vista,
+    severidade: achado.severidade,
+    observacao: textoObjetivo(achado.observacao, quem, 'achado.observacao'),
+    evidencia: evidenciaVisual(achado.evidencia, quem, 'achado.evidencia'),
+    decisao: achado.decisao,
+    estado: achado.estado,
+    vinculo: vinculoVisual(achado.vinculo, quem, 'achado.vinculo'),
+  };
+}
+
+/** Valida/canonicaliza o documento neutro de achados visuais reexecutáveis. */
+export function validarCriticaVisual(critica, { vistasOficiais = VISTAS_OFICIAIS_CRITICA } = {}) {
+  const quem = 'validarCriticaVisual';
+  objeto(critica, quem, 'crítica visual');
+  chavesObrigatorias(critica, ['formato', 'versao', 'achados'], quem, 'crítica visual');
+  chavesExatas(critica, ['formato', 'versao', 'achados'], quem, 'crítica visual');
+  if (critica.formato !== FORMATO_ACHADOS_VISUAIS || critica.versao !== VERSAO_ACHADOS_VISUAIS) {
+    erro(quem, 'formato ou versão não suportados.');
+  }
+  if (!Array.isArray(critica.achados)) erro(quem, "'achados' precisa ser lista.");
+  const itens = critica.achados.map((achado) => validarAchadoVisual(achado, { vistasOficiais }));
+  const identidades = new Set();
+  for (const achado of itens) {
+    const identidade = `${achado.alvo.tipo}\u0000${achado.alvo.id}\u0000${achado.vista}\u0000${achado.observacao}`;
+    if (identidades.has(identidade)) erro(quem, 'achados repetem o mesmo alvo, vista e observação.');
+    identidades.add(identidade);
+  }
+  itens.sort((a, b) => {
+    const chaveA = `${a.alvo.tipo}\u0000${a.alvo.id}\u0000${a.vista}\u0000${a.observacao}`;
+    const chaveB = `${b.alvo.tipo}\u0000${b.alvo.id}\u0000${b.vista}\u0000${b.observacao}`;
+    return compararTexto(chaveA, chaveB);
+  });
+  return { formato: FORMATO_ACHADOS_VISUAIS, versao: VERSAO_ACHADOS_VISUAIS, achados: itens };
 }
 
 /**
@@ -667,6 +790,7 @@ export function compararRevisoes(revisaoAnterior, revisaoAtual, criticaAnterior 
     materiais: mudarMapas(anterior.modelo.aparencia?.materiais ?? [], atual.modelo.aparencia?.materiais ?? [], (item) => item.nome),
     partes: mudarMapas(anterior.modelo.aparencia?.partes ?? [], atual.modelo.aparencia?.partes ?? [], (item) => item.nome),
   };
+  const intencao = compararIntencoes(anterior.modelo.intencao ?? null, atual.modelo.intencao ?? null);
   const geometriaPartes = mudarMapas(
     anterior.modelo.geometria?.partes ?? [], atual.modelo.geometria?.partes ?? [], (item) => item.nome,
   );
@@ -699,6 +823,7 @@ export function compararRevisoes(revisaoAnterior, revisaoAtual, criticaAnterior 
     relacoes,
     portas,
     aparencia,
+    intencao,
     geometria,
     contagens,
     criticaAnterior: criticaAnterior === null ? null : marcarCriticaObsoleta(criticaAnterior, atual.assinaturaModelo),

@@ -11,6 +11,44 @@ Uma referência visual não deve virar uma ordem genérica como “faça mais
 realista”. Antes de modelar, ela vira um **briefing da peça**: um artefato curto,
 específico daquela tarefa, com regiões, relações e enquadramentos observáveis.
 
+## Contrato mínimo de achado reexecutável
+
+`mecanifica.critica-modelagem` continua sendo o formato histórico de crítica
+ligado a uma revisão de peça e a um checklist. Para observações que precisam
+atravessar peças, montagens e domínios, o mesmo módulo oferece o contrato puro
+`mecanifica.achados-critica-visual` (`versao: 1`). Ele não abre a bancada, não
+conhece o domínio do alvo e não guarda caminho de arquivo, UUID, índice ou
+relógio.
+
+Cada item declara somente:
+
+```json
+{
+  "alvo": {"tipo": "montagem", "id": "conjunto-neutro"},
+  "vista": "direita",
+  "severidade": "alta",
+  "observacao": "A transição entre os dois volumes perde continuidade visível na vista lateral.",
+  "evidencia": {"tipo": "render", "hash": "sha256:..."},
+  "decisao": "corrigir",
+  "estado": "aberto",
+  "vinculo": {"antes": "sha256:...", "depois": null}
+}
+```
+
+`evidencia` e seu `hash` são opcionais; quando ausente, a validação devolve
+`evidencia: null`. O vínculo antes/depois é obrigatório e exige ao menos um
+hash SHA-256 do marco comparado — por exemplo, render, imagem ou assinatura de
+modelo. Vistas precisam pertencer ao conjunto oficial informado pelo host (as
+sete vistas da bancada são o padrão); alvo, decisão, estado, severidade e tipo
+de evidência têm vocabulário fechado. Observações vagas, hashes inválidos,
+alvos não semânticos, campos extras, duplicatas e vínculos vazios são recusados.
+
+`validarCriticaVisual` canonicaliza todos os objetos e ordena os achados por
+alvo, vista e observação. Assim, duas execuções sobre a mesma evidência
+produzem o mesmo JSON, mesmo que o agente tenha enviado os itens em ordem
+diferente. Os hashes `antes`/`depois` relacionam a crítica a marcos comparáveis
+sem transformar uma crítica em autorização automática de alteração.
+
 Instruções ajudam a IA a notar um problema; não substituem uma operação
 geométrica que a linguagem ainda não possui. Toda divergência encontrada é
 classificada como:

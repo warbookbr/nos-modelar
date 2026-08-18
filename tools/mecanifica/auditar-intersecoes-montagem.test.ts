@@ -36,8 +36,8 @@ function anelQuadrado() {
 }
 
 function montagem(instancias: any[]) {
-  return { id: 'raiz', instancias: instancias.map(({ id, neutro, deslocamento = [0, 0, 0] }) => ({
-    id, caminho: [id], alvo: { tipo: 'peca', ref: id }, definicao: { neutro }, poseMundo: pose(deslocamento),
+  return { id: 'raiz', instancias: instancias.map(({ id, neutro, caminho = [id], deslocamento = [0, 0, 0] }) => ({
+    id, caminho, alvo: { tipo: 'peca', ref: id }, definicao: { neutro }, poseMundo: pose(deslocamento),
   })) };
 }
 
@@ -91,6 +91,29 @@ describe('auditarIntersecoesMontagem', () => {
       expect.objectContaining({ a: ['aberta'], b: ['sobreposta'], estado: 'inconclusivo' }),
     ]);
     expect(resultado.cobertura.completa).toBe(false);
+  });
+
+  it('mantém foco incidente por padrão e permite restringir a pares internos', () => {
+    const montagemComFoco = montagem([
+      { id: 'foco-a', caminho: ['foco', 'a'], neutro: caixaNeutra([0, 0, 0], [1, 1, 1]) },
+      { id: 'foco-b', caminho: ['foco', 'b'], neutro: caixaNeutra([0.2, 0.2, 0.2], [1.2, 1.2, 1.2]) },
+      { id: 'externa', caminho: ['externa'], neutro: caixaNeutra([0.4, 0.4, 0.4], [1.4, 1.4, 1.4]) },
+    ]);
+    const incidente = auditarIntersecoesMontagem(montagemComFoco, { caminho: ['foco'] });
+    expect(incidente.escopo).toMatchObject({ caminho: ['foco'], modoFoco: 'incidente', paresOmitidosPorFoco: 0 });
+    expect(incidente.pares).toHaveLength(3);
+
+    const interno = auditarIntersecoesMontagem(montagemComFoco, { caminho: ['foco'], modoFoco: 'interno' });
+    expect(interno.escopo).toMatchObject({ caminho: ['foco'], modoFoco: 'interno', paresOmitidosPorFoco: 2 });
+    expect(interno.pares).toHaveLength(1);
+    expect(interno.pares[0]).toMatchObject({ a: ['foco', 'a'], b: ['foco', 'b'], estado: 'interpenetram' });
+    expect(interno.cobertura).toMatchObject({ paresTotais: 3, paresNoEscopo: 1, paresVerificados: 1, inconclusivos: 0, completa: false });
+  });
+
+  it('recusa modo de foco desconhecido', () => {
+    expect(() => auditarIntersecoesMontagem(montagem([
+      { id: 'a', neutro: caixaNeutra([0, 0, 0], [1, 1, 1]) },
+    ]), { caminho: ['a'], modoFoco: 'vizinhos' as any })).toThrow(/modoFoco/);
   });
 
   it('expande montagem recursiva e mantém caminhos semânticos', () => {

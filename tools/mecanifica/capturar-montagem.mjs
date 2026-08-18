@@ -3,7 +3,12 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-export const VISTAS_MONTAGEM = Object.freeze(['isometrica', 'frontal', 'direita', 'superior']);
+/* Montagens aceitam o mesmo conjunto ortográfico da bancada. A revisão
+   canônica continua escolhendo quatro vistas; esta porta de inspeção precisa
+   também alcançar verso, lado oposto e fundo de um sistema composto. */
+export const VISTAS_MONTAGEM = Object.freeze([
+  'isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior',
+]);
 
 class ErroCapturaMontagem extends Error {
   constructor(codigo, mensagem) {

@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço JavaScript público, exercitado pelo contrato.
-import { derivarImpactoMontagem, ErroImpactoMontagem } from '../../src/autoria/derivar-impacto-montagem.js';
+import { derivarImpactoDefinicaoMontagem, derivarImpactoMontagem, ErroImpactoMontagem } from '../../src/autoria/derivar-impacto-montagem.js';
 // @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 
@@ -31,6 +31,26 @@ function autoria(ordemInvertida = false) {
     formato: 'mecanifica.montagem', versao: 3, id: 'corrente',
     instancias: ordemInvertida ? instancias.reverse() : instancias,
     relacoes: ordemInvertida ? relacoes.reverse() : relacoes,
+  };
+}
+
+function autoriaComPecaCompartilhadaQuatroVezes() {
+  return {
+    formato: 'mecanifica.montagem', versao: 3, id: 'quatro-consumidores',
+    instancias: [
+      { id: 'a', alvo: { tipo: 'peca', ref: 'bloco' }, pose: pose(0) },
+      { id: 'b', alvo: { tipo: 'peca', ref: 'bloco' }, pose: pose(1.02) },
+      { id: 'c', alvo: { tipo: 'peca', ref: 'bloco' }, pose: pose(2.04) },
+      { id: 'd', alvo: { tipo: 'peca', ref: 'bloco' }, pose: pose(3.06) },
+      { id: 'e', alvo: { tipo: 'peca', ref: 'externa' }, pose: pose(4.08) },
+      { id: 'f', alvo: { tipo: 'peca', ref: 'externa' }, pose: pose(5.10) },
+    ],
+    relacoes: [
+      relacao('aComB', 'a', 'b'),
+      relacao('cComD', 'c', 'd'),
+      relacao('dComE', 'd', 'e'),
+      relacao('eComF', 'e', 'f'),
+    ],
   };
 }
 
@@ -95,6 +115,49 @@ describe('derivarImpactoMontagem — R02', () => {
       expect(erro).toBeInstanceOf(ErroImpactoMontagem);
       expect(erro).toMatchObject({ codigo: 'alvo-ausente', campo: 'alvo.caminho' });
       expect((erro as any).acao).toContain('caminhos');
+    }
+  });
+
+  it('localiza os quatro consumidores de uma definição e propaga relações relevantes', async () => {
+    const mapa = derivarImpactoDefinicaoMontagem(
+      await resolver(autoriaComPecaCompartilhadaQuatroVezes()),
+      { tipo: 'peca', ref: 'bloco' },
+    );
+
+    expect(mapa.alvo).toEqual({ tipo: 'peca', ref: 'bloco' });
+    expect(mapa.consumidoresDefinicao.map((item: any) => item.caminho)).toEqual([
+      ['a'], ['b'], ['c'], ['d'],
+    ]);
+    expect(mapa.caminhosIniciais).toEqual([
+      ['a'], ['b'], ['c'], ['d'],
+    ]);
+    expect(mapa.relacoesDiretas.map((item: any) => item.id)).toEqual([
+      'aComB', 'cComD', 'dComE',
+    ]);
+    expect(mapa.relacoesIndiretas.map((item: any) => item.id)).toEqual(['eComF']);
+    expect(mapa.instanciasRelacionadas).toEqual([
+      { caminho: ['e'], origem: 'direta' },
+      { caminho: ['f'], origem: 'indireta' },
+    ]);
+    expect(mapa.montagensARevalidar).toEqual([{ caminho: [] }]);
+    expect(mapa.limitacoes).toContain('uso-global-fora-da-raiz-nao-verificado');
+  });
+
+  it('falha fechado quando uma definição não é consumida pela raiz', async () => {
+    const resolvida = await resolver(autoriaComPecaCompartilhadaQuatroVezes());
+    expect(() => derivarImpactoDefinicaoMontagem(
+      resolvida,
+      { tipo: 'peca', ref: 'ausente' },
+    )).toThrow();
+    try {
+      derivarImpactoDefinicaoMontagem(
+        resolvida,
+        { tipo: 'peca', ref: 'ausente' },
+      );
+    } catch (erro) {
+      expect(erro).toBeInstanceOf(ErroImpactoMontagem);
+      expect(erro).toMatchObject({ codigo: 'definicao-nao-usada', campo: 'alvo.ref' });
+      expect((erro as any).acao).toContain('catálogo');
     }
   });
 });

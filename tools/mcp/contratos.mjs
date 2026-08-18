@@ -108,7 +108,9 @@ export const renderizarEntrada = z.object({ peca }).strict();
 
 const caminhoMontagem = z.array(nomeParte).max(64);
 const idMontagem = slug;
-const vistaMontagem = z.enum(['isometrica', 'frontal', 'direita', 'superior']);
+const vistaMontagem = z.enum([
+  'isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior',
+]);
 
 export const descreverMontagemEntrada = z.object({
   id: idMontagem,
@@ -119,7 +121,10 @@ export const descreverMontagemEntrada = z.object({
 
 export const revalidarMontagemEntrada = z.object({
   id: idMontagem,
-  alvo: caminhoMontagem.min(1),
+  alvo: z.union([
+    caminhoMontagem.min(1),
+    z.object({ tipo: z.enum(['peca', 'montagem']), ref: slug }).strict(),
+  ]),
 }).strict();
 
 export const catalogarMontagensEntrada = z.object({
@@ -135,6 +140,7 @@ export const renderizarMontagemEntrada = z.object({
 export const revisarMontagemEntrada = z.object({
   id: idMontagem,
   caminho: caminhoMontagem.optional(),
+  modoFoco: z.enum(['incidente', 'interno']).optional(),
   vistas: z.array(vistaMontagem).min(1).max(4).optional(),
   incluirRelacionados: z.boolean().optional(),
 }).strict();
@@ -397,7 +403,16 @@ export const descreverMontagemSaida = z.object({
 const roteiroRevalidacao = z.object({
   formato: z.literal('mecanifica.roteiro-revalidacao'),
   versao: z.literal(1),
-  alvo: z.object({ caminho: caminhoMontagem }).strict(),
+  alvo: z.union([
+    z.object({ caminho: caminhoMontagem }).strict(),
+    z.object({ tipo: z.enum(['peca', 'montagem']), ref: slug }).strict(),
+  ]),
+  consumidoresDefinicao: z.array(z.object({
+    caminho: caminhoMontagem,
+    id: nomeParte,
+    alvo: z.object({ tipo: z.enum(['peca', 'montagem']), ref: slug }).strict(),
+  }).strict()).optional(),
+  caminhosIniciais: z.array(caminhoMontagem).optional(),
   montagensARevalidar: z.array(z.object({ caminho: caminhoMontagem }).strict()),
   itens: z.array(z.json()),
   pendencias: z.array(z.object({ codigo: z.string(), executavel: z.literal(false), acao: z.string() }).strict()),

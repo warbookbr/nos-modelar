@@ -87,6 +87,18 @@ function validarEntrada(raiz, alvo) {
   }
 }
 
+function validarAlvoDefinicao(raiz, alvo) {
+  if (!raiz || !Array.isArray(raiz.instancias)) {
+    falhar('montagem-resolvida-invalida', 'raiz', 'a árvore resolvida precisa trazer instâncias.',
+      'Resolva a montagem persistida antes de derivar impacto.');
+  }
+  if (!alvo || (alvo.tipo !== 'peca' && alvo.tipo !== 'montagem')
+    || typeof alvo.ref !== 'string' || alvo.ref.length === 0) {
+    falhar('definicao-alvo-invalida', 'alvo', 'informe tipo peca ou montagem e uma referência semântica não vazia.',
+      'Use { tipo: "peca" | "montagem", ref } para consultar uma definição.');
+  }
+}
+
 function adicionarMontagemEAncestrais(destino, caminho, montagens) {
   destino.add(chave([]));
   for (let tamanho = 1; tamanho <= caminho.length; tamanho += 1) {
@@ -95,19 +107,16 @@ function adicionarMontagemEAncestrais(destino, caminho, montagens) {
   }
 }
 
-export function derivarImpactoMontagem(raiz, alvo) {
-  validarEntrada(raiz, alvo);
-  const arvore = coletarArvore(raiz);
-  const instanciaAlvo = arvore.instancias.find((instancia) =>
-    compararCaminhos(instancia.caminho, alvo.caminho) === 0);
-  if (!instanciaAlvo) {
-    falhar('alvo-ausente', 'alvo.caminho', `a instância '${alvo.caminho.join('/')}' não existe.`,
-      'Consulte os caminhos da árvore resolvida e escolha uma instância existente.');
-  }
-
-  const iniciais = new Set(arvore.instancias
-    .filter((instancia) => caminhoComecaCom(instancia.caminho, alvo.caminho))
-    .map((instancia) => chave(instancia.caminho)));
+function derivarImpactoComIniciais(raiz, arvore, {
+  alvoPublico,
+  caminhosIniciais,
+  caminhosParaRevalidar = caminhosIniciais,
+  consumidoresDefinicao,
+} = {}) {
+  const caminhosOrdenados = caminhosIniciais
+    .map((caminho) => caminho.slice())
+    .sort(compararCaminhos);
+  const iniciais = new Set(caminhosOrdenados.map((caminho) => chave(caminho)));
   const alcancadas = new Set(iniciais);
   const classificadas = new Set();
   const diretas = [];
@@ -142,7 +151,9 @@ export function derivarImpactoMontagem(raiz, alvo) {
   }
 
   const montagensARevalidar = new Set();
-  adicionarMontagemEAncestrais(montagensARevalidar, alvo.caminho, arvore.montagens);
+  for (const caminho of caminhosParaRevalidar) {
+    adicionarMontagemEAncestrais(montagensARevalidar, caminho, arvore.montagens);
+  }
   for (const item of [...diretas, ...indiretas]) {
     adicionarMontagemEAncestrais(montagensARevalidar, item.montagem, arvore.montagens);
   }
@@ -161,7 +172,15 @@ export function derivarImpactoMontagem(raiz, alvo) {
     formato: 'mecanifica.impacto-montagem',
     versao: 1,
     raiz: { id: raiz.id },
-    alvo: { caminho: alvo.caminho.slice() },
+    alvo: alvoPublico,
+    ...(consumidoresDefinicao ? {
+      caminhosIniciais: caminhosOrdenados,
+      consumidoresDefinicao: consumidoresDefinicao.map((consumidor) => ({
+        caminho: consumidor.caminho.slice(),
+        id: consumidor.id,
+        alvo: { ...consumidor.alvo },
+      })),
+    } : {}),
     relacoesDiretas: diretas.map(relacaoPublica),
     relacoesIndiretas: indiretas.map(relacaoPublica),
     instanciasRelacionadas: relacionadas,
@@ -171,4 +190,57 @@ export function derivarImpactoMontagem(raiz, alvo) {
       'dependencia-interna-de-porta-nao-inferida',
     ],
   };
+}
+
+export function derivarImpactoMontagem(raiz, alvo) {
+  validarEntrada(raiz, alvo);
+  const arvore = coletarArvore(raiz);
+  const instanciaAlvo = arvore.instancias.find((instancia) =>
+    compararCaminhos(instancia.caminho, alvo.caminho) === 0);
+  if (!instanciaAlvo) {
+    falhar('alvo-ausente', 'alvo.caminho', `a instância '${alvo.caminho.join('/')}' não existe.`,
+      'Consulte os caminhos da árvore resolvida e escolha uma instância existente.');
+  }
+
+  const caminhosIniciais = arvore.instancias
+    .filter((instancia) => caminhoComecaCom(instancia.caminho, alvo.caminho))
+    .map((instancia) => instancia.caminho);
+  return derivarImpactoComIniciais(raiz, arvore, {
+    alvoPublico: { caminho: alvo.caminho.slice() },
+    caminhosIniciais,
+    // Preserva o contrato histórico do alvo por caminho: somente a instância
+    // escolhida e os declarantes de relação acrescentam escopos de montagem.
+    // O alvo por definição, abaixo, encaminha intencionalmente cada consumidor.
+    caminhosParaRevalidar: [alvo.caminho],
+  });
+}
+
+/**
+ * Deriva o impacto local de uma definição semântica compartilhada.
+ *
+ * Todas as instâncias da definição dentro da raiz são pontos iniciais. Para
+ * uma montagem, sua subárvore também é inicial: alterar a definição pode
+ * alterar qualquer consumidor descendente, inclusive montagens aninhadas.
+ * A busca é deliberadamente limitada à árvore resolvida recebida.
+ */
+export function derivarImpactoDefinicaoMontagem(raiz, alvo) {
+  validarAlvoDefinicao(raiz, alvo);
+  const arvore = coletarArvore(raiz);
+  const consumidoresDefinicao = arvore.instancias
+    .filter((instancia) => instancia.alvo.tipo === alvo.tipo && instancia.alvo.ref === alvo.ref)
+    .sort((a, b) => compararCaminhos(a.caminho, b.caminho));
+  if (consumidoresDefinicao.length === 0) {
+    falhar('definicao-nao-usada', 'alvo.ref', `a definição '${alvo.tipo}:${alvo.ref}' não é usada nesta raiz.`,
+      'Consulte um catálogo de usos ou forneça uma raiz que contenha consumidores da definição.');
+  }
+
+  const caminhosIniciais = arvore.instancias
+    .filter((instancia) => consumidoresDefinicao.some((consumidor) =>
+      caminhoComecaCom(instancia.caminho, consumidor.caminho)))
+    .map((instancia) => instancia.caminho);
+  return derivarImpactoComIniciais(raiz, arvore, {
+    alvoPublico: { tipo: alvo.tipo, ref: alvo.ref },
+    caminhosIniciais,
+    consumidoresDefinicao,
+  });
 }

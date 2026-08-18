@@ -1,6 +1,9 @@
 /* derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas. */
 
-import { derivarImpactoMontagem } from './derivar-impacto-montagem.js';
+import {
+  derivarImpactoDefinicaoMontagem,
+  derivarImpactoMontagem,
+} from './derivar-impacto-montagem.js';
 
 function acaoDaRelacao(relacao) {
   return relacao.satisfeita
@@ -31,7 +34,9 @@ function item(relacao, alcance) {
  * de uma alteração e quais limites continuam pendentes fora da raiz recebida.
  */
 export function derivarRoteiroRevalidacao(montagemResolvida, alvo) {
-  const impacto = derivarImpactoMontagem(montagemResolvida, alvo);
+  const impacto = alvo?.tipo
+    ? derivarImpactoDefinicaoMontagem(montagemResolvida, alvo)
+    : derivarImpactoMontagem(montagemResolvida, alvo);
   const itens = [
     ...impacto.relacoesDiretas.map((relacao) => item(relacao, 'direta')),
     ...impacto.relacoesIndiretas.map((relacao) => item(relacao, 'indireta')),
@@ -40,6 +45,10 @@ export function derivarRoteiroRevalidacao(montagemResolvida, alvo) {
     formato: 'mecanifica.roteiro-revalidacao',
     versao: 1,
     alvo: impacto.alvo,
+    ...(impacto.consumidoresDefinicao ? {
+      consumidoresDefinicao: impacto.consumidoresDefinicao,
+      caminhosIniciais: impacto.caminhosIniciais,
+    } : {}),
     montagensARevalidar: impacto.montagensARevalidar,
     itens,
     pendencias: impacto.limitacoes.map((codigo) => ({

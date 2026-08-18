@@ -50,6 +50,32 @@ derivarImpactoMontagem(montagemResolvida, {
 })
 ```
 
+Quando uma definição é reutilizada, a mesma API oferece um alvo semântico
+independente de caminho:
+
+```js
+derivarImpactoDefinicaoMontagem(montagemResolvida, {
+  tipo: 'peca', // ou 'montagem'
+  ref: 'parafuso',
+})
+```
+
+Essa consulta localiza todos os consumidores da definição dentro da raiz. A
+saída conserva `alvo: { tipo, ref }` e acrescenta `consumidoresDefinicao` (os
+caminhos que referenciam diretamente a definição) e `caminhosIniciais` (esses
+consumidores e suas subárvores, quando houver). Relações tocadas por qualquer
+consumidor entram no fecho direto/indireto e todos os declarantes/ancestrais
+necessários aparecem em `montagensARevalidar`. Se a definição não for usada na
+raiz, a operação falha com `definicao-nao-usada` e uma ação explícita, em vez de
+retornar um impacto vazio que poderia ser confundido com cobertura global.
+
+Como o serviço continua limitado à árvore resolvida recebida, a limitação
+`uso-global-fora-da-raiz-nao-verificado` permanece presente. Um catálogo global
+ou outra raiz deve ser consultado separadamente para descobrir usos externos.
+Pela porta MCP, `planejar_revalidacao_montagem` aceita o alvo antigo como lista
+de caminhos ou `{ tipo, ref }` para uma definição compartilhada e devolve os
+mesmos consumidores e caminhos iniciais no roteiro.
+
 A saída serializável usa `formato: mecanifica.impacto-montagem`, `versao: 1` e
 separa:
 
