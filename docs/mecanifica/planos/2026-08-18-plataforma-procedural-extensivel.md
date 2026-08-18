@@ -10,7 +10,8 @@
 R02: registro explícito; R03: operações fora do núcleo; R04: artefato, efeitos,
 identidade, procedência e grafo, sem mudar receita ou canônico; R05: catálogo,
 busca, explicação, hipergrafo e projeções geradas do registro; R06: composições
-declarativas, reutilização, tipos, orçamento e procedência sem receita pública.
+declarativas, reutilização, tipos, orçamento e procedência sem receita pública;
+R07: SDK nativo confinado, extensão de prova e diagnóstico de ausência.
 
 ## Objetivo verificável
 

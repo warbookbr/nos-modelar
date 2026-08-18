@@ -397,6 +397,16 @@ function addF(st, id, vs) {
   st.F.set(id, Face(id, vs));
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
+function contextoNativo(st, i) {
+  const vertices = new Map(), faces = new Map(), base = baseDoPasso(i);
+  const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO - 1}`); return id; };
+  return Object.freeze({
+    numero: (valor) => st.num(valor), vetor: (valor) => st.vec(valor),
+    emitirVertice(id, ponto) { id = local(id, 'vértice'); if (vertices.has(id)) throw new Error(`vértice local ${id} duplicado`); vertices.set(id, st.vec(ponto)); },
+    emitirFace(id, vs) { id = local(id, 'face'); if (faces.has(id) || !Array.isArray(vs) || vs.length < 3 || new Set(vs).size !== vs.length || vs.some((v) => !vertices.has(v))) throw new Error(`face local ${id} inválida`); faces.set(id, vs.slice()); },
+    publicar() { for (const [id, ponto] of vertices) addV(st, base + id, ponto); for (const [id, vs] of faces) addF(st, base + id, vs.map((v) => base + v)); },
+  });
+}
 
 /* CONTRATO DE IDENTIDADE DE PARTE — a ÚNICA definição de "esta face tem nome".
    Existe porque a revisão da R2 achou TRÊS respostas diferentes para a mesma
@@ -2519,7 +2529,7 @@ function portasDoNucleo(portas) {
    `dict` funde PARAMS e TOPO — os passos citam o NOME (raio: 'troncoR'), então
    trocar o valor reconstrói sem tocar em número nenhum da lista.
 ---------------------------------------------------------------------------- */
-export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = []) {
+export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = [], OPCOES = {}) {
   const dict = { ...PARAMS, ...TOPO };
   const { num } = criarResolverNumerico(dict);
   /* ponto 3D SEMPRE: sem a guarda de aridade, `[0,1]` passava e o z virava
@@ -2591,7 +2601,9 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
-    const registrada = REGISTRO_OPERACOES.resolver(op);
+    const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
+    if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
+    const registrada = registro.resolver(op);
     if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
@@ -2605,7 +2617,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
-    fn(st, args, i);
+    if (fn.nativaMecanifica) { try { const contexto = contextoNativo(st, i); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
+    else fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
     const mudou = (antes, depois) => [...depois].filter(([id, valor]) => antes.get(id) !== JSON.stringify(valor)).map(([id]) => id).sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
     registrarProcedencia(st.procedencia, {

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-377 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+383 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -155,6 +155,7 @@
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
+- `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
@@ -281,6 +282,12 @@
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
 
+## prototipos/procedural/v3/extensoes/prisma-triangular/
+
+- `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
+- `implementacao.js` — implementacao.js — recebe somente emissor transacional e resolução numérica.
+- `manifesto.js` — manifesto.js — contrato versionado da extensão neutra de prova.
+
 ## prototipos/procedural/v3/motor/
 
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
@@ -290,6 +297,7 @@
 - `composicoes.js` — composicoes.js — subgrafos procedurais declarativos, sem estado global ou I/O.
 - `executor.js` — executor.js — orquestra núcleo, adaptador e animação sem duplicar execução.
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
+- `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
 - `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
@@ -526,6 +534,7 @@
 - `corpus-motor-r00.mjs` — Corpus sintético da R00. Cada caso dá uma entrada mínima e independente a uma capacidade do núcleo; ele congela o resultado observável, não a sua implementaç…
 - `corpus-motor-r00.test.mjs` — Guarda determinismo e compatibilidade da linha de base R00 do núcleo.
 - `expressoes.test.ts` — expressoes.test.ts — contrato da aritmética fechada de PARAMS/TOPO (O-5).
+- `extensoes-nativas.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
 - `filete-v2-aceitacao.mjs` — filete-v2-aceitacao.mjs — gate de descoberta do arredondamento real. Não entra em `npm test` enquanto o v2 não existir: hoje ele precisa FALHAR, exibindo a l…
 - `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
 - `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
