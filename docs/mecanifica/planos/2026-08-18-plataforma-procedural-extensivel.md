@@ -11,6 +11,8 @@
 núcleo, adaptador, animação e executor têm implementação única separada.
 R02 concluída: as 32 operações são registradas por configuração explícita,
 versionada e assinada antes do despacho.
+R03 em execução: primitivas básicas começaram a sair para módulos com
+dependências explícitas, sem segundo executor.
 
 ## Objetivo verificável
 

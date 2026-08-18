@@ -27,13 +27,13 @@ function importsDo(texto) {
 
 function operacoesDo(texto) {
   const inicio = texto.indexOf('export const OPS = {');
-  if (inicio < 0) throw new Error('OPS não encontrado na fachada procedural.');
-  const trecho = texto.slice(inicio);
+  const base = inicio < 0 ? 0 : inicio;
+  const trecho = texto.slice(base);
   const achados = [...trecho.matchAll(/^  ([a-zA-Z][\w]*)\(st, a, i\) \{/gm)];
   return achados.map((m, indice) => {
-    const posicao = inicio + m.index;
+    const posicao = base + m.index;
     const proxima = achados[indice + 1];
-    const fim = proxima ? inicio + proxima.index : texto.indexOf('\n};', posicao);
+    const fim = proxima ? base + proxima.index : texto.indexOf('\n};', posicao);
     return { nome: m[1], linhaInicial: linhaDe(texto, posicao), linhas: linhaDe(texto, fim) - linhaDe(texto, posicao) };
   });
 }
@@ -52,7 +52,8 @@ function exportsDaFachada(texto) {
 export function mapearMotorProcedural() {
   const fonte = readFileSync(arquivoNucleo, 'utf8');
   const fachada = readFileSync(arquivoFachada, 'utf8');
-  const moduloMotor = arquivosSob(resolve(raiz, 'prototipos/procedural/v3/motor')).map(rel).sort();
+  const arquivosDoMotor = arquivosSob(resolve(raiz, 'prototipos/procedural/v3/motor'));
+  const moduloMotor = arquivosDoMotor.map(rel).sort();
   const consumidores = arquivosSob(raiz)
     .filter((arquivo) => arquivo !== arquivoNucleo && /\.(?:[cm]?[jt]sx?)$/.test(arquivo))
     .filter((arquivo) => readFileSync(arquivo, 'utf8').includes('motor/oficina.js'))
@@ -64,7 +65,7 @@ export function mapearMotorProcedural() {
     fonte: { arquivo: rel(arquivoNucleo), sha256: createHash('sha256').update(fonte).digest('hex'), linhas: fonte.split('\n').length },
     exportacoes: exportsDaFachada(fachada),
     exportacoesInternasDoNucleo: exportsDo(fonte),
-    operacoes: operacoesDo(fonte),
+    operacoes: arquivosDoMotor.flatMap((arquivo) => operacoesDo(readFileSync(arquivo, 'utf8'))).sort((a, b) => a.nome < b.nome ? -1 : a.nome > b.nome ? 1 : 0),
     dependenciasDiretas: importsDo(fonte),
     modulosDoMotor: moduloMotor,
     consumidores,
