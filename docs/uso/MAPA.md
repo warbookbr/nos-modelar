@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-363 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+367 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -292,9 +292,13 @@
 
 ## prototipos/procedural/v3/motor/operacoes/
 
+- `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
+- `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `geradores-avancados.js` — geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
+- `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 
 ## src/autoria/
 

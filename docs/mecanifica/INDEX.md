@@ -67,8 +67,8 @@ aplicação publicada aqui.
   `oficina.js` é a fachada compatível; núcleo, adaptador, animação e executor
   têm implementação única separada. A R02 foi concluída: o despacho passa por
   registro explícito, versionado e determinístico das 32 operações. Não haverá
-  cópia `legacy` nem segundo executor. A R03 está em execução: as operações
-  passam a sair do núcleo por grupos com dependências explícitas.
+  cópia `legacy` nem segundo executor. A R03 foi concluída: as operações vivem
+  em grupos com dependências explícitas e o núcleo não contém seus corpos.
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
