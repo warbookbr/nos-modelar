@@ -81,6 +81,8 @@ aplicação publicada aqui.
   A R08 foi concluída: lacunas persistíveis e planejamento determinístico
   distinguem cadeia existente, candidato a operação nativa e necessidade de
   representação por evidência explícita, sem promoção automática.
+  A R09 foi concluída: o mesmo serviço puro de descoberta é exposto por recursos
+  e ferramentas MCP de leitura, provado por cliente externo sem escrita.
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
@@ -204,8 +206,10 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 16. [`EXTENSOES-NATIVAS-V1.md`](EXTENSOES-NATIVAS-V1.md) para extensões nativas.
 17. [`LACUNAS-DE-CAPACIDADE-V1.md`](LACUNAS-DE-CAPACIDADE-V1.md) para registrar
     e planejar uma capacidade ausente sem criar extensão automaticamente.
-18. `docs/uso/MAPA.md` para o inventário gerado.
-19. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
+18. [`SERVICOS-PROCEDURAL-V1.md`](SERVICOS-PROCEDURAL-V1.md) para descoberta e
+    exposição MCP do vocabulário procedural.
+19. `docs/uso/MAPA.md` para o inventário gerado.
+20. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
 ## Leitura por tarefa
 
@@ -225,6 +229,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
   capacidades; não confundir composição de passos com montagem de peças.
 - Capacidade ausente: `LACUNAS-DE-CAPACIDADE-V1.md` e o catálogo gerado; planeje
   primeiro, classifique com evidência e só então abra recorte de implementação.
+- Descoberta MCP: `SERVICOS-PROCEDURAL-V1.md`; leia o catálogo, combine e valide
+  em memória antes de propor extensão ou registrar lacuna.
 - Peça nova ou refinamento: `AUTORIA-IA.md`, `PERFIS-DE-AUTORIA.md`,
   `REFERENCIA-E-CRITICA-VISUAL.md`, `FLUXO-MODELAGEM-IA.md` e
   `BANCADA-E-APRESENTACAO.md`.
@@ -402,5 +408,7 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 <!-- Contrato R07 alcançável: docs/mecanifica/EXTENSOES-NATIVAS-V1.md -->
 
 <!-- Contrato R08 alcançável: docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md -->
+
+<!-- Contrato R09 alcançável: docs/mecanifica/SERVICOS-PROCEDURAL-V1.md -->
 
 <!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-386 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+390 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -179,6 +179,7 @@
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
+- `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
@@ -319,6 +320,10 @@
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 
+## prototipos/procedural/v3/servicos/
+
+- `descoberta.js` — descoberta.js — porta neutra de descoberta procedural; sem I/O, MCP ou visor.
+
 ## src/autoria/
 
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
@@ -417,6 +422,7 @@
 - `contratos.mjs` — contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura.
 - `ensaio-ponta-a-ponta.test.mjs` — ensaio-ponta-a-ponta.test.mjs — três peças privadas exercitando o MCP real.
 - `mcp.test.mjs` — mcp.test.mjs — contrato real de stdio, catálogo, recursos e ferramentas MCP.
+- `procedural.test.mjs` — procedural.test.mjs — R09: serviço puro e consumo MCP externo usam a mesma lógica.
 - `servidor.mjs` — servidor.mjs — servidor MCP local stdio com revisão e autoria opt-in.
 - `universo-dependencias.mjs` — universo-dependencias.mjs — universo canônico confiável para leitura MCP.
 - `universo-dependencias.test.mjs` — universo-dependencias.test.mjs — provas do adaptador MCP do mapa global.
@@ -435,6 +441,7 @@
 - `autoria-receitas.test.mjs` — Contrato fino da porta MCP de autoria declarativa.
 - `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
+- `procedural.mjs` — procedural.mjs — adaptador MCP fino sobre o serviço puro de descoberta.
 - `revalidacao.mjs` — revalidacao.mjs — porta MCP Agent-First sobre campanhas persistidas.
 - `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.
 - `revisao.mjs` — revisao.mjs — adaptador MCP fino para os serviços existentes de modelagem.

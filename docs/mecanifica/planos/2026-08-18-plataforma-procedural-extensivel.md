@@ -13,7 +13,7 @@ busca, explicação, hipergrafo e projeções geradas do registro; R06: composi�
 declarativas, reutilização, tipos, orçamento e procedência sem receita pública;
 R07: SDK nativo confinado, extensão de prova e diagnóstico de ausência; R08:
 lacuna persistível, planejamento determinístico por artefatos, interfaces,
-requisitos e custo, com classificação sem promoção automática.
+requisitos e custo, com classificação sem promoção automática; R09: serviço procedural puro, recursos e ferramentas MCP de leitura e ensaio caixa-preta.
 ## Objetivo verificável
 
 Transformar o motor procedural numa plataforma modular que uma IA consiga

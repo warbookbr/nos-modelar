@@ -10,6 +10,7 @@ import { criarFerramentasImpactoGlobal } from './perfis/impacto-global.mjs';
 import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
+import { criarFerramentasProcedurais } from './perfis/procedural.mjs';
 import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
@@ -19,10 +20,12 @@ import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
+import { criarServicoDescobertaProcedural } from '../../prototipos/procedural/v3/servicos/descoberta.js';
 
-const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.5.0' });
+const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.6.0' });
 export const INSTRUCOES_AGENTE = [
   REGRA_ESCOPO_CATALOGO,
+  'Para descobrir o vocabulário procedural, leia mecanifica://procedural/catalogo ou use buscar_capacidades. Combine e valide contratos antes de propor extensão; uma lacuna ou extensão ausente não é autorização para instalar, escrever ou promover código.',
   'Para avaliar uma montagem, use revisar_montagem e reporte separadamente o estado retornado, as verificações declaradas, a auditoriaIntersecoes e o que permaneceu não verificado. Interpenetração reprova; inconclusivo não significa ausência de colisão; expectativa registrada explica intenção, mas não apaga o achado.',
   'Só declare que uma montagem está homologada quando uma fonte específica de homologação afirmar isso explicitamente.',
 ].join(' ');
@@ -62,6 +65,9 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
       'reunir verificações, cobertura e vistas de uma montagem em uma revisão',
       ...(universoDependencias.configurado ? ['consultar impacto global no universo canônico configurado'] : []),
       'produzir vistas de montagem ou subárvore em memória',
+      'consultar catálogo, grafo, schemas e contratos procedurais registrados',
+      'buscar, combinar e validar composições procedurais em memória',
+      'analisar lacunas e diagnosticar extensões sem instalar ou promover código',
       ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas', 'reler revisões ativas pelas ferramentas comuns'] : []),
     ],
     aindaNaoConsegue: perfil === 'autoria'
@@ -74,6 +80,7 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
       `catálogo de montagens configurado: ${catalogoMontagens.configurado ? 'sim' : 'não'}`,
       `universo canônico de dependências configurado: ${universoDependencias.configurado ? 'sim' : 'não'}`,
       'não executa shell, Git ou servidor HTTP',
+      'não instala extensão, não escreve receita e não promove capacidade procedural',
       ...(perfil === 'autoria'
         ? ['autoria exige perfil e repositório local opt-in do host']
         : ['não escreve em pacotes, revisões, fontes ou documentação']),
@@ -140,7 +147,7 @@ function registrarPerfil(server, ferramentas) {
 }
 
 function registrarRecursos(server, {
-  ferramentas, catalogoMontagens, universoDependencias, perfil, autoria, provedoresAutoria,
+  ferramentas, catalogoMontagens, universoDependencias, perfil, autoria, provedoresAutoria, servicoProcedural,
 }) {
   const estado = estadoDo(ferramentas, catalogoMontagens, universoDependencias, perfil, autoria);
   const capacidadesModelagem = capacidadesDo(catalogoMontagens, universoDependencias, perfil);
@@ -149,6 +156,24 @@ function registrarRecursos(server, {
     'mecanifica://estado',
     { title: 'Estado do servidor Mecanifica', description: 'Contrato e capacidades ativas.', mimeType: 'application/json' },
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(estado) }] }),
+  );
+  server.registerResource(
+    'catalogo-procedural',
+    'mecanifica://procedural/catalogo',
+    { title: 'Catálogo procedural', description: 'Contratos de operações registrados nesta configuração do motor.', mimeType: 'application/json' },
+    async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(servicoProcedural.catalogo()) }] }),
+  );
+  server.registerResource(
+    'grafo-procedural',
+    'mecanifica://procedural/grafo',
+    { title: 'Hipergrafo procedural', description: 'Relações de consumo e produção entre artefatos e operações registradas.', mimeType: 'application/json' },
+    async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(servicoProcedural.hipergrafo()) }] }),
+  );
+  server.registerResource(
+    'schemas-procedurais',
+    'mecanifica://procedural/schemas',
+    { title: 'Schemas procedurais', description: 'Schemas serializáveis dos contratos procedurais expostos pelo servidor.', mimeType: 'application/json' },
+    async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(servicoProcedural.schemas()) }] }),
   );
   server.registerResource(
     'resumo-dependencias-global',
@@ -267,6 +292,7 @@ export function criarServidor({
   autoria = autoriaDoAmbiente(catalogoMontagens, universoDependencias),
 } = {}) {
   const server = new McpServer(IDENTIDADE, { instructions: INSTRUCOES_AGENTE });
+  const servicoProcedural = criarServicoDescobertaProcedural();
   const idsUniverso = universoDependencias.ids();
   const provedoresAutoria = autoria.configurado
     ? criarProvedoresAutoriaAtiva({
@@ -293,6 +319,7 @@ export function criarServidor({
     ? criarFerramentasRevalidacao({ raizRepositorio: autoria.raizRepositorio, podeEscrever: perfil === 'autoria' })
     : [];
   const leitura = [
+    ...criarFerramentasProcedurais(servicoProcedural),
     ...criarFerramentasRevisao(catalogoAtivo),
     ...criarFerramentasMontagem(catalogoAtivo),
     ...criarFerramentasImpactoGlobal(universoAtivo),
@@ -309,6 +336,7 @@ export function criarServidor({
     universoDependencias: universoAtivo,
     autoria: contextoAutoria,
     provedoresAutoria,
+    servicoProcedural,
     perfil: perfilAutoria ? 'autoria' : PERFIL,
   });
   return server;

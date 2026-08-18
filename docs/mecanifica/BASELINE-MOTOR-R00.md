@@ -10,7 +10,7 @@ próximas rodadas.
 - Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
 - Foto após R08: 2.683 linhas no núcleo, SHA-256
   `2e1b2ce59a8edc023df5de9857e3c37da206c58263a83f1c486b48aff98497e4`,
-  fachada de 18 linhas, 24 módulos no diretório e 60 consumidores de código.
+  fachada de 18 linhas, 24 módulos no diretório e 61 consumidores de código.
 - Separação R01: núcleo geométrico e canônico em `nucleo.js`; projeção visual
   em `adaptador.js`; animação/skinning em `animacao.js`; orquestração em
   `executor.js`. A fachada passou a expor 19 entradas: as 16 compatíveis e o
@@ -31,6 +31,8 @@ próximas rodadas.
 - R08 concluída: lacunas serializáveis, planejamento estrutural determinístico
   por artefatos, interfaces, requisitos e custo, e classificação explicável;
   nenhum diagnóstico instala ou promove capacidade automaticamente.
+- R09 concluída: serviço puro reúne descoberta, composição, lacuna e extensão;
+  MCP expõe esse serviço sem duplicar regra e sem abrir escrita procedural.
 - Superfície pública: 48 exportações; `nucleo`, `neutroCanonico`, `executar` e
   `adaptarV3` são as entradas mais usadas pelos consumidores atuais.
 - Capacidades: 32 operações publicadas por `OPS`.

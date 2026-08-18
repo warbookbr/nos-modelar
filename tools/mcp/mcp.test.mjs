@@ -158,7 +158,7 @@ describe('servidor MCP local — perfil revisao', () => {
     });
     try {
       await client.connect(transport);
-      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
+      expect(client.getServerVersion()).toEqual({ name: 'mecanifica-mcp', version: '0.6.0' });
       expect(client.getNegotiatedProtocolVersion()).toBe(LATEST_PROTOCOL_VERSION);
       expect(client.getServerCapabilities()).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
@@ -168,10 +168,10 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   });
 
-  it('faz handshake bruto, anuncia dez tools e sete resources somente leitura', async () => {
+  it('faz handshake bruto, anuncia ferramentas e recursos somente leitura', async () => {
     const { cliente, inicializacao } = await conectado();
     try {
-      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.5.0' });
+      expect(inicializacao.result.serverInfo).toEqual({ name: 'mecanifica-mcp', version: '0.6.0' });
       expect(inicializacao.result.capabilities).toEqual({
         tools: { listChanged: true }, resources: { listChanged: true },
       });
@@ -183,10 +183,11 @@ describe('servidor MCP local — perfil revisao', () => {
       );
       const ferramentas = await cliente.enviar('tools/list');
       expect(ferramentas.result.tools.map((tool) => tool.name)).toEqual([
+        'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(10);
+      expect(ferramentas.result.tools).toHaveLength(16);
       expect(ferramentas.result.tools.find(({ name }) => name === 'revisar_montagem')?.description)
         .toContain('A listagem não é aprovação nem homologação.');
       for (const tool of ferramentas.result.tools) {
@@ -195,10 +196,10 @@ describe('servidor MCP local — perfil revisao', () => {
       }
       const recursos = await cliente.enviar('resources/list');
       expect(recursos.result.resources.map((resource) => resource.uri)).toEqual([
-        'mecanifica://estado', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
+        'mecanifica://estado', 'mecanifica://procedural/catalogo', 'mecanifica://procedural/grafo', 'mecanifica://procedural/schemas', 'mecanifica://dependencias', 'mecanifica://capacidades/modelagem',
         'mecanifica://pacotes', 'mecanifica://montagens', 'mecanifica://pecas', 'mecanifica://autoria',
       ]);
-      expect(recursos.result.resources).toHaveLength(7);
+      expect(recursos.result.resources).toHaveLength(10);
     } finally {
       await cliente.fechar();
     }
@@ -298,22 +299,29 @@ describe('servidor MCP local — perfil revisao', () => {
     const { cliente } = await conectado();
     try {
       const estado = await cliente.enviar('resources/read', { uri: 'mecanifica://estado' });
+      const catalogoProcedural = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/catalogo' });
+      const grafoProcedural = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/grafo' });
+      const schemasProcedurais = await cliente.enviar('resources/read', { uri: 'mecanifica://procedural/schemas' });
       const capacidades = await cliente.enviar('resources/read', { uri: 'mecanifica://capacidades/modelagem' });
       const pacotes = await cliente.enviar('resources/read', { uri: 'mecanifica://pacotes' });
       const dependencias = await cliente.enviar('resources/read', { uri: 'mecanifica://dependencias' });
       const montagens = await cliente.enviar('resources/read', { uri: 'mecanifica://montagens' });
       const pecas = await cliente.enviar('resources/read', { uri: 'mecanifica://pecas' });
       const estadoValor = JSON.parse(estado.result.contents[0].text);
+      const catalogoProceduralValor = JSON.parse(catalogoProcedural.result.contents[0].text);
+      const grafoProceduralValor = JSON.parse(grafoProcedural.result.contents[0].text);
+      const schemasProceduraisValor = JSON.parse(schemasProcedurais.result.contents[0].text);
       const capacidadesValor = JSON.parse(capacidades.result.contents[0].text);
       const pacotesValor = JSON.parse(pacotes.result.contents[0].text);
       const dependenciasValor = JSON.parse(dependencias.result.contents[0].text);
       const montagensValor = JSON.parse(montagens.result.contents[0].text);
       const pecasValor = JSON.parse(pecas.result.contents[0].text);
       expect(estadoValor).toMatchObject({
-        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v5',
+        perfil: 'revisao', transporte: 'stdio', contrato: 'mecanifica.mcp.revisao.v6',
         catalogoMontagensConfigurado: true, universoDependenciasConfigurado: true,
       });
       expect(estadoValor.ferramentas).toEqual([
+        'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
@@ -322,6 +330,10 @@ describe('servidor MCP local — perfil revisao', () => {
         'A presença no catálogo significa apenas que o host incluiu o ID no escopo de operações do MCP. Ela permite usar as ferramentas anunciadas pelo perfil atual; por si só, não comprova homologação, aprovação, validação completa nem ausência de falhas.',
       );
       expect(capacidadesValor.consegue).toContain('descobrir pacotes e revisões oficiais disponíveis');
+      expect(catalogoProceduralValor).toMatchObject({ formato: 'mecanifica.catalogo-capacidades@1', operacoes: expect.any(Array) });
+      expect(grafoProceduralValor).toMatchObject({ formato: 'mecanifica.hipergrafo-capacidades@1', hiperarestas: expect.any(Array) });
+      expect(schemasProceduraisValor).toMatchObject({ lacuna: { $id: 'mecanifica.lacuna-capacidade@1' } });
+      expect(JSON.stringify({ catalogoProceduralValor, grafoProceduralValor, schemasProceduraisValor })).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
       expect(JSON.stringify(pacotesValor)).not.toMatch(/\/workspaces|[A-Z]:\\|\/home\//);
       expect(dependenciasValor).toMatchObject({
         formato: 'mecanifica.resumo-dependencias-global', configurado: true,
@@ -595,6 +607,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const publico = JSON.parse(estado.contents[0].text);
       expect(publico).toMatchObject({ perfil: 'autoria' });
       expect(publico.ferramentas).toEqual([
+        'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
         'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',

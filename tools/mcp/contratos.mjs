@@ -1,6 +1,6 @@
 /* contratos.mjs — schemas e respostas públicas do perfil MCP somente leitura. */
 import { z } from 'zod';
-export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v5';
+export const VERSAO_CONTRATO_MCP = 'mecanifica.mcp.revisao.v6';
 export const PERFIL = 'revisao';
 export const TRANSPORTE = 'stdio';
 
@@ -156,6 +156,46 @@ const provenienciaImpactoGlobal = z.object({
 }).strict();
 
 export const consultarImpactoGlobalEntrada = alvoImpactoGlobal;
+
+const artefatosProcedurais = z.object({
+  entra: z.array(z.string().min(1)), sai: z.array(z.string().min(1)),
+}).strict();
+const interfacesProcedurais = z.object({
+  entra: z.array(z.string().min(1)), sai: z.array(z.string().min(1)),
+}).strict();
+const identificadorProcedural = z.string().min(1).max(240);
+
+export const buscarCapacidadesEntrada = z.object({
+  texto: z.string().min(1).max(240).optional(), consome: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(),
+  produz: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(), efeito: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(),
+  identidade: z.string().min(1).max(240).optional(),
+}).strict();
+export const descreverCapacidadeEntrada = z.object({ identificador: identificadorProcedural }).strict();
+export const combinarCapacidadesEntrada = z.object({
+  artefatos: artefatosProcedurais, interfaces: interfacesProcedurais.optional(), requisitos: z.array(z.string().min(1)).optional(),
+  maxCusto: z.number().finite().nonnegative().optional(), maxCadeias: z.number().int().positive().max(32).optional(),
+  pesos: z.record(z.string().min(1), z.number().finite().nonnegative()).optional(),
+}).strict();
+export const validarComposicaoEntrada = z.object({
+  composicoes: z.array(z.json()).min(1).max(64), id: identificadorProcedural,
+  parametros: z.record(z.string().min(1), z.json()).optional(),
+  orcamento: z.object({ maxPassos: z.number().int().positive().max(8192).optional(), maxProfundidade: z.number().int().positive().max(128).optional() }).strict().optional(),
+}).strict();
+export const analisarLacunaEntrada = z.object({
+  id: identificadorProcedural, objetivo: z.string().min(1).max(500), artefatos: artefatosProcedurais,
+  interfaces: interfacesProcedurais.optional(), requisitos: z.array(z.string().min(1)).optional(), candidatas: z.array(identificadorProcedural).optional(),
+  requisitoAusente: z.object({ tipo: z.enum(['artefato', 'interface', 'representacao']), id: identificadorProcedural }).strict().nullable().optional(),
+  contorno: z.object({ descricao: z.string().min(1).max(500), custo: z.number().finite().nonnegative() }).strict().nullable().optional(),
+  recorrencia: z.number().int().nonnegative().optional(), classificacao: z.enum(['composicao', 'operacao-nativa', 'representacao']).nullable().optional(),
+}).strict();
+export const diagnosticarExtensaoEntrada = z.object({ capacidade: identificadorProcedural }).strict();
+const saidaProcedural = z.object({ ...respostaBase, resultado: z.json().optional() }).strict();
+export const buscarCapacidadesSaida = saidaProcedural;
+export const descreverCapacidadeSaida = saidaProcedural;
+export const combinarCapacidadesSaida = saidaProcedural;
+export const validarComposicaoSaida = saidaProcedural;
+export const analisarLacunaSaida = saidaProcedural;
+export const diagnosticarExtensaoSaida = saidaProcedural;
 
 export const descreverSaida = z.object({
   ...respostaBase,
