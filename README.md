@@ -52,9 +52,12 @@ para a direção de composição.
   aí. O que esses casos aprovam é o processo — briefing, execução na bancada,
   medição e revisão. A peça usada em cada caso continua sendo exemplo, como
   todas as outras: homologar o fluxo nunca homologou geometria.
-- **Não há plano executivo ativo, e não há capacidade em aberto** na lista de
-  pendências. O critério para reabrir qualquer candidato está em
-  [`docs/mecanifica/planos/BACKLOG.md`](docs/mecanifica/planos/BACKLOG.md).
+- **Plano executivo ativo:** [plataforma procedural extensível e
+  descobrível](docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md).
+  A R00 está mapeando a linha de base e as dependências do motor antes da
+  extração modular. O plano cria núcleo pequeno, registro tipado, módulos,
+  grafo de capacidades, subgrafos reutilizáveis, extensões verificáveis e
+  descoberta Agent-First, sem manter cópia `legacy` ou segundo executor.
 - O núcleo, as receitas, o visor compatível, a bancada e as ferramentas continuam
   ativos.
 - Montagem persistida v1/v2/v3, contexto JSON consultável, mapa canônico de
