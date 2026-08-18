@@ -59,11 +59,13 @@ aplicação publicada aqui.
   foi concluído e aprovado. Ele entrega verificação neutra entre peças-folha
   por malha e contenção, com cobertura explícita e consumo pela revisão MCP;
   solver, correção automática e folga universal permanecem fora.
-- O plano da [plataforma procedural extensível e descobrível](planos/2026-08-18-plataforma-procedural-extensivel.md) está
-  **ativo**. Ele substitui o monólito por núcleo pequeno, registro tipado,
+- O plano da [plataforma procedural extensível e descobrível](planos/2026-08-18-plataforma-procedural-extensivel.md)
+  (`docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`) foi
+  **concluído e aprovado**. Ele substituiu o monólito por núcleo pequeno, registro tipado,
   pacotes de capacidades, grafos derivados, subgrafos reutilizáveis, SDK de
   extensão e descoberta Agent-First. A R00 já fixou a [linha de base
-  executável](BASELINE-MOTOR-R00.md) e o mapa da fachada. A R01 foi concluída:
+  executável](BASELINE-MOTOR-R00.md)
+  (`docs/mecanifica/BASELINE-MOTOR-R00.md`) e o mapa da fachada. A R01 foi concluída:
   `oficina.js` é a fachada compatível; núcleo, adaptador, animação e executor
   têm implementação única separada. A R02 foi concluída: o despacho passa por
   registro explícito, versionado e determinístico das 32 operações. Não haverá
@@ -83,7 +85,8 @@ aplicação publicada aqui.
   representação por evidência explícita, sem promoção automática.
   A R09 foi concluída: o mesmo serviço puro de descoberta é exposto por recursos
   e ferramentas MCP de leitura, provado por cliente externo sem escrita.
-  (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
+  A R10 removeu a lacuna de extensão nas portas oficiais e aprovou o estudo de
+  campo privado (`docs/mecanifica/RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
@@ -273,9 +276,9 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- A plataforma procedural extensível concluiu R00–R07 do plano ativo.
-  Nenhuma rodada posterior deve começar sem a evidência e o fechamento da
-  anterior.
+- O plano ativo é o [ensaio ponta a ponta da dobradiça](planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
+  (`docs/mecanifica/planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md`),
+  aberto após a plataforma procedural concluir R00–R10 com decisão `aprovar`.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.

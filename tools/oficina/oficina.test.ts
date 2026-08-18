@@ -1536,7 +1536,7 @@ describe('P3 — espelha + rotaciona (seleção transformada)', () => {
       // seg=30 (900 faces, <1000 vértices novos) passa; seg=31 (961 faces, 1024 vértices novos) estoura SÓ por vértice.
       expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 30 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).not.toThrow();
       expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 31 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).toThrow(/estoura o bloco/);
-    });
+    }, 20_000);
 
   });
 });

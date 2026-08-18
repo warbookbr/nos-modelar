@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-390 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+400 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -93,6 +93,19 @@
 - `folha-movel.js` — Experimento confinado — folha móvel de uma dobradiça didática.
 - `pino-dobradica.js` — Experimento confinado — pino passante de uma dobradiça didática.
 
+## autoria-assistida/experimentos/plataforma-procedural-r10/
+
+- `auditar-visual.mjs` — Captura duas vistas de cada peça e do conjunto, sem usar a bancada publicada.
+- `carregar-estudo.mjs` — Adaptador confinado do estudo R10. Nenhuma fixture entra no catálogo público.
+- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
+- `executar-estudo.mjs` — Resumo reproduzível do estudo privado R10.
+
+## autoria-assistida/experimentos/plataforma-procedural-r10/receitas/
+
+- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
+- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
+- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
+
 ## autoria-assistida/guias/forma/
 
 - `silhueta-e-transicoes.md` — Silhueta e transições
@@ -178,6 +191,7 @@
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
+- `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
@@ -230,6 +244,7 @@
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
+- `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -551,4 +566,5 @@
 - `lados-por-desvio.test.ts` — lados-por-desvio.test.ts — A-34: a IA declara uma tolerância geométrica e o núcleo deriva a menor contagem circular, sem adivinhar números sem unidade.
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
+- `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.
 - `registro-operacoes.test.mjs` — registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02.

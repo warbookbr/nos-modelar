@@ -3,14 +3,15 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-18-plataforma-procedural-extensivel.md`](2026-08-18-plataforma-procedural-extensivel.md).
+[`2026-08-18-ensaio-ponta-a-ponta-dobradica.md`](2026-08-18-ensaio-ponta-a-ponta-dobradica.md).
 
-O plano transforma o motor monolítico em uma plataforma procedural modular e
-descobrível: núcleo pequeno, registro tipado, pacotes de capacidades, grafos
-derivados, subgrafos reutilizáveis, SDK de extensão e acesso Agent-First por
-serviço neutro e MCP. A migração não mantém cópia `legacy`; Git é o histórico e
-código movido sai da origem na mesma transição. A execução começa pela R00,
-linha de base e mapa executável de dependências.
+O plano valida a plataforma entregue na R00–R10 usando uma dobradiça didática
+privada: registro, catálogo, hipergrafo, busca, subgrafo, extensão, procedência,
+lacuna, exportação, montagem v4, auditoria, vistas e revisão MCP. Não publica
+geometria nem abre cinemática, solver ou engenharia de fixação.
+
+O plano da plataforma procedural extensível foi concluído no R10 com decisão
+`aprovar`; a evidência está em `../RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`.
 
 O plano concluído mais recente foi a [auditoria de interseções em montagens](2026-08-18-auditoria-intersecoes-montagem.md), aprovada após integrar malha, contenção, casos inconclusivos e MCP.
 

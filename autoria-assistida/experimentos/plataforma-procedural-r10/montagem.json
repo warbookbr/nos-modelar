@@ -1,0 +1,20 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "plataforma-procedural-r10",
+  "instancias": [
+    { "id": "apoio", "alvo": { "tipo": "peca", "ref": "apoio-prismatico" } },
+    {
+      "id": "nervura",
+      "alvo": { "tipo": "peca", "ref": "nervura-triangular" },
+      "pose": { "deslocamento": [0.5, 0.2, 0], "rotacao": [[1, 0, 0], [0, 1, 0], [0, 0, 1]] }
+    },
+    {
+      "id": "pino",
+      "alvo": { "tipo": "peca", "ref": "pino-circular" },
+      "pose": { "deslocamento": [-0.5, 0.2, 0], "rotacao": [[1, 0, 0], [0, 1, 0], [0, 0, 1]] }
+    }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": { "toleranciaNumerica": 1e-9, "expectativas": [] }
+}

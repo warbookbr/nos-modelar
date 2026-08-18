@@ -1,6 +1,6 @@
 # Plataforma procedural extensível e descobrível
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** agente executor a designar por rodada
 
@@ -197,4 +197,4 @@ implementação; e estudo de campo aprovado. A decisão final é `aprovar`,
 
 ## Fechamento
 
-A preencher após R10.
+R10 concluiu limpeza e campo sem alterar corpus, catálogo ou arquitetura; ver [`RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`](../RELATORIO-PLATAFORMA-PROCEDURAL-R10.md). **Decisão: `aprovar`.**
