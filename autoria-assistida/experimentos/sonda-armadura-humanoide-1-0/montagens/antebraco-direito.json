@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "armadura-antebraco-direito",
+  "instancias": [
+    { "id": "antebraco", "alvo": { "tipo": "peca", "ref": "antebraco" } },
+    { "id": "mao", "alvo": { "tipo": "peca", "ref": "mao-direita" }, "pose": { "deslocamento": [0, -0.47, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": { "toleranciaNumerica": 1e-9, "expectativas": [] }
+}

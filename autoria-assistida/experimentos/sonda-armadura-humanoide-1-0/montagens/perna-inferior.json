@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "armadura-perna-inferior",
+  "instancias": [
+    { "id": "canela", "alvo": { "tipo": "peca", "ref": "canela" } },
+    { "id": "pe", "alvo": { "tipo": "peca", "ref": "pe" }, "pose": { "deslocamento": [0, -0.65, 0.06], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": { "toleranciaNumerica": 1e-9, "expectativas": [] }
+}

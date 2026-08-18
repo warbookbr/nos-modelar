@@ -1,0 +1,36 @@
+{
+  "formato": "mecanifica.achados-critica-visual",
+  "versao": 1,
+  "achados": [
+    {
+      "alvo": { "tipo": "montagem", "id": "sonda-armadura-humanoide-1-0" },
+      "vista": "frontal",
+      "severidade": "alta",
+      "observacao": "Os espaços entre braços, cotovelos, antebraços, coxas e canelas quebram a leitura de uma cobertura corporal contínua.",
+      "evidencia": { "tipo": "comparacao", "hash": "sha256:5790bdb60e243781fab4b80df6464e75bc13b6fbe337b85c307034e7c3c0a2fc" },
+      "decisao": "adiar",
+      "estado": "adiado",
+      "vinculo": { "antes": "sha256:2a3a607d30f8ee24391e5082d3b35e454a2dd6035b26abb67941f5f2443b9346", "depois": "sha256:5790bdb60e243781fab4b80df6464e75bc13b6fbe337b85c307034e7c3c0a2fc" }
+    },
+    {
+      "alvo": { "tipo": "montagem", "id": "sonda-armadura-humanoide-1-0" },
+      "vista": "frontal",
+      "severidade": "media",
+      "observacao": "O tórax largo, a cabeça grande e os membros estreitos produzem proporção de robô de bancada, distante do exotraje atlético da referência.",
+      "evidencia": { "tipo": "comparacao", "hash": "sha256:5790bdb60e243781fab4b80df6464e75bc13b6fbe337b85c307034e7c3c0a2fc" },
+      "decisao": "aceitar",
+      "estado": "resolvido",
+      "vinculo": { "antes": "sha256:2a3a607d30f8ee24391e5082d3b35e454a2dd6035b26abb67941f5f2443b9346", "depois": "sha256:5790bdb60e243781fab4b80df6464e75bc13b6fbe337b85c307034e7c3c0a2fc" }
+    },
+    {
+      "alvo": { "tipo": "montagem", "id": "sonda-armadura-humanoide-1-0-articulada" },
+      "vista": "isometrica",
+      "severidade": "alta",
+      "observacao": "A flexão isolada de cotovelo e joelho mantém tronco e apoios rígidos, deixando a pose visualmente desequilibrada mesmo sem nova interseção.",
+      "evidencia": { "tipo": "comparacao", "hash": "sha256:34c3f46644418acbc7aea4c9235a4dcfb6e19bc40bf2895d34a6d7248287a72a" },
+      "decisao": "investigar",
+      "estado": "aberto",
+      "vinculo": { "antes": "sha256:e0218d427203b8d584c39b01cb0c5072ce508a5885c8103fbf0be5beea0bb042", "depois": "sha256:34c3f46644418acbc7aea4c9235a4dcfb6e19bc40bf2895d34a6d7248287a72a" }
+    }
+  ]
+}

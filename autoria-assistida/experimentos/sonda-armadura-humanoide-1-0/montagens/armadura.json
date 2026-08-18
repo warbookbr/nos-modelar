@@ -1,0 +1,37 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "sonda-armadura-humanoide-1-0",
+  "instancias": [
+    { "id": "pelve", "alvo": { "tipo": "peca", "ref": "pelve" }, "pose": { "deslocamento": [0, 1.72, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "abdomen", "alvo": { "tipo": "peca", "ref": "abdomen" }, "pose": { "deslocamento": [0, 2.14, -0.05], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "torax", "alvo": { "tipo": "peca", "ref": "torax" }, "pose": { "deslocamento": [0, 2.65, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "capacete", "alvo": { "tipo": "peca", "ref": "capacete" }, "pose": { "deslocamento": [0, 3.42, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "braco-esquerdo", "alvo": { "tipo": "montagem", "ref": "braco-esquerdo" }, "pose": { "deslocamento": [-0.84, 2.91, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "braco-direito", "alvo": { "tipo": "montagem", "ref": "braco-direito" }, "pose": { "deslocamento": [0.84, 2.91, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "perna-esquerda", "alvo": { "tipo": "montagem", "ref": "perna" }, "pose": { "deslocamento": [-0.23, 1.55, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "perna-direita", "alvo": { "tipo": "montagem", "ref": "perna" }, "pose": { "deslocamento": [0.23, 1.55, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      { "id": "camadas-abdomen-pelve", "a": { "caminho": ["abdomen"] }, "b": { "caminho": ["pelve"] }, "motivo": "as lâminas inferiores cobrem a borda do cinto" },
+      { "id": "camadas-abdomen-torax", "a": { "caminho": ["abdomen"] }, "b": { "caminho": ["torax"] }, "motivo": "as lâminas superiores entram sob a placa do tórax" },
+      { "id": "cotovelo-direito-coberto", "a": { "caminho": ["braco-direito", "cotovelo"] }, "b": { "caminho": ["braco-direito", "segmento-inferior", "antebraco"] }, "motivo": "a carenagem do antebraço cobre parcialmente a junta" },
+      { "id": "ombro-direito-camadas", "a": { "caminho": ["braco-direito", "ombreira"] }, "b": { "caminho": ["braco-direito", "segmento-superior"] }, "motivo": "a ombreira cobre a extremidade do braço superior" },
+      { "id": "ombro-direito-torax", "a": { "caminho": ["braco-direito", "ombreira"] }, "b": { "caminho": ["torax"] }, "motivo": "a ombreira sobrepõe a placa lateral do tórax" },
+      { "id": "braco-direito-no-ombro", "a": { "caminho": ["braco-direito", "segmento-superior"] }, "b": { "caminho": ["torax"] }, "motivo": "a extremidade superior entra sob a placa do ombro do tórax" },
+      { "id": "cotovelo-esquerdo-coberto", "a": { "caminho": ["braco-esquerdo", "cotovelo"] }, "b": { "caminho": ["braco-esquerdo", "segmento-inferior", "antebraco"] }, "motivo": "a carenagem do antebraço cobre parcialmente a junta" },
+      { "id": "ombro-esquerdo-camadas", "a": { "caminho": ["braco-esquerdo", "ombreira"] }, "b": { "caminho": ["braco-esquerdo", "segmento-superior"] }, "motivo": "a ombreira cobre a extremidade do braço superior" },
+      { "id": "ombro-esquerdo-torax", "a": { "caminho": ["braco-esquerdo", "ombreira"] }, "b": { "caminho": ["torax"] }, "motivo": "a ombreira sobrepõe a placa lateral do tórax" },
+      { "id": "braco-esquerdo-no-ombro", "a": { "caminho": ["braco-esquerdo", "segmento-superior"] }, "b": { "caminho": ["torax"] }, "motivo": "a extremidade superior entra sob a placa do ombro do tórax" },
+      { "id": "colar-capacete", "a": { "caminho": ["capacete"] }, "b": { "caminho": ["torax"] }, "motivo": "a base do capacete entra no colar protetor" },
+      { "id": "quadril-direito-coberto", "a": { "caminho": ["pelve"] }, "b": { "caminho": ["perna-direita", "coxa"] }, "motivo": "a placa da pelve cobre o topo da coxa" },
+      { "id": "quadril-esquerdo-coberto", "a": { "caminho": ["pelve"] }, "b": { "caminho": ["perna-esquerda", "coxa"] }, "motivo": "a placa da pelve cobre o topo da coxa" },
+      { "id": "joelho-direito-coberto", "a": { "caminho": ["perna-direita", "joelho"] }, "b": { "caminho": ["perna-direita", "segmento-inferior", "canela"] }, "motivo": "a carenagem da canela cobre parcialmente a junta" },
+      { "id": "bota-direita-sob-canela", "a": { "caminho": ["perna-direita", "segmento-inferior", "canela"] }, "b": { "caminho": ["perna-direita", "segmento-inferior", "pe"] }, "motivo": "a borda superior da bota entra sob a carenagem da canela ao flexionar" },
+      { "id": "joelho-esquerdo-coberto", "a": { "caminho": ["perna-esquerda", "joelho"] }, "b": { "caminho": ["perna-esquerda", "segmento-inferior", "canela"] }, "motivo": "a carenagem da canela cobre parcialmente a junta" }
+    ]
+  }
+}

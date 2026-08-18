@@ -1,0 +1,12 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "armadura-perna",
+  "instancias": [
+    { "id": "coxa", "alvo": { "tipo": "peca", "ref": "coxa" }, "pose": { "deslocamento": [0, -0.05, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "joelho", "alvo": { "tipo": "peca", "ref": "junta-articulada" }, "pose": { "deslocamento": [0, -0.77, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "segmento-inferior", "alvo": { "tipo": "montagem", "ref": "perna-inferior" }, "pose": { "deslocamento": [0, -0.77, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": { "toleranciaNumerica": 1e-9, "expectativas": [] }
+}

@@ -1,0 +1,13 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "armadura-braco-esquerdo",
+  "instancias": [
+    { "id": "ombreira", "alvo": { "tipo": "peca", "ref": "ombreira" } },
+    { "id": "segmento-superior", "alvo": { "tipo": "peca", "ref": "braco-superior" }, "pose": { "deslocamento": [0, -0.07, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "cotovelo", "alvo": { "tipo": "peca", "ref": "junta-articulada" }, "pose": { "deslocamento": [0, -0.59, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "segmento-inferior", "alvo": { "tipo": "montagem", "ref": "antebraco-esquerdo" }, "pose": { "deslocamento": [0, -0.59, 0], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": { "toleranciaNumerica": 1e-9, "expectativas": [] }
+}
