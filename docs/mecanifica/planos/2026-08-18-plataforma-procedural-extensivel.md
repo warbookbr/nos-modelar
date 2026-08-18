@@ -7,8 +7,8 @@
 **Base:** `warbookbr/nos-mecanifica`, `main` em `b9c3f64`.
 
 **Execução:** R00 concluída: mapa estático e baseline canônica em
-`BASELINE-MOTOR-R00.md`. R01 em execução: `oficina.js` é a fachada compatível
-e a implementação única foi movida para `nucleo.js`.
+`BASELINE-MOTOR-R00.md`. R01 concluída: `oficina.js` é a fachada compatível;
+núcleo, adaptador, animação e executor têm implementação única separada.
 
 ## Objetivo verificável
 

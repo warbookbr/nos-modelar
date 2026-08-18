@@ -42,8 +42,16 @@ function exportsDo(texto) {
   return [...texto.matchAll(/^export\s+(?:const|function|class)\s+([\w$]+)/gm)].map((m) => m[1]).sort();
 }
 
+function exportsDaFachada(texto) {
+  return [...texto.matchAll(/export\s*\{([\s\S]*?)\}\s*from/g)]
+    .flatMap((m) => m[1].split(','))
+    .map((nome) => nome.trim().split(/\s+as\s+/)[0])
+    .filter(Boolean).sort();
+}
+
 export function mapearMotorProcedural() {
   const fonte = readFileSync(arquivoNucleo, 'utf8');
+  const fachada = readFileSync(arquivoFachada, 'utf8');
   const moduloMotor = arquivosSob(resolve(raiz, 'prototipos/procedural/v3/motor')).map(rel).sort();
   const consumidores = arquivosSob(raiz)
     .filter((arquivo) => arquivo !== arquivoNucleo && /\.(?:[cm]?[jt]sx?)$/.test(arquivo))
@@ -52,9 +60,10 @@ export function mapearMotorProcedural() {
   return {
     formato: 'mecanifica.mapa-motor-procedural',
     versao: 1,
-    fachada: { arquivo: rel(arquivoFachada), linhas: readFileSync(arquivoFachada, 'utf8').split('\n').length },
+    fachada: { arquivo: rel(arquivoFachada), linhas: fachada.split('\n').length },
     fonte: { arquivo: rel(arquivoNucleo), sha256: createHash('sha256').update(fonte).digest('hex'), linhas: fonte.split('\n').length },
-    exportacoes: exportsDo(fonte),
+    exportacoes: exportsDaFachada(fachada),
+    exportacoesInternasDoNucleo: exportsDo(fonte),
     operacoes: operacoesDo(fonte),
     dependenciasDiretas: importsDo(fonte),
     modulosDoMotor: moduloMotor,

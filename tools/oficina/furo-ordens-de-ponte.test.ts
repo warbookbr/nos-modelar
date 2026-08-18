@@ -25,7 +25,7 @@ import { adaptarThree } from '../../src/autoria/adaptar-three.js';
 import { arestasSemPar, conferirMalha } from './conferir-malha.js';
 
 const NUCLEO_FONTE = readFileSync(
-  resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/procedural/v3/motor/oficina.js'),
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../prototipos/procedural/v3/motor/nucleo.js'),
   'utf8',
 );
 

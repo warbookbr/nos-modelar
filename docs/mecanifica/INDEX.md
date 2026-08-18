@@ -63,9 +63,9 @@ aplicação publicada aqui.
   **ativo**. Ele substitui o monólito por núcleo pequeno, registro tipado,
   pacotes de capacidades, grafos derivados, subgrafos reutilizáveis, SDK de
   extensão e descoberta Agent-First. A R00 já fixou a [linha de base
-  executável](BASELINE-MOTOR-R00.md) e o mapa da fachada. A R01 está em
-  execução: `oficina.js` tornou-se a fachada compatível da implementação única
-  em `nucleo.js`; não haverá cópia `legacy` nem segundo executor
+  executável](BASELINE-MOTOR-R00.md) e o mapa da fachada. A R01 foi concluída:
+  `oficina.js` é a fachada compatível; núcleo, adaptador, animação e executor
+  têm implementação única separada. Não haverá cópia `legacy` nem segundo executor
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
