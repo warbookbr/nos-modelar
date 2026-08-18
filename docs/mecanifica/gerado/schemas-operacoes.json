@@ -1,0 +1,3170 @@
+{
+  "formato": "mecanifica.schemas-operacoes@1",
+  "assinatura": "sha256:7ba5466719f07939ed7a4bd6ac9d5eb304abe2512df01e1feeb87d6767898646",
+  "total": 32,
+  "operacoes": [
+    {
+      "id": "mecanifica.operacao.apagaFace",
+      "nome": "apagaFace",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Remover exatamente uma face, preferencialmente por seleção semântica.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.apagaFace@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "face": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "ID legado da face."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "apagaFace",
+              {
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1,
+                    "face": "topo"
+                  }
+                }
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "A seleção precisa resolver exatamente uma face."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.arranja",
+      "nome": "arranja",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar cópias lineares ou radiais com identidade estrutural.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.arranja@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "modo",
+            "total"
+          ],
+          "properties": {
+            "modo": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'linear' ou 'radial'."
+            },
+            "total": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Total incluindo a fonte."
+            },
+            "d": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Passo linear."
+            },
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Eixo radial."
+            },
+            "graus": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Passo angular."
+            },
+            "volta": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Arco fechado."
+            },
+            "pivo": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Pivô radial."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade das cópias."
+            },
+            "derivaDe": {
+              "type": "object",
+              "description": "Origem-fonte."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            },
+            "nomes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Um nome por cópia, total-1."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "arranja",
+              {
+                "modo": "linear",
+                "total": 2,
+                "d": [
+                  2,
+                  0,
+                  0
+                ],
+                "origemId": 9,
+                "derivaDe": {
+                  "op": "cubo",
+                  "id": 1
+                },
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1
+                  }
+                },
+                "nomes": [
+                  "copia"
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Modo estrutural requer origemId, derivaDe e seleção da origem completa."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.arredondarAresta",
+      "nome": "arredondarAresta",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Substituir uma aresta convexa por múltiplos painéis de raio geométrico.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.arredondarAresta@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "de",
+            "aresta",
+            "raio",
+            "paineis"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade da saída."
+            },
+            "de": {
+              "type": "object",
+              "description": "Face que contém a aresta."
+            },
+            "aresta": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Índice local da aresta na face."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio positivo."
+            },
+            "paineis": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Quantidade de painéis, mínimo 2."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "arredondarAresta",
+              {
+                "origemId": 9,
+                "de": {
+                  "op": "cubo",
+                  "id": 1,
+                  "face": "topo"
+                },
+                "aresta": 0,
+                "raio": 0.1,
+                "paineis": 2
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Escopo atual exige duas faces convexas manifold."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.chamferBox",
+      "nome": "chamferBox",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar caixa de faces planas com quinas chanfradas.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.chamferBox@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "lado": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Atalho cúbico."
+            },
+            "larg": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Largura."
+            },
+            "alt": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Altura."
+            },
+            "prof": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Profundidade."
+            },
+            "chanfro": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Recuo das quinas."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "chamferBox",
+              {
+                "larg": 1,
+                "alt": 1,
+                "prof": 1,
+                "chanfro": 0.1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Não produz arredondamento suave; mantém painéis planos."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.cilindro",
+      "nome": "cilindro",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar cilindro fechado com laterais e duas tampas endereçáveis.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.cilindro@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio positivo."
+            },
+            "altura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Comprimento no eixo."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Resolução circular, mínimo 3."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            },
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Direção do eixo de revolução; o padrão é y."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cilindro",
+              {
+                "raio": 0.5,
+                "altura": 1,
+                "lados": 8
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "lados muda a topologia e precisa caber no bloco de IDs."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.cone",
+      "nome": "cone",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar cone fechado com base circular.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.cone@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio da base."
+            },
+            "altura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Comprimento no eixo."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Resolução circular."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            },
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Direção do eixo de revolução; o padrão é y."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cone",
+              {
+                "raio": 0.5,
+                "altura": 1,
+                "lados": 8
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.cubo",
+      "nome": "cubo",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar uma caixa retangular apoiada em y=0.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.cubo@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "lado": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Atalho para largura, altura e profundidade."
+            },
+            "larg": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Largura em x."
+            },
+            "alt": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Altura em y."
+            },
+            "prof": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Profundidade em z."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "lado": 1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Produz seis faces nominais; dimensões não devem ser degeneradas."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.displace",
+      "nome": "displace",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Deslocar seleção ao longo das normais por ruído determinístico.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.displace@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "amplitude": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Desvio máximo."
+            },
+            "frequencia": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Escala espacial do ruído."
+            },
+            "semente": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Semente reproduzível."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "displace",
+              {
+                "amplitude": 0.01,
+                "frequencia": 1,
+                "semente": 7
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Vértices precisam pertencer a faces com normal calculável."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.encostar",
+      "nome": "encostar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Posicionar uma seleção em contato direcional com uma referência.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.encostar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sel",
+            "referencia",
+            "direcao"
+          ],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "referencia": {
+              "type": "object",
+              "description": "Seleção imóvel."
+            },
+            "direcao": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Direção não nula declarada."
+            },
+            "folga": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Separação final não negativa."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0,
+                  0.5,
+                  0
+                ]
+              }
+            ],
+            [
+              "encostar",
+              {
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 2
+                  }
+                },
+                "referencia": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1
+                  }
+                },
+                "direcao": [
+                  0,
+                  1,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Não é solver, colisão ou encaixe por extensão."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.esfera",
+      "nome": "esfera",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar esfera UV apoiada no chão.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.esfera@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio positivo."
+            },
+            "aneis": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Divisões polares, mínimo 2."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Divisões azimutais, mínimo 3."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "esfera",
+              {
+                "raio": 0.5,
+                "aneis": 4,
+                "lados": 6
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.espelha",
+      "nome": "espelha",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Duplicar faces refletidas, com modo estrutural opcional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.espelha@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "eixo"
+          ],
+          "properties": {
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Normal do plano de espelho."
+            },
+            "pos": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Posição do plano."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade da saída estrutural."
+            },
+            "derivaDe": {
+              "type": "object",
+              "description": "Origem completa copiada no modo estrutural."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "espelha",
+              {
+                "eixo": "x",
+                "origemId": 9,
+                "derivaDe": {
+                  "op": "cubo",
+                  "id": 1
+                },
+                "sel": {
+                  "origem": {
+                    "op": "cubo",
+                    "id": 1
+                  }
+                }
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Modo estrutural exige origemId, derivaDe e sel.origem equivalentes."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.extruda",
+      "nome": "extruda",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Extrudar uma face por ID posicional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.extruda@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "face"
+          ],
+          "properties": {
+            "face": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "ID da face."
+            },
+            "dist": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Distância assinada."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "extruda",
+              {
+                "face": 1,
+                "dist": 0.1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional e local."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.filete",
+      "nome": "filete",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar chanfro plano compatível com o filete v1.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.filete@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "de",
+            "aresta"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade da saída."
+            },
+            "de": {
+              "type": "object",
+              "description": "Face que contém a aresta."
+            },
+            "aresta": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Índice local da aresta."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Recuo do painel."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "filete",
+              {
+                "origemId": 9,
+                "de": {
+                  "op": "cubo",
+                  "id": 1,
+                  "face": "topo"
+                },
+                "aresta": 0,
+                "raio": 0.1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Não é arredondamento multi-painel e não cobre encontro de três arestas."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.furo",
+      "nome": "furo",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Abrir um ou vários furos estruturais passantes ou cegos.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.furo@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "de"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do corte."
+            },
+            "de": {
+              "type": "object",
+              "description": "Face de entrada."
+            },
+            "saida": {
+              "type": "object",
+              "description": "Face de saída no modo passante."
+            },
+            "profundidade": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Profundidade no modo cego."
+            },
+            "centro": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Centro de um furo."
+            },
+            "centros": {
+              "type": "array",
+              "description": "Centros/grupos de vários furos."
+            },
+            "ate": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Segundo centro de um rasgo."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio positivo."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Resolução da parede."
+            },
+            "orientacao": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Referência no plano da entrada."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cilindro",
+              {
+                "origemId": 1,
+                "raio": 1,
+                "altura": 0.5,
+                "lados": 12
+              }
+            ],
+            [
+              "furo",
+              {
+                "origemId": 9,
+                "de": {
+                  "op": "cilindro",
+                  "id": 1,
+                  "tampa": "topo"
+                },
+                "saida": {
+                  "op": "cilindro",
+                  "id": 1,
+                  "tampa": "fundo"
+                },
+                "centro": [
+                  0,
+                  0.5,
+                  0
+                ],
+                "raio": 0.15,
+                "lados": 8,
+                "orientacao": [
+                  1,
+                  0,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Declare centro ou centros e exatamente um entre saida e profundidade."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.inflate",
+      "nome": "inflate",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Construir volume voxel fechado pela interseção de dois contornos 2D.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.inflate@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contornoLado",
+            "contornoTopo"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "contornoLado": {
+              "type": "array",
+              "description": "Polígono lateral com ao menos três pontos."
+            },
+            "contornoTopo": {
+              "type": "array",
+              "description": "Polígono superior com ao menos três pontos."
+            },
+            "divisoes": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Resolução da grade voxel."
+            },
+            "segmentosCurva": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Discretização das concordâncias."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "inflate",
+              {
+                "contornoLado": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                "contornoTopo": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                "divisoes": 2
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Produz forma blocky; grade acima do limite de sanidade é recusada."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.lathe",
+      "nome": "lathe",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Revolucionar perfil [raio,y] em torno de um eixo.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.lathe@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perfil"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "perfil": {
+              "type": "array",
+              "description": "Ao menos dois pontos [raio,y] ou [raio,y,concordancia]."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Resolução da revolução."
+            },
+            "segmentosCurva": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Discretização das concordâncias."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            },
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Direção do eixo de revolução; o padrão é y."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "lathe",
+              {
+                "perfil": [
+                  [
+                    0.3,
+                    0
+                  ],
+                  [
+                    0.3,
+                    1
+                  ]
+                ],
+                "lados": 8
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Perfil precisa ter ao menos dois pontos e raios não negativos."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.liso",
+      "nome": "liso",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Marcar faces para sombreamento liso.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.liso@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "liso",
+              {
+                "faces": [
+                  1
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.loft",
+      "nome": "loft",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Conectar seções ao longo de um caminho 3D.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.loft@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "secoes"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "secoes": {
+              "type": "array",
+              "description": "Ao menos duas seções {pos, raio} ou {pos, contorno}."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Pontos por seção."
+            },
+            "orientacao": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Referência explícita do frame local."
+            },
+            "segmentosCurva": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Discretização de concordâncias."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "loft",
+              {
+                "secoes": [
+                  {
+                    "pos": [
+                      0,
+                      0,
+                      0
+                    ],
+                    "raio": 0.2
+                  },
+                  {
+                    "pos": [
+                      0,
+                      1,
+                      0
+                    ],
+                    "raio": 0.2
+                  }
+                ],
+                "lados": 8
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Seções devem ser ordenadas, válidas e compatíveis com lados."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.material",
+      "nome": "material",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Associar faces a um material declarado em MATERIAIS.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.material@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "usa"
+          ],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            },
+            "usa": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Nome exato em MATERIAIS."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "material",
+              {
+                "faces": [
+                  1
+                ],
+                "usa": "teste"
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {
+            "teste": {
+              "cor": "#ffffff"
+            }
+          },
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "O material precisa existir em MATERIAIS."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.mescla",
+      "nome": "mescla",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.mescla@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "de",
+            "para"
+          ],
+          "properties": {
+            "de": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Vértices removidos."
+            },
+            "para": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Vértice preservado."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "mescla",
+              {
+                "de": [
+                  1
+                ],
+                "para": 0
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional; conferir efeito porque entrada vazia pode ser no-op."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.moveA",
+      "nome": "moveA",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Mover os dois vértices de uma aresta posicional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.moveA@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "a",
+            "b"
+          ],
+          "properties": {
+            "a": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Primeiro vértice."
+            },
+            "b": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Segundo vértice."
+            },
+            "d": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Deslocamento."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "moveA",
+              {
+                "a": 0,
+                "b": 1,
+                "d": [
+                  0,
+                  0.1,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.moveF",
+      "nome": "moveF",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Mover todos os vértices de uma face posicional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.moveF@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "face"
+          ],
+          "properties": {
+            "face": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "ID da face."
+            },
+            "d": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Deslocamento."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "moveF",
+              {
+                "face": 1,
+                "d": [
+                  0,
+                  0.1,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.moveV",
+      "nome": "moveV",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Mover um vértice por ID posicional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.moveV@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "v"
+          ],
+          "properties": {
+            "v": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "ID do vértice."
+            },
+            "d": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Deslocamento."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "moveV",
+              {
+                "v": 0,
+                "d": [
+                  0,
+                  0.1,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional; prefira transformações com seleção semântica."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.parte",
+      "nome": "parte",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Nomear faces como parte semântica e declarar hierarquia opcional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.parte@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nome"
+          ],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            },
+            "nome": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identidade persistida da parte."
+            },
+            "pai": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Parte-pai já declarada."
+            },
+            "pivo": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Pivô explícito."
+            },
+            "substituir": {
+              "type": "boolean",
+              "description": "Literal true permite reatribuição intencional."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "parte",
+              {
+                "faces": [
+                  1
+                ],
+                "nome": "corpo"
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Uma face pertence a no máximo uma parte, salvo substituir:true explícito."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.pesar",
+      "nome": "pesar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.pesar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "osso"
+          ],
+          "properties": {
+            "osso": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Nome em ESQUELETO."
+            },
+            "peso": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Peso acumulado."
+            },
+            "vs": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Vértices afetados."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Faces cujos vértices são afetados."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "pesar",
+              {
+                "osso": "raiz",
+                "vs": [
+                  0
+                ],
+                "peso": 1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": {
+            "ossos": [
+              {
+                "nome": "raiz"
+              }
+            ]
+          },
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Ainda é posicional; não aceita sel."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.pincel",
+      "nome": "pincel",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Atribuir cor de face ou dabs locais determinísticos.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.pincel@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "modo": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'face' ou 'livre'."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            },
+            "cor": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cor ou null."
+            },
+            "pontos": {
+              "type": "array",
+              "description": "Dabs {f,a,b} no modo livre."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio do dab."
+            },
+            "dureza": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Dureza do dab."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "pincel",
+              {
+                "faces": [
+                  1
+                ],
+                "cor": "#123456"
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.plano",
+      "nome": "plano",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Criar grade plana no plano xz.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.plano@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Base de IDs do passo para compatibilidade; prefira origemId."
+            },
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade estrutural publicada pela operação."
+            },
+            "largura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Extensão em x."
+            },
+            "profundidade": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Extensão em z."
+            },
+            "seg": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Divisões por eixo."
+            },
+            "em": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Translação aplicada somente ao que este gerador criou."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "plano",
+              {
+                "largura": 1,
+                "profundidade": 1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "É superfície aberta, não sólido."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.publicarPorta",
+      "nome": "publicarPorta",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Publicar interface semântica endereçável de uma origem existente.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.publicarPorta@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "de"
+          ],
+          "properties": {
+            "nome": {
+              "type": "string",
+              "minLength": 1,
+              "description": "ID legado da porta."
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "ID semântico atual."
+            },
+            "rotulo": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Rótulo obrigatório quando id é usado."
+            },
+            "de": {
+              "type": "object",
+              "description": "Origem geométrica publicada."
+            },
+            "interface": {
+              "type": "object",
+              "description": "Interface cilíndrica ou anular mensurável."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "publicarPorta",
+              {
+                "id": "topo",
+                "rotulo": "Topo",
+                "de": {
+                  "op": "cubo",
+                  "id": 1,
+                  "face": "topo"
+                }
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Use nome ou o par id+rotulo, nunca ambos."
+        ],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.rotaciona",
+      "nome": "rotaciona",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Rotacionar malha ou seleção em convenção destra.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.rotaciona@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "eixo"
+          ],
+          "properties": {
+            "eixo": {
+              "enum": [
+                "x",
+                "y",
+                "z"
+              ],
+              "description": "Eixo da rotação."
+            },
+            "graus": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Ângulo em graus."
+            },
+            "pivo": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Pivô; o padrão é o centroide."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "rotaciona",
+              {
+                "eixo": "y",
+                "graus": 15
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.solido",
+      "nome": "solido",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Marcar faces para renderização sólida.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.solido@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "solido",
+              {
+                "faces": [
+                  1
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.transladar",
+      "nome": "transladar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Transladar malha inteira ou seleção semântica.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.transladar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "d": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              ],
+              "description": "Deslocamento."
+            },
+            "sel": {
+              "type": "object",
+              "description": "Seleção semântica; quando ausente, siga o contrato específico da operação."
+            },
+            "faces": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "Compatibilidade posicional legada; não misture com sel."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "transladar",
+              {
+                "d": [
+                  0,
+                  0.1,
+                  0
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.vira",
+      "nome": "vira",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Inverter o winding de uma face posicional.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.vira@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "face"
+          ],
+          "properties": {
+            "face": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "ID da face."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 1,
+                "alt": 1,
+                "prof": 1
+              }
+            ],
+            [
+              "vira",
+              {
+                "face": 1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Operação posicional; use somente para corrigir orientação comprovada."
+        ],
+        "diagnosticos": []
+      }
+    }
+  ]
+}

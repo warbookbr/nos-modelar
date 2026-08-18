@@ -33,5 +33,10 @@ export function criarRegistroComExtensoes({ registroBase, extensoes } = {}) {
 }
 export function diagnosticarExtensaoAusente(registro, nome) {
   if (!registro || typeof registro.resolver !== 'function') throw new ErroExtensaoNativa('diagnóstico exige registro de operações');
-  return registro.resolver(nome) ? null : Object.freeze({ formato: 'mecanifica.diagnostico-extensao@1', capacidade: nome, estado: 'ausente', acao: 'instale a extensão nativa compatível antes de expandir ou executar a receita' });
+  return registro.resolver(nome) ? null : Object.freeze({
+    formato: 'mecanifica.diagnostico-extensao@1', capacidade: nome, estado: 'ausente',
+    decisao: 'nao-executar',
+    acao: 'registre a lacuna; somente um host confiável pode fornecer e registrar a extensão antes da execução',
+    proximoPasso: Object.freeze({ tipo: 'analisar-lacuna', ferramenta: 'analisar_lacuna' }),
+  });
 }

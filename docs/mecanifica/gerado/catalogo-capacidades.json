@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "{\"formato\":\"mecanifica.registro-operacoes@1\",\"modulos\":[{\"id\":\"mecanifica.motor.nucleo\",\"versao\":\"1.0.0\",\"requer\":[],\"operacoes\":[{\"id\":\"mecanifica.operacao.apagaFace\",\"nome\":\"apagaFace\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.arranja\",\"nome\":\"arranja\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.arredondarAresta\",\"nome\":\"arredondarAresta\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.chamferBox\",\"nome\":\"chamferBox\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cilindro\",\"nome\":\"cilindro\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cone\",\"nome\":\"cone\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cubo\",\"nome\":\"cubo\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.displace\",\"nome\":\"displace\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.encostar\",\"nome\":\"encostar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.esfera\",\"nome\":\"esfera\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.espelha\",\"nome\":\"espelha\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.extruda\",\"nome\":\"extruda\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.filete\",\"nome\":\"filete\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.furo\",\"nome\":\"furo\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.inflate\",\"nome\":\"inflate\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.lathe\",\"nome\":\"lathe\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.liso\",\"nome\":\"liso\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.loft\",\"nome\":\"loft\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.material\",\"nome\":\"material\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.mescla\",\"nome\":\"mescla\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveA\",\"nome\":\"moveA\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveF\",\"nome\":\"moveF\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveV\",\"nome\":\"moveV\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.parte\",\"nome\":\"parte\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.parte@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"nomeia-faces\"],\"identidade\":\"declara-semantica\"},{\"id\":\"mecanifica.operacao.pesar\",\"nome\":\"pesar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.pesos@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"anota-pesos\"],\"identidade\":\"por-vertice\"},{\"id\":\"mecanifica.operacao.pincel\",\"nome\":\"pincel\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.plano\",\"nome\":\"plano\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.publicarPorta\",\"nome\":\"publicarPorta\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.porta@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"publica-porta\"],\"identidade\":\"declara-semantica\"},{\"id\":\"mecanifica.operacao.rotaciona\",\"nome\":\"rotaciona\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.solido\",\"nome\":\"solido\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.transladar\",\"nome\":\"transladar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.vira\",\"nome\":\"vira\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"interfaces\":{\"entra\":[],\"sai\":[]},\"requisitos\":[],\"custo\":1,\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"}]}]}",
+  "assinatura": "sha256:7ba5466719f07939ed7a4bd6ac9d5eb304abe2512df01e1feeb87d6767898646",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -29,7 +29,12 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Remover exatamente uma face, preferencialmente por seleção semântica.",
+            "schema": "mecanifica.argumentos.apagaFace@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.arranja",
@@ -53,7 +58,15 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Criar cópias lineares ou radiais com identidade estrutural.",
+            "schema": "mecanifica.argumentos.arranja@1",
+            "obrigatorios": [
+              "modo",
+              "total"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.arredondarAresta",
@@ -77,7 +90,18 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Substituir uma aresta convexa por múltiplos painéis de raio geométrico.",
+            "schema": "mecanifica.argumentos.arredondarAresta@1",
+            "obrigatorios": [
+              "origemId",
+              "de",
+              "aresta",
+              "raio",
+              "paineis"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.chamferBox",
@@ -99,7 +123,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar caixa de faces planas com quinas chanfradas.",
+            "schema": "mecanifica.argumentos.chamferBox@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.cilindro",
@@ -121,7 +150,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar cilindro fechado com laterais e duas tampas endereçáveis.",
+            "schema": "mecanifica.argumentos.cilindro@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.cone",
@@ -143,7 +177,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar cone fechado com base circular.",
+            "schema": "mecanifica.argumentos.cone@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.cubo",
@@ -165,7 +204,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar uma caixa retangular apoiada em y=0.",
+            "schema": "mecanifica.argumentos.cubo@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.displace",
@@ -189,7 +233,12 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Deslocar seleção ao longo das normais por ruído determinístico.",
+            "schema": "mecanifica.argumentos.displace@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.encostar",
@@ -213,7 +262,16 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Posicionar uma seleção em contato direcional com uma referência.",
+            "schema": "mecanifica.argumentos.encostar@1",
+            "obrigatorios": [
+              "sel",
+              "referencia",
+              "direcao"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.esfera",
@@ -235,7 +293,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar esfera UV apoiada no chão.",
+            "schema": "mecanifica.argumentos.esfera@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.espelha",
@@ -259,7 +322,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Duplicar faces refletidas, com modo estrutural opcional.",
+            "schema": "mecanifica.argumentos.espelha@1",
+            "obrigatorios": [
+              "eixo"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.extruda",
@@ -283,7 +353,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Extrudar uma face por ID posicional.",
+            "schema": "mecanifica.argumentos.extruda@1",
+            "obrigatorios": [
+              "face"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.filete",
@@ -307,7 +384,16 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Criar chanfro plano compatível com o filete v1.",
+            "schema": "mecanifica.argumentos.filete@1",
+            "obrigatorios": [
+              "origemId",
+              "de",
+              "aresta"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.furo",
@@ -331,7 +417,15 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Abrir um ou vários furos estruturais passantes ou cegos.",
+            "schema": "mecanifica.argumentos.furo@1",
+            "obrigatorios": [
+              "origemId",
+              "de"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.inflate",
@@ -353,7 +447,15 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Construir volume voxel fechado pela interseção de dois contornos 2D.",
+            "schema": "mecanifica.argumentos.inflate@1",
+            "obrigatorios": [
+              "contornoLado",
+              "contornoTopo"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.lathe",
@@ -375,7 +477,14 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Revolucionar perfil [raio,y] em torno de um eixo.",
+            "schema": "mecanifica.argumentos.lathe@1",
+            "obrigatorios": [
+              "perfil"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.liso",
@@ -399,7 +508,12 @@
           "efeitos": [
             "anota-face"
           ],
-          "identidade": "preserva"
+          "identidade": "preserva",
+          "uso": {
+            "intencao": "Marcar faces para sombreamento liso.",
+            "schema": "mecanifica.argumentos.liso@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.loft",
@@ -421,7 +535,14 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Conectar seções ao longo de um caminho 3D.",
+            "schema": "mecanifica.argumentos.loft@1",
+            "obrigatorios": [
+              "secoes"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.material",
@@ -445,7 +566,14 @@
           "efeitos": [
             "anota-face"
           ],
-          "identidade": "preserva"
+          "identidade": "preserva",
+          "uso": {
+            "intencao": "Associar faces a um material declarado em MATERIAIS.",
+            "schema": "mecanifica.argumentos.material@1",
+            "obrigatorios": [
+              "usa"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.mescla",
@@ -469,7 +597,15 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+            "schema": "mecanifica.argumentos.mescla@1",
+            "obrigatorios": [
+              "de",
+              "para"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.moveA",
@@ -493,7 +629,15 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Mover os dois vértices de uma aresta posicional.",
+            "schema": "mecanifica.argumentos.moveA@1",
+            "obrigatorios": [
+              "a",
+              "b"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.moveF",
@@ -517,7 +661,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Mover todos os vértices de uma face posicional.",
+            "schema": "mecanifica.argumentos.moveF@1",
+            "obrigatorios": [
+              "face"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.moveV",
@@ -541,7 +692,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Mover um vértice por ID posicional.",
+            "schema": "mecanifica.argumentos.moveV@1",
+            "obrigatorios": [
+              "v"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.parte",
@@ -565,7 +723,14 @@
           "efeitos": [
             "nomeia-faces"
           ],
-          "identidade": "declara-semantica"
+          "identidade": "declara-semantica",
+          "uso": {
+            "intencao": "Nomear faces como parte semântica e declarar hierarquia opcional.",
+            "schema": "mecanifica.argumentos.parte@1",
+            "obrigatorios": [
+              "nome"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.pesar",
@@ -589,7 +754,14 @@
           "efeitos": [
             "anota-pesos"
           ],
-          "identidade": "por-vertice"
+          "identidade": "por-vertice",
+          "uso": {
+            "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+            "schema": "mecanifica.argumentos.pesar@1",
+            "obrigatorios": [
+              "osso"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.pincel",
@@ -613,7 +785,12 @@
           "efeitos": [
             "anota-face"
           ],
-          "identidade": "preserva"
+          "identidade": "preserva",
+          "uso": {
+            "intencao": "Atribuir cor de face ou dabs locais determinísticos.",
+            "schema": "mecanifica.argumentos.pincel@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.plano",
@@ -635,7 +812,12 @@
           "efeitos": [
             "cria-geometria"
           ],
-          "identidade": "cria-por-passo"
+          "identidade": "cria-por-passo",
+          "uso": {
+            "intencao": "Criar grade plana no plano xz.",
+            "schema": "mecanifica.argumentos.plano@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.publicarPorta",
@@ -659,7 +841,14 @@
           "efeitos": [
             "publica-porta"
           ],
-          "identidade": "declara-semantica"
+          "identidade": "declara-semantica",
+          "uso": {
+            "intencao": "Publicar interface semântica endereçável de uma origem existente.",
+            "schema": "mecanifica.argumentos.publicarPorta@1",
+            "obrigatorios": [
+              "de"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.rotaciona",
@@ -683,7 +872,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Rotacionar malha ou seleção em convenção destra.",
+            "schema": "mecanifica.argumentos.rotaciona@1",
+            "obrigatorios": [
+              "eixo"
+            ]
+          }
         },
         {
           "id": "mecanifica.operacao.solido",
@@ -707,7 +903,12 @@
           "efeitos": [
             "anota-face"
           ],
-          "identidade": "preserva"
+          "identidade": "preserva",
+          "uso": {
+            "intencao": "Marcar faces para renderização sólida.",
+            "schema": "mecanifica.argumentos.solido@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.transladar",
@@ -731,7 +932,12 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Transladar malha inteira ou seleção semântica.",
+            "schema": "mecanifica.argumentos.transladar@1",
+            "obrigatorios": []
+          }
         },
         {
           "id": "mecanifica.operacao.vira",
@@ -755,7 +961,14 @@
           "efeitos": [
             "transforma-malha"
           ],
-          "identidade": "preserva-ou-deriva"
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Inverter o winding de uma face posicional.",
+            "schema": "mecanifica.argumentos.vira@1",
+            "obrigatorios": [
+              "face"
+            ]
+          }
         }
       ]
     }
@@ -783,7 +996,12 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Remover exatamente uma face, preferencialmente por seleção semântica.",
+        "schema": "mecanifica.argumentos.apagaFace@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.arranja",
@@ -807,7 +1025,15 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Criar cópias lineares ou radiais com identidade estrutural.",
+        "schema": "mecanifica.argumentos.arranja@1",
+        "obrigatorios": [
+          "modo",
+          "total"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.arredondarAresta",
@@ -831,7 +1057,18 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Substituir uma aresta convexa por múltiplos painéis de raio geométrico.",
+        "schema": "mecanifica.argumentos.arredondarAresta@1",
+        "obrigatorios": [
+          "origemId",
+          "de",
+          "aresta",
+          "raio",
+          "paineis"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.chamferBox",
@@ -853,7 +1090,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar caixa de faces planas com quinas chanfradas.",
+        "schema": "mecanifica.argumentos.chamferBox@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.cilindro",
@@ -875,7 +1117,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar cilindro fechado com laterais e duas tampas endereçáveis.",
+        "schema": "mecanifica.argumentos.cilindro@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.cone",
@@ -897,7 +1144,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar cone fechado com base circular.",
+        "schema": "mecanifica.argumentos.cone@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.cubo",
@@ -919,7 +1171,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar uma caixa retangular apoiada em y=0.",
+        "schema": "mecanifica.argumentos.cubo@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.displace",
@@ -943,7 +1200,12 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Deslocar seleção ao longo das normais por ruído determinístico.",
+        "schema": "mecanifica.argumentos.displace@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.encostar",
@@ -967,7 +1229,16 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Posicionar uma seleção em contato direcional com uma referência.",
+        "schema": "mecanifica.argumentos.encostar@1",
+        "obrigatorios": [
+          "sel",
+          "referencia",
+          "direcao"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.esfera",
@@ -989,7 +1260,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar esfera UV apoiada no chão.",
+        "schema": "mecanifica.argumentos.esfera@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.espelha",
@@ -1013,7 +1289,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Duplicar faces refletidas, com modo estrutural opcional.",
+        "schema": "mecanifica.argumentos.espelha@1",
+        "obrigatorios": [
+          "eixo"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.extruda",
@@ -1037,7 +1320,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Extrudar uma face por ID posicional.",
+        "schema": "mecanifica.argumentos.extruda@1",
+        "obrigatorios": [
+          "face"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.filete",
@@ -1061,7 +1351,16 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Criar chanfro plano compatível com o filete v1.",
+        "schema": "mecanifica.argumentos.filete@1",
+        "obrigatorios": [
+          "origemId",
+          "de",
+          "aresta"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.furo",
@@ -1085,7 +1384,15 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Abrir um ou vários furos estruturais passantes ou cegos.",
+        "schema": "mecanifica.argumentos.furo@1",
+        "obrigatorios": [
+          "origemId",
+          "de"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.inflate",
@@ -1107,7 +1414,15 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Construir volume voxel fechado pela interseção de dois contornos 2D.",
+        "schema": "mecanifica.argumentos.inflate@1",
+        "obrigatorios": [
+          "contornoLado",
+          "contornoTopo"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.lathe",
@@ -1129,7 +1444,14 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Revolucionar perfil [raio,y] em torno de um eixo.",
+        "schema": "mecanifica.argumentos.lathe@1",
+        "obrigatorios": [
+          "perfil"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.liso",
@@ -1153,7 +1475,12 @@
       "efeitos": [
         "anota-face"
       ],
-      "identidade": "preserva"
+      "identidade": "preserva",
+      "uso": {
+        "intencao": "Marcar faces para sombreamento liso.",
+        "schema": "mecanifica.argumentos.liso@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.loft",
@@ -1175,7 +1502,14 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Conectar seções ao longo de um caminho 3D.",
+        "schema": "mecanifica.argumentos.loft@1",
+        "obrigatorios": [
+          "secoes"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.material",
@@ -1199,7 +1533,14 @@
       "efeitos": [
         "anota-face"
       ],
-      "identidade": "preserva"
+      "identidade": "preserva",
+      "uso": {
+        "intencao": "Associar faces a um material declarado em MATERIAIS.",
+        "schema": "mecanifica.argumentos.material@1",
+        "obrigatorios": [
+          "usa"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.mescla",
@@ -1223,7 +1564,15 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Fundir vértices posicionais em um vértice-alvo.",
+        "schema": "mecanifica.argumentos.mescla@1",
+        "obrigatorios": [
+          "de",
+          "para"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.moveA",
@@ -1247,7 +1596,15 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Mover os dois vértices de uma aresta posicional.",
+        "schema": "mecanifica.argumentos.moveA@1",
+        "obrigatorios": [
+          "a",
+          "b"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.moveF",
@@ -1271,7 +1628,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Mover todos os vértices de uma face posicional.",
+        "schema": "mecanifica.argumentos.moveF@1",
+        "obrigatorios": [
+          "face"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.moveV",
@@ -1295,7 +1659,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Mover um vértice por ID posicional.",
+        "schema": "mecanifica.argumentos.moveV@1",
+        "obrigatorios": [
+          "v"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.parte",
@@ -1319,7 +1690,14 @@
       "efeitos": [
         "nomeia-faces"
       ],
-      "identidade": "declara-semantica"
+      "identidade": "declara-semantica",
+      "uso": {
+        "intencao": "Nomear faces como parte semântica e declarar hierarquia opcional.",
+        "schema": "mecanifica.argumentos.parte@1",
+        "obrigatorios": [
+          "nome"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.pesar",
@@ -1343,7 +1721,14 @@
       "efeitos": [
         "anota-pesos"
       ],
-      "identidade": "por-vertice"
+      "identidade": "por-vertice",
+      "uso": {
+        "intencao": "Atribuir peso de osso a vértices ou faces posicionais.",
+        "schema": "mecanifica.argumentos.pesar@1",
+        "obrigatorios": [
+          "osso"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.pincel",
@@ -1367,7 +1752,12 @@
       "efeitos": [
         "anota-face"
       ],
-      "identidade": "preserva"
+      "identidade": "preserva",
+      "uso": {
+        "intencao": "Atribuir cor de face ou dabs locais determinísticos.",
+        "schema": "mecanifica.argumentos.pincel@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.plano",
@@ -1389,7 +1779,12 @@
       "efeitos": [
         "cria-geometria"
       ],
-      "identidade": "cria-por-passo"
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar grade plana no plano xz.",
+        "schema": "mecanifica.argumentos.plano@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.publicarPorta",
@@ -1413,7 +1808,14 @@
       "efeitos": [
         "publica-porta"
       ],
-      "identidade": "declara-semantica"
+      "identidade": "declara-semantica",
+      "uso": {
+        "intencao": "Publicar interface semântica endereçável de uma origem existente.",
+        "schema": "mecanifica.argumentos.publicarPorta@1",
+        "obrigatorios": [
+          "de"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.rotaciona",
@@ -1437,7 +1839,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Rotacionar malha ou seleção em convenção destra.",
+        "schema": "mecanifica.argumentos.rotaciona@1",
+        "obrigatorios": [
+          "eixo"
+        ]
+      }
     },
     {
       "id": "mecanifica.operacao.solido",
@@ -1461,7 +1870,12 @@
       "efeitos": [
         "anota-face"
       ],
-      "identidade": "preserva"
+      "identidade": "preserva",
+      "uso": {
+        "intencao": "Marcar faces para renderização sólida.",
+        "schema": "mecanifica.argumentos.solido@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.transladar",
@@ -1485,7 +1899,12 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Transladar malha inteira ou seleção semântica.",
+        "schema": "mecanifica.argumentos.transladar@1",
+        "obrigatorios": []
+      }
     },
     {
       "id": "mecanifica.operacao.vira",
@@ -1509,7 +1928,14 @@
       "efeitos": [
         "transforma-malha"
       ],
-      "identidade": "preserva-ou-deriva"
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Inverter o winding de uma face posicional.",
+        "schema": "mecanifica.argumentos.vira@1",
+        "obrigatorios": [
+          "face"
+        ]
+      }
     }
   ]
 }

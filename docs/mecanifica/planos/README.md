@@ -3,12 +3,16 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-18-ensaio-ponta-a-ponta-dobradica.md`](2026-08-18-ensaio-ponta-a-ponta-dobradica.md).
+[`2026-08-18-sonda-supercarro-1-0.md`](2026-08-18-sonda-supercarro-1-0.md).
 
-O plano valida a plataforma entregue na R00–R10 usando uma dobradiça didática
-privada: registro, catálogo, hipergrafo, busca, subgrafo, extensão, procedência,
-lacuna, exportação, montagem v4, auditoria, vistas e revisão MCP. Não publica
-geometria nem abre cinemática, solver ou engenharia de fixação.
+O plano usa um supercarro exterior ficcional e privado para testar escala:
+hierarquia, instâncias, materiais, orçamento geométrico, contexto progressivo,
+crítica visual, exportação e correções genéricas encontradas em execução. Não
+publica geometria, replica fabricante nem abre interior ou física veicular.
+
+O [ensaio ponta a ponta da dobradiça](2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
+foi concluído com decisão `aprovar`; a evidência está em
+[`../RELATORIO-ENSAIO-DOBRADICA-1-0.md`](../RELATORIO-ENSAIO-DOBRADICA-1-0.md).
 
 O plano da plataforma procedural extensível foi concluído no R10 com decisão
 `aprovar`; a evidência está em `../RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`.
@@ -232,6 +236,7 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-Não abra um segundo plano enquanto a plataforma procedural extensível estiver
-ativa. O estado no topo desta página é a fonte. Os demais candidatos permanecem
-no [`BACKLOG.md`](BACKLOG.md) sem autorização automática.
+Não abra um segundo plano enquanto a sonda do supercarro estiver ativa. O
+estado no topo desta página é a fonte. A sonda seguinte será a armadura
+humanoide e só abre após decisão do plano atual; os demais candidatos
+permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização automática.

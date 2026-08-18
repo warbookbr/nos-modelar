@@ -5,6 +5,7 @@
 - [Catálogo legível](CATALOGO-CAPACIDADES.md)
 - [Catálogo JSON](catalogo-capacidades.json)
 - [Schema do catálogo](catalogo-capacidades.schema.json)
+- [Contratos executáveis das operações](schemas-operacoes.json)
 - [Hipergrafo de capacidades](grafo-capacidades.json)
 - [Schema do hipergrafo](grafo-capacidades.schema.json)
 - [Schema de lacuna de capacidade](lacuna-capacidade.schema.json)

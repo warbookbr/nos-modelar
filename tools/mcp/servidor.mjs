@@ -194,7 +194,7 @@ function registrarRecursos(server, {
   server.registerResource(
     'capacidades-modelagem',
     'mecanifica://capacidades/modelagem',
-    { title: 'Capacidades de modelagem', description: 'Limites do perfil revisao.', mimeType: 'application/json' },
+    { title: 'Capacidades de modelagem', description: `Capacidades, limites e ações do perfil ${perfil}.`, mimeType: 'application/json' },
     async (uri) => ({ contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(capacidadesModelagem) }] }),
   );
   server.registerResource(

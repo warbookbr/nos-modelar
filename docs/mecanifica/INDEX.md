@@ -87,6 +87,13 @@ aplicação publicada aqui.
   e ferramentas MCP de leitura, provado por cliente externo sem escrita.
   A R10 removeu a lacuna de extensão nas portas oficiais e aprovou o estudo de
   campo privado (`docs/mecanifica/RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`).
+- O [ensaio ponta a ponta da dobradiça 1.0](planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
+  (`docs/mecanifica/planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md`)
+  foi concluído e aprovado: três receitas privadas, três relações cilíndricas,
+  auditoria 3/3, oito vistas, composições pelas portas oficiais e descoberta
+  com contratos executáveis. A evidência está em
+  [`RELATORIO-ENSAIO-DOBRADICA-1-0.md`](RELATORIO-ENSAIO-DOBRADICA-1-0.md)
+  (`docs/mecanifica/RELATORIO-ENSAIO-DOBRADICA-1-0.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
@@ -202,7 +209,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 12. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho
   paralelo.
 13. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
-14. [`gerado/INDEX.md`](gerado/INDEX.md) para o catálogo, schemas e hipergrafo
+14. [`gerado/INDEX.md`](gerado/INDEX.md) para o catálogo, schemas, contratos de
+    uso e hipergrafo
     de capacidades atuais.
 15. [`COMPOSICAO-PROCEDURAL-V1.md`](COMPOSICAO-PROCEDURAL-V1.md) para
     reutilização declarativa dentro de receitas.
@@ -276,9 +284,11 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é o [ensaio ponta a ponta da dobradiça](planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
-  (`docs/mecanifica/planos/2026-08-18-ensaio-ponta-a-ponta-dobradica.md`),
-  aberto após a plataforma procedural concluir R00–R10 com decisão `aprovar`.
+- O plano ativo é a [sonda de escala do supercarro 1.0](planos/2026-08-18-sonda-supercarro-1-0.md)
+  (`docs/mecanifica/planos/2026-08-18-sonda-supercarro-1-0.md`),
+  aberta após a dobradiça concluir com decisão `aprovar`. A fixture é privada,
+  ficcional e testa hierarquia, instâncias, contexto, materiais, orçamento e
+  crítica visual sem domínio automotivo no núcleo.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.

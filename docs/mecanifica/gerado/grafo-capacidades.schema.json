@@ -14,13 +14,68 @@
       "const": "mecanifica.hipergrafo-capacidades@1"
     },
     "assinatura": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "nos": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "tipo"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tipo": {
+            "enum": [
+              "artefato",
+              "operacao"
+            ]
+          },
+          "artefato": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        }
+      }
     },
     "hiperarestas": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "operacao",
+          "entra",
+          "sai"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "operacao": {
+            "type": "string"
+          },
+          "entra": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sai": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   }
 }

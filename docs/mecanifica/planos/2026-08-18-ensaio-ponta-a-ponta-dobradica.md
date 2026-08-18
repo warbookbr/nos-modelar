@@ -1,6 +1,6 @@
 # Ensaio ponta a ponta — dobradiça de porta
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -131,4 +131,17 @@ contornar uma recusa do núcleo. O fechamento será `aprovar`, `corrigir` ou
 
 ## Fechamento
 
-A preencher após R05.
+**Decisão: aprovar.** As três receitas privadas executam, descrevem, exportam e
+reabrem pelas portas oficiais; a montagem v4 satisfaz 3/3 relações cilíndricas,
+a auditoria cobre 3/3 pares e oito vistas passam. A sonda corrigiu a propagação
+oficial de composições e transformou as 32 operações em contratos de uso
+descobríveis e executáveis, com paginação MCP, saídas tipadas e diagnósticos
+seguros. A baseline R00 permaneceu byte-idêntica.
+
+O custo aceito foi +22,98 kB minificado/+7,70 kB gzip no build; catálogo,
+hipergrafo, busca e plano padrão ficaram menores. A suíte integral passou em 83
+arquivos: 1.040 testes aprovados, dois ignorados previstos e zero falha. O
+relatório causal está em `../RELATORIO-ENSAIO-DOBRADICA-1-0.md`.
+
+A continuidade foi aberta no plano de sonda do supercarro 1.0. Ele testa escala
+e apresentação sem reabrir este recorte nem publicar as peças da dobradiça.

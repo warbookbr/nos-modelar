@@ -4,7 +4,10 @@ Uma extensão nativa é código versionado do repositório, nunca JavaScript vin
 de receita. Seu pacote possui manifesto, implementação e fixture/teste.
 
 O manifesto `mecanifica.extensao-nativa@1` declara a operação completa:
-identidade, versão, artefatos, efeitos e política de identidade. A extensão é
+identidade, versão, artefatos, efeitos, política de identidade e o mesmo
+contrato de uso descobrível das operações do núcleo. Schema de argumentos,
+exemplo, pré-condições, limites e diagnósticos entram na assinatura do registro.
+A extensão é
 combinada explicitamente ao registro base; não há autorregistro nem mutação
 global.
 

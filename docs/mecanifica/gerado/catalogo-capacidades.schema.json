@@ -14,13 +14,309 @@
       "const": "mecanifica.catalogo-capacidades@1"
     },
     "assinatura": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "modulos": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "versao",
+          "requer",
+          "operacoes"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "versao": {
+            "type": "string"
+          },
+          "requer": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "operacoes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "nome",
+                "versao",
+                "categoria",
+                "artefatos",
+                "interfaces",
+                "requisitos",
+                "custo",
+                "efeitos",
+                "identidade",
+                "uso"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "nome": {
+                  "type": "string"
+                },
+                "versao": {
+                  "type": "string"
+                },
+                "categoria": {
+                  "type": "string"
+                },
+                "artefatos": {
+                  "type": "object",
+                  "required": [
+                    "entra",
+                    "sai"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "entra": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "sai": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "interfaces": {
+                  "type": "object",
+                  "required": [
+                    "entra",
+                    "sai"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "entra": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "sai": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "requisitos": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "custo": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "efeitos": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "identidade": {
+                  "type": "string"
+                },
+                "uso": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "intencao",
+                        "schema",
+                        "obrigatorios"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "intencao": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "schema": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "obrigatorios": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "uniqueItems": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "operacoes": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "versao",
+          "categoria",
+          "artefatos",
+          "interfaces",
+          "requisitos",
+          "custo",
+          "efeitos",
+          "identidade",
+          "uso"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "versao": {
+            "type": "string"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "artefatos": {
+            "type": "object",
+            "required": [
+              "entra",
+              "sai"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "entra": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sai": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "interfaces": {
+            "type": "object",
+            "required": [
+              "entra",
+              "sai"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "entra": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sai": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "requisitos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "custo": {
+            "type": "number",
+            "minimum": 0
+          },
+          "efeitos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "identidade": {
+            "type": "string"
+          },
+          "uso": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "intencao",
+                  "schema",
+                  "obrigatorios"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "intencao": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "schema": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "obrigatorios": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": true
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
     }
   }
 }

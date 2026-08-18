@@ -9,6 +9,10 @@ describe('SDK de extensões nativas — R07', () => {
   it('executa a extensão por contexto limitado, de modo determinístico e com topologia finita', () => {
     const registro = completo(), a = nucleo(PASSOS, {}, {}, {}, null, [], { registroOperacoes: registro }), b = nucleo(PASSOS, {}, {}, {}, null, [], { registroOperacoes: registro });
     expect(a.orfaos).toEqual([]); expect(a.V.size).toBe(6); expect(a.F.size).toBe(5); expect([...a.V]).toEqual([...b.V]); expect([...a.F.values()].map((f) => f.vs)).toEqual([...b.F.values()].map((f) => f.vs));
+    expect(registro.resolver('prismaTriangular').uso).toMatchObject({
+      formato: 'mecanifica.uso-operacao@1', schemaArgumentos: { $id: 'mecanifica.argumentos.prismaTriangular@1' },
+      exemplo: { PASSOS },
+    });
   });
   it('funciona como operação registrada numa composição e a ausência vira diagnóstico sem estado parcial', async () => {
     const { FORMATO_COMPOSICAO_PROCEDURAL, criarRegistroComposicoes, expandirComposicao } = await import('../../prototipos/procedural/v3/motor/oficina.js');
@@ -16,7 +20,10 @@ describe('SDK de extensões nativas — R07', () => {
     const composicoes = criarRegistroComposicoes({ resolverOperacao: registro.resolver, composicoes: [{ formato: FORMATO_COMPOSICAO_PROCEDURAL, id: 'mecanifica.composicao.prova-extensao', versao: '1.0.0', parametros: {}, artefatos: { entra: [], sai: ['mecanifica.malha-poligonal@1'] }, nos: [{ id: 'prisma', operacao: 'prismaTriangular', argumentos: { raio: 0.5, altura: 1 } }] }] });
     expect(nucleo(expandirComposicao(composicoes, 'mecanifica.composicao.prova-extensao').passos, {}, {}, {}, null, [], { registroOperacoes: registro }).orfaos).toEqual([]);
     const ausente = diagnosticarExtensaoAusente(REGISTRO_OPERACOES, 'prismaTriangular');
-    expect(ausente).toMatchObject({ estado: 'ausente', capacidade: 'prismaTriangular' });
+    expect(ausente).toMatchObject({
+      estado: 'ausente', capacidade: 'prismaTriangular', decisao: 'nao-executar',
+      proximoPasso: { tipo: 'analisar-lacuna', ferramenta: 'analisar_lacuna' },
+    });
     const tentativa = nucleo(PASSOS); expect(tentativa.orfaos).toHaveLength(1); expect(tentativa.V.size).toBe(0); expect(tentativa.F.size).toBe(0);
   });
 });

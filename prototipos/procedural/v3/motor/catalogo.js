@@ -14,6 +14,20 @@ function lista(valor, nome) {
   const valores = Array.isArray(valor) ? valor : [valor];
   return valores.map((item) => texto(item, nome)).sort(comparar);
 }
+function limite(valor) {
+  if (valor == null) return null;
+  if (!Number.isSafeInteger(valor) || valor < 1 || valor > 100) throw new TypeError('consulta.limite precisa ser inteiro entre 1 e 100');
+  return valor;
+}
+function copiar(valor) { return valor == null ? valor : JSON.parse(JSON.stringify(valor)); }
+function usoCompacto(uso) {
+  if (!uso) return null;
+  return {
+    intencao: uso.intencao,
+    schema: uso.schema ?? uso.schemaArgumentos?.$id ?? null,
+    obrigatorios: [...(uso.obrigatorios ?? uso.schemaArgumentos?.required ?? [])],
+  };
+}
 function copiarOperacao(operacao) {
   return {
     id: operacao.id, nome: operacao.nome, versao: operacao.versao,
@@ -28,6 +42,7 @@ function copiarOperacao(operacao) {
     requisitos: [...(operacao.requisitos ?? [])].sort(comparar),
     custo: operacao.custo ?? 1,
     efeitos: [...(operacao.efeitos ?? [])].sort(comparar), identidade: operacao.identidade,
+    uso: usoCompacto(operacao.uso),
   };
 }
 
@@ -60,24 +75,42 @@ export function buscarCapacidades(catalogo, consulta = {}) {
     texto: texto(consulta.texto, 'consulta.texto'),
     consome: lista(consulta.consome, 'consulta.consome'), produz: lista(consulta.produz, 'consulta.produz'),
     efeito: lista(consulta.efeito, 'consulta.efeito'), identidade: texto(consulta.identidade, 'consulta.identidade'),
+    limite: limite(consulta.limite), cursor: texto(consulta.cursor, 'consulta.cursor'),
   };
-  const operacoes = catalogo.operacoes.filter((operacao) => {
-    const corpus = [operacao.id, operacao.nome, operacao.categoria, operacao.identidade, ...operacao.efeitos, ...operacao.artefatos.entra, ...operacao.artefatos.sai, ...operacao.interfaces.entra, ...operacao.interfaces.sai, ...operacao.requisitos]
+  const encontradas = catalogo.operacoes.filter((operacao) => {
+    const corpus = [operacao.id, operacao.nome, operacao.categoria, operacao.identidade, operacao.uso?.intencao, ...(operacao.uso?.obrigatorios ?? []), ...operacao.efeitos, ...operacao.artefatos.entra, ...operacao.artefatos.sai, ...operacao.interfaces.entra, ...operacao.interfaces.sai, ...operacao.requisitos]
+      .filter(Boolean)
       .join(' ').toLocaleLowerCase('pt-BR');
     return (!filtros.texto || corpus.includes(filtros.texto))
       && incluiTodos(operacao.artefatos.entra.map((item) => item.toLocaleLowerCase('pt-BR')), filtros.consome)
       && incluiTodos(operacao.artefatos.sai.map((item) => item.toLocaleLowerCase('pt-BR')), filtros.produz)
       && incluiTodos(operacao.efeitos.map((item) => item.toLocaleLowerCase('pt-BR')), filtros.efeito)
       && (!filtros.identidade || operacao.identidade.toLocaleLowerCase('pt-BR') === filtros.identidade);
-  }).map(copiarOperacao);
-  return { formato: 'mecanifica.busca-capacidades@1', consulta: filtros, total: operacoes.length, operacoes };
+  });
+  const depoisDoCursor = filtros.cursor
+    ? encontradas.filter(({ id }) => id.toLocaleLowerCase('pt-BR') > filtros.cursor)
+    : encontradas;
+  const operacoes = depoisDoCursor.slice(0, filtros.limite ?? depoisDoCursor.length).map(copiarOperacao);
+  const truncado = operacoes.length < depoisDoCursor.length;
+  return {
+    formato: 'mecanifica.busca-capacidades@1', consulta: filtros,
+    total: encontradas.length, retornadas: operacoes.length,
+    omitidas: depoisDoCursor.length - operacoes.length, truncado,
+    proximoCursor: truncado ? operacoes.at(-1)?.id ?? null : null,
+    operacoes,
+  };
 }
 
-export function explicarCapacidade(catalogo, identificador) {
+export function explicarCapacidade(catalogo, identificador, { registro = null } = {}) {
   conferirCatalogo(catalogo);
   const termo = texto(identificador, 'identificador');
   const exata = catalogo.operacoes.find((operacao) => operacao.id.toLocaleLowerCase('pt-BR') === termo || operacao.nome.toLocaleLowerCase('pt-BR') === termo);
-  if (exata) return { formato: 'mecanifica.explicacao-capacidade@1', encontrada: true, operacao: copiarOperacao(exata) };
+  if (exata) {
+    const operacao = copiarOperacao(exata);
+    const registrada = registro?.resolver?.(exata.id) ?? null;
+    if (registrada?.uso) operacao.uso = copiar(registrada.uso);
+    return { formato: 'mecanifica.explicacao-capacidade@1', encontrada: true, operacao };
+  }
   const candidatas = buscarCapacidades(catalogo, { texto: termo }).operacoes.map(({ id, nome }) => ({ id, nome }));
   return {
     formato: 'mecanifica.explicacao-capacidade@1', encontrada: false, identificador,

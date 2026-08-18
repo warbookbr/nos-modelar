@@ -14,9 +14,11 @@ receita monolítica.
 
 1. Descubra capacidades no [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
    ou, pelo MCP procedural, em `mecanifica://procedural/catalogo` e
-   `mecanifica://procedural/schemas`. Busque, descreva e combine/valide a
-   cadeia antes de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`; não replique
-   tabelas por regex nem invente uma operação ausente.
+   `mecanifica://procedural/schemas`. Busque em modo resumido e use
+   `descrever_capacidade` para obter schema, exemplo, pré-condições, limites e
+   diagnósticos somente da operação escolhida. Combine/valide a cadeia antes
+   de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`; não replique tabelas por
+   regex nem invente uma operação ausente.
 2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
    quando o contrato permitir. Não grave identidade por índice ou UUID.
 3. Rode a descrição estrita e obtenha vistas por uma bancada/harness privado

@@ -13,6 +13,7 @@
 import { criarResolverNumerico } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
+import { usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
 import { criarOperacoesPrimitivasSuperficie } from './operacoes/primitivas-superficie.js';
 import { criarOperacoesEdicaoDireta } from './operacoes/edicao-direta.js';
@@ -2380,7 +2381,8 @@ function contratoDaOperacao(nome) {
 export const REGISTRO_OPERACOES = criarRegistroOperacoes({ modulos: [{
   id: 'mecanifica.motor.nucleo', versao: '1.0.0', requer: [],
   operacoes: NOMES_DAS_OPERACOES.map((nome) => ({
-    id: `mecanifica.operacao.${nome}`, nome, versao: '1.0.0', categoria: 'procedural', executar: OPS[nome], ...contratoDaOperacao(nome),
+    id: `mecanifica.operacao.${nome}`, nome, versao: '1.0.0', categoria: 'procedural',
+    executar: OPS[nome], uso: usoDaOperacao(nome), ...contratoDaOperacao(nome),
   })),
 }] });
 

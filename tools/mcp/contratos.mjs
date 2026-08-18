@@ -164,20 +164,49 @@ const interfacesProcedurais = z.object({
   entra: z.array(z.string().min(1)), sai: z.array(z.string().min(1)),
 }).strict();
 const identificadorProcedural = z.string().min(1).max(240);
+/* O núcleo usa o mesmo identificador semântico para composições declarativas.
+   Mantê-lo na borda evita aceitar uma chamada que só falhará dentro do
+   resolvedor, depois de atravessar o protocolo MCP. */
+const identificadorComposicao = z.string().regex(/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$/);
+const detalheProcedural = z.enum(['resumo', 'completo']).default('resumo');
+const limiteProcedural = z.number().int().positive().max(64).default(8);
+const objetoJSON = z.record(z.string(), z.unknown());
+const usoOperacaoCompacto = z.object({
+  intencao: z.string().min(1), schema: z.string().min(1).nullable(),
+  obrigatorios: z.array(z.string()),
+}).strict();
+const schemaArgumentosOperacao = z.object({
+  $schema: z.string().min(1), $id: z.string().min(1), type: z.literal('object'),
+  additionalProperties: z.boolean(), required: z.array(z.string()),
+  properties: z.record(z.string(), z.unknown()),
+}).passthrough();
+const exemploOperacao = z.object({
+  formato: z.literal('mecanifica.exemplo-operacao@1'),
+  PASSOS: z.array(z.tuple([z.string(), objetoJSON])), PARAMS: objetoJSON,
+  TOPO: objetoJSON, MATERIAIS: objetoJSON, ESQUELETO: z.unknown().nullable(),
+  ALIASES: z.array(z.unknown()),
+}).strict();
+const usoOperacaoCompleto = z.object({
+  formato: z.literal('mecanifica.uso-operacao@1'), intencao: z.string().min(1),
+  schemaArgumentos: schemaArgumentosOperacao, exemplo: exemploOperacao,
+  precondicoes: z.array(z.string()), limites: z.array(z.string()),
+  diagnosticos: z.array(z.object({ quando: z.string(), acao: z.string() }).strict()),
+}).strict();
 
 export const buscarCapacidadesEntrada = z.object({
   texto: z.string().min(1).max(240).optional(), consome: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(),
   produz: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(), efeito: z.union([z.string().min(1), z.array(z.string().min(1))]).optional(),
-  identidade: z.string().min(1).max(240).optional(),
+  identidade: z.string().min(1).max(240).optional(), limite: limiteProcedural,
+  cursor: z.string().min(1).max(240).optional(), detalhe: detalheProcedural,
 }).strict();
 export const descreverCapacidadeEntrada = z.object({ identificador: identificadorProcedural }).strict();
 export const combinarCapacidadesEntrada = z.object({
   artefatos: artefatosProcedurais, interfaces: interfacesProcedurais.optional(), requisitos: z.array(z.string().min(1)).optional(),
   maxCusto: z.number().finite().nonnegative().optional(), maxCadeias: z.number().int().positive().max(32).optional(),
-  pesos: z.record(z.string().min(1), z.number().finite().nonnegative()).optional(),
+  pesos: z.record(z.string().min(1), z.number().finite().nonnegative()).optional(), limite: limiteProcedural, detalhe: detalheProcedural,
 }).strict();
 export const validarComposicaoEntrada = z.object({
-  composicoes: z.array(z.json()).min(1).max(64), id: identificadorProcedural,
+  composicoes: z.array(z.json()).min(1).max(64), id: identificadorComposicao,
   parametros: z.record(z.string().min(1), z.json()).optional(),
   orcamento: z.object({ maxPassos: z.number().int().positive().max(8192).optional(), maxProfundidade: z.number().int().positive().max(128).optional() }).strict().optional(),
 }).strict();
@@ -187,15 +216,87 @@ export const analisarLacunaEntrada = z.object({
   requisitoAusente: z.object({ tipo: z.enum(['artefato', 'interface', 'representacao']), id: identificadorProcedural }).strict().nullable().optional(),
   contorno: z.object({ descricao: z.string().min(1).max(500), custo: z.number().finite().nonnegative() }).strict().nullable().optional(),
   recorrencia: z.number().int().nonnegative().optional(), classificacao: z.enum(['composicao', 'operacao-nativa', 'representacao']).nullable().optional(),
+  limite: limiteProcedural, detalhe: detalheProcedural,
 }).strict();
 export const diagnosticarExtensaoEntrada = z.object({ capacidade: identificadorProcedural }).strict();
-const saidaProcedural = z.object({ ...respostaBase, resultado: z.json().optional() }).strict();
-export const buscarCapacidadesSaida = saidaProcedural;
-export const descreverCapacidadeSaida = saidaProcedural;
-export const combinarCapacidadesSaida = saidaProcedural;
-export const validarComposicaoSaida = saidaProcedural;
-export const analisarLacunaSaida = saidaProcedural;
-export const diagnosticarExtensaoSaida = saidaProcedural;
+
+const operacaoProcedural = z.object({
+  id: z.string(), nome: z.string(), versao: z.string(), categoria: z.string(),
+  artefatos: artefatosProcedurais, interfaces: interfacesProcedurais,
+  requisitos: z.array(z.string()), custo: z.number().finite().nonnegative(),
+  efeitos: z.array(z.string()), identidade: z.string(),
+  uso: z.union([usoOperacaoCompacto, usoOperacaoCompleto, z.null()]).optional(),
+}).passthrough();
+const operacaoProceduralResumo = operacaoProcedural.pick({
+  id: true, nome: true, versao: true, categoria: true, artefatos: true,
+  interfaces: true, requisitos: true, custo: true, efeitos: true, identidade: true, uso: true,
+});
+const consultaBusca = z.object({
+  texto: z.string().nullable(), consome: z.array(z.string()).nullable(), produz: z.array(z.string()).nullable(),
+  efeito: z.array(z.string()).nullable(), identidade: z.string().nullable(),
+  limite: z.number().int().positive().nullable(), cursor: z.string().nullable(),
+}).passthrough();
+const controleProgressivo = z.object({
+  limite: z.number().int().positive(), retornadas: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(), truncado: z.boolean(), detalhe: z.enum(['resumo', 'completo']),
+}).strict();
+const buscaProcedural = z.object({
+  formato: z.literal('mecanifica.busca-capacidades@1'), consulta: consultaBusca,
+  total: z.number().int().nonnegative(), retornadas: z.number().int().nonnegative().optional(),
+  omitidas: z.number().int().nonnegative().optional(), truncado: z.boolean().optional(), proximoCursor: z.string().nullable().optional(),
+  operacoes: z.array(operacaoProceduralResumo),
+  controle: controleProgressivo,
+}).passthrough();
+const explicacaoProcedural = z.object({
+  formato: z.literal('mecanifica.explicacao-capacidade@1'), encontrada: z.boolean(),
+  operacao: operacaoProcedural.optional(), identificador: z.string().optional(),
+  diagnostico: z.string().optional(), candidatas: z.array(z.object({ id: z.string(), nome: z.string() }).strict()).optional(),
+}).passthrough();
+const cadeiaProcedural = z.object({
+  operacoes: z.array(z.object({ id: z.string(), nome: z.string() }).strict()), custo: z.number().finite(),
+  artefatos: artefatosProcedurais, interfaces: interfacesProcedurais,
+}).strict();
+const descarteProcedural = z.object({
+  operacao: z.object({ id: z.string(), nome: z.string() }).strict(), motivo: z.string(),
+}).strict();
+const planoProcedural = z.object({
+  formato: z.literal('mecanifica.plano-capacidades@1'),
+  objetivo: z.object({ artefatos: artefatosProcedurais, interfaces: interfacesProcedurais, requisitos: z.array(z.string()) }).strict(),
+  cadeias: z.array(cadeiaProcedural), descartes: z.array(descarteProcedural),
+  limites: z.object({ maxCusto: z.number().finite(), maxCadeias: z.number().int().nonnegative() }).strict(),
+  diagnostico: z.string(), controle: controleProgressivo,
+}).passthrough();
+const validacaoProcedural = z.object({
+  formato: z.literal('mecanifica.validacao-composicao@1'), valida: z.boolean(), composicao: z.string(),
+  artefatos: artefatosProcedurais, passos: z.array(z.tuple([z.string(), objetoJSON])), procedencia: z.object({
+    formato: z.literal('mecanifica.procedencia-composicao@1'),
+    nos: z.array(z.object({ passo: z.number().int().nonnegative(), caminho: z.string(), composicao: z.string(), no: z.string(), operacao: z.string() }).strict()),
+  }).strict(),
+}).strict();
+const lacunaPublica = z.object({
+  formato: z.literal('mecanifica.lacuna-capacidade@1'), id: z.string(), objetivo: z.string(),
+  artefatos: artefatosProcedurais, interfaces: interfacesProcedurais, requisitos: z.array(z.string()),
+  candidatas: z.array(z.string()), requisitoAusente: z.object({ tipo: z.enum(['artefato', 'interface', 'representacao']), id: z.string() }).strict().nullable(),
+  contorno: z.object({ descricao: z.string(), custo: z.number().finite().nonnegative() }).strict().nullable(),
+  recorrencia: z.number().int().nonnegative(), classificacao: z.enum(['composicao', 'operacao-nativa', 'representacao']).nullable(),
+}).strict();
+const classificacaoLacuna = z.object({
+  formato: z.literal('mecanifica.classificacao-lacuna@1'), lacuna: z.string(),
+  classificacao: z.enum(['composicao', 'operacao-nativa', 'representacao']), fundamento: z.string(), plano: planoProcedural,
+}).strict();
+const lacunaProcedural = z.object({ lacuna: lacunaPublica, classificacao: classificacaoLacuna }).strict();
+const extensaoProcedural = z.object({
+  formato: z.literal('mecanifica.diagnostico-extensao@1'), capacidade: z.string(), estado: z.enum(['ausente', 'disponivel']),
+  acao: z.string(), codigo: z.string().optional(), executavel: z.boolean().optional(),
+  proximoPasso: z.object({ ferramenta: z.string(), motivo: z.string() }).strict().optional(),
+}).passthrough();
+const saidaProcedural = (resultado) => z.object({ ...respostaBase, resultado: resultado.optional() }).strict();
+export const buscarCapacidadesSaida = saidaProcedural(buscaProcedural);
+export const descreverCapacidadeSaida = saidaProcedural(explicacaoProcedural);
+export const combinarCapacidadesSaida = saidaProcedural(planoProcedural);
+export const validarComposicaoSaida = saidaProcedural(validacaoProcedural);
+export const analisarLacunaSaida = saidaProcedural(lacunaProcedural);
+export const diagnosticarExtensaoSaida = saidaProcedural(extensaoProcedural);
 
 export const descreverSaida = z.object({
   ...respostaBase,

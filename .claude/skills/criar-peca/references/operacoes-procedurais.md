@@ -3,7 +3,12 @@
 Leia esta referência quando a tarefa exigir uma operação específica. O catálogo
 de operações é gerado do registro do núcleo: rode `npm run catalogo:gerar` e
 consulte [`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](../../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md).
-O executor continua sendo a autoridade final para argumentos e recusas.
+Cada operação publica também schema de argumentos, exemplo executável,
+pré-condições, limites e diagnóstico em
+[`schemas-operacoes.json`](../../../../docs/mecanifica/gerado/schemas-operacoes.json).
+Pelo MCP, prefira `descrever_capacidade`: ele entrega somente o contrato completo
+da operação pedida. O executor continua sendo a autoridade final para validar
+uma receita concreta e produzir recusas ligadas ao estado real da malha.
 
 O acervo de receitas está vazio; nomes de peças em exemplos históricos desta
 referência não são caminhos disponíveis nem modelos para copiar.
@@ -11,6 +16,7 @@ referência não são caminhos disponíveis nem modelos para copiar.
 ## Navegação
 
 - descoberta de operações, artefatos, efeitos e identidade: catálogo gerado;
+- argumentos e exemplo de uma operação: `descrever_capacidade` ou contratos gerados;
 - seleção semântica, identidade e limites: seção de seleção;
 - proveniência de `origem`, rotação e exemplos: detalhes de seleção;
 - aliases, atributos e animação: bloco de aliases e leis do núcleo.
