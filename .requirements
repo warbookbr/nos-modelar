@@ -1,0 +1,14 @@
+# Ambiente de desenvolvimento — Mecanifica
+
+- Node.js 22 LTS (>= 22.12; não use Node.js 24 enquanto o transporte MCP por
+  stdio não for homologado nessa linha).
+- npm que acompanha o Node.js 22 LTS.
+- Dependências do projeto: `npm ci`.
+
+Verificação mínima:
+
+```sh
+node --version
+npm ci
+npm run mcp:check
+```

@@ -343,6 +343,10 @@ export function criarServidor({
 }
 
 export function iniciarServidor() {
+  // Em Node 24, apenas registrar o listener do transporte não mantém o stdin
+  // referenciado enquanto o cliente ainda prepara a primeira requisição. Sem
+  // este resume, o processo stdio pode encerrar limpo antes do `initialize`.
+  process.stdin.resume();
   return serveStdio(() => criarServidor(), {
     onerror: (erro) => process.stderr.write(`mecanifica-mcp: ${erro.message}\n`),
   });

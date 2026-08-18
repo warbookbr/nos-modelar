@@ -1,5 +1,6 @@
 /* procedural.test.mjs — R09: serviço puro e consumo MCP externo usam a mesma lógica. */
 import { readFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
@@ -48,4 +49,24 @@ describe('serviço procedural e MCP — R09', () => {
       expect(extensao.structuredContent.resultado).toMatchObject({ estado: 'ausente' });
     } finally { await client.close(); }
   }, 30_000);
+
+  it('mantém o processo stdio vivo até receber a primeira requisição', async () => {
+    const processo = spawn(process.execPath, [SERVIDOR], {
+      cwd: RAIZ,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    try {
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, 150);
+        processo.once('close', (codigo, sinal) => {
+          clearTimeout(timer);
+          reject(new Error(`servidor encerrou antes da primeira requisição (${codigo ?? sinal})`));
+        });
+      });
+      expect(processo.exitCode).toBeNull();
+    } finally {
+      processo.kill('SIGTERM');
+      await new Promise((resolve) => processo.once('close', resolve));
+    }
+  });
 });
