@@ -1,6 +1,6 @@
 # Sonda de escala — supercarro exterior 1.0
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -129,4 +129,20 @@ produza ganho comprovado ou declarar a aproximação visual. O fechamento será
 
 ## Fechamento
 
-A preencher após R06.
+R00–R06 foram concluídas em 2026-08-18 com decisão `aprovar`. A fixture privada
+possui 12 definições, 27 peças-folha, quatro submontagens compartilhadas,
+1.428 vértices e 1.434 faces únicas. As 13 vistas são válidas; a auditoria
+decide 351/351 pares globais e a consulta interna de uma roda decide 3 pares
+com 348 omissões explícitas. Exportação, contexto progressivo e impacto por
+definição são determinísticos.
+
+O relatório e as limitações estão em
+`docs/mecanifica/RELATORIO-SONDA-SUPERCARRO-1-0.md`. Enquadramento por
+profundidade, sete direções de vista, foco interno de auditoria, impacto por
+definição compartilhada, metalicidade observável e correções das skills foram
+integrados como melhorias neutras. Caixa de roda subtrativa, movimento,
+catálogo compartilhado de materiais e crítica visual estruturada continuam
+limites explícitos.
+
+A continuidade foi aberta no plano separado
+`2026-08-18-sonda-armadura-humanoide-1-0.md`.

@@ -1,0 +1,128 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "sonda-supercarro-1-0",
+  "instancias": [
+    { "id": "aerodinamica", "alvo": { "tipo": "peca", "ref": "aerodinamica" } },
+    { "id": "cabine", "alvo": { "tipo": "peca", "ref": "cabine" } },
+    { "id": "carroceria", "alvo": { "tipo": "peca", "ref": "carroceria" } },
+    { "id": "porta-esquerda", "alvo": { "tipo": "peca", "ref": "porta-lateral" }, "pose": { "deslocamento": [-0.705, 0.52, 0.02], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "porta-direita", "alvo": { "tipo": "peca", "ref": "porta-lateral" }, "pose": { "deslocamento": [0.705, 0.52, 0.02], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "canal-esquerdo", "alvo": { "tipo": "peca", "ref": "painel-lateral" }, "pose": { "deslocamento": [-0.735, 0.44, -0.78], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "canal-direito", "alvo": { "tipo": "peca", "ref": "painel-lateral" }, "pose": { "deslocamento": [0.735, 0.44, -0.78], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "entrada-frontal-esquerda", "alvo": { "tipo": "peca", "ref": "entrada-frontal" }, "pose": { "deslocamento": [-0.34, 0.34, 2.22], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "entrada-frontal-direita", "alvo": { "tipo": "peca", "ref": "entrada-frontal" }, "pose": { "deslocamento": [0.34, 0.34, 2.22], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "farol-esquerdo", "alvo": { "tipo": "peca", "ref": "farol" }, "pose": { "deslocamento": [-0.39, 0.51, 2.16], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "farol-direito", "alvo": { "tipo": "peca", "ref": "farol" }, "pose": { "deslocamento": [0.39, 0.51, 2.16], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "lanterna-esquerda", "alvo": { "tipo": "peca", "ref": "lanterna" }, "pose": { "deslocamento": [-0.40, 0.54, -2.17], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "lanterna-direita", "alvo": { "tipo": "peca", "ref": "lanterna" }, "pose": { "deslocamento": [0.40, 0.54, -2.17], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "espelho-esquerdo", "alvo": { "tipo": "peca", "ref": "espelho" }, "pose": { "deslocamento": [-0.80, 0.84, 0.40], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "espelho-direito", "alvo": { "tipo": "peca", "ref": "espelho" }, "pose": { "deslocamento": [0.80, 0.84, 0.40], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "roda-dianteira-esquerda", "alvo": { "tipo": "montagem", "ref": "roda" }, "pose": { "deslocamento": [-0.87, 0.36, 1.36], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "roda-dianteira-direita", "alvo": { "tipo": "montagem", "ref": "roda" }, "pose": { "deslocamento": [0.87, 0.36, 1.36], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "roda-traseira-esquerda", "alvo": { "tipo": "montagem", "ref": "roda" }, "pose": { "deslocamento": [-0.91, 0.36, -1.42], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } },
+    { "id": "roda-traseira-direita", "alvo": { "tipo": "montagem", "ref": "roda" }, "pose": { "deslocamento": [0.91, 0.36, -1.42], "rotacao": [[1,0,0],[0,1,0],[0,0,1]] } }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      {
+        "id": "apoio-cabine-carroceria",
+        "a": { "caminho": ["cabine"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "a canópia apoia e cruza marginalmente o envelope externo"
+      },
+      {
+        "id": "aero-fixada-na-carroceria",
+        "a": { "caminho": ["aerodinamica"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "splitter, difusor e suportes são cascas externas fixadas à carroceria"
+      },
+      {
+        "id": "canal-direito-embutido",
+        "a": { "caminho": ["canal-direito"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "o canal visual é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "canal-esquerdo-embutido",
+        "a": { "caminho": ["canal-esquerdo"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "o canal visual é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "entrada-frontal-direita-embutida",
+        "a": { "caminho": ["entrada-frontal-direita"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "a entrada visual é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "entrada-frontal-esquerda-embutida",
+        "a": { "caminho": ["entrada-frontal-esquerda"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "a entrada visual é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "lanterna-direita-embutida",
+        "a": { "caminho": ["lanterna-direita"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "a lente é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "lanterna-esquerda-embutida",
+        "a": { "caminho": ["lanterna-esquerda"] },
+        "b": { "caminho": ["carroceria"] },
+        "motivo": "a lente é um inserto deliberadamente embutido na casca"
+      },
+      {
+        "id": "roda-dd-aro-disco",
+        "a": { "caminho": ["roda-dianteira-direita", "aro"] },
+        "b": { "caminho": ["roda-dianteira-direita", "disco"] },
+        "motivo": "o cubo visual do aro cobre o centro do disco"
+      },
+      {
+        "id": "roda-dd-aro-pneu",
+        "a": { "caminho": ["roda-dianteira-direita", "aro"] },
+        "b": { "caminho": ["roda-dianteira-direita", "pneu"] },
+        "motivo": "o assentamento anular deliberado é validado pela relação da submontagem"
+      },
+      {
+        "id": "roda-de-aro-disco",
+        "a": { "caminho": ["roda-dianteira-esquerda", "aro"] },
+        "b": { "caminho": ["roda-dianteira-esquerda", "disco"] },
+        "motivo": "o cubo visual do aro cobre o centro do disco"
+      },
+      {
+        "id": "roda-de-aro-pneu",
+        "a": { "caminho": ["roda-dianteira-esquerda", "aro"] },
+        "b": { "caminho": ["roda-dianteira-esquerda", "pneu"] },
+        "motivo": "o assentamento anular deliberado é validado pela relação da submontagem"
+      },
+      {
+        "id": "roda-td-aro-disco",
+        "a": { "caminho": ["roda-traseira-direita", "aro"] },
+        "b": { "caminho": ["roda-traseira-direita", "disco"] },
+        "motivo": "o cubo visual do aro cobre o centro do disco"
+      },
+      {
+        "id": "roda-td-aro-pneu",
+        "a": { "caminho": ["roda-traseira-direita", "aro"] },
+        "b": { "caminho": ["roda-traseira-direita", "pneu"] },
+        "motivo": "o assentamento anular deliberado é validado pela relação da submontagem"
+      },
+      {
+        "id": "roda-te-aro-disco",
+        "a": { "caminho": ["roda-traseira-esquerda", "aro"] },
+        "b": { "caminho": ["roda-traseira-esquerda", "disco"] },
+        "motivo": "o cubo visual do aro cobre o centro do disco"
+      },
+      {
+        "id": "roda-te-aro-pneu",
+        "a": { "caminho": ["roda-traseira-esquerda", "aro"] },
+        "b": { "caminho": ["roda-traseira-esquerda", "pneu"] },
+        "motivo": "o assentamento anular deliberado é validado pela relação da submontagem"
+      }
+    ]
+  }
+}

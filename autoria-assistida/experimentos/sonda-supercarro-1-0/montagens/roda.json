@@ -1,0 +1,40 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "supercarro-roda",
+  "instancias": [
+    { "id": "aro", "alvo": { "tipo": "peca", "ref": "aro" } },
+    { "id": "disco", "alvo": { "tipo": "peca", "ref": "disco-freio" } },
+    { "id": "pneu", "alvo": { "tipo": "peca", "ref": "pneu" } }
+  ],
+  "relacoes": [
+    {
+      "id": "aroNoPneu",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["pneu"], "porta": "assentoDoAro" },
+      "movel": { "caminho": ["aro"], "porta": "assentoNoPneu" },
+      "especificacao": {
+        "sobreposicaoRadial": {
+          "nominal": 0.025,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "sobreposicaoAxial": {
+          "nominal": 0.150,
+          "toleranciaFabricacao": { "menos": 0.0001, "mais": 0.0001 }
+        },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-9,
+    "expectativas": [
+      {
+        "id": "contato-aro-pneu",
+        "a": { "caminho": ["aro"] },
+        "b": { "caminho": ["pneu"] },
+        "motivo": "o aro ocupa o assento anular publicado pelo pneu"
+      }
+    ]
+  }
+}
