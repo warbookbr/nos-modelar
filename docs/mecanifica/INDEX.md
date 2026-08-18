@@ -69,6 +69,8 @@ aplicação publicada aqui.
   registro explícito, versionado e determinístico das 32 operações. Não haverá
   cópia `legacy` nem segundo executor. A R03 foi concluída: as operações vivem
   em grupos com dependências explícitas e o núcleo não contém seus corpos.
+  A R04 foi concluída: artefato neutro, procedência por entidade e grafo de
+  execução são derivados sem mudar a receita.
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já

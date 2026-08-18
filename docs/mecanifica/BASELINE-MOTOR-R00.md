@@ -8,15 +8,18 @@ próximas rodadas.
 
 - Fachada pública: `prototipos/procedural/v3/motor/oficina.js`.
 - Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
-- Foto após R03: 2.645 linhas no núcleo, SHA-256
-  `449af014d68f349bbcd61c6f3c443332bd28b755c5b138ae8cdebc801fb70632`,
-  fachada de 13 linhas, 19 módulos no diretório e 54 consumidores de código.
+- Foto após R04: 2.670 linhas no núcleo, SHA-256
+  `f82e4917089232bb5fbfd7d5b8a201d881cb542e31eb983716f05d0c15abbf8b`,
+  fachada de 14 linhas, 20 módulos no diretório e 55 consumidores de código.
 - Separação R01: núcleo geométrico e canônico em `nucleo.js`; projeção visual
   em `adaptador.js`; animação/skinning em `animacao.js`; orquestração em
   `executor.js`. A fachada passou a expor 19 entradas: as 16 compatíveis e o
   registro explícito de operações da R02.
 - R03 concluída: as 32 operações vivem em grupos próprios; o núcleo mantém
   estado, serviços, execução, diagnóstico e canônico, sem corpo de operação.
+- R04 concluída: a malha retorna o artefato `mecanifica.malha-poligonal@1`,
+  procedência por entidade final e grafo derivado de passos observados; esses
+  campos não entram no canônico compatível.
 - Superfície pública: 16 exportações; `nucleo`, `neutroCanonico`, `executar` e
   `adaptarV3` são as entradas mais usadas pelos consumidores atuais.
 - Capacidades: 32 operações publicadas por `OPS`.

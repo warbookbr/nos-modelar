@@ -9,6 +9,8 @@ describe('registro explícito de operações — R02', () => {
   it('registra as 32 operações sem alterar os nomes usados por receitas', () => {
     expect(REGISTRO_OPERACOES.listar().map((x) => x.nome).sort()).toEqual(Object.keys(OPS).sort());
     expect(REGISTRO_OPERACOES.resolver('cubo').id).toBe('mecanifica.operacao.cubo');
+    expect(REGISTRO_OPERACOES.resolver('cubo').artefatos.sai).toEqual(['mecanifica.malha-poligonal@1']);
+    expect(REGISTRO_OPERACOES.resolver('parte').identidade).toBe('declara-semantica');
     expect(REGISTRO_OPERACOES.resolver('cubo', '2.0.0')).toBeNull();
     expect(nucleo([['cubo', { lado: 1 }]], {}, {}).orfaos).toEqual([]);
   });

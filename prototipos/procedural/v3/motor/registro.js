@@ -45,7 +45,11 @@ export function criarRegistroOperacoes({ modulos } = {}) {
       if (porNome.has(operacao.nome)) throw new ErroRegistroOperacoes(`nome de operação duplicado '${operacao.nome}'`);
       const registrada = Object.freeze({ ...operacao, modulo: modulo.id });
       porId.set(registrada.id, registrada); porNome.set(registrada.nome, registrada);
-      operacoes.push({ id: registrada.id, nome: registrada.nome, versao: registrada.versao, categoria: registrada.categoria ?? 'geral' });
+      operacoes.push({
+        id: registrada.id, nome: registrada.nome, versao: registrada.versao,
+        categoria: registrada.categoria ?? 'geral', artefatos: registrada.artefatos ?? null,
+        efeitos: registrada.efeitos ?? [], identidade: registrada.identidade ?? 'nao-informada',
+      });
     }
     manifesto.push({ id: modulo.id, versao: modulo.versao, requer: [...(modulo.requer ?? [])].sort((a, b) => compararTexto(a.id, b.id)), operacoes: operacoes.sort((a, b) => compararTexto(a.id, b.id)) });
   }

@@ -6,13 +6,9 @@
 
 **Base:** `warbookbr/nos-mecanifica`, `main` em `b9c3f64`.
 
-**Execução:** R00 concluída: mapa estático e baseline canônica em
-`BASELINE-MOTOR-R00.md`. R01 concluída: `oficina.js` é a fachada compatível;
-núcleo, adaptador, animação e executor têm implementação única separada.
-R02 concluída: as 32 operações são registradas por configuração explícita,
-versionada e assinada antes do despacho.
-R03 concluída: as 32 operações foram separadas por responsabilidade e o núcleo
-ficou sem corpo de operação, preservando registro, fachada e baseline.
+**Execução:** R00: baseline em `BASELINE-MOTOR-R00.md`; R01: fachada e camadas;
+R02: registro explícito; R03: operações fora do núcleo; R04: artefato, efeitos,
+identidade, procedência e grafo, sem mudar receita ou canônico.
 
 ## Objetivo verificável
 

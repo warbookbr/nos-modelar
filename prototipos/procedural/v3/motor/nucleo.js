@@ -11,6 +11,7 @@
    O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
    mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
 import { criarResolverNumerico } from './expressoes.js';
+import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
 import { criarOperacoesPrimitivasSuperficie } from './operacoes/primitivas-superficie.js';
@@ -2355,10 +2356,21 @@ const NOMES_DAS_OPERACOES = [
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
+const PRIMITIVAS = new Set(['cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft', 'inflate']);
+const ATRIBUTOS = new Set(['pincel', 'solido', 'liso', 'material']);
+function contratoDaOperacao(nome) {
+  if (nome === 'publicarPorta') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.porta@1'] }, efeitos: ['publica-porta'], identidade: 'declara-semantica' };
+  if (nome === 'parte') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.parte@1'] }, efeitos: ['nomeia-faces'], identidade: 'declara-semantica' };
+  if (nome === 'pesar') return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: ['mecanifica.pesos@1'] }, efeitos: ['anota-pesos'], identidade: 'por-vertice' };
+  if (PRIMITIVAS.has(nome)) return { artefatos: { entra: [], sai: [TIPO_MALHA_POLIGONAL] }, efeitos: ['cria-geometria'], identidade: 'cria-por-passo' };
+  if (ATRIBUTOS.has(nome)) return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: [TIPO_MALHA_POLIGONAL] }, efeitos: ['anota-face'], identidade: 'preserva' };
+  return { artefatos: { entra: [TIPO_MALHA_POLIGONAL], sai: [TIPO_MALHA_POLIGONAL] }, efeitos: ['transforma-malha'], identidade: 'preserva-ou-deriva' };
+}
+
 export const REGISTRO_OPERACOES = criarRegistroOperacoes({ modulos: [{
   id: 'mecanifica.motor.nucleo', versao: '1.0.0', requer: [],
   operacoes: NOMES_DAS_OPERACOES.map((nome) => ({
-    id: `mecanifica.operacao.${nome}`, nome, versao: '1.0.0', categoria: 'procedural', executar: OPS[nome],
+    id: `mecanifica.operacao.${nome}`, nome, versao: '1.0.0', categoria: 'procedural', executar: OPS[nome], ...contratoDaOperacao(nome),
   })),
 }] });
 
@@ -2575,7 +2587,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
@@ -2587,11 +2599,23 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
        translação seriam oito chances de divergir de sinal ou de ordem; o
        despacho aplica a MESMA transformação rígida sobre os vértices que o
        passo acabou de criar, seja qual for o gerador. */
+    const antesV = new Map([...st.V].map(([id, p]) => [id, JSON.stringify(p)]));
+    const antesF = new Map([...st.F].map(([id, f]) => [id, JSON.stringify(f)]));
+    const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
     const pose = lerPoseDeCriacao(st, i, op, args);
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
     fn(st, args, i);
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
+    const mudou = (antes, depois) => [...depois].filter(([id, valor]) => antes.get(id) !== JSON.stringify(valor)).map(([id]) => id).sort((a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0);
+    registrarProcedencia(st.procedencia, {
+      passo: i, operacao: registrada.id,
+      saidas: {
+        vertices: mudou(antesV, st.V), faces: mudou(antesF, st.F),
+        portas: [...st.portas.keys()].filter((id) => !antesPortas.has(id)).sort(),
+        partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
+      },
+    });
   });
   aplicarHierarquiaDasPartes(st);
 
@@ -2599,7 +2623,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      revisão sem o dicionário não conseguiria dizer se uma alteração de cor ou
      aspereza mudou a peça. O núcleo continua sem saber de renderizador; ele
      apenas preserva a declaração já usada pela op `material`. */
-  return { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas), materiais: st.materiais };
+  const neutro = { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas), materiais: st.materiais };
+  return { ...neutro, artefato: artefatoDaMalha(neutro), procedencia: procedenciaCanonica(st.procedencia) };
 }
 
 /* forma canônica e ORDENADA do neutro — a base de toda comparação (replay da
