@@ -23,13 +23,17 @@ peça isolada e não inventa validade global de uma montagem.
 
    Confira contagens, órfãos, partes, portas, materiais e o envelope.
 
-2. Abra a bancada neutra e leia as quatro vistas canônicas:
+2. Abra uma bancada/harness privado explicitamente configurado e leia as quatro
+   vistas canônicas:
 
    ```bash
    npm run bancada -- <peca> --vistas=isometrica,frontal,direita,superior
    ```
 
-   Leia as imagens produzidas. Verifique enquadramento, escala, cortes,
+   O catálogo homologado da bancada publicada pode estar vazio. Não use uma URL
+   pública com `?peca=` para validar receita privada; use um pacote de modelagem,
+   o harness autorizado ou o perfil MCP correspondente. Leia as imagens
+   produzidas. Verifique enquadramento, escala, cortes,
    legibilidade das partes e coerência da forma. Não conclua apenas pela
    existência de um PNG.
 
@@ -48,8 +52,6 @@ peça isolada e não inventa validade global de uma montagem.
    npm run typecheck
    npm run build
    npm run porteiro
-   npm run typecheck
-   npm run porteiro
    npm run guarda:portas
    npm run guarda:camera
    npm run guarda:par
@@ -66,8 +68,9 @@ peça isolada e não inventa validade global de uma montagem.
    npm run criar -- <peca>
    ```
 
-   `porteiro` e `npm run peca` ainda podem ajudar a diagnosticar o visor v3,
-   mas são compatibilidade legada, não o gate visual oficial da Mecanifica.
+   `porteiro`, `npm run peca` e `npm run criar` ainda podem ajudar a diagnosticar
+   o visor v3, mas são compatibilidade legada, não publicação nem o gate visual
+   oficial da Mecanifica.
 
 ## O que não é requisito
 
@@ -78,6 +81,8 @@ peça isolada e não inventa validade global de uma montagem.
   com peças e ferramentas v3; use-os quando o formato legado exigir.
 - Não trate câmera, material, geometria ou identidade semântica como defeito
   sem evidência correspondente no fluxo atual.
+- Receita privada não é peça homologada: a ausência no catálogo é um estado
+  válido e deve ser relatada separadamente da falha geométrica.
 
 ## Relato
 

@@ -12,23 +12,34 @@ receita monolítica.
 
 ## Caminho curto
 
-1. Consulte o [catálogo gerado de capacidades](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
-   e defina o alvo, `PARAMS`, `TOPO` e `PASSOS` antes de escolher operações.
+1. Descubra capacidades no [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
+   ou, pelo MCP procedural, em `mecanifica://procedural/catalogo` e
+   `mecanifica://procedural/schemas`. Busque, descreva e combine/valide a
+   cadeia antes de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`; não replique
+   tabelas por regex nem invente uma operação ausente.
 2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
    quando o contrato permitir. Não grave identidade por índice ou UUID.
-3. Rode a descrição estrita e a bancada neutra. Esse é o laço oficial de
-   inspeção visual:
+3. Rode a descrição estrita e obtenha vistas por uma bancada/harness privado
+   explicitamente configurado. Esse é o laço oficial de inspeção visual:
 
    ```bash
    npm run descrever -- <peça> --estrito
    npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
    ```
 
+   O catálogo homologado da bancada publicada pode estar vazio; isso não
+   publica uma receita privada. Se a peça ainda não estiver num catálogo ou
+   harness autorizado, use o pacote de modelagem (`preparar:modelagem`,
+   `validar:modelagem`, `revisar:modelagem`) ou o perfil MCP de autoria, e
+   registre a captura como bloqueada até existir um adaptador privado explícito.
+
 4. Leia as quatro imagens, registre pelo menos uma medida/gate e itere sobre
    defeitos concretos. A bancada confirma enquadramento; não decide sozinha se
    a forma atende ao briefing.
 5. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
-   compatibilidade e gabarito, quando a peça tiver esses artefatos.
+   compatibilidade e gabarito, quando a receita local e esses artefatos forem
+   autorizados. Esse visor legado é diagnóstico; não transforma a peça em
+   entrada publicada.
 
 `npm run peca` e `porteiro` permanecem diagnósticos do visor v3. Não são
 substitutos da descrição e das vistas da bancada. A peça mora em
@@ -38,6 +49,11 @@ O catálogo público de peças está vazio de propósito: receitas anteriores n�
 são modelos homologados. Não cite nem tente copiar nomes históricos. Só crie
 uma receita quando houver alvo e pacote de modelagem autorizados; o catálogo de
 **capacidades** do motor continua disponível mesmo sem nenhuma peça publicada.
+
+Quando uma capacidade faltar, consulte primeiro `buscar_capacidades`,
+`descrever_capacidade`, `combinar_capacidades`, `validar_composicao` e
+`analisar_lacuna` pela descoberta procedural. Só depois diagnostique uma
+extensão; nunca instale código ou esconda JavaScript na receita.
 
 ## Contrato mínimo
 
@@ -120,8 +136,6 @@ npm test
 npm run typecheck
 npm run build
 npm run porteiro
-npm run typecheck
-npm run porteiro
 npm run guarda:portas
 npm run guarda:camera
 npm run guarda:par
@@ -131,6 +145,7 @@ npm run docs:links:check
 npm run planos:check
 npm run exportar:check
 npm run catalogo:check
+npm run mcp:check
 ```
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.

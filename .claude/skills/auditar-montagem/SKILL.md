@@ -47,13 +47,21 @@ Leia os PNGs. Registre montagem, vista, instâncias visíveis e enquadramento.
 Imagem é evidência visual, não substitui relação mensurável nem prova global.
 Saída existente não deve ser sobrescrita.
 
-## 3. Revalidar o impacto
+## 3. Revalidar o impacto e as interseções
 
 Para um alvo alterado, derive o roteiro de revalidação. Separe relações
 diretas, indiretas, executáveis e pendências fora de cobertura. Uma relação
 local satisfeita não torna a montagem globalmente válida; registre sempre os
 limites atuais, inclusive quando colisão global e dependências indiretas não
 foram verificadas.
+
+`descrever_montagem` só fornece contexto estrutural. `revisar_montagem`, quando
+disponível, também audita pares de peças-folha por contenção e malha. Registre
+para cada par `interpenetram`, `encostam`, `separadas` ou `inconclusivo`, o método,
+as expectativas associadas e a cobertura. Interpenetração reprova a revisão;
+`inconclusivo`, foco parcial ou vista indisponível deixam-na incompleta. Uma
+expectativa explica a intenção, mas nunca apaga um achado. Não chame isso de
+solver, folga universal, movimento ou aprovação completa.
 
 ## 4. MCP de leitura
 
@@ -63,13 +71,17 @@ montagens pelo recurso `mecanifica://montagens` e use somente IDs semânticos:
 - `descrever_montagem`: contexto inteiro ou recorte;
 - `planejar_revalidacao_montagem`: impacto e pendências do alvo;
 - `catalogar_montagens`: relações entre raízes explicitamente autorizadas;
-- `renderizar_montagem`: uma a quatro vistas em memória.
+- `renderizar_montagem`: uma a quatro vistas em memória;
+- `revisar_montagem`: verificações declaradas, auditoria de interseções,
+  cobertura, recomendações e vistas.
 
 O cliente não fornece caminhos locais ao MCP. A configuração confiável mantém
-as raízes. O MCP atual é somente leitura; não assuma que ele materializa
-arquivos, publica revisão ou faz commit. A escrita pode ser adicionada quando
-o plano ativo de autoria segura fechar seus gates — essa sequência é uma
-decisão de implementação, não um veto permanente ao MCP.
+as raízes. O perfil padrão é somente leitura e não materializa arquivos, publica
+revisão nem faz commit. Quando o host habilitar explicitamente o perfil `autoria`,
+use `observar_autoria_montagem`, `planejar_*`, `inspecionar_proposta_montagem` e
+`aplicar_autoria_montagem` somente na sequência observação → plano → inspeção →
+aplicação; a aplicação exige confirmação, gates e revalidação. Isso é opt-in,
+não uma permissão implícita do catálogo e não é veto permanente ao MCP.
 
 ## Relato
 
