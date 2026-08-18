@@ -12,8 +12,8 @@ receita monolítica.
 
 ## Caminho curto
 
-1. Leia um exemplo próximo, começando por `pecas/_tampa-de-caixa.js`, e defina
-   `PARAMS`, `TOPO`, `PASSOS` exportado e `construir = executar(...)`.
+1. Consulte o [catálogo gerado de capacidades](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
+   e defina o alvo, `PARAMS`, `TOPO` e `PASSOS` antes de escolher operações.
 2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
    quando o contrato permitir. Não grave identidade por índice ou UUID.
 3. Rode a descrição estrita e a bancada neutra. Esse é o laço oficial de
@@ -34,14 +34,17 @@ receita monolítica.
 substitutos da descrição e das vistas da bancada. A peça mora em
 `prototipos/procedural/v3/pecas/`; prefixo `_` indica exemplo/fixture.
 
+O catálogo público de peças está vazio de propósito: receitas anteriores não
+são modelos homologados. Não cite nem tente copiar nomes históricos. Só crie
+uma receita quando houver alvo e pacote de modelagem autorizados; o catálogo de
+**capacidades** do motor continua disponível mesmo sem nenhuma peça publicada.
+
 ## Contrato mínimo
 
-Comece copiando `prototipos/procedural/v3/pecas/_modelo-procedural.js`. A peça precisa abrir com
-o selo de peça de exemplo, byte a byte igual ao dele — toda peça daqui é
-exemplo para provar capacidade do núcleo, nenhuma é referência de engenharia ou
-base de produto. Peça sem selo, ou com selo reescrito, reprova em
-`tools/bancadas/pecas-sao-exemplos.test.ts`. O texto longo está em
-"Peças são exemplos" no `README.md`.
+Não existe modelo de receita no acervo atual e não se deve recriar uma cópia
+histórica. Para uma receita nova, use o contrato declarativo em
+`docs/mecanifica/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
+não referência de engenharia, e registre o pacote que autorizou a modelagem.
 
 `PARAMS` guarda dimensões; `TOPO` guarda decisões que podem reconstruir a
 topologia; `PASSOS` é a lista `[['op', {...}], ...]`. Não escreva `id:` em um
@@ -127,7 +130,7 @@ npm run docs:toc:check
 npm run docs:links:check
 npm run planos:check
 npm run exportar:check
-npm run criar -- _viga
+npm run catalogo:check
 ```
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mecanifica.catalogo-capacidades@1",
+  "type": "object",
+  "required": [
+    "formato",
+    "assinatura",
+    "modulos",
+    "operacoes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "formato": {
+      "const": "mecanifica.catalogo-capacidades@1"
+    },
+    "assinatura": {
+      "type": "string"
+    },
+    "modulos": {
+      "type": "array"
+    },
+    "operacoes": {
+      "type": "array"
+    }
+  }
+}

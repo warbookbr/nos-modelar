@@ -1,46 +1,26 @@
 # Referência de operações procedurais
 
-Leia esta referência quando a tarefa exigir uma operação específica. A lista
-é conferida por `npm run criar` contra `Object.keys(OPS)` do núcleo; o núcleo é
-a autoridade final para argumentos e recusas.
+Leia esta referência quando a tarefa exigir uma operação específica. O catálogo
+de operações é gerado do registro do núcleo: rode `npm run catalogo:gerar` e
+consulte [`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](../../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md).
+O executor continua sendo a autoridade final para argumentos e recusas.
+
+O acervo de receitas está vazio; nomes de peças em exemplos históricos desta
+referência não são caminhos disponíveis nem modelos para copiar.
 
 ## Navegação
 
-- resumo de operações e cuidados: tabela abaixo;
+- descoberta de operações, artefatos, efeitos e identidade: catálogo gerado;
 - seleção semântica, identidade e limites: seção de seleção;
 - proveniência de `origem`, rotação e exemplos: detalhes de seleção;
 - aliases, atributos e animação: bloco de aliases e leis do núcleo.
 
 ## Operações disponíveis
 
-| operação | forma essencial | cuidado principal |
-|---|---|---|
-| `cubo`, `cilindro`, `esfera`, `cone`, `plano` | dimensões, `lados` quando aplicável, `em?`, `eixo?`, `origemId?` | sem `em` nascem na origem; `eixo` só nos de revolução |
-| `chamferBox` | dimensões, `chanfro`, `em?`, `origemId?` | chanfro plano, não filete |
-| `lathe` | `perfil`, `lados`, `segmentosCurva?`, `em?`, `eixo?`, `origemId?` | sem `eixo` gira em torno de Y |
-| `loft` | seções/`contorno`, `lados`, `orientacao?`, `origemId?` | contornos expandidos devem preservar `lados` |
-| `inflate` | dois contornos, `divisoes`, `segmentosCurva?`, `origemId?` | volume fechado, porém facetado |
-| `moveV`, `moveF`, `moveA` | IDs e `d` aditivo | não aceitam `sel` |
-| `vira` | uma `face` | inverte winding; não é correção automática |
-| `apagaFace` | `sel: {...}` de exatamente uma face | única edição que abre vão; falha em ambiguidade |
-| `displace` | `sel?`, `amplitude`, `frequencia`, `semente` | ruído determinístico sobre normais médias |
-| `extruda` | uma `face`, `dist` | cria anel no bloco do passo |
-| `mescla` | `de`, `para` | ID literal; não deixe no-op fantasma |
-| `rotaciona` | eixo, graus, `sel?`, `pivo?` | sem pivô, usa centroide da seleção |
-| `transladar` | `d`, `sel?` | aditivo; sem pivô |
-| `encostar` | `sel`, `referencia`, `direcao`, `folga?` | contato por extensão na direção declarada; não é solver |
-| `espelha` | eixo, `pos?`, `sel?`, ou modo estrutural | modo estrutural exige origem direta |
-| `publicarPorta` | `nome`, `de` | publica identidade semântica, não faces resolvidas |
-| `arranja` | radial/linear, `total`, `derivaDe`, `origemId`, `nomes?` | conta a fonte; ângulo é derivado, não acumulado |
-| `furo` | `origemId`, `de`, centro(s), raio e saída/profundidade | não é booleana genérica |
-| `pincel` | modo face/livre e seus parâmetros | modo livre não aceita `sel` |
-| `liso` | `sel` ou `faces` legado | atributo de sombreado |
-| `material` | `sel` ou `faces` legado, `usa` | não existe contrato genérico de materiais |
-| `parte` | `nome`, seleção, `pivo?` | nome é identidade; reatribuição exige intenção explícita |
-| `pesar` | osso, vértices/faces, peso | skinning por IDs; não aceita `sel` |
-| `solido` | `sel` ou `faces` legado | compatibilidade de colisão |
-| `filete` | origem, face, aresta, raio | estado atual é um painel/chanfro limitado |
-| `arredondarAresta` | origem, face, aresta, raio, painéis | Escopo A; recusa cantos compostos |
+Não mantenha outra lista aqui. O catálogo gerado contém cada operação registrada
+uma única vez, com os artefatos que consome e produz, seus efeitos e política de
+identidade. Esta referência conserva apenas decisões de autoria que não podem
+ser inferidas de um contrato curto: seleção, orientação, proveniência e limites.
 
 ## Seleção semântica
 

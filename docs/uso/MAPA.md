@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-369 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+374 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -179,6 +179,11 @@
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
 
+## docs/mecanifica/gerado/
+
+- `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
+- `INDEX.md` — Artefatos gerados do catálogo procedural
+
 ## docs/mecanifica/historico/
 
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
@@ -280,6 +285,7 @@
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
+- `catalogo.js` — catálogo.js — projeções puras e determinísticas do registro de operações. Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio.
 - `executor.js` — executor.js — orquestra núcleo, adaptador e animação sem duplicar execução.
 - `expressoes.js` — expressoes.js — aritmética determinística e fechada para parâmetros da Oficina. A expressão só existe em um campo numérico e sempre começa com `=`. Ela aceit…
 - `geo.js` — helpers de GEOMETRIA do motor v3 (D-55): malha = lista chata de vértices (pos xyz, uv, normal) — 8 floats por vértice, triângulos soltos.
@@ -374,6 +380,10 @@
 ## tools/bancadas/fixtures/
 
 - `catalogo-visual.js` — catalogo-visual.js — fixtures mínimas do harness privado.
+
+## tools/catalogo/
+
+- `gerar-catalogo-capacidades.mjs` — Gera projeções publicáveis. O motor permanece puro; somente esta borda lê e escreve disco.
 
 ## tools/coordenacao/
 
@@ -506,6 +516,7 @@
 - `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
 - `artefatos-procedencia.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
 - `canon-linha-de-base.test.ts` — canon-linha-de-base.test.ts — fotografia do furo antes de portas novas do ciclo 6: raios iguais devem conservar exatamente a geometria atual.
+- `catalogo-capacidades.test.mjs` — catálogo-capacidades.test.mjs — R05: descoberta deriva do registro, sem tabela paralela.
 - `chao-do-ciclo6.test.ts` — chao-do-ciclo6.test.ts — caso vermelho da quinta propriedade: um triângulo emitido pode ter área zero mesmo com núcleo, adaptador e casca saudáveis.
 - `concordancia-por-ponto.test.ts` — concordancia-por-ponto.test.ts — A-35: cada curva de um mesmo passo pode declarar seu próprio custo sem obrigar todas as outras a usarem o maior.
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.

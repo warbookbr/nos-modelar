@@ -76,13 +76,6 @@ function paragrafoCom(marca: string) {
   expect(p.length, `esperava UM parágrafo com ${JSON.stringify(marca)} no SKILL.md, achei ${p.length}`).toBe(1);
   return p[0];
 }
-/* A linha da tabela de vocabulário daquela op (`| \`op\` | args | nota |`). */
-function linhaDaTabela(op: string) {
-  const linha = textoOperacoes.split('\n').filter((l) => new RegExp(`^\\|\\s*\`${op}\``).test(l));
-  expect(linha.length, `esperava UMA linha de tabela para \`${op}\` na referência procedural`).toBe(1);
-  return linha[0];
-}
-
 describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
   const medido = Object.fromEntries(Object.keys(SONDAS).map((op) => [op, aceitaSel(op)]));
 
@@ -102,19 +95,10 @@ describe('SKILL criar-peca x núcleo — quem aceita `sel`', () => {
     expect([...citadas].sort()).toEqual([...esperado].sort());
   });
 
-  it('toda op que ACEITA `sel` mostra `sel` na própria linha da tabela', () => {
-    for (const op of Object.keys(SONDAS)) {
-      if (!medido[op]) continue;
-      expect(linhaDaTabela(op), `\`${op}\` aceita sel no núcleo mas a tabela da skill não diz`).toMatch(/`sel/);
-    }
-  });
-
   it('`apagaFace` documenta a forma SEMÂNTICA, não só o id posicional', () => {
     expect(medido.apagaFace).toBe(true);
-    const linha = linhaDaTabela('apagaFace');
-    // a nota precisa ensinar a forma `sel: {...}` e o contrato de UMA face só
-    expect(linha).toMatch(/sel:\s*\{/);
-    expect(linha).toMatch(/exatamente uma face|uma face só|UMA face/i);
+    expect(textoOperacoes).toMatch(/apagaFace[\s\S]{0,1200}sel:\s*\{/);
+    expect(textoOperacoes).toMatch(/apagaFace[\s\S]{0,1200}exatamente uma face|uma face só|UMA face/i);
   });
 });
 

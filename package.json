@@ -17,6 +17,8 @@
     "arquitetura:motor:check": "node tools/arquitetura/mapear-motor-procedural.mjs --check",
     "baseline:motor": "node tools/oficina/corpus-motor-r00.mjs --check",
     "baseline:motor:medir": "node tools/oficina/corpus-motor-r00.mjs --medir",
+    "catalogo:gerar": "node tools/catalogo/gerar-catalogo-capacidades.mjs",
+    "catalogo:check": "node tools/catalogo/gerar-catalogo-capacidades.mjs --check",
     "bancada:vazia:check": "node tools/mecanifica/guarda-bancada-vazia.mjs",
     "test": "vitest run",
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs",

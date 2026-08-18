@@ -8,6 +8,7 @@ export {
 } from './nucleo.js';
 export { criarRegistroOperacoes, ErroRegistroOperacoes } from './registro.js';
 export { TIPO_MALHA_POLIGONAL, artefatoDaMalha, grafoDaProcedencia, procedenciaCanonica } from './artefatos.js';
+export { FORMATO_CATALOGO, FORMATO_HIPERGRAFO, buscarCapacidades, catalogoDeCapacidades, explicarCapacidade, hipergrafoDeCapacidades } from './catalogo.js';
 export { adaptarV3 } from './adaptador.js';
 export { avaliarChaves, bindPoseOssos, montarAnimar } from './animacao.js';
 export { colisaoDe, executar } from './executor.js';

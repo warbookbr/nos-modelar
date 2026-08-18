@@ -71,6 +71,9 @@ aplicação publicada aqui.
   em grupos com dependências explícitas e o núcleo não contém seus corpos.
   A R04 foi concluída: artefato neutro, procedência por entidade e grafo de
   execução são derivados sem mudar a receita.
+  A R05 foi concluída: catálogo, busca, explicação e hipergrafo de capacidades
+  derivam do registro; schemas e referência para skill são gerados, sem tabelas
+  manuais reconciliadas por regex.
   (`docs/mecanifica/BASELINE-MOTOR-R00.md`; `docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
@@ -187,8 +190,10 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 12. `docs/mecanifica/COORDENACAO-LOCAL.md` e `COORDENACAO-REPOS.md` para trabalho
   paralelo.
 13. `docs/uso/oficina-contrato.md` para o vocabulário procedural vigente.
-14. `docs/uso/MAPA.md` para o inventário gerado.
-15. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
+14. [`gerado/INDEX.md`](gerado/INDEX.md) para o catálogo, schemas e hipergrafo
+    de capacidades atuais.
+15. `docs/uso/MAPA.md` para o inventário gerado.
+16. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
 ## Leitura por tarefa
 
@@ -202,7 +207,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 - Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
-  `docs/uso/oficina-contrato.md`.
+  `docs/uso/oficina-contrato.md`; para descobrir uma capacidade, abra
+  `gerado/INDEX.md` antes de procurar em implementação.
 - Peça nova ou refinamento: `AUTORIA-IA.md`, `PERFIS-DE-AUTORIA.md`,
   `REFERENCIA-E-CRITICA-VISUAL.md`, `FLUXO-MODELAGEM-IA.md` e
   `BANCADA-E-APRESENTACAO.md`.
@@ -238,13 +244,14 @@ npm run docs:toc:check
 npm run docs:links:check
 npm run planos:check
 npm run exportar:check
+npm run catalogo:check
 npm run mcp:check
 npm run mcp:ensaio
 ```
 
 ## Pendências atuais
 
-- A plataforma procedural extensível está em execução pela R00 do plano ativo.
+- A plataforma procedural extensível concluiu R00–R05 do plano ativo.
   Nenhuma rodada posterior deve começar sem a evidência e o fechamento da
   anterior.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
@@ -371,5 +378,7 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 <!-- Contexto visual alcançável: docs/mecanifica/CONTEXTO-VISUAL-REVALIDACAO.md -->
 
 <!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-materializacao-autoria-segura.md -->
+
+<!-- Artefatos R05 alcançáveis: docs/mecanifica/gerado/INDEX.md docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md -->
 
 <!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->

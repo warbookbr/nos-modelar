@@ -8,9 +8,9 @@ próximas rodadas.
 
 - Fachada pública: `prototipos/procedural/v3/motor/oficina.js`.
 - Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
-- Foto após R04: 2.670 linhas no núcleo, SHA-256
+- Foto após R05: 2.670 linhas no núcleo, SHA-256
   `f82e4917089232bb5fbfd7d5b8a201d881cb542e31eb983716f05d0c15abbf8b`,
-  fachada de 14 linhas, 20 módulos no diretório e 55 consumidores de código.
+  fachada de 15 linhas, 21 módulos no diretório e 57 consumidores de código.
 - Separação R01: núcleo geométrico e canônico em `nucleo.js`; projeção visual
   em `adaptador.js`; animação/skinning em `animacao.js`; orquestração em
   `executor.js`. A fachada passou a expor 19 entradas: as 16 compatíveis e o
@@ -20,10 +20,14 @@ próximas rodadas.
 - R04 concluída: a malha retorna o artefato `mecanifica.malha-poligonal@1`,
   procedência por entidade final e grafo derivado de passos observados; esses
   campos não entram no canônico compatível.
-- Superfície pública: 16 exportações; `nucleo`, `neutroCanonico`, `executar` e
+- R05 concluída: catálogo, busca e explicação são projeções puras do registro;
+  schemas, índice e referência legível são gerados. O mapa de capacidades é
+  hipergrafo direcionado, pois transformações preservam o tipo de malha.
+- Superfície pública: 29 exportações; `nucleo`, `neutroCanonico`, `executar` e
   `adaptarV3` são as entradas mais usadas pelos consumidores atuais.
 - Capacidades: 32 operações publicadas por `OPS`.
-- Dependências diretas do motor: `./expressoes.js` e `earcut`.
+- Dependência externa direta do núcleo: `earcut`; seus serviços internos,
+  registro, artefatos e grupos de operações aparecem no mapa gerado.
 - Corpus: 32 receitas sintéticas independentes, uma por operação, todas sem
   diagnóstico na baseline.
 - Comparação: hash SHA-256 do neutro canônico, contagem de vértices, faces e
@@ -43,12 +47,16 @@ npm run arquitetura:motor
 npm run arquitetura:motor:check
 npm run baseline:motor
 npm run baseline:motor:medir
+npm run catalogo:check
 ```
 
 `arquitetura:motor` deriva o mapa atual de imports, exportações, operações,
 módulos e consumidores de código. `baseline:motor` falha se uma saída canônica
 mudar. Atualizar a baseline é uma decisão explícita de contrato, nunca uma
 forma de esconder regressão.
+
+`catalogo:check` falha quando os JSON, schemas ou referência gerada não forem a
+projeção atual do registro de operações.
 
 ## Limite desta rodada
 

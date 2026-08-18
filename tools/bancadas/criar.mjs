@@ -3,9 +3,9 @@
  * criar.mjs — P7 do playground (D-120): A CAMADA IA, laço único.
  *
  * Recebe uma peça e devolve NUM COMANDO: estado como dado (vértices/faces/
- * caixa/colisão, direto do núcleo — sem browser), o manifesto de capacidades
- * (as ops que EXISTEM de verdade, de `Object.keys(OPS)` — nunca hand-copiado,
- * cruzado contra a doc), os renders (3 ângulos texturizados + 3 geo=normais —
+ * caixa/colisão, direto do núcleo — sem browser), o catálogo de capacidades
+ * (derivado do registro explícito, sem tabela ou regex paralela), os renders
+ * (3 ângulos texturizados + 3 geo=normais —
  * a evidência forçada) e os GATES (porteiro + gabarito, se houver
  * referência) resumidos num VEREDITO AGREGADO. Fecha o "83%": nenhum destes
  * passos fica de fora por esquecimento — um comando só cobre todos.
@@ -17,7 +17,7 @@
  */
 import { createServer } from 'node:http';
 import { pathToFileURL } from 'node:url';
-import { readFileSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, existsSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodePng, pngStats } from './bench/pngstats.mjs';
@@ -30,15 +30,18 @@ const REPO = resolve(HERE, '../..');
 const OUT = join(HERE, 'out');
 const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 const GABARITOS = join(REPO, 'prototipos/procedural/v3/gabaritos');
-const SKILL = join(REPO, '.claude/skills/criar-peca/SKILL.md');
-const OPERACOES_DOC = join(REPO, '.claude/skills/criar-peca/references/operacoes-procedurais.md');
-const OFICINA_DOC = join(REPO, 'docs/uso/oficina-contrato.md');
 
 const args = process.argv.slice(2);
 const nome = (args.find((a) => !a.startsWith('--')) || '').replace(/[^a-z0-9_-]/gi, '');
 const res = /^--res=(\d+)$/.exec(args.find((a) => a.startsWith('--res=')) || '')?.[1] || '900';
 if (!nome) { console.error('uso: node tools/bancadas/criar.mjs <peça> [--res=N]'); process.exit(2); }
-if (!existsSync(join(PECAS, `${nome}.js`))) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(2); }
+if (!existsSync(join(PECAS, `${nome}.js`))) {
+  const haReceitas = readdirSync(PECAS).some((arquivo) => arquivo.endsWith('.js'));
+  console.error(haReceitas
+    ? `peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`
+    : 'catálogo de peças está vazio; informe uma receita autorizada antes de executar criar');
+  process.exit(2);
+}
 
 const linhas = [];
 const log = (s = '') => { linhas.push(s); console.log(s); };
@@ -50,7 +53,7 @@ log(`═══ criar — ${nome} ═══`);
 
 /* 1 · ESTADO COMO DADO (headless, direto do núcleo — sem browser) */
 log('\n── estado (núcleo) ──');
-const { nucleo, neutroCanonico, colisaoDe, OPS } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
+const { nucleo, neutroCanonico, colisaoDe, REGISTRO_OPERACOES, catalogoDeCapacidades } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
 const mod = await import(pathToFileURL(join(PECAS, `${nome}.js`)).href);
 const temPassos = Array.isArray(mod.PASSOS);
 if (temPassos) {
@@ -69,67 +72,11 @@ if (temPassos) {
   log('  peça JS-pura (sem PASSOS/PARAMS/TOPO exportado) — sem estado de núcleo pra inspecionar, só os gates abaixo');
 }
 
-/* 2 · MANIFESTO DE CAPACIDADES — Object.keys(OPS), nunca hand-copiado; cruza contra a skill */
-log('\n── manifesto (núcleo x doc) ──');
-const opsNucleo = new Set(Object.keys(OPS));
-log(`  ${opsNucleo.size} ops implementadas: ${[...opsNucleo].join(', ')}`);
-const opsDoc = new Set();
-{
-  const texto = readFileSync(OPERACOES_DOC, 'utf8').split('\n');
-  let dentro = false;
-  for (const linha of texto) {
-    if (linha.startsWith('| op | args | nota |') || linha.startsWith('| operação | forma essencial | cuidado principal |')) { dentro = true; continue; }
-    if (!dentro) continue;
-    if (!linha.startsWith('|')) break;
-    if (linha.startsWith('|---')) continue;
-    const primeiraCelula = linha.split('|')[1] || '';
-    for (const m of primeiraCelula.matchAll(/`([a-zA-Z]+)`/g)) opsDoc.add(m[1]);
-  }
-}
-const semDoc = [...opsNucleo].filter((o) => !opsDoc.has(o));
-const semOp = [...opsDoc].filter((o) => !opsNucleo.has(o));
-if (semDoc.length === 0 && semOp.length === 0) ok('vocabulário da skill criar-peca em dia com o núcleo');
-else {
-  if (semDoc.length) falha(`op(s) no núcleo SEM doc na skill: ${semDoc.join(', ')}`);
-  if (semOp.length) falha(`skill documenta op que NÃO existe (ou não é mais) no núcleo: ${semOp.join(', ')}`);
-}
-
-/* 2b · manifesto x docs/oficina.md (Rodada 3, D-120 estendido): a "Lista de
-   operações" tem uma coluna Status (FEITO|ROTEIRO), marcação estruturada —
-   não a prosa livre da Observação, que cita "FEITO" e "NÃO existe" sem
-   formato fixo. Regra: toda linha FEITO tem que existir em OPS; toda chave de
-   OPS tem que ter uma linha FEITO; linha ROTEIRO cuja op JÁ existe em OPS é
-   ACHADO (roteiro construído, doc não atualizado) — reportado como falha. */
-log('\n── manifesto (núcleo x docs/uso/oficina-contrato.md) ──');
-{
-  const feitoOficina = new Set();
-  const roteiroOficina = new Set();
-  const texto = readFileSync(OFICINA_DOC, 'utf8').split('\n');
-  let dentro = false;
-  for (const linha of texto) {
-    if (linha.startsWith('| Status | Operação |')) { dentro = true; continue; }
-    if (!dentro) continue;
-    if (!linha.startsWith('|')) break;
-    if (linha.startsWith('|---')) continue;
-    const celulas = linha.split('|');
-    const status = (celulas[1] || '').trim();
-    const celulaOp = celulas[2] || '';
-    const nomes = [...celulaOp.matchAll(/`([a-zA-Z]+)`/g)].map((m) => m[1]);
-    if (status === 'FEITO') for (const n of nomes) feitoOficina.add(n);
-    else if (status === 'ROTEIRO') for (const n of nomes) roteiroOficina.add(n);
-    else falha(`docs/uso/oficina-contrato.md: linha de op com Status inesperado (${JSON.stringify(status)}): ${nomes.join(', ') || '(sem op)'}`);
-  }
-  const opsSemFeito = [...opsNucleo].filter((o) => !feitoOficina.has(o));
-  const feitoSemOp = [...feitoOficina].filter((o) => !opsNucleo.has(o));
-  const roteiroJaConstruido = [...roteiroOficina].filter((o) => opsNucleo.has(o));
-  if (opsSemFeito.length === 0 && feitoSemOp.length === 0 && roteiroJaConstruido.length === 0) {
-    ok('tabela de operações do oficina-contrato.md em dia com o núcleo');
-  } else {
-    if (opsSemFeito.length) falha(`op(s) no núcleo SEM linha FEITO em docs/uso/oficina-contrato.md: ${opsSemFeito.join(', ')}`);
-    if (feitoSemOp.length) falha(`docs/uso/oficina-contrato.md marca FEITO uma op que NÃO existe no núcleo: ${feitoSemOp.join(', ')}`);
-    if (roteiroJaConstruido.length) falha(`docs/uso/oficina-contrato.md marca ROTEIRO op(s) que JÁ existem no núcleo (achado — roteiro construído, doc desatualizado): ${roteiroJaConstruido.join(', ')}`);
-  }
-}
+/* 2 · CATÁLOGO DE CAPACIDADES — projeção do registro, sem reconciliação por regex. */
+log("\n── catálogo de capacidades ──");
+const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);
+log(`  ${catalogo.operacoes.length} operações registradas; assinatura=${catalogo.assinatura}`);
+ok("catálogo deriva diretamente do registro do núcleo; npm run catalogo:check confere os artefatos publicados");
 
 /* 3 · BROWSER (uma vez só) — porteiro, renders (evidência), gabarito */
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };

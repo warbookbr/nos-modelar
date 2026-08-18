@@ -1,0 +1,490 @@
+{
+  "formato": "mecanifica.hipergrafo-capacidades@1",
+  "assinatura": "{\"formato\":\"mecanifica.registro-operacoes@1\",\"modulos\":[{\"id\":\"mecanifica.motor.nucleo\",\"versao\":\"1.0.0\",\"requer\":[],\"operacoes\":[{\"id\":\"mecanifica.operacao.apagaFace\",\"nome\":\"apagaFace\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.arranja\",\"nome\":\"arranja\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.arredondarAresta\",\"nome\":\"arredondarAresta\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.chamferBox\",\"nome\":\"chamferBox\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cilindro\",\"nome\":\"cilindro\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cone\",\"nome\":\"cone\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.cubo\",\"nome\":\"cubo\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.displace\",\"nome\":\"displace\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.encostar\",\"nome\":\"encostar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.esfera\",\"nome\":\"esfera\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.espelha\",\"nome\":\"espelha\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.extruda\",\"nome\":\"extruda\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.filete\",\"nome\":\"filete\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.furo\",\"nome\":\"furo\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.inflate\",\"nome\":\"inflate\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.lathe\",\"nome\":\"lathe\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.liso\",\"nome\":\"liso\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.loft\",\"nome\":\"loft\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.material\",\"nome\":\"material\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.mescla\",\"nome\":\"mescla\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveA\",\"nome\":\"moveA\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveF\",\"nome\":\"moveF\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.moveV\",\"nome\":\"moveV\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.parte\",\"nome\":\"parte\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.parte@1\"]},\"efeitos\":[\"nomeia-faces\"],\"identidade\":\"declara-semantica\"},{\"id\":\"mecanifica.operacao.pesar\",\"nome\":\"pesar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.pesos@1\"]},\"efeitos\":[\"anota-pesos\"],\"identidade\":\"por-vertice\"},{\"id\":\"mecanifica.operacao.pincel\",\"nome\":\"pincel\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.plano\",\"nome\":\"plano\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"cria-geometria\"],\"identidade\":\"cria-por-passo\"},{\"id\":\"mecanifica.operacao.publicarPorta\",\"nome\":\"publicarPorta\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.porta@1\"]},\"efeitos\":[\"publica-porta\"],\"identidade\":\"declara-semantica\"},{\"id\":\"mecanifica.operacao.rotaciona\",\"nome\":\"rotaciona\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.solido\",\"nome\":\"solido\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"anota-face\"],\"identidade\":\"preserva\"},{\"id\":\"mecanifica.operacao.transladar\",\"nome\":\"transladar\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"},{\"id\":\"mecanifica.operacao.vira\",\"nome\":\"vira\",\"versao\":\"1.0.0\",\"categoria\":\"procedural\",\"artefatos\":{\"entra\":[\"mecanifica.malha-poligonal@1\"],\"sai\":[\"mecanifica.malha-poligonal@1\"]},\"efeitos\":[\"transforma-malha\"],\"identidade\":\"preserva-ou-deriva\"}]}]}",
+  "nos": [
+    {
+      "id": "artefato:mecanifica.malha-poligonal@1",
+      "tipo": "artefato",
+      "artefato": "mecanifica.malha-poligonal@1"
+    },
+    {
+      "id": "artefato:mecanifica.parte@1",
+      "tipo": "artefato",
+      "artefato": "mecanifica.parte@1"
+    },
+    {
+      "id": "artefato:mecanifica.pesos@1",
+      "tipo": "artefato",
+      "artefato": "mecanifica.pesos@1"
+    },
+    {
+      "id": "artefato:mecanifica.porta@1",
+      "tipo": "artefato",
+      "artefato": "mecanifica.porta@1"
+    },
+    {
+      "id": "mecanifica.operacao.apagaFace",
+      "tipo": "operacao",
+      "nome": "apagaFace"
+    },
+    {
+      "id": "mecanifica.operacao.arranja",
+      "tipo": "operacao",
+      "nome": "arranja"
+    },
+    {
+      "id": "mecanifica.operacao.arredondarAresta",
+      "tipo": "operacao",
+      "nome": "arredondarAresta"
+    },
+    {
+      "id": "mecanifica.operacao.chamferBox",
+      "tipo": "operacao",
+      "nome": "chamferBox"
+    },
+    {
+      "id": "mecanifica.operacao.cilindro",
+      "tipo": "operacao",
+      "nome": "cilindro"
+    },
+    {
+      "id": "mecanifica.operacao.cone",
+      "tipo": "operacao",
+      "nome": "cone"
+    },
+    {
+      "id": "mecanifica.operacao.cubo",
+      "tipo": "operacao",
+      "nome": "cubo"
+    },
+    {
+      "id": "mecanifica.operacao.displace",
+      "tipo": "operacao",
+      "nome": "displace"
+    },
+    {
+      "id": "mecanifica.operacao.encostar",
+      "tipo": "operacao",
+      "nome": "encostar"
+    },
+    {
+      "id": "mecanifica.operacao.esfera",
+      "tipo": "operacao",
+      "nome": "esfera"
+    },
+    {
+      "id": "mecanifica.operacao.espelha",
+      "tipo": "operacao",
+      "nome": "espelha"
+    },
+    {
+      "id": "mecanifica.operacao.extruda",
+      "tipo": "operacao",
+      "nome": "extruda"
+    },
+    {
+      "id": "mecanifica.operacao.filete",
+      "tipo": "operacao",
+      "nome": "filete"
+    },
+    {
+      "id": "mecanifica.operacao.furo",
+      "tipo": "operacao",
+      "nome": "furo"
+    },
+    {
+      "id": "mecanifica.operacao.inflate",
+      "tipo": "operacao",
+      "nome": "inflate"
+    },
+    {
+      "id": "mecanifica.operacao.lathe",
+      "tipo": "operacao",
+      "nome": "lathe"
+    },
+    {
+      "id": "mecanifica.operacao.liso",
+      "tipo": "operacao",
+      "nome": "liso"
+    },
+    {
+      "id": "mecanifica.operacao.loft",
+      "tipo": "operacao",
+      "nome": "loft"
+    },
+    {
+      "id": "mecanifica.operacao.material",
+      "tipo": "operacao",
+      "nome": "material"
+    },
+    {
+      "id": "mecanifica.operacao.mescla",
+      "tipo": "operacao",
+      "nome": "mescla"
+    },
+    {
+      "id": "mecanifica.operacao.moveA",
+      "tipo": "operacao",
+      "nome": "moveA"
+    },
+    {
+      "id": "mecanifica.operacao.moveF",
+      "tipo": "operacao",
+      "nome": "moveF"
+    },
+    {
+      "id": "mecanifica.operacao.moveV",
+      "tipo": "operacao",
+      "nome": "moveV"
+    },
+    {
+      "id": "mecanifica.operacao.parte",
+      "tipo": "operacao",
+      "nome": "parte"
+    },
+    {
+      "id": "mecanifica.operacao.pesar",
+      "tipo": "operacao",
+      "nome": "pesar"
+    },
+    {
+      "id": "mecanifica.operacao.pincel",
+      "tipo": "operacao",
+      "nome": "pincel"
+    },
+    {
+      "id": "mecanifica.operacao.plano",
+      "tipo": "operacao",
+      "nome": "plano"
+    },
+    {
+      "id": "mecanifica.operacao.publicarPorta",
+      "tipo": "operacao",
+      "nome": "publicarPorta"
+    },
+    {
+      "id": "mecanifica.operacao.rotaciona",
+      "tipo": "operacao",
+      "nome": "rotaciona"
+    },
+    {
+      "id": "mecanifica.operacao.solido",
+      "tipo": "operacao",
+      "nome": "solido"
+    },
+    {
+      "id": "mecanifica.operacao.transladar",
+      "tipo": "operacao",
+      "nome": "transladar"
+    },
+    {
+      "id": "mecanifica.operacao.vira",
+      "tipo": "operacao",
+      "nome": "vira"
+    }
+  ],
+  "hiperarestas": [
+    {
+      "id": "contrato:mecanifica.operacao.apagaFace",
+      "operacao": "mecanifica.operacao.apagaFace",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.arranja",
+      "operacao": "mecanifica.operacao.arranja",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.arredondarAresta",
+      "operacao": "mecanifica.operacao.arredondarAresta",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.chamferBox",
+      "operacao": "mecanifica.operacao.chamferBox",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.cilindro",
+      "operacao": "mecanifica.operacao.cilindro",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.cone",
+      "operacao": "mecanifica.operacao.cone",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.cubo",
+      "operacao": "mecanifica.operacao.cubo",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.displace",
+      "operacao": "mecanifica.operacao.displace",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.encostar",
+      "operacao": "mecanifica.operacao.encostar",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.esfera",
+      "operacao": "mecanifica.operacao.esfera",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.espelha",
+      "operacao": "mecanifica.operacao.espelha",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.extruda",
+      "operacao": "mecanifica.operacao.extruda",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.filete",
+      "operacao": "mecanifica.operacao.filete",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.furo",
+      "operacao": "mecanifica.operacao.furo",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.inflate",
+      "operacao": "mecanifica.operacao.inflate",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.lathe",
+      "operacao": "mecanifica.operacao.lathe",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.liso",
+      "operacao": "mecanifica.operacao.liso",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.loft",
+      "operacao": "mecanifica.operacao.loft",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.material",
+      "operacao": "mecanifica.operacao.material",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.mescla",
+      "operacao": "mecanifica.operacao.mescla",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.moveA",
+      "operacao": "mecanifica.operacao.moveA",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.moveF",
+      "operacao": "mecanifica.operacao.moveF",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.moveV",
+      "operacao": "mecanifica.operacao.moveV",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.parte",
+      "operacao": "mecanifica.operacao.parte",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.parte@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.pesar",
+      "operacao": "mecanifica.operacao.pesar",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.pesos@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.pincel",
+      "operacao": "mecanifica.operacao.pincel",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.plano",
+      "operacao": "mecanifica.operacao.plano",
+      "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.publicarPorta",
+      "operacao": "mecanifica.operacao.publicarPorta",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.porta@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.rotaciona",
+      "operacao": "mecanifica.operacao.rotaciona",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.solido",
+      "operacao": "mecanifica.operacao.solido",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.transladar",
+      "operacao": "mecanifica.operacao.transladar",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.vira",
+      "operacao": "mecanifica.operacao.vira",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    }
+  ]
+}
