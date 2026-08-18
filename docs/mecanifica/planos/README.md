@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:**
+[`2026-08-18-plataforma-procedural-extensivel.md`](2026-08-18-plataforma-procedural-extensivel.md).
+
+O plano transforma o motor monolítico em uma plataforma procedural modular e
+descobrível: núcleo pequeno, registro tipado, pacotes de capacidades, grafos
+derivados, subgrafos reutilizáveis, SDK de extensão e acesso Agent-First por
+serviço neutro e MCP. A migração não mantém cópia `legacy`; Git é o histórico e
+código movido sai da origem na mesma transição. A execução começa pela R00,
+linha de base e mapa executável de dependências.
 
 O plano concluído mais recente foi a [auditoria de interseções em montagens](2026-08-18-auditoria-intersecoes-montagem.md), aprovada após integrar malha, contenção, casos inconclusivos e MCP.
 
@@ -223,6 +231,6 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-Não há plano aberto neste momento. O estado no topo desta página é a fonte. Os
-demais candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
-automática.
+Não abra um segundo plano enquanto a plataforma procedural extensível estiver
+ativa. O estado no topo desta página é a fonte. Os demais candidatos permanecem
+no [`BACKLOG.md`](BACKLOG.md) sem autorização automática.

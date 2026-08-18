@@ -7,6 +7,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 
 | Candidato | Estado / próximo recorte |
 |---|---|
+| Plataforma procedural extensível e descobrível | **ativo** em `2026-08-18-plataforma-procedural-extensivel.md`; R00 mapeia dependências e fixa a linha de base antes da extração modular |
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
 | Auditoria de interseções em montagens | concluído e aprovado em `2026-08-18-auditoria-intersecoes-montagem.md`; malha neutra, contenção, cobertura explícita e MCP, sem solver ou folga universal |
 | Caso 3 da homologação | retirado; a pergunta foi respondida com evidência mais forte |

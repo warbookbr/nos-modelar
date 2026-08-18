@@ -59,6 +59,12 @@ aplicação publicada aqui.
   foi concluído e aprovado. Ele entrega verificação neutra entre peças-folha
   por malha e contenção, com cobertura explícita e consumo pela revisão MCP;
   solver, correção automática e folga universal permanecem fora.
+- O plano da [plataforma procedural extensível e descobrível](planos/2026-08-18-plataforma-procedural-extensivel.md) está
+  **ativo**. Ele substitui o monólito por núcleo pequeno, registro tipado,
+  pacotes de capacidades, grafos derivados, subgrafos reutilizáveis, SDK de
+  extensão e descoberta Agent-First. A R00 começa pela linha de base e pelo
+  mapa executável; não haverá cópia `legacy` nem segundo executor
+  (`docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md`).
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
@@ -231,6 +237,9 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
+- A plataforma procedural extensível está em execução pela R00 do plano ativo.
+  Nenhuma rodada posterior deve começar sem a evidência e o fechamento da
+  anterior.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.

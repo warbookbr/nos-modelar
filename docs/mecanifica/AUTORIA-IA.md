@@ -23,6 +23,12 @@ procedural da peça, organizar peças em montagens, declarar relações, escolhe
 contexto necessário para trabalhar e receber retorno suficiente para corrigir o
 resultado.
 
+Quando o vocabulário existente não expressar a intenção, a IA também deve
+conseguir consultar a lacuna, compor uma capacidade reutilizável ou implementar
+uma extensão nativa por contrato e gates. Essa extensão pertence à plataforma
+procedural versionada; não vira código oculto dentro da receita nem caso
+especial de carro ou robô.
+
 O ciclo desejado é:
 
 ```text
@@ -591,6 +597,10 @@ Qualquer arquitetura, plano ou ferramenta futura deve respeitar estas regras:
     autoria.
 15. Testes resolvem decisões ambíguas, não reabrem princípios lógicos já
     estabelecidos.
+16. Capacidades do motor são módulos registrados e consultáveis; documentação,
+    schemas e grafos derivam dos mesmos contratos executáveis.
+17. Uma capacidade composta pode ser reutilizada como subgrafo declarativo; um
+    algoritmo novo entra como extensão nativa confinada e validada.
 
 ## Desvios a evitar
 

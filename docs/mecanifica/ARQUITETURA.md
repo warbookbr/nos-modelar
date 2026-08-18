@@ -53,6 +53,20 @@ fundir todos os objetos em uma receita única.
 7. **Portas de acesso**: MCP, CLI, API ou edição assistida podem expor essas
    capacidades. Nenhuma dessas portas define a estrutura interna.
 
+O plano ativo da plataforma procedural extensível acrescenta uma fronteira
+interna a essa direção: o núcleo executa um registro explícito de módulos e
+operações; contratos executáveis derivam catálogo, schemas, documentação e
+grafos de capacidades; subgrafos declarativos e extensões nativas confinadas
+ampliam o vocabulário sem concentrá-lo novamente num arquivo único. O
+`oficina.js` pode permanecer como entrada canônica pequena, mas não como dono
+das implementações.
+
+Capacidades, procedimento e montagem possuem grafos diferentes. O grafo de
+capacidades explica disponibilidade e dependências do motor; o procedural
+registra execução e procedência da peça; o de montagem preserva composição e
+relações entre instâncias. Todos são derivados de dados executáveis, não de
+diagramas mantidos à mão.
+
 A regra de direção é:
 
 > **Peças são geradas por receitas. Conjuntos são organizados por montagens.
