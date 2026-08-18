@@ -70,6 +70,7 @@ export async function descreverPecaReutilizavel({
   casas = 6,
   estrito = false,
   listar = false,
+  registroOperacoes = null,
 } = {}) {
   if (listar) {
     return {
@@ -126,7 +127,7 @@ export async function descreverPecaReutilizavel({
 
   let neutro;
   try {
-    ({ neutro } = executarReceita(modulo));
+    ({ neutro } = executarReceita(modulo, { registroOperacoes }));
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }

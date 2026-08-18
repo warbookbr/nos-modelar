@@ -137,7 +137,7 @@ function portasParaArtefato(portas) {
   return [...portas.values()].map((porta) => JSON.parse(JSON.stringify(porta)));
 }
 
-export async function exportarPeca(nome, { paramsExtra = null, modulo = null } = {}) {
+export async function exportarPeca(nome, { paramsExtra = null, modulo = null, registroOperacoes = null } = {}) {
   const caminho = join(PECAS, `${nome}.js`);
   /* A fronteira de disco é opcional: produção usa nome explícito do acervo;
      testes e hosts podem fornecer uma receita já carregada. */
@@ -150,7 +150,7 @@ export async function exportarPeca(nome, { paramsExtra = null, modulo = null } =
     throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS; não é peça procedural`);
   }
 
-  const { entrada, neutro: bruto } = executarReceita(mod, { paramsExtra });
+  const { entrada, neutro: bruto } = executarReceita(mod, { paramsExtra, registroOperacoes });
   conferirSemOrfaos(nome, bruto.orfaos);
   conferirCapacidadesTransportaveis(nome, bruto);
 
@@ -165,7 +165,9 @@ export async function exportarPeca(nome, { paramsExtra = null, modulo = null } =
     formato: FORMATO,
     versao: VERSAO,
     peca: nome,
-    receita: hash16(JSON.stringify(entrada)),
+    receita: hash16(JSON.stringify(registroOperacoes
+      ? { entrada, registroOperacoes: registroOperacoes.assinatura }
+      : entrada)),
     /* `meta` por LISTA BRANCA. Medido: o produto lê um campo só, `meta.nome`,
        para nomear a raiz do grupo Three.js. A peça publica mais — `tipo`,
        `desc`, `fechada` e `colisao` — e nenhum atravessa.

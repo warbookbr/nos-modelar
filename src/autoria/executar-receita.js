@@ -31,6 +31,9 @@ export function entradaDaReceita(modulo, { paramsExtra = null } = {}) {
 
 export function executarReceita(modulo, opcoes = {}) {
   const entrada = entradaDaReceita(modulo, opcoes);
+  const opcoesDoNucleo = opcoes.registroOperacoes
+    ? { registroOperacoes: opcoes.registroOperacoes }
+    : undefined;
   const neutro = nucleo(
     entrada.PASSOS,
     entrada.PARAMS,
@@ -38,6 +41,7 @@ export function executarReceita(modulo, opcoes = {}) {
     entrada.MATERIAIS,
     entrada.ESQUELETO,
     entrada.ALIASES,
+    opcoesDoNucleo,
   );
   return { entrada, neutro };
 }
