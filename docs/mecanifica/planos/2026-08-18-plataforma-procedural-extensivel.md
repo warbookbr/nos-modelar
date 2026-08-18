@@ -6,6 +6,9 @@
 
 **Base:** `warbookbr/nos-mecanifica`, `main` em `b9c3f64`.
 
+**Execução:** R00 concluída: mapa estático e baseline canônica em
+`BASELINE-MOTOR-R00.md`; a fachada ainda não foi movida.
+
 ## Objetivo verificável
 
 Transformar o motor procedural numa plataforma modular que uma IA consiga

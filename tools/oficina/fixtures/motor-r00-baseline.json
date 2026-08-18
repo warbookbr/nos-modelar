@@ -1,0 +1,360 @@
+{
+  "formato": "mecanifica.baseline-motor-r00",
+  "versao": 1,
+  "operacoes": [
+    "cubo",
+    "cilindro",
+    "esfera",
+    "cone",
+    "plano",
+    "chamferBox",
+    "lathe",
+    "loft",
+    "inflate",
+    "publicarPorta",
+    "moveV",
+    "extruda",
+    "mescla",
+    "moveF",
+    "moveA",
+    "vira",
+    "apagaFace",
+    "displace",
+    "encostar",
+    "transladar",
+    "rotaciona",
+    "espelha",
+    "arranja",
+    "furo",
+    "arredondarAresta",
+    "filete",
+    "pincel",
+    "solido",
+    "liso",
+    "material",
+    "parte",
+    "pesar"
+  ],
+  "casos": [
+    {
+      "id": "r00/cubo",
+      "operacoes": [
+        "cubo"
+      ],
+      "hashCanonico": "e65009e58e1730646aed1e290ae74a1961549bf337fd6222b9bd5eae37afe804",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/cilindro",
+      "operacoes": [
+        "cilindro"
+      ],
+      "hashCanonico": "a67b2d5572114e52a69cc8247f4694baa3984f11a27946a2a7eeed632929fd20",
+      "vertices": 16,
+      "faces": 10,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/esfera",
+      "operacoes": [
+        "esfera"
+      ],
+      "hashCanonico": "40034767167dbf5b2e58dd62cf317a99e7e0cb59337355b8084b564f75352fa5",
+      "vertices": 20,
+      "faces": 24,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/cone",
+      "operacoes": [
+        "cone"
+      ],
+      "hashCanonico": "5f789cda5f87d9776f19ef6354e4347ef9fd126719f7d27c91aab2945f834274",
+      "vertices": 9,
+      "faces": 9,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/plano",
+      "operacoes": [
+        "plano"
+      ],
+      "hashCanonico": "a7a9302ea326b47e42af854603c376674e74d4d73b953e13deb952b4f0498625",
+      "vertices": 4,
+      "faces": 1,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/chamferBox",
+      "operacoes": [
+        "chamferBox"
+      ],
+      "hashCanonico": "c3cfe389cc84522f4339a450eb5f5710c037da6ca6d4ff37c8d82e3f1e799aa1",
+      "vertices": 24,
+      "faces": 26,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/lathe",
+      "operacoes": [
+        "lathe"
+      ],
+      "hashCanonico": "b7d7ee1c6257b84743cdf953f32771c7d1025c83b11818d8af916281036dae18",
+      "vertices": 16,
+      "faces": 8,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/loft",
+      "operacoes": [
+        "loft"
+      ],
+      "hashCanonico": "0dd27ac65917f9c05cc14953f4f089eca459a885eadd2e3acd3c107e9eedd0b1",
+      "vertices": 16,
+      "faces": 8,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/inflate",
+      "operacoes": [
+        "inflate"
+      ],
+      "hashCanonico": "81c1c79181545e66bce7632f15492c073e52e2674657f20c51e39bf7665de4a0",
+      "vertices": 26,
+      "faces": 24,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/publicarPorta",
+      "operacoes": [
+        "publicarPorta"
+      ],
+      "hashCanonico": "e65009e58e1730646aed1e290ae74a1961549bf337fd6222b9bd5eae37afe804",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/moveV",
+      "operacoes": [
+        "moveV"
+      ],
+      "hashCanonico": "b6fcc63ae39b5ae05ed4afbfa36dcd0590718d0299ecd10879d184aaa71e07c6",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/extruda",
+      "operacoes": [
+        "extruda"
+      ],
+      "hashCanonico": "d2bfaa95bd02dabaebc27b15be7188ff7bb661e07d522e6ad46cd548693efe2d",
+      "vertices": 12,
+      "faces": 10,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/mescla",
+      "operacoes": [
+        "mescla"
+      ],
+      "hashCanonico": "483fd2c4575ae615c50634736a77413d236b7d7af2967037c8ee9e138e71c437",
+      "vertices": 7,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/moveF",
+      "operacoes": [
+        "moveF"
+      ],
+      "hashCanonico": "6e7fea0750020e34fb3c671ec80dd5d37515a29bef6afe1313aeac253d98096f",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/moveA",
+      "operacoes": [
+        "moveA"
+      ],
+      "hashCanonico": "59fdd507b85ceadb5181322cee2c6625a69311e0f48b00ef6217aef64e8f5ce1",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/vira",
+      "operacoes": [
+        "vira"
+      ],
+      "hashCanonico": "62618fc867cd45b18db5e146de72b8938c37d2e4e544505114c7a90c8b6cbbf4",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/apagaFace",
+      "operacoes": [
+        "apagaFace"
+      ],
+      "hashCanonico": "b28115aa4291b94a7e780fc5f079c8e66c3c97761ba897c74474b35b816c1309",
+      "vertices": 8,
+      "faces": 5,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/displace",
+      "operacoes": [
+        "displace"
+      ],
+      "hashCanonico": "15c260164804c27c16b0117ae1105c87d579ab995d00f82c275e71504c08c34e",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/encostar",
+      "operacoes": [
+        "encostar"
+      ],
+      "hashCanonico": "c7168feb650b95edab72e3c6406d67f714a3b078529695872144175e8310323d",
+      "vertices": 16,
+      "faces": 12,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/transladar",
+      "operacoes": [
+        "transladar"
+      ],
+      "hashCanonico": "5ccdee4e0e5adafed5dff91430abd7383d5ca9502d91bc175279ef58b2b8912e",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/rotaciona",
+      "operacoes": [
+        "rotaciona"
+      ],
+      "hashCanonico": "bd1a0412bec46661427fafec455860818d051afa7c681652121db8d0723ab668",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/espelha",
+      "operacoes": [
+        "espelha"
+      ],
+      "hashCanonico": "aa2889e70097238a11370fe8a4997558b7eeafbfca52f1a29365be806c8fad61",
+      "vertices": 16,
+      "faces": 12,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/arranja",
+      "operacoes": [
+        "arranja"
+      ],
+      "hashCanonico": "c74cc26549487c427b53d66d70c2e52b00002b40ec7698a1dd85cbd798951068",
+      "vertices": 16,
+      "faces": 12,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/furo",
+      "operacoes": [
+        "furo"
+      ],
+      "hashCanonico": "fdfa27b0bc4684156271118b63b59f6b32eb702c7dbb1f8b64adda7b3618c439",
+      "vertices": 40,
+      "faces": 36,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/arredondarAresta",
+      "operacoes": [
+        "arredondarAresta"
+      ],
+      "hashCanonico": "dd1371c19262946266cdf5b6de444080c1a421f2cfc07015c0954c7a372f6fef",
+      "vertices": 12,
+      "faces": 8,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/filete",
+      "operacoes": [
+        "filete"
+      ],
+      "hashCanonico": "88bdd3f315b91d85db56aeec2aac7483bc6caf7984f00fd0471bdf17dace0c3d",
+      "vertices": 10,
+      "faces": 7,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/pincel",
+      "operacoes": [
+        "pincel"
+      ],
+      "hashCanonico": "9273e03bba2de1b7f4295686d219afc289be601cbe939a97a308e8a1476b7bf5",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/solido",
+      "operacoes": [
+        "solido"
+      ],
+      "hashCanonico": "bfa3810299c8f135fd1e247e732d90d85c65b173ce6a88631c7a0ff12db088de",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/liso",
+      "operacoes": [
+        "liso"
+      ],
+      "hashCanonico": "258cfea33aa8227ef430df3ad21093cfb3a2a3a295ae7b71a9fa0e7b0964533e",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/material",
+      "operacoes": [
+        "material"
+      ],
+      "hashCanonico": "f70bfddd57a608429466c722483149fd5d4fc48cdf85335d51664684c42ba883",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/parte",
+      "operacoes": [
+        "parte"
+      ],
+      "hashCanonico": "f4a32b2a5ee296081c31672ae54d6c75911302c85c488eb7b51d889c6cb1a475",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/pesar",
+      "operacoes": [
+        "pesar"
+      ],
+      "hashCanonico": "289f707e37c3d102624c316f9d829102c2b6165ba3ffef48d5668ad0bc1817f7",
+      "vertices": 8,
+      "faces": 6,
+      "diagnosticos": 0
+    }
+  ]
+}
