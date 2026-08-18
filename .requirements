@@ -4,11 +4,14 @@
   stdio não for homologado nessa linha).
 - npm que acompanha o Node.js 22 LTS.
 - Dependências do projeto: `npm ci`.
+- Chromium e bibliotecas Linux do Playwright:
+  `npx playwright install --with-deps chromium`.
 
 Verificação mínima:
 
 ```sh
 node --version
 npm ci
+npx playwright install --with-deps chromium
 npm run mcp:check
 ```
