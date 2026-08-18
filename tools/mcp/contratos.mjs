@@ -331,6 +331,7 @@ export const revisarMontagemSaida = z.object({
     estado: z.enum(['sem-falhas-declaradas', 'reprovada', 'incompleta']),
     contexto: z.json(),
     verificacoes: z.array(verificacaoMontagem),
+    auditoriaIntersecoes: z.json(),
     cobertura: coberturaRevisaoMontagem,
     visual: visualRevisaoMontagem,
     recomendacoes: z.array(z.string()),

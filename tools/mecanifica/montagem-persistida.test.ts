@@ -42,7 +42,7 @@ describe('montagem persistida v1', () => {
 
   it('recusa todas as estruturas fora do contrato com erro estruturado', () => {
     esperaErro({ ...base(), formato: 'outro' }, 'formato-desconhecido', 'formato');
-    esperaErro({ ...base(), versao: 4 }, 'versao-nao-suportada', 'versao');
+    esperaErro({ ...base(), versao: 5 }, 'versao-nao-suportada', 'versao');
     esperaErro({ ...base(), id: '' }, 'id-invalido', 'id');
     esperaErro(base([instancia('a'), instancia('a')]), 'instancia-duplicada', 'instancias[1].id');
     esperaErro(base([instancia('a', 'outro')]), 'tipo-alvo-nao-suportado', 'instancias[0].alvo.tipo');
@@ -83,7 +83,7 @@ const baseV2 = (relacoes: any[] = []) => ({ ...base(), versao: 2, relacoes });
 
 describe('montagem persistida v2 — leitura e validação estrutural', () => {
   it('expõe as versões suportadas sem compartilhar coleção mutável', () => {
-    expect(VERSOES_SUPORTADAS).toEqual([1, 2, VERSAO_ATUAL]);
+    expect(VERSOES_SUPORTADAS).toEqual([1, 2, VERSAO_ATUAL, 4]);
     expect(Object.isFrozen(VERSOES_SUPORTADAS)).toBe(true);
   });
 
@@ -139,5 +139,29 @@ describe('montagem persistida v2 — leitura e validação estrutural', () => {
     esperaV2({ ...relacaoCilindrica(), especificacao: { folgaRadial: faixa(), toleranciaNumerica: NaN } }, 'especificacao-invalida', 'relacoes[0].especificacao.toleranciaNumerica');
     esperaV2({ ...relacaoCilindrica(), especificacao: { folgaRadial: faixa(0), toleranciaNumerica: 0 } }, 'especificacao-invalida', 'relacoes[0].especificacao.folgaRadial');
     esperaV2({ ...relacaoAnular(), especificacao: { ...relacaoAnular().especificacao, sobreposicaoAxial: { nominal: 0, toleranciaFabricacao: { menos: 0, mais: 0, extra: 1 } } } }, 'chave-desconhecida', 'relacoes[0].especificacao.sobreposicaoAxial.toleranciaFabricacao');
+  });
+});
+
+describe('montagem persistida v4 — política de auditoria de interseções', () => {
+  const baseV4 = (auditoriaIntersecoes: any = { toleranciaNumerica: 1e-9, expectativas: [] }) => ({
+    formato: 'mecanifica.montagem', versao: 4, id: 'm1', instancias: [], relacoes: [], auditoriaIntersecoes,
+  });
+  const expectativa = (id = 'press-fit') => ({ id, a: { caminho: ['a'] }, b: { caminho: ['b'] }, motivo: 'interferencia de montagem declarada' });
+
+  it('aceita, ordena e copia expectativas sem alterar v1-v3', () => {
+    const entrada = baseV4({ toleranciaNumerica: 0.000001, expectativas: [expectativa('z'), expectativa('a')] });
+    const antes = JSON.stringify(entrada);
+    const resultado = lerMontagemPersistida(entrada);
+    expect(resultado).toMatchObject({ versao: 4, auditoriaIntersecoes: { toleranciaNumerica: 0.000001 } });
+    expect(resultado.auditoriaIntersecoes.expectativas.map((item: any) => item.id)).toEqual(['a', 'z']);
+    expect(JSON.stringify(entrada)).toBe(antes);
+  });
+
+  it('recusa política ambígua ou duplicada', () => {
+    const esperaV4 = (auditoriaIntersecoes: any, codigo: string, caminho: string) => esperaErro(baseV4(auditoriaIntersecoes), codigo, caminho);
+    esperaV4({ toleranciaNumerica: 0, expectativas: [expectativa(), expectativa()] }, 'expectativa-duplicada', 'auditoriaIntersecoes.expectativas[1].id');
+    esperaV4({ toleranciaNumerica: 0, expectativas: [{ ...expectativa(), a: { caminho: ['a'] }, b: { caminho: ['a'] } }] }, 'expectativa-invalida', 'auditoriaIntersecoes.expectativas[0]');
+    esperaV4({ toleranciaNumerica: -1, expectativas: [] }, 'especificacao-invalida', 'auditoriaIntersecoes.toleranciaNumerica');
+    esperaV4({ toleranciaNumerica: 0, expectativas: [{ ...expectativa(), motivo: '' }] }, 'expectativa-invalida', 'auditoriaIntersecoes.expectativas[0].motivo');
   });
 });

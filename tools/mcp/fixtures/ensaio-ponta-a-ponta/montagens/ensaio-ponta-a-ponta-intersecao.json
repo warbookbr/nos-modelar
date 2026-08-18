@@ -1,0 +1,23 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "ensaio-ponta-a-ponta-intersecao",
+  "instancias": [
+    { "id": "base", "alvo": { "tipo": "peca", "ref": "placa-base" } },
+    {
+      "id": "suporte",
+      "alvo": { "tipo": "peca", "ref": "suporte-portas" },
+      "pose": { "deslocamento": [0, 0.2, 0] }
+    },
+    {
+      "id": "pino",
+      "alvo": { "tipo": "peca", "ref": "pino-guia" },
+      "pose": { "deslocamento": [0, 1.2, 0] }
+    }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 0.000001,
+    "expectativas": []
+  }
+}

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { derivarCatalogoMontagens } from '../../../src/autoria/derivar-catalogo-montagens.js';
 import { derivarRoteiroRevalidacao } from '../../../src/autoria/derivar-roteiro-revalidacao.js';
 import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
+import { auditarIntersecoesMontagem } from '../../../src/autoria/auditar-intersecoes-montagem.js';
 import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
 import { ErroCatalogoMcpMontagens, REGRA_ESCOPO_CATALOGO } from '../catalogo-montagens.mjs';
 import {
@@ -116,6 +117,21 @@ export async function revisarMontagem(input, {
   if (!descricao.ok) return { resposta: descricao, imagens: [] };
 
   const contexto = descricao.resultado.contexto;
+  const resolvida = await catalogo.resolver(argumentos.id);
+  const auditoriaIntersecoes = auditarIntersecoesMontagem(resolvida, {
+    ...(argumentos.caminho ? { caminho: argumentos.caminho } : {}),
+  });
+  const colisaoCompleta = argumentos.caminho === undefined && auditoriaIntersecoes.cobertura.completa;
+  const contextoRevisao = {
+    ...contexto,
+    cobertura: {
+      ...contexto.cobertura,
+      colisaoGlobalVerificada: colisaoCompleta,
+      ...(colisaoCompleta
+        ? { limitacoes: contexto.cobertura.limitacoes.filter((codigo) => codigo !== 'caixas-mundo-nao-provam-colisao-distancia-ou-folga') }
+        : {}),
+    },
+  };
   const verificacoes = contexto.relacoes.map((relacao) => ({
     id: relacao.id,
     tipo: relacao.tipo,
@@ -130,23 +146,26 @@ export async function revisarMontagem(input, {
     ...(argumentos.caminho ? { caminho: argumentos.caminho } : {}),
     ...(argumentos.vistas ? { vistas: argumentos.vistas } : {}),
   }, { catalogo, capturar, agora });
-  const naoVerificadas = contexto.cobertura.limitacoes.map((codigo) => ({
+  const naoVerificadas = contextoRevisao.cobertura.limitacoes.map((codigo) => ({
     codigo,
     mensagem: mensagemDaLimitacao(codigo),
   }));
   const visualDisponivel = visual.resposta.ok;
   const estado = verificacoes.some(({ estado: atual }) => atual === 'falhou')
     ? 'reprovada'
-    : (!visualDisponivel || verificacoes.length === 0 || naoVerificadas.length > 0
-      ? 'incompleta' : 'sem-falhas-declaradas');
+    : (auditoriaIntersecoes.pares.some(({ estado: atual }) => atual === 'interpenetram')
+      ? 'reprovada'
+      : (!visualDisponivel || verificacoes.length === 0 || naoVerificadas.length > 0
+        ? 'incompleta' : 'sem-falhas-declaradas'));
   const resposta = respostaOk(0, {
     formato: 'mecanifica.revisao-montagem',
     versao: 1,
     id: argumentos.id,
     caminho: argumentos.caminho ?? [],
     estado,
-    contexto,
+    contexto: contextoRevisao,
     verificacoes,
+    auditoriaIntersecoes,
     cobertura: {
       verificadas: verificacoes.length > 0 ? ['relações declaradas nesta montagem'] : [],
       naoVerificadas,
@@ -160,6 +179,10 @@ export async function revisarMontagem(input, {
       `Interpretação obrigatória: ${REGRA_ESCOPO_CATALOGO}`,
       ...(verificacoes.some(({ estado: atual }) => atual === 'falhou')
         ? ['Corrija as verificações reprovadas antes de aceitar a montagem.'] : []),
+      ...(auditoriaIntersecoes.pares.some(({ estado: atual }) => atual === 'interpenetram')
+        ? ['Corrija as interpenetrações detectadas antes de aceitar a montagem.'] : []),
+      ...(auditoriaIntersecoes.cobertura.inconclusivos > 0
+        ? ['A auditoria geométrica ficou inconclusiva em alguns pares; não trate a montagem como livre de interseções.'] : []),
       ...(naoVerificadas.length > 0
         ? ['Não trate esta revisão como aprovação completa: há verificações fora do escopo atual.'] : []),
       ...(visualDisponivel ? [] : ['Repita a revisão com um ambiente visual disponível.']),
@@ -198,10 +221,11 @@ export function conteudoRevisaoMontagem({ resposta, imagens }) {
   }
   const resultado = resposta.resultado;
   const falhas = resultado.verificacoes.filter(({ estado }) => estado === 'falhou').length;
+  const interpenetracoes = resultado.auditoriaIntersecoes.pares.filter(({ estado }) => estado === 'interpenetram').length;
   const texto = [
     `revisar_montagem: ${resultado.estado}.`,
     `Escopo: ${REGRA_ESCOPO_CATALOGO}`,
-    `${resultado.verificacoes.length} verificação(ões) executada(s), ${falhas} falha(s).`,
+    `${resultado.verificacoes.length} verificação(ões) declarada(s), ${falhas} falha(s); ${interpenetracoes} interpenetração(ões) detectada(s).`,
     resultado.visual.estado === 'produzida'
       ? `${resultado.visual.vistas.length} vista(s) produzida(s); a análise visual cabe à IA consumidora.`
       : 'As imagens não foram produzidas; a revisão está incompleta.',

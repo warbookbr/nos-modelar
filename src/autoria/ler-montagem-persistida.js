@@ -6,7 +6,8 @@ export const FORMATO = 'mecanifica.montagem';
 export const VERSAO = 1;
 export const VERSAO_RELACOES = 2;
 export const VERSAO_ATUAL = 3;
-export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_RELACOES, VERSAO_ATUAL]);
+export const VERSAO_AUDITORIA_INTERSECOES = 4;
+export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_RELACOES, VERSAO_ATUAL, VERSAO_AUDITORIA_INTERSECOES]);
 
 export class ErroMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem) {
@@ -21,6 +22,8 @@ const ehObjetoSimples = (valor) => valor !== null
   && typeof valor === 'object'
   && !Array.isArray(valor)
   && (Object.getPrototypeOf(valor) === Object.prototype || Object.getPrototypeOf(valor) === null);
+
+function compararTexto(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
 
 function falhar(codigo, caminho, mensagem) {
   throw new ErroMontagemPersistida(codigo, caminho, mensagem);
@@ -149,6 +152,41 @@ function lerEspecificacaoDirecional(valor, caminho) {
   };
 }
 
+function lerExpectativaIntersecao(valor, indice) {
+  const caminho = `auditoriaIntersecoes.expectativas[${indice}]`;
+  if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['id', 'a', 'b', 'motivo'], caminho);
+  const id = textoNaoVazio(valor.id, 'id-invalido', `${caminho}.id`);
+  const lerCaminho = (lado) => {
+    const campo = `${caminho}.${lado}`;
+    if (!ehObjetoSimples(valor[lado])) falhar('expectativa-invalida', campo, 'precisa ser objeto simples.');
+    chavesExatas(valor[lado], ['caminho'], campo);
+    if (!Array.isArray(valor[lado].caminho) || valor[lado].caminho.length === 0) {
+      falhar('expectativa-invalida', `${campo}.caminho`, 'precisa ser caminho de peça não vazio.');
+    }
+    return { caminho: valor[lado].caminho.map((idCaminho, j) => textoNaoVazio(idCaminho, 'expectativa-invalida', `${campo}.caminho[${j}]`)) };
+  };
+  const a = lerCaminho('a');
+  const b = lerCaminho('b');
+  if (JSON.stringify(a.caminho) === JSON.stringify(b.caminho)) falhar('expectativa-invalida', caminho, 'os dois lados precisam ser peças diferentes.');
+  return { id, a, b, motivo: textoNaoVazio(valor.motivo, 'expectativa-invalida', `${caminho}.motivo`) };
+}
+
+function lerAuditoriaIntersecoes(valor) {
+  const caminho = 'auditoriaIntersecoes';
+  if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
+  chavesExatas(valor, ['toleranciaNumerica', 'expectativas'], caminho);
+  if (!Array.isArray(valor.expectativas)) falhar('estrutura-invalida', `${caminho}.expectativas`, 'precisa ser array.');
+  const expectativas = valor.expectativas.map(lerExpectativaIntersecao);
+  const ids = new Set();
+  for (const [indice, expectativa] of expectativas.entries()) {
+    if (ids.has(expectativa.id)) falhar('expectativa-duplicada', `${caminho}.expectativas[${indice}].id`, `ID '${expectativa.id}' duplicado.`);
+    ids.add(expectativa.id);
+  }
+  expectativas.sort((a, b) => compararTexto(a.id, b.id));
+  return { toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`), expectativas };
+}
+
 function lerRelacao(valor, indice, permitirDirecional = false) {
   const caminho = `relacoes[${indice}]`;
   if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
@@ -234,6 +272,17 @@ function lerV3(dado) {
   return { formato: FORMATO, versao: VERSAO_ATUAL, id, instancias, relacoes };
 }
 
+function lerV4(dado) {
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'auditoriaIntersecoes'], '$');
+  const { auditoriaIntersecoes, ...semAuditoria } = dado;
+  const base = lerV3({ ...semAuditoria, versao: VERSAO_ATUAL });
+  return {
+    ...base,
+    versao: VERSAO_AUDITORIA_INTERSECOES,
+    auditoriaIntersecoes: lerAuditoriaIntersecoes(auditoriaIntersecoes),
+  };
+}
+
 export function lerMontagemPersistida(dado) {
   if (!ehObjetoSimples(dado)) falhar('estrutura-invalida', '$', 'precisa ser objeto simples.');
   if (dado.formato !== FORMATO) falhar('formato-desconhecido', 'formato', `esperado '${FORMATO}'.`);
@@ -241,5 +290,7 @@ export function lerMontagemPersistida(dado) {
     falhar('versao-nao-suportada', 'versao', `esperado uma de ${VERSOES_SUPORTADAS.join(', ')}.`);
   }
   if (dado.versao === VERSAO) return lerV1(dado);
-  return dado.versao === VERSAO_RELACOES ? lerV2(dado) : lerV3(dado);
+  if (dado.versao === VERSAO_RELACOES) return lerV2(dado);
+  if (dado.versao === VERSAO_ATUAL) return lerV3(dado);
+  return lerV4(dado);
 }

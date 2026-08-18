@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-345 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+348 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -162,6 +162,7 @@
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
+- `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
@@ -288,6 +289,7 @@
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
 - `assinatura-geometria.js` — assinatura-geometria.js — SHA-256 síncrono e portátil para os contratos de autoria. Não usa `node:crypto`: a descrição também roda na bancada.
+- `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
 - `derivar-catalogo-montagens.js` — derivar-catalogo-montagens.js — índice determinístico limitado às raízes dadas.
 - `derivar-impacto-montagem.js` — derivar-impacto-montagem.js — deriva dependências locais sem executar revalidação.
@@ -402,6 +404,7 @@
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
+- `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
 - `autoria-ativa.mjs` — autoria-ativa.mjs — provedores neutros para revisões imutáveis ativas.
 - `autoria-ativa.test.mjs` — autoria-ativa.test.mjs — continuidade autorizada e falha fechada.
 - `autoria-montagem.mjs` — autoria-montagem.mjs — planejamento e aplicação interna de montagens v1/v2/v3.

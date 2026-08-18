@@ -56,9 +56,12 @@ aplicação publicada aqui.
   consumidor antes de remover as receitas não homologadas.
 - O plano de [auditoria de interseções em montagens](planos/2026-08-18-auditoria-intersecoes-montagem.md)
   (`docs/mecanifica/planos/2026-08-18-auditoria-intersecoes-montagem.md`)
-  está ativo. Ele abre verificação neutra entre peças-folha por malha e
-  contenção, com cobertura explícita e consumo pela revisão MCP; solver,
-  correção automática e folga universal permanecem fora.
+  foi concluído e aprovado. Ele entrega verificação neutra entre peças-folha
+  por malha e contenção, com cobertura explícita e consumo pela revisão MCP;
+  solver, correção automática e folga universal permanecem fora.
+- O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md)
+  registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
+  transporta a auditoria; `descrever_montagem` continua sem executá-la.
 - A [matriz de testes acoplados ao acervo](MATRIZ-TESTES-ACOPLADOS.md)
   (`docs/mecanifica/MATRIZ-TESTES-ACOPLADOS.md`) registra o
   que é contrato genérico, integração, publicação ou conteúdo específico após
@@ -158,7 +161,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 7. [`MONTAGEM-PERSISTIDA-V1.md`](MONTAGEM-PERSISTIDA-V1.md) para o contrato
    executável de montagem persistida v1.
 8. [`MONTAGEM-PERSISTIDA-V2.md`](MONTAGEM-PERSISTIDA-V2.md),
-   [`MONTAGEM-PERSISTIDA-V3.md`](MONTAGEM-PERSISTIDA-V3.md) e
+   [`MONTAGEM-PERSISTIDA-V3.md`](MONTAGEM-PERSISTIDA-V3.md),
+   [`MONTAGEM-PERSISTIDA-V4.md`](MONTAGEM-PERSISTIDA-V4.md) e
    [`CONTEXTO-MONTAGEM-IA.md`](CONTEXTO-MONTAGEM-IA.md) para relações locais e
    sua descrição compacta e consultável.
 9. [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) para inspeção visual
@@ -227,9 +231,6 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- Auditoria de interseções em montagens está aberta no plano ativo. A entrega
-  precisa provar cruzamento, contenção, contato, casos inconclusivos, escala e
-  consumo MCP sem usar caixas como veredito ou introduzir solver.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
@@ -346,6 +347,8 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 <!-- Contrato de contexto alcançável: docs/mecanifica/CONTEXTO-MONTAGEM-IA.md -->
 
 <!-- Contrato v3 alcançável: docs/mecanifica/MONTAGEM-PERSISTIDA-V3.md -->
+
+<!-- Contrato v4 alcançável: docs/mecanifica/MONTAGEM-PERSISTIDA-V4.md -->
 
 <!-- Contrato de escrita alcançável: docs/mecanifica/ESCRITA-TRANSACIONAL-MONTAGEM.md -->
 

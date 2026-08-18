@@ -1,6 +1,6 @@
 # Auditoria de interseções em montagens
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** agente executor a designar
 
@@ -27,6 +27,18 @@ eleva a confiabilidade da IA sem criar dependência de produto ou solver.
 
 A abertura foi autorizada em 18 de agosto de 2026. Foi recusado usar caixas
 como veredito, calcular folga universal ou corrigir poses automaticamente.
+
+## Execução atual
+
+R00–R06 estão implementados neste recorte: a decisão foi manter o núcleo de
+predicados neutro próprio e reutilizar somente `earcut`, já dependência direta,
+para triangular faces. As provas cobrem invasão, contenção, contato, anel com
+pino no furo, malha aberta, foco, montagem recursiva e ordem determinística.
+V4 valida e transporta expectativas sem suprimi-las; `revisar_montagem` expõe a
+auditoria ao MCP e `descrever_montagem` continua sem custo geométrico implícito.
+O benchmark de 64 peças/2.016 pares teve média de 5,49 ms, com cobertura
+completa. O ensaio MCP provou os estados livre, interpenetrando e inconclusivo;
+as vistas isométrica e direita do ensaio permaneceram válidas.
 
 ## Contratos do recorte
 
@@ -162,3 +174,18 @@ O plano só conclui com provas 1–11, gates verdes, contrato e MCP coerentes e
 estudo de campo registrado. `aprovar` exige zero falsos positivos/negativos nas
 fixtures adversariais; caso contrário a decisão é `corrigir` ou `cancelar`, sem
 publicar a auditoria como garantia global.
+
+## Fechamento
+
+As provas 1–11 passaram. A auditoria não usa caixas como veredito, detecta
+cruzamento e contenção, distingue contato, preserva inconclusivos e não permite
+que expectativas escondam achados. V1–v3 continuam legíveis, v4 é explícita,
+`revisar_montagem` integra o resultado e o MCP instrui a IA sobre seu
+significado.
+
+Passaram 72 arquivos de teste, 995 testes e 2 ignorados, typecheck, build,
+porteiro, bancada vazia, guardas visuais, mapa, links, TOC, planos, exportação,
+MCP e ensaio ponta a ponta.
+
+**Decisão: `aprovar`.** Solver, folga universal, movimento, espaço varrido,
+deformação e colisão entre partes internas da mesma peça permanecem fora.
