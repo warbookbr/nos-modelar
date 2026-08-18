@@ -11,8 +11,9 @@ R02: registro explícito; R03: operações fora do núcleo; R04: artefato, efeit
 identidade, procedência e grafo, sem mudar receita ou canônico; R05: catálogo,
 busca, explicação, hipergrafo e projeções geradas do registro; R06: composições
 declarativas, reutilização, tipos, orçamento e procedência sem receita pública;
-R07: SDK nativo confinado, extensão de prova e diagnóstico de ausência.
-
+R07: SDK nativo confinado, extensão de prova e diagnóstico de ausência; R08:
+lacuna persistível, planejamento determinístico por artefatos, interfaces,
+requisitos e custo, com classificação sem promoção automática.
 ## Objetivo verificável
 
 Transformar o motor procedural numa plataforma modular que uma IA consiga

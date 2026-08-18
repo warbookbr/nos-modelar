@@ -21,6 +21,12 @@ function copiarOperacao(operacao) {
       entra: [...(operacao.artefatos?.entra ?? [])].sort(comparar),
       sai: [...(operacao.artefatos?.sai ?? [])].sort(comparar),
     },
+    interfaces: {
+      entra: [...(operacao.interfaces?.entra ?? [])].sort(comparar),
+      sai: [...(operacao.interfaces?.sai ?? [])].sort(comparar),
+    },
+    requisitos: [...(operacao.requisitos ?? [])].sort(comparar),
+    custo: operacao.custo ?? 1,
     efeitos: [...(operacao.efeitos ?? [])].sort(comparar), identidade: operacao.identidade,
   };
 }
@@ -56,7 +62,7 @@ export function buscarCapacidades(catalogo, consulta = {}) {
     efeito: lista(consulta.efeito, 'consulta.efeito'), identidade: texto(consulta.identidade, 'consulta.identidade'),
   };
   const operacoes = catalogo.operacoes.filter((operacao) => {
-    const corpus = [operacao.id, operacao.nome, operacao.categoria, operacao.identidade, ...operacao.efeitos, ...operacao.artefatos.entra, ...operacao.artefatos.sai]
+    const corpus = [operacao.id, operacao.nome, operacao.categoria, operacao.identidade, ...operacao.efeitos, ...operacao.artefatos.entra, ...operacao.artefatos.sai, ...operacao.interfaces.entra, ...operacao.interfaces.sai, ...operacao.requisitos]
       .join(' ').toLocaleLowerCase('pt-BR');
     return (!filtros.texto || corpus.includes(filtros.texto))
       && incluiTodos(operacao.artefatos.entra.map((item) => item.toLocaleLowerCase('pt-BR')), filtros.consome)

@@ -13,6 +13,20 @@ function versaoValida(versao, onde) {
 function maior(versao) { return Number(versao.split('.')[0]); }
 function textoCanonico(valor) { return JSON.stringify(valor); }
 function compararTexto(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
+function rotulos(valor, onde) {
+  if (!Array.isArray(valor) || valor.some((item) => typeof item !== 'string' || !item.trim())) throw new ErroRegistroOperacoes(`${onde} exige lista de textos não vazios`);
+  const lista = [...valor].sort(compararTexto);
+  if (new Set(lista).size !== lista.length) throw new ErroRegistroOperacoes(`${onde} não pode repetir valor`);
+  return lista;
+}
+function interfaces(valor, onde) {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor) || Object.keys(valor).sort(compararTexto).join(',') !== 'entra,sai') throw new ErroRegistroOperacoes(`${onde} exige interfaces entra e sai`);
+  return { entra: rotulos(valor.entra, `${onde}.entra`), sai: rotulos(valor.sai, `${onde}.sai`) };
+}
+function custoOperacao(valor, onde) {
+  if (typeof valor !== 'number' || !Number.isFinite(valor) || valor < 0) throw new ErroRegistroOperacoes(`${onde} exige custo finito não negativo`);
+  return valor;
+}
 
 /* Não há autorregistro: o chamador entrega a configuração completa. A ordem de
    entrada nunca muda o resultado porque módulos e operações são ordenados por ID. */
@@ -48,6 +62,9 @@ export function criarRegistroOperacoes({ modulos } = {}) {
       operacoes.push({
         id: registrada.id, nome: registrada.nome, versao: registrada.versao,
         categoria: registrada.categoria ?? 'geral', artefatos: registrada.artefatos ?? null,
+        interfaces: interfaces(registrada.interfaces ?? { entra: [], sai: [] }, `operação '${registrada.id}'.interfaces`),
+        requisitos: rotulos(registrada.requisitos ?? [], `operação '${registrada.id}'.requisitos`),
+        custo: custoOperacao(registrada.custo ?? 1, `operação '${registrada.id}'.custo`),
         efeitos: registrada.efeitos ?? [], identidade: registrada.identidade ?? 'nao-informada',
       });
     }
