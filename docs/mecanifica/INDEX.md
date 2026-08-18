@@ -54,6 +54,11 @@ aplicação publicada aqui.
   foi concluído e aprovado. Ele deixou o catálogo homologado vazio, fixtures
   confinadas, validadores por entrada explícita e rollout coordenado com o
   consumidor antes de remover as receitas não homologadas.
+- O plano de [auditoria de interseções em montagens](planos/2026-08-18-auditoria-intersecoes-montagem.md)
+  (`docs/mecanifica/planos/2026-08-18-auditoria-intersecoes-montagem.md`)
+  está ativo. Ele abre verificação neutra entre peças-folha por malha e
+  contenção, com cobertura explícita e consumo pela revisão MCP; solver,
+  correção automática e folga universal permanecem fora.
 - A [matriz de testes acoplados ao acervo](MATRIZ-TESTES-ACOPLADOS.md)
   (`docs/mecanifica/MATRIZ-TESTES-ACOPLADOS.md`) registra o
   que é contrato genérico, integração, publicação ou conteúdo específico após
@@ -222,10 +227,12 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- Nenhuma capacidade em aberto. `alinhar` e variantes nomeadas foram medidos e
-  recusados; `loft` fechado foi implementado depois que a medida por uso se
-  mostrou inválida para capacidade ausente. A medida, o erro e o critério de
-  reabertura estão em `docs/mecanifica/planos/BACKLOG.md`.
+- Auditoria de interseções em montagens está aberta no plano ativo. A entrega
+  precisa provar cruzamento, contenção, contato, casos inconclusivos, escala e
+  consumo MCP sem usar caixas como veredito ou introduzir solver.
+- `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
+  implementado. A medida e os critérios estão em
+  `docs/mecanifica/planos/BACKLOG.md`.
 
 Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
 só abre após decisão e plano executivo explícitos.

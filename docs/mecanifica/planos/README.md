@@ -2,7 +2,11 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [Auditoria de interseções em montagens](2026-08-18-auditoria-intersecoes-montagem.md).
+
+O plano abre uma auditoria neutra sobre peças-folha resolvidas, com fase ampla
+por caixas, decisão por malha, contenção, casos inconclusivos e integração à
+revisão MCP. Solver, correção automática e folga universal ficam fora.
 
 O plano de desacoplamento entre núcleo, validadores, fixtures e catálogo foi
 concluído com catálogo vazio e rollout coordenado com `warbookbr/mecanica`.
@@ -221,9 +225,6 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-**Nenhuma.** O mapa canônico, que esta seção já chamou de plano ativo, foi
-concluído com decisão `aprovar`, e nenhum plano ocupou o lugar dele — o estado
-no topo desta página é a fonte, e esta seção existe para não contradizê-lo.
-
-Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md), que também registra
-quais foram medidos e recusados, e o que uma reabertura exige.
+Não há segunda abertura enquanto o plano de auditoria de interseções estiver
+ativo. O estado no topo desta página é a fonte. Os demais candidatos permanecem
+no [`BACKLOG.md`](BACKLOG.md) sem autorização automática.

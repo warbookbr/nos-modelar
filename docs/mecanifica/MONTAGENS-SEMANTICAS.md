@@ -227,7 +227,9 @@ A direção não decide antecipadamente:
 - como representar movimento e cinemática;
 - até onde revalidar dependentes;
 - quando uma região interna deve virar peça separada;
-- qual representação de colisão será usada;
+- se a representação por malha final e pose mundial aberta no plano de
+  [auditoria de interseções](planos/2026-08-18-auditoria-intersecoes-montagem.md)
+  será aprovada pelas provas adversariais e de escala;
 - se haverá solver e qual será seu alcance;
 - como agentes concorrentes reservam alvos.
 

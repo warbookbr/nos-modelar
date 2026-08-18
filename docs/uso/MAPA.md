@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+345 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -218,6 +218,7 @@
 - `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
+- `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
