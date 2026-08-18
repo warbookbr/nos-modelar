@@ -4,10 +4,12 @@
 
 **Plano ativo:** Nenhum.
 
+O plano concluído mais recente foi a [auditoria de interseções em montagens](2026-08-18-auditoria-intersecoes-montagem.md), aprovada após integrar malha, contenção, casos inconclusivos e MCP.
+
 O plano de desacoplamento entre núcleo, validadores, fixtures e catálogo foi
 concluído com catálogo vazio e rollout coordenado com `warbookbr/mecanica`.
 
-**Plano concluído mais recente:**
+**Plano concluído anterior à auditoria:**
 [`2026-08-17-migracao-fps-para-procedural.md`](2026-08-17-migracao-fps-para-procedural.md).
 
 Ele moveu a raiz canônica para `prototipos/procedural/v3/`, preservando
@@ -221,9 +223,6 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-**Nenhuma.** O mapa canônico, que esta seção já chamou de plano ativo, foi
-concluído com decisão `aprovar`, e nenhum plano ocupou o lugar dele — o estado
-no topo desta página é a fonte, e esta seção existe para não contradizê-lo.
-
-Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md), que também registra
-quais foram medidos e recusados, e o que uma reabertura exige.
+Não há plano aberto neste momento. O estado no topo desta página é a fonte. Os
+demais candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
+automática.

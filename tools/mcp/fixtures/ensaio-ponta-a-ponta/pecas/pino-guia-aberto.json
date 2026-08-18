@@ -1,0 +1,21 @@
+{
+  "formato": "mecanifica.peca-resolvida",
+  "versao": 1,
+  "peca": "pino-guia-aberto",
+  "receita": "2ca42445e9417c67",
+  "meta": { "nome": "Pino guia aberto de ensaio" },
+  "materiais": {},
+  "partes": ["pino"],
+  "portas": [],
+  "V": [
+    [0, -0.2, 0, -0.2], [1, 0.2, 0, -0.2], [2, 0.2, 0, 0.2], [3, -0.2, 0, 0.2],
+    [4, -0.2, 0.5, -0.2], [5, 0.2, 0.5, -0.2], [6, 0.2, 0.5, 0.2], [7, -0.2, 0.5, 0.2]
+  ],
+  "F": [
+    [0, [0, 1, 2, 3], null, null, false, false, "pino"],
+    [1, [7, 6, 5, 4], null, null, false, false, "pino"],
+    [2, [1, 0, 4, 5], null, null, false, false, "pino"],
+    [3, [2, 1, 5, 6], null, null, false, false, "pino"],
+    [4, [3, 2, 6, 7], null, null, false, false, "pino"]
+  ]
+}

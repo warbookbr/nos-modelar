@@ -8,6 +8,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Candidato | Estado / próximo recorte |
 |---|---|
 | Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
+| Auditoria de interseções em montagens | concluído e aprovado em `2026-08-18-auditoria-intersecoes-montagem.md`; malha neutra, contenção, cobertura explícita e MCP, sem solver ou folga universal |
 | Caso 3 da homologação | retirado; a pergunta foi respondida com evidência mais forte |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
 | Mapa de composição e dependências | concluído e aprovado: universo explícito, mapa derivado, impacto global MCP, continuidade ativa e recusa concorrente |

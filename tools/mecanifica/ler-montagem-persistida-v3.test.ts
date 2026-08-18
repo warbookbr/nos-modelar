@@ -21,7 +21,7 @@ describe('montagem persistida v3 — contrato estrutural R00', () => {
     const bruto = json('v3-separacao-direcional');
     const lido = lerMontagemPersistida(bruto);
 
-    expect(VERSOES_SUPORTADAS).toEqual([1, 2, 3]);
+    expect(VERSOES_SUPORTADAS).toEqual([1, 2, 3, 4]);
     expect(lido).toMatchObject({
       versao: 3,
       id: 'gabarito-separacao-direcional',

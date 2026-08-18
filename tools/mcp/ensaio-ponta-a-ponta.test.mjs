@@ -56,7 +56,11 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
         formato: 'mecanifica.catalogo-mcp-montagens-publico',
         versao: 1,
         configurado: true,
-        raizes: [{ id: 'ensaio-ponta-a-ponta' }],
+        raizes: [
+          { id: 'ensaio-ponta-a-ponta' },
+          { id: 'ensaio-ponta-a-ponta-inconclusiva' },
+          { id: 'ensaio-ponta-a-ponta-intersecao' },
+        ],
       });
 
       const pecas = await client.readResource({ uri: 'mecanifica://pecas' });
@@ -66,6 +70,7 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
         configurado: true,
         pecas: [
           { id: 'pino-guia' },
+          { id: 'pino-guia-aberto' },
           { id: 'placa-base' },
           { id: 'suporte-portas' },
         ],
@@ -190,6 +195,66 @@ describe('ensaio privado ponta a ponta — peças, montagem e MCP', () => {
         },
       });
       expect(revisao.content.filter(({ type }) => type === 'image')).toHaveLength(1);
+    } finally {
+      await client.close();
+    }
+  }, 120_000);
+
+  it('reprova uma interseção geométrica detectada pela auditoria MCP', async () => {
+    const client = new Client({ name: 'ensaio-ponta-a-ponta-intersecao', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [SERVIDOR],
+      cwd: RAIZ,
+      stderr: 'pipe',
+      env: {
+        ...process.env,
+        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
+      },
+    });
+    try {
+      await client.connect(transport);
+      const revisao = await client.callTool({
+        name: 'revisar_montagem',
+        arguments: { id: 'ensaio-ponta-a-ponta-intersecao', vistas: ['isometrica'] },
+      });
+      expect(revisao.isError).not.toBe(true);
+      revisarMontagemSaida.parse(revisao.structuredContent);
+      expect(revisao.structuredContent.resultado).toMatchObject({ estado: 'reprovada' });
+      expect(revisao.structuredContent.resultado.auditoriaIntersecoes.pares).toEqual(
+        expect.arrayContaining([expect.objectContaining({
+          a: ['pino'], b: ['suporte'], estado: 'interpenetram',
+        })]),
+      );
+    } finally {
+      await client.close();
+    }
+  }, 120_000);
+
+  it('mantém uma geometria aberta como inconclusiva no MCP', async () => {
+    const client = new Client({ name: 'ensaio-ponta-a-ponta-inconclusiva', version: '1' });
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [SERVIDOR],
+      cwd: RAIZ,
+      stderr: 'pipe',
+      env: {
+        ...process.env,
+        MECANIFICA_CATALOGO_MONTAGENS: join(RAIZ, 'tools/mcp/fixtures/ensaio-ponta-a-ponta/catalogo.json'),
+      },
+    });
+    try {
+      await client.connect(transport);
+      const revisao = await client.callTool({
+        name: 'revisar_montagem',
+        arguments: { id: 'ensaio-ponta-a-ponta-inconclusiva', vistas: ['isometrica'] },
+      });
+      expect(revisao.isError).not.toBe(true);
+      revisarMontagemSaida.parse(revisao.structuredContent);
+      expect(revisao.structuredContent.resultado).toMatchObject({ estado: 'incompleta' });
+      expect(revisao.structuredContent.resultado.auditoriaIntersecoes.pares).toEqual(
+        expect.arrayContaining([expect.objectContaining({ estado: 'inconclusivo' })]),
+      );
     } finally {
       await client.close();
     }

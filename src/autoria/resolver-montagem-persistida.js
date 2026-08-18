@@ -258,7 +258,13 @@ function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem, poseMonta
     };
     return executarRelacao(resolvida, indice, trilhaMontagem, poseMontagem);
   });
-  return { ...montagemResolvida, relacoes };
+  return {
+    ...montagemResolvida,
+    relacoes,
+    ...(montagem.auditoriaIntersecoes !== undefined
+      ? { auditoriaIntersecoes: montagem.auditoriaIntersecoes }
+      : {}),
+  };
 }
 
 export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {

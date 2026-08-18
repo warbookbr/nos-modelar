@@ -4,6 +4,8 @@
   "raizMontagens": "montagens",
   "raizPecas": "pecas",
   "raizes": [
-    { "id": "ensaio-ponta-a-ponta", "ref": "ensaio-ponta-a-ponta" }
+    { "id": "ensaio-ponta-a-ponta", "ref": "ensaio-ponta-a-ponta" },
+    { "id": "ensaio-ponta-a-ponta-intersecao", "ref": "ensaio-ponta-a-ponta-intersecao" },
+    { "id": "ensaio-ponta-a-ponta-inconclusiva", "ref": "ensaio-ponta-a-ponta-inconclusiva" }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 4,
+  "id": "ensaio-ponta-a-ponta-inconclusiva",
+  "instancias": [
+    {
+      "id": "suporte",
+      "alvo": { "tipo": "peca", "ref": "suporte-portas" },
+      "pose": { "deslocamento": [0, 0.2, 0] }
+    },
+    {
+      "id": "pino",
+      "alvo": { "tipo": "peca", "ref": "pino-guia-aberto" },
+      "pose": { "deslocamento": [0, 1.2, 0] }
+    }
+  ],
+  "relacoes": [],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 0.000001,
+    "expectativas": []
+  }
+}

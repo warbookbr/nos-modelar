@@ -23,7 +23,7 @@ import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
 const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.5.0' });
 export const INSTRUCOES_AGENTE = [
   REGRA_ESCOPO_CATALOGO,
-  'Para avaliar uma montagem, use revisar_montagem e reporte separadamente o estado retornado, as verificações executadas e o que permaneceu não verificado.',
+  'Para avaliar uma montagem, use revisar_montagem e reporte separadamente o estado retornado, as verificações declaradas, a auditoriaIntersecoes e o que permaneceu não verificado. Interpenetração reprova; inconclusivo não significa ausência de colisão; expectativa registrada explica intenção, mas não apaga o achado.',
   'Só declare que uma montagem está homologada quando uma fonte específica de homologação afirmar isso explicitamente.',
 ].join(' ');
 

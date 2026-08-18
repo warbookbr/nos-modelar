@@ -1,7 +1,7 @@
 # Contexto de montagem para IA
 
 Este contrato transforma uma árvore já resolvida de `mecanifica.montagem` v1,
-v2 ou v3 em JSON compacto, determinístico e consultável. Ele permite que a IA
+v2, v3 ou v4 em JSON compacto, determinístico e consultável. Ele permite que a IA
 compreenda composição, poses, caixas, partes, portas e relações sem receber a
 malha bruta nem objetos internos de runtime.
 
@@ -84,7 +84,9 @@ verificadas; não publica um campo de “montagem válida”.
 
 ## Limites e próximos consumidores
 
-Este contrato não renderiza montagem, calcula colisão, escreve autoria nem
-publica MCP. A v3 oferece separação direcional e um serviço separado deriva
-impacto local; nenhum deles prova colisão ou executa revalidação. Contexto
-visual, revalidação automática e portas externas exigem planos próprios.
+Este contrato, quando produzido por `descrever_montagem`, não renderiza montagem,
+calcula colisão, escreve autoria nem publica MCP. A v3 oferece separação
+direcional e um serviço separado deriva impacto local. A auditoria só é executada
+por `revisar_montagem`, que transporta um resultado separado; contexto visual,
+revalidação automática e portas externas continuam sujeitos aos seus próprios
+limites.
