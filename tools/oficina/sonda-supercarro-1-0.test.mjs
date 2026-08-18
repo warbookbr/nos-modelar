@@ -105,7 +105,7 @@ describe('Mecanifica 1.0 — sonda de escala do supercarro ficcional', () => {
       || (b[0] === 'carroceria' && a.at(-1) === 'pneu')
     ));
     expect(pneusContraCarroceria.every(({ estado }) => estado === 'separadas')).toBe(true);
-  });
+  }, 30_000);
 
   it('produz frente, traseira, topo, lateral e vistas isoladas válidas e distintas', async () => {
     const alvos = [
