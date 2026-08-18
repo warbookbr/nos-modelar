@@ -33,4 +33,3 @@ comparador não relata posições de arrays: usa `funcao`, `familia`, o nome do
 `eixo` e conjuntos nomeados de `invariantes` e `criteriosVisuais` adicionados ou
 removidos. A intenção não é inserida no formato persistido
 `mecanifica.peca-resolvida` v1.
-

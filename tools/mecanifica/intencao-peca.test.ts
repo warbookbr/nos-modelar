@@ -89,4 +89,3 @@ describe('intenção semântica opcional de peça', () => {
     expect(legado.assinaturaModelo).toBe(legadoComNull.assinaturaModelo);
   });
 });
-

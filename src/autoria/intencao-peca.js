@@ -107,4 +107,3 @@ export function compararIntencoes(intencaoAnterior, intencaoAtual) {
     || criteriosVisuais.adicionadas.length || criteriosVisuais.removidas.length);
   return { mudou, campos, eixosLocais: { alterados: eixosAlterados }, invariantes, criteriosVisuais };
 }
-
