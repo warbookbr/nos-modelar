@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-478 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+480 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -125,6 +125,8 @@
 
 ## autoria-assistida/experimentos/prova-cage-quarto-dianteiro/
 
+- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
+- `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
 - `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
 - `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
 
