@@ -136,6 +136,16 @@ aplicação publicada aqui.
   skill `desenhar-prancha`. A prova é o cupê de cunha em
   `docs/mecanifica/img/cupe-cunha-prancha.svg`, desenhado do zero e julgado pelo
   relatório antes de qualquer render.
+- A [leitura de referência rasterizada](planos/2026-08-19-leitura-de-referencia-medida.md)
+  (`docs/mecanifica/planos/2026-08-19-leitura-de-referencia-medida.md`) foi
+  concluída. `tools/mecanifica/prancha-referencia.mjs` decodifica um PNG em Node
+  puro, calibra pixel→milímetro pelo entre-eixos entre as manchas de contato das
+  rodas e compara silhuetas por desvio. A imagem de terceiro não entra no
+  repositório: entram só as coordenadas derivadas, sob a regra de procedência de
+  [`referencias/README.md`](referencias/README.md)
+  (`docs/mecanifica/referencias/README.md`). Limite medido e registrado: desvio
+  de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
+  a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

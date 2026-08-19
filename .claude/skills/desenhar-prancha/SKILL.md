@@ -129,7 +129,43 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
 3. compare com a referência e anote **diferenças, não impressões**: "a linha do
    teto está abaulada", não "está estranho".
 
-## 7. Checklist de defeitos recorrentes
+## 7. Comparar com a referência por número
+
+Se existe prancha de referência rasterizada, pare de comparar de olho. Use
+`tools/mecanifica/prancha-referencia.mjs`:
+
+```js
+const img = lerPng(caminho);
+const env = envelope(img, { x0, x1, y0, y1 });
+const cal = calibrarPorRodas(env, ret, { entreEixos, comprimento, altura });
+const ref = paraMilimetros(env, cal, { qual: 'topo' });
+const c = compararSilhuetas(ref, minhaSilhueta);
+```
+
+Leia primeiro o **resíduo** da calibração. Ele compara duas medidas
+independentes contra o que a escala prevê; acima de uns 3%, a prancha está fora
+de esquadro e o resto da comparação carrega esse erro.
+
+Depois leia o desvio **por região** — traseira, teto, para-brisa, capô, nariz —
+e não só o total. O agregado esconde: um desenho com 45 mm de desvio médio pode
+ter capô perfeito e traseira 112 mm alta.
+
+**Dois limites que valem mais que o resultado:**
+
+- a imagem de referência não entra no repositório, só as coordenadas derivadas.
+  Ver `docs/mecanifica/referencias/README.md`;
+- **desvio é confiável, curvatura de raster não é.** Numa prancha de 736 px, o
+  desvio médio é estável sob suavização e a contagem de inversões varia de 31 a
+  51 sem convergir. Julgue proporção e posição pela referência; julgue caráter
+  de superfície pelas métricas do seu próprio traçado.
+
+Um efeito colateral honesto disto: a medida pode **contrariar** sua leitura
+visual. No estudo do fastback eu havia afirmado que o erro grave era a linha do
+teto abaulada; medindo, o teto desviava 17 mm e os erros reais eram a traseira
+alta em 112 mm e a ponta do nariz em 314 mm. Quando medida e olho divergem, a
+medida ganha.
+
+## 8. Checklist de defeitos recorrentes
 
 Todos já aconteceram. Confira antes de entregar:
 
@@ -144,7 +180,7 @@ Todos já aconteceram. Confira antes de entregar:
 - pneu mais largo que a carroceria — sempre verifique o item 1;
 - vista lateral desenhada com a frente para o lado errado.
 
-## 8. Encerrar
+## 9. Encerrar
 
 - relatório sem alerta;
 - todas as vistas fechadas;
