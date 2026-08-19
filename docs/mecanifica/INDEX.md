@@ -136,6 +136,14 @@ aplicação publicada aqui.
   skill `desenhar-prancha`. A prova é o cupê de cunha em
   `docs/mecanifica/img/cupe-cunha-prancha.svg`, desenhado do zero e julgado pelo
   relatório antes de qualquer render.
+- A [coerência entre vistas](planos/2026-08-19-coerencia-entre-vistas.md)
+  (`docs/mecanifica/planos/2026-08-19-coerencia-entre-vistas.md`) foi concluída e
+  **fecha o motor de prancha**. As vistas passam a ser comparadas pelos eixos que
+  compartilham, cada uma declarando leitura `projecao` ou `secao`, com envelope e
+  simetria conferidos pelo motor. A rodada também desfez um silenciamento
+  indevido de `foraDoContorno`, que sozinho acusou quatro rodas escapando da
+  carroceria em planta, e converteu as linhas inferiores do P0 de spline para
+  filete — a spline afundava para 94 mm onde a altura livre declarada é 105.
 - A [leitura de referência rasterizada](planos/2026-08-19-leitura-de-referencia-medida.md)
   (`docs/mecanifica/planos/2026-08-19-leitura-de-referencia-medida.md`) foi
   concluída. `tools/mecanifica/prancha-referencia.mjs` decodifica um PNG em Node

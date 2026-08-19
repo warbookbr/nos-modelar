@@ -37,21 +37,25 @@ const TOPO = [
 /* Silhueta inferior em três segmentos: os arcos são aberturas reais, então a
    linha de baixo é interrompida por eles em vez de atravessá-los. */
 const BASE = [
-  [[2265, 520], [2215, 340], [2100, 205], [1900, 168], [1710, 260], [1710, 340]],
-  [[940, 340], [820, 200], [400, 145], [0, 145], [-500, 152], [-800, 190], [-925, 358]],
-  [[-1725, 358], [-1900, 210], [-2080, 200], [-2240, 380], [-2335, 920]],
+  [[2265, 520], [2215, 340, 120], [2100, 205, 180], [1900, 168, 300], [1710, 260, 200], [1710, 340]],
+  /* A vista lateral é PROJEÇÃO, então sua linha de baixo é o ponto mais baixo do
+     corpo — a altura livre de 105 mm — e não a aresta da soleira, que vive em
+     x = ±925 e virou linha de painel. A coerência entre vistas acusou os 35 mm
+     de diferença contra a frontal. */
+  [[940, 340], [820, 190, 120], [560, 105, 220], [-560, 105, 220], [-800, 190, 120], [-925, 358]],
+  [[-1725, 358], [-1900, 210, 140], [-2080, 200, 300], [-2240, 380, 160], [-2335, 920]],
 ];
 /* Curva mestra 3 — linha de ombro, projetada na lateral. */
 const OMBRO = [[1325, 900], [700, 935], [0, 950], [-900, 930], [-1500, 900]];
 /* Curva mestra 2 — planta: meia largura por estação. */
 const PLANTA = [
-  [2200, 300], [2100, 620], [1900, 845], [1325, 965], [800, 945],
-  [0, 940], [-900, 1000], [-1600, 970], [-2100, 880], [-2335, 665],
+  [2200, 300], [2100, 620, 260], [1900, 845, 500], [1325, 965, 900], [800, 945, 1400],
+  [0, 940, 2000], [-900, 1000, 1500], [-1600, 970, 1200], [-2100, 880, 500], [-2335, 665],
 ];
 /* Vista frontal — meia largura por altura. */
 const FRONTAL = [
-  [105, 860], [340, 940], [725, 962], [900, 965], [1010, 890],
-  [1120, 725], [1185, 625],
+  [105, 860], [340, 940, 260], [725, 962, 900], [900, 965, 300], [1010, 890, 260],
+  [1120, 725, 300], [1185, 625],
 ];
 
 const camadas = [
@@ -63,7 +67,7 @@ const camadas = [
        limite existe para pegar ondulação — a versão anterior media dez. */
     esperado: { concentracaoMax: 0.30, inversoesMax: 4 },
   },
-  ...BASE.map((pts) => ({ vista: 'lateral', contorno: true, pts, tipo: 'suave' })),
+  ...BASE.map((pts) => ({ vista: 'lateral', contorno: true, pts })),
   ...[RD, RT].flatMap((r) => [
     { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio },
     { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio * 0.74 },
@@ -73,11 +77,13 @@ const camadas = [
      silhueta de x = 0 não faz sentido, e a crista do para-lama fica mesmo acima
      do centro do capô. */
   { vista: 'lateral', classe: 'carater', nome: 'linhaDeOmbro', pts: OMBRO, foraDoContorno: true, esperado: { concentracaoMax: 0.6, inversoesMax: 2 } },
+  /* Soleira: aresta inferior do flanco em x = ±925, dentro da projeção. */
+  { vista: 'lateral', classe: 'painel', nome: 'soleira', pts: [[740, 200], [400, 145], [0, 145], [-500, 152], [-760, 205]] },
 
   { vista: 'planta', tipo: 'poli', classe: 'eixo', pts: [[zMin - 80, 0], [zMax + 80, 0]] },
-  { vista: 'planta', contorno: true, pts: PLANTA, tipo: 'suave' },
-  { vista: 'planta', contorno: true, pts: PLANTA.map(([z, w]) => [z, -w]), tipo: 'suave' },
-  { vista: 'planta', contorno: true, pts: [[2200, 300], [2265, 0], [2200, -300]], tipo: 'suave' },
+  { vista: 'planta', contorno: true, nome: 'plantaDireita', pts: PLANTA, esperado: { concentracaoMax: 0.5 } },
+  { vista: 'planta', contorno: true, pts: PLANTA.map(([z, w, r]) => (r === undefined ? [z, -w] : [z, -w, r])) },
+  { vista: 'planta', contorno: true, pts: [[2200, 300], [2265, 0, 200], [2200, -300]] },
   { vista: 'planta', contorno: true, tipo: 'poli', pts: [[-2335, 665], [-2335, -665]] },
   ...[RD, RT].flatMap((r) => [1, -1].map((k) => ({
     vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
@@ -86,7 +92,7 @@ const camadas = [
   }))),
 
   { vista: 'frontal', tipo: 'poli', classe: 'eixo', pts: [[0, -60], [0, yMax + 40]] },
-  ...[1, -1].map((k) => ({ vista: 'frontal', contorno: true, tipo: 'suave', pts: FRONTAL.map(([y, w]) => [k * w, y]) })),
+  ...[1, -1].map((k) => ({ vista: 'frontal', contorno: true, pts: FRONTAL.map(([y, w, r]) => (r === undefined ? [k * w, y] : [k * w, y, r])) })),
   { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-860, 105], [860, 105]] },
   { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-625, 1185], [625, 1185]] },
   ...[1, -1].map((k) => ({
@@ -103,11 +109,12 @@ const spec = {
   tela: { largura: 1320, altura: 800 },
   limites: { zMin, zMax, yMax, xMax },
   vistas: {
-    lateral: { x: 70, y: 96, rotulo: 'LATERAL — plano x = 0, frente à direita' },
-    frontal: { x: 900, y: 96, rotulo: 'FRONTAL — vista ao longo de z' },
-    planta: { x: 70, y: 420, rotulo: 'SUPERIOR — planta, frente à direita' },
+    lateral: { x: 70, y: 96, rotulo: 'LATERAL — projeção, frente à direita', leitura: 'projecao' },
+    frontal: { x: 900, y: 96, rotulo: 'FRONTAL — seção no eixo dianteiro', leitura: 'secao' },
+    planta: { x: 70, y: 420, rotulo: 'SUPERIOR — projeção, frente à direita', leitura: 'projecao' },
   },
   camadas,
+  envelope: { comprimento: 4600, largura: 2000, altura: 1190 },
   cotas: [
     { vista: 'lateral', de: [-1325, 0], ate: [1325, 0], desloca: [0, 34], texto: 'entre-eixos 2650' },
     { vista: 'lateral', de: [zMin, 0], ate: [zMax, 0], desloca: [0, 58], texto: 'comprimento 4600' },
@@ -119,6 +126,7 @@ const spec = {
   landmarks: LANDMARKS.flatMap(([id, x, y, z]) => (
     x === 0 || id === 'L14' || id === 'L15'
       ? [{ vista: 'lateral', em: [z, y], id, sobre: ['L01', 'L04', 'L05', 'L06', 'L07', 'L08', 'L09'].includes(id) ? 'silhuetaSuperior' : undefined }]
+      : id === 'L11' ? [{ vista: 'lateral', em: [z, y], id, sobre: 'soleira' }, { vista: 'planta', em: [z, x] }]
       : [{ vista: 'planta', em: [z, x], id }, { vista: 'lateral', em: [z, y] }]
   )),
   legenda: {

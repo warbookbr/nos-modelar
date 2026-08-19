@@ -88,7 +88,28 @@ Uma de cada vez, medindo entre elas. Não desenhe tudo de uma vez.
 Detalhe adicionado antes de a silhueta fechar vira ruído que esconde o erro
 estrutural embaixo.
 
-## 5. Declarar a expectativa junto com a linha
+## 5. Declarar a leitura de cada vista
+
+Toda vista declara o que ela é:
+
+- `leitura: 'projecao'` — enxerga o corpo inteiro, como uma prancha de convenção.
+  Tem de bater com o extremo global daquele eixo;
+- `leitura: 'secao'` — corta numa estação, como uma frontal desenhada no eixo
+  dianteiro. Só precisa **caber dentro** do corpo.
+
+O motor compara as vistas pelos eixos que elas compartilham: lateral e planta
+compartilham `z`; lateral, frontal e traseira compartilham `y`; planta, frontal
+e traseira compartilham `x`. Sem essa declaração, as quatro vistas podem
+discordar sobre o mesmo corpo e ninguém percebe.
+
+Declare também o `envelope` — comprimento, largura, altura — e o motor confere
+contra o que foi de fato traçado, no lugar de `throw` escrito à mão.
+
+**Não declare `secao` para calar um desacordo.** Se todas as vistas de um eixo
+forem seção, ninguém estabelece a extensão do corpo naquele eixo, e o motor
+acusa exatamente isso.
+
+## 6. Declarar a expectativa junto com a linha
 
 Toda linha de caráter recebe `nome` e `esperado`. É o que transforma "achei que
 ficou abaulado" em alerta automático:
@@ -114,7 +135,7 @@ a curva pelo meio.
 
 Por vista, o relatório também dá `contornoFechado` e `pontosForaDoContorno`.
 
-## 6. Rodar, ler o relatório, só então olhar
+## 7. Rodar, ler o relatório, só então olhar
 
 ```bash
 node tools/mecanifica/<especificacao>.mjs
@@ -129,7 +150,7 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
 3. compare com a referência e anote **diferenças, não impressões**: "a linha do
    teto está abaulada", não "está estranho".
 
-## 7. Comparar com a referência por número
+## 8. Comparar com a referência por número
 
 Se existe prancha de referência rasterizada, pare de comparar de olho. Use
 `tools/mecanifica/prancha-referencia.mjs`:
@@ -165,7 +186,7 @@ teto abaulada; medindo, o teto desviava 17 mm e os erros reais eram a traseira
 alta em 112 mm e a ponta do nariz em 314 mm. Quando medida e olho divergem, a
 medida ganha.
 
-## 8. Checklist de defeitos recorrentes
+## 9. Checklist de defeitos recorrentes
 
 Todos já aconteceram. Confira antes de entregar:
 
@@ -178,9 +199,17 @@ Todos já aconteceram. Confira antes de entregar:
 - cota colidindo com legenda, rótulo ou outra cota;
 - rótulo de landmark cortado na margem;
 - pneu mais largo que a carroceria — sempre verifique o item 1;
-- vista lateral desenhada com a frente para o lado errado.
+- vista lateral desenhada com a frente para o lado errado;
+- **`foraDoContorno` aplicado por hábito.** Este é o pior da lista, porque
+  desliga um teste que funcionava. Ele vale por camada **e por vista**: uma roda
+  escapa legitimamente na lateral, onde desce abaixo da soleira, e **nunca** na
+  planta, onde estar fora da carroceria é o defeito. Foi assim que um pneu passou
+  12 mm para fora sem ninguém ver. Todo uso que sobreviver leva comentário
+  dizendo por que aquela camada tem direito de sair, naquela vista;
+- linha inferior traçada com `suave`: a spline afunda abaixo do ponto declarado.
+  Na prancha do P0 ela mergulhava para 94 mm onde a altura livre é 105.
 
-## 9. Encerrar
+## 10. Encerrar
 
 - relatório sem alerta;
 - todas as vistas fechadas;

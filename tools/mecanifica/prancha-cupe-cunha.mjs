@@ -54,7 +54,10 @@ const TOPO = [
   [zMin, fy(0.87)],
 ];
 const BASE = [
-  [[zMax, fy(0.34)], [2100, 150, 60], [1900, 105, 120], [RD.z + RD.arco, RD.raio]],
+  /* Trecho reto na altura livre: filete aplicado num mínimo local sempre levanta
+     a curva, e era por isso que a lateral parava em 115 mm enquanto as vistas
+     verticais diziam 100. A coerência entre vistas acusou os 15 mm. */
+  [[zMax, fy(0.34)], [2100, 168, 60], [2000, 100, 50], [1800, 100, 90], [RD.z + RD.arco, RD.raio]],
   [[RD.z - RD.arco, RD.raio], [700, 165, 90], [0, 150], [-700, 168, 90], [RT.z + RT.arco, RT.raio]],
   [[RT.z - RT.arco, RT.raio], [-1900, 175, 100], [-2150, 180, 120], [zMin, 320, 90], [zMin, fy(0.87)]],
 ];
@@ -85,9 +88,13 @@ const CUNHA = [[2060, 424], [fz(0.60), 706, 900], [fz(0.02), 736], [fz(-0.14), 7
 const SOLEIRA = [[700, 215], [0, 205], [-700, 220]];
 
 /* --- 5. vistas de topo ----------------------------------------------------- */
+/* A planta precisa cobrir a PEGADA da roda, não só o centro do eixo: a versão
+   anterior estreitava rápido demais depois do eixo e o pneu aparecia para fora
+   nas duas extremidades de cada roda. O relatório pegou assim que parei de
+   silenciar a checagem. */
 const PLANTA = [
-  [2130, 480], [1900, 830, 500], [RD.z, 975, 400], [600, 950],
-  [0, 960], [-900, 1020, 700], [-1700, 990, 800], [-2270, 830],
+  [2130, 480], [1900, 862, 400], [1600, 968, 600], [RD.z, 978, 500], [600, 950],
+  [0, 960], [-900, 1020, 700], [-1600, 1014, 900], [-1900, 986, 600], [-2270, 830],
 ];
 const FRONTAL = [
   [100, 900], [300, 962, 120], [620, 978, 300], [740, 975, 90],
@@ -100,16 +107,22 @@ const TRASEIRA = [
 
 const espelhoZ = (pts) => pts.map(([z, w, r]) => (r === undefined ? [z, -w] : [z, -w, r]));
 const perfilV = (pts, k) => pts.map(([y, w, r]) => (r === undefined ? [k * w, y] : [k * w, y, r]));
+/* Na lateral a roda desce legitimamente abaixo da soleira e passa por dentro do
+   arco, que é abertura: aqui `foraDoContorno` tem razão de existir. */
 const rodaLateral = (r) => [
   { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio },
   { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio * 0.66 },
   { vista: 'lateral', tipo: 'arco', contorno: true, centro: [r.z, r.raio], raio: r.arco },
 ];
+/* Na planta, roda fora da carroceria é o defeito que se quer pegar — foi assim
+   que o pneu traseiro passou 12 mm para fora sem ninguém ver. Sem silenciamento. */
 const rodaPlanta = (r) => [1, -1].map((k) => ({
-  vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
+  vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true,
   pts: [[r.z - r.raio, k * r.x - r.larg / 2], [r.z + r.raio, k * r.x - r.larg / 2],
     [r.z + r.raio, k * r.x + r.larg / 2], [r.z - r.raio, k * r.x + r.larg / 2]],
 }));
+/* Nas vistas verticais o pneu aparece abaixo da soleira, fora do contorno do
+   corpo: escape legítimo, mesmo caso da lateral. */
 const rodaVertical = (vista, r) => [1, -1].map((k) => ({
   vista, tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
   pts: [[k * r.x - r.larg / 2, 0], [k * r.x + r.larg / 2, 0],
@@ -181,11 +194,15 @@ const spec = {
   limites: { zMin, zMax, yMax: D.altura, xMax },
   vistas: {
     lateral: { x: 46, y: 96, rotulo: 'LATERAL — plano x = 0, frente à direita' },
-    traseira: { x: 830, y: 96, rotulo: 'TRASEIRA' },
+    traseira: { x: 830, y: 96, rotulo: 'TRASEIRA', leitura: 'projecao' },
     planta: { x: 46, y: 452, rotulo: 'SUPERIOR — frente à direita' },
-    frontal: { x: 830, y: 452, rotulo: 'FRONTAL' },
+    /* Seção no eixo dianteiro, não projeção do corpo inteiro: a anca traseira é
+       mais larga e apareceria atrás numa prancha de convenção. Declarado, a
+       coerência exige apenas que caiba dentro do corpo. */
+    frontal: { x: 830, y: 452, rotulo: 'FRONTAL — seção no eixo dianteiro', leitura: 'secao' },
   },
   camadas,
+  envelope: { comprimento: D.comprimento, largura: D.largura, altura: D.altura },
   cotas: [
     { vista: 'lateral', de: [RT.z, 0], ate: [RD.z, 0], desloca: [0, 34], texto: `entre-eixos ${D.entreEixos}` },
     { vista: 'lateral', de: [zMin, 0], ate: [zMax, 0], desloca: [0, 58], texto: `comprimento ${D.comprimento}` },

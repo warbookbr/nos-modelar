@@ -25,9 +25,8 @@ continuidade, aberturas reais e história semântica, dentro de um orçamento de
 polígonos justificável.
 
 A causa raiz está lida no código: a carroceria rejeitada é um único `loft` de
-nove seções elípticas com doze lados — 86 vértices. O protótipo seguinte, com
-três envelopes sobrepostos e 1.014 vértices, confirmou que densidade não corrige
-abstração.
+nove seções elípticas — 86 vértices. O protótipo seguinte, com três envelopes
+sobrepostos e 1.014 vértices, confirmou que densidade não corrige abstração.
 
 Dois problemas independentes acompanham:
 
@@ -93,10 +92,9 @@ algoritmo local em JavaScript puro, não um kernel.
 Executada em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md).
 
 Entregou perfil `realistaApresentacao / F3 / dimensional` declarado antes de
-modelar, envelope e quinze landmarks, cinco curvas mestras, limiares numéricos
-dos oito eixos, oito condições de rejeição visual e orçamento por nível.
-
-Duas decisões valem registro aqui:
+modelar, envelope e quinze landmarks, cinco curvas mestras, limiares dos oito
+eixos, oito condições de rejeição visual e orçamento por nível. Duas decisões
+valem registro aqui:
 
 - **Referência.** Não existe prancha calibrável, e o carro é ficcional — não há
   original contra o qual medir erro. A referência vinculante passa a ser a
@@ -108,6 +106,9 @@ Duas decisões valem registro aqui:
 ### P1 — contrato da cage
 
 - formato da malha de controle: quads, vincos, loops nomeados;
+- **seção transversal como contrato**, nas cinco estações da curva mestra 4 de
+  P0. Ela é entrada da cage, não recurso de desenho: fixá-la no motor de prancha
+  criaria um formato que esta rodada teria de refazer;
 - regra de linhagem `face da cage → faces do nível k`;
 - contrato entre cage e `mecanifica.malha-poligonal@1`;
 - política de diff que distinga mudança de forma de mudança de topologia.
@@ -116,8 +117,7 @@ Duas decisões valem registro aqui:
 
 Um quarto dianteiro, em zona privada, contendo obrigatoriamente:
 
-- plano de simetria;
-- capô, para-lama e lateral como regiões da mesma superfície;
+- plano de simetria e capô, para-lama e lateral como regiões da mesma superfície;
 - arco de roda realmente aberto, com retorno de borda;
 - transição capô–para-lama sem corpo sobreposto;
 - uma linha de caráter por vinco semi-agudo;
@@ -132,22 +132,20 @@ silhueta, pontos extraordinários visíveis e custo de contexto da alteração.
 Produzir também uma forma não automotiva, para provar que a representação não
 carrega vocabulário de carro.
 
-**Critério de descarte, declarado antes:** a decisão é reaberta se a cage exigir
-mais de aproximadamente 800 quads para o quarto dianteiro, se o arco de roda não
-puder ser aberto sem booleana, ou se a alteração local exigir tocar mais de um
-loop nomeado.
+**Critério de descarte, declarado antes:** a decisão reabre se a cage exigir mais
+de ~800 quads no quarto dianteiro, se o arco não puder ser aberto sem booleana,
+ou se a alteração local exigir tocar mais de um loop nomeado.
 
 ### P3 — integração e operação
 
-- onde a subdivisão executa: núcleo, e o que isso custa em `bancada.html`;
+- onde a subdivisão executa: núcleo, e o que custa em `bancada.html`;
 - impacto medido em bundle, memória, tempo e bytes exportados;
-- relação com registro de capacidades, extensão nativa e MCP;
-- preview em nível baixo e publicação em nível alto.
+- registro de capacidades, extensão nativa, MCP, preview baixo e publicação alta.
 
 ### P4 — plano executivo
 
-- fatias reversíveis, migração, gates, rollback e condição de encerramento;
-- aprovação explícita antes de alterar o produto.
+- fatias reversíveis, migração, gates, rollback, condição de encerramento e
+  aprovação explícita antes de alterar o produto.
 
 ## Validação
 
@@ -196,5 +194,7 @@ baking e fabricação.
   `../CHASSI-P0-ALVO-E-LIMIARES.md`. Referência resolvida por prancha
   ortográfica derivada, com a imagem em perspectiva declarada não vinculante.
   `BLOCO = 1000` convertido em limiar de 900 ids por passo de cage.
+- **V4 — 2026-08-19:** seção transversal encaixada em P1 como entrada da cage, e
+  mantida fora do motor de prancha para não criar formato que P1 refaria.
 - **Próxima revisão:** executar P1 — contrato da cage: formato de quads e
-  vincos, loops nomeados, regra de linhagem e política de diff.
+  vincos, seção transversal, loops nomeados, linhagem e política de diff.

@@ -45,6 +45,16 @@ const ESTILOS = `
   .rot{fill:#8b93a0;font-size:10.5px;letter-spacing:.06em}
 `;
 
+/* Que par de coordenadas de mundo cada vista carrega. É este mapa que permite
+   comparar vistas entre si: lateral e planta compartilham z; lateral, frontal e
+   traseira compartilham y; planta, frontal e traseira compartilham x. */
+export const EIXOS_DA_VISTA = {
+  lateral: ['z', 'y'],
+  planta: ['z', 'x'],
+  frontal: ['x', 'y'],
+  traseira: ['x', 'y'],
+};
+
 function projetores(spec) {
   const s = spec.escala;
   const { zMin, yMax, xMax } = spec.limites;
@@ -92,6 +102,98 @@ function encadear(trechos, tol) {
     }
   }
   return { anel, abertos: restante };
+}
+
+/* C2, C3 e C4: as quatro vistas descrevem o MESMO objeto, e até aqui ninguém
+   verificava isso. Cada vista era medida sozinha, então lateral e frontal podiam
+   discordar sobre onde o corpo termina embaixo, e ninguém percebia. */
+function medirCoerencia(spec, porVista, alertas) {
+  const tol = spec.toleranciaCoerencia ?? 8;
+  const faixas = {};
+
+  for (const [nome, m] of Object.entries(porVista)) {
+    const eixos = EIXOS_DA_VISTA[nome];
+    if (!eixos || !m.caixa) continue;
+    const leitura = spec.vistas[nome]?.leitura ?? 'projecao';
+    const par = [
+      [eixos[0], m.caixa.xMin, m.caixa.xMax],
+      [eixos[1], m.caixa.yMin, m.caixa.yMax],
+    ];
+    for (const [eixo, min, max] of par) {
+      (faixas[eixo] ??= []).push({ vista: nome, leitura, min, max });
+    }
+  }
+
+  /* Faixa por eixo compartilhado. Uma vista declarada `projecao` enxerga o corpo
+     inteiro e tem de bater com o extremo global; uma `secao` só precisa caber
+     dentro dele. Forçar essa declaração é metade do valor da checagem. */
+  const porEixo = {};
+  for (const [eixo, lista] of Object.entries(faixas)) {
+    if (lista.length < 2) continue;
+    const proj = lista.filter((f) => f.leitura === 'projecao');
+    /* Declarar tudo como seção silenciaria a checagem — o mesmo erro que
+       `foraDoContorno` já causou uma vez. Se nenhuma vista de um eixo enxerga o
+       corpo inteiro, a prancha não estabelece a medida daquele eixo em lugar
+       nenhum, e isso é o alerta. */
+    if (proj.length === 0) alertas.push(`coerência ${eixo}: nenhuma vista declarada como projeção, então a extensão do corpo neste eixo não é estabelecida por ninguém`);
+    const referencia = proj.length ? proj : lista;
+    const min = Math.min(...referencia.map((f) => f.min));
+    const max = Math.max(...referencia.map((f) => f.max));
+    porEixo[eixo] = { min: n(min), max: n(max), vistas: {} };
+    for (const f of lista) {
+      const dMin = f.min - min;
+      const dMax = f.max - max;
+      porEixo[eixo].vistas[f.vista] = { min: n(f.min), max: n(f.max), leitura: f.leitura };
+      if (f.leitura === 'projecao') {
+        if (Math.abs(dMin) > tol) alertas.push(`coerência ${eixo}: ${f.vista} começa em ${n(f.min)} e as outras vistas em ${n(min)} — diferença de ${n(Math.abs(dMin))} mm no mesmo corpo`);
+        if (Math.abs(dMax) > tol) alertas.push(`coerência ${eixo}: ${f.vista} termina em ${n(f.max)} e as outras vistas em ${n(max)} — diferença de ${n(Math.abs(dMax))} mm no mesmo corpo`);
+      } else {
+        if (dMin < -tol) alertas.push(`coerência ${eixo}: seção ${f.vista} passa de ${n(f.min)}, abaixo do corpo em ${n(min)}`);
+        if (dMax > tol) alertas.push(`coerência ${eixo}: seção ${f.vista} passa de ${n(f.max)}, acima do corpo em ${n(max)}`);
+      }
+    }
+  }
+
+  /* Envelope declarado, conferido contra o que foi de fato traçado — no lugar de
+     `throw` escrito à mão em cada especificação. */
+  const envelope = {};
+  const decl = spec.envelope ?? {};
+  /* Deriva de `faixas`, e não de `porEixo`: um eixo carregado por uma única
+     vista não tem par para comparar, mas continua tendo medida — e era assim que
+     o comprimento, que só a lateral conhece, escapava da conferência. */
+  const medidoDe = (eixo, modo) => {
+    const lista = faixas[eixo];
+    if (!lista || lista.length === 0) return null;
+    const proj = lista.filter((f) => f.leitura === 'projecao');
+    const ref = proj.length ? proj : lista;
+    const min = Math.min(...ref.map((f) => f.min));
+    const max = Math.max(...ref.map((f) => f.max));
+    return modo === 'vao' ? max - min : max;
+  };
+  for (const [chave, eixo, modo] of [['comprimento', 'z', 'vao'], ['largura', 'x', 'vao'], ['altura', 'y', 'topo']]) {
+    if (decl[chave] === undefined) continue;
+    const medido = medidoDe(eixo, modo);
+    if (medido === null) continue;
+    envelope[chave] = { medido: n(medido), declarado: decl[chave], desvio: n(medido - decl[chave]) };
+    if (Math.abs(medido - decl[chave]) > tol) {
+      alertas.push(`envelope: ${chave} traçado ${n(medido)} contra ${decl[chave]} declarado`);
+    }
+  }
+
+  /* Simetria: contorno que cruza x = 0 conferido contra o próprio espelho. */
+  const simetria = {};
+  for (const [nome, m] of Object.entries(porVista)) {
+    const eixos = EIXOS_DA_VISTA[nome];
+    if (!eixos || !eixos.includes('x') || !m.caixa) continue;
+    const ehPrimeiro = eixos[0] === 'x';
+    const min = ehPrimeiro ? m.caixa.xMin : m.caixa.yMin;
+    const max = ehPrimeiro ? m.caixa.xMax : m.caixa.yMax;
+    const desvio = Math.abs(max + min);
+    simetria[nome] = n(desvio);
+    if (desvio > tol) alertas.push(`simetria: ${nome} vai de ${n(min)} a ${n(max)}, fora de esquadro com o plano x = 0 em ${n(desvio)} mm`);
+  }
+
+  return { porEixo, envelope, simetria };
 }
 
 function medir(spec, camadas) {
@@ -165,7 +267,9 @@ function medir(spec, camadas) {
     if (d > limite) alertas.push(`landmark ${l.id}: ${n(d)} mm fora de "${l.sobre}", tolerância ${limite} mm`);
   }
 
-  return { porVista, porCamada, porLandmark, alertas };
+  const coerencia = medirCoerencia(spec, porVista, alertas);
+
+  return { porVista, porCamada, porLandmark, coerencia, alertas };
 }
 
 export function prancha(spec) {
@@ -237,6 +341,13 @@ export function imprimirRelatorio(r) {
   for (const [nome, m] of Object.entries(r.porCamada)) {
     L.push(`  ${nome}: concentração ${m.concentracao}, retidão ${m.retidao}, `
       + `${m.inversoes} inversão(ões), raio mín ${m.raioMin ?? '—'} mm`);
+  }
+  for (const [eixo, f] of Object.entries(r.coerencia?.porEixo ?? {})) {
+    const vs = Object.entries(f.vistas).map(([v, d]) => `${v} ${n(d.min)}..${n(d.max)}`).join(' | ');
+    L.push(`  eixo ${eixo}: ${vs}`);
+  }
+  for (const [chave, e] of Object.entries(r.coerencia?.envelope ?? {})) {
+    L.push(`  envelope ${chave}: traçado ${e.medido}, declarado ${e.declarado} (${e.desvio >= 0 ? '+' : ''}${e.desvio})`);
   }
   const lms = Object.entries(r.porLandmark ?? {});
   if (lms.length) {

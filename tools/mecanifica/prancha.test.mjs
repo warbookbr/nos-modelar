@@ -129,6 +129,97 @@ describe('curvatura medida por janela de arco', () => {
   });
 });
 
+/* Duas vistas do mesmo corpo: lateral em (z, y) e frontal em (x, y). */
+const duasVistas = (camadas, extra = {}) => ({
+  titulo: 't',
+  subtitulo: 's',
+  escala: 0.1,
+  tela: { largura: 600, altura: 400 },
+  limites: { zMin: -100, zMax: 100, yMax: 100, xMax: 100 },
+  vistas: { lateral: { x: 10, y: 10 }, frontal: { x: 300, y: 10 } },
+  camadas,
+  ...extra,
+});
+
+const caixaEm = (vista, a0, a1, b0, b1) => ({
+  vista, contorno: true, tipo: 'poli', fechado: true,
+  pts: [[a0, a1], [b0, a1], [b0, b1], [a0, b1]],
+});
+
+describe('coerência entre vistas', () => {
+  it('acusa vistas que discordam sobre onde o corpo termina', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 20, 100, 80),
+      caixaEm('frontal', -60, 0, 60, 80),
+    ]));
+    expect(relatorio.alertas.join(' ')).toMatch(/coerência y/);
+    expect(relatorio.coerencia.porEixo.y.vistas.lateral.min).toBe(20);
+    expect(relatorio.coerencia.porEixo.y.vistas.frontal.min).toBe(0);
+  });
+
+  it('aceita vistas que concordam', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 0, 60, 80),
+    ]));
+    expect(relatorio.alertas).toHaveLength(0);
+  });
+
+  it('exige que a seção caiba dentro da projeção, sem exigir que a iguale', () => {
+    const dentro = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 20, 60, 60),
+    ], { vistas: { lateral: { x: 10, y: 10 }, frontal: { x: 300, y: 10, leitura: 'secao' } } }));
+    expect(dentro.relatorio.alertas).toHaveLength(0);
+
+    const estourando = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 20, 60, 140),
+    ], { vistas: { lateral: { x: 10, y: 10 }, frontal: { x: 300, y: 10, leitura: 'secao' } } }));
+    expect(estourando.relatorio.alertas.join(' ')).toMatch(/seção frontal passa de/);
+  });
+
+  it('acusa eixo em que nenhuma vista é projeção — o silenciamento por declaração', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 0, 60, 80),
+    ], {
+      vistas: {
+        lateral: { x: 10, y: 10, leitura: 'secao' },
+        frontal: { x: 300, y: 10, leitura: 'secao' },
+      },
+    }));
+    expect(relatorio.alertas.join(' ')).toMatch(/nenhuma vista declarada como projeção/);
+  });
+
+  it('confere o envelope declarado contra o que foi traçado', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 0, 60, 80),
+    ], { envelope: { comprimento: 200, altura: 80, largura: 120 } }));
+    expect(relatorio.coerencia.envelope.comprimento.desvio).toBe(0);
+    expect(relatorio.coerencia.envelope.altura.medido).toBe(80);
+    expect(relatorio.alertas).toHaveLength(0);
+  });
+
+  it('acusa envelope que o traçado não cumpre', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -60, 0, 60, 80),
+    ], { envelope: { comprimento: 500 } }));
+    expect(relatorio.alertas.join(' ')).toMatch(/envelope: comprimento traçado 200 contra 500/);
+  });
+
+  it('acusa contorno fora de esquadro com o plano de simetria', () => {
+    const { relatorio } = prancha(duasVistas([
+      caixaEm('lateral', -100, 0, 100, 80),
+      caixaEm('frontal', -20, 0, 90, 80),
+    ]));
+    expect(relatorio.alertas.join(' ')).toMatch(/simetria: frontal/);
+    expect(relatorio.coerencia.simetria.frontal).toBe(70);
+  });
+});
+
 describe('determinismo', () => {
   it('produz o mesmo SVG em execuções repetidas', () => {
     const spec = base([{ vista: 'lateral', pts: [[-100, 0], [0, 60, 25], [100, 20]] }]);

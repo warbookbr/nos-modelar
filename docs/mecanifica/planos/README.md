@@ -4,6 +4,13 @@
 
 **Plano ativo:** nenhum.
 
+A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída e
+fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que
+sozinho já acusou quatro rodas escapando da carroceria em planta — e passou a
+comparar as vistas pelos eixos que compartilham, com leitura `projecao` ou
+`secao` declarada. O investimento volta ao chassi: a próxima rodada é P1, o
+contrato da cage, onde a seção transversal foi encaixada.
+
 O [motor de prancha com filete e medida](2026-08-19-motor-de-prancha-medida.md)
 foi **concluído**. Ele trocou a spline por traçado com filete, adotou âncora
 proporcional e passou a emitir relatório medido da própria saída. O ganho não é
