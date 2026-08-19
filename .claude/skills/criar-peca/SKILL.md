@@ -187,3 +187,26 @@ npm run mcp:check
 ```
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.
+
+## Despachar o crítico, sem contexto
+
+Em marco — antes de propor promoção, publicação ou de levar o resultado ao
+usuário — despache um subagente como **crítico visual**. O protocolo está em
+[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+
+Passe **apenas** as vistas, o briefing e o critério declarado. **Não passe o seu
+raciocínio nem o histórico de construção** — é ele que ancora, e um crítico que
+herda a sua narrativa não acrescenta nada. Papel separado dentro da mesma sessão
+é ficção: quem modelou tem a narrativa e não consegue não tê-la.
+
+A forma mais forte é legibilidade cega: entregue a imagem sem dizer o que é e
+pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
+teste não exige gosto — só verifica se a forma comunica.
+
+Três limites, todos inegociáveis:
+
+- **achado, nunca aprovação.** Silêncio do crítico não é evidência de qualidade
+  e não entra em registro como aceite. Forma quem aprova é o usuário;
+- **depois dos gates, nunca no lugar deles.** Se descrição, medida ou gate ainda
+  acusam, corrija primeiro;
+- **em marco, não a cada rodada.** Cada despacho é partida fria.

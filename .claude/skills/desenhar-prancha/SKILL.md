@@ -186,7 +186,29 @@ teto abaulada; medindo, o teto desviava 17 mm e os erros reais eram a traseira
 alta em 112 mm e a ponta do nariz em 314 mm. Quando medida e olho divergem, a
 medida ganha.
 
-## 9. Checklist de defeitos recorrentes
+## 9. Despachar o crítico, sem contexto
+
+Quando o relatório determinístico estiver **limpo** e antes de levar o resultado
+ao usuário, despache um subagente como **crítico visual**. O protocolo completo
+está em
+[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+
+Passe **apenas** o artefato, as vistas e o critério declarado. **Não passe o seu
+raciocínio** — ele é exatamente o que ancora, e um crítico que herda a sua
+narrativa não acrescenta nada.
+
+A forma mais forte é legibilidade cega: entregue a imagem sem dizer o que é e
+pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado.
+
+Três limites, todos inegociáveis:
+
+- **achado, nunca aprovação.** Silêncio do crítico não vira evidência de
+  qualidade nem entra num registro como aceite. Forma quem aprova é o usuário;
+- **depois da medida, nunca no lugar dela.** Se o relatório ainda acusa, corrija
+  primeiro: crítico é caro e não determinístico, medida é grátis e determinística;
+- **em marco, não a cada rodada.** Cada despacho é partida fria.
+
+## 10. Checklist de defeitos recorrentes
 
 Todos já aconteceram. Confira antes de entregar:
 
@@ -209,7 +231,7 @@ Todos já aconteceram. Confira antes de entregar:
 - linha inferior traçada com `suave`: a spline afunda abaixo do ponto declarado.
   Na prancha do P0 ela mergulhava para 94 mm onde a altura livre é 105.
 
-## 10. Encerrar
+## 11. Encerrar
 
 - relatório sem alerta;
 - todas as vistas fechadas;
