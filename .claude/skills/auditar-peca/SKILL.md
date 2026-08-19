@@ -37,7 +37,26 @@ peça isolada e não inventa validade global de uma montagem.
    legibilidade das partes e coerência da forma. Não conclua apenas pela
    existência de um PNG.
 
-3. Se existir um pacote de modelagem associado, rode a revisão oficial:
+3. **Isole por pergunta.** Auditar tudo junto esconde erro estrutural debaixo de
+   detalhe. Rode os três modos para a parte sob suspeita:
+
+   ```bash
+   npm run bancada -- <peca> --selecionadas=<parte> --modo=isolar --focar
+   npm run bancada -- <peca> --selecionadas=<parte> --modo=contexto
+   npm run bancada -- <peca> --par=<parte>,<vizinha>
+   ```
+
+   | modo | pergunta | o que avaliar |
+   |---|---|---|
+   | `isolar` | a superfície está boa? | continuidade, vinco, transição, ondulação |
+   | `contexto` | cabe e encaixa? | folga, interferência, proporção, alinhamento |
+   | `par` | este encaixe específico fecha? | contato, coaxialidade, penetração |
+   | `todas` | lê como o objeto certo? | leitura geral, que **não** se decide sozinho |
+
+   **Peça com vizinho nunca é aprovada só em `isolar`**: forma impossível passa
+   isolada. Um arco que não comporta a própria roda só aparece em `contexto`.
+
+4. Se existir um pacote de modelagem associado, rode a revisão oficial:
 
    ```bash
    npm run revisar:modelagem -- <pacote> --revisao=r001
@@ -45,7 +64,7 @@ peça isolada e não inventa validade global de uma montagem.
 
    A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-4. Rode os gates aplicáveis:
+5. Rode os gates aplicáveis:
 
    ```bash
    npm test

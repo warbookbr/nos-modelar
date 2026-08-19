@@ -85,6 +85,13 @@ que a medida por vista não acusava.
 Seção transversal, ajuste automático de âncora contra referência, leitura de
 outras vistas da referência e qualquer geometria 3D.
 
+**Isolamento por camada no motor de prancha** também fica fora, e vale registro
+porque é lacuna conhecida: não há como renderizar só a silhueta sem cromo, roda e
+cotas. Foi o que deixou a segunda iteração do estudo do fastback ilegível. Na
+modelagem o equivalente já existe — `olhar-bancada.mjs` tem `--selecionadas`,
+`--modo` e `--focar` — e a instrução de uso entrou nas skills `criar-peca` e
+`auditar-peca`. No desenho, falta a capacidade.
+
 **Seção transversal fica explicitamente adiada, com destino definido:** ela é a
 entrada da malha de controle, não um recurso de desenho. Implementá-la aqui
 criaria um contrato de seção que o P1 teria de refazer. Ela entra na rodada P1 do

@@ -35,10 +35,32 @@ receita monolítica.
    `validar:modelagem`, `revisar:modelagem`) ou o perfil MCP de autoria, e
    registre a captura como bloqueada até existir um adaptador privado explícito.
 
-4. Leia as quatro imagens, registre pelo menos uma medida/gate e itere sobre
-   defeitos concretos. A bancada confirma enquadramento; não decide sozinha se
-   a forma atende ao briefing.
-5. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
+4. **Isole por pergunta, não por hábito.** Peça inteira numa imagem só esconde
+   erro estrutural debaixo de detalhe. A bancada tem três modos, e cada um
+   responde uma pergunta diferente:
+
+   ```bash
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=contexto
+   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
+   ```
+
+   | modo | pergunta | o que avaliar |
+   |---|---|---|
+   | `isolar` | a superfície está boa? | continuidade, vinco, transição entre regiões, ondulação, faceteamento onde deveria ser liso |
+   | `contexto` (o resto vira fantasma) | cabe e encaixa? | folga, interferência, proporção contra o vizinho, alinhamento de eixo |
+   | `todas` | lê como o objeto certo? | leitura geral — e aqui **você não decide sozinho** |
+
+   **`isolar` sozinho aprova coisa impossível.** Um arco de roda que não cabe na
+   própria roda passa isolado e só aparece em `contexto`. Regra: nunca conclua
+   sobre uma peça que tem vizinho sem ter olhado em `contexto`.
+
+   `--par a,b` isola exatamente duas peças e já enquadra, para julgar um encaixe.
+
+5. Registre pelo menos uma medida ou gate por rodada e itere sobre defeitos
+   concretos. A bancada confirma enquadramento; não decide sozinha se a forma
+   atende ao briefing.
+6. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
    compatibilidade e gabarito, quando a receita local e esses artefatos forem
    autorizados. Esse visor legado é diagnóstico; não transforma a peça em
    entrada publicada.
