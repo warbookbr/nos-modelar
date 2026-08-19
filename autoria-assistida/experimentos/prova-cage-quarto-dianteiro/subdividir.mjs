@@ -47,10 +47,18 @@ export function topologia(faces) {
 }
 
 /* Nitidez efetiva de uma aresta. Borda — aresta com uma face só — é sempre
-   aguda: sem isso o contorno de uma superfície aberta encolhe a cada nível. */
+   aguda: sem isso o contorno de uma superfície aberta encolhe a cada nível.
+
+   A nitidez é INTEIRA, por decisão medida. A primeira versão interpolava valor
+   fracionário entre a regra lisa e a aguda, e isso produzia zigue-zague de
+   período 2: numa crista perfeitamente reta de 200 mm, o nível 2 alternava entre
+   175 e 195 mm. O ponto de aresta e o ponto de vértice recebiam misturas que não
+   se correspondiam, e a crista serrilhava. O contrato de P1 já lê nitidez como
+   "por quantos níveis a aresta permanece aguda"; agora o código lê igual. */
 function nitidezDe(e, vincos) {
   if (e.faces.length < 2) return Infinity;
-  return vincos.get(chaveAresta(e.a, e.b)) ?? 0;
+  const s = vincos.get(chaveAresta(e.a, e.b)) ?? 0;
+  return s <= 0 ? 0 : Math.ceil(s);
 }
 
 /* Um nível de Catmull-Clark. Vinco semi-agudo pelo método de nitidez inteira
@@ -69,10 +77,8 @@ export function subdividirUmNivel(cage) {
   const pontoDaAresta = new Map();
   for (const [k, e] of arestas) {
     const meio = media([V.get(e.a), V.get(e.b)]);
-    const s = nitidezDe(e, vincos);
-    if (s >= 1) { pontoDaAresta.set(k, meio); continue; }
-    const liso = media([V.get(e.a), V.get(e.b), ...e.faces.map((fid) => pontoDaFace.get(fid))]);
-    pontoDaAresta.set(k, s <= 0 ? liso : mistura(liso, meio, s));
+    if (nitidezDe(e, vincos) >= 1) { pontoDaAresta.set(k, meio); continue; }
+    pontoDaAresta.set(k, media([V.get(e.a), V.get(e.b), ...e.faces.map((fid) => pontoDaFace.get(fid))]));
   }
 
   /* Ponto de vértice. Vértice tocado por aresta aguda usa a regra de vinco:
@@ -83,10 +89,6 @@ export function subdividirUmNivel(cage) {
     if (ks.length === 0) { pontoDoVertice.set(v, p); continue; }
 
     const agudas = ks.filter((k) => nitidezDe(arestas.get(k), vincos) >= 1);
-    const maiorNitidez = Math.max(0, ...ks.map((k) => {
-      const s = nitidezDe(arestas.get(k), vincos);
-      return Number.isFinite(s) ? s : 1;
-    }));
 
     const fs = [...(facesDoVertice.get(v) ?? [])].sort((a, b) => a - b);
     const n = ks.length;
@@ -121,7 +123,7 @@ export function subdividirUmNivel(cage) {
         (pontas[0][1] + 6 * p[1] + pontas[1][1]) / 8,
         (pontas[0][2] + 6 * p[2] + pontas[1][2]) / 8,
       ];
-      pontoDoVertice.set(v, maiorNitidez >= 1 ? cordao : mistura(liso, cordao, maiorNitidez));
+      pontoDoVertice.set(v, cordao);
       continue;
     }
     pontoDoVertice.set(v, liso);
@@ -176,7 +178,30 @@ export function subdividirUmNivel(cage) {
     novosVincos.set(chaveAresta(m, deVertice.get(e.b)), resto);
   }
 
-  return { V: novoV, F: novoF, vincos: novosVincos };
+  return { V: novoV, F: novoF, vincos: novosVincos, deVertice, deAresta, deFace };
+}
+
+/* Rastreia um loop nomeado através dos níveis. Sem isto, medir a crista era
+   inferir "maior y por faixa de z", o que mistura crista, corte traseiro e arco
+   e produz número sem sentido. É também a linhagem que P1 descreve, exercida. */
+export function rastrearLoop(cage, caminho, niveis) {
+  let atual = { V: cage.V, F: cage.F, vincos: cage.vincos ?? new Map() };
+  let vs = [...caminho];
+  for (let n = 0; n < niveis; n += 1) {
+    const prox = subdividirUmNivel(atual);
+    const novo = [];
+    for (let i = 0; i < vs.length; i += 1) {
+      novo.push(prox.deVertice.get(vs[i]));
+      if (i < vs.length - 1) {
+        const k = chaveAresta(vs[i], vs[i + 1]);
+        const m = prox.deAresta.get(k);
+        if (m !== undefined) novo.push(m);
+      }
+    }
+    vs = novo;
+    atual = prox;
+  }
+  return { malha: atual, vertices: vs, pontos: vs.map((v) => atual.V.get(v)) };
 }
 
 export function subdividir(cage, niveis = 1) {

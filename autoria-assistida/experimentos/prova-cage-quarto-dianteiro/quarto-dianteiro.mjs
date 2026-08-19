@@ -21,65 +21,54 @@ export const ALVO = {
 const lerp = (a, b, t) => a + (b - a) * t;
 const suavizar = (t) => t * t * (3 - 2 * t);
 
-/* Perfil do capô na linha de centro, entre nariz, crista e base do para-brisa.
-   Duas rampas com transição suave — a mesma forma que a prancha do P0 traça. */
-function yCentro(z) {
-  const A = ALVO;
-  if (z >= A.cristaZ) {
-    const t = (A.zNariz - z) / (A.zNariz - A.cristaZ);
-    return lerp(A.yNariz, A.cristaY, suavizar(t));
-  }
-  const t = (A.cristaZ - z) / (A.cristaZ - A.zCowl);
-  return lerp(A.cristaY, A.yCowl, suavizar(t));
-}
+/* SEÇÕES DECLARADAS. Esta é a correção da rodada Q7: a versão reprovada gerava
+   a seção por fórmula genérica a partir da silhueta e da meia largura, e o
+   resultado não tinha quebra nenhuma — o vinco da linha de ombro foi aplicado
+   onde a superfície era colinear e não revelou nada.
 
-/* Meia largura do corpo por estação, da curva mestra 2 de P0. */
-function meiaLargura(z) {
-  const A = ALVO;
-  if (z >= 2100) return lerp(300, 620, (A.zNariz - z) / (A.zNariz - 2100));
-  if (z >= 1900) return lerp(620, 845, (2100 - z) / 200);
-  if (z >= A.zEixo) return lerp(845, A.ombroX, (1900 - z) / (1900 - A.zEixo));
-  return lerp(A.ombroX, 945, (A.zEixo - z) / (A.zEixo - A.zCowl));
-}
+   Cada estação é escrita à mão, com o que faz caráter: capô com vale raso, CRISTA
+   DE PARA-LAMA que sobe acima do capô, quebra dura na crista, flanco com
+   recolhimento e tuck na soleira. Dez anéis, da costura até a soleira.
+   O anel 4 é a crista, e é ele que recebe o vinco. */
+export const SECOES = [
+  { z: 2265, pts: [[0, 520], [120, 512], [220, 494], [280, 462], [300, 420], [296, 356], [284, 288], [262, 224], [232, 176], [206, 150]] },
+  { z: 2100, pts: [[0, 640], [190, 630], [360, 608], [470, 588], [520, 606], [532, 520], [524, 414], [500, 310], [468, 220], [436, 162]] },
+  { z: 1900, pts: [[0, 742], [270, 734], [520, 718], [690, 706], [812, 726], [838, 622], [828, 486], [800, 344], [764, 232], [730, 162]] },
+  { z: 1600, pts: [[0, 826], [290, 818], [560, 806], [760, 802], [906, 838], [930, 726], [920, 570], [892, 398], [856, 262], [822, 168]] },
+  { z: 1325, pts: [[0, 880], [300, 872], [600, 866], [800, 878], [965, 900], [960, 780], [948, 600], [920, 408], [884, 258], [850, 152]] },
+  { z: 1000, pts: [[0, 922], [312, 916], [612, 910], [816, 920], [952, 940], [962, 822], [950, 636], [922, 432], [888, 268], [858, 152]] },
+  { z: 700, pts: [[0, 952], [306, 948], [600, 944], [800, 950], [940, 966], [950, 846], [940, 656], [916, 444], [884, 272], [858, 152]] },
+  { z: 480, pts: [[0, 980], [300, 976], [580, 972], [780, 978], [928, 992], [940, 866], [932, 668], [910, 450], [882, 276], [858, 154]] },
+];
+const ANEL_CRISTA = 4;
 
-/* Altura da linha de ombro por estação — a aresta de caráter da lateral. */
-function yOmbro(z) {
-  const A = ALVO;
-  if (z >= A.zEixo) {
-    const t = (A.zNariz - z) / (A.zNariz - A.zEixo);
-    return lerp(A.yNariz - 40, A.ombroY, suavizar(t));
-  }
-  return lerp(A.ombroY, 935, (A.zEixo - z) / (A.zEixo - A.zCowl));
-}
+const lerp2 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 
-/* Seção transversal por estação: nove anéis da linha de centro até a soleira.
-   Capô quase plano, quebra curta no ombro, flanco caindo, soleira. */
+/* Interpola entre as seções declaradas. Loft entre seções ESCRITAS é diferente
+   de varredura de envelope: as seções são o contrato, e a estação intermediária
+   é a interpolação delas, não uma elipse esticada. */
 function secao(z) {
-  const A = ALVO;
-  const W = meiaLargura(z);
-  const yc = yCentro(z);
-  const yo = yOmbro(z);
-  const ySol = lerp(A.alturaLivre, A.soleiraY, Math.min(1, (A.zNariz - z) / 900));
-  const xSol = Math.min(W * 0.96, A.soleiraX);
-  /* A primeira versão tinha lados verticais e capô plano, e a vista frontal saía
-     uma banheira. Agora o capô coroa e o flanco tem barriga: a maior meia largura
-     fica no meio do flanco, não no ombro. */
-  const coroa = (yc - yo) * 0.34;
-  return [
-    [0, yc],                                       // 0 costura, centro do capô
-    [W * 0.36, yc - coroa * 0.10],                 // 1 capô
-    [W * 0.70, yc - coroa * 0.42],                 // 2 capô externo
-    [W * 0.92, yo + (yc - yo) * 0.30],             // 3 crista do para-lama
-    [W * 0.995, yo],                               // 4 OMBRO — recebe o vinco
-    [W * 1.00, lerp(yo, ySol, 0.28)],              // 5 barriga do flanco
-    [W * 0.975, lerp(yo, ySol, 0.58)],             // 6 flanco
-    [xSol, lerp(yo, ySol, 0.86)],                  // 7 flanco baixo
-    [xSol * 0.94, ySol],                           // 8 soleira
-  ];
+  const ordem = SECOES;
+  if (z >= ordem[0].z) return ordem[0].pts;
+  if (z <= ordem[ordem.length - 1].z) return ordem[ordem.length - 1].pts;
+  for (let i = 0; i < ordem.length - 1; i += 1) {
+    const a = ordem[i];
+    const b = ordem[i + 1];
+    if (z <= a.z && z >= b.z) {
+      /* Interpolação LINEAR entre seções, não smoothstep. Smoothstep zera a
+         derivada em cada estação declarada, o que faz o loft "parar" em toda
+         seção e produz crista serrilhada — visível assim que o vinco tornou a
+         crista nítida. A suavidade é trabalho da subdivisão, não da
+         interpolação. */
+      const t = (a.z - z) / (a.z - b.z);
+      return a.pts.map((p, k) => lerp2(p, b.pts[k], t));
+    }
+  }
+  return ordem[ordem.length - 1].pts;
 }
 
-const ESTACOES = [2265, 2180, 2060, 1920, 1780, 1650, 1520, 1400, 1325, 1240, 1120, 980, 830, 680, 550, 480];
-const ANEIS = 9;
+const ESTACOES = [2265, 2180, 2100, 1980, 1900, 1750, 1600, 1460, 1325, 1180, 1000, 850, 700, 590, 480];
+const ANEIS = 10;
 
 /* --- montagem da cage ------------------------------------------------------ */
 export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
@@ -107,7 +96,8 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
     const z = (ESTACOES[i] + ESTACOES[i + 1]) / 2;
     if (j <= 2) return 'capo';
     if (j === 3) return z > 900 ? 'paralamaDianteiro' : 'capo';
-    return z > 900 ? 'paralamaDianteiro' : 'lateralDianteira';
+    if (j <= 5) return z > 900 ? 'paralamaDianteiro' : 'lateralDianteira';
+    return 'lateralDianteira';
   };
 
   /* Abertura do arco: face cujo centro cai dentro do círculo do arco, medido no
@@ -202,9 +192,9 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
 
   /* Vincos. Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma
      fileira extra de geometria — P0 e P1 dizem isso, e é o que se faz aqui. */
-  const loopOmbro = grade.map((l) => l[4]);
+  const loopOmbro = grade.map((l) => l[ANEL_CRISTA]);
   for (let i = 0; i < loopOmbro.length - 1; i += 1) {
-    vincos.set(chave(loopOmbro[i], loopOmbro[i + 1]), 1.4);
+    vincos.set(chave(loopOmbro[i], loopOmbro[i + 1]), 2);
   }
   /* A borda do arco é aguda pelo retorno; o retorno em si é vinco cheio. */
   for (const [a, b] of contorno.arestas) vincos.set(chave(a, b), 2);
@@ -247,6 +237,10 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
   return {
     formato: 'mecanifica.cage-quad@1',
     V, F, vincos, loops,
+    /* A seção declarada volta como CONFERÊNCIA da cage, fechando o laço que P1
+       pediu: a cage é hipótese e a seção é o alvo contra o qual ela é medida. */
+    secoes: SECOES.filter((s) => ESTACOES.includes(s.z))
+      .map((s) => ({ z: s.z, contorno: s.pts, tolerancia: 8, janela: 1, apenas: grade.flat() })),
     simetria: { plano: 'x', autorada: 'x >= 0' },
     grade,
     arcoRemovido: removidas.length,

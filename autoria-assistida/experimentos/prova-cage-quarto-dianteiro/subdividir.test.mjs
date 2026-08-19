@@ -3,7 +3,7 @@
    vinco que resiste ao nível declarado, borda que não encolhe e determinismo. */
 import { describe, expect, it } from 'vitest';
 import {
-  subdividir, subdividirUmNivel, malhaCanonica, pontosExtraordinarios, topologia,
+  subdividir, subdividirUmNivel, malhaCanonica, pontosExtraordinarios, topologia, rastrearLoop,
 } from './subdividir.mjs';
 
 const cubo = () => ({
@@ -88,11 +88,40 @@ describe('vinco semi-agudo', () => {
     expect(cume(comVinco(3))).toBeLessThan(1);
   });
 
-  it('nitidez fracionária fica entre o liso e o agudo', () => {
-    const liso = cume(subdividirUmNivel(telhado()));
-    const meio = cume(subdividirUmNivel(telhado(new Map([[arestaDoCume, 0.5]]))));
-    expect(meio).toBeGreaterThan(liso);
-    expect(meio).toBeLessThan(1);
+  it('nitidez é inteira: fracionária arredonda para cima', () => {
+    /* A mistura fracionária foi REMOVIDA por defeito medido: numa crista
+       perfeitamente reta de 200 mm, o nível 2 alternava entre 175 e 195 mm,
+       porque o ponto de aresta e o ponto de vértice recebiam misturas que não se
+       correspondiam. O contrato de P1 lê nitidez como "por quantos níveis a
+       aresta permanece aguda", e agora o código lê igual. */
+    expect(cume(subdividirUmNivel(telhado(new Map([[arestaDoCume, 0.5]]))))).toBeCloseTo(1, 9);
+    expect(cume(subdividirUmNivel(telhado()))).toBeLessThan(1);
+  });
+
+  it('crista reta continua reta em todos os níveis', () => {
+    /* O teste que teria pego o defeito acima. Uma crista sem curvatura não pode
+       ganhar ondulação nenhuma da subdivisão. */
+    const V = new Map(); const F = new Map(); const g = [];
+    let n = 0;
+    for (let i = 0; i < 9; i += 1) {
+      const linha = [];
+      for (let j = 0; j < 3; j += 1) { V.set(n, [(j - 1) * 100, j === 1 ? 200 : 0, i * 100]); linha.push(n); n += 1; }
+      g.push(linha);
+    }
+    let f = 0;
+    for (let i = 0; i < 8; i += 1) for (let j = 0; j < 2; j += 1) { F.set(f, { id: f, vs: [g[i][j], g[i][j + 1], g[i + 1][j + 1], g[i + 1][j]] }); f += 1; }
+    const crista = g.map((l) => l[1]);
+    const ch = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+    const vincos = new Map();
+    for (let i = 0; i < crista.length - 1; i += 1) vincos.set(ch(crista[i], crista[i + 1]), 2);
+    for (const nivel of [1, 2, 3]) {
+      const { pontos } = rastrearLoop({ V, F, vincos }, crista, nivel);
+      for (let i = 1; i < pontos.length - 1; i += 1) {
+        const esperado = [0, 1, 2].map((k) => (pontos[i - 1][k] + pontos[i + 1][k]) / 2);
+        const d = Math.hypot(pontos[i][0] - esperado[0], pontos[i][1] - esperado[1], pontos[i][2] - esperado[2]);
+        expect(d).toBeLessThan(1e-9);
+      }
+    }
   });
 
   it('a nitidez decrementa de um por nível', () => {

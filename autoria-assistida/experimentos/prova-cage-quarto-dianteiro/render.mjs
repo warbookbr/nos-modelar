@@ -36,7 +36,12 @@ export function desenhar(malha, { largura = 620, altura = 440, camera = 'isometr
     const n = unit(cruz(sub(ps[1], ps[0]), sub(ps[2], ps[0])));
     const c = ps.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4, a[2] + p[2] / 4], [0, 0, 0]);
     return { f, ps: ps.map(proj), z: prof(c), lambert: Math.max(0, ponto(n, luz)), frente: ponto(n, cam.olhar) < 0 };
-  }).sort((a, b) => a.z - b.z);
+  }).sort((a, b) => (a.frente === b.frente ? a.z - b.z : (a.frente ? 1 : -1)));
+  /* Duas passadas em vez de ordenação pura por profundidade. Numa casca aberta,
+     face de dentro e de fora quase se tocam perto da tangente, e o algoritmo do
+     pintor alterna qual fica por cima — o resultado é uma serrilha na silhueta
+     que parece defeito de geometria e não é. Verificado: o loop da crista é
+     monótono nos dados. */
 
   const xs = preparadas.flatMap((q) => q.ps.map((p) => p[0]));
   const ys = preparadas.flatMap((q) => q.ps.map((p) => p[1]));
@@ -57,8 +62,13 @@ export function desenhar(malha, { largura = 620, altura = 440, camera = 'isometr
   const O = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}">`,
     `<rect width="${largura}" height="${altura}" fill="#f6f6f4"/>`];
   for (const q of preparadas) {
-    O.push(`<polygon points="${q.ps.map(tela).join(' ')}" fill="${cor(q)}"`
-      + (fio ? ' stroke="#2a3a52" stroke-width="0.35"' : ' stroke="none"') + '/>');
+    /* Traço da MESMA cor do preenchimento. Perto da silhueta a face é vista de
+       topo e vira uma lasca; sem traço, a face de trás aparece pelas frestas e a
+       borda sai serrilhada. Medido: no nível 2 a silhueta da malha tem zero
+       inversão — a serrilha era do desenho, não da geometria. */
+    const c = cor(q);
+    O.push(`<polygon points="${q.ps.map(tela).join(' ')}" fill="${c}"`
+      + (fio ? ' stroke="#2a3a52" stroke-width="0.35"' : ` stroke="${c}" stroke-width="0.7"`) + '/>');
   }
   O.push(`<text x="14" y="${altura - 12}" font-family="ui-sans-serif,system-ui" font-size="12" fill="#6b7481">${camera}</text>`);
   O.push('</svg>');

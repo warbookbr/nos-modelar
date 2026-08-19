@@ -96,8 +96,12 @@ export function validarCage(cage) {
   const secoes = [];
   for (const s of cage.secoes ?? []) {
     const tol = s.tolerancia ?? 8;
+    /* `apenas` limita a conferência à pele externa. O retorno de borda é
+       deslocado para dentro por construção, então cobrá-lo contra o contorno da
+       seção reprovaria exatamente o que P0 mandou existir. */
+    const permitido = s.apenas ? new Set(s.apenas) : null;
     const naEstacao = [...cage.V.entries()]
-      .filter(([, p]) => Math.abs(p[2] - s.z) <= (s.janela ?? 1))
+      .filter(([id, p]) => (!permitido || permitido.has(id)) && Math.abs(p[2] - s.z) <= (s.janela ?? 1))
       .map(([id, p]) => ({ id, xy: [p[0], p[1]] }));
     if (naEstacao.length === 0) { erro('secao', `nenhum vértice na estação z = ${s.z}`); continue; }
     let pior = { id: null, desvio: 0 };
