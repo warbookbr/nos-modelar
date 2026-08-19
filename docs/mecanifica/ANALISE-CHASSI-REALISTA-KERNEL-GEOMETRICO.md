@@ -1,65 +1,62 @@
-# Análise — chassi realista e alternativas de kernel geométrico
+# Análise — chassi realista e escolha de representação geométrica
 
-**Estado:** dossiê iterativo — não autoriza implementação
+**Estado:** dossiê com decisão de representação; autoriza prova descartável, não
+autoriza código de produto
 
 **Responsável pela curadoria:** Codex
 
-**Objeto desta versão:** definir o problema atual com evidência, inventariar
-limitações e comparar direções possíveis. Esta versão deliberadamente não fecha
-arquitetura, dependência, schema, cronograma nem sequência de implementação.
+**Objeto desta versão:** fechar a representação de autoria da carroceria,
+registrar as rejeições com motivo técnico e reduzir a próxima rodada a uma prova
+única e decisiva. A versão anterior mantinha seis famílias abertas e propunha um
+bake-off de três kernels; esta versão elimina o que é elminável por análise e
+concentra a evidência onde ela ainda falta.
 
-## 1. Como este plano será usado
+## 1. Como este documento é usado
 
-Este não é um plano pronto para execução. É o documento de trabalho que será
-criticado e reescrito antes de qualquer nova tentativa de carroceria.
+Este documento não é plano executivo. É a base técnica que decide **qual
+representação** a Mecanifica passa a usar para superfície exterior, e o que
+ainda precisa de prova antes de virar produto.
 
-O processo esperado é:
+A versão 0 tratava toda alternativa como igualmente aberta. Isso estava errado
+como método: parte das alternativas é decidível por análise de requisito e custo,
+sem gastar uma rodada de implementação em cada uma. Manter tudo aberto não é
+rigor; é adiar a decisão e pagar por experimentos que já se sabe que perdem.
 
-1. ler e contestar fatos, inferências, requisitos e alternativas;
-2. corrigir termos ambíguos e remover hipóteses sem evidência;
-3. adicionar referências, medições e casos adversariais;
-4. comparar abordagens com provas pequenas e descartáveis;
-5. registrar decisões e rejeições com seus motivos;
-6. somente depois transformar a alternativa escolhida em plano executivo.
-
-Cada rodada deve poder alterar, adicionar ou remover conteúdo. Nada nesta versão
-é definitivo só porque foi escrito. Uma mudança relevante deve atualizar a
-seção **Registro das rodadas**, no fim do documento.
+O que continua aberto está na seção **Perguntas ainda sem resposta**. O que foi
+fechado está em **Decisão de representação** com o motivo e a condição de
+reabertura.
 
 ### 1.1 Regra de contenção
 
-Enquanto o estado for `rascunho iterativo`:
+Enquanto o plano estiver em `rascunho`:
 
 - não integrar operação nova ao registro do motor;
-- não instalar kernel ou dependência geométrica;
+- não instalar dependência geométrica;
 - não promover a carroceria atual;
 - não atualizar snapshots ou limites para fazer o protótipo rejeitado passar;
-- não chamar uma prova estrutural de aprovação visual;
-- não confundir uma investigação descartável com arquitetura escolhida.
+- não chamar uma prova estrutural de aprovação visual.
 
-Spikes poderão ser autorizados numa rodada posterior, em diretório privado e
-com critérios de descarte. Código de produto só começa depois do **Gate de
-prontidão para implementação**, ainda não satisfeito.
+A prova descartável da seção 14 é autorizada em diretório privado, com critério
+de descarte declarado. Código de produto só começa depois do **Gate de prontidão
+para implementação**.
 
-## 2. Termo em disputa: “chassi”
+## 2. Termo resolvido: “chassi”
 
-No uso automotivo estrito, `chassi` pode significar a estrutura resistente que
-recebe suspensão, carroceria e sistemas. O objeto que está visualmente ruim no
-experimento é a **carroceria exterior**: capô, para-lamas, laterais, teto,
-para-choques, recortes e transições de superfície.
+No uso automotivo estrito, `chassi` é a estrutura resistente. O objeto rejeitado
+é a **carroceria exterior**: capô, para-lamas, laterais, teto, para-choques,
+recortes e transições de superfície.
 
-Neste rascunho, `chassi realista` significa provisoriamente:
+Neste documento, `chassi realista` significa:
 
 > carroceria exterior de um supercarro ficcional, com qualidade de ativo de jogo
-> observado de perto, editável por regiões semânticas e convincente em várias
-> vistas.
+> observado de perto, editável por regiões semânticas, otimizada em contagem de
+> polígonos e convincente em todas as vistas canônicas.
 
-Isso não inclui, por enquanto, monocoque estrutural, crash structure, suspensão,
-motor ou validação de fabricação. A próxima rodada precisa confirmar ou corrigir
-essa definição. Implementar sem resolver essa ambiguidade repetiria o erro de
-aprovar um objeto diferente do que o usuário esperava.
+Fora do escopo: monocoque estrutural, crash structure, suspensão, motor,
+validação de fabricação e exportação CAD. Essa exclusão não é provisória — ela
+é o que permite rejeitar um kernel CAD na seção 8.
 
-## 3. Fontes de evidência usadas nesta versão
+## 3. Fontes de evidência
 
 ### 3.1 Estado e contratos do projeto
 
@@ -68,38 +65,40 @@ aprovar um objeto diferente do que o usuário esperava.
 - [`../AUTORIA-IA.md`](../AUTORIA-IA.md): autoria por IA e validação em camadas.
 - [`../AGENT-FIRST.md`](../AGENT-FIRST.md): intenção, contexto, determinismo,
   diagnóstico, composição e identidade.
-- [`../PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md): distinção entre F2,
-  F3 e `realistaApresentacao`.
+- [`../PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md): distinção entre F2, F3 e
+  `realistaApresentacao`.
 - [`../REFERENCIA-E-CRITICA-VISUAL.md`](../REFERENCIA-E-CRITICA-VISUAL.md):
   protocolo de referência e crítica.
 - [`../RELATORIO-SONDA-SUPERCARRO-1-0.md`](../RELATORIO-SONDA-SUPERCARRO-1-0.md):
-  métricas e limites declarados pela sonda anterior.
+  métricas e limites da sonda anterior.
 
-### 3.2 Artefatos observados
+### 3.2 Código lido diretamente nesta versão
 
-- referência única em perspectiva:
-  `autoria-assistida/experimentos/sonda-supercarro-1-0/referencias/supercarro-ficcional-cobalto.png`;
-- cinco vistas globais canônicas do conjunto;
-- receitas de carroceria, cabine, painéis, óptica e aerodinâmica;
-- montagem persistida com 27 peças-folha;
-- catálogo gerado das 32 operações do motor;
-- protótipo local não integrado de `inflate` por seções e as imagens que ele
-  regenerou.
+Esta versão não se apoia só em relatórios. Os fatos abaixo foram lidos na fonte:
 
-### 3.3 Limite da evidência
+- `prototipos/procedural/v3/motor/nucleo.js`: `BLOCO = 1000`, o bloco de ids por
+  passo, aplicado a vértices e a faces;
+- `prototipos/procedural/v3/motor/operacoes/geradores-avancados.js`: `loft`,
+  `inflate` e a semântica de `orientacao`;
+- `prototipos/procedural/v3/motor/operacoes/primitivas-superficie.js`: geradores
+  fechados e o contrato `faixas × lados` de `origemId`;
+- `prototipos/procedural/v3/motor/extensoes.js`: SDK de extensão nativa;
+- `prototipos/procedural/v3/motor/composicoes.js`: subgrafos declarativos;
+- `autoria-assistida/experimentos/sonda-supercarro-1-0/receitas/carroceria.js`;
+- `autoria-assistida/experimentos/sonda-supercarro-1-0/perfil-autoria.js`;
+- `package.json`: dependências atuais.
 
-Existe apenas uma imagem de referência em perspectiva. Não há prancha
+### 3.3 Limite da evidência visual
+
+Existe uma única imagem de referência em perspectiva. Não há prancha
 ortográfica, distância focal conhecida, dimensões de envelope, seções de
-carroceria, curvas mestras, desenho de caixa de roda nem mapa de continuidade.
-Portanto, a referência atual sustenta uma direção estética, mas não determina
-uma forma 3D única. Qualquer alegação de fidelidade precisa começar reconhecendo
-essa subdeterminação.
+carroceria, curvas mestras nem desenho de caixa de roda. A referência atual
+sustenta uma direção estética, mas não determina uma forma 3D única. Isso não
+bloqueia a decisão de representação — bloqueia a alegação de fidelidade.
 
 ## 4. Estado factual do que existe
 
 ### 4.1 O que a plataforma já faz bem
-
-A plataforma não está vazia nem estruturalmente quebrada. Ela já oferece:
 
 - receitas determinísticas e replay;
 - malha neutra com vértices compartilhados e faces endereçáveis;
@@ -107,621 +106,347 @@ A plataforma não está vazia nem estruturalmente quebrada. Ela já oferece:
 - montagens recursivas e instâncias compartilhadas;
 - descrição, exportação, diff, captura e auditoria;
 - seleção, isolamento e vistas reproduzíveis;
-- extensões registradas, contratos de uso e descoberta Agent-First;
+- extensões nativas registradas, contratos de uso e descoberta Agent-First;
+- subgrafos declarativos com parâmetros, tipos e orçamento;
 - falha fechada para várias classes de entrada inválida;
 - separação entre núcleo geométrico e Three.js.
 
-Essas capacidades são valiosas e devem ser preservadas. O problema não é a
-ausência de uma fundação procedural; é o teto da representação geométrica e do
-processo de aprovação visual para este alvo.
+O problema não é ausência de fundação procedural. É o teto da representação de
+superfície e o critério de aprovação visual.
 
-### 4.2 Representação geométrica atual
+### 4.2 A causa raiz, lida no código
 
-O artefato geométrico central é `mecanifica.malha-poligonal@1`: vértices e faces.
-As 32 operações registradas cobrem:
+A carroceria rejeitada é esta receita, integral:
 
-- primitivas e geradores: cubo, cilindro, esfera, cone, plano, caixa chanfrada,
-  revolução, loft e `inflate` voxel;
-- edições: mover vértice/aresta/face, extrudar face, mesclar vértices, apagar ou
-  inverter face;
-- transformações e repetição: translação, rotação, espelho e arranjo;
-- recursos locais: furo, arredondamento convexo, filete plano, ruído;
-- semântica e aparência: parte, porta, material, liso, sólido, pintura e pesos.
+```js
+['loft', { origemId: CORPO, lados: 12, orientacao: [1, 0, 0], secoes: [ ...9 seções... ] }]
+```
 
-Não foi encontrada no registro atual uma representação de:
+Nove seções, doze lados, 86 vértices e 96 faces. Cada seção é uma elipse fechada
+gerada por `contorno(meiaLargura, piso, teto)`. A carroceria inteira de um
+supercarro é **uma varredura de elipse ao longo de z**.
 
-- curva paramétrica persistida;
-- rede de curvas mestras;
-- superfície Bézier, B-spline ou NURBS como artefato editável;
-- superfície de subdivisão e malha de controle;
-- B-rep com vértices, arestas, wires, faces, shells e sólidos;
-- trimming de superfície por curvas;
-- costura de patches com tolerância e continuidade declarada;
-- união, interseção ou diferença geral entre sólidos;
-- shell/offset de superfície com espessura;
-- remalhamento ou retopologia;
-- LOD derivado da mesma fonte geométrica;
-- UV, baking ou tangentes como contrato de autoria.
+Isso encerra a discussão sobre “quantas seções faltam”. Nenhum número de seções
+elípticas produz para-lama, caixa de roda aberta, linha de caráter ou transição
+capô–para-lama, porque a representação não tem graus de liberdade para isso. O
+protótipo seguinte — três envelopes sobrepostos, 1.014 vértices — confirmou:
+mais que dez vezes a densidade, mesmo resultado de leitura.
 
-`furo`, `espelha`, `mescla` e os filetes atuais resolvem casos locais. Eles não
-equivalem a um kernel de superfícies ou a CSG/B-rep geral.
+### 4.3 Restrição de identidade não registrada antes: `BLOCO = 1000`
 
-### 4.3 Sonda aprovada anteriormente
+`nucleo.js:33` define `BLOCO = 1000`. A identidade posicional reserva um bloco de
+mil ids por passo, no espaço de vértice e no de face. Todo gerador atual valida
+contra esse teto e aborta o passo quando o estoura.
 
-A sonda registrada como concluída possui:
+Isso tem consequência direta na arquitetura, e a versão 0 não a registrava:
 
-| Medida | Baseline documentada |
+> Uma superfície de carroceria com qualidade F3 não cabe no espaço de ids de um
+> passo. Portanto a superfície final **não pode ser emitida como um passo comum
+> que numera vértices e faces posicionalmente**.
+
+A leitura correta não é “aumentar o BLOCO”. É que a malha densa é **produto
+compilado**, não artefato autoral. O `CLAUDE.md` já diz que índices e posições
+nunca são identidade persistida; a arquitetura precisa obedecer isso em vez de
+esticar o limite.
+
+### 4.4 Sonda anterior — o que ela mediu e o que não mediu
+
+| Medida | Baseline |
 |---|---:|
 | definições privadas | 12 |
 | peças-folha resolvidas | 27 |
-| submontagens compartilhadas | 4 |
 | vértices/faces nas definições únicas | 1.428 / 1.434 |
-| vértices/faces depois das instâncias | 4.620 / 4.530 |
 | export JSON | 372.939 bytes |
-| vistas válidas | 13 |
 | pares globais decididos | 351 / 351 |
 
-Essas métricas provam estrutura, repetição, fechamento do fluxo e capacidade de
-inspeção. Não medem semelhança com a referência, continuidade de carroceria ou
-qualidade de superfície.
+O perfil declarado da sonda é `perfil-autoria.js`:
 
-### 4.4 Protótipo local rejeitado
-
-Depois da reprovação visual, foi tentado um modo opcional de `inflate` que cruza
-uma silhueta lateral e uma planta por superelipses transversais. A carroceria foi
-dividida em monocoque central e dois ombros de para-lama sobrepostos.
-
-Estado mensurado desse protótipo não integrado:
-
-| Medida | Baseline | Protótipo | Variação |
-|---|---:|---:|---:|
-| carroceria — vértices | 86 | 1.014 | +928 |
-| carroceria — faces | 96 | 1.056 | +960 |
-| definições únicas — vértices | 1.428 | 2.356 | +928 |
-| definições únicas — faces | 1.434 | 2.394 | +960 |
-| export JSON | 372.939 B | 642.757 B | +269.818 B |
-
-O protótipo passou 485 testes focados do núcleo antes de ser interrompido, mas a
-suíte completa e o teste da sonda não foram concluídos. O snapshot atual da
-sonda espera as contagens antigas e menos de 400.000 bytes; portanto não se pode
-considerar o workspace verde.
-
-Visualmente, o protótipo produziu:
-
-- planta em ampulheta e ombros mais claros;
-- rodas parcialmente cobertas na leitura frontal e superior;
-- silhueta lateral mais contínua.
-
-Também produziu ou manteve:
-
-- leitura de protótipo de corrida/“batmóvel”, não de supercarro realista;
-- três cascas que se sobrepõem sem união ou continuidade controlada;
-- ressaltos e vales arbitrários nos para-lamas;
-- canópia, portas, entradas, faróis e aerodinâmica ainda aplicados como objetos
-  independentes;
-- caixas de roda aproximadas pela borda inferior, sem cavidade topológica;
-- aumento de aproximadamente 72% nos bytes exportados sem atingir o alvo.
-
-O usuário rejeitou explicitamente o resultado. Essa rejeição tem precedência
-sobre os ganhos geométricos locais e sobre gates estruturais.
-
-## 5. Problema atual, formulado sem solução embutida
-
-> A Mecanifica consegue gerar e organizar malhas mecânicas determinísticas, mas
-> não possui hoje um caminho demonstrado para uma IA definir, editar e validar
-> uma carroceria exterior contínua de qualidade F3: com controle local de
-> silhueta e curvatura em duas direções, transições entre regiões, recortes reais,
-> espessura, bordas e continuidade preservados por uma história semântica.
-
-O problema possui quatro componentes simultâneos.
-
-### 5.1 Alvo visual subespecificado
-
-Uma perspectiva única não fixa proporções 3D, seções ou continuidade. O agente
-precisa inventar dados essenciais e pode produzir uma forma internamente
-coerente, porém diferente da expectativa do usuário.
-
-### 5.2 Representação insuficiente para o alvo
-
-Primitivas, lofts e volumes inflados controlam envelopes globais, mas não uma
-rede de superfícies automotivas. Somar corpos permite bloquear massa; não permite
-declarar que duas regiões compartilham uma curva e devem encontrar-se com
-continuidade G0, G1 ou G2.
-
-#### A armadilha do “tubo de pasta de dente”
-
-O `loft` longitudinal e o protótipo de `inflate` suave partem da mesma família
-de decisão: para cada posição ao longo do carro existe uma seção transversal.
-É possível alargar, achatar, elevar ou torcer essa seção. Isso equivale a apertar
-e deformar um tubo ao longo do comprimento.
-
-Essa representação acopla regiões que o autor precisa controlar separadamente.
-Ao elevar o para-lama na estação da roda, também se altera a seção que atravessa
-capô e região central; ao estreitar a cintura, toda a seção responde; um arco de
-roda precisa ser simulado pela borda do envelope em vez de existir como trim ou
-cavidade. Acrescentar seções melhora a amostragem do mesmo modelo mental, mas
-não acrescenta graus de liberdade semânticos.
-
-Portanto, a pergunta não é “quantas seções faltam?”. É:
-
-> qual representação permite à IA editar linha de ombro, capô, para-lama,
-> caixa de roda, teto e cintura como decisões relacionadas, porém independentes?
-
-#### Mecanismo Agent-First procurado
-
-A hipótese a testar é uma autoria hierárquica, em vez de autoria por vértices ou
-por um envelope único:
-
-1. dimensões, eixos de roda, landmarks e planos fixam a proporção;
-2. curvas mestras controlam silhueta lateral, planta, ombros e aberturas;
-3. uma pele composta por patches ou cage liga essas curvas com continuidade;
-4. trims, cavidades, gaps e painéis acrescentam detalhes sem destruir a pele;
-5. features mantêm nomes e procedência;
-6. tesselação gera a malha adequada a cada distância.
-
-A IA deveria poder pedir “subir 25 mm a crista do para-lama sem mover a base do
-para-brisa” ou “aumentar a tangência capô–para-lama”, observar o impacto e
-reverter. Esse é o nível de praticidade a avaliar. Ainda não está decidido se a
-pele será B-rep/NURBS, SubD ou uma IR capaz de compilar para ambas.
-
-### 5.3 Operações locais sem história de forma adequada
-
-As edições de vértice, aresta e face existem, porém várias são posicionais e
-agem depois da tesselação. Uma carroceria realista exige editar decisões como
-“linha de ombro”, “arco da roda”, “queda do capô” e “transição capô–para-lama”
-sem depender de IDs frágeis de centenas de vértices.
-
-### 5.4 Aprovação visual sem critério vinculante
-
-A sonda anterior foi declarada `aprovar` porque estrutura, orçamento, vistas e
-auditoria passaram. O perfil visual era conceitual/F2, enquanto a expectativa
-do usuário evoluiu para realismo. Não havia limiar verificável de semelhança,
-continuidade ou fabricação que impedisse o fechamento. O processo aceitou um
-fluxo funcional como se também aprovasse a forma.
-
-## 6. Sintomas observáveis e suas causas prováveis
-
-| Sintoma | Evidência | Classe atual | Observação |
-|---|---|---|---|
-| carro parece cápsula, prancha ou barco | lateral e superior | representação | seção única por estação não controla regiões independentes |
-| rodas parecem externas ou coladas | frontal, traseira e lateral | representação/topologia | não há caixa de roda recortada e integrada |
-| para-lamas parecem volumes anexos | isométrica e frontal | continuidade | corpos sobrepostos não compartilham superfície nem curvatura |
-| cabine parece pousada sobre o corpo | lateral e isométrica | continuidade/decomposição | interseção visual substitui transição de teto, coluna e cintura |
-| portas e dutos parecem placas | lateral | autoria | caixas chanfradas aplicadas não seguem a superfície hospedeira |
-| faróis e lanternas parecem barras | frente e traseira | autoria/recorte | não há alojamento, lente conformada ou trim na casca |
-| mais faces não trouxeram realismo | métricas do protótipo | abstração | densidade foi gasta em anéis, não em decisões de forma |
-| gates passaram apesar da rejeição | relatório e feedback | validação | integridade e estética não tinham saídas independentes |
-
-“Causa provável” não significa decisão arquitetural. Cada linha deverá ser
-testada por uma prova mínima antes de virar requisito de implementação.
-
-## 7. O que ainda não sabemos
-
-Não há evidência suficiente para fechar estas perguntas:
-
-1. O alvo é um **hero asset de jogo**, uma carroceria conceitual de apresentação
-   ou um modelo CAD com plausibilidade de fabricação?
-2. Qual distância mínima e resolução de tela precisam sustentar a ilusão?
-3. A forma deve ser exportável somente como malha, ou também como STEP/B-rep?
-4. Painéis precisam possuir espessura física ou basta casca visual no primeiro
-   marco?
-5. Portas, capô e aerofólio precisarão mover, ou apenas ser selecionáveis?
-6. A bancada publicada precisa executar o kernel, ou pode consumir somente
-   malha compilada por ferramenta Node/WASM?
-7. É aceitável introduzir um runtime externo pesado ou processo headless?
-8. Qual orçamento de download, memória, geração, faces e tempo de autoria vale?
-9. “Tipo supercarro” descreve proporção e linguagem visual ou exige aproximação de
-   um modelo específico? Este plano assume veículo ficcional até decisão oposta.
-10. Quais vistas e referências constituem verdade: perspectiva artística,
-    blueprint ortográfico, medidas ou combinação explícita?
-
-Responder essas perguntas não é burocracia. Cada resposta altera qual kernel e
-qual representação são adequados.
-
-## 8. Capacidades que um teto realista provavelmente exige
-
-Esta seção é uma matriz de necessidades a validar, não uma lista automática de
-features.
-
-### 8.1 Referência e esqueleto dimensional
-
-- wheelbase, bitola, diâmetro das rodas, balanços e altura total;
-- câmeras e pranchas calibradas;
-- curvas mestras de lateral, planta e seções transversais;
-- planos de simetria e estações nomeadas;
-- vínculo explícito entre referência e decisão geométrica.
-
-### 8.2 Curvas e superfícies
-
-- curvas paramétricas editáveis, com grau, nós, pesos e pontos de controle;
-- patches de superfície ou malha de controle SubD;
-- continuidade G0 (posição), G1 (tangência) e, onde necessário, G2
-  (curvatura) entre regiões;
-- avaliação de curvatura, reflexão/zebra e desvio entre patches;
-- controle local sem reconstruir toda a carroceria.
-
-### 8.3 Topologia e recursos
-
-- trims e recortes por curvas para caixa de roda, vidro, portas, dutos e luzes;
-- costura de faces em shell e validação de fechamento;
-- offset/shell para espessura quando exigida;
-- união, diferença e interseção robustas onde a estratégia depender delas;
-- filetes e blends que conheçam superfícies, não somente arestas já tesselladas;
-- simetria com possibilidade de quebrá-la intencionalmente.
-
-### 8.4 História e identidade
-
-- grafo de features acima da malha final;
-- identidades semânticas para curvas, patches, trims, painéis e recursos;
-- procedência das faces tesselladas até a feature que as gerou;
-- política explícita para o problema de nomeação topológica depois de booleanas,
-  trims e reconstruções;
-- diff que distinga mudança de intenção, controle, topologia e tesselação.
-
-### 8.5 Compilação para jogo
-
-- tesselação determinística por tolerância e distância;
-- normais, tangentes, UVs e fronteiras de material;
-- LODs derivados da mesma fonte;
-- retopologia ou redução que preserve silhueta e regiões críticas;
-- exportação para malha neutra atual sem fazer dela a única fonte de autoria.
-
-### 8.6 Validação visual e geométrica
-
-- sobreposição da referência na mesma câmera;
-- erro de silhueta por vista;
-- análise de continuidade nas costuras;
-- mapas de curvatura/reflexão;
-- crítica humana/IA ligada a hashes antes/depois;
-- gates separados para estrutura, geometria, forma visual e apresentação.
-
-## 9. Famílias de abordagem
-
-Nenhuma alternativa abaixo está aprovada. Elas serão comparadas por spikes
-equivalentes, não por demonstrações diferentes escolhidas para favorecer uma.
-
-### A. Evoluir a malha nativa com SubD e booleanas robustas
-
-**Ideia:** tornar uma malha de controle semântica a fonte de autoria, avaliar uma
-superfície de subdivisão e usar uma biblioteca de booleanas de malha para cortes.
-
-**Potencial:** alto para ativo de jogo, carroceria orgânica, creases, edição
-local e retopologia orientada à renderização.
-
-**Vantagens:**
-
-- conversa diretamente com o destino em malha;
-- modelagem por cage é familiar ao hard-surface de jogos;
-- controle de arestas duras e suaves;
-- pode preservar o núcleo atual como saída;
-- tende a custar menos que uma pilha CAD completa.
-
-**Riscos e custos:**
-
-- booleana de malha exige entrada manifold e tolerâncias cuidadosas;
-- cortes podem degradar a malha de controle e a qualidade do SubD;
-- espessura, blends e painéis precisam de contratos próprios;
-- continuidade existe como superfície limite, mas não substitui relações G2
-  explícitas entre patches independentes;
-- identidade depois de remalhamento continua difícil.
-
-**Candidatos a investigar:** OpenSubdiv para avaliação SubD e Manifold para
-booleanas de malha. OpenSubdiv é otimizado para avaliação de topologia estática
-em CPU/GPU; Manifold afirma saída manifold para entrada manifold e rastreia
-proveniência de faces. Isso não prova integração com a Mecanifica.
-
-### B. Adotar um kernel CAD B-rep com curvas e superfícies paramétricas
-
-**Ideia:** tornar wire/face/shell/solid e curvas/superfícies paramétricas uma
-representação de autoria, compilando depois para a malha neutra.
-
-**Potencial:** o teto geométrico mais alto entre as alternativas examinadas para
-trims, costura, shell, booleana, filete e interoperabilidade CAD.
-
-**Vantagens:**
-
-- B-rep distingue geometria de superfície e topologia de borda;
-- suporta NURBS/B-splines, loft, sweep, trim, sewing, shelling e booleana;
-- oferece tolerâncias, checagem de shape e tesselação;
-- pode exportar formatos CAD além da malha;
-- evita reimplementar décadas de geometria computacional.
-
-**Riscos e custos:**
-
-- API extensa, verbosa e pouco Agent-First sem uma camada semântica forte;
-- kernel WASM pode acrescentar megabytes, inicialização e memória;
-- operações podem falhar em geometrias marginais e precisam de healing;
-- nomeação topológica continua sendo problema do produto, mesmo quando o kernel
-  oferece histórico de operação;
-- licenciamento e forma de distribuição precisam de revisão jurídica/técnica;
-- superfície CAD tecnicamente correta não produz automaticamente design
-  automotivo de classe A.
-
-**Candidato principal a investigar:** Open CASCADE Technology por meio de um
-binding WASM/Node. A documentação oficial lista curvas e superfícies livres,
-interseções, NURBS, sewing, lofts, sweeps, booleans, hollowing, shelling,
-filetes e tesselação. OpenCascade.js oferece bindings e builds customizados, mas
-o build completo documentado é pesado.
-
-### C. Fluxo externo de DCC/Blender como backend de autoria
-
-**Ideia:** usar um modelador headless maduro para SubD, modificadores, booleans,
-UV, baking e exportação; a Mecanifica manteria briefing, identidades, montagem,
-validação e procedência.
-
-**Potencial:** caminho mais curto para qualidade visual de jogo se a dependência
-externa e sua automação forem aceitáveis.
-
-**Vantagens:**
-
-- conjunto muito amplo de operações de modelagem e acabamento;
-- ecossistema de formatos, UV, materiais, baking e LOD;
-- boa adequação ao resultado final de jogo;
-- permite comparar o teto visual antes de construir um kernel próprio.
-
-**Riscos e custos:**
-
-- runtime externo grande, processo separado e instalação mais complexa;
-- scripts e estado `.blend` podem reduzir transparência e determinismo;
-- identidade semântica precisa atravessar objetos, modifiers e exportação;
-- integração com navegador não é direta;
-- licença, distribuição e isolamento do processo precisam de análise própria;
-- pode deslocar o núcleo do projeto para uma ferramenta que ele não controla.
-
-### D. Representação implícita/SDF com CSG
-
-**Ideia:** definir a forma como campo de distância e combinar volumes por união,
-diferença, interseção e blends, extraindo a superfície no final.
-
-**Potencial:** alto para booleanas robustas, blends orgânicos, cavidades e
-exploração rápida.
-
-**Vantagens:**
-
-- composição volumétrica simples e fechada;
-- blends e recortes naturais;
-- independente de uma topologia de entrada frágil;
-- bom escape hatch para formas generativas.
-
-**Riscos e custos:**
-
-- painéis finos, vincos controlados e gaps precisos são difíceis;
-- extração gera malha que pode exigir muita resolução;
-- UV, bordas semânticas e identidade de face são trabalhosas;
-- continuidade visual suave não significa controle de superfície automotiva;
-- tende a produzir formas “derretidas” sem disciplina adicional.
-
-### E. Kernel híbrido: superfície livre + sólido/booleana + compilação de jogo
-
-**Ideia:** manter uma IR semântica comum e permitir backends especializados:
-curvas/patches ou SubD para a pele exterior, B-rep ou Manifold para sólidos e
-recortes, e tesselação/LOD para consumo visual.
-
-**Potencial:** o maior teto absoluto, porque não força uma única representação a
-resolver todas as fases.
-
-**Vantagens:**
-
-- escolhe a representação adequada por feature;
-- preserva autoria rica e saída de jogo;
-- permite substituir backend sem mudar a intenção persistida;
-- abre caminho para carroceria, peças mecânicas e robótica no mesmo produto.
-
-**Riscos e custos:**
-
-- é também a alternativa de maior complexidade arquitetural;
-- conversões entre representações podem perder continuidade, identidade ou
-  tolerância;
-- exige um modelo de procedência e erro muito mais forte;
-- dois kernels ampliam bundle, testes, diagnóstico e manutenção;
-- sem uma IR mínima bem escolhida, vira apenas uma coleção de adaptadores.
-
-### F. Construir um kernel completo internamente
-
-**Ideia:** implementar curvas, superfícies, B-rep, interseções, booleans,
-healing, fillets e tesselação dentro do repositório.
-
-**Potencial:** controle máximo em teoria.
-
-**Trade-off dominante:** risco e tempo desproporcionais. O problema inclui
-predicados robustos, tolerâncias, degenerações e nomeação topológica. Esta opção
-fica registrada para não ser confundida com “independência”, mas não é recomendada
-sem uma razão que invalide kernels maduros.
-
-## 10. Hipótese de direção mais potente — ainda não é decisão
-
-A direção de maior teto aparente é a **E, híbrida**, com uma restrição: começar
-por uma única representação autoral principal, não integrar tudo ao mesmo tempo.
-
-Uma arquitetura candidata seria:
-
-```text
-briefing + referências calibradas
-→ grafo semântico de features
-→ curvas mestras e patches/sólidos autorais
-→ operações de trim, costura, blend e corte
-→ validação da representação rica
-→ tesselação determinística
-→ mecanifica.malha-poligonal@1
-→ montagem, inspeção, diff e exportação atuais
+```js
+{ visual: 'conceitual', fidelidade: 'F2', precisao: 'visual', orcamentoFaces: 1400 }
 ```
 
-O núcleo atual continuaria útil como executor de malha e contrato de saída. A
-representação rica não deve ser achatada em `PASSOS` de vértices antes da hora.
+A sonda foi aprovada contra `F2 conceitual` e julgada pelo usuário contra `F3
+realista`. O processo não errou ao aprovar: ele errou ao não exigir que o perfil
+declarado fosse o perfil esperado antes de modelar.
 
-O candidato mais forte para a primeira comparação é:
+### 4.5 Dependências atuais
 
-- **B-rep/OCCT** como teto de superfície, trim, shell e recursos;
-- **SubD + Manifold** como teto de ativo de jogo e booleanas de malha;
-- o mesmo quarto de carroceria modelado nas duas rotas;
-- Blender headless como referência externa de produtividade e qualidade, não
-  automaticamente como dependência final.
+`three`, `earcut`, `ajv`, `zod`, `@modelcontextprotocol/server`. Nenhum kernel
+geométrico. Qualquer dependência nova é a primeira do tipo e carrega custo de
+bundle, licença e distribuição que hoje não existe.
 
-Escolher diretamente OCCT ou SubD sem esse bake-off seria um chute arquitetural.
+## 5. Problema, formulado sem solução embutida
 
-### 10.1 Abordagem 1 congelada para revisão
+> A Mecanifica gera e organiza malhas mecânicas determinísticas, mas não possui
+> caminho demonstrado para uma IA definir, editar e validar uma carroceria
+> exterior contínua de qualidade F3: com controle local de silhueta e curvatura
+> em duas direções, transições entre regiões, recortes reais, bordas e
+> continuidade preservados por uma história semântica, dentro de um orçamento de
+> polígonos justificável.
 
-A primeira formulação da Abordagem 1 é:
+Quatro componentes simultâneos: alvo visual subespecificado, representação
+insuficiente, história de forma inadequada e aprovação visual sem critério
+vinculante.
 
-```text
-grafo semântico próprio da Mecanifica
-→ dimensões, landmarks e curvas mestras
-→ pele por patches com continuidade
-→ trims, shell, blends e cortes por kernel maduro
-→ tesselação determinística
-→ malha neutra, montagem e bancada atuais
-```
+### 5.1 A armadilha do envelope longitudinal
 
-O objetivo desta subseção é tentar quebrar e melhorar essa formulação sem
-mudá-la durante o julgamento. A conclusão pode ser `manter`, `revisar` ou
-`rejeitar`; acrescentar texto, sozinho, não conta como ganho.
+`loft` e `inflate` partem da mesma decisão: para cada posição ao longo do carro
+existe **uma** seção transversal. Dá para alargar, achatar, elevar ou torcer essa
+seção — é apertar um tubo ao longo do comprimento.
 
-### 10.2 Afirmações com confiança alta
+Isso acopla regiões que o autor precisa controlar separadamente. Elevar o
+para-lama na estação da roda altera a seção que atravessa capô e túnel central.
+Estreitar a cintura move tudo naquela estação. Um arco de roda precisa ser
+simulado pela borda do envelope em vez de existir como abertura.
 
-1. A malha tessellada não deve ser a única fonte de autoria F3.
-2. A IA precisa controlar regiões e intenções, não centenas de IDs de vértice.
-3. Proporção, pele, recortes e compilação são níveis diferentes.
-4. A procedência semântica precisa atravessar o backend e chegar à malha.
-5. A carroceria deve ser avaliada durante a construção, não somente no final.
-6. O backend geométrico deve ser substituível pela IR; chamadas cruas de OCCT,
-   Blender ou outra biblioteca não devem ser o formato persistido do produto.
+A pergunta correta:
 
-Essas conclusões sobrevivem à escolha entre NURBS, SubD, B-rep ou DCC.
+> qual representação permite editar linha de ombro, capô, para-lama, caixa de
+> roda, teto e cintura como decisões relacionadas, porém independentes?
 
-### 10.3 Ataques à formulação inicial
+## 6. Sintomas e causa técnica
 
-#### Ataque A — curvas mestras podem recriar o tubo
+| Sintoma | Evidência | Causa técnica |
+|---|---|---|
+| carro parece cápsula ou barco | lateral e superior | uma seção elíptica por estação; sem controle regional |
+| rodas parecem externas | frontal e lateral | não existe abertura de caixa de roda; só borda do envelope |
+| para-lamas parecem volumes anexos | isométrica | corpos sobrepostos não compartilham superfície |
+| cabine parece pousada | lateral | interseção visual no lugar de transição de teto e coluna |
+| portas e dutos parecem placas | lateral | caixas chanfradas não seguem a superfície hospedeira |
+| faróis parecem barras | frente | sem alojamento nem abertura conformada |
+| mais faces não trouxeram realismo | métricas do protótipo | densidade gasta em anéis, não em decisões de forma |
+| gates passaram apesar da rejeição | relatório e feedback | perfil declarado F2 contra expectativa F3 |
 
-Uma lista de curvas laterais e transversais ainda pode formar somente uma pele
-global. Se toda alteração percorre a seção inteira, o sistema apenas substitui o
-`loft` por um loft mais sofisticado.
+Todas as linhas, exceto a última, têm a mesma raiz: **a superfície não tem
+topologia de controle**. A última é de processo.
 
-**Correção exigida:** curvas precisam pertencer a regiões e relações locais. A
-crista do para-lama, a borda do capô e a base do para-brisa são controles
-separados, conectados por restrições explícitas. “Curva mestra” não pode
-significar “mais uma seção do tubo”.
+## 7. Decisão de representação
 
-#### Ataque B — G2 não garante uma superfície bonita
+A representação de autoria da superfície exterior passa a ser:
 
-Duas superfícies podem passar numericamente em G2 e ainda apresentar ondulação,
-pinçamento ou distribuição ruim de curvatura.
+> **malha de controle de quadriláteros com vincos, avaliada por subdivisão
+> Catmull-Clark determinística, implementada no núcleo, sem dependência externa.**
 
-**Correção exigida:** além de continuidade de borda, medir fairness: variação de
-curvatura, inflexões, densidade de isocurvas, zebra e sensibilidade a pequenas
-mudanças dos controles.
+A malha final entregue a `mecanifica.malha-poligonal@1` é **produto compilado**
+dessa malha de controle, num nível de subdivisão declarado.
 
-#### Ataque C — patches podem explodir o custo cognitivo
+Em vocabulário do projeto: a `cage` é o artefato autoral e versionado; a malha
+tesselada é derivada, como o grafo de execução da R04 é derivado da receita.
 
-Uma carroceria com dezenas de patches, graus, nós e pesos pode ser tão ruim para
-a IA quanto centenas de vértices.
+### 7.1 Por que esta é a escolha certa para este alvo
 
-**Correção exigida:** a interface comum deve expor handles semânticos e objetivos
-locais. Grau, nós, pesos e tolerâncias ficam disponíveis para diagnóstico ou
-escape hatch, mas não são a linguagem principal.
+**1. É o pipeline real da indústria para o alvo declarado.** Carroceria de
+veículo como ativo de jogo ou de filme é modelada com subdivisão sobre uma malha
+de quads com vincos. Não é uma aposta: é o método padrão de estúdio, e é
+exatamente o alvo do documento — ativo de jogo visto de perto, não peça de
+fabricação.
 
-#### Ataque D — trims e booleanas quebram identidade
+**2. Resolve os sintomas por topologia, não por sobreposição.** Numa malha de
+controle única, para-lama, lateral e capô são regiões da *mesma* superfície,
+ligadas por loops de aresta. A continuidade deixa de ser algo a declarar e
+verificar entre corpos: ela é propriedade da superfície limite. A caixa de roda
+deixa de ser aproximada pela borda e passa a ser um loop fechado com borda
+retornada para dentro — abertura real, com espessura visível.
 
-Depois de cortar uma caixa de roda, uma face pode ser dividida em várias; depois
-de alterar a curva, a contagem pode mudar novamente.
+**3. Entrega o requisito de otimização.** Subdivisão é a tecnologia que dá
+superfície suave a partir de poucos controles. Uma cage de carroceria na casa de
+300 a 500 quads produz, no nível 2, uma malha na casa de 5 a 8 mil faces com
+silhueta correta. O protótipo rejeitado gastou 1.056 faces para não chegar a
+lugar nenhum, porque a densidade estava na amostragem de um modelo errado, não
+na forma. Vincos semi-agudos reduzem ainda mais: uma linha de caráter vira um
+atributo de aresta, dispensando os loops de suporte que dobrariam a cage.
 
-**Correção exigida:** identidade pertence à feature e à região de intenção. A
-saída carrega linhagem `feature → regiões resultantes → faces tesselladas`, com
-estado explícito para divisão, fusão ou desaparecimento.
+**4. Resolve o problema de identidade que a versão 0 declarou insolúvel.** A
+seção 11 da versão 0 dizia que nenhuma biblioteca resolve topological naming
+sozinha. Isso é verdade para booleanas e trims, e **falso para subdivisão**. Em
+Catmull-Clark, cada face de `n` lados gera exatamente `n` filhas por nível, em
+ordem determinística. A linhagem `face da cage → faces tesseladas` é uma função
+aritmética, não uma heurística de correspondência. Uma face de cage nomeada
+`paralama-dianteiro-esquerdo.crista` mantém procedência exata até a malha final,
+em qualquer nível, para sempre. Nenhuma outra alternativa avaliada oferece isso
+de graça.
 
-#### Ataque E — B-rep pode ser inadequado como única pele de jogo
+**5. Respeita `BLOCO = 1000` sem esticá-lo.** A cage cabe folgadamente no espaço
+de ids de passo. A malha subdividida nasce com identidade derivada da cage, o que
+é exatamente o que o `CLAUDE.md` exige quando proíbe índice como identidade.
 
-OCCT oferece recursos fortes de sólido e superfície, mas uma API CAD extensa não
-é automaticamente produtiva para estilização, retopologia, UV e LOD.
+**6. Custo de implementação baixo e sob controle.** Catmull-Clark uniforme com
+vincos é um algoritmo pequeno, fechado e determinístico: pontos de face, pontos
+de aresta, reposicionamento de vértice, com as regras de vinco aplicadas por
+peso. Cabe no núcleo em JavaScript puro. Sem WASM, sem bundle novo, sem licença
+de terceiros, sem processo externo. Isso preserva `bancada.html`, o determinismo
+byte a byte e a independência do núcleo.
 
-**Correção exigida:** não decidir que B-rep será toda a autoria. Comparar uma
-pele paramétrica B-rep com uma cage SubD usando o mesmo briefing e a mesma saída.
+**7. LOD sai de graça.** Níveis 0, 1, 2 e 3 da mesma fonte, sem retopologia e sem
+segunda pipeline.
 
-#### Ataque F — SubD pode degradar recortes e painéis
+### 7.2 O que esta decisão não resolve
 
-Booleans sobre a malha de controle podem criar poles, triângulos e densidade
-irregular, prejudicando a superfície limite e a edição posterior.
+- não produz automaticamente uma forma bonita: cage ruim gera superfície ruim;
+- não substitui referência calibrada;
+- pontos extraordinários (valência diferente de 4) são G1, não G2, e podem
+  concentrar curvatura — a disciplina de topologia precisa mantê-los fora de
+  superfícies de classe visível;
+- não dá booleana robusta; recortes complexos permanecem questão separada;
+- não dá UV nem baking.
 
-**Correção exigida:** separar a pele primária dos detalhes compilados e testar
-se trims devem permanecer paramétricos até a tesselação, em vez de destruir a
-cage.
+## 8. Alternativas rejeitadas, com motivo
 
-#### Ataque G — preview pode ficar lento demais
+Rejeição aqui significa: fora do caminho de produção, com condição explícita de
+reabertura. Não significa que a tecnologia seja ruim.
 
-Uma interação correta, porém com segundos ou dezenas de segundos por pequena
-mudança, impede a IA de explorar e corrigir.
+### 8.1 Rejeitada — kernel CAD B-rep (OCCT / opencascade.js)
 
-**Correção exigida:** cada feature declara seu domínio de impacto; preview pode
-usar tesselação provisória e recompilar somente regiões dependentes. Qualidade
-final não precisa ser o custo de cada iteração.
+A versão 0 tratava OCCT como candidato principal. Isto está errado para este
+alvo, por cinco razões independentes:
 
-#### Ataque H — referência ainda pode dominar o erro
+1. **O requisito que justificaria B-rep não existe.** B-rep se paga quando é
+   preciso STEP, tolerância de fabricação ou interoperabilidade CAD. A seção 2
+   exclui fabricação. Pagar o custo de um kernel de sólidos por um ativo de jogo
+   ficcional é comprar a ferramenta errada.
+2. **B-rep e ativo de jogo são incompatíveis na saída.** A malha vem de
+   tesselação de superfícies aparadas, que produz triangulação irregular,
+   inadequada para jogo, sem loops de aresta e sem quads. O caminho realista
+   seria B-rep → tesselação → retopologia manual: duas conversões, e a segunda
+   descarta a identidade que a primeira preservava.
+3. **Superfície de estilo não é o forte de OCCT.** OCCT é kernel de sólidos
+   mecânicos. Blends e fillets falham em geometria marginal e exigem healing —
+   e é justamente na transição capô–para-lama, o caso difícil desta carroceria,
+   que essa fragilidade aparece.
+4. **Custo de distribuição incompatível.** O build completo de opencascade.js
+   está na casa de dezenas de megabytes de WASM. `bancada.html` é a única
+   aplicação publicada e hoje não carrega nenhum kernel. Builds customizados
+   reduzem, ao preço de manter uma toolchain de build C++/Emscripten no projeto.
+5. **Superfície de API contrária ao Agent-First.** Milhares de classes é o risco
+   15.3 deste próprio documento. Domar isso exigiria uma camada semântica que é,
+   sozinha, maior que a implementação nativa de subdivisão.
 
-Mesmo a melhor superfície não recupera uma forma 3D determinada a partir de uma
-perspectiva única.
+**Reabertura:** se surgir requisito real de exportação CAD, fabricação ou
+tolerância dimensional de peça mecânica. Nesse caso, B-rep entra como backend de
+*peças mecânicas*, não como pele exterior.
 
-**Correção exigida:** a camada de referência é parte da autoria: câmeras,
-landmarks, medidas, confiança e conflitos precisam ser dados, não memória do
-agente.
+### 8.2 Rejeitada — Blender headless como backend de produção
 
-### 10.4 Abordagem 1 revisada
+Viola de uma vez três invariantes já estabelecidos: determinismo verificável
+(estado `.blend` e ordem de modificadores não são reexecutáveis byte a byte),
+procedência semântica (identidade teria de atravessar objetos, modificadores e
+exportador) e distribuição (runtime externo grande, processo separado, sem
+caminho para o navegador).
 
-A reanálise transforma a proposta numa arquitetura de cinco camadas:
+**Papel mantido:** referência externa de teto visual. Um humano ou uma IA pode
+produzir em Blender a imagem-alvo da carroceria e usá-la como critério de
+aceitação. Isso é referência, não backend. É um uso legítimo e barato.
 
-#### Camada R — referência calibrada
+### 8.3 Rejeitada — SDF / implícito
+
+Bom para composição volumétrica, blends orgânicos e cavidades; ruim exatamente
+no que esta carroceria exige: painéis finos, vincos controlados, gaps precisos e
+bordas. A extração de superfície gera densidade alta e destrói identidade de
+face. Tende a produzir formas derretidas.
+
+**Reabertura:** para formas orgânicas onde painel e vinco não sejam requisito.
+
+### 8.4 Rejeitada — kernel próprio completo de B-rep
+
+Predicados robustos, tolerâncias, degenerações e nomeação topológica. Risco e
+tempo desproporcionais. Registrada para não ser confundida com independência.
+
+Note-se a assimetria com a decisão da seção 7: implementar **Catmull-Clark** não
+é implementar um kernel. É um algoritmo local, sem predicados de robustez, sem
+interseção e sem tolerância global. A diferença de risco é de ordens de grandeza.
+
+### 8.5 Adiada — booleana de malha (Manifold)
+
+Manifold é a escolha certa *se* booleana for necessária: saída manifold para
+entrada manifold, e rastreio de propriedades através da operação.
+
+Mas a decisão de arquitetura é mais forte:
+
+> **A pele primária nunca sofre booleana.** Caixa de roda, recorte de vidro e
+> vão de porta são feitos por topologia da cage — loop fechado, borda retornada
+> — não por subtração.
+
+Isso elimina o ataque F da versão 0 na origem: booleana sobre cage destrói a
+malha de controle, cria polos e degrada a superfície limite. Booleana fica
+disponível apenas para features secundárias, depois da subdivisão, e só entra no
+projeto quando um caso concreto provar que a topologia da cage não resolve.
+
+### 8.6 Rejeitado como método — o bake-off de três kernels
+
+A versão 0 propunha modelar o mesmo quarto dianteiro em B-rep, SubD e Blender. O
+custo é uma rodada inteira em três pilhas, e duas delas já são elimináveis por
+requisito e custo, como as seções 8.1 e 8.2 mostram. Um experimento que confirma
+uma rejeição já derivável não gera informação; consome orçamento.
+
+A prova da seção 14 substitui o bake-off: uma rota, o caso difícil de verdade,
+critério de descarte declarado.
+
+## 9. Arquitetura em cinco camadas
+
+### Camada R — referência calibrada
 
 - imagens, câmeras e escala conhecidas;
 - landmarks 2D/3D com confiança e fonte;
-- dimensões rígidas: rodas, eixos, wheelbase, bitola e envelope;
+- dimensões rígidas: rodas, eixos, entre-eixos, bitola e envelope;
 - divergências entre referências registradas, não suavizadas em silêncio.
 
-#### Camada I — intenção e dependências
+Referência é dado do sistema, não memória do agente.
 
-- regiões: capô, para-lama, lateral, teto e aberturas;
-- handles: crista, linha de ombro, cintura, arco e bordas;
-- restrições locais e dependências direcionadas;
-- simetria como restrição removível, não cópia irreversível;
-- objetivos como posição, tangência, curvatura, fairness e folga.
+### Camada I — intenção e topologia de controle
 
-#### Camada S — representação de superfície
+Esta é a camada que a versão 0 deixou abstrata (“região + handle + restrição”) e
+que agora tem forma concreta. A unidade editável é o **loop de arestas nomeado**
+sobre a cage:
 
-- backend candidato B-spline/B-rep ou SubD;
-- fronteiras compartilhadas e continuidade verificável;
-- domínio paramétrico e regiões semanticamente nomeadas;
-- pele primária preservada antes de detalhes destrutivos.
+| Intenção do autor | Objeto na cage |
+|---|---|
+| linha de ombro | loop longitudinal nomeado |
+| arco da caixa de roda | loop fechado com borda retornada |
+| crista do para-lama | loop com vinco parcial |
+| cintura | loop longitudinal |
+| base do para-brisa | loop transversal |
+| linha de caráter | vinco semi-agudo sobre um loop |
 
-#### Camada F — features e detalhes
+Isso resolve o ataque A da versão 0 — curvas mestras recriando o tubo. Um loop
+pertence a uma região e tem extensão finita; mover a crista do para-lama entre as
+estações do eixo dianteiro não toca a base do para-brisa, porque são loops
+distintos, com domínio distinto. Não existe seção global que force acoplamento.
 
-- trims, caixas de roda, gaps, dutos, alojamentos e retornos;
+### Camada S — superfície
+
+- cage de quads com vincos, versionada e endereçável;
+- avaliação Catmull-Clark determinística por nível declarado;
+- continuidade como propriedade da superfície limite, não como restrição a
+  verificar entre corpos;
+- pontos extraordinários inventariados e mantidos fora de superfície de classe
+  visível.
+
+### Camada F — features e detalhes
+
+- aberturas por topologia da cage: caixa de roda, vidro, vão de porta, entrada;
+- retorno de borda por extrusão para dentro, dando espessura visível;
+- alojamentos e dutos como features secundárias, aplicadas após subdivisão;
 - histórico não destrutivo e ordenado;
-- linhagem de identidade através de divisões e fusões;
-- falha local com causa, feature e sugestão de correção.
+- falha local com causa, feature e correção sugerida.
 
-#### Camada C — compilação e apresentação
+### Camada C — compilação e apresentação
 
-- tesselação por tolerância e distância;
-- normais, tangentes, UV/material e LOD;
-- malha atual como produto compilado;
-- preview incremental, diff visual e commit condicionado aos gates.
+- subdivisão até o nível declarado, com linhagem aritmética preservada;
+- LOD por nível, da mesma fonte;
+- normais e sombreamento derivados da superfície limite, não da cage;
+- `mecanifica.malha-poligonal@1` como produto compilado;
+- preview em nível baixo, publicação em nível alto.
 
-O ganho principal é separar **o que a IA quer mudar** de **como o kernel calcula
-a superfície**. A primeira formulação dizia “curvas e patches”; a revisão define
-onde vivem referência, intenção, superfície, features e compilação, e quais
-perdas não podem atravessar essas fronteiras.
+## 10. Interação mínima desejada
 
-### 10.5 Interação mínima desejada para a IA
-
-Uma alteração típica deveria poder ser expressa assim, conceitualmente:
+Uma alteração típica, conceitualmente:
 
 ```text
-alvo: para-lama-dianteiro-esquerdo.crista
-mudança: elevar 0,025 m na estação do eixo
+alvo: paralama-dianteiro-esquerdo.crista        # um loop nomeado
+mudança: elevar 0,025 m nas estações 4 a 7      # domínio finito e explícito
 preservar:
   - arco-da-roda.folga
-  - capô.borda-central
-  - para-brisa.base
-continuidade:
-  com capô: G2
-  com lateral: G1
+  - capo.borda-central
 validar:
   - lateral
   - frontal
@@ -729,307 +454,229 @@ validar:
   - zebra-isometrica
 ```
 
-O sistema derivaria curvas, patches e regiões afetadas, produziria preview e
-mostraria violações antes de publicar. Essa forma ainda não é schema; ela serve
-para testar se uma alternativa reduz esforço cognitivo de verdade.
+O sistema resolve o loop, aplica o deslocamento no domínio declarado, subdivide
+no nível de preview e mostra violações antes de publicar. Isto não é schema
+ainda; serve para testar se a linguagem reduz esforço cognitivo de verdade.
 
-### 10.6 Bake-off refinado
+O ganho sobre a versão 0 é que cada termo aqui já tem correspondente concreto na
+representação escolhida. `crista` é um loop; `estações 4 a 7` é um intervalo de
+arestas do loop; `folga` é medida entre malha e envelope de roda.
 
-O quarto dianteiro será produzido por três rotas:
+## 11. Identidade e procedência
 
-| Rota | Pele | Recorte/fechamento | Papel |
-|---|---|---|---|
-| A | B-spline/NURBS | OCCT B-rep | maior teto CAD/superfície |
-| B | cage SubD | Manifold ou feature não destrutiva | maior aderência a jogo |
-| C | Blender headless | modifiers/booleans do DCC | controle externo de produtividade |
+A subdivisão resolve a linhagem principal por aritmética:
 
-Todas recebem os mesmos landmarks, handles, dimensões, alterações e vistas. O
-teste não permite que cada backend modele um carro diferente ou receba ajuda
-manual desigual.
+- cada face de `n` lados gera `n` filhas por nível, em ordem determinística;
+- a linhagem `face da cage → faces do nível k` é função, não correspondência;
+- o nome semântico vive na cage e é herdado, não recalculado.
 
-### 10.7 Como julgar se a reanálise ajudou
+O que continua exigindo política explícita:
 
-| Critério | Antes | Depois desta revisão |
-|---|---|---|
-| unidade editável | “curvas e patches” | região + handle + restrição + feature |
-| referência | entrada visual implícita | camada calibrada com confiança |
-| continuidade | G0/G1/G2 | continuidade + fairness + zebra |
-| identidade | requisito geral | linhagem explícita entre feature e faces |
-| backend | OCCT como candidato forte | bake-off simétrico B-rep/SubD/DCC |
-| iteração | não definida | preview incremental por domínio de impacto |
-| saída | tesselação | compilação com LOD, atributos e gates |
-| falha | kernel recusa | diagnóstico localizado na feature/intenção |
+- edição da própria cage: inserir ou remover um loop muda a contagem de faces da
+  cage e precisa de diff que distinga “forma mudou” de “topologia mudou”;
+- features secundárias pós-subdivisão, se e quando existirem;
+- desaparecimento de região por edição, com estado explícito.
 
-**Ganho material encontrado:** sim. A arquitetura ficou menos acoplada ao OCCT,
-passou a tratar referência e iteração como partes do sistema, identificou que
-G2 sozinho é insuficiente e transformou identidade/preview em contratos de
-fronteira. Também derivou um bake-off mais justo.
+Isso é bem menor que o problema geral de topological naming da versão 0, e é essa
+redução que torna a decisão da seção 7 defensável.
 
-**O que não foi resolvido:** schema da IR, algoritmo de fairness, backend
-vencedor, topological naming completo, tolerâncias, desempenho e licenças.
+## 12. Restrições do motor atual a respeitar
 
-**Decisão da rodada:** `revisar e manter como Abordagem 1`. Ela é mais forte que
-o envelope longitudinal, mas ainda não está pronta para implementação.
+1. **`BLOCO = 1000`.** A cage cabe; a malha subdividida não pode ser emitida como
+   passo posicional. A subdivisão é compilação com identidade derivada.
+2. **Núcleo neutro.** Nenhum vocabulário automotivo entra no motor. A operação é
+   `subdividir` sobre malha de quads; `paralama` vive na receita e na montagem.
+3. **Determinismo byte a byte.** A avaliação precisa produzir a mesma saída no
+   mesmo nível, sempre; o gate de exportação já cobre isso.
+4. **Receitas existentes intactas.** A subdivisão é aditiva; nenhuma peça atual
+   muda de bytes.
+5. **Catálogo público vazio.** A prova vive em zona privada.
 
-### 10.8 Confiança depois da reanálise
+## 13. Validação visual com limiares
 
-| Afirmação | Confiança |
-|---|---:|
-| abandonar envelope longitudinal como fonte principal | 95% |
-| grafo semântico com regiões, handles e features | 92% |
-| separar representação rica da malha compilada | 92% |
-| curvas/pele controlável como base do exterior | 84% |
-| bake-off B-rep/SubD/DCC como próxima prova | 90% |
-| OCCT como único backend | 58% |
-| arquitetura híbrida como teto de longo prazo | 78% |
+A validação separa oito eixos; o erro da sonda foi deixar 1, 2 e 7 aprovarem por
+3, 4 e 8:
 
-As porcentagens são juízo arquitetural explícito, não estatística. A próxima
-rodada deve aumentá-las ou reduzi-las por evidência comparativa.
-
-## 11. O problema de identidade que nenhuma biblioteca resolve sozinha
-
-O projeto exige identidade semântica estável. Booleanas e trims mudam a
-topologia: uma face pode ser dividida, removida ou recriada. IDs de face do
-kernel ou índices da malha não podem virar identidade persistida.
-
-O plano futuro precisará definir:
-
-- feature de origem: `paralama-dianteiro-esquerdo`, `recorte-caixa-roda`;
-- regiões esperadas da saída: exterior, retorno interno, borda do recorte;
-- linhagem um-para-muitos e muitos-para-um;
-- política quando uma região desaparece;
-- seleção por intenção e procedência, com a topologia apenas como resolução;
-- diff e diagnóstico quando o kernel não consegue mapear a história.
-
-Esse é um requisito central, não um detalhe posterior de MCP ou UI.
-
-## 12. O problema de validação visual
-
-As próximas provas não podem usar apenas “PNG válido”, “não cortado” ou “vistas
-distintas”. Esses gates verificam infraestrutura de captura.
-
-Uma validação de carroceria precisa separar:
-
-1. **integridade:** receita/IR executa, fecha e exporta;
+1. **integridade:** executa, fecha e exporta;
 2. **dimensão:** rodas, eixos, balanços e envelope obedecem ao briefing;
-3. **silhueta:** contorno por vista aproxima referências calibradas;
-4. **superfície:** costuras, reflexos e curvatura não denunciam patches ruins;
-5. **topologia:** trims, gaps e cavidades existem de verdade;
+3. **silhueta:** contorno por vista aproxima a referência calibrada;
+4. **superfície:** curvatura e reflexão não denunciam topologia ruim;
+5. **topologia:** aberturas existem de verdade, com retorno de borda;
 6. **semântica:** regiões continuam endereçáveis e comparáveis;
 7. **apresentação:** material e iluminação permitem enxergar a forma;
-8. **aceite:** usuário ou crítico autorizado aprova explicitamente o marco.
+8. **aceite:** o usuário aprova explicitamente o marco.
 
-Métricas candidatas a investigar:
+Métricas a instrumentar:
 
 - IoU e distância de Hausdorff entre silhuetas por vista;
 - desvio de landmarks projetados;
-- diferença angular G1 e diferença de curvatura G2 nas costuras;
-- zebra/reflection lines e mapas de curvatura;
+- zebra e mapa de curvatura sobre a superfície limite;
+- inventário de pontos extraordinários em superfície visível;
+- razão entre faces da cage e faces compiladas — mede se a densidade está na
+  decisão de forma ou na amostragem;
 - contagem de gaps, overlaps e self-intersections;
-- erro de espessura e raio mínimo;
-- tempo, tokens, operações e correções até o aceite;
-- estabilidade de hash sob replay e tesselação repetida.
+- estabilidade de hash sob replay.
 
-Os limiares ainda não existem e não devem ser inventados nesta rodada.
+Os limiares numéricos são fixados na rodada P0, junto com a referência
+calibrada, e antes de modelar. Fixá-los depois repetiria o erro de 2026-08-18.
 
-## 13. Prova comparativa proposta para uma rodada futura
+## 14. Prova decisiva — uma rota, o caso difícil
 
-Antes de um carro completo, cada abordagem deverá construir o mesmo recorte
-neutro: um quarto dianteiro de carroceria com:
+Substitui o bake-off. Escopo: **um quarto dianteiro**, em cage manual mais
+subdivisão, num diretório privado descartável.
+
+Deve conter, obrigatoriamente:
 
 - plano de simetria;
-- roda e envelope de esterçamento somente como contexto;
-- capô, para-lama e lateral;
-- arco de roda realmente aberto;
-- transição capô–para-lama com continuidade declarada;
-- uma linha de caráter controlada;
+- capô, para-lama e lateral como regiões da mesma superfície;
+- arco de roda realmente aberto, com retorno de borda;
+- transição capô–para-lama sem corpo sobreposto;
+- uma linha de caráter por vinco semi-agudo;
 - recorte de farol conformado;
-- espessura ou retorno de borda conforme o perfil escolhido;
-- identidades semânticas preservadas até a malha final.
+- identidades semânticas preservadas da cage até a malha compilada;
+- uma alteração local (`elevar a crista 25 mm`) reexecutada por outra sessão.
 
-A mesma tecnologia também deverá provar uma forma não automotiva — por exemplo,
-casco, carenagem industrial ou eletrodoméstico — para evitar um kernel com
-vocabulário específico de carro.
+Medidas a registrar: faces da cage, faces por nível, bytes, tempo de avaliação,
+erro de silhueta contra a referência calibrada, pontos extraordinários visíveis e
+custo de contexto da alteração.
 
-Saídas comparáveis:
+**Critério de descarte, declarado antes:** se a cage exigir mais de
+aproximadamente 800 quads para o quarto dianteiro, ou se o arco de roda não puder
+ser aberto sem booleana, ou se a alteração local exigir tocar mais de um loop
+nomeado, a decisão da seção 7 é reaberta e o bake-off volta à mesa.
 
-- fonte de autoria;
-- grafo de features;
-- malha tessellada no mesmo erro máximo;
-- vistas ortográficas, isométrica e zebra;
-- relatório de continuidade e topologia;
-- tempo, memória, bundle, bytes persistidos e custo de contexto;
-- alteração local repetida por outra sessão de IA.
+A mesma tecnologia deve também produzir uma forma não automotiva — casco,
+carenagem industrial ou eletrodoméstico — para provar que a representação não
+carrega vocabulário de carro.
 
-## 14. Trade-offs que precisam de decisão explícita
+## 15. Perguntas ainda sem resposta
 
-| Decisão | Ganho | Custo ou risco |
-|---|---|---|
-| B-rep em vez de malha como fonte | trims, shell, CAD, precisão | kernel pesado, API complexa, naming |
-| SubD como fonte | forma visual e edição de cage | cortes, precisão e semântica de painel |
-| backend externo | teto visual imediato | instalação, processo, determinismo e licença |
-| WASM no navegador | autoria local uniforme | download, compilação e memória |
-| kernel apenas em Node | bancada leve | preview requer compilação/serviço |
-| múltiplas representações | teto amplo | conversão, procedência e manutenção |
-| malha final como única verdade | simplicidade | perde intenção e editabilidade de alto nível |
-| IR própria acima do kernel | identidade e portabilidade | desenho de schema e adaptadores |
-| fidelidade F3 | inspeção próxima convincente | autoria, polígonos, materiais e validação maiores |
-| alvo ficcional | liberdade e menor risco de cópia | referência técnica precisa ser criada |
+As perguntas abaixo permanecem abertas e são endereçadas na P0. As que a versão 0
+listava sobre kernel externo, execução WASM e exportação CAD foram fechadas pelas
+seções 7 e 8.
 
-## 15. Riscos de projeto
+1. Quais dimensões rígidas o carro tem: entre-eixos, bitola, diâmetro de roda,
+   balanços e altura?
+2. Qual distância mínima de observação precisa sustentar a ilusão?
+3. Painéis precisam de espessura física ou basta retorno de borda visível?
+4. Portas, capô e asa precisarão mover, ou apenas ser selecionáveis?
+5. Quais vistas e referências constituem verdade, e como serão calibradas?
+6. Qual orçamento de faces compiladas é aceitável para o carro completo?
 
-### 15.1 Trocar o motor sem trocar o processo
+## 16. Riscos
 
-Um kernel poderoso ainda pode produzir um carro ruim se a referência continuar
-subespecificada e o aceite continuar subjetivo e tardio.
+**16.1 Trocar a representação sem trocar o processo.** Uma cage boa ainda produz
+carro ruim se a referência continuar subespecificada e o aceite continuar tardio.
+Por isso P0 vem antes de qualquer modelagem.
 
-### 15.2 Construir uma fachada sem representação
+**16.2 Cage mal construída.** Subdivisão não perdoa topologia ruim: polos em
+superfície visível aparecem como amassados no reflexo. Exige disciplina de quads
+e inventário de pontos extraordinários.
 
-Schemas bonitos como `criarParalama` não aumentam o teto se forem compilados
-para os mesmos balões sobrepostos.
+**16.3 Reintroduzir o tubo com outro nome.** Uma cage gerada por varredura de
+seções é o mesmo erro com mais vértices. A cage precisa nascer de regiões e
+loops, não de estações.
 
-### 15.3 Expor a API bruta do kernel à IA
+**16.4 Chamar densidade de qualidade.** Toda métrica de custo precisa estar
+ligada a ganho visual ou semântico observável.
 
-Milhares de classes CAD ou detalhes de half-edge aumentariam contexto e chance
-de erro. A integração precisa de uma camada Agent-First menor, descobrível e
-diagnosticável.
-
-### 15.4 Perder a identidade conquistada
-
-Migrar para uma biblioteca que devolve faces novas sem linhagem pode elevar a
-imagem e degradar manutenção, diff e revalidação.
-
-### 15.5 Otimizar bundle antes de provar a forma
-
-Bundle importa para `bancada.html`, mas um kernel leve incapaz do alvo não é
-ganho. A ordem correta é provar capacidade em spike isolado, medir e só então
-decidir onde executá-la.
-
-### 15.6 Chamar densidade de qualidade
-
-O protótipo aumentou faces e bytes sem alcançar o alvo. Toda métrica de custo
-deve ser relacionada a um ganho visual ou semântico observável.
-
-## 16. Rodadas de maturação deste plano
-
-As rodadas abaixo refinam o documento; não constituem implementação do produto.
-
-### P0 — definição do alvo
-
-- resolver “chassi” versus “carroceria”;
-- fixar perfil, distância, plataforma e uso;
-- reunir referência ortográfica e dimensional suficiente;
-- escrever condições de rejeição visual antes de modelar.
-
-### P1 — matriz de capacidade existente
-
-- provar o que cada operação atual consegue ou não consegue no quarto dianteiro;
-- separar ausência de representação, ausência de operação e ausência de workflow;
-- registrar contornos legítimos e seus custos.
-
-### P2 — pesquisa e bake-off dos kernels
-
-- definir versões, licenças e ambientes candidatos;
-- executar o mesmo spike em B-rep, SubD/mesh e backend externo;
-- medir forma, robustez, identidade, tempo, contexto e custo.
-
-### P3 — IR, persistência e identidade
-
-- desenhar somente o mínimo de artefatos ricos exigidos pelo vencedor;
-- resolver procedência e naming em operações destrutivas;
-- testar replay, diff e alteração por outra sessão.
-
-### P4 — integração e operação
-
-- decidir Node, WASM/browser, worker ou processo externo;
-- medir bundle, memória, cache, falha, isolamento e distribuição;
-- definir relação com registro de capacidades, extensão nativa e MCP.
-
-### P5 — plano executivo
-
-- escolher uma arquitetura;
-- dividir implementação em fatias reversíveis;
-- declarar baseline, migração, gates, rollback e condição de encerramento;
-- pedir aprovação explícita antes de alterar o produto.
+**16.5 Perder identidade em features secundárias.** Se booleana entrar depois,
+ela precisa chegar com política de linhagem pronta, não improvisada.
 
 ## 17. Gate de prontidão para implementação
 
-O plano só pode mudar para `pronto` quando todos os itens abaixo tiverem resposta
-com evidência:
+O plano vira `pronto` quando todos os itens tiverem evidência:
 
-- alvo e nível de fidelidade inequívocos;
-- referências calibradas suficientes;
-- recorte comparativo e métricas aprovados;
-- ao menos duas abordagens comparadas no mesmo problema;
-- representação autoral escolhida e alternativas rejeitadas com motivo;
-- estratégia de identidade/topological naming;
-- contrato entre representação rica e `mecanifica.malha-poligonal@1`;
-- ambiente de execução e impacto de distribuição medidos;
-- licença e dependências revisadas;
-- gates visuais e geométricos com limiares;
+- alvo e nível de fidelidade inequívocos, com perfil de autoria declarado antes
+  de modelar;
+- referências calibradas suficientes e limiares numéricos fixados;
+- prova da seção 14 executada, com todas as medidas registradas;
+- critério de descarte avaliado explicitamente, com resultado `manter` ou
+  `reabrir`;
+- contrato entre cage e `mecanifica.malha-poligonal@1` escrito;
+- política de identidade para edição de cage e para features secundárias;
+- impacto medido em bundle, tempo de execução e bytes exportados;
 - plano de migração que preserve receitas e baseline existentes;
-- protótipo local rejeitado classificado como descarte, reaproveitamento ou
+- destino do protótipo local rejeitado decidido: descarte, reaproveitamento ou
   evidência histórica.
 
-Hoje, nenhum desses itens está completo o bastante para autorizar implementação.
+Hoje nenhum item está completo. Não há plano ativo de implementação.
 
-## 18. Pesquisa técnica inicial, sem decisão
+## 18. Confiança nas afirmações desta versão
 
-Fontes primárias consultadas nesta versão:
+| Afirmação | Confiança |
+|---|---:|
+| abandonar o envelope longitudinal como fonte | 98% |
+| a malha compilada não pode ser a fonte de autoria | 95% |
+| cage de quads + subdivisão é a representação certa para o alvo | 90% |
+| o loop de aresta nomeado é a unidade editável correta | 88% |
+| subdivisão resolve a linhagem principal por aritmética | 95% |
+| B-rep/OCCT é a ferramenta errada para carroceria de jogo | 88% |
+| Blender headless é incompatível como backend de produção | 92% |
+| a pele primária não deve sofrer booleana | 90% |
+| Catmull-Clark nativo é implementável sem risco de kernel | 90% |
+| o bake-off de três rotas não vale o custo | 85% |
 
-- [OCCT — visão geral dos algoritmos de modelagem](https://dev.opencascade.org/doc/overview/html/index.html):
-  documenta curvas/superfícies livres, NURBS, sewing, sweeps, lofts, booleans,
-  shelling, fillets e tesselação B-rep.
-- [OCCT — formato B-rep](https://dev.opencascade.org/doc/overview/html/specification__brep_format.html):
-  distingue vértices, arestas, wires, faces, shells, sólidos e triangulações.
+São juízos arquiteturais explícitos, não estatística. A prova da seção 14 deve
+mover os três primeiros para cima ou reabrir a decisão.
+
+## 19. Fontes técnicas
+
+- [OCCT — visão geral](https://dev.opencascade.org/doc/overview/html/index.html)
+  e [formato B-rep](https://dev.opencascade.org/doc/overview/html/specification__brep_format.html):
+  base da avaliação da seção 8.1.
 - [OpenCascade.js](https://dev.opencascade.org/project/opencascadejs): bindings
-  JavaScript/WASM e builds customizados; a documentação de tamanho registra
-  custo relevante do build completo.
-- [OCCT — licença](https://dev.opencascade.org/doc/overview/html/index.html):
-  LGPL 2.1 com exceção adicional e obrigações de distribuição a revisar.
-- [Manifold](https://github.com/elalish/manifold): booleanas sobre malhas
-  manifold, bindings JS/WASM e rastreamento de propriedades/proveniência.
-- [OpenSubdiv](https://github.com/PixarAnimationStudios/OpenSubdiv): avaliação
-  de superfícies de subdivisão em CPU/GPU, incluindo refinamento adaptativo.
+  WASM e o custo de build que motiva a rejeição por distribuição.
+- [Manifold](https://github.com/elalish/manifold): booleana manifold com
+  rastreio de propriedades — opção adiada da seção 8.5.
+- [OpenSubdiv](https://github.com/PixarAnimationStudios/OpenSubdiv): referência
+  de comportamento para subdivisão com vincos e refinamento adaptativo. É
+  referência de algoritmo, não dependência proposta.
 - [Three.js `NURBSSurface`](https://threejs.org/docs/pages/NURBSSurface.html):
-  avaliador de superfície disponível como addon; por si só não fornece B-rep,
-  trimming, sewing, booleans ou história semântica.
+  avaliador isolado, sem B-rep, trimming, costura ou história semântica.
 
-Essas fontes demonstram que as famílias de tecnologia existem. Elas não provam
-compatibilidade, estabilidade, desempenho ou adequação Agent-First neste projeto.
+## 20. Estado do workspace
 
-## 19. Estado do workspace durante esta redação
+O workspace contém alterações locais não integradas da tentativa rejeitada: modo
+`secoes` experimental em `inflate`, testes focados, receita de carroceria por
+três envelopes e imagens regeneradas. Não são baseline, não estão aprovadas e não
+devem ser publicadas. A destinação é decidida no gate da seção 17.
 
-O workspace contém alterações locais não integradas da tentativa rejeitada:
-
-- modo `secoes` experimental em `inflate`;
-- testes focados desse modo;
-- receita de carroceria por três envelopes;
-- cinco imagens globais regeneradas;
-- rascunho anterior de plano apontando essa direção.
-
-Esses arquivos não são baseline, não estão aprovados e não devem ser publicados
-ou usados para atualizar expectativas. Esta versão do plano não remove nem
-integra essas alterações; a destinação será decidida explicitamente em rodada
-posterior para preservar evidência e evitar perda acidental.
-
-## 20. Registro das rodadas
+## 21. Registro das rodadas
 
 ### Versão 0 — 2026-08-18
 
 - consolidou evidência do baseline e do protótipo rejeitado;
 - formulou o problema em referência, representação, história e validação;
-- inventariou capacidades ausentes sem convertê-las em backlog automático;
-- comparou seis famílias de abordagem;
-- registrou a hipótese híbrida como maior teto, sem decisão;
-- definiu rodadas de maturação e gate que impede implementação prematura.
+- comparou seis famílias de abordagem sem decidir;
+- propôs bake-off de três kernels.
+
+### Versão 1 — 2026-08-19
+
+Mudanças materiais em relação à versão 0:
+
+1. **Decisão de representação fechada:** cage de quads com vincos + Catmull-Clark
+   nativo, com a malha compilada como produto derivado.
+2. **OCCT/B-rep rejeitado** por requisito ausente, incompatibilidade com saída de
+   jogo, fragilidade em superfície de estilo, custo de distribuição e superfície
+   de API. Reabertura condicionada a requisito CAD.
+3. **Blender headless rejeitado** como backend e mantido como referência visual.
+4. **Bake-off de três rotas eliminado** e substituído por uma prova única com
+   critério de descarte declarado.
+5. **Unidade editável definida:** loop de aresta nomeado, com domínio finito —
+   fecha o ataque A da versão 0.
+6. **Booleana proibida na pele primária** — fecha o ataque F na origem.
+7. **Identidade reformulada:** a linhagem principal passa a ser aritmética; a
+   afirmação da versão 0 de que nenhuma biblioteca resolve o problema vale para
+   booleana, não para subdivisão.
+8. **`BLOCO = 1000` registrado** como restrição de arquitetura, lido em
+   `nucleo.js:33`, com a consequência de que a malha densa é produto compilado.
+9. **Causa raiz citada do código:** a carroceria é um `loft` de nove seções
+   elípticas, não uma aproximação a refinar.
+10. **Perfil de autoria identificado como causa do falso positivo:** a sonda
+    declarava `F2 conceitual, orcamentoFaces 1400` e foi julgada contra F3.
 
 ### Próxima revisão esperada
 
-Debater, nesta ordem:
-
-1. definição exata de `chassi realista`;
-2. aceitabilidade de kernel externo e execução Node/WASM;
-3. quais referências e métricas podem representar a expectativa do usuário;
-4. se o bake-off deve comparar B-rep, SubD/mesh e Blender headless;
-5. quais partes deste documento são excessivas, ausentes ou baseadas em hipótese.
+P0: fixar dimensões rígidas, referência calibrada, limiares numéricos e perfil de
+autoria esperado, antes de qualquer modelagem.

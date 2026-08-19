@@ -104,12 +104,18 @@ aplicação publicada aqui.
   [`RELATORIO-SONDA-SUPERCARRO-1-0.md`](RELATORIO-SONDA-SUPERCARRO-1-0.md)
   (`docs/mecanifica/RELATORIO-SONDA-SUPERCARRO-1-0.md`).
 - A qualidade visual da carroceria foi reprovada depois desse fechamento. O
-  novo [plano de maturação do chassi realista](planos/2026-08-18-chassi-realista-kernel-geometrico.md)
+  [plano do chassi realista](planos/2026-08-18-chassi-realista-kernel-geometrico.md)
   (`docs/mecanifica/planos/2026-08-18-chassi-realista-kernel-geometrico.md`)
-  está em `rascunho` e não autoriza implementação. O problema, as evidências e
-  as alternativas de kernel estão no
+  está em `rascunho` e não autoriza implementação. A causa raiz é de
+  representação, não de refino: a carroceria rejeitada é um único `loft` de nove
+  seções elípticas. A representação de autoria já foi decidida no
   [`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md)
-  (`docs/mecanifica/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`).
+  (`docs/mecanifica/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`): malha de
+  controle de quadriláteros com vincos, avaliada por subdivisão Catmull-Clark
+  nativa, com a malha densa como produto compilado e a unidade editável no loop
+  de aresta nomeado. OCCT/B-rep, Blender headless, SDF e kernel próprio estão
+  rejeitados com motivo e condição de reabertura. Falta a prova descartável do
+  quarto dianteiro e os limiares de referência.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

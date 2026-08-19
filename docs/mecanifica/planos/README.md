@@ -6,10 +6,14 @@
 
 **Plano em elaboração:**
 [`2026-08-18-chassi-realista-kernel-geometrico.md`](2026-08-18-chassi-realista-kernel-geometrico.md).
-Ele está em `rascunho`, não autoriza implementação e será revisto em
-várias rodadas antes de escolher representação ou kernel. O recorte anterior de
-`inflate` suave foi cancelado após reprovação visual e permanece somente como
-evidência local ainda não integrada.
+Ele está em `rascunho` e não autoriza implementação. A representação de autoria
+já foi decidida no dossiê: malha de controle de quadriláteros com vincos,
+avaliada por subdivisão Catmull-Clark nativa, com a malha densa como produto
+compilado. OCCT/B-rep, Blender headless, SDF e kernel próprio foram rejeitados
+com motivo e condição de reabertura; booleana fica proibida na pele primária. O
+que falta é a prova descartável do quarto dianteiro e os limiares de referência.
+O recorte anterior de `inflate` suave foi cancelado após reprovação visual e
+permanece somente como evidência local ainda não integrada.
 
 A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
 foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,

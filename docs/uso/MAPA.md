@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-459 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+461 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -226,6 +226,7 @@
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
+- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
@@ -320,6 +321,7 @@
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
+- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
