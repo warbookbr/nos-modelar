@@ -130,7 +130,11 @@ aplicação publicada aqui.
   ordenado derivado, porque o formato salvo não tem entidade aresta; a seção
   transversal é conferência e não geradora; e a malha compilada **não tem
   identidade persistida** — persistem a cage e o nome semântico, que a face já
-  carrega na linha canônica. Falta a prova descartável do quarto dianteiro.
+  carrega na linha canônica. A prova descartável do quarto dianteiro está em
+  execução no [plano P2](planos/2026-08-19-chassi-p2-prova-do-quarto.md)
+  (`docs/mecanifica/planos/2026-08-19-chassi-p2-prova-do-quarto.md`), em zona
+  privada e sem tocar o núcleo. A rodada Q1 entregou Catmull-Clark determinística
+  com vinco semi-agudo, canto de retalho congelado e borda curva relaxando.
 - O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
   (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
   `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um

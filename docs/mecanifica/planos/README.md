@@ -2,7 +2,11 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-19-chassi-p2-prova-do-quarto.md`](2026-08-19-chassi-p2-prova-do-quarto.md).
+A prova descartável do quarto dianteiro, que confirma ou reabre a cage de quads
+com Catmull-Clark. Vive em zona privada, não toca o núcleo e tem critério de
+descarte declarado desde P0.
 
 A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída e
 fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-475 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+478 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -122,6 +122,11 @@
 - `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
 - `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
 - `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
+
+## autoria-assistida/experimentos/prova-cage-quarto-dianteiro/
+
+- `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
+- `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
 
 ## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/
 
@@ -332,6 +337,7 @@
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
 - `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
+- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
 - `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
 - `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
