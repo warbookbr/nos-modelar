@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-463 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+464 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -604,7 +604,8 @@
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
-- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — gera docs/mecanifica/img/chassi-p0-prancha.svg: a prancha ortográfica ALVO da rodada P0 do chassi realista. Não é a projeção de uma p…
+- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
+- `prancha.mjs` — prancha.mjs — motor de desenho de pranchas ortográficas alvo. Recebe uma especificação declarativa em milímetros e devolve SVG determinístico. Não conhece ca…
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
