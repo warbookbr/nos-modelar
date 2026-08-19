@@ -24,16 +24,17 @@ definir, editar e validar uma carroceria exterior F3 com controle local de forma
 continuidade, aberturas reais e história semântica, dentro de um orçamento de
 polígonos justificável.
 
-A causa raiz está lida no código, não inferida: a carroceria rejeitada é um único
-`loft` de nove seções elípticas com doze lados — 86 vértices. Uma varredura de
-elipse ao longo do comprimento. O protótipo seguinte, com três envelopes
-sobrepostos e 1.014 vértices, confirmou que densidade não corrige abstração.
+A causa raiz está lida no código: a carroceria rejeitada é um único `loft` de
+nove seções elípticas com doze lados — 86 vértices. O protótipo seguinte, com
+três envelopes sobrepostos e 1.014 vértices, confirmou que densidade não corrige
+abstração.
 
 Dois problemas independentes acompanham:
 
 - uma referência única em perspectiva não determina a forma 3D esperada;
 - a sonda declarava perfil `F2 conceitual, orcamentoFaces 1400` e foi julgada
   contra expectativa F3, sem limiar vinculante que impedisse o fechamento.
+Ambos foram resolvidos em P0.
 
 ## Decisão de representação
 
@@ -51,10 +52,9 @@ Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma fileira ext
 de geometria.
 
 Motivos completos no dossiê, seção 7. Em resumo: é o método padrão para o alvo
-declarado; resolve os sintomas por topologia e não por sobreposição; entrega o
-requisito de otimização, porque poucos controles geram superfície suave; resolve a
-linhagem de identidade por aritmética, já que cada face da cage gera filhas
-determinísticas por nível; respeita `BLOCO = 1000` sem esticá-lo; e custa um
+declarado; resolve os sintomas por topologia, não por sobreposição; poucos
+controles geram superfície suave, o que atende o requisito de otimização; a
+linhagem de identidade sai por aritmética; respeita `BLOCO = 1000`; e custa um
 algoritmo local em JavaScript puro, não um kernel.
 
 ### Rejeições registradas
@@ -88,18 +88,22 @@ algoritmo local em JavaScript puro, não um kernel.
 
 ## Rodadas
 
-### P0 — alvo, referência e limiares
+### P0 — alvo, referência e limiares — **fechada**
 
-Fixar antes de qualquer modelagem:
+Executada em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md).
 
-- dimensões rígidas: entre-eixos, bitola, diâmetro de roda, balanços, altura;
-- perfil de autoria esperado, declarado explicitamente como `F3`;
-- referência calibrada: vistas, câmeras, escala e landmarks com confiança;
-- limiares numéricos dos oito eixos de validação;
-- condições de rejeição visual, escritas antes de existir geometria.
+Entregou perfil `realistaApresentacao / F3 / dimensional` declarado antes de
+modelar, envelope e quinze landmarks, cinco curvas mestras, limiares numéricos
+dos oito eixos, oito condições de rejeição visual e orçamento por nível.
 
-Sem P0 não há como julgar P2. Foi a ausência desta rodada que produziu o falso
-positivo de 2026-08-18.
+Duas decisões valem registro aqui:
+
+- **Referência.** Não existe prancha calibrável, e o carro é ficcional — não há
+  original contra o qual medir erro. A referência vinculante passa a ser a
+  prancha ortográfica derivada dos landmarks de P0; a imagem em perspectiva fica
+  como direção estética, fora de todo gate.
+- **`BLOCO = 1000` virou limiar.** A cage completa, teto de 2800 quads, não cabe
+  num passo: é emitida por regiões, 900 vértices e 900 faces cada.
 
 ### P1 — contrato da cage
 
@@ -125,9 +129,8 @@ Um quarto dianteiro, em zona privada, contendo obrigatoriamente:
 
 Medir: faces da cage, faces por nível, bytes, tempo de avaliação, erro de
 silhueta, pontos extraordinários visíveis e custo de contexto da alteração.
-
-Também produzir uma forma não automotiva — casco, carenagem ou eletrodoméstico —
-para provar que a representação não carrega vocabulário de carro.
+Produzir também uma forma não automotiva, para provar que a representação não
+carrega vocabulário de carro.
 
 **Critério de descarte, declarado antes:** a decisão é reaberta se a cage exigir
 mais de aproximadamente 800 quads para o quarto dianteiro, se o arco de roda não
@@ -148,20 +151,16 @@ loop nomeado.
 
 ## Validação
 
-Oito eixos independentes, com limiares fixados em P0: integridade, dimensão,
-silhueta, superfície, topologia, semântica, apresentação e aceite. O erro anterior
-foi deixar integridade, dimensão e apresentação aprovarem por silhueta, superfície
-e aceite.
-
-Métricas a instrumentar: IoU e Hausdorff de silhueta por vista, desvio de
-landmarks projetados, zebra e curvatura sobre a superfície limite, inventário de
-pontos extraordinários visíveis, razão entre faces da cage e faces compiladas,
-gaps e self-intersections, estabilidade de hash sob replay.
+Oito eixos independentes — integridade, dimensão, silhueta, superfície,
+topologia, semântica, apresentação e aceite — com limiares e métricas já fixados
+em P0. O erro anterior foi deixar integridade, dimensão e apresentação aprovarem
+por silhueta, superfície e aceite.
 
 ## Gate para virar `pronto`
 
-- alvo e fidelidade inequívocos, com perfil declarado antes de modelar;
-- referências calibradas e limiares numéricos fixados;
+- ~~alvo e fidelidade inequívocos, com perfil declarado antes de modelar~~ —
+  fechado em P0;
+- ~~referência resolvida e limiares numéricos fixados~~ — fechado em P0;
 - prova P2 executada com todas as medidas registradas;
 - critério de descarte avaliado, com resultado `manter` ou `reabrir`;
 - contrato entre cage e malha compilada escrito;
@@ -170,13 +169,14 @@ gaps e self-intersections, estabilidade de hash sob replay.
 - migração que preserve receitas e baseline existentes;
 - destino do protótipo rejeitado decidido.
 
-Nenhum item está completo. Não há plano ativo de implementação.
+Dois itens fechados em P0; os demais seguem abertos. Não há plano ativo de
+implementação.
 
 ## Fora desta versão
 
 Implementação de produto, dependência geométrica nova, schema definitivo,
-cronograma, réplica de fabricante, interior, monocoque estrutural, suspensão,
-física, UV, baking e fabricação.
+cronograma, réplica de fabricante, interior, monocoque, suspensão, física, UV,
+baking e fabricação.
 
 ## Registro
 
@@ -192,5 +192,9 @@ física, UV, baking e fabricação.
   base da pele exterior, com o argumento de aberturas envidraçadas registrado no
   dossiê, seção 8.7. `loft` mantido sem alteração para peças varridas. Prova P2
   passa a exigir vão envidraçado aberto por topologia.
-- **Próxima revisão:** executar P0 — dimensões rígidas, referência calibrada,
-  perfil `F3` declarado e limiares numéricos, antes de qualquer modelagem.
+- **V3 — 2026-08-19:** P0 executada e fechada em
+  `../CHASSI-P0-ALVO-E-LIMIARES.md`. Referência resolvida por prancha
+  ortográfica derivada, com a imagem em perspectiva declarada não vinculante.
+  `BLOCO = 1000` convertido em limiar de 900 ids por passo de cage.
+- **Próxima revisão:** executar P1 — contrato da cage: formato de quads e
+  vincos, loops nomeados, regra de linhagem e política de diff.

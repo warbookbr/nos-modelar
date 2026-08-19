@@ -114,8 +114,17 @@ aplicação publicada aqui.
   controle de quadriláteros com vincos, avaliada por subdivisão Catmull-Clark
   nativa, com a malha densa como produto compilado e a unidade editável no loop
   de aresta nomeado. OCCT/B-rep, Blender headless, SDF e kernel próprio estão
-  rejeitados com motivo e condição de reabertura. Falta a prova descartável do
-  quarto dianteiro e os limiares de referência.
+  rejeitados com motivo e condição de reabertura. `loft` e qualquer envelope
+  varrido estão proibidos como base da pele exterior, porque para-brisa, vidro
+  lateral e vão de porta são loops fechados internos que uma varredura não abre
+  sem booleana. A rodada P0 está fechada em
+  [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md)
+  (`docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md`): perfil `F3` declarado antes
+  de modelar, envelope e quinze landmarks fixados, prancha ortográfica derivada
+  adotada como referência vinculante no lugar da imagem em perspectiva, limiares
+  numéricos dos oito eixos e oito condições de rejeição visual escritas antes da
+  geometria. Faltam o contrato da cage e a prova descartável do quarto
+  dianteiro.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
