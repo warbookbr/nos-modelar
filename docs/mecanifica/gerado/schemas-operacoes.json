@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:7ba5466719f07939ed7a4bd6ac9d5eb304abe2512df01e1feeb87d6767898646",
+  "assinatura": "sha256:12ec3e0401271b2323d3765eb70ead3680dd3d4c6094565e1521f9fa8820a72d",
   "total": 32,
   "operacoes": [
     {
@@ -1600,7 +1600,7 @@
       "nome": "inflate",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Construir volume voxel fechado pela interseção de dois contornos 2D.",
+        "intencao": "Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.inflate@1",
@@ -1623,11 +1623,16 @@
             },
             "contornoLado": {
               "type": "array",
-              "description": "Polígono lateral com ao menos três pontos."
+              "description": "Polígono lateral z×y com ao menos três pontos."
             },
             "contornoTopo": {
               "type": "array",
-              "description": "Polígono superior com ao menos três pontos."
+              "description": "Polígono superior z×x com ao menos três pontos."
+            },
+            "modo": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'grade' (padrão, aceita cavidades) ou 'secoes' (suave, exige um intervalo por estação)."
             },
             "divisoes": {
               "anyOf": [
@@ -1641,7 +1646,35 @@
                   "type": "array"
                 }
               ],
-              "description": "Resolução da grade voxel."
+              "description": "Resolução da grade ou quantidade de segmentos longitudinais."
+            },
+            "lados": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Pontos por seção no modo 'secoes'."
+            },
+            "expoenteSecao": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Expoente positivo da superelipse no modo 'secoes'; 2 produz elipse."
             },
             "segmentosCurva": {
               "anyOf": [
@@ -1713,7 +1746,7 @@
         },
         "precondicoes": [],
         "limites": [
-          "Produz forma blocky; grade acima do limite de sanidade é recusada."
+          "O modo 'grade' é blocky; o modo 'secoes' não representa múltiplos intervalos na mesma estação; não é CSG."
         ],
         "diagnosticos": []
       }

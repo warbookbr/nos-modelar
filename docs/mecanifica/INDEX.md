@@ -103,6 +103,13 @@ aplicação publicada aqui.
   métricas e limites estão em
   [`RELATORIO-SONDA-SUPERCARRO-1-0.md`](RELATORIO-SONDA-SUPERCARRO-1-0.md)
   (`docs/mecanifica/RELATORIO-SONDA-SUPERCARRO-1-0.md`).
+- A qualidade visual da carroceria foi reprovada depois desse fechamento. O
+  novo [plano de maturação do chassi realista](planos/2026-08-18-chassi-realista-kernel-geometrico.md)
+  (`docs/mecanifica/planos/2026-08-18-chassi-realista-kernel-geometrico.md`)
+  está em `rascunho` e não autoriza implementação. O problema, as evidências e
+  as alternativas de kernel estão no
+  [`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md)
+  (`docs/mecanifica/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`).
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

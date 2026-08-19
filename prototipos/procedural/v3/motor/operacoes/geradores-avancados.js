@@ -510,9 +510,13 @@ export function criarOperacoesGeradoresAvancados(servicos) {
      emitida entre um voxel DENTRO e um vizinho FORA (ou fora da grade) — toda
      parede interna (dentro↔dentro) nunca aparece — por isso a superfície é
      SEMPRE um 2-manifold fechado, por construção topológica, não por sorte.
-     LIMITAÇÃO HONESTA: o resultado é BLOCKY (facetado pelos voxels), não
-     suave — a mesma classe do "lathe só reto por enquanto" (D-115): útil hoje,
-     suavizar (ex. marching cubes) fica pra quando o caso real pedir.
+     O modo histórico `grade` continua BLOCKY (facetado pelos voxels). O modo
+     opcional `secoes` cruza os intervalos dos dois contornos em estações de Z e
+     liga superelipses transversais. Ele serve a volumes cuja lateral e planta
+     têm exatamente UM intervalo por estação (carenagem, casco, cabo, móvel,
+     corpo estilizado). Contorno com ilhas ou cavidades é ambíguo nesse método e
+     GRITA indicando `grade` ou envelopes separados; nunca escolhe uma ilha em
+     silêncio. Não é CSG nem união entre os envelopes.
 
      ARGS: `contornoLado`/`contornoTopo`: `[[a,b],...]` ou `[[a,b,concordancia],
      ...]` (≥3 pontos cada, PARAM via `st.num`) — a MESMA lei do `contorno` do
@@ -577,6 +581,8 @@ export function criarOperacoesGeradoresAvancados(servicos) {
     const topo = validaContorno(a.contornoTopo, 'contornoTopo');
     if (!lado || !topo) return;   // grita já registrado por contorno inválido
 
+    const modo = a.modo ?? 'grade';
+    if (!['grade', 'secoes'].includes(modo)) return grita(st, i, 'inflate', 'modo', `modo precisa ser 'grade' ou 'secoes'; recebido ${JSON.stringify(modo)}`);
     const divisoes = Math.max(2, st.num(a.divisoes ?? 8) | 0);   // TOPO: muda a CONTAGEM
 
     const dentroPoligono = (px, py, pontos) => {
@@ -591,6 +597,95 @@ export function criarOperacoesGeradoresAvancados(servicos) {
 
     const [zMinL, zMaxL, yMin, yMax] = bboxDe(lado);
     const [zMinT, zMaxT, xMin, xMax] = bboxDe(topo);
+
+    if (modo === 'secoes') {
+      /* INTERVALO DE UMA SILHUETA numa estação. A regra meio-aberta evita
+         contar um vértice compartilhado duas vezes. Duplicatas numéricas são
+         consolidadas; qualquer resultado diferente de dois limites revela
+         vazio, ilha ou cavidade que uma única superelipse não representa. */
+      const intervaloNaEstacao = (pontos, z, nome, estacao) => {
+        const cruzamentos = [];
+        for (let k = 0, j = pontos.length - 1; k < pontos.length; j = k++) {
+          const [zk, qk] = pontos[k], [zj, qj] = pontos[j];
+          if ((zk > z) !== (zj > z)) cruzamentos.push(qj + (z - zj) * (qk - qj) / (zk - zj));
+        }
+        cruzamentos.sort((p, q) => p - q);
+        const unicos = cruzamentos.filter((valor, indice) => indice === 0
+          || Math.abs(valor - cruzamentos[indice - 1]) > Math.max(1, Math.abs(valor)) * 1e-9);
+        if (unicos.length !== 2 || !(unicos[1] - unicos[0] > 1e-9)) {
+          grita(st, i, 'inflate', estacao, `modo 'secoes': ${nome} precisa formar exatamente um intervalo na estação ${estacao} (z=${z.toFixed(9)}); encontrou ${unicos.length} limite(s). Use modo:'grade' para silhueta com cavidades/ilhas ou divida a forma em envelopes`);
+          return null;
+        }
+        return unicos;
+      };
+
+      const zMin = Math.max(zMinL, zMinT), zMax = Math.min(zMaxL, zMaxT);
+      if (!(zMax - zMin > 1e-9)) return grita(st, i, 'inflate', null, `modo 'secoes': contornoLado e contornoTopo não compartilham extensão positiva em Z (${zMin}..${zMax})`);
+      const lados = Math.max(3, st.num(a.lados ?? 12) | 0);
+      const expoente = st.num(a.expoenteSecao ?? 2);
+      if (!(expoente > 0)) return grita(st, i, 'inflate', 'expoenteSecao', `expoenteSecao precisa ser positivo; recebido ${expoente}`);
+      const potencia = 2 / expoente;
+      const epsilonZ = (zMax - zMin) * 1e-9;
+      const aneis = [];
+      let invalido = false;
+      for (let estacao = 0; estacao <= divisoes; estacao++) {
+        const t = estacao / divisoes;
+        const zGeometrico = zMin + (zMax - zMin) * t;
+        const zAmostra = estacao === 0 ? zMin + epsilonZ : estacao === divisoes ? zMax - epsilonZ : zGeometrico;
+        const iy = intervaloNaEstacao(lado, zAmostra, 'contornoLado', estacao);
+        const ix = intervaloNaEstacao(topo, zAmostra, 'contornoTopo', estacao);
+        if (!iy || !ix) { invalido = true; continue; }
+        aneis.push({ z: zGeometrico, x0: ix[0], x1: ix[1], y0: iy[0], y1: iy[1] });
+      }
+      if (invalido) return;   // diagnósticos já registrados; fail-closed
+
+      const nV = aneis.length * lados + 2;
+      const nF = divisoes * lados + 2 * lados;
+      if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: inflate modo='secoes' (${divisoes} divisões × lados=${lados}) estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+
+      const idsAneis = [];
+      let cursorV = 0;
+      for (const anel of aneis) {
+        const cx = (anel.x0 + anel.x1) / 2, rx = (anel.x1 - anel.x0) / 2;
+        const cy = (anel.y0 + anel.y1) / 2, ry = (anel.y1 - anel.y0) / 2;
+        const ids = [];
+        for (let ladoIdx = 0; ladoIdx < lados; ladoIdx++) {
+          const angulo = ladoIdx / lados * Math.PI * 2;
+          const c = Math.cos(angulo), s = Math.sin(angulo);
+          const x = cx + rx * Math.sign(c) * Math.abs(c) ** potencia;
+          const y = cy + ry * Math.sign(s) * Math.abs(s) ** potencia;
+          const id = b + cursorV++;
+          addV(st, id, [x, y, anel.z]);
+          ids.push(id);
+        }
+        idsAneis.push(ids);
+      }
+      const centroInicio = b + cursorV++, centroFim = b + cursorV;
+      const primeiro = aneis[0], ultimo = aneis[aneis.length - 1];
+      addV(st, centroInicio, [(primeiro.x0 + primeiro.x1) / 2, (primeiro.y0 + primeiro.y1) / 2, primeiro.z]);
+      addV(st, centroFim, [(ultimo.x0 + ultimo.x1) / 2, (ultimo.y0 + ultimo.y1) / 2, ultimo.z]);
+
+      let cursorF = 0;
+      for (let estacao = 0; estacao < divisoes; estacao++) {
+        const A = idsAneis[estacao], B = idsAneis[estacao + 1];
+        for (let ladoIdx = 0; ladoIdx < lados; ladoIdx++) {
+          const proximo = (ladoIdx + 1) % lados;
+          addF(st, b + cursorF++, [A[ladoIdx], A[proximo], B[proximo], B[ladoIdx]]);
+        }
+      }
+      const anelInicio = idsAneis[0], anelFim = idsAneis[idsAneis.length - 1];
+      for (let ladoIdx = 0; ladoIdx < lados; ladoIdx++) {
+        const proximo = (ladoIdx + 1) % lados;
+        addF(st, b + cursorF++, [centroInicio, anelInicio[proximo], anelInicio[ladoIdx]]);
+      }
+      for (let ladoIdx = 0; ladoIdx < lados; ladoIdx++) {
+        const proximo = (ladoIdx + 1) % lados;
+        addF(st, b + cursorF++, [centroFim, anelFim[ladoIdx], anelFim[proximo]]);
+      }
+      if (a.origemId != null) registraOrigem(st, i, 'inflate', a.origemId, { faces: Array.from({ length: nF }, (_, k) => b + k) });
+      return;
+    }
+
     const zMin = Math.min(zMinL, zMinT), zMax = Math.max(zMaxL, zMaxT);
     const dx = xMax - xMin, dy = yMax - yMin, dz = zMax - zMin;
     const maior = Math.max(dx, dy, dz);

@@ -2116,6 +2116,78 @@ describe('P6 — inflate (dois contornos 2D -> volume por interseção de prisma
     expect(volume(V, F)).toBeCloseTo(2 * 1 * 1.4, 6);   // dx=1.4, dy=1, dz=2 — os voxels cobrem a caixa exata quando ela já é axis-aligned
   });
 
+  it("modo 'secoes': cruza as duas silhuetas em superelipses, fecha a malha e preserva as extensões declaradas", () => {
+    const lado = [[-2, -0.5], [2, -0.5], [2, 0.5], [-2, 0.5]];
+    const topo = [[-2, -0.8], [2, -0.8], [2, 0.8], [-2, 0.8]];
+    const { V, F, orfaos } = nucleo([['inflate', {
+      id: 0, modo: 'secoes', contornoLado: lado, contornoTopo: topo,
+      divisoes: 4, lados: 8, expoenteSecao: 2,
+    }]], {}, {});
+    expect(orfaos).toHaveLength(0);
+    expect(V.size).toBe(42);   // 5 anéis × 8 lados + 2 centros de tampa
+    expect(F.size).toBe(48);   // 4 faixas × 8 + 2 tampas × 8
+    expect(manifoldRuim(F)).toBe(0);
+    expect(volume(V, F)).toBeGreaterThan(0);
+    const pontos = [...V.values()] as number[][];
+    const extensao = (eixo: number) => [Math.min(...pontos.map((p) => p[eixo])), Math.max(...pontos.map((p) => p[eixo]))];
+    expect(extensao(0)).toEqual([-0.8, 0.8]);
+    expect(extensao(1)).toEqual([-0.5, 0.5]);
+    expect(extensao(2)).toEqual([-2, 2]);
+    expect(pontos.every((p) => p.every(Number.isFinite))).toBe(true);
+  });
+
+  it("modo 'secoes': acompanha cintura em planta e concavidade inferior da lateral sem virar grade voxel", () => {
+    const lado = [
+      [-2, 0.30], [-1, 0.62], [0, 0.22], [1, 0.62], [2, 0.30],
+      [2, 0.80], [1, 1.18], [0, 0.98], [-1, 1.18], [-2, 0.80],
+    ];
+    const topo = [
+      [-2, -0.42], [-1, -0.92], [0, -0.58], [1, -0.92], [2, -0.42],
+      [2, 0.42], [1, 0.92], [0, 0.58], [-1, 0.92], [-2, 0.42],
+    ];
+    const { V, F, orfaos } = nucleo([['inflate', {
+      id: 0, modo: 'secoes', contornoLado: lado, contornoTopo: topo,
+      divisoes: 8, lados: 12, expoenteSecao: 2.6,
+    }]], {}, {});
+    expect(orfaos).toHaveLength(0);
+    expect(manifoldRuim(F)).toBe(0);
+    const anelEm = (z: number) => ([...V.values()] as number[][]).filter((p) => Math.abs(p[2] - z) < 1e-9);
+    const largura = (anel: number[][]) => Math.max(...anel.map((p) => p[0])) - Math.min(...anel.map((p) => p[0]));
+    const piso = (anel: number[][]) => Math.min(...anel.map((p) => p[1]));
+    expect(largura(anelEm(1))).toBeGreaterThan(largura(anelEm(0)));   // ombro na planta, cintura no centro
+    expect(piso(anelEm(1))).toBeGreaterThan(piso(anelEm(0)));        // recorte inferior declarado na lateral
+  });
+
+  it("modo 'secoes': recusa silhueta com mais de um intervalo e sugere grade ou envelopes separados", () => {
+    const comIlhaNaEstacao = [
+      [-2, -2], [2, -2], [2, -1], [-1, -1],
+      [-1, 1], [2, 1], [2, 2], [-2, 2],
+    ];
+    const n = nucleo([['inflate', {
+      id: 0, modo: 'secoes', contornoLado: comIlhaNaEstacao,
+      contornoTopo: [[-2, -1], [2, -1], [2, 1], [-2, 1]],
+      divisoes: 4, lados: 8,
+    }]], {}, {});
+    expect(n.V.size).toBe(0);
+    expect(n.F.size).toBe(0);
+    expect(n.orfaos.some((o: any) => /exatamente um intervalo/.test(o.motivo))).toBe(true);
+    expect(n.orfaos.some((o: any) => /modo:'grade'.*envelopes/.test(o.motivo))).toBe(true);
+  });
+
+  it("modo 'secoes': argumentos próprios falham fechados e o modo desconhecido nunca cai em grade", () => {
+    const base = { contornoLado: QUAD, contornoTopo: QUAD, divisoes: 4, lados: 8 };
+    for (const args of [
+      { ...base, modo: 'fantasma' },
+      { ...base, modo: 'secoes', expoenteSecao: 0 },
+      { ...base, modo: 'secoes', expoenteSecao: -2 },
+    ]) {
+      const n = nucleo([['inflate', { id: 0, ...args }]], {}, {});
+      expect(n.V.size).toBe(0);
+      expect(n.F.size).toBe(0);
+      expect(n.orfaos.length).toBeGreaterThan(0);
+    }
+  });
+
   it('winding: TODA face aponta pra FORA do voxel — Newell por direção, não só o volume agregado', () => {
     const { V, F } = nucleo([['inflate', { id: 0, contornoLado: circ(1), contornoTopo: circ(1), divisoes: 10 }]], {}, {});
     for (const f of F.values()) {

@@ -142,10 +142,10 @@ const definicoes = {
     precondicoes: ['Seções devem ser ordenadas, válidas e compatíveis com lados.'],
   },
   inflate: {
-    intencao: 'Construir volume voxel fechado pela interseção de dois contornos 2D.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), contornoLado: ['lista', 'Polígono lateral com ao menos três pontos.'], contornoTopo: ['lista', 'Polígono superior com ao menos três pontos.'], divisoes: ['inteiro', 'Resolução da grade voxel.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'] },
+    intencao: 'Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta.',
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), contornoLado: ['lista', 'Polígono lateral z×y com ao menos três pontos.'], contornoTopo: ['lista', 'Polígono superior z×x com ao menos três pontos.'], modo: ['texto', "'grade' (padrão, aceita cavidades) ou 'secoes' (suave, exige um intervalo por estação)."], divisoes: ['inteiro', 'Resolução da grade ou quantidade de segmentos longitudinais.'], lados: ['inteiro', "Pontos por seção no modo 'secoes'."], expoenteSecao: ['escalar', "Expoente positivo da superelipse no modo 'secoes'; 2 produz elipse."], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'] },
     obrigatorios: ['contornoLado', 'contornoTopo'], passos: [['inflate', { contornoLado: [[0, 0], [1, 0], [1, 1], [0, 1]], contornoTopo: [[0, 0], [1, 0], [1, 1], [0, 1]], divisoes: 2 }]],
-    limites: ['Produz forma blocky; grade acima do limite de sanidade é recusada.'],
+    limites: ["O modo 'grade' é blocky; o modo 'secoes' não representa múltiplos intervalos na mesma estação; não é CSG."],
   },
   publicarPorta: {
     intencao: 'Publicar interface semântica endereçável de uma origem existente.',

@@ -4,6 +4,13 @@
 
 **Plano ativo:** nenhum.
 
+**Plano em elaboração:**
+[`2026-08-18-chassi-realista-kernel-geometrico.md`](2026-08-18-chassi-realista-kernel-geometrico.md).
+Ele está em `rascunho`, não autoriza implementação e será revisto em
+várias rodadas antes de escolher representação ou kernel. O recorte anterior de
+`inflate` suave foi cancelado após reprovação visual e permanece somente como
+evidência local ainda não integrada.
+
 A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
 foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,
 bilateralidade, quiralidade, estados estáticos, contexto progressivo, crítica
