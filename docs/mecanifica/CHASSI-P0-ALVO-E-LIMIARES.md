@@ -75,7 +75,7 @@ para a classe, já que não existe original a copiar.
 | Dimensão | Valor | Tolerância |
 |---|---|---|
 | comprimento total | 4600 | ±10 |
-| largura máxima, sem espelhos | 1960 | ±8 |
+| largura máxima, sem espelhos | 2000 | ±8 |
 | altura total | 1190 | ±8 |
 | entre-eixos | 2650 | ±3 |
 | bitola dianteira | 1660 | ±3 |
@@ -85,7 +85,9 @@ para a classe, já que não existe original a copiar.
 | altura livre do solo | 105 | ±5 |
 
 Consistência verificável: `940 + 2650 + 1010 = 4600`. Bitola traseira maior que a
-dianteira, largura máxima na anca traseira — assinatura da classe.
+dianteira, largura máxima na anca traseira — assinatura da classe. A largura
+máxima cobre o pneu traseiro com folga: `840 + 305/2 = 992 < 1000`. O mesmo vale
+na frente: `830 + 245/2 = 952 < 965`, a meia largura do ombro dianteiro.
 
 ### 4.2 Rodas
 
@@ -118,15 +120,25 @@ curvas mestras e depois a cage são medidas.
 | L09 | extremidade traseira | 0 | 920 | −2335 |
 | L10 | linha de cintura, na porta | ±930 | 950 | 0 |
 | L11 | soleira, aresta inferior | ±925 | 145 | 0 |
-| L12 | largura máxima, anca traseira | ±980 | 850 | −900 |
-| L13 | ombro dianteiro | ±950 | 900 | +1325 |
+| L12 | largura máxima, anca traseira | ±1000 | 850 | −900 |
+| L13 | ombro dianteiro | ±965 | 900 | +1325 |
 | L14 | topo do arco dianteiro | ±830 | 725 | +1325 |
 | L15 | topo do arco traseiro | ±840 | 758 | −1325 |
 
 Derivada e vinculante: inclinação do para-brisa, de L04 a L05, é **73° da
 vertical** (±2°).
 
-### 4.4 Curvas mestras
+### 4.4 Prancha ortográfica
+
+As seções 4.1 a 4.3 são desenhadas em
+[`img/chassi-p0-prancha.svg`](img/chassi-p0-prancha.svg), gerada por
+`node tools/mecanifica/prancha-chassi-p0.mjs`. A prancha é derivada, não uma
+segunda verdade: se ela divergir das tabelas acima, as tabelas mandam e o
+gerador está errado.
+
+Ela desenha o alvo, não uma peça. Nenhuma geometria foi modelada.
+
+### 4.5 Curvas mestras
 
 O produto de P0 são cinco curvas que qualquer cage precisa reproduzir. Elas são o
 alvo; a cage é uma hipótese sobre como atingi-lo.
@@ -309,3 +321,7 @@ qualquer linha de código. P1 e P3 tratam disso.
   não é; limiares numéricos dos oito eixos fixados; oito condições de rejeição
   visual escritas antes da geometria; `BLOCO = 1000` convertido em limiar de
   900 ids por passo de cage.
+- **P0 v2 — 2026-08-19:** prancha ortográfica desenhada a partir das tabelas. O
+  desenho expôs uma inconsistência do próprio alvo: com largura máxima 1960 e
+  bitola traseira 1680, o pneu 305 ultrapassava a carroceria em 12 mm de cada
+  lado. Largura máxima corrigida para 2000, L12 para ±1000 e L13 para ±965.
