@@ -125,6 +125,17 @@ aplicação publicada aqui.
   numéricos dos oito eixos e oito condições de rejeição visual escritas antes da
   geometria. Faltam o contrato da cage e a prova descartável do quarto
   dianteiro.
+- O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
+  (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
+  `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um
+  relatório medido da própria saída; `tools/mecanifica/prancha-geometria.mjs`
+  traça por filete e mede curvatura por janela de comprimento de arco. A
+  primitiva padrão deixou de ser spline por pontos, que abaulava tudo, e passou a
+  ser polilinha com raio por vértice. O relatório verifica contorno fechado,
+  detalhe que escapou do contorno e landmark que saiu da linha. O método está na
+  skill `desenhar-prancha`. A prova é o cupê de cunha em
+  `docs/mecanifica/img/cupe-cunha-prancha.svg`, desenhado do zero e julgado pelo
+  relatório antes de qualquer render.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

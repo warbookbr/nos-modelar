@@ -4,6 +4,13 @@
 
 **Plano ativo:** nenhum.
 
+O [motor de prancha com filete e medida](2026-08-19-motor-de-prancha-medida.md)
+foi **concluído**. Ele trocou a spline por traçado com filete, adotou âncora
+proporcional e passou a emitir relatório medido da própria saída. O ganho não é
+estético: o relatório pegou sozinho um arco de roda furando o capô e dez
+inversões de curvatura na silhueta do P0 que ninguém tinha visto. Método
+registrado na skill `desenhar-prancha`.
+
 **Plano em elaboração:**
 [`2026-08-18-chassi-realista-kernel-geometrico.md`](2026-08-18-chassi-realista-kernel-geometrico.md).
 Ele está em `rascunho` e não autoriza implementação. A representação de autoria

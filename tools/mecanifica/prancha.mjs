@@ -1,43 +1,29 @@
 #!/usr/bin/env node
-/* prancha.mjs — motor de desenho de pranchas ortográficas alvo. Recebe uma
-   especificação declarativa em milímetros e devolve SVG determinístico. Não
-   conhece carro: conhece vistas, camadas, cotas e legenda. O vocabulário de
-   domínio vive na especificação, nunca aqui. Sem dependência e sem timestamp. */
+/* prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa
+   em milímetros e devolve SVG determinístico MAIS um relatório medido da própria
+   saída. Não conhece carro: conhece vista, camada, âncora, cota e métrica.
+   O relatório existe porque desenhar sem medir é a causa raiz documentada em
+   docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md. */
+
+import * as G from './prancha-geometria.mjs';
 
 const n = (v) => Number(v.toFixed(2));
 
-/* Catmull-Rom → bézier: a curva passa exatamente pelos pontos declarados. */
-export function suave(pts, fechado = false) {
-  if (pts.length < 2) return '';
-  const p = fechado ? [...pts, pts[0]] : pts;
-  const em = (i) => p[Math.min(Math.max(i, 0), p.length - 1)];
-  let d = `M ${n(p[0][0])} ${n(p[0][1])}`;
-  for (let i = 0; i < p.length - 1; i += 1) {
-    const p0 = fechado ? p[(i - 1 + p.length) % p.length] : em(i - 1);
-    const p1 = p[i];
-    const p2 = p[i + 1];
-    const p3 = fechado ? p[(i + 2) % p.length] : em(i + 2);
-    d += ` C ${n(p1[0] + (p2[0] - p0[0]) / 6)} ${n(p1[1] + (p2[1] - p0[1]) / 6)},`
-      + ` ${n(p2[0] - (p3[0] - p1[0]) / 6)} ${n(p2[1] - (p3[1] - p1[1]) / 6)},`
-      + ` ${n(p2[0])} ${n(p2[1])}`;
-  }
-  return d + (fechado ? ' Z' : '');
-}
-
-export function reta(pts, fechado = false) {
-  return `M ${pts.map(([a, b]) => `${n(a)} ${n(b)}`).join(' L ')}${fechado ? ' Z' : ''}`;
-}
-
-/* Cada vista declara como um par de coordenadas de mundo vira pixel. */
-function projetores(spec) {
-  const s = spec.escala;
-  const { zMin, zMax, yMax, xMax } = spec.limites;
-  const v = spec.vistas;
+/* Âncoras proporcionais: a referência é lida em fração ("base do para-brisa a
+   0,45 do entre-eixos"), então a especificação escreve na mesma moeda e o motor
+   traduz. Milímetro absoluto continua válido onde a medida é rígida. */
+export function criarAncoras({ entreEixos, altura, meiaLargura }) {
+  const meio = entreEixos / 2;
   return {
-    lateral: ([z, y]) => [v.lateral.x + (z - zMin) * s, v.lateral.y + (yMax - y) * s],
-    planta: ([z, x]) => [v.planta.x + (z - zMin) * s, v.planta.y + (x + xMax) * s],
-    frontal: ([x, y]) => [v.frontal.x + (x + xMax) * s, v.frontal.y + (yMax - y) * s],
-    traseira: ([x, y]) => [v.traseira.x + (xMax - x) * s, v.traseira.y + (yMax - y) * s],
+    /* 0 = eixo traseiro, 1 = eixo dianteiro; fora do intervalo são os balanços. */
+    fz: (f) => -meio + f * entreEixos,
+    fy: (f) => f * altura,
+    fx: (f) => f * meiaLargura,
+    entreEixos,
+    altura,
+    meiaLargura,
+    zEixoT: -meio,
+    zEixoD: meio,
   };
 }
 
@@ -59,9 +45,134 @@ const ESTILOS = `
   .rot{fill:#8b93a0;font-size:10.5px;letter-spacing:.06em}
 `;
 
+function projetores(spec) {
+  const s = spec.escala;
+  const { zMin, yMax, xMax } = spec.limites;
+  const v = spec.vistas;
+  return {
+    lateral: ([z, y]) => [v.lateral.x + (z - zMin) * s, v.lateral.y + (yMax - y) * s],
+    planta: ([z, x]) => [v.planta.x + (z - zMin) * s, v.planta.y + (x + xMax) * s],
+    frontal: ([x, y]) => [v.frontal.x + (x + xMax) * s, v.frontal.y + (yMax - y) * s],
+    traseira: ([x, y]) => [v.traseira.x + (xMax - x) * s, v.traseira.y + (yMax - y) * s],
+  };
+}
+
+/* Toda camada vira polilinha amostrada em milímetro. É o que permite desenhar e
+   medir o MESMO dado, em vez de medir uma segunda verdade reconstruída. */
+function amostrar(c) {
+  const op = { fechado: Boolean(c.fechado) };
+  switch (c.tipo) {
+    case 'circulo': return G.circulo(c.centro, c.raio);
+    case 'arco': return G.arcoSuperior(c.centro, c.raio);
+    case 'poli': return G.poli(c.pts, op);
+    case 'suave': return G.suave(c.pts, op);
+    default: return G.filete(c.pts, op);
+  }
+}
+
+/* Encadeia os trechos de contorno de uma vista num anel único, para medir
+   fechamento e para testar o que escapou dele. */
+function encadear(trechos, tol) {
+  if (trechos.length === 0) return { anel: [], abertos: [] };
+  const restante = trechos.map((t) => t.slice());
+  const anel = restante.shift();
+  let mudou = true;
+  while (restante.length > 0 && mudou) {
+    mudou = false;
+    const fim = anel[anel.length - 1];
+    const ini = anel[0];
+    for (let i = 0; i < restante.length; i += 1) {
+      const t = restante[i];
+      const a = t[0]; const b = t[t.length - 1];
+      const d = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+      if (d(fim, a) <= tol) { anel.push(...t.slice(1)); restante.splice(i, 1); mudou = true; break; }
+      if (d(fim, b) <= tol) { anel.push(...t.slice(0, -1).reverse()); restante.splice(i, 1); mudou = true; break; }
+      if (d(ini, b) <= tol) { anel.unshift(...t.slice(0, -1)); restante.splice(i, 1); mudou = true; break; }
+      if (d(ini, a) <= tol) { anel.unshift(...t.slice(1).reverse()); restante.splice(i, 1); mudou = true; break; }
+    }
+  }
+  return { anel, abertos: restante };
+}
+
+function medir(spec, camadas) {
+  const tol = spec.tolerancia ?? 6;
+  const porVista = {};
+  const alertas = [];
+
+  for (const nome of Object.keys(spec.vistas)) {
+    const daVista = camadas.filter((c) => c.vista === nome);
+    const contorno = daVista.filter((c) => c.contorno).map((c) => c.pl);
+    const { anel, abertos } = encadear(contorno, tol);
+    const fechado = anel.length > 2
+      && Math.hypot(anel[0][0] - anel[anel.length - 1][0], anel[0][1] - anel[anel.length - 1][1]) <= tol
+      && abertos.length === 0;
+
+    let fora = 0;
+    const culpadas = [];
+    if (fechado) {
+      for (const c of daVista) {
+        if (c.contorno || c.classe === 'eixo' || c.foraDoContorno) continue;
+        let foraDaCamada = 0;
+        for (const p of c.pl) if (!G.dentro(p, anel)) foraDaCamada += 1;
+        if (foraDaCamada > 0) culpadas.push(`${c.nome ?? c.classe ?? 'camada'} (${foraDaCamada})`);
+        fora += foraDaCamada;
+      }
+    }
+
+    porVista[nome] = {
+      caixa: anel.length ? G.caixa(anel) : null,
+      contornoFechado: fechado,
+      trechosSoltos: abertos.length,
+      pontosForaDoContorno: fora,
+      camadasQueEscaparam: culpadas,
+    };
+    if (contorno.length > 0 && !fechado) alertas.push(`${nome}: contorno não fecha (${abertos.length} trecho(s) solto(s))`);
+    if (fora > 0) alertas.push(`${nome}: ${fora} ponto(s) fora do contorno — ${culpadas.join(', ')}`);
+  }
+
+  const porCamada = {};
+  for (const c of camadas) {
+    if (!c.nome) continue;
+    const m = {
+      vista: c.vista,
+      comprimento: n(G.comprimento(c.pl)),
+      retidao: Number(G.retidao(c.pl).toFixed(3)),
+      concentracao: Number(G.concentracaoDoGiro(c.pl).toFixed(3)),
+      inversoes: G.inversoes(c.pl),
+      raioMin: G.raioMinimo(c.pl) === Infinity ? null : Math.round(G.raioMinimo(c.pl)),
+    };
+    porCamada[c.nome] = m;
+    const e = c.esperado;
+    if (!e) continue;
+    if (e.concentracaoMax !== undefined && m.concentracao > e.concentracaoMax) alertas.push(`${c.nome}: concentração de giro ${m.concentracao} acima de ${e.concentracaoMax} — abaulou onde a especificação pediu trecho reto com raio curto`);
+    if (e.retidaoMin !== undefined && m.retidao < e.retidaoMin) alertas.push(`${c.nome}: retidão ${m.retidao} abaixo do mínimo ${e.retidaoMin}`);
+    if (e.inversoesMax !== undefined && m.inversoes > e.inversoesMax) alertas.push(`${c.nome}: ${m.inversoes} inversões de curvatura, máximo ${e.inversoesMax}`);
+    if (e.raioMinMin !== undefined && m.raioMin !== null && m.raioMin < e.raioMinMin) alertas.push(`${c.nome}: raio mínimo ${m.raioMin} mm abaixo de ${e.raioMinMin} mm`);
+  }
+
+  /* Landmark declarado "sobre" uma camada precisa cair nela. É o que pega o
+     desvio introduzido pelo filete, que corta o canto e afasta a linha do
+     vértice declarado. */
+  const porLandmark = {};
+  for (const l of spec.landmarks ?? []) {
+    if (!l.sobre) continue;
+    const alvo = camadas.find((c) => c.nome === l.sobre && c.vista === l.vista);
+    if (!alvo) { alertas.push(`landmark ${l.id}: camada "${l.sobre}" não existe na vista ${l.vista}`); continue; }
+    let d = Infinity;
+    for (const p of alvo.pl) d = Math.min(d, Math.hypot(p[0] - l.em[0], p[1] - l.em[1]));
+    porLandmark[l.id] = { sobre: l.sobre, desvio: n(d) };
+    const limite = l.tolerancia ?? spec.toleranciaLandmark ?? 6;
+    if (d > limite) alertas.push(`landmark ${l.id}: ${n(d)} mm fora de "${l.sobre}", tolerância ${limite} mm`);
+  }
+
+  return { porVista, porCamada, porLandmark, alertas };
+}
+
 export function prancha(spec) {
   const proj = projetores(spec);
-  const s = spec.escala;
+  const camadas = spec.camadas.map((c) => ({ ...c, pl: amostrar(c) }));
+  const relatorio = medir(spec, camadas);
+
   const O = [];
   const put = (x) => O.push(x);
   const { largura: W, altura: H } = spec.tela;
@@ -72,47 +183,32 @@ export function prancha(spec) {
   put(`<text x="40" y="34" class="tit">${spec.titulo}</text>`);
   put(`<text x="40" y="53" class="sub">${spec.subtitulo}</text>`);
 
-  for (const [nome, vista] of Object.entries(spec.vistas)) {
+  for (const vista of Object.values(spec.vistas)) {
     if (vista.rotulo) put(`<text x="${vista.x}" y="${vista.y - 12}" class="rot">${vista.rotulo}</text>`);
   }
 
-  for (const c of spec.camadas) {
+  for (const c of camadas) {
     const p = proj[c.vista];
-    const cls = c.classe ?? 'contorno';
-    if (c.tipo === 'circulo') {
-      const [cx, cy] = p(c.centro);
-      put(`<circle class="${cls}" cx="${n(cx)}" cy="${n(cy)}" r="${n(c.raio * s)}"/>`);
-    } else if (c.tipo === 'arcoSuperior') {
-      const [ax, ay] = p(c.de);
-      const [bx, by] = p(c.ate);
-      put(`<path class="${cls}" d="M ${n(ax)} ${n(ay)} A ${n(c.raio * s)} ${n(c.raio * s)} 0 0 1 ${n(bx)} ${n(by)}"/>`);
-    } else if (c.tipo === 'reta') {
-      put(`<path class="${cls}" d="${reta(c.pts.map(p), c.fechado)}"/>`);
-    } else {
-      put(`<path class="${cls}" d="${suave(c.pts.map(p), c.fechado)}"/>`);
-    }
+    const d = c.pl.map((q) => p(q)).map(([a, b], i) => `${i ? 'L' : 'M'} ${n(a)} ${n(b)}`).join(' ');
+    put(`<path class="${c.classe ?? 'contorno'}" d="${d}"/>`);
   }
 
   for (const c of spec.cotas ?? []) {
     const p = proj[c.vista];
-    const [ax, ay] = p(c.de);
-    const [bx, by] = p(c.ate);
-    const dx = c.desloca?.[0] ?? 0;
-    const dy = c.desloca?.[1] ?? 0;
+    const [ax, ay] = p(c.de); const [bx, by] = p(c.ate);
+    const dx = c.desloca?.[0] ?? 0; const dy = c.desloca?.[1] ?? 0;
     put(`<path class="cota" d="M ${n(ax + dx)} ${n(ay + dy)} L ${n(bx + dx)} ${n(by + dy)}"/>`);
-    const mx = (ax + bx) / 2 + dx;
-    const my = (ay + by) / 2 + dy;
+    const mx = (ax + bx) / 2 + dx; const my = (ay + by) / 2 + dy;
     const vert = Math.abs(bx - ax) < Math.abs(by - ay);
-    const t = vert
+    put(vert
       ? `<text x="${n(mx - 6)}" y="${n(my)}" class="cotat" text-anchor="middle" transform="rotate(-90 ${n(mx - 6)} ${n(my)})">${c.texto}</text>`
-      : `<text x="${n(mx)}" y="${n(my - 6)}" class="cotat" text-anchor="middle">${c.texto}</text>`;
-    put(t);
+      : `<text x="${n(mx)}" y="${n(my - 6)}" class="cotat" text-anchor="middle">${c.texto}</text>`);
   }
 
   for (const l of spec.landmarks ?? []) {
     const [x, y] = proj[l.vista](l.em);
     put(`<circle class="lm" cx="${n(x)}" cy="${n(y)}" r="2.6"/>`);
-    if (l.id) put(`<text class="lmt" x="${n(x + 6)}" y="${n(y + (l.acima === false ? 14 : -6))}">${l.id}</text>`);
+    if (l.id) put(`<text class="lmt" x="${n(x + 6)}" y="${n(y + (l.abaixo ? 14 : -6))}">${l.id}</text>`);
   }
 
   if (spec.legenda) {
@@ -127,5 +223,27 @@ export function prancha(spec) {
   }
 
   put(`</svg>`);
-  return O.join('\n') + '\n';
+  return { svg: O.join('\n') + '\n', relatorio };
+}
+
+/* Relatório legível no terminal: é ele que eu leio ANTES de olhar o desenho. */
+export function imprimirRelatorio(r) {
+  const L = [];
+  for (const [vista, m] of Object.entries(r.porVista)) {
+    L.push(`  ${vista}: contorno ${m.contornoFechado ? 'fechado' : 'ABERTO'}`
+      + `, ${m.pontosForaDoContorno} ponto(s) fora`
+      + (m.caixa ? `, caixa ${Math.round(m.caixa.xMax - m.caixa.xMin)}×${Math.round(m.caixa.yMax - m.caixa.yMin)} mm` : ''));
+  }
+  for (const [nome, m] of Object.entries(r.porCamada)) {
+    L.push(`  ${nome}: concentração ${m.concentracao}, retidão ${m.retidao}, `
+      + `${m.inversoes} inversão(ões), raio mín ${m.raioMin ?? '—'} mm`);
+  }
+  const lms = Object.entries(r.porLandmark ?? {});
+  if (lms.length) {
+    const pior = lms.sort((a, b) => b[1].desvio - a[1].desvio)[0];
+    L.push(`  landmarks verificados: ${lms.length}, pior desvio ${pior[1].desvio} mm (${pior[0]})`);
+  }
+  if (r.alertas.length === 0) L.push('  sem alertas');
+  else for (const a of r.alertas) L.push(`  ALERTA ${a}`);
+  return L.join('\n');
 }

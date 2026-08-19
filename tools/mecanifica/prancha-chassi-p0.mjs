@@ -8,7 +8,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { prancha } from './prancha.mjs';
+import { prancha, imprimirRelatorio } from './prancha.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SAIDA = path.join(REPO, 'docs', 'mecanifica', 'img', 'chassi-p0-prancha.svg');
@@ -26,11 +26,13 @@ const LANDMARKS = [
   ['L13', 965, 900, 1325], ['L14', 830, 725, 1325], ['L15', 840, 758, -1325],
 ];
 
-/* Curva mestra 1 — silhueta lateral superior, em x = 0. */
+/* Curva mestra 1 — silhueta lateral superior, em x = 0.
+   Traçada com filete e apenas nos landmarks: a versão anterior tinha pontos de
+   forma intermediários e o relatório mediu 10 inversões de curvatura — ondulação,
+   não abaulamento intencional. Os raios são grandes porque as quebras são rasas. */
 const TOPO = [
-  [2265, 520], [2100, 700], [1800, 830], [1325, 900], [900, 930],
-  [480, 980], [120, 1090], [-180, 1185], [-370, 1190], [-560, 1190],
-  [-820, 1168], [-1150, 1120], [-1750, 1055], [-2100, 1010], [-2335, 920],
+  [2265, 520], [1325, 880, 1400], [480, 980, 900], [-180, 1185, 300],
+  [-560, 1190, 400], [-1150, 1120, 600], [-1750, 1055, 900], [-2335, 920],
 ];
 /* Silhueta inferior em três segmentos: os arcos são aberturas reais, então a
    linha de baixo é interrompida por eles em vez de atravessá-los. */
@@ -53,33 +55,42 @@ const FRONTAL = [
 ];
 
 const camadas = [
-  { vista: 'lateral', tipo: 'reta', classe: 'eixo', pts: [[zMin - 80, 0], [zMax + 80, 0]] },
-  { vista: 'lateral', pts: TOPO },
-  ...BASE.map((pts) => ({ vista: 'lateral', pts })),
+  { vista: 'lateral', tipo: 'poli', classe: 'eixo', pts: [[zMin - 80, 0], [zMax + 80, 0]] },
+  {
+    vista: 'lateral', contorno: true, nome: 'silhuetaSuperior', pts: TOPO,
+    /* Três inversões são corretas aqui e não defeito: a silhueta inteira tem
+       inflexão real no capô, na base do para-brisa e na queda da traseira. O
+       limite existe para pegar ondulação — a versão anterior media dez. */
+    esperado: { concentracaoMax: 0.30, inversoesMax: 4 },
+  },
+  ...BASE.map((pts) => ({ vista: 'lateral', contorno: true, pts, tipo: 'suave' })),
   ...[RD, RT].flatMap((r) => [
-    { vista: 'lateral', tipo: 'circulo', classe: 'roda', centro: [r.z, r.raio], raio: r.raio },
-    { vista: 'lateral', tipo: 'circulo', classe: 'aro', centro: [r.z, r.raio], raio: r.raio * 0.74 },
-    { vista: 'lateral', tipo: 'arcoSuperior', raio: r.arco, de: [r.z - r.arco, r.raio], ate: [r.z + r.arco, r.raio] },
+    { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio },
+    { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio * 0.74 },
+    { vista: 'lateral', tipo: 'arco', classe: 'contorno', contorno: true, centro: [r.z, r.raio], raio: r.arco },
   ]),
-  { vista: 'lateral', classe: 'carater', pts: OMBRO },
+  /* A linha de ombro vive em x = ±965 e é projetada na lateral: comparar com a
+     silhueta de x = 0 não faz sentido, e a crista do para-lama fica mesmo acima
+     do centro do capô. */
+  { vista: 'lateral', classe: 'carater', nome: 'linhaDeOmbro', pts: OMBRO, foraDoContorno: true, esperado: { concentracaoMax: 0.6, inversoesMax: 2 } },
 
-  { vista: 'planta', tipo: 'reta', classe: 'eixo', pts: [[zMin - 80, 0], [zMax + 80, 0]] },
-  { vista: 'planta', pts: PLANTA },
-  { vista: 'planta', pts: PLANTA.map(([z, w]) => [z, -w]) },
-  { vista: 'planta', pts: [[2200, 300], [2265, 0], [2200, -300]] },
-  { vista: 'planta', tipo: 'reta', pts: [[-2335, 665], [-2335, -665]] },
+  { vista: 'planta', tipo: 'poli', classe: 'eixo', pts: [[zMin - 80, 0], [zMax + 80, 0]] },
+  { vista: 'planta', contorno: true, pts: PLANTA, tipo: 'suave' },
+  { vista: 'planta', contorno: true, pts: PLANTA.map(([z, w]) => [z, -w]), tipo: 'suave' },
+  { vista: 'planta', contorno: true, pts: [[2200, 300], [2265, 0], [2200, -300]], tipo: 'suave' },
+  { vista: 'planta', contorno: true, tipo: 'poli', pts: [[-2335, 665], [-2335, -665]] },
   ...[RD, RT].flatMap((r) => [1, -1].map((k) => ({
-    vista: 'planta', tipo: 'reta', classe: 'roda', fechado: true,
+    vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
     pts: [[r.z - r.raio, k * r.x - r.larg / 2], [r.z + r.raio, k * r.x - r.larg / 2],
       [r.z + r.raio, k * r.x + r.larg / 2], [r.z - r.raio, k * r.x + r.larg / 2]],
   }))),
 
-  { vista: 'frontal', tipo: 'reta', classe: 'eixo', pts: [[0, -60], [0, yMax + 40]] },
-  ...[1, -1].map((k) => ({ vista: 'frontal', pts: FRONTAL.map(([y, w]) => [k * w, y]) })),
-  { vista: 'frontal', tipo: 'reta', pts: [[-860, 105], [860, 105]] },
-  { vista: 'frontal', tipo: 'reta', pts: [[-625, 1185], [625, 1185]] },
+  { vista: 'frontal', tipo: 'poli', classe: 'eixo', pts: [[0, -60], [0, yMax + 40]] },
+  ...[1, -1].map((k) => ({ vista: 'frontal', contorno: true, tipo: 'suave', pts: FRONTAL.map(([y, w]) => [k * w, y]) })),
+  { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-860, 105], [860, 105]] },
+  { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-625, 1185], [625, 1185]] },
   ...[1, -1].map((k) => ({
-    vista: 'frontal', tipo: 'reta', classe: 'roda', fechado: true,
+    vista: 'frontal', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
     pts: [[k * RD.x - RD.larg / 2, 0], [k * RD.x + RD.larg / 2, 0],
       [k * RD.x + RD.larg / 2, RD.raio * 2], [k * RD.x - RD.larg / 2, RD.raio * 2]],
   })),
@@ -107,7 +118,7 @@ const spec = {
   ],
   landmarks: LANDMARKS.flatMap(([id, x, y, z]) => (
     x === 0 || id === 'L14' || id === 'L15'
-      ? [{ vista: 'lateral', em: [z, y], id }]
+      ? [{ vista: 'lateral', em: [z, y], id, sobre: ['L01', 'L04', 'L05', 'L06', 'L07', 'L08', 'L09'].includes(id) ? 'silhuetaSuperior' : undefined }]
       : [{ vista: 'planta', em: [z, x], id }, { vista: 'lateral', em: [z, y] }]
   )),
   legenda: {
@@ -122,6 +133,8 @@ const spec = {
   },
 };
 
+const { svg, relatorio } = prancha(spec);
 mkdirSync(path.dirname(SAIDA), { recursive: true });
-writeFileSync(SAIDA, prancha(spec));
+writeFileSync(SAIDA, svg);
 console.log(`prancha-chassi-p0: ${path.relative(REPO, SAIDA)}`);
+console.log(imprimirRelatorio(relatorio));
