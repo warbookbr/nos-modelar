@@ -50,11 +50,10 @@ ombro, arco da caixa de roda, crista do para-lama, cintura, base do para-brisa.
 Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma fileira extra
 de geometria.
 
-Motivos completos no dossiê, seção 7. Em resumo: é o método padrão para o alvo
-declarado; resolve os sintomas por topologia, não por sobreposição; poucos
-controles geram superfície suave, o que atende o requisito de otimização; a
-linhagem de identidade sai por aritmética; respeita `BLOCO = 1000`; e custa um
-algoritmo local em JavaScript puro, não um kernel.
+Motivos completos no dossiê, seção 7: é o método padrão para o alvo declarado,
+resolve os sintomas por topologia e não por sobreposição, poucos controles geram
+superfície suave, respeita `BLOCO = 1000` e custa um algoritmo local em
+JavaScript puro, não um kernel.
 
 ### Rejeições registradas
 
@@ -89,29 +88,31 @@ algoritmo local em JavaScript puro, não um kernel.
 
 ### P0 — alvo, referência e limiares — **fechada**
 
-Executada em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md).
+Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md): perfil
+`realistaApresentacao / F3 / dimensional` declarado antes de modelar, envelope e
+quinze landmarks, cinco curvas mestras, limiares dos oito eixos, oito condições
+de rejeição visual e orçamento por nível. Duas decisões:
 
-Entregou perfil `realistaApresentacao / F3 / dimensional` declarado antes de
-modelar, envelope e quinze landmarks, cinco curvas mestras, limiares dos oito
-eixos, oito condições de rejeição visual e orçamento por nível. Duas decisões
-valem registro aqui:
+- **referência** — o carro é ficcional e não há prancha calibrável, então a
+  referência vinculante é a prancha ortográfica derivada dos landmarks, e a
+  imagem em perspectiva fica fora de todo gate;
+- **`BLOCO = 1000` virou limiar** — a cage é emitida por regiões, 900 vértices e
+  900 faces por passo.
 
-- **Referência.** Não existe prancha calibrável, e o carro é ficcional — não há
-  original contra o qual medir erro. A referência vinculante passa a ser a
-  prancha ortográfica derivada dos landmarks de P0; a imagem em perspectiva fica
-  como direção estética, fora de todo gate.
-- **`BLOCO = 1000` virou limiar.** A cage completa, teto de 2800 quads, não cabe
-  num passo: é emitida por regiões, 900 vértices e 900 faces cada.
+### P1 — contrato da cage — **fechada**
 
-### P1 — contrato da cage
+Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../CHASSI-P1-CONTRATO-DA-CAGE.md):
+`mecanifica.cage-quad@1` como artefato autoral separado, aresta como par ordenado
+derivado, loop nomeado com domínio fechado, seção como conferência e não como
+geradora, herança de `parte` pelas filhas e diff em três classes. Duas decisões:
 
-- formato da malha de controle: quads, vincos, loops nomeados;
-- **seção transversal como contrato**, nas cinco estações da curva mestra 4 de
-  P0. Ela é entrada da cage, não recurso de desenho: fixá-la no motor de prancha
-  criaria um formato que esta rodada teria de refazer;
-- regra de linhagem `face da cage → faces do nível k`;
-- contrato entre cage e `mecanifica.malha-poligonal@1`;
-- política de diff que distinga mudança de forma de mudança de topologia.
+- **a malha compilada não tem identidade persistida** — o dossiê dizia que a
+  linhagem sai "por aritmética", o que vale para o cálculo, mas id derivado de
+  posição em lista ordenada é o que o `CLAUDE.md` proíbe; persistem a cage e o
+  nome semântico;
+- **atrito registrado, escolha adiada** — o alocador aborta em `id >= BLOCO`
+  (`nucleo.js:403`), então a compilação escreve fora do caminho posicional. Há
+  duas rotas, e a escolha depende de medição que só P2 tem.
 
 ### P2 — prova decisiva, descartável
 
@@ -127,10 +128,9 @@ Um quarto dianteiro, em zona privada, contendo obrigatoriamente:
 - identidades preservadas da cage até a malha compilada;
 - a alteração `elevar a crista 25 mm` reexecutada por outra sessão.
 
-Medir: faces da cage, faces por nível, bytes, tempo de avaliação, erro de
-silhueta, pontos extraordinários visíveis e custo de contexto da alteração.
-Produzir também uma forma não automotiva, para provar que a representação não
-carrega vocabulário de carro.
+Medir: faces da cage e por nível, bytes, tempo, erro de silhueta, pontos
+extraordinários visíveis e custo de contexto da alteração. Produzir também uma
+forma não automotiva, para provar que a representação não carrega vocabulário.
 
 **Critério de descarte, declarado antes:** a decisão reabre se a cage exigir mais
 de ~800 quads no quarto dianteiro, se o arco não puder ser aberto sem booleana,
@@ -149,16 +149,17 @@ ou se a alteração local exigir tocar mais de um loop nomeado.
 
 ## Validação
 
-Oito eixos independentes — integridade, dimensão, silhueta, superfície,
-topologia, semântica, apresentação e aceite — com limiares e métricas já fixados
-em P0. O erro anterior foi deixar integridade, dimensão e apresentação aprovarem
-por silhueta, superfície e aceite.
+Oito eixos independentes — integridade, dimensão, silhueta, superfície, topologia,
+semântica, apresentação e aceite — com limiares fixados em P0. O erro anterior foi
+deixar integridade, dimensão e apresentação aprovarem por silhueta e aceite.
 
 ## Gate para virar `pronto`
 
 - ~~alvo e fidelidade inequívocos, com perfil declarado antes de modelar~~ —
   fechado em P0;
 - ~~referência resolvida e limiares numéricos fixados~~ — fechado em P0;
+- ~~contrato entre cage e malha compilada escrito~~ — fechado em P1;
+- ~~política de identidade para edição de cage~~ — fechado em P1;
 - prova P2 executada com todas as medidas registradas;
 - critério de descarte avaliado, com resultado `manter` ou `reabrir`;
 - contrato entre cage e malha compilada escrito;
@@ -167,8 +168,8 @@ por silhueta, superfície e aceite.
 - migração que preserve receitas e baseline existentes;
 - destino do protótipo rejeitado decidido.
 
-Dois itens fechados em P0; os demais seguem abertos. Não há plano ativo de
-implementação.
+Quatro itens fechados, em P0 e P1; os demais seguem abertos. Não há plano ativo
+de implementação.
 
 ## Fora desta versão
 
@@ -178,14 +179,12 @@ baking e fabricação.
 
 ## Registro
 
-- **V0 — 2026-08-18:** problema, evidência, armadilha do envelope, seis
-  alternativas e processo iterativo registrados, sem decisão.
+- **V0 — 2026-08-18:** problema, evidência e seis alternativas, sem decisão.
 - **V1 — 2026-08-19:** representação decidida — cage de quads com vincos e
-  subdivisão Catmull-Clark nativa. OCCT, Blender headless, SDF e kernel próprio
-  rejeitados com motivo e condição de reabertura. Bake-off de três rotas
-  substituído por prova única com critério de descarte. Unidade editável definida
-  como loop de aresta nomeado. Booleana proibida na pele primária. `BLOCO = 1000`
-  registrado como restrição de arquitetura. Causa raiz citada do código.
+  Catmull-Clark nativa. OCCT, Blender headless, SDF e kernel próprio rejeitados
+  com motivo e condição de reabertura. Bake-off substituído por prova única com
+  critério de descarte. Unidade editável no loop de aresta nomeado. Booleana
+  proibida na pele primária. `BLOCO = 1000` registrado como restrição.
 - **V2 — 2026-08-19:** `loft` e envelopes varridos rejeitados explicitamente como
   base da pele exterior, com o argumento de aberturas envidraçadas registrado no
   dossiê, seção 8.7. `loft` mantido sem alteração para peças varridas. Prova P2
@@ -196,5 +195,6 @@ baking e fabricação.
   `BLOCO = 1000` convertido em limiar de 900 ids por passo de cage.
 - **V4 — 2026-08-19:** seção transversal encaixada em P1 como entrada da cage, e
   mantida fora do motor de prancha para não criar formato que P1 refaria.
-- **Próxima revisão:** executar P1 — contrato da cage: formato de quads e
-  vincos, seção transversal, loops nomeados, linhagem e política de diff.
+- **V5 — 2026-08-19:** P1 executada e fechada em `../CHASSI-P1-CONTRATO-DA-CAGE.md`.
+- **Próxima revisão:** executar P2 — a prova descartável do quarto dianteiro,
+  contra o critério de descarte já declarado.

@@ -123,8 +123,14 @@ aplicação publicada aqui.
   de modelar, envelope e quinze landmarks fixados, prancha ortográfica derivada
   adotada como referência vinculante no lugar da imagem em perspectiva, limiares
   numéricos dos oito eixos e oito condições de rejeição visual escritas antes da
-  geometria. Faltam o contrato da cage e a prova descartável do quarto
-  dianteiro.
+  geometria. A rodada P1 também está fechada em
+  [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md)
+  (`docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md`): `mecanifica.cage-quad@1` é
+  artefato autoral separado, para não esticar `malha-poligonal@1`; aresta é par
+  ordenado derivado, porque o formato salvo não tem entidade aresta; a seção
+  transversal é conferência e não geradora; e a malha compilada **não tem
+  identidade persistida** — persistem a cage e o nome semântico, que a face já
+  carrega na linha canônica. Falta a prova descartável do quarto dianteiro.
 - O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
   (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
   `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um
