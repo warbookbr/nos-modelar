@@ -74,6 +74,13 @@ booleana, ou se a alteração local exigir tocar mais de um loop nomeado.
 malha compilada, e reexecução idêntica. Mais uma forma não automotiva pelo mesmo
 módulo, provando que a representação não carrega vocabulário de carro.
 
+### Q7 — refazer a partir da seção declarada
+
+A forma foi reprovada. Causa raiz isolada: a cage nasceu de silhueta e meia
+largura, com seção interpolada genericamente, então não há quebra para o vinco
+revelar e a linha de caráter não se lê. Declarar as cinco seções de P0 e
+reconstruir a cage a partir delas.
+
 ### Q6 — veredito
 
 `manter` ou `reabrir`, com as medidas na mesa e crítico visual despachado sem
@@ -95,3 +102,8 @@ carroceria inteira, interior e qualquer promoção a peça publicada.
 ## Registro
 
 - **V1 — 2026-08-19:** plano aberto.
+- **V2 — 2026-08-19:** Q1 a Q5 entregues e **reprovadas no aceite**. O plano
+  segue ativo: prova reprovada não fecha. A próxima rodada é Q7 — declarar as
+  cinco seções transversais de P0 como contrato, em vez de interpolar seção
+  genérica, e refazer a cage a partir delas. As oito condições de rejeição de P0
+  passam a ser rodadas **antes** de apresentar, não depois.

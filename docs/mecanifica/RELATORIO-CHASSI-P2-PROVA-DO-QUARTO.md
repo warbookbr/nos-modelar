@@ -84,7 +84,48 @@ tocados em mais de um vértice.
 - **linha de caráter por vinco.** A linha de ombro é nitidez 1,4 sobre um loop,
   não uma fileira extra de geometria.
 
-## 6. Limites honestos desta prova
+## 6. Veredito: REPROVADA no eixo de aceite
+
+O usuário reprovou a forma. Isso é o veredito de registro, e não um comentário
+ao lado das medidas.
+
+**O erro de método que produziu este relatório precisa ficar escrito**, porque
+ele é a falha fundadora do projeto repetida com roupa nova. Em 2026-08-18 os
+gates passaram e o usuário reprovou. Aqui o autor escreveu o gate verde e a
+reprovação **na mesma página** — a seção 2 com medidas boas e a seção de limites
+admitindo forma medíocre — e mesmo assim chamou o conjunto de prova. Admitir o
+defeito por antecipação não é aceitá-lo: é blindá-lo para que passe assim mesmo.
+
+As oito condições de rejeição visual de P0 existem exatamente para converter
+"ficou ruim" em específico, e **não foram rodadas** antes de fechar. Rodando:
+
+| condição de P0 | resultado |
+|---|---|
+| 1 — lê como cápsula, tubo ou sabonete | **dispara** |
+| 2 — arco lê como borda pintada | passa |
+| 3 — para-lama lê como volume anexo | passa |
+| 5 — reflexão quebra na linha de ombro | **dispara** — a linha não se lê |
+| 6 — recorte de farol lê como decalque | **dispara** — está invisível |
+| 8 — densidade na amostragem e não na forma | inconclusivo |
+
+Cada uma reprova sozinha, por decisão declarada antes de existir geometria.
+
+### O diagnóstico que a condição 5 entrega
+
+A linha de ombro foi declarada com nitidez 1,4 e **não aparece**. A causa não é
+nível de subdivisão nem vinco fraco:
+
+> **O vinco foi aplicado onde não há quebra.** Nos anéis 4 e 5 da seção, a
+> superfície é quase colinear. Vinco torna nítido um ângulo que já existe; onde a
+> superfície é lisa, ele não faz nada.
+
+E isso aponta a causa raiz da forma inteira: a cage foi gerada a partir de uma
+silhueta e de uma meia largura, com a seção transversal **interpolada
+genericamente**. P1 encaixou a seção como contrato de entrada da cage
+precisamente para isso, e esta rodada passou por cima. Sem seção com caráter, não
+há caráter para vinco nenhum revelar.
+
+## 7. Limites honestos desta prova
 
 - **a forma é medíocre.** A máquina está provada; o desenho não. A vista frontal
   ainda lê como banheira, o recorte de farol mal se enxerga e o nariz termina num
@@ -95,9 +136,16 @@ tocados em mais de um vértice.
 - **o crítico visual não foi despachado** ainda, conforme o protocolo de
   `REFERENCIA-E-CRITICA-VISUAL.md`.
 
-## 7. Registro
+## 8. Registro
 
 - **P2 v1 — 2026-08-19:** Q1 a Q5 executadas. Dois braços do critério de descarte
   passam com folga; o terceiro disparou por um vértice compartilhado entre dois
-  loops que se encontram. Veredito Q6 pendente de decisão do usuário sobre o
-  critério.
+  loops que se encontram.
+- **P2 v2 — 2026-08-19:** **reprovada pelo usuário no eixo de aceite.** Três das
+  oito condições de rejeição visual de P0 disparam, e elas não haviam sido
+  rodadas antes de fechar. Registrado o erro de método — autocrítica preventiva
+  usada como blindagem, com gate verde e reprovação na mesma página. Causa raiz
+  da forma isolada: a seção transversal foi interpolada genericamente em vez de
+  declarada, então não existe quebra para o vinco revelar, e a linha de ombro não
+  se lê. A representação **não** está confirmada por esta rodada: medida boa com
+  forma reprovada não confirma nada.
