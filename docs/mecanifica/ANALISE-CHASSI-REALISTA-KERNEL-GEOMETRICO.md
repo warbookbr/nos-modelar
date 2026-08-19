@@ -381,6 +381,30 @@ uma rejeição já derivável não gera informação; consome orçamento.
 A prova da seção 14 substitui o bake-off: uma rota, o caso difícil de verdade,
 critério de descarte declarado.
 
+### 8.7 Rejeitado como base — `loft` e qualquer envelope varrido
+
+`loft` deixa de ser candidato à pele exterior. Não é uma preferência de estilo: é
+consequência direta da seção 5.1, e a proibição fica registrada como invariante.
+
+Três motivos, cada um suficiente:
+
+- **Aberturas.** Para-brisa, vidros laterais, vão de porta e caixa de roda são
+  loops fechados dentro da superfície. Uma varredura só tem borda nas
+  extremidades do caminho; qualquer abertura interna exigiria booleana, que a
+  seção 8.5 proíbe na pele primária.
+- **Acoplamento.** Uma seção por estação faz capô, para-lama e túnel central
+  compartilharem os mesmos graus de liberdade. Editar um move os outros — o
+  oposto do requisito de controle local.
+- **Silhueta.** O resultado converge para um tubo suavizado. Foi exatamente o que
+  a sonda produziu, e adensar seções não muda a família de formas alcançável.
+
+`loft` continua legítimo, e permanece no núcleo sem alteração, para o que ele
+descreve bem: peças genuinamente varridas — dutos, escapamento, longarinas
+tubulares, aros, perfis extrudados. O que muda é que ele nunca é a representação
+central de uma carroceria.
+
+**Reabertura:** nenhuma prevista para a pele exterior.
+
 ## 9. Arquitetura em cinco camadas
 
 ### Camada R — referência calibrada
@@ -675,6 +699,19 @@ Mudanças materiais em relação à versão 0:
    elípticas, não uma aproximação a refinar.
 10. **Perfil de autoria identificado como causa do falso positivo:** a sonda
     declarava `F2 conceitual, orcamentoFaces 1400` e foi julgada contra F3.
+
+### Versão 2 — 2026-08-19
+
+1. **`loft` rejeitado como base da pele exterior** e registrado como invariante,
+   seção 8.7. O argumento decisivo é o vão envidraçado: para-brisa, janela
+   lateral e vão de porta são loops fechados internos, e uma varredura só tem
+   borda nas extremidades do caminho — abri-los exigiria a booleana que a seção
+   8.5 proíbe. Somam-se o acoplamento entre regiões e a convergência de silhueta
+   para tubo.
+2. **Escopo do `loft` preservado:** segue no núcleo, sem alteração, para peças
+   genuinamente varridas.
+3. **Prova P2 ampliada:** passa a exigir base de para-brisa e canto de janela
+   lateral abertos por topologia, com moldura de retorno.
 
 ### Próxima revisão esperada
 

@@ -67,6 +67,7 @@ algoritmo local em JavaScript puro, não um kernel.
 | kernel próprio de B-rep | rejeitada | risco desproporcional | nenhuma prevista |
 | booleana de malha (Manifold) | adiada | pele primária não sofre booleana | feature secundária que a topologia da cage não resolva |
 | bake-off de três kernels | eliminado | duas rotas já eram elimináveis por análise | se a prova P2 acionar o critério de descarte |
+| `loft` / envelope varrido como base da pele | rejeitado | não abre para-brisa, vidro nem vão de porta sem booleana; acopla capô, para-lama e túnel; converge para tubo | nenhuma para a pele exterior; segue válido em peças varridas |
 
 ## Invariantes
 
@@ -80,6 +81,9 @@ algoritmo local em JavaScript puro, não um kernel.
 - receitas atuais e baseline continuam byte a byte compatíveis;
 - estrutura, geometria, forma visual e apresentação têm decisões separadas;
 - a pele primária não sofre booleana;
+- a pele exterior não é autorada por `loft` nem por qualquer envelope varrido —
+  aberturas são loops fechados na cage, e `loft` fica restrito a peças
+  genuinamente varridas;
 - o catálogo público permanece vazio durante a investigação.
 
 ## Rodadas
@@ -114,6 +118,8 @@ Um quarto dianteiro, em zona privada, contendo obrigatoriamente:
 - transição capô–para-lama sem corpo sobreposto;
 - uma linha de caráter por vinco semi-agudo;
 - recorte de farol conformado;
+- início do vão envidraçado: base do para-brisa e canto dianteiro da janela
+  lateral abertos por loop fechado, com moldura de retorno — sem booleana;
 - identidades preservadas da cage até a malha compilada;
 - a alteração `elevar a crista 25 mm` reexecutada por outra sessão.
 
@@ -182,5 +188,9 @@ física, UV, baking e fabricação.
   substituído por prova única com critério de descarte. Unidade editável definida
   como loop de aresta nomeado. Booleana proibida na pele primária. `BLOCO = 1000`
   registrado como restrição de arquitetura. Causa raiz citada do código.
+- **V2 — 2026-08-19:** `loft` e envelopes varridos rejeitados explicitamente como
+  base da pele exterior, com o argumento de aberturas envidraçadas registrado no
+  dossiê, seção 8.7. `loft` mantido sem alteração para peças varridas. Prova P2
+  passa a exigir vão envidraçado aberto por topologia.
 - **Próxima revisão:** executar P0 — dimensões rígidas, referência calibrada,
   perfil `F3` declarado e limiares numéricos, antes de qualquer modelagem.
