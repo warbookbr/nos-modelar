@@ -134,7 +134,16 @@ aplicação publicada aqui.
   execução no [plano P2](planos/2026-08-19-chassi-p2-prova-do-quarto.md)
   (`docs/mecanifica/planos/2026-08-19-chassi-p2-prova-do-quarto.md`), em zona
   privada e sem tocar o núcleo. A rodada Q1 entregou Catmull-Clark determinística
-  com vinco semi-agudo, canto de retalho congelado e borda curva relaxando.
+  com vinco semi-agudo, canto de retalho congelado e borda curva relaxando. Q1 a
+  Q5 estão feitas e medidas em
+  [`RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md`](RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md)
+  (`docs/mecanifica/RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md`): a cage do quarto
+  cabe em 114 quads contra teto de 800, o arco de roda abre por topologia sem
+  booleana, e o nome da região atravessa a subdivisão. O terceiro braço do
+  critério de descarte disparou — a alteração local tocou dois loops em vez de um
+  — por um único vértice compartilhado onde a crista do para-lama encontra a base
+  do para-brisa. O veredito está pendente de decisão sobre o critério, e o
+  relatório não o renegocia por conta própria.
 - O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
   (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
   `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um

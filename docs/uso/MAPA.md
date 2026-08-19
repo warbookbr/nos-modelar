@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-480 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+487 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -125,8 +125,14 @@
 
 ## autoria-assistida/experimentos/prova-cage-quarto-dianteiro/
 
+- `alteracao-local.mjs` — alteracao-local.mjs — Q5 da prova P2: `elevar a crista 25 mm`. Mede quantos loops a alteração toca, o que muda na malha compilada e se a reexecução dá o mesm…
 - `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
 - `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
+- `compilar.mjs` — compilar.mjs — compila a cage do quarto dianteiro, mede e desenha. É o passo Q4 da prova P2: nada aqui vira peça publicada.
+- `forma-nao-automotiva.mjs` — forma-nao-automotiva.mjs — a segunda metade da prova P2: a mesma cage e a mesma subdivisão sobre um objeto que não é carro. Se a representação carregasse voc…
+- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão: a c…
+- `quarto-dianteiro.test.mjs` — Testes da cage do quarto dianteiro e da forma não automotiva. O que se prova aqui é o que P2 exige: abertura real, retorno de borda, regiões da mesma superfí…
+- `render.mjs` — render.mjs — desenho sólido da malha compilada, por pintor. Sem dependência e sem navegador: projeta, ordena por profundidade e preenche com sombreado da nor…
 - `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
 - `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
 
@@ -275,6 +281,7 @@
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
+- `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
