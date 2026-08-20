@@ -21,32 +21,127 @@ export const ALVO = {
 const lerp = (a, b, t) => a + (b - a) * t;
 const suavizar = (t) => t * t * (3 - 2 * t);
 
-/* SEÇÕES DECLARADAS. Esta é a correção da rodada Q7: a versão reprovada gerava
-   a seção por fórmula genérica a partir da silhueta e da meia largura, e o
-   resultado não tinha quebra nenhuma — o vinco da linha de ombro foi aplicado
-   onde a superfície era colinear e não revelou nada.
+/* PERFIL — a seção deixa de ser tabela de coordenadas e passa a ser um punhado
+   de grandezas com nome. Esta é a correção da rodada Q9.
 
-   Cada estação é escrita à mão, com o que faz caráter: capô com vale raso, CRISTA
-   DE PARA-LAMA que sobe acima do capô, quebra dura na crista, flanco com
-   recolhimento e tuck na soleira. Dez anéis, da costura até a soleira.
-   O anel 4 é a crista, e é ele que recebe o vinco.
+   As duas versões anteriores eram 80 números digitados à mão, e as duas
+   produziram o mesmo defeito por baixo de sintomas diferentes: NINGUÉM confere
+   convexidade nem volume olhando uma tabela. A Q7 digitou uma calha no capô; a
+   Q8 corrigiu a calha e o flanco continuou uma parede — de x=965 a x=850 em
+   750 mm de altura, 115 mm de variação, chapa vertical. Vinco numa chapa não
+   faz caráter, faz um vinco numa chapa.
 
-   Correção de 2026-08-19: o capô ABAULA. A versão anterior caía de 8 a 36 mm do
-   eixo de simetria para fora antes de subir na crista, e era essa calha que o
-   usuário via como duas asas na vista frontal. Agora os anéis 1 a 3 passam
-   acima da corda que liga o eixo de simetria à crista. Quem julga isso é a
-   condição 9 de `rejeicoes-p0.mjs`, não o olho. */
-export const SECOES = [
-  { z: 2265, pts: [[0, 520], [120, 506], [220, 464], [280, 431], [300, 420], [296, 356], [284, 288], [262, 224], [232, 176], [206, 150]] },
-  { z: 2100, pts: [[0, 640], [190, 653], [360, 636], [470, 616], [520, 606], [532, 520], [524, 414], [500, 310], [468, 220], [436, 162]] },
-  { z: 1900, pts: [[0, 742], [270, 761], [520, 753], [690, 739], [812, 726], [838, 622], [828, 486], [800, 344], [764, 232], [730, 162]] },
-  { z: 1600, pts: [[0, 826], [290, 854], [560, 856], [760, 847], [906, 838], [930, 726], [920, 570], [892, 398], [856, 262], [822, 168]] },
-  { z: 1325, pts: [[0, 880], [300, 910], [600, 915], [800, 908], [965, 900], [960, 780], [948, 600], [920, 408], [884, 258], [850, 152]] },
-  { z: 1000, pts: [[0, 922], [312, 952], [612, 955], [816, 947], [952, 940], [962, 822], [950, 636], [922, 432], [888, 268], [858, 152]] },
-  { z: 700, pts: [[0, 952], [306, 981], [600, 983], [800, 974], [940, 966], [950, 846], [940, 656], [916, 444], [884, 272], [858, 152]] },
-  { z: 480, pts: [[0, 980], [300, 1008], [580, 1010], [780, 1001], [928, 992], [940, 866], [932, 668], [910, 450], [882, 276], [858, 154]] },
+   Aqui eu edito `bojoDoCapo` e `larguraMax`, não oitenta coordenadas. O que dá
+   volume ao para-lama é `larguraMax` ficar FORA da crista: a superfície sai da
+   crista, incha por cima da roda e recolhe na soleira. Era exatamente isso que
+   não existia. */
+export const PERFIL = [
+  /* z, capô no eixo de simetria, crista do para-lama, bojo do capô sobre a
+     corda, ponto mais largo do flanco (e a que altura, entre soleira e crista),
+     soleira. Milímetros.
+
+     A LARGURA DA FRENTE é correção da rodada Q11. Até aqui o nariz tinha 300 mm
+     de meia largura contra 965 na cowl: 600 mm de frente para um corpo de
+     1930 mm. Isso é um cone, e é a razão de a peça ler como barraca de lona em
+     toda vista. O P0 não tem landmark de largura do nariz — só o ponto no eixo
+     de simetria, L01 — e eu preenchi o vazio com um número que nunca olhei.
+
+     `alturaDaLarguraMax` é correção da rodada Q12, e o P0 já tinha dado o
+     número: L13 põe o ombro em (965, 900) e L12 a largura máxima em (1000, 850)
+     — 35 mm para fora e 50 mm abaixo, ou seja o ponto mais largo encosta na
+     crista. Eu tinha escrito 0,45, no meio da altura, e isso transforma o
+     flanco num barril e ENGOLE a crista: a linha de caráter vira inflexão
+     macia, porque o volume que deveria estar sob ela está no meio do lado. */
+  { z: 2265, centro: 520, crista: [806, 505], bojoDoCapo: 12, larguraMax: 830, alturaDaLarguraMax: 0.88, soleira: [744, 150] },
+  { z: 1900, centro: 742, crista: [906, 742], bojoDoCapo: 22, larguraMax: 940, alturaDaLarguraMax: 0.90, soleira: [800, 158] },
+  { z: 1325, centro: 880, crista: [965, 900], bojoDoCapo: 26, larguraMax: 1000, alturaDaLarguraMax: 0.93, soleira: [830, 152] },
+  { z: 480, centro: 980, crista: [958, 992], bojoDoCapo: 22, larguraMax: 994, alturaDaLarguraMax: 0.92, soleira: [858, 154] },
 ];
+
+/* Onde cada anel cai. Anéis 1..3 repartem o capô, o 4 é a crista, os 5..8
+   percorrem o flanco e o 9 é a soleira. */
+const FRACOES_DO_CAPO = [0.31, 0.62, 0.83];
+/* Frações de ALTURA entre crista e soleira. Adensadas em cima, que é onde
+   estão a largura máxima e o recolhimento do ombro. */
+const FRACOES_DO_FLANCO = [0.10, 0.28, 0.55, 0.80];
 const ANEL_CRISTA = 4;
+
+/* Flanco parametrizado pela ALTURA, não por um parâmetro de curva.
+
+   A primeira versão era uma Bézier quadrática forçada a passar pelo ponto mais
+   largo em t = 0,5. Com o ponto mais largo encostado na crista — que é onde o
+   P0 o coloca, 50 mm abaixo do ombro — o ponto de controle precisa estourar
+   para cima, e o flanco subia 55 mm ACIMA da crista: em z = 1325 a crista dava
+   (965, 900) e o anel seguinte (1001, 955). A condição 3 pegou isso como
+   segunda quebra de tangente, que é exatamente o que era.
+
+   Aqui y desce monotonicamente da crista à soleira e x sai de uma interpolação
+   de Lagrange pelos três pontos que têm nome: crista, largura máxima e soleira.
+   Overshoot em y deixa de ser possível por construção. */
+function xNaAltura(y, crista, largo, soleira) {
+  /* Duas quedas a partir da largura máxima: para cima até a crista, para baixo
+     até a soleira. Assim o ponto mais largo É o mais largo, e fica na altura
+     declarada.
+
+     Interpolação de Lagrange pelos três pontos não serve: a parábola que passa
+     por (900, 965), (848, 1000) e (152, 830) tem vértice em y ≈ 700 com
+     x ≈ 1065, ou seja estoura 65 mm além do teto de meia largura do P0 e põe o
+     ponto mais largo onde ninguém pediu. */
+  const queda = (a, b, u, p) => a - (a - b) * Math.pow(Math.min(1, Math.max(0, u)), p);
+  if (y >= largo[1]) return queda(largo[0], crista[0], (y - largo[1]) / ((crista[1] - largo[1]) || 1), 1.8);
+  return queda(largo[0], soleira[0], (largo[1] - y) / ((largo[1] - soleira[1]) || 1), 1.6);
+}
+
+/* Avalia um perfil numa seção de dez anéis. */
+export function secaoDoPerfil(q) {
+  const [cx, cy] = q.crista;
+  const pts = [[0, q.centro]];
+  for (const f of FRACOES_DO_CAPO) {
+    const x = cx * f;
+    const naCorda = q.centro + (cy - q.centro) * f;
+    pts.push([Math.round(x), Math.round(naCorda + q.bojoDoCapo * Math.sin(Math.PI * Math.pow(f, 0.85)))]);
+  }
+  pts.push([cx, cy]);
+  const largo = [q.larguraMax, q.soleira[1] + (cy - q.soleira[1]) * q.alturaDaLarguraMax];
+  for (const t of FRACOES_DO_FLANCO) {
+    const y = cy + (q.soleira[1] - cy) * t;
+    pts.push([Math.round(xNaAltura(y, q.crista, largo, q.soleira)), Math.round(y)]);
+  }
+  pts.push(q.soleira.slice());
+  return pts;
+}
+
+const interp = (a, b, t) => a + (b - a) * t;
+
+/* Interpola os PARÂMETROS entre estações-chave e só então avalia a seção.
+   Interpolar parâmetro preserva o significado; interpolar coordenada não. */
+function perfilEm(z) {
+  const o = PERFIL;
+  if (z >= o[0].z) return o[0];
+  if (z <= o[o.length - 1].z) return o[o.length - 1];
+  for (let i = 0; i < o.length - 1; i += 1) {
+    const a = o[i];
+    const b = o[i + 1];
+    if (z <= a.z && z >= b.z) {
+      const t = (a.z - z) / (a.z - b.z);
+      return {
+        z,
+        centro: interp(a.centro, b.centro, t),
+        crista: [interp(a.crista[0], b.crista[0], t), interp(a.crista[1], b.crista[1], t)],
+        bojoDoCapo: interp(a.bojoDoCapo, b.bojoDoCapo, t),
+        larguraMax: interp(a.larguraMax, b.larguraMax, t),
+        alturaDaLarguraMax: interp(a.alturaDaLarguraMax, b.alturaDaLarguraMax, t),
+        soleira: [interp(a.soleira[0], b.soleira[0], t), interp(a.soleira[1], b.soleira[1], t)],
+      };
+    }
+  }
+  return o[o.length - 1];
+}
+
+/* As seções continuam sendo o contrato conferido pela cage; o que mudou é que
+   agora elas são DERIVADAS do perfil, não digitadas. */
+export const SECOES = [2265, 2100, 1900, 1600, 1325, 1000, 700, 480]
+  .map((z) => ({ z, pts: secaoDoPerfil(perfilEm(z)) }));
 
 const lerp2 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 
@@ -196,11 +291,75 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     if (j < 3) vincos.set(chave(grade[ult][j], grade[ult][j + 1]), 1.8);
   }
 
+  /* FRENTE DO CARRO. z = 2265 não é plano de corte da prova — é onde o carro
+     acaba. Sem esta tampa a peça é uma casca aberta e a vista frontal mostra o
+     interior da superfície do outro lado: foi isso que o usuário viu como
+     "muito estranho, não sei explicar", depois de eu ter registrado o corte reto
+     como defeito conhecido e continuado a entregar renders assim mesmo.
+
+     A tampa é uma grade de quads entre o anel do nariz e o plano de simetria,
+     recuando em z: o lábio do capô desce e volta, e a fáscia encontra a própria
+     imagem espelhada em x = 0. Sem booleana, como a pele exige. */
+  /* A tampa em dois tempos: primeiro o LÁBIO rola em z quase sem andar em x,
+     depois o PAINEL achata em x a z constante. Fazer as duas coisas juntas
+     puxava 200 mm para dentro num anel só e produzia dois espigões nos cantos
+     dianteiros — visíveis na frontal como duas barbatanas acima da linha do
+     capô. */
+  /* O z tem de ser ESTRITAMENTE crescente. Com dois anéis no mesmo z, a coluna
+     j = 0 — que está sobre o plano de simetria e portanto tem x = 0 em todos os
+     anéis — colapsa em pontos coincidentes e gera quads degenerados: diedro de
+     180° medido pela condição 8. O topo da tampa é um lado curto de 70 mm ao
+     longo de z, não um vértice. */
+  const CAPA_ANEIS = [{ x: 0.97, z: 0.45 }, { x: 0.86, z: 0.80 }, { x: 0.55, z: 0.94 }, { x: 0, z: 1 }];
+  const CAPA = CAPA_ANEIS.length;
+  const recuoDoNariz = 70;
+  /* O recuo se esgota no primeiro quarto da tampa: aí a fáscia vira PAINEL
+     PLANO. Recuo linear até a costura fazia todos os anéis convergirem para uma
+     quilha em x = 0 — proa de barco, que é a condição 1 de rejeição do P0. O que
+     recua é a dobra do lábio, não a fáscia inteira. */
+
+  const anelDoNariz = grade[0];
+  const alvoNaCostura = anelDoNariz.map((v, j) => {
+    const p = V.get(v);
+    return [0, j === 0 ? p[1] : SECOES[0].pts[9][1] + (p[1] - SECOES[0].pts[9][1]) * (j === 0 ? 1 : 0)];
+  });
+  /* A costura vai do alto do nariz até a soleira, na altura de cada anel. */
+  for (let j = 0; j < ANEIS; j += 1) alvoNaCostura[j] = [0, V.get(anelDoNariz[j])[1]];
+
+  const capa = [anelDoNariz];
+  for (let k = 1; k <= CAPA; k += 1) {
+    const anel = CAPA_ANEIS[k - 1];
+    const linha = [];
+    for (let j = 0; j < ANEIS; j += 1) {
+      const p = V.get(anelDoNariz[j]);
+      V.set(proximo, [p[0] * anel.x, p[1], ALVO.zNariz - recuoDoNariz * anel.z]);
+      linha.push(proximo);
+      proximo += 1;
+    }
+    capa.push(linha);
+  }
+  for (let k = 0; k < CAPA; k += 1) {
+    for (let j = 0; j < ANEIS - 1; j += 1) {
+      F.set(idF, {
+        id: idF,
+        vs: [capa[k][j], capa[k + 1][j], capa[k + 1][j + 1], capa[k][j + 1]],
+        parte: 'fasciaDianteira',
+      });
+      idF += 1;
+    }
+  }
+
   /* Vincos. Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma
      fileira extra de geometria — P0 e P1 dizem isso, e é o que se faz aqui. */
   const loopOmbro = grade.map((l) => l[ANEL_CRISTA]);
+  /* A linha de caráter MORRE antes do canto dianteiro. Num carro ela se apaga
+     ao virar a quina do para-lama; levada até o anel do nariz ela encontra a
+     tampa em ângulo e vira uma ponta aguda. As duas primeiras estações ficam
+     sem vinco, e a terceira entra com metade da nitidez. */
+  const NITIDEZ_DA_CRISTA = [0, 0, 1, 2];
   for (let i = 0; i < loopOmbro.length - 1; i += 1) {
-    vincos.set(chave(loopOmbro[i], loopOmbro[i + 1]), 2);
+    const n = NITIDEZ_DA_CRISTA[Math.min(i, NITIDEZ_DA_CRISTA.length - 1)];
+    if (n > 0) vincos.set(chave(loopOmbro[i], loopOmbro[i + 1]), n);
   }
   /* A borda do arco é aguda pelo retorno; o retorno em si é vinco cheio. */
   for (const [a, b] of contorno.arestas) vincos.set(chave(a, b), 2);

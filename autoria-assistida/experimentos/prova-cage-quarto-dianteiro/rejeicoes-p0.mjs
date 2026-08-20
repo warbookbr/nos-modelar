@@ -196,12 +196,19 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
        "não há buraco" numa peça cujo buraco está provado desde Q4 — detector
        mentindo, não forma errada. Seleciona-se por posição. */
     const naBorda = new Set(lacosDeBorda(malha).flat());
-    const raios = [];
-    for (const v of naBorda) {
-      const p = malha.V.get(v);
-      const raio = Math.hypot(p[2] - ALVO.zEixo, p[1] - ALVO.rodaRaio);
-      if (raio < ALVO.arcoRaio + 40) raios.push(raio);
+    /* Seleciona pela FITA DE RETORNO, não por um anel de raio: a janela de raio
+       pegava também os vértices de borda da soleira que passam por baixo do
+       arco, e com retorno zerado o detector ainda lia 6,75 mm de recuo — quase
+       aprovando uma abertura sem espessura nenhuma. */
+    const daFita = new Set();
+    for (const f of malha.F.values()) {
+      if (!/arcoDianteiroRetorno/.test(f.parte ?? '')) continue;
+      for (const v of f.vs) if (naBorda.has(v)) daFita.add(v);
     }
+    const raios = [...daFita].map((v) => {
+      const p = malha.V.get(v);
+      return Math.hypot(p[2] - ALVO.zEixo, p[1] - ALVO.rodaRaio);
+    });
     if (raios.length < 8) diz(2, 'reprova', { verticesNoArco: raios.length }, 'não há contorno de abertura no círculo do arco');
     else {
       const medio = raios.reduce((a, b) => a + b, 0) / raios.length;
