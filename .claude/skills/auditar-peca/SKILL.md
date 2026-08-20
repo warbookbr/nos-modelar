@@ -37,7 +37,26 @@ peça isolada e não inventa validade global de uma montagem.
    legibilidade das partes e coerência da forma. Não conclua apenas pela
    existência de um PNG.
 
-3. Se existir um pacote de modelagem associado, rode a revisão oficial:
+3. **Isole por pergunta.** Auditar tudo junto esconde erro estrutural debaixo de
+   detalhe. Rode os três modos para a parte sob suspeita:
+
+   ```bash
+   npm run bancada -- <peca> --selecionadas=<parte> --modo=isolar --focar
+   npm run bancada -- <peca> --selecionadas=<parte> --modo=contexto
+   npm run bancada -- <peca> --par=<parte>,<vizinha>
+   ```
+
+   | modo | pergunta | o que avaliar |
+   |---|---|---|
+   | `isolar` | a superfície está boa? | continuidade, vinco, transição, ondulação |
+   | `contexto` | cabe e encaixa? | folga, interferência, proporção, alinhamento |
+   | `par` | este encaixe específico fecha? | contato, coaxialidade, penetração |
+   | `todas` | lê como o objeto certo? | leitura geral, que **não** se decide sozinho |
+
+   **Peça com vizinho nunca é aprovada só em `isolar`**: forma impossível passa
+   isolada. Um arco que não comporta a própria roda só aparece em `contexto`.
+
+4. Se existir um pacote de modelagem associado, rode a revisão oficial:
 
    ```bash
    npm run revisar:modelagem -- <pacote> --revisao=r001
@@ -45,7 +64,7 @@ peça isolada e não inventa validade global de uma montagem.
 
    A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-4. Rode os gates aplicáveis:
+5. Rode os gates aplicáveis:
 
    ```bash
    npm test
@@ -90,3 +109,57 @@ Registre comandos, medidas, vistas lidas, falhas e decisões. Diferencie um gate
 reprodutível de uma observação visual. Se o briefing exigir algo que as vistas
 não conseguem mostrar, registre a divergência honestamente em vez de alterar a
 peça ou simular a capacidade.
+
+### Antes de tudo: OLHE a imagem
+
+Rasterize as vistas e **abra o PNG**:
+
+```
+node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
+```
+
+Ler o PNG como imagem é passo obrigatório antes de julgar, antes de despachar
+crítico e antes de levar qualquer coisa ao usuário. SVG gerado, entregue e nunca
+aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 mm
+ficou várias rodadas visível na vista frontal e só foi achado por um script.
+Medição pega o defeito que alguém já imaginou; olhar pega o resto.
+
+## Despachar o crítico, sem contexto
+
+Em marco — antes de propor promoção, publicação ou de levar o resultado ao
+usuário — despache um subagente como **crítico visual**. O protocolo está em
+[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+
+Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
+relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
+VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
+que lê a receita volta a julgar a intenção em vez do resultado, que é
+exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
+mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
+
+A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
+pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
+teste não exige gosto — só verifica se a forma comunica.
+
+Três limites, todos inegociáveis:
+
+- **achado, nunca aprovação.** Silêncio do crítico não é evidência de qualidade
+  e não entra em registro como aceite. Forma quem aprova é o usuário;
+- **depois dos gates, nunca no lugar deles.** Se descrição, medida ou gate ainda
+  acusam, corrija primeiro;
+- **em marco, não a cada rodada.** Cada despacho é partida fria.
+
+## Antes de qualquer julgamento: abra o alvo e sobreponha
+
+Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
+isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto uma
+única vez, e o crítico visual recebendo só o render.
+
+1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
+2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
+   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
+3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
+   modelo e sobreposição. Crítico que recebe só o render dá opinião.
+
+Sem alvo desenhado, desenhe antes: veja
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-459 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+493 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -18,6 +18,7 @@
 
 ## .claude/agents/
 
+- `critico-visual.md` — Crítico visual sem contexto da Mecanifica. Recebe o DESENHO ALVO e as vistas do MODELO e responde se o segundo bate com o primeiro. Use antes de fechar qualq…
 - `game-builder.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
 - `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
 
@@ -36,6 +37,10 @@
 ## .claude/skills/criar-peca/references/
 
 - `operacoes-procedurais.md` — Referência de operações procedurais
+
+## .claude/skills/desenhar-prancha/
+
+- `SKILL.md` — Desenhar uma prancha ortográfica alvo da Mecanifica com o motor de prancha — silhueta, aberturas, painéis e cotas em vistas lateral, frontal, traseira e supe…
 
 ## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/
 
@@ -118,6 +123,21 @@
 - `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
 - `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
 - `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
+
+## autoria-assistida/experimentos/prova-cage-quarto-dianteiro/
+
+- `alteracao-local.mjs` — alteracao-local.mjs — Q5 da prova P2: `elevar a crista 25 mm`. Mede quantos loops a alteração toca, o que muda na malha compilada e se a reexecução dá o mesm…
+- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
+- `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
+- `compilar.mjs` — compilar.mjs — compila a cage do quarto dianteiro, mede e desenha. É o passo Q4 da prova P2: nada aqui vira peça publicada.
+- `forma-nao-automotiva.mjs` — forma-nao-automotiva.mjs — a segunda metade da prova P2: a mesma cage e a mesma subdivisão sobre um objeto que não é carro. Se a representação carregasse voc…
+- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão: a c…
+- `quarto-dianteiro.test.mjs` — Testes da cage do quarto dianteiro e da forma não automotiva. O que se prova aqui é o que P2 exige: abertura real, retorno de borda, regiões da mesma superfí…
+- `rejeicoes-p0.mjs` — rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
+- `rejeicoes-p0.test.mjs` — Um detector que nunca reprova e um que sempre reprova são igualmente inúteis. Cada condição automatizada ganha AQUI um par: uma cage que ela deve deixar pass…
+- `render.mjs` — render.mjs — desenho sólido da malha compilada, por pintor. Sem dependência e sem navegador: projeta, ordena por profundidade e preenche com sombreado da nor…
+- `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
+- `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
 
 ## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/
 
@@ -226,12 +246,15 @@
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
+- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
+- `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
+- `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
 - `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
@@ -261,6 +284,7 @@
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
+- `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
@@ -320,10 +344,15 @@
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
+- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
 - `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
+- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
+- `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
+- `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
+- `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -358,6 +387,10 @@
 ## docs/mecanifica/planos/mcp/concluidos/
 
 - `01-fatia-1a-piloto-leitura.md` — MCP — encerramento da Fatia 1A somente leitura
+
+## docs/mecanifica/referencias/
+
+- `README.md` — Referências de forma
 
 ## docs/rumo/
 
@@ -547,6 +580,7 @@
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
+- `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
 - `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
@@ -562,6 +596,7 @@
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
+- `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
@@ -598,9 +633,17 @@
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
+- `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
+- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
+- `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
+- `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
+- `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
+- `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
+- `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
+- `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.

@@ -2,14 +2,36 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-19-chassi-p2-prova-do-quarto.md`](2026-08-19-chassi-p2-prova-do-quarto.md).
+A prova descartável do quarto dianteiro, que confirma ou reabre a cage de quads
+com Catmull-Clark. Vive em zona privada, não toca o núcleo e tem critério de
+descarte declarado desde P0.
+
+A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída e
+fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que
+sozinho já acusou quatro rodas escapando da carroceria em planta — e passou a
+comparar as vistas pelos eixos que compartilham, com leitura `projecao` ou
+`secao` declarada. O investimento volta ao chassi: a próxima rodada é P1, o
+contrato da cage, onde a seção transversal foi encaixada.
+
+O [motor de prancha com filete e medida](2026-08-19-motor-de-prancha-medida.md)
+foi **concluído**. Ele trocou a spline por traçado com filete, adotou âncora
+proporcional e passou a emitir relatório medido da própria saída. O ganho não é
+estético: o relatório pegou sozinho um arco de roda furando o capô e dez
+inversões de curvatura na silhueta do P0 que ninguém tinha visto. Método
+registrado na skill `desenhar-prancha`.
 
 **Plano em elaboração:**
 [`2026-08-18-chassi-realista-kernel-geometrico.md`](2026-08-18-chassi-realista-kernel-geometrico.md).
-Ele está em `rascunho`, não autoriza implementação e será revisto em
-várias rodadas antes de escolher representação ou kernel. O recorte anterior de
-`inflate` suave foi cancelado após reprovação visual e permanece somente como
-evidência local ainda não integrada.
+Ele está em `rascunho` e não autoriza implementação. A representação de autoria
+já foi decidida no dossiê: malha de controle de quadriláteros com vincos,
+avaliada por subdivisão Catmull-Clark nativa, com a malha densa como produto
+compilado. OCCT/B-rep, Blender headless, SDF e kernel próprio foram rejeitados
+com motivo e condição de reabertura; booleana fica proibida na pele primária. O
+que falta é a prova descartável do quarto dianteiro e os limiares de referência.
+O recorte anterior de `inflate` suave foi cancelado após reprovação visual e
+permanece somente como evidência local ainda não integrada.
 
 A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
 foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,

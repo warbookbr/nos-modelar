@@ -1,4 +1,4 @@
-# Chassi realista — maturação do plano de implementação
+# Chassi realista — representação de superfície para carroceria
 
 **Estado:** rascunho
 
@@ -9,156 +9,192 @@
 
 ## Objetivo desta fase
 
-Definir com evidência o problema que impede a Mecanifica de produzir uma
-carroceria exterior realista e editável por IA. Comparar representações e
-kernels antes de escolher arquitetura. Este rascunho não autoriza código de
-produto, dependência nova, promoção da carroceria ou atualização de snapshots.
+Fixar o alvo, calibrar a referência e executar uma prova descartável que confirme
+ou reabra a representação escolhida no dossiê. Este rascunho não autoriza código
+de produto, dependência nova, promoção da carroceria nem atualização de snapshots.
 
-O plano e o dossiê serão iterados em várias rodadas: conteúdo poderá ser
-criticado, corrigido, ampliado, reduzido ou removido. Só uma versão posterior,
-aprovada explicitamente, poderá mudar para `pronto` e detalhar implementação.
+A representação de autoria já está decidida no dossiê. O que falta é evidência de
+que ela resolve o caso difícil, e o alvo dimensional contra o qual julgar.
 
-## Problema atual
+## Problema
 
-A plataforma já produz malhas determinísticas, partes semânticas, montagens,
-exportação e vistas reproduzíveis. Entretanto, não existe hoje um caminho
-demonstrado para uma IA definir, editar e validar uma carroceria F3 com controle
-local de forma, continuidade, recortes, espessura e história semântica.
+A plataforma produz malhas determinísticas, partes semânticas, montagens,
+exportação e vistas reproduzíveis. Não existe caminho demonstrado para uma IA
+definir, editar e validar uma carroceria exterior F3 com controle local de forma,
+continuidade, aberturas reais e história semântica, dentro de um orçamento de
+polígonos justificável.
 
-A carroceria atual cai na **armadilha do envelope longitudinal**: um loft ou
-`inflate` varia largura e altura ao longo do comprimento, como um tubo de pasta
-de dente deformável. Aumentar seções ou polígonos refina esse tubo; não cria
-controle independente sobre capô, para-lamas, caixas de roda, cintura, teto,
-colunas, painéis e suas transições.
+A causa raiz está lida no código: a carroceria rejeitada é um único `loft` de
+nove seções elípticas — 86 vértices. O protótipo seguinte, com três envelopes
+sobrepostos e 1.014 vértices, confirmou que densidade não corrige abstração.
 
-O protótipo rejeitado comprovou o limite: carroceria de três envelopes elevou a
-peça de 86/96 para 1.014/1.056 vértices/faces e o export total de 372.939 para
-642.757 bytes. A leitura virou protótipo de corrida, não supercarro realista.
-Mais densidade não corrigiu a abstração.
+Dois problemas independentes acompanham:
 
-Há ainda dois problemas independentes:
+- uma referência única em perspectiva não determina a forma 3D esperada;
+- a sonda declarava perfil `F2 conceitual, orcamentoFaces 1400` e foi julgada
+  contra expectativa F3, sem limiar vinculante que impedisse o fechamento.
+Ambos foram resolvidos em P0.
 
-- uma única referência em perspectiva não determina a forma 3D esperada;
-- gates estruturais anteriores passaram sem um limiar vinculante de qualidade
-  visual, continuidade ou semelhança.
+## Decisão de representação
 
-## Hipótese de mecanismo Agent-First
+A superfície exterior passa a ser autorada como:
 
-A IA não deveria esculpir centenas de vértices nem ampliar envelopes globais.
-Ela precisa trabalhar em níveis de intenção:
+> **malha de controle de quadriláteros com vincos, avaliada por subdivisão
+> Catmull-Clark determinística, implementada no núcleo, sem dependência externa.**
 
-```text
-dimensões + landmarks + curvas mestras
-→ pele editável por regiões e continuidade
-→ trims, cavidades, painéis e detalhes em camadas
-→ validação da representação rica
-→ tesselação/LOD determinísticos
-→ mecanifica.malha-poligonal@1
-```
+A malha entregue a `mecanifica.malha-poligonal@1` é produto compilado num nível
+de subdivisão declarado. A cage é o artefato autoral e versionado.
 
-Exemplos de controles semânticos: eixo das rodas, linha de ombro, arco da caixa
-de roda, queda do capô, cintura, base do para-brisa e transição
-capô–para-lama. A malha final deve manter procedência até esses controles.
+A unidade editável é o **loop de aresta nomeado**, com domínio finito: linha de
+ombro, arco da caixa de roda, crista do para-lama, cintura, base do para-brisa.
+Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma fileira extra
+de geometria.
 
-Essa hipótese não escolhe tecnologia. B-rep/NURBS, SubD com booleanas robustas,
-backend DCC e uma pilha híbrida serão comparados no mesmo recorte.
+Motivos completos no dossiê, seção 7: é o método padrão para o alvo declarado,
+resolve os sintomas por topologia e não por sobreposição, poucos controles geram
+superfície suave, respeita `BLOCO = 1000` e custa um algoritmo local em
+JavaScript puro, não um kernel.
 
-## Alternativas em análise
+### Rejeições registradas
 
-1. **SubD + booleanas de malha:** forte para ativo de jogo e edição de cage;
-   riscos em cortes, precisão, retopologia e identidade.
-2. **B-rep/OCCT:** maior teto para superfícies paramétricas, trims, shell,
-   booleans e CAD; custo alto de integração, bundle, API e naming.
-3. **Blender/DCC headless:** teto visual e ferramentas de jogo disponíveis;
-   custo de runtime externo, estado, distribuição e identidade.
-4. **SDF/implícito:** composição e cavidades robustas; fraco para painéis,
-   vincos, gaps e superfície automotiva controlada.
-5. **Híbrido:** curvas/pele para forma, B-rep ou mesh kernel para recursos e
-   compilação para jogo; maior teto e maior complexidade.
-6. **Kernel próprio completo:** controle teórico máximo, risco e tempo hoje
-   desproporcionais.
-
-A hipótese de maior teto é híbrida, mas escolher diretamente seria prematuro.
+| Alternativa | Decisão | Motivo curto | Reabertura |
+|---|---|---|---|
+| OCCT / B-rep | rejeitada | requisito CAD ausente; saída ruim para jogo; custo de bundle; API contrária ao Agent-First | requisito real de STEP ou fabricação |
+| Blender headless | rejeitada como backend | quebra determinismo, procedência e distribuição | nenhuma; mantido como referência visual |
+| SDF / implícito | rejeitada | ruim em painel fino, vinco e gap | formas orgânicas sem requisito de painel |
+| kernel próprio de B-rep | rejeitada | risco desproporcional | nenhuma prevista |
+| booleana de malha (Manifold) | adiada | pele primária não sofre booleana | feature secundária que a topologia da cage não resolva |
+| bake-off de três kernels | eliminado | duas rotas já eram elimináveis por análise | se a prova P2 acionar o critério de descarte |
+| `loft` / envelope varrido como base da pele | rejeitado | não abre para-brisa, vidro nem vão de porta sem booleana; acopla capô, para-lama e túnel; converge para tubo | nenhuma para a pele exterior; segue válido em peças varridas |
 
 ## Invariantes
 
-- núcleo e contratos não recebem vocabulário automotivo;
+- núcleo e contratos não recebem vocabulário automotivo: a operação é
+  `subdividir` sobre malha de quads, e `paralama` vive na receita;
 - identidade persistida permanece semântica;
-- a representação rica não é achatada cedo em IDs de vértice/faces;
+- a malha densa é produto compilado, nunca passo posicional — `BLOCO = 1000`
+  é respeitado, não esticado;
+- a representação rica não é achatada cedo em ids de vértice;
 - falha, perda de procedência e tolerância ficam visíveis;
-- receitas atuais e baseline continuam compatíveis;
+- receitas atuais e baseline continuam byte a byte compatíveis;
 - estrutura, geometria, forma visual e apresentação têm decisões separadas;
-- o catálogo público permanece vazio durante investigação.
+- a pele primária não sofre booleana;
+- a pele exterior não é autorada por `loft` nem por qualquer envelope varrido —
+  aberturas são loops fechados na cage, e `loft` fica restrito a peças
+  genuinamente varridas;
+- o catálogo público permanece vazio durante a investigação.
 
-## Rodadas de maturação
+## Rodadas
 
-### P0 — alvo e referência
+### P0 — alvo, referência e limiares — **fechada**
 
-Resolver `chassi` versus `carroceria`, perfil, plataforma, distância, uso,
-dimensões e referências ortográficas. Definir rejeições antes de modelar.
+Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md): perfil
+`realistaApresentacao / F3 / dimensional` declarado antes de modelar, envelope e
+quinze landmarks, cinco curvas mestras, limiares dos oito eixos, oito condições
+de rejeição visual e orçamento por nível. Duas decisões:
 
-### P1 — capacidade existente
+- **referência** — o carro é ficcional e não há prancha calibrável, então a
+  referência vinculante é a prancha ortográfica derivada dos landmarks, e a
+  imagem em perspectiva fica fora de todo gate;
+- **`BLOCO = 1000` virou limiar** — a cage é emitida por regiões, 900 vértices e
+  900 faces por passo.
 
-Provar, num quarto dianteiro, o que as operações atuais conseguem. Separar
-ausência de representação, operação e workflow.
+### P1 — contrato da cage — **fechada**
 
-### P2 — bake-off
+Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../CHASSI-P1-CONTRATO-DA-CAGE.md):
+`mecanifica.cage-quad@1` como artefato autoral separado, aresta como par ordenado
+derivado, loop nomeado com domínio fechado, seção como conferência e não como
+geradora, herança de `parte` pelas filhas e diff em três classes. Duas decisões:
 
-Modelar o mesmo quarto dianteiro em B-rep, SubD/mesh e backend externo. Exigir
-arco de roda aberto, capô, para-lama, linha de caráter, recorte de farol,
-continuidade declarada e identidades até a malha.
+- **a malha compilada não tem identidade persistida** — o dossiê dizia que a
+  linhagem sai "por aritmética", o que vale para o cálculo, mas id derivado de
+  posição em lista ordenada é o que o `CLAUDE.md` proíbe; persistem a cage e o
+  nome semântico;
+- **atrito registrado, escolha adiada** — o alocador aborta em `id >= BLOCO`
+  (`nucleo.js:403`), então a compilação escreve fora do caminho posicional. Há
+  duas rotas, e a escolha depende de medição que só P2 tem.
 
-### P3 — IR e identidade
+### P2 — prova decisiva, descartável
 
-Definir o menor grafo de features e resolver procedência/topological naming,
-replay, diff e alteração por outra sessão.
+Um quarto dianteiro, em zona privada, contendo obrigatoriamente:
 
-### P4 — integração
+- plano de simetria e capô, para-lama e lateral como regiões da mesma superfície;
+- arco de roda realmente aberto, com retorno de borda;
+- transição capô–para-lama sem corpo sobreposto;
+- uma linha de caráter por vinco semi-agudo;
+- recorte de farol conformado;
+- início do vão envidraçado: base do para-brisa e canto dianteiro da janela
+  lateral abertos por loop fechado, com moldura de retorno — sem booleana;
+- identidades preservadas da cage até a malha compilada;
+- a alteração `elevar a crista 25 mm` reexecutada por outra sessão.
 
-Comparar Node, WASM/browser, worker e processo externo. Medir dependência,
-licença, bundle, memória, cache, falha e distribuição.
+Medir: faces da cage e por nível, bytes, tempo, erro de silhueta, pontos
+extraordinários visíveis e custo de contexto da alteração. Produzir também uma
+forma não automotiva, para provar que a representação não carrega vocabulário.
 
-### P5 — plano executivo
+**Critério de descarte, declarado antes:** a decisão reabre se a cage exigir mais
+de ~800 quads no quarto dianteiro, se o arco não puder ser aberto sem booleana,
+ou se a alteração local exigir tocar mais de um loop nomeado.
 
-Escolher arquitetura, fatias reversíveis, migração, gates, rollback e condição
-de encerramento. Solicitar aprovação antes de implementar.
+### P3 — integração e operação
 
-## Evidências e métricas a definir
+- onde a subdivisão executa: núcleo, e o que custa em `bancada.html`;
+- impacto medido em bundle, memória, tempo e bytes exportados;
+- registro de capacidades, extensão nativa, MCP, preview baixo e publicação alta.
 
-- pranchas/câmeras calibradas, dimensões e landmarks;
-- erro de silhueta por vista e landmarks projetados;
-- continuidade G0/G1/G2 e mapas zebra/curvatura;
-- manifold, gaps, overlaps, self-intersections e espessura;
-- procedência após trim, booleana e tesselação;
-- tempo, tokens, operações e correções até aceite;
-- determinismo, faces, bytes, bundle, memória e geração;
-- alteração local reexecutada por outra IA.
+### P4 — plano executivo
 
-Os limiares ainda não existem e não serão inventados nesta rodada.
+- fatias reversíveis, migração, gates, rollback, condição de encerramento e
+  aprovação explícita antes de alterar o produto.
+
+## Validação
+
+Oito eixos independentes — integridade, dimensão, silhueta, superfície, topologia,
+semântica, apresentação e aceite — com limiares fixados em P0. O erro anterior foi
+deixar integridade, dimensão e apresentação aprovarem por silhueta e aceite.
 
 ## Gate para virar `pronto`
 
-- alvo e fidelidade inequívocos;
-- referências calibradas suficientes;
-- duas ou mais abordagens comparadas no mesmo spike;
-- representação escolhida e rejeições justificadas;
-- estratégia de identidade e procedência;
-- contrato de compilação para a malha atual;
-- execução, licença e distribuição medidas;
-- gates geométricos e visuais com limiares;
-- migração e rollback que preservem o existente;
-- destino explícito do protótipo local rejeitado.
+- ~~alvo e fidelidade inequívocos, com perfil declarado antes de modelar~~ —
+  fechado em P0;
+- ~~referência resolvida e limiares numéricos fixados~~ — fechado em P0;
+- ~~contrato entre cage e malha compilada escrito~~ — fechado em P1;
+- ~~política de identidade para edição de cage~~ — fechado em P1;
+- prova P2 executada com todas as medidas registradas;
+- critério de descarte avaliado, com resultado `manter` ou `reabrir`;
+- contrato entre cage e malha compilada escrito;
+- política de identidade para edição de cage e features secundárias;
+- impacto de execução e distribuição medido;
+- migração que preserve receitas e baseline existentes;
+- destino do protótipo rejeitado decidido.
 
-Nenhum item está completo. Portanto, não há plano ativo de implementação.
+Quatro itens fechados, em P0 e P1; os demais seguem abertos. Não há plano ativo
+de implementação.
 
 ## Fora desta versão
 
-Implementação, instalação de kernel, schema definitivo, cronograma, réplica de
-fabricante, interior, monocoque estrutural, suspensão, física e fabricação.
+Implementação de produto, dependência geométrica nova, schema definitivo,
+cronograma, réplica de fabricante, interior, monocoque, suspensão, física, UV,
+baking e fabricação.
 
 ## Registro
 
-- **V0 — 2026-08-18:** problema, evidência, armadilha do envelope, alternativas,
-  hipótese Agent-First e processo iterativo registrados.
-- **Próxima revisão:** confirmar o significado e o nível de `chassi realista`,
-  depois decidir quais candidatos entram no bake-off.
+- **V0 — 2026-08-18:** problema, evidência e seis alternativas, sem decisão.
+- **V1 — 2026-08-19:** representação decidida — cage de quads com vincos e
+  Catmull-Clark nativa. OCCT, Blender headless, SDF e kernel próprio rejeitados
+  com motivo e condição de reabertura. Bake-off substituído por prova única com
+  critério de descarte. Unidade editável no loop de aresta nomeado. Booleana
+  proibida na pele primária. `BLOCO = 1000` registrado como restrição.
+- **V2 — 2026-08-19:** `loft` e envelopes varridos rejeitados explicitamente como
+  base da pele exterior, com o argumento de aberturas envidraçadas registrado no
+  dossiê, seção 8.7. `loft` mantido sem alteração para peças varridas. Prova P2
+  passa a exigir vão envidraçado aberto por topologia.
+- **V3 — 2026-08-19:** P0 executada e fechada em
+  `../CHASSI-P0-ALVO-E-LIMIARES.md`. Referência resolvida por prancha
+  ortográfica derivada, com a imagem em perspectiva declarada não vinculante.
+  `BLOCO = 1000` convertido em limiar de 900 ids por passo de cage.
+- **V4 — 2026-08-19:** seção transversal encaixada em P1 como entrada da cage, e
+  mantida fora do motor de prancha para não criar formato que P1 refaria.
+- **V5 — 2026-08-19:** P1 executada e fechada em `../CHASSI-P1-CONTRATO-DA-CAGE.md`.
+- **Próxima revisão:** executar P2 — a prova descartável do quarto dianteiro,
+  contra o critério de descarte já declarado.

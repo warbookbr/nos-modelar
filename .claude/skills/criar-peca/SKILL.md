@@ -35,10 +35,32 @@ receita monolítica.
    `validar:modelagem`, `revisar:modelagem`) ou o perfil MCP de autoria, e
    registre a captura como bloqueada até existir um adaptador privado explícito.
 
-4. Leia as quatro imagens, registre pelo menos uma medida/gate e itere sobre
-   defeitos concretos. A bancada confirma enquadramento; não decide sozinha se
-   a forma atende ao briefing.
-5. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
+4. **Isole por pergunta, não por hábito.** Peça inteira numa imagem só esconde
+   erro estrutural debaixo de detalhe. A bancada tem três modos, e cada um
+   responde uma pergunta diferente:
+
+   ```bash
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=contexto
+   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
+   ```
+
+   | modo | pergunta | o que avaliar |
+   |---|---|---|
+   | `isolar` | a superfície está boa? | continuidade, vinco, transição entre regiões, ondulação, faceteamento onde deveria ser liso |
+   | `contexto` (o resto vira fantasma) | cabe e encaixa? | folga, interferência, proporção contra o vizinho, alinhamento de eixo |
+   | `todas` | lê como o objeto certo? | leitura geral — e aqui **você não decide sozinho** |
+
+   **`isolar` sozinho aprova coisa impossível.** Um arco de roda que não cabe na
+   própria roda passa isolado e só aparece em `contexto`. Regra: nunca conclua
+   sobre uma peça que tem vizinho sem ter olhado em `contexto`.
+
+   `--par a,b` isola exatamente duas peças e já enquadra, para julgar um encaixe.
+
+5. Registre pelo menos uma medida ou gate por rodada e itere sobre defeitos
+   concretos. A bancada confirma enquadramento; não decide sozinha se a forma
+   atende ao briefing.
+6. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
    compatibilidade e gabarito, quando a receita local e esses artefatos forem
    autorizados. Esse visor legado é diagnóstico; não transforma a peça em
    entrada publicada.
@@ -165,3 +187,57 @@ npm run mcp:check
 ```
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.
+
+### Antes de tudo: OLHE a imagem
+
+Rasterize as vistas e **abra o PNG**:
+
+```
+node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
+```
+
+Ler o PNG como imagem é passo obrigatório antes de julgar, antes de despachar
+crítico e antes de levar qualquer coisa ao usuário. SVG gerado, entregue e nunca
+aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 mm
+ficou várias rodadas visível na vista frontal e só foi achado por um script.
+Medição pega o defeito que alguém já imaginou; olhar pega o resto.
+
+## Despachar o crítico, sem contexto
+
+Em marco — antes de propor promoção, publicação ou de levar o resultado ao
+usuário — despache um subagente como **crítico visual**. O protocolo está em
+[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+
+Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
+relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
+VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
+que lê a receita volta a julgar a intenção em vez do resultado, que é
+exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
+mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
+
+A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
+pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
+teste não exige gosto — só verifica se a forma comunica.
+
+Três limites, todos inegociáveis:
+
+- **achado, nunca aprovação.** Silêncio do crítico não é evidência de qualidade
+  e não entra em registro como aceite. Forma quem aprova é o usuário;
+- **depois dos gates, nunca no lugar deles.** Se descrição, medida ou gate ainda
+  acusam, corrija primeiro;
+- **em marco, não a cada rodada.** Cada despacho é partida fria.
+
+## Antes de qualquer julgamento: abra o alvo e sobreponha
+
+Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
+isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto uma
+única vez, e o crítico visual recebendo só o render.
+
+1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
+2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
+   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
+3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
+   modelo e sobreposição. Crítico que recebe só o render dá opinião.
+
+Sem alvo desenhado, desenhe antes: veja
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).

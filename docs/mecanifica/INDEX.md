@@ -104,12 +104,75 @@ aplicação publicada aqui.
   [`RELATORIO-SONDA-SUPERCARRO-1-0.md`](RELATORIO-SONDA-SUPERCARRO-1-0.md)
   (`docs/mecanifica/RELATORIO-SONDA-SUPERCARRO-1-0.md`).
 - A qualidade visual da carroceria foi reprovada depois desse fechamento. O
-  novo [plano de maturação do chassi realista](planos/2026-08-18-chassi-realista-kernel-geometrico.md)
+  [plano do chassi realista](planos/2026-08-18-chassi-realista-kernel-geometrico.md)
   (`docs/mecanifica/planos/2026-08-18-chassi-realista-kernel-geometrico.md`)
-  está em `rascunho` e não autoriza implementação. O problema, as evidências e
-  as alternativas de kernel estão no
+  está em `rascunho` e não autoriza implementação. A causa raiz é de
+  representação, não de refino: a carroceria rejeitada é um único `loft` de nove
+  seções elípticas. A representação de autoria já foi decidida no
   [`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md)
-  (`docs/mecanifica/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`).
+  (`docs/mecanifica/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`): malha de
+  controle de quadriláteros com vincos, avaliada por subdivisão Catmull-Clark
+  nativa, com a malha densa como produto compilado e a unidade editável no loop
+  de aresta nomeado. OCCT/B-rep, Blender headless, SDF e kernel próprio estão
+  rejeitados com motivo e condição de reabertura. `loft` e qualquer envelope
+  varrido estão proibidos como base da pele exterior, porque para-brisa, vidro
+  lateral e vão de porta são loops fechados internos que uma varredura não abre
+  sem booleana. A rodada P0 está fechada em
+  [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md)
+  (`docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md`): perfil `F3` declarado antes
+  de modelar, envelope e quinze landmarks fixados, prancha ortográfica derivada
+  adotada como referência vinculante no lugar da imagem em perspectiva, limiares
+  numéricos dos oito eixos e oito condições de rejeição visual escritas antes da
+  geometria. A rodada P1 também está fechada em
+  [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md)
+  (`docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md`): `mecanifica.cage-quad@1` é
+  artefato autoral separado, para não esticar `malha-poligonal@1`; aresta é par
+  ordenado derivado, porque o formato salvo não tem entidade aresta; a seção
+  transversal é conferência e não geradora; e a malha compilada **não tem
+  identidade persistida** — persistem a cage e o nome semântico, que a face já
+  carrega na linha canônica. A prova descartável do quarto dianteiro está em
+  execução no [plano P2](planos/2026-08-19-chassi-p2-prova-do-quarto.md)
+  (`docs/mecanifica/planos/2026-08-19-chassi-p2-prova-do-quarto.md`), em zona
+  privada e sem tocar o núcleo. A rodada Q1 entregou Catmull-Clark determinística
+  com vinco semi-agudo, canto de retalho congelado e borda curva relaxando. Q1 a
+  Q5 estão feitas e medidas em
+  [`RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md`](RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md)
+  (`docs/mecanifica/RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md`): a cage do quarto
+  cabe em 114 quads contra teto de 800, o arco de roda abre por topologia sem
+  booleana, e o nome da região atravessa a subdivisão. O terceiro braço do
+  critério de descarte disparou — a alteração local tocou dois loops em vez de um
+  — por um único vértice compartilhado onde a crista do para-lama encontra a base
+  do para-brisa. O veredito está pendente de decisão sobre o critério, e o
+  relatório não o renegocia por conta própria.
+- O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
+  (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
+  `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um
+  relatório medido da própria saída; `tools/mecanifica/prancha-geometria.mjs`
+  traça por filete e mede curvatura por janela de comprimento de arco. A
+  primitiva padrão deixou de ser spline por pontos, que abaulava tudo, e passou a
+  ser polilinha com raio por vértice. O relatório verifica contorno fechado,
+  detalhe que escapou do contorno e landmark que saiu da linha. O método está na
+  skill `desenhar-prancha`. A prova é o cupê de cunha em
+  `docs/mecanifica/img/cupe-cunha-prancha.svg`, desenhado do zero e julgado pelo
+  relatório antes de qualquer render.
+- A [coerência entre vistas](planos/2026-08-19-coerencia-entre-vistas.md)
+  (`docs/mecanifica/planos/2026-08-19-coerencia-entre-vistas.md`) foi concluída e
+  **fecha o motor de prancha**. As vistas passam a ser comparadas pelos eixos que
+  compartilham, cada uma declarando leitura `projecao` ou `secao`, com envelope e
+  simetria conferidos pelo motor. A rodada também desfez um silenciamento
+  indevido de `foraDoContorno`, que sozinho acusou quatro rodas escapando da
+  carroceria em planta, e converteu as linhas inferiores do P0 de spline para
+  filete — a spline afundava para 94 mm onde a altura livre declarada é 105.
+- A [leitura de referência rasterizada](planos/2026-08-19-leitura-de-referencia-medida.md)
+  (`docs/mecanifica/planos/2026-08-19-leitura-de-referencia-medida.md`) foi
+  concluída. `tools/mecanifica/prancha-referencia.mjs` decodifica um PNG em Node
+  puro, calibra pixel→milímetro pelo entre-eixos entre as manchas de contato das
+  rodas e compara silhuetas por desvio. A imagem de terceiro não entra no
+  repositório: entram só as coordenadas derivadas, sob a regra de procedência de
+  [`referencias/README.md`](referencias/README.md)
+  (`docs/mecanifica/referencias/README.md`). Limite medido e registrado: desvio
+  de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
+  a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
