@@ -3,11 +3,16 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-20-motor-de-prancha-autonomia.md`](2026-08-20-motor-de-prancha-autonomia.md).
-Ele assume a evolução integral, autônoma e verificável do Motor de Prancha:
-audita inclusive as ferramentas, métricas e skills existentes, pesquisa
-capacidades externas, mede lacunas, escolhe e prova mudanças. Não pede ao
-usuário que diagnostique problemas ou escolha tecnologia.
+[`2026-08-20-validacao-integrada-mecanifica.md`](2026-08-20-validacao-integrada-mecanifica.md).
+Ele compara, sob o mesmo briefing e orçamento, um fluxo mínimo contra as
+portas oficiais integradas da Mecanifica. O objetivo é medir valor final —
+qualidade, correção local, contexto e revalidação — sem abrir capacidade nova
+antes de um defeito comprovado.
+
+O plano de [autonomia verificável do Motor de Prancha](2026-08-20-motor-de-prancha-autonomia.md)
+está **congelado em `pronto`**: R0–R3 foram aprovadas, R4 só prova autoria e
+mutações, e impacto 3D permanece não demonstrado. R5 não executa; essa pergunta
+foi transferida para a validação integrada.
 
 O [P2 do chassi](2026-08-19-chassi-p2-prova-do-quarto.md) está **congelado no
 estado `pronto`**. Suas evidências e a decisão pendente sobre a alteração local
@@ -276,8 +281,8 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-Não há plano ativo. A continuidade seguinte será definida pela evidência do
-sistema articulado, sem roteiro fechado antecipadamente.
-Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
-automática; um novo plano deve nascer de ganho verificável, não da sequência
-das sondas encerradas.
+A abertura atual é a [validação integrada do valor Agent-First](2026-08-20-validacao-integrada-mecanifica.md).
+A continuidade seguinte será definida pela evidência comparativa, sem roteiro
+fechado antecipadamente. Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md)
+sem autorização automática; um novo plano deve nascer de ganho verificável,
+não da sequência das sondas encerradas.

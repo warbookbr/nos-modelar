@@ -175,12 +175,10 @@ aplicação publicada aqui.
   de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
   a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
 - O plano de [autonomia verificável do Motor de Prancha](planos/2026-08-20-motor-de-prancha-autonomia.md)
-  (`docs/mecanifica/planos/2026-08-20-motor-de-prancha-autonomia.md`) é o único
-  plano **ativo**. Ele não parte de uma lista de defeitos do usuário: deve auditar
-  e poder substituir o motor, a skill, métricas, referências, sobreposição e
-  crítica atuais; pesquisar alternativas externas; implementar apenas ganhos
-  comprovados; e demonstrar que uma IA consegue desenhar, reconhecer incerteza,
-  detectar erro e orientar uma modelagem melhor. A linha de base R0 está em
+  (`docs/mecanifica/planos/2026-08-20-motor-de-prancha-autonomia.md`) está
+  **congelado em `pronto`**. Ele auditou o motor, a skill, métricas, referências,
+  sobreposição e crítica; R0–R3 foram aprovadas, mas a R4 só demonstrou autoria
+  independente e mutações, não impacto 3D comparável. A linha de base R0 está em
   [`docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R0.md`](RELATORIO-MOTOR-DE-PRANCHA-R0.md):
   o contrato agora rejeita auto-interseção, entrada inválida, supressão sem
   motivo, calibração contraditória e comparação de cobertura parcial. A comparação
@@ -194,8 +192,14 @@ aplicação publicada aqui.
   e a skill expõem o bloqueio sem transformar referência insuficiente em alvo preciso.
 - A R3 reexecutou o corpus contra o caminho integrado e recusou incorporar
   mecanismos sem defeito mensurado; a matriz de resultados está em
-  `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R3.md`. A próxima prova é a R4,
-  com autoria e revisão independentes.
+  `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R3.md`. A R4 parcial está em
+  `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R4.md`; R5 não executa neste
+  recorte.
+- O plano de [validação integrada do valor Agent-First](planos/2026-08-20-validacao-integrada-mecanifica.md)
+  (`docs/mecanifica/planos/2026-08-20-validacao-integrada-mecanifica.md`) é o
+  único plano **ativo**. Ele compara um fluxo mínimo e as portas oficiais sob o
+  mesmo briefing para decidir, por qualidade e custo mensuráveis, se o conjunto
+  da Mecanifica produz valor integrado antes de abrir outra capacidade.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
@@ -399,15 +403,16 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- Não há plano ativo. As próximas linhas candidatas — cenário multi-documento,
-  envelope de movimento, subtração robusta, materiais/LOD e autoria por
-  intenção — dependem de recorte executivo próprio e ganho verificável.
+- O plano ativo é a validação integrada do valor Agent-First; cenário
+  multi-documento, envelope de movimento, subtração robusta, materiais/LOD e
+  autoria por intenção continuam candidatos e dependem de recorte executivo
+  próprio e ganho verificável.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
 
-Nenhuma pendência desta lista autoriza implementação automática. Um novo recorte
-só abre após decisão e plano executivo explícitos.
+Nenhuma pendência desta lista autoriza implementação automática. O plano ativo
+também não abre capacidade nova sem falha mensurada.
 
 ## Histórico
 
