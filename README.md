@@ -53,10 +53,11 @@ arquivo, e `docs/mecanifica/INDEX.md` (ver "Desenvolvimento" abaixo) tem o
 resto:
 
 - **motor de prancha** (`tools/mecanifica/prancha.mjs`, skill
-  `desenhar-prancha`) — desenha a referência ortográfica de uma carroceria antes
-  de existir geometria 3D, e mede a própria saída (contorno fechado, curvatura,
-  landmarks). `tools/mecanifica/comparar-alvo.mjs` sobrepõe esse desenho ao
-  resultado modelado;
+  `desenhar-prancha`) — desenha o CONTORNO de referência de uma carroceria em
+  2D (vistas lateral, frontal, traseira, superior), antes de existir geometria
+  3D, e mede a própria saída (contorno fechado, curvatura, landmarks).
+  `tools/mecanifica/comparar-alvo.mjs` sobrepõe esse desenho ao resultado
+  modelado, para checar se um bate com o outro;
 - **crítico visual** (`.claude/agents/critico-visual.md`) — agente sem contexto
   que só olha imagem e diz se o modelo bate com o alvo. Ver
   [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md)
