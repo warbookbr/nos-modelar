@@ -14,6 +14,16 @@ Ferramentas:
 `tools/mecanifica/prancha-geometria.mjs` (traçado e medida).
 Exemplo vivo: `tools/mecanifica/prancha-chassi-p0.mjs`.
 
+## Porta zero: declarar se o alvo pode existir
+
+Antes de traçar, inclua `autoria` conforme o
+[`CONTRATO-AUTORIA-PRANCHA.md`](../../../docs/mecanifica/CONTRATO-AUTORIA-PRANCHA.md):
+intenção, fonte com evidência, confiança e incertezas. Sem medida independente
+ou quatro vistas coerentes, declare `estado: 'bloqueada'`, confiança baixa e a
+incerteza que bloqueia. O motor desenha o diagnóstico, mas ele **não** pode
+orientar modelagem precisa. `modo: 'quatro-vistas'` só é válido se lateral,
+frontal, traseira e planta forem desenhadas de fato.
+
 ## A regra que governa tudo
 
 > **Nunca julgue o desenho só olhando.**

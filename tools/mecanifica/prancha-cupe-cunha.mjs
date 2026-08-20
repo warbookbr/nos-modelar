@@ -187,6 +187,15 @@ const camadas = [
 ];
 
 const spec = {
+  autoria: {
+    versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'quatro-vistas', confianca: 'alta',
+    intencao: 'cupê ficcional de cunha para provar autoria ortográfica de quatro vistas',
+    procedencias: [{
+      id: 'briefing-cupe', tipo: 'briefing-ficcional',
+      evidencia: 'medidas, proporções e invariantes declarados neste arquivo antes do traçado',
+    }],
+    incertezas: [],
+  },
   titulo: 'Cupê de cunha, motor central — prancha ortográfica alvo',
   subtitulo: 'Carroceria ficcional. Milímetros. x = largura, y = altura, z = frente positiva. Escala 1:6,25.',
   escala: 0.16,

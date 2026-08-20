@@ -61,6 +61,15 @@ const camadas = [
 ];
 
 const spec = {
+  autoria: {
+    versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'parcial', confianca: 'alta',
+    intencao: 'alvo dimensional vinculante do chassi P0 antes de qualquer geometria',
+    procedencias: [{
+      id: 'p0-medidas', tipo: 'medidas-declaradas',
+      evidencia: 'docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, seções 4.1 a 4.4',
+    }],
+    incertezas: [],
+  },
   titulo: 'Chassi P0 — prancha ortográfica alvo',
   subtitulo: 'Alvo declarado antes da geometria. Milímetros. x = largura, y = altura, z = frente positiva. Escala 1:6,25.',
   escala: 0.16,

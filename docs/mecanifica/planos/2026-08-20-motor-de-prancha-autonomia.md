@@ -197,3 +197,4 @@ para reativar P2 do chassi.
   de nova geometria. O usuário delegou diagnóstico, pesquisa, decisão,
   implementação e validação ao responsável; não há lista prévia de defeitos nem
   feature externa preescolhida.
+- **R2 — 2026-08-20:** concluída com decisão `aprovar`: contrato `mecanifica.prancha-autoria@1` explicita intenção, procedência, confiança, incerteza e bloqueio; evidência em `../RELATORIO-MOTOR-DE-PRANCHA-R2.md`.

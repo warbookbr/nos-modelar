@@ -187,6 +187,11 @@ aplicação publicada aqui.
   externa R1 está em [`docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R1.md`](RELATORIO-MOTOR-DE-PRANCHA-R1.md):
   OpenCV, Potrace e Inkscape não superaram autoria vetorial local com semântica,
   calibração e coerência entre vistas; nenhuma dependência foi incorporada.
+- A R2 fechou o contrato de autoria confiável
+  (`docs/mecanifica/CONTRATO-AUTORIA-PRANCHA.md`): intenção, procedência,
+  confiança, incerteza e bloqueio agora são dados validados antes do desenho.
+  A evidência é `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R2.md`; o relatório
+  e a skill expõem o bloqueio sem transformar referência insuficiente em alvo preciso.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

@@ -3,7 +3,7 @@
    desenho pare de abaular sozinho e que o defeito seja pego por número. */
 import { describe, expect, it } from 'vitest';
 import * as G from './prancha-geometria.mjs';
-import { criarAncoras, prancha } from './prancha.mjs';
+import { criarAncoras, imprimirRelatorio, prancha } from './prancha.mjs';
 
 const RAMPA = [[0, 0], [1000, 600, 300], [3000, 400]];
 
@@ -65,6 +65,12 @@ const base = (camadas) => ({
   tela: { largura: 400, altura: 300 },
   limites: { zMin: -100, zMax: 100, yMax: 100, xMax: 100 },
   vistas: { lateral: { x: 10, y: 10 } },
+  autoria: {
+    versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'parcial', confianca: 'alta',
+    intencao: 'fixture geométrica de validação',
+    procedencias: [{ id: 'fixture', tipo: 'medidas-declaradas', evidencia: 'coordenadas declaradas no teste' }],
+    incertezas: [],
+  },
   camadas,
 });
 
@@ -154,6 +160,12 @@ const duasVistas = (camadas, extra = {}) => ({
   tela: { largura: 600, altura: 400 },
   limites: { zMin: -100, zMax: 100, yMax: 100, xMax: 100 },
   vistas: { lateral: { x: 10, y: 10 }, frontal: { x: 300, y: 10 } },
+  autoria: {
+    versao: 'mecanifica.prancha-autoria@1', estado: 'pronta', modo: 'parcial', confianca: 'alta',
+    intencao: 'fixture de coerência entre vistas',
+    procedencias: [{ id: 'fixture', tipo: 'medidas-declaradas', evidencia: 'coordenadas declaradas no teste' }],
+    incertezas: [],
+  },
   camadas,
   ...extra,
 });
@@ -249,5 +261,43 @@ describe('determinismo', () => {
 
   it('recusa camada que aponta para vista não declarada com diagnóstico', () => {
     expect(() => prancha(base([{ vista: 'frontal', tipo: 'poli', pts: [[0, 0], [10, 20]] }]))).toThrow(/vista "frontal" não declarada/);
+  });
+});
+
+describe('autoria confiável', () => {
+  it('recusa prancha sem fonte, confiança e incerteza declaradas', () => {
+    const spec = base([{ vista: 'lateral', tipo: 'poli', pts: [[0, 0], [10, 10]] }]);
+    delete spec.autoria;
+    expect(() => prancha(spec)).toThrow(/autoria ausente/);
+  });
+
+  it('recusa quatro-vistas quando alguma vista não existe', () => {
+    const spec = base([]);
+    spec.autoria.modo = 'quatro-vistas';
+    expect(() => prancha(spec)).toThrow(/exige vista frontal/);
+  });
+
+  it('recusa quatro-vistas que só declara uma vista sem desenhá-la', () => {
+    const spec = base([{ vista: 'lateral', tipo: 'poli', pts: [[0, 0], [10, 10]] }]);
+    spec.autoria.modo = 'quatro-vistas';
+    spec.vistas = {
+      lateral: { x: 10, y: 10 }, frontal: { x: 150, y: 10 },
+      traseira: { x: 10, y: 150 }, planta: { x: 150, y: 150 },
+    };
+    expect(() => prancha(spec)).toThrow(/camada na vista frontal/);
+  });
+
+  it('mantém referência insuficiente visível e bloqueada', () => {
+    const spec = base([{ vista: 'lateral', tipo: 'poli', pts: [[0, 0], [10, 10]] }]);
+    spec.autoria = {
+      versao: 'mecanifica.prancha-autoria@1', estado: 'bloqueada', modo: 'parcial', confianca: 'baixa',
+      intencao: 'referência sem escala suficiente para fixar uma carroceria',
+      procedencias: [{ id: 'foto', tipo: 'referencia-raster-derivada', evidencia: 'imagem em perspectiva sem escala' }],
+      incertezas: [{ id: 'escala', sobre: 'dimensões', fonte: 'foto', efeito: 'bloqueia', motivo: 'não há medida independente' }],
+    };
+    const { relatorio } = prancha(spec);
+    expect(relatorio.autoria.bloqueada).toBe(true);
+    expect(relatorio.alertas.join(' ')).toMatch(/não pode orientar modelagem precisa/);
+    expect(imprimirRelatorio(relatorio)).toMatch(/BLOQUEADA para modelagem precisa/);
   });
 });

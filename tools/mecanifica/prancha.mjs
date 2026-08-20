@@ -6,6 +6,7 @@
    docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md. */
 
 import * as G from './prancha-geometria.mjs';
+import { validarAutoriaPrancha } from './prancha-autoria.mjs';
 
 const n = (v) => Number(v.toFixed(2));
 
@@ -305,11 +306,22 @@ function validarSpec(spec) {
 }
 
 export function prancha(spec) {
-  const erros = validarSpec(spec);
+  const autoria = validarAutoriaPrancha(spec);
+  const erros = [...validarSpec(spec), ...autoria.erros];
   if (erros.length) throw new Error(`prancha inválida: ${erros.join('; ')}`);
   const proj = projetores(spec);
   const camadas = spec.camadas.map((c) => ({ ...c, pl: amostrar(c) }));
   const relatorio = medir(spec, camadas);
+  relatorio.autoria = {
+    estado: spec.autoria.estado,
+    confianca: spec.autoria.confianca,
+    bloqueada: autoria.bloqueada,
+    procedencias: spec.autoria.procedencias.map((p) => p.id),
+    incertezas: spec.autoria.incertezas.map((u) => u.id),
+  };
+  if (autoria.bloqueada) {
+    relatorio.alertas.push('autoria bloqueada: referência insuficiente não pode orientar modelagem precisa');
+  }
 
   const O = [];
   const put = (x) => O.push(x);
@@ -367,6 +379,12 @@ export function prancha(spec) {
 /* Relatório legível no terminal: é ele que eu leio ANTES de olhar o desenho. */
 export function imprimirRelatorio(r) {
   const L = [];
+  if (r.autoria) {
+    L.push(`  autoria: ${r.autoria.estado}, confiança ${r.autoria.confianca}`
+      + (r.autoria.bloqueada ? ' — BLOQUEADA para modelagem precisa' : '')
+      + `, fontes ${r.autoria.procedencias.join(', ')}`
+      + (r.autoria.incertezas.length ? `, incertezas ${r.autoria.incertezas.join(', ')}` : ''));
+  }
   for (const [vista, m] of Object.entries(r.porVista)) {
     L.push(`  ${vista}: contorno ${m.contornoFechado ? 'fechado' : 'ABERTO'}`
       + `, ${m.pontosForaDoContorno} ponto(s) fora`
