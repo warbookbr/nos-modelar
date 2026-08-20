@@ -52,7 +52,9 @@
     "docs:links:check": "node tools/mapa/links.mjs --check",
     "planos:check": "node tools/mapa/planos.mjs --check",
     "exportar": "node tools/mecanifica/exportar.mjs",
-    "exportar:check": "node tools/mecanifica/exportar.mjs --check"
+    "exportar:check": "node tools/mecanifica/exportar.mjs --check",
+    "olhar": "node tools/mecanifica/olhar.mjs",
+    "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

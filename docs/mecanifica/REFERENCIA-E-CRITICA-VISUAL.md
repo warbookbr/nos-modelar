@@ -175,6 +175,37 @@ Uma crítica sem referência pode ser usada depois para perguntar o que parece
 artificial, desconectado ou estruturalmente improvável. Ela não substitui a
 comparação principal.
 
+## O laço obrigatório: abrir o alvo, sobrepor, despachar com os dois
+
+Escrito depois de uma prova inteira feita sem ele, e o custo foi este: o quarto
+dianteiro do chassi foi modelado por doze rodadas sem que o desenho de
+referência do P0 fosse aberto **uma única vez**, e o crítico visual recebeu
+sempre o render sozinho. A única pergunta que ele podia responder era "isso
+parece um carro?", e a resposta foi 3/10 duas vezes seguidas sem que ninguém
+pudesse apontar contra o quê. Quando a sobreposição finalmente existiu, ela
+mostrou em cinco segundos que o nariz do modelo era uma parede vertical onde o
+alvo enrola para baixo, e que a planta do modelo era 500 mm mais larga que o
+alvo na ponta.
+
+Três passos, em ordem, e nenhum é opcional:
+
+1. **Abrir o alvo antes de modelar.** `npm run olhar -- alvo.png desenho.svg`,
+   e então LER a imagem. Não basta a existência do desenho no repositório: o
+   desenho do P0 existia desde a primeira rodada e nunca foi aberto.
+2. **Sobrepor a cada rodada.** `npm run comparar:alvo -- cmp.svg malha.json`
+   põe a silhueta do modelo sobre as curvas do alvo, em milímetros, na mesma
+   origem. Cinza é alvo, azul é modelo: onde só há cinza falta forma, onde só
+   há azul sobra.
+3. **Despachar o crítico com os dois.** O agente `critico-visual` recebe o
+   caminho do alvo, o do modelo e o da sobreposição, e a pergunta deixa de ser
+   "parece um carro?" para virar "bate com o alvo?". Crítico que recebe só o
+   render dá opinião, não crítica.
+
+Se não houver alvo desenhado para a peça, **desenhe primeiro** — a skill
+`desenhar-prancha` existe para isso. Modelar contra a própria intuição e depois
+medir foi o que produziu doze rodadas de correção em círculo: mudei a largura do
+nariz de 300 para 806 mm por achismo, e o alvo dizia 300.
+
 ## Fluxo
 
 1. Fixar perfil de autoria, distância mínima e orçamento.
@@ -182,8 +213,10 @@ comparação principal.
 3. Gerar briefing com no máximo oito itens e vistas de prova.
 4. Permitir revisão do usuário quando o resultado visual for subjetivo.
 5. Modelar envelope e interfaces; depois, uma região por vez.
-6. Renderizar vistas canônicas equivalentes às referências.
-7. Rodar crítica intermediária **por despacho** — subagente sem contexto,
+6. Renderizar vistas canônicas equivalentes às referências, **e sobrepor ao
+   alvo** com `comparar:alvo` antes de julgar qualquer coisa.
+7. Rodar crítica intermediária **por despacho** — subagente `critico-visual`,
+   sem contexto, recebendo alvo, modelo e sobreposição,
    limitado às cinco maiores divergências — depois que a prova determinística
    estiver limpa.
 8. Classificar cada divergência e corrigir somente as prioritárias.

@@ -258,3 +258,18 @@ Todos já aconteceram. Confira antes de entregar:
 
 Se a prancha for referência vinculante de um plano, diga explicitamente que ela
 é **derivada** da tabela de medidas: divergiu, a tabela manda.
+
+## Antes de qualquer julgamento: abra o alvo e sobreponha
+
+Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
+isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto uma
+única vez, e o crítico visual recebendo só o render.
+
+1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
+2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
+   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
+3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
+   modelo e sobreposição. Crítico que recebe só o render dá opinião.
+
+Sem alvo desenhado, desenhe antes: veja
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
