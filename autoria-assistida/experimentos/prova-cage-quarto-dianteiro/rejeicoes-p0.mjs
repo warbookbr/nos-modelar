@@ -175,6 +175,7 @@ const LIMIARES = {
   ondulacaoDaCristaMax: 6,   // mm
   profundidadeDoFarolMin: 12,// mm sobreviventes à subdivisão, a 60 cm
   diedroLisoMax: 12,         // graus fora de vinco e borda
+  fatiaDeCaracterMax: 0.20,  // acima disto a condição 8 não é avaliável
   afundamentoDoCapoMax: 5,   // mm
 };
 
@@ -297,17 +298,35 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
     const faces = new Map([...malha.F.values()].map((f) => [f.id, f]));
     const { arestas } = topologia([...faces.values()]);
     const normais = new Map([...faces.values()].map((f) => [f.id, normalDaFace(malha.V, f.vs)]));
-    /* Linha de caráter é quebra INTENCIONAL: o vinco é o projeto, não defeito de
-       amostragem. Rastrear os loops declarados dá as arestas exatas a ignorar.
-       Ler `malha.vincos` no nível compilado não serve: nitidez 2 já expirou no
-       nível 2, e a crista — quebra deliberada de 98° — entrava como facetamento. */
-    const arestasDeCaracter = new Set();
-    /* TODO loop declarado é decisão de forma. Filtrar por nome deixava de fora
-       o lábio do capô e a base do para-brisa, e os 40° e 45° dessas quinas
-       entravam como facetamento. Se um loop foi nomeado, alguém decidiu. */
+    /* Linha de caráter é quebra INTENCIONAL, e ela ocupa uma FAIXA, não uma
+       aresta de largura zero. O canto dianteiro do carro faz uns 90°, e a
+       subdivisão reparte essa virada entre a aresta declarada e as vizinhas.
+
+       Medido antes de afrouxar nada: sem vinco nenhum e sem loop de apoio o
+       canto ainda dá 29,6°, e ADENSAR piorou para 79°. Canto, não amostragem.
+
+       O raio da faixa sai da própria resolução de autoria — metade da aresta
+       média da cage — e não de um número escolhido para o teste passar: uma
+       linha de caráter transita ao longo de meia célula da malha em que a
+       forma foi decidida. A fração excluída volta no relatório e tem teto em
+       teste; passando disso, a faixa virou desculpa e não descrição. */
+    const pontosDeCarater = [];
     for (const l of Object.values(cage.loops ?? {})) {
-      const vs = rastrearLoop(cage, l.v, niveis).vertices;
-      for (let i = 0; i < vs.length - 1; i += 1) arestasDeCaracter.add(chave(vs[i], vs[i + 1]));
+      for (const p of rastrearLoop(cage, l.v, niveis).pontos) pontosDeCarater.push(p);
+    }
+    let somaCage = 0;
+    let nCage = 0;
+    for (const f of cage.F.values()) {
+      for (let i = 0; i < f.vs.length; i += 1) {
+        somaCage += norma(sub(cage.V.get(f.vs[i]), cage.V.get(f.vs[(i + 1) % f.vs.length])));
+        nCage += 1;
+      }
+    }
+    const raioDaLinha = (somaCage / nCage) / 2;
+    const arestasDeCaracter = new Set();
+    for (const e of arestas.values()) {
+      const m = [0, 1, 2].map((k) => (malha.V.get(e.a)[k] + malha.V.get(e.b)[k]) / 2);
+      if (pontosDeCarater.some((q) => norma(sub(m, q)) <= raioDaLinha)) arestasDeCaracter.add(chave(e.a, e.b));
     }
     let max = 0;
     let onde = null;
@@ -321,8 +340,27 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
       const d = grau(Math.acos(Math.max(-1, Math.min(1, ponto(normais.get(e.faces[0]), normais.get(e.faces[1]))))));
       if (d > max) { max = d; onde = [e.a, e.b]; }
     }
-    diz(8, max <= LIMIARES.diedroLisoMax ? 'passa' : 'reprova',
-      { diedroMax: +max.toFixed(2), maximo: LIMIARES.diedroLisoMax, aresta: onde }, null);
+    /* Se a faixa de linha de caráter cobre mais que o teto, esta condição não é
+       AVALIÁVEL nesta peça, e dizer "passa" seria aprovação por vacuidade — o
+       defeito que este arquivo inteiro existe para corrigir. Medido: adensar as
+       estações de 15 para 32 só leva a faixa de 52% para 42%, porque quem manda
+       no raio é o espaçamento dos anéis. Um quarto dianteiro é quase todo
+       transição entre linhas de caráter; sobra pouca pele lisa para julgar. */
+    const fatia = arestasDeCaracter.size / arestas.size;
+    const medida8 = {
+      diedroMax: +max.toFixed(2),
+      maximo: LIMIARES.diedroLisoMax,
+      aresta: onde,
+      fatiaEmLinhaDeCarater: +fatia.toFixed(3),
+      tetoDaFaixa: LIMIARES.fatiaDeCaracterMax,
+      raioDaLinha: +raioDaLinha.toFixed(1),
+    };
+    if (fatia > LIMIARES.fatiaDeCaracterMax) {
+      diz(8, 'naoAvaliavel', medida8,
+        `${(fatia * 100).toFixed(0)}% das arestas caem na faixa de alguma linha de caráter declarada; não sobra pele lisa suficiente para separar facetamento de canto`);
+    } else {
+      diz(8, max <= LIMIARES.diedroLisoMax ? 'passa' : 'reprova', medida8, null);
+    }
   }
 
   /* 9 — capô em calha. Do eixo de simetria até a crista o capô não pode

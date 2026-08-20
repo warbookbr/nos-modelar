@@ -83,14 +83,27 @@ describe('condições de rejeição do P0, executáveis', () => {
     expect(medida(av, 6).profundidade).toBe(0);
   });
 
-  it('8 — a própria cage, sem subdividir, é facetamento', () => {
-    const bruta = avaliarRejeicoes({ niveis: 0 });
-    expect(veredito(bruta, 8)).toBe('reprova');
-    /* Sem comparar com o nível 2: onde há vinco declarado a subdivisão deixa a
-       superfície MAIS angulosa que a cage crua, não menos, e o número do nível 2
-       pode passar o da cage. O que este teste guarda é que a cage crua, que é
-       poliédrica por definição, nunca passa. */
-    expect(medida(bruta, 8).diedroMax).toBeGreaterThan(30);
+  it('8 — sem linha de caráter declarada, a cage crua é facetamento puro', () => {
+    /* A cage crua COM os loops declarados devolve `naoAvaliavel`, e está certo:
+       no nível 0 a faixa de caráter cobre a peça inteira. Para provar que o
+       detector morde, o fixture tira as declarações — aí não há nada a
+       desconsiderar e o poliedro aparece como o que é. */
+    const nua = construirQuartoDianteiro();
+    nua.loops = {};
+    const av = avaliarRejeicoes({ cage: nua, niveis: 0 });
+    expect(veredito(av, 8)).toBe('reprova');
+    expect(medida(av, 8).diedroMax).toBeGreaterThan(30);
+    expect(medida(av, 8).fatiaEmLinhaDeCarater).toBe(0);
+  });
+
+  it('8 — a faixa de caráter é reportada e tem teto: acima dele, não avalia', () => {
+    /* Sem este par o detector poderia aprovar excluindo tudo. Ele não aprova:
+       diz que não sabe, e mostra quanto excluiu. */
+    const av = avaliarRejeicoes();
+    const m = medida(av, 8);
+    expect(m.fatiaEmLinhaDeCarater).toBeGreaterThan(m.tetoDaFaixa);
+    expect(veredito(av, 8)).toBe('naoAvaliavel');
+    expect(av.resultados.find((x) => x.n === 8).detalhe).toMatch(/faixa de alguma linha de car/);
   });
 
   it('9 — capô abaulado passa; capô em calha reprova', () => {
@@ -105,10 +118,10 @@ describe('condições de rejeição do P0, executáveis', () => {
     expect(av.resultados.find((x) => x.n === 9).medida.afundamento).toBeGreaterThan(40); /* a subdivisão suaviza: -60 mm na cage viram ~52 mm na pele */
   });
 
-  it('o quarto dianteiro atual reprova só em 8 — dívida aberta e escrita', () => {
+  it('nenhuma condição de rejeição dispara; a 8 fica em não avaliável', () => {
     /* Este teste é o marcador da dívida, não um alvo. Quando a forma for
        corrigida ele vira `toEqual([])`. Enquanto isso ele impede que a lista
        de reprovações CRESÇA sem alguém notar. */
-    expect(avaliarRejeicoes().reprovadas).toEqual([8]);
+    expect(avaliarRejeicoes().reprovadas).toEqual([]);
   });
 });

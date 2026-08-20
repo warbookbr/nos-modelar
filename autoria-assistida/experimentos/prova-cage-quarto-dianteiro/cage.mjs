@@ -43,6 +43,74 @@ export function fita(F, arestas, parceiro, parte, proximoId) {
   return { feitas, idF };
 }
 
+/* Orienta todas as faces de forma consistente, por caminhada na topologia, e
+   depois vira o conjunto inteiro para fora. Passar a montar cada retalho na mão
+   custou três rodadas: fáscia, retorno do arco, moldura do vão, rasgo da forma
+   não automotiva e fundo da grelha, cada um descoberto separado, e o sintoma
+   sempre longe da causa. Isto resolve a classe. */
+export function orientarConsistente(F) {
+  const faces = [...F.values()];
+  const porAresta = new Map();
+  for (const f of faces) {
+    const n = f.vs.length;
+    for (let i = 0; i < n; i += 1) {
+      const k = chaveDeAresta(f.vs[i], f.vs[(i + 1) % n]);
+      if (!porAresta.has(k)) porAresta.set(k, []);
+      porAresta.get(k).push(f);
+    }
+  }
+  const sentido = (f, a, b) => {
+    const n = f.vs.length;
+    for (let i = 0; i < n; i += 1) {
+      if (f.vs[i] === a && f.vs[(i + 1) % n] === b) return 1;
+      if (f.vs[i] === b && f.vs[(i + 1) % n] === a) return -1;
+    }
+    return 0;
+  };
+  const vistas = new Set();
+  let viradas = 0;
+  for (const semente of faces) {
+    if (vistas.has(semente.id)) continue;
+    vistas.add(semente.id);
+    const fila = [semente];
+    while (fila.length) {
+      const f = fila.shift();
+      const n = f.vs.length;
+      for (let i = 0; i < n; i += 1) {
+        const a = f.vs[i];
+        const b = f.vs[(i + 1) % n];
+        for (const g of porAresta.get(chaveDeAresta(a, b)) ?? []) {
+          if (g === f || vistas.has(g.id)) continue;
+          vistas.add(g.id);
+          if (sentido(g, a, b) === 1) { g.vs.reverse(); viradas += 1; }
+          fila.push(g);
+        }
+      }
+    }
+  }
+  return viradas;
+}
+
+/* Vira o conjunto para FORA, se a caminhada tiver fixado o sentido errado.
+   Mede pelo alinhamento médio entre a normal e o raio a partir do centro. */
+export function apontarParaFora(V, F) {
+  const pts = [...V.values()];
+  const c = [0, 1, 2].map((k) => pts.reduce((s, p) => s + p[k], 0) / pts.length);
+  let soma = 0;
+  for (const f of F.values()) {
+    const ps = f.vs.map((v) => V.get(v));
+    const u = [0, 1, 2].map((k) => ps[1][k] - ps[0][k]);
+    const w = [0, 1, 2].map((k) => ps[2][k] - ps[0][k]);
+    const nrm = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+    const r = [0, 1, 2].map((k) => ps[0][k] - c[k]);
+    soma += nrm[0] * r[0] + nrm[1] * r[1] + nrm[2] * r[2];
+  }
+  if (soma < 0) { for (const f of F.values()) f.vs.reverse(); return true; }
+  return false;
+}
+
+const chaveDeAresta = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+
 export function espelhar(cage, { plano = 'x', tolerancia = 1e-6 } = {}) {
   const eixo = { x: 0, y: 1, z: 2 }[plano];
   const V = new Map(cage.V);

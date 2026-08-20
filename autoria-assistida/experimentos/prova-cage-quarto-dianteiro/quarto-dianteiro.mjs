@@ -6,7 +6,7 @@
    Meia carroceria em x >= 0; o espelho é da compilação. Privada e descartável. */
 
 /* --- alvo de P0, em milímetros --------------------------------------------- */
-import { fita } from './cage.mjs';
+import { fita, orientarConsistente, apontarParaFora } from './cage.mjs';
 
 export const ALVO = {
   zNariz: 2265, yNariz: 520,
@@ -170,6 +170,10 @@ function secao(z) {
   return ordem[ordem.length - 1].pts;
 }
 
+/* Estações medidas, sem apoio junto ao nariz. Tentei 2245 e 2215 como loops de
+   apoio e PIOROU: o diedro máximo subiu de 39° para 79°, porque o canto
+   dianteiro é um canto de verdade e mais densidade só o revela mais afiado. Sem
+   vinco nenhum e sem apoio ele ainda dá 29,6°. Não é amostragem. */
 const ESTACOES = [2265, 2180, 2100, 1980, 1900, 1750, 1600, 1460, 1325, 1180, 1000, 850, 700, 590, 480];
 const ANEIS = 10;
 
@@ -336,8 +340,16 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     }
     fascia.push(linha);
   }
+  /* GRELHA: um bloco de células da fáscia sai e vira caixa recuada. Sem
+     abertura central a frente lê como caixa fechada — o crítico cego, sem saber
+     o que era, chamou a fáscia de artefato de renderização. Abertura é
+     topologia, aqui como no arco e no vão envidraçado. */
+  const GRELHA = { a0: 0, a1: 2, b0: 1, b1: 3, fundo: 115 };
+  const naGrelha = (a, b) => a >= GRELHA.a0 && a < GRELHA.a1 && b >= GRELHA.b0 && b < GRELHA.b1;
+
   for (let b = 0; b < FRENTE_LINHAS - 1; b += 1) {
     for (let a = 0; a < FRENTE_COLUNAS - 1; a += 1) {
+      if (naGrelha(a, b)) continue;
       F.set(idF, {
         id: idF,
         /* Enrolamento TRANSPOSTO em relação à pele: nas faces do corpo o
@@ -346,6 +358,60 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
            e fáscia lia 168° — que é 180 menos os 12° reais da quina. */
         vs: [fascia[b][a], fascia[b + 1][a], fascia[b + 1][a + 1], fascia[b][a + 1]],
         parte: 'fasciaDianteira',
+      });
+      idF += 1;
+    }
+  }
+
+  /* Fundo e paredes da grelha. A caixa fecha atrás, então não há borda livre
+     nova: a abertura tem profundidade, não é mancha escura. */
+  const fundoDaGrelha = [];
+  for (let b = GRELHA.b0; b <= GRELHA.b1; b += 1) {
+    const linha = [];
+    for (let a = GRELHA.a0; a <= GRELHA.a1; a += 1) {
+      const q = V.get(fascia[b][a]);
+      V.set(proximo, [q[0], q[1], q[2] - GRELHA.fundo]);
+      linha.push(proximo);
+      proximo += 1;
+    }
+    fundoDaGrelha.push(linha);
+  }
+  {
+    /* Anel da abertura, em ordem de caminhada. */
+    const anel = [];
+    const parceiro = new Map();
+    const por = (b, a) => {
+      anel.push(fascia[b][a]);
+      parceiro.set(fascia[b][a], fundoDaGrelha[b - GRELHA.b0][a - GRELHA.a0]);
+    };
+    for (let a = GRELHA.a0; a <= GRELHA.a1; a += 1) por(GRELHA.b0, a);
+    for (let b = GRELHA.b0 + 1; b <= GRELHA.b1; b += 1) por(b, GRELHA.a1);
+    for (let a = GRELHA.a1 - 1; a >= GRELHA.a0; a -= 1) por(GRELHA.b1, a);
+    for (let b = GRELHA.b1 - 1; b > GRELHA.b0; b -= 1) por(b, GRELHA.a0);
+    /* Sem parede no PLANO DE SIMETRIA: a grelha é central e atravessa x = 0.
+       Fechá-la ali fazia as duas metades empilharem parede depois de espelhar —
+       quatro faces na mesma aresta. */
+    const noEixo = (v) => Math.abs(V.get(v)[0]) < 1e-6;
+    const arestas = anel
+      .map((v, i) => [v, anel[(i + 1) % anel.length]])
+      .filter(([a, b]) => !(noEixo(a) && noEixo(b)));
+    const r = fita(F, arestas, parceiro, 'grelhaParede', idF);
+    for (const f of r.feitas) F.set(f.id, f);
+    idF = r.idF;
+    /* Nitidez 3, o teto do contrato: o aro tem de continuar agudo no nível de publicação. Com 2 ele
+       expira antes e a subdivisão arredonda a caixa até virar amassado — a
+       abertura existia na topologia e não se lia na imagem. */
+    for (const [a, b] of arestas) vincos.set(chave(a, b), 3);
+  }
+  for (let b = 0; b < fundoDaGrelha.length - 1; b += 1) {
+    for (let a = 0; a < fundoDaGrelha[0].length - 1; a += 1) {
+      F.set(idF, {
+        id: idF,
+        /* Enrolamento invertido em relação à fáscia: o fundo da caixa olha na
+           direção oposta à pele, e o validador de orientação apontou as oito
+           arestas em que ele discordava das paredes. */
+        vs: [fundoDaGrelha[b][a], fundoDaGrelha[b + 1][a], fundoDaGrelha[b + 1][a + 1], fundoDaGrelha[b][a + 1]],
+        parte: 'grelhaFundo',
       });
       idF += 1;
     }
@@ -381,7 +447,7 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
      amassado no meio da tampa do motor, a meio metro de onde um farol fica. A
      condição 6 aprovava porque só perguntava se existia recuo em algum lugar,
      nunca onde. Detector verdadeiro e cego. */
-  const FAROL = { a0: 2, a1: 3, b0: 1, b1: 2 };
+  const FAROL = { a0: 2, a1: 3, b0: 1, b1: 3 };
   const bordaFarol = [];
   for (let b = FAROL.b0; b <= FAROL.b1; b += 1) {
     for (let a = FAROL.a0; a <= FAROL.a1; a += 1) {
@@ -392,8 +458,8 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     bordaFarol.push(fascia[b][FAROL.a0], fascia[b][FAROL.a1]);
   }
   for (let b = FAROL.b0; b < FAROL.b1; b += 1) {
-    vincos.set(chave(fascia[b][FAROL.a0], fascia[b + 1][FAROL.a0]), 2);
-    vincos.set(chave(fascia[b][FAROL.a1], fascia[b + 1][FAROL.a1]), 2);
+    vincos.set(chave(fascia[b][FAROL.a0], fascia[b + 1][FAROL.a0]), 3);
+    vincos.set(chave(fascia[b][FAROL.a1], fascia[b + 1][FAROL.a1]), 3);
   }
 
   /* Vincos. Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma
@@ -464,6 +530,9 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     baseParabrisa: { v: bordaDoVao, fechado: false },
     ...nomear('recorteFarol', bordaFarol),
   };
+
+  orientarConsistente(F);
+  apontarParaFora(V, F);
 
   return {
     formato: 'mecanifica.cage-quad@1',
