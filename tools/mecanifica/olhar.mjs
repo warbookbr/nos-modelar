@@ -33,10 +33,12 @@ const pecas = entradas.map((f) => ({
 const html = `<!doctype html><meta charset="utf-8">
 <style>
   body { margin:0; background:#f2f2f0; font:13px/1.4 system-ui,sans-serif; }
-  .fila { display:flex; align-items:flex-start; }
-  .peca { padding:8px; }
+  /* width:max-content e flex:none: sem isso o flex ENCOLHE as vistas para
+     caber na janela, e a captura sai comprimida em vez de completa. */
+  .fila { display:flex; align-items:flex-start; width:max-content; }
+  .peca { padding:8px; flex:none; }
   .rotulo { color:#666; padding:4px 2px; }
-  svg { display:block; max-height:78vh; width:auto; }
+  svg { display:block; }
 </style>
 <div class="fila">
 ${pecas.map((p) => `<div class="peca">${p.svg}<div class="rotulo">${p.nome}</div></div>`).join('\n')}
@@ -45,7 +47,12 @@ ${pecas.map((p) => `<div class="peca">${p.svg}<div class="rotulo">${p.nome}</div
 const navegador = await chromium.launch();
 const pagina = await navegador.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 2 });
 await pagina.setContent(html, { waitUntil: 'load' });
-const alvo = await pagina.locator('.fila').boundingBox();
-await pagina.screenshot({ path: saida, clip: alvo });
+
+/* Captura do ELEMENTO, não da viewport. Redimensionar a janela não bastou: o
+   `clip` do Playwright é limitado à viewport, então a terceira e a quarta vista
+   simplesmente não eram pintadas. O crítico cego reclamou do enquadramento da
+   lateral duas rodadas seguidas e eu tratei como ruído dele; era defeito desta
+   ferramenta, e eu vinha julgando a forma em imagem cortada. */
+await pagina.locator('.fila').screenshot({ path: saida });
 await navegador.close();
 console.log(saida);
