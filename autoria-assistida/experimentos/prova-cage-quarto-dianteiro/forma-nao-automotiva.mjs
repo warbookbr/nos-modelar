@@ -9,7 +9,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validarCage, imprimirMedidas } from './cage.mjs';
+import { validarCage, imprimirMedidas, fita } from './cage.mjs';
 import { subdividir } from './subdividir.mjs';
 import { desenhar } from './render.mjs';
 
@@ -74,11 +74,16 @@ export function construirInvolucro({ larg = 300, alt = 220, prof = 240, retorno 
     dentro.set(v, n);
     n += 1;
   }
-  for (const [a, b] of borda) {
-    F.set(f, { id: f, vs: [a, b, dentro.get(b), dentro.get(a)], parte: 'rasgoRetorno' });
-    f += 1;
-    vincos.set(chave(a, b), 2);
+  /* Fita orientada contra a pele, pelo utilitário neutro. Escrever
+     `[a, b, dentro(b), dentro(a)]` direto entra com a normal invertida quando a
+     pele percorre a aresta nesse mesmo sentido, e nada reclamava antes de o
+     validador ganhar a regra de orientação. */
+  {
+    const r = fita(F, borda, dentro, 'rasgoRetorno', f);
+    for (const face of r.feitas) F.set(face.id, face);
+    f = r.idF;
   }
+  for (const [a, b] of borda) vincos.set(chave(a, b), 2);
 
   /* Base reta e viva; aresta de encontro com o piso não deve arredondar. */
   for (let j = 0; j < COLUNAS; j += 1) vincos.set(chave(grade[0][j], grade[0][(j + 1) % COLUNAS]), 3);

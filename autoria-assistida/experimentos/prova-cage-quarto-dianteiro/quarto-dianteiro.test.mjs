@@ -101,16 +101,26 @@ describe('alteração local', () => {
     expect(subdividir(espelhar(depois), 2).F.size).toBe(subdividir(espelhar(cage), 2).F.size);
   });
 
-  it('toca a crista e ENCOSTA na base do para-brisa por um vértice só', () => {
-    /* O critério de P0 pede um loop. A medida dá dois, e a causa é um único
-       vértice compartilhado onde a crista termina no para-brisa — duas linhas de
-       caráter que se encontram, não duas regiões acopladas. O teste registra o
-       fato medido; a decisão sobre o critério é do usuário. */
+  it('toca a crista e ENCOSTA em duas outras linhas de caráter, por 1 e 2 vértices', () => {
+    /* O critério de descarte de P0 pede que a alteração local toque UM loop
+       nomeado. A medida dá três, e a causa continua sendo a mesma: pontas
+       compartilhadas onde linhas de caráter se encontram, não regiões
+       acopladas. A crista divide 2 vértices com a base do para-brisa, onde ela
+       morre no vão, e 1 vértice com o lábio do capô, onde ela morre na quina
+       dianteira. Toda carroceria real tem esses encontros.
+
+       O teste registra o fato medido e não renegocia o critério: a escolha
+       entre reabrir a representação e refinar a redação do critério é do
+       usuário, e está anotada no relatório de P2. */
     const depois = elevarLoop(cage, 'cristaParalama', 25);
     const movidos = [...cage.V.keys()].filter((v) => cage.V.get(v)[1] !== depois.V.get(v)[1]);
-    expect(loopsTocados(cage, movidos)).toEqual(['baseParabrisa', 'cristaParalama']);
-    const comuns = cage.loops.cristaParalama.v.filter((v) => cage.loops.baseParabrisa.v.includes(v));
-    expect(comuns).toHaveLength(1);
+    expect(loopsTocados(cage, movidos)).toEqual(['baseParabrisa', 'cristaParalama', 'labioDoCapo']);
+    const divide = (nome) => cage.loops.cristaParalama.v.filter((v) => cage.loops[nome].v.includes(v)).length;
+    expect(divide('baseParabrisa')).toBe(2);
+    expect(divide('labioDoCapo')).toBe(1);
+    /* Nenhum vértice interior em comum: os encontros são só nas pontas. */
+    const interior = cage.loops.cristaParalama.v.slice(1, -1);
+    expect(interior.filter((v) => cage.loops.labioDoCapo.v.includes(v))).toEqual([]);
   });
 });
 

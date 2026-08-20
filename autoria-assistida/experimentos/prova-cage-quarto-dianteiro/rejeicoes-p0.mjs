@@ -166,6 +166,9 @@ export const CONDICOES = [
    a forma acabou. Tudo fora disto é casca aberta. */
 const CORTES = { soleiraY: 170, cowlZ: 500 };
 
+/* Onde um farol pode estar: na frente, entre o para-choque e a linha do capô. */
+const FAROL_ESPERADO = { zMin: 2100, yMin: 300, yMax: 700 };
+
 const LIMIARES = {
   recuoDoRetornoMin: 6,      // mm — abaixo disto o arco é borda pintada
   quebrasNoCapoMax: 1,       // só a crista
@@ -222,8 +225,13 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
      até a crista existe UMA quebra de tangente: a crista. Volume anexo aparece
      como segunda quebra, onde o anexo encontra o capô. */
   {
+    /* Estação cortada por abertura declarada não entra: a borda do vão é uma
+       quebra por projeto, e contá-la como segunda quebra do capô acusava volume
+       anexo onde há um para-brisa. A pergunta é sobre a pele contínua. */
+    const cortadas = new Set((cage.aberturas ?? []).map((x) => x.estacao));
     const pior = { estacao: -1, quebras: 0 };
     secoes.forEach((pts, i) => {
+      if (cortadas.has(i)) return;
       const ate = Math.round((pts.length - 1) * 5 / 9) + 1;
       const q = quebras(pts.slice(0, ate), 20);
       if (q.length > pior.quebras) { pior.estacao = i; pior.quebras = q.length; }
@@ -258,13 +266,20 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
      correspondem e a diferença é o rebaixo real. */
   {
     const semFarol = subdividir(construirQuartoDianteiro({ recorteFarol: 0 }), niveis);
+    /* Onde, não só quanto. A versão anterior mediu 41,7 mm de recuo e aprovou
+       um amassado no meio do capô, a meio metro de onde um farol fica. */
     let max = 0;
+    let onde = null;
     for (const [id, p] of malha.V) {
       const q = semFarol.V.get(id);
-      if (q) max = Math.max(max, norma(sub(p, q)));
+      if (!q) continue;
+      const d = norma(sub(p, q));
+      if (d > max) { max = d; onde = p.map((n) => Math.round(n)); }
     }
-    diz(6, max >= LIMIARES.profundidadeDoFarolMin ? 'passa' : 'reprova',
-      { profundidade: +max.toFixed(2), minimo: LIMIARES.profundidadeDoFarolMin }, null);
+    const naFrente = onde && onde[2] >= FAROL_ESPERADO.zMin && onde[1] >= FAROL_ESPERADO.yMin && onde[1] <= FAROL_ESPERADO.yMax;
+    diz(6, max >= LIMIARES.profundidadeDoFarolMin && naFrente ? 'passa' : 'reprova',
+      { profundidade: +max.toFixed(2), minimo: LIMIARES.profundidadeDoFarolMin, em: onde, naFrente },
+      naFrente ? null : 'o recuo existe mas não está na frente do carro, na altura de um farol');
   }
 
   /* 7 — vão envidraçado. A mesma regra do arco: abertura é laço de borda com
@@ -287,8 +302,10 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
        Ler `malha.vincos` no nível compilado não serve: nitidez 2 já expirou no
        nível 2, e a crista — quebra deliberada de 98° — entrava como facetamento. */
     const arestasDeCaracter = new Set();
-    for (const [nome, l] of Object.entries(cage.loops ?? {})) {
-      if (!/ombro|crista|farol|arco/i.test(nome)) continue;
+    /* TODO loop declarado é decisão de forma. Filtrar por nome deixava de fora
+       o lábio do capô e a base do para-brisa, e os 40° e 45° dessas quinas
+       entravam como facetamento. Se um loop foi nomeado, alguém decidiu. */
+    for (const l of Object.values(cage.loops ?? {})) {
       const vs = rastrearLoop(cage, l.v, niveis).vertices;
       for (let i = 0; i < vs.length - 1; i += 1) arestasDeCaracter.add(chave(vs[i], vs[i + 1]));
     }

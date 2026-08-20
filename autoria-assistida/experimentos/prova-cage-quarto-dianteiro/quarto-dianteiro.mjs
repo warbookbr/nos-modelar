@@ -6,6 +6,8 @@
    Meia carroceria em x >= 0; o espelho é da compilação. Privada e descartável. */
 
 /* --- alvo de P0, em milímetros --------------------------------------------- */
+import { fita } from './cage.mjs';
+
 export const ALVO = {
   zNariz: 2265, yNariz: 520,
   zCowl: 480, yCowl: 980,          // L04, base do para-brisa
@@ -203,6 +205,13 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
 
   /* Abertura do arco: face cujo centro cai dentro do círculo do arco, medido no
      plano z–y, sai da malha. É abertura de verdade, não borda de envelope. */
+  /* Início do vão envidraçado: as células do alto da última baia saem, e o
+     buraco ganha moldura de retorno. Antes disto o "vão" era um deslocamento de
+     26 mm dos vértices da borda da grade — superfície escurecida, que é
+     literalmente a condição 7 de rejeição do P0. Abertura é topologia. */
+  const VAO = { i: ESTACOES.length - 2, j0: 0, j1: 2 };
+  const noVao = (i, j) => i === VAO.i && j >= VAO.j0 && j <= VAO.j1;
+
   const dentroDoArco = (i, j) => {
     const zs = [ESTACOES[i], ESTACOES[i + 1]];
     const ids = [grade[i][j], grade[i][j + 1], grade[i + 1][j + 1], grade[i + 1][j]];
@@ -216,7 +225,7 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
   const removidas = [];
   for (let i = 0; i < ESTACOES.length - 1; i += 1) {
     for (let j = 0; j < ANEIS - 1; j += 1) {
-      if (dentroDoArco(i, j)) { removidas.push([i, j]); continue; }
+      if (dentroDoArco(i, j) || noVao(i, j)) { removidas.push([i, j]); continue; }
       F.set(idF, {
         id: idF,
         vs: [grade[i][j], grade[i][j + 1], grade[i + 1][j + 1], grade[i + 1][j]],
@@ -226,7 +235,16 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     }
   }
 
-  const contorno = arestasDeBorda(F, grade);
+  /* Só o contorno DO ARCO. Com o vão envidraçado aberto na mesma passada, a
+     busca por arestas de uma face só devolvia as duas aberturas juntas, e o
+     retorno de borda do arco acabava construído também na borda do para-brisa —
+     três faces na mesma aresta, pele não manifold. */
+  const contorno = arestasDeBorda(F, grade, (a, b) => {
+    const [pa, pb] = [V.get(a), V.get(b)];
+    const zc = (pa[2] + pb[2]) / 2;
+    const yc = (pa[1] + pb[1]) / 2;
+    return Math.hypot(zc - ALVO.zEixo, yc - ALVO.rodaRaio) < ALVO.arcoRaio + 120;
+  });
 
   /* O contorno do buraco é PROJETADO no círculo do arco. Sem isto a abertura é a
      união das células removidas — um entalhe retangular, que a subdivisão apenas
@@ -256,39 +274,10 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     dentro.set(v, proximo);
     proximo += 1;
   }
-  for (const [a, b] of contorno.arestas) {
-    F.set(idF, { id: idF, vs: [a, b, dentro.get(b), dentro.get(a)], parte: 'arcoDianteiroRetorno' });
-    idF += 1;
-  }
-
-  /* Recorte de farol: conformado, não decalque. Um bloco de células do capô
-     externo recua ao longo da própria normal aproximada, e a borda do recuo
-     ganha vinco — é o rebaixo que a luz denuncia numa vista próxima. */
-  const farol = { i0: 1, i1: 3, j0: 2, j1: 4, fundo: recorteFarol };
-  const noFarol = new Set();
-  for (let i = farol.i0; i <= farol.i1; i += 1) {
-    for (let j = farol.j0; j <= farol.j1; j += 1) noFarol.add(grade[i][j]);
-  }
-  for (const v of noFarol) {
-    const p = V.get(v);
-    V.set(v, [p[0] - farol.fundo * 0.35, p[1] - farol.fundo * 0.55, p[2] - farol.fundo * 0.75]);
-  }
-  const bordaFarol = [];
-  for (let i = farol.i0; i <= farol.i1; i += 1) bordaFarol.push(grade[i][farol.j0], grade[i][farol.j1]);
-  for (let i = farol.i0; i < farol.i1; i += 1) {
-    vincos.set(chave(grade[i][farol.j0], grade[i + 1][farol.j0]), 2);
-    vincos.set(chave(grade[i][farol.j1], grade[i + 1][farol.j1]), 2);
-  }
-
-  /* Início do vão envidraçado: a base do para-brisa recua e o canto dianteiro da
-     janela lateral abre. O vão é loop fechado com moldura de retorno, sem
-     booleana — a mesma regra do arco. */
-  const ult = grade.length - 1;
-  for (let j = 0; j <= 3; j += 1) {
-    const v = grade[ult][j];
-    const p = V.get(v);
-    V.set(v, [p[0], p[1] + 26, p[2] - 14]);
-    if (j < 3) vincos.set(chave(grade[ult][j], grade[ult][j + 1]), 1.8);
+  {
+    const r = fita(F, contorno.arestas, dentro, 'arcoDianteiroRetorno', idF);
+    for (const f of r.feitas) F.set(f.id, f);
+    idF = r.idF;
   }
 
   /* FRENTE DO CARRO. z = 2265 não é plano de corte da prova — é onde o carro
@@ -297,56 +286,114 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
      "muito estranho, não sei explicar", depois de eu ter registrado o corte reto
      como defeito conhecido e continuado a entregar renders assim mesmo.
 
-     A tampa é uma grade de quads entre o anel do nariz e o plano de simetria,
-     recuando em z: o lábio do capô desce e volta, e a fáscia encontra a própria
-     imagem espelhada em x = 0. Sem booleana, como a pele exige. */
-  /* A tampa em dois tempos: primeiro o LÁBIO rola em z quase sem andar em x,
-     depois o PAINEL achata em x a z constante. Fazer as duas coisas juntas
-     puxava 200 mm para dentro num anel só e produzia dois espigões nos cantos
-     dianteiros — visíveis na frontal como duas barbatanas acima da linha do
-     capô. */
-  /* O z tem de ser ESTRITAMENTE crescente. Com dois anéis no mesmo z, a coluna
-     j = 0 — que está sobre o plano de simetria e portanto tem x = 0 em todos os
-     anéis — colapsa em pontos coincidentes e gera quads degenerados: diedro de
-     180° medido pela condição 8. O topo da tampa é um lado curto de 70 mm ao
-     longo de z, não um vértice. */
-  const CAPA_ANEIS = [{ x: 0.97, z: 0.45 }, { x: 0.86, z: 0.80 }, { x: 0.55, z: 0.94 }, { x: 0, z: 1 }];
-  const CAPA = CAPA_ANEIS.length;
-  const recuoDoNariz = 70;
-  /* O recuo se esgota no primeiro quarto da tampa: aí a fáscia vira PAINEL
-     PLANO. Recuo linear até a costura fazia todos os anéis convergirem para uma
-     quilha em x = 0 — proa de barco, que é a condição 1 de rejeição do P0. O que
-     recua é a dobra do lábio, não a fáscia inteira. */
+     A fáscia é uma GRADE de verdade, não um colapso para x = 0. A primeira
+     versão escalava todos os anéis do nariz em direção à costura, inclusive os
+     anéis 0 a 4, que já estão espalhados em x ao longo do alto do capô — o
+     resultado era uma aba dobrada sobre si mesma, e nenhum recorte de farol
+     cabia nela: a parede do rebaixo saía a 157° da fáscia, quase paralela.
 
+     Aqui as colunas vêm dos anéis do capô, que dão o x, e as linhas vêm dos
+     anéis do flanco, que dão o y. A coluna de fora É o flanco do nariz e a
+     linha de cima É o lábio do capô, então a tampa casa com a pele sem costura
+     inventada. Sem booleana, como a pele exige. */
+  const FRENTE_COLUNAS = ANEL_CRISTA + 1;               // anéis 0..4, o alto do capô
+  const FRENTE_LINHAS = ANEIS - ANEL_CRISTA;            // anéis 4..9, o flanco
+  const recuoDaFascia = 78;
   const anelDoNariz = grade[0];
-  const alvoNaCostura = anelDoNariz.map((v, j) => {
-    const p = V.get(v);
-    return [0, j === 0 ? p[1] : SECOES[0].pts[9][1] + (p[1] - SECOES[0].pts[9][1]) * (j === 0 ? 1 : 0)];
-  });
-  /* A costura vai do alto do nariz até a soleira, na altura de cada anel. */
-  for (let j = 0; j < ANEIS; j += 1) alvoNaCostura[j] = [0, V.get(anelDoNariz[j])[1]];
+  const xDoNariz = anelDoNariz.map((v) => V.get(v)[0]);
+  const yDoNariz = anelDoNariz.map((v) => V.get(v)[1]);
+  const larguraNaCrista = xDoNariz[ANEL_CRISTA] || 1;
 
-  const capa = [anelDoNariz];
-  for (let k = 1; k <= CAPA; k += 1) {
-    const anel = CAPA_ANEIS[k - 1];
+  /* Recuo nulo na borda que encosta na pele — coluna de fora e linha de cima —
+     e crescendo pelo PRODUTO das duas distâncias, não pelo mínimo. Com o
+     mínimo, a célula diagonalmente vizinha da quina recuava metade de uma vez
+     só, e a quina dianteira superior externa saía como lasca: 166° entre as
+     normais da pele e da fáscia, ou seja 14° de abertura. */
+  const rampa = (u) => { const t = Math.min(1, Math.max(0, u)); return t * t * (3 - 2 * t); };
+  /* A rampa corre em MILÍMETROS, não em índice de célula. As linhas da fáscia
+     são desigualmente espaçadas — 35 mm entre a primeira e a segunda, 96 mm
+     entre a terceira e a quarta — então rampa por índice enfia 39 mm de recuo
+     em 35 mm de altura e produz uma parede de 48° dentro do painel. Foi o que a
+     condição 8 vinha acusando, e não era amostragem: era forma. */
+  const ALCANCE_ABAIXO = 170;
+  const ALCANCE_PARA_DENTRO = 260;
+  const recuoDe = (x, y, xNaLinha) => recuoDaFascia
+    * rampa((yDoNariz[ANEL_CRISTA] - y) / ALCANCE_ABAIXO)
+    * rampa((xNaLinha - x) / ALCANCE_PARA_DENTRO);
+
+  const fascia = [];
+  for (let b = 0; b < FRENTE_LINHAS; b += 1) {
+    const anel = ANEL_CRISTA + b;
     const linha = [];
-    for (let j = 0; j < ANEIS; j += 1) {
-      const p = V.get(anelDoNariz[j]);
-      V.set(proximo, [p[0] * anel.x, p[1], ALVO.zNariz - recuoDoNariz * anel.z]);
+    for (let a = 0; a < FRENTE_COLUNAS; a += 1) {
+      if (b === 0) { linha.push(anelDoNariz[a]); continue; }          // o lábio do capô
+      if (a === FRENTE_COLUNAS - 1) { linha.push(anelDoNariz[anel]); continue; } // o flanco
+      const x = xDoNariz[a] * (xDoNariz[anel] / larguraNaCrista);
+      const y = yDoNariz[anel];
+      V.set(proximo, [x, y, ALVO.zNariz - recuoDe(x, y, xDoNariz[anel])]);
       linha.push(proximo);
       proximo += 1;
     }
-    capa.push(linha);
+    fascia.push(linha);
   }
-  for (let k = 0; k < CAPA; k += 1) {
-    for (let j = 0; j < ANEIS - 1; j += 1) {
+  for (let b = 0; b < FRENTE_LINHAS - 1; b += 1) {
+    for (let a = 0; a < FRENTE_COLUNAS - 1; a += 1) {
       F.set(idF, {
         id: idF,
-        vs: [capa[k][j], capa[k + 1][j], capa[k + 1][j + 1], capa[k][j + 1]],
+        /* Enrolamento TRANSPOSTO em relação à pele: nas faces do corpo o
+           primeiro índice é a estação e o segundo o anel; aqui o primeiro é o
+           anel. Listar na mesma ordem invertia a normal, e o diedro entre pele
+           e fáscia lia 168° — que é 180 menos os 12° reais da quina. */
+        vs: [fascia[b][a], fascia[b + 1][a], fascia[b + 1][a + 1], fascia[b][a + 1]],
         parte: 'fasciaDianteira',
       });
       idF += 1;
     }
+  }
+
+  /* Moldura do vão envidraçado. A borda dianteira e a de fora do buraco ganham
+     uma fita que desce e corre até o plano da cowl — é o requadro do para-brisa
+     caindo no painel corta-vento. A borda de trás é o corte da prova, e fica
+     aberta por isso, não por descuido. */
+  const bordaDoVao = [];
+  for (let j = VAO.j0; j <= VAO.j1 + 1; j += 1) bordaDoVao.push(grade[VAO.i][j]);
+  bordaDoVao.push(grade[VAO.i + 1][VAO.j1 + 1]);
+  const molduraDoVao = bordaDoVao.map((v) => {
+    const p = V.get(v);
+    V.set(proximo, [p[0], p[1] - 40, ALVO.zCowl]);
+    proximo += 1;
+    return proximo - 1;
+  });
+  {
+    const parceiro = new Map(bordaDoVao.map((v, i) => [v, molduraDoVao[i]]));
+    const arestas = bordaDoVao.slice(0, -1).map((v, i) => [v, bordaDoVao[i + 1]]);
+    const r = fita(F, arestas, parceiro, 'vaoEnvidracadoRetorno', idF);
+    for (const f of r.feitas) F.set(f.id, f);
+    idF = r.idF;
+  }
+  for (let i = 0; i < bordaDoVao.length - 1; i += 1) {
+    vincos.set(chave(bordaDoVao[i], bordaDoVao[i + 1]), 2);
+  }
+
+  /* RECORTE DE FAROL, na FÁSCIA — não no capô.
+
+     Até a rodada Q12 o "farol" era um bloco de células do capô que recuava: um
+     amassado no meio da tampa do motor, a meio metro de onde um farol fica. A
+     condição 6 aprovava porque só perguntava se existia recuo em algum lugar,
+     nunca onde. Detector verdadeiro e cego. */
+  const FAROL = { a0: 2, a1: 3, b0: 1, b1: 2 };
+  const bordaFarol = [];
+  for (let b = FAROL.b0; b <= FAROL.b1; b += 1) {
+    for (let a = FAROL.a0; a <= FAROL.a1; a += 1) {
+      const v = fascia[b][a];
+      const q = V.get(v);
+      V.set(v, [q[0], q[1], q[2] - recorteFarol]);
+    }
+    bordaFarol.push(fascia[b][FAROL.a0], fascia[b][FAROL.a1]);
+  }
+  for (let b = FAROL.b0; b < FAROL.b1; b += 1) {
+    vincos.set(chave(fascia[b][FAROL.a0], fascia[b + 1][FAROL.a0]), 2);
+    vincos.set(chave(fascia[b][FAROL.a1], fascia[b + 1][FAROL.a1]), 2);
   }
 
   /* Vincos. Uma linha de caráter é um vinco semi-agudo sobre um loop, não uma
@@ -389,13 +436,32 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
       : Object.fromEntries(ts.map((t, i) => [`${base}${i + 1}`, { v: t, fechado: false }]));
   };
 
+  /* O lábio do capô é linha de caráter, não sobra de amostragem: é a aresta em
+     que a tampa do motor vira fáscia. Declarado como loop e com vinco, ele
+     passa a ser decisão de forma; sem isso a condição 8 lia os 40° da quina
+     como facetamento. */
+  for (let a = 0; a < ANEL_CRISTA; a += 1) {
+    vincos.set(chave(anelDoNariz[a], anelDoNariz[a + 1]), 1);
+  }
+
+  /* A quina dianteira — onde a fáscia encontra o flanco — também é linha de
+     caráter. Medida ao longo dos níveis ela não some: 61° no nível 1, 33° no 2,
+     30° no 3. Isso é aresta convergindo, não amostragem grosseira. Declarar o
+     que a forma É vale mais que perseguir o número. */
+  const quinaDianteira = fascia.map((linha) => linha[FRENTE_COLUNAS - 1]);
+  for (let i = 0; i < quinaDianteira.length - 1; i += 1) {
+    vincos.set(chave(quinaDianteira[i], quinaDianteira[i + 1]), 1);
+  }
+
   const loops = {
+    quinaDianteira: { v: quinaDianteira, fechado: false },
+    labioDoCapo: { v: anelDoNariz.slice(0, ANEL_CRISTA + 1), fechado: false },
     ...nomear('linhaDeOmbro', loopOmbro),
     ...nomear('cintura', grade.map((l) => l[7])),
     ...nomear('cristaParalama', grade.map((l) => l[3])),
     /* Aberto, não fechado: a soleira limita o arco por baixo. */
     arcoDianteiro: { v: contorno.ciclo, fechado: false },
-    baseParabrisa: { v: grade[grade.length - 1].slice(0, 5), fechado: false },
+    baseParabrisa: { v: bordaDoVao, fechado: false },
     ...nomear('recorteFarol', bordaFarol),
   };
 
@@ -407,6 +473,9 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 4
     secoes: SECOES.filter((s) => ESTACOES.includes(s.z))
       .map((s) => ({ z: s.z, contorno: s.pts, tolerancia: 8, janela: 1, apenas: grade.flat() })),
     simetria: { plano: 'x', autorada: 'x >= 0' },
+    /* Estações atravessadas por abertura declarada, para quem confere não
+       confundir borda de vão com quebra de superfície. */
+    aberturas: [{ nome: 'vaoEnvidracado', estacao: VAO.i }, { nome: 'vaoEnvidracado', estacao: VAO.i + 1 }],
     grade,
     arcoRemovido: removidas.length,
   };
@@ -416,7 +485,7 @@ const chave = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
 /* Arestas que sobraram com uma face só e NÃO estão na moldura externa da grade:
    é o contorno do buraco do arco. */
-function arestasDeBorda(F, grade) {
+function arestasDeBorda(F, grade, aceita = () => true) {
   const conta = new Map();
   for (const f of F.values()) {
     for (let i = 0; i < 4; i += 1) {
@@ -438,6 +507,7 @@ function arestasDeBorda(F, grade) {
   for (const [k, n] of [...conta.entries()].sort()) {
     if (n !== 1 || naMoldura.has(k)) continue;
     const [a, b] = k.split('|').map(Number);
+    if (!aceita(a, b)) continue;
     arestas.push([a, b]);
     if (!vizinho.has(a)) vizinho.set(a, []);
     if (!vizinho.has(b)) vizinho.set(b, []);

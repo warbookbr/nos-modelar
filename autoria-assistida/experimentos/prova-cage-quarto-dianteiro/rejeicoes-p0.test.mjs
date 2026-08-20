@@ -44,7 +44,11 @@ describe('condições de rejeição do P0, executáveis', () => {
     expect(veredito(avaliarRejeicoes(), 3)).toBe('passa');
     /* Levanta o anel 2 em todas as estações: cria uma segunda crista onde a
        superfície deveria ser contínua até a crista do para-lama. */
-    const cage = mutar((c) => { for (const l of c.grade) mover(c, l[2], [0, 90, 0]); });
+    /* Uma crista extra no meio do capô: sobe o anel 2 e desce o 3, para que a
+       segunda quebra seja de tangente e não só uma barriga. */
+    const cage = mutar((c) => {
+      for (const l of c.grade) { mover(c, l[2], [0, 110, 0]); mover(c, l[3], [0, -70, 0]); }
+    });
     expect(veredito(avaliarRejeicoes({ cage }), 3)).toBe('reprova');
   });
 
@@ -82,7 +86,11 @@ describe('condições de rejeição do P0, executáveis', () => {
   it('8 — a própria cage, sem subdividir, é facetamento', () => {
     const bruta = avaliarRejeicoes({ niveis: 0 });
     expect(veredito(bruta, 8)).toBe('reprova');
-    expect(medida(bruta, 8).diedroMax).toBeGreaterThan(medida(avaliarRejeicoes(), 8).diedroMax);
+    /* Sem comparar com o nível 2: onde há vinco declarado a subdivisão deixa a
+       superfície MAIS angulosa que a cage crua, não menos, e o número do nível 2
+       pode passar o da cage. O que este teste guarda é que a cage crua, que é
+       poliédrica por definição, nunca passa. */
+    expect(medida(bruta, 8).diedroMax).toBeGreaterThan(30);
   });
 
   it('9 — capô abaulado passa; capô em calha reprova', () => {
@@ -97,10 +105,10 @@ describe('condições de rejeição do P0, executáveis', () => {
     expect(av.resultados.find((x) => x.n === 9).medida.afundamento).toBeGreaterThan(40); /* a subdivisão suaviza: -60 mm na cage viram ~52 mm na pele */
   });
 
-  it('o quarto dianteiro atual reprova em 7 e 8 — dívida aberta e escrita', () => {
+  it('o quarto dianteiro atual reprova só em 8 — dívida aberta e escrita', () => {
     /* Este teste é o marcador da dívida, não um alvo. Quando a forma for
        corrigida ele vira `toEqual([])`. Enquanto isso ele impede que a lista
        de reprovações CRESÇA sem alguém notar. */
-    expect(avaliarRejeicoes().reprovadas).toEqual([7, 8]);
+    expect(avaliarRejeicoes().reprovadas).toEqual([8]);
   });
 });

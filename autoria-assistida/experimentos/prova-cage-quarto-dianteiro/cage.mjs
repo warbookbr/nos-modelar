@@ -16,6 +16,33 @@ export class ErroDeCage extends Error {}
 /* Espelha a meia carroceria em x. Vértice na costura (x ≈ 0) não é duplicado —
    duplicar criaria aresta de borda no plano de simetria e a superfície abriria
    uma fenda no meio do carro. */
+/* Em que sentido a pele já percorre esta aresta. A fita de retorno tem de
+   percorrê-la no sentido CONTRÁRIO, senão entra com a normal invertida — e
+   normal invertida não dispara nada por si: o sintoma aparece longe, como
+   diedro de 168° entre duas superfícies que na verdade fazem 12°. */
+export function sentidoNaPele(F, a, b) {
+  for (const f of F.values()) {
+    const n = f.vs.length;
+    for (let i = 0; i < n; i += 1) {
+      if (f.vs[i] === a && f.vs[(i + 1) % n] === b) return 1;
+      if (f.vs[i] === b && f.vs[(i + 1) % n] === a) return -1;
+    }
+  }
+  return 0;
+}
+
+/* Fita de retorno de uma borda, já orientada contra a pele. */
+export function fita(F, arestas, parceiro, parte, proximoId) {
+  let idF = proximoId;
+  const feitas = [];
+  for (const [a, b] of arestas) {
+    const [p, q] = sentidoNaPele(F, a, b) === 1 ? [b, a] : [a, b];
+    feitas.push({ id: idF, vs: [p, q, parceiro.get(q), parceiro.get(p)], parte });
+    idF += 1;
+  }
+  return { feitas, idF };
+}
+
 export function espelhar(cage, { plano = 'x', tolerancia = 1e-6 } = {}) {
   const eixo = { x: 0, y: 1, z: 2 }[plano];
   const V = new Map(cage.V);
@@ -132,6 +159,31 @@ export function validarCage(cage) {
   /* Aresta com mais de duas faces não é superfície: é não-manifold. */
   for (const [k, e] of arestas) {
     if (e.faces.length > 2) erro('manifold', `aresta ${k} tem ${e.faces.length} faces; a pele precisa ser manifold`);
+  }
+
+  /* Orientação consistente: duas faces vizinhas percorrem a aresta comum em
+     sentidos OPOSTOS. Sem esta regra uma região inteira pode entrar com a
+     normal invertida e nada reclama — foi o que aconteceu com a fáscia
+     dianteira, montada com os índices transpostos em relação à pele. O sintoma
+     apareceu longe da causa: o diedro entre pele e fáscia lia 168°, que é 180
+     menos os 12° reais da quina, e virou caça a facetamento inexistente. */
+  const sentido = new Map();
+  for (const f of faces) {
+    const n = f.vs.length;
+    for (let i = 0; i < n; i += 1) {
+      const a = f.vs[i];
+      const b = f.vs[(i + 1) % n];
+      const k = a < b ? `${a}|${b}` : `${b}|${a}`;
+      const dir = a < b ? 1 : -1;
+      if (!sentido.has(k)) sentido.set(k, []);
+      sentido.get(k).push({ face: f.id, dir });
+    }
+  }
+  for (const [k, usos] of [...sentido.entries()].sort()) {
+    if (usos.length !== 2) continue;
+    if (usos[0].dir === usos[1].dir) {
+      erro('orientacao', `faces ${usos[0].face} e ${usos[1].face} percorrem a aresta ${k} no mesmo sentido; uma delas está com a normal invertida`);
+    }
   }
 
   return { problemas, medidas };
