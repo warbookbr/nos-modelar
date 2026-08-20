@@ -46,6 +46,22 @@ definição completa e
 [`docs/mecanifica/MONTAGENS-SEMANTICAS.md`](docs/mecanifica/MONTAGENS-SEMANTICAS.md)
 para a direção de composição.
 
+## Ferramentas centrais
+
+Duas ferramentas que vale nomear aqui porque não são óbvias pelo nome do
+arquivo, e `docs/mecanifica/INDEX.md` (ver "Desenvolvimento" abaixo) tem o
+resto:
+
+- **motor de prancha** (`tools/mecanifica/prancha.mjs`, skill
+  `desenhar-prancha`) — desenha a referência ortográfica de uma carroceria antes
+  de existir geometria 3D, e mede a própria saída (contorno fechado, curvatura,
+  landmarks). `tools/mecanifica/comparar-alvo.mjs` sobrepõe esse desenho ao
+  resultado modelado;
+- **crítico visual** (`.claude/agents/critico-visual.md`) — agente sem contexto
+  que só olha imagem e diz se o modelo bate com o alvo. Ver
+  [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md)
+  para o fluxo completo.
+
 ## Estado
 
 - O **fluxo de autoria** foi homologado nos Casos 1 e 2, e a série foi encerrada
