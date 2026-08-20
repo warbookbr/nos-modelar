@@ -1,6 +1,6 @@
 # Chassi P2 — prova descartável do quarto dianteiro
 
-**Estado:** ativo
+**Estado:** pronto
 
 **Responsável:** Claude
 
@@ -107,3 +107,8 @@ carroceria inteira, interior e qualquer promoção a peça publicada.
   cinco seções transversais de P0 como contrato, em vez de interpolar seção
   genérica, e refazer a cage a partir delas. As oito condições de rejeição de P0
   passam a ser rodadas **antes** de apresentar, não depois.
+- **V3 — 2026-08-20:** congelado em `pronto` pela abertura do plano
+  `2026-08-20-motor-de-prancha-autonomia.md`. P2 preserva integralmente a prova,
+  seus limites e o veredito pendente, mas não executa Q7 nem altera a cage até
+  que a auditoria da ferramenta que define e valida o alvo tenha encerramento
+  registrado. A retomada exige reativação explícita deste plano.

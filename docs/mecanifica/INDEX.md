@@ -142,8 +142,9 @@ aplicação publicada aqui.
   booleana, e o nome da região atravessa a subdivisão. O terceiro braço do
   critério de descarte disparou — a alteração local tocou dois loops em vez de um
   — por um único vértice compartilhado onde a crista do para-lama encontra a base
-  do para-brisa. O veredito está pendente de decisão sobre o critério, e o
-  relatório não o renegocia por conta própria.
+  do para-brisa. O plano P2 está congelado em `pronto`: suas evidências e esse
+  veredito pendente não mudam enquanto a ferramenta que define o alvo passa pela
+  auditoria ativa abaixo.
 - O [motor de prancha com filete e medida](planos/2026-08-19-motor-de-prancha-medida.md)
   (`docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md`) foi concluído.
   `tools/mecanifica/prancha.mjs` desenha pranchas ortográficas alvo e emite um
@@ -173,6 +174,13 @@ aplicação publicada aqui.
   (`docs/mecanifica/referencias/README.md`). Limite medido e registrado: desvio
   de silhueta é confiável, curvatura vinda de raster é ruído. A medida contrariou
   a análise visual — o erro grave não era o teto, eram a traseira e o nariz.
+- O plano de [autonomia verificável do Motor de Prancha](planos/2026-08-20-motor-de-prancha-autonomia.md)
+  (`docs/mecanifica/planos/2026-08-20-motor-de-prancha-autonomia.md`) é o único
+  plano **ativo**. Ele não parte de uma lista de defeitos do usuário: deve auditar
+  e poder substituir o motor, a skill, métricas, referências, sobreposição e
+  crítica atuais; pesquisar alternativas externas; implementar apenas ganhos
+  comprovados; e demonstrar que uma IA consegue desenhar, reconhecer incerteza,
+  detectar erro e orientar uma modelagem melhor.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

@@ -3,10 +3,16 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-19-chassi-p2-prova-do-quarto.md`](2026-08-19-chassi-p2-prova-do-quarto.md).
-A prova descartável do quarto dianteiro, que confirma ou reabre a cage de quads
-com Catmull-Clark. Vive em zona privada, não toca o núcleo e tem critério de
-descarte declarado desde P0.
+[`2026-08-20-motor-de-prancha-autonomia.md`](2026-08-20-motor-de-prancha-autonomia.md).
+Ele assume a evolução integral, autônoma e verificável do Motor de Prancha:
+audita inclusive as ferramentas, métricas e skills existentes, pesquisa
+capacidades externas, mede lacunas, escolhe e prova mudanças. Não pede ao
+usuário que diagnostique problemas ou escolha tecnologia.
+
+O [P2 do chassi](2026-08-19-chassi-p2-prova-do-quarto.md) está **congelado no
+estado `pronto`**. Suas evidências e a decisão pendente sobre a alteração local
+permanecem íntegras, mas Q7 não executa enquanto a confiabilidade da prancha —
+alvo e fonte de julgamento da prova — estiver sob auditoria ativa.
 
 A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída e
 fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que

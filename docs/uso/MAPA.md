@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-493 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+494 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -353,6 +353,7 @@
 - `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
 - `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
 - `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
+- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
