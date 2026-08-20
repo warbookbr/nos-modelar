@@ -267,6 +267,42 @@ export function dentro(ponto, poligono) {
   return d;
 }
 
+/* Um anel fechado que cruza a si mesmo pode continuar "fechado" para uma
+   checagem de pontas e ainda assim não representa uma silhueta utilizável.
+   Interseções entre trechos vizinhos são normais (eles compartilham vértice),
+   por isso só os pares não adjacentes entram nesta medida. */
+export function autoIntersecoes(pl, { epsilon = 1e-9 } = {}) {
+  if (pl.length < 4) return [];
+  const pts = pl.slice();
+  if (dist(pts[0], pts[pts.length - 1]) <= epsilon) pts.pop();
+  if (pts.length < 3) return [];
+  const cruz2 = (a, b, c) => cruz(sub(b, a), sub(c, a));
+  const entre = (a, b, p) => p[0] >= Math.min(a[0], b[0]) - epsilon
+    && p[0] <= Math.max(a[0], b[0]) + epsilon
+    && p[1] >= Math.min(a[1], b[1]) - epsilon
+    && p[1] <= Math.max(a[1], b[1]) + epsilon;
+  const corta = (a, b, c, d) => {
+    const abC = cruz2(a, b, c); const abD = cruz2(a, b, d);
+    const cdA = cruz2(c, d, a); const cdB = cruz2(c, d, b);
+    if (Math.abs(abC) <= epsilon && entre(a, b, c)) return true;
+    if (Math.abs(abD) <= epsilon && entre(a, b, d)) return true;
+    if (Math.abs(cdA) <= epsilon && entre(c, d, a)) return true;
+    if (Math.abs(cdB) <= epsilon && entre(c, d, b)) return true;
+    return ((abC > epsilon && abD < -epsilon) || (abC < -epsilon && abD > epsilon))
+      && ((cdA > epsilon && cdB < -epsilon) || (cdA < -epsilon && cdB > epsilon));
+  };
+  const achadas = [];
+  for (let i = 0; i < pts.length; i += 1) {
+    const a = pts[i]; const b = pts[(i + 1) % pts.length];
+    for (let j = i + 1; j < pts.length; j += 1) {
+      if (j === i + 1 || (i === 0 && j === pts.length - 1)) continue;
+      const c = pts[j]; const d = pts[(j + 1) % pts.length];
+      if (corta(a, b, c, d)) achadas.push({ a: i, b: j });
+    }
+  }
+  return achadas;
+}
+
 export function anguloTangente(pl, ponto) {
   let melhor = 0; let melhorD = Infinity;
   for (let i = 0; i < pl.length; i += 1) {

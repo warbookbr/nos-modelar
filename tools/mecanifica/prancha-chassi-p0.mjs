@@ -27,14 +27,14 @@ const camadas = [
   },
   ...BASE.map((pts) => ({ vista: 'lateral', contorno: true, pts })),
   ...[RD, RT].flatMap((r) => [
-    { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio },
-    { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio * 0.74 },
+    { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, motivoForaDoContorno: 'roda atravessa a abertura do arco e fica abaixo da soleira na projeção lateral', centro: [r.z, r.raio], raio: r.raio },
+    { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, motivoForaDoContorno: 'aro acompanha a roda através da abertura do arco na projeção lateral', centro: [r.z, r.raio], raio: r.raio * 0.74 },
     { vista: 'lateral', tipo: 'arco', classe: 'contorno', contorno: true, centro: [r.z, r.raio], raio: r.arco },
   ]),
   /* A linha de ombro vive em x = ±965 e é projetada na lateral: comparar com a
      silhueta de x = 0 não faz sentido, e a crista do para-lama fica mesmo acima
      do centro do capô. */
-  { vista: 'lateral', classe: 'carater', nome: 'linhaDeOmbro', pts: OMBRO, foraDoContorno: true, esperado: { concentracaoMax: 0.6, inversoesMax: 2 } },
+  { vista: 'lateral', classe: 'carater', nome: 'linhaDeOmbro', pts: OMBRO, foraDoContorno: true, motivoForaDoContorno: 'crista do flanco está em x diferente do plano central e pode projetar acima da silhueta lateral', esperado: { concentracaoMax: 0.6, inversoesMax: 2 } },
   /* Soleira: aresta inferior do flanco em x = ±925, dentro da projeção. */
   { vista: 'lateral', classe: 'painel', nome: 'soleira', pts: [[740, 200], [400, 145], [0, 145], [-500, 152], [-760, 205]] },
 
@@ -44,7 +44,7 @@ const camadas = [
   { vista: 'planta', contorno: true, pts: [[2200, 300], [2265, 0, 200], [2200, -300]] },
   { vista: 'planta', contorno: true, tipo: 'poli', pts: [[-2335, 665], [-2335, -665]] },
   ...[RD, RT].flatMap((r) => [1, -1].map((k) => ({
-    vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
+    vista: 'planta', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true, motivoForaDoContorno: 'a projeção da roda é inspecionada como interface externa declarada nesta prova P0',
     pts: [[r.z - r.raio, k * r.x - r.larg / 2], [r.z + r.raio, k * r.x - r.larg / 2],
       [r.z + r.raio, k * r.x + r.larg / 2], [r.z - r.raio, k * r.x + r.larg / 2]],
   }))),
@@ -54,7 +54,7 @@ const camadas = [
   { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-860, 105], [860, 105]] },
   { vista: 'frontal', contorno: true, tipo: 'poli', pts: [[-625, 1185], [625, 1185]] },
   ...[1, -1].map((k) => ({
-    vista: 'frontal', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
+    vista: 'frontal', tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true, motivoForaDoContorno: 'roda aparece abaixo do contorno da carroceria na seção frontal',
     pts: [[k * RD.x - RD.larg / 2, 0], [k * RD.x + RD.larg / 2, 0],
       [k * RD.x + RD.larg / 2, RD.raio * 2], [k * RD.x - RD.larg / 2, RD.raio * 2]],
   })),

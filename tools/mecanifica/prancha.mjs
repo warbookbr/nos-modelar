@@ -208,6 +208,7 @@ function medir(spec, camadas) {
     const fechado = anel.length > 2
       && Math.hypot(anel[0][0] - anel[anel.length - 1][0], anel[0][1] - anel[anel.length - 1][1]) <= tol
       && abertos.length === 0;
+    const autoIntersecoes = fechado ? G.autoIntersecoes(anel) : [];
 
     let fora = 0;
     const culpadas = [];
@@ -225,15 +226,20 @@ function medir(spec, camadas) {
       caixa: anel.length ? G.caixa(anel) : null,
       contornoFechado: fechado,
       trechosSoltos: abertos.length,
+      autoIntersecoes: autoIntersecoes.length,
       pontosForaDoContorno: fora,
       camadasQueEscaparam: culpadas,
     };
     if (contorno.length > 0 && !fechado) alertas.push(`${nome}: contorno não fecha (${abertos.length} trecho(s) solto(s))`);
+    if (autoIntersecoes.length > 0) alertas.push(`${nome}: contorno se auto-intersecta em ${autoIntersecoes.length} par(es) de trecho — silhueta ambígua`);
     if (fora > 0) alertas.push(`${nome}: ${fora} ponto(s) fora do contorno — ${culpadas.join(', ')}`);
   }
 
   const porCamada = {};
   for (const c of camadas) {
+    if (c.foraDoContorno && !c.motivoForaDoContorno) {
+      alertas.push(`${c.nome ?? c.classe ?? 'camada'}: foraDoContorno exige motivoForaDoContorno para não silenciar um defeito`);
+    }
     if (!c.nome) continue;
     const m = {
       vista: c.vista,
@@ -272,7 +278,35 @@ function medir(spec, camadas) {
   return { porVista, porCamada, porLandmark, coerencia, alertas };
 }
 
+function validarSpec(spec) {
+  const erros = [];
+  const finito = (v) => typeof v === 'number' && Number.isFinite(v);
+  const ponto = (p) => Array.isArray(p) && p.length >= 2 && finito(p[0]) && finito(p[1]);
+  if (!spec || typeof spec !== 'object') return ['especificação ausente'];
+  if (!spec.tela || !finito(spec.tela.largura) || !finito(spec.tela.altura)
+    || spec.tela.largura <= 0 || spec.tela.altura <= 0) erros.push('tela precisa ter largura e altura finitas e positivas');
+  if (!spec.limites || !['zMin', 'zMax', 'yMax', 'xMax'].every((k) => finito(spec.limites[k]))) erros.push('limites precisam declarar zMin, zMax, yMax e xMax finitos');
+  if (!spec.vistas || Object.keys(spec.vistas).length === 0) erros.push('é necessária ao menos uma vista declarada');
+  for (const [nome, vista] of Object.entries(spec.vistas ?? {})) {
+    if (!EIXOS_DA_VISTA[nome]) erros.push(`vista "${nome}" não é uma vista ortográfica reconhecida`);
+    if (!vista || !finito(vista.x) || !finito(vista.y)) erros.push(`vista "${nome}" precisa de posição x/y finita`);
+    if (vista?.leitura !== undefined && !['projecao', 'secao'].includes(vista.leitura)) erros.push(`vista "${nome}" tem leitura inválida`);
+  }
+  if (!Array.isArray(spec.camadas) || spec.camadas.length === 0) erros.push('é necessária ao menos uma camada');
+  for (const [i, camada] of (spec.camadas ?? []).entries()) {
+    if (!spec.vistas?.[camada.vista]) erros.push(`camada ${i}: vista "${camada.vista}" não declarada`);
+    if (camada.tipo === 'circulo' || camada.tipo === 'arco') {
+      if (!ponto(camada.centro) || !finito(camada.raio) || camada.raio <= 0) erros.push(`camada ${i}: círculo/arco exige centro e raio positivo finitos`);
+    } else if (!Array.isArray(camada.pts) || camada.pts.length < 2 || camada.pts.some((p) => !ponto(p))) {
+      erros.push(`camada ${i}: pts precisa conter ao menos dois pontos finitos`);
+    }
+  }
+  return erros;
+}
+
 export function prancha(spec) {
+  const erros = validarSpec(spec);
+  if (erros.length) throw new Error(`prancha inválida: ${erros.join('; ')}`);
   const proj = projetores(spec);
   const camadas = spec.camadas.map((c) => ({ ...c, pl: amostrar(c) }));
   const relatorio = medir(spec, camadas);

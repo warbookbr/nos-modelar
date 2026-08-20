@@ -93,6 +93,11 @@ describe('calibração por rodas', () => {
     expect(Math.abs(cal.residuo.altura.erroRelativo)).toBeLessThan(0.05);
   });
 
+  it('recusa calibração cuja medida independente contradiz a escala', () => {
+    expect(() => calibrarPorRodas(envelope(img, ret), ret, { entreEixos: 2000, altura: 1600 }))
+      .toThrow(/calibração insuficiente/);
+  });
+
   it('mede o resíduo contra a tinta, não contra o recorte com folga', () => {
     const justo = calibrarPorRodas(envelope(img, { x0: 10, x1: 190, y0: 30, y1: 80 }), ret, { entreEixos: 2000, altura: 1000 });
     const folgado = calibrarPorRodas(envelope(img, { x0: 0, x1: 199, y0: 0, y1: 99 }), ret, { entreEixos: 2000, altura: 1000 });
@@ -158,9 +163,14 @@ describe('compararSilhuetas', () => {
     expect(Math.abs(c.zDoPior)).toBeLessThan(60);
   });
 
-  it('só compara a faixa em que as duas existem', () => {
-    const c = compararSilhuetas(reta, [[-200, 500], [200, 500]]);
+  it('declara a cobertura quando a comparação parcial é autorizada', () => {
+    const c = compararSilhuetas(reta, [[-200, 500], [200, 500]], { minCobertura: 0.1 });
     expect(c.faixaZ).toEqual([-200, 200]);
+    expect(c.cobertura.referencia).toBeCloseTo(0.2, 3);
+  });
+
+  it('recusa comparação que omitiria a maior parte da silhueta', () => {
+    expect(() => compararSilhuetas(reta, [[-200, 500], [200, 500]])).toThrow(/cobertura insuficiente/);
   });
 
   it('recusa silhuetas que não se sobrepõem', () => {

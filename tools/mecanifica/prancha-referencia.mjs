@@ -134,7 +134,9 @@ export function envelope(img, ret, { limiar = 200, suavizar = 5 } = {}) {
 /* Calibração por rodas: as manchas de contato com o solo dão os centros de eixo,
    e a distância entre elas é o entre-eixos conhecido. Duas medidas independentes
    — comprimento e altura — voltam como resíduo, que é a honestidade da escala. */
-export function calibrarPorRodas(env, ret, { entreEixos, comprimento, altura, larguraMinima = 4 } = {}) {
+export function calibrarPorRodas(env, ret, {
+  entreEixos, comprimento, altura, larguraMinima = 4, maxErroRelativo = 0.03,
+} = {}) {
   const chao = Math.max(...env.base.filter((v) => v !== null));
   const manchas = []; let ini = null;
   env.base.forEach((b, i) => {
@@ -162,6 +164,11 @@ export function calibrarPorRodas(env, ret, { entreEixos, comprimento, altura, la
   }
   if (altura) residuo.altura = { medido: Math.round((chao - topoTinta) * mmPorPx), declarado: altura };
   for (const r of Object.values(residuo)) r.erroRelativo = Number(((r.medido - r.declarado) / r.declarado).toFixed(4));
+  const ruim = Object.entries(residuo).filter(([, r]) => Math.abs(r.erroRelativo) > maxErroRelativo);
+  if (ruim.length) {
+    const detalhe = ruim.map(([nome, r]) => `${nome} ${Math.round(Math.abs(r.erroRelativo) * 100)}%`).join(', ');
+    throw new Error(`calibração insuficiente: resíduo acima de ${Math.round(maxErroRelativo * 100)}% (${detalhe})`);
+  }
   return { mmPorPx, chao, centrosPx: centros, zMeioPx: (centros[0] + centros[centros.length - 1]) / 2, residuo };
 }
 
@@ -220,7 +227,7 @@ export function simplificar(pts, { tolerancia = 6 } = {}) {
 /* Desvio vertical entre duas silhuetas, estação a estação em z. Só compara onde
    as duas existem; reporta a cobertura para que um trecho faltante não vire
    "erro zero". */
-export function compararSilhuetas(referencia, minha, { estacoes = 120 } = {}) {
+export function compararSilhuetas(referencia, minha, { estacoes = 120, minCobertura = 0.98 } = {}) {
   const emZ = (pts, z) => {
     let a = null; let b = null;
     for (let i = 1; i < pts.length; i += 1) {
@@ -232,6 +239,17 @@ export function compararSilhuetas(referencia, minha, { estacoes = 120 } = {}) {
   };
   const zMin = Math.max(referencia[0][0], minha[0][0]);
   const zMax = Math.min(referencia[referencia.length - 1][0], minha[minha.length - 1][0]);
+  const faixaReferencia = referencia[referencia.length - 1][0] - referencia[0][0];
+  const faixaMinha = minha[minha.length - 1][0] - minha[0][0];
+  const faixaComum = Math.max(0, zMax - zMin);
+  if (faixaComum === 0) throw new Error('as duas silhuetas não se sobrepõem em z');
+  const cobertura = {
+    referencia: faixaReferencia === 0 ? 1 : Number((faixaComum / faixaReferencia).toFixed(4)),
+    minha: faixaMinha === 0 ? 1 : Number((faixaComum / faixaMinha).toFixed(4)),
+  };
+  if (cobertura.referencia < minCobertura || cobertura.minha < minCobertura) {
+    throw new Error(`silhuetas têm cobertura insuficiente: referência ${Math.round(cobertura.referencia * 100)}%, desenho ${Math.round(cobertura.minha * 100)}% (mínimo ${Math.round(minCobertura * 100)}%)`);
+  }
   const amostras = [];
   for (let i = 0; i <= estacoes; i += 1) {
     const z = zMin + ((zMax - zMin) * i) / estacoes;
@@ -246,6 +264,7 @@ export function compararSilhuetas(referencia, minha, { estacoes = 120 } = {}) {
   return {
     estacoes: amostras.length,
     faixaZ: [Math.round(zMin), Math.round(zMax)],
+    cobertura,
     desvioMedio: Number((desvios.reduce((s, v) => s + v, 0) / desvios.length).toFixed(1)),
     desvioAbsMedio: Number((abs.reduce((s, v) => s + v, 0) / abs.length).toFixed(1)),
     desvioMaximo: Number(pior.desvio.toFixed(1)),

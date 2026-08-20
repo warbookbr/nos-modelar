@@ -110,8 +110,8 @@ const perfilV = (pts, k) => pts.map(([y, w, r]) => (r === undefined ? [k * w, y]
 /* Na lateral a roda desce legitimamente abaixo da soleira e passa por dentro do
    arco, que é abertura: aqui `foraDoContorno` tem razão de existir. */
 const rodaLateral = (r) => [
-  { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio },
-  { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, centro: [r.z, r.raio], raio: r.raio * 0.66 },
+  { vista: 'lateral', tipo: 'circulo', classe: 'roda', foraDoContorno: true, motivoForaDoContorno: 'roda atravessa a abertura do arco e fica abaixo da soleira na projeção lateral', centro: [r.z, r.raio], raio: r.raio },
+  { vista: 'lateral', tipo: 'circulo', classe: 'aro', foraDoContorno: true, motivoForaDoContorno: 'aro acompanha a roda através da abertura do arco na projeção lateral', centro: [r.z, r.raio], raio: r.raio * 0.66 },
   { vista: 'lateral', tipo: 'arco', contorno: true, centro: [r.z, r.raio], raio: r.arco },
 ];
 /* Na planta, roda fora da carroceria é o defeito que se quer pegar — foi assim
@@ -124,7 +124,7 @@ const rodaPlanta = (r) => [1, -1].map((k) => ({
 /* Nas vistas verticais o pneu aparece abaixo da soleira, fora do contorno do
    corpo: escape legítimo, mesmo caso da lateral. */
 const rodaVertical = (vista, r) => [1, -1].map((k) => ({
-  vista, tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true,
+  vista, tipo: 'poli', classe: 'roda', fechado: true, foraDoContorno: true, motivoForaDoContorno: 'roda aparece abaixo do contorno da carroceria nas vistas verticais',
   pts: [[k * r.x - r.larg / 2, 0], [k * r.x + r.larg / 2, 0],
     [k * r.x + r.larg / 2, r.raio * 1.6], [k * r.x - r.larg / 2, r.raio * 1.6]],
 }));
@@ -144,7 +144,7 @@ const camadas = [
   { vista: 'lateral', classe: 'painel', nome: 'corteCapo', pts: CORTE_CAPO },
   { vista: 'lateral', classe: 'painel', nome: 'tomadaLateral', pts: TOMADA, fechado: true },
   {
-    vista: 'lateral', classe: 'carater', nome: 'linhaDaCunha', pts: CUNHA, foraDoContorno: true,
+    vista: 'lateral', classe: 'carater', nome: 'linhaDaCunha', pts: CUNHA, foraDoContorno: true, motivoForaDoContorno: 'linha de caráter projetada no flanco pode ficar fora da silhueta do plano central',
     esperado: { concentracaoMax: 0.20, inversoesMax: 1 },
   },
   { vista: 'lateral', classe: 'painel', nome: 'soleira', pts: SOLEIRA },

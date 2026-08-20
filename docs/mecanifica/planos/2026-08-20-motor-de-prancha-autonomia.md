@@ -89,8 +89,8 @@ entre vistas, referência mal calibrada, detalhe fora do contorno, confiança
 forjada e desvio entre prancha e modelo. Cada caso demonstra qual defesa atual o
 pega ou por que ainda passa.
 
-**Aceite:** relatório de linha de base reproduzível e matriz “defeito → defesa
-atual → lacuna → evidência”; nenhuma lacuna é inferida apenas por opinião.
+**Aceite:** concluído — [relatório de linha de base R0](../RELATORIO-MOTOR-DE-PRANCHA-R0.md)
+reproduzível; nenhuma lacuna é inferida apenas por opinião.
 
 ### R1 — pesquisa externa e provas curtas
 

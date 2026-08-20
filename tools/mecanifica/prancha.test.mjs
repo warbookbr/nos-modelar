@@ -86,6 +86,15 @@ describe('métrica', () => {
     expect(relatorio.alertas).toHaveLength(0);
   });
 
+  it('reprova silhueta fechada que cruza a si mesma', () => {
+    const { relatorio } = prancha(base([
+      { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 80], [-100, 80], [100, 0]] },
+    ]));
+    expect(relatorio.porVista.lateral.contornoFechado).toBe(true);
+    expect(relatorio.porVista.lateral.autoIntersecoes).toBeGreaterThan(0);
+    expect(relatorio.alertas.join(' ')).toMatch(/auto-intersecta/);
+  });
+
   it('acusa detalhe que escapou do contorno', () => {
     const { relatorio } = prancha(base([
       { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },
@@ -93,6 +102,14 @@ describe('métrica', () => {
     ]));
     expect(relatorio.porVista.lateral.pontosForaDoContorno).toBeGreaterThan(0);
     expect(relatorio.alertas.join(' ')).toMatch(/fora do contorno/);
+  });
+
+  it('não deixa silenciar fora do contorno sem motivo explícito', () => {
+    const { relatorio } = prancha(base([
+      { vista: 'lateral', contorno: true, tipo: 'poli', fechado: true, pts: [[-100, 0], [100, 0], [100, 80], [-100, 80]] },
+      { vista: 'lateral', classe: 'roda', foraDoContorno: true, tipo: 'circulo', centro: [0, 0], raio: 60 },
+    ]));
+    expect(relatorio.alertas.join(' ')).toMatch(/exige motivoForaDoContorno/);
   });
 
   it('reprova cúpula onde a especificação declarou rampa', () => {
@@ -224,5 +241,13 @@ describe('determinismo', () => {
   it('produz o mesmo SVG em execuções repetidas', () => {
     const spec = base([{ vista: 'lateral', pts: [[-100, 0], [0, 60, 25], [100, 20]] }]);
     expect(prancha(spec).svg).toBe(prancha(spec).svg);
+  });
+
+  it('recusa coordenada não finita em vez de gerar SVG inválido', () => {
+    expect(() => prancha(base([{ vista: 'lateral', tipo: 'poli', pts: [[0, 0], [NaN, 20]] }]))).toThrow(/pontos finitos/);
+  });
+
+  it('recusa camada que aponta para vista não declarada com diagnóstico', () => {
+    expect(() => prancha(base([{ vista: 'frontal', tipo: 'poli', pts: [[0, 0], [10, 20]] }]))).toThrow(/vista "frontal" não declarada/);
   });
 });
