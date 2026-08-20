@@ -3,11 +3,16 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-20-auditoria-praticas-autoria-3d.md`](2026-08-20-auditoria-praticas-autoria-3d.md).
-Ele confronta arquitetura, workflow, representação e validação locais com nove
-práticas de autoria 3D agentiva. A auditoria não executa ferramenta externa nem
-modela: classifica evidência e decide o que preservar, corrigir, redesenhar ou
-interromper antes de outra prova.
+[`2026-08-20-aceite-visual-e-prova-de-superficie.md`](2026-08-20-aceite-visual-e-prova-de-superficie.md).
+
+Ele cria o porteiro de aceite visual e uma prova privada de cage com seções de
+caráter declaradas. P2 e a validação integrada permanecem congelados; nenhum
+núcleo ou conteúdo público é alterado antes de a prova demonstrar valor.
+
+A [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md)
+foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela
+P2 e a validação integrada até uma prova privada ligar o aceite visual ao
+fechamento e exercitar seções de caráter declaradas.
 
 A [validação integrada do valor Agent-First](2026-08-20-validacao-integrada-mecanifica.md)
 está **congelada em `pronto` antes de R0**. O comparativo da trava pode ser
@@ -286,7 +291,7 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-A abertura atual é a [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md).
-A continuidade será definida por sua matriz e decisão, sem roteiro fechado
-antecipadamente. Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem
-autorização automática; nenhum recorte nasce apenas da sequência das sondas.
+A abertura ativa é o [aceite visual e prova de superfície](2026-08-20-aceite-visual-e-prova-de-superficie.md).
+Ela executa a correção determinada pela auditoria antes de qualquer retomada.
+Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
+automática; nenhum recorte nasce apenas da sequência das sondas.

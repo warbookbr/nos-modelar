@@ -200,10 +200,21 @@ aplicação publicada aqui.
   **congelado em `pronto` antes de R0**. Seu comparativo da trava só pode ser
   retomado se a auditoria ativa mantiver válidas suas premissas e métricas.
 - O plano de [auditoria das práticas de autoria 3D](planos/2026-08-20-auditoria-praticas-autoria-3d.md)
-  (`docs/mecanifica/planos/2026-08-20-auditoria-praticas-autoria-3d.md`) é o
-  único plano **ativo**. Ele confronta decomposição, papéis, variantes,
-  inspeção, representação, topologia, orçamento, edição e qualidade final com
-  evidência local, sem executar Blender ou outro comparador externo.
+  foi concluído com decisão **`corrigir`**. O relatório
+  [`RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`](RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md)
+  preserva núcleo, identidade e composição, mas registra que P2 fechou medidas
+  verdes com forma reprovada. P2 e a validação integrada permanecem congelados
+  até uma prova privada tornar alvo, sobreposição, vistas, rejeições e crítica
+  independente evidência vinculante, antes de nova prova de superfície.
+  Os registros alcançáveis são
+  `docs/mecanifica/planos/2026-08-20-auditoria-praticas-autoria-3d.md` e
+  `docs/mecanifica/RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`.
+- O plano de [aceite visual vinculante e prova de superfície](planos/2026-08-20-aceite-visual-e-prova-de-superficie.md)
+  é o único **ativo**. Ele primeiro torna alvo, sobreposição, vistas, rejeições
+  e crítica independente condicionantes do fechamento privado; depois prova uma
+  cage com seções de caráter declaradas. P2 e a validação integrada continuam
+  congelados, e núcleo, receita pública e catálogo permanecem fora de escopo.
+  Registro: `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
@@ -407,7 +418,7 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é a auditoria das práticas de autoria 3D; cenário
+- O plano ativo é o aceite visual vinculante e a prova de superfície. Cenário
   multi-documento, envelope de movimento, subtração robusta, materiais/LOD e
   autoria por intenção continuam candidatos e dependem de recorte executivo
   próprio e ganho verificável.
@@ -415,8 +426,7 @@ npm run mcp:ensaio
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
 
-Nenhuma pendência desta lista autoriza implementação automática. O plano ativo
-somente audita e não altera comportamento ou geometria.
+Nenhuma pendência desta lista autoriza implementação automática.
 
 ## Histórico
 

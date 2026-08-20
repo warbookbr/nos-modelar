@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-505 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+507 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -285,6 +285,7 @@
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
+- `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md` — Auditoria das práticas de autoria 3D
 - `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
 - `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
 - `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
@@ -359,6 +360,7 @@
 - `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
 - `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
 - `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
+- `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First

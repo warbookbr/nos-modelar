@@ -1,6 +1,6 @@
 # Auditoria das práticas de autoria 3D da Mecanifica
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -121,5 +121,14 @@ tese antes de descongelar qualquer prova de modelagem.
 
 ## Fechamento
 
-Preencher com relatório, decisão, gates, commit e planos que permanecem
-congelados ou podem ser retomados.
+Relatório: [`../RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`](../RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md).
+
+**Decisão: `corrigir`.** A base semântica, determinística e de composição é
+mantida. O ciclo de autoria de superfície não pode voltar a fechar por métricas
+estruturais sem evidência visual vinculante. P2 e a validação integrada
+permanecem congelados; um plano sucessor deve primeiro provar o porteiro de
+aceite visual e uma cage com seções de caráter declaradas.
+
+Gates de documentação: `mapa:check`, `docs:toc:check`, `docs:links:check` e
+`planos:check` passam na entrega desta rodada. Nenhum comportamento, geometria,
+material ou câmera foi alterado.
