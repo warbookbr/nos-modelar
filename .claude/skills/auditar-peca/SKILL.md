@@ -110,18 +110,34 @@ reprodutível de uma observação visual. Se o briefing exigir algo que as vista
 não conseguem mostrar, registre a divergência honestamente em vez de alterar a
 peça ou simular a capacidade.
 
+### Antes de tudo: OLHE a imagem
+
+Rasterize as vistas e **abra o PNG**:
+
+```
+node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
+```
+
+Ler o PNG como imagem é passo obrigatório antes de julgar, antes de despachar
+crítico e antes de levar qualquer coisa ao usuário. SVG gerado, entregue e nunca
+aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 mm
+ficou várias rodadas visível na vista frontal e só foi achado por um script.
+Medição pega o defeito que alguém já imaginou; olhar pega o resto.
+
 ## Despachar o crítico, sem contexto
 
 Em marco — antes de propor promoção, publicação ou de levar o resultado ao
 usuário — despache um subagente como **crítico visual**. O protocolo está em
 [`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
 
-Passe **apenas** as vistas, o briefing e o critério declarado. **Não passe o seu
-raciocínio nem o histórico de construção** — é ele que ancora, e um crítico que
-herda a sua narrativa não acrescenta nada. Papel separado dentro da mesma sessão
-é ficção: quem modelou tem a narrativa e não consegue não tê-la.
+Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
+relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
+VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
+que lê a receita volta a julgar a intenção em vez do resultado, que é
+exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
+mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
 
-A forma mais forte é legibilidade cega: entregue a imagem sem dizer o que é e
+A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
 pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
 teste não exige gosto — só verifica se a forma comunica.
 

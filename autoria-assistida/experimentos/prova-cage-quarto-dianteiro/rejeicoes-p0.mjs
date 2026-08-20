@@ -145,12 +145,26 @@ export const CONDICOES = [
   { n: 7, texto: 'o vão envidraçado lê como superfície escurecida em vez de abertura com moldura' },
   { n: 8, texto: 'a densidade de malha está na amostragem e não na decisão de forma' },
   { n: 9, texto: 'o capô afunda entre o eixo de simetria e a crista — lê como calha, não como abaulado' },
+  { n: 10, texto: 'a peça tem borda livre onde o carro é fechado — vê-se o interior da casca' },
 ];
 
-/* Condição 9 é acréscimo de 2026-08-19. Ela não estava em P0 e é exatamente o
+/* Condição 10 é acréscimo de 2026-08-20, pelo mesmo motivo da 9. O usuário viu
+   a vista frontal "muito estranha" e não soube nomear: o nariz do carro era um
+   buraco aberto de 600 x 370 mm, e a vista frontal mostrava o interior da casca
+   pelo outro lado. As condições 2 e 7 conferem que as aberturas que DEVEM
+   existir existem; nenhuma conferia que as que NÃO devem existir não existem.
+
+   z = 2265 não é plano de corte da prova: é a frente do carro. Corte de prova
+   são a soleira, a cowl e o plano de simetria, e só esses.
+
+   Condição 9 é acréscimo de 2026-08-19. Ela não estava em P0 e é exatamente o
    defeito que o usuário viu e a lista não pegou: em todas as oito estações da
    Q7 o capô caía de 8 a 36 mm do eixo de simetria para fora antes de subir na
    crista. Capô de carro é abaulado. A lista cresce quando falha. */
+
+/* Cortes declarados da prova: onde a peça acaba porque é um quarto, não porque
+   a forma acabou. Tudo fora disto é casca aberta. */
+const CORTES = { soleiraY: 170, cowlZ: 500 };
 
 const LIMIARES = {
   recuoDoRetornoMin: 6,      // mm — abaixo disto o arco é borda pintada
@@ -309,6 +323,25 @@ export function avaliarRejeicoes({ niveis = 2, cage = construirQuartoDianteiro()
     });
     diz(9, pior.afundamento <= LIMIARES.afundamentoDoCapoMax ? 'passa' : 'reprova',
       { afundamento: +pior.afundamento.toFixed(2), maximo: LIMIARES.afundamentoDoCapoMax, estacao: pior.estacao }, null);
+  }
+
+  /* 10 — casca aberta onde o carro é fechado. Borda livre é permitida só nos
+     cortes declarados: soleira, cowl e plano de simetria. */
+  {
+    const naBorda = new Set(lacosDeBorda(malha).flat());
+    const indevidos = [];
+    for (const v of naBorda) {
+      const [x, y, z] = malha.V.get(v);
+      if (x <= 1) continue;                       // costura de simetria
+      if (y <= CORTES.soleiraY) continue;         // corte da soleira
+      if (z <= CORTES.cowlZ) continue;            // corte da cowl
+      const raio = Math.hypot(z - ALVO.zEixo, y - ALVO.rodaRaio);
+      if (raio < ALVO.arcoRaio + 40) continue;    // arco de roda, abertura declarada
+      indevidos.push(v);
+    }
+    diz(10, indevidos.length ? 'reprova' : 'passa',
+      { verticesEmBordaIndevida: indevidos.length },
+      indevidos.length ? `a superfície acaba no ar em ${indevidos.length} vértice(s) fora de corte declarado` : null);
   }
 
   return {

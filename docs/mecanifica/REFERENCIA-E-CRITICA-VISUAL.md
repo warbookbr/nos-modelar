@@ -94,27 +94,52 @@ autor afirmou que o defeito grave era a linha do teto; a medida mostrou desvio d
 17 mm no teto e de 112 mm na traseira, que ele não havia apontado. Um crítico frio
 não herda a expectativa de quem desenhou.
 
+### Antes de despachar: OLHE você mesmo
+
+O crítico existe porque quem modelou não consegue não ter a narrativa. Ele
+**não** existe para substituir o ato de olhar. Rasterize as vistas e abra a
+imagem:
+
+```
+node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
+```
+
+e leia o PNG como imagem. SVG entregue ao usuário e nunca aberto por quem
+desenhou é o modo de falha real desta investigação: um nariz aberto de
+600 x 370 mm ficou várias rodadas visível na vista frontal e só foi achado por
+um script que contava laços de borda. Medição só pega o defeito que alguém já
+imaginou; olhar pega o resto.
+
+### O crítico recebe IMAGEM
+
+O que se despacha ao crítico é a **imagem**, e a pergunta é sobre o que ela
+mostra. Não se despacha receita, código, passos, contrato nem relatório para
+revisão: isso é revisão de código, tem outro dono, e um crítico lendo a receita
+volta a julgar a intenção em vez do resultado — que é exatamente o defeito que o
+papel existe para cobrir.
+
 Três formas de despacho, da mais forte para a mais fraca:
 
-1. **Legibilidade cega.** Entregue só a imagem, sem dizer o que é, e pergunte
+1. **Legibilidade cega.** Entregue só o PNG, sem dizer o que é, e pergunte
    "o que é isto?". Se a resposta não bate com a intenção, é achado — e o teste
-   não exige gosto nenhum, só verifica se a forma comunica.
-2. **Critério sem racional.** Entregue o artefato e as condições de rejeição
-   declaradas, e pergunte quais estão violadas. Omita o motivo de cada escolha:
-   o motivo é justamente o que ancora.
-3. **Reinterpretação da medida.** Entregue o relatório numérico e peça a leitura
-   independente. Pega o caso em que o autor explica um alerta em vez de corrigir.
+   não exige gosto nenhum, só verifica se a forma comunica. É a forma padrão.
+2. **Condições de rejeição sobre a imagem.** Entregue o PNG e a lista de
+   condições de rejeição declaradas, e pergunte quais estão violadas **no que se
+   vê**. Omita o motivo de cada escolha: o motivo é justamente o que ancora.
+3. **Reinterpretação da medida.** Entregue o relatório numérico junto do PNG e
+   peça a leitura independente. Pega o caso em que o autor explica um alerta em
+   vez de corrigir. É a forma mais fraca porque reintroduz números.
 
 Limites do papel, que valem mais que os achados:
 
 - **produz achado, nunca aprovação.** Silêncio do crítico não é evidência de
   qualidade, e não pode ser registrado como aceite. Aprovação de forma é do
   usuário;
-- **roda depois da prova determinística estar limpa.** Medida é grátis e
-  determinística; crítico é caro e não é. Gastar crítico no que a medida já
-  reprova é desperdício;
-- **em marco, não em iteração.** Cada despacho é partida fria e reconstrói
-  contexto;
+- **legibilidade cega roda sempre que uma forma vai ao usuário.** É barata e é
+  a única defesa contra entregar algo que o autor já não consegue enxergar. As
+  formas 2 e 3, essas sim, rodam em marco e depois da medida limpa: são caras e
+  gastá-las no que a medida já reprova é desperdício;
+- **cada despacho é partida fria** e reconstrói contexto;
 - **não edita.** Aponta e prova; quem corrige é o modelador.
 
 O crítico aponta no máximo cinco divergências prioritárias. Para cada uma,

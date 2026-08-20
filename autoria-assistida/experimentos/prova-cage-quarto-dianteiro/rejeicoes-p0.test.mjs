@@ -97,10 +97,10 @@ describe('condições de rejeição do P0, executáveis', () => {
     expect(av.resultados.find((x) => x.n === 9).medida.afundamento).toBeGreaterThan(40); /* a subdivisão suaviza: -60 mm na cage viram ~52 mm na pele */
   });
 
-  it('o quarto dianteiro atual reprova em 7 e 8 — dívida aberta e escrita', () => {
+  it('o quarto dianteiro atual reprova em 7, 8 e 10 — dívida aberta e escrita', () => {
     /* Este teste é o marcador da dívida, não um alvo. Quando a forma for
        corrigida ele vira `toEqual([])`. Enquanto isso ele impede que a lista
        de reprovações CRESÇA sem alguém notar. */
-    expect(avaliarRejeicoes().reprovadas).toEqual([7, 8]);
+    expect(avaliarRejeicoes().reprovadas).toEqual([7, 8, 10]);
   });
 });
