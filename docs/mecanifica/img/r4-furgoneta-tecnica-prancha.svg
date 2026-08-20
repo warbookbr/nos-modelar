@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 860" width="1300" height="860" font-family="ui-sans-serif, system-ui, sans-serif">
+<rect width="1300" height="860" fill="#fbfbfa"/>
+<style>
+  .contorno{fill:none;stroke:#12233b;stroke-width:2.1;stroke-linejoin:round;stroke-linecap:round}
+  .painel{fill:none;stroke:#2f4562;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+  .vidro{fill:none;stroke:#3d6b86;stroke-width:1.35;stroke-linejoin:round}
+  .cromo{fill:none;stroke:#8a94a2;stroke-width:1.4;stroke-linejoin:round}
+  .roda{fill:none;stroke:#8a94a2;stroke-width:1.6}
+  .aro{fill:none;stroke:#c0c6cf;stroke-width:1.1}
+  .eixo{fill:none;stroke:#c8ccd2;stroke-width:1;stroke-dasharray:9 4 2 4}
+  .carater{fill:none;stroke:#b3593d;stroke-width:1.7;stroke-dasharray:6 3}
+  .cota{stroke:#b3593d;stroke-width:1;fill:none}
+  .cotat{fill:#b3593d;font-size:11px}
+  .lm{fill:#1f6f5c}
+  .lmt{fill:#1f6f5c;font-size:9.5px}
+  .tit{fill:#12233b;font-size:15px;font-weight:600}
+  .sub{fill:#6b7481;font-size:11px}
+  .rot{fill:#8b93a0;font-size:10.5px;letter-spacing:.06em}
+</style>
+<text x="40" y="34" class="tit">Furgoneta técnica — prancha ortográfica R4</text>
+<text x="40" y="53" class="sub">Briefing ficcional independente. Milímetros. Frente à direita.</text>
+<text x="50" y="80" class="rot">LATERAL — projeção</text>
+<text x="830" y="80" class="rot">FRONTAL — projeção</text>
+<text x="50" y="458" class="rot">SUPERIOR — projeção</text>
+<text x="830" y="458" class="rot">TRASEIRA — projeção</text>
+<path class="contorno" d="M 50 352.8 L 90 239.2 L 270.8 114.4 L 538 111.2 L 562 92 L 674 149.6 L 674 352.8 L 50 352.8"/>
+<path class="painel" d="M 234 293.6 L 256.4 149.6 L 469.2 144.8 L 488.4 287.2 L 234 293.6"/>
+<path class="painel" d="M 523.6 296.8 L 523.6 156"/>
+<path class="contorno" d="M 50 700.4 L 122 737.2 L 346 751.6 L 562 745.2 L 674 714.8 L 674 506.8 L 562 476.4 L 346 470 L 122 484.4 L 50 521.2 L 50 700.4"/>
+<path class="contorno" d="M 970.8 352.8 L 1106.8 309.6 L 1111.6 178.4 L 1082.8 92 L 858.8 92 L 830 178.4 L 834.8 309.6 L 970.8 352.8"/>
+<path class="contorno" d="M 970.8 730.8 L 833.2 687.6 L 830 556.4 L 858.8 470 L 1082.8 470 L 1111.6 556.4 L 1108.4 687.6 L 970.8 730.8"/>
+<path class="cota" d="M 50 416.8 L 674 416.8"/>
+<text x="362" y="410.8" class="cotat" text-anchor="middle">comprimento 3900</text>
+<path class="cota" d="M 712 376.8 L 712 92"/>
+<text x="706" y="234.4" class="cotat" text-anchor="middle" transform="rotate(-90 706 234.4)">altura 1780</text>
+<path class="cota" d="M 441 470 L 441 751.6"/>
+<text x="435" y="610.8" class="cotat" text-anchor="middle" transform="rotate(-90 435 610.8)">largura 1760</text>
+<circle class="lm" cx="50" cy="352.8" r="2.6"/>
+<text class="lmt" x="56" y="346.8">R4-01</text>
+<circle class="lm" cx="270.8" cy="114.4" r="2.6"/>
+<text class="lmt" x="276.8" y="108.4">R4-02</text>
+<circle class="lm" cx="538" cy="111.2" r="2.6"/>
+<text class="lmt" x="544" y="105.2">R4-03</text>
+<circle class="lm" cx="346" cy="751.6" r="2.6"/>
+<text class="lmt" x="352" y="745.6">R4-04</text>
+</svg>

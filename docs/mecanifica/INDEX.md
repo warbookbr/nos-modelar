@@ -192,6 +192,10 @@ aplicação publicada aqui.
   confiança, incerteza e bloqueio agora são dados validados antes do desenho.
   A evidência é `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R2.md`; o relatório
   e a skill expõem o bloqueio sem transformar referência insuficiente em alvo preciso.
+- A R3 reexecutou o corpus contra o caminho integrado e recusou incorporar
+  mecanismos sem defeito mensurado; a matriz de resultados está em
+  `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R3.md`. A próxima prova é a R4,
+  com autoria e revisão independentes.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

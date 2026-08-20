@@ -192,9 +192,7 @@ para reativar P2 do chassi.
 
 ## Registro
 
-- **V1 — 2026-08-20:** plano aberto por decisão do usuário. P2 do chassi foi
-  congelado em `pronto` para que autoria e validação do alvo sejam auditadas antes
-  de nova geometria. O usuário delegou diagnóstico, pesquisa, decisão,
-  implementação e validação ao responsável; não há lista prévia de defeitos nem
-  feature externa preescolhida.
+- **V1 — 2026-08-20:** plano aberto por decisão do usuário; P2 foi congelado em
+  `pronto` para auditar autoria e validação do alvo antes de nova geometria.
 - **R2 — 2026-08-20:** concluída com decisão `aprovar`: contrato `mecanifica.prancha-autoria@1` explicita intenção, procedência, confiança, incerteza e bloqueio; evidência em `../RELATORIO-MOTOR-DE-PRANCHA-R2.md`.
+- **R3 — 2026-08-20:** concluída com decisão `aprovar`: corpus reexecutado, sem mecanismo adicional não justificado; evidência em `../RELATORIO-MOTOR-DE-PRANCHA-R3.md`.
