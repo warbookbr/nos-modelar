@@ -183,7 +183,10 @@ aplicação publicada aqui.
   detectar erro e orientar uma modelagem melhor. A linha de base R0 está em
   [`docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R0.md`](RELATORIO-MOTOR-DE-PRANCHA-R0.md):
   o contrato agora rejeita auto-interseção, entrada inválida, supressão sem
-  motivo, calibração contraditória e comparação de cobertura parcial.
+  motivo, calibração contraditória e comparação de cobertura parcial. A comparação
+  externa R1 está em [`docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R1.md`](RELATORIO-MOTOR-DE-PRANCHA-R1.md):
+  OpenCV, Potrace e Inkscape não superaram autoria vetorial local com semântica,
+  calibração e coerência entre vistas; nenhuma dependência foi incorporada.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

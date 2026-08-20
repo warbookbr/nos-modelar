@@ -103,9 +103,8 @@ caso do corpus. Medir qualidade do vetor editável, preservação semântica,
 determinismo, diagnóstico, instalação/licença, custo de contexto e capacidade de
 rejeitar erro. Solução que apenas gere pixels bonitos é recusada.
 
-**Aceite:** relatório comparativo com fontes, custo e veredito `usar`,
-`adaptar`, `rejeitar` ou `adiar`; linha atual e alternativa externa materialmente
-plausível são comparadas pelo mesmo caso.
+**Aceite:** concluído — [relatório comparativo R1](../RELATORIO-MOTOR-DE-PRANCHA-R1.md)
+com fontes, custo e veredito; linha atual e alternativa plausível foram comparadas no mesmo caso.
 
 ### R2 — contrato de autoria confiável
 
