@@ -29,16 +29,22 @@ const suavizar = (t) => t * t * (3 - 2 * t);
    Cada estação é escrita à mão, com o que faz caráter: capô com vale raso, CRISTA
    DE PARA-LAMA que sobe acima do capô, quebra dura na crista, flanco com
    recolhimento e tuck na soleira. Dez anéis, da costura até a soleira.
-   O anel 4 é a crista, e é ele que recebe o vinco. */
+   O anel 4 é a crista, e é ele que recebe o vinco.
+
+   Correção de 2026-08-19: o capô ABAULA. A versão anterior caía de 8 a 36 mm do
+   eixo de simetria para fora antes de subir na crista, e era essa calha que o
+   usuário via como duas asas na vista frontal. Agora os anéis 1 a 3 passam
+   acima da corda que liga o eixo de simetria à crista. Quem julga isso é a
+   condição 9 de `rejeicoes-p0.mjs`, não o olho. */
 export const SECOES = [
-  { z: 2265, pts: [[0, 520], [120, 512], [220, 494], [280, 462], [300, 420], [296, 356], [284, 288], [262, 224], [232, 176], [206, 150]] },
-  { z: 2100, pts: [[0, 640], [190, 630], [360, 608], [470, 588], [520, 606], [532, 520], [524, 414], [500, 310], [468, 220], [436, 162]] },
-  { z: 1900, pts: [[0, 742], [270, 734], [520, 718], [690, 706], [812, 726], [838, 622], [828, 486], [800, 344], [764, 232], [730, 162]] },
-  { z: 1600, pts: [[0, 826], [290, 818], [560, 806], [760, 802], [906, 838], [930, 726], [920, 570], [892, 398], [856, 262], [822, 168]] },
-  { z: 1325, pts: [[0, 880], [300, 872], [600, 866], [800, 878], [965, 900], [960, 780], [948, 600], [920, 408], [884, 258], [850, 152]] },
-  { z: 1000, pts: [[0, 922], [312, 916], [612, 910], [816, 920], [952, 940], [962, 822], [950, 636], [922, 432], [888, 268], [858, 152]] },
-  { z: 700, pts: [[0, 952], [306, 948], [600, 944], [800, 950], [940, 966], [950, 846], [940, 656], [916, 444], [884, 272], [858, 152]] },
-  { z: 480, pts: [[0, 980], [300, 976], [580, 972], [780, 978], [928, 992], [940, 866], [932, 668], [910, 450], [882, 276], [858, 154]] },
+  { z: 2265, pts: [[0, 520], [120, 506], [220, 464], [280, 431], [300, 420], [296, 356], [284, 288], [262, 224], [232, 176], [206, 150]] },
+  { z: 2100, pts: [[0, 640], [190, 653], [360, 636], [470, 616], [520, 606], [532, 520], [524, 414], [500, 310], [468, 220], [436, 162]] },
+  { z: 1900, pts: [[0, 742], [270, 761], [520, 753], [690, 739], [812, 726], [838, 622], [828, 486], [800, 344], [764, 232], [730, 162]] },
+  { z: 1600, pts: [[0, 826], [290, 854], [560, 856], [760, 847], [906, 838], [930, 726], [920, 570], [892, 398], [856, 262], [822, 168]] },
+  { z: 1325, pts: [[0, 880], [300, 910], [600, 915], [800, 908], [965, 900], [960, 780], [948, 600], [920, 408], [884, 258], [850, 152]] },
+  { z: 1000, pts: [[0, 922], [312, 952], [612, 955], [816, 947], [952, 940], [962, 822], [950, 636], [922, 432], [888, 268], [858, 152]] },
+  { z: 700, pts: [[0, 952], [306, 981], [600, 983], [800, 974], [940, 966], [950, 846], [940, 656], [916, 444], [884, 272], [858, 152]] },
+  { z: 480, pts: [[0, 980], [300, 1008], [580, 1010], [780, 1001], [928, 992], [940, 866], [932, 668], [910, 450], [882, 276], [858, 154]] },
 ];
 const ANEL_CRISTA = 4;
 
@@ -71,7 +77,7 @@ const ESTACOES = [2265, 2180, 2100, 1980, 1900, 1750, 1600, 1460, 1325, 1180, 10
 const ANEIS = 10;
 
 /* --- montagem da cage ------------------------------------------------------ */
-export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
+export function construirQuartoDianteiro({ retornoDeBorda = 26, recorteFarol = 42 } = {}) {
   const V = new Map();
   const F = new Map();
   const vincos = new Map();
@@ -163,7 +169,7 @@ export function construirQuartoDianteiro({ retornoDeBorda = 26 } = {}) {
   /* Recorte de farol: conformado, não decalque. Um bloco de células do capô
      externo recua ao longo da própria normal aproximada, e a borda do recuo
      ganha vinco — é o rebaixo que a luz denuncia numa vista próxima. */
-  const farol = { i0: 1, i1: 3, j0: 2, j1: 4, fundo: 42 };
+  const farol = { i0: 1, i1: 3, j0: 2, j1: 4, fundo: recorteFarol };
   const noFarol = new Set();
   for (let i = farol.i0; i <= farol.i1; i += 1) {
     for (let j = farol.j0; j <= farol.j1; j += 1) noFarol.add(grade[i][j]);
