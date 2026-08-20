@@ -196,10 +196,14 @@ aplicação publicada aqui.
   `docs/mecanifica/RELATORIO-MOTOR-DE-PRANCHA-R4.md`; R5 não executa neste
   recorte.
 - O plano de [validação integrada do valor Agent-First](planos/2026-08-20-validacao-integrada-mecanifica.md)
-  (`docs/mecanifica/planos/2026-08-20-validacao-integrada-mecanifica.md`) é o
-  único plano **ativo**. Ele compara um fluxo mínimo e as portas oficiais sob o
-  mesmo briefing para decidir, por qualidade e custo mensuráveis, se o conjunto
-  da Mecanifica produz valor integrado antes de abrir outra capacidade.
+  (`docs/mecanifica/planos/2026-08-20-validacao-integrada-mecanifica.md`) está
+  **congelado em `pronto` antes de R0**. Seu comparativo da trava só pode ser
+  retomado se a auditoria ativa mantiver válidas suas premissas e métricas.
+- O plano de [auditoria das práticas de autoria 3D](planos/2026-08-20-auditoria-praticas-autoria-3d.md)
+  (`docs/mecanifica/planos/2026-08-20-auditoria-praticas-autoria-3d.md`) é o
+  único plano **ativo**. Ele confronta decomposição, papéis, variantes,
+  inspeção, representação, topologia, orçamento, edição e qualidade final com
+  evidência local, sem executar Blender ou outro comparador externo.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
@@ -403,7 +407,7 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é a validação integrada do valor Agent-First; cenário
+- O plano ativo é a auditoria das práticas de autoria 3D; cenário
   multi-documento, envelope de movimento, subtração robusta, materiais/LOD e
   autoria por intenção continuam candidatos e dependem de recorte executivo
   próprio e ganho verificável.
@@ -412,7 +416,7 @@ npm run mcp:ensaio
   `docs/mecanifica/planos/BACKLOG.md`.
 
 Nenhuma pendência desta lista autoriza implementação automática. O plano ativo
-também não abre capacidade nova sem falha mensurada.
+somente audita e não altera comportamento ou geometria.
 
 ## Histórico
 

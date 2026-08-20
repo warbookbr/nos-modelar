@@ -3,11 +3,16 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-20-validacao-integrada-mecanifica.md`](2026-08-20-validacao-integrada-mecanifica.md).
-Ele compara, sob o mesmo briefing e orçamento, um fluxo mínimo contra as
-portas oficiais integradas da Mecanifica. O objetivo é medir valor final —
-qualidade, correção local, contexto e revalidação — sem abrir capacidade nova
-antes de um defeito comprovado.
+[`2026-08-20-auditoria-praticas-autoria-3d.md`](2026-08-20-auditoria-praticas-autoria-3d.md).
+Ele confronta arquitetura, workflow, representação e validação locais com nove
+práticas de autoria 3D agentiva. A auditoria não executa ferramenta externa nem
+modela: classifica evidência e decide o que preservar, corrigir, redesenhar ou
+interromper antes de outra prova.
+
+A [validação integrada do valor Agent-First](2026-08-20-validacao-integrada-mecanifica.md)
+está **congelada em `pronto` antes de R0**. O comparativo da trava pode ser
+retomado somente depois que a auditoria decidir se sua premissa e suas métricas
+continuam válidas.
 
 O plano de [autonomia verificável do Motor de Prancha](2026-08-20-motor-de-prancha-autonomia.md)
 está **congelado em `pronto`**: R0–R3 foram aprovadas, R4 só prova autoria e
@@ -281,8 +286,7 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Próxima abertura
 
-A abertura atual é a [validação integrada do valor Agent-First](2026-08-20-validacao-integrada-mecanifica.md).
-A continuidade seguinte será definida pela evidência comparativa, sem roteiro
-fechado antecipadamente. Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md)
-sem autorização automática; um novo plano deve nascer de ganho verificável,
-não da sequência das sondas encerradas.
+A abertura atual é a [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md).
+A continuidade será definida por sua matriz e decisão, sem roteiro fechado
+antecipadamente. Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem
+autorização automática; nenhum recorte nasce apenas da sequência das sondas.

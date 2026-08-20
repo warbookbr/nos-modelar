@@ -1,6 +1,6 @@
 # Validação integrada da Mecanifica — valor Agent-First
 
-**Estado:** ativo
+**Estado:** pronto
 
 **Responsável:** Codex
 
@@ -121,3 +121,10 @@ ganho encerra ou corrige o recorte, sem expansão automática.
 
 Preencher ao encerrar com o veredito, o commit, os artefatos comparados, as
 métricas, os gates e as capacidades devolvidas ao backlog.
+
+## Registro
+
+- **Congelamento — 2026-08-20:** por decisão do usuário, o plano fica em
+  `pronto` antes de R0. O comparativo da trava permanece válido como possível
+  prova posterior, mas primeiro a arquitetura e o workflow completos serão
+  auditados em `2026-08-20-auditoria-praticas-autoria-3d.md`.
