@@ -1,0 +1,32 @@
+{
+  "formato": "mecanifica.consulta-visual@1",
+  "papel": "critico-visual-independente",
+  "proposito": "revisar",
+  "regiao": "arco-dianteiro",
+  "entradas": [
+    {
+      "id": "alvo-arco",
+      "classe": "alvo",
+      "regiao": "arco-dianteiro",
+      "vista": "lateral",
+      "arquivo": "repo://autoria-assistida/experimentos/prova-superficie-aceite/evidencias/arco-dianteiro-alvo.svg",
+      "sha256": "2ee19b225d36ec8735ea36ea0f9f53c99c26f38837bc2daab9fef6425f7bbabe"
+    },
+    {
+      "id": "modelo-arco",
+      "classe": "modelo",
+      "regiao": "arco-dianteiro",
+      "vista": "lateral",
+      "arquivo": "repo://autoria-assistida/experimentos/prova-superficie-aceite/evidencias/arco-dianteiro-modelo.svg",
+      "sha256": "bb15e91abbd68109cdaefcd42dfdd038d1a4f97b1b508f074c71560e31d8c94a"
+    },
+    {
+      "id": "comparacao-arco",
+      "classe": "comparacao-regional",
+      "regiao": "arco-dianteiro",
+      "vista": "lateral",
+      "arquivo": "repo://autoria-assistida/experimentos/prova-superficie-aceite/evidencias/arco-dianteiro-p0-vs-loop.svg",
+      "sha256": "600357905d9cf11480fb492c7a30cc927d217d8095837cdebf18145a47c2359a"
+    }
+  ]
+}

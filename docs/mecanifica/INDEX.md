@@ -215,6 +215,11 @@ aplicação publicada aqui.
   cage com seções de caráter declaradas. P2 e a validação integrada continuam
   congelados, e núcleo, receita pública e catálogo permanecem fora de escopo.
   Registro: `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`.
+  A R0 já isolou o contrato `mecanifica.aceite-visual` v1 em
+  [`CONTRATO-ACEITE-VISUAL.md`](CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
+  quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1
+  ligar o porteiro à revisão privada.
+  Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

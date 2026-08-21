@@ -150,6 +150,38 @@ function validarChecklist(checklist) {
   unicos(ids, 'briefing.checklist');
 }
 
+/* Opt-in: pacotes históricos continuam válidos, mas um fechamento por aceite
+   visual só pode usar critérios já declarados no briefing canônico. */
+function validarAceiteVisual(aceiteVisual, checklist) {
+  if (aceiteVisual === undefined) return null;
+  chavesExatas(aceiteVisual, ['rejeicoes'], 'briefing.aceiteVisual');
+  lista(aceiteVisual.rejeicoes, 'briefing.aceiteVisual.rejeicoes');
+  if (!aceiteVisual.rejeicoes.length || aceiteVisual.rejeicoes.length > LIMITE_CHECKLIST) {
+    falhar(`briefing.aceiteVisual.rejeicoes precisa ter entre 1 e ${LIMITE_CHECKLIST} itens.`);
+  }
+  const idsChecklist = new Set(checklist.map((item) => item.id));
+  const rejeicoes = aceiteVisual.rejeicoes.map((id, indice) => slug(id, `briefing.aceiteVisual.rejeicoes[${indice}]`));
+  unicos(rejeicoes, 'briefing.aceiteVisual.rejeicoes');
+  if (rejeicoes.some((id) => !idsChecklist.has(id))) {
+    falhar('briefing.aceiteVisual.rejeicoes só pode citar IDs do checklist do próprio briefing.');
+  }
+  return { rejeicoes };
+}
+
+/* Complemento v2: as rejeições continuam na régua visual já assinada; esta
+   lista só declara quais recortes exigem consulta regional. */
+function validarAceiteVisualRegional(aceiteVisualRegional) {
+  if (aceiteVisualRegional === undefined) return null;
+  chavesExatas(aceiteVisualRegional, ['recortes'], 'briefing.aceiteVisualRegional');
+  lista(aceiteVisualRegional.recortes, 'briefing.aceiteVisualRegional.recortes');
+  if (!aceiteVisualRegional.recortes.length || aceiteVisualRegional.recortes.length > LIMITE_CHECKLIST) {
+    falhar(`briefing.aceiteVisualRegional.recortes precisa ter entre 1 e ${LIMITE_CHECKLIST} itens.`);
+  }
+  const recortes = aceiteVisualRegional.recortes.map((id, indice) => slug(id, `briefing.aceiteVisualRegional.recortes[${indice}]`));
+  unicos(recortes, 'briefing.aceiteVisualRegional.recortes');
+  return { recortes };
+}
+
 /* Os cinco eixos de PERFIS-DE-AUTORIA.md são metadado do pacote, não um nome
    comprimido. O autor pode trocar a origem para `declarado`; o preparador marca
    explicitamente quando aplicou o padrão canônico por falta de informação. */
@@ -190,6 +222,8 @@ function validarPerfil(perfil) {
 
 function validarBriefing(briefing, opcoes) {
   chavesExatas(briefing, [
+    ...(Object.hasOwn(briefing, 'aceiteVisual') ? ['aceiteVisual'] : []),
+    ...(Object.hasOwn(briefing, 'aceiteVisualRegional') ? ['aceiteVisualRegional'] : []),
     'alvo', 'checklist', 'formato', 'guias', 'id', 'objetivo', 'partesEsperadas', 'perfil', 'provas', 'versao',
   ], 'briefing');
   if (briefing.formato !== 'mecanifica.pacote-modelagem' || briefing.versao !== 1) {
@@ -222,11 +256,13 @@ function validarBriefing(briefing, opcoes) {
   }
   validarGuias(briefing.guias, opcoes);
   validarChecklist(briefing.checklist);
+  const aceiteVisual = validarAceiteVisual(briefing.aceiteVisual, briefing.checklist);
+  const aceiteVisualRegional = validarAceiteVisualRegional(briefing.aceiteVisualRegional);
   lista(briefing.provas, 'briefing.provas');
   if (briefing.provas.length < 1 || briefing.provas.length > 4) falhar('briefing.provas precisa ter entre 1 e 4 provas.');
   const provas = briefing.provas.map((prova, indice) => slug(prova, `briefing.provas[${indice}]`));
   unicos(provas, 'briefing.provas');
-  return { peca, caminho, modo, partes };
+  return { peca, caminho, modo, partes, aceiteVisual, aceiteVisualRegional };
 }
 
 function validarLocalizador(localizador, onde) {

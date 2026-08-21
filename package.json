@@ -31,6 +31,7 @@
     "validar:modelagem": "node tools/modelagem/validar-pacote.mjs",
     "revisar:modelagem": "node tools/modelagem/revisar-pacote.mjs",
     "comparar:revisao": "node tools/modelagem/comparar-revisao.mjs",
+    "fechar:aceite:visual": "node tools/modelagem/fechar-aceite-visual.mjs",
     "validar:critica": "node tools/modelagem/critica-modelagem.mjs",
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
     "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
