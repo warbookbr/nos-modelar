@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-568 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+572 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -67,6 +67,10 @@
 - `ITERACAO-12.md` — R2 — iteração 12: largura regional da cabine central
 - `ITERACAO-13.md` — R2 — iteração 13: posição da transição traseira da cabine
 - `ITERACAO-14.md` — R2 — iteração 14: largura da tampa traseira
+- `ITERACAO-15.md` — R2 — iteração 15: ombro da anca traseira na frontal
+- `ITERACAO-16.md` — R2 — iteração 16: ombro do quarto dianteiro
+- `ITERACAO-17.md` — R2 — iteração 17: busca regional com envelope obrigatório
+- `ITERACAO-18.md` — R2 — iteração 18: anel da transição da anca
 - `ITERACAO-2.md` — R2 — iteração 2: envelope topologicamente fechado
 - `ITERACAO-3.md` — R2 — iteração 3: proporções e Catmull-Clark completo
 - `ITERACAO-4.md` — R2 — iteração 4: controles de caráter sem recortes

@@ -53,8 +53,8 @@ function medirCurva(captura, curva, projetar, leitura) {
   };
 }
 
-export function compararSilhuetasP0({ largura = 1024, altura = 768 } = {}) {
-  const malha = subdividirUmNivel(espelharCage(criarCageDireta()));
+export function compararSilhuetasP0({ largura = 1024, altura = 768, ajustesDaCage } = {}) {
+  const malha = subdividirUmNivel(espelharCage(criarCageDireta(ajustesDaCage)));
   const vistas = capturarVistas(malha, { largura, altura, quadros: undefined, geometria: 'inteira', finalidade: 'conjunto' });
   for (const vista of Object.keys(vistas)) vistas[vista] = capturarVistas(malha, { largura, altura, quadro: briefing.cameras[vista], geometria: 'inteira', finalidade: 'conjunto' })[vista];
   const lateral = medirCurva(vistas.lateral, filete(TOPO), ([z, y]) => [-z / 1000, y / 1000], Object.assign((m, w, h, x) => limiteEmColuna(m, w, h, x, 'superior'), { eixo: 'y' }));
@@ -65,7 +65,7 @@ export function compararSilhuetasP0({ largura = 1024, altura = 768 } = {}) {
 
 export function gravarComparacaoP0() {
   const aqui = path.dirname(fileURLToPath(import.meta.url)); const relatorio = compararSilhuetasP0();
-  const destino = path.join(aqui, 'evidencias', 'forma-global-12', 'comparacao-silhueta-p0.json');
+  const destino = path.join(aqui, 'evidencias', 'forma-global-16', 'comparacao-silhueta-p0.json');
   mkdirSync(path.dirname(destino), { recursive: true }); writeFileSync(destino, `${JSON.stringify(relatorio, null, 2)}\n`);
   return relatorio;
 }

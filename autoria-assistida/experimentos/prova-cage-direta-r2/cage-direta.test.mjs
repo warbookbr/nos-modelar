@@ -15,9 +15,16 @@ describe('R2 — cage direta de forma global', () => {
     const depois = moverLoop(cage, 'linhaDeOmbro', [0, .025, 0]);
     for (const [id, ponto] of antes) expect(depois.V.get(id)[1] - ponto[1]).toBeCloseTo(cage.loops.linhaDeOmbro.v.includes(id) ? .025 : 0, 12);
   });
+  it('aceita calibração descartável sem mudar a topologia autoral', () => {
+    const base = criarCageDireta(); const calibrada = criarCageDireta({ pontos: { '1:1': [.36, .48] }, z: { 1: 2.16 } });
+    expect(calibrada.V.get(11)[0]).toBeCloseTo(.36 * 1.08880571623001, 12);
+    expect(calibrada.V.get(11)[2]).toBe(2.16);
+    expect(calibrada.F).toEqual(base.F);
+    expect(calibrada.loops).toEqual(base.loops);
+  });
   it('separa os controles globais sem criar arestas novas', () => {
     const cage = criarCageDireta();
-    expect(Object.keys(cage.loops)).toEqual(expect.arrayContaining(['linhaDeCapo', 'anelPonta', 'anelExpansaoDianteira', 'baseParabrisa', 'teto', 'larguraCabineCentral', 'linhaDeTeto', 'transicaoCabineTraseira', 'quedaTraseira', 'linhaDeOmbro', 'cintura', 'linhaDeSoleira', 'ancaTraseira', 'larguraTampaTraseira', 'contornoNariz']));
+    expect(Object.keys(cage.loops)).toEqual(expect.arrayContaining(['linhaDeCapo', 'anelPonta', 'anelExpansaoDianteira', 'baseParabrisa', 'teto', 'larguraCabineCentral', 'linhaDeTeto', 'transicaoCabineTraseira', 'transicaoAncaTraseira', 'quedaTraseira', 'linhaDeOmbro', 'cintura', 'linhaDeSoleira', 'ancaTraseira', 'larguraTampaTraseira', 'contornoNariz']));
     const arestas = new Set([...cage.F.values()].flatMap((face) => face.vs.map((a, i) => { const b = face.vs[(i + 1) % 4]; return a < b ? `${a}|${b}` : `${b}|${a}`; })));
     for (const { v, fechado } of Object.values(cage.loops)) for (let i = 0; i < (fechado ? v.length : v.length - 1); i += 1) {
       const a = v[i], b = v[(i + 1) % v.length]; const chave = a < b ? `${a}|${b}` : `${b}|${a}`;

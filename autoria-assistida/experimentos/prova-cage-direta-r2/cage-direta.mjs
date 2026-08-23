@@ -12,39 +12,45 @@ const chave = (a, b) => a < b ? `${a}|${b}` : `${b}|${a}`;
    Os números vêm do briefing P0, mas nenhuma estação cria a topologia. */
 const ESTACOES = [
   /* L01: a tampa dianteira preserva a ponta e a meia-largura no compilado. */
-  { z: 2.265, pontos: [[0, .501], [.28, .46], [.285, .28], [.18, .105], [0, .105]] },
+  { z: 2.265, pontos: [[0, .501], [.28, .46], [.25, .28], [.18, .105], [0, .105]] },
   /* Anel estreito: mantém a ponta independente do alargamento seguinte. */
   { z: 2.18, pontos: [[0, .515], [.32, .48], [.32, .29], [.23, .105], [0, .105]] },
   /* Anel de expansão: recupera largura antes da estação do quarto dianteiro. */
-  { z: 2.05, pontos: [[0, .54], [.55, .54], [.75, .31], [.46, .105], [0, .105]] },
+  { z: 2.05, pontos: [[0, .54], [.40, .54], [.80, .31], [.46, .105], [0, .105]] },
   /* Controla a expansão entre o nariz e a roda dianteira, sem varredura. */
   { z: 1.90, pontos: [[0, .56], [.75, .58], [.79, .34], [.65, .105], [0, .105]] },
   { z: 1.60, pontos: [[0, .67], [.90, .68], [.85, .40], [.75, .105], [0, .105]] },
-  { z: 1.325, pontos: [[0, .74], [.892, .90], [.92, .50], [.86, .145], [0, .105]] },
-  { z: .48, pontos: [[0, .98], [.92, .88], [.86, .54], [.803, .105], [0, .105]] },
+  { z: 1.325, pontos: [[0, .74], [.892, .89], [.92, .50], [.86, .145], [0, .105]] },
+  { z: .48, pontos: [[0, .98], [.90, .88], [.86, .54], [.803, .105], [0, .105]] },
   /* Loop próprio no topo do para-brisa: separa a subida da linha de teto. */
-  { z: -.18, pontos: [[0, 1.13825], [.58359453125, 1.143], [.96, .58], [.803, .105], [0, .105]] },
-  { z: -.56, pontos: [[0, 1.14325], [.58359453125, 1.143], [.82, .58], [.82, .145], [0, .105]] },
+  { z: -.18, pontos: [[0, 1.13825], [.5740234375, 1.143], [.96, .58], [.803, .105], [0, .105]] },
+  { z: -.56, pontos: [[0, 1.14325], [.5740234375, 1.143], [.82, .58], [.82, .145], [0, .105]] },
   /* Fecha a cabine antes de a anca traseira começar a dominar. */
-  { z: -.90, pontos: [[0, 1.12], [.65, 1.077], [.99, .60], [.86, .145], [0, .105]] },
-  { z: -1.325, pontos: [[0, 1.10], [1.00, .82], [.90, .62], [.88, .145], [0, .105]] },
-  { z: -1.75, pontos: [[0, 1.055], [.82, .91], [.76, .53], [.70, .105], [0, .105]] },
+  { z: -.90, pontos: [[0, 1.12], [.65, 1.077], [.98, .60], [.86, .145], [0, .105]] },
+  { z: -1.325, pontos: [[0, 1.10], [.965, .82], [.91, .62], [.88, .145], [0, .105]] },
+  /* Anel da transição da anca: corrige a largura traseira sem deslocar a tampa. */
+  { z: -1.75, pontos: [[0, 1.055], [.84, .92], [.68, .53], [.70, .105], [0, .105]] },
   /* Fecha a redução de largura entre a tampa e a extremidade traseira. */
-  { z: -2.00, pontos: [[0, .98], [.78, .82], [.95, .48], [.72, .105], [0, .105]] },
+  { z: -2.00, pontos: [[0, .98], [.78, .82], [.90, .48], [.72, .105], [0, .105]] },
   /* L09: a tampa traseira preserva altura e meia-largura do alvo no compilado. */
   { z: -2.335, pontos: [[0, .885], [.58, .70], [.645, .40], [.45, .105], [0, .105]] },
 ];
 const SOLO = .105;
 /* Medidos após um nível: Catmull-Clark preserva comprimento pelas tampas, mas
    contrai largura e altura. A cage compensa para o produto compilado bater P0. */
-const COMPENSACAO = { x: 1.07095046854083, y: 1.0451535219747141 };
+const COMPENSACAO = { x: 1.08880571623001, y: 1.0451535219747141 };
 const pontoDeControle = ([x, y], z) => [x * COMPENSACAO.x, SOLO + (y - SOLO) * COMPENSACAO.y, z];
+const estacoesAjustadas = ({ pontos = {}, z = {} } = {}) => ESTACOES.map((estacao, linha) => ({
+  z: z[linha] ?? estacao.z,
+  pontos: estacao.pontos.map((ponto, trilho) => [...(pontos[`${linha}:${trilho}`] ?? ponto)]),
+}));
 
-export function criarCageDireta() {
+export function criarCageDireta(ajustes = {}) {
+  const estacoes = estacoesAjustadas(ajustes);
   const V = new Map();
-  ESTACOES.forEach((estacao, linha) => estacao.pontos.forEach((ponto, trilho) => V.set(linha * 10 + trilho, pontoDeControle(ponto, estacao.z))));
+  estacoes.forEach((estacao, linha) => estacao.pontos.forEach((ponto, trilho) => V.set(linha * 10 + trilho, pontoDeControle(ponto, estacao.z))));
   /* Miolos das tampas ficam no plano de simetria e quadrangulam cada metade. */
-  V.set(5, pontoDeControle([0, .34], ESTACOES[0].z)); V.set(135, pontoDeControle([0, .34], ESTACOES.at(-1).z));
+  V.set(5, pontoDeControle([0, .34], estacoes[0].z)); V.set(135, pontoDeControle([0, .34], estacoes.at(-1).z));
   const F = new Map();
   for (let linha = 0; linha < ESTACOES.length - 1; linha += 1) for (let trilho = 0; trilho < 4; trilho += 1) {
     const parteSuperior = linha < 4 ? 'capo' : linha === 4 ? 'baseParabrisa' : linha < 7 ? 'teto' : 'quedaTraseira';
@@ -62,6 +68,7 @@ export function criarCageDireta() {
     larguraCabineCentral: { v: [70, 71, 72, 73, 74], fechado: false },
     linhaDeTeto: { v: [71, 81, 91], fechado: false },
     transicaoCabineTraseira: { v: [90, 91, 92, 93, 94], fechado: false },
+    transicaoAncaTraseira: { v: [110, 111, 112, 113, 114], fechado: false },
     quedaTraseira: { v: [80, 90, 100, 110, 120, 130], fechado: false },
     linhaDeOmbro: { v: [1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 121, 131], fechado: false },
     cintura: { v: [2, 12, 22, 32, 42, 52, 62, 72, 82, 92, 102, 112, 122, 132], fechado: false },
