@@ -6,7 +6,7 @@ Alvo em [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md);
 contrato em [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md).
 
 Código e evidências em
-`autoria-assistida/experimentos/prova-cage-quarto-dianteiro/`. Zona privada e
+`autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/`. Zona privada e
 descartável: núcleo, receitas, catálogo e baseline não foram tocados.
 
 ## 1. O que foi construído

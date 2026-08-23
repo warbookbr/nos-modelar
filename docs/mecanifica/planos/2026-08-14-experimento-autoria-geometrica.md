@@ -31,7 +31,7 @@ autorizado por MCP sem caminho do consumidor.
 
 ## Incluído
 
-- fixture isolada em `autoria-assistida/experimentos/autoria-geometrica-do-zero`;
+- fixture isolada em `autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero`;
 - três receitas, montagem persistida e executor reproduzível;
 - descrição, vistas e inspeção em dois enquadramentos;
 - alteração deliberadamente inválida, correção, impacto e autoria MCP;

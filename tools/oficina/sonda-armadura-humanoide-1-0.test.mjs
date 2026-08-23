@@ -12,9 +12,9 @@ import {
   REFERENCIAS_ARMADURA,
   carregarEstudoArmadura,
   carregarPecaArmadura,
-} from '../../autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/carregar-estudo.mjs';
+} from '../../autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/carregar-estudo.mjs';
 
-const RAIZ = new URL('../../autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/', import.meta.url);
+const RAIZ = new URL('../../autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/', import.meta.url);
 const bytes = (valor) => Buffer.byteLength(JSON.stringify(valor));
 const hash = (arquivo) => `sha256:${createHash('sha256').update(readFileSync(new URL(arquivo, RAIZ))).digest('hex')}`;
 

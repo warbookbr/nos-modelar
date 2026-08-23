@@ -2,7 +2,7 @@
 
 **Data:** 2026-08-14
 **Natureza:** evidência experimental; não autoriza implementação
-**Artefatos:** [experimento reproduzível](../../autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/README.md)
+**Artefatos:** [experimento reproduzível](../../autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/README.md)
 
 ## Resultado
 
@@ -101,7 +101,7 @@ esse contexto. Revalidação automática e MCP continuam separados: primeiro
 precisam de contrato transacional e de política explícita para falhas.
 
 O registro cronológico, comandos, medidas e atritos completos estão em
-[`REGISTRO.md`](../../autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/REGISTRO.md).
+[`REGISTRO.md`](../../autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/REGISTRO.md).
 
 ## Repetição R06 — autoria segura
 

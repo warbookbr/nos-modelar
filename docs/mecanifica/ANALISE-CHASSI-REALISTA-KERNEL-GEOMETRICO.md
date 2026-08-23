@@ -84,8 +84,8 @@ Esta versão não se apoia só em relatórios. Os fatos abaixo foram lidos na fo
   fechados e o contrato `faixas × lados` de `origemId`;
 - `prototipos/procedural/v3/motor/extensoes.js`: SDK de extensão nativa;
 - `prototipos/procedural/v3/motor/composicoes.js`: subgrafos declarativos;
-- `autoria-assistida/experimentos/sonda-supercarro-1-0/receitas/carroceria.js`;
-- `autoria-assistida/experimentos/sonda-supercarro-1-0/perfil-autoria.js`;
+- `autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/receitas/carroceria.js`;
+- `autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/perfil-autoria.js`;
 - `package.json`: dependências atuais.
 
 ### 3.3 Limite da evidência visual

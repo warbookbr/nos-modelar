@@ -55,7 +55,7 @@ e isométrica foram inspecionadas; roda, cabine, lateral e aerodinâmica também
 foram isoladas em pares de vistas.
 
 As evidências estão em
-`autoria-assistida/experimentos/sonda-supercarro-1-0/evidencias/`. O experimento
+`autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/evidencias/`. O experimento
 e o teste ficam em zona privada; não promovem conteúdo ao catálogo.
 
 ## Auditoria geométrica
@@ -123,7 +123,7 @@ e crítica visual estruturada serão testados como capacidades genéricas.
 ## Reprodução
 
 ```text
-node autoria-assistida/experimentos/sonda-supercarro-1-0/executar-estudo.mjs
+node autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/executar-estudo.mjs
 npm exec vitest run -- tools/oficina/sonda-supercarro-1-0.test.mjs
 ```
 

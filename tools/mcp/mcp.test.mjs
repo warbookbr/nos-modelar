@@ -28,7 +28,7 @@ import {
   carregarCatalogoMontagens, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
 import { VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS } from './universo-dependencias.mjs';
-import * as EIXO_AUTORIA from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
+import * as EIXO_AUTORIA from '../../autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
@@ -37,7 +37,7 @@ const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependenci
 const CONFIGURACAO_CATALOGO_MAPA = join(RAIZ, 'tools/mcp/fixtures/catalogo-mapa-dependencias.json');
 const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
 const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
-const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/experimentos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
+const MATERIALIZAR_CATALOGO_AUTORIA = join(RAIZ, 'autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/materializar-catalogo.mjs');
 const receitaEixo = (fim) => ({
   formato: 'mecanifica.receita-declarativa', versao: 1, id: 'eixo-guia',
   params: { ...EIXO_AUTORIA.PARAMS, fim, comprimento: fim - EIXO_AUTORIA.PARAMS.inicio },

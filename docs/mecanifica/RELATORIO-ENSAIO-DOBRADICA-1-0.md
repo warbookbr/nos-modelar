@@ -12,7 +12,7 @@ operações existiam, mas não ensinava uma IA a chamá-las.
 ## Peças e montagem
 
 O estudo em
-`autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/` modela folha do
+`autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/` modela folha do
 batente, folha da porta e parafuso/pino central. As receitas reutilizam três
 composições declarativas e publicam seis partes e seis portas semânticas. Os
 neutros somam 402 vértices e 420 faces; não há face sem parte nem diagnóstico

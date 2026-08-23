@@ -211,9 +211,13 @@ aplicação publicada aqui.
   `docs/mecanifica/RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`.
 - O plano de [aceite visual vinculante e prova de superfície](planos/2026-08-20-aceite-visual-e-prova-de-superficie.md)
   é o único **ativo**. Ele primeiro torna alvo, sobreposição, vistas, rejeições
-  e crítica independente condicionantes do fechamento privado; depois prova uma
-  cage com seções de caráter declaradas. P2 e a validação integrada continuam
-  congelados, e núcleo, receita pública e catálogo permanecem fora de escopo.
+  e crítica independente condicionantes do fechamento privado. A auditoria da
+  prova retirou validade da captura frontal/superior sem profundidade e mostrou
+  que o gerador por seções reintroduziu uma varredura. A R1B concluiu captura
+  com z-buffer, quadro fixo, cobertura declarada e modalidades isoladas; a R2
+  agora prova cage autoral direta, Catmull-Clark e forma global
+  antes dos recortes. P2 e a validação integrada continuam congelados, e núcleo,
+  receita pública e catálogo permanecem fora de escopo.
   Registro: `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`.
   A R0 já isolou o contrato `mecanifica.aceite-visual` v1 em
   [`CONTRATO-ACEITE-VISUAL.md`](CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,

@@ -1,3 +1,4 @@
+/* aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2. */
 import { createHash } from 'node:crypto';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

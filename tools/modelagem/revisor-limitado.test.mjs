@@ -1,3 +1,4 @@
+/* revisor-limitado.test.mjs — prova leitura do despacho e recusa de acesso externo pelo crítico Node. */
 import { createHash } from 'node:crypto';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

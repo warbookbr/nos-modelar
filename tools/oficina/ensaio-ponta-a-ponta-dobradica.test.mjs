@@ -20,7 +20,7 @@ import {
   carregarEstudoDobradica,
   carregarPecaDobradica,
   criarConfiguracaoDobradica,
-} from '../../autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/carregar-estudo.mjs';
+} from '../../autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/carregar-estudo.mjs';
 
 describe('Mecanifica 1.0 — ensaio ponta a ponta da dobradiça', () => {
   let estudo;

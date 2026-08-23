@@ -142,8 +142,8 @@ não autorizam implementação automática.
 ## Reprodução
 
 ```text
-node autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/executar-estudo.mjs
-node autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/auditar-visual.mjs
+node autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/executar-estudo.mjs
+node autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/auditar-visual.mjs
 npm exec vitest run -- tools/oficina/sonda-armadura-humanoide-1-0.test.mjs
 ```
 
