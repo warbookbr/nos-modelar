@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-512 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+583 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -58,145 +58,51 @@
 - `condicao-assistida.js` — PEÇA DE EXERCÍCIO — dobradiça vertical de portão para inspeção na bancada. Duas folhas de chapa compartilham o eixo Y: a folha fixa carrega o gomo central e …
 - `condicao-crua.js` — DOBRADIÇA DE PORTÃO — conjunto procedural técnico-didático F2 para inspeção e montagem. Duas folhas retangulares de 1,20 m × 0,65 m × 35 mm encontram-se num …
 
-## autoria-assistida/experimentos/autoria-geometrica-do-zero/
+## autoria-assistida/experimentos/prova-cage-direta-r2/
 
-- `auditar-visual.mjs` — Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada.
-- `executar-estudo.mjs` — Executor reproduzível da fixture, sem publicar receitas no catálogo.
-- `materializar-catalogo.mjs` — Materializa JSONs descartáveis para o catálogo MCP local do experimento.
+- `ITERACAO-0.md` — R2 — iteração 0: envelope compilado
+- `ITERACAO-1.md` — R2 — iteração 1: envelope alongado e fechado
+- `ITERACAO-10.md` — R2 — iteração 10: hipótese de anel único no nariz
+- `ITERACAO-11.md` — R2 — iteração 11: dois anéis de controle no nariz
+- `ITERACAO-12.md` — R2 — iteração 12: largura regional da cabine central
+- `ITERACAO-13.md` — R2 — iteração 13: posição da transição traseira da cabine
+- `ITERACAO-14.md` — R2 — iteração 14: largura da tampa traseira
+- `ITERACAO-15.md` — R2 — iteração 15: ombro da anca traseira na frontal
+- `ITERACAO-16.md` — R2 — iteração 16: ombro do quarto dianteiro
+- `ITERACAO-17.md` — R2 — iteração 17: busca regional com envelope obrigatório
+- `ITERACAO-18.md` — R2 — iteração 18: anel da transição da anca
+- `ITERACAO-19.md` — R2 — iteração 19: desacoplamento da ponta dianteira
+- `ITERACAO-2.md` — R2 — iteração 2: envelope topologicamente fechado
+- `ITERACAO-20.md` — R2 — iteração 20: desacoplamento antes da anca
+- `ITERACAO-21.md` — R2 — iteração 21: largura da tampa traseira
+- `ITERACAO-22.md` — R2 — iteração 22: contorno da extremidade traseira
+- `ITERACAO-23.md` — R2 — iteração 23: expansão dianteira
+- `ITERACAO-24.md` — R2B — iteração 24: prova da faixa vertical
+- `ITERACAO-25.md` — R2B — iteração 25: primeira promoção regional
+- `ITERACAO-3.md` — R2 — iteração 3: proporções e Catmull-Clark completo
+- `ITERACAO-4.md` — R2 — iteração 4: controles de caráter sem recortes
+- `ITERACAO-5.md` — R2 — iteração 5: leitura por máscara de profundidade
+- `ITERACAO-6.md` — R2 — iteração 6: tampa traseira e largura de teto
+- `ITERACAO-7.md` — R2 — iteração 7: transições dianteira e traseira
+- `ITERACAO-8.md` — R2 — iteração 8: seção frontal da anca
+- `ITERACAO-9.md` — R2 — iteração 9: transição dianteira em planta
+- `README.md` — Prova privada R2 — cage autoral direta
+- `cage-direta.mjs` — Cage R2: vértices escritos diretamente; não deriva uma pele de seções.
+- `cage-direta.test.mjs` — Provas da primeira cage R2: quads explícitos, loop local e simetria.
+- `calibrar-r2b.mjs` — Sondagem determinística B2: compara candidatos descartáveis sem editar a cage.
+- `calibrar-r2b.test.mjs` — Confere que nenhuma sonda parcial é promovida sem envelope e silhuetas P0.
+- `comparar-silhueta-p0.mjs` — Mede a silhueta visível da R2 contra as curvas P0, sem inferir por vértices. Cada limite é lido da máscara de profundidade da mesma câmera ortográfica.
+- `comparar-silhueta-p0.test.mjs` — Prova que a comparação lê a máscara de profundidade nas três vistas.
+- `gerar-vistas.mjs` — Gera as vistas globais isoladas da primeira compilação R2.
+- `subdividir.mjs` — Compilador privado R2: um nível Catmull-Clark para cage de quadriláteros.
+- `subdividir.test.mjs` — Garante que a compilação vem da cage e preserva a semântica das faces.
 
-## autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/
+## autoria-assistida/experimentos/prova-captura-r1b/
 
-- `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
-- `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
-- `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
-
-## autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/
-
-- `auditar-visual.mjs` — Captura isolada e do conjunto; imagens ficam confinadas ao experimento.
-- `carregar-estudo.mjs` — Adaptador privado que usa somente portas oficiais de autoria e leitura.
-- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
-- `executar-estudo.mjs` — Resumo causal e reproduzível da primeira sonda 1.0.
-
-## autoria-assistida/experimentos/ensaio-ponta-a-ponta-dobradica/receitas/
-
-- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
-- `folha-porta.js` — Receita privada: folha da porta com olhal central.
-- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
-
-## autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/
-
-- `README.md` — Estudo de campo — conjunto dianteiro mínimo
-- `REGISTRO.md` — Registro de campo
-- `executar-estudo.mjs` — Executa a montagem do estudo sem criar uma porta nova no produto.
-
-## autoria-assistida/experimentos/estudo-campo-conjunto-dianteiro/receitas/
-
-- `_estudo-aro-dianteiro.js` — ESTUDO DE CAMPO — aro simplificado, separado do pneu e do cubo para testar composição e relações entre peças independentes.
-- `_estudo-cubo-dianteiro.js` — ESTUDO DE CAMPO — cubo escalonado e vazado do conjunto dianteiro mínimo. A peça prova perfil de revolução e três interfaces semânticas.
-- `_estudo-disco-dianteiro.js` — ESTUDO DE CAMPO — disco anular simplificado. O raio externo será alterado na segunda rodada para testar propagação de impacto até a pinça.
-- `_estudo-eixo-dianteiro.js` — ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é evidência descartável de autoria e montagem; não é ativo automotivo.
-- `_estudo-pinca-dianteira.js` — ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a folga radial com o disco sem fingir um tipo de relação ainda inexistente.
-- `_estudo-pneu-dianteiro.js` — ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar assentamento anular e inspeção visual individual.
-
-## autoria-assistida/experimentos/estudo-conjunto-dobradica/
-
-- `REGISTRO.md` — Registro — estudo de autoria de um conjunto simples
-- `auditar-visual.mjs` — auditar-visual.mjs — captura cada peça e o conjunto em vistas reproduzíveis.
-- `carregar-estudo.mjs` — carregar-estudo.mjs — adaptador confinado das receitas para montagem resolvida.
-- `executar-estudo.mjs` — executar-estudo.mjs — mede as três receitas e valida as relações da fixture.
-
-## autoria-assistida/experimentos/estudo-conjunto-dobradica/receitas/
-
-- `folha-fixa.js` — Experimento confinado — folha fixa de uma dobradiça didática.
-- `folha-movel.js` — Experimento confinado — folha móvel de uma dobradiça didática.
-- `pino-dobradica.js` — Experimento confinado — pino passante de uma dobradiça didática.
-
-## autoria-assistida/experimentos/plataforma-procedural-r10/
-
-- `auditar-visual.mjs` — Captura duas vistas de cada peça e do conjunto, sem usar a bancada publicada.
-- `carregar-estudo.mjs` — Adaptador confinado do estudo R10. Nenhuma fixture entra no catálogo público.
-- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
-- `executar-estudo.mjs` — Resumo reproduzível do estudo privado R10.
-
-## autoria-assistida/experimentos/plataforma-procedural-r10/receitas/
-
-- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
-- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
-- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
-
-## autoria-assistida/experimentos/prova-cage-quarto-dianteiro/
-
-- `alteracao-local.mjs` — alteracao-local.mjs — Q5 da prova P2: `elevar a crista 25 mm`. Mede quantos loops a alteração toca, o que muda na malha compilada e se a reexecução dá o mesm…
-- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
-- `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
-- `compilar.mjs` — compilar.mjs — compila a cage do quarto dianteiro, mede e desenha. É o passo Q4 da prova P2: nada aqui vira peça publicada.
-- `forma-nao-automotiva.mjs` — forma-nao-automotiva.mjs — a segunda metade da prova P2: a mesma cage e a mesma subdivisão sobre um objeto que não é carro. Se a representação carregasse voc…
-- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão: a c…
-- `quarto-dianteiro.test.mjs` — Testes da cage do quarto dianteiro e da forma não automotiva. O que se prova aqui é o que P2 exige: abertura real, retorno de borda, regiões da mesma superfí…
-- `rejeicoes-p0.mjs` — rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
-- `rejeicoes-p0.test.mjs` — Um detector que nunca reprova e um que sempre reprova são igualmente inúteis. Cada condição automatizada ganha AQUI um par: uma cage que ela deve deixar pass…
-- `render.mjs` — render.mjs — desenho sólido da malha compilada, por pintor. Sem dependência e sem navegador: projeta, ordena por profundidade e preenche com sombreado da nor…
-- `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
-- `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
-
-## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/
-
-- `auditar-visual.mjs` — Capturas privadas por estado e alvo para crítica visual reexecutável.
-- `carregar-estudo.mjs` — Adaptador privado: peças oficiais, montagens recursivas e poses derivadas.
-- `executar-estudo.mjs` — Resumo mensurável de geometria, estados, contexto e auditoria estática.
-- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
-
-## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/familias/
-
-- `intencao.js` — Vocabulário de intenção da sonda: comum nos eixos, específico na função.
-- `mao.js` — Família privada: quiralidade é parâmetro explícito, não escala negativa.
-
-## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/receitas/
-
-- `abdomen.js` — Abdômen segmentado original: três lâminas articuláveis e faixa central emissiva.
-- `antebraco.js` — Antebraço local com origem no cotovelo e mão abaixo em Y.
-- `braco-superior.js` — Segmento superior local: origem na articulação do ombro, Y aponta para cima.
-- `canela.js` — Segmento inferior local com origem no joelho.
-- `capacete.js` — Cabeça modular original: casco facetado, visor contínuo e luz de leitura.
-- `coxa.js` — Segmento femoral simétrico; origem na articulação do quadril.
-- `junta-articulada.js` — Junta visual reutilizável em cotovelos e joelhos; eixo local X.
-- `mao-direita.js` — Variante quiral direita da família privada de mãos blindadas.
-- `mao-esquerda.js` — Variante quiral esquerda da família privada de mãos blindadas.
-- `ombreira.js` — Casca de ombro simétrica; o lado pertence à instância, não à geometria.
-- `pe.js` — Bota simplificada, com frente positiva em Z.
-- `pelve.js` — Pelve blindada original: placas de quadril, proteção central e sinalização baixa.
-- `torax.js` — Torso blindado original: envelope por loft, placas sobrepostas e núcleo luminoso.
-
-## autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/referencias/
-
-- `README.md` — Referência visual privada
-
-## autoria-assistida/experimentos/sonda-supercarro-1-0/
-
-- `auditar-visual.mjs` — Capturas privadas, globais e isoladas, para crítica visual iterativa.
-- `carregar-estudo.mjs` — Adaptador privado pelas portas oficiais de autoria, exportação e montagem.
-- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
-- `executar-estudo.mjs` — Resumo mensurável da sonda, sem depender da bancada publicada.
-- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
-
-## autoria-assistida/experimentos/sonda-supercarro-1-0/receitas/
-
-- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
-- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
-- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
-- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
-- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
-- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
-- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
-- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
-- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
-- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
-- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
-- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
-
-## autoria-assistida/experimentos/sonda-supercarro-1-0/referencias/
-
-- `README.md` — Referência visual privada
+- `README.md` — Prova privada de captura R1B
+- `gerar-evidencias.mjs` — Materializa o contraexemplo mínimo R1B: duas faces coincidentes em tela.
+- `renderizador-profundo.mjs` — Captura privada R1B: rasterização ortográfica com z-buffer, fora do núcleo.
+- `renderizador-profundo.test.mjs` — Provas R1B: o PNG é derivado, mas a oclusão é conferida no z-buffer.
 
 ## autoria-assistida/guias/forma/
 
@@ -217,6 +123,173 @@
 ## autoria-assistida/homologacoes/fluxo-ia-v2/caso-02-placa/
 
 - `relato-processo.md` — Relato de processo — Caso 02: placa adaptadora
+
+## autoria-assistida/rascunhos-defeituosos/
+
+- `README.md` — Rascunhos defeituosos
+
+## autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/
+
+- `auditar-visual.mjs` — Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada.
+- `executar-estudo.mjs` — Executor reproduzível da fixture, sem publicar receitas no catálogo.
+- `materializar-catalogo.mjs` — Materializa JSONs descartáveis para o catálogo MCP local do experimento.
+
+## autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/
+
+- `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
+- `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
+- `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
+
+## autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/
+
+- `auditar-visual.mjs` — Captura isolada e do conjunto; imagens ficam confinadas ao experimento.
+- `carregar-estudo.mjs` — Adaptador privado que usa somente portas oficiais de autoria e leitura.
+- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
+- `executar-estudo.mjs` — Resumo causal e reproduzível da primeira sonda 1.0.
+
+## autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/receitas/
+
+- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
+- `folha-porta.js` — Receita privada: folha da porta com olhal central.
+- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
+
+## autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/
+
+- `README.md` — Estudo de campo — conjunto dianteiro mínimo
+- `REGISTRO.md` — Registro de campo
+- `executar-estudo.mjs` — Executa a montagem do estudo sem criar uma porta nova no produto.
+
+## autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/receitas/
+
+- `_estudo-aro-dianteiro.js` — ESTUDO DE CAMPO — aro simplificado, separado do pneu e do cubo para testar composição e relações entre peças independentes.
+- `_estudo-cubo-dianteiro.js` — ESTUDO DE CAMPO — cubo escalonado e vazado do conjunto dianteiro mínimo. A peça prova perfil de revolução e três interfaces semânticas.
+- `_estudo-disco-dianteiro.js` — ESTUDO DE CAMPO — disco anular simplificado. O raio externo será alterado na segunda rodada para testar propagação de impacto até a pinça.
+- `_estudo-eixo-dianteiro.js` — ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é evidência descartável de autoria e montagem; não é ativo automotivo.
+- `_estudo-pinca-dianteira.js` — ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a folga radial com o disco sem fingir um tipo de relação ainda inexistente.
+- `_estudo-pneu-dianteiro.js` — ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar assentamento anular e inspeção visual individual.
+
+## autoria-assistida/rascunhos-defeituosos/estudo-conjunto-dobradica/
+
+- `REGISTRO.md` — Registro — estudo de autoria de um conjunto simples
+- `auditar-visual.mjs` — auditar-visual.mjs — captura cada peça e o conjunto em vistas reproduzíveis.
+- `carregar-estudo.mjs` — carregar-estudo.mjs — adaptador confinado das receitas para montagem resolvida.
+- `executar-estudo.mjs` — executar-estudo.mjs — mede as três receitas e valida as relações da fixture.
+
+## autoria-assistida/rascunhos-defeituosos/estudo-conjunto-dobradica/receitas/
+
+- `folha-fixa.js` — Experimento confinado — folha fixa de uma dobradiça didática.
+- `folha-movel.js` — Experimento confinado — folha móvel de uma dobradiça didática.
+- `pino-dobradica.js` — Experimento confinado — pino passante de uma dobradiça didática.
+
+## autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/
+
+- `auditar-visual.mjs` — Captura duas vistas de cada peça e do conjunto, sem usar a bancada publicada.
+- `carregar-estudo.mjs` — Adaptador confinado do estudo R10. Nenhuma fixture entra no catálogo público.
+- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
+- `executar-estudo.mjs` — Resumo reproduzível do estudo privado R10.
+
+## autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/receitas/
+
+- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
+- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
+- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
+
+## autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/
+
+- `alteracao-local.mjs` — alteracao-local.mjs — Q5 da prova P2: `elevar a crista 25 mm`. Mede quantos loops a alteração toca, o que muda na malha compilada e se a reexecução dá o mesm…
+- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
+- `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
+- `compilar.mjs` — compilar.mjs — compila a cage do quarto dianteiro, mede e desenha. É o passo Q4 da prova P2: nada aqui vira peça publicada.
+- `forma-nao-automotiva.mjs` — forma-nao-automotiva.mjs — a segunda metade da prova P2: a mesma cage e a mesma subdivisão sobre um objeto que não é carro. Se a representação carregasse voc…
+- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão: a c…
+- `quarto-dianteiro.test.mjs` — Testes da cage do quarto dianteiro e da forma não automotiva. O que se prova aqui é o que P2 exige: abertura real, retorno de borda, regiões da mesma superfí…
+- `rejeicoes-p0.mjs` — rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
+- `rejeicoes-p0.test.mjs` — Um detector que nunca reprova e um que sempre reprova são igualmente inúteis. Cada condição automatizada ganha AQUI um par: uma cage que ela deve deixar pass…
+- `render.mjs` — render.mjs — desenho sólido da malha compilada, por pintor. Sem dependência e sem navegador: projeta, ordena por profundidade e preenche com sombreado da nor…
+- `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
+- `subdividir.test.mjs` — Testes do Catmull-Clark da prova P2. Os casos foram escolhidos para DENUNCIAR implementação errada, não para confirmar a certa: contagem exata, convergência,…
+
+## autoria-assistida/rascunhos-defeituosos/prova-superficie-aceite/
+
+- `CRITICA-ARCO-REGIONAL.md` — Crítica regional — arco dianteiro
+- `ITERACAO-3.md` — Iteração 3 — arco conectado
+- `ITERACAO-4.md` — Iteração 4 — seções nas extremidades do arco
+- `ITERACAO-5.md` — Iteração 5 — grade local que acompanha o arco
+- `ITERACAO-6.md` — Iteração 6 — recorte de farol com grade local
+- `ITERACAO-7.md` — Iteração 7 — comparação parcial com o P0
+- `ITERACAO-8.md` — Iteração 8 — arco dianteiro alinhado ao P0
+- `README.md` — Prova privada de superfície — R2
+- `avaliar-iteracao.mjs` — Juízo local da iteração; não é o aceite R0. Ele existe para impedir que uma malha inicial seja confundida com a prova que o plano exige.
+- `avaliar-iteracao.test.mjs` — avaliar-iteracao.test.mjs — prova que a cage privada só avança quando seus recortes pertencem à mesma pele.
+- `comparar-arco.mjs` — Comparação regional: o arco interno não é silhueta exterior. Desenha o loop da abertura da malha contra o arco declarado do P0, em mm e vista lateral.
+- `comparar-p0.mjs` — Adaptador privado: a comparação oficial recebe uma malha serializada; esta prova mantém Maps em memória. Não altera o comparador nem promove a peça.
+- `consulta-visual.mjs` — consulta-visual.mjs — valida a seleção isolada e hasheada de imagens por papel e região.
+- `consulta-visual.test.mjs` — consulta-visual.test.mjs — recusa painel composto, hash divergente e contexto regional incompleto.
+- `gerar-consulta-arco.mjs` — gerar-consulta-arco.mjs — materializa consultas isoladas do arco para modelador e crítico.
+- `rejeicoes-p0-parciais.mjs` — rejeicoes-p0-parciais.mjs — executa somente os critérios P0 alcançáveis pelo quarto dianteiro privado.
+- `rejeicoes-p0-parciais.test.mjs` — rejeicoes-p0-parciais.test.mjs — fixa o veredito dimensional parcial do arco e dos recortes.
+- `render.mjs` — render.mjs — rasterizador descartável da prova; suas vistas sem profundidade não servem ao aceite.
+- `secoes-de-carater.mjs` — Primeira hipótese R2: meia pele dianteira definida por estações de caráter. Os valores são autorais e privados. Não reutiliza a cage nem a geometria P2.
+- `secoes-de-carater.test.mjs` — secoes-de-carater.test.mjs — fixa a contraevidência estrutural do gerador privado por seções.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/
+
+- `auditar-visual.mjs` — Capturas privadas por estado e alvo para crítica visual reexecutável.
+- `carregar-estudo.mjs` — Adaptador privado: peças oficiais, montagens recursivas e poses derivadas.
+- `executar-estudo.mjs` — Resumo mensurável de geometria, estados, contexto e auditoria estática.
+- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/familias/
+
+- `intencao.js` — Vocabulário de intenção da sonda: comum nos eixos, específico na função.
+- `mao.js` — Família privada: quiralidade é parâmetro explícito, não escala negativa.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/receitas/
+
+- `abdomen.js` — Abdômen segmentado original: três lâminas articuláveis e faixa central emissiva.
+- `antebraco.js` — Antebraço local com origem no cotovelo e mão abaixo em Y.
+- `braco-superior.js` — Segmento superior local: origem na articulação do ombro, Y aponta para cima.
+- `canela.js` — Segmento inferior local com origem no joelho.
+- `capacete.js` — Cabeça modular original: casco facetado, visor contínuo e luz de leitura.
+- `coxa.js` — Segmento femoral simétrico; origem na articulação do quadril.
+- `junta-articulada.js` — Junta visual reutilizável em cotovelos e joelhos; eixo local X.
+- `mao-direita.js` — Variante quiral direita da família privada de mãos blindadas.
+- `mao-esquerda.js` — Variante quiral esquerda da família privada de mãos blindadas.
+- `ombreira.js` — Casca de ombro simétrica; o lado pertence à instância, não à geometria.
+- `pe.js` — Bota simplificada, com frente positiva em Z.
+- `pelve.js` — Pelve blindada original: placas de quadril, proteção central e sinalização baixa.
+- `torax.js` — Torso blindado original: envelope por loft, placas sobrepostas e núcleo luminoso.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/referencias/
+
+- `README.md` — Referência visual privada
+
+## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/
+
+- `auditar-visual.mjs` — Capturas privadas, globais e isoladas, para crítica visual iterativa.
+- `carregar-estudo.mjs` — Adaptador privado pelas portas oficiais de autoria, exportação e montagem.
+- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
+- `executar-estudo.mjs` — Resumo mensurável da sonda, sem depender da bancada publicada.
+- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/receitas/
+
+- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
+- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
+- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
+- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
+- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
+- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
+- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
+- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
+- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
+- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
+- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
+- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
+
+## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/referencias/
+
+- `README.md` — Referência visual privada
 
 ## docs/
 
@@ -299,6 +372,7 @@
 - `RELATORIO-MOTOR-DE-PRANCHA-R4.md` — Motor de Prancha — R4: autoria fria, revisão e limite de impacto
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
+- `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
@@ -365,6 +439,7 @@
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -676,17 +751,25 @@
 
 ## tools/modelagem/
 
+- `aceite-visual-regional.mjs` — aceite-visual-regional.mjs — v2 do aceite: evidência por região e papel. A v1 continua em aceite-visual.mjs, com suas quatro vistas globais intactas.
+- `aceite-visual-regional.test.mjs` — aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2.
 - `aceite-visual.mjs` — aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais.
 - `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
 - `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
 - `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
+- `despachar-consulta-visual.mjs` — Materializa um despacho visual mínimo. Não é sandbox de modelo: prova os bytes entregues, e deixa explícito que isolamento do processo é outra camada.
+- `despachar-consulta-visual.test.mjs` — despachar-consulta-visual.test.mjs — prova que o despacho entrega somente a consulta declarada e íntegra.
 - `fechar-aceite-visual.mjs` — fechar-aceite-visual.mjs — fecha tecnicamente uma revisão privada só após conferir briefing, modelo, arquivos e crítica pelo porteiro visual.
 - `fechar-aceite-visual.test.mjs` — fechar-aceite-visual.test.mjs — o fechamento não concede aceite retroativo.
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
+- `orquestrar-revisao-regional.mjs` — Caminho único R1A: despacho mínimo, revisor limitado e crítica persistida.
+- `orquestrar-revisao-regional.test.mjs` — orquestrar-revisao-regional.test.mjs — fixa a ordem despacho, revisão limitada e crítica persistida.
 - `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
 - `revisao-modelagem.mjs` — Revisão de modelagem — núcleo puro do ciclo assistido por IA.
 - `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
+- `revisor-limitado.mjs` — Revisor visual em processo separado. O pai libera leitura apenas do próprio programa e do despacho; a criança prova que não alcança outro arquivo.
+- `revisor-limitado.test.mjs` — revisor-limitado.test.mjs — prova leitura do despacho e recusa de acesso externo pelo crítico Node.
 - `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
 
 ## tools/oficina/

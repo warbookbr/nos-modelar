@@ -28,7 +28,7 @@ import { planejarAutoriaReceita } from './autoria-receita.mjs';
 // @ts-expect-error — porta MCP Agent-First.
 import { criarFerramentasRevalidacao } from '../mcp/perfis/revalidacao.mjs';
 // @ts-expect-error — receita declarativa usada como nova revisão real.
-import * as EIXO from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
+import * as EIXO from '../../autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 const raizFixture = new URL('./fixtures/mapa-dependencias/', import.meta.url);
 const raizMontagens = fileURLToPath(new URL('montagens/', raizFixture));

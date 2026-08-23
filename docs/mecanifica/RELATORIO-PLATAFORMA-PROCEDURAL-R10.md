@@ -5,7 +5,7 @@
 **Decisão: aprovar.** A R10 encerra o plano de plataforma procedural extensível
 e descobrível. Não há executor, receita pública ou catálogo paralelo no estudo:
 o catálogo publicado continua vazio e toda a prova vive em
-`autoria-assistida/experimentos/plataforma-procedural-r10/`.
+`autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/`.
 
 ## Limpeza e integração
 

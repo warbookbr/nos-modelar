@@ -1,0 +1,10 @@
+{
+  "nivel": 1,
+  "faces": 512,
+  "vistas": [
+    "frontal",
+    "lateral",
+    "superior"
+  ],
+  "assinaturaMalha": "r1b-398e0869"
+}

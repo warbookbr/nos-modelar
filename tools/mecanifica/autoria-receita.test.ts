@@ -9,7 +9,7 @@ import {
 // @ts-ignore — serviço JavaScript exercitado pelo contrato.
 } from './autoria-receita.mjs';
 // @ts-expect-error — fixture experimental JavaScript.
-import * as eixo from '../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
+import * as eixo from '../../autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 
 function receita(fim = 0.015) {
   return {

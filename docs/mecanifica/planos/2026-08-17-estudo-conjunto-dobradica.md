@@ -77,7 +77,7 @@ sobreposição axial de 0,04 m. Conjunto e folhas passaram em duas vistas; o pin
 foi lido em três, mas o enquadramento automático recusou sua proporção fina.
 
 O registro em
-`autoria-assistida/experimentos/estudo-conjunto-dobradica/REGISTRO.md`
+`autoria-assistida/rascunhos-defeituosos/estudo-conjunto-dobradica/REGISTRO.md`
 documenta nove achados com causa e recomendação. Entre eles: ausência
 deliberada de união topológica geral e cinemática, falta de porta reutilizável
 para receitas confinadas, template procedural incorreto, estado arquitetural

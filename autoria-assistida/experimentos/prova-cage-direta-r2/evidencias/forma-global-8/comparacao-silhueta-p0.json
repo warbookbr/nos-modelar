@@ -1,0 +1,44 @@
+{
+  "formato": "mecanifica.comparacao-silhueta-r2@1",
+  "largura": 1024,
+  "altura": 768,
+  "assinaturaMalha": "r1b-3a622957",
+  "vistas": {
+    "lateral": {
+      "amostras": 68,
+      "medioMm": 9.8,
+      "maximoMm": 24.6,
+      "pior": {
+        "alvoMm": [
+          -1146.9673813587344,
+          1120.3598022116755
+        ],
+        "desvioMm": -24.6
+      }
+    },
+    "superior": {
+      "amostras": 90,
+      "medioMm": 33.1,
+      "maximoMm": 82.5,
+      "pior": {
+        "alvoMm": [
+          -72.68892393417511,
+          944.8459282622783
+        ],
+        "desvioMm": -82.5
+      }
+    },
+    "frontal": {
+      "amostras": 57,
+      "medioMm": 14.2,
+      "maximoMm": 41.5,
+      "pior": {
+        "alvoMm": [
+          897.041012389132,
+          955.1073157236756
+        ],
+        "desvioMm": 41.5
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+/* orquestrar-revisao-regional.test.mjs — fixa a ordem despacho, revisão limitada e crítica persistida. */
 import { mkdtempSync, rmSync, existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';

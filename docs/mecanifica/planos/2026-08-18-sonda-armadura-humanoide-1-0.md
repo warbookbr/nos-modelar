@@ -49,7 +49,7 @@ robô industrial, exoesqueleto, ferramenta articulada ou outro sistema composto.
 
 ## Escopo
 
-- fixture privada `autoria-assistida/experimentos/sonda-armadura-humanoide-1-0/`;
+- fixture privada `autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/`;
 - referência visual original gerada e preservada com sua intenção;
 - capacete, tórax/costas, pelve, ombros, braços, antebraços, mãos simplificadas,
   coxas, pernas e pés como peças ou subconjuntos justificáveis;

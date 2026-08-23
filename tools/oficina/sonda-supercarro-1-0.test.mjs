@@ -9,7 +9,7 @@ import {
   REFERENCIAS,
   carregarEstudoSupercarro,
   carregarPecaSupercarro,
-} from '../../autoria-assistida/experimentos/sonda-supercarro-1-0/carregar-estudo.mjs';
+} from '../../autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/carregar-estudo.mjs';
 
 const bytes = (valor) => Buffer.byteLength(JSON.stringify(valor));
 

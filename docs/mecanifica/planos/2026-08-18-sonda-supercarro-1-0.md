@@ -48,7 +48,7 @@ operação ou ferramenta nova não conta como evolução apenas por existir.
 
 ## Escopo
 
-- fixture privada `autoria-assistida/experimentos/sonda-supercarro-1-0/`;
+- fixture privada `autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/`;
 - envelope e carroceria facetada de baixo/médio orçamento para jogo;
 - subconjuntos recursivos de carroceria, cabine, eixos/rodas, óptica e aero;
 - peças externas semanticamente isoláveis, com esquerda/direita por instância

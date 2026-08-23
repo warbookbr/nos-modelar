@@ -1,0 +1,21 @@
+/* Prova que a comparação lê a máscara de profundidade nas três vistas. */
+import { describe, expect, it } from 'vitest';
+import { compararSilhuetasP0 } from './comparar-silhueta-p0.mjs';
+
+describe('R2 — comparação de silhueta por profundidade', () => {
+  it('mede as três vistas da máscara rasterizada, sem amostrar vértices', () => {
+    const resultado = compararSilhuetasP0({ largura: 320, altura: 240 });
+    expect(resultado.formato).toBe('mecanifica.comparacao-silhueta-r2@1');
+    for (const medida of Object.values(resultado.vistas)) {
+      expect(medida.amostras).toBeGreaterThan(5);
+      expect(medida.maximoMm).toBeGreaterThanOrEqual(medida.medioMm);
+    }
+  });
+  it('expõe as amostras assinadas somente quando a calibração pede diagnóstico', () => {
+    const resultado = compararSilhuetasP0({ largura: 320, altura: 240, detalhar: true });
+    for (const medida of Object.values(resultado.vistas)) {
+      expect(medida.desvios).toHaveLength(medida.amostras);
+      expect(medida.desvios.every(({ alvoMm, desvioMm }) => Array.isArray(alvoMm) && Number.isFinite(desvioMm))).toBe(true);
+    }
+  });
+});

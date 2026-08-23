@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import * as eixo from '../../../autoria-assistida/experimentos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
+import * as eixo from '../../../autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/eixo-guia.js';
 import { observarReceita, planejarReceita } from './autoria-receitas.mjs';
 
 const documento = {

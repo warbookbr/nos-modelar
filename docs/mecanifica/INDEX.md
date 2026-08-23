@@ -210,11 +210,16 @@ aplicação publicada aqui.
   `docs/mecanifica/planos/2026-08-20-auditoria-praticas-autoria-3d.md` e
   `docs/mecanifica/RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md`.
 - O plano de [aceite visual vinculante e prova de superfície](planos/2026-08-20-aceite-visual-e-prova-de-superficie.md)
-  é o único **ativo**. Ele primeiro torna alvo, sobreposição, vistas, rejeições
-  e crítica independente condicionantes do fechamento privado; depois prova uma
-  cage com seções de caráter declaradas. P2 e a validação integrada continuam
-  congelados, e núcleo, receita pública e catálogo permanecem fora de escopo.
-  Registro: `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`.
+  foi concluído com decisão `redesenhar`: R0–R1B passam, mas a R2 não alcança
+  os limites P0. O [relatório R2/R3](RELATORIO-R2-CAGE-DIRETA-R3.md) preserva
+  as evidências e o achado da suíte agregada. O único plano **ativo** é o
+  [redesenho R2B com controle vertical](planos/2026-08-23-redesenho-cage-r2b-controle-vertical.md):
+  mantém cage direta, z-buffer e vistas isoladas, mas separa ombro e flanco
+  antes de qualquer recorte. P2, validação integrada, núcleo, receita pública
+  e catálogo continuam congelados. Registros:
+  `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`,
+  `docs/mecanifica/RELATORIO-R2-CAGE-DIRETA-R3.md` e
+  `docs/mecanifica/planos/2026-08-23-redesenho-cage-r2b-controle-vertical.md`.
   A R0 já isolou o contrato `mecanifica.aceite-visual` v1 em
   [`CONTRATO-ACEITE-VISUAL.md`](CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
   quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1

@@ -1,3 +1,4 @@
+/* despachar-consulta-visual.test.mjs — prova que o despacho entrega somente a consulta declarada e íntegra. */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

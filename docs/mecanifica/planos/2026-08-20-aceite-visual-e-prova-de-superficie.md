@@ -1,6 +1,6 @@
 # Aceite visual vinculante e prova de superfície
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -9,18 +9,18 @@
 
 ## Objetivo
 
-Impedir que uma prova de forma seja encerrada só por métricas estruturais e
-provar, em zona privada, se uma cage com seções de caráter declaradas pode
-responder ao alvo visual. O plano não promove uma geometria nem altera o núcleo
-procedural antes de a prova passar.
+Impedir que uma prova de forma seja encerrada por evidência estrutural ou visual
+inválida e provar, em zona privada, se uma cage autoral direta, compilada por
+Catmull-Clark e medida por seções de caráter, pode responder ao alvo visual. O
+plano não promove geometria nem altera o núcleo antes de a prova passar.
 
 ## Hipótese
 
-O problema observado no P2 é a ausência de um aceite visual vinculante e a
-interpolação genérica da seção transversal, não uma falha de identidade,
-composição ou determinismo. Se o pacote visual for obrigatório e as seções de
-caráter forem autorais, as rejeições P0 podem decidir a prova antes de qualquer
-alegação de aprovação.
+O problema observado no P2 combina três falhas: aceite visual contornável,
+representação autoral inadequada e captura incapaz de provar visibilidade 3D.
+Se o pacote for obrigatório, a cage for editada diretamente e as vistas vierem
+de um renderer com profundidade, a forma global pode ser decidida antes dos
+recortes e antes de qualquer alegação de aprovação.
 
 ## Escopo e invariantes
 
@@ -38,6 +38,11 @@ alegação de aprovação.
 - O agente de modelagem consulta referências por demanda, no recorte em que
   trabalha. O crítico recebe os arquivos visuais e critérios da mesma região no
   momento de revisão; não recebe uma montagem geral como única entrada.
+- Seções transversais são medidores vinculantes da cage, nunca geradores dela.
+- Forma global precede arco, farol e outros detalhes. Toda aprovação regional é
+  seguida por regressão nas vistas globais válidas.
+- Evidência de superfície vem da malha subdividida; wireframe da cage é uma
+  modalidade separada e não pode se passar pelo produto visual final.
 
 ## Fatias
 
@@ -90,94 +95,106 @@ arquivos foram entregues. Testes recusam pacote cuja única entrada seja imagem
 composta, revisão sem a vista pedida ou comparação que omita um recorte
 declarado. Repetir uma consulta produz a mesma seleção e os mesmos hashes.
 
-**Decisão de versão:** `mecanifica.aceite-visual` v1 continua imutável como
-linha de base. A R1A decide por evidência executável se o manifesto cabe como
-extensão compatível do pacote ou exige v2; não se muda o significado de v1 em
-silêncio.
-
-**Decisão executada:** exige v2. A v1 fixa quatro vistas globais e seus campos
-exatos não carregam região, papel, propósito nem classe de contorno sem perder
-o significado. A v2 regional é validada, verifica hashes no disco e é entendida
-pelo porteiro de fechamento.
-
 **R1A concluída:** a consulta regional do arco já foi reproduzida para modelador
-e crítico, com alvo, modelo e comparação isolados e hashes conferidos. A crítica
-visual reprovou o arco pelo raio menor e pelos segmentos angulares. A separação
-de arquivos está provada. O despacho material copia somente os bytes declarados
-e a v2 já é reconhecida pelo porteiro, que a bloqueia em reprovação. Isolamento
-técnico do revisor Node está provado por teste de acesso negado a arquivo fora
-do despacho. Uma prova temporária já fechou v2 com briefing assinado, revisão,
-seis evidências regionais e crítica hasheada. A preparação sem crítica só serve
-ao despacho; o orquestrador limitado persiste a crítica e devolve o aceite
-pronto para o porteiro. Testes cobrem ausência, mutação e achado aberto.
+e crítico com três imagens isoladas e hashes. Isso exigiu v2 sem mudar v1. O
+despacho limita os bytes, o processo Node recusa leitura externa e o porteiro
+fecha uma prova completa com crítica hasheada. Ausência, mutação e achado aberto
+são recusados por teste.
 
-### R2 — prova privada de seções de caráter
+### R1B — validade perceptiva da captura
 
-Construir somente um quarto dianteiro novo com cage de quadriláteros e seções
-transversais declaradas: largura, altura, quebra de ombro, abertura e recorte
-de farol. Compilar em produto descartável e comparar com a prancha P0.
+Substituir a projeção privada que pinta faces por ordem de criação por uma
+captura 3D com oclusão e profundidade reais, fora do núcleo neutro. Fixar
+câmeras ortográficas calibradas e produzir, por vista, modalidades separadas:
+superfície sombreada, silhueta, wireframe, normais, profundidade e identidade de
+região. Meia peça precisa ser declarada como tal ou espelhada para a vista que
+pretende provar o conjunto.
 
-**Prova:** abrir alvo, render e sobreposição; ler as vistas frontal, lateral,
-superior e isométrica; executar as oito rejeições P0 antes do fechamento;
-despachar crítico independente apenas com os arquivos visuais. A prova passa
-somente se não houver rejeição, a medida contra a prancha estiver no limite e o
-usuário aceitar a forma.
+**Prova:** fixtures com faces sobrepostas trocam a visibilidade ao trocar a
+profundidade; face traseira não cobre face dianteira; frontal, lateral e
+superior mostram a mesma geometria sob câmeras assinadas; imagem vazia,
+degenerada, sem profundidade ou com cobertura parcial não chega ao crítico.
 
-**R2 pausada para correção do fluxo:** a exploração privada demonstrou arco e
-farol como aberturas topológicas, mas a forma segue visualmente reprovada. A
-comparação parcial também revelou que a sobreposição de silhueta exterior não
-mostra o contorno interno do arco. Nenhum desses resultados fecha a R2. A
-modelagem só retoma após a R1A provar consulta por demanda, vistas isoladas e
-comparação regional que inclua os recortes relevantes.
+**Estado atual:** obrigatória antes de qualquer nova correção de forma. A vista
+frontal da prova em `prova-superficie-aceite/` sobrepõe estações sem teste de
+profundidade e mostra meia pele como se fosse uma vista frontal completa. Ela e
+a vista superior estão invalidadas; a aprovação local baseada no conjunto de
+quatro vistas foi retirada. A comparação lateral isolada do arco permanece
+válida porque compara diretamente dois contornos no mesmo plano.
+**R1B em execução:** a prova privada `prova-captura-r1b/` introduz rasterização ortográfica por z-buffer e emite superfície, profundidade, normais, wireframe e
+identidade regional a partir da mesma malha. O contraexemplo de duas placas
+coincidentes prova por teste que a face frontal vence independentemente da ordem
+de criação e que inverter as profundidades altera a face exposta. Cada captura
+agora declara inteira/meia peça e finalidade; o pacote de conjunto exige as três
+vistas da mesma malha assinada e recusa meia peça não espelhada. Ainda falta
+declarar o quadro específico da futura cage; o mecanismo R1B está concluído e
+impede reenquadrar a forma automaticamente. Essa declaração abre a R2, sem
+autorizar refino do rascunho defeituoso.
+### R2 — prova privada de cage autoral direta
+Construir um quarto dianteiro em cage de quadriláteros editada diretamente, com
+loops semânticos e vincos, e compilá-la pelo Catmull-Clark já provado. As seções
+de caráter declaram largura, altura e quebra de ombro para medir a cage; não
+criam vértices nem conectam estações. A unidade de edição da IA é operação
+semântica reversível sobre loop, aresta ou região — não escrita manual de mapas
+de IDs.
+
+**Ordem obrigatória:** envelope e proporções; silhuetas frontal, lateral e
+superior em conjunto; capô, ombro e flanco; continuidade por normais; somente
+então arco, farol e demais recortes. Cada recorte encerra com regressão global.
+
+**Prova:** abrir alvo, render subdividido e sobreposição; ler vistas e
+modalidades válidas; executar as oito rejeições P0 antes do fechamento;
+despachar crítico independente apenas com os arquivos declarados. A prova passa
+somente se não houver rejeição, as medidas estiverem no limite e o usuário
+aceitar a forma global.
+
+**R2 redesenhada e liberada pela R1B:** `secoes-de-carater.mjs` é contraevidência porque gera a pele por varredura; permanece em rascunhos defeituosos, sem promoção. A nova prova `prova-cage-direta-r2/` usa envelope e quadro fixos.
+
+**R2A — topologia global de controle:** antes de mover pontos, declarar loops distintos para capô, base do para-brisa, teto, queda traseira, ombro e cintura. Se uma vista medir região sem controle próprio, acrescentar o loop antes de forçar outro. A prova exige que cada um possa mudar isoladamente e que as três silhuetas globais melhorem sem arco, farol, vidro ou outro recorte.
 
 ### R3 — síntese e decisão
 
-Publicar relatório com pacote reproduzível, mutações, custos e falhas. Decidir:
+Publicar relatório com pacote, mutações, custos e falhas. Decidir `aprovar`,
+`corrigir`, `redesenhar` ou `interromper`, sem promover representação por
+silêncio.
 
-- `aprovar`: manter o porteiro e reavaliar a retomada da validação integrada;
-- `corrigir`: localizar defeito restante sem promover representação;
-- `redesenhar`: se seções declaradas e ciclo completo ainda não permitirem
-  controlar a forma;
-- `interromper`: se o custo exceder o valor demonstrado.
-
-## Arquivos inicialmente esperados
-
-- `tools/modelagem/validar-pacote.mjs`, `revisar-pacote.mjs` e seus testes;
-- `tools/mecanifica/comparar-alvo.mjs`, `olhar.mjs` somente se uma lacuna
-  reproduzível exigir alteração;
-- `autoria-assistida/experimentos/prova-superficie-aceite/` e evidências;
-- contrato, skill e relatório novos sob `docs/mecanifica/`.
-
-Nenhum desses arquivos, exceto este plano e seus índices, está autorizado a
-mudar sem reserva específica na fatia correspondente.
+**R3 concluída — decisão `redesenhar`:** R0–R1B demonstraram o pacote, a
+captura e a cage íntegra. A R2 reprova P0 em 20,5/31,5/32,7 mm, contra
+14/16/16 mm. A única faixa entre ombro e flanco acopla planta e dois níveis da
+frontal; o R2B acrescenta controle vertical. Recortes, crítico de aprovação e
+aceite humano ficam bloqueados antes da forma global.
 
 ## Gates de saída
 
 1. não existe caminho de aprovação visual sem pacote completo e reproduzível;
 2. os três defeitos P2 e omissões do pacote são recusados por testes;
-3. a prova usa seções de caráter declaradas, não interpolação genérica;
+3. a prova usa cage direta subdividida; seções medem e não geram geometria;
 4. medidas, leitura de PNG e crítico independente aparecem como evidências
    distintas; silêncio do crítico não aprova;
 5. imagem composta não substitui vista isolada e cada papel recebe somente o
    conjunto declarado para sua região e propósito;
 6. abertura interna declarada tem alvo e comparação próprios, sem ser inferida
    da silhueta exterior;
-7. a decisão final distingue forma, representação e infraestrutura;
-8. `npm test`, tipagem, build e os gates do `INDEX.md` passam;
-9. nenhuma receita, catálogo ou geometria pública é promovida sem autorização
+7. toda vista usada no aceite prova oclusão, profundidade, câmera, cobertura e
+   modalidade; cage crua não se passa por superfície final;
+8. forma global passa antes dos recortes e todo recorte roda regressão global;
+9. edição autoral usa operações semânticas reversíveis, não IDs manuais;
+10. a decisão final distingue forma, representação e infraestrutura;
+11. `npm test`, tipagem, build e os gates do `INDEX.md` passam;
+12. nenhuma receita, catálogo ou geometria pública é promovida sem autorização
    posterior.
 
 ## Riscos e parada
 
-- Medida de silhueta não mede qualidade completa de superfície; ela não pode
-  substituir as rejeições visuais ou o aceite humano.
-- Recortar demais o contexto pode esconder incoerência entre regiões. Por isso
-  cada aprovação regional exige uma checagem posterior de conjunto, também em
-  vistas isoladas; a prancha composta continua apenas resumo.
+- Medida de silhueta não substitui rejeições visuais nem aceite humano.
+- Hash íntegro prova bytes, não projeção 3D; R1B fecha essa lacuna antes do crítico.
+- Recortar contexto pode esconder incoerência; aprovação regional exige conjunto em vistas isoladas.
 - Uma prova aceita não homologa o chassi inteiro nem reabre P2 automaticamente.
-- Falha visual com pacote íntegro suspende a retomada da validação integrada e
-  leva a decisão de representação, não a refino cosmético.
+- Falha visual leva a decisão de representação, não a refino cosmético.
 
 ## Fechamento
 
-Preencher com relatório, decisão, gates, commit e estado dos planos congelados.
+Relatório e achado da suíte agregada:
+[`../RELATORIO-R2-CAGE-DIRETA-R3.md`](../RELATORIO-R2-CAGE-DIRETA-R3.md).
+Decisão: `redesenhar`; sem recortes, aceite ou promoção. Sucessor:
+`2026-08-23-redesenho-cage-r2b-controle-vertical.md`.

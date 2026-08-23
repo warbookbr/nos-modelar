@@ -1,0 +1,45 @@
+{
+  "tipo": "mecanifica.prova-captura-r1b@1",
+  "camera": {
+    "vista": "frontal",
+    "olhar": [
+      0,
+      0,
+      1
+    ],
+    "acima": [
+      0,
+      1,
+      0
+    ],
+    "quadro": {
+      "minU": -1.2,
+      "maxU": 1.2,
+      "minV": -1.2,
+      "maxV": 1.2
+    },
+    "assinatura": "r1b-5c31f93b"
+  },
+  "declaracao": {
+    "geometria": "inteira",
+    "espelhada": false,
+    "finalidade": "inspecao"
+  },
+  "assinaturaMalha": "r1b-87aaa0b3",
+  "dimensoes": {
+    "largura": 320,
+    "altura": 240
+  },
+  "cobertura": 0.421875,
+  "facesVisiveis": [
+    0
+  ],
+  "modalidades": [
+    "superficie",
+    "profundidade",
+    "normais",
+    "wireframe",
+    "identidade"
+  ],
+  "cenario": "duas placas sobrepostas; a placa frontal deve ocultar a traseira"
+}

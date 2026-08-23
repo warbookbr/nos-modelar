@@ -5,7 +5,7 @@ import { descreverMontagemResolvida } from '../../src/autoria/descrever-montagem
 import { diagnosticarExtensaoAusente, nucleo, REGISTRO_OPERACOES } from '../../prototipos/procedural/v3/motor/oficina.js';
 import { PASSOS as PASSOS_PRISMA } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/fixture.js';
 import { capturarMontagem } from '../mecanifica/capturar-montagem.mjs';
-import { carregarEstudoR10 } from '../../autoria-assistida/experimentos/plataforma-procedural-r10/carregar-estudo.mjs';
+import { carregarEstudoR10 } from '../../autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/carregar-estudo.mjs';
 
 describe('plataforma procedural — estudo de campo R10', () => {
   it('modela três famílias e preserva a procedência do subgrafo e da extensão', async () => {

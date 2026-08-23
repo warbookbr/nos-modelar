@@ -1,0 +1,165 @@
+{
+  "formato": "mecanifica.sondagem-calibracao-r2b@1",
+  "limitesMm": {
+    "lateral": 14,
+    "superior": 16,
+    "frontal": 16
+  },
+  "envelopeP0": {
+    "largura": 2,
+    "comprimento": 4.6,
+    "altura": 1.19
+  },
+  "resultados": [
+    {
+      "id": "b1-base",
+      "regiao": "baseline",
+      "envelope": {
+        "largura": 2,
+        "comprimento": 4.6,
+        "altura": 1.19
+      },
+      "vistas": {
+        "lateral": {
+          "amostras": 68,
+          "medioMm": 8.1,
+          "maximoMm": 20.5,
+          "pior": {
+            "alvoMm": [
+              400.9786825267027,
+              1004.5445001242817
+            ],
+            "desvioMm": -20.5
+          }
+        },
+        "superior": {
+          "amostras": 90,
+          "medioMm": 11.7,
+          "maximoMm": 44.8,
+          "pior": {
+            "alvoMm": [
+              -818.0506557347989,
+              994.5367103823199
+            ],
+            "desvioMm": -44.8
+          }
+        },
+        "frontal": {
+          "amostras": 57,
+          "medioMm": 16.3,
+          "maximoMm": 43.5,
+          "pior": {
+            "alvoMm": [
+              1026.3489697347545,
+              864.092210989059
+            ],
+            "desvioMm": -43.5
+          }
+        }
+      },
+      "passaEnvelope": true,
+      "passaP0": false,
+      "melhoraSemRegressao": false
+    },
+    {
+      "id": "faixa-alta",
+      "regiao": "cintura-frontal",
+      "envelope": {
+        "largura": 2,
+        "comprimento": 4.6,
+        "altura": 1.19
+      },
+      "vistas": {
+        "lateral": {
+          "amostras": 68,
+          "medioMm": 8.1,
+          "maximoMm": 20.5,
+          "pior": {
+            "alvoMm": [
+              400.9786825267027,
+              1004.5445001242817
+            ],
+            "desvioMm": -20.5
+          }
+        },
+        "superior": {
+          "amostras": 90,
+          "medioMm": 18.2,
+          "maximoMm": 42.9,
+          "pior": {
+            "alvoMm": [
+              58.28531824351578,
+              940.4173087715851
+            ],
+            "desvioMm": 42.9
+          }
+        },
+        "frontal": {
+          "amostras": 57,
+          "medioMm": 15,
+          "maximoMm": 32.7,
+          "pior": {
+            "alvoMm": [
+              833.4421444329059,
+              963.8590081902784
+            ],
+            "desvioMm": 32.7
+          }
+        }
+      },
+      "passaEnvelope": true,
+      "passaP0": false,
+      "melhoraSemRegressao": true
+    },
+    {
+      "id": "faixa-alta-e-traseira",
+      "regiao": "cintura-frontal-e-traseira",
+      "envelope": {
+        "largura": 2,
+        "comprimento": 4.6,
+        "altura": 1.19
+      },
+      "vistas": {
+        "lateral": {
+          "amostras": 68,
+          "medioMm": 8.1,
+          "maximoMm": 20.5,
+          "pior": {
+            "alvoMm": [
+              400.9786825267027,
+              1004.5445001242817
+            ],
+            "desvioMm": -20.5
+          }
+        },
+        "superior": {
+          "amostras": 90,
+          "medioMm": 16.9,
+          "maximoMm": 42.9,
+          "pior": {
+            "alvoMm": [
+              58.28531824351578,
+              940.4173087715851
+            ],
+            "desvioMm": 42.9
+          }
+        },
+        "frontal": {
+          "amostras": 57,
+          "medioMm": 15,
+          "maximoMm": 32.7,
+          "pior": {
+            "alvoMm": [
+              833.4421444329059,
+              963.8590081902784
+            ],
+            "desvioMm": 32.7
+          }
+        }
+      },
+      "passaEnvelope": true,
+      "passaP0": false,
+      "melhoraSemRegressao": true
+    }
+  ]
+}
