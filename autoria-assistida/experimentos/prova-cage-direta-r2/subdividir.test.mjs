@@ -8,7 +8,7 @@ describe('R2 — Catmull-Clark da cage direta', () => {
     const origem = espelharCage(criarCageDireta()); const compilada = subdividirUmNivel(origem);
     expect(compilada.F.size).toBe(origem.F.size * 4);
     expect([...compilada.F.values()].every((face) => face.vs.length === 4)).toBe(true);
-    expect(new Set([...compilada.F.values()].map((face) => face.parte))).toEqual(new Set(['capo', 'baseParabrisa', 'teto', 'quedaTraseira', 'linhaDeOmbro', 'flanco', 'assoalho', 'nariz', 'traseira']));
+    expect(new Set([...compilada.F.values()].map((face) => face.parte))).toEqual(new Set(['capo', 'baseParabrisa', 'teto', 'quedaTraseira', 'linhaDeOmbro', 'faixaVertical', 'flanco', 'assoalho', 'nariz', 'traseira']));
     expect(compilada.V.get(10)).not.toEqual(origem.V.get(10));
   });
   it('o produto compilado, não a cage crua, bate o envelope global P0', () => {

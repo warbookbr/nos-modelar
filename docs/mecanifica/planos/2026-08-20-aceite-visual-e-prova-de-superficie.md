@@ -1,6 +1,6 @@
 # Aceite visual vinculante e prova de superfície
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Codex
 
@@ -158,6 +158,12 @@ Publicar relatório com pacote, mutações, custos e falhas. Decidir `aprovar`,
 `corrigir`, `redesenhar` ou `interromper`, sem promover representação por
 silêncio.
 
+**R3 concluída — decisão `redesenhar`:** R0–R1B demonstraram o pacote, a
+captura e a cage íntegra. A R2 reprova P0 em 20,5/31,5/32,7 mm, contra
+14/16/16 mm. A única faixa entre ombro e flanco acopla planta e dois níveis da
+frontal; o R2B acrescenta controle vertical. Recortes, crítico de aprovação e
+aceite humano ficam bloqueados antes da forma global.
+
 ## Gates de saída
 
 1. não existe caminho de aprovação visual sem pacote completo e reproduzível;
@@ -180,17 +186,15 @@ silêncio.
 
 ## Riscos e parada
 
-- Medida de silhueta não mede qualidade completa de superfície; ela não pode
-  substituir as rejeições visuais ou o aceite humano.
-- Hash íntegro prova os bytes entregues, não que a imagem seja uma projeção 3D
-  válida. R1B existe para fechar essa lacuna antes do crítico.
-- Recortar demais o contexto pode esconder incoerência entre regiões. Por isso
-  cada aprovação regional exige uma checagem posterior de conjunto, também em
-  vistas isoladas; a prancha composta continua apenas resumo.
+- Medida de silhueta não substitui rejeições visuais nem aceite humano.
+- Hash íntegro prova bytes, não projeção 3D; R1B fecha essa lacuna antes do crítico.
+- Recortar contexto pode esconder incoerência; aprovação regional exige conjunto em vistas isoladas.
 - Uma prova aceita não homologa o chassi inteiro nem reabre P2 automaticamente.
-- Falha visual com pacote íntegro suspende a retomada da validação integrada e
-  leva a decisão de representação, não a refino cosmético.
+- Falha visual leva a decisão de representação, não a refino cosmético.
 
 ## Fechamento
 
-Preencher com relatório, decisão, gates, commit e estado dos planos congelados.
+Relatório e achado da suíte agregada:
+[`../RELATORIO-R2-CAGE-DIRETA-R3.md`](../RELATORIO-R2-CAGE-DIRETA-R3.md).
+Decisão: `redesenhar`; sem recortes, aceite ou promoção. Sucessor:
+`2026-08-23-redesenho-cage-r2b-controle-vertical.md`.

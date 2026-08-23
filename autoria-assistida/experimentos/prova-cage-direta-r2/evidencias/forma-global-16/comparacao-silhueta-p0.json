@@ -2,7 +2,7 @@
   "formato": "mecanifica.comparacao-silhueta-r2@1",
   "largura": 1024,
   "altura": 768,
-  "assinaturaMalha": "r1b-2148507e",
+  "assinaturaMalha": "r1b-0fb890c6",
   "vistas": {
     "lateral": {
       "amostras": 68,
@@ -18,14 +18,14 @@
     },
     "superior": {
       "amostras": 90,
-      "medioMm": 14.6,
-      "maximoMm": 38.2,
+      "medioMm": 14.5,
+      "maximoMm": 40.3,
       "pior": {
         "alvoMm": [
-          2200,
-          300
+          2116.681894949473,
+          566.6179361616852
         ],
-        "desvioMm": 38.2
+        "desvioMm": -40.3
       }
     },
     "frontal": {

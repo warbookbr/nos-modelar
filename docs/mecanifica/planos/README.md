@@ -3,11 +3,14 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-20-aceite-visual-e-prova-de-superficie.md`](2026-08-20-aceite-visual-e-prova-de-superficie.md).
+[`2026-08-23-redesenho-cage-r2b-controle-vertical.md`](2026-08-23-redesenho-cage-r2b-controle-vertical.md).
 
-Ele cria o porteiro de aceite visual e uma prova privada de cage com seções de
-caráter declaradas. P2 e a validação integrada permanecem congelados; nenhum
-núcleo ou conteúdo público é alterado antes de a prova demonstrar valor.
+Ele retoma somente a prova privada após a decisão `redesenhar` da cage R2:
+mantém cage direta, captura com profundidade e aceite regional, mas separa o
+controle vertical que acoplava planta e frontal. P2, validação integrada,
+núcleo e conteúdo público continuam congelados. O plano anterior de
+[`aceite visual e prova de superfície`](2026-08-20-aceite-visual-e-prova-de-superficie.md)
+foi concluído com essa decisão, não aprovado por silêncio.
 
 A [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md)
 foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela

@@ -11,4 +11,11 @@ describe('R2 — comparação de silhueta por profundidade', () => {
       expect(medida.maximoMm).toBeGreaterThanOrEqual(medida.medioMm);
     }
   });
+  it('expõe as amostras assinadas somente quando a calibração pede diagnóstico', () => {
+    const resultado = compararSilhuetasP0({ largura: 320, altura: 240, detalhar: true });
+    for (const medida of Object.values(resultado.vistas)) {
+      expect(medida.desvios).toHaveLength(medida.amostras);
+      expect(medida.desvios.every(({ alvoMm, desvioMm }) => Array.isArray(alvoMm) && Number.isFinite(desvioMm))).toBe(true);
+    }
+  });
 });

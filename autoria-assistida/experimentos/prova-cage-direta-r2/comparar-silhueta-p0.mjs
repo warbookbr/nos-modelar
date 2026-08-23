@@ -34,7 +34,7 @@ const limiteEmLinha = (mascara, largura, altura, y) => {
   }
   return null;
 };
-function medirCurva(captura, curva, projetar, leitura) {
+function medirCurva(captura, curva, projetar, leitura, { detalhar = false } = {}) {
   const mascara = mascaraDaSilhueta(captura); const desvios = [];
   for (const ponto of curva) {
     const [x, y, escala] = tela(captura, projetar(ponto));
@@ -50,24 +50,25 @@ function medirCurva(captura, curva, projetar, leitura) {
     medioMm: Number((absolutos.reduce((s, n) => s + n, 0) / absolutos.length).toFixed(1)),
     maximoMm: Number(Math.max(...absolutos).toFixed(1)),
     pior: { alvoMm: pior.alvoMm, desvioMm: Number(pior.desvioMm.toFixed(1)) },
+    ...(detalhar ? { desvios } : {}),
   };
 }
 
-export function compararSilhuetasP0({ largura = 1024, altura = 768, ajustesDaCage } = {}) {
+export function compararSilhuetasP0({ largura = 1024, altura = 768, ajustesDaCage, detalhar = false } = {}) {
   const malha = subdividirUmNivel(espelharCage(criarCageDireta(ajustesDaCage)));
   const vistas = capturarVistas(malha, { largura, altura, quadros: undefined, geometria: 'inteira', finalidade: 'conjunto' });
   for (const vista of Object.keys(vistas)) vistas[vista] = capturarVistas(malha, { largura, altura, quadro: briefing.cameras[vista], geometria: 'inteira', finalidade: 'conjunto' })[vista];
-  const lateral = medirCurva(vistas.lateral, filete(TOPO), ([z, y]) => [-z / 1000, y / 1000], Object.assign((m, w, h, x) => limiteEmColuna(m, w, h, x, 'superior'), { eixo: 'y' }));
-  const superior = medirCurva(vistas.superior, filete(PLANTA), ([z, x]) => [x / 1000, -z / 1000], Object.assign((m, w, h, _x, y) => limiteEmLinha(m, w, h, y), { eixo: 'x' }));
-  const frontal = medirCurva(vistas.frontal, filete(FRONTAL), ([y, x]) => [x / 1000, y / 1000], Object.assign((m, w, h, _x, y) => limiteEmLinha(m, w, h, y), { eixo: 'x' }));
+  const lateral = medirCurva(vistas.lateral, filete(TOPO), ([z, y]) => [-z / 1000, y / 1000], Object.assign((m, w, h, x) => limiteEmColuna(m, w, h, x, 'superior'), { eixo: 'y' }), { detalhar });
+  const superior = medirCurva(vistas.superior, filete(PLANTA), ([z, x]) => [x / 1000, -z / 1000], Object.assign((m, w, h, _x, y) => limiteEmLinha(m, w, h, y), { eixo: 'x' }), { detalhar });
+  const frontal = medirCurva(vistas.frontal, filete(FRONTAL), ([y, x]) => [x / 1000, y / 1000], Object.assign((m, w, h, _x, y) => limiteEmLinha(m, w, h, y), { eixo: 'x' }), { detalhar });
   return { formato: 'mecanifica.comparacao-silhueta-r2@1', largura, altura, assinaturaMalha: vistas.lateral.assinaturaMalha, vistas: { lateral, superior, frontal } };
 }
 
-export function gravarComparacaoP0() {
-  const aqui = path.dirname(fileURLToPath(import.meta.url)); const relatorio = compararSilhuetasP0();
-  const destino = path.join(aqui, 'evidencias', 'forma-global-16', 'comparacao-silhueta-p0.json');
+export function gravarComparacaoP0({ pastaDaEvidencia = 'forma-global-r2b-b1', ajustesDaCage } = {}) {
+  const aqui = path.dirname(fileURLToPath(import.meta.url)); const relatorio = compararSilhuetasP0({ ajustesDaCage });
+  const destino = path.join(aqui, 'evidencias', pastaDaEvidencia, 'comparacao-silhueta-p0.json');
   mkdirSync(path.dirname(destino), { recursive: true }); writeFileSync(destino, `${JSON.stringify(relatorio, null, 2)}\n`);
   return relatorio;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) console.log(JSON.stringify(gravarComparacaoP0(), null, 2));
+if (import.meta.url === `file://${process.argv[1]}`) console.log(JSON.stringify(gravarComparacaoP0({ pastaDaEvidencia: process.argv[2] }), null, 2));

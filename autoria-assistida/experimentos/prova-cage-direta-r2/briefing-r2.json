@@ -16,7 +16,7 @@
     "lateral": { "minU": -2.5, "maxU": 2.5, "minV": 0, "maxV": 1.3 },
     "superior": { "minU": -1.1, "maxU": 1.1, "minV": -2.5, "maxV": 2.5 }
   },
-  "loopsPermitidosNestaRodada": ["linhaDeCapo", "baseParabrisa", "teto", "quedaTraseira", "linhaDeOmbro", "cintura"],
+  "loopsPermitidosNestaRodada": ["linhaDeCapo", "anelAjustePonta", "anelPonta", "anelExpansaoDianteira", "baseParabrisa", "teto", "anelAjusteAnca", "quedaTraseira", "linhaDeOmbro", "faixaVertical", "cintura"],
   "proibidosNestaRodada": ["arcoDianteiro", "arcoTraseiro", "vaoEnvidracado", "farol"],
   "criterioDeSaida": "as três silhuetas globais precisam passar antes de qualquer recorte"
 }

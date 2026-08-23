@@ -50,11 +50,19 @@ const ALLOWLIST = new Map([
   ['docs/historico/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
 ]);
 
-const rastreados = execFileSync(
-  'git',
-  ['ls-files', '--cached', '--others', '--exclude-standard'],
-  { cwd: REPO, encoding: 'utf8' },
-)
+let saidaGit;
+try {
+  saidaGit = execFileSync(
+    'git',
+    ['ls-files', '--cached', '--others', '--exclude-standard'],
+    { cwd: REPO, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 },
+  );
+} catch (erro) {
+  /* O runtime pode reportar EPERM depois de entregar stdout com status 0. */
+  if (erro?.status !== 0 || typeof erro?.stdout !== 'string') throw erro;
+  saidaGit = erro.stdout;
+}
+const rastreados = saidaGit
   .split('\n').filter(Boolean)
   .filter((f) => existsSync(path.join(REPO, f)))
   .filter((f) => !IGNORAR.has(f) && EXTS.has(path.extname(f)));

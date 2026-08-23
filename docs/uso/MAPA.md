@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-572 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+583 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -71,7 +71,14 @@
 - `ITERACAO-16.md` — R2 — iteração 16: ombro do quarto dianteiro
 - `ITERACAO-17.md` — R2 — iteração 17: busca regional com envelope obrigatório
 - `ITERACAO-18.md` — R2 — iteração 18: anel da transição da anca
+- `ITERACAO-19.md` — R2 — iteração 19: desacoplamento da ponta dianteira
 - `ITERACAO-2.md` — R2 — iteração 2: envelope topologicamente fechado
+- `ITERACAO-20.md` — R2 — iteração 20: desacoplamento antes da anca
+- `ITERACAO-21.md` — R2 — iteração 21: largura da tampa traseira
+- `ITERACAO-22.md` — R2 — iteração 22: contorno da extremidade traseira
+- `ITERACAO-23.md` — R2 — iteração 23: expansão dianteira
+- `ITERACAO-24.md` — R2B — iteração 24: prova da faixa vertical
+- `ITERACAO-25.md` — R2B — iteração 25: primeira promoção regional
 - `ITERACAO-3.md` — R2 — iteração 3: proporções e Catmull-Clark completo
 - `ITERACAO-4.md` — R2 — iteração 4: controles de caráter sem recortes
 - `ITERACAO-5.md` — R2 — iteração 5: leitura por máscara de profundidade
@@ -82,6 +89,8 @@
 - `README.md` — Prova privada R2 — cage autoral direta
 - `cage-direta.mjs` — Cage R2: vértices escritos diretamente; não deriva uma pele de seções.
 - `cage-direta.test.mjs` — Provas da primeira cage R2: quads explícitos, loop local e simetria.
+- `calibrar-r2b.mjs` — Sondagem determinística B2: compara candidatos descartáveis sem editar a cage.
+- `calibrar-r2b.test.mjs` — Confere que nenhuma sonda parcial é promovida sem envelope e silhuetas P0.
 - `comparar-silhueta-p0.mjs` — Mede a silhueta visível da R2 contra as curvas P0, sem inferir por vértices. Cada limite é lido da máscara de profundidade da mesma câmera ortográfica.
 - `comparar-silhueta-p0.test.mjs` — Prova que a comparação lê a máscara de profundidade nas três vistas.
 - `gerar-vistas.mjs` — Gera as vistas globais isoladas da primeira compilação R2.
@@ -363,6 +372,7 @@
 - `RELATORIO-MOTOR-DE-PRANCHA-R4.md` — Motor de Prancha — R4: autoria fria, revisão e limite de impacto
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
+- `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
@@ -429,6 +439,7 @@
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica

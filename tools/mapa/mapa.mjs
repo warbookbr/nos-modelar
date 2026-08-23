@@ -19,11 +19,22 @@ const CODIGO = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.html']);
 const DOCS = new Set(['.md']);
 const IGNORAR = new Set(['docs/uso/MAPA.md']); // o mapa não se auto-lista
 
-const rastreados = execFileSync(
-  'git',
-  ['ls-files', '--cached', '--others', '--exclude-standard'],
-  { cwd: REPO, encoding: 'utf8' },
-)
+let saidaGit;
+try {
+  saidaGit = execFileSync(
+    'git',
+    ['ls-files', '--cached', '--others', '--exclude-standard'],
+    /* O corpus de evidências contém centenas de PNGs; o inventário pode passar
+       do buffer padrão do Node sem que o Git tenha falhado. */
+    { cwd: REPO, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 },
+  );
+} catch (erro) {
+  /* Alguns runtimes reportam EPERM depois de entregar stdout com status 0.
+     Nesse caso, o processo terminou e a saída do Git continua válida. */
+  if (erro?.status !== 0 || typeof erro?.stdout !== 'string') throw erro;
+  saidaGit = erro.stdout;
+}
+const rastreados = saidaGit
   .split('\n').filter(Boolean)
   .filter((f) => existsSync(path.join(REPO, f)))
   .filter((f) => {
