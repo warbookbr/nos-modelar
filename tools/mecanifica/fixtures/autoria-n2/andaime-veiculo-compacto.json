@@ -1,0 +1,80 @@
+{
+  "formato": "mecanifica.andaime-global@1",
+  "id": "andaime-veiculo-compacto-n2",
+  "objetivo": "veiculo-compacto-n2",
+  "alvo": "alvo-veiculo-compacto-n2",
+  "familia": "veiculo",
+  "intencao": "blocagem inteira de baixa densidade antes de decomposição ou superfície",
+  "unidade": "mm",
+  "eixos": { "direita": "+x", "cima": "+y", "frente": "+z" },
+  "envelope": { "min": [-930, 0, -2100], "max": [930, 1450, 2150] },
+  "landmarks": [
+    { "id": "eixo-dianteiro", "posicao": [0, 320, 1350] },
+    { "id": "eixo-traseiro", "posicao": [0, 320, -1350] },
+    { "id": "nariz", "posicao": [0, 500, 2150] },
+    { "id": "pico-cabine", "posicao": [0, 1450, 300] },
+    { "id": "traseira", "posicao": [0, 350, -2100] }
+  ],
+  "volumes": [
+    {
+      "id": "cabine-global",
+      "regiao": "cabine",
+      "tipo": "prisma",
+      "centro": [0, 0, 0],
+      "eixoExtrusao": "x",
+      "eixosPerfil": ["z", "y"],
+      "comprimento": 1300,
+      "perfil": [[-900, 700], [-600, 1320], [300, 1450], [900, 720]]
+    },
+    {
+      "id": "corpo-global",
+      "regiao": "corpo-base",
+      "tipo": "prisma",
+      "centro": [0, 0, 0],
+      "eixoExtrusao": "x",
+      "eixosPerfil": ["z", "y"],
+      "comprimento": 1700,
+      "perfil": [[-2100, 350], [-2050, 700], [1900, 800], [2150, 500], [2050, 350]]
+    },
+    {
+      "id": "roda-dianteira-direita",
+      "regiao": "rodas-dianteiras",
+      "tipo": "cilindro",
+      "centro": [820, 320, 1350],
+      "eixo": "x",
+      "raio": 320,
+      "comprimento": 220,
+      "segmentos": 16
+    },
+    {
+      "id": "roda-dianteira-esquerda",
+      "regiao": "rodas-dianteiras",
+      "tipo": "cilindro",
+      "centro": [-820, 320, 1350],
+      "eixo": "x",
+      "raio": 320,
+      "comprimento": 220,
+      "segmentos": 16
+    },
+    {
+      "id": "roda-traseira-direita",
+      "regiao": "rodas-traseiras",
+      "tipo": "cilindro",
+      "centro": [820, 320, -1350],
+      "eixo": "x",
+      "raio": 320,
+      "comprimento": 220,
+      "segmentos": 16
+    },
+    {
+      "id": "roda-traseira-esquerda",
+      "regiao": "rodas-traseiras",
+      "tipo": "cilindro",
+      "centro": [-820, 320, -1350],
+      "eixo": "x",
+      "raio": 320,
+      "comprimento": 220,
+      "segmentos": 16
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-/* JSON Schemas descobríveis da N1. A validação semântica final continua nos
+/* JSON Schemas descobríveis de N1/N2. A validação semântica final continua nos
    normalizadores e na máquina de estados; schemas são a fronteira estrutural. */
 
 import {
@@ -10,6 +10,11 @@ import {
   FORMATO_EXECUCAO_FLUXO_AUTORIA, FORMATO_PLANO_FLUXO_AUTORIA,
   FORMATO_PROTOCOLO_FLUXO_AUTORIA,
 } from './orquestrar-fluxo-autoria.js';
+import {
+  FORMATO_ALVO_FORMA_GLOBAL, FORMATO_ANDAIME_GLOBAL, FORMATO_AVALIACAO_FORMA_GLOBAL,
+  FORMATO_BLOCAGEM_GLOBAL, FORMATO_CRITICA_FORMA_GLOBAL, FORMATO_DECISAO_FORMA_GLOBAL,
+  TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
+} from './forma-global.js';
 
 export const FORMATO_SCHEMAS_AUTORIA_3D = 'mecanifica.schemas-autoria-3d@1';
 export const FORMATO_RESULTADO_ETAPA_AUTORIA = 'mecanifica.resultado-etapa-autoria@1';
@@ -39,6 +44,9 @@ const objeto = (properties, required = Object.keys(properties)) => ({
   type: 'object', additionalProperties: false, required, properties,
 });
 const anulavel = (schema) => ({ anyOf: [schema, { type: 'null' }] });
+const vetor = (tamanho) => ({
+  type: 'array', minItems: tamanho, maxItems: tamanho, items: { type: 'number' },
+});
 
 const eixos = () => objeto({
   direita: { enum: DIRECOES }, cima: { enum: DIRECOES }, frente: { enum: DIRECOES },
@@ -228,11 +236,141 @@ const SCHEMA_COBERTURA = {
   }),
 };
 
+const envelope = () => objeto({ min: vetor(3), max: vetor(3) });
+const landmark = (comTolerancia = false) => objeto({
+  id: slug(), posicao: vetor(3), ...(comTolerancia ? { tolerancia: { type: 'number', exclusiveMinimum: 0 } } : {}),
+});
+const contornosPorVista = () => objeto(Object.fromEntries(VISTAS_ORTOGRAFICAS_FORMA_GLOBAL.map((vista) => [vista, objeto({
+  contornos: {
+    type: 'array', minItems: 1,
+    items: { type: 'array', minItems: 3, items: vetor(2) },
+  },
+})])));
+
+const volumeBase = {
+  id: slug(), regiao: slug(), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL }, centro: vetor(3),
+};
+const SCHEMA_VOLUME_FORMA_GLOBAL = {
+  oneOf: [
+    objeto({ ...volumeBase, tipo: { const: 'caixa' }, dimensoes: vetor(3) }),
+    objeto({
+      ...volumeBase, tipo: { const: 'cilindro' }, eixo: { enum: ['x', 'y', 'z'] },
+      raio: { type: 'number', exclusiveMinimum: 0 }, comprimento: { type: 'number', exclusiveMinimum: 0 },
+      segmentos: { type: 'integer', minimum: 8, maximum: 128 },
+    }),
+    objeto({
+      ...volumeBase, tipo: { const: 'prisma' }, eixoExtrusao: { enum: ['x', 'y', 'z'] },
+      eixosPerfil: { type: 'array', minItems: 2, maxItems: 2, uniqueItems: true, items: { enum: ['x', 'y', 'z'] } },
+      comprimento: { type: 'number', exclusiveMinimum: 0 },
+      perfil: { type: 'array', minItems: 3, items: vetor(2) },
+    }),
+  ],
+};
+
+const SCHEMA_ALVO_FORMA_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_ALVO_FORMA_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_ALVO_FORMA_GLOBAL }, id: slug(), objetivo: slug(),
+    familia: { enum: FAMILIAS_AUTORIA }, intencao: texto(), unidade: { const: 'mm' }, eixos: eixos(),
+    envelope: envelope(), landmarks: { type: 'array', minItems: 1, items: landmark(true) },
+    regioesObrigatorias: listaTexto({ minItems: 1, slugue: true }), vistas: contornosPorVista(),
+    limiares: objeto({
+      iouMinimo: { type: 'number', minimum: 0, maximum: 1 },
+      desvioMaximo: { type: 'number', minimum: 0, maximum: 1 },
+      erroEnvelopeRelativoMaximo: { type: 'number', minimum: 0, maximum: 1 },
+      erroLandmarkNormalizadoMaximo: { type: 'number', minimum: 0 },
+    }),
+    orcamento: objeto({
+      volumesMaximos: { type: 'integer', minimum: 1, maximum: 1000 },
+      triangulosMaximos: { type: 'integer', minimum: 1, maximum: 1000000 },
+      resolucaoGrade: { type: 'integer', minimum: 32, maximum: 256 },
+    }),
+    rejeicoes: listaTexto({ minItems: 1, slugue: true }),
+  }),
+};
+
+const SCHEMA_ANDAIME_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_ANDAIME_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_ANDAIME_GLOBAL }, id: slug(), objetivo: slug(), alvo: slug(),
+    familia: { enum: FAMILIAS_AUTORIA }, intencao: texto(), unidade: { const: 'mm' }, eixos: eixos(),
+    envelope: envelope(), landmarks: { type: 'array', minItems: 1, items: landmark(false) },
+    volumes: { type: 'array', minItems: 1, items: SCHEMA_VOLUME_FORMA_GLOBAL },
+  }),
+};
+
+const SCHEMA_BLOCAGEM_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_BLOCAGEM_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_BLOCAGEM_GLOBAL }, id: slug(), objetivo: slug(), alvo: slug(), andaime: slug(),
+    familia: { enum: FAMILIAS_AUTORIA }, unidade: { const: 'mm' }, eixos: eixos(),
+    envelopeDeclarado: envelope(), envelopeDerivado: envelope(),
+    landmarks: { type: 'array', minItems: 1, items: landmark(false) },
+    volumes: {
+      type: 'array', minItems: 1, items: objeto({
+        id: slug(), regiao: slug(), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL },
+        inicioVertice: { type: 'integer', minimum: 0 }, quantidadeVertices: { type: 'integer', minimum: 1 },
+        quantidadeTriangulos: { type: 'integer', minimum: 1 },
+      }),
+    },
+    malha: objeto({
+      vertices: { type: 'array', minItems: 1, items: vetor(3) },
+      faces: {
+        type: 'array', minItems: 1,
+        items: objeto({ vertices: { type: 'array', minItems: 3, maxItems: 3, items: { type: 'integer', minimum: 0 } }, volume: slug(), regiao: slug() }),
+      },
+    }),
+    estatisticas: objeto({ volumes: { type: 'integer', minimum: 1 }, vertices: { type: 'integer', minimum: 1 }, triangulos: { type: 'integer', minimum: 1 } }),
+  }),
+};
+
+const SCHEMA_AVALIACAO_FORMA_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_AVALIACAO_FORMA_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_AVALIACAO_FORMA_GLOBAL }, alvo: slug(), blocagem: slug(), objetivo: slug(),
+    gate: { const: 'g01-forma-global-medida' }, estado: { enum: ['aprovado', 'reprovado'] },
+    vistas: {
+      type: 'array', minItems: 3, maxItems: 3,
+      items: objeto({
+        id: { enum: VISTAS_ORTOGRAFICAS_FORMA_GLOBAL }, estado: { enum: ['aprovada', 'reprovada'] },
+        metricas: objeto({ iou: { type: 'number' }, falta: { type: 'number' }, excesso: { type: 'number' }, desvioMaximo: { type: 'number' } }),
+      }),
+    },
+    envelope: objeto({ estado: { enum: ['aprovado', 'reprovado'] }, erroRelativoMaximo: { type: 'number', minimum: 0 } }),
+    landmarks: {
+      type: 'array', minItems: 1,
+      items: objeto({ id: slug(), estado: { enum: ['aprovado', 'reprovado'] }, erroNormalizado: anulavel({ type: 'number', minimum: 0 }) }),
+    },
+    regioes: objeto({ estado: { enum: ['aprovado', 'reprovado'] }, ausentes: listaTexto({ slugue: true }) }),
+    orcamento: objeto({ estado: { enum: ['aprovado', 'reprovado'] }, usado: { type: 'object' }, limite: { type: 'object' } }),
+    diagnosticos: { type: 'array', items: diagnostico() },
+  }),
+};
+
+const SCHEMA_CRITICA_FORMA_GLOBAL = objeto({
+  formato: { const: FORMATO_CRITICA_FORMA_GLOBAL }, papel: { const: 'critico-visual-independente' },
+  contexto: { const: 'vistas-neutras-sem-identidade-do-alvo' }, blocagem: slug(),
+  estado: { enum: ['reconhecida', 'reprovada', 'inconclusiva'] }, rotulo: anulavel(texto(120)),
+  achados: listaTexto(),
+});
+
+const SCHEMA_DECISAO_FORMA_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_DECISAO_FORMA_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_DECISAO_FORMA_GLOBAL }, alvo: slug(), blocagem: slug(),
+    estado: { enum: ['aprovado', 'reprovado', 'bloqueado'] }, motivo: slug(),
+    gates: objeto({ g01: { enum: ['aprovado', 'reprovado'] }, g02: { enum: ['aprovado', 'reprovado', 'bloqueado'] } }),
+    critica: anulavel(SCHEMA_CRITICA_FORMA_GLOBAL), decisaoUsuario: anulavel({ enum: ['aprovar', 'reprovar'] }),
+  }),
+};
+
 const CONTRATOS = congelar({
   objetivo: SCHEMA_OBJETIVO, receitaAutoral: SCHEMA_RECEITA, provedor: SCHEMA_PROVEDOR,
   protocolo: SCHEMA_PROTOCOLO, plano: SCHEMA_PLANO, execucao: SCHEMA_EXECUCAO,
   resultadoEtapa: SCHEMA_RESULTADO_ETAPA, resultadoPlanejamento: SCHEMA_RESULTADO_PLANEJAMENTO,
-  cobertura: SCHEMA_COBERTURA,
+  cobertura: SCHEMA_COBERTURA, alvoFormaGlobal: SCHEMA_ALVO_FORMA_GLOBAL,
+  andaimeGlobal: SCHEMA_ANDAIME_GLOBAL, blocagemGlobal: SCHEMA_BLOCAGEM_GLOBAL,
+  avaliacaoFormaGlobal: SCHEMA_AVALIACAO_FORMA_GLOBAL, decisaoFormaGlobal: SCHEMA_DECISAO_FORMA_GLOBAL,
 });
 
 const INDICE = congelar({
@@ -242,6 +380,7 @@ const INDICE = congelar({
   limites: [
     'schema valida estrutura; normalizador valida eixos não colineares, referências e identidades cruzadas',
     'schema não aprova forma, superfície, conectividade, evidência ou decisão humana',
+    'G01 mede envelope, landmarks, cobertura regional e silhueta; G02 permanece dependente de crítico independente e usuário',
   ],
 });
 

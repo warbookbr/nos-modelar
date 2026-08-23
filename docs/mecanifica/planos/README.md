@@ -11,7 +11,9 @@ superfície semântica, conectividade obrigatória e aprovação separada de
 plataforma/artefato. O fluxo não depende de Blender, DCC, CAD ou formatos
 externos. N0 e N1 foram concluídos. O [relatório N1](../RELATORIO-N1-FLUXO-AUTORIA.md)
 fecha objetivo, receita elevada, schemas, provedores, planejamento, transições e
-cliente caixa-preta sem mudar geometria. A próxima fatia é N2 — forma global. Os três
+cliente caixa-preta sem mudar geometria. A N2 está implementada e com G01 verde;
+o [relatório N2](../RELATORIO-N2-FORMA-GLOBAL.md) mantém G02 bloqueado até crítica
+independente e aceite do usuário. N3 ainda não está aberta. Os três
 dossiês vinculantes, mais a [matriz
 executável de rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
 ficam ligados ao plano.

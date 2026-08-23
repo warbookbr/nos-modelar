@@ -3,7 +3,7 @@
 **Estado:** ativo  
 **Responsável:** Codex  
 **Repositório e base:** `warbookbr/nos-mecanifica`, `7bb1bd8`  
-**Execução:** N0 e N1 concluídos; próxima fatia N2 — forma global.
+**Execução:** N0 e N1 concluídos; N2 implementada com G01 verde e G02 pendente.
 
 ## Origem, decisão e objetivo
 
@@ -158,7 +158,8 @@ mensurada. `Low poly` só vale quando declarado. Peça isolada não aprova máqu
 2. **N1 — contrato:** receita elevada, provedores, orquestração e falha segura.
    [Concluída](../RELATORIO-N1-FLUXO-AUTORIA.md) com schemas e prova caixa-preta.
 3. **N2 — forma global:** implementar andaime e gate de reconhecimento numa
-   blocagem inteira pequena.
+   blocagem inteira pequena. Implementação e G01 concluídos; G02 aguarda crítica
+   independente e aceite do usuário.
 4. **N3 — superfície nativa:** provar edição regional, simetria, continuidade,
    vinco e compilação neutra.
 5. **N4 — veículo bruto:** produzir carro reconhecível antes de detalhe.
@@ -195,6 +196,5 @@ Inclui arquitetura, receita, orquestração, andaime, superfície, interfaces,
 validadores, carro bruto e prova humanoide. Exclui software externo, clone de
 Blender/CAD, produção final imediata, fabricação e solver universal prematuro.
 
-O plano foi ativado após o R2B. N0 fechou baseline e dossiês; N1 fechou
-contratos, schemas, provedores e prova caixa-preta sem mudar geometria. N2 é a
-próxima fatia. Evidências e decisões dos dois eixos continuam obrigatórias; métrica ou estrutura correta não encerram a forma.
+O plano foi ativado após o R2B. N0/N1 fecharam verdade e contratos; N2 entregou
+alvo, andaime, blocagem, vistas e G01. G02 segue bloqueado sem crítico e usuário; métrica ou estrutura correta não encerram a forma.

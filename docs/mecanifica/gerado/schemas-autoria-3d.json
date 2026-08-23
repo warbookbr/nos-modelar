@@ -1621,10 +1621,1352 @@
           }
         }
       }
+    },
+    "alvoFormaGlobal": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.alvo-forma-global@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "objetivo",
+        "familia",
+        "intencao",
+        "unidade",
+        "eixos",
+        "envelope",
+        "landmarks",
+        "regioesObrigatorias",
+        "vistas",
+        "limiares",
+        "orcamento",
+        "rejeicoes"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.alvo-forma-global@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "objetivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "intencao": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "unidade": {
+          "const": "mm"
+        },
+        "eixos": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "direita",
+            "cima",
+            "frente"
+          ],
+          "properties": {
+            "direita": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "cima": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "frente": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            }
+          }
+        },
+        "envelope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "max": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "landmarks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "posicao",
+              "tolerancia"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "posicao": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "tolerancia": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        },
+        "regioesObrigatorias": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 120
+          }
+        },
+        "vistas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "frontal",
+            "direita",
+            "superior"
+          ],
+          "properties": {
+            "frontal": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contornos"
+              ],
+              "properties": {
+                "contornos": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "array",
+                    "minItems": 3,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "direita": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contornos"
+              ],
+              "properties": {
+                "contornos": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "array",
+                    "minItems": 3,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "superior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contornos"
+              ],
+              "properties": {
+                "contornos": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "array",
+                    "minItems": 3,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "limiares": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "iouMinimo",
+            "desvioMaximo",
+            "erroEnvelopeRelativoMaximo",
+            "erroLandmarkNormalizadoMaximo"
+          ],
+          "properties": {
+            "iouMinimo": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "desvioMaximo": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "erroEnvelopeRelativoMaximo": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "erroLandmarkNormalizadoMaximo": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "orcamento": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "volumesMaximos",
+            "triangulosMaximos",
+            "resolucaoGrade"
+          ],
+          "properties": {
+            "volumesMaximos": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "triangulosMaximos": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000
+            },
+            "resolucaoGrade": {
+              "type": "integer",
+              "minimum": 32,
+              "maximum": 256
+            }
+          }
+        },
+        "rejeicoes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 120
+          }
+        }
+      }
+    },
+    "andaimeGlobal": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.andaime-global@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "objetivo",
+        "alvo",
+        "familia",
+        "intencao",
+        "unidade",
+        "eixos",
+        "envelope",
+        "landmarks",
+        "volumes"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.andaime-global@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "objetivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "alvo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "intencao": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "unidade": {
+          "const": "mm"
+        },
+        "eixos": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "direita",
+            "cima",
+            "frente"
+          ],
+          "properties": {
+            "direita": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "cima": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "frente": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            }
+          }
+        },
+        "envelope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "max": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "landmarks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "posicao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "posicao": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regiao",
+                  "tipo",
+                  "centro",
+                  "dimensoes"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regiao": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "tipo": {
+                    "const": "caixa"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "dimensoes": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regiao",
+                  "tipo",
+                  "centro",
+                  "eixo",
+                  "raio",
+                  "comprimento",
+                  "segmentos"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regiao": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "tipo": {
+                    "const": "cilindro"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixo": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "raio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "comprimento": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "segmentos": {
+                    "type": "integer",
+                    "minimum": 8,
+                    "maximum": 128
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "regiao",
+                  "tipo",
+                  "centro",
+                  "eixoExtrusao",
+                  "eixosPerfil",
+                  "comprimento",
+                  "perfil"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regiao": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "tipo": {
+                    "const": "prisma"
+                  },
+                  "centro": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "eixoExtrusao": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "eixosPerfil": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "uniqueItems": true,
+                    "items": {
+                      "enum": [
+                        "x",
+                        "y",
+                        "z"
+                      ]
+                    }
+                  },
+                  "comprimento": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "perfil": {
+                    "type": "array",
+                    "minItems": 3,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "blocagemGlobal": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.blocagem-global@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "objetivo",
+        "alvo",
+        "andaime",
+        "familia",
+        "unidade",
+        "eixos",
+        "envelopeDeclarado",
+        "envelopeDerivado",
+        "landmarks",
+        "volumes",
+        "malha",
+        "estatisticas"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.blocagem-global@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "objetivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "alvo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "andaime": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "unidade": {
+          "const": "mm"
+        },
+        "eixos": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "direita",
+            "cima",
+            "frente"
+          ],
+          "properties": {
+            "direita": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "cima": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "frente": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            }
+          }
+        },
+        "envelopeDeclarado": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "max": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "envelopeDerivado": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            },
+            "max": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "landmarks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "posicao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "posicao": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "regiao",
+              "tipo",
+              "inicioVertice",
+              "quantidadeVertices",
+              "quantidadeTriangulos"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "regiao": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "tipo": {
+                "enum": [
+                  "caixa",
+                  "cilindro",
+                  "prisma"
+                ]
+              },
+              "inicioVertice": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "quantidadeVertices": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "quantidadeTriangulos": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "malha": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "vertices",
+            "faces"
+          ],
+          "properties": {
+            "vertices": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "faces": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "vertices",
+                  "volume",
+                  "regiao"
+                ],
+                "properties": {
+                  "vertices": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "volume": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "regiao": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        "estatisticas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "volumes",
+            "vertices",
+            "triangulos"
+          ],
+          "properties": {
+            "volumes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "vertices": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "triangulos": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "avaliacaoFormaGlobal": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.avaliacao-forma-global@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "alvo",
+        "blocagem",
+        "objetivo",
+        "gate",
+        "estado",
+        "vistas",
+        "envelope",
+        "landmarks",
+        "regioes",
+        "orcamento",
+        "diagnosticos"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.avaliacao-forma-global@1"
+        },
+        "alvo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "blocagem": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "objetivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "gate": {
+          "const": "g01-forma-global-medida"
+        },
+        "estado": {
+          "enum": [
+            "aprovado",
+            "reprovado"
+          ]
+        },
+        "vistas": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "estado",
+              "metricas"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "frontal",
+                  "direita",
+                  "superior"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "aprovada",
+                  "reprovada"
+                ]
+              },
+              "metricas": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "iou",
+                  "falta",
+                  "excesso",
+                  "desvioMaximo"
+                ],
+                "properties": {
+                  "iou": {
+                    "type": "number"
+                  },
+                  "falta": {
+                    "type": "number"
+                  },
+                  "excesso": {
+                    "type": "number"
+                  },
+                  "desvioMaximo": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "envelope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "estado",
+            "erroRelativoMaximo"
+          ],
+          "properties": {
+            "estado": {
+              "enum": [
+                "aprovado",
+                "reprovado"
+              ]
+            },
+            "erroRelativoMaximo": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "landmarks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "estado",
+              "erroNormalizado"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "estado": {
+                "enum": [
+                  "aprovado",
+                  "reprovado"
+                ]
+              },
+              "erroNormalizado": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "regioes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "estado",
+            "ausentes"
+          ],
+          "properties": {
+            "estado": {
+              "enum": [
+                "aprovado",
+                "reprovado"
+              ]
+            },
+            "ausentes": {
+              "type": "array",
+              "minItems": 0,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              }
+            }
+          }
+        },
+        "orcamento": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "estado",
+            "usado",
+            "limite"
+          ],
+          "properties": {
+            "estado": {
+              "enum": [
+                "aprovado",
+                "reprovado"
+              ]
+            },
+            "usado": {
+              "type": "object"
+            },
+            "limite": {
+              "type": "object"
+            }
+          }
+        },
+        "diagnosticos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "codigo",
+              "campo",
+              "causa",
+              "impacto",
+              "proximoPasso"
+            ],
+            "properties": {
+              "codigo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "campo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "causa": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "impacto": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "proximoPasso": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          }
+        }
+      }
+    },
+    "decisaoFormaGlobal": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.decisao-forma-global@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "alvo",
+        "blocagem",
+        "estado",
+        "motivo",
+        "gates",
+        "critica",
+        "decisaoUsuario"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.decisao-forma-global@1"
+        },
+        "alvo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "blocagem": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "estado": {
+          "enum": [
+            "aprovado",
+            "reprovado",
+            "bloqueado"
+          ]
+        },
+        "motivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "gates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "g01",
+            "g02"
+          ],
+          "properties": {
+            "g01": {
+              "enum": [
+                "aprovado",
+                "reprovado"
+              ]
+            },
+            "g02": {
+              "enum": [
+                "aprovado",
+                "reprovado",
+                "bloqueado"
+              ]
+            }
+          }
+        },
+        "critica": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "formato",
+                "papel",
+                "contexto",
+                "blocagem",
+                "estado",
+                "rotulo",
+                "achados"
+              ],
+              "properties": {
+                "formato": {
+                  "const": "mecanifica.critica-forma-global@1"
+                },
+                "papel": {
+                  "const": "critico-visual-independente"
+                },
+                "contexto": {
+                  "const": "vistas-neutras-sem-identidade-do-alvo"
+                },
+                "blocagem": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                  "maxLength": 120
+                },
+                "estado": {
+                  "enum": [
+                    "reconhecida",
+                    "reprovada",
+                    "inconclusiva"
+                  ]
+                },
+                "rotulo": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "achados": {
+                  "type": "array",
+                  "minItems": 0,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decisaoUsuario": {
+          "anyOf": [
+            {
+              "enum": [
+                "aprovar",
+                "reprovar"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
     }
   },
   "limites": [
     "schema valida estrutura; normalizador valida eixos não colineares, referências e identidades cruzadas",
-    "schema não aprova forma, superfície, conectividade, evidência ou decisão humana"
+    "schema não aprova forma, superfície, conectividade, evidência ou decisão humana",
+    "G01 mede envelope, landmarks, cobertura regional e silhueta; G02 permanece dependente de crítico independente e usuário"
   ]
 }

@@ -228,12 +228,17 @@ aplicação publicada aqui.
   Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
 - O único plano **ativo** é a [arquitetura híbrida nativa de autoria por famílias](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
   (`docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`)
-  com N0 e N1 concluídos. O [relatório N1](RELATORIO-N1-FLUXO-AUTORIA.md)
+  com N0 e N1 concluídos e N2 tecnicamente implementada. O [relatório N1](RELATORIO-N1-FLUXO-AUTORIA.md)
   (`docs/mecanifica/RELATORIO-N1-FLUXO-AUTORIA.md`) fecha objetivo, receita
   elevada, schemas, provedores, planejamento, falha segura e cliente caixa-preta.
   O contrato operacional permanece em [`FLUXO-AUTORIA-N1.md`](FLUXO-AUTORIA-N1.md)
   (`docs/mecanifica/FLUXO-AUTORIA-N1.md`).
-  A próxima fatia é N2 — forma global. O plano preserva o procedural, identidade, montagem, revisão,
+  O [relatório N2](RELATORIO-N2-FORMA-GLOBAL.md) registra alvo independente,
+  andaime, blocagem inteira, quatro vistas e G01 aprovado. G02 permanece
+  bloqueado até crítica independente e aceite explícito do usuário; N3 não está
+  aberta. Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
+  `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
+  identidade, montagem, revisão,
   bancada e MCP; acrescenta andaime global, superfície semântica nativa,
   conectividade e aprovação separada da plataforma/artefato, sem software
   externo. Os dossiês vinculantes são

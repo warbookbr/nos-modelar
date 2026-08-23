@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+<rect width="960" height="640" fill="#f5f6f4"/>
+<rect x="18" y="18" width="924" height="604" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="735.22,582.41 814.30,582.41 814.30,352.35 735.22,352.35" fill="#1f4f88" stroke="#153653" stroke-width="2.2"/>
+<polygon points="145.70,582.41 224.78,582.41 224.78,352.35 145.70,352.35" fill="#668bb7" stroke="#153653" stroke-width="2.2"/>
+<polygon points="735.22,582.41 814.30,582.41 814.30,352.35 735.22,352.35" fill="#244874" stroke="#153653" stroke-width="2.2"/>
+<polygon points="145.70,582.41 224.78,582.41 224.78,352.35 145.70,352.35" fill="#7a9abe" stroke="#153653" stroke-width="2.2"/>
+<polygon points="174.46,456.59 785.54,456.59 785.54,294.84 174.46,294.84" fill="#4977ad" stroke="#153653" stroke-width="2.2"/>
+<polygon points="246.35,330.78 713.65,330.78 713.65,61.19 246.35,61.19" fill="#315f9b" stroke="#153653" stroke-width="2.2"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">FRONTAL</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1494 1014" width="1494" height="1014">
+<rect width="100%" height="100%" fill="#dde2df"/>
+<g transform="translate(18 18)"><rect width="720" height="480" fill="#f5f6f4"/>
+<rect x="18" y="18" width="684" height="444" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="299.01,181.81 301.26,198.43 307.68,214.28 317.29,226.94 328.63,234.48 339.96,235.75 368.25,227.83 377.86,222.65 384.28,211.80 386.54,196.93 384.28,180.31 377.86,164.47 368.25,151.81 356.91,144.27 345.58,142.99 317.29,150.91 307.68,156.09 301.26,166.95" fill="#1f4f88" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-direita" data-regiao="rodas-dianteiras"/>
+<polygon points="88.15,240.85 90.40,257.47 96.82,273.32 106.44,285.98 117.77,293.52 129.11,294.79 157.39,286.87 167.00,281.69 173.43,270.84 175.68,255.97 173.43,239.35 167.00,223.51 157.39,210.85 146.06,203.31 134.72,202.03 106.44,209.95 96.82,215.13 90.40,225.99" fill="#668bb7" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-esquerda" data-regiao="rodas-dianteiras"/>
+<polygon points="548.95,279.01 551.20,295.63 557.62,311.48 567.24,324.14 578.57,331.68 589.91,332.95 618.19,325.03 627.80,319.85 634.23,309.00 636.48,294.13 634.23,277.51 627.80,261.67 618.19,249.01 606.86,241.47 595.52,240.19 567.24,248.11 557.62,253.29 551.20,264.15" fill="#244874" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-direita" data-regiao="rodas-traseiras"/>
+<polygon points="338.09,338.05 340.35,354.67 346.77,370.52 356.38,383.18 367.71,390.72 379.05,391.99 407.34,384.07 416.95,378.89 423.37,368.04 425.62,353.17 423.37,336.55 416.95,320.71 407.34,308.05 396.00,300.51 384.66,299.23 356.38,307.15 346.77,312.33 340.35,323.19" fill="#7a9abe" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-esquerda" data-regiao="rodas-traseiras"/>
+<polygon points="54.00,197.55 63.26,220.44 447.43,369.84 666.00,308.64 661.37,261.84 295.71,106.78 77.14,167.98" fill="#4977ad" stroke="#153653" stroke-width="2.2" data-volume="corpo-global" data-regiao="corpo-base"/>
+<polygon points="195.43,207.06 362.06,274.44 529.20,227.64 501.43,137.12 418.11,88.01 250.97,134.81" fill="#315f9b" stroke="#153653" stroke-width="2.2" data-volume="cabine-global" data-regiao="cabine"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">ISOMETRICA</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text></g>
+<g transform="translate(756 18)"><rect width="720" height="480" fill="#f5f6f4"/>
+<rect x="18" y="18" width="684" height="444" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="141.32,338.03 578.68,338.03 578.68,219.89 141.32,219.89" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="191.59,250.05 528.41,250.05 528.41,54.00 191.59,54.00" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="126.24,423.49 181.54,423.49 181.54,262.62 126.24,262.62" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="538.46,423.49 593.76,423.49 593.76,262.62 538.46,262.62" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="538.46,423.49 593.76,423.49 593.76,262.62 538.46,262.62" fill="#1f4f88" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-direita" data-regiao="rodas-dianteiras"/>
+<polygon points="126.24,423.49 181.54,423.49 181.54,262.62 126.24,262.62" fill="#668bb7" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-esquerda" data-regiao="rodas-dianteiras"/>
+<polygon points="538.46,423.49 593.76,423.49 593.76,262.62 538.46,262.62" fill="#244874" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-direita" data-regiao="rodas-traseiras"/>
+<polygon points="126.24,423.49 181.54,423.49 181.54,262.62 126.24,262.62" fill="#7a9abe" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-esquerda" data-regiao="rodas-traseiras"/>
+<polygon points="146.35,335.51 573.65,335.51 573.65,222.41 146.35,222.41" fill="#4977ad" stroke="#153653" stroke-width="2.2" data-volume="corpo-global" data-regiao="corpo-base"/>
+<polygon points="196.62,247.54 523.38,247.54 523.38,59.03 196.62,59.03" fill="#315f9b" stroke="#153653" stroke-width="2.2" data-volume="cabine-global" data-regiao="cabine"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">FRONTAL</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text></g>
+<g transform="translate(18 516)"><rect width="720" height="480" fill="#f5f6f4"/>
+<rect x="18" y="18" width="684" height="444" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="54.00,295.64 61.13,245.71 630.34,228.59 666.00,271.38 651.73,295.64" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="225.19,245.71 267.99,152.98 402.08,134.43 487.68,242.85" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="118.20,298.49 121.62,315.89 131.61,330.73 146.44,340.72 163.85,344.14 181.25,340.72 196.09,330.73 206.07,315.89 209.50,298.49 206.07,281.09 196.09,266.25 181.25,256.26 163.85,252.84 146.44,256.26 131.61,266.25 121.62,281.09" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="503.37,298.49 506.79,315.89 516.78,330.73 531.62,340.72 549.02,344.14 566.43,340.72 581.26,330.73 591.25,315.89 594.67,298.49 591.25,281.09 581.26,266.25 566.43,256.26 549.02,252.84 531.62,256.26 516.78,266.25 506.79,281.09" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="503.37,298.49 506.85,315.96 516.74,330.77 531.55,340.66 549.02,344.14 566.49,340.66 581.30,330.77 591.20,315.96 594.67,298.49 591.20,281.02 581.30,266.21 566.49,256.31 549.02,252.84 531.55,256.31 516.74,266.21 506.85,281.02" fill="#1f4f88" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-direita" data-regiao="rodas-dianteiras"/>
+<polygon points="503.37,298.49 506.85,315.96 516.74,330.77 531.55,340.66 549.02,344.14 566.49,340.66 581.30,330.77 591.20,315.96 594.67,298.49 591.20,281.02 581.30,266.21 566.49,256.31 549.02,252.84 531.55,256.31 516.74,266.21 506.85,281.02" fill="#668bb7" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-esquerda" data-regiao="rodas-dianteiras"/>
+<polygon points="118.20,298.49 121.67,315.96 131.57,330.77 146.38,340.66 163.85,344.14 181.32,340.66 196.13,330.77 206.02,315.96 209.50,298.49 206.02,281.02 196.13,266.21 181.32,256.31 163.85,252.84 146.38,256.31 131.57,266.21 121.67,281.02" fill="#244874" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-direita" data-regiao="rodas-traseiras"/>
+<polygon points="118.20,298.49 121.67,315.96 131.57,330.77 146.38,340.66 163.85,344.14 181.32,340.66 196.13,330.77 206.02,315.96 209.50,298.49 206.02,281.02 196.13,266.21 181.32,256.31 163.85,252.84 146.38,256.31 131.57,266.21 121.67,281.02" fill="#7a9abe" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-esquerda" data-regiao="rodas-traseiras"/>
+<polygon points="56.85,294.21 648.88,294.21 663.15,272.81 627.48,230.01 63.99,244.28" fill="#4977ad" stroke="#153653" stroke-width="2.2" data-volume="corpo-global" data-regiao="corpo-base"/>
+<polygon points="228.04,244.28 484.83,241.43 399.23,137.29 270.84,155.83" fill="#315f9b" stroke="#153653" stroke-width="2.2" data-volume="cabine-global" data-regiao="cabine"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">DIREITA</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text></g>
+<g transform="translate(756 516)"><rect width="720" height="480" fill="#f5f6f4"/>
+<rect x="18" y="18" width="684" height="444" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="284.56,426.00 435.44,426.00 435.44,54.00 284.56,54.00" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="301.90,321.94 418.10,321.94 418.10,162.39 301.90,162.39" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="279.36,386.98 298.43,386.98 298.43,331.48 279.36,331.48" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="421.57,386.98 440.64,386.98 440.64,331.48 421.57,331.48" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="279.36,152.85 298.43,152.85 298.43,97.36 279.36,97.36" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="421.57,152.85 440.64,152.85 440.64,97.36 421.57,97.36" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="421.57,152.85 440.64,152.85 440.64,97.36 421.57,97.36" fill="#1f4f88" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-direita" data-regiao="rodas-dianteiras"/>
+<polygon points="279.36,152.85 298.43,152.85 298.43,97.36 279.36,97.36" fill="#668bb7" stroke="#153653" stroke-width="2.2" data-volume="roda-dianteira-esquerda" data-regiao="rodas-dianteiras"/>
+<polygon points="421.57,386.98 440.64,386.98 440.64,331.48 421.57,331.48" fill="#244874" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-direita" data-regiao="rodas-traseiras"/>
+<polygon points="279.36,386.98 298.43,386.98 298.43,331.48 279.36,331.48" fill="#7a9abe" stroke="#153653" stroke-width="2.2" data-volume="roda-traseira-esquerda" data-regiao="rodas-traseiras"/>
+<polygon points="286.29,424.27 433.71,424.27 433.71,55.73 286.29,55.73" fill="#4977ad" stroke="#153653" stroke-width="2.2" data-volume="corpo-global" data-regiao="corpo-base"/>
+<polygon points="303.64,320.21 416.36,320.21 416.36,164.13 303.64,164.13" fill="#315f9b" stroke="#153653" stroke-width="2.2" data-volume="cabine-global" data-regiao="cabine"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">SUPERIOR</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text></g>
+</svg>

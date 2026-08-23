@@ -1,0 +1,17 @@
+{
+  "formato": "mecanifica.pacote-critica-forma-global@1",
+  "consulta": "consulta-cega-n2-01",
+  "contexto": "vistas-neutras-sem-identidade-do-alvo",
+  "vistas": [
+    "cego-isometrica.svg",
+    "cego-frontal.svg",
+    "cego-direita.svg",
+    "cego-superior.svg"
+  ],
+  "comparacoes": [
+    "comparacao-frontal.svg",
+    "comparacao-direita.svg",
+    "comparacao-superior.svg"
+  ],
+  "instrucao": "registre o rótulo reconhecido, achados objetivos e estado reconhecida, reprovada ou inconclusiva sem consultar alvo, fonte, manifesto ou nomes internos"
+}

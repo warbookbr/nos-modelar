@@ -1,0 +1,13 @@
+{
+  "formato": "mecanifica.decisao-forma-global@1",
+  "alvo": "alvo-veiculo-compacto-n2",
+  "blocagem": "andaime-veiculo-compacto-n2-blocagem",
+  "estado": "bloqueado",
+  "motivo": "critica-ou-decisao-ausente",
+  "gates": {
+    "g01": "aprovado",
+    "g02": "bloqueado"
+  },
+  "critica": null,
+  "decisaoUsuario": null
+}

@@ -21,8 +21,8 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 |---|---|---|---|---|---|
 | RT-01 | preservar a base semântica | peça, montagem, identidade e revisão — existente/provado | `prototipos/procedural/v3/`, `src/autoria/`, `docs/mecanifica/ARQUITETURA.md` | `npm test`, typecheck, build, round-trip | G11; regressão bloqueia |
 | RT-02 | descobrir capacidade antes de inventar operação | catálogo, combinação, lacunas e adaptador — N1 provado | `docs/mecanifica/gerado/`, `prototipos/procedural/v3/servicos/provedor-autoria.js` | testes N1, `npm run catalogo:check` | N1 concluída; promover ou registrar lacuna |
-| RT-03 | definir referência e rejeições antes da malha | prancha, landmarks, coerência e comparação — existente/limitado | `tools/mecanifica/prancha*.mjs`, `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md` | relatório medido, sobreposição e vistas abertas | N0/N2; alvo aprovado/bloqueado |
-| RT-04 | modelar objeto inteiro reconhecível | andaime global e blocagem — proposto | novo serviço de andaime do plano; não existe ainda | quatro vistas, três-quartos, reconhecimento cego e aceite do usuário | G01/G02; avançar ou voltar à referência |
+| RT-03 | definir referência e rejeições antes da malha | alvo, landmarks, silhuetas e comparação — N2 provado tecnicamente | `src/autoria/forma-global.js`, `CONTRATO-FORMA-GLOBAL-N2.md` | alvo independente, sobreposição, métricas e corpus adversarial | G01 aprovado; G02 pendente |
+| RT-04 | modelar objeto inteiro reconhecível | andaime global, blocagem e vistas — N2 implementado; reconhecimento pendente | `src/autoria/forma-global.js`, `src/autoria/renderizar-forma-global-svg.js` | quatro vistas, pacote cego, crítica e aceite do usuário | G01 aprovado; G02 bloqueado sem crítico/usuário |
 | RT-05 | editar superfície por intenção/região | tipo de fonte e separação fonte/derivado — N1 provado; executor — proposto | `src/autoria/contrato-autoria-3d.js`, `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` | testes N1; depois prova de representações e edição local | G02/G07; escolher, corrigir ou descartar |
 | RT-06 | manter superfície tecnicamente saudável | continuidade, malha, normais, espessura e curvatura — existente/limitado | validadores atuais + novo validador de superfície | casos bons, degenerados, G0/G1/G2, facetas e ondulação | G07; reprovação retorna à superfície |
 | RT-07 | decompor sem perder a forma global | receita elevada, regiões e fonte/derivado — N1 provado; decomposição — proposta | `src/autoria/contrato-autoria-3d.js`, pacote de família futuro | testes N1; depois comparação antes/depois e influência fonte→produto | G03/G04; aceitar ou redesenhar |
@@ -41,7 +41,7 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 |---|---|---|---|---|
 | N0 verdade | R2B encerrado, contraevidências, base e matriz | baseline, referência inicial, decisões separadas e dossiês | RT-01–RT-03, RT-15 | sim, somente com baseline explícito |
 | N1 contrato | matriz, lacunas, dossiês e serviços existentes | schemas, estados, fonte/derivado, diagnóstico, adaptadores honestos e plano caixa-preta | RT-02, RT-05, RT-07, RT-11 | sim; N1 concluída, N2 pode abrir |
-| N2 forma global | referência, andaime e orçamento | blocagem inteira, vistas, medidas, crítica e aceite | RT-03/RT-04 | sim, somente com G01/G02 |
+| N2 forma global | referência, andaime e orçamento | blocagem inteira, vistas, medidas, crítica e aceite | RT-03/RT-04 | não ainda; G01 passou e G02 aguarda crítico/usuário |
 | N3 superfície | blocagem aprovada e alternativas | compilador, edição regional, procedência e validadores | RT-05–RT-07 | sim, se G07 e edição local passarem |
 | N4 veículo | superfície aprovada e andaime veicular | carro bruto reconhecível e pacote de evidências | RT-09/RT-13 | sim, somente por aceite explícito |
 | N5 integração | carro bruto, mecânica e interfaces | montagem híbrida, conexões e impacto | RT-08/RT-09 | sim, se nenhuma conexão obrigatória faltar |
@@ -60,6 +60,7 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 | evidências R2B | faixa vertical e campeão 20,5/42,9/32,7 mm | leitura de carro | R2B interrompido |
 | `DOSSIE-*.md` | arquitetura e critérios de construção | implementação executada | vinculante para N0/N1 |
 | testes e `RELATORIO-N1-FLUXO-AUTORIA.md` | contratos, schemas, reutilização, diagnóstico e cliente caixa-preta | provedores de forma/superfície prontos | N1 passou; lacunas transferidas para N2/N3 |
+| `RELATORIO-N2-FORMA-GLOBAL.md` e evidências N2 | alvo independente, andaime, blocagem inteira, vistas, métricas e falha segura | reconhecimento independente, superfície ou carro final | G01 aprovado; G02 pendente |
 
 ## Protocolo de mudança
 

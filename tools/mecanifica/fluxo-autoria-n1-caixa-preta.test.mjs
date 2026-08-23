@@ -65,12 +65,12 @@ describe('N1.2 — cliente caixa-preta do fluxo de autoria', () => {
         cobertura: { $id: 'mecanifica.cobertura-fluxo-autoria@1' },
       },
     });
-    expect(cobertura.totais).toEqual({ etapas: 10, cobertas: 1, lacunas: 9 });
+    expect(cobertura.totais).toEqual({ etapas: 10, cobertas: 4, lacunas: 6 });
     expect(cobertura.etapas[0]).toEqual({
       id: 'briefing', classe: 'objetivo', estado: 'coberta', provedores: ['contratos-autoria'],
     });
-    expect(cobertura.etapas.find(({ id }) => id === 'blocagem')).toMatchObject({ estado: 'lacuna', provedores: [] });
-    expect(servico.provedores().map(({ id }) => id)).toEqual(['contratos-autoria', 'procedural-dimensional']);
+    expect(cobertura.etapas.find(({ id }) => id === 'blocagem')).toMatchObject({ estado: 'coberta', provedores: ['forma-global-nativa'] });
+    expect(servico.provedores().map(({ id }) => id)).toEqual(['contratos-autoria', 'forma-global-nativa', 'procedural-dimensional']);
   });
 
   it('reutiliza procedural numa necessidade explícita, mas mantém o veículo bloqueado', () => {
@@ -93,7 +93,7 @@ describe('N1.2 — cliente caixa-preta do fluxo de autoria', () => {
     });
     expect(escolha).toMatchObject({ estado: 'planejada', provedor: 'procedural-dimensional' });
     expect(a.plano.escolhas.find(({ necessidade }) => necessidade === 'etapa-alvo')).toMatchObject({
-      estado: 'bloqueada', provedor: null,
+      estado: 'planejada', provedor: 'forma-global-nativa',
     });
     expect(a.diagnosticos.some(({ codigo }) => codigo === 'provedor-ausente')).toBe(true);
     expect(JSON.stringify(a)).not.toMatch(/[A-Z]:\\|file:\/\/|node:fs|function\s*\(/i);

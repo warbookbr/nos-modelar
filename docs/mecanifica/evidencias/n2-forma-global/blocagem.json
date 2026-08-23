@@ -1,0 +1,3467 @@
+{
+  "formato": "mecanifica.blocagem-global@1",
+  "id": "andaime-veiculo-compacto-n2-blocagem",
+  "objetivo": "veiculo-compacto-n2",
+  "alvo": "alvo-veiculo-compacto-n2",
+  "andaime": "andaime-veiculo-compacto-n2",
+  "familia": "veiculo",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelopeDeclarado": {
+    "min": [
+      -930,
+      0,
+      -2100
+    ],
+    "max": [
+      930,
+      1450,
+      2150
+    ]
+  },
+  "envelopeDerivado": {
+    "min": [
+      -930,
+      0,
+      -2100
+    ],
+    "max": [
+      930,
+      1450,
+      2150
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "eixo-dianteiro",
+      "posicao": [
+        0,
+        320,
+        1350
+      ]
+    },
+    {
+      "id": "eixo-traseiro",
+      "posicao": [
+        0,
+        320,
+        -1350
+      ]
+    },
+    {
+      "id": "nariz",
+      "posicao": [
+        0,
+        500,
+        2150
+      ]
+    },
+    {
+      "id": "pico-cabine",
+      "posicao": [
+        0,
+        1450,
+        300
+      ]
+    },
+    {
+      "id": "traseira",
+      "posicao": [
+        0,
+        350,
+        -2100
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "id": "cabine-global",
+      "regiao": "cabine",
+      "tipo": "prisma",
+      "inicioVertice": 0,
+      "quantidadeVertices": 8,
+      "quantidadeTriangulos": 12
+    },
+    {
+      "id": "corpo-global",
+      "regiao": "corpo-base",
+      "tipo": "prisma",
+      "inicioVertice": 8,
+      "quantidadeVertices": 10,
+      "quantidadeTriangulos": 16
+    },
+    {
+      "id": "roda-dianteira-direita",
+      "regiao": "rodas-dianteiras",
+      "tipo": "cilindro",
+      "inicioVertice": 18,
+      "quantidadeVertices": 34,
+      "quantidadeTriangulos": 64
+    },
+    {
+      "id": "roda-dianteira-esquerda",
+      "regiao": "rodas-dianteiras",
+      "tipo": "cilindro",
+      "inicioVertice": 52,
+      "quantidadeVertices": 34,
+      "quantidadeTriangulos": 64
+    },
+    {
+      "id": "roda-traseira-direita",
+      "regiao": "rodas-traseiras",
+      "tipo": "cilindro",
+      "inicioVertice": 86,
+      "quantidadeVertices": 34,
+      "quantidadeTriangulos": 64
+    },
+    {
+      "id": "roda-traseira-esquerda",
+      "regiao": "rodas-traseiras",
+      "tipo": "cilindro",
+      "inicioVertice": 120,
+      "quantidadeVertices": 34,
+      "quantidadeTriangulos": 64
+    }
+  ],
+  "malha": {
+    "vertices": [
+      [
+        -650,
+        700,
+        -900
+      ],
+      [
+        -650,
+        1320,
+        -600
+      ],
+      [
+        -650,
+        1450,
+        300
+      ],
+      [
+        -650,
+        720,
+        900
+      ],
+      [
+        650,
+        700,
+        -900
+      ],
+      [
+        650,
+        1320,
+        -600
+      ],
+      [
+        650,
+        1450,
+        300
+      ],
+      [
+        650,
+        720,
+        900
+      ],
+      [
+        -850,
+        350,
+        -2100
+      ],
+      [
+        -850,
+        700,
+        -2050
+      ],
+      [
+        -850,
+        800,
+        1900
+      ],
+      [
+        -850,
+        500,
+        2150
+      ],
+      [
+        -850,
+        350,
+        2050
+      ],
+      [
+        850,
+        350,
+        -2100
+      ],
+      [
+        850,
+        700,
+        -2050
+      ],
+      [
+        850,
+        800,
+        1900
+      ],
+      [
+        850,
+        500,
+        2150
+      ],
+      [
+        850,
+        350,
+        2050
+      ],
+      [
+        710,
+        640,
+        1350
+      ],
+      [
+        710,
+        615.6414504036118,
+        1472.4586983568288
+      ],
+      [
+        710,
+        546.2741699796952,
+        1576.2741699796952
+      ],
+      [
+        710,
+        442.45869835682873,
+        1645.6414504036118
+      ],
+      [
+        710,
+        320,
+        1670
+      ],
+      [
+        710,
+        197.5413016431713,
+        1645.6414504036118
+      ],
+      [
+        710,
+        93.72583002030481,
+        1576.2741699796952
+      ],
+      [
+        710,
+        24.35854959638823,
+        1472.4586983568288
+      ],
+      [
+        710,
+        0,
+        1350
+      ],
+      [
+        710,
+        24.35854959638823,
+        1227.5413016431712
+      ],
+      [
+        710,
+        93.72583002030473,
+        1123.7258300203048
+      ],
+      [
+        710,
+        197.5413016431711,
+        1054.3585495963885
+      ],
+      [
+        710,
+        319.99999999999994,
+        1030
+      ],
+      [
+        710,
+        442.4586983568288,
+        1054.3585495963882
+      ],
+      [
+        710,
+        546.2741699796952,
+        1123.7258300203048
+      ],
+      [
+        710,
+        615.6414504036117,
+        1227.541301643171
+      ],
+      [
+        930,
+        640,
+        1350
+      ],
+      [
+        930,
+        615.6414504036118,
+        1472.4586983568288
+      ],
+      [
+        930,
+        546.2741699796952,
+        1576.2741699796952
+      ],
+      [
+        930,
+        442.45869835682873,
+        1645.6414504036118
+      ],
+      [
+        930,
+        320,
+        1670
+      ],
+      [
+        930,
+        197.5413016431713,
+        1645.6414504036118
+      ],
+      [
+        930,
+        93.72583002030481,
+        1576.2741699796952
+      ],
+      [
+        930,
+        24.35854959638823,
+        1472.4586983568288
+      ],
+      [
+        930,
+        0,
+        1350
+      ],
+      [
+        930,
+        24.35854959638823,
+        1227.5413016431712
+      ],
+      [
+        930,
+        93.72583002030473,
+        1123.7258300203048
+      ],
+      [
+        930,
+        197.5413016431711,
+        1054.3585495963885
+      ],
+      [
+        930,
+        319.99999999999994,
+        1030
+      ],
+      [
+        930,
+        442.4586983568288,
+        1054.3585495963882
+      ],
+      [
+        930,
+        546.2741699796952,
+        1123.7258300203048
+      ],
+      [
+        930,
+        615.6414504036117,
+        1227.541301643171
+      ],
+      [
+        710,
+        320,
+        1350
+      ],
+      [
+        930,
+        320,
+        1350
+      ],
+      [
+        -930,
+        640,
+        1350
+      ],
+      [
+        -930,
+        615.6414504036118,
+        1472.4586983568288
+      ],
+      [
+        -930,
+        546.2741699796952,
+        1576.2741699796952
+      ],
+      [
+        -930,
+        442.45869835682873,
+        1645.6414504036118
+      ],
+      [
+        -930,
+        320,
+        1670
+      ],
+      [
+        -930,
+        197.5413016431713,
+        1645.6414504036118
+      ],
+      [
+        -930,
+        93.72583002030481,
+        1576.2741699796952
+      ],
+      [
+        -930,
+        24.35854959638823,
+        1472.4586983568288
+      ],
+      [
+        -930,
+        0,
+        1350
+      ],
+      [
+        -930,
+        24.35854959638823,
+        1227.5413016431712
+      ],
+      [
+        -930,
+        93.72583002030473,
+        1123.7258300203048
+      ],
+      [
+        -930,
+        197.5413016431711,
+        1054.3585495963885
+      ],
+      [
+        -930,
+        319.99999999999994,
+        1030
+      ],
+      [
+        -930,
+        442.4586983568288,
+        1054.3585495963882
+      ],
+      [
+        -930,
+        546.2741699796952,
+        1123.7258300203048
+      ],
+      [
+        -930,
+        615.6414504036117,
+        1227.541301643171
+      ],
+      [
+        -710,
+        640,
+        1350
+      ],
+      [
+        -710,
+        615.6414504036118,
+        1472.4586983568288
+      ],
+      [
+        -710,
+        546.2741699796952,
+        1576.2741699796952
+      ],
+      [
+        -710,
+        442.45869835682873,
+        1645.6414504036118
+      ],
+      [
+        -710,
+        320,
+        1670
+      ],
+      [
+        -710,
+        197.5413016431713,
+        1645.6414504036118
+      ],
+      [
+        -710,
+        93.72583002030481,
+        1576.2741699796952
+      ],
+      [
+        -710,
+        24.35854959638823,
+        1472.4586983568288
+      ],
+      [
+        -710,
+        0,
+        1350
+      ],
+      [
+        -710,
+        24.35854959638823,
+        1227.5413016431712
+      ],
+      [
+        -710,
+        93.72583002030473,
+        1123.7258300203048
+      ],
+      [
+        -710,
+        197.5413016431711,
+        1054.3585495963885
+      ],
+      [
+        -710,
+        319.99999999999994,
+        1030
+      ],
+      [
+        -710,
+        442.4586983568288,
+        1054.3585495963882
+      ],
+      [
+        -710,
+        546.2741699796952,
+        1123.7258300203048
+      ],
+      [
+        -710,
+        615.6414504036117,
+        1227.541301643171
+      ],
+      [
+        -930,
+        320,
+        1350
+      ],
+      [
+        -710,
+        320,
+        1350
+      ],
+      [
+        710,
+        640,
+        -1350
+      ],
+      [
+        710,
+        615.6414504036118,
+        -1227.5413016431712
+      ],
+      [
+        710,
+        546.2741699796952,
+        -1123.7258300203048
+      ],
+      [
+        710,
+        442.45869835682873,
+        -1054.3585495963882
+      ],
+      [
+        710,
+        320,
+        -1030
+      ],
+      [
+        710,
+        197.5413016431713,
+        -1054.3585495963882
+      ],
+      [
+        710,
+        93.72583002030481,
+        -1123.7258300203048
+      ],
+      [
+        710,
+        24.35854959638823,
+        -1227.5413016431712
+      ],
+      [
+        710,
+        0,
+        -1350
+      ],
+      [
+        710,
+        24.35854959638823,
+        -1472.4586983568288
+      ],
+      [
+        710,
+        93.72583002030473,
+        -1576.2741699796952
+      ],
+      [
+        710,
+        197.5413016431711,
+        -1645.6414504036115
+      ],
+      [
+        710,
+        319.99999999999994,
+        -1670
+      ],
+      [
+        710,
+        442.4586983568288,
+        -1645.6414504036118
+      ],
+      [
+        710,
+        546.2741699796952,
+        -1576.2741699796952
+      ],
+      [
+        710,
+        615.6414504036117,
+        -1472.458698356829
+      ],
+      [
+        930,
+        640,
+        -1350
+      ],
+      [
+        930,
+        615.6414504036118,
+        -1227.5413016431712
+      ],
+      [
+        930,
+        546.2741699796952,
+        -1123.7258300203048
+      ],
+      [
+        930,
+        442.45869835682873,
+        -1054.3585495963882
+      ],
+      [
+        930,
+        320,
+        -1030
+      ],
+      [
+        930,
+        197.5413016431713,
+        -1054.3585495963882
+      ],
+      [
+        930,
+        93.72583002030481,
+        -1123.7258300203048
+      ],
+      [
+        930,
+        24.35854959638823,
+        -1227.5413016431712
+      ],
+      [
+        930,
+        0,
+        -1350
+      ],
+      [
+        930,
+        24.35854959638823,
+        -1472.4586983568288
+      ],
+      [
+        930,
+        93.72583002030473,
+        -1576.2741699796952
+      ],
+      [
+        930,
+        197.5413016431711,
+        -1645.6414504036115
+      ],
+      [
+        930,
+        319.99999999999994,
+        -1670
+      ],
+      [
+        930,
+        442.4586983568288,
+        -1645.6414504036118
+      ],
+      [
+        930,
+        546.2741699796952,
+        -1576.2741699796952
+      ],
+      [
+        930,
+        615.6414504036117,
+        -1472.458698356829
+      ],
+      [
+        710,
+        320,
+        -1350
+      ],
+      [
+        930,
+        320,
+        -1350
+      ],
+      [
+        -930,
+        640,
+        -1350
+      ],
+      [
+        -930,
+        615.6414504036118,
+        -1227.5413016431712
+      ],
+      [
+        -930,
+        546.2741699796952,
+        -1123.7258300203048
+      ],
+      [
+        -930,
+        442.45869835682873,
+        -1054.3585495963882
+      ],
+      [
+        -930,
+        320,
+        -1030
+      ],
+      [
+        -930,
+        197.5413016431713,
+        -1054.3585495963882
+      ],
+      [
+        -930,
+        93.72583002030481,
+        -1123.7258300203048
+      ],
+      [
+        -930,
+        24.35854959638823,
+        -1227.5413016431712
+      ],
+      [
+        -930,
+        0,
+        -1350
+      ],
+      [
+        -930,
+        24.35854959638823,
+        -1472.4586983568288
+      ],
+      [
+        -930,
+        93.72583002030473,
+        -1576.2741699796952
+      ],
+      [
+        -930,
+        197.5413016431711,
+        -1645.6414504036115
+      ],
+      [
+        -930,
+        319.99999999999994,
+        -1670
+      ],
+      [
+        -930,
+        442.4586983568288,
+        -1645.6414504036118
+      ],
+      [
+        -930,
+        546.2741699796952,
+        -1576.2741699796952
+      ],
+      [
+        -930,
+        615.6414504036117,
+        -1472.458698356829
+      ],
+      [
+        -710,
+        640,
+        -1350
+      ],
+      [
+        -710,
+        615.6414504036118,
+        -1227.5413016431712
+      ],
+      [
+        -710,
+        546.2741699796952,
+        -1123.7258300203048
+      ],
+      [
+        -710,
+        442.45869835682873,
+        -1054.3585495963882
+      ],
+      [
+        -710,
+        320,
+        -1030
+      ],
+      [
+        -710,
+        197.5413016431713,
+        -1054.3585495963882
+      ],
+      [
+        -710,
+        93.72583002030481,
+        -1123.7258300203048
+      ],
+      [
+        -710,
+        24.35854959638823,
+        -1227.5413016431712
+      ],
+      [
+        -710,
+        0,
+        -1350
+      ],
+      [
+        -710,
+        24.35854959638823,
+        -1472.4586983568288
+      ],
+      [
+        -710,
+        93.72583002030473,
+        -1576.2741699796952
+      ],
+      [
+        -710,
+        197.5413016431711,
+        -1645.6414504036115
+      ],
+      [
+        -710,
+        319.99999999999994,
+        -1670
+      ],
+      [
+        -710,
+        442.4586983568288,
+        -1645.6414504036118
+      ],
+      [
+        -710,
+        546.2741699796952,
+        -1576.2741699796952
+      ],
+      [
+        -710,
+        615.6414504036117,
+        -1472.458698356829
+      ],
+      [
+        -930,
+        320,
+        -1350
+      ],
+      [
+        -710,
+        320,
+        -1350
+      ]
+    ],
+    "faces": [
+      {
+        "vertices": [
+          0,
+          1,
+          2
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          4,
+          6,
+          5
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          0,
+          2,
+          3
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          4,
+          7,
+          6
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          0,
+          1,
+          5
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          0,
+          5,
+          4
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          1,
+          2,
+          6
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          1,
+          6,
+          5
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          2,
+          3,
+          7
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          2,
+          7,
+          6
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          3,
+          0,
+          4
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          3,
+          4,
+          7
+        ],
+        "volume": "cabine-global",
+        "regiao": "cabine"
+      },
+      {
+        "vertices": [
+          8,
+          9,
+          10
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          13,
+          15,
+          14
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          8,
+          10,
+          11
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          13,
+          16,
+          15
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          8,
+          11,
+          12
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          13,
+          17,
+          16
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          8,
+          9,
+          14
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          8,
+          14,
+          13
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          9,
+          10,
+          15
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          9,
+          15,
+          14
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          10,
+          11,
+          16
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          10,
+          16,
+          15
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          11,
+          12,
+          17
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          11,
+          17,
+          16
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          12,
+          8,
+          13
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          12,
+          13,
+          17
+        ],
+        "volume": "corpo-global",
+        "regiao": "corpo-base"
+      },
+      {
+        "vertices": [
+          50,
+          19,
+          18
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          34,
+          35
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          18,
+          19,
+          35
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          18,
+          35,
+          34
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          20,
+          19
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          35,
+          36
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          19,
+          20,
+          36
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          19,
+          36,
+          35
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          21,
+          20
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          36,
+          37
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          20,
+          21,
+          37
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          20,
+          37,
+          36
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          22,
+          21
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          37,
+          38
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          21,
+          22,
+          38
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          21,
+          38,
+          37
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          23,
+          22
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          38,
+          39
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          22,
+          23,
+          39
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          22,
+          39,
+          38
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          24,
+          23
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          39,
+          40
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          23,
+          24,
+          40
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          23,
+          40,
+          39
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          25,
+          24
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          40,
+          41
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          24,
+          25,
+          41
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          24,
+          41,
+          40
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          26,
+          25
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          41,
+          42
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          25,
+          26,
+          42
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          25,
+          42,
+          41
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          27,
+          26
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          42,
+          43
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          26,
+          27,
+          43
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          26,
+          43,
+          42
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          28,
+          27
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          43,
+          44
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          27,
+          28,
+          44
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          27,
+          44,
+          43
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          29,
+          28
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          44,
+          45
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          28,
+          29,
+          45
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          28,
+          45,
+          44
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          30,
+          29
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          45,
+          46
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          29,
+          30,
+          46
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          29,
+          46,
+          45
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          31,
+          30
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          46,
+          47
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          30,
+          31,
+          47
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          30,
+          47,
+          46
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          32,
+          31
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          47,
+          48
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          31,
+          32,
+          48
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          31,
+          48,
+          47
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          33,
+          32
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          48,
+          49
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          32,
+          33,
+          49
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          32,
+          49,
+          48
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          50,
+          18,
+          33
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          51,
+          49,
+          34
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          33,
+          18,
+          34
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          33,
+          34,
+          49
+        ],
+        "volume": "roda-dianteira-direita",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          53,
+          52
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          68,
+          69
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          52,
+          53,
+          69
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          52,
+          69,
+          68
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          54,
+          53
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          69,
+          70
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          53,
+          54,
+          70
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          53,
+          70,
+          69
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          55,
+          54
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          70,
+          71
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          54,
+          55,
+          71
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          54,
+          71,
+          70
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          56,
+          55
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          71,
+          72
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          55,
+          56,
+          72
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          55,
+          72,
+          71
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          57,
+          56
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          72,
+          73
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          56,
+          57,
+          73
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          56,
+          73,
+          72
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          58,
+          57
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          73,
+          74
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          57,
+          58,
+          74
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          57,
+          74,
+          73
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          59,
+          58
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          74,
+          75
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          58,
+          59,
+          75
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          58,
+          75,
+          74
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          60,
+          59
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          75,
+          76
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          59,
+          60,
+          76
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          59,
+          76,
+          75
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          61,
+          60
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          76,
+          77
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          60,
+          61,
+          77
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          60,
+          77,
+          76
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          62,
+          61
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          77,
+          78
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          61,
+          62,
+          78
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          61,
+          78,
+          77
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          63,
+          62
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          78,
+          79
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          62,
+          63,
+          79
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          62,
+          79,
+          78
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          64,
+          63
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          79,
+          80
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          63,
+          64,
+          80
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          63,
+          80,
+          79
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          65,
+          64
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          80,
+          81
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          64,
+          65,
+          81
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          64,
+          81,
+          80
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          66,
+          65
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          81,
+          82
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          65,
+          66,
+          82
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          65,
+          82,
+          81
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          67,
+          66
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          82,
+          83
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          66,
+          67,
+          83
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          66,
+          83,
+          82
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          84,
+          52,
+          67
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          85,
+          83,
+          68
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          67,
+          52,
+          68
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          67,
+          68,
+          83
+        ],
+        "volume": "roda-dianteira-esquerda",
+        "regiao": "rodas-dianteiras"
+      },
+      {
+        "vertices": [
+          118,
+          87,
+          86
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          102,
+          103
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          86,
+          87,
+          103
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          86,
+          103,
+          102
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          88,
+          87
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          103,
+          104
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          87,
+          88,
+          104
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          87,
+          104,
+          103
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          89,
+          88
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          104,
+          105
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          88,
+          89,
+          105
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          88,
+          105,
+          104
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          90,
+          89
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          105,
+          106
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          89,
+          90,
+          106
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          89,
+          106,
+          105
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          91,
+          90
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          106,
+          107
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          90,
+          91,
+          107
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          90,
+          107,
+          106
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          92,
+          91
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          107,
+          108
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          91,
+          92,
+          108
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          91,
+          108,
+          107
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          93,
+          92
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          108,
+          109
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          92,
+          93,
+          109
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          92,
+          109,
+          108
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          94,
+          93
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          109,
+          110
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          93,
+          94,
+          110
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          93,
+          110,
+          109
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          95,
+          94
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          110,
+          111
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          94,
+          95,
+          111
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          94,
+          111,
+          110
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          96,
+          95
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          111,
+          112
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          95,
+          96,
+          112
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          95,
+          112,
+          111
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          97,
+          96
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          112,
+          113
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          96,
+          97,
+          113
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          96,
+          113,
+          112
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          98,
+          97
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          113,
+          114
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          97,
+          98,
+          114
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          97,
+          114,
+          113
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          99,
+          98
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          114,
+          115
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          98,
+          99,
+          115
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          98,
+          115,
+          114
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          100,
+          99
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          115,
+          116
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          99,
+          100,
+          116
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          99,
+          116,
+          115
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          101,
+          100
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          116,
+          117
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          100,
+          101,
+          117
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          100,
+          117,
+          116
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          118,
+          86,
+          101
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          119,
+          117,
+          102
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          101,
+          86,
+          102
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          101,
+          102,
+          117
+        ],
+        "volume": "roda-traseira-direita",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          121,
+          120
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          136,
+          137
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          120,
+          121,
+          137
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          120,
+          137,
+          136
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          122,
+          121
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          137,
+          138
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          121,
+          122,
+          138
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          121,
+          138,
+          137
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          123,
+          122
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          138,
+          139
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          122,
+          123,
+          139
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          122,
+          139,
+          138
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          124,
+          123
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          139,
+          140
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          123,
+          124,
+          140
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          123,
+          140,
+          139
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          125,
+          124
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          140,
+          141
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          124,
+          125,
+          141
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          124,
+          141,
+          140
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          126,
+          125
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          141,
+          142
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          125,
+          126,
+          142
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          125,
+          142,
+          141
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          127,
+          126
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          142,
+          143
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          126,
+          127,
+          143
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          126,
+          143,
+          142
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          128,
+          127
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          143,
+          144
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          127,
+          128,
+          144
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          127,
+          144,
+          143
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          129,
+          128
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          144,
+          145
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          128,
+          129,
+          145
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          128,
+          145,
+          144
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          130,
+          129
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          145,
+          146
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          129,
+          130,
+          146
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          129,
+          146,
+          145
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          131,
+          130
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          146,
+          147
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          130,
+          131,
+          147
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          130,
+          147,
+          146
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          132,
+          131
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          147,
+          148
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          131,
+          132,
+          148
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          131,
+          148,
+          147
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          133,
+          132
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          148,
+          149
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          132,
+          133,
+          149
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          132,
+          149,
+          148
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          134,
+          133
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          149,
+          150
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          133,
+          134,
+          150
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          133,
+          150,
+          149
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          135,
+          134
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          150,
+          151
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          134,
+          135,
+          151
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          134,
+          151,
+          150
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          152,
+          120,
+          135
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          153,
+          151,
+          136
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          135,
+          120,
+          136
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      },
+      {
+        "vertices": [
+          135,
+          136,
+          151
+        ],
+        "volume": "roda-traseira-esquerda",
+        "regiao": "rodas-traseiras"
+      }
+    ]
+  },
+  "estatisticas": {
+    "volumes": 6,
+    "vertices": 154,
+    "triangulos": 284
+  }
+}

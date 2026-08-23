@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-600 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+609 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -335,6 +335,7 @@
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
+- `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
@@ -376,6 +377,7 @@
 - `RELATORIO-MOTOR-DE-PRANCHA-R3.md` — Motor de Prancha — R3: implementação e replay do corpus
 - `RELATORIO-MOTOR-DE-PRANCHA-R4.md` — Motor de Prancha — R4: autoria fria, revisão e limite de impacto
 - `RELATORIO-N1-FLUXO-AUTORIA.md` — Relatório N1 — contratos e orquestração da autoria 3D
+- `RELATORIO-N2-FORMA-GLOBAL.md` — Relatório N2 — forma global
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
@@ -545,7 +547,7 @@
 ## prototipos/procedural/v3/servicos/
 
 - `descoberta.js` — descoberta.js — porta neutra de descoberta procedural; sem I/O, MCP ou visor.
-- `fluxo-autoria.js` — Configuração nativa atual do fluxo N1: contratos + descoberta procedural.
+- `fluxo-autoria.js` — Configuração nativa atual: fluxo N1 + capacidade medida de forma global N2.
 - `provedor-autoria.js` — Adaptador N1 da descoberta procedural para o contrato de provedores. Ele só planeja: não executa receita, não registra lacuna e não escreve.
 
 ## src/autoria/
@@ -564,6 +566,7 @@
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
+- `forma-global.js` — Contrato e executor neutros da N2. A fonte é um andaime de volumes semânticos; a malha e as projeções são produtos derivados sem identidade. Este módulo não …
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
@@ -573,10 +576,13 @@
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
+- `provedor-forma-global.js` — Provedor N2: cobre planejamento de alvo, andaime e blocagem porque há um serviço puro correspondente. Crítica e aceite continuam fora deste manifesto.
+- `renderizar-forma-global-svg.js` — Adaptador SVG puro da N2. Consome somente alvo e blocagem neutros; não usa DOM, Three.js, câmera de runtime ou caminhos de arquivo.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
-- `schemas-autoria-3d.js` — JSON Schemas descobríveis da N1. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
+- `schemas-autoria-3d.js` — JSON Schemas descobríveis de N1/N2. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
+- `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 
@@ -719,6 +725,9 @@
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
+- `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
+- `forma-global-n2.test.mjs` — Provas unitárias e adversariais do contrato, G01, G02 e render N2.
+- `gerar-evidencias-forma-global-n2.mjs` — Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas. SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
 - `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
