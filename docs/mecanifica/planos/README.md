@@ -9,10 +9,9 @@ Ele governa a plataforma nativa de autoria por famílias: preserva o procedural,
 montagens, identidade, revisão, bancada e MCP; acrescenta andaime global,
 superfície semântica, conectividade obrigatória e aprovação separada de
 plataforma/artefato. O fluxo não depende de Blender, DCC, CAD ou formatos
-externos. N0 foi concluído com a matriz de rastreabilidade. A N1 está em
-execução: [N1.1](../FLUXO-AUTORIA-N1.md) tornou objetivo, receita elevada,
-provedores, planejamento e transições contratos executáveis sem mudar
-geometria; N1.2 ainda precisa fechar schemas e adaptadores reais. Os três
+externos. N0 e N1 foram concluídos. O [relatório N1](../RELATORIO-N1-FLUXO-AUTORIA.md)
+fecha objetivo, receita elevada, schemas, provedores, planejamento, transições e
+cliente caixa-preta sem mudar geometria. A próxima fatia é N2 — forma global. Os três
 dossiês vinculantes, mais a [matriz
 executável de rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
 ficam ligados ao plano.

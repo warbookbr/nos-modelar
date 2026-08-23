@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-593 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+600 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -375,6 +375,7 @@
 - `RELATORIO-MOTOR-DE-PRANCHA-R2.md` — Motor de Prancha — R2: contrato de autoria confiável
 - `RELATORIO-MOTOR-DE-PRANCHA-R3.md` — Motor de Prancha — R3: implementação e replay do corpus
 - `RELATORIO-MOTOR-DE-PRANCHA-R4.md` — Motor de Prancha — R4: autoria fria, revisão e limite de impacto
+- `RELATORIO-N1-FLUXO-AUTORIA.md` — Relatório N1 — contratos e orquestração da autoria 3D
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
@@ -544,6 +545,7 @@
 ## prototipos/procedural/v3/servicos/
 
 - `descoberta.js` — descoberta.js — porta neutra de descoberta procedural; sem I/O, MCP ou visor.
+- `fluxo-autoria.js` — Configuração nativa atual do fluxo N1: contratos + descoberta procedural.
 - `provedor-autoria.js` — Adaptador N1 da descoberta procedural para o contrato de provedores. Ele só planeja: não executa receita, não registra lacuna e não escreve.
 
 ## src/autoria/
@@ -570,8 +572,11 @@
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
+- `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
+- `schemas-autoria-3d.js` — JSON Schemas descobríveis da N1. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
+- `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 
@@ -712,7 +717,9 @@
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
 - `exportar-peca.test.ts` — Exportação: contrato do artefato e estado sem catálogo publicado.
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
+- `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
+- `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.

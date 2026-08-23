@@ -7,6 +7,7 @@ import {
 
 export const FORMATO_PLANO_FLUXO_AUTORIA = 'mecanifica.plano-fluxo-autoria@1';
 export const FORMATO_EXECUCAO_FLUXO_AUTORIA = 'mecanifica.execucao-fluxo-autoria@1';
+export const FORMATO_PROTOCOLO_FLUXO_AUTORIA = 'mecanifica.protocolo-fluxo-autoria@1';
 
 const PERFIS = Object.freeze({
   'peca-mecanica': ['briefing', 'alvo', 'decomposicao', 'integracao', 'superficie', 'revisao', 'promocao'],
@@ -20,6 +21,15 @@ const CLASSE_ETAPA = Object.freeze({
   decomposicao: 'semantica', integracao: 'montagem', superficie: 'superficie',
   estados: 'estados', revisao: 'validacao', promocao: 'publicacao',
 });
+
+export function descreverProtocoloAutoria(familia) {
+  const etapas = PERFIS[familia];
+  if (!etapas) falhar('familia-invalida', `família '${familia}' não possui protocolo de autoria.`);
+  return congelar({
+    formato: FORMATO_PROTOCOLO_FLUXO_AUTORIA, familia,
+    etapas: etapas.map((id) => ({ id, classe: CLASSE_ETAPA[id] })),
+  });
+}
 
 export class ErroFluxoAutoria extends Error {
   constructor(codigo, mensagem) {
@@ -82,8 +92,8 @@ function conferirResposta(valor, provedor) {
 }
 
 function necessidadesDoFluxo(objetivo) {
-  const basicas = PERFIS[objetivo.familia].map((etapa) => ({
-    id: `etapa-${etapa}`, etapa, classe: CLASSE_ETAPA[etapa],
+  const basicas = descreverProtocoloAutoria(objetivo.familia).etapas.map(({ id: etapa, classe }) => ({
+    id: `etapa-${etapa}`, etapa, classe,
     artefatos: { entra: [], sai: [] }, interfaces: { entra: [], sai: [] },
     requisitos: [], obrigatoria: true, origem: 'fluxo',
   }));

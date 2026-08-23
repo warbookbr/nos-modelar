@@ -20,16 +20,16 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 | ID | Objetivo verificável | Capacidade e estado | Fonte canônica | Teste/evidência | Gate e decisão |
 |---|---|---|---|---|---|
 | RT-01 | preservar a base semântica | peça, montagem, identidade e revisão — existente/provado | `prototipos/procedural/v3/`, `src/autoria/`, `docs/mecanifica/ARQUITETURA.md` | `npm test`, typecheck, build, round-trip | G11; regressão bloqueia |
-| RT-02 | descobrir capacidade antes de inventar operação | catálogo, combinação e lacunas — existente/provado; adaptador N1.1 provado | `docs/mecanifica/gerado/`, `prototipos/procedural/v3/servicos/provedor-autoria.js` | teste N1, `npm run catalogo:check`, `npm run mcp:ensaio` | N1; promover ou registrar lacuna |
+| RT-02 | descobrir capacidade antes de inventar operação | catálogo, combinação, lacunas e adaptador — N1 provado | `docs/mecanifica/gerado/`, `prototipos/procedural/v3/servicos/provedor-autoria.js` | testes N1, `npm run catalogo:check` | N1 concluída; promover ou registrar lacuna |
 | RT-03 | definir referência e rejeições antes da malha | prancha, landmarks, coerência e comparação — existente/limitado | `tools/mecanifica/prancha*.mjs`, `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md` | relatório medido, sobreposição e vistas abertas | N0/N2; alvo aprovado/bloqueado |
 | RT-04 | modelar objeto inteiro reconhecível | andaime global e blocagem — proposto | novo serviço de andaime do plano; não existe ainda | quatro vistas, três-quartos, reconhecimento cego e aceite do usuário | G01/G02; avançar ou voltar à referência |
-| RT-05 | editar superfície por intenção/região | tipo de fonte e separação fonte/derivado — contrato N1.1; executor — proposto | `src/autoria/contrato-autoria-3d.js`, `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` | teste N1; depois prova de duas representações, edição local, compilação e procedência | G02/G07; escolher, corrigir ou descartar |
+| RT-05 | editar superfície por intenção/região | tipo de fonte e separação fonte/derivado — N1 provado; executor — proposto | `src/autoria/contrato-autoria-3d.js`, `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` | testes N1; depois prova de representações e edição local | G02/G07; escolher, corrigir ou descartar |
 | RT-06 | manter superfície tecnicamente saudável | continuidade, malha, normais, espessura e curvatura — existente/limitado | validadores atuais + novo validador de superfície | casos bons, degenerados, G0/G1/G2, facetas e ondulação | G07; reprovação retorna à superfície |
-| RT-07 | decompor sem perder a forma global | receita elevada, regiões e fonte/derivado — contrato N1.1; decomposição — proposta | `src/autoria/contrato-autoria-3d.js`, pacote de família futuro | teste N1; depois comparação antes/depois, IDs e influência fonte→produto | G03/G04; aceitar ou redesenhar |
+| RT-07 | decompor sem perder a forma global | receita elevada, regiões e fonte/derivado — N1 provado; decomposição — proposta | `src/autoria/contrato-autoria-3d.js`, pacote de família futuro | testes N1; depois comparação antes/depois e influência fonte→produto | G03/G04; aceitar ou redesenhar |
 | RT-08 | impedir peças flutuantes | interfaces, adjacências e conectividade — existente/limitado | montagens v4, portas e relações; ampliado em N1/N5 | grafo de adjacências, distância, orientação, contato e folga | G05/G06; componente isolado reprova |
 | RT-09 | integrar superfície e mecânica | composição híbrida — existente/limitado | montagens, resolvedor e exportação | carro/robô pequeno com peça procedural e superfície nativa | G04; integrar ou retornar |
 | RT-10 | manter corpo em estados válidos | pose estática — existente/limitado; trajetória — proposto | montagens/poses atuais; contrato cinemático posterior | neutra, articulada e envelope quando essencial | G05; movimento não é presumido |
-| RT-11 | dar à IA um caminho único | planejador e máquina de estados — N1.1 provado; provedores reais e porta caixa-preta — parciais | `src/autoria/orquestrar-fluxo-autoria.js`, `FLUXO-AUTORIA-N1.md` | teste N1; cliente caixa-preta permanece N1.2/N7 | N1/N7; serviço aprovado ou bloqueado |
+| RT-11 | dar à IA um caminho único | planejador, estados, schemas, fachada e cliente caixa-preta — N1 provado | `src/autoria/servico-fluxo-autoria.js`, `RELATORIO-N1-FLUXO-AUTORIA.md` | testes N1 e `npm run autoria:schemas:check` | N1 concluída; exposição MCP permanece N7 |
 | RT-12 | reduzir contexto sem esconder falha | skills, MCP e revisão — existente/limitado | `.claude/skills/`, `tools/mcp/`, `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` | chamada somente leitura, proposta, captura e aplicação opt-in | G09; expor somente serviço provado |
 | RT-13 | provar carro reconhecível | veículo bruto — proposto | pacote de família veículo, referência e superfície | roda/postura, capô, cabine, cintura, para-lamas, traseira e leitura cega | N4/G04; usuário aprova ou interrompe |
 | RT-14 | provar humanoide conectado | corpo-base e cobertura — proposto | pacote de família humanoide, andaime e interfaces | tórax, cabeça, pelve, membros, cadeia conectada e vistas | N6/G05; usuário aprova ou interrompe |
@@ -40,7 +40,7 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 | Fase | Entradas obrigatórias | Saídas obrigatórias | Linhas cobertas | Pode abrir a próxima? |
 |---|---|---|---|---|
 | N0 verdade | R2B encerrado, contraevidências, base e matriz | baseline, referência inicial, decisões separadas e dossiês | RT-01–RT-03, RT-15 | sim, somente com baseline explícito |
-| N1 contrato | matriz, lacunas, dossiês e serviços existentes | N1.1: estados, fonte/derivado, diagnóstico e adaptador procedural; N1.2: schemas, demais adaptadores e plano caixa-preta | RT-02, RT-05, RT-07, RT-11 | não ainda; N1.2 permanece aberta |
+| N1 contrato | matriz, lacunas, dossiês e serviços existentes | schemas, estados, fonte/derivado, diagnóstico, adaptadores honestos e plano caixa-preta | RT-02, RT-05, RT-07, RT-11 | sim; N1 concluída, N2 pode abrir |
 | N2 forma global | referência, andaime e orçamento | blocagem inteira, vistas, medidas, crítica e aceite | RT-03/RT-04 | sim, somente com G01/G02 |
 | N3 superfície | blocagem aprovada e alternativas | compilador, edição regional, procedência e validadores | RT-05–RT-07 | sim, se G07 e edição local passarem |
 | N4 veículo | superfície aprovada e andaime veicular | carro bruto reconhecível e pacote de evidências | RT-09/RT-13 | sim, somente por aceite explícito |
@@ -59,7 +59,7 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 | `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` | hierarquia, reutilização e estados estáticos | robô visualmente bom ou conectado | aprovado como plataforma, forma limitada |
 | evidências R2B | faixa vertical e campeão 20,5/42,9/32,7 mm | leitura de carro | R2B interrompido |
 | `DOSSIE-*.md` | arquitetura e critérios de construção | implementação executada | vinculante para N0/N1 |
-| `tools/mecanifica/fluxo-autoria-n1.test.ts` | contratos, reutilização procedural, diagnóstico e falha segura | provedores de forma/superfície prontos | N1.1 passou; N1.2 permanece aberta |
+| testes e `RELATORIO-N1-FLUXO-AUTORIA.md` | contratos, schemas, reutilização, diagnóstico e cliente caixa-preta | provedores de forma/superfície prontos | N1 passou; lacunas transferidas para N2/N3 |
 
 ## Protocolo de mudança
 

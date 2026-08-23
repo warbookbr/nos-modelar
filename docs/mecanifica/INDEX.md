@@ -228,10 +228,12 @@ aplicação publicada aqui.
   Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
 - O único plano **ativo** é a [arquitetura híbrida nativa de autoria por famílias](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
   (`docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`)
-  com N0 concluído e N1 em execução. A [entrega N1.1](FLUXO-AUTORIA-N1.md)
-  (`docs/mecanifica/FLUXO-AUTORIA-N1.md`) já torna objetivo, receita elevada,
-  provedores, planejamento e falha segura contratos executáveis; schemas e
-  demais adaptadores reais permanecem na N1.2. O plano preserva o procedural, identidade, montagem, revisão,
+  com N0 e N1 concluídos. O [relatório N1](RELATORIO-N1-FLUXO-AUTORIA.md)
+  (`docs/mecanifica/RELATORIO-N1-FLUXO-AUTORIA.md`) fecha objetivo, receita
+  elevada, schemas, provedores, planejamento, falha segura e cliente caixa-preta.
+  O contrato operacional permanece em [`FLUXO-AUTORIA-N1.md`](FLUXO-AUTORIA-N1.md)
+  (`docs/mecanifica/FLUXO-AUTORIA-N1.md`).
+  A próxima fatia é N2 — forma global. O plano preserva o procedural, identidade, montagem, revisão,
   bancada e MCP; acrescenta andaime global, superfície semântica nativa,
   conectividade e aprovação separada da plataforma/artefato, sem software
   externo. Os dossiês vinculantes são
@@ -441,6 +443,7 @@ npm run docs:links:check
 npm run planos:check
 npm run exportar:check
 npm run catalogo:check
+npm run autoria:schemas:check
 npm run mcp:check
 npm run mcp:ensaio
 ```

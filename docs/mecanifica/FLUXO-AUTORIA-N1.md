@@ -2,15 +2,15 @@
 
 ## Estado e alcance
 
-Esta é a primeira entrega executável da N1 do plano
+Este é o contrato executável concluído da N1 do plano
 [`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 Ela cria a fronteira neutra acima dos serviços existentes sem mudar geometria
 pública, receitas atuais, montagem, revisão, visor ou MCP.
 
-A entrega prova contrato e falha segura. Ela **não** afirma que os provedores de
+A N1 prova contrato, descoberta e falha segura. Ela **não** afirma que os provedores de
 andaime, blocagem, superfície semântica e conectividade já existem. Um provedor
-completo usado nos testes é fixture; o único adaptador real novo é o da
-descoberta procedural existente.
+completo usado nos testes é fixture; os adaptadores reais são o contrato de
+briefing e a descoberta procedural existente.
 
 ## Contratos
 
@@ -70,6 +70,10 @@ capacidades existentes primeiro; somente sem cadeia compatível chama
 `analisarLacuna`. Não executa receita, não instala extensão, não grava lacuna e
 não promove operação.
 
+O adaptador `contratos-autoria` cobre somente `briefing/objetivo`. Ele confirma
+que o objetivo já atravessou o normalizador e produz o roteiro dessa etapa. Não
+declara que referência, forma, superfície ou publicação estão aprovadas.
+
 ## Orquestração
 
 `planejarFluxoAutoria` deriva o protocolo por família e busca cobertura por
@@ -109,21 +113,39 @@ O serviço registra transições imutáveis em memória. Ele ainda não compila,
 renderiza, persiste ou publica; essas ações permanecem separadas e só entram por
 provedores provados nas fatias correspondentes.
 
+## Fachada e schemas descobríveis
+
+`criarServicoFluxoAutoria` é a fachada neutra; a configuração atual
+`criarServicoAutoria3DNativa` registra os dois provedores reais. Ela expõe
+`schemas`, `provedores`, `protocolo`, `cobertura`, `planejar`,
+`normalizarReceita`, `iniciar` e `registrar` sem I/O ou MCP.
+
+O índice `mecanifica.schemas-autoria-3d@1` descreve objetivo, receita elevada,
+manifesto de provedor, protocolo, plano, execução, resultado de etapa,
+resultado de planejamento e cobertura. A cópia estática gerada é
+[`gerado/schemas-autoria-3d.json`](gerado/schemas-autoria-3d.json). O gate
+`npm run autoria:schemas:check` impede divergência entre código e artefato.
+
+Schema valida estrutura e descoberta; os normalizadores continuam responsáveis
+por relações semânticas como eixos não colineares e IDs cruzados. Nenhum schema
+aprova forma, superfície, conectividade, evidência ou decisão humana.
+
 ## Cobertura atual honesta
 
-| Capacidade | Estado após N1.1 |
+| Capacidade | Estado ao concluir N1 |
 |---|---|
-| objetivo e incerteza | contrato executável |
+| objetivo e incerteza | contrato e provedor de briefing executáveis |
 | fonte versus derivado | contrato executável |
 | registro de provedores | contrato executável |
 | fluxo por família | planejador executável |
 | transições e aceite humano | máquina de estados executável |
 | descoberta procedural | adaptador real sobre serviço existente |
+| schemas | índice dinâmico e artefato estático com gate de paridade |
+| cliente caixa-preta | prova determinística da fachada configurada |
 | andaime e blocagem | sem provedor; plano bloqueia |
 | superfície semântica | tipo de fonte definido; sem executor |
 | conectividade ampliada | sem provedor N1 |
 | renderização, revisão e publicação unificadas | serviços existentes ainda não adaptados |
-| JSON Schemas e porta caixa-preta | pendentes da N1.2 |
 
 Um plano criado apenas com o provedor procedural atual deve ficar bloqueado nas
 etapas não cobertas. Isso é resultado correto, não regressão: impede a IA de
@@ -131,7 +153,8 @@ confundir catálogo geométrico com fluxo completo de autoria.
 
 ## Prova executável
 
-`tools/mecanifica/fluxo-autoria-n1.test.ts` cobre:
+`tools/mecanifica/fluxo-autoria-n1.test.ts` e
+`tools/mecanifica/fluxo-autoria-n1-caixa-preta.test.mjs` cobrem:
 
 - canonicalização e casos adversariais dos contratos;
 - separação obrigatória entre fonte e produto;
@@ -141,17 +164,24 @@ confundir catálogo geométrico com fluxo completo de autoria.
 - bloqueio por referência e provedor ausente;
 - recusa de plano não serializável;
 - sequência, evidência, decisão humana e terminalidade.
+- schemas dinâmicos/estáticos e todas as saídas públicas;
+- cobertura real por família e diagnóstico estruturado sem exceção;
+- cliente que usa somente a fachada configurada, sem acesso oculto.
 
 Comando focado:
 
 ```text
-npx vitest run tools/mecanifica/fluxo-autoria-n1.test.ts
+npx vitest run tools/mecanifica/fluxo-autoria-n1.test.ts tools/mecanifica/fluxo-autoria-n1-caixa-preta.test.mjs
 ```
 
-## Próxima entrega da N1
+## Encerramento e passagem para N2
 
-N1.2 precisa derivar schemas descobríveis desses contratos, adaptar somente os
-serviços existentes que realmente satisfaçam uma classe, executar um cliente
-caixa-preta interno e registrar o plano bloqueado real que indicará as lacunas
-de N2/N3. Nenhum adaptador pode declarar `forma-global`, `superficie` ou
+A N1 está concluída. A prova real de veículo tem dez etapas básicas: briefing
+fica coberto e as outras nove permanecem lacunas explícitas. Uma necessidade
+procedural adicional é coberta sem alterar esse veredito global. O relatório de
+encerramento está em
+[`RELATORIO-N1-FLUXO-AUTORIA.md`](RELATORIO-N1-FLUXO-AUTORIA.md).
+
+A N2 pode abrir para implementar alvo operacional, andaime e blocagem global.
+Nenhum adaptador futuro pode declarar `forma-global`, `superficie` ou
 `publicacao` apenas porque produz malha, imagem ou arquivo.

@@ -1,0 +1,1630 @@
+{
+  "formato": "mecanifica.schemas-autoria-3d@1",
+  "rascunho": "https://json-schema.org/draft/2020-12/schema",
+  "contratos": {
+    "objetivo": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.objetivo-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "familia",
+        "intencao",
+        "qualidade",
+        "unidade",
+        "eixos",
+        "referencias",
+        "restricoes",
+        "rejeicoes",
+        "incertezas",
+        "necessidades"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.objetivo-autoria@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "intencao": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "qualidade": {
+          "enum": [
+            "exploratoria",
+            "reconhecivel",
+            "integrada",
+            "promovivel"
+          ]
+        },
+        "unidade": {
+          "const": "mm"
+        },
+        "eixos": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "direita",
+            "cima",
+            "frente"
+          ],
+          "properties": {
+            "direita": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "cima": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            },
+            "frente": {
+              "enum": [
+                "+x",
+                "-x",
+                "+y",
+                "-y",
+                "+z",
+                "-z"
+              ]
+            }
+          }
+        },
+        "referencias": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "evidencia"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "tipo": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "evidencia": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          }
+        },
+        "restricoes": {
+          "type": "array",
+          "minItems": 0,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "rejeicoes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "incertezas": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "sobre",
+              "motivo",
+              "efeito",
+              "referencia"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "sobre": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "motivo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "efeito": {
+                "enum": [
+                  "diagnostico",
+                  "bloqueia"
+                ]
+              },
+              "referencia": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "necessidades": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "etapa",
+              "classe",
+              "artefatos",
+              "interfaces",
+              "requisitos",
+              "obrigatoria"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "etapa": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "classe": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "artefatos": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "entra",
+                  "sai"
+                ],
+                "properties": {
+                  "entra": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  },
+                  "sai": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  }
+                }
+              },
+              "interfaces": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "entra",
+                  "sai"
+                ],
+                "properties": {
+                  "entra": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  },
+                  "sai": {
+                    "type": "array",
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  }
+                }
+              },
+              "requisitos": {
+                "type": "array",
+                "minItems": 0,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "obrigatoria": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "receitaAutoral": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.receita-autoral@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "objetivo",
+        "familia",
+        "revisaoPai",
+        "intencao",
+        "coordenadas",
+        "fontes",
+        "semantica",
+        "dependencias",
+        "produtosDerivados",
+        "aceite"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.receita-autoral@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "objetivo": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "revisaoPai": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 120
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intencao": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "coordenadas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unidade",
+            "escala",
+            "eixos"
+          ],
+          "properties": {
+            "unidade": {
+              "const": "mm"
+            },
+            "escala": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "eixos": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "direita",
+                "cima",
+                "frente"
+              ],
+              "properties": {
+                "direita": {
+                  "enum": [
+                    "+x",
+                    "-x",
+                    "+y",
+                    "-y",
+                    "+z",
+                    "-z"
+                  ]
+                },
+                "cima": {
+                  "enum": [
+                    "+x",
+                    "-x",
+                    "+y",
+                    "-y",
+                    "+z",
+                    "-z"
+                  ]
+                },
+                "frente": {
+                  "enum": [
+                    "+x",
+                    "-x",
+                    "+y",
+                    "-y",
+                    "+z",
+                    "-z"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "fontes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "formato",
+              "versao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "tipo": {
+                "enum": [
+                  "receita-procedural",
+                  "andaime",
+                  "superficie-semantica",
+                  "montagem",
+                  "estado",
+                  "combinada"
+                ]
+              },
+              "formato": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "versao": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+              }
+            }
+          }
+        },
+        "semantica": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "regioes",
+            "landmarks",
+            "interfaces"
+          ],
+          "properties": {
+            "regioes": {
+              "type": "array",
+              "minItems": 0,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              }
+            },
+            "landmarks": {
+              "type": "array",
+              "minItems": 0,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              }
+            },
+            "interfaces": {
+              "type": "array",
+              "minItems": 0,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              }
+            }
+          }
+        },
+        "dependencias": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo",
+              "id",
+              "revisao"
+            ],
+            "properties": {
+              "tipo": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "revisao": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "produtosDerivados": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tipo",
+              "estado",
+              "assinatura",
+              "provedor",
+              "versao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "tipo": {
+                "enum": [
+                  "malha-neutra",
+                  "malha-densa",
+                  "triangulacao",
+                  "normais",
+                  "medicao",
+                  "imagem",
+                  "contexto-resolvido"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "esperado",
+                  "compilado"
+                ]
+              },
+              "assinatura": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provedor": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "versao": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "estado": {
+                      "const": "esperado"
+                    }
+                  },
+                  "required": [
+                    "estado"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "assinatura": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "estado": {
+                      "const": "compilado"
+                    }
+                  },
+                  "required": [
+                    "estado"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "assinatura": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "aceite": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gates"
+          ],
+          "properties": {
+            "gates": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "estado"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  "estado": {
+                    "enum": [
+                      "pendente",
+                      "aprovado",
+                      "reprovado",
+                      "bloqueado"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "provedor": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.provedor-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "id",
+        "versao",
+        "familias",
+        "etapas",
+        "classes",
+        "efeitos"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.provedor-autoria@1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 120
+        },
+        "versao": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+        },
+        "familias": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "*",
+              "peca-mecanica",
+              "veiculo",
+              "humanoide",
+              "sistema-articulado"
+            ]
+          }
+        },
+        "etapas": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "briefing",
+              "alvo",
+              "andaime",
+              "blocagem",
+              "decomposicao",
+              "integracao",
+              "superficie",
+              "estados",
+              "revisao",
+              "promocao"
+            ]
+          }
+        },
+        "classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 120
+          }
+        },
+        "efeitos": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "leitura",
+              "planejamento",
+              "compilacao",
+              "validacao",
+              "revisao",
+              "publicacao"
+            ]
+          }
+        }
+      }
+    },
+    "protocolo": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.protocolo-fluxo-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "familia",
+        "etapas"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.protocolo-fluxo-autoria@1"
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "etapas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "classe"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "classe": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              }
+            }
+          }
+        }
+      }
+    },
+    "plano": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.plano-fluxo-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "estado",
+        "objetivo",
+        "etapas",
+        "escolhas",
+        "diagnosticos"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.plano-fluxo-autoria@1"
+        },
+        "estado": {
+          "enum": [
+            "pronto",
+            "bloqueado"
+          ]
+        },
+        "objetivo": {
+          "$ref": "mecanifica.objetivo-autoria@1"
+        },
+        "etapas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "estado",
+              "necessidades"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "planejada",
+                  "bloqueada"
+                ]
+              },
+              "necessidades": {
+                "type": "array",
+                "minItems": 0,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                  "maxLength": 120
+                }
+              }
+            }
+          }
+        },
+        "escolhas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "necessidade",
+              "etapa",
+              "estado",
+              "provedor",
+              "custo",
+              "plano",
+              "lacuna"
+            ],
+            "properties": {
+              "necessidade": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "etapa": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "planejada",
+                  "bloqueada",
+                  "omitida"
+                ]
+              },
+              "provedor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "maxLength": 120
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "custo": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "plano": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "lacuna": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "diagnosticos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "codigo",
+              "campo",
+              "causa",
+              "impacto",
+              "proximoPasso"
+            ],
+            "properties": {
+              "codigo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "campo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "causa": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "impacto": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "proximoPasso": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          }
+        }
+      }
+    },
+    "execucao": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.execucao-fluxo-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "objetivo",
+        "estado",
+        "etapaAtual",
+        "etapas",
+        "historico"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.execucao-fluxo-autoria@1"
+        },
+        "objetivo": {
+          "$ref": "mecanifica.objetivo-autoria@1"
+        },
+        "estado": {
+          "enum": [
+            "em-execucao",
+            "concluido",
+            "reprovado",
+            "bloqueado"
+          ]
+        },
+        "etapaAtual": {
+          "anyOf": [
+            {
+              "enum": [
+                "briefing",
+                "alvo",
+                "andaime",
+                "blocagem",
+                "decomposicao",
+                "integracao",
+                "superficie",
+                "estados",
+                "revisao",
+                "promocao"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "etapas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "estado"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "pendente",
+                  "aprovada",
+                  "reprovada",
+                  "bloqueada"
+                ]
+              }
+            }
+          }
+        },
+        "historico": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "etapa",
+              "estado",
+              "evidencias",
+              "diagnosticos",
+              "decisaoUsuario"
+            ],
+            "properties": {
+              "etapa": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "estado": {
+                "enum": [
+                  "aprovada",
+                  "reprovada",
+                  "bloqueada"
+                ]
+              },
+              "evidencias": {
+                "type": "array",
+                "minItems": 0,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "diagnosticos": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "codigo",
+                    "campo",
+                    "causa",
+                    "impacto",
+                    "proximoPasso"
+                  ],
+                  "properties": {
+                    "codigo": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "campo": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "causa": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "impacto": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "proximoPasso": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    }
+                  }
+                }
+              },
+              "decisaoUsuario": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "aprovar",
+                      "reprovar"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "estado": {
+                "const": "concluido"
+              }
+            },
+            "required": [
+              "estado"
+            ]
+          },
+          "then": {
+            "properties": {
+              "etapaAtual": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "estado": {
+                "enum": [
+                  "em-execucao",
+                  "reprovado",
+                  "bloqueado"
+                ]
+              }
+            },
+            "required": [
+              "estado"
+            ]
+          },
+          "then": {
+            "properties": {
+              "etapaAtual": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "resultadoEtapa": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.resultado-etapa-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "etapa",
+        "estado",
+        "evidencias",
+        "diagnosticos",
+        "decisaoUsuario"
+      ],
+      "properties": {
+        "etapa": {
+          "enum": [
+            "briefing",
+            "alvo",
+            "andaime",
+            "blocagem",
+            "decomposicao",
+            "integracao",
+            "superficie",
+            "estados",
+            "revisao",
+            "promocao"
+          ]
+        },
+        "estado": {
+          "enum": [
+            "aprovada",
+            "reprovada",
+            "bloqueada"
+          ]
+        },
+        "evidencias": {
+          "type": "array",
+          "minItems": 0,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "diagnosticos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "codigo",
+              "campo",
+              "causa",
+              "impacto",
+              "proximoPasso"
+            ],
+            "properties": {
+              "codigo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "campo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "causa": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "impacto": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "proximoPasso": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          }
+        },
+        "decisaoUsuario": {
+          "anyOf": [
+            {
+              "enum": [
+                "aprovar",
+                "reprovar"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "resultadoPlanejamento": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.resultado-planejamento-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "estado",
+        "plano",
+        "diagnosticos"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.resultado-planejamento-autoria@1"
+        },
+        "estado": {
+          "enum": [
+            "pronto",
+            "bloqueado",
+            "invalido"
+          ]
+        },
+        "plano": {
+          "anyOf": [
+            {
+              "$ref": "mecanifica.plano-fluxo-autoria@1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "diagnosticos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "codigo",
+              "campo",
+              "causa",
+              "impacto",
+              "proximoPasso"
+            ],
+            "properties": {
+              "codigo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "campo": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "causa": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "impacto": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "proximoPasso": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "estado": {
+                "const": "invalido"
+              }
+            },
+            "required": [
+              "estado"
+            ]
+          },
+          "then": {
+            "properties": {
+              "plano": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "estado": {
+                "enum": [
+                  "pronto",
+                  "bloqueado"
+                ]
+              }
+            },
+            "required": [
+              "estado"
+            ]
+          },
+          "then": {
+            "properties": {
+              "plano": {
+                "$ref": "mecanifica.plano-fluxo-autoria@1"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "cobertura": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.cobertura-fluxo-autoria@1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formato",
+        "familia",
+        "protocolo",
+        "provedores",
+        "etapas",
+        "totais"
+      ],
+      "properties": {
+        "formato": {
+          "const": "mecanifica.cobertura-fluxo-autoria@1"
+        },
+        "familia": {
+          "enum": [
+            "peca-mecanica",
+            "veiculo",
+            "humanoide",
+            "sistema-articulado"
+          ]
+        },
+        "protocolo": {
+          "const": "mecanifica.protocolo-fluxo-autoria@1"
+        },
+        "provedores": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "versao"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "versao": {
+                "type": "string",
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+              }
+            }
+          }
+        },
+        "etapas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "classe",
+              "estado",
+              "provedores"
+            ],
+            "properties": {
+              "id": {
+                "enum": [
+                  "briefing",
+                  "alvo",
+                  "andaime",
+                  "blocagem",
+                  "decomposicao",
+                  "integracao",
+                  "superficie",
+                  "estados",
+                  "revisao",
+                  "promocao"
+                ]
+              },
+              "classe": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "maxLength": 120
+              },
+              "estado": {
+                "enum": [
+                  "coberta",
+                  "lacuna"
+                ]
+              },
+              "provedores": {
+                "type": "array",
+                "minItems": 0,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                  "maxLength": 120
+                }
+              }
+            }
+          }
+        },
+        "totais": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "etapas",
+            "cobertas",
+            "lacunas"
+          ],
+          "properties": {
+            "etapas": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "cobertas": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "lacunas": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "limites": [
+    "schema valida estrutura; normalizador valida eixos não colineares, referências e identidades cruzadas",
+    "schema não aprova forma, superfície, conectividade, evidência ou decisão humana"
+  ]
+}

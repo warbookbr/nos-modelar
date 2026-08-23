@@ -3,7 +3,7 @@
 **Estado:** ativo  
 **Responsável:** Codex  
 **Repositório e base:** `warbookbr/nos-mecanifica`, `7bb1bd8`  
-**Execução:** N0 concluído; N1.1 entregue; próxima: N1.2 — schemas e adaptadores.
+**Execução:** N0 e N1 concluídos; próxima fatia N2 — forma global.
 
 ## Origem, decisão e objetivo
 
@@ -156,7 +156,7 @@ mensurada. `Low poly` só vale quando declarado. Peça isolada não aprova máqu
 1. **N0 — verdade:** congelar contraevidências, separar os dois eixos de decisão
    e fixar baseline, referência inicial e contratos.
 2. **N1 — contrato:** receita elevada, provedores, orquestração e falha segura.
-   [N1.1](../FLUXO-AUTORIA-N1.md) entregue; schemas e adaptadores ficam em N1.2.
+   [Concluída](../RELATORIO-N1-FLUXO-AUTORIA.md) com schemas e prova caixa-preta.
 3. **N2 — forma global:** implementar andaime e gate de reconhecimento numa
    blocagem inteira pequena.
 4. **N3 — superfície nativa:** provar edição regional, simetria, continuidade,
@@ -195,6 +195,6 @@ Inclui arquitetura, receita, orquestração, andaime, superfície, interfaces,
 validadores, carro bruto e prova humanoide. Exclui software externo, clone de
 Blender/CAD, produção final imediata, fabricação e solver universal prematuro.
 
-O plano foi ativado após o R2B. N0 fechou baseline e dossiês; N1.1 tornou
-objetivo, fonte, provedores e transições executáveis, sem mudar geometria. N1.2
-fecha schemas e adaptadores. O encerramento exige evidências e decisões dos dois eixos; métrica ou estrutura correta não encerram a forma.
+O plano foi ativado após o R2B. N0 fechou baseline e dossiês; N1 fechou
+contratos, schemas, provedores e prova caixa-preta sem mudar geometria. N2 é a
+próxima fatia. Evidências e decisões dos dois eixos continuam obrigatórias; métrica ou estrutura correta não encerram a forma.
