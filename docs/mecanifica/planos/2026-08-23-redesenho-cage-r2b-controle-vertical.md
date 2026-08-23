@@ -1,6 +1,8 @@
 # Redesenho R2B — controle vertical da cage direta
 
-**Estado:** ativo
+**Estado:** concluído
+
+**Decisão:** `interromper`
 
 **Responsável:** Codex
 
@@ -137,3 +139,20 @@ interna própria e regressão global. Consolidar `aprovar`, `corrigir`,
 4. as três silhuetas passam P0 antes de recortes;
 5. o pacote visual e o crítico independente não têm achados abertos;
 6. somente aceite humano explícito permite B4 e qualquer promoção posterior.
+
+## Encerramento
+
+Encerrado em 2026-08-23 por decisão explícita do usuário. A B1 provou a faixa
+vertical e a B2 preserva como contraevidência o campeão reprovado
+`forma-global-r2b-b2`, com 20,5/42,9/32,7 mm. B2–B4 não prosseguem.
+
+O motivo não é apenas o não atendimento dos três limiares: as imagens abertas
+não apresentam leitura convincente de carro, e o ciclo regional continuaria
+otimizando uma representação global já rejeitada. Evidências, IDs, testes e
+artefatos privados permanecem preservados; nada é promovido ao núcleo, receita
+pública ou catálogo.
+
+O sucessor é o plano ativo de
+[`arquitetura híbrida nativa de autoria por famílias`](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md),
+que separa aprovação da plataforma e do artefato, exige blocagem global
+reconhecível e abre capacidade nativa de superfície antes de novo refinamento.

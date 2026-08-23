@@ -3,14 +3,19 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-23-redesenho-cage-r2b-controle-vertical.md`](2026-08-23-redesenho-cage-r2b-controle-vertical.md).
+[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 
-Ele retoma somente a prova privada após a decisão `redesenhar` da cage R2:
-mantém cage direta, captura com profundidade e aceite regional, mas separa o
-controle vertical que acoplava planta e frontal. P2, validação integrada,
-núcleo e conteúdo público continuam congelados. O plano anterior de
-[`aceite visual e prova de superfície`](2026-08-20-aceite-visual-e-prova-de-superficie.md)
-foi concluído com essa decisão, não aprovado por silêncio.
+Ele governa a plataforma nativa de autoria por famílias: preserva o procedural,
+montagens, identidade, revisão, bancada e MCP; acrescenta andaime global,
+superfície semântica, conectividade obrigatória e aprovação separada de
+plataforma/artefato. O fluxo não depende de Blender, DCC, CAD ou formatos
+externos. A execução começa em N0 e os três dossiês vinculantes ficam no próprio
+plano.
+
+O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
+foi concluído com decisão `interromper`: sua melhor evidência continuou
+reprovada numérica e visualmente, e B2–B4 não prosseguem. Cage, métricas e
+imagens permanecem como contraevidência; nada foi promovido.
 
 A [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md)
 foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela

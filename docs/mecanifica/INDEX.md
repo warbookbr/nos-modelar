@@ -212,11 +212,12 @@ aplicação publicada aqui.
 - O plano de [aceite visual vinculante e prova de superfície](planos/2026-08-20-aceite-visual-e-prova-de-superficie.md)
   foi concluído com decisão `redesenhar`: R0–R1B passam, mas a R2 não alcança
   os limites P0. O [relatório R2/R3](RELATORIO-R2-CAGE-DIRETA-R3.md) preserva
-  as evidências e o achado da suíte agregada. O único plano **ativo** é o
-  [redesenho R2B com controle vertical](planos/2026-08-23-redesenho-cage-r2b-controle-vertical.md):
-  mantém cage direta, z-buffer e vistas isoladas, mas separa ombro e flanco
-  antes de qualquer recorte. P2, validação integrada, núcleo, receita pública
-  e catálogo continuam congelados. Registros:
+  as evidências e o achado da suíte agregada. O
+  [redesenho R2B com controle vertical](planos/2026-08-23-redesenho-cage-r2b-controle-vertical.md)
+  foi concluído com decisão `interromper`: B1 provou a faixa vertical, mas o
+  campeão B2 permaneceu reprovado em 20,5/42,9/32,7 mm e sem leitura convincente
+  de carro. B2–B4 não continuam; evidências e IDs permanecem preservados.
+  Registros:
   `docs/mecanifica/planos/2026-08-20-aceite-visual-e-prova-de-superficie.md`,
   `docs/mecanifica/RELATORIO-R2-CAGE-DIRETA-R3.md` e
   `docs/mecanifica/planos/2026-08-23-redesenho-cage-r2b-controle-vertical.md`.
@@ -225,6 +226,18 @@ aplicação publicada aqui.
   quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1
   ligar o porteiro à revisão privada.
   Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
+- O único plano **ativo** é a [arquitetura híbrida nativa de autoria por famílias](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
+  (`docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`)
+  na fatia N0. Ele preserva o procedural, identidade, montagem, revisão,
+  bancada e MCP; acrescenta andaime global, superfície semântica nativa,
+  conectividade e aprovação separada da plataforma/artefato, sem software
+  externo. Os dossiês vinculantes são
+  [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
+  [`DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`](DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md) e
+  [`DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`](DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md).
+  Registros alcançáveis: `docs/mecanifica/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
+  `docs/mecanifica/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` e
+  `docs/mecanifica/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
@@ -428,10 +441,10 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é o aceite visual vinculante e a prova de superfície. Cenário
-  multi-documento, envelope de movimento, subtração robusta, materiais/LOD e
-  autoria por intenção continuam candidatos e dependem de recorte executivo
-  próprio e ganho verificável.
+- O plano ativo é a arquitetura híbrida nativa. N0 fixa baseline, decisões em
+  dois eixos, referência inicial e contratos antes de N1. Cenário
+  multi-documento, movimento, subtração robusta e materiais/LOD entram somente
+  quando uma fatia demonstrar que são essenciais ao próximo gate.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
