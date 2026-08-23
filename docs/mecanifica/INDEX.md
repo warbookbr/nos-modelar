@@ -228,7 +228,7 @@ aplicação publicada aqui.
   Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
 - O único plano **ativo** é a [arquitetura híbrida nativa de autoria por famílias](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
   (`docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`)
-  na fatia N0. Ele preserva o procedural, identidade, montagem, revisão,
+  com N0 concluído e N1 como próxima fatia. Ele preserva o procedural, identidade, montagem, revisão,
   bancada e MCP; acrescenta andaime global, superfície semântica nativa,
   conectividade e aprovação separada da plataforma/artefato, sem software
   externo. Os dossiês vinculantes são
@@ -238,6 +238,9 @@ aplicação publicada aqui.
   Registros alcançáveis: `docs/mecanifica/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
   `docs/mecanifica/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` e
   `docs/mecanifica/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`.
+  A matriz executável está em
+  [`MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`](MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md)
+  (`docs/mecanifica/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`).
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito

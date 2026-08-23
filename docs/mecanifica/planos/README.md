@@ -9,8 +9,10 @@ Ele governa a plataforma nativa de autoria por famílias: preserva o procedural,
 montagens, identidade, revisão, bancada e MCP; acrescenta andaime global,
 superfície semântica, conectividade obrigatória e aprovação separada de
 plataforma/artefato. O fluxo não depende de Blender, DCC, CAD ou formatos
-externos. A execução começa em N0 e os três dossiês vinculantes ficam no próprio
-plano.
+externos. N0 foi concluído com a matriz de rastreabilidade e a execução segue
+para N1. Os três dossiês vinculantes, mais a [matriz
+executável de rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
+ficam ligados ao plano.
 
 O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
 foi concluído com decisão `interromper`: sua melhor evidência continuou

@@ -3,7 +3,7 @@
 **Estado:** ativo  
 **Responsável:** Codex  
 **Repositório e base:** `warbookbr/nos-mecanifica`, `7bb1bd8`  
-**Execução:** N0 — verdade, baseline e contratos de decisão.
+**Execução:** N0 concluído; próxima fatia N1 — contratos e orquestração.
 
 ## Origem, decisão e objetivo
 
@@ -23,7 +23,7 @@ convincentes, editáveis, verificáveis e reutilizáveis.
 
 **Dossiês vinculantes:**
 
-- [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](../DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md): arquitetura, contratos, lacunas e garantias;
+- [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](../DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md): arquitetura, contratos, lacunas e garantias; [`MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md): rastreio executável;
 - [`DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`](../DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md): fonte, compilação, operações e provas de superfície;
 - [`DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`](../DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md): estados, papéis, gates e recuperação.
 
@@ -195,6 +195,6 @@ Inclui arquitetura, receita, orquestração, andaime, superfície, interfaces,
 validadores, carro bruto e prova humanoide. Exclui software externo, clone de
 Blender/CAD, produção final imediata, fabricação e solver universal prematuro.
 
-O plano foi ativado após o encerramento explícito do R2B. N0 fixa a primeira
-referência/gates antes de N1. O fechamento registra commits, artefatos, imagens,
-crítica, decisão do usuário e decisões dos dois eixos. Métrica, silêncio ou estrutura correta não encerram a forma.
+O plano foi ativado após o encerramento explícito do R2B. N0 fechou com matriz,
+baseline, dossiês e gates documentais; N1 é a próxima fatia. O fechamento
+registra commits, artefatos, imagens, crítica, decisão do usuário e decisões dos dois eixos. Métrica, silêncio ou estrutura correta não encerram a forma.

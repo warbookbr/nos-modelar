@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-587 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+588 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -349,6 +349,7 @@
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
+- `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
