@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-609 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+613 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -501,6 +501,14 @@
 - `oficina-contrato.md` — Oficina — contrato procedural preservado
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 
+## laboratorio-isolado/cupe-livre-01/
+
+- `README.md` — Cupê livre 01 — experimento isolado
+- `index.html` — **SEM CABEÇALHO**
+- `motor.js` — Motor WebGL autocontido do experimento. Sem dependências, imports ou assets.
+- `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
+- `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.
+
 ## prototipos/procedural/v3/
 
 - `README.md` — v3 — núcleo procedural, peças e visor
@@ -726,7 +734,6 @@
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
 - `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
-- `forma-global-n2.test.mjs` — Provas unitárias e adversariais do contrato, G01, G02 e render N2.
 - `gerar-evidencias-forma-global-n2.mjs` — Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas. SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
 - `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
