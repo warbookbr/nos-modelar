@@ -283,3 +283,16 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
 
 Sem alvo desenhado, desenhe antes: veja
 [`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+
+## Antes de caçar defeito: o método tem limite
+
+Se você está tentando decidir **forma, proporção ou caráter**, não é problema
+diagnóstico, e eliminar defeito ali rende conserto certo num objeto que continua
+ruim. O sintoma é os achados encolherem e a nota não subir. Ver
+[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
+
+Quando o método valer, dois passos são obrigatórios e são os que mais somem:
+**identificar o que falta** (o desenho de referência existia desde a primeira
+rodada e nunca foi aberto) e **levantar hipóteses no plural antes de testar**
+(o serrilhado foi culpa do renderizador duas vezes antes de alguém rastrear o
+loop).
