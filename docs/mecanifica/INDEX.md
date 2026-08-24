@@ -236,9 +236,20 @@ aplicação publicada aqui.
   O [relatório N2](RELATORIO-N2-FORMA-GLOBAL.md) registra alvo independente,
   andaime, blocagem inteira, quatro vistas e G01 aprovado. G02 permanece
   bloqueado até crítica independente e aceite explícito do usuário. N3 foi
-  concluída somente para C1: o [relatório N3](RELATORIO-N3-CANAL-PERCEPCAO.md)
-  (`docs/mecanifica/RELATORIO-N3-CANAL-PERCEPCAO.md`) registra zebra,
-  isófotas, curvatura e procedência; N3.5 não está aberta.
+  **revalidada para C1**: o primeiro aceite foi revogado por confundir
+  rasterização plana e mosaico com inspeção de superfície; o novo aceite usa
+  imagens individuais multivista, em tamanho nativo e vinculadas por SHA-256.
+  O [relatório N3](RELATORIO-N3-CANAL-PERCEPCAO.md)
+  (`docs/mecanifica/RELATORIO-N3-CANAL-PERCEPCAO.md`) registra a correção. A
+  sonda N3.5 foi executada e **rejeitada**: suavização C1 não produziu melhoria
+  visual/material no quarto dianteiro. A [sonda N4](RELATORIO-N4-RESTRICOES.md)
+  (`docs/mecanifica/RELATORIO-N4-RESTRICOES.md`) aprovou a viabilidade estreita
+  de C2 — duas seções limpas e três restrições —, após corrigir uma crista
+  central que o P95 escondia. A [sonda N5](RELATORIO-N5-BUSCA.md)
+  (`docs/mecanifica/RELATORIO-N5-BUSCA.md`) provou a busca C3 em alvo sintético.
+  O usuário aprovou o [alvo N6 de cupê esportivo](ALVO-N6-CUPE-ESPORTIVO.md)
+  (`docs/mecanifica/ALVO-N6-CUPE-ESPORTIVO.md`): a preparação N6 está aberta,
+  mas geometria continua dependente de blocagem multivista e crítica independente.
   Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
   `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
   identidade, montagem, revisão,

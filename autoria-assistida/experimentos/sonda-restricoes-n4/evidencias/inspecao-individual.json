@@ -1,0 +1,10 @@
+{
+  "formato": "mecanifica.inspecao-n4@1",
+  "estado": "aprovada",
+  "revisor": "Codex — revisão visual independente",
+  "data": "2026-08-24",
+  "impressaoManifesto": "60760889de6f69d72d54f1deed99cd22f9ae50f4d48d15ef160a382835f98a66",
+  "cobertura": { "imagens": 12, "porSecao": ["zebra isométrica, lateral, frontal e superior", "isófota isométrica", "curvatura isométrica"] },
+  "veredito": "as duas seções exibem faixa contínua sem facetas ou costuras espúrias; a vista frontal mostra uma crista central arredondada, sem a ponta que revogou a primeira versão de N4; vistas oblíquas mostram continuidade no coroamento longitudinal e no ombro.",
+  "regra": "todo arquivo foi aberto individualmente em tamanho nativo; mosaico não participou do aceite"
+}

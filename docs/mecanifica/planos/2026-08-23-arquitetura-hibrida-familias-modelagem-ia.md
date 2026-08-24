@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 **Responsável:** Codex · **Base:** `8198833`
-**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 está **concluída** com C1 calibrado e procedência verificável; N3.5 é a próxima sonda, ainda não aberta.
+**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 foi **revalidada para C1**: a aprovação anterior usou painel e rasterização plana inválidos, foi revogada e substituída por inspeção individual multivista ligada ao manifesto SHA-256. N3.5 foi executada e **rejeitada**: suavização C1 não melhorou materialmente o quarto e aumentou ruptura abrupta. N4 corrigiu uma crista central C0 que o P95 escondia e então aprovou a viabilidade estreita de C2; N5 provou C3 somente sobre alvo sintético. O alvo visual N6 foi aprovado pelo usuário e separado por vista; somente a preparação N6 abriu.
 
 ## Por onde começar
 
@@ -60,9 +60,18 @@ A fonte deixa de conter coordenada e passa a conter enunciado com nome: relaçã
 - N4 abre com uma **sonda de viabilidade** — uma seção, três restrições — antes de qualquer compromisso;
 - se a sonda falhar, a condição de encerramento dispara **ali**, não em N6.
 
+**Leitura corrigida após N3.5:** a sonda de suavização não executou C2; ela só
+testou se uma malha histórica ruim poderia ser recuperada depois de pronta. A
+resposta foi não. Portanto N4 continua sendo a primeira prova de C2 e precisa
+partir de uma representação limpa, não de R2B, cupê livre ou quarto reprovado.
+
 ### C3 — busca · risco médio
 
 Onde sobrar liberdade, a IA define o objetivo e uma busca acha os valores. **O espaço de busca é exatamente o grau de liberdade que C2 deixar em aberto — nunca inventado pela IA.** Sem espaço livre bem-definido, C3 fecha vazia; isso evita chamar doze chutes nomeados de avanço.
+
+N3.5 também não executou busca, logo não produz veredito sobre C3. N5 continua
+bloqueada até N4 provar uma representação de C2 e declarar ao menos um grau de
+liberdade e um objetivo mensurável que possam ser buscados.
 
 ## Procedência do número, com gate
 
@@ -99,10 +108,10 @@ rodadas** — foi assim que a carroceria chegou a doze.
 
 | Fatia | Teto | Marco que o usuário vê |
 |---|---|---|
-| N3 — canal de percepção | 4 | zebra dos artefatos reprovados lado a lado |
-| N3.5 — sonda de suavização | 2 | o quarto reprovado, só suavizado |
-| N4 — autoria por restrição | 5 | duas formas do mesmo enunciado |
-| N5 — busca | 3 | melhor candidato contra ajuste no braço |
+| N3 — canal de percepção | 4 | zebra individual multivista dos artefatos reprovados |
+| N3.5 — sonda de suavização | 2 | rejeitada: quarto só suavizado, sem melhora material |
+| N4 — autoria por restrição | 5 | aprovada: duas formas limpas do mesmo enunciado |
+| N5 — busca | 3 | vencedor de uma liberdade residual contra alvo sintético |
 | N6 — carro inteiro bruto | 5 | o carro |
 | N7 — integração | 4 | superfície e mecânica ligadas |
 
@@ -113,15 +122,33 @@ zebra é regular por construção. O canal precisa mostrar zebra regular nesses,
 irregularidade no quarto dianteiro, no R2B e no cupê livre, e ordená-los conforme o
 veredito humano. Canal que aprova o que o usuário reprovou não serve.
 
-N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas. **Encerrada em 2026-08-24:** o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md) registra controles sadios regulares e quarto, R2B e Cupê-livre irregulares; a ordenação humana disponível é binária, logo C1 separa classes e não inventa ranking estético entre reprovados.
+N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas. **Revalidada em 2026-08-24:** o primeiro painel usava cor plana por triângulo e foi incorretamente tratado como prova; C1 exige raster de normais interpoladas e abertura individual, em tamanho nativo, de cada imagem obrigatória. Métrica e mosaico não aprovam nada; o aceite só vale se `inspecao-individual.json` coincidir por SHA-256 com o manifesto gerado.
 
 **N3.5 — sonda de suavização.** Barata e decisiva; existe porque o plano não
 podia ficar quatro fatias sem nada visível. Pega o quarto dianteiro reprovado,
 aplica **só energia de suavidade** guiada por C1, sem restrição nem busca, e
-mede. Testa a hipótese central — suavidade medida melhora o que humano julga —
-antes de gastar N4. Se não melhorar, C2 e C3 ficam sob suspeita.
+mede. Testa exclusivamente a hipótese de que suavidade medida recupera uma
+malha histórica ruim antes de gastar N4. **Executada em 2026-08-24 e
+rejeitada:** seis iterações fixas preservaram topologia, bordas e quinas, mas
+reduziram o P95 da região livre só 0,57% e elevaram a parcela abrupta de 4,211%
+para 4,391%; as doze vistas individuais não mostram melhora visível. Isso não
+é veredito sobre C2 ou C3; a malha é descartada.
 
-**N4** não começa sem N3 calibrado. **N6** não começa sem N4 e N5.
+**N4 — sonda de viabilidade de C2.** Concluída e aprovada no escopo estreito:
+constrói uma
+seção nova e contínua de uma família paramétrica declarada, sem reaproveitar
+malha reprovada, e resolve exatamente três restrições: (1) relação de posição
+do ponto mais largo abaixo do ombro; (2) desigualdade de capô convexo, sem
+afundamento; (3) continuidade G1 na linha de ombro. A prova entrega duas
+formas diferentes que satisfazem o mesmo enunciado, abre cada vista C1
+individualmente e registra a procedência de cada parâmetro. Falhar dentro do
+teto de N4 rejeita C2; passar não aprova veículo.
+
+**N5 — busca residual de C3.** Executada no escopo mínimo: `bojoRelativo` é
+o único grau livre da seção N4; a busca enumerou 21 candidatos, mantendo as
+três restrições, C1 e diedro máximo ≤ 19°, e escolheu 0,16 para igualar a
+sagita sintética medida de 41,6 mm. Isto prova o mecanismo de busca, não um
+estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash; **N6.1** só começa por blocagem contra as quatro ortográficas e crítica independente — N4/N5 sozinhas não bastam.
 
 ## Passivo declarado
 
@@ -160,8 +187,13 @@ de um gate provar que são essenciais à forma.
 ## Registro
 
 - **V1 — 2026-08-23:** plano ativado após o R2B.
-- **V2 — 2026-08-24:** reescrito de N3 em diante. O plano anterior dizia **o
-  que** autorar e não **como a IA decide o número**.
+- **V2 — 2026-08-24:** reescrito de N3 em diante: o plano dizia **o que** autorar, não **como a IA decide o número**.
 - **V3 — 2026-08-24:** auditoria corrigiu dez defeitos: C2 escondia a parte difícil, N3 exigia uma superfície sã inexistente e C3 não justificava seu espaço de busca. Entraram sonda N4 e segundo braço de encerramento, lado sadio sintético, N3.5 barato, teto de rodadas, procedência, passivo, ponto de entrada e humanoide não especificado.
 - **V4 — 2026-08-24:** N3 aberto após sincronizar as quatro provas públicas N1/N2. Percepção declara seu limite — superfície não é reconhecimento veicular —, procedência estrutural não se esconde no teto global e o verificador é entrega N3, não capacidade presumida.
 - **V5 — 2026-08-24:** N3 encerrou C1 com painel visual inspecionado, corpus reprodutível e `procedencia:check`; N3.5 permanece parada até autorização. A calibração só separa o veredito binário disponível, sem fabricar ranking estético dos rejeitados.
+- **V6 — 2026-08-24:** a inspeção individual corrigiu a V5: painel lado a lado e cor plana por triângulo não provaram C1. N3 reabre com raster de normais interpoladas, imagens individuais multivista e bloqueio de N3.5 até aceite visual válido.
+- **V7 — 2026-08-24:** C1 foi revalidada: os 42 diagnósticos foram abertos individualmente, os controles não mostraram triangulação/costura espúria e os rejeitados mantiveram falhas reais. O aceite é vinculado ao manifesto SHA-256; qualquer imagem regenerada sem inspeção correspondente perde o gate.
+- **V8 — 2026-08-24:** N3.5 rejeitou a hipótese de que suavização C1 isolada recupera o quarto histórico: preservou topologia, mas a redução de rugosidade foi imaterial e a ruptura abrupta cresceu. Nenhuma malha foi promovida.
+- **V9 — 2026-08-24:** corrigida a inferência da N3.5: ela não testa C2 nem C3. N4 é a próxima prova de autoria por restrição, construída do zero sobre uma seção limpa; N5 permanece bloqueada até haver liberdade residual e objetivo mensurável.
+- **V10 — 2026-08-24:** N4 aprovou a viabilidade estreita de C2: duas seções novas, diferentes e C1-regulares obedecem as mesmas três restrições, com procedência e inspeção individual vinculada ao manifesto. N5 não abriu: não existe liberdade residual/objetivo de busca declarado.
+- **V11 — 2026-08-24:** a inspeção individual de N5 revelou uma crista central C0 que o P95 de N4 escondia. O aceite N4 foi revogado, a base do capô foi reescrita com tangentes nulas no centro/ombro e diedro máximo passou a ser gate. N4 foi revalidada; N5 então provou C3 sobre `bojoRelativo` e alvo sintético. O usuário aprovou uma prancha N6; ela foi recortada/hashada e só abre a preparação, com pareamento vista↔vista obrigatório.

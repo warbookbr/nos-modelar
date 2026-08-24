@@ -10,10 +10,17 @@ cabine e detalhes não são superfície primária e ficam fora da leitura C1. Is
 não troca nem corrige o experimento isolado; dá ao canal uma malha reproduzível
 dele para calibração.
 
-Execute `node gerar-evidencias.mjs`. O resultado em `evidencias/resultado-c1.json`
-é o gate: só passa se o lado sadio for regular e todo caso reprovado for
-irregular no canal. A leitura não decide se um objeto é um carro, nem aprova
-proporção ou caráter visual.
+Execute `node gerar-evidencias.mjs`. Cada diagnóstico é salvo como imagem PNG
+individual, em tamanho nativo: zebra nas quatro vistas (isométrica, lateral,
+frontal e superior), isófota e curvatura na isométrica. Não há painel de
+aprovação. Se houver mosaico, ele é apenas índice.
+
+`evidencias/resultado-c1.json` separa a métrica do aceite: os controles devem
+ser regulares e os negativos irregulares. O gate só passa quando
+`inspecao-individual.json` registra a inspeção e sua impressão SHA-256 coincide
+com as imagens atuais; qualquer regeneração diferente o devolve a `passa: false`.
+A leitura não decide se um objeto é um carro, nem aprova proporção ou caráter
+visual.
 
 `fonte-veiculo-valida.json` é o corpus mínimo de `procedencia:check`: campos
 estruturais são medidos/derivados; o único declarado é não estrutural; e o

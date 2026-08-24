@@ -1,17 +1,26 @@
 /* Gera o corpus N3. Não altera receitas nem promove geometria histórica. */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { analisarSuperficie, renderizarDiagnosticoSvg, renderizarPainelZebra, superficiesSinteticas } from '../../../tools/mecanifica/percepcao-superficie.mjs';
+import { analisarSuperficie, renderizarDiagnosticoPng, superficiesSinteticas } from '../../../tools/mecanifica/percepcao-superficie.mjs';
 import { criarCageDireta, espelharCage } from '../prova-cage-direta-r2/cage-direta.mjs';
 import { subdividirUmNivel } from '../prova-cage-direta-r2/subdividir.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const raiz = path.resolve(aqui, '..', '..', '..');
 const destino = path.join(aqui, 'evidencias');
+const caminhoInspecao = path.join(destino, 'inspecao-individual.json');
 const json = (arquivo) => JSON.parse(readFileSync(arquivo, 'utf8'));
 const gravar = (arquivo, conteudo) => writeFileSync(path.join(destino, arquivo), `${conteudo}\n`);
+const gravarBinario = (arquivo, conteudo) => writeFileSync(path.join(destino, arquivo), conteudo);
+const sha256 = (conteudo) => createHash('sha256').update(conteudo).digest('hex');
+const assinaturaManifesto = (arquivos) => sha256(JSON.stringify(arquivos.map(({ caso, tipo, camera, sha256: impressao }) => ({ caso, tipo, camera, sha256: impressao }))));
+export const DIAGNOSTICOS_C1 = [
+  { tipo: 'zebra', camera: 'isometrica' }, { tipo: 'zebra', camera: 'lateral' }, { tipo: 'zebra', camera: 'frontal' }, { tipo: 'zebra', camera: 'superior' },
+  { tipo: 'isofota', camera: 'isometrica' }, { tipo: 'curvatura', camera: 'isometrica' },
+];
 
 function receitaCupe() {
   const window = {};
@@ -63,25 +72,47 @@ export function montarCorpusN3() {
   ].map((item) => ({ ...item, analise: analisarSuperficie(item.malha) }));
 }
 
-export function gerarEvidenciasN3() {
-  mkdirSync(destino, { recursive: true });
-  const corpus = montarCorpusN3();
-  for (const item of corpus) gravar(`${item.id}.svg`, renderizarDiagnosticoSvg(item.analise, { titulo: item.id }));
-  gravar('painel-zebra.svg', renderizarPainelZebra(corpus));
+export function montarResultadoC1(corpus, arquivos = [], inspecao = null) {
   const saudaveis = corpus.filter((item) => item.vereditoHumano === 'sadio-por-construcao');
   const reprovados = corpus.filter((item) => item.vereditoHumano !== 'sadio-por-construcao');
+  const impressaoManifesto = assinaturaManifesto(arquivos);
+  const inspecaoValida = Boolean(inspecao?.estado === 'aprovada' && inspecao.impressaoManifesto === impressaoManifesto);
   const resultado = {
-    formato: 'mecanifica.calibracao-c1-n3@1',
+    formato: 'mecanifica.calibracao-c1-n3@2',
     escopo: 'continuidade de superfície; não mede reconhecimento, proporção ou caráter veicular',
+    protocoloInspecao: {
+      regra: 'cada imagem é aberta individualmente, em tamanho nativo; mosaico é apenas índice e não aprova',
+      obrigatoriosPorCaso: DIAGNOSTICOS_C1,
+      estado: inspecaoValida ? 'aprovada-por-inspecao-individual' : 'pendente-de-inspecao-individual',
+      impressaoManifesto,
+    },
     corpus: corpus.map(({ id, vereditoHumano, analise }) => ({ id, vereditoHumano, ...Object.fromEntries(Object.entries(analise).filter(([chave]) => !['malha', 'diedros', 'vizinhos'].includes(chave))) })),
-    gate: {
+    gateMetricas: {
       saudaveisRegulares: saudaveis.every((item) => item.analise.leitura === 'regular-no-canal-c1'),
       reprovadosIrregulares: reprovados.every((item) => item.analise.leitura === 'irregular-no-canal-c1'),
     },
+    arquivos,
   };
-  resultado.gate.passa = resultado.gate.saudaveisRegulares && resultado.gate.reprovadosIrregulares;
+  resultado.gateMetricas.passa = resultado.gateMetricas.saudaveisRegulares && resultado.gateMetricas.reprovadosIrregulares;
+  resultado.gate = resultado.gateMetricas.passa && inspecaoValida
+    ? { passa: true, motivo: 'métricas e inspeção individual vinculada ao manifesto aprovadas' }
+    : { passa: false, motivo: 'métricas não substituem a inspeção individual obrigatória' };
+  return resultado;
+}
+
+export async function gerarEvidenciasN3() {
+  mkdirSync(destino, { recursive: true });
+  const corpus = montarCorpusN3();
+  const arquivos = [];
+  for (const item of corpus) for (const diagnostico of DIAGNOSTICOS_C1) {
+    const arquivo = `${item.id}-${diagnostico.tipo}-${diagnostico.camera}.png`;
+    gravarBinario(arquivo, await renderizarDiagnosticoPng(item.analise, diagnostico));
+    arquivos.push({ caso: item.id, ...diagnostico, arquivo, sha256: sha256(readFileSync(path.join(destino, arquivo))) });
+  }
+  const inspecao = existsSync(caminhoInspecao) ? json(caminhoInspecao) : null;
+  const resultado = montarResultadoC1(corpus, arquivos, inspecao);
   gravar('resultado-c1.json', JSON.stringify(resultado, null, 2));
   return resultado;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) console.log(JSON.stringify(gerarEvidenciasN3(), null, 2));
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) console.log(JSON.stringify(await gerarEvidenciasN3(), null, 2));

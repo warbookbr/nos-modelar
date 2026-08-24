@@ -1,0 +1,21 @@
+{
+  "formato": "mecanifica.inspecao-c1@1",
+  "estado": "aprovada",
+  "revisor": "Codex — revisão visual independente",
+  "data": "2026-08-24",
+  "impressaoManifesto": "706a79dbad89fb036b03bccde17a891797995eb1fef3d92ca7f9d45789d480be",
+  "cobertura": {
+    "imagens": 42,
+    "porCaso": [
+      "zebra isométrica, lateral, frontal e superior",
+      "isófota isométrica",
+      "curvatura isométrica"
+    ]
+  },
+  "veredito": {
+    "controles": "regulares sem wireframe, costura paramétrica ou borda de triângulo confundida com defeito",
+    "quebraSintetica": "a descontinuidade C0 aparece nas seis leituras",
+    "historicosReprovados": "quarto, R2B e cupê livre exibem rupturas e/ou superfícies facetadas coerentes com o veredito métrico"
+  },
+  "regra": "todo arquivo foi aberto individualmente em tamanho nativo; mosaico não participou do aceite"
+}

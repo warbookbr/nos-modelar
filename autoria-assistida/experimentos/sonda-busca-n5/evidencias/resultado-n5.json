@@ -1,0 +1,115 @@
+{
+  "formato": "mecanifica.sonda-busca-n5@1",
+  "escopo": "prova C3 em uma seção sintética; não escolhe o desenho de um carro nem aprova G02",
+  "liberdadeResidual": {
+    "campo": "bojoRelativo",
+    "minimo": 0.08,
+    "maximo": 0.18,
+    "passo": 0.005
+  },
+  "objetivo": {
+    "id": "sagita-capo-central",
+    "alvoMm": 41.6,
+    "toleranciaMm": 0.01,
+    "descricao": "igualar o bojo central medido acima da base suave da seção sintética N5"
+  },
+  "candidatos": {
+    "avaliados": 21,
+    "elegiveis": 21
+  },
+  "vencedor": {
+    "bojoRelativo": 0.16,
+    "sagitaMm": 41.6,
+    "erroObjetivoMm": 0,
+    "restricoes": {
+      "pontoMaisLargoAbaixoDoOmbro": true,
+      "capoSemCavidadeEG1Central": true,
+      "continuidadeG1": true,
+      "alinhamentoG1": 1
+    },
+    "c1": {
+      "diedroP95Graus": 4.771,
+      "diedroMaximoGraus": 18.704,
+      "parcelaAbrupta": 0,
+      "leitura": "regular-no-canal-c1"
+    }
+  },
+  "protocoloInspecao": {
+    "regra": "cada imagem é aberta individualmente em tamanho nativo; mosaico não aprova",
+    "imagens": [
+      {
+        "tipo": "zebra",
+        "camera": "isometrica"
+      },
+      {
+        "tipo": "zebra",
+        "camera": "lateral"
+      },
+      {
+        "tipo": "zebra",
+        "camera": "frontal"
+      },
+      {
+        "tipo": "zebra",
+        "camera": "superior"
+      },
+      {
+        "tipo": "isofota",
+        "camera": "isometrica"
+      },
+      {
+        "tipo": "curvatura",
+        "camera": "isometrica"
+      }
+    ],
+    "impressaoManifesto": "635ec86659b45f85b72ea47e8c48f8a56cc689d6ddaade755f9b0d2d25cfc6d7",
+    "estado": "aprovada-por-inspecao-individual"
+  },
+  "gate": {
+    "procedencia": true,
+    "dominioResidual": true,
+    "objetivoAtingido": true,
+    "restricoes": true,
+    "c1Regular": true,
+    "inspecaoIndividual": true,
+    "passa": true
+  },
+  "arquivos": [
+    {
+      "tipo": "zebra",
+      "camera": "isometrica",
+      "arquivo": "vencedor-zebra-isometrica.png",
+      "sha256": "1b435d4029edc8ad5a1df634a7dcfad2620c09e70c9be5273cae52af41a78fd1"
+    },
+    {
+      "tipo": "zebra",
+      "camera": "lateral",
+      "arquivo": "vencedor-zebra-lateral.png",
+      "sha256": "da1b79857f3b11d788e3b5c27ac1bac7a8e2ce774d094890f7b7a520b7fd28a9"
+    },
+    {
+      "tipo": "zebra",
+      "camera": "frontal",
+      "arquivo": "vencedor-zebra-frontal.png",
+      "sha256": "a45fd4248035f1bc4f14bbb52fd08810f061b1f03dded79285e479366732c12c"
+    },
+    {
+      "tipo": "zebra",
+      "camera": "superior",
+      "arquivo": "vencedor-zebra-superior.png",
+      "sha256": "bfa916dbe5683c4962c01579eeec8484f52d77fb5824b50efeadd4a6aab75b80"
+    },
+    {
+      "tipo": "isofota",
+      "camera": "isometrica",
+      "arquivo": "vencedor-isofota-isometrica.png",
+      "sha256": "402d414baeffa1be031cd1232dcbc94c89d29d4d17b13c41b12b54537d2be8dd"
+    },
+    {
+      "tipo": "curvatura",
+      "camera": "isometrica",
+      "arquivo": "vencedor-curvatura-isometrica.png",
+      "sha256": "e2192cdbc1d0b011ba7231042132178507d117ea1f5a78f26e93f1c6252ff54b"
+    }
+  ]
+}

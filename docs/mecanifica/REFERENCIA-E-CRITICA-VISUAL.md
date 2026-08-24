@@ -110,6 +110,31 @@ desenhou é o modo de falha real desta investigação: um nariz aberto de
 um script que contava laços de borda. Medição só pega o defeito que alguém já
 imaginou; olhar pega o resto.
 
+### Regra obrigatória de inspeção individual
+
+**Mosaico, folha de contato, painel lado a lado ou miniatura é somente índice;
+nunca é evidência suficiente para aprovar ou encerrar uma fatia visual.** Cada
+imagem exigida pelo gate é aberta separadamente, em tamanho nativo, e lida antes
+de registrar o resultado. Para forma 3D, o conjunto mínimo inclui mais de um
+enquadramento: isométrica, lateral, frontal e superior quando aplicáveis.
+
+Um canal de diagnóstico também obedece a essa regra: zebra, isófota e curvatura
+não podem mostrar wireframe, triangulação, costura de UV/índice ou um recorte de
+exportação como se isso fosse defeito de superfície. Primeiro se valida a leitura
+nos controles sadios, depois se lê cada artefato individualmente. Métrica e
+painel resumem; não substituem essa inspeção.
+
+### Pareamento referência ↔ render
+
+Quando a referência nasce como prancha com várias vistas, ela é uma fonte de
+origem, não uma imagem a ser julgada inteira. O pacote deve recortar e hashear
+cada vista antes da modelagem. Em toda rodada, `frontal` confronta somente
+`frontal`, `lateral` somente `lateral`, `traseira` somente `traseira` e
+`superior` somente `superior`, todos abertos individualmente em tamanho nativo.
+A perspectiva confirma a integração entre decisões já aceitas nas ortográficas;
+ela nunca mascara uma falha nelas. O manifesto do alvo precisa declarar esse
+pareamento e o crítico registra os hashes de ambos os lados da comparação.
+
 ### O crítico recebe IMAGEM
 
 O que se despacha ao crítico é a **imagem**, e a pergunta é sobre o que ela

@@ -1,0 +1,72 @@
+{
+  "formato": "mecanifica.alvo-visual-n6@1",
+  "id": "cupe-esportivo-n6-aprovado",
+  "origem": {
+    "tipo": "prancha-gerada",
+    "ferramenta": "imagegen",
+    "arquivo": "prancha-origem.png",
+    "sha256": "e81c2f2934a7beef31ce87fca27c447481d3af9acf07a12dd90c19677a713996",
+    "dimensoes": [
+      1536,
+      1024
+    ]
+  },
+  "aprovacaoUsuario": {
+    "estado": "aprovada",
+    "data": "2026-08-24",
+    "decisao": "direção visual aprovada para converter em pacote técnico N6"
+  },
+  "regraDeUso": "cada vista é aberta individualmente, em tamanho nativo, e comparada somente ao render de mesmo enquadramento; a prancha inteira é índice de coerência, não evidência de aceite",
+  "vistas": [
+    {
+      "id": "frontal",
+      "arquivo": "vistas/frontal.png",
+      "x": 0,
+      "y": 0,
+      "largura": 440,
+      "altura": 464,
+      "papel": "comparar largura, faróis, entradas frontais, para-brisa e arcos dianteiros",
+      "sha256": "50b2881d86685d70d4a4ef1151907be5962e2615ac34ed1304632209cd366421"
+    },
+    {
+      "id": "lateral-direita",
+      "arquivo": "vistas/lateral-direita.png",
+      "x": 444,
+      "y": 0,
+      "largura": 668,
+      "altura": 464,
+      "papel": "comparar postura, entre-eixos, cabine, entradas laterais e balanços",
+      "sha256": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434"
+    },
+    {
+      "id": "traseira",
+      "arquivo": "vistas/traseira.png",
+      "x": 1116,
+      "y": 0,
+      "largura": 420,
+      "altura": 464,
+      "papel": "comparar largura traseira, lanternas, difusor e saídas",
+      "sha256": "2510318e216b24e156875bdc63427f7c2c064616c74f2c0695aeb59b9fc42306"
+    },
+    {
+      "id": "superior",
+      "arquivo": "vistas/superior.png",
+      "x": 0,
+      "y": 468,
+      "largura": 764,
+      "altura": 556,
+      "papel": "comparar planta, cabine, ombros e deck traseiro",
+      "sha256": "a372aa4f3a20554bec196cca6f7d9e2b22318bc37a90a556e1ba57a6aa3e65ca"
+    },
+    {
+      "id": "perspectiva-frontal-direita",
+      "arquivo": "vistas/perspectiva-frontal-direita.png",
+      "x": 768,
+      "y": 468,
+      "largura": 768,
+      "altura": 556,
+      "papel": "verificar integração entre as quatro ortográficas; não substitui nenhuma delas",
+      "sha256": "2e466151cf20f724b2c5339132d43b9aa6d1a4323824276f5e77f5d328394605"
+    }
+  ]
+}

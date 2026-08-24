@@ -1,0 +1,10 @@
+{
+  "formato": "mecanifica.inspecao-n5@1",
+  "estado": "aprovada",
+  "revisor": "Codex — revisão visual independente",
+  "data": "2026-08-24",
+  "impressaoManifesto": "635ec86659b45f85b72ea47e8c48f8a56cc689d6ddaade755f9b0d2d25cfc6d7",
+  "cobertura": { "imagens": 6, "porSecao": ["zebra isométrica, lateral, frontal e superior", "isófota isométrica", "curvatura isométrica"] },
+  "veredito": "o vencedor exibe faixa contínua, crista central arredondada e transição sem costura espúria no ombro; a evidência confirma somente a seção sintética, não uma carroceria.",
+  "regra": "todo arquivo foi aberto individualmente em tamanho nativo; mosaico não participou do aceite"
+}

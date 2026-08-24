@@ -1,0 +1,22 @@
+{
+  "formato": "mecanifica.fonte-busca-n5@1",
+  "escopo": "prova C3 sobre uma seção sintética; não é alvo de veículo",
+  "secao": {
+    "id": "compacto-busca",
+    "parametrosFixos": { "centroY": 620, "ombroX": 900, "ombroY": 880, "salienciaFlanco": 58, "quedaDoMaximo": 48, "soleiraX": 820, "soleiraY": 145 },
+    "liberdadeResidual": { "campo": "bojoRelativo", "minimo": 0.08, "maximo": 0.18, "passo": 0.005 }
+  },
+  "objetivo": {
+    "id": "sagita-capo-central",
+    "alvoMm": 41.6,
+    "toleranciaMm": 0.01,
+    "descricao": "igualar o bojo central medido acima da base suave da seção sintética N5"
+  },
+  "valores": [
+    { "id": "centro", "campo": "perfil.centro", "valor": 620, "origem": { "tipo": "medido", "referencia": "seção sintética N5" } },
+    { "id": "ombro", "campo": "ombro.direito", "valor": 880, "origem": { "tipo": "medido", "referencia": "seção sintética N5" } },
+    { "id": "sagita-alvo", "campo": "perfil.sagita-capo", "valor": 41.6, "origem": { "tipo": "medido", "referencia": "alvo sintético N5" } },
+    { "id": "bojo-esperado", "campo": "perfil.bojo-relativo", "valor": 0.16, "origem": { "tipo": "derivado", "referencia": "sagita-alvo / (ombro - centro)" } },
+    { "id": "bojo-resolvido", "campo": "perfil.bojo-escolhido", "valor": 0.16, "origem": { "tipo": "resolvido", "fontes": ["sagita-alvo", "bojo-esperado"] } }
+  ]
+}

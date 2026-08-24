@@ -1,0 +1,126 @@
+{
+  "formato": "mecanifica.sonda-suavizacao-n3-5@1",
+  "escopo": "quarto dianteiro reprovado; suavização C1 sem busca, sem receita nova e sem promoção de artefato",
+  "fonte": "rascunhos-defeituosos/prova-cage-quarto-dianteiro/evidencias/malha-nivel-2.json",
+  "parametros": {
+    "iteracoes": 6,
+    "lambda": 0.18,
+    "limiteProtecaoGraus": 25
+  },
+  "antes": {
+    "c1": {
+      "diedroP95Graus": 22.027,
+      "parcelaAbrupta": 0.04211
+    },
+    "regiaoSuave": {
+      "arestasProtegidas": 7697,
+      "verticesProtegidos": 4266,
+      "adjacenciasSuaves": 2051,
+      "diedroSuaveMedioGraus": 13.721,
+      "diedroSuaveP95Graus": 23.972,
+      "diedroSuaveMaximoGraus": 24.99
+    }
+  },
+  "depois": {
+    "c1": {
+      "diedroP95Graus": 21.321,
+      "parcelaAbrupta": 0.04391
+    },
+    "regiaoSuave": {
+      "arestasProtegidas": 7709,
+      "verticesProtegidos": 4263,
+      "adjacenciasSuaves": 2039,
+      "diedroSuaveMedioGraus": 13.471,
+      "diedroSuaveP95Graus": 23.836,
+      "diedroSuaveMaximoGraus": 24.99
+    }
+  },
+  "preservacao": {
+    "verticesProtegidos": 4266,
+    "arestasProtegidas": 7697,
+    "deslocamentoMaximoMm": 9.304,
+    "deslocamentoMedioMm": 0.137
+  },
+  "gate": {
+    "passa": false,
+    "reducaoRelativaP95": 0.0057,
+    "melhoraMaterial": false,
+    "semRegressaoAbrupta": false,
+    "topologiaPreservada": true,
+    "motivo": "sonda não aprova veículo; só passa com redução material da rugosidade livre, sem criar ruptura abrupta nem mover bordas/quinas protegidas"
+  },
+  "arquivos": [
+    {
+      "rotulo": "antes",
+      "tipo": "zebra",
+      "camera": "isometrica",
+      "arquivo": "antes-zebra-isometrica.png"
+    },
+    {
+      "rotulo": "antes",
+      "tipo": "zebra",
+      "camera": "lateral",
+      "arquivo": "antes-zebra-lateral.png"
+    },
+    {
+      "rotulo": "antes",
+      "tipo": "zebra",
+      "camera": "frontal",
+      "arquivo": "antes-zebra-frontal.png"
+    },
+    {
+      "rotulo": "antes",
+      "tipo": "zebra",
+      "camera": "superior",
+      "arquivo": "antes-zebra-superior.png"
+    },
+    {
+      "rotulo": "antes",
+      "tipo": "isofota",
+      "camera": "isometrica",
+      "arquivo": "antes-isofota-isometrica.png"
+    },
+    {
+      "rotulo": "antes",
+      "tipo": "curvatura",
+      "camera": "isometrica",
+      "arquivo": "antes-curvatura-isometrica.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "zebra",
+      "camera": "isometrica",
+      "arquivo": "depois-zebra-isometrica.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "zebra",
+      "camera": "lateral",
+      "arquivo": "depois-zebra-lateral.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "zebra",
+      "camera": "frontal",
+      "arquivo": "depois-zebra-frontal.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "zebra",
+      "camera": "superior",
+      "arquivo": "depois-zebra-superior.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "isofota",
+      "camera": "isometrica",
+      "arquivo": "depois-isofota-isometrica.png"
+    },
+    {
+      "rotulo": "depois",
+      "tipo": "curvatura",
+      "camera": "isometrica",
+      "arquivo": "depois-curvatura-isometrica.png"
+    }
+  ]
+}

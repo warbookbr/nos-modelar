@@ -1,0 +1,25 @@
+{
+  "formato": "mecanifica.fonte-restricoes-n4@1",
+  "perfis": [
+    {
+      "id": "compacto",
+      "parametros": { "centroY": 620, "ombroX": 900, "ombroY": 880, "salienciaFlanco": 58, "quedaDoMaximo": 48, "soleiraX": 820, "soleiraY": 145 }
+    },
+    {
+      "id": "gran-turismo",
+      "parametros": { "centroY": 670, "ombroX": 1020, "ombroY": 930, "salienciaFlanco": 74, "quedaDoMaximo": 56, "soleiraX": 885, "soleiraY": 150 }
+    }
+  ],
+  "valores": [
+    { "id": "comprimento", "campo": "envelope.comprimento", "valor": 4.7, "origem": { "tipo": "medido", "referencia": "alvo sintético N4" } },
+    { "id": "largura", "campo": "envelope.largura", "valor": 2.04, "origem": { "tipo": "medido", "referencia": "alvo sintético N4" } },
+    { "id": "ombro-compacto", "campo": "ombro.direito", "valor": 0.88, "origem": { "tipo": "medido", "referencia": "seção sintética compacto" } },
+    { "id": "ombro-gt", "campo": "ombro.esquerdo", "valor": 0.93, "origem": { "tipo": "medido", "referencia": "seção sintética gran-turismo" } },
+    { "id": "maximo-compacto", "campo": "massa-primaria.contorno", "valor": 0.958, "origem": { "tipo": "derivado", "referencia": "ombro-compacto + saliência medida" } },
+    { "id": "maximo-gt", "campo": "massa-primaria.contorno", "valor": 1.094, "origem": { "tipo": "derivado", "referencia": "ombro-gt + saliência medida" } },
+    { "id": "queda-compacto", "campo": "perfil.queda-maximo", "valor": 0.048, "origem": { "tipo": "derivado", "referencia": "seção sintética compacto" } },
+    { "id": "queda-gt", "campo": "perfil.queda-maximo", "valor": 0.056, "origem": { "tipo": "derivado", "referencia": "seção sintética gran-turismo" } },
+    { "id": "tangente-ombro", "campo": "perfil.g1-ombro", "valor": 1, "origem": { "tipo": "resolvido", "fontes": ["ombro-compacto", "maximo-compacto"] } },
+    { "id": "folga-teste", "campo": "ensaio.folga", "valor": 0.04, "origem": { "tipo": "declarado", "justificativa": "não estrutural; apenas meta da sonda" } }
+  ]
+}

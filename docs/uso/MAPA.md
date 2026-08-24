@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-625 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+642 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -115,6 +115,27 @@
 - `README.md` — Prova: seções por medida — interrompida, com um achado que fica
 - `informacao-das-vistas.mjs` — informacao-das-vistas.mjs — as três vistas ortográficas determinam a seção?
 - `secoes-por-medida.mjs` — secoes-por-medida.mjs — seções transversais derivadas de PERFIL MEDIDO, não de números digitados.
+
+## autoria-assistida/experimentos/sonda-busca-n5/
+
+- `README.md` — Sonda N5 — busca sobre liberdade residual
+- `busca-bojo.mjs` — N5: busca determinística em uma liberdade residual declarada por N4.
+- `gerar-evidencias.mjs` — Gera a evidência N5 do vencedor; não desenha nem promove um veículo.
+- `sonda-busca-n5.test.mjs` — Provas N5: a busca usa uma liberdade real e não promove uma carroceria.
+
+## autoria-assistida/experimentos/sonda-restricoes-n4/
+
+- `README.md` — Sonda N4 — autoria por restrição
+- `gerar-evidencias.mjs` — Gera as duas seções N4 e suas evidências C1, sem produzir veículo.
+- `restricoes-secao.mjs` — N4: autoria restrita de uma seção limpa. Não é uma carroceria nem toca no núcleo.
+- `sonda-restricoes-n4.test.mjs` — Provas N4: duas formas limpas obedecem o mesmo enunciado restrito.
+
+## autoria-assistida/experimentos/sonda-suavizacao-n3-5/
+
+- `README.md` — Sonda N3.5 — suavização C1
+- `gerar-evidencias.mjs` — Gera a sonda N3.5 sem alterar a receita ou a malha histórica de entrada.
+- `sonda-suavizacao-n3-5.test.mjs` — Provas de isolamento, preservação e leitura C1 da sonda N3.5.
+- `suavizar-c1.mjs` — Sonda N3.5: suavização local guiada exclusivamente por continuidade C1. É isolada: não importa o núcleo nem reescreve a receita do quarto dianteiro.
 
 ## autoria-assistida/guias/forma/
 
@@ -331,6 +352,7 @@
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
+- `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
 - `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
@@ -392,6 +414,8 @@
 - `RELATORIO-N1-FLUXO-AUTORIA.md` — Relatório N1 — contratos e orquestração da autoria 3D
 - `RELATORIO-N2-FORMA-GLOBAL.md` — Relatório N2 — forma global
 - `RELATORIO-N3-CANAL-PERCEPCAO.md` — Relatório N3 — canal de percepção
+- `RELATORIO-N4-RESTRICOES.md` — Relatório N4 — sonda de autoria por restrição
+- `RELATORIO-N5-BUSCA.md` — Relatório N5 — busca residual controlada
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
@@ -785,6 +809,8 @@
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `recortar-prancha-n6.mjs` — Recorta deterministicamente a prancha N6 aprovada; cada vista vira evidência própria.
+- `recortar-prancha-n6.test.mjs` — Garante que a prancha aprovada não volte a ser consumida como mosaico.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.

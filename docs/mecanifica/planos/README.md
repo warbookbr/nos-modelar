@@ -330,9 +330,19 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 A fatia N3 — canal de percepção — do
 [plano de arquitetura híbrida por famílias](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
-foi concluída: o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md) registra
-zebra, isófotas, curvatura e procedência contra controles sintéticos e
-artefatos reprovados. N3.5 é somente a próxima sonda possível; não está aberta
-e não aprova veículo, encerra G02 ou libera N4/N6. Os demais candidatos,
+foi **revalidada para C1**: o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md)
+corrige o falso aceite que usou painel e rasterização plana. Agora zebra,
+isófota e curvatura são julgadas individualmente, em tamanho nativo e em
+múltiplas vistas; painel e métricas só indexam, e o aceite é ligado por
+SHA-256 ao manifesto das imagens. N3.5 foi executada e **rejeitada**: a
+suavização C1 preservou a peça, mas não reduziu materialmente sua rugosidade e
+aumentou rupturas abruptas. Esse resultado só reprova reparo por suavização. A
+[sonda N4](../RELATORIO-N4-RESTRICOES.md) aprovou a viabilidade estreita de C2
+com duas seções limpas e três restrições, mas só após revogar e corrigir uma
+crista central que o P95 escondia. A [sonda N5](../RELATORIO-N5-BUSCA.md) provou
+busca C3 sobre um único grau residual e alvo sintético. O usuário aprovou o
+[alvo visual N6](../ALVO-N6-CUPE-ESPORTIVO.md): a preparação está aberta com
+pareamento obrigatório entre vistas individuais, mas a geometria ainda depende
+de blocagem multivista e crítica visual independente. Os demais candidatos,
 inclusive o antigo aceite visual e prova de superfície, permanecem no
 [`BACKLOG.md`](BACKLOG.md) sem autorização automática.
