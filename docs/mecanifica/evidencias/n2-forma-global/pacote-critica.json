@@ -1,17 +1,33 @@
 {
-  "formato": "mecanifica.pacote-critica-forma-global@1",
-  "consulta": "consulta-cega-n2-01",
+  "formato": "mecanifica.pacote-critica-forma-global@2",
+  "consulta": "consulta-cega-n2-02",
   "contexto": "vistas-neutras-sem-identidade-do-alvo",
-  "vistas": [
-    "cego-isometrica.svg",
-    "cego-frontal.svg",
-    "cego-direita.svg",
-    "cego-superior.svg"
+  "fases": [
+    {
+      "id": "reconhecimento-cego",
+      "vistas": [
+        "cego-isometrica.svg",
+        "cego-frontal.svg",
+        "cego-direita.svg",
+        "cego-superior.svg"
+      ]
+    },
+    {
+      "id": "adequacao-ao-alvo",
+      "vistas": [
+        "comparacao-frontal.svg",
+        "comparacao-direita.svg",
+        "comparacao-superior.svg"
+      ]
+    }
   ],
-  "comparacoes": [
-    "comparacao-frontal.svg",
-    "comparacao-direita.svg",
-    "comparacao-superior.svg"
+  "criterios": [
+    "categoria-identificavel",
+    "frente-traseira-distinguiveis",
+    "leitura-sem-apoios",
+    "massas-integradas",
+    "proporcoes-plausiveis",
+    "vistas-coerentes"
   ],
-  "instrucao": "registre o rótulo reconhecido, achados objetivos e estado reconhecida, reprovada ou inconclusiva sem consultar alvo, fonte, manifesto ou nomes internos"
+  "instrucao": "julgue todos os critérios; a segunda fase só abre depois do rótulo cego; qualquer reprovação ou dúvida impede reconhecimento"
 }

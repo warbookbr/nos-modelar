@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+<rect width="960" height="640" fill="#f5f6f4"/>
+<rect x="18" y="18" width="924" height="604" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
+<polygon points="403.09,586.00 367.82,512.56 364.35,420.04 371.29,315.95 370.13,223.43 368.40,162.71 382.27,96.21 445.30,54.00 514.70,54.00 577.73,96.21 591.60,162.71 589.87,223.43 588.71,315.95 595.65,420.04 592.18,512.56 556.91,586.00" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="415.23,460.52 408.30,396.91 409.45,315.95 399.04,223.43 560.96,223.43 550.55,315.95 551.70,396.91 544.77,460.52" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="358.57,510.59 601.43,510.59 601.43,427.79 358.57,427.79" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<polygon points="358.57,202.03 601.43,202.03 601.43,123.39 358.57,123.39" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
+<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">SUPERIOR</text>
+<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text>
+</svg>

@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
 <rect width="960" height="640" fill="#f5f6f4"/>
 <rect x="18" y="18" width="924" height="604" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
-<polygon points="568.05,195.37 595.33,195.37 595.33,116.00 568.05,116.00" fill="#1f4f88" stroke="#153653" stroke-width="2.2"/>
-<polygon points="364.67,195.37 391.95,195.37 391.95,116.00 364.67,116.00" fill="#668bb7" stroke="#153653" stroke-width="2.2"/>
-<polygon points="568.05,530.20 595.33,530.20 595.33,450.83 568.05,450.83" fill="#244874" stroke="#153653" stroke-width="2.2"/>
-<polygon points="364.67,530.20 391.95,530.20 391.95,450.83 364.67,450.83" fill="#7a9abe" stroke="#153653" stroke-width="2.2"/>
-<polygon points="374.59,583.52 585.41,583.52 585.41,56.48 374.59,56.48" fill="#4977ad" stroke="#153653" stroke-width="2.2"/>
-<polygon points="399.39,434.71 560.61,434.71 560.61,211.49 399.39,211.49" fill="#315f9b" stroke="#153653" stroke-width="2.2"/>
+<polygon points="379.38,420.04 580.62,420.04 580.62,211.87 379.38,211.87" fill="#173c69" stroke="#153653" stroke-width="2.2"/>
+<polygon points="561.53,202.03 590.45,202.03 590.45,123.39 561.53,123.39" fill="#1f4f88" stroke="#153653" stroke-width="2.2"/>
+<polygon points="369.55,202.03 398.47,202.03 398.47,123.39 369.55,123.39" fill="#668bb7" stroke="#153653" stroke-width="2.2"/>
+<polygon points="559.22,510.59 595.07,510.59 595.07,427.79 559.22,427.79" fill="#244874" stroke="#153653" stroke-width="2.2"/>
+<polygon points="364.93,510.59 400.78,510.59 400.78,427.79 364.93,427.79" fill="#7a9abe" stroke="#153653" stroke-width="2.2"/>
+<polygon points="365.50,469.19 368.97,518.34 373.60,529.91 404.83,584.27 555.17,584.27 586.40,529.91 591.03,518.34 594.50,469.19 589.87,162.71 584.09,119.34 575.99,96.21 515.85,55.73 444.15,55.73 384.01,96.21 375.91,119.34 370.13,162.71" fill="#4977ad" stroke="#153653" stroke-width="2.2"/>
+<polygon points="392.10,224.59 396.73,420.04 399.04,460.52 408.30,518.34 551.70,518.34 560.96,460.52 563.27,420.04 567.90,224.59" fill="#315f9b" stroke="#153653" stroke-width="2.2"/>
 <text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">SUPERIOR</text>
 <text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text>
 </svg>

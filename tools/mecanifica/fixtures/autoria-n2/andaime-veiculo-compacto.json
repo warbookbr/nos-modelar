@@ -1,80 +1,85 @@
 {
-  "formato": "mecanifica.andaime-global@1",
-  "id": "andaime-veiculo-compacto-n2",
-  "objetivo": "veiculo-compacto-n2",
-  "alvo": "alvo-veiculo-compacto-n2",
+  "formato": "mecanifica.andaime-global@2",
+  "id": "andaime-cupe-esportivo-n2",
+  "objetivo": "cupe-esportivo-n2",
+  "alvo": "alvo-cupe-esportivo-n2",
   "familia": "veiculo",
-  "intencao": "blocagem inteira de baixa densidade antes de decomposição ou superfície",
+  "intencao": "blocagem integrada de baixa densidade; massas automotivas antes de superfície, painéis ou detalhe",
   "unidade": "mm",
   "eixos": { "direita": "+x", "cima": "+y", "frente": "+z" },
-  "envelope": { "min": [-930, 0, -2100], "max": [930, 1450, 2150] },
+  "envelope": { "min": [-1045, 0, -2320], "max": [1045, 1190, 2250] },
   "landmarks": [
-    { "id": "eixo-dianteiro", "posicao": [0, 320, 1350] },
-    { "id": "eixo-traseiro", "posicao": [0, 320, -1350] },
-    { "id": "nariz", "posicao": [0, 500, 2150] },
-    { "id": "pico-cabine", "posicao": [0, 1450, 300] },
-    { "id": "traseira", "posicao": [0, 350, -2100] }
+    { "id": "eixo-dianteiro", "posicao": [0, 340, 1325] },
+    { "id": "eixo-traseiro", "posicao": [0, 358, -1325] },
+    { "id": "fim-cabine", "posicao": [0, 920, -1240] },
+    { "id": "inicio-cabine", "posicao": [0, 890, 790] },
+    { "id": "nariz", "posicao": [0, 510, 2250] },
+    { "id": "ombro-dianteiro", "posicao": [950, 890, 1325] },
+    { "id": "ombro-traseiro", "posicao": [985, 840, -900] },
+    { "id": "pico-cabine", "posicao": [0, 1190, -550] },
+    { "id": "traseira", "posicao": [0, 910, -2320] }
   ],
   "volumes": [
     {
+      "id": "carroceria-global",
+      "regioes": ["capo", "cintura", "corpo-base", "ombros", "para-lamas-dianteiros", "para-lamas-traseiros", "traseira"],
+      "tipo": "casco-secoes",
+      "centro": [0, 0, 0],
+      "eixoPercurso": "z",
+      "eixosSecao": ["x", "y"],
+      "secoes": [
+        { "posicao": -2320, "perfil": [[-520, 210], [520, 210], [650, 560], [520, 900], [-520, 900], [-650, 560]] },
+        { "posicao": -1850, "perfil": [[-760, 200], [760, 200], [920, 600], [700, 850], [-700, 850], [-920, 600]] },
+        { "posicao": -1750, "perfil": [[-820, 360], [820, 360], [960, 600], [760, 850], [-760, 850], [-960, 600]] },
+        { "posicao": -1325, "perfil": [[-860, 430], [860, 430], [990, 600], [780, 810], [-780, 810], [-990, 600]] },
+        { "posicao": -900, "perfil": [[-890, 400], [890, 400], [980, 590], [790, 780], [-790, 780], [-980, 590]] },
+        { "posicao": 0, "perfil": [[-880, 400], [880, 400], [930, 570], [760, 760], [-760, 760], [-930, 570]] },
+        { "posicao": 800, "perfil": [[-870, 400], [870, 400], [940, 600], [780, 790], [-780, 790], [-940, 600]] },
+        { "posicao": 1325, "perfil": [[-850, 420], [850, 420], [950, 620], [800, 820], [-800, 820], [-950, 620]] },
+        { "posicao": 1700, "perfil": [[-720, 190], [720, 190], [900, 520], [620, 720], [-620, 720], [-900, 520]] },
+        { "posicao": 1900, "perfil": [[-650, 190], [650, 190], [830, 480], [500, 640], [-500, 640], [-830, 480]] },
+        { "posicao": 2250, "perfil": [[-260, 200], [260, 200], [310, 470], [230, 510], [-230, 510], [-310, 470]] }
+      ]
+    },
+    {
+      "id": "soleira-global",
+      "regioes": ["corpo-base"],
+      "tipo": "caixa",
+      "centro": [0, 275, 0],
+      "dimensoes": [1740, 250, 1800]
+    },
+    {
       "id": "cabine-global",
-      "regiao": "cabine",
-      "tipo": "prisma",
+      "regioes": ["cabine"],
+      "tipo": "casco-secoes",
       "centro": [0, 0, 0],
-      "eixoExtrusao": "x",
-      "eixosPerfil": ["z", "y"],
-      "comprimento": 1300,
-      "perfil": [[-900, 700], [-600, 1320], [300, 1450], [900, 720]]
+      "eixoPercurso": "z",
+      "eixosSecao": ["x", "y"],
+      "secoes": [
+        { "posicao": -1750, "perfil": [[-620, 800], [620, 800], [500, 1030], [-500, 1030]] },
+        { "posicao": -1250, "perfil": [[-700, 720], [700, 720], [560, 1100], [-560, 1100]] },
+        { "posicao": -900, "perfil": [[-720, 740], [720, 740], [610, 1140], [-610, 1140]] },
+        { "posicao": -550, "perfil": [[-720, 750], [720, 750], [600, 1190], [-600, 1190]] },
+        { "posicao": -180, "perfil": [[-710, 750], [710, 750], [600, 1185], [-600, 1185]] },
+        { "posicao": 400, "perfil": [[-730, 760], [730, 760], [630, 1040], [-630, 1040]] },
+        { "posicao": 790, "perfil": [[-760, 770], [760, 770], [700, 890], [-700, 890]] }
+      ]
     },
     {
-      "id": "corpo-global",
-      "regiao": "corpo-base",
-      "tipo": "prisma",
-      "centro": [0, 0, 0],
-      "eixoExtrusao": "x",
-      "eixosPerfil": ["z", "y"],
-      "comprimento": 1700,
-      "perfil": [[-2100, 350], [-2050, 700], [1900, 800], [2150, 500], [2050, 350]]
+      "id": "roda-dianteira-direita", "regioes": ["rodas-dianteiras"], "tipo": "cilindro",
+      "centro": [830, 340, 1325], "eixo": "x", "raio": 340, "comprimento": 250, "segmentos": 20
     },
     {
-      "id": "roda-dianteira-direita",
-      "regiao": "rodas-dianteiras",
-      "tipo": "cilindro",
-      "centro": [820, 320, 1350],
-      "eixo": "x",
-      "raio": 320,
-      "comprimento": 220,
-      "segmentos": 16
+      "id": "roda-dianteira-esquerda", "regioes": ["rodas-dianteiras"], "tipo": "cilindro",
+      "centro": [-830, 340, 1325], "eixo": "x", "raio": 340, "comprimento": 250, "segmentos": 20
     },
     {
-      "id": "roda-dianteira-esquerda",
-      "regiao": "rodas-dianteiras",
-      "tipo": "cilindro",
-      "centro": [-820, 320, 1350],
-      "eixo": "x",
-      "raio": 320,
-      "comprimento": 220,
-      "segmentos": 16
+      "id": "roda-traseira-direita", "regioes": ["rodas-traseiras"], "tipo": "cilindro",
+      "centro": [840, 358, -1325], "eixo": "x", "raio": 358, "comprimento": 310, "segmentos": 20
     },
     {
-      "id": "roda-traseira-direita",
-      "regiao": "rodas-traseiras",
-      "tipo": "cilindro",
-      "centro": [820, 320, -1350],
-      "eixo": "x",
-      "raio": 320,
-      "comprimento": 220,
-      "segmentos": 16
-    },
-    {
-      "id": "roda-traseira-esquerda",
-      "regiao": "rodas-traseiras",
-      "tipo": "cilindro",
-      "centro": [-820, 320, -1350],
-      "eixo": "x",
-      "raio": 320,
-      "comprimento": 220,
-      "segmentos": 16
+      "id": "roda-traseira-esquerda", "regioes": ["rodas-traseiras"], "tipo": "cilindro",
+      "centro": [-840, 358, -1325], "eixo": "x", "raio": 358, "comprimento": 310, "segmentos": 20
     }
   ]
 }

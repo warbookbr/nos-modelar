@@ -1,0 +1,21 @@
+{
+  "formato": "mecanifica.pacote-critica-alvo-forma-global@1",
+  "consulta": "consulta-alvo-n2-02",
+  "contexto": "alvo-e-rubrica-sem-blocagem",
+  "alvo": "alvo-cupe-esportivo-n2",
+  "categoriaEsperada": "cupe-esportivo",
+  "vistas": [
+    "alvo-frontal.svg",
+    "alvo-direita.svg",
+    "alvo-superior.svg"
+  ],
+  "criterios": [
+    "categoria-identificavel",
+    "frente-traseira-distinguiveis",
+    "leitura-sem-apoios",
+    "massas-integradas",
+    "proporcoes-plausiveis",
+    "vistas-coerentes"
+  ],
+  "instrucao": "avalie se o próprio alvo tem nível suficiente para orientar a blocagem; não consulte nem receba a blocagem"
+}

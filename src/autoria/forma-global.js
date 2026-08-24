@@ -4,16 +4,25 @@
 
 import { FAMILIAS_AUTORIA } from './contrato-autoria-3d.js';
 
-export const FORMATO_ALVO_FORMA_GLOBAL = 'mecanifica.alvo-forma-global@1';
-export const FORMATO_ANDAIME_GLOBAL = 'mecanifica.andaime-global@1';
-export const FORMATO_BLOCAGEM_GLOBAL = 'mecanifica.blocagem-global@1';
+export const FORMATO_ALVO_FORMA_GLOBAL = 'mecanifica.alvo-forma-global@2';
+export const FORMATO_ANDAIME_GLOBAL = 'mecanifica.andaime-global@2';
+export const FORMATO_BLOCAGEM_GLOBAL = 'mecanifica.blocagem-global@2';
+export const FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL = 'mecanifica.avaliacao-alvo-forma-global@1';
+export const FORMATO_CRITICA_ALVO_FORMA_GLOBAL = 'mecanifica.critica-alvo-forma-global@1';
 export const FORMATO_AVALIACAO_FORMA_GLOBAL = 'mecanifica.avaliacao-forma-global@1';
 export const FORMATO_DECISAO_FORMA_GLOBAL = 'mecanifica.decisao-forma-global@1';
 export const FORMATO_CRITICA_FORMA_GLOBAL = 'mecanifica.critica-forma-global@1';
 
 export const VISTAS_ORTOGRAFICAS_FORMA_GLOBAL = Object.freeze(['frontal', 'direita', 'superior']);
 export const VISTAS_EVIDENCIA_FORMA_GLOBAL = Object.freeze(['isometrica', ...VISTAS_ORTOGRAFICAS_FORMA_GLOBAL]);
-export const TIPOS_VOLUME_FORMA_GLOBAL = Object.freeze(['caixa', 'cilindro', 'prisma']);
+export const TIPOS_VOLUME_FORMA_GLOBAL = Object.freeze(['caixa', 'cilindro', 'prisma', 'casco-secoes']);
+
+export const CRITERIOS_VISUAIS_FORMA_GLOBAL = Object.freeze([
+  'categoria-identificavel', 'frente-traseira-distinguiveis', 'leitura-sem-apoios',
+  'massas-integradas', 'proporcoes-plausiveis', 'vistas-coerentes',
+]);
+
+const PAPEIS_CONTORNO = new Set(['massa-primaria', 'apoio-reconhecimento', 'referencia-secundaria']);
 
 const FAMILIAS = new Set(FAMILIAS_AUTORIA);
 const EIXOS = new Set(['x', 'y', 'z']);
@@ -141,10 +150,45 @@ function normalizarLandmarks(valor, caminho, { tolerancia = false } = {}) {
   return itens;
 }
 
+function listaTextos(valor, caminho, { vazia = true } = {}) {
+  if (!Array.isArray(valor) || (!vazia && valor.length === 0)) falhar('lista-invalida', caminho, `precisa ser lista${vazia ? '' : ' não vazia'}.`);
+  const itens = valor.map((item, indice) => texto(item, `${caminho}[${indice}]`));
+  if (new Set(itens).size !== itens.length) falhar('item-duplicado', caminho, 'não pode repetir item.');
+  return itens;
+}
+
+function normalizarProcedenciaAlvo(valor) {
+  chavesExatas(valor, ['tipo', 'referencias'], 'procedencia');
+  const referencias = listaTextos(valor.referencias, 'procedencia.referencias', { vazia: false });
+  if (referencias.some((item) => !item.startsWith('repo://') || item.includes('..'))) {
+    falhar('referencia-invalida', 'procedencia.referencias', 'cada referência precisa ser repo:// canônica e versionável.');
+  }
+  return { tipo: slug(valor.tipo, 'procedencia.tipo'), referencias };
+}
+
+function normalizarRubricaAlvo(valor) {
+  chavesExatas(valor, ['id', 'categoriaEsperada', 'criterios', 'papeisAuxiliares'], 'rubrica');
+  const papeisAuxiliares = listaSlugs(valor.papeisAuxiliares, 'rubrica.papeisAuxiliares');
+  if (papeisAuxiliares.some((papel) => !PAPEIS_CONTORNO.has(papel) || papel === 'massa-primaria')) {
+    falhar('papel-contorno-invalido', 'rubrica.papeisAuxiliares', 'só aceita papéis de contorno auxiliares conhecidos.');
+  }
+  return {
+    id: slug(valor.id, 'rubrica.id'), categoriaEsperada: slug(valor.categoriaEsperada, 'rubrica.categoriaEsperada'),
+    criterios: listaSlugs(valor.criterios, 'rubrica.criterios', { vazia: false }), papeisAuxiliares,
+  };
+}
+
+function normalizarContornoSemantico(valor, caminho) {
+  chavesExatas(valor, ['id', 'papel', 'pontos'], caminho);
+  if (!PAPEIS_CONTORNO.has(valor.papel)) falhar('papel-contorno-invalido', `${caminho}.papel`, 'papel de contorno desconhecido.');
+  return { id: slug(valor.id, `${caminho}.id`), papel: valor.papel, pontos: poligono(valor.pontos, `${caminho}.pontos`) };
+}
+
 export function normalizarAlvoFormaGlobal(valor) {
   chavesExatas(valor, [
     'formato', 'id', 'objetivo', 'familia', 'intencao', 'unidade', 'eixos', 'envelope',
     'landmarks', 'regioesObrigatorias', 'vistas', 'limiares', 'orcamento', 'rejeicoes',
+    'procedencia', 'rubrica',
   ], '$');
   if (valor.formato !== FORMATO_ALVO_FORMA_GLOBAL) falhar('formato-invalido', 'formato', `esperado '${FORMATO_ALVO_FORMA_GLOBAL}'.`);
   if (!FAMILIAS.has(valor.familia)) falhar('familia-invalida', 'familia', 'família de autoria desconhecida.');
@@ -158,9 +202,11 @@ export function normalizarAlvoFormaGlobal(valor) {
   const vistas = Object.fromEntries(VISTAS_ORTOGRAFICAS_FORMA_GLOBAL.map((vista) => {
     const item = valor.vistas[vista], onde = `vistas.${vista}`; chavesExatas(item, ['contornos'], onde);
     if (!Array.isArray(item.contornos) || !item.contornos.length) falhar('contorno-ausente', `${onde}.contornos`, 'precisa declarar ao menos um contorno.');
-    const contornos = item.contornos.map((contorno, indice) => poligono(contorno, `${onde}.contornos[${indice}]`));
+    const contornos = item.contornos.map((contorno, indice) => normalizarContornoSemantico(contorno, `${onde}.contornos[${indice}]`));
+    if (new Set(contornos.map(({ id }) => id)).size !== contornos.length) falhar('item-duplicado', `${onde}.contornos`, 'não pode repetir ID de contorno.');
+    if (!contornos.some(({ papel }) => papel === 'massa-primaria')) falhar('massa-primaria-ausente', `${onde}.contornos`, 'cada vista precisa declarar ao menos uma massa primária.');
     const limites = limitesDaVista(envelopeNormalizado, vista);
-    if (contornos.flat().some(([a, b]) => a < limites[0] || a > limites[2] || b < limites[1] || b > limites[3])) {
+    if (contornos.flatMap(({ pontos }) => pontos).some(([a, b]) => a < limites[0] || a > limites[2] || b < limites[1] || b > limites[3])) {
       falhar('contorno-fora-do-envelope', `${onde}.contornos`, 'todo ponto precisa pertencer à projeção do envelope do alvo.');
     }
     return [vista, { contornos }];
@@ -182,6 +228,7 @@ export function normalizarAlvoFormaGlobal(valor) {
     formato: FORMATO_ALVO_FORMA_GLOBAL, id: slug(valor.id, 'id'), objetivo: slug(valor.objetivo, 'objetivo'),
     familia: valor.familia, intencao: texto(valor.intencao, 'intencao'), unidade: 'mm',
     eixos: normalizarEixos(valor.eixos, 'eixos'), envelope: envelopeNormalizado,
+    procedencia: normalizarProcedenciaAlvo(valor.procedencia), rubrica: normalizarRubricaAlvo(valor.rubrica),
     landmarks: landmarksNormalizados,
     regioesObrigatorias: listaSlugs(valor.regioesObrigatorias, 'regioesObrigatorias', { vazia: false }),
     vistas, limiares, orcamento,
@@ -191,11 +238,11 @@ export function normalizarAlvoFormaGlobal(valor) {
 
 function normalizarVolume(valor, caminho) {
   objeto(valor, caminho);
-  const comuns = ['id', 'regiao', 'tipo', 'centro'];
+  const comuns = ['id', 'regioes', 'tipo', 'centro'];
   const tipo = valor.tipo;
   if (!TIPOS_VOLUME_FORMA_GLOBAL.includes(tipo)) falhar('tipo-volume-invalido', `${caminho}.tipo`, 'tipo de volume desconhecido.');
   const base = {
-    id: slug(valor.id, `${caminho}.id`), regiao: slug(valor.regiao, `${caminho}.regiao`), tipo,
+    id: slug(valor.id, `${caminho}.id`), regioes: listaSlugs(valor.regioes, `${caminho}.regioes`, { vazia: false }), tipo,
     centro: vetor3(valor.centro, `${caminho}.centro`),
   };
   if (tipo === 'caixa') {
@@ -213,6 +260,23 @@ function normalizarVolume(valor, caminho) {
       comprimento: numero(valor.comprimento, `${caminho}.comprimento`, { minimo: Number.EPSILON }),
       segmentos: numero(valor.segmentos, `${caminho}.segmentos`, { minimo: 8, maximo: 128, inteiro: true }),
     };
+  }
+  if (tipo === 'casco-secoes') {
+    chavesExatas(valor, [...comuns, 'eixoPercurso', 'eixosSecao', 'secoes'], caminho);
+    if (!EIXOS.has(valor.eixoPercurso)) falhar('eixo-invalido', `${caminho}.eixoPercurso`, 'precisa ser x, y ou z.');
+    if (!Array.isArray(valor.eixosSecao) || valor.eixosSecao.length !== 2 || valor.eixosSecao.some((eixo) => !EIXOS.has(eixo))
+      || new Set([valor.eixoPercurso, ...valor.eixosSecao]).size !== 3) {
+      falhar('eixos-secao-invalidos', `${caminho}.eixosSecao`, 'percurso e seção precisam cobrir x, y e z uma vez cada.');
+    }
+    if (!Array.isArray(valor.secoes) || valor.secoes.length < 2) falhar('secoes-insuficientes', `${caminho}.secoes`, 'casco precisa de ao menos duas seções.');
+    const secoes = valor.secoes.map((secao, indice) => {
+      const onde = `${caminho}.secoes[${indice}]`; chavesExatas(secao, ['posicao', 'perfil'], onde);
+      return { posicao: numero(secao.posicao, `${onde}.posicao`), perfil: poligono(secao.perfil, `${onde}.perfil`, { convexo: true }) };
+    });
+    if (secoes.some((secao, indice) => indice > 0 && secao.posicao <= secoes[indice - 1].posicao)) falhar('secoes-fora-de-ordem', `${caminho}.secoes`, 'posições precisam ser estritamente crescentes.');
+    const pontosPorSecao = secoes[0].perfil.length;
+    if (secoes.some(({ perfil }) => perfil.length !== pontosPorSecao)) falhar('topologia-secao-divergente', `${caminho}.secoes`, 'todas as seções precisam ter a mesma quantidade de pontos.');
+    return { ...base, eixoPercurso: valor.eixoPercurso, eixosSecao: [...valor.eixosSecao], secoes };
   }
   chavesExatas(valor, [...comuns, 'eixoExtrusao', 'eixosPerfil', 'comprimento', 'perfil'], caminho);
   if (!EIXOS.has(valor.eixoExtrusao)) falhar('eixo-invalido', `${caminho}.eixoExtrusao`, 'precisa ser x, y ou z.');
@@ -293,9 +357,29 @@ function malhaPrisma(volume) {
   }
   return { vertices, faces };
 }
+function malhaCascoSecoes(volume) {
+  const vertices = [], faces = [], percurso = indiceEixo[volume.eixoPercurso];
+  const a = indiceEixo[volume.eixosSecao[0]], b = indiceEixo[volume.eixosSecao[1]];
+  const quantidadeSecoes = volume.secoes.length, pontosPorSecao = volume.secoes[0].perfil.length;
+  for (const secao of volume.secoes) for (const [pa, pb] of secao.perfil) {
+    const ponto = [...volume.centro]; ponto[percurso] += secao.posicao; ponto[a] += pa; ponto[b] += pb; vertices.push(ponto);
+  }
+  const inverso = areaAssinada(volume.secoes[0].perfil) < 0;
+  for (let i = 1; i < pontosPorSecao - 1; i++) {
+    faces.push(inverso ? [0, i, i + 1] : [0, i + 1, i]);
+    const base = (quantidadeSecoes - 1) * pontosPorSecao;
+    faces.push(inverso ? [base, base + i + 1, base + i] : [base, base + i, base + i + 1]);
+  }
+  for (let secao = 0; secao < quantidadeSecoes - 1; secao++) for (let i = 0; i < pontosPorSecao; i++) {
+    const j = (i + 1) % pontosPorSecao, atual = secao * pontosPorSecao, proxima = (secao + 1) * pontosPorSecao;
+    faces.push([atual + i, atual + j, proxima + j], [atual + i, proxima + j, proxima + i]);
+  }
+  return { vertices, faces };
+}
 function malhaDoVolume(volume) {
   if (volume.tipo === 'caixa') return malhaCaixa(volume);
   if (volume.tipo === 'cilindro') return malhaCilindro(volume);
+  if (volume.tipo === 'casco-secoes') return malhaCascoSecoes(volume);
   return malhaPrisma(volume);
 }
 function envelopeDosVertices(vertices) {
@@ -317,8 +401,8 @@ export function compilarBlocagemGlobal(entrada) {
   for (const volume of andaime.volumes) {
     const malha = malhaDoVolume(volume), base = vertices.length;
     vertices.push(...malha.vertices);
-    faces.push(...malha.faces.map((face) => ({ vertices: face.map((indice) => indice + base), volume: volume.id, regiao: volume.regiao })));
-    volumes.push({ id: volume.id, regiao: volume.regiao, tipo: volume.tipo, inicioVertice: base, quantidadeVertices: malha.vertices.length, quantidadeTriangulos: malha.faces.length });
+    faces.push(...malha.faces.map((face) => ({ vertices: face.map((indice) => indice + base), volume: volume.id, regioes: copia(volume.regioes) })));
+    volumes.push({ id: volume.id, regioes: copia(volume.regioes), tipo: volume.tipo, inicioVertice: base, quantidadeVertices: malha.vertices.length, quantidadeTriangulos: malha.faces.length });
   }
   if (faces.length > alvo.orcamento.triangulosMaximos) falhar('orcamento-excedido', 'triangulos', 'quantidade derivada de triângulos excede o orçamento do alvo.');
   return congelar({
@@ -400,9 +484,109 @@ function compararGrades(alvo, modelo, resolucao) {
 function arredondar(valor) { return Math.round(valor * 1_000_000) / 1_000_000; }
 function diagnostico(codigo, campo, causa, impacto, proximoPasso) { return { codigo, campo, causa, impacto, proximoPasso }; }
 
+function intersecoesHorizontais(poligono, b) {
+  const xs = [];
+  for (let i = 0; i < poligono.length; i++) {
+    const p = poligono[i], q = poligono[(i + 1) % poligono.length];
+    if ((p[1] <= b && q[1] > b) || (q[1] <= b && p[1] > b)) xs.push(p[0] + (b - p[1]) * (q[0] - p[0]) / (q[1] - p[1]));
+  }
+  return xs;
+}
+
+function larguraNasMassas(contornos, b) {
+  const xs = contornos.flatMap(({ pontos }) => intersecoesHorizontais(pontos, b));
+  return xs.length >= 2 ? Math.max(...xs) - Math.min(...xs) : 0;
+}
+
+function normalizarCriticaAlvo(valor, alvo) {
+  chavesExatas(valor, ['formato', 'papel', 'contexto', 'alvo', 'estado', 'categoriaReconhecida', 'criterios', 'achados'], 'criticaAlvo');
+  if (valor.formato !== FORMATO_CRITICA_ALVO_FORMA_GLOBAL) falhar('formato-invalido', 'criticaAlvo.formato', `esperado '${FORMATO_CRITICA_ALVO_FORMA_GLOBAL}'.`);
+  if (valor.papel !== 'critico-visual-independente') falhar('papel-invalido', 'criticaAlvo.papel', 'G00 exige crítico visual independente.');
+  if (valor.contexto !== 'alvo-e-rubrica-sem-blocagem') falhar('contexto-invalido', 'criticaAlvo.contexto', 'o crítico do alvo não pode receber a blocagem.');
+  if (valor.alvo !== alvo.id) falhar('alvo-divergente', 'criticaAlvo.alvo', `esperado '${alvo.id}'.`);
+  if (!['aprovada', 'reprovada', 'inconclusiva'].includes(valor.estado)) falhar('estado-invalido', 'criticaAlvo.estado', 'estado desconhecido.');
+  const categoriaReconhecida = valor.categoriaReconhecida === null ? null : slug(valor.categoriaReconhecida, 'criticaAlvo.categoriaReconhecida');
+  if (valor.estado === 'aprovada' && categoriaReconhecida === null) falhar('categoria-ausente', 'criticaAlvo.categoriaReconhecida', 'aprovação precisa registrar a categoria reconhecida.');
+  if (!Array.isArray(valor.criterios)) falhar('criterios-invalidos', 'criticaAlvo.criterios', 'precisa ser lista.');
+  const criterios = valor.criterios.map((item, indice) => {
+    const onde = `criticaAlvo.criterios[${indice}]`; chavesExatas(item, ['id', 'estado', 'achado'], onde);
+    if (!['passa', 'reprova', 'inconclusivo'].includes(item.estado)) falhar('estado-invalido', `${onde}.estado`, 'estado de critério desconhecido.');
+    return { id: slug(item.id, `${onde}.id`), estado: item.estado, achado: texto(item.achado, `${onde}.achado`) };
+  }).sort((a, b) => comparar(a.id, b.id));
+  if (new Set(criterios.map(({ id }) => id)).size !== criterios.length
+    || criterios.length !== alvo.rubrica.criterios.length
+    || alvo.rubrica.criterios.some((id) => !criterios.some((item) => item.id === id))) {
+    falhar('cobertura-rubrica-invalida', 'criticaAlvo.criterios', 'precisa cobrir exatamente os critérios da rubrica do alvo.');
+  }
+  return { formato: FORMATO_CRITICA_ALVO_FORMA_GLOBAL, papel: valor.papel, contexto: valor.contexto, alvo: alvo.id, estado: valor.estado, categoriaReconhecida, criterios, achados: listaTextos(valor.achados, 'criticaAlvo.achados') };
+}
+
+function diagnosticosAlvoVeiculo(alvo) {
+  const encontrados = [];
+  const exigir = (passou, codigo, campo, causa, impacto, proximoPasso) => { if (!passou) encontrados.push(diagnostico(codigo, campo, causa, impacto, proximoPasso)); };
+  const dimensoes = alvo.envelope.max.map((maximo, indice) => maximo - alvo.envelope.min[indice]);
+  const [largura, altura, comprimento] = dimensoes;
+  exigir(comprimento / largura >= 1.8 && comprimento / largura <= 3.2 && altura / comprimento >= 0.18 && altura / comprimento <= 0.45,
+    'proporcao-familiar-invalida', 'envelope', `L/C ${arredondar(largura / comprimento)}; A/C ${arredondar(altura / comprimento)}.`,
+    'o alvo não fixa proporções plausíveis para uma blocagem veicular.', 'revise envelope, categoria e ocupação antes da geometria.');
+  const criteriosAusentes = CRITERIOS_VISUAIS_FORMA_GLOBAL.filter((id) => !alvo.rubrica.criterios.includes(id));
+  exigir(!criteriosAusentes.length, 'rubrica-incompleta', 'rubrica.criterios', `faltam: ${criteriosAusentes.join(', ') || '(nenhum)'}.`,
+    'o crítico poderia aprovar sem responder às falhas visuais conhecidas.', 'inclua todos os critérios mínimos da família veículo.');
+  const landmarks = new Map(alvo.landmarks.map((item) => [item.id, item]));
+  const landmarksObrigatorios = ['eixo-dianteiro', 'eixo-traseiro', 'fim-cabine', 'inicio-cabine', 'nariz', 'ombro-dianteiro', 'ombro-traseiro', 'pico-cabine', 'traseira'];
+  const faltamLandmarks = landmarksObrigatorios.filter((id) => !landmarks.has(id));
+  exigir(!faltamLandmarks.length, 'landmarks-familia-ausentes', 'landmarks', `faltam: ${faltamLandmarks.join(', ') || '(nenhum)'}.`,
+    'a distribuição capô-cabine-traseira e os ombros não está mensurável.', 'declare as estações semânticas veiculares antes da blocagem.');
+  if (!faltamLandmarks.length) {
+    const entreEixos = Math.abs(landmarks.get('eixo-dianteiro').posicao[2] - landmarks.get('eixo-traseiro').posicao[2]);
+    exigir(entreEixos / comprimento >= 0.5 && entreEixos / comprimento <= 0.7, 'entre-eixos-inverossimil', 'landmarks', `razão ${arredondar(entreEixos / comprimento)}.`,
+      'a postura veicular fica comprimida ou esticada.', 'corrija eixos e balanços no alvo.');
+    const diferencaExtremos = Math.abs(landmarks.get('nariz').posicao[1] - landmarks.get('traseira').posicao[1]) / altura;
+    exigir(diferencaExtremos >= 0.08, 'frente-traseira-indistintas', 'landmarks', `diferença vertical normalizada ${arredondar(diferencaExtremos)}.`,
+      'frente e traseira podem ser intercambiáveis na silhueta.', 'diferencie nariz e término traseiro na massa global.');
+  }
+  const planta = alvo.vistas.superior.contornos.filter(({ papel }) => papel === 'massa-primaria');
+  const zMin = alvo.envelope.min[2], zMax = alvo.envelope.max[2];
+  const amostras = [0.02, 0.15, 0.5, 0.85, 0.98].map((t) => larguraNasMassas(planta, zMin + (zMax - zMin) * t));
+  const maximo = Math.max(...amostras), minimo = Math.min(...amostras.filter((valor) => valor > 0));
+  exigir(maximo > 0 && minimo / maximo <= 0.82, 'planta-retangular', 'vistas.superior', `variação relativa ${maximo ? arredondar(1 - minimo / maximo) : 0}.`,
+    'uma caixa constante em planta pode passar por combinar com um alvo igualmente fraco.', 'declare afunilamento de nariz/traseira e ombros na massa primária.');
+  const frontal = alvo.vistas.frontal.contornos.filter(({ papel }) => papel === 'massa-primaria');
+  const yMin = alvo.envelope.min[1], yMax = alvo.envelope.max[1];
+  const larguraBaixa = larguraNasMassas(frontal, yMin + (yMax - yMin) * 0.35);
+  const larguraAlta = larguraNasMassas(frontal, yMin + (yMax - yMin) * 0.85);
+  exigir(larguraBaixa > 0 && larguraAlta > 0 && larguraAlta / larguraBaixa <= 0.78, 'secao-frontal-caixote', 'vistas.frontal', `razão topo/base ${larguraBaixa ? arredondar(larguraAlta / larguraBaixa) : 0}.`,
+    'cabine, cintura e ombros não formam hierarquia legível.', 'estreite o topo e explicite os ombros no alvo.');
+  return encontrados;
+}
+
+export function avaliarAlvoFormaGlobal(entrada) {
+  chavesExatas(entrada, ['alvo', 'critica'], '$');
+  const alvo = normalizarAlvoFormaGlobal(entrada.alvo);
+  const diagnosticos = alvo.familia === 'veiculo' ? diagnosticosAlvoVeiculo(alvo) : [];
+  const automatico = diagnosticos.length ? 'reprovado' : 'aprovado';
+  const critica = entrada.critica === null ? null : normalizarCriticaAlvo(entrada.critica, alvo);
+  let estado = 'bloqueado', motivo = 'critica-independente-ausente';
+  if (automatico === 'reprovado') { estado = 'reprovado'; motivo = 'qualidade-automatica-reprovada'; }
+  else if (critica?.estado === 'reprovada' || critica?.criterios.some((item) => item.estado === 'reprova')) { estado = 'reprovado'; motivo = 'critica-reprovou-alvo'; }
+  else if (critica?.estado === 'inconclusiva' || critica?.criterios.some((item) => item.estado === 'inconclusivo')) { motivo = 'critica-inconclusiva'; }
+  else if (critica?.estado === 'aprovada' && critica.categoriaReconhecida === alvo.rubrica.categoriaEsperada
+    && critica.criterios.every((item) => item.estado === 'passa')) { estado = 'aprovado'; motivo = 'qualidade-e-critica-confirmadas'; }
+  else if (critica?.estado === 'aprovada') { estado = 'reprovado'; motivo = 'categoria-divergente'; }
+  return congelar({
+    formato: FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL, alvo: alvo.id, objetivo: alvo.objetivo,
+    gate: 'g00-qualidade-do-alvo', estado, motivo, automatico, rubrica: copia(alvo.rubrica),
+    critica: critica ? copia(critica) : null, diagnosticos,
+  });
+}
+
 export function avaliarFormaGlobal(entrada) {
-  chavesExatas(entrada, ['alvo', 'blocagem'], '$');
+  chavesExatas(entrada, ['alvo', 'avaliacaoAlvo', 'blocagem'], '$');
   const alvo = normalizarAlvoFormaGlobal(entrada.alvo), blocagem = entrada.blocagem;
+  const avaliacaoAlvo = entrada.avaliacaoAlvo;
+  if (!avaliacaoAlvo || avaliacaoAlvo.formato !== FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL || avaliacaoAlvo.alvo !== alvo.id) {
+    falhar('avaliacao-alvo-invalida', 'avaliacaoAlvo', 'G01 exige avaliação G00 do mesmo alvo.');
+  }
   if (!blocagem || blocagem.formato !== FORMATO_BLOCAGEM_GLOBAL || !blocagem.malha || !Array.isArray(blocagem.malha.vertices)) {
     falhar('blocagem-invalida', 'blocagem', 'precisa ser produto de compilarBlocagemGlobal.');
   }
@@ -413,7 +597,7 @@ export function avaliarFormaGlobal(entrada) {
   const triangulos = blocagem.malha.faces.map((face) => face.vertices.map((indice) => blocagem.malha.vertices[indice]));
   const vistas = VISTAS_ORTOGRAFICAS_FORMA_GLOBAL.map((vista) => {
     const limites = limitesDaVista(alvo.envelope, vista), contornos = alvo.vistas[vista].contornos;
-    const alvoGrade = criarGrade(resolucao, limites, (ponto) => contornos.some((contorno) => dentroPoligono(ponto, contorno)));
+    const alvoGrade = criarGrade(resolucao, limites, (ponto) => contornos.some(({ pontos }) => dentroPoligono(ponto, pontos)));
     const triangulos2d = triangulos.map((face) => face.map((ponto) => projetar(ponto, vista)));
     const modeloGrade = criarGrade(resolucao, limites, (ponto) => triangulos2d.some(([a, b, c]) => dentroTriangulo(ponto, a, b, c)));
     const metricasBrutas = compararGrades(alvoGrade, modeloGrade, resolucao);
@@ -451,7 +635,7 @@ export function avaliarFormaGlobal(entrada) {
     ));
     return { id: esperado.id, estado: passou ? 'aprovado' : 'reprovado', erroNormalizado: Number.isFinite(erro) ? arredondar(erro) : null };
   });
-  const regioesPresentes = new Set(blocagem.volumes.map(({ regiao }) => regiao));
+  const regioesPresentes = new Set(blocagem.volumes.flatMap(({ regioes }) => regioes));
   const regioesAusentes = alvo.regioesObrigatorias.filter((regiao) => !regioesPresentes.has(regiao));
   if (regioesAusentes.length) diagnosticos.push(diagnostico(
     'regiao-global-ausente', 'regioesObrigatorias', `faltam: ${regioesAusentes.join(', ')}.`,
@@ -460,11 +644,16 @@ export function avaliarFormaGlobal(entrada) {
   const orcamentoAprovado = blocagem.estatisticas.volumes <= alvo.orcamento.volumesMaximos
     && blocagem.estatisticas.triangulos <= alvo.orcamento.triangulosMaximos;
   const envelopeAprovado = erroEnvelope <= alvo.limiares.erroEnvelopeRelativoMaximo;
-  const aprovado = vistas.every(({ estado }) => estado === 'aprovada') && landmarks.every(({ estado }) => estado === 'aprovado')
+  const medidasAprovadas = vistas.every(({ estado }) => estado === 'aprovada') && landmarks.every(({ estado }) => estado === 'aprovado')
     && !regioesAusentes.length && orcamentoAprovado && envelopeAprovado;
+  if (avaliacaoAlvo.estado !== 'aprovado') diagnosticos.unshift(diagnostico(
+    'alvo-nao-aprovado', 'avaliacaoAlvo', `G00 está ${avaliacaoAlvo.estado}: ${avaliacaoAlvo.motivo}.`,
+    'métricas contra um alvo fraco não autorizam a forma.', 'aprove o alvo por rubrica e crítica independente antes de usar G01.',
+  ));
+  const estado = avaliacaoAlvo.estado === 'reprovado' || !medidasAprovadas ? 'reprovado' : avaliacaoAlvo.estado === 'aprovado' ? 'aprovado' : 'bloqueado';
   return congelar({
     formato: FORMATO_AVALIACAO_FORMA_GLOBAL, alvo: alvo.id, blocagem: blocagem.id, objetivo: alvo.objetivo,
-    gate: 'g01-forma-global-medida', estado: aprovado ? 'aprovado' : 'reprovado',
+    gate: 'g01-forma-global-medida', estado, g00: { estado: avaliacaoAlvo.estado, motivo: avaliacaoAlvo.motivo },
     vistas, envelope: { estado: envelopeAprovado ? 'aprovado' : 'reprovado', erroRelativoMaximo: arredondar(erroEnvelope) },
     landmarks, regioes: { estado: regioesAusentes.length ? 'reprovado' : 'aprovado', ausentes: regioesAusentes },
     orcamento: { estado: orcamentoAprovado ? 'aprovado' : 'reprovado', usado: copia(blocagem.estatisticas), limite: copia(alvo.orcamento) },
@@ -473,7 +662,7 @@ export function avaliarFormaGlobal(entrada) {
 }
 
 function normalizarCritica(valor, blocagem) {
-  chavesExatas(valor, ['formato', 'papel', 'contexto', 'blocagem', 'estado', 'rotulo', 'achados'], 'critica');
+  chavesExatas(valor, ['formato', 'papel', 'contexto', 'blocagem', 'estado', 'rotulo', 'criterios', 'achados'], 'critica');
   if (valor.formato !== FORMATO_CRITICA_FORMA_GLOBAL) falhar('formato-invalido', 'critica.formato', `esperado '${FORMATO_CRITICA_FORMA_GLOBAL}'.`);
   if (valor.papel !== 'critico-visual-independente') falhar('papel-invalido', 'critica.papel', 'a decisão G02 exige crítico visual independente.');
   if (valor.contexto !== 'vistas-neutras-sem-identidade-do-alvo') falhar('contexto-invalido', 'critica.contexto', 'o crítico precisa receber somente vistas neutras sem o rótulo esperado.');
@@ -481,8 +670,20 @@ function normalizarCritica(valor, blocagem) {
   if (!['reconhecida', 'reprovada', 'inconclusiva'].includes(valor.estado)) falhar('estado-invalido', 'critica.estado', 'estado de crítica desconhecido.');
   const rotulo = valor.rotulo === null ? null : texto(valor.rotulo, 'critica.rotulo', 120);
   if (valor.estado === 'reconhecida' && rotulo === null) falhar('rotulo-ausente', 'critica.rotulo', 'reconhecimento precisa registrar o que foi reconhecido.');
+  if (!Array.isArray(valor.criterios)) falhar('criterios-invalidos', 'critica.criterios', 'precisa ser lista.');
+  const criterios = valor.criterios.map((item, indice) => {
+    const onde = `critica.criterios[${indice}]`; chavesExatas(item, ['id', 'estado', 'achado'], onde);
+    if (!['passa', 'reprova', 'inconclusivo'].includes(item.estado)) falhar('estado-invalido', `${onde}.estado`, 'estado de critério desconhecido.');
+    return { id: slug(item.id, `${onde}.id`), estado: item.estado, achado: texto(item.achado, `${onde}.achado`) };
+  }).sort((a, b) => comparar(a.id, b.id));
+  if (new Set(criterios.map(({ id }) => id)).size !== criterios.length
+    || criterios.length !== CRITERIOS_VISUAIS_FORMA_GLOBAL.length
+    || CRITERIOS_VISUAIS_FORMA_GLOBAL.some((id) => !criterios.some((item) => item.id === id))) {
+    falhar('cobertura-rubrica-invalida', 'critica.criterios', 'precisa cobrir exatamente os critérios visuais mínimos.');
+  }
+  if (valor.estado === 'reconhecida' && criterios.some((item) => item.estado !== 'passa')) falhar('critica-contraditoria', 'critica', 'reconhecimento não pode coexistir com critério reprovado ou inconclusivo.');
   if (!Array.isArray(valor.achados) || valor.achados.some((item) => typeof item !== 'string' || !item.trim())) falhar('achados-invalidos', 'critica.achados', 'precisa ser lista de textos.');
-  return { formato: FORMATO_CRITICA_FORMA_GLOBAL, papel: valor.papel, contexto: valor.contexto, blocagem, estado: valor.estado, rotulo, achados: valor.achados.map((item) => item.trim()) };
+  return { formato: FORMATO_CRITICA_FORMA_GLOBAL, papel: valor.papel, contexto: valor.contexto, blocagem, estado: valor.estado, rotulo, criterios, achados: valor.achados.map((item) => item.trim()) };
 }
 
 export function decidirFormaGlobal(entrada) {
@@ -492,14 +693,15 @@ export function decidirFormaGlobal(entrada) {
   const critica = entrada.critica === null ? null : normalizarCritica(entrada.critica, avaliacao.blocagem);
   if (![null, 'aprovar', 'reprovar'].includes(entrada.decisaoUsuario)) falhar('decisao-invalida', 'decisaoUsuario', 'precisa ser aprovar, reprovar ou null.');
   let estado = 'bloqueado', motivo = 'critica-ou-decisao-ausente';
-  if (avaliacao.estado !== 'aprovado') { estado = 'reprovado'; motivo = 'g01-reprovado'; }
+  if (avaliacao.estado === 'reprovado') { estado = 'reprovado'; motivo = 'g01-reprovado'; }
+  else if (avaliacao.estado === 'bloqueado') { estado = 'bloqueado'; motivo = 'g00-ou-g01-bloqueado'; }
   else if (critica?.estado === 'reprovada' || entrada.decisaoUsuario === 'reprovar') { estado = 'reprovado'; motivo = critica?.estado === 'reprovada' ? 'critica-reprovou' : 'usuario-reprovou'; }
   else if (critica?.estado === 'inconclusiva') { estado = 'bloqueado'; motivo = 'critica-inconclusiva'; }
   else if (critica?.estado === 'reconhecida' && entrada.decisaoUsuario === 'aprovar') { estado = 'aprovado'; motivo = 'reconhecimento-e-aceite-confirmados'; }
   return congelar({
     formato: FORMATO_DECISAO_FORMA_GLOBAL, alvo: avaliacao.alvo, blocagem: avaliacao.blocagem,
     estado, motivo, gates: {
-      g01: avaliacao.estado,
+      g00: avaliacao.g00?.estado ?? 'bloqueado', g01: avaliacao.estado,
       g02: estado === 'aprovado' ? 'aprovado' : estado === 'reprovado' ? 'reprovado' : 'bloqueado',
     },
     critica: critica ? copia(critica) : null, decisaoUsuario: entrada.decisaoUsuario,

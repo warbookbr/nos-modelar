@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
 <rect width="960" height="640" fill="#f5f6f4"/>
 <rect x="18" y="18" width="924" height="604" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
-<polygon points="735.22,582.41 814.30,582.41 814.30,352.35 735.22,352.35" fill="#1f4f88" stroke="#153653" stroke-width="2.2"/>
-<polygon points="145.70,582.41 224.78,582.41 224.78,352.35 145.70,352.35" fill="#668bb7" stroke="#153653" stroke-width="2.2"/>
-<polygon points="735.22,582.41 814.30,582.41 814.30,352.35 735.22,352.35" fill="#244874" stroke="#153653" stroke-width="2.2"/>
-<polygon points="145.70,582.41 224.78,582.41 224.78,352.35 145.70,352.35" fill="#7a9abe" stroke="#153653" stroke-width="2.2"/>
-<polygon points="174.46,456.59 785.54,456.59 785.54,294.84 174.46,294.84" fill="#4977ad" stroke="#153653" stroke-width="2.2"/>
-<polygon points="246.35,330.78 713.65,330.78 713.65,61.19 246.35,61.19" fill="#315f9b" stroke="#153653" stroke-width="2.2"/>
+<polygon points="127.03,502.57 832.97,502.57 832.97,401.14 127.03,401.14" fill="#173c69" stroke="#153653" stroke-width="2.2"/>
+<polygon points="766.03,563.43 867.46,563.43 867.46,287.54 766.03,287.54" fill="#1f4f88" stroke="#153653" stroke-width="2.2"/>
+<polygon points="92.54,563.43 193.97,563.43 193.97,287.54 92.54,287.54" fill="#668bb7" stroke="#153653" stroke-width="2.2"/>
+<polygon points="757.91,563.43 883.69,563.43 883.69,272.94 757.91,272.94" fill="#244874" stroke="#153653" stroke-width="2.2"/>
+<polygon points="76.31,563.43 202.09,563.43 202.09,272.94 76.31,272.94" fill="#7a9abe" stroke="#153653" stroke-width="2.2"/>
+<polygon points="78.34,320.00 118.91,401.14 171.66,482.29 187.89,486.34 772.11,486.34 788.34,482.29 841.09,401.14 881.66,320.00 804.57,230.74 788.34,218.57 690.97,198.29 269.03,198.29 171.66,218.57 155.43,230.74" fill="#4977ad" stroke="#153653" stroke-width="2.2"/>
+<polygon points="171.66,251.03 196.00,271.31 764.00,271.31 788.34,251.03 723.43,80.63 236.57,80.63" fill="#315f9b" stroke="#153653" stroke-width="2.2"/>
 <text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">FRONTAL</text>
 <text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text>
 </svg>

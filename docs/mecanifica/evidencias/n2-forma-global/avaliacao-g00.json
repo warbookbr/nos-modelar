@@ -1,0 +1,26 @@
+{
+  "formato": "mecanifica.avaliacao-alvo-forma-global@1",
+  "alvo": "alvo-cupe-esportivo-n2",
+  "objetivo": "cupe-esportivo-n2",
+  "gate": "g00-qualidade-do-alvo",
+  "estado": "bloqueado",
+  "motivo": "critica-independente-ausente",
+  "automatico": "aprovado",
+  "rubrica": {
+    "id": "veiculo-forma-global-n2",
+    "categoriaEsperada": "cupe-esportivo",
+    "criterios": [
+      "categoria-identificavel",
+      "frente-traseira-distinguiveis",
+      "leitura-sem-apoios",
+      "massas-integradas",
+      "proporcoes-plausiveis",
+      "vistas-coerentes"
+    ],
+    "papeisAuxiliares": [
+      "apoio-reconhecimento"
+    ]
+  },
+  "critica": null,
+  "diagnosticos": []
+}

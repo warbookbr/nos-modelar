@@ -11,9 +11,10 @@ import {
   FORMATO_PROTOCOLO_FLUXO_AUTORIA,
 } from './orquestrar-fluxo-autoria.js';
 import {
-  FORMATO_ALVO_FORMA_GLOBAL, FORMATO_ANDAIME_GLOBAL, FORMATO_AVALIACAO_FORMA_GLOBAL,
-  FORMATO_BLOCAGEM_GLOBAL, FORMATO_CRITICA_FORMA_GLOBAL, FORMATO_DECISAO_FORMA_GLOBAL,
-  TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
+  CRITERIOS_VISUAIS_FORMA_GLOBAL, FORMATO_ALVO_FORMA_GLOBAL, FORMATO_ANDAIME_GLOBAL,
+  FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL, FORMATO_AVALIACAO_FORMA_GLOBAL,
+  FORMATO_BLOCAGEM_GLOBAL, FORMATO_CRITICA_ALVO_FORMA_GLOBAL, FORMATO_CRITICA_FORMA_GLOBAL,
+  FORMATO_DECISAO_FORMA_GLOBAL, TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
 } from './forma-global.js';
 
 export const FORMATO_SCHEMAS_AUTORIA_3D = 'mecanifica.schemas-autoria-3d@1';
@@ -243,12 +244,15 @@ const landmark = (comTolerancia = false) => objeto({
 const contornosPorVista = () => objeto(Object.fromEntries(VISTAS_ORTOGRAFICAS_FORMA_GLOBAL.map((vista) => [vista, objeto({
   contornos: {
     type: 'array', minItems: 1,
-    items: { type: 'array', minItems: 3, items: vetor(2) },
+    items: objeto({
+      id: slug(), papel: { enum: ['massa-primaria', 'apoio-reconhecimento', 'referencia-secundaria'] },
+      pontos: { type: 'array', minItems: 3, items: vetor(2) },
+    }),
   },
 })])));
 
 const volumeBase = {
-  id: slug(), regiao: slug(), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL }, centro: vetor(3),
+  id: slug(), regioes: listaTexto({ minItems: 1, slugue: true }), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL }, centro: vetor(3),
 };
 const SCHEMA_VOLUME_FORMA_GLOBAL = {
   oneOf: [
@@ -264,6 +268,14 @@ const SCHEMA_VOLUME_FORMA_GLOBAL = {
       comprimento: { type: 'number', exclusiveMinimum: 0 },
       perfil: { type: 'array', minItems: 3, items: vetor(2) },
     }),
+    objeto({
+      ...volumeBase, tipo: { const: 'casco-secoes' }, eixoPercurso: { enum: ['x', 'y', 'z'] },
+      eixosSecao: { type: 'array', minItems: 2, maxItems: 2, uniqueItems: true, items: { enum: ['x', 'y', 'z'] } },
+      secoes: {
+        type: 'array', minItems: 2,
+        items: objeto({ posicao: { type: 'number' }, perfil: { type: 'array', minItems: 3, items: vetor(2) } }),
+      },
+    }),
   ],
 };
 
@@ -273,6 +285,11 @@ const SCHEMA_ALVO_FORMA_GLOBAL = {
     formato: { const: FORMATO_ALVO_FORMA_GLOBAL }, id: slug(), objetivo: slug(),
     familia: { enum: FAMILIAS_AUTORIA }, intencao: texto(), unidade: { const: 'mm' }, eixos: eixos(),
     envelope: envelope(), landmarks: { type: 'array', minItems: 1, items: landmark(true) },
+    procedencia: objeto({ tipo: slug(), referencias: listaTexto({ minItems: 1 }) }),
+    rubrica: objeto({
+      id: slug(), categoriaEsperada: slug(), criterios: listaTexto({ minItems: 1, slugue: true }),
+      papeisAuxiliares: listaTexto({ slugue: true }),
+    }),
     regioesObrigatorias: listaTexto({ minItems: 1, slugue: true }), vistas: contornosPorVista(),
     limiares: objeto({
       iouMinimo: { type: 'number', minimum: 0, maximum: 1 },
@@ -299,6 +316,28 @@ const SCHEMA_ANDAIME_GLOBAL = {
   }),
 };
 
+const SCHEMA_ITEM_CRITERIO_VISUAL = objeto({
+  id: { enum: CRITERIOS_VISUAIS_FORMA_GLOBAL }, estado: { enum: ['passa', 'reprova', 'inconclusivo'] }, achado: texto(),
+});
+
+const SCHEMA_CRITICA_ALVO_FORMA_GLOBAL = objeto({
+  formato: { const: FORMATO_CRITICA_ALVO_FORMA_GLOBAL }, papel: { const: 'critico-visual-independente' },
+  contexto: { const: 'alvo-e-rubrica-sem-blocagem' }, alvo: slug(),
+  estado: { enum: ['aprovada', 'reprovada', 'inconclusiva'] }, categoriaReconhecida: anulavel(slug()),
+  criterios: { type: 'array', minItems: CRITERIOS_VISUAIS_FORMA_GLOBAL.length, maxItems: CRITERIOS_VISUAIS_FORMA_GLOBAL.length, items: SCHEMA_ITEM_CRITERIO_VISUAL },
+  achados: listaTexto(),
+});
+
+const SCHEMA_AVALIACAO_ALVO_FORMA_GLOBAL = {
+  $schema: RASCUNHO, $id: FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL,
+  ...objeto({
+    formato: { const: FORMATO_AVALIACAO_ALVO_FORMA_GLOBAL }, alvo: slug(), objetivo: slug(),
+    gate: { const: 'g00-qualidade-do-alvo' }, estado: { enum: ['aprovado', 'reprovado', 'bloqueado'] },
+    motivo: slug(), automatico: { enum: ['aprovado', 'reprovado'] }, rubrica: { type: 'object' },
+    critica: anulavel(SCHEMA_CRITICA_ALVO_FORMA_GLOBAL), diagnosticos: { type: 'array', items: diagnostico() },
+  }),
+};
+
 const SCHEMA_BLOCAGEM_GLOBAL = {
   $schema: RASCUNHO, $id: FORMATO_BLOCAGEM_GLOBAL,
   ...objeto({
@@ -308,7 +347,7 @@ const SCHEMA_BLOCAGEM_GLOBAL = {
     landmarks: { type: 'array', minItems: 1, items: landmark(false) },
     volumes: {
       type: 'array', minItems: 1, items: objeto({
-        id: slug(), regiao: slug(), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL },
+        id: slug(), regioes: listaTexto({ minItems: 1, slugue: true }), tipo: { enum: TIPOS_VOLUME_FORMA_GLOBAL },
         inicioVertice: { type: 'integer', minimum: 0 }, quantidadeVertices: { type: 'integer', minimum: 1 },
         quantidadeTriangulos: { type: 'integer', minimum: 1 },
       }),
@@ -317,7 +356,7 @@ const SCHEMA_BLOCAGEM_GLOBAL = {
       vertices: { type: 'array', minItems: 1, items: vetor(3) },
       faces: {
         type: 'array', minItems: 1,
-        items: objeto({ vertices: { type: 'array', minItems: 3, maxItems: 3, items: { type: 'integer', minimum: 0 } }, volume: slug(), regiao: slug() }),
+        items: objeto({ vertices: { type: 'array', minItems: 3, maxItems: 3, items: { type: 'integer', minimum: 0 } }, volume: slug(), regioes: listaTexto({ minItems: 1, slugue: true }) }),
       },
     }),
     estatisticas: objeto({ volumes: { type: 'integer', minimum: 1 }, vertices: { type: 'integer', minimum: 1 }, triangulos: { type: 'integer', minimum: 1 } }),
@@ -328,7 +367,8 @@ const SCHEMA_AVALIACAO_FORMA_GLOBAL = {
   $schema: RASCUNHO, $id: FORMATO_AVALIACAO_FORMA_GLOBAL,
   ...objeto({
     formato: { const: FORMATO_AVALIACAO_FORMA_GLOBAL }, alvo: slug(), blocagem: slug(), objetivo: slug(),
-    gate: { const: 'g01-forma-global-medida' }, estado: { enum: ['aprovado', 'reprovado'] },
+    gate: { const: 'g01-forma-global-medida' }, estado: { enum: ['aprovado', 'reprovado', 'bloqueado'] },
+    g00: objeto({ estado: { enum: ['aprovado', 'reprovado', 'bloqueado'] }, motivo: slug() }),
     vistas: {
       type: 'array', minItems: 3, maxItems: 3,
       items: objeto({
@@ -351,6 +391,7 @@ const SCHEMA_CRITICA_FORMA_GLOBAL = objeto({
   formato: { const: FORMATO_CRITICA_FORMA_GLOBAL }, papel: { const: 'critico-visual-independente' },
   contexto: { const: 'vistas-neutras-sem-identidade-do-alvo' }, blocagem: slug(),
   estado: { enum: ['reconhecida', 'reprovada', 'inconclusiva'] }, rotulo: anulavel(texto(120)),
+  criterios: { type: 'array', minItems: CRITERIOS_VISUAIS_FORMA_GLOBAL.length, maxItems: CRITERIOS_VISUAIS_FORMA_GLOBAL.length, items: SCHEMA_ITEM_CRITERIO_VISUAL },
   achados: listaTexto(),
 });
 
@@ -359,7 +400,7 @@ const SCHEMA_DECISAO_FORMA_GLOBAL = {
   ...objeto({
     formato: { const: FORMATO_DECISAO_FORMA_GLOBAL }, alvo: slug(), blocagem: slug(),
     estado: { enum: ['aprovado', 'reprovado', 'bloqueado'] }, motivo: slug(),
-    gates: objeto({ g01: { enum: ['aprovado', 'reprovado'] }, g02: { enum: ['aprovado', 'reprovado', 'bloqueado'] } }),
+    gates: objeto({ g00: { enum: ['aprovado', 'reprovado', 'bloqueado'] }, g01: { enum: ['aprovado', 'reprovado', 'bloqueado'] }, g02: { enum: ['aprovado', 'reprovado', 'bloqueado'] } }),
     critica: anulavel(SCHEMA_CRITICA_FORMA_GLOBAL), decisaoUsuario: anulavel({ enum: ['aprovar', 'reprovar'] }),
   }),
 };
@@ -370,6 +411,7 @@ const CONTRATOS = congelar({
   resultadoEtapa: SCHEMA_RESULTADO_ETAPA, resultadoPlanejamento: SCHEMA_RESULTADO_PLANEJAMENTO,
   cobertura: SCHEMA_COBERTURA, alvoFormaGlobal: SCHEMA_ALVO_FORMA_GLOBAL,
   andaimeGlobal: SCHEMA_ANDAIME_GLOBAL, blocagemGlobal: SCHEMA_BLOCAGEM_GLOBAL,
+  avaliacaoAlvoFormaGlobal: SCHEMA_AVALIACAO_ALVO_FORMA_GLOBAL,
   avaliacaoFormaGlobal: SCHEMA_AVALIACAO_FORMA_GLOBAL, decisaoFormaGlobal: SCHEMA_DECISAO_FORMA_GLOBAL,
 });
 
@@ -380,7 +422,7 @@ const INDICE = congelar({
   limites: [
     'schema valida estrutura; normalizador valida eixos não colineares, referências e identidades cruzadas',
     'schema não aprova forma, superfície, conectividade, evidência ou decisão humana',
-    'G01 mede envelope, landmarks, cobertura regional e silhueta; G02 permanece dependente de crítico independente e usuário',
+    'G00 reprova alvo fraco antes da geometria; G01 mede forma somente contra alvo aprovado; G02 depende de crítico independente e usuário',
   ],
 });
 

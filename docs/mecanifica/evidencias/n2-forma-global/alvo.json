@@ -1,9 +1,9 @@
 {
-  "formato": "mecanifica.alvo-forma-global@1",
-  "id": "alvo-veiculo-compacto-n2",
-  "objetivo": "veiculo-compacto-n2",
+  "formato": "mecanifica.alvo-forma-global@2",
+  "id": "alvo-cupe-esportivo-n2",
+  "objetivo": "cupe-esportivo-n2",
   "familia": "veiculo",
-  "intencao": "veículo compacto inteiro reconhecível somente por postura, rodas, corpo e cabine",
+  "intencao": "blocagem integrada de cupê esportivo reconhecível por postura, massas e silhueta antes de superfície ou detalhe",
   "unidade": "mm",
   "eixos": {
     "direita": "+x",
@@ -12,14 +12,36 @@
   },
   "envelope": {
     "min": [
-      -940,
-      -10,
-      -2120
+      -1050,
+      0,
+      -2335
     ],
     "max": [
-      940,
-      1470,
-      2170
+      1050,
+      1200,
+      2265
+    ]
+  },
+  "procedencia": {
+    "tipo": "prancha-medida-reutilizada",
+    "referencias": [
+      "repo://docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md",
+      "repo://tools/mecanifica/alvo-chassi-p0.mjs"
+    ]
+  },
+  "rubrica": {
+    "id": "veiculo-forma-global-n2",
+    "categoriaEsperada": "cupe-esportivo",
+    "criterios": [
+      "categoria-identificavel",
+      "frente-traseira-distinguiveis",
+      "leitura-sem-apoios",
+      "massas-integradas",
+      "proporcoes-plausiveis",
+      "vistas-coerentes"
+    ],
+    "papeisAuxiliares": [
+      "apoio-reconhecimento"
     ]
   },
   "landmarks": [
@@ -27,8 +49,8 @@
       "id": "eixo-dianteiro",
       "posicao": [
         0,
-        320,
-        1370
+        340,
+        1325
       ],
       "tolerancia": 80
     },
@@ -36,17 +58,53 @@
       "id": "eixo-traseiro",
       "posicao": [
         0,
-        320,
-        -1370
+        358,
+        -1325
       ],
       "tolerancia": 80
+    },
+    {
+      "id": "fim-cabine",
+      "posicao": [
+        0,
+        920,
+        -1250
+      ],
+      "tolerancia": 100
+    },
+    {
+      "id": "inicio-cabine",
+      "posicao": [
+        0,
+        900,
+        800
+      ],
+      "tolerancia": 100
     },
     {
       "id": "nariz",
       "posicao": [
         0,
-        510,
-        2170
+        520,
+        2265
+      ],
+      "tolerancia": 100
+    },
+    {
+      "id": "ombro-dianteiro",
+      "posicao": [
+        965,
+        900,
+        1325
+      ],
+      "tolerancia": 100
+    },
+    {
+      "id": "ombro-traseiro",
+      "posicao": [
+        1000,
+        850,
+        -900
       ],
       "tolerancia": 100
     },
@@ -54,8 +112,8 @@
       "id": "pico-cabine",
       "posicao": [
         0,
-        1470,
-        320
+        1190,
+        -560
       ],
       "tolerancia": 100
     },
@@ -63,399 +121,525 @@
       "id": "traseira",
       "posicao": [
         0,
-        350,
-        -2120
+        920,
+        -2335
       ],
       "tolerancia": 100
     }
   ],
   "regioesObrigatorias": [
     "cabine",
+    "capo",
+    "cintura",
     "corpo-base",
+    "ombros",
+    "para-lamas-dianteiros",
+    "para-lamas-traseiros",
     "rodas-dianteiras",
-    "rodas-traseiras"
+    "rodas-traseiras",
+    "traseira"
   ],
   "vistas": {
     "frontal": {
       "contornos": [
-        [
-          [
-            -870,
-            340
-          ],
-          [
-            870,
-            340
-          ],
-          [
-            870,
-            810
-          ],
-          [
-            -870,
-            810
+        {
+          "id": "massa-frontal",
+          "papel": "massa-primaria",
+          "pontos": [
+            [
+              -980,
+              120
+            ],
+            [
+              -1020,
+              450
+            ],
+            [
+              -960,
+              760
+            ],
+            [
+              -780,
+              1000
+            ],
+            [
+              -600,
+              1190
+            ],
+            [
+              600,
+              1190
+            ],
+            [
+              780,
+              1000
+            ],
+            [
+              960,
+              760
+            ],
+            [
+              1020,
+              450
+            ],
+            [
+              980,
+              120
+            ]
           ]
-        ],
-        [
-          [
-            -670,
-            690
-          ],
-          [
-            670,
-            690
-          ],
-          [
-            670,
-            1470
-          ],
-          [
-            -670,
-            1470
+        },
+        {
+          "id": "roda-frontal-esquerda",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              -1050,
+              0
+            ],
+            [
+              -760,
+              0
+            ],
+            [
+              -760,
+              620
+            ],
+            [
+              -1050,
+              620
+            ]
           ]
-        ],
-        [
-          [
-            -930,
-            0
-          ],
-          [
-            -710,
-            0
-          ],
-          [
-            -710,
-            640
-          ],
-          [
-            -930,
-            640
+        },
+        {
+          "id": "roda-frontal-direita",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              760,
+              0
+            ],
+            [
+              1050,
+              0
+            ],
+            [
+              1050,
+              620
+            ],
+            [
+              760,
+              620
+            ]
           ]
-        ],
-        [
-          [
-            710,
-            0
-          ],
-          [
-            930,
-            0
-          ],
-          [
-            930,
-            640
-          ],
-          [
-            710,
-            640
-          ]
-        ]
+        }
       ]
     },
     "direita": {
       "contornos": [
-        [
-          [
-            -2120,
-            340
-          ],
-          [
-            -2070,
-            690
-          ],
-          [
-            1920,
-            810
-          ],
-          [
-            2170,
-            510
-          ],
-          [
-            2070,
-            340
+        {
+          "id": "massa-lateral",
+          "papel": "massa-primaria",
+          "pontos": [
+            [
+              -2335,
+              200
+            ],
+            [
+              -2335,
+              920
+            ],
+            [
+              -1750,
+              1055
+            ],
+            [
+              -1150,
+              1120
+            ],
+            [
+              -560,
+              1190
+            ],
+            [
+              -180,
+              1185
+            ],
+            [
+              480,
+              980
+            ],
+            [
+              1325,
+              880
+            ],
+            [
+              1900,
+              650
+            ],
+            [
+              2265,
+              520
+            ],
+            [
+              2140,
+              190
+            ],
+            [
+              1700,
+              190
+            ],
+            [
+              1600,
+              350
+            ],
+            [
+              1000,
+              350
+            ],
+            [
+              900,
+              160
+            ],
+            [
+              -900,
+              160
+            ],
+            [
+              -1000,
+              360
+            ],
+            [
+              -1700,
+              360
+            ],
+            [
+              -1850,
+              200
+            ],
+            [
+              -2200,
+              200
+            ]
           ]
-        ],
-        [
-          [
-            -920,
-            690
-          ],
-          [
-            -620,
-            1340
-          ],
-          [
-            320,
-            1470
-          ],
-          [
-            920,
-            710
+        },
+        {
+          "id": "roda-lateral-traseira",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              -1683,
+              358
+            ],
+            [
+              -1656,
+              221
+            ],
+            [
+              -1578,
+              105
+            ],
+            [
+              -1462,
+              27
+            ],
+            [
+              -1325,
+              0
+            ],
+            [
+              -1188,
+              27
+            ],
+            [
+              -1072,
+              105
+            ],
+            [
+              -994,
+              221
+            ],
+            [
+              -967,
+              358
+            ],
+            [
+              -994,
+              495
+            ],
+            [
+              -1072,
+              611
+            ],
+            [
+              -1188,
+              689
+            ],
+            [
+              -1325,
+              716
+            ],
+            [
+              -1462,
+              689
+            ],
+            [
+              -1578,
+              611
+            ],
+            [
+              -1656,
+              495
+            ]
           ]
-        ],
-        [
-          [
-            -1670,
-            320
-          ],
-          [
-            -1646,
-            198
-          ],
-          [
-            -1576,
-            94
-          ],
-          [
-            -1472,
-            24
-          ],
-          [
-            -1350,
-            0
-          ],
-          [
-            -1228,
-            24
-          ],
-          [
-            -1124,
-            94
-          ],
-          [
-            -1054,
-            198
-          ],
-          [
-            -1030,
-            320
-          ],
-          [
-            -1054,
-            442
-          ],
-          [
-            -1124,
-            546
-          ],
-          [
-            -1228,
-            616
-          ],
-          [
-            -1350,
-            640
-          ],
-          [
-            -1472,
-            616
-          ],
-          [
-            -1576,
-            546
-          ],
-          [
-            -1646,
-            442
+        },
+        {
+          "id": "roda-lateral-dianteira",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              985,
+              340
+            ],
+            [
+              1011,
+              210
+            ],
+            [
+              1085,
+              100
+            ],
+            [
+              1195,
+              26
+            ],
+            [
+              1325,
+              0
+            ],
+            [
+              1455,
+              26
+            ],
+            [
+              1565,
+              100
+            ],
+            [
+              1639,
+              210
+            ],
+            [
+              1665,
+              340
+            ],
+            [
+              1639,
+              470
+            ],
+            [
+              1565,
+              580
+            ],
+            [
+              1455,
+              654
+            ],
+            [
+              1325,
+              680
+            ],
+            [
+              1195,
+              654
+            ],
+            [
+              1085,
+              580
+            ],
+            [
+              1011,
+              470
+            ]
           ]
-        ],
-        [
-          [
-            1030,
-            320
-          ],
-          [
-            1054,
-            198
-          ],
-          [
-            1124,
-            94
-          ],
-          [
-            1228,
-            24
-          ],
-          [
-            1350,
-            0
-          ],
-          [
-            1472,
-            24
-          ],
-          [
-            1576,
-            94
-          ],
-          [
-            1646,
-            198
-          ],
-          [
-            1670,
-            320
-          ],
-          [
-            1646,
-            442
-          ],
-          [
-            1576,
-            546
-          ],
-          [
-            1472,
-            616
-          ],
-          [
-            1350,
-            640
-          ],
-          [
-            1228,
-            616
-          ],
-          [
-            1124,
-            546
-          ],
-          [
-            1054,
-            442
-          ]
-        ]
+        }
       ]
     },
     "superior": {
       "contornos": [
-        [
-          [
-            -870,
-            -2120
-          ],
-          [
-            870,
-            -2120
-          ],
-          [
-            870,
-            2170
-          ],
-          [
-            -870,
-            2170
+        {
+          "id": "massa-planta",
+          "papel": "massa-primaria",
+          "pontos": [
+            [
+              -665,
+              -2335
+            ],
+            [
+              -970,
+              -1700
+            ],
+            [
+              -1000,
+              -900
+            ],
+            [
+              -940,
+              0
+            ],
+            [
+              -950,
+              800
+            ],
+            [
+              -965,
+              1325
+            ],
+            [
+              -845,
+              1900
+            ],
+            [
+              -300,
+              2265
+            ],
+            [
+              300,
+              2265
+            ],
+            [
+              845,
+              1900
+            ],
+            [
+              965,
+              1325
+            ],
+            [
+              950,
+              800
+            ],
+            [
+              940,
+              0
+            ],
+            [
+              1000,
+              -900
+            ],
+            [
+              970,
+              -1700
+            ],
+            [
+              665,
+              -2335
+            ]
           ]
-        ],
-        [
-          [
-            -670,
-            -920
-          ],
-          [
-            670,
-            -920
-          ],
-          [
-            670,
-            920
-          ],
-          [
-            -670,
-            920
+        },
+        {
+          "id": "cabine-planta",
+          "papel": "referencia-secundaria",
+          "pontos": [
+            [
+              -560,
+              -1250
+            ],
+            [
+              -620,
+              -700
+            ],
+            [
+              -610,
+              0
+            ],
+            [
+              -700,
+              800
+            ],
+            [
+              700,
+              800
+            ],
+            [
+              610,
+              0
+            ],
+            [
+              620,
+              -700
+            ],
+            [
+              560,
+              -1250
+            ]
           ]
-        ],
-        [
-          [
-            -930,
-            -1670
-          ],
-          [
-            -710,
-            -1670
-          ],
-          [
-            -710,
-            -1030
-          ],
-          [
-            -930,
-            -1030
+        },
+        {
+          "id": "rodas-planta-traseiras",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              -1050,
+              -1683
+            ],
+            [
+              1050,
+              -1683
+            ],
+            [
+              1050,
+              -967
+            ],
+            [
+              -1050,
+              -967
+            ]
           ]
-        ],
-        [
-          [
-            710,
-            -1670
-          ],
-          [
-            930,
-            -1670
-          ],
-          [
-            930,
-            -1030
-          ],
-          [
-            710,
-            -1030
+        },
+        {
+          "id": "rodas-planta-dianteiras",
+          "papel": "apoio-reconhecimento",
+          "pontos": [
+            [
+              -1050,
+              985
+            ],
+            [
+              1050,
+              985
+            ],
+            [
+              1050,
+              1665
+            ],
+            [
+              -1050,
+              1665
+            ]
           ]
-        ],
-        [
-          [
-            -930,
-            1030
-          ],
-          [
-            -710,
-            1030
-          ],
-          [
-            -710,
-            1670
-          ],
-          [
-            -930,
-            1670
-          ]
-        ],
-        [
-          [
-            710,
-            1030
-          ],
-          [
-            930,
-            1030
-          ],
-          [
-            930,
-            1670
-          ],
-          [
-            710,
-            1670
-          ]
-        ]
+        }
       ]
     }
   },
   "limiares": {
-    "iouMinimo": 0.9,
-    "desvioMaximo": 0.04,
-    "erroEnvelopeRelativoMaximo": 0.02,
+    "iouMinimo": 0.78,
+    "desvioMaximo": 0.12,
+    "erroEnvelopeRelativoMaximo": 0.035,
     "erroLandmarkNormalizadoMaximo": 1
   },
   "orcamento": {
     "volumesMaximos": 8,
-    "triangulosMaximos": 400,
-    "resolucaoGrade": 96
+    "triangulosMaximos": 600,
+    "resolucaoGrade": 128
   },
   "rejeicoes": [
-    "cabine-ausente",
-    "forma-nao-inteira",
-    "postura-incompativel",
-    "rodas-sem-leitura"
+    "alvo-fraco",
+    "cabine-nao-integrada",
+    "categoria-indistinta",
+    "frente-traseira-intercambiaveis",
+    "leitura-dependente-das-rodas",
+    "partes-flutuantes",
+    "planta-retangular",
+    "proporcao-inverossimil"
   ]
 }

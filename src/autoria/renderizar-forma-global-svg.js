@@ -28,7 +28,7 @@ function limitesIsometricos(blocagem) {
   const pontos = blocagem.malha.vertices.map(projecaoIsometrica);
   return [Math.min(...pontos.map((p) => p[0])), Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[0])), Math.max(...pontos.map((p) => p[1]))];
 }
-function cena({ alvo, blocagem, vista, mostrarAlvo, exporSemantica, largura = 960, altura = 640 }) {
+function cena({ alvo, blocagem, vista, mostrarAlvo, mostrarModelo, exporSemantica, largura = 960, altura = 640 }) {
   if (!VISTAS_EVIDENCIA_FORMA_GLOBAL.includes(vista)) falhar(`vista '${vista}' não é suportada.`);
   const limites = vista === 'isometrica' ? limitesIsometricos(blocagem) : limitesDaVista(alvo.envelope, vista);
   const margem = 54, spanA = limites[2] - limites[0], spanB = limites[3] - limites[1];
@@ -40,16 +40,16 @@ function cena({ alvo, blocagem, vista, mostrarAlvo, exporSemantica, largura = 96
   saida.push(`<rect width="${largura}" height="${altura}" fill="#f5f6f4"/>`);
   saida.push(`<rect x="18" y="18" width="${largura - 36}" height="${altura - 36}" rx="16" fill="#eef1ef" stroke="#d5dad7"/>`);
   if (mostrarAlvo && vista !== 'isometrica') for (const contorno of alvo.vistas[vista].contornos) {
-    saida.push(`<polygon points="${pontosSvg(contorno)}" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>`);
+    saida.push(`<polygon points="${pontosSvg(contorno.pontos)}" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>`);
   }
-  const volumes = blocagem.volumes.map((volume, indice) => {
+  const volumes = (mostrarModelo ? blocagem.volumes : []).map((volume, indice) => {
     const pontos3d = pontosDoVolume(blocagem, volume);
     const camadaVertical = pontos3d.reduce((soma, ponto) => soma + ponto[1], 0) / pontos3d.length;
     const pontos2d = pontos3d.map((ponto) => vista === 'isometrica' ? projecaoIsometrica(ponto) : projetar(ponto, vista));
     return { volume, indice, camadaVertical, casco: cascoConvexo(pontos2d) };
   }).sort((a, b) => a.camadaVertical - b.camadaVertical || a.indice - b.indice);
   for (const { volume, indice, casco } of volumes) {
-    const semantica = exporSemantica ? ` data-volume="${escapar(volume.id)}" data-regiao="${escapar(volume.regiao)}"` : '';
+    const semantica = exporSemantica ? ` data-volume="${escapar(volume.id)}" data-regioes="${escapar(volume.regioes.join(' '))}"` : '';
     saida.push(`<polygon points="${pontosSvg(casco)}" fill="${CORES[indice % CORES.length]}" stroke="#153653" stroke-width="2.2"${semantica}/>`);
   }
   saida.push(`<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">${escapar(vista.toUpperCase())}</text>`);
@@ -63,16 +63,16 @@ function conferirBlocagem(blocagem) {
   }
 }
 
-export function renderizarVistaFormaGlobalSvg({ alvo: bruto, blocagem, vista, mostrarAlvo = true, exporSemantica = true }) {
+export function renderizarVistaFormaGlobalSvg({ alvo: bruto, blocagem, vista, mostrarAlvo = true, mostrarModelo = true, exporSemantica = true }) {
   const alvo = normalizarAlvoFormaGlobal(bruto); conferirBlocagem(blocagem);
-  const render = cena({ alvo, blocagem, vista, mostrarAlvo, exporSemantica });
+  const render = cena({ alvo, blocagem, vista, mostrarAlvo, mostrarModelo, exporSemantica });
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${render.largura} ${render.altura}" width="${render.largura}" height="${render.altura}">\n${render.corpo}\n</svg>\n`;
 }
 
-export function renderizarPainelFormaGlobalSvg({ alvo: bruto, blocagem, mostrarAlvo = true, exporSemantica = true }) {
+export function renderizarPainelFormaGlobalSvg({ alvo: bruto, blocagem, mostrarAlvo = true, mostrarModelo = true, exporSemantica = true }) {
   const alvo = normalizarAlvoFormaGlobal(bruto); conferirBlocagem(blocagem);
   const largura = 720, altura = 480, gap = 18, painelLargura = largura * 2 + gap * 3, painelAltura = altura * 2 + gap * 3;
-  const cenas = VISTAS_EVIDENCIA_FORMA_GLOBAL.map((vista) => cena({ alvo, blocagem, vista, mostrarAlvo, exporSemantica, largura, altura }));
+  const cenas = VISTAS_EVIDENCIA_FORMA_GLOBAL.map((vista) => cena({ alvo, blocagem, vista, mostrarAlvo, mostrarModelo, exporSemantica, largura, altura }));
   const posicoes = [[gap, gap], [largura + gap * 2, gap], [gap, altura + gap * 2], [largura + gap * 2, altura + gap * 2]];
   const grupos = cenas.map((item, indice) => `<g transform="translate(${posicoes[indice][0]} ${posicoes[indice][1]})">${item.corpo}</g>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${painelLargura} ${painelAltura}" width="${painelLargura}" height="${painelAltura}">\n<rect width="100%" height="100%" fill="#dde2df"/>\n${grupos.join('\n')}\n</svg>\n`;

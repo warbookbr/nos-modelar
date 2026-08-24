@@ -1,12 +1,13 @@
 {
   "formato": "mecanifica.decisao-forma-global@1",
-  "alvo": "alvo-veiculo-compacto-n2",
-  "blocagem": "andaime-veiculo-compacto-n2-blocagem",
-  "estado": "bloqueado",
-  "motivo": "critica-ou-decisao-ausente",
+  "alvo": "alvo-cupe-esportivo-n2",
+  "blocagem": "andaime-cupe-esportivo-n2-blocagem",
+  "estado": "reprovado",
+  "motivo": "g01-reprovado",
   "gates": {
-    "g01": "aprovado",
-    "g02": "bloqueado"
+    "g00": "bloqueado",
+    "g01": "reprovado",
+    "g02": "reprovado"
   },
   "critica": null,
   "decisaoUsuario": null

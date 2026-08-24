@@ -1,0 +1,8 @@
+{
+  "formato": "mecanifica.registro-reprovacao-forma-global@1",
+  "objeto": "andaime-veiculo-compacto-n2-blocagem",
+  "commit": "b71da61",
+  "decisaoUsuario": "reprovar",
+  "motivo": "alvo-e-blocagem-fracos; leitura dependia das rodas e as massas eram caixas sobrepostas",
+  "consequencia": "não autoriza G02 nem abertura de N3; preservada no histórico Git"
+}

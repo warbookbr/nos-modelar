@@ -1,71 +1,95 @@
 {
   "formato": "mecanifica.avaliacao-forma-global@1",
-  "alvo": "alvo-veiculo-compacto-n2",
-  "blocagem": "andaime-veiculo-compacto-n2-blocagem",
-  "objetivo": "veiculo-compacto-n2",
+  "alvo": "alvo-cupe-esportivo-n2",
+  "blocagem": "andaime-cupe-esportivo-n2-blocagem",
+  "objetivo": "cupe-esportivo-n2",
   "gate": "g01-forma-global-medida",
-  "estado": "aprovado",
+  "estado": "reprovado",
+  "g00": {
+    "estado": "bloqueado",
+    "motivo": "critica-independente-ausente"
+  },
   "vistas": [
     {
       "id": "frontal",
       "estado": "aprovada",
       "metricas": {
-        "iou": 0.971762,
-        "falta": 0.028238,
-        "excesso": 0,
-        "desvioMaximo": 0.014731
+        "iou": 0.894601,
+        "falta": 0.096628,
+        "excesso": 0.009804,
+        "desvioMaximo": 0.073703
       }
     },
     {
       "id": "direita",
-      "estado": "aprovada",
+      "estado": "reprovada",
       "metricas": {
-        "iou": 0.970554,
-        "falta": 0.027173,
-        "excesso": 0.002342,
-        "desvioMaximo": 0.023292
+        "iou": 0.935033,
+        "falta": 0.051634,
+        "excesso": 0.014259,
+        "desvioMaximo": 0.121534
       }
     },
     {
       "id": "superior",
       "estado": "aprovada",
       "metricas": {
-        "iou": 0.984458,
-        "falta": 0.015542,
-        "excesso": 0,
-        "desvioMaximo": 0.010417
+        "iou": 0.966227,
+        "falta": 0.032311,
+        "excesso": 0.001512,
+        "desvioMaximo": 0.046875
       }
     }
   ],
   "envelope": {
     "estado": "aprovado",
-    "erroRelativoMaximo": 0.013514
+    "erroRelativoMaximo": 0.02619
   },
   "landmarks": [
     {
       "id": "eixo-dianteiro",
       "estado": "aprovado",
-      "erroNormalizado": 0.25
+      "erroNormalizado": 0
     },
     {
       "id": "eixo-traseiro",
       "estado": "aprovado",
-      "erroNormalizado": 0.25
+      "erroNormalizado": 0
+    },
+    {
+      "id": "fim-cabine",
+      "estado": "aprovado",
+      "erroNormalizado": 0.1
+    },
+    {
+      "id": "inicio-cabine",
+      "estado": "aprovado",
+      "erroNormalizado": 0.141421
     },
     {
       "id": "nariz",
       "estado": "aprovado",
-      "erroNormalizado": 0.223607
+      "erroNormalizado": 0.180278
+    },
+    {
+      "id": "ombro-dianteiro",
+      "estado": "aprovado",
+      "erroNormalizado": 0.180278
+    },
+    {
+      "id": "ombro-traseiro",
+      "estado": "aprovado",
+      "erroNormalizado": 0.180278
     },
     {
       "id": "pico-cabine",
       "estado": "aprovado",
-      "erroNormalizado": 0.282843
+      "erroNormalizado": 0.1
     },
     {
       "id": "traseira",
       "estado": "aprovado",
-      "erroNormalizado": 0.2
+      "erroNormalizado": 0.180278
     }
   ],
   "regioes": {
@@ -75,15 +99,30 @@
   "orcamento": {
     "estado": "aprovado",
     "usado": {
-      "volumes": 6,
-      "vertices": 154,
-      "triangulos": 284
+      "volumes": 7,
+      "vertices": 270,
+      "triangulos": 512
     },
     "limite": {
       "volumesMaximos": 8,
-      "triangulosMaximos": 400,
-      "resolucaoGrade": 96
+      "triangulosMaximos": 600,
+      "resolucaoGrade": 128
     }
   },
-  "diagnosticos": []
+  "diagnosticos": [
+    {
+      "codigo": "alvo-nao-aprovado",
+      "campo": "avaliacaoAlvo",
+      "causa": "G00 está bloqueado: critica-independente-ausente.",
+      "impacto": "métricas contra um alvo fraco não autorizam a forma.",
+      "proximoPasso": "aprove o alvo por rubrica e crítica independente antes de usar G01."
+    },
+    {
+      "codigo": "silhueta-reprovada",
+      "campo": "vistas.direita",
+      "causa": "IoU 0.935033 e desvio máximo 0.121534.",
+      "impacto": "a forma projetada diverge do alvo global nesta vista.",
+      "proximoPasso": "ajuste landmarks ou volumes maiores; não acrescente detalhe."
+    }
+  ]
 }

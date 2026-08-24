@@ -1,73 +1,98 @@
 {
   "formato": "mecanifica.evidencias-forma-global@1",
-  "objetivo": "veiculo-compacto-n2",
-  "blocagem": "andaime-veiculo-compacto-n2-blocagem",
-  "estadoG01": "aprovado",
-  "estadoG02": "bloqueado",
+  "objetivo": "cupe-esportivo-n2",
+  "blocagem": "andaime-cupe-esportivo-n2-blocagem",
+  "estadoG00": "bloqueado",
+  "estadoG01": "reprovado",
+  "estadoG02": "reprovado",
   "arquivos": [
     {
       "nome": "alvo.json",
-      "hash": "sha256:9366435a195f34ab531c9db45b7e4b2bdd3655c419d9c1a1fb1584b9f1a27a73"
+      "hash": "sha256:60d3fe3b7adea4c50c8749fa4eef9dcc0e821088f495ac288b8552e513c3351d"
     },
     {
       "nome": "andaime.json",
-      "hash": "sha256:2941e0f5049db41eb8622fe69f249b1a30949b807f4db4ec0c87714d9a6edb13"
+      "hash": "sha256:27bbf3ae9acd9f04d6d3cb29b6ce25513b6522466f2a81896b105a4ae8e94972"
     },
     {
       "nome": "blocagem.json",
-      "hash": "sha256:10e998b73b8c4af54b28f3694e4832f1a0538731d59dc10cc361ea3df3570b2a"
+      "hash": "sha256:e05ef11c499ae936183fd450e6f334d9c96bf8def010fe2cdaeb9a1865450c74"
+    },
+    {
+      "nome": "avaliacao-g00.json",
+      "hash": "sha256:6afd3ecf670eab52166c1cc081825ce89b0286053e50b842d22206239eb1891c"
     },
     {
       "nome": "avaliacao-g01.json",
-      "hash": "sha256:ef1a9231392bb1da25e27240f0f4afea7b842fa5abc34115e9812a2c6606d08b"
+      "hash": "sha256:3308273fe89a0417b1d91e1d938d08f3909cae704bd9da629217c1bd774758e6"
     },
     {
       "nome": "decisao-g02-pendente.json",
-      "hash": "sha256:93ac5799a76437e87d7508c9adeb755d538395451efa0105253bebac3693b67c"
+      "hash": "sha256:1bf1bc6858872e5beadfb6f1aa79d465667ef19216f5c06602d61fa3e9272ea6"
+    },
+    {
+      "nome": "prova-anterior-reprovada.json",
+      "hash": "sha256:4d0fc37d74da66e911f66db5d236e57ec185900176db775187426124f066951f"
     },
     {
       "nome": "cego-isometrica.svg",
-      "hash": "sha256:8c3ae0afc41c6fd3a4668f02e48f33e2d689f68c155b92bd472c44e4ed64a806"
+      "hash": "sha256:b8f17187f9569f5ee722a594116ff2f6fb80f00a277323c83946c6be37aba69b"
     },
     {
       "nome": "comparacao-isometrica.svg",
-      "hash": "sha256:3821f08acc92f4a88c6cc4a13191019e84844e204052f1338defe690c7ae99ce"
+      "hash": "sha256:9d0cd36cf98bacb560ead51b98d6a3bd508f39287d3ff93f2cef22c973151aab"
     },
     {
       "nome": "cego-frontal.svg",
-      "hash": "sha256:a18713e49c4cc75f11b67776289a48a7abe71fb92aed2a822dce41c8b10f28d2"
+      "hash": "sha256:6231041d5bbe395904ab83c6d48158624d3f1af0eeb5c10269a29221fcb1ab6b"
     },
     {
       "nome": "comparacao-frontal.svg",
-      "hash": "sha256:b0accc732fd1f3b628ed4d7369109554a715a9df0f04adf4de406b557430b5e2"
+      "hash": "sha256:72db0e2fba7bf2d4cbe0e57851abe47f15368ae402fb8b1283835d58e5941a73"
+    },
+    {
+      "nome": "alvo-frontal.svg",
+      "hash": "sha256:b93bd98bda96e3af0c793de4c5d829319159639594673c99b64c58eab0941ee7"
     },
     {
       "nome": "cego-direita.svg",
-      "hash": "sha256:a4270d816503fd83fc6dd359907eef801d089065ff24e70664afa138e0c152a8"
+      "hash": "sha256:d49afe218a1834c6c0972e7ebdb84a2e9d6f9c3d46d587ffcdd48f6520364359"
     },
     {
       "nome": "comparacao-direita.svg",
-      "hash": "sha256:affb547a1ed313ff07b8ebf07897ad84f4815680e353df2386464dda7db32ef5"
+      "hash": "sha256:7515f6af7aa91285ec0d597cdc9359260880dfd3785d3aeb70abe4eea5193882"
+    },
+    {
+      "nome": "alvo-direita.svg",
+      "hash": "sha256:37326700e425fae700774108de3a7871e752e4b3fa0d8f9c9516579729b4dc8c"
     },
     {
       "nome": "cego-superior.svg",
-      "hash": "sha256:954f289a175c517b269eee6d0f1897e38cc05f379bbcee7621960db6b0fdc579"
+      "hash": "sha256:9679e19af7d341cc5a0ca40f7d15d5aca8cef6737545504b902a02d5ac30b933"
     },
     {
       "nome": "comparacao-superior.svg",
-      "hash": "sha256:53f354a82b2f4dfb151c4f74d1d7e287f49d5091aef46a4a14d0a0b27b8cd5b3"
+      "hash": "sha256:e2a997837ef68469a37aebe18a4a8093cf0338a83cc32d8958a7255448e0e59a"
+    },
+    {
+      "nome": "alvo-superior.svg",
+      "hash": "sha256:3c6a21123407b0a7e6af6043d90c905dc44c5a51df1137d6b0e4504324e7c4db"
     },
     {
       "nome": "painel-cego.svg",
-      "hash": "sha256:ae82f339b26c1b1d26ad1a0b027c0cfbc6255687b50b55f1c78b703b53d5d3f5"
+      "hash": "sha256:21ea28c19228678a0cc20822a977d2468d1acb50e08b1b907c622898b474ccc0"
     },
     {
       "nome": "painel-comparacao.svg",
-      "hash": "sha256:c6acef9424edd9c34458af2a20714a2ec0f3568a73d77005b8acc25bcd33c590"
+      "hash": "sha256:1f038e56b03f331b89d613d4263e239e644ac8a38c9ca7e39f5184e7df00b016"
     },
     {
       "nome": "pacote-critica.json",
-      "hash": "sha256:1a7483ec2afaddbe64fc6d3bb6e007fac688c4221e9da70fe9355d0fc7f72a9b"
+      "hash": "sha256:4b8a9389dce59b3361163e34bf37b9ecac7011700481fc54b2503feb0ea76bbc"
+    },
+    {
+      "nome": "pacote-critica-alvo.json",
+      "hash": "sha256:d729898b83576f513f85cb96228844579b52bc4f325db79aa8f1cb5f7755700a"
     }
   ]
 }
