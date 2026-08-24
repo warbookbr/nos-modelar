@@ -6,12 +6,22 @@ import { criarServicoAutoria3DNativa } from '../../prototipos/procedural/v3/serv
 
 const ler = (nome) => JSON.parse(readFileSync(new URL(`./fixtures/autoria-n2/${nome}`, import.meta.url), 'utf8'));
 
+function criticaAlvoAprovada(alvo) {
+  return {
+    formato: 'mecanifica.critica-alvo-forma-global@1', papel: 'critico-visual-independente',
+    contexto: 'alvo-e-rubrica-sem-blocagem', alvo: alvo.id, estado: 'aprovada',
+    categoriaReconhecida: alvo.rubrica.categoriaEsperada,
+    criterios: alvo.rubrica.criterios.map((id) => ({ id, estado: 'passa', achado: `critério '${id}' coberto pela rubrica.` })),
+    achados: [],
+  };
+}
+
 describe('N2 — consumidor caixa-preta', () => {
   it('descobre uma única porta para alvo, andaime, blocagem e G01/G02', () => {
     const servico = criarServicoAutoria3DNativa();
     expect(servico.formaGlobal.formato).toBe('mecanifica.servico-forma-global@1');
     expect(Object.keys(servico.formaGlobal).sort()).toEqual([
-      'avaliar', 'compilar', 'decidir', 'formato', 'normalizarAlvo', 'normalizarAndaime', 'renderizarPainel', 'renderizarVista',
+      'avaliar', 'avaliarAlvo', 'compilar', 'decidir', 'formato', 'normalizarAlvo', 'normalizarAndaime', 'renderizarPainel', 'renderizarVista',
     ]);
     expect(servico.cobertura('veiculo').totais).toEqual({ etapas: 10, cobertas: 4, lacunas: 6 });
     expect(servico.cobertura('veiculo').etapas.slice(0, 4).map(({ id, estado }) => [id, estado])).toEqual([
@@ -22,12 +32,14 @@ describe('N2 — consumidor caixa-preta', () => {
   it('executa a prova inteira sem importar implementação geométrica', () => {
     const forma = criarServicoAutoria3DNativa().formaGlobal;
     const alvo = ler('alvo-veiculo-compacto.json'), andaime = ler('andaime-veiculo-compacto.json');
-    const blocagem = forma.compilar(alvo, andaime), avaliacao = forma.avaliar(alvo, blocagem);
+    const avaliacaoAlvo = forma.avaliarAlvo(alvo, criticaAlvoAprovada(alvo));
+    const blocagem = forma.compilar(alvo, andaime), avaliacao = forma.avaliar(alvo, blocagem, avaliacaoAlvo);
     const decisao = forma.decidir(avaliacao);
-    expect(blocagem.estatisticas).toEqual({ volumes: 6, vertices: 154, triangulos: 284 });
+    expect(blocagem.estatisticas).toEqual({ volumes: 7, vertices: 270, triangulos: 512 });
+    expect(avaliacaoAlvo.estado).toBe('aprovado');
     expect(avaliacao.estado).toBe('aprovado');
-    expect(decisao).toMatchObject({ estado: 'bloqueado', gates: { g01: 'aprovado', g02: 'bloqueado' } });
-    expect(JSON.stringify({ blocagem, avaliacao, decisao })).not.toMatch(/node:fs|three|function\s*\(|camera|uuid/i);
+    expect(decisao).toMatchObject({ estado: 'bloqueado', gates: { g00: 'aprovado', g01: 'aprovado', g02: 'bloqueado' } });
+    expect(JSON.stringify({ avaliacaoAlvo, blocagem, avaliacao, decisao })).not.toMatch(/node:fs|three|function\s*\(|camera|uuid/i);
   });
 
   it('publica schemas N2 válidos e sincronizáveis com as saídas', () => {
@@ -37,10 +49,11 @@ describe('N2 — consumidor caixa-preta', () => {
     const alvo = servico.formaGlobal.normalizarAlvo(ler('alvo-veiculo-compacto.json'));
     const andaime = servico.formaGlobal.normalizarAndaime(ler('andaime-veiculo-compacto.json'));
     const blocagem = servico.formaGlobal.compilar(alvo, andaime);
-    const avaliacao = servico.formaGlobal.avaliar(alvo, blocagem), decisao = servico.formaGlobal.decidir(avaliacao);
+    const avaliacaoAlvo = servico.formaGlobal.avaliarAlvo(alvo, criticaAlvoAprovada(alvo));
+    const avaliacao = servico.formaGlobal.avaliar(alvo, blocagem, avaliacaoAlvo), decisao = servico.formaGlobal.decidir(avaliacao);
     for (const [id, valor] of [
-      ['mecanifica.alvo-forma-global@1', alvo], ['mecanifica.andaime-global@1', andaime],
-      ['mecanifica.blocagem-global@1', blocagem], ['mecanifica.avaliacao-forma-global@1', avaliacao],
+      ['mecanifica.alvo-forma-global@2', alvo], ['mecanifica.andaime-global@2', andaime],
+      ['mecanifica.avaliacao-alvo-forma-global@1', avaliacaoAlvo], ['mecanifica.blocagem-global@2', blocagem], ['mecanifica.avaliacao-forma-global@1', avaliacao],
       ['mecanifica.decisao-forma-global@1', decisao],
     ]) expect(ajv.validate(id, valor), `${id}: ${ajv.errorsText()}`).toBe(true);
   });

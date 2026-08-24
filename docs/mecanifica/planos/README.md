@@ -326,9 +326,11 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
 [diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
 
-## Próxima abertura
+## Abertura em curso
 
-A abertura ativa é o [aceite visual e prova de superfície](2026-08-20-aceite-visual-e-prova-de-superficie.md).
-Ela executa a correção determinada pela auditoria antes de qualquer retomada.
-Os candidatos permanecem no [`BACKLOG.md`](BACKLOG.md) sem autorização
-automática; nenhum recorte nasce apenas da sequência das sondas.
+A única abertura ativa é N3 — canal de percepção — do
+[plano de arquitetura híbrida por famílias](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+Ela calibra zebra, isófotas e curvatura contra artefatos sintéticos e reprovados,
+sem aprovar veículo, encerrar G02 ou liberar N4/N6. Os demais candidatos,
+inclusive o antigo aceite visual e prova de superfície, permanecem no
+[`BACKLOG.md`](BACKLOG.md) sem autorização automática.

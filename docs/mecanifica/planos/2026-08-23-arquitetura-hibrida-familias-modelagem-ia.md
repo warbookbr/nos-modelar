@@ -2,30 +2,17 @@
 
 **Estado:** ativo
 **Responsável:** Codex · **Base:** `8198833`
-**Execução:** N0 e N1 concluídos, N2 com G01 verde e G02 pendente. De N3 em
-diante foi reescrito e revisado por auditoria do próprio plano.
+**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 está **aberta** depois da sincronização das provas caixa-preta de N1/N2; de N3 em diante o plano foi reescrito e revisado por auditoria própria.
 
 ## Por onde começar
 
-Uma IA sem contexto começa nesta ordem: `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`
-(decidir forma **não** é problema diagnóstico); este plano, só a fatia aberta;
-`REFERENCIA-E-CRITICA-VISUAL.md`, o laço de alvo, sobreposição e crítico. Código
-que já existe e não se reescreve: `tools/mecanifica/capturar-montagem.mjs`,
-`src/autoria/forma-global.js`, `tools/mecanifica/comparar-alvo.mjs` e
-`tools/mecanifica/olhar.mjs`.
+Uma IA sem contexto começa por `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` (decidir forma **não** é problema diagnóstico), este plano apenas na fatia aberta e `REFERENCIA-E-CRITICA-VISUAL.md` (alvo, sobreposição e crítico). Código existente que não se reescreve: `tools/mecanifica/capturar-montagem.mjs`, `src/autoria/forma-global.js`, `tools/mecanifica/comparar-alvo.mjs` e `tools/mecanifica/olhar.mjs`.
 
 ## O que a evidência obriga a mudar
 
-Cinco tentativas falharam igual: `loft` de seções elípticas; três envelopes
-sobrepostos; cage quad com Catmull-Clark em doze rodadas; a cage direta R2/R2B,
-interrompida; e `laboratorio-isolado/cupe-livre-01/`, feito por **outro
-modelo, em esforço máximo, sem importar uma linha deste repositório**, e
-reprovado — cuja receita faz o mesmo que todas, **catorze seções digitadas à
-mão**. Mudaram representação, ferramenta, modelo e base. Não mudou o ato.
+Cinco tentativas falharam igual: `loft` de seções elípticas; três envelopes sobrepostos; cage quad com Catmull-Clark em doze rodadas; cage direta R2/R2B interrompida; e `laboratorio-isolado/cupe-livre-01/`, feito por **outro modelo, em esforço máximo e sem importar uma linha deste repositório**, mas reprovado — a mesma receita de **catorze seções digitadas à mão**. Mudaram representação, ferramenta, modelo e base; não mudou o ato.
 
-A assinatura é sempre a mesma: **o que é verificável por medida passa, o que só
-se vê reprova** — dez condições de rejeição verdes e crítico cego em 3/10. Três
-medidas fecham o diagnóstico:
+A assinatura é sempre a mesma: **o que é verificável por medida passa, o que só se vê reprova** — dez condições de rejeição verdes e crítico cego em 3/10. Três medidas fecham o diagnóstico:
 
 - três vistas ortográficas deixam **82% das estações sem informação de seção**, e
   duas famílias com as três vistas idênticas diferem 28 mm no flanco
@@ -61,36 +48,21 @@ dois espaços só se ligam por um laço lento e com perda.
 
 ### C1 — canal de percepção · risco baixo
 
-A captura tem `superficie`, `normais`, `profundidade`, `wireframe`, `identidade`
-e `silhueta`, e **não tem** o que a indústria usa para julgar superfície:
-**zebra, isófotas e curvatura**. Zebra torta é defeito, zebra reta e espaçada é
-superfície boa — julgável a olho **e** mensurável no mesmo artefato, a ponte que
-falta. Técnica conhecida e fechada: por isso é a primeira fatia.
+A captura tem `superficie`, `normais`, `profundidade`, `wireframe`, `identidade` e `silhueta`, mas não zebra, isófotas e curvatura — a ponte industrial entre julgamento visível e mensurável de superfície. Técnica conhecida e fechada: por isso é a primeira fatia.
 
 ### C2 — autoria por restrição · **risco alto, é a incerteza central do plano**
 
-A fonte deixa de conter coordenada e passa a conter enunciado com nome: relação
-("o ponto mais largo fica logo abaixo do ombro"), desigualdade ("o capô abaula,
-nunca afunda"), continuidade ("G1 na linha de ombro"), folga ("40 mm sobre o
-pneu") e aderência ("silhueta a menos de 25 mm do perfil medido").
+A fonte deixa de conter coordenada e passa a conter enunciado com nome: relação ("o ponto mais largo fica logo abaixo do ombro"), desigualdade ("o capô abaula, nunca afunda"), continuidade ("G1 na linha de ombro"), folga ("40 mm sobre o pneu") e aderência ("silhueta a menos de 25 mm do perfil medido").
 
-**A auditoria acusou aqui o mesmo pecado que o plano denuncia no dossiê antigo:**
-"um solver satisfaz o conjunto" era uma frase para a coisa mais difícil de tudo.
-Não é fatia entre outras — é a aposta. Correções:
+**A auditoria acusou aqui o mesmo pecado que o plano denuncia no dossiê antigo:** "um solver satisfaz o conjunto" escondia a coisa mais difícil. Não é fatia entre outras — é a aposta. Correções:
 
-- o solver **não é geral**. Ele resolve a lista fechada de cinco tipos acima, e
-  só. Tipo novo exige fatia nova com evidência;
-- N4 abre com uma **sonda de viabilidade** num caso mínimo — uma seção, três
-  restrições — antes de qualquer compromisso com o resto;
+- o solver **não é geral**: resolve apenas a lista fechada de cinco tipos; tipo novo exige fatia com evidência;
+- N4 abre com uma **sonda de viabilidade** — uma seção, três restrições — antes de qualquer compromisso;
 - se a sonda falhar, a condição de encerramento dispara **ali**, não em N6.
 
 ### C3 — busca · risco médio
 
-Onde sobrar liberdade, a IA não chuta: define o objetivo e uma busca acha os
-valores. **O espaço de busca é exatamente o grau de liberdade que C2 deixar em
-aberto — nunca um espaço inventado pela IA.** Se C2 não deixar espaço livre
-bem-definido, C3 não se aplica e a fatia fecha vazia. Isso fecha a armadilha em
-que a IA caiu ao chamar de avanço doze parâmetros que também eram chute.
+Onde sobrar liberdade, a IA define o objetivo e uma busca acha os valores. **O espaço de busca é exatamente o grau de liberdade que C2 deixar em aberto — nunca inventado pela IA.** Sem espaço livre bem-definido, C3 fecha vazia; isso evita chamar doze chutes nomeados de avanço.
 
 ## Procedência do número, com gate
 
@@ -98,9 +70,9 @@ Todo valor da fonte declara origem: `medido`, `derivado`, `resolvido` ou
 `declarado`. Coordenada crua não é origem válida. `declarado` exige uma frase de
 justificativa e é minoria auditável.
 
-**Gate executável:** `procedencia:check` lê a fonte e reprova valor sem origem, e
-reprova quando `declarado` passa de um quinto dos valores. Regra sem gate
-apodrece — este repositório já provou isso.
+Para veículo, a minoria não basta: dimensões do envelope, landmarks `nariz`, eixos, início/fim/pico da cabine e ombros, e contornos de `massa-primaria` não podem ser `declarado`; precisam ser `medido` ou `derivado`. `resolvido` só aparece no candidato de fonte medida/derivada. Falta nessa lista reprova por vacuidade, mesmo abaixo do quinto global.
+
+**Gate obrigatório da abertura N3:** `procedencia:check` será entregue antes do encerramento; reprova valor sem origem, `declarado` acima de um quinto e a lista estrutural acima. Até existir, é requisito aberto — não capacidade alegada.
 
 ## Famílias
 
@@ -141,6 +113,8 @@ zebra é regular por construção. O canal precisa mostrar zebra regular nesses,
 irregularidade no quarto dianteiro, no R2B e no cupê livre, e ordená-los conforme o
 veredito humano. Canal que aprova o que o usuário reprovou não serve.
 
+N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas.
+
 **N3.5 — sonda de suavização.** Barata e decisiva; existe porque o plano não
 podia ficar quatro fatias sem nada visível. Pega o quarto dianteiro reprovado,
 aplica **só energia de suavidade** guiada por C1, sem restrição nem busca, e
@@ -153,9 +127,7 @@ antes de gastar N4. Se não melhorar, C2 e C3 ficam sob suspeita.
 
 Um plano que ignora dívida deixa ela apodrecer. Fica registrado e datado:
 
-- **4 testes vermelhos na main** em `fluxo-autoria-n1-caixa-preta` e
-  `forma-global-n2-caixa-preta`: a API do N2 ganhou `avaliarAlvo` e a prova
-  caixa-preta não acompanhou. Resolver **antes** de abrir N3;
+- **Sincronização N1/N2 concluída na abertura N3:** `fluxo-autoria-n1-caixa-preta` e `forma-global-n2-caixa-preta` acompanham `avaliarAlvo`/G00 e schema gerado; os quatro casos antes vermelhos precisam permanecer verdes;
 - planos congelados — P2, validação integrada e motor de prancha — não voltam
   sem decisão explícita;
 - artefatos reprovados viram insumo do gate de calibração do N3.
@@ -190,11 +162,5 @@ de um gate provar que são essenciais à forma.
 - **V1 — 2026-08-23:** plano ativado após o R2B.
 - **V2 — 2026-08-24:** reescrito de N3 em diante. O plano anterior dizia **o
   que** autorar e não **como a IA decide o número**.
-- **V3 — 2026-08-24:** revisado por auditoria do próprio plano, dez defeitos.
-  Os três graves: C2 escondia a coisa mais difícil numa frase, o mesmo pecado
-  que o plano denuncia no dossiê antigo; o gate do N3 **não podia ser
-  executado**, por exigir uma superfície sã que não existe aqui; e C3 movia o
-  problema um andar acima sem dizer de onde vinha o espaço de busca. Entram
-  sonda de viabilidade e segundo braço de encerramento em N4, lado sadio
-  sintético em N3, N3.5 como marco barato, teto de rodadas, gate de procedência,
-  passivo declarado, ponto de entrada, e humanoide marcado não especificado.
+- **V3 — 2026-08-24:** auditoria corrigiu dez defeitos: C2 escondia a parte difícil, N3 exigia uma superfície sã inexistente e C3 não justificava seu espaço de busca. Entraram sonda N4 e segundo braço de encerramento, lado sadio sintético, N3.5 barato, teto de rodadas, procedência, passivo, ponto de entrada e humanoide não especificado.
+- **V4 — 2026-08-24:** N3 aberto após sincronizar as quatro provas públicas N1/N2. Percepção declara seu limite — superfície não é reconhecimento veicular —, procedência estrutural não se esconde no teto global e o verificador é entrega N3, não capacidade presumida.
