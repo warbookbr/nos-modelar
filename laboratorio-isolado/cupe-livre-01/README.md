@@ -4,6 +4,15 @@ Este diretório é uma prova deliberadamente separada da Mecanifica. Ele não
 importa código, contratos, schemas, receitas, renderizadores, dependências ou
 assets do repositório hospedeiro.
 
+## Declaração de resultado
+
+Este experimento **não deu certo e está reprovado**. O modelo obtido não
+atingiu o nível visual esperado para um carro esportivo italiano: a
+silhueta, a integração entre carroceria, cabine e rodas e o acabamento geral
+continuaram insuficientes. Portanto, estes arquivos são apenas evidência de
+uma tentativa isolada; não são uma solução aprovada, não devem substituir o
+plano do produto e não devem ser tratados como baseline de qualidade.
+
 ## Hipótese
 
 Uma IA pode obter uma forma automotiva melhor começando por uma receita visual
