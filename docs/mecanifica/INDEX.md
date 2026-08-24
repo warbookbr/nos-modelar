@@ -235,8 +235,11 @@ aplicação publicada aqui.
   (`docs/mecanifica/FLUXO-AUTORIA-N1.md`).
   O [relatório N2](RELATORIO-N2-FORMA-GLOBAL.md) registra alvo independente,
   andaime, blocagem inteira, quatro vistas e G01 aprovado. G02 permanece
-  bloqueado até crítica independente e aceite explícito do usuário; N3 não está
-  aberta. Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
+  bloqueado até crítica independente e aceite explícito do usuário. N3 foi
+  concluída somente para C1: o [relatório N3](RELATORIO-N3-CANAL-PERCEPCAO.md)
+  (`docs/mecanifica/RELATORIO-N3-CANAL-PERCEPCAO.md`) registra zebra,
+  isófotas, curvatura e procedência; N3.5 não está aberta.
+  Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
   `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
   identidade, montagem, revisão,
   bancada e MCP; acrescenta andaime global, superfície semântica nativa,

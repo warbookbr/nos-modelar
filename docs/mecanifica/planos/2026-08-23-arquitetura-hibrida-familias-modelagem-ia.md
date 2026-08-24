@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 **Responsável:** Codex · **Base:** `8198833`
-**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 está **aberta** depois da sincronização das provas caixa-preta de N1/N2; de N3 em diante o plano foi reescrito e revisado por auditoria própria.
+**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 está **concluída** com C1 calibrado e procedência verificável; N3.5 é a próxima sonda, ainda não aberta.
 
 ## Por onde começar
 
@@ -113,7 +113,7 @@ zebra é regular por construção. O canal precisa mostrar zebra regular nesses,
 irregularidade no quarto dianteiro, no R2B e no cupê livre, e ordená-los conforme o
 veredito humano. Canal que aprova o que o usuário reprovou não serve.
 
-N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas.
+N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas. **Encerrada em 2026-08-24:** o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md) registra controles sadios regulares e quarto, R2B e Cupê-livre irregulares; a ordenação humana disponível é binária, logo C1 separa classes e não inventa ranking estético entre reprovados.
 
 **N3.5 — sonda de suavização.** Barata e decisiva; existe porque o plano não
 podia ficar quatro fatias sem nada visível. Pega o quarto dianteiro reprovado,
@@ -164,3 +164,4 @@ de um gate provar que são essenciais à forma.
   que** autorar e não **como a IA decide o número**.
 - **V3 — 2026-08-24:** auditoria corrigiu dez defeitos: C2 escondia a parte difícil, N3 exigia uma superfície sã inexistente e C3 não justificava seu espaço de busca. Entraram sonda N4 e segundo braço de encerramento, lado sadio sintético, N3.5 barato, teto de rodadas, procedência, passivo, ponto de entrada e humanoide não especificado.
 - **V4 — 2026-08-24:** N3 aberto após sincronizar as quatro provas públicas N1/N2. Percepção declara seu limite — superfície não é reconhecimento veicular —, procedência estrutural não se esconde no teto global e o verificador é entrega N3, não capacidade presumida.
+- **V5 — 2026-08-24:** N3 encerrou C1 com painel visual inspecionado, corpus reprodutível e `procedencia:check`; N3.5 permanece parada até autorização. A calibração só separa o veredito binário disponível, sem fabricar ranking estético dos rejeitados.

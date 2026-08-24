@@ -328,9 +328,11 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura em curso
 
-A única abertura ativa é N3 — canal de percepção — do
-[plano de arquitetura híbrida por famílias](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
-Ela calibra zebra, isófotas e curvatura contra artefatos sintéticos e reprovados,
-sem aprovar veículo, encerrar G02 ou liberar N4/N6. Os demais candidatos,
+A fatia N3 — canal de percepção — do
+[plano de arquitetura híbrida por famílias](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
+foi concluída: o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md) registra
+zebra, isófotas, curvatura e procedência contra controles sintéticos e
+artefatos reprovados. N3.5 é somente a próxima sonda possível; não está aberta
+e não aprova veículo, encerra G02 ou libera N4/N6. Os demais candidatos,
 inclusive o antigo aceite visual e prova de superfície, permanecem no
 [`BACKLOG.md`](BACKLOG.md) sem autorização automática.

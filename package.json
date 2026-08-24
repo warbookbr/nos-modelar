@@ -23,6 +23,8 @@
     "autoria:schemas:check": "node tools/mecanifica/gerar-schemas-autoria-3d.mjs --check",
     "autoria:n2:evidencias": "node tools/mecanifica/gerar-evidencias-forma-global-n2.mjs --png",
     "autoria:n2:evidencias:check": "node tools/mecanifica/gerar-evidencias-forma-global-n2.mjs --check",
+    "percepcao:n3:evidencias": "node autoria-assistida/experimentos/canal-percepcao-n3/gerar-evidencias.mjs",
+    "procedencia:check": "node tools/mecanifica/procedencia-check.mjs",
     "bancada:vazia:check": "node tools/mecanifica/guarda-bancada-vazia.mjs",
     "test": "vitest run",
     "mcp:check": "vitest run tools/mcp/mcp.test.mjs tools/mcp/procedural.test.mjs",

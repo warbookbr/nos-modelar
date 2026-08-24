@@ -1,0 +1,13 @@
+{
+  "formato": "mecanifica.fonte-restricoes-n3@1",
+  "valores": [
+    { "id": "comprimento", "campo": "envelope.comprimento", "valor": 4.6, "origem": { "tipo": "medido", "referencia": "prancha medida" } },
+    { "id": "largura", "campo": "envelope.largura", "valor": 2.0, "origem": { "tipo": "medido", "referencia": "prancha medida" } },
+    { "id": "nariz", "campo": "landmark.nariz", "valor": 0.841, "origem": { "tipo": "derivado", "referencia": "perfil medido" } },
+    { "id": "cabine-inicio", "campo": "cabine.inicio", "valor": 0.42, "origem": { "tipo": "derivado", "referencia": "perfil medido" } },
+    { "id": "ombro-e", "campo": "ombro.esquerdo", "valor": 0.91, "origem": { "tipo": "medido", "referencia": "frontal medida" } },
+    { "id": "ombro-d", "campo": "ombro.direito", "valor": 0.91, "origem": { "tipo": "derivado", "referencia": "simetria medida" } },
+    { "id": "folga", "campo": "folga.roda", "valor": 0.04, "origem": { "tipo": "declarado", "justificativa": "meta explícita de projeto; não é landmark estrutural" } },
+    { "id": "ajuste", "campo": "ajuste.candidate", "valor": 0.12, "origem": { "tipo": "resolvido", "fontes": ["comprimento", "nariz"] } }
+  ]
+}
