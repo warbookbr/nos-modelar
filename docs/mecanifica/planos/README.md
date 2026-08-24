@@ -29,6 +29,18 @@ rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md), ficam ligados
 ao plano; o de superfícies precisa ser reescrito porque suas operações terminam
 todas em "ajustar valor".
 
+O plano passou por **auditoria de si mesmo** no mesmo dia, que achou dez
+defeitos e virou a V3. Os três graves: a autoria por restrição escondia a coisa
+mais difícil de tudo numa frase — "um solver satisfaz o conjunto" —, que é o
+mesmo pecado denunciado no dossiê antigo; o gate de calibração do canal de
+percepção **não podia ser executado**, porque exigia uma superfície sã que não
+existe neste repositório; e a busca movia o problema um andar acima sem dizer de
+onde vinha o espaço de parâmetros. Entraram sonda de viabilidade com braço
+próprio de encerramento, lado sadio sintético, uma sonda barata de suavização
+como primeiro marco visível, teto de rodadas por fatia, gate de procedência do
+número, passivo declarado com os 4 testes vermelhos da main, ponto de entrada
+para IA sem contexto, e o eixo humanoide marcado como não especificado.
+
 O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
 foi concluído com decisão `interromper`: sua melhor evidência continuou
 reprovada numérica e visualmente, e B2–B4 não prosseguem. Cage, métricas e
