@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-613 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+616 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -103,6 +103,12 @@
 - `gerar-evidencias.mjs` — Materializa o contraexemplo mínimo R1B: duas faces coincidentes em tela.
 - `renderizador-profundo.mjs` — Captura privada R1B: rasterização ortográfica com z-buffer, fora do núcleo.
 - `renderizador-profundo.test.mjs` — Provas R1B: o PNG é derivado, mas a oclusão é conferida no z-buffer.
+
+## autoria-assistida/experimentos/prova-secoes-por-medida/
+
+- `README.md` — Prova: seções por medida — interrompida, com um achado que fica
+- `informacao-das-vistas.mjs` — informacao-das-vistas.mjs — as três vistas ortográficas determinam a seção?
+- `secoes-por-medida.mjs` — secoes-por-medida.mjs — seções transversais derivadas de PERFIL MEDIDO, não de números digitados.
 
 ## autoria-assistida/guias/forma/
 
@@ -504,7 +510,7 @@
 ## laboratorio-isolado/cupe-livre-01/
 
 - `README.md` — Cupê livre 01 — experimento isolado
-- `index.html` — **SEM CABEÇALHO**
+- `index.html` — Bancada autocontida do experimento isolado. Sem imports, assets ou contratos do repositório hospedeiro.
 - `motor.js` — Motor WebGL autocontido do experimento. Sem dependências, imports ou assets.
 - `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
 - `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.

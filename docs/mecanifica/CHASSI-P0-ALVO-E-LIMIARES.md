@@ -1,5 +1,13 @@
 # Chassi P0 — alvo, referência e limiares
 
+> **NÃO VINCULANTE desde 2026-08-24.** Os landmarks e curvas deste documento
+> foram inventados pela IA, não medidos. O confronto com o perfil real de um cupê
+> fastback mostrou o alto do nariz declarado em 520 mm contra 841 mm medidos —
+> 321 mm abaixo, e abaixo do topo do pneu dianteiro, o que é a causa do perfil
+> ler como cunha. Este alvo volta a valer quando for confrontado com dado
+> medido. Ver `planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`.
+
+
 Rodada P0 do plano
 [`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](planos/2026-08-18-chassi-realista-kernel-geometrico.md).
 Fundamentação em

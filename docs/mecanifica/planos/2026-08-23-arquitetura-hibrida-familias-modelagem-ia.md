@@ -1,200 +1,192 @@
 # Arquitetura híbrida nativa de autoria por famílias para IA
 
-**Estado:** ativo  
-**Responsável:** Codex  
-**Repositório e base:** `warbookbr/nos-mecanifica`, `7bb1bd8`  
-**Execução:** N0 e N1 concluídos; N2 implementada com G01 verde e G02 pendente.
+**Estado:** ativo
+**Responsável:** Codex
+**Repositório e base:** `warbookbr/nos-mecanifica`, `0d99700`
+**Execução:** N0 e N1 concluídos. N2 entregue com G01 verde e G02 pendente. N3
+em diante foi **reescrito** nesta revisão, pelo motivo da seção seguinte.
 
-## Origem, decisão e objetivo
+## O que a evidência obriga a mudar
 
-Este plano sintetiza o fluxo proposto pelo usuário, a reprovação visual da
-carroceria, a revisão da sonda humanoide e as capacidades atuais da Mecanifica.
-Ele substitui o R2B, encerrado com decisão explícita `interromper`.
+Cinco tentativas de dar forma a uma carroceria falharam do mesmo jeito: `loft`
+de seções elípticas; três envelopes sobrepostos com 1.014 vértices; cage quad
+com Catmull-Clark em doze rodadas; a cage direta R2/R2B, interrompida; e o
+experimento `laboratorio-isolado/cupe-livre-01/`, feito por **outro modelo,
+em esforço máximo, sem importar uma linha deste repositório**, e reprovado.
 
-A autoria deve ser **nativa deste repositório**. Blender, DCC, CAD, serviços de
-modelagem e fluxos GLTF/OBJ/USD não são dependências nem rotas de produção. Uma
-capacidade essencial ausente pode ser implementada aqui no menor recorte que
-eleve o resultado. O objetivo não é clonar software geral, mas elevar o teto do
-sistema e da receita para veículos, peças mecânicas e robôs humanoides
-convincentes, editáveis, verificáveis e reutilizáveis.
+Abrindo a receita do cupê livre, ela faz o mesmo que todas as outras: **catorze
+seções transversais digitadas à mão, com números tirados da cabeça**. Mudaram a
+representação, a ferramenta, o modelo e a base de código. Não mudou o ato.
 
-> **Primeiro obter uma forma global reconhecível e aprovada. Depois decompor,
-> conectar, refinar e tornar cada parte reproduzível sem perder o conjunto.**
+A assinatura da falha é sempre a mesma: **o que é verificável por medida passa,
+o que só se vê reprova.** Dez condições de rejeição verdes e crítico cego em
+3/10 não é coincidência.
 
-**Dossiês vinculantes:**
+Três medidas desta rodada fecham o diagnóstico:
 
-- [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](../DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md): arquitetura, contratos, lacunas e garantias; [`MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md): rastreio executável;
-- [`DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`](../DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md): fonte, compilação, operações e provas de superfície;
-- [`DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`](../DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md): estados, papéis, gates e recuperação.
+- três vistas ortográficas deixam **82% das estações sem informação de seção**;
+  duas famílias com as três vistas idênticas ainda diferem 28 mm no flanco
+  (`autoria-assistida/experimentos/prova-secoes-por-medida/`);
+- o alvo P0 que a própria IA inventou põe o nariz a 520 mm; o perfil **medido**
+  de um cupê fastback real põe a 841 mm — 321 mm abaixo, e abaixo do topo do
+  pneu dianteiro;
+- trocar 80 coordenadas por 12 parâmetros com nome não resolveu: os 12 também
+  foram chutados, com nome bonito em cima.
 
-## Diagnóstico e contraevidência
+**Causa raiz:** a IA autora em milímetros e a forma é julgada em imagem. Os dois
+espaços só se ligam por um laço lento e com perda — renderizar e olhar. Tudo que
+a IA consegue verificar sozinha é ortogonal ao que decide o aceite.
 
-A base já entrega motor procedural determinístico e descobrível, identidade,
-partes, portas, montagens recursivas, impacto, revalidação, revisões, bancada,
-captura, crítica e MCP. Ela permanece como infraestrutura compartilhada.
+## A inversão
 
-A carroceria passou por `loft`, cage, prancha e métricas sem adquirir leitura
-convincente de carro. O fluxo refinou uma representação global já reprovada.
+| | hoje | a partir de N3 |
+|---|---|---|
+| a IA produz | coordenadas | restrições, objetivos e julgamento comparativo |
+| quem produz número | a IA, no braço | solver e busca |
+| realimentação | render lido a olho | canal de percepção medido **e** visível |
 
-A sonda humanoide provou hierarquia, reutilização, bilateralidade e estados,
-mas não um bom robô. A referência era uma armadura atlética e contínua; tórax e
-capacete viraram envelopes genéricos; membros foram volumes separados colocados
-por deslocamentos; corpo, braços e pernas mantiveram `relacoes: []`; a auditoria
-registrou zero contatos e 15/16 interpenetrações. Lacunas graves foram adiadas e
-o estudo aprovou a plataforma apesar do artefato facetado e desconectado.
+A IA passa a fazer o que faz bem — nomear, relacionar, restringir, escrever
+código, comparar candidatos — e para de fazer o que faz mal: emitir coordenada
+absoluta e prever como um número vira sombra.
 
-A causa não é apenas "low poly": faltaram forma global, superfície adequada,
-interfaces obrigatórias e um gate capaz de reprovar o objeto quando somente a
-infraestrutura passa.
+## Práticas retiradas por evidência
+
+1. **Tabela de seções digitada à mão está proibida** como fonte de forma. Cinco
+   tentativas, duas famílias de modelo, mesmo resultado.
+2. **Alvo inventado pela IA não é referência vinculante.** Os landmarks do
+   `CHASSI-P0-ALVO-E-LIMIARES.md` passam a `não vinculantes` até serem
+   confrontados com dado medido; o erro de 321 mm no nariz é a prova.
+3. A lista de operações do `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — "ajustar
+   largura, altura, seção, tensão e volume por região" — descreve **metas de
+   solver**, não atos de autoria. Reescrever nesses termos.
+4. **Aprovação por vacuidade** em detector é falha do detector: condição fora de
+   escopo devolve `naoAvaliavel` com motivo, nunca `passa`.
+5. Prova veicular em **quarto isolado** não decide forma. Já estava no dossiê;
+   passa a ser impeditivo.
+
+## Três capacidades novas, compartilhadas entre famílias
+
+### C1 — canal de percepção
+
+Hoje a captura tem `superficie`, `normais`, `profundidade`, `wireframe`,
+`identidade` e `silhueta`. Falta exatamente o que a indústria usa para julgar
+superfície: **linhas de reflexo — zebra e isófotas — e mapa de curvatura**.
+Zebra torta, apertada ou quebrada é defeito de superfície; zebra reta e
+espaçada é superfície boa. É julgável a olho **e mensurável no mesmo artefato**.
+
+É o que liga os dois espaços que hoje não se falam.
+
+### C2 — autoria por restrição
+
+A fonte editável deixa de conter coordenada. Contém enunciado com nome:
+
+- relação — "o ponto mais largo fica logo abaixo do ombro";
+- desigualdade — "o capô abaula, nunca afunda";
+- continuidade — "G1 do para-lama dianteiro ao traseiro na linha de ombro";
+- folga — "40 mm uniformes sobre o pneu no arco";
+- aderência — "silhueta lateral a menos de 25 mm do perfil medido".
+
+Um solver satisfaz o conjunto. O que ficar subdeterminado é resolvido por
+energia de suavidade — que é, não por acaso, o que faz superfície parecer boa.
+
+### C3 — busca sobre parâmetros semânticos
+
+Onde sobrar liberdade, a IA **não chuta**: define o objetivo (C1 + aderência à
+referência + restrições de C2) e uma busca acha os valores. A IA julga os
+finalistas por comparação, que é onde ela é forte, em vez de gerar em absoluto,
+que é onde ela é fraca.
 
 ## Aprovação em dois eixos
 
-Toda prova produz decisões independentes:
+Mantida sem mudança. Toda prova decide **plataforma** e **artefato** em
+separado. Capacidade aprovada com artefato reprovado é resultado válido; prova
+de qualidade só fecha com os dois. Achado visual grave não é adiado.
 
-1. **plataforma:** determinismo, identidade, edição, montagem, impacto,
-   cobertura e custo;
-2. **artefato:** reconhecimento, proporção, superfície, continuidade, conexões
-   e aderência ao alvo.
+## Famílias
 
-Uma capacidade pode ser aprovada com artefato reprovado. Prova de qualidade só
-fecha com os dois eixos aprovados. Achado visual grave não pode ser adiado para
-permitir aprovação do objeto.
-
-## Famílias e base comum
-
-| Família | Autoria principal | Base compartilhada |
+| Família | Ato de autoria dominante | Referência |
 |---|---|---|
-| mecânica dimensional | receita procedural atual | identidade, portas, medidas, montagem |
-| superfície estilizada | superfície semântica nativa | referência, regiões, restrições, crítica |
-| sistema articulado | peças, juntas e estados | interfaces, impacto, validação de pose |
-| máquina completa | composição híbrida nativa | orquestração, contexto, revalidação global |
+| mecânica dimensional | receita procedural atual, **inalterada** | cota e função |
+| superfície estilizada (veículo) | restrição proporcional e relacional | prancha medida e landmarks |
+| cobertura sobre base (humanoide) | **conformar placa a corpo com folga** | cânone de proporção humana |
+| sistema articulado | juntas, limites e estados | pose e envelope |
+| máquina completa | composição por interfaces | conjunto |
 
-A família escolhe como criar a forma, sem mudar peça, montagem, identidade ou
-revisão. Carro e robô não são receitas monolíticas.
+Veículo e humanoide **não compartilham o ato de autoria**. Carroceria é seção e
+silhueta; armadura é projeção e afastamento sobre uma base corporal. Tratar as
+duas com o mesmo mecanismo foi parte da falha da sonda humanoide.
 
-## Arquitetura proposta
+Compartilham tudo o mais: identidade, peça, montagem, revisão, impacto,
+interfaces, C1, C2, C3 e o protocolo de crítica.
 
-1. **Núcleo compartilhado:** contratos neutros de artefato, peça, montagem,
-   identidade, revisão, dependência e validação; sem domínio ou Three.js.
-2. **Orquestrador por objetivo:** recebe família, alvo, referência, estado e
-   aceite; escolhe capacidades, ordena o fluxo e interrompe rotas reprovadas.
-3. **Procedural dimensional:** preserva operações e receitas atuais.
-4. **Andaime global:** esqueleto, landmarks, envelopes e proporções do objeto
-   completo antes da decomposição.
-5. **Superfície semântica:** curvas, seções, patches ou malha de controle,
-   simetria, vincos, aberturas, continuidade e regiões nomeadas.
-6. **Integração:** interfaces de cobertura, contato, folga, orientação e
-   separação intencional entre vizinhos.
-7. **Cinemática:** juntas, limites e trajetória somente após estados estáticos
-   conectados e necessidade comprovada.
+## Fatias
 
-Os provedores podem crescer por extensões confinadas, mas não duplicam
-identidade, montagem ou revisão.
+1. **N0 — verdade.** Concluída.
+2. **N1 — contrato.** Concluída.
+3. **N2 — forma global.** Entregue; G02 aberto. **Não avança sem N3.**
+4. **N3 — canal de percepção (C1).** Zebra, isófotas e curvatura, renderizados
+   e medidos. **Gate de calibração:** o canal precisa separar os artefatos que
+   humanos já reprovaram — quarto dianteiro, R2B e Cupê livre — de uma
+   superfície de referência sã. Canal que aprova o que o usuário reprovou não
+   serve, e a evidência para calibrar já existe no repositório.
+5. **N4 — autoria por restrição (C2).** Gate: a fonte de autoria de um corpo
+   inteiro **não contém uma coordenada sequer**, e duas formas visivelmente
+   diferentes saem do mesmo conjunto mudando só enunciado declarado.
+6. **N5 — busca (C3).** Gate: no mesmo orçamento, a busca vence o ajuste no
+   braço, medido por C1 e por aderência à referência.
+7. **N6 — carro inteiro bruto.** Corpo completo, nunca quarto. Reconhecimento
+   cego e aceite do usuário antes de qualquer detalhe.
+8. **N7 — integração.** Superfície e mecânica ligadas por interfaces.
+9. **N8 — humanoide.** Corpo-base e poucas placas conformadas e conectadas, com
+   o solver de conformação, sem regra de carro no núcleo.
+10. **N9 — Agent-First.** Descoberta, edição, captura e gates por serviço,
+    skill e MCP.
+11. **N10 — decisão.** Promover, corrigir, redesenhar ou remover por evidência.
 
-## Receita elevada
-
-Conforme a família, a fonte editável nativa pode conter:
-
-- intenção, referência, condições de rejeição e critérios de reconhecimento;
-- parâmetros, landmarks, eixos, simetria e andaime global;
-- grafo procedural, curvas, patches ou malha de controle;
-- regiões, interfaces, vizinhanças e restrições de continuidade/cobertura;
-- estados, variantes, malha neutra derivada, assinatura e diagnósticos.
-
-A malha densa é produto compilado, não identidade persistida. Índices podem ser
-detalhe interno de operação, nunca a identidade pública da autoria ou montagem.
-
-## Fluxo vinculante
-
-1. Fixar referência, intenção, vistas e rejeições antes da geometria.
-2. Criar andaime e blocagem do objeto inteiro em material neutro.
-3. Exigir reconhecimento em vistas globais e aceite do usuário.
-4. Só então decompor regiões em peças e submontagens.
-5. Editar cada peça isolada, com vizinhos e no conjunto completo.
-6. Declarar toda adjacência relevante como contato, cobertura, folga ou
-   separação intencional verificável.
-7. Refinar em ordem: proporção, volumes, aberturas, caráter, painéis e detalhes.
-8. Recompilar e rever consumidores e conjunto após mudanças locais relevantes.
-9. Validar pose neutra e estados estáticos; trajetória entra quando necessária.
-10. Promover somente com decisões explícitas de plataforma, artefato e usuário.
-
-### Veículo
-
-Rodas, entre-eixos, bitolas, envelope e ocupantes formam o andaime. Capô,
-cabine, cintura, ombros, para-lamas e traseira devem existir na blocagem. A pele
-usa edição regional; arcos, vidros e painéis são loops ligados a ela. Mecânica
-permanece procedural. Se a leitura cega não for carro, métricas não autorizam
-detalhe ou integração.
-
-### Humanoide
-
-Esqueleto e proporções formam o andaime. Cabeça, caixa torácica, cintura
-escapular, pelve e membros devem ler como corpo antes da armadura. Placas são
-conformadas à base corporal. Capacete declara frente, laterais, topo, mandíbula
-e pescoço; tórax declara peitoral, costas, cintura e transições. Toda cadeia do
-tronco à extremidade permanece conectada e a pose neutra precede articulação.
+N4 não começa sem N3 calibrado. N6 não começa sem N4 e N5. N8 não começa se N7
+depender de regra automotiva.
 
 ## Validadores e porteiros
 
-| Camada | Verifica | Ação |
-|---|---|---|
-| estrutural | schema, determinismo, identidade, partes, portas | preservar |
-| forma global | reconhecimento, silhueta, proporção, landmarks | acrescentar |
-| superfície | facetas, ondulação, continuidade, vincos, normais | acrescentar |
-| conectividade | componentes isolados e adjacências obrigatórias | acrescentar |
-| interface | distância, orientação, contato, cobertura, folga | ampliar relações |
-| contexto | isolado, par de vizinhos e conjunto completo | tornar vinculante |
-| estados | pose estática e depois envelope de movimento | ampliar se necessário |
-| visual | leitura cega, comparação e decisão humana | tornar impeditivo |
+Camadas estrutural, forma global, superfície, conectividade, interface,
+contexto, estados e visual permanecem como estavam, com dois acréscimos:
 
-`relacoes: []` é falha em conjunto que exige encaixes. Zero contatos não é
-sucesso quando o alvo pede cobertura contínua. Interpenetração esperada continua
-mensurada. `Low poly` só vale quando declarado. Peça isolada não aprova máquina.
+- **percepção** — zebra, isófotas e curvatura entram como camada medida;
+- **procedência do número** — todo valor da fonte de autoria declara origem:
+  `medido`, `derivado`, `resolvido` ou `declarado`. `declarado` é minoria
+  auditável e precisa de uma frase de justificativa. Coordenada crua não é
+  origem válida.
 
-## Fatias propostas
+`relacoes: []` continua falha em conjunto que exige encaixe. `Low poly` só vale
+declarado. Peça isolada não aprova máquina.
 
-1. **N0 — verdade:** congelar contraevidências, separar os dois eixos de decisão
-   e fixar baseline, referência inicial e contratos.
-2. **N1 — contrato:** receita elevada, provedores, orquestração e falha segura.
-   [Concluída](../RELATORIO-N1-FLUXO-AUTORIA.md) com schemas e prova caixa-preta.
-3. **N2 — forma global:** implementar andaime e gate de reconhecimento numa
-   blocagem inteira pequena. Implementação e G01 concluídos; G02 aguarda crítica
-   independente e aceite do usuário.
-4. **N3 — superfície nativa:** provar edição regional, simetria, continuidade,
-   vinco e compilação neutra.
-5. **N4 — veículo bruto:** produzir carro reconhecível antes de detalhe.
-6. **N5 — integração:** ligar superfície a peças procedurais por interfaces.
-7. **N6 — humanoide:** provar corpo-base e poucas placas conectadas sem domínio
-   automotivo no núcleo.
-8. **N7 — Agent-First:** expor descoberta, edição, captura e gates por serviços,
-   skills e MCP adequados.
-9. **N8 — decisão:** promover, corrigir, redesenhar ou remover por evidência.
+## Parada e saída honesta
 
-N4 não começa se N3 não elevar a forma; N6 não começa se N5 depender de regra
-de carro. Solver geral e movimento contínuo só entram diante de gate essencial.
+Três blocagens não reconhecíveis revisam referência, representação ou
+ferramenta. Além disso, esta revisão declara uma **condição de encerramento**:
 
-## Gates de saída
+> Se N6 falhar no reconhecimento cego depois de N3, N4 e N5 aprovados, a
+> conclusão registrada é que **autoria de superfície automotiva por IA está
+> fora de alcance nesta plataforma no estado atual**, e o alvo do repositório
+> passa a ser editar, validar, montar e raciocinar sobre geometria de
+> superfície vinda de fora — que é onde a base já é forte.
 
-1. blocagem reconhecida cegamente e aprovada pelo usuário antes do detalhe;
-2. fonte nativa reaberta e editada por regiões/intenção pela IA;
-3. edição local preserva ou declara impacto global;
-4. veículo combina superfície e mecânica pelas interfaces comuns;
-5. humanoide mantém cadeia corporal conectada e cobertura coerente;
-6. nenhuma parte obrigatória flutua ou se liga apenas por câmera;
-7. superfície atende ao alvo sem faceteamento ou ondulação indevidos;
-8. decisões de plataforma e artefato permanecem separadas;
-9. autor e crítico independente usam evidência adequada e papéis separados;
-10. corpus atual não regride e custo/contexto das capacidades novas são medidos.
+Isso não é desistência antecipada: é o critério escrito antes, para que a sexta
+tentativa não vire a sétima por inércia.
 
-## Parada, escopo e ativação
+## Fora de escopo
 
-Após três blocagens não reconhecíveis, revisar referência, representação ou
-ferramenta. Silhueta errada retorna à blocagem; parte flutuante com gate verde
-obriga corrigir o contrato. Reprovação visual mantém o artefato reprovado.
+Software externo como dependência ou rota de produção, clone de Blender ou CAD,
+produção final, fabricação, solver universal prematuro, UV, textura e escultura
+livre antes de um gate provar que são essenciais à forma.
 
-Inclui arquitetura, receita, orquestração, andaime, superfície, interfaces,
-validadores, carro bruto e prova humanoide. Exclui software externo, clone de
-Blender/CAD, produção final imediata, fabricação e solver universal prematuro.
+## Registro
 
-O plano foi ativado após o R2B. N0/N1 fecharam verdade e contratos; N2 entregou
-alvo, andaime, blocagem, vistas e G01. G02 segue bloqueado sem crítico e usuário; métrica ou estrutura correta não encerram a forma.
+- **V1 — 2026-08-23:** plano ativado após o R2B, com dois eixos de decisão,
+  famílias, andaime global e superfície semântica.
+- **V2 — 2026-08-24:** reescrito de N3 em diante. O plano anterior descrevia
+  **o que** autorar e não **como a IA decide o número**, e todas as operações do
+  dossiê de superfícies terminavam em "ajustar valor" — o ato que cinco provas
+  já mostraram não funcionar. Entram o canal de percepção, a autoria por
+  restrição, a busca, a procedência obrigatória do número, a separação do ato de
+  autoria entre veículo e humanoide, e uma condição de encerramento escrita.

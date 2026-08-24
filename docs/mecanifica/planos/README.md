@@ -5,18 +5,29 @@
 **Plano ativo:**
 [`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 
-Ele governa a plataforma nativa de autoria por famílias: preserva o procedural,
-montagens, identidade, revisão, bancada e MCP; acrescenta andaime global,
-superfície semântica, conectividade obrigatória e aprovação separada de
-plataforma/artefato. O fluxo não depende de Blender, DCC, CAD ou formatos
-externos. N0 e N1 foram concluídos. O [relatório N1](../RELATORIO-N1-FLUXO-AUTORIA.md)
-fecha objetivo, receita elevada, schemas, provedores, planejamento, transições e
-cliente caixa-preta sem mudar geometria. A N2 está implementada e com G01 verde;
-o [relatório N2](../RELATORIO-N2-FORMA-GLOBAL.md) mantém G02 bloqueado até crítica
-independente e aceite do usuário. N3 ainda não está aberta. Os três
-dossiês vinculantes, mais a [matriz
-executável de rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
-ficam ligados ao plano.
+Ele governa a plataforma nativa de autoria por famílias e foi **reescrito de N3
+em diante em 2026-08-24**. O motivo está escrito nele: cinco tentativas de dar
+forma a uma carroceria falharam do mesmo jeito, incluindo o experimento
+`laboratorio-isolado/cupe-livre-01/` — feito por outro modelo, em esforço
+máximo, sem importar uma linha deste repositório — e todas terminam no mesmo
+ato, digitar seções transversais à mão. A causa raiz registrada é que a IA
+autora em milímetros e a forma é julgada em imagem, e os dois espaços só se
+ligam por um laço lento e com perda.
+
+A revisão inverte isso: a IA passa a declarar restrição e objetivo, um solver
+produz coordenada, e um canal de percepção — zebra, isófotas e curvatura —
+torna a qualidade de superfície visível **e** mensurável no mesmo artefato. Todo
+número da fonte declara procedência: `medido`, `derivado`, `resolvido` ou
+`declarado`. N0 e N1 seguem concluídos; o [relatório
+N1](../RELATORIO-N1-FLUXO-AUTORIA.md) fecha objetivo, receita elevada, schemas,
+provedores e cliente caixa-preta. A N2 está implementada com G01 verde e o
+[relatório N2](../RELATORIO-N2-FORMA-GLOBAL.md) mantém G02 bloqueado; ela **não
+avança sem o canal de percepção calibrado**. O plano também traz uma condição de
+encerramento escrita antes da tentativa, para que a sexta não vire a sétima por
+inércia. Os três dossiês vinculantes, mais a [matriz executável de
+rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md), ficam ligados
+ao plano; o de superfícies precisa ser reescrito porque suas operações terminam
+todas em "ajustar valor".
 
 O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
 foi concluído com decisão `interromper`: sua melhor evidência continuou
