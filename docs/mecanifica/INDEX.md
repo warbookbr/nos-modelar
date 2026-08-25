@@ -423,6 +423,11 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   aplicar eliminação ali rende consertos certos num objeto que continua ruim.
+- **Como o modelador de carroceria funciona:** o [dossiê do modelador por
+  seleção](DOSSIE-MODELADOR-POR-SELECAO.md)
+  (`docs/mecanifica/DOSSIE-MODELADOR-POR-SELECAO.md`). A decisão central é que o
+  gerador varia **linhas de caráter**, não seções, e que a IA ordena candidatos
+  em vez de escolher valores.
 - **Antes de abrir experimento novo:** [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`), o registro
   vivo do que já falhou, e o [canário de casco](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)

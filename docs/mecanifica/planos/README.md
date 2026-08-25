@@ -19,6 +19,15 @@ candidatos**; um gerador deliberadamente simples produz muitas variações, a IA
 escolhe, a leva seguinte nasce em volta da escolhida, e o volume de rodadas é o
 ponto. É o princípio do retrato falado.
 
+O desenho completo está no [dossiê do modelador por
+seleção](../DOSSIE-MODELADOR-POR-SELECAO.md). A decisão central dele: o gerador
+varia **linhas de caráter** — teto, ombro, cintura, arcos, soleira — e não
+seções transversais, porque é nas linhas que mora a diferença entre um carro
+comum e um bonito, e variar tabela de seção era variar ruído. A superfície é
+esticada entre as linhas, regiões vizinhas compartilham contorno, e o vencedor
+já nasce editável, porque o conjunto de linhas é a mesma coisa que gera e que
+edita.
+
 O risco central — o gerador conseguir alcançar um carro bom — é testado na
 primeira fatia e não na última: cem variações geradas e olhadas, com uma
 pergunta só. N6 e o que vinha depois foram cancelados. Identidade, montagem,
