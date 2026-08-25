@@ -138,8 +138,8 @@ históricos em capacidade atual. Cada linha usa um destes estados:
 | V-17 | O primeiro experimento N6.1 repetiu uma carroceria cápsula com rodas, frente/traseira sem leitura e perspectiva inconsistente. | **reprovado e encerrado** | A pasta isolada é somente evidência do erro. Nem malha fechada, nem teste, nem IoU autorizam reutilização. |
 | V-18 | Na primeira execução N6.1, o projetor recebeu coordenadas erradas; depois rodas não possuíam face externa e janelas vazavam pelo lado oculto. | **corrigido localmente, experimento ainda reprovado** | Esses bugs de render foram corrigidos para entender a falha, mas a forma resultante continuou ruim. A correção técnica não reabilita a hipótese de modelagem. |
 | V-19 | Frontais/traseiras e topo da N6.1 não comunicavam veículo apesar de métricas de silhueta numéricas. | **aberto** | Falta crítico semântico bloqueante e modelador automotivo por regiões; IoU deve ficar apenas como diagnóstico. |
-| V-20 | Suite agregada e `mcp:check` já tiveram falhas passivas fora de N2/N3 (paths `repo://`, guarda histórica `fps`, importação isolada do perfil MCP e timeouts de ensaio). | **histórico não revalidado** | Esses problemas não podem ser usados para declarar o núcleo bom ou ruim sem nova medição. Não são explicação para a forma ruim, mas impedem alegar saúde total da suíte. |
-| V-21 | Uma referência completa era ampla demais para orientar uma correção local, enquanto separar frente, centro e traseira como objetos causaria nova montagem desconexa. | **planejado, ainda não provado** | N6.1 passa a testar recortes regionais rastreáveis e edição regional na mesma carroceria contínua, sempre com regressão do carro completo. |
+| V-20 | Suíte agregada e `mcp:check` tiveram falhas passivas fora de N2/N3 (`repo://`, guarda histórica `fps` e importação isolada do perfil MCP). | **aberto; revalidado em parte em 2026-08-25** | A nova linha de base passou 1.264/1.277 testes, com 11 falhas e 2 ignorados: nove falhas derivam de `repo://`, uma guarda encontra `prototipos/fps/v3` e uma importação MCP falha apenas no agregado. Não explicam a forma ruim, mas impedem alegar saúde total. |
+| V-21 | Uma referência completa era ampla demais para orientar uma correção local, enquanto separar frente, centro e traseira como objetos causaria nova montagem desconexa. | **rota N6.1 encerrada; princípio preservado** | Recorte regional nunca vira peça isolada e toda edição exige regressão do objeto completo. Essa regra pode voltar em P4/P6, após prior e fitting; não autoriza retomar N6.1. |
 | V-22 | Interseção de silhuetas binárias das vistas N6 produziu uma malha única com IoU frontal 0,7645, mas frontal/lateral/superior/perspectiva formaram bloco escalonado sem leitura automotiva. | **reprovado e encerrado** | A máscara informa ocupação, não arcos, cabine, entradas, cintura ou topologia. `canario-casco-visual-n6/` é evidência negativa; o sucessor exige marcos semânticos regionais e patches contínuos de fronteira compartilhada. |
 | V-23 | Métrica angular usada como sinal de qualidade sem normalizar pela densidade da malha. Aconteceu três vezes: segunda diferença de ondulação que encolhia ~4× por nível de subdivisão; curvatura por vértice que lia um círculo perfeito como giro concentrado; e o P95/máximo de diedro do canal C1. | **aberto** | O conserto conhecido é normalizar pelo comprimento de arco ou da aresta — curvatura discreta ≈ ângulo/comprimento — ou reamostrar o corpus para densidade comum. Enquanto não for feito, o P95 do C1 não é evidência, e os gates de N4/N5 que usam "diedro máximo ≤ 19°" herdam o problema: as seções vencedoras estão em 18,704° e 15,903°, a um passo de malha de reprovar. |
 | V-24 | Uma região inteira entrou com a normal invertida e nenhum validador reclamou. Ocorreu em cinco lugares: fáscia dianteira, retorno do arco, moldura do vão, rasgo da forma não automotiva e fundo da grelha. | **corrigido e provado** | O sintoma aparecia longe da causa: o diedro entre pele e fáscia lia 168°, que é 180 menos os 12° reais da quina, e virou caça a facetamento inexistente. `validarCage` ganhou regra de orientação (faces vizinhas percorrem a aresta comum em sentidos opostos) e o módulo neutro ganhou `orientarConsistente`. |
@@ -151,6 +151,11 @@ históricos em capacidade atual. Cada linha usa um destes estados:
 | V-30 | Trocar 80 coordenadas digitadas por 12 parâmetros com nome e tratar isso como avanço. | **reprovado e encerrado** | Os 12 também foram chutados, com nome bonito em cima: `larguraNoOmbro: 0,94`, `bojoSuperior: 34`. Mudou a quantidade, não o ato. Vale também para família de curvas escrita à mão que satisfaz restrições **por construção**: isso não é solver. |
 | V-31 | Gastar uma rodada redescobrindo algo já medido e registrado no próprio repositório. | **aberto** | O canário N6 (V-22) chegou a "silhueta não carrega topologia automotiva" construindo um casco por interseção; `prova-secoes-por-medida` já tinha medido isso, e o plano ativo cita esse caminho. Antes de abrir experimento, o passo "identificar o que falta" exige varrer o registro existente. |
 | V-32 | Contornar por redação uma condição de encerramento escrita antes. | **aberto — decisão do usuário** | O plano diz: N6 falha no reconhecimento cego com N3/N4/N5 aprovados → conclusão de que está fora de alcance. N6.1 foi reprovada, e a saída usada foi que N4 aprovou só "viabilidade estreita" e N5 só "alvo sintético". Literalmente correto, e é exatamente o mecanismo que a condição existia para bloquear. Sexta tentativa reprovada; a decisão de continuar precisa ser explícita e do usuário, não resolvida por escolha de palavras. |
+| V-33 | Promover “a IA compara bem” de observação útil para premissa arquitetural sem teste repetido. | **aberto; plano dependente cancelado** | O plano por seleção dizia que a assimetria estava medida, mas S1 existia justamente porque os mesmos pares nunca tinham sido repetidos com ordem embaralhada. Comparação só volta ao caminho crítico após corpus frio, empates, `indeterminado`, holdout e intervalo de confiança. |
+| V-34 | Confinamento `repo://` comparava caminhos Windows com o prefixo textual `${raiz}/`. | **aberto e reproduzido** | A suíte de 2026-08-25 teve nove falhas de aceites/despacho a partir desse defeito compartilhado. A correção deve usar `realpath` + `relative`/`isAbsolute`, com testes de travessia, prefixo irmão e symlink; trocar a barra não é contrato portátil. |
+| V-35 | Tratar recortes de uma prancha ImageGen como vistas de um alvo geométrico único. | **limitado a direção estética** | O manifesto N6 prova bytes, recortes e perguntas, não câmeras, escala 3D, profundidade ou correspondências. Ele orienta caráter e rejeições; fitting quantitativo exige alvo do mesmo objeto 3D com calibração, ou devolve `indeterminado`. |
+| V-36 | Esperar que busca/seleção encontre forma ausente do gerador. | **reprovado como premissa; plano cancelado** | Caixas, linhas e topologia feitas à mão delimitam o espaço alcançável. Um ranqueador não cria uma cabine, arco ou flanco que esse espaço não representa. O sucessor precisa provar um prior por família contra arquétipo holdout antes de otimizar preferência. |
+| V-37 | Confundir fronteira compartilhada e interpolação de Coons com continuidade de qualidade. | **aberto** | Compartilhar posição prova apenas G0. G1/G2 exigem derivadas transversais compatíveis, ribbons e/ou fairing global, medidas em unidade física e independentes da tesselação. |
 
 ## O que já existe e não deve ser descartado
 
@@ -167,22 +172,18 @@ capacidades sejam confundidas com a lacuna de forma.
 
 ## Lacunas que realmente bloqueiam o objetivo atual
 
-1. **Gramática por família implementada.** Veículo precisa de regiões e
-   aberturas topológicas; humanoide precisa de esqueleto, volumes conectados e
-   juntas; peça precisa de interfaces e função. O núcleo compartilhado não
-   substitui essas gramáticas.
-2. **Modelador correspondente.** A cage quad com vincos e subdivisão é uma
-   direção arquitetural documentada, não uma carroceria pronta. Ela não pode ser
-   declarada solução antes de produzir um caso canário reconhecível.
-3. **Crítico visual automático e independente.** Precisa receber somente a
-   referência pareada, o render e critérios de rejeição; deve registrar marcos
-   encontrados/ausentes e bloquear `reprovar` ou `indeterminado`.
-4. **Contrato mensurável de landmarks por alvo.** Cabine, arcos, rodas,
-   nariz, ombros e traseira devem vir de medida/derivação por vista, não de
-   números escolhidos para fazer uma malha passar.
-5. **Canário completo por família.** Um carro, um humanoide e uma peça precisam
-   passar os marcos mínimos em vistas individuais antes de qualquer receita
-   “final”, superfície livre ou ampliação de escopo.
+1. **Linha de base confiável.** Os gates portáteis e a suíte agregada precisam
+   fechar antes de novos experimentos de forma.
+2. **Alvo qualificado.** Direção estética não pode ser promovida a levantamento
+   geométrico; fitting exige câmera, escala, correspondências e incerteza.
+3. **Prior por família provado em holdout.** Veículo, humanoide e peça usam
+   representações diferentes; o núcleo compartilhado não substitui os priors.
+4. **Superfície semântica com continuidade real.** Identidade regional, G0/G1/G2
+   e fairing precisam sobreviver à compilação sem depender da tesselação.
+5. **Crítico calibrado e independente.** Comparação só governa busca depois de
+   repetibilidade, controles, holdout e zero promoção de defeito grosseiro.
+6. **Canário completo por família.** Reconhecimento em vistas individuais vem
+   antes de detalhe, edição ou integração.
 
 ## Regra de manutenção deste documento
 

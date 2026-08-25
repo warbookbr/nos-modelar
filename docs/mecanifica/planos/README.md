@@ -3,36 +3,26 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+[`2026-08-25-modelador-inverso-priors-familia.md`](2026-08-25-modelador-inverso-priors-familia.md).
 
-Ele mudou de **mecanismo** em 2026-08-24, por decisão do usuário, depois da
-sexta reprovação de forma. Seis tentativas de dar forma a uma carroceria
-falharam do mesmo jeito, incluindo uma feita por outro modelo em esforço máximo
-sem tocar neste repositório: todas pediram que a IA **produzisse** o formato, e
-todas terminaram com alguém digitando números.
+O plano anterior de seleção foi **cancelado** antes de implementação. A
+premissa “a IA compara bem” não tinha passado pelo teste repetido e embaralhado
+que o próprio plano reservava para S1; o gerador manual continuava definindo o
+limite da forma alcançável; e o alvo N6 não contém calibração para representar
+um objeto 3D exato. A hipótese permanece no histórico, sem autorização.
 
-A aposta anterior — um resolvedor de restrições — foi descartada não por ter
-falhado, mas porque as restrições que decidem se algo parece um carro não são
-escrevíveis. O plano passa a usar a assimetria medida na investigação: a IA erra
-ao produzir forma e acerta ao comparar. O ato de autoria vira **ordenar
-candidatos**; um gerador deliberadamente simples produz muitas variações, a IA
-escolhe, a leva seguinte nasce em volta da escolhida, e o volume de rodadas é o
-ponto. É o princípio do retrato falado.
+O mecanismo vigente é [modelagem inversa com priors por
+família](../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md). Veículos partem de
+arquétipos automotivos semanticamente alinhados e deformáveis; humanoides usam
+esqueleto, volumes e juntas; peças usam features e interfaces funcionais. As
+famílias compartilham receitas, identidade, montagem, revisão, câmeras,
+evidência e MCP, não um gerador universal.
 
-O desenho completo está no [dossiê do modelador por
-seleção](../DOSSIE-MODELADOR-POR-SELECAO.md). A decisão central dele: o gerador
-varia **linhas de caráter** — teto, ombro, cintura, arcos, soleira — e não
-seções transversais, porque é nas linhas que mora a diferença entre um carro
-comum e um bonito, e variar tabela de seção era variar ruído. A superfície é
-esticada entre as linhas, regiões vizinhas compartilham contorno, e o vencedor
-já nasce editável, porque o conjunto de linhas é a mesma coisa que gera e que
-edita.
-
-O risco central — o gerador conseguir alcançar um carro bom — é testado na
-primeira fatia e não na última: cem variações geradas e olhadas, com uma
-pergunta só. N6 e o que vinha depois foram cancelados. Identidade, montagem,
-revisão, impacto e o laço de referência continuam valendo e são a razão de as
-últimas fatias serem viáveis. O registro de falhas em
+A primeira execução é **P0, confiança antes de geometria**: fechar a suíte no
+Windows, classificar cada alvo, produzir um canário calibrado e medir o crítico
+em pares frios, repetidos, embaralhados e com holdout. Priors, fitting,
+preferência e novo carro só abrem pelos gates cumulativos escritos antes da
+implementação. O registro de falhas em
 [`GOTCHAS-AUTORIA-VISUAL.md`](../GOTCHAS-AUTORIA-VISUAL.md) é leitura
 obrigatória antes de abrir experimento.
 
@@ -65,8 +55,8 @@ A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída
 fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que
 sozinho já acusou quatro rodas escapando da carroceria em planta — e passou a
 comparar as vistas pelos eixos que compartilham, com leitura `projecao` ou
-`secao` declarada. O investimento volta ao chassi: a próxima rodada é P1, o
-contrato da cage, onde a seção transversal foi encaixada.
+`secao` declarada. Essa conclusão é evidência histórica; não reabre P1, cage ou
+geometria antes dos gates do novo P0.
 
 O [motor de prancha com filete e medida](2026-08-19-motor-de-prancha-medida.md)
 foi **concluído**. Ele trocou a spline por traçado com filete, adotou âncora
@@ -75,16 +65,14 @@ estético: o relatório pegou sozinho um arco de roda furando o capô e dez
 inversões de curvatura na silhueta do P0 que ninguém tinha visto. Método
 registrado na skill `desenhar-prancha`.
 
-**Plano em elaboração:**
+**Plano histórico em rascunho:**
 [`2026-08-18-chassi-realista-kernel-geometrico.md`](2026-08-18-chassi-realista-kernel-geometrico.md).
-Ele está em `rascunho` e não autoriza implementação. A representação de autoria
-já foi decidida no dossiê: malha de controle de quadriláteros com vincos,
+Ele está em `rascunho` e não autoriza implementação. A representação então
+decidida era malha de controle de quadriláteros com vincos,
 avaliada por subdivisão Catmull-Clark nativa, com a malha densa como produto
 compilado. OCCT/B-rep, Blender headless, SDF e kernel próprio foram rejeitados
-com motivo e condição de reabertura; booleana fica proibida na pele primária. O
-que falta é a prova descartável do quarto dianteiro e os limiares de referência.
-O recorte anterior de `inflate` suave foi cancelado após reprovação visual e
-permanece somente como evidência local ainda não integrada.
+naquele recorte. A prova do quarto, cage e `inflate` permanecem contraevidência;
+nenhum deles é a próxima execução.
 
 A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
 foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,
@@ -323,24 +311,11 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura em curso
 
-A fatia N3 — canal de percepção — do
-[plano de arquitetura híbrida por famílias](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
-foi **revalidada para C1**: o [relatório N3](../RELATORIO-N3-CANAL-PERCEPCAO.md)
-corrige o falso aceite que usou painel e rasterização plana. Agora zebra,
-isófota e curvatura são julgadas individualmente, em tamanho nativo e em
-múltiplas vistas; painel e métricas só indexam, e o aceite é ligado por
-SHA-256 ao manifesto das imagens. N3.5 foi executada e **rejeitada**: a
-suavização C1 preservou a peça, mas não reduziu materialmente sua rugosidade e
-aumentou rupturas abruptas. Esse resultado só reprova reparo por suavização. A
-[sonda N4](../RELATORIO-N4-RESTRICOES.md) aprovou a viabilidade estreita de C2
-com duas seções limpas e três restrições, mas só após revogar e corrigir uma
-crista central que o P95 escondia. A [sonda N5](../RELATORIO-N5-BUSCA.md) provou
-busca C3 sobre um único grau residual e alvo sintético. O usuário aprovou o
-[alvo visual N6](../ALVO-N6-CUPE-ESPORTIVO.md): a preparação está aberta com
-pareamento obrigatório entre vistas individuais, mas a geometria ainda depende
-de blocagem multivista e crítica visual independente. A primeira N6.1 foi
-reprovada: não se modelam partes para colagem; a próxima prova usa recortes
-regionais rastreáveis para corrigir regiões de uma mesma carroceria e regressão
-obrigatória do carro inteiro. Os demais candidatos,
-inclusive o antigo aceite visual e prova de superfície, permanecem no
-[`BACKLOG.md`](BACKLOG.md) sem autorização automática.
+Somente P0 do [modelador inverso com priors por
+família](2026-08-25-modelador-inverso-priors-familia.md) está aberto. O plano
+executável está em
+[`docs/superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md).
+Ele corrige a linha de base, qualifica alvo e calibra o avaliador; **não modela
+carroceria**. P1 só abre se suíte, alvo e crítico passarem sem ressalva que
+invalide o estágio seguinte. N3–N6, seleção por linhas e os demais candidatos
+permanecem como evidência histórica ou backlog, sem continuidade automática.

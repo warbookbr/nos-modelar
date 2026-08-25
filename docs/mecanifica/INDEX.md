@@ -226,54 +226,41 @@ aplicação publicada aqui.
   quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1
   ligar o porteiro à revisão privada.
   Registro: `docs/mecanifica/CONTRATO-ACEITE-VISUAL.md`.
-- O único plano **ativo** é a [arquitetura híbrida nativa de autoria por famílias](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
-  (`docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`)
-  com N0 e N1 concluídos e N2 tecnicamente implementada. O [relatório N1](RELATORIO-N1-FLUXO-AUTORIA.md)
-  (`docs/mecanifica/RELATORIO-N1-FLUXO-AUTORIA.md`) fecha objetivo, receita
-  elevada, schemas, provedores, planejamento, falha segura e cliente caixa-preta.
-  O contrato operacional permanece em [`FLUXO-AUTORIA-N1.md`](FLUXO-AUTORIA-N1.md)
-  (`docs/mecanifica/FLUXO-AUTORIA-N1.md`).
-  O [relatório N2](RELATORIO-N2-FORMA-GLOBAL.md) registra alvo independente,
-  andaime, blocagem inteira, quatro vistas e G01 aprovado. G02 permanece
-  bloqueado até crítica independente e aceite explícito do usuário. N3 foi
-  **revalidada para C1**: o primeiro aceite foi revogado por confundir
-  rasterização plana e mosaico com inspeção de superfície; o novo aceite usa
-  imagens individuais multivista, em tamanho nativo e vinculadas por SHA-256.
-  O [relatório N3](RELATORIO-N3-CANAL-PERCEPCAO.md)
-  (`docs/mecanifica/RELATORIO-N3-CANAL-PERCEPCAO.md`) registra a correção. A
-  sonda N3.5 foi executada e **rejeitada**: suavização C1 não produziu melhoria
-  visual/material no quarto dianteiro. A [sonda N4](RELATORIO-N4-RESTRICOES.md)
-  (`docs/mecanifica/RELATORIO-N4-RESTRICOES.md`) aprovou a viabilidade estreita
-  de C2 — duas seções limpas e três restrições —, após corrigir uma crista
-  central que o P95 escondia. A [sonda N5](RELATORIO-N5-BUSCA.md)
-  (`docs/mecanifica/RELATORIO-N5-BUSCA.md`) provou a busca C3 em alvo sintético.
-  O usuário aprovou o [alvo N6 de cupê esportivo](ALVO-N6-CUPE-ESPORTIVO.md)
-  (`docs/mecanifica/ALVO-N6-CUPE-ESPORTIVO.md`): a preparação N6 está aberta,
-  mas geometria continua dependente de blocagem multivista e crítica independente;
-  a próxima prova usa referências regionais rastreáveis na mesma carroceria, com
-  regressão obrigatória das vistas completas.
-  A primeira tentativa de blocagem N6.1 foi reprovada visualmente; os
-  [gotchas de autoria visual](GOTCHAS-AUTORIA-VISUAL.md)
-  (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`) passam a vetar promoção por
-  métrica local quando o objeto não é reconhecível em cada vista individual.
-  O [canário de casco por silhuetas](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
-  também foi reprovado: malha única e IoU não substituem topologia automotiva
-  nem inspeção individual.
-  Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
-  `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
-  identidade, montagem, revisão,
-  bancada e MCP; acrescenta andaime global, superfície semântica nativa,
-  conectividade e aprovação separada da plataforma/artefato, sem software
-  externo. Os dossiês vinculantes são
-  [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
-  [`DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`](DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md) e
-  [`DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`](DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md).
-  Registros alcançáveis: `docs/mecanifica/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
-  `docs/mecanifica/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` e
-  `docs/mecanifica/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`.
-  A matriz executável está em
-  [`MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`](MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md)
-  (`docs/mecanifica/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`).
+- O único plano **ativo** é o [modelador inverso com priors por família](planos/2026-08-25-modelador-inverso-priors-familia.md). O plano por
+  seleção foi cancelado: sua capacidade de comparação não tinha calibração
+  repetida, o gerador restringia o espaço alcançável e o alvo N6 é direção
+  estética sem câmeras/correspondências geométricas. O [novo dossiê vinculante](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
+  preserva o núcleo
+  procedural, identidade, montagem, revisão, impacto, bancada, câmeras e MCP;
+  separa priors de veículo, humanoide e peça; e introduz qualificação de alvo,
+  superfície semântica, fitting inverso e crítico calibrado por gates.
+  Somente P0 está aberto: fechar a suíte no Windows, qualificar os alvos e medir
+  o avaliador antes de criar geometria. N0–N6, R2B, seleção por linhas e o
+  canário de silhuetas permanecem evidência histórica, não continuidade.
+  Registros do caminho substituído: [plano cancelado](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md),
+  [dossiê por seleção](DOSSIE-MODELADOR-POR-SELECAO.md),
+  [plataforma nativa](DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
+  [motor de superfícies](DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md),
+  [fluxo multifamília](DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
+  [matriz de rastreabilidade](MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
+  [contrato N1](FLUXO-AUTORIA-N1.md), [relatório N1](RELATORIO-N1-FLUXO-AUTORIA.md),
+  [contrato N2](CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](RELATORIO-N2-FORMA-GLOBAL.md),
+  [relatório N3](RELATORIO-N3-CANAL-PERCEPCAO.md),
+  [relatório N4](RELATORIO-N4-RESTRICOES.md) e [relatório N5](RELATORIO-N5-BUSCA.md).
+  Caminhos alcançáveis: `docs/mecanifica/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
+  `docs/mecanifica/planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`,
+  `docs/mecanifica/DOSSIE-MODELADOR-POR-SELECAO.md`,
+  `docs/mecanifica/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
+  `docs/mecanifica/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`,
+  `docs/mecanifica/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`,
+  `docs/mecanifica/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`,
+  `docs/mecanifica/FLUXO-AUTORIA-N1.md`,
+  `docs/mecanifica/RELATORIO-N1-FLUXO-AUTORIA.md`,
+  `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`,
+  `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md`,
+  `docs/mecanifica/RELATORIO-N3-CANAL-PERCEPCAO.md`,
+  `docs/mecanifica/RELATORIO-N4-RESTRICOES.md` e
+  `docs/mecanifica/RELATORIO-N5-BUSCA.md`.
 - A [sonda da armadura humanoide tecnológica 1.0](planos/2026-08-18-sonda-armadura-humanoide-1-0.md)
   (`docs/mecanifica/planos/2026-08-18-sonda-armadura-humanoide-1-0.md`)
   foi concluída e aprovada: 13 definições privadas, 22 peças-folha, oito
@@ -423,11 +410,9 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   aplicar eliminação ali rende consertos certos num objeto que continua ruim.
-- **Como o modelador de carroceria funciona:** o [dossiê do modelador por
-  seleção](DOSSIE-MODELADOR-POR-SELECAO.md)
-  (`docs/mecanifica/DOSSIE-MODELADOR-POR-SELECAO.md`). A decisão central é que o
-  gerador varia **linhas de caráter**, não seções, e que a IA ordena candidatos
-  em vez de escolher valores.
+- **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
+  O antigo [modelador por seleção](DOSSIE-MODELADOR-POR-SELECAO.md) é somente
+  histórico.
 - **Antes de abrir experimento novo:** [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`), o registro
   vivo do que já falhou, e o [canário de casco](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
@@ -492,10 +477,9 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é a arquitetura híbrida nativa. N0 fixa baseline, decisões em
-  dois eixos, referência inicial e contratos antes de N1. Cenário
-  multi-documento, movimento, subtração robusta e materiais/LOD entram somente
-  quando uma fatia demonstrar que são essenciais ao próximo gate.
+- O plano ativo é o modelador inverso com priors por família. Somente P0 está
+  aberto: reparar a linha de base, qualificar alvo e calibrar o avaliador. Nova
+  geometria, corpus de priors, fitting e MCP de edição dependem dos gates.
 - `alinhar` e variantes nomeadas permanecem recusados; `loft` fechado já foi
   implementado. A medida e os critérios estão em
   `docs/mecanifica/planos/BACKLOG.md`.
@@ -618,7 +602,7 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 
 <!-- Contexto visual alcançável: docs/mecanifica/CONTEXTO-VISUAL-REVALIDACAO.md -->
 
-<!-- Plano ativo alcançável: docs/mecanifica/planos/2026-08-14-materializacao-autoria-segura.md -->
+<!-- Plano histórico alcançável: docs/mecanifica/planos/2026-08-14-materializacao-autoria-segura.md -->
 
 <!-- Artefatos R05 alcançáveis: docs/mecanifica/gerado/INDEX.md docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md -->
 

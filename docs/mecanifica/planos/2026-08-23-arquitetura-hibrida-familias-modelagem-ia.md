@@ -1,17 +1,18 @@
-# Modelador por seleção — a IA escolhe, não desenha
+# Histórico cancelado — modelador por seleção
 
-**Estado:** ativo
+**Estado:** cancelado
 **Responsável:** Codex · **Base:** `3bf1b19`
-**Dossiê vinculante:** [`../DOSSIE-MODELADOR-POR-SELECAO.md`](../DOSSIE-MODELADOR-POR-SELECAO.md)
-**Execução:** N0 a N5 concluídos. N6 e o que vinha depois foram **cancelados** em
-2026-08-24, por decisão do usuário, depois da sexta reprovação de forma. Este
-plano é a execução do dossiê.
+**Dossiê histórico:** [`../DOSSIE-MODELADOR-POR-SELECAO.md`](../DOSSIE-MODELADOR-POR-SELECAO.md)
+**Substituído por:** [`2026-08-25-modelador-inverso-priors-familia.md`](2026-08-25-modelador-inverso-priors-familia.md)
+**Encerramento:** a premissa de comparação confiável não tinha teste repetido,
+o gerador limitava a forma alcançável e o alvo não era geometricamente calibrado.
+O conteúdo abaixo permanece como registro da hipótese, não como autorização.
 
-## Por onde começar
+## Como ler este registro
 
-Nesta ordem: `GOTCHAS-AUTORIA-VISUAL.md`, o registro do que já falhou;
-`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, que diz por que decidir forma não é
-problema de diagnóstico; o dossiê acima; e este plano, só na fatia aberta.
+Para auditar a hipótese antiga, leia `GOTCHAS-AUTORIA-VISUAL.md`,
+`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, o dossiê histórico e então este arquivo.
+**Nenhuma fatia abaixo permanece aberta; nenhuma instrução autoriza execução.**
 Código existente que não se reescreve:
 `tools/mecanifica/capturar-montagem.mjs`, `tools/mecanifica/percepcao-superficie.mjs`,
 `tools/mecanifica/comparar-alvo.mjs`, `tools/mecanifica/olhar.mjs` e

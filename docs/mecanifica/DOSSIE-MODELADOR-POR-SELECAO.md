@@ -1,11 +1,18 @@
-# Dossiê — modelador por seleção
+# Dossiê histórico — modelador por seleção
+
+> **Superado em 2026-08-25.** Este documento preserva a hipótese e seu
+> raciocínio, mas não governa implementação. A premissa de que a IA compara
+> forma com confiabilidade não foi calibrada por pares repetidos e embaralhados;
+> o gerador manual também restringia o que poderia ser encontrado. A decisão
+> vigente está no
+> [`DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
 
 ## Papel
 
-Este documento define o modelador de carroceria da Mecanifica. Ele existe porque
-seis tentativas de fazer a IA **produzir** a forma falharam do mesmo jeito, e
-porque uma assimetria ficou medida na investigação: a IA erra ao criar forma e
-acerta ao comparar formas.
+Este documento registrou uma proposta de modelador de carroceria. Ela surgiu
+porque seis tentativas de fazer a IA **produzir** a forma falharam do mesmo
+jeito e porque a investigação tomou como premissa uma assimetria ainda não
+calibrada: a IA erraria ao criar forma e acertaria ao comparar formas.
 
 O modelador troca o ato de autoria. A IA deixa de escolher valores e passa a
 ordenar candidatos. O registro das falhas anteriores está em

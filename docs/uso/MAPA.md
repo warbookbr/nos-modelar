@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-652 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+656 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -384,7 +384,8 @@
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
-- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê — modelador por seleção
+- `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
+- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
 - `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
 - `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
@@ -419,6 +420,7 @@
 - `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
+- `RELATORIO-MODELADOR-INVERSO-P0.md` — Relatório P0 — confiança antes de geometria
 - `RELATORIO-MOTOR-DE-PRANCHA-R0.md` — Motor de Prancha — R0: linha de base e corpus adversarial
 - `RELATORIO-MOTOR-DE-PRANCHA-R1.md` — Motor de Prancha — R1: comparação externa controlada
 - `RELATORIO-MOTOR-DE-PRANCHA-R2.md` — Motor de Prancha — R2: contrato de autoria confiável
@@ -499,8 +501,9 @@
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Modelador por seleção — a IA escolhe, não desenha
+- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
+- `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -546,6 +549,10 @@
 - `PLANO.md` — PLANO — evolução da linguagem de criação do NÓS
 - `arquitetura-identidade-estavel.md` — Arquitetura — identidade estável de objetos e subpartes
 - `oficina-roteiro.md` — Oficina — o que ainda não existe
+
+## docs/superpowers/plans/
+
+- `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — P0 Implementation Plan
 
 ## docs/uso/
 
