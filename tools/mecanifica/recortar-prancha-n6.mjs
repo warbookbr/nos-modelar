@@ -44,6 +44,14 @@ export function recortarPranchaN6() {
   const manifesto = {
     formato: 'mecanifica.alvo-visual-n6@1',
     id: 'cupe-esportivo-n6-aprovado',
+    qualificacao: {
+      formato: 'mecanifica.qualificacao-alvo@1',
+      versao: 1,
+      id: 'cupe-n6',
+      classe: 'direcao-estetica',
+      origem: { tipo: 'prancha-gerada', hash: `sha256:${hash(readFileSync(origem))}` },
+      limitacoes: ['sem-cameras-calibradas', 'sem-correspondencias-3d', 'sem-escala-3d'],
+    },
     origem: { tipo: 'prancha-gerada', ferramenta: 'imagegen', arquivo: 'prancha-origem.png', sha256: hash(readFileSync(origem)), dimensoes: [imagem.W, imagem.H] },
     aprovacaoUsuario: { estado: 'aprovada', data: '2026-08-24', decisao: 'direção visual aprovada para converter em pacote técnico N6' },
     regraDeUso: 'cada vista é aberta individualmente, em tamanho nativo, e comparada somente ao render de mesmo enquadramento; a prancha inteira é índice de coerência, não evidência de aceite',

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-660 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+662 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -867,6 +867,8 @@
 - `fechar-aceite-visual.mjs` — fechar-aceite-visual.mjs — fecha tecnicamente uma revisão privada só após conferir briefing, modelo, arquivos e crítica pelo porteiro visual.
 - `fechar-aceite-visual.test.mjs` — fechar-aceite-visual.test.mjs — o fechamento não concede aceite retroativo.
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
+- `gerar-canario-geometrico-p0.mjs` — Canário P0: fixture sintética calibrada para provar o fluxo de fitting.
+- `gerar-canario-geometrico-p0.test.mjs` — Canário P0: prova o contrato calibrado, não qualidade de modelagem.
 - `orquestrar-revisao-regional.mjs` — Caminho único R1A: despacho mínimo, revisor limitado e crítica persistida.
 - `orquestrar-revisao-regional.test.mjs` — orquestrar-revisao-regional.test.mjs — fixa a ordem despacho, revisão limitada e crítica persistida.
 - `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.

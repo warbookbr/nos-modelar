@@ -1,0 +1,314 @@
+{
+  "formato": "mecanifica.canario-geometrico-p0@1",
+  "id": "canario-geometrico-p0",
+  "semente": "p0-fixa-01",
+  "malha": {
+    "unidade": "mm",
+    "vertices": [
+      [
+        -80,
+        -45,
+        -30
+      ],
+      [
+        80,
+        -45,
+        -30
+      ],
+      [
+        80,
+        45,
+        -30
+      ],
+      [
+        -80,
+        45,
+        -30
+      ],
+      [
+        -45,
+        -35,
+        50
+      ],
+      [
+        45,
+        -35,
+        50
+      ],
+      [
+        45,
+        35,
+        50
+      ],
+      [
+        -45,
+        35,
+        50
+      ]
+    ],
+    "faces": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        0,
+        4,
+        5,
+        1
+      ],
+      [
+        1,
+        5,
+        6,
+        2
+      ],
+      [
+        2,
+        6,
+        7,
+        3
+      ],
+      [
+        3,
+        7,
+        4,
+        0
+      ],
+      [
+        4,
+        7,
+        6,
+        5
+      ]
+    ]
+  },
+  "qualificacao": {
+    "formato": "mecanifica.qualificacao-alvo@1",
+    "versao": 1,
+    "id": "canario-geometrico-p0",
+    "classe": "alvo-geometrico",
+    "origem": {
+      "tipo": "canario-sintetico",
+      "hash": "sha256:8401e6e4957d6c921c0da0c6edb9d9624cfef939c4ab262cb270e501fa0f1720"
+    },
+    "limitacoes": [],
+    "geometria": {
+      "objeto": "prisma-cunha-sintetico-p0",
+      "escala": {
+        "unidade": "mm",
+        "fator": 1
+      },
+      "cameras": [
+        "frontal",
+        "lateral-direita",
+        "superior"
+      ],
+      "correspondencias": [
+        "base-esquerda",
+        "base-direita",
+        "topo"
+      ]
+    }
+  },
+  "landmarks3d": [
+    {
+      "id": "base-esquerda",
+      "xyz": [
+        -80,
+        -45,
+        -30
+      ]
+    },
+    {
+      "id": "base-direita",
+      "xyz": [
+        80,
+        -45,
+        -30
+      ]
+    },
+    {
+      "id": "topo",
+      "xyz": [
+        0,
+        0,
+        50
+      ]
+    }
+  ],
+  "vistas": [
+    {
+      "id": "frontal",
+      "objeto": "prisma-cunha-sintetico-p0",
+      "arquivo": "vistas/frontal.svg",
+      "sha256": "8a9f57e4e75a6b04db044fa62e094cd596525a3d9382c1833278dde81dcc9b6c",
+      "camera": {
+        "projeção": "ortografica",
+        "escalaMmPorPixel": 1,
+        "matrizMundoParaCamera": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          300,
+          1
+        ]
+      },
+      "landmarks2d": [
+        {
+          "id": "base-esquerda",
+          "xy": [
+            120,
+            180
+          ]
+        },
+        {
+          "id": "topo",
+          "xy": [
+            160,
+            70
+          ]
+        },
+        {
+          "id": "base-direita",
+          "xy": [
+            200,
+            180
+          ]
+        }
+      ],
+      "oclusoes": []
+    },
+    {
+      "id": "lateral-direita",
+      "objeto": "prisma-cunha-sintetico-p0",
+      "arquivo": "vistas/lateral-direita.svg",
+      "sha256": "6b904f866bf607999d87c823fb9a3420b8045584ef6a926246e1b9553322a86a",
+      "camera": {
+        "projeção": "ortografica",
+        "escalaMmPorPixel": 1,
+        "matrizMundoParaCamera": [
+          0,
+          0,
+          -1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          300,
+          1
+        ]
+      },
+      "landmarks2d": [
+        {
+          "id": "nariz",
+          "xy": [
+            80,
+            180
+          ]
+        },
+        {
+          "id": "teto-frontal",
+          "xy": [
+            115,
+            70
+          ]
+        },
+        {
+          "id": "teto-traseiro",
+          "xy": [
+            205,
+            70
+          ]
+        },
+        {
+          "id": "cauda",
+          "xy": [
+            240,
+            180
+          ]
+        }
+      ],
+      "oclusoes": []
+    },
+    {
+      "id": "superior",
+      "objeto": "prisma-cunha-sintetico-p0",
+      "arquivo": "vistas/superior.svg",
+      "sha256": "29f1163b3e7e839677d302ec14e91492f75ce9432d00e5b174812d84aa828b12",
+      "camera": {
+        "projeção": "ortografica",
+        "escalaMmPorPixel": 1,
+        "matrizMundoParaCamera": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          300,
+          1
+        ]
+      },
+      "landmarks2d": [
+        {
+          "id": "ponta-esquerda",
+          "xy": [
+            80,
+            180
+          ]
+        },
+        {
+          "id": "ponta-direita",
+          "xy": [
+            240,
+            180
+          ]
+        },
+        {
+          "id": "teto-esquerdo",
+          "xy": [
+            135,
+            95
+          ]
+        },
+        {
+          "id": "teto-direito",
+          "xy": [
+            185,
+            95
+          ]
+        }
+      ],
+      "oclusoes": []
+    }
+  ]
+}
