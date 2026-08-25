@@ -16,6 +16,7 @@ import {
   FORMATO_BLOCAGEM_GLOBAL, FORMATO_CRITICA_ALVO_FORMA_GLOBAL, FORMATO_CRITICA_FORMA_GLOBAL,
   FORMATO_DECISAO_FORMA_GLOBAL, TIPOS_VOLUME_FORMA_GLOBAL, VISTAS_ORTOGRAFICAS_FORMA_GLOBAL,
 } from './forma-global.js';
+import { SCHEMA_QUALIFICACAO_ALVO } from './qualificacao-alvo.js';
 
 export const FORMATO_SCHEMAS_AUTORIA_3D = 'mecanifica.schemas-autoria-3d@1';
 export const FORMATO_RESULTADO_ETAPA_AUTORIA = 'mecanifica.resultado-etapa-autoria@1';
@@ -413,6 +414,7 @@ const CONTRATOS = congelar({
   andaimeGlobal: SCHEMA_ANDAIME_GLOBAL, blocagemGlobal: SCHEMA_BLOCAGEM_GLOBAL,
   avaliacaoAlvoFormaGlobal: SCHEMA_AVALIACAO_ALVO_FORMA_GLOBAL,
   avaliacaoFormaGlobal: SCHEMA_AVALIACAO_FORMA_GLOBAL, decisaoFormaGlobal: SCHEMA_DECISAO_FORMA_GLOBAL,
+  qualificacaoAlvo: SCHEMA_QUALIFICACAO_ALVO,
 });
 
 const INDICE = congelar({

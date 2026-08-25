@@ -1,9 +1,10 @@
 /* aceite-visual-regional.mjs — v2 do aceite: evidência por região e papel.
    A v1 continua em aceite-visual.mjs, com suas quatro vistas globais intactas. */
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { validarCriticaVisual } from './revisao-modelagem.mjs';
+import { resolverEvidenciaDoRepositorio } from './caminho-repositorio.mjs';
 
 export const FORMATO_ACEITE_VISUAL_REGIONAL = 'mecanifica.aceite-visual';
 export const VERSAO_ACEITE_VISUAL_REGIONAL = 2;
@@ -90,9 +91,9 @@ export function validarAceiteVisualRegional(aceite, opcoes) { return validarRegi
 export function validarPreparacaoVisualRegional(aceite, opcoes) { return validarRegional(aceite, opcoes, { permitirCriticaAusente: true }); }
 
 function verificarProva(evidencia, raiz) {
-  const candidato = resolve(raiz, evidencia.localizador.slice('repo://'.length));
-  if (!candidato.startsWith(`${raiz}/`) || !existsSync(candidato) || !lstatSync(candidato).isFile()) falhar(`evidência ausente: ${evidencia.localizador}.`);
-  const real = realpathSync(candidato); if (!real.startsWith(`${raiz}/`)) falhar(`symlink fora da raiz: ${evidencia.localizador}.`);
+  let real;
+  try { real = resolverEvidenciaDoRepositorio(evidencia.localizador, raiz); }
+  catch { falhar(`evidência ausente: ${evidencia.localizador}.`); }
   const atual = `sha256:${createHash('sha256').update(readFileSync(real)).digest('hex')}`;
   if (atual !== evidencia.hash) falhar(`hash diverge: ${evidencia.localizador}.`);
 }
@@ -103,7 +104,7 @@ export function verificarEvidenciasAceiteRegionalNoDisco(aceite, opcoes, { raizR
   valido.consultas.flatMap((c) => c.entradas).forEach((e) => verificarProva(e.evidencia, raiz));
   verificarProva(valido.critica.evidencia, raiz);
   let documento;
-  try { documento = JSON.parse(readFileSync(resolve(raiz, valido.critica.evidencia.localizador.slice('repo://'.length)), 'utf8')); }
+  try { documento = JSON.parse(readFileSync(resolverEvidenciaDoRepositorio(valido.critica.evidencia.localizador, raiz), 'utf8')); }
   catch { falhar('crítica não contém JSON válido.'); }
   let critica;
   try { critica = validarCriticaVisual(documento); }

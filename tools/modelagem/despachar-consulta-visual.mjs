@@ -1,15 +1,14 @@
 /* Materializa um despacho visual mínimo. Não é sandbox de modelo: prova os
    bytes entregues, e deixa explícito que isolamento do processo é outra camada. */
-import { copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 import { verificarPreparacaoVisualRegionalNoDisco } from './aceite-visual-regional.mjs';
+import { resolverEvidenciaDoRepositorio } from './caminho-repositorio.mjs';
 
 function falhar(texto) { throw new Error(`despachar-consulta-visual: ${texto}`); }
 function arquivoDaEvidencia(evidencia, raiz) {
-  const candidato = resolve(raiz, evidencia.localizador.slice('repo://'.length));
-  if (!candidato.startsWith(`${raiz}/`) || !existsSync(candidato) || !lstatSync(candidato).isFile()) falhar(`evidência ausente: ${evidencia.localizador}.`);
-  const real = realpathSync(candidato); if (!real.startsWith(`${raiz}/`)) falhar(`symlink fora da raiz: ${evidencia.localizador}.`);
-  return real;
+  try { return resolverEvidenciaDoRepositorio(evidencia.localizador, raiz); }
+  catch { falhar(`evidência ausente: ${evidencia.localizador}.`); }
 }
 
 /** Copia unicamente as evidências declaradas para um papel e região. */

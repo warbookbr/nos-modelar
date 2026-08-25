@@ -16,6 +16,15 @@ O alvo fixa direção visual e relações de forma, não medidas absolutas em
 milímetros. As cotas/landmarks necessários à geometria deverão ser derivados e
 declarados numa fatia posterior, nunca inventados para acomodar uma malha.
 
+## Qualificação P0
+
+O manifesto agora declara `mecanifica.qualificacao-alvo@1` como
+**`direcao-estetica`**. Isso permite usar o N6 para intenção, caráter e
+rejeições visuais, mas bloqueia fitting geométrico quantitativo: a prancha não
+fornece câmeras calibradas, escala 3D, profundidade ou correspondências de um
+objeto único. Um canário sintético calibrado de P0 prova o fitting sem fingir
+que esta imagem é levantamento técnico.
+
 ## Regra operacional obrigatória
 
 **Cada render é comparado exclusivamente com a referência individual de mesmo

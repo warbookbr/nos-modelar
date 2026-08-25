@@ -1,8 +1,8 @@
 /* aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais. */
 import { createHash } from 'node:crypto';
-import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { validarCriticaVisual } from './revisao-modelagem.mjs';
+import { resolverEvidenciaDoRepositorio } from './caminho-repositorio.mjs';
 
 export const FORMATO_ACEITE_VISUAL = 'mecanifica.aceite-visual';
 export const VERSAO_ACEITE_VISUAL = 1;
@@ -69,9 +69,9 @@ export function validarAceiteVisual(entrada, entradaOpcoes) {
 }
 
 function arquivoDaProva(item, raizRepositorio) {
-  const raiz = realpathSync(raizRepositorio); const candidato = resolve(raiz, item.localizador.slice('repo://'.length));
-  if ((!candidato.startsWith(`${raiz}/`) && candidato !== raiz) || !existsSync(candidato) || !lstatSync(candidato).isFile()) falhar(`evidência ausente ou fora da raiz: ${item.localizador}.`);
-  const real = realpathSync(candidato); if (!real.startsWith(`${raiz}/`)) falhar(`evidência aponta symlink fora da raiz: ${item.localizador}.`);
+  let real;
+  try { real = resolverEvidenciaDoRepositorio(item.localizador, raizRepositorio); }
+  catch { falhar(`evidência ausente ou fora da raiz: ${item.localizador}.`); }
   const encontrado = `sha256:${createHash('sha256').update(readFileSync(real)).digest('hex')}`;
   if (encontrado !== item.hash) falhar(`hash diverge para ${item.localizador}.`);
   return real;

@@ -1,6 +1,21 @@
 {
   "formato": "mecanifica.alvo-visual-n6@1",
   "id": "cupe-esportivo-n6-aprovado",
+  "qualificacao": {
+    "formato": "mecanifica.qualificacao-alvo@1",
+    "versao": 1,
+    "id": "cupe-n6",
+    "classe": "direcao-estetica",
+    "origem": {
+      "tipo": "prancha-gerada",
+      "hash": "sha256:e81c2f2934a7beef31ce87fca27c447481d3af9acf07a12dd90c19677a713996"
+    },
+    "limitacoes": [
+      "sem-cameras-calibradas",
+      "sem-correspondencias-3d",
+      "sem-escala-3d"
+    ]
+  },
   "origem": {
     "tipo": "prancha-gerada",
     "ferramenta": "imagegen",

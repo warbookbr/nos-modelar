@@ -3490,6 +3490,228 @@
           ]
         }
       }
+    },
+    "qualificacaoAlvo": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "mecanifica.qualificacao-alvo@1",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classe",
+            "formato",
+            "id",
+            "limitacoes",
+            "origem",
+            "versao"
+          ],
+          "properties": {
+            "formato": {
+              "const": "mecanifica.qualificacao-alvo@1"
+            },
+            "versao": {
+              "const": 1
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "classe": {
+              "const": "direcao-estetica"
+            },
+            "limitacoes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "origem": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "hash",
+                "tipo"
+              ],
+              "properties": {
+                "tipo": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classe",
+            "formato",
+            "geometria",
+            "id",
+            "limitacoes",
+            "origem",
+            "versao"
+          ],
+          "properties": {
+            "formato": {
+              "const": "mecanifica.qualificacao-alvo@1"
+            },
+            "versao": {
+              "const": 1
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "classe": {
+              "const": "alvo-geometrico"
+            },
+            "limitacoes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "origem": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "hash",
+                "tipo"
+              ],
+              "properties": {
+                "tipo": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                }
+              }
+            },
+            "geometria": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cameras",
+                "correspondencias",
+                "escala",
+                "objeto"
+              ],
+              "properties": {
+                "objeto": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "escala": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "fator",
+                    "unidade"
+                  ],
+                  "properties": {
+                    "unidade": {
+                      "const": "mm"
+                    },
+                    "fator": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                },
+                "cameras": {
+                  "type": "array",
+                  "minItems": 2,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                },
+                "correspondencias": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classe",
+            "formato",
+            "id",
+            "limitacoes",
+            "motivo",
+            "origem",
+            "versao"
+          ],
+          "properties": {
+            "formato": {
+              "const": "mecanifica.qualificacao-alvo@1"
+            },
+            "versao": {
+              "const": 1
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "classe": {
+              "const": "indeterminado"
+            },
+            "motivo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitacoes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              }
+            },
+            "origem": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "hash",
+                "tipo"
+              ],
+              "properties": {
+                "tipo": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "limites": [

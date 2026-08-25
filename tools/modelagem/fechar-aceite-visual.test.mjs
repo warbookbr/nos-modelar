@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { fecharAceiteVisual, verificarAceiteParaFechamento } from './fechar-aceite-visual.mjs';
 import { FORMATO_ACEITE_VISUAL_REGIONAL } from './aceite-visual-regional.mjs';
@@ -61,7 +61,7 @@ describe('fechamento privado de aceite visual', () => {
     const fixture = fixtureCompletaV2(); try {
       const fechado = await fecharAceiteVisual({ id: fixture.id, revisao: 'r001', arquivoAceite: 'aceite-v2.json', raizPacotes: fixture.pacotes, raizRepositorio: fixture.repositorio });
       expect(fechado.resultado.veredito).toEqual({ estado: 'aprovavel', motivos: [] });
-      expect(fechado.destino.endsWith('aceites/r001/aceite-tecnico.json')).toBe(true);
+      expect(relative(join(fixture.pacotes, fixture.id), fechado.destino).replaceAll('\\', '/')).toBe('aceites/r001/aceite-tecnico.json');
     } finally { rmSync(fixture.raiz, { recursive: true, force: true }); }
   });
 });

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-656 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+660 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -644,6 +644,7 @@
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
 - `provedor-forma-global.js` — Provedor N2: cobre planejamento de alvo, andaime e blocagem porque há um serviço puro correspondente. Crítica e aceite continuam fora deste manifesto.
+- `qualificacao-alvo.js` — qualificacao-alvo.js — declara o que uma referência permite inferir.
 - `renderizar-forma-global-svg.js` — Adaptador SVG puro da N2. Consome somente alvo e blocagem neutros; não usa DOM, Three.js, câmera de runtime ou caminhos de arquivo.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
 - `schemas-autoria-3d.js` — JSON Schemas descobríveis de N1/N2. A validação semântica final continua nos normalizadores e na máquina de estados; schemas são a fronteira estrutural.
@@ -830,6 +831,7 @@
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
 - `recortar-prancha-n6.mjs` — Recorta deterministicamente a prancha N6 aprovada; cada vista vira evidência própria.
 - `recortar-prancha-n6.test.mjs` — Garante que a prancha aprovada não volte a ser consumida como mosaico.
 - `recortar-regioes-n6.mjs` — Deriva referências regionais N6 sem reinterpretar a imagem aprovada.
@@ -855,6 +857,8 @@
 - `aceite-visual-regional.test.mjs` — aceite-visual-regional.test.mjs — prova cobertura regional, hashes e crítica obrigatória no aceite v2.
 - `aceite-visual.mjs` — aceite-visual.mjs — porteiro de vínculo entre revisão, briefing e evidências visuais.
 - `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
+- `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
+- `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
 - `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
 - `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
