@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-642 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+645 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -57,6 +57,11 @@
 
 - `condicao-assistida.js` — PEÇA DE EXERCÍCIO — dobradiça vertical de portão para inspeção na bancada. Duas folhas de chapa compartilham o eixo Y: a folha fixa carrega o gomo central e …
 - `condicao-crua.js` — DOBRADIÇA DE PORTÃO — conjunto procedural técnico-didático F2 para inspeção e montagem. Duas folhas retangulares de 1,20 m × 0,65 m × 35 mm encontram-se num …
+
+## autoria-assistida/experimentos/blocagem-multivista-n6/
+
+- `blocagem-n6.test.mjs` — Evidência do experimento N6.1 reprovado: rastreia os arquivos, não aprova a forma.
+- `gerar-blocagem-n6.mjs` — N6.1 — prova isolada de blocagem multivista. Não usa nem altera o núcleo. A geometria é uma carroceria fechada contínua; rodas são a única submontagem separa…
 
 ## autoria-assistida/experimentos/canal-percepcao-n3/
 
@@ -380,6 +385,7 @@
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
+- `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1

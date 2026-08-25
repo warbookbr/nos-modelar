@@ -47,7 +47,16 @@ intercambiáveis; ou uma vista aceita por miniatura, sem pareamento individual.
 
 ## Próximo gate
 
-N6.1 começa por uma blocagem inteira e sem detalhe contra estas quatro vistas
-ortográficas. Cada rodada gera sobreposição por vista e passa por crítica cega
-de legibilidade. Nenhuma tentativa de superfície livre ou receita final ocorre
-antes de a blocagem ser reconhecível e aprovada pelo usuário.
+N6.1 reabre por **testes regionais sobre uma mesma carroceria contínua**, depois
+que a primeira casca por estações foi reprovada. A referência completa continua
+sendo a fonte; dela se derivam recortes de dianteira/capô e para-lamas,
+cabine/cintura, lateral/entrada e ombros/deck traseiro. Cada recorte preserva
+vista, câmera, escala, retângulo de origem e hash da imagem completa.
+
+O recorte não vira uma peça independente: ele delimita a região topológica que
+pode ser corrigida na carroceria única. Cada alteração produz (1) referência,
+render e sobreposição individuais para a região e (2) as quatro vistas completas
+regeneradas para regressão. Reprovar ou `indeterminado` em qualquer região ou
+vista completa bloqueia a rodada. Nenhuma superfície livre, receita final ou
+montagem de partes ocorre antes de a blocagem integrada ser reconhecível e
+aprovada pelo usuário.

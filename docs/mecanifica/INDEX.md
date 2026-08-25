@@ -249,7 +249,13 @@ aplicação publicada aqui.
   (`docs/mecanifica/RELATORIO-N5-BUSCA.md`) provou a busca C3 em alvo sintético.
   O usuário aprovou o [alvo N6 de cupê esportivo](ALVO-N6-CUPE-ESPORTIVO.md)
   (`docs/mecanifica/ALVO-N6-CUPE-ESPORTIVO.md`): a preparação N6 está aberta,
-  mas geometria continua dependente de blocagem multivista e crítica independente.
+  mas geometria continua dependente de blocagem multivista e crítica independente;
+  a próxima prova usa referências regionais rastreáveis na mesma carroceria, com
+  regressão obrigatória das vistas completas.
+  A primeira tentativa de blocagem N6.1 foi reprovada visualmente; os
+  [gotchas de autoria visual](GOTCHAS-AUTORIA-VISUAL.md)
+  (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`) passam a vetar promoção por
+  métrica local quando o objeto não é reconhecível em cada vista individual.
   Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
   `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
   identidade, montagem, revisão,

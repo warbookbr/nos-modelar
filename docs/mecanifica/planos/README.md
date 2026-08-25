@@ -343,6 +343,9 @@ crista central que o P95 escondia. A [sonda N5](../RELATORIO-N5-BUSCA.md) provou
 busca C3 sobre um único grau residual e alvo sintético. O usuário aprovou o
 [alvo visual N6](../ALVO-N6-CUPE-ESPORTIVO.md): a preparação está aberta com
 pareamento obrigatório entre vistas individuais, mas a geometria ainda depende
-de blocagem multivista e crítica visual independente. Os demais candidatos,
+de blocagem multivista e crítica visual independente. A primeira N6.1 foi
+reprovada: não se modelam partes para colagem; a próxima prova usa recortes
+regionais rastreáveis para corrigir regiões de uma mesma carroceria e regressão
+obrigatória do carro inteiro. Os demais candidatos,
 inclusive o antigo aceite visual e prova de superfície, permanecem no
 [`BACKLOG.md`](BACKLOG.md) sem autorização automática.

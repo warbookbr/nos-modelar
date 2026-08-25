@@ -1,0 +1,148 @@
+{
+  "formato": "mecanifica.n6.1-blocagem@1",
+  "escopo": "experimento isolado; nao altera o nucleo nem aprova a receita",
+  "regra": "cada vista e aberta individualmente em tamanho nativo; painel e proibido como evidencia",
+  "carroceria": "uma casca fechada continua; rodas sao a unica submontagem separada",
+  "vistas": {
+    "frontal": {
+      "referencia": "frontal.png",
+      "hashReferencia": "50b2881d86685d70d4a4ef1151907be5962e2615ac34ed1304632209cd366421",
+      "hashRender": "baa37390c98b7846c9cd0569d73c85ac766bf6e4e40a79cccf4e7f8d51b5aaee",
+      "hashSobreposicao": "f3f3f1a002089d97ef36c9ebb9860d5f44ff7e515adb0431397465c25db3fe52",
+      "iouSilhueta": 0.3769,
+      "bboxReferencia": {
+        "x0": 9,
+        "y0": 156,
+        "x1": 766,
+        "y1": 459,
+        "w": 758,
+        "h": 304
+      },
+      "inspecaoObrigatoria": "abrir referencia, render e sobreposicao separadamente; registrar achado por vista"
+    },
+    "lateral-direita": {
+      "referencia": "lateral-direita.png",
+      "hashReferencia": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434",
+      "hashRender": "e1337c4f2b7b4dff66caade5363ccb4c9523e4de6c4ec48f62e90ea1978f783f",
+      "hashSobreposicao": "cf3bcbe29dce62856012a8cb919e1a21db3be0287c0235a50d241b1099291af2",
+      "iouSilhueta": 0.5503,
+      "bboxReferencia": {
+        "x0": 2,
+        "y0": 188,
+        "x1": 766,
+        "y1": 447,
+        "w": 765,
+        "h": 260
+      },
+      "inspecaoObrigatoria": "abrir referencia, render e sobreposicao separadamente; registrar achado por vista"
+    },
+    "traseira": {
+      "referencia": "traseira.png",
+      "hashReferencia": "2510318e216b24e156875bdc63427f7c2c064616c74f2c0695aeb59b9fc42306",
+      "hashRender": "2ffaf884d2ecb6d7a8f814ea520987ff9cbb597f8e581562de22123875d16760",
+      "hashSobreposicao": "8c1a33375d6794a5e6aa577dc71655bcc3c8b625fb70ba70833d179206b5c5ba",
+      "iouSilhueta": 0.3538,
+      "bboxReferencia": {
+        "x0": 2,
+        "y0": 184,
+        "x1": 758,
+        "y1": 461,
+        "w": 757,
+        "h": 278
+      },
+      "inspecaoObrigatoria": "abrir referencia, render e sobreposicao separadamente; registrar achado por vista"
+    },
+    "superior": {
+      "referencia": "superior.png",
+      "hashReferencia": "a372aa4f3a20554bec196cca6f7d9e2b22318bc37a90a556e1ba57a6aa3e65ca",
+      "hashRender": "36133304354394c635ee580a0dd39e1f09ae2b0a3c943a6357d308496fe1f607",
+      "hashSobreposicao": "b2aa50018e2129283d474a12c65eb74c0e8c2a2335f66a0b1124d95a55d85455",
+      "iouSilhueta": 0.3584,
+      "bboxReferencia": {
+        "x0": 6,
+        "y0": 37,
+        "x1": 764,
+        "y1": 478,
+        "w": 759,
+        "h": 442
+      },
+      "inspecaoObrigatoria": "abrir referencia, render e sobreposicao separadamente; registrar achado por vista"
+    },
+    "perspectiva-frontal-direita": {
+      "referencia": "perspectiva-frontal-direita.png",
+      "hashReferencia": "2e466151cf20f724b2c5339132d43b9aa6d1a4323824276f5e77f5d328394605",
+      "hashRender": "63306a58addffcb2d55823812c2aa1a64cbf7fa0ec5360ff4eb2366d169dda51",
+      "hashSobreposicao": "6c6cb202c8ea3041809f43c15a11a28eeba7d94e121b9bb1efc38010647dcf34",
+      "iouSilhueta": 0.5664,
+      "bboxReferencia": {
+        "x0": 0,
+        "y0": 96,
+        "x1": 761,
+        "y1": 409,
+        "w": 762,
+        "h": 314
+      },
+      "inspecaoObrigatoria": "abrir referencia, render e sobreposicao separadamente; registrar achado por vista"
+    }
+  },
+  "geometria": {
+    "vertices": 361,
+    "triangulos": 662,
+    "estacoes": [
+      [
+        -1.72,
+        0.48,
+        0.18,
+        -0.17
+      ],
+      [
+        -1.5,
+        0.86,
+        0.31,
+        -0.19
+      ],
+      [
+        -1.15,
+        1.02,
+        0.46,
+        -0.2
+      ],
+      [
+        -0.7,
+        1.04,
+        0.86,
+        -0.2
+      ],
+      [
+        -0.2,
+        1.02,
+        1.02,
+        -0.2
+      ],
+      [
+        0.34,
+        0.96,
+        0.87,
+        -0.19
+      ],
+      [
+        0.82,
+        0.93,
+        0.52,
+        -0.18
+      ],
+      [
+        1.25,
+        0.82,
+        0.34,
+        -0.15
+      ],
+      [
+        1.56,
+        0.52,
+        0.2,
+        -0.12
+      ]
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 **Responsável:** Codex · **Base:** `8198833`
-**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 foi **revalidada para C1**: a aprovação anterior usou painel e rasterização plana inválidos, foi revogada e substituída por inspeção individual multivista ligada ao manifesto SHA-256. N3.5 foi executada e **rejeitada**: suavização C1 não melhorou materialmente o quarto e aumentou ruptura abrupta. N4 corrigiu uma crista central C0 que o P95 escondia e então aprovou a viabilidade estreita de C2; N5 provou C3 somente sobre alvo sintético. O alvo visual N6 foi aprovado pelo usuário e separado por vista; somente a preparação N6 abriu.
+**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 foi **revalidada para C1**: a aprovação anterior usou painel e rasterização plana inválidos, foi revogada e substituída por inspeção individual multivista ligada ao manifesto SHA-256. N3.5 foi executada e **rejeitada**: suavização C1 não melhorou materialmente o quarto e aumentou ruptura abrupta. N4 corrigiu uma crista central C0 que o P95 escondia e então aprovou a viabilidade estreita de C2; N5 provou C3 somente sobre alvo sintético. O alvo visual N6 foi aprovado e separado por vista; a primeira blocagem N6.1 foi **reprovada** como cápsula com rodas. N6 reabre somente por testes regionais pareados sobre uma carroceria contínua.
 
 ## Por onde começar
 
@@ -112,7 +112,7 @@ rodadas** — foi assim que a carroceria chegou a doze.
 | N3.5 — sonda de suavização | 2 | rejeitada: quarto só suavizado, sem melhora material |
 | N4 — autoria por restrição | 5 | aprovada: duas formas limpas do mesmo enunciado |
 | N5 — busca | 3 | vencedor de uma liberdade residual contra alvo sintético |
-| N6 — carro inteiro bruto | 5 | o carro |
+| N6 — carro por regiões contínuas | 5 | referência regional, forma local e carro inteiro coerentes |
 | N7 — integração | 4 | superfície e mecânica ligadas |
 
 **N3 — gate de calibração.** O canal precisa separar artefato reprovado de
@@ -148,7 +148,7 @@ teto de N4 rejeita C2; passar não aprova veículo.
 o único grau livre da seção N4; a busca enumerou 21 candidatos, mantendo as
 três restrições, C1 e diedro máximo ≤ 19°, e escolheu 0,16 para igualar a
 sagita sintética medida de 41,6 mm. Isto prova o mecanismo de busca, não um
-estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash; **N6.1** só começa por blocagem contra as quatro ortográficas e crítica independente — N4/N5 sozinhas não bastam.
+estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash. A primeira N6.1, uma casca genérica por estações, foi reprovada visualmente e não é base. A reabertura N6.1 testa, sem detalhar nem criar peças soltas: (a) recortes regionais derivados das vistas completas, com câmera, escala e hash de origem preservados; (b) edição de uma **região nomeada da mesma carroceria contínua** — dianteira/capô e para-lamas, cabine/cintura, lateral/entrada, ombros/deck traseiro —; (c) comparação individual recorte↔render local e regressão nas quatro vistas completas; e (d) crítico cego que pode reprovar ou devolver `indeterminado`. Um recorte orienta e limita a correção local, mas não autoriza modelar frente, centro ou traseira como objetos a serem colados. Só uma rodada em que todos os marcos regionais e a leitura do conjunto sobrevivam abre superfície/receita; N4/N5 sozinhas não bastam.
 
 ## Passivo declarado
 
@@ -197,3 +197,4 @@ de um gate provar que são essenciais à forma.
 - **V9 — 2026-08-24:** corrigida a inferência da N3.5: ela não testa C2 nem C3. N4 é a próxima prova de autoria por restrição, construída do zero sobre uma seção limpa; N5 permanece bloqueada até haver liberdade residual e objetivo mensurável.
 - **V10 — 2026-08-24:** N4 aprovou a viabilidade estreita de C2: duas seções novas, diferentes e C1-regulares obedecem as mesmas três restrições, com procedência e inspeção individual vinculada ao manifesto. N5 não abriu: não existe liberdade residual/objetivo de busca declarado.
 - **V11 — 2026-08-24:** a inspeção individual de N5 revelou uma crista central C0 que o P95 de N4 escondia. O aceite N4 foi revogado, a base do capô foi reescrita com tangentes nulas no centro/ombro e diedro máximo passou a ser gate. N4 foi revalidada; N5 então provou C3 sobre `bojoRelativo` e alvo sintético. O usuário aprovou uma prancha N6; ela foi recortada/hashada e só abre a preparação, com pareamento vista↔vista obrigatório.
+- **V12 — 2026-08-24:** a primeira N6.1 isolada confirmou a causa já documentada: casca por estações e rodas anexadas não produzem leitura automotiva, embora gerem arquivos e métricas. A tentativa foi reprovada e passa a ser evidência negativa. A reabertura é regional, mas preserva uma única carroceria: recortes por região vêm das vistas completas, carregam a mesma escala/câmera/hash e toda edição local regressa o conjunto inteiro.
