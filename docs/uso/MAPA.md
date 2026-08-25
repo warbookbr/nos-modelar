@@ -498,7 +498,7 @@
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Arquitetura híbrida nativa de autoria por famílias para IA
+- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Autoria por seleção — a IA escolhe, não desenha
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto

@@ -1,200 +1,193 @@
-# Arquitetura híbrida nativa de autoria por famílias para IA
+# Autoria por seleção — a IA escolhe, não desenha
 
 **Estado:** ativo
-**Responsável:** Codex · **Base:** `8198833`
-**Execução:** N0 e N1 concluídos; N2 mantém G01 verde e G02 pendente, sem promoção. N3 foi **revalidada para C1**: a aprovação anterior usou painel e rasterização plana inválidos, foi revogada e substituída por inspeção individual multivista ligada ao manifesto SHA-256. N3.5 foi executada e **rejeitada**: suavização C1 não melhorou materialmente o quarto e aumentou ruptura abrupta. N4 corrigiu uma crista central C0 que o P95 escondia e então aprovou a viabilidade estreita de C2; N5 provou C3 somente sobre alvo sintético. O alvo visual N6 foi aprovado e separado por vista; a primeira blocagem N6.1 foi **reprovada** como cápsula com rodas. N6 reabre somente por testes regionais pareados sobre uma carroceria contínua.
+**Responsável:** Codex · **Base:** `2a74b7e`
+**Execução:** N0 a N5 concluídos com o resultado registrado abaixo. **N6 e o que
+vinha depois estão cancelados** e substituídos por S0–S4, por decisão do usuário
+em 2026-08-24, depois da sexta reprovação de forma.
 
 ## Por onde começar
 
-Uma IA sem contexto começa por `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` (decidir forma **não** é problema diagnóstico), este plano apenas na fatia aberta e `REFERENCIA-E-CRITICA-VISUAL.md` (alvo, sobreposição e crítico). Código existente que não se reescreve: `tools/mecanifica/capturar-montagem.mjs`, `src/autoria/forma-global.js`, `tools/mecanifica/comparar-alvo.mjs` e `tools/mecanifica/olhar.mjs`.
+Uma IA sem contexto lê, nesta ordem: `GOTCHAS-AUTORIA-VISUAL.md`, que é o
+registro do que já falhou e por quê; `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, que
+diz por que decidir forma não é problema de diagnóstico; e este plano, só na
+fatia aberta. Código que já existe e não se reescreve:
+`tools/mecanifica/capturar-montagem.mjs`, `tools/mecanifica/percepcao-superficie.mjs`,
+`tools/mecanifica/comparar-alvo.mjs`, `tools/mecanifica/olhar.mjs` e
+`src/autoria/forma-global.js`.
 
-## O que a evidência obriga a mudar
+## Por que o plano anterior foi cancelado
 
-Cinco tentativas falharam igual: `loft` de seções elípticas; três envelopes sobrepostos; cage quad com Catmull-Clark em doze rodadas; cage direta R2/R2B interrompida; e `laboratorio-isolado/cupe-livre-01/`, feito por **outro modelo, em esforço máximo e sem importar uma linha deste repositório**, mas reprovado — a mesma receita de **catorze seções digitadas à mão**. Mudaram representação, ferramenta, modelo e base; não mudou o ato.
+Seis tentativas de dar forma a uma carroceria falharam do mesmo jeito. Todas
+pediram que a IA **produzisse** o formato, e todas terminaram com alguém
+digitando números. Mudaram representação, ferramenta, modelo e base de código —
+incluindo uma tentativa de outro modelo, em esforço máximo, sem tocar neste
+repositório. Não mudou o ato, e não mudou o resultado.
 
-A assinatura é sempre a mesma: **o que é verificável por medida passa, o que só se vê reprova** — dez condições de rejeição verdes e crítico cego em 3/10. Três medidas fecham o diagnóstico:
+A aposta central do plano anterior era um resolvedor de restrições. Ela não foi
+descartada por ter falhado: foi descartada porque as restrições que decidem se
+algo parece um carro **não são escrevíveis**. Ninguém sabe enunciar como regra o
+que faz um para-lama parecer certo. Se soubesse, o problema já estaria resolvido.
 
-- três vistas ortográficas deixam **82% das estações sem informação de seção**, e
-  duas famílias com as três vistas idênticas diferem 28 mm no flanco
-  (`autoria-assistida/experimentos/prova-secoes-por-medida/`);
-- o alvo P0 inventado põe o nariz a 520 mm e o perfil **medido** de um cupê real
-  põe a 841 mm, abaixo do topo do pneu dianteiro;
-- 80 coordenadas viraram 12 parâmetros com nome, e os 12 também foram chutados.
+## A assimetria que sustenta o plano novo
 
-**Causa raiz:** a IA autora em milímetros e a forma é julgada em imagem, e os
-dois espaços só se ligam por um laço lento e com perda.
+Está medida nesta investigação, várias vezes:
 
-## A inversão
+- **produzir forma: ruim.** Seis tentativas, seis reprovações;
+- **julgar forma comparando: bom.** A IA identificou corretamente flanco sem
+  volume, capô em calha, nariz aberto e frente sem leitura — todos confirmados
+  depois por medida ou pelo usuário. Um revisor cego, vendo só imagens, deu
+  vereditos consistentes e certos. E a primeira sobreposição contra o alvo
+  produziu o achado certo em segundos, depois de doze rodadas falhando em criar.
 
-| | hoje | a partir de N3 |
-|---|---|---|
-| a IA produz | coordenadas | restrições, objetivos, julgamento comparativo |
-| quem produz número | a IA, no braço | solver e busca |
-| realimentação | render lido a olho | percepção medida **e** visível |
+O mecanismo novo usa a IA no que ela acerta e tira dela o que ela erra.
 
-## Práticas retiradas por evidência
+## O mecanismo
 
-1. **Tabela de seções digitada à mão** está proibida como fonte de forma.
-2. **Alvo inventado pela IA não é referência vinculante.** Os landmarks do
-   `CHASSI-P0-ALVO-E-LIMIARES.md` estão marcados não vinculantes no próprio
-   documento.
-3. As operações do `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — "ajustar largura,
-   tensão e volume por região" — são **metas de solver**, não atos de autoria.
-4. **Aprovação por vacuidade**: condição fora de escopo devolve `naoAvaliavel`
-   com motivo, nunca `passa`.
-5. Prova veicular em **quarto isolado** não decide forma.
+> **Alguma coisa gera muitas variações. A IA escolhe. A próxima leva nasce em
+> volta da escolhida. Repete até convergir.**
 
-## As três capacidades, com o risco de cada uma declarado
+É o princípio do retrato falado. A testemunha não sabe desenhar o rosto, mas
+sabe apontar qual dos nove está mais perto; repetindo, chega-se a um rosto que
+ela jamais desenharia. Ela não ganhou habilidade de desenho — foi usada no que
+sabe fazer.
 
-### C1 — canal de percepção · risco baixo
+Três diferenças em relação a tudo que já foi tentado:
 
-A captura tem `superficie`, `normais`, `profundidade`, `wireframe`, `identidade` e `silhueta`, mas não zebra, isófotas e curvatura — a ponte industrial entre julgamento visível e mensurável de superfície. Técnica conhecida e fechada: por isso é a primeira fatia.
+1. a IA **nunca escolhe um valor**. Ela ordena candidatos;
+2. o gerador **pode ser burro**. Ele não precisa saber o que é bonito, só
+   precisa variar bastante e rápido, dentro do formato geral de carro;
+3. o volume é o ponto. Doze rodadas não é iteração — é uma tentativa dividida em
+   doze. Um projetista faz doze ajustes em um minuto. Com rodada barata e sem
+   depender do usuário, dá para fazer centenas.
 
-### C2 — autoria por restrição · **risco alto, é a incerteza central do plano**
+## O que este plano assume, e como isso pode quebrar
 
-A fonte deixa de conter coordenada e passa a conter enunciado com nome: relação ("o ponto mais largo fica logo abaixo do ombro"), desigualdade ("o capô abaula, nunca afunda"), continuidade ("G1 na linha de ombro"), folga ("40 mm sobre o pneu") e aderência ("silhueta a menos de 25 mm do perfil medido").
+**O espaço do gerador precisa alcançar um carro bom.** Se nenhuma combinação
+possível chega perto, ordenar não adianta — seleção acha o melhor do que existe,
+não o que não existe. Este é o risco central e ele é barato de testar, por isso
+S0 existe e vem antes de tudo.
 
-**A auditoria acusou aqui o mesmo pecado que o plano denuncia no dossiê antigo:** "um solver satisfaz o conjunto" escondia a coisa mais difícil. Não é fatia entre outras — é a aposta. Correções:
+**O espaço é desenhado à mão, e isso é uma limitação declarada.** A diferença
+para a armadilha já registrada em `GOTCHAS-AUTORIA-VISUAL.md`, V-30, é que lá a
+IA **escolhia os valores** e chamava isso de autoria; aqui ela não escolhe
+nenhum. O espaço limita o que é alcançável, e S0 mede exatamente esse limite.
 
-- o solver **não é geral**: resolve apenas a lista fechada de cinco tipos; tipo novo exige fatia com evidência;
-- N4 abre com uma **sonda de viabilidade** — uma seção, três restrições — antes de qualquer compromisso;
-- se a sonda falhar, a condição de encerramento dispara **ali**, não em N6.
+**Selecionar não é aprovar.** Mosaico serve para ordenar candidatos e nunca para
+promover — a regra de inspeção individual continua valendo integralmente para
+qualquer coisa que avance. Ver V-07 e a regra de painel nos gotchas.
 
-**Leitura corrigida após N3.5:** a sonda de suavização não executou C2; ela só
-testou se uma malha histórica ruim poderia ser recuperada depois de pronta. A
-resposta foi não. Portanto N4 continua sendo a primeira prova de C2 e precisa
-partir de uma representação limpa, não de R2B, cupê livre ou quarto reprovado.
+## Fatias
 
-### C3 — busca · risco médio
+Cada fatia tem teto. Estourar o teto abre revisão, nunca mais rodadas.
 
-Onde sobrar liberdade, a IA define o objetivo e uma busca acha os valores. **O espaço de busca é exatamente o grau de liberdade que C2 deixar em aberto — nunca inventado pela IA.** Sem espaço livre bem-definido, C3 fecha vazia; isso evita chamar doze chutes nomeados de avanço.
+| Fatia | Teto | O que entrega | Marco visível |
+|---|---|---|---|
+| S0 — o espaço alcança? | 2 | cem variações geradas e olhadas | a folha das cem |
+| S1 — laço de seleção | 3 | gerar, mostrar, ordenar, repetir | a convergência em imagens |
+| S2 — carro inteiro | 4 | melhor candidato após centenas de rodadas | o carro |
+| S3 — tornar editável | 4 | o vencedor vira peça com identidade | o carro alterado com intenção |
+| S4 — integração | 4 | superfície ligada à mecânica | o conjunto |
 
-N3.5 também não executou busca, logo não produz veredito sobre C3. N5 continua
-bloqueada até N4 provar uma representação de C2 e declarar ao menos um grau de
-liberdade e um objetivo mensurável que possam ser buscados.
+### S0 — o espaço alcança um carro?
 
-## Procedência do número, com gate
+Gerar cem variações e olhar. Uma pergunta só: **alguma está no bairro certo?**
 
-Todo valor da fonte declara origem: `medido`, `derivado`, `resolvido` ou
-`declarado`. Coordenada crua não é origem válida. `declarado` exige uma frase de
-justificativa e é minoria auditável.
+Passa se pelo menos algumas lerem como carro em silhueta e proporção, mesmo
+toscas. Reprova se todas forem cápsula, caixa ou bloco — e aí o problema é o
+gerador, não a seleção, e o plano volta à mesa antes de gastar o resto.
 
-Para veículo, a minoria não basta: dimensões do envelope, landmarks `nariz`, eixos, início/fim/pico da cabine e ombros, e contornos de `massa-primaria` não podem ser `declarado`; precisam ser `medido` ou `derivado`. `resolvido` só aparece no candidato de fonte medida/derivada. Falta nessa lista reprova por vacuidade, mesmo abaixo do quinto global.
+O gerador fixa o que é estrutura de carro — roda no chão, entre-eixos, cabine
+sobre a base, arco sobre a roda — e sorteia o que é proporção e forma. Ele não
+tem noção de bonito e não precisa ter.
 
-**Gate obrigatório da abertura N3:** `procedencia:check` será entregue antes do encerramento; reprova valor sem origem, `declarado` acima de um quinto e a lista estrutural acima. Até existir, é requisito aberto — não capacidade alegada.
+### S1 — o laço de seleção
 
-## Famílias
+Gerar uma leva, renderizar, mostrar todas juntas, a IA ordena, a leva seguinte
+nasce em volta das melhores com variação menor, repete. O usuário entra de vez
+em quando, só para dizer se a direção escolhida é a que ele quer.
 
-| Família | Ato de autoria dominante | Referência |
-|---|---|---|
-| mecânica dimensional | receita procedural atual, **inalterada** | cota e função |
-| superfície estilizada (veículo) | restrição proporcional e relacional | prancha medida |
-| cobertura sobre base (humanoide) | conformar placa a corpo com folga | cânone humano |
-| sistema articulado | juntas, limites e estados | pose e envelope |
-| máquina completa | composição por interfaces | conjunto |
+Fecha quando a ordenação parar de mudar de direção e as escolhas convergirem, ou
+quando ficar claro que não convergem.
 
-Veículo e humanoide **não compartilham o ato de autoria**: carroceria é seção e
-silhueta, armadura é projeção e afastamento. Tratar as duas igual foi parte da
-falha da sonda humanoide. Compartilham identidade, peça, montagem, revisão,
-impacto, interfaces, C1, C2, C3 e o protocolo de crítica.
+### S2 — carro inteiro
 
-**O eixo humanoide não está especificado** — uma linha de plano não é projeto, e
-o plano ainda não sabe como fazer. N8 exige dossiê próprio antes de abrir.
+Corpo completo, nunca um quarto. Reconhecimento cego por revisor sem contexto e
+aceite do usuário antes de qualquer detalhe.
 
-## Fatias, com teto e marco visível
+### S3 — tornar editável
 
-Cada fatia tem teto de rodadas. **Estourar o teto abre revisão, nunca mais
-rodadas** — foi assim que a carroceria chegou a doze.
+O vencedor não pode ser uma malha morta. Ele vira peça com identidade,
+alterável por intenção — mais comprido, teto mais baixo, frente diferente — sem
+perder o que foi conquistado. É aqui que o resto do repositório volta a valer.
 
-| Fatia | Teto | Marco que o usuário vê |
-|---|---|---|
-| N3 — canal de percepção | 4 | zebra individual multivista dos artefatos reprovados |
-| N3.5 — sonda de suavização | 2 | rejeitada: quarto só suavizado, sem melhora material |
-| N4 — autoria por restrição | 5 | aprovada: duas formas limpas do mesmo enunciado |
-| N5 — busca | 3 | vencedor de uma liberdade residual contra alvo sintético |
-| N6 — carro por regiões contínuas | 5 | referência regional, forma local e carro inteiro coerentes |
-| N7 — integração | 4 | superfície e mecânica ligadas |
+### S4 — integração
 
-**N3 — gate de calibração.** O canal precisa separar artefato reprovado de
-superfície sã. Não existe superfície aprovada aqui — o README diz isso —, então o
-lado sadio é **sintético e verificável**: esfera, toro e um patch justo, onde a
-zebra é regular por construção. O canal precisa mostrar zebra regular nesses,
-irregularidade no quarto dianteiro, no R2B e no cupê livre, e ordená-los conforme o
-veredito humano. Canal que aprova o que o usuário reprovou não serve.
+Superfície ligada às peças mecânicas pelas interfaces que já existem.
 
-N3 aprova somente C1, **qualidade de superfície**. Zebra, isófota e curvatura não provam proporção, caráter ou reconhecimento; portanto não fecham G02, não aprovam veículo e não liberam N6. Esses julgamentos voltam no reconhecimento cego do carro inteiro; N3 limita-se a C1, corpus sintético/reprovado, `procedencia:check` e quatro rodadas. **Revalidada em 2026-08-24:** o primeiro painel usava cor plana por triângulo e foi incorretamente tratado como prova; C1 exige raster de normais interpoladas e abertura individual, em tamanho nativo, de cada imagem obrigatória. Métrica e mosaico não aprovam nada; o aceite só vale se `inspecao-individual.json` coincidir por SHA-256 com o manifesto gerado.
+## O que continua valendo do trabalho anterior
 
-**N3.5 — sonda de suavização.** Barata e decisiva; existe porque o plano não
-podia ficar quatro fatias sem nada visível. Pega o quarto dianteiro reprovado,
-aplica **só energia de suavidade** guiada por C1, sem restrição nem busca, e
-mede. Testa exclusivamente a hipótese de que suavidade medida recupera uma
-malha histórica ruim antes de gastar N4. **Executada em 2026-08-24 e
-rejeitada:** seis iterações fixas preservaram topologia, bordas e quinas, mas
-reduziram o P95 da região livre só 0,57% e elevaram a parcela abrupta de 4,211%
-para 4,391%; as doze vistas individuais não mostram melhora visível. Isso não
-é veredito sobre C2 ou C3; a malha é descartada.
+Nada disso é descartado, e nada disso vira julgamento de forma:
 
-**N4 — sonda de viabilidade de C2.** Concluída e aprovada no escopo estreito:
-constrói uma
-seção nova e contínua de uma família paramétrica declarada, sem reaproveitar
-malha reprovada, e resolve exatamente três restrições: (1) relação de posição
-do ponto mais largo abaixo do ombro; (2) desigualdade de capô convexo, sem
-afundamento; (3) continuidade G1 na linha de ombro. A prova entrega duas
-formas diferentes que satisfazem o mesmo enunciado, abre cada vista C1
-individualmente e registra a procedência de cada parâmetro. Falhar dentro do
-teto de N4 rejeita C2; passar não aprova veículo.
+- **identidade, peças, montagem, revisão, impacto e revalidação** — provados e
+  aprovados, e são a razão de S3 e S4 serem viáveis;
+- **canal de percepção** — vira detector de defeito de superfície, não juiz de
+  forma. Continua com V-08 reaberto: o braço de diedro mede densidade de malha,
+  e precisa ser normalizado antes de voltar a ser evidência;
+- **comparação contra alvo, olhar e crítico cego** — o laço de referência é
+  obrigatório e não muda;
+- **procedência do número** — o gerador declara origem como qualquer outra fonte;
+- **o registro de falhas** — `GOTCHAS-AUTORIA-VISUAL.md` é leitura obrigatória
+  antes de abrir experimento, e V-31 existe porque uma rodada já foi gasta
+  redescobrindo o que estava medido ali.
 
-**N5 — busca residual de C3.** Executada no escopo mínimo: `bojoRelativo` é
-o único grau livre da seção N4; a busca enumerou 21 candidatos, mantendo as
-três restrições, C1 e diedro máximo ≤ 19°, e escolheu 0,16 para igualar a
-sagita sintética medida de 41,6 mm. Isto prova o mecanismo de busca, não um
-estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash. A primeira N6.1, uma casca genérica por estações, foi reprovada visualmente e não é base. A reabertura N6.1 testa, sem detalhar nem criar peças soltas: (a) recortes regionais derivados das vistas completas, com câmera, escala e hash de origem preservados; (b) edição de uma **região nomeada da mesma carroceria contínua** — dianteira/capô e para-lamas, cabine/cintura, lateral/entrada, ombros/deck traseiro —; (c) comparação individual recorte↔render local e regressão nas quatro vistas completas; e (d) crítico cego que pode reprovar ou devolver `indeterminado`. Um recorte orienta e limita a correção local, mas não autoriza modelar frente, centro ou traseira como objetos a serem colados. Só uma rodada em que todos os marcos regionais e a leitura do conjunto sobrevivam abre superfície/receita; N4/N5 sozinhas não bastam.
+## Práticas proibidas, por evidência
 
-**Rejeição complementar de N6.** A interseção binária das silhuetas foi testada e reprovada nas quatro vistas individuais: malha única e IoU medem ocupação, mas não carregam arcos, cabine, cintura, entradas ou deck traseiro. O próximo canário só pode construir a mesma carroceria contínua a partir de marcos semânticos rastreáveis e patches com fronteiras compartilhadas, e precisa dizer **o que é diferente** do que já reprovou; não pode refinar, suavizar nem reutilizar esse casco.
+1. **A IA digitar coordenada ou parâmetro de forma.** Seis provas. Vale também
+   para família de curvas escrita à mão que satisfaz restrições por construção.
+2. **Alvo inventado pela IA como referência vinculante.** O nariz do alvo
+   anterior estava 321 mm abaixo do medido num carro real.
+3. **Aprovação por painel, mosaico ou métrica.** Mosaico ordena, não promove.
+4. **Detector devolvendo `passa` fora do escopo.** Devolve `naoAvaliavel`.
+5. **Prova de forma em pedaço isolado.** Corpo inteiro ou nada.
 
-## Passivo declarado
+## Aprovação e parada
 
-Um plano que ignora dívida deixa ela apodrecer. Fica registrado e datado:
+Toda prova decide **plataforma** e **artefato** em separado; capacidade aprovada
+com artefato reprovado é resultado válido, e qualidade só fecha com os dois.
+Achado visual grave não é adiado.
 
-- **Sincronização N1/N2 concluída na abertura N3:** `fluxo-autoria-n1-caixa-preta` e `forma-global-n2-caixa-preta` acompanham `avaliarAlvo`/G00 e schema gerado; os quatro casos antes vermelhos precisam permanecer verdes;
-- planos congelados — P2, validação integrada e motor de prancha — não voltam sem decisão explícita;
-- artefatos reprovados viram insumo do gate de calibração do N3;
-- **V-08 reaberto:** o braço P95/máximo do canal C1 mede densidade de malha, não qualidade — o mesmo toro justo lê irregular em 36×16 e regular em 36×20, e a quebra sintética tem P95 abaixo dos controles sadios. Os gates de N4/N5 que usam "diedro máximo ≤ 19°" herdam isso. Ver `GOTCHAS-AUTORIA-VISUAL.md`, V-23.
+A condição de encerramento tem três braços, e o terceiro existe porque o anterior
+foi contornado por redação — ver V-32:
 
-## Aprovação, parada e saída honesta
+> **(a)** se S0 não produzir nenhuma variação no bairro certo, a conclusão é que
+> **o gerador não alcança** e o mecanismo não se sustenta como está;
+> **(b)** se S1 rodar até o teto sem convergir, a conclusão é que **a seleção não
+> conduz** e a assimetria medida não se traduz em forma;
+> **(c)** qualquer reprovação de forma em S2 encerra a fatia e obriga decisão
+> explícita do usuário antes de qualquer continuação — nenhuma leitura de
+> redação sobre o que foi "estreito" ou "sintético" reabre por conta própria.
 
-Toda prova decide **plataforma** e **artefato** em separado; capacidade aprovada com artefato reprovado é resultado válido e qualidade só fecha com os dois. Achado visual grave não é adiado. As camadas de validação seguem como estavam, mais percepção e procedência.
-
-A condição de encerramento tem **dois braços**, e o segundo veio da auditoria:
-
-> **(a)** se a sonda de viabilidade do N4 não fechar dentro do teto, a
-> conclusão é que **a autoria por restrição não se provou construível aqui**;
-> **(b)** se N6 falhar no reconhecimento cego com N3, N4 e N5 aprovados, a
-> conclusão é que **autoria de superfície automotiva por IA está fora de alcance
-> nesta plataforma no estado atual**.
-
-Nos dois casos o alvo passa a ser editar, validar, montar e raciocinar sobre
-geometria vinda de fora, onde a base já é forte — critério escrito antes, para a
-sexta tentativa não virar a sétima por inércia.
+Nos três casos, o alvo do repositório passa a ser editar, validar, montar e
+raciocinar sobre geometria vinda de fora, onde a base já é forte.
 
 ## Fora de escopo
 
-Software externo como dependência ou rota de produção, clone de Blender ou CAD,
-produção final, fabricação, solver universal, UV, textura e escultura livre antes
-de um gate provar que são essenciais à forma.
+Software externo como dependência ou rota de produção, clone de programa de
+modelagem, produção final, fabricação, UV, textura e escultura livre. O eixo
+humanoide segue **não especificado** e exige dossiê próprio antes de abrir.
 
 ## Registro
 
 - **V1 — 2026-08-23:** plano ativado após o R2B.
-- **V2 — 2026-08-24:** reescrito de N3 em diante: o plano dizia **o que** autorar, não **como a IA decide o número**.
-- **V3 — 2026-08-24:** auditoria corrigiu dez defeitos: C2 escondia a parte difícil, N3 exigia uma superfície sã inexistente e C3 não justificava seu espaço de busca. Entraram sonda N4 e segundo braço de encerramento, lado sadio sintético, N3.5 barato, teto de rodadas, procedência, passivo, ponto de entrada e humanoide não especificado.
-- **V4 — 2026-08-24:** N3 aberto após sincronizar as quatro provas públicas N1/N2. Percepção declara seu limite — superfície não é reconhecimento veicular —, procedência estrutural não se esconde no teto global e o verificador é entrega N3, não capacidade presumida.
-- **V5 — 2026-08-24:** N3 encerrou C1 com painel visual inspecionado, corpus reprodutível e `procedencia:check`; N3.5 permanece parada até autorização. A calibração só separa o veredito binário disponível, sem fabricar ranking estético dos rejeitados.
-- **V6 — 2026-08-24:** a inspeção individual corrigiu a V5: painel lado a lado e cor plana por triângulo não provaram C1. N3 reabre com raster de normais interpoladas, imagens individuais multivista e bloqueio de N3.5 até aceite visual válido.
-- **V7 — 2026-08-24:** C1 foi revalidada: os 42 diagnósticos foram abertos individualmente, os controles não mostraram triangulação/costura espúria e os rejeitados mantiveram falhas reais. O aceite é vinculado ao manifesto SHA-256; qualquer imagem regenerada sem inspeção correspondente perde o gate.
-- **V8 — 2026-08-24:** N3.5 rejeitou a hipótese de que suavização C1 isolada recupera o quarto histórico: preservou topologia, mas a redução de rugosidade foi imaterial e a ruptura abrupta cresceu. Nenhuma malha foi promovida.
-- **V9 — 2026-08-24:** corrigida a inferência da N3.5: ela não testa C2 nem C3. N4 é a próxima prova de autoria por restrição, construída do zero sobre uma seção limpa; N5 permanece bloqueada até haver liberdade residual e objetivo mensurável.
-- **V10 — 2026-08-24:** N4 aprovou a viabilidade estreita de C2: duas seções novas, diferentes e C1-regulares obedecem as mesmas três restrições, com procedência e inspeção individual vinculada ao manifesto. N5 não abriu: não existe liberdade residual/objetivo de busca declarado.
-- **V11 — 2026-08-24:** a inspeção individual de N5 revelou uma crista central C0 que o P95 de N4 escondia. O aceite N4 foi revogado, a base do capô foi reescrita com tangentes nulas no centro/ombro e diedro máximo passou a ser gate. N4 foi revalidada; N5 então provou C3 sobre `bojoRelativo` e alvo sintético. O usuário aprovou uma prancha N6; ela foi recortada/hashada e só abre a preparação, com pareamento vista↔vista obrigatório.
-- **V12 — 2026-08-24:** a primeira N6.1 isolada confirmou a causa já documentada: casca por estações e rodas anexadas não produzem leitura automotiva, embora gerem arquivos e métricas. A tentativa foi reprovada e passa a ser evidência negativa. A reabertura é regional, mas preserva uma única carroceria: recortes por região vêm das vistas completas, carregam a mesma escala/câmera/hash e toda edição local regressa o conjunto inteiro.
-- **V13 — 2026-08-24:** o canário de interseção de silhuetas N6 foi reprovado nas quatro vistas individuais. Mesmo uma malha única com IoUs mensuráveis virou bloco escalonado, pois máscara binária não carrega arcos, cabine, cintura, entradas ou deck. O teste fica como evidência negativa; N6 exige contrato de marcos e patches topológicos regionais antes de nova geometria.
+- **V2 — 2026-08-24:** reescrito porque dizia o que autorar e não como a IA
+  decide o número.
+- **V3 — 2026-08-24:** auditoria do próprio plano, dez defeitos corrigidos.
+- **V4 — 2026-08-24:** **mudança de mecanismo, por decisão do usuário.** A
+  autoria por restrição deixa de ser a aposta, porque as regras que decidem se
+  algo parece um carro não são escrevíveis. O plano passa a usar a assimetria
+  medida na investigação: a IA erra ao produzir forma e acerta ao comparar. O
+  ato de autoria vira ordenar candidatos, o gerador é deliberadamente burro, e
+  o volume de rodadas passa a ser o ponto. N6 e o que vinha depois foram
+  cancelados; entram S0 a S4, com o risco central — o gerador alcançar um carro
+  bom — testado na primeira fatia e não na última.

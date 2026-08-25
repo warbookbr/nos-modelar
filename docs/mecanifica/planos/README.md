@@ -5,41 +5,27 @@
 **Plano ativo:**
 [`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 
-Ele governa a plataforma nativa de autoria por famílias e foi **reescrito de N3
-em diante em 2026-08-24**. O motivo está escrito nele: cinco tentativas de dar
-forma a uma carroceria falharam do mesmo jeito, incluindo o experimento
-`laboratorio-isolado/cupe-livre-01/` — feito por outro modelo, em esforço
-máximo, sem importar uma linha deste repositório — e todas terminam no mesmo
-ato, digitar seções transversais à mão. A causa raiz registrada é que a IA
-autora em milímetros e a forma é julgada em imagem, e os dois espaços só se
-ligam por um laço lento e com perda.
+Ele mudou de **mecanismo** em 2026-08-24, por decisão do usuário, depois da
+sexta reprovação de forma. Seis tentativas de dar forma a uma carroceria
+falharam do mesmo jeito, incluindo uma feita por outro modelo em esforço máximo
+sem tocar neste repositório: todas pediram que a IA **produzisse** o formato, e
+todas terminaram com alguém digitando números.
 
-A revisão inverte isso: a IA passa a declarar restrição e objetivo, um solver
-produz coordenada, e um canal de percepção — zebra, isófotas e curvatura —
-torna a qualidade de superfície visível **e** mensurável no mesmo artefato. Todo
-número da fonte declara procedência: `medido`, `derivado`, `resolvido` ou
-`declarado`. N0 e N1 seguem concluídos; o [relatório
-N1](../RELATORIO-N1-FLUXO-AUTORIA.md) fecha objetivo, receita elevada, schemas,
-provedores e cliente caixa-preta. A N2 está implementada com G01 verde e o
-[relatório N2](../RELATORIO-N2-FORMA-GLOBAL.md) mantém G02 bloqueado; ela **não
-avança sem o canal de percepção calibrado**. O plano também traz uma condição de
-encerramento escrita antes da tentativa, para que a sexta não vire a sétima por
-inércia. Os três dossiês vinculantes, mais a [matriz executável de
-rastreabilidade](../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md), ficam ligados
-ao plano; o de superfícies precisa ser reescrito porque suas operações terminam
-todas em "ajustar valor".
+A aposta anterior — um resolvedor de restrições — foi descartada não por ter
+falhado, mas porque as restrições que decidem se algo parece um carro não são
+escrevíveis. O plano passa a usar a assimetria medida na investigação: a IA erra
+ao produzir forma e acerta ao comparar. O ato de autoria vira **ordenar
+candidatos**; um gerador deliberadamente simples produz muitas variações, a IA
+escolhe, a leva seguinte nasce em volta da escolhida, e o volume de rodadas é o
+ponto. É o princípio do retrato falado.
 
-O plano passou por **auditoria de si mesmo** no mesmo dia, que achou dez
-defeitos e virou a V3. Os três graves: a autoria por restrição escondia a coisa
-mais difícil de tudo numa frase — "um solver satisfaz o conjunto" —, que é o
-mesmo pecado denunciado no dossiê antigo; o gate de calibração do canal de
-percepção **não podia ser executado**, porque exigia uma superfície sã que não
-existe neste repositório; e a busca movia o problema um andar acima sem dizer de
-onde vinha o espaço de parâmetros. Entraram sonda de viabilidade com braço
-próprio de encerramento, lado sadio sintético, uma sonda barata de suavização
-como primeiro marco visível, teto de rodadas por fatia, gate de procedência do
-número, passivo declarado com os 4 testes vermelhos da main, ponto de entrada
-para IA sem contexto, e o eixo humanoide marcado como não especificado.
+O risco central — o gerador conseguir alcançar um carro bom — é testado na
+primeira fatia e não na última: cem variações geradas e olhadas, com uma
+pergunta só. N6 e o que vinha depois foram cancelados. Identidade, montagem,
+revisão, impacto e o laço de referência continuam valendo e são a razão de as
+últimas fatias serem viáveis. O registro de falhas em
+[`GOTCHAS-AUTORIA-VISUAL.md`](../GOTCHAS-AUTORIA-VISUAL.md) é leitura
+obrigatória antes de abrir experimento.
 
 O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
 foi concluído com decisão `interromper`: sua melhor evidência continuou
