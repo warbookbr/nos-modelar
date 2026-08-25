@@ -1,0 +1,122 @@
+{
+  "formato": "mecanifica.n6-canario-casco-visual@1",
+  "estado": "reprovado-inspecao-individual",
+  "regra": "interseção binária de silhuetas é apenas diagnóstico negativo; não é receita final nem rota de promoção",
+  "qualidadeNumerica": "diagnostico-nao-promocional",
+  "fontes": {
+    "frontal": {
+      "arquivo": "vistas/frontal.png",
+      "sha256": "50b2881d86685d70d4a4ef1151907be5962e2615ac34ed1304632209cd366421",
+      "bbox": {
+        "x0": 8,
+        "y0": 141,
+        "x1": 438,
+        "y1": 397,
+        "w": 431,
+        "h": 257
+      }
+    },
+    "lateral": {
+      "arquivo": "vistas/lateral-direita.png",
+      "sha256": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434",
+      "bbox": {
+        "x0": 2,
+        "y0": 170,
+        "x1": 663,
+        "y1": 368,
+        "w": 662,
+        "h": 199
+      }
+    },
+    "superior": {
+      "arquivo": "vistas/superior.png",
+      "sha256": "a372aa4f3a20554bec196cca6f7d9e2b22318bc37a90a556e1ba57a6aa3e65ca",
+      "bbox": {
+        "x0": 31,
+        "y0": 40,
+        "x1": 732,
+        "y1": 425,
+        "w": 702,
+        "h": 386
+      }
+    }
+  },
+  "malha": {
+    "vertices": 57230,
+    "triangulos": 114396,
+    "componentes": 1
+  },
+  "vistas": {
+    "frontal": {
+      "iouSilhueta": 0.7645,
+      "referencia": "vistas/frontal.png",
+      "render": "render-frontal.png",
+      "sobreposicao": "sobreposicao-frontal.png",
+      "veredito": "reprovado",
+      "motivo": "degraus e volumes retos substituem para-lamas, nariz e leitura frontal automotiva"
+    },
+    "lateral": {
+      "iouSilhueta": 0.5678,
+      "referencia": "vistas/lateral-direita.png",
+      "render": "render-lateral.png",
+      "sobreposicao": "sobreposicao-lateral.png",
+      "veredito": "reprovado",
+      "motivo": "faixas de tetraedros formam caixote; não há cabine, arcos de roda nem proporção lateral crível"
+    },
+    "superior": {
+      "iouSilhueta": 0.3134,
+      "referencia": "vistas/superior.png",
+      "render": "render-superior.png",
+      "sobreposicao": "sobreposicao-superior.png",
+      "veredito": "reprovado",
+      "motivo": "planta perde ombros, cabine e cintura; o contorno não sustenta leitura de cupê"
+    },
+    "perspectiva": {
+      "render": "render-perspectiva.png",
+      "veredito": "reprovado",
+      "motivo": "o conjunto parece bloco técnico, não carro; a vista auxiliar confirma o veto das ortográficas"
+    }
+  },
+  "inspecaoIndividual": {
+    "metodo": "abertura nativa, uma imagem por vez; painel e IoU não são evidência de aprovação",
+    "vereditoGlobal": "reprovado",
+    "evidencias": {
+      "frontal": {
+        "render": {
+          "arquivo": "evidencias/render-frontal.png",
+          "sha256": "5adb47423f8ea6641f5f70c3d82d262850053450bd6556f54fc19d5a5555ccea"
+        },
+        "sobreposicao": {
+          "arquivo": "evidencias/sobreposicao-frontal.png",
+          "sha256": "6a4416ec250b87312321f7c6573e5265ff97346aca8f31d26927cf035c8bef46"
+        }
+      },
+      "lateral": {
+        "render": {
+          "arquivo": "evidencias/render-lateral.png",
+          "sha256": "0e47ed0e2d03f76c98cec86edb7dc500256266195cb30f09a8e4a501a835ef87"
+        },
+        "sobreposicao": {
+          "arquivo": "evidencias/sobreposicao-lateral.png",
+          "sha256": "b3594c63a4b51331cafef76279e36795fd31d881e28c9124ee958ee9b7ee758c"
+        }
+      },
+      "superior": {
+        "render": {
+          "arquivo": "evidencias/render-superior.png",
+          "sha256": "3af03d3b44f3aa3a2081eacc47912717a5441316284f30a74d148697c6944f1d"
+        },
+        "sobreposicao": {
+          "arquivo": "evidencias/sobreposicao-superior.png",
+          "sha256": "5d7ad0a01f27b6291cbdaffec3c948f686627de8455a31dd59008e80edd04dce"
+        }
+      },
+      "perspectiva": {
+        "render": {
+          "arquivo": "evidencias/render-perspectiva.png",
+          "sha256": "e916d6ccb2ee75298895b75bebdc90aee4a9ced84cbb88703196be308acdb9d6"
+        }
+      }
+    }
+  }
+}

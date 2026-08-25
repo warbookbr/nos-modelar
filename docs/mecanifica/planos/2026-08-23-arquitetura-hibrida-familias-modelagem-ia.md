@@ -150,6 +150,13 @@ três restrições, C1 e diedro máximo ≤ 19°, e escolheu 0,16 para igualar a
 sagita sintética medida de 41,6 mm. Isto prova o mecanismo de busca, não um
 estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash. A primeira N6.1, uma casca genérica por estações, foi reprovada visualmente e não é base. A reabertura N6.1 testa, sem detalhar nem criar peças soltas: (a) recortes regionais derivados das vistas completas, com câmera, escala e hash de origem preservados; (b) edição de uma **região nomeada da mesma carroceria contínua** — dianteira/capô e para-lamas, cabine/cintura, lateral/entrada, ombros/deck traseiro —; (c) comparação individual recorte↔render local e regressão nas quatro vistas completas; e (d) crítico cego que pode reprovar ou devolver `indeterminado`. Um recorte orienta e limita a correção local, mas não autoriza modelar frente, centro ou traseira como objetos a serem colados. Só uma rodada em que todos os marcos regionais e a leitura do conjunto sobrevivam abre superfície/receita; N4/N5 sozinhas não bastam.
 
+**Rejeição complementar de N6.** A interseção binária das silhuetas foi testada
+e reprovada nas quatro vistas individuais: malha única e IoU medem ocupação,
+mas não carregam arcos, cabine, cintura, entradas ou deck traseiro. O próximo
+canário só pode construir a mesma carroceria contínua a partir de marcos
+semânticos rastreáveis e patches com fronteiras compartilhadas; não pode
+refinar, suavizar nem reutilizar esse casco.
+
 ## Passivo declarado
 
 Um plano que ignora dívida deixa ela apodrecer. Fica registrado e datado:
@@ -198,3 +205,4 @@ de um gate provar que são essenciais à forma.
 - **V10 — 2026-08-24:** N4 aprovou a viabilidade estreita de C2: duas seções novas, diferentes e C1-regulares obedecem as mesmas três restrições, com procedência e inspeção individual vinculada ao manifesto. N5 não abriu: não existe liberdade residual/objetivo de busca declarado.
 - **V11 — 2026-08-24:** a inspeção individual de N5 revelou uma crista central C0 que o P95 de N4 escondia. O aceite N4 foi revogado, a base do capô foi reescrita com tangentes nulas no centro/ombro e diedro máximo passou a ser gate. N4 foi revalidada; N5 então provou C3 sobre `bojoRelativo` e alvo sintético. O usuário aprovou uma prancha N6; ela foi recortada/hashada e só abre a preparação, com pareamento vista↔vista obrigatório.
 - **V12 — 2026-08-24:** a primeira N6.1 isolada confirmou a causa já documentada: casca por estações e rodas anexadas não produzem leitura automotiva, embora gerem arquivos e métricas. A tentativa foi reprovada e passa a ser evidência negativa. A reabertura é regional, mas preserva uma única carroceria: recortes por região vêm das vistas completas, carregam a mesma escala/câmera/hash e toda edição local regressa o conjunto inteiro.
+- **V13 — 2026-08-24:** o canário de interseção de silhuetas N6 foi reprovado nas quatro vistas individuais. Mesmo uma malha única com IoUs mensuráveis virou bloco escalonado, pois máscara binária não carrega arcos, cabine, cintura, entradas ou deck. O teste fica como evidência negativa; N6 exige contrato de marcos e patches topológicos regionais antes de nova geometria.

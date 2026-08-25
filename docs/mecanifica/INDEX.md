@@ -256,6 +256,9 @@ aplicação publicada aqui.
   [gotchas de autoria visual](GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`) passam a vetar promoção por
   métrica local quando o objeto não é reconhecível em cada vista individual.
+  O [canário de casco por silhuetas](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
+  também foi reprovado: malha única e IoU não substituem topologia automotiva
+  nem inspeção individual.
   Registros: `docs/mecanifica/RELATORIO-N2-FORMA-GLOBAL.md` e
   `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`. O plano preserva o procedural,
   identidade, montagem, revisão,

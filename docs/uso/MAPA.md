@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-647 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+651 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -68,6 +68,12 @@
 - `README.md` — Corpus do canal de percepção N3
 - `canal-percepcao-n3.test.mjs` — Calibração reprodutível entre controles sadios e históricos reprovados.
 - `gerar-evidencias.mjs` — Gera o corpus N3. Não altera receitas nem promove geometria histórica.
+
+## autoria-assistida/experimentos/canario-casco-visual-n6/
+
+- `README.md` — Canário N6 — casco por interseção de silhuetas
+- `canario-casco-visual.test.mjs` — O canário exige silhuetas de origem, uma única malha e veredito explicitamente pendente.
+- `construir-casco-visual.mjs` — Canário N6: casco-base por interseção de silhuetas, não por seções digitadas. É uma prova isolada e reprovável; não importa o núcleo procedural.
 
 ## autoria-assistida/experimentos/prova-cage-direta-r2/
 
@@ -422,6 +428,7 @@
 - `RELATORIO-N3-CANAL-PERCEPCAO.md` — Relatório N3 — canal de percepção
 - `RELATORIO-N4-RESTRICOES.md` — Relatório N4 — sonda de autoria por restrição
 - `RELATORIO-N5-BUSCA.md` — Relatório N5 — busca residual controlada
+- `RELATORIO-N6-CANARIO-CASCO-VISUAL.md` — Relatório N6 — canário de casco por silhuetas
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta

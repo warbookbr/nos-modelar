@@ -93,6 +93,13 @@ bloco automotivo que passe os marcos desta página. O próximo trabalho não é
 “ajustar números” daquela malha; é implementar esse contrato de avaliação e o
 modelador específico que ele exige.
 
+O canário posterior de interseção de silhuetas, em
+`autoria-assistida/experimentos/canario-casco-visual-n6/`, também está
+**reprovado e encerrado**. Ele produziu uma malha única e IoUs numéricos, mas
+as imagens individuais revelaram um bloco escalonado. A interseção binária
+captura ocupação, não a topologia automotiva; aumentar a resolução, suavizar
+ou ajustar o limiar não é uma correção aceita para esse método.
+
 ## Registro consolidado de problemas já encontrados
 
 Este é o registro vivo do programa de autoria. Ele cobre os problemas que
@@ -128,6 +135,7 @@ históricos em capacidade atual. Cada linha usa um destes estados:
 | V-19 | Frontais/traseiras e topo da N6.1 não comunicavam veículo apesar de métricas de silhueta numéricas. | **aberto** | Falta crítico semântico bloqueante e modelador automotivo por regiões; IoU deve ficar apenas como diagnóstico. |
 | V-20 | Suite agregada e `mcp:check` já tiveram falhas passivas fora de N2/N3 (paths `repo://`, guarda histórica `fps`, importação isolada do perfil MCP e timeouts de ensaio). | **histórico não revalidado** | Esses problemas não podem ser usados para declarar o núcleo bom ou ruim sem nova medição. Não são explicação para a forma ruim, mas impedem alegar saúde total da suíte. |
 | V-21 | Uma referência completa era ampla demais para orientar uma correção local, enquanto separar frente, centro e traseira como objetos causaria nova montagem desconexa. | **planejado, ainda não provado** | N6.1 passa a testar recortes regionais rastreáveis e edição regional na mesma carroceria contínua, sempre com regressão do carro completo. |
+| V-22 | Interseção de silhuetas binárias das vistas N6 produziu uma malha única com IoU frontal 0,7645, mas frontal/lateral/superior/perspectiva formaram bloco escalonado sem leitura automotiva. | **reprovado e encerrado** | A máscara informa ocupação, não arcos, cabine, entradas, cintura ou topologia. `canario-casco-visual-n6/` é evidência negativa; o sucessor exige marcos semânticos regionais e patches contínuos de fronteira compartilhada. |
 
 ## O que já existe e não deve ser descartado
 
