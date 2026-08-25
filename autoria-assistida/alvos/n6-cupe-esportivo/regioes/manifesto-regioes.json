@@ -1,0 +1,189 @@
+{
+  "formato": "mecanifica.alvo-visual-n6-regioes@1",
+  "regra": "recorte é referência local da mesma carroceria, não peça 3D independente; cada edição regional regressa as vistas completas",
+  "origem": "manifesto.json",
+  "recortes": [
+    {
+      "id": "dianteira-frontal",
+      "regiao": "dianteira-capô-paralamas",
+      "vista": "frontal",
+      "origem": "vistas/frontal.png",
+      "x": 10,
+      "y": 170,
+      "largura": 420,
+      "altura": 220,
+      "pergunta": "nariz, faróis, entradas, arcos e largura estão integrados?",
+      "arquivo": "regioes/dianteira-frontal.png",
+      "dimensoes": [
+        420,
+        220
+      ],
+      "sha256Origem": "50b2881d86685d70d4a4ef1151907be5962e2615ac34ed1304632209cd366421",
+      "sha256": "09256e952a639b6620b5dada540dd560303e5bf78ccf40d8a5599b6fd123dc08"
+    },
+    {
+      "id": "dianteira-lateral",
+      "regiao": "dianteira-capô-paralamas",
+      "vista": "lateral-direita",
+      "origem": "vistas/lateral-direita.png",
+      "x": 0,
+      "y": 170,
+      "largura": 270,
+      "altura": 230,
+      "pergunta": "nariz, balanço e arco dianteiro preservam a postura?",
+      "arquivo": "regioes/dianteira-lateral.png",
+      "dimensoes": [
+        270,
+        230
+      ],
+      "sha256Origem": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434",
+      "sha256": "1e3c49e741cd4afb1c1119e3b3f0ceb3ba803228a5c4276515f3203c5f82233b"
+    },
+    {
+      "id": "cabine-lateral",
+      "regiao": "cabine-cintura",
+      "vista": "lateral-direita",
+      "origem": "vistas/lateral-direita.png",
+      "x": 155,
+      "y": 105,
+      "largura": 310,
+      "altura": 240,
+      "pergunta": "para-brisa, teto, coluna e cintura são uma transição contínua?",
+      "arquivo": "regioes/cabine-lateral.png",
+      "dimensoes": [
+        310,
+        240
+      ],
+      "sha256Origem": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434",
+      "sha256": "2a427a8b284f2a731b710272f770a8803991f92c6579d69f05bbcf2f3920bd4a"
+    },
+    {
+      "id": "cabine-superior",
+      "regiao": "cabine-cintura",
+      "vista": "superior",
+      "origem": "vistas/superior.png",
+      "x": 145,
+      "y": 65,
+      "largura": 405,
+      "altura": 300,
+      "pergunta": "a cabine ocupa a planta corretamente e se liga aos ombros?",
+      "arquivo": "regioes/cabine-superior.png",
+      "dimensoes": [
+        405,
+        300
+      ],
+      "sha256Origem": "a372aa4f3a20554bec196cca6f7d9e2b22318bc37a90a556e1ba57a6aa3e65ca",
+      "sha256": "73a3bd6e8be46da4b540ded11e40650e1843e095468974b1084bc338b22ba4a8"
+    },
+    {
+      "id": "lateral-entrada",
+      "regiao": "lateral-entrada",
+      "vista": "lateral-direita",
+      "origem": "vistas/lateral-direita.png",
+      "x": 305,
+      "y": 180,
+      "largura": 185,
+      "altura": 190,
+      "pergunta": "porta, soleira e entrada lateral pertencem à mesma pele?",
+      "arquivo": "regioes/lateral-entrada.png",
+      "dimensoes": [
+        185,
+        190
+      ],
+      "sha256Origem": "7aaf7cb9658dd509cef0765dc0524a922570960596fe87bfa51baa88aba3d434",
+      "sha256": "468292b7cc24bbc9b1e8efff04e859da565eae813be2547d67bf5532db2d46bf"
+    },
+    {
+      "id": "lateral-perspectiva",
+      "regiao": "lateral-entrada",
+      "vista": "perspectiva-frontal-direita",
+      "origem": "vistas/perspectiva-frontal-direita.png",
+      "x": 270,
+      "y": 125,
+      "largura": 430,
+      "altura": 295,
+      "pergunta": "a leitura lateral continua integrada em profundidade?",
+      "arquivo": "regioes/lateral-perspectiva.png",
+      "dimensoes": [
+        430,
+        295
+      ],
+      "sha256Origem": "2e466151cf20f724b2c5339132d43b9aa6d1a4323824276f5e77f5d328394605",
+      "sha256": "fd2b580f64e5f6c87d422784815fca003734ea0f426271d1326e2b0726f41a67"
+    },
+    {
+      "id": "traseira",
+      "regiao": "ombros-deck-traseiro",
+      "vista": "traseira",
+      "origem": "vistas/traseira.png",
+      "x": 12,
+      "y": 180,
+      "largura": 396,
+      "altura": 220,
+      "pergunta": "ombros, lanternas, difusor e saídas distinguem a traseira?",
+      "arquivo": "regioes/traseira.png",
+      "dimensoes": [
+        396,
+        220
+      ],
+      "sha256Origem": "2510318e216b24e156875bdc63427f7c2c064616c74f2c0695aeb59b9fc42306",
+      "sha256": "9788da611475cfecb20b64e90e8ccf8a5438d829ffba401e0e582a823e402ea5"
+    },
+    {
+      "id": "ombros-deck-superior",
+      "regiao": "ombros-deck-traseiro",
+      "vista": "superior",
+      "origem": "vistas/superior.png",
+      "x": 360,
+      "y": 175,
+      "largura": 350,
+      "altura": 285,
+      "pergunta": "ombros, deck ventilado e largura traseira fecham a planta?",
+      "arquivo": "regioes/ombros-deck-superior.png",
+      "dimensoes": [
+        350,
+        285
+      ],
+      "sha256Origem": "a372aa4f3a20554bec196cca6f7d9e2b22318bc37a90a556e1ba57a6aa3e65ca",
+      "sha256": "de88dd49164b82e3653d3eeee90f177fc794d607915663ac3e3f16876fa41a78"
+    }
+  ],
+  "sobreposicoes": [
+    {
+      "entre": [
+        "dianteira-capô-paralamas",
+        "cabine-cintura"
+      ],
+      "vista": "lateral-direita",
+      "recortes": [
+        "dianteira-lateral",
+        "cabine-lateral"
+      ],
+      "pergunta": "a passagem capô-para-brisa não cria degrau, vão ou mudança de escala?"
+    },
+    {
+      "entre": [
+        "cabine-cintura",
+        "lateral-entrada"
+      ],
+      "vista": "lateral-direita",
+      "recortes": [
+        "cabine-lateral",
+        "lateral-entrada"
+      ],
+      "pergunta": "coluna, porta, soleira e entrada mantêm a mesma pele?"
+    },
+    {
+      "entre": [
+        "lateral-entrada",
+        "ombros-deck-traseiro"
+      ],
+      "vista": "perspectiva-frontal-direita",
+      "recortes": [
+        "lateral-perspectiva",
+        "ombros-deck-superior"
+      ],
+      "pergunta": "a tomada lateral termina nos ombros sem peça anexada ou transição abrupta?"
+    }
+  ]
+}

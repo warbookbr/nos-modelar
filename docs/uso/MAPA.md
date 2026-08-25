@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-645 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+647 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -817,6 +817,8 @@
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `recortar-prancha-n6.mjs` — Recorta deterministicamente a prancha N6 aprovada; cada vista vira evidência própria.
 - `recortar-prancha-n6.test.mjs` — Garante que a prancha aprovada não volte a ser consumida como mosaico.
+- `recortar-regioes-n6.mjs` — Deriva referências regionais N6 sem reinterpretar a imagem aprovada.
+- `recortar-regioes-n6.test.mjs` — Prova que toda referência regional N6 permanece vinculada à vista completa aprovada.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.

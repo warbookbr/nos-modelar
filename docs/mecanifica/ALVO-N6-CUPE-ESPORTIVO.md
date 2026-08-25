@@ -60,3 +60,12 @@ regeneradas para regressão. Reprovar ou `indeterminado` em qualquer região ou
 vista completa bloqueia a rodada. Nenhuma superfície livre, receita final ou
 montagem de partes ocorre antes de a blocagem integrada ser reconhecível e
 aprovada pelo usuário.
+
+O pacote inicial vive em `regioes/`: oito recortes derivados de quatro regiões
+e vinculados por `regioes/manifesto-regioes.json` à vista completa de origem,
+ao retângulo de recorte e aos hashes dos dois arquivos. O gerador
+`tools/mecanifica/recortar-regioes-n6.mjs` é determinístico: regenerar as
+referências não permite trocar carro, enquadramento ou escala silenciosamente.
+As três faixas de sobreposição declaradas no manifesto são gates próprios:
+dianteira↔cabine, cabine↔entrada lateral e entrada↔ombros/deck precisam
+continuar coerentes antes de uma região poder ser dada como corrigida.
