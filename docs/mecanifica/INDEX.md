@@ -423,6 +423,11 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   aplicar eliminação ali rende consertos certos num objeto que continua ruim.
+- **Antes de abrir experimento novo:** [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
+  (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`), o registro
+  vivo do que já falhou, e o [canário de casco](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
+  (`docs/mecanifica/RELATORIO-N6-CANARIO-CASCO-VISUAL.md`), a evidência
+  negativa mais recente. Rodada gasta redescobrindo algo já medido é falha V-31.
 - Peças versus montagens, carro, motor e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
 - Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA-V1.md`,

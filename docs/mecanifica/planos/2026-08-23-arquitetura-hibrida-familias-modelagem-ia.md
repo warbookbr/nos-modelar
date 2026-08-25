@@ -150,28 +150,20 @@ três restrições, C1 e diedro máximo ≤ 19°, e escolheu 0,16 para igualar a
 sagita sintética medida de 41,6 mm. Isto prova o mecanismo de busca, não um
 estilo automotivo. **N6.0** exige alvo aprovado e vistas individuais vinculadas por hash. A primeira N6.1, uma casca genérica por estações, foi reprovada visualmente e não é base. A reabertura N6.1 testa, sem detalhar nem criar peças soltas: (a) recortes regionais derivados das vistas completas, com câmera, escala e hash de origem preservados; (b) edição de uma **região nomeada da mesma carroceria contínua** — dianteira/capô e para-lamas, cabine/cintura, lateral/entrada, ombros/deck traseiro —; (c) comparação individual recorte↔render local e regressão nas quatro vistas completas; e (d) crítico cego que pode reprovar ou devolver `indeterminado`. Um recorte orienta e limita a correção local, mas não autoriza modelar frente, centro ou traseira como objetos a serem colados. Só uma rodada em que todos os marcos regionais e a leitura do conjunto sobrevivam abre superfície/receita; N4/N5 sozinhas não bastam.
 
-**Rejeição complementar de N6.** A interseção binária das silhuetas foi testada
-e reprovada nas quatro vistas individuais: malha única e IoU medem ocupação,
-mas não carregam arcos, cabine, cintura, entradas ou deck traseiro. O próximo
-canário só pode construir a mesma carroceria contínua a partir de marcos
-semânticos rastreáveis e patches com fronteiras compartilhadas; não pode
-refinar, suavizar nem reutilizar esse casco.
+**Rejeição complementar de N6.** A interseção binária das silhuetas foi testada e reprovada nas quatro vistas individuais: malha única e IoU medem ocupação, mas não carregam arcos, cabine, cintura, entradas ou deck traseiro. O próximo canário só pode construir a mesma carroceria contínua a partir de marcos semânticos rastreáveis e patches com fronteiras compartilhadas, e precisa dizer **o que é diferente** do que já reprovou; não pode refinar, suavizar nem reutilizar esse casco.
 
 ## Passivo declarado
 
 Um plano que ignora dívida deixa ela apodrecer. Fica registrado e datado:
 
 - **Sincronização N1/N2 concluída na abertura N3:** `fluxo-autoria-n1-caixa-preta` e `forma-global-n2-caixa-preta` acompanham `avaliarAlvo`/G00 e schema gerado; os quatro casos antes vermelhos precisam permanecer verdes;
-- planos congelados — P2, validação integrada e motor de prancha — não voltam
-  sem decisão explícita;
-- artefatos reprovados viram insumo do gate de calibração do N3.
+- planos congelados — P2, validação integrada e motor de prancha — não voltam sem decisão explícita;
+- artefatos reprovados viram insumo do gate de calibração do N3;
+- **V-08 reaberto:** o braço P95/máximo do canal C1 mede densidade de malha, não qualidade — o mesmo toro justo lê irregular em 36×16 e regular em 36×20, e a quebra sintética tem P95 abaixo dos controles sadios. Os gates de N4/N5 que usam "diedro máximo ≤ 19°" herdam isso. Ver `GOTCHAS-AUTORIA-VISUAL.md`, V-23.
 
 ## Aprovação, parada e saída honesta
 
-Toda prova decide **plataforma** e **artefato** em separado; capacidade aprovada
-com artefato reprovado é resultado válido e qualidade só fecha com os dois.
-Achado visual grave não é adiado. As camadas de validação seguem como estavam,
-mais percepção e procedência.
+Toda prova decide **plataforma** e **artefato** em separado; capacidade aprovada com artefato reprovado é resultado válido e qualidade só fecha com os dois. Achado visual grave não é adiado. As camadas de validação seguem como estavam, mais percepção e procedência.
 
 A condição de encerramento tem **dois braços**, e o segundo veio da auditoria:
 
