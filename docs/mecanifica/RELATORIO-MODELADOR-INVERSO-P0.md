@@ -1,6 +1,6 @@
 # Relatório P0 — confiança antes de geometria
 
-**Estado:** aberto, P0-B executado; P0-A pendente e P0-C aguardando execução independente
+**Estado:** aberto, P0-A e P0-B executados; P0-C aguardando execução independente
 **Plano:** [`planos/2026-08-25-modelador-inverso-priors-familia.md`](planos/2026-08-25-modelador-inverso-priors-familia.md)
 **Execução detalhada:** [`../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
 
@@ -24,11 +24,23 @@ timeouts adicionais (17 falhas). Ela foi preservada como sinal de saturação,
 mas não usada como baseline causal; a repetição sem concorrência voltou às 11
 falhas determinísticas acima.
 
+## Registro P0-A — revalidação local, 2026-08-25
+
+- A resolução portátil de `repo://` e a importação isolada do perfil MCP já
+  estavam corrigidas no checkout. Restava somente a árvore local residual
+  `prototipos/fps/v3`: ela não era rastreada pelo Git e foi removida antes da
+  reexecução.
+- `npm test` foi executado isoladamente até o encerramento: **132 arquivos de
+  teste passaram; 1.296 testes passaram e 2 ficaram ignorados**. Duração
+  registrada pelo Vitest: 31,78 s.
+- Este resultado fecha **P0-A neste checkout Windows**. Ele não calibra o
+  crítico, não qualifica um veículo e não autoriza P1 por si só.
+
 ## Vereditos
 
 | Braço | Estado | Evidência exigida |
 | --- | --- | --- |
-| P0-A — linha de base | bloqueado | todos os gates oficiais verdes no mesmo checkout Windows |
+| P0-A — linha de base | aprovado localmente | 132 arquivos / 1.296 testes verdes no mesmo checkout Windows |
 | P0-B — alvo | aprovado localmente | contrato de qualificação + canário geométrico calibrado |
 | P0-C — avaliador | bloqueado por execução independente | corpus, repetições embaralhadas, holdout e intervalos |
 
