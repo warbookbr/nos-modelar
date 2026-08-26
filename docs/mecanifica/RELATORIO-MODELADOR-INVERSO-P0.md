@@ -81,10 +81,20 @@ falhas determinísticas acima.
 - As respostas externas carregam provedor, modelo, hash de prompt, achados
   regionais, confiança e assinatura própria; não carregam gabarito nem ID do
   item.
+- `tools/modelagem/analisar-calibracao-critico.mjs` mede somente respostas já
+  ingeridas: unanimidade de quatro respostas por item, acerto (sem unanimidade
+  é erro), matriz de confusão, promoção de defeito grosseiro e bootstrap de
+  95% reamostrando os **objetos** holdout. O melhor baseline constante é
+  escolhido exclusivamente na calibração e então avaliado no holdout. O
+  resultado de uma fixture ou de origem não independente fica
+  `indeterminado`; o analisador não transforma teste local em execução externa.
 - `npx vitest run tools/modelagem/validar-corpus-avaliacao.test.mjs
   tools/modelagem/contrato-julgamento-critico.test.mjs
   tools/modelagem/orquestrar-calibracao-critico.test.mjs
-  tools/modelagem/gerar-corpus-p0.test.mjs` passou (4/4) no protocolo v2.
+  tools/modelagem/gerar-corpus-p0.test.mjs
+  tools/modelagem/analisar-calibracao-critico.test.mjs` passa nos casos de
+  transporte, bootstrap agrupado e veto de promoção grosseira. Isto testa a
+  ferramenta; não é resultado de crítico.
 
 **Decisão P0-C:** `bloqueado por execução independente`. O corpus sintético
 calibra apenas repetibilidade sobre defeitos definidos por construção; ele não
