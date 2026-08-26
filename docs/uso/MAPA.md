@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-670 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+672 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -871,6 +871,8 @@
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
 - `gerar-canario-geometrico-p0.mjs` — Canário P0: fixture sintética calibrada para provar o fluxo de fitting.
 - `gerar-canario-geometrico-p0.test.mjs` — Canário P0: prova o contrato calibrado, não qualidade de modelagem.
+- `gerar-corpus-p0.mjs` — Gera controles visuais sintéticos P0. Não representa produto, veículo ou humanoide aprovados.
+- `gerar-corpus-p0.test.mjs` — Corpus sintético P0: estímulos rastreáveis para calibrar crítico, não modelos de produto.
 - `inventariar-candidatos-corpus-p0.mjs` — Varre V-01..V-32 e registra candidatas sem confundir arquivo existente com controle pronto.
 - `inventariar-candidatos-corpus-p0.test.mjs` — Inventário não promove uma evidência: só torna ausência e insuficiência visíveis.
 - `orquestrar-calibracao-critico.mjs` — Transporte offline: exporta estímulos cegos e ingere respostas assinadas.

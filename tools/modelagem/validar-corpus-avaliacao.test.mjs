@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { validarCorpusAvaliacaoP0 } from './validar-corpus-avaliacao.mjs';
+import { gerarCorpusP0 } from './gerar-corpus-p0.mjs';
 
 const raiz = resolve(import.meta.dirname, '..', '..');
 const hash = (n) => `sha256:${n.toString(16).padStart(64, '0')}`;
@@ -27,9 +28,10 @@ function corpusCongelado() {
 }
 
 describe('validador do corpus de avaliação P0', () => {
-  it('mantém o manifesto atual honesto enquanto os controles não existem', () => {
+  it('aceita o manifesto gerado somente quando os controles existem', () => {
+    gerarCorpusP0();
     const manifesto = JSON.parse(readFileSync(resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0/manifesto.json'), 'utf8'));
-    expect(validarCorpusAvaliacaoP0(manifesto)).toMatchObject({ prontoParaCritico: false, estado: 'pendente-de-coleta' });
+    expect(validarCorpusAvaliacaoP0(manifesto)).toMatchObject({ prontoParaCritico: true, estado: 'congelado', itensHoldout: 80 });
   });
 
   it('aceita somente holdout balanceado por objeto e repetido nas duas ordens', () => {

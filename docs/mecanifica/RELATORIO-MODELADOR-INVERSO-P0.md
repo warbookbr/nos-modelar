@@ -30,7 +30,7 @@ falhas determinísticas acima.
 | --- | --- | --- |
 | P0-A — linha de base | bloqueado | todos os gates oficiais verdes no mesmo checkout Windows |
 | P0-B — alvo | aprovado localmente | contrato de qualificação + canário geométrico calibrado |
-| P0-C — avaliador | bloqueado por insumos | corpus, repetições embaralhadas, holdout e intervalos |
+| P0-C — avaliador | bloqueado por execução independente | corpus, repetições embaralhadas, holdout e intervalos |
 
 **Decisão P0:** aberta. P1 não está autorizada.
 
@@ -53,9 +53,11 @@ falhas determinísticas acima.
 
 ## Registro P0-C — infraestrutura, 2026-08-25
 
-- O manifesto `autoria-assistida/avaliacao/corpus-p0/manifesto.json` está em
-  `pendente-de-coleta`, sem itens. Ele enumera as lacunas em vez de preencher
-  controles, V-01..V-32 ou resultados com conteúdo sintético não observado.
+- O manifesto `autoria-assistida/avaliacao/corpus-p0/manifesto.json` foi
+  congelado com 20 objetos holdout e cinco objetos de calibração separados. Os
+  100 itens têm duas evidências SVG individuais com hash: 80 holdout balanceados
+  (40 decisivos, dos quais 20 grosseiros, 20 empates e 20 indeterminados) e 20
+  itens de calibração. Isso gera 400 apresentações cegas A/B.
 - O inventário gerado de V-01..V-32 encontrou evidência individual em apenas
   sete candidatas e marcou as 32 como **inelegíveis**: nenhum registro contém
   ainda par A/B, resposta conhecida, pergunta congelada, quatro apresentações
@@ -72,11 +74,12 @@ falhas determinísticas acima.
   tools/modelagem/contrato-julgamento-critico.test.mjs
   tools/modelagem/orquestrar-calibracao-critico.test.mjs` passou (6/6).
 
-**Decisão P0-C:** `bloqueado por insumos`. Ainda faltam os 20 objetos e suas
-evidências individuais, a seleção controlada dos casos V-01..V-32 e as
-execuções de um crítico independente. O transporte e o validador não substituem
-nenhum desses dados; sem eles não há bootstrap, limiar, holdout revelado nem
-autorização para P1.
+**Decisão P0-C:** `bloqueado por execução independente`. O corpus sintético
+calibra apenas repetibilidade sobre defeitos definidos por construção; ele não
+prova reconhecimento de carro ou humanoide. Ainda faltam as execuções de um
+crítico externo, a escolha do limiar só na calibração, o holdout fechado, o
+bootstrap por objeto e a verificação de zero promoção grosseira. Sem isso não
+há autorização para P1.
 
 ## Regra de atualização
 

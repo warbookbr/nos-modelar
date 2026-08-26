@@ -1,11 +1,4808 @@
 {
   "formato": "mecanifica.corpus-avaliacao-p0@1",
-  "estado": "pendente-de-coleta",
-  "itens": [],
-  "lacunas": [
-    "vinte-objetos-de-origem-com-evidencia-individual-rastreavel",
-    "oitenta-itens-holdout-balanceados",
-    "controles-v01-a-v32-com-hash-e-severidade",
-    "critico-independente-configurado-para-execucao-fria"
+  "estado": "congelado",
+  "escopo": "controles visuais sintéticos para calibrar repetibilidade; não demonstram qualidade automotiva ou humanoide",
+  "semente": "p0-corpus-sintetico-01",
+  "itens": [
+    {
+      "id": "holdout-esfera-regular-1",
+      "split": "holdout",
+      "objeto": "esfera-regular",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i001-a.svg",
+          "sha256": "sha256:163d1b2a8615cfe29703b6d060f2366dca89bff719f0375c7623fd952b9d664f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i001-b.svg",
+          "sha256": "sha256:3423263b17d8c52916c2033cd5afd4be99e12afe48f629cb5848c06388f6f702"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-esfera-regular-2",
+      "split": "holdout",
+      "objeto": "esfera-regular",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i002-a.svg",
+          "sha256": "sha256:821d1bec030834e21bed7b657dd7b15dbf15872cc3d2e8a4e3913382917727bc"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i002-b.svg",
+          "sha256": "sha256:f8798e204f1b880e7f90054733012c5d543b277e90dd918b965dd8c0f4e842b6"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-esfera-regular-3",
+      "split": "holdout",
+      "objeto": "esfera-regular",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i003-a.svg",
+          "sha256": "sha256:58659797c3c5916401763ff2c0c1580e3a5731086efb9f88c2de77c2415e7733"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i003-b.svg",
+          "sha256": "sha256:58659797c3c5916401763ff2c0c1580e3a5731086efb9f88c2de77c2415e7733"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-esfera-regular-4",
+      "split": "holdout",
+      "objeto": "esfera-regular",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i004-a.svg",
+          "sha256": "sha256:3c1a7823e49cdffb67cac57bfca52a2fd6e8d2f51cb9504555c11b5325d48dc4"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i004-b.svg",
+          "sha256": "sha256:dc8c528f18b18d425d83f3aeab8c325918f12ada8948516fcc8661aadd54b27d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-toro-regular-1",
+      "split": "holdout",
+      "objeto": "toro-regular",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i005-a.svg",
+          "sha256": "sha256:d670357bdc03f9256a38619be0d3b66b21d84aa605b5cdcb6a3ff573690796b9"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i005-b.svg",
+          "sha256": "sha256:9b0c24b1a8f48aa6268e6661874976ec20a03bf85d187267888b6d2672d6a439"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-toro-regular-2",
+      "split": "holdout",
+      "objeto": "toro-regular",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i006-a.svg",
+          "sha256": "sha256:4facc41067b092869a3502c88c5f08935b01fbc6b7f7ad6d170e3fa00b5d5e8a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i006-b.svg",
+          "sha256": "sha256:b759afc27fdd182db750f3bfe3b5cdc5d25099d2aa31717c0713aec344c77756"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-toro-regular-3",
+      "split": "holdout",
+      "objeto": "toro-regular",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i007-a.svg",
+          "sha256": "sha256:f6e298f11463853c77035e785f22ffa76f0960e98687d4cb406b1c3a5f6a179f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i007-b.svg",
+          "sha256": "sha256:f6e298f11463853c77035e785f22ffa76f0960e98687d4cb406b1c3a5f6a179f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-toro-regular-4",
+      "split": "holdout",
+      "objeto": "toro-regular",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i008-a.svg",
+          "sha256": "sha256:884ec5c5c632e5358bacf30def4686e07eb8b3bf05af82c0ddaa6deb3c456ebf"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i008-b.svg",
+          "sha256": "sha256:b3dfa32166fb00b2990edcf45596cc9264086f39849f5b4dbeb9aefedc218f4f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-patch-justo-1",
+      "split": "holdout",
+      "objeto": "patch-justo",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i009-a.svg",
+          "sha256": "sha256:33780b4acc3001754863c339f318c7334664b2daf73ebf6ffe310339c68eaa00"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i009-b.svg",
+          "sha256": "sha256:e5ea1842e67df3d99d457453f153b5abc2fbefe00d55a6661be2dbc3a195a470"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-patch-justo-2",
+      "split": "holdout",
+      "objeto": "patch-justo",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i010-a.svg",
+          "sha256": "sha256:72252491d00573e3bbe2d8ced3e996551d6c8b542d8aa54e44091e1152015039"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i010-b.svg",
+          "sha256": "sha256:bb267ea3aa28f6f5654913a2727b970d5a3d9e57c119b67a63ad7e83e2963c78"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-patch-justo-3",
+      "split": "holdout",
+      "objeto": "patch-justo",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i011-a.svg",
+          "sha256": "sha256:b2bdc151e4f87e161d35010327bc9a3ac0bb9a7b91824b197cea50ceb1a78553"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i011-b.svg",
+          "sha256": "sha256:b2bdc151e4f87e161d35010327bc9a3ac0bb9a7b91824b197cea50ceb1a78553"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-patch-justo-4",
+      "split": "holdout",
+      "objeto": "patch-justo",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i012-a.svg",
+          "sha256": "sha256:c537562e794a5501e82941c19f27d03ef7728d501c4a835db73d07f0018a52e7"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i012-b.svg",
+          "sha256": "sha256:bae3f3ac45e61c320514c083089c6651c7e808081ea4bf3d062ae65ae6662bd0"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-prisma-cunha-1",
+      "split": "holdout",
+      "objeto": "prisma-cunha",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i013-a.svg",
+          "sha256": "sha256:df782bd5c6be51015ddd3268367bcfbc7eeb957c54e53c0acea78a93a98f5230"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i013-b.svg",
+          "sha256": "sha256:9aa3d29912baae675e067ba5d35a20dbe0e15c5109d4ce95da253ef71d1e39b9"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-prisma-cunha-2",
+      "split": "holdout",
+      "objeto": "prisma-cunha",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i014-a.svg",
+          "sha256": "sha256:b1645491608ac6935e64ad4ae12db62be70f0b3799e23ce88f5e64d9bd5199ef"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i014-b.svg",
+          "sha256": "sha256:74d942fbbc46056b074afdd4675c0f12e3eb20dc000645ce8a6e6d5998834c22"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-prisma-cunha-3",
+      "split": "holdout",
+      "objeto": "prisma-cunha",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i015-a.svg",
+          "sha256": "sha256:6b6479b51361a609062e5b828793c9ede7a9fa7e51f5c2393c8b4f5d75072592"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i015-b.svg",
+          "sha256": "sha256:6b6479b51361a609062e5b828793c9ede7a9fa7e51f5c2393c8b4f5d75072592"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-prisma-cunha-4",
+      "split": "holdout",
+      "objeto": "prisma-cunha",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i016-a.svg",
+          "sha256": "sha256:c131f7512df373f5151681c0d7fda36723a88fe0936f70bcc15b299277b95fb5"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i016-b.svg",
+          "sha256": "sha256:6d620c703d0ea880d192ed3d9924311cf0835e00a9df329f2e2ec82d5a241130"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-bloco-filetado-1",
+      "split": "holdout",
+      "objeto": "bloco-filetado",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i017-a.svg",
+          "sha256": "sha256:9b1db70e475314c119aa2d67ea57faafe565a39d026724cce3dc1129c139cb20"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i017-b.svg",
+          "sha256": "sha256:701ed7a139b3b8ae9bf0571fe64db06cdf5282e79fc7141a1cb60721d210d0a1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-bloco-filetado-2",
+      "split": "holdout",
+      "objeto": "bloco-filetado",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i018-a.svg",
+          "sha256": "sha256:51c15f6b3a666392d08d30a4e6b963932e4b1bf6feef9aea2a20be62aa7e0616"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i018-b.svg",
+          "sha256": "sha256:780bbae66dc6805e49cfd7c8b9e86ae4660567ec46fc5339eb6ab7777248808f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-bloco-filetado-3",
+      "split": "holdout",
+      "objeto": "bloco-filetado",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i019-a.svg",
+          "sha256": "sha256:a1ed737b47f3cf7087b62df5723e981c9cb83e971c43b6b11bace188b88d4884"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i019-b.svg",
+          "sha256": "sha256:a1ed737b47f3cf7087b62df5723e981c9cb83e971c43b6b11bace188b88d4884"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-bloco-filetado-4",
+      "split": "holdout",
+      "objeto": "bloco-filetado",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i020-a.svg",
+          "sha256": "sha256:9aa9e5d409a7e84e2f216c8839b1fb70ee354cc4cb58c1d5a7cee9462d2aa3b4"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i020-b.svg",
+          "sha256": "sha256:d3adaa0e5c662cc1d4575c28d3b077c84e7953b99e46d657be070ade7e660e9f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-cilindro-oco-1",
+      "split": "holdout",
+      "objeto": "cilindro-oco",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i021-a.svg",
+          "sha256": "sha256:8081df5511039c2d6d0e6c4976219a08a82b0e5f47026a3def2f0f9ffa6e3a19"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i021-b.svg",
+          "sha256": "sha256:92dae6b5dd2eb691c62bdf2ff83d428e9ea5faf3824802384dab7c1b9560024d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-cilindro-oco-2",
+      "split": "holdout",
+      "objeto": "cilindro-oco",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i022-a.svg",
+          "sha256": "sha256:d95a0ff3d9e20ce7e1f55209b6c87726ea2725d3d760d1796436314c66dd93dc"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i022-b.svg",
+          "sha256": "sha256:fb56cf191d30d7e0447ae4e6918e88bd140af938965b7c8b1ecc9b762e94e649"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-cilindro-oco-3",
+      "split": "holdout",
+      "objeto": "cilindro-oco",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i023-a.svg",
+          "sha256": "sha256:6301eae5c87c33982594799094c64858bf1e606f57df1b7dc8c7f1949595603a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i023-b.svg",
+          "sha256": "sha256:6301eae5c87c33982594799094c64858bf1e606f57df1b7dc8c7f1949595603a"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-cilindro-oco-4",
+      "split": "holdout",
+      "objeto": "cilindro-oco",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i024-a.svg",
+          "sha256": "sha256:96de158e4a3bef05126505e4c1a322f2e35f2eac622582c5a6e6df194cd6eb4d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i024-b.svg",
+          "sha256": "sha256:cb13e2b2e61c51adc93d62bbe75e90b1fc16399dd4e99b7828202d73abb759ca"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-engrenagem-simples-1",
+      "split": "holdout",
+      "objeto": "engrenagem-simples",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i025-a.svg",
+          "sha256": "sha256:416b002d9a8e84228fd0fe18f8c3ad277ae31b768c2ffece9fd18c37558f9753"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i025-b.svg",
+          "sha256": "sha256:b6b3970e97577d855ef50e99d694bc2f1d97004be1ee419b8395f0d4867f77e4"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-engrenagem-simples-2",
+      "split": "holdout",
+      "objeto": "engrenagem-simples",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i026-a.svg",
+          "sha256": "sha256:9b01407b3070da3f602589016a2c883d6714db8f00898582a03842f080ace0a5"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i026-b.svg",
+          "sha256": "sha256:2c53de0f3d43b0654f94c9f937c741fda573cfea841fda0051b4762ed17a57fc"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-engrenagem-simples-3",
+      "split": "holdout",
+      "objeto": "engrenagem-simples",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i027-a.svg",
+          "sha256": "sha256:c8632a9e245d248708e22a1a357ec0dbe3f159deb1031688e61fda379378825e"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i027-b.svg",
+          "sha256": "sha256:c8632a9e245d248708e22a1a357ec0dbe3f159deb1031688e61fda379378825e"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-engrenagem-simples-4",
+      "split": "holdout",
+      "objeto": "engrenagem-simples",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i028-a.svg",
+          "sha256": "sha256:af1092d2f729c6f7b7ca7e66a2bf1fa33fc8089978c913da2d2d8bbfb1fd5986"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i028-b.svg",
+          "sha256": "sha256:f14ac16412190c8dd1eb2e501ad6279d8f70ca559be14e717846953962d215c6"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-flange-1",
+      "split": "holdout",
+      "objeto": "flange",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i029-a.svg",
+          "sha256": "sha256:48cf120efa495d815dd63026e58749077769732d328b46fadda59a197566e7f2"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i029-b.svg",
+          "sha256": "sha256:40082fceaa8d927663e3a80fb6cf01b2400bcb00f8bb68d3dd1c47e3eeb82c72"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-flange-2",
+      "split": "holdout",
+      "objeto": "flange",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i030-a.svg",
+          "sha256": "sha256:cf8345c1ff4f0ccbefc091a7e84256d1387d7b7e0e2acae4d5fcdbcf5de921fd"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i030-b.svg",
+          "sha256": "sha256:84a412dbaed4ca6a1a25b7ac49b90c6a99c057071d239ece49bbb2393b33231f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-flange-3",
+      "split": "holdout",
+      "objeto": "flange",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i031-a.svg",
+          "sha256": "sha256:a4049327ffa3dfb44795a7d0babf662b767a7a4047ded8b6bfb7e2096ebfb7b1"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i031-b.svg",
+          "sha256": "sha256:a4049327ffa3dfb44795a7d0babf662b767a7a4047ded8b6bfb7e2096ebfb7b1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-flange-4",
+      "split": "holdout",
+      "objeto": "flange",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i032-a.svg",
+          "sha256": "sha256:fad13ff783f80dcff7a891d388b4d2b378414c2c0a7c090d5ed07ba011f2d141"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i032-b.svg",
+          "sha256": "sha256:69a7ea010d5d19bd51081bbcc0523eb8f4ee65442ab1973d6312be0a42312d1b"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-dobradica-integra-1",
+      "split": "holdout",
+      "objeto": "dobradica-integra",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i033-a.svg",
+          "sha256": "sha256:d2d86b4b1412bcc2911b682e7117b1f5572931695c7bd67a77fbf51754ecc5dd"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i033-b.svg",
+          "sha256": "sha256:1f3c3abb2cff623e806ad3c0154c9c1b0989454130e267423c11cca17bd2ecbf"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-dobradica-integra-2",
+      "split": "holdout",
+      "objeto": "dobradica-integra",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i034-a.svg",
+          "sha256": "sha256:0e49d9a92d29b01eb8dd1b0628f9e1d65271578aac7554293a7ceb23b88dd964"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i034-b.svg",
+          "sha256": "sha256:f718e738121dc9dbb2cd746698f5069fa4fe41b887d07f3e5d32cd036408a733"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-dobradica-integra-3",
+      "split": "holdout",
+      "objeto": "dobradica-integra",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i035-a.svg",
+          "sha256": "sha256:4ff9beb802e2a73de02e7f447cfcba9bf77a81e8e0eb6f1596db61266a303f63"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i035-b.svg",
+          "sha256": "sha256:4ff9beb802e2a73de02e7f447cfcba9bf77a81e8e0eb6f1596db61266a303f63"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-dobradica-integra-4",
+      "split": "holdout",
+      "objeto": "dobradica-integra",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i036-a.svg",
+          "sha256": "sha256:ba6c0a70b854681422c2f27a0ae73f101253b75e24dde13bce5b80f062240ab9"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i036-b.svg",
+          "sha256": "sha256:8e6856f74e94744c5f0e4be6130bcc8c2610e7fb0a77a61d2656850c41d96e7b"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-freio-disco-1",
+      "split": "holdout",
+      "objeto": "freio-disco",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i037-a.svg",
+          "sha256": "sha256:3764dec02576f1307f46c821e4e6acba2bbeeb19cceae3673bc76edba5b8d80f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i037-b.svg",
+          "sha256": "sha256:5edc76a9c44d76a501857fcb0f0ce44c5afbc41d6c5b55a7313fdd238cd0be8b"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-freio-disco-2",
+      "split": "holdout",
+      "objeto": "freio-disco",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i038-a.svg",
+          "sha256": "sha256:12ae76e15f3354362525df42bd87edb485706d5608235c145ef047072073c496"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i038-b.svg",
+          "sha256": "sha256:d4b84b911540670afd9587a9cb29175bce381c996f7e5d12aa41fd820f12b989"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-freio-disco-3",
+      "split": "holdout",
+      "objeto": "freio-disco",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i039-a.svg",
+          "sha256": "sha256:3e0e161c882298cafec5ae9a13d5b43ab0e18b1a3578d9790fe67453d82b9b18"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i039-b.svg",
+          "sha256": "sha256:3e0e161c882298cafec5ae9a13d5b43ab0e18b1a3578d9790fe67453d82b9b18"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-freio-disco-4",
+      "split": "holdout",
+      "objeto": "freio-disco",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i040-a.svg",
+          "sha256": "sha256:65ba57198e620c42f3ecb9cf4c68a64ffd04b4f33a99e8d2bf76f85052c7148a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i040-b.svg",
+          "sha256": "sha256:6311e07825ad49c2199d5a831458056699542419631e791ff038360029383ef9"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-eixo-acoplado-1",
+      "split": "holdout",
+      "objeto": "eixo-acoplado",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i041-a.svg",
+          "sha256": "sha256:fa7edcaa8482f0eec41c57243885e3c3c301e151a1c3de8b7c718a5a475ca172"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i041-b.svg",
+          "sha256": "sha256:bdb348de982ac89ac18751a5316f096b5ad6e977d69d03f786c7ba85d0987c2d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-eixo-acoplado-2",
+      "split": "holdout",
+      "objeto": "eixo-acoplado",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i042-a.svg",
+          "sha256": "sha256:7dcd75e04c3b7f8c85e4cfb8f1e2f7081ad31f704eb743954f9fd23bb3ed4a3e"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i042-b.svg",
+          "sha256": "sha256:8e04c83ba53f88c6661d54203ba102721c350de4ddbebb024d2bbadc8ac0074e"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-eixo-acoplado-3",
+      "split": "holdout",
+      "objeto": "eixo-acoplado",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i043-a.svg",
+          "sha256": "sha256:267ad62f8d6b9a691831c26f4f67e2013b2964a91d24749472d89f6d008990f3"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i043-b.svg",
+          "sha256": "sha256:267ad62f8d6b9a691831c26f4f67e2013b2964a91d24749472d89f6d008990f3"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-eixo-acoplado-4",
+      "split": "holdout",
+      "objeto": "eixo-acoplado",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i044-a.svg",
+          "sha256": "sha256:35c524ca5ee62156cee34f1836793f99b9bec6cfce65b5e953ff4649147d7c6b"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i044-b.svg",
+          "sha256": "sha256:e706f58174c80eaea331e67426ec6a216e8fe49a3859600e2f716ca1172304bb"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-placa-adaptadora-1",
+      "split": "holdout",
+      "objeto": "placa-adaptadora",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i045-a.svg",
+          "sha256": "sha256:8fe6f567ab1cf184d336c2f7e22aff9834ce1c90830485fd21d74b98ed18110d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i045-b.svg",
+          "sha256": "sha256:1a8030576802ef0b064eb4c3af8c2732a55fc62e901d4926f765c50d4a89d01f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-placa-adaptadora-2",
+      "split": "holdout",
+      "objeto": "placa-adaptadora",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i046-a.svg",
+          "sha256": "sha256:7fcb559d3624a503ee6b031072ce9679b1795852807bdca9e43976bad12ff864"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i046-b.svg",
+          "sha256": "sha256:08e0b3306d4714369cd00c8ebc1e8148c1a9d174d98d547e7dd026549b52fcc1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-placa-adaptadora-3",
+      "split": "holdout",
+      "objeto": "placa-adaptadora",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i047-a.svg",
+          "sha256": "sha256:21bb525e76c49da16f14b927ae7e3aefc75e576f7786f2f286d81913d74617b1"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i047-b.svg",
+          "sha256": "sha256:21bb525e76c49da16f14b927ae7e3aefc75e576f7786f2f286d81913d74617b1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-placa-adaptadora-4",
+      "split": "holdout",
+      "objeto": "placa-adaptadora",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i048-a.svg",
+          "sha256": "sha256:9802b727e996e5daf61a6810e3f89d380b7ca85899c36f9f0381ea29af824c0d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i048-b.svg",
+          "sha256": "sha256:603bcc359286d9fe7f996349e63bbceda3963f26d7b2cb0a3dd2228c222292c8"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-conjunto-dianteiro-1",
+      "split": "holdout",
+      "objeto": "conjunto-dianteiro",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i049-a.svg",
+          "sha256": "sha256:debe589a475b30ea871bf5826cacc23bb997392f9b7685f7ef32d541516f5456"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i049-b.svg",
+          "sha256": "sha256:09837a49502462e4d9f2091e6b4a1ecf9b4aec7c5b125c94cc8e1aa91e1cd63c"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-conjunto-dianteiro-2",
+      "split": "holdout",
+      "objeto": "conjunto-dianteiro",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i050-a.svg",
+          "sha256": "sha256:ddd6dfa04fcc78ddaa190be20ef0e4b3c6abffd51c899038c145c3afeac53d73"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i050-b.svg",
+          "sha256": "sha256:1134744184de6fad601b22fd45243f4c4d1c246cac543d4384d6f0838e604ef4"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-conjunto-dianteiro-3",
+      "split": "holdout",
+      "objeto": "conjunto-dianteiro",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i051-a.svg",
+          "sha256": "sha256:34ce44da7a604b2c9630156814f0ff992f49d7e31c5c9b955927fa6e02b9bb3c"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i051-b.svg",
+          "sha256": "sha256:34ce44da7a604b2c9630156814f0ff992f49d7e31c5c9b955927fa6e02b9bb3c"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-conjunto-dianteiro-4",
+      "split": "holdout",
+      "objeto": "conjunto-dianteiro",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i052-a.svg",
+          "sha256": "sha256:9c5af12619f9f7bf62cd3f5b194bd841590b116acb345e2d5a79145a5356a873"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i052-b.svg",
+          "sha256": "sha256:313362346393012ed82f01259a385709a40a77f41ab108010e2b90c4516a80e5"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-capsula-1",
+      "split": "holdout",
+      "objeto": "casco-capsula",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i053-a.svg",
+          "sha256": "sha256:c663e9268a10edd1db2142446240c9815a4cceeb8146e1e16e32545fce5a59e5"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i053-b.svg",
+          "sha256": "sha256:a35aed4b87c723cc0c89c2bf40660396163bb48e1eb9f6643a783bf2d8bc2d4d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-capsula-2",
+      "split": "holdout",
+      "objeto": "casco-capsula",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i054-a.svg",
+          "sha256": "sha256:c3594dbd1418b8fa08b88ba707ca5292eba956cb46539012648a333e68619fa4"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i054-b.svg",
+          "sha256": "sha256:a7cc1a521f7097a5f8f0d808bf1f7726ab90cf6964f5299d698b0559c63c4078"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-capsula-3",
+      "split": "holdout",
+      "objeto": "casco-capsula",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i055-a.svg",
+          "sha256": "sha256:8e8db9ce1ab6ab4f7444f0da6fb4c258634d475b8be4ff787c03c86b2beb3208"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i055-b.svg",
+          "sha256": "sha256:8e8db9ce1ab6ab4f7444f0da6fb4c258634d475b8be4ff787c03c86b2beb3208"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-capsula-4",
+      "split": "holdout",
+      "objeto": "casco-capsula",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i056-a.svg",
+          "sha256": "sha256:2e71ac3ef18f894735fcaf91c943e7e483aa56f1cec38a2188cab83f8272f85a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i056-b.svg",
+          "sha256": "sha256:5609cd756a8984093228e1b223feadc86a171abdf3046113107dfa5f1ec1c798"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-silhueta-1",
+      "split": "holdout",
+      "objeto": "casco-silhueta",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i057-a.svg",
+          "sha256": "sha256:c009846dc79c436ac88408b7ada7c4bc3475dfea5015f1108cc1979de9e34607"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i057-b.svg",
+          "sha256": "sha256:449d246cd75d5d2988fc709145f8d325bfb1629e252c65c241cadda5773a33de"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-silhueta-2",
+      "split": "holdout",
+      "objeto": "casco-silhueta",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i058-a.svg",
+          "sha256": "sha256:1c2de3fe4804bb25d33f340055c36d40cb85b1e23bc9fd40e430d2ef59ea1879"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i058-b.svg",
+          "sha256": "sha256:44d504c521ad2b5804d0e41df5079c8e44d1d6481822d07210a430d66aa41dff"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-silhueta-3",
+      "split": "holdout",
+      "objeto": "casco-silhueta",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i059-a.svg",
+          "sha256": "sha256:d1f30feee0f049b66d36f905378bdd4db1ad20d41ebc13dede7ab25f038143c1"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i059-b.svg",
+          "sha256": "sha256:d1f30feee0f049b66d36f905378bdd4db1ad20d41ebc13dede7ab25f038143c1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-casco-silhueta-4",
+      "split": "holdout",
+      "objeto": "casco-silhueta",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i060-a.svg",
+          "sha256": "sha256:d52c09938726c2acde790180c8450491b1e8ee0b79b0e7f1d0913fb03ed4c745"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i060-b.svg",
+          "sha256": "sha256:bed383d0e2a7fd2c5c38dedc39bd9f4c00da5bccda3d78073ea38633eaee3742"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-carroceria-loft-1",
+      "split": "holdout",
+      "objeto": "carroceria-loft",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i061-a.svg",
+          "sha256": "sha256:83133a39c1fa0fd86966d7121d262f103a74ed257f539e7b5b9c9a6f98eadb4b"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i061-b.svg",
+          "sha256": "sha256:d662409a9a0823a16489a07fd25c278a1f300beb569720adbfa241e6ddaaaa73"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-carroceria-loft-2",
+      "split": "holdout",
+      "objeto": "carroceria-loft",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i062-a.svg",
+          "sha256": "sha256:b133b1e63e28b5182462a26cf696f48617f7c74c8ef9489809c0ab0b4eca54bd"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i062-b.svg",
+          "sha256": "sha256:4b9caafe211761e80b281ca33d507bc6e16790e76c78fb1b53fea05a547fe592"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-carroceria-loft-3",
+      "split": "holdout",
+      "objeto": "carroceria-loft",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i063-a.svg",
+          "sha256": "sha256:cc9b3c7ac0714a9a6bc49495f8394500038d0f3cd1b210310dcab144b881d9a2"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i063-b.svg",
+          "sha256": "sha256:cc9b3c7ac0714a9a6bc49495f8394500038d0f3cd1b210310dcab144b881d9a2"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-carroceria-loft-4",
+      "split": "holdout",
+      "objeto": "carroceria-loft",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i064-a.svg",
+          "sha256": "sha256:6442898fa4a5cfa9734a484cc09482b5d802d7380638657348565c4195259f9d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i064-b.svg",
+          "sha256": "sha256:942829d778769e8d49aa2ced2176784738acf2b250ca0de47b29554c9a9f6169"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-supercarro-desconexo-1",
+      "split": "holdout",
+      "objeto": "supercarro-desconexo",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i065-a.svg",
+          "sha256": "sha256:df084894dfa06d58bd38a7b4bfcfe3a5fa2d7af4d1071b4c4ca301c784e284a0"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i065-b.svg",
+          "sha256": "sha256:0a3c0068536421bee3800ad872fc0ae7b844243c6f000d836ce185c0dc374d37"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-supercarro-desconexo-2",
+      "split": "holdout",
+      "objeto": "supercarro-desconexo",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i066-a.svg",
+          "sha256": "sha256:77ffd659d0baa1d429315af5374f8bc9921062f492b4bbbf87d4dfa39ce77228"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i066-b.svg",
+          "sha256": "sha256:31838ad8c848dd7263b2dbbfca36da24408787eb0e83a1379aa66ed490b19a15"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-supercarro-desconexo-3",
+      "split": "holdout",
+      "objeto": "supercarro-desconexo",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i067-a.svg",
+          "sha256": "sha256:5d500100ea31d4fa8588a33d3f1a5b4985d9ea688afe2511fe2d03eebc54a8b4"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i067-b.svg",
+          "sha256": "sha256:5d500100ea31d4fa8588a33d3f1a5b4985d9ea688afe2511fe2d03eebc54a8b4"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-supercarro-desconexo-4",
+      "split": "holdout",
+      "objeto": "supercarro-desconexo",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i068-a.svg",
+          "sha256": "sha256:ffd40809b95895dd7c3ee5fd0457d9b0f3ec59677989410be51cdc55eda983e7"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i068-b.svg",
+          "sha256": "sha256:ba506b1d1ddf40ebf7965c7b15d4e44084b2c5d334ecb6906fe57d639665bb7e"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-veiculo-rodas-soltas-1",
+      "split": "holdout",
+      "objeto": "veiculo-rodas-soltas",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i069-a.svg",
+          "sha256": "sha256:dcb20338792dd112296df35cad507cef10035b00cf6af5ecf4cba6817b17f222"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i069-b.svg",
+          "sha256": "sha256:c84048a52c96b7d7c76802c90d487602c30f02e3fc3921967c89ea9449d0adcb"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-veiculo-rodas-soltas-2",
+      "split": "holdout",
+      "objeto": "veiculo-rodas-soltas",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i070-a.svg",
+          "sha256": "sha256:7f77c7872d62f8f369eab17467f6263db568b6980a3f3ac191bde501a62a3986"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i070-b.svg",
+          "sha256": "sha256:dc26e75b6385c008bb16a5c3901399928043930d8113d539b59ce83535604232"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-veiculo-rodas-soltas-3",
+      "split": "holdout",
+      "objeto": "veiculo-rodas-soltas",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i071-a.svg",
+          "sha256": "sha256:86c0967b9a5b11f739187c41b201c3ddc5eb834d5cbf605b8167f3b4826a4767"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i071-b.svg",
+          "sha256": "sha256:86c0967b9a5b11f739187c41b201c3ddc5eb834d5cbf605b8167f3b4826a4767"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-veiculo-rodas-soltas-4",
+      "split": "holdout",
+      "objeto": "veiculo-rodas-soltas",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i072-a.svg",
+          "sha256": "sha256:03811d5f08f4638899da44fad69dfe5eaeaf2639f25abc94faf878be2a0f26ad"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i072-b.svg",
+          "sha256": "sha256:e40a3979984f0cd150c00141fe6cb7710f9fd00a06dc01d82053bacf5a687078"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-esquematico-1",
+      "split": "holdout",
+      "objeto": "humanoide-esquematico",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i073-a.svg",
+          "sha256": "sha256:ce41dccccbc27193881e5486bfe60b77358bc6aee395f3a8daa54874623bae89"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i073-b.svg",
+          "sha256": "sha256:212b6e7e8652fe15e7bdbaeacae9e25fe99740bd724103937b29e059e1fc1f72"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-esquematico-2",
+      "split": "holdout",
+      "objeto": "humanoide-esquematico",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i074-a.svg",
+          "sha256": "sha256:f9f32ae12b270b7edc3f73f95b80eb4ad0acbb583e760a0e95b31180ef5c528b"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i074-b.svg",
+          "sha256": "sha256:839e3a3b94a20b1353f529edba36e03dd01c233cab4d918edb296fdb8f3aeab1"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-esquematico-3",
+      "split": "holdout",
+      "objeto": "humanoide-esquematico",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i075-a.svg",
+          "sha256": "sha256:9e4fedf3eb4798ee8d6cf844671b42a1fbcb5665de97ff8e499cb8ef0890225f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i075-b.svg",
+          "sha256": "sha256:9e4fedf3eb4798ee8d6cf844671b42a1fbcb5665de97ff8e499cb8ef0890225f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-esquematico-4",
+      "split": "holdout",
+      "objeto": "humanoide-esquematico",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i076-a.svg",
+          "sha256": "sha256:d7f5e62a64b9904b861c83a3f0260f962887a343fb1bf97a4e212a6df97ad2d9"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i076-b.svg",
+          "sha256": "sha256:36350e44043c5f6691225c9d1f5e1335963afe89d681b5b976912f446702bd01"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-desconexo-1",
+      "split": "holdout",
+      "objeto": "humanoide-desconexo",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i077-a.svg",
+          "sha256": "sha256:0f93865f0a01aead90cc4384cd5a286848c11331bc454d381e6c6b4643933b8a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i077-b.svg",
+          "sha256": "sha256:f76939ddc1f809eca000b2ed670002f80309e868833b1b49503dd03cc6f50e1a"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-desconexo-2",
+      "split": "holdout",
+      "objeto": "humanoide-desconexo",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i078-a.svg",
+          "sha256": "sha256:9e9f9c834c0fa1d55eb159cffec29676662b2de60e79a7c177442432d3aeb065"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i078-b.svg",
+          "sha256": "sha256:252512b3eeb6ce71609b0acee63688112152c53380456d2954e81615e75f4a76"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-desconexo-3",
+      "split": "holdout",
+      "objeto": "humanoide-desconexo",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i079-a.svg",
+          "sha256": "sha256:33f5b1cbab4bafb4e60a72c97307aafdfb20b330c9cb0eee3be52ec62156b019"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i079-b.svg",
+          "sha256": "sha256:33f5b1cbab4bafb4e60a72c97307aafdfb20b330c9cb0eee3be52ec62156b019"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "holdout-humanoide-desconexo-4",
+      "split": "holdout",
+      "objeto": "humanoide-desconexo",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i080-a.svg",
+          "sha256": "sha256:07d779dc5c5d5688d46b7a9744ec5aab0efd890097e50ee28302b3dd7c49dfba"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i080-b.svg",
+          "sha256": "sha256:a740e35d8282bb8d2f36de045be5c4dd12e2c3dde10264cc05f8963862652ea6"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-circulo-1",
+      "split": "calibracao",
+      "objeto": "calibracao-circulo",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i081-a.svg",
+          "sha256": "sha256:1802f438ce86f72a06efcbc0c7bb8c75920110818c951d130c04a4214c8d41f7"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i081-b.svg",
+          "sha256": "sha256:041921ca4084561b5780d205812022a1c51b207204fa91274fbc6eab299b5f2d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-circulo-2",
+      "split": "calibracao",
+      "objeto": "calibracao-circulo",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i082-a.svg",
+          "sha256": "sha256:42fa3b620d76dc39f361f1f4fe7c4233f15afea645e4d804ec80ac6738f924f4"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i082-b.svg",
+          "sha256": "sha256:0706fba920b95e6397a95c99ef8635bef94e41f99f8d41487fce6908d90c63f2"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-circulo-3",
+      "split": "calibracao",
+      "objeto": "calibracao-circulo",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i083-a.svg",
+          "sha256": "sha256:b8feb7a4d0cbb4f7e07288664292784b0fa868e2f432698618fab5546dc7d5e0"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i083-b.svg",
+          "sha256": "sha256:b8feb7a4d0cbb4f7e07288664292784b0fa868e2f432698618fab5546dc7d5e0"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-circulo-4",
+      "split": "calibracao",
+      "objeto": "calibracao-circulo",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i084-a.svg",
+          "sha256": "sha256:b0bd3339cddd3e1bb5c6f385525003a57383146a72c4d2fa4b2f6b80fc066442"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i084-b.svg",
+          "sha256": "sha256:896148a4d469dae1c9bb203dfad3619287d7ce76fb95a94bcc46abd67852a2df"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-anel-1",
+      "split": "calibracao",
+      "objeto": "calibracao-anel",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i085-a.svg",
+          "sha256": "sha256:d0f205f2296086a782e88b4f9a6010069c4ecbf1697666af68f44e55e5f029c8"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i085-b.svg",
+          "sha256": "sha256:923e7f11fa11648a3de5def0b1bd00c7626efd7691c0ae6da2546184f21feafd"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-anel-2",
+      "split": "calibracao",
+      "objeto": "calibracao-anel",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i086-a.svg",
+          "sha256": "sha256:a125ef6a2dc1489ed4ee9d916fb09a6c429d1bbdcdf18717ce997bb9e98dbc6a"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i086-b.svg",
+          "sha256": "sha256:dd0eb1e54144b10b139e6a32bf5f2dee2c6cc94be482dccdb8e56881e6f0c86b"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-anel-3",
+      "split": "calibracao",
+      "objeto": "calibracao-anel",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i087-a.svg",
+          "sha256": "sha256:aff75c633c3f3e74e714c0e89f1c3bbb4d9fafb99f2d949c4e4d20e9eec58cfe"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i087-b.svg",
+          "sha256": "sha256:aff75c633c3f3e74e714c0e89f1c3bbb4d9fafb99f2d949c4e4d20e9eec58cfe"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-anel-4",
+      "split": "calibracao",
+      "objeto": "calibracao-anel",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i088-a.svg",
+          "sha256": "sha256:712a9eea108980270e37c8e200044d962ffcac25b7dd2f0b6f45ecadc1b99db9"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i088-b.svg",
+          "sha256": "sha256:9ca35c3b7263e80b88269b3852c7a1134d550bd5c7212058d53ea1f334a462cd"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-placa-1",
+      "split": "calibracao",
+      "objeto": "calibracao-placa",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i089-a.svg",
+          "sha256": "sha256:70588c21e081fad52983c3a3eeeebfb5e62df724c951e494f1f3add9510d4cbd"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i089-b.svg",
+          "sha256": "sha256:02dc50b4c083551c7ccb39c68ffe2c330472a4090940fd8fc1046726e8f51f56"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-placa-2",
+      "split": "calibracao",
+      "objeto": "calibracao-placa",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i090-a.svg",
+          "sha256": "sha256:3e196fc82d64a7c65cbf74e29107187aed1bdf56940c14af7c42ebf96fcc089d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i090-b.svg",
+          "sha256": "sha256:b13194354ee3e4cee95d7029495fce669da0b71a4d972333a790b3c199b912ee"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-placa-3",
+      "split": "calibracao",
+      "objeto": "calibracao-placa",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i091-a.svg",
+          "sha256": "sha256:de974c3f165f9c2f17f45d46603218e8bfaf7632f65c86e4c1f5ceb17bb3c039"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i091-b.svg",
+          "sha256": "sha256:de974c3f165f9c2f17f45d46603218e8bfaf7632f65c86e4c1f5ceb17bb3c039"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-placa-4",
+      "split": "calibracao",
+      "objeto": "calibracao-placa",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i092-a.svg",
+          "sha256": "sha256:8592c48b70e576b5fed1c4693e177ed1551a62722812921064e3c46489b07024"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i092-b.svg",
+          "sha256": "sha256:d93dc327801d0514d56c6f4a088cf7544a51fac2f08ba9339273b38620276cf7"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-conjunto-1",
+      "split": "calibracao",
+      "objeto": "calibracao-conjunto",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i093-a.svg",
+          "sha256": "sha256:4cf2a3058c4b681bdf894df3994fb7141e3df49776929ae124823a752d36180d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i093-b.svg",
+          "sha256": "sha256:73c56ed9eb2395a212a9f2f217ed3575eb53c5c7d280c6a37f1c80ce52b93d43"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-conjunto-2",
+      "split": "calibracao",
+      "objeto": "calibracao-conjunto",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i094-a.svg",
+          "sha256": "sha256:3c7d6117e4160bf5bbe13a3fbd254d3e9d0215000d47d3deff69926365d86490"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i094-b.svg",
+          "sha256": "sha256:3003548f94f71e14efcc32469f8b9e295a5f2402113e85bf25bd83f217f8a523"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-conjunto-3",
+      "split": "calibracao",
+      "objeto": "calibracao-conjunto",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i095-a.svg",
+          "sha256": "sha256:41bab87326fdddff94895b23fd31e425d92814677973f1b6491c6977c820a58d"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i095-b.svg",
+          "sha256": "sha256:41bab87326fdddff94895b23fd31e425d92814677973f1b6491c6977c820a58d"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-conjunto-4",
+      "split": "calibracao",
+      "objeto": "calibracao-conjunto",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i096-a.svg",
+          "sha256": "sha256:4b27d9af9ecea7cb5568dda95b357d6f326074427f6c31728ba61c09685b81ff"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i096-b.svg",
+          "sha256": "sha256:46b70a54c7d4d1143ddd0882a4dd1daa2b122d41ad3b613faf120dacb6b66406"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-estrutura-1",
+      "split": "calibracao",
+      "objeto": "calibracao-estrutura",
+      "tipo": "decisivo",
+      "severidade": "normal",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva a relação contínua indicada nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i097-a.svg",
+          "sha256": "sha256:9ee8875070a76ffce2b31fec7ad59f9f4260632ec6e33a898280e592b09a622f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i097-b.svg",
+          "sha256": "sha256:c55e10f5fe5300ec3ade8e31b9ca4d892d81fa6e4c78b5049213231f6fed8e81"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-estrutura-2",
+      "split": "calibracao",
+      "objeto": "calibracao-estrutura",
+      "tipo": "decisivo",
+      "severidade": "grosseiro",
+      "respostaConhecida": "A",
+      "vista": "isometrica",
+      "pergunta": "Qual alternativa preserva um objeto único sem ruptura grosseira?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i098-a.svg",
+          "sha256": "sha256:5d866336153e0ea48cb98a74289fce4f38118ff294b6cb3f7efd9753cab1b971"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i098-b.svg",
+          "sha256": "sha256:6b83a0cd619cf5bb773b76f518414bf9bca70d58f44feef5f7ec5a46593ae21e"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-estrutura-3",
+      "split": "calibracao",
+      "objeto": "calibracao-estrutura",
+      "tipo": "empate",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "empate",
+      "vista": "isometrica",
+      "pergunta": "Há diferença material verificável entre as alternativas nesta vista?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i099-a.svg",
+          "sha256": "sha256:2a630c425b7fe37e8cb9cce198c3d7f4c5ea64f0672e52f4a760217615e86d4f"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i099-b.svg",
+          "sha256": "sha256:2a630c425b7fe37e8cb9cce198c3d7f4c5ea64f0672e52f4a760217615e86d4f"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calibracao-calibracao-estrutura-4",
+      "split": "calibracao",
+      "objeto": "calibracao-estrutura",
+      "tipo": "indeterminado",
+      "severidade": "nao-aplicavel",
+      "respostaConhecida": "indeterminado",
+      "vista": "isometrica",
+      "pergunta": "Há informação suficiente nesta vista única para preferir uma alternativa?",
+      "evidencias": [
+        {
+          "papel": "A",
+          "arquivo": "evidencias/i100-a.svg",
+          "sha256": "sha256:f37af98cb864c421b3f49c1ac6fc912d19f243595e4202f572e574e89b5e0a0c"
+        },
+        {
+          "papel": "B",
+          "arquivo": "evidencias/i100-b.svg",
+          "sha256": "sha256:ca89ac1e219162ad48cc9240cbc4bc25fcf30144dfcb391c24892f6d15e49166"
+        }
+      ],
+      "apresentacoes": [
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        },
+        {
+          "ordem": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "ordem": [
+            "B",
+            "A"
+          ]
+        }
+      ]
+    }
   ]
 }
