@@ -56,6 +56,11 @@ falhas determinísticas acima.
 - O manifesto `autoria-assistida/avaliacao/corpus-p0/manifesto.json` está em
   `pendente-de-coleta`, sem itens. Ele enumera as lacunas em vez de preencher
   controles, V-01..V-32 ou resultados com conteúdo sintético não observado.
+- O inventário gerado de V-01..V-32 encontrou evidência individual em apenas
+  sete candidatas e marcou as 32 como **inelegíveis**: nenhum registro contém
+  ainda par A/B, resposta conhecida, pergunta congelada, quatro apresentações
+  cegas e isolamento entre `calibracao`/`holdout`. Contar arquivos de poucos
+  experimentos como vinte objetos seria vazamento metodológico.
 - O validador só torna um corpus elegível quando há ao menos 80 itens holdout,
   20 objetos sem vazamento entre splits, no máximo quatro itens por objeto, 40
   decisivos (20 grosseiros), 20 empates, 20 indeterminados e quatro
