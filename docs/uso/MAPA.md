@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-674 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+676 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -859,6 +859,8 @@
 - `aceite-visual.test.mjs` — aceite-visual.test.mjs — corpus de vínculo, bytes e reprovações visuais.
 - `analisar-calibracao-critico.mjs` — Estatística P0-C: mede respostas já ingeridas; não chama nem simula um crítico externo.
 - `analisar-calibracao-critico.test.mjs` — Estatística P0-C: quatro respostas por item e bootstrap por objeto, não por apresentação.
+- `calibracao-critico-cli.mjs` — Porta offline para enviar estímulos e reingressar respostas sem chamar rede/modelo.
+- `calibracao-critico-cli.test.mjs` — CLI offline: separa lote público, chave local e respostas para auditoria.
 - `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
 - `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.

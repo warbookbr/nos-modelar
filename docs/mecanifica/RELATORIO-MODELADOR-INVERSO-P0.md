@@ -78,6 +78,12 @@ falhas determinísticas acima.
   assinada e vinculada ao lote, que não acompanha o estímulo. Na volta, a
   ingestão confere as assinaturas, exige cobertura integral e só então recupera
   a decisão semântica localmente.
+- A CLI `tools/modelagem/calibracao-critico-cli.mjs` materializa essa fronteira
+  offline: `exportar <manifesto> <lote-publico> <chave-local>` grava o estímulo
+  separado da chave; `ingerir <lote-publico> <chave-local> <respostas>
+  <normalizado>` confere e preserva a devolução normalizada. Ela não chama rede
+  nem escolhe modelo; a execução independente continua sendo uma etapa externa
+  e auditável.
 - As respostas externas carregam provedor, modelo, hash de prompt, achados
   regionais, confiança e assinatura própria; não carregam gabarito nem ID do
   item.
