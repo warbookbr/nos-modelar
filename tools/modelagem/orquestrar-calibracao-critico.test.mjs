@@ -11,20 +11,23 @@ function corpusValido() {
   return { formato: 'mecanifica.corpus-avaliacao-p0@1', estado: 'congelado', itens };
 }
 function resposta(apresentacao, lote) {
-  const base = { formato: 'mecanifica.julgamento-critico@1', lote: lote.id, assinaturaLote: lote.assinatura, item: apresentacao.item, apresentacao: apresentacao.id, decisao: 'A', achados: [], confianca: 0.6, provedor: 'simulador', modelo: 'critico-de-teste', hashPrompt: sha(999) };
+  const base = { formato: 'mecanifica.julgamento-critico@2', lote: lote.id, assinaturaLote: lote.assinatura, apresentacao: apresentacao.id, decisao: 'primeira', achados: [], confianca: 0.6, provedor: 'simulador', modelo: 'critico-de-teste', hashPrompt: sha(999) };
   return { ...base, assinaturaResposta: assinarJulgamentoCritico(base) };
 }
 
 describe('orquestrador de calibração crítica', () => {
   it('exporta o lote sem revelar o gabarito e exige cobertura de todas as apresentações', () => {
-    const lote = exportarLoteCritico(corpusValido());
+    const { lote, chavePrivada } = exportarLoteCritico(corpusValido());
     expect(lote.apresentacoes).toHaveLength(324);
     expect(JSON.stringify(lote)).not.toContain('respostaConhecida');
-    expect(() => ingerirRespostasCritico(lote, lote.apresentacoes.slice(0, -1).map((apresentacao) => resposta(apresentacao, lote)))).toThrow(/cobertura/);
+    expect(JSON.stringify(lote)).not.toMatch(/"papel"|"item"|"ordem"/);
+    expect(() => ingerirRespostasCritico(lote, chavePrivada, lote.apresentacoes.slice(0, -1).map((apresentacao) => resposta(apresentacao, lote)))).toThrow(/cobertura/);
     const adulterada = resposta(lote.apresentacoes[0], lote);
-    adulterada.item = 'item-de-outro-objeto';
+    adulterada.apresentacao = 'p999';
     adulterada.assinaturaResposta = assinarJulgamentoCritico(adulterada);
-    expect(() => ingerirRespostasCritico(lote, [adulterada, ...lote.apresentacoes.slice(1).map((apresentacao) => resposta(apresentacao, lote))])).toThrow(/item/);
-    expect(ingerirRespostasCritico(lote, lote.apresentacoes.map((apresentacao) => resposta(apresentacao, lote)))).toMatchObject({ respostas: 324 });
+    expect(() => ingerirRespostasCritico(lote, chavePrivada, [adulterada, ...lote.apresentacoes.slice(1).map((apresentacao) => resposta(apresentacao, lote))])).toThrow(/lote/);
+    const resultado = ingerirRespostasCritico(lote, chavePrivada, lote.apresentacoes.map((apresentacao) => resposta(apresentacao, lote)));
+    expect(resultado).toMatchObject({ respostas: 324 });
+    expect(resultado.julgamentos[0]).toMatchObject({ item: 'i-0', decisaoSemantica: 'A' });
   });
 });

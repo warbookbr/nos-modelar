@@ -1,6 +1,6 @@
 # Relatório P0 — confiança antes de geometria
 
-**Estado:** aberto, P0-B executado; P0-A e P0-C pendentes
+**Estado:** aberto, P0-B executado; P0-A pendente e P0-C aguardando execução independente
 **Plano:** [`planos/2026-08-25-modelador-inverso-priors-familia.md`](planos/2026-08-25-modelador-inverso-priors-familia.md)
 **Execução detalhada:** [`../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
 
@@ -67,12 +67,24 @@ falhas determinísticas acima.
   20 objetos sem vazamento entre splits, no máximo quatro itens por objeto, 40
   decisivos (20 grosseiros), 20 empates, 20 indeterminados e quatro
   apresentações com ordem A/B invertida duas vezes.
-- O transporte offline exporta apenas lote, vistas e hashes — nunca o gabarito —
-  e ingere respostas com provedor, modelo, hash de prompt, achados regionais,
-  confiança e assinaturas de lote/resposta.
+- O primeiro transporte (`mecanifica.lote-critico-p0@1`) foi invalidado antes
+  de qualquer execução externa: embora não exportasse o gabarito, ainda expunha
+  `A/B`, a ordem e a identidade do item. Inverter posições dentro desse mesmo
+  lote não cegava um crítico contra viés de posição. Nenhum resultado externo
+  foi perdido ou aceito desse formato.
+- O transporte vigente (`mecanifica.lote-critico-p0@2`) exporta somente IDs
+  opacos `pNNNN`, a vista, a pergunta e alternativas `primeira`/`segunda` com
+  arquivo e hash. O mapa que liga posição a A/B e item fica numa chave privada,
+  assinada e vinculada ao lote, que não acompanha o estímulo. Na volta, a
+  ingestão confere as assinaturas, exige cobertura integral e só então recupera
+  a decisão semântica localmente.
+- As respostas externas carregam provedor, modelo, hash de prompt, achados
+  regionais, confiança e assinatura própria; não carregam gabarito nem ID do
+  item.
 - `npx vitest run tools/modelagem/validar-corpus-avaliacao.test.mjs
   tools/modelagem/contrato-julgamento-critico.test.mjs
-  tools/modelagem/orquestrar-calibracao-critico.test.mjs` passou (6/6).
+  tools/modelagem/orquestrar-calibracao-critico.test.mjs
+  tools/modelagem/gerar-corpus-p0.test.mjs` passou (4/4) no protocolo v2.
 
 **Decisão P0-C:** `bloqueado por execução independente`. O corpus sintético
 calibra apenas repetibilidade sobre defeitos definidos por construção; ele não

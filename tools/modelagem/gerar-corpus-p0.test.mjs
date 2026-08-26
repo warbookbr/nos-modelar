@@ -20,9 +20,11 @@ describe('gerador do corpus sintético P0', () => {
     const hashesHoldout = new Set(manifesto.itens.filter(({ split }) => split === 'holdout').flatMap(({ evidencias }) => evidencias.map(({ sha256: impressao }) => impressao)));
     const hashesCalibracao = manifesto.itens.filter(({ split }) => split === 'calibracao').flatMap(({ evidencias }) => evidencias.map(({ sha256: impressao }) => impressao));
     expect(hashesCalibracao.every((impressao) => !hashesHoldout.has(impressao))).toBe(true);
-    const lote = exportarLoteCritico(manifesto);
+    const { lote } = exportarLoteCritico(manifesto);
     expect(lote.apresentacoes).toHaveLength(400);
     expect(JSON.stringify(lote)).not.toContain('respostaConhecida');
+    expect(JSON.stringify(lote)).not.toMatch(/"papel"|"item"|"ordem"/);
+    expect(lote.apresentacoes.every(({ id, alternativas }) => /^p\d{4}$/.test(id) && alternativas.every(({ posicao, arquivo }) => ['primeira', 'segunda'].includes(posicao) && /^evidencias\/i\d{3}-[ab]\.svg$/.test(arquivo)))).toBe(true);
     for (const item of manifesto.itens) for (const evidencia of item.evidencias) {
       const arquivo = resolve(pasta, evidencia.arquivo);
       expect(existsSync(arquivo)).toBe(true);
