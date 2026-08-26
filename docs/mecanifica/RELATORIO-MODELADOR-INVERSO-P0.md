@@ -30,7 +30,7 @@ falhas determinísticas acima.
 | --- | --- | --- |
 | P0-A — linha de base | bloqueado | todos os gates oficiais verdes no mesmo checkout Windows |
 | P0-B — alvo | aprovado localmente | contrato de qualificação + canário geométrico calibrado |
-| P0-C — avaliador | não iniciado | corpus, repetições embaralhadas, holdout e intervalos |
+| P0-C — avaliador | bloqueado por insumos | corpus, repetições embaralhadas, holdout e intervalos |
 
 **Decisão P0:** aberta. P1 não está autorizada.
 
@@ -50,6 +50,28 @@ falhas determinísticas acima.
 - Limite explícito: isto prova apenas o contrato de entrada e sua rejeição de
   incoerência; não mede nem demonstra fidelidade de veículo, fitting, estética
   ou qualidade de superfície.
+
+## Registro P0-C — infraestrutura, 2026-08-25
+
+- O manifesto `autoria-assistida/avaliacao/corpus-p0/manifesto.json` está em
+  `pendente-de-coleta`, sem itens. Ele enumera as lacunas em vez de preencher
+  controles, V-01..V-32 ou resultados com conteúdo sintético não observado.
+- O validador só torna um corpus elegível quando há ao menos 80 itens holdout,
+  20 objetos sem vazamento entre splits, no máximo quatro itens por objeto, 40
+  decisivos (20 grosseiros), 20 empates, 20 indeterminados e quatro
+  apresentações com ordem A/B invertida duas vezes.
+- O transporte offline exporta apenas lote, vistas e hashes — nunca o gabarito —
+  e ingere respostas com provedor, modelo, hash de prompt, achados regionais,
+  confiança e assinaturas de lote/resposta.
+- `npx vitest run tools/modelagem/validar-corpus-avaliacao.test.mjs
+  tools/modelagem/contrato-julgamento-critico.test.mjs
+  tools/modelagem/orquestrar-calibracao-critico.test.mjs` passou (6/6).
+
+**Decisão P0-C:** `bloqueado por insumos`. Ainda faltam os 20 objetos e suas
+evidências individuais, a seleção controlada dos casos V-01..V-32 e as
+execuções de um crítico independente. O transporte e o validador não substituem
+nenhum desses dados; sem eles não há bootstrap, limiar, holdout revelado nem
+autorização para P1.
 
 ## Regra de atualização
 

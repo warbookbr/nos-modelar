@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-662 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+668 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -860,6 +860,8 @@
 - `caminho-repositorio.mjs` — caminho-repositorio.mjs — resolução portátil e confinada de repo://.
 - `caminho-repositorio.test.mjs` — caminho-repositorio.test.mjs — confinamento de evidências repo:// portátil.
 - `comparar-revisao.mjs` — CLI fino: lê dois JSONs, usa somente o núcleo puro e escreve JSON canônico.
+- `contrato-julgamento-critico.mjs` — Resposta de crítico externo: dados assinados, nunca veredito inferido localmente.
+- `contrato-julgamento-critico.test.mjs` — Contrato assinado que mantém o julgamento externo rastreável.
 - `critica-modelagem.mjs` — CLI fino: valida crítica sem abrir navegador, peça ou Oficina.
 - `critica-visual.test.mjs` — crítica-visual.test.mjs — contrato neutro e reexecutável de achados visuais.
 - `despachar-consulta-visual.mjs` — Materializa um despacho visual mínimo. Não é sandbox de modelo: prova os bytes entregues, e deixa explícito que isolamento do processo é outra camada.
@@ -869,6 +871,8 @@
 - `formato-pacote.mjs` — formato-pacote.mjs — contrato pequeno, estrito e canônico do pacote de modelagem assistida. Não conhece Three.js, domínio automotivo ou runtime de navegador:…
 - `gerar-canario-geometrico-p0.mjs` — Canário P0: fixture sintética calibrada para provar o fluxo de fitting.
 - `gerar-canario-geometrico-p0.test.mjs` — Canário P0: prova o contrato calibrado, não qualidade de modelagem.
+- `orquestrar-calibracao-critico.mjs` — Transporte offline: exporta estímulos cegos e ingere respostas assinadas.
+- `orquestrar-calibracao-critico.test.mjs` — Lote cego: o transporte não revela gabarito e exige cobertura completa.
 - `orquestrar-revisao-regional.mjs` — Caminho único R1A: despacho mínimo, revisor limitado e crítica persistida.
 - `orquestrar-revisao-regional.test.mjs` — orquestrar-revisao-regional.test.mjs — fixa a ordem despacho, revisão limitada e crítica persistida.
 - `preparar-pacote.mjs` — preparar-pacote.mjs — cria só o esqueleto canônico; uma pasta já existente é sempre erro. Assim, uma segunda tentativa nunca apaga briefing ou crítica.
@@ -876,6 +880,8 @@
 - `revisar-pacote.mjs` — revisar-pacote.mjs — marco 2 do fluxo assistido: a única ponte entre o pacote, a régua headless e as quatro câmeras da bancada.
 - `revisor-limitado.mjs` — Revisor visual em processo separado. O pai libera leitura apenas do próprio programa e do despacho; a criança prova que não alcança outro arquivo.
 - `revisor-limitado.test.mjs` — revisor-limitado.test.mjs — prova leitura do despacho e recusa de acesso externo pelo crítico Node.
+- `validar-corpus-avaliacao.mjs` — Contrato local do corpus P0; não chama modelo nem infere qualidade visual.
+- `validar-corpus-avaliacao.test.mjs` — O corpus P0 só fica elegível após cobertura, isolamento e quatro julgamentos cegos.
 - `validar-pacote.mjs` — validar-pacote.mjs — porta fail-closed do marco 1. Lê, exige bytes canônicos e confere o alvo com a régua headless assim que a fonte canônica existir.
 
 ## tools/oficina/

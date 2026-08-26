@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.corpus-avaliacao-p0@1",
+  "estado": "pendente-de-coleta",
+  "itens": [],
+  "lacunas": [
+    "vinte-objetos-de-origem-com-evidencia-individual-rastreavel",
+    "oitenta-itens-holdout-balanceados",
+    "controles-v01-a-v32-com-hash-e-severidade",
+    "critico-independente-configurado-para-execucao-fria"
+  ]
+}
