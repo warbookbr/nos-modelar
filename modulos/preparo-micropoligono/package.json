@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@mecanifica/preparo-micropoligono",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Verifica e prepara malha para pipelines de micropolígono (Nanite e equivalentes): triangula, confere fechamento, orientação e escala, e declara o que não cobre."
+}

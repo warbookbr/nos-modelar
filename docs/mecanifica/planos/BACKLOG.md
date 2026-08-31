@@ -107,3 +107,27 @@ Resolvem-se por planos pequenos e provas, dentro das invariantes de
 [`../usar/MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
 [`../AUTORIA-IA.md`](../AUTORIA-IA.md).
 
+## Questões ainda abertas da autoria
+
+Esta definição não decide antecipadamente:
+
+- como representar variantes e instâncias compartilhadas;
+- como versionar relações;
+- como declarar movimento e cinemática;
+- se haverá solver automático e qual será seu alcance;
+- se a representação por malha final e pose mundial aberta no plano de
+  [auditoria de interseções](encerrados/2026-08-18-auditoria-intersecoes-montagem.md)
+  será aprovada pelas provas adversariais e de escala;
+- quando uma alteração cria variante ou modifica a peça de origem;
+- como agentes concorrentes reservam alvos;
+- qual será a primeira camada de escrita;
+- quais operações entram no MCP e quais permanecem em serviços internos;
+- como materiais, física e deformação entrarão no mesmo mapa;
+- qual fidelidade mínima caracteriza um carro ou robô completo.
+
+Essas perguntas devem ser resolvidas por planos pequenos, provas e comparação de
+resultados, sempre dentro das invariantes deste documento.
+
+Vieram de `AUTORIA-IA.md`, onde eram deliberação de projeto dentro de um
+documento que também servia de contrato. Resolvem-se por planos pequenos.
+

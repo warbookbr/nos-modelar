@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@mecanifica/topologia",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Analisador de topologia de malha: devolve veredito e lista de achados, nunca geometria."
+}

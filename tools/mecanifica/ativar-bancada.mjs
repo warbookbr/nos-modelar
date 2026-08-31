@@ -56,6 +56,29 @@ const { caixas, facesSemParte } = caixasPorParte(neutro);
 const portas = portasPublicadas(neutro);
 const partesNomes = Array.from(caixas.keys());
 
+/* Cobertura de material, medida junto da de parte. Uma parte sem material
+   renderiza cinza e nada reclamava — a bancada confere identidade de parte, não
+   de material, e cinza passa por escolha do autor. */
+const partesSemMaterial = [];
+for (const nome of caixas.keys()) {
+  let temMaterial = false;
+  for (const [, f] of (neutro.F instanceof Map ? neutro.F.entries() : Object.entries(neutro.F))) {
+    if (f.parte === nome && f.material) { temMaterial = true; break; }
+  }
+  if (!temMaterial) partesSemMaterial.push(nome);
+}
+
+/* Os critérios são MEDIDOS. Antes desta linha, 'Validado sem órfãos' era uma
+   string fixa e a contagem impressa era o literal 0 — a maça de abas entrou com
+   quatro faces sem parte (as tampas dos dois cilindros, que `{op:'cilindro'}`
+   não seleciona de propósito) e mesmo assim o comando anunciou zero órfãs. Um
+   número que não vem de medida é decoração, e decoração aqui mente. */
+const criterios = [
+  facesSemParte.length ? `${facesSemParte.length} face(s) sem parte` : 'Sem faces órfãs',
+  `${partesNomes.length} corpos identificados`,
+];
+if (partesSemMaterial.length) criterios.push(`sem material: ${partesSemMaterial.join(', ')}`);
+
 const nomeAlvo = receita.meta?.nome ?? 'Peça Ativa';
 const idAlvo = caminhoRelativo.replace(/[\/\\]/g, '-').replace(/\.js$/, '');
 
@@ -76,7 +99,7 @@ const payload = {
   referencias: {
     pranchas: [],
     imagens: [],
-    criterios: ['Validado sem órfãos', `${partesNomes.length} corpos identificados`],
+    criterios: criterios,
   },
   receita,
 };
@@ -95,7 +118,20 @@ if (focar) {
 }
 
 console.log(`\n✓ Receita ativada na Bancada com sucesso!`);
-console.log(`  Alvo: ${nomeAlvo} (${partesNomes.length} corpos, 0 faces órfãs)`);
+console.log(`  Alvo: ${nomeAlvo} (${partesNomes.length} corpos, ${facesSemParte.length} faces órfãs)`);
+/* Os gritos do motor: `executarReceita` acumula em vez de lançar, e sem esta
+   linha um passo que não fez efeito nenhum entra na bancada em silêncio. */
+const gritos = neutro.orfaos ?? [];
+if (gritos.length) {
+  console.log(`  ! a receita reclamou de ${gritos.length} coisa(s):`);
+  for (const g of gritos.slice(0, 6)) console.log(`      passo ${g.passo} (${g.op}) ${g.ref}: ${g.motivo}`);
+  if (gritos.length > 6) console.log(`      …e mais ${gritos.length - 6}`);
+}
+if (facesSemParte.length) {
+  console.log(`  ! faces sem parte: ${facesSemParte.slice(0, 8).join(', ')}${facesSemParte.length > 8 ? '…' : ''}`);
+  console.log('    lembre que {op:\'cilindro\',id} seleciona só as laterais; as tampas pedem tampa:\'fundo\' e tampa:\'topo\'.');
+}
+if (partesSemMaterial.length) console.log(`  ! partes sem material (renderizam cinza): ${partesSemMaterial.join(', ')}`);
 console.log(`  Arquivo de sessão: public/sessao-ativa.json`);
 console.log(`\nURL da Bancada:`);
 console.log(`  http://localhost:${porta}/nos-mecanifica/bancada.html${query}`);

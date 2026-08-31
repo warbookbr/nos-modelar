@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@mecanifica/otimizador-malha",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Redução de malha na camada de saída: solda, funde coplanares e descarta o que não é referenciado, sem mover nenhum ponto."
+}

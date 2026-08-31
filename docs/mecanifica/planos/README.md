@@ -2,7 +2,11 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:**
+[`2026-08-31-malha-otimizada-e-prova-por-objeto.md`](2026-08-31-malha-otimizada-e-prova-por-objeto.md)
+— modelar objetos reais pelo fluxo atual e provar ou recusar, por medição, três
+módulos de saída de malha. Rastreio em
+[`../MALHA-OTIMIZADA-PROGRESSO.md`](../MALHA-OTIMIZADA-PROGRESSO.md).
 
 A [reorganização da documentação por uso](encerrados/2026-08-31-reorganizacao-por-uso.md)
 foi **concluída e aprovada** em 2026-08-31. Ela separou a documentação por quem

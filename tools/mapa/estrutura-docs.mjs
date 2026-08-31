@@ -54,10 +54,6 @@ export const ALLOWLIST_G1 = new Map([
     'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md:docs/mecanifica/planos/BACKLOG.md',
     'manda a questão em aberto para onde questão em aberto mora, em vez de deliberar dentro do contrato',
   ],
-  [
-    'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md:docs/mecanifica/AUTORIA-IA.md',
-    'aponta a definição ampla de autoria; exceção PENDENTE da divisão do AUTORIA-IA, que hoje mistura contrato de uso e justificativa de projeto — quando a metade de uso for separada, esta linha sai',
-  ],
 ]);
 
 /* Porta é porta: se cresce, vira o catálogo que a reorganização veio desfazer.

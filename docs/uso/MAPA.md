@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+752 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -399,6 +399,7 @@
 - `INDEX.md` — Mecanifica — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
+- `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
@@ -467,6 +468,7 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-08-31-malha-otimizada-e-prova-por-objeto.md` — Malha otimizada e prova por objeto
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -562,6 +564,7 @@
 ## docs/mecanifica/usar/
 
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
+- `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
@@ -623,10 +626,40 @@
 
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 
+## modulos/otimizador-malha/src/
+
+- `otimizar.js` — otimizar.js — reduz malha na CAMADA DE SAÍDA, sem mover um único ponto.
+
+## modulos/otimizador-malha/tests/
+
+- `otimizar.test.js` — otimizar.test.js — o invariante é a coisa a provar, não o ganho.
+
+## modulos/preparo-micropoligono/src/
+
+- `preparar.js` — preparar.js — deixa a malha pronta para pipeline de micropolígono.
+
+## modulos/preparo-micropoligono/tests/
+
+- `preparar.test.js` — preparar.test.js — cada requisito é visto reprovando o seu defeito.
+
+## modulos/topologia/src/
+
+- `analisar.js` — analisar.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve.
+
+## modulos/topologia/tests/
+
+- `analisar.test.js` — analisar.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
+
 ## prototipos/procedural/v3/
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+
+## prototipos/procedural/v3/armas/
+
+- `espada-curta.js` — espada-curta.js — espada curta de infantaria, tipo gládio: lâmina larga com afilamento em duas etapas, guarda, punho e pomo.
+- `maca-de-abas.js` — maca-de-abas.js — maça de abas: cabeça de seis abas radiais em haste de aço.
+- `machado-de-guerra.js` — machado-de-guerra.js — machado de guerra de uma mão, com OLHO FURADO: o cabo atravessa a cabeça por um furo real, não por um encaixe fingido.
 
 ## prototipos/procedural/v3/armas/machado-de-sucata/
 
@@ -690,6 +723,8 @@
 ## prototipos/procedural/v3/pecas/
 
 - `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
+- `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
+- `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
 - `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
 
@@ -879,7 +914,9 @@
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
+- `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
+- `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.

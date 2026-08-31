@@ -104,6 +104,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(COR_FUNDO);
+  let auditoria = false;
 
   const piso = new THREE.Mesh(
     new THREE.PlaneGeometry(18, 18),
@@ -238,8 +239,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     const up = vertical
       ? new THREE.Vector3(0, 0, direcao[1] > 0 ? -1 : 1)
       : new THREE.Vector3(0, 1, 0);
-    piso.visible = vista !== 'inferior';
-    grade.visible = vista !== 'inferior';
+    piso.visible = !auditoria && vista !== 'inferior';
+    grade.visible = piso.visible;
     iniciarTransicao(posicaoDaVista(vista), up, instantaneo);
     aoMudarVista?.(vistaAtual);
   }
@@ -307,9 +308,25 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     camera.lookAt(controls.target);
     controls.update();
     vistaAtual = 'livre';
-    piso.visible = true;
-    grade.visible = true;
+    piso.visible = !auditoria;
+    grade.visible = !auditoria;
     aoMudarVista?.(vistaAtual);
+  }
+
+  /* Cenário de AUDITORIA: sem piso, sem grade e sem sombra projetada.
+     Numa imagem que a IA vai ler para julgar forma, a sombra é ruído com cara de
+     geometria — ela some junto do objeto no fundo claro e, pior, a mancha no
+     chão já foi confundida com uma peça deitada. Piso e grade dão contexto de
+     escala para quem OLHA a bancada; para quem AUDITA, a escala vem da régua e
+     do relatório, não do desenho do chão. */
+  function definirAuditoria(ligado) {
+    auditoria = Boolean(ligado);
+    renderer.shadowMap.enabled = !auditoria;
+    principal.castShadow = !auditoria;
+    piso.visible = !auditoria && vistaAtual !== 'inferior';
+    grade.visible = piso.visible;
+    scene.background = new THREE.Color(auditoria ? '#f2f4f3' : COR_FUNDO);
+    return auditoria;
   }
 
   function redimensionar() {
@@ -503,11 +520,16 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       const v = Math.min(1, Math.max(0, Number(valor) || 0));
       const opacidadePiso = Math.max(0, 1 - v * 2.5);
       const opacidadeGrade = Math.max(0, 0.34 * (1 - v * 2.5));
-      piso.visible = opacidadePiso > 0.01;
-      grade.visible = opacidadeGrade > 0.01;
+      /* Em auditoria o piso fica fora sempre: explodir a montagem não pode
+         trazer de volta o chão que o modo acabou de tirar. */
+      piso.visible = !auditoria && opacidadePiso > 0.01;
+      grade.visible = !auditoria && opacidadeGrade > 0.01;
       piso.material.opacity = opacidadePiso;
       grade.material.opacity = opacidadeGrade;
     },
+    definirAuditoria,
+    redimensionar,
+    get auditoria() { return auditoria; },
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

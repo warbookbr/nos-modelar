@@ -10,6 +10,22 @@ import { nomesDaSubarvore } from '../autoria/hierarquia-partes.js';
 
 const VERDE_DESTAQUE = new THREE.Color('#35c98a');
 
+/* Cores de AUDITORIA: uma por parte, para quem olha a imagem saber onde uma
+   peça termina e a outra começa. A bancada normal mostra o material do autor, e
+   material do autor é justamente o que confunde numa auditoria de forma — três
+   partes de aço são um borrão cinza só, e a junção some.
+
+   O tom vem do índice da parte na lista ORDENADA por nome, não da ordem de
+   criação: assim a mesma parte recebe a mesma cor entre execuções, e duas
+   imagens da mesma peça são comparáveis. Saturação e luminosidade fixas mantêm
+   todas as partes igualmente legíveis; só a matiz distingue. */
+const PASSO_MATIZ = 0.618033988749895;   // razão áurea: espalha as matizes sem repetir cedo
+
+export function corDeAuditoria(indice) {
+  const matiz = (0.06 + indice * PASSO_MATIZ) % 1;
+  return new THREE.Color().setHSL(matiz, 0.62, 0.55);
+}
+
 function materiaisDoGrupo(grupo) {
   const materiais = [];
   grupo.traverse((objeto) => {
@@ -44,12 +60,29 @@ function restaurarMaterial(material) {
   material.depthWrite = base.depthWrite;
 }
 
-function aplicarEstadoMaterial(material, estado) {
+function aplicarEstadoMaterial(material, estado, corDaParte = null) {
   restaurarMaterial(material);
+  /* A cor de auditoria entra ANTES dos estados de seleção, para que destaque e
+     fantasma continuem funcionando por cima dela. Se entrasse depois, isolar uma
+     peça deixaria de marcá-la e o modo viraria duas coisas que brigam. */
+  if (corDaParte && material.color) {
+    material.color.copy(corDaParte);
+    material.emissive?.setRGB(0, 0, 0);
+    material.emissiveIntensity = 0;
+    if (material.metalness !== undefined) material.metalness = 0.05;
+    if (material.roughness !== undefined) material.roughness = 0.62;
+  }
   if (estado === 'destaque') {
-    material.emissive?.copy(VERDE_DESTAQUE);
-    material.emissiveIntensity = 0.55;
-    material.color?.lerp(VERDE_DESTAQUE, 0.46);
+    /* Com cor de auditoria ligada o destaque NÃO tinge. O verde existe para o
+       olho humano achar a seleção num modelo cinza; sobre cores de auditoria ele
+       apaga justamente a informação que a imagem foi feita para carregar — três
+       partes selecionadas viravam três verdes iguais. Aqui a seleção já se lê
+       pelo fantasma das outras. */
+    if (!corDaParte) {
+      material.emissive?.copy(VERDE_DESTAQUE);
+      material.emissiveIntensity = 0.55;
+      material.color?.lerp(VERDE_DESTAQUE, 0.46);
+    }
   } else if (estado === 'fantasma') {
     material.transparent = true;
     material.opacity = 0.105;
@@ -62,6 +95,7 @@ function aplicarEstadoMaterial(material, estado) {
 
 export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar, aoEstabilizarExplosao }) {
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  let coresPorParte = false;
   const permitidos = new Set(nomes);
   /* A seleção entende a árvore declarada, mas os grupos Three continuam irmãos.
      Isso impede que escolher uma subárvore mude transformações, explosão ou a
@@ -108,7 +142,8 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       const grupo = partes.get(nome);
       const visual = estados[nome];
       grupo.visible = visual !== 'oculto';
-      for (const material of materiaisDoGrupo(grupo)) aplicarEstadoMaterial(material, visual);
+      const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
+      for (const material of materiaisDoGrupo(grupo)) aplicarEstadoMaterial(material, visual, cor);
     }
     aoMudar?.(estado());
   }
@@ -194,6 +229,17 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       return hierarquia.some((item) => item?.pai !== null && item?.pai !== undefined);
     },
     limpar() { definirSelecao([]); },
+    /* Liga/desliga a cor por parte. Devolve a LEGENDA — nome e cor em hex — sem
+       a qual a imagem colorida é bonita e inútil: quem audita precisa saber que
+       o roxo é o colar, e não adivinhar pela posição. */
+    definirCoresPorParte(ligado) {
+      coresPorParte = Boolean(ligado);
+      aplicarVisual();
+      return nomes.map((nome, i) => ({
+        parte: nome,
+        cor: coresPorParte ? `#${corDeAuditoria(i).getHexString()}` : null,
+      }));
+    },
     definirModo(novoModo) {
       modo = ['todas', 'contexto', 'isolar'].includes(novoModo) ? novoModo : 'todas';
       aplicarVisual();

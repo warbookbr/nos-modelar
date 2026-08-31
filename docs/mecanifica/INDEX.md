@@ -24,44 +24,44 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- **Não há plano ativo.** A [reorganização da documentação por
-  uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
-  (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`) foi
-  concluída em 2026-08-31: separou o acervo por quem o lê, encurtou esta porta
-  de 665 para 200 linhas e deixou cinco gates que impedem a separação de vazar.
-  O relato por fase está em
+- Plano **ativo**: [malha otimizada e prova por
+  objeto](planos/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
+  (`docs/mecanifica/planos/2026-08-31-malha-otimizada-e-prova-por-objeto.md`) —
+  modelar cadeira e armas brancas pelo fluxo atual e provar ou recusar, por
+  medição, três módulos de saída. Rastreio em
+  [`MALHA-OTIMIZADA-PROGRESSO.md`](MALHA-OTIMIZADA-PROGRESSO.md)
+  (`docs/mecanifica/MALHA-OTIMIZADA-PROGRESSO.md`).
+- A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
+  (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
+  separou o acervo por quem o lê e deixou cinco gates; relato em
   [`REORGANIZACAO-POR-USO-PROGRESSO.md`](REORGANIZACAO-POR-USO-PROGRESSO.md)
   (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
-  com priors por família está
-  [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
+  está [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
   (`docs/mecanifica/planos/congelados/README.md`), não refutado.
 
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   (`docs/mecanifica/planos/encerrados/2026-08-28-exportacao-cad-step.md`) foi
-  **concluída e aprovada**. Entregou os módulos puros `modulos/exportador-cad/` e
-  `modulos/exportador-obj/` e as CLIs `npm run exportar:step` e
-  `npm run exportar:obj`, que escrevem sólidos nomeados com unidade explícita.
-  O STEP sai por `occt-wasm@4.3.2`: a ferramenta é MIT/Apache-2.0 e o `.wasm`
-  compilado é LGPL-2.1, consumido como pacote separado e substituível, então
-  nada disso muda a licença deste repositório. Detalhe técnico em
+  **concluída e aprovada**. Entregou os módulos puros `modulos/exportador-cad/`
+  e `modulos/exportador-obj/` e as CLIs `npm run exportar:step` e
+  `npm run exportar:obj`. O STEP sai por `occt-wasm@4.3.2`: ferramenta
+  MIT/Apache-2.0 com `.wasm` LGPL-2.1 consumido como pacote separado e
+  substituível, o que não muda a licença deste repositório. Detalhe técnico em
   [`DOSSIE-EXPORTACAO-CAD-STEP.md`](DOSSIE-EXPORTACAO-CAD-STEP.md)
   (`docs/mecanifica/DOSSIE-EXPORTACAO-CAD-STEP.md`) e prova em
   [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](./historico/RELATORIO-EXPORTACAO-CAD-STEP-R00.md)
   (`docs/mecanifica/historico/RELATORIO-EXPORTACAO-CAD-STEP-R00.md`).
-- `npm run ativar:bancada` carrega qualquer peça ou montagem na bancada e
-  sincroniza a sessão em tempo real. O estado da sessão (`sessao-ativa.json` e
-  `public/sessao-ativa.json`) é local e não versionado. O procedimento está em
+- `npm run ativar:bancada` carrega peça ou montagem na bancada e sincroniza a
+  sessão; o estado é local e não versionado. Procedimento em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md)
-  (`docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`); hospedagem estática e
-  isolamento de rede, inclusive em servidor corporativo interno, em
+  (`docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`); hospedagem estática
+  e isolamento de rede em
   [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md)
   (`docs/mecanifica/ARQUITETURA-SESSAO-E-SEGURANCA.md`).
 
-A crônica dos planos concluídos e cancelados saiu daqui — ocupava mais da
-metade desta porta com narrativa de coisa encerrada. Está inteira em
+A crônica dos planos concluídos e cancelados está em
 [`planos/encerrados/README.md`](planos/encerrados/README.md)
-(`docs/mecanifica/planos/encerrados/README.md`), que continua sendo evidência
-consultável e não governa trabalho novo.
+(`docs/mecanifica/planos/encerrados/README.md`): evidência consultável, não
+governa trabalho novo.
 
 ## Direção estabelecida
 
@@ -107,7 +107,7 @@ fontes é inventário, não porta de entrada.
 ## Leitura por tarefa
 
 - Estado, objetivo e horizonte: `VISAO.md`, este índice e `planos/README.md`.
-- Princípios de autoria: `AUTORIA-IA.md`.
+- Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
 - **Investigar defeito ou entender por que uma abordagem falha:**
   `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. Ele também diz quando **não** usar o
   método: decidir forma, proporção e caráter não é problema diagnóstico, e

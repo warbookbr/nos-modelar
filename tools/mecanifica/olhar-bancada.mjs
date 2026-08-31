@@ -139,6 +139,10 @@ export async function olharBancada({
   estrito = false,
   focar = false,
   revisar = false,
+  /* Imagem para LEITURA AUTOMÁTICA: sem cromo de interface, sem piso, sem grade
+     e sem sombra. `coresPorParte` pinta uma cor por peça e devolve a legenda. */
+  auditoria = false,
+  coresPorParte = false,
   capturarEmMemoria = false,
   timeoutMs = null,
   logger = null,
@@ -152,6 +156,7 @@ export async function olharBancada({
   let temporizador = null;
   let encerramentoForcado = null;
   let expirou = false;
+  let legendaDeAuditoria = null;
   try {
     if (capturarEmMemoria && (saidaDeclarada !== null || relatorioDeclarado !== null)) {
       erroDeUso('captura em memória não aceita --saida ou --relatorio.');
@@ -368,6 +373,32 @@ export async function olharBancada({
       } else if (focar) {
         await page.evaluate(() => window.__mecanificaBancada.focar());
       }
+      /* AUDITORIA depois de escolher a vista e antes de esperar o quadro: o modo
+         mexe no tamanho do canvas (o cromo sai e o desenho ocupa tudo), e mudar
+         isso depois da espera capturaria o quadro do layout velho. */
+      if (auditoria) {
+        legendaDeAuditoria = await page.evaluate(
+          (cores) => window.__mecanificaBancada.auditoria({ cores }), coresPorParte,
+        );
+        /* Reenquadra só quando NINGUÉM pediu foco. `auditoria()` troca o
+           tamanho do canvas, e sem reenquadrar a peça fica descentrada — mas
+           chamar `enquadrar` depois de `focar` desfaz o zoom que o autor pediu,
+           que foi o que aconteceu na primeira versão desta linha. */
+        /* Seleção e foco são REAPLICADOS pela ponte, não deixados a cargo da
+           URL. O parâmetro de URL é lido uma vez, na subida da página; a peça da
+           sessão ativa chega segundos depois pelo polling, e o controlador é
+           refeito com ela — levando junto a seleção que a URL tinha pedido. Em
+           auditoria isso aparecia como uma imagem sem foco e sem fantasma, com o
+           argumento aceito e ignorado em silêncio. */
+        if (selecionadas.length) {
+          await page.evaluate(([nomes, m]) => {
+            window.__mecanificaBancada.selecionar(nomes);
+            window.__mecanificaBancada.modo(m);
+          }, [selecionadas, modo]);
+        }
+        if (focar || parPedida) await page.evaluate(() => window.__mecanificaBancada.focar());
+        else await page.evaluate(() => window.__mecanificaBancada.enquadrar());
+      }
       await page.waitForTimeout(espera);
       garantirPrazo();
       const urlReproduzivel = await page.evaluate(() => window.__mecanificaBancada.url());
@@ -400,6 +431,10 @@ export async function olharBancada({
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
         await page.screenshot({ path: arquivo });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
+        if (legendaDeAuditoria?.cores) {
+          const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
+          registrar(relato, logger, 'stdout', `            legenda: ${legenda}`);
+        }
         registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
         registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
       }
@@ -457,7 +492,7 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
-      bandeiras: ['listar', 'estrito', 'focar', 'revisar'],
+      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'cores'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -470,6 +505,10 @@ function comoCLI(argv) {
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
+    /* --cores implica --auditoria: pedir cor por parte e receber a imagem com
+       painel em cima seria entregar metade do que foi pedido. */
+    auditoria: lido.bandeira('auditoria') || lido.bandeira('cores'),
+    coresPorParte: lido.bandeira('cores'),
   });
 }
 

@@ -482,6 +482,102 @@ function registraOrigem(st, i, op, origemId, contrato) {
    precisam publicar UMA origem citável. `faces` é o contrato mínimo: não
    inventa nomes geométricos frágeis, mas torna cada face do resultado
    semanticamente pertencente à primitiva. */
+
+/* ENDEREÇAMENTO DE FACE DO `inflate` (atrito A13).
+   Antes disto `inflate` publicava só `{op,id}` = TODAS as faces, e quem
+   precisava de uma face única não tinha como pedir. O sintoma concreto: `furo`
+   exige que a entrada resolva para exatamente uma face, então NENHUMA peça de
+   chapa feita por `inflate` podia ser furada — o olho de um machado, o rasgo de
+   um suporte, a passagem de um eixo. O motor sabia fazer o furo; faltava
+   endereço.
+
+   O modo 'secoes' tem uma grade EXATA, e é ela que vira endereço:
+     - corpo: `divisoes × lados` quadriláteros, um por (estacao, lado);
+     - duas tampas em leque, `lados` triângulos cada.
+   `estacao` é a posição ao longo do caminho e `lado` é a volta da seção, com a
+   mesma gramática de eixo do `cilindro` (inteiro, nome de PARAM, 'primeira',
+   'ultima' ou filtro {passo,fase}).
+
+   `{op,id}` SOZINHO continua devolvendo tudo. Isso não é preguiça: mudar o que
+   uma citação já escrita resolve, sem diagnóstico, é a classe de erro que o
+   A-19 condena, e há receitas no acervo citando `inflate` assim.
+
+   O modo 'grade' NÃO GANHA endereço aqui, e isso é dito em vez de silenciado:
+   as faces dele saem de uma varredura de voxels, então não existe (estacao,
+   lado) — e inventar um índice pela ordem da varredura seria identidade
+   posicional, que este repositório proíbe. Pedir sub-endereço num inflate de
+   grade GRITA com essa explicação. */
+function contratoInflate() {
+  const op = 'inflate';
+  const TAMPAS = ['inicio', 'fim'];
+  const msg = `${op} usa op, id, e opcionalmente estacao + lado (uma face do corpo) ou tampa ('inicio' ou 'fim') + lado; sem nenhum deles resolve a peça inteira`;
+  return {
+    validar(origem) {
+      for (const k of Object.keys(origem)) {
+        if (!['op', 'id', 'estacao', 'lado', 'tampa'].includes(k)) return msg;
+      }
+      if (origem.tampa != null && !TAMPAS.includes(origem.tampa)) return msg;
+      if (origem.tampa != null && origem.estacao != null) return `${op}: estacao é do corpo e tampa é do fim do caminho — declare um ou outro, nunca os dois`;
+      if (!validarEixo(origem.estacao) || !validarEixo(origem.lado)) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const semSubEndereco = origem.estacao == null && origem.lado == null && origem.tampa == null;
+      if (semSubEndereco) {
+        for (const f of registro.faces) {
+          const consumo = conferirConsumo(st, f, `a face ${f} da origem ${op}:${origem.id}`);
+          if (consumo) return { erro: consumo };
+        }
+        const faces = registro.faces.filter((f) => st.F.has(f));
+        return faces.length ? { faces } : { erro: `origem ${op}:${origem.id} não tem nenhuma face viva` };
+      }
+      if (!registro.grade) {
+        return { erro: `origem ${op}:${origem.id} foi gerada no modo 'grade', que não tem estacao nem lado: as faces dela vêm de uma varredura de voxels e numerá-las pela ordem da varredura seria identidade posicional. Para endereçar face de um inflate, use modo:'secoes'` };
+      }
+      const { divisoes, lados } = registro.grade;
+      const coletar = (ids, idx, nome, total) => {
+        if (eixoDeIndiceUnico(idx)) {
+          const r = indiceDeEixo(st, idx, total);
+          if (r.erro) return { erro: `${nome} '${idx}' da origem ${op}:${origem.id} ${r.erro}` };
+          if (r.idx >= total) return { erro: `${nome} ${textoDeEixo(idx, r.idx)} fora do limite da origem ${op}:${origem.id} (0..${total - 1})` };
+          return { indices: [r.idx] };
+        }
+        const lista = indicesEixo(idx, total);
+        if (typeof idx === 'object' && idx != null && !lista.length) {
+          return { erro: `filtro de ${nome} {passo:${idx.passo},fase:${idx.fase}} não casa nenhum índice em 0..${total - 1} na origem ${op}:${origem.id}` };
+        }
+        return { indices: lista };
+      };
+
+      const faces = [];
+      if (origem.tampa != null) {
+        const banco = registro.tampas[origem.tampa];
+        const r = coletar(banco, origem.lado, 'lado', lados);
+        if (r.erro) return r;
+        for (const j of r.indices) {
+          const f = banco[j];
+          const consumo = conferirConsumo(st, f, `lado ${j} da tampa '${origem.tampa}' da origem ${op}:${origem.id}`);
+          if (consumo) return { erro: consumo };
+          if (st.F.has(f)) faces.push(f);
+        }
+      } else {
+        const re = coletar(null, origem.estacao, 'estacao', divisoes);
+        if (re.erro) return re;
+        const rl = coletar(null, origem.lado, 'lado', lados);
+        if (rl.erro) return rl;
+        for (const e of re.indices) for (const j of rl.indices) {
+          const f = registro.corpo[e * lados + j];
+          const consumo = conferirConsumo(st, f, `estacao ${e}, lado ${j} da origem ${op}:${origem.id}`);
+          if (consumo) return { erro: consumo };
+          if (st.F.has(f)) faces.push(f);
+        }
+      }
+      if (!faces.length) return { erro: `origem ${op}:${origem.id} não tem nenhuma face correspondente` };
+      return { faces };
+    },
+  };
+}
+
 function contratoFaces(op) {
   return {
     validar(origem) {
@@ -903,7 +999,7 @@ const CONTRATOS_ORIGEM = {
      endereçar. Publicar `{linha,coluna}` aqui seria prometer região e entregar
      ordem de varredura. Enquanto a topologia for essa, o contrato certo é
      citar a primitiva inteira. */
-  inflate: contratoFaces('inflate'),
+  inflate: contratoInflate(),
   espelha: {
     validar(origem) {
       const chaves = ['op', 'id', 'de'];

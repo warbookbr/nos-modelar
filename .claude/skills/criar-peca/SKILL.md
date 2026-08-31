@@ -10,6 +10,12 @@ uma árvore de composição, relações entre peças ou revalidação de conjunt
 use também `../auditar-montagem/SKILL.md`; não transforme uma montagem em uma
 receita monolítica.
 
+O contrato que esta skill executa é
+[`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
+o que conta como peça e não montagem, identidade estável, isolamento, limites
+do controle, propagação de alteração, validação em camadas, invariantes e
+desvios a evitar. A skill diz **como fazer**; o contrato diz **o que vale**.
+
 ## Caminho curto
 
 1. Descubra capacidades no [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
@@ -81,8 +87,18 @@ extensão; nunca instale código ou esconda JavaScript na receita.
 
 ## Contrato mínimo
 
-Não existe modelo de receita no acervo atual e não se deve recriar uma cópia
-histórica. Para uma receita nova, use o contrato declarativo em
+O acervo TEM receitas completas para ler antes de começar, e ler uma poupa a
+maior parte dos tropeços. Escolha pela forma que você precisa, não pelo tema:
+
+| se a forma é… | leia |
+| --- | --- |
+| caixa e junção (marcenaria, estrutura) | `prototipos/procedural/v3/pecas/cadeira-de-madeira.js` |
+| seção que muda ao longo do comprimento | `prototipos/procedural/v3/armas/espada-curta.js` |
+| assimétrica num plano | `prototipos/procedural/v3/armas/machado-de-guerra.js` |
+| detalhe repetido em torno de um eixo | `prototipos/procedural/v3/armas/maca-de-abas.js` |
+
+Ler é para entender a operação e a convenção; **copiar uma receita histórica
+como molde, não**. Para uma receita nova, use o contrato declarativo em
 `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
 não referência de engenharia, e registre o pacote que autorizou a modelagem.
 
