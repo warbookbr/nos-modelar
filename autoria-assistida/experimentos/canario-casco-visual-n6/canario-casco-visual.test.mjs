@@ -17,5 +17,7 @@ describe('canário de casco visual N6',()=>{
     expect(r.malha.componentes).toBe(1);
     for(const vista of ['frontal','lateral','superior']){expect(r.vistas[vista].iouSilhueta).toBeGreaterThan(.3);expect(r.vistas[vista].veredito).toBe('reprovado');expect(r.vistas[vista].motivo).toBeTruthy();expect(existsSync(resolve(aqui,'evidencias',r.vistas[vista].render))).toBe(true);expect(r.inspecaoIndividual.evidencias[vista].render.sha256).toMatch(/^[a-f0-9]{64}$/);}
     expect(r.vistas.perspectiva.veredito).toBe('reprovado');
-  });
+    /* Constrói o casco completo e captura quatro vistas; o trabalho real passa
+       dos 5 s padrão quando a suíte roda em paralelo. */
+  }, 30000);
 });

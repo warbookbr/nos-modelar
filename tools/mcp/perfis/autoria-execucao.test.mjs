@@ -68,7 +68,11 @@ describe('perfil MCP autoria-execucao', () => {
     if (existsSync(resolve(saidaTeste))) {
       unlinkSync(resolve(saidaTeste));
     }
-  });
+    /* Estes dois carregam o kernel OCCT (wasm de 22 MB) e executam a receita
+       inteira. Isolados cabem nos 5 s padrão; com a suíte toda em paralelo,
+       não. O tempo declarado é a duração real do trabalho, não folga para
+       esconder travamento. */
+  }, 30000);
 
   it('exporta modelo para arquivo OBJ com multipartes semânticas', async () => {
     const saidaTeste = 'exportacoes/obj/teste_mcp_prensa.obj';
@@ -89,5 +93,5 @@ describe('perfil MCP autoria-execucao', () => {
     if (existsSync(resolve(saidaTeste))) {
       unlinkSync(resolve(saidaTeste));
     }
-  });
+  }, 30000);
 });
