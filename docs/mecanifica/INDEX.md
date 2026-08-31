@@ -26,7 +26,13 @@ aplicação publicada aqui.
   (`docs/mecanifica/RELATORIO-EXPORTACAO-CAD-STEP-R00.md`).
 - `npm run ativar:bancada` carrega qualquer peça ou montagem na bancada e
   sincroniza a sessão em tempo real. O estado da sessão (`sessao-ativa.json` e
-  `public/sessao-ativa.json`) é local e não versionado.
+  `public/sessao-ativa.json`) é local e não versionado. O procedimento está em
+  [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](ATIVACAO-BANCADA-SESSAO-ATIVA.md)
+  (`docs/mecanifica/ATIVACAO-BANCADA-SESSAO-ATIVA.md`), e o modelo de
+  hospedagem estática e isolamento de rede — inclusive para servidor
+  corporativo interno — está em
+  [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md)
+  (`docs/mecanifica/ARQUITETURA-SESSAO-E-SEGURANCA.md`).
 
 - A homologação **do fluxo** foi concluída nos Casos 1 e 2, e encerrada aí. Ela
   aprova o processo de autoria, não a geometria: a peça de cada caso segue sendo
