@@ -15,8 +15,8 @@ IA que modela um mecanismo consegue dizer que existe `pinca`, `pastilha` e
 Isso obriga outro agente a reconstruir essa intenção pela geometria ou pelo
 nome, e impede uma inspeção estrutural simples antes de crescer para uma
 montagem grande. A lacuna é a regra 3 de
-[`AUTORIA-IA.md`](../AUTORIA-IA.md) e o próximo degrau explícito de
-[`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md).
+[`AUTORIA-IA.md`](../../AUTORIA-IA.md) e o próximo degrau explícito de
+[`MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md).
 
 ## Resultado
 

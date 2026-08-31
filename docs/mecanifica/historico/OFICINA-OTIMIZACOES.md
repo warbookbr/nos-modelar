@@ -6,12 +6,12 @@ itens específicos daquela UI permanecem apenas como histórico para upstream.
 
 Análise de dependências e backlog das mudanças na linguagem de autoria. Este
 arquivo não autoriza implementação; um candidato só começa quando ganha plano
-curto em [`planos/README.md`](planos/README.md). A divisão de trabalho entre os
+curto em [`planos/README.md`](../planos/README.md). A divisão de trabalho entre os
 documentos é:
 
-- [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md) registra a **dor observada** (A-1 a
+- [`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md) registra a **dor observada** (A-1 a
   A-17) — é a evidência;
-- [`UPSTREAM-NOS.md`](UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
+- [`UPSTREAM-NOS.md`](../UPSTREAM-NOS.md) registra a **candidatura ao NÓS** (UP-008
   a UP-016) — é a portabilidade;
 - este documento registra **dependências, custo e provas candidatas** — é a
   análise que alimenta o backlog.
@@ -426,7 +426,7 @@ suporte usam `chamferBox` como bloco maciço.
 `canto`, e `plano` a grade `faixa`×`lado` do `loft` — tudo reusando as fábricas
 de contrato que já existiam, sem vocabulário novo, e sem mudar o que `{op,id}`
 sem eixo já respondia. `inflate` fica no contrato mínimo por decisão medida,
-agora escrita no código. Detalhe em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md),
+agora escrita no código. Detalhe em [`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md),
 A-18 (resolvidos).
 
 **E PROVADO na peça, não só no núcleo.** `_jardineira` foi reescrita para
@@ -481,7 +481,7 @@ do `peDoCaule`; o centro do `assentoDoBotao` cai sobre o centro da
 uma porta reresolvida por posição.
 
 **Três achados da prova**, todos registrados em
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), nenhum contornado em silêncio:
+[`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md), nenhum contornado em silêncio:
 
 - **A-21 (corrigido nesta rodada).** O gate `id-cru` reprovava a peça por "5 ids
   posicionais" que eram as cinco portas: a chave `de` passou a ter dois
@@ -607,7 +607,7 @@ O uso, que era a metade que faltava, entrou no fechamento do mesmo ciclo:
 **O que continua devendo:** o prisioneiro de roda e a aleta de ventilação do
 freio seguem não modelados — a peça `freio-disco.js` não foi tocada neste ciclo,
 por escopo. A reescrita achou um limite novo do arranjo, registrado como A-24.
-Ver A-17, A-23 e A-24 em [`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md).
+Ver A-17, A-23 e A-24 em [`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md).
 
 ### O-9 — parâmetro de tipo ponto e caminho
 

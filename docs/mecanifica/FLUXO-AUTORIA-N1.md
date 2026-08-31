@@ -3,7 +3,7 @@
 ## Estado e alcance
 
 Este é o contrato executável concluído da N1 do plano
-[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 Ela cria a fronteira neutra acima dos serviços existentes sem mudar geometria
 pública, receitas atuais, montagem, revisão, visor ou MCP.
 
@@ -180,7 +180,7 @@ A N1 está concluída. A prova real de veículo tem dez etapas básicas: briefin
 fica coberto e as outras nove permanecem lacunas explícitas. Uma necessidade
 procedural adicional é coberta sem alterar esse veredito global. O relatório de
 encerramento está em
-[`RELATORIO-N1-FLUXO-AUTORIA.md`](RELATORIO-N1-FLUXO-AUTORIA.md).
+[`RELATORIO-N1-FLUXO-AUTORIA.md`](./historico/RELATORIO-N1-FLUXO-AUTORIA.md).
 
 A N2 pode abrir para implementar alvo operacional, andaime e blocagem global.
 Nenhum adaptador futuro pode declarar `forma-global`, `superficie` ou

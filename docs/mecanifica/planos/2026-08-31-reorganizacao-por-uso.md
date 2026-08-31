@@ -86,6 +86,10 @@ Cada gate roda no CI e reprova sozinho.
 - **G5 — teto das portas.** `usar/README.md` até 60 linhas; `INDEX.md` até 200.
 - **G6 — o de sempre.** `docs:links:check`, `mapa:check`, `docs:toc:check` e a
   suíte continuam verdes em cada fatia.
+- **G7 — link relativo também conta.** Achado na F1: `docs:links:check` só
+  confere caminhos `docs/<...>.md` e é cego a link relativo de markdown, que é a
+  forma mais usada. A `main` já carregava 26 links relativos quebrados com todos
+  os gates verdes. O gate passa a resolver link relativo também.
 
 ## Fatias
 
@@ -122,7 +126,7 @@ duas coisas) e os `PRANCHA-*.md`, que parecem exemplo e não regra.
 
 ### F3 — os gates que seguram
 
-Implementar G1, G3, G4 e G5. Cada gate entra com o teste que o vê reprovar
+Implementar G1, G3, G4, G5 e G7. Cada gate entra com o teste que o vê reprovar
 antes de vê-lo passar: gate que nunca foi visto vermelho é decoração, e este
 repositório já registrou essa falha.
 

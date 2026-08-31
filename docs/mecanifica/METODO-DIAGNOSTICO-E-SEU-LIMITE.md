@@ -54,7 +54,7 @@ generativo.
 
 Quando esse sintoma aparecer, a saída não é achar o décimo primeiro defeito. É
 trocar de método: ver
-[`planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+[`planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 
 ## Os dois passos que a IA pula, e não pode pular
 

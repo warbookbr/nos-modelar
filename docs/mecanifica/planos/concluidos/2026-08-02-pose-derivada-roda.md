@@ -13,7 +13,7 @@ O Recorte A de AUT-05 prova se a roda já está corretamente encaixada, mas não
 consegue indicar onde uma roda deslocada deve ficar. Um cilindro com apenas
 eixo e centro também deixa giro e posição axial ambíguos. A evidência e a
 escada de maturidade estão em
-[`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md), níveis 1–3.
+[`MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md), níveis 1–3.
 
 ## Resultado
 

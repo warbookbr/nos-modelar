@@ -13,7 +13,7 @@ O validador cilíndrico já mede causas específicas, mas sua resposta principal
 apenas `satisfeita`. Uma IA não distingue, por um campo estável, um encaixe
 correto porém subdeterminado de uma divergência corrigível ou de uma relação
 estruturalmente impossível. A lacuna é o checklist aberto do nível 2 em
-[`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md).
 
 ## Resultado
 

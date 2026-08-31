@@ -72,7 +72,10 @@ describe('condições de rejeição do P0, executáveis', () => {
     const [n1, n2, n3] = [1, 2, 3].map((n) => medida(avaliarRejeicoes({ cage, niveis: n }), 5).ondulacao);
     expect(n3).toBeGreaterThan(n1 * 0.5);
     expect(n3).toBeLessThan(n1 * 1.5);
-  });
+    /* Subdivide a cage até o nível 3 três vezes seguidas; isolado leva ~9 s e
+       com a suíte em paralelo estoura os 5 s padrão. O tempo declarado é a
+       duração real do trabalho, não folga para esconder travamento. */
+  }, 30000);
 
   it('6 — sem recuo, o farol é decalque', () => {
     expect(veredito(avaliarRejeicoes(), 6)).toBe('passa');

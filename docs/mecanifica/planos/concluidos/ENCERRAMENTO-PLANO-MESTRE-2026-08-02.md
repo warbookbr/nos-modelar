@@ -20,7 +20,7 @@ construir cantos compostos. Depois da convergência, o contrato aceito é outro:
 - o canto composto de `chamferBox` permanece no Escopo B, falhando fechado.
 
 Executar F0b, F3 e F4 como escritos criaria dois significados para `filete` e
-contrariaria [`FILETE-V2.md`](../FILETE-V2.md). F2 e F5 estavam acoplados ao
+contrariaria [`FILETE-V2.md`](../../FILETE-V2.md). F2 e F5 estavam acoplados ao
 mesmo pacote de 29 commits; não havia motivo para conservar a agregação depois
 de sua premissa central cair.
 

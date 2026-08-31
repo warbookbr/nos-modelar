@@ -25,7 +25,7 @@ dez braços formando cinco raios duplos, barril, flange, rebaixo central e cinco
 fixadores. Ela não é desenho técnico e não fornece medidas ocultas.
 
 A verdade dimensional continua sendo
-[`PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md): eixo X, raio externo
+[`PRANCHA-RODA-DIANTEIRA.md`](../PRANCHA-RODA-DIANTEIRA.md): eixo X, raio externo
 0,340 m, largura 0,220 m e composição com o cubo já existente no freio. Não criar
 outro cubo para obter a aparência da imagem.
 
@@ -78,4 +78,4 @@ perfil `realista-apresentacao`. Ela permanece como prova e não substitui
 O resultado, as tentativas e as limitações estão em
 [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md). A avaliação comparável e o
 fluxo que ela passou a justificar estão em
-[`PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md).
+[`PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md).

@@ -13,7 +13,7 @@
 concordâncias, mas `segmentosCurva` vale para o passo inteiro. Um perfil com
 curvas de tamanhos diferentes precisa pagar o custo da maior em todas elas.
 A evidência e a fronteira estão no A-35 de
-[`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md).
+[`ATRITOS-AUTORIA.md`](../../ATRITOS-AUTORIA.md).
 
 ## Resultado
 

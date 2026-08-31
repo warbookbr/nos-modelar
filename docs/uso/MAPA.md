@@ -368,7 +368,6 @@
 
 - `AGENT-FIRST.md` — Filtro Agent-First
 - `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
-- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
@@ -392,7 +391,6 @@
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
-- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
 - `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
 - `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
@@ -421,6 +419,25 @@
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
+- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
+- `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
+- `VISAO.md` — Visão da Mecanifica
+
+## docs/mecanifica/gerado/
+
+- `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
+- `INDEX.md` — Artefatos gerados do catálogo procedural
+
+## docs/mecanifica/historico/
+
+- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
+- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
+- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
+- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
+- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `README.md` — Histórico da Mecanifica
+- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
 - `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md` — Auditoria das práticas de autoria 3D
 - `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
@@ -442,78 +459,18 @@
 - `RELATORIO-N5-BUSCA.md` — Relatório N5 — busca residual controlada
 - `RELATORIO-N6-CANARIO-CASCO-VISUAL.md` — Relatório N6 — canário de casco por silhuetas
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
+- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
-- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
-- `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
-- `VISAO.md` — Visão da Mecanifica
-
-## docs/mecanifica/gerado/
-
-- `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
-- `INDEX.md` — Artefatos gerados do catálogo procedural
-
-## docs/mecanifica/historico/
-
-- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
-- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
-- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
-- `README.md` — Histórico da Mecanifica
-- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
-- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 
 ## docs/mecanifica/planos/
 
-- `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
-- `2026-08-05-mcp-autoria-controlada.md` — MCP — autoria controlada de pacotes
-- `2026-08-05-mcp-avaliacao-consolidada.md` — MCP — avaliação consolidada por agente consumidor
-- `2026-08-05-mcp-correcao-descoberta.md` — MCP — correção de descoberta de pacotes e revisões
-- `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
-- `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
-- `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
-- `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
-- `2026-08-14-autoria-segura-receitas.md` — Autoria segura de receitas declarativas
-- `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
-- `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
-- `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
-- `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
-- `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
-- `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
-- `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
-- `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
-- `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
-- `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
-- `2026-08-17-alteracao-compacta.md` — Alteração semântica compacta de montagem
-- `2026-08-17-correcoes-fluxo-dobradica.md` — Correções do fluxo encontradas no estudo de dobradiça
-- `2026-08-17-desacoplamento-catalogo-validacao.md` — Independência entre núcleo, validação e catálogo
-- `2026-08-17-encostar.md` — Encostar — contato derivado no lugar de coordenada digitada
-- `2026-08-17-estudo-conjunto-dobradica.md` — Estudo de campo — autoria de um conjunto simples de três peças
-- `2026-08-17-historico-de-revisao.md` — Histórico de revisão — olhar para trás e voltar
-- `2026-08-17-lathe-fechado.md` — Perfil fechado no `lathe` — e a limpeza da lista de pendências
-- `2026-08-17-migracao-fps-para-procedural.md` — Migração estrutural de `fps` para `procedural`
-- `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
-- `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
-- `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
-- `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
 - `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
-- `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
-- `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
-- `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
-- `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
-- `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
-- `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
-- `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
-- `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
-- `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
-- `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
-- `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
 - `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -546,6 +503,52 @@
 
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `README.md` — Planos congelados
+
+## docs/mecanifica/planos/encerrados/
+
+- `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
+- `2026-08-05-mcp-autoria-controlada.md` — MCP — autoria controlada de pacotes
+- `2026-08-05-mcp-avaliacao-consolidada.md` — MCP — avaliação consolidada por agente consumidor
+- `2026-08-05-mcp-correcao-descoberta.md` — MCP — correção de descoberta de pacotes e revisões
+- `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
+- `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
+- `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
+- `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
+- `2026-08-14-autoria-segura-receitas.md` — Autoria segura de receitas declarativas
+- `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
+- `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
+- `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
+- `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
+- `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
+- `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
+- `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
+- `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
+- `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
+- `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
+- `2026-08-17-alteracao-compacta.md` — Alteração semântica compacta de montagem
+- `2026-08-17-correcoes-fluxo-dobradica.md` — Correções do fluxo encontradas no estudo de dobradiça
+- `2026-08-17-desacoplamento-catalogo-validacao.md` — Independência entre núcleo, validação e catálogo
+- `2026-08-17-encostar.md` — Encostar — contato derivado no lugar de coordenada digitada
+- `2026-08-17-estudo-conjunto-dobradica.md` — Estudo de campo — autoria de um conjunto simples de três peças
+- `2026-08-17-historico-de-revisao.md` — Histórico de revisão — olhar para trás e voltar
+- `2026-08-17-lathe-fechado.md` — Perfil fechado no `lathe` — e a limpeza da lista de pendências
+- `2026-08-17-migracao-fps-para-procedural.md` — Migração estrutural de `fps` para `procedural`
+- `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
+- `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
+- `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
+- `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
+- `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
+- `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
+- `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
+- `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
+- `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
+- `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
+- `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
+- `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
+- `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
+- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
+- `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
+- `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
 
 ## docs/mecanifica/planos/mcp/
 

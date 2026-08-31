@@ -17,7 +17,7 @@ diferença entre congelado, cancelado e concluído, e cada plano guardado lá
 declara sua condição de descongelamento.
 
 **Concluído e aprovado:**
-[`2026-08-28-exportacao-cad-step.md`](2026-08-28-exportacao-cad-step.md) —
+[`2026-08-28-exportacao-cad-step.md`](./encerrados/2026-08-28-exportacao-cad-step.md) —
 entregou os módulos puros `modulos/exportador-cad/` e `modulos/exportador-obj/`,
 as CLIs `npm run exportar:step` e `npm run exportar:obj` com escrita atômica, e a
 ativação da bancada por sessão (`npm run ativar:bancada`).
@@ -43,12 +43,12 @@ implementação. O registro de falhas em
 [`GOTCHAS-AUTORIA-VISUAL.md`](../GOTCHAS-AUTORIA-VISUAL.md) é leitura
 obrigatória antes de abrir experimento.
 
-O [R2B com controle vertical](2026-08-23-redesenho-cage-r2b-controle-vertical.md)
+O [R2B com controle vertical](./encerrados/2026-08-23-redesenho-cage-r2b-controle-vertical.md)
 foi concluído com decisão `interromper`: sua melhor evidência continuou
 reprovada numérica e visualmente, e B2–B4 não prosseguem. Cage, métricas e
 imagens permanecem como contraevidência; nada foi promovido.
 
-A [auditoria das práticas de autoria 3D](2026-08-20-auditoria-praticas-autoria-3d.md)
+A [auditoria das práticas de autoria 3D](./encerrados/2026-08-20-auditoria-praticas-autoria-3d.md)
 foi concluída com decisão `corrigir`. Ela preserva a base semântica e congela
 P2 e a validação integrada até uma prova privada ligar o aceite visual ao
 fechamento e exercitar seções de caráter declaradas.
@@ -68,14 +68,14 @@ estado `pronto`**. Suas evidências e a decisão pendente sobre a alteração lo
 permanecem íntegras, mas Q7 não executa enquanto a confiabilidade da prancha —
 alvo e fonte de julgamento da prova — estiver sob auditoria ativa.
 
-A [coerência entre vistas](2026-08-19-coerencia-entre-vistas.md) foi concluída e
+A [coerência entre vistas](./encerrados/2026-08-19-coerencia-entre-vistas.md) foi concluída e
 fecha o motor de prancha. Ela desfez um silenciamento indevido de teste — que
 sozinho já acusou quatro rodas escapando da carroceria em planta — e passou a
 comparar as vistas pelos eixos que compartilham, com leitura `projecao` ou
 `secao` declarada. Essa conclusão é evidência histórica; não reabre P1, cage ou
 geometria antes dos gates do novo P0.
 
-O [motor de prancha com filete e medida](2026-08-19-motor-de-prancha-medida.md)
+O [motor de prancha com filete e medida](./encerrados/2026-08-19-motor-de-prancha-medida.md)
 foi **concluído**. Ele trocou a spline por traçado com filete, adotou âncora
 proporcional e passou a emitir relatório medido da própria saída. O ganho não é
 estético: o relatório pegou sozinho um arco de roda furando o capô e dez
@@ -91,37 +91,37 @@ compilado. OCCT/B-rep, Blender headless, SDF e kernel próprio foram rejeitados
 naquele recorte. A prova do quarto, cage e `inflate` permanecem contraevidência;
 nenhum deles é a próxima execução.
 
-A [sonda da armadura humanoide tecnológica](2026-08-18-sonda-armadura-humanoide-1-0.md)
+A [sonda da armadura humanoide tecnológica](./encerrados/2026-08-18-sonda-armadura-humanoide-1-0.md)
 foi concluída com decisão `aprovar`. Ela testou hierarquia profunda,
 bilateralidade, quiralidade, estados estáticos, contexto progressivo, crítica
 visual estruturada e correções genéricas sem publicar geometria ou replicar
 franquia. A evidência está em
-[`../RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](../RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md).
+[`../RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md`](../historico/RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md).
 
-A [sonda do supercarro](2026-08-18-sonda-supercarro-1-0.md) foi concluída com
+A [sonda do supercarro](./encerrados/2026-08-18-sonda-supercarro-1-0.md) foi concluída com
 decisão `aprovar`; a evidência está em
-[`../RELATORIO-SONDA-SUPERCARRO-1-0.md`](../RELATORIO-SONDA-SUPERCARRO-1-0.md).
+[`../RELATORIO-SONDA-SUPERCARRO-1-0.md`](../historico/RELATORIO-SONDA-SUPERCARRO-1-0.md).
 
-O [ensaio ponta a ponta da dobradiça](2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
+O [ensaio ponta a ponta da dobradiça](./encerrados/2026-08-18-ensaio-ponta-a-ponta-dobradica.md)
 foi concluído com decisão `aprovar`; a evidência está em
-[`../RELATORIO-ENSAIO-DOBRADICA-1-0.md`](../RELATORIO-ENSAIO-DOBRADICA-1-0.md).
+[`../RELATORIO-ENSAIO-DOBRADICA-1-0.md`](../historico/RELATORIO-ENSAIO-DOBRADICA-1-0.md).
 
 O plano da plataforma procedural extensível foi concluído no R10 com decisão
 `aprovar`; a evidência está em `../RELATORIO-PLATAFORMA-PROCEDURAL-R10.md`.
 
-O plano concluído mais recente foi a [auditoria de interseções em montagens](2026-08-18-auditoria-intersecoes-montagem.md), aprovada após integrar malha, contenção, casos inconclusivos e MCP.
+O plano concluído mais recente foi a [auditoria de interseções em montagens](./encerrados/2026-08-18-auditoria-intersecoes-montagem.md), aprovada após integrar malha, contenção, casos inconclusivos e MCP.
 
 O plano de desacoplamento entre núcleo, validadores, fixtures e catálogo foi
 concluído com catálogo vazio e rollout coordenado com `warbookbr/mecanica`.
 
 **Plano concluído anterior à auditoria:**
-[`2026-08-17-migracao-fps-para-procedural.md`](2026-08-17-migracao-fps-para-procedural.md).
+[`2026-08-17-migracao-fps-para-procedural.md`](./encerrados/2026-08-17-migracao-fps-para-procedural.md).
 
 Ele moveu a raiz canônica para `prototipos/procedural/v3/`, preservando
 comportamento, geometria e contratos, após verificar o consumidor externo.
 
 **Plano concluído anterior:**
-[`2026-08-17-correcoes-fluxo-dobradica.md`](2026-08-17-correcoes-fluxo-dobradica.md).
+[`2026-08-17-correcoes-fluxo-dobradica.md`](./encerrados/2026-08-17-correcoes-fluxo-dobradica.md).
 
 Ele corrigiu os atritos comprovados pelo estudo de dobradiça: referência
 procedural, template, descrição de receita confinada, estado dos contratos e
@@ -129,7 +129,7 @@ enquadramento do visor privado. Materiais, união topológica e cinemática
 continuam fora.
 
 **Plano concluído anterior:**
-[`2026-08-17-estudo-conjunto-dobradica.md`](2026-08-17-estudo-conjunto-dobradica.md).
+[`2026-08-17-estudo-conjunto-dobradica.md`](./encerrados/2026-08-17-estudo-conjunto-dobradica.md).
 
 O estudo criou três peças confinadas e uma montagem v3 válida, registrando nove
 achados com diagnóstico causal. A decisão foi `corrigir`: a fixture passou,
@@ -137,7 +137,7 @@ mas documentação operacional e enquadramento de peças finas exigem recortes
 próprios.
 
 O plano concluído anterior foi
-[`2026-08-14-revalidacao-cascata-persistida.md`](2026-08-14-revalidacao-cascata-persistida.md).
+[`2026-08-14-revalidacao-cascata-persistida.md`](./encerrados/2026-08-14-revalidacao-cascata-persistida.md).
 
 O plano abriu a revalidação em cascata como acréscimo sobre mapa, impacto,
 revisões e transações existentes. R00–R06 foram concluídas com decisão
@@ -146,20 +146,20 @@ obsolescência, estudo de campo multi-raiz e consumo Agent-First estão provados
 Correção e publicação automática de dependentes permanecem fora.
 
 O plano de
-[`continuidade de autoria ativa`](2026-08-14-continuidade-autoria-ativa.md) foi
+[`continuidade de autoria ativa`](./encerrados/2026-08-14-continuidade-autoria-ativa.md) foi
 concluído e aprovado. Revisões imutáveis
 autorizadas passam a alimentar leitura, vistas e revalidação, e o perfil de
 autoria preserva as ferramentas de auditoria. Ele não abre mapa global,
 correção automática de dependentes nem publicação em fontes JavaScript.
 
 O diagnóstico técnico do motor procedural foi concluído. O relatório está em
-[`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../RELATORIO-DIAGNOSTICO-MOTOR.md) e a
+[`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../historico/RELATORIO-DIAGNOSTICO-MOTOR.md) e a
 decisão final — **abrir Montagem Mínima Persistida v1** — já foi executada: o
 plano está aberto em
-[`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
+[`2026-08-07-montagem-minima-persistida-v1.md`](./encerrados/2026-08-07-montagem-minima-persistida-v1.md).
 O PR #33 que abriu o plano foi mergeado na `main`. A Montagem Mínima Persistida
 v1 foi concluída no arquivo
-[`2026-08-07-montagem-minima-persistida-v1.md`](2026-08-07-montagem-minima-persistida-v1.md).
+[`2026-08-07-montagem-minima-persistida-v1.md`](./encerrados/2026-08-07-montagem-minima-persistida-v1.md).
 O plano de relações locais foi concluído no R06 pelo PR #41, mergeado na `main`
 no commit `e7b80ac`. As provas A–F, fixtures persistidas v2, contrato v2 e o
 documento de continuidade arquitetural estão integrados. O contexto de
@@ -205,7 +205,7 @@ enquanto não houver evidência nova.
 
 ## Resultado pós-estudo
 
-[`2026-08-14-contexto-de-montagem-para-ia.md`](2026-08-14-contexto-de-montagem-para-ia.md)
+[`2026-08-14-contexto-de-montagem-para-ia.md`](./encerrados/2026-08-14-contexto-de-montagem-para-ia.md)
 foi concluído no R05. Ele entrega descrição estruturada, compacta e consultável
 de montagem persistida arbitrária, com cobertura explícita do que foi e do que
 não foi verificado.
@@ -233,13 +233,13 @@ O painel de programa acompanha dependências e resultados, mas não conta como
 plano executivo ativo. A Fatia 1A somente leitura foi aprovada e encerrada em
 [`mcp/concluidos/01-fatia-1a-piloto-leitura.md`](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 a Fatia 1B visual foi encerrada em
-[`2026-08-05-mcp-fatia-1b-visual.md`](2026-08-05-mcp-fatia-1b-visual.md), a
+[`2026-08-05-mcp-fatia-1b-visual.md`](./encerrados/2026-08-05-mcp-fatia-1b-visual.md), a
 avaliação consolidada foi concluída com decisão `corrigir` em
-[`2026-08-05-mcp-avaliacao-consolidada.md`](2026-08-05-mcp-avaliacao-consolidada.md),
+[`2026-08-05-mcp-avaliacao-consolidada.md`](./encerrados/2026-08-05-mcp-avaliacao-consolidada.md),
 a correção de descoberta foi concluída com decisão `aprovar` em
-[`2026-08-05-mcp-correcao-descoberta.md`](2026-08-05-mcp-correcao-descoberta.md)
+[`2026-08-05-mcp-correcao-descoberta.md`](./encerrados/2026-08-05-mcp-correcao-descoberta.md)
 e a primeira fatia de autoria controlada foi concluída com decisão `interromper`
-em [`2026-08-05-mcp-autoria-controlada.md`](2026-08-05-mcp-autoria-controlada.md).
+em [`2026-08-05-mcp-autoria-controlada.md`](./encerrados/2026-08-05-mcp-autoria-controlada.md).
 
 A primeira autoria controlada de pacotes não foi publicada. O PR #25 foi fechado sem merge porque a
 implementação portátil não demonstrou simultaneamente publicação do pacote
@@ -297,14 +297,14 @@ nos arquivos originais.
 | Estudo de autoria — conjunto dobradiça | concluído: corrigir |
 
 O plano da abertura oblonga está em
-[`2026-08-17-abertura-oblonga.md`](2026-08-17-abertura-oblonga.md). Ele fechou a
+[`2026-08-17-abertura-oblonga.md`](./encerrados/2026-08-17-abertura-oblonga.md). Ele fechou a
 primeira das três lacunas geométricas listadas em
-[`../RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](../RELATORIO-ANALISE-GRANDES-MELHORIAS.md):
+[`../RELATORIO-ANALISE-GRANDES-MELHORIAS.md`](../historico/RELATORIO-ANALISE-GRANDES-MELHORIAS.md):
 `furo` passou a expressar rasgo por `ate`, sem operação nova e sem família de
 endereço nova. Costuras de `lathe` e endereço único de grupo linear continuam
 abertas, sem abertura automática.
 
-A [pose de criação](2026-08-17-pose-de-criacao.md) fechou o atrito A-4: os
+A [pose de criação](./encerrados/2026-08-17-pose-de-criacao.md) fechou o atrito A-4: os
 geradores aceitam `em` e `eixo`, e o trio criar/rotacionar/transladar vira um
 passo. O acervo gastava 128 dos 853 passos (15%) só em transporte.
 
@@ -320,16 +320,16 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 [inspeção](concluidos/2026-08-03-inspecao-reproduzivel-de-par.md), [seleção](concluidos/2026-08-03-selecao-subarvore-semantica.md),
 [encerramento](concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md),
 [MCP Fatia 1A](mcp/concluidos/01-fatia-1a-piloto-leitura.md),
-[MCP Fatia 1B](2026-08-05-mcp-fatia-1b-visual.md),
-[MCP avaliação consolidada](2026-08-05-mcp-avaliacao-consolidada.md),
-[MCP correção de descoberta](2026-08-05-mcp-correcao-descoberta.md),
-[MCP autoria controlada](2026-08-05-mcp-autoria-controlada.md) e
-[diagnóstico do motor](2026-08-06-diagnostico-motor-procedural.md).
+[MCP Fatia 1B](./encerrados/2026-08-05-mcp-fatia-1b-visual.md),
+[MCP avaliação consolidada](./encerrados/2026-08-05-mcp-avaliacao-consolidada.md),
+[MCP correção de descoberta](./encerrados/2026-08-05-mcp-correcao-descoberta.md),
+[MCP autoria controlada](./encerrados/2026-08-05-mcp-autoria-controlada.md) e
+[diagnóstico do motor](./encerrados/2026-08-06-diagnostico-motor-procedural.md).
 
 ## Abertura em curso
 
 Somente P0 do [modelador inverso com priors por
-família](2026-08-25-modelador-inverso-priors-familia.md) está aberto. O plano
+família](./congelados/2026-08-25-modelador-inverso-priors-familia.md) está aberto. O plano
 executável está em
 [`docs/superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md).
 Ele corrige a linha de base, qualifica alvo e calibra o avaliador; **não modela

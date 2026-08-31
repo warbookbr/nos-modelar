@@ -70,7 +70,7 @@ resto:
   medição e revisão. A peça usada em cada caso continua sendo exemplo, como
   todas as outras: homologar o fluxo nunca homologou geometria.
 - **Plano executivo ativo:** [plataforma procedural extensível e
-  descobrível](docs/mecanifica/planos/2026-08-18-plataforma-procedural-extensivel.md).
+  descobrível](docs/mecanifica/planos/encerrados/2026-08-18-plataforma-procedural-extensivel.md).
   A R00 está mapeando a linha de base e as dependências do motor antes da
   extração modular. O plano cria núcleo pequeno, registro tipado, módulos,
   grafo de capacidades, subgrafos reutilizáveis, extensões verificáveis e

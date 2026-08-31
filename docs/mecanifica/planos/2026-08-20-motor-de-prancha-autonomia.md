@@ -89,7 +89,7 @@ entre vistas, referência mal calibrada, detalhe fora do contorno, confiança
 forjada e desvio entre prancha e modelo. Cada caso demonstra qual defesa atual o
 pega ou por que ainda passa.
 
-**Aceite:** concluído — [relatório de linha de base R0](../RELATORIO-MOTOR-DE-PRANCHA-R0.md)
+**Aceite:** concluído — [relatório de linha de base R0](../historico/RELATORIO-MOTOR-DE-PRANCHA-R0.md)
 reproduzível; nenhuma lacuna é inferida apenas por opinião.
 
 ### R1 — pesquisa externa e provas curtas
@@ -103,7 +103,7 @@ caso do corpus. Medir qualidade do vetor editável, preservação semântica,
 determinismo, diagnóstico, instalação/licença, custo de contexto e capacidade de
 rejeitar erro. Solução que apenas gere pixels bonitos é recusada.
 
-**Aceite:** concluído — [relatório comparativo R1](../RELATORIO-MOTOR-DE-PRANCHA-R1.md)
+**Aceite:** concluído — [relatório comparativo R1](../historico/RELATORIO-MOTOR-DE-PRANCHA-R1.md)
 com fontes, custo e veredito; linha atual e alternativa plausível foram comparadas no mesmo caso.
 
 ### R2 — contrato de autoria confiável
