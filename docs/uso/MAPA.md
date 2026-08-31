@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-751 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+752 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -724,6 +724,7 @@
 
 - `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
+- `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
 - `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
 

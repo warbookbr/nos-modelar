@@ -4132,9 +4132,13 @@ describe('A-18 — cone, plano e chamferBox passam a citar o eixo que a topologi
     }
   });
 
-  it('inflate continua no contrato mínimo, dito como decisão: citar eixo nele GRITA', () => {
+  it('inflate ganhou eixo próprio (estacao/lado), e continua recusando os alheios', () => {
+    /* A decisão mudou no atrito A13: inflate saiu do contrato mínimo e passou a
+       publicar `estacao` e `lado`, porque sem face única nenhuma chapa podia ser
+       furada. O que NÃO mudou é a recusa de eixo alheio: `faixa` é do `plano`, e
+       aceitá-la em silêncio devolveria a peça inteira fingindo obediência. */
     const n = pintaOrigemEm([['cubo', { id: 0, lado: 1, origemId: 13 }]], { op: 'inflate', id: 13, faixa: 0 });
-    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /inflate usa somente op e id/.test(o.motivo))).toBe(true);
+    expect(n.orfaos.some((o: any) => o.op === 'pincel' && /inflate usa op, id, e opcionalmente estacao/.test(o.motivo))).toBe(true);
   });
 });
 
@@ -5779,5 +5783,84 @@ describe('filete — a aresta escolhida vira um painel; as outras cinco ficam de
   it('a malha continua fechada (watertight) depois do filete — nenhuma aresta solta', () => {
     const n = nucleo(CUBO_FILETE(ARESTA_TOPO_TRAS) as any, {}, {});
     expect(arestasSoltas(n)).toBe(0);
+  });
+});
+
+/* ENDEREÇAMENTO DE FACE DO `inflate` (atrito A13).
+ *
+ * Antes disto `inflate` publicava só `{op,id}` = TODAS as faces. O sintoma que
+ * expôs a falta: `furo` exige que a entrada resolva para exatamente uma face,
+ * então nenhuma peça de chapa feita por `inflate` podia ser furada. Cada regra
+ * abaixo é vista recusando o próprio defeito, não só aprovando o caso feliz. */
+describe('inflate — endereçamento de face por estacao e lado', () => {
+  const LADO = [[0, 0.05], [0.14, 0.05], [0.14, -0.05], [0, -0.05]];
+  const TOPO = [[0, 0.03], [0.14, 0.03], [0.14, -0.03], [0, -0.03]];
+  const chapa = (extra = {}) => ['inflate', {
+    origemId: 2, contornoLado: LADO, contornoTopo: TOPO,
+    modo: 'secoes', divisoes: 3, lados: 12, expoenteSecao: 20, ...extra,
+  }];
+  const comSelecao = (origem: unknown, passoBase = chapa()) => nucleo(
+    [passoBase, ['parte', { nome: 'p', sel: { origem } }]], {}, {},
+  );
+  const quantas = (r: { F: Map<number, { parte?: string }> }) =>
+    [...r.F.values()].filter((f) => f.parte === 'p').length;
+
+  it('{op,id} sozinho continua devolvendo a peça inteira', () => {
+    /* Compatibilidade não é detalhe: há receita no acervo citando inflate
+       assim, e mudar o que uma citação já escrita resolve, sem diagnóstico, é
+       a classe de erro que o A-19 condena. */
+    const r = comSelecao({ op: 'inflate', id: 2 });
+    expect(r.orfaos).toHaveLength(0);
+    expect(quantas(r)).toBe(3 * 12 + 2 * 12);
+  });
+
+  it('estacao + lado resolve para EXATAMENTE uma face', () => {
+    const r = comSelecao({ op: 'inflate', id: 2, estacao: 1, lado: 3 });
+    expect(r.orfaos).toHaveLength(0);
+    expect(quantas(r)).toBe(1);
+  });
+
+  it('estacao sozinha é o anel; tampa sozinha é o leque', () => {
+    expect(quantas(comSelecao({ op: 'inflate', id: 2, estacao: 1 }))).toBe(12);
+    expect(quantas(comSelecao({ op: 'inflate', id: 2, tampa: 'fim' }))).toBe(12);
+    expect(quantas(comSelecao({ op: 'inflate', id: 2, tampa: 'fim', lado: 0 }))).toBe(1);
+  });
+
+  it('índice fora do limite grita nomeando o limite', () => {
+    const r = comSelecao({ op: 'inflate', id: 2, estacao: 99, lado: 0 });
+    expect(r.orfaos[0].motivo).toMatch(/estacao 99 fora do limite.*0\.\.2/);
+  });
+
+  it('estacao junto de tampa é ambíguo e grita', () => {
+    const r = comSelecao({ op: 'inflate', id: 2, estacao: 1, tampa: 'fim' });
+    expect(r.orfaos[0].motivo).toMatch(/declare um ou outro/);
+  });
+
+  it("modo 'grade' recusa sub-endereço EXPLICANDO por quê", () => {
+    /* Silêncio aqui seria pior que o erro: numerar face de varredura de voxel
+       pela ordem em que ela saiu é identidade posicional, que este repositório
+       proíbe. O motor tem de dizer isso, não devolver seleção vazia. */
+    const r = comSelecao({ op: 'inflate', id: 2, estacao: 0, lado: 0 },
+      chapa({ modo: 'grade' }));
+    expect(r.orfaos[0].motivo).toMatch(/identidade posicional/);
+    expect(r.orfaos[0].motivo).toMatch(/modo:'secoes'/);
+  });
+
+  it('o furo ATRAVESSA a chapa: era isto que faltava', () => {
+    const r = nucleo([
+      chapa(),
+      ['furo', {
+        origemId: 9,
+        de: { op: 'inflate', id: 2, estacao: 1, lado: 2 },
+        saida: { op: 'inflate', id: 2, estacao: 1, lado: 9 },
+        centro: [0.014, 0.05, 0.070], raio: 0.008, lados: 12, orientacao: [1, 0, 0],
+      }],
+    ], {}, {});
+    expect(r.orfaos).toHaveLength(0);
+    /* `conferirMalha` cobra as quatro coisas de uma vez: sem órfão, polígono
+       simples, casca fechada e desenha. Um furo é justamente onde as quatro
+       podem divergir — a casca continua fechada mesmo com um bico de espessura
+       zero na borda do corte. */
+    conferirMalha(r, { fechada: true, rotulo: 'chapa de inflate furada' });
   });
 });

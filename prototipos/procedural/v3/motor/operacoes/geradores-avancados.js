@@ -682,7 +682,24 @@ export function criarOperacoesGeradoresAvancados(servicos) {
         const proximo = (ladoIdx + 1) % lados;
         addF(st, b + cursorF++, [centroFim, anelFim[ladoIdx], anelFim[proximo]]);
       }
-      if (a.origemId != null) registraOrigem(st, i, 'inflate', a.origemId, { faces: Array.from({ length: nF }, (_, k) => b + k) });
+      /* GRADE PUBLICADA (atrito A13). As faces já nascem numa ordem exata —
+         `estacao * lados + lado` para o corpo, depois as duas tampas em leque —
+         e é essa ordem que vira endereço. Sem publicá-la, `{op,id}` resolvia
+         para as centenas de faces da peça e nenhuma operação que exige UMA face
+         (o `furo`, à frente de todas) alcançava uma chapa de `inflate`. */
+      const corpo = Array.from({ length: divisoes * lados }, (_, k) => b + k);
+      const tampas = {
+        inicio: Array.from({ length: lados }, (_, k) => b + divisoes * lados + k),
+        fim: Array.from({ length: lados }, (_, k) => b + divisoes * lados + lados + k),
+      };
+      if (a.origemId != null) {
+        registraOrigem(st, i, 'inflate', a.origemId, {
+          faces: Array.from({ length: nF }, (_, k) => b + k),
+          grade: { divisoes, lados },
+          corpo,
+          tampas,
+        });
+      }
       return;
     }
 

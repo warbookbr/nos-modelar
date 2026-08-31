@@ -228,6 +228,58 @@ parte**, não a olho. Três números resolveram o diagnóstico — topo do cabo,
 da cabeça e espessura no olho — e nenhum deles aparece em veredito de topologia
 ou de micropolígono.
 
+### A13 — `inflate` não tinha endereço de face, e por isso chapa não furava
+
+Eu tinha afirmado que "não existe furo de verdade" no motor. **Errado, e o
+operador cobrou.** `furo` existe, faz passante, cego e rasgo, e num cubo entrega
+malha fechada e aprovada.
+
+O que não existia era outra coisa, bem mais estreita: `furo` exige que a face de
+entrada resolva para EXATAMENTE UMA face, e `inflate` publicava as suas só como
+bloco. O motor respondeu literalmente:
+
+> `de` precisa resolver para EXATAMENTE uma face: `{op:'inflate',id:2}` resolveu
+> para 168
+
+Ou seja, o motor sabia abrir o furo; faltava **endereço**. Nenhuma peça de chapa
+podia ser furada — nem olho de machado, nem rasgo de suporte, nem passagem de
+eixo.
+
+O modo `'secoes'` já tinha uma grade exata (`estacao × lado` no corpo, mais duas
+tampas em leque); ela só não era publicada. Agora é. `{op,id}` sozinho continua
+devolvendo tudo, porque mudar o que uma citação já escrita resolve, sem
+diagnóstico, é a classe de erro que o A-19 condena.
+
+O modo `'grade'` **não** ganhou endereço, e isso é dito em vez de silenciado: as
+faces dele vêm de varredura de voxels, e numerá-las pela ordem da varredura
+seria identidade posicional, proibida aqui.
+
+Prova: `prototipos/procedural/v3/pecas/chapa-de-fixacao.js`, com dois furos
+passantes, aprovada em `conferirMalha` (sem órfão, polígono simples, casca
+fechada, desenha).
+
+### A14 — a tolerância de planaridade do `furo` tranca a cabeça do machado
+
+Testei as 14 estações da cabeça e **todas** são recusadas, agora por planaridade,
+não por endereço: as faces desviam de 2 a 54 µm contra uma tolerância de 1 µm.
+
+Não mexi nessa tolerância. Afrouxar número de operação de corte para fazer um
+caso passar é exatamente o defeito que este repositório batiza, e eu não sei
+ainda que invariante o 1 µm protege — furar face torta deixa o plano do furo
+mal definido, então a rigidez pode estar certa. Fica medido e registrado para
+decisão informada, não corrigido no susto.
+
+Vale notar que a causa raiz é a mesma de sempre: seção que muda de proporção
+torce a face. No prisma de seções semelhantes o furo passa; na cabeça do
+machado, que precisa ficar mais alta e mais fina ao mesmo tempo, não.
+
+### Segunda restrição do `furo`, medida
+
+O furo tem de caber dentro da face de entrada **e** da de saída. Numa chapa de
+140 mm com 3 divisões, um furo de 6 mm passa a partir de 40 mm de espessura; com
+32 mm não passa nem com raio de 5 mm. Chapa fina pede mais `lados` na seção, não
+furo menor.
+
 ### O limite que continua de pé
 
 Contagem, fechamento e orientação o conferente resolve por linha de comando. Se
