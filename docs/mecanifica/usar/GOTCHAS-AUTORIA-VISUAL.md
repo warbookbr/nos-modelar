@@ -228,3 +228,51 @@ Uma autoria concluída entrega, além da receita executável:
 5. vistas críticas e perguntas de inspeção;
 6. resultados estruturais e geométricos, incluindo o que **não** foi avaliado;
 7. lista de pendências visuais, sem promover um blockout como final.
+
+## Armadilhas de `loft`, medidas nas armas do acervo
+
+Estas quatro apareceram modelando espada, machado e maça, e nenhuma delas dá
+erro: a receita executa, a peça aparece, e o defeito só se vê na imagem ou no
+conferente.
+
+**1. `loft` sem polo sai TUBO ABERTO.** Uma seção `{pos, raio: 0}` em cada ponta
+fecha a forma. Sem isso a lâmina da espada entrou com 24 arestas de borda — que
+é buraco, e buraco reprova no preparo para micropolígono. O polo da base pode
+ficar enterrado dentro da peça vizinha; ele existe para fechar, não para
+aparecer.
+
+**2. Quad de `loft` só sai PLANO quando as duas seções são SEMELHANTES** — mesma
+razão entre espessura e altura. Não é regra de bolso: é o determinante da
+diagonal, e dá zero exatamente nesse caso. Consequências práticas:
+
+- lâmina que afila só na largura e mantém a espessura torce 25% perto da ponta,
+  e a seção deixa de ser losango deitado e vira losango em pé — uma agulha
+  grossa. Fazer a espessura acompanhar a largura conserta a forma E a torção;
+- quando a forma EXIGE romper a semelhança — a cabeça do machado fica mais alta
+  e mais fina ao mesmo tempo — a torção é inevitável. Aceite e diga por quê.
+  Subdividir não resolve: de 4 para 16 estações o triângulo quadruplica e a
+  torção cai só pela metade.
+
+**3. `{op:'cilindro', id}` sem eixo seleciona SÓ AS LATERAIS.** As tampas pedem
+citação própria (`tampa: 'fundo'`, `tampa: 'topo'`). Sem elas as duas faces
+ficam sem parte, cinzentas e mudas. `npm run ativar:bancada` conta e nomeia as
+faces órfãs, e diz esta causa.
+
+**4. Repetição radial é UMA descrição.** Seis abas de maça saem de um `arranja`
+`modo: 'radial'` com `volta: 360` e `total: 6`. Descrever seis abas é seis
+lugares para errar. Nomeie as cópias: posição não é identidade.
+
+## Proporção: a medida que só a imagem corrige
+
+Contagem, fechamento e orientação o conferente resolve por linha de comando. O
+que ele **não** responde é se a coisa lê como o objeto certo — e essa foi a
+correção mais repetida desta rodada.
+
+A cabeça da maça saiu duas vezes como bola facetada antes de ler como maça de
+abas. A causa era sempre a mesma: a aba tinha quase a mesma extensão na altura e
+no raio, e seis delas a 60° preenchiam o espaço entre si. Só quando a altura
+ficou bem abaixo do diâmetro da cabeça o vão entre as abas apareceu.
+
+A regra que sobrou: **quando um detalhe repetido tem que ser LIDO como separado,
+a folga entre as instâncias precisa ser visível na silhueta**, e silhueta se
+confere olhando, com `--cores --modo=isolar --focar` na parte suspeita.

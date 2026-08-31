@@ -24,11 +24,26 @@ peça isolada e não inventa validade global de uma montagem.
    Confira contagens, órfãos, partes, portas, materiais e o envelope.
 
 2. Abra uma bancada/harness privado explicitamente configurado e leia as quatro
-   vistas canônicas:
+   vistas canônicas **em modo de auditoria**:
 
    ```bash
-   npm run bancada -- <peca> --vistas=isometrica,frontal,direita,superior
+   npm run bancada -- <peca> --vistas=isometrica,frontal,direita,superior --cores
    ```
+
+   `--cores` liga a auditoria e pinta uma cor por parte; `--auditoria` sozinho dá
+   o mesmo enquadramento limpo mantendo o material do autor. Em auditoria a
+   imagem perde o cromo da interface, o piso, a grade e a sombra, e a peça passa
+   a ocupar o quadro inteiro.
+
+   **Peça sempre `--cores` numa peça de mais de uma parte.** Sem isso, partes do
+   mesmo material são um borrão só e a junção entre elas é invisível — três peças
+   de aço lado a lado leem como uma. O comando imprime a LEGENDA (`aba=#ebb78e
+   colar=#978eeb …`); use-a para citar a peça pelo nome, nunca pela posição.
+
+   Sem `--cores` a captura sai como a pessoa vê a bancada: painel de componentes
+   à esquerda, inspeção à direita, cabeçalho, barra de vistas e rodapé. Nessa
+   imagem a peça fica numa tira estreita no meio, e a sombra no chão já foi lida
+   como geometria. Para leitura humana está certo; para auditar, não.
 
    O catálogo homologado da bancada publicada pode estar vazio — isso é
    proposital, não defeito. Para carregar a peça sem publicá-la, use a sessão
@@ -46,10 +61,15 @@ peça isolada e não inventa validade global de uma montagem.
    detalhe. Rode os três modos para a parte sob suspeita:
 
    ```bash
-   npm run bancada -- <peca> --selecionadas=<parte> --modo=isolar --focar
-   npm run bancada -- <peca> --selecionadas=<parte> --modo=contexto
-   npm run bancada -- <peca> --par=<parte>,<vizinha>
+   npm run bancada -- <peca> --cores --selecionadas=<parte> --modo=isolar --focar
+   npm run bancada -- <peca> --cores --selecionadas=<parte> --modo=contexto
+   npm run bancada -- <peca> --cores --par=<parte>,<vizinha>
    ```
+
+   **Para APROXIMAR numa parte, use `--modo=isolar --focar`.** Em `contexto` o
+   enquadramento inclui a montagem inteira de propósito — é o que dá o contexto —
+   então `--focar` ali não aproxima nada, e a imagem volta igual à geral. Quem
+   quer ver de perto pede `isolar`.
 
    | modo | pergunta | o que avaliar |
    |---|---|---|

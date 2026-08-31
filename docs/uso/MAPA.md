@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-747 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+751 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -655,6 +655,12 @@
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
 
+## prototipos/procedural/v3/armas/
+
+- `espada-curta.js` — espada-curta.js — espada curta de infantaria, tipo gládio: lâmina larga com afilamento em duas etapas, guarda, punho e pomo.
+- `maca-de-abas.js` — maca-de-abas.js — maça de abas: cabeça de seis abas radiais em haste de aço.
+- `machado-de-guerra.js` — machado-de-guerra.js — machado de guerra de uma mão: cabeça assimétrica com barba e esporão traseiro, cabo de madeira com reforço.
+
 ## prototipos/procedural/v3/armas/machado-de-sucata/
 
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica: cutelo reforçado com lâmina de sucata pesada e cabo revestido.
@@ -909,6 +915,7 @@
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
+- `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.
 - `derivar-catalogo-montagens.test.ts` — Prova catálogo global confinado às raízes explicitamente resolvidas.

@@ -3,7 +3,7 @@
  * Um preparador que sempre aprova é pior que nenhum: ele transfere para o motor
  * a confiança que ele mesmo não conquistou. */
 import { describe, expect, it } from 'vitest';
-import { prepararParaMicropoligono, NAO_COBERTO, ErroPreparo } from '../src/preparar.js';
+import { prepararParaMicropoligono, melhorDiagonal, NAO_COBERTO, ErroPreparo } from '../src/preparar.js';
 
 function cuboSao() {
   return {
@@ -68,6 +68,48 @@ describe('preparo para micropolígono', () => {
     expect(cods(r)).toContain('face-torta');
     expect(r.veredito).toBe('alerta');
     expect(r.malha).not.toBeNull();            // alerta não bloqueia entrega
+  });
+
+  it('escolhe a diagonal curta no quad torto, não a do primeiro canto', () => {
+    /* Quad torto em que a diagonal 0-2 é a LONGA. Sem escolha, o leque pegaria
+       ela e produziria dois triângulos mais alongados que o necessário. */
+    const pontos = new Map([[0, [0, 0, 0]], [1, [3, 0, 0]], [2, [3, 1, 1]], [3, [0, 1, 0]]]);
+    expect(melhorDiagonal(pontos, [0, 1, 2, 3])).toBe(1);
+  });
+
+  it('mantém a diagonal do primeiro canto quando ela já é a curta', () => {
+    const pontos = new Map([[0, [0, 0, 0]], [1, [1, 0, 0]], [2, [1, 1, 0]], [3, [0, 3, 0]]]);
+    expect(melhorDiagonal(pontos, [0, 1, 2, 3])).toBe(0);
+  });
+
+  it('recusa a diagonal que passa por fora do quad côncavo, mesmo sendo a curta', () => {
+    /* Canto 0 reflexo: a diagonal interna é a 0-2 (3,54) e a 1-3 é mais curta
+       (2,50) mas passa FORA — um dos triângulos cobriria área que não é da face.
+       O critério de dentro tem de vencer o de comprimento. Este caso não aparece
+       em quad qualquer: numa varredura, só 19% dos quads côncavos têm a diagonal
+       de fora mais curta. Foi preciso procurar por um. */
+    const pontos = new Map([[0, [4, 3.5, 0]], [1, [4.5, 1.5, 0]], [2, [0.5, 3, 0]], [3, [4.5, 4, 0]]]);
+    const q = [...pontos.values()];
+    const dist = (a, b) => Math.hypot(...[0, 1, 2].map((k) => q[a][k] - q[b][k]));
+    expect(dist(1, 3)).toBeLessThan(dist(0, 2));
+    expect(melhorDiagonal(pontos, [0, 1, 2, 3])).toBe(0);
+  });
+
+  it('registra a diagonal usada em cada triângulo, para a escolha ser auditável', () => {
+    const r = prepararParaMicropoligono(cuboSao());
+    expect(r.malha.triangulos.every((t) => Array.isArray(t.diagonal) && t.diagonal.length === 2)).toBe(true);
+  });
+
+  it('ignora ruído de ponto flutuante e acusa torção real', () => {
+    /* A medida no acervo mostrou dois grupos e nada entre eles: face de caixa
+       desvia 1e-17, face de loft que torce desvia 1e-2 para cima. O limiar
+       precisa separar exatamente isso — e não ser frouxo a ponto de calar a
+       segunda, que foi a tentação quando a espada começou a alertar. */
+    const m = cuboSao();
+    m.vertices.set(6, [1, 1, 1 + 1e-16]);
+    expect(cods(prepararParaMicropoligono(m))).not.toContain('face-torta');
+    m.vertices.set(6, [1, 1, 1.02]);
+    expect(cods(prepararParaMicropoligono(m))).toContain('face-torta');
   });
 
   it('declara por escrito o que não cobre', () => {

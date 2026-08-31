@@ -1154,3 +1154,25 @@ h1, h2 { margin-top: 6px; font-size: 21px; letter-spacing: -0.025em; }
   .aba-conteudo > .controle-explosao,
   .aba-conteudo > .acoes-inspecao { padding: 8px; }
 }
+
+/* ---------- modo auditoria ----------
+   A bancada é feita para uma pessoa: painéis de componentes e de inspeção,
+   cabeçalho, barra de vistas e rodapé de atalhos. Numa imagem que vai para
+   leitura automática isso é a maior parte dos pixels e nada da peça — na
+   primeira captura desta rodada os painéis cobriam o objeto e sobrava uma tira
+   estreita no meio. Aqui some tudo menos o desenho. */
+body.auditoria .topo,
+body.auditoria .rodape,
+body.auditoria .vistas,
+body.auditoria .painel,
+body.auditoria .referencia-metrica,
+body.auditoria .dicas,
+body.auditoria .aviso-sessao {
+  display: none !important;
+}
+body.auditoria #cenaBancada {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}

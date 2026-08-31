@@ -12,6 +12,12 @@
  *     em leque a partir do primeiro canto, o que é correto para face convexa e
  *     plana — e a verificação avisa quando a face não é nenhuma das duas, em vez
  *     de triangular errado em silêncio.
+ *     No QUADRILÁTERO o leque não é indiferente. Quad torto tem duas diagonais e
+ *     cada uma dá uma silhueta diferente; escolher sempre a do primeiro canto faz
+ *     a forma depender de qual canto o autor escreveu primeiro. Aqui a diagonal é
+ *     escolhida: entre as que ficam DENTRO do quad, a mais curta — que é a regra
+ *     usual e a que menos deforma. A escolha é registrada em `diagonal`, então é
+ *     auditável em vez de implícita.
  *   - FECHAMENTO. Aresta de borda vira buraco, e buraco em malha de
  *     micropolígono aparece como falha de iluminação que ninguém rastreia até a
  *     geometria.
@@ -40,6 +46,21 @@
 export const FORMATO = 'mecanifica.preparo-micropoligono@1';
 
 const EPS_AREA = 1e-14;
+
+/* Desvio máximo tolerado de uma face ao próprio plano, como fração do tamanho
+   dela. O valor vem de medida no acervo, e o que a medida mostrou é que a
+   distribuição é DE DOIS GRUPOS, sem meio-termo: face de caixa desvia 1e-17, que
+   é ruído de ponto flutuante, e face de loft que torce de verdade desvia de 1e-2
+   para cima. Entre um e outro não há nada.
+
+   Por isso o limiar é frouxo o bastante para ignorar o ruído e nada além disso.
+   Qualquer valor entre 1e-15 e 1e-2 daria a mesma resposta neste acervo; 1e-9 foi
+   escolhido por ficar longe das duas pontas. Subir para 1e-2 tinha sido a
+   tentação — calaria os alertas da espada e do machado — mas eles são
+   verdadeiros: as duas lâminas torcem 25% na ponta, onde a seção deixa de ser
+   semelhante. Calar alerta verdadeiro para deixar a saída verde é o defeito que
+   este repositório já batizou. */
+const TOLERANCIA_PLANARIDADE = 1e-9;
 
 export const NAO_COBERTO = Object.freeze([
   'cluster e hierarquia de nível de detalhe do motor',
@@ -111,10 +132,46 @@ function planaridade(vertices, vs) {
   return escala > 0 ? maior / escala : 0;
 }
 
+/* Qual das duas diagonais de um quad usar. Devolve 0 para a do primeiro canto e
+   1 para a outra (girar a lista em um faz o leque cair na outra diagonal).
+
+   Uma diagonal só serve se as duas metades que ela produz apontam para o mesmo
+   lado: num quad côncavo uma das diagonais passa POR FORA, e o par resultante
+   cobre área que não é da face. Esse é o critério eliminatório. Entre as que
+   sobram, a mais curta — o par fica menos alongado e a silhueta desvia menos. */
+export function melhorDiagonal(pontos, vs) {
+  const p = vs.map((v) => pontos.get(v));
+  const cruz = (a, b, c) => {
+    const ux = b[0] - a[0]; const uy = b[1] - a[1]; const uz = b[2] - a[2];
+    const vx = c[0] - a[0]; const vy = c[1] - a[1]; const vz = c[2] - a[2];
+    return [uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx];
+  };
+  /* Normal de referência: a soma das duas normais possíveis é indiferente à
+     diagonal, então serve de árbitro sem favorecer nenhuma das duas. */
+  const soma = [0, 0, 0];
+  for (let k = 0; k < 4; k++) {
+    const n = cruz(p[k], p[(k + 1) % 4], p[(k + 2) % 4]);
+    for (let e = 0; e < 3; e++) soma[e] += n[e];
+  }
+  const dentro = (i) => {
+    const a = [p[i], p[(i + 1) % 4], p[(i + 2) % 4]];
+    const b = [p[i], p[(i + 2) % 4], p[(i + 3) % 4]];
+    for (const t of [a, b]) {
+      const n = cruz(t[0], t[1], t[2]);
+      if (n[0] * soma[0] + n[1] * soma[1] + n[2] * soma[2] <= 0) return false;
+    }
+    return true;
+  };
+  const d = (i, j) => Math.hypot(p[i][0] - p[j][0], p[i][1] - p[j][1], p[i][2] - p[j][2]);
+  const ok0 = dentro(0); const ok1 = dentro(1);
+  if (ok0 !== ok1) return ok0 ? 0 : 1;
+  return d(1, 3) < d(0, 2) ? 1 : 0;
+}
+
 export function prepararParaMicropoligono(malhaBruta, {
   unidadeEntrada = 'm',
   unidadeSaida = 'cm',
-  tolerânciaPlanaridade = 1e-6,
+  tolerânciaPlanaridade = TOLERANCIA_PLANARIDADE,
 } = {}) {
   if (!FATOR[unidadeEntrada]) throw new ErroPreparo('unidade-invalida', `Unidade de entrada '${unidadeEntrada}' desconhecida.`);
   if (!FATOR[unidadeSaida]) throw new ErroPreparo('unidade-invalida', `Unidade de saída '${unidadeSaida}' desconhecida.`);
@@ -159,14 +216,16 @@ export function prepararParaMicropoligono(malhaBruta, {
   for (const [id, p] of vertices) pontos.set(id, [p[0] * fator, p[1] * fator, p[2] * fator]);
   const triangulos = [];
   for (const f of faces) {
-    for (let k = 1; k < f.vs.length - 1; k++) {
-      const tri = [f.vs[0], f.vs[k], f.vs[k + 1]];
+    const giro = f.vs.length === 4 ? melhorDiagonal(pontos, f.vs) : 0;
+    const vs = giro ? [...f.vs.slice(giro), ...f.vs.slice(0, giro)] : f.vs;
+    for (let k = 1; k < vs.length - 1; k++) {
+      const tri = [vs[0], vs[k], vs[k + 1]];
       const area = areaTriangulo(pontos.get(tri[0]), pontos.get(tri[1]), pontos.get(tri[2]));
       if (area <= EPS_AREA) {
         anota('reprova', 'triangulo-degenerado', `A face ${f.id} produz um triângulo de área nula.`, { face: f.id, triangulo: tri });
         continue;
       }
-      triangulos.push({ vs: tri, parte: f.parte, material: f.material, faceOrigem: f.id });
+      triangulos.push({ vs: tri, parte: f.parte, material: f.material, faceOrigem: f.id, diagonal: [vs[0], vs[2]] });
     }
   }
 

@@ -47,18 +47,32 @@ if (!receita) uso('o arquivo não exporta uma receita com PASSOS.');
 const { neutro } = executarReceita(receita);
 const malha = { vertices: neutro.V, faces: neutro.F };
 
+/* GRITOS DO MOTOR primeiro. `executarReceita` não lança: acumula em
+   `neutro.orfaos` e devolve a peça que conseguiu montar. Quem não lê esse campo
+   recebe uma malha plausível e nenhuma notícia de que um passo inteiro não fez
+   efeito — foi exatamente assim que um `sel` com a chave errada passou
+   despercebido aqui, com a mensagem certa já escrita e ninguém para mostrá-la. */
+const gritos = neutro.orfaos ?? [];
+
 const topologia = analisarTopologia(malha);
 const otimizacao = otimizarMalha(malha);
 const micro = prepararParaMicropoligono(malha, { unidadeEntrada: unidade, unidadeSaida: 'cm' });
 
 if (json) {
-  console.log(JSON.stringify({ receita: alvo, topologia, otimizacao: { ganho: otimizacao.ganho, operacoes: otimizacao.operacoes }, micropoligono: micro }, null, 2));
-  process.exit(topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);
+  console.log(JSON.stringify({ receita: alvo, gritos, topologia, otimizacao: { ganho: otimizacao.ganho, operacoes: otimizacao.operacoes }, micropoligono: micro }, null, 2));
+  process.exit(gritos.length || topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);
 }
 
 const simbolo = { aprova: '✓', alerta: '!', reprova: '✗' };
 console.log(`\n${receita.meta?.nome ?? alvo}`);
 console.log(`  ${otimizacao.antes.vertices} vértices · ${otimizacao.antes.faces} faces · ${otimizacao.antes.triangulos} triângulos · ${topologia.resumo.componentes} corpo(s)`);
+
+if (gritos.length) {
+  console.log(`\n✗ a receita reclamou de ${gritos.length} coisa(s) ao executar:`);
+  for (const g of gritos.slice(0, 8)) console.log(`    passo ${g.passo} (${g.op}) ${g.ref}: ${g.motivo}`);
+  if (gritos.length > 8) console.log(`    …e mais ${gritos.length - 8}`);
+  console.log('    a malha abaixo é o que o motor conseguiu montar apesar disso.');
+}
 
 console.log(`\n${simbolo[topologia.veredito]} topologia: ${topologia.veredito}`);
 const porCodigo = new Map();
@@ -79,8 +93,13 @@ if (otimizacao.ganho.triangulos === 0) {
 }
 
 console.log(`\n${simbolo[micro.veredito]} micropolígono: ${micro.veredito} (${micro.resumo.triangulos} triângulos, ${unidade}→cm)`);
-for (const a of micro.achados.slice(0, 5)) console.log(`    ${a.severidade === 'reprova' ? '✗' : '!'} ${a.mensagem}`);
+/* Ordenado do PIOR para o melhor, e não na ordem em que apareceram. Com a ordem
+   de chegada eu li os cinco primeiros desvios desta lista, todos brandos, e
+   concluí que a lâmina estava sã — quando a pior face dela torce 25%. Lista
+   cortada em cinco tem de mostrar os cinco que importam. */
+const piores = [...micro.achados].sort((a, b) => (b.onde?.desvio ?? 0) - (a.onde?.desvio ?? 0));
+for (const a of piores.slice(0, 5)) console.log(`    ${a.severidade === 'reprova' ? '✗' : '!'} ${a.mensagem}`);
 console.log(`    não cobre: ${micro.naoCoberto.join('; ')}`);
 console.log('');
 
-process.exit(topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);
+process.exit(gritos.length || topologia.veredito === 'reprova' || micro.veredito === 'reprova' ? 1 : 0);

@@ -624,12 +624,17 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
            mantê-lo deixava a peça cortada e minúscula na revisão headless. */
         aplicarModelo(novoModelo, { preservarCamera: fonte !== 'manual' && modeloAtual !== null });
       }
-      painelReferencias.renderizar({
+      /* Os painéis são OPCIONAIS: as fábricas devolvem null quando o container
+         não existe, e no harness headless ele não existe mesmo. Sem o `?.` a
+         primeira entrega de sessão estourava 'reading renderizar', o
+         sincronizador caía e a seleção pedida por --selecionadas nunca chegava a
+         ser aplicada — a captura saía com a montagem inteira e sem foco. */
+      painelReferencias?.renderizar({
         intencaoIA: estado.intencaoIA,
         referencias: estado.referencias,
       });
       gerenciadorReferencias3D.sincronizarComSessao(estado.referencias);
-      painelParametros.renderizar({
+      painelParametros?.renderizar({
         receita: novoModelo?.receita ?? estado.receita,
         parametros: estado.parametros,
       });
@@ -753,6 +758,25 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     /* Métrica de câmera consumida pela revisão headless: a bancada já sabe
        medir a silhueta projetada; faltava publicar isso na ponte. */
     enquadramento: () => ambiente.medirEnquadramento(),
+    /* AUDITORIA — a imagem feita para ser lida, não para ser usada.
+       Tira o cromo da interface, o piso, a grade e a sombra, e opcionalmente
+       pinta uma cor por parte. Devolve a LEGENDA, porque imagem colorida sem
+       legenda troca um problema de leitura por outro: quem audita precisa saber
+       qual cor é qual peça sem deduzir pela posição. */
+    auditoria: ({ cores = false } = {}) => {
+      document.body.classList.add('auditoria');
+      ambiente.definirAuditoria(true);
+      const legenda = controlador?.definirCoresPorParte(cores) ?? [];
+      ambiente.redimensionar?.();
+      return { auditoria: true, cores: Boolean(cores), legenda };
+    },
+    semAuditoria: () => {
+      document.body.classList.remove('auditoria');
+      ambiente.definirAuditoria(false);
+      controlador?.definirCoresPorParte(false);
+      ambiente.redimensionar?.();
+      return { auditoria: false };
+    },
     carregarPayloadSessao: (payload) => sincronizador.definirPayload(payload),
     estado: () => ({
       peca: nomePecaAtual,
