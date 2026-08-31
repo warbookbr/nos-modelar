@@ -1,7 +1,7 @@
 # Reorganização por uso — progresso
 
 Documento auxiliar do plano
-[`planos/2026-08-31-reorganizacao-por-uso.md`](planos/2026-08-31-reorganizacao-por-uso.md).
+[`planos/2026-08-31-reorganizacao-por-uso.md`](planos/encerrados/2026-08-31-reorganizacao-por-uso.md).
 Ele existe porque o plano cabe em 200 linhas e o rastreio das fases não. Aqui
 ficam o retrato de antes, o estado de cada fase e as decisões tomadas durante a
 execução.
@@ -15,7 +15,7 @@ execução.
 | F2 | criar `usar/` e a porta curta | concluída |
 | F3 | gates G1, G3, G4, G5 e G7 | concluída |
 | F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | concluída |
-| F5 | decidir sobre a pasta `desenvolver/` | pendente |
+| F5 | decidir sobre a pasta `desenvolver/` | concluída — **recusada, com número** |
 | F6 | encurtar o INDEX de 665 para 200 linhas | concluída |
 
 ## F0 — retrato antes de mexer
@@ -235,6 +235,35 @@ aparecia como se não apontasse ninguém. A alcançabilidade passou a seguir lin
 relativo também. A alternativa era repetir `docs/mecanifica/...` no texto só
 para o gate enxergar, o que seria dobrar o gate à documentação em vez do
 contrário.
+
+## F5 — a pasta `desenvolver/` fica de fora
+
+A fatia existia para decidir com custo medido, e as duas saídas eram conclusão
+válida. Medido, o custo reprova.
+
+| medida | valor |
+| --- | --- |
+| documentos na raiz que se moveriam | 51 |
+| menções a eles no repositório | 406 |
+| arquivos distintos que os citam | 54 |
+| deles, arquivos de **código** | 20 |
+| **arquivos de evidência congelada que os citam** | **10** |
+
+A última linha decide. Dez arquivos `.json` de evidência — alvos, críticas e
+vereditos gravados, com formato versionado — carregam caminhos como
+`docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md` dentro do próprio registro.
+Mover os documentos obrigaria a **reescrever evidência encerrada**, que é
+literalmente a condição de parada escrita no plano antes de qualquer execução.
+
+Comparando com a F1, que custou 12 arquivos e nenhuma evidência: aquela valia,
+esta não. E a exposição, que era o objetivo, já foi resolvida por inteiro —
+`usar/` isola quem usa, e a porta de desenvolvimento caiu de 665 para 200
+linhas. A pasta acrescentaria arrumação, não separação.
+
+**Decisão: a raiz de `docs/mecanifica/` continua sendo a área de
+desenvolvimento.** Se alguém quiser retomar isso, o caminho honesto é primeiro
+tirar caminho de documento de dentro de evidência gravada — o defeito real que
+esta medição encontrou é evidência congelada guardar caminho mutável.
 
 ## Decisões tomadas durante a execução
 

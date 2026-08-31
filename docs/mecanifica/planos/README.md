@@ -2,11 +2,15 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-08-31-reorganizacao-por-uso.md`](2026-08-31-reorganizacao-por-uso.md) —
-separa a documentação por quem a lê: quem **usa** o Mecanifica, quem o
-**desenvolve** e o que é **histórico**, com gates que impedem a separação de
-vazar de volta. O progresso por fase fica em
+**Plano ativo:** nenhum.
+
+A [reorganização da documentação por uso](encerrados/2026-08-31-reorganizacao-por-uso.md)
+foi **concluída e aprovada** em 2026-08-31. Ela separou a documentação por quem
+a lê — [`usar/`](../usar/README.md) para quem usa o Mecanifica, a raiz de
+`docs/mecanifica/` para quem o desenvolve, `historico/` e `encerrados/` para o
+que já fechou — e deixou cinco gates que impedem a separação de vazar de volta.
+A porta de entrada caiu de 665 para 200 linhas. O relato por fase, com as
+decisões tomadas e o que foi recusado por custo medido, está em
 [`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../REORGANIZACAO-POR-USO-PROGRESSO.md).
 
 **Plano congelado:** o [modelador inverso com priors por

@@ -24,12 +24,12 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- O plano **ativo** é a [reorganização da documentação por
-  uso](planos/2026-08-31-reorganizacao-por-uso.md)
-  (`docs/mecanifica/planos/2026-08-31-reorganizacao-por-uso.md`): separar o que
-  serve a quem **usa** o Mecanifica, a quem o **desenvolve** e o que é
-  **histórico**, com gates que impedem a separação de vazar de volta. O
-  progresso por fase e as decisões tomadas na execução ficam em
+- **Não há plano ativo.** A [reorganização da documentação por
+  uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
+  (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`) foi
+  concluída em 2026-08-31: separou o acervo por quem o lê, encurtou esta porta
+  de 665 para 200 linhas e deixou cinco gates que impedem a separação de vazar.
+  O relato por fase está em
   [`REORGANIZACAO-POR-USO-PROGRESSO.md`](REORGANIZACAO-POR-USO-PROGRESSO.md)
   (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
   com priors por família está
@@ -180,8 +180,7 @@ npm run mcp:ensaio
 
 ## Pendências atuais
 
-- O plano ativo é a reorganização da documentação por uso. O modelador inverso
-  está congelado: nova geometria, corpus de priors, fitting e MCP de edição
+- Não há plano ativo. O modelador inverso está congelado: nova geometria, corpus de priors, fitting e MCP de edição
   seguem dependendo dos gates dele, que não executam enquanto isso durar.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `docs/mecanifica/planos/BACKLOG.md`.

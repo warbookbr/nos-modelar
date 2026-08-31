@@ -465,7 +465,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -543,6 +542,7 @@
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
+- `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
 - `README.md` — Planos encerrados
 
 ## docs/mecanifica/planos/mcp/

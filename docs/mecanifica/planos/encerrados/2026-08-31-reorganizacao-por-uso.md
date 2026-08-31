@@ -1,6 +1,9 @@
 # Reorganização da documentação por uso
 
-**Estado:** ativo
+**Estado:** concluído
+
+**Decisão:** aprovar — F0 a F4 e F6 executadas; F5 recusada com custo medido,
+que era uma das duas saídas previstas.
 
 **Responsável:** Claude
 
@@ -8,7 +11,7 @@
 `4ba67037c9099a7550cd892cfae776eb6a258df6`
 
 **Rastreio das fases:**
-[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../REORGANIZACAO-POR-USO-PROGRESSO.md)
+[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../../REORGANIZACAO-POR-USO-PROGRESSO.md)
 (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`)
 
 ## Problema observado
