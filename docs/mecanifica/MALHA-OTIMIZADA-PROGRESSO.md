@@ -170,6 +170,37 @@ com ela que a cadeira passou a mostrar a marcenaria de relance. Para aproximar
 numa parte é `--modo=isolar --focar` — em `contexto` o enquadramento inclui a
 montagem inteira de propósito, e `--focar` ali não aproxima nada.
 
+### A correção que veio do operador, e o que ela expõe
+
+Fechei H5 dizendo que as três armas estavam boas. O operador olhou e disse que
+não: machado e maça estavam com lâminas ruins, a do machado "cheia de faces e
+toda deformada". Estava certo, e o erro do meu lado tem nome — **julguei pela
+silhueta pequena e parei**. "Lê como machado" virou critério de aceitação, e
+essa leitura me cegou para o que aparece quando se aproxima.
+
+Aproximando, a cabeça do machado era um cristal de quartzo e a aba da maça era
+uma lente hexagonal. As duas passavam em TODA medida: fechadas, orientadas, sem
+face órfã, sem grito, sem torção acima do limiar. Nenhum gate falhou, porque
+nenhum gate mede forma.
+
+A causa era a mesma nas duas: `loft` de seção em losango. O losango põe uma
+quina no meio da face, onde tinha de ser chapa; e os polos que fecham o loft
+afinam a peça até virar bico exatamente onde deveria estar o gume. As duas
+foram refeitas com `inflate` — silhueta recortada cruzada com planta de
+espessura — e a regra geral está registrada nos gotchas.
+
+Um detalhe do processo que também falhou: renderizei o machado novo ANTES de
+rodar `malha:conferir`, e a bancada recusou a peça por face degenerada. A
+ferramenta funcionava e pegava o defeito; eu é que pulei a ordem.
+
+| peça | antes | depois |
+| --- | --- | --- |
+| Machado de Guerra | `loft` losango, 134 tri, torção 24% | `inflate` chapa, 582 tri, torção 6,6% |
+| Maça de Abas | `loft` losango, 364 tri | `inflate` chapa, 1516 tri |
+
+O triângulo subiu bastante, e é preço de forma, não de descuido: chapa com
+contorno recortado tem mais superfície que uma seção viajando.
+
 ### O limite que continua de pé
 
 Contagem, fechamento e orientação o conferente resolve por linha de comando. Se

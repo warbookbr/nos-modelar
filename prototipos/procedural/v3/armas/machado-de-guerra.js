@@ -1,81 +1,123 @@
-/* machado-de-guerra.js — machado de guerra de uma mão: cabeça assimétrica com
- * barba e esporão traseiro, cabo de madeira com reforço.
+/* machado-de-guerra.js — machado de guerra de uma mão: cabeça de chapa com
+ * barba, esporão traseiro e cabo com reforço.
  *
  * Exemplo de autoria, não referência histórica.
  *
  * POR QUE ESTE OBJETO. A espada é simétrica em torno do próprio eixo; a cadeira
  * é bilateral. O machado não é nenhum dos dois: a cabeça é ASSIMÉTRICA no plano
  * do corte — gume de um lado, esporão do outro — e simétrica só na espessura.
- * Essa é a exigência que faltava exercitar.
  *
  * O QUE FAZ LER COMO MACHADO DE GUERRA e não como machado de lenhador:
- *   - o gume DESCE abaixo da linha do cabo, formando barba. Lenhador tem gume
- *     centrado; guerra tem barba, para enganchar escudo e braço;
- *   - a cabeça é FINA. Machado de guerra pesa pouco mais de um quilo; a massa
- *     de lenhador aqui viraria arma que ninguém levanta duas vezes;
- *   - o esporão traseiro é uma ponta, não um martelo. É o lado que perfura.
+ *   - o gume DESCE abaixo da linha do cabo, formando barba, para enganchar
+ *     escudo e braço. Lenhador tem gume centrado;
+ *   - a cabeça é FINA. Machado de guerra pesa pouco mais de um quilo;
+ *   - o esporão traseiro é uma ponta, não um martelo.
  *
- * ECONOMIA. O corpo da cabeça é um loft de quatro seções ao longo de X, o eixo
- * do corte. A barba não é peça separada: é a seção do gume descendo em Y, o que
- * mantém a cabeça como um sólido só e sem junção para fechar.
+ * ---------------------------------------------------------------------------
+ * POR QUE `inflate` E NÃO `loft` — a correção que custou uma versão inteira
  *
- * TORÇÃO ACEITA, e dita aqui porque o conferente vai acusá-la. Um quad de loft
- * só sai plano quando as duas seções vizinhas são SEMELHANTES — mesma razão
- * entre espessura e altura. A espada curta obedece a isso e as faces dela são
- * planas até o último dígito. A cabeça de machado NÃO PODE obedecer: do olho ao
- * fio ela precisa ficar mais ALTA (a barba desce) e ao mesmo tempo mais FINA
- * (42 mm para 3 mm). A razão despenca por exigência da forma, e as faces do
- * gume torcem cerca de 24%.
+ * A primeira cabeça era um `loft` de seções em LOSANGO ao longo do gume. Ela
+ * passava em tudo que se mede por linha de comando — fechada, orientada, sem
+ * face órfã — e mesmo assim era um cristal de quartzo, não um machado. O erro
+ * não estava no número: estava na SEÇÃO.
  *
- * Duas saídas foram medidas antes de aceitar:
- *   - subdividir o loft: de 4 para 16 estações quadruplica o triângulo (32 para
- *     128) e a torção só cai pela metade (24% para 11%). Preço ruim;
- *   - achatar o perfil até as seções ficarem semelhantes: isso é desistir da
- *     barba e do fio, ou seja, deixar de ser um machado de guerra.
- * Fica a torção. O que ela custa é a triangulação da face passar a importar, e
- * disso cuida o preparo, que escolhe a diagonal em vez de pegar a primeira.
+ * Um losango tem um vértice no meio de cada lado, então a cabeça ganhava uma
+ * QUINA correndo pelo meio da face, e a face de uma cabeça de machado é
+ * justamente a parte que tem de ser CHAPA. Somando a isso `cima`, `baixo` e
+ * espessura variando cada um a seu ritmo entre quatro estações, cada quadrilátero
+ * saía torto numa direção diferente e o conjunto virava um monte de facetas sem
+ * plano nenhum.
+ *
+ * `inflate` descreve a peça como ela é de fato feita: uma SILHUETA (o perfil do
+ * machado visto de lado) cruzada com uma PLANTA (a espessura, grossa no olho e
+ * fina no gume). É a mesma descrição do ferreiro — chapa recortada, depois
+ * afinada no fio — e sai fechada por construção, sem polo e sem tampa.
+ *
+ * LIÇÃO GERAL, que vale além do machado: `loft` serve quando a forma É uma
+ * seção viajando; quando a forma é uma CHAPA com contorno, a seção viajando é a
+ * ferramenta errada, e nenhuma quantidade de estações conserta isso.
+ *
+ * EIXOS. `inflate` lê a silhueta em z×y e a planta em z×x, então o gume aponta
+ * para +Z e a espessura fica em X. O cabo continua em Y.
  */
 
 const P = {
   cabo: { comprimento: 0.62, raio: 0.019, lados: 8 },
   cabeca: {
-    larguraGume: 0.115,   // do olho até o fio, em X
-    espessuraOlho: 0.042,
-    espessuraFio: 0.003,
+    alcance: 0.132,       // do olho ao fio, em Z
+    meiaEspOlho: 0.021,
+    meiaEspFio: 0.0016,
     alturaCima: 0.052,    // acima da linha do cabo
-    alturaBarba: 0.085,   // abaixo: é a barba que define a arma
+    alturaBarba: 0.082,   // abaixo: é a barba que define a arma
+    divisoes: 14,
+    lados: 16,
+    /* Expoente da superelipse da seção. 2 daria elipse — cabeça de bico de
+       pena. Alto achata os lados e é o que devolve a CHAPA que o losango do
+       `loft` tinha destruído. Com 6 a face ainda saía como travesseiro no
+       render; 14 é onde ela vira chapa de verdade. O modo 'grade' foi medido
+       como alternativa e é pior: sai escada literal no contorno. */
+    expoenteSecao: 14,
   },
-  esporao: { comprimento: 0.070, base: 0.030 },
+  esporao: { comprimento: 0.062, base: 0.040 },
   reforco: { alt: 0.055, folga: 0.006 },
 };
 
-/* O cabo é o eixo Y; a cabeça monta no topo. `yCabeca` é a linha do cabo na
-   altura da cabeça — a referência de que "acima" e "abaixo" dependem. */
 const yCabeca = P.cabo.comprimento;
+const C = P.cabeca;
 
-/* Seção da cabeça no plano YZ, parametrizada pela distância em X do olho.
-   `cima` e `baixo` são as duas alturas, e é a diferença entre elas que faz a
-   barba: no olho são simétricas, no fio a de baixo desceu. */
-const secaoCabeca = (x, cima, baixo, meiaEsp) => ({
-  pos: [x, yCabeca, 0],
-  contorno: [
-    [cima, 0],
-    [0, meiaEsp],
-    [-baixo, 0],
-    [0, -meiaEsp],
-  ],
-});
+/* SILHUETA (z×y): o recorte da chapa, em metros absolutos.
+
+   O DESENHO importa mais que os números. Um machado de guerra não é um retângulo
+   com um entalhe — foi isso que a primeira chapa produziu, e ela lia como cutelo
+   de açougue. A forma tem três trechos, nesta ordem:
+
+     1. PESCOÇO: logo depois do olho a chapa é ESTREITA. É o que separa a massa
+        do gume da massa do cabo, e é ele que faz a arma parecer leve;
+     2. ABANO: a partir da metade a chapa abre para cima e para baixo;
+     3. GUME EM CRESCENTE, com barriga adiante e BARBA que desce e volta para
+        trás em gancho. O gume não é uma reta vertical: reta lê como lâmina de
+        guilhotina, e o gancho da barba é o que engata escudo e braço. */
+const silhueta = [
+  [0, 0.030],                       // olho, borda de cima
+  [C.alcance * 0.30, 0.035],        // pescoço: quase sem crescer
+  [C.alcance * 0.63, 0.047],        // ombro: aqui começa o abano
+  [C.alcance * 0.86, 0.052],
+  [C.alcance * 0.985, 0.030],       // o gume vira para dentro no alto
+  /* A barriga do gume precisa de DOIS pontos no z máximo, não de um. Com um só,
+     a última estação do `inflate` tem altura zero e nascem oito faces de área
+     nula — o `malha:conferir` reprova e a bancada recusa a peça. Fisicamente
+     estes dois pontos são o pequeno plano do fio, que todo machado real tem. */
+  [C.alcance, 0.006],
+  [C.alcance, -0.034],
+  [C.alcance * 0.94, -0.058],
+  [C.alcance * 0.78, -0.086],       // ponta da barba, o gancho
+  [C.alcance * 0.45, -0.062],
+  [C.alcance * 0.20, -0.032],       // pescoço por baixo
+  [0, -0.026],                      // olho, borda de baixo
+];
+
+/* PLANTA (z×x): a espessura. Quase constante nos dois primeiros terços — o
+   corpo da chapa é paralelo — e só então cai para o fio. É o bisel, e
+   concentrá-lo no fim é o que deixa a face grande PLANA. */
+const planta = [
+  [0, C.meiaEspOlho],
+  [C.alcance * 0.55, C.meiaEspOlho * 0.86],
+  [C.alcance, C.meiaEspFio],
+  [C.alcance, -C.meiaEspFio],
+  [C.alcance * 0.55, -C.meiaEspOlho * 0.86],
+  [0, -C.meiaEspOlho],
+];
 
 export const receitaMachadoDeGuerra = {
-  meta: { nome: 'Machado de Guerra', versao: '1.0.0', autor: 'Mecanifica Procedural AI' },
+  meta: { nome: 'Machado de Guerra', versao: '2.0.0', autor: 'Mecanifica Procedural AI' },
 
   PARAMS: P,
 
   TOPO: {
-    assimetria: 'no plano do corte, não bilateral: gume de um lado, esporão do outro',
+    cabecaPorInflate: 'silhueta recortada cruzada com a planta da espessura, como chapa forjada',
+    faceChapa: 'expoenteSecao alto achata a face; losango de loft punha uma quina no meio dela',
     barba: 'o gume desce abaixo da linha do cabo — é o que separa guerra de lenhador',
-    cabecaUnica: 'a barba é seção do mesmo loft, não peça colada',
-    eixoDoCorte: 'X; o cabo é Y; a espessura é Z',
+    eixoDoCorte: 'Z; o cabo é Y; a espessura é X',
   },
 
   MATERIAIS: {
@@ -87,7 +129,8 @@ export const receitaMachadoDeGuerra = {
   PASSOS: [
     /* ---------- cabo ----------
        Levemente mais grosso no fim, para a mão não escorregar no golpe. Fecha
-       nas duas pontas com polo de raio zero: loft sem isso sai tubo aberto. */
+       nas duas pontas com polo de raio zero: loft sem isso sai tubo aberto.
+       Aqui o loft está CERTO — o cabo é mesmo uma seção viajando. */
     ['loft', {
       origemId: 1,
       lados: P.cabo.lados,
@@ -103,41 +146,40 @@ export const receitaMachadoDeGuerra = {
     }],
     ['parte', { nome: 'cabo', sel: { origem: { op: 'loft', id: 1 } } }],
 
-    /* ---------- cabeça ----------
-       Quatro estações ao longo de X. A primeira e a última são polos, e é entre
-       a segunda e a terceira que a barba aparece: `baixo` cresce de 0,022 para
-       a altura cheia enquanto `cima` quase não muda. */
-    ['loft', {
+    /* ---------- cabeça ---------- */
+    ['inflate', {
       origemId: 2,
-      lados: 4,
-      orientacao: [0, 1, 0],
-      secoes: [
-        { pos: [-0.016, yCabeca, 0], raio: 0 },
-        secaoCabeca(-0.010, P.cabeca.alturaCima * 0.62, 0.022, P.cabeca.espessuraOlho / 2),
-        secaoCabeca(0.030, P.cabeca.alturaCima * 0.9, P.cabeca.alturaBarba * 0.55, P.cabeca.espessuraOlho / 2.4),
-        secaoCabeca(P.cabeca.larguraGume * 0.8, P.cabeca.alturaCima, P.cabeca.alturaBarba, P.cabeca.espessuraOlho / 5),
-        secaoCabeca(P.cabeca.larguraGume, P.cabeca.alturaCima * 0.98, P.cabeca.alturaBarba * 0.97, P.cabeca.espessuraFio / 2),
-        { pos: [P.cabeca.larguraGume + 0.002, yCabeca, 0], raio: 0 },
-      ],
+      contornoLado: silhueta,
+      contornoTopo: planta,
+      modo: 'secoes',
+      divisoes: C.divisoes,
+      lados: C.lados,
+      expoenteSecao: C.expoenteSecao,
     }],
-    ['parte', { nome: 'cabeca', sel: { origem: { op: 'loft', id: 2 } } }],
+    ['parte', { nome: 'cabeca', sel: { origem: { op: 'inflate', id: 2 } } }],
+    /* `inflate` nasce em torno da origem; a cabeça sobe até o topo do cabo e
+       recua um pouco em Z para o olho abraçar a haste em vez de tangenciá-la. */
+    /* O recuo em Z põe o OLHO em cima da haste, não atrás dela. Com -0,012 a
+       cabeça encostava na haste pela quina de cima e a arma lia como lâmina
+       aparafusada num pau; o cabo precisa ATRAVESSAR o corpo da cabeça. */
+    ['transladar', { d: [0, yCabeca, -0.030], sel: { grupo: 'cabeca' } }],
 
     /* ---------- esporão ----------
-       Cone apontando para -X, no lado oposto ao gume. É ponta, não martelo:
-       machado de guerra perfura pelo lado de trás. */
+       Cone apontando para -Z, no lado oposto ao gume. É ponta, não martelo. */
     ['cone', {
       origemId: 3,
       raio: P.esporao.base / 2,
       altura: P.esporao.comprimento,
       lados: 6,
-      eixo: 'x',
-      em: [-0.012 - P.esporao.comprimento, yCabeca, 0],
+      eixo: 'z',
+      em: [0, yCabeca, -0.030 - P.esporao.comprimento],
     }],
     ['parte', { nome: 'esporao', sel: { origem: { op: 'cone', id: 3 } } }],
 
     /* ---------- reforço do olho ----------
-       A cinta de metal que impede o cabo de rachar sob o impacto. Detalhe
-       pequeno e é ele que faz a arma parecer montada em vez de encaixada. */
+       A cinta de metal que impede o cabo de rachar sob o impacto. Laterais e
+       tampas são citações separadas: `{op:'cilindro',id}` sem eixo resolve só a
+       lateral, e sem as duas linhas seguintes o reforço perde fundo e topo. */
     ['cilindro', {
       origemId: 4,
       raio: P.cabo.raio + P.reforco.folga,
@@ -145,9 +187,6 @@ export const receitaMachadoDeGuerra = {
       lados: P.cabo.lados,
       em: [0, yCabeca - P.reforco.alt * 0.72, 0],
     }],
-    /* Laterais e tampas são citações separadas: `{op:'cilindro',id}` sem eixo
-       resolve só a lateral. Sem as duas linhas seguintes o reforço perde fundo e
-       topo para o limbo das faces sem parte. */
     ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4 } } }],
     ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4, tampa: 'fundo' } } }],
     ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4, tampa: 'topo' } } }],

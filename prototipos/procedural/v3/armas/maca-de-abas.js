@@ -25,21 +25,17 @@ const P = {
   nucleo: { raio: 0.0145, altura: 0.094, lados: 12 },
   aba: {
     quantidade: 6,
-    raioInterno: 0.010,
-    raioExterno: 0.058,
-    /* A ALTURA precisa ficar bem abaixo do diâmetro da cabeça, e esta é a
-       medida que a imagem corrigiu duas vezes. Com altura 0,092 contra 0,11 de
-       diâmetro, as seis abas tinham quase a mesma extensão nas duas direções e
-       se fundiam num bolo facetado — o render mostrou uma bola, não uma maça.
-       Com 0,062 contra 0,116 cada aba lê como barbatana, com o vão entre elas
-       visível, que é o que dá o nome à arma. */
-    alturaInterna: 0.062,
-    alturaExterna: 0.030,
-    /* altura / espessura, mantida constante para as seções ficarem semelhantes.
-       O valor é ALTO de propósito: na primeira versão era 8,2 e a aba saía
-       grossa a ponto de as seis se encostarem — o render mostrou uma bola
-       facetada, não uma maça de abas. Aba de maça é chapa, não cunha. */
-    razao: 15,
+    alcance: 0.046,        // do eixo para fora, em Z
+    alturaRaiz: 0.062,     // altura junto da haste
+    alturaGume: 0.034,     // altura da aresta que bate
+    meiaEspRaiz: 0.0075,
+    meiaEspGume: 0.0013,
+    divisoes: 8,
+    lados: 12,
+    /* Superelipse achatada: a aba é CHAPA. Seção em losango — que era o que
+       havia aqui — põe uma quina no meio da face e a aba vira lente, com o
+       gume virando ponta em vez de aresta. */
+    expoenteSecao: 12,
   },
   colar: { alt: 0.020, folga: 0.005 },
   pomo: { raio: 0.020, lados: 10 },
@@ -48,21 +44,41 @@ const P = {
 /* O topo da haste é onde a cabeça monta; tudo acima é cabeça. */
 const yCabeca = P.haste.comprimento;
 
-/* Seção da aba num raio dado. A espessura é DERIVADA da altura pela mesma
-   razão em toda estação — é isso que mantém as seções semelhantes e, com elas,
-   os quads do loft planos. Espessura constante aqui torceria as faces. */
-const secaoAba = (raio, altura) => {
-  const meiaEsp = altura / P.aba.razao / 2;
-  return {
-    pos: [raio, yCabeca + P.nucleo.altura * 0.5, 0],
-    contorno: [
-      [altura / 2, 0],
-      [0, meiaEsp],
-      [-altura / 2, 0],
-      [0, -meiaEsp],
-    ],
-  };
-};
+/* A ABA É UMA CHAPA, e por isso vem de `inflate` e não de `loft`.
+
+   A primeira versão era um `loft` de seções em losango correndo para fora, com
+   polo nas duas pontas. O resultado passava em toda medida e mesmo assim era
+   uma lente hexagonal espetada na haste: o losango punha uma quina no meio da
+   face, e os dois polos faziam a aba afinar até virar bico dos dois lados — de
+   um lado para dentro do núcleo, do outro justamente onde deveria estar a
+   ARESTA QUE BATE.
+
+   Maça de abas bate com uma aresta, não com um bico. `inflate` descreve a aba
+   como ela é: um perfil recortado (alto na raiz, mais baixo no gume, com a
+   aresta externa VERTICAL) cruzado com a espessura (grossa na raiz, fina no
+   gume). Fechada por construção, sem polo.
+
+   EIXOS: `inflate` lê a silhueta em z×y e a planta em z×x, então a aba nasce
+   apontando para +Z e o `arranja` radial em torno de Y distribui as seis. */
+const A = P.aba;
+
+const silhuetaAba = [
+  [0, A.alturaRaiz / 2],
+  [A.alcance * 0.55, A.alturaRaiz * 0.44],
+  [A.alcance, A.alturaGume / 2],     // começa a aresta externa
+  [A.alcance, -A.alturaGume / 2],    // e termina: entre as duas, uma reta vertical
+  [A.alcance * 0.55, -A.alturaRaiz * 0.44],
+  [0, -A.alturaRaiz / 2],
+];
+
+const plantaAba = [
+  [0, A.meiaEspRaiz],
+  [A.alcance * 0.6, A.meiaEspRaiz * 0.72],
+  [A.alcance, A.meiaEspGume],
+  [A.alcance, -A.meiaEspGume],
+  [A.alcance * 0.6, -A.meiaEspRaiz * 0.72],
+  [0, -A.meiaEspRaiz],
+];
 
 export const receitaMacaDeAbas = {
   meta: { nome: 'Maça de Abas', versao: '1.0.0', autor: 'Mecanifica Procedural AI' },
@@ -117,23 +133,20 @@ export const receitaMacaDeAbas = {
     ['parte', { nome: 'nucleo', sel: { origem: { op: 'cilindro', id: 2, tampa: 'fundo' } } }],
     ['parte', { nome: 'nucleo', sel: { origem: { op: 'cilindro', id: 2, tampa: 'topo' } } }],
 
-    /* ---------- uma aba ----------
-       Quatro estações: base enterrada no núcleo, corpo, e a ponta fechando num
-       polo. A aba encolhe em altura para fora, que é o que dá o perfil de
-       lâmina curta em vez de placa retangular. */
-    ['loft', {
+    /* ---------- uma aba ---------- */
+    ['inflate', {
       origemId: 3,
-      lados: 4,
-      orientacao: [0, 1, 0],
-      secoes: [
-        { pos: [P.aba.raioInterno - 0.004, yCabeca + P.nucleo.altura * 0.5, 0], raio: 0 },
-        secaoAba(P.aba.raioInterno, P.aba.alturaInterna),
-        secaoAba((P.aba.raioInterno + P.aba.raioExterno) / 2, (P.aba.alturaInterna + P.aba.alturaExterna) / 2),
-        secaoAba(P.aba.raioExterno, P.aba.alturaExterna),
-        { pos: [P.aba.raioExterno + 0.003, yCabeca + P.nucleo.altura * 0.5, 0], raio: 0 },
-      ],
+      contornoLado: silhuetaAba,
+      contornoTopo: plantaAba,
+      modo: 'secoes',
+      divisoes: A.divisoes,
+      lados: A.lados,
+      expoenteSecao: A.expoenteSecao,
     }],
-    ['parte', { nome: 'aba', sel: { origem: { op: 'loft', id: 3 } } }],
+    ['parte', { nome: 'aba', sel: { origem: { op: 'inflate', id: 3 } } }],
+    /* A raiz da aba fica ENTERRADA no núcleo: sem o recuo em Z ela encostaria na
+       superfície do cilindro e a junção apareceria como fresta. */
+    ['transladar', { d: [0, yCabeca + P.nucleo.altura * 0.5, -0.006], sel: { grupo: 'aba' } }],
 
     /* ---------- as outras cinco ----------
        `volta` é o arco FECHADO da coleção: 360 com total 6 dá passo de 60°. As
@@ -141,8 +154,8 @@ export const receitaMacaDeAbas = {
        inserir uma sétima aba não pode fazer `copia: 2` apontar para outra. */
     ['arranja', {
       origemId: 4,
-      derivaDe: { op: 'loft', id: 3 },
-      sel: { origem: { op: 'loft', id: 3 } },
+      derivaDe: { op: 'inflate', id: 3 },
+      sel: { origem: { op: 'inflate', id: 3 } },
       modo: 'radial',
       eixo: 'y',
       total: P.aba.quantidade,

@@ -229,6 +229,43 @@ Uma autoria concluída entrega, além da receita executável:
 6. resultados estruturais e geométricos, incluindo o que **não** foi avaliado;
 7. lista de pendências visuais, sem promover um blockout como final.
 
+## `loft` ou `inflate`: a escolha que nenhuma medida denuncia
+
+Esta é a armadilha mais cara desta rodada, e ela não aparece em número nenhum.
+
+A cabeça do machado e as abas da maça nasceram como `loft` de seções em losango.
+As duas passavam em tudo: fechadas, orientadas, sem face órfã, sem grito. E as
+duas estavam **erradas de forma** — a cabeça do machado era um cristal de
+quartzo e a aba da maça era uma lente hexagonal espetada na haste.
+
+A causa é a mesma nos dois casos, e é a SEÇÃO:
+
+- um losango tem vértice no meio de cada lado, então a peça ganha uma QUINA
+  correndo pelo meio da face — justamente onde uma cabeça de machado ou uma aba
+  de maça precisa ser CHAPA;
+- polo de raio zero fecha o `loft`, mas fechar afinando até virar BICO. Numa
+  cabeça de machado isso apaga o gume; numa aba de maça apaga a aresta que bate.
+  Maça de abas bate com aresta, não com ponta.
+
+**A regra:** `loft` serve quando a forma É uma seção viajando — cabo, punho,
+tubo, corrimão, lâmina de espada. Quando a forma é uma CHAPA COM CONTORNO —
+cabeça de machado, aba de maça, guarda recortada, suporte estampado — a seção
+viajando é a ferramenta errada, e nenhuma quantidade de estações conserta isso.
+Para chapa, use `inflate`: uma silhueta recortada cruzada com uma planta de
+espessura, que é a mesma descrição que o ferreiro usa, e sai fechada por
+construção, sem polo e sem tampa.
+
+Três detalhes de `inflate` que custaram render:
+
+1. **`modo: 'secoes'`, não `'grade'`.** `grade` é literalmente voxelizado e sai
+   com escada no contorno.
+2. **`expoenteSecao` alto.** 2 é elipse e a face sai como travesseiro; foi
+   preciso 12–14 para a face virar chapa de verdade.
+3. **Dois pontos no z máximo, nunca um.** Silhueta que termina em ponta única
+   deixa a última estação com altura zero e nascem faces de área nula —
+   `malha:conferir` reprova. Fisicamente esses dois pontos são o pequeno plano
+   do fio, que todo gume real tem.
+
 ## Armadilhas de `loft`, medidas nas armas do acervo
 
 Estas quatro apareceram modelando espada, machado e maça, e nenhuma delas dá
@@ -245,6 +282,7 @@ aparecer.
 razão entre espessura e altura. Não é regra de bolso: é o determinante da
 diagonal, e dá zero exatamente nesse caso. Consequências práticas:
 
+- vale para o que É seção viajando, como a lâmina da espada;
 - lâmina que afila só na largura e mantém a espessura torce 25% perto da ponta,
   e a seção deixa de ser losango deitado e vira losango em pé — uma agulha
   grossa. Fazer a espessura acompanhar a largura conserta a forma E a torção;

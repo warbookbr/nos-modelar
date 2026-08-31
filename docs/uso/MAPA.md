@@ -659,7 +659,7 @@
 
 - `espada-curta.js` — espada-curta.js — espada curta de infantaria, tipo gládio: lâmina larga com afilamento em duas etapas, guarda, punho e pomo.
 - `maca-de-abas.js` — maca-de-abas.js — maça de abas: cabeça de seis abas radiais em haste de aço.
-- `machado-de-guerra.js` — machado-de-guerra.js — machado de guerra de uma mão: cabeça assimétrica com barba e esporão traseiro, cabo de madeira com reforço.
+- `machado-de-guerra.js` — machado-de-guerra.js — machado de guerra de uma mão: cabeça de chapa com barba, esporão traseiro e cabo com reforço.
 
 ## prototipos/procedural/v3/armas/machado-de-sucata/
 
