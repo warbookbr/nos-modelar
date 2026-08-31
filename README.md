@@ -60,7 +60,7 @@ resto:
   modelado, para checar se um bate com o outro;
 - **crítico visual** (`.claude/agents/critico-visual.md`) — agente sem contexto
   que só olha imagem e diz se o modelo bate com o alvo. Ver
-  [`docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md)
+  [`docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md)
   para o fluxo completo.
 
 ## Estado

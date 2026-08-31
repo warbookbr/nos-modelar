@@ -10,6 +10,18 @@ narrativa e apresentação externa não definem o escopo. A Oficina humana, a
 aplicação jogável e o som foram removidos desta árvore. `bancada.html` é a única
 aplicação publicada aqui.
 
+## Se você só vai usar o Mecanifica
+
+Criar, inspecionar, corrigir ou auditar uma peça **não passa por este
+documento**. A porta é [`usar/README.md`](usar/README.md)
+(`docs/mecanifica/usar/README.md`): a skill da tarefa e o contrato que ela
+aplica, sem o material de desenvolvimento no caminho.
+
+Este INDEX é para quem vai **mudar** o Mecanifica — núcleo, gates, arquitetura,
+plano. O que está encerrado vive em
+[`historico/README.md`](historico/README.md)
+(`docs/mecanifica/historico/README.md`) e não governa trabalho novo.
+
 ## Estado atual
 
 - O plano **ativo** é a [reorganização da documentação por
@@ -220,7 +232,7 @@ aplicação publicada aqui.
   OpenCV, Potrace e Inkscape não superaram autoria vetorial local com semântica,
   calibração e coerência entre vistas; nenhuma dependência foi incorporada.
 - A R2 fechou o contrato de autoria confiável
-  (`docs/mecanifica/CONTRATO-AUTORIA-PRANCHA.md`): intenção, procedência,
+  (`docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md`): intenção, procedência,
   confiança, incerteza e bloqueio agora são dados validados antes do desenho.
   A evidência é `docs/mecanifica/historico/RELATORIO-MOTOR-DE-PRANCHA-R2.md`; o relatório
   e a skill expõem o bloqueio sem transformar referência insuficiente em alvo preciso.
@@ -429,10 +441,10 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
     e planejar uma capacidade ausente sem criar extensão automaticamente.
 18. [`SERVICOS-PROCEDURAL-V1.md`](SERVICOS-PROCEDURAL-V1.md) para descoberta e
     exposição MCP do vocabulário procedural.
-19. [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) e
-    [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) para
+19. [`INTENCAO-PECA-V1.md`](./usar/INTENCAO-PECA-V1.md) e
+    [`REFERENCIA-E-CRITICA-VISUAL.md`](./usar/REFERENCIA-E-CRITICA-VISUAL.md) para
     registrar propósito e achados visuais sem identidade de runtime
-    (`docs/mecanifica/INTENCAO-PECA-V1.md`).
+    (`docs/mecanifica/usar/INTENCAO-PECA-V1.md`).
 20. `docs/uso/MAPA.md` para o inventário gerado.
 21. `docs/mecanifica/historico/` e `docs/historico/` somente como evidência.
 
@@ -449,8 +461,8 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
   histórico.
 - **Antes de abrir experimento novo:** [`GOTCHAS-MODELAGEM-PROCEDURAL.md`](GOTCHAS-MODELAGEM-PROCEDURAL.md)
   (`docs/mecanifica/GOTCHAS-MODELAGEM-PROCEDURAL.md`) e
-  [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
-  (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`), o registro
+  [`GOTCHAS-AUTORIA-VISUAL.md`](./usar/GOTCHAS-AUTORIA-VISUAL.md)
+  (`docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`), o registro
   vivo do que já falhou, e o [canário de casco](./historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
   (`docs/mecanifica/historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md`), a evidência
   negativa mais recente. Rodada gasta redescobrindo algo já medido é falha V-31.
@@ -531,7 +543,7 @@ Resultados encerrados da própria Mecanifica ficam em
 ## Inventário curado
 
 Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.md),
-[AUTORIA-RECEITA-DECLARATIVA](AUTORIA-RECEITA-DECLARATIVA.md),
+[AUTORIA-RECEITA-DECLARATIVA](./usar/AUTORIA-RECEITA-DECLARATIVA.md),
 [MAPA-CANONICO-DEPENDENCIAS](MAPA-CANONICO-DEPENDENCIAS.md)
 (`docs/mecanifica/MAPA-CANONICO-DEPENDENCIAS.md`),
 [CONTEXTO-MONTAGEM-IA](CONTEXTO-MONTAGEM-IA.md),
@@ -542,11 +554,11 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](AUTORIA-IA.m
 [FLUXO-MODELAGEM-IA](FLUXO-MODELAGEM-IA.md),
 [HOMOLOGACAO-FLUXO-IA](HOMOLOGACAO-FLUXO-IA.md), [MONTAGENS-SEMANTICAS](MONTAGENS-SEMANTICAS.md),
 [UPSTREAM-NOS](UPSTREAM-NOS.md), [ATRITOS-AUTORIA](ATRITOS-AUTORIA.md), [VISAO](VISAO.md),
-[PERFIS-DE-AUTORIA](PERFIS-DE-AUTORIA.md), [REFERENCIA-E-CRITICA-VISUAL](REFERENCIA-E-CRITICA-VISUAL.md),
+[PERFIS-DE-AUTORIA](PERFIS-DE-AUTORIA.md), [REFERENCIA-E-CRITICA-VISUAL](./usar/REFERENCIA-E-CRITICA-VISUAL.md),
 [FILETE-V2](FILETE-V2.md), [PRANCHA-FREIO-DISCO](PRANCHA-FREIO-DISCO.md), [PRANCHA-RODA-DIANTEIRA](PRANCHA-RODA-DIANTEIRA.md),
 [COORDENACAO-LOCAL](COORDENACAO-LOCAL.md), [COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](PLANO.md).
 
-O contrato declarativo está em `docs/mecanifica/AUTORIA-RECEITA-DECLARATIVA.md`.
+O contrato declarativo está em `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`.
 
 Evidência atual: [estudo de campo do conjunto dianteiro](./historico/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
 O [relatório de autoria geométrica](./historico/RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md)
@@ -650,4 +662,4 @@ Rumo histórico: [NORTE](../rumo/NORTE.md), [PLANO](../rumo/PLANO.md),
 
 <!-- Contrato R09 alcançável: docs/mecanifica/SERVICOS-PROCEDURAL-V1.md -->
 
-<!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/METODO-DIAGNOSTICO-E-SEU-LIMITE.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/encerrados/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/encerrados/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->
+<!-- Inventário explícito para o gate de alcançabilidade: docs/mecanifica/AGENT-FIRST.md docs/mecanifica/ARQUITETURA.md docs/mecanifica/ATRITOS-AUTORIA.md docs/mecanifica/AUTORIA-IA.md docs/mecanifica/BANCADA-E-APRESENTACAO.md docs/mecanifica/COORDENACAO-LOCAL.md docs/mecanifica/COORDENACAO-REPOS.md docs/mecanifica/FILETE-V2.md docs/mecanifica/FLUXO-MODELAGEM-IA.md docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md docs/mecanifica/MONTAGENS-SEMANTICAS.md docs/mecanifica/MONTAGEM-PERSISTIDA-V2.md docs/mecanifica/PERFIS-DE-AUTORIA.md docs/mecanifica/PLANO.md docs/mecanifica/PRANCHA-FREIO-DISCO.md docs/mecanifica/PRANCHA-RODA-DIANTEIRA.md docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md docs/mecanifica/UPSTREAM-NOS.md docs/mecanifica/VISAO.md docs/mecanifica/historico/README.md docs/mecanifica/historico/EXPERIMENTO-AB-FLUXO-IA.md docs/mecanifica/historico/EXPERIMENTO-RODA-REALISTA.md docs/mecanifica/historico/OFICINA-OTIMIZACOES.md docs/mecanifica/historico/RELATO-RODA-REALISTA.md docs/mecanifica/historico/RELATORIO-PONTE-THREE.md docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md docs/mecanifica/planos/README.md docs/mecanifica/planos/encerrados/2026-08-06-diagnostico-motor-procedural.md docs/mecanifica/planos/BACKLOG.md docs/mecanifica/planos/MODELO.md docs/mecanifica/planos/encerrados/2026-08-04-mcp-para-agentes.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-fatia-1b-visual.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-avaliacao-consolidada.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-correcao-descoberta.md docs/mecanifica/planos/encerrados/2026-08-05-mcp-autoria-controlada.md docs/mecanifica/planos/mcp/INDEX.md docs/mecanifica/planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md docs/mecanifica/planos/concluidos/2026-08-02-assentamento-anular.md docs/mecanifica/planos/concluidos/2026-08-02-camera-livre-reproduzivel.md docs/mecanifica/planos/concluidos/2026-08-02-canto-composto.md docs/mecanifica/planos/concluidos/2026-08-02-concordancia-por-ponto.md docs/mecanifica/planos/concluidos/2026-08-02-contagem-por-desvio.md docs/mecanifica/planos/concluidos/2026-08-02-contato-local-cilindrico.md docs/mecanifica/planos/concluidos/2026-08-02-estados-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-identidade-porta-estavel.md docs/mecanifica/planos/concluidos/2026-08-02-interfaces-de-encaixe.md docs/mecanifica/planos/concluidos/2026-08-02-portas-espelho-arranja.md docs/mecanifica/planos/concluidos/2026-08-02-pose-derivada-roda.md docs/mecanifica/planos/concluidos/2026-08-02-pose-em-referencial.md docs/mecanifica/planos/concluidos/2026-08-02-recusa-estrutural-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-tolerancias-de-montagem.md docs/mecanifica/planos/concluidos/2026-08-02-triangulacao-de-furos.md docs/mecanifica/planos/concluidos/2026-08-03-consulta-subarvore-ia.md docs/mecanifica/planos/concluidos/2026-08-03-hierarquia-semantica-minima.md docs/mecanifica/planos/concluidos/2026-08-03-inspecao-reproduzivel-de-par.md docs/mecanifica/planos/concluidos/2026-08-03-selecao-subarvore-semantica.md docs/mecanifica/planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md docs/historico/DECISIONS-ARCHIVE.md docs/historico/DECISIONS.md docs/historico/TETO.md docs/historico/diagnostico-subpartes-semanticas.md docs/historico/fase4-drone-inspecao-criacao-relatorio.md docs/historico/fase4-drone-inspecao-refino-relatorio.md docs/historico/fixture-identidade-apaga-relatorio.md docs/historico/fixture-identidade-cubo-relatorio.md docs/historico/fixture-identidade-espelho-relatorio.md docs/historico/fixture-identidade-estavel-relatorio.md docs/historico/oficina-projeto.md docs/historico/playground.md docs/historico/proveniencia-local-fixture.md docs/historico/teto-moto-refino-3-relatorio.md docs/historico/teto-moto-refino-relatorio.md docs/historico/teto-moto-relatorio.md docs/historico/teto-selecao-semantica-relatorio.md docs/historico/walkthrough_colaborador4.md docs/rumo/NORTE.md docs/rumo/PLANO.md docs/rumo/arquitetura-identidade-estavel.md docs/rumo/oficina-roteiro.md docs/uso/MAPA.md docs/uso/RECURSOS.md docs/uso/oficina-contrato.md docs/uso/oficina-referencia.md docs/oficina.md -->

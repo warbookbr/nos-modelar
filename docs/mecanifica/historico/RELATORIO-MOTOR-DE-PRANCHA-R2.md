@@ -10,7 +10,7 @@ R0 recusava vetor inválido, incoerência entre vistas, calibração ruim e comp
 
 ## Contrato escolhido
 
-`mecanifica.prancha-autoria@1`, documentado em [`CONTRATO-AUTORIA-PRANCHA.md`](../CONTRATO-AUTORIA-PRANCHA.md), acrescenta um bloco `autoria` à mesma especificação que já contém vetor, landmarks, cotas, envelope e leituras de vista. Ele exige:
+`mecanifica.prancha-autoria@1`, documentado em [`CONTRATO-AUTORIA-PRANCHA.md`](../usar/CONTRATO-AUTORIA-PRANCHA.md), acrescenta um bloco `autoria` à mesma especificação que já contém vetor, landmarks, cotas, envelope e leituras de vista. Ele exige:
 
 - intenção curta, procedência tipada com evidência e IDs semânticos únicos;
 - confiança declarada e lista explícita de incertezas, inclusive quando vazia;

@@ -186,7 +186,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 **Files:**
 - Modify: `docs/mecanifica/historico/RELATORIO-MODELADOR-INVERSO-P0.md`
 - Modify: `docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`
-- Modify: `docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`
+- Modify: `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`
 
 - [ ] Reexecutar todos os gates oficiais e verificar artefatos/hashes.
 - [ ] Registrar separadamente plataforma, alvo e avaliador como `aprovar`,

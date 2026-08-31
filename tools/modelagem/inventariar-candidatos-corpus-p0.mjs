@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const origem = resolve(raiz, 'docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md');
+const origem = resolve(raiz, 'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md');
 const destino = resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0/inventario-v01-v32.json');
 const pistas = {
   'V-03': ['autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/evidencias/conjunto-frontal.png'],

@@ -168,7 +168,7 @@ O registro de atritos de autoria confirma A-1 a A-10, A-12 a A-14, A-17 a A-31
 e A-33 a A-38 como **resolvidos**, A-11 como **parcial**, e A-15, A-16 e A-32
 como escopo **retirado**, não como capacidade faltante. A lista detalhada e a
 evidência de cada identificador permanecem em
-[`ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md); esta seção impede que essas
+[`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md); esta seção impede que essas
 capacidades sejam confundidas com a lacuna de forma.
 
 ## Lacunas que realmente bloqueiam o objetivo atual

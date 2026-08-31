@@ -67,7 +67,7 @@ validação de fabricação e exportação CAD. Essa exclusão não é provisór
   diagnóstico, composição e identidade.
 - [`../PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md): distinção entre F2, F3 e
   `realistaApresentacao`.
-- [`../REFERENCIA-E-CRITICA-VISUAL.md`](../REFERENCIA-E-CRITICA-VISUAL.md):
+- [`../REFERENCIA-E-CRITICA-VISUAL.md`](../usar/REFERENCIA-E-CRITICA-VISUAL.md):
   protocolo de referência e crítica.
 - [`../RELATORIO-SONDA-SUPERCARRO-1-0.md`](./RELATORIO-SONDA-SUPERCARRO-1-0.md):
   métricas e limites da sonda anterior.

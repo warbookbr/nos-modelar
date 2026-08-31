@@ -40,7 +40,7 @@ Windows, classificar cada alvo, produzir um canário calibrado e medir o crític
 em pares frios, repetidos, embaralhados e com holdout. Priors, fitting,
 preferência e novo carro só abrem pelos gates cumulativos escritos antes da
 implementação. O registro de falhas em
-[`GOTCHAS-AUTORIA-VISUAL.md`](../GOTCHAS-AUTORIA-VISUAL.md) é leitura
+[`GOTCHAS-AUTORIA-VISUAL.md`](../usar/GOTCHAS-AUTORIA-VISUAL.md) é leitura
 obrigatória antes de abrir experimento.
 
 O [R2B com controle vertical](./encerrados/2026-08-23-redesenho-cage-r2b-controle-vertical.md)

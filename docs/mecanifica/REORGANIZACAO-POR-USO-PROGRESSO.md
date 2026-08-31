@@ -12,7 +12,7 @@ execução.
 | --- | --- | --- |
 | F0 | medir antes de mexer | concluída |
 | F1 | histórico para fora do caminho | concluída |
-| F2 | criar `usar/` e a porta curta | pendente |
+| F2 | criar `usar/` e a porta curta | concluída |
 | F3 | gates G1, G3, G4, G5 e G7 | pendente |
 | F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | pendente |
 | F5 | decidir sobre a pasta `desenvolver/` | pendente |
@@ -126,6 +126,30 @@ acontecido com o canário do casco e a exportação STEP. Não tem relação com
 mudança: é o mesmo defeito latente aparecendo conforme a suíte cresce. Tempo
 declarado com o motivo, isolado em ~9,8 s.
 
+## F2 — a pasta de uso
+
+Criada `docs/mecanifica/usar/` com seis documentos e uma porta de 41 linhas. A
+raiz caiu de 81 para 51 documentos.
+
+O órfão foi fechado: `GOTCHAS-AUTORIA-VISUAL.md` era declarado leitura
+obrigatória e nenhuma skill apontava para ele. Agora `criar-peca` e
+`modelar-maquina` mandam lê-lo antes de gerar a primeira forma, cada uma
+citando os gotchas que mais pegam o seu tipo de objeto.
+
+### O G1 classificou antes de existir
+
+Testei os seis candidatos contra a regra do G1 — documento de uso não cita
+documento de desenvolvimento — antes de escrever o gate. Quatro passaram
+limpos. Dois acusaram, e os dois acusaram **certo**:
+
+- `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` cita um plano concluído;
+- `GOTCHAS-AUTORIA-VISUAL.md` cita `ATRITOS-AUTORIA.md`, que é documento de
+  desenvolvimento.
+
+Nos dois casos a citação é de **evidência**, não de autoridade: apontam onde a
+prova está, não onde a regra mora. Isso mudou o desenho do G1 antes de eu
+implementá-lo — ver D3.
+
 ## Decisões tomadas durante a execução
 
 Registradas aqui na hora, para que a razão não se perca.
@@ -149,11 +173,34 @@ documento inteiro e troquei só essa linha por uma frase que diz onde o
 substituto vive. Reescrever a razão do congelamento seria falsificar registro: a
 decisão é de 2026-08-26 e continua sendo essa.
 
+### D3 — o G1 proíbe por padrão, com allowlist fechada e motivo escrito
+
+A F2 mostrou que a regra crua do G1 reprovaria duas citações legítimas de
+evidência. Duas saídas ruins: afrouxar o gate até ele não pegar nada, ou apagar
+ponteiro bom para agradar o gate.
+
+O G1 passa a proibir por padrão e aceitar exceção só por **allowlist fechada,
+com par arquivo→destino e motivo escrito** — exatamente o padrão que
+`tools/mapa/links.mjs` já usa. Sem glob, sem exceção por diretório. Assim cada
+vazamento custa uma linha e uma justificativa que alguém vai ler depois, em vez
+de passar despercebido.
+
 ## Lista de fronteira — decisão do usuário, não minha
 
-Preenchida na F2. Documentos cuja pasta é discutível não são movidos por decisão
-minha; entram aqui com recomendação, e o usuário decide.
+Estes documentos ficaram na raiz, ou seja, contam como desenvolvimento. Não os
+movi porque a classificação é discutível e a decisão é sua. Nada quebra se
+ficarem como estão; mover depois é `git mv` mais correção de links.
 
-| documento | recomendação | por quê |
+| documento | minha recomendação | por quê |
 | --- | --- | --- |
-| a preencher na F2 | | |
+| `AUTORIA-IA.md` (667 linhas) | **dividir**, não mover | Descreve como a IA autora, o que é uso, mas também justifica decisões de projeto, o que é desenvolvimento. Do jeito que está, ir inteiro para `usar/` levaria material que quem usa não precisa. |
+| `GOTCHAS-MODELAGEM-PROCEDURAL.md` | fundir na F4 e ir para `usar/` | Repete 7 dos 12 achados do outro registro. Manter os dois é garantir que alguém leia metade. |
+| `PRANCHA-FREIO-DISCO.md`, `PRANCHA-RODA-DIANTEIRA.md` | mover para `usar/` | Parecem exemplo aplicado do contrato de prancha, e exemplo serve a quem usa. Não movi porque nenhuma skill os cita, então o G3 os acusaria de órfãos — a decisão real é se a skill deve citá-los. |
+| `MONTAGENS-SEMANTICAS.md` | mover para `usar/` | É contrato que `auditar-montagem` aplica. Mesma pendência de citação que os anteriores. |
+| `CONTRATO-ACEITE-VISUAL.md`, `CONTRATO-FORMA-GLOBAL-N2.md` | deixar na raiz | São contratos de experimento e de gate, não de tarefa de peça. Servem a quem desenvolve. |
+| `ATIVACAO-BANCADA-SESSAO-ATIVA.md` | mover para `usar/` | Procedimento operacional puro: como pôr a peça na bancada. Mesma pendência de citação. |
+
+O padrão que aparece nos quatro "mover": todos dependem de uma skill passar a
+citá-los, senão o G3 os reprova como órfãos. Isso não é obstáculo do gate — é o
+gate perguntando se o documento tem dono. Se nenhuma skill precisa dele, ele
+provavelmente não é documento de uso.

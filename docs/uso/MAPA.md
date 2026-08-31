@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+732 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -373,7 +373,6 @@
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
-- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
 - `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
@@ -384,7 +383,6 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
-- `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
@@ -398,16 +396,13 @@
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
-- `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GOTCHAS-MODELAGEM-PROCEDURAL.md` — Gotchas de modelagem procedural
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
-- `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
-- `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
@@ -418,7 +413,6 @@
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
-- `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
@@ -561,6 +555,16 @@
 ## docs/mecanifica/referencias/
 
 - `README.md` — Referências de forma
+
+## docs/mecanifica/usar/
+
+- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
+- `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
+- `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
+- `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
+- `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
+- `README.md` — Usar o Mecanifica
+- `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 
 ## docs/rumo/
 

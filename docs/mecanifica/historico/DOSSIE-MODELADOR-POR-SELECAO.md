@@ -16,7 +16,7 @@ calibrada: a IA erraria ao criar forma e acertaria ao comparar formas.
 
 O modelador troca o ato de autoria. A IA deixa de escolher valores e passa a
 ordenar candidatos. O registro das falhas anteriores está em
-[`GOTCHAS-AUTORIA-VISUAL.md`](../GOTCHAS-AUTORIA-VISUAL.md) e é leitura obrigatória
+[`GOTCHAS-AUTORIA-VISUAL.md`](../usar/GOTCHAS-AUTORIA-VISUAL.md) e é leitura obrigatória
 antes de abrir qualquer experimento aqui.
 
 ## A decisão central: linhas, não pontos

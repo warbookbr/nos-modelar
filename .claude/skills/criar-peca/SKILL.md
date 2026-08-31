@@ -83,7 +83,7 @@ extensão; nunca instale código ou esconda JavaScript na receita.
 
 Não existe modelo de receita no acervo atual e não se deve recriar uma cópia
 histórica. Para uma receita nova, use o contrato declarativo em
-`docs/mecanifica/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
+`docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
 não referência de engenharia, e registre o pacote que autorizou a modelagem.
 
 `PARAMS` guarda dimensões; `TOPO` guarda decisões que podem reconstruir a
@@ -92,7 +92,7 @@ passo: o núcleo calcula o bloco pela posição (`BLOCO=1000`). `origemId` é um
 identidade estrutural diferente e pode ser escolhida pelo autor.
 
 Quando a função pretendida não for óbvia pela geometria, exporte o contrato
-opcional `INTENCAO` descrito em `docs/mecanifica/INTENCAO-PECA-V1.md`. Declare
+opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare
 função, família, significado dos eixos locais, invariantes e critérios visuais.
 A descrição headless e a revisão preservam e comparam essa intenção; ela não
 substitui medidas, interfaces, relações nem inspeção das imagens. Não grave
@@ -202,11 +202,20 @@ aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 m
 ficou várias rodadas visível na vista frontal e só foi achado por um script.
 Medição pega o defeito que alguém já imaginou; olhar pega o resto.
 
+## Antes de gerar a primeira forma
+
+Leia
+[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md).
+É o registro do que já falhou aqui e não pode se repetir: malha fechada não é
+objeto bom, métrica verde não aprova forma, mosaico esconde defeito que a vista
+em tamanho nativo mostra, e perspectiva bonita não compensa ortográfica ruim.
+Cada linha daquela tabela custou pelo menos uma rodada perdida.
+
 ## Despachar o crítico, sem contexto
 
 Em marco — antes de propor promoção, publicação ou de levar o resultado ao
 usuário — despache um subagente como **crítico visual**. O protocolo está em
-[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+[`../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
 Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
 relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
@@ -240,14 +249,14 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
    modelo e sobreposição. Crítico que recebe só o render dá opinião.
 
 Sem alvo desenhado, desenhe antes: veja
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
 ## Antes de caçar defeito: o método tem limite
 
 Se você está tentando decidir **forma, proporção ou caráter**, não é problema
 diagnóstico, e eliminar defeito ali rende conserto certo num objeto que continua
 ruim. O sintoma é os achados encolherem e a nota não subir. Ver
-[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
+[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
 
 Quando o método valer, dois passos são obrigatórios e são os que mais somem:
 **identificar o que falta** (o desenho de referência existia desde a primeira
