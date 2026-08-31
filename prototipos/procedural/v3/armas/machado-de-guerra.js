@@ -44,8 +44,13 @@
 const P = {
   cabo: { comprimento: 0.62, raio: 0.019, lados: 8 },
   cabeca: {
-    alcance: 0.132,       // do olho ao fio, em Z
-    meiaEspOlho: 0.021,
+    alcance: 0.148,       // da nuca ao fio, em Z
+    /* A meia-espessura no olho tem de VESTIR o cabo com folga, não empatar com
+       ele. Com 0,021 contra um raio de cabo de 0,019 sobrava 2 mm de parede — e
+       como a seção é superelipse, ela afina perto das bordas e o cabo saía
+       pelas faces. 0,028 dá 9 mm de parede, que é o que faz o olho parecer
+       olho. */
+    meiaEspOlho: 0.028,
     meiaEspFio: 0.0016,
     alturaCima: 0.052,    // acima da linha do cabo
     alturaBarba: 0.082,   // abaixo: é a barba que define a arma
@@ -78,7 +83,7 @@ const C = P.cabeca;
         trás em gancho. O gume não é uma reta vertical: reta lê como lâmina de
         guilhotina, e o gancho da barba é o que engata escudo e braço. */
 const silhueta = [
-  [0, 0.030],                       // olho, borda de cima
+  [0, 0.042],                       // olho, borda de cima
   [C.alcance * 0.30, 0.035],        // pescoço: quase sem crescer
   [C.alcance * 0.63, 0.047],        // ombro: aqui começa o abano
   [C.alcance * 0.86, 0.052],
@@ -140,8 +145,12 @@ export const receitaMachadoDeGuerra = {
         { pos: [0, 0.004, 0], raio: P.cabo.raio * 1.12 },
         { pos: [0, P.cabo.comprimento * 0.25, 0], raio: P.cabo.raio * 0.94 },
         { pos: [0, P.cabo.comprimento * 0.8, 0], raio: P.cabo.raio },
-        { pos: [0, P.cabo.comprimento + 0.03, 0], raio: P.cabo.raio },
-        { pos: [0, P.cabo.comprimento + 0.034, 0], raio: 0 },
+        /* O cabo TERMINA DENTRO da cabeça. Antes ele subia até 0,654 e o topo
+           da cabeça sobre o olho estava em 0,6538: o cabo furava a cabeça por
+           dois décimos de milímetro, que na imagem é um bico saindo do dorso.
+           Num machado real o cabo para dentro do olho e é encunhado ali. */
+        { pos: [0, P.cabo.comprimento + 0.022, 0], raio: P.cabo.raio },
+        { pos: [0, P.cabo.comprimento + 0.026, 0], raio: 0 },
       ],
     }],
     ['parte', { nome: 'cabo', sel: { origem: { op: 'loft', id: 1 } } }],
@@ -161,8 +170,14 @@ export const receitaMachadoDeGuerra = {
        recua um pouco em Z para o olho abraçar a haste em vez de tangenciá-la. */
     /* O recuo em Z põe o OLHO em cima da haste, não atrás dela. Com -0,012 a
        cabeça encostava na haste pela quina de cima e a arma lia como lâmina
-       aparafusada num pau; o cabo precisa ATRAVESSAR o corpo da cabeça. */
-    ['transladar', { d: [0, yCabeca, -0.030], sel: { grupo: 'cabeca' } }],
+       aparafusada num pau; o cabo precisa ATRAVESSAR o corpo da cabeça.
+
+       O valor mede a NUCA — o bloco de aço atrás do olho. Com -0,030 sobravam
+       9 mm atrás do cabo e a lâmina continuava lendo como colada na frente do
+       pau. Com -0,048 sobram 27 mm, e é essa massa atrás do olho que faz o
+       machado parecer montado. O `alcance` cresceu junto para o gume não
+       perder distância. */
+    ['transladar', { d: [0, yCabeca, -0.048], sel: { grupo: 'cabeca' } }],
 
     /* ---------- esporão ----------
        Cone apontando para -Z, no lado oposto ao gume. É ponta, não martelo. */
@@ -172,7 +187,9 @@ export const receitaMachadoDeGuerra = {
       altura: P.esporao.comprimento,
       lados: 6,
       eixo: 'z',
-      em: [0, yCabeca, -0.030 - P.esporao.comprimento],
+      /* O esporão ENTRA na cabeça em vez de encostar no plano dela: tangência
+         exata deixa costura visível na junção. */
+      em: [0, yCabeca, -0.040 - P.esporao.comprimento],
     }],
     ['parte', { nome: 'esporao', sel: { origem: { op: 'cone', id: 3 } } }],
 
@@ -185,7 +202,10 @@ export const receitaMachadoDeGuerra = {
       raio: P.cabo.raio + P.reforco.folga,
       altura: P.reforco.alt,
       lados: P.cabo.lados,
-      em: [0, yCabeca - P.reforco.alt * 0.72, 0],
+      /* A cinta fica ABAIXO da cabeça, encostada nela. Com o cálculo antigo ela
+         subia até 0,635 e entrava no corpo da cabeça, cujo ventre no olho está
+         em 0,594. */
+      em: [0, yCabeca - 0.028 - P.reforco.alt, 0],
     }],
     ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4 } } }],
     ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4, tampa: 'fundo' } } }],

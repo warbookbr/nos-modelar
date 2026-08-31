@@ -201,6 +201,33 @@ ferramenta funcionava e pegava o defeito; eu é que pulei a ordem.
 O triângulo subiu bastante, e é preço de forma, não de descuido: chapa com
 contorno recortado tem mais superfície que uma seção viajando.
 
+### Segunda correção do operador: montagem, não forma
+
+Com a chapa já certa, o operador apontou o que sobrou: a lâmina não vestia o
+cabo e o cabo vazava por dentro dela. As duas coisas eram verdade e mediam-se em
+milímetro:
+
+| medida | antes | depois |
+| --- | --- | --- |
+| topo do cabo | 0,654 | 0,646 |
+| topo da cabeça sobre o olho | 0,6538 | 0,657 |
+| parede do olho (meia-espessura − raio do cabo) | 2 mm | 9 mm |
+| nuca (aço atrás do cabo) | 9 mm | 27 mm |
+
+O cabo furava a cabeça por **dois décimos de milímetro** — na imagem, um bico
+saindo do dorso. E a parede de 2 mm não sobrevivia à superelipse, que afina
+perto das bordas: o cabo saía pelas faces.
+
+A nuca é a lição menos óbvia. Mesmo com o cabo bem enterrado, 9 mm de aço atrás
+do olho fazem a lâmina ler como **colada na frente do pau**. Um machado montado
+tem massa dos dois lados do cabo, e é ela que sustenta o esporão. Subir a nuca
+para 27 mm foi o que fez a peça parecer montada em vez de encaixada.
+
+Fica registrado como método: junção se confere por **caixa envolvente por
+parte**, não a olho. Três números resolveram o diagnóstico — topo do cabo, topo
+da cabeça e espessura no olho — e nenhum deles aparece em veredito de topologia
+ou de micropolígono.
+
 ### O limite que continua de pé
 
 Contagem, fechamento e orientação o conferente resolve por linha de comando. Se
