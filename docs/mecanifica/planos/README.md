@@ -3,7 +3,18 @@
 ## Estado
 
 **Plano ativo:**
-[`2026-08-25-modelador-inverso-priors-familia.md`](2026-08-25-modelador-inverso-priors-familia.md).
+[`2026-08-31-reorganizacao-por-uso.md`](2026-08-31-reorganizacao-por-uso.md) —
+separa a documentação por quem a lê: quem **usa** o Mecanifica, quem o
+**desenvolve** e o que é **histórico**, com gates que impedem a separação de
+vazar de volta. O progresso por fase fica em
+[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../REORGANIZACAO-POR-USO-PROGRESSO.md).
+
+**Plano congelado:** o [modelador inverso com priors por
+família](congelados/2026-08-25-modelador-inverso-priors-familia.md) saiu do
+caminho crítico em 2026-08-26, quando o usuário assumiu o julgamento de forma.
+Não foi refutado; a pasta [`congelados/`](congelados/README.md) explica a
+diferença entre congelado, cancelado e concluído, e cada plano guardado lá
+declara sua condição de descongelamento.
 
 **Concluído e aprovado:**
 [`2026-08-28-exportacao-cad-step.md`](2026-08-28-exportacao-cad-step.md) —

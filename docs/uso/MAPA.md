@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-728 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -446,6 +446,7 @@
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
+- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -512,8 +513,8 @@
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
-- `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
+- `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -540,6 +541,11 @@
 - `2026-08-03-inspecao-reproduzivel-de-par.md` — AUT-2026-19 — inspeção reproduzível de par
 - `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
 - `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
+
+## docs/mecanifica/planos/congelados/
+
+- `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
+- `README.md` — Planos congelados
 
 ## docs/mecanifica/planos/mcp/
 

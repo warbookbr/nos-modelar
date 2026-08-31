@@ -1,9 +1,61 @@
 # Modelador inverso com priors por família
 
-**Estado:** ativo
-**Responsável:** Codex · **Base:** `4a25f5a`
-**Dossiê vinculante:** [`../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
-**Execução detalhada aberta:** [`../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
+**Estado:** congelado
+**Congelado em:** 2026-08-26, por decisão do usuário · **Base:** `bb2e79a`
+**Responsável original:** Codex
+**Dossiê vinculante:** [`../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
+**Execução detalhada:** [`../../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
+**Substituído por:** o plano de modelagem dirigida pelo usuário, que hoje vive
+na branch `claude/revisar-plano-ativo-cyj8c3` e ainda não chegou à `main`. O
+congelamento não depende dele: a decisão que tirou este plano do caminho crítico
+foi tomada em 2026-08-26 e vale aqui do mesmo jeito.
+
+## Por que foi congelado
+
+Este plano gasta P0 inteiro provando que **uma IA julga forma de maneira
+confiável**: corpus cego, pares A/B embaralhados, holdout, limiar escolhido só
+na calibração, bootstrap por objeto. Toda essa maquinaria existe porque o
+julgamento seria automático.
+
+O usuário decidiu assumir o julgamento. Ele olha a imagem e diz o que está
+errado em linguagem comum. Com isso, a pergunta que P0 tentava responder deixa
+de estar no caminho crítico — e P0-C, que estava `bloqueado por execução
+independente`, deixa de bloquear qualquer coisa.
+
+Nada aqui foi refutado. O plano não está errado; está **fora do caminho
+escolhido agora**. Ele foi movido inteiro, com suas ferramentas, para poder
+voltar sem reconstrução.
+
+## Condição de descongelamento
+
+O usuário registrou a intenção de reavaliar este plano se a modelagem dirigida
+não der certo — e também de considerá-lo **em adição** a ela, não só como
+substituto. Dois gatilhos concretos:
+
+- a modelagem dirigida falhar em produzir um carro aceito pelo usuário, ou
+- a modelagem dirigida funcionar mas o custo de atenção do usuário por rodada
+  se mostrar alto demais para escalar além do primeiro carro.
+
+No segundo caso, o que se descongela primeiro é justamente a calibração cega do
+crítico: ela vira a maneira de **filtrar rodadas antes de chegarem ao usuário**,
+com o veredito humano continuando soberano.
+
+## O que continua de pé e foi levado para o plano novo
+
+- a classificação de alvo em `direcao-estetica`, `alvo-geometrico` e
+  `indeterminado`, que impede tentar encaixe milimétrico num desenho que não
+  suporta isso (`src/autoria/qualificacao-alvo.js`);
+- a regra de julgar **cada vista separada e grande**, com mosaico servindo só de
+  índice;
+- os recortes regionais N6 já construídos (`tools/mecanifica/recortar-regioes-n6.mjs`).
+
+## O que fica parado junto com ele
+
+A infraestrutura de calibração cega em `tools/modelagem/`: geração de corpus,
+inventário de candidatas, contrato de julgamento, transporte cego
+`mecanifica.lote-critico-p0@2`, CLI de exportação/ingestão e análise com
+bootstrap agrupado. Nada foi apagado e os testes continuam verdes; apenas não há
+plano ativo que a consuma.
 
 ## Objetivo verificável
 

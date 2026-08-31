@@ -12,6 +12,18 @@ aplicação publicada aqui.
 
 ## Estado atual
 
+- O plano **ativo** é a [reorganização da documentação por
+  uso](planos/2026-08-31-reorganizacao-por-uso.md)
+  (`docs/mecanifica/planos/2026-08-31-reorganizacao-por-uso.md`): separar o que
+  serve a quem **usa** o Mecanifica, a quem o **desenvolve** e o que é
+  **histórico**, com gates que impedem a separação de vazar de volta. O
+  progresso por fase e as decisões tomadas na execução ficam em
+  [`REORGANIZACAO-POR-USO-PROGRESSO.md`](REORGANIZACAO-POR-USO-PROGRESSO.md)
+  (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
+  com priors por família está
+  [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
+  (`docs/mecanifica/planos/congelados/README.md`), não refutado.
+
 - A [exportação CAD/STEP modular](planos/2026-08-28-exportacao-cad-step.md)
   (`docs/mecanifica/planos/2026-08-28-exportacao-cad-step.md`) foi
   **concluída e aprovada**. Entregou os módulos puros `modulos/exportador-cad/` e

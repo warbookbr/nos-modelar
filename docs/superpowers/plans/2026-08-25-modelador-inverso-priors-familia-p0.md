@@ -12,7 +12,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 **Tech Stack:** Node.js ESM, Vitest, JSON Schema, ferramentas nativas em
 `tools/modelagem/` e documentos/artefatos em `autoria-assistida/`.
 
-**Spec:** [`docs/mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md`](../../mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md)
+**Spec:** [`docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`](../../mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
 
 ## Global Constraints
 
@@ -185,7 +185,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 
 **Files:**
 - Modify: `docs/mecanifica/RELATORIO-MODELADOR-INVERSO-P0.md`
-- Modify: `docs/mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md`
+- Modify: `docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`
 - Modify: `docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`
 
 - [ ] Reexecutar todos os gates oficiais e verificar artefatos/hashes.
