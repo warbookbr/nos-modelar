@@ -17,8 +17,11 @@ export default defineConfig({
        fora do include repetiria exatamente o defeito de cima — arquivo que
        existe, nunca roda, e dá impressão de cobertura. */
     include: [
+      'src/**/*.test.js', 'src/**/*.test.mjs',
+      'prototipos/**/*.test.js', 'prototipos/**/*.test.mjs',
       'tools/**/*.test.ts', 'tools/**/*.test.mjs',
       'autoria-assistida/**/*.test.mjs',
+      'modulos/**/*.test.js', 'modulos/**/*.test.mjs',
     ],
     watch: false,
   },

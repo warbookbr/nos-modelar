@@ -109,6 +109,16 @@ function erroDeTempo(timeoutMs) {
   return erro;
 }
 
+/* Rótulo de peça vira nome de arquivo: a sessão ativa usa `meta.nome`, que tem
+   acento e espaço ("Cutelo de Sucata Reforçado"). */
+export function apelidoDeArquivo(nome) {
+  return String(nome ?? 'sessao-ativa')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'sessao-ativa';
+}
+
 /**
  * Gera e inspeciona vistas da bancada. O retorno contém as vistas relatadas,
  * os caminhos dos PNGs, métricas de enquadramento e falhas estruturadas.
@@ -194,7 +204,11 @@ export async function olharBancada({
     if (!MODOS.includes(modo)) erroDeUso(`modo '${modo}' não existe. Use: ${MODOS.join(', ')}`);
     if (!PROJECOES.includes(projecao)) erroDeUso(`projeção '${projecao}' não existe. Use: ${PROJECOES.join(', ')}`);
     if (!Number.isFinite(explosao) || explosao < 0 || explosao > 1) erroDeUso('explosao precisa estar entre 0 e 1');
-    if (saidaDeclarada && !peca) erroDeUso('--saida exige o nome da peça.');
+    /* Sem --peca a bancada abre a SESSÃO ATIVA — a peça em que se está
+       trabalhando, que por definição ainda não está no catálogo publicado.
+       Exigir nome aqui tornava impossível salvar a revisão visual justamente
+       do trabalho em curso. O nome do arquivo sai do rótulo do modelo já
+       carregado (`dado.peca`), normalizado abaixo. */
 
     const saida = capturarEmMemoria ? null : (caminhoInterno(saidaDeclarada, 'saida') ?? OUT);
     const relatorio = capturarEmMemoria ? null : caminhoInterno(relatorioDeclarado, 'relatorio');
@@ -209,7 +223,7 @@ export async function olharBancada({
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
     if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
     const arquivosPlanejados = !capturarEmMemoria && peca
-      ? vistas.map((vista) => join(saida, `bancada-${peca}-${vista}${sufixo}.png`))
+      ? vistas.map((vista) => join(saida, `bancada-${apelidoDeArquivo(peca)}-${vista}${sufixo}.png`))
       : [];
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
     if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
@@ -250,6 +264,16 @@ export async function olharBancada({
             () => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null,
             { timeout: 20000 },
           );
+          /* A ponte existir não significa que há modelo. A peça da sessão ativa
+             chega pelo POLLING do sincronizador, depois do load — ler antes
+             devolvia estatísticas nulas e derrubava a revisão visual. Espera o
+             modelo de fato entrar na cena; `listar` não precisa de modelo. */
+          if (!listar) {
+            await page.waitForFunction(
+              () => window.__mecanificaBancada.carregado === true,
+              { timeout: 20000 },
+            );
+          }
           return tentativa;
         } catch (erro) {
           const expirou = erro?.name === 'TimeoutError' || /Timeout/i.test(erro?.message ?? '');
@@ -282,7 +306,11 @@ export async function olharBancada({
       const dado = await page.evaluate(() => {
         const b = window.__mecanificaBancada;
         return {
-          ready: b.ready, erro: b.erro ?? null, peca: b.peca ?? null, partes: b.partes ?? [],
+          ready: b.ready,
+          erro: b.erro ?? null,
+          // `peca` é função na ponte; ler o campo cru devolvia função (undefined ao serializar).
+          peca: (typeof b.peca === 'function' ? b.peca() : b.peca) ?? b.nomePeca ?? null,
+          partes: b.partes ?? [],
           selecaoIgnorada: b.selecaoIgnorada ?? [], diagnosticos: b.diagnosticos ?? null,
           estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null,
         };
@@ -368,7 +396,7 @@ export async function olharBancada({
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
       } else {
-        const arquivo = join(saida, `bancada-${dado.peca}-${vista}${sufixo}.png`);
+        const arquivo = join(saida, `bancada-${apelidoDeArquivo(dado.peca)}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
         await page.screenshot({ path: arquivo });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);

@@ -1,0 +1,6 @@
+{
+  "name": "@mecanifica/exportador-cad",
+  "private": true,
+  "type": "module",
+  "description": "Conversão isolada de malha neutra para formatos CAD."
+}

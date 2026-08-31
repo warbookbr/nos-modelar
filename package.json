@@ -27,7 +27,7 @@
     "procedencia:check": "node tools/mecanifica/procedencia-check.mjs",
     "bancada:vazia:check": "node tools/mecanifica/guarda-bancada-vazia.mjs",
     "test": "vitest run",
-    "mcp:check": "vitest run tools/mcp/mcp.test.mjs tools/mcp/procedural.test.mjs",
+    "mcp:check": "vitest run tools/mcp/mcp.test.mjs tools/mcp/procedural.test.mjs tools/mcp/perfis/autoria-execucao.test.mjs",
     "mcp:ensaio": "vitest run tools/mcp/ensaio-ponta-a-ponta.test.mjs",
     "test:watch": "vitest",
     "coord": "node tools/coordenacao/coord.mjs",
@@ -60,6 +60,9 @@
     "planos:check": "node tools/mapa/planos.mjs --check",
     "exportar": "node tools/mecanifica/exportar.mjs",
     "exportar:check": "node tools/mecanifica/exportar.mjs --check",
+    "exportar:step": "node tools/mecanifica/exportar-step.mjs",
+    "exportar:obj": "node tools/mecanifica/exportar-obj.mjs",
+    "ativar:bancada": "node tools/mecanifica/ativar-bancada.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs"
   },
@@ -67,6 +70,7 @@
     "@modelcontextprotocol/server": "2.0.0",
     "ajv": "^8.20.0",
     "earcut": "3.0.2",
+    "occt-wasm": "4.3.2",
     "three": "^0.185.1",
     "zod": "4.2.0"
   },

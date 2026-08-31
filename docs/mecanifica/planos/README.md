@@ -5,6 +5,12 @@
 **Plano ativo:**
 [`2026-08-25-modelador-inverso-priors-familia.md`](2026-08-25-modelador-inverso-priors-familia.md).
 
+**Concluído e aprovado:**
+[`2026-08-28-exportacao-cad-step.md`](2026-08-28-exportacao-cad-step.md) —
+entregou os módulos puros `modulos/exportador-cad/` e `modulos/exportador-obj/`,
+as CLIs `npm run exportar:step` e `npm run exportar:obj` com escrita atômica, e a
+ativação da bancada por sessão (`npm run ativar:bancada`).
+
 O plano anterior de seleção foi **cancelado** antes de implementação. A
 premissa “a IA compara bem” não tinha passado pelo teste repetido e embaralhado
 que o próprio plano reservava para S1; o gerador manual continuava definindo o

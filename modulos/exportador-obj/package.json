@@ -1,0 +1,7 @@
+﻿{
+    "private":  true,
+    "description":  "Exportador Wavefront OBJ com suporte a multipartes semânticas para Unreal Engine e Blender.",
+    "name":  "@mecanifica/exportador-obj",
+    "version":  "1.0.0",
+    "type":  "module"
+}

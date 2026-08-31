@@ -109,6 +109,10 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   const visual = adaptarMontagemThree(reconstituir(dados));
   scene.add(visual.raiz);
   const caixa = new THREE.Box3().setFromObject(visual.raiz);
+  if (caixa.isEmpty()) {
+    caixa.min.set(-0.05, -0.05, -0.05);
+    caixa.max.set(0.05, 0.05, 0.05);
+  }
   const centro = caixa.getCenter(new THREE.Vector3());
   const vetor = new THREE.Vector3(...direcao(vista)).normalize();
   renderer.setSize(innerWidth, innerHeight);

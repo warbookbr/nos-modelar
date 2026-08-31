@@ -15,26 +15,29 @@
     <div id="bancadaApp">
       <canvas id="cenaBancada" aria-label="Bancada tridimensional de inspeção"></canvas>
       <section id="estadoCatalogoVazio" class="estado-catalogo-vazio" hidden>
-        <span class="rotulo">CATÁLOGO</span>
-        <h1>Nenhuma peça homologada</h1>
-        <p>A bancada está operacional, mas ainda não há conteúdo publicado para inspeção.</p>
+        <span class="rotulo">SESSÃO ATIVA</span>
+        <h1>Bancada de Co-Modelagem</h1>
+        <p>Aguardando envio do modelo pela IA ou carregamento de arquivo de sessão.</p>
+        <div style="margin-top: 14px;">
+          <button id="btnCarregarExemplo" class="botao primaria" type="button">Carregar Modelo de Demonstração</button>
+        </div>
       </section>
 
       <header class="topo">
-        <a class="marca" href="./" aria-label="Voltar para a Mecanifica">
-          <span class="marca-sinal" aria-hidden="true">M</span>
-          <span>
-            <strong>Mecanifica</strong>
-            <small>bancada de inspeção</small>
-          </span>
-        </a>
+
         <div class="objeto-atual">
-          <span>FIXTURE ATUAL</span>
-          <strong id="fixtureAtual">Carregando…</strong>
+          <span>FIXTURE / ALVO ATUAL</span>
+          <strong id="fixtureAtual">Aguardando modelo…</strong>
         </div>
-        <div id="estadoSemantica" class="estado-semantica" role="status">
-          <i aria-hidden="true"></i>
-          <span>Analisando semântica…</span>
+        <div class="indicadores-topo">
+          <div id="statusSessao" class="status-sessao" title="Status da sincronização em tempo real">
+            <span class="ponto-status desconectado"></span>
+            <span id="textoStatusSessao">Sessão Local</span>
+          </div>
+          <div id="estadoSemantica" class="estado-semantica" role="status">
+            <i aria-hidden="true"></i>
+            <span>Analisando semântica…</span>
+          </div>
         </div>
       </header>
 
@@ -59,56 +62,96 @@
           <span id="contagemPartes" class="contagem">0</span>
         </div>
         <p class="dica">Marque uma ou mais peças. Shift, Ctrl ou ⌘ também adicionam pela cena.</p>
+        <div class="partes-controles">
+          <label class="campo-busca" for="filtroPartes">
+            <span aria-hidden="true">⌕</span>
+            <input id="filtroPartes" type="search" placeholder="Filtrar componentes" autocomplete="off" />
+            <kbd>/</kbd>
+          </label>
+          <span id="resumoFiltro" class="resumo-filtro" aria-live="polite">0 componentes</span>
+        </div>
         <div id="listaPartes" class="lista-partes"></div>
         <button id="btnLimpar" class="botao texto" type="button">Limpar seleção <kbd>Esc</kbd></button>
       </aside>
 
       <aside class="painel painel-inspecao" aria-labelledby="tituloInspecao">
-        <span class="rotulo">INSPEÇÃO</span>
-        <h2 id="tituloInspecao">Ver no contexto</h2>
-        <p id="selecaoResumo" class="resumo">Selecione componentes para inspecionar.</p>
+        <nav class="abas-painel" role="tablist">
+          <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true">Inspeção</button>
+          <button type="button" class="aba-btn" data-aba="parametros" role="tab" aria-selected="false">Parâmetros</button>
+          <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false">IA & Ref</button>
+          <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false">Anotações</button>
+        </nav>
 
-        <div class="modos" aria-label="Modo de visualização">
-          <button id="btnTodas" class="botao ativa" type="button">
-            <span>Montagem</span>
-            <small>Todas opacas</small>
-          </button>
-          <button id="btnContexto" class="botao" type="button" disabled>
-            <span>Contexto</span>
-            <small>Restante fantasma</small>
-          </button>
-          <button id="btnIsolar" class="botao" type="button" disabled>
-            <span>Isolar</span>
-            <small>Só a seleção</small>
-          </button>
+        <!-- ABA 1: INSPEÇÃO -->
+        <div id="abaConteudoInspecao" class="aba-conteudo ativa">
+          <span class="rotulo">INSPEÇÃO</span>
+          <h2 id="tituloInspecao">Ver no contexto</h2>
+          <p id="selecaoResumo" class="resumo">Selecione componentes para inspecionar.</p>
+
+          <div class="modos" aria-label="Modo de visualização">
+            <button id="btnTodas" class="botao ativa" type="button">
+              <span>Montagem</span>
+              <small>Todas opacas</small>
+            </button>
+            <button id="btnContexto" class="botao" type="button" disabled>
+              <span>Contexto</span>
+              <small>Restante fantasma</small>
+            </button>
+            <button id="btnIsolar" class="botao" type="button" disabled>
+              <span>Isolar</span>
+              <small>Só a seleção</small>
+            </button>
+          </div>
+
+          <label class="controle-explosao" for="explosao">
+            <span>
+              <b>Explosão da montagem</b>
+              <output id="valorExplosao" for="explosao">0%</output>
+            </span>
+            <input id="explosao" type="range" min="0" max="100" value="0" step="1" />
+          </label>
+
+          <div class="acoes-inspecao">
+            <button id="btnSelecionarConjunto" class="botao" type="button" disabled>Selecionar conjunto</button>
+            <button id="btnFocarSelecao" class="botao primaria" type="button" disabled>Focar seleção</button>
+            <button id="btnCopiarEstado" class="botao" type="button">Copiar vista</button>
+          </div>
+
+          <div id="diagnostico" class="diagnostico">
+            <span class="rotulo">DIAGNÓSTICO</span>
+            <p>Preparando relatório da peça…</p>
+          </div>
+
+          <details id="portasPublicadas" class="portas" hidden>
+            <summary><span class="rotulo">PORTAS</span> <span id="resumoPortas">0 publicadas</span></summary>
+            <ul id="listaPortas" class="lista-portas"></ul>
+          </details>
         </div>
 
-        <label class="controle-explosao" for="explosao">
-          <span>
-            <b>Explosão da montagem</b>
-            <output id="valorExplosao" for="explosao">0%</output>
-          </span>
-          <input id="explosao" type="range" min="0" max="100" value="0" step="1" />
-        </label>
-
-        <div class="acoes-inspecao">
-          <button id="btnSelecionarConjunto" class="botao" type="button" disabled>Selecionar conjunto</button>
-          <button id="btnFocarSelecao" class="botao primaria" type="button" disabled>Focar seleção</button>
-          <button id="btnCopiarEstado" class="botao" type="button">Copiar vista</button>
+        <!-- ABA 2: PARÂMETROS -->
+        <div id="abaConteudoParametros" class="aba-conteudo" hidden>
+          <span class="rotulo">AJUSTE DIMENSIONAL</span>
+          <h2>Parâmetros da Peça</h2>
+          <p class="resumo">Ajuste dimensões e variáveis procedurais em tempo real.</p>
+          <div id="containerParametros"></div>
         </div>
 
-        <div id="diagnostico" class="diagnostico">
-          <span class="rotulo">DIAGNÓSTICO</span>
-          <p>Preparando relatório da peça…</p>
+        <!-- ABA 3: REFERÊNCIAS & INTENÇÃO DA IA -->
+        <div id="abaConteudoReferencias" class="aba-conteudo" hidden>
+          <div id="containerReferencias"></div>
         </div>
 
-        <!-- A-20: a porta publicada precisa existir fora do núcleo. Fica FECHADA
-             e some quando a peça não publica nenhuma: uma linha quando há o que
-             dizer, zero linha quando não há. -->
-        <details id="portasPublicadas" class="portas" hidden>
-          <summary><span class="rotulo">PORTAS</span> <span id="resumoPortas">0 publicadas</span></summary>
-          <ul id="listaPortas" class="lista-portas"></ul>
-        </details>
+        <!-- ABA 4: ANOTAÇÕES 3D & FEEDBACK -->
+        <div id="abaConteudoAnotacoes" class="aba-conteudo" hidden>
+          <span class="rotulo">FEEDBACK CO-CRIAÇÃO</span>
+          <h2>Anotações & Revisão</h2>
+          <p class="resumo">Registre observações gerais ou aponte pontos específicos na malha 3D.</p>
+          <div class="botoes-anotacao">
+            <button id="btnAdicionarAnotacaoGeral" class="botao primaria" type="button">+ Anotação Geral</button>
+            <button id="btnAdicionarAnotacao" class="botao" type="button">+ Ponto na Malha 3D</button>
+          </div>
+          <div id="listaAnotacoes" class="lista-anotacoes"></div>
+        </div>
       </aside>
 
       <footer class="rodape">

@@ -43,16 +43,18 @@ try {
     vazioVisivel: !document.getElementById('estadoCatalogoVazio').hidden,
     fixture: document.getElementById('fixtureAtual').textContent,
   }));
-  assert.deepEqual(estado.bancada, {
-    ready: true,
-    catalogoVazio: true,
-    peca: null,
-    pecasDisponiveis: [],
-    estado: estado.bancada.estado,
-    url: estado.bancada.url,
-  });
+  /* A bancada com sessão ativa expõe muito mais estado de depuração do que
+     antes, então comparar o objeto inteiro compararia forma acidental. O que a
+     guarda precisa provar continua o mesmo: subiu pronta, não carregou nada e
+     não escolheu peça nenhuma por conta própria. */
+  assert.equal(estado.bancada.ready, true);
+  assert.equal(estado.bancada.carregado, false);
+  assert.equal(estado.bancada.peca ?? null, null);
+  assert.deepEqual(estado.bancada.pecasDisponiveis, []);
+  assert.deepEqual(estado.bancada.partes, []);
+  assert.equal(estado.bancada.estatisticas, null);
   assert.equal(estado.vazioVisivel, true);
-  assert.equal(estado.fixture, 'Nenhuma peça homologada');
+  assert.equal(estado.fixture, 'Aguardando modelo…');
   assert.deepEqual(erros, []);
   console.log('✓ bancada:vazia — página publicada entrou em estado vazio sem erro ou fallback');
 } finally {
