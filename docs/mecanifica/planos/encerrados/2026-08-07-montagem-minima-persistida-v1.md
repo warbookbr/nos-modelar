@@ -7,7 +7,7 @@
 ## Problema observado
 O diagnóstico do motor concluiu que uma peça já pode ser resolvida de forma determinística em coordenadas locais, que portas e identidade semântica podem ser consumidas externamente e que múltiplas ocorrências podem receber transformação própria sem exigir mudança estrutural do núcleo.
 Ainda não existe, porém, um dado persistido que declare uma montagem como composição reproduzível de instâncias. Sem esse dado, posição, identidade de ocorrência e composição continuam sem fonte de verdade canônica.
-A decisão que autoriza este plano está em [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../../historico/RELATORIO-DIAGNOSTICO-MOTOR.md). A direção de composição está em [`../MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md).
+A decisão que autoriza este plano está em [`../RELATORIO-DIAGNOSTICO-MOTOR.md`](../../historico/RELATORIO-DIAGNOSTICO-MOTOR.md). A direção de composição está em [`../MONTAGENS-SEMANTICAS.md`](../../usar/MONTAGENS-SEMANTICAS.md).
 
 ## Resultado
 Criar e provar o menor formato persistido e versionado capaz de representar uma montagem reproduzível com identidades de instância estáveis, referências a peças ou montagens, poses locais e resolução recursiva, sem copiar a autoria geométrica das peças para dentro da montagem.

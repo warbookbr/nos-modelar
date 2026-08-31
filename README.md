@@ -43,7 +43,7 @@ acesso; nenhuma delas substitui o núcleo ou define o modelo de autoria.
 
 Leia [`docs/mecanifica/AUTORIA-IA.md`](docs/mecanifica/AUTORIA-IA.md) para a
 definição completa e
-[`docs/mecanifica/MONTAGENS-SEMANTICAS.md`](docs/mecanifica/MONTAGENS-SEMANTICAS.md)
+[`docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`](docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md)
 para a direção de composição.
 
 ## Ferramentas centrais

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-735 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -370,7 +370,6 @@
 - `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
-- `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
@@ -407,11 +406,8 @@
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
 - `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
-- `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `PLANO.md` — Plano mestre da Mecanifica — aposentado
-- `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
-- `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
@@ -458,6 +454,12 @@
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
+
+## docs/mecanifica/pecas/
+
+- `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
+- `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
+- `README.md` — Referência por peça
 
 ## docs/mecanifica/planos/
 
@@ -559,11 +561,13 @@
 
 ## docs/mecanifica/usar/
 
+- `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
+- `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `README.md` — Usar o Mecanifica
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 

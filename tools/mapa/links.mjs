@@ -48,6 +48,12 @@ const ALLOWLIST = new Map([
   ['docs/historico/DECISIONS.md:docs/HABITANTES.md', 'referência histórica preservada'],
   ['docs/historico/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
   ['docs/historico/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
+  /* Registro de crítica gravado do ciclo 6. A prancha do freio virou referência
+     por peça e mudou para `docs/mecanifica/pecas/` em 2026-08-31; o registro
+     preserva o caminho como era no dia da crítica. Corrigir o caminho aqui
+     seria reescrever evidência encerrada, que é a linha que a reorganização se
+     proibiu de cruzar. */
+  ['docs/mecanifica/projetos/ciclo6/criticas.json:docs/mecanifica/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/mecanifica/pecas/'],
 ]);
 
 let saidaGit;

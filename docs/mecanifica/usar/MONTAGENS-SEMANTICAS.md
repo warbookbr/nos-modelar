@@ -5,7 +5,7 @@
 > montagem persistida deve respeitar. Nenhuma seção autoriza trabalho automático;
 > implementação exige plano executivo próprio.
 
-A definição ampla de autoria está em [`AUTORIA-IA.md`](AUTORIA-IA.md). Este
+A definição ampla de autoria está em [`AUTORIA-IA.md`](../AUTORIA-IA.md). Este
 arquivo detalha somente a camada de composição necessária para a IA construir e
 manter sistemas complexos.
 
@@ -20,7 +20,7 @@ componentes. Não deve copiar toda a geometria e todas as operações para dentr
 de uma receita gigante.
 
 O recorte executável da montagem persistida v1 está documentado em
-[`MONTAGEM-PERSISTIDA-V1.md`](MONTAGEM-PERSISTIDA-V1.md).
+[`MONTAGEM-PERSISTIDA-V1.md`](../MONTAGEM-PERSISTIDA-V1.md).
 
 A regra é:
 
@@ -217,21 +217,8 @@ Ainda não há:
 Não simule essas capacidades com índices internos, posições de câmera, cópia de
 matriz do Three.js ou documentação manual tratada como verdade executável.
 
-## Questões abertas
-
-A direção não decide antecipadamente:
-
-- como ampliar a montagem persistida v1 com relações, variantes e instâncias compartilhadas;
-- como versionar instâncias e relações;
-- quando uma alteração modifica a origem ou cria uma variante;
-- como representar movimento e cinemática;
-- até onde revalidar dependentes;
-- quando uma região interna deve virar peça separada;
-- se a representação por malha final e pose mundial aberta no plano de
-  [auditoria de interseções](./planos/encerrados/2026-08-18-auditoria-intersecoes-montagem.md)
-  será aprovada pelas provas adversariais e de escala;
-- se haverá solver e qual será seu alcance;
-- como agentes concorrentes reservam alvos.
-
-Essas perguntas devem ser resolvidas por planos pequenos e provas dentro das
-invariantes deste documento e de [`AUTORIA-IA.md`](AUTORIA-IA.md).
+As questões que este contrato deliberadamente **não** decide — versionamento
+de instâncias, cinemática, alcance de revalidação, solver, reserva entre
+agentes concorrentes — estão no backlog, em
+[`../planos/BACKLOG.md`](../planos/BACKLOG.md). Elas são trabalho de
+desenvolvimento e não mudam o que este documento manda fazer.

@@ -12,7 +12,7 @@ existem. Descoberta implícita fora do universo e correção/publicação autom�
 de conjuntos afetados não existem.
 
 A direção de sistemas compostos está em [`AUTORIA-IA.md`](AUTORIA-IA.md) e
-[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md). Este documento não deve ser
+[`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md). Este documento não deve ser
 esticado silenciosamente para fingir que essas capacidades já existem.
 
 ## Pacote de peça
