@@ -65,6 +65,7 @@
     "exportar:step": "node tools/mecanifica/exportar-step.mjs",
     "exportar:obj": "node tools/mecanifica/exportar-obj.mjs",
     "ativar:bancada": "node tools/mecanifica/ativar-bancada.mjs",
+    "malha:conferir": "node tools/mecanifica/conferir-malha.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs"
   },

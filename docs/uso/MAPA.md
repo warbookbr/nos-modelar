@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-740 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+747 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -626,6 +626,30 @@
 
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 
+## modulos/otimizador-malha/src/
+
+- `otimizar.js` — otimizar.js — reduz malha na CAMADA DE SAÍDA, sem mover um único ponto.
+
+## modulos/otimizador-malha/tests/
+
+- `otimizar.test.js` — otimizar.test.js — o invariante é a coisa a provar, não o ganho.
+
+## modulos/preparo-micropoligono/src/
+
+- `preparar.js` — preparar.js — deixa a malha pronta para pipeline de micropolígono.
+
+## modulos/preparo-micropoligono/tests/
+
+- `preparar.test.js` — preparar.test.js — cada requisito é visto reprovando o seu defeito.
+
+## modulos/topologia/src/
+
+- `analisar.js` — analisar.js — organizador de topologia: diz o que há de errado no traçado de uma malha, e nunca a reescreve.
+
+## modulos/topologia/tests/
+
+- `analisar.test.js` — analisar.test.js — cada regra é vista REPROVANDO um defeito construído de propósito, e APROVANDO a malha sã correspondente.
+
 ## prototipos/procedural/v3/
 
 - `README.md` — v3 — núcleo procedural, peças e visor
@@ -883,6 +907,7 @@
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
+- `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
 - `derivar-campanha-revalidacao.test.ts` — Provas R02: compartilhamento, múltiplas raízes, isolamento e persistência.

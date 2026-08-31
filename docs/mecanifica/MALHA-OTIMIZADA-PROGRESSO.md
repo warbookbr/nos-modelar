@@ -11,9 +11,9 @@ que aparecem — que é o produto real das fatias de modelagem.
 | --- | --- | --- |
 | H0 | dividir o `AUTORIA-IA` | em curso |
 | H1 | a cadeira | concluída |
-| H2 | redução de vértice | pendente |
-| H3 | organizador de topologia | pendente |
-| H4 | preparação para micropolígono | pendente |
+| H2 | redução de vértice | concluída — **funciona e rende ~zero** |
+| H3 | organizador de topologia | concluída |
+| H4 | preparação para micropolígono | concluída |
 | H5 | armas brancas | pendente |
 | H6 | colher os atritos | pendente |
 
@@ -34,6 +34,65 @@ Duas economias declaradas e uma entrega que faltava:
   de **medir** qual índice de aresta é o da frente, provando as quatro.
 
 Seis atritos anotados abaixo, todos encontrados fazendo, nenhum deles previsto.
+
+## H2, H3 e H4 — os três módulos
+
+Entraram três módulos puros em `modulos/` e uma porta única,
+`npm run malha:conferir <receita>`, que responde as três perguntas de uma vez.
+A porta existe porque uma IA no meio de uma modelagem não deve precisar de três
+importações para saber se acabou de produzir malha furada.
+
+### H3 — organizador de topologia: funciona
+
+`modulos/topologia/` devolve veredito e lista, **nunca geometria**. Acusa canto
+repetido, área nula, casca aberta, aresta não-manifold, orientação incoerente,
+n-gon, polo de valência alta, ilha solta e vértice sem uso.
+
+Doze casos de teste, cada regra vista **reprovando** um defeito construído de
+propósito e **aprovando** a malha sã correspondente. Na cadeira real: zero
+reprovas, 13 corpos (correto), e quatro faces de sete cantos criadas pelo
+`arredondarAresta` — achado que ninguém tinha visto.
+
+### H2 — redução de vértice: prova o invariante e rende quase nada
+
+O limiar foi declarado antes de medir, e é o mais duro possível: caixa
+envolvente e área idênticas até 1e-9. O módulo confere o próprio invariante e
+**lança** se a forma mudar, em vez de entregar em silêncio.
+
+O resultado é honesto e vale mais que um ganho inventado:
+
+| objeto | faces | triângulos |
+| --- | --- | --- |
+| cadeira | 304 → 304 | 532 → 532 |
+| prensa progressiva | — | 392 → 392 |
+| cutelo de sucata | 194 → **182** | 340 → 340 |
+
+**Fundir coplanares reduz FACE, não TRIÂNGULO** — e triângulo é o que custa no
+motor. Isso decide a pergunta que a fatia existia para responder: sim, dá para
+reduzir sem perder qualidade, e o ganho de renderização é ~zero, porque a
+geometria procedural já nasce mínima. A redução que cortaria triângulo é
+decimação, que move a silhueta e portanto é decisão de autoria, não passo de
+saída. **Quem quer menos triângulo muda a receita** — foi o que a cadeira fez
+escolhendo `chamferBox` em vez de cilindro.
+
+### H4 — preparo para micropolígono: funciona, com o não-coberto escrito
+
+`modulos/preparo-micropoligono/` verifica fechamento, orientação, área não nula
+e planaridade **antes** de triangular, porque triangular esconde: um leque sobre
+face de borda produz triângulos que parecem sãos e o buraco continua lá.
+Converte escala declarada (metro → centímetro, que é o que o motor assume) e
+**não entrega geometria junto de um veredito de reprova**.
+
+O que ele não cobre está escrito no próprio retorno: cluster e hierarquia de
+LOD, UV e material, densidade de triângulo, e interseção entre partes.
+
+A cadeira passa limpa: 532 triângulos, fechada, coerente, 88 cm.
+
+### Um defeito que o teste achou em mim
+
+O `ler` do preparo validava `p.slice(0,3).every(Number.isFinite)` sem conferir a
+aridade. `[0,0]` passa, porque os dois elementos que existem são finitos. Um
+ponto de duas coordenadas entraria como válido.
 
 ## Atritos encontrados
 
