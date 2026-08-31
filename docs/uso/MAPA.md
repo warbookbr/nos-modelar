@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-734 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+733 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -396,7 +396,6 @@
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
-- `GOTCHAS-MODELAGEM-PROCEDURAL.md` — Gotchas de modelagem procedural
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1

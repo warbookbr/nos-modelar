@@ -32,6 +32,12 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 | Crítico recebendo só o render | Sem o alvo ao lado, a única pergunta possível é "isso parece um carro?", e a resposta não aponta contra o quê. | Crítico recebe alvo, modelo e sobreposição, nos três caminhos. |
 | Alvo inventado pela IA usado como referência | Um número que a IA escolheu vira "medida" na rodada seguinte e ninguém confere. | Alvo sem procedência medida é `não vinculante` no próprio documento. |
 | Método diagnóstico aplicado a problema generativo | Sempre acha um defeito, então dá sensação de progresso enquanto a forma não anda. | Sintoma de parada: os achados encolhem e a nota não sobe. Ver `METODO-DIAGNOSTICO-E-SEU-LIMITE.md`. |
+| Relação semântica confundida com apoio físico | `pai:` organiza a árvore sem prender nada: nome certo, peça flutuando. Vale para painel no chassi, braço no ombro, cabeçote na coluna. | Apoio, encaixe, folga e eixo são declarados por geometria e validados depois da resolução, nunca pela hierarquia. |
+| Blockout tratado como modelo final | Caixas e cilindros provam composição e identidade, e por isso parecem prontos. Produz carroceria-caixa, robô-boneco, máquina sem volumes funcionais. | Blockout só avança identificado como blockout, com etapa de refinamento explícita. |
+| Coordenadas soltas sem cadeia de apoio | Cada parte recebe posição independente; nada denuncia que o conjunto não se sustenta. | Declarar cadeia verificável do plano de apoio até a peça, e medir contra ela. |
+| Resolução escolhida sem olhar a silhueta | Receita válida e curva facetada: 16 lados passam no teste e aparecem na vista. | Lados escolhidos por raio, curvatura e peso na silhueta; toda curva protagonista inspecionada em ortográfica e em aproximação. |
+| Detalhe antes do envelope funcional | Detalhe dá sensação de avanço enquanto a proporção ainda está errada, e depois trava a correção. | Ordem obrigatória: envelope e escala, volumes estruturais, interfaces, só então detalhe. |
+| Cor ou material compensando forma | Material bonito convence numa imagem que a silhueta reprovaria. | Validar silhueta e montagem em material neutro antes de qualquer cor. |
 
 ## Pipeline mínimo que vem antes de modelar
 
@@ -193,3 +199,32 @@ entrada deve conter: artefato e vista, sintoma observável, causa conhecida ou
 hipótese marcada como tal, estado, evidência e o limite da correção. Não é
 permitido substituir uma falha por uma frase genérica como “melhorado”, nem
 mudar `aberto` para `corrigido` sem teste e inspeção visual compatíveis.
+
+## Checklist antes de aceitar uma receita
+
+Veio do registro de modelagem procedural, escrito a partir de máquinas e
+equipamentos. Vale para qualquer objeto: o que reprovou uma prensa reprova uma
+carroceria pelo mesmo motivo.
+
+- A origem, os eixos, a escala e o plano de apoio estão explícitos?
+- Toda parte estrutural tem apoio, interface ou relação de montagem verificável?
+- A hierarquia semântica está separada das transformações físicas?
+- O envelope funcional existe antes dos detalhes decorativos?
+- A resolução das curvas foi escolhida pela silhueta e pela distância de inspeção?
+- A receita usa a operação adequada para a forma, em vez de acumular cubos?
+- As vistas críticas mostram continuidade, folga, alinhamento e reconhecimento?
+- Os testes verdes cobrem exatamente o que afirmam cobrir?
+- O material neutro continua convincente sem depender das cores?
+- Cada reprovação aponta uma correção localizada e uma nova evidência?
+
+## O que entregar junto com a forma
+
+Uma autoria concluída entrega, além da receita executável:
+
+1. envelope, escala, eixos e plano de apoio;
+2. mapa de partes e relações físicas, separado da hierarquia semântica;
+3. intenção ou prior de família para cada volume importante;
+4. orçamento de resolução para curvas visíveis;
+5. vistas críticas e perguntas de inspeção;
+6. resultados estruturais e geométricos, incluindo o que **não** foi avaliado;
+7. lista de pendências visuais, sem promover um blockout como final.

@@ -6,12 +6,21 @@ jogável, a Oficina humana e o som foram removidos. `bancada.html` é a única
 aplicação publicada aqui. O produto do cliente vive em
 [`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
 
-## Entrada de contexto
+## Entrada de contexto — escolha pela tarefa, não leia tudo
 
-Leia `docs/mecanifica/INDEX.md` e `docs/mecanifica/planos/README.md` antes de
-planejar. Sem plano ativo, o backlog não autoriza implementação. Se tocar
-núcleo, plano, atrito ou identidade em trabalho paralelo, leia a coordenação
-local, consulte a inbox e reserve arquivos.
+**Vai usar o Mecanifica** (criar, inspecionar, corrigir ou auditar uma peça,
+montagem ou máquina): entre por `docs/mecanifica/usar/README.md` e use a skill
+da tarefa. Não é preciso ler o INDEX nem os planos para isso.
+
+**Vai mudar o Mecanifica** (núcleo, gates, arquitetura, ferramenta, plano):
+leia `docs/mecanifica/INDEX.md` e `docs/mecanifica/planos/README.md`. Sem plano
+ativo, o backlog não autoriza implementação. Se tocar núcleo, plano, atrito ou
+identidade em trabalho paralelo, leia a coordenação local, consulte a inbox e
+reserve arquivos.
+
+**Procurando o que já foi feito:** `docs/mecanifica/historico/README.md` e
+`docs/mecanifica/planos/encerrados/`. Serve de evidência e não governa trabalho
+novo — nem por citação, nem por analogia.
 
 ## Regras
 

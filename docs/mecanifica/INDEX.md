@@ -459,11 +459,11 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 - **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
   O antigo [modelador por seleção](./historico/DOSSIE-MODELADOR-POR-SELECAO.md) é somente
   histórico.
-- **Antes de abrir experimento novo:** [`GOTCHAS-MODELAGEM-PROCEDURAL.md`](GOTCHAS-MODELAGEM-PROCEDURAL.md)
-  (`docs/mecanifica/GOTCHAS-MODELAGEM-PROCEDURAL.md`) e
+- **Antes de abrir experimento novo:**
   [`GOTCHAS-AUTORIA-VISUAL.md`](./usar/GOTCHAS-AUTORIA-VISUAL.md)
-  (`docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`), o registro
-  vivo do que já falhou, e o [canário de casco](./historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
+  (`docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`), registro único e vivo do
+  que já falhou — o de modelagem procedural foi fundido nele, e o
+  [canário de casco](./historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
   (`docs/mecanifica/historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md`), a evidência
   negativa mais recente. Rodada gasta redescobrindo algo já medido é falha V-31.
 - Peças versus montagens, carro, motor e dependências:

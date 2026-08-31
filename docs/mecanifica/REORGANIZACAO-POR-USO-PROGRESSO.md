@@ -14,7 +14,7 @@ execução.
 | F1 | histórico para fora do caminho | concluída |
 | F2 | criar `usar/` e a porta curta | concluída |
 | F3 | gates G1, G3, G4, G5 e G7 | concluída |
-| F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | pendente |
+| F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | concluída |
 | F5 | decidir sobre a pasta `desenvolver/` | pendente |
 | F6 | encurtar o INDEX de 665 para 200 linhas | pendente, criada na F3 |
 
@@ -194,6 +194,22 @@ Encurtar de verdade é mover narrativa de plano encerrado para fora do INDEX, o
 que é trabalho de conteúdo, não de número. Virou a fatia **F6**, e ao fechá-la
 o teto cai para 200.
 
+## F4 — roteamento e fusão
+
+O `CLAUDE.md` deixou de mandar todo mundo ler as mesmas 962 linhas. Agora
+roteia por tarefa: quem vai **usar** entra por `usar/README.md`, quem vai
+**mudar** lê o INDEX e os planos, quem procura o que já foi feito vai ao
+histórico. É aqui que o ganho chega no dia a dia — o resto da reorganização
+existe para tornar esse roteamento possível.
+
+Os dois registros de erro viraram um. Os 6 achados que só existiam no registro
+de modelagem procedural entraram como linhas novas na tabela, com a redação
+generalizada para qualquer objeto em vez de falar só de prensa: relação
+semântica confundida com apoio físico, blockout tratado como final, coordenadas
+sem cadeia de apoio, resolução escolhida sem olhar a silhueta, detalhe antes do
+envelope, e cor compensando forma. O checklist e a lista de entregáveis foram
+preservados inteiros. Nenhum registro de falha se perdeu.
+
 ## Decisões tomadas durante a execução
 
 Registradas aqui na hora, para que a razão não se perca.
@@ -238,7 +254,7 @@ ficarem como estão; mover depois é `git mv` mais correção de links.
 | documento | minha recomendação | por quê |
 | --- | --- | --- |
 | `AUTORIA-IA.md` (667 linhas) | **dividir**, não mover | Descreve como a IA autora, o que é uso, mas também justifica decisões de projeto, o que é desenvolvimento. Do jeito que está, ir inteiro para `usar/` levaria material que quem usa não precisa. |
-| `GOTCHAS-MODELAGEM-PROCEDURAL.md` | fundir na F4 e ir para `usar/` | Repete 7 dos 12 achados do outro registro. Manter os dois é garantir que alguém leia metade. |
+| ~~`GOTCHAS-MODELAGEM-PROCEDURAL.md`~~ | **feito na F4** | Fundido em `usar/GOTCHAS-AUTORIA-VISUAL.md`. |
 | `PRANCHA-FREIO-DISCO.md`, `PRANCHA-RODA-DIANTEIRA.md` | mover para `usar/` | Parecem exemplo aplicado do contrato de prancha, e exemplo serve a quem usa. Não movi porque nenhuma skill os cita, então o G3 os acusaria de órfãos — a decisão real é se a skill deve citá-los. |
 | `MONTAGENS-SEMANTICAS.md` | mover para `usar/` | É contrato que `auditar-montagem` aplica. Mesma pendência de citação que os anteriores. |
 | `CONTRATO-ACEITE-VISUAL.md`, `CONTRATO-FORMA-GLOBAL-N2.md` | deixar na raiz | São contratos de experimento e de gate, não de tarefa de peça. Servem a quem desenvolve. |
