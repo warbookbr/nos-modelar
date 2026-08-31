@@ -3,7 +3,7 @@
    em milímetros e devolve SVG determinístico MAIS um relatório medido da própria
    saída. Não conhece carro: conhece vista, camada, âncora, cota e métrica.
    O relatório existe porque desenhar sem medir é a causa raiz documentada em
-   docs/mecanifica/planos/2026-08-19-motor-de-prancha-medida.md. */
+   docs/mecanifica/planos/encerrados/2026-08-19-motor-de-prancha-medida.md. */
 
 import * as G from './prancha-geometria.mjs';
 import { validarAutoriaPrancha } from './prancha-autoria.mjs';

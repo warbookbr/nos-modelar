@@ -627,7 +627,7 @@ Esta definição não decide antecipadamente:
 - como declarar movimento e cinemática;
 - se haverá solver automático e qual será seu alcance;
 - se a representação por malha final e pose mundial aberta no plano de
-  [auditoria de interseções](planos/2026-08-18-auditoria-intersecoes-montagem.md)
+  [auditoria de interseções](./planos/encerrados/2026-08-18-auditoria-intersecoes-montagem.md)
   será aprovada pelas provas adversariais e de escala;
 - quando uma alteração cria variante ou modifica a peça de origem;
 - como agentes concorrentes reservam alvos;

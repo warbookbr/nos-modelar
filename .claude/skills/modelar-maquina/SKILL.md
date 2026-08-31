@@ -7,6 +7,12 @@ description: Conceber, planejar e modelar uma máquina ou equipamento 3D procedu
 
 Use esta skill quando a tarefa for conceber, planejar ou modelar um equipamento mecânico completo (ex: prensa, esteira, torno, braço robótico, calandra, serra industrial).
 
+Antes de gerar a primeira forma, leia
+[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md):
+o registro do que já falhou na oficina. Os dois que mais pegam máquina são
+tratar blockout de caixas e cilindros como modelo acabado, e confundir relação
+semântica (`pai`) com apoio físico — nome certo, peça flutuando.
+
 ---
 
 ## Fluxo de Trabalho (Pipeline)

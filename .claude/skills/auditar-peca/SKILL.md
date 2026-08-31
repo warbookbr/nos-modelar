@@ -128,7 +128,7 @@ Medição pega o defeito que alguém já imaginou; olhar pega o resto.
 
 Em marco — antes de propor promoção, publicação ou de levar o resultado ao
 usuário — despache um subagente como **crítico visual**. O protocolo está em
-[`../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+[`../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
 Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
 relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
@@ -162,14 +162,14 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
    modelo e sobreposição. Crítico que recebe só o render dá opinião.
 
 Sem alvo desenhado, desenhe antes: veja
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md).
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
 ## Antes de caçar defeito: o método tem limite
 
 Se você está tentando decidir **forma, proporção ou caráter**, não é problema
 diagnóstico, e eliminar defeito ali rende conserto certo num objeto que continua
 ruim. O sintoma é os achados encolherem e a nota não subir. Ver
-[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
+[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
 
 Quando o método valer, dois passos são obrigatórios e são os que mais somem:
 **identificar o que falta** (o desenho de referência existia desde a primeira

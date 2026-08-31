@@ -11,7 +11,7 @@
 Rodada P0 do plano
 [`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](planos/2026-08-18-chassi-realista-kernel-geometrico.md).
 Fundamentação em
-[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
+[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](./historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
 
 Este documento fixa **contra o que a geometria será julgada**, antes de existir
 geometria. Ele não autoriza implementação, não escolhe topologia de cage — isso é

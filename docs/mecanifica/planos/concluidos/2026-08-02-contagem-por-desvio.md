@@ -11,7 +11,7 @@
 
 O autor escolhe `lados` como um número sem unidade. Assim, 12 lados num furo e
 16 num flange não informam qual superfície é mais facetada. A evidência e a
-fronteira estão no A-34 de [`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md).
+fronteira estão no A-34 de [`ATRITOS-AUTORIA.md`](../../ATRITOS-AUTORIA.md).
 
 ## Resultado
 

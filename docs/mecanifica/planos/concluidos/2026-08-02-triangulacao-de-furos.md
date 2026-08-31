@@ -13,7 +13,7 @@
 falha, mas três figuras geometricamente válidas ainda abortam com “nenhuma
 orelha livre”. Elas têm muitos furos próximos da borda e expõem um limite da
 ponte gulosa seguida de orelhas, não uma entrada inválida. A fronteira medida
-está no A-33 de [`ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md).
+está no A-33 de [`ATRITOS-AUTORIA.md`](../../ATRITOS-AUTORIA.md).
 
 ## Resultado
 

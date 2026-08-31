@@ -59,7 +59,7 @@ Cada achado deve registrar comando, resultado e uma decisão Agent-First:
 - `ADIAR`.
 
 O relatório final fica em
-[`docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md`](../../../docs/mecanifica/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
+[`docs/mecanifica/historico/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md`](../../../docs/mecanifica/historico/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
 
 ## Reprodução sem publicação
 

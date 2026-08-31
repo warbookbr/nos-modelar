@@ -2,7 +2,7 @@
 
 ## Papel
 
-Este dossiê transforma o [plano mestre](planos/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
+Este dossiê transforma o [plano mestre](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)
 num protocolo operacional para IA. Ele cobre autoria, crítica, usuário,
 validadores e recuperação; não aprova sozinho nenhuma geometria.
 

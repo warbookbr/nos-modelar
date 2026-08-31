@@ -4,7 +4,7 @@
 
 **Encerramento documental:** 2026-08-05
 
-**Plano de origem:** `docs/mecanifica/planos/2026-08-04-mcp-para-agentes.md`
+**Plano de origem:** `docs/mecanifica/planos/encerrados/2026-08-04-mcp-para-agentes.md`
 
 ## Resultado
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-728 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+735 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -368,13 +368,11 @@
 
 - `AGENT-FIRST.md` — Filtro Agent-First
 - `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
-- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
-- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
 - `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
@@ -385,14 +383,12 @@
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
-- `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
-- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
 - `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
 - `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
@@ -400,16 +396,13 @@
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
-- `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
-- `GOTCHAS-MODELAGEM-PROCEDURAL.md` — Gotchas de modelagem procedural
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
-- `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
+- `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
-- `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
@@ -420,7 +413,25 @@
 - `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
 - `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
-- `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
+- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
+- `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
+- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
+- `VISAO.md` — Visão da Mecanifica
+
+## docs/mecanifica/gerado/
+
+- `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
+- `INDEX.md` — Artefatos gerados do catálogo procedural
+
+## docs/mecanifica/historico/
+
+- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
+- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
+- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
+- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
+- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `README.md` — Histórico da Mecanifica
+- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
 - `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md` — Auditoria das práticas de autoria 3D
 - `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
@@ -442,29 +453,51 @@
 - `RELATORIO-N5-BUSCA.md` — Relatório N5 — busca residual controlada
 - `RELATORIO-N6-CANARIO-CASCO-VISUAL.md` — Relatório N6 — canário de casco por silhuetas
 - `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
+- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 - `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
-- `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
-- `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
-- `VISAO.md` — Visão da Mecanifica
-
-## docs/mecanifica/gerado/
-
-- `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
-- `INDEX.md` — Artefatos gerados do catálogo procedural
-
-## docs/mecanifica/historico/
-
-- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
-- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
-- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
-- `README.md` — Histórico da Mecanifica
-- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
-- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
 
 ## docs/mecanifica/planos/
+
+- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
+- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
+- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
+- `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `BACKLOG.md` — Backlog aberto
+- `MODELO.md` — [ID] — resultado curto
+- `README.md` — Planos da Mecanifica
+
+## docs/mecanifica/planos/concluidos/
+
+- `2026-08-02-assentamento-anular.md` — AUT-2026-11 — assentamento anular declarado
+- `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
+- `2026-08-02-canto-composto.md` — AUT-2026-04 — canto composto de aresta arredondada
+- `2026-08-02-concordancia-por-ponto.md` — AUT-2026-02 — discretização por concordância
+- `2026-08-02-contagem-por-desvio.md` — AUT-2026-01 — contagem circular por desvio
+- `2026-08-02-contato-local-cilindrico.md` — AUT-2026-10 — contato local cilíndrico e alerta global
+- `2026-08-02-estados-de-encaixe.md` — AUT-2026-09 — estados explicáveis de encaixe cilíndrico
+- `2026-08-02-identidade-porta-estavel.md` — AUT-2026-14 — identidade estável de porta
+- `2026-08-02-interfaces-de-encaixe.md` — AUT-2026-06 — interfaces mensuráveis de encaixe
+- `2026-08-02-portas-espelho-arranja.md` — AUT-2026-15 — portas sob espelho e arranja
+- `2026-08-02-pose-derivada-roda.md` — AUT-2026-07 — pose derivada de um encaixe cilíndrico
+- `2026-08-02-pose-em-referencial.md` — AUT-2026-08 — pose de encaixe em referencial transformado
+- `2026-08-02-recusa-estrutural-montagem.md` — AUT-2026-13 — recusa estrutural de montagem
+- `2026-08-02-tolerancias-de-montagem.md` — AUT-2026-12 — tolerâncias de montagem explícitas
+- `2026-08-02-triangulacao-de-furos.md` — AUT-2026-03 — triangulação robusta de vários furos
+- `2026-08-03-consulta-subarvore-ia.md` — AUT-2026-18 — consulta de subárvore para IA
+- `2026-08-03-hierarquia-semantica-minima.md` — AUT-2026-16 — hierarquia semântica mínima de partes
+- `2026-08-03-inspecao-reproduzivel-de-par.md` — AUT-2026-19 — inspeção reproduzível de par
+- `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
+- `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
+
+## docs/mecanifica/planos/congelados/
+
+- `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
+- `README.md` — Planos congelados
+
+## docs/mecanifica/planos/encerrados/
 
 - `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
 - `2026-08-05-mcp-autoria-controlada.md` — MCP — autoria controlada de pacotes
@@ -497,49 +530,20 @@
 - `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
 - `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
 - `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
-- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
 - `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
 - `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
 - `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
 - `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
-- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
 - `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
 - `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
 - `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
 - `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
-- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
-- `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
-- `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
-- `BACKLOG.md` — Backlog aberto
-- `MODELO.md` — [ID] — resultado curto
-- `README.md` — Planos da Mecanifica
-
-## docs/mecanifica/planos/concluidos/
-
-- `2026-08-02-assentamento-anular.md` — AUT-2026-11 — assentamento anular declarado
-- `2026-08-02-camera-livre-reproduzivel.md` — AUT-2026-05 — câmera livre reproduzível
-- `2026-08-02-canto-composto.md` — AUT-2026-04 — canto composto de aresta arredondada
-- `2026-08-02-concordancia-por-ponto.md` — AUT-2026-02 — discretização por concordância
-- `2026-08-02-contagem-por-desvio.md` — AUT-2026-01 — contagem circular por desvio
-- `2026-08-02-contato-local-cilindrico.md` — AUT-2026-10 — contato local cilíndrico e alerta global
-- `2026-08-02-estados-de-encaixe.md` — AUT-2026-09 — estados explicáveis de encaixe cilíndrico
-- `2026-08-02-identidade-porta-estavel.md` — AUT-2026-14 — identidade estável de porta
-- `2026-08-02-interfaces-de-encaixe.md` — AUT-2026-06 — interfaces mensuráveis de encaixe
-- `2026-08-02-portas-espelho-arranja.md` — AUT-2026-15 — portas sob espelho e arranja
-- `2026-08-02-pose-derivada-roda.md` — AUT-2026-07 — pose derivada de um encaixe cilíndrico
-- `2026-08-02-pose-em-referencial.md` — AUT-2026-08 — pose de encaixe em referencial transformado
-- `2026-08-02-recusa-estrutural-montagem.md` — AUT-2026-13 — recusa estrutural de montagem
-- `2026-08-02-tolerancias-de-montagem.md` — AUT-2026-12 — tolerâncias de montagem explícitas
-- `2026-08-02-triangulacao-de-furos.md` — AUT-2026-03 — triangulação robusta de vários furos
-- `2026-08-03-consulta-subarvore-ia.md` — AUT-2026-18 — consulta de subárvore para IA
-- `2026-08-03-hierarquia-semantica-minima.md` — AUT-2026-16 — hierarquia semântica mínima de partes
-- `2026-08-03-inspecao-reproduzivel-de-par.md` — AUT-2026-19 — inspeção reproduzível de par
-- `2026-08-03-selecao-subarvore-semantica.md` — AUT-2026-17 — seleção de subárvore semântica
-- `ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md` — Encerramento do plano mestre — 2 de agosto de 2026
+- `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
+- `README.md` — Planos encerrados
 
 ## docs/mecanifica/planos/mcp/
 
@@ -552,6 +556,16 @@
 ## docs/mecanifica/referencias/
 
 - `README.md` — Referências de forma
+
+## docs/mecanifica/usar/
+
+- `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
+- `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
+- `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
+- `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
+- `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
+- `README.md` — Usar o Mecanifica
+- `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 
 ## docs/rumo/
 
@@ -797,6 +811,8 @@
 
 ## tools/mapa/
 
+- `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
+- `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
 - `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentá…
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.

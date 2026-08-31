@@ -241,7 +241,7 @@
     {
       "id": "V-20",
       "problema": "Suíte agregada e `mcp:check` tiveram falhas passivas fora de N2/N3 (`repo://`, guarda histórica `fps` e importação isolada do perfil MCP).",
-      "estadoNoGotcha": "aberto; revalidado em parte em 2026-08-25",
+      "estadoNoGotcha": "corrigido e provado em 2026-08-25",
       "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [

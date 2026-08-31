@@ -12,7 +12,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 **Tech Stack:** Node.js ESM, Vitest, JSON Schema, ferramentas nativas em
 `tools/modelagem/` e documentos/artefatos em `autoria-assistida/`.
 
-**Spec:** [`docs/mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md`](../../mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md)
+**Spec:** [`docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`](../../mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
 
 ## Global Constraints
 
@@ -53,7 +53,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 **Files:**
 - Test: `tools/mecanifica/caminho-procedural.test.ts`
 - Inspect: `prototipos/fps/v3/`
-- Modify: `docs/mecanifica/RELATORIO-MODELADOR-INVERSO-P0.md`
+- Modify: `docs/mecanifica/historico/RELATORIO-MODELADOR-INVERSO-P0.md`
 
 - [ ] Reproduzir a falha e inventariar se cada entrada é diretório legado,
   junction, compatibilidade intencional ou conteúdo órfão.
@@ -82,7 +82,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 ### Task 4: fechar a linha de base oficial
 
 **Files:**
-- Modify: `docs/mecanifica/RELATORIO-MODELADOR-INVERSO-P0.md`
+- Modify: `docs/mecanifica/historico/RELATORIO-MODELADOR-INVERSO-P0.md`
 
 - [ ] Rodar, no mesmo checkout Windows: `npm test`, `npm run typecheck`,
   `npm run build`, `npm run porteiro`, `npm run bancada:vazia:check`,
@@ -157,7 +157,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 - Create: `tools/modelagem/orquestrar-calibracao-critico.test.mjs`
 - Create: `tools/modelagem/contrato-julgamento-critico.mjs`
 - Create: `tools/modelagem/contrato-julgamento-critico.test.mjs`
-- Modify: `docs/mecanifica/RELATORIO-MODELADOR-INVERSO-P0.md`
+- Modify: `docs/mecanifica/historico/RELATORIO-MODELADOR-INVERSO-P0.md`
 
 - [ ] Definir o transporte como arquivos JSON: a CLI exporta um lote selado e
   ingere respostas validadas; **não chama rede nem modelo**. Um agente externo
@@ -184,9 +184,9 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 ### Task 9: fechamento de P0
 
 **Files:**
-- Modify: `docs/mecanifica/RELATORIO-MODELADOR-INVERSO-P0.md`
-- Modify: `docs/mecanifica/planos/2026-08-25-modelador-inverso-priors-familia.md`
-- Modify: `docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`
+- Modify: `docs/mecanifica/historico/RELATORIO-MODELADOR-INVERSO-P0.md`
+- Modify: `docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`
+- Modify: `docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md`
 
 - [ ] Reexecutar todos os gates oficiais e verificar artefatos/hashes.
 - [ ] Registrar separadamente plataforma, alvo e avaliador como `aprovar`,

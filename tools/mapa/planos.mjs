@@ -5,8 +5,33 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const ESTADOS = new Set(['rascunho', 'pronto', 'ativo', 'concluído', 'cancelado']);
+const ESTADOS = new Set(['rascunho', 'pronto', 'ativo', 'concluído', 'cancelado', 'congelado']);
 const NOME_PLANO = /^\d{4}-\d{2}-\d{2}-.+\.md$/;
+
+/* G4 — subpasta guarda plano, não o esconde do gate.
+ *
+ * A leitura era `readdirSync` sem recursão, então qualquer plano movido para
+ * uma subpasta deixava de ter estado e limite de linhas conferidos: sumia do
+ * gate em vez de ser guardado por ele. A pasta `congelados/` já vinha se
+ * apoiando nisso sem que ninguém tivesse decidido isso.
+ *
+ * Agora todas as subpastas são varridas e conferidas. O que continua valendo
+ * só para a raiz é QUEM PODE ESTAR EM JOGO: `ativo`, `pronto` e `rascunho`
+ * moram na raiz; subpasta guarda o que saiu de cena. */
+const ESTADOS_EM_JOGO = new Set(['ativo', 'pronto', 'rascunho']);
+
+function planosDe(pasta, prefixo = '') {
+  const encontrados = [];
+  for (const entrada of readdirSync(pasta, { withFileTypes: true })) {
+    const relativo = prefixo ? `${prefixo}/${entrada.name}` : entrada.name;
+    if (entrada.isDirectory()) {
+      encontrados.push(...planosDe(join(pasta, entrada.name), relativo));
+    } else if (NOME_PLANO.test(entrada.name)) {
+      encontrados.push({ nome: relativo, caminho: join(pasta, entrada.name), naRaiz: prefixo === '' });
+    }
+  }
+  return encontrados.sort((a, b) => a.nome.localeCompare(b.nome));
+}
 
 function contarLinhas(texto) {
   const normal = texto.replace(/\r\n/g, '\n').replace(/\n$/, '');
@@ -21,13 +46,19 @@ export function conferirPlanos({
   if (!existsSync(pasta)) return { problemas: [`pasta de planos ausente: ${pasta}`], planos: [], ativos: [] };
   if (!existsSync(indice)) return { problemas: [`índice de planos ausente: ${indice}`], planos: [], ativos: [] };
 
-  const planos = readdirSync(pasta).filter((nome) => NOME_PLANO.test(nome)).sort().map((nome) => {
-    const texto = readFileSync(join(pasta, nome), 'utf8');
+  const planos = planosDe(pasta).map(({ nome, caminho, naRaiz }) => {
+    const texto = readFileSync(caminho, 'utf8');
     const linhas = contarLinhas(texto);
     const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/mi)?.[1]?.toLowerCase();
     if (linhas > 200) problemas.push(`${nome}: ${linhas} linhas; o limite é 200`);
     if (!estado || !ESTADOS.has(estado)) problemas.push(`${nome}: estado ausente ou inválido`);
-    return { nome, estado, linhas };
+    if (!naRaiz && estado && ESTADOS_EM_JOGO.has(estado)) {
+      problemas.push(
+        `${nome}: está em subpasta com estado '${estado}'. Plano em jogo mora na raiz de planos/; ` +
+        'subpasta guarda o que saiu de cena.',
+      );
+    }
+    return { nome, estado, linhas, naRaiz };
   });
 
   const ativos = planos.filter((plano) => plano.estado === 'ativo');

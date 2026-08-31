@@ -51,11 +51,11 @@ futura não autoriza implementação até existir um plano executivo ativo.
 | Fatia 1B — quatro vistas oficiais | concluído | Fatia 1A | quatro PNGs oficiais por caso, recursos e chamadas de ferramentas sem fallback |
 | Avaliação consolidada do piloto visual | concluído: corrigir | Fatia 1B | inspeção e vistas aprovadas; `AVAL-01` confirmou ausência de descoberta de pacotes e revisões na issue #18 |
 | Correção de descoberta de pacotes e revisões | concluído: aprovar | avaliação consolidada | PR #21 mesclado; `mecanifica://pacotes`; validação e comparação caixa-preta sem fallback ou escrita |
-| Autoria controlada de pacotes | concluído: interromper | Módulo 1 aprovado | [plano datado](../2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
-| Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
-| Autoria de montagem | concluído: aprovar | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../2026-08-14-materializacao-autoria-segura.md); perfil opt-in aprovado |
-| Autoria de receita | concluído: aprovar | contrato declarativo, revisão imutável, vistas e revalidação confinada | [plano datado](../2026-08-14-autoria-segura-receitas.md); JavaScript do agente permanece proibido |
-| Continuidade de autoria ativa | concluído: aprovar | autoria de montagem e receita aprovadas | [plano datado](../2026-08-14-continuidade-autoria-ativa.md); leitura e escrita compartilham revisões ativas autorizadas |
+| Autoria controlada de pacotes | concluído: interromper | Módulo 1 aprovado | [plano datado](../encerrados/2026-08-05-mcp-autoria-controlada.md); PR #25 fechado sem merge por bloqueio de publicação atômica e `no-clobber` em API portátil |
+| Leitura e auditoria de montagens | concluído: aprovar | contexto estrutural/visual, catálogo explícito e revalidação assistida concluídos | [plano datado](../encerrados/2026-08-14-mcp-montagens-leitura.md); cliente caixa-preta usa IDs semânticos e vistas em memória |
+| Autoria de montagem | concluído: aprovar | leitura MCP aprovada; revisão imutável; catálogo e revalidação explícitos | [plano datado](../encerrados/2026-08-14-materializacao-autoria-segura.md); perfil opt-in aprovado |
+| Autoria de receita | concluído: aprovar | contrato declarativo, revisão imutável, vistas e revalidação confinada | [plano datado](../encerrados/2026-08-14-autoria-segura-receitas.md); JavaScript do agente permanece proibido |
+| Continuidade de autoria ativa | concluído: aprovar | autoria de montagem e receita aprovadas | [plano datado](../encerrados/2026-08-14-continuidade-autoria-ativa.md); leitura e escrita compartilham revisões ativas autorizadas |
 | Contrato e ferramentas de materiais | candidato | contrato canônico prévio | provas determinísticas separadas da autoria geométrica |
 | Distribuição e orquestração | candidato | valor local comprovado | decisão separada sobre HTTP, autenticação e múltiplos agentes |
 

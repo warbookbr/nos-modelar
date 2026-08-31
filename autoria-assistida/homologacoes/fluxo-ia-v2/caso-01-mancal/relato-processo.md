@@ -36,7 +36,7 @@ Documentação oficial:
 - `docs/mecanifica/HOMOLOGACAO-FLUXO-IA.md`;
 - `docs/mecanifica/AUTORIA-IA.md`;
 - `docs/mecanifica/PERFIS-DE-AUTORIA.md`;
-- `docs/mecanifica/REFERENCIA-E-CRITICA-VISUAL.md`;
+- `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`;
 - `docs/mecanifica/BANCADA-E-APRESENTACAO.md`;
 - `docs/mecanifica/FLUXO-MODELAGEM-IA.md`;
 - `docs/mecanifica/MONTAGENS-SEMANTICAS.md`, com leitura integral até a

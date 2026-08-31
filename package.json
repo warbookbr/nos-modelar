@@ -58,6 +58,8 @@
     "docs:links": "node tools/mapa/links.mjs",
     "docs:links:check": "node tools/mapa/links.mjs --check",
     "planos:check": "node tools/mapa/planos.mjs --check",
+    "docs:estrutura": "node tools/mapa/estrutura-docs.mjs",
+    "docs:estrutura:check": "node tools/mapa/estrutura-docs.mjs --check",
     "exportar": "node tools/mecanifica/exportar.mjs",
     "exportar:check": "node tools/mecanifica/exportar.mjs --check",
     "exportar:step": "node tools/mecanifica/exportar-step.mjs",

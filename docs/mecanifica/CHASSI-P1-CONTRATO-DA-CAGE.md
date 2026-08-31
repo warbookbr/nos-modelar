@@ -5,7 +5,7 @@ Rodada P1 do plano
 Alvo dimensional em
 [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md); fundamentação da
 representação em
-[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
+[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](./historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
 
 Este documento fixa **o formato do artefato autoral** e como ele se liga ao que já
 existe. Não autoriza implementação, não escreve operação nova e não altera o
