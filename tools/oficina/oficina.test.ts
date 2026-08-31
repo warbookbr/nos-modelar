@@ -5864,3 +5864,60 @@ describe('inflate — endereçamento de face por estacao e lado', () => {
     conferirMalha(r, { fechada: true, rotulo: 'chapa de inflate furada' });
   });
 });
+
+/* ESTAÇÕES EXPLÍCITAS do `inflate` (atrito A15).
+ *
+ * Divisão em partes iguais é um palpite: põe densidade onde a forma não pede e
+ * deixa sem densidade onde ela pede. O caso que forçou a mudança foi o olho do
+ * machado — `furo` exige que o furo caiba numa face só, e 148 mm em 14 partes
+ * iguais dá 10,6 mm por face contra os 38 mm que o olho precisa. */
+describe('inflate — estacoes explícitas no lugar de partes iguais', () => {
+  const perfil = (L: number, h: number) => [[0, h], [L, h], [L, -h], [0, -h]];
+  const chapa = (extra: Record<string, unknown>) => nucleo([['inflate', {
+    origemId: 1, contornoLado: perfil(0.14, 0.05), contornoTopo: perfil(0.14, 0.02),
+    modo: 'secoes', lados: 10, expoenteSecao: 20, ...extra,
+  }]] as any, {}, {});
+
+  it('estacoes iguais reproduzem exatamente o que divisoes fazia', () => {
+    const uniforme = chapa({ divisoes: 3 });
+    const explicito = chapa({ estacoes: [0, 1 / 3, 2 / 3, 1] });
+    expect(uniforme.orfaos).toHaveLength(0);
+    expect(explicito.orfaos).toHaveLength(0);
+    expect(explicito.F.size).toBe(uniforme.F.size);
+  });
+
+  it('estacoes desiguais dão faces de tamanhos diferentes — o ponto da mudança', () => {
+    const r = chapa({ estacoes: [0, 0.4, 0.6, 0.8, 1] });
+    expect(r.orfaos).toHaveLength(0);
+    expect(r.F.size).toBe(4 * 10 + 2 * 10);
+  });
+
+  it('fora de ordem ou repetida GRITA em vez de gerar face de área nula', () => {
+    expect(chapa({ estacoes: [0, 0.6, 0.4, 1] }).orfaos[0].motivo).toMatch(/não é maior que/);
+    expect(chapa({ estacoes: [0, 0.5, 0.5, 1] }).orfaos[0].motivo).toMatch(/não é maior que/);
+  });
+
+  it('lista que não começa em 0 nem termina em 1 deixaria a peça sem ponta, e GRITA', () => {
+    expect(chapa({ estacoes: [0, 0.5, 0.9] }).orfaos[0].motivo).toMatch(/começar em 0 e terminar em 1/);
+    expect(chapa({ estacoes: [0.1, 0.5, 1] }).orfaos[0].motivo).toMatch(/começar em 0 e terminar em 1/);
+  });
+
+  it('divisoes junto de estacoes é ambíguo e GRITA', () => {
+    expect(chapa({ divisoes: 3, estacoes: [0, 0.5, 1] }).orfaos[0].motivo).toMatch(/declare exatamente uma/);
+  });
+
+  it('a grade publicada acompanha as estacoes, senão o endereço apontaria para outra face', () => {
+    /* Se `grade.divisoes` continuasse vindo do campo `divisoes`, o endereço
+       (estacao, lado) resolveria contra um total errado e o A13 devolveria
+       silenciosamente a face vizinha. */
+    const r = nucleo([
+      ['inflate', {
+        origemId: 1, contornoLado: perfil(0.14, 0.05), contornoTopo: perfil(0.14, 0.02),
+        modo: 'secoes', lados: 10, expoenteSecao: 20, estacoes: [0, 0.4, 0.6, 0.8, 1],
+      }],
+      ['parte', { nome: 'p', sel: { origem: { op: 'inflate', id: 1, estacao: 3, lado: 0 } } }],
+    ] as any, {}, {});
+    expect(r.orfaos).toHaveLength(0);
+    expect([...r.F.values()].filter((f: any) => f.parte === 'p')).toHaveLength(1);
+  });
+});

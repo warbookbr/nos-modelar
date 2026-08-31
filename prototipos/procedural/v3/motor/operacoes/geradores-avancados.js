@@ -626,12 +626,52 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (!(expoente > 0)) return grita(st, i, 'inflate', 'expoenteSecao', `expoenteSecao precisa ser positivo; recebido ${expoente}`);
       const potencia = 2 / expoente;
       const epsilonZ = (zMax - zMin) * 1e-9;
+      /* ESTAÇÕES EXPLÍCITAS (`estacoes`), opcionais.
+         Sem elas o caminho é dividido em partes IGUAIS, e parte igual é um
+         palpite: ela põe densidade onde a forma não pede e deixa a forma sem
+         densidade onde ela pede. Duas consequências medidas neste acervo:
+
+           - o contorno perde os próprios cantos. A silhueta do machado tem
+             ombro, barriga e barba em posições precisas, e a divisão uniforme
+             passa ao largo delas;
+           - face grande vira impossível. `furo` exige que o furo caiba numa
+             face só, e com 148 mm em 14 partes iguais cada face tem 10,6 mm —
+             enquanto o olho de um machado precisa de 38 mm. Baixar `divisoes`
+             daria a face, mas destruiria a lâmina. Não havia como pedir "uma
+             estação longa aqui e várias curtas ali".
+
+         `estacoes` é a lista de FRAÇÕES do caminho, de 0 a 1, em ordem
+         estritamente crescente, começando em 0 e terminando em 1. É TOPO: muda
+         a contagem de faces, como `divisoes`. */
+      let fracoes = null;
+      if (a.estacoes != null) {
+        if (!Array.isArray(a.estacoes) || a.estacoes.length < 2) {
+          return grita(st, i, 'inflate', 'estacoes', `estacoes é a lista de frações do caminho (>= 2 valores, de 0 a 1); recebido ${JSON.stringify(a.estacoes)}`);
+        }
+        fracoes = a.estacoes.map((v) => st.num(v));
+        for (let k = 0; k < fracoes.length; k++) {
+          if (!Number.isFinite(fracoes[k]) || fracoes[k] < 0 || fracoes[k] > 1) {
+            return grita(st, i, 'inflate', 'estacoes', `estacoes[${k}] precisa ser um número entre 0 e 1; recebido ${JSON.stringify(a.estacoes[k])} = ${fracoes[k]}`);
+          }
+          if (k > 0 && !(fracoes[k] > fracoes[k - 1])) {
+            return grita(st, i, 'inflate', 'estacoes', `estacoes[${k}] (${fracoes[k]}) não é maior que estacoes[${k - 1}] (${fracoes[k - 1]}): duas estações no mesmo lugar dariam faces de área nula, e fora de ordem inverteriam o caminho`);
+          }
+        }
+        if (fracoes[0] !== 0 || fracoes[fracoes.length - 1] !== 1) {
+          return grita(st, i, 'inflate', 'estacoes', `estacoes precisa começar em 0 e terminar em 1 (recebido ${fracoes[0]}..${fracoes[fracoes.length - 1]}); estação que não fecha o caminho deixaria a peça sem as pontas`);
+        }
+        if (a.divisoes != null) {
+          return grita(st, i, 'inflate', 'divisoes+estacoes', 'divisoes reparte o caminho em partes iguais e estacoes diz onde cada uma fica — declare exatamente uma');
+        }
+      }
+      const nEstacoes = fracoes ? fracoes.length - 1 : divisoes;
+
       const aneis = [];
       let invalido = false;
-      for (let estacao = 0; estacao <= divisoes; estacao++) {
-        const t = estacao / divisoes;
+      for (let estacao = 0; estacao <= nEstacoes; estacao++) {
+        const t = fracoes ? fracoes[estacao] : estacao / divisoes;
         const zGeometrico = zMin + (zMax - zMin) * t;
-        const zAmostra = estacao === 0 ? zMin + epsilonZ : estacao === divisoes ? zMax - epsilonZ : zGeometrico;
+        const zAmostra = estacao === 0 ? zMin + epsilonZ : estacao === nEstacoes ? zMax - epsilonZ : zGeometrico;
         const iy = intervaloNaEstacao(lado, zAmostra, 'contornoLado', estacao);
         const ix = intervaloNaEstacao(topo, zAmostra, 'contornoTopo', estacao);
         if (!iy || !ix) { invalido = true; continue; }
@@ -640,8 +680,8 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (invalido) return;   // diagnósticos já registrados; fail-closed
 
       const nV = aneis.length * lados + 2;
-      const nF = divisoes * lados + 2 * lados;
-      if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: inflate modo='secoes' (${divisoes} divisões × lados=${lados}) estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
+      const nF = nEstacoes * lados + 2 * lados;
+      if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: inflate modo='secoes' (${nEstacoes} estações × lados=${lados}) estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
       const idsAneis = [];
       let cursorV = 0;
@@ -666,7 +706,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       addV(st, centroFim, [(ultimo.x0 + ultimo.x1) / 2, (ultimo.y0 + ultimo.y1) / 2, ultimo.z]);
 
       let cursorF = 0;
-      for (let estacao = 0; estacao < divisoes; estacao++) {
+      for (let estacao = 0; estacao < nEstacoes; estacao++) {
         const A = idsAneis[estacao], B = idsAneis[estacao + 1];
         for (let ladoIdx = 0; ladoIdx < lados; ladoIdx++) {
           const proximo = (ladoIdx + 1) % lados;
@@ -687,15 +727,15 @@ export function criarOperacoesGeradoresAvancados(servicos) {
          e é essa ordem que vira endereço. Sem publicá-la, `{op,id}` resolvia
          para as centenas de faces da peça e nenhuma operação que exige UMA face
          (o `furo`, à frente de todas) alcançava uma chapa de `inflate`. */
-      const corpo = Array.from({ length: divisoes * lados }, (_, k) => b + k);
+      const corpo = Array.from({ length: nEstacoes * lados }, (_, k) => b + k);
       const tampas = {
-        inicio: Array.from({ length: lados }, (_, k) => b + divisoes * lados + k),
-        fim: Array.from({ length: lados }, (_, k) => b + divisoes * lados + lados + k),
+        inicio: Array.from({ length: lados }, (_, k) => b + nEstacoes * lados + k),
+        fim: Array.from({ length: lados }, (_, k) => b + nEstacoes * lados + lados + k),
       };
       if (a.origemId != null) {
         registraOrigem(st, i, 'inflate', a.origemId, {
           faces: Array.from({ length: nF }, (_, k) => b + k),
-          grade: { divisoes, lados },
+          grade: { divisoes: nEstacoes, lados },
           corpo,
           tampas,
         });

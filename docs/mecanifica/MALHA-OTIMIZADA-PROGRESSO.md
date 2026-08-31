@@ -280,6 +280,32 @@ O furo tem de caber dentro da face de entrada **e** da de saída. Numa chapa de
 32 mm não passa nem com raio de 5 mm. Chapa fina pede mais `lados` na seção, não
 furo menor.
 
+### A15 — estações uniformes, e o machado v3 com olho de verdade
+
+Refeito o machado com furo real. Além do A13 (endereço de face), foram precisas
+mais duas descobertas, uma de receita e uma de motor:
+
+- **`lados` múltiplo de 4 põe um vértice no topo da seção.** A seção começa com
+  um vértice em 0°, então com 12 ou 16 há outro a 90°, e um furo centrado no
+  eixo cai entre duas faces. Com 10, 14 ou 18 há uma FACE centrada no topo. Isso
+  explica por que as 14 estações do v2 recusavam: `lados: 16`;
+- **as estações eram uniformes** (atrito A15). 148 mm em 14 partes iguais dão
+  10,6 mm por face contra os ~30 mm do olho, e baixar `divisoes` destruiria a
+  lâmina. `inflate` ganhou `estacoes`: lista de frações 0..1, que põe a
+  densidade onde a forma pede. Recusa lista fora de ordem, repetida, que não
+  começa em 0 ou não termina em 1, e recusa `divisoes` junto.
+
+A planaridade (A14) deixou de barrar sem eu tocar na tolerância do corte: o
+bloco do olho tem seção CONSTANTE, seções constantes são semelhantes, e seções
+semelhantes dão face plana. A regra que já tinha endireitado a lâmina da espada
+resolveu o furo do machado. Não afrouxei número nenhum.
+
+| versão | cabeça | olho | veredito de forma |
+| --- | --- | --- | --- |
+| v1 | `loft` losango | inexistente | cristal de quartzo |
+| v2 | `inflate` chapa | cabo enterrado, encaixe fingido | chapa certa, montagem falsa |
+| v3 | `inflate` com bloco de olho paralelo | **furo passante**, cabo atravessa e sobra em cima | montado |
+
 ### O limite que continua de pé
 
 Contagem, fechamento e orientação o conferente resolve por linha de comando. Se

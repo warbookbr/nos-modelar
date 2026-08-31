@@ -1,127 +1,122 @@
-/* machado-de-guerra.js — machado de guerra de uma mão: cabeça de chapa com
- * barba, esporão traseiro e cabo com reforço.
+/* machado-de-guerra.js — machado de guerra de uma mão, com OLHO FURADO: o cabo
+ * atravessa a cabeça por um furo real, não por um encaixe fingido.
  *
  * Exemplo de autoria, não referência histórica.
  *
- * POR QUE ESTE OBJETO. A espada é simétrica em torno do próprio eixo; a cadeira
- * é bilateral. O machado não é nenhum dos dois: a cabeça é ASSIMÉTRICA no plano
- * do corte — gume de um lado, esporão do outro — e simétrica só na espessura.
- *
- * O QUE FAZ LER COMO MACHADO DE GUERRA e não como machado de lenhador:
- *   - o gume DESCE abaixo da linha do cabo, formando barba, para enganchar
- *     escudo e braço. Lenhador tem gume centrado;
- *   - a cabeça é FINA. Machado de guerra pesa pouco mais de um quilo;
- *   - o esporão traseiro é uma ponta, não um martelo.
- *
  * ---------------------------------------------------------------------------
- * POR QUE `inflate` E NÃO `loft` — a correção que custou uma versão inteira
+ * A HISTÓRIA DESTA PEÇA, porque ela é o registro de três erros
  *
- * A primeira cabeça era um `loft` de seções em LOSANGO ao longo do gume. Ela
- * passava em tudo que se mede por linha de comando — fechada, orientada, sem
- * face órfã — e mesmo assim era um cristal de quartzo, não um machado. O erro
- * não estava no número: estava na SEÇÃO.
+ * v1 — `loft` de seções em LOSANGO. Passava em toda medida (fechada, orientada,
+ * sem face órfã) e era um cristal de quartzo. O losango põe uma quina no meio da
+ * face, onde a cabeça tem de ser CHAPA.
  *
- * Um losango tem um vértice no meio de cada lado, então a cabeça ganhava uma
- * QUINA correndo pelo meio da face, e a face de uma cabeça de machado é
- * justamente a parte que tem de ser CHAPA. Somando a isso `cima`, `baixo` e
- * espessura variando cada um a seu ritmo entre quatro estações, cada quadrilátero
- * saía torto numa direção diferente e o conjunto virava um monte de facetas sem
- * plano nenhum.
+ * v2 — `inflate`, silhueta cruzada com planta. A chapa ficou certa, mas o cabo
+ * ATRAVESSAVA a cabeça por dois décimos de milímetro e saía pelas faces, porque
+ * a parede do olho tinha 2 mm. E não havia furo: o cabo era enterrado e o
+ * encaixe, disfarçado.
  *
- * `inflate` descreve a peça como ela é de fato feita: uma SILHUETA (o perfil do
- * machado visto de lado) cruzada com uma PLANTA (a espessura, grossa no olho e
- * fina no gume). É a mesma descrição do ferreiro — chapa recortada, depois
- * afinada no fio — e sai fechada por construção, sem polo e sem tampa.
+ * v3 — esta. O olho é um FURO, e para ele existir foram precisas três coisas
+ * que o motor não tinha ou que a receita não sabia pedir:
  *
- * LIÇÃO GERAL, que vale além do machado: `loft` serve quando a forma É uma
- * seção viajando; quando a forma é uma CHAPA com contorno, a seção viajando é a
- * ferramenta errada, e nenhuma quantidade de estações conserta isso.
+ *   1. ENDEREÇO DE FACE (atrito A13). `furo` exige que a entrada resolva para
+ *      exatamente uma face, e `inflate` publicava as suas só como bloco.
+ *   2. `lados` ≡ 2 (mod 4). Com `lados` múltiplo de 4 existe um VÉRTICE no topo
+ *      da seção, e um furo centrado cai entre duas faces — nunca cabe em uma.
+ *      Com 14 há uma FACE centrada no topo. Esta linha é a menos óbvia da
+ *      receita e a que mais custou a achar.
+ *   3. ESTAÇÕES EXPLÍCITAS (atrito A15). Partes iguais davam 10,6 mm por face
+ *      contra os ~30 mm que o olho precisa. `estacoes` põe UMA estação longa
+ *      sobre o olho e as curtas onde a lâmina curva.
  *
- * EIXOS. `inflate` lê a silhueta em z×y e a planta em z×x, então o gume aponta
- * para +Z e a espessura fica em X. O cabo continua em Y.
+ * E uma exigência de FORMA, não de ferramenta: a face de entrada precisa ser
+ * PLANA, e face de `loft`/`inflate` só sai plana quando as duas seções vizinhas
+ * são SEMELHANTES. Por isso o bloco do olho tem seção CONSTANTE — mesma altura,
+ * mesma espessura, do começo ao fim da estação. Isso não é concessão à
+ * ferramenta: é como um machado é forjado, com o olho num bloco paralelo e a
+ * lâmina abrindo depois dele.
+ *
+ * EIXOS: `inflate` lê a silhueta em z×y e a planta em z×x, então o gume aponta
+ * para +Z e a espessura fica em X. O cabo é Y e atravessa o olho.
  */
 
 const P = {
-  cabo: { comprimento: 0.62, raio: 0.019, lados: 8 },
+  cabo: { comprimento: 0.60, raio: 0.014, lados: 10, saliencia: 0.012 },
   cabeca: {
-    alcance: 0.148,       // da nuca ao fio, em Z
-    /* A meia-espessura no olho tem de VESTIR o cabo com folga, não empatar com
-       ele. Com 0,021 contra um raio de cabo de 0,019 sobrava 2 mm de parede — e
-       como a seção é superelipse, ela afina perto das bordas e o cabo saía
-       pelas faces. 0,028 dá 9 mm de parede, que é o que faz o olho parecer
-       olho. */
-    meiaEspOlho: 0.028,
+    alcance: 0.170,          // da nuca ao fio, em Z
+    /* O BLOCO DO OLHO, em fração do alcance. Seção constante entre os dois:
+       é essa constância que deixa as faces planas e o furo possível. */
+    olhoDe: 0.115,
+    olhoAte: 0.375,
+    meiaAlturaOlho: 0.034,
+    meiaEspOlho: 0.024,
     meiaEspFio: 0.0016,
-    alturaCima: 0.052,    // acima da linha do cabo
-    alturaBarba: 0.082,   // abaixo: é a barba que define a arma
-    divisoes: 14,
-    lados: 16,
-    /* Expoente da superelipse da seção. 2 daria elipse — cabeça de bico de
-       pena. Alto achata os lados e é o que devolve a CHAPA que o losango do
-       `loft` tinha destruído. Com 6 a face ainda saía como travesseiro no
-       render; 14 é onde ela vira chapa de verdade. O modo 'grade' foi medido
-       como alternativa e é pior: sai escada literal no contorno. */
+    /* 14: FACE centrada no topo da seção. Com 12 ou 16 haveria um vértice ali e
+       o furo do olho não caberia em face nenhuma. */
+    lados: 14,
     expoenteSecao: 14,
   },
-  esporao: { comprimento: 0.062, base: 0.040 },
-  reforco: { alt: 0.055, folga: 0.006 },
+  olho: { raio: 0.0146, lados: 12 },
+  esporao: { comprimento: 0.058, base: 0.036 },
+  reforco: { alt: 0.026, folga: 0.007 },
 };
 
-const yCabeca = P.cabo.comprimento;
 const C = P.cabeca;
+const yCabeca = P.cabo.comprimento;
+const zOlho = C.alcance * (C.olhoDe + C.olhoAte) / 2;   // centro do olho, em Z local
 
-/* SILHUETA (z×y): o recorte da chapa, em metros absolutos.
-
-   O DESENHO importa mais que os números. Um machado de guerra não é um retângulo
-   com um entalhe — foi isso que a primeira chapa produziu, e ela lia como cutelo
-   de açougue. A forma tem três trechos, nesta ordem:
-
-     1. PESCOÇO: logo depois do olho a chapa é ESTREITA. É o que separa a massa
-        do gume da massa do cabo, e é ele que faz a arma parecer leve;
-     2. ABANO: a partir da metade a chapa abre para cima e para baixo;
-     3. GUME EM CRESCENTE, com barriga adiante e BARBA que desce e volta para
-        trás em gancho. O gume não é uma reta vertical: reta lê como lâmina de
-        guilhotina, e o gancho da barba é o que engata escudo e braço. */
+/* SILHUETA (z×y). Três trechos: nuca, BLOCO DO OLHO com altura constante, e a
+   lâmina abrindo em crescente com barba em gancho. */
 const silhueta = [
-  [0, 0.042],                       // olho, borda de cima
-  [C.alcance * 0.30, 0.035],        // pescoço: quase sem crescer
-  [C.alcance * 0.63, 0.047],        // ombro: aqui começa o abano
-  [C.alcance * 0.86, 0.052],
-  [C.alcance * 0.985, 0.030],       // o gume vira para dentro no alto
-  /* A barriga do gume precisa de DOIS pontos no z máximo, não de um. Com um só,
-     a última estação do `inflate` tem altura zero e nascem oito faces de área
-     nula — o `malha:conferir` reprova e a bancada recusa a peça. Fisicamente
-     estes dois pontos são o pequeno plano do fio, que todo machado real tem. */
-  [C.alcance, 0.006],
-  [C.alcance, -0.034],
-  [C.alcance * 0.94, -0.058],
-  [C.alcance * 0.78, -0.086],       // ponta da barba, o gancho
-  [C.alcance * 0.45, -0.062],
-  [C.alcance * 0.20, -0.032],       // pescoço por baixo
-  [0, -0.026],                      // olho, borda de baixo
+  [0, C.meiaAlturaOlho * 0.80],                       // nuca, topo
+  [C.alcance * C.olhoDe, C.meiaAlturaOlho],           // entra o bloco do olho
+  [C.alcance * C.olhoAte, C.meiaAlturaOlho],          // sai o bloco: ALTURA CONSTANTE entre os dois
+  [C.alcance * 0.58, 0.044],                          // ombro: a lâmina abre
+  [C.alcance * 0.86, 0.055],
+  [C.alcance * 0.985, 0.030],                         // o gume vira para dentro no alto
+  [C.alcance, 0.006],                                 // dois pontos no z máximo: o plano do fio.
+  [C.alcance, -0.034],                                // Com um só, a última estação teria altura zero.
+  [C.alcance * 0.95, -0.066],
+  [C.alcance * 0.80, -0.098],                         // ponta da barba, o gancho
+  [C.alcance * C.olhoAte, -C.meiaAlturaOlho],         // volta ao bloco do olho
+  [C.alcance * C.olhoDe, -C.meiaAlturaOlho],
+  [0, -C.meiaAlturaOlho * 0.80],                      // nuca, base
 ];
 
-/* PLANTA (z×x): a espessura. Quase constante nos dois primeiros terços — o
-   corpo da chapa é paralelo — e só então cai para o fio. É o bisel, e
-   concentrá-lo no fim é o que deixa a face grande PLANA. */
+/* PLANTA (z×x). Espessura CONSTANTE ao longo do bloco do olho, pelo mesmo
+   motivo, e o bisel concentrado no terço final — o que também deixa a face
+   grande da cabeça plana. */
 const planta = [
-  [0, C.meiaEspOlho],
-  [C.alcance * 0.55, C.meiaEspOlho * 0.86],
+  [0, C.meiaEspOlho * 0.88],
+  [C.alcance * C.olhoDe, C.meiaEspOlho],
+  [C.alcance * C.olhoAte, C.meiaEspOlho],
+  [C.alcance * 0.70, C.meiaEspOlho * 0.72],
   [C.alcance, C.meiaEspFio],
   [C.alcance, -C.meiaEspFio],
-  [C.alcance * 0.55, -C.meiaEspOlho * 0.86],
-  [0, -C.meiaEspOlho],
+  [C.alcance * 0.70, -C.meiaEspOlho * 0.72],
+  [C.alcance * C.olhoAte, -C.meiaEspOlho],
+  [C.alcance * C.olhoDe, -C.meiaEspOlho],
+  [0, -C.meiaEspOlho * 0.88],
 ];
 
+/* ESTAÇÕES. A segunda (0,150 → 0,500) é a longa: é ela que vira a face onde o
+   furo do olho cabe. As demais são curtas e ficam onde o contorno muda. */
+const estacoes = [0, C.olhoDe, C.olhoAte, 0.58, 0.72, 0.80, 0.86, 0.95, 0.985, 1];
+/* O olho fica na estação de índice 1, e o topo da seção é o lado 14/4 = 3,5 →
+   a FACE 3 é a centrada no topo (entre os vértices 3 e 4); a de baixo é a 10. */
+const ESTACAO_OLHO = 1;
+const LADO_TOPO = 3;
+const LADO_FUNDO = 10;
+
 export const receitaMachadoDeGuerra = {
-  meta: { nome: 'Machado de Guerra', versao: '2.0.0', autor: 'Mecanifica Procedural AI' },
+  meta: { nome: 'Machado de Guerra', versao: '3.0.0', autor: 'Mecanifica Procedural AI' },
 
   PARAMS: P,
 
   TOPO: {
-    cabecaPorInflate: 'silhueta recortada cruzada com a planta da espessura, como chapa forjada',
-    faceChapa: 'expoenteSecao alto achata a face; losango de loft punha uma quina no meio dela',
-    barba: 'o gume desce abaixo da linha do cabo — é o que separa guerra de lenhador',
+    olhoFurado: 'o cabo atravessa um furo real, aberto por `furo` entre duas faces endereçadas',
+    blocoDoOlho: 'seção constante entre olhoDe e olhoAte: seções semelhantes dão face plana, e furo exige face plana',
+    ladosImpar: 'lados=14 põe uma FACE no topo da seção; múltiplo de 4 poria um vértice e o furo não caberia',
+    estacoesExplicitas: 'uma estação longa sobre o olho, curtas onde a lâmina curva',
     eixoDoCorte: 'Z; o cabo é Y; a espessura é X',
   },
 
@@ -132,89 +127,89 @@ export const receitaMachadoDeGuerra = {
   },
 
   PASSOS: [
+    /* ---------- cabeça ----------
+       Vem ANTES do cabo porque o furo dela é quem define onde o cabo passa. */
+    ['inflate', {
+      origemId: 2,
+      contornoLado: silhueta,
+      contornoTopo: planta,
+      modo: 'secoes',
+      estacoes,
+      lados: C.lados,
+      expoenteSecao: C.expoenteSecao,
+    }],
+
+    /* ---------- O OLHO ----------
+       Entra pela face de cima do bloco e sai pela de baixo. É o furo que faz
+       este machado ser montado em vez de encaixado. */
+    ['furo', {
+      origemId: 3,
+      de: { op: 'inflate', id: 2, estacao: ESTACAO_OLHO, lado: LADO_TOPO },
+      saida: { op: 'inflate', id: 2, estacao: ESTACAO_OLHO, lado: LADO_FUNDO },
+      centro: [0, C.meiaAlturaOlho, zOlho],
+      raio: P.olho.raio,
+      lados: P.olho.lados,
+      orientacao: [0, 0, 1],
+    }],
+    /* `sel: {tudo:true}` e não `{op:'inflate',id:2}`: o furo CONSUMIU as duas
+       faces de entrada e saída — elas viraram a borda anular do corte — e citar
+       a origem inteira depois disso é recusado, com razão, para ninguém receber
+       em silêncio um conjunto diferente do que pediu. Aqui `tudo` é exato
+       porque a cabeça é a PRIMEIRA geometria da receita: não existe mais nada
+       para selecionar por engano. Foi por isso que ela veio antes do cabo. */
+    ['parte', { nome: 'cabeca', sel: { tudo: true } }],
+    ['transladar', { d: [0, yCabeca, -zOlho], sel: { grupo: 'cabeca' } }],
+
     /* ---------- cabo ----------
-       Levemente mais grosso no fim, para a mão não escorregar no golpe. Fecha
-       nas duas pontas com polo de raio zero: loft sem isso sai tubo aberto.
-       Aqui o loft está CERTO — o cabo é mesmo uma seção viajando. */
+       ATRAVESSA o olho e sobra um pouco acima, que é onde vai a cunha num
+       machado real. Nas versões anteriores ele parava dentro da cabeça porque
+       não havia furo para atravessar. */
     ['loft', {
       origemId: 1,
       lados: P.cabo.lados,
       orientacao: [1, 0, 0],
       secoes: [
         { pos: [0, 0, 0], raio: 0 },
-        { pos: [0, 0.004, 0], raio: P.cabo.raio * 1.12 },
-        { pos: [0, P.cabo.comprimento * 0.25, 0], raio: P.cabo.raio * 0.94 },
-        { pos: [0, P.cabo.comprimento * 0.8, 0], raio: P.cabo.raio },
-        /* O cabo TERMINA DENTRO da cabeça. Antes ele subia até 0,654 e o topo
-           da cabeça sobre o olho estava em 0,6538: o cabo furava a cabeça por
-           dois décimos de milímetro, que na imagem é um bico saindo do dorso.
-           Num machado real o cabo para dentro do olho e é encunhado ali. */
-        { pos: [0, P.cabo.comprimento + 0.022, 0], raio: P.cabo.raio },
-        { pos: [0, P.cabo.comprimento + 0.026, 0], raio: 0 },
+        { pos: [0, 0.004, 0], raio: P.cabo.raio * 1.14 },
+        { pos: [0, P.cabo.comprimento * 0.30, 0], raio: P.cabo.raio * 0.92 },
+        { pos: [0, P.cabo.comprimento * 0.86, 0], raio: P.cabo.raio },
+        { pos: [0, yCabeca + C.meiaAlturaOlho + P.cabo.saliencia, 0], raio: P.cabo.raio },
+        { pos: [0, yCabeca + C.meiaAlturaOlho + P.cabo.saliencia + 0.004, 0], raio: 0 },
       ],
     }],
     ['parte', { nome: 'cabo', sel: { origem: { op: 'loft', id: 1 } } }],
 
-    /* ---------- cabeça ---------- */
-    ['inflate', {
-      origemId: 2,
-      contornoLado: silhueta,
-      contornoTopo: planta,
-      modo: 'secoes',
-      divisoes: C.divisoes,
-      lados: C.lados,
-      expoenteSecao: C.expoenteSecao,
-    }],
-    ['parte', { nome: 'cabeca', sel: { origem: { op: 'inflate', id: 2 } } }],
-    /* `inflate` nasce em torno da origem; a cabeça sobe até o topo do cabo e
-       recua um pouco em Z para o olho abraçar a haste em vez de tangenciá-la. */
-    /* O recuo em Z põe o OLHO em cima da haste, não atrás dela. Com -0,012 a
-       cabeça encostava na haste pela quina de cima e a arma lia como lâmina
-       aparafusada num pau; o cabo precisa ATRAVESSAR o corpo da cabeça.
-
-       O valor mede a NUCA — o bloco de aço atrás do olho. Com -0,030 sobravam
-       9 mm atrás do cabo e a lâmina continuava lendo como colada na frente do
-       pau. Com -0,048 sobram 27 mm, e é essa massa atrás do olho que faz o
-       machado parecer montado. O `alcance` cresceu junto para o gume não
-       perder distância. */
-    ['transladar', { d: [0, yCabeca, -0.048], sel: { grupo: 'cabeca' } }],
-
     /* ---------- esporão ----------
-       Cone apontando para -Z, no lado oposto ao gume. É ponta, não martelo. */
+       Cresce da NUCA, o bloco de aço atrás do olho. Entra na cabeça em vez de
+       tangenciar: tangência exata deixa costura na junção. */
     ['cone', {
-      origemId: 3,
+      origemId: 4,
       raio: P.esporao.base / 2,
       altura: P.esporao.comprimento,
       lados: 6,
       eixo: 'z',
-      /* O esporão ENTRA na cabeça em vez de encostar no plano dela: tangência
-         exata deixa costura visível na junção. */
-      em: [0, yCabeca, -0.040 - P.esporao.comprimento],
+      em: [0, yCabeca, -zOlho + 0.010 - P.esporao.comprimento],
     }],
-    ['parte', { nome: 'esporao', sel: { origem: { op: 'cone', id: 3 } } }],
+    ['parte', { nome: 'esporao', sel: { origem: { op: 'cone', id: 4 } } }],
 
-    /* ---------- reforço do olho ----------
-       A cinta de metal que impede o cabo de rachar sob o impacto. Laterais e
-       tampas são citações separadas: `{op:'cilindro',id}` sem eixo resolve só a
-       lateral, e sem as duas linhas seguintes o reforço perde fundo e topo. */
+    /* ---------- cinta do olho ----------
+       Encosta por baixo da cabeça. Laterais e tampas são citações separadas:
+       `{op:'cilindro',id}` sem eixo resolve só a lateral. */
     ['cilindro', {
-      origemId: 4,
+      origemId: 5,
       raio: P.cabo.raio + P.reforco.folga,
       altura: P.reforco.alt,
       lados: P.cabo.lados,
-      /* A cinta fica ABAIXO da cabeça, encostada nela. Com o cálculo antigo ela
-         subia até 0,635 e entrava no corpo da cabeça, cujo ventre no olho está
-         em 0,594. */
-      em: [0, yCabeca - 0.028 - P.reforco.alt, 0],
+      em: [0, yCabeca - C.meiaAlturaOlho - P.reforco.alt, 0],
     }],
-    ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4 } } }],
-    ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4, tampa: 'fundo' } } }],
-    ['parte', { nome: 'reforcoDoOlho', sel: { origem: { op: 'cilindro', id: 4, tampa: 'topo' } } }],
+    ['parte', { nome: 'cintaDoOlho', sel: { origem: { op: 'cilindro', id: 5 } } }],
+    ['parte', { nome: 'cintaDoOlho', sel: { origem: { op: 'cilindro', id: 5, tampa: 'fundo' } } }],
+    ['parte', { nome: 'cintaDoOlho', sel: { origem: { op: 'cilindro', id: 5, tampa: 'topo' } } }],
 
     ['material', { usa: 'madeira', sel: { grupo: 'cabo' } }],
     ['material', { usa: 'aco', sel: { grupo: 'cabeca' } }],
     ['material', { usa: 'aco', sel: { grupo: 'esporao' } }],
-    ['material', { usa: 'acoEscuro', sel: { grupo: 'reforcoDoOlho' } }],
+    ['material', { usa: 'acoEscuro', sel: { grupo: 'cintaDoOlho' } }],
   ],
 };
 

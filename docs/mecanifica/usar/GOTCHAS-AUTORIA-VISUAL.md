@@ -266,6 +266,44 @@ Três detalhes de `inflate` que custaram render:
    `malha:conferir` reprova. Fisicamente esses dois pontos são o pequeno plano
    do fio, que todo gume real tem.
 
+## Furar uma chapa: quatro exigências, e três não são óbvias
+
+O olho do machado — um furo passante por onde o cabo entra — levou três versões
+para existir. `furo` sempre soube abrir o buraco; o que faltava era a receita
+saber pedir. As quatro exigências, na ordem em que barram:
+
+**1. A face de entrada precisa ter ENDEREÇO.** `furo` exige que `de` resolva
+para exatamente uma face. Peça de `inflate` no modo `'secoes'` se endereça por
+`{op:'inflate', id, estacao, lado}`. No modo `'grade'` não há endereço, e o
+motor diz por quê.
+
+**2. `lados` precisa ser 10, 14 ou 18 — nunca múltiplo de 4.** Esta é a menos
+óbvia de todas. A seção começa com um vértice em 0°, então `lados` múltiplo de 4
+põe outro VÉRTICE no topo, a 90°. Um furo centrado no eixo cai bem em cima dessa
+linha, entre duas faces, e não cabe em nenhuma. Com `lados` ≡ 2 (mod 4) existe
+uma FACE centrada no topo. Foi o que destravou o olho do machado depois de
+`lados: 16` recusar em todas as estações.
+
+**3. A face precisa ser GRANDE o bastante,** e por isso existem as `estacoes`
+explícitas. Divisão em partes iguais dava 10,6 mm por face contra os ~30 mm do
+olho; baixar `divisoes` daria a face e destruiria a lâmina. Com `estacoes` você
+põe uma estação longa sobre o olho e as curtas onde o contorno curva. O furo tem
+de caber na face de ENTRADA **e** na de SAÍDA, e as duas precisam se enxergar
+(com `lados: 12`, o lado 2 enxerga o 9; o 2 com o 8, não).
+
+**4. A face precisa ser PLANA,** com tolerância apertada. E face de `inflate` só
+sai plana quando as duas seções vizinhas são SEMELHANTES — a mesma regra do
+`loft`. Por isso o bloco do olho tem seção CONSTANTE, mesma altura e mesma
+espessura de ponta a ponta da estação. Isso não é concessão à ferramenta: é como
+um machado é forjado, com o olho num bloco paralelo e a lâmina abrindo depois.
+
+**Depois de furar, a origem antiga não se cita mais inteira.** O furo CONSOME as
+faces de entrada e saída — elas viram a borda anular do corte — e
+`{op:'inflate', id}` passa a ser recusado. Isso é proteção, não estorvo: sem ela
+você receberia em silêncio um conjunto diferente do que pediu. Una as duas
+origens num `ALIAS`, ou ponha a peça furada como primeira geometria da receita e
+use `sel: {tudo: true}`.
+
 ## Armadilhas de `loft`, medidas nas armas do acervo
 
 Estas quatro apareceram modelando espada, machado e maça, e nenhuma delas dá
