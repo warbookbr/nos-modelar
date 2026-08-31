@@ -94,3 +94,9 @@ jobs:
 
       - name: Planejamento curto e com um único plano ativo
         run: npm run planos:check
+
+      # A separação da documentação por quem a lê não se mantém sozinha: basta
+      # uma citação nova para a fronteira vazar. Este gate segura a fronteira,
+      # cobra dono para cada documento de uso e impede a porta de crescer.
+      - name: Documentação separada por uso
+        run: npm run docs:estrutura:check

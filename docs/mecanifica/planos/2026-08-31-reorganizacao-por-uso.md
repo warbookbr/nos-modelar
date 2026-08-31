@@ -137,6 +137,13 @@ Fundir `GOTCHAS-MODELAGEM-PROCEDURAL.md` em `GOTCHAS-AUTORIA-VISUAL.md`,
 preservando os 5 achados que só existem no primeiro e sem perder nenhum registro
 de falha. O resultado vai para `usar/`, e G3 obriga a skill a citá-lo.
 
+### F6 — encurtar o INDEX
+
+Criada na F3, quando o G5 nasceu reprovando o próprio INDEX: 665 linhas contra
+o teto de 200. Quase tudo é narrativa de plano já encerrado, que pertence a
+`planos/encerrados/` e a `historico/`, não à porta. Ao fechar, o teto do G5 cai
+de catraca para os 200 de meta.
+
 ### F5 — decidir sobre a pasta `desenvolver/`
 
 Com F1–F4 verdes, medir quanto custaria mover os 42 documentos de

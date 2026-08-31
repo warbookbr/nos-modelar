@@ -107,6 +107,36 @@ for (const arquivo of rastreados) {
   }
 }
 
+/* --- G7: link RELATIVO de markdown também precisa resolver ---
+
+   A varredura acima só enxerga caminho no formato `docs/<...>.md`, e a maioria
+   dos documentos não escreve assim: escreve `](../INDEX.md)`. O buraco não é
+   teórico — quando este gate foi escrito, a `main` carregava 26 links relativos
+   quebrados com todos os gates verdes, e uma reorganização passou por ele com
+   159 quebrados. Gate cego transmite confiança que não tem.
+
+   A zona histórica de topo fica de fora pelo mesmo motivo de sempre: é registro
+   imutável, e reescrever caminho ali seria editar histórico. */
+const PADRAO_RELATIVO = /\]\(([^)#\s]+\.md)(?:#[^)]*)?\)/g;
+
+for (const arquivo of rastreados.filter((f) => f.endsWith('.md') && !ehZonaHistorica(f))) {
+  const texto = readFileSync(path.join(REPO, arquivo), 'utf8');
+  const linhas = texto.split('\n');
+  for (let i = 0; i < linhas.length; i++) {
+    PADRAO_RELATIVO.lastIndex = 0;
+    let m;
+    while ((m = PADRAO_RELATIVO.exec(linhas[i]))) {
+      const alvo = m[1];
+      if (/^(https?:|mailto:)/.test(alvo)) continue;
+      const absoluto = alvo.startsWith('/')
+        ? path.join(REPO, alvo)
+        : path.resolve(path.dirname(path.join(REPO, arquivo)), alvo);
+      if (existsSync(absoluto)) continue;
+      falhas.push({ arquivo, linha: i + 1, citado: alvo, zona: 'relativa' });
+    }
+  }
+}
+
 /* --- alcançabilidade: todo doc parte do índice curado da Mecanifica --- */
 const PORTA_ENTRADA = 'docs/mecanifica/INDEX.md';
 
@@ -162,7 +192,9 @@ if (falhas.length) {
        resolução exata, então dizer "nem por nome" ali seria mentira. */
     const motivo = zona === 'historica'
       ? 'não resolve exato nem por nome sob docs/'
-      : 'não resolve (zona viva exige caminho exato)';
+      : zona === 'relativa'
+        ? 'link relativo não resolve a partir da pasta do arquivo'
+        : 'não resolve (zona viva exige caminho exato)';
     console.error(`  ${arquivo}:${linha} → ${citado} → ${motivo}`);
   }
 } else {

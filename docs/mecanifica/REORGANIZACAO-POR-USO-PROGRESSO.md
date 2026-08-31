@@ -13,9 +13,10 @@ execução.
 | F0 | medir antes de mexer | concluída |
 | F1 | histórico para fora do caminho | concluída |
 | F2 | criar `usar/` e a porta curta | concluída |
-| F3 | gates G1, G3, G4, G5 e G7 | pendente |
+| F3 | gates G1, G3, G4, G5 e G7 | concluída |
 | F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | pendente |
 | F5 | decidir sobre a pasta `desenvolver/` | pendente |
+| F6 | encurtar o INDEX de 665 para 200 linhas | pendente, criada na F3 |
 
 ## F0 — retrato antes de mexer
 
@@ -149,6 +150,49 @@ limpos. Dois acusaram, e os dois acusaram **certo**:
 Nos dois casos a citação é de **evidência**, não de autoridade: apontam onde a
 prova está, não onde a regra mora. Isso mudou o desenho do G1 antes de eu
 implementá-lo — ver D3.
+
+## F3 — os gates que seguram
+
+Entraram `G1`, `G3` e `G5` em `tools/mapa/estrutura-docs.mjs`
+(`npm run docs:estrutura:check`), `G4` dentro de `planos.mjs` e `G7` dentro de
+`links.mjs`. Todos no CI.
+
+Cada um foi visto **vermelho antes de verde**, em sete casos de teste que
+montam um repositório de mentira e disparam a regra de propósito.
+
+### O que os gates acharam ao serem ligados
+
+| gate | achado |
+| --- | --- |
+| G4 | `planos:check` conferia 5 planos; agora confere **68**. Os 63 em subpasta estavam invisíveis ao gate, sem conferência de estado nem de limite de linhas. |
+| G5 | O `INDEX.md` tem **665 linhas** contra o teto de 200 que o próprio plano escreveu. |
+| G7 | Já descrito na F1: 26 links relativos quebrados passavam com todos os gates verdes. |
+
+### O defeito que o teste achou em mim
+
+A primeira versão de `estrutura-docs.mjs` derivava a raiz do repositório da
+localização do próprio script. Resultado: rodar a ferramenta apontada para
+outro diretório continuava analisando o repositório real, e os **quatro casos
+que deveriam reprovar passaram em verde**.
+
+Se eu tivesse escrito só o caso positivo, teria entregado um gate que não
+consegue reprovar nada e não teria como saber. A raiz virou parâmetro
+(`--raiz=`), que é o que torna o gate testável.
+
+### D4 — o teto do INDEX vira catraca, e não número afrouxado
+
+O G5 nasceu reprovando o `INDEX.md`: 665 linhas contra 200. Três saídas, e duas
+são mentira.
+
+Afrouxar o teto para 700 finge conformidade e mata o gate. Deixar em 200
+mantém o CI vermelho por uma dívida conhecida, e CI cronicamente vermelho para
+de ser sinal. A terceira é a catraca: o teto fica no tamanho atual e o gate
+impede a porta de **crescer** — que é exatamente como ela chegou a 665
+apontando para 158 documentos.
+
+Encurtar de verdade é mover narrativa de plano encerrado para fora do INDEX, o
+que é trabalho de conteúdo, não de número. Virou a fatia **F6**, e ao fechá-la
+o teto cai para 200.
 
 ## Decisões tomadas durante a execução
 
