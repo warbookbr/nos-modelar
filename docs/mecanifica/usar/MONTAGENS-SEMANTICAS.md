@@ -5,7 +5,8 @@
 > montagem persistida deve respeitar. Nenhuma seção autoriza trabalho automático;
 > implementação exige plano executivo próprio.
 
-A definição ampla de autoria está em [`AUTORIA-IA.md`](../AUTORIA-IA.md). Este
+A definição ampla de autoria está em
+[`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md). Este
 arquivo detalha somente a camada de composição necessária para a IA construir e
 manter sistemas complexos.
 

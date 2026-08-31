@@ -10,6 +10,12 @@ uma árvore de composição, relações entre peças ou revalidação de conjunt
 use também `../auditar-montagem/SKILL.md`; não transforme uma montagem em uma
 receita monolítica.
 
+O contrato que esta skill executa é
+[`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
+o que conta como peça e não montagem, identidade estável, isolamento, limites
+do controle, propagação de alteração, validação em camadas, invariantes e
+desvios a evitar. A skill diz **como fazer**; o contrato diz **o que vale**.
+
 ## Caminho curto
 
 1. Descubra capacidades no [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
