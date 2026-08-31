@@ -11,6 +11,7 @@ import { criarFerramentasAutoria } from './perfis/autoria-montagens.mjs';
 import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
 import { criarFerramentasProcedurais } from './perfis/procedural.mjs';
+import { criarFerramentasAutoriaExecucao } from './perfis/autoria-execucao.mjs';
 import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
@@ -68,6 +69,8 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
       'consultar catálogo, grafo, schemas e contratos procedurais registrados',
       'buscar, combinar e validar composições procedurais em memória',
       'analisar lacunas e diagnosticar extensões sem instalar ou promover código',
+      'sincronizar e ativar peça ou montagem na bancada 3D em tempo real',
+      'exportar geometria procedural para formato CAD STEP com escala milimétrica',
       ...(perfil === 'autoria' ? ['planejar, inspecionar e publicar montagens autorizadas', 'planejar, executar, revalidar e publicar receitas declarativas autorizadas', 'reler revisões ativas pelas ferramentas comuns'] : []),
     ],
     aindaNaoConsegue: perfil === 'autoria'
@@ -320,6 +323,7 @@ export function criarServidor({
     : [];
   const leitura = [
     ...criarFerramentasProcedurais(servicoProcedural),
+    ...criarFerramentasAutoriaExecucao(),
     ...criarFerramentasRevisao(catalogoAtivo),
     ...criarFerramentasMontagem(catalogoAtivo),
     ...criarFerramentasImpactoGlobal(universoAtivo),

@@ -4,6 +4,7 @@
    automóvel: a escolha do piloto vive no módulo de montagem. */
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { importarReceita } from './importar-receita.mjs';
 import {
   resolverPortasDeMontagem, diagnosticarEncaixeCilindrico, formatarDiagnosticoDeEncaixe,
   diagnosticarAssentamentoAnular, formatarDiagnosticoDeAssentamentoAnular,
@@ -27,7 +28,7 @@ if (!nome || !montagens.has(nome)) {
 
 try {
   const escolha = montagens.get(nome);
-  const modulo = await import(pathToFileURL(join(repo, 'prototipos/procedural/v3/montagens', escolha.arquivo)).href);
+  const modulo = await importarReceita(join(repo, 'prototipos/procedural/v3/montagens', escolha.arquivo));
   const montagem = modulo[escolha.fabrica]();
   const portas = resolverPortasDeMontagem(montagem.instancias);
   if (montagem.relacao.tipo === 'assentaAnular') {

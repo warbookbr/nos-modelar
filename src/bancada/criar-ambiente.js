@@ -111,6 +111,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
       color: '#cbd2ce',
       roughness: 0.94,
       metalness: 0,
+      transparent: true,
+      opacity: 1,
     }),
   );
   piso.rotation.x = -Math.PI / 2;
@@ -497,6 +499,15 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     referenciaMetrica,
     medirEnquadramento,
     medirPixelsVisiveisPorParte,
+    definirExplosao(valor) {
+      const v = Math.min(1, Math.max(0, Number(valor) || 0));
+      const opacidadePiso = Math.max(0, 1 - v * 2.5);
+      const opacidadeGrade = Math.max(0, 0.34 * (1 - v * 2.5));
+      piso.visible = opacidadePiso > 0.01;
+      grade.visible = opacidadeGrade > 0.01;
+      piso.material.opacity = opacidadePiso;
+      grade.material.opacity = opacidadeGrade;
+    },
     definirObjeto(objeto) {
       alvosAtuais = [objeto];
       enquadrar(alvosAtuais, { instantaneo: true });

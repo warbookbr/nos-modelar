@@ -24,3 +24,10 @@ scratchpad/
 # worktrees temporários de agentes isolados — código vive nos commits deles,
 # nunca no diretório de trabalho principal
 .claude/worktrees/
+
+# Exportações CAD/STEP geradas localmente
+exportacoes/
+
+# Sessão ativa da bancada — estado local, não versionado
+sessao-ativa.json
+public/sessao-ativa.json

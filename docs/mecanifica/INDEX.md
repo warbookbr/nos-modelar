@@ -12,6 +12,22 @@ aplicação publicada aqui.
 
 ## Estado atual
 
+- A [exportação CAD/STEP modular](planos/2026-08-28-exportacao-cad-step.md)
+  (`docs/mecanifica/planos/2026-08-28-exportacao-cad-step.md`) foi
+  **concluída e aprovada**. Entregou os módulos puros `modulos/exportador-cad/` e
+  `modulos/exportador-obj/` e as CLIs `npm run exportar:step` e
+  `npm run exportar:obj`, que escrevem sólidos nomeados com unidade explícita.
+  O STEP sai por `occt-wasm@4.3.2`: a ferramenta é MIT/Apache-2.0 e o `.wasm`
+  compilado é LGPL-2.1, consumido como pacote separado e substituível, então
+  nada disso muda a licença deste repositório. Detalhe técnico em
+  [`DOSSIE-EXPORTACAO-CAD-STEP.md`](DOSSIE-EXPORTACAO-CAD-STEP.md)
+  (`docs/mecanifica/DOSSIE-EXPORTACAO-CAD-STEP.md`) e prova em
+  [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](RELATORIO-EXPORTACAO-CAD-STEP-R00.md)
+  (`docs/mecanifica/RELATORIO-EXPORTACAO-CAD-STEP-R00.md`).
+- `npm run ativar:bancada` carrega qualquer peça ou montagem na bancada e
+  sincroniza a sessão em tempo real. O estado da sessão (`sessao-ativa.json` e
+  `public/sessao-ativa.json`) é local e não versionado.
+
 - A homologação **do fluxo** foi concluída nos Casos 1 e 2, e encerrada aí. Ela
   aprova o processo de autoria, não a geometria: a peça de cada caso segue sendo
   exemplo. O Caso 3 foi retirado — ver o encerramento de
@@ -413,7 +429,9 @@ de dependências possui contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços 
 - **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
   O antigo [modelador por seleção](DOSSIE-MODELADOR-POR-SELECAO.md) é somente
   histórico.
-- **Antes de abrir experimento novo:** [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
+- **Antes de abrir experimento novo:** [`GOTCHAS-MODELAGEM-PROCEDURAL.md`](GOTCHAS-MODELAGEM-PROCEDURAL.md)
+  (`docs/mecanifica/GOTCHAS-MODELAGEM-PROCEDURAL.md`) e
+  [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/mecanifica/GOTCHAS-AUTORIA-VISUAL.md`), o registro
   vivo do que já falhou, e o [canário de casco](RELATORIO-N6-CANARIO-CASCO-VISUAL.md)
   (`docs/mecanifica/RELATORIO-N6-CANARIO-CASCO-VISUAL.md`), a evidência

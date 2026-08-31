@@ -34,6 +34,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { importarReceita } from './importar-receita.mjs';
 export { FORMATO, VERSAO, lerPecaResolvida, parteDaFace };
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -151,7 +152,7 @@ export async function exportarPeca(nome, {
     throw new Error(`exportar-peca: a peça '${nome}' não existe em ${PECAS}`);
   }
 
-  const mod = modulo ?? await import(pathToFileURL(caminho).href);
+  const mod = modulo ?? await importarReceita(caminho);
   if (!Array.isArray(mod.PASSOS) && !Array.isArray(mod.CHAMADAS_COMPOSICOES)) {
     throw new Error(`exportar-peca: a peça '${nome}' não exporta PASSOS nem CHAMADAS_COMPOSICOES; não é peça procedural`);
   }

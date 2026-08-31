@@ -1,4 +1,4 @@
-/* main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível. */
+/* main.js — bancada interativa de co-modelagem (Humano + IA): 3D, referências, parâmetros e feedback. */
 import './styles.css';
 import * as THREE from 'three';
 import { carregarPeca } from './carregar-peca.js';
@@ -6,13 +6,39 @@ import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
+import { criarSincronizadorSessao } from './sessao/sincronizador.js';
+import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
+import { criarPainelReferencias } from './referencias/painel-referencias.js';
+import { criarPainelParametros } from './parametros/painel-parametros.js';
+import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import {
   alvosDeEnquadramento,
   escreverEstadoNaUrl,
   lerEstadoDaUrl,
 } from './estado-bancada.js';
 
+const DEMO_RECEITA = {
+  meta: { nome: 'Engrenagem Cônica de Demonstração' },
+  PASSOS: [
+    ['cilindro', { origemId: 10, raio: 1.2, alt: 0.35, segmentos: 32 }],
+    ['cilindro', { origemId: 20, raio: 0.7, alt: 0.7, segmentos: 32, em: [0, 0.35, 0] }],
+    ['furo', { de: { op: 'cilindro', id: 20, face: 'topo' }, raio: 0.28, ate: 1.1, segmentos: 24 }],
+    ['parte', { nome: 'coroa-dentada', sel: { origem: { op: 'cilindro', id: 10 } } }],
+    ['parte', { nome: 'cubo-central', sel: { origem: { op: 'cilindro', id: 20 } } }],
+    ['publicarPorta', {
+      id: 'eixoCentral',
+      rotulo: 'Eixo de Rotação',
+      de: { op: 'cilindro', id: 20, face: 'topo' },
+      interface: {
+        forma: 'cilindro', papel: 'interna', eixo: [0, 1, 0], centro: [0, 0, 0],
+        raio: 0.28, inicio: 0, fim: 1.1, referencia: [1, 0, 0],
+      },
+    }],
+  ],
+};
+
 function formatarNome(nome) {
+  if (!nome) return '';
   return nome
     .replace(/([a-zá-ú])([A-Z])/g, '$1 $2')
     .replaceAll('-', ' ')
@@ -21,12 +47,14 @@ function formatarNome(nome) {
 
 function mostrarErro(erro) {
   const elemento = document.getElementById('erro');
+  if (!elemento) return;
   elemento.hidden = false;
   elemento.textContent = String(erro?.stack || erro?.message || erro);
 }
 
 function mostrarAviso(texto) {
   const elemento = document.getElementById('aviso');
+  if (!elemento) return;
   elemento.textContent = texto;
   elemento.hidden = false;
   clearTimeout(mostrarAviso.timeout);
@@ -37,33 +65,16 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const params = new URLSearchParams(location.search);
   const pecaPedida = params.get('peca');
   const nomesDisponiveis = idsDoCatalogo(catalogo);
-  if (catalogo.length === 0) {
-    if (pecaPedida) throw new Error(`bancada: peça '${pecaPedida}' não está publicada; o catálogo está vazio.`);
-    document.getElementById('fixtureAtual').textContent = 'Nenhuma peça homologada';
-    document.getElementById('estadoSemantica').classList.add('ok');
-    document.getElementById('estadoSemantica').querySelector('span').textContent = 'Catálogo vazio';
-    document.getElementById('estadoCatalogoVazio').hidden = false;
-    window.__mecanificaBancada = {
-      ready: true,
-      catalogoVazio: true,
-      peca: null,
-      pecasDisponiveis: [],
-      estado: () => ({ peca: null, catalogo: 'vazio', selecionadas: [], modo: 'todas' }),
-      url: () => location.href,
-    };
-    return;
-  }
-  if (!pecaPedida) throw new Error(`bancada: informe ?peca=ID; não existe peça padrão. Disponíveis: ${nomesDisponiveis.join(', ')}`);
-  const nomePeca = pecaPedida;
-  const convertido = await carregarPeca(nomePeca, { catalogo });
-  document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
 
   const canvas = document.getElementById('cenaBancada');
   let vistaAtual = 'isometrica';
   let inicializando = true;
   let ultimaQuery = null;
-  let controlador;
+  let controlador = null;
+  let selecao3d = null;
   let parInspecionado = null;
+  let modeloAtual = null;
+  let nomePecaAtual = pecaPedida ?? 'sessao-ativa';
   const marcadoresDoPar = [];
 
   function mesmosNomes(a, b) {
@@ -79,16 +90,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     parInspecionado = null;
   }
 
-  /* Contornos são uma camada de leitura, não material, transformação ou nova
-     geometria da peça. No par, duas superfícies parecidas podem ser visíveis e
-     ainda assim parecer uma forma só; as cores distintas tornam o limite entre
-     elas observável sem sacrificar o acabamento no isolamento comum. */
   function marcarParInspecionado(nomes) {
     limparMarcadoresDoPar();
+    if (!modeloAtual) return;
     const partes = [...new Set(nomes)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
     const cores = ['#ffb000', '#39c6ff'];
     partes.forEach((nome, indice) => {
-      const grupo = convertido.partes.get(nome);
+      const grupo = modeloAtual.partes.get(nome);
       grupo?.traverse((malha) => {
         if (!malha.isMesh || !malha.geometry) return;
         const geometria = new THREE.EdgesGeometry(malha.geometry, 28);
@@ -121,11 +129,10 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       if (!inicializando && controlador) salvarEstadoNaUrl(controlador.estado());
     },
   });
-  posicionarNoEstudio(convertido.raiz);
-  ambiente.scene.add(convertido.raiz);
-  ambiente.definirObjeto(convertido.raiz);
 
   const lista = document.getElementById('listaPartes');
+  const filtroPartes = document.getElementById('filtroPartes');
+  const resumoFiltro = document.getElementById('resumoFiltro');
   const resumo = document.getElementById('selecaoResumo');
   const botoesModo = {
     todas: document.getElementById('btnTodas'),
@@ -139,14 +146,199 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const eixosReferencia = document.getElementById('eixosReferencia');
   const barraReferencia = document.getElementById('barraReferencia');
   const valorReferencia = document.getElementById('valorReferencia');
+  const estadoCatalogoVazio = document.getElementById('estadoCatalogoVazio');
   let quadroReferencia = 0;
 
+  function aplicarFiltroPartes() {
+    const termo = filtroPartes?.value.trim().toLocaleLowerCase('pt-BR') ?? '';
+    let visiveis = 0;
+    const linhas = lista.querySelectorAll('.parte-linha');
+    for (const linha of linhas) {
+      const nome = linha.querySelector('.nome')?.textContent?.toLocaleLowerCase('pt-BR') ?? '';
+      const corresponde = !termo || nome.includes(termo);
+      linha.hidden = !corresponde;
+      if (corresponde) visiveis += 1;
+    }
+    if (resumoFiltro) {
+      resumoFiltro.textContent = termo ? `${visiveis} de ${linhas.length} componentes` : `${linhas.length} componentes`;
+    }
+  }
+
+  filtroPartes?.addEventListener('input', aplicarFiltroPartes);
+  addEventListener('keydown', (evento) => {
+    const alvo = evento.target;
+    const campoEditavel = alvo instanceof HTMLInputElement
+      || alvo instanceof HTMLTextAreaElement
+      || alvo instanceof HTMLSelectElement
+      || alvo?.isContentEditable;
+    if (evento.key === '/' && !campoEditavel) {
+      evento.preventDefault();
+      filtroPartes?.focus();
+    }
+  });
+
+  // Gerenciadores visuais 3D auxiliares
+  const gerenciadorReferencias3D = criarGerenciadorReferencias3D({ cena: ambiente.scene });
+  const painelReferencias = criarPainelReferencias({
+    container: document.getElementById('containerReferencias'),
+    aoAlternarPrancha: (id, visivel) => gerenciadorReferencias3D.alternarVisibilidade(id, visivel),
+  });
+
+  let sincronizador = null;
+
+  const painelParametros = criarPainelParametros({
+    container: document.getElementById('containerParametros'),
+    aoMudarParametro: (chave, valor) => sincronizador?.atualizarParametro(chave, valor),
+  });
+
+  const gerenciadorAnotacoes3D = criarGerenciadorAnotacoes3D({
+    canvas,
+    cena: ambiente.scene,
+    cameraAtual: () => ambiente.camera,
+    aoCriarAnotacao: (novaAnotacao) => {
+      sincronizador?.enviarAnotacao(novaAnotacao);
+      mostrarAviso('Ponto de revisão registrado para a IA.');
+    },
+  });
+
+  function renderizarListaAnotacoes(anotacoes) {
+    const listaEl = document.getElementById('listaAnotacoes');
+    if (!listaEl) return;
+    listaEl.replaceChildren();
+
+    if (!Array.isArray(anotacoes) || anotacoes.length === 0) {
+      const msg = document.createElement('p');
+      msg.className = 'sem-parametros';
+      msg.textContent = 'Nenhuma anotação registrada nesta sessão.';
+      listaEl.appendChild(msg);
+      return;
+    }
+
+    for (const an of anotacoes) {
+      const item = document.createElement('div');
+      item.className = 'item-anotacao';
+      item.dataset.id = an.id;
+
+      const temPonto3D = Array.isArray(an.posicao) && an.posicao.length === 3;
+      const tipoTag = temPonto3D
+        ? '<span class="tag-anotacao tag-3d">3D</span>'
+        : '<span class="tag-anotacao tag-geral">Geral</span>';
+
+      item.innerHTML = `
+        <div class="item-anotacao-cabecalho">
+          <div class="item-anotacao-info">
+            ${tipoTag}
+            <span>${an.autor || 'Operador'} · ${an.componente || 'Geral'}</span>
+          </div>
+          <div class="item-anotacao-acoes">
+            <button type="button" class="btn-acao-anotacao btn-editar-anotacao" title="Editar anotação">Editar</button>
+            <button type="button" class="btn-acao-anotacao excluir btn-excluir-anotacao" title="Excluir anotação">✕</button>
+          </div>
+        </div>
+        <p class="item-anotacao-texto"></p>
+        <div class="item-anotacao-editor" hidden>
+          <textarea></textarea>
+          <div class="item-anotacao-editor-botoes">
+            <button type="button" class="botao texto btn-cancelar-edicao">Cancelar</button>
+            <button type="button" class="botao primaria btn-salvar-edicao">Salvar</button>
+          </div>
+        </div>
+      `;
+
+      const textoEl = item.querySelector('.item-anotacao-texto');
+      textoEl.textContent = an.texto;
+
+      const editorEl = item.querySelector('.item-anotacao-editor');
+      const textareaEl = editorEl.querySelector('textarea');
+      const btnEditar = item.querySelector('.btn-editar-anotacao');
+      const btnExcluir = item.querySelector('.btn-excluir-anotacao');
+      const btnSalvar = item.querySelector('.btn-salvar-edicao');
+      const btnCancelar = item.querySelector('.btn-cancelar-edicao');
+
+      btnEditar.addEventListener('click', () => {
+        textareaEl.value = an.texto;
+        textoEl.hidden = true;
+        editorEl.hidden = false;
+        textareaEl.focus();
+      });
+
+      btnCancelar.addEventListener('click', () => {
+        editorEl.hidden = true;
+        textoEl.hidden = false;
+      });
+
+      btnSalvar.addEventListener('click', () => {
+        const novoTexto = textareaEl.value.trim();
+        if (novoTexto && novoTexto !== an.texto) {
+          sincronizador?.editarAnotacao(an.id, novoTexto);
+          mostrarAviso('Anotação atualizada.');
+        } else {
+          editorEl.hidden = true;
+          textoEl.hidden = false;
+        }
+      });
+
+      btnExcluir.addEventListener('click', () => {
+        sincronizador?.excluirAnotacao(an.id);
+        mostrarAviso('Anotação excluída.');
+      });
+
+      listaEl.appendChild(item);
+    }
+  }
+
+  // Navegação de Abas do Painel Direito
+  const abasBotoes = document.querySelectorAll('.aba-btn');
+  const abasConteudos = {
+    inspecao: document.getElementById('abaConteudoInspecao'),
+    parametros: document.getElementById('abaConteudoParametros'),
+    referencias: document.getElementById('abaConteudoReferencias'),
+    anotacoes: document.getElementById('abaConteudoAnotacoes'),
+  };
+
+  abasBotoes.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const abaAlvo = btn.dataset.aba;
+      abasBotoes.forEach((b) => {
+        const ativa = b.dataset.aba === abaAlvo;
+        b.classList.toggle('ativa', ativa);
+        b.setAttribute('aria-selected', String(ativa));
+      });
+      Object.entries(abasConteudos).forEach(([nome, el]) => {
+        if (!el) return;
+        el.hidden = nome !== abaAlvo;
+        el.classList.toggle('ativa', nome === abaAlvo);
+      });
+    });
+  });
+
+  document.getElementById('btnAdicionarAnotacaoGeral')?.addEventListener('click', () => {
+    const texto = prompt('Digite sua anotação ou instrução geral para a IA:');
+    if (texto && texto.trim()) {
+      sincronizador?.enviarAnotacao({
+        texto: texto.trim(),
+        componente: 'Geral',
+        posicao: null,
+      });
+      mostrarAviso('Anotação geral registrada para a IA.');
+    }
+  });
+
+  document.getElementById('btnAdicionarAnotacao')?.addEventListener('click', () => {
+    gerenciadorAnotacoes3D.ativarModoAdicionar(true);
+    mostrarAviso('Clique na superfície 3D onde deseja adicionar a nota.');
+  });
+
+  canvas.addEventListener('click', (evento) => {
+    if (gerenciadorAnotacoes3D.isModoAdicionar() && modeloAtual) {
+      gerenciadorAnotacoes3D.tratarCliqueCanvas(evento, [modeloAtual.raiz]);
+    }
+  });
+
   function salvarEstadoNaUrl(estado) {
-    if (inicializando) return;
-    /* `peca` vem antes do estado de vista: é a fixture, não uma opção de câmera.
-       Sem isto, a primeira mudança de estado apagaria a peça da URL. */
+    if (inicializando || !nomePecaAtual) return;
     const saida = new URLSearchParams();
-    saida.set('peca', nomePeca);
+    if (pecaPedida) saida.set('peca', nomePecaAtual);
     const estadoDaVista = escreverEstadoNaUrl({
       ...estado,
       vista: vistaAtual,
@@ -162,6 +354,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   }
 
   function refletirEstado(estado) {
+    if (!controlador) return;
     if (parInspecionado && (estado.modo !== 'isolar' || !mesmosNomes(estado.selecionadas, parInspecionado))) {
       limparMarcadoresDoPar();
     }
@@ -187,6 +380,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     }
     explosao.value = String(Math.round(estado.explosao * 100));
     valorExplosao.value = `${Math.round(estado.explosao * 100)}%`;
+    ambiente.definirExplosao(estado.explosao);
     salvarEstadoNaUrl(estado);
   }
 
@@ -204,161 +398,141 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     quadroReferencia = requestAnimationFrame(atualizarReferenciaMetrica);
   }
 
-  controlador = criarControladorPartes({
-    raiz: convertido.raiz,
-    partes: convertido.partes,
-    hierarquia: convertido.raiz.userData.hierarquia,
-    aoMudar: refletirEstado,
-    aoEstabilizarExplosao(_estado, { enquadrar = true } = {}) {
-      /* A câmera da montagem fechada corta a explosão. Esperar a animação
-         terminar evita que ela persiga cada quadro e enquadra a caixa real. */
-      if (enquadrar) ambiente.enquadrar(controlador.gruposVisiveis());
-    },
-  });
-  /* Peça plana não ganha uma ação permanentemente desabilitada: a hierarquia
-     é ajuda contextual, não mais um controle para a IA ignorar. */
-  btnSelecionarConjunto.hidden = !controlador.temHierarquia();
-
-  for (const nome of controlador.nomes) {
-    const grupo = convertido.partes.get(nome);
-    const pai = grupo.userData.paiSemantico;
-    const botao = document.createElement('button');
-    botao.type = 'button';
-    botao.className = 'parte-linha';
-    botao.dataset.parte = nome;
-    botao.setAttribute('aria-pressed', 'false');
-    botao.innerHTML = `
-      <span class="check" aria-hidden="true"></span>
-      <span class="nome">${formatarNome(nome)}${pai ? ` <small>de ${formatarNome(pai)}</small>` : ''}</span>
-      <span class="faces">${grupo.userData.faces.length}F</span>
-    `;
-    botao.addEventListener('click', () => controlador.selecionar(nome, { aditiva: true }));
-    lista.append(botao);
-  }
-  document.getElementById('contagemPartes').textContent = String(controlador.nomes.length);
-
-  /* o painel de diagnóstico conta partes e faces sem identidade pelo módulo
-     neutro `descrever-partes.js` — a mesma medida que `npm run descrever`
-     imprime. O total de faces continua vindo das estatísticas do adaptador
-     porque lá ele já é `neutro.F.size`, e não uma segunda contagem. */
-  const semParte = convertido.medida.facesSemParte.length;
-  const estadoSemantica = document.getElementById('estadoSemantica');
-  const diagnostico = document.getElementById('diagnostico');
-  if (semParte) {
-    estadoSemantica.classList.add('erro-semantic');
-    estadoSemantica.querySelector('span').textContent = `${semParte} faces sem identidade`;
-    diagnostico.classList.add('alerta');
-    diagnostico.querySelector('p').textContent =
-      `${semParte} faces não pertencem a uma parte semântica. A bancada mantém o objeto visível, mas a fixture não está pronta para publicação.`;
-  } else {
-    estadoSemantica.classList.add('ok');
-    estadoSemantica.querySelector('span').textContent = 'Semântica íntegra';
-    diagnostico.classList.add('ok');
-    diagnostico.querySelector('p').textContent =
-      `${convertido.medida.partes.size} componentes e ${convertido.estatisticas.facesNeutras} faces: nenhuma superfície sem identidade.`;
-  }
-
-  /* A-20: a porta publicada aparece aqui, no mesmo painel onde se confere a
-     identidade das faces, e vinda do mesmo módulo neutro. Peça sem porta não
-     mostra bloco nenhum — a régua não vira poluição nas peças que não publicam. */
-  const portas = convertido.medida.portas ?? [];
-  const blocoPortas = document.getElementById('portasPublicadas');
-  if (blocoPortas) {
-    blocoPortas.hidden = portas.length === 0;
-    if (portas.length) {
-      document.getElementById('resumoPortas').textContent =
-        `${portas.length} ${portas.length === 1 ? 'publicada' : 'publicadas'}`;
-      const listaPortas = document.getElementById('listaPortas');
-      listaPortas.replaceChildren(...portas.map((porta) => {
-        const item = document.createElement('li');
-        const nome = document.createElement('b');
-        nome.textContent = porta.rotulo;
-        /* a origem DECLARADA, não as faces resolvidas — a mesma coluna que
-           `npm run descrever` imprime, pelo mesmo motivo. */
-        const origem = document.createElement('small');
-        origem.textContent = `${porta.id} · ${porta.origem}`;
-        item.append(nome, origem);
-        return item;
-      }));
-    }
-  }
-
   function focarSelecao() {
+    if (!controlador || !modeloAtual) return;
     const grupos = controlador.gruposSelecionados();
     ambiente.enquadrar(alvosDeEnquadramento({
-      raiz: convertido.raiz,
+      raiz: modeloAtual.raiz,
       selecionados: grupos,
       modo: controlador.modo,
     }), { reproduzivel: true });
   }
 
-  /* A inspeção de par é uma ferramenta de revisão, não uma relação de
-     montagem. Ela recebe duas identidades já declaradas, isola sem reposicionar
-     nada e compara somente as sete vistas canônicas. A medição vem de um render
-     de IDs com depth buffer; uma parte escondida não ganha pontos por ter caixa
-     projetada ou por parecer próxima pelo nome. */
-  function inspecionarPar(nomes) {
-    const pedidos = Array.isArray(nomes) ? nomes : controlador.selecionadas;
-    const partes = [...new Set(pedidos)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    if (partes.length !== 2 || partes.some((nome) => !controlador.nomes.includes(nome))) {
-      return {
-        valida: false,
-        motivo: 'A inspeção de par exige exatamente duas partes semânticas existentes.',
-      };
-    }
-    controlador.selecionarMuitas(partes);
-    controlador.definirModo('isolar');
-    const grupos = controlador.gruposSelecionados();
-    const candidatas = ['frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior', 'isometrica'];
-    const medidas = candidatas.map((vista, ordem) => {
-      ambiente.definirVista(vista, { instantaneo: true });
-      ambiente.enquadrar(grupos, { instantaneo: true });
-      const pixels = ambiente.medirPixelsVisiveisPorParte(grupos);
-      return {
-        vista,
-        ordem,
-        pixels,
-        menor: Math.min(...pixels.map((item) => item.pixels)),
-        total: pixels.reduce((soma, item) => soma + item.pixels, 0),
-      };
-    });
-    medidas.sort((a, b) => b.menor - a.menor || b.total - a.total || a.ordem - b.ordem);
-    const escolhida = medidas[0];
-    ambiente.definirVista(escolhida.vista, { instantaneo: true });
-    ambiente.enquadrar(grupos, { instantaneo: true, reproduzivel: true });
-    marcarParInspecionado(partes);
-    salvarEstadoNaUrl(controlador.estado());
-    return {
-      valida: true,
-      partes,
-      vistaEscolhida: escolhida.vista,
-      pixels: escolhida.pixels,
-      /* 64 pixels no buffer de prova evita chamar um ponto residual de leitura
-         legível, sem exigir que a ferramenta altere a peça para passar. */
-      legivel: escolhida.menor >= 64,
-      candidatas: medidas.map(({ vista, pixels, menor, total }) => ({ vista, pixels, menor, total })),
-    };
-  }
-
   function enquadrarMontagem() {
-    ambiente.enquadrar(alvosDeEnquadramento({ raiz: convertido.raiz, alvo: 'montagem' }));
+    if (!modeloAtual) return;
+    ambiente.enquadrar(alvosDeEnquadramento({ raiz: modeloAtual.raiz, alvo: 'montagem' }));
   }
 
-  const selecao3d = criarSelecaoBancada({
-    canvas,
-    cameraAtual: () => ambiente.camera,
-    raiz: convertido.raiz,
-    nomeDoObjeto: controlador.nomeDoObjeto,
-    aoSelecionar(nome, opcoes) {
-      if (nome) controlador.selecionar(nome, opcoes);
-      else if (!opcoes.aditiva) controlador.limpar();
-    },
-    aoFocar(nome) {
-      controlador.selecionar(nome);
-      focarSelecao();
-    },
-  });
+  function aplicarModelo(convertido, { preservarCamera = false } = {}) {
+    if (modeloAtual) {
+      modeloAtual.raiz.removeFromParent();
+      limparMarcadoresDoPar();
+      if (controlador) controlador.destruir();
+      if (selecao3d) selecao3d.destruir();
+    }
 
+    modeloAtual = convertido;
+    nomePecaAtual = convertido.nome ?? 'sessao-ativa';
+    document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
+
+    posicionarNoEstudio(convertido.raiz);
+    ambiente.scene.add(convertido.raiz);
+
+    if (!preservarCamera) {
+      ambiente.definirObjeto(convertido.raiz);
+    }
+
+    if (estadoCatalogoVazio) {
+      estadoCatalogoVazio.hidden = true;
+    }
+
+    controlador = criarControladorPartes({
+      raiz: convertido.raiz,
+      partes: convertido.partes,
+      hierarquia: convertido.raiz.userData?.hierarquia,
+      aoMudar: refletirEstado,
+      aoEstabilizarExplosao(_estado, { enquadrar = true } = {}) {
+        if (enquadrar) ambiente.enquadrar(controlador.gruposVisiveis());
+      },
+    });
+
+    btnSelecionarConjunto.hidden = !controlador.temHierarquia();
+
+    // Renderiza lista de partes
+    lista.replaceChildren();
+    for (const nome of controlador.nomes) {
+      const grupo = convertido.partes.get(nome);
+      const pai = grupo?.userData?.paiSemantico;
+      const botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'parte-linha';
+      botao.dataset.parte = nome;
+      botao.setAttribute('aria-pressed', 'false');
+      botao.innerHTML = `
+        <span class="check" aria-hidden="true"></span>
+        <span class="nome">${formatarNome(nome)}${pai ? ` <small>de ${formatarNome(pai)}</small>` : ''}</span>
+        <span class="faces">${grupo?.userData?.faces?.length ?? 0}F</span>
+      `;
+      botao.addEventListener('click', () => controlador.selecionar(nome, { aditiva: true }));
+      lista.append(botao);
+    }
+    document.getElementById('contagemPartes').textContent = String(controlador.nomes.length);
+    if (filtroPartes) filtroPartes.value = '';
+    aplicarFiltroPartes();
+
+    // Diagnóstico semântico
+    const semParte = convertido.medida?.facesSemParte?.length ?? 0;
+    const estadoSemantica = document.getElementById('estadoSemantica');
+    const diagnostico = document.getElementById('diagnostico');
+    if (semParte) {
+      estadoSemantica.classList.remove('ok');
+      estadoSemantica.classList.add('erro-semantic');
+      estadoSemantica.querySelector('span').textContent = `${semParte} faces sem identidade`;
+      diagnostico.classList.remove('ok');
+      diagnostico.classList.add('alerta');
+      diagnostico.querySelector('p').textContent =
+        `${semParte} faces não pertencem a uma parte semântica.`;
+    } else {
+      estadoSemantica.classList.remove('erro-semantic');
+      estadoSemantica.classList.add('ok');
+      estadoSemantica.querySelector('span').textContent = 'Semântica íntegra';
+      diagnostico.classList.remove('alerta');
+      diagnostico.classList.add('ok');
+      diagnostico.querySelector('p').textContent =
+        `${convertido.medida?.partes?.size ?? controlador.nomes.length} componentes: nenhuma superfície sem identidade.`;
+    }
+
+    // Portas publicadas
+    const portas = convertido.medida?.portas ?? [];
+    const blocoPortas = document.getElementById('portasPublicadas');
+    if (blocoPortas) {
+      blocoPortas.hidden = portas.length === 0;
+      if (portas.length) {
+        document.getElementById('resumoPortas').textContent =
+          `${portas.length} ${portas.length === 1 ? 'publicada' : 'publicadas'}`;
+        const listaPortas = document.getElementById('listaPortas');
+        listaPortas.replaceChildren(...portas.map((porta) => {
+          const item = document.createElement('li');
+          const nome = document.createElement('b');
+          nome.textContent = porta.rotulo;
+          const origem = document.createElement('small');
+          origem.textContent = `${porta.id} · ${porta.origem}`;
+          item.append(nome, origem);
+          return item;
+        }));
+      }
+    }
+
+    // Seleção 3D por raycast
+    selecao3d = criarSelecaoBancada({
+      canvas,
+      cameraAtual: () => ambiente.camera,
+      raiz: convertido.raiz,
+      nomeDoObjeto: controlador.nomeDoObjeto,
+      aoSelecionar(nome, opcoes) {
+        if (nome) controlador.selecionar(nome, opcoes);
+        else if (!opcoes.aditiva) controlador.limpar();
+      },
+      aoFocar(nome) {
+        controlador.selecionar(nome);
+        focarSelecao();
+      },
+    });
+
+    refletirEstado(controlador.estado());
+  }
+
+  // Event listeners de navegação e atalhos
   for (const botao of document.querySelectorAll('[data-vista]')) {
     botao.addEventListener('click', () => ambiente.definirVista(botao.dataset.vista));
   }
@@ -372,20 +546,20 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   btnProjecao.addEventListener('click', () => {
     ambiente.definirProjecao(ambiente.projecao === 'ortografica' ? 'perspectiva' : 'ortografica');
     refletirProjecao();
-    salvarEstadoNaUrl(controlador.estado());
+    if (controlador) salvarEstadoNaUrl(controlador.estado());
   });
 
   document.getElementById('btnEnquadrar').addEventListener('click', enquadrarMontagem);
   document.getElementById('btnFocarSelecao').addEventListener('click', focarSelecao);
-  btnSelecionarConjunto.addEventListener('click', () => controlador.selecionarSubarvores());
-  document.getElementById('btnLimpar').addEventListener('click', () => controlador.limpar());
+  btnSelecionarConjunto.addEventListener('click', () => controlador?.selecionarSubarvores());
+  document.getElementById('btnLimpar').addEventListener('click', () => controlador?.limpar());
   for (const [modo, botao] of Object.entries(botoesModo)) {
-    botao.addEventListener('click', () => controlador.definirModo(modo));
+    botao.addEventListener('click', () => controlador?.definirModo(modo));
   }
-  explosao.addEventListener('input', () => controlador.definirExplosao(Number(explosao.value) / 100));
+  explosao.addEventListener('input', () => controlador?.definirExplosao(Number(explosao.value) / 100));
 
   document.getElementById('btnCopiarEstado').addEventListener('click', async () => {
-    salvarEstadoNaUrl(controlador.estado());
+    if (controlador) salvarEstadoNaUrl(controlador.estado());
     try {
       await navigator.clipboard.writeText(location.href);
       mostrarAviso('Vista copiada. Outra pessoa ou IA abrirá exatamente o mesmo estado.');
@@ -411,86 +585,192 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     } else if (evento.code === 'KeyF') {
       evento.preventDefault();
       enquadrarMontagem();
-    } else if (evento.code === 'KeyI' && controlador.selecionadas.length) {
+    } else if (evento.code === 'KeyI' && controlador?.selecionadas.length) {
       evento.preventDefault();
       controlador.definirModo('isolar');
-    } else if (evento.code === 'KeyG' && controlador.selecionadas.length) {
+    } else if (evento.code === 'KeyG' && controlador?.selecionadas.length) {
       evento.preventDefault();
       controlador.definirModo('contexto');
     } else if (evento.key === 'Escape') {
-      controlador.limpar();
+      controlador?.limpar();
     }
   }
   addEventListener('keydown', atalhoVista);
 
-  const inicial = lerEstadoDaUrl(params, controlador.nomes);
-  const selecaoIgnorada = (params.get('selecionadas') ?? '')
-    .split(',')
-    .filter((nome) => nome && !inicial.selecionadas.includes(nome));
-  controlador.selecionarMuitas(inicial.selecionadas);
-  controlador.definirModo(inicial.modo);
-  controlador.definirExplosao(inicial.explosao, { enquadrar: false });
+  // Inicializa o Sincronizador de Sessão Ativa
+  const statusEl = document.getElementById('statusSessao');
+  const textoStatusEl = document.getElementById('textoStatusSessao');
+  const pontoStatusEl = statusEl?.querySelector('.ponto-status');
+
+  function atualizarStatusUI(status) {
+    if (!pontoStatusEl || !textoStatusEl) return;
+    pontoStatusEl.className = `ponto-status ${status}`;
+    const rotulos = {
+      desconectado: 'Sessão Local',
+      conectado: 'IA Conectada',
+      sincronizando: 'Sincronizando…',
+      erro: 'Erro de Sincronia',
+    };
+    textoStatusEl.textContent = rotulos[status] ?? status;
+  }
+
+  sincronizador = criarSincronizadorSessao({
+    aoMudarStatus: atualizarStatusUI,
+    aoAtualizar(estado, novoModelo, { fonte }) {
+      if (novoModelo) {
+        /* Preservar a câmera existe para não arrancar o enquadramento de quem
+           está editando ao vivo. Na PRIMEIRA entrega da sessão não há câmera a
+           preservar: o enquadramento em vigor foi calculado com a cena vazia, e
+           mantê-lo deixava a peça cortada e minúscula na revisão headless. */
+        aplicarModelo(novoModelo, { preservarCamera: fonte !== 'manual' && modeloAtual !== null });
+      }
+      painelReferencias.renderizar({
+        intencaoIA: estado.intencaoIA,
+        referencias: estado.referencias,
+      });
+      gerenciadorReferencias3D.sincronizarComSessao(estado.referencias);
+      painelParametros.renderizar({
+        receita: novoModelo?.receita ?? estado.receita,
+        parametros: estado.parametros,
+      });
+      gerenciadorAnotacoes3D.sincronizarAnotacoes(estado.anotacoes);
+      renderizarListaAnotacoes(estado.anotacoes);
+    },
+    aoErro(erro) {
+      console.error('Erro na sessão ativa:', erro);
+      mostrarAviso(`Erro na sincronização: ${erro.message}`);
+    },
+  });
+
+  // Listener para botão de demonstração
+  const btnDemo = document.getElementById('btnCarregarExemplo');
+  btnDemo?.addEventListener('click', () => {
+    sincronizador.definirPayload({
+      alvo: { nome: DEMO_RECEITA.meta.nome },
+      receita: DEMO_RECEITA,
+      referencias: {
+        pranchas: [
+          {
+            id: 'corte-plano-xy',
+            rotulo: 'Envelope Teórico do Eixo',
+            plano: 'XY',
+            offset: 0,
+            pontos: [[-1.2, -0.35], [1.2, -0.35], [1.2, 0.35], [-1.2, 0.35]],
+            cor: '#39c6ff',
+            grade: true,
+          },
+        ],
+        criterios: [
+          { id: 'crit-1', texto: 'Furo central Ø 0.56 com folga para rolamento', status: 'aprovado' },
+          { id: 'crit-2', texto: 'Espessura da coroa ≥ 0.35 mm', status: 'aprovado' },
+          { id: 'crit-3', texto: 'Ângulo cônico padrão 45°', status: 'pendente' },
+        ],
+      },
+      intencaoIA: {
+        titulo: 'Engrenagem Cônica de Demonstração',
+        resumo: 'Modelagem paramétrica baseada no padrão de acionamento mecânico.',
+        checklist: [
+          { id: 'c1', descricao: 'Gerar cilindro base da coroa', concluido: true },
+          { id: 'c2', descricao: 'Extrudar cubo central de engate', concluido: true },
+          { id: 'c3', descricao: 'Executar furo passante do eixo', concluido: true },
+          { id: 'c4', descricao: 'Publicar interface de acoplamento', concluido: true },
+        ],
+      },
+      parametros: {
+        raio_10: 1.2,
+        alt_10: 0.35,
+        raio_20: 0.7,
+        alt_20: 0.7,
+      },
+    });
+  });
+
+  // Se uma peça estática foi pedida na URL, carrega-a
+  if (pecaPedida && catalogo.length > 0) {
+    try {
+      const inicialConvertido = await carregarPeca(pecaPedida, { catalogo });
+      aplicarModelo(inicialConvertido, { preservarCamera: false });
+    } catch (erro) {
+      mostrarErro(erro);
+    }
+  } else {
+    // Sem peça estática: mostra a bancada pronta e inicia escuta da sessão
+    document.getElementById('fixtureAtual').textContent = 'Aguardando modelo…';
+    if (estadoCatalogoVazio) estadoCatalogoVazio.hidden = false;
+    sincronizador.iniciarPolling();
+  }
+
+  // Restaura estado inicial de câmera da URL
+  const inicial = lerEstadoDaUrl(params, controlador ? controlador.nomes : []);
   ambiente.definirProjecao(inicial.projecao);
   refletirProjecao();
   ambiente.definirVista(inicial.vista, { instantaneo: true });
   if (inicial.cameraLivre) ambiente.restaurarCameraLivre(inicial.cameraLivre);
   vistaAtual = ambiente.vista;
-  if (inicial.inspecao === 'par' && inicial.modo === 'isolar' && inicial.selecionadas.length === 2) {
-    marcarParInspecionado(inicial.selecionadas);
-  }
+
   inicializando = false;
-  refletirEstado(controlador.estado());
   atualizarBotoesVista();
   atualizarReferenciaMetrica();
 
-  if (selecaoIgnorada.length) {
-    mostrarAviso(
-      `Ignorei ${selecaoIgnorada.length} nome(s) que não existem nesta peça: ${selecaoIgnorada.join(', ')}.`,
-    );
-  }
-
+  // API unificada da Bancada para testes e automações
   window.__mecanificaBancada = {
     ready: true,
-    peca: nomePeca,
+    peca: () => nomePecaAtual,
     pecasDisponiveis: nomesDisponiveis,
-    selecaoIgnorada,
-    diagnosticos: convertido.diagnosticos,
-    estatisticas: convertido.estatisticas,
-    partes: controlador.nomes,
-    selecionar: (nomes) => controlador.selecionarMuitas(Array.isArray(nomes) ? nomes : [nomes]),
-    selecionarConjunto: (nomes) => controlador.selecionarSubarvores(
-      nomes === undefined ? undefined : (Array.isArray(nomes) ? nomes : [nomes]),
-    ),
-    modo: (modo) => controlador.definirModo(modo),
+    /* Leitura headless (olhar-bancada / renderizar_vistas).
+       São GETTERS, não valores fixos: a ponte é montada uma vez no fim da
+       inicialização, mas o modelo troca depois — a peça da sessão ativa chega
+       pelo polling do sincronizador, segundos após a página subir. Como
+       valores congelados, `estatisticas` era sempre null e a revisão visual
+       quebrava em TODA peça, de fixture a sessão. */
+    get nomePeca() { return nomePecaAtual; },
+    get carregado() { return modeloAtual !== null; },
+    get partes() {
+      if (!modeloAtual) return [];
+      return [...modeloAtual.partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    },
+    get estatisticas() { return modeloAtual?.estatisticas ?? null; },
+    get diagnosticos() {
+      if (!modeloAtual) return null;
+      return { facesSemParte: modeloAtual.medida?.facesSemParte ?? [] };
+    },
+    get selecaoIgnorada() {
+      if (!controlador) return [];
+      const pedidas = (params.get('selecionadas') ?? '').split(',').map((n) => n.trim()).filter(Boolean);
+      const conhecidas = new Set(controlador.nomes);
+      return pedidas.filter((nome) => !conhecidas.has(nome));
+    },
+    controlador: () => controlador,
+    ambiente: () => ambiente,
+    sincronizador: () => sincronizador,
+    selecionar: (nomes) => controlador?.selecionarMuitas(Array.isArray(nomes) ? nomes : [nomes]),
+    modo: (modo) => controlador?.definirModo(modo),
     vista: (vista) => ambiente.definirVista(vista),
     projecao: (projecao) => ambiente.definirProjecao(projecao),
-    explosao: (valor) => controlador.definirExplosao(valor),
+    explosao: (valor) => controlador?.definirExplosao(valor),
     focar: () => focarSelecao(),
-    inspecionarPar: (nomes) => inspecionarPar(nomes),
     enquadrar: () => enquadrarMontagem(),
-    enquadramento: () => ambiente.medirEnquadramento(
-      alvosDeEnquadramento({
-        raiz: convertido.raiz,
-        selecionados: controlador.gruposSelecionados(),
-        modo: controlador.modo,
-      }),
-    ),
+    /* Métrica de câmera consumida pela revisão headless: a bancada já sabe
+       medir a silhueta projetada; faltava publicar isso na ponte. */
+    enquadramento: () => ambiente.medirEnquadramento(),
+    carregarPayloadSessao: (payload) => sincronizador.definirPayload(payload),
     estado: () => ({
-      peca: nomePeca,
-      ...controlador.estado(),
+      peca: nomePecaAtual,
+      ...(controlador ? controlador.estado() : {}),
       vista: vistaAtual,
       projecao: ambiente.projecao,
       cameraLivre: ambiente.cameraLivre(),
-      inspecao: parInspecionado ? 'par' : null,
     }),
-    marcadoresDePar: () => marcadoresDoPar.length,
     url: () => location.href,
   };
 
   addEventListener('pagehide', () => {
     removeEventListener('keydown', atalhoVista);
-    selecao3d.destruir();
-    controlador.destruir();
+    sincronizador.destruir();
+    if (selecao3d) selecao3d.destruir();
+    if (controlador) controlador.destruir();
+    gerenciadorReferencias3D.destruir();
+    gerenciadorAnotacoes3D.destruir();
     limparMarcadoresDoPar();
     ambiente.destruir();
     cancelAnimationFrame(quadroReferencia);

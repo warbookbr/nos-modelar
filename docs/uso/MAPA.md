@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-676 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+726 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -41,6 +41,10 @@
 ## .claude/skills/desenhar-prancha/
 
 - `SKILL.md` — Desenhar uma prancha ortográfica alvo da Mecanifica com o motor de prancha — silhueta, aberturas, painéis e cotas em vistas lateral, frontal, traseira e supe…
+
+## .claude/skills/modelar-maquina/
+
+- `SKILL.md` — Conceber, planejar e modelar uma máquina ou equipamento 3D procedural da Mecanifica a partir de briefing ou conceito visual, decompondo em módulos estruturai…
 
 ## autoria-assistida/experimentos/ab-fluxo-ia-dobradica/
 
@@ -383,6 +387,7 @@
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
+- `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
@@ -394,6 +399,7 @@
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
+- `GOTCHAS-MODELAGEM-PROCEDURAL.md` — Gotchas de modelagem procedural
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
@@ -420,6 +426,7 @@
 - `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
 - `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
 - `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
+- `RELATORIO-EXPORTACAO-CAD-STEP-R00.md` — Relatório R00 — exportação CAD/STEP
 - `RELATORIO-MODELADOR-INVERSO-P0.md` — Relatório P0 — confiança antes de geometria
 - `RELATORIO-MOTOR-DE-PRANCHA-R0.md` — Motor de Prancha — R0: linha de base e corpus adversarial
 - `RELATORIO-MOTOR-DE-PRANCHA-R1.md` — Motor de Prancha — R1: comparação externa controlada
@@ -504,6 +511,7 @@
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
+- `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -568,16 +576,64 @@
 - `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
 - `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.
 
+## modulos/exportador-cad/src/
+
+- `contrato.js` — contrato.js — contrato e validação de opções do exportador CAD.
+- `index.js` — index.js — porta pública do módulo exportador CAD.
+- `separar-corpos.js` — separar-corpos.js — separação determinística de componentes conexos por parte.
+- `triangular-faces.js` — triangular-faces.js — decomposição determinística de faces poligonais em triângulos.
+- `validar-malha.js` — validar-malha.js — validação pura de integridade e topologia da malha neutra.
+
+## modulos/exportador-cad/src/backends/
+
+- `step-facetado.js` — step-facetado.js — backend de exportação STEP facetado via OCCT WASM.
+
+## modulos/exportador-cad/tests/
+
+- `exportador-cad.test.js` — exportador-cad.test.js — suíte de testes do exportador CAD cobrindo R01, R02 e R04.
+
+## modulos/exportador-obj/src/
+
+- `contrato.js` — contrato.js — tipos, erros e validação de opções do exportador Wavefront OBJ.
+- `gerar-obj.js` — gerar-obj.js — serializador Wavefront OBJ (.obj) puro e determinístico com suporte a multipartes.
+- `index.js` — index.js — porta pública do módulo exportador Wavefront OBJ.
+- `validar-malha.js` — validar-malha.js — validação e normalização de malha neutra para exportação OBJ.
+
+## modulos/exportador-obj/tests/
+
+- `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
+
 ## prototipos/procedural/v3/
 
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
+
+## prototipos/procedural/v3/armas/machado-de-sucata/
+
+- `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica: cutelo reforçado com lâmina de sucata pesada e cabo revestido.
 
 ## prototipos/procedural/v3/extensoes/prisma-triangular/
 
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
 - `implementacao.js` — implementacao.js — recebe somente emissor transacional e resolução numérica.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão neutra de prova.
+
+## prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/
+
+- `cinematico.js` — cinematico.js — conjunto cinematico da prensa mecanica: motor eletrico, volante com protecao amarela, eixo excentrico, biela forjada e martelo deslizante com…
+- `estrutura.js` — estrutura.js — chassi estatico da prensa mecanica industrial: base fundida, mesa bolster, 4 colunas guia e cabecote superior com mancais.
+- `ferramentas.js` — ferramentas.js — estampo progressivo industrial de 4 estagios: base inferior, 4 colunas de guia com buchas, matriz inferior, guias de tira e puncoes superiores.
+- `montagem.js` — montagem.js — montagem integrada da prensa mecanica industrial realista de 4 colunas com estampo progressivo.
+
+## prototipos/procedural/v3/maquinas/prensa-progressiva/
+
+- `README.md` — Prensa Mecânica com Estampo Progressivo
+- `cinematico.js` — cinematico.js — acionamento da prensa: excêntrico, volante de inércia, biela e martelo deslizante.
+- `estrutura.js` — estrutura.js — chassi estático da prensa mecânica: mesa, colunas guia e cabeçote superior.
+- `ferramentas.js` — ferramentas.js — estampo progressivo: porta-matriz, estações de punção e placa extratora.
+- `index.js` — index.js — ponto de entrada do módulo de prensa progressiva.
+- `montagem.js` — montagem.js — montagem integrada da prensa mecânica com estampo progressivo.
+- `prensa.test.js` — prensa.test.js — suíte de testes da prensa progressiva procedural.
 
 ## prototipos/procedural/v3/motor/
 
@@ -610,6 +666,12 @@
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+
+## prototipos/procedural/v3/pecas/
+
+- `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
+- `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
+- `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
 
 ## prototipos/procedural/v3/servicos/
 
@@ -663,7 +725,27 @@
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
 - `entrada.js` — entrada.js — única entrada publicada da bancada; a aplicação não escolhe peça padrão e usa o catálogo homologado explícito, que hoje está vazio. /
 - `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
-- `main.js` — main.js — composição da bancada: fixture procedural, estúdio, inspeção e estado reproduzível.
+- `main.js` — main.js — bancada interativa de co-modelagem (Humano + IA): 3D, referências, parâmetros e feedback.
+
+## src/bancada/anotacoes/
+
+- `pinos-anotacoes.js` — pinos-anotacoes.js — marcadores 3D interativos sobre a malha e lista de notas para feedback com a IA.
+
+## src/bancada/parametros/
+
+- `painel-parametros.js` — painel-parametros.js — gera sliders e campos numéricos interativos para ajuste fino pelo humano.
+
+## src/bancada/referencias/
+
+- `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
+- `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
+
+## src/bancada/sessao/
+
+- `carregar-sessao.js` — carregar-sessao.js — processa o payload de uma sessão ativa (peça ou montagem) para a cena Three.js.
+- `estado-sessao.js` — estado-sessao.js — modelo canônico do estado de trabalho compartilhado entre IA e operador.
+- `sessao.test.js` — sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real.
+- `sincronizador.js` — sincronizador.js — gerenciador de sincronização em tempo real para a Sessão Ativa.
 
 ## tools/
 
@@ -739,6 +821,8 @@
 
 ## tools/mcp/perfis/
 
+- `autoria-execucao.mjs` — autoria-execucao.mjs — ferramentas MCP para ativacao em tempo real na bancada e exportacao CAD/STEP.
+- `autoria-execucao.test.mjs` — autoria-execucao.test.mjs — testes unitarios para ferramentas MCP ativar_bancada e exportar_step.
 - `autoria-montagens.mjs` — autoria-montagens.mjs — porta MCP opt-in, fina sobre a autoria interna.
 - `autoria-montagens.test.mjs` — Provas R04: MCP de autoria só atua com escopo do host e sem paths públicos.
 - `autoria-receitas.mjs` — autoria-receitas.mjs — porta MCP fina para receitas declarativas.
@@ -758,6 +842,7 @@
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …
 - `argumentos.test.ts` — Contratos mínimos do parser compartilhado e recusas pré-navegador.
+- `ativar-bancada.mjs` — ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D.
 - `auditar-intersecoes-montagem.test.ts` — @ts-expect-error — serviço neutro JavaScript exercitado pelo contrato público.
 - `autoria-ativa.mjs` — autoria-ativa.mjs — provedores neutros para revisões imutáveis ativas.
 - `autoria-ativa.test.mjs` — autoria-ativa.test.mjs — continuidade autorizada e falha fechada.
@@ -788,8 +873,12 @@
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
+- `exportar-obj.mjs` — exportar-obj.mjs — CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj).
+- `exportar-obj.test.mjs` — exportar-obj.test.mjs — suíte de testes da CLI de exportação OBJ.
 - `exportar-peca.mjs` — exportar-peca.mjs — A-60: o núcleo roda AQUI e grava o resultado; o produto só lê.
 - `exportar-peca.test.ts` — Exportação: contrato do artefato e estado sem catálogo publicado.
+- `exportar-step.mjs` — exportar-step.mjs — CLI para exportação atômica e segura de receitas procedurais em formato STEP.
+- `exportar-step.test.mjs` — exportar-step.test.js — suíte de testes da CLI de exportação STEP e escrita segura.
 - `exportar.mjs` — exportar.mjs — a linha de comando do A-60.
 - `fluxo-autoria-n1-caixa-preta.test.mjs` — Prova caixa-preta N1.2: schemas, cobertura real e diagnóstico sem acesso oculto.
 - `fluxo-autoria-n1.test.ts` — Provas executáveis da N1.1: contratos, provedores, fluxo e falha segura.
@@ -802,6 +891,7 @@
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
+- `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
@@ -850,6 +940,11 @@
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
+
+## tools/mecanifica/fixtures/
+
+- `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
+- `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
 
 ## tools/modelagem/
 

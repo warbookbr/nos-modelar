@@ -13,6 +13,7 @@ import { lerArgumentos } from './argumentos.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { importarReceita } from './importar-receita.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -115,7 +116,7 @@ export async function descreverPecaReutilizavel({
   }
   if (modulo === null) {
     try {
-      modulo = await import(pathToFileURL(join(PECAS, `${peca}.js`)).href);
+      modulo = await importarReceita(join(PECAS, `${peca}.js`));
     } catch (erro) {
       return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
     }

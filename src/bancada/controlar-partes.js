@@ -118,9 +118,13 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       const grupo = partes.get(nome);
       const base = bases.get(nome);
       const direcao = direcoes[nome];
+      // Em montagens mecânicas assentes na bancada, a explosão expande radialmente
+      // no plano horizontal e eleva componentes superiores, impedindo que a base
+      // ou componentes inferiores atravessem a cota do piso.
+      const dy = Math.max(0, direcao[1]);
       grupo.position.set(
         base.x + direcao[0] * distanciaExplosao * explosao,
-        base.y + direcao[1] * distanciaExplosao * explosao,
+        base.y + dy * distanciaExplosao * explosao,
         base.z + direcao[2] * distanciaExplosao * explosao,
       );
     }
