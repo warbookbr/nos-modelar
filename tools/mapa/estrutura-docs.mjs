@@ -48,20 +48,15 @@ export const ALLOWLIST_G1 = new Map([
   ],
 ]);
 
-/* O teto do INDEX é uma CATRACA, não a meta. A meta é 200 linhas; ele está em
-   665, quase todo ocupado por narrativa de plano já encerrado. Baixar para 200
-   é a fatia F6 e exige mover conteúdo, não apertar um número.
-
-   Enquanto isso, a catraca vale por si: ela impede que a porta CRESÇA, que é
-   exatamente como ela chegou a 665 apontando para 158 documentos. Afrouxar o
-   número para o gate ficar verde seria fingir conformidade; deixar em 200 seria
-   manter o CI vermelho por uma dívida conhecida e datada. A catraca é a única
-   das três que diz a verdade e ainda segura alguma coisa.
-
-   Ao fechar a F6, este valor cai para 200 e o comentário sai junto. */
+/* Porta é porta: se cresce, vira o catálogo que a reorganização veio desfazer.
+   O INDEX já chegou a 665 linhas apontando para 158 documentos, e mais da
+   metade era crônica de plano encerrado — que hoje mora em
+   `planos/encerrados/README.md`. O teto entrou como catraca no tamanho de
+   então e caiu para a meta assim que o conteúdo saiu, em vez de o número ser
+   afrouxado para o gate ficar verde. */
 export const TETO_PORTAS = new Map([
   ['docs/mecanifica/usar/README.md', 60],
-  ['docs/mecanifica/INDEX.md', 665],
+  ['docs/mecanifica/INDEX.md', 200],
 ]);
 
 /* A raiz é parâmetro, não constante derivada da localização do script: sem isso

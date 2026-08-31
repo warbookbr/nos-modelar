@@ -153,6 +153,20 @@ function referenciasDocsDe(arquivo) {
   while ((m = PADRAO.exec(texto))) {
     if (todosDocsMd.includes(m[0])) refs.add(m[0]);
   }
+  /* Link relativo também liga um documento ao outro. Contar só o caminho
+     absoluto obrigaria todo doc a repetir `docs/mecanifica/...` no texto só
+     para o gate enxergar — e um índice que aponta os seus vizinhos com
+     `](./X.md)`, que é o normal, apareceria como se não apontasse ninguém. */
+  PADRAO_RELATIVO.lastIndex = 0;
+  while ((m = PADRAO_RELATIVO.exec(texto))) {
+    const alvo = m[1];
+    if (/^(https?:|mailto:)/.test(alvo)) continue;
+    const absoluto = alvo.startsWith('/')
+      ? path.join(REPO, alvo)
+      : path.resolve(path.dirname(path.join(REPO, arquivo)), alvo);
+    const relativo = path.relative(REPO, absoluto).split(path.sep).join('/');
+    if (todosDocsMd.includes(relativo)) refs.add(relativo);
+  }
   return refs;
 }
 

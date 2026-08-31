@@ -16,7 +16,7 @@ execução.
 | F3 | gates G1, G3, G4, G5 e G7 | concluída |
 | F4 | roteamento no `CLAUDE.md` e fusão dos gotchas | concluída |
 | F5 | decidir sobre a pasta `desenvolver/` | pendente |
-| F6 | encurtar o INDEX de 665 para 200 linhas | pendente, criada na F3 |
+| F6 | encurtar o INDEX de 665 para 200 linhas | concluída |
 
 ## F0 — retrato antes de mexer
 
@@ -209,6 +209,32 @@ semântica confundida com apoio físico, blockout tratado como final, coordenada
 sem cadeia de apoio, resolução escolhida sem olhar a silhueta, detalhe antes do
 envelope, e cor compensando forma. O checklist e a lista de entregáveis foram
 preservados inteiros. Nenhum registro de falha se perdeu.
+
+## F6 — a porta encurtada
+
+O `INDEX.md` foi de **665 para 200 linhas**, dentro da meta, sem nada apagado.
+
+| saiu | para onde | linhas |
+| --- | --- | --- |
+| crônica dos planos concluídos e cancelados | `planos/encerrados/README.md` | 308 |
+| inventário curado de documentos | `INVENTARIO.md` | 122 |
+| lista numerada de fontes de verdade | `INVENTARIO.md` | 46 |
+
+Corrigido de passagem um erro de conteúdo: a seção de pendências ainda dizia
+que o plano ativo era o modelador inverso, congelado desde 2026-08-26.
+
+### O G7 se pagou duas vezes na mesma fatia
+
+Mover a crônica levou junto 57 links relativos escritos a partir da pasta
+antiga. O gate acusou na hora. Sem ele, teriam entrado silenciosos — como os 26
+que já viviam na `main`.
+
+E a alcançabilidade acusou um documento órfão porque só seguia caminho
+absoluto: um índice que aponta os vizinhos por link relativo, que é o normal,
+aparecia como se não apontasse ninguém. A alcançabilidade passou a seguir link
+relativo também. A alternativa era repetir `docs/mecanifica/...` no texto só
+para o gate enxergar, o que seria dobrar o gate à documentação em vez do
+contrário.
 
 ## Decisões tomadas durante a execução
 
