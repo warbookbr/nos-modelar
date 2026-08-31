@@ -135,4 +135,4 @@ Ficam fora:
 
 A definição completa de autoria está em [`AUTORIA-IA.md`](AUTORIA-IA.md). O
 estado e a direção das montagens estão em
-[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md).

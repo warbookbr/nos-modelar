@@ -127,4 +127,4 @@ revalidação das relações e dos dependentes afetados. Essa capacidade ainda n
 está implementada.
 
 A definição ampla está em [`AUTORIA-IA.md`](AUTORIA-IA.md), e a direção das
-montagens em [`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md).
+montagens em [`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md).

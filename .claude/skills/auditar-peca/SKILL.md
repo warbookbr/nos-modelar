@@ -30,7 +30,12 @@ peça isolada e não inventa validade global de uma montagem.
    npm run bancada -- <peca> --vistas=isometrica,frontal,direita,superior
    ```
 
-   O catálogo homologado da bancada publicada pode estar vazio. Não use uma URL
+   O catálogo homologado da bancada publicada pode estar vazio — isso é
+   proposital, não defeito. Para carregar a peça sem publicá-la, use a sessão
+   ativa: o procedimento está em
+   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](../../../docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md).
+
+   Não use uma URL
    pública com `?peca=` para validar receita privada; use um pacote de modelagem,
    o harness autorizado ou o perfil MCP correspondente. Leia as imagens
    produzidas. Verifique enquadramento, escala, cortes,

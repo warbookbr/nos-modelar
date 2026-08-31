@@ -19,7 +19,7 @@ MCP é uma porta de acesso para agentes. Ele não é:
 
 As capacidades e invariantes da autoria são definidas em
 [`AUTORIA-IA.md`](../../AUTORIA-IA.md) e
-[`MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md). O programa MCP só
+[`MONTAGENS-SEMANTICAS.md`](../../usar/MONTAGENS-SEMANTICAS.md). O programa MCP só
 pode expor essas capacidades depois que elas existirem como serviços com
 contratos próprios.
 

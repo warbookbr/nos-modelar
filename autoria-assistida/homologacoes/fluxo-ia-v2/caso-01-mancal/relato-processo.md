@@ -39,7 +39,7 @@ Documentação oficial:
 - `docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`;
 - `docs/mecanifica/BANCADA-E-APRESENTACAO.md`;
 - `docs/mecanifica/FLUXO-MODELAGEM-IA.md`;
-- `docs/mecanifica/MONTAGENS-SEMANTICAS.md`, com leitura integral até a
+- `docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md`, com leitura integral até a
   abertura do Nível 2 e leitura dirigida dos Níveis 2 a 4.
 
 Arquivos do pacote e guias:

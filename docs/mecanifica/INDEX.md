@@ -51,8 +51,8 @@ plano. O que está encerrado vive em
 - `npm run ativar:bancada` carrega qualquer peça ou montagem na bancada e
   sincroniza a sessão em tempo real. O estado da sessão (`sessao-ativa.json` e
   `public/sessao-ativa.json`) é local e não versionado. O procedimento está em
-  [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](ATIVACAO-BANCADA-SESSAO-ATIVA.md)
-  (`docs/mecanifica/ATIVACAO-BANCADA-SESSAO-ATIVA.md`); hospedagem estática e
+  [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md)
+  (`docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md`); hospedagem estática e
   isolamento de rede, inclusive em servidor corporativo interno, em
   [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md)
   (`docs/mecanifica/ARQUITETURA-SESSAO-E-SEGURANCA.md`).
@@ -92,6 +92,7 @@ o núcleo nem define o modelo de autoria.
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
 | `autoria-assistida/` | pacotes e evidências de homologação de peças |
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
+| `docs/mecanifica/pecas/` | folha de referência por peça pronta ([índice](pecas/README.md)) |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
 
 Montagem persistida v1 possui contrato e resolvedor em `src/autoria/` e provas

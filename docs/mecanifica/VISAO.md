@@ -185,5 +185,5 @@ alterar a definição e descobrir com clareza quais montagens continuaram válid
 e quais precisam de correção.
 
 A definição detalhada está em [`AUTORIA-IA.md`](AUTORIA-IA.md),
-[`MONTAGENS-SEMANTICAS.md`](MONTAGENS-SEMANTICAS.md) e
+[`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md) e
 [`AGENT-FIRST.md`](AGENT-FIRST.md).

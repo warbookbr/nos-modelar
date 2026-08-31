@@ -300,22 +300,81 @@ com par arquivo→destino e motivo escrito** — exatamente o padrão que
 vazamento custa uma linha e uma justificativa que alguém vai ler depois, em vez
 de passar despercebido.
 
-## Lista de fronteira — decisão do usuário, não minha
+## Lista de fronteira — resolvida em 2026-08-31
 
-Estes documentos ficaram na raiz, ou seja, contam como desenvolvimento. Não os
-movi porque a classificação é discutível e a decisão é sua. Nada quebra se
-ficarem como estão; mover depois é `git mv` mais correção de links.
+O usuário decidiu seguir a recomendação. O resultado, e onde a recomendação
+mudou depois de eu abrir os arquivos:
 
-| documento | minha recomendação | por quê |
+| documento | decisão | nota |
 | --- | --- | --- |
-| `AUTORIA-IA.md` (667 linhas) | **dividir**, não mover | Descreve como a IA autora, o que é uso, mas também justifica decisões de projeto, o que é desenvolvimento. Do jeito que está, ir inteiro para `usar/` levaria material que quem usa não precisa. |
-| ~~`GOTCHAS-MODELAGEM-PROCEDURAL.md`~~ | **feito na F4** | Fundido em `usar/GOTCHAS-AUTORIA-VISUAL.md`. |
-| `PRANCHA-FREIO-DISCO.md`, `PRANCHA-RODA-DIANTEIRA.md` | mover para `usar/` | Parecem exemplo aplicado do contrato de prancha, e exemplo serve a quem usa. Não movi porque nenhuma skill os cita, então o G3 os acusaria de órfãos — a decisão real é se a skill deve citá-los. |
-| `MONTAGENS-SEMANTICAS.md` | mover para `usar/` | É contrato que `auditar-montagem` aplica. Mesma pendência de citação que os anteriores. |
-| `CONTRATO-ACEITE-VISUAL.md`, `CONTRATO-FORMA-GLOBAL-N2.md` | deixar na raiz | São contratos de experimento e de gate, não de tarefa de peça. Servem a quem desenvolve. |
-| `ATIVACAO-BANCADA-SESSAO-ATIVA.md` | mover para `usar/` | Procedimento operacional puro: como pôr a peça na bancada. Mesma pendência de citação. |
+| `MONTAGENS-SEMANTICAS.md` | **movido** para `usar/` | `auditar-montagem` passou a citá-lo como o contrato que aplica |
+| `ATIVACAO-BANCADA-SESSAO-ATIVA.md` | **movido** para `usar/` | `auditar-peca` passou a citá-lo onde fala do catálogo vazio |
+| `PRANCHA-FREIO-DISCO.md`, `PRANCHA-RODA-DIANTEIRA.md` | **movidas** para `pecas/` | ver abaixo: minha recomendação de deixar na raiz foi recusada, com razão |
+| `CONTRATO-ACEITE-VISUAL.md`, `CONTRATO-FORMA-GLOBAL-N2.md` | ficam na raiz | contratos de experimento e de gate, não de tarefa de peça |
+| `GOTCHAS-MODELAGEM-PROCEDURAL.md` | fundido na F4 | — |
+| `AUTORIA-IA.md` | **pendente** | dividir, não mover; proposta ainda não escrita |
 
-O padrão que aparece nos quatro "mover": todos dependem de uma skill passar a
-citá-los, senão o G3 os reprova como órfãos. Isso não é obstáculo do gate — é o
-gate perguntando se o documento tem dono. Se nenhuma skill precisa dele, ele
-provavelmente não é documento de uso.
+### Vizinhança encontrada, ainda não tratada
+
+Procurando irmãos das pranchas, apareceu um segundo grupo na raiz que também
+não é doutrina de desenvolvimento — é amarrado a um alvo ou a uma rodada de
+experimento: `ALVO-N6-CUPE-ESPORTIVO.md`, `CHASSI-P1-CONTRATO-DA-CAGE.md`,
+`CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` e `CONTRATO-FORMA-GLOBAL-N2.md`. E
+`CHASSI-P0-ALVO-E-LIMIARES.md`, que se declara **não vinculante** desde
+2026-08-24 e portanto já é histórico pelas próprias palavras.
+
+Não movi: é categoria diferente da folha por peça e mereceria decisão própria —
+`alvos/`, `historico/`, ou ficar. Dois deles são citados por evidência
+congelada, então teriam o mesmo tratamento de allowlist.
+
+### Correção: as pranchas não são exemplo
+
+Eu havia recomendado movê-las para `usar/` por supor que fossem exemplo
+aplicado do contrato de prancha. Abrindo os arquivos, não são: cada uma é a
+**folha de referência de uma peça que já existe** — `freio-disco.js` e
+`roda-dianteira.js` —, com convenção de eixos, o que cada parâmetro controla e
+onde cada parte fica.
+
+Isso as tira de `usar/` por dois motivos. `usar/` guarda regra que vale para
+qualquer tarefa, e essas valem só ao tocar naquelas duas peças. E o G3 exigiria
+citação por skill, mas skill é genérica: `criar-peca` não deve mandar ler a
+folha do freio dianteiro. Forçar a citação seria dobrar a skill ao gate.
+
+São uma terceira categoria — documentação por peça. Eu recomendei deixá-las na
+raiz por achar que duas não justificavam pasta nova.
+
+**O usuário recusou, e a recusa está certa.** A raiz é a área de
+desenvolvimento; folha de peça não é desenvolvimento, é manual de um artefato
+pronto. Deixar ali por economia de pasta é a mesma mistura que a reorganização
+inteira veio desfazer, só que menor. Criada `docs/mecanifica/pecas/`, com
+índice próprio e a regra de arquivo.
+
+A pasta não é coberta pelo G3, e isso é proposital: skill é genérica, e mandar
+`criar-peca` ler a folha do freio dianteiro seria dobrar a skill ao conteúdo. A
+folha é consultada quando aquela peça entra na tarefa.
+
+### A evidência congelada não foi reescrita
+
+`projetos/ciclo6/criticas.json` é registro de crítica gravado e cita a prancha
+pelo caminho de então. Corrigir o caminho ali seria reescrever evidência
+encerrada — a linha que esta reorganização se proibiu de cruzar, e a mesma que
+reprovou a pasta `desenvolver/` na F5.
+
+O registro ficou intacto e a exceção foi para a allowlist do `links.mjs`, com o
+motivo escrito, que é o mecanismo que o repositório já usava para referência
+histórica preservada.
+
+### O que o G1 achou durante a mudança
+
+`MONTAGENS-SEMANTICAS.md` tinha 220 linhas de contrato e um rabo de 17 linhas
+de "Questões abertas" — versionamento de instâncias, cinemática, alcance de
+revalidação, solver. Pensamento de desenvolvimento dentro de um contrato de
+uso, que é exatamente o vazamento que a separação existe para impedir.
+
+As questões foram para `planos/BACKLOG.md`, que é onde questão aberta mora, e o
+contrato ficou apontando para lá. O gate não foi contornado: ele achou uma
+mistura real.
+
+Três citações restantes foram para a allowlist com motivo. Uma delas está
+marcada como **pendente**: `MONTAGENS-SEMANTICAS` aponta o `AUTORIA-IA` para a
+definição ampla de autoria, e essa linha sai quando o `AUTORIA-IA` for dividido.

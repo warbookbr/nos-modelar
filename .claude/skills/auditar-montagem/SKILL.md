@@ -9,6 +9,12 @@ Use esta skill quando o alvo for uma árvore de composição. A unidade geométr
 editável continua sendo a peça; a montagem organiza peças e relações. Esta
 skill audita o estado existente e não transforma a montagem em receita de peça.
 
+O contrato que ela aplica é
+[`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md):
+distinção entre peça e montagem, composição recursiva, relações, propagação de
+alteração, invariantes e níveis de maturidade. Leia antes de julgar se uma
+montagem está certa — o que conta como erro está definido lá, não aqui.
+
 ## 1. Descobrir o conjunto
 
 Para uma montagem persistida, descreva a árvore com raízes explícitas:

@@ -3,7 +3,7 @@
 Este arquivo lista candidatos. Nenhum item é autorização de implementação.
 Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 [`AUTORIA-IA.md`](../AUTORIA-IA.md) e
-[`MONTAGENS-SEMANTICAS.md`](../MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
 | Candidato | Estado / próximo recorte |
 |---|---|
@@ -84,3 +84,26 @@ sessão em que a falta atrapalhou —, não a lembrança de que já estiveram na
 lista. Enquanto isso, `alinhar` e `loft` fechado permanecem descritos aqui como
 forma conhecida, para que ninguém precise redescobri-los do zero quando a
 evidência aparecer.
+
+## Questões abertas da montagem semântica
+
+Vieram de `usar/MONTAGENS-SEMANTICAS.md`, onde eram um rabo de pensamento de
+desenvolvimento dentro de um contrato de uso — o gate G1 acusou a mistura. A
+direção não decide antecipadamente:
+
+- como ampliar a montagem persistida v1 com relações, variantes e instâncias compartilhadas;
+- como versionar instâncias e relações;
+- quando uma alteração modifica a origem ou cria uma variante;
+- como representar movimento e cinemática;
+- até onde revalidar dependentes;
+- quando uma região interna deve virar peça separada;
+- se a representação por malha final e pose mundial aberta no plano de
+  [auditoria de interseções](encerrados/2026-08-18-auditoria-intersecoes-montagem.md)
+  será aprovada pelas provas adversariais e de escala;
+- se haverá solver e qual será seu alcance;
+- como agentes concorrentes reservam alvos.
+
+Resolvem-se por planos pequenos e provas, dentro das invariantes de
+[`../usar/MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
+[`../AUTORIA-IA.md`](../AUTORIA-IA.md).
+

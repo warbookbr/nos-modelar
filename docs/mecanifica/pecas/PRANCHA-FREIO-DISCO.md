@@ -206,7 +206,7 @@ alguma face perdeu identidade.
 `npm run descrever -- freio-disco` é a fonte atual das contagens: 8 partes,
 526 faces, 530 vértices, 0 faces sem identidade, 0 órfãos e 1 porta. As vistas
 ortogonais são regeneradas com o comando acima; os gates globais ficam em
-[`docs/mecanifica/INDEX.md`](INDEX.md), não nesta prancha.
+[`docs/mecanifica/INDEX.md`](../INDEX.md), não nesta prancha.
 
 As dificuldades encontradas ao modelar estão em
-[`docs/mecanifica/ATRITOS-AUTORIA.md`](ATRITOS-AUTORIA.md), rodada 1.
+[`docs/mecanifica/ATRITOS-AUTORIA.md`](../ATRITOS-AUTORIA.md), rodada 1.

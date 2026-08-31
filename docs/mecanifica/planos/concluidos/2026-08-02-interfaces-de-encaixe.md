@@ -13,7 +13,7 @@ O aro e o pneu têm envelopes que se sobrepõem corretamente, mas a régua só
 enxerga caixas. Ela não sabe distinguir essa cavidade válida de uma colisão e
 também não prova que a abertura do aro recebe o cubo. O cubo atual ainda não
 separa piloto de flange. As evidências são A-16, A-32 e o nível 0–2 de
-[`MONTAGENS-SEMANTICAS.md`](../../MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../../usar/MONTAGENS-SEMANTICAS.md).
 
 ## Resultado
 
