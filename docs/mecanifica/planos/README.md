@@ -8,6 +8,12 @@
 módulos de saída de malha. Rastreio em
 [`../MALHA-OTIMIZADA-PROGRESSO.md`](../MALHA-OTIMIZADA-PROGRESSO.md).
 
+**Incubação experimental isolada:** o [desenho do laboratório computacional
+para investigação por IA](../../superpowers/specs/2026-08-31-laboratorio-computacional-ia-design.md)
+está restrito à branch `experimento/laboratorio-ia`. Ele não altera a
+arquitetura vigente nem autoriza implementação na `main`; a Mecanifica é um
+instrumento opcional do laboratório.
+
 A [reorganização da documentação por uso](encerrados/2026-08-31-reorganizacao-por-uso.md)
 foi **concluída e aprovada** em 2026-08-31. Ela separou a documentação por quem
 a lê — [`usar/`](../usar/README.md) para quem usa o Mecanifica, a raiz de
