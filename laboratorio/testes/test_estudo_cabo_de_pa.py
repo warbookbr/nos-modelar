@@ -103,6 +103,56 @@ def test_a_recomendacao_aponta_MEDIR_e_nao_mexer_na_liga():
     assert "não transpõe" in r["proximaAcao"]["quemFaz"]
 
 
+def test_NAO_MEDIR_TEM_PRECO_em_milimetro_e_grama():
+    """A tradução mais direta de por que ensaiar vale a pena."""
+    caminhos = estudo.recomendar()["doisCaminhos"]
+    assert caminhos["medindo"]["diametro_mm"] < caminhos["sem_medir"]["diametro_mm"]
+    assert caminhos["medindo"]["massa_kg"] < caminhos["sem_medir"]["massa_kg"]
+    assert "10 mm" in caminhos["licao"]
+
+
+def test_o_REQUISITO_ESTRUTURAL_e_PORTA_e_nao_peso():
+    """Numa soma ponderada o papel-lignina venceu tendo a PIOR margem de todas:
+    conforto e preço compensaram o cabo quebrar. Quebrar não se negocia."""
+    c = estudo.comparar()
+    assert "papel-lignina" in c["eliminados"]
+    assert "porta, não peso" in c["porQueEliminar"]
+
+
+def test_a_PORTA_reprova_ATE_O_EUCALIPTO_nesta_carga():
+    """Confirma de novo que o caso de carga é uso abusivo, não cavar normal."""
+    assert "eucalipto" in estudo.comparar()["eliminados"]
+
+
+def test_o_CONTEXTO_DE_FORNECIMENTO_e_declarado_e_nao_cravado_no_material():
+    """Maturidade de fornecedor depende de quem pergunta; embutir isso no material
+    seria pôr a situação de uma pessoa dentro de um número que parece técnico."""
+    sem = estudo.CONTEXTOS_DE_FORNECIMENTO["sem-acesso-a-industria"]["fornecimento"]
+    com = estudo.CONTEXTOS_DE_FORNECIMENTO["com-acesso-a-industria"]["fornecimento"]
+    assert com["papel-lignina"] > sem["papel-lignina"]
+    assert com["aco-1020"] == sem["aco-1020"]
+
+
+def test_contexto_desconhecido_e_recusado():
+    import pytest
+
+    from laboratorio.erros import ErroLaboratorio
+
+    with pytest.raises(ErroLaboratorio) as erro:
+        estudo.comparar("qualquer-um")
+    assert erro.value.codigo == "contexto-desconhecido"
+
+
+def test_a_CONFORMIDADE_premia_quem_dispensa_norma_de_formaldeido():
+    """Regulamentação aqui é vantagem, não custo."""
+    assert estudo.CONFORMIDADE["papel-lignina"] > estudo.CONFORMIDADE["papel-fenolico"]
+
+
+def test_a_analise_de_fabricacao_se_declara_FORA_do_laboratorio():
+    """Análise não é estudo, e a diferença tem de estar visível."""
+    assert "NÃO SAIU DO LABORATÓRIO" in estudo.recomendar()["fabricacaoEfornecimento"]
+
+
 def test_a_recomendacao_RECUSA_a_variante_fenolica_por_saude():
     assert "formaldeído" in estudo.recomendar()["oQueNAOfazer"]
 

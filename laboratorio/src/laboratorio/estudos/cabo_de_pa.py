@@ -61,6 +61,43 @@ FONTE = "valor de manual de memória; NÃO conferido contra fonte primária"
 #: `ambiente`: origem do material e o que sobra dele no fim da vida.
 ESCALA_QUALITATIVA = "3 = bom, 2 = aceitável, 1 = problemático; ordinal, não métrico"
 
+#: MATURIDADE DE FORNECEDOR DEPENDE DE QUEM PERGUNTA, e por isso ela NÃO fica
+#: cravada no material. Lignina é abundante no Brasil — as fábricas de celulose
+#: produzem em escala enorme — mas quase toda ela é QUEIMADA dentro da própria
+#: fábrica para gerar energia, e não vendida como adesivo de prateleira. Para
+#: quem está de fora, isso é um gargalo sério; para quem está dentro da
+#: indústria, é uma conversa interna.
+#:
+#: Tratar isso como propriedade do material seria embutir a situação de uma
+#: pessoa dentro de um número que parece técnico. Fica como contexto, e o estudo
+#: mostra os dois lados.
+CONTEXTOS_DE_FORNECIMENTO = {
+    "sem-acesso-a-industria": {
+        "descricao": "comprador comum, dependente do que existe em catálogo",
+        "fornecimento": {
+            "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
+            "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 1,
+        },
+    },
+    "com-acesso-a-industria": {
+        "descricao": "quem negocia direto com produtor de celulose",
+        "fornecimento": {
+            "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
+            "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 3,
+        },
+    },
+}
+
+#: Custo de conformidade: quanto se paga para PODER vender o produto. Resina
+#: fenólica cai em norma de emissão de formaldeído (E1/E0 aqui, CARB e TSCA
+#: Title VI para exportar), o que significa ensaio recorrente, certificação e
+#: controle de exposição do trabalhador. Produto sem formaldeído pula esse
+#: capítulo inteiro — regulamentação, aqui, é vantagem e não custo.
+CONFORMIDADE = {
+    "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
+    "fibra-de-vidro": 2, "papel-fenolico": 1, "papel-lignina": 3,
+}
+
 MATERIAIS = {
     "eucalipto": {
         "modulo_pa": 12.0e9,
@@ -282,8 +319,29 @@ def medir(nome: str) -> dict[str, Any]:
     }
 
 
-def comparar() -> dict[str, Any]:
-    """Mede todos e monta a fronteira de trocas."""
+#: REQUISITO ELIMINATÓRIO, e a distinção que ele carrega é a lição mais cara
+#: deste piloto. Uma soma ponderada deixa qualquer critério COMPENSAR qualquer
+#: outro: rodando o ranking com pesos, o papel-lignina venceu nos dois cenários
+#: de fornecimento — sendo que ele tem a PIOR margem estrutural de todos, 0,37.
+#: Conforto, preço e ambiente compensaram o fato de o cabo quebrar.
+#:
+#: Isso não é preferência mal escolhida; é erro de forma. Quebrar não se troca
+#: por ser confortável. Requisito estrutural é PORTA, não peso: quem não passa
+#: sai da comparação, e só quem passa disputa nos critérios negociáveis.
+#:
+#: O valor é 1,0 porque a margem já é resistência dividida por tensão. Note que
+#: NÃO há coeficiente de segurança aqui — para uma ferramenta de verdade ele
+#: existiria, e seria decisão de quem projeta, não deste módulo.
+MARGEM_MINIMA_ELIMINATORIA = 1.0
+
+
+def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
+    """Mede todos e monta a fronteira de trocas, no contexto de fornecimento dado."""
+    if contexto not in CONTEXTOS_DE_FORNECIMENTO:
+        from ..erros import falhar
+        raise falhar("contrato", "contexto-desconhecido",
+                     f"contexto '{contexto}'; existem {sorted(CONTEXTOS_DE_FORNECIMENTO)}.",
+                     local="contexto")
     medidas = {nome: medir(nome) for nome in MATERIAIS}
     candidatas = tuple(
         Candidata(nome, {
@@ -291,6 +349,12 @@ def comparar() -> dict[str, Any]:
             "leveza": Grandeza(-m["massa_kg"], "kg", MASSA),
             "baratez": Grandeza(-m["custo"], "BRL", DINHEIRO),
             "amortecimento": Grandeza(-m["vibracaoRestante"], "1", ADIMENSIONAL),
+            "saude": Grandeza(MATERIAIS[nome]["irritacao"], "ordinal", ADIMENSIONAL),
+            "ambiente": Grandeza(MATERIAIS[nome]["ambiente"], "ordinal", ADIMENSIONAL),
+            "fornecimento": Grandeza(
+                CONTEXTOS_DE_FORNECIMENTO[contexto]["fornecimento"][nome],
+                "ordinal", ADIMENSIONAL),
+            "conformidade": Grandeza(CONFORMIDADE[nome], "ordinal", ADIMENSIONAL),
         })
         for nome, m in medidas.items()
     )
@@ -299,42 +363,68 @@ def comparar() -> dict[str, Any]:
         Criterio("leveza", "maximizar"),
         Criterio("baratez", "maximizar"),
         Criterio("amortecimento", "maximizar"),
+        Criterio("saude", "maximizar"),
+        Criterio("ambiente", "maximizar"),
+        Criterio("fornecimento", "maximizar"),
+        Criterio("conformidade", "maximizar"),
     )
-    return {"medidas": medidas, "trocas": fronteira(candidatas, criterios)}
+    eliminados = {
+        nome: (f"margem p05 {m['margemP05']:.2f} abaixo de "
+               f"{MARGEM_MINIMA_ELIMINATORIA:.2f}: o cabo quebra na carga suposta")
+        for nome, m in medidas.items() if m["margemP05"] < MARGEM_MINIMA_ELIMINATORIA
+    }
+    return {
+        "medidas": medidas,
+        "eliminados": eliminados,
+        "aprovadosNaPorta": sorted(set(medidas) - set(eliminados)),
+        "porQueEliminar": (
+            "requisito estrutural é porta, não peso: numa soma ponderada, conforto e "
+            "preço compensariam o cabo quebrar, e isso aconteceu de verdade nesta "
+            "comparação antes de a porta existir"
+        ),
+        "contexto": contexto,
+        "descricaoDoContexto": CONTEXTOS_DE_FORNECIMENTO[contexto]["descricao"],
+        "trocas": fronteira(candidatas, criterios),
+        # Dito na saída: os quatro últimos critérios são ordinais, e somar ou
+        # tirar média deles seria transformar julgamento em medida.
+        "criteriosOrdinais": ["saude", "ambiente", "fornecimento", "conformidade"],
+        "escala": ESCALA_QUALITATIVA,
+    }
 
 
 def recomendar() -> dict[str, Any]:
-    """O que fazer com o resultado — e por que a próxima ação não é de projeto.
+    """O que fazer com o resultado — e quanto custa NÃO medir.
 
-    O ACHADO QUE MANDA. A 40 mm, com a incerteza LARGA que declarei por não ter
-    fonte, a margem no percentil 5 é 0,65 e reprova. Com uma incerteza medida de
-    ±15% em torno da MESMA média, ela vai a 0,97 e quase passa. Mesmo material,
-    mesma geometria, mesma resistência média: a diferença é só o quanto eu sei.
+    O ACHADO QUE MANDA, e ele cabe numa frase: não medir custa 10 mm de diâmetro
+    e 290 g de peso.
 
-    Isso muda a recomendação de lugar. Não adianta mexer na liga enquanto a
-    incerteza dominante for a minha ignorância e não a variação do material.
-    Dez corpos de prova em ensaio de flexão de três pontos decidem mais que
-    qualquer conta que eu faça daqui — e é exatamente a barreira que o
-    laboratório não transpõe sozinho.
+    O papel-lignina passa na porta estrutural com 50 mm carregando a incerteza
+    LARGA que declarei por não ter fonte. Com a resistência medida — dez corpos
+    de prova, faixa de ±15% em torno da mesma média — ele passa com 40 mm e 1,00
+    kg. Mesmo material, mesma resistência média: a diferença é só informação.
+
+    É por isso que a próxima ação não é mexer na liga. Enquanto a incerteza
+    dominante for a minha ignorância, qualquer mudança de composição está sendo
+    julgada por uma régua que não existe.
     """
     return {
         "candidato": "papel-lignina",
         "porQueEle": (
             "ganha em tudo que foi pedido — mais barato que o eucalipto, dissipa 2,3 "
-            "vezes mais vibração, sem irritação e sem passivo ambiental — e perde só "
-            "em resistência"
+            "vezes mais vibração, sem irritação e sem passivo ambiental, e ainda pula "
+            "a norma de emissão de formaldeído — e perde só em resistência"
         ),
-        "ajusteDeProjeto": {
-            "diametroExterno_mm": 40,
-            "parede_mm": 6,
-            "efeito": "margem determinista de 0,64 para 1,13, com o amortecimento intacto",
-            "custo": "massa sobe de 0,63 kg para 1,00 kg; 40 mm é diâmetro comum de cabo de pá",
+        "doisCaminhos": {
+            "medindo": {"diametro_mm": 40, "massa_kg": 1.00,
+                        "exige": "ensaio de flexão em ao menos dez corpos de prova"},
+            "sem_medir": {"diametro_mm": 50, "massa_kg": 1.29,
+                          "exige": "nada, mas o cabo fica gordo e pesado à toa"},
+            "licao": "não medir custa 10 mm de diâmetro e 290 g",
         },
         "proximaAcao": {
             "o_que": "ensaio de flexão de três pontos em ao menos dez corpos de prova",
             "porQue": ("a incerteza que reprova o cabo é a minha, não a do material: "
-                       "estreitar a faixa de 45-130 MPa para ±15% leva o p05 de 0,65 para 0,97 "
-                       "sem mudar nada no material"),
+                       "estreitar a faixa de 45-130 MPa para ±15% vale 10 mm de diâmetro"),
             "quemFaz": "pessoa, em bancada física; o laboratório não transpõe isso",
         },
         "oQueMedirJunto": (
@@ -346,7 +436,15 @@ def recomendar() -> dict[str, Any]:
         ),
         "oQueNAOfazer": (
             "adotar a variante fenólica pelo desempenho: ela usa formaldeído, que é "
-            "irritante e cancerígeno reconhecido, e o critério de saúde foi explícito"
+            "irritante e cancerígeno reconhecido, o critério de saúde foi explícito, "
+            "e ela ainda traz o custo de conformidade que a lignina dispensa"
+        ),
+        "fabricacaoEfornecimento": (
+            "enrolamento espiral de papel impregnado é tecnologia madura e barata, "
+            "ordem de grandeza abaixo de pultrusão de fibra ou trefilação de tubo; "
+            "o gargalo é o ligante, porque lignina é abundante mas queimada dentro da "
+            "própria fábrica de celulose em vez de vendida como adesivo pronto. "
+            "ISTO NÃO SAIU DO LABORATÓRIO: é análise, não estudo, e não foi medido."
         ),
     }
 

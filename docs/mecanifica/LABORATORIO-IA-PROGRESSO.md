@@ -418,3 +418,54 @@ declarada, gerador próprio para não depender de versão de biblioteca, e
 convergência conferida em vez de assumida). A incerteza esperou dois adiamentos
 por falta de entrada dispersa real; madeira, que varia 20% ou 30% de tábua para
 tábua, finalmente deu o motivo.
+
+### Fabricação, fornecimento e conformidade — e o erro de método que eles revelaram
+
+O usuário acrescentou critérios que não são número: acessível, sem agredir o
+ambiente, sem risco de intoxicação. Entraram como escala **ordinal declarada** —
+3 melhor que 2, e a distância entre eles não significa nada. Fingir que significa
+seria transformar julgamento em medida.
+
+**Maturidade de fornecedor virou contexto, não propriedade do material.** Lignina
+é abundante no Brasil e quase toda queimada dentro da própria fábrica de celulose
+para gerar energia, em vez de vendida como adesivo de prateleira. Para quem está
+de fora isso é gargalo; para quem está dentro da indústria, é conversa interna. O
+usuário está dentro. Cravar isso no material poria a situação de uma pessoa
+dentro de um número que parece técnico, então o estudo roda nos dois cenários.
+
+**Conformidade entrou como vantagem, não custo.** Resina fenólica cai em norma de
+emissão de formaldeído — ensaio recorrente, certificação, controle de exposição.
+Sem formaldeído, pula-se o capítulo inteiro.
+
+#### O erro de método, que é a lição mais cara deste piloto
+
+Com oito critérios, **ninguém é dominado**: a fronteira devolveu os seis
+candidatos, nos dois cenários. É propriedade conhecida — mais critérios, mais
+fácil ser o melhor em algum — e significa que a fronteira sozinha parou de
+decidir.
+
+Restou o ranking com pesos. E aí apareceu o problema: **o papel-lignina venceu
+nos dois cenários tendo a PIOR margem estrutural de todas**, 0,37. Conforto,
+preço e ambiente compensaram o cabo quebrar.
+
+Isso não é peso mal escolhido, é erro de forma. Soma ponderada permite que
+qualquer critério compense qualquer outro, e **quebrar não se troca por ser
+confortável**. Requisito estrutural é PORTA, não peso: quem não passa sai da
+comparação, e só quem passa disputa nos critérios negociáveis. A porta entrou no
+estudo, e com ela a comparação volta a significar algo.
+
+#### O resultado final, numa frase
+
+**Não medir custa 10 mm de diâmetro e 290 g.**
+
+O papel-lignina passa na porta com 50 mm carregando a incerteza larga que declarei
+por não ter fonte. Com a resistência medida — dez corpos de prova, ±15% em torno
+da mesma média — passa com 40 mm e 1,00 kg. Mesmo material, mesma resistência
+média: a diferença é só informação.
+
+E a porta reprova até o eucalipto nesta carga, o que confirma pela terceira vez
+que o caso suposto é uso abusivo. A comparação segue válida porque todos sofrem a
+mesma carga.
+
+A análise de fabricação e fornecimento está registrada na recomendação **marcada
+como fora do laboratório**: é análise, não estudo, e não foi medida.
