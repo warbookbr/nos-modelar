@@ -70,7 +70,8 @@
     "ativar:bancada": "node tools/mecanifica/ativar-bancada.mjs",
     "malha:conferir": "node tools/mecanifica/conferir-malha.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
-    "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs"
+    "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs",
+    "gates": "npm run typecheck && npm run test && npm run mcp:check && npm run build && npm run arquitetura:check && npm run bancada:vazia:check && npm run porteiro && npm run exportar:check && npm run guarda:portas && npm run guarda:camera && npm run guarda:par && npm run mapa:check && npm run docs:toc:check && npm run docs:links:check && npm run planos:check && npm run docs:estrutura:check && npm run arquitetura:lab:check && npm run lab:test"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

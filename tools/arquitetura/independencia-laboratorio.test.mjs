@@ -1,3 +1,11 @@
+/* independencia-laboratorio.test.mjs — prova a guarda de fronteira do
+ * laboratório contra violações construídas de propósito.
+ *
+ * Guarda que nunca foi vista recusando é decoração: aqui cada caso monta uma
+ * árvore temporária com o import proibido e exige código de saída não-zero, e
+ * o caso permitido (laboratório citando as portas públicas da Mecanifica pelo
+ * adaptador) exige que ela deixe passar.
+ */
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

@@ -408,6 +408,63 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     }), { reproduzivel: true });
   }
 
+  /* inspecionarPar — RESTAURADA. Ela existia até `bb2e79a` e se perdeu na
+     reescrita da bancada do PR #58: os dois consumidores (`olhar-bancada` e
+     `guarda-inspecao-par`) continuaram chamando `window.__mecanificaBancada
+     .inspecionarPar`, que virou `undefined`, e o gate `guarda:par` passou a
+     falhar em toda execução. Ninguém viu porque o CI parou de rodar na mesma
+     semana.
+
+     Ela escolhe, entre as sete vistas canônicas, aquela em que a MENOR das duas
+     partes ocupa mais pixels realmente visíveis — a medida vem do depth buffer,
+     não da caixa envolvente, senão uma parte escondida atrás da outra contaria
+     como legível. */
+  function inspecionarPar(nomes) {
+    if (!controlador || !modeloAtual) {
+      return { valida: false, motivo: 'Nenhuma peça carregada na bancada.' };
+    }
+    const pedidos = Array.isArray(nomes) ? nomes : controlador.selecionadas;
+    const partes = [...new Set(pedidos)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    if (partes.length !== 2 || partes.some((nome) => !controlador.nomes.includes(nome))) {
+      return {
+        valida: false,
+        motivo: 'A inspeção de par exige exatamente duas partes semânticas existentes.',
+      };
+    }
+    controlador.selecionarMuitas(partes);
+    controlador.definirModo('isolar');
+    const grupos = controlador.gruposSelecionados();
+    const candidatas = ['frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior', 'isometrica'];
+    const medidas = candidatas.map((vista, ordem) => {
+      ambiente.definirVista(vista, { instantaneo: true });
+      ambiente.enquadrar(grupos, { instantaneo: true });
+      const pixels = ambiente.medirPixelsVisiveisPorParte(grupos);
+      return {
+        vista,
+        ordem,
+        pixels,
+        menor: Math.min(...pixels.map((item) => item.pixels)),
+        total: pixels.reduce((soma, item) => soma + item.pixels, 0),
+      };
+    });
+    medidas.sort((a, b) => b.menor - a.menor || b.total - a.total || a.ordem - b.ordem);
+    const escolhida = medidas[0];
+    ambiente.definirVista(escolhida.vista, { instantaneo: true });
+    ambiente.enquadrar(grupos, { instantaneo: true, reproduzivel: true });
+    marcarParInspecionado(partes);
+    salvarEstadoNaUrl(controlador.estado());
+    return {
+      valida: true,
+      partes,
+      vistaEscolhida: escolhida.vista,
+      pixels: escolhida.pixels,
+      /* 64 pixels no buffer de prova evita chamar um ponto residual de leitura
+         legível, sem exigir que a ferramenta altere a peça para passar. */
+      legivel: escolhida.menor >= 64,
+      candidatas: medidas.map(({ vista, pixels, menor, total }) => ({ vista, pixels, menor, total })),
+    };
+  }
+
   function enquadrarMontagem() {
     if (!modeloAtual) return;
     ambiente.enquadrar(alvosDeEnquadramento({ raiz: modeloAtual.raiz, alvo: 'montagem' }));
@@ -447,6 +504,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     });
 
     btnSelecionarConjunto.hidden = !controlador.temHierarquia();
+
+    /* SELEÇÃO DA URL, reaplicada aqui. `lerEstadoDaUrl` roda uma vez na subida
+       da página, quando o controlador ainda pode não existir — a peça da sessão
+       ativa chega segundos depois pelo polling — e ali `nomesDisponiveis` é uma
+       lista vazia, então toda seleção pedida na URL é descartada em silêncio.
+       O sintoma: recarregar um link de inspeção devolvia a montagem inteira,
+       sem seleção, sem isolamento e sem os contornos do par. É o que o gate
+       `guarda:par` cobra e é a mesma raiz do argumento `--selecionadas` que o
+       `olhar-bancada` precisava reaplicar pela ponte. */
+    const daUrl = lerEstadoDaUrl(params, controlador.nomes);
+    if (daUrl.selecionadas.length) {
+      controlador.selecionarMuitas(daUrl.selecionadas);
+      controlador.definirModo(daUrl.modo);
+      if (daUrl.inspecao === 'par' && daUrl.selecionadas.length === 2) {
+        marcarParInspecionado(daUrl.selecionadas);
+      }
+    }
 
     // Renderiza lista de partes
     lista.replaceChildren();
@@ -754,6 +828,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     projecao: (projecao) => ambiente.definirProjecao(projecao),
     explosao: (valor) => controlador?.definirExplosao(valor),
     focar: () => focarSelecao(),
+    inspecionarPar: (nomes) => inspecionarPar(nomes),
     enquadrar: () => enquadrarMontagem(),
     /* Métrica de câmera consumida pela revisão headless: a bancada já sabe
        medir a silhueta projetada; faltava publicar isso na ponte. */
@@ -784,7 +859,15 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       vista: vistaAtual,
       projecao: ambiente.projecao,
       cameraLivre: ambiente.cameraLivre(),
+      /* `inspecao` também sumiu no PR #58. Sem ela, recarregar um link de par
+         devolvia um estado que PARECIA certo — seleção e modo corretos — sem
+         dizer que aquilo é uma inspeção de par, que é o que o consumidor usa
+         para saber se a marca na tela corresponde ao que a URL prometeu. */
+      inspecao: parInspecionado ? 'par' : null,
     }),
+    /* Também perdida no PR #58, e é o que o gate usa para provar que a
+       inspeção deixou marca visível em vez de só devolver números. */
+    marcadoresDePar: () => marcadoresDoPar.length,
     url: () => location.href,
   };
 
