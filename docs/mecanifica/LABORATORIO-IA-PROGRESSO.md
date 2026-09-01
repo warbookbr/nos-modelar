@@ -507,3 +507,40 @@ O dossiê `DOSSIE-CABO-DE-PA.md` reúne resultado, limites, bibliografia e o que
 precisa ser medido, num formato para mostrar a outras pessoas. Ele abre dizendo
 o que é e o que não é, e a seção de literatura repete que **os artigos não foram
 lidos**.
+
+### A barreira não era intransponível — e a fonte real derrubou duas conclusões minhas
+
+Eu tinha declarado que não dava para trocar meus números de memória por números com
+fonte: Crossref dá metadado, Europe PMC é biomédico, a busca por resumo devolve
+artigos vizinhos. O usuário desconfiou da desistência, e estava certo.
+
+O que eu não tinha tentado: **repositório de governo**. O *Wood Handbook — Wood as
+an Engineering Material* (FPL-GTR-190, USDA Forest Service) é a referência canônica
+de propriedade mecânica de madeira, tem 509 páginas, é **domínio público** e está
+aberto. Baixado e lido aqui, Tabela 5-5a.
+
+**Os números reais, a 12% de umidade:** jarrah (*Eucalyptus marginata*) 111,7 MPa e
+13,0 GPa; karri (*E. diversicolor*) 139,0 MPa e 17,9 GPa. Eu vinha usando 75 MPa —
+que é aproximadamente o valor da madeira **verde**. Cabo de pá é madeira **seca**.
+
+Duas conclusões deste laboratório caíram junto:
+
+- **"o caso de carga é abusivo" estava errado.** Eu havia concluído isso porque a
+  carga reprovava até o eucalipto, e registrei como achado sobre a hipótese de
+  carga. Não era: a carga estava certa e minha propriedade é que estava errada. Com
+  o valor correto o eucalipto passa na porta com margem 1,01;
+- **a barra subiu 50%.** O concorrente do candidato não é 75 MPa, é 111,7.
+
+Quatro testes falharam na atualização, e todos afirmavam coisas que a fonte
+desmentiu. Cada um foi reescrito para a verdade nova, com o erro anterior citado no
+próprio teste — inclusive o preço de não medir, que eu tinha anunciado como 10 mm e
+290 g e virou 5 mm e 140 g quando a porta estrutural passou a valer estritamente.
+
+E apareceu a troca honesta, que só existe agora que o benchmark é real: o cabo de
+lignina precisa de 1,29 kg contra 0,77 kg do eucalipto — **68% mais pesado para
+dissipar 126% mais vibração**. Quem segura a ferramenta o dia todo é quem decide se
+o câmbio vale, e isso não é decisão de quem calcula.
+
+**A assimetria de fontes fica declarada no dossiê:** só o eucalipto tem fonte
+primária; o candidato recomendado segue com números de memória. O benchmark é
+sólido, o candidato é o que precisa ser medido.

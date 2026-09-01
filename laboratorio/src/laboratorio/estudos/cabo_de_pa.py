@@ -51,6 +51,22 @@ CICLOS_ENTRE_PANCADAS = 10
 #: substituir por dado com fonte — que é a primeira coisa a fazer antes de usar.
 FONTE = "valor de manual de memória; NÃO conferido contra fonte primária"
 
+#: FONTE PRIMÁRIA DE VERDADE, e a única deste estudo. O Wood Handbook do Forest
+#: Products Laboratory (USDA Forest Service, FPL-GTR-190) é domínio público e é a
+#: referência canônica de propriedade mecânica de madeira. Baixado e lido neste
+#: ambiente, Tabela 5-5a, páginas 5-19 e 5-23 do documento.
+#:
+#: E A CORREÇÃO QUE ELE IMPÔS: eu tinha usado 75 MPa para o eucalipto, que é
+#: aproximadamente o valor da madeira VERDE. Cabo de pá é madeira SECA, e a 12% de
+#: umidade o jarrah dá 111,7 MPa e o karri 139 MPa. Eu havia SUBESTIMADO o
+#: concorrente em cerca de 50%, o que tornava o candidato melhor do que ele é.
+FONTE_MADEIRA = (
+    "Wood Handbook — Wood as an Engineering Material, FPL-GTR-190, "
+    "USDA Forest Service, Forest Products Laboratory, 2010; Tabela 5-5a "
+    "(Jarrah, Eucalyptus marginata, e Karri, Eucalyptus diversicolor, a 12% de umidade). "
+    "Domínio público, consultado diretamente."
+)
+
 #: Critérios que NÃO são número e mesmo assim decidem. Eles entram como escala
 #: ordinal declarada, e não como nota inventada: 3 é melhor que 2, e a distância
 #: entre eles não significa nada. Fingir que significa seria transformar
@@ -99,11 +115,19 @@ CONFORMIDADE = {
 }
 
 MATERIAIS = {
+    # ÚNICO material deste estudo com fonte primária: ver FONTE_MADEIRA.
+    # Jarrah a 12% de umidade é o mais conservador dos dois eucaliptos tabelados,
+    # e por isso é o escolhido como referência: comparar o candidato contra o
+    # concorrente mais fraco da família é o teste mais duro para o candidato.
+    # O fator de perda vem do mesmo manual, capítulo 5: o decremento logarítmico
+    # da madeira vai de 0,02 (seca) a 0,1 (úmida), e o fator de perda é esse
+    # valor dividido por pi — de 0,006 a 0,032.
     "eucalipto": {
-        "modulo_pa": 12.0e9,
+        "modulo_pa": 13.0e9,
         "densidade_kg_m3": 800.0,
-        "resistencia_pa": 75.0e6,
+        "resistencia_pa": 111.7e6,
         "fator_de_perda": 0.010,
+        "fonte": "FPL-GTR-190",
         "preco_por_kg": 4.0,
         # A dispersão é a razão de este estudo existir: duas tábuas do mesmo
         # eucalipto diferem muito, e comparar a média da madeira com um número
@@ -111,7 +135,9 @@ MATERIAIS = {
         "irritacao": 3,
         "ambiente": 3,
         "justificativaQualitativa": "madeira de reflorestamento; pó de lixamento incomoda, e nada mais",
-        "dispersao": {"modulo_pa": (8.0e9, 16.0e9), "resistencia_pa": (55e6, 95e6)},
+        # Faixa agora ANCORADA em dado tabelado, e não em palpite: de jarrah
+        # (13,0 GPa / 111,7 MPa) a karri (17,9 GPa / 139,0 MPa), ambos a 12%.
+        "dispersao": {"modulo_pa": (13.0e9, 17.9e9), "resistencia_pa": (111.7e6, 139.0e6)},
     },
     "aco-1020": {
         "modulo_pa": 205.0e9,
@@ -393,38 +419,52 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
 
 
 def recomendar() -> dict[str, Any]:
-    """O que fazer com o resultado — e quanto custa NÃO medir.
+    """O que fazer, depois que a fonte primária derrubou duas conclusões minhas.
 
-    O ACHADO QUE MANDA, e ele cabe numa frase: não medir custa 10 mm de diâmetro
-    e 290 g de peso.
+    O QUE MUDOU. O Wood Handbook (FPL-GTR-190, domínio público) foi lido neste
+    ambiente e deu o eucalipto seco a 12% de umidade: 111,7 MPa, não os 75 MPa que
+    eu vinha usando — 75 é aproximadamente o valor da madeira VERDE, e cabo de pá
+    é madeira seca. Duas conclusões caíram junto:
 
-    O papel-lignina passa na porta estrutural com 50 mm carregando a incerteza
-    LARGA que declarei por não ter fonte. Com a resistência medida — dez corpos
-    de prova, faixa de ±15% em torno da mesma média — ele passa com 40 mm e 1,00
-    kg. Mesmo material, mesma resistência média: a diferença é só informação.
+      - o eucalipto PASSA na porta estrutural (margem p05 1,01). O "achado" de que
+        a carga suposta era abusiva estava errado: a carga estava certa, minha
+        propriedade é que estava errada;
+      - a barra para o candidato subiu 50%.
 
-    É por isso que a próxima ação não é mexer na liga. Enquanto a incerteza
-    dominante for a minha ignorância, qualquer mudança de composição está sendo
-    julgada por uma régua que não existe.
+    O QUE SOBROU DE PÉ, e agora contra um concorrente medido de verdade: o
+    papel-lignina continua ganhando em custo, em amortecimento, em saúde e em
+    ambiente. Ele precisa de 50 mm para passar carregando minha incerteza, e de
+    45 mm se a resistência for medida.
+
+    A TROCA HONESTA, dita em número: 1,29 kg contra 0,77 kg do eucalipto. O cabo é
+    68% mais pesado para dissipar 126% mais vibração. Quem segura a ferramenta o
+    dia todo é quem decide se esse câmbio vale, e isso não é decisão de quem
+    calcula.
     """
     return {
         "candidato": "papel-lignina",
         "porQueEle": (
-            "ganha em tudo que foi pedido — mais barato que o eucalipto, dissipa 2,3 "
-            "vezes mais vibração, sem irritação e sem passivo ambiental, e ainda pula "
-            "a norma de emissão de formaldeído — e perde só em resistência"
+            "ganha em custo, em amortecimento, em saúde e em ambiente, e ainda "
+            "dispensa a norma de emissão de formaldeído — e perde em resistência e "
+            "em peso, agora contra um eucalipto com fonte primária"
         ),
+        "aTrocaEmNumero": {
+            "massa_kg": {"eucalipto": 0.77, "papel-lignina": 1.29},
+            "dissipacao": {"eucalipto": "27%", "papel-lignina": "61%"},
+            "resumo": "68% mais pesado para dissipar 126% mais vibração",
+            "quemDecide": "quem segura a ferramenta o dia todo, não quem calcula",
+        },
         "doisCaminhos": {
-            "medindo": {"diametro_mm": 40, "massa_kg": 1.00,
+            "medindo": {"diametro_mm": 45, "massa_kg": 1.15,
                         "exige": "ensaio de flexão em ao menos dez corpos de prova"},
             "sem_medir": {"diametro_mm": 50, "massa_kg": 1.29,
-                          "exige": "nada, mas o cabo fica gordo e pesado à toa"},
-            "licao": "não medir custa 10 mm de diâmetro e 290 g",
+                          "exige": "nada, mas o cabo carrega minha ignorância em peso"},
+            "licao": "não medir custa 5 mm de diâmetro e 140 g",
         },
         "proximaAcao": {
             "o_que": "ensaio de flexão de três pontos em ao menos dez corpos de prova",
             "porQue": ("a incerteza que reprova o cabo é a minha, não a do material: "
-                       "estreitar a faixa de 45-130 MPa para ±15% vale 10 mm de diâmetro"),
+                       "estreitar a faixa de 45-130 MPa para ±15% vale 5 mm de diâmetro"),
             "quemFaz": "pessoa, em bancada física; o laboratório não transpõe isso",
         },
         "oQueMedirJunto": (
@@ -438,6 +478,11 @@ def recomendar() -> dict[str, Any]:
             "adotar a variante fenólica pelo desempenho: ela usa formaldeído, que é "
             "irritante e cancerígeno reconhecido, o critério de saúde foi explícito, "
             "e ela ainda traz o custo de conformidade que a lignina dispensa"
+        ),
+        "assimetriaDasFontes": (
+            "O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o "
+            "candidato NÃO tem nenhuma: os números dele saíram de memória. O "
+            "benchmark é sólido; o candidato é o que precisa ser medido."
         ),
         "fabricacaoEfornecimento": (
             "enrolamento espiral de papel impregnado é tecnologia madura e barata, "
@@ -522,7 +567,7 @@ def avaliar_estudo(comparacao: dict[str, Any] | None = None,
             "A BARREIRA QUE NÃO SE TRANSPÕE AQUI: nada foi ensaiado fisicamente. "
             "Impacto real envolve taxa de deformação, e cabo real sofre fadiga por "
             "milhares de ciclos — nenhuma das duas coisas está nesta conta.",
-            f"TODAS as propriedades são {FONTE}. Os fatores de perda são a entrada mais "
+            f"As propriedades dos demais materiais são {FONTE}. Os fatores de perda são a entrada mais "
             "frágil: eles variam com frequência e com o método de medida, às vezes por "
             "um fator de dois.",
             "A madeira foi tratada com um módulo único, mas ela é anisotrópica: fibra "
@@ -541,8 +586,13 @@ def avaliar_estudo(comparacao: dict[str, Any] | None = None,
             "a 1. Em energia dissipada, que é a medida certa, o metal dissipa cerca de "
             "dezessete vezes menos que a madeira. O critério não foi reescrito depois "
             "do resultado, e a versão corrigida está no módulo marcada como não testada.",
-            "O caso de carga (300 N na ponta, alavanca inteira) reprova ATÉ o eucalipto: "
-            "margem p05 de 0,51. Isso descreve uso abusivo, tipo pá de pé de cabra, e não "
-            "cavar normal — é achado sobre a hipótese de carga, não sobre a madeira.",
+            "CORREÇÃO REGISTRADA: este estudo afirmou que o caso de carga era abusivo "
+            "porque reprovava até o eucalipto. Estava errado. Eu usava 75 MPa para a "
+            "madeira, que é o valor VERDE; o Wood Handbook dá 111,7 MPa a 12% de umidade, "
+            "que é a condição de um cabo. Com o valor certo o eucalipto passa, a carga "
+            "estava correta, e a barra para o candidato subiu 50%.",
+            "ASSIMETRIA DE FONTES: só o eucalipto tem fonte primária (FPL-GTR-190, "
+            "domínio público, lido diretamente). Todos os outros materiais, inclusive o "
+            "candidato recomendado, seguem com números de memória.",
         ),
     )

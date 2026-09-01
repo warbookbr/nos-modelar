@@ -50,16 +50,21 @@ def test_a_FIBRA_DE_VIDRO_chega_PERTO_da_madeira_e_os_metais_nao():
     assert medidas["fibra-de-vidro"]["margemP05"] > medidas["eucalipto"]["margemP05"]
 
 
-def test_o_metal_ganha_em_resistencia():
+def test_o_EUCALIPTO_SECO_bate_os_metais_em_resistencia():
+    """Correção pela fonte primária. Com 75 MPa — que é o valor da madeira VERDE —
+    os metais ganhavam. Com os 111,7 MPa do Wood Handbook a 12% de umidade, que é
+    a condição de um cabo, a madeira passa na frente dos dois."""
     medidas = estudo.comparar()["medidas"]
     madeira = medidas["eucalipto"]["margemP05"]
-    assert all(medidas[n]["margemP05"] > madeira for n in ("aco-1020", "aluminio-6061-t6"))
+    assert all(medidas[n]["margemP05"] < madeira for n in ("aco-1020", "aluminio-6061-t6"))
 
 
-def test_A_CARGA_SUPOSTA_REPROVA_ATE_A_MADEIRA_e_isso_e_um_achado():
-    """Margem abaixo de 1 no eucalipto diz que o caso de carga é uso abusivo,
-    e não cavar normal. É achado sobre a hipótese de carga, não sobre a madeira."""
-    assert estudo.comparar()["medidas"]["eucalipto"]["margemP05"] < 1.0
+def test_A_CARGA_SUPOSTA_ESTAVA_CERTA_e_o_erro_era_meu():
+    """Este teste já afirmou o contrário. Eu concluí que a carga era abusiva porque
+    ela reprovava até o eucalipto — e o que reprovava era eu usar 75 MPa, valor da
+    madeira verde, para um cabo que é de madeira seca. Com o dado do Wood Handbook
+    a madeira passa e a carga se mostra razoável."""
+    assert estudo.comparar()["medidas"]["eucalipto"]["margemP05"] >= 1.0
 
 
 def test_TODA_propagacao_CONVERGIU():
@@ -104,11 +109,12 @@ def test_a_recomendacao_aponta_MEDIR_e_nao_mexer_na_liga():
 
 
 def test_NAO_MEDIR_TEM_PRECO_em_milimetro_e_grama():
-    """A tradução mais direta de por que ensaiar vale a pena."""
+    """A tradução mais direta de por que ensaiar vale a pena. O preço foi corrigido
+    de 10 mm para 5 mm quando a porta estrutural passou a valer estritamente."""
     caminhos = estudo.recomendar()["doisCaminhos"]
     assert caminhos["medindo"]["diametro_mm"] < caminhos["sem_medir"]["diametro_mm"]
     assert caminhos["medindo"]["massa_kg"] < caminhos["sem_medir"]["massa_kg"]
-    assert "10 mm" in caminhos["licao"]
+    assert "5 mm" in caminhos["licao"]
 
 
 def test_o_REQUISITO_ESTRUTURAL_e_PORTA_e_nao_peso():
@@ -119,9 +125,35 @@ def test_o_REQUISITO_ESTRUTURAL_e_PORTA_e_nao_peso():
     assert "porta, não peso" in c["porQueEliminar"]
 
 
-def test_a_PORTA_reprova_ATE_O_EUCALIPTO_nesta_carga():
-    """Confirma de novo que o caso de carga é uso abusivo, não cavar normal."""
-    assert "eucalipto" in estudo.comparar()["eliminados"]
+def test_a_PORTA_APROVA_o_eucalipto_e_reprova_o_candidato():
+    """O concorrente com fonte primária passa; o candidato, a 32 mm, não."""
+    c = estudo.comparar()
+    assert "eucalipto" not in c["eliminados"]
+    assert "papel-lignina" in c["eliminados"]
+
+
+def test_A_TROCA_e_dita_EM_NUMERO_e_a_decisao_nao_e_de_quem_calcula():
+    """68% mais pesado para dissipar 126% mais vibração."""
+    troca = estudo.recomendar()["aTrocaEmNumero"]
+    assert troca["massa_kg"]["papel-lignina"] > troca["massa_kg"]["eucalipto"]
+    assert "não quem calcula" in troca["quemDecide"]
+
+
+def test_a_ASSIMETRIA_DE_FONTES_e_declarada():
+    """O benchmark tem fonte primária; o candidato recomendado não tem nenhuma."""
+    assert "FPL-GTR-190" in estudo.recomendar()["assimetriaDasFontes"]
+    assert "memória" in estudo.recomendar()["assimetriaDasFontes"]
+
+
+def test_o_eucalipto_e_o_UNICO_com_fonte_primaria():
+    assert estudo.MATERIAIS["eucalipto"]["fonte"] == "FPL-GTR-190"
+    assert all("fonte" not in m for n, m in estudo.MATERIAIS.items() if n != "eucalipto")
+
+
+def test_a_fonte_da_madeira_cita_o_documento_e_a_tabela():
+    assert "FPL-GTR-190" in estudo.FONTE_MADEIRA
+    assert "Tabela 5-5a" in estudo.FONTE_MADEIRA
+    assert "12% de umidade" in estudo.FONTE_MADEIRA
 
 
 def test_o_CONTEXTO_DE_FORNECIMENTO_e_declarado_e_nao_cravado_no_material():
