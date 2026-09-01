@@ -623,3 +623,53 @@ cair.
 **Otimização vai exatamente para onde falta restrição, e o que falta não aparece
 como erro: aparece como resultado ótimo.** As três restrições estão declaradas
 agora, e cada uma custou uma rodada para ser descoberta.
+
+### O bambu, que eu tinha deixado de fora
+
+O usuário perguntou se a liga com fibra era o teto e desconfiou que houvesse fibra
+melhor. Havia — e não é uma fibra, é um material inteiro que eu não tinha
+considerado.
+
+**Bambu já é um compósito de fibra unidirecional feito pela planta, e já vem em
+forma de tubo.** A resistência por quilo do colmo é 242.857, a maior do estudo:
+acima da fibra de vidro (210.526) e quase o dobro do eucalipto (139.625). Cabo de
+ferramenta de bambu existe há séculos, o que é evidência de uso que nenhum
+candidato novo tem.
+
+| variante | geometria | massa | custo | dissipa |
+| --- | --- | ---: | ---: | ---: |
+| eucalipto | 32 mm maciço | 0,772 kg | 3,09 | 27% |
+| **bambu colmo, selecionado** | 37 × 3 mm | **0,269 kg (−65%)** | **0,54 (−83%)** | 31% |
+| bambu colmo, sem selecionar | 43 × 3 mm | 0,317 kg (−59%) | 0,63 (−79%) | 31% |
+| bambu laminado | 43 × 3 mm | 0,317 kg (−59%) | 2,53 (−18%) | 31% |
+
+**E ele é o único candidato que vence sem medir.** Todos os outros dependiam de
+estreitar a incerteza para empatar; o bambu ganha carregando a variação natural
+inteira. Para o colmo, aliás, "medir" é **selecionar lote**: a variação é da
+planta e nenhum ensaio a reduz — o que se faz é escolher o que entra.
+
+#### O processo, dito inteiro
+
+A pergunta do usuário foi a certa: não "é simples?", mas "o que exatamente precisa
+acontecer?".
+
+**Dispensa** resina, impregnação, enrolamento, máquina de laminar e estufa de cura
+— tudo o que o laminado de papel exige. **Exige** secagem, que o cabo de eucalipto
+também exige e portanto não é custo novo; e **tratamento contra caruncho**, que é
+obrigatório, porque bambu tem amido e sem tratar o cabo dura de um a três anos. O
+método padrão é imersão em bórax e ácido bórico: barato e difundido, mas é um
+tanque e alguns dias.
+
+**O risco real do bambu não é resistência, é rachadura** ao longo da fibra com
+ciclo de umidade — e este estudo não modela isso. Fica declarado.
+
+O laminado de bambu tira o nó e a rachadura de colmo, custa quatro vezes mais, e
+reabre a questão do adesivo — com resposta conhecida: existe versão sem
+formaldeído.
+
+#### O que isso diz sobre o estudo
+
+Um material com séculos de uso, disponível, barato e com a melhor resistência por
+quilo da lista ficou fora até alguém perguntar. A busca de candidatos foi guiada
+pela ideia inicial do usuário, e não por uma varredura do espaço — e isso é um modo
+de falha do próprio método, não do material.

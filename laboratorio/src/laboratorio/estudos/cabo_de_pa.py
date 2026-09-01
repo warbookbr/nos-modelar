@@ -101,6 +101,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 3,
             "papel-lignina-curaua": 2,
+            "bambu-colmo": 3, "bambu-laminado": 3,
         },
     },
 }
@@ -113,7 +114,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
 CONFORMIDADE = {
     "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
     "fibra-de-vidro": 2, "papel-fenolico": 1, "papel-lignina": 3,
-    "papel-lignina-curaua": 3,
+    "papel-lignina-curaua": 3, "bambu-colmo": 3, "bambu-laminado": 3,
 }
 
 MATERIAIS = {
@@ -262,6 +263,89 @@ MATERIAIS = {
             "tanto; alinhar fibra exige enrolamento filamentar, não o espiral barato"),
         "dispersao": {"modulo_pa": (12e9, 28e9), "resistencia_pa": (110e6, 260e6)},
     },
+    # O CANDIDATO QUE EU TINHA DEIXADO DE FORA, e o usuário cobrou. Bambu já é um
+    # compósito de fibra unidirecional feito pela planta, já vem em forma de TUBO,
+    # e tem a maior resistência por quilo de todos os materiais deste estudo —
+    # 242.857, acima até da fibra de vidro. Cabo de ferramenta de bambu existe há
+    # séculos, o que é evidência de uso que nenhum candidato novo tem.
+    #
+    # A fabricação é cortar. Não há enrolamento, resina, cura nem alinhamento de
+    # fibra: o material já vem pronto e oco, com a fibra no lugar certo.
+    #
+    # O PREÇO DISSO é a variabilidade: colmo natural varia com espécie, idade,
+    # altura no colmo e nó, e o nó é onde ele racha. A faixa aqui é larga por essa
+    # razão física, e não só por ignorância minha — e é o caso em que medir tem de
+    # virar seleção de lote, não um número só.
+    "bambu-colmo": {
+        "modulo_pa": 15.0e9,
+        "densidade_kg_m3": 700.0,
+        "resistencia_pa": 170.0e6,
+        "fator_de_perda": 0.012,
+        "preco_por_kg": 2.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaQualitativa": (
+            "material natural sem resina nem aditivo; cresce em três a cinco anos e "
+            "rebrota da mesma touceira, sem replantio"),
+        "justificativaAguaEfabricacao": (
+            "absorve umidade e precisa de acabamento, mas menos que celulose solta; "
+            "fabricação é cortar o colmo — não há resina, impregnação, enrolamento "
+            "nem cura"),
+        # PROCESSO, dito inteiro porque a pergunta certa não é "é simples?" e sim
+        # "o que exatamente precisa acontecer?". O bambu dispensa tudo o que o
+        # laminado de papel exige, e cobra duas coisas próprias.
+        "processo": {
+            "dispensa": ("resina", "impregnação", "enrolamento", "máquina de laminar",
+                         "estufa de cura"),
+            "exige": (
+                "secagem: semanas ao ar ou dias em estufa — mas o cabo de eucalipto "
+                "também seca, então não é custo novo",
+                "tratamento contra caruncho: bambu tem amido e é comido por besouro; "
+                "sem tratar, o cabo dura de um a três anos. O método padrão é imersão "
+                "em bórax e ácido bórico, barato e difundido, mas é um tanque e alguns dias",
+            ),
+            "riscoDeDurabilidade": (
+                "rachadura ao longo da fibra com ciclo de umidade. É o problema real do "
+                "bambu, e não a resistência — e este estudo NÃO o modela"),
+        },
+        "dispersao": {"modulo_pa": (9e9, 20e9), "resistencia_pa": (100e6, 240e6)},
+    },
+    # Bambu laminado colado: o mesmo material desmontado em ripas e recolado, que
+    # é como se faz piso e móvel de bambu no mundo inteiro. Perde resistência por
+    # quilo em troca de CONSISTÊNCIA e de geometria livre — some o nó, some a
+    # variação de colmo, e dá para fazer a seção que se quiser.
+    "bambu-laminado": {
+        "modulo_pa": 12.0e9,
+        "densidade_kg_m3": 700.0,
+        "resistencia_pa": 120.0e6,
+        "fator_de_perda": 0.012,
+        "preco_por_kg": 8.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaQualitativa": (
+            "indústria estabelecida no mundo todo para piso e móvel; o adesivo é a "
+            "única variável de saúde, e existe versão sem formaldeído"),
+        "justificativaAguaEfabricacao": (
+            "mesma absorção do colmo; fabricação é laminação de ripas, processo "
+            "industrial maduro e sem máquina especial"),
+        "processo": {
+            "dispensa": ("máquina especial",),
+            "exige": (
+                "as mesmas secagem e tratamento do colmo",
+                "laminação de ripas, que é indústria estabelecida para piso e móvel",
+                "adesivo — e aqui a pergunta do formaldeído reaparece, com resposta "
+                "conhecida: existe versão sem",
+            ),
+            "riscoDeDurabilidade": (
+                "some a rachadura de colmo e some o nó; em troca, a colagem vira o "
+                "ponto de falha, e ela depende do adesivo escolhido"),
+        },
+        "dispersao": {"modulo_pa": (10e9, 15e9), "resistencia_pa": (100e6, 140e6)},
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -289,6 +373,8 @@ GEOMETRIAS = {
     "papel-fenolico": ("tubular", 0.032, 0.0045),
     "papel-lignina": ("tubular", 0.032, 0.0060),
     "papel-lignina-curaua": ("tubular", 0.032, 0.0045),
+    "bambu-colmo": ("tubular", 0.032, 0.0060),
+    "bambu-laminado": ("tubular", 0.032, 0.0060),
 }
 
 SEMENTE = 20260901
@@ -511,6 +597,24 @@ PAREDE_MINIMA_PRATICA_M = 0.003
 #: pede dele. `extrema` maximiza a folga estrutural; `igualitaria` só empata com
 #: o eucalipto e gasta o resto em ser leve e barata.
 VARIANTES = {
+    "bambu-selecionado": {
+        "diametro_m": 0.037, "parede_m": 0.0030,
+        "objetivo": "empatar com o eucalipto usando colmo de bambu selecionado",
+        "observacao": "a melhor do estudo: 65% mais leve e 83% mais barata, e ganha "
+                      "mesmo sem medir",
+    },
+    "bambu-sem-selecionar": {
+        "diametro_m": 0.043, "parede_m": 0.0030,
+        "objetivo": "o mesmo, carregando a variação natural do colmo inteira",
+        "observacao": "ainda 59% mais leve e 79% mais barata — é o único candidato "
+                      "que vence sem exigir medição",
+    },
+    "bambu-laminado": {
+        "diametro_m": 0.043, "parede_m": 0.0030,
+        "objetivo": "trocar variabilidade por consistência, aceitando o custo",
+        "observacao": "some o nó e a rachadura de colmo; custa 4 vezes mais e volta a "
+                      "depender de adesivo",
+    },
     "curaua-medida": {
         "diametro_m": 0.036, "parede_m": 0.0030,
         "objetivo": "empatar com o eucalipto usando o laminado reforçado com fibra",
@@ -557,12 +661,21 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
     MEDIDAS = {
         "papel-lignina": {"resistencia_pa": (72e6, 98e6), "modulo_pa": (5e9, 7e9)},
         "papel-lignina-curaua": {"resistencia_pa": (153e6, 207e6), "modulo_pa": (17e9, 23e9)},
+        # Para o colmo natural, "medir" é SELECIONAR LOTE: a variação é da planta,
+        # e nenhum ensaio a reduz — o que se faz é escolher o que entra.
+        "bambu-colmo": {"resistencia_pa": (145e6, 195e6), "modulo_pa": (13e9, 17e9)},
+        "bambu-laminado": {"resistencia_pa": (102e6, 138e6), "modulo_pa": (10e9, 14e9)},
     }
     referencia = medir("eucalipto")
 
     saida = {}
     for nome, v in VARIANTES.items():
-        material = "papel-lignina-curaua" if nome.startswith("curaua") else "papel-lignina"
+        material = (
+            "bambu-laminado" if nome == "bambu-laminado"
+            else "bambu-colmo" if nome.startswith("bambu")
+            else "papel-lignina-curaua" if nome.startswith("curaua")
+            else "papel-lignina"
+        )
         mat = MATERIAIS[material]
         base = {k: mat[k] for k in
                 ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}

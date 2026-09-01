@@ -233,7 +233,7 @@ def test_o_AMORTECIMENTO_NAO_DEPENDE_da_geometria():
     for x in v.values():
         por_material.setdefault(x["material"], set()).add(round(x["dissipacao"], 9))
     assert all(len(d) == 1 for d in por_material.values()), por_material
-    assert len(por_material) == 2
+    assert len(por_material) >= 2
 
 
 def test_MEDIR_QUASE_METADE_o_peso_do_cabo():
@@ -300,3 +300,51 @@ def test_a_agua_e_o_ponto_fraco_dos_laminados_de_papel():
     """Celulose absorve, e a vedação externa é obrigatória — não é detalhe."""
     for nome in ("papel-lignina", "papel-lignina-curaua"):
         assert estudo.MATERIAIS[nome]["agua"] == 1
+
+
+def test_o_BAMBU_tem_a_maior_resistencia_por_quilo_do_estudo():
+    """Ele já é um compósito de fibra unidirecional feito pela planta, e já vem em
+    forma de tubo. Bate até a fibra de vidro."""
+    def especifica(n):
+        m = estudo.MATERIAIS[n]
+        return m["resistencia_pa"] / m["densidade_kg_m3"]
+
+    melhor = max(estudo.MATERIAIS, key=especifica)
+    assert melhor == "bambu-colmo"
+    assert especifica("bambu-colmo") > especifica("fibra-de-vidro")
+
+
+def test_o_BAMBU_e_o_UNICO_que_vence_SEM_medir():
+    """Todos os outros candidatos dependem de estreitar a incerteza para empatar."""
+    sem = estudo.avaliar_variantes(medida=False)["variantes"]
+    assert sem["bambu-sem-selecionar"]["empataOuSupera"]
+    assert sem["bambu-sem-selecionar"]["massaRelativaAoEucalipto"] < -0.50
+    assert not sem["igualitaria-medida"]["empataOuSupera"] or \
+        sem["igualitaria-medida"]["massa_kg"] > sem["bambu-sem-selecionar"]["massa_kg"]
+
+
+def test_o_bambu_e_MUITO_mais_barato():
+    v = estudo.avaliar_variantes(medida=True)
+    assert v["variantes"]["bambu-selecionado"]["custo"] < 0.25 * v["referencia"]["custo"]
+
+
+def test_o_PROCESSO_do_bambu_e_declarado_inteiro():
+    """A pergunta certa não é 'é simples?', é 'o que exatamente precisa acontecer?'."""
+    proc = estudo.MATERIAIS["bambu-colmo"]["processo"]
+    juntos = " ".join(proc["exige"])
+    assert "caruncho" in juntos and "secagem" in juntos
+    assert "resina" in proc["dispensa"] and "estufa de cura" in proc["dispensa"]
+    assert "rachadura" in proc["riscoDeDurabilidade"]
+    assert "NÃO o modela" in proc["riscoDeDurabilidade"]
+
+
+def test_o_laminado_de_bambu_reabre_a_questao_do_adesivo():
+    juntos = " ".join(estudo.MATERIAIS["bambu-laminado"]["processo"]["exige"])
+    assert "formaldeído" in juntos
+
+
+def test_para_o_colmo_MEDIR_e_SELECIONAR_LOTE():
+    """A variação é da planta; nenhum ensaio a reduz — o que se faz é escolher."""
+    import inspect
+    fonte = inspect.getsource(estudo.avaliar_variantes)
+    assert "SELECIONAR LOTE" in fonte
