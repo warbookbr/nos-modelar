@@ -579,3 +579,47 @@ o que falta não aparece como erro — aparece como número ótimo.** Foi o que
 aconteceu antes com a parede fina, que já tinha exigido um limite de enrugamento; é
 o mesmo modo de falha em outra variável. O limite de empunhadura entrou em 45 mm, e
 a variante de 40 mm existe para quem quiser diâmetro comum, custando 40% de massa.
+
+### A liga com fibra, e a terceira restrição que faltava
+
+O usuário leu o resultado e concluiu: a liga não tem resistência suficiente dada a
+limitação de diâmetro e peso. Estava certo, e a conta dá o número.
+
+O que decide em flexão com diâmetro limitado é **resistência por quilo** (σ/ρ). O
+eucalipto seco dá 139.625; o laminado de papel puro, 65.385 — **menos da metade**.
+A prova é direta: em 32 mm, o diâmetro da madeira, o laminado não empata **nem
+maciço**. Ele só competia porque foi autorizado a ser mais gordo e oco. A geometria
+estava compensando o material, e o usuário viu isso antes de mim.
+
+Para empatar por quilo, a liga precisaria de 182 MPa (tem 85) ou 609 kg/m³ (tem
+1300). A lacuna tem nome: **fibra longa e alinhada**. Papel dá fibra curta e
+aleatória, e é isso que trava. Curauá — brasileira, das mais resistentes entre as
+naturais — fecha a conta: a variante reforçada chega a 138.462, empate técnico com
+a madeira.
+
+**E cobra o preço na vantagem principal.** Fibra rígida endurece o compósito, e
+material mais rígido dissipa menos: 43% contra os 61% do laminado puro. Ainda bem
+acima dos 27% da madeira, mas é troca real. A fabricação também piora — alinhar
+fibra exige enrolamento filamentar, não o espiral de papel que tornava o candidato
+barato. E o pó de fibra vegetal no processamento é risco respiratório reconhecido,
+o que derruba a nota de saúde de 3 para 2.
+
+Duas opções sobram, e a escolha é de quem usa a ferramenta:
+
+- **lignina + curauá, 36 × 3 mm:** 37% mais leve, 10% mais cara, dissipa 43%;
+- **lignina pura, 45 × 4,2 mm:** 9% mais pesada, 9% mais cara, dissipa 61%.
+
+Água e fabricação entraram como critério com nota para todo material, porque o
+usuário pediu e porque ausência de nota seria omissão cômoda. Os dois laminados de
+papel levam 1 em água: celulose absorve, e a vedação externa não é detalhe.
+
+#### Três vezes o mesmo modo de falha
+
+Buscando o cabo mais leve, a otimização foi, em ordem: para a **parede que enruga**,
+para o **diâmetro de 69 mm que não cabe na mão**, e para a **parede de 1,8 mm que
+amassa em uso** — cabo fino não morre por flexão, morre amassado no encaixe ou ao
+cair.
+
+**Otimização vai exatamente para onde falta restrição, e o que falta não aparece
+como erro: aparece como resultado ótimo.** As três restrições estão declaradas
+agora, e cada uma custou uma rodada para ser descoberta.
