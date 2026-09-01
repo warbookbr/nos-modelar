@@ -1,0 +1,73 @@
+{
+ "consulta": "laminated bamboo engineered structural properties",
+ "consultadoEm": "2026-09-01",
+ "descartados": 3,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2025,
+   "citacoes": 31,
+   "doi": "10.1016/j.istruc.2025.108896",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license"
+   ],
+   "primeiroAutor": "Mashrah",
+   "revista": "Structures",
+   "tipo": "journal-article",
+   "titulo": "Comprehensive review of engineered bamboo in structural engineering: Comparative insights into laminated bamboo and bamboo scrimber"
+  },
+  {
+   "ano": 2023,
+   "citacoes": 11,
+   "doi": "10.1016/j.compstruct.2023.117405",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license",
+    "https://doi.org/10.15223/policy-017",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-012",
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-004"
+   ],
+   "primeiroAutor": "Li",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Strength properties of unidirectional laminated engineered bamboo boards under off-axis tension and compression tests"
+  },
+  {
+   "ano": 2022,
+   "citacoes": 3,
+   "doi": "10.32604/jrm.2022.021761",
+   "licencas": [],
+   "primeiroAutor": "Ji",
+   "revista": "Journal of Renewable Materials",
+   "tipo": "journal-article",
+   "titulo": "Engineered Wood/Bamboo Laminated Composites for Outdoor Hydrophilic Platforms: Structural Design and Performance"
+  },
+  {
+   "ano": 2026,
+   "citacoes": 0,
+   "doi": "10.3390/civileng7020024",
+   "licencas": [
+    "https://creativecommons.org/licenses/by/4.0/"
+   ],
+   "primeiroAutor": "Mohinderu",
+   "revista": "CivilEng",
+   "tipo": "journal-article",
+   "titulo": "Engineered Laminated Bamboo for Structural Applications: A Critical Review of Materials, Systems, and Design Challenges"
+  },
+  {
+   "ano": 2022,
+   "citacoes": 0,
+   "doi": "10.1201/9781003204497-8",
+   "licencas": [],
+   "primeiroAutor": "Xiao",
+   "revista": "Engineered Bamboo Structures",
+   "tipo": "book-chapter",
+   "titulo": "Engineered Bamboo Structural Walls"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 2444857
+}

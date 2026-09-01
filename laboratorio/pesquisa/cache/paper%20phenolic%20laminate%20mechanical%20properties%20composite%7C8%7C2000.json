@@ -1,0 +1,108 @@
+{
+ "consulta": "paper phenolic laminate mechanical properties composite",
+ "consultadoEm": "2026-09-01",
+ "descartados": 0,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2022,
+   "citacoes": 95,
+   "doi": "10.1016/j.compstruct.2022.116086",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license",
+    "https://doi.org/10.15223/policy-017",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-012",
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-004"
+   ],
+   "primeiroAutor": "Zhang",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Mechanical properties prediction of composite laminate with FEA and machine learning coupled method"
+  },
+  {
+   "ano": 2000,
+   "citacoes": 43,
+   "doi": "10.1016/s0142-9418(98)00088-9",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license"
+   ],
+   "primeiroAutor": "Jang",
+   "revista": "Polymer Testing",
+   "tipo": "journal-article",
+   "titulo": "The effect of flame retardants on the flammability and mechanical properties of paper-sludge/phenolic composite"
+  },
+  {
+   "ano": 2019,
+   "citacoes": 10,
+   "doi": "10.1016/j.compstruct.2018.10.078",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/"
+   ],
+   "primeiroAutor": "Quagliato",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Manufacturing process and mechanical properties characterization for steel skin – Carbon fiber reinforced polymer core laminate structures"
+  },
+  {
+   "ano": 2021,
+   "citacoes": 7,
+   "doi": "10.1016/j.compstruct.2020.112980",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license"
+   ],
+   "primeiroAutor": "He",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Experimental study on mechanical properties of sandwich tempered glass unidirectional composite laminate"
+  },
+  {
+   "ano": 2002,
+   "citacoes": 1,
+   "doi": "10.1016/s0167-577x(02)00381-6",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/"
+   ],
+   "primeiroAutor": "Gan",
+   "revista": "Materials Letters",
+   "tipo": "journal-article",
+   "titulo": "Nanocrystalline FeMoSiB/Ni laminate composite—preparation and mechanical properties"
+  },
+  {
+   "ano": 2025,
+   "citacoes": 0,
+   "doi": "10.4271/2025-01-8323",
+   "licencas": [],
+   "primeiroAutor": "Tanaya",
+   "revista": "SAE Technical Paper Series",
+   "tipo": "proceedings-article",
+   "titulo": "A New Inverse Method for the Determination of Mechanical Properties of an Angle-Ply Composite Laminate by the CLPT"
+  },
+  {
+   "ano": 2021,
+   "citacoes": 0,
+   "doi": "10.29121/web/v18i3/119",
+   "licencas": [],
+   "primeiroAutor": "",
+   "revista": "Webology",
+   "tipo": "journal-article",
+   "titulo": "Dynamic, mechanical and Thermal Properties of\nHybridized Jute/Sisal Reinforced Phenolic Composite"
+  },
+  {
+   "ano": 2014,
+   "citacoes": 0,
+   "doi": "10.1201/b16618-18",
+   "licencas": [],
+   "primeiroAutor": "",
+   "revista": "Experimental Characterization of Advanced Composite Materials",
+   "tipo": "book-chapter",
+   "titulo": "Laminate Mechanical Response"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 2932267
+}

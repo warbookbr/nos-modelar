@@ -349,3 +349,446 @@ testado: consulta feita onde há rede, cache trazido, resposta aqui sem rede.
 
 A versão do banco entra na chave do cache, porque o mesmo pedido a despejos
 diferentes é outra consulta, e reaproveitar misturaria duas fontes numa.
+
+## Piloto 1 — cabo de pá, e o dia em que o laboratório se pagou
+
+A pergunta veio do usuário inteira: dá para trocar o cabo de pá de eucalipto por
+uma alternativa mais barata, que aguente pelo menos o mesmo, absorva bem impacto
+e vibração, e ainda seja acessível, sem agredir o ambiente e sem risco de
+intoxicação? Seis exigências que puxam para lados diferentes.
+
+### O resultado
+
+| candidato | margem p05 | custo | energia dissipada | irritação | ambiente |
+| --- | --- | --- | --- | --- | --- |
+| eucalipto | 0,51 | 3,09 | 27,0% | 3 | 3 |
+| aço 1020 | 0,80 | 6,56 | 1,6% | 3 | 2 |
+| alumínio 6061 | 0,97 | 12,21 | 0,6% | 3 | 1 |
+| fibra de vidro | 1,65 | 9,35 | 22,2% | 1 | 1 |
+| papel-fenólico | 0,49 | 3,15 | 54,4% | 1 | 2 |
+| **papel-lignina** | **0,37** | **3,06** | **61,0%** | **3** | **3** |
+
+O laminado de papel reciclado ligado por lignina ganha em tudo que foi pedido —
+mais barato que a madeira, dissipa 2,3 vezes mais vibração, sem irritação e sem
+passivo ambiental — e perde só em resistência. O usuário lembrava exatamente
+disso: "faltava algo na liga para garantir resistência". Faltava, e ainda falta.
+
+A variante fenólica existe na comparação para mostrar o preço de escolher a que
+funciona: ela cola melhor, e é feita com formaldeído. O critério de saúde era
+explícito, então ela fica registrada e recusada, não apagada.
+
+### O achado que mandou na recomendação
+
+A 40 mm de diâmetro, com a incerteza LARGA que declarei por não ter fonte, a
+margem no percentil 5 é 0,65 e reprova. Com uma incerteza medida de ±15% em torno
+da **mesma média**, ela vai a 0,97. Mesmo material, mesma geometria, mesma
+resistência média: a diferença é só o quanto eu sei.
+
+**A incerteza que reprova o cabo é a minha, não a do material.** Isso muda a
+recomendação de lugar: não adianta mexer na liga enquanto a ignorância dominar.
+Dez corpos de prova em ensaio de flexão decidem mais que qualquer conta feita
+daqui — e é exatamente a barreira que o laboratório não transpõe sozinho.
+
+### Três erros meus que os testes pegaram
+
+- **critério que satura.** Escrevi que o metal teria de sobrar com o *dobro* da
+  vibração da madeira. Sobra é fração limitada a 1, e a da madeira já é 0,73: o
+  dobro seria impossível. A hipótese saiu `contradita` com o metal dissipando
+  dezessete vezes menos energia. O critério ficou como estava, o estado ficou
+  como saiu, e a versão corrigida entrou no módulo **marcada como não testada** —
+  reescrever critério depois de ver o resultado é escolher a conclusão;
+- **exagero sobre a fibra de vidro.** Eu disse que ela ganhava sem piorar a mão.
+  Piora: 0,778 contra 0,730;
+- **generalização que envelheceu.** Depois escrevi que nenhum candidato batia a
+  madeira em vibração — e os laminados de papel batem, com folga. A afirmação
+  certa era mais estreita.
+
+### E um achado sobre a própria hipótese de carga
+
+O caso de 300 N na ponta com alavanca inteira reprova **até o eucalipto**: margem
+p05 de 0,51. Isso não é descoberta sobre madeira; é sinal de que a carga suposta
+descreve uso abusivo — pá como pé de cabra — e não cavar normal. Fica registrado
+como achado sobre a hipótese, e não maquiado.
+
+### O que entrou de máquina nova
+
+`viga.py` (tensão, flecha, frequência e decaimento de vibração, tudo conta
+fechada e escrita do zero) e `incerteza.py` (propagação por sorteio com semente
+declarada, gerador próprio para não depender de versão de biblioteca, e
+convergência conferida em vez de assumida). A incerteza esperou dois adiamentos
+por falta de entrada dispersa real; madeira, que varia 20% ou 30% de tábua para
+tábua, finalmente deu o motivo.
+
+### Fabricação, fornecimento e conformidade — e o erro de método que eles revelaram
+
+O usuário acrescentou critérios que não são número: acessível, sem agredir o
+ambiente, sem risco de intoxicação. Entraram como escala **ordinal declarada** —
+3 melhor que 2, e a distância entre eles não significa nada. Fingir que significa
+seria transformar julgamento em medida.
+
+**Maturidade de fornecedor virou contexto, não propriedade do material.** Lignina
+é abundante no Brasil e quase toda queimada dentro da própria fábrica de celulose
+para gerar energia, em vez de vendida como adesivo de prateleira. Para quem está
+de fora isso é gargalo; para quem está dentro da indústria, é conversa interna. O
+usuário está dentro. Cravar isso no material poria a situação de uma pessoa
+dentro de um número que parece técnico, então o estudo roda nos dois cenários.
+
+**Conformidade entrou como vantagem, não custo.** Resina fenólica cai em norma de
+emissão de formaldeído — ensaio recorrente, certificação, controle de exposição.
+Sem formaldeído, pula-se o capítulo inteiro.
+
+#### O erro de método, que é a lição mais cara deste piloto
+
+Com oito critérios, **ninguém é dominado**: a fronteira devolveu os seis
+candidatos, nos dois cenários. É propriedade conhecida — mais critérios, mais
+fácil ser o melhor em algum — e significa que a fronteira sozinha parou de
+decidir.
+
+Restou o ranking com pesos. E aí apareceu o problema: **o papel-lignina venceu
+nos dois cenários tendo a PIOR margem estrutural de todas**, 0,37. Conforto,
+preço e ambiente compensaram o cabo quebrar.
+
+Isso não é peso mal escolhido, é erro de forma. Soma ponderada permite que
+qualquer critério compense qualquer outro, e **quebrar não se troca por ser
+confortável**. Requisito estrutural é PORTA, não peso: quem não passa sai da
+comparação, e só quem passa disputa nos critérios negociáveis. A porta entrou no
+estudo, e com ela a comparação volta a significar algo.
+
+#### O resultado final, numa frase
+
+**Não medir custa 10 mm de diâmetro e 290 g.**
+
+O papel-lignina passa na porta com 50 mm carregando a incerteza larga que declarei
+por não ter fonte. Com a resistência medida — dez corpos de prova, ±15% em torno
+da mesma média — passa com 40 mm e 1,00 kg. Mesmo material, mesma resistência
+média: a diferença é só informação.
+
+E a porta reprova até o eucalipto nesta carga, o que confirma pela terceira vez
+que o caso suposto é uso abusivo. A comparação segue válida porque todos sofrem a
+mesma carga.
+
+A análise de fabricação e fornecimento está registrada na recomendação **marcada
+como fora do laboratório**: é análise, não estudo, e não foi medida.
+
+### Pesquisa de verdade: o dia em que o laboratório parou de ser ensaio geral
+
+Até aqui todo número deste laboratório tinha saído de mim — memória de valor de
+manual, sem fonte primária. Isso está escrito em cada estudo, e era o limite mais
+honesto que havia para declarar.
+
+O Crossref respondeu deste ambiente. Seis consultas, 45 publicações com DOI
+verificável, guardadas em disco para a pesquisa reproduzir daqui a um ano. É a
+primeira vez que entra dado externo conferível.
+
+**E o módulo constrói `Fonte`, não `Alegacao` — zero alegações, de propósito.**
+Crossref devolve metadado: título, DOI, revista, ano, citações. Nada disso diz o
+que o artigo mediu nem em que condição. Fabricar alegação a partir de título
+seria a violação exata de "fonte não é verdade" — um título como
+"Lignin-based adhesive for particleboard" sustenta que alguém publicou sobre o
+assunto, e nada sobre o valor de resistência que se queira citar. Alegação exige
+ler o artigo e comparar a condição dele com a nossa; é trabalho de pessoa.
+
+Cada busca carrega a **pergunta que a motivou**, porque consulta sem pergunta por
+trás é pescaria — e o registro do motivo é o que permite alguém julgar se a busca
+foi honesta ou se foi atrás do que confirmava a ideia. Material suplementar, que
+o Crossref indexa com DOI próprio e sobe na relevância sem ser artigo, é
+descartado; sem ano também sai.
+
+O que a literatura sustentou:
+
+- ligante de lignina sem formaldeído com alta resistência de colagem é campo
+  ativo, com publicação de 2024 a 2026 — é exatamente a lacuna do nosso candidato;
+- emissão de formaldeído em painel é problema reconhecido, não implicância;
+- vibração mão-braço em cabo de ferramenta tem literatura própria e antiga;
+- degradação de compósito de celulose por umidade é reconhecida — a ameaça que o
+  estudo tinha apontado ao candidato.
+
+O dossiê `DOSSIE-CABO-DE-PA.md` reúne resultado, limites, bibliografia e o que
+precisa ser medido, num formato para mostrar a outras pessoas. Ele abre dizendo
+o que é e o que não é, e a seção de literatura repete que **os artigos não foram
+lidos**.
+
+### A barreira não era intransponível — e a fonte real derrubou duas conclusões minhas
+
+Eu tinha declarado que não dava para trocar meus números de memória por números com
+fonte: Crossref dá metadado, Europe PMC é biomédico, a busca por resumo devolve
+artigos vizinhos. O usuário desconfiou da desistência, e estava certo.
+
+O que eu não tinha tentado: **repositório de governo**. O *Wood Handbook — Wood as
+an Engineering Material* (FPL-GTR-190, USDA Forest Service) é a referência canônica
+de propriedade mecânica de madeira, tem 509 páginas, é **domínio público** e está
+aberto. Baixado e lido aqui, Tabela 5-5a.
+
+**Os números reais, a 12% de umidade:** jarrah (*Eucalyptus marginata*) 111,7 MPa e
+13,0 GPa; karri (*E. diversicolor*) 139,0 MPa e 17,9 GPa. Eu vinha usando 75 MPa —
+que é aproximadamente o valor da madeira **verde**. Cabo de pá é madeira **seca**.
+
+Duas conclusões deste laboratório caíram junto:
+
+- **"o caso de carga é abusivo" estava errado.** Eu havia concluído isso porque a
+  carga reprovava até o eucalipto, e registrei como achado sobre a hipótese de
+  carga. Não era: a carga estava certa e minha propriedade é que estava errada. Com
+  o valor correto o eucalipto passa na porta com margem 1,01;
+- **a barra subiu 50%.** O concorrente do candidato não é 75 MPa, é 111,7.
+
+Quatro testes falharam na atualização, e todos afirmavam coisas que a fonte
+desmentiu. Cada um foi reescrito para a verdade nova, com o erro anterior citado no
+próprio teste — inclusive o preço de não medir, que eu tinha anunciado como 10 mm e
+290 g e virou 5 mm e 140 g quando a porta estrutural passou a valer estritamente.
+
+E apareceu a troca honesta, que só existe agora que o benchmark é real: o cabo de
+lignina precisa de 1,29 kg contra 0,77 kg do eucalipto — **68% mais pesado para
+dissipar 126% mais vibração**. Quem segura a ferramenta o dia todo é quem decide se
+o câmbio vale, e isso não é decisão de quem calcula.
+
+**A assimetria de fontes fica declarada no dossiê:** só o eucalipto tem fonte
+primária; o candidato recomendado segue com números de memória. O benchmark é
+sólido, o candidato é o que precisa ser medido.
+
+### Variantes de projeto, e a otimização que fugiu para onde faltava restrição
+
+O usuário perguntou: em vez de perseguir o máximo, e se o candidato só **empatar**
+com o eucalipto e gastar o resto em ser leve e barato? A intuição estava certa, e
+o número dá razão a ela.
+
+Antes, uma correção do que eu tinha deixado ambíguo: os 61% de dissipação são
+propriedade do **material** e valem em qualquer diâmetro. Engrossar o cabo é para
+resistência, nunca para vibração. Todas as variantes amortecem igual.
+
+| variante | geometria | massa | vs. eucalipto | dissipa |
+| --- | --- | ---: | ---: | ---: |
+| eucalipto | 32 mm maciço | 0,77 kg | — | 27% |
+| **igualitária, medida** | 45 × 4,2 mm | 0,84 kg | **+9%** | 61% |
+| igualitária, sem medir | 45 × 8,0 mm | 1,45 kg | +88% | 61% |
+| igualitária, 40 mm | 40 × 6,6 mm | 1,08 kg | +40% | 61% |
+| extrema | 50 × 6,0 mm | 1,29 kg | +68% | 61% |
+
+**Só empatar custa 9% de massa; perseguir folga custa 68%** — com o mesmo
+amortecimento. E medir aparece pela terceira vez como o item mais valioso do
+estudo: mesmo material e mesmo empate, 0,84 kg medindo contra 1,45 kg sem medir.
+
+#### A otimização foi para 69 mm
+
+Procurando a configuração mais leve que empata, a varredura achou **69 mm de
+diâmetro com 2,2 mm de parede**: mais leve e mais barato que a madeira, e
+completamente impossível de segurar. Tubo grande e fino é eficiente em flexão, e a
+conta não sabia que existe mão.
+
+A lição não é sobre cabo: **otimização vai exatamente para onde falta restrição, e
+o que falta não aparece como erro — aparece como número ótimo.** Foi o que
+aconteceu antes com a parede fina, que já tinha exigido um limite de enrugamento; é
+o mesmo modo de falha em outra variável. O limite de empunhadura entrou em 45 mm, e
+a variante de 40 mm existe para quem quiser diâmetro comum, custando 40% de massa.
+
+### A liga com fibra, e a terceira restrição que faltava
+
+O usuário leu o resultado e concluiu: a liga não tem resistência suficiente dada a
+limitação de diâmetro e peso. Estava certo, e a conta dá o número.
+
+O que decide em flexão com diâmetro limitado é **resistência por quilo** (σ/ρ). O
+eucalipto seco dá 139.625; o laminado de papel puro, 65.385 — **menos da metade**.
+A prova é direta: em 32 mm, o diâmetro da madeira, o laminado não empata **nem
+maciço**. Ele só competia porque foi autorizado a ser mais gordo e oco. A geometria
+estava compensando o material, e o usuário viu isso antes de mim.
+
+Para empatar por quilo, a liga precisaria de 182 MPa (tem 85) ou 609 kg/m³ (tem
+1300). A lacuna tem nome: **fibra longa e alinhada**. Papel dá fibra curta e
+aleatória, e é isso que trava. Curauá — brasileira, das mais resistentes entre as
+naturais — fecha a conta: a variante reforçada chega a 138.462, empate técnico com
+a madeira.
+
+**E cobra o preço na vantagem principal.** Fibra rígida endurece o compósito, e
+material mais rígido dissipa menos: 43% contra os 61% do laminado puro. Ainda bem
+acima dos 27% da madeira, mas é troca real. A fabricação também piora — alinhar
+fibra exige enrolamento filamentar, não o espiral de papel que tornava o candidato
+barato. E o pó de fibra vegetal no processamento é risco respiratório reconhecido,
+o que derruba a nota de saúde de 3 para 2.
+
+Duas opções sobram, e a escolha é de quem usa a ferramenta:
+
+- **lignina + curauá, 36 × 3 mm:** 37% mais leve, 10% mais cara, dissipa 43%;
+- **lignina pura, 45 × 4,2 mm:** 9% mais pesada, 9% mais cara, dissipa 61%.
+
+Água e fabricação entraram como critério com nota para todo material, porque o
+usuário pediu e porque ausência de nota seria omissão cômoda. Os dois laminados de
+papel levam 1 em água: celulose absorve, e a vedação externa não é detalhe.
+
+#### Três vezes o mesmo modo de falha
+
+Buscando o cabo mais leve, a otimização foi, em ordem: para a **parede que enruga**,
+para o **diâmetro de 69 mm que não cabe na mão**, e para a **parede de 1,8 mm que
+amassa em uso** — cabo fino não morre por flexão, morre amassado no encaixe ou ao
+cair.
+
+**Otimização vai exatamente para onde falta restrição, e o que falta não aparece
+como erro: aparece como resultado ótimo.** As três restrições estão declaradas
+agora, e cada uma custou uma rodada para ser descoberta.
+
+### O bambu, que eu tinha deixado de fora
+
+O usuário perguntou se a liga com fibra era o teto e desconfiou que houvesse fibra
+melhor. Havia — e não é uma fibra, é um material inteiro que eu não tinha
+considerado.
+
+**Bambu já é um compósito de fibra unidirecional feito pela planta, e já vem em
+forma de tubo.** A resistência por quilo do colmo é 242.857, a maior do estudo:
+acima da fibra de vidro (210.526) e quase o dobro do eucalipto (139.625). Cabo de
+ferramenta de bambu existe há séculos, o que é evidência de uso que nenhum
+candidato novo tem.
+
+| variante | geometria | massa | custo | dissipa |
+| --- | --- | ---: | ---: | ---: |
+| eucalipto | 32 mm maciço | 0,772 kg | 3,09 | 27% |
+| **bambu colmo, selecionado** | 37 × 3 mm | **0,269 kg (−65%)** | **0,54 (−83%)** | 31% |
+| bambu colmo, sem selecionar | 43 × 3 mm | 0,317 kg (−59%) | 0,63 (−79%) | 31% |
+| bambu laminado | 43 × 3 mm | 0,317 kg (−59%) | 2,53 (−18%) | 31% |
+
+**E ele é o único candidato que vence sem medir.** Todos os outros dependiam de
+estreitar a incerteza para empatar; o bambu ganha carregando a variação natural
+inteira. Para o colmo, aliás, "medir" é **selecionar lote**: a variação é da
+planta e nenhum ensaio a reduz — o que se faz é escolher o que entra.
+
+#### O processo, dito inteiro
+
+A pergunta do usuário foi a certa: não "é simples?", mas "o que exatamente precisa
+acontecer?".
+
+**Dispensa** resina, impregnação, enrolamento, máquina de laminar e estufa de cura
+— tudo o que o laminado de papel exige. **Exige** secagem, que o cabo de eucalipto
+também exige e portanto não é custo novo; e **tratamento contra caruncho**, que é
+obrigatório, porque bambu tem amido e sem tratar o cabo dura de um a três anos. O
+método padrão é imersão em bórax e ácido bórico: barato e difundido, mas é um
+tanque e alguns dias.
+
+**O risco real do bambu não é resistência, é rachadura** ao longo da fibra com
+ciclo de umidade — e este estudo não modela isso. Fica declarado.
+
+O laminado de bambu tira o nó e a rachadura de colmo, custa quatro vezes mais, e
+reabre a questão do adesivo — com resposta conhecida: existe versão sem
+formaldeído.
+
+#### O que isso diz sobre o estudo
+
+Um material com séculos de uso, disponível, barato e com a melhor resistência por
+quilo da lista ficou fora até alguém perguntar. A busca de candidatos foi guiada
+pela ideia inicial do usuário, e não por uma varredura do espaço — e isso é um modo
+de falha do próprio método, não do material.
+
+### Secagem e preparo: a pergunta que podia derrubar o bambu, e não derrubou
+
+O usuário viu o risco: se o bambu levar o mesmo tempo que o eucalipto para secar, o
+ganho encolhe. Tempo de secagem é estoque parado, e estoque parado é dinheiro.
+
+Não leva, e o motivo é geométrico. **Secar é difusão, e o tempo característico vai
+com o QUADRADO da espessura** que a água atravessa — dobrar a espessura quadruplica
+o tempo. O cabo de eucalipto é maciço: a água do centro percorre 16 mm. O colmo já
+vem oco, com parede de 3 mm que seca dos dois lados: 1,5 mm de caminho.
+
+| peça | caminho de difusão | vezes mais lento |
+| --- | ---: | ---: |
+| cabo de eucalipto (maciço 32 mm) | 16,0 mm | **114×** |
+| bambu laminado (ripa 6 mm) | 3,0 mm | 4× |
+| colmo de bambu (parede 3 mm) | 1,5 mm | 1× |
+
+**E o tratamento contra caruncho não soma:** a imersão em bórax pode ser feita com o
+colmo ainda verde, antes de secar. O modelo declara passo sobreposto separado do
+passo somado, porque somar o que roda em paralelo inventa tempo que ninguém gasta.
+
+#### A honestidade que este resultado exigiu
+
+O número **absoluto** de dias que o modelo devolve é otimista — cabo de eucalipto
+seca ao ar em meses, não nas semanas da conta. A **razão**, essa é robusta: a
+difusividade se cancela nela e sobra a razão dos quadrados das espessuras. Há teste
+provando que a razão não muda quando a difusividade muda, e a saída carrega a
+instrução de ler a razão e não o valor.
+
+O que o modelo não faz também está dito: não é cronograma de estufa, e não modela
+colapso nem rachadura ao secar — que no eucalipto viram **perda de material**, não
+só tempo. Ou seja, a comparação real tende a favorecer o bambu ainda mais do que
+esta conta mostra, e mesmo assim a conta não foi ajustada para dizer isso.
+
+### O gate que eu mesmo não conseguia ver vermelho
+
+O CI reprovou o PR do piloto por G5: o `INDEX.md` passou de 200 linhas quando ganhou
+o link do dossiê. A catraca funcionou, e o INDEX foi enxugado até 200 em vez de o
+teto ser levantado — que é a regra do repositório.
+
+**O grave não é isso.** É que eu vinha rodando `npm run gates 2>&1 | tail -3`, e o
+pipe descarta o código de saída do npm: o que sobra é o do `tail`, que sempre dá
+zero. Toda vez que li "exited with code 0" e escrevi "gates verdes", eu estava
+lendo o sucesso do `tail`.
+
+A prova ficou registrada: a rodada de 12:21 tinha `Tests 2 failed | 1414 passed`, e
+eu reportei verde na mesma mensagem.
+
+É exatamente o defeito que este laboratório inteiro persegue — **um gate que não
+consegue reprovar** — só que desta vez no meu procedimento, e não no código. O
+laboratório recusa instrumento sem canário, exige ver cada regra vermelha, e mede
+cobertura; e o operador dele estava conferindo o resultado pelo cano errado.
+
+A correção é `set -o pipefail`, ou não usar pipe, ou conferir `$?` do npm
+explicitamente. Registrado aqui porque o próximo a operar isto vai cair no mesmo
+lugar, e porque a lição não é sobre shell: **verificar é escolher onde olhar, e
+olhar no lugar errado dá sempre verde.**
+
+### Rigidez, fixação e sol — três perguntas que o estudo não sabia responder
+
+O usuário perguntou, em sequência, três coisas que o estudo não modelava. As três
+mudaram alguma coisa.
+
+**"Tubo oco não verga demais quando se levanta terra na ponta?"** O portão só
+olhava resistência — cabo que não quebra mas balança é cabo ruim, e nada media
+isso. Medido: no diâmetro recomendado o bambu oco é **5% MAIS rígido** que o
+eucalipto maciço, porque tubo põe material longe do centro, onde ele trabalha. Mas
+a 34 mm ele fica 21% menos rígido: **o oco só funciona porque é 37 mm e não 32**, e
+a desconfiança estava certa — o que salva é o diâmetro.
+
+A rigidez virou critério, e já reprovou uma variante que passava em tudo: a lignina
+em 40 mm verga 11% mais que a madeira.
+
+**"O parafuso da pá parte com facilidade?"** Sim, e aqui o bambu é pior, não igual.
+Eucalipto é maciço e o parafuso morde material inteiro; o colmo é oco com 3 mm de
+parede, e bambu racha na fibra com facilidade que a madeira não tem — é por isso
+que construção com bambu tradicionalmente evita prego e parafuso. É o mesmo
+esmagamento de parede que já tinha obrigado a parede mínima, agora aparecendo na
+junta. As soluções são conhecidas e baratas — bucha interna na ponta, parafuso
+passante com arruela, virola metálica, junta perto de um nó — mas são obrigatórias
+como conjunto, não opcionais.
+
+**"E sol e tempo?"** Empate. UV degrada lignina na superfície dos dois; o bambu tem
+vantagem inicial pela epiderme cerosa e rica em sílica, e quando ela se vai o
+comportamento se iguala. Não inventar vantagem onde não há.
+
+#### Sobre a resposta de outra IA a respeito de resina
+
+O usuário trouxe a análise de outro assistente, e ela estava certa nas três partes:
+não precisa estruturalmente, ajuda na selagem e na fixação, e a restrição é às
+fenólicas e ureia-formol, não a resina em geral. Duas ressalvas foram acrescentadas:
+**epóxi não curado é sensibilizante de contato** e causa dermatite ocupacional, então
+"base água" não o torna a opção limpa — os selantes realmente mansos são óleo de
+linhaça, cera de carnaúba e goma-laca; e **selar reduz mas não elimina** a rachadura,
+porque bambu também racha por gradiente interno e tensão de crescimento.
+
+### Geometria na prática, e preencher o colmo
+
+Três perguntas práticas do usuário, e as três viraram seção do dossiê.
+
+**Diâmetro:** bambu não se usina, se **seleciona** — gabarito de anel passa-não-passa
+e classificação por faixa. E há uma coisa que não se pode fazer: tornear a superfície
+externa para acertar a medida, porque a resistência do bambu é **graduada**, com as
+fibras mais densas na casca. O projeto tem de tolerar faixa e não medida, e quem se
+adapta é a virola da ponta. O preço de R$ 0,54 é do material e **não inclui o
+rendimento da seleção** — faixa estreita é descarte, e descarte é custo.
+
+**Nós:** incomodam sob a mão que desliza, e resolve com lixar só o colar externo — a
+força do nó está no diafragma interno —, posicionar o corte, ou uma empunhadura.
+Estruturalmente o nó é bom: é onde o bambu resiste a rachar.
+
+**Preencher o colmo:** separa em duas coisas. Para **rigidez não serve** — espuma a
+40 kg/m³ acrescenta 13% de massa e 0,13% de rigidez, porque o material do centro não
+trabalha em flexão. Tarugo de madeira dá +65% de rigidez e +168% de massa; quem quer
+rigidez aumenta 3 mm no diâmetro, que sai de graça. Para **amassamento serve muito**,
+e é o modo de falha que importa — e por isso só as pontas: 15 cm de cada lado pesam
+23 g, 8% do cabo. Converge exatamente na bucha que já estava recomendada, agora com
+número. E não encher inteiro e selar: água que entra num tubo cheio e fechado não
+sai, e apodrece por dentro sem ninguém ver.

@@ -1,0 +1,90 @@
+{
+ "consulta": "lignin based wood adhesive bonding strength formaldehyde free",
+ "consultadoEm": "2026-09-01",
+ "descartados": 2,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2024,
+   "citacoes": 63,
+   "doi": "10.1016/j.cej.2024.152914",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license",
+    "https://doi.org/10.15223/policy-017",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-012",
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-004"
+   ],
+   "primeiroAutor": "Zhu",
+   "revista": "Chemical Engineering Journal",
+   "tipo": "journal-article",
+   "titulo": "Aminated alkali lignin nanoparticles enabled formaldehyde-free biomass wood adhesive with high strength, toughness, and mildew resistance"
+  },
+  {
+   "ano": 2025,
+   "citacoes": 14,
+   "doi": "10.1021/acsapm.4c03378",
+   "licencas": [
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-045"
+   ],
+   "primeiroAutor": "Hu",
+   "revista": "ACS Applied Polymer Materials",
+   "tipo": "journal-article",
+   "titulo": "Formaldehyde-Free, High-Bonding Performance, Fully Lignin-Based Adhesive Cross-Linked by Glutaraldehyde"
+  },
+  {
+   "ano": 2026,
+   "citacoes": 2,
+   "doi": "10.1021/acssuschemeng.5c13165",
+   "licencas": [
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-045"
+   ],
+   "primeiroAutor": "Chen",
+   "revista": "ACS Sustainable Chemistry &amp; Engineering",
+   "tipo": "journal-article",
+   "titulo": "A Formaldehyde-Free Lignin-Based Adhesive with High Bonding Strength, Mild Curing Conditions, and Reusability"
+  },
+  {
+   "ano": 2026,
+   "citacoes": 1,
+   "doi": "10.1021/acssuschemeng.6c05201",
+   "licencas": [
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-045"
+   ],
+   "primeiroAutor": "Li",
+   "revista": "ACS Sustainable Chemistry &amp; Engineering",
+   "tipo": "journal-article",
+   "titulo": "Wood Adhesive Based on Lignin-Crosslinked Epoxidized Carboxymethyl Chitosan with High Bonding Strength"
+  },
+  {
+   "ano": 2011,
+   "citacoes": 1,
+   "doi": "10.1201/b12180-18",
+   "licencas": [],
+   "primeiroAutor": "",
+   "revista": "Wood Adhesives",
+   "tipo": "book-chapter",
+   "titulo": "Bonding of Heat-Treated Spruce with Phenol-Formaldehyde Adhesive"
+  },
+  {
+   "ano": 2025,
+   "citacoes": 0,
+   "doi": "10.23977/erej.2025.090206",
+   "licencas": [],
+   "primeiroAutor": "",
+   "revista": "Environment, Resource and Ecology Journal",
+   "tipo": "journal-article",
+   "titulo": "Preparation of Formaldehyde-Free Bio-Based Plywood Adhesive Using Polyvinyl Alcohol and DES-Extracted Lignin Composite"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 7344485
+}

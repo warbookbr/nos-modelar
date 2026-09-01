@@ -1,0 +1,88 @@
+{
+ "consulta": "formaldehyde emission particleboard adhesive regulation health",
+ "consultadoEm": "2026-09-01",
+ "descartados": 1,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2018,
+   "citacoes": 103,
+   "doi": "10.1016/j.buildenv.2018.06.020",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license"
+   ],
+   "primeiroAutor": "Ghani",
+   "revista": "Building and Environment",
+   "tipo": "journal-article",
+   "titulo": "Reducing formaldehyde emission of urea formaldehyde-bonded particleboard by addition of amines as formaldehyde scavenger"
+  },
+  {
+   "ano": 2022,
+   "citacoes": 45,
+   "doi": "10.3390/polym14225037",
+   "licencas": [
+    "https://creativecommons.org/licenses/by/4.0/"
+   ],
+   "primeiroAutor": "Kawalerczyk",
+   "revista": "Polymers",
+   "tipo": "journal-article",
+   "titulo": "APTES-Modified Nanocellulose as the Formaldehyde Scavenger for UF Adhesive-Bonded Particleboard and Strawboard"
+  },
+  {
+   "ano": 2016,
+   "citacoes": 27,
+   "doi": "10.1039/c5ra18068f",
+   "licencas": [],
+   "primeiroAutor": "Zhang",
+   "revista": "RSC Advances",
+   "tipo": "journal-article",
+   "titulo": "Influence of a urea–formaldehyde resin adhesive on pyrolysis characteristics and volatiles emission of poplar particleboard"
+  },
+  {
+   "ano": 2019,
+   "citacoes": 2,
+   "doi": "10.5220/0008552702610264",
+   "licencas": [],
+   "primeiroAutor": "Risnasari",
+   "revista": "Proceedings of the International Conference on Natural Resources and Technology",
+   "tipo": "proceedings-article",
+   "titulo": "Characterization of Particleboard from Waste Tea Leaves  (Camellia Sinensis L) and Meranti Wood (Shorea Sp) using Urea-Formaldehyde Adhesive and It’s Formaldehyde Emission"
+  },
+  {
+   "ano": 2018,
+   "citacoes": 2,
+   "doi": "10.18182/tjf.402355",
+   "licencas": [],
+   "primeiroAutor": "Özlüsoylu",
+   "revista": "Turkish Journal of Forestry | Türkiye Ormancılık Dergisi",
+   "tipo": "journal-article",
+   "titulo": "Effect of urea formaldehyde resin reinforced with sodium carboxymethylcellulose (Na- CMC) on particleboard properties and formaldehyde emission"
+  },
+  {
+   "ano": 2010,
+   "citacoes": 2,
+   "doi": "10.3906/tar-0905-30",
+   "licencas": [],
+   "primeiroAutor": "LEE",
+   "revista": "Turkish Journal of Agriculture and Forestry",
+   "tipo": "journal-article",
+   "titulo": "Properties of particleboard produced with liquefaction-modified phenol-formaldehyde adhesive"
+  },
+  {
+   "ano": 2011,
+   "citacoes": 0,
+   "doi": "10.4028/www.scientific.net/amr.181-182.406",
+   "licencas": [
+    "https://www.scientific.net/PolicyAndEthics/PublishingPolicies",
+    "https://www.scientific.net/license/TDM_Licenser.pdf"
+   ],
+   "primeiroAutor": "Zhang",
+   "revista": "Advanced Materials Research",
+   "tipo": "journal-article",
+   "titulo": "Preparation of Particleboard Made from Wheat Straw with Low-Formaldehyde-Emission Composite Adhesive"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 4127671
+}
