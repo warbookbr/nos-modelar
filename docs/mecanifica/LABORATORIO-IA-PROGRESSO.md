@@ -349,3 +349,72 @@ testado: consulta feita onde há rede, cache trazido, resposta aqui sem rede.
 
 A versão do banco entra na chave do cache, porque o mesmo pedido a despejos
 diferentes é outra consulta, e reaproveitar misturaria duas fontes numa.
+
+## Piloto 1 — cabo de pá, e o dia em que o laboratório se pagou
+
+A pergunta veio do usuário inteira: dá para trocar o cabo de pá de eucalipto por
+uma alternativa mais barata, que aguente pelo menos o mesmo, absorva bem impacto
+e vibração, e ainda seja acessível, sem agredir o ambiente e sem risco de
+intoxicação? Seis exigências que puxam para lados diferentes.
+
+### O resultado
+
+| candidato | margem p05 | custo | energia dissipada | irritação | ambiente |
+| --- | --- | --- | --- | --- | --- |
+| eucalipto | 0,51 | 3,09 | 27,0% | 3 | 3 |
+| aço 1020 | 0,80 | 6,56 | 1,6% | 3 | 2 |
+| alumínio 6061 | 0,97 | 12,21 | 0,6% | 3 | 1 |
+| fibra de vidro | 1,65 | 9,35 | 22,2% | 1 | 1 |
+| papel-fenólico | 0,49 | 3,15 | 54,4% | 1 | 2 |
+| **papel-lignina** | **0,37** | **3,06** | **61,0%** | **3** | **3** |
+
+O laminado de papel reciclado ligado por lignina ganha em tudo que foi pedido —
+mais barato que a madeira, dissipa 2,3 vezes mais vibração, sem irritação e sem
+passivo ambiental — e perde só em resistência. O usuário lembrava exatamente
+disso: "faltava algo na liga para garantir resistência". Faltava, e ainda falta.
+
+A variante fenólica existe na comparação para mostrar o preço de escolher a que
+funciona: ela cola melhor, e é feita com formaldeído. O critério de saúde era
+explícito, então ela fica registrada e recusada, não apagada.
+
+### O achado que mandou na recomendação
+
+A 40 mm de diâmetro, com a incerteza LARGA que declarei por não ter fonte, a
+margem no percentil 5 é 0,65 e reprova. Com uma incerteza medida de ±15% em torno
+da **mesma média**, ela vai a 0,97. Mesmo material, mesma geometria, mesma
+resistência média: a diferença é só o quanto eu sei.
+
+**A incerteza que reprova o cabo é a minha, não a do material.** Isso muda a
+recomendação de lugar: não adianta mexer na liga enquanto a ignorância dominar.
+Dez corpos de prova em ensaio de flexão decidem mais que qualquer conta feita
+daqui — e é exatamente a barreira que o laboratório não transpõe sozinho.
+
+### Três erros meus que os testes pegaram
+
+- **critério que satura.** Escrevi que o metal teria de sobrar com o *dobro* da
+  vibração da madeira. Sobra é fração limitada a 1, e a da madeira já é 0,73: o
+  dobro seria impossível. A hipótese saiu `contradita` com o metal dissipando
+  dezessete vezes menos energia. O critério ficou como estava, o estado ficou
+  como saiu, e a versão corrigida entrou no módulo **marcada como não testada** —
+  reescrever critério depois de ver o resultado é escolher a conclusão;
+- **exagero sobre a fibra de vidro.** Eu disse que ela ganhava sem piorar a mão.
+  Piora: 0,778 contra 0,730;
+- **generalização que envelheceu.** Depois escrevi que nenhum candidato batia a
+  madeira em vibração — e os laminados de papel batem, com folga. A afirmação
+  certa era mais estreita.
+
+### E um achado sobre a própria hipótese de carga
+
+O caso de 300 N na ponta com alavanca inteira reprova **até o eucalipto**: margem
+p05 de 0,51. Isso não é descoberta sobre madeira; é sinal de que a carga suposta
+descreve uso abusivo — pá como pé de cabra — e não cavar normal. Fica registrado
+como achado sobre a hipótese, e não maquiado.
+
+### O que entrou de máquina nova
+
+`viga.py` (tensão, flecha, frequência e decaimento de vibração, tudo conta
+fechada e escrita do zero) e `incerteza.py` (propagação por sorteio com semente
+declarada, gerador próprio para não depender de versão de biblioteca, e
+convergência conferida em vez de assumida). A incerteza esperou dois adiamentos
+por falta de entrada dispersa real; madeira, que varia 20% ou 30% de tábua para
+tábua, finalmente deu o motivo.

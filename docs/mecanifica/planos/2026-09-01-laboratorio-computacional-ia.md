@@ -89,7 +89,7 @@ só abre com a anterior verde.
 | R4 | unidades, V&V, incerteza e sensibilidade | **parcial por decisão**: grandezas com dimensão e composição de pareceres entregues; incerteza adiada por não haver instrumento estocástico |
 | R5 | ponte neutra da Mecanifica | **entregue**: adaptador fora do núcleo, revisão fixada por conteúdo, recomendação sem aplicação automática e guarda de direção |
 | M1 | material, escolha do próximo experimento, trocas, leis e bancos públicos | **entregue**: as cinco frentes do foco em materiais |
-| R6 | dois pilotos verticais em domínios diferentes | não iniciada |
+| R6 | dois pilotos verticais em domínios diferentes | **piloto 1 entregue**: cabo de pá, com viga, incerteza propagada, trocas e recomendação; piloto 2 não iniciado |
 | R7 | serviços Agent-First, CLI/MCP e prova caixa-preta | não iniciada |
 
 ## Gates
