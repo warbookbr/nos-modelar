@@ -98,6 +98,19 @@ FONTE_BAMBU = (
     "para colmos inteiros: 62 a 170 MPa e 6,0 a 14,0 GPa."
 )
 
+#: QUARTA FONTE PRIMÁRIA, e a primeira que traz CISALHAMENTO — a propriedade que
+#: governa o esmagamento no furo do rebite, apontada por crítica externa e até
+#: aqui ausente de tudo neste estudo.
+FONTE_SERINGUEIRA = (
+    "LIMA, I. L.; BERGAMO, R.; BERMUDEZ, K. R.; MORAES, M. L. T.; GARCIA, J. N. "
+    "Caracterização das propriedades mecânicas da madeira de clones de Hevea "
+    "brasiliensis. Scientia Forestalis, v. 48, n. 125, e2877, 2020 (IPEF/USP). "
+    "Acesso aberto, PDF lido diretamente nesta sessão. Cinco clones, 33 anos, 25 "
+    "árvores; corpo de prova 2 x 2 x 35 cm, vão de 30 cm. Médias: densidade "
+    "aparente 0,61 g/cm³, flexão 75,76 MPa, módulo 10.043 MPa, cisalhamento "
+    "paralelo às fibras 12,51 MPa."
+)
+
 FONTE_MADEIRA_BR = (
     "GONÇALVES, F. G.; OLIVEIRA, J. T. S.; et al. Estudo de algumas propriedades "
     "mecânicas da madeira de um híbrido clonal de Eucalyptus urophylla x "
@@ -144,6 +157,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "pinus-elliottii": 3,
             "pinus-comercial": 3,
             "eucalipto-urograndis": 3,
+            "seringueira": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -158,6 +172,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "pinus-elliottii": 3,
             "pinus-comercial": 3,
             "eucalipto-urograndis": 3,
+            "seringueira": 3,
         },
     },
 }
@@ -178,6 +193,7 @@ CONFORMIDADE = {
     "pinus-elliottii": 3,
     "pinus-comercial": 3,
     "eucalipto-urograndis": 3,
+    "seringueira": 3,
 }
 
 MATERIAIS = {
@@ -726,6 +742,65 @@ MATERIAIS = {
             "rachadura interna são o motivo do tempo de estufa que o usuário relatou"),
         "dispersao": {"modulo_pa": (9.652e9, 12.781e9), "resistencia_pa": (82.95e6, 103.2e6)},
     },
+    # SERINGUEIRA, e ela é a alternativa nova que faltava — não um refinamento do
+    # que já estava mapeado.
+    #
+    # POR QUE ELA É INTERESSANTE E NINGUÉM PENSA NELA: seringal é derrubado quando
+    # a produção de látex cai, por volta dos 25 a 30 anos, e a árvore vai cair de
+    # qualquer jeito. A madeira é subproduto de verdade, não é cultura própria. Na
+    # Ásia isso virou indústria de móvel; no Brasil ainda queima em boa parte.
+    #
+    # E ELA RESOLVE A FRAQUEZA DO PINUS. O pinus perdia por ser mole — amassa no
+    # encaixe e marca com o uso. Seringueira é bem mais dura, e o mesmo artigo
+    # ainda mede o cisalhamento paralelo às fibras em 12,51 MPa, que é exatamente
+    # a propriedade que governa o rebite rasgando a madeira. É o primeiro número
+    # de cisalhamento que este estudo tem de qualquer material.
+    #
+    # O QUE ELA COBRA: é mais fraca que o urograndis (75,8 contra 92,0 MPa) e pede
+    # 36 a 38 mm em vez de 32. E ela é MUITO suscetível a fungo e inseto — o
+    # próprio artigo diz isso na introdução —, então tratamento não é opcional.
+    #
+    # E O DIÂMETRO SUBIU DE 36 PARA 38 QUANDO A DISPERSÃO ENTROU. A 36 mm o valor
+    # nominal dá 0,79 e parecia resolvido; no pior caso dá 0,60, abaixo do
+    # eucalipto. O artigo declara coeficiente de variação de 26,6% na flexão, que
+    # é grande — cinco clones diferentes num mesmo número. A 38 mm o pior caso dá
+    # 0,70 e passa o eucalipto.
+    #
+    # É a terceira vez neste estudo que o valor nominal aprova e o pior caso
+    # reprova. O padrão já tem nome: média não quebra cabo, o pior colmo quebra.
+    #
+    # A COMPARAÇÃO QUE INTERESSA, a 38 mm contra o urograndis a 32: margem 0,70
+    # contra 0,63, custando 29% menos e pesando 41% mais.
+    "seringueira": {
+        "modulo_pa": 10.043e9,
+        "densidade_kg_m3": 610.0,
+        "resistencia_pa": 75.76e6,
+        "cisalhamento_pa": 12.51e6,
+        "fator_de_perda": 0.010,
+        "fonte": "Scientia Forestalis 48(125):e2877, 2020 — lido diretamente",
+        "preco_por_kg": 1.5,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "subproduto de seringal derrubado no fim da vida produtiva; a árvore cai "
+            "de qualquer jeito, e hoje boa parte da madeira queima"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "MUITO suscetível a fungo e a besouro e cupim, e o tratamento não é "
+            "opcional; usinagem é trivial e a madeira é bem mais dura que o pinus"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "cultura dedicada"),
+            "exige": (
+                "36 a 38 mm em vez de 32, porque ela é mais fraca que o eucalipto",
+                "tratamento contra fungo e inseto, obrigatório e imediato ao corte",
+            ),
+            "riscoDeDurabilidade": (
+                "apodrecimento e ataque de inseto são a fraqueza dela, e são maiores "
+                "que os do pinus; este estudo NÃO os modela"),
+        },
+        "dispersao": {"modulo_pa": (7.1e9, 13.0e9), "resistencia_pa": (55.6e6, 96.0e6)},
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -770,6 +845,7 @@ GEOMETRIAS = {
     "pinus-elliottii": ("macica", 0.032, None),
     "pinus-comercial": ("macica", 0.044, None),
     "eucalipto-urograndis": ("macica", 0.032, None),
+    "seringueira": ("macica", 0.038, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
@@ -893,6 +969,11 @@ CORPOS_DE_PROVA = {
         "modulo_de_weibull": 12.0,
         "origem": "corpo de 2 x 2 x 30 cm, Revista Árvore 33(3), 2009; medida real",
     },
+    "madeira-seringueira": {
+        "volume_m3": 0.020 * 0.020 * 0.300,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo de 2 x 2 x 35 cm com vão de 30 cm, Scientia Forestalis 48(125), 2020",
+    },
     "madeira-estrutural": {
         "volume_m3": 0.025 * 0.025 * 0.410,
         "modulo_de_weibull": 5.0,
@@ -926,6 +1007,7 @@ FAMILIA_DE_ENSAIO = {
     # Comercial tem nó, e nó espalha muito mais a resistência que madeira limpa.
     "pinus-comercial": "madeira-estrutural",
     "eucalipto-urograndis": "madeira-br",
+    "seringueira": "madeira-seringueira",
     "bambu-colmo": "bambu",
     "bambu-laminado": "bambu",
     "papel-fenolico": "composito",

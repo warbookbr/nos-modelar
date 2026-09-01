@@ -191,7 +191,7 @@ def test_o_eucalipto_e_o_UNICO_com_fonte_primaria():
     # guarda a diferença em vez de deixar as duas se parecerem.
     citam_fonte = {n for n, m in estudo.MATERIAIS.items() if "fonte" in m}
     assert citam_fonte == {"eucalipto", "pinus-elliottii", "eucalipto-urograndis",
-                           "bambu-colmo"}
+                           "bambu-colmo", "seringueira"}
     # E a assimetria que o dossiê declarava foi FECHADA: o vencedor era o material
     # pior documentado do estudo, e agora tem fonte medida como o concorrente.
     assert "REA" in estudo.MATERIAIS["bambu-colmo"]["fonte"]
@@ -946,3 +946,50 @@ def test_o_WPC_reprova_por_PESO_agora_e_nao_mais_por_rigidez():
 
     # O que ele tem de bom é real, e é uma coisa só.
     assert otimista["fator_de_perda"] > estudo.MATERIAIS["eucalipto-urograndis"]["fator_de_perda"]
+
+
+def test_a_SERINGUEIRA_e_a_alternativa_NOVA_e_resolve_a_fraqueza_do_pinus():
+    """Não é refinamento do que já estava mapeado: é candidato novo.
+
+    Seringal é derrubado quando a produção de látex cai, e a árvore vai cair de
+    qualquer jeito — a madeira é subproduto de verdade, não cultura própria. Na
+    Ásia virou indústria de móvel; aqui boa parte ainda queima.
+
+    E ela resolve o que derrubava o pinus: dureza. O pinus amassa no encaixe, e a
+    seringueira é bem mais dura — além de trazer o primeiro número de CISALHAMENTO
+    deste estudo, que é a propriedade que governa o rebite rasgando a madeira.
+    """
+    s = estudo.MATERIAIS["seringueira"]
+    assert "Scientia Forestalis" in s["fonte"]
+    assert s["cisalhamento_pa"] > 0, "primeiro cisalhamento medido do estudo"
+    assert all("cisalhamento_pa" not in m for n, m in estudo.MATERIAIS.items()
+               if n != "seringueira"), "e o único, até agora"
+    assert s["preco_por_kg"] < estudo.MATERIAIS["eucalipto-urograndis"]["preco_por_kg"]
+
+
+def test_a_SERINGUEIRA_supera_o_eucalipto_brasileiro_e_paga_em_peso():
+    seringueira = estudo.medir("seringueira")
+    euc = estudo.medir("eucalipto-urograndis")
+    assert seringueira["margemP05"] > euc["margemP05"]
+    assert seringueira["custo"] < 0.75 * euc["custo"]
+    assert seringueira["massa_kg"] > 1.3 * euc["massa_kg"], "o preço é peso"
+
+
+def test_o_DIAMETRO_da_seringueira_subiu_quando_a_DISPERSAO_entrou():
+    """Terceira vez neste estudo que o valor nominal aprova e o pior caso reprova.
+
+    A 36 mm o nominal dá 0,79 e parecia resolvido; no pior caso dá 0,60, abaixo do
+    eucalipto. O artigo declara coeficiente de variação de 26,6% na flexão — cinco
+    clones diferentes dentro de um mesmo número.
+    """
+    import copy
+    guardado = copy.deepcopy(estudo.GEOMETRIAS)
+    try:
+        estudo.GEOMETRIAS["seringueira"] = ("macica", 0.036, None)
+        magra = estudo.medir("seringueira")
+    finally:
+        estudo.GEOMETRIAS.clear()
+        estudo.GEOMETRIAS.update(guardado)
+    assert magra["margemDeterminista"] > estudo.medir("eucalipto-urograndis")["margemP05"]
+    assert magra["margemP05"] < estudo.medir("eucalipto-urograndis")["margemP05"]
+    assert estudo.GEOMETRIAS["seringueira"][1] == 0.038
