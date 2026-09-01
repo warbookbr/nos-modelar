@@ -31,11 +31,7 @@ plano. O que está encerrado vive em
   Mecanifica como instrumento opcional e **nunca** vira dependência dela. Desenho:
   [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md)
   (`docs/mecanifica/DOSSIE-LABORATORIO-IA.md`).
-- **Resultado do primeiro piloto de materiais:**
-  [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md)
-  (`docs/mecanifica/DOSSIE-CABO-DE-PA.md`) — cabo de pá em laminado de papel com
-  lignina: resultado, entradas com origem declarada, limites, bibliografia com DOI
-  e o que precisa ser medido.
+  Primeiro piloto: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em
@@ -43,7 +39,6 @@ plano. O que está encerrado vive em
   (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
   está [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
   (`docs/mecanifica/planos/congelados/README.md`), não refutado.
-
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
   (`docs/mecanifica/planos/encerrados/2026-08-28-exportacao-cad-step.md`) foi
   **concluída e aprovada**. Entregou os módulos puros `modulos/exportador-cad/`

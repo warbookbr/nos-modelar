@@ -706,3 +706,27 @@ O que o modelo não faz também está dito: não é cronograma de estufa, e não
 colapso nem rachadura ao secar — que no eucalipto viram **perda de material**, não
 só tempo. Ou seja, a comparação real tende a favorecer o bambu ainda mais do que
 esta conta mostra, e mesmo assim a conta não foi ajustada para dizer isso.
+
+### O gate que eu mesmo não conseguia ver vermelho
+
+O CI reprovou o PR do piloto por G5: o `INDEX.md` passou de 200 linhas quando ganhou
+o link do dossiê. A catraca funcionou, e o INDEX foi enxugado até 200 em vez de o
+teto ser levantado — que é a regra do repositório.
+
+**O grave não é isso.** É que eu vinha rodando `npm run gates 2>&1 | tail -3`, e o
+pipe descarta o código de saída do npm: o que sobra é o do `tail`, que sempre dá
+zero. Toda vez que li "exited with code 0" e escrevi "gates verdes", eu estava
+lendo o sucesso do `tail`.
+
+A prova ficou registrada: a rodada de 12:21 tinha `Tests 2 failed | 1414 passed`, e
+eu reportei verde na mesma mensagem.
+
+É exatamente o defeito que este laboratório inteiro persegue — **um gate que não
+consegue reprovar** — só que desta vez no meu procedimento, e não no código. O
+laboratório recusa instrumento sem canário, exige ver cada regra vermelha, e mede
+cobertura; e o operador dele estava conferindo o resultado pelo cano errado.
+
+A correção é `set -o pipefail`, ou não usar pipe, ou conferir `$?` do npm
+explicitamente. Registrado aqui porque o próximo a operar isto vai cair no mesmo
+lugar, e porque a lição não é sobre shell: **verificar é escolher onde olhar, e
+olhar no lugar errado dá sempre verde.**
