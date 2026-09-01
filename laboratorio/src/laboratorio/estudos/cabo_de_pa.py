@@ -95,6 +95,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 1,
             "eucalipto-laminado": 3,
+            "sisal-mamona": 2,
         },
     },
     "com-acesso-a-industria": {
@@ -105,6 +106,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "papel-lignina-curaua": 2,
             "bambu-colmo": 3, "bambu-laminado": 3,
             "eucalipto-laminado": 3,
+            "sisal-mamona": 2,
         },
     },
 }
@@ -120,6 +122,8 @@ CONFORMIDADE = {
     "papel-lignina-curaua": 3, "bambu-colmo": 3, "bambu-laminado": 3,
     # Fenólica no LVL padrão traz a norma de formaldeído junto.
     "eucalipto-laminado": 2,
+    # Sem formaldeído: pula a norma de emissão inteira.
+    "sisal-mamona": 3,
 }
 
 MATERIAIS = {
@@ -421,6 +425,78 @@ MATERIAIS = {
         # ganho e mais um pouco. Laminar eucalipto resolve o gargalo de estufa de
         # quem já tem a estufa; não resolve a pergunta deste estudo.
     },
+    # Sisal com poliuretano de mamona. Entra por sugestão minha e a pedido do
+    # usuário, e a lógica parecia boa: o que matou o papelão foi fibra CURTA e
+    # desalinhada, e sisal é fibra longa; o que derrubou a fenólica foi o
+    # formaldeído, e o poliuretano de mamona é resina vegetal sem formaldeído,
+    # desenvolvida no Brasil. Fibra nacional, resina nacional, saúde resolvida.
+    #
+    # E FALHA. Fica registrado inteiro porque o motivo da falha é instrutivo.
+    #
+    # A resina PURA mede 6,46 MPa de tração, e os compósitos publicados de sisal
+    # com ela ficam em 14 a 15 MPa. Não é um número ruim de laboratório ruim: o
+    # poliuretano de mamona é uma resina FLEXÍVEL, e ela foi feita para ser. O
+    # sisal em si é ótimo — a fibra sozinha dá de 400 a 700 MPa. O problema não é
+    # a fibra, é a matriz que a segura, e é sempre a matriz que manda no
+    # compósito quando ela é mole.
+    #
+    # ERRO MEU, CORRIGIDO PELO TESTE, e vale registrar como se deu. Eu tinha posto
+    # numa faixa só o que está PUBLICADO (15 MPa) e uma EXTRAPOLAÇÃO minha para
+    # matriz rígida com fibra alinhada (180 MPa) — treze vezes maior. Sortear
+    # uniforme dentro disso afirma que qualquer valor no meio é igualmente
+    # provável, o que é falso: um extremo é medida e o outro é hipótese sobre
+    # OUTRA formulação. `test_TODA_propagacao_CONVERGIU` reprovou, porque a
+    # amostragem não assenta numa faixa dessas — o teste de convergência acabou
+    # detectando um erro de modelagem, e não de amostragem.
+    #
+    # A dispersão abaixo é só a faixa publicada. O teto extrapolado virou
+    # `TETO_EXTRAPOLADO_SISAL`, declarado e separado, porque hipótese não pode
+    # entrar disfarçada de medição.
+    #
+    # O ACHADO QUE VALE MAIS QUE O RESULTADO: mesmo no TETO otimista o cabo passa
+    # na resistência e reprova na RIGIDEZ — flete 509 mm contra 258 mm do
+    # eucalipto, o dobro. E rigidez é justamente o que resina nenhuma conserta: o
+    # módulo de fibra natural para em torno de 20 GPa. O bambu já entrega 15 GPa
+    # sem resina, sem alinhamento de fábrica e sem cura. Ou seja, fabricar sisal
+    # com resina é tentar produzir o que o bambu já é — a planta faz o compósito
+    # alinhado de graça, e faz melhor.
+    "sisal-mamona": {
+        "modulo_pa": 2.5e9,
+        "densidade_kg_m3": 1150.0,
+        "resistencia_pa": 15.0e6,
+        # O único critério em que ele ganha de todo mundo, e ganha fácil.
+        "fator_de_perda": 0.050,
+        "preco_por_kg": 12.0,
+        "irritacao": 2,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "sisal e mamona são agrícolas e nacionais, e a peça curada é inerte; o "
+            "isocianato usado na cura é sensibilizante respiratório, o que é problema "
+            "de quem fabrica e não de quem segura a pá"),
+        "agua": 2,
+        "fabricacao": 2,
+        "justificativaAguaEfabricacao": (
+            "o poliuretano veda bem, mas a fibra na borda cortada absorve; fabricação "
+            "exige pentear e alinhar a fibra, impregnar e curar em molde"),
+        "processo": {
+            "dispensa": ("formaldeído", "fibra mineral", "estufa de secagem longa"),
+            "exige": (
+                "alinhamento da fibra, que é o que dá a resistência e é a etapa cara",
+                "impregnação e cura em molde",
+                "controle de exposição ao isocianato na linha",
+            ),
+            "riscoDeDurabilidade": (
+                "descolamento fibra-matriz com ciclo de umidade; este estudo NÃO o modela"),
+        },
+        "dispersao": {"modulo_pa": (1.5e9, 3.5e9), "resistencia_pa": (14.0e6, 25.0e6)},
+        # RESULTADO, negativo nas duas pontas da faixa e por motivos DIFERENTES.
+        # No piso publicado: tubo de 32 mm dá margem 0,10 contra 1,00 do eucalipto,
+        # e nem maciço a 45 mm salva — chega a 0,37 pesando 2,2 kg, quase o triplo
+        # da madeira. Está uma ordem de grandeza fora, não é ajuste de geometria.
+        # No teto extrapolado: passa na resistência (1,18) e reprova na rigidez.
+        # Uma faixa que reprova nas duas pontas por motivos distintos é uma
+        # conclusão mais forte do que uma que reprova por pouco.
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -439,10 +515,29 @@ MATERIAIS = {
     },
 }
 
+#: O teto otimista do sisal com resina, mantido FORA da dispersão do material
+#: porque ele não é medida deste sistema: é o que uma matriz rígida com fibra
+#: bem alinhada e fração alta daria, extrapolado de compósitos de fibra natural
+#: em geral. Fica declarado para poder ser rodado à parte e citado como hipótese.
+#:
+#: E o resultado dele é o achado mais útil deste candidato: mesmo aqui o cabo
+#: PASSA na resistência (margem 1,18) e REPROVA na rigidez — flete 509 mm contra
+#: 258 mm do eucalipto. Resistência dá para comprar com resina e fibra; rigidez
+#: não, porque o módulo de fibra natural para perto de 20 GPa. O bambu entrega
+#: 15 GPa sem resina nenhuma.
+TETO_EXTRAPOLADO_SISAL = {
+    "modulo_pa": 9.0e9,
+    "densidade_kg_m3": 1200.0,
+    "resistencia_pa": 180.0e6,
+    "fator_de_perda": 0.030,
+    "natureza": "extrapolação, NÃO medida; não use como propriedade de material",
+}
+
 #: Geometrias comparáveis: a madeira maciça como é, e tubos de parede honesta.
 GEOMETRIAS = {
     "eucalipto": ("macica", 0.032, None),
     "eucalipto-laminado": ("macica", 0.032, None),
+    "sisal-mamona": ("tubular", 0.032, 0.0045),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
