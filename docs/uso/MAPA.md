@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-760 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+761 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -399,6 +399,7 @@
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
+- `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
 - `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências

@@ -20,8 +20,38 @@ from __future__ import annotations
 from typing import Any
 
 from ..contratos import Estudo, Evidencia, Execucao, Hipotese, Sintese
+from ..instrumentos import Manifesto, Registro
 
 INSTRUMENTO = "mecanifica.inflate-torcao"
+
+#: O manifesto do instrumento deste estudo. O `dominio` não é decoração: `lados`
+#: só vale 14 nesta peça porque o furo do olho precisa caber numa face, e foi
+#: exatamente isso que a primeira varredura descobriu por 21 execuções gritando.
+#: Agora o instrumento DIZ isso, e o estudo recusa medida fora do que ele declara.
+MANIFESTO = Manifesto(
+    identidade=INSTRUMENTO,
+    versao="1.1.0",
+    capacidades=("medir torção de face e caixa envolvente de uma cabeça por `inflate`",),
+    dominio={
+        "lados": lambda v: v == 14,
+        "expoenteSecao": lambda v: isinstance(v, int) and v >= 10,
+    },
+    nao_cobre=(
+        "outras peças além da cabeça deste machado",
+        "formas por `loft`",
+        "se a silhueta interna mudou — a conferência é só pela caixa envolvente",
+        "qualquer relação entre torção e aparência julgada por olho",
+    ),
+    determinista=True,
+    maturidade="experimental",
+)
+
+
+def registro_padrao() -> Registro:
+    """Registro com o instrumento deste estudo, e só ele."""
+    registro = Registro()
+    registro.registrar(MANIFESTO)
+    return registro
 
 #: Abaixo disto a torção deixa de importar para a triangulação, pela medida do
 #: acervo: face de caixa desvia 1e-17 e loft que torce, 1e-2 para cima.
@@ -91,9 +121,21 @@ def _execucoes(pacote: dict[str, Any]) -> list[Execucao]:
     ]
 
 
-def avaliar(pacote: dict[str, Any]) -> Sintese:
+def avaliar(pacote: dict[str, Any], registro: Registro | None = None) -> Sintese:
     """Recebe o pacote do instrumento e devolve a síntese, com estados e limites."""
+    # O instrumento precisa estar REGISTRADO: a medida existir não a autoriza a
+    # sustentar conclusão. Isto grita em vez de devolver síntese vazia, porque
+    # medida de origem não declarada é problema de quem montou o estudo.
+    registro = registro or registro_padrao()
+    manifesto = registro.exigir(pacote["instrumento"], pacote["versao"])
+
     todas = pacote["medidas"]
+    fora = [
+        (m, manifesto.fora_do_dominio(m["parametros"]))
+        for m in todas
+    ]
+    excluidas_por_dominio = [m for m, nomes in fora if nomes]
+    todas = [m for m, nomes in fora if not nomes]
     inadmissiveis = [m for m in todas if m["gritos"]]
     # Execução com grito do motor é PRESERVADA e não sustenta conclusão: a peça
     # saiu diferente do que a receita pediu, e medir o que saiu não responde à
@@ -194,6 +236,11 @@ def avaliar(pacote: dict[str, Any]) -> Sintese:
             f"{len(inadmissiveis)} execução(ões) da varredura foram excluídas por grito do motor "
             "e não sustentam nenhuma conclusão."
         ) if inadmissiveis else "Todas as execuções da varredura foram admissíveis.",
+        (
+            f"{len(excluidas_por_dominio)} medida(s) ficaram FORA do domínio declarado pelo "
+            "instrumento e não entraram na avaliação."
+        ) if excluidas_por_dominio else "Todas as medidas ficaram dentro do domínio declarado.",
+        "O instrumento não cobre: " + "; ".join(manifesto.nao_cobre) + ".",
         "Não diz nada sobre outras formas de `inflate`, nem sobre `loft`.",
         f"A tolerância de planaridade do `furo` é 1e-9: nenhuma combinação medida silencia o alerta, "
         f"e a menor torção alcançada ({min(m['torcaoMaxima'] for m in medidas):.5f}) segue muito acima dela.",
