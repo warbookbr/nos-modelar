@@ -30,7 +30,12 @@ jobs:
       # de `npm run test` reprova a promoção por `inspecao-visual-falhou` e
       # transforma falta de navegador em falso defeito de autoria.
       - name: Navegador para as provas visuais
-        run: npx playwright install --with-deps chromium
+        # `chromium-headless-shell` é um DOWNLOAD SEPARADO desde o Playwright
+        # 1.49, e é ele que o caminho visual do MCP lança. Instalar só
+        # `chromium` fazia a prova visual morrer em "Executable doesn't exist"
+        # enquanto as demais provas de bancada passavam, porque usam o chromium
+        # cheio — e por isso a falta ficava invisível.
+        run: npx playwright install --with-deps chromium chromium-headless-shell
 
       - name: TypeScript Typecheck
         run: npm run typecheck
@@ -62,10 +67,14 @@ jobs:
       - name: Peças publicadas em dia com a receita
         run: npm run exportar:check
 
+      # A variante visual é um SCRIPT NOMEADO, não a mesma linha com uma
+      # variável de ambiente. Com `env:` no passo, o espelho local via nome de
+      # comando não enxergava a diferença — `mcp:check` aparecia nos dois lados
+      # e o gate passava — enquanto o CI rodava um segundo conjunto de provas
+      # que ninguém rodava aqui. Foi assim que duas falhas visuais reais
+      # sobreviveram.
       - name: MCP transporta as quatro vistas oficiais
-        env:
-          MCP_VISUAL_REAL: '1'
-        run: npm run mcp:check
+        run: npm run mcp:visual:check
 
       # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
       # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa
@@ -100,3 +109,20 @@ jobs:
       # cobra dono para cada documento de uso e impede a porta de crescer.
       - name: Documentação separada por uso
         run: npm run docs:estrutura:check
+
+      # O laboratório entrou na main como incubação, e a promessa que sustenta
+      # isso é a fronteira: o núcleo nunca importa `laboratorio/`. Promessa sem
+      # gate no CI é promessa. Estes dois passos são o que a torna verificável.
+      - name: Fronteira do laboratório preservada
+        run: npm run arquitetura:lab:check
+
+      # O laboratório é Python, e o CI deste repositório era só Node. Sem este
+      # passo o gate anterior existia e o seguinte morria em "No module named
+      # pytest" — gate ligado sem a dependência que ele precisa não prova nada.
+      # A versão vem fixada do pyproject, para o CI e a máquina de quem
+      # desenvolve rodarem a mesma coisa.
+      - name: Dependências Python do laboratório
+        run: python3 -m pip install --quiet "pytest==8.4.2" "hypothesis==6.167.1"
+
+      - name: Provas do laboratório
+        run: npm run lab:test

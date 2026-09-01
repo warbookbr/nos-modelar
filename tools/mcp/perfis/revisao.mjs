@@ -13,6 +13,7 @@ import {
   RAIZ_PACOTES, REVISOES, caminhoDentro, caminhoPacote,
 } from '../../modelagem/formato-pacote.mjs';
 import { ErroDePacote } from '../../modelagem/formato-pacote.mjs';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../../src/bancada/catalogo-pecas.js';
 import {
   compararEntrada, compararSaida, descreverEntrada, descreverSaida,
   erroAcionavel, renderizarEntrada, renderizarSaida, respostaErro, respostaOk,
@@ -264,6 +265,10 @@ function pacoteVisual(resposta, imagens = []) {
   return { resposta, imagens };
 }
 
+function pecasPublicadasNaBancada() {
+  return idsDoCatalogo(CATALOGO_HOMOLOGADO);
+}
+
 export function conteudoRenderizacao({ resposta, imagens }) {
   if (!resposta.ok) {
     return [{ type: 'text', text: `renderizar_vistas: ${resposta.erro?.mensagem ?? 'operação recusada.'}` }];
@@ -306,7 +311,18 @@ export async function renderizar(input, {
   let capturado;
   let pecaRelatada = argumentos.peca;
   let vistasRelatadas;
-  if (!PECAS_DISPONIVEIS.includes(argumentos.peca)) {
+  /* A decisão é do CATÁLOGO PUBLICADO da bancada, não dos arquivos-fonte.
+     `PECAS_DISPONIVEIS` lista `prototipos/procedural/v3/pecas/*.js` — o que
+     EXISTE como receita — enquanto `olhar({peca})` pede à bancada uma peça
+     PUBLICADA. Os dois eram o mesmo conjunto até o acervo não homologado ser
+     removido e o catálogo publicado ficar deliberadamente vazio; desde então
+     qualquer receita nova em `pecas/` empurrava a renderização para um ramo que
+     não tem como servir, e a bancada esperava 30 s por uma peça que nunca
+     chegava. O sintoma era `tempo_esgotado`, longe da causa.
+
+     Com o catálogo publicado vazio, toda peça vai pela resolução — que é o
+     caminho que funciona e o mesmo que as montagens já usavam. */
+  if (!pecasPublicadasNaBancada().includes(argumentos.peca)) {
     if (!catalogo?.resolverPeca) return pacoteVisual(erroDeCatalogo());
     try {
       const resolvida = await catalogo.resolverPeca(argumentos.peca);

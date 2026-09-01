@@ -1,4 +1,13 @@
 #!/usr/bin/env node
+/* independencia-laboratorio.mjs — a guarda que sustenta a incubação: o núcleo
+ * da Mecanifica nunca importa `laboratorio/`. É esta direção, e só ela, que
+ * permite o laboratório viver na `main` sem virar dependência de quem só quer
+ * modelar — e que permite removê-lo apagando um diretório.
+ *
+ * Varre os imports estáticos de `git ls-files` (JS, TS e Python) e recusa a
+ * aresta proibida nomeando arquivo e linha. Limite conhecido: arquivo ainda não
+ * rastreado não é visto, então ela protege a `main`, não o meio da edição.
+ */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { posix, resolve } from 'node:path';

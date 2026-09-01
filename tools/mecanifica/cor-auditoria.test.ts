@@ -4,6 +4,8 @@
  * mesma cor para a mesma parte; senão comparar as duas exige reler a legenda a
  * cada vez e a cor deixa de ser atalho. */
 import { describe, expect, it } from 'vitest';
+// @ts-expect-error — módulo .js da bancada (sem tipos; roda puro no vitest/esbuild),
+// mesma convenção que oficina.test.ts já usa para o motor v3.
 import { corDeAuditoria } from '../../src/bancada/controlar-partes.js';
 
 describe('cor de auditoria', () => {
