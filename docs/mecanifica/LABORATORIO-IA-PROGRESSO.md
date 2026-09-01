@@ -168,3 +168,39 @@ coisas que só se provam contra a rede real, e o laboratório ainda não tem um
 estudo que peça literatura. Construí-los agora seria produzir código cuja única
 prova seria eu afirmando que funciona. O grafo, esse, tem prova local: dezenove
 testes, cada recusa vista acontecer.
+
+## R4 — unidades e pareceres entraram; incerteza não tem o que propagar ainda
+
+**Número nu não atravessa mais interface científica.** O erro de unidade é a
+falha mais bem disfarçada que existe aqui: não levanta exceção, não deixa rastro,
+e devolve um número plausível na ordem de grandeza errada. É a mesma família do
+instrumento que media sempre a mesma coisa parecendo varredura e do passo que
+recebe vazio e devolve número plausível — em todos, o resultado É plausível, e é
+justamente por isso que sobrevive à revisão.
+
+Duas escolhas que parecem detalhe e não são:
+
+- **dimensão não é unidade.** Metro e milímetro têm a mesma dimensão e não somam.
+  Converter em silêncio seria escolher um fator no lugar de quem mede, então a
+  conversão é explícita e exige dizer de onde vem o fator — fator sem origem é o
+  erro de unidade disfarçado de conversão, e passa na revisão por parecer uma;
+- **sem tabela de unidades do mundo.** Não há catálogo aqui. Uma tabela grande
+  seria adivinhar qual unidade o laboratório vai usar, e este repositório já
+  registrou que onde falta evidência o desenho fica bonito.
+
+**Admissibilidade virou composição, e aprovado é o veredito mais difícil de
+conseguir.** Inconclusivo não vira aprovado: um validador que não conseguiu
+decidir não é um validador satisfeito. `nao-aplicavel` exige justificativa, senão
+seria a forma cômoda de pular validador difícil — e validador exigido marcado
+assim continua bloqueando a aprovação. Nenhum validador rodar não é aprovação: é
+a afirmação mais forte possível feita com a menor evidência possível. O veredito
+carrega quem rodou e o que cada um disse, porque "aprovado" sem essa lista é gate
+nunca visto vermelho com outro nome.
+
+**Incerteza e sensibilidade ficaram de fora, e o motivo é concreto:** o único
+instrumento deste laboratório é determinístico. Não há distribuição para propagar
+nem amostra para convergir; qualquer máquina de incerteza escrita agora seria
+exercitada só por dados que eu mesmo inventasse. Ela entra quando existir medida
+com ruído real ou parâmetro com faixa declarada.
+
+Vinte e nove testes novos, cada recusa vista acontecer.
