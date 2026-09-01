@@ -62,10 +62,14 @@ jobs:
       - name: Peças publicadas em dia com a receita
         run: npm run exportar:check
 
+      # A variante visual é um SCRIPT NOMEADO, não a mesma linha com uma
+      # variável de ambiente. Com `env:` no passo, o espelho local via nome de
+      # comando não enxergava a diferença — `mcp:check` aparecia nos dois lados
+      # e o gate passava — enquanto o CI rodava um segundo conjunto de provas
+      # que ninguém rodava aqui. Foi assim que duas falhas visuais reais
+      # sobreviveram.
       - name: MCP transporta as quatro vistas oficiais
-        env:
-          MCP_VISUAL_REAL: '1'
-        run: npm run mcp:check
+        run: npm run mcp:visual:check
 
       # O painel de portas da bancada vive em `src/bancada/main.js`, que nenhum
       # arquivo de teste importa: sem esta linha, apagar o painel inteiro passa

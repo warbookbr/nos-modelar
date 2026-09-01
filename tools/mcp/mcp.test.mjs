@@ -8,6 +8,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../src/bancada/catalogo-pecas.js';
+
+/* O que a bancada PUBLICA, que é o que uma prova visual pode renderizar. */
+const PECAS_PUBLICADAS = idsDoCatalogo(CATALOGO_HOMOLOGADO);
 import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
@@ -1265,15 +1269,21 @@ describe('servidor MCP local — perfil revisao', () => {
         const validado = await client.callTool({ name: 'validar_pacote', arguments: { id } });
         metricas.ferramentas += 1;
         const pecaValidada = validado.structuredContent.resultado.peca;
-        if (PECAS_DISPONIVEIS.length === 0) {
-          metricas.casos.push({ id, peca: pecaValidada, estado: 'catalogo-procedural-vazio' });
+        /* O guarda pergunta pelo catálogo PUBLICADO, que é o que a prova visual
+           precisa, e não pelos arquivos-fonte em `prototipos/`. Os dois eram o
+           mesmo conjunto até o acervo não homologado ser removido; desde então
+           `PECAS_DISPONIVEIS` continuava cheio enquanto a bancada não publicava
+           nada, e o teste seguia adiante para pedir uma renderização impossível.
+           O nome dele — "quando há peça publicada" — já dizia o critério certo. */
+        if (PECAS_PUBLICADAS.length === 0) {
+          metricas.casos.push({ id, peca: pecaValidada, estado: 'catalogo-publicado-vazio' });
           continue;
         }
         /* Os pacotes históricos continuam validáveis, mas o catálogo publicado
            pode estar vazio ou não conter sua peça procedural. A prova visual
            usa a primeira peça procedural atualmente disponível nesse caso, sem
            reintroduzir receita removida no catálogo. */
-        const peca = PECAS_DISPONIVEIS.includes(pecaValidada) ? pecaValidada : PECAS_DISPONIVEIS[0];
+        const peca = PECAS_PUBLICADAS.includes(pecaValidada) ? pecaValidada : PECAS_PUBLICADAS[0];
         expect(peca).toBeDefined();
         await client.callTool({ name: 'descrever_peca', arguments: { peca } });
         metricas.ferramentas += 1;
@@ -1298,7 +1308,9 @@ describe('servidor MCP local — perfil revisao', () => {
     }
     const depois = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
     expect(depois).toBe(antes);
-    expect(metricas).toMatchObject({ recursos: 2, ferramentas: PECAS_DISPONIVEIS.length === 0 ? 2 : 6 });
+    /* Mesmo critério do guarda acima: sem peça PUBLICADA só há as duas
+       validações; com peça publicada entram descrever e renderizar de cada. */
+    expect(metricas).toMatchObject({ recursos: 2, ferramentas: PECAS_PUBLICADAS.length === 0 ? 2 : 6 });
     console.log(`MCP_VISUAL_METRICAS ${JSON.stringify(metricas)}`);
   }, 180_000);
 
