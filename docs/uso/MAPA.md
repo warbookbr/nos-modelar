@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-764 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+765 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -611,6 +611,10 @@
 ## laboratorio/adaptadores/mecanifica-node/
 
 - `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
+
+## laboratorio/dados/materiais/
+
+- `FONTES.md` — Fontes da tabela de materiais
 
 ## modulos/exportador-cad/src/
 
