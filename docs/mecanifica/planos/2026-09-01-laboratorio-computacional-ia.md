@@ -51,7 +51,7 @@ só abre com a anterior verde.
 | R0 | esqueleto isolado, guarda de dependência, contratos e hashing canônico | **entregue**: identidade canônica, cinco contratos mínimos e o primeiro estudo real |
 | R1 | artefatos, proveniência e reprodução | **parcial**: armazém, proveniência e verificação de reprodução entregues; RO-Crate adiado |
 | R2 | registro de instrumentos, DAG validado e runner confinado | **entregue**: registro, planejador que prova o grafo antes de executar e executor com limites e confinamento declarado |
-| R3 | pesquisa, fontes e grafo de alegações | não iniciada |
+| R3 | pesquisa, fontes e grafo de alegações | **parcial por decisão**: grafo de fontes, alegações e conflitos entregue; conectores de rede adiados por não haver como prová-los |
 | R4 | unidades, V&V, incerteza e sensibilidade | não iniciada |
 | R5 | ponte neutra da Mecanifica | não iniciada |
 | R6 | dois pilotos verticais em domínios diferentes | não iniciada |

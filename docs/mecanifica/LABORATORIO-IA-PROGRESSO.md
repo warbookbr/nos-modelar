@@ -133,3 +133,38 @@ função no meio; e saída que o passo não prometeu é descartada, para um pass
 alimentar outro por canal que o grafo não declara.
 
 Vinte e cinco testes, e cada regra foi vista vermelha antes de virar verde.
+
+## R3 — o grafo entrou; os conectores de rede não, e digo por quê
+
+**Fonte não é verdade** é a regra que o módulo inteiro serve. Uma citação válida
+sustenta que ALGUÉM PUBLICOU uma alegação; ela não prova que a alegação está
+correta nem que se aplica ao que estou medindo. Por isso a alegação não tem campo
+de verdade nem escalar de confiança — seria o mesmo pecado já recusado nas
+hipóteses, com outro nome — e há teste que verifica a ausência desses campos.
+
+Três coisas ficam separadas porque são três julgamentos diferentes: o que a
+publicação É (identidade, licença, retratação), o que ela AFIRMA (enunciado, onde
+no texto, sob que condições) e se aquilo VALE AQUI. O terceiro é do laboratório,
+não da fonte, e por isso `aplicar` exige justificativa escrita e ao menos uma
+ressalva — transportar resultado sem ressalva é a forma mais comum de usar
+achado fora do domínio dele. Alegação sem condição declarada também é recusada:
+ela se comporta como lei universal.
+
+Duas armadilhas que não levantam erro sozinhas ganharam mecanismo:
+
+- **retratação alcança quem só cita.** Fonte retratada continua no grafo, marcada,
+  e a contaminação viaja por citação, não só por vizinhança. Apagar esconderia
+  que o estudo um dia se apoiou nela;
+- **apoio que parece múltiplo.** Três alegações do mesmo artigo não são três
+  evidências, e cinco revisões do mesmo experimento também não. O grafo conta
+  fontes primárias distintas, não alegações.
+
+Conflito fica preservado e ligado, nunca resolvido: o grafo não elege vencedora,
+mostra a contradição para a síntese ter de falar dela.
+
+**Os conectores de Crossref e OpenAlex não entraram, e isso não é atraso.** Eles
+precisam de paginação, cache, rate-limit, licença e orçamento de contexto — cinco
+coisas que só se provam contra a rede real, e o laboratório ainda não tem um
+estudo que peça literatura. Construí-los agora seria produzir código cuja única
+prova seria eu afirmando que funciona. O grafo, esse, tem prova local: dezenove
+testes, cada recusa vista acontecer.
