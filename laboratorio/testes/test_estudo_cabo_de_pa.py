@@ -50,21 +50,51 @@ def test_a_FIBRA_DE_VIDRO_chega_PERTO_da_madeira_e_os_metais_nao():
     assert medidas["fibra-de-vidro"]["margemP05"] > medidas["eucalipto"]["margemP05"]
 
 
-def test_o_EUCALIPTO_SECO_bate_os_metais_em_resistencia():
-    """Correção pela fonte primária. Com 75 MPa — que é o valor da madeira VERDE —
-    os metais ganhavam. Com os 111,7 MPa do Wood Handbook a 12% de umidade, que é
-    a condição de um cabo, a madeira passa na frente dos dois."""
+def test_o_eucalipto_perde_para_o_ALUMINIO_por_um_VIES_DECLARADO():
+    """Terceira versão deste teste, e as três estão certas no seu momento.
+
+    Primeiro os metais ganhavam, porque eu usava 75 MPa de madeira VERDE. Depois a
+    madeira ganhava, com os 111,7 MPa do Wood Handbook a 12% de umidade. Agora o
+    alumínio volta à frente — e desta vez NÃO é por um dado errado, é por uma
+    assimetria de método que o estudo declara: a correção de tamanho de Weibull
+    desconta 10% da madeira e nada do metal, porque metal dúctil não segue essa
+    estatística.
+
+    O efeito de tamanho em metal é FRACO, não é ZERO. Aqui ele entra como zero por
+    falta de modelo, e o teste existe para essa diferença não passar por resultado.
+
+    E isto NÃO promove o metal a boa escolha: ele continua reprovado por vibração,
+    que é outro critério e não se compensa com resistência.
+    """
     medidas = estudo.comparar()["medidas"]
-    madeira = medidas["eucalipto"]["margemP05"]
-    assert all(medidas[n]["margemP05"] < madeira for n in ("aco-1020", "aluminio-6061-t6"))
+    assert medidas["aluminio-6061-t6"]["margemP05"] > medidas["eucalipto"]["margemP05"]
+    assert medidas["eucalipto"]["efeitoDeEscala"]["fator"] < 1.0
+    assert medidas["aluminio-6061-t6"]["efeitoDeEscala"]["fator"] == 1.0
+    assert "dúctil" in medidas["aluminio-6061-t6"]["efeitoDeEscala"]["porque"]
+    # O critério em que o metal continua perdendo, e é o que decide para a mão.
+    assert (medidas["aluminio-6061-t6"]["vibracaoRestante"]
+            > medidas["eucalipto"]["vibracaoRestante"])
 
 
-def test_A_CARGA_SUPOSTA_ESTAVA_CERTA_e_o_erro_era_meu():
-    """Este teste já afirmou o contrário. Eu concluí que a carga era abusiva porque
-    ela reprovava até o eucalipto — e o que reprovava era eu usar 75 MPa, valor da
-    madeira verde, para um cabo que é de madeira seca. Com o dado do Wood Handbook
-    a madeira passa e a carga se mostra razoável."""
-    assert estudo.comparar()["medidas"]["eucalipto"]["margemP05"] >= 1.0
+def test_a_CARGA_SUPOSTA_e_DURA_e_agora_o_eucalipto_tambem_reprova_nela():
+    """Terceiro movimento da mesma história, e vale ler os três juntos.
+
+    Primeiro eu disse que a carga era abusiva, porque ela reprovava até o
+    eucalipto. Depois descobri que o abusivo era eu: usava 75 MPa de madeira
+    verde num cabo seco, e com o dado certo a madeira passava.
+
+    Agora, com a correção de tamanho, a madeira volta a reprovar — em 0,90 — e
+    desta vez sem erro de dado. Ou seja: 300 N na ponta de 1,2 m É carga dura, e
+    nem o eucalipto aguenta com folga quando o tamanho da peça entra na conta.
+
+    O que NÃO se faz aqui é baixar a porta depois de ver o número. A porta fica em
+    1,0, o caso de carga fica como foi escolhido antes de calcular, e o cabo real
+    que o usuário trouxe tem 71 cm — onde a margem sobe muito.
+    """
+    margem = estudo.comparar()["medidas"]["eucalipto"]["margemP05"]
+    assert margem < estudo.MARGEM_MINIMA_ELIMINATORIA
+    assert 0.85 < margem < 0.95
+    assert estudo.MARGEM_MINIMA_ELIMINATORIA == 1.0, "a porta não se mexe depois do resultado"
 
 
 def test_TODA_propagacao_CONVERGIU():
@@ -125,11 +155,20 @@ def test_o_REQUISITO_ESTRUTURAL_e_PORTA_e_nao_peso():
     assert "porta, não peso" in c["porQueEliminar"]
 
 
-def test_a_PORTA_APROVA_o_eucalipto_e_reprova_o_candidato():
-    """O concorrente com fonte primária passa; o candidato, a 32 mm, não."""
+def test_a_PORTA_reprova_ATE_o_eucalipto_depois_da_correcao_de_tamanho():
+    """Este teste afirmava que a porta aprovava o eucalipto. Não afirma mais.
+
+    A 32 mm e 1,2 m, com a resistência corrigida para o tamanho da peça, ninguém
+    passa em 1,0 — nem o concorrente que a gente estava tentando bater. A porta
+    continua sendo uma porta, e o que ela está dizendo é sobre o caso de carga,
+    não sobre os candidatos.
+    """
     c = estudo.comparar()
-    assert "eucalipto" not in c["eliminados"]
+    assert "eucalipto" in c["eliminados"]
     assert "papel-lignina" in c["eliminados"]
+    # A ordem entre eles não mudou, e é ela que responde a pergunta do usuário.
+    m = c["medidas"]
+    assert m["eucalipto"]["margemP05"] > m["papel-lignina"]["margemP05"]
 
 
 def test_A_TROCA_e_dita_EM_NUMERO_e_a_decisao_nao_e_de_quem_calcula():
@@ -210,14 +249,23 @@ def test_a_escala_qualitativa_se_declara_ORDINAL():
     assert "ordinal" in estudo.ESCALA_QUALITATIVA
 
 
-def test_a_VARIANTE_IGUALITARIA_e_o_melhor_negocio():
-    """Perseguir o máximo custa 68% de massa; só empatar custa 9%, com o mesmo
-    amortecimento. A pergunta veio do usuário e a resposta é sim."""
+def test_a_VARIANTE_IGUALITARIA_DEIXOU_de_empatar_com_a_correcao_de_tamanho():
+    """Ela era o melhor negócio do estudo e não é mais.
+
+    O motivo não é o material ter piorado: é que o corpo de prova dela é o de
+    norma, de 3,2 x 12,7 x 100 mm, enquanto o da madeira é de 25 x 25 x 410 mm. A
+    peça real se afasta muito mais do ensaio pequeno, e a correção de tamanho cobra
+    27% dela contra 10% da madeira.
+
+    É um resultado sobre de onde vem o número, e não sobre o que o material é.
+    """
     v = estudo.avaliar_variantes(medida=True)["variantes"]
-    assert v["igualitaria-medida"]["empataOuSupera"]
-    assert v["igualitaria-medida"]["massaRelativaAoEucalipto"] < 0.15
-    assert v["extrema"]["massaRelativaAoEucalipto"] > 0.60
-    assert v["igualitaria-medida"]["dissipacao"] == v["extrema"]["dissipacao"]
+    igual = v["igualitaria-medida"]
+    assert not igual["empataOuSupera"]
+    assert igual["efeitoDeEscala"]["fator"] < 0.75
+    # A massa continua ótima; o que a derrubou foi a porta, e não o peso.
+    assert igual["massaRelativaAoEucalipto"] < 0.15
+    assert igual["dissipacao"] == v["extrema"]["dissipacao"]
 
 
 def test_o_AMORTECIMENTO_NAO_DEPENDE_da_geometria():
@@ -275,10 +323,13 @@ def test_a_fibra_COBRA_o_preco_em_amortecimento():
     assert v["curaua-medida"]["dissipacao"] > 0.27  # ainda bate a madeira
 
 
-def test_a_variante_com_FIBRA_e_mais_leve_que_a_madeira():
+def test_a_variante_com_FIBRA_continua_leve_e_DEIXOU_de_empatar():
+    """Mesma história da igualitária: leveza intacta, porta perdida pela correção
+    de tamanho. Leveza nunca foi o problema desta família."""
     v = estudo.avaliar_variantes(medida=True)["variantes"]["curaua-medida"]
     assert v["massaRelativaAoEucalipto"] < -0.30
-    assert v["empataOuSupera"] and v["cabeNaMao"] and v["paredeSobreviveAoUso"]
+    assert v["cabeNaMao"] and v["paredeSobreviveAoUso"]
+    assert not v["empataOuSupera"]
 
 
 def test_a_PAREDE_MINIMA_entrou_porque_a_otimizacao_achou_o_terceiro_buraco():
@@ -444,11 +495,13 @@ def test_o_OCO_so_funciona_por_causa_do_DIAMETRO():
     assert rigidez_relativa(secao_tubular(0.034, 0.003), E) < 0.85
 
 
-def test_a_RIGIDEZ_como_criterio_REPROVOU_uma_variante_que_passava():
-    """Cabo que não quebra mas balança demais é cabo ruim, e nada media isso."""
-    v = estudo.avaliar_variantes(medida=True)["variantes"]
-    assert v["igualitaria-40mm"]["empataOuSupera"]
-    assert not v["igualitaria-40mm"]["vergaMenosQueOEucalipto"]
+def test_a_RIGIDEZ_continua_sendo_criterio_e_agora_ha_DOIS_motivos_de_reprova():
+    """A rigidez entrou porque o portão só olhava resistência, e uma variante
+    passava vergando demais. Ela agora reprova nos dois — e o teste guarda os dois
+    separados, porque somar motivos de reprova esconde qual deles é o real."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]["igualitaria-40mm"]
+    assert not v["vergaMenosQueOEucalipto"], "a reprova por rigidez é a original"
+    assert not v["empataOuSupera"], "e a correção de tamanho somou a segunda"
 
 
 def test_o_estudo_DIZ_por_que_a_rigidez_entrou_tarde():

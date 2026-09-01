@@ -24,9 +24,11 @@ com o jeito de medir. Nada aqui vale para decidir compra sem conferir a entrada.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from ..contratos import Estudo, Evidencia, Execucao, Hipotese, Sintese
+from ..ensaio import efeito_de_escala
 from ..incerteza import propagar
 from ..secagem import comparar_preparo
 from ..instrumentos import Registro
@@ -612,6 +614,102 @@ ESTUDO = Estudo(
 )
 
 
+#: DE QUE CORPO DE PROVA VEIO CADA RESISTÊNCIA, e por que isso muda o número.
+#:
+#: Resistência não é propriedade média: ela é decidida pelo maior defeito que por
+#: acaso está na peça. Peça maior tem mais material, mais material tem mais chance
+#: de conter o defeito grande, e por isso **a peça real é mais fraca que o corpo
+#: de prova de onde o valor de manual saiu**. É estatística de Weibull, e vale
+#: para material frágil.
+#:
+#: ESTE ESTUDO IGNOROU ISSO ATÉ AQUI, e o erro tem direção. Os 111,7 MPa do Wood
+#: Handbook vêm de um corpo de prova de 25 x 25 x 410 mm; o cabo de 1,2 m tem
+#: quase quatro vezes esse volume. Aplicar o número direto superestimou TODO
+#: candidato cujo valor veio de corpo de prova pequeno — e os compósitos vêm do
+#: menor de todos.
+#:
+#: E A CORREÇÃO NÃO AJUDA QUEM EU ACHEI QUE AJUDARIA. Eu disse ao usuário que ela
+#: aumentaria a folga do bambu, porque só tinha olhado o desconto do eucalipto.
+#: Errado: madeira e bambu vêm de corpo de prova GRANDE e perdem cerca de 10%,
+#: enquanto os compósitos vêm do corpo de prova de norma, de 3,2 x 12,7 x 100 mm,
+#: e perdem cerca de 27%. A correção é praticamente neutra entre bambu e
+#: eucalipto, e é dura com todo o resto.
+#:
+#: METAL NÃO ENTRA. Material dúctil escoa em volta do defeito e redistribui a
+#: tensão; `ensaio.efeito_de_escala` recusa calcular para ele, e aqui ele fica de
+#: fora em vez de receber um fator inventado.
+#:
+#: Os volumes de corpo de prova são: o da madeira, real (norma de pequeno corpo
+#: livre de defeito do FPL); o do bambu, um segmento de colmo, ESTIMADO; o dos
+#: compósitos, o corpo de flexão da ASTM D790, que é padrão. Os módulos de
+#: Weibull são de faixa de literatura e estão em `ensaio.MODULOS_DE_WEIBULL`.
+CORPOS_DE_PROVA = {
+    "madeira": {
+        "volume_m3": 0.025 * 0.025 * 0.410,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo pequeno livre de defeito, FPL-GTR-190; medida real",
+    },
+    "bambu": {
+        "volume_m3": math.pi / 4 * (0.032 ** 2 - 0.020 ** 2) * 0.50,
+        "modulo_de_weibull": 8.0,
+        "origem": "segmento de colmo em flexão; volume ESTIMADO",
+    },
+    "composito": {
+        "volume_m3": 0.0032 * 0.0127 * 0.100,
+        "modulo_de_weibull": 15.0,
+        "origem": "corpo de flexão ASTM D790",
+    },
+}
+
+#: A ASSIMETRIA QUE ISTO CRIA, e ela é desconfortável. Corrigir os frágeis e não
+#: corrigir os dúcteis está certo em física — Weibull não descreve metal — e
+#: mesmo assim penaliza um lado só. O efeito de tamanho em metal é FRACO, não é
+#: ZERO, e aqui ele entra como zero por falta de modelo, não por medida.
+#:
+#: A CONSEQUÊNCIA APARECEU NA HORA: com a madeira descontada em 10% e os metais
+#: em nada, o alumínio passou na frente do eucalipto em margem — invertendo uma
+#: conclusão que este estudo já tinha registrado. Isso NÃO quer dizer que metal
+#: virou boa escolha para cabo; ele continua reprovado por vibração, que é outro
+#: critério. Quer dizer que a comparação entre frágil e dúctil, neste estudo,
+#: passou a carregar um viés declarado a favor do dúctil.
+#:
+#: A que família de corpo de prova cada candidato pertence. Metal fica de fora de
+#: propósito: ausência aqui quer dizer "não se corrige", e não "esqueci".
+FAMILIA_DE_ENSAIO = {
+    "eucalipto": "madeira",
+    "eucalipto-laminado": "madeira",
+    "bambu-colmo": "bambu",
+    "bambu-laminado": "bambu",
+    "papel-fenolico": "composito",
+    "papel-lignina": "composito",
+    "papel-lignina-curaua": "composito",
+    "sisal-mamona": "composito",
+    "fibra-de-vidro": "composito",
+}
+
+
+def fator_de_escala(nome: str, volume_da_peca_m3: float) -> dict[str, Any]:
+    """Quanto a resistência de manual cai quando a peça é maior que o ensaio.
+
+    Devolve fator 1,0 e o motivo para quem não se corrige, em vez de omitir: um
+    candidato sem correção precisa dizer POR QUE não tem.
+    """
+    familia = FAMILIA_DE_ENSAIO.get(nome)
+    if familia is None:
+        return {"fator": 1.0, "familia": None,
+                "porque": "material dúctil: escoa em volta do defeito e não segue "
+                          "a estatística do elo mais fraco"}
+    cp = CORPOS_DE_PROVA[familia]
+    r = efeito_de_escala(
+        resistencia_pa=1.0, volume_do_ensaio_m3=cp["volume_m3"],
+        volume_da_peca_m3=volume_da_peca_m3,
+        modulo_de_weibull=cp["modulo_de_weibull"], material=familia)
+    return {"fator": r["fatorDeReducao"], "familia": familia,
+            "corpoDeProva": cp["origem"],
+            "porque": "peça maior que o corpo de prova tem mais chance de conter "
+                      "o defeito que decide a ruptura"}
+
+
 def _secao(nome: str) -> dict[str, Any]:
     tipo, diametro, parede = GEOMETRIAS[nome]
     return secao_macica(diametro) if tipo == "macica" else secao_tubular(diametro, parede)
@@ -624,12 +722,23 @@ def medir(nome: str) -> dict[str, Any]:
     base = {chave: material[chave] for chave in
             ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}
 
+    # A resistência tabelada é do CORPO DE PROVA. O cabo é maior, e portanto mais
+    # fraco. A correção entra aqui, antes de qualquer conta, e vale igualmente
+    # para o valor nominal e para as duas pontas da dispersão — corrigir só o
+    # nominal deixaria a cauda ruim otimista, que é a cauda que quebra.
+    escala = fator_de_escala(nome, secao["area"] * COMPRIMENTO_M)
+    base["resistencia_pa"] *= escala["fator"]
+    dispersao_corrigida = {
+        chave: ((a * escala["fator"], b * escala["fator"])
+                if chave == "resistencia_pa" else (a, b))
+        for chave, (a, b) in material["dispersao"].items()
+    }
+
     determinista = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N,
                            condicao="ambiente, carga estática de ponta", **base)
 
-    dispersao = material["dispersao"]
     margem = propagar(
-        dispersao,
+        dispersao_corrigida,
         lambda ponto: avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N,
                               **{**base, **ponto})["margemContraFalha"],
         semente=SEMENTE, amostras=2000,
@@ -646,6 +755,8 @@ def medir(nome: str) -> dict[str, Any]:
         "versao": determinista["versao"],
         "parametros": determinista["parametros"],
         "entradas": {**determinista["entradas"], "material": nome, "fonte": FONTE},
+        "efeitoDeEscala": escala,
+        "resistenciaDeManual_pa": material["resistencia_pa"],
         "margemDeterminista": determinista["margemContraFalha"],
         "margemP05": margem["p05"],
         "margemP50": margem["p50"],
@@ -672,6 +783,26 @@ def medir(nome: str) -> dict[str, Any]:
 #: O valor é 1,0 porque a margem já é resistência dividida por tensão. Note que
 #: NÃO há coeficiente de segurança aqui — para uma ferramenta de verdade ele
 #: existiria, e seria decisão de quem projeta, não deste módulo.
+#: O QUE A CORREÇÃO DE TAMANHO FEZ COM ESTA PORTA, e por que ela NÃO foi mexida.
+#:
+#: Com a resistência corrigida para o tamanho da peça, o eucalipto cai para 0,90
+#: e passa a REPROVAR na própria porta que este estudo usa. O concorrente não
+#: passa no critério absoluto.
+#:
+#: A TENTAÇÃO ÓBVIA é baixar a porta ou torná-la relativa ao eucalipto, já que a
+#: pergunta do usuário era "pelo menos tão resistente quanto o eucalipto". E é
+#: exatamente por ser óbvia depois do resultado que ela não é feita aqui:
+#: reescrever critério depois de ver o número é escolher a conclusão. Já
+#: aconteceu uma vez neste arquivo, com o critério de vibração, e ficou
+#: registrado em vez de corrigido.
+#:
+#: O QUE O NÚMERO ESTÁ DIZENDO DE VERDADE: 300 N na ponta de 1,2 m é carga dura, e
+#: nem a madeira aguenta com folga quando o tamanho da peça entra na conta. O cabo
+#: real que o usuário trouxe tem 71 cm, e a 71 cm a margem sobe muito. A porta não
+#: está errada — o caso de carga é que é o pior caso, e ele foi escolhido antes.
+#:
+#: A comparação relativa continua existindo e sempre existiu, com outro nome:
+#: `empataOuSupera` nas variantes compara com o eucalipto, não com 1,0.
 MARGEM_MINIMA_ELIMINATORIA = 1.0
 
 #: RIGIDEZ COMO CRITÉRIO, e ela entrou porque o usuário perguntou o que o estudo
@@ -876,6 +1007,13 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
                          f"de {PAREDE_MINIMA_PRATICA_M * 1000:.1f} mm; ela amassa em uso.",
                          local="VARIANTES")
         secao = secao_tubular(v["diametro_m"], v["parede_m"])
+        # Mesma correção de tamanho da `medir`: a variante também é maior que o
+        # corpo de prova, e cada variante tem o seu volume.
+        escala = fator_de_escala(material, secao["area"] * COMPRIMENTO_M)
+        base["resistencia_pa"] *= escala["fator"]
+        dispersao = {c: ((a * escala["fator"], b * escala["fator"])
+                         if c == "resistencia_pa" else (a, b))
+                     for c, (a, b) in dispersao.items()}
         r = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N, **base)
         p = propagar(dispersao,
                      lambda pt: avaliar(secao, comprimento_m=COMPRIMENTO_M,
@@ -885,6 +1023,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         saida[nome] = {
             **v,
             "material": material,
+            "efeitoDeEscala": escala,
             "margemP05": p["p05"],
             "massa_kg": massa,
             "custo": massa * mat["preco_por_kg"],
