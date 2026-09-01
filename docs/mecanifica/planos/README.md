@@ -12,7 +12,8 @@ módulos de saída de malha. Rastreio em
 para investigação por IA](../../superpowers/specs/2026-08-31-laboratorio-computacional-ia-design.md)
 está restrito à branch `experimento/laboratorio-ia`. Ele não altera a
 arquitetura vigente nem autoriza implementação na `main`; a Mecanifica é um
-instrumento opcional do laboratório.
+instrumento opcional do laboratório. A execução R0–R7 está decomposta no
+[plano Agent-First](../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md).
 
 A [reorganização da documentação por uso](encerrados/2026-08-31-reorganizacao-por-uso.md)
 foi **concluída e aprovada** em 2026-08-31. Ela separou a documentação por quem
