@@ -23,7 +23,8 @@ function importsEstaticos(arquivo, texto) {
 
       const direto = linha.match(/^\s*import\s+(.+)$/);
       if (direto) {
-        for (const item of direto[1].split(',')) {
+        const clausula = direto[1].split('#', 1)[0].split(';', 1)[0];
+        for (const item of clausula.split(',')) {
           imports.push({ linha: indice + 1, especificador: item.trim().split(/\s+as\s+/)[0] });
         }
       }
@@ -37,7 +38,7 @@ function importsEstaticos(arquivo, texto) {
     imports.push({ linha: linhaNaPosicao(ocorrencia.index), especificador: ocorrencia[1] });
   }
 
-  const requireEstatico = /^\s*(?:const|let|var)\s+.+?=\s*require\(\s*['"]([^'"]+)['"]\s*\)/gm;
+  const requireEstatico = /^\s*(?:(?:(?:const|let|var)\s+.+?|module\.exports)\s*=\s*)?require\(\s*['"]([^'"]+)['"]\s*\)/gm;
   for (const ocorrencia of texto.matchAll(requireEstatico)) {
     imports.push({ linha: linhaNaPosicao(ocorrencia.index), especificador: ocorrencia[1] });
   }

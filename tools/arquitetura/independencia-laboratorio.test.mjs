@@ -40,6 +40,17 @@ describe('fronteira de isolamento do laboratório', () => {
     ]);
   });
 
+  it('recusa import Python do laboratório antes de terminador e comentário', () => {
+    const repo = repositorioCom({
+      'src/consumidor.py': 'import laboratorio; # dependência reversa\n',
+      'laboratorio/src/laboratorio/__init__.py': '',
+    });
+
+    expect(verificarIndependenciaLaboratorio({ repo })).toEqual([
+      expect.stringMatching(/src\/consumidor\.py:1.*importa laboratorio/i),
+    ]);
+  });
+
   it('encerra a CLI com código não zero diante da dependência reversa', () => {
     const repo = repositorioCom({
       'src/consumidor.py': 'from laboratorio.erros import falhar\n',
@@ -60,6 +71,17 @@ describe('fronteira de isolamento do laboratório', () => {
 
     expect(verificarIndependenciaLaboratorio({ repo })).toEqual([
       expect.stringMatching(/src\/consumidor\.js:1.*importa laboratorio/i),
+    ]);
+  });
+
+  it('recusa require side-effect do laboratório vindo da Mecanifica', () => {
+    const repo = repositorioCom({
+      'src/consumidor.cjs': "require('../laboratorio/src/laboratorio/erros.js');\n",
+      'laboratorio/src/laboratorio/erros.js': '',
+    });
+
+    expect(verificarIndependenciaLaboratorio({ repo })).toEqual([
+      expect.stringMatching(/src\/consumidor\.cjs:1.*importa laboratorio/i),
     ]);
   });
 
@@ -87,6 +109,17 @@ describe('fronteira de isolamento do laboratório', () => {
 
     expect(verificarIndependenciaLaboratorio({ repo })).toEqual([
       expect.stringMatching(/laboratorio\/src\/laboratorio\/instrumento\.mjs:1.*porta Mecanifica/i),
+    ]);
+  });
+
+  it('recusa module.exports com require de porta Mecanifica fora do adaptador', () => {
+    const repo = repositorioCom({
+      'laboratorio/src/laboratorio/instrumento.cjs': "module.exports = require('../../../src/autoria/executar-receita.js');\n",
+      'src/autoria/executar-receita.js': '',
+    });
+
+    expect(verificarIndependenciaLaboratorio({ repo })).toEqual([
+      expect.stringMatching(/laboratorio\/src\/laboratorio\/instrumento\.cjs:1.*porta Mecanifica/i),
     ]);
   });
 
