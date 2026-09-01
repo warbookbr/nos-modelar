@@ -1041,7 +1041,9 @@ FLECHA_MAXIMA_RELATIVA_AO_EUCALIPTO = 1.05
 
 def rigidez_relativa(secao: dict[str, Any], modulo_pa: float) -> float:
     """Rigidez à flexão da seção, dividida pela do cabo de eucalipto de referência."""
-    referencia = MATERIAIS["eucalipto"]["modulo_pa"] * secao_macica(0.032)["inercia"]
+    # REFERÊNCIA TROCADA para o eucalipto BRASILEIRO: comparar rigidez contra uma
+    # árvore australiana que ninguém planta aqui responde a pergunta errada.
+    referencia = MATERIAIS[REFERENCIA]["modulo_pa"] * secao_macica(0.032)["inercia"]
     return modulo_pa * secao["inercia"] / referencia
 
 
@@ -1133,6 +1135,12 @@ DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
 #: agora a parede que amassa. O padrão é sempre o mesmo, e o resultado ausente
 #: nunca aparece como erro — aparece como ótimo.
 PAREDE_MINIMA_PRATICA_M = 0.003
+
+#: CONTRA QUEM ESTE ESTUDO COMPARA, e a escolha é a resposta à pergunta do
+#: usuário. Ele quer substituir o cabo de eucalipto que existe no Brasil, e o que
+#: existe no Brasil é urograndis — não o jarrah australiano do Wood Handbook.
+#: O jarrah fica na tabela como referência estrangeira, e não como alvo.
+REFERENCIA = "eucalipto-urograndis"
 
 #: PINUS ENGROSSADO: a resposta mais barata do estudo inteiro, e a mais chata.
 #:
@@ -1247,7 +1255,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "bambu-colmo": {"resistencia_pa": (145e6, 195e6), "modulo_pa": (13e9, 17e9)},
         "bambu-laminado": {"resistencia_pa": (102e6, 138e6), "modulo_pa": (10e9, 14e9)},
     }
-    referencia = medir("eucalipto")
+    referencia = medir(REFERENCIA)
     referencia_flecha = referencia["flecha_m"]
 
     saida = {}
@@ -1299,7 +1307,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
             "paredeSobreviveAoUso": v["parede_m"] >= PAREDE_MINIMA_PRATICA_M,
         }
     return {
-        "referencia": {"material": "eucalipto", "margemP05": referencia["margemP05"],
+        "referencia": {"material": REFERENCIA, "margemP05": referencia["margemP05"],
                        "massa_kg": referencia["massa_kg"], "custo": referencia["custo"],
                        "dissipacao": 1 - referencia["vibracaoRestante"],
                        "fonte": FONTE_MADEIRA},

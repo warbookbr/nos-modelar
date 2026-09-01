@@ -257,7 +257,7 @@ def test_a_escala_qualitativa_se_declara_ORDINAL():
     assert "ordinal" in estudo.ESCALA_QUALITATIVA
 
 
-def test_a_VARIANTE_IGUALITARIA_DEIXOU_de_empatar_com_a_correcao_de_tamanho():
+def test_a_VARIANTE_IGUALITARIA_volta_a_empatar_contra_a_ARVORE_CERTA():
     """Ela era o melhor negócio do estudo e não é mais.
 
     O motivo não é o material ter piorado: é que o corpo de prova dela é o de
@@ -269,10 +269,14 @@ def test_a_VARIANTE_IGUALITARIA_DEIXOU_de_empatar_com_a_correcao_de_tamanho():
     """
     v = estudo.avaliar_variantes(medida=True)["variantes"]
     igual = v["igualitaria-medida"]
-    assert not igual["empataOuSupera"]
+    # Ela deixou de empatar quando o efeito de tamanho entrou, e voltou a empatar
+    # quando o concorrente virou o eucalipto brasileiro. Nenhuma das duas vezes o
+    # material mudou: mudou de onde vinha o número do lado de lá.
+    assert igual["empataOuSupera"]
     assert igual["efeitoDeEscala"]["fator"] < 0.75
-    # A massa continua ótima; o que a derrubou foi a porta, e não o peso.
-    assert igual["massaRelativaAoEucalipto"] < 0.15
+    # E a leveza dela evaporou junto: contra o jarrah pesado ela era +9%, contra o
+    # urograndis, que é leve, ela é +42%. O material não mudou; o alvo mudou.
+    assert igual["massaRelativaAoEucalipto"] > 0.35
     assert igual["dissipacao"] == v["extrema"]["dissipacao"]
 
 
@@ -331,13 +335,13 @@ def test_a_fibra_COBRA_o_preco_em_amortecimento():
     assert v["curaua-medida"]["dissipacao"] > 0.27  # ainda bate a madeira
 
 
-def test_a_variante_com_FIBRA_continua_leve_e_DEIXOU_de_empatar():
+def test_a_variante_com_FIBRA_e_leve_e_empata_contra_a_arvore_certa():
     """Mesma história da igualitária: leveza intacta, porta perdida pela correção
     de tamanho. Leveza nunca foi o problema desta família."""
     v = estudo.avaliar_variantes(medida=True)["variantes"]["curaua-medida"]
-    assert v["massaRelativaAoEucalipto"] < -0.30
+    assert v["massaRelativaAoEucalipto"] < -0.15
     assert v["cabeNaMao"] and v["paredeSobreviveAoUso"]
-    assert not v["empataOuSupera"]
+    assert v["empataOuSupera"], "empata contra a árvore certa"
 
 
 def test_a_PAREDE_MINIMA_entrou_porque_a_otimizacao_achou_o_terceiro_buraco():
@@ -373,18 +377,35 @@ def test_o_BAMBU_tem_a_maior_resistencia_por_quilo_do_estudo():
     assert especifica("bambu-colmo") > especifica("fibra-de-vidro")
 
 
-def test_o_BAMBU_e_o_UNICO_que_vence_SEM_medir():
-    """Todos os outros candidatos dependem de estreitar a incerteza para empatar."""
+def test_com_o_CONCORRENTE_CERTO_quase_tudo_empata_e_a_disputa_MUDA_de_lugar():
+    """Este teste dizia que o bambu era o único a vencer sem medir. Contra o
+    eucalipto brasileiro ele deixa de ser único — e não porque os outros
+    melhoraram, mas porque a barra era da árvore errada.
+
+    E isso muda a leitura do estudo inteiro: quando quase todo mundo passa no
+    portão estrutural, a pergunta deixa de ser 'aguenta?' e vira preço, peso e
+    processo. O portão continua sendo portão; ele só parou de ser o filtro que
+    decide.
+    """
     sem = estudo.avaliar_variantes(medida=False)["variantes"]
-    assert sem["bambu-sem-selecionar"]["empataOuSupera"]
-    assert sem["bambu-sem-selecionar"]["massaRelativaAoEucalipto"] < -0.50
-    assert not sem["igualitaria-medida"]["empataOuSupera"] or \
-        sem["igualitaria-medida"]["massa_kg"] > sem["bambu-sem-selecionar"]["massa_kg"]
+    empatam = [n for n, d in sem.items() if d["empataOuSupera"]]
+    assert len(empatam) > 3, "contra a árvore certa, o portão filtra pouco"
+    assert "bambu-sem-selecionar" in empatam
+    # O que separa o bambu agora é o resto, e a distância é grande.
+    bambu = sem["bambu-sem-selecionar"]
+    assert bambu["massaRelativaAoEucalipto"] < -0.40
+    assert all(bambu["custo"] < sem[n]["custo"]
+               for n in empatam if not n.startswith("bambu"))
+    # E entre os que empatam, os dois mais baratos são os dois de colmo.
+    dois_mais_baratos = sorted(empatam, key=lambda n: sem[n]["custo"])[:2]
+    assert all(n.startswith("bambu") for n in dois_mais_baratos)
 
 
 def test_o_bambu_e_MUITO_mais_barato():
+    """A vantagem encolheu com o concorrente certo, porque o urograndis é mais
+    leve e mais barato que o jarrah — mas continua sendo de três para um."""
     v = estudo.avaliar_variantes(medida=True)
-    assert v["variantes"]["bambu-selecionado"]["custo"] < 0.25 * v["referencia"]["custo"]
+    assert v["variantes"]["bambu-selecionado"]["custo"] < 0.35 * v["referencia"]["custo"]
 
 
 def test_o_PROCESSO_do_bambu_e_declarado_inteiro():
@@ -498,18 +519,34 @@ def test_o_OCO_so_funciona_por_causa_do_DIAMETRO():
     from laboratorio.estudos.cabo_de_pa import rigidez_relativa
     from laboratorio.viga import secao_tubular
 
+    # A referência de rigidez agora é o urograndis, que é MENOS rígido que o
+    # jarrah — então o mesmo bambu passa a folgar mais. A conclusão do teste não
+    # muda: quem salva é o diâmetro, e encolher continua custando caro.
     E = estudo.MATERIAIS["bambu-colmo"]["modulo_pa"]
-    assert rigidez_relativa(secao_tubular(0.037, 0.003), E) > 1.0
-    assert rigidez_relativa(secao_tubular(0.034, 0.003), E) < 0.85
+    grosso = rigidez_relativa(secao_tubular(0.037, 0.003), E)
+    fino = rigidez_relativa(secao_tubular(0.034, 0.003), E)
+    assert grosso > 1.0
+    assert fino / grosso < 0.85, "3 mm a menos custa mais de 15% da rigidez"
 
 
-def test_a_RIGIDEZ_continua_sendo_criterio_e_agora_ha_DOIS_motivos_de_reprova():
-    """A rigidez entrou porque o portão só olhava resistência, e uma variante
-    passava vergando demais. Ela agora reprova nos dois — e o teste guarda os dois
-    separados, porque somar motivos de reprova esconde qual deles é o real."""
+def test_a_RIGIDEZ_DEIXOU_de_reprovar_porque_o_concorrente_certo_verga_MAIS():
+    """Terceiro estado deste teste, e vale ler a sequência.
+
+    A rigidez entrou como critério porque o portão só olhava resistência e uma
+    variante passava vergando demais que o eucalipto. Depois a correção de tamanho
+    somou uma segunda reprova. Agora as duas somem — não porque a variante
+    melhorou, mas porque o eucalipto BRASILEIRO é menos rígido que o australiano
+    contra o qual ela era comparada.
+
+    O critério continua no estudo. Ele parou de morder porque o alvo mudou, e essa
+    é justamente a diferença entre um critério e um resultado.
+    """
     v = estudo.avaliar_variantes(medida=True)["variantes"]["igualitaria-40mm"]
-    assert not v["vergaMenosQueOEucalipto"], "a reprova por rigidez é a original"
-    assert not v["empataOuSupera"], "e a correção de tamanho somou a segunda"
+    assert v["vergaMenosQueOEucalipto"]
+    assert v["empataOuSupera"]
+    # E ela continua sendo mau negócio, agora por peso e preço, não por porta.
+    assert v["massaRelativaAoEucalipto"] > 0.50
+    assert v["custo"] > 2 * estudo.avaliar_variantes(medida=True)["referencia"]["custo"]
 
 
 def test_o_estudo_DIZ_por_que_a_rigidez_entrou_tarde():
