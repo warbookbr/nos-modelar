@@ -18,58 +18,110 @@ ou demorado.
 
 ## 2. Resposta curta
 
-**Colmo de bambu**, em tubo de 37 × 3 mm. Contra o eucalipto: **65% mais leve, 83%
+**Colmo de bambu**, em tubo de 43 × 3 mm. Contra o eucalipto: **59% mais leve, 80%
 mais barato, dissipa 31% da vibração contra 27%, e seca cerca de 114 vezes mais
-rápido.** É o único candidato que vence sem exigir ensaio prévio.
+rápido.** É o único candidato que empata sem exigir seleção de lote nem ensaio.
 
 Ele tem duas exigências próprias — tratamento contra caruncho, obrigatório — e um
 risco que este estudo não modela: rachadura ao longo da fibra com ciclo de umidade.
 
+**Se bambu não for viável, a segunda opção é pinus comercial em 44 mm.** Ele empata
+com o eucalipto no pior caso, custa 40% menos e seca muito mais fácil, em troca de
+ser 21% mais pesado e visivelmente mais gordo. A fraqueza dele — madeira mole, que
+amassa e marca — este estudo **não** mede.
+
+### O que mudou desta versão para a anterior
+
+Duas correções entraram e as duas pioraram os números. Elas estão aqui porque um
+dossiê que só melhora não é um dossiê, é propaganda.
+
+**Efeito de tamanho.** Resistência não é propriedade média: ela é decidida pelo
+maior defeito que por acaso está na peça, e peça maior tem mais chance de conter
+defeito grande. Os valores de manual vêm de corpo de prova pequeno, e o cabo é
+maior. Todos os números caíram — a madeira uns 10%, os compósitos uns 27%, porque
+o corpo de prova deles é bem menor. Metal não recebe a correção, porque escoa em
+volta do defeito; isso cria um viés a favor do metal, declarado na seção 12.
+
+**Preço coerente com a qualidade da peça.** A versão anterior juntava resistência
+de madeira sem nó com preço de madeira de pátio. Não dá para ter os dois: peça
+selecionada custa prêmio de seleção. Corrigido, o pinus **selecionado** sai mais
+caro que o eucalipto, e a única rota barata é a peça comercial engrossada.
+
 ## 3. Todos os candidatos
 
-Cabo de 1,2 m, 32 mm de diâmetro externo, carga de 300 N na ponta. Ordenados por
-resistência por quilo, que é o que decide em flexão com diâmetro limitado.
+Cabo de 1,2 m, carga de 300 N na ponta, cada um na geometria que se compra.
+Ordenados por resistência por quilo, que é o que decide em flexão.
 
-| material | σ/ρ | margem (p05) | custo | vibração dissipada | saúde | ambiente | água | fabricação | conformidade |
-| --- | ---: | ---: | ---: | ---: | :-: | :-: | :-: | :-: | :-: |
-| bambu-colmo | 242.857 | 0.81 | 0.82 | 31% | 3 | 3 | 2 | 3 | 3 |
-| fibra-de-vidro | 210.526 | 1.65 | 9.35 | 22% | 1 | 1 | 3 | 2 | 2 |
-| bambu-laminado | 171.429 | 0.77 | 3.29 | 31% | 3 | 3 | 2 | 3 | 3 |
-| eucalipto | 139.625 | 1.01 | 3.09 | 27% | 3 | 3 | 2 | 3 | 3 |
-| papel-lignina-curaua | 138.462 | 0.77 | 4.25 | 43% | 2 | 3 | 1 | 2 | 3 |
-| aluminio-6061-t6 | 102.222 | 0.97 | 12.21 | 1% | 3 | 1 | 3 | 3 | 3 |
-| papel-fenolico | 88.889 | 0.49 | 3.15 | 54% | 1 | 2 | 2 | 3 | 1 |
-| papel-lignina | 65.385 | 0.37 | 3.06 | 61% | 3 | 3 | 1 | 3 | 3 |
-| aco-1020 | 44.586 | 0.80 | 6.56 | 2% | 3 | 2 | 2 | 3 | 3 |
+| material | geometria | σ/ρ | fator tam. | margem (p05) | custo | dissipa | saúde | ambiente | água | fabricação |
+| --- | :-: | ---: | ---: | ---: | ---: | ---: | :-: | :-: | :-: | :-: |
+| bambu-colmo | 32 × 6.0 mm | 242.857 | 0.90 | 0.72 | 0.82 | 31% | 3 | 3 | 2 | 3 |
+| fibra-de-vidro | 32 × 3.0 mm | 210.526 | 0.75 | 1.23 | 9.35 | 22% | 1 | 1 | 3 | 2 |
+| pinus-elliottii (limpo) | 32 mm | 189.831 | 0.90 | 0.71 | 2.56 | 27% | 3 | 3 | 1 | 3 |
+| bambu-laminado | 32 × 6.0 mm | 171.429 | 0.90 | 0.69 | 3.29 | 31% | 3 | 3 | 2 | 3 |
+| **eucalipto** | 32 mm | 139.625 | 0.90 | **0.90** | 3.09 | 27% | 3 | 3 | 2 | 3 |
+| papel-lignina-curaua | 32 × 4.5 mm | 138.462 | 0.73 | 0.56 | 4.25 | 43% | 2 | 3 | 1 | 2 |
+| pinus-comercial (com nó) | 44 mm | 137.255 | 0.68 | 0.96 | 1.86 | 27% | 3 | 3 | 1 | 3 |
+| eucalipto-laminado | 32 mm | 113.333 | 0.90 | 0.63 | 5.07 | 27% | 2 | 3 | 2 | 2 |
+| aluminio-6061-t6 | 32 × 2.0 mm | 102.222 | 1.00 | 0.97 | 12.21 | 1% | 3 | 1 | 3 | 3 |
+| papel-fenolico | 32 × 4.5 mm | 88.889 | 0.73 | 0.36 | 3.15 | 54% | 1 | 2 | 2 | 3 |
+| papel-lignina | 32 × 6.0 mm | 65.385 | 0.72 | 0.27 | 3.06 | 61% | 3 | 3 | 1 | 3 |
+| aco-1020 | 32 × 1.2 mm | 44.586 | 1.00 | 0.80 | 6.56 | 2% | 3 | 2 | 2 | 3 |
+| sisal-mamona | 32 × 4.5 mm | 13.043 | 0.73 | 0.07 | 6.44 | 79% | 2 | 3 | 2 | 2 |
 
 Escala qualitativa: 3 = bom, 2 = aceitável, 1 = problemático; ordinal, não métrico.
 
-**Requisito estrutural é porta, não critério com peso:** margem abaixo de 1,0 elimina.
-Quebrar não se troca por ser confortável ou barato. As margens acima usam todos os
-cabos em 32 mm; a seção 4 dimensiona cada candidato para empatar com o eucalipto.
+**Leia a coluna de margem com cuidado.** Com o efeito de tamanho aplicado, **nem o
+eucalipto passa em 1,0** nesta carga. Isso diz que 300 N na ponta de 1,2 m é caso
+duro, e não que a madeira seja ruim — o cabo real de 71 cm tem margem bem maior. A
+porta em 1,0 ficou como estava; baixá-la depois de ver o resultado seria escolher
+a conclusão. **A comparação que responde à pergunta é contra o eucalipto**, e é a
+da seção 4.
+
+**Requisito estrutural é porta, não critério com peso.** Quebrar não se troca por
+ser confortável ou barato.
+
+### Candidatos que foram testados e reprovaram
+
+| ideia | por que entrou | por que saiu |
+| --- | --- | --- |
+| eucalipto laminado | atacar a secagem sem trocar de matéria-prima | empata só a 36 mm, e a cola custa o dobro do material que ia substituir |
+| sisal + resina de mamona | fibra longa nacional, resina vegetal sem formaldeído | a resina de mamona é flexível por projeto; mesmo no cenário otimista o cabo verga o dobro |
+| papelão / papel reciclado | material barato e abundante | fibra curta e desalinhada: metade da resistência necessária, e resina nenhuma conserta fibra |
+| pó de pedra, barro, geopolímero | material baratíssimo e disponível | cerâmica: rígida, quebradiça e pesada — margem 0,08 a 0,22 com 2 kg de cabo |
+| madeira plástica | barata, não absorve água | rigidez quatro a cinco vezes menor que a da madeira |
+| micarta (tecido + fenólica) | material antigo, muito amortecedor | é o papel-fenólico da tabela: metade da resistência, e formaldeído |
 
 ## 4. Dimensionado para empatar com o eucalipto
 
 Amortecimento é propriedade do **material** e vale em qualquer diâmetro; engrossar o
 cabo serve para resistência, não para vibração.
 
-| variante | material | geometria | massa | vs. eucalipto | custo | dissipa | cabe na mão |
-| --- | --- | --- | ---: | ---: | ---: | ---: | :-: |
-| **eucalipto** | madeira maciça | 32 mm | 0.77 kg | — | 3.09 | 27% | sim |
-| bambu-selecionado | bambu-colmo | 37 × 3.0 mm | 0.27 kg | -65% | 0.54 | 31% | sim |
-| bambu-sem-selecionar | bambu-colmo | 43 × 3.0 mm | 0.32 kg | -59% | 0.63 | 31% | sim |
-| bambu-laminado | bambu-laminado | 43 × 3.0 mm | 0.32 kg | -59% | 2.53 | 31% | sim |
-| curaua-medida | papel-lignina-curaua | 36 × 3.0 mm | 0.49 kg | -37% | 3.40 | 43% | sim |
-| curaua-sem-medir | papel-lignina-curaua | 41 × 3.0 mm | 0.56 kg | -28% | 3.91 | 43% | sim |
-| extrema | papel-lignina | 50 × 6.0 mm | 1.29 kg | +68% | 5.18 | 61% | **não** |
-| igualitaria-medida | papel-lignina | 45 × 4.2 mm | 0.84 kg | +9% | 3.36 | 61% | sim |
-| igualitaria-sem-medir | papel-lignina | 45 × 8.0 mm | 1.45 kg | +88% | 5.80 | 61% | sim |
-| igualitaria-40mm | papel-lignina | 40 × 6.6 mm | 1.08 kg | +40% | 4.32 | 61% | sim |
+| variante | material | geometria | massa | vs. eucalipto | custo | margem (p05) | dissipa | cabe na mão |
+| --- | --- | :-: | ---: | ---: | ---: | ---: | ---: | :-: |
+| **eucalipto** | madeira maciça | 32 mm | 0.77 kg | — | 3.09 | 0.90 | 27% | sim |
+| **pinus-comercial** | madeira maciça | 44 mm | 0.93 kg | +21% | 1.86 | 0.96 | 27% | sim |
+| bambu-sem-selecionar | bambu-colmo | 43 × 3.0 mm | 0.32 kg | -59% | 0.63 | 1.34 | 31% | sim |
+| extrema | papel-lignina | 50 × 6.0 mm | 1.29 kg | +68% | 5.18 | 1.15 | 61% | **não** |
+| igualitaria-sem-medir | papel-lignina | 45 × 8.0 mm | 1.45 kg | +88% | 5.80 | 1.03 | 61% | sim |
+| curaua-sem-medir | papel-lignina-curaua | 41 × 3.0 mm | 0.56 kg | -28% | 3.91 | 1.00 | 43% | sim |
+| bambu-selecionado | bambu-colmo | 37 × 3.0 mm | 0.27 kg | -65% | 0.54 | 0.98 | 31% | sim |
+| bambu-laminado | bambu-laminado | 43 × 3.0 mm | 0.32 kg | -59% | 2.53 | 0.94 | 31% | sim |
+| curaua-medida | papel-lignina-curaua | 36 × 3.0 mm | 0.49 kg | -37% | 3.40 | 0.76 | 43% | sim |
+| igualitaria-medida | papel-lignina | 45 × 4.2 mm | 0.84 kg | +9% | 3.36 | 0.73 | 61% | sim |
+| igualitaria-40mm | papel-lignina | 40 × 6.6 mm | 1.08 kg | +40% | 4.32 | 0.72 | 61% | sim |
 
-**O bambu é o único que vence sem medir.** Todos os demais dependem de estreitar a
-incerteza por ensaio para empatar. Para o colmo, aliás, "medir" é **selecionar
-lote**: a variação é da planta, e nenhum ensaio a reduz — o que se faz é escolher o
-que entra.
+**O bambu sem selecionar é o melhor negócio do estudo:** 59% mais leve, 80% mais
+barato, e é o único que supera o eucalipto com folga carregando a variação natural
+do colmo inteira. Para o colmo, "medir" é **selecionar lote**: a variação é da
+planta, e nenhum ensaio a reduz — o que se faz é escolher o que entra.
+
+**O pinus comercial é a alternativa de quem não tem bambu.** Ele empata, custa 40%
+menos, e paga em peso e diâmetro. Ele exige duas coisas de projeto, ambas baratas
+e ambas padrão de ferramenta: **virola metálica ou parafuso passante com arruela**
+na zona do encaixe, porque pinus esmaga no furo do rebite; e **acabamento em óleo
+ou cera**, porque apodrece mais rápido. Tratamento de autoclave com sal metálico é
+remédio de poste enterrado e não se aplica a cabo de mão — nem seria aceitável,
+dada a exigência de não-toxicidade.
 
 ## 5. Preparo da matéria-prima
 
@@ -358,16 +410,22 @@ O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato
 - Preço por quilo é ordem de grandeza, não cotação; ele muda com região, volume e momento.
 - O papel-fenólico é a entrada mais fraca: faixas largas por ignorância, não por conservadorismo. E o estudo NÃO modela o que mais ameaça esse candidato — absorção de umidade, que degrada celulose, e o desempenho da vedação ao longo do tempo. Sem isso, qualquer aprovação dele aqui é provisória.
 - A hipótese da vibração saiu `contradita` por ERRO MEU DE CRITÉRIO, não por o metal ser bom: pedi que a vibração RESTANTE dobrasse, e sobra é limitada a 1. Em energia dissipada, que é a medida certa, o metal dissipa cerca de dezessete vezes menos que a madeira. O critério não foi reescrito depois do resultado, e a versão corrigida está no módulo marcada como não testada.
-- CORREÇÃO REGISTRADA: este estudo afirmou que o caso de carga era abusivo porque reprovava até o eucalipto. Estava errado. Eu usava 75 MPa para a madeira, que é o valor VERDE; o Wood Handbook dá 111,7 MPa a 12% de umidade, que é a condição de um cabo. Com o valor certo o eucalipto passa, a carga estava correta, e a barra para o candidato subiu 50%.
+- CORREÇÃO REGISTRADA, em três movimentos, porque ela mudou de lado duas vezes. Primeiro este estudo disse que o caso de carga era abusivo, porque reprovava até o eucalipto. Depois descobriu que o abusivo era o dado: 75 MPa é madeira VERDE, e cabo é madeira SECA, que o Wood Handbook dá em 111,7 MPa — com o valor certo o eucalipto passava e a barra subia 50%. Agora, com o efeito de tamanho aplicado, o eucalipto volta a reprovar, em 0,90, e desta vez sem erro de dado. A leitura final é que 300 N na ponta de 1,2 m É caso duro, e o cabo real de 71 cm está longe disso.
+- VIÉS DECLARADO ENTRE FRÁGIL E DÚCTIL: a correção de tamanho desconta 10% da madeira, 27% dos compósitos e **nada** do metal, porque a estatística do elo mais fraco não descreve material que escoa. Está certo na física e cria uma assimetria: o alumínio passou à frente do eucalipto em margem por causa dela. O efeito de tamanho em metal é FRACO, não é ZERO, e aqui entra como zero por falta de modelo. Isso não promove o metal, que segue reprovado por vibração.
+- INCOERÊNCIA DE QUALIDADE E PREÇO, corrigida depois de crítica externa: a versão anterior usava resistência de madeira sem nó com preço de madeira de pátio. Corrigido, o pinus selecionado sai MAIS CARO que o eucalipto, e só a peça comercial engrossada mantém vantagem de preço. O mesmo tipo de erro pode estar em outras linhas da tabela e não foi varrido.
+- DUREZA DE SUPERFÍCIE NÃO É MODELADA, e é a fraqueza principal do pinus: madeira mole marca, amassa no encaixe e desgasta. Nenhuma conta deste dossiê a mede.
 - ASSIMETRIA DE FONTES: só o eucalipto tem fonte primária (FPL-GTR-190, domínio público, lido diretamente). Todos os outros materiais, inclusive o candidato recomendado, seguem com números de memória.
 - Rachadura do bambu ao longo da fibra com ciclo de umidade não é modelada, e é o
   risco real de durabilidade dele.
 - Três restrições entraram no estudo depois que a otimização foi para o vazio delas:
   parede que enruga, diâmetro de 69 mm que não cabe na mão, e parede de 1,8 mm que
   amassa em uso. Pode haver uma quarta que ainda não apareceu.
-- A busca de candidatos foi guiada pela ideia inicial, não por varredura do espaço:
-  o bambu — material com séculos de uso em cabo de ferramenta — só entrou quando o
-  usuário perguntou se havia algo melhor.
+- A busca de candidatos foi guiada pela ideia inicial, não por varredura do espaço,
+  e isso já cobrou duas vezes. O bambu — material com séculos de uso em cabo de
+  ferramenta — só entrou quando o usuário perguntou se havia algo melhor. E o
+  pinus, a madeira mais plantada e mais barata do país, só entrou muito depois,
+  porque o estudo tratou "madeira" como se fosse uma coisa só e foi procurar
+  material exótico. Provavelmente há outros candidatos óbvios não testados.
 
 ## 13. O que precisa ser medido
 
@@ -377,6 +435,15 @@ Para o bambu, em ordem de valor:
 - **resistência por lote de colmo**, que é seleção e não ensaio único;
 - **fator de perda medido**, porque o valor usado é de memória;
 - **resistência após ciclos**, porque cabo de pá é fadiga e isto foi carga única.
+
+Para o pinus comercial, em ordem de valor:
+
+- **dureza de superfície e desgaste no encaixe**, que é a fraqueza dele e não está
+  em nenhuma conta daqui;
+- **resistência do lote real**, porque a faixa de peça com nó é larga e é ela que
+  manda no pior caso;
+- **esmagamento no furo do parafuso**, com e sem virola, que é o modo de falha que
+  a crítica externa apontou e o remédio proposto.
 
 Para os laminados de papel, o primeiro item continua sendo resistência à flexão.
 

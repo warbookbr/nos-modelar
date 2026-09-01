@@ -645,8 +645,11 @@ def test_o_PINUS_entrou_TARDE_e_e_uma_falha_de_metodo_registrada():
     """Eu tratei 'madeira' como uma coisa só e passei o estudo tentando bater o
     eucalipto com material exótico, sem testar a outra madeira de reflorestamento
     — que no Brasil é a mais plantada e a mais barata."""
-    pinus = estudo.MATERIAIS["pinus-elliottii"]
+    # O preço aqui é o do pinus COMERCIAL: o limpo foi reprecificado com prêmio de
+    # seleção depois que a incoerência grade-versus-preço apareceu.
+    pinus = estudo.MATERIAIS["pinus-comercial"]
     assert pinus["preco_por_kg"] < estudo.MATERIAIS["eucalipto"]["preco_por_kg"]
+    pinus = estudo.MATERIAIS["pinus-elliottii"]
     assert "NÃO reconferida" in pinus["fonte"], "a linha do pinus não foi conferida"
 
 
@@ -665,9 +668,18 @@ def test_o_PINUS_ganha_do_eucalipto_no_numero_que_eu_nao_tinha_olhado():
     assert por_quilo("pinus-elliottii") > 1.3 * por_quilo("eucalipto")
 
 
-def test_o_PINUS_ENGROSSADO_passa_na_porta_que_o_eucalipto_NAO_passa():
-    """E passa mais leve e por menos da metade do preço. É a resposta mais barata
-    do estudo, e a mais sem graça."""
+def test_o_PINUS_LIMPO_passa_na_porta_e_PERDE_a_vantagem_de_preco_INTEIRA():
+    """O resultado mais duro desta rodada, e ele derruba o que eu anunciei.
+
+    Eu disse que o pinus passava na porta por metade do preço. Passa na porta —
+    mas com o preço coerente com a madeira SEM NÓ que a resistência pressupõe, ele
+    sai MAIS CARO que o eucalipto. O prêmio de seleção não encolheu a vantagem:
+    inverteu.
+
+    A vantagem de preço do pinus só existe na peça COMERCIAL, com nó, engrossada
+    para 44 mm. As duas coisas que eu tinha juntado numa só são rotas diferentes,
+    e só uma delas é barata.
+    """
     import copy
     geometrias = copy.deepcopy(estudo.GEOMETRIAS)
     try:
@@ -681,7 +693,10 @@ def test_o_PINUS_ENGROSSADO_passa_na_porta_que_o_eucalipto_NAO_passa():
     assert pinus["margemP05"] >= estudo.MARGEM_MINIMA_ELIMINATORIA
     assert euc["margemP05"] < estudo.MARGEM_MINIMA_ELIMINATORIA
     assert pinus["massa_kg"] < euc["massa_kg"]
-    assert pinus["custo"] < euc["custo"] / 2
+    assert pinus["custo"] > euc["custo"], "selecionado sai mais caro que o eucalipto"
+    # E a rota que continua barata é a outra, com nó e mais gorda.
+    comercial = estudo.medir("pinus-comercial")
+    assert comercial["custo"] < 0.7 * euc["custo"]
     assert estudo.PINUS_ENGROSSADO["diametro_m"] <= estudo.DIAMETRO_MAXIMO_DE_EMPUNHADURA_M
 
 
@@ -707,3 +722,50 @@ def test_o_PO_DE_PEDRA_e_ceramica_com_outro_nome_e_esta_fora():
                     fator_de_perda=0.01)
         assert r["margemContraFalha"] < 0.3
         assert r["massa"]["valor"] > 1.5
+
+
+def test_o_PRECO_do_pinus_LIMPO_foi_corrigido_por_critica_externa():
+    """Eu tinha juntado resistência de madeira LIMPA com preço de madeira COMUM.
+    Os 112 MPa são corpo de prova sem defeito; os R$ 2/kg são pinus de pátio, com
+    nó. Não dá para ter os dois — e a incoerência veio de fora, não de mim."""
+    limpo = estudo.MATERIAIS["pinus-elliottii"]
+    comercial = estudo.MATERIAIS["pinus-comercial"]
+    assert limpo["preco_por_kg"] > comercial["preco_por_kg"], "seleção custa prêmio"
+    assert limpo["resistencia_pa"] > comercial["resistencia_pa"]
+
+
+def test_o_NO_derruba_o_pior_caso_MUITO_mais_que_o_valor_nominal():
+    """Nó não espalha a resistência um pouco. O módulo de Weibull cai de 12 para
+    5, e o desconto de tamanho passa de 10% para 30%."""
+    limpo = estudo.medir("pinus-elliottii")["efeitoDeEscala"]
+    comercial = estudo.medir("pinus-comercial")["efeitoDeEscala"]
+    assert limpo["familia"] == "madeira"
+    assert comercial["familia"] == "madeira-estrutural"
+    assert comercial["fator"] < 0.75 < limpo["fator"]
+
+
+def test_o_PINUS_COMERCIAL_a_44mm_EMPATA_com_o_eucalipto_e_nao_o_supera():
+    """Eu anunciei 40 mm olhando o valor nominal. No pior caso 40 mm dá 0,75, e o
+    diâmetro honesto é 44. O pinus não é vitória, é troca."""
+    pinus = estudo.medir("pinus-comercial")
+    euc = estudo.medir("eucalipto")
+    assert pinus["margemP05"] >= euc["margemP05"], "empata no pior caso"
+    assert pinus["margemP05"] < estudo.MARGEM_MINIMA_ELIMINATORIA, "e não passa na porta"
+    assert pinus["custo"] < 0.7 * euc["custo"], "a vantagem que sobra é preço"
+    assert pinus["massa_kg"] > euc["massa_kg"], "e o que se paga é peso"
+    d = estudo.PINUS_COMERCIAL_ENGROSSADO["diametro_m"]
+    assert d <= estudo.DIAMETRO_MAXIMO_DE_EMPUNHADURA_M
+    assert estudo.GEOMETRIAS["pinus-comercial"][1] == d
+
+
+def test_o_esmagamento_no_parafuso_tem_REMEDIO_DECLARADO():
+    """Crítica externa certa no diagnóstico, e o remédio é padrão de ferramenta."""
+    exige = " ".join(estudo.MATERIAIS["pinus-comercial"]["processo"]["exige"])
+    assert "virola" in exige or "arruela" in exige
+
+
+def test_o_tratamento_de_POSTE_nao_se_aplica_a_cabo_de_mao():
+    """A crítica pedia autoclave com sal metálico, que é remédio de madeira
+    enterrada e brigaria com a exigência de não-toxicidade do usuário."""
+    j = estudo.MATERIAIS["pinus-comercial"]["justificativaQualitativa"]
+    assert "poste enterrado" in j and "atóxico" in j

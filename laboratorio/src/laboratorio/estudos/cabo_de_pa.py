@@ -99,6 +99,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "eucalipto-laminado": 3,
             "sisal-mamona": 2,
             "pinus-elliottii": 3,
+            "pinus-comercial": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -111,6 +112,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "eucalipto-laminado": 3,
             "sisal-mamona": 2,
             "pinus-elliottii": 3,
+            "pinus-comercial": 3,
         },
     },
 }
@@ -129,6 +131,7 @@ CONFORMIDADE = {
     # Sem formaldeído: pula a norma de emissão inteira.
     "sisal-mamona": 3,
     "pinus-elliottii": 3,
+    "pinus-comercial": 3,
 }
 
 MATERIAIS = {
@@ -535,7 +538,12 @@ MATERIAIS = {
         "resistencia_pa": 112.0e6,
         "fator_de_perda": 0.010,
         "fonte": "FPL-GTR-190 (linha NÃO reconferida nesta sessão)",
-        "preco_por_kg": 2.0,
+        # PREÇO CORRIGIDO, e a correção veio de uma crítica externa que pegou uma
+        # incoerência minha: eu tinha juntado resistência de madeira LIMPA com
+        # preço de madeira COMUM. Os 112 MPa são corpo de prova sem defeito; os
+        # R$ 2/kg são pinus de pátio, com nó. Não dá para ter os dois.
+        # Peça selecionada sem nó e de fibra reta custa prêmio de seleção.
+        "preco_por_kg": 4.5,
         "irritacao": 3,
         "ambiente": 3,
         "justificativaQualitativa": (
@@ -559,6 +567,73 @@ MATERIAIS = {
                 "NÃO modela dureza de superfície, e é a fraqueza real do candidato"),
         },
         "dispersao": {"modulo_pa": (12.3e9, 13.7e9), "resistencia_pa": (88.0e6, 112.0e6)},
+    },
+    # PINUS COMERCIAL, com nó, e ele é a variante honesta deste estudo.
+    #
+    # DE ONDE VIERAM ESTES NÚMEROS: de uma crítica externa, não de mim. Ela usou
+    # 70 MPa e 8 GPa contra os meus 112 MPa e 13,7 GPa, e a diferença não é
+    # discordância — é que estamos falando de coisas diferentes. Os meus são de
+    # corpo de prova pequeno e sem defeito; os dela são de madeira de pátio, com
+    # nó e bolsa de resina. Para uma peça que se compra pronta, os dela são os
+    # certos.
+    #
+    # E A SAÍDA É BOA: engrossar é grátis, selecionar é caro. Aceitar o nó e ir
+    # para 40 mm custa diâmetro, que não custa nada; escolher tábua limpa custa
+    # preço, que era justamente a vantagem do candidato. A crítica concluía que o
+    # pinus estava fora; com os números dela mesma, a 40 mm ele passa.
+    #
+    # E AQUI O RESULTADO ME CORRIGIU DE NOVO, na direção da crítica. Eu anunciei
+    # 40 mm olhando só o valor nominal, onde a margem dá 1,05. No PIOR CASO, com a
+    # dispersão do nó, 40 mm dá 0,75 — abaixo do eucalipto. Nó não espalha a
+    # resistência um pouco: o módulo de Weibull cai de 12 para 5, e o desconto de
+    # tamanho passa de 10% para 30%.
+    #
+    # O diâmetro honesto é 44 mm, onde o pior caso dá 0,96 e empata com o
+    # eucalipto. Para passar na porta absoluta de 1,0 seriam 45 mm, que é
+    # exatamente o limite da mão — sem folga nenhuma.
+    #
+    # ENTÃO O PINUS NÃO É VITÓRIA, É TROCA: 40% mais barato e muito mais fácil de
+    # secar, em troca de ser 20% mais pesado e visivelmente mais gordo. A crítica
+    # externa estava mais perto da verdade do que a minha primeira resposta, e o
+    # que ela errou foi só a conclusão de que ele estava fora.
+    #
+    # 44 MM CABE NA MÃO: cabo de pá comercial vive entre 38 e 42 mm, e o limite de
+    # empunhadura deste estudo é 45.
+    "pinus-comercial": {
+        "modulo_pa": 8.0e9,
+        "densidade_kg_m3": 510.0,
+        "resistencia_pa": 70.0e6,
+        "fator_de_perda": 0.010,
+        "preco_por_kg": 2.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "madeira de reflorestamento sem aditivo; acabamento de cabo é óleo ou "
+            "cera, atóxico — tratamento de autoclave com sal metálico é remédio de "
+            "poste enterrado e não se aplica a ferramenta de mão"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "apodrece mais rápido que eucalipto e pede acabamento; seca MUITO mais "
+            "fácil, que é o ganho de estufa que o laminado prometia e não entregou"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "seleção de peça limpa"),
+            "exige": (
+                "44 mm em vez de 32, para compensar o nó no PIOR CASO — e não os "
+                "40 mm que bastam no valor nominal",
+                "virola metálica ou parafuso passante com arruela na zona do encaixe, "
+                "porque pinus esmaga no furo do rebite",
+                "acabamento em óleo ou cera contra apodrecimento",
+            ),
+            "riscoDeDurabilidade": (
+                "DUREZA. Pinus é mole no corpo inteiro, não só no parafuso: marca e "
+                "amassa com o uso. É conforto e vida útil, não é segurança, e este "
+                "estudo NÃO modela dureza de superfície. É a crítica que fica de pé"),
+            "fratura": (
+                "pinus lasca em farpa longa ao romper; enfaixamento ou verniz na zona "
+                "da mão contém, e margem maior reduz a chance de chegar lá"),
+        },
+        "dispersao": {"modulo_pa": (7.0e9, 10.0e9), "resistencia_pa": (60.0e6, 80.0e6)},
     },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
@@ -602,6 +677,7 @@ GEOMETRIAS = {
     "eucalipto-laminado": ("macica", 0.032, None),
     "sisal-mamona": ("tubular", 0.032, 0.0045),
     "pinus-elliottii": ("macica", 0.032, None),
+    "pinus-comercial": ("macica", 0.044, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
@@ -716,6 +792,11 @@ CORPOS_DE_PROVA = {
         "modulo_de_weibull": 8.0,
         "origem": "segmento de colmo em flexão; volume ESTIMADO",
     },
+    "madeira-estrutural": {
+        "volume_m3": 0.025 * 0.025 * 0.410,
+        "modulo_de_weibull": 5.0,
+        "origem": "mesmo corpo do FPL, com módulo de Weibull de peça COM nó",
+    },
     "composito": {
         "volume_m3": 0.0032 * 0.0127 * 0.100,
         "modulo_de_weibull": 15.0,
@@ -741,6 +822,8 @@ FAMILIA_DE_ENSAIO = {
     "eucalipto": "madeira",
     "eucalipto-laminado": "madeira",
     "pinus-elliottii": "madeira",
+    # Comercial tem nó, e nó espalha muito mais a resistência que madeira limpa.
+    "pinus-comercial": "madeira-estrutural",
     "bambu-colmo": "bambu",
     "bambu-laminado": "bambu",
     "papel-fenolico": "composito",
@@ -999,6 +1082,15 @@ PAREDE_MINIMA_PRATICA_M = 0.003
 #: O QUE ELE NÃO RESOLVE, e precisa estar do lado do número: pinus é mole. Amassa
 #: no encaixe da pá e marca com o uso, e este estudo não modela dureza de
 #: superfície. É a fraqueza real, e ela não aparece em nenhuma conta daqui.
+PINUS_COMERCIAL_ENGROSSADO = {
+    "diametro_m": 0.044,
+    "margemP05": 0.96,
+    "porQue": ("aceitar o nó e pagar em diâmetro; selecionar peça limpa custa preço, "
+               "que era justamente a vantagem do candidato"),
+    "aTroca": "40% mais barato e mais fácil de secar; 20% mais pesado e mais gordo",
+    "oQueFaltaModelar": "dureza de superfície, que é onde o pinus perde de verdade",
+}
+
 PINUS_ENGROSSADO = {
     "diametro_m": 0.037,
     "margemA36mm": 0.9952,
