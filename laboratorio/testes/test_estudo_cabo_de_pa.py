@@ -186,7 +186,12 @@ def test_a_ASSIMETRIA_DE_FONTES_e_declarada():
 
 def test_o_eucalipto_e_o_UNICO_com_fonte_primaria():
     assert estudo.MATERIAIS["eucalipto"]["fonte"] == "FPL-GTR-190"
-    assert all("fonte" not in m for n, m in estudo.MATERIAIS.items() if n != "eucalipto")
+    # O pinus veio do MESMO documento e a linha dele NÃO foi reconferida nesta
+    # sessão. Ter fonte e ter fonte conferida são coisas diferentes, e o teste
+    # guarda a diferença em vez de deixar as duas se parecerem.
+    citam_fonte = {n for n, m in estudo.MATERIAIS.items() if "fonte" in m}
+    assert citam_fonte == {"eucalipto", "pinus-elliottii"}
+    assert "NÃO reconferida" in estudo.MATERIAIS["pinus-elliottii"]["fonte"]
 
 
 def test_a_fonte_da_madeira_cita_o_documento_e_a_tabela():
@@ -634,3 +639,71 @@ def test_a_regra_do_NO_NAS_DUAS_PONTAS_foi_corrigida():
     r = estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]["aRegraCorrigida"]
     assert "EXIJA" in r[0] and "PREFIRA, não exija" in r[1]
     assert "FAIXA de comprimento" in r[2]
+
+
+def test_o_PINUS_entrou_TARDE_e_e_uma_falha_de_metodo_registrada():
+    """Eu tratei 'madeira' como uma coisa só e passei o estudo tentando bater o
+    eucalipto com material exótico, sem testar a outra madeira de reflorestamento
+    — que no Brasil é a mais plantada e a mais barata."""
+    pinus = estudo.MATERIAIS["pinus-elliottii"]
+    assert pinus["preco_por_kg"] < estudo.MATERIAIS["eucalipto"]["preco_por_kg"]
+    assert "NÃO reconferida" in pinus["fonte"], "a linha do pinus não foi conferida"
+
+
+def test_o_PINUS_ganha_do_eucalipto_no_numero_que_eu_nao_tinha_olhado():
+    """Resistência por quilo. Ele é mais FRACO em valor absoluto e MELHOR por
+    quilo, porque é bem mais leve — e para peça em flexão com diâmetro livre é a
+    segunda conta que decide."""
+    def por_quilo(n):
+        m = estudo.MATERIAIS[n]
+        return m["resistencia_pa"] / m["densidade_kg_m3"]
+    # E aqui uma suposição minha caiu na hora de escrever o teste: eu esperava o
+    # pinus MAIS FRACO em valor absoluto. O elliottii dá 112,0 MPa contra 111,7 do
+    # jarrah — ele empata, e ganha por quilo com folga grande.
+    assert (estudo.MATERIAIS["pinus-elliottii"]["resistencia_pa"]
+            >= estudo.MATERIAIS["eucalipto"]["resistencia_pa"])
+    assert por_quilo("pinus-elliottii") > 1.3 * por_quilo("eucalipto")
+
+
+def test_o_PINUS_ENGROSSADO_passa_na_porta_que_o_eucalipto_NAO_passa():
+    """E passa mais leve e por menos da metade do preço. É a resposta mais barata
+    do estudo, e a mais sem graça."""
+    import copy
+    geometrias = copy.deepcopy(estudo.GEOMETRIAS)
+    try:
+        estudo.GEOMETRIAS["pinus-elliottii"] = (
+            "macica", estudo.PINUS_ENGROSSADO["diametro_m"], None)
+        pinus = estudo.medir("pinus-elliottii")
+        euc = estudo.medir("eucalipto")
+    finally:
+        estudo.GEOMETRIAS.clear()
+        estudo.GEOMETRIAS.update(geometrias)
+    assert pinus["margemP05"] >= estudo.MARGEM_MINIMA_ELIMINATORIA
+    assert euc["margemP05"] < estudo.MARGEM_MINIMA_ELIMINATORIA
+    assert pinus["massa_kg"] < euc["massa_kg"]
+    assert pinus["custo"] < euc["custo"] / 2
+    assert estudo.PINUS_ENGROSSADO["diametro_m"] <= estudo.DIAMETRO_MAXIMO_DE_EMPUNHADURA_M
+
+
+def test_a_MARGEM_A_36MM_registra_o_arredondamento_que_escondeu_a_reprova():
+    """Eu anunciei 36 mm olhando uma varredura arredondada que mostrava 1,00. O
+    número verdadeiro é 0,9952 e não passa. Arredondamento na saída escondeu a
+    reprova por cinco milésimos."""
+    assert estudo.PINUS_ENGROSSADO["margemA36mm"] < estudo.MARGEM_MINIMA_ELIMINATORIA
+    assert round(estudo.PINUS_ENGROSSADO["margemA36mm"], 2) == 1.0
+
+
+def test_o_PO_DE_PEDRA_e_ceramica_com_outro_nome_e_esta_fora():
+    """Partícula rígida enrijece e ao mesmo tempo concentra tensão e pesa. O cabo
+    fica rígido, quebradiço e com 2 kg — mesmo destino do barro."""
+    from laboratorio.viga import avaliar, secao_macica
+    for fracao in (0.3, 0.5, 0.7):
+        modulo = fracao * 50e9 + (1 - fracao) * 3e9
+        densidade = fracao * 2650 + (1 - fracao) * 1150
+        resistencia = max(40e6 * (1 - fracao ** 0.67), 2e6)
+        r = avaliar(secao_macica(0.032), comprimento_m=estudo.COMPRIMENTO_M,
+                    forca_n=estudo.FORCA_N, modulo_pa=modulo,
+                    densidade_kg_m3=densidade, resistencia_pa=resistencia,
+                    fator_de_perda=0.01)
+        assert r["margemContraFalha"] < 0.3
+        assert r["massa"]["valor"] > 1.5

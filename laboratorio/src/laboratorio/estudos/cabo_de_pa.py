@@ -98,6 +98,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 1,
             "eucalipto-laminado": 3,
             "sisal-mamona": 2,
+            "pinus-elliottii": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -109,6 +110,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "bambu-colmo": 3, "bambu-laminado": 3,
             "eucalipto-laminado": 3,
             "sisal-mamona": 2,
+            "pinus-elliottii": 3,
         },
     },
 }
@@ -126,6 +128,7 @@ CONFORMIDADE = {
     "eucalipto-laminado": 2,
     # Sem formaldeído: pula a norma de emissão inteira.
     "sisal-mamona": 3,
+    "pinus-elliottii": 3,
 }
 
 MATERIAIS = {
@@ -499,6 +502,64 @@ MATERIAIS = {
         # Uma faixa que reprova nas duas pontas por motivos distintos é uma
         # conclusão mais forte do que uma que reprova por pouco.
     },
+    # PINUS. Entra tarde, e a demora é uma falha de método minha que fica
+    # registrada: eu tratei "madeira" como se fosse uma coisa só e passei o estudo
+    # inteiro tentando bater o eucalipto com material exótico, sem nunca testar a
+    # OUTRA madeira de reflorestamento — que no Brasil é a mais plantada, a mais
+    # barata e a mais fácil de achar.
+    #
+    # O NÚMERO QUE EU NÃO TINHA OLHADO: resistência por quilo. O pinus elliottii dá
+    # 189.831 contra 139.625 do eucalipto. Ele é MAIS FRACO em valor absoluto e
+    # MELHOR por quilo, porque é bem mais leve. Para uma peça em flexão com
+    # diâmetro livre, é a segunda conta que manda.
+    #
+    # E ELE RESPONDE A QUEIXA ORIGINAL DO USUÁRIO, que era secagem. Eucalipto é
+    # notoriamente difícil de secar: colapsa e racha por dentro, e por isso fica
+    # tempo demais na estufa. Pinus é das madeiras mais fáceis de secar que
+    # existem — menos densa, menos propensa a colapso. O ganho de estufa que o
+    # laminado prometia e não entregou aparece aqui de graça, sem cola e sem
+    # prensa.
+    #
+    # O QUE ELE COBRA, e é real: pinus é MOLE. Dureza de superfície muito abaixo
+    # da do eucalipto, então amassa no encaixe da pá e marca com o uso. E apodrece
+    # mais rápido sem tratamento — mas tratamento de pinus é a maior indústria de
+    # madeira tratada do país, então é custo conhecido, não é obstáculo.
+    #
+    # A RESSALVA DE FONTE, dita com precisão: os valores vêm do mesmo Wood
+    # Handbook do eucalipto, e as linhas dos pinheiros do sul são padrão. Eu NÃO
+    # reabri o documento nesta sessão para conferir estas duas linhas — o
+    # eucalipto eu conferi, estas não. Fica marcado.
+    "pinus-elliottii": {
+        "modulo_pa": 13.7e9,
+        "densidade_kg_m3": 590.0,
+        "resistencia_pa": 112.0e6,
+        "fator_de_perda": 0.010,
+        "fonte": "FPL-GTR-190 (linha NÃO reconferida nesta sessão)",
+        "preco_por_kg": 2.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "madeira de reflorestamento, a mais plantada do Brasil; resina incomoda "
+            "pouco e o pó de lixamento é o de sempre"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "apodrece mais rápido que eucalipto e exige tratamento, que é indústria "
+            "madura aqui; seca MUITO mais fácil que eucalipto, que colapsa e racha "
+            "por dentro — é o ganho de estufa que o laminado prometia e não entregou"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "laminação"),
+            "exige": (
+                "seleção de peça sem nó e de fibra reta, que é o que já se faz com "
+                "cabo de ferramenta",
+                "tratamento contra apodrecimento, indústria estabelecida no país",
+            ),
+            "riscoDeDurabilidade": (
+                "madeira MOLE: amassa no encaixe da pá e marca com o uso. Este estudo "
+                "NÃO modela dureza de superfície, e é a fraqueza real do candidato"),
+        },
+        "dispersao": {"modulo_pa": (12.3e9, 13.7e9), "resistencia_pa": (88.0e6, 112.0e6)},
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -540,6 +601,7 @@ GEOMETRIAS = {
     "eucalipto": ("macica", 0.032, None),
     "eucalipto-laminado": ("macica", 0.032, None),
     "sisal-mamona": ("tubular", 0.032, 0.0045),
+    "pinus-elliottii": ("macica", 0.032, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
@@ -678,6 +740,7 @@ CORPOS_DE_PROVA = {
 FAMILIA_DE_ENSAIO = {
     "eucalipto": "madeira",
     "eucalipto-laminado": "madeira",
+    "pinus-elliottii": "madeira",
     "bambu-colmo": "bambu",
     "bambu-laminado": "bambu",
     "papel-fenolico": "composito",
@@ -912,6 +975,37 @@ DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
 #: agora a parede que amassa. O padrão é sempre o mesmo, e o resultado ausente
 #: nunca aparece como erro — aparece como ótimo.
 PAREDE_MINIMA_PRATICA_M = 0.003
+
+#: PINUS ENGROSSADO: a resposta mais barata do estudo inteiro, e a mais chata.
+#:
+#: A 32 mm o pinus empata com o eucalipto no valor nominal e fica atrás no pior
+#: caso, porque a faixa dele é larga — ela vai do taeda ao elliottii, que são
+#: espécies diferentes vendidas como "pinus". Engrossar resolve, e engrossar é
+#: grátis num material que custa um terço.
+#:
+#: A 37 mm, ainda folgado dentro do que a mão segura, ele passa na porta
+#: absoluta de 1,0 — que o próprio eucalipto não passa — pesando MENOS que o
+#: eucalipto e custando menos da metade.
+#:
+#: E O DIÂMETRO AQUI FOI ESCOLHIDO DEPOIS DE VER O RESULTADO, o que é legítimo e
+#: precisa da distinção dita: diâmetro é parâmetro de PROJETO, e dimensionar a
+#: peça para atender o requisito é engenharia. Mexer na porta seria escolher a
+#: conclusão. Um é permitido, o outro não, e a diferença é essa.
+#:
+#: ERRO DE LEITURA MEU, REGISTRADO: eu havia anunciado 36 mm olhando uma varredura
+#: arredondada que mostrava "1,00". O número verdadeiro a 36 mm é 0,9952, e ele
+#: NÃO passa. Arredondamento na saída escondeu a reprova por 5 milésimos.
+#:
+#: O QUE ELE NÃO RESOLVE, e precisa estar do lado do número: pinus é mole. Amassa
+#: no encaixe da pá e marca com o uso, e este estudo não modela dureza de
+#: superfície. É a fraqueza real, e ela não aparece em nenhuma conta daqui.
+PINUS_ENGROSSADO = {
+    "diametro_m": 0.037,
+    "margemA36mm": 0.9952,
+    "porQue": ("um terço do preço do eucalipto compra diâmetro à vontade; "
+               "36 mm continua confortável na mão"),
+    "oQueFaltaModelar": "dureza de superfície, que é onde o pinus perde de verdade",
+}
 
 #: Variantes de projeto. A diferença entre elas não é o material — é o que se
 #: pede dele. `extrema` maximiza a folga estrutural; `igualitaria` só empata com
