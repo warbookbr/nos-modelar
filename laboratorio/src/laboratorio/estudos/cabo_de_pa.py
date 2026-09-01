@@ -126,6 +126,33 @@ FONTE_MADEIRA = (
     "Domínio público, consultado diretamente."
 )
 
+#: NENHUMA DAS QUATRO FONTES PRIMÁRIAS DESTE ESTUDO MEDIU AMORTECIMENTO, e esta
+#: constante existe porque a omissão não estava visível.
+#:
+#: Os artigos do urograndis, do bambu e da seringueira medem flexão, módulo,
+#: densidade, compressão e cisalhamento. Fator de perda, nenhum deles mede. Todos
+#: os `fator_de_perda` deste estudo são valor de manual da minha memória.
+#:
+#: O ERRO DE ESTRUTURA QUE ISSO REVELOU: o campo `fonte` é do MATERIAL, e ele se
+#: espalha visualmente por cima de propriedades que a fonte nunca mediu. Quem lê a
+#: linha da seringueira vê "Scientia Forestalis 2020" e supõe que o amortecimento
+#: veio de lá. Não veio.
+#:
+#: E a ironia é que `materiais.py` e `tabela.py` foram construídos exatamente para
+#: impedir isso — lá cada propriedade carrega a sua própria condição e origem, e
+#: `Propriedade` RECUSA quem se diz publicada sem citar fonte. Este estudo ainda
+#: usa dicionário plano e não passou por essa disciplina. Migrar é trabalho aberto.
+#:
+#: A pergunta que fez isto aparecer veio do usuário: "seringueira é ruim para
+#: absorver?". A resposta honesta é que provavelmente é igual às outras madeiras,
+#: e que eu NÃO tenho o dado — e a segunda metade estava escondida.
+FONTE_DO_FATOR_DE_PERDA = (
+    "MEMÓRIA. Nenhuma das quatro fontes primárias deste estudo mediu amortecimento; "
+    "elas medem resistência, módulo, densidade, compressão e cisalhamento. Todo "
+    "fator de perda aqui é valor de manual não conferido, e ele varia muito com "
+    "frequência e com o método de medida — às vezes por um fator de dois."
+)
+
 #: Critérios que NÃO são número e mesmo assim decidem. Eles entram como escala
 #: ordinal declarada, e não como nota inventada: 3 é melhor que 2, e a distância
 #: entre eles não significa nada. Fingir que significa seria transformar

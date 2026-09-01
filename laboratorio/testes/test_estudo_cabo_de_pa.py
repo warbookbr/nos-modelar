@@ -993,3 +993,39 @@ def test_o_DIAMETRO_da_seringueira_subiu_quando_a_DISPERSAO_entrou():
     assert magra["margemDeterminista"] > estudo.medir("eucalipto-urograndis")["margemP05"]
     assert magra["margemP05"] < estudo.medir("eucalipto-urograndis")["margemP05"]
     assert estudo.GEOMETRIAS["seringueira"][1] == 0.038
+
+
+def test_NENHUMA_fonte_primaria_deste_estudo_mediu_AMORTECIMENTO():
+    """A omissão que uma pergunta do usuário expôs.
+
+    As quatro fontes primárias medem resistência, módulo, densidade, compressão e
+    cisalhamento. Amortecimento, nenhuma delas mede — e o campo `fonte` é do
+    MATERIAL, então ele se espalha visualmente por cima de uma propriedade que a
+    fonte nunca tocou. Quem lê a linha da seringueira vê 'Scientia Forestalis 2020'
+    e supõe que o fator de perda veio de lá.
+
+    `materiais.py` e `tabela.py` existem exatamente para impedir isso: lá cada
+    propriedade carrega a sua origem. Este estudo ainda usa dicionário plano.
+    """
+    assert "MEMÓRIA" in estudo.FONTE_DO_FATOR_DE_PERDA
+    assert "não mediu" in estudo.FONTE_DO_FATOR_DE_PERDA or \
+        "mediu amortecimento" in estudo.FONTE_DO_FATOR_DE_PERDA
+
+
+def test_TODAS_as_madeiras_carregam_o_MESMO_fator_de_perda_suposto():
+    """E isso não é um achado sobre madeira: é o mesmo número copiado por mim em
+    todas elas. A igualdade na tabela parece resultado e é premissa."""
+    madeiras = ("eucalipto", "eucalipto-urograndis", "eucalipto-laminado",
+                "pinus-elliottii", "pinus-comercial", "seringueira")
+    perdas = {estudo.MATERIAIS[n]["fator_de_perda"] for n in madeiras}
+    assert len(perdas) == 1, "se um dia forem medidos de verdade, isto deve quebrar"
+
+
+def test_a_tabela_COMPARTILHADA_ja_impoe_a_disciplina_que_falta_ao_estudo():
+    """A migração é trabalho aberto, e o teste guarda o alvo dela."""
+    from laboratorio import tabela
+    material = tabela.material("eucalipto-jarrah")
+    for propriedade in material.propriedades:
+        assert propriedade.origem and propriedade.condicao
+        if propriedade.origem == "publicada":
+            assert propriedade.fonte

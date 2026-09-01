@@ -480,6 +480,7 @@ O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato
 - INCOERÊNCIA DE QUALIDADE E PREÇO, corrigida depois de crítica externa: a versão anterior usava resistência de madeira sem nó com preço de madeira de pátio. Corrigido, o pinus selecionado sai MAIS CARO que o eucalipto, e só a peça comercial engrossada mantém vantagem de preço. O mesmo tipo de erro pode estar em outras linhas da tabela e não foi varrido.
 - DUREZA DE SUPERFÍCIE NÃO É MODELADA, e é a fraqueza principal do pinus: madeira mole marca, amassa no encaixe e desgasta. Nenhuma conta deste dossiê a mede.
 - ASSIMETRIA DE FONTES, **em boa parte fechada**: há três fontes primárias lidas diretamente — FPL-GTR-190 para o jarrah, Revista Árvore 33(3) 2009 para o urograndis, e REA 19(1) 2017 para o bambu, esta última em COLMO INTEIRO, que é a condição do cabo. O concorrente e o recomendado agora estão no mesmo pé. Os demais materiais seguem com números de memória, e todos eles já reprovaram — o que significa que a fraqueza de fonte restante está do lado dos eliminados, e não da recomendação.
+- **NENHUMA DAS QUATRO FONTES PRIMÁRIAS MEDIU AMORTECIMENTO.** Elas medem resistência, módulo, densidade, compressão e cisalhamento. Todo fator de perda deste dossiê — inclusive o da coluna "dissipa", que é um argumento central da recomendação — é valor de manual de memória. E o rótulo de fonte é do MATERIAL, então ele se espalha por cima de uma propriedade que a fonte nunca tocou: quem lê a linha da seringueira vê "Scientia Forestalis 2020" e supõe que o amortecimento veio de lá. Não veio. As madeiras todas carregam o mesmo número porque eu copiei o mesmo número, e a igualdade na tabela parece resultado sendo premissa.
 - E A FONTE MEDIDA PIOROU O CANDIDATO, não melhorou: eu estava 25% otimista na resistência do bambu e cortava a cauda baixa da faixa em 100 MPa quando a literatura de colmo inteiro desce a 62. Erro de memória com direção, e a direção favorecia o que eu recomendava.
 - O CONCORRENTE ERA A ÁRVORE ERRADA até esta versão, e ninguém do lado de cá percebeu. O achado veio de crítica externa que listou as espécies plantadas no Brasil. Isso sugere que outras premissas do estudo podem estar erradas do mesmo jeito: não por conta mal feita, mas por pergunta mal escolhida.
 - PREMISSA DECLARADA: o artigo brasileiro dá densidade **básica** (massa seca sobre volume verde), e o cabo trabalha a 12% de umidade. A conversão usa fator 1,22, que é valor usual e não medida deste caso. Usar a básica direto subestimaria a massa do cabo em cerca de 20%.
@@ -502,7 +503,7 @@ Para o bambu, em ordem de valor:
 
 - **rachadura em ciclo de umidade**, que é o risco real e o que este estudo não sabe;
 - **resistência por lote de colmo**, que é seleção e não ensaio único;
-- **fator de perda medido**, porque o valor usado é de memória;
+- **fator de perda medido**, e ele subiu na lista: nenhuma das quatro fontes deste dossiê mede amortecimento, e ele é argumento central da recomendação;
 - **resistência após ciclos**, porque cabo de pá é fadiga e isto foi carga única.
 
 Para o pinus comercial, em ordem de valor:
