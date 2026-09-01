@@ -190,7 +190,11 @@ def test_o_eucalipto_e_o_UNICO_com_fonte_primaria():
     # sessão. Ter fonte e ter fonte conferida são coisas diferentes, e o teste
     # guarda a diferença em vez de deixar as duas se parecerem.
     citam_fonte = {n for n, m in estudo.MATERIAIS.items() if "fonte" in m}
-    assert citam_fonte == {"eucalipto", "pinus-elliottii", "eucalipto-urograndis"}
+    assert citam_fonte == {"eucalipto", "pinus-elliottii", "eucalipto-urograndis",
+                           "bambu-colmo"}
+    # E a assimetria que o dossiê declarava foi FECHADA: o vencedor era o material
+    # pior documentado do estudo, e agora tem fonte medida como o concorrente.
+    assert "REA" in estudo.MATERIAIS["bambu-colmo"]["fonte"]
     # E a fonte que RESPONDE a pergunta é a brasileira: a australiana descreve
     # uma árvore que não é a que está no cabo da pá.
     assert "Revista Árvore" in estudo.MATERIAIS["eucalipto-urograndis"]["fonte"]
@@ -365,16 +369,24 @@ def test_a_agua_e_o_ponto_fraco_dos_laminados_de_papel():
         assert estudo.MATERIAIS[nome]["agua"] == 1
 
 
-def test_o_BAMBU_tem_a_maior_resistencia_por_quilo_do_estudo():
-    """Ele já é um compósito de fibra unidirecional feito pela planta, e já vem em
-    forma de tubo. Bate até a fibra de vidro."""
+def test_o_BAMBU_PERDEU_o_primeiro_lugar_em_resistencia_por_quilo():
+    """Com o valor de memória, 170 MPa, o bambu era o primeiro do estudo e batia
+    até a fibra de vidro. Com o valor MEDIDO, 136,3 MPa, ele cai para terceiro,
+    atrás da fibra de vidro e do pinus limpo.
+
+    Ele continua sendo o recomendado, e agora por outros motivos: preço, peso,
+    saúde, ambiente e processo. Perder o primeiro lugar na conta que eu vinha
+    citando como a razão principal é o tipo de coisa que um estudo tem de dizer
+    alto, e não deixar sumir na tabela.
+    """
     def especifica(n):
         m = estudo.MATERIAIS[n]
         return m["resistencia_pa"] / m["densidade_kg_m3"]
 
-    melhor = max(estudo.MATERIAIS, key=especifica)
-    assert melhor == "bambu-colmo"
-    assert especifica("bambu-colmo") > especifica("fibra-de-vidro")
+    assert max(estudo.MATERIAIS, key=especifica) != "bambu-colmo"
+    assert especifica("bambu-colmo") < especifica("fibra-de-vidro")
+    # E continua bem à frente do concorrente, que é o que a pergunta pede.
+    assert especifica("bambu-colmo") > 1.2 * especifica("eucalipto-urograndis")
 
 
 def test_com_o_CONCORRENTE_CERTO_quase_tudo_empata_e_a_disputa_MUDA_de_lugar():
@@ -390,15 +402,18 @@ def test_com_o_CONCORRENTE_CERTO_quase_tudo_empata_e_a_disputa_MUDA_de_lugar():
     sem = estudo.avaliar_variantes(medida=False)["variantes"]
     empatam = [n for n, d in sem.items() if d["empataOuSupera"]]
     assert len(empatam) > 3, "contra a árvore certa, o portão filtra pouco"
-    assert "bambu-sem-selecionar" in empatam
-    # O que separa o bambu agora é o resto, e a distância é grande.
-    bambu = sem["bambu-sem-selecionar"]
+    # E o bambu NÃO está entre eles sem seleção de lote — ver o teste da seleção.
+    assert "bambu-sem-selecionar" not in empatam
+
+    # Com seleção, ele empata e é o mais barato e o mais leve de todos os que
+    # empatam. É aí que a recomendação se sustenta.
+    com = estudo.avaliar_variantes(medida=True)["variantes"]
+    empatam_com = [n for n, d in com.items() if d["empataOuSupera"]]
+    assert "bambu-sem-selecionar" in empatam_com
+    bambu = com["bambu-sem-selecionar"]
     assert bambu["massaRelativaAoEucalipto"] < -0.40
-    assert all(bambu["custo"] < sem[n]["custo"]
-               for n in empatam if not n.startswith("bambu"))
-    # E entre os que empatam, os dois mais baratos são os dois de colmo.
-    dois_mais_baratos = sorted(empatam, key=lambda n: sem[n]["custo"])[:2]
-    assert all(n.startswith("bambu") for n in dois_mais_baratos)
+    assert all(bambu["custo"] < com[n]["custo"]
+               for n in empatam_com if not n.startswith("bambu"))
 
 
 def test_o_bambu_e_MUITO_mais_barato():
@@ -838,10 +853,34 @@ def test_a_BARRA_do_estudo_estava_22_por_cento_ALTA_DEMAIS():
     assert 0.65 < br / au < 0.75, "a barra caiu cerca de um quarto"
 
 
-def test_o_BAMBU_supera_o_eucalipto_BRASILEIRO_ja_a_32_mm():
-    """Contra a árvore certa o bambu ganha sem precisar engrossar nem selecionar."""
-    assert (estudo.medir("bambu-colmo")["margemP05"]
-            > estudo.medir("eucalipto-urograndis")["margemP05"])
+def test_a_SELECAO_DE_LOTE_do_bambu_DEIXOU_de_ser_opcional():
+    """O achado que mais custou à recomendação deste estudo.
+
+    Com resistência de memória, faixa de 100 a 240 MPa, o bambu era 'o único
+    candidato que vence sem exigir medição', e isso era a manchete. Com a faixa
+    MEDIDA de colmo inteiro, de 62 a 170 MPa, ele perde do eucalipto brasileiro no
+    pior caso.
+
+    A largura importou mais que o valor central: meu centro estava 25% otimista, e
+    o que virou a conclusão foi a CAUDA, que eu cortava em 100 MPa quando a
+    literatura desce a 62.
+    """
+    sem = estudo.avaliar_variantes(medida=False)
+    com = estudo.avaliar_variantes(medida=True)
+    referencia = sem["referencia"]["margemP05"]
+    assert not sem["variantes"]["bambu-sem-selecionar"]["empataOuSupera"]
+    assert com["variantes"]["bambu-sem-selecionar"]["empataOuSupera"]
+    assert com["variantes"]["bambu-sem-selecionar"]["margemP05"] > 1.5 * referencia
+    assert estudo.SELECAO_DE_LOTE["obrigatoria"] is True
+
+
+def test_ENGROSSAR_nao_substitui_selecionar_no_bambu():
+    """Colmo ruim é ruim em qualquer diâmetro que ainda caiba na mão."""
+    sem = estudo.avaliar_variantes(medida=False)["variantes"]
+    ganho = (sem["bambu-sem-selecionar"]["margemP05"]
+             - sem["bambu-selecionado"]["margemP05"])
+    assert 0.10 < ganho < 0.25, "6 mm a mais compram pouco"
+    assert not sem["bambu-sem-selecionar"]["empataOuSupera"]
 
 
 def test_a_densidade_BASICA_nao_e_a_densidade_a_12_por_cento():

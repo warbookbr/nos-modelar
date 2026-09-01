@@ -77,6 +77,27 @@ FONTE = "valor de manual de memória; NÃO conferido contra fonte primária"
 #:
 #: Quem apontou foi uma crítica externa, listando as espécies brasileiras. Ela não
 #: trazia dado conferível, mas trazia a pergunta certa.
+#: A TERCEIRA FONTE PRIMÁRIA, e a que faltava: o VENCEDOR do estudo era, até
+#: aqui, o material pior documentado dele. O concorrente tinha duas fontes medidas
+#: e o candidato recomendado rodava com a minha memória — assimetria que trabalha
+#: contra a recomendação, e que estava declarada nos limites do dossiê sem ser
+#: resolvida.
+#:
+#: E O DADO MEDIDO CORRIGE MEUS NÚMEROS PARA BAIXO, nos três. Eu usava 170 MPa,
+#: 15,0 GPa e 700 kg/m³; o medido dá 136,3 MPa, 13,1 GPa e 740 kg/m³. Ou seja: eu
+#: estava 25% otimista na resistência, 15% na rigidez, e ainda subestimava a
+#: densidade. Erro de memória com direção — e a direção favorecia o candidato que
+#: eu vinha recomendando.
+FONTE_BAMBU = (
+    "MOTA, I.; AZEVEDO, M.; COELHO, P.; et al. Estudo das propriedades físicas e "
+    "mecânicas do bambu brasileiro (Bambusa vulgaris vittata) para aplicação na "
+    "construção de sistemas hidráulicos alternativos. Revista de Estudos "
+    "Ambientais (REA), v. 19, n. 1, p. 18-26, 2017, UniFOA. Acesso aberto, PDF "
+    "lido diretamente nesta sessão. Ensaio em COLMO INTEIRO, que é a condição do "
+    "cabo. A faixa larga da dispersão é de Janssen (2000), citada no mesmo artigo "
+    "para colmos inteiros: 62 a 170 MPa e 6,0 a 14,0 GPa."
+)
+
 FONTE_MADEIRA_BR = (
     "GONÇALVES, F. G.; OLIVEIRA, J. T. S.; et al. Estudo de algumas propriedades "
     "mecânicas da madeira de um híbrido clonal de Eucalyptus urophylla x "
@@ -319,9 +340,12 @@ MATERIAIS = {
     # razão física, e não só por ignorância minha — e é o caso em que medir tem de
     # virar seleção de lote, não um número só.
     "bambu-colmo": {
-        "modulo_pa": 15.0e9,
-        "densidade_kg_m3": 700.0,
-        "resistencia_pa": 170.0e6,
+        # Medido, colmo inteiro. Ver FONTE_BAMBU, e ver ali por que estes números
+        # são MENORES que os que este estudo usou até agora.
+        "modulo_pa": 13.089e9,
+        "densidade_kg_m3": 740.0,
+        "resistencia_pa": 136.33e6,
+        "fonte": "REA 19(1):18-26, 2017 (UniFOA) — lido diretamente",
         "fator_de_perda": 0.012,
         "preco_por_kg": 2.0,
         "irritacao": 3,
@@ -352,7 +376,10 @@ MATERIAIS = {
                 "rachadura ao longo da fibra com ciclo de umidade. É o problema real do "
                 "bambu, e não a resistência — e este estudo NÃO o modela"),
         },
-        "dispersao": {"modulo_pa": (9e9, 20e9), "resistencia_pa": (100e6, 240e6)},
+        # Faixa de Janssen para colmo inteiro, e ela é MAIS LARGA e MAIS BAIXA que
+        # a que eu tinha posto de memória. Largura aqui é a variação da planta, que
+        # nenhum ensaio reduz: o que se faz com ela é selecionar lote.
+        "dispersao": {"modulo_pa": (6.0e9, 14.0e9), "resistencia_pa": (62.0e6, 170.0e6)},
     },
     # Bambu laminado colado: o mesmo material desmontado em ripas e recolado, que
     # é como se faz piso e móvel de bambu no mundo inteiro. Perde resistência por
@@ -1142,6 +1169,32 @@ PAREDE_MINIMA_PRATICA_M = 0.003
 #: O jarrah fica na tabela como referência estrangeira, e não como alvo.
 REFERENCIA = "eucalipto-urograndis"
 
+#: A SELEÇÃO DE LOTE DEIXOU DE SER OPCIONAL, e este é o achado que mais custou à
+#: recomendação deste estudo.
+#:
+#: Enquanto o bambu rodava com resistência da minha memória, faixa de 100 a 240
+#: MPa, ele era "o único candidato que vence sem exigir medição" — e isso era a
+#: manchete. Com a faixa MEDIDA de colmo inteiro, de 62 a 170 MPa, ele perde do
+#: eucalipto brasileiro no pior caso: 0,61 contra 0,63.
+#:
+#: A largura importa mais que o valor central aqui. Meu valor central estava 25%
+#: otimista, o que já era ruim; mas o que virou a conclusão foi a CAUDA, que eu
+#: tinha cortado em 100 MPa quando a literatura de colmo inteiro desce a 62.
+#:
+#: E o remédio não é engrossar: de 37 para 43 mm a margem vai de 0,44 para 0,61, e
+#: para. Colmo ruim é ruim em qualquer diâmetro que ainda caiba na mão.
+#:
+#: COM seleção de lote, o bambu a 43 mm dá 1,07 contra 0,63, pesando metade e
+#: custando um terço. A recomendação continua de pé; ela só deixou de ser grátis.
+SELECAO_DE_LOTE = {
+    "obrigatoria": True,
+    "porQue": ("a variação natural do colmo inteiro vai de 62 a 170 MPa, e a ponta "
+               "baixa dessa faixa não faz cabo"),
+    "oQueNaoResolve": "engrossar: de 37 para 43 mm ganha 0,17 de margem e para aí",
+    "margemComSelecao": 1.07,
+    "margemSemSelecao": 0.61,
+}
+
 #: PINUS ENGROSSADO: a resposta mais barata do estudo inteiro, e a mais chata.
 #:
 #: A 32 mm o pinus empata com o eucalipto no valor nominal e fica atrás no pior
@@ -1189,14 +1242,19 @@ VARIANTES = {
     "bambu-selecionado": {
         "diametro_m": 0.037, "parede_m": 0.0030,
         "objetivo": "empatar com o eucalipto usando colmo de bambu selecionado",
-        "observacao": "a melhor do estudo: 65% mais leve e 83% mais barata, e ganha "
-                      "mesmo sem medir",
+        "observacao": "leve e barata, e só empata COM seleção de lote: a 37 mm ela "
+                      "cai para 0,44 carregando a variação natural inteira",
     },
     "bambu-sem-selecionar": {
         "diametro_m": 0.043, "parede_m": 0.0030,
-        "objetivo": "o mesmo, carregando a variação natural do colmo inteira",
-        "observacao": "ainda 59% mais leve e 79% mais barata — é o único candidato "
-                      "que vence sem exigir medição",
+        "objetivo": "engrossar para absorver parte da variação natural do colmo",
+        # O NOME DESTA VARIANTE FICOU MENTIROSO, e fica registrado em vez de
+        # maquiado. Ela nasceu quando eu usava resistência de memória com faixa de
+        # 100 a 240 MPa. Com a faixa MEDIDA de colmo inteiro, de 62 a 170 MPa, ela
+        # dá 0,61 contra 0,63 do eucalipto brasileiro: perde, por pouco.
+        # Engrossar de 37 para 43 mm absorve parte da variação, e não toda.
+        "observacao": "engrossar ajuda e NÃO basta: sem seleção de lote ela dá 0,61 "
+                      "contra 0,63 do eucalipto. Com seleção, 1,07",
     },
     "bambu-laminado": {
         "diametro_m": 0.043, "parede_m": 0.0030,
@@ -1252,7 +1310,8 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "papel-lignina-curaua": {"resistencia_pa": (153e6, 207e6), "modulo_pa": (17e9, 23e9)},
         # Para o colmo natural, "medir" é SELECIONAR LOTE: a variação é da planta,
         # e nenhum ensaio a reduz — o que se faz é escolher o que entra.
-        "bambu-colmo": {"resistencia_pa": (145e6, 195e6), "modulo_pa": (13e9, 17e9)},
+        # ±15% em torno do valor MEDIDO, que é o que a seleção de lote entrega.
+        "bambu-colmo": {"resistencia_pa": (115.9e6, 156.8e6), "modulo_pa": (11.1e9, 15.1e9)},
         "bambu-laminado": {"resistencia_pa": (102e6, 138e6), "modulo_pa": (10e9, 14e9)},
     }
     referencia = medir(REFERENCIA)
