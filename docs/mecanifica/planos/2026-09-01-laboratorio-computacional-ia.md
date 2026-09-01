@@ -88,6 +88,7 @@ só abre com a anterior verde.
 | R3 | pesquisa, fontes e grafo de alegações | **parcial por decisão**: grafo de fontes, alegações e conflitos entregue; conectores de rede adiados por não haver como prová-los |
 | R4 | unidades, V&V, incerteza e sensibilidade | **parcial por decisão**: grandezas com dimensão e composição de pareceres entregues; incerteza adiada por não haver instrumento estocástico |
 | R5 | ponte neutra da Mecanifica | **entregue**: adaptador fora do núcleo, revisão fixada por conteúdo, recomendação sem aplicação automática e guarda de direção |
+| M1 | material, escolha do próximo experimento, trocas, leis e bancos públicos | **entregue**: as cinco frentes do foco em materiais |
 | R6 | dois pilotos verticais em domínios diferentes | não iniciada |
 | R7 | serviços Agent-First, CLI/MCP e prova caixa-preta | não iniciada |
 

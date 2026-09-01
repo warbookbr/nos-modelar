@@ -328,3 +328,24 @@ quase iguais é decisão falsa.
 
 Todo resultado sai com o aviso: coincidir com uma forma não explica por quê —
 duas causas diferentes produzem a mesma curva o tempo todo.
+
+### Consultar banco público antes de recalcular
+
+Materials Project, OQMD e AFLOW têm milhões de compostos já calculados. Perguntar
+custa segundos; recalcular custa horas na máquina de alguém.
+
+O risco é maior que o ganho se ignorado: **valor de banco público quase nunca é
+medida**. A maioria vem de cálculo quântico com erro sistemático conhecido, e um
+número desses colado num relatório sem etiqueta vira "a resistência do material"
+para quem ler depois. Por isso o banco é obrigado a declarar método e limitação —
+banco de cálculo sem ressalva se apresenta como medição — e todo valor sai
+marcado `calculada`, com o método e a versão do despejo dentro da condição.
+
+A parte que resolve o problema dos dois ambientes: **cache primeiro, e quem busca
+é injetado**. O módulo não abre conexão; ele recebe uma função. Sem cache e sem
+buscador, ele RECUSA dizendo que não consultou — devolver lista vazia faria o
+estudo concluir "não existe nada publicado sobre isso". O caminho real fica
+testado: consulta feita onde há rede, cache trazido, resposta aqui sem rede.
+
+A versão do banco entra na chave do cache, porque o mesmo pedido a despejos
+diferentes é outra consulta, e reaproveitar misturaria duas fontes numa.
