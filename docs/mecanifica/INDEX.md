@@ -24,13 +24,13 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [malha otimizada e prova por
-  objeto](planos/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
-  (`docs/mecanifica/planos/2026-08-31-malha-otimizada-e-prova-por-objeto.md`) —
-  modelar cadeira e armas brancas pelo fluxo atual e provar ou recusar, por
-  medição, três módulos de saída. Rastreio em
-  [`MALHA-OTIMIZADA-PROGRESSO.md`](MALHA-OTIMIZADA-PROGRESSO.md)
-  (`docs/mecanifica/MALHA-OTIMIZADA-PROGRESSO.md`).
+- Plano **ativo**: [laboratório computacional para
+  IA](planos/2026-09-01-laboratorio-computacional-ia.md)
+  (`docs/mecanifica/planos/2026-09-01-laboratorio-computacional-ia.md`) — incubar
+  na `main`, sob a guarda `arquitetura:lab:check`, um laboratório geral que usa a
+  Mecanifica como instrumento opcional e **nunca** vira dependência dela. Desenho:
+  [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md)
+  (`docs/mecanifica/DOSSIE-LABORATORIO-IA.md`).
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em

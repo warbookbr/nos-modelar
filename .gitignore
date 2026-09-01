@@ -4,6 +4,11 @@ coverage/
 *.tsbuildinfo
 .DS_Store
 debug.log
+laboratorio/.lab/
+laboratorio/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
 
 # Tick runtime artifacts (generated per run, never committed — see tick.yml)
 pending_commands.json
