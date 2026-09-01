@@ -1,0 +1,107 @@
+{
+ "consulta": "moisture absorption cellulose composite mechanical degradation",
+ "consultadoEm": "2026-09-01",
+ "descartados": 0,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2006,
+   "citacoes": 103,
+   "doi": "10.1016/j.compstruct.2005.04.032",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/"
+   ],
+   "primeiroAutor": "Boukhoulda",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "The effect of fiber orientation angle in composite materials on moisture absorption and material degradation after hygrothermal ageing"
+  },
+  {
+   "ano": 2016,
+   "citacoes": 88,
+   "doi": "10.1016/j.compstruct.2016.01.030",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license"
+   ],
+   "primeiroAutor": "Ridzuan",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Moisture absorption and mechanical degradation of hybrid Pennisetum purpureum/glass–epoxy composites"
+  },
+  {
+   "ano": 2013,
+   "citacoes": 75,
+   "doi": "10.1007/s10570-013-9876-8",
+   "licencas": [
+    "http://www.springer.com/tdm"
+   ],
+   "primeiroAutor": "Gabr",
+   "revista": "Cellulose",
+   "tipo": "journal-article",
+   "titulo": "Mechanical, thermal, and moisture absorption properties of nano-clay reinforced nano-cellulose biocomposites"
+  },
+  {
+   "ano": 2019,
+   "citacoes": 74,
+   "doi": "10.1007/s10570-019-02393-1",
+   "licencas": [
+    "http://www.springer.com/tdm"
+   ],
+   "primeiroAutor": "Hassan",
+   "revista": "Cellulose",
+   "tipo": "journal-article",
+   "titulo": "Thermo-mechanical, morphological and water absorption properties of thermoplastic starch/cellulose composite foams reinforced with PLA"
+  },
+  {
+   "ano": 2010,
+   "citacoes": 39,
+   "doi": "10.1016/j.compstruct.2009.07.004",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/"
+   ],
+   "primeiroAutor": "Avilés",
+   "revista": "Composite Structures",
+   "tipo": "journal-article",
+   "titulo": "Mechanical degradation of foam-cored sandwich materials exposed to high moisture"
+  },
+  {
+   "ano": 2022,
+   "citacoes": 16,
+   "doi": "10.1016/j.jcomc.2022.100295",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license",
+    "http://creativecommons.org/licenses/by/4.0/"
+   ],
+   "primeiroAutor": "Das",
+   "revista": "Composites Part C: Open Access",
+   "tipo": "journal-article",
+   "titulo": "Dielectric state variables as qualitative indicators of moisture absorption-caused mechanical property degradation in GFRP composite structures"
+  },
+  {
+   "ano": 2015,
+   "citacoes": 11,
+   "doi": "10.1007/s10570-015-0775-z",
+   "licencas": [
+    "http://www.springer.com/tdm"
+   ],
+   "primeiroAutor": "Bajpai",
+   "revista": "Cellulose",
+   "tipo": "journal-article",
+   "titulo": "Vapor induced phase inversion technique to prepare chitosan/microcrystalline cellulose composite films: synthesis, characterization and moisture absorption study"
+  },
+  {
+   "ano": 2005,
+   "citacoes": 11,
+   "doi": "10.1163/1568554053971597",
+   "licencas": [],
+   "primeiroAutor": "HU",
+   "revista": "Composite Interfaces",
+   "tipo": "journal-article",
+   "titulo": "Epoxy-organoclay nanocomposites: morphology, moisture absorption behavior and thermo-mechanical properties"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 1820219
+}

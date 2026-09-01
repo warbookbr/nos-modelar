@@ -469,3 +469,41 @@ mesma carga.
 
 A análise de fabricação e fornecimento está registrada na recomendação **marcada
 como fora do laboratório**: é análise, não estudo, e não foi medida.
+
+### Pesquisa de verdade: o dia em que o laboratório parou de ser ensaio geral
+
+Até aqui todo número deste laboratório tinha saído de mim — memória de valor de
+manual, sem fonte primária. Isso está escrito em cada estudo, e era o limite mais
+honesto que havia para declarar.
+
+O Crossref respondeu deste ambiente. Seis consultas, 45 publicações com DOI
+verificável, guardadas em disco para a pesquisa reproduzir daqui a um ano. É a
+primeira vez que entra dado externo conferível.
+
+**E o módulo constrói `Fonte`, não `Alegacao` — zero alegações, de propósito.**
+Crossref devolve metadado: título, DOI, revista, ano, citações. Nada disso diz o
+que o artigo mediu nem em que condição. Fabricar alegação a partir de título
+seria a violação exata de "fonte não é verdade" — um título como
+"Lignin-based adhesive for particleboard" sustenta que alguém publicou sobre o
+assunto, e nada sobre o valor de resistência que se queira citar. Alegação exige
+ler o artigo e comparar a condição dele com a nossa; é trabalho de pessoa.
+
+Cada busca carrega a **pergunta que a motivou**, porque consulta sem pergunta por
+trás é pescaria — e o registro do motivo é o que permite alguém julgar se a busca
+foi honesta ou se foi atrás do que confirmava a ideia. Material suplementar, que
+o Crossref indexa com DOI próprio e sobe na relevância sem ser artigo, é
+descartado; sem ano também sai.
+
+O que a literatura sustentou:
+
+- ligante de lignina sem formaldeído com alta resistência de colagem é campo
+  ativo, com publicação de 2024 a 2026 — é exatamente a lacuna do nosso candidato;
+- emissão de formaldeído em painel é problema reconhecido, não implicância;
+- vibração mão-braço em cabo de ferramenta tem literatura própria e antiga;
+- degradação de compósito de celulose por umidade é reconhecida — a ameaça que o
+  estudo tinha apontado ao candidato.
+
+O dossiê `DOSSIE-CABO-DE-PA.md` reúne resultado, limites, bibliografia e o que
+precisa ser medido, num formato para mostrar a outras pessoas. Ele abre dizendo
+o que é e o que não é, e a seção de literatura repete que **os artigos não foram
+lidos**.
