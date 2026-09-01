@@ -116,5 +116,13 @@ jobs:
       - name: Fronteira do laboratório preservada
         run: npm run arquitetura:lab:check
 
+      # O laboratório é Python, e o CI deste repositório era só Node. Sem este
+      # passo o gate anterior existia e o seguinte morria em "No module named
+      # pytest" — gate ligado sem a dependência que ele precisa não prova nada.
+      # A versão vem fixada do pyproject, para o CI e a máquina de quem
+      # desenvolve rodarem a mesma coisa.
+      - name: Dependências Python do laboratório
+        run: python3 -m pip install --quiet "pytest==8.4.2" "hypothesis==6.167.1"
+
       - name: Provas do laboratório
         run: npm run lab:test
