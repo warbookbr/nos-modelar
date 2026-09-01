@@ -505,3 +505,64 @@ def test_NAO_encher_inteiro_e_selar():
 
 def test_a_analise_de_preenchimento_diz_o_que_NAO_foi_calculado():
     assert "NÃO foi calculada" in estudo.PREENCHIMENTO["marca"]
+
+
+def test_a_busca_de_FORNECEDOR_revelou_o_descasamento_de_diametro():
+    """O mercado de bambu tratado mira construção e vende colmo grosso; o cabo
+    precisa da ponta fina. Não falta material, falta canal."""
+    f = estudo.FORNECEDORES
+    assert "13 a 14 cm" in f["oProblemaQueABuscaRevelou"]
+    assert "falta canal" in f["oProblemaQueABuscaRevelou"]
+
+
+def test_a_especie_do_DIAMETRO_certo_e_tambem_a_AMBIENTALMENTE_segura():
+    """Bambusa tuldoides é entouceirante e dá colmo na faixa; asper e giganteus,
+    que a indústria trata, são grandes demais."""
+    c = estudo.FORNECEDORES["aConvergenciaBoa"]
+    assert "tuldoides" in c and "ENTOUCEIRANTE" in c
+
+
+def test_a_CERTIFICACAO_e_possivel_mas_NAO_estabelecida():
+    cert = estudo.FORNECEDORES["certificacao"]
+    assert cert["veredito"] == "possível, não estabelecida"
+    assert "NÃO foi encontrada nenhuma operação" in cert["detalhe"]
+
+
+def test_toda_a_lista_carrega_que_NAO_FOI_VERIFICADA():
+    """Transformar uma busca em due diligence seria mentir sobre o que se fez."""
+    assert "NÃO VERIFICADA" in estudo.FORNECEDORES["marca"]
+    assert all(f["url"].startswith("http") for f in estudo.FORNECEDORES["encontrados"])
+
+
+def test_o_pedido_ao_fornecedor_e_uma_JANELA_e_nao_uma_medida():
+    """A dúvida de abandonar o bambu por falta de garantia de diâmetro some quando
+    se olha o que de fato é exigido: 43 combinações entre 35 e 45 mm servem."""
+    j = estudo.JANELA_DE_COLMO
+    assert j["faixaDeDiametro_mm"] == (35, 45)
+    assert j["combinacoesQueServem"] > 40
+    assert "não requisito" in j["porQueNaoEUmaMedida"]
+
+
+def test_ATE_O_PIOR_CASO_da_janela_bate_o_eucalipto():
+    p = estudo.JANELA_DE_COLMO["piorCasoDaJanela"]
+    assert p["massa_kg"] < 0.772 and p["custo"] < 3.09
+
+
+def test_existe_RESERVA_se_o_colmo_falhar():
+    """Bambu laminado é fabricado na medida: sem problema de seleção."""
+    assert "NA MEDIDA" in estudo.JANELA_DE_COLMO["seOColmoFalhar"]
+    assert len(estudo.JANELA_DE_COLMO["ordemDeAcao"]) == 3
+
+
+def test_a_PONTA_LIVRE_tambem_precisa_de_cuidado():
+    """Lacuna corrigida: o estudo tratava só da ponta que entra na pá. A de cima
+    fica aberta, e extremidade livre é onde a rachadura começa."""
+    p = estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]
+    assert "início de trinca" in p["veredito"]
+    assert "NÓ" in " ".join(p["solucoes"])
+    assert "DOIS cortes" in p["regraQueResume"]
+
+
+def test_cortar_no_no_e_a_medida_mais_BARATA_do_projeto():
+    """Custo zero: é só posicionamento do corte."""
+    assert "Custo zero" in " ".join(estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]["solucoes"])

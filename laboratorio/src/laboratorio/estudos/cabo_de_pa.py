@@ -882,6 +882,24 @@ FIXACAO_E_INTEMPERISMO = {
         ),
         "custoDisso": "barato, mas obrigatório: é detalhe de projeto, não opcional",
     },
+    # LACUNA CORRIGIDA. As soluções acima cuidam da ponta que entra na pá, e o
+    # estudo tinha deixado a OUTRA de fora. São duas pontas com problemas
+    # diferentes: embaixo o parafuso cunha e a parede amassa; em cima o tubo fica
+    # simplesmente ABERTO, e é daí que a rachadura começa, porque a extremidade
+    # livre não tem nada segurando as fibras juntas.
+    "ponta_livre": {
+        "veredito": "toda extremidade cortada é um início de trinca",
+        "solucoes": (
+            "cortar logo acima de um NÓ: o nó é um diafragma que fecha o tubo e trava "
+            "as fibras. Custo zero — é só posicionamento do corte, e é a regra mais "
+            "barata do projeto inteiro",
+            "tampa ou anel na ponta, quando o corte não puder cair num nó",
+        ),
+        "regraQueResume": (
+            "os DOIS cortes do cabo devem cair em nó sempre que der; isso ataca a maior "
+            "ameaça de durabilidade do bambu sem custar nada"
+        ),
+    },
     "sol_e_tempo": {
         "veredito": "empate com o eucalipto",
         "porQue": (
@@ -1008,6 +1026,92 @@ PREENCHIMENTO = {
     ),
     "marca": "ANÁLISE, NÃO ESTUDO: os números de massa e rigidez saem de conta, mas "
              "a resistência ao amassamento NÃO foi calculada — é raciocínio, não medida",
+}
+
+
+#: FORNECEDORES: busca feita na web em 2026-09-01. NENHUMA das empresas foi
+#: verificada — não se sabe se estão ativas, se atendem volume, nem se vendem
+#: colmo classificado por diâmetro. É lista de partida para telefonar, e não
+#: lista de fornecedor qualificado. Dizer o contrário seria transformar uma busca
+#: em due diligence.
+FORNECEDORES = {
+    "oProblemaQueABuscaRevelou": (
+        "o mercado brasileiro de bambu TRATADO mira CONSTRUÇÃO, e por isso vende "
+        "colmo grosso: os kits anunciados são de 13 a 14 cm. O cabo precisa de 36 a "
+        "42 mm, que é a ponta fina. Não falta material — falta canal"
+    ),
+    "aConvergenciaBoa": (
+        "a espécie que dá colmo nesse diâmetro é também a ambientalmente segura. "
+        "Bambusa tuldoides (bambu comum ou caipira) é ENTOUCEIRANTE, não alastra por "
+        "rizoma, e cresce na faixa certa. Já Dendrocalamus asper e giganteus, que são "
+        "os que a indústria trata, são grandes demais"
+    ),
+    "encontrados": (
+        {"nome": "Bambu Show", "url": "http://bambushow.blogspot.com/p/produtos.html",
+         "porQue": "o mais próximo: corta sob medida e lista varas de 1,5 a 20 cm, "
+                   "com tratamento — nosso diâmetro cai dentro"},
+        {"nome": "Bambu Market", "url": "https://bambu.com.br/categoria-produto/bambu-tratado/bambu-dendrocalamus-asper-tratado/",
+         "porQue": "tratado, mas só asper em 13 a 14 cm: grosso demais"},
+        {"nome": "Bambugalô", "url": "https://www.bambugalo.com.br/bambu-tratado",
+         "porQue": "distribuidor de tratado no Nordeste"},
+        {"nome": "Bambuaria", "url": "https://bambuaria.com.br/venda-de-bambu.php",
+         "porQue": "venda de colmo"},
+        {"nome": "Sítio Flora Sol", "url": "https://www.sitioflorasol.com.br/product-page/bambu-tuldoides",
+         "porQue": "mudas de tuldoides, não colmo cortado — serve para plantar, não para comprar"},
+    ),
+    "certificacao": {
+        "veredito": "possível, não estabelecida",
+        "detalhe": (
+            "o FSC cobre produto não-madeireiro e tem o padrão SLIMF para pequeno "
+            "produtor, que é exatamente o perfil de quem planta bambu. Mas NÃO foi "
+            "encontrada nenhuma operação de bambu certificada FSC no Brasil"
+        ),
+        "consequencia": ("se certificação for exigência da empresa, isso vira um "
+                         "projeto com o fornecedor, e não uma compra"),
+    },
+    "marca": ("BUSCA NA WEB, NÃO VERIFICADA: nenhuma empresa foi contatada nem "
+              "conferida quanto a atividade, capacidade ou classificação por diâmetro"),
+}
+
+
+#: JANELA DE ACEITAÇÃO DO COLMO, e ela existe porque a pergunta certa não é "qual
+#: diâmetro?" mas "o que serve?".
+#:
+#: A busca de fornecedor levantou a dúvida de abandonar o bambu por falta de
+#: garantia de diâmetro. A dúvida some quando se olha o que de fato é exigido: os
+#: 37 mm recomendados não são requisito, são o resultado de casar com o eucalipto
+#: carregando a incerteza larga. Varrendo diâmetro e parede, **43 combinações**
+#: entre 35 e 45 mm empatam com o eucalipto E ficam mais leves e mais baratas que
+#: ele. A pior delas, 45 × 6 mm, ainda dá 0,618 kg contra 0,772 e R$ 1,24 contra
+#: 3,09.
+#:
+#: O pedido ao fornecedor, então, não é uma medida — é uma faixa larga, e o
+#: projeto se ajusta ao que existe em vez de o contrário.
+JANELA_DE_COLMO = {
+    "pedidoAoFornecedor": (
+        "colmo entouceirante, 35 a 45 mm de diâmetro externo, parede de no mínimo "
+        "3 mm, tratado contra caruncho"
+    ),
+    "porQueNaoEUmaMedida": (
+        "os 37 mm são resultado de casar com o eucalipto carregando incerteza larga, "
+        "e não requisito. Qualquer combinação da janela serve, com massa e custo "
+        "diferentes — o projeto se ajusta ao que o fornecedor tem"
+    ),
+    "combinacoesQueServem": 43,
+    "faixaDeDiametro_mm": (35, 45),
+    "paredeMinima_mm": 3.0,
+    "piorCasoDaJanela": {"geometria": "45 × 6 mm", "massa_kg": 0.618, "custo": 1.24,
+                         "aindaAssim": "20% mais leve e 60% mais barato que o eucalipto"},
+    "seOColmoFalhar": (
+        "bambu laminado é fabricado NA MEDIDA, sem problema de seleção nenhum. Custa "
+        "quatro vezes mais por quilo e ainda sai 59% mais leve e 18% mais barato por "
+        "cabo que o eucalipto — é a reserva, não o plano"
+    ),
+    "ordemDeAcao": (
+        "telefonar para quem lista faixa fina",
+        "ajustar o projeto ao que o fornecedor tem dentro da janela",
+        "bambu laminado como reserva",
+    ),
 }
 
 

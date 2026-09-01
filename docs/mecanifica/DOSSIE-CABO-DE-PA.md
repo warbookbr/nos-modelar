@@ -6,6 +6,9 @@ número, os limites do que foi feito, e a literatura que sustenta as perguntas.
 
 **O que ele não é:** ensaio. Nada foi medido em bancada.
 
+**Versão em página web, para leitura fora do repositório:**
+<https://claude.ai/code/artifact/8a67eb1d-16d3-4068-bc50-16db3d18cca4>
+
 ## 1. A pergunta
 
 Substituir o cabo de pá de eucalipto por alternativa mais barata, com resistência
@@ -180,6 +183,16 @@ junta — que é onde ferramenta costuma falhar de verdade.
 
 **Custo:** barato, mas obrigatório: é detalhe de projeto, não opcional.
 
+### A outra ponta: toda extremidade cortada é um início de trinca
+
+As quatro medidas acima cuidam da ponta que entra na pá. A de cima fica simplesmente
+**aberta**, e é daí que a rachadura começa: a extremidade livre não tem nada segurando
+as fibras juntas.
+
+- cortar logo acima de um NÓ: o nó é um diafragma que fecha o tubo e trava as fibras. Custo zero — é só posicionamento do corte, e é a regra mais barata do projeto inteiro;
+- tampa ou anel na ponta, quando o corte não puder cair num nó;
+
+**A regra que resume:** os DOIS cortes do cabo devem cair em nó sempre que der; isso ataca a maior ameaça de durabilidade do bambu sem custar nada.
 ### Sol e tempo — empate
 
 Uv degrada lignina na superfície dos dois: acinzenta, abre microfissura e abre caminho para a água. o bambu tem vantagem inicial pela epiderme cerosa e rica em sílica, mas quando ela se vai o comportamento se iguala.
@@ -265,7 +278,45 @@ centro não trabalha em flexão.
 **Onde encher:** só as pontas: 15 cm de cada lado com espuma pesam 23 g, 8% do cabo. É a bucha da ponta que já estava na recomendação, agora com número.
 
 **O que não fazer:** encher o cabo inteiro e selar: se entrar água num tubo fechado e cheio, ela não sai, e o bambu apodrece por dentro sem ninguém ver.
-## 10. Entradas, e de onde cada número veio
+## 10. Fornecedores nacionais
+
+*Busca na web em 2026-09-01. Nenhuma empresa foi contatada nem verificada.*
+
+**O que a busca revelou.** O mercado brasileiro de bambu tratado mira construção, e por isso vende colmo grosso: os kits anunciados são de 13 a 14 cm. o cabo precisa de 36 a 42 mm, que é a ponta fina. não falta material — falta canal.
+
+**E uma convergência boa:** a espécie que dá colmo nesse diâmetro é também a ambientalmente segura. Bambusa tuldoides (bambu comum ou caipira) é ENTOUCEIRANTE, não alastra por rizoma, e cresce na faixa certa. Já Dendrocalamus asper e giganteus, que são os que a indústria trata, são grandes demais.
+
+### Encontrados
+
+- [Bambu Show](http://bambushow.blogspot.com/p/produtos.html) — o mais próximo: corta sob medida e lista varas de 1,5 a 20 cm, com tratamento — nosso diâmetro cai dentro.
+- [Bambu Market](https://bambu.com.br/categoria-produto/bambu-tratado/bambu-dendrocalamus-asper-tratado/) — tratado, mas só asper em 13 a 14 cm: grosso demais.
+- [Bambugalô](https://www.bambugalo.com.br/bambu-tratado) — distribuidor de tratado no Nordeste.
+- [Bambuaria](https://bambuaria.com.br/venda-de-bambu.php) — venda de colmo.
+- [Sítio Flora Sol](https://www.sitioflorasol.com.br/product-page/bambu-tuldoides) — mudas de tuldoides, não colmo cortado — serve para plantar, não para comprar.
+
+### O que pedir ao fornecedor
+
+> **colmo entouceirante, 35 a 45 mm de diâmetro externo, parede de no mínimo 3 mm, tratado contra caruncho**
+
+Não é uma medida, é uma janela — e ela é larga: os 37 mm são resultado de casar com o eucalipto carregando incerteza larga, e não requisito. Qualquer combinação da janela serve, com massa e custo diferentes — o projeto se ajusta ao que o fornecedor tem.
+
+**43 combinações** entre 35 e
+45 mm empatam com o eucalipto **e** ficam mais leves e mais
+baratas que ele. O pior caso da janela, 45 × 6 mm, ainda dá
+0.618 kg contra 0,772 e R$ 1.24
+contra 3,09.
+
+**Se o colmo falhar:** bambu laminado é fabricado NA MEDIDA, sem problema de seleção nenhum. Custa quatro vezes mais por quilo e ainda sai 59% mais leve e 18% mais barato por cabo que o eucalipto — é a reserva, não o plano.
+
+**Ordem de ação:** telefonar para quem lista faixa fina; ajustar o projeto ao que o fornecedor tem dentro da janela; bambu laminado como reserva.
+### Certificação: possível, não estabelecida
+
+O fsc cobre produto não-madeireiro e tem o padrão slimf para pequeno produtor, que é exatamente o perfil de quem planta bambu. mas não foi encontrada nenhuma operação de bambu certificada fsc no brasil. Consequência prática: se certificação for exigência da empresa, isso vira um projeto com o fornecedor, e não uma compra.
+
+**Leia esta lista pelo que ela é.** BUSCA NA WEB, NÃO VERIFICADA: nenhuma empresa foi contatada nem conferida quanto a atividade, capacidade ou classificação por diâmetro. É ponto de partida para telefonar,
+e não fornecedor qualificado — tratar uma busca como avaliação de fornecedor seria
+inventar um trabalho que não foi feito.
+## 11. Entradas, e de onde cada número veio
 
 **Leia antes de discutir qualquer resultado.** Um só material tem fonte primária.
 
@@ -297,7 +348,7 @@ estava errada. E a barra para os candidatos subiu 50%.
 
 O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato NÃO tem nenhuma: os números dele saíram de memória. O benchmark é sólido; o candidato é o que precisa ser medido.
 
-## 11. Limites
+## 12. Limites
 
 - A BARREIRA QUE NÃO SE TRANSPÕE AQUI: nada foi ensaiado fisicamente. Impacto real envolve taxa de deformação, e cabo real sofre fadiga por milhares de ciclos — nenhuma das duas coisas está nesta conta.
 - As propriedades dos demais materiais são valor de manual de memória; NÃO conferido contra fonte primária. Os fatores de perda são a entrada mais frágil: eles variam com frequência e com o método de medida, às vezes por um fator de dois.
@@ -318,7 +369,7 @@ O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato
   o bambu — material com séculos de uso em cabo de ferramenta — só entrou quando o
   usuário perguntou se havia algo melhor.
 
-## 12. O que precisa ser medido
+## 13. O que precisa ser medido
 
 Para o bambu, em ordem de valor:
 
@@ -329,7 +380,7 @@ Para o bambu, em ordem de valor:
 
 Para os laminados de papel, o primeiro item continua sendo resistência à flexão.
 
-## 13. Literatura
+## 14. Literatura
 
 70 publicações com DOI, de 10 buscas. **Estes artigos não
 foram lidos** — eles sustentam que as perguntas são reconhecidas e os campos são
