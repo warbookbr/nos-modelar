@@ -29,6 +29,7 @@ from typing import Any
 
 from ..contratos import Estudo, Evidencia, Execucao, Hipotese, Sintese
 from ..ensaio import efeito_de_escala
+from ..erros import falhar
 from ..incerteza import propagar
 from ..secagem import comparar_preparo
 from ..instrumentos import Registro
@@ -863,6 +864,192 @@ TETO_EXTRAPOLADO_SISAL = {
     "fator_de_perda": 0.030,
     "natureza": "extrapolação, NÃO medida; não use como propriedade de material",
 }
+
+#: DE ONDE VEM CADA PROPRIEDADE, uma por uma. Esta tabela existe porque o campo
+#: `fonte` do material mentia por omissão: ele é do MATERIAL, e se espalhava
+#: visualmente por cima de propriedades que a fonte nunca mediu.
+#:
+#: `PROPRIEDADES_COM_FONTE` é conferida na carga do módulo por `_conferir_fontes`,
+#: que RECUSA material com propriedade não atribuída. Marcar como MEMÓRIA é
+#: permitido; ficar em silêncio, não. Silêncio é como o amortecimento passou este
+#: estudo inteiro parecendo medido.
+MEMORIA = "MEMÓRIA — valor de manual, NÃO conferido contra fonte primária"
+
+#: As quatro propriedades numéricas que entram na viga. Toda uma delas, em todo
+#: material, precisa dizer de onde veio.
+PROPRIEDADES_COM_FONTE = ("modulo_pa", "densidade_kg_m3", "resistencia_pa",
+                          "fator_de_perda")
+
+FONTES_POR_PROPRIEDADE: dict[str, dict[str, str]] = {
+    "eucalipto": {
+        "modulo_pa": "FPL-GTR-190 tabela 5-5a",
+        "densidade_kg_m3": "FPL-GTR-190 tabela 5-5a",
+        "resistencia_pa": "FPL-GTR-190 tabela 5-5a",
+        "fator_de_perda": "FPL-GTR-190 cap. 5, decremento logarítmico dividido por pi",
+    },
+    "eucalipto-urograndis": {
+        "modulo_pa": "Revista Árvore 33(3), 2009, Tabela 3",
+        # Derivada, e não medida: o artigo dá densidade BÁSICA e o cabo trabalha a
+        # 12%. A conversão usa fator 1,22, que é valor usual e não medida daqui.
+        "densidade_kg_m3": "Revista Árvore 33(3), 2009 — DERIVADA da densidade básica × 1,22",
+        "resistencia_pa": "Revista Árvore 33(3), 2009, Tabela 3",
+        "fator_de_perda": MEMORIA,
+    },
+    "bambu-colmo": {
+        "modulo_pa": "REA 19(1), 2017, colmo inteiro",
+        "densidade_kg_m3": "REA 19(1), 2017, colmo inteiro",
+        "resistencia_pa": "REA 19(1), 2017, colmo inteiro",
+        "fator_de_perda": MEMORIA,
+    },
+    "seringueira": {
+        "modulo_pa": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "densidade_kg_m3": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "resistencia_pa": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "fator_de_perda": MEMORIA,
+    },
+    "pinus-elliottii": {
+        "modulo_pa": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "densidade_kg_m3": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "resistencia_pa": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "fator_de_perda": MEMORIA,
+    },
+}
+
+
+def _conferir_fontes() -> None:
+    """Recusa material que declare fonte e deixe propriedade sem atribuir.
+
+    Roda na carga do módulo. Falhar aqui é melhor que rodar um estudo em que o
+    leitor não distingue medida de lembrança.
+    """
+    for nome, material in MATERIAIS.items():
+        atribuidas = FONTES_POR_PROPRIEDADE.setdefault(
+            nome, {p: MEMORIA for p in PROPRIEDADES_COM_FONTE})
+        faltando = [p for p in PROPRIEDADES_COM_FONTE if p not in atribuidas]
+        if faltando:
+            raise falhar(
+                "contrato", "propriedade-sem-fonte-atribuida",
+                f"'{nome}' não diz de onde vêm {faltando}.",
+                local="FONTES_POR_PROPRIEDADE",
+                acaoSugerida=("Marcar como MEMÓRIA é permitido; ficar em silêncio, "
+                              "não. Silêncio foi como o amortecimento passou este "
+                              "estudo inteiro parecendo medido."),
+            )
+        if "fonte" in material and atribuidas.get("resistencia_pa") == MEMORIA:
+            raise falhar(
+                "contrato", "fonte-de-material-sem-medida",
+                f"'{nome}' exibe uma fonte e não tem nenhuma propriedade medida.",
+                local="MATERIAIS",
+            )
+
+
+def procedencia(nome: str) -> dict[str, Any]:
+    """De onde veio cada número deste material, e quanto dele é memória."""
+    if nome not in MATERIAIS:
+        raise falhar("contrato", "material-ausente",
+                     f"'{nome}'; existem {sorted(MATERIAIS)}.", local="nome")
+    fontes = FONTES_POR_PROPRIEDADE[nome]
+    de_memoria = [p for p in PROPRIEDADES_COM_FONTE if fontes[p] == MEMORIA]
+    return {
+        "material": nome,
+        "porPropriedade": {p: fontes[p] for p in PROPRIEDADES_COM_FONTE},
+        "deMemoria": tuple(de_memoria),
+        "fracaoMedida": 1 - len(de_memoria) / len(PROPRIEDADES_COM_FONTE),
+        "leiaAssim": ("o rótulo de fonte do material NÃO vale para as propriedades "
+                      "que a fonte não mediu; esta é a lista por propriedade"),
+    }
+
+
+#: QUANDO FALTA O NÚMERO QUE DECIDE, inverta a pergunta.
+#:
+#: A acácia-negra chegou aqui com densidade e rigidez MEDIDAS e sem o módulo de
+#: ruptura: o artigo que o traz está atrás de bloqueio de servidor. Chutar o valor
+#: seria repetir o erro que este estudo já pagou caro — número de memória com
+#: aparência de dado.
+#:
+#: A saída é dizer quanto ele PRECISA ser. Isso não inventa nada, usa só a
+#: geometria e o alvo, e transforma uma pesquisa vaga ("qual é o MOR da acácia?")
+#: numa pergunta de sim ou não que qualquer pessoa com o artigo responde em um
+#: minuto.
+#:
+#: A CONTA. Numa viga engastada de seção cheia a tensão é 32·F·L/(π·d³), e a
+#: resistência precisa cobrir isso vezes a margem alvo. O resultado é a
+#: resistência DA PEÇA; para comparar com valor de corpo de prova, é preciso
+#: desfazer o efeito de tamanho, que é o que o segundo número devolve.
+
+
+def resistencia_necessaria(*, diametro_m: float, margem_alvo: float,
+                           familia_de_ensaio: str | None = None) -> dict[str, Any]:
+    """Quanto de resistência um material PRECISA ter para alcançar a margem.
+
+    Devolve dois números, e a diferença entre eles é o efeito de tamanho:
+    `naPeca` é o que o cabo precisa aguentar, e `noCorpoDeProva` é o valor que o
+    artigo teria de reportar — sempre MAIOR, porque o corpo de prova é menor e
+    portanto mais forte que a peça.
+    """
+    if diametro_m <= 0 or margem_alvo <= 0:
+        raise falhar("contrato", "entrada-nao-positiva",
+                     f"diametro={diametro_m}, margem={margem_alvo}.", local="entradas")
+    secao = secao_macica(diametro_m)
+    tensao = FORCA_N * COMPRIMENTO_M * secao["raioExterno"] / secao["inercia"]
+    na_peca = tensao * margem_alvo
+    fator = 1.0
+    if familia_de_ensaio is not None:
+        cp = CORPOS_DE_PROVA[familia_de_ensaio]
+        fator = efeito_de_escala(
+            resistencia_pa=1.0, volume_do_ensaio_m3=cp["volume_m3"],
+            volume_da_peca_m3=secao["area"] * COMPRIMENTO_M,
+            modulo_de_weibull=cp["modulo_de_weibull"],
+            material=familia_de_ensaio)["fatorDeReducao"]
+    return {
+        "diametro_m": diametro_m,
+        "margemAlvo": margem_alvo,
+        "naPeca_pa": na_peca,
+        "noCorpoDeProva_pa": na_peca / fator,
+        "fatorDeEscala": fator,
+        "leiaAssim": ("compare `noCorpoDeProva` com o valor que o artigo reporta; "
+                      "`naPeca` é o que o cabo precisa aguentar de verdade"),
+    }
+
+
+#: CANDIDATOS COM DADO PARCIAL, e eles ficam FORA de `MATERIAIS` de propósito:
+#: material sem a propriedade que decide não entra na tabela como se estivesse
+#: avaliado. Ficam aqui, visíveis, com o que se sabe e com o que falta.
+CANDIDATOS_INCOMPLETOS = {
+    "acacia-negra": {
+        "especie": "Acacia mearnsii",
+        "porQueInteressa": (
+            "subproduto do tanino no Rio Grande do Sul, cadeia madura, corte aos "
+            "sete anos; a árvore já é derrubada pela casca"),
+        "medido": {
+            "densidade_kg_m3": 657.0,
+            "modulo_pa": 8.368e9,
+        },
+        "fonte": (
+            "Revista Ciência da Madeira 7(2):61-69, 2016 (UFPel), acácia-negra aos "
+            "quatro e sete anos, Piratini-RS. Resumo lido; PDF completo atrás de "
+            "bloqueio de servidor nesta sessão."),
+        "falta": ("modulo de ruptura na flexão",),
+        "oQueJaDaParaDizer": (
+            "a rigidez por quilo dá 12,7 milhões contra um piso de 5,5 milhões: "
+            "ela passa folgada na rigidez, e a decisão inteira está no MOR"),
+    },
+    "estipe-de-palmeira": {
+        "especie": "pupunha (Bactris gasipaes), açaí e afins",
+        "porQueInteressa": (
+            "resíduo de palmito e de fruto em volume enorme, e a arquitetura é "
+            "parecida com a do bambu: denso na periferia e mole no miolo, o que faz "
+            "o estipe inteiro se comportar como tubo sem ninguém ter furado nada"),
+        "medido": {},
+        "fonte": "nenhuma fonte quantitativa acessível nesta sessão",
+        "falta": ("resistência", "módulo", "densidade — tudo"),
+        "oQueJaDaParaDizer": (
+            "NADA de quantitativo. A parte aproveitável é só o anel externo, então "
+            "a comparação certa não é com barra maciça e sim com tubo — e a "
+            "espessura desse anel decide, sem ela não há conta"),
+    },
+}
+
 
 #: Geometrias comparáveis: a madeira maciça como é, e tubos de parede honesta.
 GEOMETRIAS = {
@@ -2062,3 +2249,6 @@ def avaliar_estudo(comparacao: dict[str, Any] | None = None,
             "candidato recomendado, seguem com números de memória.",
         ),
     )
+
+
+_conferir_fontes()

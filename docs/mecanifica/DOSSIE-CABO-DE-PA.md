@@ -152,6 +152,50 @@ cera**, porque apodrece mais rápido. Tratamento de autoclave com sal metálico 
 remédio de poste enterrado, não se aplica a cabo de mão, e brigaria com a exigência
 de não-toxicidade.
 
+## 4a. Candidatos que chegaram sem o número que decide
+
+Dois candidatos brasileiros entraram tarde e **não estão na tabela** — de
+propósito. Material sem a propriedade que decide não pode aparecer avaliado: ele
+apareceria com um número inventado.
+
+### Acácia-negra (*Acacia mearnsii*)
+
+Interessa porque no Rio Grande do Sul ela é **subproduto do tanino**: a árvore já é
+derrubada pela casca, e é cortada aos sete anos.
+
+**Medido** (Rev. Ciência da Madeira 7(2), 2016, UFPel — resumo lido; PDF completo
+bloqueado): densidade **657 kg/m³**, módulo na flexão **8.368 MPa**.
+**Falta:** módulo de ruptura. É ele que decide.
+
+O que já dá para dizer: em rigidez por quilo ela dá 12,7 milhões contra um piso de
+5,5 milhões — **passa com o dobro da folga**. A decisão inteira está no MOR.
+
+**Em vez de chutar esse número, calculamos quanto ele precisa ser.** Para empatar
+com o eucalipto brasileiro, o artigo teria de reportar:
+
+| diâmetro do cabo | MOR necessário no corpo de prova | massa do cabo |
+| :-: | ---: | ---: |
+| 32 mm | 83,9 MPa | 0,63 kg |
+| 36 mm | 60,1 MPa | 0,80 kg |
+| 40 mm | 44,6 MPa | 0,99 kg |
+
+Quem tiver o artigo responde isso em um minuto. Uma pesquisa vaga virou uma
+pergunta de sim ou não.
+
+### Estipe de palmeira (pupunha, açaí)
+
+Interessa por duas razões. É **resíduo de palmito e de fruto em volume enorme**. E
+a arquitetura é parecida com a do bambu: **denso na periferia, mole no miolo** — o
+estipe inteiro se comporta como tubo sem ninguém ter furado nada.
+
+**Medido: nada.** Nenhuma fonte quantitativa foi acessível.
+
+O que dá para dizer sem número, e vale: só o anel externo é aproveitável, então a
+comparação certa **não é com barra maciça, é com tubo** — e a espessura desse anel
+decide. Sem ela não há conta possível. Não medir e dizer que não mediu é resultado;
+não medir e ficar em silêncio é o que este dossiê passou a versão inteira
+consertando.
+
 ## 4b. Quando parar de procurar
 
 Não dá para esgotar a lista de materiais: sempre aparece mais uma ideia, e cada

@@ -1,4 +1,6 @@
 """Piloto do cabo de pá: as três hipóteses, e o achado sobre a carga suposta."""
+import pytest
+
 from laboratorio.estudos import cabo_de_pa as estudo
 
 
@@ -1029,3 +1031,90 @@ def test_a_tabela_COMPARTILHADA_ja_impoe_a_disciplina_que_falta_ao_estudo():
         assert propriedade.origem and propriedade.condicao
         if propriedade.origem == "publicada":
             assert propriedade.fonte
+
+
+def test_a_PROCEDENCIA_e_por_PROPRIEDADE_e_nao_por_material():
+    """O conserto do erro que o campo `fonte` do material cometia por omissão."""
+    p = estudo.procedencia("seringueira")
+    assert p["porPropriedade"]["resistencia_pa"].startswith("Scientia")
+    assert p["porPropriedade"]["fator_de_perda"] == estudo.MEMORIA
+    assert p["deMemoria"] == ("fator_de_perda",)
+    assert p["fracaoMedida"] == 0.75
+
+
+def test_a_DENSIDADE_do_urograndis_vem_marcada_como_DERIVADA():
+    """Ela não é medida: o artigo dá densidade básica e o cabo trabalha a 12%.
+    A conversão é premissa, e a linha de procedência diz isso."""
+    assert "DERIVADA" in estudo.procedencia("eucalipto-urograndis")["porPropriedade"]["densidade_kg_m3"]
+
+
+def test_material_SEM_procedencia_declarada_e_RECUSADO_na_carga():
+    """Marcar como MEMÓRIA é permitido; ficar em silêncio, não."""
+    from laboratorio.erros import ErroLaboratorio
+    guardado = dict(estudo.FONTES_POR_PROPRIEDADE["seringueira"])
+    try:
+        del estudo.FONTES_POR_PROPRIEDADE["seringueira"]["resistencia_pa"]
+        with pytest.raises(ErroLaboratorio) as e:
+            estudo._conferir_fontes()
+        assert "resistencia_pa" in str(e.value)
+    finally:
+        estudo.FONTES_POR_PROPRIEDADE["seringueira"] = guardado
+
+
+def test_TODO_material_do_estudo_tem_procedencia_por_propriedade():
+    for nome in estudo.MATERIAIS:
+        p = estudo.procedencia(nome)
+        assert set(p["porPropriedade"]) == set(estudo.PROPRIEDADES_COM_FONTE), nome
+
+
+# --- candidatos que chegaram sem o número que decide ----------------------
+
+def test_candidato_SEM_a_propriedade_que_decide_NAO_entra_na_tabela():
+    """Acácia-negra e estipe de palmeira ficam FORA de MATERIAIS de propósito.
+
+    Material sem a propriedade que decide não pode aparecer na tabela como se
+    estivesse avaliado — ele apareceria com um número que eu teria inventado.
+    """
+    for nome in estudo.CANDIDATOS_INCOMPLETOS:
+        assert nome not in estudo.MATERIAIS
+        assert estudo.CANDIDATOS_INCOMPLETOS[nome]["falta"]
+
+
+def test_a_ACACIA_passa_na_RIGIDEZ_e_a_decisao_inteira_esta_no_MOR():
+    """Densidade e módulo dela são medidos; o módulo de ruptura não foi acessível."""
+    from laboratorio import dominio
+    acacia = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["medido"]
+    f = dominio.fronteira(forca_n=300.0, comprimento_m=1.2, diametro_m=0.045,
+                          massa_maxima_kg=1.0, flecha_maxima_m=0.30)
+    folga = acacia["modulo_pa"] / acacia["densidade_kg_m3"] / f.rigidez_por_densidade
+    assert folga > 2.0, "sobra rigidez"
+    assert "modulo de ruptura na flexão" in estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["falta"]
+
+
+def test_INVERTER_a_pergunta_transforma_pesquisa_vaga_em_sim_ou_nao():
+    """Em vez de chutar o MOR que falta, dizer quanto ele precisa ser.
+
+    Isso não inventa nada — usa só geometria e alvo — e vira uma pergunta que
+    qualquer pessoa com o artigo na mão responde em um minuto.
+    """
+    alvo = estudo.medir("eucalipto-urograndis")["margemP05"]
+    grosso = estudo.resistencia_necessaria(
+        diametro_m=0.040, margem_alvo=alvo, familia_de_ensaio="madeira-br")
+    fino = estudo.resistencia_necessaria(
+        diametro_m=0.032, margem_alvo=alvo, familia_de_ensaio="madeira-br")
+    assert grosso["noCorpoDeProva_pa"] < fino["noCorpoDeProva_pa"], "engrossar afrouxa"
+    # O valor do corpo de prova é sempre MAIOR que o da peça: o corpo é menor e
+    # portanto mais forte, e é essa diferença que o efeito de tamanho mede.
+    assert fino["noCorpoDeProva_pa"] > fino["naPeca_pa"]
+    assert 80e6 < fino["noCorpoDeProva_pa"] < 90e6
+
+
+def test_a_PALMEIRA_nao_tem_NENHUM_numero_e_o_estudo_diz_isso():
+    """Não medir e dizer que não mediu é resultado; não medir e ficar em silêncio
+    é o que este estudo passou a sessão inteira consertando."""
+    palmeira = estudo.CANDIDATOS_INCOMPLETOS["estipe-de-palmeira"]
+    assert palmeira["medido"] == {}
+    assert "NADA de quantitativo" in palmeira["oQueJaDaParaDizer"]
+    # E o que se pode dizer sem número é qualitativo e vale: a parte aproveitável
+    # é o anel externo, então a comparação certa é com tubo, não com barra.
+    assert "tubo" in palmeira["oQueJaDaParaDizer"]
