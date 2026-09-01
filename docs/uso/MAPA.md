@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-752 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+758 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -387,6 +387,7 @@
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
 - `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
+- `DOSSIE-LABORATORIO-IA.md` — Laboratório computacional para investigação por IA
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
 - `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
 - `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
@@ -468,7 +469,7 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-08-31-malha-otimizada-e-prova-por-objeto.md` — Malha otimizada e prova por objeto
+- `2026-09-01-laboratorio-computacional-ia.md` — Laboratório computacional para investigação por IA
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -546,6 +547,7 @@
 - `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
 - `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
+- `2026-08-31-malha-otimizada-e-prova-por-objeto.md` — Malha otimizada e prova por objeto
 - `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
 - `README.md` — Planos encerrados
 
@@ -584,12 +586,17 @@
 ## docs/superpowers/plans/
 
 - `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — P0 Implementation Plan
+- `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
 
 ## docs/uso/
 
 - `RECURSOS.md` — Recursos e portas de entrada
 - `oficina-contrato.md` — Oficina — contrato procedural preservado
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
+
+## laboratorio/
+
+- `README.md` — Laboratório computacional para IA
 
 ## laboratorio-isolado/cupe-livre-01/
 
@@ -809,6 +816,8 @@
 ## tools/arquitetura/
 
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
+- `independencia-laboratorio.mjs` — **SEM CABEÇALHO**
+- `independencia-laboratorio.test.mjs` — **SEM CABEÇALHO**
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
 

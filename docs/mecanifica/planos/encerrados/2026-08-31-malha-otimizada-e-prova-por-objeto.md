@@ -1,14 +1,23 @@
 # Malha otimizada e prova por objeto
 
-**Estado:** ativo
+**Estado:** concluído
+**Encerrado em:** 2026-09-01, com H0–H5 entregues e H6 parcial
 
 **Responsável:** Claude
+
+**Encerramento honesto.** H0 a H5 foram entregues e estão na `main`: os três
+módulos, o conferente de malha, o modo de auditoria visual e cinco peças no
+acervo. H6 — consolidar atritos — foi feito em parte: A1, A2, A5, A7, A9, A11 e
+A12 estão resolvidos e registrados; A14 (tolerância de planaridade do `furo`)
+ficou medido e deliberadamente NÃO corrigido, com o motivo escrito. O que sobra
+de H6 é catalogar o resto no backlog, e isso não justifica manter um plano
+ocupando a única vaga de plano ativo.
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, `main` em
 `b97c7bb49524c4fbc7de546fd2a4a01d396c4390`
 
 **Rastreio das fatias:**
-[`../MALHA-OTIMIZADA-PROGRESSO.md`](../MALHA-OTIMIZADA-PROGRESSO.md)
+[`../../MALHA-OTIMIZADA-PROGRESSO.md`](../../MALHA-OTIMIZADA-PROGRESSO.md)
 (`docs/mecanifica/MALHA-OTIMIZADA-PROGRESSO.md`)
 
 ## Problema observado
