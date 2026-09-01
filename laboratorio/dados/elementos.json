@@ -1,0 +1,834 @@
+{
+ "formato": "lab.tabela-periodica@1",
+ "fonte": "massas atomicas padrao IUPAC (CIAAW); numero atomico e simbolo sao definicionais",
+ "licenca": "dado factual, nao protegido por direito autoral",
+ "nota": "massa de elemento sem isotopo estavel e a do isotopo de maior meia-vida conhecida, marcada em `massaEhDeIsotopo`; ela NAO e uma massa atomica padrao",
+ "elementos": [
+  {
+   "z": 1,
+   "simbolo": "H",
+   "nome": "hidrogênio",
+   "massaAtomica_u": 1.008,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 2,
+   "simbolo": "He",
+   "nome": "hélio",
+   "massaAtomica_u": 4.0026,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 3,
+   "simbolo": "Li",
+   "nome": "lítio",
+   "massaAtomica_u": 6.94,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 4,
+   "simbolo": "Be",
+   "nome": "berílio",
+   "massaAtomica_u": 9.0122,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 5,
+   "simbolo": "B",
+   "nome": "boro",
+   "massaAtomica_u": 10.81,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 6,
+   "simbolo": "C",
+   "nome": "carbono",
+   "massaAtomica_u": 12.011,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 7,
+   "simbolo": "N",
+   "nome": "nitrogênio",
+   "massaAtomica_u": 14.007,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 8,
+   "simbolo": "O",
+   "nome": "oxigênio",
+   "massaAtomica_u": 15.999,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 9,
+   "simbolo": "F",
+   "nome": "flúor",
+   "massaAtomica_u": 18.998,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 10,
+   "simbolo": "Ne",
+   "nome": "neônio",
+   "massaAtomica_u": 20.18,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 11,
+   "simbolo": "Na",
+   "nome": "sódio",
+   "massaAtomica_u": 22.99,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 12,
+   "simbolo": "Mg",
+   "nome": "magnésio",
+   "massaAtomica_u": 24.305,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 13,
+   "simbolo": "Al",
+   "nome": "alumínio",
+   "massaAtomica_u": 26.982,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 14,
+   "simbolo": "Si",
+   "nome": "silício",
+   "massaAtomica_u": 28.085,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 15,
+   "simbolo": "P",
+   "nome": "fósforo",
+   "massaAtomica_u": 30.974,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 16,
+   "simbolo": "S",
+   "nome": "enxofre",
+   "massaAtomica_u": 32.06,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 17,
+   "simbolo": "Cl",
+   "nome": "cloro",
+   "massaAtomica_u": 35.45,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 18,
+   "simbolo": "Ar",
+   "nome": "argônio",
+   "massaAtomica_u": 39.95,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 19,
+   "simbolo": "K",
+   "nome": "potássio",
+   "massaAtomica_u": 39.098,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 20,
+   "simbolo": "Ca",
+   "nome": "cálcio",
+   "massaAtomica_u": 40.078,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 21,
+   "simbolo": "Sc",
+   "nome": "escândio",
+   "massaAtomica_u": 44.956,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 22,
+   "simbolo": "Ti",
+   "nome": "titânio",
+   "massaAtomica_u": 47.867,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 23,
+   "simbolo": "V",
+   "nome": "vanádio",
+   "massaAtomica_u": 50.942,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 24,
+   "simbolo": "Cr",
+   "nome": "cromo",
+   "massaAtomica_u": 51.996,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 25,
+   "simbolo": "Mn",
+   "nome": "manganês",
+   "massaAtomica_u": 54.938,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 26,
+   "simbolo": "Fe",
+   "nome": "ferro",
+   "massaAtomica_u": 55.845,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 27,
+   "simbolo": "Co",
+   "nome": "cobalto",
+   "massaAtomica_u": 58.933,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 28,
+   "simbolo": "Ni",
+   "nome": "níquel",
+   "massaAtomica_u": 58.693,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 29,
+   "simbolo": "Cu",
+   "nome": "cobre",
+   "massaAtomica_u": 63.546,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 30,
+   "simbolo": "Zn",
+   "nome": "zinco",
+   "massaAtomica_u": 65.38,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 31,
+   "simbolo": "Ga",
+   "nome": "gálio",
+   "massaAtomica_u": 69.723,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 32,
+   "simbolo": "Ge",
+   "nome": "germânio",
+   "massaAtomica_u": 72.63,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 33,
+   "simbolo": "As",
+   "nome": "arsênio",
+   "massaAtomica_u": 74.922,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 34,
+   "simbolo": "Se",
+   "nome": "selênio",
+   "massaAtomica_u": 78.971,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 35,
+   "simbolo": "Br",
+   "nome": "bromo",
+   "massaAtomica_u": 79.904,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 36,
+   "simbolo": "Kr",
+   "nome": "criptônio",
+   "massaAtomica_u": 83.798,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 37,
+   "simbolo": "Rb",
+   "nome": "rubídio",
+   "massaAtomica_u": 85.468,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 38,
+   "simbolo": "Sr",
+   "nome": "estrôncio",
+   "massaAtomica_u": 87.62,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 39,
+   "simbolo": "Y",
+   "nome": "ítrio",
+   "massaAtomica_u": 88.906,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 40,
+   "simbolo": "Zr",
+   "nome": "zircônio",
+   "massaAtomica_u": 91.224,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 41,
+   "simbolo": "Nb",
+   "nome": "nióbio",
+   "massaAtomica_u": 92.906,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 42,
+   "simbolo": "Mo",
+   "nome": "molibdênio",
+   "massaAtomica_u": 95.95,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 43,
+   "simbolo": "Tc",
+   "nome": "tecnécio",
+   "massaAtomica_u": 98.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 44,
+   "simbolo": "Ru",
+   "nome": "rutênio",
+   "massaAtomica_u": 101.07,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 45,
+   "simbolo": "Rh",
+   "nome": "ródio",
+   "massaAtomica_u": 102.91,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 46,
+   "simbolo": "Pd",
+   "nome": "paládio",
+   "massaAtomica_u": 106.42,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 47,
+   "simbolo": "Ag",
+   "nome": "prata",
+   "massaAtomica_u": 107.87,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 48,
+   "simbolo": "Cd",
+   "nome": "cádmio",
+   "massaAtomica_u": 112.41,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 49,
+   "simbolo": "In",
+   "nome": "índio",
+   "massaAtomica_u": 114.82,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 50,
+   "simbolo": "Sn",
+   "nome": "estanho",
+   "massaAtomica_u": 118.71,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 51,
+   "simbolo": "Sb",
+   "nome": "antimônio",
+   "massaAtomica_u": 121.76,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 52,
+   "simbolo": "Te",
+   "nome": "telúrio",
+   "massaAtomica_u": 127.6,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 53,
+   "simbolo": "I",
+   "nome": "iodo",
+   "massaAtomica_u": 126.9,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 54,
+   "simbolo": "Xe",
+   "nome": "xenônio",
+   "massaAtomica_u": 131.29,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 55,
+   "simbolo": "Cs",
+   "nome": "césio",
+   "massaAtomica_u": 132.91,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 56,
+   "simbolo": "Ba",
+   "nome": "bário",
+   "massaAtomica_u": 137.33,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 57,
+   "simbolo": "La",
+   "nome": "lantânio",
+   "massaAtomica_u": 138.91,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 58,
+   "simbolo": "Ce",
+   "nome": "cério",
+   "massaAtomica_u": 140.12,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 59,
+   "simbolo": "Pr",
+   "nome": "praseodímio",
+   "massaAtomica_u": 140.91,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 60,
+   "simbolo": "Nd",
+   "nome": "neodímio",
+   "massaAtomica_u": 144.24,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 61,
+   "simbolo": "Pm",
+   "nome": "promécio",
+   "massaAtomica_u": 145.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 62,
+   "simbolo": "Sm",
+   "nome": "samário",
+   "massaAtomica_u": 150.36,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 63,
+   "simbolo": "Eu",
+   "nome": "európio",
+   "massaAtomica_u": 151.96,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 64,
+   "simbolo": "Gd",
+   "nome": "gadolínio",
+   "massaAtomica_u": 157.25,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 65,
+   "simbolo": "Tb",
+   "nome": "térbio",
+   "massaAtomica_u": 158.93,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 66,
+   "simbolo": "Dy",
+   "nome": "disprósio",
+   "massaAtomica_u": 162.5,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 67,
+   "simbolo": "Ho",
+   "nome": "hólmio",
+   "massaAtomica_u": 164.93,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 68,
+   "simbolo": "Er",
+   "nome": "érbio",
+   "massaAtomica_u": 167.26,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 69,
+   "simbolo": "Tm",
+   "nome": "túlio",
+   "massaAtomica_u": 168.93,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 70,
+   "simbolo": "Yb",
+   "nome": "itérbio",
+   "massaAtomica_u": 173.05,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 71,
+   "simbolo": "Lu",
+   "nome": "lutécio",
+   "massaAtomica_u": 174.97,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 72,
+   "simbolo": "Hf",
+   "nome": "háfnio",
+   "massaAtomica_u": 178.49,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 73,
+   "simbolo": "Ta",
+   "nome": "tântalo",
+   "massaAtomica_u": 180.95,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 74,
+   "simbolo": "W",
+   "nome": "tungstênio",
+   "massaAtomica_u": 183.84,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 75,
+   "simbolo": "Re",
+   "nome": "rênio",
+   "massaAtomica_u": 186.21,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 76,
+   "simbolo": "Os",
+   "nome": "ósmio",
+   "massaAtomica_u": 190.23,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 77,
+   "simbolo": "Ir",
+   "nome": "irídio",
+   "massaAtomica_u": 192.22,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 78,
+   "simbolo": "Pt",
+   "nome": "platina",
+   "massaAtomica_u": 195.08,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 79,
+   "simbolo": "Au",
+   "nome": "ouro",
+   "massaAtomica_u": 196.97,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 80,
+   "simbolo": "Hg",
+   "nome": "mercúrio",
+   "massaAtomica_u": 200.59,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 81,
+   "simbolo": "Tl",
+   "nome": "tálio",
+   "massaAtomica_u": 204.38,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 82,
+   "simbolo": "Pb",
+   "nome": "chumbo",
+   "massaAtomica_u": 207.2,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 83,
+   "simbolo": "Bi",
+   "nome": "bismuto",
+   "massaAtomica_u": 208.98,
+   "massaEhDeIsotopo": false
+  },
+  {
+   "z": 84,
+   "simbolo": "Po",
+   "nome": "polônio",
+   "massaAtomica_u": 209.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 85,
+   "simbolo": "At",
+   "nome": "astato",
+   "massaAtomica_u": 210.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 86,
+   "simbolo": "Rn",
+   "nome": "radônio",
+   "massaAtomica_u": 222.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 87,
+   "simbolo": "Fr",
+   "nome": "frâncio",
+   "massaAtomica_u": 223.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 88,
+   "simbolo": "Ra",
+   "nome": "rádio",
+   "massaAtomica_u": 226.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 89,
+   "simbolo": "Ac",
+   "nome": "actínio",
+   "massaAtomica_u": 227.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 90,
+   "simbolo": "Th",
+   "nome": "tório",
+   "massaAtomica_u": 232.04,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 91,
+   "simbolo": "Pa",
+   "nome": "protactínio",
+   "massaAtomica_u": 231.04,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 92,
+   "simbolo": "U",
+   "nome": "urânio",
+   "massaAtomica_u": 238.03,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 93,
+   "simbolo": "Np",
+   "nome": "netúnio",
+   "massaAtomica_u": 237.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 94,
+   "simbolo": "Pu",
+   "nome": "plutônio",
+   "massaAtomica_u": 244.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 95,
+   "simbolo": "Am",
+   "nome": "amerício",
+   "massaAtomica_u": 243.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 96,
+   "simbolo": "Cm",
+   "nome": "cúrio",
+   "massaAtomica_u": 247.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 97,
+   "simbolo": "Bk",
+   "nome": "berquélio",
+   "massaAtomica_u": 247.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 98,
+   "simbolo": "Cf",
+   "nome": "califórnio",
+   "massaAtomica_u": 251.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 99,
+   "simbolo": "Es",
+   "nome": "einstênio",
+   "massaAtomica_u": 252.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 100,
+   "simbolo": "Fm",
+   "nome": "férmio",
+   "massaAtomica_u": 257.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 101,
+   "simbolo": "Md",
+   "nome": "mendelévio",
+   "massaAtomica_u": 258.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 102,
+   "simbolo": "No",
+   "nome": "nobélio",
+   "massaAtomica_u": 259.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 103,
+   "simbolo": "Lr",
+   "nome": "laurêncio",
+   "massaAtomica_u": 266.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 104,
+   "simbolo": "Rf",
+   "nome": "rutherfórdio",
+   "massaAtomica_u": 267.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 105,
+   "simbolo": "Db",
+   "nome": "dúbnio",
+   "massaAtomica_u": 268.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 106,
+   "simbolo": "Sg",
+   "nome": "seabórgio",
+   "massaAtomica_u": 269.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 107,
+   "simbolo": "Bh",
+   "nome": "bóhrio",
+   "massaAtomica_u": 270.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 108,
+   "simbolo": "Hs",
+   "nome": "hássio",
+   "massaAtomica_u": 269.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 109,
+   "simbolo": "Mt",
+   "nome": "meitnério",
+   "massaAtomica_u": 278.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 110,
+   "simbolo": "Ds",
+   "nome": "darmstácio",
+   "massaAtomica_u": 281.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 111,
+   "simbolo": "Rg",
+   "nome": "roentgênio",
+   "massaAtomica_u": 282.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 112,
+   "simbolo": "Cn",
+   "nome": "copernício",
+   "massaAtomica_u": 285.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 113,
+   "simbolo": "Nh",
+   "nome": "nihônio",
+   "massaAtomica_u": 286.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 114,
+   "simbolo": "Fl",
+   "nome": "fleróvio",
+   "massaAtomica_u": 289.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 115,
+   "simbolo": "Mc",
+   "nome": "moscóvio",
+   "massaAtomica_u": 290.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 116,
+   "simbolo": "Lv",
+   "nome": "livermório",
+   "massaAtomica_u": 293.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 117,
+   "simbolo": "Ts",
+   "nome": "tenesso",
+   "massaAtomica_u": 294.0,
+   "massaEhDeIsotopo": true
+  },
+  {
+   "z": 118,
+   "simbolo": "Og",
+   "nome": "oganessônio",
+   "massaAtomica_u": 294.0,
+   "massaEhDeIsotopo": true
+  }
+ ]
+}

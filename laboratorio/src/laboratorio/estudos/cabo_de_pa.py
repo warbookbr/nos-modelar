@@ -24,9 +24,12 @@ com o jeito de medir. Nada aqui vale para decidir compra sem conferir a entrada.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from ..contratos import Estudo, Evidencia, Execucao, Hipotese, Sintese
+from ..ensaio import efeito_de_escala
+from ..erros import falhar
 from ..incerteza import propagar
 from ..secagem import comparar_preparo
 from ..instrumentos import Registro
@@ -61,11 +64,94 @@ FONTE = "valor de manual de memória; NÃO conferido contra fonte primária"
 #: aproximadamente o valor da madeira VERDE. Cabo de pá é madeira SECA, e a 12% de
 #: umidade o jarrah dá 111,7 MPa e o karri 139 MPa. Eu havia SUBESTIMADO o
 #: concorrente em cerca de 50%, o que tornava o candidato melhor do que ele é.
+#: A SEGUNDA FONTE PRIMÁRIA, e ela derruba a primeira como referência do problema.
+#:
+#: O eucalipto do Wood Handbook é jarrah e karri: espécies AUSTRALIANAS. O Brasil
+#: não planta isso. Aqui se planta grandis, saligna, urophylla e o híbrido
+#: urograndis, que é de longe o mais plantado. Ou seja: o estudo passou o tempo
+#: todo tentando bater uma árvore que não é a que está no cabo da pá.
+#:
+#: O ERRO NÃO FOI DE CÁLCULO, foi de pergunta. Eu peguei a fonte primária que
+#: existia em vez da fonte primária que respondia — e fonte boa sobre a coisa
+#: errada é pior que fonte fraca sobre a coisa certa, porque ela vem com
+#: autoridade.
+#:
+#: Quem apontou foi uma crítica externa, listando as espécies brasileiras. Ela não
+#: trazia dado conferível, mas trazia a pergunta certa.
+#: A TERCEIRA FONTE PRIMÁRIA, e a que faltava: o VENCEDOR do estudo era, até
+#: aqui, o material pior documentado dele. O concorrente tinha duas fontes medidas
+#: e o candidato recomendado rodava com a minha memória — assimetria que trabalha
+#: contra a recomendação, e que estava declarada nos limites do dossiê sem ser
+#: resolvida.
+#:
+#: E O DADO MEDIDO CORRIGE MEUS NÚMEROS PARA BAIXO, nos três. Eu usava 170 MPa,
+#: 15,0 GPa e 700 kg/m³; o medido dá 136,3 MPa, 13,1 GPa e 740 kg/m³. Ou seja: eu
+#: estava 25% otimista na resistência, 15% na rigidez, e ainda subestimava a
+#: densidade. Erro de memória com direção — e a direção favorecia o candidato que
+#: eu vinha recomendando.
+FONTE_BAMBU = (
+    "MOTA, I.; AZEVEDO, M.; COELHO, P.; et al. Estudo das propriedades físicas e "
+    "mecânicas do bambu brasileiro (Bambusa vulgaris vittata) para aplicação na "
+    "construção de sistemas hidráulicos alternativos. Revista de Estudos "
+    "Ambientais (REA), v. 19, n. 1, p. 18-26, 2017, UniFOA. Acesso aberto, PDF "
+    "lido diretamente nesta sessão. Ensaio em COLMO INTEIRO, que é a condição do "
+    "cabo. A faixa larga da dispersão é de Janssen (2000), citada no mesmo artigo "
+    "para colmos inteiros: 62 a 170 MPa e 6,0 a 14,0 GPa."
+)
+
+#: QUARTA FONTE PRIMÁRIA, e a primeira que traz CISALHAMENTO — a propriedade que
+#: governa o esmagamento no furo do rebite, apontada por crítica externa e até
+#: aqui ausente de tudo neste estudo.
+FONTE_SERINGUEIRA = (
+    "LIMA, I. L.; BERGAMO, R.; BERMUDEZ, K. R.; MORAES, M. L. T.; GARCIA, J. N. "
+    "Caracterização das propriedades mecânicas da madeira de clones de Hevea "
+    "brasiliensis. Scientia Forestalis, v. 48, n. 125, e2877, 2020 (IPEF/USP). "
+    "Acesso aberto, PDF lido diretamente nesta sessão. Cinco clones, 33 anos, 25 "
+    "árvores; corpo de prova 2 x 2 x 35 cm, vão de 30 cm. Médias: densidade "
+    "aparente 0,61 g/cm³, flexão 75,76 MPa, módulo 10.043 MPa, cisalhamento "
+    "paralelo às fibras 12,51 MPa."
+)
+
+FONTE_MADEIRA_BR = (
+    "GONÇALVES, F. G.; OLIVEIRA, J. T. S.; et al. Estudo de algumas propriedades "
+    "mecânicas da madeira de um híbrido clonal de Eucalyptus urophylla x "
+    "Eucalyptus grandis. Revista Árvore, Viçosa-MG, v. 33, n. 3, p. 501-509, 2009. "
+    "Acesso aberto, PDF lido diretamente nesta sessão; Tabela 3, madeira seca "
+    "corrigida para 12% de umidade."
+)
+
 FONTE_MADEIRA = (
     "Wood Handbook — Wood as an Engineering Material, FPL-GTR-190, "
     "USDA Forest Service, Forest Products Laboratory, 2010; Tabela 5-5a "
     "(Jarrah, Eucalyptus marginata, e Karri, Eucalyptus diversicolor, a 12% de umidade). "
     "Domínio público, consultado diretamente."
+)
+
+#: NENHUMA DAS QUATRO FONTES PRIMÁRIAS DESTE ESTUDO MEDIU AMORTECIMENTO, e esta
+#: constante existe porque a omissão não estava visível.
+#:
+#: Os artigos do urograndis, do bambu e da seringueira medem flexão, módulo,
+#: densidade, compressão e cisalhamento. Fator de perda, nenhum deles mede. Todos
+#: os `fator_de_perda` deste estudo são valor de manual da minha memória.
+#:
+#: O ERRO DE ESTRUTURA QUE ISSO REVELOU: o campo `fonte` é do MATERIAL, e ele se
+#: espalha visualmente por cima de propriedades que a fonte nunca mediu. Quem lê a
+#: linha da seringueira vê "Scientia Forestalis 2020" e supõe que o amortecimento
+#: veio de lá. Não veio.
+#:
+#: E a ironia é que `materiais.py` e `tabela.py` foram construídos exatamente para
+#: impedir isso — lá cada propriedade carrega a sua própria condição e origem, e
+#: `Propriedade` RECUSA quem se diz publicada sem citar fonte. Este estudo ainda
+#: usa dicionário plano e não passou por essa disciplina. Migrar é trabalho aberto.
+#:
+#: A pergunta que fez isto aparecer veio do usuário: "seringueira é ruim para
+#: absorver?". A resposta honesta é que provavelmente é igual às outras madeiras,
+#: e que eu NÃO tenho o dado — e a segunda metade estava escondida.
+FONTE_DO_FATOR_DE_PERDA = (
+    "MEMÓRIA. Nenhuma das quatro fontes primárias deste estudo mediu amortecimento; "
+    "elas medem resistência, módulo, densidade, compressão e cisalhamento. Todo "
+    "fator de perda aqui é valor de manual não conferido, e ele varia muito com "
+    "frequência e com o método de medida — às vezes por um fator de dois."
 )
 
 #: Critérios que NÃO são número e mesmo assim decidem. Eles entram como escala
@@ -94,6 +180,12 @@ CONTEXTOS_DE_FORNECIMENTO = {
         "fornecimento": {
             "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 1,
+            "eucalipto-laminado": 3,
+            "sisal-mamona": 2,
+            "pinus-elliottii": 3,
+            "pinus-comercial": 3,
+            "eucalipto-urograndis": 3,
+            "seringueira": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -103,6 +195,12 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 3,
             "papel-lignina-curaua": 2,
             "bambu-colmo": 3, "bambu-laminado": 3,
+            "eucalipto-laminado": 3,
+            "sisal-mamona": 2,
+            "pinus-elliottii": 3,
+            "pinus-comercial": 3,
+            "eucalipto-urograndis": 3,
+            "seringueira": 3,
         },
     },
 }
@@ -116,6 +214,14 @@ CONFORMIDADE = {
     "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
     "fibra-de-vidro": 2, "papel-fenolico": 1, "papel-lignina": 3,
     "papel-lignina-curaua": 3, "bambu-colmo": 3, "bambu-laminado": 3,
+    # Fenólica no LVL padrão traz a norma de formaldeído junto.
+    "eucalipto-laminado": 2,
+    # Sem formaldeído: pula a norma de emissão inteira.
+    "sisal-mamona": 3,
+    "pinus-elliottii": 3,
+    "pinus-comercial": 3,
+    "eucalipto-urograndis": 3,
+    "seringueira": 3,
 }
 
 MATERIAIS = {
@@ -278,9 +384,12 @@ MATERIAIS = {
     # razão física, e não só por ignorância minha — e é o caso em que medir tem de
     # virar seleção de lote, não um número só.
     "bambu-colmo": {
-        "modulo_pa": 15.0e9,
-        "densidade_kg_m3": 700.0,
-        "resistencia_pa": 170.0e6,
+        # Medido, colmo inteiro. Ver FONTE_BAMBU, e ver ali por que estes números
+        # são MENORES que os que este estudo usou até agora.
+        "modulo_pa": 13.089e9,
+        "densidade_kg_m3": 740.0,
+        "resistencia_pa": 136.33e6,
+        "fonte": "REA 19(1):18-26, 2017 (UniFOA) — lido diretamente",
         "fator_de_perda": 0.012,
         "preco_por_kg": 2.0,
         "irritacao": 3,
@@ -311,7 +420,10 @@ MATERIAIS = {
                 "rachadura ao longo da fibra com ciclo de umidade. É o problema real do "
                 "bambu, e não a resistência — e este estudo NÃO o modela"),
         },
-        "dispersao": {"modulo_pa": (9e9, 20e9), "resistencia_pa": (100e6, 240e6)},
+        # Faixa de Janssen para colmo inteiro, e ela é MAIS LARGA e MAIS BAIXA que
+        # a que eu tinha posto de memória. Largura aqui é a variação da planta, que
+        # nenhum ensaio reduz: o que se faz com ela é selecionar lote.
+        "dispersao": {"modulo_pa": (6.0e9, 14.0e9), "resistencia_pa": (62.0e6, 170.0e6)},
     },
     # Bambu laminado colado: o mesmo material desmontado em ripas e recolado, que
     # é como se faz piso e móvel de bambu no mundo inteiro. Perde resistência por
@@ -347,6 +459,376 @@ MATERIAIS = {
         },
         "dispersao": {"modulo_pa": (10e9, 15e9), "resistencia_pa": (100e6, 140e6)},
     },
+    # Eucalipto laminado (LVL): a MESMA árvore, fatiada em lâminas finas, seca e
+    # recolada. Entra por causa de uma pergunta do usuário — se madeira é boa e o
+    # gargalo é secagem, dá para atacar a secagem sem trocar de matéria-prima?
+    #
+    # A FÍSICA QUE JUSTIFICA: secar é difusão, e o tempo cresce com o QUADRADO da
+    # espessura. Um taco de 32 mm e uma lâmina de 2 mm da mesma tora diferem por
+    # um fator de cerca de 256. O usuário corrigiu bem o alcance disso: a estufa é
+    # carregada com paletes inteiros, não com uma peça, então o ganho não é por
+    # peça — é de OCUPAÇÃO da estufa por lote entregue. A estufa gira mais vezes.
+    #
+    # O QUE SE PAGA: o laminado é mais fraco por quilo que a madeira limpa. LVL é
+    # feito de tora comercial inteira, com nó e defeito distribuídos, enquanto os
+    # 111,7 MPa do jarrah tabelado vêm de corpo de prova SEM defeito. A média cai.
+    #
+    # O QUE SE GANHA, e é o ponto que interessa: a DISPERSÃO despenca. O defeito
+    # que numa peça maciça é o ponto de quebra vira, no laminado, uma lâmina ruim
+    # entre nove boas. Cabo não quebra na média, quebra no pior do lote — então a
+    # comparação honesta é no p05, e não no valor nominal.
+    #
+    # A FRAQUEZA: estes números são de manual de memória, como quase tudo aqui, e
+    # LVL de eucalipto varia muito com a classe da tora e com a linha de cola.
+    "eucalipto-laminado": {
+        "modulo_pa": 14.0e9,
+        "densidade_kg_m3": 750.0,
+        "resistencia_pa": 85.0e6,
+        "fator_de_perda": 0.010,
+        "preco_por_kg": 7.0,
+        "irritacao": 2,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "a madeira em si é inerte; o adesivo é a única variável de saúde, e o "
+            "LVL industrial padrão usa resina fenólica — existe versão sem "
+            "formaldeído, mas ela não é o que sai da linha por omissão"),
+        "agua": 2,
+        "fabricacao": 2,
+        "justificativaAguaEfabricacao": (
+            "mesma absorção da madeira maciça, com a linha de cola como caminho "
+            "extra; fabricação exige laminar, secar, encolar e prensar — indústria "
+            "madura e forte no Brasil, mas várias etapas a mais que tornear um taco"),
+        "processo": {
+            "dispensa": ("meses de estufa com a peça na espessura final",),
+            "exige": (
+                "laminação da tora, que é máquina dedicada",
+                "adesivo e prensa quente",
+                "usinagem do bloco até o perfil do cabo",
+            ),
+            "riscoDeDurabilidade": (
+                "a linha de cola vira o ponto de falha e o caminho de entrada de "
+                "água; delaminação com ciclo de molha e seca é o risco real, e este "
+                "estudo NÃO o modela"),
+        },
+        # Estreita de propósito, e essa estreiteza É o produto do processo.
+        "dispersao": {"modulo_pa": (13.0e9, 15.5e9), "resistencia_pa": (78.0e6, 95.0e6)},
+        # RESULTADO, e ele é NEGATIVO — fica registrado porque resultado negativo
+        # também é resultado. A 32 mm maciço, mesma geometria do cabo atual, o
+        # laminado dá margem 0,70 no p05 contra 1,01 do eucalipto maciço: reprova
+        # na porta estrutural. A dispersão estreita funcionou como previsto (o p05
+        # fica a 8% do determinista, contra a cauda larga da madeira limpa), mas a
+        # queda da média foi maior que o ganho de consistência.
+        #
+        # Ele volta a empatar a 36 mm, ainda dentro do que a mão segura. Só que aí
+        # pesa 0,92 kg contra 0,77 kg e custa R$ 6,41 contra R$ 3,09. Ou seja:
+        # empata em segurança, perde em peso, e custa o DOBRO do material que veio
+        # substituir. A exigência do usuário era ser mais barato, e não é.
+        #
+        # A CONCLUSÃO HONESTA: o ganho de secagem é real e a física dele se
+        # sustenta, mas ele é ganho de LOGÍSTICA, e o preço da colagem come esse
+        # ganho e mais um pouco. Laminar eucalipto resolve o gargalo de estufa de
+        # quem já tem a estufa; não resolve a pergunta deste estudo.
+    },
+    # Sisal com poliuretano de mamona. Entra por sugestão minha e a pedido do
+    # usuário, e a lógica parecia boa: o que matou o papelão foi fibra CURTA e
+    # desalinhada, e sisal é fibra longa; o que derrubou a fenólica foi o
+    # formaldeído, e o poliuretano de mamona é resina vegetal sem formaldeído,
+    # desenvolvida no Brasil. Fibra nacional, resina nacional, saúde resolvida.
+    #
+    # E FALHA. Fica registrado inteiro porque o motivo da falha é instrutivo.
+    #
+    # A resina PURA mede 6,46 MPa de tração, e os compósitos publicados de sisal
+    # com ela ficam em 14 a 15 MPa. Não é um número ruim de laboratório ruim: o
+    # poliuretano de mamona é uma resina FLEXÍVEL, e ela foi feita para ser. O
+    # sisal em si é ótimo — a fibra sozinha dá de 400 a 700 MPa. O problema não é
+    # a fibra, é a matriz que a segura, e é sempre a matriz que manda no
+    # compósito quando ela é mole.
+    #
+    # ERRO MEU, CORRIGIDO PELO TESTE, e vale registrar como se deu. Eu tinha posto
+    # numa faixa só o que está PUBLICADO (15 MPa) e uma EXTRAPOLAÇÃO minha para
+    # matriz rígida com fibra alinhada (180 MPa) — treze vezes maior. Sortear
+    # uniforme dentro disso afirma que qualquer valor no meio é igualmente
+    # provável, o que é falso: um extremo é medida e o outro é hipótese sobre
+    # OUTRA formulação. `test_TODA_propagacao_CONVERGIU` reprovou, porque a
+    # amostragem não assenta numa faixa dessas — o teste de convergência acabou
+    # detectando um erro de modelagem, e não de amostragem.
+    #
+    # A dispersão abaixo é só a faixa publicada. O teto extrapolado virou
+    # `TETO_EXTRAPOLADO_SISAL`, declarado e separado, porque hipótese não pode
+    # entrar disfarçada de medição.
+    #
+    # O ACHADO QUE VALE MAIS QUE O RESULTADO: mesmo no TETO otimista o cabo passa
+    # na resistência e reprova na RIGIDEZ — flete 509 mm contra 258 mm do
+    # eucalipto, o dobro. E rigidez é justamente o que resina nenhuma conserta: o
+    # módulo de fibra natural para em torno de 20 GPa. O bambu já entrega 15 GPa
+    # sem resina, sem alinhamento de fábrica e sem cura. Ou seja, fabricar sisal
+    # com resina é tentar produzir o que o bambu já é — a planta faz o compósito
+    # alinhado de graça, e faz melhor.
+    "sisal-mamona": {
+        "modulo_pa": 2.5e9,
+        "densidade_kg_m3": 1150.0,
+        "resistencia_pa": 15.0e6,
+        # O único critério em que ele ganha de todo mundo, e ganha fácil.
+        "fator_de_perda": 0.050,
+        "preco_por_kg": 12.0,
+        "irritacao": 2,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "sisal e mamona são agrícolas e nacionais, e a peça curada é inerte; o "
+            "isocianato usado na cura é sensibilizante respiratório, o que é problema "
+            "de quem fabrica e não de quem segura a pá"),
+        "agua": 2,
+        "fabricacao": 2,
+        "justificativaAguaEfabricacao": (
+            "o poliuretano veda bem, mas a fibra na borda cortada absorve; fabricação "
+            "exige pentear e alinhar a fibra, impregnar e curar em molde"),
+        "processo": {
+            "dispensa": ("formaldeído", "fibra mineral", "estufa de secagem longa"),
+            "exige": (
+                "alinhamento da fibra, que é o que dá a resistência e é a etapa cara",
+                "impregnação e cura em molde",
+                "controle de exposição ao isocianato na linha",
+            ),
+            "riscoDeDurabilidade": (
+                "descolamento fibra-matriz com ciclo de umidade; este estudo NÃO o modela"),
+        },
+        "dispersao": {"modulo_pa": (1.5e9, 3.5e9), "resistencia_pa": (14.0e6, 25.0e6)},
+        # RESULTADO, negativo nas duas pontas da faixa e por motivos DIFERENTES.
+        # No piso publicado: tubo de 32 mm dá margem 0,10 contra 1,00 do eucalipto,
+        # e nem maciço a 45 mm salva — chega a 0,37 pesando 2,2 kg, quase o triplo
+        # da madeira. Está uma ordem de grandeza fora, não é ajuste de geometria.
+        # No teto extrapolado: passa na resistência (1,18) e reprova na rigidez.
+        # Uma faixa que reprova nas duas pontas por motivos distintos é uma
+        # conclusão mais forte do que uma que reprova por pouco.
+    },
+    # PINUS. Entra tarde, e a demora é uma falha de método minha que fica
+    # registrada: eu tratei "madeira" como se fosse uma coisa só e passei o estudo
+    # inteiro tentando bater o eucalipto com material exótico, sem nunca testar a
+    # OUTRA madeira de reflorestamento — que no Brasil é a mais plantada, a mais
+    # barata e a mais fácil de achar.
+    #
+    # O NÚMERO QUE EU NÃO TINHA OLHADO: resistência por quilo. O pinus elliottii dá
+    # 189.831 contra 139.625 do eucalipto. Ele é MAIS FRACO em valor absoluto e
+    # MELHOR por quilo, porque é bem mais leve. Para uma peça em flexão com
+    # diâmetro livre, é a segunda conta que manda.
+    #
+    # E ELE RESPONDE A QUEIXA ORIGINAL DO USUÁRIO, que era secagem. Eucalipto é
+    # notoriamente difícil de secar: colapsa e racha por dentro, e por isso fica
+    # tempo demais na estufa. Pinus é das madeiras mais fáceis de secar que
+    # existem — menos densa, menos propensa a colapso. O ganho de estufa que o
+    # laminado prometia e não entregou aparece aqui de graça, sem cola e sem
+    # prensa.
+    #
+    # O QUE ELE COBRA, e é real: pinus é MOLE. Dureza de superfície muito abaixo
+    # da do eucalipto, então amassa no encaixe da pá e marca com o uso. E apodrece
+    # mais rápido sem tratamento — mas tratamento de pinus é a maior indústria de
+    # madeira tratada do país, então é custo conhecido, não é obstáculo.
+    #
+    # A RESSALVA DE FONTE, dita com precisão: os valores vêm do mesmo Wood
+    # Handbook do eucalipto, e as linhas dos pinheiros do sul são padrão. Eu NÃO
+    # reabri o documento nesta sessão para conferir estas duas linhas — o
+    # eucalipto eu conferi, estas não. Fica marcado.
+    "pinus-elliottii": {
+        "modulo_pa": 13.7e9,
+        "densidade_kg_m3": 590.0,
+        "resistencia_pa": 112.0e6,
+        "fator_de_perda": 0.010,
+        "fonte": "FPL-GTR-190 (linha NÃO reconferida nesta sessão)",
+        # PREÇO CORRIGIDO, e a correção veio de uma crítica externa que pegou uma
+        # incoerência minha: eu tinha juntado resistência de madeira LIMPA com
+        # preço de madeira COMUM. Os 112 MPa são corpo de prova sem defeito; os
+        # R$ 2/kg são pinus de pátio, com nó. Não dá para ter os dois.
+        # Peça selecionada sem nó e de fibra reta custa prêmio de seleção.
+        "preco_por_kg": 4.5,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "madeira de reflorestamento, a mais plantada do Brasil; resina incomoda "
+            "pouco e o pó de lixamento é o de sempre"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "apodrece mais rápido que eucalipto e exige tratamento, que é indústria "
+            "madura aqui; seca MUITO mais fácil que eucalipto, que colapsa e racha "
+            "por dentro — é o ganho de estufa que o laminado prometia e não entregou"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "laminação"),
+            "exige": (
+                "seleção de peça sem nó e de fibra reta, que é o que já se faz com "
+                "cabo de ferramenta",
+                "tratamento contra apodrecimento, indústria estabelecida no país",
+            ),
+            "riscoDeDurabilidade": (
+                "madeira MOLE: amassa no encaixe da pá e marca com o uso. Este estudo "
+                "NÃO modela dureza de superfície, e é a fraqueza real do candidato"),
+        },
+        "dispersao": {"modulo_pa": (12.3e9, 13.7e9), "resistencia_pa": (88.0e6, 112.0e6)},
+    },
+    # PINUS COMERCIAL, com nó, e ele é a variante honesta deste estudo.
+    #
+    # DE ONDE VIERAM ESTES NÚMEROS: de uma crítica externa, não de mim. Ela usou
+    # 70 MPa e 8 GPa contra os meus 112 MPa e 13,7 GPa, e a diferença não é
+    # discordância — é que estamos falando de coisas diferentes. Os meus são de
+    # corpo de prova pequeno e sem defeito; os dela são de madeira de pátio, com
+    # nó e bolsa de resina. Para uma peça que se compra pronta, os dela são os
+    # certos.
+    #
+    # E A SAÍDA É BOA: engrossar é grátis, selecionar é caro. Aceitar o nó e ir
+    # para 40 mm custa diâmetro, que não custa nada; escolher tábua limpa custa
+    # preço, que era justamente a vantagem do candidato. A crítica concluía que o
+    # pinus estava fora; com os números dela mesma, a 40 mm ele passa.
+    #
+    # E AQUI O RESULTADO ME CORRIGIU DE NOVO, na direção da crítica. Eu anunciei
+    # 40 mm olhando só o valor nominal, onde a margem dá 1,05. No PIOR CASO, com a
+    # dispersão do nó, 40 mm dá 0,75 — abaixo do eucalipto. Nó não espalha a
+    # resistência um pouco: o módulo de Weibull cai de 12 para 5, e o desconto de
+    # tamanho passa de 10% para 30%.
+    #
+    # O diâmetro honesto é 44 mm, onde o pior caso dá 0,96 e empata com o
+    # eucalipto. Para passar na porta absoluta de 1,0 seriam 45 mm, que é
+    # exatamente o limite da mão — sem folga nenhuma.
+    #
+    # ENTÃO O PINUS NÃO É VITÓRIA, É TROCA: 40% mais barato e muito mais fácil de
+    # secar, em troca de ser 20% mais pesado e visivelmente mais gordo. A crítica
+    # externa estava mais perto da verdade do que a minha primeira resposta, e o
+    # que ela errou foi só a conclusão de que ele estava fora.
+    #
+    # 44 MM CABE NA MÃO: cabo de pá comercial vive entre 38 e 42 mm, e o limite de
+    # empunhadura deste estudo é 45.
+    "pinus-comercial": {
+        "modulo_pa": 8.0e9,
+        "densidade_kg_m3": 510.0,
+        "resistencia_pa": 70.0e6,
+        "fator_de_perda": 0.010,
+        "preco_por_kg": 2.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "madeira de reflorestamento sem aditivo; acabamento de cabo é óleo ou "
+            "cera, atóxico — tratamento de autoclave com sal metálico é remédio de "
+            "poste enterrado e não se aplica a ferramenta de mão"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "apodrece mais rápido que eucalipto e pede acabamento; seca MUITO mais "
+            "fácil, que é o ganho de estufa que o laminado prometia e não entregou"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "seleção de peça limpa"),
+            "exige": (
+                "44 mm em vez de 32, para compensar o nó no PIOR CASO — e não os "
+                "40 mm que bastam no valor nominal",
+                "virola metálica ou parafuso passante com arruela na zona do encaixe, "
+                "porque pinus esmaga no furo do rebite",
+                "acabamento em óleo ou cera contra apodrecimento",
+            ),
+            "riscoDeDurabilidade": (
+                "DUREZA. Pinus é mole no corpo inteiro, não só no parafuso: marca e "
+                "amassa com o uso. É conforto e vida útil, não é segurança, e este "
+                "estudo NÃO modela dureza de superfície. É a crítica que fica de pé"),
+            "fratura": (
+                "pinus lasca em farpa longa ao romper; enfaixamento ou verniz na zona "
+                "da mão contém, e margem maior reduz a chance de chegar lá"),
+        },
+        "dispersao": {"modulo_pa": (7.0e9, 10.0e9), "resistencia_pa": (60.0e6, 80.0e6)},
+    },
+    # O EUCALIPTO QUE O BRASIL REALMENTE PLANTA, e portanto o concorrente de
+    # verdade. Híbrido clonal urophylla x grandis, medido, com fonte aberta lida
+    # nesta sessão. Ver FONTE_MADEIRA_BR.
+    #
+    # OS NÚMEROS, da Tabela 3, madeira seca corrigida para 12%, seis medições em
+    # três extratos e duas toras: MOR de 82,95 a 103,2 MPa, média 92,0. MOE de
+    # 9,65 a 12,78 GPa, média 11,1.
+    #
+    # A CONVERSÃO DE DENSIDADE, declarada porque é premissa e não medida: o artigo
+    # dá densidade BÁSICA (massa seca sobre volume verde), média 0,502 g/cm³. Ela
+    # NÃO é a densidade a 12% de umidade, que é a condição do cabo. O fator usual
+    # é de 1,20 a 1,25; aqui entra 1,22, o que dá cerca de 612 kg/m³. Usar a
+    # básica direto subestimaria a massa do cabo em uns 20%.
+    #
+    # E O QUE ISSO FAZ COM O ESTUDO INTEIRO: a margem do concorrente cai de 0,89
+    # para 0,69. Todo candidato deste estudo foi julgado contra uma barra 22% alta
+    # demais, e vários que "não empatavam" empatam contra a árvore certa.
+    #
+    # A COMPENSAÇÃO, e ela é interessante: o urograndis é mais fraco E bem mais
+    # leve. Por quilo ele dá 150.300 contra 139.625 do jarrah. Como madeira ele é
+    # melhor do que o número absoluto sugere; como cabo de 32 mm ele é pior,
+    # porque a 32 mm quem manda é o valor absoluto.
+    "eucalipto-urograndis": {
+        "modulo_pa": 11.1e9,
+        "densidade_kg_m3": 612.0,
+        "resistencia_pa": 92.0e6,
+        "fator_de_perda": 0.010,
+        "fonte": "Revista Árvore 33(3):501-509, 2009 — lido diretamente",
+        "preco_por_kg": 3.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": "madeira de reflorestamento, a mais plantada do país",
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "absorve água e apodrece se não tratada; seca com dificuldade — colapso e "
+            "rachadura interna são o motivo do tempo de estufa que o usuário relatou"),
+        "dispersao": {"modulo_pa": (9.652e9, 12.781e9), "resistencia_pa": (82.95e6, 103.2e6)},
+    },
+    # SERINGUEIRA, e ela é a alternativa nova que faltava — não um refinamento do
+    # que já estava mapeado.
+    #
+    # POR QUE ELA É INTERESSANTE E NINGUÉM PENSA NELA: seringal é derrubado quando
+    # a produção de látex cai, por volta dos 25 a 30 anos, e a árvore vai cair de
+    # qualquer jeito. A madeira é subproduto de verdade, não é cultura própria. Na
+    # Ásia isso virou indústria de móvel; no Brasil ainda queima em boa parte.
+    #
+    # E ELA RESOLVE A FRAQUEZA DO PINUS. O pinus perdia por ser mole — amassa no
+    # encaixe e marca com o uso. Seringueira é bem mais dura, e o mesmo artigo
+    # ainda mede o cisalhamento paralelo às fibras em 12,51 MPa, que é exatamente
+    # a propriedade que governa o rebite rasgando a madeira. É o primeiro número
+    # de cisalhamento que este estudo tem de qualquer material.
+    #
+    # O QUE ELA COBRA: é mais fraca que o urograndis (75,8 contra 92,0 MPa) e pede
+    # 36 a 38 mm em vez de 32. E ela é MUITO suscetível a fungo e inseto — o
+    # próprio artigo diz isso na introdução —, então tratamento não é opcional.
+    #
+    # E O DIÂMETRO SUBIU DE 36 PARA 38 QUANDO A DISPERSÃO ENTROU. A 36 mm o valor
+    # nominal dá 0,79 e parecia resolvido; no pior caso dá 0,60, abaixo do
+    # eucalipto. O artigo declara coeficiente de variação de 26,6% na flexão, que
+    # é grande — cinco clones diferentes num mesmo número. A 38 mm o pior caso dá
+    # 0,70 e passa o eucalipto.
+    #
+    # É a terceira vez neste estudo que o valor nominal aprova e o pior caso
+    # reprova. O padrão já tem nome: média não quebra cabo, o pior colmo quebra.
+    #
+    # A COMPARAÇÃO QUE INTERESSA, a 38 mm contra o urograndis a 32: margem 0,70
+    # contra 0,63, custando 29% menos e pesando 41% mais.
+    "seringueira": {
+        "modulo_pa": 10.043e9,
+        "densidade_kg_m3": 610.0,
+        "resistencia_pa": 75.76e6,
+        "cisalhamento_pa": 12.51e6,
+        "fator_de_perda": 0.010,
+        "fonte": "Scientia Forestalis 48(125):e2877, 2020 — lido diretamente",
+        "preco_por_kg": 1.5,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "subproduto de seringal derrubado no fim da vida produtiva; a árvore cai "
+            "de qualquer jeito, e hoje boa parte da madeira queima"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "MUITO suscetível a fungo e a besouro e cupim, e o tratamento não é "
+            "opcional; usinagem é trivial e a madeira é bem mais dura que o pinus"),
+        "processo": {
+            "dispensa": ("cola", "prensa", "resina", "cultura dedicada"),
+            "exige": (
+                "36 a 38 mm em vez de 32, porque ela é mais fraca que o eucalipto",
+                "tratamento contra fungo e inseto, obrigatório e imediato ao corte",
+            ),
+            "riscoDeDurabilidade": (
+                "apodrecimento e ataque de inseto são a fraqueza dela, e são maiores "
+                "que os do pinus; este estudo NÃO os modela"),
+        },
+        "dispersao": {"modulo_pa": (7.1e9, 13.0e9), "resistencia_pa": (55.6e6, 96.0e6)},
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -365,9 +847,316 @@ MATERIAIS = {
     },
 }
 
+#: O teto otimista do sisal com resina, mantido FORA da dispersão do material
+#: porque ele não é medida deste sistema: é o que uma matriz rígida com fibra
+#: bem alinhada e fração alta daria, extrapolado de compósitos de fibra natural
+#: em geral. Fica declarado para poder ser rodado à parte e citado como hipótese.
+#:
+#: E o resultado dele é o achado mais útil deste candidato: mesmo aqui o cabo
+#: PASSA na resistência (margem 1,18) e REPROVA na rigidez — flete 509 mm contra
+#: 258 mm do eucalipto. Resistência dá para comprar com resina e fibra; rigidez
+#: não, porque o módulo de fibra natural para perto de 20 GPa. O bambu entrega
+#: 15 GPa sem resina nenhuma.
+TETO_EXTRAPOLADO_SISAL = {
+    "modulo_pa": 9.0e9,
+    "densidade_kg_m3": 1200.0,
+    "resistencia_pa": 180.0e6,
+    "fator_de_perda": 0.030,
+    "natureza": "extrapolação, NÃO medida; não use como propriedade de material",
+}
+
+#: TODO PREÇO DESTE ESTUDO É INVENÇÃO MINHA, e isto é o maior buraco que sobrou.
+#:
+#: Quinze materiais, quinze `preco_por_kg`, nenhuma cotação. E preço não é critério
+#: derivado: é uma das TRÊS exigências que o usuário escreveu na pergunta original
+#: — "mais barato, aguentar o mesmo, absorver bem". Duas delas têm fonte medida
+#: hoje. A terceira não tem nenhuma.
+#:
+#: A DIFERENÇA PARA O CASO DO AMORTECIMENTO: lá o número existia em algum artigo e
+#: eu não fui buscar. Aqui o número depende de região, volume, época e de quem
+#: compra — não existe "o preço do bambu" para ir buscar. O que existe é cotação, e
+#: cotação é trabalho de campo, não de biblioteca. Esta constante existe para que a
+#: coluna de custo do dossiê pare de parecer dado.
+FONTE_DOS_PRECOS = (
+    "INVENTADO. Nenhum dos preços deste estudo é cotação: são ordens de grandeza "
+    "que eu escolhi para que a comparação relativa fizesse sentido. Servem para "
+    "dizer que bambu é bem mais barato que fibra de vidro; NÃO servem para dizer "
+    "que é 62% mais barato que o eucalipto. Preço real depende de região, volume, "
+    "época e de quem compra, e sai de cotação, não de literatura."
+)
+
+#: QUANDO RESÍDUO BARATO NÃO VIRA PEÇA BARATA, e o estudo já tropeçou nisto três
+#: vezes sem nomear.
+#:
+#: O argumento "é subproduto, então é de graça" tem um pedaço escondido: o resíduo
+#: precisa vir na FORMA que a peça exige. Serragem é de graça e não vira cabo;
+#: tora fina é barata e rende mal quando se quer uma barra reta de 44 mm.
+#:
+#: OS TRÊS CASOS, e eles são o mesmo caso:
+#:
+#:   - WPC: serragem da própria fábrica, custo zero, e comprou um cabo de 2,19 kg.
+#:   - Acácia-negra: subproduto do tanino, mas cortada aos SETE anos — tora fina, e
+#:     serrar cabo dela rende pouco por metro cúbico. O barato da matéria-prima
+#:     não atravessa a serraria.
+#:   - Seringueira: subproduto de seringal de 25 a 30 anos — tora grossa, e existe
+#:     indústria de serraria estabelecida para ela na Ásia. Aqui o barato ATRAVESSA.
+#:
+#: É por isso que a seringueira é a alternativa de madeira mais forte deste estudo
+#: mesmo tendo resistência menor que a acácia madura: a vantagem econômica dela
+#: chega até a peça, e a da acácia provavelmente não.
+FORMA_DO_RESIDUO = {
+    "regra": ("resíduo só é barato para o produto se vier na forma que o produto "
+              "exige; o corte, a secagem e o rendimento ficam entre o resíduo e a peça"),
+    "casos": {
+        "madeira-plastica": "serragem de graça, cabo de 2,19 kg — a forma não serve",
+        "acacia-negra": ("tora de sete anos é fina; barra reta de 36 a 44 mm rende "
+                         "mal, e o barato não atravessa a serraria"),
+        "seringueira": ("tora de 25 a 30 anos é grossa e já existe serraria para "
+                        "ela; aqui o barato atravessa"),
+    },
+    "oQueOEstudoNAOsabe": "rendimento de serraria de nenhuma das três",
+}
+
+#: DE ONDE VEM CADA PROPRIEDADE, uma por uma. Esta tabela existe porque o campo
+#: `fonte` do material mentia por omissão: ele é do MATERIAL, e se espalhava
+#: visualmente por cima de propriedades que a fonte nunca mediu.
+#:
+#: `PROPRIEDADES_COM_FONTE` é conferida na carga do módulo por `_conferir_fontes`,
+#: que RECUSA material com propriedade não atribuída. Marcar como MEMÓRIA é
+#: permitido; ficar em silêncio, não. Silêncio é como o amortecimento passou este
+#: estudo inteiro parecendo medido.
+MEMORIA = "MEMÓRIA — valor de manual, NÃO conferido contra fonte primária"
+
+#: As quatro propriedades numéricas que entram na viga. Toda uma delas, em todo
+#: material, precisa dizer de onde veio.
+PROPRIEDADES_COM_FONTE = ("modulo_pa", "densidade_kg_m3", "resistencia_pa",
+                          "fator_de_perda")
+
+FONTES_POR_PROPRIEDADE: dict[str, dict[str, str]] = {
+    "eucalipto": {
+        "modulo_pa": "FPL-GTR-190 tabela 5-5a",
+        "densidade_kg_m3": "FPL-GTR-190 tabela 5-5a",
+        "resistencia_pa": "FPL-GTR-190 tabela 5-5a",
+        "fator_de_perda": "FPL-GTR-190 cap. 5, decremento logarítmico dividido por pi",
+    },
+    "eucalipto-urograndis": {
+        "modulo_pa": "Revista Árvore 33(3), 2009, Tabela 3",
+        # Derivada, e não medida: o artigo dá densidade BÁSICA e o cabo trabalha a
+        # 12%. A conversão usa fator 1,22, que é valor usual e não medida daqui.
+        "densidade_kg_m3": "Revista Árvore 33(3), 2009 — DERIVADA da densidade básica × 1,22",
+        "resistencia_pa": "Revista Árvore 33(3), 2009, Tabela 3",
+        "fator_de_perda": MEMORIA,
+    },
+    "bambu-colmo": {
+        "modulo_pa": "REA 19(1), 2017, colmo inteiro",
+        "densidade_kg_m3": "REA 19(1), 2017, colmo inteiro",
+        "resistencia_pa": "REA 19(1), 2017, colmo inteiro",
+        "fator_de_perda": MEMORIA,
+    },
+    "seringueira": {
+        "modulo_pa": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "densidade_kg_m3": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "resistencia_pa": "Scientia Forestalis 48(125), 2020, Tabela 2",
+        "fator_de_perda": MEMORIA,
+    },
+    "pinus-elliottii": {
+        "modulo_pa": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "densidade_kg_m3": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "resistencia_pa": "FPL-GTR-190, linha NÃO reconferida nesta sessão",
+        "fator_de_perda": MEMORIA,
+    },
+}
+
+
+def _conferir_fontes() -> None:
+    """Recusa material que declare fonte e deixe propriedade sem atribuir.
+
+    Roda na carga do módulo. Falhar aqui é melhor que rodar um estudo em que o
+    leitor não distingue medida de lembrança.
+    """
+    for nome, material in MATERIAIS.items():
+        atribuidas = FONTES_POR_PROPRIEDADE.setdefault(
+            nome, {p: MEMORIA for p in PROPRIEDADES_COM_FONTE})
+        faltando = [p for p in PROPRIEDADES_COM_FONTE if p not in atribuidas]
+        if faltando:
+            raise falhar(
+                "contrato", "propriedade-sem-fonte-atribuida",
+                f"'{nome}' não diz de onde vêm {faltando}.",
+                local="FONTES_POR_PROPRIEDADE",
+                acaoSugerida=("Marcar como MEMÓRIA é permitido; ficar em silêncio, "
+                              "não. Silêncio foi como o amortecimento passou este "
+                              "estudo inteiro parecendo medido."),
+            )
+        if "fonte" in material and atribuidas.get("resistencia_pa") == MEMORIA:
+            raise falhar(
+                "contrato", "fonte-de-material-sem-medida",
+                f"'{nome}' exibe uma fonte e não tem nenhuma propriedade medida.",
+                local="MATERIAIS",
+            )
+
+
+def procedencia(nome: str) -> dict[str, Any]:
+    """De onde veio cada número deste material, e quanto dele é memória."""
+    if nome not in MATERIAIS:
+        raise falhar("contrato", "material-ausente",
+                     f"'{nome}'; existem {sorted(MATERIAIS)}.", local="nome")
+    fontes = FONTES_POR_PROPRIEDADE[nome]
+    de_memoria = [p for p in PROPRIEDADES_COM_FONTE if fontes[p] == MEMORIA]
+    return {
+        "material": nome,
+        "porPropriedade": {p: fontes[p] for p in PROPRIEDADES_COM_FONTE},
+        "deMemoria": tuple(de_memoria),
+        "fracaoMedida": 1 - len(de_memoria) / len(PROPRIEDADES_COM_FONTE),
+        "leiaAssim": ("o rótulo de fonte do material NÃO vale para as propriedades "
+                      "que a fonte não mediu; esta é a lista por propriedade"),
+    }
+
+
+#: QUANDO FALTA O NÚMERO QUE DECIDE, inverta a pergunta.
+#:
+#: A acácia-negra chegou aqui com densidade e rigidez MEDIDAS e sem o módulo de
+#: ruptura: o artigo que o traz está atrás de bloqueio de servidor. Chutar o valor
+#: seria repetir o erro que este estudo já pagou caro — número de memória com
+#: aparência de dado.
+#:
+#: A saída é dizer quanto ele PRECISA ser. Isso não inventa nada, usa só a
+#: geometria e o alvo, e transforma uma pesquisa vaga ("qual é o MOR da acácia?")
+#: numa pergunta de sim ou não que qualquer pessoa com o artigo responde em um
+#: minuto.
+#:
+#: A CONTA. Numa viga engastada de seção cheia a tensão é 32·F·L/(π·d³), e a
+#: resistência precisa cobrir isso vezes a margem alvo. O resultado é a
+#: resistência DA PEÇA; para comparar com valor de corpo de prova, é preciso
+#: desfazer o efeito de tamanho, que é o que o segundo número devolve.
+
+
+def resistencia_necessaria(*, diametro_m: float, margem_alvo: float,
+                           familia_de_ensaio: str | None = None) -> dict[str, Any]:
+    """Quanto de resistência um material PRECISA ter para alcançar a margem.
+
+    Devolve dois números, e a diferença entre eles é o efeito de tamanho:
+    `naPeca` é o que o cabo precisa aguentar, e `noCorpoDeProva` é o valor que o
+    artigo teria de reportar — sempre MAIOR, porque o corpo de prova é menor e
+    portanto mais forte que a peça.
+    """
+    if diametro_m <= 0 or margem_alvo <= 0:
+        raise falhar("contrato", "entrada-nao-positiva",
+                     f"diametro={diametro_m}, margem={margem_alvo}.", local="entradas")
+    secao = secao_macica(diametro_m)
+    tensao = FORCA_N * COMPRIMENTO_M * secao["raioExterno"] / secao["inercia"]
+    na_peca = tensao * margem_alvo
+    fator = 1.0
+    if familia_de_ensaio is not None:
+        cp = CORPOS_DE_PROVA[familia_de_ensaio]
+        fator = efeito_de_escala(
+            resistencia_pa=1.0, volume_do_ensaio_m3=cp["volume_m3"],
+            volume_da_peca_m3=secao["area"] * COMPRIMENTO_M,
+            modulo_de_weibull=cp["modulo_de_weibull"],
+            material=familia_de_ensaio)["fatorDeReducao"]
+    return {
+        "diametro_m": diametro_m,
+        "margemAlvo": margem_alvo,
+        "naPeca_pa": na_peca,
+        "noCorpoDeProva_pa": na_peca / fator,
+        "fatorDeEscala": fator,
+        "leiaAssim": ("compare `noCorpoDeProva` com o valor que o artigo reporta; "
+                      "`naPeca` é o que o cabo precisa aguentar de verdade"),
+    }
+
+
+#: CANDIDATOS COM DADO PARCIAL, e eles ficam FORA de `MATERIAIS` de propósito:
+#: material sem a propriedade que decide não entra na tabela como se estivesse
+#: avaliado. Ficam aqui, visíveis, com o que se sabe e com o que falta.
+CANDIDATOS_INCOMPLETOS = {
+    "acacia-negra": {
+        "especie": "Acacia mearnsii",
+        # SEGUNDA BUSCA, e ela achou o MOR — em outra fonte, e revelando que são
+        # DUAS ACÁCIAS diferentes, não uma com dado faltando.
+        #
+        # A árvore MADURA está compilada no Wood Database: MOR 121,8 MPa, MOE 14,60
+        # GPa, 730 kg/m³, Janka 7.590 N. Com esses números ela dá margem 0,91 a 32
+        # mm — passa o eucalipto brasileiro no MESMO diâmetro do cabo atual, sem
+        # engrossar nada. Seria a única candidata "drop-in" do estudo.
+        #
+        # SÓ QUE O PLANTIO BRASILEIRO DE TANINO É CORTADO AOS SETE ANOS, e madeira
+        # de sete anos é juvenil. O artigo da UFPel mede 8,368 GPa contra 14,60 da
+        # madura — 43% menos rigidez. Não é discordância entre fontes: é outra
+        # madeira, da mesma espécie, com outra idade.
+        #
+        # ESTIMATIVA DECLARADA, e ela NÃO é medida: a razão MOR/MOE da madura é
+        # 8,34 MPa por GPa; aplicada ao módulo do plantio dá cerca de 70 MPa. Com
+        # isso a acácia de plantio dá 0,53 a 32 mm — REPROVA contra o eucalipto — e
+        # 0,73 a 36 mm.
+        #
+        # ENTÃO A RESPOSTA DEPENDE DE QUAL ACÁCIA SE COMPRA, e a que existe em
+        # escala no Rio Grande do Sul é a de sete anos, a pior das duas.
+        #
+        # O QUE A BUSCA ENTREGOU DE MELHOR NÃO FOI O MOR: foi a DUREZA JANKA, 7.590
+        # N. Ela é maior que a do eucalipto grandis e quase o triplo da do pinus, e
+        # dureza era exatamente a propriedade que este estudo não tinha para
+        # ninguém e que derrubava o pinus. Nisso a acácia é a melhor madeira da
+        # lista, e isso vale mesmo com a incerteza do MOR.
+        "maduraCompilada": {
+            "resistencia_pa": 121.8e6,
+            "modulo_pa": 14.60e9,
+            "densidade_kg_m3": 730.0,
+            "durezaJanka_n": 7590.0,
+            "fonte": ("The Wood Database, verbete Black Wattle. COMPILAÇÃO "
+                      "comercial, não fonte primária: ela agrega ensaios de "
+                      "terceiros sem dizer a idade nem a procedência da amostra."),
+            "margemA32mm": 0.91,
+        },
+        "estimativaDePlantio": {
+            "resistencia_pa": 70.0e6,
+            "comoFoiObtida": ("razão MOR/MOE de 8,34 MPa por GPa da árvore madura, "
+                              "aplicada ao módulo medido do plantio de sete anos"),
+            "natureza": "ESTIMATIVA, não medida; não use para decidir compra",
+            "margemA32mm": 0.53,
+            "margemA36mm": 0.73,
+        },
+        "porQueInteressa": (
+            "subproduto do tanino no Rio Grande do Sul, cadeia madura, corte aos "
+            "sete anos; a árvore já é derrubada pela casca"),
+        "medido": {
+            "densidade_kg_m3": 657.0,
+            "modulo_pa": 8.368e9,
+        },
+        "fonte": (
+            "Revista Ciência da Madeira 7(2):61-69, 2016 (UFPel), acácia-negra aos "
+            "quatro e sete anos, Piratini-RS. Resumo lido; PDF completo atrás de "
+            "bloqueio de servidor nesta sessão."),
+        "falta": ("módulo de ruptura MEDIDO no plantio brasileiro de sete anos",),
+        "oQueJaDaParaDizer": (
+            "a dureza Janka de 7.590 N é a melhor da lista e é dado real; o MOR do "
+            "plantio brasileiro continua sendo estimativa, e é ele que decide entre "
+            "32 e 36 mm"),
+    },
+    "estipe-de-palmeira": {
+        "especie": "pupunha (Bactris gasipaes), açaí e afins",
+        "porQueInteressa": (
+            "resíduo de palmito e de fruto em volume enorme, e a arquitetura é "
+            "parecida com a do bambu: denso na periferia e mole no miolo, o que faz "
+            "o estipe inteiro se comportar como tubo sem ninguém ter furado nada"),
+        "medido": {},
+        "fonte": "nenhuma fonte quantitativa acessível nesta sessão",
+        "falta": ("resistência", "módulo", "densidade — tudo"),
+        "oQueJaDaParaDizer": (
+            "NADA de quantitativo. A parte aproveitável é só o anel externo, então "
+            "a comparação certa não é com barra maciça e sim com tubo — e a "
+            "espessura desse anel decide, sem ela não há conta"),
+    },
+}
+
+
 #: Geometrias comparáveis: a madeira maciça como é, e tubos de parede honesta.
 GEOMETRIAS = {
     "eucalipto": ("macica", 0.032, None),
+    "eucalipto-laminado": ("macica", 0.032, None),
+    "sisal-mamona": ("tubular", 0.032, 0.0045),
+    "pinus-elliottii": ("macica", 0.032, None),
+    "pinus-comercial": ("macica", 0.044, None),
+    "eucalipto-urograndis": ("macica", 0.032, None),
+    "seringueira": ("macica", 0.038, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
@@ -442,6 +1231,126 @@ ESTUDO = Estudo(
 )
 
 
+#: DE QUE CORPO DE PROVA VEIO CADA RESISTÊNCIA, e por que isso muda o número.
+#:
+#: Resistência não é propriedade média: ela é decidida pelo maior defeito que por
+#: acaso está na peça. Peça maior tem mais material, mais material tem mais chance
+#: de conter o defeito grande, e por isso **a peça real é mais fraca que o corpo
+#: de prova de onde o valor de manual saiu**. É estatística de Weibull, e vale
+#: para material frágil.
+#:
+#: ESTE ESTUDO IGNOROU ISSO ATÉ AQUI, e o erro tem direção. Os 111,7 MPa do Wood
+#: Handbook vêm de um corpo de prova de 25 x 25 x 410 mm; o cabo de 1,2 m tem
+#: quase quatro vezes esse volume. Aplicar o número direto superestimou TODO
+#: candidato cujo valor veio de corpo de prova pequeno — e os compósitos vêm do
+#: menor de todos.
+#:
+#: E A CORREÇÃO NÃO AJUDA QUEM EU ACHEI QUE AJUDARIA. Eu disse ao usuário que ela
+#: aumentaria a folga do bambu, porque só tinha olhado o desconto do eucalipto.
+#: Errado: madeira e bambu vêm de corpo de prova GRANDE e perdem cerca de 10%,
+#: enquanto os compósitos vêm do corpo de prova de norma, de 3,2 x 12,7 x 100 mm,
+#: e perdem cerca de 27%. A correção é praticamente neutra entre bambu e
+#: eucalipto, e é dura com todo o resto.
+#:
+#: METAL NÃO ENTRA. Material dúctil escoa em volta do defeito e redistribui a
+#: tensão; `ensaio.efeito_de_escala` recusa calcular para ele, e aqui ele fica de
+#: fora em vez de receber um fator inventado.
+#:
+#: Os volumes de corpo de prova são: o da madeira, real (norma de pequeno corpo
+#: livre de defeito do FPL); o do bambu, um segmento de colmo, ESTIMADO; o dos
+#: compósitos, o corpo de flexão da ASTM D790, que é padrão. Os módulos de
+#: Weibull são de faixa de literatura e estão em `ensaio.MODULOS_DE_WEIBULL`.
+CORPOS_DE_PROVA = {
+    "madeira": {
+        "volume_m3": 0.025 * 0.025 * 0.410,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo pequeno livre de defeito, FPL-GTR-190; medida real",
+    },
+    "bambu": {
+        "volume_m3": math.pi / 4 * (0.032 ** 2 - 0.020 ** 2) * 0.50,
+        "modulo_de_weibull": 8.0,
+        "origem": "segmento de colmo em flexão; volume ESTIMADO",
+    },
+    # O corpo de prova do artigo brasileiro é MENOR que o do FPL: 2 x 2 x 30 cm
+    # contra 2,5 x 2,5 x 41 cm. Corpo menor tem menos defeito, então o desconto de
+    # tamanho para a peça real é MAIOR. A diferença de corpo de prova entre duas
+    # fontes não é detalhe de método: ela muda o número final.
+    "madeira-br": {
+        "volume_m3": 0.020 * 0.020 * 0.300,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo de 2 x 2 x 30 cm, Revista Árvore 33(3), 2009; medida real",
+    },
+    "madeira-seringueira": {
+        "volume_m3": 0.020 * 0.020 * 0.300,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo de 2 x 2 x 35 cm com vão de 30 cm, Scientia Forestalis 48(125), 2020",
+    },
+    "madeira-estrutural": {
+        "volume_m3": 0.025 * 0.025 * 0.410,
+        "modulo_de_weibull": 5.0,
+        "origem": "mesmo corpo do FPL, com módulo de Weibull de peça COM nó",
+    },
+    "composito": {
+        "volume_m3": 0.0032 * 0.0127 * 0.100,
+        "modulo_de_weibull": 15.0,
+        "origem": "corpo de flexão ASTM D790",
+    },
+}
+
+#: A ASSIMETRIA QUE ISTO CRIA, e ela é desconfortável. Corrigir os frágeis e não
+#: corrigir os dúcteis está certo em física — Weibull não descreve metal — e
+#: mesmo assim penaliza um lado só. O efeito de tamanho em metal é FRACO, não é
+#: ZERO, e aqui ele entra como zero por falta de modelo, não por medida.
+#:
+#: A CONSEQUÊNCIA APARECEU NA HORA: com a madeira descontada em 10% e os metais
+#: em nada, o alumínio passou na frente do eucalipto em margem — invertendo uma
+#: conclusão que este estudo já tinha registrado. Isso NÃO quer dizer que metal
+#: virou boa escolha para cabo; ele continua reprovado por vibração, que é outro
+#: critério. Quer dizer que a comparação entre frágil e dúctil, neste estudo,
+#: passou a carregar um viés declarado a favor do dúctil.
+#:
+#: A que família de corpo de prova cada candidato pertence. Metal fica de fora de
+#: propósito: ausência aqui quer dizer "não se corrige", e não "esqueci".
+FAMILIA_DE_ENSAIO = {
+    "eucalipto": "madeira",
+    "eucalipto-laminado": "madeira",
+    "pinus-elliottii": "madeira",
+    # Comercial tem nó, e nó espalha muito mais a resistência que madeira limpa.
+    "pinus-comercial": "madeira-estrutural",
+    "eucalipto-urograndis": "madeira-br",
+    "seringueira": "madeira-seringueira",
+    "bambu-colmo": "bambu",
+    "bambu-laminado": "bambu",
+    "papel-fenolico": "composito",
+    "papel-lignina": "composito",
+    "papel-lignina-curaua": "composito",
+    "sisal-mamona": "composito",
+    "fibra-de-vidro": "composito",
+}
+
+
+def fator_de_escala(nome: str, volume_da_peca_m3: float) -> dict[str, Any]:
+    """Quanto a resistência de manual cai quando a peça é maior que o ensaio.
+
+    Devolve fator 1,0 e o motivo para quem não se corrige, em vez de omitir: um
+    candidato sem correção precisa dizer POR QUE não tem.
+    """
+    familia = FAMILIA_DE_ENSAIO.get(nome)
+    if familia is None:
+        return {"fator": 1.0, "familia": None,
+                "porque": "material dúctil: escoa em volta do defeito e não segue "
+                          "a estatística do elo mais fraco"}
+    cp = CORPOS_DE_PROVA[familia]
+    r = efeito_de_escala(
+        resistencia_pa=1.0, volume_do_ensaio_m3=cp["volume_m3"],
+        volume_da_peca_m3=volume_da_peca_m3,
+        modulo_de_weibull=cp["modulo_de_weibull"], material=familia)
+    return {"fator": r["fatorDeReducao"], "familia": familia,
+            "corpoDeProva": cp["origem"],
+            "porque": "peça maior que o corpo de prova tem mais chance de conter "
+                      "o defeito que decide a ruptura"}
+
+
 def _secao(nome: str) -> dict[str, Any]:
     tipo, diametro, parede = GEOMETRIAS[nome]
     return secao_macica(diametro) if tipo == "macica" else secao_tubular(diametro, parede)
@@ -454,12 +1363,23 @@ def medir(nome: str) -> dict[str, Any]:
     base = {chave: material[chave] for chave in
             ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}
 
+    # A resistência tabelada é do CORPO DE PROVA. O cabo é maior, e portanto mais
+    # fraco. A correção entra aqui, antes de qualquer conta, e vale igualmente
+    # para o valor nominal e para as duas pontas da dispersão — corrigir só o
+    # nominal deixaria a cauda ruim otimista, que é a cauda que quebra.
+    escala = fator_de_escala(nome, secao["area"] * COMPRIMENTO_M)
+    base["resistencia_pa"] *= escala["fator"]
+    dispersao_corrigida = {
+        chave: ((a * escala["fator"], b * escala["fator"])
+                if chave == "resistencia_pa" else (a, b))
+        for chave, (a, b) in material["dispersao"].items()
+    }
+
     determinista = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N,
                            condicao="ambiente, carga estática de ponta", **base)
 
-    dispersao = material["dispersao"]
     margem = propagar(
-        dispersao,
+        dispersao_corrigida,
         lambda ponto: avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N,
                               **{**base, **ponto})["margemContraFalha"],
         semente=SEMENTE, amostras=2000,
@@ -476,6 +1396,8 @@ def medir(nome: str) -> dict[str, Any]:
         "versao": determinista["versao"],
         "parametros": determinista["parametros"],
         "entradas": {**determinista["entradas"], "material": nome, "fonte": FONTE},
+        "efeitoDeEscala": escala,
+        "resistenciaDeManual_pa": material["resistencia_pa"],
         "margemDeterminista": determinista["margemContraFalha"],
         "margemP05": margem["p05"],
         "margemP50": margem["p50"],
@@ -502,6 +1424,26 @@ def medir(nome: str) -> dict[str, Any]:
 #: O valor é 1,0 porque a margem já é resistência dividida por tensão. Note que
 #: NÃO há coeficiente de segurança aqui — para uma ferramenta de verdade ele
 #: existiria, e seria decisão de quem projeta, não deste módulo.
+#: O QUE A CORREÇÃO DE TAMANHO FEZ COM ESTA PORTA, e por que ela NÃO foi mexida.
+#:
+#: Com a resistência corrigida para o tamanho da peça, o eucalipto cai para 0,90
+#: e passa a REPROVAR na própria porta que este estudo usa. O concorrente não
+#: passa no critério absoluto.
+#:
+#: A TENTAÇÃO ÓBVIA é baixar a porta ou torná-la relativa ao eucalipto, já que a
+#: pergunta do usuário era "pelo menos tão resistente quanto o eucalipto". E é
+#: exatamente por ser óbvia depois do resultado que ela não é feita aqui:
+#: reescrever critério depois de ver o número é escolher a conclusão. Já
+#: aconteceu uma vez neste arquivo, com o critério de vibração, e ficou
+#: registrado em vez de corrigido.
+#:
+#: O QUE O NÚMERO ESTÁ DIZENDO DE VERDADE: 300 N na ponta de 1,2 m é carga dura, e
+#: nem a madeira aguenta com folga quando o tamanho da peça entra na conta. O cabo
+#: real que o usuário trouxe tem 71 cm, e a 71 cm a margem sobe muito. A porta não
+#: está errada — o caso de carga é que é o pior caso, e ele foi escolhido antes.
+#:
+#: A comparação relativa continua existindo e sempre existiu, com outro nome:
+#: `empataOuSupera` nas variantes compara com o eucalipto, não com 1,0.
 MARGEM_MINIMA_ELIMINATORIA = 1.0
 
 #: RIGIDEZ COMO CRITÉRIO, e ela entrou porque o usuário perguntou o que o estudo
@@ -519,7 +1461,9 @@ FLECHA_MAXIMA_RELATIVA_AO_EUCALIPTO = 1.05
 
 def rigidez_relativa(secao: dict[str, Any], modulo_pa: float) -> float:
     """Rigidez à flexão da seção, dividida pela do cabo de eucalipto de referência."""
-    referencia = MATERIAIS["eucalipto"]["modulo_pa"] * secao_macica(0.032)["inercia"]
+    # REFERÊNCIA TROCADA para o eucalipto BRASILEIRO: comparar rigidez contra uma
+    # árvore australiana que ninguém planta aqui responde a pergunta errada.
+    referencia = MATERIAIS[REFERENCIA]["modulo_pa"] * secao_macica(0.032)["inercia"]
     return modulo_pa * secao["inercia"] / referencia
 
 
@@ -612,6 +1556,78 @@ DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
 #: nunca aparece como erro — aparece como ótimo.
 PAREDE_MINIMA_PRATICA_M = 0.003
 
+#: CONTRA QUEM ESTE ESTUDO COMPARA, e a escolha é a resposta à pergunta do
+#: usuário. Ele quer substituir o cabo de eucalipto que existe no Brasil, e o que
+#: existe no Brasil é urograndis — não o jarrah australiano do Wood Handbook.
+#: O jarrah fica na tabela como referência estrangeira, e não como alvo.
+REFERENCIA = "eucalipto-urograndis"
+
+#: A SELEÇÃO DE LOTE DEIXOU DE SER OPCIONAL, e este é o achado que mais custou à
+#: recomendação deste estudo.
+#:
+#: Enquanto o bambu rodava com resistência da minha memória, faixa de 100 a 240
+#: MPa, ele era "o único candidato que vence sem exigir medição" — e isso era a
+#: manchete. Com a faixa MEDIDA de colmo inteiro, de 62 a 170 MPa, ele perde do
+#: eucalipto brasileiro no pior caso: 0,61 contra 0,63.
+#:
+#: A largura importa mais que o valor central aqui. Meu valor central estava 25%
+#: otimista, o que já era ruim; mas o que virou a conclusão foi a CAUDA, que eu
+#: tinha cortado em 100 MPa quando a literatura de colmo inteiro desce a 62.
+#:
+#: E o remédio não é engrossar: de 37 para 43 mm a margem vai de 0,44 para 0,61, e
+#: para. Colmo ruim é ruim em qualquer diâmetro que ainda caiba na mão.
+#:
+#: COM seleção de lote, o bambu a 43 mm dá 1,07 contra 0,63, pesando metade e
+#: custando um terço. A recomendação continua de pé; ela só deixou de ser grátis.
+SELECAO_DE_LOTE = {
+    "obrigatoria": True,
+    "porQue": ("a variação natural do colmo inteiro vai de 62 a 170 MPa, e a ponta "
+               "baixa dessa faixa não faz cabo"),
+    "oQueNaoResolve": "engrossar: de 37 para 43 mm ganha 0,17 de margem e para aí",
+    "margemComSelecao": 1.07,
+    "margemSemSelecao": 0.61,
+}
+
+#: PINUS ENGROSSADO: a resposta mais barata do estudo inteiro, e a mais chata.
+#:
+#: A 32 mm o pinus empata com o eucalipto no valor nominal e fica atrás no pior
+#: caso, porque a faixa dele é larga — ela vai do taeda ao elliottii, que são
+#: espécies diferentes vendidas como "pinus". Engrossar resolve, e engrossar é
+#: grátis num material que custa um terço.
+#:
+#: A 37 mm, ainda folgado dentro do que a mão segura, ele passa na porta
+#: absoluta de 1,0 — que o próprio eucalipto não passa — pesando MENOS que o
+#: eucalipto e custando menos da metade.
+#:
+#: E O DIÂMETRO AQUI FOI ESCOLHIDO DEPOIS DE VER O RESULTADO, o que é legítimo e
+#: precisa da distinção dita: diâmetro é parâmetro de PROJETO, e dimensionar a
+#: peça para atender o requisito é engenharia. Mexer na porta seria escolher a
+#: conclusão. Um é permitido, o outro não, e a diferença é essa.
+#:
+#: ERRO DE LEITURA MEU, REGISTRADO: eu havia anunciado 36 mm olhando uma varredura
+#: arredondada que mostrava "1,00". O número verdadeiro a 36 mm é 0,9952, e ele
+#: NÃO passa. Arredondamento na saída escondeu a reprova por 5 milésimos.
+#:
+#: O QUE ELE NÃO RESOLVE, e precisa estar do lado do número: pinus é mole. Amassa
+#: no encaixe da pá e marca com o uso, e este estudo não modela dureza de
+#: superfície. É a fraqueza real, e ela não aparece em nenhuma conta daqui.
+PINUS_COMERCIAL_ENGROSSADO = {
+    "diametro_m": 0.044,
+    "margemP05": 0.96,
+    "porQue": ("aceitar o nó e pagar em diâmetro; selecionar peça limpa custa preço, "
+               "que era justamente a vantagem do candidato"),
+    "aTroca": "40% mais barato e mais fácil de secar; 20% mais pesado e mais gordo",
+    "oQueFaltaModelar": "dureza de superfície, que é onde o pinus perde de verdade",
+}
+
+PINUS_ENGROSSADO = {
+    "diametro_m": 0.037,
+    "margemA36mm": 0.9952,
+    "porQue": ("um terço do preço do eucalipto compra diâmetro à vontade; "
+               "36 mm continua confortável na mão"),
+    "oQueFaltaModelar": "dureza de superfície, que é onde o pinus perde de verdade",
+}
+
 #: Variantes de projeto. A diferença entre elas não é o material — é o que se
 #: pede dele. `extrema` maximiza a folga estrutural; `igualitaria` só empata com
 #: o eucalipto e gasta o resto em ser leve e barata.
@@ -619,14 +1635,19 @@ VARIANTES = {
     "bambu-selecionado": {
         "diametro_m": 0.037, "parede_m": 0.0030,
         "objetivo": "empatar com o eucalipto usando colmo de bambu selecionado",
-        "observacao": "a melhor do estudo: 65% mais leve e 83% mais barata, e ganha "
-                      "mesmo sem medir",
+        "observacao": "leve e barata, e só empata COM seleção de lote: a 37 mm ela "
+                      "cai para 0,44 carregando a variação natural inteira",
     },
     "bambu-sem-selecionar": {
         "diametro_m": 0.043, "parede_m": 0.0030,
-        "objetivo": "o mesmo, carregando a variação natural do colmo inteira",
-        "observacao": "ainda 59% mais leve e 79% mais barata — é o único candidato "
-                      "que vence sem exigir medição",
+        "objetivo": "engrossar para absorver parte da variação natural do colmo",
+        # O NOME DESTA VARIANTE FICOU MENTIROSO, e fica registrado em vez de
+        # maquiado. Ela nasceu quando eu usava resistência de memória com faixa de
+        # 100 a 240 MPa. Com a faixa MEDIDA de colmo inteiro, de 62 a 170 MPa, ela
+        # dá 0,61 contra 0,63 do eucalipto brasileiro: perde, por pouco.
+        # Engrossar de 37 para 43 mm absorve parte da variação, e não toda.
+        "observacao": "engrossar ajuda e NÃO basta: sem seleção de lote ela dá 0,61 "
+                      "contra 0,63 do eucalipto. Com seleção, 1,07",
     },
     "bambu-laminado": {
         "diametro_m": 0.043, "parede_m": 0.0030,
@@ -682,10 +1703,11 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "papel-lignina-curaua": {"resistencia_pa": (153e6, 207e6), "modulo_pa": (17e9, 23e9)},
         # Para o colmo natural, "medir" é SELECIONAR LOTE: a variação é da planta,
         # e nenhum ensaio a reduz — o que se faz é escolher o que entra.
-        "bambu-colmo": {"resistencia_pa": (145e6, 195e6), "modulo_pa": (13e9, 17e9)},
+        # ±15% em torno do valor MEDIDO, que é o que a seleção de lote entrega.
+        "bambu-colmo": {"resistencia_pa": (115.9e6, 156.8e6), "modulo_pa": (11.1e9, 15.1e9)},
         "bambu-laminado": {"resistencia_pa": (102e6, 138e6), "modulo_pa": (10e9, 14e9)},
     }
-    referencia = medir("eucalipto")
+    referencia = medir(REFERENCIA)
     referencia_flecha = referencia["flecha_m"]
 
     saida = {}
@@ -706,6 +1728,13 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
                          f"de {PAREDE_MINIMA_PRATICA_M * 1000:.1f} mm; ela amassa em uso.",
                          local="VARIANTES")
         secao = secao_tubular(v["diametro_m"], v["parede_m"])
+        # Mesma correção de tamanho da `medir`: a variante também é maior que o
+        # corpo de prova, e cada variante tem o seu volume.
+        escala = fator_de_escala(material, secao["area"] * COMPRIMENTO_M)
+        base["resistencia_pa"] *= escala["fator"]
+        dispersao = {c: ((a * escala["fator"], b * escala["fator"])
+                         if c == "resistencia_pa" else (a, b))
+                     for c, (a, b) in dispersao.items()}
         r = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N, **base)
         p = propagar(dispersao,
                      lambda pt: avaliar(secao, comprimento_m=COMPRIMENTO_M,
@@ -715,6 +1744,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         saida[nome] = {
             **v,
             "material": material,
+            "efeitoDeEscala": escala,
             "margemP05": p["p05"],
             "massa_kg": massa,
             "custo": massa * mat["preco_por_kg"],
@@ -729,7 +1759,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
             "paredeSobreviveAoUso": v["parede_m"] >= PAREDE_MINIMA_PRATICA_M,
         }
     return {
-        "referencia": {"material": "eucalipto", "margemP05": referencia["margemP05"],
+        "referencia": {"material": REFERENCIA, "margemP05": referencia["margemP05"],
                        "massa_kg": referencia["massa_kg"], "custo": referencia["custo"],
                        "dissipacao": 1 - referencia["vibracaoRestante"],
                        "fonte": FONTE_MADEIRA},
@@ -882,6 +1912,47 @@ FIXACAO_E_INTEMPERISMO = {
         ),
         "custoDisso": "barato, mas obrigatório: é detalhe de projeto, não opcional",
     },
+    # LACUNA CORRIGIDA. As soluções acima cuidam da ponta que entra na pá, e o
+    # estudo tinha deixado a OUTRA de fora. São duas pontas com problemas
+    # diferentes: embaixo o parafuso cunha e a parede amassa; em cima o tubo fica
+    # simplesmente ABERTO, e é daí que a rachadura começa, porque a extremidade
+    # livre não tem nada segurando as fibras juntas.
+    "ponta_livre": {
+        "veredito": "toda extremidade cortada é um início de trinca",
+        "solucoes": (
+            "cortar logo acima de um NÓ: o nó é um diafragma que fecha o tubo e trava "
+            "as fibras. Custo zero — é só posicionamento do corte, e é a regra mais "
+            "barata do projeto inteiro",
+            "tampa ou anel na ponta, quando o corte não puder cair num nó",
+        ),
+        "regraQueResume": (
+            "os DOIS cortes do cabo devem cair em nó sempre que der; isso ataca a maior "
+            "ameaça de durabilidade do bambu sem custar nada"
+        ),
+        # CORREÇÃO, e ela veio de uma pergunta simples: quantos nós tem um pedaço
+        # de 1,2 m? Entrenó de Bambusa tuldoides fica entre 30 e 45 cm, mais curto
+        # perto da base e mais longo no meio do colmo, então 1,2 m dá de três a
+        # cinco nós contando as pontas — não um.
+        #
+        # E daí sai o que eu tinha dito errado: "corte nos dois nós" não é regra
+        # que se aplica sempre, porque QUEM ESCOLHE ONDE O NÓ ESTÁ É A PLANTA. Se
+        # o entrenó for de 40 cm, 1,2 m fecha exatamente; com 35 ou 45, não fecha.
+        # Exigir nó nas duas pontas é mais um critério de seleção, e seleção custa
+        # rendimento.
+        "quantosNosEmUmCabo": {
+            "entrenoTipico_cm": (30, 45),
+            "nosEm1_2m": (3, 5),
+            "quemEscolhe": "a planta, não o projeto",
+        },
+        "aRegraCorrigida": (
+            "nó na ponta que entra na pá: EXIJA, porque é a que sofre parafuso e "
+            "esmagamento, e vale gastar rendimento nela",
+            "nó na ponta livre: PREFIRA, não exija — se não cair, uma tampa ou anel "
+            "resolve, e é barato",
+            "aceite FAIXA de comprimento, e não só de diâmetro: um cabo que pode ter "
+            "entre 1,15 e 1,30 m acha muito mais colmo que caia bem nos nós",
+        ),
+    },
     "sol_e_tempo": {
         "veredito": "empate com o eucalipto",
         "porQue": (
@@ -1008,6 +2079,92 @@ PREENCHIMENTO = {
     ),
     "marca": "ANÁLISE, NÃO ESTUDO: os números de massa e rigidez saem de conta, mas "
              "a resistência ao amassamento NÃO foi calculada — é raciocínio, não medida",
+}
+
+
+#: FORNECEDORES: busca feita na web em 2026-09-01. NENHUMA das empresas foi
+#: verificada — não se sabe se estão ativas, se atendem volume, nem se vendem
+#: colmo classificado por diâmetro. É lista de partida para telefonar, e não
+#: lista de fornecedor qualificado. Dizer o contrário seria transformar uma busca
+#: em due diligence.
+FORNECEDORES = {
+    "oProblemaQueABuscaRevelou": (
+        "o mercado brasileiro de bambu TRATADO mira CONSTRUÇÃO, e por isso vende "
+        "colmo grosso: os kits anunciados são de 13 a 14 cm. O cabo precisa de 36 a "
+        "42 mm, que é a ponta fina. Não falta material — falta canal"
+    ),
+    "aConvergenciaBoa": (
+        "a espécie que dá colmo nesse diâmetro é também a ambientalmente segura. "
+        "Bambusa tuldoides (bambu comum ou caipira) é ENTOUCEIRANTE, não alastra por "
+        "rizoma, e cresce na faixa certa. Já Dendrocalamus asper e giganteus, que são "
+        "os que a indústria trata, são grandes demais"
+    ),
+    "encontrados": (
+        {"nome": "Bambu Show", "url": "http://bambushow.blogspot.com/p/produtos.html",
+         "porQue": "o mais próximo: corta sob medida e lista varas de 1,5 a 20 cm, "
+                   "com tratamento — nosso diâmetro cai dentro"},
+        {"nome": "Bambu Market", "url": "https://bambu.com.br/categoria-produto/bambu-tratado/bambu-dendrocalamus-asper-tratado/",
+         "porQue": "tratado, mas só asper em 13 a 14 cm: grosso demais"},
+        {"nome": "Bambugalô", "url": "https://www.bambugalo.com.br/bambu-tratado",
+         "porQue": "distribuidor de tratado no Nordeste"},
+        {"nome": "Bambuaria", "url": "https://bambuaria.com.br/venda-de-bambu.php",
+         "porQue": "venda de colmo"},
+        {"nome": "Sítio Flora Sol", "url": "https://www.sitioflorasol.com.br/product-page/bambu-tuldoides",
+         "porQue": "mudas de tuldoides, não colmo cortado — serve para plantar, não para comprar"},
+    ),
+    "certificacao": {
+        "veredito": "possível, não estabelecida",
+        "detalhe": (
+            "o FSC cobre produto não-madeireiro e tem o padrão SLIMF para pequeno "
+            "produtor, que é exatamente o perfil de quem planta bambu. Mas NÃO foi "
+            "encontrada nenhuma operação de bambu certificada FSC no Brasil"
+        ),
+        "consequencia": ("se certificação for exigência da empresa, isso vira um "
+                         "projeto com o fornecedor, e não uma compra"),
+    },
+    "marca": ("BUSCA NA WEB, NÃO VERIFICADA: nenhuma empresa foi contatada nem "
+              "conferida quanto a atividade, capacidade ou classificação por diâmetro"),
+}
+
+
+#: JANELA DE ACEITAÇÃO DO COLMO, e ela existe porque a pergunta certa não é "qual
+#: diâmetro?" mas "o que serve?".
+#:
+#: A busca de fornecedor levantou a dúvida de abandonar o bambu por falta de
+#: garantia de diâmetro. A dúvida some quando se olha o que de fato é exigido: os
+#: 37 mm recomendados não são requisito, são o resultado de casar com o eucalipto
+#: carregando a incerteza larga. Varrendo diâmetro e parede, **43 combinações**
+#: entre 35 e 45 mm empatam com o eucalipto E ficam mais leves e mais baratas que
+#: ele. A pior delas, 45 × 6 mm, ainda dá 0,618 kg contra 0,772 e R$ 1,24 contra
+#: 3,09.
+#:
+#: O pedido ao fornecedor, então, não é uma medida — é uma faixa larga, e o
+#: projeto se ajusta ao que existe em vez de o contrário.
+JANELA_DE_COLMO = {
+    "pedidoAoFornecedor": (
+        "colmo entouceirante, 35 a 45 mm de diâmetro externo, parede de no mínimo "
+        "3 mm, tratado contra caruncho"
+    ),
+    "porQueNaoEUmaMedida": (
+        "os 37 mm são resultado de casar com o eucalipto carregando incerteza larga, "
+        "e não requisito. Qualquer combinação da janela serve, com massa e custo "
+        "diferentes — o projeto se ajusta ao que o fornecedor tem"
+    ),
+    "combinacoesQueServem": 43,
+    "faixaDeDiametro_mm": (35, 45),
+    "paredeMinima_mm": 3.0,
+    "piorCasoDaJanela": {"geometria": "45 × 6 mm", "massa_kg": 0.618, "custo": 1.24,
+                         "aindaAssim": "20% mais leve e 60% mais barato que o eucalipto"},
+    "seOColmoFalhar": (
+        "bambu laminado é fabricado NA MEDIDA, sem problema de seleção nenhum. Custa "
+        "quatro vezes mais por quilo e ainda sai 59% mais leve e 18% mais barato por "
+        "cabo que o eucalipto — é a reserva, não o plano"
+    ),
+    "ordemDeAcao": (
+        "telefonar para quem lista faixa fina",
+        "ajustar o projeto ao que o fornecedor tem dentro da janela",
+        "bambu laminado como reserva",
+    ),
 }
 
 
@@ -1189,3 +2346,6 @@ def avaliar_estudo(comparacao: dict[str, Any] | None = None,
             "candidato recomendado, seguem com números de memória.",
         ),
     )
+
+
+_conferir_fontes()

@@ -1,0 +1,472 @@
+{
+ "formato": "lab.tabela-de-materiais@1",
+ "aviso": "cada propriedade carrega condicao e origem, e origem 'estimada' quer dizer valor de manual de memoria NAO conferido contra fonte primaria. Substituir estimada por publicada e o trabalho permanente aqui.",
+ "materiais": [
+  {
+   "identidade": "eucalipto-jarrah",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "celulose": 0.45,
+    "hemicelulose": 0.2,
+    "lignina": 0.28,
+    "extrativos": 0.07
+   },
+   "processamento": "madeira serrada, seca ao teor de 12% de umidade",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 13000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, 12% de umidade, 20 C",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    },
+    {
+     "nome": "resistenciaAFlexao",
+     "valor": 111700000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "modulo de ruptura, 12% de umidade, 20 C",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    },
+    {
+     "nome": "densidade",
+     "valor": 800.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "12% de umidade",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.01,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "madeira seca, decremento logaritmico 0,02 a 0,1 dividido por pi",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 cap. 5"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "o concorrente a bater no estudo do cabo de pa, e a unica linha com fonte primaria conferida",
+    "cuidado": "valor de corpo de prova SEM defeito; peca comercial com no e desvio de fibra da menos"
+   }
+  },
+  {
+   "identidade": "eucalipto-karri",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "celulose": 0.45,
+    "hemicelulose": 0.2,
+    "lignina": 0.28,
+    "extrativos": 0.07
+   },
+   "processamento": "madeira serrada, seca ao teor de 12% de umidade",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 17900000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, 12% de umidade, 20 C",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    },
+    {
+     "nome": "resistenciaAFlexao",
+     "valor": 139000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "modulo de ruptura, 12% de umidade, 20 C",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    },
+    {
+     "nome": "densidade",
+     "valor": 820.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "12% de umidade",
+     "origem": "publicada",
+     "fonte": "FPL-GTR-190 tabela 5-5a"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "o outro eucalipto tabelado; a distancia ate o jarrah E a dispersao da especie"
+   }
+  },
+  {
+   "identidade": "bambu-colmo",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "celulose": 0.45,
+    "hemicelulose": 0.22,
+    "lignina": 0.23,
+    "amido-e-extrativos": 0.1
+   },
+   "processamento": "colmo inteiro, seco ao ar, sem resina e sem laminacao",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 15000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, seco ao ar, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaAFlexao",
+     "valor": 170000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, seco ao ar, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 700.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "seco ao ar",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.012,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "seco ao ar, faixa audivel baixa",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "o vencedor do estudo do cabo de pa",
+    "cuidado": "o amido e comida de caruncho; sem tratamento o colmo dura de um a tres anos",
+    "aConferir": "toda a linha e MEMORIA; nada aqui foi conferido contra fonte primaria"
+   }
+  },
+  {
+   "identidade": "aco-1020",
+   "baseDaComposicao": "elementar",
+   "fracoes": {
+    "Fe": 0.9905,
+    "C": 0.002,
+    "Mn": 0.0045,
+    "Si": 0.0025,
+    "P": 0.0003,
+    "S": 0.0002
+   },
+   "processamento": "trefilado a frio",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 205000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaAoEscoamento",
+     "valor": 350000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao, 20 C, trefilado",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 7850.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.0005,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "20 C, amplitude baixa",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "referencia de metal: ganha em resistencia e perde feio em vibracao",
+    "aConferir": "composicao dentro da faixa da norma; o carbono foi posto no meio da faixa 0,17-0,23"
+   }
+  },
+  {
+   "identidade": "aluminio-6061-t6",
+   "baseDaComposicao": "elementar",
+   "fracoes": {
+    "Al": 0.974,
+    "Mg": 0.01,
+    "Si": 0.006,
+    "Fe": 0.0035,
+    "Cu": 0.0028,
+    "Cr": 0.002,
+    "Mn": 0.0007,
+    "Zn": 0.0007,
+    "Ti": 0.0003
+   },
+   "processamento": "extrudado, tratamento T6",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 69000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaAoEscoamento",
+     "valor": 276000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao, 20 C, condicao T6",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 2700.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.0002,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "20 C, amplitude baixa",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "aConferir": "linha inteira de memoria"
+   }
+  },
+  {
+   "identidade": "sisal-fibra",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "celulose": 0.65,
+    "hemicelulose": 0.12,
+    "lignina": 0.1,
+    "pectina-e-ceras": 0.13
+   },
+   "processamento": "fibra da folha, penteada, sem tratamento",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 15000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao na fibra unica, seca, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaATracao",
+     "valor": 550000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao na fibra unica, seca, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 1450.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "seca",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "a fibra e boa; o que reprovou no cabo foi a matriz e a rigidez, nao ela",
+    "cuidado": "modulo de fibra natural para perto de 20 GPa; e teto de planta, nao de processo",
+    "faixaConhecida": "modulo de 9 a 22 GPa e resistencia de 400 a 700 MPa entre lotes"
+   }
+  },
+  {
+   "identidade": "poliuretano-de-mamona",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "poliol-de-mamona": 0.6,
+    "isocianato": 0.4
+   },
+   "processamento": "resina bicomponente vegetal, curada a temperatura ambiente",
+   "propriedades": [
+    {
+     "nome": "resistenciaATracao",
+     "valor": 6460000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao da resina pura curada, 20 C",
+     "origem": "publicada",
+     "fonte": "LIT-SISAL-PU"
+    },
+    {
+     "nome": "densidade",
+     "valor": 1150.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "curada, 20 C",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "a razao da reprova do sisal: a resina e FLEXIVEL por projeto, e matriz mole manda no composito",
+    "saude": "o isocianato e sensibilizante respiratorio na linha de producao; a peca curada e inerte"
+   }
+  },
+  {
+   "identidade": "sisal-poliuretano-de-mamona",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "fibra-de-sisal": 0.44,
+    "poliuretano-de-mamona": 0.56
+   },
+   "processamento": "tecido de sisal impregnado e curado",
+   "propriedades": [
+    {
+     "nome": "resistenciaATracao",
+     "valor": 15140000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "tracao, fibra tratada com Al(OH)3, 20 C",
+     "origem": "publicada",
+     "fonte": "LIT-SISAL-PU"
+    },
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 2500000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 1150.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "curado, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.05,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "20 C, faixa audivel baixa",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "resultado": "reprovado como cabo: margem 0,14 contra 1,01 do eucalipto",
+    "ondeEleGanha": "absorcao de vibracao, e ganha de todos com folga"
+   }
+  },
+  {
+   "identidade": "papel-fenolico",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "fibra-de-celulose": 0.55,
+    "resina-fenolica": 0.45
+   },
+   "processamento": "laminado prensado a quente (o material conhecido como Micarta)",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 8000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao, 20 C, seco",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaAFlexao",
+     "valor": 120000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao, 20 C, seco",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 1350.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.025,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "20 C",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "porqueEstaAqui": "e o que se chama de Micarta; ja foi avaliado e reprovado por saude",
+    "saude": "resina fenolica e feita com formaldeido, irritante e cancerigeno reconhecido"
+   }
+  },
+  {
+   "identidade": "fibra-de-vidro-e-pultrudada",
+   "baseDaComposicao": "constituinte",
+   "fracoes": {
+    "fibra-de-vidro-E": 0.6,
+    "resina-poliester": 0.4
+   },
+   "processamento": "perfil pultrudado, fibra unidirecional",
+   "propriedades": [
+    {
+     "nome": "moduloDeElasticidade",
+     "valor": 30000000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "resistenciaAFlexao",
+     "valor": 400000000.0,
+     "unidade": "Pa",
+     "dimensao": "pressao",
+     "condicao": "flexao na direcao da fibra, 20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "densidade",
+     "valor": 1900.0,
+     "unidade": "kg/m3",
+     "dimensao": "densidade",
+     "condicao": "20 C",
+     "origem": "estimada"
+    },
+    {
+     "nome": "fatorDePerda",
+     "valor": 0.008,
+     "unidade": "1",
+     "dimensao": "adimensional",
+     "condicao": "20 C",
+     "origem": "estimada"
+    }
+   ],
+   "notas": {
+    "saude": "po e lasca de vidro irritam pele e pulmao ao cortar ou lixar",
+    "ambiente": "praticamente nao se recicla e nao degrada"
+   }
+  }
+ ]
+}

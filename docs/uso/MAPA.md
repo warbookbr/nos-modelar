@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-762 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+765 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -612,6 +612,10 @@
 
 - `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
 
+## laboratorio/dados/materiais/
+
+- `FONTES.md` — Fontes da tabela de materiais
+
 ## modulos/exportador-cad/src/
 
 - `contrato.js` — contrato.js — contrato e validação de opções do exportador CAD.
@@ -736,10 +740,12 @@
 ## prototipos/procedural/v3/pecas/
 
 - `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
+- `cabo-de-pa-bambu.js` — cabo-de-pa-bambu.js — cabo de pá em colmo de bambu.
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
 - `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
 - `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
+- `pa-de-bico-bambu.js` — pa-de-bico-bambu.js — pá de bico completa, com cabo de colmo de bambu.
 
 ## prototipos/procedural/v3/servicos/
 
