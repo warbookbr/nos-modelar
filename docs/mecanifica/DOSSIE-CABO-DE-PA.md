@@ -110,7 +110,7 @@ ser confortável ou barato.
 | sisal + resina de mamona | fibra longa nacional, resina vegetal sem formaldeído | a resina de mamona é flexível por projeto; mesmo no cenário otimista o cabo verga o dobro |
 | papelão / papel reciclado | material barato e abundante | fibra curta e desalinhada: metade da resistência necessária, e resina nenhuma conserta fibra |
 | pó de pedra, barro, geopolímero | material baratíssimo e disponível | cerâmica: rígida, quebradiça e pesada — margem 0,08 a 0,22 com 2 kg de cabo |
-| madeira plástica | barata, não absorve água | rigidez quatro a cinco vezes menor que a da madeira |
+| madeira plástica (WPC) | serragem é resíduo de fábrica a custo zero, zero dia de estufa, e amortece muito bem | reavaliado contra o eucalipto brasileiro: a 45 mm ele até alcança a resistência, no extremo otimista da faixa — e pesa **2,19 kg contra 0,59 kg**. Tubo alivia o peso e leva a margem junto |
 | micarta (tecido + fenólica) | material antigo, muito amortecedor | é o papel-fenólico da tabela: metade da resistência, e formaldeído |
 | pinus **selecionado** | resistência alta por quilo | o prêmio de peça sem nó o deixa mais caro que o eucalipto |
 

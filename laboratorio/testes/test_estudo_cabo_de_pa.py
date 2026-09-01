@@ -861,3 +861,49 @@ def test_corpos_de_prova_de_FONTES_DIFERENTES_dao_descontos_DIFERENTES():
     au = estudo.medir("eucalipto")["efeitoDeEscala"]
     assert br["familia"] == "madeira-br" and au["familia"] == "madeira"
     assert br["fator"] < au["fator"]
+
+
+def test_o_WPC_reprova_por_PESO_agora_e_nao_mais_por_rigidez():
+    """Segunda avaliação do compósito madeira-plástico, e o motivo da reprova
+    MUDOU — o que só se percebe reavaliando depois que a barra caiu.
+
+    Na primeira vez ele reprovava por rigidez, quatro a cinco vezes menor que a da
+    madeira. Contra o eucalipto brasileiro, que é bem menos rígido que o jarrah, a
+    45 mm maciço ele até passa: margem 0,66 contra 0,63, no extremo OTIMISTA da
+    faixa publicada.
+
+    E aí reprova por massa: **2,19 kg contra 0,59 kg**, quase quatro vezes. A pá
+    inteira pesaria mais que a terra que ela levanta. Tubo alivia e some com a
+    margem junto.
+
+    Os argumentos econômicos da sugestão são verdadeiros — serragem é resíduo de
+    fábrica a custo zero, e não há dia nenhum de estufa. Eles compram um cabo que
+    ninguém levanta.
+    """
+    from laboratorio.viga import avaliar, secao_macica, secao_tubular
+    from laboratorio.ensaio import efeito_de_escala
+
+    ref = estudo.medir("eucalipto-urograndis")
+    otimista = dict(modulo_pa=3.4e9, densidade_kg_m3=1150.0, fator_de_perda=0.06)
+    volume_do_corpo = 0.0032 * 0.0127 * 0.100  # ASTM D790
+
+    def rodar(secao):
+        volume = secao["area"] * estudo.COMPRIMENTO_M
+        corrigida = efeito_de_escala(
+            resistencia_pa=40.0e6, volume_do_ensaio_m3=volume_do_corpo,
+            volume_da_peca_m3=volume, modulo_de_weibull=15.0,
+            material="composito")["resistenciaCorrigida"]["valor"]
+        return avaliar(secao, comprimento_m=estudo.COMPRIMENTO_M,
+                       forca_n=estudo.FORCA_N, resistencia_pa=corrigida, **otimista)
+
+    no_limite = rodar(secao_macica(estudo.DIAMETRO_MAXIMO_DE_EMPUNHADURA_M))
+    assert no_limite["margemContraFalha"] > ref["margemP05"], "a barra caiu e ele alcança"
+    assert no_limite["massa"]["valor"] > 3.5 * ref["massa_kg"], "e é aqui que ele morre"
+
+    # Tubo alivia o peso e leva a margem junto: não há geometria que salve.
+    tubo = rodar(secao_tubular(0.045, 0.008))
+    assert tubo["massa"]["valor"] < no_limite["massa"]["valor"]
+    assert tubo["margemContraFalha"] < ref["margemP05"]
+
+    # O que ele tem de bom é real, e é uma coisa só.
+    assert otimista["fator_de_perda"] > estudo.MATERIAIS["eucalipto-urograndis"]["fator_de_perda"]
