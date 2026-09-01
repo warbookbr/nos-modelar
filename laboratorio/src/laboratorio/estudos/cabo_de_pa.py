@@ -865,6 +865,58 @@ TETO_EXTRAPOLADO_SISAL = {
     "natureza": "extrapolação, NÃO medida; não use como propriedade de material",
 }
 
+#: TODO PREÇO DESTE ESTUDO É INVENÇÃO MINHA, e isto é o maior buraco que sobrou.
+#:
+#: Quinze materiais, quinze `preco_por_kg`, nenhuma cotação. E preço não é critério
+#: derivado: é uma das TRÊS exigências que o usuário escreveu na pergunta original
+#: — "mais barato, aguentar o mesmo, absorver bem". Duas delas têm fonte medida
+#: hoje. A terceira não tem nenhuma.
+#:
+#: A DIFERENÇA PARA O CASO DO AMORTECIMENTO: lá o número existia em algum artigo e
+#: eu não fui buscar. Aqui o número depende de região, volume, época e de quem
+#: compra — não existe "o preço do bambu" para ir buscar. O que existe é cotação, e
+#: cotação é trabalho de campo, não de biblioteca. Esta constante existe para que a
+#: coluna de custo do dossiê pare de parecer dado.
+FONTE_DOS_PRECOS = (
+    "INVENTADO. Nenhum dos preços deste estudo é cotação: são ordens de grandeza "
+    "que eu escolhi para que a comparação relativa fizesse sentido. Servem para "
+    "dizer que bambu é bem mais barato que fibra de vidro; NÃO servem para dizer "
+    "que é 62% mais barato que o eucalipto. Preço real depende de região, volume, "
+    "época e de quem compra, e sai de cotação, não de literatura."
+)
+
+#: QUANDO RESÍDUO BARATO NÃO VIRA PEÇA BARATA, e o estudo já tropeçou nisto três
+#: vezes sem nomear.
+#:
+#: O argumento "é subproduto, então é de graça" tem um pedaço escondido: o resíduo
+#: precisa vir na FORMA que a peça exige. Serragem é de graça e não vira cabo;
+#: tora fina é barata e rende mal quando se quer uma barra reta de 44 mm.
+#:
+#: OS TRÊS CASOS, e eles são o mesmo caso:
+#:
+#:   - WPC: serragem da própria fábrica, custo zero, e comprou um cabo de 2,19 kg.
+#:   - Acácia-negra: subproduto do tanino, mas cortada aos SETE anos — tora fina, e
+#:     serrar cabo dela rende pouco por metro cúbico. O barato da matéria-prima
+#:     não atravessa a serraria.
+#:   - Seringueira: subproduto de seringal de 25 a 30 anos — tora grossa, e existe
+#:     indústria de serraria estabelecida para ela na Ásia. Aqui o barato ATRAVESSA.
+#:
+#: É por isso que a seringueira é a alternativa de madeira mais forte deste estudo
+#: mesmo tendo resistência menor que a acácia madura: a vantagem econômica dela
+#: chega até a peça, e a da acácia provavelmente não.
+FORMA_DO_RESIDUO = {
+    "regra": ("resíduo só é barato para o produto se vier na forma que o produto "
+              "exige; o corte, a secagem e o rendimento ficam entre o resíduo e a peça"),
+    "casos": {
+        "madeira-plastica": "serragem de graça, cabo de 2,19 kg — a forma não serve",
+        "acacia-negra": ("tora de sete anos é fina; barra reta de 36 a 44 mm rende "
+                         "mal, e o barato não atravessa a serraria"),
+        "seringueira": ("tora de 25 a 30 anos é grossa e já existe serraria para "
+                        "ela; aqui o barato atravessa"),
+    },
+    "oQueOEstudoNAOsabe": "rendimento de serraria de nenhuma das três",
+}
+
 #: DE ONDE VEM CADA PROPRIEDADE, uma por uma. Esta tabela existe porque o campo
 #: `fonte` do material mentia por omissão: ele é do MATERIAL, e se espalhava
 #: visualmente por cima de propriedades que a fonte nunca mediu.

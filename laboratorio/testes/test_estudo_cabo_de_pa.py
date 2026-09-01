@@ -1158,3 +1158,36 @@ def test_o_ACHADO_da_busca_foi_a_DUREZA_e_nao_o_MOR():
     janka = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["maduraCompilada"]["durezaJanka_n"]
     assert janka > 7000
     assert "dureza Janka" in estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["oQueJaDaParaDizer"]
+
+
+def test_TODO_preco_deste_estudo_e_INVENTADO_e_o_estudo_diz_isso():
+    """O maior buraco que sobrou, e ele é maior que o do amortecimento: preço é
+    uma das TRÊS exigências que o usuário escreveu na pergunta original.
+
+    E a diferença é de natureza: o amortecimento existe em algum artigo e eu não
+    fui buscar. Preço não existe em artigo nenhum — sai de cotação, que é trabalho
+    de campo. A constante existe para a coluna de custo parar de parecer dado.
+    """
+    assert "INVENTADO" in estudo.FONTE_DOS_PRECOS
+    assert "cotação" in estudo.FONTE_DOS_PRECOS
+    assert "preco_por_kg" not in estudo.PROPRIEDADES_COM_FONTE, \
+        "preço não tem procedência, e fingir que tem seria pior"
+    assert all("preco_por_kg" in m for m in estudo.MATERIAIS.values())
+
+
+def test_a_comparacao_de_preco_serve_para_ORDEM_e_nao_para_PORCENTAGEM():
+    """Os números servem para dizer que bambu é bem mais barato que fibra de vidro.
+    Não servem para dizer que é 62% mais barato que o eucalipto."""
+    assert "ordens de grandeza" in estudo.FONTE_DOS_PRECOS
+    assert "NÃO servem" in estudo.FONTE_DOS_PRECOS
+
+
+def test_RESIDUO_BARATO_nao_vira_PECA_BARATA_sozinho():
+    """Três tropeços do mesmo tipo, agora nomeados: o resíduo precisa vir na FORMA
+    que a peça exige, e entre um e outro estão o corte, a secagem e o rendimento."""
+    casos = estudo.FORMA_DO_RESIDUO["casos"]
+    assert set(casos) == {"madeira-plastica", "acacia-negra", "seringueira"}
+    assert "2,19 kg" in casos["madeira-plastica"], "serragem de graça, cabo impossível"
+    assert "não atravessa" in casos["acacia-negra"], "tora de sete anos é fina"
+    assert "atravessa" in casos["seringueira"], "tora grossa e serraria existente"
+    assert estudo.FORMA_DO_RESIDUO["oQueOEstudoNAOsabe"]

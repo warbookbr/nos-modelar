@@ -193,6 +193,45 @@ incerto.
 **O que falta:** MOR medido do plantio brasileiro de sete anos. É ele que decide
 entre 32 e 36 mm.
 
+**E o preço dela provavelmente não é o que parece.** Ver a próxima seção.
+
+## 4a-bis. Duas advertências sobre a coluna de custo
+
+### Todo preço deste dossiê é inventado
+
+Quinze materiais, quinze valores de R$/kg, **nenhuma cotação**. São ordens de
+grandeza que escolhi para a comparação relativa fazer sentido.
+
+Isso é pior que o buraco do amortecimento, por duas razões. Preço é uma das **três
+exigências** da pergunta original — mais barato, aguentar o mesmo, absorver bem — e
+as outras duas hoje têm fonte medida. E a natureza do buraco é outra: o
+amortecimento existe em algum artigo e eu não fui buscar; **preço não existe em
+artigo nenhum.** Sai de cotação, que é trabalho de campo.
+
+**Como ler a coluna:** ela serve para dizer que bambu é bem mais barato que fibra
+de vidro. **Não serve** para dizer que é 62% mais barato que o eucalipto. Ordem,
+não porcentagem.
+
+### Resíduo barato não vira peça barata sozinho
+
+O argumento "é subproduto, então sai de graça" tem um pedaço escondido: **o resíduo
+precisa vir na forma que a peça exige.** Entre um e outro estão o corte, a secagem
+e o rendimento de serraria.
+
+Este dossiê tropeçou nisso três vezes antes de nomear:
+
+| caso | o resíduo | o que acontece |
+| --- | --- | --- |
+| madeira plástica | serragem da própria fábrica, custo zero | comprou um cabo de 2,19 kg — a forma não serve |
+| **acácia-negra** | subproduto do tanino | cortada aos **sete anos**: tora fina, e barra reta de 36 a 44 mm rende mal. O barato **não atravessa a serraria** |
+| **seringueira** | seringal de 25 a 30 anos | tora grossa, e já existe indústria de serraria para ela. Aqui o barato **atravessa** |
+
+É por isso que a seringueira é a alternativa de madeira mais forte deste dossiê
+**mesmo tendo resistência menor que a acácia madura**: a vantagem econômica dela
+chega até a peça.
+
+**O que o dossiê não sabe:** rendimento de serraria de nenhuma das três.
+
 ### Estipe de palmeira (pupunha, açaí)
 
 Interessa por duas razões. É **resíduo de palmito e de fruto em volume enorme**. E
@@ -558,6 +597,8 @@ Para o bambu, em ordem de valor:
 
 - **rachadura em ciclo de umidade**, que é o risco real e o que este estudo não sabe;
 - **resistência por lote de colmo**, que é seleção e não ensaio único;
+- **cotação real de preço**, de qualquer um dos candidatos. É a exigência original com a fonte mais fraca do dossiê, e a única que não se resolve em biblioteca;
+- **rendimento de serraria** de acácia de sete anos e de seringueira, que é o que decide se o barato do subproduto chega à peça;
 - **fator de perda medido**, e ele subiu na lista: nenhuma das quatro fontes deste dossiê mede amortecimento, e ele é argumento central da recomendação;
 - **resistência após ciclos**, porque cabo de pá é fadiga e isto foi carga única.
 
