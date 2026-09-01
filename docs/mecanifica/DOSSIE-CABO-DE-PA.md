@@ -151,6 +151,42 @@ apodrece mais rápido. Tratamento de autoclave com sal metálico é remédio de 
 enterrado, não se aplica a cabo de mão, e brigaria com a exigência de
 não-toxicidade.
 
+## 4b. Quando parar de procurar
+
+Não dá para esgotar a lista de materiais: sempre aparece mais uma ideia, e cada
+uma custa uma rodada de conta para morrer. Este estudo gastou assim com papelão,
+barro, pó de pedra, sisal, madeira plástica, micarta e laminado — sete candidatos,
+sete reprovas.
+
+Dá, em compensação, para **fechar o espaço por baixo**. As restrições do problema
+— 300 N na ponta de 1,2 m, no máximo 45 mm para caber na mão, no máximo 1,0 kg de
+cabo, vergando no máximo o que o eucalipto verga — recortam uma região no plano de
+**resistência por quilo** contra **rigidez por quilo**. Fora dela, não há material
+possível.
+
+**O piso, no caso mais generoso:**
+
+| exigência | mínimo |
+| --- | ---: |
+| resistência por quilo (σ/ρ) | **76.800** |
+| rigidez por quilo (E/ρ) | **5.461.000** |
+
+Um candidato novo se testa em uma linha: divide a resistência pela densidade,
+divide o módulo pela densidade, e compara. Todos os sete reprovados deste dossiê
+morrem aqui, sem chegar à bancada. O bambu passa com quase três vezes a folga
+necessária em resistência.
+
+**Duas ressalvas, e elas são o que impede a peneira de virar armadilha:**
+
+A conta é de **seção cheia**. Tubo joga material para longe do centro e afrouxa o
+piso a favor do candidato — a peneira reprova o aço, e reprova errado: aço vira
+cabo como tubo de parede fina. Quem se usa em tubo tem de ser avaliado como tubo.
+
+E passar não é ser aprovado. **Saúde, toxicidade, preço, fornecedor, dureza,
+apodrecimento, fadiga e farpa ficam todos de fora desta conta.** O alumínio passa
+com folga e continua reprovado no estudo, por vibração. Reprovar aqui é
+definitivo; passar é apenas não estar eliminado.
+
 ## 5. Preparo da matéria-prima
 
 Secar é difusão, e o tempo vai com o **quadrado** da espessura que a água atravessa.
