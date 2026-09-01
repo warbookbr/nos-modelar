@@ -1088,7 +1088,8 @@ def test_a_ACACIA_passa_na_RIGIDEZ_e_a_decisao_inteira_esta_no_MOR():
                           massa_maxima_kg=1.0, flecha_maxima_m=0.30)
     folga = acacia["modulo_pa"] / acacia["densidade_kg_m3"] / f.rigidez_por_densidade
     assert folga > 2.0, "sobra rigidez"
-    assert "modulo de ruptura na flexão" in estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["falta"]
+    assert any("módulo de ruptura MEDIDO" in f
+               for f in estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["falta"])
 
 
 def test_INVERTER_a_pergunta_transforma_pesquisa_vaga_em_sim_ou_nao():
@@ -1118,3 +1119,42 @@ def test_a_PALMEIRA_nao_tem_NENHUM_numero_e_o_estudo_diz_isso():
     # E o que se pode dizer sem número é qualitativo e vale: a parte aproveitável
     # é o anel externo, então a comparação certa é com tubo, não com barra.
     assert "tubo" in palmeira["oQueJaDaParaDizer"]
+
+
+def test_sao_DUAS_ACACIAS_e_nao_uma_com_dado_faltando():
+    """A segunda busca achou o MOR e revelou algo melhor: a árvore madura e o
+    plantio de sete anos não são a mesma madeira.
+
+    A madura dá 14,60 GPa e a de plantio 8,368 — 43% menos. Não é discordância
+    entre fontes; é outra idade da mesma espécie. E o plantio de tanino do Rio
+    Grande do Sul, que é o que existe em escala, é o de sete anos: a pior das duas.
+    """
+    a = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]
+    madura = a["maduraCompilada"]
+    plantio = a["medido"]
+    assert madura["modulo_pa"] > 1.7 * plantio["modulo_pa"]
+    assert madura["margemA32mm"] > estudo.medir("eucalipto-urograndis")["margemP05"]
+    assert a["estimativaDePlantio"]["margemA32mm"] < estudo.medir("eucalipto-urograndis")["margemP05"]
+
+
+def test_a_ESTIMATIVA_de_MOR_vem_marcada_como_estimativa():
+    """Ela sai de uma razão MOR/MOE emprestada da árvore madura. É palpite com
+    método, e palpite com método continua sendo palpite."""
+    e = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["estimativaDePlantio"]
+    assert "ESTIMATIVA, não medida" in e["natureza"]
+    assert "razão MOR/MOE" in e["comoFoiObtida"]
+
+
+def test_a_COMPILACAO_comercial_e_marcada_como_tal():
+    """Wood Database agrega ensaios de terceiros sem dizer idade nem procedência.
+    Útil, e não é fonte primária — a distinção é a mesma que já custou caro aqui."""
+    fonte = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["maduraCompilada"]["fonte"]
+    assert "COMPILAÇÃO" in fonte and "não fonte primária" in fonte
+
+
+def test_o_ACHADO_da_busca_foi_a_DUREZA_e_nao_o_MOR():
+    """Dureza era a propriedade que este estudo não tinha para NINGUÉM e que
+    derrubava o pinus. A acácia tem 7.590 N — a melhor da lista."""
+    janka = estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["maduraCompilada"]["durezaJanka_n"]
+    assert janka > 7000
+    assert "dureza Janka" in estudo.CANDIDATOS_INCOMPLETOS["acacia-negra"]["oQueJaDaParaDizer"]

@@ -163,24 +163,35 @@ apareceria com um número inventado.
 Interessa porque no Rio Grande do Sul ela é **subproduto do tanino**: a árvore já é
 derrubada pela casca, e é cortada aos sete anos.
 
-**Medido** (Rev. Ciência da Madeira 7(2), 2016, UFPel — resumo lido; PDF completo
-bloqueado): densidade **657 kg/m³**, módulo na flexão **8.368 MPa**.
-**Falta:** módulo de ruptura. É ele que decide.
+**São duas acácias, e não uma com dado faltando.** Essa foi a descoberta, e ela é
+mais útil que o número que fomos buscar.
 
-O que já dá para dizer: em rigidez por quilo ela dá 12,7 milhões contra um piso de
-5,5 milhões — **passa com o dobro da folga**. A decisão inteira está no MOR.
+| | MOR | MOE | densidade | Janka | margem a 32 mm |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| árvore **madura** (Wood Database) | 121,8 MPa | 14,60 GPa | 730 | **7.590 N** | **0,91** |
+| plantio **BR de 7 anos** (UFPel) | ~70 MPa* | 8,368 GPa | 657 | — | 0,53 |
 
-**Em vez de chutar esse número, calculamos quanto ele precisa ser.** Para empatar
-com o eucalipto brasileiro, o artigo teria de reportar:
+\* **estimativa, não medida.** Sai da razão MOR/MOE da árvore madura (8,34 MPa por
+GPa) aplicada ao módulo medido do plantio. Palpite com método continua sendo palpite.
 
-| diâmetro do cabo | MOR necessário no corpo de prova | massa do cabo |
-| :-: | ---: | ---: |
-| 32 mm | 83,9 MPa | 0,63 kg |
-| 36 mm | 60,1 MPa | 0,80 kg |
-| 40 mm | 44,6 MPa | 0,99 kg |
+A árvore madura passaria o eucalipto **no mesmo diâmetro do cabo atual** — seria a
+única candidata "drop-in" do dossiê, sem engrossar nada. Mas o plantio de tanino do
+Rio Grande do Sul é cortado aos **sete anos**, e madeira de sete anos é juvenil: 43%
+menos rigidez. A acácia que existe em escala aqui é a pior das duas, e pelo
+estimado ela precisaria de 36 mm.
 
-Quem tiver o artigo responde isso em um minuto. Uma pesquisa vaga virou uma
-pergunta de sim ou não.
+**Ressalva de fonte:** o Wood Database é **compilação comercial**, não fonte
+primária — agrega ensaios de terceiros sem dizer idade nem procedência da amostra.
+É a mesma distinção que já custou caro neste dossiê.
+
+**O que a busca entregou de melhor não foi o MOR: foi a dureza.** Janka de
+**7.590 N** — maior que a do eucalipto grandis e quase o triplo da do pinus. Dureza
+era a propriedade que este dossiê não tinha para **ninguém** e que derrubava o
+pinus. Nisso a acácia é a melhor madeira da lista, e isso vale mesmo com o MOR
+incerto.
+
+**O que falta:** MOR medido do plantio brasileiro de sete anos. É ele que decide
+entre 32 e 36 mm.
 
 ### Estipe de palmeira (pupunha, açaí)
 

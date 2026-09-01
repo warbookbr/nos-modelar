@@ -1018,6 +1018,50 @@ def resistencia_necessaria(*, diametro_m: float, margem_alvo: float,
 CANDIDATOS_INCOMPLETOS = {
     "acacia-negra": {
         "especie": "Acacia mearnsii",
+        # SEGUNDA BUSCA, e ela achou o MOR — em outra fonte, e revelando que são
+        # DUAS ACÁCIAS diferentes, não uma com dado faltando.
+        #
+        # A árvore MADURA está compilada no Wood Database: MOR 121,8 MPa, MOE 14,60
+        # GPa, 730 kg/m³, Janka 7.590 N. Com esses números ela dá margem 0,91 a 32
+        # mm — passa o eucalipto brasileiro no MESMO diâmetro do cabo atual, sem
+        # engrossar nada. Seria a única candidata "drop-in" do estudo.
+        #
+        # SÓ QUE O PLANTIO BRASILEIRO DE TANINO É CORTADO AOS SETE ANOS, e madeira
+        # de sete anos é juvenil. O artigo da UFPel mede 8,368 GPa contra 14,60 da
+        # madura — 43% menos rigidez. Não é discordância entre fontes: é outra
+        # madeira, da mesma espécie, com outra idade.
+        #
+        # ESTIMATIVA DECLARADA, e ela NÃO é medida: a razão MOR/MOE da madura é
+        # 8,34 MPa por GPa; aplicada ao módulo do plantio dá cerca de 70 MPa. Com
+        # isso a acácia de plantio dá 0,53 a 32 mm — REPROVA contra o eucalipto — e
+        # 0,73 a 36 mm.
+        #
+        # ENTÃO A RESPOSTA DEPENDE DE QUAL ACÁCIA SE COMPRA, e a que existe em
+        # escala no Rio Grande do Sul é a de sete anos, a pior das duas.
+        #
+        # O QUE A BUSCA ENTREGOU DE MELHOR NÃO FOI O MOR: foi a DUREZA JANKA, 7.590
+        # N. Ela é maior que a do eucalipto grandis e quase o triplo da do pinus, e
+        # dureza era exatamente a propriedade que este estudo não tinha para
+        # ninguém e que derrubava o pinus. Nisso a acácia é a melhor madeira da
+        # lista, e isso vale mesmo com a incerteza do MOR.
+        "maduraCompilada": {
+            "resistencia_pa": 121.8e6,
+            "modulo_pa": 14.60e9,
+            "densidade_kg_m3": 730.0,
+            "durezaJanka_n": 7590.0,
+            "fonte": ("The Wood Database, verbete Black Wattle. COMPILAÇÃO "
+                      "comercial, não fonte primária: ela agrega ensaios de "
+                      "terceiros sem dizer a idade nem a procedência da amostra."),
+            "margemA32mm": 0.91,
+        },
+        "estimativaDePlantio": {
+            "resistencia_pa": 70.0e6,
+            "comoFoiObtida": ("razão MOR/MOE de 8,34 MPa por GPa da árvore madura, "
+                              "aplicada ao módulo medido do plantio de sete anos"),
+            "natureza": "ESTIMATIVA, não medida; não use para decidir compra",
+            "margemA32mm": 0.53,
+            "margemA36mm": 0.73,
+        },
         "porQueInteressa": (
             "subproduto do tanino no Rio Grande do Sul, cadeia madura, corte aos "
             "sete anos; a árvore já é derrubada pela casca"),
@@ -1029,10 +1073,11 @@ CANDIDATOS_INCOMPLETOS = {
             "Revista Ciência da Madeira 7(2):61-69, 2016 (UFPel), acácia-negra aos "
             "quatro e sete anos, Piratini-RS. Resumo lido; PDF completo atrás de "
             "bloqueio de servidor nesta sessão."),
-        "falta": ("modulo de ruptura na flexão",),
+        "falta": ("módulo de ruptura MEDIDO no plantio brasileiro de sete anos",),
         "oQueJaDaParaDizer": (
-            "a rigidez por quilo dá 12,7 milhões contra um piso de 5,5 milhões: "
-            "ela passa folgada na rigidez, e a decisão inteira está no MOR"),
+            "a dureza Janka de 7.590 N é a melhor da lista e é dado real; o MOR do "
+            "plantio brasileiro continua sendo estimativa, e é ele que decide entre "
+            "32 e 36 mm"),
     },
     "estipe-de-palmeira": {
         "especie": "pupunha (Bactris gasipaes), açaí e afins",
