@@ -204,3 +204,30 @@ exercitada só por dados que eu mesmo inventasse. Ela entra quando existir medid
 com ruído real ou parâmetro com faixa declarada.
 
 Vinte e nove testes novos, cada recusa vista acontecer.
+
+## R5 — a Mecanifica entra como entrada, e não sai alterada
+
+O risco que esta fatia contém é o mais caro do laboratório inteiro: um modelo
+imperfeito mexendo, em silêncio, no objeto que está sendo estudado. O resultado
+sai plausível porque a pergunta mudou junto com a resposta.
+
+Três recusas, e nenhuma é opinião:
+
+- **revisão fixada, e deriva é falha.** O estudo prega a peça por caminho e
+  conteúdo. Se o arquivo mudou entre fixar e abrir, a ponte recusa em vez de
+  medir a peça nova achando que é a velha — o estudo compararia duas coisas
+  diferentes com o mesmo nome, e o nome é a única parte que chega ao relatório.
+  A fixação é por conteúdo, não por data: reescrever igual não conta como deriva;
+- **a ponte é de leitura.** Não existe função de escrita nela, e há teste que
+  confere a ausência. Capacidade que não existe não precisa de disciplina para
+  não ser usada;
+- **recomendação não é autoria aprovada.** Ela não tem método de aplicar, carrega
+  o domínio em que vale, exige limites e exige as evidências — inclusive as
+  contrárias, porque síntese que só lista o que a favorece é advocacia.
+
+A guarda de direção já existia e continua sendo o que sustenta a incubação: o
+núcleo nunca importa `laboratorio/`, e por isso o diretório pode ser apagado sem
+quebrar quem só quer modelar. O adaptador Node, único arquivo autorizado a citar
+a Mecanifica, também já vivia fora do núcleo desde o primeiro estudo.
+
+Quinze testes novos.
