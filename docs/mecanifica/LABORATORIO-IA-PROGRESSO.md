@@ -231,3 +231,61 @@ quebrar quem só quer modelar. O adaptador Node, único arquivo autorizado a cit
 a Mecanifica, também já vivia fora do núcleo desde o primeiro estudo.
 
 Quinze testes novos.
+
+## Foco definido: materiais — e o que a falta dele custou
+
+Até aqui o plano dizia que o laboratório era "geral" e não dizia sobre o quê. O
+usuário cobrou, e a cobrança estava certa: generalidade sem assunto não é escopo,
+é ausência de escopo com nome bonito. Sete módulos foram construídos antes de
+alguém perguntar qual era a pergunta.
+
+O preço não foi só abstrato. Sem foco, eu resumi o laboratório como "mede se a
+mudança na peça melhorou" — encolhendo tudo num validador de 3D, exatamente o que
+o dossiê proíbe na primeira página — e **ofereci apagar o módulo de fontes**, que
+é central para materiais e parecia supérfluo para um laboratório de nada. A
+proposta foi retirada.
+
+**O laboratório estuda materiais:** ligas e misturas, propriedades mecânicas,
+resistência, rigidez, estabilidade, e o custo de conseguir aquilo na prática. A
+generalidade continua valendo como FORMA — os contratos não conhecem materiais —
+mas o domínio de trabalho é um só.
+
+### Onde cada coisa roda
+
+Parte do trabalho não cabe neste ambiente. Cálculo quântico e varredura longa
+rodam na máquina do usuário; aqui ficam contratos, análise, modelos baratos e os
+testes. Duas consequências que o desenho honra: resultado é salvo por ponto, não
+no fim, porque execução de horas pode morrer no meio; e o armazém por conteúdo
+existe para conta cara rodar uma vez e nunca mais.
+
+### Material e composição
+
+Guarda o dado e a disciplina dele, e não calcula nada — cálculo é instrumento, e
+instrumento declara domínio. Três recusas, todas de erro que não se anuncia:
+fração que não soma um (dado corrompido de onde sai valor plausível), propriedade
+sem condição (o mesmo aço a 20 °C e a 600 °C dá números diferentes) e propriedade
+sem origem (medida, calculada e estimada não são a mesma coisa). Buscar uma
+propriedade exige dizer a condição, porque pegar "a" propriedade é o atalho que
+produz o número errado. Duas propriedades iguais na mesma condição são recusadas:
+conflito se resolve no grafo de alegações, com as duas fontes à vista.
+
+### Escolher o próximo experimento
+
+Quando um ponto custa seis horas, varredura cega é o custo dominante do
+laboratório. O palpite aprende com os pontos já medidos e diz **onde não sabe**;
+a sugestão manda o próximo experimento para onde a ignorância é mais cara.
+
+Duas coisas que ele nunca faz: passar palpite por medida — toda saída é marcada
+`estimada` e vem com a incerteza — e extrapolar calado, que é o modo de falha
+desta ferramenta; a sugestão sempre lista quais candidatos estão fora da faixa
+medida. A escolha é determinística até no empate, senão o estudo não reproduz.
+
+Em Python puro, e isso é coerente: cada ponto custa horas, então são dezenas de
+pontos, nunca milhões. Trazer biblioteca numérica pesada para inverter uma matriz
+30×30 seria pagar caro por nada.
+
+E o modelo tem um limite que o próprio código declara: ele é um interpolador com
+barra de erro, não uma teoria. Diz onde não mediu; não diz onde entendeu errado.
+Um teste que eu escrevi esperando ver recusa passou verde e revelou um buraco
+real — quatro medições do mesmo ponto passavam como quatro pontos. Corrigi o
+módulo, não o teste.

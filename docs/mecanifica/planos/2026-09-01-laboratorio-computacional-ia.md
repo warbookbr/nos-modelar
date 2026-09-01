@@ -30,16 +30,50 @@ fronteira testada expõe o custo real desde o começo.
 O preço é que a fronteira precisa ser levada a sério. Se `arquitetura:lab:check`
 ficar vermelho, o laboratório sai — não se afrouxa a guarda.
 
-## Escopo
+## Foco
 
-O laboratório é **geral**: formula estudos, pesquisa evidências, planeja e
-executa experimentos, valida modelos e quantifica incerteza. A Mecanifica é um
-instrumento **opcional** dele. Uma IA que só quer modelar continua usando a
-Mecanifica sem saber que o laboratório existe.
+**O laboratório estuda materiais.** Criação de ligas e misturas, propriedades
+mecânicas, resistência, rigidez, estabilidade, e o custo de conseguir aquilo na
+prática.
 
-Fora de escopo, e escrito para não voltar por analogia: o laboratório não vira
-dependência do núcleo, não edita peça, não promove recomendação a autoria, e não
-executa código arbitrário.
+Isto está escrito porque a versão anterior deste plano dizia apenas "o
+laboratório é geral", e generalidade sem assunto não é escopo — é ausência de
+escopo com nome bonito. Sete módulos de infraestrutura foram construídos antes
+de alguém cobrar qual era a pergunta. A maquinaria serviu; a falta de foco quase
+levou a apagar o módulo de fontes, que é central para materiais e parecia
+supérfluo para um laboratório de nada.
+
+Generalidade continua valendo como FORMA, não como assunto: os contratos, a
+proveniência e a validação não conhecem materiais, e é por isso que outro
+domínio caberia depois. Mas o domínio de trabalho é um só, e é este.
+
+A Mecanifica é instrumento **opcional**: geometria entra quando o estudo precisa
+de forma, e muitos estudos são só número e algoritmo.
+
+## Onde cada coisa roda
+
+Parte do trabalho não cabe neste ambiente, e fingir que cabe seria planejar
+contra a realidade:
+
+- **aqui (efêmero, CPU, sem garantia de rede):** contratos, planejamento,
+  análise, modelos baratos, dinâmica molecular pequena, e os testes;
+- **na máquina do usuário:** cálculo quântico, varredura longa, qualquer coisa
+  medida em horas.
+
+Consequências que o desenho tem de honrar: resultado é salvo **por ponto**, nunca
+só no fim, porque execução longa pode morrer no meio; e o armazém por conteúdo
+existe para que conta cara rode **uma vez** e nunca mais. Os gates automáticos
+rodam apenas casos minúsculos, o suficiente para provar que o instrumento
+funciona — nunca a conta real.
+
+## Limite honesto
+
+O laboratório não substitui ensaio físico e não prevê liga nova do zero. O que
+ele faz: calcular por modelos estabelecidos dentro da faixa em que valem,
+comparar candidatas com o trade-off explícito, achar quais variáveis realmente
+importam, e reunir valor publicado com condição e contradição preservadas. A
+ponte entre o átomo e a peça é o problema difícil da ciência de materiais, não
+uma peça de código que falta.
 
 ## Fatias
 
@@ -109,9 +143,9 @@ descobertas como surpresa:
 - **Python é linguagem nova neste repositório.** Dobra a superfície de CI e de
   manutenção. A aposta está declarada no dossiê (seção 13) e o custo aparece
   quando R1 trouxer a primeira dependência de verdade.
-- **O CI do repositório não aloca runner desde 2026-08-26.** Enquanto isso durar,
-  nenhum gate deste plano é verificado automaticamente — só localmente. Isso não
-  é passivo do laboratório, mas ele herda o risco.
+- **A falta de foco custou caro e pode voltar.** Este plano passou de 2026-09-01
+  sem dizer o que se estuda, e o preço foi maquinaria construída sem pergunta.
+  A seção "Foco" existe para que a próxima frente seja cobrada contra ela.
 
 ## Arquivos reservados
 
