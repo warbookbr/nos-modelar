@@ -48,7 +48,7 @@ só abre com a anterior verde.
 | fatia | entrega verificável | estado |
 | --- | --- | --- |
 | R0 | esqueleto isolado, guarda de dependência, contratos e hashing canônico | **entregue**: identidade canônica, cinco contratos mínimos e o primeiro estudo real |
-| R1 | artefatos, proveniência e RO-Crate mínimo | não iniciada |
+| R1 | artefatos, proveniência e reprodução | **parcial**: armazém, proveniência e verificação de reprodução entregues; RO-Crate adiado |
 | R2 | registro de instrumentos, DAG validado e runner confinado | não iniciada |
 | R3 | pesquisa, fontes e grafo de alegações | não iniciada |
 | R4 | unidades, V&V, incerteza e sensibilidade | não iniciada |
@@ -123,6 +123,35 @@ DAG, proveniência ou RO-Crate.
 O que ainda não se pagou é a maquinaria pesada das fatias R1 a R7. Ela continua
 justificada pelo dossiê, não por evidência deste estudo — e essa distinção fica
 escrita para a próxima rodada cobrar.
+
+## R1 — o que entrou, e o que ficou de fora com motivo
+
+O buraco veio do R0, por uso: a síntese concluiu sobre a torção da cabeça do
+machado **sem dizer qual cabeça**, e a receita mudou no meio do estudo. Quem
+lesse a conclusão depois não teria como saber que objeto foi medido.
+
+Entrou o que fecha isso:
+
+- **armazém por conteúdo** — o id do artefato é o hash dele. Guardar o mesmo
+  conteúdo duas vezes é no-op; conteúdo trocado por baixo é recusado na leitura,
+  porque o nome prometia um hash que o conteúdo não tem;
+- **proveniência** — commit, árvore limpa ou suja, e hash dos BYTES de cada
+  entrada. Ela **recusa** chamar de reproduzível o que não é: sem commit, com
+  árvore suja ou sem entrada identificada, ela diz não e diz por quê;
+- **verificação de reprodução**, em três níveis separados de propósito. Entrada
+  diferente é `nao-comparavel` — o caso mais perigoso é justamente aquele em que
+  os números batem e não significam nada. Medida diferente com a mesma entrada é
+  achado, não ruído. Conclusão diferente é o único nível que invalida a síntese.
+
+**RO-Crate ficou de fora, e isso é decisão.** Ele é formato de EXPORTAÇÃO e não
+existe consumidor: ninguém, dentro nem fora, pede um pacote nesse formato hoje.
+Construí-lo agora seria adivinhar o que um leitor futuro quer — o mesmo erro que
+esta fatia acabou de evitar ao deixar os contratos nascerem do estudo. Entra
+quando houver quem leia.
+
+Prova de ponta a ponta: duas execuções do instrumento, guardadas por conteúdo,
+avaliadas e comparadas — veredito `reproduzido`. E a proveniência da rodada saiu
+**não confiável**, corretamente, porque a árvore estava suja na hora.
 
 ## Condição de parada
 

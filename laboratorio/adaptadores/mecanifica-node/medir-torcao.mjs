@@ -12,12 +12,23 @@
  * Instrumento que decide se a própria saída prova a hipótese é instrumento que
  * se aprova sozinho.
  */
-import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '../../..');
-export const VERSAO = '1.0.0';
+export const VERSAO = '1.1.0';
+
+const RECEITA = join(REPO, 'prototipos/procedural/v3/armas/machado-de-guerra.js');
+
+/* A medida sozinha não diz de QUE peça ela é. A receita mudou no meio do
+   primeiro estudo — os índices de face do olho deixaram de ser literais — e a
+   conclusão publicada apontava para um objeto ambíguo. O hash dos BYTES do
+   arquivo resolve isso sem depender de ninguém lembrar. */
+export function hashDe(caminho) {
+  return `sha256:${createHash('sha256').update(readFileSync(caminho)).digest('hex')}`;
+}
 
 const { executarReceita } = await import(pathToFileURL(join(REPO, 'src/autoria/executar-receita.js')).href);
 const { prepararParaMicropoligono } = await import(
@@ -120,6 +131,10 @@ if (executadoComoCLI) {
     instrumento: 'mecanifica.inflate-torcao',
     versao: VERSAO,
     peca: 'machado-de-guerra',
+    entradas: {
+      receita: hashDe(RECEITA),
+      instrumento: hashDe(fileURLToPath(import.meta.url)),
+    },
     dominio: {
       ladosTestados: [10, 14, 18, 22, 26],
       ladosViaveis,
