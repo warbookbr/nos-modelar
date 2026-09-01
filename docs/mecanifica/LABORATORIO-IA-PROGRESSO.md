@@ -289,3 +289,42 @@ barra de erro, não uma teoria. Diz onde não mediu; não diz onde entendeu erra
 Um teste que eu escrevi esperando ver recusa passou verde e revelou um buraco
 real — quatro medições do mesmo ponto passavam como quatro pontos. Corrigi o
 módulo, não o teste.
+
+### Decidir com trade-off, em vez de eleger campeã
+
+O caso normal em materiais: a liga mais resistente é mais frágil, ou mais cara,
+ou depende de elemento que ninguém compra. Eleger uma exige dizer quanto vale
+cada coisa — e isso é julgamento de quem decide, não resultado do experimento.
+
+O que sai dos dados sozinho é a **fronteira**: as candidatas que ninguém supera
+em tudo, e, para cada uma, o que se perde ao escolhê-la. Ranking só sai com os
+pesos declarados e justificados, e a saída diz que **foi o peso que decidiu**.
+Um ranking multicritério que esconde os pesos é preferência de quem escreveu o
+código vestida de resultado objetivo.
+
+Duas recusas que valem citar: candidata sem um dos critérios é recusada, porque
+ausência de dado não é valor neutro e trataria desconhecido como zero; e o mesmo
+critério em unidades diferentes é recusado — é o erro de unidade decidindo compra
+de material. Custo e disponibilidade entram como critério, não como detalhe.
+
+### Extrair a relação, não devolver tabela
+
+"Medi 40 pontos, aqui estão" é dado. "A resistência cresce com o inverso da raiz
+do tamanho de grão" é conhecimento: vale fora dos pontos, dá para conferir contra
+teoria, e cabe numa frase.
+
+O módulo testa um catálogo pequeno de formas que já significam algo em materiais
+— reta, potência, exponencial, inverso da raiz (Hall-Petch) e logarítmica — em
+vez de buscar fórmula livremente. A razão é dura: com poucos pontos caros, busca
+livre acha sempre alguma coisa, e quanto mais liberdade, mais fácil ajustar ruído
+e chamar isso de lei. Forma sem significado declarado não entra no catálogo.
+
+Três cuidados que mudam o resultado: forma que não se aplica é **marcada**, não
+sumida — virar `nan` e desaparecer faria a vencedora parecer melhor do que é; a
+ordenação usa erro no espaço original, não R², porque R² de transformações
+diferentes não é comparável entre si, e comparar é o erro clássico desta conta; e
+empate técnico fica visível, porque escolher por casas decimais entre duas formas
+quase iguais é decisão falsa.
+
+Todo resultado sai com o aviso: coincidir com uma forma não explica por quê —
+duas causas diferentes produzem a mesma curva o tempo todo.
