@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-759 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+760 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -605,6 +605,10 @@
 - `motor.js` — Motor WebGL autocontido do experimento. Sem dependências, imports ou assets.
 - `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
 - `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.
+
+## laboratorio/adaptadores/mecanifica-node/
+
+- `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
 
 ## modulos/exportador-cad/src/
 

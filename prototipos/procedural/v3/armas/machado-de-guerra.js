@@ -101,11 +101,19 @@ const planta = [
 /* ESTAÇÕES. A segunda (0,150 → 0,500) é a longa: é ela que vira a face onde o
    furo do olho cabe. As demais são curtas e ficam onde o contorno muda. */
 const estacoes = [0, C.olhoDe, C.olhoAte, 0.58, 0.72, 0.80, 0.86, 0.95, 0.985, 1];
-/* O olho fica na estação de índice 1, e o topo da seção é o lado 14/4 = 3,5 →
-   a FACE 3 é a centrada no topo (entre os vértices 3 e 4); a de baixo é a 10. */
+/* O olho fica na estação de índice 1. Os lados de entrada e saída são
+   DERIVADOS de `lados`, não escritos à mão: a seção começa com um vértice em 0°
+   e o topo está a 90°, então a face centrada no topo é a de índice
+   `floor(lados/4)` e a de baixo é `floor(3*lados/4)`.
+
+   Escrever 3 e 10 direto — como esta receita fazia — amarra o olho a
+   `lados: 14`. O primeiro estudo do laboratório varreu `lados` e 21 das 25
+   execuções gritaram, porque o índice apontava para uma face que não existia
+   naquela contagem. O furo saía do lugar ou não saía, em silêncio, e quem
+   mexesse em `lados` no futuro herdaria isso. */
 const ESTACAO_OLHO = 1;
-const LADO_TOPO = 3;
-const LADO_FUNDO = 10;
+const LADO_TOPO = Math.floor(C.lados / 4);
+const LADO_FUNDO = Math.floor((3 * C.lados) / 4);
 
 export const receitaMachadoDeGuerra = {
   meta: { nome: 'Machado de Guerra', versao: '3.0.0', autor: 'Mecanifica Procedural AI' },
