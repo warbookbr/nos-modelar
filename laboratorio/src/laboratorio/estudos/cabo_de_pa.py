@@ -63,6 +63,28 @@ FONTE = "valor de manual de memória; NÃO conferido contra fonte primária"
 #: aproximadamente o valor da madeira VERDE. Cabo de pá é madeira SECA, e a 12% de
 #: umidade o jarrah dá 111,7 MPa e o karri 139 MPa. Eu havia SUBESTIMADO o
 #: concorrente em cerca de 50%, o que tornava o candidato melhor do que ele é.
+#: A SEGUNDA FONTE PRIMÁRIA, e ela derruba a primeira como referência do problema.
+#:
+#: O eucalipto do Wood Handbook é jarrah e karri: espécies AUSTRALIANAS. O Brasil
+#: não planta isso. Aqui se planta grandis, saligna, urophylla e o híbrido
+#: urograndis, que é de longe o mais plantado. Ou seja: o estudo passou o tempo
+#: todo tentando bater uma árvore que não é a que está no cabo da pá.
+#:
+#: O ERRO NÃO FOI DE CÁLCULO, foi de pergunta. Eu peguei a fonte primária que
+#: existia em vez da fonte primária que respondia — e fonte boa sobre a coisa
+#: errada é pior que fonte fraca sobre a coisa certa, porque ela vem com
+#: autoridade.
+#:
+#: Quem apontou foi uma crítica externa, listando as espécies brasileiras. Ela não
+#: trazia dado conferível, mas trazia a pergunta certa.
+FONTE_MADEIRA_BR = (
+    "GONÇALVES, F. G.; OLIVEIRA, J. T. S.; et al. Estudo de algumas propriedades "
+    "mecânicas da madeira de um híbrido clonal de Eucalyptus urophylla x "
+    "Eucalyptus grandis. Revista Árvore, Viçosa-MG, v. 33, n. 3, p. 501-509, 2009. "
+    "Acesso aberto, PDF lido diretamente nesta sessão; Tabela 3, madeira seca "
+    "corrigida para 12% de umidade."
+)
+
 FONTE_MADEIRA = (
     "Wood Handbook — Wood as an Engineering Material, FPL-GTR-190, "
     "USDA Forest Service, Forest Products Laboratory, 2010; Tabela 5-5a "
@@ -100,6 +122,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "sisal-mamona": 2,
             "pinus-elliottii": 3,
             "pinus-comercial": 3,
+            "eucalipto-urograndis": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -113,6 +136,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "sisal-mamona": 2,
             "pinus-elliottii": 3,
             "pinus-comercial": 3,
+            "eucalipto-urograndis": 3,
         },
     },
 }
@@ -132,6 +156,7 @@ CONFORMIDADE = {
     "sisal-mamona": 3,
     "pinus-elliottii": 3,
     "pinus-comercial": 3,
+    "eucalipto-urograndis": 3,
 }
 
 MATERIAIS = {
@@ -635,6 +660,45 @@ MATERIAIS = {
         },
         "dispersao": {"modulo_pa": (7.0e9, 10.0e9), "resistencia_pa": (60.0e6, 80.0e6)},
     },
+    # O EUCALIPTO QUE O BRASIL REALMENTE PLANTA, e portanto o concorrente de
+    # verdade. Híbrido clonal urophylla x grandis, medido, com fonte aberta lida
+    # nesta sessão. Ver FONTE_MADEIRA_BR.
+    #
+    # OS NÚMEROS, da Tabela 3, madeira seca corrigida para 12%, seis medições em
+    # três extratos e duas toras: MOR de 82,95 a 103,2 MPa, média 92,0. MOE de
+    # 9,65 a 12,78 GPa, média 11,1.
+    #
+    # A CONVERSÃO DE DENSIDADE, declarada porque é premissa e não medida: o artigo
+    # dá densidade BÁSICA (massa seca sobre volume verde), média 0,502 g/cm³. Ela
+    # NÃO é a densidade a 12% de umidade, que é a condição do cabo. O fator usual
+    # é de 1,20 a 1,25; aqui entra 1,22, o que dá cerca de 612 kg/m³. Usar a
+    # básica direto subestimaria a massa do cabo em uns 20%.
+    #
+    # E O QUE ISSO FAZ COM O ESTUDO INTEIRO: a margem do concorrente cai de 0,89
+    # para 0,69. Todo candidato deste estudo foi julgado contra uma barra 22% alta
+    # demais, e vários que "não empatavam" empatam contra a árvore certa.
+    #
+    # A COMPENSAÇÃO, e ela é interessante: o urograndis é mais fraco E bem mais
+    # leve. Por quilo ele dá 150.300 contra 139.625 do jarrah. Como madeira ele é
+    # melhor do que o número absoluto sugere; como cabo de 32 mm ele é pior,
+    # porque a 32 mm quem manda é o valor absoluto.
+    "eucalipto-urograndis": {
+        "modulo_pa": 11.1e9,
+        "densidade_kg_m3": 612.0,
+        "resistencia_pa": 92.0e6,
+        "fator_de_perda": 0.010,
+        "fonte": "Revista Árvore 33(3):501-509, 2009 — lido diretamente",
+        "preco_por_kg": 3.0,
+        "irritacao": 3,
+        "ambiente": 3,
+        "justificativaQualitativa": "madeira de reflorestamento, a mais plantada do país",
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": (
+            "absorve água e apodrece se não tratada; seca com dificuldade — colapso e "
+            "rachadura interna são o motivo do tempo de estufa que o usuário relatou"),
+        "dispersao": {"modulo_pa": (9.652e9, 12.781e9), "resistencia_pa": (82.95e6, 103.2e6)},
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -678,6 +742,7 @@ GEOMETRIAS = {
     "sisal-mamona": ("tubular", 0.032, 0.0045),
     "pinus-elliottii": ("macica", 0.032, None),
     "pinus-comercial": ("macica", 0.044, None),
+    "eucalipto-urograndis": ("macica", 0.032, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
@@ -792,6 +857,15 @@ CORPOS_DE_PROVA = {
         "modulo_de_weibull": 8.0,
         "origem": "segmento de colmo em flexão; volume ESTIMADO",
     },
+    # O corpo de prova do artigo brasileiro é MENOR que o do FPL: 2 x 2 x 30 cm
+    # contra 2,5 x 2,5 x 41 cm. Corpo menor tem menos defeito, então o desconto de
+    # tamanho para a peça real é MAIOR. A diferença de corpo de prova entre duas
+    # fontes não é detalhe de método: ela muda o número final.
+    "madeira-br": {
+        "volume_m3": 0.020 * 0.020 * 0.300,
+        "modulo_de_weibull": 12.0,
+        "origem": "corpo de 2 x 2 x 30 cm, Revista Árvore 33(3), 2009; medida real",
+    },
     "madeira-estrutural": {
         "volume_m3": 0.025 * 0.025 * 0.410,
         "modulo_de_weibull": 5.0,
@@ -824,6 +898,7 @@ FAMILIA_DE_ENSAIO = {
     "pinus-elliottii": "madeira",
     # Comercial tem nó, e nó espalha muito mais a resistência que madeira limpa.
     "pinus-comercial": "madeira-estrutural",
+    "eucalipto-urograndis": "madeira-br",
     "bambu-colmo": "bambu",
     "bambu-laminado": "bambu",
     "papel-fenolico": "composito",

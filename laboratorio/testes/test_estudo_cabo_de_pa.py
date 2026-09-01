@@ -190,7 +190,10 @@ def test_o_eucalipto_e_o_UNICO_com_fonte_primaria():
     # sessão. Ter fonte e ter fonte conferida são coisas diferentes, e o teste
     # guarda a diferença em vez de deixar as duas se parecerem.
     citam_fonte = {n for n, m in estudo.MATERIAIS.items() if "fonte" in m}
-    assert citam_fonte == {"eucalipto", "pinus-elliottii"}
+    assert citam_fonte == {"eucalipto", "pinus-elliottii", "eucalipto-urograndis"}
+    # E a fonte que RESPONDE a pergunta é a brasileira: a australiana descreve
+    # uma árvore que não é a que está no cabo da pá.
+    assert "Revista Árvore" in estudo.MATERIAIS["eucalipto-urograndis"]["fonte"]
     assert "NÃO reconferida" in estudo.MATERIAIS["pinus-elliottii"]["fonte"]
 
 
@@ -769,3 +772,55 @@ def test_o_tratamento_de_POSTE_nao_se_aplica_a_cabo_de_mao():
     enterrada e brigaria com a exigência de não-toxicidade do usuário."""
     j = estudo.MATERIAIS["pinus-comercial"]["justificativaQualitativa"]
     assert "poste enterrado" in j and "atóxico" in j
+
+
+def test_o_CONCORRENTE_era_a_ARVORE_ERRADA_o_estudo_inteiro():
+    """O achado mais caro deste estudo, e ele não foi de cálculo: foi de pergunta.
+
+    O eucalipto do Wood Handbook é jarrah e karri, espécies AUSTRALIANAS. O Brasil
+    planta grandis, saligna, urophylla e o híbrido urograndis. Eu peguei a fonte
+    primária que EXISTIA em vez da que RESPONDIA — e fonte boa sobre a coisa errada
+    é pior que fonte fraca sobre a coisa certa, porque vem com autoridade.
+
+    Quem apontou foi uma crítica externa sem dado conferível, mas com a pergunta
+    certa.
+    """
+    br = estudo.MATERIAIS["eucalipto-urograndis"]
+    au = estudo.MATERIAIS["eucalipto"]
+    assert br["resistencia_pa"] < au["resistencia_pa"], "a árvore daqui é mais fraca"
+    assert br["densidade_kg_m3"] < au["densidade_kg_m3"], "e bem mais leve"
+    assert "Revista Árvore" in br["fonte"]
+
+
+def test_a_BARRA_do_estudo_estava_22_por_cento_ALTA_DEMAIS():
+    """Consequência direta: todo candidato foi julgado contra um concorrente que
+    não é o que está no cabo da pá."""
+    br = estudo.medir("eucalipto-urograndis")["margemP05"]
+    au = estudo.medir("eucalipto")["margemP05"]
+    assert br < au
+    assert 0.65 < br / au < 0.75, "a barra caiu cerca de um quarto"
+
+
+def test_o_BAMBU_supera_o_eucalipto_BRASILEIRO_ja_a_32_mm():
+    """Contra a árvore certa o bambu ganha sem precisar engrossar nem selecionar."""
+    assert (estudo.medir("bambu-colmo")["margemP05"]
+            > estudo.medir("eucalipto-urograndis")["margemP05"])
+
+
+def test_a_densidade_BASICA_nao_e_a_densidade_a_12_por_cento():
+    """Premissa declarada, e não medida. O artigo dá densidade básica (massa seca
+    sobre volume verde), média 0,502 g/cm³. Usá-la direto subestimaria a massa do
+    cabo em cerca de 20%."""
+    br = estudo.MATERIAIS["eucalipto-urograndis"]
+    assert br["densidade_kg_m3"] > 502 * 1.15
+    assert br["densidade_kg_m3"] < 502 * 1.30
+
+
+def test_corpos_de_prova_de_FONTES_DIFERENTES_dao_descontos_DIFERENTES():
+    """O corpo brasileiro é 2 x 2 x 30 cm e o do FPL é 2,5 x 2,5 x 41 cm. Corpo
+    menor tem menos defeito, e o desconto para a peça real fica MAIOR. Diferença de
+    corpo de prova entre fontes não é detalhe de método: muda o número final."""
+    br = estudo.medir("eucalipto-urograndis")["efeitoDeEscala"]
+    au = estudo.medir("eucalipto")["efeitoDeEscala"]
+    assert br["familia"] == "madeira-br" and au["familia"] == "madeira"
+    assert br["fator"] < au["fator"]
