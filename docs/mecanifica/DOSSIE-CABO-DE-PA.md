@@ -160,7 +160,112 @@ Tanto na lignina quanto no bambu o gargalo é o mesmo e não é o material:
 **matéria-prima abundante, cadeia imatura**. Comprar bambu é fácil; comprar bambu
 com garantia de lote não é. A vantagem real do eucalipto neste estudo não é
 propriedade mecânica — é ter cadeia industrial pronta para cabo acabado.
-## 8. Entradas, e de onde cada número veio
+## 8. Fixação, sol e resina
+
+*Análise, não estudo: nada aqui foi medido.*
+
+### Parafuso — o bambu não aceita a mesma fixação do eucalipto
+
+Eucalipto é maciço e o parafuso morde material inteiro; o colmo é oco com 3 mm de parede, e bambu racha ao longo da fibra com facilidade que a madeira não tem. parafuso auto-atarraxante cunha as fibras e inicia trinca longitudinal — é por isso que construção com bambu tradicionalmente evita prego e parafuso.
+
+É o mesmo modo de falha que já obrigou a parede mínima de 3 mm, agora aparecendo na
+junta — que é onde ferramenta costuma falhar de verdade.
+
+**Soluções conhecidas, todas baratas e todas obrigatórias como conjunto:**
+
+- bucha interna na ponta: tarugo de madeira ou plug ocupando os últimos 10 a 15 cm, para o parafuso morder sólido e a parede não amassar
+- parafuso passante com arruela em vez de auto-atarraxante, que distribui em vez de cunhar
+- anel ou virola metálica por fora da junta, impedindo a trinca de abrir
+- posicionar a junta perto de um NÓ, que é o diafragma natural do bambu e onde ele resiste a rachar
+
+**Custo:** barato, mas obrigatório: é detalhe de projeto, não opcional.
+
+### Sol e tempo — empate
+
+Uv degrada lignina na superfície dos dois: acinzenta, abre microfissura e abre caminho para a água. o bambu tem vantagem inicial pela epiderme cerosa e rica em sílica, mas quando ela se vai o comportamento se iguala.
+
+Os dois pedem acabamento e reaplicação periódica; nenhum ganho e nenhuma perda na comparação.
+
+### Resina — não precisa, mas pode
+
+**Não usar resina é porque não precisa ou porque não pode?**
+
+Não precisa estruturalmente: o colmo já é um compósito de fibra contínua unida por lignina natural, e chega aos 170 mpa sem impregnação, prensagem nem cura. dispensar resina é economia de processo, não sacrifício.
+
+**Onde ela ajuda:**
+
+- selagem superficial contra umidade, que reduz — mas NÃO elimina — a rachadura: bambu também racha por gradiente interno e por tensão de crescimento, não só pela superfície
+- bucha ou adesivo na ponta, para a fixação descrita acima
+
+**Onde ela não pode:**
+
+- fenólica e ureia-formol, pela emissão de formaldeído — a restrição do usuário é a essas, e não a resina em geral
+- epóxi merece ressalva que costuma faltar: o epóxi NÃO CURADO é sensibilizante de contato e causa dermatite ocupacional, então 'base água' não o torna automaticamente a opção limpa
+
+**Selantes realmente mansos:** óleo de linhaça, cera de carnaúba, goma-laca.
+## 9. Como se obtém a medida, na prática
+
+*Análise, não estudo: nada aqui foi medido.*
+
+### Diâmetro: não se usina, se seleciona
+
+- classificação por gabarito de anel passa-não-passa, com os colmos indo para caixas por faixa de diâmetro — é o padrão em construção com bambu
+- a parede também varia, e diminui em direção ao topo do colmo, então a seleção é por diâmetro E por espessura na altura de corte
+
+**O que não fazer:** tornear ou lixar a superfície externa para acertar o diâmetro: a resistência do bambu é GRADUADA, com as fibras mais densas na casca. Tirar 1 mm de fora custa muito mais que 1 mm de material.
+
+**Consequência de projeto:** o projeto tem de tolerar FAIXA e não medida: exigir 37 ± 0,5 mm descarta muito colmo, e aceitar 36 a 42 mm aproveita quase tudo. Quem se adapta é a virola e a bucha da ponta, não o colmo.
+
+**Custo não contabilizado:** o preço de R$ 0,54 é do MATERIAL, e não inclui o rendimento da seleção. Faixa estreita significa descarte, e descarte é custo.
+
+### Nós: incomodam, e resolve fácil
+
+- lixar SÓ o colar externo do nó — seguro, ao contrário de lixar o colmo inteiro, porque a força do nó está no diafragma interno e não na saliência
+- posicionar o corte para que os nós caiam onde a mão não corre
+- empunhadura de borracha, cortiça ou fita no trecho de trabalho, que resolve de vez e ainda melhora o atrito com luva
+
+E lembrando: estruturalmente o nó é onde o bambu resiste a rachar, e é por isso que a junta com a pá deve ficar perto de um.
+
+### Rigidez — a pergunta sobre vergar
+
+Tubo oco não é mole por ser oco: ele põe material longe do centro, que é onde o
+material trabalha em flexão.
+
+| cabo | flecha | rigidez |
+| --- | ---: | ---: |
+| eucalipto 32 mm maciço | 258 mm | — |
+| bambu-selecionado (37 × 3.0 mm) | 247 mm (-4%) | 1.05× |
+| bambu-sem-selecionar (43 × 3.0 mm) | 152 mm (-41%) | 1.70× |
+| igualitaria-40mm (40 × 6.6 mm) | 287 mm (+11%) | 0.90× |
+
+**No diâmetro recomendado o bambu é 5% mais rígido que o eucalipto maciço.** Mas a
+34 mm ele fica 21% menos rígido: o oco só funciona porque é 37 mm e não 32 — o que
+salva é o diâmetro, não o material.
+
+A rigidez entrou como critério tarde, quando o usuário perguntou, e já reprovou uma
+variante que passava em tudo: a lignina em 40 mm verga 11% mais que a madeira.
+### Preencher o colmo ajuda?
+
+Separa em duas coisas que parecem uma só.
+
+**Para rigidez, não serve.** É a mesma física que faz o tubo existir: o material do
+centro não trabalha em flexão.
+
+| preenchimento | massa a mais | ganho de rigidez |
+| --- | ---: | ---: |
+| espuma PU 40 kg/m³ | +13% | +0,13% |
+| espuma PU 100 kg/m³ | +34% | +0,39% |
+| cortiça 150 kg/m³ | +51% | +0,19% |
+| tarugo de madeira | +168% | +65% |
+
+**Alternativa melhor:** quem quer rigidez aumenta 3 mm no diâmetro; sai de graça em massa e custo.
+
+**Para amassamento, serve muito** — e é o modo de falha que importa. Tubo cheio não afunda a parede no encaixe da pá nem ao bater em pedra, e o preenchimento colado segura a trinca de abrir.
+
+**Onde encher:** só as pontas: 15 cm de cada lado com espuma pesam 23 g, 8% do cabo. É a bucha da ponta que já estava na recomendação, agora com número.
+
+**O que não fazer:** encher o cabo inteiro e selar: se entrar água num tubo fechado e cheio, ela não sai, e o bambu apodrece por dentro sem ninguém ver.
+## 10. Entradas, e de onde cada número veio
 
 **Leia antes de discutir qualquer resultado.** Um só material tem fonte primária.
 
@@ -192,7 +297,7 @@ estava errada. E a barra para os candidatos subiu 50%.
 
 O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato NÃO tem nenhuma: os números dele saíram de memória. O benchmark é sólido; o candidato é o que precisa ser medido.
 
-## 9. Limites
+## 11. Limites
 
 - A BARREIRA QUE NÃO SE TRANSPÕE AQUI: nada foi ensaiado fisicamente. Impacto real envolve taxa de deformação, e cabo real sofre fadiga por milhares de ciclos — nenhuma das duas coisas está nesta conta.
 - As propriedades dos demais materiais são valor de manual de memória; NÃO conferido contra fonte primária. Os fatores de perda são a entrada mais frágil: eles variam com frequência e com o método de medida, às vezes por um fator de dois.
@@ -213,7 +318,7 @@ O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato
   o bambu — material com séculos de uso em cabo de ferramenta — só entrou quando o
   usuário perguntou se havia algo melhor.
 
-## 10. O que precisa ser medido
+## 12. O que precisa ser medido
 
 Para o bambu, em ordem de valor:
 
@@ -224,7 +329,7 @@ Para o bambu, em ordem de valor:
 
 Para os laminados de papel, o primeiro item continua sendo resistência à flexão.
 
-## 11. Literatura
+## 13. Literatura
 
 70 publicações com DOI, de 10 buscas. **Estes artigos não
 foram lidos** — eles sustentam que as perguntas são reconhecidas e os campos são

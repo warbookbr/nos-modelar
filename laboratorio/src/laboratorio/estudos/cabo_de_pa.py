@@ -504,6 +504,24 @@ def medir(nome: str) -> dict[str, Any]:
 #: existiria, e seria decisão de quem projeta, não deste módulo.
 MARGEM_MINIMA_ELIMINATORIA = 1.0
 
+#: RIGIDEZ COMO CRITÉRIO, e ela entrou porque o usuário perguntou o que o estudo
+#: não sabia: um tubo oco não verga demais quando se levanta terra na ponta?
+#:
+#: O portão só olhava resistência. Cabo que não quebra mas balança demais é cabo
+#: ruim, e nada aqui media isso — foi lacuna do estudo, não do material.
+#:
+#: A resposta, medida: no diâmetro recomendado o bambu oco é 5% MAIS rígido que o
+#: eucalipto maciço, porque tubo põe material longe do centro, onde ele trabalha.
+#: Mas a 34 mm ele fica 26% mais mole. O oco só funciona porque é 37 mm e não 32 —
+#: a desconfiança do usuário estava certa, e o que salva é o diâmetro.
+FLECHA_MAXIMA_RELATIVA_AO_EUCALIPTO = 1.05
+
+
+def rigidez_relativa(secao: dict[str, Any], modulo_pa: float) -> float:
+    """Rigidez à flexão da seção, dividida pela do cabo de eucalipto de referência."""
+    referencia = MATERIAIS["eucalipto"]["modulo_pa"] * secao_macica(0.032)["inercia"]
+    return modulo_pa * secao["inercia"] / referencia
+
 
 def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
     """Mede todos e monta a fronteira de trocas, no contexto de fornecimento dado."""
@@ -668,6 +686,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "bambu-laminado": {"resistencia_pa": (102e6, 138e6), "modulo_pa": (10e9, 14e9)},
     }
     referencia = medir("eucalipto")
+    referencia_flecha = referencia["flecha_m"]
 
     saida = {}
     for nome, v in VARIANTES.items():
@@ -703,6 +722,10 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
             "massaRelativaAoEucalipto": massa / referencia["massa_kg"] - 1,
             "empataOuSupera": p["p05"] >= referencia["margemP05"],
             "cabeNaMao": v["diametro_m"] <= DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+            "rigidezRelativa": rigidez_relativa(secao, base["modulo_pa"]),
+            "flechaRelativa": r["flecha"]["valor"] / referencia_flecha,
+            "vergaMenosQueOEucalipto": r["flecha"]["valor"] <= (
+                referencia_flecha * FLECHA_MAXIMA_RELATIVA_AO_EUCALIPTO),
             "paredeSobreviveAoUso": v["parede_m"] >= PAREDE_MINIMA_PRATICA_M,
         }
     return {
@@ -713,6 +736,14 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "resistenciaMedida": medida,
         "variantes": saida,
         "limiteDeEmpunhadura_m": DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+        "flechaDeReferencia_m": referencia_flecha,
+        "porQueRigidezEntrou": (
+            "o portão só olhava resistência, e cabo que não quebra mas balança demais "
+            "é cabo ruim. A pergunta veio do usuário: tubo oco não verga demais? "
+            "Resposta medida: no diâmetro recomendado é 5% MAIS rígido que o maciço, "
+            "porque tubo põe material longe do centro — mas a 34 mm fica 26% mais mole, "
+            "então o que salva é o diâmetro e não o material"
+        ),
         "paredeMinima_m": PAREDE_MINIMA_PRATICA_M,
         "porQueOLimiteExiste": (
             "sem ele a otimização foi para 69 mm de parede fina: mais leve e mais "
@@ -818,6 +849,165 @@ AMBIENTE_E_FORNECIMENTO = {
         ),
         "marca": "ANÁLISE, NÃO ESTUDO: não medido, não verificado",
     },
+}
+
+
+#: FIXAÇÃO E INTEMPERISMO. Duas perguntas do usuário que este estudo não modelava,
+#: e a primeira delas muda o projeto — não a escolha do material, mas o desenho da
+#: ponta do cabo.
+#:
+#: NADA DAQUI SAIU DE CONTA: é análise, e vale o mesmo aviso das outras.
+FIXACAO_E_INTEMPERISMO = {
+    "parafuso": {
+        "veredito": "o bambu NÃO aceita a mesma fixação do eucalipto",
+        "porQue": (
+            "eucalipto é maciço e o parafuso morde material inteiro; o colmo é OCO "
+            "com 3 mm de parede, e bambu racha ao longo da fibra com facilidade que a "
+            "madeira não tem. Parafuso auto-atarraxante cunha as fibras e inicia trinca "
+            "longitudinal — é por isso que construção com bambu tradicionalmente evita "
+            "prego e parafuso"
+        ),
+        "eOModoDeFalhaQueJaTinhaSidoMarcado": (
+            "é o mesmo esmagamento de parede que motivou a PAREDE_MINIMA_PRATICA_M; "
+            "aqui ele aparece na junta, que é onde ferramenta costuma falhar de verdade"
+        ),
+        "solucoesConhecidas": (
+            "bucha interna na ponta: tarugo de madeira ou plug ocupando os últimos "
+            "10 a 15 cm, para o parafuso morder sólido e a parede não amassar",
+            "parafuso passante com arruela em vez de auto-atarraxante, que distribui "
+            "em vez de cunhar",
+            "anel ou virola metálica por fora da junta, impedindo a trinca de abrir",
+            "posicionar a junta perto de um NÓ, que é o diafragma natural do bambu e "
+            "onde ele resiste a rachar",
+        ),
+        "custoDisso": "barato, mas obrigatório: é detalhe de projeto, não opcional",
+    },
+    "sol_e_tempo": {
+        "veredito": "empate com o eucalipto",
+        "porQue": (
+            "UV degrada lignina na superfície dos dois: acinzenta, abre microfissura e "
+            "abre caminho para a água. O bambu tem vantagem inicial pela epiderme cerosa "
+            "e rica em sílica, mas quando ela se vai o comportamento se iguala"
+        ),
+        "consequencia": "os dois pedem acabamento e reaplicação periódica; nenhum ganho "
+                        "e nenhuma perda na comparação",
+    },
+    "resina": {
+        "pergunta": "não usar resina é porque não precisa ou porque não pode?",
+        "resposta": (
+            "não PRECISA estruturalmente: o colmo já é um compósito de fibra contínua "
+            "unida por lignina natural, e chega aos 170 MPa sem impregnação, prensagem "
+            "nem cura. Dispensar resina é economia de processo, não sacrifício"
+        ),
+        "ondeEla_AJUDA": (
+            "selagem superficial contra umidade, que reduz — mas NÃO elimina — a "
+            "rachadura: bambu também racha por gradiente interno e por tensão de "
+            "crescimento, não só pela superfície",
+            "bucha ou adesivo na ponta, para a fixação descrita acima",
+        ),
+        "ondeElaNAO_PODE": (
+            "fenólica e ureia-formol, pela emissão de formaldeído — a restrição do "
+            "usuário é a essas, e não a resina em geral",
+            "epóxi merece ressalva que costuma faltar: o epóxi NÃO CURADO é "
+            "sensibilizante de contato e causa dermatite ocupacional, então 'base água' "
+            "não o torna automaticamente a opção limpa",
+        ),
+        "selantesRealmenteMansos": (
+            "óleo de linhaça", "cera de carnaúba", "goma-laca",
+        ),
+        "marca": "ANÁLISE, NÃO ESTUDO: não medido, não verificado",
+    },
+}
+
+
+#: COMO SE OBTÉM A MEDIDA, e a resposta muda o jeito de comprar. Duas perguntas do
+#: usuário: bambu não dá para usinar, então como ficar dentro da tolerância? E os
+#: nós atrapalham a empunhadura?
+#:
+#: ANÁLISE, NÃO ESTUDO: nada aqui foi medido.
+GEOMETRIA_NA_PRATICA = {
+    "diametro": {
+        "veredito": "não se usina, se SELECIONA",
+        "como": (
+            "classificação por gabarito de anel passa-não-passa, com os colmos indo "
+            "para caixas por faixa de diâmetro — é o padrão em construção com bambu",
+            "a parede também varia, e diminui em direção ao topo do colmo, então a "
+            "seleção é por diâmetro E por espessura na altura de corte",
+        ),
+        "oQueNAOfazer": (
+            "tornear ou lixar a superfície externa para acertar o diâmetro: a "
+            "resistência do bambu é GRADUADA, com as fibras mais densas na casca. "
+            "Tirar 1 mm de fora custa muito mais que 1 mm de material"
+        ),
+        "consequenciaDeProjeto": (
+            "o projeto tem de tolerar FAIXA e não medida: exigir 37 ± 0,5 mm descarta "
+            "muito colmo, e aceitar 36 a 42 mm aproveita quase tudo. Quem se adapta é "
+            "a virola e a bucha da ponta, não o colmo"
+        ),
+        "custoNaoContabilizado": (
+            "o preço de R$ 0,54 é do MATERIAL, e não inclui o rendimento da seleção. "
+            "Faixa estreita significa descarte, e descarte é custo"
+        ),
+    },
+    "nos": {
+        "veredito": "incomodam sob a mão que desliza, e resolve fácil",
+        "solucoes": (
+            "lixar SÓ o colar externo do nó — seguro, ao contrário de lixar o colmo "
+            "inteiro, porque a força do nó está no diafragma interno e não na saliência",
+            "posicionar o corte para que os nós caiam onde a mão não corre",
+            "empunhadura de borracha, cortiça ou fita no trecho de trabalho, que "
+            "resolve de vez e ainda melhora o atrito com luva",
+        ),
+        "eOnoEBOM": (
+            "estruturalmente o nó é onde o bambu resiste a rachar, e é por isso que a "
+            "junta com a pá deve ficar perto de um"
+        ),
+    },
+    "marca": "ANÁLISE, NÃO ESTUDO: não medido, não verificado",
+}
+
+
+#: PREENCHER O COLMO: ajuda? A resposta separa duas coisas que parecem uma só.
+#:
+#: PARA RIGIDEZ, NÃO SERVE — e é a mesma física que faz o tubo existir. O material
+#: do centro não trabalha em flexão, porque a contribuição vai com a quarta
+#: potência da distância ao eixo. Espuma de poliuretano a 40 kg/m³ acrescenta 13%
+#: de massa e 0,13% de rigidez. Tarugo de madeira dá +65% de rigidez, mas custa
+#: +168% de massa: quem quer rigidez aumenta 3 mm no diâmetro, que sai de graça.
+#:
+#: PARA AMASSAMENTO, SERVE MUITO — e é o modo de falha real, o mesmo que motivou a
+#: parede mínima e o cuidado com o parafuso. Tubo cheio não afunda a parede no
+#: encaixe nem quando bate em pedra, e o preenchimento colado segura a trinca.
+#:
+#: E POR ISSO SÓ AS PONTAS: 15 cm em cada extremidade com espuma pesa 23 g, 8% do
+#: cabo. É a bucha da ponta que já estava na recomendação, agora com número.
+PREENCHIMENTO = {
+    "paraRigidez": {
+        "veredito": "não serve",
+        "porQue": ("o material do centro não trabalha em flexão: a contribuição vai "
+                   "com a quarta potência da distância ao eixo"),
+        "numeros": {
+            "espuma PU 40 kg/m³": {"massa": "+13%", "rigidez": "+0,13%"},
+            "espuma PU 100 kg/m³": {"massa": "+34%", "rigidez": "+0,39%"},
+            "cortiça 150 kg/m³": {"massa": "+51%", "rigidez": "+0,19%"},
+            "tarugo de madeira": {"massa": "+168%", "rigidez": "+65%"},
+        },
+        "alternativaMelhor": ("quem quer rigidez aumenta 3 mm no diâmetro; sai de "
+                              "graça em massa e custo"),
+    },
+    "paraAmassamento": {
+        "veredito": "serve muito, e é o modo de falha que importa",
+        "porQue": ("tubo cheio não afunda a parede no encaixe da pá nem ao bater em "
+                   "pedra, e o preenchimento colado segura a trinca de abrir"),
+        "ondeEncher": "só as pontas: 15 cm de cada lado com espuma pesam 23 g, 8% do cabo",
+        "eOMesmoQue": "a bucha da ponta que já estava na recomendação, agora com número",
+    },
+    "oQueNAOfazer": (
+        "encher o cabo inteiro e selar: se entrar água num tubo fechado e cheio, ela "
+        "não sai, e o bambu apodrece por dentro sem ninguém ver"
+    ),
+    "marca": "ANÁLISE, NÃO ESTUDO: os números de massa e rigidez saem de conta, mas "
+             "a resistência ao amassamento NÃO foi calculada — é raciocínio, não medida",
 }
 
 

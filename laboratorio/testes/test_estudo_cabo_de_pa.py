@@ -389,3 +389,119 @@ def test_a_analise_de_fornecimento_separa_MATERIA_PRIMA_de_CADEIA():
 def test_toda_analise_carrega_a_MARCA_de_que_nao_e_estudo():
     for bloco in estudo.AMBIENTE_E_FORNECIMENTO.values():
         assert "NÃO ESTUDO" in bloco["marca"]
+
+
+def test_o_BAMBU_NAO_ACEITA_a_mesma_fixacao_do_eucalipto():
+    """Colmo é oco com 3 mm de parede e racha na fibra; parafuso auto-atarraxante
+    cunha as fibras. É o mesmo esmagamento de parede que motivou a parede mínima,
+    agora aparecendo na junta."""
+    f = estudo.FIXACAO_E_INTEMPERISMO["parafuso"]
+    assert "NÃO aceita" in f["veredito"]
+    assert len(f["solucoesConhecidas"]) >= 4
+    assert "NÓ" in " ".join(f["solucoesConhecidas"])
+    assert "obrigatório" in f["custoDisso"]
+
+
+def test_sol_e_tempo_dao_EMPATE_e_nao_vantagem():
+    """UV degrada lignina nos dois; não inventar vantagem onde não há."""
+    assert "empate" in estudo.FIXACAO_E_INTEMPERISMO["sol_e_tempo"]["veredito"]
+
+
+def test_a_resposta_sobre_RESINA_separa_nao_precisa_de_nao_pode():
+    r = estudo.FIXACAO_E_INTEMPERISMO["resina"]
+    assert "não PRECISA estruturalmente" in r["resposta"]
+    assert r["ondeEla_AJUDA"] and r["ondeElaNAO_PODE"]
+
+
+def test_a_ressalva_do_EPOXI_esta_declarada():
+    """'Base água' não torna o epóxi automaticamente a opção limpa: o não curado
+    é sensibilizante de contato."""
+    assert "sensibilizante" in " ".join(estudo.FIXACAO_E_INTEMPERISMO["resina"]["ondeElaNAO_PODE"])
+
+
+def test_selar_REDUZ_mas_NAO_ELIMINA_a_rachadura():
+    """Bambu também racha por gradiente interno e tensão de crescimento."""
+    assert "NÃO elimina" in " ".join(estudo.FIXACAO_E_INTEMPERISMO["resina"]["ondeEla_AJUDA"])
+
+
+def test_o_BAMBU_OCO_NAO_VERGA_MAIS_que_o_eucalipto_macico():
+    """A pergunta do usuário, medida: tubo põe material longe do centro, onde ele
+    trabalha, e os 5 mm a mais de diâmetro compensam o vazio com folga."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]["bambu-selecionado"]
+    assert v["rigidezRelativa"] > 1.0
+    assert v["flechaRelativa"] < 1.0
+    assert v["vergaMenosQueOEucalipto"]
+
+
+def test_o_OCO_so_funciona_por_causa_do_DIAMETRO():
+    """A 34 mm o mesmo bambu fica 21% menos rígido. A desconfiança estava certa:
+    o que salva é o diâmetro, não o material."""
+    from laboratorio.estudos.cabo_de_pa import rigidez_relativa
+    from laboratorio.viga import secao_tubular
+
+    E = estudo.MATERIAIS["bambu-colmo"]["modulo_pa"]
+    assert rigidez_relativa(secao_tubular(0.037, 0.003), E) > 1.0
+    assert rigidez_relativa(secao_tubular(0.034, 0.003), E) < 0.85
+
+
+def test_a_RIGIDEZ_como_criterio_REPROVOU_uma_variante_que_passava():
+    """Cabo que não quebra mas balança demais é cabo ruim, e nada media isso."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]
+    assert v["igualitaria-40mm"]["empataOuSupera"]
+    assert not v["igualitaria-40mm"]["vergaMenosQueOEucalipto"]
+
+
+def test_o_estudo_DIZ_por_que_a_rigidez_entrou_tarde():
+    d = estudo.avaliar_variantes()
+    assert "o portão só olhava resistência" in d["porQueRigidezEntrou"]
+
+
+def test_o_diametro_do_bambu_se_SELECIONA_e_nao_se_usina():
+    g = estudo.GEOMETRIA_NA_PRATICA["diametro"]
+    assert "SELECIONA" in g["veredito"]
+    assert "gabarito" in " ".join(g["como"])
+
+
+def test_NAO_SE_LIXA_a_superficie_externa_do_colmo():
+    """A resistência é graduada: as fibras mais densas estão na casca."""
+    assert "GRADUADA" in estudo.GEOMETRIA_NA_PRATICA["diametro"]["oQueNAOfazer"]
+
+
+def test_o_projeto_tem_de_tolerar_FAIXA_e_nao_medida():
+    g = estudo.GEOMETRIA_NA_PRATICA["diametro"]
+    assert "FAIXA e não medida" in g["consequenciaDeProjeto"]
+    assert "não inclui o rendimento da seleção" in g["custoNaoContabilizado"]
+
+
+def test_o_no_incomoda_mas_e_ESTRUTURALMENTE_BOM():
+    n = estudo.GEOMETRIA_NA_PRATICA["nos"]
+    assert "resiste a rachar" in n["eOnoEBOM"]
+    assert "SÓ o colar externo" in " ".join(n["solucoes"])
+
+
+def test_PREENCHER_NAO_serve_para_rigidez():
+    """O material do centro não trabalha em flexão: espuma é peso por nada."""
+    r = estudo.PREENCHIMENTO["paraRigidez"]
+    assert r["veredito"] == "não serve"
+    assert "quarta potência" in r["porQue"]
+    assert r["numeros"]["espuma PU 40 kg/m³"]["rigidez"] == "+0,13%"
+
+
+def test_aumentar_o_DIAMETRO_e_melhor_que_encher():
+    assert "3 mm no diâmetro" in estudo.PREENCHIMENTO["paraRigidez"]["alternativaMelhor"]
+
+
+def test_PREENCHER_A_PONTA_serve_contra_AMASSAMENTO():
+    """É o modo de falha real, e converge na bucha que já estava recomendada."""
+    a = estudo.PREENCHIMENTO["paraAmassamento"]
+    assert "só as pontas" in a["ondeEncher"]
+    assert "bucha da ponta" in a["eOMesmoQue"]
+
+
+def test_NAO_encher_inteiro_e_selar():
+    """Água que entra num tubo cheio e fechado não sai, e apodrece por dentro."""
+    assert "apodrece por dentro" in estudo.PREENCHIMENTO["oQueNAOfazer"]
+
+
+def test_a_analise_de_preenchimento_diz_o_que_NAO_foi_calculado():
+    assert "NÃO foi calculada" in estudo.PREENCHIMENTO["marca"]

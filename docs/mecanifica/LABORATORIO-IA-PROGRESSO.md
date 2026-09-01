@@ -730,3 +730,65 @@ A correção é `set -o pipefail`, ou não usar pipe, ou conferir `$?` do npm
 explicitamente. Registrado aqui porque o próximo a operar isto vai cair no mesmo
 lugar, e porque a lição não é sobre shell: **verificar é escolher onde olhar, e
 olhar no lugar errado dá sempre verde.**
+
+### Rigidez, fixação e sol — três perguntas que o estudo não sabia responder
+
+O usuário perguntou, em sequência, três coisas que o estudo não modelava. As três
+mudaram alguma coisa.
+
+**"Tubo oco não verga demais quando se levanta terra na ponta?"** O portão só
+olhava resistência — cabo que não quebra mas balança é cabo ruim, e nada media
+isso. Medido: no diâmetro recomendado o bambu oco é **5% MAIS rígido** que o
+eucalipto maciço, porque tubo põe material longe do centro, onde ele trabalha. Mas
+a 34 mm ele fica 21% menos rígido: **o oco só funciona porque é 37 mm e não 32**, e
+a desconfiança estava certa — o que salva é o diâmetro.
+
+A rigidez virou critério, e já reprovou uma variante que passava em tudo: a lignina
+em 40 mm verga 11% mais que a madeira.
+
+**"O parafuso da pá parte com facilidade?"** Sim, e aqui o bambu é pior, não igual.
+Eucalipto é maciço e o parafuso morde material inteiro; o colmo é oco com 3 mm de
+parede, e bambu racha na fibra com facilidade que a madeira não tem — é por isso
+que construção com bambu tradicionalmente evita prego e parafuso. É o mesmo
+esmagamento de parede que já tinha obrigado a parede mínima, agora aparecendo na
+junta. As soluções são conhecidas e baratas — bucha interna na ponta, parafuso
+passante com arruela, virola metálica, junta perto de um nó — mas são obrigatórias
+como conjunto, não opcionais.
+
+**"E sol e tempo?"** Empate. UV degrada lignina na superfície dos dois; o bambu tem
+vantagem inicial pela epiderme cerosa e rica em sílica, e quando ela se vai o
+comportamento se iguala. Não inventar vantagem onde não há.
+
+#### Sobre a resposta de outra IA a respeito de resina
+
+O usuário trouxe a análise de outro assistente, e ela estava certa nas três partes:
+não precisa estruturalmente, ajuda na selagem e na fixação, e a restrição é às
+fenólicas e ureia-formol, não a resina em geral. Duas ressalvas foram acrescentadas:
+**epóxi não curado é sensibilizante de contato** e causa dermatite ocupacional, então
+"base água" não o torna a opção limpa — os selantes realmente mansos são óleo de
+linhaça, cera de carnaúba e goma-laca; e **selar reduz mas não elimina** a rachadura,
+porque bambu também racha por gradiente interno e tensão de crescimento.
+
+### Geometria na prática, e preencher o colmo
+
+Três perguntas práticas do usuário, e as três viraram seção do dossiê.
+
+**Diâmetro:** bambu não se usina, se **seleciona** — gabarito de anel passa-não-passa
+e classificação por faixa. E há uma coisa que não se pode fazer: tornear a superfície
+externa para acertar a medida, porque a resistência do bambu é **graduada**, com as
+fibras mais densas na casca. O projeto tem de tolerar faixa e não medida, e quem se
+adapta é a virola da ponta. O preço de R$ 0,54 é do material e **não inclui o
+rendimento da seleção** — faixa estreita é descarte, e descarte é custo.
+
+**Nós:** incomodam sob a mão que desliza, e resolve com lixar só o colar externo — a
+força do nó está no diafragma interno —, posicionar o corte, ou uma empunhadura.
+Estruturalmente o nó é bom: é onde o bambu resiste a rachar.
+
+**Preencher o colmo:** separa em duas coisas. Para **rigidez não serve** — espuma a
+40 kg/m³ acrescenta 13% de massa e 0,13% de rigidez, porque o material do centro não
+trabalha em flexão. Tarugo de madeira dá +65% de rigidez e +168% de massa; quem quer
+rigidez aumenta 3 mm no diâmetro, que sai de graça. Para **amassamento serve muito**,
+e é o modo de falha que importa — e por isso só as pontas: 15 cm de cada lado pesam
+23 g, 8% do cabo. Converge exatamente na bucha que já estava recomendada, agora com
+número. E não encher inteiro e selar: água que entra num tubo cheio e fechado não
+sai, e apodrece por dentro sem ninguém ver.
