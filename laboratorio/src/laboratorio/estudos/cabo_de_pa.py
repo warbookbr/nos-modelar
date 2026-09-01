@@ -418,6 +418,94 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
     }
 
 
+#: LIMITE DE EMPUNHADURA, e ele entrou por uma otimização que fugiu. Buscando a
+#: configuração mais leve que empata com o eucalipto, a varredura foi direto para
+#: 69 mm de diâmetro com 2,2 mm de parede: mais leve e mais barato que a madeira,
+#: e completamente impossível de segurar. Tubo grande e fino é eficiente em
+#: flexão, e a conta não sabia que existe mão.
+#:
+#: A lição não é sobre cabo: **otimização vai exatamente para onde falta
+#: restrição**, e o que falta não aparece no resultado — aparece como um número
+#: ótimo. A restrição está aqui agora, e 45 mm já é a borda do que se segura bem.
+DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
+
+#: Variantes de projeto. A diferença entre elas não é o material — é o que se
+#: pede dele. `extrema` maximiza a folga estrutural; `igualitaria` só empata com
+#: o eucalipto e gasta o resto em ser leve e barata.
+VARIANTES = {
+    "extrema": {
+        "diametro_m": 0.050, "parede_m": 0.006,
+        "objetivo": "folga estrutural, sem limite de empunhadura",
+        "observacao": "50 mm passa do que se segura bem; entra como referência de topo",
+    },
+    "igualitaria-medida": {
+        "diametro_m": 0.045, "parede_m": 0.0042,
+        "objetivo": "empatar com o eucalipto gastando o mínimo de massa",
+        "observacao": "exige a resistência medida (±15%); é a melhor troca do estudo",
+    },
+    "igualitaria-sem-medir": {
+        "diametro_m": 0.045, "parede_m": 0.0080,
+        "objetivo": "empatar com o eucalipto carregando a incerteza larga",
+        "observacao": "mesmo material e mesmo empate, com quase o dobro da massa",
+    },
+    "igualitaria-40mm": {
+        "diametro_m": 0.040, "parede_m": 0.0066,
+        "objetivo": "empatar mantendo o diâmetro comum de cabo de pá",
+        "observacao": "45 mm é a borda do que se segura; 40 mm é confortável e custa massa",
+    },
+}
+
+
+def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
+    """Compara as variantes de projeto contra o eucalipto com fonte primária.
+
+    A PERGUNTA QUE ISTO RESPONDE, e ela veio do usuário: em vez de perseguir o
+    máximo, e se o candidato só EMPATAR com o eucalipto e gastar o resto em ser
+    leve e barato? A resposta é sim, e com uma condição — só compensa se a
+    resistência for medida.
+    """
+    mat = MATERIAIS["papel-lignina"]
+    base = {k: mat[k] for k in
+            ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}
+    dispersao = ({"resistencia_pa": (72e6, 98e6), "modulo_pa": (5e9, 7e9)}
+                 if medida else mat["dispersao"])
+    referencia = medir("eucalipto")
+
+    saida = {}
+    for nome, v in VARIANTES.items():
+        secao = secao_tubular(v["diametro_m"], v["parede_m"])
+        r = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N, **base)
+        p = propagar(dispersao,
+                     lambda pt: avaliar(secao, comprimento_m=COMPRIMENTO_M,
+                                        forca_n=FORCA_N, **{**base, **pt})["margemContraFalha"],
+                     semente=SEMENTE, amostras=2000)
+        massa = r["massa"]["valor"]
+        saida[nome] = {
+            **v,
+            "margemP05": p["p05"],
+            "massa_kg": massa,
+            "custo": massa * mat["preco_por_kg"],
+            "dissipacao": 1 - r["vibracaoRestanteApos10Ciclos"]["valor"],
+            "massaRelativaAoEucalipto": massa / referencia["massa_kg"] - 1,
+            "empataOuSupera": p["p05"] >= referencia["margemP05"],
+            "cabeNaMao": v["diametro_m"] <= DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+        }
+    return {
+        "referencia": {"material": "eucalipto", "margemP05": referencia["margemP05"],
+                       "massa_kg": referencia["massa_kg"], "custo": referencia["custo"],
+                       "dissipacao": 1 - referencia["vibracaoRestante"],
+                       "fonte": FONTE_MADEIRA},
+        "resistenciaMedida": medida,
+        "variantes": saida,
+        "limiteDeEmpunhadura_m": DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+        "porQueOLimiteExiste": (
+            "sem ele a otimização foi para 69 mm de parede fina: mais leve e mais "
+            "barato que a madeira, e impossível de segurar. Otimização vai exatamente "
+            "para onde falta restrição, e o que falta aparece como número ótimo"
+        ),
+    }
+
+
 def recomendar() -> dict[str, Any]:
     """O que fazer, depois que a fonte primária derrubou duas conclusões minhas.
 

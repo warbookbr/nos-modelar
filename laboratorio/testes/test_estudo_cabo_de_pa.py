@@ -208,3 +208,40 @@ def test_a_variante_de_LIGNINA_passa_nos_criterios_de_saude_e_ambiente():
 def test_a_escala_qualitativa_se_declara_ORDINAL():
     """Fingir que a distância entre 3 e 2 significa algo é virar julgamento em medida."""
     assert "ordinal" in estudo.ESCALA_QUALITATIVA
+
+
+def test_a_VARIANTE_IGUALITARIA_e_o_melhor_negocio():
+    """Perseguir o máximo custa 68% de massa; só empatar custa 9%, com o mesmo
+    amortecimento. A pergunta veio do usuário e a resposta é sim."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]
+    assert v["igualitaria-medida"]["empataOuSupera"]
+    assert v["igualitaria-medida"]["massaRelativaAoEucalipto"] < 0.15
+    assert v["extrema"]["massaRelativaAoEucalipto"] > 0.60
+    assert v["igualitaria-medida"]["dissipacao"] == v["extrema"]["dissipacao"]
+
+
+def test_o_AMORTECIMENTO_NAO_DEPENDE_da_geometria():
+    """Correção de algo que eu deixei ambíguo: os 61% vêm do material, e todas as
+    variantes têm o mesmo. Engrossar o cabo é para resistência, não para vibração."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]
+    assert len({round(x["dissipacao"], 9) for x in v.values()}) == 1
+
+
+def test_MEDIR_QUASE_METADE_o_peso_do_cabo():
+    """Mesmo material, mesmo empate: 0,84 kg medindo contra 1,45 kg sem medir."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]
+    assert v["igualitaria-sem-medir"]["massa_kg"] > 1.6 * v["igualitaria-medida"]["massa_kg"]
+
+
+def test_o_LIMITE_DE_EMPUNHADURA_existe_porque_a_otimizacao_fugiu():
+    """Sem ele a varredura foi para 69 mm de parede fina: mais leve e mais barato
+    que a madeira, e impossível de segurar."""
+    d = estudo.avaliar_variantes()
+    assert "69 mm" in d["porQueOLimiteExiste"]
+    assert "falta restrição" in d["porQueOLimiteExiste"]
+    assert d["variantes"]["extrema"]["cabeNaMao"] is False
+    assert d["variantes"]["igualitaria-medida"]["cabeNaMao"] is True
+
+
+def test_a_referencia_das_variantes_carrega_a_FONTE_da_madeira():
+    assert "FPL-GTR-190" in estudo.avaliar_variantes()["referencia"]["fonte"]

@@ -90,7 +90,43 @@ conservadorismo); **fatores de perda** dos não-madeira (a ordem de grandeza é
 robusta, os valores exatos não); e **preço por quilo** (ordem de grandeza, não
 cotação).
 
-## 5. O que decide a próxima ação
+## 5. Variantes de projeto — perseguir o máximo ou só empatar?
+
+Amortecimento é propriedade do **material**: os 61% valem em qualquer diâmetro.
+Engrossar o cabo serve para resistência, não para vibração. Então a pergunta é
+quanto de resistência se quer comprar, e a que preço em massa.
+
+| variante | geometria | margem | massa | vs. eucalipto | custo | dissipa | cabe na mão |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | :-: |
+| **eucalipto** (referência) | 32 mm maciço | 1.01 | 0.77 kg | — | 3.09 | 27% | sim |
+| extrema | 50 × 6.0 mm | 1.66 | 1.29 kg | +68% | 5.18 | 61% | **não** |
+| igualitaria-medida | 45 × 4.2 mm | 1.02 | 0.84 kg | +9% | 3.36 | 61% | sim |
+| igualitaria-sem-medir | 45 × 8.0 mm | 1.50 | 1.45 kg | +88% | 5.80 | 61% | sim |
+| igualitaria-40mm | 40 × 6.6 mm | 1.02 | 1.08 kg | +40% | 4.32 | 61% | sim |
+
+### A leitura
+
+**A variante igualitária é o melhor negócio.** Perseguir folga estrutural custa
+68% de massa; apenas empatar com o eucalipto custa **9% de massa e 9% de custo** —
+com o mesmo amortecimento de 61%. Nove por cento mais pesado e mais caro para
+dissipar 2,3 vezes mais vibração é uma troca boa em qualquer leitura.
+
+**E medir aparece pela terceira vez como o item mais valioso.** Mesmo material,
+mesmo empate: 0,84 kg com a resistência medida contra 1,45 kg sem medir. Medir
+corta quase metade do peso do cabo.
+
+### O limite de empunhadura, e por que ele existe
+
+Procurando a configuração mais leve que empata, a varredura foi direto para **69 mm
+de diâmetro com 2,2 mm de parede**: mais leve e mais barato que a madeira, e
+impossível de segurar. Tubo grande e fino é eficiente em flexão, e a conta não sabia
+que existe mão.
+
+A lição não é sobre cabo: **otimização vai exatamente para onde falta restrição, e o
+que falta não aparece como erro — aparece como número ótimo.** O limite está no
+estudo agora, em 45 mm, que já é a borda do que se segura bem. A variante de 40 mm
+existe para quem quiser diâmetro comum de cabo, e ela custa 40% de massa.
+## 6. O que decide a próxima ação
 
 **Não medir custa 5 mm de diâmetro e 140 g.**
 
@@ -103,7 +139,7 @@ Mesmo material, mesma resistência média. A diferença entre as linhas é **só
 informação**: a incerteza que engorda o cabo é a nossa ignorância sobre o material,
 não a variação dele.
 
-## 6. Limites
+## 7. Limites
 
 - A BARREIRA QUE NÃO SE TRANSPÕE AQUI: nada foi ensaiado fisicamente. Impacto real envolve taxa de deformação, e cabo real sofre fadiga por milhares de ciclos — nenhuma das duas coisas está nesta conta.
 - As propriedades dos demais materiais são valor de manual de memória; NÃO conferido contra fonte primária. Os fatores de perda são a entrada mais frágil: eles variam com frequência e com o método de medida, às vezes por um fator de dois.
@@ -116,7 +152,7 @@ não a variação dele.
 - CORREÇÃO REGISTRADA: este estudo afirmou que o caso de carga era abusivo porque reprovava até o eucalipto. Estava errado. Eu usava 75 MPa para a madeira, que é o valor VERDE; o Wood Handbook dá 111,7 MPa a 12% de umidade, que é a condição de um cabo. Com o valor certo o eucalipto passa, a carga estava correta, e a barra para o candidato subiu 50%.
 - ASSIMETRIA DE FONTES: só o eucalipto tem fonte primária (FPL-GTR-190, domínio público, lido diretamente). Todos os outros materiais, inclusive o candidato recomendado, seguem com números de memória.
 
-## 7. O que precisa ser medido
+## 8. O que precisa ser medido
 
 **Ensaio principal:** ensaio de flexão de três pontos em ao menos dez corpos de prova.
 
@@ -129,7 +165,7 @@ não a variação dele.
 - fator de perda medido, porque o valor usado aqui é de memória e é a vantagem inteira do material
 - resistência após ciclos, porque cabo de pá é fadiga e isto foi carga única
 
-## 8. Literatura
+## 9. Literatura
 
 Metadados obtidos do Crossref e guardados em disco. **Estes artigos não foram
 lidos** — eles sustentam que as perguntas são reconhecidas e o campo é ativo, e não
@@ -190,6 +226,6 @@ Busca: `hand arm vibration tool handle damping material` — 1346136 resultados,
 - Oddo (2004), *Journal of Sound and Vibration*. Design of a suspended handle to attenuate rock drill hand-arm vibration: model development and validation. [10.1016/j.jsv.2003.06.006](https://doi.org/10.1016/j.jsv.2003.06.006) — 17 citações.
 - Tony (2019), *Work*. Influence of handle shape and size to reduce the hand-arm vibration discomfort. [10.3233/wor-192948](https://doi.org/10.3233/wor-192948) — 6 citações.
 
-## 9. Fabricação e fornecimento
+## 10. Fabricação e fornecimento
 
 enrolamento espiral de papel impregnado é tecnologia madura e barata, ordem de grandeza abaixo de pultrusão de fibra ou trefilação de tubo; o gargalo é o ligante, porque lignina é abundante mas queimada dentro da própria fábrica de celulose em vez de vendida como adesivo pronto. ISTO NÃO SAIU DO LABORATÓRIO: é análise, não estudo, e não foi medido.

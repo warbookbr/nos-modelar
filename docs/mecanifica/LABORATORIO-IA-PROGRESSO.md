@@ -544,3 +544,38 @@ o câmbio vale, e isso não é decisão de quem calcula.
 **A assimetria de fontes fica declarada no dossiê:** só o eucalipto tem fonte
 primária; o candidato recomendado segue com números de memória. O benchmark é
 sólido, o candidato é o que precisa ser medido.
+
+### Variantes de projeto, e a otimização que fugiu para onde faltava restrição
+
+O usuário perguntou: em vez de perseguir o máximo, e se o candidato só **empatar**
+com o eucalipto e gastar o resto em ser leve e barato? A intuição estava certa, e
+o número dá razão a ela.
+
+Antes, uma correção do que eu tinha deixado ambíguo: os 61% de dissipação são
+propriedade do **material** e valem em qualquer diâmetro. Engrossar o cabo é para
+resistência, nunca para vibração. Todas as variantes amortecem igual.
+
+| variante | geometria | massa | vs. eucalipto | dissipa |
+| --- | --- | ---: | ---: | ---: |
+| eucalipto | 32 mm maciço | 0,77 kg | — | 27% |
+| **igualitária, medida** | 45 × 4,2 mm | 0,84 kg | **+9%** | 61% |
+| igualitária, sem medir | 45 × 8,0 mm | 1,45 kg | +88% | 61% |
+| igualitária, 40 mm | 40 × 6,6 mm | 1,08 kg | +40% | 61% |
+| extrema | 50 × 6,0 mm | 1,29 kg | +68% | 61% |
+
+**Só empatar custa 9% de massa; perseguir folga custa 68%** — com o mesmo
+amortecimento. E medir aparece pela terceira vez como o item mais valioso do
+estudo: mesmo material e mesmo empate, 0,84 kg medindo contra 1,45 kg sem medir.
+
+#### A otimização foi para 69 mm
+
+Procurando a configuração mais leve que empata, a varredura achou **69 mm de
+diâmetro com 2,2 mm de parede**: mais leve e mais barato que a madeira, e
+completamente impossível de segurar. Tubo grande e fino é eficiente em flexão, e a
+conta não sabia que existe mão.
+
+A lição não é sobre cabo: **otimização vai exatamente para onde falta restrição, e
+o que falta não aparece como erro — aparece como número ótimo.** Foi o que
+aconteceu antes com a parede fina, que já tinha exigido um limite de enrugamento; é
+o mesmo modo de falha em outra variável. O limite de empunhadura entrou em 45 mm, e
+a variante de 40 mm existe para quem quiser diâmetro comum, custando 40% de massa.
