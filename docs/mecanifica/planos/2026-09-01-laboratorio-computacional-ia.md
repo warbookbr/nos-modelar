@@ -53,7 +53,7 @@ só abre com a anterior verde.
 | R2 | registro de instrumentos, DAG validado e runner confinado | **entregue**: registro, planejador que prova o grafo antes de executar e executor com limites e confinamento declarado |
 | R3 | pesquisa, fontes e grafo de alegações | **parcial por decisão**: grafo de fontes, alegações e conflitos entregue; conectores de rede adiados por não haver como prová-los |
 | R4 | unidades, V&V, incerteza e sensibilidade | **parcial por decisão**: grandezas com dimensão e composição de pareceres entregues; incerteza adiada por não haver instrumento estocástico |
-| R5 | ponte neutra da Mecanifica | não iniciada |
+| R5 | ponte neutra da Mecanifica | **entregue**: adaptador fora do núcleo, revisão fixada por conteúdo, recomendação sem aplicação automática e guarda de direção |
 | R6 | dois pilotos verticais em domínios diferentes | não iniciada |
 | R7 | serviços Agent-First, CLI/MCP e prova caixa-preta | não iniciada |
 
