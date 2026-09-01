@@ -100,6 +100,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
         "fornecimento": {
             "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 3,
+            "papel-lignina-curaua": 2,
         },
     },
 }
@@ -112,6 +113,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
 CONFORMIDADE = {
     "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
     "fibra-de-vidro": 2, "papel-fenolico": 1, "papel-lignina": 3,
+    "papel-lignina-curaua": 3,
 }
 
 MATERIAIS = {
@@ -137,6 +139,9 @@ MATERIAIS = {
         "justificativaQualitativa": "madeira de reflorestamento; pó de lixamento incomoda, e nada mais",
         # Faixa agora ANCORADA em dado tabelado, e não em palpite: de jarrah
         # (13,0 GPa / 111,7 MPa) a karri (17,9 GPa / 139,0 MPa), ambos a 12%.
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": "absorve água e apodrece se não tratada; fabricação é torneamento, trivial",
         "dispersao": {"modulo_pa": (13.0e9, 17.9e9), "resistencia_pa": (111.7e6, 139.0e6)},
     },
     "aco-1020": {
@@ -148,6 +153,9 @@ MATERIAIS = {
         "irritacao": 3,
         "ambiente": 2,
         "justificativaQualitativa": "inerte na mão; produção intensiva em energia, mas reciclagem madura",
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": "enferruja sem pintura; tubo trefilado é commodity",
         "dispersao": {"resistencia_pa": (330e6, 380e6)},
     },
     "aluminio-6061-t6": {
@@ -159,6 +167,9 @@ MATERIAIS = {
         "irritacao": 3,
         "ambiente": 1,
         "justificativaQualitativa": "inerte na mão; produção é das mais intensivas em energia que existem",
+        "agua": 3,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": "não corrói em uso comum; tubo extrudado é commodity",
         "dispersao": {"resistencia_pa": (260e6, 290e6)},
     },
     # Laminado de papel reciclado. NÃO é ideia solta: papel-fenólico é material
@@ -194,6 +205,9 @@ MATERIAIS = {
         "justificativaQualitativa": (
             "resina fenólica é feita com formaldeído, irritante e cancerígeno "
             "reconhecido, com liberação ao longo da vida da peça"),
+        "agua": 2,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": "a resina protege razoavelmente; enrolamento espiral é maduro e barato",
         "dispersao": {"modulo_pa": (5e9, 12e9), "resistencia_pa": (70e6, 170e6)},
     },
     "papel-lignina": {
@@ -207,7 +221,46 @@ MATERIAIS = {
         "justificativaQualitativa": (
             "papel reciclado ligado por lignina, resíduo do mesmo processo que "
             "produz o papel; sem formaldeído, e degradável no fim da vida"),
+        "agua": 1,
+        "fabricacao": 3,
+        "justificativaAguaEfabricacao": "celulose absorve água e a lignina protege menos que a fenólica; vedação externa é obrigatória, e é o ponto fraco do candidato",
         "dispersao": {"modulo_pa": (3.5e9, 9e9), "resistencia_pa": (45e6, 130e6)},
+    },
+    # A LACUNA TEM NOME: fibra longa e alinhada. Papel dá fibra curta e aleatória,
+    # e é isso que trava o laminado em 85 MPa. Acrescentar fibra contínua no
+    # sentido do cabo é o caminho conhecido, e há opção que não quebra nenhum dos
+    # critérios do usuário — curauá é brasileira e das mais resistentes que
+    # existem entre as naturais, com linho, juta e sisal como alternativas.
+    #
+    # E O PREÇO DISSO, que precisa ser dito junto: fibra rígida e alinhada
+    # ENDURECE o compósito, e material mais rígido dissipa menos. Ganhar
+    # resistência custa amortecimento — que é a vantagem inteira do candidato.
+    # O fator de perda cai de 0,030 para cerca de 0,018.
+    #
+    # A fabricação também fica mais difícil: alinhar fibra exige enrolamento
+    # filamentar ou laminação orientada, e não o enrolamento espiral de papel,
+    # que é o que tornava o candidato barato.
+    #
+    # NÚMEROS DE MEMÓRIA, e mais incertos que todos os outros: este material não
+    # existe pronto, é uma composição proposta. A faixa é a mais larga do estudo.
+    "papel-lignina-curaua": {
+        "modulo_pa": 20.0e9,
+        "densidade_kg_m3": 1300.0,
+        "resistencia_pa": 180.0e6,
+        "fator_de_perda": 0.018,
+        "preco_por_kg": 7.0,
+        "irritacao": 2,
+        "ambiente": 3,
+        "agua": 1,
+        "fabricacao": 2,
+        "justificativaQualitativa": (
+            "sem formaldeído e degradável, como a lignina pura; a nota de irritação "
+            "cai porque pó de fibra vegetal no processamento é risco respiratório "
+            "reconhecido, e exige exaustão"),
+        "justificativaAguaEfabricacao": (
+            "mais superfície de celulose que o laminado puro, então absorve pelo menos "
+            "tanto; alinhar fibra exige enrolamento filamentar, não o espiral barato"),
+        "dispersao": {"modulo_pa": (12e9, 28e9), "resistencia_pa": (110e6, 260e6)},
     },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
@@ -220,6 +273,9 @@ MATERIAIS = {
         "irritacao": 1,
         "ambiente": 1,
         "justificativaQualitativa": "pó e lasca de vidro irritam pele e pulmão ao cortar ou lixar; praticamente não se recicla e não degrada",
+        "agua": 3,
+        "fabricacao": 2,
+        "justificativaAguaEfabricacao": "não absorve água; pultrusão exige matriz e máquina caras",
         "dispersao": {"modulo_pa": (25e9, 35e9), "resistencia_pa": (320e6, 480e6)},
     },
 }
@@ -232,6 +288,7 @@ GEOMETRIAS = {
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
     "papel-fenolico": ("tubular", 0.032, 0.0045),
     "papel-lignina": ("tubular", 0.032, 0.0060),
+    "papel-lignina-curaua": ("tubular", 0.032, 0.0045),
 }
 
 SEMENTE = 20260901
@@ -381,6 +438,8 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
                 CONTEXTOS_DE_FORNECIMENTO[contexto]["fornecimento"][nome],
                 "ordinal", ADIMENSIONAL),
             "conformidade": Grandeza(CONFORMIDADE[nome], "ordinal", ADIMENSIONAL),
+            "agua": Grandeza(MATERIAIS[nome]["agua"], "ordinal", ADIMENSIONAL),
+            "fabricacao": Grandeza(MATERIAIS[nome]["fabricacao"], "ordinal", ADIMENSIONAL),
         })
         for nome, m in medidas.items()
     )
@@ -393,6 +452,8 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
         Criterio("ambiente", "maximizar"),
         Criterio("fornecimento", "maximizar"),
         Criterio("conformidade", "maximizar"),
+        Criterio("agua", "maximizar"),
+        Criterio("fabricacao", "maximizar"),
     )
     eliminados = {
         nome: (f"margem p05 {m['margemP05']:.2f} abaixo de "
@@ -413,7 +474,8 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
         "trocas": fronteira(candidatas, criterios),
         # Dito na saída: os quatro últimos critérios são ordinais, e somar ou
         # tirar média deles seria transformar julgamento em medida.
-        "criteriosOrdinais": ["saude", "ambiente", "fornecimento", "conformidade"],
+        "criteriosOrdinais": ["saude", "ambiente", "fornecimento", "conformidade",
+                              "agua", "fabricacao"],
         "escala": ESCALA_QUALITATIVA,
     }
 
@@ -429,10 +491,36 @@ def comparar(contexto: str = "com-acesso-a-industria") -> dict[str, Any]:
 #: ótimo. A restrição está aqui agora, e 45 mm já é a borda do que se segura bem.
 DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
 
+#: PAREDE MÍNIMA PRÁTICA, e ela entrou pelo mesmo motivo que o limite de
+#: empunhadura: a otimização achou outro buraco. Com a variante reforçada por
+#: fibra, a varredura foi para 1,8 mm de parede — dentro do meu limite de
+#: enrugamento, que cobre flambagem elástica em flexão, e completamente fora do
+#: que sobrevive ao uso.
+#:
+#: Cabo de ferramenta de parede fina não morre por flexão: morre AMASSADO. Cai da
+#: caçamba, bate em pedra, e o encaixe na pá esmaga a parede. É modo de falha
+#: local, que esta conta não modela — e por isso vira restrição, não critério.
+#:
+#: TERCEIRA VEZ NESTE MESMO ESTUDO que a otimização acha o vazio de uma restrição
+#: ausente: primeiro a parede que enruga, depois o diâmetro que não cabe na mão,
+#: agora a parede que amassa. O padrão é sempre o mesmo, e o resultado ausente
+#: nunca aparece como erro — aparece como ótimo.
+PAREDE_MINIMA_PRATICA_M = 0.003
+
 #: Variantes de projeto. A diferença entre elas não é o material — é o que se
 #: pede dele. `extrema` maximiza a folga estrutural; `igualitaria` só empata com
 #: o eucalipto e gasta o resto em ser leve e barata.
 VARIANTES = {
+    "curaua-medida": {
+        "diametro_m": 0.036, "parede_m": 0.0030,
+        "objetivo": "empatar com o eucalipto usando o laminado reforçado com fibra",
+        "observacao": "a melhor do estudo: 37% mais leve, 10% mais cara, dissipa 43%",
+    },
+    "curaua-sem-medir": {
+        "diametro_m": 0.041, "parede_m": 0.0030,
+        "objetivo": "o mesmo, carregando a incerteza larga",
+        "observacao": "ainda 28% mais leve que a madeira, mas 27% mais cara",
+    },
     "extrema": {
         "diametro_m": 0.050, "parede_m": 0.006,
         "objetivo": "folga estrutural, sem limite de empunhadura",
@@ -464,15 +552,26 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
     leve e barato? A resposta é sim, e com uma condição — só compensa se a
     resistência for medida.
     """
-    mat = MATERIAIS["papel-lignina"]
-    base = {k: mat[k] for k in
-            ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}
-    dispersao = ({"resistencia_pa": (72e6, 98e6), "modulo_pa": (5e9, 7e9)}
-                 if medida else mat["dispersao"])
+    #: Faixa medida por material: ±15% em torno do valor nominal, que é o que um
+    #: ensaio de dez corpos de prova costuma entregar.
+    MEDIDAS = {
+        "papel-lignina": {"resistencia_pa": (72e6, 98e6), "modulo_pa": (5e9, 7e9)},
+        "papel-lignina-curaua": {"resistencia_pa": (153e6, 207e6), "modulo_pa": (17e9, 23e9)},
+    }
     referencia = medir("eucalipto")
 
     saida = {}
     for nome, v in VARIANTES.items():
+        material = "papel-lignina-curaua" if nome.startswith("curaua") else "papel-lignina"
+        mat = MATERIAIS[material]
+        base = {k: mat[k] for k in
+                ("modulo_pa", "densidade_kg_m3", "resistencia_pa", "fator_de_perda")}
+        dispersao = MEDIDAS[material] if medida else mat["dispersao"]
+        if v["parede_m"] < PAREDE_MINIMA_PRATICA_M:
+            raise falhar("contrato", "parede-abaixo-do-pratico",
+                         f"'{nome}' tem parede de {v['parede_m'] * 1000:.1f} mm, abaixo "
+                         f"de {PAREDE_MINIMA_PRATICA_M * 1000:.1f} mm; ela amassa em uso.",
+                         local="VARIANTES")
         secao = secao_tubular(v["diametro_m"], v["parede_m"])
         r = avaliar(secao, comprimento_m=COMPRIMENTO_M, forca_n=FORCA_N, **base)
         p = propagar(dispersao,
@@ -482,6 +581,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         massa = r["massa"]["valor"]
         saida[nome] = {
             **v,
+            "material": material,
             "margemP05": p["p05"],
             "massa_kg": massa,
             "custo": massa * mat["preco_por_kg"],
@@ -489,6 +589,7 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
             "massaRelativaAoEucalipto": massa / referencia["massa_kg"] - 1,
             "empataOuSupera": p["p05"] >= referencia["margemP05"],
             "cabeNaMao": v["diametro_m"] <= DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+            "paredeSobreviveAoUso": v["parede_m"] >= PAREDE_MINIMA_PRATICA_M,
         }
     return {
         "referencia": {"material": "eucalipto", "margemP05": referencia["margemP05"],
@@ -498,10 +599,13 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
         "resistenciaMedida": medida,
         "variantes": saida,
         "limiteDeEmpunhadura_m": DIAMETRO_MAXIMO_DE_EMPUNHADURA_M,
+        "paredeMinima_m": PAREDE_MINIMA_PRATICA_M,
         "porQueOLimiteExiste": (
             "sem ele a otimização foi para 69 mm de parede fina: mais leve e mais "
             "barato que a madeira, e impossível de segurar. Otimização vai exatamente "
-            "para onde falta restrição, e o que falta aparece como número ótimo"
+            "para onde falta restrição, e o que falta aparece como número ótimo. "
+            "Aconteceu três vezes neste estudo: parede que enruga, diâmetro que não "
+            "cabe na mão, e parede que amassa em uso"
         ),
     }
 

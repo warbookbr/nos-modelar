@@ -90,42 +90,71 @@ conservadorismo); **fatores de perda** dos não-madeira (a ordem de grandeza é
 robusta, os valores exatos não); e **preço por quilo** (ordem de grandeza, não
 cotação).
 
-## 5. Variantes de projeto — perseguir o máximo ou só empatar?
+## 5. Variantes de projeto
 
-Amortecimento é propriedade do **material**: os 61% valem em qualquer diâmetro.
-Engrossar o cabo serve para resistência, não para vibração. Então a pergunta é
-quanto de resistência se quer comprar, e a que preço em massa.
+Amortecimento é propriedade do **material** e vale em qualquer diâmetro; engrossar
+o cabo serve para resistência, não para vibração. A pergunta é quanta resistência
+comprar e a que preço em massa.
 
-| variante | geometria | margem | massa | vs. eucalipto | custo | dissipa | cabe na mão |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | :-: |
-| **eucalipto** (referência) | 32 mm maciço | 1.01 | 0.77 kg | — | 3.09 | 27% | sim |
-| extrema | 50 × 6.0 mm | 1.66 | 1.29 kg | +68% | 5.18 | 61% | **não** |
-| igualitaria-medida | 45 × 4.2 mm | 1.02 | 0.84 kg | +9% | 3.36 | 61% | sim |
-| igualitaria-sem-medir | 45 × 8.0 mm | 1.50 | 1.45 kg | +88% | 5.80 | 61% | sim |
-| igualitaria-40mm | 40 × 6.6 mm | 1.02 | 1.08 kg | +40% | 4.32 | 61% | sim |
+| variante | material | geometria | massa | vs. eucalipto | custo | dissipa | cabe na mão |
+| --- | --- | --- | ---: | ---: | ---: | ---: | :-: |
+| **eucalipto** | madeira maciça | 32 mm | 0.77 kg | — | 3.09 | 27% | sim |
+| curaua-medida | papel-lignina-curaua | 36 × 3.0 mm | 0.49 kg | -37% | 3.40 | 43% | sim |
+| curaua-sem-medir | papel-lignina-curaua | 41 × 3.0 mm | 0.56 kg | -28% | 3.91 | 43% | sim |
+| extrema | papel-lignina | 50 × 6.0 mm | 1.29 kg | +68% | 5.18 | 61% | **não** |
+| igualitaria-medida | papel-lignina | 45 × 4.2 mm | 0.84 kg | +9% | 3.36 | 61% | sim |
+| igualitaria-sem-medir | papel-lignina | 45 × 8.0 mm | 1.45 kg | +88% | 5.80 | 61% | sim |
+| igualitaria-40mm | papel-lignina | 40 × 6.6 mm | 1.08 kg | +40% | 4.32 | 61% | sim |
 
-### A leitura
+### Por que a fibra entrou
 
-**A variante igualitária é o melhor negócio.** Perseguir folga estrutural custa
-68% de massa; apenas empatar com o eucalipto custa **9% de massa e 9% de custo** —
-com o mesmo amortecimento de 61%. Nove por cento mais pesado e mais caro para
-dissipar 2,3 vezes mais vibração é uma troca boa em qualquer leitura.
+O que decide em flexão com diâmetro limitado é **resistência por quilo** (σ/ρ):
 
-**E medir aparece pela terceira vez como o item mais valioso.** Mesmo material,
-mesmo empate: 0,84 kg com a resistência medida contra 1,45 kg sem medir. Medir
-corta quase metade do peso do cabo.
+| material | σ/ρ |
+| --- | ---: |
+| fibra-de-vidro | 210.526 |
+| eucalipto | 139.625 |
+| papel-lignina-curaua | 138.462 |
+| aluminio-6061-t6 | 102.222 |
+| papel-fenolico | 88.889 |
+| papel-lignina | 65.385 |
+| aco-1020 | 44.586 |
 
-### O limite de empunhadura, e por que ele existe
+O laminado de papel puro tem **menos da metade** da resistência por quilo do
+eucalipto seco — e a prova é direta: em 32 mm, o diâmetro da madeira, ele não
+empata nem maciço. Ele só competia porque foi autorizado a ser mais gordo e oco: a
+geometria estava compensando o material.
 
-Procurando a configuração mais leve que empata, a varredura foi direto para **69 mm
-de diâmetro com 2,2 mm de parede**: mais leve e mais barato que a madeira, e
-impossível de segurar. Tubo grande e fino é eficiente em flexão, e a conta não sabia
-que existe mão.
+A lacuna tem nome: **fibra longa e alinhada**. Papel dá fibra curta e aleatória, e é
+isso que trava o laminado. Acrescentar fibra contínua no sentido do cabo — curauá,
+que é brasileira e das mais resistentes entre as naturais, ou linho, juta, sisal —
+fecha a conta: a variante reforçada chega a 138.462 contra 139.625 do eucalipto.
 
-A lição não é sobre cabo: **otimização vai exatamente para onde falta restrição, e o
-que falta não aparece como erro — aparece como número ótimo.** O limite está no
-estudo agora, em 45 mm, que já é a borda do que se segura bem. A variante de 40 mm
-existe para quem quiser diâmetro comum de cabo, e ela custa 40% de massa.
+**E cobra o preço na vantagem principal:** fibra rígida endurece o compósito, e
+material mais rígido dissipa menos. A dissipação cai de 61% para 43% — ainda bem
+acima dos 27% da madeira, mas é troca real, não almoço grátis. A fabricação também
+fica mais difícil: alinhar fibra exige enrolamento filamentar, não o enrolamento
+espiral de papel que tornava o candidato barato.
+
+### As duas opções que sobram
+
+- **lignina + curauá, 36 × 3 mm:** 37% mais leve que a madeira, 10% mais cara,
+  dissipa 43%. Diâmetro confortável. É a melhor do estudo;
+- **lignina pura, 45 × 4,2 mm:** 9% mais pesada, 9% mais cara, dissipa 61%. Amortece
+  muito mais, e 45 mm é a borda do que se segura bem.
+
+A escolha entre as duas é de quem vai usar a ferramenta.
+
+### Três vezes a otimização achou o vazio de uma restrição
+
+Buscando a configuração mais leve, a varredura foi, em ordem: para a **parede que
+enruga**, para o **diâmetro de 69 mm que não cabe na mão**, e para a **parede de
+1,8 mm que amassa em uso** — cabo fino não morre por flexão, morre amassado no
+encaixe ou ao cair.
+
+**Otimização vai exatamente para onde falta restrição, e o que falta não aparece
+como erro: aparece como resultado ótimo.** As três restrições estão no estudo agora:
+razão diâmetro/parede, 45 mm de empunhadura e 3 mm de parede mínima.
 ## 6. O que decide a próxima ação
 
 **Não medir custa 5 mm de diâmetro e 140 g.**

@@ -221,10 +221,19 @@ def test_a_VARIANTE_IGUALITARIA_e_o_melhor_negocio():
 
 
 def test_o_AMORTECIMENTO_NAO_DEPENDE_da_geometria():
-    """Correção de algo que eu deixei ambíguo: os 61% vêm do material, e todas as
-    variantes têm o mesmo. Engrossar o cabo é para resistência, não para vibração."""
+    """Correção de algo que eu deixei ambíguo: a dissipação vem do MATERIAL, e
+    engrossar o cabo é para resistência, não para vibração.
+
+    Este teste já afirmou que TODAS as variantes dissipavam igual, o que era
+    verdade enquanto havia um material só. Com o laminado reforçado por fibra a
+    afirmação certa é mais estreita: dentro de cada material, a geometria não
+    muda o amortecimento."""
     v = estudo.avaliar_variantes(medida=True)["variantes"]
-    assert len({round(x["dissipacao"], 9) for x in v.values()}) == 1
+    por_material = {}
+    for x in v.values():
+        por_material.setdefault(x["material"], set()).add(round(x["dissipacao"], 9))
+    assert all(len(d) == 1 for d in por_material.values()), por_material
+    assert len(por_material) == 2
 
 
 def test_MEDIR_QUASE_METADE_o_peso_do_cabo():
@@ -245,3 +254,49 @@ def test_o_LIMITE_DE_EMPUNHADURA_existe_porque_a_otimizacao_fugiu():
 
 def test_a_referencia_das_variantes_carrega_a_FONTE_da_madeira():
     assert "FPL-GTR-190" in estudo.avaliar_variantes()["referencia"]["fonte"]
+
+
+def test_a_FIBRA_FECHA_a_lacuna_de_resistencia_por_quilo():
+    """O alvo calculado era 182 MPa para empatar por quilo com o eucalipto. O
+    laminado reforçado chega a 138.462 contra 139.625 da madeira."""
+    def especifica(n):
+        m = estudo.MATERIAIS[n]
+        return m["resistencia_pa"] / m["densidade_kg_m3"]
+
+    assert especifica("papel-lignina-curaua") > 1.9 * especifica("papel-lignina")
+    assert abs(especifica("papel-lignina-curaua") / especifica("eucalipto") - 1) < 0.05
+
+
+def test_a_fibra_COBRA_o_preco_em_amortecimento():
+    """Fibra rígida e alinhada endurece o compósito, e material mais rígido dissipa
+    menos. Ganhar resistência custa a vantagem inteira do candidato."""
+    v = estudo.avaliar_variantes(medida=True)["variantes"]
+    assert v["curaua-medida"]["dissipacao"] < v["igualitaria-medida"]["dissipacao"]
+    assert v["curaua-medida"]["dissipacao"] > 0.27  # ainda bate a madeira
+
+
+def test_a_variante_com_FIBRA_e_mais_leve_que_a_madeira():
+    v = estudo.avaliar_variantes(medida=True)["variantes"]["curaua-medida"]
+    assert v["massaRelativaAoEucalipto"] < -0.30
+    assert v["empataOuSupera"] and v["cabeNaMao"] and v["paredeSobreviveAoUso"]
+
+
+def test_a_PAREDE_MINIMA_entrou_porque_a_otimizacao_achou_o_terceiro_buraco():
+    """Cabo fino não morre por flexão: morre amassado, no encaixe ou caindo."""
+    d = estudo.avaliar_variantes()
+    assert "amassa" in d["porQueOLimiteExiste"]
+    assert d["paredeMinima_m"] == 0.003
+    assert all(v["paredeSobreviveAoUso"] for v in d["variantes"].values())
+
+
+def test_a_agua_e_a_fabricacao_tem_nota_para_TODO_material():
+    """Critérios que o usuário pediu, e ausência de nota seria omissão cômoda."""
+    for nome, m in estudo.MATERIAIS.items():
+        assert "agua" in m and "fabricacao" in m, nome
+        assert m["justificativaAguaEfabricacao"].strip()
+
+
+def test_a_agua_e_o_ponto_fraco_dos_laminados_de_papel():
+    """Celulose absorve, e a vedação externa é obrigatória — não é detalhe."""
+    for nome in ("papel-lignina", "papel-lignina-curaua"):
+        assert estudo.MATERIAIS[nome]["agua"] == 1
