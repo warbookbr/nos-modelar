@@ -107,13 +107,29 @@ Duas regras, e as duas recusam:
   avaliação — o filtro de domínio roda ANTES do de admissibilidade, porque
   medida fora do que o instrumento promete nem deveria ser julgada.
 
-**DAG e runner confinado ficaram de fora, e é decisão medida.** Hoje o
-laboratório tem UM instrumento, UM estudo e NENHUM passo que consuma a saída de
-outro. Um DAG não tem o que ordenar e um runner confinado não tem o que confinar:
-o instrumento é um script local, sem rede e sem código arbitrário. Construí-los
-agora seria maquinaria para um problema que não apareceu — exatamente o que esta
-incubação vem evitando desde o R0.
+**DAG e runner entraram depois, e a mudança de rumo fica registrada.** Eu tinha
+adiado os dois com um critério escrito — um segundo instrumento, ou um estudo cujo
+passo consuma a saída de outro — e nenhum dos dois apareceu. O que mudou foi a
+decisão de quem manda no projeto: montar o laboratório antes de usá-lo, em vez de
+deixar cada peça esperar a falha que a justifica. Anoto assim porque o critério
+não foi cumprido, foi substituído, e a diferença importa para quem ler depois.
 
-Eles entram quando existir o problema, e o gatilho fica escrito: **um segundo
-instrumento, ou um estudo cujo passo consuma a saída de outro.** Sem isso, R2
-segue parcial de propósito e não por atraso.
+O planejador prova o grafo ANTES de qualquer execução, e cada prova veio de um
+modo de falha: ciclo, capacidade que o instrumento não declara, duas saídas com o
+mesmo nome (ordem de execução virando dado, que é a proibição de posição-como-
+identidade outra vez), entrada que ninguém produz — o erro que mais parece
+funcionar, porque o passo roda, recebe vazio e devolve número plausível — e
+versão de instrumento sem fixar. Falha fechada: nenhuma ordem parcial sai, para
+não convidar a rodar "o que dá". O módulo não importa o executor, e há teste que
+verifica isso: "planejar não é executar" precisa de barreira, não de frase.
+
+O executor confina tempo por passo, tempo total, teto de passos, propagação de
+falha e diretório efêmero — e **declara na própria saída** que não confina rede,
+sistema de arquivos fora daquele diretório, memória nem processos filhos. Ele
+serve para instrumento local e confiável, que é o único que este laboratório tem,
+e não para código de terceiro. Duas honestidades caras: o tempo do passo é
+conferido depois de ele rodar, porque sem subprocesso não há como interromper uma
+função no meio; e saída que o passo não prometeu é descartada, para um passo não
+alimentar outro por canal que o grafo não declara.
+
+Vinte e cinco testes, e cada regra foi vista vermelha antes de virar verde.
