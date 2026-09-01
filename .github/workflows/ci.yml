@@ -30,7 +30,12 @@ jobs:
       # de `npm run test` reprova a promoção por `inspecao-visual-falhou` e
       # transforma falta de navegador em falso defeito de autoria.
       - name: Navegador para as provas visuais
-        run: npx playwright install --with-deps chromium
+        # `chromium-headless-shell` é um DOWNLOAD SEPARADO desde o Playwright
+        # 1.49, e é ele que o caminho visual do MCP lança. Instalar só
+        # `chromium` fazia a prova visual morrer em "Executable doesn't exist"
+        # enquanto as demais provas de bancada passavam, porque usam o chromium
+        # cheio — e por isso a falta ficava invisível.
+        run: npx playwright install --with-deps chromium chromium-headless-shell
 
       - name: TypeScript Typecheck
         run: npm run typecheck
