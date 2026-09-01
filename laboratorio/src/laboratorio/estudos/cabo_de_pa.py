@@ -28,6 +28,7 @@ from typing import Any
 
 from ..contratos import Estudo, Evidencia, Execucao, Hipotese, Sintese
 from ..incerteza import propagar
+from ..secagem import comparar_preparo
 from ..instrumentos import Registro
 from ..trocas import Candidata, Criterio, fronteira
 from ..unidades import Grandeza, dimensao
@@ -721,6 +722,47 @@ def avaliar_variantes(medida: bool = True) -> dict[str, Any]:
             "cabe na mão, e parede que amassa em uso"
         ),
     }
+
+
+#: PREPARO DA MATÉRIA-PRIMA, e a pergunta veio do usuário: se o bambu levar o
+#: mesmo tempo que o eucalipto para secar, o ganho encolhe.
+#:
+#: Não leva, e o motivo é geométrico. Secar é difusão, e o tempo vai com o
+#: QUADRADO da espessura que a água atravessa. O cabo de eucalipto é maciço: a
+#: água do centro percorre 16 mm. O colmo de bambu já vem oco, com parede de 3 mm
+#: que seca dos dois lados — 1,5 mm de caminho. A razão dos quadrados dá cerca de
+#: 114 vezes.
+#:
+#: E o tratamento contra caruncho NÃO soma: a imersão em bórax pode ser feita com
+#: o colmo ainda verde, antes de secar. Somar passo que roda em paralelo inventa
+#: tempo que ninguém gasta.
+PECAS_PARA_PREPARO = {
+    "cabo de eucalipto (maciço 32 mm)": {
+        "espessura_de_difusao_m": 0.016,
+        "passos": ("abate e corte", "secagem", "torneamento", "acabamento"),
+        "observacao": "a água do centro atravessa o raio inteiro",
+    },
+    "colmo de bambu (parede 3 mm)": {
+        "espessura_de_difusao_m": 0.0015,
+        "passos": ("corte do colmo", "imersão contra caruncho", "secagem",
+                   "corte no comprimento"),
+        "sobrepostos": ("imersão contra caruncho",),
+        "observacao": "já vem oco; a parede seca pelos dois lados, e a imersão pode "
+                      "ser feita com o colmo verde",
+    },
+    "bambu laminado (ripa 6 mm)": {
+        "espessura_de_difusao_m": 0.003,
+        "passos": ("corte", "imersão", "secagem", "laminação", "usinagem"),
+        "sobrepostos": ("imersão",),
+        "observacao": "a ripa é mais grossa que a parede do colmo, e ainda assim "
+                      "seca muito mais rápido que o maciço",
+    },
+}
+
+
+def comparar_preparo_da_materia_prima() -> dict[str, Any]:
+    """Quanto tempo cada matéria-prima leva para ficar pronta."""
+    return comparar_preparo(PECAS_PARA_PREPARO)
 
 
 def recomendar() -> dict[str, Any]:

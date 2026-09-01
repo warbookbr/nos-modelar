@@ -673,3 +673,36 @@ Um material com séculos de uso, disponível, barato e com a melhor resistência
 quilo da lista ficou fora até alguém perguntar. A busca de candidatos foi guiada
 pela ideia inicial do usuário, e não por uma varredura do espaço — e isso é um modo
 de falha do próprio método, não do material.
+
+### Secagem e preparo: a pergunta que podia derrubar o bambu, e não derrubou
+
+O usuário viu o risco: se o bambu levar o mesmo tempo que o eucalipto para secar, o
+ganho encolhe. Tempo de secagem é estoque parado, e estoque parado é dinheiro.
+
+Não leva, e o motivo é geométrico. **Secar é difusão, e o tempo característico vai
+com o QUADRADO da espessura** que a água atravessa — dobrar a espessura quadruplica
+o tempo. O cabo de eucalipto é maciço: a água do centro percorre 16 mm. O colmo já
+vem oco, com parede de 3 mm que seca dos dois lados: 1,5 mm de caminho.
+
+| peça | caminho de difusão | vezes mais lento |
+| --- | ---: | ---: |
+| cabo de eucalipto (maciço 32 mm) | 16,0 mm | **114×** |
+| bambu laminado (ripa 6 mm) | 3,0 mm | 4× |
+| colmo de bambu (parede 3 mm) | 1,5 mm | 1× |
+
+**E o tratamento contra caruncho não soma:** a imersão em bórax pode ser feita com o
+colmo ainda verde, antes de secar. O modelo declara passo sobreposto separado do
+passo somado, porque somar o que roda em paralelo inventa tempo que ninguém gasta.
+
+#### A honestidade que este resultado exigiu
+
+O número **absoluto** de dias que o modelo devolve é otimista — cabo de eucalipto
+seca ao ar em meses, não nas semanas da conta. A **razão**, essa é robusta: a
+difusividade se cancela nela e sobra a razão dos quadrados das espessuras. Há teste
+provando que a razão não muda quando a difusividade muda, e a saída carrega a
+instrução de ler a razão e não o valor.
+
+O que o modelo não faz também está dito: não é cronograma de estufa, e não modela
+colapso nem rachadura ao secar — que no eucalipto viram **perda de material**, não
+só tempo. Ou seja, a comparação real tende a favorecer o bambu ainda mais do que
+esta conta mostra, e mesmo assim a conta não foi ajustada para dizer isso.

@@ -348,3 +348,23 @@ def test_para_o_colmo_MEDIR_e_SELECIONAR_LOTE():
     import inspect
     fonte = inspect.getsource(estudo.avaliar_variantes)
     assert "SELECIONAR LOTE" in fonte
+
+
+def test_o_BAMBU_SECA_ORDENS_DE_GRANDEZA_mais_rapido():
+    """A pergunta do usuário: se levar o mesmo tempo, o ganho encolhe. Não leva —
+    o colmo já vem com parede de 3 mm e o cabo de eucalipto é maciço."""
+    p = estudo.comparar_preparo_da_materia_prima()["pecas"]
+    euc = p["cabo de eucalipto (maciço 32 mm)"]["vezesMaisLentoQueOMaisRapido"]
+    assert euc > 100
+
+
+def test_a_IMERSAO_do_bambu_e_SOBREPOSTA_a_secagem():
+    """Pode ser feita com o colmo verde; somar seria inventar tempo."""
+    p = estudo.comparar_preparo_da_materia_prima()["pecas"]
+    assert "imersão contra caruncho" in p["colmo de bambu (parede 3 mm)"]["passosSobrepostos"]
+
+
+def test_ate_o_LAMINADO_seca_muito_mais_rapido_que_o_macico():
+    p = estudo.comparar_preparo_da_materia_prima()["pecas"]
+    assert (p["bambu laminado (ripa 6 mm)"]["vezesMaisLentoQueOMaisRapido"]
+            < 0.1 * p["cabo de eucalipto (maciço 32 mm)"]["vezesMaisLentoQueOMaisRapido"])
