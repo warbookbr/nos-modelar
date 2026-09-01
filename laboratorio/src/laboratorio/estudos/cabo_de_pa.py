@@ -899,6 +899,29 @@ FIXACAO_E_INTEMPERISMO = {
             "os DOIS cortes do cabo devem cair em nó sempre que der; isso ataca a maior "
             "ameaça de durabilidade do bambu sem custar nada"
         ),
+        # CORREÇÃO, e ela veio de uma pergunta simples: quantos nós tem um pedaço
+        # de 1,2 m? Entrenó de Bambusa tuldoides fica entre 30 e 45 cm, mais curto
+        # perto da base e mais longo no meio do colmo, então 1,2 m dá de três a
+        # cinco nós contando as pontas — não um.
+        #
+        # E daí sai o que eu tinha dito errado: "corte nos dois nós" não é regra
+        # que se aplica sempre, porque QUEM ESCOLHE ONDE O NÓ ESTÁ É A PLANTA. Se
+        # o entrenó for de 40 cm, 1,2 m fecha exatamente; com 35 ou 45, não fecha.
+        # Exigir nó nas duas pontas é mais um critério de seleção, e seleção custa
+        # rendimento.
+        "quantosNosEmUmCabo": {
+            "entrenoTipico_cm": (30, 45),
+            "nosEm1_2m": (3, 5),
+            "quemEscolhe": "a planta, não o projeto",
+        },
+        "aRegraCorrigida": (
+            "nó na ponta que entra na pá: EXIJA, porque é a que sofre parafuso e "
+            "esmagamento, e vale gastar rendimento nela",
+            "nó na ponta livre: PREFIRA, não exija — se não cair, uma tampa ou anel "
+            "resolve, e é barato",
+            "aceite FAIXA de comprimento, e não só de diâmetro: um cabo que pode ter "
+            "entre 1,15 e 1,30 m acha muito mais colmo que caia bem nos nós",
+        ),
     },
     "sol_e_tempo": {
         "veredito": "empate com o eucalipto",

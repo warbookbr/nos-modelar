@@ -566,3 +566,18 @@ def test_a_PONTA_LIVRE_tambem_precisa_de_cuidado():
 def test_cortar_no_no_e_a_medida_mais_BARATA_do_projeto():
     """Custo zero: é só posicionamento do corte."""
     assert "Custo zero" in " ".join(estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]["solucoes"])
+
+
+def test_um_cabo_de_1_2_m_tem_de_TRES_A_CINCO_nos():
+    """Entrenó fica entre 30 e 45 cm; não é um nó só."""
+    q = estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]["quantosNosEmUmCabo"]
+    assert q["nosEm1_2m"] == (3, 5)
+    assert q["quemEscolhe"] == "a planta, não o projeto"
+
+
+def test_a_regra_do_NO_NAS_DUAS_PONTAS_foi_corrigida():
+    """Eu disse 'corte nos dois nós' como se fosse sempre possível. Não é: quem
+    escolhe onde o nó está é a planta, e exigir nas duas pontas custa rendimento."""
+    r = estudo.FIXACAO_E_INTEMPERISMO["ponta_livre"]["aRegraCorrigida"]
+    assert "EXIJA" in r[0] and "PREFIRA, não exija" in r[1]
+    assert "FAIXA de comprimento" in r[2]
