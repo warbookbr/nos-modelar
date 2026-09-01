@@ -1,0 +1,76 @@
+{
+ "consulta": "bamboo tool handle vibration damping",
+ "consultadoEm": "2026-09-01",
+ "descartados": 3,
+ "fonte": "crossref",
+ "itens": [
+  {
+   "ano": 2022,
+   "citacoes": 8,
+   "doi": "10.1016/j.indcrop.2022.115785",
+   "licencas": [
+    "https://www.elsevier.com/tdm/userlicense/1.0/",
+    "https://www.elsevier.com/legal/tdmrep-license",
+    "https://doi.org/10.15223/policy-017",
+    "https://doi.org/10.15223/policy-037",
+    "https://doi.org/10.15223/policy-012",
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-004"
+   ],
+   "primeiroAutor": "Chen",
+   "revista": "Industrial Crops and Products",
+   "tipo": "journal-article",
+   "titulo": "The effect of constituent units on the vibration reduction of bamboo engineering materials: The synergistic vibration reduction mechanism of bamboo stiffness and wood damping"
+  },
+  {
+   "ano": 2021,
+   "citacoes": 6,
+   "doi": "10.1177/16878140211040648",
+   "licencas": [
+    "https://creativecommons.org/licenses/by/4.0/"
+   ],
+   "primeiroAutor": "Busse",
+   "revista": "Advances in Mechanical Engineering",
+   "tipo": "journal-article",
+   "titulo": "Evaluation of the vibration characteristics and handle vibration damping of diesel-fueled 15-HP single-axle tractor"
+  },
+  {
+   "ano": 2025,
+   "citacoes": 4,
+   "doi": "10.1038/s41598-025-31296-4",
+   "licencas": [
+    "https://creativecommons.org/licenses/by-nc-nd/4.0",
+    "https://creativecommons.org/licenses/by-nc-nd/4.0"
+   ],
+   "primeiroAutor": "Adimass",
+   "revista": "Scientific Reports",
+   "tipo": "journal-article",
+   "titulo": "Damping properties of bamboo and glass fiber reinforced epoxy hybrid composites with edge cracks for vibration damping applications"
+  },
+  {
+   "ano": 2012,
+   "citacoes": 2,
+   "doi": "10.2118/149696-ms",
+   "licencas": [],
+   "primeiroAutor": "Burnett",
+   "revista": "IADC/SPE Drilling Conference and Exhibition",
+   "tipo": "proceedings-article",
+   "titulo": "Rotary Steerable Tool Damage Prevention by Utilization of an Asymmetric Vibration Damping Tool"
+  },
+  {
+   "ano": 2024,
+   "citacoes": 0,
+   "doi": "10.1109/acirs62330.2024.10684933",
+   "licencas": [
+    "https://doi.org/10.15223/policy-029",
+    "https://doi.org/10.15223/policy-037"
+   ],
+   "primeiroAutor": "Zhao",
+   "revista": "2024 9th Asia-Pacific Conference on Intelligent Robot Systems (ACIRS)",
+   "tipo": "proceedings-article",
+   "titulo": "Design of a Piezoelectric-Driven Tool Handle for Vibration Damping of an Industrial Robot"
+  }
+ ],
+ "oQueIssoNaoE": "metadado apenas; nenhum valor, condição ou conclusão de artigo algum está aqui, e título não sustenta alegação",
+ "totalNaBase": 616576
+}

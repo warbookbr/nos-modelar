@@ -765,6 +765,62 @@ def comparar_preparo_da_materia_prima() -> dict[str, Any]:
     return comparar_preparo(PECAS_PARA_PREPARO)
 
 
+#: ANÁLISE AMBIENTAL E DE FORNECIMENTO. Nada disto saiu de conta: é análise, e a
+#: marca está no fim de cada bloco. Entra no estudo porque decide adoção tanto
+#: quanto resistência — e porque ausência de análise seria omissão cômoda.
+AMBIENTE_E_FORNECIMENTO = {
+    "bambu-colmo": {
+        "aFavor": (
+            "é uma gramínea: corta-se o colmo e a touceira rebrota sem replantio, "
+            "em ciclo de três a cinco anos contra sete ou mais do eucalipto",
+            "não leva resina, adesivo nem aditivo, então não há emissão de processo "
+            "nem passivo de descarte",
+            "sequestro de carbono rápido durante o crescimento",
+        ),
+        "impedimentos": (
+            "ESPÉCIE IMPORTA: bambus alastrantes do gênero Phyllostachys se espalham "
+            "por rizoma e são tratados como invasores em vários lugares; os entouceirantes "
+            "(Bambusa, Dendrocalamus) ficam onde foram plantados. Escolher espécie errada "
+            "cria problema ambiental em vez de resolver",
+            "colheita de bambu NATIVO em área de mata pode exigir licenciamento; bambu "
+            "cultivado não tem esse entrave",
+            "o banho de bórax gera efluente: boro em concentração alta afeta planta, e o "
+            "tanque precisa de reuso em circuito fechado em vez de descarte",
+        ),
+        "fornecimento": (
+            "MATÉRIA-PRIMA ABUNDANTE, CADEIA IMATURA — e essa distinção é a mesma que "
+            "apareceu na lignina. O Brasil tem cultivo relevante, com histórico de "
+            "plantios grandes para celulose no Nordeste, e há política pública "
+            "específica de incentivo ao cultivo. Mas a cadeia de colmo CLASSIFICADO, "
+            "com lote conferido e diâmetro consistente, é artesanal e regional. "
+            "Comprar bambu é fácil; comprar bambu com garantia de lote não é",
+            "o eucalipto, em contraste, tem cadeia industrial madura para cabo pronto: "
+            "é a vantagem real dele neste estudo, e não a propriedade mecânica",
+        ),
+        "marca": ("ANÁLISE, NÃO ESTUDO: nada aqui foi medido nem verificado contra "
+                  "fonte primária, inclusive a menção a política pública, que vem de "
+                  "memória e precisa ser conferida antes de ser citada a terceiros"),
+    },
+    "bambu-laminado": {
+        "aFavor": (
+            "aproveita colmo fora de bitola e resíduo de corte, o que melhora o uso do "
+            "material colhido",
+            "some o nó e a variação de colmo, que é o que trava a cadeia do colmo natural",
+        ),
+        "impedimentos": (
+            "volta a depender de adesivo, e aí a pergunta do formaldeído reaparece — "
+            "com resposta conhecida, porque existe versão sem",
+            "a laminação gasta energia e gera resíduo que o colmo cortado não gera",
+        ),
+        "fornecimento": (
+            "indústria estabelecida no mundo todo para piso e móvel, o que dá cadeia "
+            "mais previsível que a do colmo — em troca de quatro vezes o custo",
+        ),
+        "marca": "ANÁLISE, NÃO ESTUDO: não medido, não verificado",
+    },
+}
+
+
 def recomendar() -> dict[str, Any]:
     """O que fazer, depois que a fonte primária derrubou duas conclusões minhas.
 

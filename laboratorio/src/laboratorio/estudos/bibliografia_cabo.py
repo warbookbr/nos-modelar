@@ -43,6 +43,14 @@ BUSCAS = {
         "a ameaça que eu apontei ao candidato — umidade — é reconhecida?",
     "hand arm vibration tool handle damping material":
         "vibração em cabo de ferramenta é preocupação estabelecida ou detalhe?",
+    "bamboo culm mechanical properties flexural strength":
+        "bambu tem propriedade mecânica medida e publicada, e o nó importa?",
+    "bamboo tool handle vibration damping":
+        "alguém já mediu bambu por amortecimento?",
+    "bamboo preservation boron treatment durability":
+        "o tratamento contra caruncho é procedimento estabelecido?",
+    "laminated bamboo engineered structural properties":
+        "bambu laminado tem base industrial e estrutural?",
 }
 
 

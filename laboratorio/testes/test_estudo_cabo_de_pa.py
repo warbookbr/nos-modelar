@@ -368,3 +368,24 @@ def test_ate_o_LAMINADO_seca_muito_mais_rapido_que_o_macico():
     p = estudo.comparar_preparo_da_materia_prima()["pecas"]
     assert (p["bambu laminado (ripa 6 mm)"]["vezesMaisLentoQueOMaisRapido"]
             < 0.1 * p["cabo de eucalipto (maciço 32 mm)"]["vezesMaisLentoQueOMaisRapido"])
+
+
+def test_a_analise_ambiental_declara_o_IMPEDIMENTO_da_especie():
+    """Bambu alastrante vira invasor; escolher espécie errada cria o problema que
+    se queria resolver."""
+    imp = " ".join(estudo.AMBIENTE_E_FORNECIMENTO["bambu-colmo"]["impedimentos"])
+    assert "Phyllostachys" in imp and "invasor" in imp
+    assert "licenciamento" in imp
+    assert "efluente" in imp or "boro" in imp
+
+
+def test_a_analise_de_fornecimento_separa_MATERIA_PRIMA_de_CADEIA():
+    """Matéria-prima abundante e cadeia imatura é o mesmo padrão da lignina."""
+    forn = " ".join(estudo.AMBIENTE_E_FORNECIMENTO["bambu-colmo"]["fornecimento"])
+    assert "CADEIA IMATURA" in forn
+    assert "cadeia industrial madura" in forn
+
+
+def test_toda_analise_carrega_a_MARCA_de_que_nao_e_estudo():
+    for bloco in estudo.AMBIENTE_E_FORNECIMENTO.values():
+        assert "NÃO ESTUDO" in bloco["marca"]
