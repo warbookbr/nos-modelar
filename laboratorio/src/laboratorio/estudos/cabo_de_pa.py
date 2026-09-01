@@ -94,6 +94,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
         "fornecimento": {
             "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 1,
+            "eucalipto-laminado": 3,
         },
     },
     "com-acesso-a-industria": {
@@ -103,6 +104,7 @@ CONTEXTOS_DE_FORNECIMENTO = {
             "fibra-de-vidro": 3, "papel-fenolico": 2, "papel-lignina": 3,
             "papel-lignina-curaua": 2,
             "bambu-colmo": 3, "bambu-laminado": 3,
+            "eucalipto-laminado": 3,
         },
     },
 }
@@ -116,6 +118,8 @@ CONFORMIDADE = {
     "eucalipto": 3, "aco-1020": 3, "aluminio-6061-t6": 3,
     "fibra-de-vidro": 2, "papel-fenolico": 1, "papel-lignina": 3,
     "papel-lignina-curaua": 3, "bambu-colmo": 3, "bambu-laminado": 3,
+    # Fenólica no LVL padrão traz a norma de formaldeído junto.
+    "eucalipto-laminado": 2,
 }
 
 MATERIAIS = {
@@ -347,6 +351,76 @@ MATERIAIS = {
         },
         "dispersao": {"modulo_pa": (10e9, 15e9), "resistencia_pa": (100e6, 140e6)},
     },
+    # Eucalipto laminado (LVL): a MESMA árvore, fatiada em lâminas finas, seca e
+    # recolada. Entra por causa de uma pergunta do usuário — se madeira é boa e o
+    # gargalo é secagem, dá para atacar a secagem sem trocar de matéria-prima?
+    #
+    # A FÍSICA QUE JUSTIFICA: secar é difusão, e o tempo cresce com o QUADRADO da
+    # espessura. Um taco de 32 mm e uma lâmina de 2 mm da mesma tora diferem por
+    # um fator de cerca de 256. O usuário corrigiu bem o alcance disso: a estufa é
+    # carregada com paletes inteiros, não com uma peça, então o ganho não é por
+    # peça — é de OCUPAÇÃO da estufa por lote entregue. A estufa gira mais vezes.
+    #
+    # O QUE SE PAGA: o laminado é mais fraco por quilo que a madeira limpa. LVL é
+    # feito de tora comercial inteira, com nó e defeito distribuídos, enquanto os
+    # 111,7 MPa do jarrah tabelado vêm de corpo de prova SEM defeito. A média cai.
+    #
+    # O QUE SE GANHA, e é o ponto que interessa: a DISPERSÃO despenca. O defeito
+    # que numa peça maciça é o ponto de quebra vira, no laminado, uma lâmina ruim
+    # entre nove boas. Cabo não quebra na média, quebra no pior do lote — então a
+    # comparação honesta é no p05, e não no valor nominal.
+    #
+    # A FRAQUEZA: estes números são de manual de memória, como quase tudo aqui, e
+    # LVL de eucalipto varia muito com a classe da tora e com a linha de cola.
+    "eucalipto-laminado": {
+        "modulo_pa": 14.0e9,
+        "densidade_kg_m3": 750.0,
+        "resistencia_pa": 85.0e6,
+        "fator_de_perda": 0.010,
+        "preco_por_kg": 7.0,
+        "irritacao": 2,
+        "ambiente": 3,
+        "justificativaQualitativa": (
+            "a madeira em si é inerte; o adesivo é a única variável de saúde, e o "
+            "LVL industrial padrão usa resina fenólica — existe versão sem "
+            "formaldeído, mas ela não é o que sai da linha por omissão"),
+        "agua": 2,
+        "fabricacao": 2,
+        "justificativaAguaEfabricacao": (
+            "mesma absorção da madeira maciça, com a linha de cola como caminho "
+            "extra; fabricação exige laminar, secar, encolar e prensar — indústria "
+            "madura e forte no Brasil, mas várias etapas a mais que tornear um taco"),
+        "processo": {
+            "dispensa": ("meses de estufa com a peça na espessura final",),
+            "exige": (
+                "laminação da tora, que é máquina dedicada",
+                "adesivo e prensa quente",
+                "usinagem do bloco até o perfil do cabo",
+            ),
+            "riscoDeDurabilidade": (
+                "a linha de cola vira o ponto de falha e o caminho de entrada de "
+                "água; delaminação com ciclo de molha e seca é o risco real, e este "
+                "estudo NÃO o modela"),
+        },
+        # Estreita de propósito, e essa estreiteza É o produto do processo.
+        "dispersao": {"modulo_pa": (13.0e9, 15.5e9), "resistencia_pa": (78.0e6, 95.0e6)},
+        # RESULTADO, e ele é NEGATIVO — fica registrado porque resultado negativo
+        # também é resultado. A 32 mm maciço, mesma geometria do cabo atual, o
+        # laminado dá margem 0,70 no p05 contra 1,01 do eucalipto maciço: reprova
+        # na porta estrutural. A dispersão estreita funcionou como previsto (o p05
+        # fica a 8% do determinista, contra a cauda larga da madeira limpa), mas a
+        # queda da média foi maior que o ganho de consistência.
+        #
+        # Ele volta a empatar a 36 mm, ainda dentro do que a mão segura. Só que aí
+        # pesa 0,92 kg contra 0,77 kg e custa R$ 6,41 contra R$ 3,09. Ou seja:
+        # empata em segurança, perde em peso, e custa o DOBRO do material que veio
+        # substituir. A exigência do usuário era ser mais barato, e não é.
+        #
+        # A CONCLUSÃO HONESTA: o ganho de secagem é real e a física dele se
+        # sustenta, mas ele é ganho de LOGÍSTICA, e o preço da colagem come esse
+        # ganho e mais um pouco. Laminar eucalipto resolve o gargalo de estufa de
+        # quem já tem a estufa; não resolve a pergunta deste estudo.
+    },
     "fibra-de-vidro": {
         "modulo_pa": 30.0e9,
         "densidade_kg_m3": 1900.0,
@@ -368,6 +442,7 @@ MATERIAIS = {
 #: Geometrias comparáveis: a madeira maciça como é, e tubos de parede honesta.
 GEOMETRIAS = {
     "eucalipto": ("macica", 0.032, None),
+    "eucalipto-laminado": ("macica", 0.032, None),
     "aco-1020": ("tubular", 0.032, 0.0012),
     "aluminio-6061-t6": ("tubular", 0.032, 0.0020),
     "fibra-de-vidro": ("tubular", 0.032, 0.0030),
