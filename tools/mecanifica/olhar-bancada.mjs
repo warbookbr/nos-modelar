@@ -183,7 +183,14 @@ export async function olharBancada({
     if (parPedida !== null && (par.length !== 2 || par.length !== selecionadas.length)) {
       erroDeUso('--par exige exatamente duas partes semânticas diferentes, separadas por vírgula.');
     }
-    if (parPedida !== null && focar) erroDeUso('--par já enquadra as duas partes; não misture com --focar.');
+    /* `--par` ESCOLHE a vista; ele nunca enquadrou. A recusa antiga dizia que
+       sim, e o próprio relatório desmentia: ele aprova o par com 64 px por
+       parte, que é um encaixe que ninguém consegue julgar na imagem. Numa peça
+       de 1,2 m isso significa que a única pergunta que o modo `par` existe para
+       responder — "este encaixe fecha?" — era a que ele não conseguia mostrar.
+       Achado em uso: um cabo atravessando a empunhadura teve de ser diagnosticado
+       pelos números da receita porque nenhuma vista dava para ver.
+       Agora `--focar` é aceito e aproxima nas duas partes. Sem ele, nada muda. */
     if (parPedida !== null && modoDeclarado !== null && modoDeclarado !== 'isolar') {
       erroDeUso('--par sempre isola o par; não misture com outro --modo.');
     }
@@ -370,8 +377,37 @@ export async function olharBancada({
           falhou = true;
           falhasRelatadas.push({ categoria: 'camera', codigo: 'par_sem_vista_legivel', vista: vistaRelatada, mensagem: 'Nenhuma vista canônica mostrou as duas partes com leitura suficiente.', acao: 'Escolha uma vista explicitamente ou revise a peça; a ferramenta não moverá componentes.' });
         }
-      } else if (focar) {
-        await page.evaluate(() => window.__mecanificaBancada.focar());
+      }
+      if (focar) {
+        /* Depois da escolha de vista, e não em vez dela: a vista decide de ONDE
+           olhar, o foco decide de QUÃO PERTO. São perguntas diferentes.
+           No par, o foco é no CONTATO e não na união — a união de duas partes
+           compridas que se tocam na ponta é as duas inteiras, e o encaixe volta
+           a ficar com poucos pixels, que era o problema original. */
+        if (par) {
+          const contato = await page.evaluate(
+            (partes) => window.__mecanificaBancada.focarContato(partes), par,
+          );
+          if (!contato?.valida) {
+            registrar(relato, logger, 'stderr', `  foco de contato recusado: ${contato?.motivo ?? 'sem motivo'}`);
+            falhou = true;
+            falhasRelatadas.push({
+              categoria: 'modelo', codigo: 'par_sem_contato', vista: vistaRelatada,
+              mensagem: contato?.motivo ?? 'A bancada não conseguiu enquadrar o contato.',
+              acao: 'Duas partes que não se sobrepõem não têm encaixe para julgar; confira a receita.',
+            });
+          } else {
+            /* A cena é normalizada, então a caixa NÃO sai em milímetro. Sai
+               como fração do maior lado da peça, que é o que responde "isto é
+               um encaixe ou é a peça inteira?" sem fingir uma unidade. */
+            const maior = Math.max(...contato.caixas.flatMap((c) => c.tamanho));
+            const fracao = Math.max(...contato.contato.tamanho) / (maior || 1);
+            registrar(relato, logger, 'stdout',
+              `contato enquadrado: ${(fracao * 100).toFixed(1)}% do maior lado do par`);
+          }
+        } else {
+          await page.evaluate(() => window.__mecanificaBancada.focar());
+        }
       }
       /* AUDITORIA depois de escolher a vista e antes de esperar o quadro: o modo
          mexe no tamanho do canvas (o cromo sai e o desenho ocupa tudo), e mudar
@@ -396,8 +432,18 @@ export async function olharBancada({
             window.__mecanificaBancada.modo(m);
           }, [selecionadas, modo]);
         }
-        if (focar || parPedida) await page.evaluate(() => window.__mecanificaBancada.focar());
-        else await page.evaluate(() => window.__mecanificaBancada.enquadrar());
+        /* O REENQUADRE DA AUDITORIA PRECISA REPETIR A MESMA REGRA de cima, e
+           não uma parecida. Ele roda DEPOIS e sobrescreve — foi assim que o foco
+           de contato ficou sem efeito com `--cores`, aceito e desfeito em
+           silêncio, que é exatamente o defeito que o comentário acima descreve
+           para a seleção. */
+        if (par && focar) {
+          await page.evaluate((partes) => window.__mecanificaBancada.focarContato(partes), par);
+        } else if (focar || parPedida) {
+          await page.evaluate(() => window.__mecanificaBancada.focar());
+        } else {
+          await page.evaluate(() => window.__mecanificaBancada.enquadrar());
+        }
       }
       await page.waitForTimeout(espera);
       garantirPrazo();

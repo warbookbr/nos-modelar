@@ -153,6 +153,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   let projecaoAtual = 'perspectiva';
   let vistaAtual = 'isometrica';
   let alvosAtuais = [];
+  /* Caixa que substitui a dos alvos no enquadramento; null = comportamento normal. */
+  let caixaFixada = null;
   let centroAtual = new THREE.Vector3(0, 0.9, 0);
   let raioAtual = 2;
   let transicao = null;
@@ -180,7 +182,11 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     const largura = Math.max(1, canvas.clientWidth);
     const altura = Math.max(1, canvas.clientHeight);
     const aspecto = largura / altura;
-    const envelope = envelopeProjetado(caixaValida(alvosAtuais), vistaAtual);
+    /* EM ORTOGRÁFICA O ZOOM VEM DA CAIXA, e não de `raioAtual` — mexer no raio
+       aqui não muda nada, e foi por isso que a primeira tentativa de enquadrar
+       um contato saiu idêntica à imagem sem foco, sem erro nenhum. Quando há
+       caixa fixada, é ela que manda; `enquadrar(objetos)` a limpa. */
+    const envelope = envelopeProjetado(caixaFixada ?? caixaValida(alvosAtuais), vistaAtual);
     const meiaAltura = envelope
       ? meiaAlturaParaVista({
         larguraProjetada: envelope.largura,
@@ -253,9 +259,28 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     aoMudarVista?.(vistaAtual);
   }
 
+  /* ENQUADRAR UMA CAIXA, e não só um conjunto de objetos. A inspeção de par
+     precisa disto: a caixa da UNIÃO de duas partes é inútil quando as duas são
+     compridas e se tocam só na ponta — num cabo de 1,2 m encaixado numa
+     empunhadura, a união é o cabo inteiro e o encaixe fica com poucos pixels.
+     Quem quer julgar um encaixe precisa enquadrar o CONTATO. */
+  function enquadrarCaixa(caixa, { instantaneo = false, reproduzivel = false } = {}) {
+    if (caixa && !caixa.isEmpty()) {
+      caixaFixada = caixa.clone();
+      centroAtual = caixa.getCenter(new THREE.Vector3());
+      raioAtual = Math.max(0.02, caixa.getBoundingSphere(new THREE.Sphere()).radius);
+    }
+    definirVista(vistaAtual === 'livre' ? 'isometrica' : vistaAtual, { instantaneo });
+    if (reproduzivel) {
+      if (transicao) publicarCameraLivreAoEstabilizar = true;
+      else promoverCameraAtualParaLivre();
+    }
+  }
+
   function enquadrar(objetos = alvosAtuais, { instantaneo = false, reproduzivel = false } = {}) {
     const caixa = caixaValida(objetos);
     if (caixa) {
+      caixaFixada = null;
       centroAtual = caixa.getCenter(new THREE.Vector3());
       raioAtual = Math.max(0.12, caixa.getBoundingSphere(new THREE.Sphere()).radius);
       alvosAtuais = objetos.slice();
@@ -513,6 +538,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     cameraLivre,
     restaurarCameraLivre,
     enquadrar,
+    enquadrarCaixa,
     referenciaMetrica,
     medirEnquadramento,
     medirPixelsVisiveisPorParte,

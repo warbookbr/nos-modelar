@@ -251,6 +251,13 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
     gruposSelecionados() {
       return selecionadas.map((nome) => partes.get(nome)).filter(Boolean);
     },
+    /* Uma parte pelo nome. Existe para quem precisa medir DUAS partes separadas
+       em vez do conjunto selecionado — o foco de contato compara as caixas uma
+       da outra, e `gruposSelecionados` já devolve as duas fundidas numa lista
+       sem dizer qual é qual. */
+    grupoDe(nome) {
+      return partes.get(nome) ?? null;
+    },
     gruposVisiveis() {
       return nomes.map((nome) => partes.get(nome)).filter((grupo) => grupo?.visible);
     },

@@ -398,6 +398,76 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     quadroReferencia = requestAnimationFrame(atualizarReferenciaMetrica);
   }
 
+  /* O CONTATO ENTRE DUAS PARTES, e não a união delas. `focarSelecao` enquadra
+     tudo o que está selecionado, o que responde "onde isto está" e não "este
+     encaixe fecha". Numa pá, cabo mais empunhadura dá a caixa do cabo inteiro:
+     o encaixe some num canto e o defeito passa. Foi assim que um cabo
+     atravessando a empunhadura teve de ser diagnosticado pelos números da
+     receita, porque nenhuma vista conseguia mostrá-lo.
+
+     A caixa aqui é a INTERSEÇÃO das duas, folgada o suficiente para mostrar de
+     onde cada uma vem. Se elas não se tocam, isso é a resposta — e sai como
+     recusa, porque enquadrar a união em silêncio devolveria uma imagem bonita
+     para uma pergunta que ninguém respondeu. */
+  const FOLGA_DO_CONTATO = 1.5;
+
+  function focarContato(nomes) {
+    if (!controlador || !modeloAtual) return { valida: false, motivo: 'Sem modelo carregado.' };
+    const partes = [...new Set(Array.isArray(nomes) ? nomes : controlador.selecionadas)];
+    if (partes.length !== 2 || partes.some((nome) => !controlador.nomes.includes(nome))) {
+      return { valida: false, motivo: 'O foco de contato exige exatamente duas partes existentes.' };
+    }
+    const caixas = partes.map((nome) => {
+      const grupo = controlador.grupoDe(nome);
+      const caixa = new THREE.Box3();
+      if (grupo) caixa.expandByObject(grupo);
+      return caixa;
+    });
+    if (caixas.some((caixa) => caixa.isEmpty())) {
+      return { valida: false, motivo: 'Uma das partes não tem geometria visível neste modo.' };
+    }
+    /* SOBREPOSIÇÃO OU FOLGA, e as duas servem. Recusar quando as caixas não se
+       cruzam foi a primeira versão, e estava errada pela própria pergunta do
+       modo: um encaixe que NÃO fecha é exatamente o que se quer ver de perto.
+       Sem sobreposição, a região a enquadrar é o vão entre as duas — a caixa
+       que vai da face mais próxima de uma à face mais próxima da outra. */
+    const cruzam = caixas[0].intersectsBox(caixas[1]);
+    const contato = cruzam
+      ? caixas[0].clone().intersect(caixas[1])
+      : new THREE.Box3(
+        new THREE.Vector3(...[0, 1, 2].map((e) => Math.min(caixas[0].max.getComponent(e), caixas[1].max.getComponent(e)))),
+        new THREE.Vector3(...[0, 1, 2].map((e) => Math.max(caixas[0].min.getComponent(e), caixas[1].min.getComponent(e)))),
+      );
+    /* O vão pode sair invertido em eixos onde as caixas se cobrem; normalizar é
+       o que transforma "min/max trocados" numa caixa de verdade. */
+    for (const eixo of [0, 1, 2]) {
+      if (contato.min.getComponent(eixo) > contato.max.getComponent(eixo)) {
+        const a = contato.min.getComponent(eixo), b = contato.max.getComponent(eixo);
+        contato.min.setComponent(eixo, b);
+        contato.max.setComponent(eixo, a);
+      }
+    }
+    const tamanho = contato.getSize(new THREE.Vector3());
+    /* A FOLGA SAI DO MENOR LADO, e não do maior. Com o maior, duas chapas largas
+       separadas por um vão fino ganhavam uma folga do tamanho da largura — e o
+       "foco" enquadrava MAIS que a peça inteira, afastando em vez de aproximar.
+       O menor lado é a espessura do encontro, que é a escala da pergunta. */
+    const menorLado = Math.min(tamanho.x, tamanho.y, tamanho.z);
+    const folga = Math.max(0.01, menorLado * FOLGA_DO_CONTATO);
+    /* A folga nunca sai da união das duas partes: focar o contato jamais pode
+       enquadrar MAIS do que enquadrar as duas inteiras. Sem este corte, um
+       encontro largo com folga somada saía um pouco maior que o par, e o
+       comando "aproximar" afastava — pouco, e ainda assim ao contrário. */
+    const uniao = caixas[0].clone().union(caixas[1]);
+    ambiente.enquadrarCaixa(contato.expandByScalar(folga).intersect(uniao),
+      { instantaneo: true, reproduzivel: true });
+    return {
+      valida: true, tocam: cruzam, partes,
+      contato: { centro: contato.getCenter(new THREE.Vector3()).toArray(), tamanho: tamanho.toArray() },
+      caixas: partes.map((nome, i) => ({ nome, tamanho: caixas[i].getSize(new THREE.Vector3()).toArray() })),
+    };
+  }
+
   function focarSelecao() {
     if (!controlador || !modeloAtual) return;
     const grupos = controlador.gruposSelecionados();
@@ -828,6 +898,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     projecao: (projecao) => ambiente.definirProjecao(projecao),
     explosao: (valor) => controlador?.definirExplosao(valor),
     focar: () => focarSelecao(),
+    focarContato: (nomes) => focarContato(nomes),
     inspecionarPar: (nomes) => inspecionarPar(nomes),
     enquadrar: () => enquadrarMontagem(),
     /* Métrica de câmera consumida pela revisão headless: a bancada já sabe

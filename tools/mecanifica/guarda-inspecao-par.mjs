@@ -97,6 +97,41 @@ try {
     `${JSON.stringify(restaurado)} · ${marcadoresRestaurados} contorno(s)`);
 
   await provarPar(page, { peca: 'fixture-portas', partes: ['base', 'superficie'] });
+
+  /* FOCAR O CONTATO, e não a união. `inspecionarPar` escolhe a vista; ele nunca
+     enquadrou. Num par de partes compridas que se tocam só na ponta, a caixa da
+     união é as duas inteiras e o encaixe fica com poucos pixels — foi assim que
+     um cabo atravessando uma empunhadura teve de ser diagnosticado pelos números
+     da receita, porque nenhuma vista conseguia mostrá-lo.
+
+     A prova é comparativa, e não estética: a caixa do contato tem de ser
+     ESTRITAMENTE MENOR que a da união. Sem esta comparação, um `focarContato`
+     que não fizesse nada passaria — e passou, na primeira versão, porque em
+     ortográfica o zoom vem da caixa e não do raio. */
+  /* A medida do zoom é a extensão BRUTA projetada, e não `area`: `area` é
+     recortada ao quadro, então quando o par passa a transbordar ela CAI, e usá-la
+     faria o teste dizer que aproximar afasta. */
+  const extensaoProjetada = async () => {
+    const e = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
+    return e?.larguraBruta != null ? e.larguraBruta * e.alturaBruta : null;
+  };
+  const antes = await extensaoProjetada();
+  const contato = await page.evaluate(
+    () => window.__mecanificaBancada.focarContato(['base', 'superficie']));
+  ok('foco de contato: enquadra o par, tocando-se ou com folga',
+    contato?.valida === true, JSON.stringify(contato?.motivo ?? contato?.tocam));
+  const depois = await extensaoProjetada();
+  /* A regra geral é a que vale para qualquer par: focar o contato NUNCA pode
+     enquadrar mais que a união. Duas chapas cujo encontro é quase a peça inteira
+     mudam pouco, e está certo — o que não pode é AFASTAR, que foi o defeito da
+     primeira versão, quando a folga saía do maior lado. */
+  ok('foco de contato: nunca enquadra mais que a união das duas partes',
+    antes !== null && depois !== null && depois >= antes * 0.999,
+    `extensão projetada antes=${antes?.toFixed(3)} depois=${depois?.toFixed(3)}`);
+
+  const semPar = await page.evaluate(() => window.__mecanificaBancada.focarContato(['base']));
+  ok('foco de contato: recusa quando não são duas partes', semPar?.valida === false, JSON.stringify(semPar));
+
   ok('nenhuma página emitiu erro', erros.length === 0, erros.join(' | '));
   await page.close();
 } catch (erro) {

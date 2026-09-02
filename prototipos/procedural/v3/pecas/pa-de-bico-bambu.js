@@ -54,8 +54,29 @@ const P = {
 const L = P.lamina, B = P.bocal, C = P.cabo, N = P.nos, D = P.punho;
 const Re = C.diametroExterno / 2;
 const Ri = Re - C.parede;
-const yBocal = L.comprimento * 0.62;          /* onde o bocal nasce da lâmina */
-const yCabo = yBocal + B.comprimento * 0.55;  /* onde o colmo começa */
+/* A BOCA DA PÁ REAL TEM DUAS PARTES, e a primeira versão fundia as duas num
+   cilindro só. Conferido contra foto de pá de bico comercial:
+
+     - SOBRE A CHAPA ela é um NERVO — um vinco achatado que abre em leque e
+       morre no terço de baixo da lâmina. Não é um tubo deitado: tem largura e
+       quase nenhuma altura, e é ele que enrijece a chapa contra o dobramento.
+     - ACIMA DOS OMBROS ela vira CANO, e o cano sobe bem além deles para abraçar
+       o cabo num trecho longo. Na primeira versão o bocal terminava ABAIXO do
+       topo da lâmina, e por isso os ombros liam altos demais em relação à boca.
+
+   Achado pelo usuário, com foto de referência. O erro não era de medida: era de
+   não ter olhado como a peça real resolve o encontro. */
+const yOmbro = L.comprimento;                 /* topo da lâmina: onde ficam os ombros */
+const yBocal = L.comprimento * 0.62;          /* meio do nervo, sobre a chapa */
+const yBocaTopo = yOmbro + 0.064;             /* o cano sobe além dos ombros */
+const yCabo = yOmbro - 0.046;                 /* o colmo entra e é abraçado pelo cano */
+
+/* Seção achatada: larga na chapa, baixa em relevo. `lados` pontos exatos, que é
+   o que o loft exige do contorno explícito. */
+const ovalDoNervo = (meiaLargura, relevo) => Array.from({ length: B.lados }, (_, k) => {
+  const t = (k / B.lados) * Math.PI * 2;
+  return [meiaLargura * Math.cos(t), relevo * Math.sin(t)];
+});
 const yTopo = yCabo + C.comprimento;
 
 /* Planta da lâmina: bico arredondado embaixo, ombros largos em cima. Meia
@@ -166,14 +187,15 @@ export const receitaPaDeBicoBambu = {
     ['loft', {
       origemId: 2, lados: B.lados, orientacao: [1, 0, 0],
       secoes: [
-        /* O bocal da primeira versão tinha 34 mm de raio na base e engolia
-           metade da lâmina. Na pá real ele é um cone ESTREITO: agarra o cabo,
-           encosta na chapa e continua como nervura, não como capuz. */
-        { pos: [0, yBocal - 0.085, 0], raio: 0.013 },
-        { pos: [0, yBocal - 0.045, 0], raio: 0.019 },
-        { pos: [0, yBocal, 0], raio: 0.0225 },
-        { pos: [0, yBocal + B.comprimento * 0.55, 0], raio: B.raioBoca },
-        { pos: [0, yCabo + 0.012, 0], raio: Re + 0.0016 },
+        /* Nervo morrendo na chapa: largura crescendo, relevo indo a quase zero. */
+        { pos: [0, yBocal - 0.095, 0], contorno: ovalDoNervo(0.011, 0.0016) },
+        { pos: [0, yBocal - 0.050, 0], contorno: ovalDoNervo(0.021, 0.0055) },
+        { pos: [0, yBocal, 0], contorno: ovalDoNervo(0.026, 0.0115) },
+        /* Transição para cano, ainda sob os ombros. */
+        { pos: [0, yCabo, 0], contorno: ovalDoNervo(0.0255, 0.0205) },
+        { pos: [0, yOmbro, 0], raio: 0.0235 },
+        { pos: [0, yBocaTopo - 0.022, 0], raio: Re + 0.0030 },
+        { pos: [0, yBocaTopo, 0], raio: Re + 0.0016 },
       ],
     }],
     ['loft', { origemId: 3, lados: C.lados, orientacao: [1, 0, 0], secoes: perfilColmo(Re) }],
