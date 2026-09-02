@@ -45,9 +45,31 @@ const DBG = { normais: 1, flat: 2 }[P.get('debug')] || (parseInt(P.get('debug'))
 const hudNome = document.getElementById('nome'), hudFps = document.getElementById('fps'), hudDev = document.getElementById('dev');
 try {
   const mod = await import(`./pecas/${nome}.js`);
-  hudNome.textContent = `${mod.meta.nome} (${mod.meta.tipo}) — ${mod.meta.desc}`;
+  const receita = mod.default ?? Object.values(mod).find((v) => v && typeof v === 'object' && Array.isArray(v.PASSOS)) ?? mod;
+  const meta = receita.meta ?? mod.meta ?? {};
+  const nomeExibicao = meta.nome ?? nome;
+  const tipoExibicao = meta.tipo ?? 'peça';
+  const descExibicao = meta.desc ?? (receita.TOPO ? Object.values(receita.TOPO).filter((v) => typeof v === 'string').join(' · ') : '');
+  hudNome.textContent = `${nomeExibicao} (${tipoExibicao})${descExibicao ? ` — ${descExibicao}` : ''}`;
   const visor = criarVisor({ canvas: document.getElementById('c'), res, camOrbita, cam, debug: DBG });
-  visor.carregar(mod.construir({ TS, tex, geo, m4 }));
+  if (typeof mod.construir === 'function') {
+    visor.carregar(mod.construir({ TS, tex, geo, m4 }));
+  } else if (Array.isArray(receita.PASSOS)) {
+    const { executar } = await import('./motor/executor.js');
+    const pecaCarregada = executar(
+      receita.PASSOS,
+      receita.PARAMS ?? {},
+      receita.TOPO ?? {},
+      { TS, tex, geo, m4 },
+      receita.MATERIAIS ?? {},
+      receita.ANIMACOES ?? {},
+      receita.ESQUELETO ?? null,
+      receita.ALIASES ?? [],
+    );
+    visor.carregar(pecaCarregada);
+  } else {
+    throw new Error(`A peça "${nome}" não exporta construir(ctx) nem receita com PASSOS.`);
+  }
   hudDev.textContent = `${visor.info()} · tex ${16*TS}px${DBG ? ' · GEO' : ''} · ${visor.renderer}`;
   visor.rodar((fps) => { hudFps.textContent = fps + ' fps'; });
   window.__ready = true;

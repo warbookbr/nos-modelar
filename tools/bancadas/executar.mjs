@@ -8,10 +8,11 @@
      node tools/bancadas/executar.mjs                    # compatibilidade legada
      node tools/bancadas/executar.mjs --arquivo=tools/mecanifica/fixture.js */
 import { pathToFileURL } from 'node:url';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { extrairReceita } from './estado-peca.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -19,7 +20,8 @@ const args = process.argv.slice(2);
 const nome = (args.find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
 const arquivoArg = args.find((a) => a.startsWith('--arquivo='))?.slice('--arquivo='.length);
 const caminho = resolve(REPO, arquivoArg || `prototipos/procedural/v3/pecas/${nome}.js`);
-if (!existsSync(caminho) || !caminho.startsWith(`${REPO}/`)) {
+const dentroRepo = !relative(REPO, caminho).startsWith('..') && !/^[A-Za-z]:/.test(relative(REPO, caminho));
+if (!existsSync(caminho) || !dentroRepo) {
   console.error(`executar: arquivo de receita não encontrado ou fora do repositório: ${arquivoArg || nome}`);
   process.exit(2);
 }
@@ -34,11 +36,12 @@ const peca = await import(pathToFileURL(caminho).href);
    desde que os materiais existem (D-93/D-94) e ninguém viu, porque ninguém
    rodou o replay nessas peças. O `criar.mjs` sempre passou os dois — eram duas
    bancadas discordando sobre a mesma peça. */
-const { PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = [] } = peca;
+const receita = extrairReceita(peca) ?? peca;
+const { PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO = null, ALIASES = [] } = receita;
 if (!Array.isArray(PASSOS)) { console.error(`peça ${nome} não exporta PASSOS (é uma peça-objeto da Oficina?)`); process.exit(2); }
 
 /* 1 · executa */
-const n1 = neutroCanonico(executarReceita(peca).neutro);
+const n1 = neutroCanonico(executarReceita(receita).neutro);
 
 /* 2 · serializa os PASSOS (o que o arquivo salva), re-parseia, re-executa */
 const PASSOS2 = JSON.parse(JSON.stringify(PASSOS));

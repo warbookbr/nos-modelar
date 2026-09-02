@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { decodePng, pngStats } from './bench/pngstats.mjs';
 import { mascaraParaPng, sobreposicaoParaPng } from './bench/pngwrite.mjs';
 import { extrairSilhueta, rasterizarContorno, validarContorno, iou, areaMascara, LIMIAR_IOU } from './bench/gabarito-nucleo.mjs';
-import { executarNucleoDaPeca } from './estado-peca.mjs';
+import { extrairReceita, executarNucleoDaPeca } from './estado-peca.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -55,16 +55,17 @@ log(`═══ criar — ${nome} ═══`);
 log('\n── estado (núcleo) ──');
 const { nucleo, neutroCanonico, colisaoDe, REGISTRO_OPERACOES, catalogoDeCapacidades } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
 const mod = await import(pathToFileURL(join(PECAS, `${nome}.js`)).href);
-const temPassos = Array.isArray(mod.PASSOS);
+const receita = extrairReceita(mod) ?? (Array.isArray(mod.PASSOS) ? mod : null);
+const temPassos = Array.isArray(receita?.PASSOS);
 if (temPassos) {
   try {
-    const n = neutroCanonico(executarNucleoDaPeca(nucleo, mod));
+    const n = neutroCanonico(executarNucleoDaPeca(nucleo, receita));
     // linha de V é [id, x, y, z, ...] (achatada — ver o comentário de neutroCanonico), não [id,[x,y,z]]
     const xs = n.V.map((v) => v[1]), ys = n.V.map((v) => v[2]), zs = n.V.map((v) => v[3]);
     const caixa = n.V.length ? { min: [Math.min(...xs), Math.min(...ys), Math.min(...zs)], max: [Math.max(...xs), Math.max(...ys), Math.max(...zs)] } : null;
-    log(`  vértices=${n.V.length}  faces=${n.F.length}  passos=${mod.PASSOS.length}`);
+    log(`  vértices=${n.V.length}  faces=${n.F.length}  passos=${receita.PASSOS.length}`);
     if (caixa) log(`  caixa: [${caixa.min.map((v) => v.toFixed(3))}] .. [${caixa.max.map((v) => v.toFixed(3))}]`);
-    const col = colisaoDe(mod.PASSOS, mod.PARAMS ?? {}, mod.TOPO ?? {}, mod.MATERIAIS ?? {});
+    const col = colisaoDe(receita.PASSOS, receita.PARAMS ?? {}, receita.TOPO ?? {}, receita.MATERIAIS ?? {}, receita.ALIASES ?? []);
     log(`  colisão: forma=${col.forma} raio=${col.raio.toFixed(4)} altura=${col.altura.toFixed(4)} base=${col.base.toFixed(4)}`);
     if (n.orfaos.length === 0) ok('sem órfãos (grita 0)'); else falha(`${n.orfaos.length} órfão(s): ${JSON.stringify(n.orfaos).slice(0, 200)}`);
   } catch (e) { falha(`núcleo lançou: ${e.message}`); }
