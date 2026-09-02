@@ -188,11 +188,16 @@ export const receitaPaDeBicoBambu = {
       origemId: 2, lados: B.lados, orientacao: [1, 0, 0],
       secoes: [
         /* Nervo morrendo na chapa: largura crescendo, relevo indo a quase zero. */
-        { pos: [0, yBocal - 0.095, 0], contorno: ovalDoNervo(0.011, 0.0016) },
-        { pos: [0, yBocal - 0.050, 0], contorno: ovalDoNervo(0.021, 0.0055) },
-        { pos: [0, yBocal, 0], contorno: ovalDoNervo(0.026, 0.0115) },
+        /* LARGURA ENXUTA, apontada pelo usuário sobre a vista frontal: a primeira
+           versão do nervo abria 52 mm contra os 248 mm da lâmina e lia gorda.
+           O relevo NÃO acompanha o corte — ele é o que abraça o cabo, e no topo
+           precisa continuar maior que o raio do colmo. Estreitar é de forma;
+           achatar seria de função. */
+        { pos: [0, yBocal - 0.095, 0], contorno: ovalDoNervo(0.0075, 0.0016) },
+        { pos: [0, yBocal - 0.050, 0], contorno: ovalDoNervo(0.0135, 0.0050) },
+        { pos: [0, yBocal, 0], contorno: ovalDoNervo(0.0175, 0.0110) },
         /* Transição para cano, ainda sob os ombros. */
-        { pos: [0, yCabo, 0], contorno: ovalDoNervo(0.0255, 0.0205) },
+        { pos: [0, yCabo, 0], contorno: ovalDoNervo(0.0215, 0.0205) },
         { pos: [0, yOmbro, 0], raio: 0.0235 },
         { pos: [0, yBocaTopo - 0.022, 0], raio: Re + 0.0030 },
         { pos: [0, yBocaTopo, 0], raio: Re + 0.0016 },
