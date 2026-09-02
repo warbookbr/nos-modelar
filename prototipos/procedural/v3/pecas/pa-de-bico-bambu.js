@@ -178,11 +178,43 @@ const pestana = (sinal) => [
 const yColar = yTopo - 0.052;
 const yPunhoBase = yTopo - 0.006;
 const yPunhoTopo = yPunhoBase + D.altura;
+/* O PUNHO EM D É FEITO DE FITA CHATA, e não de cano redondo. Conferido contra o
+   desenho da pá comercial: são duas fitas de chapa que saem do colar, abrem
+   depressa, sobem QUASE VERTICAIS e fecham num canto curto em cima, onde
+   prendem a travessa. A primeira versão fazia um triângulo de tubos — os
+   montantes abriam em diagonal contínua até o topo, sem trecho reto e sem canto,
+   e lia como um Y de arame em vez de um D estampado.
+
+   A fita é larga no plano do D e fina de lado; é essa proporção que dá a
+   aparência de chapa dobrada. Como o loft só faz círculo por `raio`, a seção vem
+   por `contorno` explícito — a mesma porta que o nervo da lâmina usa. */
+/* ESPESSURA DE PEÇA MOLDADA, e não de chapa. A primeira versão desta fita usou
+   3 mm de meia-espessura e saiu como uma lâmina de arame vista de lado. Na foto
+   da pá comercial o punho é um corpo MOLDADO: de perfil ele tem quase a mesma
+   grossura do colar que abraça o cabo, e não a de uma chapa dobrada.
+
+   Então a fita é larga em Z (profundidade, onde os dedos fecham) e um pouco
+   menos larga no plano do D — o oposto do que eu tinha escrito. "Fita" ficou no
+   nome porque é o formato do contorno; o que mudou é a proporção. */
+const fita = { largura: 0.0095, espessura: 0.0125 };
+
+/* `orientacao` do montante é [0,0,1], então a primeira coordenada do contorno
+   corre em Z (a espessura) e a segunda no plano do D (a largura). */
+const secaoDaFita = (espessura, largura) => Array.from({ length: D.lados }, (_, k) => {
+  const a = (k / D.lados) * Math.PI * 2;
+  return [espessura * Math.cos(a), largura * Math.sin(a)];
+});
+
 const montante = (sinal) => [
-  { pos: [0, yPunhoBase, 0], raio: D.raioTubo * 1.15 },
-  { pos: [sinal * D.meiaLargura * 0.55, yPunhoBase + D.altura * 0.34, 0], raio: D.raioTubo },
-  { pos: [sinal * D.meiaLargura, yPunhoBase + D.altura * 0.70, 0], raio: D.raioTubo },
-  { pos: [sinal * D.meiaLargura, yPunhoTopo - 0.008, 0], raio: D.raioTubo },
+  /* sai do colar já como fita, e abre rápido */
+  { pos: [sinal * 0.004, yPunhoBase, 0], contorno: secaoDaFita(fita.espessura * 1.25, fita.largura * 0.95) },
+  { pos: [sinal * D.meiaLargura * 0.62, yPunhoBase + D.altura * 0.26, 0], contorno: secaoDaFita(fita.espessura, fita.largura) },
+  /* trecho reto: é ele que faz o D deixar de ser triângulo */
+  { pos: [sinal * D.meiaLargura * 0.94, yPunhoBase + D.altura * 0.48, 0], contorno: secaoDaFita(fita.espessura, fita.largura) },
+  { pos: [sinal * D.meiaLargura, yPunhoBase + D.altura * 0.70, 0], contorno: secaoDaFita(fita.espessura, fita.largura) },
+  /* canto curto e fechado, virando para dentro sob a travessa */
+  { pos: [sinal * D.meiaLargura * 0.99, yPunhoTopo - 0.014, 0], contorno: secaoDaFita(fita.espessura, fita.largura) },
+  { pos: [sinal * D.meiaLargura * 0.90, yPunhoTopo - 0.003, 0], contorno: secaoDaFita(fita.espessura * 1.1, fita.largura * 0.92) },
 ];
 
 export const receitaPaDeBicoBambu = {
@@ -263,12 +295,19 @@ export const receitaPaDeBicoBambu = {
         { pos: [0, yPunhoBase + 0.016, 0], raio: D.raioTubo * 1.30 },
       ],
     }],
+    /* A TRAVESSA É A PEÇA QUE A MÃO SEGURA, e no desenho ela é um bloco moldado
+       com topo reto, não um tubo fino. Fica mais larga em Z (profundidade, onde
+       os dedos fecham) do que alta em Y, e vai de ponta a ponta apoiada nos dois
+       cantos das fitas. `orientacao` é [0,1,0], então a primeira coordenada do
+       contorno corre em Y (altura) e a segunda em Z (profundidade). */
     ['loft', {
       origemId: 7, lados: D.lados, orientacao: [0, 1, 0],
       secoes: [
-        { pos: [-D.meiaLargura - 0.004, yPunhoTopo, 0], raio: D.raioTubo * 1.25 },
-        { pos: [0, yPunhoTopo, 0], raio: D.raioTubo * 1.25 },
-        { pos: [D.meiaLargura + 0.004, yPunhoTopo, 0], raio: D.raioTubo * 1.25 },
+        { pos: [-D.meiaLargura * 0.99, yPunhoTopo - 0.004, 0], contorno: secaoDaFita(0.0090, 0.0110) },
+        { pos: [-D.meiaLargura * 0.80, yPunhoTopo - 0.002, 0], contorno: secaoDaFita(0.0100, 0.0130) },
+        { pos: [0, yPunhoTopo, 0], contorno: secaoDaFita(0.0100, 0.0135) },
+        { pos: [D.meiaLargura * 0.80, yPunhoTopo - 0.002, 0], contorno: secaoDaFita(0.0100, 0.0130) },
+        { pos: [D.meiaLargura * 0.99, yPunhoTopo - 0.004, 0], contorno: secaoDaFita(0.0090, 0.0110) },
       ],
     }],
 
