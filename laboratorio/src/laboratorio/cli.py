@@ -20,7 +20,7 @@ import json
 import sys
 from typing import Any
 
-from . import consulta, ensaio
+from . import consulta, ensaio, revisor
 from .erros import ErroLaboratorio
 
 MM = 1000.0
@@ -84,6 +84,13 @@ def _parser() -> argparse.ArgumentParser:
                     help="sem isto, usa o limite de empunhadura, que é o piso mais frouxo")
     _opcoes_de_caso(pe)
 
+    rev = subs.add_parser(
+        "revisar",
+        help="caça número sem rastro e propriedade sem ressalva num documento")
+    rev.add_argument("documento")
+    rev.add_argument("--poder", action="store_true",
+                     help="mede quantos números inventados este revisor acusaria")
+
     en = subs.add_parser("ensaio", help="bancada virtual, sem material curado")
     ensubs = en.add_subparsers(dest="tipo", required=True)
 
@@ -137,6 +144,10 @@ def executar(argv: list[str] | None = None) -> dict[str, Any]:
         return consulta.peneirar(
             caso=_caso(args),
             diametro_m=None if args.diametro_mm is None else args.diametro_mm / MM)
+    if args.comando == "revisar":
+        if args.poder:
+            return revisor.poder_de_deteccao()
+        return revisor.revisar(args.documento)
     if args.comando == "ensaio":
         if args.tipo == "flexao":
             return ensaio.flexao_tres_pontos(
