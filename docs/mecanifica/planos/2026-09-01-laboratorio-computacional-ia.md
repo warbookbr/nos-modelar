@@ -144,6 +144,14 @@ descobertas como surpresa:
 - **Python é linguagem nova neste repositório.** Dobra a superfície de CI e de
   manutenção. A aposta está declarada no dossiê (seção 13) e o custo aparece
   quando R1 trouxer a primeira dependência de verdade.
+- **Restrição nova não foi passada nas linhas velhas.** A parede mínima prática
+  do estudo do cabo nasceu na varredura de variantes e nunca alcançou a tabela de
+  geometrias: aço (1,2 mm) e alumínio (2,0 mm) a violam desde antes de ela
+  existir, e rodavam sem que nada acusasse. Ficam como estão — metal já está
+  reprovado por vibração — mas agora nomeadas em `PAREDES_ANTERIORES_A_MINIMA`,
+  presas por teste, e marcadas em cada resultado da consulta. **A regra vale além
+  deste estudo:** restrição nova precisa ser passada nas linhas velhas, ou vira
+  regra só para quem chegou depois.
 - **A falta de foco custou caro e pode voltar.** Este plano passou de 2026-09-01
   sem dizer o que se estuda, e o preço foi maquinaria construída sem pergunta.
   A seção "Foco" existe para que a próxima frente seja cobrada contra ela.

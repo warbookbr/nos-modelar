@@ -559,6 +559,45 @@ estava errada. E a barra para os candidatos subiu 50%.
 
 O eucalipto tem fonte primária de domínio público (FPL-GTR-190) e o candidato NÃO tem nenhuma: os números dele saíram de memória. O benchmark é sólido; o candidato é o que precisa ser medido.
 
+## 11-bis. Como refazer qualquer conta deste dossiê
+
+Todo número daqui sai de um comando, e o comando aceita o caso como parâmetro —
+força, comprimento, massa, flecha, margem, diâmetro. Não é preciso editar código
+para conferir, nem para perguntar outra coisa.
+
+```bash
+npm run lab -- candidatos
+npm run lab -- avaliar bambu-colmo --diametro-mm 32
+npm run lab -- diametro-minimo seringueira --forca 350
+npm run lab -- peneirar --massa-maxima 0.8
+npm run lab -- procedencia eucalipto-urograndis
+```
+
+**O que NÃO se passa por parâmetro é propriedade de material.** Nenhum comando de
+candidato aceita resistência, módulo ou densidade solta, porque isso seria
+inventar material sem fonte pela porta dos fundos. Material entra no estudo, com
+procedência por propriedade, e aparece no comando sozinho.
+
+**Duas leituras que o comando faz por escrito, e importam aqui.** `diametro-minimo`
+devolve o valor exato E o milímetro que se compra, cada um com seu nome — foi
+arredondamento de varredura que já escondeu, neste estudo, uma reprova por cinco
+milésimos. E o diâmetro que ele devolve cumpre a margem no valor **nominal**; as
+medidas da seção 4 são mais grossas porque vêm da cauda ruim do lote, que é a que
+decide compra.
+
+### Uma inconsistência do próprio estudo, achada ao construir isto
+
+A parede mínima prática de 3 mm — aquela que a seção 9 pede ao fornecedor —
+nasceu na varredura de variantes e **nunca foi aplicada para trás**. As linhas de
+aço (1,2 mm) e alumínio (2,0 mm) da tabela da seção 3 são anteriores a ela e a
+violam: rodavam, comparavam, e nada acusava.
+
+Não foram corrigidas. Metal já está reprovado por vibração, e engrossar a parede
+mudaria a massa de duas linhas que este dossiê cita como comparação registrada.
+Ficam nomeadas, presas por teste, e cada resultado marca a violação. **Nenhuma
+conclusão deste dossiê depende delas** — o que muda é que a comparação com metal
+está sobre uma geometria que o próprio estudo não aceitaria hoje.
+
 ## 12. Limites
 
 - A BARREIRA QUE NÃO SE TRANSPÕE AQUI: nada foi ensaiado fisicamente. Impacto real envolve taxa de deformação, e cabo real sofre fadiga por milhares de ciclos — nenhuma das duas coisas está nesta conta.

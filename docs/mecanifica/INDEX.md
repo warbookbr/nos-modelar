@@ -31,7 +31,7 @@ plano. O que está encerrado vive em
   Mecanifica como instrumento opcional e **nunca** vira dependência dela. Desenho:
   [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md)
   (`docs/mecanifica/DOSSIE-LABORATORIO-IA.md`).
-  Primeiro piloto: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
+  Piloto: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md); `npm run lab` pergunta a ele.
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em
