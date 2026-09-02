@@ -38,7 +38,8 @@
  *     É achado de LEGIBILIDADE, não de geometria.
  *
  * O QUE ESTA PEÇA NÃO É. Não é desenho de fabricação: a lâmina é a forma geral
- * sem os nervos estampados, o bocal é um tronco de cone sem a costura, e a
+ * com o nervo central e a pestana, mas sem o resto do estampado; o bocal é um
+ * tronco de cone sem a costura, e a
  * empunhadura é o D em tubo sem o miolo moldado. Serve para julgar proporção,
  * encaixe e a aparência do conjunto — que é o que a pergunta pedia.
  */
@@ -87,10 +88,16 @@ const meia = L.largura / 2;
    paralelas no meio, ombros levemente recolhidos em cima, onde entra o bocal.
    A primeira versão punha 60 mm de largura já na PONTA e saía com cara de
    espátula; bico de pá é ponta, e é ela que entra na terra. */
+/* O OMBRO É CANTO ARREDONDADO, e não bisel. A primeira versão ia de
+   `meia * 0.985` a `meia * 0.90` em linha reta, e lia como um chanfro qualquer
+   com a boca aberta demais — apontado pelo usuário sobre o desenho cotado da pá
+   comercial, onde o canto vira num raio curto e a aresta de cima fica quase
+   reta entre os dois ombros. Os pontos abaixo descrevem esse raio. */
 const plantaMeia = [
   [0.000, 0.012], [0.012, 0.038], [0.032, 0.068], [0.058, 0.093],
-  [0.092, 0.112], [0.135, meia], [0.200, meia], [0.252, meia * 0.985],
-  [L.comprimento, meia * 0.90],
+  [0.092, 0.112], [0.135, meia], [0.200, meia], [0.248, meia * 0.995],
+  [0.268, meia * 0.980], [0.279, meia * 0.955], [0.286, meia * 0.915],
+  [L.comprimento, meia * 0.855],
 ];
 const plantaLamina = [
   ...plantaMeia.map(([z, x]) => [z, x]),
@@ -131,6 +138,35 @@ function perfilColmo(raioBase) {
     .filter((p, i, t) => i === 0 || p.y - t[i - 1].y > 1e-6)
     .map((p) => ({ pos: [0, p.y, 0], raio: p.r }));
 }
+
+/* A PESTANA — a borda de cima virada, onde o pé pisa.
+   Nome com ressalva: "pestana" é o que mais se ouve em pá no Brasil, ao lado de
+   "aba de pisar" e "apoio de pé"; não achei norma que fixe um só termo, então
+   fica declarado que é o nome de uso e não uma citação.
+
+   ELA NÃO É ONDULAÇÃO, É DOBRA. A chapa é a mesma, virada sobre si mesma no
+   ombro, e resolve três coisas de uma vez: enrijece o ombro contra dobrar, tira
+   o fio de corte de onde o pé encosta, e dá superfície plana para pisar. Sem
+   ela o ombro é só uma aresta de chapa, que foi como esta peça ficou até aqui.
+
+   E ELA MORRE NA LATERAL, que é a parte que o usuário viu no desenho e a nossa
+   não tinha: o raio da dobra vai diminuindo até sumir antes do canto, em vez de
+   terminar em degrau. Por isso a última seção tem raio quase nulo.
+
+   O eixo já está girado quando ela é construída: a lâmina nasce deitada em Z e
+   `rotaciona` põe o comprimento em Y, então a pestana corre em X (a largura),
+   na altura do topo da lâmina e recuada pela concha. */
+const yPestana = L.comprimento - 0.006;
+const zPestana = -(L.concha + L.espessura * 0.5);
+const RAIO_DA_PESTANA = 0.0052;
+
+const pestana = (sinal) => [
+  { pos: [sinal * 0.026, yPestana, zPestana], raio: RAIO_DA_PESTANA * 0.55 },
+  { pos: [sinal * 0.045, yPestana, zPestana], raio: RAIO_DA_PESTANA },
+  { pos: [sinal * 0.072, yPestana - 0.001, zPestana], raio: RAIO_DA_PESTANA },
+  { pos: [sinal * 0.094, yPestana - 0.004, zPestana], raio: RAIO_DA_PESTANA * 0.72 },
+  { pos: [sinal * meia * 0.87, yPestana - 0.010, zPestana], raio: RAIO_DA_PESTANA * 0.30 },
+];
 
 /* O D: dois montantes que abrem do topo do colmo e uma travessa que os une.
    Cada um é um loft de seção circular — o punho real tem miolo moldado, e a
@@ -203,6 +239,11 @@ export const receitaPaDeBicoBambu = {
         { pos: [0, yBocaTopo, 0], raio: Re + 0.0016 },
       ],
     }],
+    /* A pestana corre em X, então a referência do anel tem de ser TRANSVERSAL a
+       X — [1,0,0] é paralela à tangente e o motor recusa, com razão. */
+    ['loft', { origemId: 9, lados: 10, orientacao: [0, 1, 0], secoes: pestana(1) }],
+    ['loft', { origemId: 10, lados: 10, orientacao: [0, 1, 0], secoes: pestana(-1) }],
+
     ['loft', { origemId: 3, lados: C.lados, orientacao: [1, 0, 0], secoes: perfilColmo(Re) }],
     ['loft', { origemId: 4, lados: C.lados, orientacao: [1, 0, 0], secoes: perfilColmo(Ri) }],
     ['loft', { origemId: 5, lados: D.lados, orientacao: [0, 0, 1], secoes: montante(1) }],
@@ -232,6 +273,8 @@ export const receitaPaDeBicoBambu = {
     }],
 
     ['parte', { nome: 'lamina', sel: { origem: { op: 'inflate', id: 1 } } }],
+    ['parte', { nome: 'pestana', sel: { origem: { op: 'loft', id: 9 } } }],
+    ['parte', { nome: 'pestana', sel: { origem: { op: 'loft', id: 10 } } }],
     ['parte', { nome: 'bocal', sel: { origem: { op: 'loft', id: 2 } } }],
     ['parte', { nome: 'colmo', sel: { origem: { op: 'loft', id: 3 } } }],
     ['parte', { nome: 'furo', sel: { origem: { op: 'loft', id: 4 } } }],
@@ -242,6 +285,7 @@ export const receitaPaDeBicoBambu = {
 
     ['material', { usa: 'aco', sel: { grupo: 'lamina' } }],
     ['material', { usa: 'aco', sel: { grupo: 'bocal' } }],
+    ['material', { usa: 'aco', sel: { grupo: 'pestana' } }],
     ['material', { usa: 'bambu', sel: { grupo: 'colmo' } }],
     ['material', { usa: 'bambuInterno', sel: { grupo: 'furo' } }],
     ['material', { usa: 'borracha', sel: { grupo: 'punho' } }],

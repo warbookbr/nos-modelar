@@ -28,7 +28,8 @@ externo com parede de 3 mm — a recomendação da seção 4.*
 forma, proporção e espessura de parede. **Não** serve para volume, massa nem
 exportação de fabricação: o colmo é modelado como pele externa mais furo, sem
 costura nas extremidades, e portanto não é sólido fechado. A lâmina é a forma
-geral, **sem os nervos estampados** que enrijecem a chapa real, e o bocal é um
+geral com o nervo central e a **pestana** — a borda de cima virada, onde o pé
+pisa — mas **sem o resto do estampado** que enrijece a chapa real, e o bocal é um
 tronco de cone sem a costura. Nenhuma dessas simplificações entra em conta
 nenhuma deste dossiê — as contas saem das propriedades do material, não da malha.
 
