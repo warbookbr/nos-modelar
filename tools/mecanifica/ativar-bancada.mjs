@@ -79,6 +79,26 @@ const criterios = [
 ];
 if (partesSemMaterial.length) criterios.push(`sem material: ${partesSemMaterial.join(', ')}`);
 
+/* GRITO DO MOTOR É RECUSA, e não aviso. `adaptarThree` lança para QUALQUER
+   `orfaos` — a bancada não desenha "a parte que deu certo", ela recusa a peça
+   inteira. Enquanto isto ficava embaixo de um "✓ ... com sucesso!" e de um
+   `exit 0`, o comando dizia que ativou uma peça que não ia aparecer, e ainda
+   trocava a sessão que estava funcionando por uma que não desenha nada.
+   Aconteceu de verdade nesta sessão: quatro gritos impressos, ✓ no topo,
+   código 0, e a bancada estourando com 11 referências inválidas.
+
+   Os avisos que sobraram abaixo (face sem parte, parte sem material) continuam
+   avisos porque a bancada DESENHA nesses casos — a diferença é essa, e não o
+   grau de incômodo. */
+const gritos = neutro.orfaos ?? [];
+if (gritos.length) {
+  console.error(`\n✗ Receita NÃO ativada: o motor recusou ${gritos.length} referência(s).`);
+  for (const g of gritos) console.error(`      passo ${g.passo} (${g.op}) ${g.ref}: ${g.motivo}`);
+  console.error('\n  A bancada recusa a peça INTEIRA quando há referência inválida —');
+  console.error('  não é aviso, é a peça não desenhar. A sessão anterior foi preservada.');
+  process.exit(1);
+}
+
 const nomeAlvo = receita.meta?.nome ?? 'Peça Ativa';
 const idAlvo = caminhoRelativo.replace(/[\/\\]/g, '-').replace(/\.js$/, '');
 
@@ -119,14 +139,6 @@ if (focar) {
 
 console.log(`\n✓ Receita ativada na Bancada com sucesso!`);
 console.log(`  Alvo: ${nomeAlvo} (${partesNomes.length} corpos, ${facesSemParte.length} faces órfãs)`);
-/* Os gritos do motor: `executarReceita` acumula em vez de lançar, e sem esta
-   linha um passo que não fez efeito nenhum entra na bancada em silêncio. */
-const gritos = neutro.orfaos ?? [];
-if (gritos.length) {
-  console.log(`  ! a receita reclamou de ${gritos.length} coisa(s):`);
-  for (const g of gritos.slice(0, 6)) console.log(`      passo ${g.passo} (${g.op}) ${g.ref}: ${g.motivo}`);
-  if (gritos.length > 6) console.log(`      …e mais ${gritos.length - 6}`);
-}
 if (facesSemParte.length) {
   console.log(`  ! faces sem parte: ${facesSemParte.slice(0, 8).join(', ')}${facesSemParte.length > 8 ? '…' : ''}`);
   console.log('    lembre que {op:\'cilindro\',id} seleciona só as laterais; as tampas pedem tampa:\'fundo\' e tampa:\'topo\'.');
