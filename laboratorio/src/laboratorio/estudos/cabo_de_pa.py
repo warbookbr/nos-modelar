@@ -1556,6 +1556,22 @@ DIAMETRO_MAXIMO_DE_EMPUNHADURA_M = 0.045
 #: nunca aparece como erro — aparece como ótimo.
 PAREDE_MINIMA_PRATICA_M = 0.003
 
+#: E ELA NUNCA FOI APLICADA PARA TRÁS. Achado ao construir a camada de consulta:
+#: a parede mínima nasceu na varredura de variantes e ficou lá. As linhas de aço
+#: (1,2 mm) e alumínio (2,0 mm) em GEOMETRIAS são anteriores a ela e a violam —
+#: rodam, comparam e ninguém acusa.
+#:
+#: A REGRA QUE FALTOU, e vale além deste estudo: restrição nova precisa ser
+#: passada nas linhas VELHAS, ou ela vira regra só para quem chegou depois. É o
+#: mesmo padrão do resultado ausente que não aparece como erro, agora na forma de
+#: uma restrição que existe e não alcança metade da tabela.
+#:
+#: NÃO SÃO CORRIGIDAS AQUI de propósito: metal já está reprovado por vibração, e
+#: engrossar a parede para 3 mm mudaria a massa de duas linhas que o estudo cita
+#: como comparação registrada. Ficam nomeadas, e a consulta marca a violação em
+#: cada resultado (`paredeAbaixoDaMinima`).
+PAREDES_ANTERIORES_A_MINIMA = ("aco-1020", "aluminio-6061-t6")
+
 #: CONTRA QUEM ESTE ESTUDO COMPARA, e a escolha é a resposta à pergunta do
 #: usuário. Ele quer substituir o cabo de eucalipto que existe no Brasil, e o que
 #: existe no Brasil é urograndis — não o jarrah australiano do Wood Handbook.

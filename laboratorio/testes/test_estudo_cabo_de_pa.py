@@ -1191,3 +1191,17 @@ def test_RESIDUO_BARATO_nao_vira_PECA_BARATA_sozinho():
     assert "não atravessa" in casos["acacia-negra"], "tora de sete anos é fina"
     assert "atravessa" in casos["seringueira"], "tora grossa e serraria existente"
     assert estudo.FORMA_DO_RESIDUO["oQueOEstudoNAOsabe"]
+
+
+def test_a_parede_minima_NAO_alcanca_as_linhas_velhas_e_isso_esta_nomeado():
+    """Restrição nova que não foi passada para trás é regra só para quem chegou depois.
+
+    Este teste não conserta a inconsistência: ele a prende. Se uma linha nova
+    entrar violando a mínima sem estar na lista, ele quebra — que é a única
+    coisa que impede a exceção declarada de virar prática silenciosa.
+    """
+    violam = tuple(
+        nome for nome, (tipo, _, parede) in estudo.GEOMETRIAS.items()
+        if tipo == "tubular" and parede < estudo.PAREDE_MINIMA_PRATICA_M
+    )
+    assert set(violam) == set(estudo.PAREDES_ANTERIORES_A_MINIMA)

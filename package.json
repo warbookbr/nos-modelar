@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "arquitetura:check": "node tools/arquitetura/independencia-catalogo.mjs",
     "arquitetura:lab:check": "node tools/arquitetura/independencia-laboratorio.mjs",
+    "lab": "python3 laboratorio/lab.py",
     "lab:test": "python3 -m pytest laboratorio/testes -q",
     "lab:check": "npm run arquitetura:lab:check && npm run lab:test",
     "arquitetura:motor": "node tools/arquitetura/mapear-motor-procedural.mjs",
