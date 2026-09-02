@@ -909,17 +909,19 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
        pinta uma cor por parte. Devolve a LEGENDA, porque imagem colorida sem
        legenda troca um problema de leitura por outro: quem audita precisa saber
        qual cor é qual peça sem deduzir pela posição. */
-    auditoria: ({ cores = false } = {}) => {
+    auditoria: ({ cores = false, arame = false } = {}) => {
       document.body.classList.add('auditoria');
       ambiente.definirAuditoria(true);
       const legenda = controlador?.definirCoresPorParte(cores) ?? [];
+      controlador?.definirArame?.(arame);
       ambiente.redimensionar?.();
-      return { auditoria: true, cores: Boolean(cores), legenda };
+      return { auditoria: true, cores: Boolean(cores), arame: Boolean(arame), legenda };
     },
     semAuditoria: () => {
       document.body.classList.remove('auditoria');
       ambiente.definirAuditoria(false);
       controlador?.definirCoresPorParte(false);
+      controlador?.definirArame?.(false);
       ambiente.redimensionar?.();
       return { auditoria: false };
     },

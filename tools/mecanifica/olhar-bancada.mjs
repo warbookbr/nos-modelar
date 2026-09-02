@@ -143,6 +143,7 @@ export async function olharBancada({
      e sem sombra. `coresPorParte` pinta uma cor por peça e devolve a legenda. */
   auditoria = false,
   coresPorParte = false,
+  arame = false,
   capturarEmMemoria = false,
   timeoutMs = null,
   logger = null,
@@ -231,6 +232,7 @@ export async function olharBancada({
       explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
       par ? 'par' : null,
       focar ? 'focado' : null,
+      arame ? 'arame' : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
     if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
@@ -414,7 +416,8 @@ export async function olharBancada({
          isso depois da espera capturaria o quadro do layout velho. */
       if (auditoria) {
         legendaDeAuditoria = await page.evaluate(
-          (cores) => window.__mecanificaBancada.auditoria({ cores }), coresPorParte,
+          ([cores, ar]) => window.__mecanificaBancada.auditoria({ cores, arame: ar }),
+          [coresPorParte, arame],
         );
         /* Reenquadra só quando NINGUÉM pediu foco. `auditoria()` troca o
            tamanho do canvas, e sem reenquadrar a peça fica descentrada — mas
@@ -538,12 +541,13 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
-      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'cores'],
+      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'cores', 'arame', 'wireframe'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
   }
+  const arame = lido.bandeira('arame') || lido.bandeira('wireframe');
   return olharBancada({
     peca: lido.posicional,
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
@@ -551,10 +555,11 @@ function comoCLI(argv) {
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
-    /* --cores implica --auditoria: pedir cor por parte e receber a imagem com
+    /* --cores ou --arame implicam --auditoria: pedir cor ou arame e receber a imagem com
        painel em cima seria entregar metade do que foi pedido. */
-    auditoria: lido.bandeira('auditoria') || lido.bandeira('cores'),
+    auditoria: lido.bandeira('auditoria') || lido.bandeira('cores') || arame,
     coresPorParte: lido.bandeira('cores'),
+    arame,
   });
 }
 

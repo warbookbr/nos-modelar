@@ -46,6 +46,7 @@ function guardarMaterial(material) {
     opacity: material.opacity,
     transparent: material.transparent,
     depthWrite: material.depthWrite,
+    wireframe: Boolean(material.wireframe),
   };
 }
 
@@ -58,10 +59,14 @@ function restaurarMaterial(material) {
   material.opacity = base.opacity;
   material.transparent = base.transparent;
   material.depthWrite = base.depthWrite;
+  material.wireframe = base.wireframe ?? false;
 }
 
-function aplicarEstadoMaterial(material, estado, corDaParte = null) {
+function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false) {
   restaurarMaterial(material);
+  if (arame) {
+    material.wireframe = true;
+  }
   /* A cor de auditoria entra ANTES dos estados de seleção, para que destaque e
      fantasma continuem funcionando por cima dela. Se entrasse depois, isolar uma
      peça deixaria de marcá-la e o modo viraria duas coisas que brigam. */
@@ -96,6 +101,7 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null) {
 export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar, aoEstabilizarExplosao }) {
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   let coresPorParte = false;
+  let arame = false;
   const permitidos = new Set(nomes);
   /* A seleção entende a árvore declarada, mas os grupos Three continuam irmãos.
      Isso impede que escolher uma subárvore mude transformações, explosão ou a
@@ -143,7 +149,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       const visual = estados[nome];
       grupo.visible = visual !== 'oculto';
       const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
-      for (const material of materiaisDoGrupo(grupo)) aplicarEstadoMaterial(material, visual, cor);
+      for (const material of materiaisDoGrupo(grupo)) aplicarEstadoMaterial(material, visual, cor, arame);
     }
     aoMudar?.(estado());
   }
@@ -239,6 +245,11 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
         parte: nome,
         cor: coresPorParte ? `#${corDeAuditoria(i).getHexString()}` : null,
       }));
+    },
+    definirArame(ligado) {
+      arame = Boolean(ligado);
+      aplicarVisual();
+      return arame;
     },
     definirModo(novoModo) {
       modo = ['todas', 'contexto', 'isolar'].includes(novoModo) ? novoModo : 'todas';

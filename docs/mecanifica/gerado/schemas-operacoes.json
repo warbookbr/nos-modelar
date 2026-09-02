@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:12ec3e0401271b2323d3765eb70ead3680dd3d4c6094565e1521f9fa8820a72d",
+  "assinatura": "sha256:ff671486dc74a9642e5087d291abcab6f7529cec0b30577a110c132186cd1da1",
   "total": 32,
   "operacoes": [
     {
@@ -1646,7 +1646,11 @@
                   "type": "array"
                 }
               ],
-              "description": "Resolução da grade ou quantidade de segmentos longitudinais."
+              "description": "Resolução da grade ou quantidade de segmentos longitudinais iguais."
+            },
+            "estacoes": {
+              "type": "array",
+              "description": "Frações 0..1 em ordem crescente, de 0 a 1: põe as estações onde a forma pede, no lugar de partes iguais. Só no modo 'secoes'; exclui divisoes."
             },
             "lados": {
               "anyOf": [
