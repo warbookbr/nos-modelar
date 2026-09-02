@@ -16,6 +16,27 @@ igual ou maior, boa absorção de impacto e vibração, acessível, sem agredir 
 ambiente, sem risco de intoxicação ou irritação, e sem processo de fabricação caro
 ou demorado.
 
+## 1-bis. A peça
+
+<img src="imagens/pa-de-bico-bambu.png" alt="Pá de bico com cabo de colmo de bambu, vista isométrica" height="420">
+<img src="imagens/pa-de-bico-bambu-frontal.png" alt="Vista frontal do punho em D e do colar que abraça o cabo" height="420">
+
+*Geometria procedural, gerada da receita e não desenhada à mão. Cabo de 37 mm
+externo com parede de 3 mm — a recomendação da seção 4.*
+
+**Leia a imagem pelo que ela prova e pelo que não prova.** Ela serve para julgar
+forma, proporção e espessura de parede. **Não** serve para volume, massa nem
+exportação de fabricação: o colmo é modelado como pele externa mais furo, sem
+costura nas extremidades, e portanto não é sólido fechado. A lâmina é a forma
+geral, **sem os nervos estampados** que enrijecem a chapa real, e o bocal é um
+tronco de cone sem a costura. Nenhuma dessas simplificações entra em conta
+nenhuma deste dossiê — as contas saem das propriedades do material, não da malha.
+
+A forma foi submetida a um crítico visual sem contexto, que reconheceu o objeto
+sozinho. Ele apontou a falta de chanfro na borda de ataque — verdade, e é o
+limite acima — e não distinguiu o bocal de aço da lâmina, porque as duas saem
+quase da mesma cor. Nenhum dos dois muda número deste dossiê.
+
 ## 2. Resposta curta
 
 **Colmo de bambu**, em tubo de 43 × 3 mm, **com seleção de lote**. Contra o

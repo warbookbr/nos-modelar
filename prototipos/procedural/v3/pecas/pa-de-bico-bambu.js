@@ -22,6 +22,21 @@
  * põe a lâmina no eixo certo, e o giro é passo declarado e não ajuste de números
  * na silhueta: mexer nas coordenadas para compensar o eixo esconderia a razão.
  *
+ * O QUE O CRÍTICO CEGO VIU, e o que foi feito com cada achado. Ele reconheceu o
+ * objeto sem contexto — "pá de bico, haste de bambu, punho em D" — então a forma
+ * comunica. Três achados:
+ *
+ *   - BOCAL APARENTEMENTE DESLOCADO na isométrica. NÃO é defeito: todas as
+ *     seções do loft estão em x = 0, e a vista frontal mostra o bocal centrado e
+ *     simétrico. É a concha da lâmina inclinando a leitura em perspectiva.
+ *     Registrado em vez de "corrigido" — mexer aqui seria conserto certo num
+ *     objeto que não estava errado.
+ *   - LÂMINA SEM CHANFRO na borda de ataque. Verdade, e é o limite declarado
+ *     abaixo: forma geral, não desenho de fabricação.
+ *   - REFORÇO ENTRE HASTE E LÂMINA "não visível". Ele existe e é o bocal, em aço
+ *     — o crítico não o distinguiu porque lâmina e bocal saem quase da mesma cor.
+ *     É achado de LEGIBILIDADE, não de geometria.
+ *
  * O QUE ESTA PEÇA NÃO É. Não é desenho de fabricação: a lâmina é a forma geral
  * sem os nervos estampados, o bocal é um tronco de cone sem a costura, e a
  * empunhadura é o D em tubo sem o miolo moldado. Serve para julgar proporção,
@@ -170,8 +185,14 @@ export const receitaPaDeBicoBambu = {
       secoes: [
         { pos: [0, yColar, 0], raio: Re + 0.0035 },
         { pos: [0, yColar + 0.030, 0], raio: Re + 0.0042 },
-        { pos: [0, yTopo - 0.004, 0], raio: Re + 0.0038 },
-        { pos: [0, yPunhoBase + 0.004, 0], raio: D.raioTubo * 1.30 },
+        /* O ESTRANGULAMENTO PRECISA FICAR ACIMA DO TOPO DO COLMO. A primeira
+           versão afinava para o raio do punho em yTopo - 0.002, com 14,3 mm
+           contra os 18,5 mm do tubo: o colar apertava antes de terminar de
+           cobrir, e os últimos milímetros de bambu atravessavam ele. Achado a
+           olho pelo usuário, e confirmado nos números — a vista geral mostrava,
+           e eu tinha passado por ela sem ver. */
+        { pos: [0, yTopo + 0.004, 0], raio: Re + 0.0030 },
+        { pos: [0, yPunhoBase + 0.016, 0], raio: D.raioTubo * 1.30 },
       ],
     }],
     ['loft', {
