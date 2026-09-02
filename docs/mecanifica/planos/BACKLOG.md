@@ -31,6 +31,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Contrato genérico de materiais | capacidade futura, sem PBR ou paleta nova por implicação |
 | Movimento e espaço varrido | futuro; exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
+| Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos (colmo e furo) geram tubo aberto nas extremidades; o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha fica não-manifold, volume incalculável e exportação STEP falha em sólido. Afeta qualquer peça oca (tubo, bucha, cilindro vazado). Sem contorno possível hoje |
 
 ## Ordem lógica, não ordem executiva
 
