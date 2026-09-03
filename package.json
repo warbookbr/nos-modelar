@@ -13,11 +13,6 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "arquitetura:check": "node tools/arquitetura/independencia-catalogo.mjs",
-    "arquitetura:lab:check": "node tools/arquitetura/independencia-laboratorio.mjs",
-    "lab": "python3 laboratorio/lab.py",
-    "lab:revisar": "python3 laboratorio/lab.py revisar docs/mecanifica/DOSSIE-CABO-DE-PA.md",
-    "lab:test": "python3 -m pytest laboratorio/testes -q",
-    "lab:check": "npm run arquitetura:lab:check && npm run lab:test",
     "arquitetura:motor": "node tools/arquitetura/mapear-motor-procedural.mjs",
     "arquitetura:motor:check": "node tools/arquitetura/mapear-motor-procedural.mjs --check",
     "baseline:motor": "node tools/oficina/corpus-motor-r00.mjs --check",
@@ -74,7 +69,7 @@
     "malha:conferir": "node tools/mecanifica/conferir-malha.mjs",
     "olhar": "node tools/mecanifica/olhar.mjs",
     "comparar:alvo": "node tools/mecanifica/comparar-alvo.mjs",
-    "gates": "npm run typecheck && npm run test && npm run mcp:check && npm run mcp:visual:check && npm run build && npm run arquitetura:check && npm run bancada:vazia:check && npm run porteiro && npm run exportar:check && npm run guarda:portas && npm run guarda:camera && npm run guarda:par && npm run mapa:check && npm run docs:toc:check && npm run docs:links:check && npm run planos:check && npm run docs:estrutura:check && npm run arquitetura:lab:check && npm run lab:test",
+    "gates": "npm run typecheck && npm run test && npm run mcp:check && npm run mcp:visual:check && npm run build && npm run arquitetura:check && npm run bancada:vazia:check && npm run porteiro && npm run exportar:check && npm run guarda:portas && npm run guarda:camera && npm run guarda:par && npm run mapa:check && npm run docs:toc:check && npm run docs:links:check && npm run planos:check && npm run docs:estrutura:check",
     "mcp:visual:check": "node -e \"process.env.MCP_VISUAL_REAL='1';require('child_process').execSync('npm run mcp:check',{stdio:'inherit',env:process.env})\""
   },
   "dependencies": {

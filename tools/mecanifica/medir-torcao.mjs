@@ -3,21 +3,25 @@
  * `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa
  * envolvente, que é o que prova se a forma mudou.
  *
- * ESTE É O ÚNICO ARQUIVO DO LABORATÓRIO QUE PODE CITAR A MECANIFICA, e a guarda
- * `arquitetura:lab:check` é quem garante isso. A direção é sempre laboratório →
- * portas públicas da Mecanifica; nunca o contrário.
+ * ORIGEM: viveu em `laboratorio/adaptadores/mecanifica-node/` enquanto o
+ * laboratório de materiais e a autoria 3D dividiam um monorepo. Depois da
+ * separação em `warbookbr/nos-ciencia`, um instrumento que executa o motor de
+ * receitas não podia mais morar do lado de lá — ele PRECISA do motor, e o
+ * motor não atravessa a fronteira nova em nenhum sentido. Mora aqui agora,
+ * como qualquer outra ferramenta de `tools/mecanifica/`.
  *
- * Ele NÃO conclui nada. Devolve medida em JSON com a versão do instrumento e os
- * parâmetros efetivos, e quem julga é o plano de evidências, do lado Python.
- * Instrumento que decide se a própria saída prova a hipótese é instrumento que
- * se aprova sozinho.
+ * Ele NÃO conclui nada. Devolve medida em JSON com a versão do instrumento e
+ * os parâmetros efetivos; quem julga é o estudo `torcao_do_machado`, do lado
+ * Python em `nos-ciencia` — como um dado exportado manualmente, não como
+ * dependência de código. Instrumento que decide se a própria saída prova a
+ * hipótese é instrumento que se aprova sozinho.
  */
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const REPO = join(dirname(fileURLToPath(import.meta.url)), '../../..');
+const REPO = join(dirname(fileURLToPath(import.meta.url)), '../..');
 export const VERSAO = '1.1.0';
 
 const RECEITA = join(REPO, 'prototipos/procedural/v3/armas/machado-de-guerra.js');

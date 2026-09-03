@@ -2,26 +2,23 @@
 
 ## Estado
 
-**Plano ativo:**
-[`2026-09-01-laboratorio-computacional-ia.md`](2026-09-01-laboratorio-computacional-ia.md)
-— incubar, na `main` e atrás de fronteira testada, um laboratório computacional
-geral para investigação por IA.
+**Plano ativo:** Nenhum.
 
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de
 saída de malha, o conferente único, o modo de auditoria visual e cinco peças no
 acervo. Rastreio em [`../MALHA-OTIMIZADA-PROGRESSO.md`](../MALHA-OTIMIZADA-PROGRESSO.md).
 
-**Sobre a incubação:** o [laboratório
-computacional para investigação por IA](2026-09-01-laboratorio-computacional-ia.md)
-autoriza **incubar**, não promover: as
-onze condições de integração ao núcleo (dossiê, seção 17) seguem todas em
-aberto, e o que entrou na `main` é documentação, fronteira e esqueleto — não
-capacidade científica. O gate `arquitetura:lab:check` torna isso verificável.
-O [dossiê](../DOSSIE-LABORATORIO-IA.md) governa o desenho e a
-[execução R0–R7](../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md)
-detalha as doze tarefas. A Mecanifica é instrumento opcional do laboratório e
-nunca depende dele.
+O [laboratório computacional para investigação por
+IA](encerrados/2026-09-01-laboratorio-computacional-ia.md) foi incubado neste
+repositório e **encerrado** em 2026-09-03: o subsistema `laboratorio/` saiu
+inteiro, com histórico, para
+[`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia). A
+separação é sem conhecimento em nenhum sentido — este repositório não
+referencia o laboratório, e o laboratório não importa o motor de receitas.
+Quem quiser cruzar as duas coisas faz isso manualmente, citando versão e
+commit do lado citado. O dossiê de desenho (`DOSSIE-LABORATORIO-IA.md`) e o
+relato de progresso ficam como registro histórico.
 
 A [reorganização da documentação por uso](encerrados/2026-08-31-reorganizacao-por-uso.md)
 foi **concluída e aprovada** em 2026-08-31. Ela separou a documentação por quem

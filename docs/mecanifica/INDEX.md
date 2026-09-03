@@ -24,14 +24,11 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [laboratório computacional para
-  IA](planos/2026-09-01-laboratorio-computacional-ia.md)
-  (`docs/mecanifica/planos/2026-09-01-laboratorio-computacional-ia.md`) — incubar
-  na `main`, sob a guarda `arquitetura:lab:check`, um laboratório geral que usa a
-  Mecanifica como instrumento opcional e **nunca** vira dependência dela. Desenho:
-  [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md)
-  (`docs/mecanifica/DOSSIE-LABORATORIO-IA.md`).
-  Piloto: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md); `npm run lab` pergunta a ele.
+- Plano **ativo**: nenhum. O laboratório computacional para IA foi incubado e
+  **encerrado** em 2026-09-03 — saiu inteiro, com histórico, para
+  [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia); ver
+  [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](planos/encerrados/2026-09-01-laboratorio-computacional-ia.md).
+  Piloto de peça que usou seus números: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em

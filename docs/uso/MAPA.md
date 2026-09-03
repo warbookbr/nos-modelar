@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-772 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+768 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -471,7 +471,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-01-laboratorio-computacional-ia.md` — Laboratório computacional para investigação por IA
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -551,6 +550,7 @@
 - `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
 - `2026-08-31-malha-otimizada-e-prova-por-objeto.md` — Malha otimizada e prova por objeto
 - `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
+- `2026-09-01-laboratorio-computacional-ia.md` — Laboratório computacional para investigação por IA
 - `README.md` — Planos encerrados
 
 ## docs/mecanifica/planos/mcp/
@@ -597,10 +597,6 @@
 - `oficina-contrato.md` — Oficina — contrato procedural preservado
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 
-## laboratorio/
-
-- `README.md` — Laboratório computacional para IA
-
 ## laboratorio-isolado/cupe-livre-01/
 
 - `README.md` — Cupê livre 01 — experimento isolado
@@ -608,14 +604,6 @@
 - `motor.js` — Motor WebGL autocontido do experimento. Sem dependências, imports ou assets.
 - `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
 - `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.
-
-## laboratorio/adaptadores/mecanifica-node/
-
-- `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
-
-## laboratorio/dados/materiais/
-
-- `FONTES.md` — Fontes da tabela de materiais
 
 ## modulos/exportador-cad/src/
 
@@ -832,8 +820,6 @@
 ## tools/arquitetura/
 
 - `independencia-catalogo.mjs` — independencia-catalogo.mjs — firewall pequeno entre o núcleo, a autoria pura e as portas que resolvem arquivos. Importar uma peça pelo caminho é permitido no…
-- `independencia-laboratorio.mjs` — independencia-laboratorio.mjs — a guarda que sustenta a incubação: o núcleo da Mecanifica nunca importa `laboratorio/`. É esta direção, e só ela, que permite…
-- `independencia-laboratorio.test.mjs` — independencia-laboratorio.test.mjs — prova a guarda de fronteira do laboratório contra violações construídas de propósito.
 - `mapear-motor-procedural.mjs` — Mapa estático da fachada procedural. É uma evidência de arquitetura: não é importado pelo motor e não participa da execução de receitas.
 - `mapear-motor-procedural.test.mjs` — Guarda que o mapa R00 continue descrevendo a fachada procedural real.
 
@@ -986,6 +972,7 @@
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
+- `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …

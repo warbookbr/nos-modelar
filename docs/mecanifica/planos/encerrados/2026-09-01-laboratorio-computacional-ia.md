@@ -1,11 +1,11 @@
 # Laboratório computacional para investigação por IA
 
-**Estado:** ativo
+**Estado:** concluído
 **Aberto em:** 2026-09-01, por decisão do usuário · **Base:** `main` em `b6367ed`
 **Responsável:** Codex (desenho e R0) · Claude (integração e governança)
-**Dossiê vinculante:** [`../DOSSIE-LABORATORIO-IA.md`](../DOSSIE-LABORATORIO-IA.md)
-**Execução detalhada:** [`../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md`](../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md)
-**Relato por fatia:** [`../LABORATORIO-IA-PROGRESSO.md`](../LABORATORIO-IA-PROGRESSO.md)
+**Dossiê vinculante:** [`../../DOSSIE-LABORATORIO-IA.md`](../../DOSSIE-LABORATORIO-IA.md)
+**Execução detalhada:** [`../../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md`](../../../superpowers/plans/2026-08-31-laboratorio-computacional-ia.md)
+**Relato por fatia:** [`../../LABORATORIO-IA-PROGRESSO.md`](../../LABORATORIO-IA-PROGRESSO.md)
 
 ## O que este plano autoriza, e o que não
 
@@ -164,3 +164,36 @@ descobertas como surpresa:
 
 Trabalho de autoria e de núcleo da Mecanifica segue livre: é justamente o que a
 fronteira existe para garantir.
+
+## Encerramento — 2026-09-03: o laboratório saiu deste repositório
+
+A incubação provou o ponto que o dossiê levantava (seção 9): manter ciência de
+materiais e autoria 3D no mesmo repositório obriga qualquer leitura — humana ou
+de IA — a atravessar os dois domínios para entender qualquer um dos dois. A
+fronteira testada por `arquitetura:lab:check` provava que o núcleo não dependia
+do laboratório, mas não resolvia o custo de leitura do lado de quem só queria
+um dos dois.
+
+**Decisão do usuário:** migrar `laboratorio/` inteiro, com histórico, para
+[`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia), via
+`git subtree split`. A separação é **sem conhecimento em nenhum sentido**: este
+repositório não importa nem referencia nada do laboratório, e o laboratório não
+importa o motor de receitas. Quem quiser cruzar as duas coisas — criar uma peça
+aqui a partir de um resultado de lá, ou levar um dado medido daqui pra lá —
+faz isso manualmente, citando versão e commit do lado citado.
+
+O único arquivo que dependia de fato do motor —
+`adaptadores/mecanifica-node/medir-torcao.mjs`, que executava
+`executarReceita` para medir torção de malha — não podia atravessar a
+separação como estava: um instrumento que roda o motor tem que morar onde o
+motor mora. Ele virou `tools/mecanifica/medir-torcao.mjs`, aqui. O estudo
+Python que julga a medida (`torcao_do_machado.py`, agora em `nos-ciencia`)
+nunca invocava esse instrumento diretamente — sempre recebia um pacote JSON já
+pronto — então a separação não quebrou o julgamento, só o transporte do dado
+entre os dois lados, que passa a ser manual.
+
+Removidos deste repositório: `laboratorio/` inteiro, `tools/arquitetura/independencia-laboratorio*`,
+os passos `arquitetura:lab:check`/`lab:test`/`lab:*` do `package.json` e do CI.
+O dossiê e o relato de progresso deste plano (`DOSSIE-LABORATORIO-IA.md`,
+`LABORATORIO-IA-PROGRESSO.md`) ficam como registro histórico do desenho e da
+incubação — não descrevem mais código presente nesta árvore.
