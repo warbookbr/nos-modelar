@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-774 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+779 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -592,6 +592,7 @@
 - `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — P0 Implementation Plan
 - `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
 - `2026-09-03-melhoria-esteira-autoria-ia.md` — Melhoria da Esteira de Apoio à Modelagem e Autoria para IA — Implementation Plan
+- `2026-09-03-modelagem-prensa-hidraulica.md` — # Plano de Modelagem: Prensa Hidráulica H-Frame Industrial
 
 ## docs/uso/
 
@@ -678,6 +679,13 @@
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
 - `implementacao.js` — implementacao.js — recebe somente emissor transacional e resolução numérica.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão neutra de prova.
+
+## prototipos/procedural/v3/maquinas/prensa-hidraulica/
+
+- `cinematico.js` — cinematico.js — conjunto do atuador hidraulico: camisa do cilindro, haste cromada, sapata e mesa movel da prensa hidraulica.
+- `estrutura.js` — estrutura.js — chassi H-frame, colunas verticais, travessao superior, pes e pinos da prensa hidraulica.
+- `ferramentas.js` — ferramentas.js — bolster plate, estampo, unidade hidraulica de potencia, motor, manometro e tubulacoes da prensa hidraulica.
+- `montagem.js` — montagem.js — montagem integrada da prensa hidráulica industrial H-frame com unidade de potência.
 
 ## prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/
 

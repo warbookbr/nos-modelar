@@ -14,6 +14,7 @@ import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -90,11 +91,16 @@ export async function descreverPecaReutilizavel({
       + '\n  ex.: npm run descrever -- <id-da-peca>   (use --listar para ver todas)',
     );
   }
-  if (!moduloFornecido && !DISPONIVEIS.includes(peca)) {
-    return erroDeUso(
-      `peça '${peca}' não existe em prototipos/procedural/v3/pecas/.`
-      + `\n  disponíveis: ${DISPONIVEIS.join(', ')}`,
-    );
+  let caminhoReceita = null;
+  if (!moduloFornecido) {
+    try {
+      caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
+    } catch {
+      return erroDeUso(
+        `peça '${peca}' não existe em prototipos/procedural/v3/{pecas,maquinas}/.`
+        + `\n  disponíveis: ${DISPONIVEIS.join(', ')}`,
+      );
+    }
   }
   if (!Number.isInteger(casas) || casas < 0 || casas > 12) {
     return erroDeUso(`--casas precisa ser inteiro entre 0 e 12, recebi '${casas}'`);
@@ -116,7 +122,7 @@ export async function descreverPecaReutilizavel({
   }
   if (modulo === null) {
     try {
-      modulo = await importarReceita(join(PECAS, `${peca}.js`));
+      modulo = await importarReceita(caminhoReceita);
     } catch (erro) {
       return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
     }
