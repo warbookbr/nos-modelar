@@ -221,6 +221,49 @@ export async function executarExportarObj(input) {
   }
 }
 
+export function conteudoAtivarBancada(executado) {
+  if (!executado?.ok) {
+    return [{ type: 'text', text: `ativar_bancada: ${executado?.erro?.mensagem ?? 'falha ao ativar bancada.'}` }];
+  }
+  const r = executado.resultado;
+  const texto = [
+    `Bancada ativada: ${r.alvo}`,
+    `Partes (${r.totalPartes}): ${r.partes.join(', ')}`,
+    `Órfãos: ${r.orfaos} | Faces sem parte: ${r.facesSemParte}`,
+    `URL local: ${r.url}`,
+    `Sessão: ${r.arquivoSessao}`,
+  ].join('\n');
+  return [{ type: 'text', text: texto }];
+}
+
+export function conteudoExportarStep(executado) {
+  if (!executado?.ok) {
+    return [{ type: 'text', text: `exportar_step: ${executado?.erro?.mensagem ?? 'falha na exportação STEP.'}` }];
+  }
+  const r = executado.resultado;
+  const solidosTxt = (r.solidos ?? []).map((s) => `  - ${s.nome} (${s.faces} faces)`).join('\n');
+  const texto = [
+    `Exportação STEP concluída: ${r.arquivoStep} (${r.bytes} bytes)`,
+    `Unidade: ${r.unidade} (escala ${r.escala})`,
+    `Total de sólidos: ${r.totalSolidos}`,
+    solidosTxt,
+  ].filter(Boolean).join('\n');
+  return [{ type: 'text', text: texto }];
+}
+
+export function conteudoExportarObj(executado) {
+  if (!executado?.ok) {
+    return [{ type: 'text', text: `exportar_obj: ${executado?.erro?.mensagem ?? 'falha na exportação OBJ.'}` }];
+  }
+  const r = executado.resultado;
+  const texto = [
+    `Exportação OBJ concluída: ${r.arquivoObj} (${r.bytes} bytes)`,
+    `Unidade: ${r.unidade} (escala ${r.escala})`,
+    `Total de corpos: ${r.totalCorpos} | Vértices: ${r.totalVertices} | Triângulos: ${r.totalTriangulos}`,
+  ].join('\n');
+  return [{ type: 'text', text: texto }];
+}
+
 export function criarFerramentasAutoriaExecucao() {
   return Object.freeze([
     {
@@ -243,6 +286,7 @@ export function criarFerramentasAutoriaExecucao() {
         erro: z.object({ codigo: z.string(), mensagem: z.string(), acao: z.string() }).optional(),
       }).strict(),
       executar: executarAtivarBancada,
+      conteudo: conteudoAtivarBancada,
       anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
     {
@@ -264,6 +308,7 @@ export function criarFerramentasAutoriaExecucao() {
         erro: z.object({ codigo: z.string(), mensagem: z.string(), acao: z.string() }).optional(),
       }).strict(),
       executar: executarExportarStep,
+      conteudo: conteudoExportarStep,
       anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
     {
@@ -293,6 +338,7 @@ export function criarFerramentasAutoriaExecucao() {
         erro: z.object({ codigo: z.string(), mensagem: z.string(), acao: z.string() }).optional(),
       }).strict(),
       executar: executarExportarObj,
+      conteudo: conteudoExportarObj,
       anotacoes: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
     },
   ]);
