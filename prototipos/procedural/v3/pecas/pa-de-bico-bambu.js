@@ -45,7 +45,7 @@
  */
 
 const P = {
-  lamina: { largura: 0.248, comprimento: 0.291, espessura: 0.004, concha: 0.030 },
+  lamina: { largura: 0.248, comprimento: 0.291, espessura: 0.004, concha: 0.022 },
   bocal: { comprimento: 0.150, raioBoca: 0.024, lados: 20 },
   cabo: { comprimento: 0.710, diametroExterno: 0.037, parede: 0.003, lados: 20 },
   nos: { quantidade: 3, saliencia: 0.0018, largura: 0.013 },
@@ -156,8 +156,9 @@ function perfilColmo(raioBase) {
    O eixo já está girado quando ela é construída: a lâmina nasce deitada em Z e
    `rotaciona` põe o comprimento em Y, então a pestana corre em X (a largura),
    na altura do topo da lâmina e recuada pela concha. */
+const dZLamina = 0.003;
 const yPestana = L.comprimento - 0.006;
-const zPestana = -(L.concha + L.espessura * 0.5);
+const zPestana = -(L.concha + L.espessura * 0.5) + dZLamina;
 const RAIO_DA_PESTANA = 0.0052;
 
 const pestana = (sinal) => [
@@ -251,6 +252,7 @@ export const receitaPaDeBicoBambu = {
     }],
     /* A lâmina nasce deitada em Z e é girada para o eixo do cabo. */
     ['rotaciona', { eixo: 'x', graus: -90, pivo: [0, 0, 0], sel: { origem: { op: 'inflate', id: 1 } } }],
+    ['transladar', { d: [0, 0, dZLamina], sel: { origem: { op: 'inflate', id: 1 } } }],
 
     ['loft', {
       origemId: 2, lados: B.lados, orientacao: [1, 0, 0],
