@@ -1,10 +1,13 @@
 /* painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D. */
+import { criarModalReferencia } from './modal-referencia.js';
 
 export function criarPainelReferencias({
   container,
   aoAlternarPrancha = () => {},
 }) {
   if (!container) return null;
+
+  const modalReferencia = criarModalReferencia();
 
   function renderizar({ intencaoIA, referencias }) {
     container.replaceChildren();
@@ -35,6 +38,65 @@ export function criarPainelReferencias({
       blocoIntencao.appendChild(listaChecklist);
     }
     container.appendChild(blocoIntencao);
+
+    // 2. Bloco de Imagens de Referência Visual
+    const imagens = referencias?.imagens || [];
+    if (Array.isArray(imagens) && imagens.length > 0) {
+      const blocoImagens = document.createElement('section');
+      blocoImagens.className = 'bloco-referencia';
+      blocoImagens.innerHTML = `
+        <div class="bloco-cabecalho">
+          <span class="rotulo">REFERÊNCIAS VISUAIS</span>
+          <h3>Imagens de Inspiração & Alvo</h3>
+        </div>
+      `;
+
+      const galeria = document.createElement('div');
+      galeria.className = 'galeria-referencias-imagens';
+
+      for (const img of imagens) {
+        const url = typeof img === 'string' ? img : img?.url;
+        const rotulo = typeof img === 'object' ? (img.rotulo || 'Referência Visual') : 'Referência Visual';
+        const descricao = typeof img === 'object' ? (img.descricao || '') : '';
+        if (!url) continue;
+
+        const card = document.createElement('div');
+        card.className = 'card-referencia-img';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('title', 'Clique para abrir em tela cheia com zoom');
+        card.innerHTML = `
+          <div class="thumb-referencia-wrapper">
+            <img src="${url}" alt="${rotulo}" class="thumb-referencia-img" loading="lazy" />
+            <div class="thumb-hover-overlay">
+              <span class="icone-lupa">🔍</span>
+              <span class="texto-ampliar">Ampliar</span>
+            </div>
+          </div>
+          <div class="card-referencia-info">
+            <strong class="card-referencia-titulo">${rotulo}</strong>
+            ${descricao ? `<span class="card-referencia-desc">${descricao}</span>` : ''}
+          </div>
+        `;
+
+        const dispararAbertura = () => {
+          modalReferencia?.abrir({ url, rotulo, descricao });
+        };
+
+        card.addEventListener('click', dispararAbertura);
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            dispararAbertura();
+          }
+        });
+
+        galeria.appendChild(card);
+      }
+
+      blocoImagens.appendChild(galeria);
+      container.appendChild(blocoImagens);
+    }
 
     // 2. Bloco de Pranchas 2D e Blueprints
     const pranchas = referencias?.pranchas || [];

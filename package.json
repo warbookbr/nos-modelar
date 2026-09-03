@@ -48,6 +48,7 @@
     "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
     "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
+    "conferir:juntas": "node tools/mecanifica/conferir-juntas.mjs",
     "descrever:montagem": "node tools/mecanifica/descrever-montagem.mjs",
     "descrever:montagem:persistida": "node tools/mecanifica/descrever-montagem-persistida.mjs",
     "olhar:montagem": "node tools/mecanifica/olhar-montagem.mjs",

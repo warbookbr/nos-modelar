@@ -7,12 +7,24 @@
  * com o catálogo homologado atual e verifica o estado observável no navegador.
  */
 import assert from 'node:assert/strict';
+import { existsSync, renameSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const vite = await import('vite');
 const playwright = await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href);
+
+const arquivosSessao = [
+  { real: join(REPO, 'public/sessao-ativa.json'), bak: join(REPO, 'public/sessao-ativa.json.guarda-bak'), tinha: false },
+  { real: join(REPO, 'sessao-ativa.json'), bak: join(REPO, 'sessao-ativa.json.guarda-bak'), tinha: false },
+];
+for (const item of arquivosSessao) {
+  if (existsSync(item.real)) {
+    renameSync(item.real, item.bak);
+    item.tinha = true;
+  }
+}
 
 let servidor;
 let navegador;
@@ -60,4 +72,9 @@ try {
 } finally {
   await navegador?.close();
   await servidor?.close();
+  for (const item of arquivosSessao) {
+    if (item.tinha && existsSync(item.bak)) {
+      renameSync(item.bak, item.real);
+    }
+  }
 }

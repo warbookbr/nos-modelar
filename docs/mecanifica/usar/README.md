@@ -31,6 +31,10 @@ onde o método de "observar, medir, corrigir" funciona e onde ele acha defeito
 para sempre sem a forma andar. Vale ler quando os achados encolhem e a
 qualidade não sobe.
 
+[`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) documenta o processo de
+modelagem de uma cadeira de jantar realista contra referência fotográfica,
+com problemas e limitações de motor e ferramentas anotados durante a criação.
+
 ## Regras que valem em qualquer tarefa daqui
 
 - O núcleo de autoria é independente de Three.js e do domínio automotivo.

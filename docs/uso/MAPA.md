@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-766 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+772 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -570,6 +570,7 @@
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
+- `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
@@ -760,6 +761,8 @@
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
+- `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
+- `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
 - `derivar-catalogo-montagens.js` — derivar-catalogo-montagens.js — índice determinístico limitado às raízes dadas.
@@ -811,6 +814,7 @@
 
 ## src/bancada/referencias/
 
+- `modal-referencia.js` — modal-referencia.js — lightbox modal interativo para imagens de referência com zoom e pan.
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
 
@@ -937,6 +941,8 @@
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
+- `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
+- `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.

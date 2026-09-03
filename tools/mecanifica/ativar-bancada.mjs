@@ -1,5 +1,5 @@
 /* ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D. */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { caixasPorParte, portasPublicadas } from '../../src/autoria/descrever-partes.js';
@@ -11,7 +11,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 
 const args = lerArgumentos(process.argv.slice(2), {
-  opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo'],
+  opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo', 'perfil', 'imagem'],
   bandeiras: ['ajuda', 'h'],
 });
 
@@ -26,6 +26,8 @@ Opcoes:
   --porta=<num>      Porta do Vite (padrao: 5174 ou 5173)
   --focar=<nome>     Nome da parte para focar imediatamente na URL
   --modo=<modo>      Modo de visualizacao: todas, contexto, isolar
+  --perfil=<nome>    Perfil de aplicacao da receita (ex: jogo, marcenaria)
+  --imagem=<path>    Imagem de referencia visual vinculada a sessao
 `);
   process.exit(0);
 }
@@ -49,6 +51,11 @@ const receita = modulo.default
 if (!receita || !Array.isArray(receita.PASSOS)) {
   console.error('Erro: o modulo nao exporta uma receita valida com PASSOS.');
   process.exit(1);
+}
+
+const perfilEscolhido = args.opcao('perfil');
+if (perfilEscolhido && receita.PARAMS) {
+  receita.PARAMS.perfil = perfilEscolhido;
 }
 
 const { neutro } = executarReceita(receita);
@@ -99,8 +106,42 @@ if (gritos.length) {
   process.exit(1);
 }
 
-const nomeAlvo = receita.meta?.nome ?? 'Peça Ativa';
+const nomeAlvo = perfilEscolhido ? `${receita.meta?.nome ?? 'Peça Ativa'} (${perfilEscolhido})` : (receita.meta?.nome ?? 'Peça Ativa');
 const idAlvo = caminhoRelativo.replace(/[\/\\]/g, '-').replace(/\.js$/, '');
+const idCurto = caminhoRelativo.replace(/.*[\/\\]/, '').replace(/\.js$/, '');
+
+const imagensReferencia = [];
+const caminhoImagemArg = args.opcao('imagem');
+
+if (caminhoImagemArg) {
+  const caminhoImagemAbs = resolve(REPO, caminhoImagemArg);
+  if (existsSync(caminhoImagemAbs)) {
+    const ext = caminhoImagemAbs.endsWith('.png') ? '.png' : '.jpg';
+    const destinoRelativo = `referencias/${idCurto}${ext}`;
+    const destinoAbs = resolve(REPO, 'public', destinoRelativo);
+    mkdirSync(dirname(destinoAbs), { recursive: true });
+    copyFileSync(caminhoImagemAbs, destinoAbs);
+    imagensReferencia.push({
+      url: `./${destinoRelativo}`,
+      rotulo: `Referência Fotográfica: ${receita.meta?.nome ?? idCurto}`,
+      descricao: 'Imagem de referência fotorrealista para critérios e anatomia.',
+    });
+  } else {
+    console.warn(`! Imagem de referência não encontrada: ${caminhoImagemAbs}`);
+  }
+} else {
+  for (const ext of ['.jpg', '.png', '.jpeg', '.webp']) {
+    const candidata = `referencias/${idCurto}${ext}`;
+    if (existsSync(resolve(REPO, 'public', candidata))) {
+      imagensReferencia.push({
+        url: `./${candidata}`,
+        rotulo: `Referência Fotográfica: ${receita.meta?.nome ?? idCurto}`,
+        descricao: 'Imagem de referência fotorrealista para critérios e anatomia.',
+      });
+      break;
+    }
+  }
+}
 
 const payload = {
   status: 'conectado',
@@ -108,6 +149,7 @@ const payload = {
     id: idAlvo,
     tipo: 'peca',
     nome: nomeAlvo,
+    perfil: perfilEscolhido ?? receita.PARAMS?.perfil ?? 'jogo',
     versao: receita.meta?.versao ?? '1.0.0',
     atualizadoEm: new Date().toISOString(),
   },
@@ -118,7 +160,7 @@ const payload = {
   },
   referencias: {
     pranchas: [],
-    imagens: [],
+    imagens: imagensReferencia,
     criterios: criterios,
   },
   receita,
@@ -139,6 +181,9 @@ if (focar) {
 
 console.log(`\n✓ Receita ativada na Bancada com sucesso!`);
 console.log(`  Alvo: ${nomeAlvo} (${partesNomes.length} corpos, ${facesSemParte.length} faces órfãs)`);
+if (perfilEscolhido || receita.PARAMS?.perfil) {
+  console.log(`  Perfil ativo: ${perfilEscolhido ?? receita.PARAMS?.perfil}`);
+}
 if (facesSemParte.length) {
   console.log(`  ! faces sem parte: ${facesSemParte.slice(0, 8).join(', ')}${facesSemParte.length > 8 ? '…' : ''}`);
   console.log('    lembre que {op:\'cilindro\',id} seleciona só as laterais; as tampas pedem tampa:\'fundo\' e tampa:\'topo\'.');

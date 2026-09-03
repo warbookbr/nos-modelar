@@ -81,7 +81,19 @@ peça isolada e não inventa validade global de uma montagem.
    **Peça com vizinho nunca é aprovada só em `isolar`**: forma impossível passa
    isolada. Um arco que não comporta a própria roda só aparece em `contexto`.
 
-4. Se existir um pacote de modelagem associado, rode a revisão oficial:
+4. **Conferência de Juntas e Contato:**
+   Para peças com múltiplos corpos ou encaixes (como marcenaria ou mecânica),
+   confira vãos reais e paralelismo angular das faces com:
+
+   ```bash
+   npm run conferir:juntas -- <peca> [--entre=parteA,parteB] [--estrito]
+   ```
+
+   O comando mede a distância euclidiana normal entre faces opostas e o ângulo
+   de desvio, acusando imediatamente frestas em cunha (`⚠ CUNHA / DESALINHADA`)
+   ou folgas indesejadas (`⚠ FRESTA VISÍVEL`).
+
+5. Se existir um pacote de modelagem associado, rode a revisão oficial:
 
    ```bash
    npm run revisar:modelagem -- <pacote> --revisao=r001
@@ -89,7 +101,7 @@ peça isolada e não inventa validade global de uma montagem.
 
    A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-5. Rode os gates aplicáveis:
+6. Rode os gates aplicáveis:
 
    ```bash
    npm test

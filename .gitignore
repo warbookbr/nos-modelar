@@ -36,3 +36,7 @@ exportacoes/
 # Sessão ativa da bancada — estado local, não versionado
 sessao-ativa.json
 public/sessao-ativa.json
+
+# Arquivos temporários e de ambiente
+.agent/
+.mcp.json

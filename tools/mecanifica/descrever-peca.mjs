@@ -121,7 +121,8 @@ export async function descreverPecaReutilizavel({
       return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
     }
   }
-  if (!Array.isArray(modulo.PASSOS) && !Array.isArray(modulo.CHAMADAS_COMPOSICOES)) {
+  const receita = modulo.default ?? Object.values(modulo).find((v) => v && typeof v === 'object' && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES))) ?? modulo;
+  if (!Array.isArray(receita.PASSOS) && !Array.isArray(receita.CHAMADAS_COMPOSICOES)) {
     return falha(
       `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS nem CHAMADAS_COMPOSICOES.`
       + '\n  esta régua só mede peça escrita pelo contrato procedural da Oficina.',
@@ -132,7 +133,7 @@ export async function descreverPecaReutilizavel({
   let neutro;
   let expansao = null;
   try {
-    ({ entrada, neutro, expansao } = executarReceita(modulo, {
+    ({ entrada, neutro, expansao } = executarReceita(receita, {
       registroOperacoes,
       registroComposicoes,
       orcamentoComposicoes,

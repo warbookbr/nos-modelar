@@ -97,6 +97,8 @@ maior parte dos tropeços. Escolha pela forma que você precisa, não pelo tema:
 | assimétrica num plano | `prototipos/procedural/v3/armas/machado-de-guerra.js` |
 | detalhe repetido em torno de um eixo | `prototipos/procedural/v3/armas/maca-de-abas.js` |
 
+Para peças bilaterais com curvas ou arcos contínuos (como o encosto esculpido da cadeira), use `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` para garantir simetria matemática e eliminar frestas de tangência angular nas pontas. O estudo de caso e notas técnicas estão em [`docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md`](../../../docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md).
+
 Ler é para entender a operação e a convenção; **copiar uma receita histórica
 como molde, não**. Para uma receita nova, use o contrato declarativo em
 `docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
