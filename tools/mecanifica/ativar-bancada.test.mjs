@@ -12,7 +12,7 @@ import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'no
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
@@ -68,8 +68,19 @@ const QUEBRADA = `export const receita = {
 };
 `;
 
+let sessaoOriginal = null;
+
+beforeAll(() => {
+  if (existsSync(SESSAO)) {
+    sessaoOriginal = readFileSync(SESSAO, 'utf8');
+  }
+});
+
 afterAll(() => {
   for (const caminho of temporarias) rmSync(caminho, { force: true });
+  if (sessaoOriginal !== null) {
+    writeFileSync(SESSAO, sessaoOriginal, 'utf8');
+  }
 });
 
 describe('ativar-bancada: grito do motor é recusa', () => {
