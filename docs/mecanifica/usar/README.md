@@ -13,7 +13,7 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 
 | se a tarefa é | skill | contrato |
 | --- | --- | --- |
-| criar ou refinar uma peça | `criar-peca` | [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
+| criar ou refinar uma peça | `criar-peca` | [`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | conferir um conjunto montado | `auditar-montagem` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |

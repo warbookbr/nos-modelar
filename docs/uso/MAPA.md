@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-768 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+774 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -573,6 +573,7 @@
 - `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
+- `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
@@ -590,6 +591,7 @@
 
 - `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — P0 Implementation Plan
 - `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
+- `2026-09-03-melhoria-esteira-autoria-ia.md` — Melhoria da Esteira de Apoio à Modelagem e Autoria para IA — Implementation Plan
 
 ## docs/uso/
 
@@ -734,6 +736,7 @@
 - `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
 - `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
+- `mancal-guia.js` — mancal-guia.js — Mancal de deslizamento para guia linear/rotativa.
 - `pa-de-bico-bambu.js` — pa-de-bico-bambu.js — pá de bico completa, com cabo de colmo de bambu.
 
 ## prototipos/procedural/v3/servicos/
@@ -977,6 +980,7 @@
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
+- `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
@@ -1006,6 +1010,8 @@
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
 - `repositorio-revalidacao.mjs` — repositorio-revalidacao.mjs — persistência R01 sobre o repositório transacional existente.
 - `repositorio-revalidacao.test.ts` — Provas R01: persistência canônica, retomada, idempotência e conflito.
+- `resolver-caminho-receita.mjs` — resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro
+- `resolver-caminho-receita.test.mjs` — resolver-caminho-receita.test.mjs — testes unitários para resolução flexível e segura de receitas procedurais.
 - `revalidacao-cascata-r00.test.ts` — Provas executáveis da R00: identidade, estados, obsolescência e concorrência.
 - `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.

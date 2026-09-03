@@ -11,6 +11,8 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { ativarReceitaBancada } from './ativar-bancada.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -219,9 +221,32 @@ export async function olharBancada({
     if (!Number.isFinite(explosao) || explosao < 0 || explosao > 1) erroDeUso('explosao precisa estar entre 0 e 1');
     /* Sem --peca a bancada abre a SESSÃO ATIVA — a peça em que se está
        trabalhando, que por definição ainda não está no catálogo publicado.
-       Exigir nome aqui tornava impossível salvar a revisão visual justamente
-       do trabalho em curso. O nome do arquivo sai do rótulo do modelo já
-       carregado (`dado.peca`), normalizado abaixo. */
+       Se --peca for informada, pode ser:
+       1. Uma fixture de teste privada do harness ('fixture-visual', etc.).
+       2. Uma receita procedural do repositório (ex.: 'mancal-guia', 'prototipos/.../peca.js').
+       Se for receita, auto-ativamos a sessão ativa para ela e carregamos a bancada via sessão,
+       evitando timeout do Playwright. Se não existir em nenhum dos dois, falha rápido. */
+    const FIXTURES_HARNESS = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas'];
+    const ehFixtureHarness = Boolean(peca && FIXTURES_HARNESS.includes(peca));
+
+    if (peca && !ehFixtureHarness) {
+      let caminhoReceita;
+      try {
+        caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
+      } catch {
+        erroDeUso(`Peça '${peca}' não encontrada no catálogo de fixtures nem em prototipos/procedural/v3/{pecas,maquinas}/.`);
+      }
+
+      if (caminhoReceita) {
+        try {
+          const ativar = dependencias.ativarReceitaBancada ?? ativarReceitaBancada;
+          await ativar({ alvo: caminhoReceita, raiz: REPO });
+          if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
+        } catch (erro) {
+          erroDeUso(`Falha ao ativar peça '${peca}' na bancada: ${erro.message}`);
+        }
+      }
+    }
 
     const saida = capturarEmMemoria ? null : (caminhoInterno(saidaDeclarada, 'saida') ?? OUT);
     const relatorio = capturarEmMemoria ? null : caminhoInterno(relatorioDeclarado, 'relatorio');
@@ -284,7 +309,12 @@ export async function olharBancada({
              modelo de fato entrar na cena; `listar` não precisa de modelo. */
           if (!listar) {
             await page.waitForFunction(
-              () => window.__mecanificaBancada.carregado === true,
+              () => {
+                const b = window.__mecanificaBancada;
+                if (!b) return false;
+                if (b.erro) throw new Error(String(b.erro));
+                return b.carregado === true;
+              },
               { timeout: 20000 },
             );
           }
@@ -299,7 +329,7 @@ export async function olharBancada({
     };
     const urlDa = (vista) => {
       const params = new URLSearchParams();
-      if (peca) params.set('peca', peca);
+      if (ehFixtureHarness) params.set('peca', peca);
       if (selecionadas.length) params.set('selecionadas', [...selecionadas].sort().join(','));
       if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica') params.set('vista', vista);
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
@@ -476,7 +506,8 @@ export async function olharBancada({
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
       } else {
-        const arquivo = join(saida, `bancada-${apelidoDeArquivo(dado.peca)}-${vista}${sufixo}.png`);
+        const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
+        const arquivo = join(saida, `bancada-${apelidoEfetivo}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
         await page.screenshot({ path: arquivo });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
@@ -540,7 +571,7 @@ function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
+      opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
       bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'cores', 'arame', 'wireframe'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
@@ -549,7 +580,7 @@ function comoCLI(argv) {
   }
   const arame = lido.bandeira('arame') || lido.bandeira('wireframe');
   return olharBancada({
-    peca: lido.posicional,
+    peca: lido.opcao('peca') ?? lido.posicional,
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
     modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'),
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),

@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [Melhoria da esteira de autoria para IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md).
 
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de

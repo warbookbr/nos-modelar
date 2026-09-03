@@ -101,4 +101,14 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     expect(erro).toMatch(/passo \d+ \(loft\)/);
     expect(erro).toContain('paralela à tangente');
   });
+
+  it('aceita argumento posicional e nome curto sem --peca ou --arquivo', () => {
+    const caminho = receitaTemporaria('posicional', BOA);
+    const nomeSimples = caminho.replace(/^.*[\\/]/, '').replace(/\.js$/, '');
+    const proc = execFileSync('node', [ATIVAR, nomeSimples], {
+      cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    expect(proc).toContain('✓');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
 });
