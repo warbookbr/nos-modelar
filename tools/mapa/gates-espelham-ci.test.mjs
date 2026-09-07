@@ -16,6 +16,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GATES } from '../gates.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -27,13 +28,14 @@ function comandosDoCI() {
     .map((c) => c.slice('npm run '.length).trim()));
 }
 
+/* A lista morava na corrente de `&&` do `package.json`. Ela saiu de lá porque
+   `A && B` para no primeiro erro: com `npm test` vermelho, os dezesseis gates
+   seguintes nunca rodavam e o estado deles era desconhecido. Agora `gates` é um
+   runner que roda todos e relata todos, e a fonte da verdade é o array exportado
+   por `tools/gates.mjs`. A garantia deste arquivo não mudou — só o lugar onde
+   ele lê. */
 function comandosDoGates() {
-  const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8'));
-  const gates = pkg.scripts.gates ?? '';
-  return new Set(gates.split('&&')
-    .map((c) => c.trim())
-    .filter((c) => c.startsWith('npm run '))
-    .map((c) => c.slice('npm run '.length).trim()));
+  return new Set(GATES);
 }
 
 describe('npm run gates espelha o CI', () => {
@@ -51,5 +53,13 @@ describe('npm run gates espelha o CI', () => {
 
   it('o script existe e não está vazio', () => {
     expect(comandosDoGates().size).toBeGreaterThan(10);
+  });
+
+  it('o passo `gates` do package.json aponta para o runner', () => {
+    /* Se alguém devolver a corrente de `&&` ao package.json, a lista acima
+       deixa de descrever o que roda de fato — e este arquivo passaria a
+       garantir o espelho errado, calado. */
+    const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8'));
+    expect(pkg.scripts.gates).toContain('tools/gates.mjs');
   });
 });

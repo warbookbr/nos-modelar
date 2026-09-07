@@ -1,7 +1,8 @@
 /* autoria-execucao.test.mjs — testes unitarios para ferramentas MCP ativar_bancada e exportar_step. */
 import { afterAll, describe, expect, it } from 'vitest';
-import { existsSync, unlinkSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, mkdtempSync, rmSync, unlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import {
   criarFerramentasAutoriaExecucao,
   executarAtivarBancada,
@@ -9,15 +10,23 @@ import {
   executarExportarObj,
 } from './autoria-execucao.mjs';
 
+const SESSAO_TESTE = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-sessao-'));
+
 describe('perfil MCP autoria-execucao', () => {
-  /* ativar_bancada grava estado LOCAL da sessão. Sem limpar aqui, o gate
-     `bancada:vazia:check` passa a ver a bancada carregada e reprova — o teste
-     deixaria sujeira que muda o veredito de outro gate. */
+  /* `ativar_bancada` grava o estado LOCAL da sessão — o arquivo que diz qual
+     peça está carregada na bancada de quem está trabalhando.
+     
+     Este teste apagava esses arquivos no fim, para o gate `bancada:vazia:check`
+     não ver a bancada carregada. O efeito colateral era pior que o problema:
+     quem tivesse uma peça na bancada a perdia ao rodar a suíte, sem aviso.
+     Guardar e devolver também não resolve — dois arquivos de teste em paralelo
+     devolvem cada um o que capturou, e vence quem terminar por último; medido,
+     a sessão voltava com a peça de OUTRO teste.
+     
+     A escrita agora vai para uma pasta temporária própria. O arquivo real não é
+     lido, escrito nem apagado, e nenhum outro gate depende de limpeza daqui. */
   afterAll(() => {
-    for (const alvo of ['sessao-ativa.json', 'public/sessao-ativa.json']) {
-      const caminho = resolve(process.cwd(), alvo);
-      if (existsSync(caminho)) unlinkSync(caminho);
-    }
+    rmSync(SESSAO_TESTE, { recursive: true, force: true });
   });
 
   it('registra ferramentas ativar_bancada, exportar_step e exportar_obj', () => {
@@ -30,7 +39,7 @@ describe('perfil MCP autoria-execucao', () => {
       arquivo: 'prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js',
       focar: 'motorEletrico',
       modo: 'isolar',
-    });
+    }, { raizSessao: SESSAO_TESTE });
 
     expect(res.ok).toBe(true);
     expect(res.resultado.alvo).toBe('Prensa Mecânica Industrial 4 Colunas');

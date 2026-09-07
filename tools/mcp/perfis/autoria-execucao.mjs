@@ -43,7 +43,11 @@ const erroAcionavel = (codigo, mensagem, acao) => ({ codigo, mensagem, acao });
 const respostaOk = (resultado) => ({ ok: true, codigo: 0, resultado });
 const respostaErro = (codigo, erro) => ({ ok: false, codigo, erro });
 
-export async function executarAtivarBancada(input) {
+/* `raizSessao` separa ONDE a sessão é gravada de ONDE o repositório está, pelo
+   mesmo motivo da CLI: o teste desta ferramenta escrevia no
+   `public/sessao-ativa.json` real e desmontava a bancada de quem trabalhava.
+   Em uso normal continua sendo a raiz do repositório. */
+export async function executarAtivarBancada(input, { raizSessao = REPO } = {}) {
   try {
     const caminhoAbsoluto = resolve(REPO, input.arquivo);
     verificarCaminhoConfinado(caminhoAbsoluto, { raiz: REPO });
@@ -99,8 +103,9 @@ export async function executarAtivarBancada(input) {
     };
 
     mkdirSync(resolve(REPO, 'public'), { recursive: true });
-    writeFileSync(resolve(REPO, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
-    writeFileSync(resolve(REPO, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+    mkdirSync(resolve(raizSessao, 'public'), { recursive: true });
+    writeFileSync(resolve(raizSessao, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+    writeFileSync(resolve(raizSessao, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
 
     const porta = input.porta ?? 5174;
     const modo = input.modo ?? (input.focar ? 'isolar' : 'todas');

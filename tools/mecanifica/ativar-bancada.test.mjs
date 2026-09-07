@@ -12,26 +12,41 @@ import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'no
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
 const ATIVAR = join(AQUI, 'ativar-bancada.mjs');
-const SESSAO = join(REPO, 'public/sessao-ativa.json');
 const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
 
-/* A receita precisa morar dentro do repositório para o importador enxergá-la. */
+/* A receita precisa morar dentro do repositório para o importador enxergá-la —
+ * mas NÃO em `prototipos/procedural/v3/pecas/`. Escrever ali punha fixtures de
+ * teste dentro do acervo real durante a execução, e `descrever-peca.mjs` monta
+ * `PECAS_DISPONIVEIS` lendo essa pasta NO MOMENTO DO IMPORT. Com os arquivos de
+ * teste rodando em paralelo, `tools/mcp/mcp.test.mjs` podia enxergar uma peça
+ * `_teste-*` que só existe por alguns milissegundos: falha que não se reproduz
+ * sozinha, e que some quando alguém vai investigar.
+ *
+ * Pasta própria dentro de `tmp/`, criada e removida por execução. O resolvedor
+ * de receita aceita caminho relativo à raiz, então o alvo continua endereçável
+ * do mesmo jeito, e o acervo nunca é tocado. */
+const AREA = mkdtempSync(join(REPO, 'tmp', 'teste-ativar-bancada-'));
+/* A sessão de teste é gravada AQUI, não no `public/sessao-ativa.json` do
+   repositório: o arquivo real diz qual peça está na bancada de quem está
+   trabalhando, e teste não desmonta o trabalho de ninguém. */
+const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'mecanifica-sessao-teste-'));
+const SESSAO = join(AREA_SESSAO, 'public/sessao-ativa.json');
 const temporarias = [];
 function receitaTemporaria(nome, corpo) {
-  const caminho = join(PECAS, `_teste-${nome}.js`);
+  const caminho = join(AREA, `_teste-${nome}.js`);
   writeFileSync(caminho, corpo, 'utf8');
   temporarias.push(caminho);
-  return caminho.slice(REPO.length + 1);
+  return caminho.slice(REPO.length + 1).replace(/\\/g, '/');
 }
 
 function ativar(relativo) {
   try {
-    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`], {
+    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`, `--raiz-sessao=${AREA_SESSAO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     return { codigo: 0, saida, erro: '' };
@@ -68,19 +83,10 @@ const QUEBRADA = `export const receita = {
 };
 `;
 
-let sessaoOriginal = null;
-
-beforeAll(() => {
-  if (existsSync(SESSAO)) {
-    sessaoOriginal = readFileSync(SESSAO, 'utf8');
-  }
-});
-
 afterAll(() => {
   for (const caminho of temporarias) rmSync(caminho, { force: true });
-  if (sessaoOriginal !== null) {
-    writeFileSync(SESSAO, sessaoOriginal, 'utf8');
-  }
+  rmSync(AREA, { recursive: true, force: true });
+  rmSync(AREA_SESSAO, { recursive: true, force: true });
 });
 
 describe('ativar-bancada: grito do motor é recusa', () => {
@@ -113,10 +119,22 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     expect(erro).toContain('paralela à tangente');
   });
 
-  it('aceita argumento posicional e nome curto sem --peca ou --arquivo', () => {
+  /* Nome curto só tem sentido contra o ACERVO: é o resolvedor procurando em
+     `prototipos/procedural/v3/{pecas,maquinas}/`. Uma fixture temporária mora
+     fora dessas pastas de propósito — usá-la aqui provaria o resolvedor com a
+     pasta errada. Por isso o caso do nome curto usa peça real, e o caso do
+     caminho, logo abaixo, usa a fixture. */
+  it('aceita argumento posicional com nome curto de peça do acervo', () => {
+    const proc = execFileSync('node', [ATIVAR, 'chapa-de-fixacao', `--raiz-sessao=${AREA_SESSAO}`], {
+      cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    expect(proc).toContain('✓');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain('chapa-de-fixacao');
+  });
+
+  it('aceita argumento posicional com caminho relativo à raiz', () => {
     const caminho = receitaTemporaria('posicional', BOA);
-    const nomeSimples = caminho.replace(/^.*[\\/]/, '').replace(/\.js$/, '');
-    const proc = execFileSync('node', [ATIVAR, nomeSimples], {
+    const proc = execFileSync('node', [ATIVAR, caminho, `--raiz-sessao=${AREA_SESSAO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');

@@ -7,6 +7,9 @@ import {
   carregarCatalogoMontagens, catalogoMontagensDoAmbiente,
   criarCatalogoMontagensVazio, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
+import { SYMLINK, avisarSymlinkAusente } from '../mecanifica/capacidade-symlink.mjs';
+
+avisarSymlinkAusente();
 
 const CONFIGURACAO = resolve('tools/mcp/fixtures/catalogo-montagens.json');
 
@@ -106,7 +109,7 @@ describe('catálogo MCP de montagens configurado pelo host', () => {
     expect(() => carregarCatalogoMontagens('relativo.json')).toThrowError(expect.objectContaining({ codigo: 'configuracao-invalida' }));
   });
 
-  it('recusa vínculo simbólico mesmo quando a raiz foi explicitamente listada', async () => {
+  it.skipIf(!SYMLINK.disponivel)('recusa vínculo simbólico mesmo quando a raiz foi explicitamente listada', async () => {
     const temp = mkdtempSync(join(tmpdir(), 'mecanifica-catalogo-mcp-'));
     const fora = mkdtempSync(join(tmpdir(), 'mecanifica-catalogo-fora-'));
     try {

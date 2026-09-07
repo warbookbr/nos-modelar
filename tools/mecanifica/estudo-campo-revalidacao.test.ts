@@ -176,5 +176,11 @@ describe('estudo de campo R05 — cascata persistida', () => {
     } finally {
       await rm(raiz, { recursive: true, force: true });
     }
-  });
+    /* 30 s, não os 5 s do padrão: este é um ESTUDO DE CAMPO — deriva campanha,
+       obsoleta a anterior e retoma em sessão nova, tudo em disco. Sozinho ele
+       fecha em ~1,2 s, mas na suíte agregada, com os arquivos rodando em
+       paralelo, estourava os 5 s e aparecia como falha. Um teste que passa
+       isolado e falha junto ensina a desconfiar da suíte inteira; o orçamento
+       de tempo aqui é do tamanho do trabalho que ele faz. */
+  }, 30_000);
 });

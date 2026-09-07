@@ -19,6 +19,19 @@ export async function ativarReceitaBancada({
   imagem,
   porta = '5174',
   raiz = REPO,
+  /* ONDE a sessão é gravada, separado de ONDE a receita é procurada.
+   *
+   * Os dois eram o mesmo `raiz`, e por isso todo teste que exercitava esta CLI
+   * escrevia no `public/sessao-ativa.json` REAL — o arquivo que diz qual peça
+   * está na bancada de quem está trabalhando. Dois arquivos de teste tentaram
+   * remediar isso guardando e devolvendo o conteúdo, e não resolve: rodando em
+   * paralelo, cada um devolve o que capturou, e vence quem terminar por último.
+   * Medido: a sessão saía de `cadeira-de-madeira` e voltava como outra peça.
+   *
+   * Separar os dois deixa o teste apontar a ESCRITA para uma pasta temporária
+   * enquanto a BUSCA continua no acervo real, que é o que ele precisa exercitar.
+   * Em uso normal os dois continuam iguais, e nada muda. */
+  raizSessao = raiz,
 } = {}) {
   if (!alvo) {
     throw new Error('Informe a receita (ex.: mancal-guia ou --arquivo=<caminho.js>)');
@@ -121,9 +134,9 @@ export async function ativarReceitaBancada({
     receita,
   };
 
-  mkdirSync(resolve(raiz, 'public'), { recursive: true });
-  writeFileSync(resolve(raiz, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
-  writeFileSync(resolve(raiz, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+  mkdirSync(resolve(raizSessao, 'public'), { recursive: true });
+  writeFileSync(resolve(raizSessao, 'public/sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
+  writeFileSync(resolve(raizSessao, 'sessao-ativa.json'), JSON.stringify(payload, null, 2), 'utf8');
 
   const modoEfetivo = modo ?? (focar ? 'isolar' : 'todas');
   let query = '';
@@ -150,7 +163,7 @@ export async function ativarReceitaBancada({
 
 async function main() {
   const args = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo', 'perfil', 'imagem'],
+    opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo', 'perfil', 'imagem', 'raiz-sessao'],
     bandeiras: ['ajuda', 'h'],
     posicional: { nome: 'a receita', obrigatorio: false },
   });
@@ -169,6 +182,8 @@ Opcoes:
   --modo=<modo>      Modo de visualizacao: todas, contexto, isolar
   --perfil=<nome>    Perfil de aplicacao da receita (ex: jogo, marcenaria)
   --imagem=<path>    Imagem de referencia visual vinculada a sessao
+  --raiz-sessao=<d>  Onde gravar sessao-ativa.json (padrao: raiz do repo).
+                     Existe para teste escrever fora da sessao de trabalho.
 `);
     process.exit(0);
   }
@@ -187,6 +202,7 @@ Opcoes:
       modo: args.opcao('modo'),
       imagem: args.opcao('imagem'),
       porta: args.opcao('porta') ?? '5174',
+      raizSessao: args.opcao('raiz-sessao') ?? REPO,
     });
 
     console.log(`\n✓ Receita ativada na Bancada com sucesso!`);

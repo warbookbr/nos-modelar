@@ -4,6 +4,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { resolverEvidenciaDoRepositorio } from './caminho-repositorio.mjs';
+import { SYMLINK, avisarSymlinkAusente } from '../mecanifica/capacidade-symlink.mjs';
+
+avisarSymlinkAusente();
 
 function ambiente() {
   const pai = mkdtempSync(join(tmpdir(), 'mecanifica-caminho-'));
@@ -35,7 +38,7 @@ describe('resolverEvidenciaDoRepositorio', () => {
     } finally { rmSync(pai, { recursive: true, force: true }); }
   });
 
-  it('recusa symlink que aponta para fora da raiz', () => {
+  it.skipIf(!SYMLINK.disponivel)('recusa symlink que aponta para fora da raiz', () => {
     const { pai, raiz } = ambiente();
     try {
       const externo = join(pai, 'fora.txt');

@@ -5,6 +5,10 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço MJS exercitado pelo contrato de armazenamento.
 import { lerHistoricoAutoria, lerRevisaoAtivaAutoria, limparOrfaosAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria, publicarRevisaoAutoria } from './repositorio-autoria.mjs';
+// @ts-expect-error — sonda MJS de capacidade do ambiente, sem tipos próprios.
+import { SYMLINK, avisarSymlinkAusente } from './capacidade-symlink.mjs';
+
+avisarSymlinkAusente();
 
 describe('repositório de autoria imutável', () => {
   it('planeja sem escrever e publica somente após o commit completo', async () => {
@@ -88,7 +92,7 @@ describe('repositório de autoria imutável', () => {
     expect(planos.map((plano) => plano.commit)).toContain(ativa?.commit);
   });
 
-  it('recusa raiz symlink, filesystem sem hard link e objeto adulterado', async () => {
+  it.skipIf(!SYMLINK.disponivel)('recusa raiz symlink, filesystem sem hard link e objeto adulterado', async () => {
     const real = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-raiz-'));
     const raizSymlink = join(real, 'atalho');
     await symlink(real, raizSymlink);
@@ -119,7 +123,7 @@ describe('repositório de autoria imutável', () => {
     await expect(materializarRevisaoAutoria({ raiz, plano: concorrente })).rejects.toMatchObject({ codigo: 'revisao-desatualizada' });
   });
 
-  it('falha fechado para transição malformada e symlink interno', async () => {
+  it.skipIf(!SYMLINK.disponivel)('falha fechado para transição malformada e symlink interno', async () => {
     const raiz = await mkdtemp(join(tmpdir(), 'mecanifica-autoria-transicao-'));
     const plano = planejarRevisaoAutoria({ entidade: 'montagem-a', conteudo: { valor: 1 } });
     await materializarRevisaoAutoria({ raiz, plano });
