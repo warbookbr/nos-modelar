@@ -4,6 +4,17 @@
 
 **Plano ativo:** Nenhum.
 
+**Plano pronto, aguardando abertura:** [parâmetro que move a
+peça](2026-09-07-parametro-que-move-a-peca.md). Ele nasceu da pergunta "onde a IA
+gasta tempo" e de uma medição que respondeu outra coisa: **dos 88 parâmetros
+declarados no acervo, 13 estão vivos**. Nove das dez receitas que carregam trazem
+`PASSOS` como literais fixos e `PARAMS` decorativo ao lado — a prensa industrial
+declara catorze liberdades e nenhuma move um vértice. A ferramenta de varredura
+que o plano abre mede a derivada de cada parâmetro sobre um critério; a primeira
+coisa que ela relata, na maioria dos alvos de hoje, é que não há o que varrer.
+Avaliar uma variante custa de 1 a 62 ms e é determinística, então o mapa completo
+de uma peça sai por menos que uma chamada de `olhar-bancada`.
+
 A [esteira confiável para a IA](encerrados/2026-09-07-esteira-confiavel-para-ia.md)
 foi **concluída e aprovada** em 2026-09-07. Ela não tocou o motor, as receitas
 nem a geometria: mudou o custo de descobrir que a forma está errada. Olhar uma
