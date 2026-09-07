@@ -2,23 +2,32 @@
 
 ## Estado
 
-**Plano ativo:** [esteira confiável para a IA](2026-09-07-esteira-confiavel-para-ia.md) (2026-09-07-esteira-confiavel-para-ia.md)
+**Plano ativo:** Nenhum.
 
-A [melhoria da esteira de autoria para
-IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md) e a
-[modelagem da prensa hidráulica
-H-frame](../../superpowers/plans/2026-09-03-modelagem-prensa-hidraulica.md) são
-planos de execução, não planos executivos datados: entregaram endereço único de
-receita, auto-ativação da sessão no `olhar-bancada` e a prensa em
-`maquinas/prensa-hidraulica/`. Declará-los como plano ativo reprovava
-`planos:check`, que exige que a declaração aponte para um arquivo datado em
-estado `ativo` nesta pasta.
+A [esteira confiável para a IA](encerrados/2026-09-07-esteira-confiavel-para-ia.md)
+foi **concluída e aprovada** em 2026-09-07. Ela não tocou o motor, as receitas
+nem a geometria: mudou o custo de descobrir que a forma está errada. Olhar uma
+peça pelo nome saiu de 63 s de timeout mudo para 3,2 s com PNG; a suíte saiu de
+cinco vermelhos por privilégio ausente para zero, e parou de trocar a peça
+carregada na bancada; `npm run gates` passou a rodar os dezenove e relatar todos,
+em vez de morrer no segundo; as 22 citações mortas do caminho de leitura viraram
+zero, com gate no CI; a leitura obrigatória caiu de 119,8 KB para 69,8 KB sem
+perder lição; e a saída de `descrever` encolheu 57% mantendo todo fato de
+contato.
 
-O plano ativo corrige o laço que a IA repete — descrever, ativar, olhar, medir,
-corrigir — e corta o que ela precisa ler antes de começar. Abriu com seis medidas
-de linha de base tiradas em `8efe072`, e cada rodada fecha refazendo a mesma
-medida. R00 (fundir a esteira que já existia), R01 (linha de base verde) e R02
-(gate de citações) estão concluídas; R03 a R05 seguem abertas.
+Ela também deixou o **diário da oficina** (`npm run diario`): as ferramentas do
+laço registram sozinhas onde o tempo vai e o que emperra, sem pedir relato a
+quem as usa. A primeira leitura apontou `olhar-bancada` como 96% do tempo do
+laço — confirmar isso numa série longa é a próxima pergunta.
+
+A rodada R00 dela fundiu dois planos de execução que já estavam prontos e não
+mergeados: a [melhoria da esteira de autoria para
+IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md), que
+entregou o endereço único de receita e a auto-ativação da sessão, e a [modelagem
+da prensa hidráulica
+H-frame](../../superpowers/plans/2026-09-03-modelagem-prensa-hidraulica.md), que
+entregou a máquina em `maquinas/prensa-hidraulica/`. Plano de execução não é
+plano executivo datado, e declará-los como plano ativo reprovava `planos:check`.
 
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de

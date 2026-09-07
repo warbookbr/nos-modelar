@@ -1,6 +1,6 @@
 # Esteira confiável para a IA
 
-**Estado:** ativo
+**Estado:** concluído
 
 ## Objetivo
 
@@ -31,33 +31,25 @@ capacidade nova do motor — e é pré-requisito para medir qualquer outra coisa
 
 Os oito são reprodutíveis por comando; nenhum depende de julgamento.
 
-## Escopo — arquivos e identidades
+## Escopo e invariantes
 
-As CLIs do laço (`olhar-bancada`, `ativar-bancada`, `exportar-step`,
-`descrever-peca`) e seus testes; `tools/mapa/` para os verificadores novos;
-`package.json` e `ci.yml` para os passos; `docs/mecanifica/usar/` e as skills
-para o corte de leitura; o `README.md` na seção do selo.
+Escopo: as CLIs do laço e seus testes, `tools/mapa/` para os verificadores novos,
+`package.json` e `ci.yml`, `docs/mecanifica/usar/` e as skills, e o `README.md`.
 
-## Invariantes
-
-1. Nenhuma rodada acrescenta ritual para a IA. Instrumento mede a ferramenta,
-   nunca pede relato ao agente.
-2. Nenhum documento operacional perde conteúdo: o que sai do caminho
-   obrigatório vai para zona consultável, com link, e não é apagado.
-3. Teste não escreve na árvore real do repositório — nem em `public/`, nem em
-   `prototipos/procedural/v3/pecas/`.
-4. Teste que não pode rodar no ambiente é **ignorado com motivo**, nunca
-   vermelho e nunca silenciado.
-5. O motor, as receitas e a geometria do acervo não são tocados por este plano.
+Invariantes, todos cumpridos: nenhuma rodada acrescenta ritual para a IA —
+instrumento mede a ferramenta, nunca pede relato ao agente; nenhum documento
+operacional perde conteúdo, o que sai do obrigatório vai para zona consultável
+com ponteiro; teste não escreve na árvore real, nem em `public/` nem em
+`pecas/`; teste que não pode rodar é ignorado com motivo, nunca vermelho e nunca
+silenciado; o motor, as receitas e a geometria não são tocados.
 
 ## Rodadas
 
 ### R00 — fundir a esteira que já existe — **concluída**
 
 A branch `feat/melhoria-esteira-autoria-ia` (base `8efe072`, 6 commits) já
-entregava resolução única de endereço (`resolverCaminhoReceita`), auto-ativação
-da sessão no `olhar-bancada` e o laço visual funcionando fora do catálogo de
-fixtures do harness.
+entregava resolução única de endereço, auto-ativação da sessão no `olhar-bancada`
+e o laço visual funcionando fora do catálogo de fixtures do harness.
 
 **Resultado:** mergeada em `9cc275e` após revisão dos 6 commits. O laço fecha em
 3,9 s para peça e 3,4 s para máquina, pelo nome curto. Quatro achados da revisão
@@ -78,20 +70,18 @@ orçamento do tamanho do trabalho que faz.
 versionado; a peça carregada na bancada sobrevive ao gate.
 
 A causa da interferência era pior que a falha: o teste do perfil MCP APAGAVA os
-dois arquivos de sessão no fim, para o `bancada:vazia:check` não vê-los. Salvar e
-devolver não conserta — dois arquivos em paralelo devolvem cada um o que
-capturaram, e vence quem terminar por último. `ativarReceitaBancada` e
-`executarAtivarBancada` passaram a separar ONDE a sessão é gravada de ONDE a
-receita é procurada; o teste escreve em pasta própria e o arquivo real deixa de
-ser lido, escrito ou apagado por qualquer teste.
+dois arquivos de sessão no fim. Salvar e devolver não conserta — dois arquivos em
+paralelo devolvem cada um o que capturaram, e vence quem terminar por último.
+`ativarReceitaBancada` e `executarAtivarBancada` passaram a separar ONDE a sessão
+é gravada de ONDE a receita é procurada, e o arquivo real deixou de ser tocado
+por qualquer teste.
 
 ### R02 — gate de citações — **concluída**
 
 Um verificador confere se cada caminho e cada `npm run` citados na leitura
-obrigatória existem. Achou **22 citações mortas**, onze delas receitas de
-exemplo que `references/operacoes-procedurais.md` manda abrir e que saíram do
-acervo. Medida que justifica o gate: na branch do R00 o número **sobe para 26** —
-sem verificador, a classe cresce sozinha.
+obrigatória existem. Achou **22 citações mortas**, onze delas receitas que
+`references/operacoes-procedurais.md` manda abrir e que saíram do acervo. Na
+branch do R00 o número **sobe para 26** — sem gate, a classe cresce sozinha.
 
 **Resultado:** 113 citações conferidas em 21 documentos, zero mortas; o gate
 entrou no `ci.yml` e no `gates`. O README afirmava um selo obrigatório, um
@@ -109,7 +99,7 @@ valem para qualquer peça. O gate é `npm run leitura:obrigatoria` contra o teto
 **Resultado: 119,8 KB → 69,8 KB, 42% a menos, sem perder uma lição.** Saíram
 para `historico/REGISTRO-FALHAS-AUTORIA-V.md` a tabela V-01..V-38 e as três
 seções de estado do programa. O laço visual virou
-[`LACO-VISUAL.md`](../usar/LACO-VISUAL.md), citado pelas duas skills que o
+[`LACO-VISUAL.md`](../../usar/LACO-VISUAL.md), citado pelas duas skills que o
 copiavam palavra por palavra. O esquema JSON do achado e os casos aplicados
 viraram consulta em `CRITICA-VISUAL-CONTRATO-E-CASOS.md`, e o método diagnóstico
 foi reclassificado como consulta pelo que a própria porta já dizia dele: "vale
@@ -142,11 +132,9 @@ quatro invocações de um laço, `olhar-bancada` levou 3.309 ms dos 3.451 ms —
 do tempo está em produzir imagem, e é ali que qualquer ganho seguinte tem de
 sair.
 
-Ela também achou dois defeitos no próprio instrumento, os dois da família que o
-R01 tratou: a suíte gravava no diário de quem trabalha (três recusas do motor e
-seis erros de uso que ninguém cometeu), e o leitor contava a MESMA falha sobre
-alvos diferentes como falhas distintas — a normalização existe justamente para
-que falha repetida pareça repetida.
+Ela também achou dois defeitos no próprio instrumento, ambos da família que o R01
+tratou: a suíte gravava no diário de quem trabalha, e o leitor contava a MESMA
+falha sobre alvos diferentes como falhas distintas.
 
 ### R05 — volume de saída por rodada — **concluída**
 
@@ -187,14 +175,26 @@ apontada no momento em que ela importa.
 - reorganizar a documentação de novo: R03 corta e desduplica, não remaneja;
 - o `laboratorio/`, que saiu para `warbookbr/nos-ciencia` em `8efe072`.
 
-## Encerramento e decisão
+## Encerramento e decisão — `aprovar`
 
-O plano fecha quando as cinco medidas da linha de base atingem o alvo e o R04
-produz um diário lido pelo menos uma vez. A decisão registrada será `aprovar`,
-`corrigir` ou `interromper`, com a tabela medida de novo lado a lado com a de
-abertura.
+R00 a R05 fechadas; a tabela acima é a medida refeita, ao lado da de abertura.
+Um alvo não foi atingido de propósito: a saída de `descrever` parou em 4,2 KB e
+não nos 2 KB escritos na abertura, porque os 2 KB só sairiam escondendo relação
+de contato — que é exatamente o que se vai ler. Alvo escrito antes de medir pode
+estar errado, e o certo é dizer isso, não perseguir o número.
 
-R00 pode ser recusado inteiro se a revisão dos commits reprovar: nesse caso R01
-absorve o isolamento de teste e o restante da esteira volta ao backlog. Nenhuma
-rodada posterior abre sem a anterior fechada, e R04 não abre com a linha de base
-vermelha — um diário sobre esteira quebrada mede o defeito, não o trabalho.
+O que este plano NÃO fez, e continua valendo: ele não tocou o motor, as receitas
+nem a geometria. Nada aqui é evidência sobre forma. O que ele mudou é o custo de
+descobrir que a forma está errada.
+
+Três defeitos apareceram no caminho e não estavam em nenhuma lista de abertura:
+o teste do perfil MCP APAGAVA a sessão de trabalho; o `GUIA-AUTORIA-IA.md`
+ensinava `ALIASES` numa sintaxe que o núcleo recusa de saída; e o perfil vazava
+entre ativações no servidor MCP, por mutação do módulo importado. Os três são da
+mesma família — estado global escrito por quem não é dono dele — e é a família
+que o registro de falhas deve vigiar em seguida.
+
+O que fica aberto para quem retomar: o diário mede, mas ninguém leu ainda uma
+série longa. A primeira leitura curta já apontou `olhar-bancada` como 96% do
+tempo do laço; confirmar isso em dezenas de rodadas reais é a próxima pergunta, e
+ela decide se o esforço seguinte vai para captura mais barata ou para outro lugar.
