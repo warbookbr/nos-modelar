@@ -216,3 +216,7 @@ regras estão em
 [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), e estavam
 copiadas palavra por palavra aqui e na outra skill — regra duplicada envelhece
 em lugares diferentes.
+
+Para EMITIR um achado em formato reexecutável, o contrato está em
+[`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](../../../docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md).
+É consulta, não leitura de partida.

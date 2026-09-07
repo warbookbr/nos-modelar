@@ -26,22 +26,16 @@ capacidade nova do motor — e é pré-requisito para medir qualquer outra coisa
 | `npm run gates` | morre no passo 2 de 17 | roda todos, relata todos | **18/18 em 106 s** (R01) |
 | citações mortas na leitura obrigatória | **22** | 0, com gate | **0**, 113 conferidas (R02) |
 | a suíte preserva o trabalho | troca a peça da bancada | não toca | **preserva** (R01) |
-| leitura obrigatória antes da 1ª linha | **119,8 KB** | ≤ 70 KB | **77,9 KB** (R03, parcial) |
+| leitura obrigatória antes da 1ª linha | **119,8 KB** | ≤ 70 KB | **69,8 KB** (R03) |
 
 Os seis são reprodutíveis por comando; nenhum depende de julgamento.
 
 ## Escopo — arquivos e identidades
 
-- `tools/mecanifica/olhar-bancada.mjs`, `ativar-bancada.mjs`, `exportar-step.mjs`,
-  `descrever-peca.mjs` e o novo `resolver-caminho-receita.mjs`;
-- `tools/mecanifica/ativar-bancada.test.mjs`, `repositorio-autoria.test.ts`,
-  `estudo-campo-revalidacao.test.ts`, `tools/mcp/catalogo-montagens.test.mjs`,
-  `tools/modelagem/caminho-repositorio.test.mjs`;
-- `tools/mapa/` — um verificador novo de citações;
-- `package.json` — o passo `gates` e o passo do verificador novo;
-- `docs/mecanifica/usar/` — `GOTCHAS-AUTORIA-VISUAL.md` e a porta `README.md`;
-- `.claude/skills/` — as três skills que repetem os mesmos quatro blocos;
-- `README.md` — a seção do selo.
+As CLIs do laço (`olhar-bancada`, `ativar-bancada`, `exportar-step`,
+`descrever-peca`) e seus testes; `tools/mapa/` para os verificadores novos;
+`package.json` e `ci.yml` para os passos; `docs/mecanifica/usar/` e as skills
+para o corte de leitura; o `README.md` na seção do selo.
 
 ## Invariantes
 
@@ -104,7 +98,7 @@ entrou no `ci.yml` e no `gates`. O README afirmava um selo obrigatório, um
 removeu o acervo que policiavam, e o texto ficou para trás. Arquivo gerado não é
 cobrado: o critério é o `.gitignore`.
 
-### R03 — cortar o obrigatório — **parcial**
+### R03 — cortar o obrigatório — **concluída**
 
 `GOTCHAS-AUTORIA-VISUAL.md` tem 36 KB e é leitura obrigatória. Medido por seção:
 **15,6 KB são o registro histórico V-01..V-38**, quase todo sobre o programa de
@@ -122,18 +116,23 @@ valem para qualquer peça.
 **Gate:** `npm run leitura:obrigatoria` mede a lista declarada contra o teto;
 gates de documentação verdes; nenhuma lição perdida.
 
-**Resultado: 119,8 KB → 77,9 KB, 35% a menos, e 7,9 KB acima do teto.** Saíram
+**Resultado: 119,8 KB → 69,8 KB, 42% a menos, sem perder uma lição.** Saíram
 para `historico/REGISTRO-FALHAS-AUTORIA-V.md` a tabela V-01..V-38 e as três
-seções de estado do programa; o laço visual virou
+seções de estado do programa. O laço visual virou
 [`LACO-VISUAL.md`](../usar/LACO-VISUAL.md), citado pelas duas skills que o
-copiavam palavra por palavra. Nada foi apagado, e o consumidor em código daquela
-tabela (`inventariar-candidatos-corpus-p0.mjs`) acompanhou o endereço.
+copiavam palavra por palavra. O esquema JSON do achado e os casos aplicados
+viraram consulta em `CRITICA-VISUAL-CONTRATO-E-CASOS.md`, e o método diagnóstico
+foi reclassificado como consulta pelo que a própria porta já dizia dele: "vale
+ler quando os achados encolhem e a qualidade não sobe".
 
-Os 7,9 KB que faltam não saem sem decisão editorial: sobraram
-`REFERENCIA-E-CRITICA-VISUAL.md` (13,1 KB), `AUTORIA-DE-PECA.md` (11,6 KB) e o
-`GUIA-AUTORIA-IA.md` que chegou no R00 (4,3 KB, com trechos que repetem a
-referência de operações). Cortar contrato é diferente de mover arqueologia, e a
-escolha é do usuário — o teto fica cobrado pelo script até lá.
+O corte achou um defeito que a duplicação escondia: o `GUIA-AUTORIA-IA.md` que
+chegou no R00 ensinava `ALIASES` como OBJETO, e o núcleo exige LISTA DE PARES —
+`ALIASES precisa ser uma lista`. Duas verdades sobre a mesma coisa em dois
+documentos é pior que uma verdade longe, porque quem lê a errada não tem como
+saber que era a errada.
+
+`npm run leitura:obrigatoria` entrou no `gates` e no `ci.yml`: o teto vira
+catraca, e voltar a crescer passa a exigir decisão explícita.
 
 ### R04 — diário da oficina
 

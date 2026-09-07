@@ -103,13 +103,6 @@ Para modelar uma peça, uma arma ou uma máquina, o que vale está abaixo: a reg
 zero, o pipeline mínimo, os limites do crítico e as lições de motor — `loft`
 contra `inflate`, furar chapa, as armadilhas de `loft` e a proporção que só a
 imagem corrige.
-## Regra de manutenção deste documento
-
-Toda nova falha observada entra neste registro antes da próxima promoção. A
-entrada deve conter: artefato e vista, sintoma observável, causa conhecida ou
-hipótese marcada como tal, estado, evidência e o limite da correção. Não é
-permitido substituir uma falha por uma frase genérica como “melhorado”, nem
-mudar `aberto` para `corrigido` sem teste e inspeção visual compatíveis.
 ## Checklist antes de aceitar uma receita
 
 Veio do registro de modelagem procedural, escrito a partir de máquinas e

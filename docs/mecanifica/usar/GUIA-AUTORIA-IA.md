@@ -37,40 +37,27 @@ export const receita = {
 
 ---
 
-## 3. Regras Críticas de Seleção e Sintaxe Procedural
+## 3. Regras críticas de seleção e sintaxe
 
-### 3.1. Primitiva `cilindro` e Tampas
-A primitiva `cilindro` não gera um seletor único para o corpo todo:
-- `{ op: 'cilindro', id: N }`: seleciona **apenas** as faces laterais cilíndricas.
-- `{ op: 'cilindro', id: N, tampa: 'topo' }`: seleciona a tampa superior circular.
-- `{ op: 'cilindro', id: N, tampa: 'fundo' }`: seleciona a tampa inferior circular.
+Estas moram, medidas e travadas por teste, em
+[`operacoes-procedurais.md`](../../../.claude/skills/criar-peca/references/operacoes-procedurais.md),
+a referência da skill `criar-peca`. Não são repetidas aqui, e a razão não é
+economia de espaço: a versão que existia nesta seção ensinava `ALIASES` como
+OBJETO (`ALIASES: { nome: {...} }`), e o núcleo exige LISTA DE PARES —
+`if (!Array.isArray(ALIASES)) throw new Error('oficina: ALIASES precisa ser uma
+lista')`. Quem seguisse este guia batia no grito do motor antes da primeira
+malha.
 
-Ignorar as tampas gera **faces sem parte** e falha no gate `--estrito`.
+Duas verdades sobre a mesma coisa em dois documentos é pior que uma verdade
+longe: quem lê a errada não tem como saber que era a errada. As três que mais
+pegam, para você saber o que procurar lá:
 
-### 3.2. Composição de `ALIASES` com `unir`
-Para agrupar múltiplas faces sob um mesmo alias, toda entrada na lista `unir` deve ser um objeto contendo a propriedade `origem`:
-```javascript
-// CORRETO:
-ALIASES: {
-  superficieCilindro: {
-    unir: [
-      { origem: { op: 'cilindro', id: 2 } },
-      { origem: { op: 'cilindro', id: 2, tampa: 'topo' } },
-      { origem: { op: 'cilindro', id: 2, tampa: 'fundo' } },
-    ],
-  },
-}
+- `{op:'cilindro', id}` seleciona **só as laterais**; as tampas pedem citação
+  própria (`tampa:'fundo'`, `tampa:'topo'`);
+- `ALIASES` é uma lista de pares `[nome, definição]`, cada termo uma origem ou
+  um `unir` de origens, e **não encadeia**;
+- toda face precisa de `parte` semântica, e identidade nunca é índice nem UUID.
 
-// INCORRETO (o motor rejeita):
-// ALIASES: { superficieCilindro: { unir: [{ op: 'cilindro', id: 2 }] } }
-```
-
-### 3.3. Identidade Semântica e Cobertura
-- Toda face resultante deve pertencer a uma `parte` semântica (`['parte', { nome: 'corpo', sel: ... }]`).
-- Todo corpo deve ter material atribuído (`['material', { usa: 'aco', sel: { grupo: 'corpo' } }]`).
-- Nunca utilize índices numéricos voláteis ou UUIDs para persistir partes ou relacionamentos.
-
----
 
 ## 4. Esteira Canônica de Validação Local
 

@@ -38,7 +38,6 @@ export const CAMINHO_OBRIGATORIO = [
   'docs/mecanifica/usar/INTENCAO-PECA-V1.md',
   'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md',
   'docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md',
-  'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md',
 ];
 
 /* Consultável: entra quando a tarefa pede, e por isso não soma no teto. Fica
@@ -46,6 +45,11 @@ export const CAMINHO_OBRIGATORIO = [
    tarefa que escolha uma operação soma esta linha. */
 export const SOB_DEMANDA = [
   '.claude/skills/criar-peca/references/operacoes-procedurais.md',
+  /* A própria porta o descreve como condicional: "vale ler quando os achados
+     encolhem e a qualidade não sobe". Documento que se lê no meio de uma
+     investigação travada não é leitura de partida. */
+  'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md',
+  'docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md',
   'docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md',
   'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md',
   'docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md',

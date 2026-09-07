@@ -155,3 +155,9 @@ regras estão em
 [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), e estavam
 copiadas palavra por palavra aqui e na outra skill — regra duplicada envelhece
 em lugares diferentes.
+
+Quando precisar EMITIR um achado em formato reexecutável — ou consultar o caso
+aplicado da roda dianteira —, o contrato está em
+[`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](../../../docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md).
+É consulta: o esquema JSON de um achado não é coisa que se leia para decidir uma
+proporção.

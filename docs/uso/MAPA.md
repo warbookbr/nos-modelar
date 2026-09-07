@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-786 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+787 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -574,6 +574,7 @@
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
+- `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1

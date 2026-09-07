@@ -31,6 +31,7 @@ export const GATES = [
   'guarda:portas', 'guarda:camera', 'guarda:par', 'mapa:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',
+  'leitura:obrigatoria',
 ];
 
 function executar() {

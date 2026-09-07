@@ -119,3 +119,10 @@ jobs:
       - name: Citações de arquivo e de comando resolvem
         run: npm run docs:citacoes:check
 
+      # O caminho que uma sessão lê antes de escrever a primeira linha de receita
+      # tinha 119,8 KB e ninguém media. Documento é barato de escrever e caro de
+      # ler, e o custo não aparece: cada sessão nova paga o acervo inteiro de
+      # novo, em silêncio, antes de produzir qualquer coisa. O teto força a
+      # escolha entre o que se LÊ e o que se CONSULTA.
+      - name: Leitura obrigatória dentro do teto
+        run: npm run leitura:obrigatoria
