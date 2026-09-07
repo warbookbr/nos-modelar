@@ -57,10 +57,6 @@ Outros dois números medidos, ambos favoráveis:
 - **determinismo**: mesmos parâmetros, duas execuções, geometria idêntica nas
   oito peças. A avaliação de variante é pura; nada precisa ir para disco.
 
-E, na única receita paramétrica, a varredura já responde a pergunta certa:
-`perna.secaoTopo` é o único dos 21 que move a menor folga — encolher abre 6,07 mm
-**e cria 4 interpenetrações**; engordar abre 2,00 mm **sem quebrar nada**.
-
 ## Resultado
 
 A IA pergunta "quais parâmetros movem este critério, e o que cada um custa" e
@@ -162,15 +158,20 @@ entre os que movem o critério, por uma diferença de 2,8e-14 m — ruído de po
 flutuante, porque parâmetros diferentes percorrem contas diferentes. Efeito
 abaixo de 1 nm deixou de contar, e o teste guarda o caso medido.
 
-### R03 — a medição escolhe o enquadramento
+### R03 — a medição escolhe o enquadramento — **concluída**
 
-A varredura sabe quais partes se moveram entre a base e o candidato. Isso decide
-onde olhar melhor que um palpite: o comando emite a linha de `olhar-bancada` já
-com `--selecionadas` e `--modo=isolar --focar` sobre a região que a medida
-apontou. Sem renderizador novo; são bandeiras que já existem.
+Toda varredura termina com a linha de bancada que a medida escolheu, sobre as
+partes que de fato andaram entre a base e o candidato. Sem renderizador novo:
+são bandeiras que já existem.
 
-**Gate:** numa correção real, a vista sugerida mostra a junção alterada; V-25
-(forma julgada em imagem cortada) não se repete no caso de prova.
+**Resultado:** na cadeira, alterar `perna.secaoTopo` **não move a caixa das
+pernas** — move saias e travessas, que são onde a mudança encosta. Quem olhasse
+a perna, palpite óbvio, não veria nada. A linha sugerida seleciona as quatro,
+escolhe `contexto` pela quantidade e acrescenta `--res=1280x1707`, porque a
+cadeira ocupava 19% da largura no quadro deitado — a bancada avisava disso
+depois de gastar a captura, e V-25 nasce exatamente aí.
+
+Uma vista de peça alta, verificada na imagem e não pela existência do PNG.
 
 ### R04 — prova de campo e fechamento
 

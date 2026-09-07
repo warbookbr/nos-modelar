@@ -220,6 +220,23 @@ export function varrerSensibilidade(receita, {
     efeitos.push({ caminho: caminho.join('.'), valor, move, sondas });
   }
 
+  /* A sonda que mais move o critério sem quebrar a peça define onde olhar.
+     Escolher o maior efeito, e não o primeiro da lista, é o que faz a imagem
+     sugerida cair na região que a decisão precisa ver. */
+  let melhor = null;
+  for (const efeito of efeitos) {
+    if (!efeito.move) continue;
+    for (const s of efeito.sondas) {
+      if (s.recusa || s.quebrou || s.deltaCriterio === null) continue;
+      if (!melhor || Math.abs(s.deltaCriterio) > Math.abs(melhor.deltaCriterio)) {
+        melhor = { caminho: efeito.caminho, valor: s.valor, deltaCriterio: s.deltaCriterio };
+      }
+    }
+  }
+  const olhar = melhor
+    ? partesMovidas(receita, comCaminho(params, melhor.caminho.split('.'), melhor.valor))
+    : { partes: [], proporcao: null };
+
   return {
     criterio: criterio.nome,
     unidade: criterio.unidade,
@@ -227,6 +244,9 @@ export function varrerSensibilidade(receita, {
     delta,
     base: { valor: base.valor, invariantes: base.invariantes },
     efeitos,
+    melhor,
+    movidas: olhar.partes,
+    proporcao: olhar.proporcao,
     variantes,
   };
 }
@@ -333,6 +353,17 @@ export function varrerLote(receita, {
     viaveis.sort((a, b) => (chave(a) - chave(b)) || (a.custo.interpenetracoes - b.custo.interpenetracoes));
   }
 
+  /* Só o primeiro colocado ganha enquadramento: é o único que alguém vai olhar
+     em seguida, e cada captura custa ~3 s. */
+  let olhar = { partes: [], proporcao: null };
+  if (objetivo && viaveis.length) {
+    let escolhido = params;
+    for (const [rotulo, valor] of Object.entries(viaveis[0].valores)) {
+      escolhido = comCaminho(escolhido, rotulo.split('.'), valor);
+    }
+    olhar = partesMovidas(receita, escolhido);
+  }
+
   return {
     criterio: criterio.nome,
     unidade: criterio.unidade,
@@ -341,8 +372,82 @@ export function varrerLote(receita, {
     base: { valor: base.valor, invariantes: base.invariantes },
     candidatos,
     viaveis,
+    movidas: olhar.partes,
+    proporcao: olhar.proporcao,
     variantes: grade.length,
   };
+}
+
+/**
+ * Quais partes se moveram entre a base e um candidato, da que mais andou para a
+ * que menos andou.
+ *
+ * Compara a caixa de cada parte e usa o maior deslocamento de canto como
+ * medida. Nomes semânticos, nunca índice: é a mesma identidade que a bancada
+ * usa em `--selecionadas`.
+ */
+export function partesMovidas(receita, paramsCandidato, { minimo = EPSILON_EFEITO } = {}) {
+  const medir = (params) => {
+    const { neutro } = executarReceita(receitaComParametros(receita, params));
+    return new Map(descreverPeca(neutro).partes.map((p) => [p.nome, p]));
+  };
+  const base = medir(receita.PARAMS ?? {});
+  const candidato = medir(paramsCandidato);
+  const movidas = [];
+  for (const [nome, antes] of base) {
+    const depois = candidato.get(nome);
+    if (!depois) { movidas.push({ nome, deslocamento: Infinity }); continue; }
+    const deslocamento = Math.max(
+      ...[0, 1, 2].map((i) => Math.max(
+        Math.abs(depois.min[i] - antes.min[i]),
+        Math.abs(depois.max[i] - antes.max[i]),
+      )),
+    );
+    if (deslocamento > minimo) movidas.push({ nome, deslocamento });
+  }
+  const caixas = [...base.values()];
+  const extensao = (i) => Math.max(...caixas.map((p) => p.max[i])) - Math.min(...caixas.map((p) => p.min[i]));
+  const largura = Math.min(extensao(0), extensao(2));
+  return {
+    partes: movidas.sort((a, b) => b.deslocamento - a.deslocamento),
+    /* Serve para escolher a resolução da vista, não para julgar a peça. */
+    proporcao: largura > 0 ? extensao(1) / largura : null,
+  };
+}
+
+/**
+ * A linha de bancada que a MEDIÇÃO escolheu.
+ *
+ * Hoje o enquadramento é palpite, e cada palpite custa uma captura de ~3 s — a
+ * chamada mais cara do laço. A varredura já sabe quais partes andaram entre a
+ * base e o candidato, e isso decide onde olhar melhor do que a intuição de quem
+ * nunca viu a peça. Duas partes viram `--par`, que é o enquadramento de encaixe;
+ * uma vira `isolar --focar`; três ou mais pedem `contexto`, porque forma
+ * impossível passa isolada (V-25). `--cores` sempre: sem ele, partes do mesmo
+ * material leem como um borrão só.
+ *
+ * É sugestão, não execução: quem olha continua decidindo o que olhar.
+ */
+export function sugerirEnquadramento(alvo, movidas, { limite = 4, proporcao = null } = {}) {
+  if (!movidas.length) return null;
+  const nomes = movidas.slice(0, limite).map((m) => m.nome);
+  /* Peça alta e estreita num quadro deitado sobra fundo, e é assim que nasce o
+     V-25: forma julgada em pouco pixel. A cadeira ocupa 19% da largura no
+     quadro padrão, medido. A bancada avisa disso DEPOIS de gastar a captura;
+     sugerir a resolução junto poupa a segunda rodada.
+
+     O limiar aqui é do MODELO (altura contra a menor das duas medidas de
+     planta), não o da bancada, que compara o enquadramento já projetado de uma
+     vista. Copiar o número dela seria fingir que medimos a mesma coisa. 1,5 é
+     conservador: abaixo disso um quadro deitado ainda serve. */
+  const res = proporcao !== null && proporcao >= 1.5 ? ' --res=1280x1707' : '';
+  if (nomes.length === 1) {
+    return `npm run bancada -- ${alvo} --cores --selecionadas=${nomes[0]} --modo=isolar --focar${res}`;
+  }
+  if (nomes.length === 2) {
+    return `npm run bancada -- ${alvo} --cores --par=${nomes.join(',')}${res}`;
+  }
+  return `npm run bancada -- ${alvo} --cores --selecionadas=${nomes.join(',')} --modo=contexto${res}`;
 }
 
 const RODAPE = 'Isto são CANDIDATOS medidos, não uma decisão: nada foi aplicado à receita.';
@@ -399,8 +504,17 @@ export function formatarSensibilidade(resultado, { alvo = 'receita' } = {}) {
     linhas.push('', '  Nenhum parâmetro move este critério. Confira `npm run parametros`:');
     linhas.push('  receita com PASSOS literais não responde a parâmetro nenhum.');
   }
+  linhas.push(...linhasDeEnquadramento(resultado, alvo));
   linhas.push('', `  ${RODAPE}`);
   return `${linhas.join('\n')}\n`;
+}
+
+/** A vista que a medição escolheu, quando houve o que ver. */
+function linhasDeEnquadramento(resultado, alvo) {
+  const comando = sugerirEnquadramento(alvo, resultado.movidas, { proporcao: resultado.proporcao });
+  if (!comando) return [];
+  const nomes = resultado.movidas.slice(0, 4).map((m) => m.nome).join(', ');
+  return ['', `  ONDE OLHAR — a medição escolheu, não o palpite: ${nomes}`, `    ${comando}`];
 }
 
 export function formatarLote(resultado, { alvo = 'receita', mostrar = 5 } = {}) {
@@ -434,6 +548,7 @@ export function formatarLote(resultado, { alvo = 'receita', mostrar = 5 } = {}) 
   } else {
     linhas.push('', '  NENHUM CANDIDATO VIÁVEL. A faixa declarada não contém solução que preserve a peça.');
   }
+  linhas.push(...linhasDeEnquadramento(resultado, alvo));
   linhas.push('', `  ${RODAPE}`);
   return `${linhas.join('\n')}\n`;
 }

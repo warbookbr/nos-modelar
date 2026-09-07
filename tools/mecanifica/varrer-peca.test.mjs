@@ -5,6 +5,8 @@ import {
   EPSILON_EFEITO,
   lerCriterio,
   lerLiberdade,
+  partesMovidas,
+  sugerirEnquadramento,
   varrerLote,
   varrerSensibilidade,
 } from '../../src/autoria/varrer-parametros.js';
@@ -180,4 +182,43 @@ describe('o que a ferramenta NÃO faz', () => {
     expect(criterioRuim.codigo).toBe(2);
     expect(criterioRuim.stderr).toContain('menor-folga');
   }, 30_000);
+});
+
+describe('a medição escolhe o enquadramento', () => {
+  it('aponta as partes que andaram, não a que foi alterada', async () => {
+    /* Mexer em `perna.secaoTopo` não move a caixa das pernas: move as saias e
+       travessas que se encontram com elas. Quem olhasse a perna não veria a
+       mudança — é exatamente o palpite que esta linha substitui. */
+    const receita = await carregar('cadeira-de-madeira');
+    const { comCaminho } = await import('../../src/autoria/parametros-vivos.js');
+    const { partes, proporcao } = partesMovidas(
+      receita,
+      comCaminho(receita.PARAMS, ['perna', 'secaoTopo'], 0.036),
+    );
+    expect(partes.map((p) => p.nome).sort())
+      .toEqual(['saiaLateral', 'saiaTraseira', 'travessaLateral', 'travessaTraseira']);
+    expect(partes.every((p) => p.deslocamento > 0)).toBe(true);
+    expect(proporcao).toBeGreaterThan(1.5);
+  }, 60_000);
+
+  it('escolhe o modo pela quantidade de partes e pede resolução para peça alta', () => {
+    const uma = [{ nome: 'aba', deslocamento: 1 }];
+    const duas = [...uma, { nome: 'colar', deslocamento: 1 }];
+    const tres = [...duas, { nome: 'haste', deslocamento: 1 }];
+    expect(sugerirEnquadramento('x', uma)).toContain('--selecionadas=aba --modo=isolar --focar');
+    expect(sugerirEnquadramento('x', duas)).toContain('--par=aba,colar');
+    expect(sugerirEnquadramento('x', tres)).toContain('--modo=contexto');
+    expect(sugerirEnquadramento('x', uma)).not.toContain('--res=');
+    expect(sugerirEnquadramento('x', uma, { proporcao: 2.1 })).toContain('--res=1280x1707');
+    expect(sugerirEnquadramento('x', [])).toBeNull();
+  });
+
+  it('emite a linha pronta na saída da sensibilidade, e nenhuma quando nada move', async () => {
+    const comMovimento = await varrerReutilizavel({ alvo: 'cadeira-de-madeira' });
+    expect(comMovimento.stdout).toContain('ONDE OLHAR');
+    expect(comMovimento.stdout).toMatch(/npm run bancada -- cadeira-de-madeira --cores/);
+
+    const semMovimento = await varrerReutilizavel({ alvo: 'prensa-hidraulica', criterio: 'envelope:y' });
+    expect(semMovimento.stdout).not.toContain('ONDE OLHAR');
+  }, 90_000);
 });
