@@ -148,10 +148,50 @@ export function avaliarVariante(receita, params, criterio) {
   try {
     const { neutro } = executarReceita(receitaComParametros(receita, params));
     const descricao = descreverPeca(neutro);
-    return { ok: true, valor: criterio.avaliar(descricao), invariantes: invariantesDe(descricao) };
+    return {
+      ok: true,
+      valor: criterio.avaliar(descricao),
+      invariantes: invariantesDe(descricao),
+      relacoes: mapaDeRelacoes(descricao),
+    };
   } catch (erro) {
-    return { ok: false, recusa: erro.message, valor: null, invariantes: null };
+    return { ok: false, recusa: erro.message, valor: null, invariantes: null, relacoes: null };
   }
+}
+
+function mapaDeRelacoes(descricao) {
+  return new Map(descricao.relacoes.map((r) => [
+    r.a < r.b ? `${r.a}|${r.b}` : `${r.b}|${r.a}`,
+    { tipo: r.tipo, distancia: r.distancia },
+  ]));
+}
+
+/**
+ * Quantas relações que NÃO eram o critério ficaram piores.
+ *
+ * A prova de campo do R04 obrigou isto a existir. O melhor candidato para
+ * "fechar a fresta entre saiaLateral e saiaTraseira" levava o vão de 14,14 mm a
+ * zero — e abria quatro outras juntas da mesma cadeira, duas delas dobrando de
+ * tamanho. O relatório dizia "+1 interpenetração" e nada mais, então o número
+ * bonito passava como se fosse melhoria.
+ *
+ * Contar só interpenetração era estreito demais: contato que vira folga e folga
+ * que cresce são exatamente o defeito que `conferir:juntas` chama de fresta
+ * visível. Otimizar um critério declarado sem esta conta encontra uma solução
+ * pior mais rápido — que é o risco nomeado em `METODO-DIAGNOSTICO-E-SEU-LIMITE`.
+ */
+export function relacoesPioradas(base, candidato, { minimo = EPSILON_EFEITO } = {}) {
+  let pioradas = 0;
+  for (const [chave, antes] of base) {
+    const depois = candidato.get(chave);
+    if (!depois) { pioradas += 1; continue; }
+    if (antes.tipo === 'encosta' && depois.tipo === 'folga') { pioradas += 1; continue; }
+    if (antes.tipo !== 'interpenetra' && depois.tipo === 'interpenetra') { pioradas += 1; continue; }
+    if (antes.tipo === 'folga' && depois.tipo === 'folga' && depois.distancia > antes.distancia + minimo) {
+      pioradas += 1;
+    }
+  }
+  return pioradas;
 }
 
 /**
@@ -209,6 +249,7 @@ export function varrerSensibilidade(receita, {
         recusa: r.ok ? null : r.recusa,
         deltaCriterio: r.ok && r.valor !== null && base.valor !== null ? r.valor - base.valor : null,
         deltaInterpenetracoes: r.ok ? r.invariantes.interpenetracoes - base.invariantes.interpenetracoes : null,
+        pioradas: r.ok ? relacoesPioradas(base.relacoes, r.relacoes) : null,
         quebrou: r.ok ? quebrou(base.invariantes, r) : true,
       });
     }
@@ -339,7 +380,10 @@ export function varrerLote(receita, {
       estado: 'viavel',
       motivo: null,
       valor: r.valor,
-      custo: { interpenetracoes: r.invariantes.interpenetracoes - base.invariantes.interpenetracoes },
+      custo: {
+        interpenetracoes: r.invariantes.interpenetracoes - base.invariantes.interpenetracoes,
+        pioradas: relacoesPioradas(base.relacoes, r.relacoes),
+      },
     });
   }
 
@@ -350,7 +394,9 @@ export function varrerLote(receita, {
       : (c) => (objetivo.modo === 'maximizar' ? -c.valor : c.valor);
     /* Desempate declarado, como na sonda N5: primeiro o objetivo, depois o
        menor custo em interpenetração. Ordem estável, sem sorte. */
-    viaveis.sort((a, b) => (chave(a) - chave(b)) || (a.custo.interpenetracoes - b.custo.interpenetracoes));
+    viaveis.sort((a, b) => (chave(a) - chave(b))
+      || (a.custo.pioradas - b.custo.pioradas)
+      || (a.custo.interpenetracoes - b.custo.interpenetracoes));
   }
 
   /* Só o primeiro colocado ganha enquadramento: é o único que alguém vai olhar
@@ -452,6 +498,14 @@ export function sugerirEnquadramento(alvo, movidas, { limite = 4, proporcao = nu
 
 const RODAPE = 'Isto são CANDIDATOS medidos, não uma decisão: nada foi aplicado à receita.';
 
+/** O preço do candidato em uma linha: o que ele quebra além do que melhora. */
+function textoDeCusto({ interpenetracoes = 0, pioradas = 0 } = {}) {
+  const partes = [];
+  if (interpenetracoes) partes.push(`${interpenetracoes > 0 ? '+' : ''}${interpenetracoes} interpenetração(ões)`);
+  if (pioradas) partes.push(`${pioradas} junta(s) pioraram`);
+  return partes.length ? partes.join(', ') : 'sem custo';
+}
+
 function numero(valor, escala, casas = 2) {
   if (valor === null || valor === undefined) return '—';
   const n = valor * escala;
@@ -485,9 +539,10 @@ export function formatarSensibilidade(resultado, { alvo = 'receita' } = {}) {
           linhas.push(`      ${seta}  motor recusa: ${s.recusa}`);
           continue;
         }
-        const custo = s.quebrou
-          ? 'QUEBRA A PEÇA'
-          : (s.deltaInterpenetracoes ? `${s.deltaInterpenetracoes > 0 ? '+' : ''}${s.deltaInterpenetracoes} interpenetração(ões)` : 'sem custo');
+        const custo = s.quebrou ? 'QUEBRA A PEÇA' : textoDeCusto({
+          interpenetracoes: s.deltaInterpenetracoes,
+          pioradas: s.pioradas,
+        });
         const efeitoTexto = s.deltaCriterio === null
           ? 'critério indefinido'
           : `${s.deltaCriterio >= 0 ? '+' : ''}${numero(s.deltaCriterio, escala)} ${unidade}`;
@@ -540,10 +595,7 @@ export function formatarLote(resultado, { alvo = 'receita', mostrar = 5 } = {}) 
     linhas.push('', `  CANDIDATOS (${lista.length} de ${resultado.viaveis.length})`);
     for (const c of lista) {
       const valores = Object.entries(c.valores).map(([k, v]) => `${k}=${Number(v.toFixed(6))}`).join('  ');
-      const custo = c.custo.interpenetracoes
-        ? `  ${c.custo.interpenetracoes > 0 ? '+' : ''}${c.custo.interpenetracoes} interpenetração(ões)`
-        : '';
-      linhas.push(`    ${numero(c.valor, escala)} ${unidade}   ${valores}${custo}`);
+      linhas.push(`    ${numero(c.valor, escala)} ${unidade}   ${valores}   ${textoDeCusto(c.custo)}`);
     }
   } else {
     linhas.push('', '  NENHUM CANDIDATO VIÁVEL. A faixa declarada não contém solução que preserve a peça.');

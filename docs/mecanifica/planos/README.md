@@ -2,16 +2,27 @@
 
 ## Estado
 
-**Plano ativo:** [parâmetro que move a peça](2026-09-07-parametro-que-move-a-peca.md),
-em execução desde 2026-09-07. Ele nasceu da pergunta "onde a IA
+**Plano ativo:** Nenhum.
+
+O [parâmetro que move a peça](encerrados/2026-09-07-parametro-que-move-a-peca.md)
+foi **concluído e aprovado** em 2026-09-07. Ele nasceu da pergunta "onde a IA
 gasta tempo" e de uma medição que respondeu outra coisa: **dos 103 parâmetros
 declarados no acervo, 13 estão vivos**. Dez das onze receitas trazem `PASSOS`
-como literais fixos e `PARAMS` decorativo ao lado — as três prensas somam
-trinta e sete liberdades declaradas e nenhuma move um vértice. A ferramenta de varredura
-que o plano abre mede a derivada de cada parâmetro sobre um critério; a primeira
-coisa que ela relata, na maioria dos alvos de hoje, é que não há o que varrer.
-Avaliar uma variante custa de 1 a 62 ms e é determinística, então o mapa completo
-de uma peça sai por menos que uma chamada de `olhar-bancada`.
+como literais fixos e `PARAMS` decorativo ao lado, e as três prensas somam trinta
+e sete liberdades declaradas que não movem um vértice.
+
+Ele deixou dois comandos. `npm run parametros` separa liberdade declarada de
+liberdade real, e recusa diagnosticar receita que executa sem publicar parte, em
+vez de chamar tudo de inerte. `npm run varrer` mede sensibilidade e lote sobre o
+mesmo motor, com orçamento declarado, e termina com a linha de bancada que a
+MEDIÇÃO escolheu — na cadeira, alterar a seção da perna não move a caixa das
+pernas, move saias e travessas, e o palpite óbvio olharia no lugar errado.
+
+A prova de campo condenou a primeira versão da própria ferramenta: o candidato
+que zerava uma fresta de 14,14 mm abria quatro outras juntas, e o relatório só
+contava interpenetração. Todo candidato passou a trazer quantas relações
+pioraram. O A/B contra o fluxo desassistido fica pendente: quem o executar não
+pode ser quem construiu a ferramenta.
 
 A [esteira confiável para a IA](encerrados/2026-09-07-esteira-confiavel-para-ia.md)
 foi **concluída e aprovada** em 2026-09-07. Ela não tocou o motor, as receitas

@@ -6,6 +6,7 @@ import {
   lerCriterio,
   lerLiberdade,
   partesMovidas,
+  relacoesPioradas,
   sugerirEnquadramento,
   varrerLote,
   varrerSensibilidade,
@@ -221,4 +222,41 @@ describe('a medição escolhe o enquadramento', () => {
     const semMovimento = await varrerReutilizavel({ alvo: 'prensa-hidraulica', criterio: 'envelope:y' });
     expect(semMovimento.stdout).not.toContain('ONDE OLHAR');
   }, 90_000);
+});
+
+describe('custo de regressão — a lição da prova de campo', () => {
+  const rel = (pares) => new Map(pares.map(([k, tipo, distancia]) => [k, { tipo, distancia }]));
+
+  it('conta contato perdido, folga que cresce e interpenetração nova', () => {
+    const base = rel([['a|b', 'encosta', 0], ['c|d', 'folga', 0.001], ['e|f', 'folga', 0.01]]);
+    expect(relacoesPioradas(base, base)).toBe(0);
+    expect(relacoesPioradas(base, rel([['a|b', 'folga', 0.002], ['c|d', 'folga', 0.001], ['e|f', 'folga', 0.01]]))).toBe(1);
+    expect(relacoesPioradas(base, rel([['a|b', 'encosta', 0], ['c|d', 'folga', 0.004], ['e|f', 'folga', 0.01]]))).toBe(1);
+    expect(relacoesPioradas(base, rel([['a|b', 'interpenetra', 0.001], ['c|d', 'folga', 0.001], ['e|f', 'folga', 0.005]]))).toBe(1);
+    /* Folga que ENCOLHE não é regressão: é o que se pediu. */
+    expect(relacoesPioradas(base, rel([['a|b', 'encosta', 0], ['c|d', 'folga', 0.0005], ['e|f', 'folga', 0.001]]))).toBe(0);
+  });
+
+  it('o melhor número do lote deixa de passar por melhoria', async () => {
+    /* Medido na prova de campo: fechar a fresta saiaLateral↔saiaTraseira de
+       14,14 mm a zero abre outras juntas da mesma cadeira. Antes disto o
+       relatório dizia só "+1 interpenetração", e o zero parecia vitória. */
+    const receita = await carregar('cadeira-de-madeira');
+    const r = varrerLote(receita, {
+      criterio: 'folga:saiaLateral,saiaTraseira',
+      liberdades: ['perna.secaoTopo:0.04..0.08:11', 'saia.esp:0.02..0.05:11'],
+      objetivo: { modo: 'minimizar' },
+    });
+    const zero = r.viaveis[0];
+    expect(zero.valor * 1000).toBeCloseTo(0, 1);
+    expect(zero.custo.pioradas).toBeGreaterThan(5);
+
+    const texto = (await varrerReutilizavel({
+      alvo: 'cadeira-de-madeira',
+      criterio: 'folga:saiaLateral,saiaTraseira',
+      liberdades: ['perna.secaoTopo:0.04..0.08:11', 'saia.esp:0.02..0.05:11'],
+      objetivo: { modo: 'minimizar' },
+    })).stdout;
+    expect(texto).toMatch(/junta\(s\) pioraram/);
+  }, 120_000);
 });

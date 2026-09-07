@@ -125,6 +125,11 @@ não tem devolve `—`, não zero.
   autor, e o aviso está no rodapé de toda execução.
 - **A previsão é local.** Um parâmetro por vez não vê interação entre dois, e
   ±10% não diz nada sobre ±100%. Remeça o candidato escolhido de verdade.
+- **Leia o custo, não só o número.** Todo candidato traz quantas relações
+  pioraram — contato que virou folga, folga que cresceu, interpenetração nova.
+  Medido na cadeira: o candidato que zera a fresta entre duas saias abre dez
+  outras relações, e um que para em 1,41 mm abre uma. O melhor número quase
+  nunca é a melhor peça.
 - **Orçamento declarado.** A varredura recusa antes de rodar se passar de 200
   variantes; `--orcamento` levanta o teto de propósito, em vez de o comando
   sumir por minutos.
