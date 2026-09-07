@@ -29,7 +29,7 @@ estado canônico, contagens, relações e comparação de imagens. "Parece bom" 
 
 ## Git e entrega
 
-- Branch `wip/...` a partir de `origin/main` (`git fetch origin main` primeiro). Commit com mensagem PT-BR clara, **SEM trailer**. **NÃO dê push nem merge** — o orquestrador verifica, registra a decisão em `docs/historico/DECISIONS.md` e mescla.
+- Branch `wip/...` a partir de `origin/main` (`git fetch origin main` primeiro). Commit com mensagem PT-BR clara, **SEM trailer**. **NÃO dê push nem merge** — o orquestrador verifica, registra a decisão no plano ativo e mescla.
 - Gates antes de reportar: `npm test`, `npm run typecheck`, `npm run mapa:check`
   (rode `npm run mapa` se criar arquivo), `npm run docs:toc:check` e a bancada
   ou auditoria correspondente à mudança.

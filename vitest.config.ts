@@ -24,5 +24,23 @@ export default defineConfig({
       'modulos/**/*.test.js', 'modulos/**/*.test.mjs',
     ],
     watch: false,
+
+    /* 20 s por teste, não os 5 s do padrão do Vitest.
+     *
+     * Três testes desta suíte já falharam por este motivo, e nenhum tinha
+     * defeito: o estudo de campo da cascata persistida (1,2 s isolado), a sonda
+     * da armadura humanoide (0,7 s isolada) e a exportação STEP com occt-wasm
+     * (4 s isolada). Todos passam sozinhos e estouram quando os arquivos rodam
+     * em paralelo e disputam CPU e disco.
+     *
+     * Teste que passa isolado e falha junto é pior que teste vermelho: ensina
+     * quem roda — pessoa ou agente — a desconfiar da suíte inteira e a repetir
+     * "só para ver se passa desta vez". Corrigir um a um virou caça sem fim; o
+     * orçamento tem de caber no trabalho que a suíte de fato faz, com malha,
+     * WASM e navegador dentro dela.
+     *
+     * Isto NÃO esconde teste travado: travado passa de 20 s igual. O que some é
+     * a falha por contenção, que nunca foi sinal de nada. */
+    testTimeout: 20_000,
   },
 });

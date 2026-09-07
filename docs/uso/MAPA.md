@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-790 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+771 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -345,24 +345,9 @@
 
 ## docs/historico/
 
-- `DECISIONS-ARCHIVE.md` — Arquivo de Decisões — NÓS (D-01…D-54)
-- `DECISIONS.md` — Registro de Decisões — NÓS
 - `TETO.md` — O TETO — medir o que a Oficina de fato cria
-- `diagnostico-subpartes-semanticas.md` — Diagnóstico — subpartes semânticas da moto
-- `fase4-drone-inspecao-criacao-relatorio.md` — Relatório de criação — drone-inspecao
-- `fase4-drone-inspecao-refino-relatorio.md` — Relatório de refinamento — drone-inspecao
-- `fixture-identidade-apaga-relatorio.md` — Fixture — identidade estrutural ao apagar
-- `fixture-identidade-cubo-relatorio.md` — Fixture — identidade estável de cubo
-- `fixture-identidade-espelho-relatorio.md` — Fixture — identidade estrutural do espelho
-- `fixture-identidade-estavel-relatorio.md` — Fixture — identidade estável de loft
 - `oficina-projeto.md` — Oficina — o registro de projeto
 - `playground.md` — O Playground — o épico da criação por IA
-- `proveniencia-local-fixture.md` — Fixture de proveniência local de loft
-- `teto-moto-refino-3-relatorio.md` — TETO — relatório da 3ª corrida de refino da moto
-- `teto-moto-refino-relatorio.md` — TETO — relatório do REFINO da moto (2ª corrida)
-- `teto-moto-relatorio.md` — TETO — relatório da moto
-- `teto-selecao-semantica-relatorio.md` — TETO — medição da seleção semântica na moto
-- `walkthrough_colaborador4.md` — Resumo de Alterações — Colaborador 4 (branch `colaborador4`)
 
 ## docs/mecanifica/
 
@@ -583,13 +568,6 @@
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `README.md` — Usar o Mecanifica
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
-
-## docs/rumo/
-
-- `NORTE.md` — NORTE — objetivo e método do NÓS
-- `PLANO.md` — PLANO — evolução da linguagem de criação do NÓS
-- `arquitetura-identidade-estavel.md` — Arquitetura — identidade estável de objetos e subpartes
-- `oficina-roteiro.md` — Oficina — o que ainda não existe
 
 ## docs/superpowers/plans/
 

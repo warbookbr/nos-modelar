@@ -12,8 +12,8 @@ verificável contra o núcleo
 (`prototipos/procedural/v3/motor/oficina.js`) — a tabela de operações é gateada por
 `npm run criar`.
 
-O que ainda NÃO existe está em [`docs/rumo/oficina-roteiro.md`](../rumo/oficina-roteiro.md);
-o registro de projeto (por que cada coisa ficou assim, o que já foi construído) em
+O registro de projeto (por que cada coisa ficou assim, o que já foi construído)
+está em
 [`docs/historico/oficina-projeto.md`](../historico/oficina-projeto.md). Pra usar a
 ferramenta no dia a dia, [`oficina-referencia.md`](./oficina-referencia.md) é mais
 curto que isto.
