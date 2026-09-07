@@ -41,16 +41,28 @@ export async function ativarReceitaBancada({
   const caminhoRelativo = relative(raiz, caminhoAbsoluto).replace(/\\/g, '/');
 
   const modulo = await importarReceita(caminhoAbsoluto);
-  const receita = modulo.default
+  const original = modulo.default
     ?? Object.values(modulo).find((v) => v && typeof v === 'object' && Array.isArray(v.PASSOS));
 
-  if (!receita || !Array.isArray(receita.PASSOS)) {
+  if (!original || !Array.isArray(original.PASSOS)) {
     throw new Error('O módulo não exporta uma receita válida com PASSOS.');
   }
 
-  if (perfil && receita.PARAMS) {
-    receita.PARAMS.perfil = perfil;
-  }
+  /* O perfil entra numa CÓPIA, nunca no objeto do módulo.
+   *
+   * `importarReceita` guarda o módulo por URL, então o objeto devolvido é o
+   * MESMO entre chamadas do mesmo processo. Escrever `receita.PARAMS.perfil`
+   * ali deixava o perfil grudado: numa CLI ninguém via, porque o processo morre
+   * a cada execução, mas o servidor MCP é longo — ativar com
+   * `--perfil=marcenaria` e depois sem perfil nenhum devolvia a peça ainda em
+   * marcenaria, sem erro e sem aviso, e a segunda chamada relatava o perfil da
+   * primeira como se fosse dela.
+   *
+   * A cópia é rasa e cobre exatamente o que muda: a receita continua sendo a
+   * mesma lista de PASSOS, e só `PARAMS` ganha um objeto próprio. */
+  const receita = perfil && original.PARAMS
+    ? { ...original, PARAMS: { ...original.PARAMS, perfil } }
+    : original;
 
   const { neutro } = executarReceita(receita);
   const { caixas, facesSemParte } = caixasPorParte(neutro);

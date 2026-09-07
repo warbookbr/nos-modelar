@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
+import { ativarReceitaBancada } from './ativar-bancada.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
@@ -139,5 +140,20 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     });
     expect(proc).toContain('✓');
     expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
+});
+
+describe('perfil não vaza entre ativações no mesmo processo', () => {
+  /* O importador guarda o módulo por URL, então o objeto da receita é o mesmo
+     entre chamadas. Enquanto o perfil era escrito nele, ativar com perfil e
+     depois sem perfil devolvia o perfil da chamada anterior — invisível numa
+     CLI, que morre a cada execução, e permanente no servidor MCP, que não. */
+  it('ativa com perfil e depois sem perfil, e a segunda não herda a primeira', async () => {
+    const alvo = 'prototipos/procedural/v3/pecas/cadeira-de-madeira.js';
+    const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO });
+    expect(comPerfil.payload.alvo.perfil).toBe('marcenaria');
+
+    const semPerfil = await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO });
+    expect(semPerfil.payload.alvo.perfil).not.toBe('marcenaria');
   });
 });
