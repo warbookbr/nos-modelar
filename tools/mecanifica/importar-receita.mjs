@@ -24,3 +24,21 @@ export async function importarReceita(caminhoAbsoluto) {
 }
 
 export default importarReceita;
+
+/**
+ * A receita dentro de um módulo importado.
+ *
+ * A mesma expressão estava copiada em `descrever-peca.mjs` e
+ * `conferir-juntas.mjs`, e uma terceira variante menor vive em
+ * `conferir-malha.mjs` — que aceita só `PASSOS`. Regra de identidade repetida
+ * envelhece em lugares diferentes; esta é a versão que as duas primeiras já
+ * usavam, agora num lugar só. A de `conferir-malha.mjs` fica como está: ampliá-la
+ * mudaria o que aquele gate aceita, e isso é decisão do dono do gate.
+ */
+export function receitaDoModulo(modulo) {
+  const encontrada = Object.values(modulo ?? {}).find(
+    (v) => v && typeof v === 'object'
+      && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES)),
+  );
+  return modulo?.default ?? encontrada ?? modulo;
+}

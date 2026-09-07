@@ -13,7 +13,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { importarReceita } from './importar-receita.mjs';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -144,7 +144,7 @@ export async function conferirJuntasCli(args = process.argv.slice(2)) {
     : join(PECAS, `${alvo}.js`);
 
   const mod = await importarReceita(caminho);
-  const receita = mod.default ?? Object.values(mod).find((v) => v && typeof v === 'object' && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES))) ?? mod;
+  const receita = receitaDoModulo(mod);
   const { neutro } = executarReceita(receita);
 
   let filtroEntre = null;

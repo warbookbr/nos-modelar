@@ -37,8 +37,8 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
    ```
 
-   O catálogo publicado está vazio de propósito, e isso não impede nada: a peça
-   em trabalho é ativada na sessão e capturada pelo nome curto.
+   O catálogo publicado está vazio de propósito: a peça em trabalho é ativada
+   na sessão e capturada pelo nome curto.
 
 4. **Isole por pergunta, não por hábito.** Peça inteira numa imagem só esconde
    erro estrutural debaixo de detalhe. A bancada tem três modos, e cada um
@@ -73,14 +73,13 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    autorizados. Esse visor legado é diagnóstico; não transforma a peça em
    entrada publicada.
 
-`npm run peca` e `porteiro` permanecem diagnósticos do visor v3. Não são
-substitutos da descrição e das vistas da bancada. A peça mora em
+`npm run peca` e `porteiro` permanecem diagnósticos do mesmo visor legado do
+item 6; não substituem a descrição nem as vistas da bancada. A peça mora em
 `prototipos/procedural/v3/pecas/`; prefixo `_` indica exemplo/fixture.
 
-O catálogo público de peças está vazio de propósito: receitas anteriores não
-são modelos homologados. Não cite nem tente copiar nomes históricos. Só crie
-uma receita quando houver alvo e pacote de modelagem autorizados; o catálogo de
-**capacidades** do motor continua disponível mesmo sem nenhuma peça publicada.
+Receita anterior não é modelo homologado: não cite nem copie nome histórico. Só
+crie uma receita quando houver alvo e pacote de modelagem autorizados; o
+catálogo de **capacidades** continua disponível mesmo sem peça publicada.
 
 Quando uma capacidade faltar, consulte primeiro `buscar_capacidades`,
 `descrever_capacidade`, `combinar_capacidades`, `validar_composicao` e
@@ -110,6 +109,10 @@ não referência de engenharia, e registre o pacote que autorizou a modelagem.
 topologia; `PASSOS` é a lista `[['op', {...}], ...]`. Não escreva `id:` em um
 passo: o núcleo calcula o bloco pela posição (`BLOCO=1000`). `origemId` é uma
 identidade estrutural diferente e pode ser escolhida pelo autor.
+
+**Derive `PASSOS` de `PARAMS`** (`get PASSOS() { return gerarPassos(this.PARAMS); }`);
+lista de literais congela os números e faz `PARAMS` virar enfeite, sem aviso.
+`npm run parametros -- <peça>` diz quais estão ligados.
 
 Quando a função pretendida não for óbvia pela geometria, exporte o contrato
 opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare

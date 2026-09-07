@@ -2,14 +2,12 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
-
-**Plano pronto, aguardando abertura:** [parâmetro que move a
-peça](2026-09-07-parametro-que-move-a-peca.md). Ele nasceu da pergunta "onde a IA
-gasta tempo" e de uma medição que respondeu outra coisa: **dos 88 parâmetros
-declarados no acervo, 13 estão vivos**. Nove das dez receitas que carregam trazem
-`PASSOS` como literais fixos e `PARAMS` decorativo ao lado — a prensa industrial
-declara catorze liberdades e nenhuma move um vértice. A ferramenta de varredura
+**Plano ativo:** [parâmetro que move a peça](2026-09-07-parametro-que-move-a-peca.md),
+em execução desde 2026-09-07. Ele nasceu da pergunta "onde a IA
+gasta tempo" e de uma medição que respondeu outra coisa: **dos 103 parâmetros
+declarados no acervo, 13 estão vivos**. Dez das onze receitas trazem `PASSOS`
+como literais fixos e `PARAMS` decorativo ao lado — as três prensas somam
+trinta e sete liberdades declaradas e nenhuma move um vértice. A ferramenta de varredura
 que o plano abre mede a derivada de cada parâmetro sobre um critério; a primeira
 coisa que ela relata, na maioria dos alvos de hoje, é que não há o que varrer.
 Avaliar uma variante custa de 1 a 62 ms e é determinística, então o mapa completo

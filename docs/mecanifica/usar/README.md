@@ -36,6 +36,9 @@ onde o método de "observar, medir, corrigir" funciona e onde ele acha defeito
 para sempre sem a forma andar. Vale ler quando os achados encolhem e a
 qualidade não sobe.
 
+[`PARAMETROS-VIVOS.md`](PARAMETROS-VIVOS.md): antes de alterar um número, saber
+se aquele parâmetro está ligado em algo. `npm run parametros`.
+
 [`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) documenta o processo de
 modelagem de uma cadeira de jantar realista contra referência fotográfica,
 com problemas e limitações de motor e ferramentas anotados durante a criação.

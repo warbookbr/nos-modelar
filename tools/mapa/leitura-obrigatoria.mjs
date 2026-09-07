@@ -54,6 +54,10 @@ export const SOB_DEMANDA = [
   'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md',
   'docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md',
   'docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md',
+  /* Só interessa a quem vai ALTERAR um número de receita, e a resposta que ele
+     dá cabe na saída do próprio comando. Ler antes de começar seria pagar por
+     um diagnóstico que ainda não se pediu. */
+  'docs/mecanifica/usar/PARAMETROS-VIVOS.md',
 ];
 
 function medir(lista) {

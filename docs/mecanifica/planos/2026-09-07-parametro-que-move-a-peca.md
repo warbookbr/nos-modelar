@@ -1,6 +1,6 @@
 # Parâmetro que move a peça
 
-**Estado:** pronto
+**Estado:** ativo
 
 **Responsável:** a definir
 
@@ -19,29 +19,35 @@ mais grave.
 
 ## Linha de base medida — 2026-09-07, `a3b589e`, Windows 11
 
-Varredura de um parâmetro por vez, ×1,1, comparando a caixa de cada parte contra
-a base. Reprodutível por script; nenhum número depende de julgamento.
+Reprodutível por `npm run parametros -- --acervo` (R00), em ~9 s. Um parâmetro
+por vez, sondado em ×1,1 e — quando inteiro — em ±1, comparando forma e contato
+medidos contra a base. Nenhum número depende de julgamento.
 
 | Alvo | declarados | vivos | inertes |
 |---|---:|---:|---:|
 | cadeira-de-madeira | 21 | **13** | 8 |
 | pa-de-bico-bambu | 18 | 0 | 18 |
+| prensa-progressiva | 15 | 0 | 15 |
+| prensa-mecanica-industrial | 14 | 0 | 14 |
 | chapa-de-fixacao | 9 | 0 | 9 |
+| prensa-hidraulica | 8 | 0 | 8 |
 | cabo-de-pa-bambu | 7 | 0 | 7 |
 | mancal-guia | 7 | 0 | 7 |
 | barricada-de-sucata | 2 | 0 | 2 |
 | cutelo-de-sucata | 2 | 0 | 2 |
 | gabarito-eixos | 0 | 0 | 0 |
-| prensa-mecanica-industrial | 14 | 0 | 14 |
-| prensa-hidraulica | 8 | 0 | 8 |
-| prensa-progressiva | — | — | não carrega |
-| **total** | **88** | **13 (15%)** | **75 (85%)** |
+| **total** | **103** | **13 (13%)** | **90 (87%)** |
 
-**Nove das dez receitas que carregam têm `PARAMS` decorativo.** Só a cadeira liga
+A `prensa-progressiva` constava aqui como receita que não carrega: era o script
+descartável procurando-a por `modulo.default ?? modulo`, e ela não exporta
+`default` nem envelope único. Pela regra que o `descrever` usa, carrega — e traz
+quinze parâmetros, todos inertes.
+
+**Dez das onze receitas do acervo têm `PARAMS` decorativo.** Só a cadeira liga
 os passos aos parâmetros (`get PASSOS() { return gerarPassos(this.PARAMS); }`);
 as outras trazem `PASSOS` como lista de literais fixada na carga do módulo, e
-`PARAMS` ao lado, sem efeito. A prensa industrial declara catorze parâmetros e
-nenhum deles move um vértice.
+`PARAMS` ao lado, sem efeito. As três prensas somam trinta e sete
+parâmetros declarados e nenhum deles move um vértice.
 
 Outros dois números medidos, ambos favoráveis:
 
@@ -98,7 +104,6 @@ rodadas que qualquer solver, e é pré-requisito dele.
   depois, com plano próprio;
 - montagem persistida (`descreverMontagemResolvida`): não medida aqui;
 - aplicar automaticamente um vencedor — ver invariantes;
-- consertar `prensa-progressiva`, que não carrega; vai para o backlog.
 
 ## Invariantes
 
@@ -118,15 +123,22 @@ rodadas que qualquer solver, e é pré-requisito dele.
 
 ## Rodadas
 
-### R00 — parâmetro vivo, como fato conferível
+### R00 — parâmetro vivo, como fato conferível — **concluída**
 
-Transformar a tabela acima em teste e comando. `npm run parametros -- <alvo>`
-responde quais liberdades existem de fato, e o teste trava a contagem para que a
-regressão apareça. Prova de pureza e determinismo entra aqui, porque é a
-condição de validade de tudo que vem depois.
+`npm run parametros -- <alvo>` e `-- --acervo`, sobre o módulo puro
+`src/autoria/parametros-vivos.js`, com o retrato 103/13/90 travado em teste.
 
-**Saída:** os 88/13/75 reproduzíveis por comando, e a prensa-progressiva
-registrada como receita que não carrega.
+**Resultado:** onze alvos diagnosticados em ~9 s, todos determinísticos.
+O comando corrigiu duas afirmações da primeira versão desta tabela — o total era
+88/13/75 e a `prensa-progressiva` constava como receita que não carrega. Ele
+também expôs um erro de desenho meu: peça que executa sem publicar parte era
+relatada como "tudo inerte", resposta precisa para a pergunta errada; agora
+recusa diagnosticar e diz por quê. A regra de identidade de receita, que estava
+copiada em dois CLIs, passou a morar em `receitaDoModulo`.
+
+O teste é o gate: se alguém ligar uma receita aos seus parâmetros — ou
+desligar —, o número muda e a suíte avisa. Não virou passo novo em `gates`
+porque já roda dentro de `npm test`.
 
 ### R01 — motor de varredura
 

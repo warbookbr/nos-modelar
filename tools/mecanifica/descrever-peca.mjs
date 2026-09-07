@@ -13,7 +13,7 @@ import { lerArgumentos } from './argumentos.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { importarReceita } from './importar-receita.mjs';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 
@@ -136,7 +136,7 @@ export async function descreverPecaReutilizavel({
       return falha(`PEÇA NÃO CARREGOU\n  ${peca}: ${erro.message}`);
     }
   }
-  const receita = modulo.default ?? Object.values(modulo).find((v) => v && typeof v === 'object' && (Array.isArray(v.PASSOS) || Array.isArray(v.CHAMADAS_COMPOSICOES))) ?? modulo;
+  const receita = receitaDoModulo(modulo);
   if (!Array.isArray(receita.PASSOS) && !Array.isArray(receita.CHAMADAS_COMPOSICOES)) {
     return falha(
       `PEÇA SEM ENVELOPE DA OFICINA\n  '${peca}' não exporta PASSOS nem CHAMADAS_COMPOSICOES.`

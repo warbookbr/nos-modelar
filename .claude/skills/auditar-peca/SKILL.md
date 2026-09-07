@@ -81,7 +81,20 @@ peça isolada e não inventa validade global de uma montagem.
    **Peça com vizinho nunca é aprovada só em `isolar`**: forma impossível passa
    isolada. Um arco que não comporta a própria roda só aparece em `contexto`.
 
-4. **Conferência de Juntas e Contato:**
+4. **Antes de propor alteração de valor, confira o que está ligado:**
+
+   ```bash
+   npm run parametros -- <peca>
+   ```
+
+   Ele responde quais números de `PARAMS` movem a peça medida e quais estão só
+   declarados. Uma receita cujos `PASSOS` são literais fixos aceita qualquer
+   alteração de parâmetro sem mudar um vértice, e sem avisar — recomendar
+   "reduza a espessura" numa receita dessas gasta a rodada de quem seguir o
+   conselho. O contrato, o modo de medir e os limites estão em
+   [`PARAMETROS-VIVOS.md`](../../../docs/mecanifica/usar/PARAMETROS-VIVOS.md).
+
+5. **Conferência de Juntas e Contato:**
    Para peças com múltiplos corpos ou encaixes (como marcenaria ou mecânica),
    confira vãos reais e paralelismo angular das faces com:
 
@@ -93,7 +106,7 @@ peça isolada e não inventa validade global de uma montagem.
    de desvio, acusando imediatamente frestas em cunha (`⚠ CUNHA / DESALINHADA`)
    ou folgas indesejadas (`⚠ FRESTA VISÍVEL`).
 
-5. Se existir um pacote de modelagem associado, rode a revisão oficial:
+6. Se existir um pacote de modelagem associado, rode a revisão oficial:
 
    ```bash
    npm run revisar:modelagem -- <pacote> --revisao=r001
@@ -101,7 +114,7 @@ peça isolada e não inventa validade global de uma montagem.
 
    A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-6. Rode os gates:
+7. Rode os gates:
 
    ```bash
    npm run gates
