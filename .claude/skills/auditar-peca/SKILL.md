@@ -91,7 +91,21 @@ peça isolada e não inventa validade global de uma montagem.
    declarados. Uma receita cujos `PASSOS` são literais fixos aceita qualquer
    alteração de parâmetro sem mudar um vértice, e sem avisar — recomendar
    "reduza a espessura" numa receita dessas gasta a rodada de quem seguir o
-   conselho. O contrato, o modo de medir e os limites estão em
+   conselho.
+
+   Havendo parâmetro vivo, meça o efeito antes de recomendar um valor:
+
+   ```bash
+   npm run varrer -- <peca> --criterio=menor-folga
+   ```
+
+   A varredura diz quais parâmetros movem o critério, quanto, e **o que cada
+   movimento quebra** — o achado típico é que um parâmetro entre vinte importa,
+   e que a direção que mais melhora é a que cria interferência. Com faixa
+   declarada (`--livres=<caminho>:<min>..<max>:<passos>` e `--maximizar`,
+   `--minimizar` ou `--alvo=`) ela compara candidatos em lote. Ela **não aplica**
+   o vencedor: relate o candidato e a evidência, e decida com a imagem.
+   Critérios, objetivos e limites em
    [`PARAMETROS-VIVOS.md`](../../../docs/mecanifica/usar/PARAMETROS-VIVOS.md).
 
 5. **Conferência de Juntas e Contato:**

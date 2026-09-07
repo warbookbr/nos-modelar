@@ -140,26 +140,27 @@ O teste é o gate: se alguém ligar uma receita aos seus parâmetros — ou
 desligar —, o número muda e a suíte avisa. Não virou passo novo em `gates`
 porque já roda dentro de `npm test`.
 
-### R01 — motor de varredura
+### R01 — motor de varredura — **concluída**, com o R02 dentro
 
-Módulo puro em `src/autoria/`, CLI fina em `tools/mecanifica/`, registro no
-diário como qualquer ferramenta do laço. Dois modos sobre o mesmo motor:
-sensibilidade (um parâmetro por vez, derivada) e lote (grade sobre liberdades
-declaradas, sobreviventes ordenados). Critério vem de vocabulário fechado sobre
-o que `descreverPeca` já devolve — `menor-folga`, `interpenetracoes`,
-`dimensao:<parte>:<eixo>` —, não de uma linguagem de expressão nova.
+`npm run varrer`, sobre `src/autoria/varrer-parametros.js`. Dois modos no mesmo
+motor: sensibilidade (um parâmetro por vez, ±δ) e lote (grade declarada,
+sobreviventes ordenados por objetivo). Critério é vocabulário fechado sobre o
+que `descreverPeca` já devolve.
 
-**Gate:** na cadeira, o modo sensibilidade reproduz o achado de `perna.secaoTopo`
-sem nenhuma dica; o orçamento de variantes é declarado e o comando recusa passar
-dele em vez de rodar por minutos.
+**Resultado:** na cadeira, sem nenhuma dica, a sensibilidade aponta
+`perna.secaoTopo` como o único dos 21 que move a menor folga, e mostra o
+trade-off — encolher abre 6,07 mm e cria 4 interpenetrações, engordar abre
+2,00 mm sem custo. 42 variantes em ~1,3 s. Orçamento de 200 variantes recusa
+antes de rodar, com a conta na mensagem.
 
-### R02 — saída que cabe na cabeça do agente
+O teto do R02 saiu junto e por construção, não como rodada separada: a saída
+inteira tem **788 bytes**, contra o alvo de 4 KB, com os 20 sem efeito
+recolhidos numa linha. Ficou travado em teste.
 
-A varredura só ganha rodada se a resposta for menor que a pergunta. `descrever`
-caiu de 9,8 KB para 4,2 KB no plano anterior; a varredura nasce com teto.
-
-**Gate:** mapa completo da cadeira (21 parâmetros) em ≤ 4 KB, com os inertes
-recolhidos a uma linha e o trade-off de cada parâmetro vivo explícito.
+Uma correção durante a execução: a primeira versão listava `assento.altura`
+entre os que movem o critério, por uma diferença de 2,8e-14 m — ruído de ponto
+flutuante, porque parâmetros diferentes percorrem contas diferentes. Efeito
+abaixo de 1 nm deixou de contar, e o teste guarda o caso medido.
 
 ### R03 — a medição escolhe o enquadramento
 

@@ -44,6 +44,7 @@
     "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "parametros": "node tools/mecanifica/parametros-peca.mjs",
+    "varrer": "node tools/mecanifica/varrer-peca.mjs",
     "conferir:juntas": "node tools/mecanifica/conferir-juntas.mjs",
     "descrever:montagem": "node tools/mecanifica/descrever-montagem.mjs",
     "descrever:montagem:persistida": "node tools/mecanifica/descrever-montagem-persistida.mjs",

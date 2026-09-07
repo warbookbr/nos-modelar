@@ -87,3 +87,53 @@ enquanto isso acontecer, "mudou" não separa efeito de ruído.
 
 Nada é escrito: as variantes vivem em memória e o arquivo da receita não é
 tocado.
+
+## Depois: quanto cada parâmetro move
+
+Saber que um parâmetro está ligado não diz o quanto ele importa. Para isso:
+
+```bash
+npm run varrer -- <receita> --criterio=menor-folga
+```
+
+Sensibilidade: sonda cada parâmetro para baixo e para cima (±10%, mude com
+`--delta`) e responde quais movem o critério, quanto, e **o que cada movimento
+custa**. Na cadeira, de 21 parâmetros, um só move a menor folga — encolher a
+seção da perna abre 6,07 mm e cria quatro interpenetrações; engordar abre
+2,00 mm sem quebrar nada.
+
+```bash
+npm run varrer -- <receita> --livres=perna.secaoTopo:0.036..0.05:8 --maximizar
+```
+
+Lote: mede a grade declarada, separa o que sobrevive do que quebra, e ordena
+pelo objetivo — `--maximizar`, `--minimizar` ou `--alvo=<valor>`. Sem objetivo
+declarado a lista sai na ordem da grade, porque ordenar sem critério é escolher
+no lugar de quem perguntou.
+
+### Critérios aceitos
+
+`menor-folga`, `interpenetracoes`, `contatos`, `folga:<a>,<b>`,
+`dimensao:<parte>:<x|y|z>`, `envelope:<x|y|z>`. Vocabulário fechado de
+propósito: uma linguagem de expressão sobre a descrição obrigaria a aprender uma
+gramática nova só para perguntar a folga entre duas partes. Critério que a peça
+não tem devolve `—`, não zero.
+
+### Limites que valem ler antes de confiar
+
+- **Nada é aplicado.** A saída é candidato medido; escolher continua sendo do
+  autor, e o aviso está no rodapé de toda execução.
+- **A previsão é local.** Um parâmetro por vez não vê interação entre dois, e
+  ±10% não diz nada sobre ±100%. Remeça o candidato escolhido de verdade.
+- **Orçamento declarado.** A varredura recusa antes de rodar se passar de 200
+  variantes; `--orcamento` levanta o teto de propósito, em vez de o comando
+  sumir por minutos.
+- **Ruído não é efeito.** Diferença abaixo de 1 nm é aritmética de ponto
+  flutuante, não geometria, e não entra na lista dos que movem o critério. Isto
+  não contradiz a comparação exata do diagnóstico acima: lá a pergunta é "este
+  parâmetro entra na conta?", e parâmetro que não entra produz resultado
+  idêntico bit a bit, então qualquer diferença responde sim. Aqui a pergunta é
+  "quanto ele move?", e 28 femtômetros respondem nada.
+- **Métrica não aprova forma.** Otimizar um critério inadequado só encontra uma
+  solução inadequada mais rápido; vale
+  [`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
