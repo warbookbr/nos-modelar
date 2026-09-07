@@ -1,6 +1,6 @@
 # Esteira confiável para a IA
 
-**Estado:** pronto
+**Estado:** ativo
 
 ## Objetivo
 
@@ -19,15 +19,16 @@ capacidade nova do motor — e é pré-requisito para medir qualquer outra coisa
 
 ## Linha de base medida — 2026-09-07, `8efe072`, Windows 11
 
-| Medida | Hoje | Alvo |
-|---|---|---|
-| `npm run bancada -- cadeira-de-madeira` | falha em **63 s** sem produzir imagem | sucesso, com PNG |
-| `npm test` | **5 testes / 4 arquivos** vermelhos | 0 vermelhos, ou ignorado com motivo |
-| `npm run gates` | morre no passo 2 de 19 (encadeado por `&&`) | roda os 19, relata todos |
-| Citações inexistentes nos documentos de leitura obrigatória | **22** | 0, com gate |
-| Caminho obrigatório antes da primeira linha de receita | **~108 KB** | ≤ 70 KB |
+| Medida | Abertura | Alvo | Agora |
+|---|---|---|---|
+| olhar uma peça pelo nome | falha em **63 s**, sem imagem | sucesso, com PNG | **3,9 s** com PNG (R00) |
+| `npm test` | **5 vermelhos / 4 arquivos** | 0, ou ignorado com motivo | **0 vermelhos, 4 ignorados** (R01) |
+| `npm run gates` | morre no passo 2 de 17 | roda todos, relata todos | **18/18 em 106 s** (R01) |
+| citações mortas na leitura obrigatória | **22** | 0, com gate | **0**, 113 conferidas (R02) |
+| a suíte preserva o trabalho | troca a peça da bancada | não toca | **preserva** (R01) |
+| leitura obrigatória antes da 1ª linha | **~108 KB** | ≤ 70 KB | R03 |
 
-Os cinco são reprodutíveis por comando; nenhum depende de julgamento.
+Os seis são reprodutíveis por comando; nenhum depende de julgamento.
 
 ## Escopo — arquivos e identidades
 
@@ -56,60 +57,52 @@ Os cinco são reprodutíveis por comando; nenhum depende de julgamento.
 
 ## Rodadas
 
-### R00 — fundir a esteira que já existe
+### R00 — fundir a esteira que já existe — **concluída**
 
 A branch `feat/melhoria-esteira-autoria-ia` (base `8efe072`, 6 commits) já
-entrega resolução única de endereço (`resolverCaminhoReceita`), auto-ativação da
-sessão no `olhar-bancada` e preservação do `sessao-ativa.json` nos testes.
+entregava resolução única de endereço (`resolverCaminhoReceita`), auto-ativação
+da sessão no `olhar-bancada` e o laço visual funcionando fora do catálogo de
+fixtures do harness.
 
-Medido na própria branch: `olhar-bancada --peca=cadeira-de-madeira` passou de
-**63 s de timeout mudo para 3,9 s com PNG gravado**, e o vermelho de
-`ativar-bancada.test.mjs` na suíte desapareceu.
+**Resultado:** mergeada em `9cc275e` após revisão dos 6 commits. O laço fecha em
+3,9 s para peça e 3,4 s para máquina, pelo nome curto. Quatro achados da revisão
+foram corrigidos aqui: a declaração de plano ativo apontava para um plano de
+execução e reprovava `planos:check`; a correção da sessão era salvar-e-restaurar,
+não isolamento (R01); `descrever-peca` engolia a mensagem do resolvedor; e o
+número de citações mortas subia de 22 para 26 na branch (R02).
 
-**Gate:** revisão dos 6 commits, `npm test` sem regressão nova, e o laço
-completo (`descrever` → `ativar:bancada` → `olhar-bancada` → `exportar:step`)
-rodando com nome curto em uma peça e em uma máquina.
+### R01 — linha de base verde — **concluída**
 
-**Limite conhecido:** a correção da sessão é salvar-e-restaurar, não isolamento.
-O teste continua escrevendo no arquivo real durante a execução. R01 fecha isso.
+Cinco testes falhavam, nenhum por defeito de código: quatro em `EPERM: symlink`
+(medido: `symlink` falha e `link` funciona — é o privilégio do Windows) e um por
+timeout de 5 s num estudo de campo que leva 1,2 s sozinho e estoura sob a carga
+da suíte. Os quatro passam a se declarar ignorados com motivo; o quinto ganhou
+orçamento do tamanho do trabalho que faz.
 
-### R01 — linha de base verde
+**Resultado:** 18/18 gates verdes em 106 s; a suíte não altera nenhum arquivo
+versionado; a peça carregada na bancada sobrevive ao gate.
 
-Cinco testes falham nesta máquina. Quatro morrem em `EPERM: symlink` — medido:
-`symlink` falha, `hardlink` funciona, ou seja, falta o privilégio do Windows,
-não há defeito no código. O quinto (`estudo-campo-revalidacao`) precisa ser
-diagnosticado antes de classificado.
+A causa da interferência era pior que a falha: o teste do perfil MCP APAGAVA os
+dois arquivos de sessão no fim, para o `bancada:vazia:check` não vê-los. Salvar e
+devolver não conserta — dois arquivos em paralelo devolvem cada um o que
+capturaram, e vence quem terminar por último. `ativarReceitaBancada` e
+`executarAtivarBancada` passaram a separar ONDE a sessão é gravada de ONDE a
+receita é procurada; o teste escreve em pasta própria e o arquivo real deixa de
+ser lido, escrito ou apagado por qualquer teste.
 
-Correções, nesta ordem:
+### R02 — gate de citações — **concluída**
 
-1. teste que exige `symlink` detecta a capacidade e se declara ignorado com
-   motivo legível, em vez de vermelho — a suíte precisa dizer a verdade nos dois
-   sistemas;
-2. `ativar-bancada.test.mjs` passa a usar `mkdtemp` e `cwd` próprios, sem tocar
-   `public/sessao-ativa.json` nem `pecas/` reais;
-3. `gates` deixa de encadear por `&&` e passa a rodar os 19 e relatar todos,
-   com saída não-zero no fim se algum falhou.
-
-**Gate:** `npm test` verde nesta máquina; `npm run gates` chega ao passo 19;
-`npm test` executado duas vezes seguidas não altera nenhum arquivo versionado
-nem o `sessao-ativa.json`.
-
-### R02 — gate de citações
-
-Um verificador extrai caminhos e `npm run` citados nos documentos de leitura
-obrigatória e confere se existem. O protótipo tem 40 linhas e acusa **22
-citações mortas** hoje: `references/operacoes-procedurais.md` manda ler onze
-receitas de exemplo que foram removidas do acervo (entre elas a peça de
-referência sem id cru e a que ensina a abrir vão), e o `README.md` manda copiar
-um `_modelo.js` inexistente para satisfazer um gate de selo que também não
-existe.
-
-Medida que justifica o gate: na branch do R00 o número **sobe de 22 para 26** —
+Um verificador confere se cada caminho e cada `npm run` citados na leitura
+obrigatória existem. Achou **22 citações mortas**, onze delas receitas de
+exemplo que `references/operacoes-procedurais.md` manda abrir e que saíram do
+acervo. Medida que justifica o gate: na branch do R00 o número **sobe para 26** —
 sem verificador, a classe cresce sozinha.
 
-**Gate:** `npm run docs:citacoes:check` entra em `gates` e fecha em 0; cada
-citação morta é corrigida ou removida, e o texto que dependia dela é reescrito
-para o acervo atual.
+**Resultado:** 113 citações conferidas em 21 documentos, zero mortas; o gate
+entrou no `ci.yml` e no `gates`. O README afirmava um selo obrigatório, um
+`_modelo.js` e um teste byte a byte — os três saíram no mesmo `c78961f` que
+removeu o acervo que policiavam, e o texto ficou para trás. Arquivo gerado não é
+cobrado: o critério é o `.gitignore`.
 
 ### R03 — cortar o obrigatório
 
@@ -159,6 +152,14 @@ e a saída é byte a byte idêntica à do modo normal numa peça limpa.
 
 Recorte: um modo resumido que entrega totais, violações e o que mudou desde a
 chamada anterior, mantendo a tabela completa sob bandeira explícita.
+
+Entra aqui um achado do R00, medido ao olhar a primeira máquina capturada: a
+captura tem proporção **16:9 fixa no código** (`altura = largura * 9/16`), então
+objeto alto gasta o quadro à toa — a prensa hidráulica ocupa cerca de 18% da
+largura. É a mesma família da V-25 do registro de gotchas, em que forma foi
+julgada por três rodadas numa imagem cortada: pixel que não existe não vira
+julgamento. `olhar-bancada` passa a aceitar `--res=LARGURAxALTURA` e a escolher
+a proporção pelo envelope do objeto quando ela não for declarada.
 
 **Gate:** saída padrão de uma peça de 11 partes abaixo de 2 KB sem perder
 nenhuma violação que a saída atual acusa, provado por comparação nas peças do

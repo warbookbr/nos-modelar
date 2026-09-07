@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [esteira confiável para a IA](2026-09-07-esteira-confiavel-para-ia.md) (2026-09-07-esteira-confiavel-para-ia.md)
 
 A [melhoria da esteira de autoria para
 IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md) e a
@@ -14,12 +14,11 @@ receita, auto-ativação da sessão no `olhar-bancada` e a prensa em
 `planos:check`, que exige que a declaração aponte para um arquivo datado em
 estado `ativo` nesta pasta.
 
-**Pronto para ativação:** [esteira confiável para a
-IA](2026-09-07-esteira-confiavel-para-ia.md) — corrigir o laço que a IA repete
-(descrever, ativar, olhar, medir, corrigir) e cortar o que ela precisa ler antes
-de começar. Abre com cinco medidas de linha de base tiradas em `8efe072` e
-depende de decidir primeiro o destino da branch `feat/melhoria-esteira-autoria-ia`,
-que já entrega a rodada R00. Estar `pronto` não autoriza implementação.
+O plano ativo corrige o laço que a IA repete — descrever, ativar, olhar, medir,
+corrigir — e corta o que ela precisa ler antes de começar. Abriu com seis medidas
+de linha de base tiradas em `8efe072`, e cada rodada fecha refazendo a mesma
+medida. R00 (fundir a esteira que já existia), R01 (linha de base verde) e R02
+(gate de citações) estão concluídas; R03 a R05 seguem abertas.
 
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de
