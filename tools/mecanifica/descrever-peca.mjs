@@ -72,6 +72,13 @@ export async function descreverPecaReutilizavel({
   subarvore = null,
   casas = 6,
   estrito = false,
+  /* Resumido por PADRÃO. A saída completa tem 9,8 KB numa peça de 11 partes, e
+     cresce O(n²) nas relações — uma máquina de 40 partes passaria de 60 KB por
+     chamada, várias vezes por rodada. Quem chama para MEDIR um encaixe pede
+     `--completo` e recebe tudo; quem chama para saber se a peça está sã, que é
+     a maioria das chamadas, não precisa pagar a tabela inteira.
+     O dado estruturado devolvido continua completo: só o TEXTO encolhe. */
+  resumo = true,
   listar = false,
   registroOperacoes = null,
   registroComposicoes = null,
@@ -175,7 +182,7 @@ export async function descreverPecaReutilizavel({
       + `  partes (${selecionadas.length}): ${selecionadas.join(', ')}\n`
       + `  bancada: https://warbookbr.github.io/nos-mecanifica/bancada.html?${params}\n\n`;
   }
-  stdout += formatarDescricao(descricao, { peca, casas });
+  stdout += formatarDescricao(descricao, { peca, casas, resumo });
 
   let stderr = '';
   let falhou = false;
@@ -209,7 +216,7 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['partes', 'subarvore', 'casas'],
-      bandeiras: ['listar', 'estrito'],
+      bandeiras: ['listar', 'estrito', 'completo'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -233,6 +240,7 @@ function comoCLI(argv) {
     subarvore: raizDaSubarvore,
     casas,
     estrito: lido.bandeira('estrito'),
+    resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
   });
 }

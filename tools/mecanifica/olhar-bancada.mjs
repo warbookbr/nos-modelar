@@ -207,8 +207,24 @@ export async function olharBancada({
     const modo = par ? 'isolar' : (modoDeclarado ?? 'todas');
     const projecao = projecaoDeclarada ?? (revisar || par ? 'ortografica' : 'perspectiva');
     const explosao = Number(explosaoDeclarada ?? 0);
-    const largura = Math.max(640, parseInt(resDeclarada, 10) || 1280);
-    const altura = Math.round(largura * 9 / 16);
+    /* `--res` aceita LARGURA ou LARGURAxALTURA.
+     *
+     * A proporção era 16:9 fixa no código, e objeto ALTO gastava o quadro à toa:
+     * medido numa prensa hidráulica, a peça ocupava cerca de 18% da largura, e o
+     * resto era fundo. Isso não é cosmético — é a mesma família da V-25, em que
+     * forma foi julgada por três rodadas numa imagem cortada. Pixel que não
+     * existe não vira julgamento, e julgar forma é o trabalho mais difícil que a
+     * bancada serve.
+     *
+     * O padrão continua 16:9 de propósito: mudá-lo mexeria em toda captura de
+     * gate já calibrada. O que muda é passar a EXISTIR a escolha, e o relatório
+     * abaixo passa a apontá-la quando a silhueta é claramente vertical. */
+    const declarada = String(resDeclarada ?? '');
+    const casadoWxH = declarada.match(/^(\d+)\s*[xX×]\s*(\d+)$/);
+    const largura = Math.max(640, parseInt(casadoWxH ? casadoWxH[1] : declarada, 10) || 1280);
+    const altura = casadoWxH
+      ? Math.max(360, parseInt(casadoWxH[2], 10))
+      : Math.round(largura * 9 / 16);
     const espera = parseInt(esperaDeclarada, 10) || 1200;
     const estritoEfetivo = Boolean(estrito || revisar);
     if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
@@ -483,6 +499,17 @@ export async function olharBancada({
       garantirPrazo();
       const urlReproduzivel = await page.evaluate(() => window.__mecanificaBancada.url());
       const enquadramento = await page.evaluate(() => window.__mecanificaBancada.enquadramento());
+      /* Silhueta claramente vertical num quadro deitado: a peça cabe pela
+         altura e sobra fundo dos dois lados. O enquadramento está CERTO — quem
+         está errado é a proporção do quadro —, então isto é dica, não falha:
+         quem julga forma decide se vale recapturar, e ninguém deve mexer na
+         geometria por causa de moldura. */
+      if (enquadramento.largura > 0 && enquadramento.altura / enquadramento.largura >= 2.5) {
+        const sugerida = `${largura}x${Math.round(largura * 4 / 3)}`;
+        registrar(relato, logger, 'stdout',
+          `  (silhueta vertical: ocupa ${(enquadramento.largura * 100).toFixed(0)}% da largura.`
+          + ` Para não julgar forma em pouco pixel, tente --res=${sugerida})`);
+      }
       if (revisar) {
         const medida = `ocupação ${(enquadramento.area * 100).toFixed(1)}% (${(enquadramento.largura * 100).toFixed(1)}% × ${(enquadramento.altura * 100).toFixed(1)}%)`;
         if (!enquadramento.valida) {

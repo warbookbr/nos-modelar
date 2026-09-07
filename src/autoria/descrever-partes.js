@@ -714,7 +714,12 @@ function tabela(colunas, linhas) {
  * Relatório em texto, determinístico: a mesma descrição dá sempre a mesma
  * string, com precisão fixa e ordem estável — pode virar teste.
  */
-export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
+/* Quantas `folga` o modo resumido mostra antes de contar o resto. Cinco porque o
+   que interessa numa folga é ela ser MENOR do que se esperava — a folga grande
+   entre duas partes distantes é geometria trivial, não achado. */
+const FOLGAS_NO_RESUMO = 5;
+
+export function formatarDescricao(descricao, { peca = null, casas = 6, resumo = false } = {}) {
   const quem = 'formatarDescricao';
   if (!descricao?.totais || !Array.isArray(descricao.partes) || !Array.isArray(descricao.relacoes)) {
     throw new Error(`${quem}: esperava a descrição devolvida por descreverPeca().`);
@@ -761,16 +766,33 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     { titulo: 'centro', direita: true },
     { titulo: 'dimensão', direita: true },
   ];
+  /* Três linhas por parte, uma por eixo, é a forma completa — e é onde a leitura
+     cresce sem trazer decisão: onze partes viram trinta e três linhas. No resumo,
+     uma linha por parte com as três dimensões juntas responde a pergunta que se
+     faz de fato ("do tamanho de quê é isso?"); min, max e centro por eixo ficam
+     na tabela completa, para quem foi medir um encaixe. */
   const linhasCaixa = [];
-  for (const parte of descricao.partes) {
-    for (let k = 0; k < 3; k++) {
+  if (resumo) {
+    for (const parte of descricao.partes) {
       linhasCaixa.push([
-        parte.nome, parte.faces, parte.corpos, EIXOS[k],
-        n(parte.min[k]), n(parte.max[k]), n(parte.centro[k]), n(parte.dimensoes[k]),
+        parte.nome, parte.faces, parte.corpos,
+        `${n(parte.dimensoes[0])} × ${n(parte.dimensoes[1])} × ${n(parte.dimensoes[2])}`,
       ]);
     }
+  } else {
+    for (const parte of descricao.partes) {
+      for (let k = 0; k < 3; k++) {
+        linhasCaixa.push([
+          parte.nome, parte.faces, parte.corpos, EIXOS[k],
+          n(parte.min[k]), n(parte.max[k]), n(parte.centro[k]), n(parte.dimensoes[k]),
+        ]);
+      }
+    }
   }
-  linhas.push(...(linhasCaixa.length ? tabela(colunasCaixa, linhasCaixa) : ['(nenhuma parte)']));
+  const colunasEfetivas = resumo
+    ? [{ titulo: 'parte' }, { titulo: 'faces', direita: true }, { titulo: 'corpos', direita: true }, { titulo: 'dimensões (x × y × z)', direita: true }]
+    : colunasCaixa;
+  linhas.push(...(linhasCaixa.length ? tabela(colunasEfetivas, linhasCaixa) : ['(nenhuma parte)']));
   linhas.push('');
 
   linhas.push('RELAÇÃO ENTRE PARTES — medida corpo a corpo, pelo par de corpos que decide');
@@ -791,11 +813,36 @@ export function formatarDescricao(descricao, { peca = null, casas = 6 } = {}) {
     { titulo: 'vão y', direita: true },
     { titulo: 'vão z', direita: true },
   ];
-  const linhasRelacao = descricao.relacoes.map((relacao) => [
+  /* A tabela de relações é O(n²) em partes: 11 partes dão 55 linhas, uma máquina
+     de 40 daria 780. Numa peça real, a esmagadora maioria é `folga` entre partes
+     que nunca se encostariam — geometria trivial ocupando a leitura inteira.
+     Medido na cadeira: 44 das 58 linhas.
+
+     O resumo mantém tudo que é FATO DE CONTATO (`interpenetra` e `encosta`) e as
+     folgas MENORES, que são as que podem ser um contato que não fechou. O resto
+     vira uma linha de contagem, e a tabela inteira continua a um argumento de
+     distância. Nada é descartado: o dado estruturado devolvido por
+     `descreverPeca()` continua completo, e é dele que os gates vivem. */
+  const relacoesMostradas = resumo
+    ? (() => {
+      const contato = descricao.relacoes.filter((r) => r.tipo !== 'folga');
+      const folgas = descricao.relacoes.filter((r) => r.tipo === 'folga')
+        .sort((a, b) => a.distancia - b.distancia);
+      return { itens: [...contato, ...folgas.slice(0, FOLGAS_NO_RESUMO)], omitidas: Math.max(0, folgas.length - FOLGAS_NO_RESUMO) };
+    })()
+    : { itens: descricao.relacoes, omitidas: 0 };
+
+  const linhasRelacao = relacoesMostradas.itens.map((relacao) => [
     relacao.a, relacao.b, relacao.tipo, relacao.eixo, n(relacao.distancia),
     n(relacao.porEixo[0]), n(relacao.porEixo[1]), n(relacao.porEixo[2]),
   ]);
   linhas.push(...(linhasRelacao.length ? tabela(colunasRelacao, linhasRelacao) : ['(nenhum par)']));
+  if (relacoesMostradas.omitidas > 0) {
+    linhas.push(
+      `… e mais ${relacoesMostradas.omitidas} folga(s) maiores, omitidas pelo resumo.`
+      + ' Para a tabela completa: --completo.',
+    );
+  }
   linhas.push('');
 
   /* A-20: a porta publicada aparece onde se confere. Sem esta seção, a única

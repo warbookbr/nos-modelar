@@ -6,8 +6,7 @@
 
 Fazer o laço que a IA repete — descrever, ativar, olhar, medir, corrigir —
 terminar sempre com a resposta certa, e reduzir o que ela precisa ler antes de
-começar. Verificável por cinco números medidos hoje nesta árvore, todos com alvo
-declarado na tabela de linha de base.
+começar. Verificável pelos números da tabela abaixo, todos com alvo declarado.
 
 ## Hipótese
 
@@ -27,8 +26,10 @@ capacidade nova do motor — e é pré-requisito para medir qualquer outra coisa
 | citações mortas na leitura obrigatória | **22** | 0, com gate | **0**, 113 conferidas (R02) |
 | a suíte preserva o trabalho | troca a peça da bancada | não toca | **preserva** (R01) |
 | leitura obrigatória antes da 1ª linha | **119,8 KB** | ≤ 70 KB | **69,8 KB** (R03) |
+| saída de `descrever` por chamada | **9,8 KB** (27,1 numa máquina) | menor, sem perder contato | **4,2 KB** (8,6) (R05) |
+| onde o tempo do laço vai | não se sabia | medido sem ritual | **96% em `olhar-bancada`** (R04) |
 
-Os seis são reprodutíveis por comando; nenhum depende de julgamento.
+Os oito são reprodutíveis por comando; nenhum depende de julgamento.
 
 ## Escopo — arquivos e identidades
 
@@ -125,13 +126,10 @@ catraca, e voltar a crescer passa a exigir decisão explícita.
 
 ### R04 — diário da oficina — **concluída**
 
-Só depois de R00–R03, porque medir esteira quebrada mede a quebra.
-
-Um módulo importado pelos CLIs que a IA já roda grava uma linha JSONL por
-invocação, fora do versionamento, com o que a ferramenta já sabia. A unidade é a
-**rodada** — entre duas gravações da receita —, não a tarefa: assim a leitura não
-precisa comparar machado com cadeira. Mensagem de erro que se repete entre
-sessões é defeito de ferramenta ou de documento, nunca do agente.
+Só depois de R00–R03, porque medir esteira quebrada mede a quebra. Um módulo
+importado pelos CLIs que a IA já roda grava uma linha JSONL por invocação, fora
+do versionamento. A unidade é a **rodada** — entre duas gravações da receita —,
+não a tarefa: assim a leitura não precisa comparar machado com cadeira.
 
 **Resultado:** `npm run diario` responde as quatro perguntas — onde vai o tempo,
 onde emperra, o que falha, e o que saiu 0 sem entregar. As garantias estão em
@@ -150,7 +148,7 @@ seis erros de uso que ninguém cometeu), e o leitor contava a MESMA falha sobre
 alvos diferentes como falhas distintas — a normalização existe justamente para
 que falha repetida pareça repetida.
 
-### R05 — volume de saída por rodada
+### R05 — volume de saída por rodada — **concluída**
 
 `descrever --estrito` emite 9,8 KB por chamada, e a tabela de relações é O(n²)
 em partes: 11 partes geram 55 linhas; uma máquina de 40 partes geraria ~780.
@@ -168,9 +166,18 @@ julgada por três rodadas numa imagem cortada: pixel que não existe não vira
 julgamento. `olhar-bancada` passa a aceitar `--res=LARGURAxALTURA` e a escolher
 a proporção pelo envelope do objeto quando ela não for declarada.
 
-**Gate:** saída padrão de uma peça de 11 partes abaixo de 2 KB sem perder
-nenhuma violação que a saída atual acusa, provado por comparação nas peças do
-acervo.
+**Resultado:** `descrever` passa a resumir por PADRÃO — 9,8 KB → 4,2 KB numa peça
+de 11 partes, 27,1 KB → 8,6 KB numa máquina de 20. Nenhum fato de contato se
+perde: `interpenetra` e `encosta` saem inteiros, junto das cinco menores folgas,
+que são as que podem ser um contato que não fechou; as maiores viram uma linha de
+contagem. `--completo` devolve tudo, e o dado estruturado nunca encolheu — é dele
+que os gates vivem. A meta de 2 KB não foi atingida e não deveria ser: cortar
+mais exigiria esconder relação de contato, que é justamente o que se vai ler.
+
+`olhar-bancada` aceita `--res=LARGURAxALTURA`, e avisa quando a silhueta é
+vertical num quadro deitado. O padrão continua 16:9 de propósito — mudá-lo
+mexeria em toda captura de gate já calibrada; o que passou a existir é a escolha,
+apontada no momento em que ela importa.
 
 ## Fora de escopo
 
