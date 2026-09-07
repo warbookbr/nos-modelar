@@ -58,7 +58,7 @@ describe('porta MCP da varredura', () => {
       objetivo: 'minimizar',
     });
     const primeiro = r.estruturado.resultado.candidatos[0];
-    expect(primeiro.valor * 1000).toBeCloseTo(0, 1);
+    expect(primeiro.valor).toBeCloseTo(0, 1);
     expect(primeiro.custo.pioradas).toBeGreaterThan(5);
   }, 120_000);
 
@@ -82,4 +82,39 @@ describe('porta MCP da varredura', () => {
     expect(schema.safeParse({ alvo: 'x', delta: 1.5 }).success).toBe(false);
     expect(schema.safeParse({ alvo: 'x', livres: ['a:0..1:3'], objetivo: 'maximizar' }).success).toBe(true);
   });
+});
+
+describe('a estrutura não pode mentir onde o texto acerta', () => {
+  it('devolve os números NA UNIDADE anunciada, não em metros crus', async () => {
+    /* Achado ao chamar a porta como agente: `unidade: "mm"` ao lado de
+       0.014142135623730944 metros. Quem lê o texto acerta; quem lê a estrutura
+       erra por mil, e erra com confiança porque o campo promete milímetro. */
+    const r = await chamar('varrer_parametros', {
+      alvo: 'cadeira-de-madeira',
+      criterio: 'folga:saiaLateral,saiaTraseira',
+    });
+    expect(r.estruturado.resultado.unidade).toBe('mm');
+    expect(r.estruturado.resultado.base).toBeCloseTo(14.14, 1);
+    expect(r.conteudo[0].text).toContain('14.14 mm');
+  }, 90_000);
+
+  it('critério que conta pares não é convertido', async () => {
+    const r = await chamar('varrer_parametros', {
+      alvo: 'cadeira-de-madeira',
+      criterio: 'interpenetracoes',
+    });
+    expect(r.estruturado.resultado.unidade).toBe('par(es)');
+    expect(r.estruturado.resultado.base).toBe(4);
+  }, 90_000);
+
+  it('honra `mostrar` na estrutura, não só no texto', async () => {
+    const r = await chamar('varrer_parametros', {
+      alvo: 'cadeira-de-madeira',
+      criterio: 'menor-folga',
+      livres: ['perna.secaoTopo:0.036..0.05:8'],
+      objetivo: 'maximizar',
+      mostrar: 3,
+    });
+    expect(r.estruturado.resultado.candidatos).toHaveLength(3);
+  }, 90_000);
 });

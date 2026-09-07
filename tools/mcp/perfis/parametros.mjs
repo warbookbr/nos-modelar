@@ -78,6 +78,7 @@ async function executarVarrer(entrada) {
       },
     };
   }
+  const mostrar = entrada.mostrar ?? 5;
   const objetivo = entrada.objetivo
     ? (entrada.objetivo === 'alvo'
       ? { modo: 'alvo', alvo: entrada.valorAlvo }
@@ -90,9 +91,16 @@ async function executarVarrer(entrada) {
     liberdades: entrada.livres ?? [],
     objetivo,
     orcamento: entrada.orcamento ?? ORCAMENTO_PADRAO,
-    mostrar: entrada.mostrar ?? 5,
+    mostrar,
   });
-  return { ...bruto, ...comAcao(bruto, 'Confira alvo, critério e formato das liberdades (caminho:min..max:passos).') };
+  /* `mostrar` viaja junto porque `estruturar` só recebe o executado, e sem ele
+     a estrutura devolvia sempre cinco candidatos enquanto o texto respeitava o
+     pedido. Duas respostas diferentes para a mesma chamada. */
+  return {
+    ...bruto,
+    mostrar,
+    ...comAcao(bruto, 'Confira alvo, critério e formato das liberdades (caminho:min..max:passos).'),
+  };
 }
 
 /* A estrutura devolvida é deliberadamente rasa. O relatório completo tem
@@ -119,27 +127,41 @@ const estruturarDiagnostico = (executado) => (executado.ok
   }
   : executado);
 
-const estruturarVarredura = (executado) => (executado.ok
-  ? {
+/**
+ * Todo número sai NA UNIDADE que o campo `unidade` anuncia.
+ *
+ * O motor mede em metros; a saída dizia `unidade: "mm"` e entregava
+ * `0.014142135623730944`. Quem lê o texto vê 14,14 mm e acerta; quem lê a
+ * estrutura — que é o caso de um agente — conclui 0,014 mm e erra por mil,
+ * justamente porque o campo ao lado promete milímetro. Converter aqui é mais
+ * seguro do que documentar a armadilha.
+ */
+const naUnidade = (valor, escala) => (valor === null || valor === undefined ? null : valor * escala);
+
+const estruturarVarredura = (executado) => {
+  if (!executado.ok) return executado;
+  const { escala } = executado.resultado;
+  const quantos = executado.mostrar ?? 5;
+  return {
     ok: true,
     codigo: 0,
     resultado: {
       criterio: executado.resultado.criterio,
       unidade: executado.resultado.unidade,
       variantes: executado.resultado.variantes,
-      base: executado.resultado.base.valor,
+      base: naUnidade(executado.resultado.base.valor, escala),
       movem: executado.resultado.efeitos
         ? executado.resultado.efeitos.filter((e) => e.move).map((e) => e.caminho)
         : undefined,
       candidatos: executado.resultado.viaveis
-        ? executado.resultado.viaveis.slice(0, 5).map((c) => ({
-          valores: c.valores, valor: c.valor, custo: c.custo,
+        ? executado.resultado.viaveis.slice(0, quantos).map((c) => ({
+          valores: c.valores, valor: naUnidade(c.valor, escala), custo: c.custo,
         }))
         : undefined,
       ondeOlhar: executado.resultado.movidas.map((m) => m.nome),
     },
-  }
-  : executado);
+  };
+};
 
 export function criarFerramentasParametros() {
   return Object.freeze([
