@@ -208,78 +208,11 @@ npm run mcp:check
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.
 
-### Antes de tudo: OLHE a imagem
+## O laço visual — obrigatório, e mora num lugar só
 
-Rasterize as vistas e **abra o PNG**:
-
-```
-node tools/mecanifica/olhar.mjs saida.png vista-a.svg vista-b.svg
-```
-
-Ler o PNG como imagem é passo obrigatório antes de julgar, antes de despachar
-crítico e antes de levar qualquer coisa ao usuário. SVG gerado, entregue e nunca
-aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 mm
-ficou várias rodadas visível na vista frontal e só foi achado por um script.
-Medição pega o defeito que alguém já imaginou; olhar pega o resto.
-
-## Antes de gerar a primeira forma
-
-Leia
-[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md).
-É o registro do que já falhou aqui e não pode se repetir: malha fechada não é
-objeto bom, métrica verde não aprova forma, mosaico esconde defeito que a vista
-em tamanho nativo mostra, e perspectiva bonita não compensa ortográfica ruim.
-Cada linha daquela tabela custou pelo menos uma rodada perdida.
-
-## Despachar o crítico, sem contexto
-
-Em marco — antes de propor promoção, publicação ou de levar o resultado ao
-usuário — despache um subagente como **crítico visual**. O protocolo está em
-[`../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
-
-Passe **apenas o PNG** e a pergunta. **Não passe receita, código, passos,
-relatório, o seu raciocínio nem o histórico de construção.** O crítico é para
-VER a imagem — revisão de receita é outro trabalho, com outro dono, e um crítico
-que lê a receita volta a julgar a intenção em vez do resultado, que é
-exatamente o defeito que este papel existe para cobrir. Papel separado dentro da
-mesma sessão é ficção: quem modelou tem a narrativa e não consegue não tê-la.
-
-A forma padrão é legibilidade cega: entregue a imagem sem dizer o que é e
-pergunte "o que é isto?". Se a resposta não bate com a intenção, é achado, e o
-teste não exige gosto — só verifica se a forma comunica.
-
-Três limites, todos inegociáveis:
-
-- **achado, nunca aprovação.** Silêncio do crítico não é evidência de qualidade
-  e não entra em registro como aceite. Forma quem aprova é o usuário;
-- **depois dos gates, nunca no lugar deles.** Se descrição, medida ou gate ainda
-  acusam, corrija primeiro;
-- **em marco, não a cada rodada.** Cada despacho é partida fria.
-
-## Antes de qualquer julgamento: abra o alvo e sobreponha
-
-Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
-isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto uma
-única vez, e o crítico visual recebendo só o render.
-
-1. `npm run olhar -- alvo.png caminho/do/desenho.svg` e **leia a imagem**;
-2. `npm run comparar:alvo -- cmp.svg caminho/da/malha.json` para pôr a silhueta
-   do modelo sobre as curvas do alvo, em milímetros e na mesma origem;
-3. despache o agente `critico-visual` passando os **três** caminhos — alvo,
-   modelo e sobreposição. Crítico que recebe só o render dá opinião.
-
-Sem alvo desenhado, desenhe antes: veja
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
-
-## Antes de caçar defeito: o método tem limite
-
-Se você está tentando decidir **forma, proporção ou caráter**, não é problema
-diagnóstico, e eliminar defeito ali rende conserto certo num objeto que continua
-ruim. O sintoma é os achados encolherem e a nota não subir. Ver
-[`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](../../../docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md).
-
-Quando o método valer, dois passos são obrigatórios e são os que mais somem:
-**identificar o que falta** (o desenho de referência existia desde a primeira
-rodada e nunca foi aberto) e **levantar hipóteses no plural antes de testar**
-(o serrilhado foi culpa do renderizador duas vezes antes de alguém rastrear o
-loop).
+Olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto e reconhecer o
+limite do método diagnóstico valem em toda tarefa que produz forma. As quatro
+regras estão em
+[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), e estavam
+copiadas palavra por palavra aqui e na outra skill — regra duplicada envelhece
+em lugares diferentes.

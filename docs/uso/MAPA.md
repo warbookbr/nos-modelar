@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-783 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+786 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -431,6 +431,7 @@
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
 - `README.md` — Histórico da Mecanifica
+- `REGISTRO-FALHAS-AUTORIA-V.md` — Registro de falhas da autoria — V-01 a V-38
 - `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
 - `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
 - `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md` — Auditoria das práticas de autoria 3D
@@ -576,6 +577,7 @@
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
+- `LACO-VISUAL.md` — O laço visual — olhar, sobrepor, despachar
 - `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `README.md` — Usar o Mecanifica
@@ -878,6 +880,7 @@
 - `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
 - `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
+- `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto uma sessão precisa LER antes de escrever a primeira linha de receita.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
 - `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentá…
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.

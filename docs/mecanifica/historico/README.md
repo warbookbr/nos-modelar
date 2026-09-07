@@ -6,6 +6,7 @@ de `docs/mecanifica/`; pendências ficam em `planos/BACKLOG.md`.
 
 | Arquivo | O que prova |
 |---|---|
+| [`REGISTRO-FALHAS-AUTORIA-V.md`](REGISTRO-FALHAS-AUTORIA-V.md) | as 38 falhas medidas da autoria (V-01 a V-38); leitura obrigatória antes de reabrir hipótese de forma |
 | [`EXPERIMENTO-AB-FLUXO-IA.md`](EXPERIMENTO-AB-FLUXO-IA.md) | medição cega do efeito do fluxo sobre modeladores |
 | [`EXPERIMENTO-RODA-REALISTA.md`](EXPERIMENTO-RODA-REALISTA.md) | prova isolada do perfil de autoria realista |
 | [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) | execução, limites e decisão de não integrar a roda |

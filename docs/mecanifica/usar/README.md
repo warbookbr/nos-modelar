@@ -21,6 +21,11 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 
 ## Leitura obrigatória antes de gerar forma
 
+[`LACO-VISUAL.md`](LACO-VISUAL.md) reúne as quatro regras que valem em qualquer
+tarefa que produza forma: olhar o PNG, sobrepor ao alvo, despachar o crítico sem
+contexto e saber onde o método diagnóstico para de render.
+
+
 [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md) é o registro do que já
 falhou e não pode se repetir. Malha fechada não é objeto bom, métrica verde não
 aprova forma, e perspectiva bonita não compensa ortográfica ruim. Ler antes

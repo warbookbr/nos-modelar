@@ -4,7 +4,12 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const origem = resolve(raiz, 'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md');
+/* A tabela V-01..V-38 saiu de `usar/GOTCHAS-AUTORIA-VISUAL.md` para a zona
+   histórica: eram 15,6 dos 35,8 KB de um documento de leitura obrigatória, e a
+   maior parte é arqueologia de um programa congelado. Este inventário é o
+   consumidor em CÓDIGO daquela tabela, e por isso acompanha a mudança de
+   endereço — a fonte é a mesma, o lugar é outro. */
+const origem = resolve(raiz, 'docs/mecanifica/historico/REGISTRO-FALHAS-AUTORIA-V.md');
 const destino = resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0/inventario-v01-v32.json');
 const pistas = {
   'V-03': ['autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/evidencias/conjunto-frontal.png'],

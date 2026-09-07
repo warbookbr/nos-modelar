@@ -39,6 +39,13 @@ export const ALLOWLIST_G1 = new Map([
     'aponta a lista detalhada e a evidência de cada atrito; a regra continua sendo a tabela local',
   ],
   [
+    'docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/mecanifica/historico/REGISTRO-FALHAS-AUTORIA-V.md',
+    'as 38 falhas medidas saíram daqui: eram 15,6 dos 35,8 KB de um documento de leitura '
+    + 'obrigatória, e a maior parte é arqueologia do N6 congelado. Quem vai modelar uma peça '
+    + 'não precisa delas; quem vai reabrir hipótese de forma precisa de todas, e o ponteiro '
+    + 'existe para isso — redescobrir o que a tabela já mediu é a própria falha V-31',
+  ],
+  [
     'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md:docs/mecanifica/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md',
     'cita plano encerrado como registro do caso que originou o método; plano encerrado não governa',
   ],

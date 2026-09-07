@@ -202,34 +202,16 @@ comparação principal.
 
 ## O laço obrigatório: abrir o alvo, sobrepor, despachar com os dois
 
-Escrito depois de uma prova inteira feita sem ele, e o custo foi este: o quarto
-dianteiro do chassi foi modelado por doze rodadas sem que o desenho de
-referência do P0 fosse aberto **uma única vez**, e o crítico visual recebeu
-sempre o render sozinho. A única pergunta que ele podia responder era "isso
-parece um carro?", e a resposta foi 3/10 duas vezes seguidas sem que ninguém
-pudesse apontar contra o quê. Quando a sobreposição finalmente existiu, ela
-mostrou em cinco segundos que o nariz do modelo era uma parede vertical onde o
-alvo enrola para baixo, e que a planta do modelo era 500 mm mais larga que o
-alvo na ponta.
+Os três passos — abrir o alvo antes de modelar, sobrepor a cada rodada e
+despachar o crítico com os dois — estão em [`LACO-VISUAL.md`](LACO-VISUAL.md),
+junto das outras regras que valem em qualquer tarefa que produza forma.
 
-Três passos, em ordem, e nenhum é opcional:
-
-1. **Abrir o alvo antes de modelar.** `npm run olhar -- alvo.png desenho.svg`,
-   e então LER a imagem. Não basta a existência do desenho no repositório: o
-   desenho do P0 existia desde a primeira rodada e nunca foi aberto.
-2. **Sobrepor a cada rodada.** `npm run comparar:alvo -- cmp.svg malha.json`
-   põe a silhueta do modelo sobre as curvas do alvo, em milímetros, na mesma
-   origem. Cinza é alvo, azul é modelo: onde só há cinza falta forma, onde só
-   há azul sobra.
-3. **Despachar o crítico com os dois.** O agente `critico-visual` recebe o
-   caminho do alvo, o do modelo e o da sobreposição, e a pergunta deixa de ser
-   "parece um carro?" para virar "bate com o alvo?". Crítico que recebe só o
-   render dá opinião, não crítica.
-
-Se não houver alvo desenhado para a peça, **desenhe primeiro** — a skill
-`desenhar-prancha` existe para isso. Modelar contra a própria intuição e depois
-medir foi o que produziu doze rodadas de correção em círculo: mudei a largura do
-nariz de 300 para 806 mm por achismo, e o alvo dizia 300.
+O custo que os originou fica aqui, porque é o argumento: o quarto dianteiro do
+chassi foi modelado por doze rodadas sem que o desenho de referência do P0 fosse
+aberto uma única vez. A única pergunta que o crítico podia responder era "isso
+parece um carro?". Quando a sobreposição finalmente existiu, ela mostrou em
+cinco segundos que o nariz do modelo era parede vertical onde o alvo enrola, e
+que a planta era 500 mm mais larga que o alvo na ponta.
 
 ## Fluxo
 

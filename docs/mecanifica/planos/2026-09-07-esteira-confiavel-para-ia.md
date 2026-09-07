@@ -26,7 +26,7 @@ capacidade nova do motor — e é pré-requisito para medir qualquer outra coisa
 | `npm run gates` | morre no passo 2 de 17 | roda todos, relata todos | **18/18 em 106 s** (R01) |
 | citações mortas na leitura obrigatória | **22** | 0, com gate | **0**, 113 conferidas (R02) |
 | a suíte preserva o trabalho | troca a peça da bancada | não toca | **preserva** (R01) |
-| leitura obrigatória antes da 1ª linha | **~108 KB** | ≤ 70 KB | R03 |
+| leitura obrigatória antes da 1ª linha | **119,8 KB** | ≤ 70 KB | **77,9 KB** (R03, parcial) |
 
 Os seis são reprodutíveis por comando; nenhum depende de julgamento.
 
@@ -104,7 +104,7 @@ entrou no `ci.yml` e no `gates`. O README afirmava um selo obrigatório, um
 removeu o acervo que policiavam, e o texto ficou para trás. Arquivo gerado não é
 cobrado: o critério é o `.gitignore`.
 
-### R03 — cortar o obrigatório
+### R03 — cortar o obrigatório — **parcial**
 
 `GOTCHAS-AUTORIA-VISUAL.md` tem 36 KB e é leitura obrigatória. Medido por seção:
 **15,6 KB são o registro histórico V-01..V-38**, quase todo sobre o programa de
@@ -119,9 +119,21 @@ valem para qualquer peça.
 3. o `GUIA-AUTORIA-IA.md` que chega no R00 é reconciliado com o que já existe,
    para acrescentar caminho e não acrescentar volume.
 
-**Gate:** caminho obrigatório ≤ 70 KB medido por script; `docs:links:check`,
-`docs:estrutura:check` e `mapa:check` verdes; nenhuma lição operacional perdida,
-conferida item a item contra a versão anterior.
+**Gate:** `npm run leitura:obrigatoria` mede a lista declarada contra o teto;
+gates de documentação verdes; nenhuma lição perdida.
+
+**Resultado: 119,8 KB → 77,9 KB, 35% a menos, e 7,9 KB acima do teto.** Saíram
+para `historico/REGISTRO-FALHAS-AUTORIA-V.md` a tabela V-01..V-38 e as três
+seções de estado do programa; o laço visual virou
+[`LACO-VISUAL.md`](../usar/LACO-VISUAL.md), citado pelas duas skills que o
+copiavam palavra por palavra. Nada foi apagado, e o consumidor em código daquela
+tabela (`inventariar-candidatos-corpus-p0.mjs`) acompanhou o endereço.
+
+Os 7,9 KB que faltam não saem sem decisão editorial: sobraram
+`REFERENCIA-E-CRITICA-VISUAL.md` (13,1 KB), `AUTORIA-DE-PECA.md` (11,6 KB) e o
+`GUIA-AUTORIA-IA.md` que chegou no R00 (4,3 KB, com trechos que repetem a
+referência de operações). Cortar contrato é diferente de mover arqueologia, e a
+escolha é do usuário — o teto fica cobrado pelo script até lá.
 
 ### R04 — diário da oficina
 
