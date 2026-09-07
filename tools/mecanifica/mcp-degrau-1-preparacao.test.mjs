@@ -25,7 +25,13 @@ describe('fatia preparatória do Degrau 1', () => {
 
     const erro = await descreverPecaReutilizavel({ peca: 'nao-existe' });
     expect(erro).toMatchObject({ ok: false, codigo: 2, erro: { categoria: 'uso' } });
-    expect(erro.stderr).toContain("peça 'nao-existe' não existe");
+    /* O que este teste guarda é o CONTRATO — erro de uso devolvido, processo
+       vivo — e o alvo aparecer na mensagem, para quem errou o nome saber qual
+       nome errou. A frase exata é do resolvedor, e ele distingue "não
+       encontrada" de "confinamento violado": prender a redação aqui obrigaria a
+       mentir numa das duas. */
+    expect(erro.stderr).toContain("'nao-existe'");
+    expect(erro.stderr).toMatch(/não encontrada|não existe/i);
   });
 
   it('olharBancada valida e retorna erro sem iniciar infraestrutura', async () => {

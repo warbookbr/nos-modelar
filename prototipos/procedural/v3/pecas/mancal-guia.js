@@ -1,4 +1,4 @@
-﻿/* mancal-guia.js — Mancal de deslizamento para guia linear/rotativa.
+/* mancal-guia.js — Mancal de deslizamento para guia linear/rotativa.
  *
  * Componente mecânico composto por:
  * 1. Base retangular usinada com apoio em y=0.

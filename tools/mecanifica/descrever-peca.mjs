@@ -95,11 +95,12 @@ export async function descreverPecaReutilizavel({
   if (!moduloFornecido) {
     try {
       caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
-    } catch {
-      return erroDeUso(
-        `peça '${peca}' não existe em prototipos/procedural/v3/{pecas,maquinas}/.`
-        + `\n  disponíveis: ${DISPONIVEIS.join(', ')}`,
-      );
+    } catch (erro) {
+      /* A mensagem do resolvedor distingue "não encontrada" de "confinamento
+         violado", e engoli-la fazia uma tentativa de sair do repositório ser
+         relatada como peça inexistente — resposta errada para a pergunta errada.
+         O catálogo continua junto, porque é o que ajuda quem só errou o nome. */
+      return erroDeUso(`${erro.message}\n  disponíveis em pecas/: ${DISPONIVEIS.join(', ')}`);
     }
   }
   if (!Number.isInteger(casas) || casas < 0 || casas > 12) {

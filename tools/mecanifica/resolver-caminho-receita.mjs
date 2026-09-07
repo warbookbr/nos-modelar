@@ -1,4 +1,4 @@
-﻿/* resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro */
+/* resolver-caminho-receita.mjs — localizador flexível de receitas com confinamento seguro */
 import { existsSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
