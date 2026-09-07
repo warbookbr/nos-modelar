@@ -152,24 +152,29 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 103 declarados e só 13 vivos', async () => {
+  it('trava o retrato do acervo: 139 declarados e só 47 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 103, vivos: 13, inertes: 90 });
+    expect(r.resultado.totais).toEqual({ declarados: 139, vivos: 47, inertes: 92 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
     expect(porAlvo['prensa-mecanica-industrial']).toEqual({ declarados: 14, vivos: 0, inertes: 14 });
     expect(porAlvo['prensa-progressiva']).toEqual({ declarados: 15, vivos: 0, inertes: 15 });
+    /* A bicicleta entrou depois e derivou PASSOS de PARAMS como a skill manda:
+       34 dos 36 vivos. Ela sozinha leva o acervo de 13% para 34% de liberdade
+       real, e é a contraprova de que o 13% não era limite do motor. */
+    expect(porAlvo['bicicleta-urbana']).toEqual({ declarados: 36, vivos: 34, inertes: 2 });
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);
-    /* 60 s: o retrato reexecuta o acervo inteiro, 103 parâmetros × até três
-       sondas cada, e leva ~9 s sozinho. O orçamento é do tamanho do trabalho,
+    /* 90 s: o retrato reexecuta o acervo inteiro, 139 parâmetros × até três
+       sondas cada, e a bicicleta sozinha custa 36 deles numa malha de mil
+       faces. O orçamento é do tamanho do trabalho,
        não do padrão do runner — a lição do R01 do plano anterior. */
-  }, 60_000);
+  }, 90_000);
 
   it('recusa uso ambíguo em vez de escolher por conta própria', async () => {
     expect((await parametrosReutilizavel({})).codigo).toBe(2);
