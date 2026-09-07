@@ -4,6 +4,13 @@
 
 **Plano ativo:** Nenhum.
 
+**Pronto para ativação:** [esteira confiável para a
+IA](2026-09-07-esteira-confiavel-para-ia.md) — corrigir o laço que a IA repete
+(descrever, ativar, olhar, medir, corrigir) e cortar o que ela precisa ler antes
+de começar. Abre com cinco medidas de linha de base tiradas em `8efe072` e
+depende de decidir primeiro o destino da branch `feat/melhoria-esteira-autoria-ia`,
+que já entrega a rodada R00. Estar `pronto` não autoriza implementação.
+
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de
 saída de malha, o conferente único, o modo de auditoria visual e cinco peças no

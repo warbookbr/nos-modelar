@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-768 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+769 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -471,6 +471,7 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-09-07-esteira-confiavel-para-ia.md` — Esteira confiável para a IA
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
