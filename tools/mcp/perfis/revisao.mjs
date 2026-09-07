@@ -6,7 +6,7 @@ import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../../mecanifica/d
 import { olharBancada } from '../../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../../modelagem/revisao-modelagem.mjs';
-import { descreverPeca as medirPeca } from '../../../src/autoria/descrever-partes.js';
+import { descreverPeca as medirPeca, formatarDescricao } from '../../../src/autoria/descrever-partes.js';
 import { identidadeTransformacaoRigida } from '../../../src/autoria/transformacao-rigida.js';
 import { capturarMontagem } from '../../mecanifica/capturar-montagem.mjs';
 import {
@@ -197,7 +197,20 @@ export async function descrever(input, { catalogo = null } = {}) {
       descricao: resumoDescricao(resultado.resultado.descricao),
     });
   }
-  if (!catalogo?.resolverPeca) return erroDeCatalogo();
+  if (!catalogo?.resolverPeca) {
+    try {
+      const resultado = await descreverPecaReutilizavel(argumentos);
+      if (resultado.ok) {
+        return respostaOk(resultado.codigo, {
+          peca: resultado.resultado.peca,
+          descricao: resumoDescricao(resultado.resultado.descricao),
+        });
+      }
+    } catch {
+      // continua para erroDeCatalogo()
+    }
+    return erroDeCatalogo();
+  }
   try {
     const resolvida = await catalogo.resolverPeca(argumentos.peca);
     return resumoDeNeutro(argumentos.peca, resolvida.neutro, argumentos);
@@ -269,6 +282,22 @@ function pecasPublicadasNaBancada() {
   return idsDoCatalogo(CATALOGO_HOMOLOGADO);
 }
 
+export function conteudoDescricao(executado) {
+  if (!executado?.ok) {
+    return [{ type: 'text', text: `descrever_peca: ${executado?.erro?.mensagem ?? 'falha na medição.'}` }];
+  }
+  const resultado = executado.resultado;
+  if (resultado?.descricao) {
+    try {
+      const texto = formatarDescricao(resultado.descricao, { peca: resultado.peca });
+      return [{ type: 'text', text: texto }];
+    } catch {
+      return [{ type: 'text', text: JSON.stringify(resultado.descricao, null, 2) }];
+    }
+  }
+  return [{ type: 'text', text: 'descrever_peca: medição concluída.' }];
+}
+
 export function conteudoRenderizacao({ resposta, imagens }) {
   if (!resposta.ok) {
     return [{ type: 'text', text: `renderizar_vistas: ${resposta.erro?.mensagem ?? 'operação recusada.'}` }];
@@ -323,17 +352,30 @@ export async function renderizar(input, {
      Com o catálogo publicado vazio, toda peça vai pela resolução — que é o
      caminho que funciona e o mesmo que as montagens já usavam. */
   if (!pecasPublicadasNaBancada().includes(argumentos.peca)) {
-    if (!catalogo?.resolverPeca) return pacoteVisual(erroDeCatalogo());
-    try {
-      const resolvida = await catalogo.resolverPeca(argumentos.peca);
-      capturado = await capturar({
-        montagem: montagemVisualDePeca(argumentos.peca, resolvida.neutro),
-        vistas: VISTAS_OFICIAIS,
-        timeoutMs: limites.timeoutMs,
-      });
-      vistasRelatadas = capturado.resultado?.capturas?.map(({ nome, enquadramento }) => ({ nome, enquadramento })) ?? [];
-    } catch (erro) {
-      return pacoteVisual(erro?.codigo ? erroDeCatalogo(erro) : falhaInterna('renderizar_vistas', erro));
+    if (catalogo?.resolverPeca) {
+      try {
+        const resolvida = await catalogo.resolverPeca(argumentos.peca);
+        capturado = await capturar({
+          montagem: montagemVisualDePeca(argumentos.peca, resolvida.neutro),
+          vistas: VISTAS_OFICIAIS,
+          timeoutMs: limites.timeoutMs,
+        });
+        vistasRelatadas = capturado.resultado?.capturas?.map(({ nome, enquadramento }) => ({ nome, enquadramento })) ?? [];
+      } catch (erro) {
+        return pacoteVisual(erro?.codigo ? erroDeCatalogo(erro) : falhaInterna('renderizar_vistas', erro));
+      }
+    } else {
+      try {
+        capturado = await olhar({
+          peca: argumentos.peca,
+          revisar: true,
+          capturarEmMemoria: true,
+          timeoutMs: limites.timeoutMs,
+        });
+        vistasRelatadas = capturado.resultado?.vistas ?? [];
+      } catch (erro) {
+        return pacoteVisual(falhaInterna('renderizar_vistas', erro));
+      }
     }
   } else {
     try {
@@ -438,6 +480,7 @@ export function criarFerramentasRevisao(catalogo = null) {
       inputSchema: descreverEntrada,
       outputSchema: descreverSaida,
       executar: (entrada) => descrever(entrada, { catalogo }),
+      conteudo: conteudoDescricao,
     },
     {
       nome: 'validar_pacote',

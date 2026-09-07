@@ -92,8 +92,20 @@ function capacidadesDo(catalogoMontagens, universoDependencias, perfil = PERFIL)
 }
 
 function textoDaResposta(nome, resposta) {
-  if (resposta.ok) return `${nome}: operação concluída.`;
-  return `${nome}: ${resposta.erro?.mensagem ?? 'operação recusada.'}`;
+  if (!resposta.ok) {
+    return `${nome}: ${resposta.erro?.mensagem ?? 'operação recusada.'}`;
+  }
+  if (resposta.resultado !== undefined && resposta.resultado !== null) {
+    if (typeof resposta.resultado === 'string') return resposta.resultado;
+    if (typeof resposta.resultado === 'object') {
+      try {
+        return `${nome}: operação concluída.\n` + JSON.stringify(resposta.resultado, null, 2);
+      } catch {
+        // fallback
+      }
+    }
+  }
+  return `${nome}: operação concluída.`;
 }
 
 function respostaFalhaInterna(nome, erro) {

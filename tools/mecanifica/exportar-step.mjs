@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportarCad, separarCorpos, validarMalha, validarOpcoes } from '../../modulos/exportador-cad/src/index.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(AQUI, '../..');
@@ -70,18 +71,7 @@ export async function carregarReceita(caminhoArquivo) {
     throw new Error('Caminho do arquivo da receita é obrigatório. Use --arquivo=<caminho>.');
   }
 
-  const caminhoAbsoluto = isAbsolute(caminhoArquivo)
-    ? resolve(caminhoArquivo)
-    : resolve(process.cwd(), caminhoArquivo);
-
-  const rel = relative(REPO, caminhoAbsoluto);
-  if (rel.startsWith('..') || isAbsolute(rel)) {
-    throw new Error(`Confinamento violado: o arquivo '${caminhoArquivo}' está fora do repositório.`);
-  }
-
-  if (!existsSync(caminhoAbsoluto)) {
-    throw new Error(`Arquivo da receita não encontrado: ${caminhoAbsoluto}`);
-  }
+  const caminhoAbsoluto = resolverCaminhoReceita(caminhoArquivo, { raiz: REPO });
 
   const mod = await importarReceita(caminhoAbsoluto);
   const receita = mod.PASSOS || mod.CHAMADAS_COMPOSICOES

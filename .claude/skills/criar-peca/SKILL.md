@@ -15,6 +15,8 @@ O contrato que esta skill executa é
 o que conta como peça e não montagem, identidade estável, isolamento, limites
 do controle, propagação de alteração, validação em camadas, invariantes e
 desvios a evitar. A skill diz **como fazer**; o contrato diz **o que vale**.
+Para a anatomia de receitas procedurais, armadilhas conhecidas de sintaxe e
+esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md).
 
 ## Caminho curto
 

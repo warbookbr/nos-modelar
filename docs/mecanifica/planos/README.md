@@ -4,6 +4,16 @@
 
 **Plano ativo:** Nenhum.
 
+A [melhoria da esteira de autoria para
+IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md) e a
+[modelagem da prensa hidráulica
+H-frame](../../superpowers/plans/2026-09-03-modelagem-prensa-hidraulica.md) são
+planos de execução, não planos executivos datados: entregaram endereço único de
+receita, auto-ativação da sessão no `olhar-bancada` e a prensa em
+`maquinas/prensa-hidraulica/`. Declará-los como plano ativo reprovava
+`planos:check`, que exige que a declaração aponte para um arquivo datado em
+estado `ativo` nesta pasta.
+
 **Pronto para ativação:** [esteira confiável para a
 IA](2026-09-07-esteira-confiavel-para-ia.md) — corrigir o laço que a IA repete
 (descrever, ativar, olhar, medir, corrigir) e cortar o que ela precisa ler antes

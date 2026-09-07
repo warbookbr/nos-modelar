@@ -12,7 +12,7 @@ import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'no
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
@@ -68,8 +68,19 @@ const QUEBRADA = `export const receita = {
 };
 `;
 
+let sessaoOriginal = null;
+
+beforeAll(() => {
+  if (existsSync(SESSAO)) {
+    sessaoOriginal = readFileSync(SESSAO, 'utf8');
+  }
+});
+
 afterAll(() => {
   for (const caminho of temporarias) rmSync(caminho, { force: true });
+  if (sessaoOriginal !== null) {
+    writeFileSync(SESSAO, sessaoOriginal, 'utf8');
+  }
 });
 
 describe('ativar-bancada: grito do motor é recusa', () => {
@@ -100,5 +111,15 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     const { erro } = ativar(receitaTemporaria('quebrada3', QUEBRADA));
     expect(erro).toMatch(/passo \d+ \(loft\)/);
     expect(erro).toContain('paralela à tangente');
+  });
+
+  it('aceita argumento posicional e nome curto sem --peca ou --arquivo', () => {
+    const caminho = receitaTemporaria('posicional', BOA);
+    const nomeSimples = caminho.replace(/^.*[\\/]/, '').replace(/\.js$/, '');
+    const proc = execFileSync('node', [ATIVAR, nomeSimples], {
+      cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    expect(proc).toContain('✓');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
   });
 });
