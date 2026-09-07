@@ -1,0 +1,85 @@
+/* As duas ferramentas da varredura vistas pela porta MCP.
+ *
+ * Um agente que fala com o Mecanifica por MCP não roda `npm run`. Se a porta
+ * não anunciar estas duas, ele continua alterando número no escuro — que é o
+ * desperdício que elas cortam. Este arquivo prova que ela anuncia, que elas
+ * respondem, e que não escrevem nada. */
+import { describe, expect, it } from 'vitest';
+import { criarFerramentasParametros } from './parametros.mjs';
+
+const ferramentas = criarFerramentasParametros();
+const pegar = (nome) => ferramentas.find((f) => f.nome === nome);
+
+async function chamar(nome, entrada) {
+  const f = pegar(nome);
+  const executado = await f.executar(entrada);
+  return { executado, estruturado: f.estruturar(executado), conteudo: f.conteudo(executado) };
+}
+
+describe('porta MCP da varredura', () => {
+  it('anuncia as duas como somente leitura', () => {
+    expect(ferramentas.map((f) => f.nome)).toEqual(['diagnosticar_parametros', 'varrer_parametros']);
+    for (const f of ferramentas) {
+      expect(f.anotacoes).toMatchObject({ readOnlyHint: true, destructiveHint: false });
+      expect(f.inputSchema).toBeDefined();
+      expect(f.outputSchema).toBeDefined();
+    }
+    /* A descrição precisa dizer que o custo existe: um agente que leia só
+       "encontra o melhor valor" vai acreditar no melhor número. */
+    expect(pegar('varrer_parametros').descricao).toMatch(/QUEBRA|pioraram|custo/);
+    expect(pegar('diagnosticar_parametros').descricao).toMatch(/ANTES de alterar/);
+  });
+
+  it('diagnostica um alvo e o acervo, com a mesma resposta da CLI', async () => {
+    const um = await chamar('diagnosticar_parametros', { alvo: 'cadeira-de-madeira' });
+    expect(um.estruturado.ok).toBe(true);
+    expect(um.estruturado.resultado.totais).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
+    expect(um.estruturado.resultado.vivos).toContain('perna.secaoTopo');
+    expect(um.conteudo[0].text).toContain('PARÂMETROS DE cadeira-de-madeira');
+
+    const todos = await chamar('diagnosticar_parametros', { acervo: true });
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 103, vivos: 13, inertes: 90 });
+  }, 90_000);
+
+  it('varre sensibilidade e devolve onde olhar', async () => {
+    const r = await chamar('varrer_parametros', { alvo: 'cadeira-de-madeira', criterio: 'menor-folga' });
+    expect(r.estruturado.ok).toBe(true);
+    expect(r.estruturado.resultado.movem).toEqual(['perna.secaoTopo']);
+    expect(r.estruturado.resultado.variantes).toBe(42);
+    expect(r.estruturado.resultado.ondeOlhar.length).toBeGreaterThan(0);
+    expect(r.conteudo[0].text).toContain('nada foi aplicado');
+  }, 90_000);
+
+  it('no lote, entrega o custo junto do número — não só o número', async () => {
+    const r = await chamar('varrer_parametros', {
+      alvo: 'cadeira-de-madeira',
+      criterio: 'folga:saiaLateral,saiaTraseira',
+      livres: ['perna.secaoTopo:0.04..0.08:11', 'saia.esp:0.02..0.05:11'],
+      objetivo: 'minimizar',
+    });
+    const primeiro = r.estruturado.resultado.candidatos[0];
+    expect(primeiro.valor * 1000).toBeCloseTo(0, 1);
+    expect(primeiro.custo.pioradas).toBeGreaterThan(5);
+  }, 120_000);
+
+  it('recusa entrada ambígua com ação, em vez de escolher sozinha', async () => {
+    const semAlvo = await chamar('diagnosticar_parametros', {});
+    expect(semAlvo.estruturado.ok).toBe(false);
+    expect(semAlvo.estruturado.erro.acao).toContain('acervo:true');
+
+    const semValor = await chamar('varrer_parametros', {
+      alvo: 'cadeira-de-madeira',
+      livres: ['perna.secaoTopo:0.04..0.05:3'],
+      objetivo: 'alvo',
+    });
+    expect(semValor.estruturado.ok).toBe(false);
+    expect(semValor.estruturado.erro.codigo).toBe('objetivo_incompleto');
+  }, 60_000);
+
+  it('rejeita campo desconhecido no schema em vez de ignorar em silêncio', () => {
+    const schema = pegar('varrer_parametros').inputSchema;
+    expect(schema.safeParse({ alvo: 'x', criterioo: 'menor-folga' }).success).toBe(false);
+    expect(schema.safeParse({ alvo: 'x', delta: 1.5 }).success).toBe(false);
+    expect(schema.safeParse({ alvo: 'x', livres: ['a:0..1:3'], objetivo: 'maximizar' }).success).toBe(true);
+  });
+});

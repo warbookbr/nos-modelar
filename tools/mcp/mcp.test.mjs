@@ -181,10 +181,11 @@ describe('servidor MCP local — perfil revisao', () => {
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',
+      'diagnosticar_parametros', 'varrer_parametros',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
-      expect(ferramentas.result.tools).toHaveLength(19);
+      expect(ferramentas.result.tools).toHaveLength(21);
       expect(ferramentas.result.tools.find(({ name }) => name === 'revisar_montagem')?.description)
         .toContain('A listagem não é aprovação nem homologação.');
       for (const tool of ferramentas.result.tools) {
@@ -322,6 +323,7 @@ describe('servidor MCP local — perfil revisao', () => {
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',
+      'diagnosticar_parametros', 'varrer_parametros',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
       ]);
@@ -652,6 +654,7 @@ describe('servidor MCP local — perfil revisao', () => {
         'buscar_capacidades', 'descrever_capacidade', 'combinar_capacidades', 'validar_composicao', 'analisar_lacuna', 'diagnosticar_extensao',
         'ativar_bancada', 'exportar_step',
       'exportar_obj',
+      'diagnosticar_parametros', 'varrer_parametros',
         'descrever_peca', 'validar_pacote', 'comparar_revisoes', 'renderizar_vistas',
         'descrever_montagem', 'planejar_revalidacao_montagem', 'catalogar_montagens', 'renderizar_montagem', 'revisar_montagem', 'consultar_impacto_global',
         'consultar_campanha_revalidacao', 'consultar_item_revalidacao', 'registrar_resultado_revalidacao', 'obsoletar_item_revalidacao', 'obsoletar_campanha_revalidacao',

@@ -12,6 +12,7 @@ import { criarFerramentasAutoriaReceitas } from './perfis/autoria-receitas.mjs';
 import { criarFerramentasRevalidacao } from './perfis/revalidacao.mjs';
 import { criarFerramentasProcedurais } from './perfis/procedural.mjs';
 import { criarFerramentasAutoriaExecucao } from './perfis/autoria-execucao.mjs';
+import { criarFerramentasParametros } from './perfis/parametros.mjs';
 import { catalogoMontagensDoAmbiente, REGRA_ESCOPO_CATALOGO } from './catalogo-montagens.mjs';
 import { universoDependenciasDoAmbiente } from './universo-dependencias.mjs';
 import {
@@ -336,6 +337,7 @@ export function criarServidor({
   const leitura = [
     ...criarFerramentasProcedurais(servicoProcedural),
     ...criarFerramentasAutoriaExecucao(),
+    ...criarFerramentasParametros(),
     ...criarFerramentasRevisao(catalogoAtivo),
     ...criarFerramentasMontagem(catalogoAtivo),
     ...criarFerramentasImpactoGlobal(universoAtivo),

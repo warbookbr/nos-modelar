@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-779 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+781 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -898,6 +898,8 @@
 - `autoria-receitas.test.mjs` — Contrato fino da porta MCP de autoria declarativa.
 - `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
+- `parametros.mjs` — parametros.mjs — ferramentas MCP da varredura paramétrica.
+- `parametros.test.mjs` — As duas ferramentas da varredura vistas pela porta MCP.
 - `procedural.mjs` — procedural.mjs — adaptador MCP fino sobre o serviço puro de descoberta.
 - `revalidacao.mjs` — revalidacao.mjs — porta MCP Agent-First sobre campanhas persistidas.
 - `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.
