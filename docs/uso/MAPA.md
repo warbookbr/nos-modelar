@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-780 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+783 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -828,6 +828,7 @@
 ## tools/
 
 - `README.md` — tools/ — ferramentas da Mecanifica e do núcleo herdado
+- `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
 
 ## tools/arquitetura/
 
@@ -873,6 +874,7 @@
 
 ## tools/mapa/
 
+- `citacoes.mjs` — citacoes.mjs — documento de leitura obrigatória não pode mandar abrir arquivo que não existe.
 - `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
 - `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
@@ -935,6 +937,7 @@
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.
 - `caminho-procedural.test.ts` — caminho-procedural.test.ts — a raiz da Oficina é neutra e não volta a fps.
+- `capacidade-symlink.mjs` — capacidade-symlink.mjs — este ambiente consegue criar vínculo simbólico?
 - `capturar-montagem.mjs` — capturar-montagem.mjs — serviço importável de vistas de montagem em memória.
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /

@@ -10,8 +10,11 @@ Pelo MCP, prefira `descrever_capacidade`: ele entrega somente o contrato complet
 da operação pedida. O executor continua sendo a autoridade final para validar
 uma receita concreta e produzir recusas ligadas ao estado real da malha.
 
-O acervo de receitas está vazio; nomes de peças em exemplos históricos desta
-referência não são caminhos disponíveis nem modelos para copiar.
+As peças citadas como exemplo nesta referência foram removidas do acervo em
+`c78961f`. As lições continuam medidas e válidas — o que não existe mais é o
+arquivo para abrir. O acervo atual está em `prototipos/procedural/v3/pecas/` e
+`prototipos/procedural/v3/armas/`; a tabela "Contrato mínimo" da skill diz qual
+receita ler para cada forma.
 
 ## Navegação
 
@@ -157,7 +160,8 @@ com `para` válido e `de` ausente ele volta CALADO, 0 órfão e 0 mudança, ent�
 ali nem o grito te salva — confira o efeito, não a ausência de erro. Quem
 precisa de identidade estável compõe por primitiva +
 `transladar`/`rotaciona`/`espelha` endereçados por `origem`/`alias`: a peça de
-referência sem id cru (`freio-disco.js`) não usa nenhuma das seis. Se o assunto
+referência sem id cru, um disco de freio com dezessete aliases, não usava
+nenhuma das seis (peça removida do acervo; a medida permanece). Se o assunto
 exigir uma delas (correção de normal, solda), use — e REPORTE, porque é lacuna
 de contrato, não estilo.
 
@@ -166,8 +170,8 @@ que remove face — logo a única forma de abrir um furo, uma porta, um vão —
 núcleo já lhe deu o ramo semântico: `sel:{...}` resolvido pelos mesmos sete
 campos, exigindo **exatamente uma face**, gritando em ambiguidade e em seleção
 vazia. Abrir um vão **não custa id posicional**; escrever `['apagaFace',
-{ face: 4003 }]` é dívida escolhida, não imposta. A forma certa está na peça de
-exercício `pecas/_vao-e-anteparo.js`:
+{ face: 4003 }]` é dívida escolhida, não imposta. A forma certa, medida numa peça de
+exercício hoje removida do acervo, é citar a face pela origem:
 
 ```js
 // o vão: remove a tampa de fundo da carcaça, POR NOME, sem citar id
@@ -176,7 +180,7 @@ exercício `pecas/_vao-e-anteparo.js`:
 
 Cuidado com a assimetria: `vira` (a op irmã, que conserta normal invertida)
 continua sem caminho semântico — provar `vira` custa exatamente uma referência
-posicional, e o cabeçalho de `_vao-e-anteparo.js` declara essa dívida alto em
+posicional, e quem precisar dela declara essa dívida no cabeçalho da peça, em
 vez de escondê-la.
 
 **O SENTIDO da rotação — DESTRO nos três eixos.** A fórmula `p' = pivo +
@@ -212,7 +216,7 @@ horizontal (disco de freio, cubo de roda, pistão, polia, virabrequim) mora em
 leva `+Y` para `+X`, e `+90` levaria para `-X`, espelhando o conjunto inteiro:
 
 ```js
-// põe uma primitiva de revolução no eixo X (o helper `paraEixoX` do freio-disco)
+// põe uma primitiva de revolução no eixo X
 ['rotaciona', { eixo: 'z', graus: -90, pivo: [0, 0, 0], sel: { origem: { op: 'cilindro', id } } }],
 ```
 
@@ -220,7 +224,7 @@ O `pivo` explícito é obrigatório aqui pelo motivo da linha do `rotaciona` aci
 o default (centroide da seleção) giraria a primitiva em torno de si mesma, e ela
 ficaria deitada **no lugar onde já estava** em vez de no eixo do conjunto. Depois
 da rotação, o que era `tampa:'fundo'` (y=0) fica no **menor x** e `tampa:'topo'`
-no **maior x** — é assim que `freio-disco.js` chama `pistaInterna`/`pistaExterna`
+no **maior x** — é assim que um disco de freio nomeia `pistaInterna`/`pistaExterna`
 por alias, sendo `+X` o lado de FORA do carro.
 
 **Seleção semântica (`sel`, D-129/D-130/D-131):** os SETE campos são `tudo`,
@@ -293,9 +297,9 @@ posicional do PASSO não ganha novo significado.
 
 **`origem` SEM eixo já é a primitiva inteira — não escreva a união à mão.**
 `sel:{origem:{op:'cubo',id}}` sem `face` são as 6 faces vivas (medido: 6 de 6);
-no `loft`/`lathe`, `{}` é a união de todas as faixas. Recurso que existe e
-nenhuma peça legada usa: o `drone-inspecao.js` ainda une as seis faces do cubo
-à mão por um helper JS (`facesCubo`) — é dívida herdada, não modelo a copiar.
+no `loft`/`lathe`, `{}` é a união de todas as faixas. Recurso que existe e as
+peças legadas não usavam: uma delas unia as seis faces do cubo à mão por um
+helper JS (`facesCubo`) — era dívida herdada, não modelo a copiar.
 **O `cilindro` é a exceção que morde:** sem `lado` nem `tampa` são só as
 LATERAIS (medido: 8 de 10 faces num cilindro de 8 lados), porque essa é a única
 forma de dizer "o bordo, não as tampas" — `sel:{regiao}` não separa as duas (os
@@ -305,7 +309,7 @@ termos: lateral + `tampa:'fundo'` + `tampa:'topo'`.
 **`ALIASES` — dar NOME à seleção, o caminho que dispensa id de face.** A peça
 exporta uma lista de pares `[nome, definição]` e qualquer passo cita
 `sel:{alias:'nome'}`. É o que torna uma peça inteira escrevível sem um único id
-cru: `pecas/freio-disco.js` tem **17 aliases e 0 id de vértice/face**. Alias é
+cru: a peça de referência medida tinha **17 aliases e 0 id de vértice/face**. Alias é
 NOME DE SELEÇÃO, não `parte` — quem nomeia faces é a op `parte` (e só ela
 alimenta `sel:{grupo}`); confundir os dois já produziu peça errada com todos os
 gates verdes (D-140, no drone).
@@ -383,8 +387,8 @@ histórica, não simetria).
 (e `colisaoDe(PASSOS, PARAMS, TOPO, MATERIAIS = {}, ALIASES = [])`,
 `nucleo(PASSOS, PARAMS, TOPO, MATERIAIS = {}, ESQUELETO = null, ALIASES = [])` —
 os argumentos posicionais NÃO estão na mesma ordem nas três; confira antes de
-copiar). Exemplos: `_oficina-anim.js` (partes), `_oficina-esqueleto.js` (rig
-completo); peça com `ALIASES` encaminhado: `freio-disco.js`, `drone-inspecao.js`.
+copiar). As peças que exercitavam animação, esqueleto e encaminhamento de `ALIASES`
+saíram do acervo; o contrato acima continua valendo e é conferido por teste.
 
 **Alcance honesto:** caixa+cilindro+esfera+cone+plano+lathe+loft+extruda+move
 cobrem arquitetura, móveis, props angulados, troncos, bolas, chão, perfil
@@ -403,10 +407,11 @@ reporte o limite (ou use o caminho JS-puro abaixo). `chamferBox` destrava caixa
 ainda faces PLANAS, só sem quina viva); `displace` quebra a monotonia de
 qualquer malha fechada com relevo orgânico determinístico (pedra, tronco
 áspero, terreno) — os dois juntos (chamferBox + displace) dão pedra
-lascada/rocha sem precisar de `inflate`. Exemplo das primitivas novas:
-`_primitivas.js`; do loft com raio: `_galho.js`; do loft com contorno
-explícito (seção não-circular): `_viga.js`; do inflate: `_corpo.js`; do
-chamferBox+displace: `_pedra.js`.
+lascada/rocha sem precisar de `inflate`. As peças de exercício que demonstravam cada
+uma dessas primitivas saíram do acervo. Para ver a operação em uso hoje, a
+tabela "Contrato mínimo" da skill aponta a receita atual por FORMA — caixa e
+junção, seção que viaja, assimetria num plano, detalhe repetido em torno de um
+eixo.
 
 ## Limites honestos
 

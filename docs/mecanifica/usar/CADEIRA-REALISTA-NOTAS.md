@@ -21,11 +21,11 @@ A referência gerada apresenta uma cadeira de jantar em carvalho maciço com mar
 ### 2.1 Desempacotamento de Receitas em `descrever-peca.mjs`
 - **Problema:** A CLI `npm run descrever -- cadeira-de-madeira --estrito` falhava com `PEÇA SEM ENVELOPE DA OFICINA: 'cadeira-de-madeira' não exporta PASSOS nem CHAMADAS_COMPOSICOES`.
 - **Causa:** O script lia `modulo.PASSOS` diretamente no topo do arquivo importado, ignorando o padrão v3 de envelope (`export const receitaCadeiraDeMadeira = { PASSOS, ... }`).
-- **Solução aplicada:** Atualizado `tools/mecanifica/descrever-peca.mjs` para extrair a receita via `modulo.default ?? Object.values(modulo).find(...)` de forma uniforme com `ativar-bancada.mjs` e `executar-receita.js`.
+- **Solução aplicada:** Atualizado `tools/mecanifica/descrever-peca.mjs` para extrair a receita via `modulo.default ?? Object.values(modulo).find(...)` de forma uniforme com `tools/mecanifica/ativar-bancada.mjs` e `src/autoria/executar-receita.js`.
 
 ### 2.2 Inspeção Headless com `olhar-bancada.mjs` vs. Harness Privado
 - **Problema:** `npm run bancada -- cadeira-de-madeira --cores` expirava com `page.waitForFunction: Timeout 30000ms exceeded`.
-- **Causa:** O harness privado (`harness.html` / `harness-entry.js`) propositalmente restringe seu catálogo interno a fixtures homologadas de regressão (`fixture-visual`, `fixture-portas`, etc.). Peças de prova não catalogadas precisam ser carregadas pela **Sessão Ativa** (`public/sessao-ativa.json`) na aplicação oficial `bancada.html`.
+- **Causa:** O harness privado (`tools/bancadas/harness.html` / `tools/bancadas/harness-entry.js`) propositalmente restringe seu catálogo interno a fixtures homologadas de regressão (`fixture-visual`, `fixture-portas`, etc.). Peças de prova não catalogadas precisam ser carregadas pela **Sessão Ativa** (`public/sessao-ativa.json`) na aplicação oficial `bancada.html`.
 ### 2.3 Servidor Local Vite em Execução Contínua
 - **Problema:** Acesso à URL `http://localhost:5174/nos-mecanifica/bancada.html` resultava em "A conexão com localhost foi recusada".
 - **Causa:** O comando `npm run ativar:bancada` apenas processa e grava o arquivo de sincronização `public/sessao-ativa.json`; ele não inicia um daemon HTTP de longa duração.

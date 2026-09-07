@@ -110,3 +110,12 @@ jobs:
       - name: Documentação separada por uso
         run: npm run docs:estrutura:check
 
+      # `docs:links:check` confere link entre documentos; ninguém conferia o que
+      # a documentação cita em crase — caminho de arquivo e passo de npm. Vinte e
+      # duas citações mortas viviam no caminho de leitura obrigatório, a maioria
+      # apontando peças removidas do acervo em c78961f. Documento longo custa
+      # contexto; documento errado custa rodada, e cobra de quem menos pode
+      # conferir: a sessão nova, que obedece a citação por não conhecer a árvore.
+      - name: Citações de arquivo e de comando resolvem
+        run: npm run docs:citacoes:check
+

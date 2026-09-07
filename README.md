@@ -125,30 +125,16 @@ Quando uma mudança alterar o dado exportado, o procedimento é **avisar**, não
 pedir permissão: registre no PR o que mudou e siga. Compatibilidade com o
 consumidor é assunto dele, na hora em que ele decidir atualizar.
 
-Por isso toda peça abre com o mesmo selo, nestas palavras e nesta posição:
+Esta regra vale por escrito, e hoje **não** existe gate que a imponha. Houve um:
+um selo obrigatório no topo de cada receita, um modelo para copiar e um teste
+que comparava o selo byte a byte. Os três saíram juntos em `c78961f`, quando o
+acervo não homologado foi removido e o catálogo publicado passou a ser vazio —
+não fazia sentido policiar o selo de peças que tinham deixado de existir.
 
-```js
-/* PEÇA DE EXEMPLO — NÃO HOMOLOGADA, NÃO É BASE DE PROJETO.
- *
- * Todas as peças de `prototipos/procedural/v3/pecas/` são exemplos. Elas existem para
- * exercitar e provar capacidades do núcleo, e nada mais. Nenhuma é referência de
- * engenharia, componente aprovado ou ponto de partida de produto.
- *
- * Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
- * falhar, não para descrever um componente real. Esta geometria pode mudar ou
- * ser removida a qualquer momento, sem aviso e sem migração.
- *
- * O que este repositório sustenta é o núcleo e as capacidades provadas — nunca
- * a geometria daqui. Ver "Peças são exemplos" no README.md.
- */
-```
-
-O selo é a primeira coisa do arquivo porque um aviso que aparece depois da
-receita não é aviso. Peça nova sem selo **reprova** em
-`tools/bancadas/pecas-sao-exemplos.test.ts`, que também recusa selo reescrito
-por conta própria — o padrão vale byte a byte, comparado com `_modelo.js`.
-
-Ao criar uma peça, copie `_modelo.js`: o selo vem junto.
+O acervo foi repovoado depois, com outras peças, e o selo não voltou. Quem
+retomar essa exigência precisa decidir as três coisas juntas: o texto do selo, o
+modelo a copiar e o gate que confere. Enquanto isso, a seção acima é o contrato,
+e cabeçalho de peça é convenção de autoria, não verificação automática.
 
 ## Desenvolvimento
 
@@ -157,7 +143,7 @@ npm ci
 npm run dev
 npm run build
 npm test
-npm run criar -- _viga
+npm run criar -- cadeira-de-madeira
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 

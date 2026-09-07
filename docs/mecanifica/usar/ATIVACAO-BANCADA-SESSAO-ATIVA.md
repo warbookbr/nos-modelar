@@ -108,7 +108,7 @@ defeitos empilhados, todos corrigidos:
 
 3. **O caminho da sessão era relativo à página, não à aplicação.**
    O harness dos gates vive em `tools/bancadas/`, então `./sessao-ativa.json`
-   resolvia para `tools/bancadas/sessao-ativa.json` (404) e a sessão nunca subia
+   resolvia para um sessao-ativa.json dentro de `tools/bancadas/`, que nunca existiu (404) e a sessão nunca subia
    em modo headless. O `fetch` passou a ancorar em `import.meta.env.BASE_URL`.
 
 4. **A câmera nunca enquadrava a peça da sessão.**
