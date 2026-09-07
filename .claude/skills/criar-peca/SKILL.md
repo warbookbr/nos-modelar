@@ -37,11 +37,8 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
    ```
 
-   O catálogo homologado da bancada publicada pode estar vazio; isso não
-   publica uma receita privada. Se a peça ainda não estiver num catálogo ou
-   harness autorizado, use o pacote de modelagem (`preparar:modelagem`,
-   `validar:modelagem`, `revisar:modelagem`) ou o perfil MCP de autoria, e
-   registre a captura como bloqueada até existir um adaptador privado explícito.
+   O catálogo publicado está vazio de propósito, e isso não impede nada: a peça
+   em trabalho é ativada na sessão e capturada pelo nome curto.
 
 4. **Isole por pergunta, não por hábito.** Peça inteira numa imagem só esconde
    erro estrutural debaixo de detalhe. A bancada tem três modos, e cada um
@@ -66,8 +63,11 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    `--par a,b` isola exatamente duas peças e já enquadra, para julgar um encaixe.
 
 5. Registre pelo menos uma medida ou gate por rodada e itere sobre defeitos
-   concretos. A bancada confirma enquadramento; não decide sozinha se a forma
-   atende ao briefing.
+   concretos. `npm run malha:conferir -- <peça>` pega fechamento e face de área
+   nula, que o olho não vê e o `descrever` não cobre. `npm run diario` diz onde o
+   tempo foi e o que você repetiu sem a receita mudar — as ferramentas registram
+   sozinhas, você não relata nada. A bancada confirma enquadramento; não decide
+   se a forma atende ao briefing.
 6. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
    compatibilidade e gabarito, quando a receita local e esses artefatos forem
    autorizados. Esse visor legado é diagnóstico; não transforma a peça em
@@ -187,24 +187,18 @@ registre essa lacuna como evidência para uma futura operação.
 
 Peça nova precisa de cabeçalho no primeiro comentário, pois `mapa:check` o
 exige. Para uma iteração local, execute descrição, bancada e `criar`. Antes de
-publicar uma mudança, use os gates aplicáveis do índice:
+publicar uma mudança:
 
 ```bash
-npm test
-npm run typecheck
-npm run build
-npm run porteiro
-npm run guarda:portas
-npm run guarda:camera
-npm run guarda:par
-npm run mapa:check
-npm run docs:toc:check
-npm run docs:links:check
-npm run planos:check
-npm run exportar:check
-npm run catalogo:check
-npm run mcp:check
+npm run gates
 ```
+
+Roda todos e relata todos numa execução, com saída não-zero se algum falhar.
+Esta seção listava os gates um a um; era a terceira cópia da mesma lista, e
+lista repetida em três lugares envelhece em três velocidades. A fonte é
+`tools/gates.mjs`, conferida contra o `ci.yml` nos dois sentidos.
+
+Enquanto conserta um gate específico: `npm run gates -- --parar-no-primeiro`.
 
 O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.
 

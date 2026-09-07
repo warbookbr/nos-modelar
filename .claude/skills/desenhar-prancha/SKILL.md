@@ -12,7 +12,12 @@ bancada.
 Ferramentas:
 `tools/mecanifica/prancha.mjs` (motor) e
 `tools/mecanifica/prancha-geometria.mjs` (traçado e medida).
-Exemplo vivo: `tools/mecanifica/prancha-chassi-p0.mjs`.
+Exemplo: `tools/mecanifica/prancha-chassi-p0.mjs` — leia como uso do motor, não
+como alvo. Os landmarks daquele P0 estão marcados NÃO VINCULANTES no próprio
+documento: eles foram inventados e usados como alvo por rodadas, e o perfil
+medido de um cupê real põe o alto do nariz 321 mm abaixo do que o P0 declarava
+(V-27). O programa de carroceria está congelado; esta skill continua valendo
+para qualquer carenagem ou invólucro.
 
 ## Porta zero: declarar se o alvo pode existir
 

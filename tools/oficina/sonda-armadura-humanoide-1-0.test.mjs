@@ -89,7 +89,13 @@ describe('Mecanifica 1.0 — sonda da armadura humanoide original', () => {
       expect(interpenetracoes).toHaveLength(estado === 'neutra' ? 15 : 16);
       expect(interpenetracoes.every(({ expectativa }) => expectativa?.id && expectativa?.motivo)).toBe(true);
     }
-  });
+    /* 30 s, não os 5 s do padrão: sozinho este teste fecha em ~0,7 s, mas
+       executa a armadura inteira DUAS vezes — neutra e articulada — e audita
+       todos os pares das duas. Na suíte agregada, com os arquivos em paralelo,
+       ele estourava os 5 s e aparecia como falha. Teste que passa isolado e
+       falha junto ensina a desconfiar da suíte, e é o mesmo defeito que o
+       estudo de campo do R05 tinha: orçamento de tempo menor que o trabalho. */
+  }, 30_000);
 
   it('reduz contexto e pares por membro e encontra quatro consumidores da junta', () => {
     const global = descreverMontagemResolvida(estudo.estados.neutra);

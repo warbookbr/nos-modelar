@@ -18,7 +18,7 @@ semântica (`pai`) com apoio físico — nome certo, peça flutuando.
 ## Fluxo de Trabalho (Pipeline)
 
 ```text
-1. Conceito Visual (generate_image) -> Fixar em referencias/
+1. Referência visual fixada em referencias/ (ver passo 1)
 2. Plano de Decomposição Modular (Estrutura, Cinemático, Ferramental)
 3. Autoria Procedural em PASSOS (Nomes semânticos por parte)
 4. Provas de Bancada e Validação de Montagem (Sem órfãos, alinhamento)
@@ -32,7 +32,18 @@ semântica (`pai`) com apoio físico — nome certo, peça flutuando.
 
 Ao receber um pedido de criação de máquina (ex: *"Gere uma prensa modelo X"*):
 
-1. **Gerar Render Conceitual:** Utilize a ferramenta `generate_image` para criar a imagem de referência ortográfica/isométrica da máquina com proporções mecânicas realistas.
+1. **Fixar a referência.** A máquina precisa de um ALVO antes da primeira forma,
+   e ele tem de existir como arquivo — o modo de falha documentado é modelar
+   contra a própria intuição e medir depois (ver
+   [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md)). Três
+   origens, da mais forte para a mais fraca: uma foto ou desenho técnico que o
+   usuário forneça; uma prancha ortográfica desenhada com a skill
+   `desenhar-prancha`; ou, se o ambiente oferecer geração de imagem, um render
+   conceitual — que orienta caráter e proporção, nunca medida (V-35).
+
+   Esta seção mandava chamar `generate_image` como passo obrigatório. Ferramenta
+   que pode não existir no ambiente não pode ser o passo 1 de um fluxo: a skill
+   começava por um comando que falha, e quem a seguisse parava na primeira linha.
 2. **Criar Diretório da Máquina:**
    Crie a pasta correspondente em `prototipos/procedural/v3/maquinas/<nome-da-maquina>/`.
 3. **Fixar Imagem de Referência:**
@@ -110,12 +121,11 @@ Após qualquer alteração ou criação de novos arquivos:
 
 ```powershell
 npm run mapa
-npm run mapa:check
-npm run docs:links:check
-npm run typecheck
-npm run mcp:check
-npm test
+npm run gates
 ```
+
+`mapa` regenera o inventário (nunca editado à mão); `gates` roda todos os
+verificadores e relata todos numa execução.
 
 ---
 

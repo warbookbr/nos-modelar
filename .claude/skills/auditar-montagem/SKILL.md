@@ -122,3 +122,13 @@ Separe fatos estruturais, medidas, observações visuais e inferências. Informe
 o caminho semântico afetado, a relação que falhou, o alcance do impacto e o
 que ficou fora da verificação. Não use índice de array, UUID ou caminho local
 como identidade pública.
+
+## Gates
+
+```bash
+npm run gates
+```
+
+Roda todos e relata todos numa execução, com saída não-zero se algum falhar. Se
+a auditoria custou mais rodadas do que devia, `npm run diario` mostra onde —
+as ferramentas registram sozinhas, sem você relatar nada.

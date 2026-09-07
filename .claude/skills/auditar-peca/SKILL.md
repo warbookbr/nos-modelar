@@ -101,27 +101,21 @@ peça isolada e não inventa validade global de uma montagem.
 
    A promoção deve ser feita pelo fluxo; não crie `revisao.json` manualmente.
 
-6. Rode os gates aplicáveis:
+6. Rode os gates:
 
    ```bash
-   npm test
-   npm run typecheck
-   npm run build
-   npm run porteiro
-   npm run guarda:portas
-   npm run guarda:camera
-   npm run guarda:par
-   npm run mapa:check
-   npm run docs:toc:check
-   npm run docs:links:check
-   npm run planos:check
-   npm run exportar:check
+   npm run gates
    ```
+
+   Roda todos e relata todos numa execução. Esta seção listava doze deles à mão,
+   e a lista já tinha ficado para trás — a fonte é `tools/gates.mjs`, conferida
+   contra o `ci.yml` nos dois sentidos.
 
    Para uma peça nova ou alterada, inclua também:
 
    ```bash
    npm run criar -- <peca>
+   npm run malha:conferir -- <peca>
    ```
 
    `porteiro`, `npm run peca` e `npm run criar` ainda podem ajudar a diagnosticar
