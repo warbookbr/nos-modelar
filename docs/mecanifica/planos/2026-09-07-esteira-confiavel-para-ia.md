@@ -100,21 +100,10 @@ cobrado: o critério é o `.gitignore`.
 
 ### R03 — cortar o obrigatório — **concluída**
 
-`GOTCHAS-AUTORIA-VISUAL.md` tem 36 KB e é leitura obrigatória. Medido por seção:
-**15,6 KB são o registro histórico V-01..V-38**, quase todo sobre o programa de
-carroceria, que está congelado; **7 KB são as lições operacionais de motor**
-(`loft` contra `inflate`, furar chapa, armadilhas de `loft`, proporção) que
-valem para qualquer peça.
-
-1. o registro V vai para `historico/`, citado e consultável, fora do obrigatório;
-2. os quatro blocos hoje repetidos palavra por palavra em três skills
-   (`OLHE a imagem`, `Despachar o crítico`, `abra o alvo e sobreponha`,
-   `o método tem limite`) viram um documento só, citado pelas três;
-3. o `GUIA-AUTORIA-IA.md` que chega no R00 é reconciliado com o que já existe,
-   para acrescentar caminho e não acrescentar volume.
-
-**Gate:** `npm run leitura:obrigatoria` mede a lista declarada contra o teto;
-gates de documentação verdes; nenhuma lição perdida.
+`GOTCHAS-AUTORIA-VISUAL.md` tinha 36 KB de leitura obrigatória, dos quais
+**15,6 KB eram o registro V-01..V-38** — quase todo sobre o programa de
+carroceria, congelado — contra **7 KB de lições operacionais de motor** que
+valem para qualquer peça. O gate é `npm run leitura:obrigatoria` contra o teto.
 
 **Resultado: 119,8 KB → 69,8 KB, 42% a menos, sem perder uma lição.** Saíram
 para `historico/REGISTRO-FALHAS-AUTORIA-V.md` a tabela V-01..V-38 e as três
@@ -134,25 +123,32 @@ saber que era a errada.
 `npm run leitura:obrigatoria` entrou no `gates` e no `ci.yml`: o teto vira
 catraca, e voltar a crescer passa a exigir decisão explícita.
 
-### R04 — diário da oficina
+### R04 — diário da oficina — **concluída**
 
 Só depois de R00–R03, porque medir esteira quebrada mede a quebra.
 
-Um módulo compartilhado, importado pelos CLIs que a IA já roda, grava uma linha
-JSONL por invocação, fora do versionamento: instante, comando, alvo normalizado,
-duração, código de saída, se produziu o artefato prometido, e os contadores que
-a ferramenta **já calcula** (partes, faces, órfãos, achados).
+Um módulo importado pelos CLIs que a IA já roda grava uma linha JSONL por
+invocação, fora do versionamento, com o que a ferramenta já sabia. A unidade é a
+**rodada** — entre duas gravações da receita —, não a tarefa: assim a leitura não
+precisa comparar machado com cadeira. Mensagem de erro que se repete entre
+sessões é defeito de ferramenta ou de documento, nunca do agente.
 
-A unidade de análise é a **rodada** — o intervalo entre duas gravações do arquivo
-da receita — e não a tarefa. Isso responde onde o tempo vai e onde está a
-dificuldade sem precisar comparar machado com cadeira: soma de duração por
-comando, repetição do mesmo comando no mesmo alvo, e frequência de cada mensagem
-de erro. Mensagem que se repete entre sessões é defeito de ferramenta ou de
-documento — nunca do agente.
+**Resultado:** `npm run diario` responde as quatro perguntas — onde vai o tempo,
+onde emperra, o que falha, e o que saiu 0 sem entregar. As garantias estão em
+teste: ligado e desligado produzem a MESMA saída e o mesmo código, falha ao
+gravar não derruba quem está sendo medido, e nome curto e caminho completo caem
+na mesma rodada.
 
-**Gate:** o laço completo de uma peça produz diário legível; o diário não muda
-nenhuma saída existente; desligá-lo não altera nenhum resultado; e uma leitura
-do diário aponta pelo menos um desperdício que não estava nesta lista.
+A primeira leitura real já apontou o que a lista de abertura não tinha: das
+quatro invocações de um laço, `olhar-bancada` levou 3.309 ms dos 3.451 ms — 96%
+do tempo está em produzir imagem, e é ali que qualquer ganho seguinte tem de
+sair.
+
+Ela também achou dois defeitos no próprio instrumento, os dois da família que o
+R01 tratou: a suíte gravava no diário de quem trabalha (três recusas do motor e
+seis erros de uso que ninguém cometeu), e o leitor contava a MESMA falha sobre
+alvos diferentes como falhas distintas — a normalização existe justamente para
+que falha repetida pareça repetida.
 
 ### R05 — volume de saída por rodada
 

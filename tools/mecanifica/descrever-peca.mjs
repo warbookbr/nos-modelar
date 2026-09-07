@@ -15,6 +15,7 @@ import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { iniciarRegistro } from './diario.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -239,8 +240,15 @@ function comoCLI(argv) {
 const executadoComoCLI = process.argv[1]
   && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 if (executadoComoCLI) {
+  const fechar = iniciarRegistro('descrever', process.argv[2]);
   const resultado = await comoCLI(process.argv.slice(2));
   process.stdout.write(resultado.stdout);
   process.stderr.write(resultado.stderr);
   process.exitCode = resultado.codigo;
+  /* Depois de escrever a saída: o diário observa, nunca antecede o trabalho. */
+  fechar({
+    codigo: resultado.codigo,
+    medidas: resultado.resultado?.descricao?.totais ?? null,
+    erro: resultado.erro?.mensagem ?? null,
+  });
 }

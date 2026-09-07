@@ -152,29 +152,24 @@ npm run build
 npm run porteiro
 npm run exportar:check
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
+npm run diario
 ```
+
+`npm run diario` lê o diário da oficina, que as ferramentas do laço gravam
+sozinhas: onde o tempo foi, o que foi repetido sem a receita mudar, que erro se
+repete e o que saiu 0 sem entregar. Desligar: `MECANIFICA_DIARIO=0`.
 
 ## Gates completos
 
 ```text
-npm test
-npm run typecheck
-npm run build
-npm run porteiro
-npm run bancada:vazia:check
-npm run guarda:portas
-npm run guarda:camera
-npm run guarda:par
-npm run mapa:check
-npm run docs:toc:check
-npm run docs:links:check
-npm run planos:check
-npm run exportar:check
-npm run catalogo:check
-npm run autoria:schemas:check
-npm run mcp:check
-npm run mcp:ensaio
+npm run gates
 ```
+
+Roda TODOS e relata TODOS, com saída não-zero se algum falhar; a lista vive em
+`tools/gates.mjs` e é conferida contra o `ci.yml` nos dois sentidos. Esta seção
+era uma terceira cópia da lista, escrita à mão, e já tinha ficado para trás —
+lista repetida em três lugares envelhece em três velocidades. Para um laço curto
+enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 

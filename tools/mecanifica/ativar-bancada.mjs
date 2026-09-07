@@ -7,6 +7,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { importarReceita } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { iniciarRegistro } from './diario.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '../..');
@@ -206,6 +207,7 @@ Opcoes:
     process.exit(1);
   }
 
+  const fechar = iniciarRegistro('ativar-bancada', alvo);
   try {
     const res = await ativarReceitaBancada({
       alvo,
@@ -230,8 +232,20 @@ Opcoes:
     if (res.porta !== '5173') {
       console.log(`  (Se a porta 5174 estiver ocupada, tente http://localhost:5173/nos-mecanifica/bancada.html${res.query})`);
     }
+    fechar({
+      codigo: 0,
+      prometeu: [resolve(REPO, 'public/sessao-ativa.json')],
+      medidas: {
+        corpos: res.partesNomes.length,
+        facesSemParte: res.facesSemParte.length,
+        partesSemMaterial: res.partesSemMaterial.length,
+      },
+    });
   } catch (erro) {
     console.error(`\n✗ ${erro.message}`);
+    /* A rodada que estourou é a que mais interessa: recusa do motor aqui é o
+       sinal mais direto de que a receita mudou para pior. */
+    fechar({ codigo: 1, erro: erro.message });
     process.exit(1);
   }
 }

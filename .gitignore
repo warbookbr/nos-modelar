@@ -40,3 +40,4 @@ public/sessao-ativa.json
 # Arquivos temporários e de ambiente
 .agent/
 .mcp.json
+.diario/

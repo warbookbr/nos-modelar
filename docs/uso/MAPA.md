@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-787 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+790 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -961,6 +961,8 @@
 - `descrever-montagem.mjs` — descrever-montagem.mjs — lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. Não abre renderizador, não aplica pose e não conhece automóve…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
+- `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
@@ -987,6 +989,7 @@
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
+- `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.

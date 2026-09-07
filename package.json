@@ -73,7 +73,8 @@
     "mcp:visual:check": "node -e \"process.env.MCP_VISUAL_REAL='1';require('child_process').execSync('npm run mcp:check',{stdio:'inherit',env:process.env})\"",
     "docs:citacoes": "node tools/mapa/citacoes.mjs",
     "docs:citacoes:check": "node tools/mapa/citacoes.mjs --check",
-    "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs"
+    "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
+    "diario": "node tools/mecanifica/ler-diario.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

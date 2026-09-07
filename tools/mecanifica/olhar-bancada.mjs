@@ -12,6 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -597,8 +598,21 @@ function comoCLI(argv) {
 const executadoComoCLI = process.argv[1]
   && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 if (executadoComoCLI) {
+  const pedido = process.argv.slice(2).find((a) => a.startsWith('--peca='))?.slice('--peca='.length)
+    ?? process.argv.slice(2).find((a) => !a.startsWith('-'));
+  const fechar = iniciarRegistro('olhar-bancada', pedido);
   const resultado = await comoCLI(process.argv.slice(2));
   process.stdout.write(resultado.stdout);
   process.stderr.write(resultado.stderr);
   process.exitCode = resultado.codigo;
+  /* `arquivos` aqui é a lista PLANEJADA, montada antes da captura. Vai como
+     promessa; quem confere o disco é o diário. */
+  fechar({
+    codigo: resultado.codigo,
+    prometeu: resultado.resultado?.arquivos ?? [],
+    medidas: resultado.resultado?.vistas
+      ? { vistas: resultado.resultado.vistas.length }
+      : null,
+    erro: resultado.erro?.mensagem ?? null,
+  });
 }
