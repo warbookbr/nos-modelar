@@ -2,7 +2,18 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [o que nenhuma vista mostra](2026-09-07-o-que-nenhuma-vista-mostra.md)
+Aberto em 2026-09-07. Fecha a última família conhecida de "erra e mede limpo": as rodas da bicicleta foram
+dois cilindros concêntricos, o de fora engoliu aro, cubo e raios, e `descrever
+--estrito` passou limpo com malha aprovada e zero órfãos. Nenhuma medida atual
+pergunta o que uma parte esconde da outra.
+
+O desenho vem de duas evidências da própria sessão que o abriu: duas skills
+mandam "isole por pergunta" em destaque e não foram seguidas, e a bancada
+imprimiu uma dica junto da imagem que foi ignorada. Lembrete em prosa é
+ignorado, fato na saída é filtrado por quem estreita a leitura, e só estado que
+muda o veredito sobrevive — por isso contenção não declarada REPROVA em vez de
+avisar, e as vistas por par saem como imagem em vez de comando sugerido.
 
 O [atrito achado modelando](encerrados/2026-09-07-atrito-achado-modelando.md) foi
 **concluído e aprovado** em 2026-09-07. Modelar uma bicicleta de ponta a ponta
