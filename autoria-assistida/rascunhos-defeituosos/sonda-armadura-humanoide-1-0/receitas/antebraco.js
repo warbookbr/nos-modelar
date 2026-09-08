@@ -32,3 +32,9 @@ export const PASSOS = [
   ['solido', { sel: { grupo: 'frisoDoAntebraco' } }],
 ];
 export const meta = { nome: 'antebraco', tipo: 'objeto', desc: 'antebraço blindado com friso emissivo' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez. */
+export const contatos = [
+  { par: ['frisoDoAntebraco', 'placaDoAntebraco'], motivo: 'o friso é o reforço estampado sobre a placa' },
+];

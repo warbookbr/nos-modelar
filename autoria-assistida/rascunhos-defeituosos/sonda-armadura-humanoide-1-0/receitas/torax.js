@@ -85,3 +85,12 @@ export const PASSOS = [
 ];
 
 export const meta = { nome: 'torax', tipo: 'objeto', desc: 'torso humanoide original com placas azuis e núcleo luminoso' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez.
+   Armadura é construção em camadas — placa assentada sobre casco é o caso
+   legítimo que a medida precisa distinguir de peça que atravessa peça. */
+export const contatos = [
+  { par: ['cascoToraxGrafite', 'colarGrafite'], motivo: 'o colar nasce da borda superior do casco do tórax' },
+  { par: ['cascoToraxGrafite', 'placaPeitoralCobalto'], motivo: 'a placa peitoral assenta sobre o casco do tórax' },
+];

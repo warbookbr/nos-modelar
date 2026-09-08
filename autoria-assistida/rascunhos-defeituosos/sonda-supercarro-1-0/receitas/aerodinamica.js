@@ -15,3 +15,10 @@ export const CHAMADAS_COMPOSICOES = [
   { id: 'suporte-direito', composicao: ID_VOLUME_FACETADO, argumentos: { origem: 5105, largura: 0.045, altura: 0.22, profundidade: 0.06, chanfro: 0.010, centro: [0.38, 0.76, -1.88], parte: 'suporteAsaDireito', material: 'compostoEscuro' } },
 ];
 export const meta = { nome: 'aerodinamica', tipo: 'objeto', desc: 'aerodinâmica exterior simplificada' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez. */
+export const contatos = [
+  { par: ['asaTraseira', 'suporteAsaDireito'], motivo: 'a asa é fixada sobre o suporte direito' },
+  { par: ['asaTraseira', 'suporteAsaEsquerdo'], motivo: 'a asa é fixada sobre o suporte esquerdo' },
+];

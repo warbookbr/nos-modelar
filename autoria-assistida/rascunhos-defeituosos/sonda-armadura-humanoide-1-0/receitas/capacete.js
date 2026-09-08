@@ -77,3 +77,14 @@ export const PASSOS = [
 ];
 
 export const meta = { nome: 'capacete', tipo: 'objeto', desc: 'capacete humanoide original com visor e leitura emissiva' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez.
+   Armadura é construção em camadas — placa assentada sobre casco é o caso
+   legítimo que a medida precisa distinguir de peça que atravessa peça. */
+export const contatos = [
+  { par: ['cascoGrafite', 'placaCobaltoDireita'], motivo: 'a placa direita assenta sobre o casco do capacete' },
+  { par: ['cascoGrafite', 'placaCobaltoEsquerda'], motivo: 'a placa esquerda assenta sobre o casco do capacete' },
+  { par: ['cascoGrafite', 'visorFrontal'], motivo: 'o visor encaixa na abertura frontal do casco' },
+  { par: ['faixaEmissiva', 'visorFrontal'], motivo: 'a faixa emissiva corre embutida no visor' },
+];

@@ -27,3 +27,11 @@ export const PASSOS = [
   ['solido', { sel: { grupo: 'placaFrontalDoBraco' } }],
 ];
 export const meta = { nome: 'braco-superior', tipo: 'objeto', desc: 'segmento blindado de braço superior' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez.
+   Armadura é construção em camadas — placa assentada sobre casco é o caso
+   legítimo que a medida precisa distinguir de peça que atravessa peça. */
+export const contatos = [
+  { par: ['nucleoDoBraco', 'placaFrontalDoBraco'], motivo: 'a placa frontal assenta sobre o núcleo do braço' },
+];

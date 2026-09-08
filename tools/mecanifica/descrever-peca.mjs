@@ -11,6 +11,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
+import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -196,6 +197,39 @@ export async function descreverPecaReutilizavel({
       + `\n  ids: ${descricao.facesSemParte.slice(0, 20).join(', ')}\n`;
     falhou = true;
   }
+
+  /* CONTATO NÃO DECLARADO REPROVA. A tabela de relações acima já dizia, em
+     texto, que partes se cruzavam — e um `grep` que pedia só contagem de partes
+     e órfãos apagou o achado. O conserto não é escrever a linha melhor: é o
+     estado sair no código de saída, que filtro nenhum descarta.
+     Roda só em `--estrito` porque é veredito, e veredito é o que quem chama
+     pediu para ser cobrado. */
+  let contatos = null;
+  if (estrito) {
+    try {
+      contatos = contatosDaPeca(neutro, receita);
+    } catch (erro) {
+      return falha(`NÃO CONSEGUI MEDIR OS CONTATOS\n  ${erro.message}`);
+    }
+    if (contatos.naoDeclarados.length) {
+      stderr += `\n${contatos.naoDeclarados.length} CONTATO(S) NÃO DECLARADO(S) (--estrito)`
+        + '\n  A receita não disse que estas partes deveriam se tocar:\n'
+        + contatos.naoDeclarados
+          .map(({ par, estado, metodo }) => `    ${par[0]} ↔ ${par[1]}: ${estado} (${metodo})`)
+          .join('\n')
+        + '\n  Se o contato é intencional, declare-o em `contatos` da receita,'
+        + '\n  com o motivo. Se não é, a geometria está errada.\n';
+      falhou = true;
+    }
+    if (contatos.cobertura.inconclusivos.length) {
+      /* Não reprova: malha aberta é estilo que o motor aceita, e reprovar aqui
+         puniria peça legítima. Mas também não vira "livre" — a medida diz que
+         não conseguiu decidir, em vez de inventar garantia. */
+      stderr += `\n${contatos.cobertura.inconclusivos.length} par(es) que a medida NÃO conseguiu decidir`
+        + ' — malha aberta ou não-manifold; não são pares livres.\n';
+    }
+  }
+
   return {
     ok: !falhou,
     codigo: falhou ? 1 : 0,
@@ -205,6 +239,7 @@ export async function descreverPecaReutilizavel({
       peca,
       descricao: { ...descricao, intencao: entrada.INTENCAO ?? null },
       intencao: entrada.INTENCAO ?? null,
+      contatos,
       neutro,
       expansao,
     },

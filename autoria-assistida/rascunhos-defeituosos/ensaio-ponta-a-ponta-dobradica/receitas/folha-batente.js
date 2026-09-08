@@ -27,3 +27,10 @@ export const CHAMADAS_COMPOSICOES = [
   },
 ];
 export const meta = { nome: 'folha-batente', tipo: 'objeto', desc: 'folha privada do batente' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez. */
+export const contatos = [
+  { par: ['chapaBatente', 'olhalInferior'], motivo: 'o olhal inferior nasce da chapa e é conformado nela' },
+  { par: ['chapaBatente', 'olhalSuperior'], motivo: 'o olhal superior nasce da chapa e é conformado nela' },
+];

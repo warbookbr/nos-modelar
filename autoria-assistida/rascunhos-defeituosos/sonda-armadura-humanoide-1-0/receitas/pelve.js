@@ -56,3 +56,15 @@ export const PASSOS = [
 ];
 
 export const meta = { nome: 'pelve', tipo: 'objeto', desc: 'pelve humanoide original com placas de quadril' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez.
+   Armadura é construção em camadas — placa assentada sobre casco é o caso
+   legítimo que a medida precisa distinguir de peça que atravessa peça. */
+export const contatos = [
+  { par: ['cintoGrafite', 'placaQuadrilDireita'], motivo: 'a placa do quadril direito prende no cinto de grafite' },
+  { par: ['cintoGrafite', 'placaQuadrilEsquerda'], motivo: 'a placa do quadril esquerdo prende no cinto de grafite' },
+  { par: ['cintoGrafite', 'protecaoCentralGrafite'], motivo: 'a proteção central pende do cinto de grafite' },
+  { par: ['placaQuadrilDireita', 'protecaoCentralGrafite'], motivo: 'a proteção central encosta na placa do quadril direito' },
+  { par: ['placaQuadrilEsquerda', 'protecaoCentralGrafite'], motivo: 'a proteção central encosta na placa do quadril esquerdo' },
+];

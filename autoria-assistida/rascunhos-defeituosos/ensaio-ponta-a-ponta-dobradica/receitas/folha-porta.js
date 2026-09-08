@@ -23,3 +23,9 @@ export const CHAMADAS_COMPOSICOES = [
   },
 ];
 export const meta = { nome: 'folha-porta', tipo: 'objeto', desc: 'folha privada da porta' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez. */
+export const contatos = [
+  { par: ['chapaPorta', 'olhalCentral'], motivo: 'o olhal central nasce da chapa e é conformado nela' },
+];

@@ -27,3 +27,11 @@ export const PASSOS = [
   ['solido', { sel: { grupo: 'peitoDaBota' } }],
 ];
 export const meta = { nome: 'pe', tipo: 'objeto', desc: 'bota tecnológica simplificada' };
+
+/* CONTATOS INTENCIONAIS. Declarados quando `--estrito` passou a reprovar contato
+   não declarado: a geometria não mudou, só passou a dizer o que sempre fez.
+   Armadura é construção em camadas — placa assentada sobre casco é o caso
+   legítimo que a medida precisa distinguir de peça que atravessa peça. */
+export const contatos = [
+  { par: ['peitoDaBota', 'solaDaBota'], motivo: 'o peito da bota assenta sobre a sola e é preso nela' },
+];
