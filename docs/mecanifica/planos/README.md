@@ -2,15 +2,21 @@
 
 ## Estado
 
-**Plano ativo:** [atrito achado modelando](2026-09-07-atrito-achado-modelando.md),
-aberto em 2026-09-07. Modelar uma bicicleta de ponta a ponta produziu oito
-atritos, e **nenhum deles aparecia em gate** — os dezenove estavam verdes antes,
-durante e depois. Três enganam: `transladar` aceita chave errada e translada por
-zero sem uma linha de aviso; a paleta de `--cores` não separa 24 partes e fez o
-crítico visual cego devolver duas críticas falsas de cinco; e nenhuma medida vê
-oclusão, então duas rodas que eram discos maciços passaram por `--estrito`
-limpo. Os outros cinco custam rodada: comandos que a skill manda escrever e não
-funcionam como escritos, e busca que zera calada.
+**Plano ativo:** Nenhum.
+
+O [atrito achado modelando](encerrados/2026-09-07-atrito-achado-modelando.md) foi
+**concluído e aprovado** em 2026-09-07. Modelar uma bicicleta de ponta a ponta
+produziu oito atritos, e **nenhum deles aparecia em gate** — os dezenove estavam
+verdes antes, durante e depois. Argumento fora do contrato passou a gritar em vez
+de virar translação por zero; a paleta de auditoria caiu de 43 pares
+confundíveis para 4 e passou a nomear os que sobram; busca que zera diz qual
+palavra a zerou; e o retrato do acervo passou a varrer as quatro pastas de
+receita, não duas.
+
+O achado que mais rendeu não estava na lista: ligar a validação expôs três
+silêncios nos **próprios testes do repositório** — `esfera` com `seg`, `plano`
+com `larg`/`prof`, `cubo` com `tam`. Três testes verdes medindo geometria
+diferente da que declaravam.
 
 O [parâmetro que move a peça](encerrados/2026-09-07-parametro-que-move-a-peca.md)
 foi **concluído e aprovado** em 2026-09-07. Ele nasceu da pergunta "onde a IA

@@ -98,6 +98,47 @@ export function buscarCapacidades(catalogo, consulta = {}) {
     omitidas: depoisDoCursor.length - operacoes.length, truncado,
     proximoCursor: truncado ? operacoes.at(-1)?.id ?? null : null,
     operacoes,
+    diagnostico: encontradas.length === 0 ? diagnosticarBuscaVazia(catalogo, filtros) : null,
+  };
+}
+
+/**
+ * Por que a busca voltou vazia.
+ *
+ * POR QUE ISTO EXISTE (achado modelando a bicicleta): `texto: 'tubo cilindro
+ * caminho'` devolveu zero e `texto: 'cilindro'` devolveu um. O `texto` é
+ * casado como UMA substring do corpus, então frase com mais de uma palavra
+ * praticamente nunca casa — e quem pergunta recebe uma lista vazia idêntica à
+ * de um catálogo que realmente não tem nada, sem nenhum sinal de que a palavra
+ * a mais foi o que zerou.
+ *
+ * Zero resultados é uma resposta legítima; zero resultados SEM MOTIVO é a mesma
+ * família do no-op silencioso: a ferramenta sabe a causa e não conta. Aqui ela
+ * conta qual termo existe no índice sozinho e qual não existe.
+ *
+ * Isto NÃO muda o casamento. Trocar substring por conjunção mudaria o que toda
+ * consulta existente devolve, e é decisão separada — o diagnóstico deixa a
+ * decisão informada em vez de tomá-la por conta própria.
+ */
+function diagnosticarBuscaVazia(catalogo, filtros) {
+  if (!filtros.texto) return { motivo: 'sem-correspondencia', termos: [], sugestao: null };
+  const termos = filtros.texto.split(/\s+/).filter(Boolean);
+  if (termos.length < 2) return { motivo: 'sem-correspondencia', termos: [], sugestao: null };
+
+  const porTermo = termos.map((termo) => ({
+    termo,
+    operacoes: buscarCapacidades(catalogo, { texto: termo }).total,
+  }));
+  const acham = porTermo.filter(({ operacoes }) => operacoes > 0);
+  return {
+    motivo: 'texto-casa-como-frase-inteira',
+    termos: porTermo,
+    sugestao: acham.length ? acham[0].termo : null,
+    explicacao: acham.length
+      ? `'${filtros.texto}' é procurado como frase única, não como conjunto de palavras.`
+        + ` Sozinho(s), ${acham.map(({ termo, operacoes }) => `'${termo}' acha ${operacoes}`).join(', ')};`
+        + ` ${porTermo.filter(({ operacoes }) => operacoes === 0).map(({ termo }) => `'${termo}'`).join(', ')} não está no índice.`
+      : `nenhuma das palavras de '${filtros.texto}' está no índice, nem sozinha.`,
   };
 }
 

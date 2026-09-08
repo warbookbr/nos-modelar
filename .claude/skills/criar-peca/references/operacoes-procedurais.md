@@ -121,13 +121,23 @@ continua resolvendo e passa a apontar para uma cópia com outro papel, sem erro.
 
 Declare `nomes` no passo, um por cópia, e cite por nome:
 
+`derivaDe` e `de` recebem uma ORIGEM — `{op,id}` —, não o `origemId` cru. O
+exemplo abaixo escreve `TABUA` nos dois, e `TABUA` é a origem inteira, não o
+número. Trocar por um inteiro dá `derivaDe inválida: origem precisa ser um
+objeto com op e id`, e custou três rodadas a quem leu isto como identificador.
+
 ```js
+const TABUA = { op: 'cubo', id: 7 };   // ← origem, não número
+
 ['arranja', { origemId: CERCA, derivaDe: TABUA, sel: { origem: TABUA },
               modo: 'linear', d: ['passo', 0, 0], total: 'totalDeTabuas',
               nomes: ['central', 'direita', 'ponta'] }],
 ['parte', { nome: 'tabuaDaPonta',
             sel: { origem: { op: 'arranja', id: CERCA, de: TABUA, nome: 'ponta' } } }],
 ```
+
+`espelha` segue a mesma regra: `derivaDe` na criação e `de` na citação, os dois
+com a origem completa.
 
 A lista é exata: uma entrada por cópia (`total − 1`, porque a fonte não é
 cópia). Mexer no `total` sem revisar os nomes GRITA — é isso que obriga a olhar
