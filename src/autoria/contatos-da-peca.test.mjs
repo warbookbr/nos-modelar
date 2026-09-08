@@ -102,6 +102,24 @@ describe('lerContatosDeclarados', () => {
   });
 });
 
+describe('a ordem é por GRAVIDADE, porque quem consome tem orçamento', () => {
+  it('interpenetração vem antes de encosto', async () => {
+    /* A bancada captura só os primeiros pares acusados. Se a ordem fosse
+       alfabética, o defeito grave poderia ficar fora do teto — foi o que
+       aconteceu na primeira versão, medida na bicicleta. */
+    const mod = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
+    const { neutro } = executarReceita({ meta: mod.meta, PASSOS: mod.PASSOS });
+    const resultado = contatosDaPeca(neutro, {});
+    const estados = resultado.paresEmContato.map((p) => p.estado);
+    const primeiroEncosto = estados.indexOf('encostam');
+    const ultimaInvasao = estados.lastIndexOf('interpenetram');
+    if (primeiroEncosto !== -1 && ultimaInvasao !== -1) {
+      expect(ultimaInvasao).toBeLessThan(primeiroEncosto);
+    }
+    expect(estados[0]).toBe('interpenetram');
+  });
+});
+
 describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () => {
   /* O defeito original sobreviveu porque a acusação era texto no stdout e um
      `grep` a descartou. Estes testes olham `codigo`, nunca a mensagem: se

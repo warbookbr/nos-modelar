@@ -15,12 +15,19 @@ import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
 import { paresIndistinguiveis } from '../../src/bancada/cor-de-auditoria.js';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const OUT = join(REPO, 'tools/bancadas/out');
 const VISTAS_VALIDAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
 const MODOS = ['todas', 'contexto', 'isolar'];
+/* Teto de imagens de par por chamada. Uma peça de 24 partes tem 276 pares; sem
+   teto, a primeira peça grande vira um despejo que ninguém abre. Três é o que
+   cabe numa leitura sem rolar a tela, e o relato diz quantos ficaram de fora. */
+const TETO_DE_PARES_POR_CHAMADA = 3;
 const PROJECOES = ['perspectiva', 'ortografica'];
 
 class ErroDeUso extends Error {
@@ -247,10 +254,12 @@ export async function olharBancada({
     const FIXTURES_HARNESS = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas'];
     const ehFixtureHarness = Boolean(peca && FIXTURES_HARNESS.includes(peca));
 
+    let caminhoDaReceita = null;
     if (peca && !ehFixtureHarness) {
       let caminhoReceita;
       try {
         caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
+        caminhoDaReceita = caminhoReceita;
       } catch {
         erroDeUso(`Peça '${peca}' não encontrada no catálogo de fixtures nem em prototipos/procedural/v3/{pecas,maquinas}/.`);
       }
@@ -285,6 +294,25 @@ export async function olharBancada({
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
     if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
       erroDeUso('--saida já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão.');
+    }
+
+    /* OS PARES ACUSADOS SÃO MEDIDOS EM NODE, não perguntados à bancada: é a
+       mesma medida que faz `descrever --estrito` reprovar, e duas respostas
+       para a mesma pergunta seria o defeito. Peça vinda da sessão ativa não tem
+       receita para executar aqui — nesse caso não há acusação a mostrar, e o
+       silêncio é declarado em vez de virar lista vazia com cara de "está tudo
+       certo". */
+    let paresAcusados = [];
+    if (peca && caminhoDaReceita) {
+      try {
+        const moduloDaPeca = await importarReceita(caminhoDaReceita);
+        const receitaDaPeca = receitaDoModulo(moduloDaPeca);
+        const { neutro } = executarReceita(receitaDaPeca);
+        paresAcusados = contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
+      } catch (erro) {
+        registrar(relato, logger, 'stdout',
+          `(não consegui medir os contatos desta peça: ${erro.message.split('\n')[0]})`);
+      }
     }
 
     const createServer = dependencias.createServer ?? (async (...args) => (await import('vite')).createServer(...args));
@@ -345,13 +373,15 @@ export async function olharBancada({
       }
       return 2;
     };
-    const urlDa = (vista) => {
+    const urlDa = (vista, sobrepor = {}) => {
+      const alvos = sobrepor.selecionadas ?? selecionadas;
+      const modoAlvo = sobrepor.modo ?? modo;
       const params = new URLSearchParams();
       if (ehFixtureHarness) params.set('peca', peca);
-      if (selecionadas.length) params.set('selecionadas', [...selecionadas].sort().join(','));
+      if (alvos.length) params.set('selecionadas', [...alvos].sort().join(','));
       if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica') params.set('vista', vista);
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
-      if (modo !== 'todas') params.set('modo', modo);
+      if (modoAlvo !== 'todas') params.set('modo', modoAlvo);
       if (explosao > 0) params.set('explosao', explosao.toFixed(2));
       const query = params.toString();
       return query ? `${base}?${query}` : base;
@@ -359,6 +389,7 @@ export async function olharBancada({
     let falhou = false;
     const vistasRelatadas = [];
     const capturas = [];
+    const paresCapturados = [];
     let pecaRelatada = null;
     for (const [indice, vista] of vistas.entries()) {
       const url = urlDa(vista);
@@ -564,6 +595,59 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);
       }
     }
+    /* R02 — A VISTA DO PAR ACUSADO SAI COMO IMAGEM, junto das que foram pedidas.
+       A rodada anterior fez o contato não declarado reprovar, e a reprovação
+       nomeia o par em texto. Texto nomeia; imagem mostra. Quem recebe
+       "tuboInferior ↔ rodaDianteiraPneu interpenetram" ainda precisa montar um
+       comando para VER — e comando sugerido é tarefa de casa, que é o que esta
+       sessão viu ser esquecido três vezes.
+       Sem bandeira nova e sem comando novo: sai da mesma chamada.
+       O teto existe porque uma peça de 24 partes tem 276 pares; sem ele, a
+       primeira peça grande viraria um despejo de imagens que ninguém abre. */
+    if (!falhou && !listar && !par && paresAcusados.length && !capturarEmMemoria) {
+      const doTeto = paresAcusados.slice(0, TETO_DE_PARES_POR_CHAMADA);
+      const excedente = paresAcusados.length - doTeto.length;
+      registrar(relato, logger, 'stdout',
+        `\npares acusados pela medida (${paresAcusados.length}): capturando ${doTeto.length}`
+        + `${excedente > 0 ? `, ${excedente} além do teto de ${TETO_DE_PARES_POR_CHAMADA}` : ''}`);
+      for (const alvo of doTeto) {
+        const urlPar = urlDa('isometrica', { selecionadas: alvo, modo: 'isolar' });
+        await abrirComRepeticao(urlPar);
+        garantirPrazo();
+        const inspecao = await page.evaluate((partes) => window.__mecanificaBancada.inspecionarPar(partes), alvo);
+        if (!inspecao?.valida) {
+          registrar(relato, logger, 'stdout', `  ${alvo.join(' ↔ ')}: bancada não conseguiu inspecionar — ${inspecao?.motivo ?? 'sem motivo'}`);
+          continue;
+        }
+        /* SEMPRE EM AUDITORIA, mesmo que a chamada não tenha pedido. Esta imagem
+           existe para ser LIDA — por quem revisa e pelo crítico cego, que recebe
+           só o PNG. A primeira versão capturava com o cromo da bancada ligado, e
+           os painéis de interface cobriam justamente o par que a imagem deveria
+           mostrar. Cromo aqui não é preferência de estilo: é a prova tapada.
+           A ordem repete a do laço principal e pela mesma razão: `auditoria()`
+           troca o tamanho do canvas, e a seleção precisa ser reaplicada depois
+           dela; o foco vem por último, senão o reenquadre desfaz o zoom. */
+        await page.evaluate(
+          ([cores, ar]) => window.__mecanificaBancada.auditoria({ cores, arame: ar }),
+          [coresPorParte, arame],
+        );
+        await page.evaluate(([nomes]) => {
+          window.__mecanificaBancada.selecionar(nomes);
+          window.__mecanificaBancada.modo('isolar');
+        }, [alvo]);
+        const contato = await page.evaluate((partes) => window.__mecanificaBancada.focarContato(partes), alvo);
+        await page.waitForTimeout(espera);
+        garantirPrazo();
+        const apelidoEfetivo = apelidoDeArquivo(peca ?? pecaRelatada);
+        const arquivo = join(saida, `bancada-${apelidoEfetivo}-par-${alvo.map(apelidoDeArquivo).join('+')}.png`);
+        verificarCaminhoConfinado(arquivo, { raiz: REPO });
+        await page.screenshot({ path: arquivo });
+        paresCapturados.push({ par: alvo, vista: inspecao.vistaEscolhida, arquivo, enquadrado: Boolean(contato?.valida) });
+        registrar(relato, logger, 'stdout',
+          `  ${alvo.join(' ↔ ')} (${inspecao.vistaEscolhida})${contato?.valida ? '' : ' — sem foco de contato'}: ${arquivo}`);
+      }
+    }
+
     if (errosDaPagina.length) {
       registrar(relato, logger, 'stderr', `\nerros de página:\n  ${errosDaPagina.join('\n  ')}`);
       falhasRelatadas.push({ categoria: 'ferramenta', codigo: 'erro_da_pagina', vista: null, mensagem: 'A página da bancada emitiu erro durante a captura.', acao: 'Repita a captura depois de corrigir a ferramenta; não remodele a peça.' });
@@ -581,6 +665,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
+      paresAcusados, paresCapturados,
       ...(capturarEmMemoria ? { capturas } : {}),
     };
     resposta = {
