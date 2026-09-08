@@ -2,30 +2,26 @@
 
 ## Estado
 
-**Plano ativo:** [o que nenhuma vista mostra](2026-09-07-o-que-nenhuma-vista-mostra.md)
-Aberto em 2026-09-07, **versão 2** em 2026-09-08. Fecha as duas famílias de
-"erra e mede limpo" que a bicicleta produziu. Na primeira, a peça não saiu com a
-forma prometida: as rodas foram dois cilindros concêntricos, o de fora engoliu
-aro, cubo e raios, e `descrever --estrito` passou limpo. Na segunda, o arco
-atravessou a roda dianteira — e essa o `descrever` **já reportava**, mas a saída
-foi estreitada por um `grep`, porque hoje "passou" e "reprovou" são o mesmo
-texto no `stdout` e `--estrito` só reprova por face sem identidade.
+**Plano ativo:** Nenhum.
 
-O desenho vem de três evidências da sessão que o abriu, todas do mesmo tipo:
-duas skills mandam "isole por pergunta" em destaque e a IA confirmou ter lido
-sem levar em conta; a bancada imprimiu uma dica junto da imagem que foi
-ignorada; e o achado de interpenetração foi filtrado. Lembrete em prosa é
-ignorado, fato na saída é filtrado, e só estado que muda o veredito sobrevive.
+O [que nenhuma vista mostra](encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md)
+foi **concluído e aprovado** em 2026-09-08. Ele fechou as duas famílias de "erra
+e mede limpo" que a bicicleta produziu: peça que não sai com a forma prometida, e
+parte atravessando parte. Contato não declarado passou a REPROVAR com código de
+saída, a forma prometida é conferida por V−E+F, os pares acusados saem como
+imagem da mesma chamada, e a dica passou a aparecer uma vez e só quando se
+aplica.
 
-A versão 2 acrescenta o que o prompt que gerou a bicicleta expôs — *"leia as
-skills e o readme, modele uma bicicleta"*, sem nenhuma menção a colisão. Se isso
-precisa ser dito, a lista é infinita, então a declaração de contatos vira
-**contrato dito antes**, e não escapatória escrita depois para calar a
-reprovação: par que se toca e não foi declarado REPROVA, porque com prompt curto
-o que vale é o padrão. Entram também a conferência de forma por V−E+F, que pega
-o pneu maciço sem nada dentro (caso que a medida de contato não vê), e o gate de
-fechamento pelo mesmo prompt mínimo: bicicleta correta ou veredito vermelho,
-nunca verde e errada.
+Nada de geometria foi escrito: o teste exato de sólido já existia dentro da
+auditoria de montagem e a contagem de furo em `modulos/topologia`. O núcleo saiu
+para `contato-de-solidos.js` e a auditoria de montagem caiu de 340 para 108
+linhas sem mudar comportamento.
+
+O gate de fechamento passou com quem não construiu a ferramenta: um subagente
+frio recebeu *"leia as skills e o readme, modele uma bicicleta"*, sem menção a
+colisão, e a peça saiu verde por estar certa — 22 contatos declarados, zero
+atravessamentos. Ele ainda achou dois defeitos e corrigiu a geometria em vez de
+declarar, que era o risco de projeto que mataria a porta.
 
 O [atrito achado modelando](encerrados/2026-09-07-atrito-achado-modelando.md) foi
 **concluído e aprovado** em 2026-09-07. Modelar uma bicicleta de ponta a ponta

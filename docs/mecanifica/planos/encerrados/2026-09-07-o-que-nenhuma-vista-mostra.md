@@ -1,14 +1,12 @@
 # O que nenhuma vista mostra
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Versão:** 2, de 2026-09-08. A 1 tratava só a peça escondida dentro de outra;
 esta soma interpenetração como veredito e conferência de forma, e inverte a
-polaridade da declaração. Rodadas entregues; falta o gate de fechamento.
+polaridade da declaração.
 
-**Responsável:** execução por agente
-
-**Repositório e base:** `warbookbr/nos-mecanifica`, `main` em `4c042cf`
+**Responsável:** execução por agente · **Base:** `main` em `4c042cf`
 
 ## Problema observado
 
@@ -31,8 +29,8 @@ disparou certo — mas "passou" e "reprovou" eram a mesma saída, texto no
 saída.
 
 **B é a mais grave.** Forma errada é erro de modelagem; parte atravessando parte
-é erro de montagem, e montagem é para onde o projeto vai — carro, motor, robôs.
-A versão 1 tratou B como nota de rodapé.
+é erro de montagem, e montagem é para onde o projeto vai. A versão 1 tratou B
+como nota de rodapé.
 
 ### Instrução não resolve nenhuma das duas
 
@@ -44,8 +42,8 @@ Além do achado filtrado em B, duas evidências da mesma sessão:
   captura, e foi ignorada — ela dispara em toda peça alta, e dica constante
   vira moldura de tela.
 
-A escala, medida e não suposta: lembrete em prosa é ignorado; fato na saída é
-filtrado; **estado que muda o veredito não tem como ser filtrado.**
+A escala, medida: lembrete em prosa é ignorado, fato na saída é filtrado, e
+**estado que muda o veredito não tem como ser filtrado.**
 
 ### O prompt mínimo é o teste, não a atenuante
 
@@ -126,8 +124,8 @@ Existe porque R00 não basta: contato é relação entre DUAS partes, e se o pne
 sai maciço com nada modelado dentro não há segunda parte para acusar — a peça é
 um disco sólido e passa limpa. Entregue em `src/autoria/forma-da-parte.js`.
 
-O vocabulário oferece `solido` e `anel` e não oferece `tubo`: tubo e anel são a
-mesma topologia, e a palavra a mais prometeria uma distinção que a régua não faz.
+O vocabulário oferece `solido` e `anel` e não `tubo`: tubo e anel são a mesma
+topologia, e a palavra a mais prometeria distinção que a régua não faz.
 
 ### R02 — a vista do par sai como imagem
 
@@ -143,22 +141,18 @@ dica tem chave, junta as vistas em que apareceu e sai uma vez só.
 
 ## O gate que fecha o plano
 
-As fixtures provam que a medida funciona. Elas não provam que o laço funciona —
-e foi o laço que falhou, não a aritmética. O gate de fechamento é o prompt
-mínimo, repetido: *"leia as skills e o readme, modele uma bicicleta"*, sem
-menção a colisão. O resultado tem de ser bicicleta correta **ou** veredito
-vermelho. Nunca verde e errada.
-
-Quem executar este gate não pode ser quem construiu a ferramenta.
+As fixtures provam que a medida funciona, não que o laço funciona — e foi o laço
+que falhou, não a aritmética. O gate é o prompt mínimo repetido, *"leia as skills
+e o readme, modele uma bicicleta"*, sem menção a colisão: o resultado tem de ser
+peça correta **ou** veredito vermelho, nunca verde e errada. Quem o executa não
+pode ser quem construiu a ferramenta.
 
 ## Riscos e parada
 
-- **Custo da medição.** O(n²) em partes e O(v) em vértices. Mitigação: a caixa
-  filtra candidatos e o teste exato roda só neles. Medido: 525 ms na bicicleta
-  inteira. V−E+F, de R01, é O(V+F) e não entra nesta conta.
-- **Falso positivo condena peça boa.** É o risco que mata a porta: reprovação
-  errada ensina a ignorar reprovação. Por isso a declaração existe desde a
-  primeira rodada, e não depois.
+- **Custo da medição.** O(n²) em partes e O(v) em vértices, mitigado pela caixa
+  filtrando candidatos: 525 ms na bicicleta inteira. V−E+F é O(V+F).
+- **Falso positivo condena peça boa.** Reprovação errada ensina a ignorar
+  reprovação; por isso a declaração existe desde a primeira rodada, não depois.
 - **A declaração vira carimbo.** Risco de projeto, não de código: se declarar
   ficar mais barato que corrigir, a IA declara tudo e o veredito morre. Alarme:
   contatos declarados crescendo sem a geometria mudar. O laboratório deste
@@ -172,29 +166,34 @@ Quem executar este gate não pode ser quem construiu a ferramenta.
 
 **As quatro rodadas foram entregues** em 2026-09-08, 19/19 gates verdes em cada
 uma: R00 em `f3a2aad`, R01 em `8e1f097`, R02 em `f231ac3`. Duas medidas não
-precisaram ser escritas, só ligadas, e o núcleo geométrico extraído para
+precisaram ser escritas, só ligadas, e o núcleo extraído para
 `contato-de-solidos.js` fez a auditoria de montagem cair de 340 para 108 linhas
 sem mudar comportamento.
 
-**O gate de fechamento NÃO foi executado.** Ele exige que quem o rode não seja
-quem construiu a ferramenta, e quem escreveu R00–R03 foi o agente desta sessão.
-É a única coisa que falta para o plano encerrar.
+**O gate de fechamento PASSOU**, em `563106c`. Rodou num subagente frio, que não
+viu as rodadas serem feitas e não sabia que declaração de contato existe, com o
+prompt literal do plano e sem uma palavra sobre colisão.
 
-Evidência parcial, com o limite dito: a bicicleta que passava limpa sai VERMELHA,
-com o tubo atravessando o pneu nomeado no veredito e capturado como imagem — mas
-peça já modelada não prova que o laço funciona numa peça feita do zero.
+`bicicleta-prova` sai com código 0, e verde por estar certa — conferido na medida,
+não no relato do agente: 22 contatos todos declarados, ZERO
+`intersecao-de-superficies` (a bicicleta original tinha uma, e era o defeito),
+zero declaração fictícia, motivos mecânicos de verdade. O agente ainda achou dois
+defeitos e CORRIGIU a geometria em vez de declarar — o risco que mataria a porta
+não se realizou.
 
 **O que a execução ensinou, e não estava previsto:**
 
-- o acervo tinha 23 contatos legítimos não declarados; todos ganharam
-  declaração, sem mudar geometria. O custo é real: a pelve da armadura tem cinco;
+- o acervo tinha 23 contatos legítimos não declarados; todos ganharam declaração
+  sem mudar geometria. O custo é real: a pelve da armadura tem cinco;
 - a bicicleta tem 28 pares acusados, não os 13 estimados antes de medir;
 - ordenar por gravidade não bastou: 22 dos 28 são interpenetração e o defeito
   real ficava fora de um teto de três. O que o separou foi o MÉTODO —
   `intersecao-de-superficies` sai só quando nenhum vértice está dentro do outro,
   assinatura de peça atravessando peça contra peça assentada. Um em 28, e é o
-  defeito. Heurística de ordem, não lei.
+  defeito. Heurística de ordem, não lei;
+- relato de agente não substitui rodar o gate: o subagente deu por concluído com
+  `mapa:check` e `malha:conferir` verdes, e os gates completos davam 16/19.
 
-**Devolvido ao backlog:** as menores folgas como pares acusados; `catalogo:check`
-fora de `gates` e do CI; e se a leitura obrigatória, hoje em 69.986 de um teto de
-70.000 bytes, ainda se paga — a bicicleta com defeito saiu depois de lê-la toda.
+**Backlog:** menores folgas como pares acusados; `catalogo:check` fora de `gates`
+e do CI; e se a leitura obrigatória, em 69.986 de um teto de 70.000 bytes, ainda
+se paga — a bicicleta com defeito saiu depois de lê-la toda.

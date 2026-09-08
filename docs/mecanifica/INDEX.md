@@ -24,11 +24,15 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: nenhum. O laboratório computacional para IA foi incubado e
-  **encerrado** em 2026-09-03 — saiu inteiro, com histórico, para
-  [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia); ver
-  [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](planos/encerrados/2026-09-01-laboratorio-computacional-ia.md).
-  Piloto de peça que usou seus números: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
+- Plano **ativo**: nenhum. [O que nenhuma vista
+  mostra](planos/encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md) foi
+  **concluído** em 2026-09-08: contato não declarado entre partes REPROVA em
+  `--estrito` com código de saída, a forma prometida é conferida por V−E+F, e os
+  pares acusados saem como imagem da mesma chamada de bancada. O laboratório
+  computacional saiu para
+  [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia) em
+  2026-09-03; o piloto de peça que usou seus números continua aqui, em
+  [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em
