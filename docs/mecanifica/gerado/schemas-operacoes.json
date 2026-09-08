@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:ff671486dc74a9642e5087d291abcab6f7529cec0b30577a110c132186cd1da1",
+  "assinatura": "sha256:8a1ee64860409b98c49effe8c68260b27be81a62bf281038e6a5f3c31d85f028",
   "total": 32,
   "operacoes": [
     {
@@ -249,7 +249,9 @@
         "precondicoes": [
           "Modo estrutural requer origemId, derivaDe e seleção da origem completa."
         ],
-        "limites": [],
+        "limites": [
+          "Repetição radial é UMA descrição: seis abas de maça saem de um arranja radial com volta 360 e total 6. Descrever seis abas à mão é seis lugares para errar. Nomeie as cópias, porque posição não é identidade."
+        ],
         "diagnosticos": []
       }
     },
@@ -607,7 +609,8 @@
         },
         "precondicoes": [],
         "limites": [
-          "lados muda a topologia e precisa caber no bloco de IDs."
+          "lados muda a topologia e precisa caber no bloco de IDs.",
+          "{op:'cilindro', id} sem eixo seleciona SÓ AS LATERAIS. As tampas pedem citação própria (tampa:'fundo', tampa:'topo'); sem elas as duas faces ficam sem parte, cinzentas e mudas. `npm run ativar:bancada` conta as faces órfãs e diz esta causa."
         ],
         "diagnosticos": []
       }
@@ -1591,7 +1594,11 @@
         "precondicoes": [
           "Declare centro ou centros e exatamente um entre saida e profundidade."
         ],
-        "limites": [],
+        "limites": [
+          "lados precisa ser ≡ 2 (mod 4) — 10, 14 ou 18, nunca múltiplo de 4. A seção começa com um vértice em 0°, então múltiplo de 4 põe outro VÉRTICE no topo, a 90°, e um furo centrado no eixo cai entre duas faces e não cabe em nenhuma. Foi o que destravou o olho do machado depois de lados:16 recusar em todas as estações.",
+          "de precisa resolver para exatamente UMA face, e ela precisa ser grande o bastante e plana. O furo tem de caber na face de entrada E na de saída, e as duas precisam se enxergar: com lados:12 o lado 2 enxerga o 9, e o 2 com o 8 não.",
+          "O furo CONSOME as faces de entrada e saída, que viram a borda anular do corte, e a origem antiga passa a ser recusada inteira. Una as duas origens num ALIAS, ou ponha a peça furada como primeira geometria e use sel:{tudo:true}."
+        ],
         "diagnosticos": []
       }
     },
@@ -1750,7 +1757,11 @@
         },
         "precondicoes": [],
         "limites": [
-          "O modo 'grade' é blocky; o modo 'secoes' não representa múltiplos intervalos na mesma estação; não é CSG."
+          "O modo 'grade' é blocky; o modo 'secoes' não representa múltiplos intervalos na mesma estação; não é CSG.",
+          "Para chapa com contorno prefira 'secoes': 'grade' é literalmente voxelizado e sai com escada no contorno.",
+          "expoenteSecao 2 é elipse e a face sai como travesseiro; foi preciso 12–14 para a face virar chapa de verdade.",
+          "Silhueta que termina em ponta única deixa a última estação com altura zero e nascem faces de área nula, que malha:conferir reprova. Use dois pontos no z máximo: fisicamente são o pequeno plano do fio, que todo gume real tem.",
+          "Face de inflate só sai plana quando as duas seções vizinhas são SEMELHANTES, a mesma regra do loft. Bloco que vai receber furo pede seção CONSTANTE, e no modo 'grade' não há endereço de face para furar."
         ],
         "diagnosticos": []
       }
@@ -2035,7 +2046,11 @@
         "precondicoes": [
           "Seções devem ser ordenadas, válidas e compatíveis com lados."
         ],
-        "limites": [],
+        "limites": [
+          "Sem seção de raio 0 em cada ponta sai TUBO ABERTO: a lâmina da espada entrou com 24 arestas de borda, e borda reprova no preparo para micropolígono. O polo pode ficar enterrado dentro da peça vizinha; ele existe para fechar, não para aparecer.",
+          "Quad só sai PLANO quando as duas seções são SEMELHANTES, mesma razão entre espessura e altura — é o determinante da diagonal, que zera exatamente nesse caso. Lâmina que afila só na largura torce 25% perto da ponta. Subdividir não resolve: de 4 para 16 estações a torção cai só pela metade.",
+          "Serve quando a forma É uma seção viajando: cabo, punho, tubo, corrimão, lâmina. Para CHAPA COM CONTORNO — cabeça de machado, aba de maça, guarda recortada — a seção viajando é a ferramenta errada e nenhuma quantidade de estações conserta; use inflate. O polo de raio 0 fecha afinando até virar BICO, e isso apaga o gume."
+        ],
         "diagnosticos": []
       }
     },

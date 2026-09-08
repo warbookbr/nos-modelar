@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-802 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+803 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -554,6 +554,7 @@
 
 ## docs/mecanifica/referencias/
 
+- `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
 - `README.md` — Referências de forma
 
 ## docs/mecanifica/usar/
