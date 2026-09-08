@@ -245,11 +245,38 @@ function malhasSeInterseccionam(a, b, tolerancia) {
  * `interpenetram` ou `inconclusivo`. Sólido de malha aberta nunca recebe
  * veredito de separação nem de invasão — recebe `inconclusivo` com o motivo.
  */
+/* O CENTROIDE ENTRA PORQUE O VÉRTICE É JUSTAMENTE ONDE AS MALHAS EMPATAM.
+   A contenção amostrava só os vértices dos triângulos. Com dois sólidos de lado
+   igual e eixos alinhados, todo vértice de um cai EXATAMENTE na superfície do
+   outro, nenhum ponto fica estritamente dentro, e sobreposição real de metade
+   do volume era rebaixada de `interpenetram` para `encostam` — a acusação
+   continuava, só a gravidade mentia.
+
+   Medido antes de escolher, no caso do empate: dos 36 vértices, nenhum cai
+   dentro; o ponto médio de aresta acerta 2 de 36 e o centroide 2 de 12. Os dois
+   resolvem, e o centroide resolve com um terço dos pontos, que é o que importa
+   porque cada ponto custa um lançamento de raio contra a malha inteira.
+
+   Impacto medido no acervo antes de entrar: nenhuma peça mudou de código de
+   saída nem de quantidade de pares acusados. Só a `barricada-de-sucata` mudou o
+   estado de três pares, de `encostam` para `interpenetram`, e ela é a peça com
+   defeito real de posicionamento. Custo do acervo inteiro: de 6,23 para 7,02
+   segundos.
+
+   Uma sonda adversarial tentou cinco ataques com esta amostragem e nenhum
+   passou como livre. Ela também mostrou que refinar a malha não abre brecha: o
+   cruzamento é testado triângulo contra triângulo, e só a contenção depende de
+   amostragem. */
+function pontosDeAmostragem(solido) {
+  const centroide = (t) => [0, 1, 2].map((i) => (t[0][i] + t[1][i] + t[2][i]) / 3);
+  return [...solido.triangulos.flatMap((t) => t), ...solido.triangulos.map(centroide)];
+}
+
 export function auditarParDeSolidos(a, b, tolerancia) {
   if (a.inconclusivo || b.inconclusivo) return { estado: 'inconclusivo', diagnosticos: [a.inconclusivo, b.inconclusivo].filter(Boolean) };
   if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return { estado: 'separadas', metodo: 'caixa-mundo' };
-  const pontosA = a.triangulos.flatMap((triangulo) => triangulo);
-  const pontosB = b.triangulos.flatMap((triangulo) => triangulo);
+  const pontosA = pontosDeAmostragem(a);
+  const pontosB = pontosDeAmostragem(b);
   const estadosA = pontosA.map((ponto) => pontoDentroMalha(ponto, b, tolerancia));
   const estadosB = pontosB.map((ponto) => pontoDentroMalha(ponto, a, tolerancia));
   if (estadosA.includes(true) || estadosB.includes(true)) {

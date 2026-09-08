@@ -85,10 +85,17 @@ describe('Mecanifica 1.0 — ensaio ponta a ponta da dobradiça', () => {
     expect(auditoria.cobertura).toEqual({
       paresTotais: 3, paresNoEscopo: 3, paresVerificados: 3, inconclusivos: 0, completa: true,
     });
+    /* O PARAFUSO PASSA PELAS DUAS FOLHAS, e agora a medida diz isso. Os dois
+       pares com o parafuso eram `encostam` porque a contenção só amostrava
+       vértices, e nas malhas alinhadas da dobradiça nenhum vértice ficava
+       estritamente dentro do outro sólido. Com o centroide de cada triângulo na
+       amostragem, a contenção aparece. O encaixe continua legítimo e continua
+       declarado; o que mudou é o estado corresponder ao que a dobradiça é. As
+       duas folhas entre si seguem `encostam`, porque de fato só se tocam. */
     expect(auditoria.pares).toEqual([
       expect.objectContaining({ a: ['folha-batente'], b: ['folha-porta'], estado: 'encostam' }),
-      expect.objectContaining({ a: ['folha-batente'], b: ['parafuso-central'], estado: 'encostam' }),
-      expect.objectContaining({ a: ['folha-porta'], b: ['parafuso-central'], estado: 'encostam' }),
+      expect.objectContaining({ a: ['folha-batente'], b: ['parafuso-central'], estado: 'interpenetram', metodo: 'contencao-e-malha' }),
+      expect.objectContaining({ a: ['folha-porta'], b: ['parafuso-central'], estado: 'interpenetram', metodo: 'contencao-e-malha' }),
     ]);
   });
 

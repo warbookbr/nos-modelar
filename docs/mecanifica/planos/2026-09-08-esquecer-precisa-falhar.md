@@ -157,41 +157,40 @@ faces, é malha aberta, e todo par dela sai inconclusivo em vez de acusado.
 
 ### R03 — as skills param de pedir a bandeira
 
-`criar-peca/SKILL.md` e `auditar-peca/SKILL.md` deixam de mandar digitar
-`--estrito`, porque o comportamento passou a ser o padrão. O texto removido
-libera espaço na leitura obrigatória, que hoje está em 69869 de 70000 bytes.
+As skills deixam de mandar digitar `--estrito`, porque virou o padrão.
 
-Prova: `npm run leitura:obrigatoria` e os gates completos.
-
-Feito. Saiu das duas skills e do `GUIA-AUTORIA-IA.md`, cujo critério passou a
-citar contato não declarado e forma divergente. Relato e plano encerrado
-mantêm a menção: história é evidência, não instrução. A leitura obrigatória caiu
-para 69851 bytes.
+Feito. Saiu de `criar-peca/SKILL.md`, `auditar-peca/SKILL.md` e do
+`GUIA-AUTORIA-IA.md`, cujo critério passou a citar contato não declarado e forma
+divergente. Relato e plano encerrado mantêm a menção: história é evidência, não
+instrução. A leitura obrigatória caiu para 69851 de 70000 bytes.
 
 ### R04 — a amostragem da contenção inclui o centroide
 
-O teste de contenção amostra só os VÉRTICES dos triângulos. Com dois sólidos de
-lado igual e eixos alinhados, todo vértice de um cai exatamente na superfície do
-outro, nenhum ponto fica estritamente dentro, e sobreposição real de metade do
-volume sai como `encostam`. Somar o centroide de cada triângulo resolve.
+A contenção amostrava só os VÉRTICES. Com dois sólidos de lado igual e eixos
+alinhados, todo vértice de um cai exatamente na superfície do outro, nenhum fica
+estritamente dentro, e metade de volume sobreposto saía como `encostam`. O
+centroide de cada triângulo resolve.
 
 Medido antes de propor. No empate, dos 36 vértices nenhum cai dentro; o meio de
 aresta acerta 2 de 36 e o centroide 2 de 12, mesmo resultado com um terço dos
-pontos. No acervo inteiro nenhuma peça mudou de código de saída nem de
-quantidade de pares acusados; só a `barricada-de-sucata` mudou o estado de três
-pares, de `encostam` para `interpenetram`, e ela é a peça com defeito real. O
-custo foi de 6,23 para 7,02 segundos, treze por cento.
+pontos. Nas peças, nenhuma mudou de código de saída nem de quantidade de pares
+acusados; só a `barricada-de-sucata` mudou o estado de três pares, e ela é a
+peça com defeito real. Custo: de 6,23 para 7,02 segundos.
 
 Uma sonda adversarial tentou cinco ataques com a amostragem nova — malha
-grosseira, haste fina atravessando chapa fina, penetração por quina, sólidos
+grosseira, haste fina atravessando chapa, penetração por quina, sólidos
 idênticos e malha aberta — e nenhum passou como livre. Ela derrubou uma
-suposição: a haste fina não passa entre os triângulos da chapa, porque o
-cruzamento é testado triângulo contra triângulo, e não por amostragem. O único
-código 0 com sobreposição real foi malha aberta, que sai inconclusiva e nunca
-livre.
+suposição: a haste não passa entre os triângulos da chapa, porque o cruzamento é
+testado triângulo contra triângulo. O único código 0 com sobreposição real foi
+malha aberta, que sai inconclusiva e nunca livre.
 
-Prova: uma fixture com o caso do empate exigindo `interpenetram`, e a suíte
-completa verde sem mudança de veredito no acervo.
+Feito, com uma correção à medida acima. Ao entrar de verdade, os dois pares do
+parafuso com as folhas na dobradiça do ensaio passaram de `encostam` para
+`interpenetram` por contenção — o parafuso atravessa as duas folhas, o estado
+novo é o certo, e o encaixe segue declarado. Minha varredura anterior só cobriu
+`prototipos/procedural/v3/pecas` e não alcançou composições. Nenhum veredito de
+aprovação mudou; mudou o rótulo de gravidade em três pares da barricada e dois
+da dobradiça.
 
 ## Fechamento
 

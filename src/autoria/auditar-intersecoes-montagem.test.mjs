@@ -16,13 +16,8 @@ const cubo = (origemId, em, lado = 1) => ({
   ],
 });
 
-/* O SEGUNDO CUBO É MENOR DE PROPÓSITO. Com dois cubos de lado igual e eixos
-   alinhados, todo vértice de um cai EXATAMENTE na superfície do outro, o teste
-   de contenção não encontra ponto estritamente dentro, e a sobreposição sai
-   como `encostam` em vez de `interpenetram`. O par continua acusado, porque os
-   dois estados contam como contato, mas a gravidade fica menor do que a
-   realidade. Um cubo menor produz vértice de fato interno e prova o caso grave
-   sem depender desse empate. */
+/* O segundo cubo é menor para produzir contenção por vértice, que é o caminho
+   mais direto. O caso de lados iguais tem teste próprio abaixo. */
 function montagem({ separacao, expectativas, lado = 0.4 }) {
   const a = executarReceita(cubo(1, [0, 0, 0])).neutro;
   const b = executarReceita(cubo(2, [separacao, 0, 0], lado)).neutro;
@@ -48,11 +43,22 @@ describe('a declaração da montagem é contrato, não anotação', () => {
     expect(r.naoDeclarados[0].metodo).toBe('contencao-e-malha');
   });
 
-  /* O empate descrito na nota de `montagem`, fixado para não ser descoberto de
-     novo por acidente: sobreposição real entre iguais rebaixa a GRAVIDADE, e
-     nunca a acusação. */
-  it('cubos de lado igual meio sobrepostos ainda são acusados, como encostam', () => {
+  /* O CASO QUE O CENTROIDE CONSERTOU. Com lados iguais e eixos alinhados, todo
+     vértice de um cubo cai exatamente na superfície do outro, nenhum fica
+     estritamente dentro, e metade de volume sobreposto saía como `encostam`. A
+     amostragem passou a incluir o centroide de cada triângulo, e o estado
+     voltou a corresponder ao que a geometria mostra. */
+  it('cubos de lado igual meio sobrepostos são acusados como interpenetram', () => {
     const r = auditarIntersecoesMontagem(montagem({ separacao: 0.5, expectativas: [], lado: 1 }));
+    expect(r.naoDeclarados).toHaveLength(1);
+    expect(r.naoDeclarados[0].estado).toBe('interpenetram');
+    expect(r.naoDeclarados[0].metodo).toBe('contencao-e-malha');
+  });
+
+  /* A amostragem nova não pode inventar contato onde não há: cubos iguais que
+     apenas se encostam face a face continuam `encostam`. */
+  it('cubos de lado igual que só se encostam continuam encostam', () => {
+    const r = auditarIntersecoesMontagem(montagem({ separacao: 1, expectativas: [], lado: 1 }));
     expect(r.naoDeclarados).toHaveLength(1);
     expect(r.naoDeclarados[0].estado).toBe('encostam');
   });
