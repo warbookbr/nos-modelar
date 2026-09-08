@@ -15,10 +15,10 @@ Se o alvo for uma árvore de composição, relações entre peças ou impacto de
 revalidação, mude para `../auditar-montagem/SKILL.md`. Esta skill cobre uma
 peça isolada e não inventa validade global de uma montagem.
 
-1. Gere a descrição estrita da peça:
+1. Gere a descrição da peça:
 
    ```bash
-   npm run descrever -- <peca> --estrito
+   npm run descrever -- <peca>
    ```
 
    Confira contagens, órfãos, partes, portas, materiais e o envelope.

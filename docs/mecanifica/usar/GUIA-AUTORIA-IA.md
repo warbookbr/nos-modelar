@@ -67,9 +67,11 @@ Execute as validações nesta sequência:
 
 ### Passo 1: Inspeção de Contrato e Ausência de Órfãos
 ```bash
-npm run descrever -- <nome-da-peca> --estrito
+npm run descrever -- <nome-da-peca>
 ```
-*Critério:* Código de saída 0, zero referências órfãs e zero faces sem identidade.
+*Critério:* Código de saída 0, zero referências órfãs, zero faces sem identidade,
+nenhum contato fora do que a receita declarou em `contatos` e nenhuma parte com
+forma diferente da prometida.
 
 ### Passo 2: Verificação de Encaixes e Juntas
 ```bash

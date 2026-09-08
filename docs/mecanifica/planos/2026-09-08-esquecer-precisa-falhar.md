@@ -91,27 +91,23 @@ e passa a ser aceita sem efeito, para não quebrar chamada existente. Entra uma
 opção de sentido oposto, que desliga o veredito e imprime na saída que ele foi
 desligado.
 
-Prova: um teste que roda `descrever` sem opção nenhuma sobre uma fixture com
-contato não declarado e exige código de saída diferente de zero; outro que roda
-com a opção de desligar e exige código zero mais a marca de que o veredito não
-foi aplicado.
+Prova: um teste roda `descrever` sem opção nenhuma sobre fixture com contato não
+declarado e exige código diferente de zero; outro desliga o veredito e exige
+código zero mais a marca de que ele não foi aplicado.
 
 Feito. O veredito roda por padrão, `--estrito` continua aceito sem efeito, e
-`--sem-veredito` desliga imprimindo na saída que desligou. As quatro peças
-legítimas do acervo ganharam a declaração do que já faziam, sem mudar
-geometria: `cadeira-de-madeira`, `cutelo-de-sucata`, `gabarito-eixos` e
-`mancal-guia`.
+`--sem-veredito` desliga imprimindo na saída que desligou. Quatro peças do
+acervo ganharam a declaração do que já faziam, sem mudar geometria:
+`cadeira-de-madeira`, `cutelo-de-sucata`, `gabarito-eixos` e `mancal-guia`.
 
 **Dois defeitos reais que a inversão revelou, registrados e não corrigidos
-aqui.** Em `barricada-de-sucata` a receita usa `em` como se fosse o canto
-mínimo do cubo, mas `em` é translação de um cubo centrado na origem, então cada
-volume ficou deslocado meia largura para a esquerda. A viga inferior ocupa de
-−2,40 a 0,00 em vez de −1,20 a 1,20, encosta no pilar esquerdo e não alcança o
-direito; o pilar direito está preso a nada. Em `bicicleta-urbana` sobrevive o
-defeito que originou o plano anterior: `rodaDianteiraPneu ↔ tuboInferior` com
-`intersecao-de-superficies`, o tubo passando pelo pneu. Declarar qualquer um
-dos dois seria usar a declaração como escapatória, que a invariante 2 proíbe.
-As duas peças reprovam, e é o comportamento correto.
+aqui.** Em `barricada-de-sucata` a receita usa `em` como canto mínimo do cubo,
+mas `em` é translação de um cubo centrado na origem: cada volume ficou meia
+largura à esquerda, a viga inferior ocupa de −2,40 a 0,00 em vez de −1,20 a
+1,20, e o pilar direito não encosta em nada. Em `bicicleta-urbana` sobrevive o
+defeito que originou o plano anterior, `rodaDianteiraPneu ↔ tuboInferior` por
+`intersecao-de-superficies`. Declarar qualquer um seria usar a declaração como
+escapatória, que a invariante 2 proíbe. As duas reprovam, e está correto.
 
 ### R01 — a montagem declara seus contatos
 
@@ -121,8 +117,7 @@ tamanho mínimo. Par que se toque fora da lista fica marcado como não declarado
 Nome de caminho inexistente falha nomeando os caminhos disponíveis, como já
 acontece na peça.
 
-Prova: fixtures de montagem com par declarado, par não declarado e declaração
-morta, cobrindo os três casos.
+Prova: fixtures com par declarado, não declarado e declaração morta.
 
 Feito em `auditar-intersecoes-montagem.js`. A expectativa deixou de só anotar:
 a auditoria passa a devolver `naoDeclarados` e `declaradosSemContato`, com a
@@ -167,6 +162,11 @@ faces, é malha aberta, e todo par dela sai inconclusivo em vez de acusado.
 libera espaço na leitura obrigatória, que hoje está em 69869 de 70000 bytes.
 
 Prova: `npm run leitura:obrigatoria` e os gates completos.
+
+Feito. Saiu das duas skills e do `GUIA-AUTORIA-IA.md`, cujo critério passou a
+citar contato não declarado e forma divergente. Relato e plano encerrado
+mantêm a menção: história é evidência, não instrução. A leitura obrigatória caiu
+para 69851 bytes.
 
 ### R04 — a amostragem da contenção inclui o centroide
 

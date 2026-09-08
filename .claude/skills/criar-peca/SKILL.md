@@ -29,11 +29,11 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    regex nem invente uma operação ausente.
 2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
    quando o contrato permitir. Não grave identidade por índice ou UUID.
-3. Rode a descrição estrita e obtenha vistas por uma bancada/harness privado
+3. Rode a descrição e obtenha vistas por uma bancada/harness privado
    explicitamente configurado. Esse é o laço oficial de inspeção visual:
 
    ```bash
-   npm run descrever -- <peça> --estrito
+   npm run descrever -- <peça>
    npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
    ```
 
