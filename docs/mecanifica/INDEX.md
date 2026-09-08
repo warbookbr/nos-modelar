@@ -24,15 +24,15 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: [Esquecer precisa
-  falhar](planos/2026-09-08-esquecer-precisa-falhar.md) — o veredito de contato
-  deixa de depender da bandeira `--estrito` e passa a ser o padrão, e a montagem
-  passa a reprovar peça atravessando peça, o que hoje só vira descrição. Ele
-  continua [o que nenhuma vista
-  mostra](planos/encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md),
-  **concluído** em 2026-09-08: contato não declarado entre partes REPROVA em
-  `--estrito` com código de saída, a forma prometida é conferida por V−E+F, e os
-  pares acusados saem como imagem da mesma chamada de bancada. O laboratório
+- Plano **ativo**: nenhum. [Esquecer precisa
+  falhar](planos/encerrados/2026-09-08-esquecer-precisa-falhar.md) foi
+  **concluído** em 2026-09-08: o veredito de contato virou o padrão em vez de
+  depender da bandeira `--estrito`, a montagem passou a reprovar peça
+  atravessando peça, e a contenção passou a amostrar o centroide do triângulo.
+  Continua [o que nenhuma vista
+  mostra](planos/encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md), que fez
+  contato não declarado reprovar com código de saída, conferiu por V−E+F a forma
+  prometida e trouxe os pares acusados como imagem. O laboratório
   computacional saiu para
   [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia) em
   2026-09-03; o piloto de peça que usou seus números continua aqui, em

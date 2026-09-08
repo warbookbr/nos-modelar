@@ -1,6 +1,6 @@
 # Esquecer precisa falhar
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** a definir · **Base:** `main` em `0adb825`
 
@@ -11,61 +11,51 @@ declaração. A correção funciona, e duas medições desta sessão mostram que
 não chega a quem precisa.
 
 A primeira é que o veredito é opcional. `--estrito` é uma bandeira que a IA
-precisa digitar, e ela está pedida apenas no texto de duas skills,
-`criar-peca/SKILL.md` e `auditar-peca/SKILL.md`. Nenhum gate obriga, nenhum
-comando falha se ela for esquecida. Quem chama `npm run descrever` sem a
-bandeira recebe a mesma saída de sempre e código de saída zero, com a peça
-atravessada.
+precisa digitar, pedida apenas no texto de `criar-peca/SKILL.md` e
+`auditar-peca/SKILL.md`, e obrigada por gate nenhum. Sem ela, peça atravessada
+sai com código zero.
 
-A segunda é que a montagem inteira está descoberta. O código que mede peça
-atravessando peça em uma montagem existe, está testado e roda em
-`auditar-intersecoes-montagem.js`. O resultado é consumido em um único lugar, o
-perfil de montagens do MCP, e vira descrição para ser lida. Nenhum comando
-termina com erro por causa dele. O arquivo diz isso de si mesmo na linha 19: a
+A segunda é que a montagem está descoberta. O código que mede peça atravessando
+peça existe, está testado e roda em `auditar-intersecoes-montagem.js`, mas o
+resultado é consumido num lugar só, o perfil de montagens do MCP, e vira
+descrição para ser lida. O arquivo diz isso de si mesmo na linha 19: a
 expectativa ali anota, não julga.
 
-As duas juntas produzem o pior caso possível. Dentro de uma peça o defeito
-reprova, desde que alguém lembre da bandeira. Entre peças de uma montagem ele
-não reprova nunca. Montagem é onde o defeito é mais provável, porque quem monta
-não desenhou as duas peças ao mesmo tempo, e é para onde o projeto vai.
+As duas juntas produzem o pior caso. Dentro de uma peça o defeito reprova, desde
+que alguém lembre da bandeira; entre peças ele não reprova nunca. E é entre
+peças que ele é mais provável, porque quem monta não desenhou as duas.
 
 ### Por que a bandeira opcional não se sustenta
 
 O plano anterior mediu que lembrete em prosa é ignorado e que fato impresso na
 saída é filtrado. Uma bandeira que precisa ser lembrada é a mesma classe de
-coisa: ela transfere para a memória da IA a decisão de se o veredito existe.
-Com prompt curto, do tipo "modele uma bicicleta", ninguém digita `--estrito`, e
-o projeto volta a aprovar peça atravessada com código de saída zero.
+coisa: transfere para a memória da IA a decisão de se o veredito existe. Com
+prompt curto ninguém digita `--estrito`.
 
-A polaridade correta é a que o plano anterior fixou para a declaração: esquecer
-tem de falhar. Aplicada à bandeira, isso significa que o veredito é o padrão e
-quem quiser a saída apenas descritiva precisa pedir.
+A polaridade correta é a que o plano anterior fixou: esquecer tem de falhar. O
+veredito é o padrão, e quem quiser a saída apenas descritiva precisa pedir.
 
 ## Resultado
 
-Rodar `descrever` ou `descrever:montagem` sem nenhuma opção já reprova peça ou
-montagem com partes se atravessando fora do que foi declarado. A montagem
-declara seus contatos intencionais do mesmo jeito que a peça, e a expectativa
-que hoje só anota passa a julgar. Quem quiser a saída antiga, sem veredito,
-pede explicitamente.
+Rodar `descrever` ou `descrever:montagem` sem opção nenhuma já reprova peça ou
+montagem com partes se tocando fora do que foi declarado. A montagem declara
+seus contatos como a peça faz, e a expectativa que só anotava passa a julgar.
+Quem quiser a saída antiga pede explicitamente.
 
 ## Filtro Agent-First
 
-Nada de geometria nova. O teste exato de sólido, a tabela de estados e a
-ordenação por gravidade já existem em `contato-de-solidos.js` e
-`contatos-da-peca.js`, e a travessia da árvore da montagem já existe em
-`auditar-intersecoes-montagem.js`. O trabalho é inverter um padrão, ligar um
-resultado que já é calculado ao código de saída, e transformar um campo que
-anota em um campo que julga.
+Nada de geometria nova. O teste de sólido, a tabela de estados e a ordenação por
+gravidade já existem, e a travessia da árvore também. O trabalho é inverter um
+padrão, ligar ao código de saída um resultado que já é calculado, e transformar
+um campo que anota em um campo que julga.
 
 ## Excluído
 
-- corrigir as receitas e montagens do acervo. Elas ganham a declaração do que
-  já fazem, sem mudar geometria. Se alguma reprovar por defeito real, o defeito
-  é registrado e não corrigido dentro deste plano;
-- a ancoragem por `encostar`. A operação existe, funciona e foi medida nesta
-  sessão, e o que faltaria seria converter receitas não homologadas e escrever
-  regra de estilo. Regra em prosa é o que este projeto já mediu ser ignorado;
+- corrigir receitas e montagens do acervo. Elas ganham a declaração do que já
+  fazem, sem mudar geometria; defeito real é registrado, não corrigido aqui;
+- a ancoragem por `encostar`. A operação existe e foi medida nesta sessão; o que
+  faltaria era converter receitas não homologadas e escrever regra de estilo, e
+  regra em prosa é o que este projeto já mediu ser ignorado;
 - a verificação de contato dentro da varredura de parâmetros. Ela depende de
   cada receita declarar a faixa válida de cada número, e nenhuma declara hoje;
 - oclusão por contagem de pixel, que o plano anterior já excluiu pelo mesmo
@@ -77,9 +67,8 @@ anota em um campo que julga.
 2. A declaração continua sendo contrato e não escapatória. Ela diz o que se
    espera antes de medir, e par ausente da lista que se toque reprova.
 3. Contato é medido contra o sólido, nunca contra a caixa.
-4. A opção que desliga o veredito existe, tem nome explícito e aparece na
-   saída quando usada, para que uma execução relaxada nunca se pareça com uma
-   execução aprovada.
+4. A opção que desliga o veredito tem nome explícito e aparece na saída quando
+   usada: execução relaxada nunca se parece com execução aprovada.
 5. A leitura obrigatória continua em 70 KB ou menos.
 
 ## Rodadas
@@ -103,11 +92,10 @@ acervo ganharam a declaração do que já faziam, sem mudar geometria:
 **Dois defeitos reais que a inversão revelou, registrados e não corrigidos
 aqui.** Em `barricada-de-sucata` a receita usa `em` como canto mínimo do cubo,
 mas `em` é translação de um cubo centrado na origem: cada volume ficou meia
-largura à esquerda, a viga inferior ocupa de −2,40 a 0,00 em vez de −1,20 a
-1,20, e o pilar direito não encosta em nada. Em `bicicleta-urbana` sobrevive o
-defeito que originou o plano anterior, `rodaDianteiraPneu ↔ tuboInferior` por
-`intersecao-de-superficies`. Declarar qualquer um seria usar a declaração como
-escapatória, que a invariante 2 proíbe. As duas reprovam, e está correto.
+largura à esquerda e o pilar direito não encosta em nada. Em `bicicleta-urbana`
+sobrevive o defeito que originou o plano anterior, `rodaDianteiraPneu ↔
+tuboInferior`. Declarar qualquer um seria escapatória, que a invariante 2
+proíbe. As duas reprovam, e está correto.
 
 ### R01 — a montagem declara seus contatos
 
@@ -150,10 +138,10 @@ isso. No MCP, o que reprova deixou de ser `interpenetram` cru e passou a ser
 contato não declarado: a regra anterior reprovava junta legítima declarada e
 deixava passar peças apenas encostando sem declaração.
 
-A montagem do ensaio ponta a ponta ganhou a declaração do que já fazia e passou
-da versão 3 para a 4, que é a que transporta `auditoriaIntersecoes`. Entrou a
-fixture `bloco-fechado.json`, um cubo de seis faces: a `bloco-gabarito` tem duas
-faces, é malha aberta, e todo par dela sai inconclusivo em vez de acusado.
+A montagem do ensaio ganhou a declaração do que já fazia e passou para a versão
+4, que transporta `auditoriaIntersecoes`. Entrou a fixture `bloco-fechado.json`:
+a `bloco-gabarito` tem duas faces, é malha aberta, e todo par dela sai
+inconclusivo em vez de acusado.
 
 ### R03 — as skills param de pedir a bandeira
 
@@ -173,27 +161,40 @@ centroide de cada triângulo resolve.
 
 Medido antes de propor. No empate, dos 36 vértices nenhum cai dentro; o meio de
 aresta acerta 2 de 36 e o centroide 2 de 12, mesmo resultado com um terço dos
-pontos. Nas peças, nenhuma mudou de código de saída nem de quantidade de pares
-acusados; só a `barricada-de-sucata` mudou o estado de três pares, e ela é a
-peça com defeito real. Custo: de 6,23 para 7,02 segundos.
+pontos. Custo: de 6,23 para 7,02 segundos. Uma sonda adversarial tentou cinco
+ataques e nenhum passou como livre; ela mostrou que refinar a malha não abre
+brecha, porque o cruzamento é testado triângulo contra triângulo e só a
+contenção depende de amostragem.
 
-Uma sonda adversarial tentou cinco ataques com a amostragem nova — malha
-grosseira, haste fina atravessando chapa, penetração por quina, sólidos
-idênticos e malha aberta — e nenhum passou como livre. Ela derrubou uma
-suposição: a haste não passa entre os triângulos da chapa, porque o cruzamento é
-testado triângulo contra triângulo. O único código 0 com sobreposição real foi
-malha aberta, que sai inconclusiva e nunca livre.
-
-Feito, com uma correção à medida acima. Ao entrar de verdade, os dois pares do
-parafuso com as folhas na dobradiça do ensaio passaram de `encostam` para
-`interpenetram` por contenção — o parafuso atravessa as duas folhas, o estado
-novo é o certo, e o encaixe segue declarado. Minha varredura anterior só cobriu
-`prototipos/procedural/v3/pecas` e não alcançou composições. Nenhum veredito de
-aprovação mudou; mudou o rótulo de gravidade em três pares da barricada e dois
-da dobradiça.
+Feito, com uma correção. Ao entrar, os dois pares do parafuso com as folhas na
+dobradiça passaram de `encostam` para `interpenetram`: o parafuso atravessa as
+folhas, o estado novo é o certo, e o encaixe segue declarado. A varredura
+anterior só cobriu `pecas/` e não alcançou composições. Nenhum veredito de
+aprovação mudou; mudou o rótulo de gravidade em cinco pares.
 
 ## Fechamento
 
-Este plano fecha quando um agente sem contexto receber o pedido mínimo "modele
-uma montagem com duas peças que se atravessam" e o resultado reprovar sem que
-ninguém digite bandeira nenhuma.
+O gate rodou com um agente sem contexto e o pedido "modele um cavalete de serra
+com duas pernas em X cruzadas e uma travessa apoiada em cima", sem nenhuma
+menção a contato, atravessamento, declaração ou bandeira. Ele entregou
+`cavalete-de-serra.js` declarando os três contatos intencionais com motivo
+próprio, e a peça passa com código 0 sem opção nenhuma. Dez parâmetros
+declarados, dez vivos, nenhuma medida digitada.
+
+**A ferramenta não chegou a reprovar esse agente, e isso precisa ficar escrito.**
+O transcript mostra que ele declarou na primeira escrita da receita. A única
+ocorrência de "CONTATO(S) NÃO DECLARADO(S)" ali é ele LENDO o código-fonte de
+`descrever-peca.mjs`, não uma saída de comando. Antes disso ele leu a
+`cadeira-de-madeira`, que só tem `contatos` porque a R00 os acrescentou horas
+antes — ou seja, quem preparou o teste contaminou o ambiente do teste. Um autor
+comum não lê a implementação da ferramenta que o julga.
+
+O que ficou provado veio de medida direta, não do comportamento do agente:
+removendo o campo `contatos` da peça dele e mais nada, o mesmo comando sai com
+código 1 e acusa os três pares — as duas tábuas cruzadas e a travessa contra
+cada uma. Com a declaração de volta, código 0. Esquecer falha.
+
+A lição para o próximo gate deste tipo: um teste que exige reprovação depende de
+o agente errar, e repetir até alguém errar é caçar o vermelho. A pergunta
+verificável é se a ausência de declaração muda o veredito, e essa se responde
+tirando a declaração de uma peça pronta.

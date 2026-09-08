@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-801 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+802 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -457,7 +457,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-08-esquecer-precisa-falhar.md` — Esquecer precisa falhar
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -542,6 +541,7 @@
 - `2026-09-07-esteira-confiavel-para-ia.md` — Esteira confiável para a IA
 - `2026-09-07-o-que-nenhuma-vista-mostra.md` — O que nenhuma vista mostra
 - `2026-09-07-parametro-que-move-a-peca.md` — Parâmetro que move a peça
+- `2026-09-08-esquecer-precisa-falhar.md` — Esquecer precisa falhar
 - `README.md` — Planos encerrados
 
 ## docs/mecanifica/planos/mcp/
@@ -730,6 +730,7 @@
 - `bicicleta-urbana.js` — bicicleta-urbana.js — bicicleta urbana de quadro diamante, aro 700c.
 - `cabo-de-pa-bambu.js` — cabo-de-pa-bambu.js — cabo de pá em colmo de bambu.
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
+- `cavalete-de-serra.js` — cavalete-de-serra.js — cavalete de serra simples de madeira, com duas pernas em X cruzadas em cada extremidade e uma travessa horizontal apoiada em cima.
 - `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
 - `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
 - `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …

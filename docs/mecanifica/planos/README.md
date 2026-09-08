@@ -2,15 +2,28 @@
 
 ## Estado
 
-**Plano ativo:** [Esquecer precisa falhar](2026-09-08-esquecer-precisa-falhar.md).
+**Plano ativo:** Nenhum.
 
-O plano anterior fez a peça reprovar quando duas partes se atravessam sem
-declaração, e este trata as duas lacunas que sobraram. A primeira é que o
-veredito depende da bandeira `--estrito`, pedida apenas no texto de duas skills
-e obrigada por nenhum gate; ela passa a ser o padrão, e desligar o veredito
-passa a exigir pedido explícito. A segunda é que a montagem inteira não reprova:
-o código que mede peça atravessando peça existe e roda, mas o resultado só vira
-descrição, e a expectativa declarada anota em vez de julgar.
+[Esquecer precisa falhar](encerrados/2026-09-08-esquecer-precisa-falhar.md) foi
+**concluído** em 2026-09-08. O veredito de contato deixou de depender da
+bandeira `--estrito` e passou a ser o padrão, a montagem passou a reprovar peça
+atravessando peça, a expectativa de interseção virou contrato em vez de
+anotação, e a amostragem da contenção passou a incluir o centroide de cada
+triângulo, o que corrigiu o rebaixamento de `interpenetram` para `encostam`
+entre sólidos de lado igual.
+
+O gate de fechamento entregou `cavalete-de-serra`, modelada por um agente sem
+contexto a partir de um pedido que não citava contato nem bandeira, e ela passa
+declarando os três contatos intencionais. A ferramenta não chegou a reprovar
+esse agente, e o registro no plano diz por quê: ele declarou de primeira, depois
+de ler uma receita que só tinha `contatos` porque a R00 os acrescentou horas
+antes. O que ficou provado veio de medida direta — tirando o campo `contatos`
+daquela mesma peça, o comando sai com código 1 e acusa os três pares.
+
+A inversão do padrão também revelou dois defeitos reais no acervo, registrados e
+não corrigidos: `barricada-de-sucata`, cuja receita trata `em` como canto mínimo
+do cubo quando é translação de um cubo centrado, e `bicicleta-urbana`, que
+mantém o tubo inferior atravessando o pneu dianteiro.
 
 O [que nenhuma vista mostra](encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md)
 foi **concluído e aprovado** em 2026-09-08. Ele fechou as duas famílias de "erra

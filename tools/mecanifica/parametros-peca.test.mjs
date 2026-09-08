@@ -152,17 +152,19 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 234 declarados e 91 vivos', async () => {
+  it('trava o retrato do acervo: 244 declarados e 101 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
        do gate de fechamento do plano "o que nenhuma vista mostra", modelada por
        um agente frio a partir das skills, e trouxe 45 declarados com 44 vivos.
        É a mudança que o comentário acima autoriza — receita ligada aos próprios
-       parâmetros de propósito — e não regressão. */
+       parâmetros de propósito — e não regressão. Subiu de 234/91 para 244/101
+       quando `cavalete-de-serra` entrou: dez declarados, dez vivos, porque a
+       receita deriva PASSOS de PARAMS e nenhuma medida está digitada. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 234, vivos: 91, inertes: 143 });
+    expect(r.resultado.totais).toEqual({ declarados: 244, vivos: 101, inertes: 143 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
