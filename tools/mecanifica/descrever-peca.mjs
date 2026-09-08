@@ -73,7 +73,18 @@ export async function descreverPecaReutilizavel({
   partes = [],
   subarvore = null,
   casas = 6,
+  /* O VEREDITO É O PADRÃO, e desligá-lo exige pedido explícito.
+     Ele já nasceu como `--estrito`, uma bandeira que quem chama precisava
+     lembrar de digitar, pedida só no texto de duas skills e obrigada por gate
+     nenhum. Medido nesta sessão: com o pedido curto que produziu a bicicleta
+     ninguém digita bandeira, então a peça atravessada saía com código de saída
+     zero. Uma bandeira que precisa ser lembrada transfere para a memória de
+     quem chama a decisão de se o veredito existe, e é a mesma classe de coisa
+     que o lembrete em prosa que este projeto já mediu ser ignorado.
+     `estrito` continua aceito para não quebrar chamada existente, e não tem
+     mais efeito: o veredito roda de qualquer jeito. */
   estrito = false,
+  semVeredito = false,
   /* Resumido por PADRÃO. A saída completa tem 9,8 KB numa peça de 11 partes, e
      cresce O(n²) nas relações — uma máquina de 40 partes passaria de 60 KB por
      chamada, várias vezes por rodada. Quem chama para MEDIR um encaixe pede
@@ -176,6 +187,13 @@ export async function descreverPecaReutilizavel({
   }
 
   let stdout = '';
+  /* A EXECUÇÃO RELAXADA PRECISA SE PARECER COM UMA. Sem esta linha, uma saída
+     sem veredito e uma saída aprovada são o mesmo texto com o mesmo código de
+     saída zero, e quem lê depois não tem como distinguir as duas. */
+  if (semVeredito) {
+    stdout += 'VEREDITO DESLIGADO (--sem-veredito): contato entre partes e forma'
+      + ' prometida NÃO foram conferidos nesta execução.\n\n';
+  }
   if (consultaDeSubarvore) {
     const selecionadas = [...consultaDeSubarvore.nomes].sort();
     const params = new URLSearchParams({ peca, selecionadas: selecionadas.join(',') });
@@ -193,8 +211,9 @@ export async function descreverPecaReutilizavel({
       + ' descrevem uma peça incompleta.\n  ' + amostraDeOrfaos(neutro).join('\n  ') + '\n';
     falhou = true;
   }
-  if (descricao.totais.facesSemParte && estrito) {
-    stderr += `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica (--estrito)`
+  const comVeredito = !semVeredito;
+  if (descricao.totais.facesSemParte && comVeredito) {
+    stderr += `\n${descricao.totais.facesSemParte} face(s) sem identidade semântica`
       + `\n  ids: ${descricao.facesSemParte.slice(0, 20).join(', ')}\n`;
     falhou = true;
   }
@@ -203,18 +222,17 @@ export async function descreverPecaReutilizavel({
      texto, que partes se cruzavam — e um `grep` que pedia só contagem de partes
      e órfãos apagou o achado. O conserto não é escrever a linha melhor: é o
      estado sair no código de saída, que filtro nenhum descarta.
-     Roda só em `--estrito` porque é veredito, e veredito é o que quem chama
-     pediu para ser cobrado. */
+     Roda por padrão: ver a nota sobre `semVeredito` na assinatura. */
   let contatos = null;
   let formas = null;
-  if (estrito) {
+  if (comVeredito) {
     try {
       contatos = contatosDaPeca(neutro, receita);
     } catch (erro) {
       return falha(`NÃO CONSEGUI MEDIR OS CONTATOS\n  ${erro.message}`);
     }
     if (contatos.naoDeclarados.length) {
-      stderr += `\n${contatos.naoDeclarados.length} CONTATO(S) NÃO DECLARADO(S) (--estrito)`
+      stderr += `\n${contatos.naoDeclarados.length} CONTATO(S) NÃO DECLARADO(S)`
         + '\n  A receita não disse que estas partes deveriam se tocar:\n'
         + contatos.naoDeclarados
           .map(({ par, estado, metodo }) => `    ${par[0]} ↔ ${par[1]}: ${estado} (${metodo})`)
@@ -233,7 +251,7 @@ export async function descreverPecaReutilizavel({
       return falha(`NÃO CONSEGUI CONFERIR AS FORMAS\n  ${erro.message}`);
     }
     if (formas.divergentes.length) {
-      stderr += `\n${formas.divergentes.length} PARTE(S) COM FORMA DIFERENTE DA PROMETIDA (--estrito)\n`
+      stderr += `\n${formas.divergentes.length} PARTE(S) COM FORMA DIFERENTE DA PROMETIDA\n`
         + formas.divergentes
           .map(({ parte, forma, erros }) => `    ${parte}${forma ? ` (${forma})` : ''}: `
             + erros.map((e) => `${e.campo} esperado ${e.esperado}, medido ${e.medido}`).join('; '))
@@ -277,7 +295,7 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['partes', 'subarvore', 'casas'],
-      bandeiras: ['listar', 'estrito', 'completo'],
+      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -301,6 +319,7 @@ function comoCLI(argv) {
     subarvore: raizDaSubarvore,
     casas,
     estrito: lido.bandeira('estrito'),
+    semVeredito: lido.bandeira('sem-veredito'),
     resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
   });

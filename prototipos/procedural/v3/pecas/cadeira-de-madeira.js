@@ -290,6 +290,19 @@ export const receitaCadeiraDeMadeira = {
 
   PARAMS: P,
 
+  /* Marcenaria: assento apoiado na estrutura, saias e travessas encaixadas nas
+     pernas. Nenhum destes pares atravessa o outro; todos apenas encostam. */
+  contatos: [
+    { par: ['assento', 'pernaDianteira'], motivo: 'o assento apoia sobre o topo da perna' },
+    { par: ['assento', 'saiaFrontal'], motivo: 'a saia frontal sustenta a borda do assento' },
+    { par: ['assento', 'saiaLateral'], motivo: 'a saia lateral sustenta a borda do assento' },
+    { par: ['assento', 'saiaTraseira'], motivo: 'a saia traseira sustenta a borda do assento' },
+    { par: ['pernaDianteira', 'saiaFrontal'], motivo: 'a saia frontal encaixa na perna dianteira' },
+    { par: ['pernaDianteira', 'saiaLateral'], motivo: 'a saia lateral encaixa na perna dianteira' },
+    { par: ['pernaDianteira', 'travessaFrontal'], motivo: 'a travessa frontal trava as duas pernas' },
+    { par: ['pernaDianteira', 'travessaLateral'], motivo: 'a travessa lateral trava as duas pernas' },
+  ],
+
   TOPO: {
     /* Decisões que reconstroem a topologia, não resultados dela. */
     simetria: 'bilateral em X; lado direito autorado, esquerdo espelhado',

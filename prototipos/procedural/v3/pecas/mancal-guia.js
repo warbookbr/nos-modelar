@@ -77,8 +77,17 @@ export const PASSOS = [
   ['material', { usa: 'bronze', sel: { grupo: 'bucha' } }],
 ];
 
+/* Mancal montado: a bucha assentada dentro do alojamento, e o alojamento
+   apoiado na base. Os tres se tocam por construcao, sem atravessar. */
+export const contatos = [
+  { par: ['alojamento', 'base'], motivo: 'o alojamento apoia sobre a face da base' },
+  { par: ['alojamento', 'bucha'], motivo: 'a bucha assenta dentro do alojamento' },
+  { par: ['base', 'bucha'], motivo: 'a bucha encosta na base no fundo do alojamento' },
+];
+
 export const receitaMancalGuia = {
   meta,
+  contatos,
   INTENCAO,
   PARAMS,
   MATERIAIS,

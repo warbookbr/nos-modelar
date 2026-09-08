@@ -96,6 +96,23 @@ contato não declarado e exige código de saída diferente de zero; outro que ro
 com a opção de desligar e exige código zero mais a marca de que o veredito não
 foi aplicado.
 
+Feito. O veredito roda por padrão, `--estrito` continua aceito sem efeito, e
+`--sem-veredito` desliga imprimindo na saída que desligou. As quatro peças
+legítimas do acervo ganharam a declaração do que já faziam, sem mudar
+geometria: `cadeira-de-madeira`, `cutelo-de-sucata`, `gabarito-eixos` e
+`mancal-guia`.
+
+**Dois defeitos reais que a inversão revelou, registrados e não corrigidos
+aqui.** Em `barricada-de-sucata` a receita usa `em` como se fosse o canto
+mínimo do cubo, mas `em` é translação de um cubo centrado na origem, então cada
+volume ficou deslocado meia largura para a esquerda. A viga inferior ocupa de
+−2,40 a 0,00 em vez de −1,20 a 1,20, encosta no pilar esquerdo e não alcança o
+direito; o pilar direito está preso a nada. Em `bicicleta-urbana` sobrevive o
+defeito que originou o plano anterior: `rodaDianteiraPneu ↔ tuboInferior` com
+`intersecao-de-superficies`, o tubo passando pelo pneu. Declarar qualquer um
+dos dois seria usar a declaração como escapatória, que a invariante 2 proíbe.
+As duas peças reprovam, e é o comportamento correto.
+
 ### R01 — a montagem declara seus contatos
 
 O campo `auditoriaIntersecoes.expectativas` da montagem resolvida passa a ser

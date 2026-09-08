@@ -31,6 +31,14 @@ export const receitaCutelo = {
     comprimentoTotal: 0.88,
     larguraLamina: 0.138,
   },
+  /* O cabo atravessa guarda e lamina de proposito: e a espiga, que entra
+     inteira nas duas para a arma nao se desmontar no impacto. Contencao total
+     e o caso extremo do mesmo contato, medido pela mesma regua. */
+  contatos: [
+    { par: ['cabo', 'guarda'], motivo: 'a espiga do cabo atravessa a guarda inteira' },
+    { par: ['cabo', 'lamina'], motivo: 'a espiga do cabo entra dentro da lamina' },
+    { par: ['guarda', 'lamina'], motivo: 'a guarda assenta contra o ombro da lamina' },
+  ],
   MATERIAIS: {
     ferroSucata: { cor: '#475569', metalicidade: 0.85, aspereza: 0.45 },
     fioAfiado: { cor: '#cbd5e1', metalicidade: 0.95, aspereza: 0.15 },

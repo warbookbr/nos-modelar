@@ -148,12 +148,36 @@ describe('o veredito sai no CÓDIGO DE SAÍDA, que filtro nenhum descarta', () =
     expect(r.ok).toBe(false);
   });
 
-  it('sem --estrito o contato não é medido: veredito é o que se pediu', async () => {
+  /* SEM BANDEIRA NENHUMA TAMBÉM REPROVA. Este teste já existiu com a afirmação
+     oposta, de que sem `--estrito` o contato não era medido. A bandeira estava
+     pedida apenas no texto de duas skills e obrigada por gate nenhum, então com
+     um pedido curto ninguém a digitava e a peça atravessada saía com código 0.
+     Esquecer precisa falhar. */
+  it('sem bandeira nenhuma, o contato não declarado reprova', async () => {
     const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
     const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
     const r = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo });
+    expect(r.codigo).toBe(1);
+    expect(r.resultado.contatos).not.toBeNull();
+  });
+
+  it('--estrito continua aceito e não muda mais nada', async () => {
+    const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
+    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const comBandeira = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo, estrito: true });
+    const semBandeira = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo });
+    expect(comBandeira.codigo).toBe(semBandeira.codigo);
+  });
+
+  /* Desligar o veredito é legítimo, e por isso mesmo não pode se parecer com
+     uma aprovação: a execução relaxada se anuncia na própria saída. */
+  it('--sem-veredito aprova, não mede, e diz na saída que não mediu', async () => {
+    const modulo = await import(`${RAIZ_FIXTURES}/fixture-parte-engolida.js`);
+    const { descreverPecaReutilizavel } = await import('../../tools/mecanifica/descrever-peca.mjs');
+    const r = await descreverPecaReutilizavel({ peca: 'fixture-parte-engolida', modulo, semVeredito: true });
     expect(r.codigo).toBe(0);
     expect(r.resultado.contatos).toBeNull();
+    expect(r.stdout).toContain('VEREDITO DESLIGADO');
   });
 });
 

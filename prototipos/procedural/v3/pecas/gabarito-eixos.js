@@ -18,6 +18,13 @@ export const receitaGabarito = {
     eixoY: { cor: '#16a34a', metalicidade: 0.1, aspereza: 0.8 },
     eixoZ: { cor: '#2563eb', metalicidade: 0.1, aspereza: 0.8 },
   },
+  /* As tres hastes nascem na mesma origem, entao elas se tocam ali por
+     construcao: e o que faz o gabarito ser um gabarito de eixos. */
+  contatos: [
+    { par: ['hasteX', 'hasteY'], motivo: 'as duas hastes nascem na origem comum do gabarito' },
+    { par: ['hasteX', 'hasteZ'], motivo: 'as duas hastes nascem na origem comum do gabarito' },
+    { par: ['hasteY', 'hasteZ'], motivo: 'as duas hastes nascem na origem comum do gabarito' },
+  ],
   PASSOS: [
     // Cada haste sai da ORIGEM para o lado POSITIVO do seu eixo: assim a foto
     // mostra o sentido, não só a direção.
