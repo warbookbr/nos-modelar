@@ -3,17 +3,29 @@
 ## Estado
 
 **Plano ativo:** [o que nenhuma vista mostra](2026-09-07-o-que-nenhuma-vista-mostra.md)
-Aberto em 2026-09-07. Fecha a última família conhecida de "erra e mede limpo": as rodas da bicicleta foram
-dois cilindros concêntricos, o de fora engoliu aro, cubo e raios, e `descrever
---estrito` passou limpo com malha aprovada e zero órfãos. Nenhuma medida atual
-pergunta o que uma parte esconde da outra.
+Aberto em 2026-09-07, **versão 2** em 2026-09-08. Fecha as duas famílias de
+"erra e mede limpo" que a bicicleta produziu. Na primeira, a peça não saiu com a
+forma prometida: as rodas foram dois cilindros concêntricos, o de fora engoliu
+aro, cubo e raios, e `descrever --estrito` passou limpo. Na segunda, o arco
+atravessou a roda dianteira — e essa o `descrever` **já reportava**, mas a saída
+foi estreitada por um `grep`, porque hoje "passou" e "reprovou" são o mesmo
+texto no `stdout` e `--estrito` só reprova por face sem identidade.
 
-O desenho vem de duas evidências da própria sessão que o abriu: duas skills
-mandam "isole por pergunta" em destaque e não foram seguidas, e a bancada
-imprimiu uma dica junto da imagem que foi ignorada. Lembrete em prosa é
-ignorado, fato na saída é filtrado por quem estreita a leitura, e só estado que
-muda o veredito sobrevive — por isso contenção não declarada REPROVA em vez de
-avisar, e as vistas por par saem como imagem em vez de comando sugerido.
+O desenho vem de três evidências da sessão que o abriu, todas do mesmo tipo:
+duas skills mandam "isole por pergunta" em destaque e a IA confirmou ter lido
+sem levar em conta; a bancada imprimiu uma dica junto da imagem que foi
+ignorada; e o achado de interpenetração foi filtrado. Lembrete em prosa é
+ignorado, fato na saída é filtrado, e só estado que muda o veredito sobrevive.
+
+A versão 2 acrescenta o que o prompt que gerou a bicicleta expôs — *"leia as
+skills e o readme, modele uma bicicleta"*, sem nenhuma menção a colisão. Se isso
+precisa ser dito, a lista é infinita, então a declaração de contatos vira
+**contrato dito antes**, e não escapatória escrita depois para calar a
+reprovação: par que se toca e não foi declarado REPROVA, porque com prompt curto
+o que vale é o padrão. Entram também a conferência de forma por V−E+F, que pega
+o pneu maciço sem nada dentro (caso que a medida de contato não vê), e o gate de
+fechamento pelo mesmo prompt mínimo: bicicleta correta ou veredito vermelho,
+nunca verde e errada.
 
 O [atrito achado modelando](encerrados/2026-09-07-atrito-achado-modelando.md) foi
 **concluído e aprovado** em 2026-09-07. Modelar uma bicicleta de ponta a ponta
