@@ -126,3 +126,12 @@ jobs:
       # escolha entre o que se LÊ e o que se CONSULTA.
       - name: Leitura obrigatória dentro do teto
         run: npm run leitura:obrigatoria
+
+      # O catálogo de capacidades é gerado do registro do motor e assinado por
+      # hash. Ele é o que permite a skill não carregar a tabela de operações:
+      # quem precisa consulta uma operação e recebe schema, exemplo e limites.
+      # O `--check` já saía 1 na divergência e não era rodado em lugar nenhum,
+      # então o catálogo podia descrever um motor que não existe mais sem que
+      # ninguém percebesse.
+      - name: Catálogo de capacidades em dia com o motor
+        run: npm run catalogo:check

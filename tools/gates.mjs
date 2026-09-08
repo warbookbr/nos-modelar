@@ -32,6 +32,15 @@ export const GATES = [
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',
   'leitura:obrigatoria',
+  /* O catálogo é derivado do registro do motor e assinado por hash, e é a
+     camada que permite a skill NÃO carregar a tabela de operações: quem precisa
+     de uma consulta `descrever_capacidade` e recebe schema, exemplo e limites
+     de uma operação só. Ele existia com `--check` funcionando, saindo 1 na
+     divergência, e não era rodado por gate nem por CI. Fonte de verdade que
+     ninguém confere volta a ser texto solto: bastava uma operação mudar de
+     intenção no código para o catálogo descrever um motor que não existe mais,
+     e quem consulta não tem como saber. */
+  'catalogo:check',
 ];
 
 function executar() {
