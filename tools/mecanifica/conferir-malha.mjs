@@ -16,6 +16,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -31,8 +32,17 @@ const json = args.includes('--json');
 const unidade = args.find((a) => a.startsWith('--unidade='))?.slice('--unidade='.length) ?? 'm';
 if (!alvo) uso('falta o caminho da receita.');
 
-const absoluto = path.resolve(REPO, alvo);
-if (!absoluto.startsWith(REPO + path.sep)) uso('a receita precisa estar dentro do repositório.');
+/* Nome curto OU caminho. A skill `criar-peca` manda escrever
+   `npm run malha:conferir -- <peca>`, e ate aqui isso respondia "receita nao
+   encontrada": este comando resolvia so caminho, enquanto `descrever` e
+   `bancada` resolviam nome. Comando documentado que nao funciona como
+   documentado gasta a rodada de quem seguiu a instrucao. */
+let absoluto;
+try {
+  absoluto = resolverCaminhoReceita(alvo, { raiz: REPO });
+} catch (erro) {
+  uso(erro.message);
+}
 if (!existsSync(absoluto)) uso(`receita não encontrada: ${alvo}`);
 
 const { executarReceita } = await import(pathToFileURL(path.join(REPO, 'src/autoria/executar-receita.js')).href);

@@ -15,26 +15,38 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { diagnosticarParametros, formatarDiagnostico } from '../../src/autoria/parametros-vivos.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { PASTAS_BUSCA, resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
-const MAQUINAS = join(REPO, 'prototipos/procedural/v3/maquinas');
+/* As mesmas pastas que o resolvedor procura, menos a raiz. Antes esta lista era
+   `pecas` e `maquinas` escritas a mao, e o comando anunciava "acervo inteiro"
+   varrendo dois tercos dele: `armas/` tem tres receitas e nunca entrou na
+   conta. Derivar do resolvedor faz as duas listas nao poderem divergir. */
+const PASTAS = PASTAS_BUSCA.filter(Boolean).map((relativo) => join(REPO, relativo));
 
-/** Todo alvo do acervo: peça é arquivo, máquina é pasta com `montagem.js`. */
+/** Todo alvo do acervo: receita é arquivo, ou pasta com `montagem.js`. */
 export function alvosDoAcervo() {
-  const pecas = readdirSync(PECAS)
-    .filter((arquivo) => arquivo.endsWith('.js') && !arquivo.startsWith('_'))
-    .map((arquivo) => ({ nome: arquivo.slice(0, -'.js'.length), tipo: 'peca' }));
-  const maquinas = readdirSync(MAQUINAS, { withFileTypes: true })
-    .filter((entrada) => entrada.isDirectory())
-    .filter((entrada) => {
-      try { return statSync(join(MAQUINAS, entrada.name, 'montagem.js')).isFile(); } catch { return false; }
-    })
-    .map((entrada) => ({ nome: entrada.name, tipo: 'maquina' }));
-  return [...pecas, ...maquinas].sort((a, b) => a.nome.localeCompare(b.nome));
+  const alvos = [];
+  for (const pasta of PASTAS) {
+    let entradas;
+    try { entradas = readdirSync(pasta, { withFileTypes: true }); } catch { continue; }
+    for (const entrada of entradas) {
+      if (entrada.isDirectory()) {
+        try {
+          if (statSync(join(pasta, entrada.name, 'montagem.js')).isFile()) {
+            alvos.push({ nome: entrada.name, tipo: 'maquina' });
+          }
+        } catch { /* pasta sem montagem não é alvo */ }
+        continue;
+      }
+      if (entrada.name.endsWith('.js') && !entrada.name.startsWith('_')) {
+        alvos.push({ nome: entrada.name.slice(0, -'.js'.length), tipo: 'peca' });
+      }
+    }
+  }
+  return alvos.sort((a, b) => a.nome.localeCompare(b.nome));
 }
 
 function erroDeUso(mensagem) {
@@ -141,7 +153,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
   }
   if (!acervo && !alvo) {
     return erroDeUso(
-      'diga qual receita diagnosticar, pelo nome em prototipos/procedural/v3/{pecas,maquinas}/.'
+      'diga qual receita diagnosticar, pelo nome em prototipos/procedural/v3/{pecas,maquinas,armas,extensoes}/.'
       + '\n  ex.: npm run parametros -- cadeira-de-madeira   (ou --acervo para todas)',
     );
   }

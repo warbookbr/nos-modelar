@@ -38,7 +38,7 @@ describe('porta MCP da varredura', () => {
     expect(um.conteudo[0].text).toContain('PARÂMETROS DE cadeira-de-madeira');
 
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 139, vivos: 47, inertes: 92 });
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 189, vivos: 47, inertes: 142 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

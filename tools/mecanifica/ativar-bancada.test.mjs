@@ -60,7 +60,7 @@ const BOA = `export const receita = {
   meta: { nome: 'Fixture Boa', versao: '1.0.0' },
   MATERIAIS: { aco: { cor: '#2b2f33', metalicidade: 0.72, aspereza: 0.44 } },
   PASSOS: [
-    ['cubo', { origemId: 1, tam: [0.1, 0.1, 0.1] }],
+    ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1 }],
     ['parte', { nome: 'bloco', sel: { origem: { op: 'cubo', id: 1 } } }],
     ['material', { usa: 'aco', sel: { grupo: 'bloco' } }],
   ],
@@ -72,7 +72,7 @@ const QUEBRADA = `export const receita = {
   meta: { nome: 'Fixture Quebrada', versao: '1.0.0' },
   MATERIAIS: { aco: { cor: '#2b2f33', metalicidade: 0.72, aspereza: 0.44 } },
   PASSOS: [
-    ['cubo', { origemId: 1, tam: [0.1, 0.1, 0.1] }],
+    ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1 }],
     ['loft', { origemId: 2, lados: 8, orientacao: [1, 0, 0], secoes: [
       { pos: [0, 0, 0], raio: 0.01 },
       { pos: [0.1, 0, 0], raio: 0.01 },

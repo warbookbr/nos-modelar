@@ -94,9 +94,17 @@ describe('a pose de criação é igual aos passos escritos à mão', () => {
     const casos: Array<[string, Record<string, unknown>]> = [
       ['cubo', { larg: 0.1, alt: 0.1, prof: 0.1 }],
       ['cilindro', { raio: 0.03, altura: 0.08, lados: 10 }],
-      ['esfera', { raio: 0.04, seg: 8, aneis: 6 }],
+      /* `seg` nao existe no contrato da esfera nem no motor: a chave era ignorada
+         em silencio desde que este teste foi escrito, e so apareceu quando o
+         nucleo passou a recusar argumento fora do contrato. O nome certo e
+         `lados`. */
+      ['esfera', { raio: 0.04, lados: 8, aneis: 6 }],
       ['cone', { raio: 0.03, altura: 0.07, lados: 9 }],
-      ['plano', { larg: 0.1, prof: 0.1 }],
+/* `plano` le `largura`/`profundidade`; com `larg`/`prof` ele caia no
+         padrao 1x1 em silencio, e este teste comparava dois planos padrao
+         achando que comparava dois de 0,1. So apareceu quando o nucleo passou
+         a recusar argumento fora do contrato. */
+      ['plano', { largura: 0.1, profundidade: 0.1 }],
       ['chamferBox', { larg: 0.1, alt: 0.1, prof: 0.1, chanfro: 0.01 }],
       ['lathe', { lados: 8, perfil: [[0, 0], [0.03, 0], [0.03, 0.05], [0, 0.05]] }],
     ];

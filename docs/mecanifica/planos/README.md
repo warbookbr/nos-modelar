@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [atrito achado modelando](2026-09-07-atrito-achado-modelando.md),
+aberto em 2026-09-07. Modelar uma bicicleta de ponta a ponta produziu oito
+atritos, e **nenhum deles aparecia em gate** — os dezenove estavam verdes antes,
+durante e depois. Três enganam: `transladar` aceita chave errada e translada por
+zero sem uma linha de aviso; a paleta de `--cores` não separa 24 partes e fez o
+crítico visual cego devolver duas críticas falsas de cinco; e nenhuma medida vê
+oclusão, então duas rodas que eram discos maciços passaram por `--estrito`
+limpo. Os outros cinco custam rodada: comandos que a skill manda escrever e não
+funcionam como escritos, e busca que zera calada.
 
 O [parâmetro que move a peça](encerrados/2026-09-07-parametro-que-move-a-peca.md)
 foi **concluído e aprovado** em 2026-09-07. Ele nasceu da pergunta "onde a IA

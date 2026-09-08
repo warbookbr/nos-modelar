@@ -398,6 +398,67 @@ function addF(st, id, vs) {
   st.F.set(id, Face(id, vs));
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
+
+/** Distância de edição, só para sugerir o nome certo num typo de argumento. */
+function distanciaDeEdicao(a, b) {
+  const linha = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let diagonal = linha[0];
+    linha[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const anterior = linha[j];
+      linha[j] = Math.min(linha[j] + 1, linha[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diagonal = anterior;
+    }
+  }
+  return linha[b.length];
+}
+
+/**
+ * Argumento fora do contrato da operação GRITA, e o passo não roda.
+ *
+ * POR QUE ISTO EXISTE (achado modelando a bicicleta): `['transladar', { por:
+ * [1,0,0], sel }]` transladava por ZERO. Sem erro, sem órfão, sem uma linha —
+ * `a.d` chegava `undefined`, virava `[0,0,0]`, e a peça saía no lugar errado
+ * com todas as medidas verdes. Régua que mede a peça errada em silêncio é pior
+ * do que não medir, e é exatamente a lei que `tools/mecanifica/argumentos.mjs`
+ * aplica nas CLIs: bandeira desconhecida FALHA com diagnóstico, nunca vira
+ * no-op silencioso. A lei não alcançava argumento de passo.
+ *
+ * A tabela de campos aceitos já existia em `uso-operacoes.js` e já era
+ * importada aqui — faltava conferi-la. Levantamento antes de ligar: 593 passos
+ * nas 15 receitas do acervo, ZERO chaves fora do contrato, então nenhuma peça
+ * muda de geometria por causa desta porta.
+ *
+ * O passo é abortado, não corrigido: pedir o que a operação não entende deixa
+ * a intenção ambígua, e adivinhar seria a segunda-verdade silenciosa de novo.
+ */
+function argumentoDesconhecido(st, i, op, args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return false;
+  const propriedades = usoDaOperacao(op)?.schemaArgumentos?.properties;
+  /* Operação sem contrato publicado (extensão registrada em tempo de execução)
+     continua aceitando o que quiser: recusar ali seria inventar um contrato. */
+  if (!propriedades) return false;
+  const aceitos = Object.keys(propriedades);
+  let gritou = false;
+  for (const chave of Object.keys(args)) {
+    if (aceitos.includes(chave)) continue;
+    /* `em` e `eixo` sao lidos pelo DESPACHO, nao pela operacao, e ja tem recusa
+       propria com mensagem melhor — `em` fora de um gerador explica o que `em`
+       faz e por que ali nao cabe. Gritar antes trocaria uma mensagem que ensina
+       por uma lista de chaves. */
+    if (chave === 'em' || chave === 'eixo') continue;
+    let melhor = null;
+    for (const candidato of aceitos) {
+      const d = distanciaDeEdicao(chave, candidato);
+      if (d <= 2 && (melhor === null || d < melhor.d)) melhor = { candidato, d };
+    }
+    const dica = melhor ? ` Você quis dizer '${melhor.candidato}'?` : '';
+    grita(st, i, op, chave, `argumento desconhecido '${chave}'.${dica} '${op}' aceita: ${aceitos.join(', ')}`);
+    gritou = true;
+  }
+  return gritou;
+}
 function contextoNativo(st, i) {
   const vertices = new Map(), faces = new Map(), base = baseDoPasso(i);
   const local = (id, tipo) => { if (!Number.isSafeInteger(id) || id < 0 || id >= BLOCO) throw new Error(`${tipo} local precisa ser inteiro entre 0 e ${BLOCO - 1}`); return id; };
@@ -2703,6 +2764,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
     const registrada = registro.resolver(op);
     if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    if (argumentoDesconhecido(st, i, op, args)) return;
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
        não dentro de cada gerador. Oito geradores implementando a mesma

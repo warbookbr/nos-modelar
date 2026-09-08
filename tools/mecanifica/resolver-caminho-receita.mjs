@@ -6,10 +6,16 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '../..');
 
-const PASTAS_BUSCA = [
+/* Toda pasta de receita do repositorio, nao so as duas primeiras que alguem
+   precisou. `armas/` tem tres receitas e ficava inalcancavel pelo nome curto:
+   `npm run parametros -- espada-curta` respondia "nao encontrada" sobre um
+   arquivo que a propria skill `criar-peca` manda ler como exemplo. */
+export const PASTAS_BUSCA = [
   '',
   'prototipos/procedural/v3/pecas',
   'prototipos/procedural/v3/maquinas',
+  'prototipos/procedural/v3/armas',
+  'prototipos/procedural/v3/extensoes',
 ];
 
 function caminhoArquivoValido(p) {
