@@ -37,6 +37,11 @@ novo — nem por citação, nem por analogia.
 ## Coordenação e qualidade
 
 - Use pt-BR.
+- Escreva em parágrafos corridos e literais, aqui e nas respostas ao usuário.
+  Sem frases picotadas, listas de fragmentos, oposições "não X, e sim Y" nem
+  negrito no meio do texto. Descreva o fato, não a analogia: diga "o valor fixo
+  deixa de corresponder ao parâmetro e as partes se atravessam", não "o número
+  envelhece mal".
 - Rode os gates completos do INDEX.
 - Não edite `docs/uso/MAPA.md` à mão; rode `npm run mapa`.
 - Histórico e evidências encerradas não governam trabalho novo.

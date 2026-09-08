@@ -17,21 +17,10 @@ consulte a inbox e reserve arquivos antes de editar. Use
   histórica. Não autorizam implementação.
 - Em divergência, `docs/mecanifica/` prevalece.
 
-## Fronteiras
+## Fronteiras e qualidade
 
-- Permanecem o núcleo procedural, as receitas, o visor compatível, a bancada e
-  as ferramentas de validação.
-- `bancada.html` é a única aplicação publicada deste repositório.
-- A aplicação jogável, a Oficina humana e o som foram removidos.
-- O produto do cliente vive em `warbookbr/mecanica`.
-- O núcleo não importa Three.js nem conhece o domínio automotivo.
-- Identidade salva é semântica. UUIDs, índices de arrays e posições de passos
-  não são identidade.
-
-## Qualidade
-
-- Use pt-BR em documentação e nomes de domínio.
-- Rode os gates de `docs/mecanifica/INDEX.md`.
-- Confira peças na bancada em mais de um enquadramento.
-- Não edite `docs/uso/MAPA.md` à mão; use `npm run mapa`.
-- Não altere comportamento, geometria, materiais ou câmera sem escopo explícito.
+`CLAUDE.md` já define o escopo do repositório, a independência do núcleo, a
+identidade semântica, o idioma, a escrita e os gates; tudo aquilo vale aqui e
+não se repete. Além disso: confira peças na bancada em mais de um
+enquadramento, e não altere comportamento, geometria, materiais ou câmera sem
+escopo explícito.
