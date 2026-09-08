@@ -124,6 +124,20 @@ acontece na peça.
 Prova: fixtures de montagem com par declarado, par não declarado e declaração
 morta, cobrindo os três casos.
 
+Feito em `auditar-intersecoes-montagem.js`. A expectativa deixou de só anotar:
+a auditoria passa a devolver `naoDeclarados` e `declaradosSemContato`, com a
+mesma ordenação por gravidade da peça. Caminho que a montagem não tem falha
+nomeando os caminhos disponíveis, motivo abaixo de 15 caracteres falha, e o
+mesmo par declarado duas vezes falha.
+
+**Um limite da medida, encontrado ao escrever as fixtures.** Dois cubos de lado
+igual com eixos alinhados, meio sobrepostos, saem como `encostam` e não como
+`interpenetram`: todo vértice de um cai exatamente na superfície do outro, o
+teste de contenção não acha ponto estritamente dentro, e o veredito cai para o
+estado mais leve. O par continua acusado, porque os dois estados contam como
+contato, então a reprovação não muda — só a gravidade fica menor que a
+realidade. Está fixado por teste para não ser redescoberto por acidente.
+
 ### R02 — a montagem reprova
 
 `descrever:montagem` ganha veredito e reprova por padrão quando existe par não

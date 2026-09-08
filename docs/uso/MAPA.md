@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-800 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+801 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -749,6 +749,7 @@
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
+- `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural da Mecanifica.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `consultar-impacto-global.js` — consultar-impacto-global.js — consulta direcionada sobre o mapa v1.

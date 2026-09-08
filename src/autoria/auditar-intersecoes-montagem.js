@@ -4,6 +4,7 @@ import {
   exigirToleranciaDeContato,
   prepararSolido,
 } from './contato-de-solidos.js';
+import { ESTADOS_DE_CONTATO, MINIMO_DO_MOTIVO } from './contatos-da-peca.js';
 
 /* auditoria de interseções de montagem — serviço neutro, sem Three.js.
  *
@@ -16,8 +17,18 @@ import {
  * MONTAGEM: percorrer a árvore de instâncias, aplicar foco e cruzar o resultado
  * com as expectativas declaradas. A régua é uma só, para os dois.
  *
- * A EXPECTATIVA AQUI ANOTA, NÃO JULGA — um par esperado sai marcado, e o estado
- * geométrico continua o que a medida achou. Quem decide veredito é quem chama.
+ * A EXPECTATIVA JULGA. Ela anotava e só: um par esperado saía marcado, o estado
+ * geométrico continuava o que a medida achou, e nada além disso acontecia. Como
+ * o único consumidor transformava o resultado em descrição para ser lida,
+ * montagem com peça atravessando peça nunca reprovava — o defeito estava
+ * fechado dentro de uma peça e aberto entre peças, que é onde ele é mais
+ * provável, porque quem monta não desenhou as duas peças.
+ *
+ * A POLARIDADE É A MESMA DA PEÇA, e ela importa mais que o resto do módulo. A
+ * montagem lista os contatos INTENCIONAIS antes de medir, e par que se toque
+ * fora da lista sai em `naoDeclarados`. Se declarar servisse para calar uma
+ * reprovação já emitida, bastaria declarar tudo depois de ver o vermelho.
+ * Esquecer precisa falhar, não silenciar.
  */
 
 export const FORMATO_AUDITORIA_INTERSECOES = 'mecanifica.auditoria-intersecoes';
@@ -61,6 +72,40 @@ function expectativaDoPar(expectativas, a, b) {
   ));
 }
 
+function chaveDoPar(a, b) {
+  const [x, y] = compararCaminho(a, b) <= 0 ? [a, b] : [b, a];
+  return `${JSON.stringify(x)} ${JSON.stringify(y)}`;
+}
+
+/**
+ * Confere a lista declarada contra a montagem que existe de verdade.
+ *
+ * Caminho inexistente FALHA nomeando os caminhos disponíveis: declaração que não
+ * casa com nada é declaração morta, e declaração morta some sem ninguém notar.
+ * O motivo tem tamanho mínimo pela mesma razão que na peça — campo livre que
+ * aceita "ok" é campo que some.
+ */
+function conferirExpectativas(expectativas, folhas, quem) {
+  const conhecidos = new Set(folhas.map((folha) => JSON.stringify(folha.caminho)));
+  const disponiveis = () => [...conhecidos].sort(compararTexto).join(', ') || '(nenhum)';
+  const vistos = new Set();
+  for (const expectativa of expectativas) {
+    const onde = `${quem}: expectativa '${expectativa.id}'`;
+    for (const lado of ['a', 'b']) {
+      const chave = JSON.stringify(expectativa[lado].caminho);
+      if (!conhecidos.has(chave)) {
+        throw new Error(`${onde}: a montagem não tem a peça ${chave}. Caminhos disponíveis: ${disponiveis()}.`);
+      }
+    }
+    if (typeof expectativa.motivo !== 'string' || expectativa.motivo.trim().length < MINIMO_DO_MOTIVO) {
+      throw new Error(`${onde}: 'motivo' precisa dizer POR QUE estas peças se tocam, com pelo menos ${MINIMO_DO_MOTIVO} caracteres. Motivo curto é declaração que ninguém confere.`);
+    }
+    const par = chaveDoPar(expectativa.a.caminho, expectativa.b.caminho);
+    if (vistos.has(par)) throw new Error(`${onde}: este par já foi declarado por outra expectativa.`);
+    vistos.add(par);
+  }
+}
+
 export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
   if (!montagemResolvida || !Array.isArray(montagemResolvida.instancias)) throw new TypeError('auditar interseções: montagem resolvida inválida.');
   if (!opcoes || typeof opcoes !== 'object' || Array.isArray(opcoes)) throw new TypeError('auditar interseções: opções inválidas.');
@@ -75,6 +120,7 @@ export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
     ?? TOLERANCIA_INTERSECOES, 'auditar interseções');
   const expectativas = montagemResolvida.auditoriaIntersecoes?.expectativas ?? [];
   const folhas = prepararFolhas(montagemResolvida);
+  conferirExpectativas(expectativas, folhas, 'auditar interseções');
   const pares = [];
   let filtrados = 0;
   for (let i = 0; i < folhas.length; i += 1) for (let j = i + 1; j < folhas.length; j += 1) {
@@ -93,12 +139,31 @@ export function auditarIntersecoesMontagem(montagemResolvida, opcoes = {}) {
     });
   }
   const inconclusivos = pares.filter((par) => par.estado === 'inconclusivo').length;
+  /* GRAVIDADE PRIMEIRO, como na peça: quem consome com orçamento apertado
+     precisa receber os piores, e não os que vêm antes na ordem do caminho. */
+  const gravidade = (estado) => (estado === 'interpenetram' ? 0 : 1);
+  const suspeita = (metodo) => (metodo === 'intersecao-de-superficies' ? 0 : 1);
+  const emContato = pares.filter((par) => ESTADOS_DE_CONTATO.includes(par.estado));
+  const naoDeclarados = emContato
+    .filter((par) => par.expectativa === undefined)
+    .sort((x, y) => gravidade(x.estado) - gravidade(y.estado)
+      || suspeita(x.metodo) - suspeita(y.metodo)
+      || compararCaminho(x.a, y.a) || compararCaminho(x.b, y.b));
+  const tocam = new Set(emContato.map((par) => chaveDoPar(par.a, par.b)));
+  /* Declaração que não corresponde a contato nenhum. Não reprova — pode ser
+     folga que a montagem pretende fechar — mas aparece, porque declaração que
+     descreve o que não existe é a primeira forma de a lista virar ficção. */
+  const declaradosSemContato = expectativas
+    .filter((item) => !tocam.has(chaveDoPar(item.a.caminho, item.b.caminho)))
+    .map((item) => ({ id: item.id, a: item.a.caminho, b: item.b.caminho, motivo: item.motivo }));
   return {
     formato: FORMATO_AUDITORIA_INTERSECOES,
     versao: VERSAO_AUDITORIA_INTERSECOES,
     escopo: { caminho: caminho.slice(), modoFoco, folhas: folhas.length, paresOmitidosPorFoco: filtrados },
     toleranciaNumerica: tolerancia,
     pares,
+    naoDeclarados,
+    declaradosSemContato,
     cobertura: {
       paresTotais: (folhas.length * (folhas.length - 1)) / 2,
       paresNoEscopo: pares.length,
