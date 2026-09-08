@@ -148,6 +148,18 @@ Prova: teste de ponta a ponta sobre as fixtures da R01, exigindo código de
 saída diferente de zero, e a verificação de que as montagens do acervo passam
 depois de declararem o que já fazem.
 
+Feito em `descrever-montagem-persistida.mjs` e no perfil de montagens do MCP. A
+CLI roda a auditoria por padrão, devolve o veredito no JSON e sai com código 1
+quando existe par não declarado; `--sem-veredito` desliga e a saída registra
+isso. No MCP, o que reprova deixou de ser `interpenetram` cru e passou a ser
+contato não declarado: a regra anterior reprovava junta legítima declarada e
+deixava passar peças apenas encostando sem declaração.
+
+A montagem do ensaio ponta a ponta ganhou a declaração do que já fazia e passou
+da versão 3 para a 4, que é a que transporta `auditoriaIntersecoes`. Entrou a
+fixture `bloco-fechado.json`, um cubo de seis faces: a `bloco-gabarito` tem duas
+faces, é malha aberta, e todo par dela sai inconclusivo em vez de acusado.
+
 ### R03 — as skills param de pedir a bandeira
 
 `criar-peca/SKILL.md` e `auditar-peca/SKILL.md` deixam de mandar digitar
@@ -155,6 +167,31 @@ depois de declararem o que já fazem.
 libera espaço na leitura obrigatória, que hoje está em 69869 de 70000 bytes.
 
 Prova: `npm run leitura:obrigatoria` e os gates completos.
+
+### R04 — a amostragem da contenção inclui o centroide
+
+O teste de contenção amostra só os VÉRTICES dos triângulos. Com dois sólidos de
+lado igual e eixos alinhados, todo vértice de um cai exatamente na superfície do
+outro, nenhum ponto fica estritamente dentro, e sobreposição real de metade do
+volume sai como `encostam`. Somar o centroide de cada triângulo resolve.
+
+Medido antes de propor. No empate, dos 36 vértices nenhum cai dentro; o meio de
+aresta acerta 2 de 36 e o centroide 2 de 12, mesmo resultado com um terço dos
+pontos. No acervo inteiro nenhuma peça mudou de código de saída nem de
+quantidade de pares acusados; só a `barricada-de-sucata` mudou o estado de três
+pares, de `encostam` para `interpenetram`, e ela é a peça com defeito real. O
+custo foi de 6,23 para 7,02 segundos, treze por cento.
+
+Uma sonda adversarial tentou cinco ataques com a amostragem nova — malha
+grosseira, haste fina atravessando chapa fina, penetração por quina, sólidos
+idênticos e malha aberta — e nenhum passou como livre. Ela derrubou uma
+suposição: a haste fina não passa entre os triângulos da chapa, porque o
+cruzamento é testado triângulo contra triângulo, e não por amostragem. O único
+código 0 com sobreposição real foi malha aberta, que sai inconclusiva e nunca
+livre.
+
+Prova: uma fixture com o caso do empate exigindo `interpenetram`, e a suíte
+completa verde sem mudança de veredito no acervo.
 
 ## Fechamento
 

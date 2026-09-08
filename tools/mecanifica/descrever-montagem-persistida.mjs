@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { descreverMontagemResolvida } from '../../src/autoria/descrever-montagem-resolvida.js';
+import { auditarIntersecoesMontagem } from '../../src/autoria/auditar-intersecoes-montagem.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { verificarCaminhoConfinado } from './caminho-confinado.mjs';
@@ -92,7 +93,7 @@ function diagnostico(erro) {
 try {
   const argumentos = lerArgumentos(process.argv.slice(2), {
     opcoes: ['arquivo', 'raiz-montagens', 'raiz-pecas', 'caminho', 'profundidade'],
-    bandeiras: ['incluir-relacionados'],
+    bandeiras: ['incluir-relacionados', 'sem-veredito'],
   });
   const raizMontagens = resolve(exigir(argumentos.opcao('raiz-montagens'), 'raiz-montagens'));
   const raizPecas = resolve(exigir(argumentos.opcao('raiz-pecas'), 'raiz-pecas'));
@@ -106,7 +107,32 @@ try {
     ...(argumentos.opcao('profundidade') !== null ? { profundidade: profundidadeDaConsulta(argumentos.opcao('profundidade')) } : {}),
     ...(argumentos.bandeira('incluir-relacionados') ? { incluirRelacionados: true } : {}),
   };
-  process.stdout.write(`${JSON.stringify(descreverMontagemResolvida(resolvida, opcoes), null, 2)}\n`);
+  /* O VEREDITO É O PADRÃO. Peça atravessando peça já era medido aqui e virava
+     descrição para ser lida; nada reprovava. Dentro de uma peça o defeito
+     falha, entre peças ele passava, e é entre peças que ele é mais provável,
+     porque quem monta não desenhou as duas. Desligar exige --sem-veredito, e
+     a saída diz quando foi desligado, para execução relaxada nunca se parecer
+     com execução aprovada. */
+  const semVeredito = argumentos.bandeira('sem-veredito');
+  const auditoria = semVeredito ? null : auditarIntersecoesMontagem(resolvida);
+  const veredito = semVeredito
+    ? { aplicado: false, motivo: 'desligado por --sem-veredito' }
+    : {
+      aplicado: true,
+      naoDeclarados: auditoria.naoDeclarados,
+      declaradosSemContato: auditoria.declaradosSemContato,
+      /* Par inconclusivo aparece e NÃO reprova: malha aberta é estilo que o
+         motor aceita, e reprovar aqui puniria montagem legítima. Ele também
+         nunca vira "livre" — a medida diz que não conseguiu decidir. */
+      inconclusivos: auditoria.cobertura.inconclusivos,
+    };
+  process.stdout.write(`${JSON.stringify({ ...descreverMontagemResolvida(resolvida, opcoes), veredito }, null, 2)}\n`);
+  if (veredito.aplicado && veredito.naoDeclarados.length) {
+    process.stderr.write(`descrever-montagem-persistida: ${veredito.naoDeclarados.length} CONTATO(S) NÃO DECLARADO(S) entre peças da montagem.\n`
+      + veredito.naoDeclarados.map((par) => `  ${par.a.join('/')} ↔ ${par.b.join('/')}: ${par.estado} (${par.metodo})\n`).join('')
+      + '  Se o contato é intencional, declare-o em auditoriaIntersecoes.expectativas, com o motivo. Se não é, a montagem está errada.\n');
+    process.exitCode = 1;
+  }
 } catch (erro) {
   process.stderr.write(`descrever-montagem-persistida: ${JSON.stringify({ erro: diagnostico(erro) })}\n`);
   process.exitCode = 1;

@@ -34,6 +34,38 @@ function montagemComPeca(ref: string) {
   return { formato: 'mecanifica.montagem', versao: 1, id: 'raiz', instancias: [{ id: 'alvo', alvo: { tipo: 'peca', ref } }] };
 }
 
+/* Duas cópias do mesmo bloco, sobrepostas de propósito: o par se toca e a
+   montagem não o declara, que é exatamente o caso que a R02 passou a reprovar.
+   O bloco usado é `bloco-fechado` e não `bloco-gabarito`: este último tem só
+   duas faces, é malha aberta, e por isso todo par dele sai INCONCLUSIVO em vez
+   de acusado — a medida se recusa a decidir invasão sobre malha que não fecha
+   sólido, e essa recusa é intencional. */
+function montagemComParEmContato(expectativas: unknown[] = []) {
+  return {
+    formato: 'mecanifica.montagem',
+    /* Versão 4: é a que transporta auditoriaIntersecoes, onde a declaração vive. */
+    versao: 4,
+    id: 'par-em-contato',
+    instancias: [
+      { id: 'movel', alvo: { tipo: 'peca', ref: 'bloco-fechado' }, pose: { deslocamento: [0.3, 0.5, 0.3], rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]] } },
+      { id: 'referencia', alvo: { tipo: 'peca', ref: 'bloco-fechado' } },
+    ],
+    relacoes: [],
+    auditoriaIntersecoes: { toleranciaNumerica: 0.000001, expectativas },
+  };
+}
+
+function correrMontagem(montagem: unknown, extra: string[] = []) {
+  const temp = temporario();
+  writeFileSync(join(temp.montagens, 'par.json'), JSON.stringify(montagem));
+  return correr([
+    `--arquivo=${join(temp.montagens, 'par.json')}`,
+    `--raiz-montagens=${temp.montagens}`,
+    `--raiz-pecas=${PECAS}`,
+    ...extra,
+  ]);
+}
+
 afterEach(() => {
   for (const caminho of temporarios.splice(0)) rmSync(caminho, { recursive: true, force: true });
 });
@@ -116,5 +148,32 @@ describe('descrever:montagem:persistida — R03', () => {
     const resultado = correr([`--arquivo=${raiz}`, `--raiz-montagens=${temp.montagens}`, `--raiz-pecas=${temp.pecas}`]);
     expect(resultado).toMatchObject({ codigo: 1, stdout: '' });
     expect(resultado.stderr).toMatch(/vínculo simbólico|reparse point/);
+  });
+});
+
+/* R02: a montagem reprova. O que se prova aqui é o CÓDIGO DE SAÍDA, nunca a
+   mensagem: o defeito original sobreviveu porque a acusação era texto. */
+describe('o veredito da montagem sai no código de saída', () => {
+  it('par em contato sem declaração reprova, sem bandeira nenhuma', () => {
+    const r = correrMontagem(montagemComParEmContato());
+    expect(r.codigo).toBe(1);
+    expect(JSON.parse(r.stdout).veredito.naoDeclarados).toHaveLength(1);
+  });
+
+  it('o mesmo par declarado passa', () => {
+    const r = correrMontagem(montagemComParEmContato([{
+      id: 'e1',
+      a: { caminho: ['movel'] },
+      b: { caminho: ['referencia'] },
+      motivo: 'os dois blocos se encaixam de propósito nesta montagem',
+    }]));
+    expect(r.codigo).toBe(0);
+    expect(JSON.parse(r.stdout).veredito.naoDeclarados).toEqual([]);
+  });
+
+  it('--sem-veredito passa, não mede, e diz na saída que não mediu', () => {
+    const r = correrMontagem(montagemComParEmContato(), ['--sem-veredito']);
+    expect(r.codigo).toBe(0);
+    expect(JSON.parse(r.stdout).veredito).toMatchObject({ aplicado: false });
   });
 });

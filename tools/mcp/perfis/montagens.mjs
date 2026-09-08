@@ -157,7 +157,12 @@ export async function revisarMontagem(input, {
   const visualDisponivel = visual.resposta.ok;
   const estado = verificacoes.some(({ estado: atual }) => atual === 'falhou')
     ? 'reprovada'
-    : (auditoriaIntersecoes.pares.some(({ estado: atual }) => atual === 'interpenetram')
+    /* O QUE REPROVA É O CONTATO NÃO DECLARADO, e não `interpenetram` cru. A
+       regra anterior errava dos dois lados: reprovava junta legítima que a
+       montagem declarou de propósito, e deixava passar peças apenas ENCOSTANDO
+       sem declaração, que é contato igual. A declaração é o contrato; a medida
+       diz o que existe, e o veredito compara os dois. */
+    : (auditoriaIntersecoes.naoDeclarados.length > 0
       ? 'reprovada'
       : (!visualDisponivel || verificacoes.length === 0 || naoVerificadas.length > 0
         ? 'incompleta' : 'sem-falhas-declaradas'));

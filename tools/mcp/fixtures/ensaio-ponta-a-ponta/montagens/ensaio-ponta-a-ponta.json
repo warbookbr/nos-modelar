@@ -1,33 +1,103 @@
 {
   "formato": "mecanifica.montagem",
-  "versao": 3,
+  "versao": 4,
   "id": "ensaio-ponta-a-ponta",
   "instancias": [
-    { "id": "base", "alvo": { "tipo": "peca", "ref": "placa-base" } },
+    {
+      "id": "base",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "placa-base"
+      }
+    },
     {
       "id": "suporte",
-      "alvo": { "tipo": "peca", "ref": "suporte-portas" },
-      "pose": { "deslocamento": [0, 0.2, 0] }
+      "alvo": {
+        "tipo": "peca",
+        "ref": "suporte-portas"
+      },
+      "pose": {
+        "deslocamento": [
+          0,
+          0.2,
+          0
+        ]
+      }
     },
     {
       "id": "pino",
-      "alvo": { "tipo": "peca", "ref": "pino-guia" },
-      "pose": { "deslocamento": [0, 1.3, 0] }
+      "alvo": {
+        "tipo": "peca",
+        "ref": "pino-guia"
+      },
+      "pose": {
+        "deslocamento": [
+          0,
+          1.3,
+          0
+        ]
+      }
     }
   ],
   "relacoes": [
     {
       "id": "encaixeDoPino",
       "tipo": "encaixaCilindrico",
-      "referencia": { "caminho": ["suporte"], "porta": "guiaExterna" },
-      "movel": { "caminho": ["pino"], "porta": "guiaInterna" },
+      "referencia": {
+        "caminho": [
+          "suporte"
+        ],
+        "porta": "guiaExterna"
+      },
+      "movel": {
+        "caminho": [
+          "pino"
+        ],
+        "porta": "guiaInterna"
+      },
       "especificacao": {
         "folgaRadial": {
           "nominal": 0,
-          "toleranciaFabricacao": { "menos": 0, "mais": 0 }
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
         },
-        "toleranciaNumerica": 0.000001
+        "toleranciaNumerica": 1e-06
       }
     }
-  ]
+  ],
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-06,
+    "expectativas": [
+      {
+        "id": "suporteApoiaNaBase",
+        "a": {
+          "caminho": [
+            "base"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporte"
+          ]
+        },
+        "motivo": "o suporte apoia sobre a face superior da placa base"
+      },
+      {
+        "id": "pinoAssentaNoSuporte",
+        "a": {
+          "caminho": [
+            "pino"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "suporte"
+          ]
+        },
+        "motivo": "o pino assenta na guia do suporte, que e o encaixe declarado em encaixeDoPino"
+      }
+    ]
+  }
 }
