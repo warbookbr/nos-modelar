@@ -7,8 +7,8 @@ description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, esc
 
 Use esta skill quando o alvo for uma peça geométrica editável. Se o alvo for
 uma árvore de composição, relações entre peças ou revalidação de conjunto,
-use também `../auditar-montagem/SKILL.md`; não transforme uma montagem em uma
-receita monolítica.
+use também `../auditar-montagem/SKILL.md`: cada peça é uma receita, e o conjunto
+é uma montagem que as relaciona.
 
 O contrato que esta skill executa é
 [`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
@@ -25,10 +25,10 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    `mecanifica://procedural/schemas`. Busque em modo resumido e use
    `descrever_capacidade` para obter schema, exemplo, pré-condições, limites e
    diagnósticos somente da operação escolhida. Combine/valide a cadeia antes
-   de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`; não replique tabelas por
-   regex nem invente uma operação ausente.
+   de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`. Toda operação usada vem do
+   catálogo, lida por `descrever_capacidade`.
 2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
-   quando o contrato permitir. Não grave identidade por índice ou UUID.
+   quando o contrato permitir: identidade persistida é sempre semântica.
 3. Rode a descrição e obtenha vistas por uma bancada/harness privado
    explicitamente configurado. Esse é o laço oficial de inspeção visual:
 
@@ -40,9 +40,9 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    O catálogo publicado está vazio de propósito: a peça em trabalho é ativada
    na sessão e capturada pelo nome curto.
 
-4. **Isole por pergunta, não por hábito.** Peça inteira numa imagem só esconde
-   erro estrutural debaixo de detalhe. A bancada tem três modos, e cada um
-   responde uma pergunta diferente:
+4. **Cada imagem responde uma pergunta.** Escolha o modo pela pergunta que
+   você precisa responder agora. A bancada tem três, e cada um responde uma
+   coisa diferente:
 
    ```bash
    npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar
@@ -57,8 +57,8 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    | `todas` | lê como o objeto certo? | leitura geral — e aqui **você não decide sozinho** |
 
    **`isolar` sozinho aprova coisa impossível.** Um arco de roda que não cabe na
-   própria roda passa isolado e só aparece em `contexto`. Regra: nunca conclua
-   sobre uma peça que tem vizinho sem ter olhado em `contexto`.
+   própria roda passa isolado e só aparece em `contexto`. Regra: peça com
+   vizinho conclui em `contexto`.
 
    `--par a,b` isola exatamente duas peças e já enquadra, para julgar um encaixe.
 
@@ -77,14 +77,16 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
 item 6; não substituem a descrição nem as vistas da bancada. A peça mora em
 `prototipos/procedural/v3/pecas/`; prefixo `_` indica exemplo/fixture.
 
-Receita anterior não é modelo homologado: não cite nem copie nome histórico. Só
-crie uma receita quando houver alvo e pacote de modelagem autorizados; o
+Receita anterior é evidência do que foi feito, e o alvo autorizado é a fonte
+dos nomes. Crie uma receita quando houver alvo e pacote de modelagem
+autorizados; o
 catálogo de **capacidades** continua disponível mesmo sem peça publicada.
 
 Quando uma capacidade faltar, consulte primeiro `buscar_capacidades`,
 `descrever_capacidade`, `combinar_capacidades`, `validar_composicao` e
 `analisar_lacuna` pela descoberta procedural. Só depois diagnostique uma
-extensão; nunca instale código ou esconda JavaScript na receita.
+extensão, que é a via declarada para capacidade ausente e mantém a receita
+inteira dentro do vocabulário do motor.
 
 ## Contrato mínimo
 
@@ -106,9 +108,9 @@ como molde, não**. Para uma receita nova, use o contrato declarativo em
 não referência de engenharia, e registre o pacote que autorizou a modelagem.
 
 `PARAMS` guarda dimensões; `TOPO` guarda decisões que podem reconstruir a
-topologia; `PASSOS` é a lista `[['op', {...}], ...]`. Não escreva `id:` em um
-passo: o núcleo calcula o bloco pela posição (`BLOCO=1000`). `origemId` é uma
-identidade estrutural diferente e pode ser escolhida pelo autor.
+topologia; `PASSOS` é a lista `[['op', {...}], ...]`. O núcleo calcula o bloco pela posição
+do passo (`BLOCO=1000`), então o passo dispensa `id:`. `origemId` é identidade
+estrutural, outra coisa, e essa o autor escolhe.
 
 **Derive `PASSOS` de `PARAMS`** (`get PASSOS() { return gerarPassos(this.PARAMS); }`);
 lista de literais congela os números e faz `PARAMS` virar enfeite, sem aviso.
@@ -117,13 +119,13 @@ lista de literais congela os números e faz `PARAMS` virar enfeite, sem aviso.
 Quando a função pretendida não for óbvia pela geometria, exporte o contrato
 opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare
 função, família, significado dos eixos locais, invariantes e critérios visuais.
-A descrição headless e a revisão preservam e comparam essa intenção; ela não
-substitui medidas, interfaces, relações nem inspeção das imagens. Não grave
-posição de passo, índice, UUID, caminho local ou estado de runtime nela.
+A descrição headless e a revisão preservam e comparam essa intenção; ela soma às
+medidas, interfaces, relações e à inspeção das imagens. Grave nela só o que
+sobrevive a uma reexecução em outra máquina.
 
 Números precisam ser finitos e pontos precisam ter exatamente `[x,y,z]`.
 `NaN`, `Infinity` e aridade errada devem lançar erro. Determinismo exige
-semente explícita; nunca use `Date.now()` ou `Math.random()` cru.
+semente explícita: todo sorteio parte dela, e a receita reexecuta igual.
 
 `meta.colisao`, `colisaoDe` e `solido` são compatibilidade opcionais para
 consumidores v3, não requisitos universais da bancada atual. Quando a peça
@@ -155,7 +157,8 @@ Para identidade estável, prefira uma primitiva com
 semântica documentada.
 
 `apagaFace` é a exceção importante: aceita `sel: {...}`, exige exatamente uma face e é
-a forma semântica de abrir um vão. Não misture `face` e `sel` no mesmo passo.
+a forma semântica de abrir um vão. Cada passo endereça por `face` ou por `sel`,
+um dos dois.
 
 ## Orientação e casos recorrentes
 
