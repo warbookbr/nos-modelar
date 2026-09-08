@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-798 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+799 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -725,6 +725,7 @@
 ## prototipos/procedural/v3/pecas/
 
 - `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
+- `bicicleta-prova.js` — bicicleta-prova.js — bicicleta de passeio de quadro aberto (step-through), aro 26.
 - `bicicleta-urbana.js` — bicicleta-urbana.js — bicicleta urbana de quadro diamante, aro 700c.
 - `cabo-de-pa-bambu.js` — cabo-de-pa-bambu.js — cabo de pá em colmo de bambu.
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.

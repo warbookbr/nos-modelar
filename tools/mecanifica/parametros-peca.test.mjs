@@ -152,12 +152,17 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 189 declarados e só 47 vivos', async () => {
+  it('trava o retrato do acervo: 234 declarados e 91 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
-       ligado uma receita aos seus parâmetros de propósito, algo regrediu. */
+       ligado uma receita aos seus parâmetros de propósito, algo regrediu.
+       Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
+       do gate de fechamento do plano "o que nenhuma vista mostra", modelada por
+       um agente frio a partir das skills, e trouxe 45 declarados com 44 vivos.
+       É a mudança que o comentário acima autoriza — receita ligada aos próprios
+       parâmetros de propósito — e não regressão. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 189, vivos: 47, inertes: 142 });
+    expect(r.resultado.totais).toEqual({ declarados: 234, vivos: 91, inertes: 143 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
@@ -167,6 +172,7 @@ describe('acervo real', () => {
        34 dos 36 vivos. Ela sozinha leva o acervo de 13% para 34% de liberdade
        real, e é a contraprova de que o 13% não era limite do motor. */
     expect(porAlvo['bicicleta-urbana']).toEqual({ declarados: 36, vivos: 34, inertes: 2 });
+    expect(porAlvo['bicicleta-prova']).toEqual({ declarados: 45, vivos: 44, inertes: 1 });
     /* `armas/` so entrou na conta no R00 deste plano: ate ali o comando dizia
        "acervo inteiro" varrendo duas das quatro pastas de receita. */
     expect(porAlvo['espada-curta']).toEqual({ declarados: 13, vivos: 0, inertes: 13 });
