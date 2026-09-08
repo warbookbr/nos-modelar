@@ -24,8 +24,12 @@ plano. O que está encerrado vive em
 
 ## Estado atual
 
-- Plano **ativo**: nenhum. [O que nenhuma vista
-  mostra](planos/encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md) foi
+- Plano **ativo**: [Esquecer precisa
+  falhar](planos/2026-09-08-esquecer-precisa-falhar.md) — o veredito de contato
+  deixa de depender da bandeira `--estrito` e passa a ser o padrão, e a montagem
+  passa a reprovar peça atravessando peça, o que hoje só vira descrição. Ele
+  continua [o que nenhuma vista
+  mostra](planos/encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md),
   **concluído** em 2026-09-08: contato não declarado entre partes REPROVA em
   `--estrito` com código de saída, a forma prometida é conferida por V−E+F, e os
   pares acusados saem como imagem da mesma chamada de bancada. O laboratório

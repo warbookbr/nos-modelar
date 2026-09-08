@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [Esquecer precisa falhar](2026-09-08-esquecer-precisa-falhar.md).
+
+O plano anterior fez a peça reprovar quando duas partes se atravessam sem
+declaração, e este trata as duas lacunas que sobraram. A primeira é que o
+veredito depende da bandeira `--estrito`, pedida apenas no texto de duas skills
+e obrigada por nenhum gate; ela passa a ser o padrão, e desligar o veredito
+passa a exigir pedido explícito. A segunda é que a montagem inteira não reprova:
+o código que mede peça atravessando peça existe e roda, mas o resultado só vira
+descrição, e a expectativa declarada anota em vez de julgar.
 
 O [que nenhuma vista mostra](encerrados/2026-09-07-o-que-nenhuma-vista-mostra.md)
 foi **concluído e aprovado** em 2026-09-08. Ele fechou as duas famílias de "erra
