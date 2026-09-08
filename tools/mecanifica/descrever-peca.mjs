@@ -12,6 +12,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -205,6 +206,7 @@ export async function descreverPecaReutilizavel({
      Roda só em `--estrito` porque é veredito, e veredito é o que quem chama
      pediu para ser cobrado. */
   let contatos = null;
+  let formas = null;
   if (estrito) {
     try {
       contatos = contatosDaPeca(neutro, receita);
@@ -221,6 +223,29 @@ export async function descreverPecaReutilizavel({
         + '\n  com o motivo. Se não é, a geometria está errada.\n';
       falhou = true;
     }
+    /* FORMA PROMETIDA CONTRA ENTREGUE. Existe porque contato não basta: se o
+       pneu sai maciço e aro, cubo e raios não chegam a ser modelados, não há
+       segunda parte para acusar contato — a peça é um disco sólido e passa
+       limpa. Mesma falha, forma mais simples, invisível para a medida acima. */
+    try {
+      formas = formasDaPeca(neutro, receita);
+    } catch (erro) {
+      return falha(`NÃO CONSEGUI CONFERIR AS FORMAS\n  ${erro.message}`);
+    }
+    if (formas.divergentes.length) {
+      stderr += `\n${formas.divergentes.length} PARTE(S) COM FORMA DIFERENTE DA PROMETIDA (--estrito)\n`
+        + formas.divergentes
+          .map(({ parte, forma, erros }) => `    ${parte}${forma ? ` (${forma})` : ''}: `
+            + erros.map((e) => `${e.campo} esperado ${e.esperado}, medido ${e.medido}`).join('; '))
+          .join('\n')
+        + '\n';
+      falhou = true;
+    }
+    if (formas.indecidiveis.length) {
+      stderr += `\n${formas.indecidiveis.length} forma(s) que a medida NÃO conseguiu decidir`
+        + ' — furo passante só é contável em malha fechada.\n';
+    }
+
     if (contatos.cobertura.inconclusivos.length) {
       /* Não reprova: malha aberta é estilo que o motor aceita, e reprovar aqui
          puniria peça legítima. Mas também não vira "livre" — a medida diz que
@@ -240,6 +265,7 @@ export async function descreverPecaReutilizavel({
       descricao: { ...descricao, intencao: entrada.INTENCAO ?? null },
       intencao: entrada.INTENCAO ?? null,
       contatos,
+      formas,
       neutro,
       expansao,
     },

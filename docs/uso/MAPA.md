@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-794 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+798 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -761,6 +761,8 @@
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
+- `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
+- `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
 - `forma-global.js` — Contrato e executor neutros da N2. A fonte é um andaime de volumes semânticos; a malha e as projeções são produtos derivados sem identidade. Este módulo não …
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
@@ -1046,6 +1048,8 @@
 
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
+- `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
+- `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
 
 ## tools/modelagem/
