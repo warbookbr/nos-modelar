@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-784 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+786 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -785,6 +785,8 @@
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
+- `cor-de-auditoria.js` — cor-de-auditoria.js — a paleta da auditoria visual, e a conferência dela.
+- `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
 - `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
 - `entrada.js` — entrada.js — única entrada publicada da bancada; a aplicação não escolhe peça padrão e usa o catálogo homologado explícito, que hoje está vazio. /

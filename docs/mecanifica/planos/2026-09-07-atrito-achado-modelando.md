@@ -117,14 +117,39 @@ não lê em lugar nenhum; `plano` recebia `larg`/`prof` quando lê
 comparava dois de 0,1; e `cubo` recebia `tam`, caindo no cubo padrão. Três
 testes verdes medindo geometria diferente da que declaravam.
 
-### R02 — a paleta denuncia o que não consegue separar
+### R02 — a paleta denuncia o que não consegue separar — **concluída**
 
-Segunda dimensão na cor (a matiz sozinha não basta em 24 partes) e conferência
-da distância entre as cores atribuídas. Quando duas partes ficarem perto demais,
-a legenda diz quais, em vez de deixar o crítico descobrir errando.
+A cor ganhou duas dimensões além da matiz, escolhidas por BUSCA e não por gosto:
+oito combinações de saturação e luminosidade foram avaliadas contra as 276
+distâncias de uma peça de 24 partes, maximizando a menor delas. E a captura
+passou a conferir a própria legenda.
 
-**Gate:** na bicicleta, nenhum par de partes abaixo do limiar declarado; o par
-`garfo`/`tirante`, que enganou o crítico, fica acima dele.
+**Resultado:** os pares confundíveis caíram de **43 para 4**, e a distância
+mínima subiu de 0,039 para 0,089 — acima dos 0,079 do par que enganou o crítico.
+Índices vizinhos passaram de 0,079 para mais de 0,12 de separação.
+
+**O gate como escrito NÃO foi cumprido, e não vai ser.** Ele pedia zero pares
+abaixo do limiar; sobraram quatro, e são estruturais: cor estável por índice — a
+promessa de que a mesma parte tem a mesma cor entre execuções, independente de
+quantas partes existem — é incompatível com separação garantida quando o total
+cresce. Escolher as cores em função do total separaria melhor e trocaria a cor
+da peça inteira a cada parte nova, quebrando a comparação entre duas imagens da
+mesma peça. A troca foi feita de olho aberto, e por isso o contrato da
+ferramenta passou a ser "digo o que não separei" em vez de "separo sempre":
+
+```text
+⚠ cores próximas demais para distinguir na imagem: mesa~tuboSuperior (0.089),
+  coroa~tuboSuperior (0.097), rodaTraseiraAro~tirante (0.104),
+  garfo~tuboInferior (0.107). Isole essas partes por vez.
+```
+
+Dois achados de caminho. O primeiro: Three trata o resultado de `setHSL` como
+linear e emite sRGB, então a cor que a bancada pinta é bem mais clara que a
+conta de HSL — calibrar fora do navegador sem essa transferência calibraria uma
+cor que ninguém vê. O segundo: o teste que existia cobrava luminosidade FIXA em
+0,55, travando a implementação em vez do requisito — e a implementação travada
+era justamente a que confundia as partes. Ele passou a cobrar o que o nome dele
+sempre disse, contraste contra o fundo, com o mesmo instrumento.
 
 ### R03 — busca que zera diz por quê
 

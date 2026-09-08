@@ -14,6 +14,7 @@ import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado 
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { paresIndistinguiveis } from '../../src/bancada/cor-de-auditoria.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -542,6 +543,22 @@ export async function olharBancada({
         if (legendaDeAuditoria?.cores) {
           const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
           registrar(relato, logger, 'stdout', `            legenda: ${legenda}`);
+          /* A paleta CONFERE a si mesma e diz o que não conseguiu separar.
+             Medido na bicicleta: `garfo` e `tirante` saíram a 0,079 de
+             distância e o crítico visual cego leu os dois como uma peça só,
+             reportando um achado falso com toda a confiança. Paleta que falha
+             calada transfere o erro para quem olha; o aviso não decide nada,
+             só impede que o silêncio decida. */
+          const cores = Object.fromEntries(legendaDeAuditoria.legenda.map((e) => [e.parte, e.cor]));
+          const proximos = paresIndistinguiveis(cores);
+          if (proximos.length) {
+            const lista = proximos.slice(0, 5)
+              .map(({ a, b, distancia }) => `${a}~${b} (${distancia.toFixed(3)})`).join(', ');
+            const resto = proximos.length > 5 ? `, e mais ${proximos.length - 5}` : '';
+            registrar(relato, logger, 'stdout',
+              `            ⚠ cores próximas demais para distinguir na imagem: ${lista}${resto}.`
+              + ' Isole essas partes por vez em vez de julgá-las nesta vista.');
+          }
         }
         registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
         registrar(relato, logger, 'stdout', `            Pages após publicar este commit: ${urlPublicadaDa(urlReproduzivel)}`);

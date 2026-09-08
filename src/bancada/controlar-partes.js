@@ -7,6 +7,7 @@ import {
   normalizarSelecao,
 } from './estado-bancada.js';
 import { nomesDaSubarvore } from '../autoria/hierarquia-partes.js';
+import { hslDeAuditoria } from './cor-de-auditoria.js';
 
 const VERDE_DESTAQUE = new THREE.Color('#35c98a');
 
@@ -19,11 +20,13 @@ const VERDE_DESTAQUE = new THREE.Color('#35c98a');
    criação: assim a mesma parte recebe a mesma cor entre execuções, e duas
    imagens da mesma peça são comparáveis. Saturação e luminosidade fixas mantêm
    todas as partes igualmente legíveis; só a matiz distingue. */
-const PASSO_MATIZ = 0.618033988749895;   // razão áurea: espalha as matizes sem repetir cedo
-
+/* A paleta e a conferencia dela moram em `cor-de-auditoria.js`, sem Three, para
+   a CLI poder auditar a mesma legenda que a bancada pinta. Ver o cabecalho de
+   la: saturacao e luminosidade fixas confundiam partes vizinhas em 24 nomes, e
+   isso fez o critico visual cego reportar achado falso. */
 export function corDeAuditoria(indice) {
-  const matiz = (0.06 + indice * PASSO_MATIZ) % 1;
-  return new THREE.Color().setHSL(matiz, 0.62, 0.55);
+  const { h, s, l } = hslDeAuditoria(indice);
+  return new THREE.Color().setHSL(h, s, l);
 }
 
 function materiaisDoGrupo(grupo) {

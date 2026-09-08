@@ -42,11 +42,24 @@ const P = {
     alturaEixo: 0.350,
     alturaMovimentoCentral: 0.270,
     recuoMovimentoCentral: 0.06,
-    alturaSelim: 0.760,
-    recuoSelim: 0.14,
-    alturaDirecaoTopo: 0.760,
-    alturaDirecaoBase: 0.560,
-    avancoDirecao: 0.045,
+    /* ALTURA DA DIREÇÃO, medida contra a roda e não escolhida por gosto.
+       A primeira versão pôs a base da direção em 0,560 — ABAIXO do topo da roda
+       dianteira, que fica em 0,700 (eixo 0,350 + raio 0,350). O resultado é que
+       tubo de direção e tubo inferior atravessavam aro, pneu e raios, e o
+       `descrever` acusou `rodaDianteiraAro ↔ tuboDirecao interpenetra` desde a
+       primeira medição. A base da coroa do garfo precisa passar POR CIMA da
+       roda: 0,735 deixa 35 mm de folga sobre o pneu, e o comprimento do garfo
+       daí até o eixo sai em 0,391 m, que é a medida real de um garfo 700c. */
+    alturaSelim: 0.850,
+    recuoSelim: 0.10,
+    alturaDirecaoTopo: 0.930,
+    alturaDirecaoBase: 0.735,
+    /* Recuo da direção contra o eixo dianteiro. Não é gosto: com 0,070 o TUBO
+       INFERIOR passava a 0,337 do centro da roda, e o pneu tem raio 0,350 —
+       raspava 13 mm. Com 0,130 a aproximação mais curta vai a 0,366 e sobram
+       16 mm de folga. De quebra o ângulo de direção sai em 71°, que é o de uma
+       bicicleta urbana de verdade. */
+    avancoDirecao: 0.130,
     raioTuboGrosso: 0.0175,
     raioTuboFino: 0.0110,
     meiaBitolaTraseira: 0.058,
@@ -122,6 +135,8 @@ export function gerarPassos(params = P) {
   const eixoDianteiro = [0, q.alturaEixo, zDianteiro];
   const movimentoCentral = [0, q.alturaMovimentoCentral, zTraseiro + q.entreEixos * 0.42];
   const topoSelim = [0, q.alturaSelim, movimentoCentral[2] - q.recuoSelim];
+  /* A direção recua em relação ao eixo dianteiro: é o que dá o ângulo de
+     caster e mantém o quadro fora do círculo da roda. */
   const direcaoTopo = [0, q.alturaDirecaoTopo, zDianteiro - q.avancoDirecao - 0.055];
   const direcaoBase = [0, q.alturaDirecaoBase, zDianteiro - q.avancoDirecao];
 
