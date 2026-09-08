@@ -4,7 +4,7 @@
 
 **Versão:** 2, de 2026-09-08. A 1 tratava só a peça escondida dentro de outra;
 esta soma interpenetração como veredito e conferência de forma, e inverte a
-polaridade da declaração.
+polaridade da declaração. Rodadas entregues; falta o gate de fechamento.
 
 **Responsável:** execução por agente
 
@@ -15,21 +15,20 @@ polaridade da declaração.
 Modelando a bicicleta, duas falhas passaram por todas as verificações.
 
 **A — a forma prometida não foi a entregue.** As rodas eram dois cilindros
-concêntricos, e o anel foi *prometido* "pela diferença de raio". O cilindro
-externo é maciço: engoliu aro, cubo e raios. `descrever --estrito` limpo, malha
-aprovada, zero órfãos — e as rodas eram dois discos chapados. Só a imagem pegou,
-e só porque alguém abriu a imagem.
+concêntricos, e o anel foi *prometido* "pela diferença de raio". O externo é
+maciço: engoliu aro, cubo e raios. `--estrito` limpo, malha aprovada, zero
+órfãos, e as rodas eram dois discos chapados. Só a imagem pegou.
 
 **B — partes se atravessando.** O arco passou pelo meio da roda dianteira, e
 aqui está o pior modo de falha do conjunto: o `descrever` **reportou**
 `rodaDianteiraAro ↔ tuboDirecao interpenetra` desde a primeira medição. A
-ferramenta funcionou; a informação foi perdida porque a saída foi estreitada por
-um `grep` que só pedia contagem de partes e órfãos.
+ferramenta funcionou; a informação foi perdida num `grep` que só pedia contagem
+de partes e órfãos.
 
 As duas pedem correções opostas. Em A, a medida não existia. Em B, ela existia e
 disparou certo — mas "passou" e "reprovou" eram a mesma saída, texto no
-`stdout`, que qualquer filtro descarta. Hoje `--estrito` só reprova por face sem
-identidade semântica; interpenetração não toca o código de saída.
+`stdout`, que qualquer filtro descarta; interpenetração não tocava o código de
+saída.
 
 **B é a mais grave.** Forma errada é erro de modelagem; parte atravessando parte
 é erro de montagem, e montagem é para onde o projeto vai — carro, motor, robôs.
@@ -40,9 +39,7 @@ A versão 1 tratou B como nota de rodapé.
 Além do achado filtrado em B, duas evidências da mesma sessão:
 
 - duas skills mandam **"isole por pergunta, não por hábito"**, em destaque.
-  Perguntada depois, a IA confirmou ter lido e não ter levado em conta: a
-  bicicleta foi julgada inteira numa vista só, e o crítico cego recebeu a peça
-  toda;
+  Perguntada depois, a IA confirmou ter lido e não ter levado em conta;
 - a bancada imprimiu *"silhueta vertical: ocupa 19% da largura"* na primeira
   captura, e foi ignorada — ela dispara em toda peça alta, e dica constante
   vira moldura de tela.
@@ -56,48 +53,41 @@ O prompt que produziu a bicicleta foi *"leia as skills e o readme, modele uma
 bicicleta"*, sem nada sobre colisão. Isso não absolve o resultado — define o
 alvo. Se "não deixe as partes se atravessarem" precisa ser dito, a lista é
 infinita: depois vem o pistão saindo do cilindro, o dente da engrenagem
-sobrepondo o outro, o parafuso passando pela porca. Quem pede a peça não pode
-ser o portador desse requisito a cada vez. "Bicicleta" já carrega isso; o
-problema é que carregava só na cabeça da IA, e lá não é verificável.
+sobrepondo o outro, o parafuso passando pela porca. "Bicicleta" já carrega isso;
+o problema é que carregava só na cabeça da IA, e lá não é verificável.
 
-**Consequência de projeto:** com prompt curto, o que vale é o padrão, e a IA
-não declara o que ninguém pediu. A ausência de declaração tem de ser estrita:
-se for permissiva, prompt curto produz silêncio — e a correção não pega
-justamente o caso que originou o plano.
+**Consequência de projeto:** com prompt curto o que vale é o padrão, e a IA não
+declara o que ninguém pediu. A ausência de declaração tem de ser estrita: se for
+permissiva, prompt curto produz silêncio, e a correção não pega justamente o
+caso que originou o plano.
 
 ## Resultado
 
 A receita declara como as peças se encaixam **antes** de medir: quais pares se
-tocam de propósito, e que forma cada parte deve ter. Par que se toque fora dessa
-lista reprova, e parte cuja forma entregue não seja a prometida reprova. As
-vistas que a medida acusa saem como imagem, não como comando a lembrar.
+tocam de propósito, e que forma cada parte deve ter. Par que se toque fora da
+lista reprova, e forma entregue diferente da prometida reprova. As vistas que a
+medida acusa saem como imagem, não como comando a lembrar.
 
 ## Filtro Agent-First
 
-- **Contato declarado como contrato — ENVOLVER.** `expectativaDoPar` já existe
-  em `src/autoria/auditar-intersecoes-montagem.js`, indexado por par, para
-  montagem. Falta para peça. Mecanismo reusado, não inventado.
-- **Reprovar em `--estrito` — REFATORAR.** Aviso é ignorável, e esta sessão
-  provou isso três vezes. É veredito, como órfão já é.
-- **Forma prometida contra entregue — ENVOLVER.**
-  `modulos/topologia/src/analisar.js` já conta vértices, arestas, faces e
-  bordas. V−E+F sai daí.
-- **Vistas por par — ENVOLVER.** Saem como imagem, junto das já pedidas.
-  Comando sugerido é tarefa de casa, e tarefa de casa é esquecida.
-- **Dica condicional — ADIAR até R03.** A mais fraca das três.
+Nada de geometria foi inventado: o teste exato de sólido já existia em
+`auditar-intersecoes-montagem.js` e a contagem por Euler em `modulos/topologia`.
+Reprovar em `--estrito` é REFATORAR, não somar — aviso é ignorável, e esta
+sessão provou isso três vezes; veredito não é. As vistas por par saem da mesma
+chamada porque comando sugerido é tarefa de casa, e tarefa de casa é esquecida.
 
 ## Excluído
 
 - **oclusão de verdade** (contar pixel por parte em cada vista). Responde a
   pergunta certa — "esta parte aparece em alguma vista?" — e custa a bancada
   inteira a cada medição, sem eliminar o caso legítimo: pistão dentro do corpo
-  da prensa é invisível e está correto. Contato declarado é o atalho barato que
-  pega o caso real; o que ele não pega fica como limite declarado;
-- **texto dentro da imagem.** A imagem é prova: tem hash, é comparada e vai para
-  o crítico cego, que recebe só o PNG e a pergunta "o que é isto?". Texto ali
-  seria lido como parte do objeto e estragaria o instrumento;
-- corrigir as receitas antigas do acervo, que são material de prova e não
-  produto. Elas ganham a declaração do que já fazem, sem mudar geometria.
+  da prensa é invisível e está correto. O que o contato não pega fica como
+  limite declarado;
+- **texto dentro da imagem.** A imagem é prova: vai para o crítico cego, que
+  recebe só o PNG e a pergunta "o que é isto?". Texto ali seria lido como parte
+  do objeto e estragaria o instrumento;
+- corrigir as receitas antigas do acervo. Elas ganham a declaração do que já
+  fazem, sem mudar geometria.
 
 ## Invariantes
 
@@ -105,9 +95,8 @@ vistas que a medida acusa saem como imagem, não como comando a lembrar.
 2. **A declaração é contrato, não escapatória.** Ela diz o que se espera, antes
    de medir. Nunca é escrita depois, em resposta a uma reprovação, para calá-la.
    Par ausente da lista que se toque REPROVA — esquecer falha, não silencia.
-3. Contato é medido contra o SÓLIDO, nunca contra a caixa. A bicicleta de hoje
-   tem aro dentro da caixa do pneu e fora do sólido dele, porque o pneu virou
-   anel — caixa acusaria a peça correta.
+3. Contato é medido contra o SÓLIDO, nunca contra a caixa. A bicicleta tem aro
+   dentro da caixa do pneu e fora do sólido dele — caixa acusaria peça correta.
 4. Nenhum passo novo para quem já usa: as vistas por par saem da mesma chamada.
 5. A leitura obrigatória continua ≤ 70 KB.
 
@@ -127,44 +116,30 @@ contatos: [
 Todo par que se toque fora dessa lista reprova `--estrito`, com código de saída
 diferente de zero. Contenção total entra como o caso extremo de interpenetração
 — mesma medida, mesma tabela, mesma declaração — e não como mecanismo separado.
-
-**Gate:** três fixtures. A roda como foi feita primeiro — cilindro maciço com
-aro, cubo e raios dentro — reprova. O arco atravessando a roda reprova. A
-bicicleta de hoje, com os contatos declarados, acusa **zero**. Nos dois
-primeiros o processo sai com código diferente de zero, verificado pelo código e
-não pelo texto.
+Entregue em `src/autoria/contatos-da-peca.js`; as fixtures e o que elas provam
+estão em `contatos-da-peca.test.mjs`.
 
 ### R01 — forma prometida contra forma entregue
 
-A parte declara a forma que deve ter (`solido`, `anel`, `tubo`, ou o número de
-furos direto). A medida calcula V−E+F sobre a malha e compara.
+A parte declara a forma que deve ter, e a medida calcula V−E+F sobre a malha.
+Existe porque R00 não basta: contato é relação entre DUAS partes, e se o pneu
+sai maciço com nada modelado dentro não há segunda parte para acusar — a peça é
+um disco sólido e passa limpa. Entregue em `src/autoria/forma-da-parte.js`.
 
-Existe porque R00 não basta: contato é relação entre duas partes. Se o pneu
-sair maciço e aro, cubo e raios não forem modelados, não há segunda parte para
-acusar contato — a peça é um disco sólido e passa limpa. Mesma falha, forma
-mais simples, invisível para R00.
-
-**Gate:** o pneu declarado `anel` que sai maciço reprova; o mesmo pneu correto
-passa. Peça sem declaração de forma não reprova por isso — forma é opcional
-onde contato não é.
+O vocabulário oferece `solido` e `anel` e não oferece `tubo`: tubo e anel são a
+mesma topologia, e a palavra a mais prometeria uma distinção que a régua não faz.
 
 ### R02 — a vista do par sai como imagem
 
-Os pares que a medida acusa passam a ser capturados junto das vistas pedidas,
-com orçamento declarado de quantos. Sem comando novo, sem bandeira nova.
-
-**Gate:** na bicicleta, uma chamada de bancada produz as vistas pedidas mais os
-pares acusados, e o teto de capturas é respeitado em vez de a peça virar 276
-imagens.
+Os pares que a medida acusa são capturados junto das vistas pedidas, com teto
+declarado. Sem comando novo, sem bandeira nova. Entregue em
+`tools/mecanifica/olhar-bancada.mjs`.
 
 ### R03 — dica que aparece quando se aplica
 
-Junto do retorno da captura, nunca dentro da imagem, e só quando há o que dizer:
-peça com muitas partes, pares abaixo do limiar, cores que não separam. Repetir a
-mesma linha em toda execução é como a dica de resolução morreu.
-
-**Gate:** não aparece numa peça de três partes sem achado; aparece na bicicleta;
-e o texto nomeia o achado concreto, não a regra genérica.
+Junto do retorno da captura, nunca dentro da imagem, e só quando há o que dizer.
+Repetir a mesma linha em toda execução é como a dica de resolução morreu: cada
+dica tem chave, junta as vistas em que apareceu e sai uma vez só.
 
 ## O gate que fecha o plano
 
@@ -178,23 +153,48 @@ Quem executar este gate não pode ser quem construiu a ferramenta.
 
 ## Riscos e parada
 
-- **Custo da medição.** Testar todo ponto de cada parte contra o sólido das
-  outras é O(n²) em partes e O(v) em vértices. Mitigação: caixa filtra
-  candidatos, o teste exato roda só neles, e o custo entra medido no diário.
-  V−E+F, de R01, é O(V+F) e não entra nesta conta.
+- **Custo da medição.** O(n²) em partes e O(v) em vértices. Mitigação: a caixa
+  filtra candidatos e o teste exato roda só neles. Medido: 525 ms na bicicleta
+  inteira. V−E+F, de R01, é O(V+F) e não entra nesta conta.
 - **Falso positivo condena peça boa.** É o risco que mata a porta: reprovação
-  errada ensina a ignorar reprovação. Por isso a fixture da bicicleta corrigida
-  é gate, e a declaração existe desde a primeira rodada, não depois.
+  errada ensina a ignorar reprovação. Por isso a declaração existe desde a
+  primeira rodada, e não depois.
 - **A declaração vira carimbo.** Risco de projeto, não de código: se declarar
   ficar mais barato que corrigir, a IA declara tudo e o veredito morre. Alarme:
-  receita cujos contatos declarados crescem sem a geometria mudar. O laboratório
-  deste projeto já viveu isso — o revisor dizia "aprovado" deixando passar 91%
-  dos números inventados.
+  contatos declarados crescendo sem a geometria mudar. O laboratório deste
+  projeto já viveu isso — o revisor dizia "aprovado" deixando passar 91% dos
+  números inventados.
 - **Parar se** o teste exato acusar contato não declarado na bicicleta de hoje
   depois de os legítimos serem declarados: aí a medida está errada, e ligar
   reprovação em cima dela quebraria a confiança no veredito antes de ela existir.
 
 ## Fechamento
 
-Preencher ao concluir: estado final, commit, gates, resultado e candidatos
-devolvidos ao backlog.
+**As quatro rodadas foram entregues** em 2026-09-08, 19/19 gates verdes em cada
+uma: R00 em `f3a2aad`, R01 em `8e1f097`, R02 em `f231ac3`. Duas medidas não
+precisaram ser escritas, só ligadas, e o núcleo geométrico extraído para
+`contato-de-solidos.js` fez a auditoria de montagem cair de 340 para 108 linhas
+sem mudar comportamento.
+
+**O gate de fechamento NÃO foi executado.** Ele exige que quem o rode não seja
+quem construiu a ferramenta, e quem escreveu R00–R03 foi o agente desta sessão.
+É a única coisa que falta para o plano encerrar.
+
+Evidência parcial, com o limite dito: a bicicleta que passava limpa sai VERMELHA,
+com o tubo atravessando o pneu nomeado no veredito e capturado como imagem — mas
+peça já modelada não prova que o laço funciona numa peça feita do zero.
+
+**O que a execução ensinou, e não estava previsto:**
+
+- o acervo tinha 23 contatos legítimos não declarados; todos ganharam
+  declaração, sem mudar geometria. O custo é real: a pelve da armadura tem cinco;
+- a bicicleta tem 28 pares acusados, não os 13 estimados antes de medir;
+- ordenar por gravidade não bastou: 22 dos 28 são interpenetração e o defeito
+  real ficava fora de um teto de três. O que o separou foi o MÉTODO —
+  `intersecao-de-superficies` sai só quando nenhum vértice está dentro do outro,
+  assinatura de peça atravessando peça contra peça assentada. Um em 28, e é o
+  defeito. Heurística de ordem, não lei.
+
+**Devolvido ao backlog:** as menores folgas como pares acusados; `catalogo:check`
+fora de `gates` e do CI; e se a leitura obrigatória, hoje em 69.986 de um teto de
+70.000 bytes, ainda se paga — a bicicleta com defeito saiu depois de lê-la toda.

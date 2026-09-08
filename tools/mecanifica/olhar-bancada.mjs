@@ -28,6 +28,28 @@ const MODOS = ['todas', 'contexto', 'isolar'];
    teto, a primeira peça grande vira um despejo que ninguém abre. Três é o que
    cabe numa leitura sem rolar a tela, e o relato diz quantos ficaram de fora. */
 const TETO_DE_PARES_POR_CHAMADA = 3;
+
+/* DICA APARECE UMA VEZ, E SÓ QUANDO SE APLICA.
+   As duas dicas que existiam disparavam DENTRO do laço de vistas: numa chamada
+   de três vistas, a mesma linha saía três vezes. Foi assim que a dica de
+   resolução morreu — repetida em toda captura de peça alta, virou moldura de
+   tela e parou de ser lida. Aqui cada dica tem chave, junta as vistas em que
+   apareceu e sai uma vez só. Sem achado, `listar()` devolve lista vazia e nada
+   é impresso: dica que sempre aparece não é dica, é cabeçalho. */
+export function criarDicas() {
+  const porChave = new Map();
+  return {
+    anotar(chave, texto, vista = null) {
+      const atual = porChave.get(chave) ?? { chave, texto, vistas: [] };
+      atual.texto = texto;
+      if (vista && !atual.vistas.includes(vista)) atual.vistas.push(vista);
+      porChave.set(chave, atual);
+    },
+    listar() {
+      return [...porChave.values()].map(({ chave, texto, vistas }) => ({ chave, texto, vistas: [...vistas] }));
+    },
+  };
+}
 const PROJECOES = ['perspectiva', 'ortografica'];
 
 class ErroDeUso extends Error {
@@ -390,6 +412,8 @@ export async function olharBancada({
     const vistasRelatadas = [];
     const capturas = [];
     const paresCapturados = [];
+    const dicas = criarDicas();
+    const anotarDica = (chave, texto, vista = null) => dicas.anotar(chave, texto, vista);
     let pecaRelatada = null;
     for (const [indice, vista] of vistas.entries()) {
       const url = urlDa(vista);
@@ -538,9 +562,9 @@ export async function olharBancada({
          geometria por causa de moldura. */
       if (enquadramento.largura > 0 && enquadramento.altura / enquadramento.largura >= 2.5) {
         const sugerida = `${largura}x${Math.round(largura * 4 / 3)}`;
-        registrar(relato, logger, 'stdout',
-          `  (silhueta vertical: ocupa ${(enquadramento.largura * 100).toFixed(0)}% da largura.`
-          + ` Para não julgar forma em pouco pixel, tente --res=${sugerida})`);
+        anotarDica('silhueta-vertical',
+          `silhueta vertical: ocupa ${(enquadramento.largura * 100).toFixed(0)}% da largura do quadro.`
+          + ` Para não julgar forma em pouco pixel, tente --res=${sugerida}`, vista);
       }
       if (revisar) {
         const medida = `ocupação ${(enquadramento.area * 100).toFixed(1)}% (${(enquadramento.largura * 100).toFixed(1)}% × ${(enquadramento.altura * 100).toFixed(1)}%)`;
@@ -586,9 +610,9 @@ export async function olharBancada({
             const lista = proximos.slice(0, 5)
               .map(({ a, b, distancia }) => `${a}~${b} (${distancia.toFixed(3)})`).join(', ');
             const resto = proximos.length > 5 ? `, e mais ${proximos.length - 5}` : '';
-            registrar(relato, logger, 'stdout',
-              `            ⚠ cores próximas demais para distinguir na imagem: ${lista}${resto}.`
-              + ' Isole essas partes por vez em vez de julgá-las nesta vista.');
+            anotarDica('cores-proximas',
+              `cores próximas demais para distinguir na imagem: ${lista}${resto}.`
+              + ' Isole essas partes por vez em vez de julgá-las nesta vista.', vista);
           }
         }
         registrar(relato, logger, 'stdout', `            local: ${urlReproduzivel}`);
@@ -648,6 +672,30 @@ export async function olharBancada({
       }
     }
 
+    /* A DICA QUE SÓ EXISTE SE TIVER O QUE DIZER. O plano que abriu esta rodada
+       classificou a dica como a mais fraca das três defesas, e ela só se paga
+       se disparar quando se aplica dizendo algo que ainda não se sabe.
+       Por isso NÃO existe aqui uma dica genérica de "isole por pergunta": essa
+       instrução já estava escrita, em destaque, em duas skills, foi lida e não
+       foi seguida. Repeti-la em prosa seria a quarta tentativa do mesmo tipo.
+       A R02 resolveu o problema fazendo — os pares acusados saem isolados como
+       imagem sem ninguém precisar lembrar. O que sobra para a dica é o que a
+       ferramenta sabe e quem lê não: quanto do acervo de pares ficou fora do
+       teto, e por que a imagem pode enganar. */
+    if (paresAcusados.length > paresCapturados.length && paresCapturados.length) {
+      anotarDica('pares-alem-do-teto',
+        `${paresAcusados.length - paresCapturados.length} par(es) acusado(s) ficaram sem imagem nesta chamada.`
+        + ' Eles estão todos no veredito de `descrever --estrito`; o teto limita a exibição, nunca a detecção.');
+    }
+    const dicasListadas = dicas.listar();
+    if (dicasListadas.length) {
+      registrar(relato, logger, 'stdout', '\ndicas desta chamada:');
+      for (const { texto, vistas } of dicasListadas) {
+        const onde = vistas.length ? ` (${vistas.join(', ')})` : '';
+        registrar(relato, logger, 'stdout', `  • ${texto}${onde}`);
+      }
+    }
+
     if (errosDaPagina.length) {
       registrar(relato, logger, 'stderr', `\nerros de página:\n  ${errosDaPagina.join('\n  ')}`);
       falhasRelatadas.push({ categoria: 'ferramenta', codigo: 'erro_da_pagina', vista: null, mensagem: 'A página da bancada emitiu erro durante a captura.', acao: 'Repita a captura depois de corrigir a ferramenta; não remodele a peça.' });
@@ -666,6 +714,7 @@ export async function olharBancada({
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
       paresAcusados, paresCapturados,
+      dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
     };
     resposta = {

@@ -1,6 +1,6 @@
 /* olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless. */
 import { describe, expect, it } from 'vitest';
-import { olharBancada } from './olhar-bancada.mjs';
+import { criarDicas, olharBancada } from './olhar-bancada.mjs';
 
 describe('olhar-bancada — validação rápida e mitigação de timeout', () => {
   it('rejeita imediatamente peça inexistente antes de iniciar servidor ou navegador', async () => {
@@ -82,5 +82,46 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
     expect(ativouComAlvo).toContain('mancal-guia.js');
     expect(resultado.ok).toBe(false);
     expect(resultado.erro.mensagem).toContain('Interrompido propositalmente');
+  });
+});
+
+describe('dica aparece uma vez, e só quando se aplica', () => {
+  it('sem achado, não existe linha nenhuma', () => {
+    /* Dica que sempre aparece não é dica, é cabeçalho — e foi assim que a dica
+       de resolução parou de ser lida. */
+    expect(criarDicas().listar()).toEqual([]);
+  });
+
+  it('a MESMA dica em três vistas sai UMA vez, juntando as vistas', () => {
+    const dicas = criarDicas();
+    for (const vista of ['frontal', 'direita', 'superior']) {
+      dicas.anotar('silhueta-vertical', 'silhueta vertical: ocupa 13% da largura', vista);
+    }
+    const lista = dicas.listar();
+    expect(lista).toHaveLength(1);
+    expect(lista[0].vistas).toEqual(['frontal', 'direita', 'superior']);
+  });
+
+  it('a mesma vista repetida não duplica na lista de vistas', () => {
+    const dicas = criarDicas();
+    dicas.anotar('cores-proximas', 'texto', 'frontal');
+    dicas.anotar('cores-proximas', 'texto', 'frontal');
+    expect(dicas.listar()[0].vistas).toEqual(['frontal']);
+  });
+
+  it('dicas diferentes convivem, e a sem vista fica sem vista', () => {
+    const dicas = criarDicas();
+    dicas.anotar('cores-proximas', 'cores', 'frontal');
+    dicas.anotar('pares-alem-do-teto', '25 pares ficaram sem imagem');
+    const lista = dicas.listar();
+    expect(lista.map((d) => d.chave)).toEqual(['cores-proximas', 'pares-alem-do-teto']);
+    expect(lista[1].vistas).toEqual([]);
+  });
+
+  it('listar devolve cópia: mexer no retorno não muda o acumulador', () => {
+    const dicas = criarDicas();
+    dicas.anotar('a', 'texto', 'frontal');
+    dicas.listar()[0].vistas.push('invadida');
+    expect(dicas.listar()[0].vistas).toEqual(['frontal']);
   });
 });
