@@ -40,17 +40,20 @@ export const TABELA = {
   raioTuboSuperior: 15,
   /* O tubo inferior não é redondo. No quadro de alumínio hidroformado da
      referência ele é largo e chato junto ao movimento central e vai ficando
-     alto e estreito ao chegar no tubo de direção, e o caminho dele arqueia.
+     alto e estreito ao chegar no tubo de direção. A comparação com o recorte
+     lateral da referência corrigiu as duas coisas: lá o tubo é reto, de bordas
+     paralelas, e a largura quase não muda, crescendo pouco em direção ao tubo
+     de direção. O arqueio ficou em zero e o perfil quase constante.
      Cada entrada é [fração do caminho, largura em x, altura no plano lateral,
      expoente da superelipse]. Expoente 2 é elipse; acima disso as faces
      achatam e os cantos viram raio curto, que é o desenho hidroformado. */
   perfilTuboInferior: [
-    [0.00, 62, 40, 4.5],
-    [0.30, 60, 42, 4.5],
-    [0.60, 52, 48, 4.0],
-    [1.00, 40, 56, 3.2],
+    [0.00, 54, 46, 4.5],
+    [0.35, 56, 50, 4.5],
+    [0.70, 58, 52, 4.5],
+    [1.00, 58, 54, 4.2],
   ],
-  arqueioTuboInferior: 30,
+  arqueioTuboInferior: 0,
   raioTuboDirecao: 24,
   raioBalancoInferior: 11,
   raioBalancoSuperior: 9,
