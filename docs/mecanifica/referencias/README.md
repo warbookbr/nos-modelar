@@ -22,6 +22,10 @@ repositório, que autorizou a inclusão. Entra porque é o alvo de CARÁTER da
 rodada da bicicleta — que peças existem e que forma têm, o garfo com coroa e
 dois tubos, o guidão reto com manetes, a ponteira do triângulo traseiro.
 
+Ela está recortada em uma vista por arquivo em
+[`bicicleta-29/`](bicicleta-29/README.md), para que cada parte isolada na
+bancada tenha a sua vista correspondente sem procurar na folha.
+
 **Ela não vale como fonte dimensional.** Medir proporção numa imagem gerada é
 medir o que outro modelo inventou. A dimensão da bicicleta vem da tabela em
 `tools/mecanifica/prancha-bicicleta-29.mjs`, e quando as duas divergirem, a
