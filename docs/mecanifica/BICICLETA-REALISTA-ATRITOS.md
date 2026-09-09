@@ -35,7 +35,7 @@ que estava errado ou desatualizado.
 |---|---|---|
 | tabela dimensional | valores públicos do formato | **feita**, em `prancha-bicicleta-29.mjs` |
 | vistas de caráter | `referencias/bicicleta-29/` | **recortadas**, uma por vista |
-| quadro | prancha lateral | não começado |
+| quadro | tabela + `bicicleta-29/lateral.png` | **feito**, 9 partes, 12 contatos declarados |
 | garfo de suspensão | foto frontal do garfo | não começado |
 | roda | foto lateral | não começado |
 | guidão e freios | foto de cima | não começado |
@@ -142,23 +142,6 @@ olho, que é justamente o que a esteira existe para evitar. E `calibrarPorRodas`
 não tem defesa contra texto: um chão que é uma fileira de letras produz escala
 absurda sem um alerta.
 
-### 4. O recorte do painel é achado na mão, e texto dentro dele passa por geometria
-
-**O que aconteceu.** Meu primeiro recorte da vista lateral pegou a legenda
-"VISTA GERAL LATERAL" logo abaixo do desenho. As letras eram a tinta mais baixa,
-então viraram o "solo", e `calibrarPorRodas` achou duas manchas de letras a 68
-pixels uma da outra. A escala saiu 16,7 mm por pixel numa bicicleta que ocupa
-430. **Nada reprovou.** Só percebi porque o pneu deu 3030 mm de altura.
-
-**O que fiz no lugar.** Cortei acima da legenda, em y=285, e a calibração passou
-a dar 4,18 mm por pixel com as rodas a 270 pixels.
-
-**O que teria resolvido.** Duas coisas. `acharPaineis` devolveu uma faixa só,
-de 35 a 997, para a folha inteira, porque as linhas de cota do guidão atravessam
-os vãos entre painéis; o recorte teve de ser achado no olho, que é o que a
-esteira existe para evitar. E `calibrarPorRodas` não tem defesa contra texto: um
-chão feito de letras produz escala absurda sem um alerta.
-
 ### 5. A prancha SVG foi retirada: motor de casca não mede esqueleto
 
 **O que aconteceu.** A prancha desenhou, o relatório passou sem alertas, e o
@@ -176,24 +159,75 @@ recortadas.
 coerência quando não há anel, em vez de silenciar. Ausência de verificação hoje
 é indistinguível de verificação que passou.
 
+### 6. `imprimirRelatorio` não é o único nome que engana
+
+Ao selecionar o cilindro inteiro, `sel: { origem: [a, b, c] }` foi recusado com
+"só origem ou unir de origens". A união vive num ALIAS, e cada termo do `unir`
+precisa ser `{ origem: {...} }` e não a origem crua. Duas tentativas até acertar;
+a referência de operações diz "una lateral, fundo e topo ou publique um alias",
+e a forma exata só aparece lendo uma receita do acervo.
+
+### 7. O tubo redondo é hábito meu, não limite do motor
+
+O quadro saiu com todos os tubos perfeitamente redondos e a referência é um
+quadro hidroformado, de corpos achatados. Ao conferir, o `loft` aceita
+`{ pos, contorno }` por seção, com contorno 2D arbitrário, e
+`cadeira-de-madeira.js` já usa isso. A forma achatada estava disponível o tempo
+todo; eu usei `raio` porque era o campo que eu tinha na mão.
+
+O que me levou a `raio` foi o próprio exemplo mais curto: quem lê a operação vê
+primeiro a seção circular, e o contorno aparece depois, como variação. O limite
+que a operação publica hoje fala de polo e de contagem de pontos, e não diz que
+a seção pode ser qualquer polígono.
+
+Escrevi `_estudo-secao-de-tubo.js` fora do quadro para medir isso: um gerador de
+superelipse por largura, altura e expoente, que sempre devolve exatamente
+`lados` pontos, então a regra de contagem do motor não tem como ser violada.
+Quatro variantes de 400 mm — redonda, ovalada, caixa arredondada e uma com a
+seção mudando ao longo do comprimento — saíram com 0 faces sem parte e código 0.
+
 ## Acertos que valem registrar
 
 O que funcionou melhor do que eu esperava também é medida do projeto, e some se
 ninguém escrever.
 
-### 2. A comparação por número contradisse a tabela, e a tabela estava errada
 
-Com a folha em disco, a conferência mediu o selim a 1128 mm do chão contra os
-914 mm que a minha tabela derivava. 914 é indefensável para uma 29 de quadro
-médio, onde o selim fica entre 1000 e 1100. O canote exposto subiu de 180 para
-380 mm e o selim foi para 1105.
+### 1. Os dois limites escritos hoje dispararam na primeira execução da peça
 
-O mesmo cruzamento mediu o pneu em 777 mm contra os 734 da tabela, e aqui eu
-mantive a tabela: 734 é valor publicado, e imagem gerada por IA não é fonte
-dimensional. A mesma comparação acusou os dois lados, e decidir qual lado cede
-depende da procedência, não do tamanho do desvio.
+De manhã as armadilhas de operação saíram do documento e viraram `limites` de
+cada operação. À tarde, na primeira medição do quadro, as duas que eu tinha
+escrito apareceram: as tampas do `cilindro` ficaram sem parte, e os nove tubos
+de `loft` saíram abertos por falta de polo, dando 17 pares inconclusivos.
 
-### 2. A comparação por número contradisse a tabela, e a tabela cedeu
+Isso não prova que a mudança de lugar ajuda — eu já conhecia as duas, porque as
+escrevi. Prova que elas são as armadilhas certas: as duas primeiras coisas que
+uma peça de tubos encontra.
+
+### 2. O veredito de contato achou dois defeitos que eu não veria
+
+`balancoInferior ↔ tuboInferior` saiu como interseção de superfícies: os dois
+partiam do movimento central, um para a frente e outro para trás, e se cruzavam
+lá dentro. `balancoSuperior ↔ tuboSuperior` saiu como contenção: eu tinha
+soldado os dois na mesma junção do tubo do selim, e num quadro real o balanço
+encontra o tubo do selim mais abaixo.
+
+Nenhum dos dois aparece na vista lateral — estão dentro de outra peça. A
+correção foi cada tubo nascer na superfície da caixa do movimento central, e a
+solda do balanço superior descer 100 mm.
+
+### 3. Declaração sem contato correspondente achou peça solta
+
+Depois de corrigidos os dois cruzamentos, sobraram duas declarações descrevendo
+contato que não existia: os balanços inferiores não encostavam na caixa. A
+medida mostrou que eles paravam a 1,2 mm dela. A seção de um tubo é
+perpendicular ao próprio eixo, então um balanço que corre em z quase não avança
+em z na ponta, e encostar por milímetro não funciona. Nascendo DENTRO da caixa,
+o contato vira contenção e para de depender de tolerância.
+
+Vale o registro de que isto é o lado que NÃO reprova: a peça saía com código 0
+e dois tubos soltos. Quem só olhasse o código de saída não veria.
+
+### 4. A comparação por número contradisse a tabela, e a tabela cedeu
 
 A conferência mediu o selim a 1128 mm do chão contra os 914 que a tabela
 derivava. 914 é indefensável para uma 29 de quadro médio. O tubo do selim foi
@@ -204,7 +238,7 @@ publicado, e imagem gerada por IA não é fonte dimensional. A mesma comparaçã
 acusou os dois lados, e quem cede se decide pela procedência, não pelo tamanho
 do desvio.
 
-### 1. O contrato de autoria da prancha cobrou o que eu ia deixar implícito
+### 5. O contrato de autoria da prancha cobrou o que eu ia deixar implícito
 
 `validarAutoriaPrancha` recusa a prancha sem fonte, evidência, confiança e
 incerteza declaradas. Eu tinha as duas limitações acima na cabeça e teria

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-806 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+808 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -731,8 +731,10 @@
 
 ## prototipos/procedural/v3/pecas/
 
+- `_estudo-secao-de-tubo.js` — _estudo-secao-de-tubo.js — FIXTURE de estudo, não é peça de acervo.
 - `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
 - `bicicleta-prova.js` — bicicleta-prova.js — bicicleta de passeio de quadro aberto (step-through), aro 26.
+- `bicicleta-quadro.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
 - `bicicleta-urbana.js` — bicicleta-urbana.js — bicicleta urbana de quadro diamante, aro 700c.
 - `cabo-de-pa-bambu.js` — cabo-de-pa-bambu.js — cabo de pá em colmo de bambu.
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
@@ -1014,7 +1016,7 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
-- `prancha-bicicleta-29.mjs` — prancha-bicicleta-29.mjs — alvo ortográfico de uma MTB hardtail 29", quadro M.
+- `prancha-bicicleta-29.mjs` — prancha-bicicleta-29.mjs — imprime a tabela e o derivado da bicicleta 29".
 - `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
 - `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
