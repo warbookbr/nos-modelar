@@ -5,9 +5,11 @@
  * importa daqui para imprimir. Duas cópias da mesma tabela envelhecem em duas
  * velocidades.
  *
- * DE ONDE VÊM OS NÚMEROS. `TABELA` traz a faixa corrente publicada do formato
- * 29" hardtail tamanho M — entre-eixos, ângulos, balanço, diâmetro de roda. Não
- * é um modelo específico. Toda POSIÇÃO é derivada dela por trigonometria; nenhum
+ * DE ONDE VÊM OS NÚMEROS. `TABELA` foi medida no recorte lateral da folha de
+ * referência, com a escala vinda do diâmetro da roda de 734 mm, que é o único
+ * valor publicado usado. A tabela publicada de 29" hardtail tamanho M ficou
+ * para trás por decisão explícita: a imagem tem traseiro longo, direção em pé e
+ * garfo curto para o tamanho da roda, e o pedido foi bater com ela. Toda POSIÇÃO é derivada dela por trigonometria; nenhum
  * ponto é digitado à mão, porque número digitado deixa de corresponder à tabela
  * assim que ela muda, e o acervo já tem um caso desses medido.
  *
@@ -23,16 +25,16 @@
 export const TABELA = {
   aroISO: 622,
   pneuLargura: 56,
-  entreEixos: 1130,
-  balancoTraseiro: 435,
-  quedaDoMovimentoCentral: 65,
-  anguloDirecao: 69,
-  anguloSelim: 66,
-  tuboDirecaoComprimento: 110,
-  tuboSelimComprimento: 480,
-  garfoEixoACoroa: 490,
-  garfoAvanco: 44,
-  canoteExposto: 360,
+  entreEixos: 1110,
+  balancoTraseiro: 502,
+  quedaDoMovimentoCentral: 50,
+  anguloDirecao: 75,
+  anguloSelim: 70,
+  tuboDirecaoComprimento: 215,
+  tuboSelimComprimento: 422,
+  garfoEixoACoroa: 383,
+  garfoAvanco: 8,
+  canoteExposto: 240,
   meiaLarguraGuidao: 360,
   meiaLarguraCubo: 74,
   /* Seções dos tubos, medidas de quadro de alumínio corrente. */
@@ -49,7 +51,7 @@ export const TABELA = {
     [1.00, 46, 64, 4.2],
   ],
   /* O tubo superior arqueia para baixo, com a barriga no meio do vão. */
-  arqueioTuboSuperior: -16,
+  arqueioTuboSuperior: -8,
   /* O tubo inferior não é redondo. No quadro de alumínio hidroformado da
      referência ele é largo e chato junto ao movimento central e vai ficando
      alto e estreito ao chegar no tubo de direção. A comparação com o recorte
@@ -67,8 +69,8 @@ export const TABELA = {
   ],
   /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
      isso o controle da Bézier fica a três quartos do caminho, não na metade. */
-  arqueioTuboInferior: 12,
-  posicaoArqueioTuboInferior: 0.75,
+  arqueioTuboInferior: 40,
+  posicaoArqueioTuboInferior: 0.8,
   raioTuboDirecao: 24,
   raioBalancoInferior: 11,
   raioBalancoSuperior: 9,
@@ -278,12 +280,15 @@ function gerarPassos(t = TABELA) {
   passos.push(tubo(ID.tuboSelim, P.mc, P.selimTopo, t.raioTuboSelim));
   parte('tuboSelim', 'loft', ID.tuboSelim);
 
-  passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.direcaoBaixo,
+  /* Sem o tubo de direção, o tubo inferior sobe até a mesma ponta do tubo
+     superior, e é lá que os dois se encontram. */
+  passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.direcaoTopo,
     t.perfilTuboInferior, t.arqueioTuboInferior, t.posicaoArqueioTuboInferior));
   parte('tuboInferior', 'loft', ID.tuboInferior);
 
-  passos.push(tubo(ID.tuboDirecao, P.coroa, P.direcaoTopo, t.raioTuboDirecao));
-  parte('tuboDirecao', 'loft', ID.tuboDirecao);
+  /* TUBO DE DIREÇÃO FORA POR ENQUANTO. Ele tapava o encontro do tubo superior
+     com o inferior e atrapalhava a comparação com a referência. Sem ele, os
+     dois tubos se encontram diretamente, e esse encontro é contato declarado. */
 
   passos.push(tuboPerfilado(ID.tuboSuperior, P.selimJuncao, P.direcaoTopo,
     t.perfilTuboSuperior, t.arqueioTuboSuperior));
@@ -299,7 +304,7 @@ function gerarPassos(t = TABELA) {
     parte(`balancoSuperior${lado}`, 'loft', ID[`balancoSup${lado}`]);
   }
 
-  for (const nome of ['caixaMovimentoCentral', 'tuboSelim', 'tuboInferior', 'tuboDirecao', 'tuboSuperior',
+  for (const nome of ['caixaMovimentoCentral', 'tuboSelim', 'tuboInferior', 'tuboSuperior',
     'balancoInferiorEsq', 'balancoInferiorDir', 'balancoSuperiorEsq', 'balancoSuperiorDir']) {
     passos.push(['material', { usa: 'aluminioBranco', sel: { grupo: nome } }]);
     passos.push(['solido', { sel: { grupo: nome } }]);
@@ -339,8 +344,7 @@ export const receitaBicicletaQuadro = {
     { par: ['tuboSelim', 'tuboSuperior'], motivo: 'o tubo superior solda no tubo do selim' },
     { par: ['tuboSelim', 'balancoSuperiorEsq'], motivo: 'o balanco superior esquerdo solda no tubo do selim' },
     { par: ['tuboSelim', 'balancoSuperiorDir'], motivo: 'o balanco superior direito solda no tubo do selim' },
-    { par: ['tuboDirecao', 'tuboSuperior'], motivo: 'o tubo superior solda no tubo de direcao' },
-    { par: ['tuboDirecao', 'tuboInferior'], motivo: 'o tubo inferior solda no tubo de direcao' },
+    { par: ['tuboInferior', 'tuboSuperior'], motivo: 'sem o tubo de direcao os dois se encontram na frente' },
     { par: ['balancoInferiorEsq', 'balancoSuperiorEsq'], motivo: 'os dois balancos se encontram na ponteira esquerda' },
     { par: ['balancoInferiorDir', 'balancoSuperiorDir'], motivo: 'os dois balancos se encontram na ponteira direita' },
   ],
