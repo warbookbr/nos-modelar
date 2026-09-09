@@ -62,9 +62,9 @@ export const TABELA = {
      expoente da superelipse]. Expoente 2 é elipse; acima disso as faces
      achatam e os cantos viram raio curto, que é o desenho hidroformado. */
   perfilTuboInferior: [
-    [0.00, 54, 62, 4.5],
-    [0.35, 56, 84, 4.5],
-    [0.70, 58, 90, 4.5],
+    [0.00, 54, 96, 4.5],
+    [0.35, 56, 92, 4.5],
+    [0.70, 58, 86, 4.5],
     [1.00, 58, 74, 4.2],
   ],
   /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
