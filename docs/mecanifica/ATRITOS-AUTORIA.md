@@ -3,6 +3,11 @@
 Registro compacto. `resolvido` significa capacidade provada em teste/peça;
 `aberto` permanece no backlog. Os diários e comandos antigos ficam no histórico.
 
+Rodada em curso: o diário aberto da bicicleta realista está em
+[`BICICLETA-REALISTA-ATRITOS.md`](BICICLETA-REALISTA-ATRITOS.md). Ele registra
+atrito no momento em que acontece; o que virar capacidade entra nesta tabela
+depois, com a evidência junto.
+
 | ID | Estado e evidência |
 |---|---|
 | A-1 | resolvido; URL reproduz câmera livre |

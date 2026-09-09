@@ -90,15 +90,28 @@ inteira dentro do vocabulário do motor.
 
 ## Contrato mínimo
 
-O acervo TEM receitas completas para ler antes de começar, e ler uma poupa a
-maior parte dos tropeços. Escolha pela forma que você precisa, não pelo tema:
+**A convenção vem do catálogo, não do acervo.** As receitas de
+`prototipos/procedural/v3/` são exemplo e não passaram por homologação: em
+2026-09-08 a varredura com o veredito de contato ligado achou defeito real em
+duas delas — `barricada-de-sucata`, que trata `em` como canto mínimo do cubo
+quando é translação de um cubo centrado, e `bicicleta-urbana`, com o tubo
+inferior atravessando o pneu. Aprender convenção lendo receita defeituosa
+propaga o defeito. `descrever_capacidade` devolve schema, exemplo, pré-condições
+e limites da operação, e é essa a fonte.
 
-| se a forma é… | leia |
+Abrir uma receita do acervo continua útil para VER uma operação em uso, e aí a
+escolha é pela forma, não pelo tema:
+
+| se a forma é… | abra |
 | --- | --- |
-| caixa e junção (marcenaria, estrutura) | `prototipos/procedural/v3/pecas/cadeira-de-madeira.js` |
+| caixa e junção | `prototipos/procedural/v3/pecas/cadeira-de-madeira.js` |
 | seção que muda ao longo do comprimento | `prototipos/procedural/v3/armas/espada-curta.js` |
 | assimétrica num plano | `prototipos/procedural/v3/armas/machado-de-guerra.js` |
 | detalhe repetido em torno de um eixo | `prototipos/procedural/v3/armas/maca-de-abas.js` |
+
+Rode
+`npm run descrever` nela antes de copiar qualquer ideia: o que reprovar ali não
+deve entrar na sua peça.
 
 Para peças bilaterais com curvas ou arcos contínuos (como o encosto esculpido da cadeira), use `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` para garantir simetria matemática e eliminar frestas de tangência angular nas pontas. O estudo de caso e notas técnicas estão em [`docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md`](../../../docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md).
 
@@ -131,6 +144,16 @@ semente explícita: todo sorteio parte dela, e a receita reexecuta igual.
 consumidores v3, não requisitos universais da bancada atual. Quando a peça
 exportar `ALIASES`, encaminhe-os tanto a `colisaoDe` quanto a `executar`; caso
 contrário, as citações podem virar órfãs mesmo quando a definição está correta.
+
+## Quando existe referência fotográfica
+
+Foto de produto de terceiro NUNCA entra no repositório; só coordenadas
+derivadas dela, em `docs/mecanifica/referencias/`. Com uma foto em mãos, o alvo
+vem antes da geometria: a skill `../desenhar-prancha/SKILL.md` produz a prancha
+ortográfica, e ela é o que transforma "está coerente?" em desvio medido por
+região. Sem alvo, a única coisa que sobra para julgar a peça é a opinião de quem
+a fez. A comparação e seus limites estão em
+[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
 ## Seleção e operações
 
