@@ -62,14 +62,14 @@ export const TABELA = {
      expoente da superelipse]. Expoente 2 é elipse; acima disso as faces
      achatam e os cantos viram raio curto, que é o desenho hidroformado. */
   perfilTuboInferior: [
-    [0.00, 54, 46, 4.5],
-    [0.35, 56, 50, 4.5],
-    [0.70, 58, 52, 4.5],
-    [1.00, 58, 54, 4.2],
+    [0.00, 54, 62, 4.5],
+    [0.35, 56, 84, 4.5],
+    [0.70, 58, 90, 4.5],
+    [1.00, 58, 74, 4.2],
   ],
   /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
      isso o controle da Bézier fica a três quartos do caminho, não na metade. */
-  arqueioTuboInferior: 40,
+  arqueioTuboInferior: 22,
   posicaoArqueioTuboInferior: 0.8,
   raioTuboDirecao: 24,
   raioBalancoInferior: 11,
