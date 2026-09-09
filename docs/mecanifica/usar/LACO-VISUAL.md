@@ -33,7 +33,10 @@ isto: doze rodadas de modelagem sem que o desenho de referência fosse aberto um
    modelo e sobreposição. Crítico que recebe só o render dá opinião.
 
 Sem alvo desenhado, desenhe antes: veja
-[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md).
+[`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md). Quando o que
+existe é foto e não prancha, `npm run conferir:referencia` mede a borda em
+milímetro contra a foto; o contrato e os limites estão em
+[`CONFERIR-CONTRA-REFERENCIA.md`](CONFERIR-CONTRA-REFERENCIA.md).
 
 ## 3. Despachar o crítico, sem contexto
 

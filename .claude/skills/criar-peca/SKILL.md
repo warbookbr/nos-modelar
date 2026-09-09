@@ -155,6 +155,13 @@ região. Sem alvo, a única coisa que sobra para julgar a peça é a opinião de
 a fez. A comparação e seus limites estão em
 [`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
 
+Quando a prancha não existe e a foto é o que há, `npm run conferir:referencia`
+devolve o desvio em milímetro entre a borda da peça e a borda da foto, por
+estação, e reprova acima da tolerância declarada. Média perto de zero com máximo
+alto é erro de inclinação; média igual ao máximo é erro de altura. O contrato
+está em
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md).
+
 ## Seleção e operações
 
 A referência completa de operações, argumentos e armadilhas está em

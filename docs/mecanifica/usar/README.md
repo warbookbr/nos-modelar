@@ -37,16 +37,18 @@ aprova forma, e perspectiva bonita não compensa ortográfica ruim. Ler antes
 custa minutos; descobrir depois já custou doze rodadas neste repositório.
 
 [`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](METODO-DIAGNOSTICO-E-SEU-LIMITE.md) diz
-onde o método de "observar, medir, corrigir" funciona e onde ele acha defeito
-para sempre sem a forma andar. Vale ler quando os achados encolhem e a
-qualidade não sobe.
+onde "observar, medir, corrigir" acha defeito para sempre sem a forma andar.
+
+[`CONFERIR-CONTRA-REFERENCIA.md`](CONFERIR-CONTRA-REFERENCIA.md): com foto e sem
+prancha, `npm run conferir:referencia` mede a borda em milímetro e separa erro
+de inclinação de erro de altura.
 
 [`PARAMETROS-VIVOS.md`](PARAMETROS-VIVOS.md): antes de alterar um número, saber
 se aquele parâmetro está ligado em algo. `npm run parametros`.
 
-[`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) documenta o processo de
-modelagem de uma cadeira de jantar realista contra referência fotográfica,
-com problemas e limitações de motor e ferramentas anotados durante a criação.
+[`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) documenta a modelagem de
+uma cadeira contra referência fotográfica, com os limites de motor e ferramenta
+anotados durante a criação.
 
 ## Regras que valem em qualquer tarefa daqui
 

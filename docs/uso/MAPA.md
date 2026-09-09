@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-809 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+811 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -568,6 +568,7 @@
 - `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
 - `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
+- `CONFERIR-CONTRA-REFERENCIA.md` — Conferir a peça contra uma foto de referência
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
@@ -953,6 +954,7 @@
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `comparar-alvo.mjs` — comparar-alvo.mjs — sobrepõe a silhueta do MODELO ao DESENHO ALVO, em milímetros, na mesma origem e na mesma escala.
 - `conferir-contra-referencia.mjs` — conferir-contra-referencia.mjs — desvio em MILÍMETRO entre a silhueta lateral de partes de uma peça e a borda correspondente de uma foto de referência.
+- `conferir-contra-referencia.test.mjs` — Duas âncoras coerentes: 10 px valem 40 mm nos dois eixos.
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
