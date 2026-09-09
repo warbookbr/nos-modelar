@@ -152,7 +152,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 266 declarados e 121 vivos', async () => {
+  it('trava o retrato do acervo: 267 declarados e 122 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
@@ -162,13 +162,13 @@ describe('acervo real', () => {
        parâmetros de propósito — e não regressão. Subiu de 234/91 para 244/101
        quando `cavalete-de-serra` entrou: dez declarados, dez vivos, porque a
        receita deriva PASSOS de PARAMS e nenhuma medida está digitada. Subiu de
-       244/101 para 266/121 quando o quadro da bicicleta e o estudo de seção de
+       244/101 para 267/122 quando o quadro da bicicleta e o estudo de seção de
        tubo entraram: o quadro traz vinte declarados vivos, porque a tabela de
        geometria chega como argumento e a derivação roda a cada chamada, e o
        estudo traz dois inertes por ser fixture de comparação visual. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 266, vivos: 121, inertes: 145 });
+    expect(r.resultado.totais).toEqual({ declarados: 267, vivos: 122, inertes: 145 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });

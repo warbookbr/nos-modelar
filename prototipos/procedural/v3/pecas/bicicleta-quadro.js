@@ -27,7 +27,7 @@ export const TABELA = {
   balancoTraseiro: 435,
   quedaDoMovimentoCentral: 65,
   anguloDirecao: 69,
-  anguloSelim: 73,
+  anguloSelim: 66,
   tuboDirecaoComprimento: 110,
   tuboSelimComprimento: 480,
   garfoEixoACoroa: 490,
@@ -37,7 +37,19 @@ export const TABELA = {
   meiaLarguraCubo: 74,
   /* Seções dos tubos, medidas de quadro de alumínio corrente. */
   raioTuboSelim: 17,
-  raioTuboSuperior: 15,
+  /* O tubo superior também não é redondo: no recorte lateral ele é estreito na
+     solda do tubo do selim e vai alargando até virar um painel largo no tubo de
+     direção. Mesmo formato de entrada do perfil do tubo inferior: fração do
+     caminho, largura em x, altura no plano lateral, expoente. A fração 0 é a
+     ponta do tubo do selim. */
+  perfilTuboSuperior: [
+    [0.00, 30, 34, 3.5],
+    [0.45, 34, 40, 4.0],
+    [0.80, 42, 54, 4.2],
+    [1.00, 46, 64, 4.2],
+  ],
+  /* O tubo superior arqueia para baixo, com a barriga no meio do vão. */
+  arqueioTuboSuperior: -16,
   /* O tubo inferior não é redondo. No quadro de alumínio hidroformado da
      referência ele é largo e chato junto ao movimento central e vai ficando
      alto e estreito ao chegar no tubo de direção. A comparação com o recorte
@@ -53,7 +65,10 @@ export const TABELA = {
     [0.70, 58, 52, 4.5],
     [1.00, 58, 54, 4.2],
   ],
-  arqueioTuboInferior: 0,
+  /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
+     isso o controle da Bézier fica a três quartos do caminho, não na metade. */
+  arqueioTuboInferior: 12,
+  posicaoArqueioTuboInferior: 0.75,
   raioTuboDirecao: 24,
   raioBalancoInferior: 11,
   raioBalancoSuperior: 9,
@@ -179,12 +194,12 @@ const secao = (largura, altura, expoente, lados) => {
  *  `perfil` pela fração do caminho. `orientacao` [1,0,0] põe a largura do
  *  contorno em x, então a altura do contorno cai no plano lateral. */
 const LADOS_PERFILADO = 24;
-const tuboPerfilado = (origemId, de, ate, perfil, arqueio) => {
-  const meio = [(de[0] + ate[0]) / 2, (de[1] + ate[1]) / 2];
+const tuboPerfilado = (origemId, de, ate, perfil, arqueio, ondeArqueia = 0.5) => {
   const d = [ate[0] - de[0], ate[1] - de[1]];
   const comp = Math.hypot(...d);
   const normal = [-d[1] / comp, d[0] / comp];
-  const ctrl = [meio[0] + normal[0] * arqueio, meio[1] + normal[1] * arqueio];
+  const apoio = [de[0] + d[0] * ondeArqueia, de[1] + d[1] * ondeArqueia];
+  const ctrl = [apoio[0] + normal[0] * arqueio, apoio[1] + normal[1] * arqueio];
   const emT = (f) => {
     const g = 1 - f;
     return [
@@ -264,13 +279,14 @@ function gerarPassos(t = TABELA) {
   parte('tuboSelim', 'loft', ID.tuboSelim);
 
   passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.direcaoBaixo,
-    t.perfilTuboInferior, t.arqueioTuboInferior));
+    t.perfilTuboInferior, t.arqueioTuboInferior, t.posicaoArqueioTuboInferior));
   parte('tuboInferior', 'loft', ID.tuboInferior);
 
   passos.push(tubo(ID.tuboDirecao, P.coroa, P.direcaoTopo, t.raioTuboDirecao));
   parte('tuboDirecao', 'loft', ID.tuboDirecao);
 
-  passos.push(tubo(ID.tuboSuperior, P.selimJuncao, P.direcaoTopo, t.raioTuboSuperior));
+  passos.push(tuboPerfilado(ID.tuboSuperior, P.selimJuncao, P.direcaoTopo,
+    t.perfilTuboSuperior, t.arqueioTuboSuperior));
   parte('tuboSuperior', 'loft', ID.tuboSuperior);
 
   for (const [lado, sinal] of [['Esq', -1], ['Dir', 1]]) {
