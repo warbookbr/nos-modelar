@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-804 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+805 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1010,6 +1010,7 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
+- `prancha-bicicleta-29.mjs` — prancha-bicicleta-29.mjs — alvo ortográfico de uma MTB hardtail 29", quadro M.
 - `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
 - `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
