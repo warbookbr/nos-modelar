@@ -152,7 +152,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 269 declarados e 119 vivos', async () => {
+  it('trava o retrato do acervo: 267 declarados e 114 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
@@ -170,10 +170,13 @@ describe('acervo real', () => {
        declarados sobe com os pontos novos e o de vivos CAI, porque ângulo e
        comprimento do tubo do selim deixaram de mover geometria quando a solda
        passou a ser coordenada. É perda de parâmetro vivo aceita em troca de
-       erro que não acumula ao longo da corrente de juntas. */
+       erro que não acumula ao longo da corrente de juntas. Foi para 267/114
+       quando o tubo inferior passou a ser descrito pelas duas bordas medidas:
+       o perfil por fração e as duas pontas saíram da tabela e deram lugar a
+       duas polilinhas, que são dado medido e não parâmetro de projeto. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 269, vivos: 119, inertes: 150 });
+    expect(r.resultado.totais).toEqual({ declarados: 267, vivos: 114, inertes: 153 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });

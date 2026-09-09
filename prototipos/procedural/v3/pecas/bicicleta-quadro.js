@@ -47,7 +47,6 @@ export const TABELA = {
   pontoTuboSuperiorAtras: [-116, 682],
   pontoTuboSuperiorFrente: [447, 969],
   /* Os dois tubos terminam na MESMA ponta. */
-  pontoTuboInferiorFrente: [508, 899],
   coroaAvancoDoMovimentoCentral: 462,
   coroaAlturaDoSolo: 704,
   garfoEixoACoroa: 383,
@@ -72,25 +71,29 @@ export const TABELA = {
   ],
   /* O tubo superior arqueia para baixo, com a barriga no meio do vão. */
   arqueioTuboSuperior: 0,
-  /* O tubo inferior não é redondo. No quadro de alumínio hidroformado da
-     referência ele é largo e chato junto ao movimento central e vai ficando
-     alto e estreito ao chegar no tubo de direção. A comparação com o recorte
-     lateral da referência corrigiu as duas coisas: lá o tubo é reto, de bordas
-     paralelas, e a largura quase não muda, crescendo pouco em direção ao tubo
-     de direção. O arqueio ficou em zero e o perfil quase constante.
-     Cada entrada é [fração do caminho, largura em x, altura no plano lateral,
-     expoente da superelipse]. Expoente 2 é elipse; acima disso as faces
-     achatam e os cantos viram raio curto, que é o desenho hidroformado. */
-  perfilTuboInferior: [
-    [0.00, 54, 96, 4.5],
-    [0.35, 56, 92, 4.5],
-    [0.70, 58, 86, 4.5],
-    [1.00, 58, 74, 4.2],
+  /* O TUBO INFERIOR É DESCRITO PELAS DUAS BORDAS, NÃO POR EIXO E SEÇÃO. Com
+     eixo e seção simétrica, a borda de baixo é o eixo menos metade da altura:
+     corrigir a de cima engrossando a seção descia a de baixo junto, e a cada
+     acerto de uma o outro lado saía do lugar. Aqui as duas bordas são medidas
+     coluna a coluna no recorte lateral e o construtor deriva o eixo como o meio
+     entre elas e a altura como a distância entre elas. Mexer numa não move a
+     outra.
+     Cada entrada é [avanço do movimento central, altura do solo], em mm. As
+     pontas em z=20 e z=447 são extensão pela reta de mínimos quadrados do eixo
+     medido (y = 1,4976 z + 290, 56,3 graus), com a espessura da estação mais
+     próxima: extrapolar as duas bordas separadamente abria um leque que a foto
+     não mostra. */
+  bordaSuperiorTuboInferior: [
+    [20, 381], [108, 513], [130, 543], [152, 573], [173, 608], [195, 643],
+    [217, 678], [260, 747], [282, 777], [304, 812], [325, 847], [447, 1025],
   ],
-  /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
-     isso o controle da Bézier fica a três quartos do caminho, não na metade. */
-  arqueioTuboInferior: 10,
-  posicaoArqueioTuboInferior: 0.88,
+  bordaInferiorTuboInferior: [
+    [20, 259], [108, 391], [130, 430], [152, 460], [173, 491], [195, 530],
+    [217, 561], [260, 604], [282, 642], [304, 677], [325, 717], [447, 895],
+  ],
+  /* A largura em x não aparece na vista lateral, então continua declarada por
+     fração do caminho: [fração, largura, expoente da superelipse]. */
+  larguraTuboInferior: [[0, 54, 4.5], [0.35, 56, 4.5], [1, 58, 4.2]],
   raioTuboDirecao: 37,
   raioBalancoInferior: 11,
   raioBalancoSuperior: 9,
@@ -149,7 +152,9 @@ export function derivar(t = TABELA) {
   return {
     raioRoda, mc, eixoTraseiro, eixoDianteiro, coroa, direcaoTopo, direcaoBaixo,
     pontoSuperiorFrente: [...t.pontoTuboSuperiorFrente],
-    pontoInferiorFrente: [...t.pontoTuboInferiorFrente],
+    bordaSuperiorInferior: t.bordaSuperiorTuboInferior.map((p) => [...p]),
+    bordaInferiorInferior: t.bordaInferiorTuboInferior.map((p) => [...p]),
+    larguraInferior: t.larguraTuboInferior.map((p) => [...p]),
     selimTopo, selimJuncao, selimJuncaoBalanco, selim, saidaInferior, saidaBalanco,
     empilhamento: direcaoTopo[1] - mc[1],
     alcance: direcaoTopo[0] - mc[0],
@@ -264,6 +269,62 @@ const tuboPerfilado = (origemId, de, ate, perfil, arqueio, ondeArqueia = 0.5) =>
   }];
 };
 
+/** Tubo derivado das DUAS bordas medidas. Em cada estação, o eixo é o meio
+ *  entre as bordas e a altura da seção é a distância entre elas, corrigida pelo
+ *  cosseno da inclinação local, porque a seção do `loft` é perpendicular ao
+ *  caminho e a medida na foto é vertical. Mexer numa borda não move a outra. */
+const tuboEntreBordas = (origemId, superior, inferior, larguras, estacoes = 10) => {
+  const emZ = (pts, z) => {
+    if (z <= pts[0][0]) return pts[0][1];
+    if (z >= pts[pts.length - 1][0]) return pts[pts.length - 1][1];
+    for (let i = 1; i < pts.length; i += 1) {
+      if (pts[i - 1][0] <= z && pts[i][0] >= z) {
+        const [z0, y0] = pts[i - 1]; const [z1, y1] = pts[i];
+        return y0 + ((y1 - y0) * (z - z0)) / (z1 - z0);
+      }
+    }
+    return pts[pts.length - 1][1];
+  };
+  const zIni = Math.max(superior[0][0], inferior[0][0]);
+  const zFim = Math.min(superior[superior.length - 1][0], inferior[inferior.length - 1][0]);
+  const eixo = (z) => (emZ(superior, z) + emZ(inferior, z)) / 2;
+  const larguraEm = (f) => {
+    let i = 0;
+    while (i < larguras.length - 2 && larguras[i + 1][0] < f) i += 1;
+    const [f0, l0, e0] = larguras[i]; const [f1, l1, e1] = larguras[i + 1];
+    const k = f1 === f0 ? 0 : (f - f0) / (f1 - f0);
+    return [l0 + (l1 - l0) * k, e0 + (e1 - e0) * k];
+  };
+  const secoes = [];
+  const passo = (zFim - zIni) / estacoes;
+  for (let i = 0; i <= estacoes; i += 1) {
+    const z = zIni + passo * i;
+    const f = i / estacoes;
+    const zA = Math.max(zIni, z - passo / 2); const zB = Math.min(zFim, z + passo / 2);
+    const inclinacao = (eixo(zB) - eixo(zA)) / (zB - zA);
+    const cos = 1 / Math.hypot(1, inclinacao);
+    const altura = (emZ(superior, z) - emZ(inferior, z)) * cos;
+    const [largura, expoente] = larguraEm(f);
+    secoes.push({ pos: mundo([z, eixo(z)]), contorno: secao(largura, altura, expoente, LADOS_PERFILADO) });
+  }
+  /* Polo em cada ponta, pela tangente da primeira e da última estação. */
+  const alem = (a, b, k) => {
+    const d = [b.pos[2] - a.pos[2], b.pos[1] - a.pos[1]];
+    const n = Math.hypot(...d);
+    return { pos: [a.pos[0], a.pos[1] - (d[1] / n) * m(POLO) * k, a.pos[2] - (d[0] / n) * m(POLO) * k], raio: 0 };
+  };
+  return ['loft', {
+    origemId,
+    lados: LADOS_PERFILADO,
+    orientacao: [1, 0, 0],
+    secoes: [
+      alem(secoes[0], secoes[1], 1),
+      ...secoes,
+      alem(secoes[secoes.length - 1], secoes[secoes.length - 2], 1),
+    ],
+  }];
+};
+
 const ID = {
   caixaMC: 101, tuboSelim: 102, tuboInferior: 103, tuboDirecao: 104, tuboSuperior: 105,
   balancoInfEsq: 106, balancoInfDir: 107, balancoSupEsq: 108, balancoSupDir: 109,
@@ -302,8 +363,8 @@ function gerarPassos(t = TABELA) {
 
   /* Sem o tubo de direção, o tubo inferior sobe até a mesma ponta do tubo
      superior, e é lá que os dois se encontram. */
-  passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.pontoInferiorFrente,
-    t.perfilTuboInferior, t.arqueioTuboInferior, t.posicaoArqueioTuboInferior));
+  passos.push(tuboEntreBordas(ID.tuboInferior, P.bordaSuperiorInferior,
+    P.bordaInferiorInferior, P.larguraInferior));
   parte('tuboInferior', 'loft', ID.tuboInferior);
 
   passos.push(tuboPerfilado(ID.tuboSuperior, P.selimJuncao, P.pontoSuperiorFrente,

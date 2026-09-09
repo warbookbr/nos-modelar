@@ -1,0 +1,12 @@
+{
+  "descricao": "Vista lateral do quadro sozinho, 2000x1198, gerada por IA. SEM RODA NA IMAGEM, então ela não carrega escala própria: as âncoras são o movimento central e a ponteira traseira, e a distância entre eles vem do balanço traseiro já medido na folha com rodas. Esta imagem serve para FORMA em alta resolução, não para tamanho. A altura da ponteira foi medida aqui: a queda do movimento central dá 28 mm, contra os 50 que a folha anterior indicava.",
+  "imagem": "lateral-quadro.png",
+  "ancoras": [
+    { "nome": "centro da ponteira traseira", "px": [440, 798], "mm": [-499.5, 345] },
+    { "nome": "centro do movimento central", "px": [916, 824.5], "mm": [0, 317] }
+  ],
+  "recorte": [400, 100, 1400, 900],
+  "qual": "topo",
+  "tolerancia": 25,
+  "limiar": 248
+}

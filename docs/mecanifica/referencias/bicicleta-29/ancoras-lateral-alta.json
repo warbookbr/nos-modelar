@@ -1,0 +1,13 @@
+{
+  "descricao": "Âncoras da vista lateral em alta resolução (1336x800), gerada por IA. Escala vinda dos dois cubos: 731 px entre eixos. A conferência cruzada é o movimento central, que cai em (629,536) pelo cálculo e é medido em (630,535) na coroa.",
+  "imagem": "lateral-alta.png",
+  "ancoras": [
+    { "nome": "centro do cubo traseiro", "px": [300.5, 503.5], "mm": [-499.5, 367] },
+    { "nome": "centro do cubo dianteiro", "px": [1031.5, 503.5], "mm": [610.5, 367] }
+  ],
+  "recorte": [560, 100, 900, 420],
+  "qual": "topo",
+  "partes": ["tuboSuperior"],
+  "tolerancia": 25,
+  "limiar": 248
+}
