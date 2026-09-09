@@ -28,10 +28,28 @@ export const TABELA = {
   entreEixos: 1110,
   balancoTraseiro: 502,
   quedaDoMovimentoCentral: 50,
-  anguloDirecao: 75,
+  anguloDirecao: 78,
   anguloSelim: 70,
-  tuboDirecaoComprimento: 215,
+  tuboDirecaoComprimento: 178,
   tuboSelimComprimento: 422,
+  /* A COROA VEM MEDIDA, NÃO DERIVADA DO GARFO. Encadear entre-eixos, avanço e
+     eixo-a-coroa punha o tubo de direção 60 mm acima e 60 atrás do que a imagem
+     mostra, e cada correção no garfo mexia nos dois tubos que soldam nele. As
+     duas coordenadas do encontro do tubo de direção com o garfo saem direto do
+     recorte ampliado: avanço em relação ao movimento central e altura do solo.
+     O eixo-a-coroa e o avanço do garfo ficam na tabela para o módulo do garfo,
+     que é quem vai precisar deles. */
+  /* PONTOS DE SOLDA MEDIDOS, EM [avanço do movimento central, altura do solo].
+     Encadear ângulo e comprimento acumulava erro em cada junta, e mexer num
+     parâmetro arrastava tubos que não deviam se mexer. Cada junta agora sai do
+     recorte ampliado, na escala do diâmetro da roda. */
+  pontoSelimTopo: [-134, 716],
+  pontoTuboSuperiorAtras: [-116, 682],
+  pontoTuboSuperiorFrente: [447, 969],
+  /* Os dois tubos terminam na MESMA ponta. */
+  pontoTuboInferiorFrente: [508, 899],
+  coroaAvancoDoMovimentoCentral: 462,
+  coroaAlturaDoSolo: 704,
   garfoEixoACoroa: 383,
   garfoAvanco: 8,
   canoteExposto: 240,
@@ -44,14 +62,16 @@ export const TABELA = {
      direção. Mesmo formato de entrada do perfil do tubo inferior: fração do
      caminho, largura em x, altura no plano lateral, expoente. A fração 0 é a
      ponta do tubo do selim. */
+  /* SEÇÃO CONSTANTE. Enquanto a altura crescia ao longo do tubo, a borda de
+     cima saía curva mesmo com o eixo reto, porque é a metade da seção que a
+     desenha. Com altura constante a borda vira uma reta paralela ao eixo, que
+     é o que a referência mostra. */
   perfilTuboSuperior: [
-    [0.00, 30, 34, 3.5],
-    [0.45, 34, 40, 4.0],
-    [0.80, 42, 54, 4.2],
-    [1.00, 46, 64, 4.2],
+    [0.00, 38, 52, 4.0],
+    [1.00, 46, 52, 4.2],
   ],
   /* O tubo superior arqueia para baixo, com a barriga no meio do vão. */
-  arqueioTuboSuperior: -8,
+  arqueioTuboSuperior: 0,
   /* O tubo inferior não é redondo. No quadro de alumínio hidroformado da
      referência ele é largo e chato junto ao movimento central e vai ficando
      alto e estreito ao chegar no tubo de direção. A comparação com o recorte
@@ -69,9 +89,9 @@ export const TABELA = {
   ],
   /* Uma subida leve, concentrada perto do tubo de direção e não no meio: por
      isso o controle da Bézier fica a três quartos do caminho, não na metade. */
-  arqueioTuboInferior: 22,
-  posicaoArqueioTuboInferior: 0.8,
-  raioTuboDirecao: 24,
+  arqueioTuboInferior: 10,
+  posicaoArqueioTuboInferior: 0.88,
+  raioTuboDirecao: 37,
   raioBalancoInferior: 11,
   raioBalancoSuperior: 9,
   larguraCaixaMovimentoCentral: 73,
@@ -96,16 +116,14 @@ export function derivar(t = TABELA) {
   const a = rad(t.anguloDirecao);
   const subirDirecao = [-Math.cos(a), Math.sin(a)];
   const frenteDirecao = [Math.sin(a), Math.cos(a)];
-  const noEixo = som(eixoDianteiro, esc(frenteDirecao, -t.garfoAvanco));
-  const aoLongo = Math.sqrt(t.garfoEixoACoroa ** 2 - t.garfoAvanco ** 2);
-  const coroa = som(noEixo, esc(subirDirecao, aoLongo));
+  const coroa = [t.coroaAvancoDoMovimentoCentral, t.coroaAlturaDoSolo];
   const direcaoTopo = som(coroa, esc(subirDirecao, t.tuboDirecaoComprimento));
 
   const s = rad(t.anguloSelim);
   const subirSelim = [-Math.cos(s), Math.sin(s)];
-  const selimTopo = som(mc, esc(subirSelim, t.tuboSelimComprimento));
+  const selimTopo = [...t.pontoSelimTopo];
   /* Onde o tubo superior solda no tubo do selim. */
-  const selimJuncao = som(mc, esc(subirSelim, t.tuboSelimComprimento - 30));
+  const selimJuncao = [...t.pontoTuboSuperiorAtras];
   /* Onde os balanços superiores soldam, ABAIXO do tubo superior. Na primeira
      versão os dois usavam a mesma junção e a medição acusou balanço superior
      dentro do tubo superior, por contenção. Num quadro real o balanço encontra
@@ -130,6 +148,8 @@ export function derivar(t = TABELA) {
 
   return {
     raioRoda, mc, eixoTraseiro, eixoDianteiro, coroa, direcaoTopo, direcaoBaixo,
+    pontoSuperiorFrente: [...t.pontoTuboSuperiorFrente],
+    pontoInferiorFrente: [...t.pontoTuboInferiorFrente],
     selimTopo, selimJuncao, selimJuncaoBalanco, selim, saidaInferior, saidaBalanco,
     empilhamento: direcaoTopo[1] - mc[1],
     alcance: direcaoTopo[0] - mc[0],
@@ -282,15 +302,11 @@ function gerarPassos(t = TABELA) {
 
   /* Sem o tubo de direção, o tubo inferior sobe até a mesma ponta do tubo
      superior, e é lá que os dois se encontram. */
-  passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.direcaoTopo,
+  passos.push(tuboPerfilado(ID.tuboInferior, P.saidaInferior, P.pontoInferiorFrente,
     t.perfilTuboInferior, t.arqueioTuboInferior, t.posicaoArqueioTuboInferior));
   parte('tuboInferior', 'loft', ID.tuboInferior);
 
-  /* TUBO DE DIREÇÃO FORA POR ENQUANTO. Ele tapava o encontro do tubo superior
-     com o inferior e atrapalhava a comparação com a referência. Sem ele, os
-     dois tubos se encontram diretamente, e esse encontro é contato declarado. */
-
-  passos.push(tuboPerfilado(ID.tuboSuperior, P.selimJuncao, P.direcaoTopo,
+  passos.push(tuboPerfilado(ID.tuboSuperior, P.selimJuncao, P.pontoSuperiorFrente,
     t.perfilTuboSuperior, t.arqueioTuboSuperior));
   parte('tuboSuperior', 'loft', ID.tuboSuperior);
 
@@ -344,7 +360,7 @@ export const receitaBicicletaQuadro = {
     { par: ['tuboSelim', 'tuboSuperior'], motivo: 'o tubo superior solda no tubo do selim' },
     { par: ['tuboSelim', 'balancoSuperiorEsq'], motivo: 'o balanco superior esquerdo solda no tubo do selim' },
     { par: ['tuboSelim', 'balancoSuperiorDir'], motivo: 'o balanco superior direito solda no tubo do selim' },
-    { par: ['tuboInferior', 'tuboSuperior'], motivo: 'sem o tubo de direcao os dois se encontram na frente' },
+    { par: ['tuboInferior', 'tuboSuperior'], motivo: 'os dois se encontram na mesma ponta, dentro do tubo de direcao' },
     { par: ['balancoInferiorEsq', 'balancoSuperiorEsq'], motivo: 'os dois balancos se encontram na ponteira esquerda' },
     { par: ['balancoInferiorDir', 'balancoSuperiorDir'], motivo: 'os dois balancos se encontram na ponteira direita' },
   ],

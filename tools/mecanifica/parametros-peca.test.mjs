@@ -152,7 +152,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 267 declarados e 122 vivos', async () => {
+  it('trava o retrato do acervo: 269 declarados e 119 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
@@ -165,10 +165,15 @@ describe('acervo real', () => {
        244/101 para 267/122 quando o quadro da bicicleta e o estudo de seção de
        tubo entraram: o quadro traz vinte declarados vivos, porque a tabela de
        geometria chega como argumento e a derivação roda a cada chamada, e o
-       estudo traz dois inertes por ser fixture de comparação visual. */
+       estudo traz dois inertes por ser fixture de comparação visual. Foi para
+       269/119 quando as juntas do quadro viraram ponto medido: o número de
+       declarados sobe com os pontos novos e o de vivos CAI, porque ângulo e
+       comprimento do tubo do selim deixaram de mover geometria quando a solda
+       passou a ser coordenada. É perda de parâmetro vivo aceita em troca de
+       erro que não acumula ao longo da corrente de juntas. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 267, vivos: 122, inertes: 145 });
+    expect(r.resultado.totais).toEqual({ declarados: 269, vivos: 119, inertes: 150 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });

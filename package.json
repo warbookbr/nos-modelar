@@ -76,7 +76,8 @@
     "docs:citacoes": "node tools/mapa/citacoes.mjs",
     "docs:citacoes:check": "node tools/mapa/citacoes.mjs --check",
     "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
-    "diario": "node tools/mecanifica/ler-diario.mjs"
+    "diario": "node tools/mecanifica/ler-diario.mjs",
+    "conferir:referencia": "node tools/mecanifica/conferir-contra-referencia.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

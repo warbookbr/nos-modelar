@@ -1,0 +1,40 @@
+{
+  "descricao": "Âncoras da vista lateral da folha gerada, para conferir o quadro contra ela. px é pixel em lateral.png; mm é o plano lateral da peça, z para a frente e y para cima, origem no movimento central projetado no solo.",
+  "imagem": "lateral.png",
+  "ancoras": [
+    {
+      "nome": "centro do cubo traseiro",
+      "px": [
+        100,
+        177.5
+      ],
+      "mm": [
+        -499.5,
+        367
+      ]
+    },
+    {
+      "nome": "centro do movimento central",
+      "px": [
+        215,
+        189
+      ],
+      "mm": [
+        0,
+        317
+      ]
+    }
+  ],
+  "recorte": [
+    194,
+    30,
+    304,
+    200
+  ],
+  "qual": "topo",
+  "partes": [
+    "tuboSuperior"
+  ],
+  "tolerancia": 25,
+  "limiar": 248
+}
