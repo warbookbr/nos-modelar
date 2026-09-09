@@ -14,6 +14,25 @@ imagem de origem não está versionada. Cada arquivo declara sua origem, o méto
 de calibração e o resíduo, para que a medida possa ser conferida por quem tiver
 a prancha em mãos.
 
+## A exceção escrita: imagem gerada entra, e não vale como dimensão
+
+`bicicleta-29-vistas-geradas.png` está versionada aqui, e a regra acima continua
+de pé. Ela não é prancha de terceiro: foi gerada por IA a pedido do dono do
+repositório, que autorizou a inclusão. Entra porque é o alvo de CARÁTER da
+rodada da bicicleta — que peças existem e que forma têm, o garfo com coroa e
+dois tubos, o guidão reto com manetes, a ponteira do triângulo traseiro.
+
+**Ela não vale como fonte dimensional.** Medir proporção numa imagem gerada é
+medir o que outro modelo inventou. A dimensão da bicicleta vem da tabela em
+`tools/mecanifica/prancha-bicicleta-29.mjs`, e quando as duas divergirem, a
+tabela manda.
+
+Como ela chegou ao disco também vale registrar, porque custou uma conclusão
+errada: anexo de sessão vive em base64 dentro da transcrição do projeto, em
+`~/.claude/projects/**/**.jsonl`, e sai de lá por decodificação. Procurar por
+arquivo de imagem recente não acha nada e leva a concluir que a imagem não
+existe.
+
 ## Como um derivado é produzido
 
 Com `tools/mecanifica/prancha-referencia.mjs`, que decodifica o PNG em Node puro,

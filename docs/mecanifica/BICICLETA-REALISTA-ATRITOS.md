@@ -34,6 +34,7 @@ que estava errado ou desatualizado.
 | módulo | referência | estado |
 |---|---|---|
 | prancha alvo | tabela pública + fotos para caráter | **feita**, relatório sem alertas |
+| folha de vistas gerada | `referencias/bicicleta-29-vistas-geradas.png` | em disco; caráter, não dimensão |
 | quadro | prancha lateral | não começado |
 | garfo de suspensão | foto frontal do garfo | não começado |
 | roda | foto lateral | não começado |
@@ -45,7 +46,29 @@ que estava errado ou desatualizado.
 Um por bloco, na ordem em que aconteceram. Formato: o que eu tentava fazer, o
 que a ferramenta respondeu, o que eu fiz no lugar, e o que teria resolvido.
 
-### 1. Referência que chega pela conversa não entra no laço de medição
+### 1. Referência que chega pela conversa PARECE não entrar no laço — e entra
+
+**CORRIGIDO NO MESMO DIA, e o erro era meu.** O registro abaixo, escrito antes,
+afirmava que a imagem não existia em disco. Ela existe: a transcrição da sessão
+guarda os bytes em base64, em blocos `{"type":"image"}` dentro do `.jsonl` do
+projeto, e basta decodificar. Eu tinha procurado por ARQUIVOS de imagem
+recentes, não achei, e concluí impossibilidade a partir de uma busca que nunca
+cobriu o lugar certo. Insisti três vezes nessa conclusão antes de um subagente
+achar em quarenta e nove segundos.
+
+**A lição não é sobre a ferramenta.** É que "procurei e não achei" virou "não
+existe" sem que eu tivesse verificado o caminho pelo qual a coisa chega. O
+mesmo erro que este projeto já mediu em outra forma: documento descreve a
+intenção, e só o código diz o que acontece.
+
+**A capacidade que falta.** Extrair anexo da sessão para disco hoje é script
+manual. Deveria ser comando, e o alvo natural é `docs/mecanifica/referencias/`.
+Enquanto não existir, toda sessão redescobre isto do zero — ou, como aqui,
+conclui que é impossível.
+
+**O registro original, mantido porque a lição está no erro:**
+
+### 1-a. O que eu tinha escrito antes de descobrir
 
 **O que eu tentava fazer.** Calibrar a prancha contra as três fotos de produto,
 como manda o passo 1 da skill, e comparar por região com
@@ -63,9 +86,9 @@ tabela não depende do meu olho. As fotos passaram a informar só caráter. Est�
 declarado em `autoria.procedencias` da prancha, com a incerteza
 `sem-comparacao-por-numero`.
 
-**O que teria resolvido.** Um jeito de materializar em disco uma imagem que
-chega pela sessão. Enquanto não existir, toda referência fotográfica de sessão
-fica fora do laço medido, e isso vale para qualquer rodada, não só esta.
+**O que eu disse que resolveria.** "Um jeito de materializar em disco uma
+imagem que chega pela sessão." Existia o tempo todo, dentro da própria
+transcrição.
 
 ### 2. O motor de prancha assume objeto com casca; bicicleta é esqueleto
 
