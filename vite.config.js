@@ -3,9 +3,13 @@
    vive em warbookbr/mecanica e se constrói de lá. */
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import { escritaDeParametro } from './tools/bancadas/servir-escrita.mjs';
 
 export default defineConfig({
   base: '/nos-mecanifica/',
+  /* Só no servidor de desenvolvimento: a página publicada não escreve arquivo
+     nenhum, e quem a abre não tem o repositório para escrever nele. */
+  plugins: [escritaDeParametro()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

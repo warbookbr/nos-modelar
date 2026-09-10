@@ -32,7 +32,8 @@ export function parametrosDoPainel(receita, valoresAtuais = {}) {
 
 export function criarPainelParametros({
   container,
-  aoMudarParametro = () => {},
+  aoArrastar = () => {},
+  aoSoltar = () => {},
 }) {
   if (!container) return null;
 
@@ -71,15 +72,27 @@ export function criarPainelParametros({
       const slider = linha.querySelector('input[type="range"]');
       const numInput = linha.querySelector('input[type="number"]');
 
-      const atualizar = (novoValor) => {
-        const val = Number(novoValor);
+      /* Arrastar é PRÉVIA e soltar é GRAVAÇÃO. Sem essa separação, cada quadro
+         do arrasto escreveria no arquivo: dezenas de escritas por gesto, cada
+         uma reexecutando e conferindo a receita, e um histórico de trabalho
+         cheio de valores intermediários que ninguém escolheu. */
+      const mostrar = (val) => {
         slider.value = String(val);
         numInput.value = String(val);
-        aoMudarParametro(chave, val);
       };
 
-      slider.addEventListener('input', (e) => atualizar(e.target.value));
-      numInput.addEventListener('change', (e) => atualizar(e.target.value));
+      slider.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        mostrar(val);
+        aoArrastar(chave, val);
+      });
+      slider.addEventListener('change', (e) => aoSoltar(chave, Number(e.target.value)));
+      numInput.addEventListener('change', (e) => {
+        const val = Number(e.target.value);
+        mostrar(val);
+        aoArrastar(chave, val);
+        aoSoltar(chave, val);
+      });
 
       form.appendChild(linha);
     }

@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { carregarPeca } from './carregar-peca.js';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
 import { listarAcervo } from './acervo-receitas.js';
+import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
+import { parametroDeclarado } from '../autoria/parametros-declarados.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -239,9 +241,75 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   let sincronizador = null;
 
+  /* A receita que a bancada tem em mãos, quando a peça veio do acervo. É dela
+     que sai a prévia: mexer o controle monta uma receita equivalente com o
+     valor novo e reexecuta, em vez de deformar a malha na tela. */
+  let receitaAberta = null;
+
+  function previaDeParametro(chave, valor) {
+    if (!receitaAberta) return;
+    const declarado = parametroDeclarado(receitaAberta, chave);
+    if (!declarado) return;
+    const params = comCaminho(receitaAberta.PARAMS, declarado.caminho, valor);
+    sincronizador?.definirPayload({
+      alvo: { nome: idNaUrl ?? nomePecaAtual },
+      receita: receitaComParametros(receitaAberta, params),
+    });
+  }
+
+  /* Um gesto, uma gravação. O mouse solta uma vez e dispara um `change`, mas o
+     teclado dispara um por tecla: cinco setinhas viravam cinco escritas no
+     arquivo, cada uma reexecutando e conferindo a receita, e o histórico ficava
+     com quatro valores que ninguém escolheu. A gravação espera o valor
+     assentar, e valor novo no meio da espera substitui o anterior.
+
+     Gravar exige o arquivo, e o arquivo só existe para quem roda a bancada a
+     partir do repositório. Na página publicada o atendente não está lá, o
+     `fetch` falha, e o controle segue valendo como prévia — que é a verdade da
+     situação, não um erro a esconder. */
+  const gravacoesPendentes = new Map();
+  const ESPERA_GRAVACAO = 400;
+
+  function gravarParametro(chave, valor) {
+    clearTimeout(gravacoesPendentes.get(chave));
+    gravacoesPendentes.set(chave, setTimeout(() => {
+      gravacoesPendentes.delete(chave);
+      gravarAgora(chave, valor);
+    }, ESPERA_GRAVACAO));
+  }
+
+  async function gravarAgora(chave, valor) {
+    if (!idNaUrl) {
+      mostrarAviso('Esta peça veio da sessão da IA; abra pelo acervo para gravar no arquivo.');
+      return;
+    }
+    try {
+      const resposta = await fetch('/api/parametro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ peca: idNaUrl, id: chave, valor }),
+      });
+      const resultado = await resposta.json();
+      if (resultado.estado === 'aplicado') {
+        if (receitaAberta) receitaAberta.PARAMS = comCaminho(
+          receitaAberta.PARAMS,
+          parametroDeclarado(receitaAberta, chave).caminho,
+          resultado.para,
+        );
+        mostrarAviso(`${chave}: ${resultado.de} → ${resultado.para}, gravado na receita.`);
+      } else {
+        mostrarAviso(`Não gravei: ${resultado.motivo}`);
+        previaDeParametro(chave, parametroDeclarado(receitaAberta, chave)?.valor);
+      }
+    } catch {
+      mostrarAviso('Sem atendente de escrita: o valor vale como prévia nesta sessão.');
+    }
+  }
+
   const painelParametros = criarPainelParametros({
     container: document.getElementById('containerParametros'),
-    aoMudarParametro: (chave, valor) => sincronizador?.atualizarParametro(chave, valor),
+    aoArrastar: previaDeParametro,
+    aoSoltar: gravarParametro,
   });
 
   const gerenciadorAnotacoes3D = criarGerenciadorAnotacoes3D({
@@ -828,6 +896,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          à mão e a peça enviada pela IA chegam à cena pela mesma porta, com a
          mesma medição e o mesmo tratamento de erro. */
       idNaUrl = entrada.id;
+      receitaAberta = receita;
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
     } catch (erro) {

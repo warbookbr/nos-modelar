@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-810 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+812 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -837,6 +837,8 @@
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
+- `servir-escrita.mjs` — servir-escrita.mjs — o único caminho da bancada até o arquivo da receita.
+- `servir-escrita.test.mjs` — servir-escrita.test.mjs — o atendente escreve dentro do acervo, e só ali.
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
 - `visor-imports.test.mjs` — Prova a resolução de imports bare no visor legado servido sem transformação.
 
