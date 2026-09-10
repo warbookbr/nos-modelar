@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** [ponte do gesto ao parâmetro nomeado](2026-09-10-ponte-do-gesto-ao-parametro.md).
+
+A bancada vai ganhar controle direto para o usuário mover geometria, e o desenho
+atual das receitas não recebe esse gesto sem estragar: a bicicleta não tem
+posição escrita, tem posição derivada de uma tabela, e as operações de mover
+vértice, aresta e face só aceitam id literal, que é a referência que o
+`CLAUDE.md` proíbe persistir. O plano constrói a ponte que falta, do gesto até
+um número declarado da receita, e deixa o movimento livre e a criação de
+primitivos pela interface de fora.
 
 As [referências visuais e controles da bancada](encerrados/2026-09-09-bancada-referencias-e-controles.md),
 com o desenho em
