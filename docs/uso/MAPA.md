@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-798 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+800 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -456,9 +456,7 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-09-bancada-referencias-e-controles.md` — 2026-09-09 — referências visuais e controles da bancada
 - `BACKLOG.md` — Backlog aberto
-- `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
 
@@ -544,6 +542,8 @@
 - `2026-09-07-o-que-nenhuma-vista-mostra.md` — O que nenhuma vista mostra
 - `2026-09-07-parametro-que-move-a-peca.md` — Parâmetro que move a peça
 - `2026-09-08-esquecer-precisa-falhar.md` — Esquecer precisa falhar
+- `2026-09-09-bancada-referencias-e-controles.md` — 2026-09-09 — referências visuais e controles da bancada
+- `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
 ## docs/mecanifica/planos/mcp/
@@ -771,6 +771,11 @@
 ## src/bancada/anotacoes/
 
 - `pinos-anotacoes.js` — pinos-anotacoes.js — marcadores 3D interativos sobre a malha e lista de notas para feedback com a IA.
+
+## src/bancada/controles/
+
+- `atalhos.js` — atalhos.js — catálogo de comandos de teclado da bancada, com persistência local e recusa de colisão.
+- `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
 
 ## src/bancada/parametros/
 

@@ -1,6 +1,6 @@
 # 2026-09-09 — referências visuais e controles da bancada
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago, com execução assistida.
 
@@ -92,7 +92,7 @@ computadores foi **ADIADO**.
 5. **Interface de referência e apresentação da seleção.**
    `referencias/painel-referencias.js` recebe arquivo, URL, pose e remoção;
    `controlar-partes.js` aplica wireframe e opacidade só à seleção. Integrada.
-6. **Barra superior e atalhos.** Criar `src/bancada/controles/atalhos.js` com
+6. **Barra superior e atalhos.** Integrada. Criar `src/bancada/controles/atalhos.js` com
    `criarRegistroAtalhos({ padrao, armazenamento })` expondo `obter`,
    `atribuir`, `restaurarPadroes` e `comandoDaCombinacao`. Colisão devolve
    `{ ok: false, motivo: 'ocupado', comandoOcupante }` e não altera nada.
@@ -101,12 +101,11 @@ computadores foi **ADIADO**.
    com a lista de comandos e os gestos de ponteiro como linhas de leitura. Cada
    painel lateral ganha botão estreito de recolhimento no canto externo, com
    aba de borda para reabrir, e o botão não aparece em captura de auditoria.
-   Pendente.
-7. **Fronteira entre referência visual e modelo procedural.** Provar por teste
+7. **Fronteira entre referência visual e modelo procedural.** Integrada. Provar por teste
    que `peca()`, `partes`, `estatisticas` e `diagnosticos` continuam relatando
    só o modelo procedural, que o plano de referência nunca entra em seleção,
    caixa, enquadramento ou medição sem cabeça, e regenerar `docs/uso/MAPA.md`
-   por `npm run mapa`. Pendente.
+   por `npm run mapa`.
 
 ## Riscos e parada
 
@@ -122,6 +121,25 @@ conseguiu persistir; ela não pode fingir que guardou.
 
 ## Fechamento
 
-Este plano fecha quando as fatias seis e sete estiverem integradas, com os
-vinte gates verdes e uma inspeção manual do `bicicleta-quadro` ativado com a
-imagem de referência nas vistas esquerda, direita e isométrica.
+Concluído em 2026-09-10 com os vinte gates verdes. As sete fatias estão em
+`main`.
+
+O que a fatia seis entregou difere do desenho em um ponto que vale registrar. O
+desenho previa a barra fina apenas com `Configurações` e `Controles`; a
+implementação manteve isso e tirou o rodapé de dicas, movendo os gestos de
+ponteiro para dentro de `Controles` como linhas de leitura. A faixa que o rodapé
+ocupava voltou para a cena, e dica que não faz nada deixou de disputar espaço
+com controle que faz.
+
+Dois defeitos apareceram e foram corrigidos durante a integração. O menu nascia
+aberto e cobria o painel de componentes, porque `display: grid` vence o
+`[hidden]` do navegador e faltava dizer por escrito que escondido é escondido. E
+a captura de tecla precisava desligar o atalho global enquanto está aberta,
+senão escolher a tecla dispara o comando que já estava nela — é o registro que
+resolve isso, por `deveIgnorar`, e há teste para o caso.
+
+A inspeção manual foi feita no navegador com o `bicicleta-quadro` ativo e a
+imagem de referência vinculada: o menu de controles lista os treze comandos com
+a tecla de cada um, o recolhimento do painel de componentes devolve a cena
+inteira e deixa a aba de borda, e desmarcar `Mostrar grade` apaga a grade sem
+tocar no chão.

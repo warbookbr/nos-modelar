@@ -23,6 +23,32 @@
         </div>
       </section>
 
+      <div class="barra-controles">
+        <div class="menu-barra">
+          <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="true" aria-expanded="false">Configurações</button>
+          <div id="menuConfiguracoes" class="menu-suspenso" hidden>
+            <label class="linha-menu"><input id="prefGrade" type="checkbox" checked /> <span>Mostrar grade</span></label>
+            <label class="linha-menu"><input id="prefChao" type="checkbox" checked /> <span>Mostrar chão</span></label>
+          </div>
+        </div>
+        <div class="menu-barra">
+          <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="true" aria-expanded="false">Controles</button>
+          <div id="menuAtalhos" class="menu-suspenso largo" hidden>
+            <span class="rotulo">TECLADO</span>
+            <div id="listaAtalhos" class="lista-atalhos"></div>
+            <span class="rotulo">PONTEIRO</span>
+            <div class="lista-gestos">
+              <span><b>Arraste</b> orbitar</span>
+              <span><b>Roda</b> aproximar</span>
+              <span><b>Duplo clique</b> focar peça</span>
+              <span><b>URL</b> preserva o estado</span>
+            </div>
+            <button id="btnRestaurarAtalhos" class="botao texto" type="button">Restaurar padrões</button>
+          </div>
+        </div>
+        <span id="avisoAtalho" class="aviso-atalho" role="status" aria-live="polite"></span>
+      </div>
+
       <header class="topo">
 
         <div class="objeto-atual">
@@ -53,7 +79,8 @@
         <button id="btnEnquadrar" type="button"><span>Enquadrar tudo</span><kbd>F</kbd></button>
       </nav>
 
-      <aside class="painel painel-partes" aria-labelledby="tituloPartes">
+      <aside class="painel painel-partes" data-painel="partes" aria-labelledby="tituloPartes">
+        <button class="recolher" type="button" data-recolher="partes" aria-expanded="true" title="Recolher Componentes"><span aria-hidden="true">‹</span><span class="sr">Componentes</span></button>
         <div class="painel-cabecalho">
           <div>
             <span class="rotulo">ESTRUTURA</span>
@@ -74,7 +101,8 @@
         <button id="btnLimpar" class="botao texto" type="button">Limpar seleção <kbd>Esc</kbd></button>
       </aside>
 
-      <aside class="painel painel-inspecao" aria-labelledby="tituloInspecao">
+      <aside class="painel painel-inspecao" data-painel="inspecao" aria-labelledby="tituloInspecao">
+        <button class="recolher" type="button" data-recolher="inspecao" aria-expanded="true" title="Recolher Inspeção"><span aria-hidden="true">›</span><span class="sr">Inspeção</span></button>
         <nav class="abas-painel" role="tablist">
           <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true">Inspeção</button>
           <button type="button" class="aba-btn" data-aba="parametros" role="tab" aria-selected="false">Parâmetros</button>
@@ -162,13 +190,6 @@
           <div id="listaAnotacoes" class="lista-anotacoes"></div>
         </div>
       </aside>
-
-      <footer class="rodape">
-        <span><b>Arraste</b> orbitar</span>
-        <span><b>Roda</b> aproximar</span>
-        <span><b>Duplo clique</b> focar peça</span>
-        <span><b>URL</b> preserva o estado</span>
-      </footer>
 
       <div class="referencia-metrica" aria-label="Referência espacial da vista">
         <span id="eixosReferencia">Eixos X / Y / Z</span>

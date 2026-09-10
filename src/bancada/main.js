@@ -12,6 +12,8 @@ import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
 import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { criarPainelParametros } from './parametros/painel-parametros.js';
+import { criarPreferenciasBancada } from './preferencias/estado-local.js';
+import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import {
   alvosDeEnquadramento,
@@ -763,34 +765,184 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     }
   });
 
+  /* Comandos de teclado: nome, o que fazem e a tecla que vem de fábrica. A
+     tabela é a fonte única — a lista do menu, a resolução da tecla e a
+     persistência do remapeamento leem daqui, então comando novo aparece no
+     menu sozinho. `Esc` fica fora porque cancela captura e seleção, e não pode
+     ser remapeado para dentro de outra coisa. */
+  const COMANDOS = [
+    { id: 'vista-frontal', rotulo: 'Vista de frente', padrao: '1', executar: () => ambiente.definirVista('frontal') },
+    { id: 'vista-traseira', rotulo: 'Vista de trás', padrao: 'Shift+1', executar: () => ambiente.definirVista('traseira') },
+    { id: 'vista-direita', rotulo: 'Vista da direita', padrao: '3', executar: () => ambiente.definirVista('direita') },
+    { id: 'vista-esquerda', rotulo: 'Vista da esquerda', padrao: 'Shift+3', executar: () => ambiente.definirVista('esquerda') },
+    { id: 'vista-superior', rotulo: 'Vista de cima', padrao: '7', executar: () => ambiente.definirVista('superior') },
+    { id: 'vista-inferior', rotulo: 'Vista de baixo', padrao: 'Shift+7', executar: () => ambiente.definirVista('inferior') },
+    { id: 'vista-isometrica', rotulo: 'Vista isométrica', padrao: '0', executar: () => ambiente.definirVista('isometrica') },
+    { id: 'projecao', rotulo: 'Alternar projeção', padrao: '5', executar: () => btnProjecao.click() },
+    { id: 'enquadrar', rotulo: 'Enquadrar tudo', padrao: 'f', executar: () => enquadrarMontagem() },
+    { id: 'isolar', rotulo: 'Isolar seleção', padrao: 'i', executar: () => controlador?.selecionadas.length && controlador.definirModo('isolar') },
+    { id: 'contexto', rotulo: 'Contexto fantasma', padrao: 'g', executar: () => controlador?.selecionadas.length && controlador.definirModo('contexto') },
+    { id: 'wireframe-selecao', rotulo: 'Wireframe da seleção', padrao: 'w', executar: () => controlador?.selecionadas.length && controlador.definirWireframeSelecao(!controlador.estado().wireframeSelecao) },
+    { id: 'alternar-grade', rotulo: 'Mostrar ou esconder a grade', padrao: 'h', executar: () => alternarPreferenciaCena('grade') },
+  ];
+  const porComando = new Map(COMANDOS.map((c) => [c.id, c]));
+  const registroAtalhos = criarRegistroAtalhos({
+    padrao: Object.fromEntries(COMANDOS.map((c) => [c.id, c.padrao])),
+  });
+
   function atalhoVista(evento) {
-    if (evento.target instanceof HTMLInputElement) return;
-    const codigo = evento.code.replace('Numpad', 'Digit');
-    let vista = null;
-    if (codigo === 'Digit0') vista = 'isometrica';
-    if (codigo === 'Digit1') vista = evento.shiftKey ? 'traseira' : 'frontal';
-    if (codigo === 'Digit3') vista = evento.shiftKey ? 'esquerda' : 'direita';
-    if (codigo === 'Digit7') vista = evento.shiftKey ? 'inferior' : 'superior';
-    if (vista) {
-      evento.preventDefault();
-      ambiente.definirVista(vista);
-    } else if (codigo === 'Digit5') {
-      evento.preventDefault();
-      btnProjecao.click();
-    } else if (evento.code === 'KeyF') {
-      evento.preventDefault();
-      enquadrarMontagem();
-    } else if (evento.code === 'KeyI' && controlador?.selecionadas.length) {
-      evento.preventDefault();
-      controlador.definirModo('isolar');
-    } else if (evento.code === 'KeyG' && controlador?.selecionadas.length) {
-      evento.preventDefault();
-      controlador.definirModo('contexto');
-    } else if (evento.key === 'Escape') {
+    if (evento.key === 'Escape') {
+      if (registroAtalhos.capturando) return;
       controlador?.limpar();
+      return;
     }
+    if (registroAtalhos.deveIgnorar(evento.target)) return;
+    const comando = registroAtalhos.comandoDaCombinacao(normalizarCombinacao(evento));
+    if (!comando) return;
+    evento.preventDefault();
+    porComando.get(comando)?.executar();
   }
   addEventListener('keydown', atalhoVista);
+
+  /* ---------- barra de controles ---------- */
+  const preferenciasBancada = criarPreferenciasBancada();
+  const prefGrade = document.getElementById('prefGrade');
+  const prefChao = document.getElementById('prefChao');
+  const avisoAtalho = document.getElementById('avisoAtalho');
+  const listaAtalhos = document.getElementById('listaAtalhos');
+
+  function aplicarPreferenciasCena(parcial) {
+    const proximo = preferenciasBancada.salvar(parcial);
+    ambiente.definirPreferenciasCena(proximo);
+    if (prefGrade) prefGrade.checked = proximo.grade;
+    if (prefChao) prefChao.checked = proximo.chao;
+    return proximo;
+  }
+
+  function alternarPreferenciaCena(qual) {
+    const atual = preferenciasBancada.ler();
+    aplicarPreferenciasCena({ [qual]: !atual[qual] });
+  }
+
+  aplicarPreferenciasCena({});
+  prefGrade?.addEventListener('change', () => aplicarPreferenciasCena({ grade: prefGrade.checked }));
+  prefChao?.addEventListener('change', () => aplicarPreferenciasCena({ chao: prefChao.checked }));
+
+  let mensagemAtalho = null;
+  function dizerSobreAtalho(texto) {
+    if (avisoAtalho) avisoAtalho.textContent = texto ?? '';
+    clearTimeout(mensagemAtalho);
+    if (texto) mensagemAtalho = setTimeout(() => { if (avisoAtalho) avisoAtalho.textContent = ''; }, 4000);
+  }
+
+  function desenharAtalhos() {
+    if (!listaAtalhos) return;
+    const atual = registroAtalhos.obter();
+    listaAtalhos.replaceChildren(...COMANDOS.map((comando) => {
+      const linha = document.createElement('button');
+      linha.type = 'button';
+      linha.dataset.comando = comando.id;
+      const nome = document.createElement('span');
+      nome.textContent = comando.rotulo;
+      const tecla = document.createElement('kbd');
+      tecla.textContent = atual[comando.id];
+      linha.append(nome, tecla);
+      linha.addEventListener('click', () => capturarTeclaPara(comando, linha, tecla));
+      return linha;
+    }));
+  }
+
+  /* Captura escuta UMA vez. Enquanto ela está aberta o registro manda ignorar
+     todo atalho global, então a tecla escolhida não dispara o comando que
+     estava nela enquanto a pessoa a escolhe. */
+  function capturarTeclaPara(comando, linha, tecla) {
+    if (registroAtalhos.capturando) return;
+    registroAtalhos.iniciarCaptura();
+    linha.classList.add('capturando');
+    tecla.textContent = 'aperte uma tecla';
+    dizerSobreAtalho(`Escolhendo tecla para ${comando.rotulo}. Esc cancela.`);
+
+    const ouvir = (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      if (evento.key === 'Escape') return encerrar('Captura cancelada.');
+      const combinacao = normalizarCombinacao(evento);
+      if (!combinacao) return;
+      const r = registroAtalhos.atribuir(comando.id, combinacao);
+      if (r.ok) return encerrar(`${comando.rotulo}: ${combinacao}.`);
+      if (r.motivo === 'ocupado') {
+        const ocupante = porComando.get(r.comandoOcupante)?.rotulo ?? r.comandoOcupante;
+        dizerSobreAtalho(`${combinacao} já é de "${ocupante}". Escolha outra tecla.`);
+        return;
+      }
+      dizerSobreAtalho('Essa tecla não serve como atalho.');
+    };
+
+    function encerrar(mensagem) {
+      removeEventListener('keydown', ouvir, true);
+      registroAtalhos.cancelarCaptura();
+      linha.classList.remove('capturando');
+      desenharAtalhos();
+      dizerSobreAtalho(mensagem);
+    }
+
+    addEventListener('keydown', ouvir, true);
+  }
+
+  desenharAtalhos();
+  document.getElementById('btnRestaurarAtalhos')?.addEventListener('click', () => {
+    registroAtalhos.restaurarPadroes();
+    desenharAtalhos();
+    dizerSobreAtalho('Atalhos de volta ao padrão.');
+  });
+
+  const menus = [
+    ['btnMenuConfiguracoes', 'menuConfiguracoes'],
+    ['btnMenuAtalhos', 'menuAtalhos'],
+  ].map(([idBotao, idMenu]) => ({
+    botao: document.getElementById(idBotao),
+    menu: document.getElementById(idMenu),
+  })).filter(({ botao, menu }) => botao && menu);
+
+  function fecharMenus(exceto = null) {
+    for (const { botao, menu } of menus) {
+      if (menu === exceto) continue;
+      menu.hidden = true;
+      botao.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  for (const { botao, menu } of menus) {
+    botao.addEventListener('click', (evento) => {
+      evento.stopPropagation();
+      const abrir = menu.hidden;
+      fecharMenus(abrir ? menu : null);
+      menu.hidden = !abrir;
+      botao.setAttribute('aria-expanded', String(abrir));
+    });
+    menu.addEventListener('click', (evento) => evento.stopPropagation());
+  }
+  addEventListener('click', () => fecharMenus());
+  addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && !registroAtalhos.capturando) fecharMenus();
+  });
+
+  /* Recolher esconde o corpo do painel e deixa a aba de borda. Nada do estado
+     do painel é reinicializado: seleção, aba ativa e listas continuam onde
+     estavam, e reabrir devolve a mesma tela. */
+  for (const botao of document.querySelectorAll('[data-recolher]')) {
+    const painel = document.querySelector(`.painel[data-painel="${botao.dataset.recolher}"]`);
+    if (!painel) continue;
+    const seta = botao.querySelector('[aria-hidden="true"]');
+    const paraDentro = painel.classList.contains('painel-partes') ? '‹' : '›';
+    const paraFora = painel.classList.contains('painel-partes') ? '›' : '‹';
+    botao.addEventListener('click', () => {
+      const recolhido = painel.classList.toggle('recolhido');
+      botao.setAttribute('aria-expanded', String(!recolhido));
+      if (seta) seta.textContent = recolhido ? paraFora : paraDentro;
+      ambiente.redimensionar?.();
+    });
+  }
 
   // Inicializa o Sincronizador de Sessão Ativa
   const statusEl = document.getElementById('statusSessao');

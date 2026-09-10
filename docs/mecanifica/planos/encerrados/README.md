@@ -10,6 +10,14 @@ voltar, mora em [`../congelados/README.md`](../congelados/README.md).
 
 ## Crônica
 
+- As [referências visuais e controles da bancada](./2026-09-09-bancada-referencias-e-controles.md)
+  foram concluídas em 2026-09-10, com o desenho em
+  [DESENHO-bancada-referencias-e-controles.md](./DESENHO-bancada-referencias-e-controles.md).
+  A bancada passou a sustentar imagem de referência por alvo, preferências de
+  cena, wireframe e opacidade sobre a seleção, atalhos remapeáveis que recusam
+  colisão e painéis recolhíveis. A fronteira entre referência visual e modelo
+  procedural ficou guardada por teste.
+
 O que segue veio do `INDEX.md`, onde ocupava mais da metade da porta de entrada
 com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
 

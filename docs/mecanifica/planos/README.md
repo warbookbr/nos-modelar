@@ -2,19 +2,18 @@
 
 ## Estado
 
-**Plano ativo:** referências visuais e controles da bancada (2026-09-09-bancada-referencias-e-controles.md).
+**Plano ativo:** Nenhum.
 
-As [referências visuais e controles da bancada](2026-09-09-bancada-referencias-e-controles.md),
+As [referências visuais e controles da bancada](encerrados/2026-09-09-bancada-referencias-e-controles.md),
 com o desenho em
-[DESENHO-bancada-referencias-e-controles.md](DESENHO-bancada-referencias-e-controles.md),
-moram na superfície de observação e não tocam receita, materiais autorais,
-geometria, identidade semântica nem montagem persistida. As fatias de uma a
-cinco estão em `main`, conferidas na bancada e com a suíte verde: o painel
-`IA & Ref` deixou de mostrar `undefined`, a referência por imagem persiste por
-alvo, o plano texturizado é materializado e descartado no Three.js, e a inspeção
-ganhou wireframe e opacidade sobre a seleção. Faltam a barra superior com
-painéis recolhíveis e atalhos remapeáveis, e a validação da fronteira entre
-referência visual e modelo procedural.
+[DESENHO-bancada-referencias-e-controles.md](encerrados/DESENHO-bancada-referencias-e-controles.md),
+foram **concluídas** em 2026-09-10. O painel `IA & Ref` deixou de mostrar
+`undefined`, a referência por imagem persiste por alvo, o plano texturizado é
+materializado e descartado no Three.js, a inspeção ganhou wireframe e opacidade
+sobre a seleção, e a barra superior trouxe grade e chão como preferência,
+atalhos remapeáveis com recusa de colisão e recolhimento dos painéis laterais. A
+fronteira entre referência visual e modelo procedural está guardada por teste: o
+plano da foto não entra na raiz do modelo nem no enquadramento.
 
 [Esquecer precisa falhar](encerrados/2026-09-08-esquecer-precisa-falhar.md) foi
 **concluído** em 2026-09-08. O veredito de contato deixou de depender da
