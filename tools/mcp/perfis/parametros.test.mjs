@@ -40,9 +40,12 @@ describe('porta MCP da varredura', () => {
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
     /* O mesmo retrato travado em `parametros-peca.test.mjs`: caiu de 267/114
        para 90/26 quando o acervo publicado ficou só com o quadro da bicicleta e
-       cadeira, chapa e prensas viraram fixture de ferramenta. Os dois números
-       têm de andar juntos, porque a porta MCP e a CLI leem a mesma varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 90, vivos: 26, inertes: 64 });
+       cadeira, chapa e prensas viraram fixture de ferramenta, e subiu para
+       96/32 quando a leitura passou a descer em coordenada — os seis números
+       novos são os três pontos de solda da bicicleta, todos vivos. Os dois
+       números têm de andar juntos, porque a porta MCP e a CLI leem a mesma
+       varredura. */
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 96, vivos: 32, inertes: 64 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

@@ -22,6 +22,7 @@ export const TABELA = {
   comprimento: 480,
   raio: 17,
   folga: 0.5,
+  ponto: [-134, 716],
 };
 
 export default {
@@ -110,6 +111,35 @@ describe('escrever parâmetro na receita', () => {
     const r = await escreverParametro(caminho, 'raio', -50);
     expect(r.estado).toBe('falha-recuperavel');
     expect(r.motivo).toMatch(/raio precisa ser positivo/);
+    expect(readFileSync(caminho, 'utf8')).toBe(antes);
+  });
+
+  it('troca UMA casa da coordenada e deixa a outra em paz', async () => {
+    const caminho = novaPeca();
+    const r = await escreverParametro(caminho, 'ponto.1', 700);
+    expect(r).toMatchObject({ estado: 'aplicado', id: 'ponto.1', de: 716, para: 700 });
+    expect(readFileSync(caminho, 'utf8')).toContain('ponto: [-134, 700],');
+
+    const volta = await escreverParametro(caminho, 'ponto.0', -120);
+    expect(volta).toMatchObject({ de: -134, para: -120 });
+    expect(readFileSync(caminho, 'utf8')).toContain('ponto: [-120, 700],');
+  });
+
+  it('RECUSA casa que a coordenada não tem, e não toca no arquivo', async () => {
+    const caminho = novaPeca();
+    const antes = readFileSync(caminho, 'utf8');
+    const r = await escreverParametro(caminho, 'ponto.5', 10);
+    expect(r.estado).toBe('falha-recuperavel');
+    expect(readFileSync(caminho, 'utf8')).toBe(antes);
+  });
+
+  it('RECUSA caminho dentro de objeto aninhado, que o texto não endereça sem ambiguidade', async () => {
+    const aninhada = RECEITA.replace('  folga: 0.5,', '  folga: 0.5,\n  secao: { raio: 8 },');
+    const caminho = novaPeca('aninhada', aninhada);
+    const antes = readFileSync(caminho, 'utf8');
+    const r = await escreverParametro(caminho, 'secao.raio', 9);
+    expect(r.estado).toBe('falha-recuperavel');
+    expect(r.motivo).toMatch(/aninhado em objeto/);
     expect(readFileSync(caminho, 'utf8')).toBe(antes);
   });
 

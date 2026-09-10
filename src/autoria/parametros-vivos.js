@@ -27,15 +27,32 @@ import { executarReceita } from './executar-receita.js';
  *
  * `PARAMS` é aninhado (`{ perna: { secaoTopo: 0.04 } }`), então a identidade de
  * um parâmetro é o CAMINHO, não a chave folha: `perna.secaoTopo` e
- * `travessa.esp` coexistem com `esp` repetido em três lugares. Array não é
- * percorrido — uma lista de números é um dado, não uma grade de liberdades, e
- * sondar seus itens um a um produziria ruído em vez de resposta.
+ * `travessa.esp` coexistem com `esp` repetido em três lugares.
+ *
+ * ARRAY DEPENDE DO QUE ELE É, e a diferença está na profundidade. Uma lista de
+ * NÚMEROS é uma coordenada ou um vetor — `pontoSelimTopo: [-134, 716]` é o
+ * ponto de solda do selim medido na folha de referência, e cada uma das duas
+ * casas é uma liberdade de verdade, que alguém quer mexer. Uma lista de LISTAS
+ * é uma curva — as doze estações de `bordaSuperiorTuboInferior` descrevem o
+ * contorno do tubo, e sondar os vinte e quatro números dela um a um produz
+ * ruído em vez de resposta. Então descemos na primeira e paramos na segunda.
+ *
+ * A regra anterior era não descer em array nenhum, e ela custava caro: os três
+ * pontos de solda da bicicleta são as entradas medidas mais importantes da peça
+ * e não apareciam como parâmetro em lugar nenhum.
  */
+function ehCoordenada(valor) {
+  return Array.isArray(valor) && valor.length > 0
+    && valor.every((item) => typeof item === 'number' && Number.isFinite(item));
+}
+
 export function caminhosNumericos(objeto, prefixo = []) {
   const encontrados = [];
   for (const [chave, valor] of Object.entries(objeto ?? {})) {
     if (typeof valor === 'number' && Number.isFinite(valor)) {
       encontrados.push([...prefixo, chave]);
+    } else if (ehCoordenada(valor)) {
+      for (const [indice] of valor.entries()) encontrados.push([...prefixo, chave, String(indice)]);
     } else if (valor && typeof valor === 'object' && !Array.isArray(valor)) {
       encontrados.push(...caminhosNumericos(valor, [...prefixo, chave]));
     }
@@ -50,10 +67,16 @@ export function lerCaminho(objeto, caminho) {
 /** Cópia com UM caminho trocado; o objeto original não é tocado. */
 export function comCaminho(objeto, caminho, valor) {
   const [chave, ...resto] = caminho;
-  return {
-    ...objeto,
-    [chave]: resto.length ? comCaminho(objeto[chave] ?? {}, resto, valor) : valor,
-  };
+  const proximo = resto.length ? comCaminho(objeto?.[chave] ?? {}, resto, valor) : valor;
+  /* Espalhar um array com `{...}` o transformaria em objeto de índices, e a
+     receita receberia `{0: -134, 1: 716}` onde esperava `[-134, 716]` — a peça
+     sairia deformada sem ninguém errar uma conta. */
+  if (Array.isArray(objeto)) {
+    const copia = [...objeto];
+    copia[Number(chave)] = proximo;
+    return copia;
+  }
+  return { ...objeto, [chave]: proximo };
 }
 
 /**

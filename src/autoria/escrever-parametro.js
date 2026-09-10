@@ -32,19 +32,36 @@ function comoTexto(valor) {
   return String(Number(valor.toFixed(6)));
 }
 
-/* Só chave de primeiro nível. Localizar `raio` dentro de `secao: { raio: 8 }`
-   pelo texto é ambíguo — a mesma palavra aparece em outros objetos — e este
-   serviço prefere recusar a acertar por sorte. */
-function trocarNoTexto(texto, chave, valor) {
-  const padrao = new RegExp(`^(\\s*)${chave}:(\\s*)(-?\\d+(?:\\.\\d+)?)(\\s*,?)$`, 'gm');
+/* Duas formas de declaração, as duas numa linha só: o número solto
+   (`raioTuboSelim: 17,`) e a coordenada (`pontoSelimTopo: [-134, 716],`). A
+   coordenada é endereçada pela casa, `pontoSelimTopo.1`.
+
+   Objeto aninhado NÃO entra: localizar `raio` dentro de `secao: { raio: 8 }`
+   pelo texto é ambíguo, porque a mesma palavra aparece em outros objetos, e
+   este serviço prefere recusar a acertar por sorte. */
+function trocarNoTexto(texto, chave, indice, valor) {
+  const corpo = indice === null ? '(-?\\d+(?:\\.\\d+)?)' : '\\[([^\\]\\n]*)\\]';
+  const padrao = new RegExp(`^(\\s*)${chave}:(\\s*)${corpo}(\\s*,?)$`, 'gm');
   const achados = [...texto.matchAll(padrao)];
   if (achados.length === 0) return { erro: `não achei a linha que declara '${chave}'` };
   if (achados.length > 1) {
     return { erro: `'${chave}' aparece em ${achados.length} linhas; qual delas é ambíguo` };
   }
+
+  if (indice === null) {
+    return {
+      de: Number(achados[0][3]),
+      texto: texto.replace(padrao, (_, ident, espaco, _antigo, fim) => `${ident}${chave}:${espaco}${comoTexto(valor)}${fim}`),
+    };
+  }
+
+  const casas = achados[0][3].split(',').map((n) => n.trim());
+  if (!casas[indice]) return { erro: `'${chave}' não tem a casa ${indice}` };
+  const de = Number(casas[indice]);
+  casas[indice] = comoTexto(valor);
   return {
-    texto: texto.replace(padrao, (_, ident, espaco, _antigo, fim) => `${ident}${chave}:${espaco}${comoTexto(valor)}${fim}`),
-    de: Number(achados[0][3]),
+    de,
+    texto: texto.replace(padrao, (_, ident, espaco, _antigo, fim) => `${ident}${chave}:${espaco}[${casas.join(', ')}]${fim}`),
   };
 }
 
@@ -78,12 +95,16 @@ export async function escreverParametro(caminhoArquivo, id, valor) {
       declarados: listarParametrosDeclarados(receita).map((p) => p.id),
     });
   }
-  if (declarado.caminho.length > 1) {
-    return falha(`'${id}' é aninhado, e a escrita cirúrgica só endereça chave de primeiro nível`);
+  /* `pontoSelimTopo.1` é chave mais casa de coordenada, e a escrita sabe fazer.
+     `secao.raio` é objeto dentro de objeto, e não sabe. */
+  const [chave, segundo, ...resto] = declarado.caminho;
+  const indice = segundo === undefined ? null : Number(segundo);
+  if (resto.length > 0 || (segundo !== undefined && !Number.isInteger(indice))) {
+    return falha(`'${id}' é aninhado em objeto, e a escrita cirúrgica só endereça chave de primeiro nível e casa de coordenada`);
   }
 
   const original = readFileSync(caminhoArquivo, 'utf8');
-  const troca = trocarNoTexto(original, id, valor);
+  const troca = trocarNoTexto(original, chave, indice, valor);
   if (troca.erro) return falha(troca.erro);
   if (troca.texto === original) return { estado: 'aplicado', id, de: declarado.valor, para: valor, semMudanca: true };
 

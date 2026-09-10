@@ -54,9 +54,26 @@ function receitaSemParte() {
 }
 
 describe('caminhos de parâmetro', () => {
-  it('encontra número aninhado, ignora array, texto e objeto vazio', () => {
-    const params = { a: 1, b: { c: 2, d: 'texto' }, e: [3, 4], f: {} };
-    expect(caminhosNumericos(params).map((c) => c.join('.'))).toEqual(['a', 'b.c']);
+  it('encontra número aninhado e coordenada, ignora curva, texto e objeto vazio', () => {
+    const params = {
+      a: 1,
+      b: { c: 2, d: 'texto' },
+      e: [3, 4],
+      curva: [[0, 1], [1, 2]],
+      f: {},
+    };
+    /* Lista de NÚMEROS é coordenada, e cada casa é liberdade: o ponto de solda
+       medido da bicicleta mora assim. Lista de LISTAS é curva, e sondar as suas
+       dezenas de números um a um produz ruído em vez de resposta. */
+    expect(caminhosNumericos(params).map((c) => c.join('.'))).toEqual(['a', 'b.c', 'e.0', 'e.1']);
+  });
+
+  it('troca uma casa de coordenada sem transformar o array em objeto', () => {
+    const params = { ponto: [-134, 716] };
+    const novo = comCaminho(params, ['ponto', '1'], 700);
+    expect(Array.isArray(novo.ponto)).toBe(true);
+    expect(novo.ponto).toEqual([-134, 700]);
+    expect(params.ponto).toEqual([-134, 716]);
   });
 
   it('troca um caminho sem tocar no original', () => {
@@ -94,7 +111,10 @@ describe('cópia de receita', () => {
 describe('diagnóstico de parâmetro vivo', () => {
   it('acha vivo o que deriva os passos, e inerte o que fica ao lado deles', () => {
     const viva = diagnosticarParametros(receitaViva());
-    expect(viva.totais).toEqual({ declarados: 2, vivos: 2, inertes: 0 });
+    /* Quatro declarados: as duas medidas do corpo e as duas casas de `folgas`,
+       que a peça não usa — coordenada declarada e não usada é inerte, e a
+       contagem precisa dizer isso. */
+    expect(viva.totais).toEqual({ declarados: 4, vivos: 2, inertes: 2 });
     expect(viva.determinismo.estavel).toBe(true);
 
     const decorativa = diagnosticarParametros(receitaDecorativa());
@@ -152,7 +172,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 90 declarados e 26 vivos', async () => {
+  it('trava o retrato do acervo: 96 declarados e 32 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Caiu de 267/114 para 90/26 quando o acervo publicado passou a ser só o
@@ -163,20 +183,33 @@ describe('acervo real', () => {
        fixtures porque ela lê `PASTAS_BUSCA`, então o retrato mede tudo que
        ainda é receita executável no repositório. A queda não é regressão de
        autoria: nenhuma receita perdeu parâmetro vivo, o conjunto é que
-       encolheu. */
+       encolheu.
+
+       Subiu de 90/26 para 96/32 quando a leitura passou a descer em coordenada:
+       lista de NÚMEROS é ponto medido e cada casa é liberdade, lista de LISTAS
+       é curva e continua fora. Os seis números novos são os três pontos de
+       solda da bicicleta, e os seis são VIVOS — nenhum ruído entrou. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 90, vivos: 26, inertes: 64 });
+    expect(r.resultado.totais).toEqual({ declarados: 96, vivos: 32, inertes: 64 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
     expect(porAlvo['prensa-mecanica-industrial']).toEqual({ declarados: 14, vivos: 0, inertes: 14 });
     expect(porAlvo['prensa-progressiva']).toEqual({ declarados: 15, vivos: 0, inertes: 15 });
-    /* O quadro é a única receita do acervo publicado, e treze dos seus vinte e
-       três declarados movem geometria. Os dez inertes são as juntas medidas:
-       ponto de solda é coordenada lida da referência, não parâmetro que a
-       derivação usa para mover a peça. */
-    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 23, vivos: 13, inertes: 10 });
+    /* O quadro é a única receita do acervo publicado, e dezenove dos seus vinte
+       e nove declarados movem geometria.
+
+       A explicação anterior aqui estava ERRADA, e a leitura por coordenada a
+       desmentiu: dizia que os pontos de solda eram inertes porque coordenada
+       lida da referência não seria parâmetro. Eles nunca foram inertes — eles
+       eram INVISÍVEIS, porque a busca não descia em lista. Assim que passou a
+       descer, os seis números dos três pontos apareceram e os seis são vivos.
+
+       Os dez inertes de verdade são outra coisa: `garfoEixoACoroa`,
+       `garfoAvanco`, `meiaLarguraGuidao` e companhia estão declarados neste
+       módulo para os módulos do garfo e do guidão, que ainda não existem. */
+    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 29, vivos: 19, inertes: 10 });
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);

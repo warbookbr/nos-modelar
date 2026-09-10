@@ -77,14 +77,22 @@ describe('ponte do gesto ao parâmetro — retrato antes', () => {
 
   it('o painel oferece exatamente as entradas declaradas em PARAMS', () => {
     const oferecidos = parametrosDoPainel(receita).map((p) => p.id);
-    const declarados = Object.keys(receita.PARAMS).filter(
-      (chave) => typeof receita.PARAMS[chave] === 'number',
-    );
+    /* Número solto e casa de coordenada: `pontoSelimTopo` é o ponto de solda
+       medido, e as duas casas dele são as entradas que mais movem o tubo do
+       selim. Curva, como as bordas do tubo inferior, fica de fora. */
+    const declarados = Object.entries(receita.PARAMS).flatMap(([chave, valor]) => {
+      if (typeof valor === 'number') return [chave];
+      if (Array.isArray(valor) && valor.every((n) => typeof n === 'number')) {
+        return valor.map((_, i) => `${chave}.${i}`);
+      }
+      return [];
+    });
 
     /* Era aqui que o painel oferecia `raio_101` e companhia: raios de tubo já
        calculados pela derivação, número de saída oferecido como entrada. */
     expect(oferecidos).toEqual(declarados);
     expect(oferecidos).toContain('tuboSelimComprimento');
+    expect(oferecidos).toContain('pontoSelimTopo.1');
     expect(oferecidos.some((chave) => /^raio_\d+$/.test(chave))).toBe(false);
   });
 
