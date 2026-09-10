@@ -13,31 +13,35 @@
 A bancada vai ganhar controle direto para o usuário mover geometria, e o
 desenho atual das receitas não recebe esse gesto sem estragar.
 
-A receita da bicicleta, que é a única do acervo, tem quatrocentas e quarenta e
-duas linhas e não é lista de passos: é uma `TABELA` de números medidos, uma
-função `derivar` que calcula toda posição por trigonometria a partir dela, e uma
-`gerarPassos` que emite os passos na hora da execução. Nenhuma posição está
-escrita; toda posição é derivada. Um `transladar` empurrado por cima de um corpo
-gerado é remendo, e a peça deixa de ser derivada a partir dali.
+A receita da bicicleta não é lista de passos: é uma `TABELA` de números medidos,
+uma `derivar` que calcula toda posição por trigonometria, e uma `gerarPassos`
+que emite os passos na execução. Nenhuma posição está escrita, toda posição é
+derivada, e um `transladar` empurrado por cima de um corpo gerado é remendo.
 
 O caminho de baixo nível é pior. `moveV`, `moveF`, `moveA`, `vira`, `extruda` e
-`mescla` só aceitam id literal, que é a referência que o `CLAUDE.md` proíbe
-persistir; a referência de operações da skill chama isso de dívida posicional e
-manda relatar. Gravar um arrasto assim registra "o vértice que por acaso recebeu
-o número 4003 naquela execução": muda um parâmetro acima, o número passa a ser
-outro vértice, e o passo deforma o lugar errado sem gritar.
+`mescla` só aceitam id literal, a referência que o `CLAUDE.md` proíbe persistir e
+que a skill chama de dívida posicional. Gravar um arrasto assim registra "o
+vértice que por acaso recebeu o número 4003 naquela execução": muda um parâmetro
+acima e o passo deforma o lugar errado sem gritar.
 
-A bancada também ainda não escreve receita. O `atualizarParametro` do
-sincronizador muda o estado em memória e avisa por broadcast, e o painel de
-parâmetros descobre os controles varrendo argumentos de passo atrás de chaves
-como `raio` e `alt`. Na bicicleta esses argumentos são resultados da derivação,
-e não as entradas da `TABELA`, então o botão mexe no lugar errado.
+A bancada também ainda não escreve receita, e o painel de parâmetros descobre os
+controles varrendo argumentos de passo atrás de chaves como `raio`. Na bicicleta
+esses argumentos são resultados da derivação, e não entradas da `TABELA`, então
+o controle mexe no lugar errado.
 
 ## Resultado
 
-Arrastar um punho na bancada muda **um número declarado da receita**, o arquivo
-é reescrito com esse número e a peça é reexecutada a partir dele — sem passo de
+Mexer um controle na bancada muda **um número declarado da receita**, a peça é
+reexecutada a partir dele, e ao salvar o arquivo é reescrito — sem passo de
 remendo, sem id literal e sem decimal contínuo gravado.
+
+MEXER É PRÉVIA, SALVAR É GRAVAÇÃO, e a separação foi decidida durante a
+execução. Gravar ao soltar cada controle daria uma escrita por gesto: ajustar
+cinco números viraria cinco commits, cinco disparos de integração contínua e
+cinco publicações, com o histórico cheio de estados intermediários que ninguém
+escolheu, e uma janela por gesto para outra pessoa commitar no meio da
+sequência. A bancada acumula, mostra quantas alterações estão sem salvar, e
+grava o lote inteiro de uma vez.
 
 ## O que vem do `brigsd/nos`, e o que não vem
 
@@ -99,11 +103,16 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
 
 - pergunta única que devolve os parâmetros declarados de uma receita, com valor
   atual, limites e unidade;
-- serviço de escrita que troca o valor de um parâmetro declarado na receita, de
-  forma transacional e reexecutando antes de gravar;
+- serviço de escrita que troca valores de parâmetros declarados na receita, em
+  lote, de forma transacional e reexecutando antes de gravar;
+- as duas portas para esse serviço: o atendente no servidor de desenvolvimento,
+  que escreve no arquivo local, e a API de conteúdo do GitHub, que faz a bancada
+  publicada virar commit;
 - ligação entre parte e parâmetro derivada da varredura de sensibilidade;
-- punhos por eixo na parte selecionada, ligados a um parâmetro declarado, com
-  encaixe em passo legível e prévia por reexecução da receita;
+- controles ligados aos parâmetros declarados, com prévia por reexecução da
+  receita e botão de salvar que grava o lote;
+- setas por eixo na parte selecionada, ligadas a um parâmetro pela ligação
+  medida, com a conta do arrasto vinda do `nos`;
 - desfazer limitado à sessão, sem alcançar o estado que veio do arquivo;
 - prova de que arrastar e digitar o mesmo valor produzem o mesmo arquivo.
 
@@ -120,15 +129,17 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
 
 1. a bancada mostra, para a parte selecionada, apenas parâmetros que de fato a
    movem, e a lista vem da varredura e não de nome de argumento;
-2. arrastar um punho grava um número nomeado na receita, e reexecutar o arquivo
-   gravado reproduz a geometria vista na tela;
-3. escrita recusada não altera o arquivo, e o erro diz qual parâmetro e por quê;
-4. arrastar e digitar o mesmo valor produzem arquivos idênticos byte a byte;
-5. nenhum passo novo aparece na receita por causa de um arrasto, e nenhum id
+2. salvar grava os números nomeados na receita, e reexecutar o arquivo gravado
+   reproduz a geometria vista na tela;
+3. mexer um controle não grava nada: só o botão de salvar escreve, e o rodapé
+   diz quantas alterações estão pendentes;
+4. escrita recusada não altera o arquivo, e o erro diz qual parâmetro e por quê;
+5. arrastar e digitar o mesmo valor produzem arquivos idênticos byte a byte;
+6. nenhum passo novo aparece na receita por causa de um gesto, e nenhum id
    literal de vértice ou face é escrito;
-6. desfazer para no estado que veio do arquivo e devolve a receita byte a byte
+7. desfazer para no estado que veio do arquivo e devolve a receita byte a byte
    ao que estava ao abrir;
-7. o retrato de parâmetros e os vinte gates continuam verdes.
+8. o retrato de parâmetros e os vinte gates continuam verdes.
 
 ## Fatias
 
@@ -141,21 +152,26 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
    forma de tabela da bicicleta. Prova: a bicicleta responde os vinte e três
    declarados; uma receita sem declaração responde lista vazia em vez de
    adivinhar.
-3. **Escrita transacional.** Serviço que troca o valor de um parâmetro
-   declarado: valida o nome, valida o limite, reexecuta a receita com o valor
-   novo, e só então grava. Prova: valor fora do limite não toca no arquivo;
-   valor válido muda exatamente um número, e nada mais no arquivo se move.
+3. **Escrita transacional.** Serviço que troca valores de parâmetros declarados:
+   valida os nomes, reexecuta a receita com os valores novos, e só então grava.
+   Prova: valor recusado não toca no arquivo; lote válido muda exatamente as
+   linhas pedidas, e nada mais no arquivo se move; lote com uma troca inválida
+   não grava nenhuma das outras.
 4. **Ligação parte e parâmetro.** Da varredura de sensibilidade sai, por parte,
    a lista de parâmetros que a movem e o quanto movem. Prova: o tubo superior
    lista os parâmetros que o governam, e um parâmetro inerte não aparece em
    parte nenhuma.
-5. **Punhos.** Setas por eixo na parte selecionada, cada uma ligada a um
-   parâmetro pela ligação da fatia anterior, com a geometria e a conta do
-   arrasto vindas do `nos`. Durante o arrasto a receita é reexecutada com o
-   valor tentativo, sem tocar na malha em memória. Prova: arrastar até um valor
-   e digitar o mesmo valor produzem o mesmo arquivo; soltar fora do limite não
-   grava.
-6. **Desfazer da sessão.** Ctrl+Z devolve o valor anterior de cada parâmetro
+5. **Laço fechado por controle.** Os controles do painel passam a listar os
+   parâmetros declarados, mexer reexecuta a receita com os valores tentativos, e
+   o botão de salvar grava o lote — no arquivo local pelo atendente do servidor
+   de desenvolvimento, ou no repositório pela API do GitHub quando a bancada
+   está publicada. Prova: vários toques em dois parâmetros não gravam nada até o
+   botão, e depois gravam num envio só.
+6. **Setas na peça.** As mesmas ligações, com outro gesto: setas por eixo na
+   parte selecionada, desenhadas sobre a cena, com a conta do arrasto travado no
+   eixo vinda do `nos`. Prova: arrastar até um valor e digitar o mesmo valor
+   produzem o mesmo arquivo.
+7. **Desfazer da sessão.** Ctrl+Z devolve o valor anterior de cada parâmetro
    alterado nesta sessão, e para no estado que veio do arquivo. Prova: desfazer
    além do início da sessão não altera o arquivo, e o texto da receita volta
    byte a byte ao que estava ao abrir.
@@ -167,6 +183,13 @@ ligado a um parâmetro só — porque a posição que ele move nasce de três en
 da tabela ao mesmo tempo — então o gesto não tem tradução, e insistir produz
 punho que muda a coisa errada com confiança. Nesse caso a saída é declarar na
 receita qual parâmetro o punho governa, e não adivinhar por sensibilidade.
+
+O terceiro risco apareceu medido e está registrado aqui porque limita o
+resultado: parte cuja forma nasce de uma CURVA medida, e não de números soltos,
+continua sem controle. É o caso do tubo inferior da bicicleta, cujas duas bordas
+são polilinhas de doze pontos. A leitura desce em coordenada, que é lista de
+números, e para em lista de listas. Mexer num ponto de curva é outro gesto e
+outro plano.
 
 O segundo risco é a peça sem parâmetro declarado. Numa receita que escreve
 número direto no passo, este plano não tem onde escrever, e a bancada precisa
