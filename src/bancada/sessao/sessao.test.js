@@ -1,6 +1,11 @@
 /* sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real. */
 import { describe, expect, it } from 'vitest';
-import { criarEstadoSessaoInicial, validarPacoteSessao } from './estado-sessao.js';
+import {
+  criarEstadoSessaoInicial,
+  normalizarChecklist,
+  normalizarCriterios,
+  validarPacoteSessao,
+} from './estado-sessao.js';
 import { processarReceitaSessao, processarPayloadSessao } from './carregar-sessao.js';
 import { criarSincronizadorSessao } from './sincronizador.js';
 
@@ -25,6 +30,15 @@ describe('Sessão Ativa (Humano + IA)', () => {
     expect(() => validarPacoteSessao(null)).toThrow(TypeError);
     expect(() => validarPacoteSessao({})).toThrow(/ao menos uma receita/);
     expect(validarPacoteSessao({ receita: receitaTeste })).toEqual({ receita: receitaTeste });
+  });
+
+  it('normaliza checklist e critérios legados de texto antes de exibi-los', () => {
+    expect(normalizarChecklist(['medir altura'])).toEqual([
+      { descricao: 'medir altura', concluido: false },
+    ]);
+    expect(normalizarCriterios(['Sem faces órfãs'])).toEqual([
+      { texto: 'Sem faces órfãs', status: 'pendente' },
+    ]);
   });
 
   it('processa receita procedural e gera nós Three.js com estatísticas', () => {

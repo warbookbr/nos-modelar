@@ -65,7 +65,7 @@ function restaurarMaterial(material) {
   material.wireframe = base.wireframe ?? false;
 }
 
-function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false) {
+function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false, apresentacaoSelecao = null) {
   restaurarMaterial(material);
   if (arame) {
     material.wireframe = true;
@@ -98,6 +98,14 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = fals
     material.color?.lerp(new THREE.Color('#b7c2bd'), 0.58);
     material.emissiveIntensity = 0;
   }
+  if (apresentacaoSelecao) {
+    if (apresentacaoSelecao.wireframe) material.wireframe = true;
+    if (apresentacaoSelecao.opacidade < 1) {
+      material.transparent = true;
+      material.opacity = apresentacaoSelecao.opacidade;
+      material.depthWrite = false;
+    }
+  }
   material.needsUpdate = true;
 }
 
@@ -105,6 +113,8 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   let coresPorParte = false;
   let arame = false;
+  let wireframeSelecao = false;
+  let opacidadeSelecao = 1;
   const permitidos = new Set(nomes);
   /* A seleção entende a árvore declarada, mas os grupos Three continuam irmãos.
      Isso impede que escolher uma subárvore mude transformações, explosão ou a
@@ -142,6 +152,8 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       selecionadas: selecionadas.slice(),
       modo,
       explosao: explosaoAlvo,
+      wireframeSelecao,
+      opacidadeSelecao,
     };
   }
 
@@ -152,7 +164,12 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       const visual = estados[nome];
       grupo.visible = visual !== 'oculto';
       const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
-      for (const material of materiaisDoGrupo(grupo)) aplicarEstadoMaterial(material, visual, cor, arame);
+      const apresentacaoSelecao = selecionadas.includes(nome)
+        ? { wireframe: wireframeSelecao, opacidade: opacidadeSelecao }
+        : null;
+      for (const material of materiaisDoGrupo(grupo)) {
+        aplicarEstadoMaterial(material, visual, cor, arame, apresentacaoSelecao);
+      }
     }
     aoMudar?.(estado());
   }
@@ -253,6 +270,17 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       arame = Boolean(ligado);
       aplicarVisual();
       return arame;
+    },
+    definirWireframeSelecao(ligado) {
+      wireframeSelecao = Boolean(ligado);
+      aplicarVisual();
+      return wireframeSelecao;
+    },
+    definirOpacidadeSelecao(valor) {
+      opacidadeSelecao = Math.min(1, Math.max(0, Number(valor)));
+      if (!Number.isFinite(opacidadeSelecao)) opacidadeSelecao = 1;
+      aplicarVisual();
+      return opacidadeSelecao;
     },
     definirModo(novoModo) {
       modo = ['todas', 'contexto', 'isolar'].includes(novoModo) ? novoModo : 'todas';

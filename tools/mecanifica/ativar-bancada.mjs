@@ -80,10 +80,15 @@ export async function ativarReceitaBancada({
   }
 
   const criterios = [
-    facesSemParte.length ? `${facesSemParte.length} face(s) sem parte` : 'Sem faces órfãs',
-    `${partesNomes.length} corpos identificados`,
+    {
+      texto: facesSemParte.length ? `${facesSemParte.length} face(s) sem parte` : 'Sem faces órfãs',
+      status: facesSemParte.length ? 'reprovado' : 'aprovado',
+    },
+    { texto: `${partesNomes.length} corpos identificados`, status: 'aprovado' },
   ];
-  if (partesSemMaterial.length) criterios.push(`sem material: ${partesSemMaterial.join(', ')}`);
+  if (partesSemMaterial.length) {
+    criterios.push({ texto: `sem material: ${partesSemMaterial.join(', ')}`, status: 'pendente' });
+  }
 
   const gritos = neutro.orfaos ?? [];
   if (gritos.length) {
@@ -137,7 +142,7 @@ export async function ativarReceitaBancada({
     intencaoIA: {
       titulo: `Modelagem: ${nomeAlvo}`,
       resumo: `Carregado automaticamente via ativar-bancada a partir de ${caminhoRelativo}.`,
-      checklist: partesNomes.slice(0, 8),
+      checklist: partesNomes.slice(0, 8).map((descricao) => ({ descricao, concluido: false })),
     },
     referencias: {
       pranchas: [],

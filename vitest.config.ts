@@ -42,5 +42,13 @@ export default defineConfig({
      * Isto NÃO esconde teste travado: travado passa de 20 s igual. O que some é
      * a falha por contenção, que nunca foi sinal de nada. */
     testTimeout: 20_000,
+
+    /* A máquina local expõe mais núcleos lógicos do que esta suíte pesada
+       sustenta ao mesmo tempo. Com o padrão do Vitest, a oficina e o estudo
+       de revalidação só ultrapassavam o limite quando concorriam com dezenas
+       de arquivos; isolados e com dois trabalhadores, ambos continuam
+       rápidos. Dois preserva paralelismo sem transformar contenção de CPU e
+       disco em falso vermelho. */
+    maxWorkers: 2,
   },
 });
