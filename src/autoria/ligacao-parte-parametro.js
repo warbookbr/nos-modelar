@@ -37,12 +37,16 @@ function medirCaixas(receita, params) {
   return new Map(descreverPeca(neutro).partes.map((p) => [p.nome, p]));
 }
 
-function deslocamentoEntre(antes, depois) {
-  if (!depois) return Infinity;
-  return Math.max(...[0, 1, 2].map((i) => Math.max(
+/* Deslocamento POR EIXO, e não só o maior. A seta que a bancada desenha é de um
+   eixo, então ela precisa saber qual parâmetro move a parte NAQUELE eixo: um
+   número que estica a peça em y não tem nada a dizer para a seta de x, e o
+   máximo entre os três esconde isso. */
+function deslocamentoPorEixo(antes, depois) {
+  if (!depois) return [Infinity, Infinity, Infinity];
+  return [0, 1, 2].map((i) => Math.max(
     Math.abs(depois.min[i] - antes.min[i]),
     Math.abs(depois.max[i] - antes.max[i]),
-  )));
+  ));
 }
 
 /**
@@ -63,6 +67,7 @@ export function ligarPartesAParametros(receita) {
 
   for (const parametro of declarados) {
     const candidato = comCaminho(receita.PARAMS, parametro.caminho, parametro.valor + sonda(parametro.valor));
+    const passoDaSonda = sonda(parametro.valor);
     let medido;
     try {
       medido = medirCaixas(receita, candidato);
@@ -73,10 +78,21 @@ export function ligarPartesAParametros(receita) {
       continue;
     }
 
+    const passo = passoDaSonda;
     const movidas = [];
     for (const [nome, antes] of base) {
-      const deslocamento = deslocamentoEntre(antes, medido.get(nome));
-      if (deslocamento > MINIMO) movidas.push({ parte: nome, deslocamento });
+      const porEixo = deslocamentoPorEixo(antes, medido.get(nome));
+      const deslocamento = Math.max(...porEixo);
+      if (deslocamento <= MINIMO) continue;
+      /* Sensibilidade: quanto a parte anda, em metros, por unidade do
+         parâmetro. É ela que faz a seta mover a peça na medida do arrasto, em
+         vez de por um fator inventado. */
+      movidas.push({
+        parte: nome,
+        deslocamento,
+        porEixo,
+        sensibilidade: porEixo.map((d) => d / passo),
+      });
     }
 
     if (movidas.length === 0) {
@@ -86,8 +102,8 @@ export function ligarPartesAParametros(receita) {
 
     movidas.sort((a, b) => b.deslocamento - a.deslocamento);
     porParametro[parametro.id] = movidas;
-    for (const { parte, deslocamento } of movidas) {
-      porParte[parte].push({ id: parametro.id, deslocamento });
+    for (const { parte, deslocamento, porEixo, sensibilidade } of movidas) {
+      porParte[parte].push({ id: parametro.id, deslocamento, porEixo, sensibilidade });
     }
   }
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-815 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+818 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -757,6 +757,8 @@
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
 - `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
+- `setas-por-eixo.js` — setas-por-eixo.js — qual parâmetro cada seta governa, e quanto ela anda.
+- `setas-por-eixo.test.js` — setas-por-eixo.test.js — a seta de um eixo não pode mover a peça noutro.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
@@ -786,6 +788,7 @@
 
 - `atalhos.js` — atalhos.js — catálogo de comandos de teclado da bancada, com persistência local e recusa de colisão.
 - `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
+- `setas-de-parametro.js` — setas-de-parametro.js — as três setas por eixo, ligadas a um parâmetro.
 
 ## src/bancada/parametros/
 

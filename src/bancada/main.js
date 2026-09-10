@@ -6,6 +6,9 @@ import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
 import { listarAcervo } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
 import { parametroDeclarado } from '../autoria/parametros-declarados.js';
+import { ligarPartesAParametros, parametrosDaParte } from '../autoria/ligacao-parte-parametro.js';
+import { escolherSetas } from '../autoria/setas-por-eixo.js';
+import { criarSetasDeParametro } from './controles/setas-de-parametro.js';
 import {
   gravarParametrosNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
 } from './repositorio/gravar-no-github.js';
@@ -266,10 +269,18 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       const alvo = parametroDeclarado(receitaAberta, id);
       if (alvo) params = comCaminho(params, alvo.caminho, v);
     }
+    /* A prévia reconstrói o modelo, e reconstruir destrói o controlador junto
+       com a seleção — no meio de um arrasto de seta isso apagava a seleção e
+       fazia as próprias setas sumirem. A seleção da bancada é por NOME, então
+       ela sobrevive à reconstrução: basta devolvê-la depois. */
+    const selecionadasAntes = controlador ? [...controlador.selecionadas] : [];
     sincronizador?.definirPayload({
       alvo: { nome: idNaUrl ?? nomePecaAtual },
       receita: receitaComParametros(receitaAberta, params),
     });
+    if (selecionadasAntes.length && controlador) {
+      controlador.selecionarMuitas(selecionadasAntes);
+    }
   }
 
   /* Duas portas para o mesmo destino, e o destino é sempre o arquivo da receita.
@@ -359,6 +370,59 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   }
 
   btnSalvarParametros?.addEventListener('click', () => { salvarPendentes(); });
+
+  /* As setas por eixo na parte selecionada. A ligação entre parte e parâmetro
+     custa uma execução por parâmetro — dois segundos na bicicleta —, então ela
+     é calculada UMA vez por peça aberta e guardada. Calcular a cada seleção
+     travaria a bancada a cada clique. */
+  let ligacaoDaPeca = null;
+
+  const setasDeParametro = criarSetasDeParametro({
+    cena: ambiente.scene,
+    canvas,
+    cameraAtual: () => ambiente.camera,
+    valorAtual: (id) => (pendentes.has(id)
+      ? pendentes.get(id)
+      : parametroDeclarado(receitaAberta, id)?.valor ?? 0),
+    passoDe: (id) => parametroDeclarado(receitaAberta, id)?.passo ?? 1,
+    aoArrastar: previaDeParametro,
+    aoSoltar: () => refletirPendencias(),
+  });
+
+  function garantirLigacao() {
+    if (ligacaoDaPeca || !receitaAberta) return ligacaoDaPeca;
+    try {
+      ligacaoDaPeca = ligarPartesAParametros(receitaAberta);
+    } catch (erro) {
+      console.warn('não consegui ligar partes a parâmetros', erro);
+      ligacaoDaPeca = { porParte: {}, porParametro: {}, inertes: [], partes: [] };
+    }
+    return ligacaoDaPeca;
+  }
+
+  function refletirSetas(selecionadas) {
+    /* Uma parte por vez: com duas selecionadas não existe centro nem parâmetro
+       comum, e uma seta que aparece no meio de duas peças diria uma ligação que
+       ninguém mediu. */
+    if (!receitaAberta || selecionadas.length !== 1) return setasDeParametro.esconder();
+
+    const ligacao = garantirLigacao();
+    const caixa = modeloAtual?.medida?.partes?.get?.(selecionadas[0]);
+    if (!caixa) return setasDeParametro.esconder();
+
+    return setasDeParametro.mostrar({
+      centro: new THREE.Vector3(...caixa.centro),
+      ligacoes: escolherSetas(parametrosDaParte(ligacao, selecionadas[0])),
+    });
+  }
+
+  /* A seta tem tamanho constante na tela, então ela precisa reagir à câmera a
+     cada quadro. O ambiente não publica gancho de quadro, e abrir um só para
+     isto seria mudar o visor por causa de um controle. */
+  (function acompanharCamera() {
+    setasDeParametro.atualizarEscala();
+    requestAnimationFrame(acompanharCamera);
+  }());
 
   const painelParametros = criarPainelParametros({
     container: document.getElementById('containerParametros'),
@@ -542,6 +606,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       linha.setAttribute('aria-pressed', String(ativa));
       linha.querySelector('.check').textContent = ativa ? '✓' : '';
     }
+    refletirSetas(estado.selecionadas);
     const temSelecao = estado.selecionadas.length > 0;
     resumo.textContent = temSelecao
       ? estado.selecionadas.length === 1
@@ -988,6 +1053,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          mesma medição e o mesmo tratamento de erro. */
       idNaUrl = entrada.id;
       receitaAberta = receita;
+      ligacaoDaPeca = null;
       pendentes.clear();
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
