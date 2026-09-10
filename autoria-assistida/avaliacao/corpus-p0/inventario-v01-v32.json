@@ -30,9 +30,7 @@
       "id": "V-03",
       "problema": "Rodas pareciam externas; para-lamas, cabine, portas e dutos pareciam volumes/placas pousados.",
       "estadoNoGotcha": "aberto para veículo completo",
-      "evidenciasEncontradas": [
-        "autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/evidencias/conjunto-frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -80,9 +78,7 @@
       "id": "V-07",
       "problema": "Painel lado a lado e cor plana por triângulo foram aceitos como prova C1; triangulação e costuras pareciam defeitos de superfície.",
       "estadoNoGotcha": "corrigido e provado",
-      "evidenciasEncontradas": [
-        "autoria-assistida/experimentos/canal-percepcao-n3/evidencias/esfera-sintetica-zebra-frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -190,9 +186,7 @@
       "id": "V-16",
       "problema": "O robô humanoide ficou low-poly, com tórax sem volume humanoide/mecânico, cabeça sem leitura e membros desconectados.",
       "estadoNoGotcha": "aberto",
-      "evidenciasEncontradas": [
-        "autoria-assistida/rascunhos-defeituosos/sonda-armadura-humanoide-1-0/evidencias/neutra-conjunto-frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -204,9 +198,7 @@
       "id": "V-17",
       "problema": "O primeiro experimento N6.1 repetiu uma carroceria cápsula com rodas, frente/traseira sem leitura e perspectiva inconsistente.",
       "estadoNoGotcha": "reprovado e encerrado",
-      "evidenciasEncontradas": [
-        "autoria-assistida/experimentos/canario-casco-visual-n6/evidencias/render-frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -266,9 +258,7 @@
       "id": "V-22",
       "problema": "Interseção de silhuetas binárias das vistas N6 produziu uma malha única com IoU frontal 0,7645, mas frontal/lateral/superior/perspectiva formaram bloco escalonado sem leitura automotiva.",
       "estadoNoGotcha": "reprovado e encerrado",
-      "evidenciasEncontradas": [
-        "autoria-assistida/experimentos/canario-casco-visual-n6/evidencias/render-frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -304,9 +294,7 @@
       "id": "V-25",
       "problema": "A ferramenta de captura entregou imagem comprimida por três rodadas, e a reclamação do crítico foi descartada como implicância dele.",
       "estadoNoGotcha": "corrigido e provado",
-      "evidenciasEncontradas": [
-        "autoria-assistida/experimentos/prova-captura-r1b/evidencias/oclusao-duas-placas/superficie.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",
@@ -318,9 +306,7 @@
       "id": "V-26",
       "problema": "O desenho de referência existia no repositório desde a primeira rodada e **nunca foi aberto**; o crítico recebia sempre o render sozinho.",
       "estadoNoGotcha": "corrigido e provado",
-      "evidenciasEncontradas": [
-        "autoria-assistida/alvos/n6-cupe-esportivo/vistas/frontal.png"
-      ],
+      "evidenciasEncontradas": [],
       "elegivel": false,
       "bloqueios": [
         "não há par A/B com resposta conhecida e pergunta congelada",

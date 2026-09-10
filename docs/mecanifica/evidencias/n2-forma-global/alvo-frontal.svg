@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
-<rect width="960" height="640" fill="#f5f6f4"/>
-<rect x="18" y="18" width="924" height="604" rx="16" fill="#eef1ef" stroke="#d5dad7"/>
-<polygon points="82.40,514.74 66.17,380.86 90.51,255.09 163.54,157.71 236.57,80.63 723.43,80.63 796.46,157.71 869.49,255.09 893.83,380.86 877.60,514.74" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
-<polygon points="54.00,563.43 171.66,563.43 171.66,311.89 54.00,311.89" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
-<polygon points="788.34,563.43 906.00,563.43 906.00,311.89 788.34,311.89" fill="#8e959b" fill-opacity="0.24" stroke="#747c83" stroke-width="3" stroke-dasharray="10 7"/>
-<text x="38" y="50" font-family="ui-sans-serif,system-ui,sans-serif" font-size="18" font-weight="650" fill="#28323b">FRONTAL</text>
-<text x="38" y="76" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="#66717a">material neutro · volumes globais · sem detalhe</text>
-</svg>

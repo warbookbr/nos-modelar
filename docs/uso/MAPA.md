@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-806 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+797 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -64,7 +64,6 @@
 
 ## autoria-assistida/experimentos/blocagem-multivista-n6/
 
-- `blocagem-n6.test.mjs` — Evidência do experimento N6.1 reprovado: rastreia os arquivos, não aprova a forma.
 - `gerar-blocagem-n6.mjs` — N6.1 — prova isolada de blocagem multivista. Não usa nem altera o núcleo. A geometria é uma carroceria fechada contínua; rodas são a única submontagem separa…
 
 ## autoria-assistida/experimentos/canal-percepcao-n3/
@@ -76,7 +75,6 @@
 ## autoria-assistida/experimentos/canario-casco-visual-n6/
 
 - `README.md` — Canário N6 — casco por interseção de silhuetas
-- `canario-casco-visual.test.mjs` — O canário exige silhuetas de origem, uma única malha e veredito explicitamente pendente.
 - `construir-casco-visual.mjs` — Canário N6: casco-base por interseção de silhuetas, não por seções digitadas. É uma prova isolada e reprovável; não importa o núcleo procedural.
 
 ## autoria-assistida/experimentos/prova-cage-direta-r2/
@@ -1027,10 +1025,6 @@
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
-- `recortar-prancha-n6.mjs` — Recorta deterministicamente a prancha N6 aprovada; cada vista vira evidência própria.
-- `recortar-prancha-n6.test.mjs` — Garante que a prancha aprovada não volte a ser consumida como mosaico.
-- `recortar-regioes-n6.mjs` — Deriva referências regionais N6 sem reinterpretar a imagem aprovada.
-- `recortar-regioes-n6.test.mjs` — Prova que toda referência regional N6 permanece vinculada à vista completa aprovada.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
 - `repositorio-autoria.test.ts` — Prova publicação imutável, falha recuperável e conflito explícito.
@@ -1089,8 +1083,6 @@
 - `gerar-canario-geometrico-p0.test.mjs` — Canário P0: prova o contrato calibrado, não qualidade de modelagem.
 - `gerar-corpus-p0.mjs` — Gera controles visuais sintéticos P0. Não representa produto, veículo ou humanoide aprovados.
 - `gerar-corpus-p0.test.mjs` — Corpus sintético P0: estímulos rastreáveis para calibrar crítico, não modelos de produto.
-- `inventariar-candidatos-corpus-p0.mjs` — Varre V-01..V-32 e registra candidatas sem confundir arquivo existente com controle pronto.
-- `inventariar-candidatos-corpus-p0.test.mjs` — Inventário não promove uma evidência: só torna ausência e insuficiência visíveis.
 - `orquestrar-calibracao-critico.mjs` — Transporte offline: exporta estímulos cegos e ingere respostas assinadas.
 - `orquestrar-calibracao-critico.test.mjs` — Lote cego: o transporte não revela gabarito e exige cobertura completa.
 - `orquestrar-revisao-regional.mjs` — Caminho único R1A: despacho mínimo, revisor limitado e crítica persistida.
@@ -1131,5 +1123,4 @@
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 - `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.
 - `registro-operacoes.test.mjs` — registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02.
-- `sonda-armadura-humanoide-1-0.test.mjs` — Sonda 1.0: sistema humanoide original, hierárquico e multiestado.
 - `sonda-supercarro-1-0.test.mjs` — Sonda de escala 1.0: sistema exterior ficcional, privado e recursivo.

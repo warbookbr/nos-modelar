@@ -66,5 +66,9 @@ Não conclua nada sobre caráter de superfície a partir da curvatura dela.
 - `fastback-1965-silhueta.json` — silhueta lateral, topo e base, de um cupê
   fastback de 1965. Calibrada por entre-eixos de 2743 mm; resíduo de −1,9% no
   comprimento e +1,8% na altura.
-- `roda-realista-alvo.png` — alvo visual da roda dianteira, anterior a esta
-  convenção.
+- `bicicleta-29/` — a folha da bicicleta 29", em três resoluções da lateral
+  mais frontal, garfo, guidão e triângulo traseiro, com os arquivos de âncoras
+  que dão escala e origem a cada uma. É o único conjunto de imagem que o
+  repositório guarda hoje: o alvo visual da roda dianteira e as evidências
+  geradas pelos experimentos antigos foram apagados, e o que eles ensinaram
+  continua nos relatórios de texto.

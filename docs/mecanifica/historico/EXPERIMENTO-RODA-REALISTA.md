@@ -18,9 +18,11 @@ medir o fluxo, o resultado e as capacidades que faltam.
 
 ## Alvo visual e verdade técnica
 
-![Referência estética multivista](referencias/roda-realista-alvo.png)
+A referência estética multivista desta roda era
+`referencias/roda-realista-alvo.png` e saiu do repositório na limpeza que
+deixou só as imagens da bicicleta. O que ela mostrava fica registrado aqui.
 
-A imagem é referência de **aparência**: pneu com ombros e sulcos, aro vazado,
+A imagem era referência de **aparência**: pneu com ombros e sulcos, aro vazado,
 dez braços formando cinco raios duplos, barril, flange, rebaixo central e cinco
 fixadores. Ela não é desenho técnico e não fornece medidas ocultas.
 
