@@ -7,15 +7,20 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '../..');
 
 /* Toda pasta de receita do repositorio, nao so as duas primeiras que alguem
-   precisou. `armas/` tem tres receitas e ficava inalcancavel pelo nome curto:
-   `npm run parametros -- espada-curta` respondia "nao encontrada" sobre um
-   arquivo que a propria skill `criar-peca` manda ler como exemplo. */
+   precisou. O acervo publicado vive em `prototipos/procedural/v3/`; as receitas
+   de `tools/fixtures/acervo/` existem para dar assunto estavel aos testes de
+   ferramenta, que precisam de cadeira parametrizada, chapa furada e prensa
+   montada para provar sensibilidade, resolucao por nome e exportacao
+   multiparte. Elas ficam fora do acervo justamente para que trabalho de peca
+   nao mexa no que a suite mede, e ficam alcancaveis pelo nome curto porque
+   varios desses testes exercitam a propria resolucao por nome. */
 export const PASTAS_BUSCA = [
   '',
   'prototipos/procedural/v3/pecas',
   'prototipos/procedural/v3/maquinas',
   'prototipos/procedural/v3/armas',
   'prototipos/procedural/v3/extensoes',
+  'tools/fixtures/acervo',
 ];
 
 function caminhoArquivoValido(p) {

@@ -152,51 +152,34 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 267 declarados e 114 vivos', async () => {
+  it('trava o retrato do acervo: 90 declarados e 26 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
-       Mudou de 189/47 para 234/91 quando `bicicleta-prova` entrou: ela é a peça
-       do gate de fechamento do plano "o que nenhuma vista mostra", modelada por
-       um agente frio a partir das skills, e trouxe 45 declarados com 44 vivos.
-       É a mudança que o comentário acima autoriza — receita ligada aos próprios
-       parâmetros de propósito — e não regressão. Subiu de 234/91 para 244/101
-       quando `cavalete-de-serra` entrou: dez declarados, dez vivos, porque a
-       receita deriva PASSOS de PARAMS e nenhuma medida está digitada. Subiu de
-       244/101 para 267/122 quando o quadro da bicicleta e o estudo de seção de
-       tubo entraram: o quadro traz vinte declarados vivos, porque a tabela de
-       geometria chega como argumento e a derivação roda a cada chamada, e o
-       estudo traz dois inertes por ser fixture de comparação visual. Foi para
-       269/119 quando as juntas do quadro viraram ponto medido: o número de
-       declarados sobe com os pontos novos e o de vivos CAI, porque ângulo e
-       comprimento do tubo do selim deixaram de mover geometria quando a solda
-       passou a ser coordenada. É perda de parâmetro vivo aceita em troca de
-       erro que não acumula ao longo da corrente de juntas. Foi para 267/114
-       quando o tubo inferior passou a ser descrito pelas duas bordas medidas:
-       o perfil por fração e as duas pontas saíram da tabela e deram lugar a
-       duas polilinhas, que são dado medido e não parâmetro de projeto. */
+       Caiu de 267/114 para 90/26 quando o acervo publicado passou a ser só o
+       quadro da bicicleta: cadeira, chapa e as três prensas saíram de
+       `prototipos/procedural/v3/` e viraram fixture de ferramenta em
+       `tools/fixtures/acervo/`, e as armas, a barricada, as duas outras
+       bicicletas e o resto foram apagados. A varredura continua alcançando as
+       fixtures porque ela lê `PASTAS_BUSCA`, então o retrato mede tudo que
+       ainda é receita executável no repositório. A queda não é regressão de
+       autoria: nenhuma receita perdeu parâmetro vivo, o conjunto é que
+       encolheu. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 267, vivos: 114, inertes: 153 });
+    expect(r.resultado.totais).toEqual({ declarados: 90, vivos: 26, inertes: 64 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
     expect(porAlvo['prensa-mecanica-industrial']).toEqual({ declarados: 14, vivos: 0, inertes: 14 });
     expect(porAlvo['prensa-progressiva']).toEqual({ declarados: 15, vivos: 0, inertes: 15 });
-    /* A bicicleta entrou depois e derivou PASSOS de PARAMS como a skill manda:
-       34 dos 36 vivos. Ela sozinha leva o acervo de 13% para 34% de liberdade
-       real, e é a contraprova de que o 13% não era limite do motor. */
-    expect(porAlvo['bicicleta-urbana']).toEqual({ declarados: 36, vivos: 34, inertes: 2 });
-    expect(porAlvo['bicicleta-prova']).toEqual({ declarados: 45, vivos: 44, inertes: 1 });
-    /* `armas/` so entrou na conta no R00 deste plano: ate ali o comando dizia
-       "acervo inteiro" varrendo duas das quatro pastas de receita. */
-    expect(porAlvo['espada-curta']).toEqual({ declarados: 13, vivos: 0, inertes: 13 });
+    /* O quadro é a única receita do acervo publicado, e treze dos seus vinte e
+       três declarados movem geometria. Os dez inertes são as juntas medidas:
+       ponto de solda é coordenada lida da referência, não parâmetro que a
+       derivação usa para mover a peça. */
+    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 23, vivos: 13, inertes: 10 });
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);
-    /* 90 s: o retrato reexecuta o acervo inteiro, 139 parâmetros × até três
-       sondas cada, e a bicicleta sozinha custa 36 deles numa malha de mil
-       faces. O orçamento é do tamanho do trabalho,
-       não do padrão do runner — a lição do R01 do plano anterior. */
   }, 90_000);
 
   it('recusa uso ambíguo em vez de escolher por conta própria', async () => {

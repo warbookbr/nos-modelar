@@ -4,23 +4,23 @@ import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 describe('resolverCaminhoReceita', () => {
   it('resolve caminho relativo existente diretamente', () => {
-    const caminho = resolverCaminhoReceita('prototipos/procedural/v3/pecas/chapa-de-fixacao.js');
+    const caminho = resolverCaminhoReceita('tools/fixtures/acervo/chapa-de-fixacao.js');
     expect(caminho).toMatch(/chapa-de-fixacao\.js$/);
   });
 
   it('resolve nome simples de peça sem extensão', () => {
     const caminho = resolverCaminhoReceita('chapa-de-fixacao');
-    expect(caminho).toMatch(/prototipos[\\/]procedural[\\/]v3[\\/]pecas[\\/]chapa-de-fixacao\.js$/);
+    expect(caminho).toMatch(/tools[\\/]fixtures[\\/]acervo[\\/]chapa-de-fixacao\.js$/);
   });
 
   it('resolve nome de peça com extensão .js', () => {
     const caminho = resolverCaminhoReceita('chapa-de-fixacao.js');
-    expect(caminho).toMatch(/prototipos[\\/]procedural[\\/]v3[\\/]pecas[\\/]chapa-de-fixacao\.js$/);
+    expect(caminho).toMatch(/tools[\\/]fixtures[\\/]acervo[\\/]chapa-de-fixacao\.js$/);
   });
 
-  it('resolve máquina em maquinas/ com montagem.js por nome da pasta', () => {
+  it('resolve pasta com montagem.js por nome da pasta', () => {
     const caminho = resolverCaminhoReceita('prensa-mecanica-industrial');
-    expect(caminho).toMatch(/prototipos[\\/]procedural[\\/]v3[\\/]maquinas[\\/]prensa-mecanica-industrial[\\/]montagem\.js$/);
+    expect(caminho).toMatch(/tools[\\/]fixtures[\\/]acervo[\\/]prensa-mecanica-industrial[\\/]montagem\.js$/);
   });
 
   it('lança erro claro quando a receita não é encontrada', () => {

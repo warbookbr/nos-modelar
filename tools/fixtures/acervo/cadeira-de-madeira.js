@@ -24,7 +24,7 @@
  * perna direita não pode divergir da esquerda porque só existe uma autoria.
  */
 
-import { criarCaminhoSimetrico } from '../../../../src/autoria/caminho-simetrico.js';
+import { criarCaminhoSimetrico } from '../../../src/autoria/caminho-simetrico.js';
 
 const P = {
   /* Perfil ativo: 'jogo' (geometria externa limpa para real-time 3D) ou

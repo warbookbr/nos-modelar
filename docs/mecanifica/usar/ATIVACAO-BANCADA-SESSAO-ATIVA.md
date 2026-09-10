@@ -22,7 +22,7 @@ Clientes MCP (como agentes de IA) ativam receitas diretamente através da ferram
 
 - **Nome da Tool:** `ativar_bancada`
 - **Parâmetros:**
-  - `arquivo` (string, obrigatório): Caminho do arquivo `.js` relativo à raiz do repositório (ex: `prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js`).
+  - `arquivo` (string, obrigatório): Caminho do arquivo `.js` relativo à raiz do repositório (ex: `prototipos/procedural/v3/pecas/bicicleta-quadro.js`).
   - `focar` (string, opcional): Nome da parte para aplicar foco/isolamento imediato.
   - `modo` (enum: `'todas'`, `'contexto'`, `'isolar'`, opcional): Modo de visualização na bancada.
   - `porta` (número, opcional): Porta HTTP do servidor Vite (padrão: 5174).
@@ -32,15 +32,15 @@ Clientes MCP (como agentes de IA) ativam receitas diretamente através da ferram
 Para ativar qualquer receita ou montagem na bancada via terminal:
 
 ```powershell
-npm run ativar:bancada -- --arquivo=prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js
+npm run ativar:bancada -- --arquivo=prototipos/procedural/v3/pecas/bicicleta-quadro.js
 ```
 
 #### Opções Disponíveis
 
 | Opção | Descrição | Exemplo |
 |---|---|---|
-| `--arquivo=<caminho>` | Caminho do arquivo `.js` da receita | `--arquivo=prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js` |
-| `--focar=<parte>` | Foca e isola imediatamente o componente especificado | `--focar=motorEletrico` |
+| `--arquivo=<caminho>` | Caminho do arquivo `.js` da receita | `--arquivo=prototipos/procedural/v3/pecas/bicicleta-quadro.js` |
+| `--focar=<parte>` | Foca e isola imediatamente o componente especificado | `--focar=tuboInferior` |
 | `--modo=<modo>` | Modo visual: `todas`, `contexto` ou `isolar` | `--modo=isolar` |
 | `--porta=<num>` | Porta do servidor Vite (padrão: 5174 ou 5173) | `--porta=5174` |
 

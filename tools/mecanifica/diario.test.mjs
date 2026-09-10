@@ -79,7 +79,7 @@ describe('diário da oficina', () => {
     /* Sem isto, o mesmo trabalho apareceria como dois alvos distintos e a
        contagem de repetição — o sinal de "emperrou" — nunca acusaria nada. */
     iniciarRegistro('rodada-curta', 'cadeira-de-madeira', { destino: DIARIO })({ codigo: 0 });
-    iniciarRegistro('rodada-longa', 'prototipos/procedural/v3/pecas/cadeira-de-madeira.js', { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-longa', 'tools/fixtures/acervo/cadeira-de-madeira.js', { destino: DIARIO })({ codigo: 0 });
     const curta = linhasDoDiario().findLast((l) => l.comando === 'rodada-curta');
     const longa = linhasDoDiario().findLast((l) => l.comando === 'rodada-longa');
     expect(longa.alvo).toBe(curta.alvo);

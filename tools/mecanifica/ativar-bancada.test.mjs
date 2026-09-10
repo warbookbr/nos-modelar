@@ -158,7 +158,7 @@ describe('perfil não vaza entre ativações no mesmo processo', () => {
      depois sem perfil devolvia o perfil da chamada anterior — invisível numa
      CLI, que morre a cada execução, e permanente no servidor MCP, que não. */
   it('ativa com perfil e depois sem perfil, e a segunda não herda a primeira', async () => {
-    const alvo = 'prototipos/procedural/v3/pecas/cadeira-de-madeira.js';
+    const alvo = 'tools/fixtures/acervo/cadeira-de-madeira.js';
     const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO });
     expect(comPerfil.payload.alvo.perfil).toBe('marcenaria');
 

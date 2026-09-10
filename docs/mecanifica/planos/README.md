@@ -2,14 +2,13 @@
 
 ## Estado
 
-**Plano ativo:** Nenhum.
+**Plano ativo:** referências visuais e controles da bancada (2026-09-09-bancada-referencias-e-controles.md).
 
-Existe uma linha de execução aberta fora dos planos executivos datados: as
-[referências visuais e controles da bancada](../../superpowers/plans/2026-09-09-bancada-referencias-e-controles.md),
+As [referências visuais e controles da bancada](2026-09-09-bancada-referencias-e-controles.md),
 com o desenho em
-[especificação](../../superpowers/specs/2026-09-09-bancada-referencias-e-controles-design.md).
-Ela mora na superfície de observação e não toca receita, materiais autorais,
-geometria, identidade semântica nem montagem persistida. As tarefas de um a
+[DESENHO-bancada-referencias-e-controles.md](DESENHO-bancada-referencias-e-controles.md),
+moram na superfície de observação e não tocam receita, materiais autorais,
+geometria, identidade semântica nem montagem persistida. As fatias de uma a
 cinco estão em `main`, conferidas na bancada e com a suíte verde: o painel
 `IA & Ref` deixou de mostrar `undefined`, a referência por imagem persiste por
 alvo, o plano texturizado é materializado e descartado no Three.js, e a inspeção

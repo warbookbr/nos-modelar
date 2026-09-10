@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+806 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -458,7 +458,9 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
+- `2026-09-09-bancada-referencias-e-controles.md` — 2026-09-09 — referências visuais e controles da bancada
 - `BACKLOG.md` — Backlog aberto
+- `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
 
@@ -587,11 +589,6 @@
 - `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
 - `2026-09-03-melhoria-esteira-autoria-ia.md` — Melhoria da Esteira de Apoio à Modelagem e Autoria para IA — Implementation Plan
 - `2026-09-03-modelagem-prensa-hidraulica.md` — # Plano de Modelagem: Prensa Hidráulica H-Frame Industrial
-- `2026-09-09-bancada-referencias-e-controles.md` — Referências visuais e controles da bancada — Plano de implementação
-
-## docs/superpowers/specs/
-
-- `2026-09-09-bancada-referencias-e-controles-design.md` — Referências visuais e controles persistentes da bancada
 
 ## docs/uso/
 
@@ -663,45 +660,11 @@
 - `README.md` — v3 — núcleo procedural, peças e visor
 - `visor.html` — visor.html — visor de peças da OFICINA (D-55): abre qualquer peça de pecas/ isolada no ambiente padrão (?peca=nome).
 
-## prototipos/procedural/v3/armas/
-
-- `espada-curta.js` — espada-curta.js — espada curta de infantaria, tipo gládio: lâmina larga com afilamento em duas etapas, guarda, punho e pomo.
-- `maca-de-abas.js` — maca-de-abas.js — maça de abas: cabeça de seis abas radiais em haste de aço.
-- `machado-de-guerra.js` — machado-de-guerra.js — machado de guerra de uma mão, com OLHO FURADO: o cabo atravessa a cabeça por um furo real, não por um encaixe fingido.
-
-## prototipos/procedural/v3/armas/machado-de-sucata/
-
-- `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica: cutelo reforçado com lâmina de sucata pesada e cabo revestido.
-
 ## prototipos/procedural/v3/extensoes/prisma-triangular/
 
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça.
 - `implementacao.js` — implementacao.js — recebe somente emissor transacional e resolução numérica.
 - `manifesto.js` — manifesto.js — contrato versionado da extensão neutra de prova.
-
-## prototipos/procedural/v3/maquinas/prensa-hidraulica/
-
-- `cinematico.js` — cinematico.js — conjunto do atuador hidraulico: camisa do cilindro, haste cromada, sapata e mesa movel da prensa hidraulica.
-- `estrutura.js` — estrutura.js — chassi H-frame, colunas verticais, travessao superior, pes e pinos da prensa hidraulica.
-- `ferramentas.js` — ferramentas.js — bolster plate, estampo, unidade hidraulica de potencia, motor, manometro e tubulacoes da prensa hidraulica.
-- `montagem.js` — montagem.js — montagem integrada da prensa hidráulica industrial H-frame com unidade de potência.
-
-## prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/
-
-- `cinematico.js` — cinematico.js — conjunto cinematico da prensa mecanica: motor eletrico, volante com protecao amarela, eixo excentrico, biela forjada e martelo deslizante com…
-- `estrutura.js` — estrutura.js — chassi estatico da prensa mecanica industrial: base fundida, mesa bolster, 4 colunas guia e cabecote superior com mancais.
-- `ferramentas.js` — ferramentas.js — estampo progressivo industrial de 4 estagios: base inferior, 4 colunas de guia com buchas, matriz inferior, guias de tira e puncoes superiores.
-- `montagem.js` — montagem.js — montagem integrada da prensa mecanica industrial realista de 4 colunas com estampo progressivo.
-
-## prototipos/procedural/v3/maquinas/prensa-progressiva/
-
-- `README.md` — Prensa Mecânica com Estampo Progressivo
-- `cinematico.js` — cinematico.js — acionamento da prensa: excêntrico, volante de inércia, biela e martelo deslizante.
-- `estrutura.js` — estrutura.js — chassi estático da prensa mecânica: mesa, colunas guia e cabeçote superior.
-- `ferramentas.js` — ferramentas.js — estampo progressivo: porta-matriz, estações de punção e placa extratora.
-- `index.js` — index.js — ponto de entrada do módulo de prensa progressiva.
-- `montagem.js` — montagem.js — montagem integrada da prensa mecânica com estampo progressivo.
-- `prensa.test.js` — prensa.test.js — suíte de testes da prensa progressiva procedural.
 
 ## prototipos/procedural/v3/motor/
 
@@ -737,19 +700,7 @@
 
 ## prototipos/procedural/v3/pecas/
 
-- `_estudo-secao-de-tubo.js` — _estudo-secao-de-tubo.js — FIXTURE de estudo, não é peça de acervo.
-- `barricada-de-sucata.js` — barricada-de-sucata.js — estrutura destrutivel modular pos-apocaliptica para testes de impacto e fisica Chaos.
-- `bicicleta-prova.js` — bicicleta-prova.js — bicicleta de passeio de quadro aberto (step-through), aro 26.
 - `bicicleta-quadro.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
-- `bicicleta-urbana.js` — bicicleta-urbana.js — bicicleta urbana de quadro diamante, aro 700c.
-- `cabo-de-pa-bambu.js` — cabo-de-pa-bambu.js — cabo de pá em colmo de bambu.
-- `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
-- `cavalete-de-serra.js` — cavalete-de-serra.js — cavalete de serra simples de madeira, com duas pernas em X cruzadas em cada extremidade e uma travessa horizontal apoiada em cima.
-- `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
-- `cutelo-de-sucata.js` — cutelo-de-sucata.js — arma corpo a corpo pós-apocalíptica. v2: lâmina de verdade (loft com seção em cunha: dorso grosso, fio fino, barriga larga e ponta fech…
-- `gabarito-eixos.js` — gabarito-eixos.js — régua de orientação para descobrir, por medição em vez de palpite, como os eixos LOCAIS de uma malha caem no mundo quando ela é presa ao …
-- `mancal-guia.js` — mancal-guia.js — Mancal de deslizamento para guia linear/rotativa.
-- `pa-de-bico-bambu.js` — pa-de-bico-bambu.js — pá de bico completa, com cabo de colmo de bambu.
 
 ## prototipos/procedural/v3/servicos/
 
@@ -896,6 +847,35 @@
 - `coord.mjs` — coord.mjs — caixa postal local, econômica e sem dependências para coordenar agentes em repositórios diferentes sem carregar histórico ou diffs inteiros.
 - `coord.test.mjs` — coord.test.mjs — prova mensagens imutáveis, leitura econômica, confirmações independentes e bloqueio de reservas sobrepostas do canal entre agentes.
 
+## tools/fixtures/acervo/
+
+- `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
+- `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
+
+## tools/fixtures/acervo/prensa-hidraulica/
+
+- `cinematico.js` — cinematico.js — conjunto do atuador hidraulico: camisa do cilindro, haste cromada, sapata e mesa movel da prensa hidraulica.
+- `estrutura.js` — estrutura.js — chassi H-frame, colunas verticais, travessao superior, pes e pinos da prensa hidraulica.
+- `ferramentas.js` — ferramentas.js — bolster plate, estampo, unidade hidraulica de potencia, motor, manometro e tubulacoes da prensa hidraulica.
+- `montagem.js` — montagem.js — montagem integrada da prensa hidráulica industrial H-frame com unidade de potência.
+
+## tools/fixtures/acervo/prensa-mecanica-industrial/
+
+- `cinematico.js` — cinematico.js — conjunto cinematico da prensa mecanica: motor eletrico, volante com protecao amarela, eixo excentrico, biela forjada e martelo deslizante com…
+- `estrutura.js` — estrutura.js — chassi estatico da prensa mecanica industrial: base fundida, mesa bolster, 4 colunas guia e cabecote superior com mancais.
+- `ferramentas.js` — ferramentas.js — estampo progressivo industrial de 4 estagios: base inferior, 4 colunas de guia com buchas, matriz inferior, guias de tira e puncoes superiores.
+- `montagem.js` — montagem.js — montagem integrada da prensa mecanica industrial realista de 4 colunas com estampo progressivo.
+
+## tools/fixtures/acervo/prensa-progressiva/
+
+- `README.md` — Prensa Mecânica com Estampo Progressivo
+- `cinematico.js` — cinematico.js — acionamento da prensa: excêntrico, volante de inércia, biela e martelo deslizante.
+- `estrutura.js` — estrutura.js — chassi estático da prensa mecânica: mesa, colunas guia e cabeçote superior.
+- `ferramentas.js` — ferramentas.js — estampo progressivo: porta-matriz, estações de punção e placa extratora.
+- `index.js` — index.js — ponto de entrada do módulo de prensa progressiva.
+- `montagem.js` — montagem.js — montagem integrada da prensa mecânica com estampo progressivo.
+- `prensa.test.js` — prensa.test.js — suíte de testes da prensa progressiva procedural.
+
 ## tools/mapa/
 
 - `citacoes.mjs` — citacoes.mjs — documento de leitura obrigatória não pode mandar abrir arquivo que não existe.
@@ -1019,7 +999,6 @@
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
-- `medir-torcao.mjs` — medir-torcao.mjs — instrumento: mede a torção das faces de uma cabeça de `inflate` sob variação de `lados` e `expoenteSecao`, e mede junto a caixa envolvente…
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …

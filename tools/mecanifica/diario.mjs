@@ -93,7 +93,7 @@ export function iniciarRegistro(comando, alvo, { destino = null } = {}) {
   const inicio = Date.now();
   /* O alvo chega como a pessoa (ou a IA) digitou: nome curto, caminho relativo,
      nome de máquina. Resolver aqui é o que faz `cadeira-de-madeira` e
-     `prototipos/procedural/v3/pecas/cadeira-de-madeira.js` virarem a MESMA
+     `tools/fixtures/acervo/cadeira-de-madeira.js` virarem a MESMA
      rodada no diário — sem isso, o mesmo trabalho apareceria como dois, e a
      assinatura da receita sairia nula justamente na forma que a IA mais usa. */
   let alvoAbsoluto = null;

@@ -36,7 +36,7 @@ describe('perfil MCP autoria-execucao', () => {
 
   it('ativa receita na bancada com sucesso e devolve URL estruturada', async () => {
     const res = await executarAtivarBancada({
-      arquivo: 'prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js',
+      arquivo: 'tools/fixtures/acervo/prensa-mecanica-industrial/montagem.js',
       focar: 'motorEletrico',
       modo: 'isolar',
     }, { raizSessao: SESSAO_TESTE });
@@ -61,7 +61,7 @@ describe('perfil MCP autoria-execucao', () => {
   it('exporta modelo para arquivo STEP com escala milimetrica', async () => {
     const saidaTeste = 'exportacoes/cad/teste_mcp_prensa.step';
     const res = await executarExportarStep({
-      arquivo: 'prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js',
+      arquivo: 'tools/fixtures/acervo/prensa-mecanica-industrial/montagem.js',
       saida: saidaTeste,
       unidade: 'mm',
       sobrescrever: true,
@@ -86,7 +86,7 @@ describe('perfil MCP autoria-execucao', () => {
   it('exporta modelo para arquivo OBJ com multipartes semânticas', async () => {
     const saidaTeste = 'exportacoes/obj/teste_mcp_prensa.obj';
     const res = await executarExportarObj({
-      arquivo: 'prototipos/procedural/v3/maquinas/prensa-mecanica-industrial/montagem.js',
+      arquivo: 'tools/fixtures/acervo/prensa-mecanica-industrial/montagem.js',
       saida: saidaTeste,
       unidade: 'cm',
       sobrescrever: true,

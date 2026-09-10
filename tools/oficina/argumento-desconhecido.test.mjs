@@ -13,8 +13,14 @@ import { usoDaOperacao } from '../../prototipos/procedural/v3/motor/uso-operacoe
 import { receitaDoModulo } from '../mecanifica/importar-receita.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const RAIZ_RECEITAS = join(REPO, 'prototipos/procedural/v3');
-const PASTAS = ['pecas', 'maquinas', 'armas', 'extensoes'];
+/* As duas raizes que guardam receita: o acervo publicado e as fixtures de
+   ferramenta. A varredura precisa das duas porque o contrato de argumento vale
+   para qualquer receita executavel, e porque o acervo encolheu para uma peca
+   quando a bicicleta virou o unico assunto publicado. */
+const RAIZES_RECEITAS = [
+  { raiz: join(REPO, 'prototipos/procedural/v3'), pastas: ['pecas', 'maquinas', 'armas', 'extensoes'] },
+  { raiz: join(REPO, 'tools/fixtures'), pastas: ['acervo'] },
+];
 
 const MATERIAIS = { m: { cor: '#888888' } };
 const cilindro = ['cilindro', { origemId: 1, raio: 0.05, altura: 0.4, em: [0, 0, 0] }];
@@ -93,24 +99,30 @@ describe('argumento desconhecido em passo', () => {
   });
 
   it('o acervo inteiro está dentro do contrato — nenhuma peça muda por esta porta', async () => {
-    /* Este é o gate da mudança, não uma curiosidade. Medido antes de ligar a
-       validação: 15 receitas, 593 passos, zero chaves fora do contrato. Se
-       alguém escrever uma chave inventada numa receita, este teste acusa antes
-       de a peça sair torta em silêncio. */
+    /* Este é o gate da mudança, não uma curiosidade. Se alguém escrever uma
+       chave inventada numa receita, este teste acusa antes de a peça sair torta
+       em silêncio. O piso já foi 15 receitas, quando o acervo publicado tinha
+       cadeira, prensas e armas; hoje o acervo é só a bicicleta e o resto virou
+       fixture de ferramenta. O piso agora é a existência da varredura: uma
+       raiz que não devolve receita nenhuma quer dizer que o caminho quebrou, e
+       um teste que varre zero arquivo passa sem provar nada. */
     const alvos = [];
-    for (const pasta of PASTAS) {
-      let entradas;
-      try { entradas = readdirSync(join(RAIZ_RECEITAS, pasta), { withFileTypes: true }); } catch { continue; }
-      for (const entrada of entradas) {
-        if (entrada.isDirectory()) {
-          const montagem = join(RAIZ_RECEITAS, pasta, entrada.name, 'montagem.js');
-          try { if (statSync(montagem).isFile()) alvos.push(montagem); } catch { /* sem montagem */ }
-        } else if (entrada.name.endsWith('.js')) {
-          alvos.push(join(RAIZ_RECEITAS, pasta, entrada.name));
+    for (const { raiz, pastas } of RAIZES_RECEITAS) {
+      const antes = alvos.length;
+      for (const pasta of pastas) {
+        let entradas;
+        try { entradas = readdirSync(join(raiz, pasta), { withFileTypes: true }); } catch { continue; }
+        for (const entrada of entradas) {
+          if (entrada.isDirectory()) {
+            const montagem = join(raiz, pasta, entrada.name, 'montagem.js');
+            try { if (statSync(montagem).isFile()) alvos.push(montagem); } catch { /* sem montagem */ }
+          } else if (entrada.name.endsWith('.js') && !entrada.name.endsWith('.test.js')) {
+            alvos.push(join(raiz, pasta, entrada.name));
+          }
         }
       }
+      expect(alvos.length, `nenhuma receita encontrada em ${raiz}`).toBeGreaterThan(antes);
     }
-    expect(alvos.length).toBeGreaterThanOrEqual(15);
 
     const fora = [];
     let passosConferidos = 0;
@@ -126,7 +138,10 @@ describe('argumento desconhecido em passo', () => {
         }
       }
     }
-    expect(passosConferidos).toBeGreaterThan(500);
+    /* Eram 593 passos com o acervo antigo inteiro; sobraram 329 depois que a
+       cadeira, as prensas e as armas sairam do acervo. O piso continua alto o
+       bastante para que uma varredura vazia ou truncada seja acusada. */
+    expect(passosConferidos).toBeGreaterThan(300);
     expect(fora).toEqual([]);
   }, 60_000);
 });

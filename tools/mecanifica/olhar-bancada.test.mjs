@@ -61,7 +61,7 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
     };
 
     const resultado = await olharBancada({
-      peca: 'mancal-guia',
+      peca: 'bicicleta-quadro',
       vistas: ['isometrica'],
       capturarEmMemoria: true,
       dependencias: {
@@ -79,7 +79,7 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
       },
     });
 
-    expect(ativouComAlvo).toContain('mancal-guia.js');
+    expect(ativouComAlvo).toContain('bicicleta-quadro.js');
     expect(resultado.ok).toBe(false);
     expect(resultado.erro.mensagem).toContain('Interrompido propositalmente');
   });

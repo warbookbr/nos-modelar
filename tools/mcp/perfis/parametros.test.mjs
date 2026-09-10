@@ -38,7 +38,11 @@ describe('porta MCP da varredura', () => {
     expect(um.conteudo[0].text).toContain('PARÂMETROS DE cadeira-de-madeira');
 
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 267, vivos: 114, inertes: 153 });
+    /* O mesmo retrato travado em `parametros-peca.test.mjs`: caiu de 267/114
+       para 90/26 quando o acervo publicado ficou só com o quadro da bicicleta e
+       cadeira, chapa e prensas viraram fixture de ferramenta. Os dois números
+       têm de andar juntos, porque a porta MCP e a CLI leem a mesma varredura. */
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 90, vivos: 26, inertes: 64 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

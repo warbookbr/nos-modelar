@@ -1,6 +1,6 @@
 /* prensa.test.js — suíte de testes da prensa progressiva procedural. */
 import { describe, expect, it } from 'vitest';
-import { executarReceita } from '../../../../../src/autoria/executar-receita.js';
+import { executarReceita } from '../../../../src/autoria/executar-receita.js';
 import {
   receitaCinematico,
   receitaEstrutura,

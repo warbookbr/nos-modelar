@@ -10,7 +10,7 @@ import {
   validarOpcoes,
 } from '../src/index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
-import { receitaEstrutura } from '../../../prototipos/procedural/v3/maquinas/prensa-progressiva/estrutura.js';
+import { receitaEstrutura } from '../../../tools/fixtures/acervo/prensa-progressiva/estrutura.js';
 
 const pontosCubo = [
   [0, 0, 0],

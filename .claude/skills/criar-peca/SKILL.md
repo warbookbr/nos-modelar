@@ -102,12 +102,15 @@ e limites da operação, e é essa a fonte.
 Abrir uma receita do acervo continua útil para VER uma operação em uso, e aí a
 escolha é pela forma, não pelo tema:
 
-| se a forma é… | abra |
-| --- | --- |
-| caixa e junção | `prototipos/procedural/v3/pecas/cadeira-de-madeira.js` |
-| seção que muda ao longo do comprimento | `prototipos/procedural/v3/armas/espada-curta.js` |
-| assimétrica num plano | `prototipos/procedural/v3/armas/machado-de-guerra.js` |
-| detalhe repetido em torno de um eixo | `prototipos/procedural/v3/armas/maca-de-abas.js` |
+O acervo publicado hoje tem uma receita só, o quadro da bicicleta em
+`prototipos/procedural/v3/pecas/bicicleta-quadro.js`, e é onde ver tubo de seção
+que muda ao longo do comprimento e tubo descrito pelas duas bordas medidas em
+vez de eixo mais seção. As receitas que ficaram de exemplo para outras formas
+moram em `tools/fixtures/acervo/`, onde continuam servindo de assunto para os
+testes de ferramenta: `tools/fixtures/acervo/cadeira-de-madeira.js` para caixa
+e junção, `tools/fixtures/acervo/chapa-de-fixacao.js` para furo endereçado por
+estação e lado, e `tools/fixtures/acervo/prensa-mecanica-industrial/montagem.js`
+para montagem de várias receitas.
 
 Rode
 `npm run descrever` nela antes de copiar qualquer ideia: o que reprovar ali não

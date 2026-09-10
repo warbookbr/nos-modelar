@@ -35,7 +35,7 @@ export async function ativarReceitaBancada({
   raizSessao = raiz,
 } = {}) {
   if (!alvo) {
-    throw new Error('Informe a receita (ex.: mancal-guia ou --arquivo=<caminho.js>)');
+    throw new Error('Informe a receita (ex.: bicicleta-quadro ou --arquivo=<caminho.js>)');
   }
 
   const caminhoAbsoluto = resolverCaminhoReceita(alvo, { raiz });
