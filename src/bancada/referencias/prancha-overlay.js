@@ -7,6 +7,56 @@ export function criarGerenciadorReferencias3D({ cena }) {
   cena.add(grupoReferencias);
 
   const camadas = new Map();
+  let imagemReferencia = null;
+
+  function descartarImagemReferencia() {
+    if (!imagemReferencia) return;
+    const { malha, possuiTextura } = imagemReferencia;
+    malha.removeFromParent();
+    malha.geometry.dispose();
+    if (possuiTextura) malha.material.map?.dispose();
+    malha.material.dispose();
+    imagemReferencia = null;
+  }
+
+  function aplicarAlinhamentoImagem(alinhamento) {
+    if (!imagemReferencia) return null;
+    const segura = { ...imagemReferencia.descritor.alinhamento, ...alinhamento };
+    imagemReferencia.descritor.alinhamento = segura;
+    const { malha } = imagemReferencia;
+    malha.position.set(segura.x, segura.y, segura.z);
+    malha.scale.setScalar(segura.escala);
+    malha.material.opacity = segura.opacidade;
+    malha.material.needsUpdate = true;
+    return imagemReferencia.descritor;
+  }
+
+  function definirImagemReferencia(descritor, { textura, possuiTextura = false } = {}) {
+    if (!textura) throw new TypeError('imagem de referência: textura obrigatória.');
+    descartarImagemReferencia();
+    const alinhamento = descritor?.alinhamento;
+    if (!alinhamento) throw new TypeError('imagem de referência: alinhamento obrigatório.');
+    const geometria = new THREE.PlaneGeometry(alinhamento.largura, alinhamento.altura);
+    geometria.rotateY(Math.PI / 2);
+    const material = new THREE.MeshBasicMaterial({
+      map: textura,
+      transparent: true,
+      opacity: alinhamento.opacidade,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const malha = new THREE.Mesh(geometria, material);
+    malha.name = '__imagem_referencia__';
+    malha.renderOrder = -1;
+    grupoReferencias.add(malha);
+    imagemReferencia = {
+      descritor: { ...descritor, alinhamento: { ...alinhamento } },
+      malha,
+      possuiTextura,
+    };
+    aplicarAlinhamentoImagem(alinhamento);
+    return malha;
+  }
 
   function limpar() {
     for (const [, objeto] of camadas.entries()) {
@@ -110,10 +160,15 @@ export function criarGerenciadorReferencias3D({ cena }) {
     adicionarPlanoPrancha,
     alternarVisibilidade,
     sincronizarComSessao,
+    definirImagemReferencia,
+    atualizarImagemReferencia: aplicarAlinhamentoImagem,
+    removerImagemReferencia: descartarImagemReferencia,
+    obterImagemReferencia: () => (imagemReferencia ? imagemReferencia.descritor : null),
     limpar,
     obterCamadas: () => Array.from(camadas.entries()).map(([id, item]) => ({ id, ...item })),
     destruir: () => {
       limpar();
+      descartarImagemReferencia();
       grupoReferencias.removeFromParent();
     },
   };
