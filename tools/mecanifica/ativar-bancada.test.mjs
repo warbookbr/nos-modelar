@@ -96,7 +96,16 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     expect(resultado.codigo).toBe(0);
     expect(resultado.saida).toContain('✓');
     expect(existsSync(SESSAO)).toBe(true);
-    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
+    const payload = JSON.parse(readFileSync(SESSAO, 'utf8'));
+    expect(payload.alvo.nome).toBe('Fixture Boa');
+    expect(payload.intencaoIA.checklist[0]).toEqual({
+      descricao: 'bloco',
+      concluido: false,
+    });
+    expect(payload.referencias.criterios[0]).toEqual({
+      texto: 'Sem faces órfãs',
+      status: 'aprovado',
+    });
   });
 
   it('RECUSA e sai com código 1 quando o motor grita', () => {

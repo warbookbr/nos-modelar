@@ -1,5 +1,6 @@
 /* painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D. */
 import { criarModalReferencia } from './modal-referencia.js';
+import { normalizarChecklist, normalizarCriterios } from '../sessao/estado-sessao.js';
 
 export function criarPainelReferencias({
   container,
@@ -23,10 +24,11 @@ export function criarPainelReferencias({
       <p class="resumo-ia">${intencaoIA?.resumo || 'Aguardando especificações ou comandos do operador.'}</p>
     `;
 
-    if (Array.isArray(intencaoIA?.checklist) && intencaoIA.checklist.length > 0) {
+    const checklist = normalizarChecklist(intencaoIA?.checklist);
+    if (checklist.length > 0) {
       const listaChecklist = document.createElement('ul');
       listaChecklist.className = 'checklist-ia';
-      for (const item of intencaoIA.checklist) {
+      for (const item of checklist) {
         const li = document.createElement('li');
         li.className = item.concluido ? 'concluido' : 'pendente';
         li.innerHTML = `
@@ -130,7 +132,7 @@ export function criarPainelReferencias({
     }
 
     // 3. Bloco de Critérios Técnicos
-    const criterios = referencias?.criterios || [];
+    const criterios = normalizarCriterios(referencias?.criterios);
     if (criterios.length > 0) {
       const blocoCriterios = document.createElement('section');
       blocoCriterios.className = 'bloco-referencia';
