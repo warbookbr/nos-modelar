@@ -8,7 +8,7 @@
  * o código de saída, o arquivo de sessão e a ordem da mensagem.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +31,11 @@ const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
  * Pasta própria dentro de `tmp/`, criada e removida por execução. O resolvedor
  * de receita aceita caminho relativo à raiz, então o alvo continua endereçável
  * do mesmo jeito, e o acervo nunca é tocado. */
+/* `tmp/` não é versionado, então num clone novo ele não existe e o `mkdtemp`
+   falhava com ENOENT antes de qualquer teste rodar — verde na máquina de quem
+   já tinha a pasta, vermelho no CI. Criar aqui é a única forma de o teste não
+   depender do que sobrou de execuções anteriores. */
+mkdirSync(join(REPO, 'tmp'), { recursive: true });
 const AREA = mkdtempSync(join(REPO, 'tmp', 'teste-ativar-bancada-'));
 /* A sessão de teste é gravada AQUI, não no `public/sessao-ativa.json` do
    repositório: o arquivo real diz qual peça está na bancada de quem está
