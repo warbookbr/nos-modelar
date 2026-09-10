@@ -38,3 +38,4 @@ zero daqui a três meses.
 | plano | congelado em | gatilho para voltar |
 | --- | --- | --- |
 | [modelador inverso com priors por família](2026-08-25-modelador-inverso-priors-familia.md) (`docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`) | 2026-08-26 | a modelagem dirigida não produzir carro aceito, ou custar atenção demais por rodada |
+| [carroceria por casca deformável](2026-09-10-carroceria-por-casca-deformavel.md) (`docs/mecanifica/planos/congelados/2026-09-10-carroceria-por-casca-deformavel.md`) | 2026-09-10 | existir no acervo uma casca base de carro, fechada e com regiões nomeadas, reconhecível como carro antes de qualquer ajuste |
