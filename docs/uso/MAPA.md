@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-813 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -809,6 +809,7 @@
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
+- `controlar-partes.test.js` — controlar-partes.test.js — apresentação temporária apenas da seleção.
 - `cor-de-auditoria.js` — cor-de-auditoria.js — a paleta da auditoria visual, e a conferência dela.
 - `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
 - `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
@@ -825,11 +826,21 @@
 
 - `painel-parametros.js` — painel-parametros.js — gera sliders e campos numéricos interativos para ajuste fino pelo humano.
 
+## src/bancada/preferencias/
+
+- `estado-local.js` — estado-local.js — preferências persistentes e locais da apresentação da bancada.
+- `estado-local.test.js` — estado-local.test.js — preferências visuais locais da bancada.
+
 ## src/bancada/referencias/
 
+- `armazenamento-imagem.js` — armazenamento-imagem.js — persistência local de uma imagem de referência por alvo.
+- `armazenamento-imagem.test.js` — armazenamento-imagem.test.js — isolamento de referências locais por alvo.
+- `imagem-referencia.js` — imagem-referencia.js — forma validada e alinhamento lateral de referência visual.
+- `imagem-referencia.test.js` — imagem-referencia.test.js — contrato do descritor e alinhamento lateral.
 - `modal-referencia.js` — modal-referencia.js — lightbox modal interativo para imagens de referência com zoom e pan.
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
+- `prancha-overlay.test.js` — prancha-overlay.test.js — plano de foto é apresentação, não modelo procedural.
 
 ## src/bancada/sessao/
 

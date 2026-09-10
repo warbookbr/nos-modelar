@@ -9,11 +9,13 @@ Existe uma linha de execução aberta fora dos planos executivos datados: as
 com o desenho em
 [especificação](../../superpowers/specs/2026-09-09-bancada-referencias-e-controles-design.md).
 Ela mora na superfície de observação e não toca receita, materiais autorais,
-geometria, identidade semântica nem montagem persistida. O trabalho está no ramo
-`codex/bancada-referencias-controles`, com as tarefas de um a cinco
-implementadas e a suíte verde. Faltam a barra superior com painéis recolhíveis e
-atalhos remapeáveis, a validação da fronteira entre referência visual e modelo
-procedural, e a conferência visual do que já foi construído.
+geometria, identidade semântica nem montagem persistida. As tarefas de um a
+cinco estão em `main`, conferidas na bancada e com a suíte verde: o painel
+`IA & Ref` deixou de mostrar `undefined`, a referência por imagem persiste por
+alvo, o plano texturizado é materializado e descartado no Three.js, e a inspeção
+ganhou wireframe e opacidade sobre a seleção. Faltam a barra superior com
+painéis recolhíveis e atalhos remapeáveis, e a validação da fronteira entre
+referência visual e modelo procedural.
 
 [Esquecer precisa falhar](encerrados/2026-09-08-esquecer-precisa-falhar.md) foi
 **concluído** em 2026-09-08. O veredito de contato deixou de depender da
