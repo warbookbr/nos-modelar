@@ -771,19 +771,19 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      menu sozinho. `Esc` fica fora porque cancela captura e seleção, e não pode
      ser remapeado para dentro de outra coisa. */
   const COMANDOS = [
-    { id: 'vista-frontal', rotulo: 'Vista de frente', padrao: '1', executar: () => ambiente.definirVista('frontal') },
-    { id: 'vista-traseira', rotulo: 'Vista de trás', padrao: 'Shift+1', executar: () => ambiente.definirVista('traseira') },
-    { id: 'vista-direita', rotulo: 'Vista da direita', padrao: '3', executar: () => ambiente.definirVista('direita') },
-    { id: 'vista-esquerda', rotulo: 'Vista da esquerda', padrao: 'Shift+3', executar: () => ambiente.definirVista('esquerda') },
-    { id: 'vista-superior', rotulo: 'Vista de cima', padrao: '7', executar: () => ambiente.definirVista('superior') },
-    { id: 'vista-inferior', rotulo: 'Vista de baixo', padrao: 'Shift+7', executar: () => ambiente.definirVista('inferior') },
-    { id: 'vista-isometrica', rotulo: 'Vista isométrica', padrao: '0', executar: () => ambiente.definirVista('isometrica') },
-    { id: 'projecao', rotulo: 'Alternar projeção', padrao: '5', executar: () => btnProjecao.click() },
-    { id: 'enquadrar', rotulo: 'Enquadrar tudo', padrao: 'f', executar: () => enquadrarMontagem() },
-    { id: 'isolar', rotulo: 'Isolar seleção', padrao: 'i', executar: () => controlador?.selecionadas.length && controlador.definirModo('isolar') },
-    { id: 'contexto', rotulo: 'Contexto fantasma', padrao: 'g', executar: () => controlador?.selecionadas.length && controlador.definirModo('contexto') },
-    { id: 'wireframe-selecao', rotulo: 'Wireframe da seleção', padrao: 'w', executar: () => controlador?.selecionadas.length && controlador.definirWireframeSelecao(!controlador.estado().wireframeSelecao) },
-    { id: 'alternar-grade', rotulo: 'Mostrar ou esconder a grade', padrao: 'h', executar: () => alternarPreferenciaCena('grade') },
+    { id: 'vista-frontal', rotulo: 'Frente', grupo: 'Câmera', padrao: '1', executar: () => ambiente.definirVista('frontal') },
+    { id: 'vista-traseira', rotulo: 'Trás', grupo: 'Câmera', padrao: 'Shift+1', executar: () => ambiente.definirVista('traseira') },
+    { id: 'vista-direita', rotulo: 'Direita', grupo: 'Câmera', padrao: '3', executar: () => ambiente.definirVista('direita') },
+    { id: 'vista-esquerda', rotulo: 'Esquerda', grupo: 'Câmera', padrao: 'Shift+3', executar: () => ambiente.definirVista('esquerda') },
+    { id: 'vista-superior', rotulo: 'Cima', grupo: 'Câmera', padrao: '7', executar: () => ambiente.definirVista('superior') },
+    { id: 'vista-inferior', rotulo: 'Baixo', grupo: 'Câmera', padrao: 'Shift+7', executar: () => ambiente.definirVista('inferior') },
+    { id: 'vista-isometrica', rotulo: 'Isométrica', grupo: 'Câmera', padrao: '0', executar: () => ambiente.definirVista('isometrica') },
+    { id: 'projecao', rotulo: 'Projeção', grupo: 'Vista', padrao: '5', executar: () => btnProjecao.click() },
+    { id: 'enquadrar', rotulo: 'Enquadrar tudo', grupo: 'Vista', padrao: 'f', executar: () => enquadrarMontagem() },
+    { id: 'alternar-grade', rotulo: 'Grade', grupo: 'Vista', padrao: 'h', executar: () => alternarPreferenciaCena('grade') },
+    { id: 'isolar', rotulo: 'Isolar', grupo: 'Seleção', padrao: 'i', executar: () => controlador?.selecionadas.length && controlador.definirModo('isolar') },
+    { id: 'contexto', rotulo: 'Contexto fantasma', grupo: 'Seleção', padrao: 'g', executar: () => controlador?.selecionadas.length && controlador.definirModo('contexto') },
+    { id: 'wireframe-selecao', rotulo: 'Wireframe', grupo: 'Seleção', padrao: 'w', executar: () => controlador?.selecionadas.length && controlador.definirWireframeSelecao(!controlador.estado().wireframeSelecao) },
   ];
   const porComando = new Map(COMANDOS.map((c) => [c.id, c]));
   const registroAtalhos = criarRegistroAtalhos({
@@ -835,20 +835,41 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     if (texto) mensagemAtalho = setTimeout(() => { if (avisoAtalho) avisoAtalho.textContent = ''; }, 4000);
   }
 
+  /* A lista é agrupada por família porque treze linhas de peso igual não têm
+     hierarquia: a pessoa lê todas para achar uma. Câmera, Vista e Seleção são
+     os três assuntos, e dentro de cada um o nome é curto e paralelo — 'Grade' e
+     'Projeção', não 'Mostrar ou esconder a grade' ao lado de 'Alternar
+     projeção'. */
   function desenharAtalhos() {
     if (!listaAtalhos) return;
     const atual = registroAtalhos.obter();
-    listaAtalhos.replaceChildren(...COMANDOS.map((comando) => {
-      const linha = document.createElement('button');
-      linha.type = 'button';
-      linha.dataset.comando = comando.id;
-      const nome = document.createElement('span');
-      nome.textContent = comando.rotulo;
-      const tecla = document.createElement('kbd');
-      tecla.textContent = atual[comando.id];
-      linha.append(nome, tecla);
-      linha.addEventListener('click', () => capturarTeclaPara(comando, linha, tecla));
-      return linha;
+    const grupos = [];
+    for (const comando of COMANDOS) {
+      const ultimo = grupos[grupos.length - 1];
+      if (ultimo?.nome === comando.grupo) ultimo.itens.push(comando);
+      else grupos.push({ nome: comando.grupo, itens: [comando] });
+    }
+
+    listaAtalhos.replaceChildren(...grupos.flatMap(({ nome, itens }) => {
+      const titulo = document.createElement('h4');
+      titulo.className = 'secao-modal';
+      titulo.textContent = nome;
+      const caixa = document.createElement('div');
+      caixa.className = 'linhas';
+      caixa.append(...itens.map((comando) => {
+        const linha = document.createElement('button');
+        linha.type = 'button';
+        linha.className = 'linha';
+        linha.dataset.comando = comando.id;
+        const rotulo = document.createElement('span');
+        rotulo.textContent = comando.rotulo;
+        const tecla = document.createElement('kbd');
+        tecla.textContent = atual[comando.id];
+        linha.append(rotulo, tecla);
+        linha.addEventListener('click', () => capturarTeclaPara(comando, linha, tecla));
+        return linha;
+      }));
+      return [titulo, caixa];
     }));
   }
 
