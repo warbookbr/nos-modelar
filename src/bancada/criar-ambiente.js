@@ -105,6 +105,8 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(COR_FUNDO);
   let auditoria = false;
+  let explosaoAtual = 0;
+  let preferenciasCena = { grade: true, chao: true };
 
   const piso = new THREE.Mesh(
     new THREE.PlaneGeometry(18, 18),
@@ -178,6 +180,15 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     if (vistaAtual === 'livre') aoMudarCameraLivre?.();
   });
 
+  function aplicarVisibilidadeDoCenario() {
+    const podeExibir = !auditoria && vistaAtual !== 'inferior' && explosaoAtual < 0.4;
+    const fatorExplosao = Math.max(0, 1 - explosaoAtual * 2.5);
+    piso.visible = Boolean(preferenciasCena.chao && podeExibir);
+    grade.visible = Boolean(preferenciasCena.grade && podeExibir);
+    piso.material.opacity = fatorExplosao;
+    grade.material.opacity = 0.34 * fatorExplosao;
+  }
+
   function ajustarOrtografica() {
     const largura = Math.max(1, canvas.clientWidth);
     const altura = Math.max(1, canvas.clientHeight);
@@ -245,8 +256,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     const up = vertical
       ? new THREE.Vector3(0, 0, direcao[1] > 0 ? -1 : 1)
       : new THREE.Vector3(0, 1, 0);
-    piso.visible = !auditoria && vista !== 'inferior';
-    grade.visible = piso.visible;
+    aplicarVisibilidadeDoCenario();
     iniciarTransicao(posicaoDaVista(vista), up, instantaneo);
     aoMudarVista?.(vistaAtual);
   }
@@ -333,8 +343,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     camera.lookAt(controls.target);
     controls.update();
     vistaAtual = 'livre';
-    piso.visible = !auditoria;
-    grade.visible = !auditoria;
+    aplicarVisibilidadeDoCenario();
     aoMudarVista?.(vistaAtual);
   }
 
@@ -348,8 +357,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     auditoria = Boolean(ligado);
     renderer.shadowMap.enabled = !auditoria;
     principal.castShadow = !auditoria;
-    piso.visible = !auditoria && vistaAtual !== 'inferior';
-    grade.visible = piso.visible;
+    aplicarVisibilidadeDoCenario();
     scene.background = new THREE.Color(auditoria ? '#f2f4f3' : COR_FUNDO);
     return auditoria;
   }
@@ -543,16 +551,18 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     medirEnquadramento,
     medirPixelsVisiveisPorParte,
     definirExplosao(valor) {
-      const v = Math.min(1, Math.max(0, Number(valor) || 0));
-      const opacidadePiso = Math.max(0, 1 - v * 2.5);
-      const opacidadeGrade = Math.max(0, 0.34 * (1 - v * 2.5));
-      /* Em auditoria o piso fica fora sempre: explodir a montagem não pode
-         trazer de volta o chão que o modo acabou de tirar. */
-      piso.visible = !auditoria && opacidadePiso > 0.01;
-      grade.visible = !auditoria && opacidadeGrade > 0.01;
-      piso.material.opacity = opacidadePiso;
-      grade.material.opacity = opacidadeGrade;
+      explosaoAtual = Math.min(1, Math.max(0, Number(valor) || 0));
+      aplicarVisibilidadeDoCenario();
     },
+    definirPreferenciasCena(parcial = {}) {
+      preferenciasCena = {
+        grade: typeof parcial.grade === 'boolean' ? parcial.grade : preferenciasCena.grade,
+        chao: typeof parcial.chao === 'boolean' ? parcial.chao : preferenciasCena.chao,
+      };
+      aplicarVisibilidadeDoCenario();
+      return { ...preferenciasCena };
+    },
+    preferenciasCena: () => ({ ...preferenciasCena }),
     definirAuditoria,
     redimensionar,
     get auditoria() { return auditoria; },
