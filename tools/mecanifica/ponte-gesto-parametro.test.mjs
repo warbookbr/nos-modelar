@@ -17,18 +17,21 @@
  *      `PARAMS` — antes da segunda fatia ele varria argumentos de passo atrás
  *      de nomes como `raio`, e na bicicleta esses argumentos são RESULTADOS da
  *      derivação;
- *   3. não existe caminho de escrita: nada na bancada grava valor de parâmetro
- *      na receita.
+ *   3. a escrita na receita existe, é transacional, e recusar não altera o
+ *      arquivo — antes da terceira fatia nada gravava parâmetro em lugar
+ *      nenhum.
  *
  * Quando a ponte existir, os dois últimos casos mudam de resposta e este
  * arquivo é reescrito junto. É esse o ponto: ele obriga a atualização.
  */
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parametrosDoPainel } from '../../src/bancada/parametros/painel-parametros.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { escreverParametro } from '../../src/autoria/escrever-parametro.js';
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
 
@@ -90,21 +93,43 @@ describe('ponte do gesto ao parâmetro — retrato antes', () => {
     expect(parametrosDoPainel(semDeclaracao)).toEqual([]);
   });
 
-  it('RETRATO: não existe caminho que escreva parâmetro na receita', async () => {
-    const antes = readFileSync(ARQUIVO_RECEITA, 'utf8');
+  it('escreve na receita real e volta ao original byte a byte', async () => {
+    const original = readFileSync(ARQUIVO_RECEITA, 'utf8');
+    /* A prova roda numa cópia: teste que mexe no acervo e falha no meio deixa a
+       peça de trabalho alterada, e ninguém descobre pelo teste que falhou. */
+    const area = mkdtempSync(join(tmpdir(), 'ponte-bicicleta-'));
+    const copia = join(area, 'bicicleta-quadro.js');
+    writeFileSync(copia, original, 'utf8');
 
-    const modulos = await Promise.allSettled([
-      import('../../src/bancada/parametros/escrever-parametro.js'),
-    ]);
-    expect(modulos[0].status).toBe('rejected');
+    try {
+      const ida = await escreverParametro(copia, 'tuboSelimComprimento', 455);
+      expect(ida).toMatchObject({ estado: 'aplicado', de: 422, para: 455 });
+      expect(readFileSync(copia, 'utf8')).not.toBe(original);
 
-    /* O `atualizarParametro` do sincronizador é a coisa mais parecida com
-       escrita que existe hoje, e ele só mexe em memória e avisa por broadcast. */
-    const { criarSincronizadorSessao } = await import('../../src/bancada/sessao/sincronizador.js');
-    const sincronizador = criarSincronizadorSessao({ intervaloPolling: 1e9 });
-    sincronizador.atualizarParametro('tuboSelimComprimento', 999);
-    expect(sincronizador.obterEstado().parametros.tuboSelimComprimento).toBe(999);
-    expect(readFileSync(ARQUIVO_RECEITA, 'utf8')).toBe(antes);
-    sincronizador.destruir();
+      const volta = await escreverParametro(copia, 'tuboSelimComprimento', 422);
+      expect(volta).toMatchObject({ estado: 'aplicado', de: 455, para: 422 });
+      /* Byte a byte: é o que o gate de saída do plano exige do desfazer. */
+      expect(readFileSync(copia, 'utf8')).toBe(original);
+    } finally {
+      rmSync(area, { recursive: true, force: true });
+    }
+
+    expect(readFileSync(ARQUIVO_RECEITA, 'utf8')).toBe(original);
+  });
+
+  it('a escrita recusada não altera o arquivo e diz qual parâmetro', async () => {
+    const original = readFileSync(ARQUIVO_RECEITA, 'utf8');
+    const area = mkdtempSync(join(tmpdir(), 'ponte-recusa-'));
+    const copia = join(area, 'bicicleta-quadro.js');
+    writeFileSync(copia, original, 'utf8');
+
+    try {
+      const r = await escreverParametro(copia, 'comprimentoQueNaoExiste', 10);
+      expect(r.estado).toBe('falha-recuperavel');
+      expect(r.motivo).toMatch(/comprimentoQueNaoExiste/);
+      expect(readFileSync(copia, 'utf8')).toBe(original);
+    } finally {
+      rmSync(area, { recursive: true, force: true });
+    }
   });
 });

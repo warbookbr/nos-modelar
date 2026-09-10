@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-806 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+808 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -729,6 +729,8 @@
 - `derivar-roteiro-revalidacao.js` — derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas.
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
+- `escrever-parametro.js` — escrever-parametro.js — troca UM número declarado na receita, no arquivo.
+- `escrever-parametro.test.js` — escrever-parametro.test.js — a escrita de UM número, e o arquivo intacto quando ela é recusada.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
 - `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
