@@ -1557,6 +1557,17 @@ body.auditoria #cenaBancada {
   margin: 0 0 6px;
   color: var(--texto-fraco);
   font-size: 11px;
+  /* O modal da imagem corta a descrição em uma linha; aqui ela EXPLICA o que o
+     token é e onde ele fica, e explicação cortada por reticências não explica. */
+  white-space: normal;
+  overflow: visible;
+  line-height: 1.45;
+}
+
+.modal-barra .modal-descricao code {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .secao-modal {
@@ -1614,6 +1625,17 @@ body.auditoria #cenaBancada {
   font: 600 9px/1.5 ui-monospace, monospace;
   text-align: center;
   white-space: nowrap;
+}
+
+.linha input[type='text'],
+.linha input[type='password'] {
+  width: 190px;
+  padding: 3px 7px;
+  border: 1px solid var(--linha);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #dfe8e3;
+  font: 500 11px/1.4 ui-monospace, monospace;
 }
 
 .linha input[type='checkbox'] {

@@ -6,6 +6,9 @@ import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
 import { listarAcervo } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
 import { parametroDeclarado } from '../autoria/parametros-declarados.js';
+import {
+  gravarParametroNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
+} from './repositorio/gravar-no-github.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -278,32 +281,62 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     }, ESPERA_GRAVACAO));
   }
 
+  /* Duas portas para o mesmo destino, e o destino é sempre o arquivo da receita.
+     Quem roda a bancada a partir do repositório tem o atendente local, que
+     escreve direto no disco. Quem abre o endereço publicado não tem arquivo
+     nenhum, e aí a gravação vai pela API do GitHub com o token da própria
+     pessoa, virando um commit. Sem nenhuma das duas, o valor vale como prévia
+     nesta sessão e a bancada diz isso. */
+  const CAMINHO_ACERVO = 'prototipos/procedural/v3/pecas';
+
+  async function gravarNoAtendenteLocal(chave, valor) {
+    const resposta = await fetch('/api/parametro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ peca: idNaUrl, id: chave, valor }),
+    });
+    return resposta.json();
+  }
+
   async function gravarAgora(chave, valor) {
     if (!idNaUrl) {
       mostrarAviso('Esta peça veio da sessão da IA; abra pelo acervo para gravar no arquivo.');
       return;
     }
+
+    let resultado = null;
     try {
-      const resposta = await fetch('/api/parametro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ peca: idNaUrl, id: chave, valor }),
-      });
-      const resultado = await resposta.json();
-      if (resultado.estado === 'aplicado') {
-        if (receitaAberta) receitaAberta.PARAMS = comCaminho(
-          receitaAberta.PARAMS,
-          parametroDeclarado(receitaAberta, chave).caminho,
-          resultado.para,
-        );
-        mostrarAviso(`${chave}: ${resultado.de} → ${resultado.para}, gravado na receita.`);
-      } else {
-        mostrarAviso(`Não gravei: ${resultado.motivo}`);
-        previaDeParametro(chave, parametroDeclarado(receitaAberta, chave)?.valor);
-      }
+      resultado = await gravarNoAtendenteLocal(chave, valor);
     } catch {
-      mostrarAviso('Sem atendente de escrita: o valor vale como prévia nesta sessão.');
+      resultado = null;
     }
+
+    if (!resultado) {
+      const config = lerConfiguracaoRepositorio();
+      if (!config) {
+        mostrarAviso('O valor vale como prévia: configure o repositório em Configurações para gravar.');
+        return;
+      }
+      mostrarAviso(`Gravando ${chave} no repositório…`);
+      resultado = await gravarParametroNoGitHub({
+        config,
+        caminhoNoRepo: `${CAMINHO_ACERVO}/${idNaUrl}.js`,
+        id: chave,
+        valor,
+      });
+    }
+
+    if (resultado.estado === 'aplicado') {
+      const alvo = parametroDeclarado(receitaAberta, chave);
+      if (receitaAberta && alvo) {
+        receitaAberta.PARAMS = comCaminho(receitaAberta.PARAMS, alvo.caminho, resultado.para);
+      }
+      mostrarAviso(`${chave}: ${resultado.de} → ${resultado.para}${resultado.commit ? ', commit publicado' : ', gravado na receita'}.`);
+      return;
+    }
+
+    mostrarAviso(`Não gravei: ${resultado.motivo}`);
+    previaDeParametro(chave, parametroDeclarado(receitaAberta, chave)?.valor);
   }
 
   const painelParametros = criarPainelParametros({
@@ -887,6 +920,41 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      recarregar a página e sem desligar a sessão ativa, que continua chegando
      pela IA e sobrescreve quando chegar. */
   const listaAcervo = document.getElementById('listaAcervo');
+
+  /* A configuração do repositório mora no navegador de quem digitou, e o campo
+     do token nunca é preenchido de volta: mostrar segredo guardado na tela não
+     ajuda ninguém a conferir e ajuda quem passa por trás. */
+  const camposRepo = {
+    dono: document.getElementById('repoDono'),
+    repo: document.getElementById('repoNome'),
+    ramo: document.getElementById('repoRamo'),
+    token: document.getElementById('repoToken'),
+  };
+
+  function refletirRepositorio() {
+    const config = lerConfiguracaoRepositorio();
+    if (!config) return;
+    camposRepo.dono.value = config.dono;
+    camposRepo.repo.value = config.repo;
+    camposRepo.ramo.value = config.ramo;
+    camposRepo.token.placeholder = 'guardado neste navegador';
+  }
+
+  refletirRepositorio();
+  document.getElementById('btnSalvarRepo')?.addEventListener('click', () => {
+    const guardado = lerConfiguracaoRepositorio();
+    const config = salvarConfiguracaoRepositorio({
+      dono: camposRepo.dono.value.trim(),
+      repo: camposRepo.repo.value.trim(),
+      ramo: camposRepo.ramo.value.trim() || 'main',
+      token: camposRepo.token.value.trim() || guardado?.token || '',
+    });
+    camposRepo.token.value = '';
+    mostrarAviso(config
+      ? `Gravação ligada em ${config.dono}/${config.repo}, ramo ${config.ramo}.`
+      : 'Faltou dono, repositório ou token.');
+    refletirRepositorio();
+  });
 
   async function abrirDoAcervo(entrada) {
     try {

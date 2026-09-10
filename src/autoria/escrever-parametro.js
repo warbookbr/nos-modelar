@@ -19,50 +19,10 @@ import { readFileSync, writeFileSync, renameSync, rmSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from './executar-receita.js';
 import { listarParametrosDeclarados, parametroDeclarado } from './parametros-declarados.js';
+import { comoTexto, trocarNoTexto } from './texto-parametro.js';
 
 function falha(motivo, extra = {}) {
   return { estado: 'falha-recuperavel', motivo, ...extra };
-}
-
-/* Número que volta legível para o arquivo. Arrasto produz decimal contínuo, e
-   gravar `422.30000000000001` transforma a tabela medida numa lista de números
-   mágicos; seis casas é mais precisão do que qualquer medida de referência tem
-   e ainda cabe na linha. */
-function comoTexto(valor) {
-  return String(Number(valor.toFixed(6)));
-}
-
-/* Duas formas de declaração, as duas numa linha só: o número solto
-   (`raioTuboSelim: 17,`) e a coordenada (`pontoSelimTopo: [-134, 716],`). A
-   coordenada é endereçada pela casa, `pontoSelimTopo.1`.
-
-   Objeto aninhado NÃO entra: localizar `raio` dentro de `secao: { raio: 8 }`
-   pelo texto é ambíguo, porque a mesma palavra aparece em outros objetos, e
-   este serviço prefere recusar a acertar por sorte. */
-function trocarNoTexto(texto, chave, indice, valor) {
-  const corpo = indice === null ? '(-?\\d+(?:\\.\\d+)?)' : '\\[([^\\]\\n]*)\\]';
-  const padrao = new RegExp(`^(\\s*)${chave}:(\\s*)${corpo}(\\s*,?)$`, 'gm');
-  const achados = [...texto.matchAll(padrao)];
-  if (achados.length === 0) return { erro: `não achei a linha que declara '${chave}'` };
-  if (achados.length > 1) {
-    return { erro: `'${chave}' aparece em ${achados.length} linhas; qual delas é ambíguo` };
-  }
-
-  if (indice === null) {
-    return {
-      de: Number(achados[0][3]),
-      texto: texto.replace(padrao, (_, ident, espaco, _antigo, fim) => `${ident}${chave}:${espaco}${comoTexto(valor)}${fim}`),
-    };
-  }
-
-  const casas = achados[0][3].split(',').map((n) => n.trim());
-  if (!casas[indice]) return { erro: `'${chave}' não tem a casa ${indice}` };
-  const de = Number(casas[indice]);
-  casas[indice] = comoTexto(valor);
-  return {
-    de,
-    texto: texto.replace(padrao, (_, ident, espaco, _antigo, fim) => `${ident}${chave}:${espaco}[${casas.join(', ')}]${fim}`),
-  };
 }
 
 async function importarDoArquivo(caminho) {

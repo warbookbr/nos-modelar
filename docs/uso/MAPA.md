@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-812 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+815 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -758,6 +758,7 @@
 - `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
 - `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
+- `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 
@@ -805,6 +806,11 @@
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
 - `prancha-overlay.test.js` — prancha-overlay.test.js — plano de foto é apresentação, não modelo procedural.
+
+## src/bancada/repositorio/
+
+- `gravar-no-github.js` — gravar-no-github.js — a bancada publicada gravando no repositório.
+- `gravar-no-github.test.js` — gravar-no-github.test.js — a gravação pela API confere antes de publicar.
 
 ## src/bancada/sessao/
 

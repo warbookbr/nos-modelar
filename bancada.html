@@ -56,6 +56,15 @@
               <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
               <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" checked /></label>
             </div>
+            <h4 class="secao-modal">Gravar no repositório</h4>
+            <p class="modal-descricao">Sem isto, mexer um parâmetro vale só nesta sessão. O token fica guardado neste navegador — use um <code>fine-grained</code> de um repositório só, com permissão de conteúdo para escrita.</p>
+            <div class="linhas">
+              <label class="linha"><span>Dono</span><input id="repoDono" type="text" placeholder="warbookbr" /></label>
+              <label class="linha"><span>Repositório</span><input id="repoNome" type="text" placeholder="nos-mecanifica" /></label>
+              <label class="linha"><span>Ramo</span><input id="repoRamo" type="text" placeholder="main" /></label>
+              <label class="linha"><span>Token</span><input id="repoToken" type="password" placeholder="github_pat_…" /></label>
+            </div>
+            <button id="btnSalvarRepo" class="botao texto" type="button">Guardar neste navegador</button>
           </div>
         </div>
       </div>
