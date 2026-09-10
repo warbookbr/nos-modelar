@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-803 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+804 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1017,6 +1017,7 @@
 - `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O número do acervo fica travado aqui de propósito — se alguém ligar uma r…
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
+- `ponte-gesto-parametro.test.mjs` — ponte-gesto-parametro.test.mjs — RETRATO DO ESTADO ANTES DA PONTE.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
