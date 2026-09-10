@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-811 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+813 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -587,6 +587,11 @@
 - `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
 - `2026-09-03-melhoria-esteira-autoria-ia.md` — Melhoria da Esteira de Apoio à Modelagem e Autoria para IA — Implementation Plan
 - `2026-09-03-modelagem-prensa-hidraulica.md` — # Plano de Modelagem: Prensa Hidráulica H-Frame Industrial
+- `2026-09-09-bancada-referencias-e-controles.md` — Referências visuais e controles da bancada — Plano de implementação
+
+## docs/superpowers/specs/
+
+- `2026-09-09-bancada-referencias-e-controles-design.md` — Referências visuais e controles persistentes da bancada
 
 ## docs/uso/
 

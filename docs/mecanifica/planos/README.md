@@ -4,6 +4,17 @@
 
 **Plano ativo:** Nenhum.
 
+Existe uma linha de execução aberta fora dos planos executivos datados: as
+[referências visuais e controles da bancada](../../superpowers/plans/2026-09-09-bancada-referencias-e-controles.md),
+com o desenho em
+[especificação](../../superpowers/specs/2026-09-09-bancada-referencias-e-controles-design.md).
+Ela mora na superfície de observação e não toca receita, materiais autorais,
+geometria, identidade semântica nem montagem persistida. O trabalho está no ramo
+`codex/bancada-referencias-controles`, com as tarefas de um a cinco
+implementadas e a suíte verde. Faltam a barra superior com painéis recolhíveis e
+atalhos remapeáveis, a validação da fronteira entre referência visual e modelo
+procedural, e a conferência visual do que já foi construído.
+
 [Esquecer precisa falhar](encerrados/2026-09-08-esquecer-precisa-falhar.md) foi
 **concluído** em 2026-09-08. O veredito de contato deixou de depender da
 bandeira `--estrito` e passou a ser o padrão, a montagem passou a reprovar peça
