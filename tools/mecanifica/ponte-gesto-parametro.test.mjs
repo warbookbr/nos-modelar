@@ -31,7 +31,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parametrosDoPainel } from '../../src/bancada/parametros/painel-parametros.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { escreverParametro } from '../../src/autoria/escrever-parametro.js';
+import { escreverParametro, escreverParametros } from '../../src/autoria/escrever-parametro.js';
+import { criarHistoricoParametros } from '../../src/bancada/controles/historico-parametros.js';
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
 
@@ -117,6 +118,67 @@ describe('ponte do gesto ao parâmetro — retrato antes', () => {
       const volta = await escreverParametro(copia, 'tuboSelimComprimento', 422);
       expect(volta).toMatchObject({ estado: 'aplicado', de: 455, para: 422 });
       /* Byte a byte: é o que o gate de saída do plano exige do desfazer. */
+      expect(readFileSync(copia, 'utf8')).toBe(original);
+    } finally {
+      rmSync(area, { recursive: true, force: true });
+    }
+
+    expect(readFileSync(ARQUIVO_RECEITA, 'utf8')).toBe(original);
+  });
+
+  /* O desfazer da sessão, provado onde ele importa: no arquivo. A bancada
+     mantém a pendência só enquanto o valor difere do que a receita tem, e é
+     essa regra que este caso repete, porque é ela que faz o desfazer completo
+     não deixar nada para salvar. */
+  it('desfazer devolve a sessão ao arquivo, e desfazer além do início não escreve nada', async () => {
+    const original = readFileSync(ARQUIVO_RECEITA, 'utf8');
+    const area = mkdtempSync(join(tmpdir(), 'ponte-desfazer-'));
+    const copia = join(area, 'bicicleta-quadro.js');
+    writeFileSync(copia, original, 'utf8');
+
+    const declarado = (chave) => receita.PARAMS[chave];
+    const historico = criarHistoricoParametros({ valorDeOrigem: declarado });
+    const pendentes = new Map();
+    const aplicar = (chave, valor) => {
+      if (Object.is(valor, declarado(chave))) pendentes.delete(chave);
+      else pendentes.set(chave, valor);
+    };
+    const mexer = (chave, valor) => { historico.registrar(chave, valor); aplicar(chave, valor); };
+
+    try {
+      mexer('tuboSelimComprimento', 440);
+      historico.separar();
+      mexer('tuboSelimComprimento', 455);
+      historico.separar();
+      mexer('anguloDirecao', 70);
+      expect([...pendentes.keys()].sort()).toEqual(['anguloDirecao', 'tuboSelimComprimento']);
+
+      /* Um gesto por desfazer: o arrasto que passou por 440 e 455 conta dois
+         passos porque houve dois gestos, e não um por quadro. */
+      for (const passo of [1, 2, 3]) {
+        const desfeito = historico.desfazer();
+        expect(desfeito, `passo ${passo}`).not.toBe(null);
+        aplicar(desfeito.chave, desfeito.valor);
+      }
+      expect(historico.vazio).toBe(true);
+      expect(pendentes.size).toBe(0);
+
+      /* Além do início da sessão não existe passo anterior, e o arquivo não é
+         tocado nem por engano. */
+      expect(historico.desfazer()).toBe(null);
+      expect(readFileSync(copia, 'utf8')).toBe(original);
+
+      /* E o caminho completo: mexer, salvar, desfazer tudo e salvar de novo
+         devolve o texto da receita byte a byte ao que estava na abertura. */
+      mexer('tuboSelimComprimento', 455);
+      expect((await escreverParametros(copia, Object.fromEntries(pendentes))).estado).toBe('aplicado');
+      expect(readFileSync(copia, 'utf8')).not.toBe(original);
+
+      pendentes.clear();
+      const volta = historico.desfazer();
+      aplicar(volta.chave, volta.valor);
+      expect(volta).toEqual({ chave: 'tuboSelimComprimento', valor: 422, naOrigem: true });
+      expect((await escreverParametros(copia, { [volta.chave]: volta.valor })).estado).toBe('aplicado');
       expect(readFileSync(copia, 'utf8')).toBe(original);
     } finally {
       rmSync(area, { recursive: true, force: true });

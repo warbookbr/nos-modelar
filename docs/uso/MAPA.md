@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-818 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+820 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -788,6 +788,8 @@
 
 - `atalhos.js` — atalhos.js — catálogo de comandos de teclado da bancada, com persistência local e recusa de colisão.
 - `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
+- `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
+- `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
 - `setas-de-parametro.js` — setas-de-parametro.js — as três setas por eixo, ligadas a um parâmetro.
 
 ## src/bancada/parametros/

@@ -23,6 +23,7 @@ import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referenci
 import { criarPainelParametros } from './parametros/painel-parametros.js';
 import { criarPreferenciasBancada } from './preferencias/estado-local.js';
 import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
+import { criarHistoricoParametros } from './controles/historico-parametros.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import {
   alvosDeEnquadramento,
@@ -257,11 +258,35 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      mostraria um estado que não é nem o gravado nem o pedido. */
   const pendentes = new Map();
 
-  function previaDeParametro(chave, valor) {
+  /* Os valores que a peça tinha quando foi aberta, lidos do arquivo. São o piso
+     do desfazer: Ctrl+Z devolve o que a sessão mexeu e para aqui, porque abaixo
+     disto não existe estado anterior que esta sessão tenha produzido. */
+  let origemDosParametros = new Map();
+  const historicoParametros = criarHistoricoParametros({
+    valorDeOrigem: (chave) => (origemDosParametros.has(chave)
+      ? origemDosParametros.get(chave)
+      : parametroDeclarado(receitaAberta, chave)?.valor),
+  });
+
+  function anotarOrigem(chave) {
+    if (origemDosParametros.has(chave)) return;
+    const declarado = parametroDeclarado(receitaAberta, chave);
+    if (declarado) origemDosParametros.set(chave, declarado.valor);
+  }
+
+  /* Aplica o valor e redesenha, SEM registrar no histórico: é por aqui que o
+     próprio desfazer devolve o valor, senão desfazer viraria mais um passo e a
+     pilha nunca esvaziaria. */
+  function aplicarValor(chave, valor) {
     if (!receitaAberta) return;
     const declarado = parametroDeclarado(receitaAberta, chave);
     if (!declarado) return;
-    pendentes.set(chave, valor);
+    /* Pendente é o que difere do arquivo. Quando o valor volta a ser o que a
+       receita já tem, a pendência sai da lista: mantê-la faria o salvar
+       reescrever o mesmo número, e o texto da receita deixaria de voltar byte a
+       byte ao que estava. */
+    if (Object.is(valor, declarado.valor)) pendentes.delete(chave);
+    else pendentes.set(chave, valor);
     refletirPendencias();
 
     let params = receitaAberta.PARAMS;
@@ -281,6 +306,27 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     if (selecionadasAntes.length && controlador) {
       controlador.selecionarMuitas(selecionadasAntes);
     }
+  }
+
+  function previaDeParametro(chave, valor) {
+    if (!receitaAberta || !parametroDeclarado(receitaAberta, chave)) return;
+    anotarOrigem(chave);
+    historicoParametros.registrar(chave, valor);
+    aplicarValor(chave, valor);
+  }
+
+  /* Ctrl+Z devolve o valor anterior de um parâmetro mexido nesta sessão e para
+     no estado que veio do arquivo: com a pilha vazia, o comando não faz nada e
+     não inventa passo anterior. */
+  function desfazerParametro() {
+    const passo = historicoParametros.desfazer();
+    if (!passo) return false;
+    aplicarValor(passo.chave, passo.valor);
+    painelParametros?.refletirValor?.(passo.chave, passo.valor);
+    mostrarAviso(historicoParametros.vazio
+      ? 'Desfeito: a peça voltou ao que veio do arquivo.'
+      : `Desfeito ${passo.chave}.`);
+    return true;
   }
 
   /* Duas portas para o mesmo destino, e o destino é sempre o arquivo da receita.
@@ -386,7 +432,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       : parametroDeclarado(receitaAberta, id)?.valor ?? 0),
     passoDe: (id) => parametroDeclarado(receitaAberta, id)?.passo ?? 1,
     aoArrastar: previaDeParametro,
-    aoSoltar: () => refletirPendencias(),
+    aoSoltar: () => { historicoParametros.separar(); refletirPendencias(); },
   });
 
   function garantirLigacao() {
@@ -427,9 +473,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const painelParametros = criarPainelParametros({
     container: document.getElementById('containerParametros'),
     aoArrastar: previaDeParametro,
-    /* Assentar o valor não grava: só confirma a pendência. Quem grava é o
+    /* Assentar o valor não grava: confirma a pendência e FECHA o gesto, para
+       que o arrasto inteiro conte como um único desfazer. Quem grava é o
        botão. */
-    aoSoltar: previaDeParametro,
+    aoSoltar: (chave, valor) => {
+      previaDeParametro(chave, valor);
+      historicoParametros.separar();
+    },
   });
 
   const gerenciadorAnotacoes3D = criarGerenciadorAnotacoes3D({
@@ -986,6 +1036,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     padrao: Object.fromEntries(COMANDOS.map((c) => [c.id, c.padrao])),
   });
 
+  /* Ctrl+Z fica FORA da tabela remapeável: é a combinação que todo editor usa
+     para desfazer, e deixá-la disponível para remapeamento abriria a porta para
+     alguém prender o desfazer numa tecla e ficar sem saída no meio de um
+     ajuste. Ela também não passa por `comandoDaCombinacao`, que só entende
+     tecla simples e Shift. */
+  function atalhoDesfazer(evento) {
+    const combinacao = (evento.ctrlKey || evento.metaKey) && !evento.shiftKey
+      && typeof evento.key === 'string' && evento.key.toLowerCase() === 'z';
+    if (!combinacao) return;
+    if (registroAtalhos.deveIgnorar(evento.target)) return;
+    evento.preventDefault();
+    if (!desfazerParametro()) {
+      mostrarAviso('Nada para desfazer nesta sessão.');
+    }
+  }
+  addEventListener('keydown', atalhoDesfazer);
+
   function atalhoVista(evento) {
     if (evento.key === 'Escape') {
       if (registroAtalhos.capturando) return;
@@ -1055,6 +1122,10 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       receitaAberta = receita;
       ligacaoDaPeca = null;
       pendentes.clear();
+      /* Peça nova, sessão nova: o piso do desfazer passa a ser o que veio do
+         arquivo desta peça, e a pilha da anterior não pode sobreviver. */
+      historicoParametros.limpar();
+      origemDosParametros = new Map();
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
     } catch (erro) {
@@ -1473,6 +1544,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   addEventListener('pagehide', () => {
     removeEventListener('keydown', atalhoVista);
+    removeEventListener('keydown', atalhoDesfazer);
     sincronizador.destruir();
     if (selecao3d) selecao3d.destruir();
     if (controlador) controlador.destruir();

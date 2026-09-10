@@ -37,8 +37,15 @@ export function criarPainelParametros({
 }) {
   if (!container) return null;
 
+  /* Os controles vivos por parâmetro, para que o desfazer da sessão possa
+     devolver o número ao slider. Sem isso, Ctrl+Z mudaria a peça na cena e
+     deixaria o painel mostrando o valor antigo, e a pessoa leria dois estados
+     diferentes da mesma medida ao mesmo tempo. */
+  const controles = new Map();
+
   function renderizar({ receita, parametros: valoresAtuais = {} }) {
     container.replaceChildren();
+    controles.clear();
 
     const parametros = parametrosDoPainel(receita, valoresAtuais);
 
@@ -94,13 +101,19 @@ export function criarPainelParametros({
         aoSoltar(chave, val);
       });
 
+      controles.set(chave, mostrar);
       form.appendChild(linha);
     }
 
     container.appendChild(form);
   }
 
+  function refletirValor(chave, valor) {
+    controles.get(chave)?.(valor);
+  }
+
   return {
     renderizar,
+    refletirValor,
   };
 }
