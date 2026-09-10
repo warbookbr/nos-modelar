@@ -7,7 +7,7 @@ import { listarAcervo } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
 import { parametroDeclarado } from '../autoria/parametros-declarados.js';
 import {
-  gravarParametroNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
+  gravarParametrosNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
 } from './repositorio/gravar-no-github.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
@@ -249,36 +249,27 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      valor novo e reexecuta, em vez de deformar a malha na tela. */
   let receitaAberta = null;
 
+  /* O que a pessoa mexeu e ainda não salvou. A prévia aplica TODAS as pendentes
+     a cada quadro: aplicar só a última desfaria as anteriores na tela, e a peça
+     mostraria um estado que não é nem o gravado nem o pedido. */
+  const pendentes = new Map();
+
   function previaDeParametro(chave, valor) {
     if (!receitaAberta) return;
     const declarado = parametroDeclarado(receitaAberta, chave);
     if (!declarado) return;
-    const params = comCaminho(receitaAberta.PARAMS, declarado.caminho, valor);
+    pendentes.set(chave, valor);
+    refletirPendencias();
+
+    let params = receitaAberta.PARAMS;
+    for (const [id, v] of pendentes) {
+      const alvo = parametroDeclarado(receitaAberta, id);
+      if (alvo) params = comCaminho(params, alvo.caminho, v);
+    }
     sincronizador?.definirPayload({
       alvo: { nome: idNaUrl ?? nomePecaAtual },
       receita: receitaComParametros(receitaAberta, params),
     });
-  }
-
-  /* Um gesto, uma gravação. O mouse solta uma vez e dispara um `change`, mas o
-     teclado dispara um por tecla: cinco setinhas viravam cinco escritas no
-     arquivo, cada uma reexecutando e conferindo a receita, e o histórico ficava
-     com quatro valores que ninguém escolheu. A gravação espera o valor
-     assentar, e valor novo no meio da espera substitui o anterior.
-
-     Gravar exige o arquivo, e o arquivo só existe para quem roda a bancada a
-     partir do repositório. Na página publicada o atendente não está lá, o
-     `fetch` falha, e o controle segue valendo como prévia — que é a verdade da
-     situação, não um erro a esconder. */
-  const gravacoesPendentes = new Map();
-  const ESPERA_GRAVACAO = 400;
-
-  function gravarParametro(chave, valor) {
-    clearTimeout(gravacoesPendentes.get(chave));
-    gravacoesPendentes.set(chave, setTimeout(() => {
-      gravacoesPendentes.delete(chave);
-      gravarAgora(chave, valor);
-    }, ESPERA_GRAVACAO));
   }
 
   /* Duas portas para o mesmo destino, e o destino é sempre o arquivo da receita.
@@ -286,27 +277,51 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      escreve direto no disco. Quem abre o endereço publicado não tem arquivo
      nenhum, e aí a gravação vai pela API do GitHub com o token da própria
      pessoa, virando um commit. Sem nenhuma das duas, o valor vale como prévia
-     nesta sessão e a bancada diz isso. */
-  const CAMINHO_ACERVO = 'prototipos/procedural/v3/pecas';
+     nesta sessão e a bancada diz isso.
 
-  async function gravarNoAtendenteLocal(chave, valor) {
+     UM SALVAR, UMA GRAVAÇÃO. Gravar a cada gesto encheria o histórico de
+     estados intermediários que ninguém escolheu, dispararia a integração
+     contínua a cada arrasto, e abriria uma janela por gesto para outra pessoa
+     commitar no meio da sequência. */
+  const CAMINHO_ACERVO = 'prototipos/procedural/v3/pecas';
+  const rodapeParametros = document.getElementById('rodapeParametros');
+  const resumoPendentes = document.getElementById('resumoPendentes');
+  const btnSalvarParametros = document.getElementById('btnSalvarParametros');
+
+  function refletirPendencias() {
+    if (!rodapeParametros) return;
+    const quantas = pendentes.size;
+    rodapeParametros.hidden = !receitaAberta;
+    rodapeParametros.classList.toggle('tem-pendencia', quantas > 0);
+    btnSalvarParametros.disabled = quantas === 0;
+    resumoPendentes.textContent = quantas === 0
+      ? 'nada para salvar'
+      : `${quantas} ${quantas === 1 ? 'alteração' : 'alterações'} sem salvar`;
+  }
+
+  async function gravarNoAtendenteLocal(mudancas) {
     const resposta = await fetch('/api/parametro', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ peca: idNaUrl, id: chave, valor }),
+      body: JSON.stringify({ peca: idNaUrl, mudancas }),
     });
     return resposta.json();
   }
 
-  async function gravarAgora(chave, valor) {
+  async function salvarPendentes() {
+    if (pendentes.size === 0) return;
     if (!idNaUrl) {
       mostrarAviso('Esta peça veio da sessão da IA; abra pelo acervo para gravar no arquivo.');
       return;
     }
 
+    const mudancas = Object.fromEntries(pendentes);
+    btnSalvarParametros.disabled = true;
+    mostrarAviso(`Salvando ${pendentes.size} alteração(ões)…`);
+
     let resultado = null;
     try {
-      resultado = await gravarNoAtendenteLocal(chave, valor);
+      resultado = await gravarNoAtendenteLocal(mudancas);
     } catch {
       resultado = null;
     }
@@ -315,34 +330,42 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       const config = lerConfiguracaoRepositorio();
       if (!config) {
         mostrarAviso('O valor vale como prévia: configure o repositório em Configurações para gravar.');
+        refletirPendencias();
         return;
       }
-      mostrarAviso(`Gravando ${chave} no repositório…`);
-      resultado = await gravarParametroNoGitHub({
+      resultado = await gravarParametrosNoGitHub({
         config,
         caminhoNoRepo: `${CAMINHO_ACERVO}/${idNaUrl}.js`,
-        id: chave,
-        valor,
+        mudancas,
       });
     }
 
     if (resultado.estado === 'aplicado') {
-      const alvo = parametroDeclarado(receitaAberta, chave);
-      if (receitaAberta && alvo) {
-        receitaAberta.PARAMS = comCaminho(receitaAberta.PARAMS, alvo.caminho, resultado.para);
+      for (const { id, para } of resultado.aplicadas ?? []) {
+        const alvo = parametroDeclarado(receitaAberta, id);
+        if (receitaAberta && alvo) {
+          receitaAberta.PARAMS = comCaminho(receitaAberta.PARAMS, alvo.caminho, para);
+        }
       }
-      mostrarAviso(`${chave}: ${resultado.de} → ${resultado.para}${resultado.commit ? ', commit publicado' : ', gravado na receita'}.`);
+      pendentes.clear();
+      refletirPendencias();
+      const quantas = resultado.aplicadas?.length ?? 0;
+      mostrarAviso(`${quantas} salva(s)${resultado.commit ? ' num commit' : ' na receita'}.`);
       return;
     }
 
-    mostrarAviso(`Não gravei: ${resultado.motivo}`);
-    previaDeParametro(chave, parametroDeclarado(receitaAberta, chave)?.valor);
+    refletirPendencias();
+    mostrarAviso(`Não salvei: ${resultado.motivo}`);
   }
+
+  btnSalvarParametros?.addEventListener('click', () => { salvarPendentes(); });
 
   const painelParametros = criarPainelParametros({
     container: document.getElementById('containerParametros'),
     aoArrastar: previaDeParametro,
-    aoSoltar: gravarParametro,
+    /* Assentar o valor não grava: só confirma a pendência. Quem grava é o
+       botão. */
+    aoSoltar: previaDeParametro,
   });
 
   const gerenciadorAnotacoes3D = criarGerenciadorAnotacoes3D({
@@ -965,6 +988,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          mesma medição e o mesmo tratamento de erro. */
       idNaUrl = entrada.id;
       receitaAberta = receita;
+      pendentes.clear();
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
     } catch (erro) {

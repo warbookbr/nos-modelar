@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync, renameSync, rmSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from './executar-receita.js';
 import { listarParametrosDeclarados, parametroDeclarado } from './parametros-declarados.js';
-import { comoTexto, trocarNoTexto } from './texto-parametro.js';
+import { aplicarTrocas, comoTexto } from './texto-parametro.js';
 
 function falha(motivo, extra = {}) {
   return { estado: 'falha-recuperavel', motivo, ...extra };
@@ -31,16 +31,18 @@ async function importarDoArquivo(caminho) {
 }
 
 /**
- * Troca o valor de um parâmetro declarado no arquivo da receita.
+ * Troca VÁRIOS parâmetros declarados no arquivo da receita, de uma vez.
  *
- * Devolve `{ estado: 'aplicado', id, de, para }` ou
+ * Uma conferência e uma gravação para o lote inteiro. Troca inválida reprova
+ * tudo: gravar metade deixaria a peça num estado que ninguém pediu.
+ *
+ * Devolve `{ estado: 'aplicado', aplicadas: [{ id, de, para }] }` ou
  * `{ estado: 'falha-recuperavel', motivo }` — e neste segundo caso o arquivo
  * fica byte a byte como estava.
  */
-export async function escreverParametro(caminhoArquivo, id, valor) {
-  if (typeof valor !== 'number' || !Number.isFinite(valor)) {
-    return falha(`valor de '${id}' precisa ser número finito`);
-  }
+export async function escreverParametros(caminhoArquivo, mudancas) {
+  const pedidos = Object.entries(mudancas ?? {});
+  if (pedidos.length === 0) return falha('não veio mudança nenhuma');
 
   let receita;
   try {
@@ -49,24 +51,14 @@ export async function escreverParametro(caminhoArquivo, id, valor) {
     return falha(`não consegui carregar a receita: ${erro.message}`);
   }
 
-  const declarado = parametroDeclarado(receita, id);
-  if (!declarado) {
-    return falha(`'${id}' não é parâmetro declarado desta peça`, {
-      declarados: listarParametrosDeclarados(receita).map((p) => p.id),
-    });
-  }
-  /* `pontoSelimTopo.1` é chave mais casa de coordenada, e a escrita sabe fazer.
-     `secao.raio` é objeto dentro de objeto, e não sabe. */
-  const [chave, segundo, ...resto] = declarado.caminho;
-  const indice = segundo === undefined ? null : Number(segundo);
-  if (resto.length > 0 || (segundo !== undefined && !Number.isInteger(indice))) {
-    return falha(`'${id}' é aninhado em objeto, e a escrita cirúrgica só endereça chave de primeiro nível e casa de coordenada`);
-  }
-
   const original = readFileSync(caminhoArquivo, 'utf8');
-  const troca = trocarNoTexto(original, chave, indice, valor);
-  if (troca.erro) return falha(troca.erro);
-  if (troca.texto === original) return { estado: 'aplicado', id, de: declarado.valor, para: valor, semMudanca: true };
+  const troca = aplicarTrocas(original, mudancas, (id) => parametroDeclarado(receita, id));
+  if (troca.erro) {
+    return falha(troca.erro, { declarados: listarParametrosDeclarados(receita).map((p) => p.id) });
+  }
+  if (troca.texto === original) {
+    return { estado: 'aplicado', aplicadas: troca.aplicadas, semMudanca: true };
+  }
 
   /* O ensaio mora ao lado do original, no mesmo sistema de arquivos, para que a
      troca final seja um `rename` e não uma cópia pela metade. */
@@ -75,35 +67,47 @@ export async function escreverParametro(caminhoArquivo, id, valor) {
     writeFileSync(ensaio, troca.texto, 'utf8');
     const candidata = await importarDoArquivo(ensaio);
 
+    const esperado = new Map(troca.aplicadas.map((a) => [a.id, a.para]));
     const depois = new Map(listarParametrosDeclarados(candidata).map((p) => [p.id, p.valor]));
-    if (depois.get(id) !== Number(comoTexto(valor))) {
-      return falha(`a troca não pegou: '${id}' continua ${depois.get(id)}`);
+    for (const [id, para] of esperado) {
+      if (depois.get(id) !== para) return falha(`a troca não pegou: '${id}' continua ${depois.get(id)}`);
     }
     for (const antes of listarParametrosDeclarados(receita)) {
-      if (antes.id === id) continue;
+      if (esperado.has(antes.id)) continue;
       if (depois.get(antes.id) !== antes.valor) {
         return falha(`a troca mexeu em '${antes.id}' também, de ${antes.valor} para ${depois.get(antes.id)}`);
       }
     }
 
     const execucao = executarReceita(candidata);
-    if (!execucao?.neutro) return falha(`a receita com '${id}' = ${valor} não executa`);
+    if (!execucao?.neutro) return falha('a receita com os valores novos não executa');
 
-    /* Órfão é face ou vértice que ficou sem dono depois da execução, e o motor
-       o relata sem interromper. Um valor que introduz órfão passa por qualquer
-       teste de "executou" e produz peça furada, então a comparação é contra o
-       que o valor ANTIGO já produzia: piorar reprova, empatar passa. */
+    /* Órfão é face ou vértice que ficou sem dono, e o motor o relata sem
+       interromper. Valor que introduz órfão passa por qualquer teste de
+       "executou" e produz peça furada; a comparação é contra o que os valores
+       ANTIGOS já produziam, então piorar reprova e empatar passa. */
     const orfaosAntes = executarReceita(receita).neutro.orfaos?.length ?? 0;
     const orfaosDepois = execucao.neutro.orfaos?.length ?? 0;
     if (orfaosDepois > orfaosAntes) {
-      return falha(`'${id}' = ${valor} deixa ${orfaosDepois} órfão(s), contra ${orfaosAntes} antes`);
+      return falha(`os valores novos deixam ${orfaosDepois} órfão(s), contra ${orfaosAntes} antes`);
     }
 
     renameSync(ensaio, caminhoArquivo);
-    return { estado: 'aplicado', id, de: troca.de, para: Number(comoTexto(valor)) };
+    return { estado: 'aplicado', aplicadas: troca.aplicadas };
   } catch (erro) {
-    return falha(`a receita com '${id}' = ${valor} não executa: ${erro.message}`);
+    return falha(`a receita com os valores novos não executa: ${erro.message}`);
   } finally {
     rmSync(ensaio, { force: true });
   }
+}
+
+/**
+ * Troca o valor de UM parâmetro declarado. Casca fina de `escreverParametros`,
+ * mantida porque o atendente da bancada e as provas falam de um número por vez.
+ */
+export async function escreverParametro(caminhoArquivo, id, valor) {
+  const resultado = await escreverParametros(caminhoArquivo, { [id]: valor });
+  if (resultado.estado !== 'aplicado') return resultado;
+  const [aplicada] = resultado.aplicadas;
+  return { estado: 'aplicado', id, de: aplicada?.de, para: aplicada?.para, ...(resultado.semMudanca ? { semMudanca: true } : {}) };
 }

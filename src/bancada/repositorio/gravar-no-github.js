@@ -21,7 +21,7 @@
 
 import { executarReceita } from '../../autoria/executar-receita.js';
 import { listarParametrosDeclarados, parametroDeclarado } from '../../autoria/parametros-declarados.js';
-import { comoTexto, trocarNoTexto } from '../../autoria/texto-parametro.js';
+import { aplicarTrocas } from '../../autoria/texto-parametro.js';
 
 const CHAVE_CONFIG = 'mecanifica.bancada.repositorio';
 const API = 'https://api.github.com';
@@ -91,20 +91,40 @@ async function executaDoTexto(texto, importar) {
   }
 }
 
+function resumoDaMensagem(aplicadas) {
+  if (aplicadas.length === 1) {
+    const [a] = aplicadas;
+    return `bancada: ${a.id} de ${a.de} para ${a.para}`;
+  }
+  const corpo = aplicadas.map((a) => `- ${a.id}: ${a.de} → ${a.para}`).join('\n');
+  return `bancada: ${aplicadas.length} parâmetros ajustados\n\n${corpo}`;
+}
+
 /**
- * Troca um parâmetro declarado e publica o commit.
+ * Troca parâmetros declarados e publica UM commit com todos.
  *
  * `caminhoNoRepo` é o caminho dentro do repositório, por exemplo
- * `prototipos/procedural/v3/pecas/bicicleta-quadro.js`.
+ * `prototipos/procedural/v3/pecas/bicicleta-quadro.js`. `mudancas` é um objeto
+ * de identificador para valor.
+ *
+ * Um commit por lote, e não por gesto: quem ajusta uma peça mexe em vários
+ * números antes de estar satisfeito, e um commit por número encheria o
+ * histórico de estados que ninguém escolheu, dispararia a integração contínua a
+ * cada um, e abriria uma janela por gesto para outra pessoa commitar no meio.
  */
-export async function gravarParametroNoGitHub({
-  config, caminhoNoRepo, id, valor, mensagem,
+export async function gravarParametrosNoGitHub({
+  config, caminhoNoRepo, mudancas, mensagem,
   buscar = (...a) => fetch(...a),
   importar = (url) => import(/* @vite-ignore */ url),
 }) {
   if (!config) return falha('sem repositório configurado');
-  if (typeof valor !== 'number' || !Number.isFinite(valor)) {
-    return falha(`valor de '${id}' precisa ser número finito`);
+  if (!mudancas || Object.keys(mudancas).length === 0) return falha('não veio mudança nenhuma');
+  /* Conferir o valor ANTES de falar com a rede: `aplicarTrocas` pegaria isto
+     depois, mas só após uma leitura do repositório que já se sabe inútil. */
+  for (const [id, valor] of Object.entries(mudancas)) {
+    if (typeof valor !== 'number' || !Number.isFinite(valor)) {
+      return falha(`valor de '${id}' precisa ser número finito`);
+    }
   }
 
   const endereco = `/repos/${config.dono}/${config.repo}/contents/${caminhoNoRepo}`;
@@ -121,47 +141,35 @@ export async function gravarParametroNoGitHub({
     return falha(`a receita que está no repositório não executa: ${erro.message}`);
   }
 
-  const declarado = parametroDeclarado(receitaAtual, id);
-  if (!declarado) {
-    return falha(`'${id}' não é parâmetro declarado desta peça`, {
-      declarados: listarParametrosDeclarados(receitaAtual).map((p) => p.id),
-    });
+  const troca = aplicarTrocas(original, mudancas, (id) => parametroDeclarado(receitaAtual, id));
+  if (troca.erro) {
+    return falha(troca.erro, { declarados: listarParametrosDeclarados(receitaAtual).map((p) => p.id) });
   }
-
-  const [chave, segundo, ...resto] = declarado.caminho;
-  const indice = segundo === undefined ? null : Number(segundo);
-  if (resto.length > 0 || (segundo !== undefined && !Number.isInteger(indice))) {
-    return falha(`'${id}' é aninhado em objeto, e a troca no texto não o endereça sem ambiguidade`);
-  }
-
-  const troca = trocarNoTexto(original, chave, indice, valor);
-  if (troca.erro) return falha(troca.erro);
   if (troca.texto === original) {
-    return { estado: 'aplicado', id, de: declarado.valor, para: valor, semMudanca: true };
+    return { estado: 'aplicado', aplicadas: troca.aplicadas, semMudanca: true };
   }
 
   let candidata;
   try {
     candidata = await executaDoTexto(troca.texto, importar);
   } catch (erro) {
-    return falha(`a receita com '${id}' = ${valor} não executa: ${erro.message}`);
+    return falha(`a receita com os valores novos não executa: ${erro.message}`);
   }
 
+  const esperado = new Map(troca.aplicadas.map((a) => [a.id, a.para]));
   const depois = new Map(listarParametrosDeclarados(candidata.receita).map((p) => [p.id, p.valor]));
-  if (depois.get(id) !== Number(comoTexto(valor))) {
-    return falha(`a troca não pegou: '${id}' continua ${depois.get(id)}`);
+  for (const [id, para] of esperado) {
+    if (depois.get(id) !== para) return falha(`a troca não pegou: '${id}' continua ${depois.get(id)}`);
   }
   for (const antes of listarParametrosDeclarados(receitaAtual)) {
-    if (antes.id === id) continue;
-    if (depois.get(antes.id) !== antes.valor) {
-      return falha(`a troca mexeu em '${antes.id}' também`);
-    }
+    if (esperado.has(antes.id)) continue;
+    if (depois.get(antes.id) !== antes.valor) return falha(`a troca mexeu em '${antes.id}' também`);
   }
 
   const publicacao = await chamar(config, endereco, {
     method: 'PUT',
     body: JSON.stringify({
-      message: mensagem ?? `bancada: ${id} de ${troca.de} para ${comoTexto(valor)}`,
+      message: mensagem ?? resumoDaMensagem(troca.aplicadas),
       content: paraBase64(troca.texto),
       sha: atual.corpo.sha,
       branch: config.ramo,
@@ -180,9 +188,20 @@ export async function gravarParametroNoGitHub({
 
   return {
     estado: 'aplicado',
-    id,
-    de: troca.de,
-    para: Number(comoTexto(valor)),
+    aplicadas: troca.aplicadas,
     commit: publicacao.corpo.commit?.html_url ?? null,
+  };
+}
+
+/**
+ * Um parâmetro só. Casca fina de `gravarParametrosNoGitHub`, mantida porque as
+ * provas e o aviso da bancada falam de um número por vez.
+ */
+export async function gravarParametroNoGitHub({ id, valor, ...resto }) {
+  const resultado = await gravarParametrosNoGitHub({ ...resto, mudancas: { [id]: valor } });
+  if (resultado.estado !== 'aplicado') return resultado;
+  const [aplicada] = resultado.aplicadas;
+  return {
+    estado: 'aplicado', id, de: aplicada?.de, para: aplicada?.para, commit: resultado.commit ?? null,
   };
 }

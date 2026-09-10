@@ -16,7 +16,7 @@
  * navegador reescrever arquivo da máquina. */
 
 import { resolve, sep } from 'node:path';
-import { escreverParametro } from '../../src/autoria/escrever-parametro.js';
+import { escreverParametros } from '../../src/autoria/escrever-parametro.js';
 
 const RAIZ_ACERVO = resolve(import.meta.dirname, '../../prototipos/procedural/v3/pecas');
 const ROTA = '/api/parametro';
@@ -47,9 +47,12 @@ export async function atenderEscrita(req, res) {
     return responder(res, 400, { estado: 'falha-recuperavel', motivo: 'corpo não é JSON' });
   }
 
-  const { peca, id, valor } = pedido;
-  if (typeof peca !== 'string' || typeof id !== 'string') {
-    return responder(res, 400, { estado: 'falha-recuperavel', motivo: 'informe peca e id' });
+  const { peca, mudancas, id, valor } = pedido;
+  /* Aceita o lote e também o par solto de um parâmetro, que é como as provas de
+     linha de comando falam. */
+  const lote = mudancas ?? (typeof id === 'string' ? { [id]: valor } : null);
+  if (typeof peca !== 'string' || !lote || Object.keys(lote).length === 0) {
+    return responder(res, 400, { estado: 'falha-recuperavel', motivo: 'informe peca e mudancas' });
   }
 
   const arquivo = caminhoNoAcervo(peca);
@@ -57,7 +60,7 @@ export async function atenderEscrita(req, res) {
     return responder(res, 403, { estado: 'falha-recuperavel', motivo: `'${peca}' está fora do acervo` });
   }
 
-  const resultado = await escreverParametro(arquivo, id, valor);
+  const resultado = await escreverParametros(arquivo, lote);
   return responder(res, resultado.estado === 'aplicado' ? 200 : 422, resultado);
 }
 
@@ -66,6 +69,15 @@ export function escritaDeParametro() {
   return {
     name: 'mecanifica-escrita-de-parametro',
     apply: 'serve',
+    /* Salvar mexe num arquivo que o Vite observa, e a recarga automática
+       derrubava a página inteira logo depois de gravar: a peça reabria, câmera
+       e seleção voltavam ao início, e o aviso do que tinha sido salvo sumia
+       antes de alguém ler. A bancada já atualizou os valores em memória quando
+       a gravação voltou, então recarregar não traz informação nova. */
+    handleHotUpdate({ file }) {
+      if (file.startsWith(RAIZ_ACERVO + sep)) return [];
+      return undefined;
+    },
     configureServer(servidor) {
       servidor.middlewares.use(ROTA, (req, res, proxima) => {
         if (req.method !== 'POST') return proxima();

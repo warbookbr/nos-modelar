@@ -1727,3 +1727,26 @@ body.auditoria #cenaBancada {
 
 body.auditoria .barra-controles,
 body.auditoria .recolher { display: none; }
+
+/* ---------- rodapé do painel de parâmetros ----------
+   Mexer é prévia e salvar é gravação, e a separação precisa estar visível: sem
+   este rodapé a pessoa não sabe se o que ela mexeu já saiu do navegador. Uma
+   gravação por gesto encheria o histórico de estados intermediários que ninguém
+   escolheu e dispararia a integração contínua a cada arrasto. */
+.rodape-parametros {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 9px 0 2px;
+  border-top: 1px solid var(--linha);
+  background: var(--painel);
+  color: var(--texto-fraco);
+  font: 600 10px/1.4 ui-monospace, monospace;
+}
+
+.rodape-parametros.tem-pendencia { color: var(--amarelo); }
+.rodape-parametros .botao { flex-shrink: 0; }

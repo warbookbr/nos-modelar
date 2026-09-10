@@ -11,7 +11,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { escreverParametro } from './escrever-parametro.js';
+import { escreverParametro, escreverParametros } from './escrever-parametro.js';
 
 const AREA = mkdtempSync(join(tmpdir(), 'escrever-parametro-'));
 afterAll(() => rmSync(AREA, { recursive: true, force: true }));
@@ -140,6 +140,34 @@ describe('escrever parâmetro na receita', () => {
     const r = await escreverParametro(caminho, 'secao.raio', 9);
     expect(r.estado).toBe('falha-recuperavel');
     expect(r.motivo).toMatch(/aninhado em objeto/);
+    expect(readFileSync(caminho, 'utf8')).toBe(antes);
+  });
+
+  it('grava VÁRIAS trocas de uma vez, numa gravação só', async () => {
+    const caminho = novaPeca();
+    const antes = readFileSync(caminho, 'utf8').split('\n');
+
+    const r = await escreverParametros(caminho, { comprimento: 500, raio: 20, 'ponto.0': -120 });
+    expect(r.estado).toBe('aplicado');
+    expect(r.aplicadas).toEqual([
+      { id: 'comprimento', de: 480, para: 500 },
+      { id: 'raio', de: 17, para: 20 },
+      { id: 'ponto.0', de: -134, para: -120 },
+    ]);
+
+    const depois = readFileSync(caminho, 'utf8').split('\n');
+    expect(depois.filter((linha, i) => linha !== antes[i])).toHaveLength(3);
+  });
+
+  it('lote com uma troca inválida NÃO grava nenhuma das outras', async () => {
+    const caminho = novaPeca();
+    const antes = readFileSync(caminho, 'utf8');
+
+    const r = await escreverParametros(caminho, { comprimento: 500, naoExiste: 3, raio: 20 });
+    expect(r.estado).toBe('falha-recuperavel');
+    expect(r.motivo).toMatch(/naoExiste/);
+    /* Meia gravação é pior que nenhuma: deixaria a peça num estado que ninguém
+       pediu, e sem ninguém saber qual metade entrou. */
     expect(readFileSync(caminho, 'utf8')).toBe(antes);
   });
 

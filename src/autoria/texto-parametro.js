@@ -50,3 +50,50 @@ export function trocarNoTexto(texto, chave, indice, valor) {
   };
 }
 
+
+/* Endereço de parâmetro dentro do texto: `raioTuboSelim` é chave de primeiro
+   nível e `pontoSelimTopo.1` é a casa de uma coordenada. Objeto dentro de
+   objeto não entra, porque localizá-lo no texto é ambíguo. */
+export function enderecoNoTexto(caminho) {
+  const [chave, segundo, ...resto] = caminho;
+  const indice = segundo === undefined ? null : Number(segundo);
+  if (resto.length > 0 || (segundo !== undefined && !Number.isInteger(indice))) return null;
+  return { chave, indice };
+}
+
+/**
+ * Aplica VÁRIAS trocas ao texto de uma vez.
+ *
+ * Existe porque uma sessão de ajuste mexe em vários números, e gravar um por um
+ * produziria um commit por gesto — histórico cheio de estados intermediários que
+ * ninguém escolheu, um disparo de integração contínua para cada um, e uma
+ * janela para outra pessoa commitar no meio da sequência. Aqui as trocas entram
+ * juntas, e quem chama confere UMA vez e grava UMA vez.
+ *
+ * Qualquer troca inválida reprova o lote inteiro: aplicar metade deixaria a peça
+ * num estado que ninguém pediu, e pior, sem ninguém saber qual metade entrou.
+ */
+export function aplicarTrocas(texto, mudancas, declarar) {
+  let atual = texto;
+  const aplicadas = [];
+
+  for (const [id, valor] of Object.entries(mudancas)) {
+    if (typeof valor !== 'number' || !Number.isFinite(valor)) {
+      return { erro: `valor de '${id}' precisa ser número finito` };
+    }
+    const declarado = declarar(id);
+    if (!declarado) return { erro: `'${id}' não é parâmetro declarado desta peça` };
+
+    const endereco = enderecoNoTexto(declarado.caminho);
+    if (!endereco) {
+      return { erro: `'${id}' é aninhado em objeto, e a troca no texto não o endereça sem ambiguidade` };
+    }
+
+    const troca = trocarNoTexto(atual, endereco.chave, endereco.indice, valor);
+    if (troca.erro) return { erro: troca.erro };
+    atual = troca.texto;
+    aplicadas.push({ id, de: troca.de, para: Number(comoTexto(valor)) });
+  }
+
+  return { texto: atual, aplicadas };
+}
