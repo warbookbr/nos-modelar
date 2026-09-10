@@ -9,6 +9,8 @@ import { criarSelecaoBancada } from './criar-selecao.js';
 import { criarSincronizadorSessao } from './sessao/sincronizador.js';
 import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
+import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
+import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { criarPainelParametros } from './parametros/painel-parametros.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
 import {
@@ -143,6 +145,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const valorExplosao = document.getElementById('valorExplosao');
   const btnFocar = document.getElementById('btnFocarSelecao');
   const btnSelecionarConjunto = document.getElementById('btnSelecionarConjunto');
+  const btnWireframeSelecao = document.getElementById('btnWireframeSelecao');
+  const opacidadeSelecao = document.getElementById('opacidadeSelecao');
+  const valorOpacidadeSelecao = document.getElementById('valorOpacidadeSelecao');
   const eixosReferencia = document.getElementById('eixosReferencia');
   const barraReferencia = document.getElementById('barraReferencia');
   const valorReferencia = document.getElementById('valorReferencia');
@@ -179,9 +184,48 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   // Gerenciadores visuais 3D auxiliares
   const gerenciadorReferencias3D = criarGerenciadorReferencias3D({ cena: ambiente.scene });
+  const armazenamentoImagem = criarArmazenamentoImagem();
+  let alvoReferenciaAtual = null;
+  let urlLocalReferencia = null;
+  async function gerarPlanoReferencia(entrada) {
+    if (!modeloAtual || !alvoReferenciaAtual) return null;
+    if (urlLocalReferencia) { URL.revokeObjectURL(urlLocalReferencia); urlLocalReferencia = null; }
+    const url = entrada.blob ? (urlLocalReferencia = URL.createObjectURL(entrada.blob)) : entrada.url;
+    if (!url) return null;
+    const imagem = await new Promise((resolver, rejeitar) => {
+      const elemento = new Image();
+      elemento.onload = () => resolver(elemento);
+      elemento.onerror = rejeitar;
+      elemento.src = url;
+    }).catch(() => null);
+    if (!imagem) return null;
+    const caixa = new THREE.Box3().setFromObject(modeloAtual.raiz);
+    const inicial = criarAlinhamentoInicial({ caixa, larguraImagem: imagem.naturalWidth, alturaImagem: imagem.naturalHeight, lado: entrada.alinhamento?.lado });
+    const ajustes = Object.fromEntries(Object.entries(entrada.alinhamento ?? {}).filter(([, valor]) => valor !== null));
+    const descritor = normalizarImagemReferencia({ ...entrada, url, alinhamento: { ...inicial, ...ajustes } });
+    if (!descritor) return null;
+    const textura = await new Promise((resolver, rejeitar) => new THREE.TextureLoader().load(url, resolver, undefined, rejeitar)).catch(() => null);
+    if (!textura) return null;
+    textura.colorSpace = THREE.SRGBColorSpace;
+    gerenciadorReferencias3D.definirImagemReferencia(descritor, { textura, possuiTextura: true });
+    await armazenamentoImagem.salvar(alvoReferenciaAtual, descritor);
+    return descritor;
+  }
   const painelReferencias = criarPainelReferencias({
     container: document.getElementById('containerReferencias'),
     aoAlternarPrancha: (id, visivel) => gerenciadorReferencias3D.alternarVisibilidade(id, visivel),
+    aoGerarPlano: gerarPlanoReferencia,
+    aoAtualizarAlinhamento: async (alinhamento) => {
+      const atual = gerenciadorReferencias3D.obterImagemReferencia();
+      if (!atual || !alvoReferenciaAtual) return;
+      const atualizado = { ...atual.alinhamento, ...alinhamento };
+      gerenciadorReferencias3D.atualizarImagemReferencia(atualizado);
+      await armazenamentoImagem.salvar(alvoReferenciaAtual, { ...atual, alinhamento: atualizado });
+    },
+    aoRemoverImagem: async () => {
+      gerenciadorReferencias3D.removerImagemReferencia();
+      if (alvoReferenciaAtual) await armazenamentoImagem.remover(alvoReferenciaAtual);
+    },
   });
 
   let sincronizador = null;
@@ -374,12 +418,17 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     botoesModo.contexto.disabled = !temSelecao;
     botoesModo.isolar.disabled = !temSelecao;
     btnFocar.disabled = !temSelecao;
+    btnWireframeSelecao.disabled = !temSelecao;
+    opacidadeSelecao.disabled = !temSelecao;
+    btnWireframeSelecao.classList.toggle('ativa', estado.wireframeSelecao);
     btnSelecionarConjunto.disabled = !temSelecao || !controlador.temDescendentesNaSelecao();
     for (const [nome, botao] of Object.entries(botoesModo)) {
       botao.classList.toggle('ativa', nome === estado.modo);
     }
     explosao.value = String(Math.round(estado.explosao * 100));
     valorExplosao.value = `${Math.round(estado.explosao * 100)}%`;
+    opacidadeSelecao.value = String(Math.round(estado.opacidadeSelecao * 100));
+    valorOpacidadeSelecao.value = `${Math.round(estado.opacidadeSelecao * 100)}%`;
     ambiente.definirExplosao(estado.explosao);
     salvarEstadoNaUrl(estado);
   }
@@ -701,6 +750,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     botao.addEventListener('click', () => controlador?.definirModo(modo));
   }
   explosao.addEventListener('input', () => controlador?.definirExplosao(Number(explosao.value) / 100));
+  btnWireframeSelecao.addEventListener('click', () => controlador?.definirWireframeSelecao(!controlador.estado().wireframeSelecao));
+  opacidadeSelecao.addEventListener('input', () => controlador?.definirOpacidadeSelecao(Number(opacidadeSelecao.value) / 100));
 
   document.getElementById('btnCopiarEstado').addEventListener('click', async () => {
     if (controlador) salvarEstadoNaUrl(controlador.estado());
@@ -760,13 +811,16 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   sincronizador = criarSincronizadorSessao({
     aoMudarStatus: atualizarStatusUI,
-    aoAtualizar(estado, novoModelo, { fonte }) {
+    async aoAtualizar(estado, novoModelo, { fonte }) {
+      alvoReferenciaAtual = estado.alvo?.id ?? alvoReferenciaAtual;
       if (novoModelo) {
         /* Preservar a câmera existe para não arrancar o enquadramento de quem
            está editando ao vivo. Na PRIMEIRA entrega da sessão não há câmera a
            preservar: o enquadramento em vigor foi calculado com a cena vazia, e
            mantê-lo deixava a peça cortada e minúscula na revisão headless. */
         aplicarModelo(novoModelo, { preservarCamera: fonte !== 'manual' && modeloAtual !== null });
+        const salva = alvoReferenciaAtual ? await armazenamentoImagem.ler(alvoReferenciaAtual) : null;
+        if (salva) await gerarPlanoReferencia(salva);
       }
       /* Os painéis são OPCIONAIS: as fábricas devolvem null quando o container
          não existe, e no harness headless ele não existe mesmo. Sem o `?.` a

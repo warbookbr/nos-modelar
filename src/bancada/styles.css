@@ -699,6 +699,37 @@ h2 {
   line-height: 1.4;
 }
 
+.controle-imagem-referencia {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.controle-imagem-referencia input[type="file"],
+.campo-url-referencia {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px dashed var(--linha);
+  border-radius: 6px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--texto);
+  font: inherit;
+}
+
+.controle-referencia {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+}
+
+.controle-referencia > span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.controle-referencia input[type="range"] { width: 100%; accent-color: var(--verde); }
+
 .checklist-ia,
 .lista-criterios {
   list-style: none;
