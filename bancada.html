@@ -24,16 +24,40 @@
       </section>
 
       <div class="barra-controles">
-        <div class="menu-barra">
-          <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="true" aria-expanded="false">Configurações</button>
-          <div id="menuConfiguracoes" class="menu-suspenso" hidden>
+        <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Configurações</button>
+        <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
+        <span id="avisoAtalho" class="aviso-atalho" role="status" aria-live="polite"></span>
+      </div>
+
+      <div id="menuConfiguracoes" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloConfiguracoes" hidden>
+        <div class="modal-backdrop" data-fechar-modal></div>
+        <div class="modal-conteudo">
+          <header class="modal-topo">
+            <div class="modal-titulos">
+              <span class="rotulo">CENA</span>
+              <h3 id="tituloConfiguracoes" class="modal-titulo">Configurações</h3>
+            </div>
+            <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
+          </header>
+          <div class="modal-corpo">
             <label class="linha-menu"><input id="prefGrade" type="checkbox" checked /> <span>Mostrar grade</span></label>
             <label class="linha-menu"><input id="prefChao" type="checkbox" checked /> <span>Mostrar chão</span></label>
           </div>
         </div>
-        <div class="menu-barra">
-          <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="true" aria-expanded="false">Controles</button>
-          <div id="menuAtalhos" class="menu-suspenso largo" hidden>
+      </div>
+
+      <div id="menuAtalhos" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloAtalhos" hidden>
+        <div class="modal-backdrop" data-fechar-modal></div>
+        <div class="modal-conteudo">
+          <header class="modal-topo">
+            <div class="modal-titulos">
+              <span class="rotulo">COMANDOS</span>
+              <h3 id="tituloAtalhos" class="modal-titulo">Controles</h3>
+              <p class="modal-descricao">Clique num comando para trocar a tecla. Esc cancela.</p>
+            </div>
+            <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
+          </header>
+          <div class="modal-corpo">
             <span class="rotulo">TECLADO</span>
             <div id="listaAtalhos" class="lista-atalhos"></div>
             <span class="rotulo">PONTEIRO</span>
@@ -46,7 +70,6 @@
             <button id="btnRestaurarAtalhos" class="botao texto" type="button">Restaurar padrões</button>
           </div>
         </div>
-        <span id="avisoAtalho" class="aviso-atalho" role="status" aria-live="polite"></span>
       </div>
 
       <header class="topo">

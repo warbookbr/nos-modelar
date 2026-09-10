@@ -896,35 +896,42 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     dizerSobreAtalho('Atalhos de volta ao padrão.');
   });
 
-  const menus = [
+  /* Cada botão da barra abre uma janela modal. Ela fecha pelo X, pelo fundo ou
+     por Esc, e não por clique em qualquer lugar: quem está marcando duas caixas
+     seguidas ou escolhendo tecla não pode perder a janela no meio do gesto. */
+  const janelas = [
     ['btnMenuConfiguracoes', 'menuConfiguracoes'],
     ['btnMenuAtalhos', 'menuAtalhos'],
-  ].map(([idBotao, idMenu]) => ({
+  ].map(([idBotao, idJanela]) => ({
     botao: document.getElementById(idBotao),
-    menu: document.getElementById(idMenu),
-  })).filter(({ botao, menu }) => botao && menu);
+    janela: document.getElementById(idJanela),
+  })).filter(({ botao, janela }) => botao && janela);
 
-  function fecharMenus(exceto = null) {
-    for (const { botao, menu } of menus) {
-      if (menu === exceto) continue;
-      menu.hidden = true;
+  function fecharJanelas() {
+    for (const { botao, janela } of janelas) {
+      janela.hidden = true;
       botao.setAttribute('aria-expanded', 'false');
+    }
+    document.body.classList.remove('modal-aberto');
+  }
+
+  for (const { botao, janela } of janelas) {
+    botao.addEventListener('click', () => {
+      const abrir = janela.hidden;
+      fecharJanelas();
+      if (!abrir) return;
+      janela.hidden = false;
+      botao.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('modal-aberto');
+      janela.querySelector('.btn-fechar-modal')?.focus();
+    });
+    for (const gatilho of janela.querySelectorAll('[data-fechar-modal]')) {
+      gatilho.addEventListener('click', () => fecharJanelas());
     }
   }
 
-  for (const { botao, menu } of menus) {
-    botao.addEventListener('click', (evento) => {
-      evento.stopPropagation();
-      const abrir = menu.hidden;
-      fecharMenus(abrir ? menu : null);
-      menu.hidden = !abrir;
-      botao.setAttribute('aria-expanded', String(abrir));
-    });
-    menu.addEventListener('click', (evento) => evento.stopPropagation());
-  }
-  addEventListener('click', () => fecharMenus());
   addEventListener('keydown', (evento) => {
-    if (evento.key === 'Escape' && !registroAtalhos.capturando) fecharMenus();
+    if (evento.key === 'Escape' && !registroAtalhos.capturando) fecharJanelas();
   });
 
   /* Recolher esconde o corpo do painel e deixa a aba de borda. Nada do estado

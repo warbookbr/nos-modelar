@@ -131,6 +131,12 @@ ponteiro para dentro de `Controles` como linhas de leitura. A faixa que o rodap�
 ocupava voltou para a cena, e dica que não faz nada deixou de disputar espaço
 com controle que faz.
 
+Depois do fechamento, os dois botões da barra deixaram de abrir menu suspenso e
+passaram a abrir janela modal com título e X, reaproveitando o modal que já
+existia para a imagem de referência. Menu suspenso fechava a qualquer clique, o
+que atrapalhava marcar duas caixas seguidas ou escolher uma tecla; a janela só
+fecha pelo X, pelo fundo ou por Esc.
+
 Dois defeitos apareceram e foram corrigidos durante a integração. O menu nascia
 aberto e cobria o painel de componentes, porque `display: grid` vence o
 `[hidden]` do navegador e faltava dizer por escrito que escondido é escondido. E
