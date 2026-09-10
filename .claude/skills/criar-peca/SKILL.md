@@ -132,6 +132,14 @@ estrutural, outra coisa, e essa o autor escolhe.
 lista de literais congela os números e faz `PARAMS` virar enfeite, sem aviso.
 `npm run parametros -- <peça>` diz quais estão ligados.
 
+Como `PASSOS` é getter, **não copie a receita com `{...receita}`** para testar um
+parâmetro diferente: o espalhamento AVALIA o getter uma vez com a tabela velha e
+guarda o resultado como valor fixo, então o número novo não tem efeito e a peça
+parece insensível ao parâmetro. Copie por descritores
+(`Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita))`) e só
+então troque `PARAMS`. Medido em
+`tools/mecanifica/ponte-gesto-parametro.test.mjs`.
+
 Quando a função pretendida não for óbvia pela geometria, exporte o contrato
 opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare
 função, família, significado dos eixos locais, invariantes e critérios visuais.
