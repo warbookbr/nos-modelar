@@ -13,9 +13,10 @@
  *
  *   1. a receita já declara as entradas reais em `PARAMS`, e mexer numa delas
  *      move a geometria;
- *   2. o painel de parâmetros da bancada NÃO olha para `PARAMS` — ele varre
- *      argumentos de passo atrás de nomes como `raio`, e na bicicleta esses
- *      argumentos são RESULTADOS da derivação;
+ *   2. o painel de parâmetros da bancada oferece exatamente as entradas de
+ *      `PARAMS` — antes da segunda fatia ele varria argumentos de passo atrás
+ *      de nomes como `raio`, e na bicicleta esses argumentos são RESULTADOS da
+ *      derivação;
  *   3. não existe caminho de escrita: nada na bancada grava valor de parâmetro
  *      na receita.
  *
@@ -26,7 +27,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { extrairParametrosDeReceita } from '../../src/bancada/parametros/painel-parametros.js';
+import { parametrosDoPainel } from '../../src/bancada/parametros/painel-parametros.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
@@ -71,16 +72,22 @@ describe('ponte do gesto ao parâmetro — retrato antes', () => {
     expect(depois).not.toBe(antes);
   });
 
-  it('RETRATO: o painel da bancada não oferece nenhuma entrada de PARAMS', () => {
-    const oferecidos = Object.keys(extrairParametrosDeReceita(receita));
-    /* O painel varre argumentos de passo, então o que ele oferece são raios de
-       tubo já calculados pela derivação — número de saída, não de entrada.
-       Mexer neles não corresponde a decisão nenhuma da tabela medida. */
-    expect(oferecidos.length).toBeGreaterThan(0);
-    expect(oferecidos.every((chave) => /^raio_/.test(chave))).toBe(true);
+  it('o painel oferece exatamente as entradas declaradas em PARAMS', () => {
+    const oferecidos = parametrosDoPainel(receita).map((p) => p.id);
+    const declarados = Object.keys(receita.PARAMS).filter(
+      (chave) => typeof receita.PARAMS[chave] === 'number',
+    );
 
-    const declarados = new Set(Object.keys(receita.PARAMS));
-    expect(oferecidos.filter((chave) => declarados.has(chave))).toEqual([]);
+    /* Era aqui que o painel oferecia `raio_101` e companhia: raios de tubo já
+       calculados pela derivação, número de saída oferecido como entrada. */
+    expect(oferecidos).toEqual(declarados);
+    expect(oferecidos).toContain('tuboSelimComprimento');
+    expect(oferecidos.some((chave) => /^raio_\d+$/.test(chave))).toBe(false);
+  });
+
+  it('peça que não declara PARAMS não ganha controle inventado', () => {
+    const semDeclaracao = { PASSOS: [['cubo', { larg: 2, alt: 3, raio: 5, origemId: 10 }]] };
+    expect(parametrosDoPainel(semDeclaracao)).toEqual([]);
   });
 
   it('RETRATO: não existe caminho que escreva parâmetro na receita', async () => {

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-804 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+806 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -740,6 +740,8 @@
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
+- `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
+- `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
 - `parametros-vivos.js` — parametros-vivos.js — separa liberdade DECLARADA de liberdade REAL.
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.
