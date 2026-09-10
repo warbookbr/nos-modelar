@@ -24,8 +24,23 @@
       </section>
 
       <div class="barra-controles">
+        <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
         <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Configurações</button>
         <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
+      </div>
+
+      <div id="menuAbrir" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloAbrir" hidden>
+        <div class="modal-backdrop" data-fechar-modal></div>
+        <div class="modal-conteudo">
+          <header class="modal-topo">
+            <h3 id="tituloAbrir" class="modal-titulo">Abrir peça</h3>
+            <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
+          </header>
+          <div class="modal-corpo">
+            <p class="modal-descricao">Receitas do acervo em trabalho. A sessão ativa continua chegando pela IA.</p>
+            <div id="listaAcervo" class="linhas"></div>
+          </div>
+        </div>
       </div>
 
       <div id="menuConfiguracoes" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloConfiguracoes" hidden>

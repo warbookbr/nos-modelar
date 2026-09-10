@@ -3,6 +3,7 @@ import './styles.css';
 import * as THREE from 'three';
 import { carregarPeca } from './carregar-peca.js';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
+import { listarAcervo } from './acervo-receitas.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -79,6 +80,12 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   let parInspecionado = null;
   let modeloAtual = null;
   let nomePecaAtual = pecaPedida ?? 'sessao-ativa';
+  /* Identidade endereçável da peça, que não é o nome de exibição. `?peca=` só
+     reabre o que o acervo sabe resolver, e o rótulo do modelo muda com a
+     receita, então guardar o rótulo na URL produz endereço que não abre nada.
+     Vale para a peça pedida na URL e para a escolhida em `Abrir`; a sessão
+     enviada pela IA não é endereçável e limpa isto. */
+  let idNaUrl = pecaPedida ?? null;
   const marcadoresDoPar = [];
 
   function mesmosNomes(a, b) {
@@ -384,7 +391,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   function salvarEstadoNaUrl(estado) {
     if (inicializando || !nomePecaAtual) return;
     const saida = new URLSearchParams();
-    if (pecaPedida) saida.set('peca', nomePecaAtual);
+    if (idNaUrl) saida.set('peca', idNaUrl);
     const estadoDaVista = escreverEstadoNaUrl({
       ...estado,
       vista: vistaAtual,
@@ -805,6 +812,58 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   addEventListener('keydown', atalhoVista);
 
   /* ---------- barra de controles ---------- */
+
+  /* A janela `Abrir` lista o acervo em trabalho, que é diferente do catálogo
+     homologado: o catálogo diz o que foi validado e publicado, e o acervo diz o
+     que existe para modelar agora. Escolher aqui troca a peça da cena sem
+     recarregar a página e sem desligar a sessão ativa, que continua chegando
+     pela IA e sobrescreve quando chegar. */
+  const listaAcervo = document.getElementById('listaAcervo');
+
+  async function abrirDoAcervo(entrada) {
+    try {
+      mostrarAviso(`Abrindo ${entrada.id}…`);
+      const receita = await entrada.carregar();
+      /* O mesmo caminho da sessão ativa, e não um segundo: assim a peça aberta
+         à mão e a peça enviada pela IA chegam à cena pela mesma porta, com a
+         mesma medição e o mesmo tratamento de erro. */
+      idNaUrl = entrada.id;
+      sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
+      if (controlador) salvarEstadoNaUrl(controlador.estado());
+    } catch (erro) {
+      mostrarErro(erro);
+    }
+  }
+
+  function desenharAcervo() {
+    if (!listaAcervo) return;
+    const entradas = listarAcervo();
+    if (!entradas.length) {
+      const vazio = document.createElement('div');
+      vazio.className = 'linha';
+      vazio.textContent = 'O acervo não tem receita nenhuma.';
+      listaAcervo.replaceChildren(vazio);
+      return;
+    }
+    listaAcervo.replaceChildren(...entradas.map((entrada) => {
+      const linha = document.createElement('button');
+      linha.type = 'button';
+      linha.className = 'linha';
+      linha.dataset.receita = entrada.id;
+      const nome = document.createElement('span');
+      nome.textContent = entrada.id;
+      const tipo = document.createElement('kbd');
+      tipo.textContent = entrada.montagem ? 'montagem' : 'peça';
+      linha.append(nome, tipo);
+      linha.addEventListener('click', () => {
+        fecharJanelas();
+        abrirDoAcervo(entrada);
+      });
+      return linha;
+    }));
+  }
+
+  desenharAcervo();
   const preferenciasBancada = criarPreferenciasBancada();
   const prefGrade = document.getElementById('prefGrade');
   const prefChao = document.getElementById('prefChao');
@@ -921,6 +980,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      por Esc, e não por clique em qualquer lugar: quem está marcando duas caixas
      seguidas ou escolhendo tecla não pode perder a janela no meio do gesto. */
   const janelas = [
+    ['btnMenuAbrir', 'menuAbrir'],
     ['btnMenuConfiguracoes', 'menuConfiguracoes'],
     ['btnMenuAtalhos', 'menuAtalhos'],
   ].map(([idBotao, idJanela]) => ({
@@ -1068,8 +1128,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     });
   });
 
-  // Se uma peça estática foi pedida na URL, carrega-a
-  if (pecaPedida && catalogo.length > 0) {
+  /* `?peca=` procura primeiro no acervo em trabalho, que é de onde a janela
+     `Abrir` tira a lista: sem isso o endereço copiado depois de abrir uma peça
+     não devolveria a mesma peça ao recarregar. O catálogo homologado continua
+     valendo como segunda tentativa. */
+  const noAcervo = pecaPedida ? listarAcervo().find((entrada) => entrada.id === pecaPedida) : null;
+  if (noAcervo) {
+    await abrirDoAcervo(noAcervo);
+  } else if (pecaPedida && catalogo.length > 0) {
     try {
       const inicialConvertido = await carregarPeca(pecaPedida, { catalogo });
       aplicarModelo(inicialConvertido, { preservarCamera: false });

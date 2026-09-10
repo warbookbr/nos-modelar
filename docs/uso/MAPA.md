@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-800 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+802 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -756,6 +756,8 @@
 
 ## src/bancada/
 
+- `acervo-receitas.js` — acervo-receitas.js — lista as receitas do acervo para a bancada abrir.
+- `acervo-receitas.test.js` — acervo-receitas.test.js — a lista que a bancada abre vem do acervo inteiro.
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
