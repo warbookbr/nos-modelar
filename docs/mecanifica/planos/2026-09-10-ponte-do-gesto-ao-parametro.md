@@ -4,7 +4,9 @@
 
 **Responsável:** Claude
 
-**Repositório e base:** `nos-mecanifica`, base `e195332`
+**Repositório e base:** `nos-mecanifica`, base `70144b8`
+
+**Referência lida:** `brigsd/nos`, `prototipos/fps/v3/oficina.html`
 
 ## Problema observado
 
@@ -37,6 +39,46 @@ Arrastar um punho na bancada muda **um número declarado da receita**, o arquivo
 é reescrito com esse número e a peça é reexecutada a partir dele — sem passo de
 remendo, sem id literal e sem decimal contínuo gravado.
 
+## O que vem do `brigsd/nos`, e o que não vem
+
+O `nos` tem um editor 3D de manipulação direta já construído e provado, em
+`prototipos/fps/v3/oficina.html`: malha desenhada num canvas 2D sobreposto,
+ordem de acerto do clique declarada (setas, depois vértice, depois face, depois
+câmera), gizmo de três setas com tamanho constante na tela, arrasto travado no
+eixo, extrusão pela normal, ímã, pincel, desfazer e refazer.
+
+Quatro coisas de lá entram neste plano.
+
+A conta do arrasto travado no eixo, que já está resolvida: seta com comprimento
+em mundo igual à distância dividida por oito, avanço igual ao produto do
+deslocamento do mouse pela direção dividido pelo comprimento, zona morta na
+base, e seta apagada e inerte quando aponta para a câmera.
+
+A prévia por reexecução: enquanto o mouse se move, a peça inteira é executada de
+novo e o resultado aparece na tela. Lá o que muda a cada quadro é um passo
+tentativo no fim da lista; aqui será um valor tentativo na tabela. É a mesma
+máquina com carga diferente, e ela dispensa qualquer edição de malha no lugar.
+
+O limite do desfazer, que o `nos` chama de baseline: as operações que vieram do
+arquivo ficam travadas, então Ctrl+Z desfaz o que a pessoa fez na sessão e nunca
+desmonta a peça. Isto não estava previsto neste plano e passa a estar.
+
+O serializador `serializarPeca`, que reescreve a peça como arquivo e a faz
+reabrir idêntica, inclusive preservando declarações do autor — o comentário do
+`meta.simetria` registra que eles já apanharam de perder declaração calada no
+round-trip e consertaram. A fatia de escrita adota essa forma em vez de
+inventar outra.
+
+Uma coisa de lá NÃO entra: como o gesto é gravado. No `nos`, soltar o arrasto
+executa `PASSOS.push(['moveV', { v: selecionado, d }])`, isto é, "mova o vértice
+número 4003 nesta distância". O número é a posição do vértice naquela execução;
+mude o número de lados do cilindro acima e ele passa a ser outro vértice, e o
+passo deforma o lugar errado sem gritar. Lá isso é coerente, porque a peça É a
+lista de passos e acrescentar no fim é a forma natural de editar. Aqui a peça é
+uma tabela medida mais o código que deriva os passos, então acrescentar no fim é
+remendo sobre valor calculado. Neste plano, soltar o arrasto grava um número com
+nome na tabela.
+
 ## Filtro Agent-First
 
 `varrer-peca.mjs` é **USADO DIRETO** como origem da ligação entre geometria e
@@ -48,7 +90,9 @@ porque hoje a bicicleta declara em `TABELA`, o contrato do núcleo fala em
 mesma coisa é custo de contexto puro e a terceira responde errado. A escrita na
 receita é **ENVOLVIDA** num serviço com validação e falha total, e não exposta
 como edição de arquivo, para que a mesma porta sirva à bancada e ao perfil de
-autoria do MCP. O movimento livre de face e vértice é **ADIADO**: ele exige a
+autoria do MCP. O editor do `nos` é **REFATORADO** na parte de interação e **NÃO PORTADO** na
+parte de gravação, pelo motivo da seção acima. O movimento livre de face e
+vértice é **ADIADO**: ele exige a
 camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
 
 ## Incluído
@@ -59,7 +103,8 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
   forma transacional e reexecutando antes de gravar;
 - ligação entre parte e parâmetro derivada da varredura de sensibilidade;
 - punhos por eixo na parte selecionada, ligados a um parâmetro declarado, com
-  encaixe em passo legível;
+  encaixe em passo legível e prévia por reexecução da receita;
+- desfazer limitado à sessão, sem alcançar o estado que veio do arquivo;
 - prova de que arrastar e digitar o mesmo valor produzem o mesmo arquivo.
 
 ## Excluído
@@ -79,8 +124,11 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
    gravado reproduz a geometria vista na tela;
 3. escrita recusada não altera o arquivo, e o erro diz qual parâmetro e por quê;
 4. arrastar e digitar o mesmo valor produzem arquivos idênticos byte a byte;
-5. nenhum passo novo aparece na receita por causa de um arrasto;
-6. o retrato de parâmetros e os vinte gates continuam verdes.
+5. nenhum passo novo aparece na receita por causa de um arrasto, e nenhum id
+   literal de vértice ou face é escrito;
+6. desfazer para no estado que veio do arquivo e devolve a receita byte a byte
+   ao que estava ao abrir;
+7. o retrato de parâmetros e os vinte gates continuam verdes.
 
 ## Fatias
 
@@ -102,9 +150,15 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
    lista os parâmetros que o governam, e um parâmetro inerte não aparece em
    parte nenhuma.
 5. **Punhos.** Setas por eixo na parte selecionada, cada uma ligada a um
-   parâmetro pela ligação da fatia anterior. O arrasto pré-visualiza, encaixa em
-   passo legível e grava ao soltar. Prova: arrastar até um valor e digitar o
-   mesmo valor produzem o mesmo arquivo; soltar fora do limite não grava.
+   parâmetro pela ligação da fatia anterior, com a geometria e a conta do
+   arrasto vindas do `nos`. Durante o arrasto a receita é reexecutada com o
+   valor tentativo, sem tocar na malha em memória. Prova: arrastar até um valor
+   e digitar o mesmo valor produzem o mesmo arquivo; soltar fora do limite não
+   grava.
+6. **Desfazer da sessão.** Ctrl+Z devolve o valor anterior de cada parâmetro
+   alterado nesta sessão, e para no estado que veio do arquivo. Prova: desfazer
+   além do início da sessão não altera o arquivo, e o texto da receita volta
+   byte a byte ao que estava ao abrir.
 
 ## Riscos e parada
 
