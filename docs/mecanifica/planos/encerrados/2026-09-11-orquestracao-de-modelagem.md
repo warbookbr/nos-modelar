@@ -1,6 +1,6 @@
 # Orquestração de modelagem — alinhamento, despacho e veredito
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude
 
@@ -156,4 +156,27 @@ bloqueio.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+**Concluído** em 2026-09-11, nos commits `0dd86da` a este, com vinte e um gates
+verdes — um a mais que antes, o `guarda:acervo`.
+
+O que passou a reprovar: contato declarado que não acontece, parte prometida e
+não entregue, parte entregue sem promessa, peça do acervo sem plano de
+modelagem, veredito em prosa, e defeito apontado em parte que não existe. O que
+passou a parar sozinho: o laço, por fechamento, por limite ou por três rodadas
+julgadas sem os defeitos caírem.
+
+Os três papéis estão separados por arquivo e por ferramenta: o crítico continua
+com `Read` apenas, o modelador não aprova nem decide parada, e quem orquestra
+não edita veredito nem receita. Um teste recusa agente que cite o objeto da vez.
+
+Desvios do desenho original, ambos registrados no corpo do plano: o `INTENCAO`
+não foi ampliado e o `PLANO` nasceu como contrato ao lado, para não quebrar a
+validação estrita e a assinatura das receitas que já o declaram; e os contatos
+continuaram onde já eram medidos, em vez de migrarem para o plano.
+
+Devolvido ao backlog, e é o que limita o resultado: a medida de ângulo e
+comprimento contra a imagem de referência não foi feita, então reprovação por
+proporção ainda depende do olho do revisor. Se as rodadas mostrarem que ele
+oscila, essa medida deixa de ser trabalho posterior e vira bloqueio. Falta
+também rodar o laço de ponta a ponta numa peça nova, com agentes de verdade: o
+que está provado é o mecanismo, não a convergência.

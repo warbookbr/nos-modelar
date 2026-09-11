@@ -18,6 +18,11 @@ O produto desta rodada é um arquivo, e não um acordo de conversa. Ele é o
 por `npm run guarda:acervo`. Enquanto a combinação viver no diálogo, ela volta a
 ser conselho, e conselho é ignorado sob pressão de terminar.
 
+Uma rodada inteira já respondida está em
+[`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md):
+as sete perguntas com as respostas de uma peça real, as decisões que não cabem
+em campo nenhum, e as duas falhas que motivaram o plano a existir.
+
 ## Como conduzir
 
 Pergunte na ordem abaixo, uma pergunta por vez, e escreva o que for sendo

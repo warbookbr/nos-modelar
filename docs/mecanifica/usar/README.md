@@ -13,6 +13,7 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 
 | se a tarefa é | skill | contrato |
 | --- | --- | --- |
+| combinar o que modelar, antes do primeiro passo | `alinhar-modelagem` | [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](RODADA-DE-ALINHAMENTO-EXEMPLO.md) |
 | criar ou refinar uma peça | `criar-peca` | [`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md), [`INTENCAO-PECA-V1.md`](INTENCAO-PECA-V1.md) |
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | conferir um conjunto montado | `auditar-montagem` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
@@ -29,7 +30,6 @@ usados, porque lista repetida em dois lugares envelhece em duas velocidades.
 [`LACO-VISUAL.md`](LACO-VISUAL.md) reúne as quatro regras que valem em qualquer
 tarefa que produza forma: olhar o PNG, sobrepor ao alvo, despachar o crítico sem
 contexto e saber onde o método diagnóstico para de render.
-
 
 [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md) é o registro do que já
 falhou e não pode se repetir. Malha fechada não é objeto bom, métrica verde não

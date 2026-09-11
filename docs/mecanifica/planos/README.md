@@ -2,15 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** [orquestração de modelagem](2026-09-11-orquestracao-de-modelagem.md).
+**Plano ativo:** nenhum.
 
-Quem modela hoje também aprova o que modelou, e trabalho torto passa por isso: a
-prancha declarada reta estava torta, e um defeito de ângulo foi respondido com
-translação. O plano separa três papéis — quem alinha, quem modela e quem julga —,
-escreve o plano de modelagem como arquivo antes de qualquer geometria, e põe no
-laço as medidas de contato que já existem. A primeira metade dessa última parte
-já foi feita fora do plano: contato declarado que não acontece passou a reprovar
-e `guarda:contatos` mede o acervo a cada gate.
+A [orquestração de modelagem](encerrados/2026-09-11-orquestracao-de-modelagem.md)
+foi **concluída** em 2026-09-11. Quem modela deixou de aprovar o que modelou: a
+peça declara em `PLANO` o que promete ser, `guarda:acervo` cobra isso a cada
+gate, o revisor devolve defeitos em vocabulário fechado onde ângulo e posição
+não trocam de sentido, e a decisão de parar saiu da sessão para `proximaAcao`,
+que lê os números da rodada. Cada rodada fica registrada com o veredito que a
+motivou. O que não foi feito, e limita o resultado: a medida de ângulo e
+comprimento contra a imagem de referência, sem a qual reprovar por proporção
+ainda depende do olho.
 
 A [ponte do gesto ao parâmetro nomeado](encerrados/2026-09-10-ponte-do-gesto-ao-parametro.md)
 foi **concluída** em 2026-09-11. A bancada passou a oferecer os números que a
