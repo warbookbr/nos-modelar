@@ -99,6 +99,22 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   const registroDeEventos = criarRegistroDeEventos();
   const estadoDaBancada = { sessao: 'desconectado', faceSemIdentidade: 0, peca: null, origem: null };
 
+  /* Quem escolheu a peça manda. A bancada relê `sessao-ativa.json` a cada
+     segundo e meio, e até aqui qualquer leitura trocava o modelo em cena. Quem
+     acabava de abrir uma peça em `Abrir` a via ser substituída pela peça do
+     arquivo sem tocar em nada, e perdia a seleção, o enquadramento e os
+     parâmetros em prévia junto. A entrega da sessão continua chegando: fica
+     guardada e aparece como oferta, que carrega num clique. */
+  let escolhaManual = false;
+  let entregaDaSessaoEmEspera = null;
+
+  function oferecerEntregaDaSessao(nome) {
+    const oferta = document.getElementById('avisoSessaoNova');
+    if (!oferta) return;
+    oferta.hidden = entregaDaSessaoEmEspera === null;
+    oferta.textContent = `A sessão da IA trouxe ${nome}. Carregar.`;
+  }
+
   function atualizarAvisoDeEstado() {
     const aviso = document.getElementById('avisoEstado');
     const selo = document.getElementById('selo-estado');
@@ -1175,6 +1191,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          arquivo desta peça, e a pilha da anterior não pode sobreviver. */
       historicoParametros.limpar();
       origemDosParametros = new Map();
+      escolhaManual = true;
+      entregaDaSessaoEmEspera = null;
+      oferecerEntregaDaSessao('');
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
       await oferecerSobreposicaoDaPeca(entrada.id, receita);
@@ -1456,9 +1475,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     atualizarAvisoDeEstado();
   }
 
-  sincronizador = criarSincronizadorSessao({
-    aoMudarStatus: atualizarStatusUI,
-    async aoAtualizar(estado, novoModelo, { fonte }) {
+  /* O corpo da entrega saiu do retorno de chamada para poder ser executado
+     também quando a pessoa aceita uma entrega que ficou em espera. */
+  async function aplicarEntregaDaSessao(estado, novoModelo, fonte) {
       alvoReferenciaAtual = estado.alvo?.id ?? alvoReferenciaAtual;
       if (novoModelo) {
         /* Preservar a câmera existe para não arrancar o enquadramento de quem
@@ -1485,11 +1504,34 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       });
       gerenciadorAnotacoes3D.sincronizarAnotacoes(estado.anotacoes);
       renderizarListaAnotacoes(estado.anotacoes);
+  }
+
+  sincronizador = criarSincronizadorSessao({
+    aoMudarStatus: atualizarStatusUI,
+    async aoAtualizar(estado, novoModelo, { fonte }) {
+      if (novoModelo && escolhaManual && fonte === 'arquivo') {
+        const nome = formatarNome(novoModelo.rotulo);
+        entregaDaSessaoEmEspera = { estado, novoModelo };
+        registroDeEventos.registrar('alerta', 'Entrega da sessão em espera', nome);
+        oferecerEntregaDaSessao(nome);
+        return;
+      }
+      await aplicarEntregaDaSessao(estado, novoModelo, fonte);
     },
     aoErro(erro) {
       console.error('Erro na sessão ativa:', erro);
       mostrarAviso(`Erro na sincronização: ${erro.message}`);
     },
+  });
+
+  document.getElementById('avisoSessaoNova')?.addEventListener('click', async () => {
+    if (!entregaDaSessaoEmEspera) return;
+    const { estado, novoModelo } = entregaDaSessaoEmEspera;
+    entregaDaSessaoEmEspera = null;
+    escolhaManual = false;
+    oferecerEntregaDaSessao('');
+    registroDeEventos.registrar('informacao', 'Entrega da sessão aceita', formatarNome(novoModelo.rotulo));
+    await aplicarEntregaDaSessao(estado, novoModelo, 'arquivo');
   });
 
   // Listener para botão de demonstração
@@ -1545,6 +1587,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   } else if (pecaPedida && catalogo.length > 0) {
     try {
       const inicialConvertido = await carregarPeca(pecaPedida, { catalogo });
+      escolhaManual = true;
       aplicarModelo(inicialConvertido, { preservarCamera: false });
     } catch (erro) {
       mostrarErro(erro);
