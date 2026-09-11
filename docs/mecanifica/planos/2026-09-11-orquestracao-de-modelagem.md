@@ -50,7 +50,7 @@ validação e a assinatura que já tem.
 deve descobrir de onde as imagens vieram. Muda só a saída, que passa de nota e
 prosa para defeitos nomeados.
 
-Modelador: **CRIAR**. Não existe. O `game-builder` implementa mudanças no
+Modelador: **CRIAR**. Não existe. O `implementador` implementa mudanças no
 repositório e não é um autor de peça; `revisor-adversarial` julga código e não
 forma. Sem um modelador com papel próprio, quem modela é a sessão principal,
 que também é quem aprova.
