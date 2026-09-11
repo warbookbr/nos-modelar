@@ -56,14 +56,28 @@ try {
   ok('(a) a bancada sobe pela URL canônica', await esperarBancada(page));
 
   const caixa = await page.locator('#cenaBancada').boundingBox();
+  /* Formas do ponteiro colhidas DURANTE o arrasto. A órbita gira a câmera, e o
+     raio que decide a forma do cursor entrava e saía da peça a cada passo: o
+     ponteiro piscava entre seta e mão no meio do gesto. Enquanto o botão está
+     apertado a forma tem de ser uma só. */
+  const formasNoArrasto = [];
+  const formaDoCursor = () => page.$eval('#cenaBancada', (el) => el.style.cursor);
   if (caixa) {
     const x = caixa.x + caixa.width * 0.5;
     const y = caixa.y + caixa.height * 0.5;
     await page.mouse.move(x, y);
     await page.mouse.down();
-    await page.mouse.move(x + 120, y - 65, { steps: 8 });
+    for (let passo = 1; passo <= 8; passo += 1) {
+      await page.mouse.move(x + passo * 15, y - passo * 8);
+      formasNoArrasto.push(await formaDoCursor());
+    }
     await page.mouse.up();
   }
+  ok('(a2 ★) o ponteiro não muda de forma durante o arrasto',
+    formasNoArrasto.length > 0 && new Set(formasNoArrasto).size === 1 && formasNoArrasto[0] === 'grabbing',
+    [...new Set(formasNoArrasto)].join(' | '));
+  ok('(a3) ao soltar, o ponteiro volta a responder ao que está sob ele',
+    ['grab', 'pointer'].includes(await formaDoCursor()), await formaDoCursor());
   await page.waitForTimeout(180);
   const urlLivre = page.url();
   const estadoLivre = await page.evaluate(() => window.__mecanificaBancada.estado());
