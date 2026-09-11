@@ -456,7 +456,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-10-ponte-do-gesto-ao-parametro.md` — Ponte do gesto ao parâmetro nomeado
 - `2026-09-11-orquestracao-de-modelagem.md` — Orquestração de modelagem — alinhamento, despacho e veredito
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -545,6 +544,7 @@
 - `2026-09-07-parametro-que-move-a-peca.md` — Parâmetro que move a peça
 - `2026-09-08-esquecer-precisa-falhar.md` — Esquecer precisa falhar
 - `2026-09-09-bancada-referencias-e-controles.md` — 2026-09-09 — referências visuais e controles da bancada
+- `2026-09-10-ponte-do-gesto-ao-parametro.md` — Ponte do gesto ao parâmetro nomeado
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

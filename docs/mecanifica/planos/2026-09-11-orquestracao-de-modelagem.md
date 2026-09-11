@@ -1,6 +1,6 @@
 # Orquestração de modelagem — alinhamento, despacho e veredito
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Responsável:** Claude
 

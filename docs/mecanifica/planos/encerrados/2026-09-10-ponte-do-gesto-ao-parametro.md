@@ -1,6 +1,6 @@
 # Ponte do gesto ao parâmetro nomeado
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude
 
@@ -101,18 +101,13 @@ camada de tradução e a marca de dívida, e nada nele bloqueia este resultado.
 
 ## Incluído
 
-- pergunta única que devolve os parâmetros declarados de uma receita, com valor
-  atual, limites e unidade;
-- serviço de escrita que troca valores de parâmetros declarados na receita, em
-  lote, de forma transacional e reexecutando antes de gravar;
-- as duas portas para esse serviço: o atendente no servidor de desenvolvimento,
-  que escreve no arquivo local, e a API de conteúdo do GitHub, que faz a bancada
-  publicada virar commit;
+- pergunta única que devolve os parâmetros declarados, com valor, limites e
+  unidade;
+- escrita transacional em lote, reexecutando antes de gravar, com duas portas: o
+  atendente do servidor de desenvolvimento e a API de conteúdo do GitHub;
 - ligação entre parte e parâmetro derivada da varredura de sensibilidade;
-- controles ligados aos parâmetros declarados, com prévia por reexecução da
-  receita e botão de salvar que grava o lote;
-- setas por eixo na parte selecionada, ligadas a um parâmetro pela ligação
-  medida, com a conta do arrasto vinda do `nos`;
+- controles e setas por eixo ligados a essa medida, com prévia por reexecução e
+  botão de salvar que grava o lote;
 - desfazer limitado à sessão, sem alcançar o estado que veio do arquivo;
 - prova de que arrastar e digitar o mesmo valor produzem o mesmo arquivo.
 
@@ -197,4 +192,8 @@ dizer isso em vez de cair no id literal por baixo do pano.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+**Concluído** em 2026-09-11, commits `54778d1` a `60a5f31`, vinte gates verdes.
+As sete fatias saíram, com a aceitação em
+`tools/mecanifica/ponte-gesto-parametro.test.mjs`. Fica pendente a conferência
+do desfazer no navegador pelo autor, e volta ao backlog o controle de parte cuja
+forma nasce de curva medida, pelo motivo já registrado nos riscos.

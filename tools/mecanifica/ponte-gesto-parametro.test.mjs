@@ -1,6 +1,6 @@
 /* ponte-gesto-parametro.test.mjs — RETRATO DO ESTADO ANTES DA PONTE.
  *
- * Plano ativo: `docs/mecanifica/planos/2026-09-10-ponte-do-gesto-ao-parametro.md`.
+ * Plano ativo: `docs/mecanifica/planos/encerrados/2026-09-10-ponte-do-gesto-ao-parametro.md`.
  *
  * A bancada vai ganhar punhos para o usuário arrastar. O destino do arrasto
  * precisa ser um número declarado da receita, e não um passo novo com id

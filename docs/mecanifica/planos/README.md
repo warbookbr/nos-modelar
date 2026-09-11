@@ -2,23 +2,24 @@
 
 ## Estado
 
-**Plano ativo:** [ponte do gesto ao parâmetro nomeado](2026-09-10-ponte-do-gesto-ao-parametro.md).
+**Plano ativo:** [orquestração de modelagem](2026-09-11-orquestracao-de-modelagem.md).
 
-Em rascunho, aguardando o fim do plano ativo: a
-[orquestração de modelagem](2026-09-11-orquestracao-de-modelagem.md). Quem
-modela hoje também aprova o que modelou, e trabalho torto passa por isso — a
+Quem modela hoje também aprova o que modelou, e trabalho torto passa por isso: a
 prancha declarada reta estava torta, e um defeito de ângulo foi respondido com
-translação. O rascunho separa três papéis, escreve o plano de modelagem antes
-de qualquer geometria e põe no laço as medidas de contato que já existem e
-ficaram fora do caminho.
+translação. O plano separa três papéis — quem alinha, quem modela e quem julga —,
+escreve o plano de modelagem como arquivo antes de qualquer geometria, e põe no
+laço as medidas de contato que já existem. A primeira metade dessa última parte
+já foi feita fora do plano: contato declarado que não acontece passou a reprovar
+e `guarda:contatos` mede o acervo a cada gate.
 
-A bancada vai ganhar controle direto para o usuário mover geometria, e o desenho
-atual das receitas não recebe esse gesto sem estragar: a bicicleta não tem
-posição escrita, tem posição derivada de uma tabela, e as operações de mover
-vértice, aresta e face só aceitam id literal, que é a referência que o
-`CLAUDE.md` proíbe persistir. O plano constrói a ponte que falta, do gesto até
-um número declarado da receita, e deixa o movimento livre e a criação de
-primitivos pela interface de fora.
+A [ponte do gesto ao parâmetro nomeado](encerrados/2026-09-10-ponte-do-gesto-ao-parametro.md)
+foi **concluída** em 2026-09-11. A bancada passou a oferecer os números que a
+receita declara em `PARAMS`, com setas por eixo na parte selecionada ligadas ao
+parâmetro que a varredura de sensibilidade apontou, prévia por reexecução, botão
+de salvar que grava o lote — no arquivo local ou como commit pela API do GitHub —
+e desfazer de sessão que para no estado que veio do arquivo. Arrastar e digitar o
+mesmo valor produzem o mesmo arquivo, e nenhum gesto escreve passo novo nem id
+literal de vértice.
 
 As [referências visuais e controles da bancada](encerrados/2026-09-09-bancada-referencias-e-controles.md),
 com o desenho em
