@@ -1502,6 +1502,27 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       return [...modeloAtual.partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
     },
     get estatisticas() { return modeloAtual?.estatisticas ?? null; },
+    /* A imagem de referência COMO ESTÁ NA CENA, e não a requisição que a
+       trouxe. A guarda da pasta da peça afirmava só que o navegador pediu o
+       arquivo e recebeu 200; com isso, a sobreposição podia falhar em virar
+       plano na cena — textura recusada, alinhamento inválido, malha não
+       adicionada — e a prova continuaria verde. É a mesma classe de defeito que
+       o painel de portas já teve: verde pelo motivo errado. */
+    get imagemReferencia() {
+      const descritor = gerenciadorReferencias3D.obterImagemReferencia();
+      if (!descritor) return null;
+      const malha = ambiente.scene.getObjectByName('__imagem_referencia__');
+      return {
+        id: descritor.id,
+        rotulo: descritor.rotulo,
+        url: descritor.url ?? null,
+        naCena: Boolean(malha),
+        visivel: Boolean(malha?.visible),
+        comTextura: Boolean(malha?.material?.map),
+        largura: malha?.geometry?.parameters?.width ?? null,
+        altura: malha?.geometry?.parameters?.height ?? null,
+      };
+    },
     get diagnosticos() {
       if (!modeloAtual) return null;
       return { facesSemParte: modeloAtual.medida?.facesSemParte ?? [] };

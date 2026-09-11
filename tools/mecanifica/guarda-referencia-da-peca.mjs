@@ -89,15 +89,31 @@ try {
   await pagina.waitForTimeout(4000);
 
   const sobreposicao = imagens.find((i) => /sobreposicao/i.test(i.pathname));
+  const naCena = await pagina.evaluate(() => window.__mecanificaBancada?.imagemReferencia ?? null);
   ok('a página não emitiu erro', errosDaPagina.length === 0, errosDaPagina[0] ?? '');
   ok('a bancada pediu a sobreposição da peça', Boolean(sobreposicao), sobreposicao?.pathname ?? 'nenhuma imagem de peça foi pedida');
   ok('a sobreposição foi servida pelo pacote construído', sobreposicao?.status === 200, `status ${sobreposicao?.status ?? '—'}`);
+  /* A REQUISIÇÃO NÃO É A PROVA. Pedir o arquivo e receber 200 diz que o pacote
+     publicou a imagem; não diz que ela virou plano na cena. Textura recusada,
+     alinhamento inválido ou malha não adicionada deixariam a requisição verde e
+     a tela sem referência nenhuma. */
+  ok('a imagem virou plano na cena', naCena?.naCena === true, JSON.stringify(naCena));
+  ok('o plano carrega a textura', naCena?.comTextura === true);
+  ok('o plano tem tamanho', (naCena?.largura ?? 0) > 0 && (naCena?.altura ?? 0) > 0,
+    `${naCena?.largura} x ${naCena?.altura}`);
+  ok('a referência na cena é a declarada pela peça', /sobreposicao/i.test(naCena?.rotulo ?? ''),
+    naCena?.rotulo ?? '—');
   ok('nenhuma imagem da peça faltou', imagens.every((i) => i.status === 200),
     imagens.filter((i) => i.status !== 200).map((i) => `${i.status} ${i.pathname}`).join(', '));
   /* `public/referencias/` não existe mais, e a prova falha se alguém a
      recriar: cópia em `public/` é o estado que esta mudança desfez. */
   ok('não há cópia de referência em `public/`', !existsSync(join(REPO, 'public/referencias')));
 
+  /* A foto é de quem confere no olho, então ela precisa enquadrar o que a
+     afirmação mede. Em perspectiva o plano fica de lado e sai do quadro; a
+     vista lateral é a que mostra a sobreposição sobre o modelo. */
+  await pagina.keyboard.press('3');
+  await pagina.waitForTimeout(1200);
   mkdirSync(OUT, { recursive: true });
   await pagina.screenshot({ path: join(OUT, 'guarda-referencia-da-peca.png') });
 } finally {
