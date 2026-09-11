@@ -26,6 +26,12 @@ passe na bancada como corpo único sem face órfã e que alguém olhe e reconhe�
 como carro antes de qualquer ajuste. No dia em que isso existir, este plano
 volta como está.
 
+## Revisão de 2026-09-11: continua congelado, sem alteração
+
+A condição não foi atingida: não existe casca base de carro no acervo, que hoje
+tem uma peça. Nada neste plano foi refutado e nada nele custa manutenção, porque
+ele nunca produziu arquivo. Fica como está até a casca existir.
+
 ## O que fica parado junto
 
 Nada de código. Este plano nunca chegou a produzir arquivo; o que existe é o

@@ -5,22 +5,10 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 [`AUTORIA-IA.md`](../AUTORIA-IA.md) e
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
-| Candidato | Estado / próximo recorte |
+| Candidato | Próximo recorte |
 |---|---|
-| Plataforma procedural extensível e descobrível | **ativo** em `2026-08-18-plataforma-procedural-extensivel.md`; R00 mapeia dependências e fixa a linha de base antes da extração modular |
-| Separação espacial e impacto local | concluído na montagem v3; relação direcional genérica + mapa derivado, sem colisão geral |
-| Auditoria de interseções em montagens | concluído e aprovado em `2026-08-18-auditoria-intersecoes-montagem.md`; malha neutra, contenção, cobertura explícita e MCP, sem solver ou folga universal |
-| Caso 3 da homologação | retirado; a pergunta foi respondida com evidência mais forte |
 | Formato canônico de montagem recursiva | definir o menor formato que instancia peças e montagens, preserva identidade e não copia autoria geométrica |
-| Mapa de composição e dependências | concluído e aprovado: universo explícito, mapa derivado, impacto global MCP, continuidade ativa e recusa concorrente |
-| Contexto de trabalho da IA | contexto estrutural, visual e roteiro de revalidação concluídos |
-| Revalidação de dependentes | concluída no plano `2026-08-14-revalidacao-cascata-persistida.md`; promoção automática de dependentes permanece fora |
-| Escrita transacional de receitas e montagens | concluída para montagem e receita declarativa; continuidade no catálogo aprovada no MCP v5 |
-| Leitura e auditoria de montagem por MCP | concluído: aprovar; descoberta explícita, contexto, revalidação, catálogo e vistas sem escrita |
-| Autoria por MCP | montagem e receita declarativa concluídas em perfil opt-in; módulos JS históricos permanecem fora |
-| Experimento de autoria geométrica do zero | concluído: correção publicada por autoria declarativa; decisão final aprovar |
-| Autoria segura de receitas | concluída para contrato declarativo v1 e MCP opt-in; revisão ativa já alimenta o catálogo, módulos JS históricos permanecem fora |
-| Alteração semântica compacta | candidato posterior ao mapa: mudar por ID/campo, recompor documento completo e confirmar bytes finais |
+| Alteração semântica compacta | mudar por ID/campo, recompor documento completo e confirmar bytes finais |
 | Histórico operacional e variantes | comparar, reativar como nova transição e ramificar sem mover estado ativo implicitamente |
 | Onboarding e custo de contexto | medir leitura e inspeção com o MCP aprovado, sem confundir economia de contexto com capacidade de autoria |
 | Seleção de contexto pela IA | medir como a IA escolhe alvos, pares, subárvores e conjuntos sem carregar o sistema inteiro |
@@ -29,9 +17,18 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Endereço único para grupo linear | capacidade semântica aberta |
 | Abertura oblonga | ainda não expressável; não simular com pintura |
 | Contrato genérico de materiais | capacidade futura, sem PBR ou paleta nova por implicação |
-| Movimento e espaço varrido | futuro; exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
+| Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
-| Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos (colmo e furo) geram tubo aberto nas extremidades; o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha fica não-manifold, volume incalculável e exportação STEP falha em sólido. Afeta qualquer peça oca (tubo, bucha, cilindro vazado). Sem contorno possível hoje |
+| Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos geram tubo aberto nas extremidades, e o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha não-manifold, volume incalculável, STEP falha em sólido. Afeta qualquer peça oca. Sem contorno hoje |
+| Medida de ângulo e comprimento contra a imagem de referência | sem ela, reprovar por proporção depende do olho do revisor; o laço de modelagem registrou isso como o que limita o resultado dele |
+| Curva medida como parâmetro | parte cuja forma nasce de polilinha, como o tubo inferior da bicicleta, continua sem controle na bancada: a leitura desce em coordenada e para em lista de listas |
+| Módulo compartilhado de tubos | `secao` e `tuboPerfilado` vivem dentro de `bicicleta-quadro.js`; a próxima peça que quiser tubo achatado recria as duas |
+
+Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
+descreviam trabalho entregue, e candidato entregue não é candidato: o registro
+de cada um está em [`encerrados/README.md`](encerrados/README.md), que é onde se
+procura o que já foi feito. Uma delas declarava ativo um plano que está
+encerrado desde agosto.
 
 ## Ordem lógica, não ordem executiva
 

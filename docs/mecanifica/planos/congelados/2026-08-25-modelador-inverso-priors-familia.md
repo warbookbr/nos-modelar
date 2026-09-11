@@ -40,6 +40,12 @@ No segundo caso, o que se descongela primeiro é justamente a calibração cega 
 crítico: ela vira a maneira de **filtrar rodadas antes de chegarem ao usuário**,
 com o veredito humano continuando soberano.
 
+## Revisão de 2026-09-11: congelado, e um pedaço mudou de dono
+
+O laço de modelagem por três papéis ocupou parte do que este plano faria: o crítico devolve defeitos em vocabulário fechado e a decisão de parar saiu da
+sessão para um comando. Resta de exclusivo a CALIBRAÇÃO CEGA, que prova se esse
+julgamento filtra rodadas antes do usuário. Nenhum gatilho foi atingido.
+
 ## O que continua de pé e foi levado para o plano novo
 
 - a classificação de alvo em `direcao-estetica`, `alvo-geometrico` e
