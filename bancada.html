@@ -27,7 +27,13 @@
         <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
         <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Configurações</button>
         <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
+        <button id="btnMenuEstado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
       </div>
+
+      <!-- Aviso de estado: aparece SÓ quando algo está ruim. Indicador que diz
+           "está tudo bem" o tempo todo ocupa campo de visão permanente para não
+           informar nada, e treina quem olha a ignorá-lo justamente quando muda. -->
+      <button id="avisoEstado" class="aviso-estado" type="button" hidden></button>
 
       <div id="menuAbrir" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloAbrir" hidden>
         <div class="modal-backdrop" data-fechar-modal></div>
@@ -93,23 +99,6 @@
         </div>
       </div>
 
-      <header class="topo">
-
-        <div class="objeto-atual">
-          <span>FIXTURE / ALVO ATUAL</span>
-          <strong id="fixtureAtual">Aguardando modelo…</strong>
-        </div>
-        <div class="indicadores-topo">
-          <div id="statusSessao" class="status-sessao" title="Status da sincronização em tempo real">
-            <span class="ponto-status desconectado"></span>
-            <span id="textoStatusSessao">Sessão Local</span>
-          </div>
-          <div id="estadoSemantica" class="estado-semantica" role="status">
-            <i aria-hidden="true"></i>
-            <span>Analisando semântica…</span>
-          </div>
-        </div>
-      </header>
 
       <nav class="vistas" aria-label="Vistas da câmera">
         <button type="button" data-vista="frontal"><span>Frente</span><kbd>1</kbd></button>
@@ -129,7 +118,6 @@
           <div>
             <h1 id="tituloPartes">Componentes</h1>
           </div>
-          <span id="contagemPartes" class="contagem">0</span>
         </div>
         <p class="dica">Marque uma ou mais peças. Shift, Ctrl ou ⌘ também adicionam pela cena.</p>
         <div class="partes-controles">
@@ -139,6 +127,7 @@
             <kbd>/</kbd>
           </label>
           <span id="resumoFiltro" class="resumo-filtro" aria-live="polite">0 componentes</span>
+          <span class="fixture-atual">de <strong id="fixtureAtual">Aguardando modelo…</strong></span>
         </div>
         <div id="listaPartes" class="lista-partes"></div>
         <button id="btnLimpar" class="botao texto" type="button">Limpar seleção <kbd>Esc</kbd></button>
@@ -234,6 +223,26 @@
           <div id="listaAnotacoes" class="lista-anotacoes"></div>
         </div>
       </aside>
+
+      <div id="menuEstado" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloEstado" hidden>
+        <div class="modal-backdrop" data-fechar-modal></div>
+        <div class="modal-conteudo">
+          <header class="modal-topo">
+            <h3 id="tituloEstado" class="modal-titulo">Estado da bancada</h3>
+            <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
+          </header>
+          <div class="modal-corpo">
+            <p class="modal-descricao">O que está carregado, como está a ligação com a sessão e o que aconteceu desde que a página abriu.</p>
+            <div id="resumoEstado" class="linhas"></div>
+            <h4 class="secao-modal">Eventos</h4>
+            <div id="listaEventos" class="lista-eventos"></div>
+          </div>
+          <footer class="modal-rodape">
+            <span class="aviso-atalho">O registro vive nesta aba e some ao recarregar.</span>
+            <button id="btnLimparEventos" class="botao texto" type="button">Limpar</button>
+          </footer>
+        </div>
+      </div>
 
       <div class="referencia-metrica" aria-label="Referência espacial da vista">
         <span id="eixosReferencia">Eixos X / Y / Z</span>

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-842 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+844 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -828,6 +828,8 @@
 
 - `carregar-sessao.js` — carregar-sessao.js — processa o payload de uma sessão ativa (peça ou montagem) para a cena Three.js.
 - `estado-sessao.js` — estado-sessao.js — modelo canônico do estado de trabalho compartilhado entre IA e operador.
+- `registro-de-eventos.js` — registro-de-eventos.js — a memória curta da bancada.
+- `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
 - `sessao.test.js` — sessao.test.js — testes do motor de sessão ativa e sincronização em tempo real.
 - `sincronizador.js` — sincronizador.js — gerenciador de sincronização em tempo real para a Sessão Ativa.
 

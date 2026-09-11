@@ -26,6 +26,7 @@ import { criarPreferenciasBancada } from './preferencias/estado-local.js';
 import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
 import { criarHistoricoParametros } from './controles/historico-parametros.js';
 import { criarGerenciadorAnotacoes3D } from './anotacoes/pinos-anotacoes.js';
+import { criarRegistroDeEventos } from './sessao/registro-de-eventos.js';
 import {
   alvosDeEnquadramento,
   escreverEstadoNaUrl,
@@ -90,6 +91,25 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   let parInspecionado = null;
   let modeloAtual = null;
   let nomePecaAtual = pecaPedida ?? 'sessao-ativa';
+
+  /* O que a barra de Estado responde. Estas três coisas eram indicadores fixos
+     no alto da tela, dizendo "tudo bem" durante todo o tempo em que nada
+     acontecia. Agora ficam guardadas aqui, aparecem como aviso só quando estão
+     ruins, e o modal de Estado mostra o resumo e a sequência de eventos. */
+  const registroDeEventos = criarRegistroDeEventos();
+  const estadoDaBancada = { sessao: 'desconectado', faceSemIdentidade: 0, peca: null, origem: null };
+
+  function atualizarAvisoDeEstado() {
+    const aviso = document.getElementById('avisoEstado');
+    const selo = document.getElementById('selo-estado');
+    if (!aviso) return;
+    const problemas = [];
+    if (estadoDaBancada.sessao === 'erro') problemas.push('Erro de sincronia com a sessão');
+    if (estadoDaBancada.faceSemIdentidade > 0) problemas.push(`${estadoDaBancada.faceSemIdentidade} faces sem identidade`);
+    aviso.hidden = problemas.length === 0;
+    aviso.textContent = problemas.join(' · ');
+    if (selo) selo.hidden = problemas.length === 0;
+  }
   /* Identidade endereçável da peça, que não é o nome de exibição. `?peca=` só
      reabre o que o acervo sabe resolver, e o rótulo do modelo muda com a
      receita, então guardar o rótulo na URL produz endereço que não abre nada.
@@ -849,6 +869,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     modeloAtual = convertido;
     nomePecaAtual = convertido.nome ?? 'sessao-ativa';
     document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
+    estadoDaBancada.peca = formatarNome(convertido.rotulo);
+    registroDeEventos.registrar('informacao', 'Peça carregada', formatarNome(convertido.rotulo));
 
     posicionarNoEstudio(convertido.raiz);
     ambiente.scene.add(convertido.raiz);
@@ -908,26 +930,29 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       botao.addEventListener('click', () => controlador.selecionar(nome, { aditiva: true }));
       lista.append(botao);
     }
-    document.getElementById('contagemPartes').textContent = String(controlador.nomes.length);
+    /* O contador redondo do cabeçalho dizia o mesmo número que "N componentes"
+       logo abaixo. Some da bancada; o harness de captura ainda tem o elemento e
+       continua sendo alimentado. */
+    const contagem = document.getElementById('contagemPartes');
+    if (contagem) contagem.textContent = String(controlador.nomes.length);
     if (filtroPartes) filtroPartes.value = '';
     aplicarFiltroPartes();
 
     // Diagnóstico semântico
     const semParte = convertido.medida?.facesSemParte?.length ?? 0;
-    const estadoSemantica = document.getElementById('estadoSemantica');
     const diagnostico = document.getElementById('diagnostico');
+    /* A integridade semântica não ocupa mais espaço fixo no alto da tela. Ela
+       continua no bloco de diagnóstico da aba Inspeção, com detalhe, e vira
+       aviso visível apenas quando há face sem parte. */
+    estadoDaBancada.faceSemIdentidade = semParte;
+    if (semParte) registroDeEventos.registrar('alerta', `${semParte} faces sem identidade`, formatarNome(convertido.rotulo));
+    atualizarAvisoDeEstado();
     if (semParte) {
-      estadoSemantica.classList.remove('ok');
-      estadoSemantica.classList.add('erro-semantic');
-      estadoSemantica.querySelector('span').textContent = `${semParte} faces sem identidade`;
       diagnostico.classList.remove('ok');
       diagnostico.classList.add('alerta');
       diagnostico.querySelector('p').textContent =
         `${semParte} faces não pertencem a uma parte semântica.`;
     } else {
-      estadoSemantica.classList.remove('erro-semantic');
-      estadoSemantica.classList.add('ok');
-      estadoSemantica.querySelector('span').textContent = 'Semântica íntegra';
       diagnostico.classList.remove('alerta');
       diagnostico.classList.add('ok');
       diagnostico.querySelector('p').textContent =
@@ -1306,6 +1331,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     ['btnMenuAbrir', 'menuAbrir'],
     ['btnMenuConfiguracoes', 'menuConfiguracoes'],
     ['btnMenuAtalhos', 'menuAtalhos'],
+    ['btnMenuEstado', 'menuEstado'],
   ].map(([idBotao, idJanela]) => ({
     botao: document.getElementById(idBotao),
     janela: document.getElementById(idJanela),
@@ -1319,11 +1345,71 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     document.body.classList.remove('modal-aberto');
   }
 
+  /* O painel de Estado é desenhado na abertura, e não a cada evento: manter uma
+     lista escondida em dia custa trabalho a cada quadro para ninguém ver. */
+  function desenharEstado() {
+    const resumo = document.getElementById('resumoEstado');
+    const lista = document.getElementById('listaEventos');
+    if (!resumo || !lista) return;
+    const linhas = [
+      ['Peça', estadoDaBancada.peca ?? 'nenhuma carregada'],
+      ['Origem', estadoDaBancada.origem ?? (idNaUrl ? `acervo: ${idNaUrl}` : 'sessão ativa')],
+      ['Sessão', ROTULOS_DE_SESSAO[estadoDaBancada.sessao] ?? estadoDaBancada.sessao],
+      ['Semântica', estadoDaBancada.faceSemIdentidade
+        ? `${estadoDaBancada.faceSemIdentidade} faces sem identidade`
+        : 'nenhuma face sem identidade'],
+    ];
+    resumo.replaceChildren(...linhas.map(([nome, valor]) => {
+      const linha = document.createElement('div');
+      linha.className = 'linha';
+      const rotulo = document.createElement('span');
+      rotulo.textContent = nome;
+      const conteudo = document.createElement('kbd');
+      conteudo.textContent = valor;
+      linha.append(rotulo, conteudo);
+      return linha;
+    }));
+
+    const eventos = registroDeEventos.listarRecentesPrimeiro();
+    if (eventos.length === 0) {
+      const vazio = document.createElement('p');
+      vazio.className = 'modal-descricao';
+      vazio.textContent = 'Nada aconteceu desde que a página abriu.';
+      lista.replaceChildren(vazio);
+      return;
+    }
+    lista.replaceChildren(...eventos.map((evento) => {
+      const item = document.createElement('div');
+      item.className = `evento evento-${evento.gravidade}`;
+      const hora = document.createElement('time');
+      hora.dateTime = evento.quando;
+      hora.textContent = new Date(evento.quando).toLocaleTimeString('pt-BR');
+      const texto = document.createElement('span');
+      texto.textContent = evento.detalhe ? `${evento.assunto} — ${evento.detalhe}` : evento.assunto;
+      item.append(hora, texto);
+      if (evento.repeticoes > 1) {
+        const vezes = document.createElement('small');
+        vezes.textContent = `${evento.repeticoes}×`;
+        item.append(vezes);
+      }
+      return item;
+    }));
+  }
+
+  document.getElementById('btnLimparEventos')?.addEventListener('click', () => {
+    registroDeEventos.limpar();
+    desenharEstado();
+  });
+  document.getElementById('avisoEstado')?.addEventListener('click', () => {
+    document.getElementById('btnMenuEstado')?.click();
+  });
+
   for (const { botao, janela } of janelas) {
     botao.addEventListener('click', () => {
       const abrir = janela.hidden;
       fecharJanelas();
       if (!abrir) return;
+      if (janela.id === 'menuEstado') desenharEstado();
       janela.hidden = false;
       botao.setAttribute('aria-expanded', 'true');
       document.body.classList.add('modal-aberto');
@@ -1356,20 +1442,18 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   }
 
   // Inicializa o Sincronizador de Sessão Ativa
-  const statusEl = document.getElementById('statusSessao');
-  const textoStatusEl = document.getElementById('textoStatusSessao');
-  const pontoStatusEl = statusEl?.querySelector('.ponto-status');
+  const ROTULOS_DE_SESSAO = {
+    desconectado: 'Sessão local',
+    conectado: 'Sessão da IA conectada',
+    sincronizando: 'Sincronizando…',
+    erro: 'Erro de sincronia',
+  };
 
   function atualizarStatusUI(status) {
-    if (!pontoStatusEl || !textoStatusEl) return;
-    pontoStatusEl.className = `ponto-status ${status}`;
-    const rotulos = {
-      desconectado: 'Sessão Local',
-      conectado: 'IA Conectada',
-      sincronizando: 'Sincronizando…',
-      erro: 'Erro de Sincronia',
-    };
-    textoStatusEl.textContent = rotulos[status] ?? status;
+    if (estadoDaBancada.sessao === status) return;
+    estadoDaBancada.sessao = status;
+    registroDeEventos.registrar(status === 'erro' ? 'erro' : 'informacao', ROTULOS_DE_SESSAO[status] ?? status);
+    atualizarAvisoDeEstado();
   }
 
   sincronizador = criarSincronizadorSessao({
