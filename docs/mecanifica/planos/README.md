@@ -135,7 +135,7 @@ plano executivo datado, e declará-los como plano ativo reprovava `planos:check`
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
 foi **encerrada** em 2026-09-01 com H0–H5 entregues e H6 parcial: três módulos de
 saída de malha, o conferente único, o modo de auditoria visual e cinco peças no
-acervo. Rastreio em [`../MALHA-OTIMIZADA-PROGRESSO.md`](../MALHA-OTIMIZADA-PROGRESSO.md).
+acervo. Rastreio em [`../MALHA-OTIMIZADA-PROGRESSO.md`](../historico/MALHA-OTIMIZADA-PROGRESSO.md).
 
 O [laboratório computacional para investigação por
 IA](encerrados/2026-09-01-laboratorio-computacional-ia.md) foi incubado neste
@@ -155,7 +155,7 @@ a lê — [`usar/`](../usar/README.md) para quem usa o Mecanifica, a raiz de
 que já fechou — e deixou cinco gates que impedem a separação de vazar de volta.
 A porta de entrada caiu de 665 para 200 linhas. O relato por fase, com as
 decisões tomadas e o que foi recusado por custo medido, está em
-[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../REORGANIZACAO-POR-USO-PROGRESSO.md).
+[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../historico/REORGANIZACAO-POR-USO-PROGRESSO.md).
 
 **Plano congelado:** o [modelador inverso com priors por
 família](congelados/2026-08-25-modelador-inverso-priors-familia.md) saiu do
@@ -318,7 +318,7 @@ plano de materialização e autoria segura de montagens foi concluído com decis
 
 O método, as perguntas de inspeção e o padrão de evidência usados no diagnóstico
 permanecem registrados em
-[`../PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../PROTOCOLO-DIAGNOSTICO-MOTOR.md).
+[`../PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md).
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, arquivos reservados,

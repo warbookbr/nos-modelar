@@ -3,10 +3,10 @@
 **Estado:** concluído
 **Aberto em:** 2026-09-01, por decisão do usuário · **Base:** `main` em `b6367ed`
 **Responsável:** Codex (desenho e R0) · Claude (integração e governança)
-**Dossiê vinculante:** [`../../DOSSIE-LABORATORIO-IA.md`](../../DOSSIE-LABORATORIO-IA.md)
+**Dossiê vinculante:** [`../../DOSSIE-LABORATORIO-IA.md`](../../historico/DOSSIE-LABORATORIO-IA.md)
 **Execução detalhada:** removida em 2026-09-11 junto com `docs/superpowers/`; o
 subsistema `laboratorio/` saiu deste repositório em 2026-09-03
-**Relato por fatia:** [`../../LABORATORIO-IA-PROGRESSO.md`](../../LABORATORIO-IA-PROGRESSO.md)
+**Relato por fatia:** [`../../LABORATORIO-IA-PROGRESSO.md`](../../historico/LABORATORIO-IA-PROGRESSO.md)
 
 ## O que este plano autoriza, e o que não
 
@@ -160,7 +160,7 @@ descobertas como surpresa:
 ## Arquivos reservados
 
 `laboratorio/**`, `tools/arquitetura/independencia-laboratorio*` e
-`docs/mecanifica/DOSSIE-LABORATORIO-IA.md`.
+`docs/mecanifica/historico/DOSSIE-LABORATORIO-IA.md`.
 
 Trabalho de autoria e de núcleo da Mecanifica segue livre: é justamente o que a
 fronteira existe para garantir.

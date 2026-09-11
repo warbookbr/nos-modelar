@@ -36,12 +36,12 @@ plano. O que está encerrado vive em
   computacional saiu para
   [`warbookbr/nos-ciencia`](https://github.com/warbookbr/nos-ciencia) em
   2026-09-03; o piloto de peça que usou seus números continua aqui, em
-  [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md).
+  [`DOSSIE-CABO-DE-PA.md`](historico/DOSSIE-CABO-DE-PA.md).
 - A [reorganização por uso](planos/encerrados/2026-08-31-reorganizacao-por-uso.md)
   (`docs/mecanifica/planos/encerrados/2026-08-31-reorganizacao-por-uso.md`)
   separou o acervo por quem o lê e deixou cinco gates; relato em
-  [`REORGANIZACAO-POR-USO-PROGRESSO.md`](REORGANIZACAO-POR-USO-PROGRESSO.md)
-  (`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
+  [`REORGANIZACAO-POR-USO-PROGRESSO.md`](historico/REORGANIZACAO-POR-USO-PROGRESSO.md)
+  (`docs/mecanifica/historico/REORGANIZACAO-POR-USO-PROGRESSO.md`). O modelador inverso
   está [congelado](planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
   (`docs/mecanifica/planos/congelados/README.md`), não refutado.
 - A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)

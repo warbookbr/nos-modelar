@@ -1,6 +1,6 @@
 # Laboratório computacional para IA — progresso por fatia
 
-**Plano que governa:** [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](planos/encerrados/2026-09-01-laboratorio-computacional-ia.md) (encerrado — o laboratório saiu para `warbookbr/nos-ciencia`)
+**Plano que governa:** [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](../planos/encerrados/2026-09-01-laboratorio-computacional-ia.md) (encerrado — o laboratório saiu para `warbookbr/nos-ciencia`)
 **Dossiê:** [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md)
 
 Este documento é o relato: o que cada fatia entregou, o que ficou de fora e por

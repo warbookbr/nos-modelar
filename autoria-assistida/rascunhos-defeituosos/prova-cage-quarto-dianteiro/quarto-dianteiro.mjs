@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos
-   landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão:
+   landmarks de docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão:
    a cage é hipótese sobre como atingir o alvo, então ela nasce do alvo.
 
    Meia carroceria em x >= 0; o espelho é da compilação. Privada e descartável. */

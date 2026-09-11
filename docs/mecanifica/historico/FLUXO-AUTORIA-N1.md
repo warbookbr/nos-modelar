@@ -3,7 +3,7 @@
 ## Estado e alcance
 
 Este é o contrato executável concluído da N1 do plano
-[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](../planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 Ela cria a fronteira neutra acima dos serviços existentes sem mudar geometria
 pública, receitas atuais, montagem, revisão, visor ou MCP.
 
@@ -123,7 +123,7 @@ provedores provados nas fatias correspondentes.
 O índice `mecanifica.schemas-autoria-3d@1` descreve objetivo, receita elevada,
 manifesto de provedor, protocolo, plano, execução, resultado de etapa,
 resultado de planejamento e cobertura. A cópia estática gerada é
-[`gerado/schemas-autoria-3d.json`](gerado/schemas-autoria-3d.json). O gate
+[`gerado/schemas-autoria-3d.json`](../gerado/schemas-autoria-3d.json). O gate
 `npm run autoria:schemas:check` impede divergência entre código e artefato.
 
 Schema valida estrutura e descoberta; os normalizadores continuam responsáveis
@@ -180,7 +180,7 @@ A N1 está concluída. A prova real de veículo tem dez etapas básicas: briefin
 fica coberto e as outras nove permanecem lacunas explícitas. Uma necessidade
 procedural adicional é coberta sem alterar esse veredito global. O relatório de
 encerramento está em
-[`RELATORIO-N1-FLUXO-AUTORIA.md`](./historico/RELATORIO-N1-FLUXO-AUTORIA.md).
+[`RELATORIO-N1-FLUXO-AUTORIA.md`](RELATORIO-N1-FLUXO-AUTORIA.md).
 
 A N2 pode abrir para implementar alvo operacional, andaime e blocagem global.
 Nenhum adaptador futuro pode declarar `forma-global`, `superficie` ou

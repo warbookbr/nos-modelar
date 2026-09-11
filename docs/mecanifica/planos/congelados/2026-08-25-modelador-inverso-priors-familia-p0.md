@@ -106,7 +106,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 - Create: `src/autoria/qualificacao-alvo.js`
 - Create: `tools/mecanifica/qualificacao-alvo.test.mjs`
 - Modify: `tools/mecanifica/gerar-schemas-autoria-3d.mjs`
-- Modify: `docs/mecanifica/ALVO-N6-CUPE-ESPORTIVO.md`
+- Modify: `docs/mecanifica/historico/ALVO-N6-CUPE-ESPORTIVO.md`
 - Modify: `autoria-assistida/alvos/n6-cupe-esportivo/manifesto.json`
 
 - [ ] Escrever testes para `direcao-estetica`, `alvo-geometrico` e

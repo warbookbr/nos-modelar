@@ -20,3 +20,42 @@ humana, o Playground e a aplicação jogável, que não existem mais aqui.
 
 Os arquivos podem ser consultados para contexto e evidência. Nenhum deles abre
 plano, altera o contrato ou autoriza implementação.
+
+## O que chegou aqui em 2026-09-11
+
+A raiz de `docs/mecanifica/` tinha 52 documentos soltos, misturando contrato
+vivo com evidência de etapa vencida. Dezoito vieram para cá, e o critério foi
+sempre o que o próprio documento diz de si:
+
+- declararam-se fora de vigor: [`PLANO.md`](PLANO.md), aposentado em agosto, e
+  [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md), cujos
+  landmarks foram inventados pela IA e não medidos;
+- são rastreio de fase de plano já encerrado:
+  [`MALHA-OTIMIZADA-PROGRESSO.md`](MALHA-OTIMIZADA-PROGRESSO.md),
+  [`REORGANIZACAO-POR-USO-PROGRESSO.md`](REORGANIZACAO-POR-USO-PROGRESSO.md) e
+  [`LABORATORIO-IA-PROGRESSO.md`](LABORATORIO-IA-PROGRESSO.md);
+- descrevem subsistema que saiu do repositório:
+  [`DOSSIE-LABORATORIO-IA.md`](DOSSIE-LABORATORIO-IA.md), 848 linhas sobre o
+  laboratório que foi incubado e mudou de casa em setembro;
+- são dossiê ou matriz de plano encerrado:
+  [`DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`](DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
+  [`DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`](DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md),
+  [`DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`](DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
+  [`MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`](MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
+  [`FLUXO-AUTORIA-N1.md`](FLUXO-AUTORIA-N1.md) e
+  [`PROTOCOLO-DIAGNOSTICO-MOTOR.md`](PROTOCOLO-DIAGNOSTICO-MOTOR.md);
+- são evidência de etapa vencida do chassi e das sondas:
+  [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md),
+  [`ALVO-N6-CUPE-ESPORTIVO.md`](ALVO-N6-CUPE-ESPORTIVO.md),
+  [`CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md`](CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md) e
+  [`BASELINE-MOTOR-R00.md`](BASELINE-MOTOR-R00.md), que congela o motor antes da
+  modularização que já aconteceu;
+- são estudo fechado: [`DOSSIE-CABO-DE-PA.md`](DOSSIE-CABO-DE-PA.md), a
+  comparação de nove materiais, e
+  [`BICICLETA-REALISTA-ATRITOS.md`](BICICLETA-REALISTA-ATRITOS.md), os atritos
+  medidos ao modelar a bicicleta.
+
+Ficaram na raiz os contratos vivos, incluindo as quatro versões de montagem
+persistida — a v1 ainda é citada como contrato por uma skill — e o dossiê do
+modelador inverso, que é vinculante para um plano congelado e não para um
+encerrado.

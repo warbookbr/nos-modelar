@@ -1,7 +1,7 @@
 # Reorganização por uso — progresso
 
 Documento auxiliar do plano
-[`planos/2026-08-31-reorganizacao-por-uso.md`](planos/encerrados/2026-08-31-reorganizacao-por-uso.md).
+[`planos/2026-08-31-reorganizacao-por-uso.md`](../planos/encerrados/2026-08-31-reorganizacao-por-uso.md).
 Ele existe porque o plano cabe em 200 linhas e o rastreio das fases não. Aqui
 ficam o retrato de antes, o estado de cada fase e as decisões tomadas durante a
 execução.
@@ -251,7 +251,7 @@ válida. Medido, o custo reprova.
 
 A última linha decide. Dez arquivos `.json` de evidência — alvos, críticas e
 vereditos gravados, com formato versionado — carregam caminhos como
-`docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md` dentro do próprio registro.
+`docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md` dentro do próprio registro.
 Mover os documentos obrigaria a **reescrever evidência encerrada**, que é
 literalmente a condição de parada escrita no plano antes de qualquer execução.
 

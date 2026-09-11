@@ -2,7 +2,7 @@
 /* prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0
    do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeção
    de uma peça existente: é o desenho contra o qual a geometria futura será medida.
-   Toda medida vem de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md e é repetida aqui
+   Toda medida vem de docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md e é repetida aqui
    como dado explícito; se divergirem, o documento manda. Saída determinística. */
 
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -66,7 +66,7 @@ const spec = {
     intencao: 'alvo dimensional vinculante do chassi P0 antes de qualquer geometria',
     procedencias: [{
       id: 'p0-medidas', tipo: 'medidas-declaradas',
-      evidencia: 'docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, seções 4.1 a 4.4',
+      evidencia: 'docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md, seções 4.1 a 4.4',
     }],
     incertezas: [],
   },

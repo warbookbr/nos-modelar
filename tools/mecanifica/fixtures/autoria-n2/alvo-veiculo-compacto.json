@@ -10,7 +10,7 @@
   "procedencia": {
     "tipo": "prancha-medida-reutilizada",
     "referencias": [
-      "repo://docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md",
+      "repo://docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md",
       "repo://tools/mecanifica/alvo-chassi-p0.mjs"
     ]
   },

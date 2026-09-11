@@ -2,7 +2,7 @@
 
 **Data:** 2026-08-31  
 **Estado:** desenho aprovado; incubação oficializada na `main` em 2026-09-01  
-**Plano que governa:** [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](planos/encerrados/2026-09-01-laboratorio-computacional-ia.md) (encerrado — o laboratório saiu para `warbookbr/nos-ciencia`)  
+**Plano que governa:** [`planos/encerrados/2026-09-01-laboratorio-computacional-ia.md`](../planos/encerrados/2026-09-01-laboratorio-computacional-ia.md) (encerrado — o laboratório saiu para `warbookbr/nos-ciencia`)  
 **Base:** `origin/main` em `b6367ed`  
 **Escopo:** especificação arquitetural; **não autoriza promoção ao núcleo**
 

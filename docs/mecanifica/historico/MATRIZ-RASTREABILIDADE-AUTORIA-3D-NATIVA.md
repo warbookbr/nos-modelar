@@ -1,7 +1,7 @@
 # Matriz de rastreabilidade — autoria 3D nativa para IA
 
 **Estado:** ativo com o plano mestre  
-**Plano:** [`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)  
+**Plano:** [`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](../planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md)  
 **Base:** `d99a639`
 
 ## Como ler

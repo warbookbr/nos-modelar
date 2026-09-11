@@ -3,7 +3,7 @@
 > **Documento de método.** Este arquivo detalha como estudar o motor atual.
 > Ele não substitui o plano ativo, não autoriza refatoração e não afirma que os
 > resultados já foram observados. A autorização vigente está em
-> [`planos/2026-08-06-diagnostico-motor-procedural.md`](./planos/encerrados/2026-08-06-diagnostico-motor-procedural.md).
+> [`planos/2026-08-06-diagnostico-motor-procedural.md`](../planos/encerrados/2026-08-06-diagnostico-motor-procedural.md).
 
 ## Finalidade
 

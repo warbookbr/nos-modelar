@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de
-   docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
+   docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
 
    Por que este arquivo existe: a rodada Q7 fechou com 52 testes verdes e foi
    reprovada pelo usuário na primeira olhada. As condições de rejeição existiam

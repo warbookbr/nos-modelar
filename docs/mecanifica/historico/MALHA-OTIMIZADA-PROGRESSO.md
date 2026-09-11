@@ -1,7 +1,7 @@
 # Malha otimizada e prova por objeto — progresso
 
 Documento auxiliar do plano
-[`planos/encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md`](planos/encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md).
+[`planos/encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md`](../planos/encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md).
 Aqui ficam o estado de cada fatia, as medições e os atritos anotados na hora em
 que aparecem — que é o produto real das fatias de modelagem.
 

@@ -9,7 +9,7 @@ reconhecimento do veículo.
 A origem é uma prancha de conceito de cupê esportivo fictício, gerada sem marca
 ou modelo existente e aprovada explicitamente pelo usuário. Ela está versionada
 em `autoria-assistida/alvos/n6-cupe-esportivo/prancha-origem.png`; o
-[`manifesto.json`](../../autoria-assistida/alvos/n6-cupe-esportivo/manifesto.json)
+[`manifesto.json`](../../../autoria-assistida/alvos/n6-cupe-esportivo/manifesto.json)
 guarda o hash da origem, a decisão e os hashes dos cinco recortes.
 
 O alvo fixa direção visual e relações de forma, não medidas absolutas em

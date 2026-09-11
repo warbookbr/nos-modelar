@@ -9,9 +9,9 @@
 
 
 Rodada P0 do plano
-[`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](planos/2026-08-18-chassi-realista-kernel-geometrico.md).
+[`planos/2026-08-18-chassi-realista-kernel-geometrico.md`](../planos/2026-08-18-chassi-realista-kernel-geometrico.md).
 Fundamentação em
-[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](./historico/ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
+[`ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md`](ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md).
 
 Este documento fixa **contra o que a geometria será julgada**, antes de existir
 geometria. Ele não autoriza implementação, não escolhe topologia de cage — isso é
@@ -33,7 +33,7 @@ P0 fecha essa lacuna. Se P0 estiver certo, P2 é decidível por medição.
 ## 2. Perfil de autoria declarado
 
 Declarado **antes** de qualquer modelagem, como exige
-[`PERFIS-DE-AUTORIA.md`](PERFIS-DE-AUTORIA.md):
+[`PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md):
 
 ```js
 export const PERFIL_AUTORIA = {

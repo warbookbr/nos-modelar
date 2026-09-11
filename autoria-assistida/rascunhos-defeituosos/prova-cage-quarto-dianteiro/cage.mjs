@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme
-   docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a
+   docs/mecanifica/historico/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a
    prova P2, não o núcleo.
 
    O validador recusa em vez de avisar. Cage que passa aqui é cage que a

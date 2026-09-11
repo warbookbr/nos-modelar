@@ -13,7 +13,7 @@ Este plano autoriza somente diagnóstico. Não autoriza refatorar o motor,
 modificar receitas, implementar montagem ou acrescentar escrita ao MCP.
 
 O método detalhado está em
-[`PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../../PROTOCOLO-DIAGNOSTICO-MOTOR.md).
+[`PROTOCOLO-DIAGNOSTICO-MOTOR.md`](../../historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md).
 
 ## Pergunta central
 > **Qual é o contrato real do motor procedural atual, qual é seu teto para
@@ -106,7 +106,7 @@ limitação estrutural comprovada
 
 ## Arquivos reservados
 - este plano;
-- `docs/mecanifica/PROTOCOLO-DIAGNOSTICO-MOTOR.md`;
+- `docs/mecanifica/historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md`;
 - `docs/mecanifica/planos/README.md`;
 - `docs/mecanifica/INDEX.md`;
 - `docs/uso/MAPA.md`, somente regenerado;

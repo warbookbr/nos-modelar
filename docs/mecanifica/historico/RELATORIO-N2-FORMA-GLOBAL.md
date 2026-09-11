@@ -46,10 +46,10 @@ independente nem decisão do usuário registradas.
   nome esperado;
 - [painel de comparação](evidencias/n2-forma-global/painel-comparacao.png): alvo
   tracejado e blocagem na mesma escala;
-- [avaliação G01](evidencias/n2-forma-global/avaliacao-g01.json) e
-  [decisão G02 pendente](evidencias/n2-forma-global/decisao-g02-pendente.json);
-- [manifesto com hashes](evidencias/n2-forma-global/manifesto.json) e
-  [pacote limitado do crítico](evidencias/n2-forma-global/pacote-critica.json).
+- [avaliação G01](../evidencias/n2-forma-global/avaliacao-g01.json) e
+  [decisão G02 pendente](../evidencias/n2-forma-global/decisao-g02-pendente.json);
+- [manifesto com hashes](../evidencias/n2-forma-global/manifesto.json) e
+  [pacote limitado do crítico](../evidencias/n2-forma-global/pacote-critica.json).
 
 A primeira renderização foi rejeitada durante a própria inspeção porque uma
 roda traseira aparecia sobre a cabine por ordenação inadequada dos volumes SVG.

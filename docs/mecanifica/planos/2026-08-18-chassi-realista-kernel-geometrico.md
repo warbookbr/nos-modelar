@@ -88,7 +88,7 @@ JavaScript puro, não um kernel.
 
 ### P0 — alvo, referência e limiares — **fechada**
 
-Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md): perfil
+Em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../historico/CHASSI-P0-ALVO-E-LIMIARES.md): perfil
 `realistaApresentacao / F3 / dimensional` declarado antes de modelar, envelope e
 quinze landmarks, cinco curvas mestras, limiares dos oito eixos, oito condições
 de rejeição visual e orçamento por nível. Duas decisões:
@@ -101,7 +101,7 @@ de rejeição visual e orçamento por nível. Duas decisões:
 
 ### P1 — contrato da cage — **fechada**
 
-Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../CHASSI-P1-CONTRATO-DA-CAGE.md):
+Em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../historico/CHASSI-P1-CONTRATO-DA-CAGE.md):
 `mecanifica.cage-quad@1` como artefato autoral separado, aresta como par ordenado
 derivado, loop nomeado com domínio fechado, seção como conferência e não como
 geradora, herança de `parte` pelas filhas e diff em três classes. Duas decisões:

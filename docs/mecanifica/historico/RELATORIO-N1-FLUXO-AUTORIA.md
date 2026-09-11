@@ -13,7 +13,7 @@ Schemas e uma fachada configurada tornam o contrato consumível sem conhecer a
 implementação interna.
 
 O contrato operacional completo está em
-[`FLUXO-AUTORIA-N1.md`](../FLUXO-AUTORIA-N1.md).
+[`FLUXO-AUTORIA-N1.md`](FLUXO-AUTORIA-N1.md).
 
 O encerramento não aprova carro, robô, superfície ou montagem híbrida. Ele
 aprova o trilho que impede essas capacidades de serem presumidas.
@@ -31,7 +31,7 @@ aprova o trilho que impede essas capacidades de serem presumidas.
 | `prototipos/procedural/v3/servicos/fluxo-autoria.js` | configuração nativa atual |
 
 O artefato estático dos schemas fica em
-[`gerado/schemas-autoria-3d.json`](gerado/schemas-autoria-3d.json) e é conferido
+[`gerado/schemas-autoria-3d.json`](../gerado/schemas-autoria-3d.json) e é conferido
 por `npm run autoria:schemas:check`.
 
 ## Auditoria de reutilização

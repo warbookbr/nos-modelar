@@ -2,8 +2,8 @@
 
 Rodada P2 do [plano do chassi](../planos/2026-08-18-chassi-realista-kernel-geometrico.md),
 executada sob [`planos/2026-08-19-chassi-p2-prova-do-quarto.md`](../planos/2026-08-19-chassi-p2-prova-do-quarto.md).
-Alvo em [`CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md);
-contrato em [`CHASSI-P1-CONTRATO-DA-CAGE.md`](../CHASSI-P1-CONTRATO-DA-CAGE.md).
+Alvo em [`CHASSI-P0-ALVO-E-LIMIARES.md`](CHASSI-P0-ALVO-E-LIMIARES.md);
+contrato em [`CHASSI-P1-CONTRATO-DA-CAGE.md`](CHASSI-P1-CONTRATO-DA-CAGE.md).
 
 Código e evidências em
 `autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/`. Zona privada e

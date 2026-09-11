@@ -228,7 +228,7 @@
     "arquivos": [
      "tools/bancadas/gabarito-selecao.json",
      "docs/mecanifica/ATRITOS-AUTORIA.md",
-     "docs/mecanifica/PLANO.md",
+     "docs/mecanifica/historico/PLANO.md",
      "docs/mecanifica/INDEX.md",
      "docs/mecanifica/UPSTREAM-NOS.md",
      ".claude/skills/criar-peca/SKILL.md",

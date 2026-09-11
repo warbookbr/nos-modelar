@@ -11,8 +11,8 @@ que era uma das duas saídas previstas.
 `4ba67037c9099a7550cd892cfae776eb6a258df6`
 
 **Rastreio das fases:**
-[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../../REORGANIZACAO-POR-USO-PROGRESSO.md)
-(`docs/mecanifica/REORGANIZACAO-POR-USO-PROGRESSO.md`)
+[`../REORGANIZACAO-POR-USO-PROGRESSO.md`](../../historico/REORGANIZACAO-POR-USO-PROGRESSO.md)
+(`docs/mecanifica/historico/REORGANIZACAO-POR-USO-PROGRESSO.md`)
 
 ## Problema observado
 

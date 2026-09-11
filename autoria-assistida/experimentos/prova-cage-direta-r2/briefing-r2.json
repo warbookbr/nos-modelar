@@ -1,7 +1,7 @@
 {
   "tipo": "mecanifica.prova-cage-direta-r2@1",
   "estado": "envelope",
-  "origemDoAlvo": "docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md",
+  "origemDoAlvo": "docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md",
   "unidade": "metro",
   "simetria": { "plano": "x", "autorada": "x >= 0" },
   "envelope": {

@@ -7,7 +7,7 @@
    sempre o render sozinho — a pergunta que ele podia responder era "isso parece
    um carro?", nunca "isso bate com o alvo?".
 
-   Toda medida vem de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md; se
+   Toda medida vem de docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md; se
    divergirem, o documento manda. */
 
 export const zMin = -2335, zMax = 2265, yMax = 1190, xMax = 1000;

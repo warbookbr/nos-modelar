@@ -9,7 +9,7 @@ integral permanece no Git no commit `41f0c50`; ela não deve ser copiada para um
 novo roteiro.
 
 A fonte de verdade para planejamento agora é
-[`planos/README.md`](planos/README.md). Ela aponta o único plano ativo, quando
+[`planos/README.md`](../planos/README.md). Ela aponta o único plano ativo, quando
 existir, e o backlog separa candidatos de compromissos. **No encerramento deste
 arquivo não há plano ativo.**
 
@@ -25,14 +25,14 @@ arquivo não há plano ativo.**
   ele mandava dar vários painéis a `filete`, enquanto a arquitetura convergida
   preserva `filete` como chanfro e usa `arredondarAresta` para arredondamento;
 - A-34, A-37, narrativa de desgaste e outras melhorias continuam somente como
-  candidatos no [`BACKLOG.md`](planos/BACKLOG.md). Candidato não é pendência de
+  candidatos no [`BACKLOG.md`](../planos/BACKLOG.md). Candidato não é pendência de
   um plano encerrado nem autorização para começar;
 - os números A-39 a A-45 propostos dentro do Ciclo 6 nunca entraram no registro
   de atritos e ficam sem efeito. A-38 continua sendo exclusivamente a revisão
   visual econômica já resolvida.
 
 O detalhamento e a justificativa de cada destino estão em
-[`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
+[`ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md`](../planos/concluidos/ENCERRAMENTO-PLANO-MESTRE-2026-08-02.md).
 
 ## Regra de compatibilidade
 

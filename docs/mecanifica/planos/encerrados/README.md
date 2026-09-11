@@ -73,8 +73,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   **concluído e aprovado**. Ele substituiu o monólito por núcleo pequeno, registro tipado,
   pacotes de capacidades, grafos derivados, subgrafos reutilizáveis, SDK de
   extensão e descoberta Agent-First. A R00 já fixou a [linha de base
-  executável](../../BASELINE-MOTOR-R00.md)
-  (`docs/mecanifica/BASELINE-MOTOR-R00.md`) e o mapa da fachada. A R01 foi concluída:
+  executável](../../historico/BASELINE-MOTOR-R00.md)
+  (`docs/mecanifica/historico/BASELINE-MOTOR-R00.md`) e o mapa da fachada. A R01 foi concluída:
   `oficina.js` é a fachada compatível; núcleo, adaptador, animação e executor
   têm implementação única separada. A R02 foi concluída: o despacho passa por
   registro explícito, versionado e determinístico das 32 operações. Não haverá
@@ -127,14 +127,14 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   varrido estão proibidos como base da pele exterior, porque para-brisa, vidro
   lateral e vão de porta são loops fechados internos que uma varredura não abre
   sem booleana. A rodada P0 está fechada em
-  [`CHASSI-P0-ALVO-E-LIMIARES.md`](../../CHASSI-P0-ALVO-E-LIMIARES.md)
-  (`docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md`): perfil `F3` declarado antes
+  [`CHASSI-P0-ALVO-E-LIMIARES.md`](../../historico/CHASSI-P0-ALVO-E-LIMIARES.md)
+  (`docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md`): perfil `F3` declarado antes
   de modelar, envelope e quinze landmarks fixados, prancha ortográfica derivada
   adotada como referência vinculante no lugar da imagem em perspectiva, limiares
   numéricos dos oito eixos e oito condições de rejeição visual escritas antes da
   geometria. A rodada P1 também está fechada em
-  [`CHASSI-P1-CONTRATO-DA-CAGE.md`](../../CHASSI-P1-CONTRATO-DA-CAGE.md)
-  (`docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md`): `mecanifica.cage-quad@1` é
+  [`CHASSI-P1-CONTRATO-DA-CAGE.md`](../../historico/CHASSI-P1-CONTRATO-DA-CAGE.md)
+  (`docs/mecanifica/historico/CHASSI-P1-CONTRATO-DA-CAGE.md`): `mecanifica.cage-quad@1` é
   artefato autoral separado, para não esticar `malha-poligonal@1`; aresta é par
   ordenado derivado, porque o formato salvo não tem entidade aresta; a seção
   transversal é conferência e não geradora; e a malha compilada **não tem
@@ -248,22 +248,22 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   canário de silhuetas permanecem evidência histórica, não continuidade.
   Registros do caminho substituído: [plano cancelado](./2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md),
   [dossiê por seleção](../../historico/DOSSIE-MODELADOR-POR-SELECAO.md),
-  [plataforma nativa](../../DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
-  [motor de superfícies](../../DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md),
-  [fluxo multifamília](../../DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
-  [matriz de rastreabilidade](../../MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
-  [contrato N1](../../FLUXO-AUTORIA-N1.md), [relatório N1](../../historico/RELATORIO-N1-FLUXO-AUTORIA.md),
+  [plataforma nativa](../../historico/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md),
+  [motor de superfícies](../../historico/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md),
+  [fluxo multifamília](../../historico/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
+  [matriz de rastreabilidade](../../historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
+  [contrato N1](../../historico/FLUXO-AUTORIA-N1.md), [relatório N1](../../historico/RELATORIO-N1-FLUXO-AUTORIA.md),
   [contrato N2](../../CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
   [relatório N3](../../historico/RELATORIO-N3-CANAL-PERCEPCAO.md),
   [relatório N4](../../historico/RELATORIO-N4-RESTRICOES.md) e [relatório N5](../../historico/RELATORIO-N5-BUSCA.md).
   Caminhos alcançáveis: `docs/mecanifica/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
   `docs/mecanifica/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`,
   `docs/mecanifica/historico/DOSSIE-MODELADOR-POR-SELECAO.md`,
-  `docs/mecanifica/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
-  `docs/mecanifica/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`,
-  `docs/mecanifica/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`,
-  `docs/mecanifica/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`,
-  `docs/mecanifica/FLUXO-AUTORIA-N1.md`,
+  `docs/mecanifica/historico/DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md`,
+  `docs/mecanifica/historico/DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md`,
+  `docs/mecanifica/historico/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md`,
+  `docs/mecanifica/historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`,
+  `docs/mecanifica/historico/FLUXO-AUTORIA-N1.md`,
   `docs/mecanifica/historico/RELATORIO-N1-FLUXO-AUTORIA.md`,
   `docs/mecanifica/CONTRATO-FORMA-GLOBAL-N2.md`,
   `docs/mecanifica/historico/RELATORIO-N2-FORMA-GLOBAL.md`,

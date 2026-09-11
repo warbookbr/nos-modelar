@@ -3,7 +3,7 @@
 ## Papel e autoridade
 
 Este dossiê detalha a arquitetura vinculante do plano
-[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+[`2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md`](../planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 Ele não autoriza implementação fora das fatias do plano. Em divergência, o
 plano ativo e os contratos executáveis prevalecem.
 

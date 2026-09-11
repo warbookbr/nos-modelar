@@ -26,7 +26,7 @@
 | [`docs/nos-herdado/oficina-projeto.md`](./nos-herdado/oficina-projeto.md) | o racional do que já foi construído + a Ordem de construção encerrada | 7 |
 
 A referência curta de uso diário é [`docs/uso/oficina-referencia.md`](./uso/oficina-referencia.md).
-O roteiro vigente da Mecanifica é [`docs/mecanifica/PLANO.md`](./mecanifica/PLANO.md).
+O roteiro vigente da Mecanifica é [`docs/mecanifica/historico/PLANO.md`](mecanifica/historico/PLANO.md).
 
 O roteiro herdado do NÓS e o que foi projetado e não construído saíram do
 repositório em 2026-09-07, junto com o resto da zona que não autorizava trabalho

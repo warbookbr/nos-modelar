@@ -252,13 +252,13 @@
 ## autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/
 
 - `alteracao-local.mjs` — alteracao-local.mjs — Q5 da prova P2: `elevar a crista 25 mm`. Mede quantos loops a alteração toca, o que muda na malha compilada e se a reexecução dá o mesm…
-- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a prova P2, não…
+- `cage.mjs` — cage.mjs — formato `mecanifica.cage-quad@1` e seu validador, conforme docs/mecanifica/historico/CHASSI-P1-CONTRATO-DA-CAGE.md. Privado e descartável: é a pro…
 - `cage.test.mjs` — Testes do formato e do validador da cage. Cada caso amarra uma regra do contrato de P1 e prova que ela RECUSA, não que ela avisa.
 - `compilar.mjs` — compilar.mjs — compila a cage do quarto dianteiro, mede e desenha. É o passo Q4 da prova P2: nada aqui vira peça publicada.
 - `forma-nao-automotiva.mjs` — forma-nao-automotiva.mjs — a segunda metade da prova P2: a mesma cage e a mesma subdivisão sobre um objeto que não é carro. Se a representação carregasse voc…
-- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita à mão: a c…
+- `quarto-dianteiro.mjs` — quarto-dianteiro.mjs — a cage do quarto dianteiro da prova P2. Derivada dos landmarks de docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md, não escrita …
 - `quarto-dianteiro.test.mjs` — Testes da cage do quarto dianteiro e da forma não automotiva. O que se prova aqui é o que P2 exige: abertura real, retorno de borda, regiões da mesma superfí…
-- `rejeicoes-p0.mjs` — rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de docs/mecanifica/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
+- `rejeicoes-p0.mjs` — rejeicoes-p0.mjs — as oito condições de rejeição visual da seção 7 de docs/mecanifica/historico/CHASSI-P0-ALVO-E-LIMIARES.md, EXECUTÁVEIS.
 - `rejeicoes-p0.test.mjs` — Um detector que nunca reprova e um que sempre reprova são igualmente inúteis. Cada condição automatizada ganha AQUI um par: uma cage que ela deve deixar pass…
 - `render.mjs` — render.mjs — desenho sólido da malha compilada, por pintor. Sem dependência e sem navegador: projeta, ordena por profundidade e preenche com sombreado da nor…
 - `subdividir.mjs` — subdividir.mjs — Catmull-Clark determinística com vinco semi-agudo, para a prova P2. Módulo PRIVADO e descartável: não é o núcleo, não vira operação registra…
@@ -353,18 +353,12 @@
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
-- `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
 - `ATRITOS-AUTORIA.md` — Atritos de autoria — resumo atual
 - `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
-- `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
-- `BICICLETA-REALISTA-ATRITOS.md` — Bicicleta realista: diário de atrito da rodada
-- `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
-- `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
-- `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural da Mecanifica
@@ -372,35 +366,23 @@
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-LOCAL.md` — Coordenação local entre agentes
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Mecanifica
-- `DOSSIE-CABO-DE-PA.md` — Cabo de pá: alternativas ao eucalipto — dossiê técnico
 - `DOSSIE-EXPORTACAO-CAD-STEP.md` — Dossiê técnico — exportação CAD/STEP
-- `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
-- `DOSSIE-LABORATORIO-IA.md` — Laboratório computacional para investigação por IA
 - `DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md` — Dossiê — modelador inverso com priors por família
-- `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
-- `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
-- `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `HOMOLOGACAO-FLUXO-IA.md` — Homologação do fluxo de IA
 - `INDEX.md` — Mecanifica — entrada atual
 - `INVENTARIO.md` — Inventário e fontes de verdade
-- `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
-- `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
-- `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA-V1.md` — Montagem persistida v1
 - `MONTAGEM-PERSISTIDA-V2.md` — Montagem persistida v2
 - `MONTAGEM-PERSISTIDA-V3.md` — Montagem persistida v3 e impacto local
 - `MONTAGEM-PERSISTIDA-V4.md` — Montagem persistida v4 e expectativas de interseção
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
-- `PLANO.md` — Plano mestre da Mecanifica — aposentado
-- `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
-- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão da Mecanifica
@@ -412,11 +394,28 @@
 
 ## docs/mecanifica/historico/
 
+- `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
 - `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
+- `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
+- `BICICLETA-REALISTA-ATRITOS.md` — Bicicleta realista: diário de atrito da rodada
+- `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
+- `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
+- `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
+- `DOSSIE-CABO-DE-PA.md` — Cabo de pá: alternativas ao eucalipto — dossiê técnico
+- `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
+- `DOSSIE-LABORATORIO-IA.md` — Laboratório computacional para investigação por IA
 - `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
+- `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
+- `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
+- `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
+- `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
+- `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
+- `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
 - `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
+- `PLANO.md` — Plano mestre da Mecanifica — aposentado
+- `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
 - `README.md` — Histórico da Mecanifica
 - `REGISTRO-FALHAS-AUTORIA-V.md` — Registro de falhas da autoria — V-01 a V-38
 - `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
@@ -446,6 +445,7 @@
 - `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
+- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
 
 ## docs/mecanifica/pecas/
 

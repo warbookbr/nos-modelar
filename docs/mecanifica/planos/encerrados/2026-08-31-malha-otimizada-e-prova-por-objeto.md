@@ -17,8 +17,8 @@ ocupando a única vaga de plano ativo.
 `b97c7bb49524c4fbc7de546fd2a4a01d396c4390`
 
 **Rastreio das fatias:**
-[`../../MALHA-OTIMIZADA-PROGRESSO.md`](../../MALHA-OTIMIZADA-PROGRESSO.md)
-(`docs/mecanifica/MALHA-OTIMIZADA-PROGRESSO.md`)
+[`../../MALHA-OTIMIZADA-PROGRESSO.md`](../../historico/MALHA-OTIMIZADA-PROGRESSO.md)
+(`docs/mecanifica/historico/MALHA-OTIMIZADA-PROGRESSO.md`)
 
 ## Problema observado
 

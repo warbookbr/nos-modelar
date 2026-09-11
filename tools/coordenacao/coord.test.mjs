@@ -41,7 +41,7 @@ describe('coordenação local', () => {
   it('recusa sobreposição por arquivo ou identidade e aceita após liberação', () => {
     const root = raiz();
     const primeira = reservar({ raiz: root, agente: 'codex', repo: 'warbook', arquivos: ['docs/mecanifica'], identidades: ['A-40'] });
-    expect(() => reservar({ raiz: root, agente: 'claude', repo: 'brigsd', arquivos: ['docs/mecanifica/PLANO.md'] })).toThrow(/conflita/);
+    expect(() => reservar({ raiz: root, agente: 'claude', repo: 'brigsd', arquivos: ['docs/mecanifica/historico/PLANO.md'] })).toThrow(/conflita/);
     expect(() => reservar({ raiz: root, agente: 'claude', repo: 'brigsd', identidades: ['A-40'] })).toThrow(/conflita/);
     liberar({ raiz: root, agente: 'codex', id: primeira.id });
     expect(() => reservar({ raiz: root, agente: 'claude', repo: 'brigsd', identidades: ['A-40'] })).not.toThrow();

@@ -3,7 +3,7 @@
 ## Papel
 
 Este dossiê define o teto e as perguntas da capacidade de superfície prevista
-no [plano mestre](./planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
+no [plano mestre](../planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md).
 Ele orienta N2–N5; a representação final só é promovida depois das provas.
 
 ## Problema a resolver

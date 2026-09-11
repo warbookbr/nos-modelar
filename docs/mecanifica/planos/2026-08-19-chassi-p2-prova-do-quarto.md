@@ -11,8 +11,8 @@ Executar a prova decisiva da rodada P2 do
 reabrir a representação decidida — cage de quads com vincos, avaliada por
 Catmull-Clark determinística.
 
-Alvo em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../CHASSI-P0-ALVO-E-LIMIARES.md);
-contrato em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../CHASSI-P1-CONTRATO-DA-CAGE.md).
+Alvo em [`../CHASSI-P0-ALVO-E-LIMIARES.md`](../historico/CHASSI-P0-ALVO-E-LIMIARES.md);
+contrato em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../historico/CHASSI-P1-CONTRATO-DA-CAGE.md).
 
 ## O que esta prova é, e o que ela não é
 
