@@ -45,9 +45,15 @@ medido e já saem com código de erro; o que falta é estarem no laço.
 nem critérios de reprovação. Cresce para virar o plano de modelagem, mantendo a
 validação e a assinatura que já tem.
 
-`critico-visual` e `revisor-adversarial`: **ENVOLVER**. Continuam como estão,
-mas passam a receber alvo e critérios do plano, sem a história da construção, e
-a devolver veredito estruturado em vez de prosa.
+`critico-visual`: **ENVOLVER**. O isolamento que o laço exige já está nele — a
+única ferramenta é `Read`, ele recebe caminhos de imagem e tem escrito que não
+deve descobrir de onde as imagens vieram. Muda só a saída, que passa de nota e
+prosa para defeitos nomeados.
+
+Modelador: **CRIAR**. Não existe. O `game-builder` implementa mudanças no
+repositório e não é um autor de peça; `revisor-adversarial` julga código e não
+forma. Sem um modelador com papel próprio, quem modela é a sessão principal,
+que também é quem aprova.
 
 Motor de prancha: **ADIAR**. O traço trêmulo vem de polilinha digitada à mão, e
 consertar isso é outro plano. Aqui a referência é a imagem, não a prancha.
@@ -62,7 +68,11 @@ consertar isso é outro plano. Aqui a referência é a imagem, não a prancha.
 - o documento vinculado ao README com o exemplo completo preenchido;
 - veredito estruturado do revisor, com vocabulário fechado de defeito;
 - o laço dos três papéis, com registro por rodada e critério de parada;
-- o gate que confere a peça contra o plano de modelagem.
+- o gate que confere a peça contra o plano de modelagem;
+- os arquivos de agente do modelador e do revisor, genéricos por construção: o
+  papel, o que podem ler, o que têm proibido fazer e o formato de entrada e
+  saída moram no agente; partes, nomes, formas, contatos e critérios vêm do
+  plano de modelagem.
 
 ## Excluído
 
@@ -80,13 +90,16 @@ consertar isso é outro plano. Aqui a referência é a imagem, não a prancha.
 3. parte nomeada no plano e ausente na peça reprova;
 4. o revisor não recebe a história da construção, e o veredito dele nomeia
    parte, tipo de defeito e sentido do erro — veredito em prosa é recusado;
-5. o vocabulário de defeito é fechado, e "ângulo" e "posição" são entradas
+5. o modelador não emite juízo sobre o próprio resultado e o revisor não edita
+   receita: nenhum dos dois arquivos de agente cita objeto específico, e trocar
+   a bicicleta por outra peça não exige tocá-los;
+6. o vocabulário de defeito é fechado, e "ângulo" e "posição" são entradas
    distintas, de modo que um defeito de ângulo não possa ser respondido com
    translação;
-6. o laço registra cada rodada com receita, medida e veredito, e para por
+7. o laço registra cada rodada com receita, medida e veredito, e para por
    critério atingido ou por limite de rodadas, nunca por concordância do autor;
-7. a rodada de alinhamento é executável como skill e produz o arquivo;
-8. os vinte gates continuam verdes.
+8. a rodada de alinhamento é executável como skill e produz o arquivo;
+9. os vinte gates continuam verdes.
 
 ## Fatias
 
@@ -103,16 +116,21 @@ consertar isso é outro plano. Aqui a referência é a imagem, não a prancha.
    critérios de reprovação — e as variáveis por família. Termina escrevendo o
    arquivo. Prova: rodar a skill sobre a bicicleta reproduz um plano equivalente
    ao que a receita atual já cumpre.
-4. **Veredito estruturado.** Contrato de saída do revisor: lista de defeitos com
+4. **Os dois papéis como agentes.** Arquivo do modelador, que escreve receita a
+   partir do plano de modelagem e não avalia o resultado, e ajuste do
+   `critico-visual`, que julga e não edita. Nenhum dos dois cita objeto
+   específico. Prova: os mesmos dois arquivos servem à bicicleta e a uma peça de
+   outra família, sem edição.
+5. **Veredito estruturado.** Contrato de saída do revisor: lista de defeitos com
    parte, tipo dentro do vocabulário fechado, extremidade afetada e sentido do
    erro. Prova: veredito em prosa é recusado pelo validador; veredito válido
    vira entrada de rodada.
-5. **O laço.** Comando que recebe o plano, despacha o modelador, roda os gates,
+6. **O laço.** Comando que recebe o plano, despacha o modelador, roda os gates,
    despacha o revisor com alvo e critérios mas sem a construção, leva o veredito
    de volta e repete até fechar ou até o limite. Prova: uma peça defeituosa de
    propósito é corrigida em rodadas registradas, e o registro mostra o veredito
    que motivou cada correção.
-6. **Documento e exemplo.** O documento vinculado ao README com a bicicleta
+7. **Documento e exemplo.** O documento vinculado ao README com a bicicleta
    inteira preenchida: o que foi perguntado, o que foi decidido, e como virou
    plano. Prova: `docs:links:check` e `docs:estrutura:check` verdes.
 
