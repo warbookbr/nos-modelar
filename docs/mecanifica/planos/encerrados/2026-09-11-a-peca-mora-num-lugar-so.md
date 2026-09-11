@@ -1,6 +1,6 @@
 # A peça mora num lugar só
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude
 
@@ -142,4 +142,24 @@ bancada real no navegador, com a pasta antiga vazia.
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+**Concluído** em 2026-09-11, nos commits `ae96f90` a este, com vinte e cinco
+gates verdes — dois a mais que antes: `guarda:referencia`, que prova no navegador
+que a imagem da peça vira plano na cena, e `reguas:check`, que veio junto.
+
+O retrato caiu de quatro árvores para duas. A que resta fora é `tools/`, onde o
+gerador de prancha continua por ser código, e isso estava excluído desde o
+começo. A peça é uma pasta: receita, referências e rodadas do laço juntas, e a
+identidade dela deixou de ser o nome do arquivo.
+
+Três coisas passaram a reprovar: referência declarada que não existe no disco,
+peça em arquivo solto, e — já de antes — parte prometida e não entregue. A
+primeira paga a dívida do risco de parada: imagem que saiu de `docs/` perdeu o
+alcance do gate de links no mesmo commit em que ganhou guarda própria.
+
+A recusa da forma antiga só entrou depois que a bicicleta migrou. Recusar antes
+seria reprovar o acervo por uma regra que ele não tinha como cumprir.
+
+Duas correções que a execução obrigou e valem como registro: `pecasDoAcervo`
+calculava o nome contra a constante do acervo em vez da base varrida, e o
+registro de rodadas deixava de conferir o nome da peça quando a pasta vinha por
+parâmetro. As duas apareceram ao escrever a prova, não ao ler o código.

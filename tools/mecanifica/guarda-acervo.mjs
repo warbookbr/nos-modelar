@@ -18,7 +18,7 @@
  * acusar.
  */
 import { existsSync, readdirSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
 import { caminhosDaReferencia } from '../../src/autoria/plano-de-modelagem.js';
@@ -72,9 +72,36 @@ export function referenciasAusentes(peca, plano, { raiz = REPO } = {}) {
     .some((candidato) => existsSync(join(raiz, candidato))));
 }
 
+/* A FORMA ANTIGA DEIXA DE SER ACEITA. Enquanto o acervo aceitava peça em
+   arquivo solto e peça em pasta, as duas formas conviviam para sempre: um `if`
+   em cada comando e uma dúvida em cada sessão sobre onde a próxima peça nasce.
+   A permissão não segura comportamento — peça nova continuaria espalhando
+   referências pelas mesmas árvores de antes só porque ninguém foi lembrado.
+
+   A recusa só entrou quando a forma antiga ficou sem ocupante: a bicicleta
+   migrou primeiro, e só então isto passou a reprovar. Recusar antes disso seria
+   reprovar o acervo por uma regra que ele ainda não tinha como cumprir. */
+export function emArquivoSolto(peca, { raiz = REPO } = {}) {
+  try {
+    return !resolverCaminhoReceita(peca, { raiz }).endsWith(`${sep}receita.js`);
+  } catch {
+    return false;
+  }
+}
+
 export async function conferirAcervo(pecas = pecasDoAcervo()) {
   const reprovadas = [];
   for (const peca of pecas) {
+    if (emArquivoSolto(peca)) {
+      reprovadas.push({
+        peca,
+        motivo: 'PEÇA EM ARQUIVO SOLTO\n'
+          + `  A peça vive em '${peca}.js', e o material dela — referências, âncoras\n`
+          + '  e rodadas do laço — não tem onde morar junto.\n'
+          + `  A forma certa é a pasta: '${peca}/receita.js', com 'referencias/' ao lado.`,
+      });
+      continue;
+    }
     const medida = await descreverPecaReutilizavel({ peca });
     if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); continue; }
     /* A medida já validou e canonicalizou o plano, e devolve `null` quando a

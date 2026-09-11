@@ -27,6 +27,16 @@ describe('rodada de alinhamento', () => {
     expect(SKILL).toContain('contatos');
   });
 
+  it('manda a peça nascer em PASTA, e diz o que reprova quem não faz isso', () => {
+    /* Sem esta instrução a pasta da peça seria permissão e não regra: peça nova
+       continuaria em arquivo solto, e o material dela voltaria a se espalhar. */
+    expect(SKILL).toMatch(/nasce como PASTA/);
+    expect(SKILL).toContain('receita.js');
+    expect(SKILL).toContain('referencias/');
+    expect(SKILL).toMatch(/sobreposicao/);
+    expect(SKILL).toMatch(/reprova em `npm run guarda:acervo`/);
+  });
+
   it('diz que o produto é arquivo e que quem conduz não aprova', () => {
     expect(SKILL).toMatch(/guarda:acervo/);
     expect(SKILL).toMatch(/não é você quem aprova/);

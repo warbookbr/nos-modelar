@@ -11,6 +11,11 @@ e escreva o `PLANO` da receita. Sem ele, parte prometida e não entregue é
 invisível para toda medida, e `npm run guarda:acervo` reprova a peça na entrada
 do acervo.
 
+A peça é uma PASTA: `prototipos/procedural/v3/pecas/<peça>/receita.js`, com as
+imagens em `referencias/` ao lado e as rodadas do laço em `rodadas/`. Peça em
+arquivo solto reprova, porque o material dela não tem onde morar junto e volta a
+se espalhar pelo repositório.
+
 Use esta skill quando o alvo for uma peça geométrica editável. Se o alvo for
 uma árvore de composição, relações entre peças ou revalidação de conjunto,
 use também `../auditar-montagem/SKILL.md`: cada peça é uma receita, e o conjunto

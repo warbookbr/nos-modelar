@@ -79,10 +79,30 @@ Traga só as que se aplicam, e diga por que está perguntando.
 
 ## Fechando a rodada
 
+A peça nasce como PASTA, e não como arquivo solto. Crie o diretório com a
+receita e as imagens dentro, e copie para lá as referências que a rodada
+escolheu:
+
+```
+prototipos/procedural/v3/pecas/<peça>/
+  receita.js
+  referencias/
+    sobreposicao.jpg     ← a que a bancada põe sobre o modelo
+    lateral.png          ← os recortes de conferência
+```
+
+Peça em arquivo solto reprova em `npm run guarda:acervo`, e reprova por um
+motivo prático: o material dela — referências, âncoras e as rodadas do laço —
+não tem onde morar junto, e volta a se espalhar por quatro árvores do
+repositório.
+
 Escreva o `PLANO` na receita, com os campos `objeto`, `referencias`, `escala`,
-`partes` e `criteriosDeReprovacao`, e a lista de `contatos` ao lado. Depois rode
-`npm run guarda:acervo` e mostre o resultado: plano inválido ou incompleto
-reprova ali, antes de existir geometria, que é o barato deste momento.
+`partes` e `criteriosDeReprovacao`, e a lista de `contatos` ao lado. As
+referências são declaradas RELATIVAS à pasta da peça, como no exemplo de árvore
+acima, e a chamada `sobreposicao` é a que a bancada mostra sobre o modelo. Depois
+rode `npm run guarda:acervo` e mostre o resultado: plano inválido, referência
+declarada que não existe e peça fora da pasta reprovam ali, antes de existir
+geometria, que é o barato deste momento.
 
 Leia em voz alta para a pessoa o que ficou escrito e pergunte se é isso. Plano
 combinado e não conferido é a mesma coisa que plano nenhum.

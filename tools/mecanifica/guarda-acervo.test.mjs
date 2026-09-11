@@ -6,12 +6,12 @@
  * bicicleta saiu com os balancos soltos no ar sem nada acusar. Declarar um
  * contato é prometer geometria; promessa não cumprida é defeito, não folga.
  */
-import { rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
-import { pecasDoAcervo, conferirAcervo } from './guarda-acervo.mjs';
+import { conferirAcervo, emArquivoSolto, pecasDoAcervo } from './guarda-acervo.mjs';
 
 const MOTIVO = 'as duas metades são soldadas uma na outra';
 const ACERVO = resolve(fileURLToPath(new URL('../..', import.meta.url)), 'prototipos/procedural/v3/pecas');
@@ -110,9 +110,12 @@ describe('veredito de contato do acervo', () => {
   it('REPROVA peça do acervo que não exporta plano nenhum', async () => {
     /* A peça é escrita no acervo de verdade e apagada depois: a guarda mede o
        que está na pasta, e provar isso com um dublê mediria outra coisa. */
+    /* A peça de ensaio nasce JÁ NA PASTA: em arquivo solto ela reprovaria pela
+       forma antes de chegar ao plano, e o teste mediria outra coisa. */
     const nome = 'ensaio-sem-plano-temporario';
-    const caminho = join(ACERVO, `${nome}.js`);
-    writeFileSync(caminho, 'export default { meta: { nome: "ensaio" }, '
+    const pasta = join(ACERVO, nome);
+    mkdirSync(pasta, { recursive: true });
+    writeFileSync(join(pasta, 'receita.js'), 'export default { meta: { nome: "ensaio" }, '
       + 'PASSOS: [["cubo", { origemId: 10, larg: 0.4, alt: 0.4, prof: 0.4 }], '
       + '["parte", { nome: "unica", sel: { origem: { op: "cubo", id: 10 } } }]] };\n', 'utf8');
     try {
@@ -121,9 +124,33 @@ describe('veredito de contato do acervo', () => {
       expect(reprovadas).toHaveLength(1);
       expect(reprovadas[0].motivo).toMatch(/SEM PLANO DE MODELAGEM/);
     } finally {
-      rmSync(caminho, { force: true });
+      rmSync(pasta, { recursive: true, force: true });
     }
     expect(pecasDoAcervo()).not.toContain(nome);
+  });
+
+  it('REPROVA peça em arquivo solto, e diz qual é a forma certa', async () => {
+    /* A recusa entra agora porque a forma antiga ficou sem ocupante: a bicicleta
+       já é pasta. Enquanto as duas formas conviviam, permitir era o certo. */
+    const nome = 'ensaio-em-arquivo-solto';
+    const caminho = join(ACERVO, `${nome}.js`);
+    writeFileSync(caminho, 'export default { meta: { nome: "ensaio" }, PASSOS: [] };\n', 'utf8');
+    try {
+      expect(emArquivoSolto(nome)).toBe(true);
+      const { reprovadas } = await conferirAcervo([nome]);
+      expect(reprovadas).toHaveLength(1);
+      expect(reprovadas[0].motivo).toMatch(/PEÇA EM ARQUIVO SOLTO/);
+      expect(reprovadas[0].motivo).toMatch(new RegExp(`${nome}/receita.js`));
+    } finally {
+      rmSync(caminho, { force: true });
+    }
+  });
+
+  it('a bicicleta, que já é pasta, não é acusada de forma antiga', () => {
+    expect(emArquivoSolto('bicicleta-quadro')).toBe(false);
+    /* Peça que não existe não é acusada: quem reclama de nome inexistente é o
+       resolvedor, com a mensagem dele. */
+    expect(emArquivoSolto('peca-que-nunca-existiu')).toBe(false);
   });
 
   it('a guarda varre o acervo e o acervo de hoje passa', async () => {
