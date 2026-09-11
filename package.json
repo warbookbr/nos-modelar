@@ -42,6 +42,7 @@
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
     "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
     "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
+    "guarda:contatos": "node tools/mecanifica/guarda-contatos.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "parametros": "node tools/mecanifica/parametros-peca.mjs",
     "varrer": "node tools/mecanifica/varrer-peca.mjs",

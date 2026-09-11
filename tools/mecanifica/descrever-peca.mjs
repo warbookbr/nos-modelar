@@ -264,6 +264,24 @@ export async function descreverPecaReutilizavel({
         + ' — furo passante só é contável em malha fechada.\n';
     }
 
+    /* DECLARADO QUE NÃO ENCOSTA TAMBÉM REPROVA, e esta é a metade que faltava.
+       A medida já apurava o par declarado sem contato, e só o exibia, com o
+       argumento de que podia ser folga que a receita pretendia fechar. O efeito
+       prático foi outro: numa bicicleta anterior os balancos que seguram a roda
+       ficaram soltos no ar, o quadro saiu em pedaços que não se tocavam, e o
+       comando devolveu zero. Declarar que duas partes se soldam e entregar
+       espaço entre elas é defeito das duas maneiras possíveis — ou a geometria
+       está errada, ou a declaração descreve uma peça que não existe. */
+    if (contatos.declaradosSemContato.length) {
+      stderr += `\n${contatos.declaradosSemContato.length} CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM`
+        + '\n  A receita disse que estas partes se tocam, e elas não se tocam:\n'
+        + contatos.declaradosSemContato
+          .map(({ par, motivo }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`)
+          .join('\n')
+        + '\n  Ou a geometria não chegou onde deveria, ou a declaração está errada.\n';
+      falhou = true;
+    }
+
     if (contatos.cobertura.inconclusivos.length) {
       /* Não reprova: malha aberta é estilo que o motor aceita, e reprovar aqui
          puniria peça legítima. Mas também não vira "livre" — a medida diz que
