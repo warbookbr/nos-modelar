@@ -1,0 +1,141 @@
+# Orquestração de modelagem — alinhamento, despacho e veredito
+
+**Estado:** rascunho
+
+**Responsável:** Claude
+
+**Repositório e base:** `nos-mecanifica`, base `60a5f31`
+
+## Problema observado
+
+Quem modela também aprova o que modelou, e por isso trabalho torto passa. Na
+prova do quarto dianteiro do chassi eu modelei sem abrir o desenho de
+referência uma única vez e mandei ao revisor visual só o render; a nota foi 3
+de 10 duas vezes seguidas sem que nenhum de nós pudesse apontar contra o quê, e
+o registro disso está no cabeçalho de `tools/mecanifica/comparar-alvo.mjs`. Na
+bicicleta eu declarei que a prancha estava reta e alinhada ao guidão quando ela
+estava torta, e chamei de translação um defeito que era de ângulo: eu disse que
+o tubo do selim precisava ir para a frente quando o que faltava era girá-lo.
+
+Os instrumentos que pegariam parte disso existem e ficaram fora do caminho.
+`src/autoria/contatos-da-peca.js` nasceu porque o tubo inferior de uma
+bicicleta atravessou o pneu e passou em todos os testes;
+`tools/mecanifica/conferir-juntas.mjs` mede vão, paralelismo e selagem. Mesmo
+assim a bicicleta antiga saiu com partes que não se tocavam, porque a receita
+não declarou os contatos e ninguém rodou a medida. O `INTENCAO`, documentado em
+`docs/mecanifica/usar/INTENCAO-PECA-V1.md`, é opcional e magro demais para
+servir de contrato.
+
+A consequência é que o resultado depende de quem está na cadeira, e não do
+método. Orientação que não falha é conselho, e conselho é ignorado sob pressão
+de terminar.
+
+## Resultado
+
+Uma peça passa a ser modelada a partir de um plano de modelagem escrito antes,
+por três papéis separados — quem alinha, quem modela, quem julga —, e nenhum
+deles aprova o próprio trabalho.
+
+## Filtro Agent-First
+
+`contatos-da-peca` e `conferir-juntas`: **USAR DIRETO**. Medem o que precisa ser
+medido e já saem com código de erro; o que falta é estarem no laço.
+
+`INTENCAO`: **REFATORAR**. A forma de cinco campos não carrega partes, contatos
+nem critérios de reprovação. Cresce para virar o plano de modelagem, mantendo a
+validação e a assinatura que já tem.
+
+`critico-visual` e `revisor-adversarial`: **ENVOLVER**. Continuam como estão,
+mas passam a receber alvo e critérios do plano, sem a história da construção, e
+a devolver veredito estruturado em vez de prosa.
+
+Motor de prancha: **ADIAR**. O traço trêmulo vem de polilinha digitada à mão, e
+consertar isso é outro plano. Aqui a referência é a imagem, não a prancha.
+
+## Incluído
+
+- o plano de modelagem como arquivo, ampliando `INTENCAO`: partes com nome e
+  forma pretendida, pares que devem se tocar, imagens de referência com a
+  medida que dá a escala, e critérios de reprovação daquele objeto;
+- a skill da rodada de alinhamento, com as perguntas fixas e as que dependem da
+  família da peça;
+- o documento vinculado ao README com o exemplo completo preenchido;
+- veredito estruturado do revisor, com vocabulário fechado de defeito;
+- o laço dos três papéis, com registro por rodada e critério de parada;
+- o gate que confere a peça contra o plano de modelagem.
+
+## Excluído
+
+- conserto do motor de prancha e do traço por polilinha;
+- medida automática de ângulo e comprimento contra a imagem de referência, que
+  entra depois, quando o laço já estiver de pé;
+- qualquer mudança no vocabulário de operações do núcleo;
+- modelagem do carro.
+
+## Gate de saída
+
+1. peça sem plano de modelagem não passa: o gate acusa e diz o que falta;
+2. par declarado como contato que não se toca reprova com número, e a mensagem
+   nomeia as duas partes;
+3. parte nomeada no plano e ausente na peça reprova;
+4. o revisor não recebe a história da construção, e o veredito dele nomeia
+   parte, tipo de defeito e sentido do erro — veredito em prosa é recusado;
+5. o vocabulário de defeito é fechado, e "ângulo" e "posição" são entradas
+   distintas, de modo que um defeito de ângulo não possa ser respondido com
+   translação;
+6. o laço registra cada rodada com receita, medida e veredito, e para por
+   critério atingido ou por limite de rodadas, nunca por concordância do autor;
+7. a rodada de alinhamento é executável como skill e produz o arquivo;
+8. os vinte gates continuam verdes.
+
+## Fatias
+
+1. **Plano de modelagem como formato.** Ampliar `INTENCAO` para carregar
+   partes, contatos, referências e critérios, com validação e recusa de chave
+   desconhecida como a de hoje. Prova: plano bem formado é aceito, plano sem
+   contatos declarados é recusado dizendo o que falta.
+2. **Gate da peça contra o plano.** Comando que compara a peça executada com o
+   plano: parte que o plano nomeia e a peça não tem, e par declarado que não se
+   toca, saem com código 1. Prova: tirar um contato da bicicleta faz o comando
+   reprovar nomeando o par.
+3. **Skill da rodada de alinhamento.** Roteiro com as perguntas fixas — objeto,
+   imagens e escala, partes e nomes, forma e técnica por parte, contatos,
+   critérios de reprovação — e as variáveis por família. Termina escrevendo o
+   arquivo. Prova: rodar a skill sobre a bicicleta reproduz um plano equivalente
+   ao que a receita atual já cumpre.
+4. **Veredito estruturado.** Contrato de saída do revisor: lista de defeitos com
+   parte, tipo dentro do vocabulário fechado, extremidade afetada e sentido do
+   erro. Prova: veredito em prosa é recusado pelo validador; veredito válido
+   vira entrada de rodada.
+5. **O laço.** Comando que recebe o plano, despacha o modelador, roda os gates,
+   despacha o revisor com alvo e critérios mas sem a construção, leva o veredito
+   de volta e repete até fechar ou até o limite. Prova: uma peça defeituosa de
+   propósito é corrigida em rodadas registradas, e o registro mostra o veredito
+   que motivou cada correção.
+6. **Documento e exemplo.** O documento vinculado ao README com a bicicleta
+   inteira preenchida: o que foi perguntado, o que foi decidido, e como virou
+   plano. Prova: `docs:links:check` e `docs:estrutura:check` verdes.
+
+## Riscos e parada
+
+O risco que obriga parar é o plano de modelagem virar burocracia sem poder. Se
+ele for escrito e os gates continuarem passando sem lê-lo, voltamos ao conselho
+com mais passos. Por isso a segunda fatia vem antes da skill: primeiro o
+arquivo tem que ser capaz de reprovar, depois vale a pena escrevê-lo com
+cuidado.
+
+O segundo risco é o vocabulário fechado de defeito ser estreito demais para o
+objeto. Se o revisor precisar dizer algo que não cabe em nenhum tipo, ele vai
+espremer o defeito no tipo mais próximo e a correção sairá errada. A saída não é
+abrir o vocabulário para texto livre, é registrar o caso e acrescentar um tipo
+nomeado.
+
+O terceiro risco é o revisor sem referência medida continuar julgando por
+impressão. Este plano não entrega a medida de ângulo e comprimento contra a
+imagem, então a reprovação por proporção ainda depende do olho. Se as rodadas
+mostrarem que o revisor oscila, a medida deixa de ser trabalho posterior e vira
+bloqueio.
+
+## Fechamento
+
+Preencher ao concluir ou cancelar.

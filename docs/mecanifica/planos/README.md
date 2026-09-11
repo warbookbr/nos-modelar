@@ -4,6 +4,14 @@
 
 **Plano ativo:** [ponte do gesto ao parâmetro nomeado](2026-09-10-ponte-do-gesto-ao-parametro.md).
 
+Em rascunho, aguardando o fim do plano ativo: a
+[orquestração de modelagem](2026-09-11-orquestracao-de-modelagem.md). Quem
+modela hoje também aprova o que modelou, e trabalho torto passa por isso — a
+prancha declarada reta estava torta, e um defeito de ângulo foi respondido com
+translação. O rascunho separa três papéis, escreve o plano de modelagem antes
+de qualquer geometria e põe no laço as medidas de contato que já existem e
+ficaram fora do caminho.
+
 A bancada vai ganhar controle direto para o usuário mover geometria, e o desenho
 atual das receitas não recebe esse gesto sem estragar: a bicicleta não tem
 posição escrita, tem posição derivada de uma tabela, e as operações de mover
