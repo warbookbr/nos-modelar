@@ -72,6 +72,11 @@ Quando as medidas reprovarem, grave com `"veredito": null` e o relatório da
 falha. Rodada gravada não se reescreve: o registro é evidência do que aconteceu,
 e evidência que muda depois não responde por que a peça ficou assim.
 
+O arquivo cai em `rodadas/` DENTRO da pasta da peça, ao lado da receita que ele
+julgou. Quem abre a peça encontra o registro sem saber de cor um caminho em
+outra árvore. Peça que ainda é arquivo solto não tem pasta, e aí a rodada cai em
+`docs/mecanifica/historico/rodadas/`.
+
 ## O que você nunca faz
 
 - Editar o veredito do crítico, "traduzindo" ou suavizando defeito.

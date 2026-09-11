@@ -16,26 +16,46 @@
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
+
+/* Onde as rodadas moravam antes da pasta da peça, e onde continuam morando
+   enquanto existir peça em arquivo solto. Registro de peça migrada não é movido:
+   ele é evidência do que aconteceu, e evidência não muda de lugar para caber
+   numa arrumação nova. */
 export const PASTA_RODADAS = join(REPO, 'docs/mecanifica/historico/rodadas');
 
 const NOME_DE_PECA = /^[a-z0-9][a-z0-9-]*$/;
 
-/* A pasta entra por parâmetro para que o teste do laço não grave no histórico
-   real: evidência de rodada que não aconteceu é pior que evidência nenhuma. */
-function pastaDaPeca(peca, raiz) {
+/* A rodada grava DENTRO da pasta da peça, ao lado da receita que ela julgou.
+   Enquanto ficava em `docs/`, responder "por que esta peça está assim" exigia
+   saber de cor um caminho em outra árvore — e quem abre a peça não descobre
+   que o registro existe. Peça em arquivo solto não tem pasta, e aí a rodada cai
+   no lugar antigo. */
+function exigirNome(peca) {
   if (!NOME_DE_PECA.test(peca ?? '')) {
     throw new Error(`'${peca}' não é nome de peça; use letras minúsculas, dígitos e hífen.`);
   }
-  return join(raiz, peca);
 }
 
-export function lerRodadas(peca, { raiz = PASTA_RODADAS } = {}) {
-  const pasta = pastaDaPeca(peca, raiz);
+export function pastaDeRodadas(peca, { raiz = REPO } = {}) {
+  exigirNome(peca);
+  try {
+    const receita = resolverCaminhoReceita(peca, { raiz });
+    if (receita.endsWith(`${sep}receita.js`)) return join(dirname(receita), 'rodadas');
+  } catch { /* peça que ainda não existe grava no lugar antigo */ }
+  return join(raiz, 'docs/mecanifica/historico/rodadas', peca);
+}
+
+export function lerRodadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {
+  /* O nome é conferido mesmo quando a pasta vem por parâmetro. Sem isto, quem
+     injeta a pasta — o teste, ou um comando futuro — passa a aceitar nome com
+     `..` e a escrever fora da árvore pretendida. */
+  exigirNome(peca);
   if (!existsSync(pasta)) return [];
   return readdirSync(pasta)
     .filter((nome) => /^rodada-\d{2}\.json$/.test(nome))
@@ -43,10 +63,10 @@ export function lerRodadas(peca, { raiz = PASTA_RODADAS } = {}) {
     .map((nome) => JSON.parse(readFileSync(join(pasta, nome), 'utf8')));
 }
 
-export function gravarRodada(peca, { veredito = null, medidas }, { raiz = PASTA_RODADAS } = {}) {
-  const anteriores = lerRodadas(peca, { raiz });
+export function gravarRodada(peca, { veredito = null, medidas }, { pasta = pastaDeRodadas(peca) } = {}) {
+  exigirNome(peca);
+  const anteriores = lerRodadas(peca, { pasta });
   const rodada = registrarRodada({ peca, numero: anteriores.length + 1, veredito, medidas });
-  const pasta = pastaDaPeca(peca, raiz);
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
   /* Rodada gravada não é reescrita. O registro é evidência do que aconteceu, e

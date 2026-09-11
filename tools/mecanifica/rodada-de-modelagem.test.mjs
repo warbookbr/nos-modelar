@@ -11,11 +11,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { gravarRodada, lerRodadas } from './rodada-de-modelagem.mjs';
+import { gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
 
 let area;
-const ler = (peca) => lerRodadas(peca, { raiz: area });
-const gravar = (peca, entrada) => gravarRodada(peca, entrada, { raiz: area });
+const ler = (peca) => lerRodadas(peca, { pasta: join(area, peca) });
+const gravar = (peca, entrada) => gravarRodada(peca, entrada, { pasta: join(area, peca) });
 
 const veredito = (quantos, nota = 6) => ({
   alvo: 'referencias/lateral.png',
@@ -80,9 +80,24 @@ describe('registro de rodadas', () => {
     expect(historia.map((r) => r.veredito?.defeitos.length ?? null)).toEqual([null, null, 3, 1, 0]);
   });
 
-  it('recusa nome de peça que não serve de pasta', () => {
+  it('recusa nome de peça que não serve de pasta, mesmo com a pasta injetada', () => {
     expect(() => ler('../fora')).toThrow(/não é nome de peça/);
     expect(() => gravar('Peça Com Espaço', { medidas: { passou: true } }))
       .toThrow(/não é nome de peça/);
+    expect(() => pastaDeRodadas('../fora')).toThrow(/não é nome de peça/);
+  });
+
+  it('a rodada mora DENTRO da pasta da peça quando a peça é uma pasta', () => {
+    /* A bicicleta migrou: o registro dela fica ao lado da receita que ele
+       julgou, e não numa árvore de documentação que quem abre a peça não vê. */
+    expect(pastaDeRodadas('bicicleta-quadro'))
+      .toMatch(/prototipos\/procedural\/v3\/pecas\/bicicleta-quadro\/rodadas$/);
+  });
+
+  it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {
+    /* Registro de peça anterior à pasta não muda de lugar: evidência não se
+       move para caber numa arrumação nova. */
+    expect(pastaDeRodadas('peca-que-nunca-existiu'))
+      .toMatch(/docs\/mecanifica\/historico\/rodadas\/peca-que-nunca-existiu$/);
   });
 });

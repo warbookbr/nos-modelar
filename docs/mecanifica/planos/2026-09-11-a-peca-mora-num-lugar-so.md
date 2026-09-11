@@ -110,7 +110,9 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
    peça. Prova: a bancada publicada abre a bicicleta e mostra a sobreposição com
    `public/referencias/` vazio.
 5. **As rodadas junto.** O registro do laço grava dentro da pasta da peça.
-   Prova: uma rodada gravada aparece ao lado da receita que a motivou.
+   Prova: a bicicleta resolve para `bicicleta-quadro/rodadas/`, peça em arquivo
+   solto continua no lugar antigo, e o nome é conferido mesmo quando a pasta vem
+   por parâmetro.
 6. **A bicicleta migrada.** A peça inteira muda de forma, e o retrato da
    primeira fatia passa de quatro árvores para DUAS: a da peça e a de `tools/`,
    onde o gerador de prancha continua por ser código. Uma árvore só seria mentir
