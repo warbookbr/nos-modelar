@@ -55,6 +55,7 @@
     "gabarito": "node tools/bancadas/gabarito.mjs",
     "criar": "node tools/bancadas/criar.mjs",
     "mapa": "node tools/mapa/mapa.mjs",
+    "reguas:check": "node tools/mapa/reguas-nos-gates.mjs",
     "mapa:check": "node tools/mapa/mapa.mjs --check",
     "docs:toc": "node tools/mapa/toc.mjs",
     "docs:toc:check": "node tools/mapa/toc.mjs --check",

@@ -30,7 +30,7 @@ export const GATES = [
   'arquitetura:check', 'arquitetura:motor:check', 'autoria:schemas:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
   'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:acervo',
-  'mapa:check',
+  'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',
   'leitura:obrigatoria',

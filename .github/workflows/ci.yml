@@ -107,6 +107,11 @@ jobs:
       - name: O acervo cumpre o plano e os contatos que declara
         run: npm run guarda:acervo
 
+      # Régua que existe e ninguém roda não protege nada, e pior, parece
+      # proteger. Três casos num dia só motivaram esta guarda.
+      - name: Toda régua é rodada por gate ou pelo CI
+        run: npm run reguas:check
+
       - name: Mapa do repositório em dia
         run: npm run mapa:check
 
