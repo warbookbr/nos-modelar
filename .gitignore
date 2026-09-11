@@ -23,6 +23,13 @@ assets/preview/
 tools/bancadas/out/
 prototipos/fps/bake/out/
 
+# Área temporária que `ativar-bancada.test.mjs` cria com mkdtemp. O teste limpa
+# o que criou, mas a pasta `tmp/` em si fica, e execução interrompida deixa
+# resíduo dentro dela. Ela precisa existir no disco e nunca no commit: é dentro
+# do repositório, e não em /tmp, porque o confinamento de caminhos recusa
+# destino fora da árvore.
+tmp/
+
 # rascunho de sessão do coder — nunca commitar
 scratchpad/
 
