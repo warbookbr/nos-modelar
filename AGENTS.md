@@ -13,7 +13,7 @@ consulte a inbox e reserve arquivos antes de editar. Use
 
 - `docs/mecanifica/` governa o produto e seus contratos atuais.
 - `docs/mecanifica/planos/README.md` governa o planejamento.
-- `docs/uso/`, `docs/rumo/` e `docs/historico/` são documentação herdada ou
+- `docs/uso/` e `docs/nos-herdado/` são documentação herdada ou
   histórica. Não autorizam implementação.
 - Em divergência, `docs/mecanifica/` prevalece.
 

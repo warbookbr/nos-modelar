@@ -34,7 +34,7 @@ export function criarOperacoesTransformacoes(servicos) {
   },
 
   /* ---- P3 do playground: espelha + rotaciona — as duas transformam uma SELEÇÃO,
-     mas de jeitos opostos (docs/historico/playground.md): `rotaciona` é SIMPLES (só move
+     mas de jeitos opostos (docs/nos-herdado/playground.md): `rotaciona` é SIMPLES (só move
      posição, nunca cria id); `espelha` é MEATY (duplica a seleção refletida,
      ids NOVOS — formato salvo). Juntas destravam objeto bilateral (metade
      modelada + espelho vira o todo; uma parte pode nascer torta/rodada). ---- */
@@ -44,7 +44,7 @@ export function criarOperacoesTransformacoes(servicos) {
      em POSIÇÃO (`st.V.set` in-place) — NUNCA cria vértice/face, NUNCA renumera,
      NÃO consome o bloco de ids do passo. Determinístico (só soma).
 
-     POR QUE ELA EXISTE (D-128, o achado do experimento do TETO — docs/historico/TETO.md):
+     POR QUE ELA EXISTE (D-128, o achado do experimento do TETO — docs/nos-herdado/TETO.md):
      o vocabulário sabia GIRAR a malha inteira (`rotaciona` com `sel` ausente)
      mas não sabia TRANSLADAR nada maior que UMA face — `moveV` move 1 vértice,
      `moveF` 1 face, `moveA` 1 aresta. E das 9 primitivas, 7 nascem PRESAS à

@@ -1,8 +1,13 @@
 # Histórico da Mecanifica
 
-Esta zona guarda experimentos e relatórios encerrados. Eles explicam decisões e
-limites medidos, mas não governam trabalho novo. Contratos atuais ficam na raiz
-de `docs/mecanifica/`; pendências ficam em `planos/BACKLOG.md`.
+Esta zona guarda experimentos e relatórios encerrados DESTE produto. Eles
+explicam decisões e limites medidos, mas não governam trabalho novo. Contratos
+atuais ficam na raiz de `docs/mecanifica/`; pendências ficam em
+`planos/BACKLOG.md`.
+
+Não confundir com [`../../nos-herdado/README.md`](../../nos-herdado/README.md),
+que guarda documentos do projeto de onde a Mecanifica foi clonada: a Oficina
+humana, o Playground e a aplicação jogável, que não existem mais aqui.
 
 | Arquivo | O que prova |
 |---|---|

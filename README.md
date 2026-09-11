@@ -153,7 +153,7 @@ Comece por [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md). Ele aponta
 fontes de verdade, leitura por tarefa, comandos e gates. O inventário completo
 está em [`docs/uso/MAPA.md`](docs/uso/MAPA.md).
 
-Documentos em `docs/uso/`, `docs/rumo/` e `docs/historico/` descrevem o NÓS ou
+Documentos em `docs/uso/` e `docs/nos-herdado/` descrevem o NÓS ou
 resultados históricos. Não autorizam trabalho novo. Em caso de divergência,
 `docs/mecanifica/` prevalece.
 

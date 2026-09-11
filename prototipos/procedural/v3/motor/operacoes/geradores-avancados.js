@@ -122,7 +122,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
      doc citava): `perfil` já é do `lathe` com outra FORMA (`[raio,y]` 2D);
      reusar o nome confundiria os dois.
 
-     CONTORNO explícito (P5, docs/historico/playground.md) — substitui `raio` por
+     CONTORNO explícito (P5, docs/nos-herdado/playground.md) — substitui `raio` por
      `contorno: [[u,w], ...]` com EXATAMENTE `lados` pontos no plano LOCAL do
      anel (os eixos `fr.u`/`fr.w` do transporte paralelo, o mesmo `ca,sa` que
      o círculo calculava de `cos/sin·raio`) — destrava seção NÃO-circular
@@ -193,7 +193,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
        de caminho reto; o loft generaliza pro caminho curvo.
 
      ⚠ CAMINHO SIMÉTRICO **NÃO** GERA MALHA SIMÉTRICA (D-128, achado pelo
-     experimento do TETO — docs/historico/TETO.md). Consequência direta do transporte
+     experimento do TETO — docs/nos-herdado/TETO.md). Consequência direta do transporte
      paralelo descrito acima: o frame de cada anel é PROPAGADO a partir da
      PRIMEIRA seção, então ele depende do HISTÓRICO do caminho, não só da
      posição da seção. Um caminho cujos `pos` são simétricos em torno de um

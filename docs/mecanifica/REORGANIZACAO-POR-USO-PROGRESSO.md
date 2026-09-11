@@ -105,7 +105,7 @@ disparando; mas a afirmação ampla era minha, não do dado.
 | quebrados ao final | 2, ambos anteriores e intocáveis |
 
 Os 12 arquivos de referência absoluta batem com a previsão da F0. Os dois que
-restam vivem em `docs/historico/` de topo, que é registro imutável por regra do
+restam vivem em `docs/nos-herdado/` de topo, que é registro imutável por regra do
 repositório: reescrever caminho ali seria editar histórico.
 
 ### Lacuna encontrada no gate de links

@@ -4,7 +4,7 @@ Recorte do antigo `docs/oficina.md` com **o que se fez e por quê**: o racional 
 design das funções já construídas, os preparos de motor já concluídos, a migração
 pra WebGL 2 e a Ordem de construção encerrada.
 
-Imutável, como todo o `historico/`: consulta-se pra saber POR QUE algo é como é,
+Imutável, como todo o `nos-herdado/`: consulta-se pra saber POR QUE algo é como é,
 não pra saber como fazer. Pra isso, [`docs/uso/oficina-contrato.md`](../uso/oficina-contrato.md)
 e [`docs/uso/oficina-referencia.md`](../uso/oficina-referencia.md).
 

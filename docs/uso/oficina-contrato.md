@@ -14,7 +14,7 @@ verificável contra o núcleo
 
 O registro de projeto (por que cada coisa ficou assim, o que já foi construído)
 está em
-[`docs/historico/oficina-projeto.md`](../historico/oficina-projeto.md). Pra usar a
+[`docs/nos-herdado/oficina-projeto.md`](../nos-herdado/oficina-projeto.md). Pra usar a
 ferramenta no dia a dia, [`oficina-referencia.md`](./oficina-referencia.md) é mais
 curto que isto.
 

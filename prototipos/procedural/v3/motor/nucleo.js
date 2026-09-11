@@ -317,7 +317,7 @@ export function normalDaFace(V, vs) {
    saída sempre — não pretende ser aleatório de verdade, só parecer). `ruido3` amostra
    os 8 cantos do RETICULADO que envolve o ponto e interpola por smoothstep (suave, sem
    quina em cada célula do reticulado) — é "value noise" clássico, devolve sempre
-   [0,1). FORMATO SALVO (docs/historico/playground.md regra 4): a fórmula em si é o que faz o
+   [0,1). FORMATO SALVO (docs/nos-herdado/playground.md regra 4): a fórmula em si é o que faz o
    `displace` de uma peça salva reproduzir o mesmo relevo sempre — mudar hash3/ruido3
    reformaria toda peça que usa `displace`, como renumerar mudaria a malha. */
 function hash3(x, y, z, seed) { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7 + seed * 269.5) * 43758.5453123; return s - Math.floor(s); }

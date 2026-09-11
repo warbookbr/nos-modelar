@@ -48,7 +48,7 @@ export function criarOperacoesPrimitivasBasicas({ BLOCO, confereId, grita, resol
   },
 
   /* ---- P1 do playground: esfera / cone / plano — geradores novos, mesmas leis ----
-     NUMERAÇÃO É FORMATO SALVO (docs/historico/playground.md, regra 4): a numeração de vértice
+     NUMERAÇÃO É FORMATO SALVO (docs/nos-herdado/playground.md, regra 4): a numeração de vértice
      e de face de cada op abaixo está documentada AQUI e travada por teste — depois
      de shipada, NUNCA muda (peça salva depende dela). Winding sempre com a normal
      pra FORA (a convenção do cubo/cilindro — a lição D1 das tampas). Guarda de

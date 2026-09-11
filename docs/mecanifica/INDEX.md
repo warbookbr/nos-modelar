@@ -193,7 +193,7 @@ Nenhuma pendência desta lista autoriza implementação automática.
 Resultados encerrados da Mecanifica ficam em
 [`historico/README.md`](historico/README.md) e os planos já fechados em
 [`planos/encerrados/README.md`](planos/encerrados/README.md). Decisões do NÓS
-ficam em `docs/historico/`. Nenhuma dessas zonas autoriza trabalho novo.
+ficam em `docs/nos-herdado/`. Nenhuma dessas zonas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em
 [`INVENTARIO.md`](INVENTARIO.md) (`docs/mecanifica/INVENTARIO.md`); o

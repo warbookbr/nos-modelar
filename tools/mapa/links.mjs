@@ -2,8 +2,8 @@
 /* links.mjs — o gate de referência: varre todo arquivo rastreado por menções a
    `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o
    caminho citado não resolve. Duas zonas, dois rigores: ZONA VIVA (todo
-   arquivo fora de `docs/historico/`) exige resolução EXATA; ZONA HISTÓRICA
-   (arquivos sob `docs/historico/`) aceita resolução por NOME de arquivo em
+   arquivo fora de `docs/nos-herdado/`) exige resolução EXATA; ZONA HISTÓRICA
+   (arquivos sob `docs/nos-herdado/`) aceita resolução por NOME de arquivo em
    qualquer lugar sob `docs/` — histórico é imutável por regra do repo, e
    reescrever caminho ali seria editar registro. A allowlist registra
    referências históricas a arquivos removidos, com o motivo escrito abaixo.
@@ -37,17 +37,17 @@ const PADRAO = /\bdocs\/[A-Za-z0-9_.\-\/]+\.md\b/g;
    Chave = "arquivo:caminho citado". */
 const ALLOWLIST = new Map([
   // arquivo genuinamente inexistente, citado pelo DECISIONS-ARCHIVE.md como registro histórico de uma branch já descartada.
-  ['docs/historico/DECISIONS-ARCHIVE.md:docs/R3_COMPARATIVO_RENDER.md', 'arquivo nunca existiu na main — citado como registro de branch descartada'],
+  ['docs/nos-herdado/DECISIONS-ARCHIVE.md:docs/R3_COMPARATIVO_RENDER.md', 'arquivo nunca existiu na main — citado como registro de branch descartada'],
   // referências preservadas em decisões e walkthroughs históricos; os documentos de origem foram removidos nesta limpeza.
-  ['docs/historico/DECISIONS-ARCHIVE.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS-ARCHIVE.md:docs/CIDADE.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS-ARCHIVE.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS-ARCHIVE.md:docs/CODER.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS.md:docs/FERRAMENTAS.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS.md:docs/AUDIO_E_CENAS.md', 'referência histórica preservada'],
-  ['docs/historico/DECISIONS.md:docs/HABITANTES.md', 'referência histórica preservada'],
-  ['docs/historico/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
-  ['docs/historico/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS-ARCHIVE.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS-ARCHIVE.md:docs/CIDADE.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS-ARCHIVE.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS-ARCHIVE.md:docs/CODER.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS.md:docs/FERRAMENTAS.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS.md:docs/AUDIO_E_CENAS.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/DECISIONS.md:docs/HABITANTES.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
+  ['docs/nos-herdado/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
   /* Registro de crítica gravado do ciclo 6. A prancha do freio virou referência
      por peça e mudou para `docs/mecanifica/pecas/` em 2026-08-31; o registro
      preserva o caminho como era no dia da crítica. Corrigir o caminho aqui
@@ -82,7 +82,7 @@ for (const f of todosDocsMd) {
 }
 
 function ehZonaHistorica(arquivo) {
-  return arquivo.startsWith('docs/historico/');
+  return arquivo.startsWith('docs/nos-herdado/');
 }
 
 const falhas = [];

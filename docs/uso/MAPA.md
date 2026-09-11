@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-834 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+835 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -350,12 +350,6 @@
 
 - `oficina.md` — A Oficina — índice do design
 
-## docs/historico/
-
-- `TETO.md` — O TETO — medir o que a Oficina de fato cria
-- `oficina-projeto.md` — Oficina — o registro de projeto
-- `playground.md` — O Playground — o épico da criação por IA
-
 ## docs/mecanifica/
 
 - `AGENT-FIRST.md` — Filtro Agent-First
@@ -594,6 +588,13 @@
 - `README.md` — Usar o Mecanifica
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RODADA-DE-ALINHAMENTO-EXEMPLO.md` — Rodada de alinhamento, preenchida: o quadro de bicicleta
+
+## docs/nos-herdado/
+
+- `README.md` — Herança do NÓS
+- `TETO.md` — O TETO — medir o que a Oficina de fato cria
+- `oficina-projeto.md` — Oficina — o registro de projeto
+- `playground.md` — O Playground — o épico da criação por IA
 
 ## docs/uso/
 
@@ -866,7 +867,7 @@
 
 ## tools/bancadas/bench/
 
-- `gabarito-nucleo.mjs` — gabarito-nucleo.mjs — P5 do playground (docs/historico/playground.md): FORMA COMO NÚMERO. Lógica PURA (sem Playwright/browser — unit-testável) por trás da ba…
+- `gabarito-nucleo.mjs` — gabarito-nucleo.mjs — P5 do playground (docs/nos-herdado/playground.md): FORMA COMO NÚMERO. Lógica PURA (sem Playwright/browser — unit-testável) por trás da …
 - `gabarito-nucleo.test.ts` — Vitest do NÚCLEO PURO da bancada de gabarito (P5 do playground, D-118): máscara por diferença de fundo (+ o corte do HUD), filtro de componente pequeno (o pi…
 - `pngstats.mjs` — pngstats.mjs — decodifica um PNG (8-bit, colortype 2/6) via zlib. Sem dependência externa. `decodePng` devolve os pixels CRUS (usado pelo porteiro via `pngSt…
 - `pngwrite.mjs` — pngwrite.mjs — codifica um buffer RGB em PNG (8-bit, colortype 2), sem dependência externa (par do decodePng em pngstats.mjs). Usado pela bancada de gabarito…
