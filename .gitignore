@@ -31,6 +31,12 @@ scratchpad/
 .claude/worktrees/
 .worktrees/
 
+# A malha do canário N6, 5,5 MB derivados de uma hipótese REPROVADA. O README
+# da pasta proíbe reutilizar esse volume, e `construir-casco-visual.mjs` o
+# regenera quando alguém quiser reexaminar. Versionar malha que ninguém pode
+# usar é peso sem leitor.
+autoria-assistida/experimentos/canario-casco-visual-n6/modelo-casco.json
+
 # Exportações CAD/STEP geradas localmente
 exportacoes/
 

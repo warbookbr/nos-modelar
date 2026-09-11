@@ -37,3 +37,11 @@ abertura oblonga deixou de ser limite depois deste registro: `furo` passou a
 expressar rasgo por `ate`, sem operação nova. Pacotes, imagens e relatos ficam em `autoria-assistida/`; experimentos
 encerrados ficam em `docs/mecanifica/historico/`. Nenhum relato histórico governa
 um caso novo.
+
+Os relatos da v2 estão em `autoria-assistida/homologacoes/fluxo-ia-v2/`:
+[caso 01, mancal de mesa](../../autoria-assistida/homologacoes/fluxo-ia-v2/caso-01-mancal/relato-processo.md),
+que terminou bloqueado antes de promover uma revisão válida, e
+[caso 02, placa](../../autoria-assistida/homologacoes/fluxo-ia-v2/caso-02-placa/relato-processo.md).
+Eles não eram apontados por documento nenhum até 2026-09-11 — o contrato dizia
+onde relatos moram e não dizia quais existiam, e relato que ninguém alcança não
+serve de evidência.

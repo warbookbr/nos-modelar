@@ -10,6 +10,12 @@ quatro imagens abertas individualmente mostram um bloco escalonado. Faltam a
 topologia e os marcos que permitem reconhecer um cupê: para-lamas/arcos,
 cabine integrada, cintura, entradas laterais, ombros e deck traseiro.
 
+`modelo-casco.json` NÃO é versionado desde 2026-09-11: eram 5,5 MB de malha
+derivada de uma hipótese reprovada, que este próprio README proíbe reutilizar.
+`construir-casco-visual.mjs` regenera o arquivo para quem quiser reexaminar a
+forma; o veredito e os hashes, que são o que importa aqui, estão no
+`resultado.json`.
+
 `resultado.json` fixa o veredito e os SHA-256 dos renders e sobreposições
 inspecionados. `canario-casco-visual.test.mjs` prova deliberadamente que
 fechamento, componente único e IoU não reabilitam a hipótese. O próximo
