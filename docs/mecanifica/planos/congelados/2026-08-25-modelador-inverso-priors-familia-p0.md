@@ -1,18 +1,22 @@
-# Modelador inverso com priors por família — P0 Implementation Plan
+# Modelador inverso com priors por família — execução do P0
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Estado:** congelado
 
-**Goal:** Restaurar uma linha de base confiável e provar se alvo e avaliador são
-adequados antes de implementar qualquer nova geometria.
+Execução tarefa a tarefa de [`2026-08-25-modelador-inverso-priors-familia.md`](2026-08-25-modelador-inverso-priors-familia.md),
+congelada em 2026-08-26 pelo mesmo motivo: o usuário assumiu o julgamento da
+forma, e provar que uma IA julga forma de maneira confiável saiu do caminho
+crítico. Nenhuma tarefa foi executada — as caixas nunca foram marcadas —, mas as
+ferramentas do P0 seguem em `tools/modelagem/`. A condição de descongelamento é
+a daquele plano.
+
+**Goal:** Restaurar uma linha de base confiável e provar se alvo e avaliador são adequados antes de implementar nova geometria.
 
 **Architecture:** P0 adiciona uma fronteira portátil para evidências do
 repositório, um contrato explícito de qualificação de alvo e um corpus de
 calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo procedural.
 
-**Tech Stack:** Node.js ESM, Vitest, JSON Schema, ferramentas nativas em
-`tools/modelagem/` e documentos/artefatos em `autoria-assistida/`.
-
-**Spec:** [`docs/mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`](../../mecanifica/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
+**Tech Stack:** Node.js ESM, Vitest, JSON Schema, ferramentas em
+`tools/modelagem/` e artefatos em `autoria-assistida/`.
 
 ## Global Constraints
 

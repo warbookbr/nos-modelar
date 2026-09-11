@@ -2,7 +2,7 @@
 
 **Estado:** aberto, P0-A e P0-B executados; P0-C aguardando execução independente
 **Plano:** [`planos/2026-08-25-modelador-inverso-priors-familia.md`](../planos/congelados/2026-08-25-modelador-inverso-priors-familia.md)
-**Execução detalhada:** [`../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
+**Execução detalhada:** [`../planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md`](../planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md)
 
 Este arquivo é o destino rastreável das evidências de P0. Sua existência não
 declara trabalho executado nem gate aprovado.

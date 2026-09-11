@@ -125,12 +125,11 @@ quem as usa. A primeira leitura apontou `olhar-bancada` como 96% do tempo do
 laço — confirmar isso numa série longa é a próxima pergunta.
 
 A rodada R00 dela fundiu dois planos de execução que já estavam prontos e não
-mergeados: a [melhoria da esteira de autoria para
-IA](../../superpowers/plans/2026-09-03-melhoria-esteira-autoria-ia.md), que
-entregou o endereço único de receita e a auto-ativação da sessão, e a [modelagem
-da prensa hidráulica
-H-frame](../../superpowers/plans/2026-09-03-modelagem-prensa-hidraulica.md), que
-entregou a máquina em `maquinas/prensa-hidraulica/`. Plano de execução não é
+mergeados: a melhoria da esteira de autoria para IA, que entregou o endereço
+único de receita e a auto-ativação da sessão, e a modelagem da prensa hidráulica
+H-frame. Os dois arquivos foram removidos em 2026-09-11: o da esteira porque
+tudo que ele descreve está na `main`, e o da prensa porque a máquina não existe
+no acervo e, se um dia existir, começa por uma rodada de alinhamento. Plano de execução não é
 plano executivo datado, e declará-los como plano ativo reprovava `planos:check`.
 
 A [malha otimizada e prova por objeto](encerrados/2026-08-31-malha-otimizada-e-prova-por-objeto.md)
@@ -477,11 +476,12 @@ Arquivos concluídos: [assentamento](concluidos/2026-08-02-assentamento-anular.m
 
 ## Abertura em curso
 
-Somente P0 do [modelador inverso com priors por
-família](./congelados/2026-08-25-modelador-inverso-priors-familia.md) está aberto. O plano
-executável está em
-[`docs/superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md).
+Nenhuma. O P0 do [modelador inverso com priors por
+família](./congelados/2026-08-25-modelador-inverso-priors-familia.md) foi
+congelado junto com o plano que ele detalha, e a execução tarefa a tarefa está
+ao lado dele, em
+[`congelados/2026-08-25-modelador-inverso-priors-familia-p0.md`](./congelados/2026-08-25-modelador-inverso-priors-familia-p0.md).
 Ele corrige a linha de base, qualifica alvo e calibra o avaliador; **não modela
-carroceria**. P1 só abre se suíte, alvo e crítico passarem sem ressalva que
-invalide o estágio seguinte. N3–N6, seleção por linhas e os demais candidatos
+carroceria**. Nenhuma tarefa dele foi executada, e as ferramentas que ele usaria
+seguem em `tools/modelagem/`. N3–N6, seleção por linhas e os demais candidatos
 permanecem como evidência histórica ou backlog, sem continuidade automática.

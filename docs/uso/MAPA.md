@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-837 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+834 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -494,6 +494,7 @@
 
 ## docs/mecanifica/planos/congelados/
 
+- `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — execução do P0
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `README.md` — Planos congelados
@@ -593,13 +594,6 @@
 - `README.md` — Usar o Mecanifica
 - `REFERENCIA-E-CRITICA-VISUAL.md` — Referência e crítica visual — protocolo de modelagem
 - `RODADA-DE-ALINHAMENTO-EXEMPLO.md` — Rodada de alinhamento, preenchida: o quadro de bicicleta
-
-## docs/superpowers/plans/
-
-- `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — P0 Implementation Plan
-- `2026-08-31-laboratorio-computacional-ia.md` — Laboratório Computacional para IA Implementation Plan
-- `2026-09-03-melhoria-esteira-autoria-ia.md` — Melhoria da Esteira de Apoio à Modelagem e Autoria para IA — Implementation Plan
-- `2026-09-03-modelagem-prensa-hidraulica.md` — # Plano de Modelagem: Prensa Hidráulica H-Frame Industrial
 
 ## docs/uso/
 

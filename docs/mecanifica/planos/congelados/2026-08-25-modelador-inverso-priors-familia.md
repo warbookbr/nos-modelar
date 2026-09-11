@@ -4,7 +4,7 @@
 **Congelado em:** 2026-08-26, por decisão do usuário · **Base:** `bb2e79a`
 **Responsável original:** Codex
 **Dossiê vinculante:** [`../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`](../../DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md)
-**Execução detalhada:** [`../../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md`](../../../superpowers/plans/2026-08-25-modelador-inverso-priors-familia-p0.md)
+**Execução detalhada:** [`2026-08-25-modelador-inverso-priors-familia-p0.md`](2026-08-25-modelador-inverso-priors-familia-p0.md)
 **Substituído por:** o plano de modelagem dirigida pelo usuário, que hoje vive
 na branch `claude/revisar-plano-ativo-cyj8c3` e ainda não chegou à `main`. O
 congelamento não depende dele: a decisão que tirou este plano do caminho crítico
