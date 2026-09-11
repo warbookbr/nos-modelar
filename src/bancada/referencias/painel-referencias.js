@@ -14,29 +14,73 @@ export function criarPainelReferencias({
   const modalReferencia = criarModalReferencia();
   let fonteSelecionada = null;
   let alinhamento = { x: null, y: null, z: null, escala: 1, opacidade: 1, lado: 'direita' };
+  /* Quem gera a imagem recebe de volta o alinhamento que a cena assumiu, que
+     pode não ser o que estava nos controles. Sem reflexão os controles passam a
+     mostrar número que não corresponde ao plano desenhado. */
+  let refletirControles = () => {};
 
-  function criarCampoIntervalo(rotulo, chave, { min, max, step }) {
+  /* Cada controle tem arrastar e digitar ao mesmo tempo. O arrastar serve para
+     procurar o encaixe olhando a cena, e o campo numérico serve para repetir um
+     valor conhecido ou corrigir a casa decimal, que no arrasto de cinco metros
+     em passo de um centésimo é praticamente inalcançável. Os dois escrevem no
+     mesmo alinhamento e refletem um no outro. */
+  function criarCampoIntervalo(rotulo, chave, { min, max, step, unidade = '' }) {
     const campo = document.createElement('label');
     campo.className = 'controle-referencia';
     const cabecalho = document.createElement('span');
     const texto = document.createElement('b');
     texto.textContent = rotulo;
-    const valor = document.createElement('output');
-    valor.textContent = String(alinhamento[chave] ?? 0);
-    cabecalho.append(texto, valor);
+    const medida = document.createElement('small');
+    medida.className = 'medida-controle';
+    medida.textContent = unidade;
+    cabecalho.append(texto, medida);
+
     const entrada = document.createElement('input');
     entrada.type = 'range'; entrada.min = String(min); entrada.max = String(max); entrada.step = String(step);
     entrada.value = String(alinhamento[chave] ?? 0);
-    entrada.addEventListener('input', () => {
-      alinhamento = { ...alinhamento, [chave]: Number(entrada.value) };
-      valor.textContent = entrada.value;
+
+    const numero = document.createElement('input');
+    numero.type = 'number'; numero.min = String(min); numero.max = String(max); numero.step = String(step);
+    numero.className = 'numero-controle';
+    numero.value = entrada.value;
+    numero.setAttribute('aria-label', `${rotulo} em número`);
+
+    function aplicar(valor) {
+      const limitado = Math.min(max, Math.max(min, valor));
+      alinhamento = { ...alinhamento, [chave]: limitado };
+      entrada.value = String(limitado);
       aoAtualizarAlinhamento(alinhamento);
+      return limitado;
+    }
+
+    entrada.addEventListener('input', () => {
+      numero.value = String(aplicar(Number(entrada.value)));
     });
-    campo.append(cabecalho, entrada);
+    numero.addEventListener('change', () => {
+      const lido = Number(numero.value);
+      if (!Number.isFinite(lido)) { numero.value = entrada.value; return; }
+      numero.value = String(aplicar(lido));
+    });
+
+    const anterior = refletirControles;
+    refletirControles = () => {
+      anterior();
+      const atual = alinhamento[chave];
+      if (!Number.isFinite(atual)) return;
+      entrada.value = String(atual);
+      numero.value = String(atual);
+    };
+
+    const linha = document.createElement('span');
+    linha.className = 'linha-controle';
+    linha.append(entrada, numero);
+    campo.append(cabecalho, linha);
     return campo;
   }
 
   function adicionarControleImagem() {
+    refletirControles = () => {};
+
     const bloco = document.createElement('section');
     bloco.className = 'bloco-referencia controle-imagem-referencia';
     const titulo = document.createElement('h3');
@@ -61,11 +105,27 @@ export function criarPainelReferencias({
       const fonte = fonteSelecionada ?? (url.value.trim() ? { fonte: 'url', url: url.value.trim(), rotulo: 'Imagem por URL' } : null);
       if (!fonte) { status.textContent = 'Escolha uma imagem ou informe uma URL.'; return; }
       const descritor = await aoGerarPlano({ ...fonte, alinhamento });
-      if (descritor) { alinhamento = { ...descritor.alinhamento }; status.textContent = 'Imagem posicionada na bancada.'; }
+      if (descritor) { alinhamento = { ...descritor.alinhamento }; refletirControles(); status.textContent = 'Imagem posicionada na bancada.'; }
       else status.textContent = 'Não foi possível carregar esta imagem.';
     });
     apagar.addEventListener('click', async () => { await aoRemoverImagem(); fonteSelecionada = null; status.textContent = 'Imagem de referência removida.'; });
-    bloco.append(titulo, ajuda, arquivo, url, criarCampoIntervalo('Posição X', 'x', { min: -5, max: 5, step: 0.01 }), criarCampoIntervalo('Posição Y', 'y', { min: -5, max: 5, step: 0.01 }), criarCampoIntervalo('Posição Z', 'z', { min: -5, max: 5, step: 0.01 }), criarCampoIntervalo('Escala', 'escala', { min: 0.1, max: 3, step: 0.01 }), criarCampoIntervalo('Opacidade', 'opacidade', { min: 0.05, max: 1, step: 0.05 }), gerar, apagar, status);
+    const ajuste = document.createElement('div');
+    ajuste.className = 'ajuste-imagem-referencia';
+    const tituloAjuste = document.createElement('h4');
+    tituloAjuste.textContent = 'Controles da imagem de referência';
+    const ajudaAjuste = document.createElement('p');
+    ajudaAjuste.className = 'resumo-ia';
+    ajudaAjuste.textContent = 'Posicionam a imagem na cena. Não tocam no modelo.';
+    ajuste.append(
+      tituloAjuste,
+      ajudaAjuste,
+      criarCampoIntervalo('Posição X', 'x', { min: -5, max: 5, step: 0.01, unidade: 'unidades da cena' }),
+      criarCampoIntervalo('Posição Y', 'y', { min: -5, max: 5, step: 0.01, unidade: 'unidades da cena' }),
+      criarCampoIntervalo('Posição Z', 'z', { min: -5, max: 5, step: 0.01, unidade: 'unidades da cena' }),
+      criarCampoIntervalo('Escala', 'escala', { min: 0.1, max: 3, step: 0.01, unidade: 'fator, 1 é o tamanho original' }),
+      criarCampoIntervalo('Opacidade', 'opacidade', { min: 0.05, max: 1, step: 0.05, unidade: '1 é opaca' }),
+    );
+    bloco.append(titulo, ajuda, arquivo, url, gerar, apagar, status, ajuste);
     container.appendChild(bloco);
   }
 
