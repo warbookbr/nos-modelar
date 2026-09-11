@@ -1,6 +1,6 @@
 # Bicicleta 29": vistas de referência, uma por arquivo
 
-Recortes de `../bicicleta-29-vistas-geradas.png`, um por vista, para comparar
+Recortes de `vistas-geradas.png`, um por vista, para comparar
 com a parte correspondente quando ela for isolada na bancada. Comparar uma peça
 isolada contra a folha inteira obriga a procurar a vista certa a cada rodada, e
 o que se procura a cada rodada se erra em alguma delas.

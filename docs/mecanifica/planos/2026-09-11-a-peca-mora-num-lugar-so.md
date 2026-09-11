@@ -79,8 +79,8 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
 
 ## Gate de saída
 
-1. abrir a pasta de uma peça mostra receita, referências e rodadas, sem que
-   nada essencial dela viva fora dali;
+1. abrir a pasta de uma peça mostra receita, referências e rodadas, e o único
+   material dela fora da pasta é código, em `tools/`;
 2. todo comando que hoje aceita o nome curto da peça continua aceitando, com a
    mesma saída — `descrever`, `bancada`, `exportar`, `guarda:acervo`;
 3. a bancada publicada continua abrindo a peça e mostrando a sobreposição, sem
@@ -112,7 +112,9 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
 5. **As rodadas junto.** O registro do laço grava dentro da pasta da peça.
    Prova: uma rodada gravada aparece ao lado da receita que a motivou.
 6. **A bicicleta migrada.** A peça inteira muda de forma, e o retrato da
-   primeira fatia passa de quatro árvores para uma.
+   primeira fatia passa de quatro árvores para DUAS: a da peça e a de `tools/`,
+   onde o gerador de prancha continua por ser código. Uma árvore só seria mentir
+   sobre o que este plano excluiu.
 7. **A forma nova vira a única.** A guarda recusa peça em arquivo solto, e a
    skill de alinhamento cria a pasta ao fechar a rodada. Prova: uma peça de
    ensaio escrita como arquivo reprova nomeando a forma certa, e a skill diz

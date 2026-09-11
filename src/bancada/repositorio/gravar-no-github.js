@@ -104,7 +104,7 @@ function resumoDaMensagem(aplicadas) {
  * Troca parâmetros declarados e publica UM commit com todos.
  *
  * `caminhoNoRepo` é o caminho dentro do repositório, por exemplo
- * `prototipos/procedural/v3/pecas/bicicleta-quadro.js`. `mudancas` é um objeto
+ * `prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js`. `mudancas` é um objeto
  * de identificador para valor.
  *
  * Um commit por lote, e não por gesto: quem ajusta uma peça mexe em vários

@@ -29,7 +29,7 @@ export const GATES = [
   'typecheck', 'test', 'mcp:check', 'mcp:visual:check', 'build',
   'arquitetura:check', 'arquitetura:motor:check', 'autoria:schemas:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
-  'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:acervo',
+  'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:acervo',
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',

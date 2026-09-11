@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CAMPOS_PLANO, normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
+import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const SKILL = readFileSync(resolve(REPO, '.claude/skills/alinhar-modelagem/SKILL.md'), 'utf8');

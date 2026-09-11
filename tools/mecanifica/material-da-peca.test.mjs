@@ -13,22 +13,26 @@ import { materialDaPeca, PAPEIS } from '../../src/autoria/material-da-peca.js';
 import { porConvencao, retratoDaPeca } from './material-da-peca.mjs';
 
 describe('material de uma peça', () => {
-  it('RETRATO DE HOJE: a bicicleta está em quatro árvores', async () => {
+  it('a bicicleta mora numa árvore, e o gerador de prancha na outra', async () => {
+    /* O retrato de 2026-09-11, antes da pasta da peça, era de quatro árvores:
+       `docs/mecanifica`, `prototipos/procedural`, `public` e `tools`. Duas
+       sumiram — a foto saiu de `public/` e as referências saíram de `docs/`.
+       A que resta fora é `tools/`, e é assim de propósito: o gerador de prancha
+       é código, e o plano excluiu mover ferramenta. */
     const retrato = await retratoDaPeca('bicicleta-quadro');
-    expect(retrato.arvores).toEqual([
-      'docs/mecanifica', 'prototipos/procedural', 'public', 'tools',
-    ]);
-    expect(retrato.espalhamento).toBe(4);
-    expect(retrato.material).toHaveLength(6);
+    expect(retrato.arvores).toEqual(['prototipos/procedural', 'tools']);
+    expect(retrato.espalhamento).toBe(2);
   });
 
-  it('RETRATO DE HOJE: dois arquivos da peça não são declarados por ninguém', async () => {
+  it('todo material da peça é declarado, menos a ferramenta que é código', async () => {
     const retrato = await retratoDaPeca('bicicleta-quadro');
     const soltos = retrato.material.filter((m) => !m.declarado);
-    expect(soltos.map((m) => m.papel).sort()).toEqual(['ferramenta', 'sobreposicao']);
-    /* A foto é servida pela aplicação publicada e o único arquivo que a cita é
-       `sessao-ativa.json`, que não é versionado. */
-    expect(soltos.some((m) => m.caminho === 'public/referencias/bicicleta-quadro.jpg')).toBe(true);
+    expect(soltos.map((m) => m.papel)).toEqual(['ferramenta']);
+    /* A foto que a bancada sobrepõe é declarada pelo plano desde que saiu de
+       `public/`: antes disso o único arquivo que a citava não era versionado. */
+    const declarados = retrato.material.filter((m) => m.declarado).map((m) => m.caminho);
+    expect(declarados).toContain('prototipos/procedural/v3/pecas/bicicleta-quadro/referencias/sobreposicao.jpg');
+    expect(declarados).toContain('prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js');
   });
 
   it('o que a receita declara entra como declarado, e a ordem não muda o retrato', () => {

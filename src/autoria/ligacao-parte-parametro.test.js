@@ -8,7 +8,7 @@
  * com confiança. */
 import { describe, expect, it } from 'vitest';
 import { ligarPartesAParametros, parametrosDaParte } from './ligacao-parte-parametro.js';
-import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
+import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
 
 const PECA_SIMPLES = {
   meta: { nome: 'duas barras' },

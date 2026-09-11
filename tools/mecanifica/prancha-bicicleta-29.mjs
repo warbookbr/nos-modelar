@@ -27,7 +27,7 @@
  */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TABELA, derivar } from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
+import { TABELA, derivar } from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
 
 
 

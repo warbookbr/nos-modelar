@@ -18,7 +18,7 @@
  * contrato; semelhança de nome é palpite. O que este módulo procura por nome é
  * apenas o que a peça ainda NÃO declara, e isso sai marcado como tal. */
 
-import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
+import { caminhosDaReferencia, normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
 
 export const FORMATO_MATERIAL = 'mecanifica.material-da-peca';
 export const VERSAO_MATERIAL = 1;
@@ -39,7 +39,7 @@ function arvoreDe(caminho) {
  * catálogos externos informam. Nada aqui toca disco: quem lê arquivo é o
  * comando, para que a medida possa ser escrita em teste sem repositório.
  */
-export function materialDaPeca({ peca, caminhoReceita, receita, extras = [] } = {}) {
+export function materialDaPeca({ peca, caminhoReceita, receita, pastaDaPeca = null, extras = [] } = {}) {
   if (typeof peca !== 'string' || peca.trim() === '') {
     throw new TypeError('material da peça: diga de que peça é.');
   }
@@ -51,7 +51,11 @@ export function materialDaPeca({ peca, caminhoReceita, receita, extras = [] } = 
 
   const plano = normalizarPlanoDeModelagem(receita?.PLANO);
   for (const referencia of plano?.referencias ?? []) {
-    itens.push({ papel: 'referencia', caminho: referencia, declarado: true });
+    /* A referência é declarada relativa à pasta da peça, e o retrato precisa do
+       caminho a partir da raiz: sem isso `referencias/lateral.png` pareceria uma
+       árvore chamada `referencias`, e o espalhamento sairia maior do que é. */
+    const [caminho] = caminhosDaReferencia(referencia, pastaDaPeca);
+    itens.push({ papel: 'referencia', caminho, declarado: true });
   }
 
   for (const extra of extras) {

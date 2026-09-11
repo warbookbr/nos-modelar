@@ -34,11 +34,11 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { escreverParametro, escreverParametros } from '../../src/autoria/escrever-parametro.js';
 import { criarHistoricoParametros } from '../../src/bancada/controles/historico-parametros.js';
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
-import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro.js';
+import receita from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
-const ARQUIVO_RECEITA = resolve(REPO, 'prototipos/procedural/v3/pecas/bicicleta-quadro.js');
+const ARQUIVO_RECEITA = resolve(REPO, 'prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js');
 
 /* `PASSOS` é um GETTER que lê `this.PARAMS`, então espalhar a receita com
    `{...receita}` AVALIA o getter uma vez com a tabela velha e congela o

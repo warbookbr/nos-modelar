@@ -416,9 +416,15 @@ export const receitaBicicletaQuadro = {
   PLANO: {
     objeto: 'quadro de MTB hardtail 29 polegadas, tamanho M, modulo 1 de 5',
     referencias: [
-      'docs/mecanifica/referencias/bicicleta-29/lateral.png',
-      'docs/mecanifica/referencias/bicicleta-29/lateral-quadro.png',
-      'docs/mecanifica/referencias/bicicleta-29/triangulo-traseiro.png',
+      'referencias/lateral.png',
+      'referencias/lateral-quadro.png',
+      'referencias/triangulo-traseiro.png',
+      /* A foto que a bancada sobrepoe ao modelo. Ela morava em `public/` e era
+         citada so pelo estado local da sessao, que nao e versionado: existia no
+         repositorio sem que nada dissesse de quem era. */
+      'referencias/sobreposicao.jpg',
+      /* As ancoras medidas no recorte lateral, na escala da roda. */
+      'referencias/ancoras-quadro.json',
     ],
     escala: { medida: 'diametro da roda montada, aro mais pneu', milimetros: 734 },
     partes: [

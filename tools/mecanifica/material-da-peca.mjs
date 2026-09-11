@@ -15,7 +15,7 @@
  * Uso: node tools/mecanifica/material-da-peca.mjs <peça> [--json]
  */
 import { existsSync, readdirSync, statSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { materialDaPeca } from '../../src/autoria/material-da-peca.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -57,14 +57,48 @@ export function porConvencao(peca, { raiz = REPO } = {}) {
   return achados;
 }
 
+/* O que mora DENTRO da pasta da peça e ninguém declarou. Enquanto a peça era um
+   arquivo solto, material não declarado ficava espalhado e invisível; dentro da
+   pasta ele fica visível, e o retrato precisa dizer que existe. */
+export function naPastaSemDeclaracao(pastaDaPeca, declarados, { raiz = REPO } = {}) {
+  if (!pastaDaPeca) return [];
+  const absoluta = join(raiz, pastaDaPeca);
+  const conhecidos = new Set(declarados);
+  return arquivosDe(absoluta)
+    .map((arquivo) => rel(arquivo))
+    .filter((caminho) => !conhecidos.has(caminho))
+    .map((caminho) => ({
+      papel: /\.(png|jpe?g|svg|webp)$/i.test(caminho) ? 'referencia' : 'rodada',
+      caminho,
+    }));
+}
+
 export async function retratoDaPeca(peca, { raiz = REPO } = {}) {
   const caminho = resolverCaminhoReceita(peca, { raiz });
   const modulo = await import(pathToFileURL(caminho).href);
+  const receita = receitaDoModulo(modulo);
+  /* Peça em pasta tem a receita como `receita.js` dentro dela; peça em arquivo
+     solto não tem pasta própria, e aí a referência continua valendo da raiz. */
+  const emPasta = caminho.endsWith('/receita.js');
+  const pastaDaPeca = emPasta ? rel(dirname(caminho)) : null;
+
+  const base = materialDaPeca({
+    peca,
+    caminhoReceita: rel(caminho),
+    receita,
+    pastaDaPeca,
+    extras: porConvencao(peca, { raiz }),
+  });
+
   return materialDaPeca({
     peca,
     caminhoReceita: rel(caminho),
-    receita: receitaDoModulo(modulo),
-    extras: porConvencao(peca, { raiz }),
+    receita,
+    pastaDaPeca,
+    extras: [
+      ...porConvencao(peca, { raiz }),
+      ...naPastaSemDeclaracao(pastaDaPeca, base.material.map((m) => m.caminho), { raiz }),
+    ],
   });
 }
 

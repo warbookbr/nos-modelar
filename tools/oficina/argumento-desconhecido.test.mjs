@@ -114,8 +114,12 @@ describe('argumento desconhecido em passo', () => {
         try { entradas = readdirSync(join(raiz, pasta), { withFileTypes: true }); } catch { continue; }
         for (const entrada of entradas) {
           if (entrada.isDirectory()) {
-            const montagem = join(raiz, pasta, entrada.name, 'montagem.js');
-            try { if (statSync(montagem).isFile()) alvos.push(montagem); } catch { /* sem montagem */ }
+            /* `receita.js` primeiro: é a entrada da pasta da peça, onde a
+               receita mora ao lado das referências e das rodadas dela. */
+            for (const porta of ['receita.js', 'montagem.js']) {
+              const arquivo = join(raiz, pasta, entrada.name, porta);
+              try { if (statSync(arquivo).isFile()) { alvos.push(arquivo); break; } } catch { /* segue */ }
+            }
           } else if (entrada.name.endsWith('.js') && !entrada.name.endsWith('.test.js')) {
             alvos.push(join(raiz, pasta, entrada.name));
           }

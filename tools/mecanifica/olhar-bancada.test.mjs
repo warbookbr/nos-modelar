@@ -79,7 +79,10 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
       },
     });
 
-    expect(ativouComAlvo).toContain('bicicleta-quadro.js');
+    /* O alvo é a receita resolvida, e a bicicleta virou pasta: o que a ativação
+       recebe é `bicicleta-quadro/receita.js`. Afirmar o nome do arquivo sozinho
+       voltaria a amarrar a prova à forma antiga. */
+    expect(ativouComAlvo).toContain('bicicleta-quadro/receita.js');
     expect(resultado.ok).toBe(false);
     expect(resultado.erro.mensagem).toContain('Interrompido propositalmente');
   });

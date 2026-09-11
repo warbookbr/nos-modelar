@@ -102,6 +102,12 @@ jobs:
       - name: Schemas de autoria 3D em dia
         run: npm run autoria:schemas:check
 
+      # A imagem da peça sai do pacote construído, e não de `public/`. Trocar o
+      # glob que a emite deixaria a página subir, os testes verdes e a
+      # referência ausente só no endereço publicado.
+      - name: A bancada publicada mostra a referência da pasta da peça
+        run: npm run guarda:referencia
+
       # A régua de contato existia, saía com código de erro e nenhum gate a
       # chamava; foi assim que um quadro saiu em pedaços que não se tocavam.
       - name: O acervo cumpre o plano e os contatos que declara

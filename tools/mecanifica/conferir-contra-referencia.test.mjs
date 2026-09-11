@@ -8,7 +8,7 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const FOTO = join(REPO, 'docs/mecanifica/referencias/bicicleta-29/lateral.png');
+const FOTO = join(REPO, 'prototipos/procedural/v3/pecas/bicicleta-quadro/referencias/lateral.png');
 const ANCORAS = join(REPO, 'docs/mecanifica/referencias/bicicleta-29/ancoras-lateral.json');
 
 /* Duas âncoras coerentes: 10 px valem 40 mm nos dois eixos. */

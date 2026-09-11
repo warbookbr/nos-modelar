@@ -41,6 +41,7 @@
     "guarda:portas": "node tools/mecanifica/guarda-portas-bancada.mjs",
     "guarda:camera": "node tools/mecanifica/guarda-camera-livre.mjs",
     "guarda:par": "node tools/mecanifica/guarda-inspecao-par.mjs",
+    "guarda:referencia": "node tools/mecanifica/guarda-referencia-da-peca.mjs",
     "guarda:acervo": "node tools/mecanifica/guarda-acervo.mjs",
     "material": "node tools/mecanifica/material-da-peca.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",

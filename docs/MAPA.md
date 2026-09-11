@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-842 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+845 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -702,9 +702,9 @@
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 
-## prototipos/procedural/v3/pecas/
+## prototipos/procedural/v3/pecas/bicicleta-quadro/
 
-- `bicicleta-quadro.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
+- `receita.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
 
 ## prototipos/procedural/v3/servicos/
 
@@ -818,6 +818,8 @@
 - `armazenamento-imagem.test.js` — armazenamento-imagem.test.js — isolamento de referências locais por alvo.
 - `imagem-referencia.js` — imagem-referencia.js — forma validada e alinhamento lateral de referência visual.
 - `imagem-referencia.test.js` — imagem-referencia.test.js — contrato do descritor e alinhamento lateral.
+- `imagens-da-peca.js` — imagens-da-peca.js — as imagens que moram na pasta da peça, servidas pelo Vite.
+- `imagens-da-peca.test.js` — imagens-da-peca.test.js — a imagem da peça precisa ter endereço no navegador.
 - `modal-referencia.js` — modal-referencia.js — lightbox modal interativo para imagens de referência com zoom e pan.
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
@@ -1031,6 +1033,7 @@
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
+- `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.

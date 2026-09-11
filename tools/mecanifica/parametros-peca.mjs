@@ -26,7 +26,9 @@ const REPO = resolve(HERE, '../..');
    conta. Derivar do resolvedor faz as duas listas nao poderem divergir. */
 const PASTAS = PASTAS_BUSCA.filter(Boolean).map((relativo) => join(REPO, relativo));
 
-/** Todo alvo do acervo: receita é arquivo, ou pasta com `montagem.js`. */
+/** Todo alvo do acervo: receita é arquivo, pasta com `receita.js` — a pasta da
+ *  peça, onde a receita mora junto das referências — ou pasta com
+ *  `montagem.js`. */
 export function alvosDoAcervo() {
   const alvos = [];
   for (const pasta of PASTAS) {
@@ -34,11 +36,14 @@ export function alvosDoAcervo() {
     try { entradas = readdirSync(pasta, { withFileTypes: true }); } catch { continue; }
     for (const entrada of entradas) {
       if (entrada.isDirectory()) {
-        try {
-          if (statSync(join(pasta, entrada.name, 'montagem.js')).isFile()) {
-            alvos.push({ nome: entrada.name, tipo: 'maquina' });
-          }
-        } catch { /* pasta sem montagem não é alvo */ }
+        for (const [porta, tipo] of [['receita.js', 'peca'], ['montagem.js', 'maquina']]) {
+          try {
+            if (statSync(join(pasta, entrada.name, porta)).isFile()) {
+              alvos.push({ nome: entrada.name, tipo });
+              break;
+            }
+          } catch { /* segue para a próxima porta */ }
+        }
         continue;
       }
       if (entrada.name.endsWith('.js') && !entrada.name.startsWith('_')) {

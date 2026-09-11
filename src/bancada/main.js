@@ -20,6 +20,7 @@ import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js'
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
 import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
+import { urlDaReferencia } from './referencias/imagens-da-peca.js';
 import { criarPainelParametros } from './parametros/painel-parametros.js';
 import { criarPreferenciasBancada } from './preferencias/estado-local.js';
 import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
@@ -1111,6 +1112,29 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     refletirRepositorio();
   });
 
+  /* A sobreposição vem da PASTA DA PEÇA, e não de uma cópia em `public/`. A
+     receita declara quais imagens são dela, e a primeira declarada que for
+     imagem serve de sobreposição. Antes disso a foto vinha do estado local da
+     sessão, que não é versionado: quem abrisse a peça num navegador limpo não
+     via referência nenhuma e não tinha como descobrir que ela existia. */
+  async function oferecerSobreposicaoDaPeca(peca, receita) {
+    if (gerenciadorReferencias3D.obterImagemReferencia()) return;
+    const declaradas = receita?.PLANO?.referencias ?? [];
+    /* A imagem chamada `sobreposicao` vem primeiro quando existe. Sem isso, a
+       escolha caía na ordem da lista do plano, e mudar a ordem das referências
+       — que é decisão de leitura, não de bancada — trocaria a imagem que
+       aparece sobre o modelo. */
+    const ordenadas = [...declaradas].sort(
+      (a, b) => Number(/sobreposicao/i.test(b)) - Number(/sobreposicao/i.test(a)),
+    );
+    for (const referencia of ordenadas) {
+      const url = urlDaReferencia(peca, referencia);
+      if (!url) continue;
+      await gerarPlanoReferencia({ fonte: 'url', id: `${peca}:${referencia}`, url, rotulo: referencia });
+      return;
+    }
+  }
+
   async function abrirDoAcervo(entrada) {
     try {
       mostrarAviso(`Abrindo ${entrada.id}…`);
@@ -1128,6 +1152,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       origemDosParametros = new Map();
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (controlador) salvarEstadoNaUrl(controlador.estado());
+      await oferecerSobreposicaoDaPeca(entrada.id, receita);
     } catch (erro) {
       mostrarErro(erro);
     }
