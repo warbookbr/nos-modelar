@@ -593,14 +593,14 @@
 
 - `README.md` — Herança do NÓS
 - `TETO.md` — O TETO — medir o que a Oficina de fato cria
+- `oficina-contrato.md` — Oficina — contrato procedural preservado
 - `oficina-projeto.md` — Oficina — o registro de projeto
+- `oficina-referencia.md` — Oficina — aviso de compatibilidade
 - `playground.md` — O Playground — o épico da criação por IA
 
 ## docs/uso/
 
 - `RECURSOS.md` — Recursos e portas de entrada
-- `oficina-contrato.md` — Oficina — contrato procedural preservado
-- `oficina-referencia.md` — Oficina — aviso de compatibilidade
 
 ## laboratorio-isolado/cupe-livre-01/
 

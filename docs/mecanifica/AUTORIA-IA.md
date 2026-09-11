@@ -293,7 +293,7 @@ exata dessas ferramentas ainda não estão decididos.
   os níveis de maturidade das montagens.
 - [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) define a superfície
   de inspeção visual.
-- [`docs/uso/oficina-contrato.md`](../uso/oficina-contrato.md) registra o
+- [`docs/nos-herdado/oficina-contrato.md`](../nos-herdado/oficina-contrato.md) registra o
   vocabulário procedural vigente.
 - `docs/mecanifica/planos/` contém planos executivos; este arquivo não substitui
   um plano nem autoriza implementação automática.

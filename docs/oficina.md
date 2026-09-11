@@ -22,10 +22,10 @@
 
 | destino | o que tem | seções |
 |---|---|---|
-| [`docs/uso/oficina-contrato.md`](./uso/oficina-contrato.md) | o que vale hoje: formato salvo, identidade de vértice, vocabulário de operações, camadas do código, contrato com a IA | 16 |
+| [`docs/nos-herdado/oficina-contrato.md`](./nos-herdado/oficina-contrato.md) | o que vale hoje: formato salvo, identidade de vértice, vocabulário de operações, camadas do código, contrato com a IA | 16 |
 | [`docs/nos-herdado/oficina-projeto.md`](./nos-herdado/oficina-projeto.md) | o racional do que já foi construído + a Ordem de construção encerrada | 7 |
 
-A referência curta de uso diário é [`docs/uso/oficina-referencia.md`](./uso/oficina-referencia.md).
+A referência curta de uso diário é [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md).
 O roteiro vigente da Mecanifica é [`docs/mecanifica/historico/PLANO.md`](mecanifica/historico/PLANO.md).
 
 O roteiro herdado do NÓS e o que foi projetado e não construído saíram do

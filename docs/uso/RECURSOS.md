@@ -37,9 +37,9 @@ há mais comandos `oficina`, `servir`, `guardar:salvar` ou `jogar`.
 
 - [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](../mecanifica/FLUXO-MODELAGEM-IA.md):
   contrato v4 de autoria e revisão.
-- [`docs/uso/oficina-contrato.md`](oficina-contrato.md): vocabulário procedural
+- [`docs/nos-herdado/oficina-contrato.md`](../nos-herdado/oficina-contrato.md): vocabulário procedural
   preservado para `npm run criar`.
-- [`docs/uso/oficina-referencia.md`](oficina-referencia.md): aviso de
+- [`docs/nos-herdado/oficina-referencia.md`](../nos-herdado/oficina-referencia.md): aviso de
   compatibilidade da interface removida.
 
 Evidências encerradas ficam em [`docs/mecanifica/historico/`](../mecanifica/historico/)

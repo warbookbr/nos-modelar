@@ -137,8 +137,8 @@ exigência de `PASSOS` foram então ligadas ao mesmo arquivo por conveniência.
 
 **Classificação:** documentação insuficiente e parcialmente desatualizada.
 
-`docs/uso/oficina-referencia.md` é apenas um aviso de compatibilidade.
-`docs/uso/oficina-contrato.md` é longo, preserva interface humana removida e
+`docs/nos-herdado/oficina-referencia.md` é apenas um aviso de compatibilidade.
+`docs/nos-herdado/oficina-contrato.md` é longo, preserva interface humana removida e
 não contém as formas atuais de `encostar`, pose de criação (`em`/`eixo`) nem
 nomes de cópia do `arranja`. Essas instruções estão consolidadas em
 `.claude/skills/criar-peca/references/operacoes-procedurais.md`, fora da rota
@@ -148,7 +148,7 @@ O gate de `npm run criar` compara nomes de operações entre núcleo e documento
 mas não compara assinaturas ou campos. Portanto consegue afirmar que `lathe`
 ou `arranja` estão documentados mesmo quando a forma documentada está antiga.
 Neste estudo, `npm run criar -- _viga` reprovou a `main` com a mensagem
-`op(s) no núcleo SEM linha FEITO em docs/uso/oficina-contrato.md: encostar`.
+`op(s) no núcleo SEM linha FEITO em docs/nos-herdado/oficina-contrato.md: encostar`.
 Assim, a ausência de `encostar` não é apenas leitura crítica: o gate canônico a
 reproduz.
 

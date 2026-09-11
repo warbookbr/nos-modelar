@@ -135,7 +135,7 @@ fontes é inventário, não porta de entrada.
 - Programa MCP: `docs/mecanifica/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
 - Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
-  `docs/uso/oficina-contrato.md`; para descobrir uma capacidade, abra
+  `docs/nos-herdado/oficina-contrato.md`; para descobrir uma capacidade, abra
   `gerado/INDEX.md` antes de procurar em implementação.
 - Reutilização procedural: `COMPOSICAO-PROCEDURAL-V1.md` e o catálogo de
   capacidades; não confundir composição de passos com montagem de peças.

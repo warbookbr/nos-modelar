@@ -23,6 +23,6 @@ tools/
 **Pré-requisito das bancadas visuais:** `npm ci` na raiz, uma vez (o Playwright
 está nas devDependencies; o Chromium já vem no ambiente — as bancadas avisam se
 faltar). O contexto da aplicação está em **`docs/mecanifica/INDEX.md`**; os
-o contrato herdado do núcleo está em **`docs/uso/oficina-contrato.md`**.
+o contrato herdado do núcleo está em **`docs/nos-herdado/oficina-contrato.md`**.
 
 Regra: **ferramenta nova de coder (bancada/auditoria) nasce em `tools/bancadas/`**.

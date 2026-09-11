@@ -5,8 +5,8 @@ design das funções já construídas, os preparos de motor já concluídos, a m
 pra WebGL 2 e a Ordem de construção encerrada.
 
 Imutável, como todo o `nos-herdado/`: consulta-se pra saber POR QUE algo é como é,
-não pra saber como fazer. Pra isso, [`docs/uso/oficina-contrato.md`](../uso/oficina-contrato.md)
-e [`docs/uso/oficina-referencia.md`](../uso/oficina-referencia.md).
+não pra saber como fazer. Pra isso, [`docs/nos-herdado/oficina-contrato.md`](../uso/oficina-contrato.md)
+e [`docs/nos-herdado/oficina-referencia.md`](../uso/oficina-referencia.md).
 
 ## Decisões abertas
 
