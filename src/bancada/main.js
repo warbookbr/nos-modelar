@@ -1371,6 +1371,10 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     const lista = document.getElementById('listaEventos');
     if (!resumo || !lista) return;
     const linhas = [
+      /* `__VERSAO_DA_BANCADA__` é trocado por texto na construção. O `typeof`
+         existe porque o harness e os testes carregam este módulo sem passar
+         pelo Vite, e ali o identificador não existe. */
+      ['Versão', typeof __VERSAO_DA_BANCADA__ === 'string' ? __VERSAO_DA_BANCADA__ : 'fora de construção'],
       ['Peça', estadoDaBancada.peca ?? 'nenhuma carregada'],
       ['Origem', estadoDaBancada.origem ?? (idNaUrl ? `acervo: ${idNaUrl}` : 'sessão ativa')],
       ['Sessão', ROTULOS_DE_SESSAO[estadoDaBancada.sessao] ?? estadoDaBancada.sessao],

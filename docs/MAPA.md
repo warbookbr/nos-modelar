@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-845 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+847 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -860,6 +860,8 @@
 - `servir-escrita.mjs` — servir-escrita.mjs — o único caminho da bancada até o arquivo da receita.
 - `servir-escrita.test.mjs` — servir-escrita.test.mjs — o atendente escreve dentro do acervo, e só ali.
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
+- `versao-publicada.mjs` — versao-publicada.mjs — de qual commit veio a página que está aberta.
+- `versao-publicada.test.mjs` — versao-publicada.test.mjs — prova que a versão na tela diz a verdade sobre a construção, inclusive quando não há git, não há commit ou a árvore está suja.
 - `visor-imports.test.mjs` — Prova a resolução de imports bare no visor legado servido sem transformação.
 
 ## tools/bancadas/bench/

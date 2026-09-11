@@ -1747,3 +1747,8 @@ body.auditoria .recolher { display: none; }
   font: 650 11px/1.2 var(--fonte-mono, ui-monospace, monospace);
   cursor: pointer;
 }
+
+/* O resumo do Estado tem valores longos, como a versão com data. Sem quebrar,
+   o texto sai da caixa pela direita. */
+#resumoEstado .linha { align-items: baseline; gap: 10px; }
+#resumoEstado .linha kbd { white-space: normal; text-align: right; }
