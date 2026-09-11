@@ -197,4 +197,4 @@ ficam em `docs/nos-herdado/`. Nenhuma dessas zonas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em
 [`INVENTARIO.md`](INVENTARIO.md) (`docs/mecanifica/INVENTARIO.md`); o
-inventário mecânico é gerado em [`../uso/MAPA.md`](../uso/MAPA.md), nunca à mão.
+inventário mecânico é gerado em [`../MAPA.md`](../MAPA.md), nunca à mão.

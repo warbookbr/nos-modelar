@@ -43,5 +43,5 @@ novo — nem por citação, nem por analogia.
   deixa de corresponder ao parâmetro e as partes se atravessam", não "o número
   envelhece mal".
 - Rode os gates completos do INDEX.
-- Não edite `docs/uso/MAPA.md` à mão; rode `npm run mapa`.
+- Não edite `docs/MAPA.md` à mão; rode `npm run mapa`.
 - Histórico e evidências encerradas não governam trabalho novo.

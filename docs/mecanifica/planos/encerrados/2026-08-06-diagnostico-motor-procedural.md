@@ -109,7 +109,7 @@ limitação estrutural comprovada
 - `docs/mecanifica/historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md`;
 - `docs/mecanifica/planos/README.md`;
 - `docs/mecanifica/INDEX.md`;
-- `docs/uso/MAPA.md`, somente regenerado;
+- `docs/MAPA.md`, somente regenerado;
 - futuro relatório e fechamento deste plano.
 
 Código, receitas, testes, bancada e ferramentas não estão reservados para

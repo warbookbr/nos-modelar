@@ -348,6 +348,7 @@
 
 ## docs/
 
+- `RECURSOS.md` — Recursos e portas de entrada
 - `oficina.md` — A Oficina — índice do design
 
 ## docs/mecanifica/
@@ -597,10 +598,6 @@
 - `oficina-projeto.md` — Oficina — o registro de projeto
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 - `playground.md` — O Playground — o épico da criação por IA
-
-## docs/uso/
-
-- `RECURSOS.md` — Recursos e portas de entrada
 
 ## laboratorio-isolado/cupe-livre-01/
 
@@ -922,7 +919,7 @@
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto uma sessão precisa LER antes de escrever a primeira linha de receita.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `docs/<...>.md` (caminho com barra, não prosa solta) e reprova quando o caminho …
-- `mapa.mjs` — mapa.mjs — gera docs/uso/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentá…
+- `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
 - `planos.mjs` — planos.mjs — impede que o planejamento volte a ter mais de um plano ativo ou que um plano executivo ultrapasse o limite curto acordado.
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente e mais de um plano ativo.
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…

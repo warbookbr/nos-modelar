@@ -151,11 +151,11 @@ Abra `http://localhost:5173/nos-mecanifica/bancada.html`.
 
 Comece por [`docs/mecanifica/INDEX.md`](docs/mecanifica/INDEX.md). Ele aponta
 fontes de verdade, leitura por tarefa, comandos e gates. O inventário completo
-está em [`docs/uso/MAPA.md`](docs/uso/MAPA.md).
+está em [`docs/MAPA.md`](docs/MAPA.md).
 
-Documentos em `docs/uso/` e `docs/nos-herdado/` descrevem o NÓS ou
-resultados históricos. Não autorizam trabalho novo. Em caso de divergência,
-`docs/mecanifica/` prevalece.
+Documentos em `docs/nos-herdado/` descrevem o NÓS, e os de
+`docs/mecanifica/historico/` descrevem resultados já medidos. Nenhum dos dois
+autoriza trabalho novo. Em caso de divergência, `docs/mecanifica/` prevalece.
 
 ## Licença e origem
 

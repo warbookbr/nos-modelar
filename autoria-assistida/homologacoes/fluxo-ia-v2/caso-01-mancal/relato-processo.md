@@ -81,7 +81,7 @@ Fontes de ferramenta consultadas para esclarecer contratos antes da fonte:
 - os quatro PNGs gerados em `tools/bancadas/out/` para isométrica, frontal,
   direita e superior.
 
-Nenhum documento legado em `docs/uso/`, `docs/rumo/` ou `docs/nos-herdado/` foi
+Nenhum documento legado em `docs/`, `docs/rumo/` ou `docs/nos-herdado/` foi
 consultado.
 
 ## Comandos, resultados e ações, na ordem

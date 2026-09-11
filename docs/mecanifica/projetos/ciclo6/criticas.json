@@ -32,10 +32,10 @@
    },
    {
     "gravidade": "alta",
-    "onde": "`docs/uso/MAPA.md`; nenhuma frente do plano",
-    "oQue": "O plano cria 13 arquivos novos (4 peças, 4 testes de integridade, 5 arquivos de teste de frente). Medi: criar um arquivo faz `npm run mapa:check` falhar com \"docs/uso/MAPA.md está desatualizado … atual 219 arquivos, esperado 220\"; com dois, 221. `docs/uso/MAPA.md` não aparece na lista de arquivos de nenhuma das seis frentes. Pior, ele tem a mesma forma de conflito que o plano mediu com tanto cuidado para o `gabarito-selecao.json`: a linha 8 é a contagem global, reescrita por toda frente, e `_flange-de-tubulacao` (F1) e `_gabarito-de-furacao` (F2) entram entre as linhas 156 e 158, com `_frondosa` sozinho no meio — dentro das 3 linhas de contexto do git.",
+    "onde": "`docs/MAPA.md`; nenhuma frente do plano",
+    "oQue": "O plano cria 13 arquivos novos (4 peças, 4 testes de integridade, 5 arquivos de teste de frente). Medi: criar um arquivo faz `npm run mapa:check` falhar com \"docs/MAPA.md está desatualizado … atual 219 arquivos, esperado 220\"; com dois, 221. `docs/MAPA.md` não aparece na lista de arquivos de nenhuma das seis frentes. Pior, ele tem a mesma forma de conflito que o plano mediu com tanto cuidado para o `gabarito-selecao.json`: a linha 8 é a contagem global, reescrita por toda frente, e `_flange-de-tubulacao` (F1) e `_gabarito-de-furacao` (F2) entram entre as linhas 156 e 158, com `_frondosa` sozinho no meio — dentro das 3 linhas de contexto do git.",
     "porQueImporta": "`mapa:check` só é cobrado no commit 29. De commit 7 a commit 28 ele fica vermelho e ninguém olha. E quando o F5 rodar `npm run mapa`, ele vai regravar de uma vez o cabeçalho de 13 arquivos que nunca foram conferidos. O `mapa.mjs` também cobra cabeçalho em todo arquivo-fonte, e o plano não diz isso em lugar nenhum para as 13 peças e testes novos.",
-    "conserto": "Tratar `docs/uso/MAPA.md` exatamente como o `gabarito-selecao.json`: regravação única no F5, com o custo declarado (mapa:check vermelho de 7 a 28), ou `npm run mapa` na mesma fatia que cria o arquivo. E escrever na regra de cada frente que todo arquivo novo nasce com cabeçalho, porque `mapa:check` cobra."
+    "conserto": "Tratar `docs/MAPA.md` exatamente como o `gabarito-selecao.json`: regravação única no F5, com o custo declarado (mapa:check vermelho de 7 a 28), ou `npm run mapa` na mesma fatia que cria o arquivo. E escrever na regra de cada frente que todo arquivo novo nasce com cabeçalho, porque `mapa:check` cobra."
    },
    {
     "gravidade": "alta",

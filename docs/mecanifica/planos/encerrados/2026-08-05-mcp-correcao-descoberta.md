@@ -21,7 +21,7 @@ rodada R07.
 `tools/mcp/servidor.mjs`, `tools/mcp/contratos.mjs`,
 `tools/mcp/perfis/revisao.mjs`, `tools/modelagem/formato-pacote.mjs`,
 `tools/modelagem/validar-pacote.mjs`, `tools/mcp/mcp.test.mjs` e
-`docs/uso/MAPA.md` quando regenerado. Outros arquivos exigem decisão explícita.
+`docs/MAPA.md` quando regenerado. Outros arquivos exigem decisão explícita.
 
 ## Problema observado
 

@@ -104,7 +104,7 @@ computadores foi **ADIADO**.
 7. **Fronteira entre referência visual e modelo procedural.** Integrada. Provar por teste
    que `peca()`, `partes`, `estatisticas` e `diagnosticos` continuam relatando
    só o modelo procedural, que o plano de referência nunca entra em seleção,
-   caixa, enquadramento ou medição sem cabeça, e regenerar `docs/uso/MAPA.md`
+   caixa, enquadramento ou medição sem cabeça, e regenerar `docs/MAPA.md`
    por `npm run mapa`.
 
 ## Riscos e parada

@@ -7,11 +7,11 @@ removidos e aparecem somente no histórico.
 
 ## Comece aqui
 
-- [`docs/mecanifica/INDEX.md`](../mecanifica/INDEX.md): estado, fontes de verdade,
+- [`docs/mecanifica/INDEX.md`](./mecanifica/INDEX.md): estado, fontes de verdade,
   comandos e gates.
-- [`package.json`](../../package.json): scripts disponíveis.
-- [`docs/uso/MAPA.md`](MAPA.md): mapa gerado dos documentos e recursos.
-- [`docs/mecanifica/planos/README.md`](../mecanifica/planos/README.md): plano ativo
+- [`package.json`](../package.json): scripts disponíveis.
+- [`docs/MAPA.md`](MAPA.md): mapa gerado dos documentos e recursos.
+- [`docs/mecanifica/planos/README.md`](./mecanifica/planos/README.md): plano ativo
   (nenhum), contrato e concluídos.
 
 ## Comandos atuais
@@ -35,12 +35,12 @@ há mais comandos `oficina`, `servir`, `guardar:salvar` ou `jogar`.
 
 ## Contratos
 
-- [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](../mecanifica/FLUXO-MODELAGEM-IA.md):
+- [`docs/mecanifica/FLUXO-MODELAGEM-IA.md`](./mecanifica/FLUXO-MODELAGEM-IA.md):
   contrato v4 de autoria e revisão.
-- [`docs/nos-herdado/oficina-contrato.md`](../nos-herdado/oficina-contrato.md): vocabulário procedural
+- [`docs/nos-herdado/oficina-contrato.md`](./nos-herdado/oficina-contrato.md): vocabulário procedural
   preservado para `npm run criar`.
-- [`docs/nos-herdado/oficina-referencia.md`](../nos-herdado/oficina-referencia.md): aviso de
+- [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md): aviso de
   compatibilidade da interface removida.
 
-Evidências encerradas ficam em [`docs/mecanifica/historico/`](../mecanifica/historico/)
+Evidências encerradas ficam em [`docs/mecanifica/historico/`](./mecanifica/historico/)
 e não governam trabalho novo.

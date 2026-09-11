@@ -72,7 +72,7 @@ git grep -n -I -E 'prototipos/fps|/fps/v3|fps/v3|\bfps\b'
    quanto tempo a compatibilidade será mantida e qual gate prova sua retirada.
 5. Preservar imports relativos entre arquivos movidos juntos.
 6. Não regravar hash para “fazer passar”; o gabarito fica byte-idêntico.
-7. `docs/uso/MAPA.md` será atualizado somente por `npm run mapa`.
+7. `docs/MAPA.md` será atualizado somente por `npm run mapa`.
 
 ## Política para dados e história
 
@@ -146,7 +146,7 @@ devem ser exceções deliberadas, não um `grep` global impossível de satisfaze
   caminho físico;
 - contagens, hashes, colisão derivada, medidas e PNGs não mudam por intenção;
 - nenhuma receita é publicada ou removida como efeito colateral;
-- não editar `docs/uso/MAPA.md` manualmente;
+- não editar `docs/MAPA.md` manualmente;
 - a palavra `fps` pode sobreviver apenas onde descreve história ou a própria
   migração, nunca como raiz operacional silenciosa.
 

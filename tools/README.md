@@ -10,7 +10,7 @@ tools/
                executar.mjs   — replay headless do núcleo procedural em Node (npm run executar)
                bench/         — gabarito de silhueta e estatísticas PNG usados pelas bancadas
                out/           — PNGs/saídas (gitignorado; evidência regenerável)
-  mapa/        mapa.mjs (docs/uso/MAPA.md gerado dos cabeçalhos + gate mapa:check),
+  mapa/        mapa.mjs (docs/MAPA.md gerado dos cabeçalhos + gate mapa:check),
                links.mjs (referências + alcançabilidade a partir do índice da
                Mecanifica) e toc.mjs (índice de docs/oficina.md)
   coordenacao/ caixa postal local entre agentes: mensagens novas primeiro,
