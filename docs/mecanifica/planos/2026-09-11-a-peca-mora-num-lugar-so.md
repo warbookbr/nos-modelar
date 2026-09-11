@@ -64,7 +64,10 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
   cópia solta em `public/`;
 - guarda que reprova peça cujo material declarado não existe, cobrindo o que os
   gates de documentação deixarem de ver;
-- a bicicleta migrada inteira, como prova.
+- a bicicleta migrada inteira, como prova;
+- a forma antiga recusada assim que ela não tiver mais ocupante, e a rodada de
+  alinhamento passando a criar a pasta — sem as duas, a pasta da peça é
+  permissão e não regra, e peça nova volta a espalhar material.
 
 ## Excluído
 
@@ -86,7 +89,9 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
    caminho, cobrindo o que `docs:links:check` deixou de conferir;
 5. o acervo continua sendo varrido por um caminho só, e a identidade da peça é
    a pasta, nunca a posição num glob;
-6. os vinte e quatro gates continuam verdes.
+6. peça nova em arquivo solto REPROVA, com a mensagem dizendo qual é a forma
+   certa, e a skill de alinhamento entrega a peça já na pasta;
+7. os vinte e quatro gates continuam verdes.
 
 ## Fatias
 
@@ -107,7 +112,11 @@ pasta da peça, ou a bancada passa a carregar por outro caminho.
 5. **As rodadas junto.** O registro do laço grava dentro da pasta da peça.
    Prova: uma rodada gravada aparece ao lado da receita que a motivou.
 6. **A bicicleta migrada.** A peça inteira muda de forma, e o retrato da
-   primeira fatia passa de seis caminhos para um.
+   primeira fatia passa de quatro árvores para uma.
+7. **A forma nova vira a única.** A guarda recusa peça em arquivo solto, e a
+   skill de alinhamento cria a pasta ao fechar a rodada. Prova: uma peça de
+   ensaio escrita como arquivo reprova nomeando a forma certa, e a skill diz
+   onde a receita nasce.
 
 ## Riscos e parada
 

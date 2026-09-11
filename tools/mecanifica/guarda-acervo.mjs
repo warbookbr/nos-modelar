@@ -18,9 +18,11 @@
  * acusar.
  */
 import { existsSync, readdirSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
+import { caminhosDaReferencia } from '../../src/autoria/plano-de-modelagem.js';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
@@ -53,6 +55,23 @@ export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
   return achadas.sort();
 }
 
+/* A GUARDA QUE SUBSTITUI O QUE O GATE DE LINKS DEIXA DE VER. Enquanto as
+   imagens moravam em `docs/`, `docs:links:check` acusava endereço morto nelas.
+   Dentro da pasta da peça elas saem desse alcance, e trocar uma conferência por
+   nenhuma seria piorar com aparência de arrumação. Aqui a referência declarada
+   que não existe no disco reprova, com o caminho na mensagem. */
+export function referenciasAusentes(peca, plano, { raiz = REPO } = {}) {
+  if (!plano?.referencias?.length) return [];
+  let pastaDaPeca = null;
+  try {
+    pastaDaPeca = relative(raiz, dirname(resolverCaminhoReceita(peca, { raiz })));
+  } catch {
+    pastaDaPeca = null;
+  }
+  return plano.referencias.filter((referencia) => !caminhosDaReferencia(referencia, pastaDaPeca)
+    .some((candidato) => existsSync(join(raiz, candidato))));
+}
+
 export async function conferirAcervo(pecas = pecasDoAcervo()) {
   const reprovadas = [];
   for (const peca of pecas) {
@@ -61,6 +80,16 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
     /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
        receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
        canônico, que carrega `formato` e `versao`. */
+    const faltando = referenciasAusentes(peca, medida.resultado.plano);
+    if (faltando.length) {
+      reprovadas.push({
+        peca,
+        motivo: `${faltando.length} REFERÊNCIA(S) DECLARADA(S) E AUSENTE(S)\n`
+          + faltando.map((r) => `    ${r}`).join('\n')
+          + '\n  O plano diz que a peça foi modelada contra estas imagens, e elas não estão lá.',
+      });
+      continue;
+    }
     if (!medida.resultado.plano) {
       reprovadas.push({
         peca,

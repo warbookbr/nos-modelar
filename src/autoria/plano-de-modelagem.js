@@ -131,6 +131,23 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
   };
 }
 
+/**
+ * Onde procurar uma referência declarada. Duas formas valem, e a ordem importa:
+ * primeiro relativa à PASTA DA PEÇA, que é onde a referência deve morar, e
+ * depois relativa à raiz do repositório, que é a forma antiga e continua aceita
+ * enquanto houver peça fora de pasta. Quem resolve de fato é quem tem disco;
+ * aqui só se diz quais caminhos são legítimos, para que a regra exista num
+ * lugar só e não seja reescrita por cada comando.
+ */
+export function caminhosDaReferencia(referencia, pastaDaPeca) {
+  const limpo = String(referencia ?? '').trim();
+  if (limpo === '') return [];
+  const candidatos = [];
+  if (pastaDaPeca) candidatos.push(`${pastaDaPeca.replace(/\/$/, '')}/${limpo}`);
+  candidatos.push(limpo);
+  return [...new Set(candidatos)];
+}
+
 /** As partes prometidas que a peça executada não entregou, e as que ela entregou
  *  sem ter prometido. Vazio dos dois lados é a única forma de cumprir o plano. */
 export function conferirPartesContraPlano(plano, nomesEntregues) {

@@ -7,6 +7,7 @@
  * escrita antes. */
 import { describe, expect, it } from 'vitest';
 import {
+  caminhosDaReferencia,
   conferirPartesContraPlano,
   normalizarPlanoDeModelagem,
 } from './plano-de-modelagem.js';
@@ -73,6 +74,18 @@ describe('plano de modelagem', () => {
     expect(conferirPartesContraPlano(plano, ['tuboSelim']).faltando).toEqual(['tuboInferior']);
     expect(conferirPartesContraPlano(plano, ['tuboInferior', 'tuboSelim', 'selim']).naoPrometidas)
       .toEqual(['selim']);
+  });
+
+  it('a referência é procurada na pasta da peça antes da raiz do repositório', () => {
+    expect(caminhosDaReferencia('referencias/lateral.png', 'prototipos/procedural/v3/pecas/bicicleta'))
+      .toEqual([
+        'prototipos/procedural/v3/pecas/bicicleta/referencias/lateral.png',
+        'referencias/lateral.png',
+      ]);
+    /* Peça sem pasta própria só tem a forma antiga, e caminho repetido não
+       aparece duas vezes. */
+    expect(caminhosDaReferencia('docs/x.png', null)).toEqual(['docs/x.png']);
+    expect(caminhosDaReferencia('  ', 'qualquer')).toEqual([]);
   });
 
   it('sem plano não há conferência, e isso não é aprovação', () => {

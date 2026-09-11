@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { listarAcervo } from '../../src/bancada/acervo-receitas.js';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { pecasDoAcervo, referenciasAusentes } from './guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const RECEITA = 'export default { meta: { nome: "ensaio" }, PASSOS: [] };\n';
@@ -59,6 +59,28 @@ describe('pasta da peça', () => {
     /* Peça em pasta não é montagem: quem abre precisa saber a diferença. */
     expect(entradas.find((e) => e.id === 'peca-em-pasta').montagem).toBe(false);
     expect(entradas.find((e) => e.id === 'prensa').montagem).toBe(true);
+  });
+
+  it('REPROVA referência declarada que não existe no disco', () => {
+    const acervo = acervoDeMentira();
+    const plano = { referencias: ['referencias/lateral.png', 'referencias/frontal.png'] };
+    /* A que existe dentro da pasta da peça passa; a que não existe é nomeada. */
+    expect(referenciasAusentes('peca-em-pasta', plano, { raiz: area }))
+      .toEqual(['referencias/frontal.png']);
+  });
+
+  it('a forma antiga de referência, relativa à raiz, continua valendo', () => {
+    const acervo = acervoDeMentira();
+    const plano = { referencias: ['prototipos/procedural/v3/pecas/peca-em-pasta/referencias/lateral.png'] };
+    expect(referenciasAusentes('peca-em-pasta', plano, { raiz: area })).toEqual([]);
+    expect(referenciasAusentes('peca-de-arquivo', plano, { raiz: area })).toEqual([]);
+    expect(acervo).toBeTruthy();
+  });
+
+  it('peça sem plano ou sem referência não tem o que conferir', () => {
+    acervoDeMentira();
+    expect(referenciasAusentes('peca-em-pasta', null, { raiz: area })).toEqual([]);
+    expect(referenciasAusentes('peca-em-pasta', { referencias: [] }, { raiz: area })).toEqual([]);
   });
 
   it('pasta sem entrada de receita continua sendo varrida por dentro', () => {
