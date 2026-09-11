@@ -194,6 +194,7 @@ dizer isso em vez de cair no id literal por baixo do pano.
 
 **Concluído** em 2026-09-11, commits `54778d1` a `60a5f31`, vinte gates verdes.
 As sete fatias saíram, com a aceitação em
-`tools/mecanifica/ponte-gesto-parametro.test.mjs`. Fica pendente a conferência
-do desfazer no navegador pelo autor, e volta ao backlog o controle de parte cuja
-forma nasce de curva medida, pelo motivo já registrado nos riscos.
+`tools/mecanifica/ponte-gesto-parametro.test.mjs`. A conferência do desfazer no
+navegador foi feita pelo autor em 2026-09-11 e passou, então o plano não tem
+mais pendência. Volta ao backlog o controle de parte cuja forma nasce de curva
+medida, pelo motivo já registrado nos riscos.
