@@ -1,6 +1,17 @@
 #!/usr/bin/env node
 /* Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas.
-   SVG/PNG são derivados; alvo e andaime continuam sendo a autoria. */
+   SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
+
+   ESTA PROVA ESTÁ FECHADA E REPROVADA: G00 bloqueado, G01 e G02 reprovados.
+   O pacote vive em `docs/mecanifica/historico/evidencias-n2-forma-global/` e o
+   único leitor dele é o relatório N2, que também é histórico.
+
+   O `--check` foi aposentado em 2026-09-11. Ele comparava o manifesto com a
+   pasta e acusava dezessete arquivos divergentes desde agosto, porque os SVG e
+   PNG derivados nunca foram versionados — e ninguém viu, porque o comando não
+   estava na lista de gates. Régua vermelha que ninguém roda não protege nada e
+   ensina que vermelho é normal. O gerador continua aqui: quem precisar do
+   pacote reexecuta e obtém tudo, inclusive as vistas. */
 
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -9,7 +20,7 @@ import { criarServicoAutoria3DNativa } from '../../prototipos/procedural/v3/serv
 
 const raiz = process.cwd();
 const pastaFixture = path.join(raiz, 'tools', 'mecanifica', 'fixtures', 'autoria-n2');
-const pastaSaida = path.join(raiz, 'docs', 'mecanifica', 'evidencias', 'n2-forma-global');
+const pastaSaida = path.join(raiz, 'docs', 'mecanifica', 'historico', 'evidencias-n2-forma-global');
 const conferir = process.argv.includes('--check');
 const gerarPng = process.argv.includes('--png');
 const lerJson = (nome) => JSON.parse(readFileSync(path.join(pastaFixture, nome), 'utf8'));

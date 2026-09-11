@@ -55,6 +55,20 @@ sempre o que o próprio documento diz de si:
   [`BICICLETA-REALISTA-ATRITOS.md`](BICICLETA-REALISTA-ATRITOS.md), os atritos
   medidos ao modelar a bicicleta.
 
+Em seguida veio a pasta `evidencias/`, que guardava um único conjunto: a prova
+N2 da forma global, com o alvo do cupê esportivo, o andaime de blocagem e os
+três vereditos — G00 bloqueado, G01 e G02 reprovados. É registro de etapa
+reprovada, e o único leitor dele é o relatório N2, que já era histórico. Está em
+[`evidencias-n2-forma-global/`](evidencias-n2-forma-global/), e o gerador
+continua em `tools/mecanifica/gerar-evidencias-forma-global-n2.mjs` para quem
+quiser reexecutar o pacote inteiro.
+
+Junto saiu o comando `autoria:n2:evidencias:check`, que comparava o manifesto
+com a pasta e acusava dezessete arquivos divergentes desde agosto, porque os SVG
+e PNG derivados nunca foram versionados. Ninguém viu porque ele não estava na
+lista de gates: régua vermelha que ninguém roda não protege nada e ensina que
+vermelho é normal.
+
 Ficaram na raiz os contratos vivos, incluindo as quatro versões de montagem
 persistida — a v1 ainda é citada como contrato por uma skill — e o dossiê do
 modelador inverso, que é vinculante para um plano congelado e não para um
