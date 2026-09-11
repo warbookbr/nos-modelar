@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-838 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+841 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -749,6 +749,7 @@
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `ligacao-parte-parametro.js` — ligacao-parte-parametro.js — qual parâmetro move qual parte.
 - `ligacao-parte-parametro.test.js` — ligacao-parte-parametro.test.js — qual parâmetro move qual parte, MEDIDO.
+- `material-da-peca.js` — material-da-peca.js — tudo que pertence a uma peça, e onde está hoje.
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
 - `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
@@ -1039,6 +1040,8 @@
 - `ler-montagem-persistida-v3.test.ts` — Prova o contrato estrutural v3 sem alterar a leitura fechada de v1/v2.
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
+- `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
+- `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
