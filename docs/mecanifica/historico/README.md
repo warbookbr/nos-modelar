@@ -69,6 +69,14 @@ e PNG derivados nunca foram versionados. Ninguém viu porque ele não estava na
 lista de gates: régua vermelha que ninguém roda não protege nada e ensina que
 vermelho é normal.
 
+Por último veio `projetos/ciclo6/`, pasta de um ocupante só: o registro da
+rodada de agosto em que quatro atritos do motor — A-30, A-34, A-36 e A-37 —
+foram atacados em paralelo, com duas propostas independentes cada, cruzamento e
+veredito. Está em [`ciclo6/`](ciclo6/). O `criticas.json` cita a prancha do
+freio pelo caminho de agosto, e esse endereço morto é tolerado de propósito, com
+motivo escrito na allowlist de `tools/mapa/links.mjs`: corrigir ali seria
+reescrever evidência encerrada.
+
 Ficaram na raiz os contratos vivos, incluindo as quatro versões de montagem
 persistida — a v1 ainda é citada como contrato por uma skill — e o dossiê do
 modelador inverso, que é vinculante para um plano congelado e não para um

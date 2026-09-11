@@ -355,7 +355,7 @@ folha é consultada quando aquela peça entra na tarefa.
 
 ### A evidência congelada não foi reescrita
 
-`projetos/ciclo6/criticas.json` é registro de crítica gravado e cita a prancha
+`historico/ciclo6/criticas.json` é registro de crítica gravado e cita a prancha
 pelo caminho de então. Corrigir o caminho ali seria reescrever evidência
 encerrada — a linha que esta reorganização se proibiu de cruzar, e a mesma que
 reprovou a pasta `desenvolver/` na F5.

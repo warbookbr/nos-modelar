@@ -53,7 +53,7 @@ const ALLOWLIST = new Map([
      preserva o caminho como era no dia da crítica. Corrigir o caminho aqui
      seria reescrever evidência encerrada, que é a linha que a reorganização se
      proibiu de cruzar. */
-  ['docs/mecanifica/projetos/ciclo6/criticas.json:docs/mecanifica/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/mecanifica/pecas/'],
+  ['docs/mecanifica/historico/ciclo6/criticas.json:docs/mecanifica/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/mecanifica/pecas/'],
 ]);
 
 let saidaGit;
