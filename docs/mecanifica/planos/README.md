@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [a peça mora num lugar só](2026-09-11-a-peca-mora-num-lugar-so.md).
+
+O material de uma peça está espalhado por seis pastas que não são vizinhas, e
+nenhum documento diz que elas pertencem à mesma peça: receita no acervo,
+referências e atritos na documentação, sobreposição em `public/`, gerador de
+prancha nas ferramentas, rodadas no histórico. A separação por natureza do
+arquivo serve a quem cuida do repositório e não a quem trabalha numa peça. O
+plano junta o que é da peça numa pasta só, e migra a bicicleta como prova
+enquanto o acervo ainda tem uma peça — mover uma é barato, mover quinze não é.
 
 A [orquestração de modelagem](encerrados/2026-09-11-orquestracao-de-modelagem.md)
 foi **concluída** em 2026-09-11. Quem modela deixou de aprovar o que modelou: a
