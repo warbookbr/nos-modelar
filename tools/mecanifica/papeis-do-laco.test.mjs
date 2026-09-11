@@ -13,6 +13,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { TIPOS_DE_DEFEITO, normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ler = (nome) => readFileSync(resolve(REPO, `.claude/agents/${nome}.md`), 'utf8');
@@ -52,6 +53,23 @@ describe('papéis do laço de modelagem', () => {
       expect(MODELADOR).toContain(tipo);
     }
     expect(MODELADOR).toMatch(/girar não é\s+transladar/);
+  });
+
+  it('o crítico emite o veredito no vocabulário fechado, e os dois falam o mesmo', () => {
+    for (const tipo of Object.keys(TIPOS_DE_DEFEITO)) {
+      expect(CRITICO, `crítico não define '${tipo}'`).toContain(tipo);
+      expect(MODELADOR, `modelador não sabe responder a '${tipo}'`).toContain(tipo);
+    }
+    for (const [tipo, sentidos] of Object.entries(TIPOS_DE_DEFEITO)) {
+      for (const sentido of sentidos) {
+        expect(CRITICO, `crítico não oferece '${sentido}' para '${tipo}'`).toContain(sentido);
+      }
+    }
+    /* O exemplo que o crítico mostra precisa passar pelo validador; exemplo que
+       o próprio contrato recusaria ensina a errar. */
+    const exemplo = JSON.parse(CRITICO.match(/```json\n([\s\S]*?)```/)[1]);
+    expect(() => normalizarVeredito(exemplo)).not.toThrow();
+    expect(CRITICO).toMatch(/não é aprovação/);
   });
 
   it('o modelador é mandado olhar a referência antes de escrever número', () => {

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-829 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+831 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -771,6 +771,8 @@
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
+- `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.
+- `veredito-de-forma.test.js` — veredito-de-forma.test.js — o veredito que não deixa a correção para o chute.
 
 ## src/bancada/
 
