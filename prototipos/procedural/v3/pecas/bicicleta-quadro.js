@@ -409,6 +409,37 @@ export const receitaBicicletaQuadro = {
 
   ALIASES,
 
+  /* PLANO DE MODELAGEM — o que esta peça promete ser, escrito no vocabulário
+     que o revisor e o gate leem. As partes prometidas aqui são conferidas
+     contra as partes entregues: prometer e não entregar reprova, porque parte
+     que não existe não tem como ser acusada por medida nenhuma. */
+  PLANO: {
+    objeto: 'quadro de MTB hardtail 29 polegadas, tamanho M, modulo 1 de 5',
+    referencias: [
+      'docs/mecanifica/referencias/bicicleta-29/lateral.png',
+      'docs/mecanifica/referencias/bicicleta-29/lateral-quadro.png',
+      'docs/mecanifica/referencias/bicicleta-29/triangulo-traseiro.png',
+    ],
+    escala: { medida: 'diametro da roda montada, aro mais pneu', milimetros: 734 },
+    partes: [
+      { nome: 'caixaMovimentoCentral', forma: 'cilindro curto e transversal, no ponto mais baixo do triangulo', tecnica: 'cilindro com tampas' },
+      { nome: 'tuboSelim', forma: 'tubo achatado quase vertical, da caixa ate o topo onde entra o canote', tecnica: 'loft de superelipse ao longo de reta' },
+      { nome: 'tuboInferior', forma: 'tubo achatado e arqueado, da caixa ate o tubo de direcao, o mais largo do quadro', tecnica: 'loft de superelipse entre duas polilinhas medidas' },
+      { nome: 'tuboSuperior', forma: 'tubo achatado que desce do tubo de direcao ate o tubo do selim', tecnica: 'loft de superelipse ao longo de reta' },
+      { nome: 'balancoInferiorEsq', forma: 'tubo fino que sai da caixa para tras, ate a ponteira esquerda', tecnica: 'loft de secao circular' },
+      { nome: 'balancoInferiorDir', forma: 'tubo fino que sai da caixa para tras, ate a ponteira direita', tecnica: 'loft de secao circular' },
+      { nome: 'balancoSuperiorEsq', forma: 'tubo fino do topo do tubo do selim ate a ponteira esquerda', tecnica: 'loft de secao circular' },
+      { nome: 'balancoSuperiorDir', forma: 'tubo fino do topo do tubo do selim ate a ponteira direita', tecnica: 'loft de secao circular' },
+    ],
+    criteriosDeReprovacao: [
+      'tubo do selim com inclinacao diferente da vista lateral de referencia',
+      'triangulo principal aberto: tubo que nao alcanca o vizinho e deixa vao',
+      'balancos assimetricos entre o lado esquerdo e o direito',
+      'tubo inferior reto, sem o arqueio que a referencia mostra',
+      'quadro em escala diferente da roda de 734 mm de diametro',
+    ],
+  },
+
   /* CONTATOS INTENCIONAIS, declarados ANTES de medir. Um quadro é uma estrutura
      soldada: o que se toca aqui se toca de propósito, e o que se tocar fora
      desta lista é defeito. */

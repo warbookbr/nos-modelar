@@ -28,7 +28,7 @@ import { pathToFileURL } from 'node:url';
 export const GATES = [
   'typecheck', 'test', 'mcp:check', 'mcp:visual:check', 'build',
   'arquitetura:check', 'bancada:vazia:check', 'porteiro', 'exportar:check',
-  'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:contatos',
+  'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:acervo',
   'mapa:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
   'docs:citacoes:check',

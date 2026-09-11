@@ -12,6 +12,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import {
+  conferirPartesContraPlano, normalizarPlanoDeModelagem,
+} from '../../src/autoria/plano-de-modelagem.js';
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -225,7 +228,37 @@ export async function descreverPecaReutilizavel({
      Roda por padrão: ver a nota sobre `semVeredito` na assinatura. */
   let contatos = null;
   let formas = null;
+  let plano = null;
   if (comVeredito) {
+    /* PARTE PROMETIDA E NÃO ENTREGUE É INVISÍVEL PARA O RESTO DA RÉGUA. Quando
+       o pneu saiu maciço, aro, cubo e raios nunca chegaram a existir; sem a
+       segunda parte não havia par para acusar contato, e a peça passou limpa.
+       O plano declara as partes ANTES, e é por isso que a ausência vira
+       mensurável. Peça sem plano não reprova aqui — quem exige o plano é a
+       guarda do acervo, porque medir uma peça de ensaio precisa continuar
+       possível. */
+    try {
+      plano = normalizarPlanoDeModelagem(entrada.PLANO ?? receita.PLANO);
+    } catch (erro) {
+      return falha(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`);
+    }
+    if (plano) {
+      const nomes = new Set();
+      for (const face of neutro.F.values()) if (face.parte) nomes.add(face.parte);
+      const conferencia = conferirPartesContraPlano(plano, [...nomes]);
+      if (conferencia.faltando.length) {
+        stderr += `\n${conferencia.faltando.length} PARTE(S) PROMETIDA(S) E NÃO ENTREGUE(S)`
+          + `\n  O plano de modelagem declara: ${conferencia.faltando.join(', ')}.`
+          + '\n  A peça não tem nenhuma face com esses nomes.\n';
+        falhou = true;
+      }
+      if (conferencia.naoPrometidas.length) {
+        stderr += `\n${conferencia.naoPrometidas.length} PARTE(S) ENTREGUE(S) SEM PROMESSA`
+          + `\n  A peça tem: ${conferencia.naoPrometidas.join(', ')}.`
+          + '\n  Ou o plano está desatualizado, ou a peça ganhou parte que ninguém pediu.\n';
+        falhou = true;
+      }
+    }
     try {
       contatos = contatosDaPeca(neutro, receita);
     } catch (erro) {
@@ -302,6 +335,7 @@ export async function descreverPecaReutilizavel({
       intencao: entrada.INTENCAO ?? null,
       contatos,
       formas,
+      plano,
       neutro,
       expansao,
     },

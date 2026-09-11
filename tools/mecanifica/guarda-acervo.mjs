@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* guarda-contatos.mjs — roda o veredito de contato sobre TODO o acervo.
+/* guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
  *
  * A medida de contato existe há tempo, sai com código de erro e ninguém a
  * chamava. `descrever-peca` reprova peça atravessando peça e peça que declara
@@ -10,6 +10,12 @@
  * Esta guarda fecha isso: ela varre o acervo, mede cada peça e sai com código 1
  * se qualquer uma reprovar. Instrumento que não é rodado por gate volta a ser
  * conselho, e conselho é ignorado sob pressão de terminar.
+ *
+ * ELA TAMBÉM EXIGE O PLANO DE MODELAGEM, e é o único lugar que exige. Medir uma
+ * peça de ensaio, escrita para provar um defeito, precisa continuar possível sem
+ * plano nenhum; mas peça que entra no acervo sem dizer antes que partes promete
+ * volta a ter ausência invisível, que foi como um pneu saiu maciço sem nada
+ * acusar.
  */
 import { readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
@@ -32,24 +38,34 @@ export function pecasDoAcervo(pasta = ACERVO) {
   return achadas.sort();
 }
 
-export async function conferirContatosDoAcervo(pecas = pecasDoAcervo()) {
+export async function conferirAcervo(pecas = pecasDoAcervo()) {
   const reprovadas = [];
   for (const peca of pecas) {
     const medida = await descreverPecaReutilizavel({ peca });
-    if (!medida.ok) reprovadas.push({ peca, motivo: medida.stderr.trim() });
+    if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); continue; }
+    /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
+       receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
+       canônico, que carrega `formato` e `versao`. */
+    if (!medida.resultado.plano) {
+      reprovadas.push({
+        peca,
+        motivo: 'SEM PLANO DE MODELAGEM\n  A receita não exporta `PLANO`, então ninguém sabe que partes'
+          + '\n  ela deveria ter, e parte que falta não pode ser acusada por medida nenhuma.',
+      });
+    }
   }
   return { pecas, reprovadas };
 }
 
-if (process.argv[1] && process.argv[1].endsWith('guarda-contatos.mjs')) {
-  const { pecas, reprovadas } = await conferirContatosDoAcervo();
+if (process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
+  const { pecas, reprovadas } = await conferirAcervo();
   if (pecas.length === 0) {
-    console.error('guarda:contatos — o acervo está vazio; nada foi medido.');
+    console.error('guarda:acervo — o acervo está vazio; nada foi medido.');
     process.exit(1);
   }
   for (const { peca, motivo } of reprovadas) {
-    console.error(`guarda:contatos — ${peca} REPROVOU\n${motivo}\n`);
+    console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
   }
   if (reprovadas.length) process.exit(1);
-  console.log(`guarda:contatos ok — ${pecas.length} peça(s) do acervo medida(s): ${pecas.join(', ')}.`);
+  console.log(`guarda:acervo ok — ${pecas.length} peça(s) do acervo medida(s): ${pecas.join(', ')}.`);
 }

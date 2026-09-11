@@ -94,8 +94,8 @@ jobs:
 
       # A régua de contato existia, saía com código de erro e nenhum gate a
       # chamava; foi assim que um quadro saiu em pedaços que não se tocavam.
-      - name: O acervo cumpre os contatos que declara
-        run: npm run guarda:contatos
+      - name: O acervo cumpre o plano e os contatos que declara
+        run: npm run guarda:acervo
 
       - name: Mapa do repositório em dia
         run: npm run mapa:check
