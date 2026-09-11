@@ -29,10 +29,16 @@ function caminhoArquivoValido(p) {
     const st = statSync(p);
     if (st.isFile()) return p;
     if (st.isDirectory()) {
-      const montagem = join(p, 'montagem.js');
-      if (existsSync(montagem) && statSync(montagem).isFile()) return montagem;
-      const index = join(p, 'index.js');
-      if (existsSync(index) && statSync(index).isFile()) return index;
+      /* `receita.js` e a entrada da PASTA DA PECA: a peca passa a ser um
+         diretorio com receita, referencias e rodadas juntas, e a identidade
+         dela vira o nome da pasta. Vem primeiro porque uma peca que tambem
+         publica montagem deve abrir pela receita, que e o que se modela.
+         `montagem.js` e `index.js` continuam para as montagens em pasta que ja
+         existem; duas formas convivem enquanto houver ocupante das duas. */
+      for (const entrada of ['receita.js', 'montagem.js', 'index.js']) {
+        const candidato = join(p, entrada);
+        if (existsSync(candidato) && statSync(candidato).isFile()) return candidato;
+      }
     }
   } catch {
     return null;

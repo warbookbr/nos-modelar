@@ -17,7 +17,7 @@
  * volta a ter ausência invisível, que foi como um pneu saiu maciço sem nada
  * acusar.
  */
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
@@ -26,14 +26,29 @@ const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
 
 /* O nome da peça é o caminho relativo sem extensão, que é o mesmo endereço que
-   `descrever-peca` aceita. Arquivo de teste não é peça. */
-export function pecasDoAcervo(pasta = ACERVO) {
+   `descrever-peca` aceita. Arquivo de teste não é peça.
+
+   PASTA DA PEÇA: quando o diretório tem `receita.js`, a peça é a PASTA e nada
+   mais dentro dela é peça — as referências, as rodadas e o que mais morar ali
+   pertencem a ela, não são acervo. Varrer o conteúdo faria cada arquivo da
+   pasta virar uma peça fantasma que o gate tentaria medir. */
+const ENTRADAS_DE_PASTA = ['receita.js', 'montagem.js', 'index.js'];
+
+export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
+  /* O nome sai relativo à BASE da varredura, e não à constante do acervo: sem
+     isso, medir um acervo de ensaio devolvia caminho com `../..` até a pasta
+     temporária, e o teste que prova a pasta da peça era impossível de escrever. */
   const achadas = [];
   for (const entrada of readdirSync(pasta, { withFileTypes: true })) {
     const caminho = join(pasta, entrada.name);
-    if (entrada.isDirectory()) { achadas.push(...pecasDoAcervo(caminho)); continue; }
+    if (entrada.isDirectory()) {
+      const porta = ENTRADAS_DE_PASTA.find((nome) => existsSync(join(caminho, nome)));
+      if (porta) achadas.push(relative(base, caminho));
+      else achadas.push(...pecasDoAcervo(caminho, { base }));
+      continue;
+    }
     if (!entrada.name.endsWith('.js') || entrada.name.endsWith('.test.js')) continue;
-    achadas.push(relative(ACERVO, caminho).replace(/\.js$/, ''));
+    achadas.push(relative(base, caminho).replace(/\.js$/, ''));
   }
   return achadas.sort();
 }

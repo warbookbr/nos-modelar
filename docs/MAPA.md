@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-841 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+842 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1053,6 +1053,7 @@
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
 - `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O número do acervo fica travado aqui de propósito — se alguém ligar uma r…
+- `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
 - `ponte-gesto-parametro.test.mjs` — ponte-gesto-parametro.test.mjs — RETRATO DO ESTADO ANTES DA PONTE.

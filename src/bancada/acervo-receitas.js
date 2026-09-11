@@ -13,14 +13,18 @@
 
 const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/**/*.js');
 
-/* Duas formas convivem no acervo: peça de arquivo único, `quadro.js`, e
-   montagem em pasta, `prensa/montagem.js`. Nos dois casos o nome que a pessoa
-   reconhece é o mesmo que o resolvedor de receita aceita. */
+/* Três formas convivem no acervo: peça de arquivo único, `quadro.js`, peça em
+   pasta, `bicicleta-quadro/receita.js`, e montagem em pasta,
+   `prensa/montagem.js`. Nos três casos o nome que a pessoa reconhece é o mesmo
+   que o resolvedor de receita aceita, e nos dois últimos ele é o nome da PASTA
+   — a identidade da peça deixa de ser o nome do arquivo. */
+const ENTRADAS_DE_PASTA = new Set(['receita', 'montagem', 'index']);
+
 function identificar(caminho) {
   const partes = caminho.split('/');
   const arquivo = partes[partes.length - 1].replace(/\.js$/, '');
-  if (arquivo === 'montagem' && partes.length >= 2) {
-    return { id: partes[partes.length - 2], montagem: true };
+  if (ENTRADAS_DE_PASTA.has(arquivo) && partes.length >= 2) {
+    return { id: partes[partes.length - 2], montagem: arquivo === 'montagem' };
   }
   return { id: arquivo, montagem: false };
 }
