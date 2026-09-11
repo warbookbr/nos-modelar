@@ -1231,8 +1231,17 @@ body.modal-aberto {
 }
 
 .vistas {
-  top: 94px;
-  max-width: calc(100vw - 720px);
+  /* Encostada na barra de comandos: o cabeçalho que ocupava esta faixa saiu, e
+     manter o afastamento dele deixava um vão vazio no alto da cena. */
+  top: 38px;
+  /* Os painéis laterais medem no máximo 360 e ficam a 16 da borda; deixar 700
+     de folga mantém a fileira inteira visível sem encostar neles, e ela mede
+     874 com os onze botões. */
+  max-width: calc(100vw - 700px);
+  /* Sem isto a caixa encolhe até um pouco menos que o conteúdo e corta o último
+     botão, porque o afastamento entre os grupos não entra na largura mínima
+     calculada pelo navegador. */
+  width: max-content;
   padding: 6px;
   border-radius: 13px;
 }
@@ -1255,7 +1264,7 @@ body.modal-aberto {
 kbd { padding: 2px 5px; font: 650 9px/1.35 var(--fonte-mono); }
 
 .painel {
-  top: 96px;
+  top: 40px;
   bottom: 54px;
   width: clamp(300px, 19vw, 360px);
   border-radius: 18px;
