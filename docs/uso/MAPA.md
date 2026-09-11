@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-825 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+827 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -21,6 +21,10 @@
 - `critico-visual.md` — Crítico visual sem contexto da Mecanifica. Recebe o DESENHO ALVO e as vistas do MODELO e responde se o segundo bate com o primeiro. Use antes de fechar qualq…
 - `implementador.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
 - `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
+
+## .claude/skills/alinhar-modelagem/
+
+- `SKILL.md` — Conduzir a rodada de alinhamento antes de modelar — levantar objeto, referências, escala, partes, contatos e critérios de reprovação com a pessoa, e sintetiz…
 
 ## .claude/skills/auditar-montagem/
 
@@ -957,6 +961,7 @@
 
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
+- `alinhar-modelagem.test.mjs` — alinhar-modelagem.test.mjs — a rodada de alinhamento continua colada ao formato que ela produz.
 - `alterar-montagem.test.ts` — alterar-montagem.test.ts — alteração semântica compacta de montagem.
 - `alvo-chassi-p0.mjs` — alvo-chassi-p0.mjs — o ALVO do P0 como dado, separado de quem desenha.
 - `argumentos.mjs` — argumentos.mjs — leitura de linha de comando dos CLIs da Mecanifica, com a MESMA lei que o núcleo de autoria aplica a uma referência: bandeira desconhecida, …

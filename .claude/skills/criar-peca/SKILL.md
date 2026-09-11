@@ -5,6 +5,12 @@ description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, esc
 
 # Criar peça
 
+Antes de escrever o primeiro passo de uma peça NOVA, conduza a rodada de
+alinhamento em [`../alinhar-modelagem/SKILL.md`](../alinhar-modelagem/SKILL.md)
+e escreva o `PLANO` da receita. Sem ele, parte prometida e não entregue é
+invisível para toda medida, e `npm run guarda:acervo` reprova a peça na entrada
+do acervo.
+
 Use esta skill quando o alvo for uma peça geométrica editável. Se o alvo for
 uma árvore de composição, relações entre peças ou revalidação de conjunto,
 use também `../auditar-montagem/SKILL.md`: cada peça é uma receita, e o conjunto
