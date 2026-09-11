@@ -40,8 +40,17 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
 
    ```bash
    npm run descrever -- <peça>
-   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
+   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
    ```
+
+   **Capture sempre com `--cores`, ou ao menos com `--auditoria`.** Sem isso a
+   imagem sai como a pessoa vê a bancada — painel à esquerda, inspeção à
+   direita, cabeçalho, barra de vistas, piso, grade e sombra —, e a peça fica
+   numa tira estreita no meio. `--auditoria` tira o cromo, o piso, a grade e a
+   sombra, e a peça ocupa o quadro inteiro; `--cores` faz o mesmo e ainda pinta
+   uma cor por parte, imprimindo a legenda. Numa peça de mais de uma parte
+   `--cores` é obrigatório: partes do mesmo material leem como um borrão só, e a
+   junção entre elas fica invisível.
 
    O catálogo publicado está vazio de propósito: a peça em trabalho é ativada
    na sessão e capturada pelo nome curto.
@@ -51,9 +60,9 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
    coisa diferente:
 
    ```bash
-   npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar
-   npm run bancada -- <peça> --selecionadas=carroceria --modo=contexto
-   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar --cores
+   npm run bancada -- <peça> --selecionadas=carroceria --modo=contexto --cores
+   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
    ```
 
    | modo | pergunta | o que avaliar |

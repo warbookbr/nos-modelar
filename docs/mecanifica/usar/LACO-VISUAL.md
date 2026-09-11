@@ -20,6 +20,21 @@ aberto por quem desenhou é o modo de falha real: um nariz aberto de 600 x 370 m
 ficou várias rodadas visível na vista frontal e só foi achado por um script.
 Medição pega o defeito que alguém já imaginou; olhar pega o resto.
 
+**Capture em modo de auditoria.** A bancada tem dois enquadramentos: o que a
+pessoa vê, com painel de componentes à esquerda, inspeção à direita, cabeçalho,
+barra de vistas, piso, grade e sombra; e o de leitura automática, sem nada
+disso, com a peça ocupando o quadro inteiro.
+
+```bash
+npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
+```
+
+`--auditoria` tira o cromo, o piso, a grade e a sombra. `--cores` faz o mesmo e
+pinta uma cor por parte, imprimindo a legenda — e é obrigatório em peça de mais
+de uma parte, porque partes do mesmo material leem como um borrão só e a junção
+entre elas fica invisível. Sem a bandeira, a peça sai numa tira estreita no meio
+da tela, e a sombra no chão já foi lida como geometria mais de uma vez.
+
 ## 2. Antes de qualquer julgamento: abra o alvo e sobreponha
 
 Não é opcional e não é passo final. Uma prova inteira do chassi foi feita sem
