@@ -103,10 +103,10 @@ describe('ativar-bancada: grito do motor é recusa', () => {
     expect(existsSync(SESSAO)).toBe(true);
     const payload = JSON.parse(readFileSync(SESSAO, 'utf8'));
     expect(payload.alvo.nome).toBe('Fixture Boa');
-    expect(payload.intencaoIA.checklist[0]).toEqual({
-      descricao: 'bloco',
-      concluido: false,
-    });
+    /* Ativar não declara intenção: o checklist do painel é de ciclo de
+       modelagem, e enchê-lo com os nomes das partes repetia a lista de
+       Componentes marcando como pendente o que já está na cena. */
+    expect(payload.intencaoIA.checklist).toEqual([]);
     expect(payload.referencias.criterios[0]).toEqual({
       texto: 'Sem faces órfãs',
       status: 'aprovado',

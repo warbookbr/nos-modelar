@@ -142,7 +142,13 @@ export async function ativarReceitaBancada({
     intencaoIA: {
       titulo: `Modelagem: ${nomeAlvo}`,
       resumo: `Carregado automaticamente via ativar-bancada a partir de ${caminhoRelativo}.`,
-      checklist: partesNomes.slice(0, 8).map((descricao) => ({ descricao, concluido: false })),
+      /* O checklist fica vazio de propósito. Ele existe para um ciclo de
+         modelagem dizer o que pretende fazer e o que já fez; preenchê-lo com os
+         nomes das partes repetia a lista de Componentes do painel da esquerda e
+         ainda marcava como pendente o que já estava na cena. Quem ativa a
+         bancada a partir de uma receita pronta não tem intenção nenhuma a
+         declarar. */
+      checklist: [],
     },
     referencias: {
       pranchas: [],
