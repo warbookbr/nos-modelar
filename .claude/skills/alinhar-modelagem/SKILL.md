@@ -14,7 +14,7 @@ parte que nunca foi prometida.
 
 O produto desta rodada é um arquivo, e não um acordo de conversa. Ele é o
 `PLANO` exportado pela receita, validado por
-[`plano-de-modelagem.js`](../../../src/autoria/plano-de-modelagem.js) e cobrado
+[`src/autoria/plano-de-modelagem.js`](../../../src/autoria/plano-de-modelagem.js) e cobrado
 por `npm run guarda:acervo`. Enquanto a combinação viver no diálogo, ela volta a
 ser conselho, e conselho é ignorado sob pressão de terminar.
 
