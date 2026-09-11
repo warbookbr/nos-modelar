@@ -17,6 +17,7 @@ humana, o Playground e a aplicação jogável, que não existem mais aqui.
 | [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md) | execução, limites e decisão de não integrar a roda |
 | [`RELATORIO-PONTE-THREE.md`](RELATORIO-PONTE-THREE.md) | evidência da ponte entre receita procedural e apresentação |
 | [`OFICINA-OTIMIZACOES.md`](OFICINA-OTIMIZACOES.md) | análise histórica de dependências e candidatos |
+| [`EXPERIMENTO-CARRO-SEM-APOIO.md`](EXPERIMENTO-CARRO-SEM-APOIO.md) | o que outra IA fez ao modelar um carro do zero, sem o núcleo procedural, e por que o código dela saiu do repositório |
 
 Os arquivos podem ser consultados para contexto e evidência. Nenhum deles abre
 plano, altera o contrato ou autoriza implementação.

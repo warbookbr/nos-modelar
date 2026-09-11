@@ -24,7 +24,12 @@ export const DIAGNOSTICOS_C1 = [
 
 function receitaCupe() {
   const window = {};
-  vm.runInNewContext(readFileSync(path.join(raiz, 'laboratorio-isolado', 'cupe-livre-01', 'receita-cupe.js'), 'utf8'), { window });
+  /* A receita mora AQUI desde 2026-09-11. O experimento isolado que a produziu
+     foi removido do repositório — o gerador dele não executava, com receita e
+     motor em versões diferentes —, e o registro do que aconteceu está em
+     `docs/mecanifica/historico/EXPERIMENTO-CARRO-SEM-APOIO.md`. A receita ficou
+     porque C1 mede a pele dela, e por isso passou a morar ao lado de quem a lê. */
+  vm.runInNewContext(readFileSync(path.join(aqui, 'receita-cupe.js'), 'utf8'), { window });
   return window.RECEITA_CUPE_LIVRE;
 }
 

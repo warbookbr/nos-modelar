@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-845 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+842 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -80,6 +80,7 @@
 - `README.md` — Corpus do canal de percepção N3
 - `canal-percepcao-n3.test.mjs` — Calibração reprodutível entre controles sadios e históricos reprovados.
 - `gerar-evidencias.mjs` — Gera o corpus N3. Não altera receitas nem promove geometria histórica.
+- `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
 
 ## autoria-assistida/experimentos/canario-casco-visual-n6/
 
@@ -409,6 +410,7 @@
 - `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
 - `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
 - `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
+- `EXPERIMENTO-CARRO-SEM-APOIO.md` — Carro modelado do zero, sem o motor da Mecanifica
 - `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
 - `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
 - `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
@@ -599,14 +601,6 @@
 - `oficina-projeto.md` — Oficina — o registro de projeto
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 - `playground.md` — O Playground — o épico da criação por IA
-
-## laboratorio-isolado/cupe-livre-01/
-
-- `README.md` — Cupê livre 01 — experimento isolado
-- `index.html` — Bancada autocontida do experimento isolado. Sem imports, assets ou contratos do repositório hospedeiro.
-- `motor.js` — Motor WebGL autocontido do experimento. Sem dependências, imports ou assets.
-- `receita-cupe.js` — Receita autoral independente. Não importa nem referencia código da Mecanifica.
-- `servidor-local.mjs` — Servidor de inspeção local, sem dependências. Publica somente esta pasta.
 
 ## modulos/exportador-cad/src/
 
