@@ -91,3 +91,18 @@ describe('ligação entre parte e parâmetro', () => {
     expect(parametrosDaParte(ligarPartesAParametros(receita), 'tuboInferior')).toEqual([]);
   });
 });
+
+describe('crescer não é andar', () => {
+  it('parâmetro que só engorda a parte mede centro zero e crescimento positivo', () => {
+    const ligacao = ligarPartesAParametros(receita);
+    const raio = parametrosDaParte(ligacao, 'tuboSelim').find((p) => p.id === 'raioTuboSelim');
+    expect(raio).toBeTruthy();
+    /* O raio afasta as duas bordas do tubo, então a medida de borda o vê como
+       movimento; o centro não sai do lugar. É a distinção que decide se ele
+       pode governar uma seta. */
+    expect(Math.max(...raio.porEixo)).toBeGreaterThan(0);
+    expect(raio.centroPorEixo).toEqual([0, 0, 0]);
+    expect(Math.max(...raio.crescimentoPorEixo)).toBeGreaterThan(0);
+    expect(raio.sensibilidade).toEqual([0, 0, 0]);
+  });
+});

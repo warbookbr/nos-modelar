@@ -13,6 +13,12 @@
  * em y viraria a seta de x só por mover x um pouquinho de raspão, e arrastar
  * essa seta faria a peça subir.
  *
+ * A medida lida é o deslocamento do CENTRO da parte. A caixa engorda quando o
+ * tubo engorda, e por borda isso é indistinguível de andar: foi assim que o raio
+ * do tubo do selim ganhou a seta de x daquele tubo, e arrastá-la engordava o
+ * tubo em vez de movê-lo. Parâmetro que só muda tamanho tem centro parado e não
+ * ganha seta nenhuma.
+ *
  * A segunda é o piso: movimento muito menor que o do melhor candidato daquele
  * eixo não vira seta. Duas setas quase empatadas não ajudam ninguém a escolher,
  * e a menor é sempre a que surpreende. */
@@ -23,6 +29,13 @@ const PISO_RELATIVO = 0.2;
 function dominaOEixo(porEixo, eixo) {
   return [0, 1, 2].every((i) => i === eixo || porEixo[eixo] >= porEixo[i]);
 }
+
+/* Translação por eixo, que é a única medida que a seta pode prometer. Entrada
+   antiga, sem esta casa, vale zero: ligação sem translação medida não governa
+   seta. */
+const translacao = (parametro) => (Array.isArray(parametro?.centroPorEixo)
+  ? parametro.centroPorEixo
+  : [0, 0, 0]);
 
 /**
  * Escolhe, para cada eixo, o parâmetro que a seta daquele eixo governa.
@@ -37,17 +50,18 @@ export function escolherSetas(parametros = []) {
 
   for (const [eixo, nome] of nomes.entries()) {
     const candidatos = parametros
-      .filter((p) => Array.isArray(p.porEixo) && p.porEixo[eixo] > 0 && dominaOEixo(p.porEixo, eixo))
-      .sort((a, b) => b.porEixo[eixo] - a.porEixo[eixo]);
+      .filter((p) => translacao(p)[eixo] > 0 && dominaOEixo(translacao(p), eixo))
+      .sort((a, b) => translacao(b)[eixo] - translacao(a)[eixo]);
 
     const melhor = candidatos[0];
     if (!melhor) continue;
-    if (melhor.porEixo[eixo] < (parametros[0]?.porEixo?.[eixo] ?? 0) * PISO_RELATIVO) continue;
+    const maiorDoEixo = Math.max(...parametros.map((p) => translacao(p)[eixo]), 0);
+    if (translacao(melhor)[eixo] < maiorDoEixo * PISO_RELATIVO) continue;
 
     escolhas[nome] = {
       id: melhor.id,
       sensibilidade: melhor.sensibilidade?.[eixo] ?? 0,
-      deslocamento: melhor.porEixo[eixo],
+      deslocamento: translacao(melhor)[eixo],
     };
   }
 

@@ -31,6 +31,13 @@ const FRACAO_DA_DISTANCIA = 1 / 8;
    erro, então ela apaga e não pega o clique. */
 const MINIMO_EM_PIXELS = 14;
 
+/* A haste desenhada tem treze milímetros de espessura na cena, o que é fino
+   demais para o ponteiro acertar: o autor relatou não saber se estava clicando
+   na seta ou na peça atrás dela. O alvo de clique é um cilindro invisível bem
+   mais grosso em volta da seta inteira, então pegar a seta deixa de exigir
+   pontaria — e como ele é invisível, a seta continua fina na tela. */
+const RAIO_DO_ALVO = 0.09;
+
 function criarHaste(cor) {
   const material = new THREE.MeshBasicMaterial({ color: cor, depthTest: false, transparent: true });
   const grupo = new THREE.Group();
@@ -38,7 +45,13 @@ function criarHaste(cor) {
   haste.position.y = 0.4;
   const ponta = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.2, 10), material);
   ponta.position.y = 0.9;
-  grupo.add(haste, ponta);
+  const alvo = new THREE.Mesh(
+    new THREE.CylinderGeometry(RAIO_DO_ALVO, RAIO_DO_ALVO, 1.05, 8),
+    new THREE.MeshBasicMaterial({ visible: false }),
+  );
+  alvo.position.y = 0.5;
+  alvo.name = '__alvo_da_seta__';
+  grupo.add(haste, ponta, alvo);
   grupo.renderOrder = 999;
   return { grupo, material };
 }
@@ -47,6 +60,14 @@ export function criarSetasDeParametro({
   cena, canvas, cameraAtual,
   valorAtual = () => 0,
   passoDe = () => 1,
+  /* A peça é redimensionada para caber no estúdio, e a sensibilidade foi medida
+     nas unidades da receita. Sem dividir por essa escala o gesto anda tantas
+     vezes mais quanto a peça foi ampliada — na bicicleta, três vezes e meia: o
+     ponteiro andava um palmo e o tubo atravessava a tela. */
+  escalaDoModelo = () => 1,
+  /* A tabela declara mínimo e máximo, e o arrasto não pode escrever fora deles:
+     o painel recusa, e a seta escreveria o mesmo número por outra porta. */
+  limitesDe = () => ({}),
   aoArrastar = () => {},
   aoSoltar = () => {},
 }) {
@@ -106,6 +127,14 @@ export function criarSetasDeParametro({
   }
 
   function mostrar({ centro, ligacoes }) {
+    /* Durante o arrasto as setas ficam onde estão. A prévia reconstrói o modelo
+       a cada movimento, e a bancada devolve a seleção logo depois: isso chamava
+       `mostrar` e `esconder` no meio do gesto, e `esconder` jogava fora o
+       arrasto. O resultado era o gesto morrer no primeiro movimento — a peça
+       andava um passo de ponteiro e parava, parecendo que a seta não tinha sido
+       pega. Mover a base no meio do arrasto também mudaria a conta do avanço,
+       que é medida contra o ponto onde o gesto começou. */
+    if (arrasto) return raiz.visible;
     if (!centro || !ligacoes) return esconder();
     raiz.position.copy(centro);
     let alguma = false;
@@ -120,9 +149,20 @@ export function criarSetasDeParametro({
   }
 
   function esconder() {
+    if (arrasto) return raiz.visible;
     raiz.visible = false;
-    arrasto = null;
     return false;
+  }
+
+  /* Realce sob o ponteiro: sem ele, a única maneira de descobrir se a seta foi
+     pega era arrastar e ver o que acontece. A seta sob o ponteiro clareia e o
+     cursor vira mão, antes de qualquer clique. */
+  function realcar(seta) {
+    for (const outra of setas.values()) {
+      const ativa = outra === seta;
+      outra.material.color.setHex(ativa ? 0xffffff : outra.cor);
+      if (!outra.grupo.userData.inerte) outra.material.opacity = ativa ? 1 : 0.92;
+    }
   }
 
   function setaSobOPonteiro(evento) {
@@ -137,6 +177,13 @@ export function criarSetasDeParametro({
       if (no && !no.userData.inerte) return setas.get(no.userData.eixo);
     }
     return null;
+  }
+
+  function aoPassar(evento) {
+    if (arrasto || !raiz.visible) return;
+    const seta = setaSobOPonteiro(evento);
+    realcar(seta?.ligacao ? seta : null);
+    if (seta?.ligacao) canvas.style.cursor = 'grab';
   }
 
   function aoPressionar(evento) {
@@ -165,8 +212,9 @@ export function criarSetasDeParametro({
     /* Projeção do movimento do ponteiro sobre a direção da seta na tela,
        dividida pelo comprimento dela: é a fórmula do editor do `nos`, e ela dá
        o avanço em unidades de mundo ao longo do eixo. */
+    const escala = escalaDoModelo() || 1;
     const avanco = ((x - arrasto.partida.x) * dx + (y - arrasto.partida.y) * dy)
-      / (comprimento * comprimento) * raiz.scale.x;
+      / (comprimento * comprimento) * raiz.scale.x / escala;
     const passo = passoDoParametro(avanco, arrasto.seta.ligacao.sensibilidade);
     /* ENCAIXE. Arrasto produz decimal contínuo, e a tabela da peça é medida em
        milímetros: sem encaixar, o gesto grava `743.354569` onde a folha de
@@ -174,7 +222,11 @@ export function criarSetasDeParametro({
        na primeira vez que alguém usar a seta. */
     const grade = passoDe(arrasto.seta.ligacao.id) || 1;
     const bruto = arrasto.base + passo;
-    aoArrastar(arrasto.seta.ligacao.id, Math.round(bruto / grade) * grade);
+    const { min, max } = limitesDe(arrasto.seta.ligacao.id) ?? {};
+    let valor = Math.round(bruto / grade) * grade;
+    if (Number.isFinite(min)) valor = Math.max(min, valor);
+    if (Number.isFinite(max)) valor = Math.min(max, valor);
+    aoArrastar(arrasto.seta.ligacao.id, valor);
   }
 
   function aoSoltarPonteiro(evento) {
@@ -188,6 +240,7 @@ export function criarSetasDeParametro({
 
   canvas.addEventListener('pointerdown', aoPressionar, true);
   canvas.addEventListener('pointermove', aoMover, true);
+  canvas.addEventListener('pointermove', aoPassar);
   canvas.addEventListener('pointerup', aoSoltarPonteiro, true);
 
   return {
@@ -199,6 +252,7 @@ export function criarSetasDeParametro({
     destruir() {
       canvas.removeEventListener('pointerdown', aoPressionar, true);
       canvas.removeEventListener('pointermove', aoMover, true);
+      canvas.removeEventListener('pointermove', aoPassar);
       canvas.removeEventListener('pointerup', aoSoltarPonteiro, true);
       raiz.removeFromParent();
       for (const seta of setas.values()) {

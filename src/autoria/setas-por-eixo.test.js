@@ -6,9 +6,12 @@
 import { describe, expect, it } from 'vitest';
 import { escolherSetas, passoDoParametro } from './setas-por-eixo.js';
 
-const alto = { id: 'altura', porEixo: [0.001, 0.4, 0.001], sensibilidade: [0.00001, 0.004, 0.00001] };
-const largo = { id: 'largura', porEixo: [0.3, 0.002, 0.001], sensibilidade: [0.003, 0.00002, 0.00001] };
-const fundo = { id: 'profundidade', porEixo: [0.001, 0.001, 0.25], sensibilidade: [0, 0, 0.0025] };
+/* `centroPorEixo` é o quanto a parte ANDA; `porEixo` inclui o quanto ela cresce,
+   e por isso não decide seta. */
+const alto = { id: 'altura', porEixo: [0.001, 0.4, 0.001], centroPorEixo: [0.001, 0.4, 0.001], sensibilidade: [0.00001, 0.004, 0.00001] };
+const largo = { id: 'largura', porEixo: [0.3, 0.002, 0.001], centroPorEixo: [0.3, 0.002, 0.001], sensibilidade: [0.003, 0.00002, 0.00001] };
+const fundo = { id: 'profundidade', porEixo: [0.001, 0.001, 0.25], centroPorEixo: [0.001, 0.001, 0.25], sensibilidade: [0, 0, 0.0025] };
+const engorda = { id: 'raio', porEixo: [0.002, 0.002, 0.002], centroPorEixo: [0, 0, 0], crescimentoPorEixo: [0.004, 0.004, 0.004], sensibilidade: [0, 0, 0] };
 
 describe('setas por eixo', () => {
   it('dá cada eixo ao parâmetro que domina aquele eixo', () => {
@@ -27,10 +30,19 @@ describe('setas por eixo', () => {
   });
 
   it('deixa o eixo vazio quando nenhum parâmetro o move', () => {
-    const setas = escolherSetas([{ id: 'so-y', porEixo: [0, 0.2, 0], sensibilidade: [0, 0.002, 0] }]);
+    const setas = escolherSetas([{ id: 'so-y', porEixo: [0, 0.2, 0], centroPorEixo: [0, 0.2, 0], sensibilidade: [0, 0.002, 0] }]);
     expect(setas.x).toBe(null);
     expect(setas.z).toBe(null);
     expect(setas.y.id).toBe('so-y');
+  });
+
+  it('RECUSA o parâmetro que só engorda a parte', () => {
+    /* O caso medido na bicicleta: `raioTuboSelim` afasta as duas bordas do tubo
+       e por borda parece movimento, mas o centro não sai do lugar. Arrastar
+       essa seta engordaria o tubo enquanto a peça inteira escorregava. */
+    expect(escolherSetas([engorda])).toEqual({ x: null, y: null, z: null });
+    /* E sozinho ele também não pode roubar o eixo de quem move de verdade. */
+    expect(escolherSetas([engorda, largo]).x.id).toBe('largura');
   });
 
   it('lista vazia e entrada sem medida não viram seta', () => {

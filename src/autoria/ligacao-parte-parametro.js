@@ -49,6 +49,29 @@ function deslocamentoPorEixo(antes, depois) {
   ));
 }
 
+/* ANDAR e CRESCER são coisas diferentes, e a medida de borda acima não as
+   separa: engordar um tubo afasta as duas bordas exatamente como mover
+   afastaria uma. Foi assim que `raioTuboSelim`, que desloca o centro do tubo em
+   zero, ganhou a seta de x do tubo do selim — e arrastar essa seta engordava o
+   tubo enquanto a peça inteira escorregava pelo reencaixe. O centro da caixa só
+   anda quando a parte anda. */
+function centroPorEixo(antes, depois) {
+  if (!depois) return [0, 0, 0];
+  return [0, 1, 2].map((i) => Math.abs(
+    ((depois.min[i] + depois.max[i]) / 2) - ((antes.min[i] + antes.max[i]) / 2),
+  ));
+}
+
+/* O quanto a parte mudou de tamanho em cada eixo. Não decide seta, e existe
+   para quem lê a ligação saber por que um parâmetro aparece na lista da parte
+   sem governar seta nenhuma. */
+function crescimentoPorEixo(antes, depois) {
+  if (!depois) return [0, 0, 0];
+  return [0, 1, 2].map((i) => Math.abs(
+    (depois.max[i] - depois.min[i]) - (antes.max[i] - antes.min[i]),
+  ));
+}
+
 /**
  * Liga cada parte aos parâmetros que a movem.
  *
@@ -81,17 +104,22 @@ export function ligarPartesAParametros(receita) {
     const passo = passoDaSonda;
     const movidas = [];
     for (const [nome, antes] of base) {
-      const porEixo = deslocamentoPorEixo(antes, medido.get(nome));
+      const depoisDaParte = medido.get(nome);
+      const porEixo = deslocamentoPorEixo(antes, depoisDaParte);
       const deslocamento = Math.max(...porEixo);
       if (deslocamento <= MINIMO) continue;
-      /* Sensibilidade: quanto a parte anda, em metros, por unidade do
-         parâmetro. É ela que faz a seta mover a peça na medida do arrasto, em
-         vez de por um fator inventado. */
+      const centro = centroPorEixo(antes, depoisDaParte).map((d) => (d <= MINIMO ? 0 : d));
+      /* Sensibilidade: quanto a parte ANDA, em metros, por unidade do
+         parâmetro. Vem do centro, e não da borda: é ela que converte o arrasto
+         em valor, e com a borda um raio devolveria avanço para um gesto que não
+         move nada. */
       movidas.push({
         parte: nome,
         deslocamento,
         porEixo,
-        sensibilidade: porEixo.map((d) => d / passo),
+        centroPorEixo: centro,
+        crescimentoPorEixo: crescimentoPorEixo(antes, depoisDaParte),
+        sensibilidade: centro.map((d) => d / passo),
       });
     }
 
@@ -102,8 +130,9 @@ export function ligarPartesAParametros(receita) {
 
     movidas.sort((a, b) => b.deslocamento - a.deslocamento);
     porParametro[parametro.id] = movidas;
-    for (const { parte, deslocamento, porEixo, sensibilidade } of movidas) {
-      porParte[parte].push({ id: parametro.id, deslocamento, porEixo, sensibilidade });
+    for (const movida of movidas) {
+      const { parte, ...resto } = movida;
+      porParte[parte].push({ id: parametro.id, ...resto });
     }
   }
 

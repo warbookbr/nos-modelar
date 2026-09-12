@@ -468,6 +468,11 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       ? pendentes.get(id)
       : parametroDeclarado(receitaAberta, id)?.valor ?? 0),
     passoDe: (id) => parametroDeclarado(receitaAberta, id)?.passo ?? 1,
+    escalaDoModelo: () => modeloAtual?.raiz?.scale?.x ?? 1,
+    limitesDe: (id) => {
+      const declarado = parametroDeclarado(receitaAberta, id);
+      return { min: declarado?.min, max: declarado?.max };
+    },
     aoArrastar: previaDeParametro,
     aoSoltar: () => { historicoParametros.separar(); refletirPendencias(); },
   });
@@ -874,6 +879,31 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     ambiente.enquadrar(alvosDeEnquadramento({ raiz: modeloAtual.raiz, alvo: 'montagem' }));
   }
 
+  /* Onde a peça foi encaixada no estúdio, para a prévia não reencaixar.
+     `posicionarNoEstudio` centraliza e redimensiona para caber num tamanho fixo,
+     então qualquer mudança de parâmetro que altere a caixa da peça movia TODAS
+     as partes: um arrasto de seta de 120 px chegou a deslocar as oito partes da
+     bicicleta os mesmos 51,9 mm, juntas, e o movimento pedido pelo gesto ficava
+     brigando com esse reencaixe. Enquanto a mesma peça está na tela, a colocação
+     em vigor é reaproveitada; peça nova encaixa de novo. */
+  let colocacaoNoEstudio = null;
+
+  function colocarNoEstudio(convertido) {
+    const peca = convertido.nome ?? 'sessao-ativa';
+    if (colocacaoNoEstudio && colocacaoNoEstudio.peca === peca) {
+      convertido.raiz.position.fromArray(colocacaoNoEstudio.posicao);
+      convertido.raiz.scale.setScalar(colocacaoNoEstudio.escala);
+      convertido.raiz.updateMatrixWorld(true);
+      return;
+    }
+    posicionarNoEstudio(convertido.raiz);
+    colocacaoNoEstudio = {
+      peca,
+      posicao: convertido.raiz.position.toArray(),
+      escala: convertido.raiz.scale.x,
+    };
+  }
+
   function aplicarModelo(convertido, { preservarCamera = false } = {}) {
     if (modeloAtual) {
       modeloAtual.raiz.removeFromParent();
@@ -888,7 +918,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     estadoDaBancada.peca = formatarNome(convertido.rotulo);
     registroDeEventos.registrar('informacao', 'Peça carregada', formatarNome(convertido.rotulo));
 
-    posicionarNoEstudio(convertido.raiz);
+    colocarNoEstudio(convertido);
     ambiente.scene.add(convertido.raiz);
 
     if (!preservarCamera) {
@@ -1192,6 +1222,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       historicoParametros.limpar();
       origemDosParametros = new Map();
       escolhaManual = true;
+      /* Abrir é peça nova mesmo quando é a mesma peça: quem abre espera vê-la
+         enquadrada, e não na colocação herdada da sessão anterior. */
+      colocacaoNoEstudio = null;
       entregaDaSessaoEmEspera = null;
       oferecerEntregaDaSessao('');
       sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });

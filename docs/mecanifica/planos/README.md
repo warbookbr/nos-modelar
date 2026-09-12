@@ -4,6 +4,17 @@
 
 **Plano ativo:** nenhum.
 
+A [seta move de verdade](encerrados/2026-09-12-a-seta-move-de-verdade.md) foi
+**concluída** em 2026-09-12. O gesto direto da bancada tinha quatro defeitos ao mesmo tempo, todos medidos: a
+seta escolhida comparava as bordas da caixa da parte e por isso um raio, que
+engorda sem andar, governava a seta; toda prévia reencaixava a peça no estúdio e
+as oito partes escorregavam juntas; a reconstrução da prévia jogava fora o
+arrasto em curso, e o gesto morria no primeiro movimento do ponteiro; e a
+conversão do arrasto ignorava a escala do estúdio. A haste também era fina demais
+para o ponteiro acertar. Agora o arrasto move a parte na medida do ponteiro e só
+ela, com `guarda:seta` afirmando isso no navegador. Volta ao backlog dizer à
+pessoa por que um eixo ficou sem seta.
+
 A [peça mora num lugar só](encerrados/2026-09-11-a-peca-mora-num-lugar-so.md)
 foi **concluída** em 2026-09-11. O material de uma peça estava em quatro árvores
 do repositório e nada dizia que pertencia à mesma peça; agora a peça é uma pasta

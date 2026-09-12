@@ -129,3 +129,11 @@ resultados, sempre dentro das invariantes deste documento.
 Vieram de `AUTORIA-IA.md`, onde eram deliberação de projeto dentro de um
 documento que também servia de contrato. Resolvem-se por planos pequenos.
 
+## Dizer por que o eixo ficou sem seta
+
+Medida: na bicicleta, o tubo do selim não tem seta em x porque nenhum parâmetro
+declarado o translada nesse eixo. A regra está certa — seta que mente é pior que
+seta ausente —, mas a bancada não diz isso: o eixo simplesmente não aparece, e
+quem olha não distingue "não dá para mover nesse eixo" de "a bancada falhou".
+Origem: fechamento de `encerrados/2026-09-12-a-seta-move-de-verdade.md`.
+
