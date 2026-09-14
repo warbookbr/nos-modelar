@@ -2,7 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Ajuste da bancada volta como receita](2026-09-14-ajuste-da-bancada-volta-como-receita.md) (2026-09-14-ajuste-da-bancada-volta-como-receita.md).
+
+A bancada exige que todo gesto caia num parâmetro nomeado, e num quadro em
+treliça não existe número que empurre um tubo inteiro sem descolar as juntas —
+medido na bicicleta, arrastar a seta do balanço estica os quatro balanços em vez
+de mover um. O plano separa os dois lados: a bancada passa a ser o espaço do
+autor, e uma rodada de absorção com skill própria devolve a receita organizada
+que a IA lê, provada por reexecução contra o ajuste capturado e guardada contra
+parâmetro inventado sem origem declarada.
 
 A [seta move de verdade](encerrados/2026-09-12-a-seta-move-de-verdade.md) foi
 **concluída** em 2026-09-12. O gesto direto da bancada tinha quatro defeitos ao mesmo tempo, todos medidos: a
