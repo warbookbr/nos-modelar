@@ -2,6 +2,8 @@
 
 **Estado:** ativo
 
+**PARADO na fatia 1** pela cláusula de parada abaixo; a decisão de escopo é do autor.
+
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
 **Repositório e base:** `warbookbr/nos-mecanifica`, base `b7e7238` na main.
@@ -103,6 +105,34 @@ ou perdeu parte. Fica para o plano seguinte, escrito assim que este fechar.
 3b. **Apontar e grudar.** Gizmo de três setas na seleção, e o ímã do Ctrl.
 4. **Fechar.** Gate de navegador, documentação, `npm run mapa`, gates completos,
    e a abertura do plano de topologia.
+
+## Medido na fatia 1 — o risco aconteceu
+
+A medida da fatia 1 responde a pergunta do gate de saída, e a resposta é não. A
+edição livre produz alvo que a receita da bicicleta não alcança.
+
+Mover UM vértice do tubo do selim 5 mm em y deixa a receita original 5,000 mm
+fora. Uma descida por coordenada sobre os vinte e nove parâmetros declarados,
+com passo caindo de 8% até 0,06%, chega a 2,531 mm — cinco vezes a tolerância de
+meio milímetro. E esses 2,531 mm não vêm de reproduzir a edição: vêm de
+`quedaDoMovimentoCentral`, que desce o quadro inteiro e por acaso encurta a maior
+distância medida.
+
+Mover o tubo do selim INTEIRO 5 mm em y é pior: 5,000 mm antes da busca e 5,000
+mm depois. Nenhum dos vinte e nove parâmetros melhora nada, porque nenhum
+translada aquele tubo naquele eixo.
+
+A busca foi validada num caso de controle, para a conclusão não ser sobre busca
+ruim. Contra um alvo que É uma receita — a bicicleta com `balancoTraseiro` 502 →
+514 — ela sai de 12,158 mm e chega a 0,969 mm, convergindo para a resposta certa.
+
+E a medida nova não é rigorosa demais: o gesto por junta, que corresponde a um
+parâmetro, continua passando. Puxar as duas ponteiras e comparar com
+`balancoTraseiro: 514` dá 0,340 mm com a nuvem de pontos, dentro da tolerância.
+
+A conclusão é a separação: edição que corresponde a algo que a receita sabe dizer
+volta; edição livre de vértice não volta, e não é questão de a rodada se esforçar
+mais.
 
 ## Riscos e parada
 
