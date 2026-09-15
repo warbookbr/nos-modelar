@@ -307,6 +307,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      disto não existe estado anterior que esta sessão tenha produzido. */
   let origemDosParametros = new Map();
   let origemDaMalha = null;
+  /* O que o controlador de câmera usa fora do modo de edição, guardado para ser
+     devolvido na saída. */
+  const BOTOES_DE_CAMERA_PADRAO = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
   const historicoParametros = criarHistoricoParametros({
     valorDeOrigem: (chave) => (chave === '__edicao_de_malha__'
       ? origemDaMalha
@@ -691,6 +694,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   (function acompanharCamera() {
     setasDeParametro.atualizarEscala();
     punhosDeJunta.atualizarEscala();
+    edicaoDeMalha?.acompanharCamera?.();
     edicaoDeMalha?.acompanharCamera?.();
     requestAnimationFrame(acompanharCamera);
   }());
@@ -1087,6 +1091,56 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     };
   }
 
+  function criarCamadaDeEdicao(modelo, partes) {
+    return criarCamadaEdicaoDeMalha({
+      canvas,
+      cameraAtual: () => ambiente.camera,
+      raiz: modelo.raiz,
+      neutro: modelo.neutro,
+      partes,
+      aoMudar(estadoEdicao) {
+        if (estadoEdicao.ativo) {
+          mostrarAviso(`Edição de malha: ${estadoEdicao.modo}. ${estadoEdicao.selecionados.length} selecionado(s).`);
+        }
+      },
+      aoConfirmarMovimento({ depois }) {
+        historicoParametros.registrar('__edicao_de_malha__', depois);
+        historicoParametros.separar();
+        mostrarAviso('Movimento de malha confirmado. Ctrl+Z desfaz.');
+      },
+    });
+  }
+
+  /* A CAMADA É RECRIADA A CADA ENTRADA NO MODO, com as partes que estão
+     selecionadas naquele instante. Criada uma vez por peça, ela punha os 502
+     vértices da bicicleta inteira na tela para quem queria mexer num tubo só, e
+     um clique podia cair em vértice de outra peça. Recriar é barato e não
+     atrapalha o desfazer, que guarda cópias de `V` e não depende da camada.
+
+     Enquanto o modo está ligado, o botão esquerdo pertence à seleção, então a
+     órbita do controlador de câmera passa para o botão do meio e o arrasto para
+     o direito — a mesma divisão que o Blender usa. Sair devolve o padrão. */
+  function alternarEdicaoDeMalha() {
+    if (!modeloAtual?.neutro) return;
+    if (edicaoDeMalha?.estado?.().ativo) {
+      edicaoDeMalha.alternar();
+      ambiente.controls.mouseButtons = { ...BOTOES_DE_CAMERA_PADRAO };
+      return;
+    }
+    const selecionadas = controlador ? [...controlador.selecionadas] : [];
+    edicaoDeMalha?.destruir();
+    edicaoDeMalha = criarCamadaDeEdicao(modeloAtual, selecionadas);
+    edicaoDeMalha.alternar();
+    ambiente.controls.mouseButtons = {
+      LEFT: null,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+    mostrarAviso(selecionadas.length
+      ? `Editando ${selecionadas.join(', ')}. Botão do meio gira, direito arrasta.`
+      : 'Editando a peça inteira. Selecione uma parte antes do Tab para limitar.');
+  }
+
   function aplicarModelo(convertido, { preservarCamera = false, deAjuste = false } = {}) {
     if (modeloAtual) {
       modeloAtual.raiz.removeFromParent();
@@ -1136,24 +1190,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       },
     });
 
-    edicaoDeMalha = convertido.neutro
-      ? criarCamadaEdicaoDeMalha({
-        canvas,
-        cameraAtual: () => ambiente.camera,
-        raiz: convertido.raiz,
-        neutro: convertido.neutro,
-        aoMudar(estadoEdicao) {
-          if (estadoEdicao.ativo) {
-            mostrarAviso(`Edição de malha: ${estadoEdicao.modo}. ${estadoEdicao.selecionados.length} selecionado(s).`);
-          }
-        },
-        aoConfirmarMovimento({ depois }) {
-          historicoParametros.registrar('__edicao_de_malha__', depois);
-          historicoParametros.separar();
-          mostrarAviso('Movimento de malha confirmado. Ctrl+Z desfaz.');
-        },
-      })
-      : null;
+    edicaoDeMalha = convertido.neutro ? criarCamadaDeEdicao(convertido, null) : null;
     if (!deAjuste && edicaoDeMalha) origemDaMalha = edicaoDeMalha.vertices();
 
     btnSelecionarConjunto.hidden = !controlador.temHierarquia();
@@ -1344,9 +1381,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   function atalhoVista(evento) {
     const campoEditavel = registroAtalhos.deveIgnorar(evento.target);
-    if (evento.key === 'Tab' && !campoEditavel && edicaoDeMalha) {
+    if (evento.key === 'Tab' && !campoEditavel && modeloAtual?.neutro) {
       evento.preventDefault();
-      edicaoDeMalha.alternar();
+      alternarEdicaoDeMalha();
       return;
     }
     if (edicaoDeMalha?.estado().ativo && !campoEditavel) {

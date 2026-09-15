@@ -13,8 +13,13 @@ const TOPOLOGIA = {
 };
 
 describe('estado de edição de malha', () => {
-  it('mantém o ponto de seleção fino o suficiente para não cobrir malhas densas', () => {
-    expect(TAMANHO_PONTO_EM_EDICAO).toBeLessThanOrEqual(3);
+  /* O limite anterior era três pixels, e o autor não conseguia ver nem acertar o
+     vértice: o ponto fino demais deixa de ser punho. A faixa útil vai de cinco,
+     abaixo do qual ele some, a doze, acima do qual ele cobre a forma que a
+     pessoa está tentando enxergar. */
+  it('mantém o ponto de seleção grande o bastante para ser punho e pequeno o bastante para não cobrir a malha', () => {
+    expect(TAMANHO_PONTO_EM_EDICAO).toBeGreaterThanOrEqual(5);
+    expect(TAMANHO_PONTO_EM_EDICAO).toBeLessThanOrEqual(12);
   });
 
   it('deriva a topologia temporária da malha neutra sem levar seus ids ao alvo', () => {

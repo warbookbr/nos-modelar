@@ -130,6 +130,7 @@ const ler = () => pagina.evaluate(() => {
 
   return {
     edicao: bancada.edicaoDeMalha?.() ?? null,
+    camera: [ambiente.camera.position.x, ambiente.camera.position.y, ambiente.camera.position.z],
     gizmoVisivel: Boolean(gizmo?.visible),
     setas,
     grupoVisivel: Boolean(grupo?.visible),
@@ -161,7 +162,44 @@ try {
     ligado.pontosVisiveis && ligado.tamanhoDoPonto >= 2 && ligado.pontosNaTela.length > 0,
     `visível ${ligado.pontosVisiveis}, tamanho ${ligado.tamanhoDoPonto}, ${ligado.pontosNaTela.length} pontos no quadro`);
 
-  const alvo = ligado.pontosNaTela[Math.floor(ligado.pontosNaTela.length / 2)];
+  /* A CÂMERA CONTINUA ANDANDO DENTRO DO MODO. A camada parava a propagação de
+     qualquer botão do ponteiro, e a pessoa que apertava Tab ficava presa num
+     ângulo só. Dentro do modo o esquerdo é da seleção, e a órbita passa para o
+     botão do meio. */
+  const antesDeGirar = await ler();
+  await pagina.mouse.move(700, 430);
+  await pagina.mouse.down({ button: 'middle' });
+  for (let passo = 1; passo <= 6; passo += 1) await pagina.mouse.move(700 + passo * 20, 430);
+  await pagina.mouse.up({ button: 'middle' });
+  await pagina.waitForTimeout(600);
+  const depoisDeGirar = await ler();
+  const girou = Math.hypot(...[0, 1, 2].map((i) => depoisDeGirar.camera[i] - antesDeGirar.camera[i]));
+  ok('no modo de edição o botão do meio ainda gira a câmera', girou > 0.05,
+    `a câmera andou ${girou.toFixed(4)}`);
+  ok('girar a câmera não mexe na seleção',
+    (depoisDeGirar.edicao?.selecionados?.length ?? 0) === (antesDeGirar.edicao?.selecionados?.length ?? 0));
+
+  /* O RECORTE PELA PEÇA. Entrar no modo com uma parte selecionada edita só ela;
+     sem seleção, a peça inteira. Sem isto, mexer num tubo punha os 502 vértices
+     da bicicleta na tela e um clique podia cair em vértice de outra peça. */
+  await tecla('Tab');
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSelim']));
+  await pagina.waitForTimeout(500);
+  await tecla('Tab');
+  const recortado = await ler();
+  ok('com uma parte selecionada, o modo edita só ela',
+    recortado.pontosNaTela.length > 0 && recortado.pontosNaTela.length < ligado.pontosNaTela.length,
+    `${ligado.pontosNaTela.length} na peça inteira, ${recortado.pontosNaTela.length} no tubo do selim`);
+  await tecla('Tab');
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar([]));
+  await pagina.waitForTimeout(400);
+  await tecla('Tab');
+  const inteiro = await ler();
+  ok('sem seleção, o modo volta a valer para a peça inteira',
+    inteiro.pontosNaTela.length === ligado.pontosNaTela.length,
+    `${inteiro.pontosNaTela.length} pontos`);
+
+  const alvo = inteiro.pontosNaTela[Math.floor(inteiro.pontosNaTela.length / 2)];
   ok('há vértice sob o ponteiro para clicar', Boolean(alvo));
   if (!alvo) throw new Error('nenhum vértice projetado no quadro');
 
@@ -171,11 +209,41 @@ try {
   ok('clicar num vértice seleciona', (selecionado.edicao?.selecionados?.length ?? 0) > 0,
     `${selecionado.edicao?.selecionados?.length ?? 0} selecionado(s)`);
 
+  /* CLICAR DE LONGE. O autor relatou clicar em certos vértices e nada acontecer.
+     A hipótese era o alcance do clique: o ponto é desenhado com tamanho
+     constante na tela e o alcance do raio é medido no mundo, então afastar a
+     câmera encolheria a área clicável sem encolher o desenho. O alcance passou a
+     acompanhar a distância por isso.
+     ESTA AFIRMAÇÃO NÃO PROVA AQUELA CORREÇÃO: com o alcance fixo de volta, e a
+     câmera recuada até o limite, o clique continua pegando o vértice. Ou seja, a
+     causa do que o autor viu é outra e ainda não foi encontrada. A afirmação
+     fica porque o que ela cobra — clicar funcionar com a câmera longe — precisa
+     continuar valendo, mas ela não pode ser lida como o defeito resolvido. */
+  await pagina.mouse.move(700, 430);
+  await pagina.mouse.wheel(0, 4000);
+  await pagina.waitForTimeout(1000);
+  const longe = await ler();
+  const alvoLonge = longe.pontosNaTela[Math.floor(longe.pontosNaTela.length / 2)];
+  if (alvoLonge) {
+    await pagina.mouse.click(alvoLonge.x, alvoLonge.y);
+    await pagina.waitForTimeout(400);
+    const deLonge = await ler();
+    ok('com a câmera afastada o clique ainda pega o vértice',
+      (deLonge.edicao?.selecionados?.length ?? 0) > 0,
+      `${deLonge.edicao?.selecionados?.length ?? 0} selecionado(s)`);
+  }
+  await pagina.mouse.wheel(0, -4000);
+  await pagina.waitForTimeout(1000);
+  const dePerto = await ler();
+  const alvoPerto = dePerto.pontosNaTela[Math.floor(dePerto.pontosNaTela.length / 2)];
+  await pagina.mouse.click(alvoPerto.x, alvoPerto.y);
+  await pagina.waitForTimeout(400);
+
   await tecla('l');
   const ilha = await ler();
   ok('L pega a ilha inteira sob o ponteiro',
-    (ilha.edicao?.selecionados?.length ?? 0) > (selecionado.edicao?.selecionados?.length ?? 0),
-    `${selecionado.edicao?.selecionados?.length} → ${ilha.edicao?.selecionados?.length}`);
+    (ilha.edicao?.selecionados?.length ?? 0) > 1,
+    `${ilha.edicao?.selecionados?.length} selecionado(s)`);
 
   await tecla('2');
   const emAresta = await ler();

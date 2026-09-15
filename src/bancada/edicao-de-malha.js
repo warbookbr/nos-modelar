@@ -8,7 +8,12 @@
 import * as THREE from 'three';
 
 const MODOS = new Set(['vertice', 'aresta', 'face']);
-export const TAMANHO_PONTO_EM_EDICAO = 2.5;
+/* O vértice desenhado, em pixels na tela. Dois e meio era o valor inicial e o
+   autor não conseguia ver nem acertar: sete é o tamanho em que o ponto lê como
+   punho e ainda não esconde a forma atrás dele. Tamanho constante na tela, e não
+   no mundo — um punho que encolhe com a distância deixa de ser clicável
+   justamente quando a pessoa se afasta para ver a peça toda. */
+export const TAMANHO_PONTO_EM_EDICAO = 7;
 
 function chaveDaAresta(a, b) {
   return a < b ? `${a}:${b}` : `${b}:${a}`;
@@ -120,12 +125,33 @@ function adjacentes(topologia, modo, id) {
   return resultado;
 }
 
-export function topologiaDaMalhaNeutra(neutro) {
-  const vertices = [...(neutro?.V?.keys?.() ?? [])].map(String).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+/**
+ * Topologia da malha, opcionalmente restrita a algumas partes.
+ *
+ * `partes` limita a edição ao que a pessoa selecionou antes de apertar Tab.
+ * Sem esse recorte, entrar no modo de edição de um quadro punha os 502 vértices
+ * da bicicleta inteira na tela para quem queria mexer num tubo só, e qualquer
+ * clique podia cair num vértice de outra peça. Lista vazia ou ausente significa
+ * a peça inteira, que é o comportamento certo quando nada está selecionado.
+ *
+ * O vértice entra quando ALGUMA face das partes escolhidas o usa: vértice solto,
+ * que não pertence a face nenhuma, não tem como ser movido de forma coerente e
+ * não aparece.
+ */
+export function topologiaDaMalhaNeutra(neutro, { partes = null } = {}) {
+  const filtro = Array.isArray(partes) && partes.length ? new Set(partes) : null;
   const faces = [...(neutro?.F?.values?.() ?? [])]
-    .filter((face) => Array.isArray(face?.vs))
+    .filter((face) => Array.isArray(face?.vs) && (!filtro || filtro.has(face.parte)))
     .map((face) => ({ id: String(face.id), vertices: face.vs.map(String) }))
     .sort((a, b) => a.id.localeCompare(b.id, 'pt-BR'));
+
+  const usados = new Set();
+  for (const face of faces) for (const id of face.vertices) usados.add(id);
+  const vertices = [...(neutro?.V?.keys?.() ?? [])]
+    .map(String)
+    .filter((id) => (filtro ? usados.has(id) : true))
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
   return { vertices, faces };
 }
 
@@ -216,8 +242,8 @@ export function criarEstadoEdicaoDeMalha(entrada) {
 /* Desenha a seleção como uma camada filha da peça. As coordenadas continuam
    locais à peça, portanto escala e pose do estúdio acompanham naturalmente o
    realce sem entrar no estado salvo. */
-export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, aoMudar = () => {}, aoConfirmarMovimento = () => {} }) {
-  const topologia = topologiaDaMalhaNeutra(neutro);
+export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, partes = null, aoMudar = () => {}, aoConfirmarMovimento = () => {} }) {
+  const topologia = topologiaDaMalhaNeutra(neutro, { partes });
   const estrutura = construirTopologia(topologia);
   const estado = criarEstadoEdicaoDeMalha(topologia);
   const posicoes = new Map([...(neutro?.V ?? [])].map(([id, ponto]) => [String(id), ponto]));
@@ -264,8 +290,16 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     { eixo: 1, direcao: new THREE.Vector3(0, 1, 0), cor: 0x46d67f },
     { eixo: 2, direcao: new THREE.Vector3(0, 0, 1), cor: 0x5a8bff },
   ];
-  const FRACAO_DO_GIZMO = 1 / 8;
-  const RAIO_DO_ALVO_DO_GIZMO = 0.09;
+  /* Um oitavo da distância é o tamanho da seta de parâmetro, que aponta para uma
+     peça inteira. Aqui ela aponta para um vértice, e nesse tamanho cobria a
+     região que a pessoa está tentando enxergar. Um dezesseis avos mantém a seta
+     legível sem engolir a malha. */
+  const FRACAO_DO_GIZMO = 1 / 16;
+  /* O alvo de clique é o DOBRO do que seria proporcional à haste. A seta
+     encolheu pela metade para não engolir a malha, e o alvo encolheria junto:
+     pegar a seta voltaria a exigir pontaria, que é a queixa que ela veio
+     resolver. Como ele é invisível, engrossar não muda nada na imagem. */
+  const RAIO_DO_ALVO_DO_GIZMO = 0.18;
   const gizmo = new THREE.Group();
   gizmo.name = '__gizmo_de_edicao__';
   gizmo.visible = false;
@@ -320,8 +354,22 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
   document.body.append(caixa);
 
   const raycaster = new THREE.Raycaster();
-  raycaster.params.Points.threshold = 0.08;
-  raycaster.params.Line.threshold = 0.05;
+  /* ALCANCE DO CLIQUE PROPORCIONAL À DISTÂNCIA. O ponto é desenhado com tamanho
+     constante na TELA, mas o alcance do raio é medido no MUNDO: com um número
+     fixo, o vértice longe da câmera continuava do mesmo tamanho na imagem e ia
+     ficando impossível de acertar. Era o "clico e não acontece nada" em certos
+     vértices, e não em outros. Agora o alcance acompanha a distância, então a
+     área clicável casa com o que está desenhado em qualquer zoom. */
+  const FRACAO_DO_ALCANCE = 1 / 110;
+  function ajustarAlcance() {
+    const camera = cameraAtual();
+    const centro = new THREE.Vector3().setFromMatrixPosition(raiz.matrixWorld);
+    const distancia = Math.max(camera.position.distanceTo(centro), 1e-3);
+    const escala = raiz.scale.x || 1;
+    raycaster.params.Points.threshold = (distancia * FRACAO_DO_ALCANCE) / escala;
+    raycaster.params.Line.threshold = (distancia * FRACAO_DO_ALCANCE * 0.7) / escala;
+  }
+  ajustarAlcance();
   const ponteiro = new THREE.Vector2();
   let inicio = null;
   let ultimoPonteiro = null;
@@ -520,6 +568,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
   }
 
   function raio(evento) {
+    ajustarAlcance();
     const rect = canvas.getBoundingClientRect();
     ponteiro.x = ((evento.clientX - rect.left) / rect.width) * 2 - 1;
     ponteiro.y = -((evento.clientY - rect.top) / rect.height) * 2 + 1;
@@ -598,8 +647,15 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     return { ...movimento, origem: undefined, plano: undefined, partida: undefined };
   }
 
+  /* SÓ O BOTÃO ESQUERDO É DA EDIÇÃO. O modo parava a propagação de qualquer
+     botão, e com isso a órbita e o arrasto da câmera morriam assim que a pessoa
+     apertava Tab: ela entrava para mexer num vértice e ficava presa num ângulo
+     só. O botão do meio e o direito seguem para o controlador de câmera, como
+     fora do modo. */
+  const daEdicao = (evento) => evento.button === undefined || evento.button === 0;
+
   function aoPressionar(evento) {
-    if (!estado.estado().ativo) return;
+    if (!estado.estado().ativo || !daEdicao(evento)) return;
     if (movimento) {
       confirmarMovimento();
       evento.stopPropagation();
@@ -633,6 +689,8 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
       evento.stopPropagation();
       return;
     }
+    /* Sem gesto de edição em curso o movimento do ponteiro pertence à câmera.
+       Parar a propagação aqui seria o mesmo que desligar a órbita. */
     if (!inicio) return;
     if (Math.hypot(evento.clientX - inicio[0], evento.clientY - inicio[1]) > 5) {
       atualizarCaixa(inicio, [evento.clientX, evento.clientY]);
@@ -641,6 +699,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
   }
 
   function aoSoltar(evento) {
+    if (!daEdicao(evento)) return;
     if (movimento?.pelaSeta) {
       /* O gesto da seta é apertar, arrastar e soltar. Sem isto ele ficaria
          pendurado esperando um clique, e o clique seguinte da pessoa — que ela
