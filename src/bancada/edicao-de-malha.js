@@ -251,6 +251,70 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
   desenhoFaces.visible = false;
   grupo.add(desenhoFaces);
 
+  /* GIZMO DE TRÊS SETAS na seleção. O G com trava de eixo já move, mas ele não
+     mostra para onde a seleção vai antes de ela ir: a pessoa aperta a tecla e
+     descobre. As setas dizem o eixo antes do gesto e dão um segundo caminho para
+     quem prefere o ponteiro. Elas convivem com o G — arrastar a seta abre o
+     mesmo movimento que a tecla abre, com o eixo já travado.
+     Tamanho constante na tela pela mesma conta das setas de parâmetro, e alvo de
+     clique invisível bem mais grosso que a haste desenhada, porque o autor já
+     relatou não conseguir acertar uma haste fina. */
+  const EIXOS_DO_GIZMO = [
+    { eixo: 0, direcao: new THREE.Vector3(1, 0, 0), cor: 0xff5a52 },
+    { eixo: 1, direcao: new THREE.Vector3(0, 1, 0), cor: 0x46d67f },
+    { eixo: 2, direcao: new THREE.Vector3(0, 0, 1), cor: 0x5a8bff },
+  ];
+  const FRACAO_DO_GIZMO = 1 / 8;
+  const RAIO_DO_ALVO_DO_GIZMO = 0.09;
+  const gizmo = new THREE.Group();
+  gizmo.name = '__gizmo_de_edicao__';
+  gizmo.visible = false;
+  gizmo.renderOrder = 1000;
+  raiz.add(gizmo);
+  const materiaisDoGizmo = [];
+  for (const { eixo, direcao, cor } of EIXOS_DO_GIZMO) {
+    const material = new THREE.MeshBasicMaterial({ color: cor, depthTest: false, transparent: true });
+    materiaisDoGizmo.push(material);
+    const braco = new THREE.Group();
+    const haste = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.8, 8), material);
+    haste.position.y = 0.4;
+    const ponta = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.2, 10), material);
+    ponta.position.y = 0.9;
+    const alvo = new THREE.Mesh(
+      new THREE.CylinderGeometry(RAIO_DO_ALVO_DO_GIZMO, RAIO_DO_ALVO_DO_GIZMO, 1.05, 8),
+      new THREE.MeshBasicMaterial({ visible: false }),
+    );
+    alvo.position.y = 0.5;
+    braco.add(haste, ponta, alvo);
+    braco.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direcao);
+    braco.userData.eixoDoGizmo = eixo;
+    gizmo.add(braco);
+  }
+
+  function atualizarGizmo() {
+    const atual = estado.estado();
+    const centro = atual.ativo && atual.selecionados.length ? centroDaSelecao() : null;
+    gizmo.visible = Boolean(centro);
+    if (!centro) return;
+    gizmo.position.fromArray(centro);
+    const camera = cameraAtual();
+    const naCena = gizmo.position.clone().applyMatrix4(raiz.matrixWorld);
+    const distancia = camera.position.distanceTo(naCena);
+    const escala = raiz.scale.x || 1;
+    gizmo.scale.setScalar(Math.max((distancia * FRACAO_DO_GIZMO) / escala, 1e-4));
+  }
+
+  function eixoDoGizmoSobOPonteiro(evento) {
+    if (!gizmo.visible) return null;
+    raio(evento);
+    for (const item of raycaster.intersectObject(gizmo, true)) {
+      let no = item.object;
+      while (no && no.userData.eixoDoGizmo === undefined) no = no.parent;
+      if (no) return no.userData.eixoDoGizmo;
+    }
+    return null;
+  }
+
   const caixa = document.createElement('div');
   caixa.className = 'caixa-selecao-malha';
   document.body.append(caixa);
@@ -326,15 +390,60 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     movimento.deslocamento = deslocamento;
   }
 
+  /* ÍMÃ. Segurar Ctrl durante o movimento gruda a seleção no vértice mais
+     próximo da malha que NÃO está sendo movido. É o gesto mecânico: encostar a
+     ponta de um tubo na ponta do outro sem depender de mira, e sem precisar
+     descobrir qual número faz isso.
+     O ímã trabalha sobre o ponto de referência da seleção — o centro dela antes
+     do gesto —, e não sobre cada vértice: puxar cada um para o vizinho mais
+     próximo desmontaria a forma que a pessoa selecionou. */
+  function candidatosDoIma() {
+    const movidos = verticesDaSelecao(estrutura, estado.estado().modo, new Set(estado.estado().selecionados));
+    const candidatos = [];
+    for (const id of topologia.vertices) {
+      if (movidos.has(id)) continue;
+      const ponto = movimento.origem.get(Number(id)) ?? movimento.origem.get(id);
+      if (ponto) candidatos.push(ponto);
+    }
+    return candidatos;
+  }
+
+  function grudar(deslocamento) {
+    if (!movimento?.referencia) return deslocamento;
+    const destino = movimento.referencia.map((valor, i) => valor + deslocamento[i]);
+    let melhor = null;
+    let melhorD2 = Infinity;
+    for (const candidato of movimento.candidatos ?? []) {
+      const d2 = (candidato[0] - destino[0]) ** 2 + (candidato[1] - destino[1]) ** 2 + (candidato[2] - destino[2]) ** 2;
+      if (d2 < melhorD2) { melhorD2 = d2; melhor = candidato; }
+    }
+    if (!melhor) return deslocamento;
+    const grudado = melhor.map((valor, i) => valor - movimento.referencia[i]);
+    /* Com eixo travado, o ímã só decide a casa daquele eixo: as outras duas
+       continuam zeradas, senão o Ctrl desfaria a trava que a pessoa acabou de
+       pedir. */
+    if (movimento.eixo != null) {
+      const so = [0, 0, 0];
+      so[movimento.eixo] = grudado[movimento.eixo];
+      return so;
+    }
+    return grudado;
+  }
+
   function atualizarMovimento(evento) {
     if (!movimento || movimento.entrada) return;
     const ponto = pontoNoPlano(evento, movimento.plano);
     if (!ponto) return;
     const escala = raiz.scale.x || 1;
     const deslocamentoMundo = ponto.sub(movimento.partida);
-    const deslocamento = [deslocamentoMundo.x / escala, deslocamentoMundo.y / escala, deslocamentoMundo.z / escala];
+    let deslocamento = [deslocamentoMundo.x / escala, deslocamentoMundo.y / escala, deslocamentoMundo.z / escala];
     if (movimento.eixo != null) {
       for (let i = 0; i < 3; i++) if (i !== movimento.eixo) deslocamento[i] = 0;
+    }
+    movimento.ima = Boolean(evento.ctrlKey || evento.metaKey);
+    if (movimento.ima) {
+      if (!movimento.candidatos) movimento.candidatos = candidatosDoIma();
+      deslocamento = grudar(deslocamento);
     }
     aplicarDeslocamento(deslocamento);
   }
@@ -405,6 +514,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     preencherCores(geometriaPontos, pontos, selecionados);
     preencherCores(geometriaArestas, arestas, selecionados, 2);
     atualizarFaces(selecionados);
+    atualizarGizmo();
     aoMudar(atual);
     return atual;
   }
@@ -470,11 +580,44 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     }).map((face) => face.id);
   }
 
+  function iniciarMovimentoInterno() {
+    const centro = centroDaSelecao();
+    if (!centro) return null;
+    const camera = cameraAtual();
+    const centroMundo = new THREE.Vector3(...centro).applyMatrix4(raiz.matrixWorld);
+    const normal = camera.getWorldDirection(new THREE.Vector3()).negate();
+    const plano = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, centroMundo);
+    const partida = ultimoPonteiro ? pontoNoPlano(ultimoPonteiro, plano) : centroMundo;
+    if (!partida) return null;
+    movimento = {
+      origem: copiarVertices(), deslocamento: [0, 0, 0], eixo: null, entrada: '',
+      plano, partida,
+      /* O ponto que o ímã gruda: o centro da seleção antes do gesto. */
+      referencia: centro, candidatos: null, ima: false, pelaSeta: false,
+    };
+    return { ...movimento, origem: undefined, plano: undefined, partida: undefined };
+  }
+
   function aoPressionar(evento) {
     if (!estado.estado().ativo) return;
     if (movimento) {
       confirmarMovimento();
       evento.stopPropagation();
+      return;
+    }
+    const eixoPego = eixoDoGizmoSobOPonteiro(evento);
+    if (eixoPego !== null) {
+      /* Arrastar a seta abre o MESMO movimento que o G abre, já com o eixo
+         travado. Dois caminhos, um estado só: cancelar, confirmar, desfazer e o
+         ímã continuam valendo igual. */
+      evento.preventDefault();
+      evento.stopPropagation();
+      ultimoPonteiro = { clientX: evento.clientX, clientY: evento.clientY };
+      if (iniciarMovimentoInterno()) {
+        movimento.eixo = eixoPego;
+        movimento.pelaSeta = true;
+        canvas.setPointerCapture?.(evento.pointerId);
+      }
       return;
     }
     inicio = [evento.clientX, evento.clientY];
@@ -498,6 +641,16 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
   }
 
   function aoSoltar(evento) {
+    if (movimento?.pelaSeta) {
+      /* O gesto da seta é apertar, arrastar e soltar. Sem isto ele ficaria
+         pendurado esperando um clique, e o clique seguinte da pessoa — que ela
+         faria para selecionar outra coisa — confirmaria um movimento que ela já
+         considerava terminado. */
+      evento.stopPropagation();
+      canvas.releasePointerCapture?.(evento.pointerId);
+      confirmarMovimento();
+      return;
+    }
     if (!estado.estado().ativo || !inicio) return;
     const deslocamento = Math.hypot(evento.clientX - inicio[0], evento.clientY - inicio[1]);
     const origem = inicio;
@@ -528,18 +681,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     selecionarTudo() { estado.selecionarTudo(); return atualizarVisibilidade(); },
     limpar() { estado.limpar(); return atualizarVisibilidade(); },
     selecionarIlha() { estado.selecionarIlha(); return atualizarVisibilidade(); },
-    iniciarMovimento() {
-      const centro = centroDaSelecao();
-      if (!centro) return null;
-      const camera = cameraAtual();
-      const centroMundo = new THREE.Vector3(...centro).applyMatrix4(raiz.matrixWorld);
-      const normal = camera.getWorldDirection(new THREE.Vector3()).negate();
-      const plano = new THREE.Plane().setFromNormalAndCoplanarPoint(normal, centroMundo);
-      const partida = ultimoPonteiro ? pontoNoPlano(ultimoPonteiro, plano) : centroMundo;
-      if (!partida) return null;
-      movimento = { origem: copiarVertices(), deslocamento: [0, 0, 0], eixo: null, entrada: '', plano, partida };
-      return { ...movimento, origem: undefined, plano: undefined, partida: undefined };
-    },
+    iniciarMovimento: () => iniciarMovimentoInterno(),
     travarEixo(nome) {
       if (!movimento) return null;
       movimento.eixo = ({ x: 0, y: 1, z: 2 })[String(nome).toLowerCase()] ?? null;
@@ -562,6 +704,10 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
     restaurar,
     vertices: copiarVertices,
     get movendo() { return Boolean(movimento); },
+    get imaLigado() { return Boolean(movimento?.ima); },
+    /* A seta tem tamanho constante na tela, então precisa reagir à câmera a cada
+       quadro; quem tem o laço de quadro é a bancada. */
+    acompanharCamera: atualizarGizmo,
     destruir() {
       canvas.removeEventListener('pointerdown', aoPressionar, true);
       canvas.removeEventListener('pointermove', aoMover, true);
@@ -569,6 +715,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, ao
       geometriaPontos.dispose(); materialPontos.dispose();
       geometriaArestas.dispose(); materialArestas.dispose();
       geometriaFaces.dispose(); materialFaces.dispose();
+      for (const material of materiaisDoGizmo) material.dispose();
+      gizmo.traverse((no) => no.geometry?.dispose());
+      gizmo.removeFromParent();
       caixa.remove();
       grupo.removeFromParent();
     },

@@ -691,6 +691,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   (function acompanharCamera() {
     setasDeParametro.atualizarEscala();
     punhosDeJunta.atualizarEscala();
+    edicaoDeMalha?.acompanharCamera?.();
     requestAnimationFrame(acompanharCamera);
   }());
 

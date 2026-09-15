@@ -110,8 +110,28 @@ const ler = () => pagina.evaluate(() => {
     }
   }
 
+  const gizmo = ambiente.scene.getObjectByName('__gizmo_de_edicao__');
+  const setas = [];
+  if (gizmo?.visible) {
+    const V = ambiente.camera.position.constructor;
+    for (const braco of gizmo.children) {
+      const direcao = new V(0, 1, 0).applyQuaternion(braco.quaternion);
+      const base = gizmo.position.clone();
+      gizmo.parent.localToWorld(base);
+      const ponta = gizmo.position.clone().addScaledVector(direcao, gizmo.scale.x);
+      gizmo.parent.localToWorld(ponta);
+      const emPixels = (v) => {
+        const pr = v.clone().project(ambiente.camera);
+        return { x: (pr.x * 0.5 + 0.5) * rect.width + rect.left, y: (-pr.y * 0.5 + 0.5) * rect.height + rect.top };
+      };
+      setas.push({ eixo: braco.userData.eixoDoGizmo, base: emPixels(base), ponta: emPixels(ponta) });
+    }
+  }
+
   return {
     edicao: bancada.edicaoDeMalha?.() ?? null,
+    gizmoVisivel: Boolean(gizmo?.visible),
+    setas,
     grupoVisivel: Boolean(grupo?.visible),
     pontosVisiveis: Boolean(pontos?.visible),
     tamanhoDoPonto: pontos?.material?.size ?? 0,
@@ -188,6 +208,67 @@ try {
     : 0;
   ok('G com eixo travado e valor digitado move a malha desenhada',
     Math.abs(subiu) > 1e-3, `a caixa da cena subiu ${subiu.toFixed(4)}`);
+
+  /* O GIZMO. Ele aparece com a seleção e arrastar uma seta move no eixo dela,
+     que é o segundo caminho pedido depois do teste: a trava por tecla funciona,
+     mas não mostra o eixo antes do gesto. */
+  ok('o gizmo aparece com a seleção e tem as três setas',
+    depoisDoMovimento.gizmoVisivel && depoisDoMovimento.setas.length === 3,
+    `visível ${depoisDoMovimento.gizmoVisivel}, ${depoisDoMovimento.setas.length} setas`);
+
+  const seta = depoisDoMovimento.setas
+    .map((s) => ({ ...s, comprimento: Math.hypot(s.ponta.x - s.base.x, s.ponta.y - s.base.y) }))
+    .sort((a, b) => b.comprimento - a.comprimento)[0];
+  if (seta) {
+    const ux = (seta.ponta.x - seta.base.x) / seta.comprimento;
+    const uy = (seta.ponta.y - seta.base.y) / seta.comprimento;
+    /* Ponto de partida ao lado da haste desenhada, de propósito: pegar a seta
+       não pode exigir pontaria. */
+    const meio = {
+      x: (seta.base.x + seta.ponta.x) / 2 - uy * 10,
+      y: (seta.base.y + seta.ponta.y) / 2 + ux * 10,
+    };
+    await pagina.mouse.move(meio.x, meio.y);
+    await pagina.mouse.down();
+    for (let passo = 1; passo <= 8; passo += 1) {
+      await pagina.mouse.move(meio.x + (ux * 90 * passo) / 8, meio.y + (uy * 90 * passo) / 8);
+    }
+    await pagina.mouse.up();
+    await pagina.waitForTimeout(600);
+    const comGizmo = await ler();
+    const andou = comGizmo.caixaDaCena && depoisDoMovimento.caixaDaCena
+      ? Math.hypot(...[0, 1, 2].map((i) => comGizmo.caixaDaCena.max[i] - depoisDoMovimento.caixaDaCena.max[i]))
+      : 0;
+    ok('arrastar a seta do gizmo move a malha desenhada', andou > 1e-3, `andou ${andou.toFixed(4)}`);
+    await tecla('Control+z');
+    await pagina.waitForTimeout(500);
+  }
+
+  /* O ÍMÃ. Com Ctrl apertado durante o movimento, a seleção gruda no vértice
+     mais próximo que não está sendo movido, em vez de seguir o ponteiro livre.
+     A afirmação é que o resultado MUDA com o Ctrl: sem isso o ímã poderia estar
+     desligado e ninguém notaria. */
+  await pagina.mouse.move(alvo.x, alvo.y);
+  await tecla('g');
+  await pagina.mouse.move(alvo.x + 60, alvo.y - 40);
+  await pagina.waitForTimeout(300);
+  const livre = await ler();
+  await pagina.keyboard.down('Control');
+  await pagina.mouse.move(alvo.x + 61, alvo.y - 41);
+  await pagina.waitForTimeout(300);
+  const grudado = await ler();
+  await pagina.keyboard.up('Control');
+  await tecla('Escape');
+  const diferenca = livre.caixaDaCena && grudado.caixaDaCena
+    ? Math.hypot(...[0, 1, 2].map((i) => grudado.caixaDaCena.max[i] - livre.caixaDaCena.max[i]))
+    : 0;
+  /* O limite é generoso de propósito, e mesmo assim tem dente. O ímã recalcula
+     no movimento do ponteiro, então a leitura com Ctrl precisa de um pixel de
+     deslocamento; um pixel sozinho move a malha por volta de 0,005. Com o ímã
+     ligado o salto medido é 0,83, duas ordens de grandeza acima. Exigir mais de
+     um décimo separa os dois casos sem depender de sorte. */
+  ok('segurar Ctrl durante o movimento liga o ímã e muda onde a seleção para',
+    diferenca > 0.1, `o destino mudou ${diferenca.toFixed(4)} ao apertar Ctrl`);
 
   await tecla('Control+z');
   await pagina.waitForTimeout(600);

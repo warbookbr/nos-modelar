@@ -59,6 +59,12 @@ ou perdeu parte. Fica para o plano seguinte, escrito assim que este fechar.
 - G move a seleção, X, Y e Z travam o eixo, número digitado dá valor exato, Esc
   cancela e clique confirma;
 - Ctrl+Z desfaz, parando no estado que veio do arquivo;
+- gizmo de três setas no centro da seleção, arrastável, convivendo com o G. O
+  autor pediu depois de testar: a trava de eixo por tecla funciona, mas não
+  mostra para onde a seleção vai andar antes de ela andar;
+- ímã com Ctrl durante o movimento, grudando no vértice mais próximo da malha
+  que não está na seleção. É o uso mecânico — encostar uma ponta na outra sem
+  depender de mira —, e é o que o Ctrl faz no Blender;
 - alvo que enxerga vértice movido, não só caixa de parte;
 - gate de navegador afirmando seleção, movimento e desfazer sobre o pacote
   construído.
@@ -94,6 +100,7 @@ ou perdeu parte. Fica para o plano seguinte, escrito assim que este fechar.
    com realce na tela.
 3. **Mover.** G com trava de eixo, valor digitado, cancelar, confirmar e
    desfazer.
+3b. **Apontar e grudar.** Gizmo de três setas na seleção, e o ímã do Ctrl.
 4. **Fechar.** Gate de navegador, documentação, `npm run mapa`, gates completos,
    e a abertura do plano de topologia.
 
