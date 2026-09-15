@@ -90,14 +90,14 @@ describe('registro de rodadas', () => {
   it('a rodada mora DENTRO da pasta da peça quando a peça é uma pasta', () => {
     /* A bicicleta migrou: o registro dela fica ao lado da receita que ele
        julgou, e não numa árvore de documentação que quem abre a peça não vê. */
-    expect(pastaDeRodadas('bicicleta-quadro'))
+    expect(pastaDeRodadas('bicicleta-quadro').replaceAll('\\', '/'))
       .toMatch(/prototipos\/procedural\/v3\/pecas\/bicicleta-quadro\/rodadas$/);
   });
 
   it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {
     /* Registro de peça anterior à pasta não muda de lugar: evidência não se
        move para caber numa arrumação nova. */
-    expect(pastaDeRodadas('peca-que-nunca-existiu'))
+    expect(pastaDeRodadas('peca-que-nunca-existiu').replaceAll('\\', '/'))
       .toMatch(/docs\/mecanifica\/historico\/rodadas\/peca-que-nunca-existiu$/);
   });
 });

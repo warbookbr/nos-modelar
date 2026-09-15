@@ -42,7 +42,7 @@ describe('pasta da peça', () => {
   it('o resolvedor abre a pasta pela receita, e o nome curto continua valendo', () => {
     acervoDeMentira();
     const caminho = resolverCaminhoReceita('peca-em-pasta', { raiz: area });
-    expect(caminho.endsWith('peca-em-pasta/receita.js')).toBe(true);
+    expect(caminho.replaceAll('\\', '/').endsWith('peca-em-pasta/receita.js')).toBe(true);
     /* O caminho completo da pasta também resolve, para quem copiou da saída de
        um comando em vez de digitar o nome. */
     expect(resolverCaminhoReceita('prototipos/procedural/v3/pecas/peca-em-pasta', { raiz: area }))

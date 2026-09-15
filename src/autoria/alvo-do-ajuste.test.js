@@ -2,6 +2,7 @@
    onde a pessoa deixou a peça na bancada. */
 import { describe, expect, it } from 'vitest';
 import { capturarAlvo, compararComAlvo, FORMATO_DO_ALVO, TOLERANCIA_PADRAO_MM } from './alvo-do-ajuste.js';
+import { descreverPeca } from './descrever-partes.js';
 import { executarReceita } from './executar-receita.js';
 import { receitaComParametros } from './parametros-vivos.js';
 import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
@@ -16,8 +17,9 @@ describe('capturarAlvo', () => {
     expect(alvo.toleranciaMm).toBe(TOLERANCIA_PADRAO_MM);
     expect(alvo.partes.length).toBeGreaterThan(0);
     for (const parte of alvo.partes) {
-      expect(Object.keys(parte).sort()).toEqual(['max', 'min', 'parte']);
+      expect(Object.keys(parte).sort()).toEqual(['max', 'min', 'parte', 'pontos']);
       expect(typeof parte.parte).toBe('string');
+      expect(Array.isArray(parte.pontos)).toBe(true);
     }
     const texto = JSON.stringify(alvo);
     expect(texto).not.toMatch(/\b(vertice|vértice|face|passo|indice|índice)\b/i);
@@ -81,5 +83,50 @@ describe('compararComAlvo', () => {
 
   it('recusa alvo de formato desconhecido em vez de comparar por engano', () => {
     expect(() => compararComAlvo(executar(), { formato: 'outra-coisa/9', partes: [] })).toThrow(/formato/);
+  });
+
+  /* O CASO DE FALHA DA MEDIDA POR CAIXA. Mover um vértice no meio de um tubo
+     não altera a caixa envolvente da parte (min e max permanecem os mesmos),
+     mas muda a geometria real da peça. A comparação pontual acusa a deformação
+     em milímetros e reprova a receita que não a absorveu. */
+  it('reprova vértice movido no meio de um tubo que a caixa envolvente não enxerga', () => {
+    const neutroOriginal = executar();
+    const partesOrig = descreverPeca(neutroOriginal).partes;
+    const caixaTubo = partesOrig.find((p) => p.nome === 'tuboSuperior');
+    const facesTubo = [...neutroOriginal.F.values()].filter((f) => f.parte === 'tuboSuperior');
+    const idsTubo = [...new Set(facesTubo.flatMap((f) => f.vs))];
+
+    const idInterno = idsTubo.find((id) => {
+      const pt = neutroOriginal.V.get(id);
+      return pt[0] > caixaTubo.min[0] + 0.005 && pt[0] < caixaTubo.max[0] - 0.005
+        && pt[1] > caixaTubo.min[1] + 0.005 && pt[1] < caixaTubo.max[1] - 0.005
+        && pt[2] > caixaTubo.min[2] + 0.005 && pt[2] < caixaTubo.max[2] - 0.005;
+    });
+    expect(idInterno).toBeDefined();
+
+    const ptOrig = neutroOriginal.V.get(idInterno);
+    const deslocamentoM = 0.005; // 5 mm
+    const novoV = new Map(neutroOriginal.V);
+    novoV.set(idInterno, [ptOrig[0] + deslocamentoM, ptOrig[1], ptOrig[2]]);
+    const neutroDeformado = { ...neutroOriginal, V: novoV };
+
+    const partesDeform = descreverPeca(neutroDeformado).partes;
+    const caixaDeform = partesDeform.find((p) => p.nome === 'tuboSuperior');
+    expect(caixaDeform.min).toEqual(caixaTubo.min);
+    expect(caixaDeform.max).toEqual(caixaTubo.max);
+
+    const alvoDeformado = capturarAlvo(neutroDeformado, { peca: 'bicicleta-quadro' });
+    const veredito = compararComAlvo(neutroOriginal, alvoDeformado);
+
+    expect(veredito.dentro).toBe(false);
+    expect(veredito.piorMm).toBeGreaterThanOrEqual(4.99);
+    expect(veredito.piorMm).toBeLessThanOrEqual(5.01);
+
+    const parteTubo = veredito.partes.find((p) => p.parte === 'tuboSuperior');
+    expect(parteTubo.dentro).toBe(false);
+    expect(parteTubo.desvioMm).toBeGreaterThanOrEqual(4.99);
+    expect(parteTubo.desvioMm).toBeLessThanOrEqual(5.01);
+    for (const v of parteTubo.centroMm) expect(Math.abs(v)).toBeLessThan(0.001);
+    for (const v of parteTubo.dimensaoMm) expect(Math.abs(v)).toBeLessThan(0.001);
   });
 });

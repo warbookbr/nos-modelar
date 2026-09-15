@@ -8,14 +8,15 @@
  * que a pessoa quer fazer não cabe no parâmetro no momento em que ela o faz.
  *
  * Este módulo tira a escrita do parâmetro do caminho do gesto. O que sai da
- * bancada é ALVO: onde cada parte, por nome, passou a estar e que tamanho passou
- * a ter. Não é malha, não carrega vértice nem face, e por isso não carrega id
- * interno, índice de array nem posição de passo — só nome de parte e dois
- * cantos de caixa. Quem transforma esse alvo em receita organizada é a rodada de
- * absorção, depois, com tempo de perguntar o que ficou ambíguo.
+ * bancada é ALVO: onde cada parte, por nome, passou a estar, seus dois cantos
+ * de caixa envolvente e sua nuvem canônica de coordenadas de pontos ordenadas
+ * lexicograficamente. Ele não persiste identificadores internos de vértices,
+ * índices de arrays nem posições de passos. Quem transforma esse alvo em
+ * receita organizada é a rodada de absorção, depois, com tempo de perguntar o
+ * que ficou ambíguo.
  *
- * A medida é a mesma de `descrever-partes.js`, que o laço de modelagem já usa
- * para julgar forma. Uma verdade só sobre a mesma pergunta.
+ * A medida de caixa vem de `descrever-partes.js`, e a medida de pontos calcula
+ * a distância euclidiana máxima bidirecional entre as nuvens de pontos.
  *
  * UNIDADE. O estado neutro vem em metro e o alvo guarda metro, arredondado a
  * seis casas — um milésimo de milímetro, abaixo do que qualquer receita daqui
@@ -36,12 +37,85 @@ export const FORMATO_DO_ALVO = 'mecanifica.alvo-do-ajuste/1';
 export const TOLERANCIA_PADRAO_MM = 0.5;
 
 const CASAS = 6;
-const arredondar = (v) => Number(v.toFixed(CASAS));
+const arredondar = (v) => {
+  const n = Number(v.toFixed(CASAS));
+  return Object.is(n, -0) ? 0 : n;
+};
 const emMilimetro = (v) => v * 1000;
 
 function medirPorNome(neutro) {
   const partes = descreverPeca(neutro).partes;
   return new Map(partes.map((p) => [p.nome, p]));
+}
+
+function extrairPontosPorParte(neutro) {
+  const porParte = new Map();
+  if (!neutro?.F || !neutro?.V) return porParte;
+
+  for (const face of neutro.F.values()) {
+    if (typeof face.parte !== 'string' || !face.parte) continue;
+    let conjunto = porParte.get(face.parte);
+    if (!conjunto) {
+      conjunto = new Set();
+      porParte.set(face.parte, conjunto);
+    }
+    if (Array.isArray(face.vs)) {
+      for (const idV of face.vs) {
+        conjunto.add(idV);
+      }
+    }
+  }
+
+  const resultado = new Map();
+  for (const [nome, conjunto] of porParte) {
+    const vistos = new Set();
+    const pontos = [];
+    for (const idV of conjunto) {
+      const p = neutro.V.get(idV);
+      if (!p || p.length < 3) continue;
+      const x = arredondar(p[0]);
+      const y = arredondar(p[1]);
+      const z = arredondar(p[2]);
+      const chave = `${x},${y},${z}`;
+      if (vistos.has(chave)) continue;
+      vistos.add(chave);
+      pontos.push([x, y, z]);
+    }
+    pontos.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
+    resultado.set(nome, pontos);
+  }
+  return resultado;
+}
+
+function desvioEntrePontos(esperados, obtidos) {
+  if (!esperados?.length || !obtidos?.length) return 0;
+
+  let piorD2 = 0;
+  for (const p of esperados) {
+    let minD2 = Infinity;
+    for (const q of obtidos) {
+      const dx = p[0] - q[0];
+      const dy = p[1] - q[1];
+      const dz = p[2] - q[2];
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < minD2) minD2 = d2;
+    }
+    if (minD2 > piorD2) piorD2 = minD2;
+  }
+
+  for (const q of obtidos) {
+    let minD2 = Infinity;
+    for (const p of esperados) {
+      const dx = q[0] - p[0];
+      const dy = q[1] - p[1];
+      const dz = q[2] - p[2];
+      const d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < minD2) minD2 = d2;
+    }
+    if (minD2 > piorD2) piorD2 = minD2;
+  }
+
+  return Math.sqrt(piorD2);
 }
 
 /**
@@ -55,9 +129,15 @@ export function capturarAlvo(neutro, { peca, base = null, toleranciaMm = TOLERAN
   if (typeof peca !== 'string' || !peca) throw new Error('capturarAlvo: `peca` é obrigatório');
   if (!(toleranciaMm > 0)) throw new Error('capturarAlvo: `toleranciaMm` precisa ser positivo');
 
+  const pontosPorNome = extrairPontosPorParte(neutro);
   const medidas = [...medirPorNome(neutro).values()]
     .sort((a, b) => (a.nome < b.nome ? -1 : a.nome > b.nome ? 1 : 0))
-    .map((p) => ({ parte: p.nome, min: p.min.map(arredondar), max: p.max.map(arredondar) }));
+    .map((p) => ({
+      parte: p.nome,
+      min: p.min.map(arredondar),
+      max: p.max.map(arredondar),
+      pontos: pontosPorNome.get(p.nome) ?? [],
+    }));
 
   return { formato: FORMATO_DO_ALVO, peca, base, toleranciaMm, partes: medidas };
 }
@@ -72,8 +152,9 @@ function centroEDimensao({ min, max }) {
  * Compara a peça reexecutada com o alvo, parte a parte.
  *
  * Devolve `{ dentro, piorMm, partes, ausentes, sobrando }`. `piorMm` é a maior
- * diferença encontrada em qualquer eixo, de centro ou de dimensão: é o número
- * único que decide se a receita reescrita chegou onde a pessoa deixou.
+ * diferença encontrada em qualquer eixo (centro, dimensão ou desvio interno de
+ * pontos): é o número único que decide se a receita reescrita chegou onde a
+ * pessoa deixou.
  *
  * Parte que o alvo declara e a receita não produz mais é falha, não empate:
  * some da lista e leva `piorMm` a infinito, porque uma reescrita que apaga uma
@@ -82,6 +163,7 @@ function centroEDimensao({ min, max }) {
 export function compararComAlvo(neutro, alvo) {
   if (alvo?.formato !== FORMATO_DO_ALVO) throw new Error(`compararComAlvo: formato desconhecido: ${alvo?.formato}`);
   const atual = medirPorNome(neutro);
+  const pontosAtuais = extrairPontosPorParte(neutro);
   const tolerancia = alvo.toleranciaMm ?? TOLERANCIA_PADRAO_MM;
 
   const partes = [];
@@ -91,10 +173,20 @@ export function compararComAlvo(neutro, alvo) {
     if (!obtida) { ausentes.push(esperada.parte); continue; }
     const alvoDa = centroEDimensao(esperada);
     const obtidaDa = centroEDimensao(obtida);
-    const centroMm = [0, 1, 2].map((i) => emMilimetro(obtidaDa.centro[i] - alvoDa.centro[i]));
-    const dimensaoMm = [0, 1, 2].map((i) => emMilimetro(obtidaDa.dimensao[i] - alvoDa.dimensao[i]));
-    const pior = Math.max(...centroMm.map(Math.abs), ...dimensaoMm.map(Math.abs));
-    partes.push({ parte: esperada.parte, centroMm, dimensaoMm, piorMm: pior, dentro: pior <= tolerancia });
+    const centroMm = [0, 1, 2].map((i) => arredondar(emMilimetro(obtidaDa.centro[i] - alvoDa.centro[i])));
+    const dimensaoMm = [0, 1, 2].map((i) => arredondar(emMilimetro(obtidaDa.dimensao[i] - alvoDa.dimensao[i])));
+    const desvioMm = esperada.pontos && esperada.pontos.length > 0
+      ? arredondar(emMilimetro(desvioEntrePontos(esperada.pontos, pontosAtuais.get(esperada.parte) ?? [])))
+      : 0;
+    const pior = Math.max(...centroMm.map(Math.abs), ...dimensaoMm.map(Math.abs), desvioMm);
+    partes.push({
+      parte: esperada.parte,
+      centroMm,
+      dimensaoMm,
+      desvioMm,
+      piorMm: pior,
+      dentro: pior <= tolerancia,
+    });
   }
 
   const declaradas = new Set(alvo.partes.map((p) => p.parte));

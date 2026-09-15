@@ -9,7 +9,7 @@ import { caminhoNoAcervo } from './servir-escrita.mjs';
 describe('atendente de escrita da bancada', () => {
   it('resolve peça do acervo pelo nome', () => {
     const caminho = caminhoNoAcervo('bicicleta-quadro');
-    expect(caminho).toMatch(/prototipos\/procedural\/v3\/pecas\/bicicleta-quadro\.js$/);
+    expect(caminho?.replaceAll('\\', '/')).toMatch(/prototipos\/procedural\/v3\/pecas\/bicicleta-quadro\.js$/);
   });
 
   it('RECUSA endereço que escapa da pasta do acervo', () => {
@@ -29,11 +29,11 @@ describe('atendente de escrita da bancada', () => {
        `resolve` não desfaz escape percentual, então ele aterrissa dentro da
        pasta e vira um arquivo que não existe. A garantia que importa não é
        recusar a string, é o endereço final ficar dentro do acervo. */
-    expect(caminhoNoAcervo('..%2F..%2Fpackage'))
+    expect(caminhoNoAcervo('..%2F..%2Fpackage')?.replaceAll('\\', '/'))
       .toMatch(/prototipos\/procedural\/v3\/pecas\//);
   });
 
   it('aceita subpasta do acervo, que é onde montagem mora', () => {
-    expect(caminhoNoAcervo('prensa/montagem')).toMatch(/pecas\/prensa\/montagem\.js$/);
+    expect(caminhoNoAcervo('prensa/montagem')?.replaceAll('\\', '/')).toMatch(/pecas\/prensa\/montagem\.js$/);
   });
 });

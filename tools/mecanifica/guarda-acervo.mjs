@@ -45,12 +45,12 @@ export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
     const caminho = join(pasta, entrada.name);
     if (entrada.isDirectory()) {
       const porta = ENTRADAS_DE_PASTA.find((nome) => existsSync(join(caminho, nome)));
-      if (porta) achadas.push(relative(base, caminho));
+      if (porta) achadas.push(relative(base, caminho).replaceAll('\\', '/'));
       else achadas.push(...pecasDoAcervo(caminho, { base }));
       continue;
     }
     if (!entrada.name.endsWith('.js') || entrada.name.endsWith('.test.js')) continue;
-    achadas.push(relative(base, caminho).replace(/\.js$/, ''));
+    achadas.push(relative(base, caminho).replaceAll('\\', '/').replace(/\.js$/, ''));
   }
   return achadas.sort();
 }

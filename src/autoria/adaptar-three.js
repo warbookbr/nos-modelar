@@ -201,7 +201,7 @@ function normaisSuaves(neutro, preparo) {
   return suaves;
 }
 
-function triangularFace(face, preparo, destino, destinoNormais, suaves) {
+function triangularFace(face, preparo, destino, destinoNormais, destinoOrigens, destinoVertices, suaves) {
   const { pontos, normal, tris } = preparo.get(face.id);
   for (const cantos of tris) {
     /* a normal chapada do TRIÂNGULO, e não a do plano da face, para que um
@@ -215,7 +215,14 @@ function triangularFace(face, preparo, destino, destinoNormais, suaves) {
        de uma geometria errada é o defeito silencioso que este arquivo veio
        consertar. Quem garante o sentido é a orelha. */
     const chapada = normalizar(normalDoTriangulo(pontos[cantos[0]], pontos[cantos[1]], pontos[cantos[2]])) ?? normal;
-    for (const k of cantos) destino.push(...pontos[k]);
+    for (const k of cantos) {
+      destino.push(...pontos[k]);
+      /* A origem acompanha somente a malha de cena. Ela permite que o modo de
+         edição descubra qual face o raio acertou, mas nunca entra na receita
+         nem no alvo que a bancada salva. */
+      destinoOrigens.push(face.id);
+      destinoVertices.push(face.vs[k]);
+    }
     for (const k of cantos) {
       const suave = face.liso ? suaves.get(face.vs[k]) : null;
       destinoNormais.push(...(suave ?? chapada));
@@ -249,10 +256,10 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
     const chave = `${parte}\u0000${material.chave}`;
     let lote = grupos.get(chave);
     if (!lote) {
-      lote = { parte, material, posicoes: [], normais: [], faces: [] };
+      lote = { parte, material, posicoes: [], normais: [], origens: [], vertices: [], faces: [] };
       grupos.set(chave, lote);
     }
-    triangularFace(face, preparo, lote.posicoes, lote.normais, suaves);
+    triangularFace(face, preparo, lote.posicoes, lote.normais, lote.origens, lote.vertices, suaves);
     lote.faces.push(face.id);
   }
 
@@ -278,6 +285,11 @@ export function adaptarThree(neutro, { materiais = {}, nome = 'peca-procedural' 
        geometria não indexada devolve sempre a normal chapada do triângulo, e era
        ela que jogava fora todo `liso` da peça. */
     geometria.setAttribute('normal', new THREE.Float32BufferAttribute(lote.normais, 3));
+    geometria.setAttribute('origemFace', new THREE.Float32BufferAttribute(lote.origens, 1));
+    /* Como a face, a origem do vértice só acompanha esta geometria de cena.
+       Uma mesma coordenada pode ocorrer em diversos triângulos não indexados;
+       este elo permite atualizá-los todos durante a prévia de edição. */
+    geometria.setAttribute('origemVertice', new THREE.Float32BufferAttribute(lote.vertices, 1));
     geometria.computeBoundingBox();
     geometria.computeBoundingSphere();
 

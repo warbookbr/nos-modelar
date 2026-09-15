@@ -50,7 +50,7 @@ export function porConvencao(peca, { raiz = REPO } = {}) {
   const termo = peca.split('-')[0];
   const ferramentas = join(raiz, 'tools/mecanifica');
   for (const arquivo of arquivosDe(ferramentas)) {
-    const nome = arquivo.split('/').pop();
+    const nome = arquivo.split(/[/\\]/).pop();
     if (nome.startsWith(`prancha-${termo}`)) achados.push({ papel: 'ferramenta', caminho: rel(arquivo) });
   }
 
@@ -79,7 +79,7 @@ export async function retratoDaPeca(peca, { raiz = REPO } = {}) {
   const receita = receitaDoModulo(modulo);
   /* Peça em pasta tem a receita como `receita.js` dentro dela; peça em arquivo
      solto não tem pasta própria, e aí a referência continua valendo da raiz. */
-  const emPasta = caminho.endsWith('/receita.js');
+  const emPasta = caminho.replaceAll('\\', '/').endsWith('/receita.js');
   const pastaDaPeca = emPasta ? rel(dirname(caminho)) : null;
 
   const base = materialDaPeca({

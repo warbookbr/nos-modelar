@@ -15,6 +15,7 @@
  *
  *   npm run origens:check
  */
+import { pathToFileURL } from 'node:url';
 import { conferirOrigens } from '../../src/autoria/origem-de-parametro.js';
 import { pecasDoAcervo } from './guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -26,7 +27,7 @@ const pecas = pecasDoAcervo();
 for (const nome of pecas) {
   let receita;
   try {
-    const modulo = await import(resolverCaminhoReceita(nome));
+    const modulo = await import(pathToFileURL(resolverCaminhoReceita(nome)).href);
     receita = modulo.default ?? modulo;
   } catch (erro) {
     problemas.push(`${nome}: não abriu — ${erro?.message ?? erro}`);

@@ -20,6 +20,7 @@ import {
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
+import { criarCamadaEdicaoDeMalha } from './edicao-de-malha.js';
 import { criarSincronizadorSessao } from './sessao/sincronizador.js';
 import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
@@ -93,6 +94,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   let ultimaQuery = null;
   let controlador = null;
   let selecao3d = null;
+  let edicaoDeMalha = null;
   let parInspecionado = null;
   let modeloAtual = null;
   let nomePecaAtual = pecaPedida ?? 'sessao-ativa';
@@ -304,8 +306,11 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      do desfazer: Ctrl+Z devolve o que a sessão mexeu e para aqui, porque abaixo
      disto não existe estado anterior que esta sessão tenha produzido. */
   let origemDosParametros = new Map();
+  let origemDaMalha = null;
   const historicoParametros = criarHistoricoParametros({
-    valorDeOrigem: (chave) => (origemDosParametros.has(chave)
+    valorDeOrigem: (chave) => (chave === '__edicao_de_malha__'
+      ? origemDaMalha
+      : origemDosParametros.has(chave)
       ? origemDosParametros.get(chave)
       : parametroDeclarado(receitaAberta, chave)?.valor),
   });
@@ -363,6 +368,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   function desfazerParametro() {
     const passo = historicoParametros.desfazer();
     if (!passo) return false;
+    if (passo.chave === '__edicao_de_malha__') {
+      if (!edicaoDeMalha) return false;
+      edicaoDeMalha.restaurar(passo.valor);
+      mostrarAviso(historicoParametros.vazio
+        ? 'Desfeito: a malha voltou ao que veio do arquivo.'
+        : 'Desfeito movimento de malha.');
+      return true;
+    }
     aplicarValor(passo.chave, passo.valor);
     painelParametros?.refletirValor?.(passo.chave, passo.valor);
     mostrarAviso(historicoParametros.vazio
@@ -1079,6 +1092,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       limparMarcadoresDoPar();
       if (controlador) controlador.destruir();
       if (selecao3d) selecao3d.destruir();
+      if (edicaoDeMalha) edicaoDeMalha.destruir();
     }
 
     modeloAtual = convertido;
@@ -1120,6 +1134,26 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
         if (enquadrar) ambiente.enquadrar(controlador.gruposVisiveis());
       },
     });
+
+    edicaoDeMalha = convertido.neutro
+      ? criarCamadaEdicaoDeMalha({
+        canvas,
+        cameraAtual: () => ambiente.camera,
+        raiz: convertido.raiz,
+        neutro: convertido.neutro,
+        aoMudar(estadoEdicao) {
+          if (estadoEdicao.ativo) {
+            mostrarAviso(`Edição de malha: ${estadoEdicao.modo}. ${estadoEdicao.selecionados.length} selecionado(s).`);
+          }
+        },
+        aoConfirmarMovimento({ depois }) {
+          historicoParametros.registrar('__edicao_de_malha__', depois);
+          historicoParametros.separar();
+          mostrarAviso('Movimento de malha confirmado. Ctrl+Z desfaz.');
+        },
+      })
+      : null;
+    if (!deAjuste && edicaoDeMalha) origemDaMalha = edicaoDeMalha.vertices();
 
     btnSelecionarConjunto.hidden = !controlador.temHierarquia();
 
@@ -1308,8 +1342,44 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   addEventListener('keydown', atalhoDesfazer);
 
   function atalhoVista(evento) {
+    const campoEditavel = registroAtalhos.deveIgnorar(evento.target);
+    if (evento.key === 'Tab' && !campoEditavel && edicaoDeMalha) {
+      evento.preventDefault();
+      edicaoDeMalha.alternar();
+      return;
+    }
+    if (edicaoDeMalha?.estado().ativo && !campoEditavel) {
+      if (evento.key === '1') { evento.preventDefault(); edicaoDeMalha.definirModo('vertice'); return; }
+      if (evento.key === '2') { evento.preventDefault(); edicaoDeMalha.definirModo('aresta'); return; }
+      if (evento.key === '3') { evento.preventDefault(); edicaoDeMalha.definirModo('face'); return; }
+      if (evento.key.toLowerCase() === 'a' && evento.altKey) { evento.preventDefault(); edicaoDeMalha.limpar(); return; }
+      if (evento.key.toLowerCase() === 'a') { evento.preventDefault(); edicaoDeMalha.selecionarTudo(); return; }
+      if (evento.key.toLowerCase() === 'l') { evento.preventDefault(); edicaoDeMalha.selecionarIlha(); return; }
+      if (evento.key.toLowerCase() === 'g') {
+        evento.preventDefault();
+        if (edicaoDeMalha.iniciarMovimento()) mostrarAviso('Mover: aponte, use X/Y/Z ou digite um valor; clique confirma.');
+        return;
+      }
+      if (edicaoDeMalha.movendo) {
+        if (['x', 'y', 'z'].includes(evento.key.toLowerCase())) {
+          evento.preventDefault();
+          edicaoDeMalha.travarEixo(evento.key);
+          return;
+        }
+        if (/^[0-9.-]$/.test(evento.key)) {
+          evento.preventDefault();
+          edicaoDeMalha.digitarValor(evento.key);
+          return;
+        }
+        if (evento.key === 'Enter' || evento.key === 'Return' || evento.code === 'Enter') { evento.preventDefault(); edicaoDeMalha.confirmarMovimento(); return; }
+      }
+    }
     if (evento.key === 'Escape') {
       if (registroAtalhos.capturando) return;
+      if (edicaoDeMalha?.cancelarMovimento()) {
+        mostrarAviso('Movimento de malha cancelado.');
+        return;
+      }
       controlador?.limpar();
       return;
     }
@@ -1403,6 +1473,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          arquivo desta peça, e a pilha da anterior não pode sobreviver. */
       historicoParametros.limpar();
       origemDosParametros = new Map();
+      origemDaMalha = null;
       escolhaManual = true;
       /* Abrir é peça nova mesmo quando é a mesma peça: quem abre espera vê-la
          enquadrada, e não na colocação herdada da sessão anterior. */
@@ -1939,6 +2010,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     removeEventListener('keydown', atalhoDesfazer);
     sincronizador.destruir();
     if (selecao3d) selecao3d.destruir();
+    if (edicaoDeMalha) edicaoDeMalha.destruir();
     if (controlador) controlador.destruir();
     gerenciadorReferencias3D.destruir();
     gerenciadorAnotacoes3D.destruir();

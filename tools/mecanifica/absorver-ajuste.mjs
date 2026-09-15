@@ -17,6 +17,7 @@
  * é justamente o que a IA vai trabalhar para zerar.
  */
 import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { compararComAlvo } from '../../src/autoria/alvo-do-ajuste.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { conferirAbsorcao, conferirOrigens } from '../../src/autoria/origem-de-parametro.js';
@@ -37,7 +38,7 @@ if (!nomeDaReceita) {
   process.exit(2);
 }
 
-const modulo = await import(resolverCaminhoReceita(nomeDaReceita));
+const modulo = await import(pathToFileURL(resolverCaminhoReceita(nomeDaReceita)).href);
 const receita = modulo.default ?? modulo;
 const { neutro } = executarReceita(receita);
 const veredito = compararComAlvo(neutro, alvo);
@@ -52,12 +53,13 @@ if (Array.isArray(alvo.gestos) && alvo.gestos.length) {
   }
 }
 
-console.log('\nparte                       pior   centro (mm)            dimensão (mm)');
+console.log('\nparte                       pior  desvio   centro (mm)            dimensão (mm)');
 for (const parte of veredito.partes) {
   const centro = parte.centroMm.map((n) => n.toFixed(2).padStart(7)).join(' ');
   const dimensao = parte.dimensaoMm.map((n) => n.toFixed(2).padStart(7)).join(' ');
+  const desvio = (parte.desvioMm ?? 0).toFixed(2).padStart(7);
   const marca = parte.dentro ? '  ' : '->';
-  console.log(`${marca} ${parte.parte.padEnd(24)} ${parte.piorMm.toFixed(2).padStart(6)}  ${centro}  ${dimensao}`);
+  console.log(`${marca} ${parte.parte.padEnd(24)} ${parte.piorMm.toFixed(2).padStart(6)} ${desvio}  ${centro}  ${dimensao}`);
 }
 for (const nome of veredito.ausentes) console.log(`-> ${nome}: o alvo declara esta parte e a receita não a produz`);
 for (const nome of veredito.sobrando) console.log(`-> ${nome}: a receita produz esta parte e o alvo não a declara`);
@@ -66,7 +68,7 @@ for (const nome of veredito.sobrando) console.log(`-> ${nome}: a receita produz 
    inventou número? Só dá para responder quando existe com o que comparar, então
    ela só aparece se o ajuste disser de que receita partiu. */
 if (alvo.receitaDeOrigem) {
-  const anterior = await import(resolverCaminhoReceita(alvo.receitaDeOrigem));
+  const anterior = await import(pathToFileURL(resolverCaminhoReceita(alvo.receitaDeOrigem)).href);
   const absorcao = conferirAbsorcao(anterior.default ?? anterior, receita);
   console.log(`\nparâmetros novos: ${absorcao.novos.length ? absorcao.novos.join(', ') : 'nenhum'}`);
   for (const id of absorcao.semOrigem) console.log(`-> '${id}' é novo e não diz de onde veio`);

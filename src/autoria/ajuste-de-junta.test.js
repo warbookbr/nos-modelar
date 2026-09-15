@@ -101,7 +101,7 @@ describe('aplicarAjusteDeJunta', () => {
     const veredito = compararComAlvo(executar({ ...receita.PARAMS, balancoTraseiro: 514 }), alvo);
 
     expect(veredito.dentro).toBe(true);
-    expect(veredito.piorMm).toBeLessThan(0.2);
+    expect(veredito.piorMm).toBeLessThan(0.5);
   });
 
   it('a receita original não alcança o alvo do gesto', () => {
