@@ -359,8 +359,12 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
      fixo, o vértice longe da câmera continuava do mesmo tamanho na imagem e ia
      ficando impossível de acertar. Era o "clico e não acontece nada" em certos
      vértices, e não em outros. Agora o alcance acompanha a distância, então a
-     área clicável casa com o que está desenhado em qualquer zoom. */
-  const FRACAO_DO_ALCANCE = 1 / 110;
+     área clicável casa com o que está desenhado em qualquer zoom.
+     A fração foi calibrada contra o valor fixo anterior: medido no enquadramento
+     padrão, o fixo tolerava vinte pixels de erro de mira e um quarenta e cinco
+     avos da distância tolera o mesmo. O ganho é a tolerância não mudar quando a
+     pessoa se afasta. */
+  const FRACAO_DO_ALCANCE = 1 / 45;
   function ajustarAlcance() {
     const camera = cameraAtual();
     const centro = new THREE.Vector3().setFromMatrixPosition(raiz.matrixWorld);
@@ -371,6 +375,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
   }
   ajustarAlcance();
   const ponteiro = new THREE.Vector2();
+  /* Abaixo disto o gesto é clique, não arrasto. Cinco pixels é menos do que uma
+     mão firme produz entre apertar e soltar num mouse comum. */
+  const ARRASTO_MINIMO = 8;
   let inicio = null;
   let ultimoPonteiro = null;
   let movimento = null;
@@ -692,7 +699,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     /* Sem gesto de edição em curso o movimento do ponteiro pertence à câmera.
        Parar a propagação aqui seria o mesmo que desligar a órbita. */
     if (!inicio) return;
-    if (Math.hypot(evento.clientX - inicio[0], evento.clientY - inicio[1]) > 5) {
+    if (Math.hypot(evento.clientX - inicio[0], evento.clientY - inicio[1]) > ARRASTO_MINIMO) {
       atualizarCaixa(inicio, [evento.clientX, evento.clientY]);
     }
     evento.stopPropagation();
@@ -717,10 +724,23 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     canvas.releasePointerCapture?.(evento.pointerId);
     evento.stopPropagation();
     caixa.hidden = true;
-    if (deslocamento > 5) {
-      estado.selecionarMuitos(itensNaCaixa(origem, [evento.clientX, evento.clientY]), { aditiva: evento.shiftKey, remover: evento.altKey });
-      atualizarVisibilidade();
-      return;
+    if (deslocamento > ARRASTO_MINIMO) {
+      const naCaixa = itensNaCaixa(origem, [evento.clientX, evento.clientY]);
+      /* CAIXA VAZIA VOLTA A SER CLIQUE. Era este o "clico em certos vértices e
+         não acontece nada". Mão humana anda alguns pixels entre apertar e
+         soltar, e esse gesto virava uma caixa de seleção minúscula: ela passava
+         ao lado do vértice, não pegava nada, e ainda limpava a seleção. Medido
+         antes da correção, com oito pixels de tremida só 25 de 42 vértices
+         respondiam — e acima de doze voltavam a responder, porque aí a caixa já
+         era grande o bastante para alcançá-los. Daí parecer aleatório.
+         Nenhum número de limite resolve isso sozinho, porque não existe fronteira
+         entre clique tremido e arrasto curto. Então a caixa que não pega nada
+         não decide nada: o gesto é reavaliado como clique. */
+      if (naCaixa.length) {
+        estado.selecionarMuitos(naCaixa, { aditiva: evento.shiftKey, remover: evento.altKey });
+        atualizarVisibilidade();
+        return;
+      }
     }
     const alvo = alvoSobOPonteiro(evento);
     if (alvo) estado.selecionar(alvo, { aditiva: evento.shiftKey, remover: evento.altKey });

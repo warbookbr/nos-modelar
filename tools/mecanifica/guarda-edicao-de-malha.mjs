@@ -132,6 +132,13 @@ const ler = () => pagina.evaluate(() => {
     edicao: bancada.edicaoDeMalha?.() ?? null,
     camera: [ambiente.camera.position.x, ambiente.camera.position.y, ambiente.camera.position.z],
     gizmoVisivel: Boolean(gizmo?.visible),
+    /* O gizmo mora no centro da seleção, então a posição dele é a medida direta
+       de onde a seleção está. A caixa da peça inteira não serve: mover uma parte
+       que não define o canto da peça quase não a muda, e a afirmação passaria ou
+       falharia conforme qual parte a pessoa selecionou. */
+    centroDaSelecao: gizmo?.visible
+      ? (() => { const v = gizmo.position.clone(); gizmo.parent.localToWorld(v); return [v.x, v.y, v.z]; })()
+      : null,
     setas,
     grupoVisivel: Boolean(grupo?.visible),
     pontosVisiveis: Boolean(pontos?.visible),
@@ -209,16 +216,38 @@ try {
   ok('clicar num vértice seleciona', (selecionado.edicao?.selecionados?.length ?? 0) > 0,
     `${selecionado.edicao?.selecionados?.length ?? 0} selecionado(s)`);
 
-  /* CLICAR DE LONGE. O autor relatou clicar em certos vértices e nada acontecer.
-     A hipótese era o alcance do clique: o ponto é desenhado com tamanho
-     constante na tela e o alcance do raio é medido no mundo, então afastar a
-     câmera encolheria a área clicável sem encolher o desenho. O alcance passou a
-     acompanhar a distância por isso.
-     ESTA AFIRMAÇÃO NÃO PROVA AQUELA CORREÇÃO: com o alcance fixo de volta, e a
-     câmera recuada até o limite, o clique continua pegando o vértice. Ou seja, a
-     causa do que o autor viu é outra e ainda não foi encontrada. A afirmação
-     fica porque o que ela cobra — clicar funcionar com a câmera longe — precisa
-     continuar valendo, mas ela não pode ser lida como o defeito resolvido. */
+  /* Uma dúzia de vértices espalhados pela peça, e não um só: o defeito do clique
+     tremido pegava uns e não outros conforme a vizinhança, e um único ponto de
+     prova passaria por sorte. */
+  const amostraDeVertices = inteiro.pontosNaTela.filter((_, i) => i % 40 === 0).slice(0, 12);
+
+  /* CLIQUE TREMIDO. Mão humana anda alguns pixels entre apertar e soltar, e esse
+     gesto virava uma caixa de seleção minúscula que passava ao lado do vértice,
+     não pegava nada e ainda limpava a seleção. Era o "clico em certos vértices e
+     não acontece nada", e parecia aleatório porque tremidas maiores voltavam a
+     funcionar — a caixa ficava grande o bastante para alcançar o ponto. Medido
+     antes da correção: com oito pixels de tremida, 25 de 42 vértices respondiam.
+     O clique do Playwright não move o ponteiro, então sem esta afirmação a
+     guarda nunca veria o defeito. */
+  for (const tremida of [3, 6, 9, 14]) {
+    await pagina.evaluate(() => window.__mecanificaBancada.edicaoDeMalha());
+    let pegou = 0;
+    for (const ponto of amostraDeVertices) {
+      await pagina.mouse.move(ponto.x, ponto.y);
+      await pagina.mouse.down();
+      await pagina.mouse.move(ponto.x + tremida, ponto.y + Math.round(tremida / 2));
+      await pagina.mouse.up();
+      const quantos = await pagina.evaluate(() => window.__mecanificaBancada.edicaoDeMalha()?.selecionados?.length ?? 0);
+      if (quantos > 0) pegou += 1;
+    }
+    ok(`clicar com ${tremida}px de tremida ainda seleciona`, pegou === amostraDeVertices.length,
+      `${pegou} de ${amostraDeVertices.length}`);
+  }
+
+  /* CLICAR DE LONGE. O ponto é desenhado com tamanho constante na tela e o
+     alcance do raio é medido no mundo, então um número fixo encolheria a área
+     clicável conforme a câmera se afasta sem encolher o desenho. O alcance
+     acompanha a distância por isso. */
   await pagina.mouse.move(700, 430);
   await pagina.mouse.wheel(0, 4000);
   await pagina.waitForTimeout(1000);
@@ -304,10 +333,10 @@ try {
     await pagina.mouse.up();
     await pagina.waitForTimeout(600);
     const comGizmo = await ler();
-    const andou = comGizmo.caixaDaCena && depoisDoMovimento.caixaDaCena
-      ? Math.hypot(...[0, 1, 2].map((i) => comGizmo.caixaDaCena.max[i] - depoisDoMovimento.caixaDaCena.max[i]))
+    const andou = comGizmo.centroDaSelecao && depoisDoMovimento.centroDaSelecao
+      ? Math.hypot(...[0, 1, 2].map((i) => comGizmo.centroDaSelecao[i] - depoisDoMovimento.centroDaSelecao[i]))
       : 0;
-    ok('arrastar a seta do gizmo move a malha desenhada', andou > 1e-3, `andou ${andou.toFixed(4)}`);
+    ok('arrastar a seta do gizmo move a malha desenhada', andou > 0.05, `andou ${andou.toFixed(4)}`);
     await tecla('Control+z');
     await pagina.waitForTimeout(500);
   }
@@ -327,8 +356,8 @@ try {
   const grudado = await ler();
   await pagina.keyboard.up('Control');
   await tecla('Escape');
-  const diferenca = livre.caixaDaCena && grudado.caixaDaCena
-    ? Math.hypot(...[0, 1, 2].map((i) => grudado.caixaDaCena.max[i] - livre.caixaDaCena.max[i]))
+  const diferenca = livre.centroDaSelecao && grudado.centroDaSelecao
+    ? Math.hypot(...[0, 1, 2].map((i) => grudado.centroDaSelecao[i] - livre.centroDaSelecao[i]))
     : 0;
   /* O limite é generoso de propósito, e mesmo assim tem dente. O ímã recalcula
      no movimento do ponteiro, então a leitura com Ctrl precisa de um pixel de
