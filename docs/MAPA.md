@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-852 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -712,6 +712,8 @@
 
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
+- `ajuste-de-junta.js` — ajuste-de-junta.js — arrastar o canto onde as partes se encontram.
+- `ajuste-de-junta.test.js` — ajuste-de-junta.test.js — o gesto do canto: quais juntas a peça tem, o que anda quando a pessoa puxa uma, e se o que ela desenhou cabe numa receita.
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
 - `alvo-do-ajuste.js` — alvo-do-ajuste.js — o que a pessoa deixou na bancada, escrito como medida.
 - `alvo-do-ajuste.test.js` — alvo-do-ajuste.test.js — a régua que decide se a receita reescrita chegou onde a pessoa deixou a peça na bancada.
