@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-863 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+867 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -718,6 +718,7 @@
 
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
+- `adaptar-three.test.js` — adaptar-three.test.js — a malha da cena carrega de qual vértice neutro cada posição veio, que é o que permite a edição devolver o movimento à malha.
 - `ajuste-de-junta.js` — ajuste-de-junta.js — arrastar o canto onde as partes se encontram.
 - `ajuste-de-junta.test.js` — ajuste-de-junta.test.js — o gesto do canto: quais juntas a peça tem, o que anda quando a pessoa puxa uma, e se o que ela desenhou cabe numa receita.
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
@@ -795,6 +796,8 @@
 - `cor-de-auditoria.test.mjs` — A paleta da auditoria e a conferência dela.
 - `criar-ambiente.js` — criar-ambiente.js — estúdio neutro, câmeras previsíveis e enquadramento da bancada.
 - `criar-selecao.js` — criar-selecao.js — raycast da bancada com seleção múltipla e foco por duplo clique.
+- `edicao-de-malha.js` — edicao-de-malha.js — seleção temporária por topologia na bancada.
+- `edicao-de-malha.test.js` — edicao-de-malha.test.js — topologia, conversão de seleção entre vértice, aresta e face, e o movimento aplicado à malha neutra.
 - `entrada.js` — entrada.js — única entrada publicada da bancada; a aplicação não escolhe peça padrão e usa o catálogo homologado explícito, que hoje está vazio. /
 - `estado-bancada.js` — estado-bancada.js — estado headless e determinístico da bancada de inspeção.
 - `main.js` — main.js — bancada interativa de co-modelagem (Humano + IA): 3D, referências, parâmetros e feedback.
@@ -1045,6 +1048,7 @@
 - `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
+- `guarda-edicao-de-malha.mjs` — guarda-edicao-de-malha.mjs — o modo de edição existe na tela e responde.
 - `guarda-escolha-da-peca.mjs` — guarda-escolha-da-peca.mjs — a escolha de quem está na bancada não é desfeita pelo relógio.
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
 - `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.

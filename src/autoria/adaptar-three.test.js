@@ -1,3 +1,5 @@
+/* adaptar-three.test.js — a malha da cena carrega de qual vértice neutro cada
+   posição veio, que é o que permite a edição devolver o movimento à malha. */
 import { describe, expect, it } from 'vitest';
 import { adaptarThree } from './adaptar-three.js';
 

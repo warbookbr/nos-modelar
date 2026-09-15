@@ -1,3 +1,5 @@
+/* edicao-de-malha.test.js — topologia, conversão de seleção entre vértice,
+   aresta e face, e o movimento aplicado à malha neutra. */
 import { describe, expect, it } from 'vitest';
 import { criarEstadoEdicaoDeMalha, moverSelecaoDaMalha, TAMANHO_PONTO_EM_EDICAO, topologiaDaMalhaNeutra } from './edicao-de-malha.js';
 

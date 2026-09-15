@@ -1349,17 +1349,10 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       return;
     }
     if (edicaoDeMalha?.estado().ativo && !campoEditavel) {
-      if (evento.key === '1') { evento.preventDefault(); edicaoDeMalha.definirModo('vertice'); return; }
-      if (evento.key === '2') { evento.preventDefault(); edicaoDeMalha.definirModo('aresta'); return; }
-      if (evento.key === '3') { evento.preventDefault(); edicaoDeMalha.definirModo('face'); return; }
-      if (evento.key.toLowerCase() === 'a' && evento.altKey) { evento.preventDefault(); edicaoDeMalha.limpar(); return; }
-      if (evento.key.toLowerCase() === 'a') { evento.preventDefault(); edicaoDeMalha.selecionarTudo(); return; }
-      if (evento.key.toLowerCase() === 'l') { evento.preventDefault(); edicaoDeMalha.selecionarIlha(); return; }
-      if (evento.key.toLowerCase() === 'g') {
-        evento.preventDefault();
-        if (edicaoDeMalha.iniciarMovimento()) mostrarAviso('Mover: aponte, use X/Y/Z ou digite um valor; clique confirma.');
-        return;
-      }
+      /* O TECLADO DO MOVIMENTO VEM PRIMEIRO. Com os níveis antes dele, digitar o
+         valor do deslocamento era interpretado como troca de nível: escrever
+         "0.2" mandava o "2" para o modo aresta, a entrada ficava em "0." e o
+         movimento saía zero. A pessoa digitava um número e a peça não andava. */
       if (edicaoDeMalha.movendo) {
         if (['x', 'y', 'z'].includes(evento.key.toLowerCase())) {
           evento.preventDefault();
@@ -1372,6 +1365,17 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
           return;
         }
         if (evento.key === 'Enter' || evento.key === 'Return' || evento.code === 'Enter') { evento.preventDefault(); edicaoDeMalha.confirmarMovimento(); return; }
+      }
+      if (evento.key === '1') { evento.preventDefault(); edicaoDeMalha.definirModo('vertice'); return; }
+      if (evento.key === '2') { evento.preventDefault(); edicaoDeMalha.definirModo('aresta'); return; }
+      if (evento.key === '3') { evento.preventDefault(); edicaoDeMalha.definirModo('face'); return; }
+      if (evento.key.toLowerCase() === 'a' && evento.altKey) { evento.preventDefault(); edicaoDeMalha.limpar(); return; }
+      if (evento.key.toLowerCase() === 'a') { evento.preventDefault(); edicaoDeMalha.selecionarTudo(); return; }
+      if (evento.key.toLowerCase() === 'l') { evento.preventDefault(); edicaoDeMalha.selecionarIlha(); return; }
+      if (evento.key.toLowerCase() === 'g') {
+        evento.preventDefault();
+        if (edicaoDeMalha.iniciarMovimento()) mostrarAviso('Mover: aponte, use X/Y/Z ou digite um valor; clique confirma.');
+        return;
       }
     }
     if (evento.key === 'Escape') {
@@ -1952,6 +1956,11 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     },
     controlador: () => controlador,
     ambiente: () => ambiente,
+    /* O estado da edição de malha, para a guarda de navegador poder afirmar o
+       que a pessoa vê: modo corrente, quantos itens selecionados e se um
+       movimento está em curso. Sem isto a guarda teria de adivinhar a seleção
+       pela cor dos pontos desenhados. */
+    edicaoDeMalha: () => edicaoDeMalha?.estado?.() ?? null,
     sincronizador: () => sincronizador,
     selecionar: (nomes) => controlador?.selecionarMuitas(Array.isArray(nomes) ? nomes : [nomes]),
     modo: (modo) => controlador?.definirModo(modo),
