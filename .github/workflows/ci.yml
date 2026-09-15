@@ -129,6 +129,12 @@ jobs:
       - name: O acervo cumpre o plano e os contatos que declara
         run: npm run guarda:acervo
 
+      # A rodada de absorção acerta o desenho da pessoa reescrevendo a receita,
+      # e acertaria mais fácil inventando termos até a conta fechar. Quem
+      # declara de onde vieram os números, declara todos.
+      - name: Quem declara origem de parâmetro, declara de todos
+        run: npm run origens:check
+
       # Régua que existe e ninguém roda não protege nada, e pior, parece
       # proteger. Três casos num dia só motivaram esta guarda.
       - name: Toda régua é rodada por gate ou pelo CI

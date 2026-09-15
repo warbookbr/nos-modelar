@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+862 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -22,6 +22,10 @@
 - `implementador.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
 - `modelador.md` — Escreve e corrige a receita procedural de UMA peça a partir de um plano de modelagem e, nas rodadas seguintes, de um veredito de defeitos. Não julga o própri…
 - `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
+
+## .claude/skills/absorver-ajuste-da-bancada/
+
+- `SKILL.md` — Transformar um ajuste que a pessoa fez na bancada em receita organizada — ler o alvo salvo, reescrever TABELA, derivar e gerarPassos, e provar por medida que…
 
 ## .claude/skills/alinhar-modelagem/
 
@@ -462,7 +466,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-14-ajuste-da-bancada-volta-como-receita.md` — Ajuste da bancada volta como receita — o caminho de volta existe
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -555,6 +558,7 @@
 - `2026-09-11-a-peca-mora-num-lugar-so.md` — A peça mora num lugar só
 - `2026-09-11-orquestracao-de-modelagem.md` — Orquestração de modelagem — alinhamento, despacho e veredito
 - `2026-09-12-a-seta-move-de-verdade.md` — A seta move de verdade
+- `2026-09-14-ajuste-da-bancada-volta-como-receita.md` — Ajuste da bancada volta como receita — o caminho de volta existe
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -577,6 +581,7 @@
 
 ## docs/mecanifica/usar/
 
+- `AJUSTE-DA-BANCADA.md` — Ajuste da bancada
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
@@ -750,6 +755,8 @@
 - `ligacao-parte-parametro.js` — ligacao-parte-parametro.js — qual parâmetro move qual parte.
 - `ligacao-parte-parametro.test.js` — ligacao-parte-parametro.test.js — qual parâmetro move qual parte, MEDIDO.
 - `material-da-peca.js` — material-da-peca.js — tudo que pertence a uma peça, e onde está hoje.
+- `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
+- `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
 - `orquestrar-fluxo-autoria.js` — Orquestração pura da N1: planeja, diagnostica e registra transições. Não compila, renderiza, persiste ou publica nada por conta própria.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
 - `parametros-declarados.test.js` — parametros-declarados.test.js — a pergunta única não adivinha.
@@ -972,6 +979,7 @@
 
 ## tools/mecanifica/
 
+- `absorver-ajuste.mjs` — absorver-ajuste.mjs — a régua da rodada de absorção.
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
 - `adaptar-three.test.ts` — adaptar-three.test.ts — prova headless da fronteira entre o núcleo procedural herdado e Three.js.
 - `alinhar-modelagem.test.mjs` — alinhar-modelagem.test.mjs — a rodada de alinhamento continua colada ao formato que ela produz.
@@ -1061,6 +1069,7 @@
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
+- `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
 - `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O número do acervo fica travado aqui de propósito — se alguém ligar uma r…

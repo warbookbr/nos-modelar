@@ -83,7 +83,9 @@
     "leitura:obrigatoria": "node tools/mapa/leitura-obrigatoria.mjs",
     "diario": "node tools/mecanifica/ler-diario.mjs",
     "conferir:referencia": "node tools/mecanifica/conferir-contra-referencia.mjs",
-    "guarda:junta": "node tools/mecanifica/guarda-junta-da-bancada.mjs"
+    "guarda:junta": "node tools/mecanifica/guarda-junta-da-bancada.mjs",
+    "origens:check": "node tools/mecanifica/origens-check.mjs",
+    "absorver": "node tools/mecanifica/absorver-ajuste.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

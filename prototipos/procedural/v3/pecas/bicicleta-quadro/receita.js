@@ -409,6 +409,45 @@ export const receitaBicicletaQuadro = {
 
   ALIASES,
 
+  /* DE ONDE VEIO CADA NUMERO. A tabela acima ja explica isso em prosa, e a
+     prosa serve para quem le a receita inteira. Esta lista serve para o gate:
+     ela e conferida entrada por entrada, e a rodada de absorcao reprova
+     parametro novo que nao apareca aqui. Sem isso, acertar o desenho da pessoa
+     seria possivel inventando termos ate a conta fechar, e a tabela medida
+     viraria uma lista de numeros magicos. */
+  ORIGENS: {
+    aroISO: 'norma ISO 5775: aro 622 e a medida nominal da roda 29',
+    pneuLargura: 'medido no recorte lateral, na escala do diametro da roda',
+    entreEixos: 'medido no recorte lateral, entre os centros das duas rodas',
+    balancoTraseiro: 'medido no recorte lateral, do movimento central ao eixo traseiro',
+    quedaDoMovimentoCentral: 'medido no recorte lateral, do eixo das rodas ao movimento central',
+    anguloDirecao: 'medido no recorte lateral, entre o tubo de direcao e o solo',
+    anguloSelim: 'medido no recorte lateral, entre o tubo do selim e o solo',
+    tuboDirecaoComprimento: 'medido no recorte ampliado do tubo de direcao',
+    tuboSelimComprimento: 'medido no recorte lateral, da caixa ao topo do tubo do selim',
+    pontoSelimTopo: 'junta medida no recorte ampliado, em [avanco do movimento central, altura do solo]',
+    pontoTuboSuperiorAtras: 'junta medida no recorte ampliado, em [avanco do movimento central, altura do solo]',
+    pontoTuboSuperiorFrente: 'junta medida no recorte ampliado, em [avanco do movimento central, altura do solo]',
+    coroaAvancoDoMovimentoCentral: 'medido no recorte ampliado do encontro do tubo de direcao com o garfo',
+    coroaAlturaDoSolo: 'medido no recorte ampliado do encontro do tubo de direcao com o garfo',
+    garfoEixoACoroa: 'entrada do modulo do garfo, declarada aqui para o modulo 2; nao governa geometria deste quadro',
+    garfoAvanco: 'entrada do modulo do garfo, declarada aqui para o modulo 2; nao governa geometria deste quadro',
+    canoteExposto: 'medido no recorte lateral, do topo do tubo do selim ate o selim',
+    meiaLarguraGuidao: 'entrada do modulo do guidao, declarada aqui para o modulo 4; nao governa geometria deste quadro',
+    meiaLarguraCubo: 'espacamento de cubo traseiro corrente, 148 mm boost, dividido por dois',
+    raioTuboSelim: 'secao de quadro de aluminio corrente',
+    arqueioTuboSuperior: 'escolha de forma: zero mantem a borda reta que a referencia mostra',
+    raioTuboDirecao: 'secao de quadro de aluminio corrente',
+    raioBalancoInferior: 'secao de quadro de aluminio corrente',
+    raioBalancoSuperior: 'secao de quadro de aluminio corrente',
+    larguraCaixaMovimentoCentral: 'padrao de caixa de movimento central de 73 mm',
+    raioCaixaMovimentoCentral: 'padrao de caixa de movimento central de 73 mm',
+    perfilTuboSuperior: 'medido no recorte lateral, estacao a estacao ao longo do tubo',
+    bordaSuperiorTuboInferior: 'medido no recorte lateral, coluna a coluna, em [avanco, altura]',
+    bordaInferiorTuboInferior: 'medido no recorte lateral, coluna a coluna, em [avanco, altura]',
+    larguraTuboInferior: 'largura em x, que a vista lateral nao mostra: declarada por fracao do caminho',
+  },
+
   /* PLANO DE MODELAGEM — o que esta peça promete ser, escrito no vocabulário
      que o revisor e o gate leem. As partes prometidas aqui são conferidas
      contra as partes entregues: prometer e não entregar reprova, porque parte

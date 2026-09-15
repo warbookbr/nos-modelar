@@ -1,6 +1,6 @@
 # Ajuste da bancada volta como receita — o caminho de volta existe
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -122,4 +122,31 @@ não couber nela, quem muda é a receita, não a tolerância.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-15.** Commits `b4a865e`, `98841ff`, `b616377` e o desta
+linha, na main. Vinte e nove gates verdes, com dois novos: `guarda:junta`, que
+afirma o gesto no navegador, e `origens:check`, que cobra a declaração de onde
+veio cada número.
+
+O que passou a ser possível: a pessoa abre a peça, liga `Juntas`, arrasta os
+cantos, e salva um arquivo com a peça como ela ficou. A skill
+`absorver-ajuste-da-bancada` recebe esse arquivo, e `npm run absorver` diz em
+milímetro o que a receita ainda não alcança, parte por parte.
+
+As medidas que sustentam o resultado. O gesto cabe numa receita: puxar as duas
+ponteiras 12,059 mm para trás produz um alvo que a receita com
+`balancoTraseiro: 514` reproduz com erro máximo de 0,104 mm, dentro da tolerância
+de meio milímetro. O gesto não vaza: arrastar a ponteira esquerda move o balanço
+inferior e o superior daquele lado e deixa as outras seis partes intocadas, medido
+por caixa no teste e por posição no navegador. E a régua enxerga o defeito certo:
+contra um alvo com o balanço 12 mm mais longo, a receita original erra 11,955 mm e
+acusa só os quatro balanços.
+
+Dois defeitos foram achados na prova de navegador e corrigidos: o punho voltava
+para a posição do arquivo ao soltar o ponteiro, porque o redesenho lia as juntas
+da malha base em vez da ajustada, e o rodapé do modo ficava dentro de uma aba
+escondida. A guarda reprova com a primeira correção desfeita, acusando "ponteiro
+110px, punho 0.0px".
+
+Devolvido ao backlog: o editor de malha completo, adiado de propósito até o
+caminho de volta existir — agora ele existe. Continua no backlog dizer à pessoa
+por que um eixo ficou sem seta.

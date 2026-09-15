@@ -2,15 +2,19 @@
 
 ## Estado
 
-**Plano ativo:** [Ajuste da bancada volta como receita](2026-09-14-ajuste-da-bancada-volta-como-receita.md) (2026-09-14-ajuste-da-bancada-volta-como-receita.md).
+**Plano ativo:** nenhum.
 
-A bancada exige que todo gesto caia num parâmetro nomeado, e num quadro em
-treliça não existe número que empurre um tubo inteiro sem descolar as juntas —
-medido na bicicleta, arrastar a seta do balanço estica os quatro balanços em vez
-de mover um. O plano separa os dois lados: a bancada passa a ser o espaço do
-autor, e uma rodada de absorção com skill própria devolve a receita organizada
-que a IA lê, provada por reexecução contra o ajuste capturado e guardada contra
-parâmetro inventado sem origem declarada.
+O [ajuste da bancada volta como receita](encerrados/2026-09-14-ajuste-da-bancada-volta-como-receita.md)
+foi **concluído** em 2026-09-15. A bancada exigia que todo gesto caísse num
+parâmetro nomeado no instante do arrasto, e num quadro em treliça nenhum número
+empurra um tubo inteiro sem descolar as juntas: arrastar a seta do balanço
+esticava os quatro balanços de uma vez. Os dois momentos foram separados. Agora a
+pessoa arrasta os cantos onde as partes se encontram, a malha deforma sem tocar na
+receita, e o que ela salva é a peça medida por nome de parte, sem vértice nem
+índice de passo. A skill `absorver-ajuste-da-bancada` traduz isso de volta, com
+`npm run absorver` dizendo em milímetro o que falta e `origens:check` impedindo
+que a tradução invente número para fechar a conta. O editor de malha completo
+continua adiado, agora sobre um caminho de volta provado.
 
 A [seta move de verdade](encerrados/2026-09-12-a-seta-move-de-verdade.md) foi
 **concluída** em 2026-09-12. O gesto direto da bancada tinha quatro defeitos ao mesmo tempo, todos medidos: a
