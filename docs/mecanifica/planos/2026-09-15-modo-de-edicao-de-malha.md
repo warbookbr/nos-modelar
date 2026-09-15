@@ -106,33 +106,32 @@ ou perdeu parte. Fica para o plano seguinte, escrito assim que este fechar.
 4. **Fechar.** Gate de navegador, documentação, `npm run mapa`, gates completos,
    e a abertura do plano de topologia.
 
-## Medido na fatia 1 — o risco aconteceu
+## Medido na fatia 1 — o que a medida responde, e o que ela não responde
 
-A medida da fatia 1 responde a pergunta do gate de saída, e a resposta é não. A
-edição livre produz alvo que a receita da bicicleta não alcança.
+Variar os números que a receita já declara NÃO alcança uma edição livre. Mover um
+vértice do tubo do selim 5 mm em y deixa a receita 5,000 mm fora, e uma descida
+por coordenada sobre os vinte e nove parâmetros, com passo caindo de 8% até
+0,06%, só chega a 2,531 mm — cinco vezes a tolerância, e vindo de
+`quedaDoMovimentoCentral`, que desce o quadro inteiro em vez de reproduzir a
+edição. Mover o tubo do selim inteiro 5 mm em y não melhora nada: 5,000 mm antes
+e depois.
 
-Mover UM vértice do tubo do selim 5 mm em y deixa a receita original 5,000 mm
-fora. Uma descida por coordenada sobre os vinte e nove parâmetros declarados,
-com passo caindo de 8% até 0,06%, chega a 2,531 mm — cinco vezes a tolerância de
-meio milímetro. E esses 2,531 mm não vêm de reproduzir a edição: vêm de
-`quedaDoMovimentoCentral`, que desce o quadro inteiro e por acaso encurta a maior
-distância medida.
+ISSO NÃO É O LIMITE DO PLANO, e registrar assim seria enganar quem ler depois. A
+rodada de absorção não procura número: ela reescreve `TABELA`, `derivar` e
+`gerarPassos`. Para o tubo do selim ficar com outra forma, a receita ganha a
+entrada que descreve essa forma, com origem declarada em `ORIGENS` — e isso é
+trabalho de escrita, não de busca. A busca acima serve só para dizer que a
+receita COMO ESTÁ não alcança, que é a pergunta que o comando `npm run absorver`
+responde no começo de cada rodada.
 
-Mover o tubo do selim INTEIRO 5 mm em y é pior: 5,000 mm antes da busca e 5,000
-mm depois. Nenhum dos vinte e nove parâmetros melhora nada, porque nenhum
-translada aquele tubo naquele eixo.
+Duas medidas de apoio. A busca foi validada em controle, para a conclusão não ser
+sobre busca ruim: contra um alvo que é uma receita — `balancoTraseiro` 502 → 514
+— ela sai de 12,158 mm e chega a 0,969 mm, convergindo para a resposta certa. E a
+medida de nuvem de pontos não é rigorosa demais: o gesto por junta, que
+corresponde a um parâmetro existente, passa com 0,340 mm.
 
-A busca foi validada num caso de controle, para a conclusão não ser sobre busca
-ruim. Contra um alvo que É uma receita — a bicicleta com `balancoTraseiro` 502 →
-514 — ela sai de 12,158 mm e chega a 0,969 mm, convergindo para a resposta certa.
-
-E a medida nova não é rigorosa demais: o gesto por junta, que corresponde a um
-parâmetro, continua passando. Puxar as duas ponteiras e comparar com
-`balancoTraseiro: 514` dá 0,340 mm com a nuvem de pontos, dentro da tolerância.
-
-A conclusão é a separação: edição que corresponde a algo que a receita sabe dizer
-volta; edição livre de vértice não volta, e não é questão de a rodada se esforçar
-mais.
+O que falta provar é a reescrita: pegar uma edição de vértice, escrever a receita
+que chega nela e medir. É o que a fatia 1 ainda deve.
 
 ## Riscos e parada
 
