@@ -1752,3 +1752,37 @@ body.auditoria .recolher { display: none; }
    o texto sai da caixa pela direita. */
 #resumoEstado .linha { align-items: baseline; gap: 10px; }
 #resumoEstado .linha kbd { white-space: normal; text-align: right; }
+
+/* Botão de modo ligado na barra: o "Juntas" fica aceso enquanto os punhos
+   estão na cena, senão não há como saber qual gesto o ponteiro vai fazer. */
+.botao-barra[aria-pressed='true'],
+.botao-barra.ativo {
+  background: var(--amarelo);
+  color: #1b1206;
+  border-color: var(--amarelo);
+}
+
+/* O rodapé do modo de junta flutua sobre a cena, centralizado embaixo: ele
+   pertence ao modo, não a uma aba, e precisa continuar visível seja qual for o
+   painel aberto. */
+.rodape-juntas {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(18, 18, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  font: 500 12px/1 ui-monospace, monospace;
+  color: #e8e8ea;
+}
+
+.rodape-juntas.tem-pendencia {
+  border-color: var(--amarelo);
+}

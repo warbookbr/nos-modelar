@@ -134,9 +134,14 @@ export function detectarJuntas(neutro, { raio = RAIO_DE_JUNTA_PADRAO } = {}) {
  * não passa pela junta não anda. Vértice que pertence a duas partes que passam
  * pela junta anda pelo maior dos dois pesos, senão a solda abriria.
  */
-export function aplicarAjusteDeJunta(neutro, ajustes = [], { raio = RAIO_DE_JUNTA_PADRAO } = {}) {
+export function aplicarAjusteDeJunta(neutro, ajustes = [], { raio = RAIO_DE_JUNTA_PADRAO, juntas: jaDetectadas = null } = {}) {
   if (!Array.isArray(ajustes)) throw new Error('aplicarAjusteDeJunta: `ajustes` precisa ser uma lista');
-  const juntas = new Map(detectarJuntas(neutro, { raio }).map((j) => [j.nome, j]));
+  /* Detectar custa uma varredura de pares de vértices, medida em 32 ms na
+     bicicleta. Durante um arrasto isso rodaria a cada quadro e a bancada
+     engasgaria, então quem arrasta detecta uma vez e passa a lista aqui. As
+     juntas da peça não mudam enquanto a pessoa puxa uma delas: elas são as
+     mesmas da malha base, que é sempre a mesma. */
+  const juntas = new Map((jaDetectadas ?? detectarJuntas(neutro, { raio })).map((j) => [j.nome, j]));
   const porParte = verticesPorParte(neutro);
 
   const deslocamentoDe = new Map();

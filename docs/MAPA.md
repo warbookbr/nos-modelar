@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-854 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -801,6 +801,7 @@
 - `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
 - `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
+- `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
 - `setas-de-parametro.js` — setas-de-parametro.js — as três setas por eixo, ligadas a um parâmetro.
 
 ## src/bancada/parametros/
@@ -1037,6 +1038,7 @@
 - `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
 - `guarda-escolha-da-peca.mjs` — guarda-escolha-da-peca.mjs — a escolha de quem está na bancada não é desfeita pelo relógio.
 - `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
+- `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
 - `guarda-seta-de-parametro.mjs` — guarda-seta-de-parametro.mjs — a seta move a parte na medida do arrasto, e só ela.

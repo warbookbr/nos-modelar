@@ -9,6 +9,11 @@ import { parametroDeclarado } from '../autoria/parametros-declarados.js';
 import { ligarPartesAParametros, parametrosDaParte } from '../autoria/ligacao-parte-parametro.js';
 import { escolherSetas } from '../autoria/setas-por-eixo.js';
 import { criarSetasDeParametro } from './controles/setas-de-parametro.js';
+import { criarPunhosDeJunta } from './controles/punhos-de-junta.js';
+import { aplicarAjusteDeJunta, detectarJuntas } from '../autoria/ajuste-de-junta.js';
+import { capturarAlvo } from '../autoria/alvo-do-ajuste.js';
+import { adaptarThree } from '../autoria/adaptar-three.js';
+import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
 import {
   gravarParametrosNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
 } from './repositorio/gravar-no-github.js';
@@ -477,6 +482,169 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     aoSoltar: () => { historicoParametros.separar(); refletirPendencias(); },
   });
 
+  /* AJUSTE DE JUNTA — o gesto que não passa por parâmetro.
+   *
+   * A seta acima escreve um número declarado no instante do arrasto, e num
+   * quadro em treliça isso não alcança o que a pessoa quer: puxar o balanço
+   * pelo comprimento estica os quatro balanços, porque todos terminam no mesmo
+   * eixo traseiro. Aqui a pessoa pega o canto e arrasta. A malha deforma, a
+   * receita não é tocada, e o que fica guardado é um deslocamento por junta.
+   *
+   * Quem transforma esse deslocamento em receita organizada é a rodada de
+   * absorção, que lê o alvo salvo. Durante o gesto ninguém precisa saber que
+   * número existe. */
+  let neutroDoArquivo = null;
+  let juntasDaPeca = null;
+  let materiaisDaPeca = {};
+  const ajustesDeJunta = new Map();
+  let arrastoDeJunta = null;
+  let modoJuntas = false;
+  const btnJuntas = document.getElementById('btnJuntas');
+  const rodapeJuntas = document.getElementById('rodapeJuntas');
+  const resumoJuntas = document.getElementById('resumoJuntas');
+  const btnSalvarAjusteDeJunta = document.getElementById('btnSalvarAjusteDeJunta');
+  const btnDescartarAjusteDeJunta = document.getElementById('btnDescartarAjusteDeJunta');
+
+  const somar = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+
+  const punhosDeJunta = criarPunhosDeJunta({
+    cena: ambiente.scene,
+    canvas,
+    cameraAtual: () => ambiente.camera,
+    escalaDoModelo: () => modeloAtual?.raiz?.scale?.x ?? 1,
+    aoArrastar(junta, deslocamento) {
+      /* O punho informa o deslocamento desde que o ponteiro desceu. Somar isso
+         ao que a junta já acumulava exige guardar o ponto de partida, senão o
+         segundo arrasto na mesma junta apagaria o primeiro. */
+      if (arrastoDeJunta?.junta !== junta) {
+        arrastoDeJunta = { junta, partida: ajustesDeJunta.get(junta) ?? [0, 0, 0] };
+      }
+      ajustesDeJunta.set(junta, somar(arrastoDeJunta.partida, deslocamento));
+      reconstruirComAjuste();
+    },
+    aoSoltar() {
+      arrastoDeJunta = null;
+      refletirAjusteDeJunta();
+    },
+  });
+
+  function listaDeAjustes() {
+    return [...ajustesDeJunta]
+      .filter(([, d]) => d.some((c) => Math.abs(c) > 1e-9))
+      .map(([junta, deslocamento]) => ({ junta, deslocamento }));
+  }
+
+  /** A malha que a pessoa está vendo: a do arquivo com as juntas arrastadas. */
+  function neutroAjustado() {
+    if (!neutroDoArquivo) return null;
+    const ajustes = listaDeAjustes();
+    if (!ajustes.length) return neutroDoArquivo;
+    return aplicarAjusteDeJunta(neutroDoArquivo, ajustes, { juntas: juntasDaPeca });
+  }
+
+  function reconstruirComAjuste() {
+    const deformado = neutroAjustado();
+    if (!deformado) return;
+    const rotulo = modeloAtual?.rotulo ?? nomePecaAtual;
+    const { caixas, facesSemParte } = caixasPorParte(deformado);
+    const adaptado = adaptarThree(deformado, { nome: rotulo, materiais: materiaisDaPeca });
+    const selecionadasAntes = controlador ? [...controlador.selecionadas] : [];
+    aplicarModelo({
+      nome: modeloAtual?.nome ?? nomePecaAtual,
+      rotulo,
+      medida: { partes: caixas, facesSemParte, portas: portasPublicadas(deformado) },
+      neutro: deformado,
+      materiais: materiaisDaPeca,
+      ...adaptado,
+    }, { preservarCamera: true, deAjuste: true });
+    if (selecionadasAntes.length && controlador) controlador.selecionarMuitas(selecionadasAntes);
+    refletirAjusteDeJunta();
+  }
+
+  function refletirAjusteDeJunta() {
+    const quantas = listaDeAjustes().length;
+    if (rodapeJuntas) {
+      rodapeJuntas.hidden = !modoJuntas;
+      rodapeJuntas.classList.toggle('tem-pendencia', quantas > 0);
+    }
+    if (resumoJuntas) {
+      resumoJuntas.textContent = quantas === 0
+        ? 'nenhuma junta movida'
+        : `${quantas} ${quantas === 1 ? 'junta movida' : 'juntas movidas'}`;
+    }
+    if (btnSalvarAjusteDeJunta) btnSalvarAjusteDeJunta.disabled = quantas === 0;
+    if (btnDescartarAjusteDeJunta) btnDescartarAjusteDeJunta.disabled = quantas === 0;
+    if (modoJuntas && juntasDaPeca && modeloAtual && !punhosDeJunta.arrastando) {
+      modeloAtual.raiz.updateMatrixWorld(true);
+      /* O punho tem de ficar onde o canto está AGORA, e não onde ele estava no
+         arquivo: redesenhar na posição original fazia o punho voltar para trás
+         assim que a pessoa soltava o ponteiro, e o segundo arrasto partia do
+         lugar errado. O canto anda exatamente o que foi acumulado nele. */
+      const movidas = juntasDaPeca.map((junta) => {
+        const d = ajustesDeJunta.get(junta.nome);
+        return d ? { ...junta, posicao: somar(junta.posicao, d) } : junta;
+      });
+      punhosDeJunta.mostrar(movidas, modeloAtual.raiz.matrixWorld);
+    }
+  }
+
+  function definirModoJuntas(ligado) {
+    modoJuntas = Boolean(ligado);
+    btnJuntas?.setAttribute('aria-pressed', String(modoJuntas));
+    btnJuntas?.classList.toggle('ativo', modoJuntas);
+    if (!modoJuntas) {
+      punhosDeJunta.esconder();
+      if (rodapeJuntas) rodapeJuntas.hidden = true;
+      return;
+    }
+    if (!neutroDoArquivo) {
+      mostrarAviso('Sem peça aberta para ajustar.');
+      modoJuntas = false;
+      btnJuntas?.setAttribute('aria-pressed', 'false');
+      btnJuntas?.classList.remove('ativo');
+      return;
+    }
+    if (!juntasDaPeca) juntasDaPeca = detectarJuntas(neutroDoArquivo);
+    /* As setas de parâmetro e os punhos de junta escrevem coisas diferentes, e
+       ter os dois na tela ao mesmo tempo deixaria a pessoa sem saber qual gesto
+       está fazendo. */
+    setasDeParametro.esconder();
+    registroDeEventos.registrar('informacao', 'Ajuste de junta ligado', `${juntasDaPeca.length} juntas`);
+    refletirAjusteDeJunta();
+  }
+
+  function salvarAlvoDoAjuste() {
+    const deformado = neutroAjustado();
+    if (!deformado || !listaDeAjustes().length) return;
+    const alvo = {
+      ...capturarAlvo(deformado, { peca: nomePecaAtual, base: modeloAtual?.rotulo ?? nomePecaAtual }),
+      /* O que a pessoa fez, ao lado de onde ela chegou. A rodada de absorção
+         mede pelo alvo; os gestos existem para ela saber o que perguntar quando
+         duas leituras couberem na mesma medida. */
+      gestos: listaDeAjustes(),
+    };
+    const texto = JSON.stringify(alvo, null, 2);
+    const url = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+    const ligacao = document.createElement('a');
+    ligacao.href = url;
+    ligacao.download = `ajuste-${nomePecaAtual}.json`;
+    ligacao.click();
+    URL.revokeObjectURL(url);
+    registroDeEventos.registrar('informacao', 'Ajuste salvo', `${alvo.gestos.length} juntas`);
+    mostrarAviso('Ajuste salvo. Leve o arquivo para a rodada de absorção.');
+  }
+
+  function descartarAjusteDeJunta() {
+    ajustesDeJunta.clear();
+    arrastoDeJunta = null;
+    reconstruirComAjuste();
+    mostrarAviso('Ajuste descartado: a peça voltou ao que veio do arquivo.');
+  }
+
+  btnJuntas?.addEventListener('click', () => definirModoJuntas(!modoJuntas));
+  btnSalvarAjusteDeJunta?.addEventListener('click', salvarAlvoDoAjuste);
+  btnDescartarAjusteDeJunta?.addEventListener('click', descartarAjusteDeJunta);
+
   function garantirLigacao() {
     if (ligacaoDaPeca || !receitaAberta) return ligacaoDaPeca;
     try {
@@ -509,6 +677,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      isto seria mudar o visor por causa de um controle. */
   (function acompanharCamera() {
     setasDeParametro.atualizarEscala();
+    punhosDeJunta.atualizarEscala();
     requestAnimationFrame(acompanharCamera);
   }());
 
@@ -904,7 +1073,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     };
   }
 
-  function aplicarModelo(convertido, { preservarCamera = false } = {}) {
+  function aplicarModelo(convertido, { preservarCamera = false, deAjuste = false } = {}) {
     if (modeloAtual) {
       modeloAtual.raiz.removeFromParent();
       limparMarcadoresDoPar();
@@ -914,6 +1083,19 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
     modeloAtual = convertido;
     nomePecaAtual = convertido.nome ?? 'sessao-ativa';
+
+    /* A base do ajuste é a peça COMO ELA VEIO DO ARQUIVO. Uma reconstrução
+       causada pelo próprio arrasto não vira base nova: se virasse, cada
+       movimento do ponteiro passaria a contar a partir do movimento anterior e
+       o deslocamento acumulado dobraria a cada quadro. */
+    if (!deAjuste) {
+      neutroDoArquivo = convertido.neutro ?? null;
+      materiaisDaPeca = convertido.materiais ?? {};
+      juntasDaPeca = null;
+      ajustesDeJunta.clear();
+      arrastoDeJunta = null;
+      if (modoJuntas) definirModoJuntas(Boolean(neutroDoArquivo));
+    }
     document.getElementById('fixtureAtual').textContent = formatarNome(convertido.rotulo);
     estadoDaBancada.peca = formatarNome(convertido.rotulo);
     registroDeEventos.registrar('informacao', 'Peça carregada', formatarNome(convertido.rotulo));

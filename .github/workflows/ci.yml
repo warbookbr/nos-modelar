@@ -118,6 +118,12 @@ jobs:
       - name: A seta move a parte na medida do arrasto
         run: npm run guarda:seta
 
+      # Num quadro em treliça nenhum parâmetro empurra um tubo inteiro, então o
+      # gesto passou a ser o canto. O que só aparece no navegador é o arrasto
+      # sobreviver à reconstrução da malha que ele mesmo dispara.
+      - name: Arrastar a junta deforma só quem passa por ela
+        run: npm run guarda:junta
+
       # A régua de contato existia, saía com código de erro e nenhum gate a
       # chamava; foi assim que um quadro saiu em pedaços que não se tocavam.
       - name: O acervo cumpre o plano e os contatos que declara

@@ -27,6 +27,7 @@ export function processarReceitaSessao(receita, { nome = 'Sessão Ativa' } = {})
     raiz: adaptado.raiz,
     receita,
     neutro,
+    materiais,
   };
 }
 

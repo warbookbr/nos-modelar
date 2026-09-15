@@ -40,6 +40,11 @@ export async function carregarPeca(nome, { catalogo = CATALOGO_HOMOLOGADO } = {}
     nome,
     rotulo: peca.meta?.nome ?? nome,
     medida: { partes: caixas, facesSemParte, portas },
+    /* O estado neutro segue junto porque o ajuste de junta trabalha nele: as
+       juntas são achadas nos vértices da peça, e a malha deformada é construída
+       a partir daqui, sem passar pela receita. */
+    neutro,
+    materiais,
     ...adaptarThree(neutro, { nome: peca.meta?.nome ?? nome, materiais }),
   };
 }

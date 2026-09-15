@@ -121,3 +121,14 @@ describe('aplicarAjusteDeJunta', () => {
     expect(detectarJuntas(executar(), { raio: 0.0005 }).length).toBeLessThan(6);
   });
 });
+
+describe('orçamento do arrasto', () => {
+  it('aceita as juntas já detectadas e chega no mesmo resultado', () => {
+    const base = executar();
+    const juntas = detectarJuntas(base);
+    const ajuste = [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.012] }];
+    const comLista = aplicarAjusteDeJunta(base, ajuste, { juntas });
+    const semLista = aplicarAjusteDeJunta(base, ajuste);
+    expect(JSON.stringify([...comLista.V.entries()])).toBe(JSON.stringify([...semLista.V.entries()]));
+  });
+});
