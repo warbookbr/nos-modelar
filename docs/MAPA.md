@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-850 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+852 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -713,6 +713,8 @@
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `alterar-montagem.js` — alterar-montagem.js — alteração semântica compacta de montagem persistida.
+- `alvo-do-ajuste.js` — alvo-do-ajuste.js — o que a pessoa deixou na bancada, escrito como medida.
+- `alvo-do-ajuste.test.js` — alvo-do-ajuste.test.js — a régua que decide se a receita reescrita chegou onde a pessoa deixou a peça na bancada.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
