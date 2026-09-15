@@ -2,7 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Modo de edição de malha](2026-09-15-modo-de-edicao-de-malha.md) (2026-09-15-modo-de-edicao-de-malha.md).
+
+O gesto por junta move os cantos onde as partes se encontram e nada além disso, e
+o autor recusou por ser complexo demais: ele quer o que já sabe usar, que é o modo
+de edição do Blender. A restrição que justificava limitar o gesto caiu quando o
+caminho de volta ficou pronto, porque a rodada de absorção trabalha com qualquer
+malha deformada. O plano entrega selecionar e mover vértice, aresta e face, com
+as teclas de sempre, e uma medida de alvo que enxergue abaixo da caixa da parte.
+Extrudar, duplicar e apagar mudam topologia e ficam para o plano seguinte, que é
+escrito assim que este fechar.
+
 
 O [ajuste da bancada volta como receita](encerrados/2026-09-14-ajuste-da-bancada-volta-como-receita.md)
 foi **concluído** em 2026-09-15. A bancada exigia que todo gesto caísse num
