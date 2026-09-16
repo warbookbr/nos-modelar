@@ -74,15 +74,6 @@
               <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
               <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" checked /></label>
             </div>
-            <h4 class="secao-modal">Gravar no repositório</h4>
-            <p class="modal-descricao">Sem isto, mexer um parâmetro vale só nesta sessão. O token fica guardado neste navegador — use um <code>fine-grained</code> de um repositório só, com permissão de conteúdo para escrita.</p>
-            <div class="linhas">
-              <label class="linha"><span>Dono</span><input id="repoDono" type="text" placeholder="warbookbr" /></label>
-              <label class="linha"><span>Repositório</span><input id="repoNome" type="text" placeholder="nos-mecanifica" /></label>
-              <label class="linha"><span>Ramo</span><input id="repoRamo" type="text" placeholder="main" /></label>
-              <label class="linha"><span>Token</span><input id="repoToken" type="password" placeholder="github_pat_…" /></label>
-            </div>
-            <button id="btnSalvarRepo" class="botao texto" type="button">Guardar neste navegador</button>
           </div>
         </div>
       </div>
@@ -149,7 +140,6 @@
         <button class="recolher" type="button" data-recolher="inspecao" aria-expanded="true" title="Recolher Inspeção"><span aria-hidden="true">›</span><span class="sr">Inspeção</span></button>
         <nav class="abas-painel" role="tablist">
           <button type="button" class="aba-btn ativa" data-aba="inspecao" role="tab" aria-selected="true">Inspeção</button>
-          <button type="button" class="aba-btn" data-aba="parametros" role="tab" aria-selected="false">Parâmetros</button>
           <button type="button" class="aba-btn" data-aba="referencias" role="tab" aria-selected="false">IA & Ref</button>
           <button type="button" class="aba-btn" data-aba="anotacoes" role="tab" aria-selected="false">Anotações</button>
         </nav>
@@ -206,18 +196,6 @@
             <summary><span class="rotulo">PORTAS</span> <span id="resumoPortas">0 publicadas</span></summary>
             <ul id="listaPortas" class="lista-portas"></ul>
           </details>
-        </div>
-
-        <!-- ABA 2: PARÂMETROS -->
-        <div id="abaConteudoParametros" class="aba-conteudo" hidden>
-          <h2>Parâmetros da Peça</h2>
-          <p class="resumo">Ajuste dimensões e variáveis procedurais em tempo real.</p>
-          <div id="containerParametros"></div>
-          <footer class="rodape-parametros" id="rodapeParametros" hidden>
-            <span id="resumoPendentes">nada para salvar</span>
-            <button id="btnSalvarParametros" class="botao primaria" type="button" disabled>Salvar</button>
-          </footer>
-
         </div>
 
         <!-- ABA 3: REFERÊNCIAS & INTENÇÃO DA IA -->

@@ -4,7 +4,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
-import { escritaDeParametro } from './tools/bancadas/servir-escrita.mjs';
 import { descreverVersao, lerVersaoPublicada } from './tools/bancadas/versao-publicada.mjs';
 
 /* A versão entra como texto fixo no pacote: a página publicada não tem git para
@@ -19,7 +18,7 @@ export default defineConfig({
   define: { __VERSAO_DA_BANCADA__: JSON.stringify(VERSAO_DA_BANCADA) },
   /* Só no servidor de desenvolvimento: a página publicada não escreve arquivo
      nenhum, e quem a abre não tem o repositório para escrever nele. */
-  plugins: [escritaDeParametro()],
+  plugins: [],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

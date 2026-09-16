@@ -157,8 +157,7 @@ parâmetro diferente: o espalhamento AVALIA o getter uma vez com a tabela velha 
 guarda o resultado como valor fixo, então o número novo não tem efeito e a peça
 parece insensível ao parâmetro. Copie por descritores
 (`Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita))`) e só
-então troque `PARAMS`. Medido em
-`tools/mecanifica/ponte-gesto-parametro.test.mjs`.
+então troque `PARAMS`. Vale em qualquer código que copie uma receita.
 
 Quando a função pretendida não for óbvia pela geometria, exporte o contrato
 opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare

@@ -119,10 +119,6 @@ jobs:
       - name: A leitura periódica não desfaz a escolha da peça
         run: npm run guarda:escolha
 
-      # Quatro defeitos ao mesmo tempo no gesto direto, cada um escondendo o
-      # outro, e nenhum visível em teste de unidade.
-      - name: A seta move a parte na medida do arrasto
-        run: npm run guarda:seta
 
       # Num quadro em treliça nenhum parâmetro empurra um tubo inteiro, então o
       # gesto passou a ser o canto. O que só aparece no navegador é o arrasto

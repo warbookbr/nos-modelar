@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-870 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -745,8 +745,6 @@
 - `derivar-roteiro-revalidacao.js` — derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas.
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
-- `escrever-parametro.js` — escrever-parametro.js — troca UM número declarado na receita, no arquivo.
-- `escrever-parametro.test.js` — escrever-parametro.test.js — a escrita de UM número, e o arquivo intacto quando ela é recusada.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
 - `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
@@ -759,8 +757,6 @@
 - `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
-- `ligacao-parte-parametro.js` — ligacao-parte-parametro.js — qual parâmetro move qual parte.
-- `ligacao-parte-parametro.test.js` — ligacao-parte-parametro.test.js — qual parâmetro move qual parte, MEDIDO.
 - `material-da-peca.js` — material-da-peca.js — tudo que pertence a uma peça, e onde está hoje.
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
@@ -780,8 +776,6 @@
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `servico-fluxo-autoria.js` — Fachada pura e serializável da N1 para clientes internos caixa-preta.
 - `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
-- `setas-por-eixo.js` — setas-por-eixo.js — qual parâmetro cada seta governa, e quanto ela anda.
-- `setas-por-eixo.test.js` — setas-por-eixo.test.js — a seta de um eixo não pode mover a peça noutro.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
@@ -815,11 +809,6 @@
 - `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
 - `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
-- `setas-de-parametro.js` — setas-de-parametro.js — as três setas por eixo, ligadas a um parâmetro.
-
-## src/bancada/parametros/
-
-- `painel-parametros.js` — painel-parametros.js — gera sliders e campos numéricos interativos para ajuste fino pelo humano.
 
 ## src/bancada/preferencias/
 
@@ -838,11 +827,6 @@
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
 - `prancha-overlay.test.js` — prancha-overlay.test.js — plano de foto é apresentação, não modelo procedural.
-
-## src/bancada/repositorio/
-
-- `gravar-no-github.js` — gravar-no-github.js — a bancada publicada gravando no repositório.
-- `gravar-no-github.test.js` — gravar-no-github.test.js — a gravação pela API confere antes de publicar.
 
 ## src/bancada/sessao/
 
@@ -878,8 +862,6 @@
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
-- `servir-escrita.mjs` — servir-escrita.mjs — o único caminho da bancada até o arquivo da receita.
-- `servir-escrita.test.mjs` — servir-escrita.test.mjs — o atendente escreve dentro do acervo, e só ali.
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
 - `versao-publicada.mjs` — versao-publicada.mjs — de qual commit veio a página que está aberta.
 - `versao-publicada.test.mjs` — versao-publicada.test.mjs — prova que a versão na tela diz a verdade sobre a construção, inclusive quando não há git, não há commit ou a árvore está suja.
@@ -1057,7 +1039,6 @@
 - `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
-- `guarda-seta-de-parametro.mjs` — guarda-seta-de-parametro.mjs — mexer num parâmetro não faz a peça escorregar.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
@@ -1084,7 +1065,6 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
-- `ponte-gesto-parametro.test.mjs` — ponte-gesto-parametro.test.mjs — RETRATO DO ESTADO ANTES DA PONTE.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).

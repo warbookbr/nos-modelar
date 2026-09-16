@@ -5,18 +5,11 @@ import { carregarPeca } from './carregar-peca.js';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
 import { listarAcervo } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
-import { parametroDeclarado } from '../autoria/parametros-declarados.js';
-import { ligarPartesAParametros, parametrosDaParte } from '../autoria/ligacao-parte-parametro.js';
-import { escolherSetas } from '../autoria/setas-por-eixo.js';
-import { criarSetasDeParametro } from './controles/setas-de-parametro.js';
 import { criarPunhosDeJunta } from './controles/punhos-de-junta.js';
 import { aplicarAjusteDeJunta, detectarJuntas } from '../autoria/ajuste-de-junta.js';
 import { capturarAlvo } from '../autoria/alvo-do-ajuste.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
-import {
-  gravarParametrosNoGitHub, lerConfiguracaoRepositorio, salvarConfiguracaoRepositorio,
-} from './repositorio/gravar-no-github.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
@@ -27,7 +20,6 @@ import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
 import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { urlDaReferencia } from './referencias/imagens-da-peca.js';
-import { criarPainelParametros } from './parametros/painel-parametros.js';
 import { criarPreferenciasBancada } from './preferencias/estado-local.js';
 import { criarRegistroAtalhos, normalizarCombinacao } from './controles/atalhos.js';
 import { criarHistoricoParametros } from './controles/historico-parametros.js';
@@ -297,207 +289,38 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      valor novo e reexecuta, em vez de deformar a malha na tela. */
   let receitaAberta = null;
 
-  /* O que a pessoa mexeu e ainda não salvou. A prévia aplica TODAS as pendentes
-     a cada quadro: aplicar só a última desfaria as anteriores na tela, e a peça
-     mostraria um estado que não é nem o gravado nem o pedido. */
-  const pendentes = new Map();
-
-  /* Os valores que a peça tinha quando foi aberta, lidos do arquivo. São o piso
-     do desfazer: Ctrl+Z devolve o que a sessão mexeu e para aqui, porque abaixo
-     disto não existe estado anterior que esta sessão tenha produzido. */
-  let origemDosParametros = new Map();
+  /* PARÂMETRO SAIU DA BANCADA. A aba de parâmetros, as setas por eixo e o botão
+     de gravar existiam para a pessoa digitar um número medido da receita sem
+     abrir código. Na prática o autor não os usava, e a IA nunca usou o painel —
+     ela edita o arquivo da receita direto, onde vê o contexto inteiro. Dois
+     caminhos para a mesma coisa, um deles sem uso, e os dois disputando a tela
+     com o gizmo de mover.
+     Agora a bancada é o lugar de desenhar, e o número medido é assunto da
+     receita. O que a pessoa desenha sai como alvo e a rodada de absorção
+     escreve. O histórico continua aqui porque o Ctrl+Z da malha usa ele. */
+  /* A malha como ela veio do arquivo. É o piso do desfazer: Ctrl+Z devolve o que
+     esta sessão desenhou e para aqui, porque abaixo disto não existe estado
+     anterior que ela tenha produzido. */
   let origemDaMalha = null;
   /* O que o controlador de câmera usa fora do modo de edição, guardado para ser
      devolvido na saída. */
   const BOTOES_DE_CAMERA_PADRAO = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
   const historicoParametros = criarHistoricoParametros({
-    valorDeOrigem: (chave) => (chave === '__edicao_de_malha__'
-      ? origemDaMalha
-      : origemDosParametros.has(chave)
-      ? origemDosParametros.get(chave)
-      : parametroDeclarado(receitaAberta, chave)?.valor),
+    valorDeOrigem: (chave) => (chave === '__edicao_de_malha__' ? origemDaMalha : undefined),
   });
 
-  function anotarOrigem(chave) {
-    if (origemDosParametros.has(chave)) return;
-    const declarado = parametroDeclarado(receitaAberta, chave);
-    if (declarado) origemDosParametros.set(chave, declarado.valor);
-  }
-
-  /* Aplica o valor e redesenha, SEM registrar no histórico: é por aqui que o
-     próprio desfazer devolve o valor, senão desfazer viraria mais um passo e a
-     pilha nunca esvaziaria. */
-  function aplicarValor(chave, valor) {
-    if (!receitaAberta) return;
-    const declarado = parametroDeclarado(receitaAberta, chave);
-    if (!declarado) return;
-    /* Pendente é o que difere do arquivo. Quando o valor volta a ser o que a
-       receita já tem, a pendência sai da lista: mantê-la faria o salvar
-       reescrever o mesmo número, e o texto da receita deixaria de voltar byte a
-       byte ao que estava. */
-    if (Object.is(valor, declarado.valor)) pendentes.delete(chave);
-    else pendentes.set(chave, valor);
-    refletirPendencias();
-
-    let params = receitaAberta.PARAMS;
-    for (const [id, v] of pendentes) {
-      const alvo = parametroDeclarado(receitaAberta, id);
-      if (alvo) params = comCaminho(params, alvo.caminho, v);
-    }
-    /* A prévia reconstrói o modelo, e reconstruir destrói o controlador junto
-       com a seleção — no meio de um arrasto de seta isso apagava a seleção e
-       fazia as próprias setas sumirem. A seleção da bancada é por NOME, então
-       ela sobrevive à reconstrução: basta devolvê-la depois. */
-    const selecionadasAntes = controlador ? [...controlador.selecionadas] : [];
-    sincronizador?.definirPayload({
-      alvo: { nome: idNaUrl ?? nomePecaAtual },
-      receita: receitaComParametros(receitaAberta, params),
-    });
-    if (selecionadasAntes.length && controlador) {
-      controlador.selecionarMuitas(selecionadasAntes);
-    }
-  }
-
-  function previaDeParametro(chave, valor) {
-    if (!receitaAberta || !parametroDeclarado(receitaAberta, chave)) return;
-    anotarOrigem(chave);
-    historicoParametros.registrar(chave, valor);
-    aplicarValor(chave, valor);
-  }
-
-  /* Ctrl+Z devolve o valor anterior de um parâmetro mexido nesta sessão e para
-     no estado que veio do arquivo: com a pilha vazia, o comando não faz nada e
-     não inventa passo anterior. */
-  function desfazerParametro() {
+  /* Ctrl+Z devolve o que esta sessão desenhou na malha e para no estado que veio
+     do arquivo: com a pilha vazia, o comando não faz nada e não inventa estado
+     anterior. */
+  function desfazerDesenho() {
     const passo = historicoParametros.desfazer();
-    if (!passo) return false;
-    if (passo.chave === '__edicao_de_malha__') {
-      if (!edicaoDeMalha) return false;
-      edicaoDeMalha.restaurar(passo.valor);
-      mostrarAviso(historicoParametros.vazio
-        ? 'Desfeito: a malha voltou ao que veio do arquivo.'
-        : 'Desfeito movimento de malha.');
-      return true;
-    }
-    aplicarValor(passo.chave, passo.valor);
-    painelParametros?.refletirValor?.(passo.chave, passo.valor);
+    if (!passo || passo.chave !== '__edicao_de_malha__' || !edicaoDeMalha) return false;
+    edicaoDeMalha.restaurar(passo.valor);
     mostrarAviso(historicoParametros.vazio
-      ? 'Desfeito: a peça voltou ao que veio do arquivo.'
-      : `Desfeito ${passo.chave}.`);
+      ? 'Desfeito: a malha voltou ao que veio do arquivo.'
+      : 'Desfeito o último movimento.');
     return true;
   }
-
-  /* Duas portas para o mesmo destino, e o destino é sempre o arquivo da receita.
-     Quem roda a bancada a partir do repositório tem o atendente local, que
-     escreve direto no disco. Quem abre o endereço publicado não tem arquivo
-     nenhum, e aí a gravação vai pela API do GitHub com o token da própria
-     pessoa, virando um commit. Sem nenhuma das duas, o valor vale como prévia
-     nesta sessão e a bancada diz isso.
-
-     UM SALVAR, UMA GRAVAÇÃO. Gravar a cada gesto encheria o histórico de
-     estados intermediários que ninguém escolheu, dispararia a integração
-     contínua a cada arrasto, e abriria uma janela por gesto para outra pessoa
-     commitar no meio da sequência. */
-  const CAMINHO_ACERVO = 'prototipos/procedural/v3/pecas';
-  const rodapeParametros = document.getElementById('rodapeParametros');
-  const resumoPendentes = document.getElementById('resumoPendentes');
-  const btnSalvarParametros = document.getElementById('btnSalvarParametros');
-
-  function refletirPendencias() {
-    if (!rodapeParametros) return;
-    const quantas = pendentes.size;
-    rodapeParametros.hidden = !receitaAberta;
-    rodapeParametros.classList.toggle('tem-pendencia', quantas > 0);
-    btnSalvarParametros.disabled = quantas === 0;
-    resumoPendentes.textContent = quantas === 0
-      ? 'nada para salvar'
-      : `${quantas} ${quantas === 1 ? 'alteração' : 'alterações'} sem salvar`;
-  }
-
-  async function gravarNoAtendenteLocal(mudancas) {
-    const resposta = await fetch('/api/parametro', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ peca: idNaUrl, mudancas }),
-    });
-    return resposta.json();
-  }
-
-  async function salvarPendentes() {
-    if (pendentes.size === 0) return;
-    if (!idNaUrl) {
-      mostrarAviso('Esta peça veio da sessão da IA; abra pelo acervo para gravar no arquivo.');
-      return;
-    }
-
-    const mudancas = Object.fromEntries(pendentes);
-    btnSalvarParametros.disabled = true;
-    mostrarAviso(`Salvando ${pendentes.size} alteração(ões)…`);
-
-    let resultado = null;
-    try {
-      resultado = await gravarNoAtendenteLocal(mudancas);
-    } catch {
-      resultado = null;
-    }
-
-    if (!resultado) {
-      const config = lerConfiguracaoRepositorio();
-      if (!config) {
-        mostrarAviso('O valor vale como prévia: configure o repositório em Configurações para gravar.');
-        refletirPendencias();
-        return;
-      }
-      resultado = await gravarParametrosNoGitHub({
-        config,
-        caminhoNoRepo: `${CAMINHO_ACERVO}/${idNaUrl}.js`,
-        mudancas,
-      });
-    }
-
-    if (resultado.estado === 'aplicado') {
-      for (const { id, para } of resultado.aplicadas ?? []) {
-        const alvo = parametroDeclarado(receitaAberta, id);
-        if (receitaAberta && alvo) {
-          receitaAberta.PARAMS = comCaminho(receitaAberta.PARAMS, alvo.caminho, para);
-        }
-      }
-      pendentes.clear();
-      refletirPendencias();
-      const quantas = resultado.aplicadas?.length ?? 0;
-      mostrarAviso(`${quantas} salva(s)${resultado.commit ? ' num commit' : ' na receita'}.`);
-      return;
-    }
-
-    refletirPendencias();
-    mostrarAviso(`Não salvei: ${resultado.motivo}`);
-  }
-
-  btnSalvarParametros?.addEventListener('click', () => { salvarPendentes(); });
-
-  /* As setas por eixo na parte selecionada. A ligação entre parte e parâmetro
-     custa uma execução por parâmetro — dois segundos na bicicleta —, então ela
-     é calculada UMA vez por peça aberta e guardada. Calcular a cada seleção
-     travaria a bancada a cada clique. */
-  let ligacaoDaPeca = null;
-
-  const setasDeParametro = criarSetasDeParametro({
-    cena: ambiente.scene,
-    canvas,
-    cameraAtual: () => ambiente.camera,
-    valorAtual: (id) => (pendentes.has(id)
-      ? pendentes.get(id)
-      : parametroDeclarado(receitaAberta, id)?.valor ?? 0),
-    passoDe: (id) => parametroDeclarado(receitaAberta, id)?.passo ?? 1,
-    escalaDoModelo: () => modeloAtual?.raiz?.scale?.x ?? 1,
-    limitesDe: (id) => {
-      const declarado = parametroDeclarado(receitaAberta, id);
-      return { min: declarado?.min, max: declarado?.max };
-    },
-    aoArrastar: previaDeParametro,
-    aoSoltar: () => { historicoParametros.separar(); refletirPendencias(); },
-  });
-
   /* AJUSTE DE JUNTA — o gesto que não passa por parâmetro.
    *
    * A seta acima escreve um número declarado no instante do arrasto, e num
@@ -621,10 +444,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       return;
     }
     if (!juntasDaPeca) juntasDaPeca = detectarJuntas(neutroDoArquivo);
-    /* As setas de parâmetro e os punhos de junta escrevem coisas diferentes, e
-       ter os dois na tela ao mesmo tempo deixaria a pessoa sem saber qual gesto
-       está fazendo. */
-    setasDeParametro.esconder();
     registroDeEventos.registrar('informacao', 'Ajuste de junta ligado', `${juntasDaPeca.length} juntas`);
     refletirAjusteDeJunta();
   }
@@ -661,62 +480,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   btnSalvarAjusteDeJunta?.addEventListener('click', salvarAlvoDoAjuste);
   btnDescartarAjusteDeJunta?.addEventListener('click', descartarAjusteDeJunta);
 
-  function garantirLigacao() {
-    if (ligacaoDaPeca || !receitaAberta) return ligacaoDaPeca;
-    try {
-      ligacaoDaPeca = ligarPartesAParametros(receitaAberta);
-    } catch (erro) {
-      console.warn('não consegui ligar partes a parâmetros', erro);
-      ligacaoDaPeca = { porParte: {}, porParametro: {}, inertes: [], partes: [] };
-    }
-    return ligacaoDaPeca;
-  }
-
-  function refletirSetas(selecionadas) {
-    /* AS SETAS DE PARÂMETRO SAÍRAM DA CENA. Elas e o gizmo de mover apareciam
-       juntas na parte selecionada, em tamanhos diferentes, e não havia como
-       saber qual gesto cada uma fazia — o autor relatou a confusão com as duas
-       na tela. Escolher a peça passa a mostrar UM punho, o de mover, que é o que
-       ele espera ao clicar. Os números declarados continuam inteiros na aba de
-       parâmetros, com campo e arrasto; o que se perdeu foi a duplicata na cena. */
-    return setasDeParametro.esconder();
-  }
-
-  function refletirSetasDeParametro(selecionadas) {
-    if (!receitaAberta || selecionadas.length !== 1) return setasDeParametro.esconder();
-
-    const ligacao = garantirLigacao();
-    const caixa = modeloAtual?.medida?.partes?.get?.(selecionadas[0]);
-    if (!caixa) return setasDeParametro.esconder();
-
-    return setasDeParametro.mostrar({
-      centro: new THREE.Vector3(...caixa.centro),
-      ligacoes: escolherSetas(parametrosDaParte(ligacao, selecionadas[0])),
-    });
-  }
-
-  /* A seta tem tamanho constante na tela, então ela precisa reagir à câmera a
+  /* O punho tem tamanho constante na tela, então ele precisa reagir à câmera a
      cada quadro. O ambiente não publica gancho de quadro, e abrir um só para
      isto seria mudar o visor por causa de um controle. */
   (function acompanharCamera() {
-    setasDeParametro.atualizarEscala();
     punhosDeJunta.atualizarEscala();
-    edicaoDeMalha?.acompanharCamera?.();
     edicaoDeMalha?.acompanharCamera?.();
     requestAnimationFrame(acompanharCamera);
   }());
-
-  const painelParametros = criarPainelParametros({
-    container: document.getElementById('containerParametros'),
-    aoArrastar: previaDeParametro,
-    /* Assentar o valor não grava: confirma a pendência e FECHA o gesto, para
-       que o arrasto inteiro conte como um único desfazer. Quem grava é o
-       botão. */
-    aoSoltar: (chave, valor) => {
-      previaDeParametro(chave, valor);
-      historicoParametros.separar();
-    },
-  });
 
   const gerenciadorAnotacoes3D = criarGerenciadorAnotacoes3D({
     canvas,
@@ -892,7 +663,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       linha.setAttribute('aria-pressed', String(ativa));
       linha.querySelector('.check').textContent = ativa ? '✓' : '';
     }
-    refletirSetas(estado.selecionadas);
     prepararMoverParte(estado.selecionadas);
     const temSelecao = estado.selecionadas.length > 0;
     resumo.textContent = temSelecao
@@ -1430,7 +1200,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     if (!combinacao) return;
     if (registroAtalhos.deveIgnorar(evento.target)) return;
     evento.preventDefault();
-    if (!desfazerParametro()) {
+    if (!desfazerDesenho()) {
       mostrarAviso('Nada para desfazer nesta sessão.');
     }
   }
@@ -1507,41 +1277,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      pela IA e sobrescreve quando chegar. */
   const listaAcervo = document.getElementById('listaAcervo');
 
-  /* A configuração do repositório mora no navegador de quem digitou, e o campo
-     do token nunca é preenchido de volta: mostrar segredo guardado na tela não
-     ajuda ninguém a conferir e ajuda quem passa por trás. */
-  const camposRepo = {
-    dono: document.getElementById('repoDono'),
-    repo: document.getElementById('repoNome'),
-    ramo: document.getElementById('repoRamo'),
-    token: document.getElementById('repoToken'),
-  };
-
-  function refletirRepositorio() {
-    const config = lerConfiguracaoRepositorio();
-    if (!config) return;
-    camposRepo.dono.value = config.dono;
-    camposRepo.repo.value = config.repo;
-    camposRepo.ramo.value = config.ramo;
-    camposRepo.token.placeholder = 'guardado neste navegador';
-  }
-
-  refletirRepositorio();
-  document.getElementById('btnSalvarRepo')?.addEventListener('click', () => {
-    const guardado = lerConfiguracaoRepositorio();
-    const config = salvarConfiguracaoRepositorio({
-      dono: camposRepo.dono.value.trim(),
-      repo: camposRepo.repo.value.trim(),
-      ramo: camposRepo.ramo.value.trim() || 'main',
-      token: camposRepo.token.value.trim() || guardado?.token || '',
-    });
-    camposRepo.token.value = '';
-    mostrarAviso(config
-      ? `Gravação ligada em ${config.dono}/${config.repo}, ramo ${config.ramo}.`
-      : 'Faltou dono, repositório ou token.');
-    refletirRepositorio();
-  });
-
   /* A sobreposição vem da PASTA DA PEÇA, e não de uma cópia em `public/`. A
      receita declara quais imagens são dela, e a primeira declarada que for
      imagem serve de sobreposição. Antes disso a foto vinha do estado local da
@@ -1574,12 +1309,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          mesma medição e o mesmo tratamento de erro. */
       idNaUrl = entrada.id;
       receitaAberta = receita;
-      ligacaoDaPeca = null;
-      pendentes.clear();
       /* Peça nova, sessão nova: o piso do desfazer passa a ser o que veio do
          arquivo desta peça, e a pilha da anterior não pode sobreviver. */
       historicoParametros.limpar();
-      origemDosParametros = new Map();
       origemDaMalha = null;
       escolhaManual = true;
       /* Abrir é peça nova mesmo quando é a mesma peça: quem abre espera vê-la
@@ -1895,10 +1627,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
         referencias: estado.referencias,
       });
       gerenciadorReferencias3D.sincronizarComSessao(estado.referencias);
-      painelParametros?.renderizar({
-        receita: novoModelo?.receita ?? estado.receita,
-        parametros: estado.parametros,
-      });
       gerenciadorAnotacoes3D.sincronizarAnotacoes(estado.anotacoes);
       renderizarListaAnotacoes(estado.anotacoes);
   }
