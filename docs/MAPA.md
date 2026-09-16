@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-867 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+868 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -716,6 +716,7 @@
 
 ## src/autoria/
 
+- `absorcao-da-edicao.test.js` — absorcao-da-edicao.test.js — o laço inteiro: a pessoa edita a malha, a receita é reescrita, e a medida diz se chegou.
 - `adaptar-montagem-three.js` — adaptar-montagem-three.js — projeta uma montagem resolvida em cena Three.js.
 - `adaptar-three.js` — adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido.
 - `adaptar-three.test.js` — adaptar-three.test.js — a malha da cena carrega de qual vértice neutro cada posição veio, que é o que permite a edição devolver o movimento à malha.
