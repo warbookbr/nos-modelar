@@ -1622,7 +1622,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
          sincronizador caía e a seleção pedida por --selecionadas nunca chegava a
          ser aplicada — a captura saía com a montagem inteira e sem foco. */
       painelReferencias?.renderizar({
-        intencaoIA: estado.intencaoIA,
         referencias: estado.referencias,
       });
       gerenciadorReferencias3D.sincronizarComSessao(estado.referencias);
@@ -1680,16 +1679,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
           { id: 'crit-1', texto: 'Furo central Ø 0.56 com folga para rolamento', status: 'aprovado' },
           { id: 'crit-2', texto: 'Espessura da coroa ≥ 0.35 mm', status: 'aprovado' },
           { id: 'crit-3', texto: 'Ângulo cônico padrão 45°', status: 'pendente' },
-        ],
-      },
-      intencaoIA: {
-        titulo: 'Engrenagem Cônica de Demonstração',
-        resumo: 'Modelagem paramétrica baseada no padrão de acionamento mecânico.',
-        checklist: [
-          { id: 'c1', descricao: 'Gerar cilindro base da coroa', concluido: true },
-          { id: 'c2', descricao: 'Extrudar cubo central de engate', concluido: true },
-          { id: 'c3', descricao: 'Executar furo passante do eixo', concluido: true },
-          { id: 'c4', descricao: 'Publicar interface de acoplamento', concluido: true },
         ],
       },
       parametros: {

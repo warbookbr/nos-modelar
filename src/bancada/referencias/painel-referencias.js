@@ -1,6 +1,6 @@
 /* painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D. */
 import { criarModalReferencia } from './modal-referencia.js';
-import { normalizarChecklist, normalizarCriterios } from '../sessao/estado-sessao.js';
+import { normalizarCriterios } from '../sessao/estado-sessao.js';
 
 export function criarPainelReferencias({
   container,
@@ -129,37 +129,18 @@ export function criarPainelReferencias({
     container.appendChild(bloco);
   }
 
-  function renderizar({ intencaoIA, referencias }) {
+  function renderizar({ referencias }) {
     container.replaceChildren();
     adicionarControleImagem();
 
-    // 1. Bloco de Intenção e Status da IA
-    const blocoIntencao = document.createElement('section');
-    blocoIntencao.className = 'bloco-referencia';
-    blocoIntencao.innerHTML = `
-      <div class="bloco-cabecalho">
-        <span class="rotulo">RACIONAL DA IA</span>
-        <h3>${intencaoIA?.titulo || 'Sem ciclo de modelagem ativo'}</h3>
-      </div>
-      <p class="resumo-ia">${intencaoIA?.resumo || 'Aguardando especificações ou comandos do operador.'}</p>
-    `;
-
-    const checklist = normalizarChecklist(intencaoIA?.checklist);
-    if (checklist.length > 0) {
-      const listaChecklist = document.createElement('ul');
-      listaChecklist.className = 'checklist-ia';
-      for (const item of checklist) {
-        const li = document.createElement('li');
-        li.className = item.concluido ? 'concluido' : 'pendente';
-        li.innerHTML = `
-          <span class="icone-check">${item.concluido ? '✓' : '○'}</span>
-          <span class="texto-check">${item.descricao}</span>
-        `;
-        listaChecklist.appendChild(li);
-      }
-      blocoIntencao.appendChild(listaChecklist);
-    }
-    container.appendChild(blocoIntencao);
+    /* O BLOCO DE RACIONAL DA IA SAIU. Ele mostrava o título, o resumo e a lista
+       de conferência do que a IA estaria modelando, e essa informação chegaria
+       pela sessão ativa. Nada nunca escreveu esses campos: o painel ficava
+       permanentemente em "Aguardando alvo da IA", ocupando o topo da aba para
+       não dizer nada. Promessa sem ninguém do outro lado é pior que espaço
+       vazio, porque quem lê fica procurando o que ligar.
+       Se a IA voltar a anunciar o que está fazendo, o lugar disso é o painel de
+       Estado, que já existe e já é lido. */
 
     // 2. Bloco de Imagens de Referência Visual
     const imagens = referencias?.imagens || [];
