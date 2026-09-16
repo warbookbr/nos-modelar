@@ -101,9 +101,12 @@ const ler = () => pagina.evaluate(() => {
     for (let i = 0; i < posicao.count; i += 1) {
       const p = new V(posicao.getX(i), posicao.getY(i), posicao.getZ(i));
       pontos.localToWorld(p);
+      const distancia = ambiente.camera.position.distanceTo(p);
       const projetado = p.project(ambiente.camera);
       if (Math.abs(projetado.x) > 1 || Math.abs(projetado.y) > 1 || projetado.z > 1) continue;
       naTela.push({
+        indice: i,
+        distancia,
         x: (projetado.x * 0.5 + 0.5) * rect.width + rect.left,
         y: (-projetado.y * 0.5 + 0.5) * rect.height + rect.top,
       });
@@ -243,6 +246,72 @@ try {
     ok(`clicar com ${tremida}px de tremida ainda seleciona`, pegou === amostraDeVertices.length,
       `${pegou} de ${amostraDeVertices.length}`);
   }
+
+  /* CLICAR NUM E VIR OUTRO. O raio escolhe o primeiro que ele encontra no
+     caminho, e isso não é o que a pessoa vê: dois vértices podem estar a um
+     pixel um do outro na imagem e longe um do outro no espaço, e o raio prefere
+     o mais perto da câmera mesmo com o ponteiro em cima do outro.
+     A prova pega os vértices que mais se sobrepõem na tela — os que têm vizinho
+     a menos de dez pixels — e clica exatamente em cima de cada um. O que vem
+     tem de ser aquele, e não o vizinho. */
+  /* Leitura fresca: a câmera andou desde a primeira, e clicar em coordenada
+     velha erraria o alvo por movimento da cena, não por defeito da seleção. */
+  const agora = await ler();
+  const comVizinhoPerto = agora.pontosNaTela.filter((p) => agora.pontosNaTela
+    .some((q) => q !== p && Math.hypot(q.x - p.x, q.y - p.y) < 10));
+  const disputados = comVizinhoPerto.filter((_, i) => i % 7 === 0).slice(0, 14);
+  ok('a peça tem vértices que se sobrepõem na tela, senão a prova não vale',
+    disputados.length >= 8, `${comVizinhoPerto.length} vértices com vizinho a menos de 10px`);
+
+  let acertou = 0;
+  let piorEmPixels = 0;
+  for (const ponto of disputados) {
+    await pagina.mouse.click(ponto.x, ponto.y);
+    /* Onde ficou, na tela, o vértice que veio selecionado. A exigência não é que
+       seja o mesmo id que eu mirei: quando dois se sobrepõem, vencer o da frente
+       é o certo, e é o que a pessoa vê. A exigência é que o selecionado esteja
+       EM CIMA do ponteiro, e não do outro lado da peça — que era o sintoma. */
+    const onde = await pagina.evaluate(() => {
+      const ambiente = window.__mecanificaBancada.ambiente();
+      const grupo = ambiente.scene.getObjectByName('__edicao_de_malha__');
+      const destaque = (grupo?.children ?? [])
+        .find((no) => no.isPoints && no.visible && !no.geometry.getAttribute('color'));
+      const p = destaque?.geometry?.getAttribute('position');
+      if (!p || p.count !== 1) return null;
+      const rect = document.getElementById('cenaBancada').getBoundingClientRect();
+      const V = ambiente.camera.position.constructor;
+      const v = new V(p.getX(0), p.getY(0), p.getZ(0));
+      destaque.localToWorld(v);
+      const pr = v.project(ambiente.camera);
+      return { x: (pr.x * 0.5 + 0.5) * rect.width + rect.left, y: (-pr.y * 0.5 + 0.5) * rect.height + rect.top };
+    });
+    if (!onde) continue;
+    const erro = Math.hypot(onde.x - ponto.x, onde.y - ponto.y);
+    piorEmPixels = Math.max(piorEmPixels, erro);
+    if (erro <= 6) acertou += 1;
+  }
+  ok('o vértice que vem selecionado está sob o ponteiro, não do outro lado da peça',
+    acertou === disputados.length,
+    `${acertou} de ${disputados.length}, pior erro ${piorEmPixels.toFixed(1)}px`);
+
+  /* O REALCE. Trocar a cor de um ponto de sete pixels não diz onde a pessoa
+     clicou. O selecionado é redesenhado por cima, maior e em branco. */
+  const realce = await pagina.evaluate(() => {
+    const ambiente = window.__mecanificaBancada.ambiente();
+    const grupo = ambiente.scene.getObjectByName('__edicao_de_malha__');
+    const desenhos = (grupo?.children ?? []).filter((no) => no.isPoints && no.visible);
+    const base = desenhos.find((no) => no.geometry.getAttribute('color'));
+    const destaque = desenhos.find((no) => no !== base);
+    return {
+      temDestaque: Boolean(destaque),
+      tamanhoBase: base?.material?.size ?? 0,
+      tamanhoDestaque: destaque?.material?.size ?? 0,
+      quantos: destaque?.geometry?.getAttribute('position')?.count ?? 0,
+    };
+  });
+  ok('o vértice selecionado é desenhado por cima, bem maior que os outros',
+    realce.temDestaque && realce.quantos > 0 && realce.tamanhoDestaque >= realce.tamanhoBase * 2,
+    `base ${realce.tamanhoBase}px, destaque ${realce.tamanhoDestaque}px, ${realce.quantos} ponto(s)`);
 
   /* CLICAR DE LONGE. O ponto é desenhado com tamanho constante na tela e o
      alcance do raio é medido no mundo, então um número fixo encolheria a área

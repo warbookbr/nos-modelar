@@ -271,11 +271,47 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
   desenhoArestas.visible = false;
   grupo.add(desenhoArestas);
 
+  /* O REALCE É UM DESENHO À PARTE, e não uma cor diferente no mesmo desenho.
+     Trocar a cor de um ponto de sete pixels não diz à pessoa onde ela clicou: o
+     autor relatou não conseguir saber o que estava selecionado. O selecionado é
+     desenhado de novo por cima, maior e em branco, e por isso ele salta da malha
+     mesmo num aglomerado de vértices. */
+  const geometriaPontosSel = new THREE.BufferGeometry();
+  geometriaPontosSel.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
+  const materialPontosSel = new THREE.PointsMaterial({
+    color: '#ffffff', size: TAMANHO_PONTO_EM_EDICAO * 2.2, sizeAttenuation: false, depthTest: false,
+  });
+  const desenhoPontosSel = new THREE.Points(geometriaPontosSel, materialPontosSel);
+  desenhoPontosSel.renderOrder = 1001;
+  desenhoPontosSel.visible = false;
+  grupo.add(desenhoPontosSel);
+
+  /* A aresta selecionada ganha as duas pontas em destaque junto com a linha:
+     linha em WebGL não engrossa, então a espessura que a pessoa procura vem dos
+     pontos. */
+  const geometriaArestasSel = new THREE.BufferGeometry();
+  geometriaArestasSel.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
+  const materialArestasSel = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false });
+  const desenhoArestasSel = new THREE.LineSegments(geometriaArestasSel, materialArestasSel);
+  desenhoArestasSel.renderOrder = 1001;
+  desenhoArestasSel.visible = false;
+  grupo.add(desenhoArestasSel);
+
   const geometriaFaces = new THREE.BufferGeometry();
-  const materialFaces = new THREE.MeshBasicMaterial({ color: '#45e0a5', depthTest: false, depthWrite: false, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+  const materialFaces = new THREE.MeshBasicMaterial({ color: '#45e0a5', depthTest: false, depthWrite: false, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
   const desenhoFaces = new THREE.Mesh(geometriaFaces, materialFaces);
   desenhoFaces.visible = false;
   grupo.add(desenhoFaces);
+
+  /* O contorno da face selecionada. O preenchimento translúcido some contra a
+     peça clara; a borda branca diz onde a face começa e termina. */
+  const geometriaContornoFace = new THREE.BufferGeometry();
+  geometriaContornoFace.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
+  const materialContornoFace = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false });
+  const desenhoContornoFace = new THREE.LineSegments(geometriaContornoFace, materialContornoFace);
+  desenhoContornoFace.renderOrder = 1001;
+  desenhoContornoFace.visible = false;
+  grupo.add(desenhoContornoFace);
 
   /* GIZMO DE TRÊS SETAS na seleção. O G com trava de eixo já move, mas ele não
      mostra para onde a seleção vai antes de ela ir: a pessoa aperta a tecla e
@@ -314,11 +350,16 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     haste.position.y = 0.4;
     const ponta = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.2, 10), material);
     ponta.position.y = 0.9;
+    /* O ALVO NÃO COBRE O CENTRO. Ele ia da base à ponta, e a base fica em cima da
+       própria seleção: clicar num vértice vizinho pegava a seta e começava um
+       movimento em vez de selecionar, e a seleção antiga continuava lá. Era o
+       "clico em um e vem outro". A haste continua desenhada inteira; só a área
+       que rouba o clique começa depois do centro. */
     const alvo = new THREE.Mesh(
-      new THREE.CylinderGeometry(RAIO_DO_ALVO_DO_GIZMO, RAIO_DO_ALVO_DO_GIZMO, 1.05, 8),
+      new THREE.CylinderGeometry(RAIO_DO_ALVO_DO_GIZMO, RAIO_DO_ALVO_DO_GIZMO, 0.75, 8),
       new THREE.MeshBasicMaterial({ visible: false }),
     );
-    alvo.position.y = 0.5;
+    alvo.position.y = 0.65;
     braco.add(haste, ponta, alvo);
     braco.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direcao);
     braco.userData.eixoDoGizmo = eixo;
@@ -535,6 +576,41 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     geometria.setAttribute('color', new THREE.Float32BufferAttribute(cores, 3));
   }
 
+  function atualizarRealce(atual, selecionados) {
+    const pontosSel = [];
+    const arestasSel = [];
+    if (atual.modo === 'vertice') {
+      for (const id of selecionados) pontosSel.push(...(posicoes.get(id) ?? [0, 0, 0]));
+    } else if (atual.modo === 'aresta') {
+      for (const chave of selecionados) {
+        const par = estrutura.arestas.get(chave);
+        if (!par) continue;
+        for (const id of par) {
+          arestasSel.push(...(posicoes.get(id) ?? [0, 0, 0]));
+          pontosSel.push(...(posicoes.get(id) ?? [0, 0, 0]));
+        }
+      }
+    }
+    geometriaPontosSel.setAttribute('position', new THREE.Float32BufferAttribute(pontosSel, 3));
+    geometriaArestasSel.setAttribute('position', new THREE.Float32BufferAttribute(arestasSel, 3));
+    desenhoPontosSel.visible = atual.ativo && pontosSel.length > 0;
+    desenhoArestasSel.visible = atual.ativo && arestasSel.length > 0;
+
+    const contorno = [];
+    if (atual.modo === 'face') {
+      for (const id of selecionados) {
+        const face = estrutura.facesPorId.get(id);
+        if (!face) continue;
+        for (let i = 0; i < face.vertices.length; i++) {
+          contorno.push(...(posicoes.get(face.vertices[i]) ?? [0, 0, 0]));
+          contorno.push(...(posicoes.get(face.vertices[(i + 1) % face.vertices.length]) ?? [0, 0, 0]));
+        }
+      }
+    }
+    geometriaContornoFace.setAttribute('position', new THREE.Float32BufferAttribute(contorno, 3));
+    desenhoContornoFace.visible = atual.ativo && contorno.length > 0;
+  }
+
   function atualizarFaces(selecionados) {
     const posicoesDasFaces = [];
     for (const id of selecionados) {
@@ -569,6 +645,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     preencherCores(geometriaPontos, pontos, selecionados);
     preencherCores(geometriaArestas, arestas, selecionados, 2);
     atualizarFaces(selecionados);
+    atualizarRealce(atual, selecionados);
     atualizarGizmo();
     aoMudar(atual);
     return atual;
@@ -592,17 +669,105 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     return String(hit.object.geometry.getAttribute('origemFace').getX(hit.faceIndex * 3));
   }
 
+  /* ESCOLHA POR DISTÂNCIA NA TELA, e não por distância ao raio no espaço.
+   *
+   * O raio escolhe o primeiro que ele encontra no caminho, e isso não é o que a
+   * pessoa vê: dois vértices podem estar a um pixel um do outro na imagem e a
+   * vinte centímetros um do outro no espaço, e o raio prefere o mais perto da
+   * câmera mesmo que o ponteiro esteja em cima do outro. Era o "clico em um e
+   * seleciona outro".
+   *
+   * Aqui todos os candidatos são projetados na tela e vence o mais perto do
+   * ponteiro em PIXELS, que é a mesma conta que o olho faz. Empate a menos de
+   * três pixels é desfeito pelo mais perto da câmera, que é o que está à frente.
+   */
+  const ALCANCE_EM_PIXELS = 18;
+  const EMPATE_EM_PIXELS = 3;
+
+  function emPixels(ponto, camera, rect) {
+    const v = new THREE.Vector3(...ponto).applyMatrix4(raiz.matrixWorld);
+    const distancia = camera.position.distanceTo(v);
+    const p = v.project(camera);
+    if (p.z > 1) return null;
+    return {
+      x: rect.left + ((p.x + 1) / 2) * rect.width,
+      y: rect.top + ((1 - p.y) / 2) * rect.height,
+      distancia,
+    };
+  }
+
+  /* Distância do ponteiro ao segmento na tela, que é o que decide a aresta. */
+  function distanciaAoSegmento(px, py, a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const comprimento = dx * dx + dy * dy;
+    if (comprimento < 1e-9) return Math.hypot(px - a.x, py - a.y);
+    let fracao = ((px - a.x) * dx + (py - a.y) * dy) / comprimento;
+    fracao = Math.max(0, Math.min(1, fracao));
+    return Math.hypot(px - (a.x + fracao * dx), py - (a.y + fracao * dy));
+  }
+
+  /* DUAS PASSADAS, E NÃO UMA COMPARAÇÃO ENCADEADA. Comparando cada candidato com
+     o melhor corrente, um empate de três pixels puxa o melhor um pouco para
+     longe, o seguinte empata com esse novo melhor e puxa mais, e a escolha
+     caminha. Medido: o vértice que vinha selecionado chegou a 41,8 pixels do
+     ponteiro. Aqui o mínimo é achado primeiro e o empate é sempre medido contra
+     ELE, então a escolha não anda. */
+  function melhorCandidato(candidatos) {
+    let minimo = Infinity;
+    for (const candidato of candidatos) {
+      if (candidato.pixels < minimo) minimo = candidato.pixels;
+    }
+    if (!(minimo <= ALCANCE_EM_PIXELS)) return null;
+
+    let melhor = null;
+    for (const candidato of candidatos) {
+      if (candidato.pixels > minimo + EMPATE_EM_PIXELS) continue;
+      if (!melhor || candidato.distancia < melhor.distancia) melhor = candidato;
+    }
+    return melhor?.id ?? null;
+  }
+
   function alvoSobOPonteiro(evento) {
-    raio(evento);
     const atual = estado.estado();
+    const camera = cameraAtual();
+    raiz.updateMatrixWorld(true);
+    camera.updateMatrixWorld();
+    const rect = canvas.getBoundingClientRect();
+
     if (atual.modo === 'vertice') {
-      const hit = raycaster.intersectObject(desenhoPontos, false)[0];
-      return hit ? pontos[hit.index] : null;
+      const candidatos = [];
+      for (const id of pontos) {
+        const tela = emPixels(posicoes.get(id) ?? [0, 0, 0], camera, rect);
+        if (!tela) continue;
+        candidatos.push({
+          id,
+          pixels: Math.hypot(evento.clientX - tela.x, evento.clientY - tela.y),
+          distancia: tela.distancia,
+        });
+      }
+      return melhorCandidato(candidatos);
     }
+
     if (atual.modo === 'aresta') {
-      const hit = raycaster.intersectObject(desenhoArestas, false)[0];
-      return hit?.index == null ? null : arestas[Math.floor(hit.index / 2)];
+      const candidatos = [];
+      for (const chave of arestas) {
+        const [ia, ib] = estrutura.arestas.get(chave);
+        const a = emPixels(posicoes.get(ia) ?? [0, 0, 0], camera, rect);
+        const b = emPixels(posicoes.get(ib) ?? [0, 0, 0], camera, rect);
+        if (!a || !b) continue;
+        candidatos.push({
+          id: chave,
+          pixels: distanciaAoSegmento(evento.clientX, evento.clientY, a, b),
+          distancia: Math.min(a.distancia, b.distancia),
+        });
+      }
+      return melhorCandidato(candidatos);
     }
+
+    /* A face continua pelo raio: ali o encontro com a superfície É o que a
+       pessoa vê, e projetar polígono na tela não acrescenta nada. */
+    raio(evento);
     return faceSobORaio();
   }
 
@@ -708,6 +873,22 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
   function aoSoltar(evento) {
     if (!daEdicao(evento)) return;
     if (movimento?.pelaSeta) {
+      /* PEGAR A SETA E NÃO ARRASTAR É CLIQUE, NÃO MOVIMENTO. Sem isto, todo
+         clique que encosta na seta some: ele abre e fecha um movimento de zero e
+         a seleção nunca muda. Com o gesto desfeito, o clique segue o caminho
+         normal e seleciona o que está sob o ponteiro. */
+      const andou = movimento.deslocamento.some((c) => Math.abs(c) > 1e-9);
+      if (!andou) {
+        restaurar(movimento.origem);
+        movimento = null;
+        canvas.releasePointerCapture?.(evento.pointerId);
+        const alvoDoClique = alvoSobOPonteiro(evento);
+        if (alvoDoClique) estado.selecionar(alvoDoClique, { aditiva: evento.shiftKey, remover: evento.altKey });
+        else if (!evento.shiftKey && !evento.altKey) estado.limpar();
+        atualizarVisibilidade();
+        evento.stopPropagation();
+        return;
+      }
       /* O gesto da seta é apertar, arrastar e soltar. Sem isto ele ficaria
          pendurado esperando um clique, e o clique seguinte da pessoa — que ela
          faria para selecionar outra coisa — confirmaria um movimento que ela já
@@ -794,6 +975,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
       geometriaPontos.dispose(); materialPontos.dispose();
       geometriaArestas.dispose(); materialArestas.dispose();
       geometriaFaces.dispose(); materialFaces.dispose();
+      geometriaPontosSel.dispose(); materialPontosSel.dispose();
+      geometriaArestasSel.dispose(); materialArestasSel.dispose();
+      geometriaContornoFace.dispose(); materialContornoFace.dispose();
       for (const material of materiaisDoGizmo) material.dispose();
       gizmo.traverse((no) => no.geometry?.dispose());
       gizmo.removeFromParent();
