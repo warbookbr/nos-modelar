@@ -1091,13 +1091,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     };
   }
 
-  function criarCamadaDeEdicao(modelo, partes) {
+  function criarCamadaDeEdicao(modelo, partes, { desenharMalha = true } = {}) {
     return criarCamadaEdicaoDeMalha({
       canvas,
       cameraAtual: () => ambiente.camera,
       raiz: modelo.raiz,
       neutro: modelo.neutro,
       partes,
+      desenharMalha,
       aoMudar(estadoEdicao) {
         if (estadoEdicao.ativo) {
           mostrarAviso(`Edição de malha: ${estadoEdicao.modo}. ${estadoEdicao.selecionados.length} selecionado(s).`);
@@ -1120,8 +1121,39 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      Enquanto o modo está ligado, o botão esquerdo pertence à seleção, então a
      órbita do controlador de câmera passa para o botão do meio e o arrasto para
      o direito — a mesma divisão que o Blender usa. Sair devolve o padrão. */
+  /* MOVER A PARTE INTEIRA. É o gesto que o autor pediu depois de testar: escolher
+     uma parte na cena e deslocá-la como corpo, sem entrar na malha. Não é outra
+     máquina — é a mesma camada de edição, restrita às partes escolhidas, com
+     tudo selecionado e sem os vértices na frente. Por isso o ímã, o gizmo, o
+     eixo travado, o valor digitado e o Ctrl+Z valem igual, e o que sai é o mesmo
+     alvo medido.
+     `G` sem estar no modo de edição é o que o Blender faz no modo objeto. */
+  function moverParteInteira() {
+    const selecionadas = controlador ? [...controlador.selecionadas] : [];
+    if (!modeloAtual?.neutro || selecionadas.length === 0) {
+      mostrarAviso('Selecione uma parte antes de mover.');
+      return false;
+    }
+    edicaoDeMalha?.destruir();
+    edicaoDeMalha = criarCamadaDeEdicao(modeloAtual, selecionadas, { desenharMalha: false });
+    edicaoDeMalha.alternar();
+    edicaoDeMalha.selecionarTudo();
+    if (!edicaoDeMalha.iniciarMovimento()) {
+      edicaoDeMalha.alternar();
+      return false;
+    }
+    mostrarAviso(`Movendo ${selecionadas.join(', ')}. X/Y/Z travam o eixo, Ctrl gruda, Esc cancela.`);
+    return true;
+  }
+
   function alternarEdicaoDeMalha() {
     if (!modeloAtual?.neutro) return;
+    /* Sair do modo peça com Tab é entrar no de edição, e não desligar tudo: a
+       camada do modo peça está ativa, mas não é o modo que o Tab governa. */
+    if (edicaoDeMalha?.estado?.().ativo && !edicaoDeMalha.desenhaMalha) {
+      edicaoDeMalha.destruir();
+      edicaoDeMalha = null;
+    }
     if (edicaoDeMalha?.estado?.().ativo) {
       edicaoDeMalha.alternar();
       ambiente.controls.mouseButtons = { ...BOTOES_DE_CAMERA_PADRAO };
@@ -1381,12 +1413,20 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   function atalhoVista(evento) {
     const campoEditavel = registroAtalhos.deveIgnorar(evento.target);
+    if (evento.key.toLowerCase() === 'g' && !campoEditavel && !evento.ctrlKey && !evento.metaKey
+      && !(edicaoDeMalha?.estado?.().ativo && edicaoDeMalha.desenhaMalha)
+      && !edicaoDeMalha?.movendo && modeloAtual?.neutro) {
+      evento.preventDefault();
+      moverParteInteira();
+      return;
+    }
     if (evento.key === 'Tab' && !campoEditavel && modeloAtual?.neutro) {
       evento.preventDefault();
       alternarEdicaoDeMalha();
       return;
     }
-    if (edicaoDeMalha?.estado().ativo && !campoEditavel) {
+    if (edicaoDeMalha?.estado().ativo && !campoEditavel
+      && (edicaoDeMalha.desenhaMalha || edicaoDeMalha.movendo)) {
       /* O TECLADO DO MOVIMENTO VEM PRIMEIRO. Com os níveis antes dele, digitar o
          valor do deslocamento era interpretado como troca de nível: escrever
          "0.2" mandava o "2" para o modo aresta, a entrada ficava em "0." e o
@@ -1999,6 +2039,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
        movimento está em curso. Sem isto a guarda teria de adivinhar a seleção
        pela cor dos pontos desenhados. */
     edicaoDeMalha: () => edicaoDeMalha?.estado?.() ?? null,
+    edicaoDeMalhaDesenhaMalha: () => Boolean(edicaoDeMalha?.desenhaMalha),
     sincronizador: () => sincronizador,
     selecionar: (nomes) => controlador?.selecionarMuitas(Array.isArray(nomes) ? nomes : [nomes]),
     modo: (modo) => controlador?.definirModo(modo),

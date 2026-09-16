@@ -36,6 +36,18 @@ arraste de novo.
 Nada disso escreve parâmetro. `Descartar` devolve a peça ao que veio do arquivo;
 `Salvar ajuste` baixa um `ajuste-<peça>.json`.
 
+## Mover a parte inteira
+
+Selecione a parte na cena e aperte `G`, sem entrar no modo de edição. A parte
+anda como corpo: `X`, `Y` e `Z` travam o eixo, um número digitado dá o valor
+exato, `Ctrl` gruda no vértice mais próximo que não está sendo movido, `Esc`
+cancela, clique confirma e `Ctrl+Z` desfaz. É a mesma convenção do modo objeto
+do Blender.
+
+Por dentro é a mesma máquina do modo de edição, com a parte inteira selecionada e
+os vértices escondidos. Por isso o que sai é o mesmo alvo medido, e a rodada de
+absorção trata igual.
+
 ## O modo de edição: vértice, aresta e face
 
 O gesto por junta move cantos inteiros. Para mexer na forma com liberdade, o modo

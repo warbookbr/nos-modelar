@@ -134,6 +134,7 @@ const ler = () => pagina.evaluate(() => {
 
   return {
     edicao: bancada.edicaoDeMalha?.() ?? null,
+    modoPeca: bancada.edicaoDeMalha?.() ? !bancada.edicaoDeMalhaDesenhaMalha?.() : false,
     camera: [ambiente.camera.position.x, ambiente.camera.position.y, ambiente.camera.position.z],
     gizmoVisivel: Boolean(gizmo?.visible),
     /* O gizmo mora no centro da seleção, então a posição dele é a medida direta
@@ -492,6 +493,69 @@ try {
   const fechado = await ler();
   ok('Tab desliga o modo e some com os pontos',
     fechado.edicao?.ativo === false && !fechado.grupoVisivel);
+
+  /* MOVER A PARTE INTEIRA. O autor pediu depois de testar: escolher uma parte e
+     deslocá-la como corpo, sem entrar na malha. O que se afirma é o que separa
+     mover de deformar — a parte anda inteira, com a caixa do MESMO tamanho, e as
+     outras sete ficam paradas. */
+  await tecla('Escape');
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSuperior']));
+  await pagina.waitForTimeout(600);
+
+  const caixasDe = () => pagina.evaluate(() => {
+    const ambiente = window.__mecanificaBancada.ambiente();
+    const caixas = {};
+    ambiente.scene.traverse((no) => {
+      if (!no.userData?.identidadeParte || !no.geometry) return;
+      no.updateWorldMatrix(true, false);
+      no.geometry.computeBoundingBox?.();
+      const c = no.geometry.boundingBox;
+      if (!c) return;
+      const min = c.min.clone(); const max = c.max.clone();
+      no.localToWorld(min); no.localToWorld(max);
+      caixas[no.userData.identidadeParte] = {
+        centro: [(min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2],
+        tamanho: [Math.abs(max.x - min.x), Math.abs(max.y - min.y), Math.abs(max.z - min.z)],
+      };
+    });
+    return caixas;
+  });
+
+  const antesDeMover = await caixasDe();
+  await tecla('g');
+  await tecla('y');
+  for (const digito of '0.15') await tecla(digito);
+  await tecla('Enter');
+  await pagina.waitForTimeout(800);
+  const depoisDeMover = await caixasDe();
+
+  const andou = (nome) => {
+    const a = antesDeMover[nome]; const d = depoisDeMover[nome];
+    if (!a || !d) return Infinity;
+    return Math.hypot(...[0, 1, 2].map((i) => d.centro[i] - a.centro[i]));
+  };
+  const mudouDeTamanho = (nome) => {
+    const a = antesDeMover[nome]; const d = depoisDeMover[nome];
+    if (!a || !d) return Infinity;
+    return Math.max(...[0, 1, 2].map((i) => Math.abs(d.tamanho[i] - a.tamanho[i])));
+  };
+
+  ok('G fora do modo de edição move a parte selecionada', andou('tuboSuperior') > 0.01,
+    `andou ${andou('tuboSuperior').toFixed(4)}`);
+  ok('a parte anda inteira, sem mudar de tamanho', mudouDeTamanho('tuboSuperior') < 1e-3,
+    `a caixa mudou ${mudouDeTamanho('tuboSuperior').toFixed(5)}`);
+  const outrasQueAndaram = Object.keys(antesDeMover)
+    .filter((nome) => nome !== 'tuboSuperior' && andou(nome) > 1e-4);
+  ok('as outras partes ficam paradas', outrasQueAndaram.length === 0, outrasQueAndaram.join(', '));
+
+  await tecla('Control+z');
+  await pagina.waitForTimeout(700);
+  const desfeitoPeca = await caixasDe();
+  const voltouTudo = Object.keys(antesDeMover).every((nome) => {
+    const a = antesDeMover[nome]; const d = desfeitoPeca[nome];
+    return d && Math.hypot(...[0, 1, 2].map((i) => d.centro[i] - a.centro[i])) < 1e-4;
+  });
+  ok('Ctrl+Z devolve a parte movida ao lugar', voltouTudo);
 
   ok('a página não emitiu erro', erros.length === 0, erros[0] ?? '');
 } catch (erro) {

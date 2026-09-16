@@ -242,7 +242,18 @@ export function criarEstadoEdicaoDeMalha(entrada) {
 /* Desenha a seleção como uma camada filha da peça. As coordenadas continuam
    locais à peça, portanto escala e pose do estúdio acompanham naturalmente o
    realce sem entrar no estado salvo. */
-export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, partes = null, aoMudar = () => {}, aoConfirmarMovimento = () => {} }) {
+/**
+ * A camada de edição.
+ *
+ * `desenharMalha: false` é o modo peça: o movimento, o gizmo, o ímã, o desfazer
+ * e o alvo são os mesmos, mas os vértices, arestas e faces não aparecem e não
+ * pegam clique. Mover a parte inteira não é outra máquina — é esta, com tudo
+ * selecionado e sem o desenho da malha na frente.
+ */
+export function criarCamadaEdicaoDeMalha({
+  canvas, cameraAtual, raiz, neutro, partes = null, desenharMalha = true,
+  aoMudar = () => {}, aoConfirmarMovimento = () => {},
+}) {
   const topologia = topologiaDaMalhaNeutra(neutro, { partes });
   const estrutura = construirTopologia(topologia);
   const estado = criarEstadoEdicaoDeMalha(topologia);
@@ -600,8 +611,8 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     }
     geometriaPontosSel.setAttribute('position', new THREE.Float32BufferAttribute(pontosSel, 3));
     geometriaArestasSel.setAttribute('position', new THREE.Float32BufferAttribute(arestasSel, 3));
-    desenhoPontosSel.visible = atual.ativo && pontosSel.length > 0;
-    desenhoArestasSel.visible = atual.ativo && arestasSel.length > 0;
+    desenhoPontosSel.visible = desenharMalha && atual.ativo && pontosSel.length > 0;
+    desenhoArestasSel.visible = desenharMalha && atual.ativo && arestasSel.length > 0;
 
     const contorno = [];
     if (atual.modo === 'face') {
@@ -615,7 +626,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
       }
     }
     geometriaContornoFace.setAttribute('position', new THREE.Float32BufferAttribute(contorno, 3));
-    desenhoContornoFace.visible = atual.ativo && contorno.length > 0;
+    desenhoContornoFace.visible = desenharMalha && atual.ativo && contorno.length > 0;
   }
 
   function atualizarFaces(selecionados) {
@@ -645,9 +656,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
   function atualizarVisibilidade() {
     const atual = estado.estado();
     grupo.visible = atual.ativo;
-    desenhoPontos.visible = atual.ativo && atual.modo === 'vertice';
-    desenhoArestas.visible = atual.ativo && atual.modo === 'aresta';
-    desenhoFaces.visible = atual.ativo && atual.modo === 'face' && atual.selecionados.length > 0;
+    desenhoPontos.visible = desenharMalha && atual.ativo && atual.modo === 'vertice';
+    desenhoArestas.visible = desenharMalha && atual.ativo && atual.modo === 'aresta';
+    desenhoFaces.visible = desenharMalha && atual.ativo && atual.modo === 'face' && atual.selecionados.length > 0;
     const selecionados = new Set(atual.selecionados);
     preencherCores(geometriaPontos, pontos, selecionados);
     preencherCores(geometriaArestas, arestas, selecionados, 2);
@@ -835,6 +846,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
 
   function aoPressionar(evento) {
     if (!estado.estado().ativo || !daEdicao(evento)) return;
+    /* No modo peça o clique continua sendo da bancada, que escolhe PARTES. Só o
+       gesto de mover pertence a esta camada. */
+    if (!desenharMalha && !movimento && eixoDoGizmoSobOPonteiro(evento) === null) return;
     if (movimento) {
       confirmarMovimento();
       evento.stopPropagation();
@@ -972,6 +986,9 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
     vertices: copiarVertices,
     get movendo() { return Boolean(movimento); },
     get imaLigado() { return Boolean(movimento?.ima); },
+    /* Quem pergunta é o teclado da bancada: no modo peça as teclas de nível e de
+       seleção não valem, porque ali não existe vértice na tela para escolher. */
+    get desenhaMalha() { return desenharMalha; },
     /* A seta tem tamanho constante na tela, então precisa reagir à câmera a cada
        quadro; quem tem o laço de quadro é a bancada. */
     acompanharCamera: atualizarGizmo,
