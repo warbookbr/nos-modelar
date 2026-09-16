@@ -1473,7 +1473,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      seguidas ou escolhendo tecla não pode perder a janela no meio do gesto. */
   const janelas = [
     ['btnMenuAbrir', 'menuAbrir'],
-    ['btnMenuConfiguracoes', 'menuConfiguracoes'],
     ['btnMenuAtalhos', 'menuAtalhos'],
     ['btnMenuEstado', 'menuEstado'],
   ].map(([idBotao, idJanela]) => ({

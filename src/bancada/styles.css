@@ -1581,13 +1581,15 @@ body.auditoria #cenaBancada {
 .modal-rodape .botao { flex-shrink: 0; white-space: nowrap; }
 
 .botao-barra {
-  height: 22px;
-  padding: 0 9px;
+  height: 28px;
+  padding: 0 11px;
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
   color: #c7d3cd;
-  font: 600 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Treze pixels, e não dez: o autor relatou a barra pequena demais para ler.
+     A altura acompanha, senão o texto encosta na borda do botão. */
+  font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
   cursor: pointer;
 }
 
@@ -1795,4 +1797,10 @@ body.auditoria .recolher { display: none; }
 
 .rodape-juntas.tem-pendencia {
   border-color: var(--amarelo);
+}
+
+/* Grade e chão dentro da aba de inspeção, onde antes havia um modal só para
+   eles. Margem em cima para não colar no resumo da seleção. */
+.cena-preferencias {
+  margin: 10px 0 14px;
 }

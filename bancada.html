@@ -25,7 +25,6 @@
 
       <div class="barra-controles">
         <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
-        <button id="btnMenuConfiguracoes" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Configurações</button>
         <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
         <button id="btnJuntas" class="botao-barra" type="button" aria-pressed="false" title="Arrastar os cantos onde as partes se encontram">Juntas</button>
         <button id="btnMenuEstado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
@@ -57,23 +56,6 @@
           <div class="modal-corpo">
             <p class="modal-descricao">Receitas do acervo em trabalho. A sessão ativa continua chegando pela IA.</p>
             <div id="listaAcervo" class="linhas"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="menuConfiguracoes" class="modal-referencia modal-barra" role="dialog" aria-modal="true" aria-labelledby="tituloConfiguracoes" hidden>
-        <div class="modal-backdrop" data-fechar-modal></div>
-        <div class="modal-conteudo">
-          <header class="modal-topo">
-            <h3 id="tituloConfiguracoes" class="modal-titulo">Configurações</h3>
-            <button type="button" class="btn-fechar-modal" data-fechar-modal title="Fechar (Esc)" aria-label="Fechar">✕</button>
-          </header>
-          <div class="modal-corpo">
-            <h4 class="secao-modal">Cena</h4>
-            <div class="linhas">
-              <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
-              <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" checked /></label>
-            </div>
           </div>
         </div>
       </div>
@@ -147,6 +129,14 @@
         <!-- ABA 1: INSPEÇÃO -->
         <div id="abaConteudoInspecao" class="aba-conteudo ativa">
           <h2 id="tituloInspecao">Ver no contexto</h2>
+
+          <!-- Grade e chão moravam num modal de Configurações com duas linhas
+               dentro. Eles pertencem a quem está olhando a peça, que é esta
+               aba; o modal virava um clique a mais para chegar a um interruptor. -->
+          <div class="linhas cena-preferencias">
+            <label class="linha"><span>Grade</span><input id="prefGrade" type="checkbox" checked /></label>
+            <label class="linha"><span>Chão</span><input id="prefChao" type="checkbox" checked /></label>
+          </div>
           <p id="selecaoResumo" class="resumo">Selecione componentes para inspecionar.</p>
 
           <div class="modos" aria-label="Modo de visualização">
