@@ -557,6 +557,70 @@ try {
   });
   ok('Ctrl+Z devolve a parte movida ao lugar', voltouTudo);
 
+  /* TOPOLOGIA. Extrudar, duplicar, apagar e criar face mudam as FACES, e a malha
+     desenhada precisa ser refeita inteira — a camada de edição só sabe mexer em
+     posição. O que se afirma aqui é que a operação chegou à CENA: teste de
+     unidade prova a conta, e não prova que o triângulo novo apareceu. */
+  const contarNaCena = () => pagina.evaluate(() => {
+    const ambiente = window.__mecanificaBancada.ambiente();
+    let triangulos = 0;
+    ambiente.scene.traverse((no) => {
+      if (!no.userData?.identidadeParte || !no.geometry) return;
+      const indice = no.geometry.getIndex();
+      triangulos += (indice ? indice.count : no.geometry.getAttribute('position').count) / 3;
+    });
+    return { triangulos, partes: window.__mecanificaBancada.partes.length };
+  });
+
+  await tecla('Escape');
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSelim']));
+  await pagina.waitForTimeout(500);
+  await tecla('Tab');
+  /* A escolha é feita em modo VÉRTICE e depois convertida: em modo face os
+     pontos não são desenhados, e é por eles que a guarda sabe onde clicar. */
+  await tecla('1');
+  await pagina.waitForTimeout(400);
+  const pontosDoTubo = (await ler()).pontosNaTela;
+  ok('o tubo do selim abre com vértices para escolher', pontosDoTubo.length > 0,
+    `${pontosDoTubo.length} vértices`);
+  await pagina.mouse.click(pontosDoTubo[Math.floor(pontosDoTubo.length / 2)].x, pontosDoTubo[Math.floor(pontosDoTubo.length / 2)].y);
+  await pagina.waitForTimeout(400);
+  await tecla('l');
+  await tecla('3');
+  await pagina.waitForTimeout(500);
+  const antesDaTopologia = await contarNaCena();
+  const paraExtrudar = await ler();
+  ok('há face selecionada para extrudar', (paraExtrudar.edicao?.selecionados?.length ?? 0) > 0,
+    `${paraExtrudar.edicao?.selecionados?.length ?? 0} face(s)`);
+
+  await tecla('e');
+  await pagina.waitForTimeout(1200);
+  const extrudado = await contarNaCena();
+  ok('E extruda e a casca nova aparece na cena',
+    extrudado.triangulos > antesDaTopologia.triangulos,
+    `${antesDaTopologia.triangulos} → ${extrudado.triangulos} triângulos`);
+
+  await tecla('Control+z');
+  await pagina.waitForTimeout(900);
+
+  /* APAGAR ATÉ A PARTE SUMIR. É o caso que a fatia 1 mediu e que a rodada de
+     absorção precisa tratar: a peça passa a ter uma parte a menos, e a bancada
+     não pode quebrar por causa disso. */
+  await tecla('a');
+  await pagina.waitForTimeout(400);
+  await tecla('x');
+  await pagina.waitForTimeout(1200);
+  const apagado = await contarNaCena();
+  ok('X apaga a seleção, e a peça fica com uma parte a menos',
+    apagado.partes === antesDaTopologia.partes - 1,
+    `${antesDaTopologia.partes} → ${apagado.partes} partes`);
+
+  await tecla('Control+z');
+  await pagina.waitForTimeout(1200);
+  const desfeitoTopologia = await contarNaCena();
+  ok('Ctrl+Z devolve a parte apagada', desfeitoTopologia.partes === antesDaTopologia.partes,
+    `${apagado.partes} → ${desfeitoTopologia.partes} partes`);
+
   ok('a página não emitiu erro', erros.length === 0, erros[0] ?? '');
 } catch (erro) {
   ok('a execução chega ao fim sem exceção', false, String(erro?.message ?? erro));

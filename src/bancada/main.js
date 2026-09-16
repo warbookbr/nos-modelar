@@ -18,6 +18,7 @@ import { criarSincronizadorSessao } from './sessao/sincronizador.js';
 import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
 import { criarPunhoDaImagem } from './referencias/punho-da-imagem.js';
+import { apagar, criarFace, duplicar, escalar, extrudar, rotacionar } from '../autoria/topologia-da-malha.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
 import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { urlDaReferencia } from './referencias/imagens-da-peca.js';
@@ -329,8 +330,17 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      escreve. O histórico continua aqui porque o Ctrl+Z da malha usa ele. */
   /* A malha como ela veio do arquivo. É o piso do desfazer: Ctrl+Z devolve o que
      esta sessão desenhou e para aqui, porque abaixo disto não existe estado
-     anterior que ela tenha produzido. */
+     anterior que ela tenha produzido.
+     Guarda `V` E `F`, e não só as posições. Enquanto o gesto era só mover, as
+     faces nunca mudavam e o desfazer podia trocar coordenadas no lugar. Com
+     extrudar e apagar, desfazer sem as faces devolvia a peça sem a parte que a
+     pessoa tinha acabado de recuperar — medido: apagar o tubo do selim e
+     desfazer deixava a peça com sete partes. */
   let origemDaMalha = null;
+  const fotografarMalha = (neutro) => ({
+    V: new Map([...neutro.V].map(([id, p]) => [id, [...p]])),
+    F: new Map([...neutro.F].map(([id, f]) => [id, { ...f, vs: [...f.vs] }])),
+  });
   /* O que o controlador de câmera usa fora do modo de edição, guardado para ser
      devolvido na saída. */
   const BOTOES_DE_CAMERA_PADRAO = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
@@ -343,8 +353,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      anterior. */
   function desfazerDesenho() {
     const passo = historicoParametros.desfazer();
-    if (!passo || passo.chave !== '__edicao_de_malha__' || !edicaoDeMalha) return false;
-    edicaoDeMalha.restaurar(passo.valor);
+    if (!passo || passo.chave !== '__edicao_de_malha__' || !edicaoDeMalha || !passo.valor) return false;
+    /* Duas formas de voltar, e a diferença é o custo. Se só as posições mudaram,
+       trocar coordenadas na geometria desenhada basta e é instantâneo. Se as
+       FACES mudaram, a malha desenhada tem outra forma e precisa ser refeita. */
+    const viva = edicaoDeMalha.malha();
+    const mesmasFaces = viva.F.size === passo.valor.F.size
+      && [...passo.valor.F.keys()].every((id) => viva.F.has(id));
+    if (mesmasFaces) edicaoDeMalha.restaurar(passo.valor.V);
+    else {
+      const estadoAtual = edicaoDeMalha.estado();
+      reconstruirMalhaEditada({ ...viva, V: passo.valor.V, F: passo.valor.F }, {
+        partes: edicaoDeMalha.partesEditadas,
+        desenharMalha: edicaoDeMalha.desenhaMalha,
+        modo: estadoAtual.modo,
+        selecionados: [],
+      });
+    }
     mostrarAviso(historicoParametros.vazio
       ? 'Desfeito: a malha voltou ao que veio do arquivo.'
       : 'Desfeito o último movimento.');
@@ -913,7 +938,9 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
         }
       },
       aoConfirmarMovimento({ depois }) {
-        historicoParametros.registrar('__edicao_de_malha__', depois);
+        /* `depois` são as posições que o gesto produziu; as faces são as da
+           malha viva, que o movimento não muda. */
+        historicoParametros.registrar('__edicao_de_malha__', { V: depois, F: modelo.neutro.F });
         historicoParametros.separar();
         mostrarAviso('Movimento de malha confirmado. Ctrl+Z desfaz.');
       },
@@ -969,6 +996,70 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     }
     mostrarAviso(`Movendo ${selecionadas.join(', ')}. X/Y/Z travam o eixo, Ctrl gruda, Esc cancela.`);
     return true;
+  }
+
+  /* TOPOLOGIA. Extrudar, duplicar, apagar e criar face mudam as FACES, e não só
+     as posições — a malha desenhada precisa ser reconstruída, e a camada de
+     edição só sabe mexer em posição. Por isso a operação roda aqui: pega a malha
+     viva da camada, chama a conta no núcleo, reconstrói o modelo e recria a
+     camada com a seleção que a operação produziu.
+     Girar e escalar não mudam topologia, mas passam pelo mesmo caminho: é um
+     estado novo da malha, e tratar os dois iguais evita dois desfazeres
+     diferentes para gestos que a pessoa vê como um só. */
+  const OPERACOES_DE_MALHA = { extrudar, duplicar, apagar, criarFace };
+
+  function aplicarNaMalha(qual, argumentos = null) {
+    if (!edicaoDeMalha?.estado?.().ativo || edicaoDeMalha.movendo) return false;
+    const viva = edicaoDeMalha.malha();
+    const estadoAtual = edicaoDeMalha.estado();
+    const operacao = OPERACOES_DE_MALHA[qual] ?? ({ rotacionar, escalar }[qual]);
+    if (!operacao) return false;
+
+    const resultado = argumentos
+      ? operacao(viva, estadoAtual, argumentos)
+      : operacao(viva, estadoAtual);
+    if (!resultado.mudou) {
+      mostrarAviso(resultado.motivo ? `Não deu: ${resultado.motivo}.` : 'Nada para fazer com esta seleção.');
+      return false;
+    }
+
+    const partes = edicaoDeMalha.partesEditadas;
+    const selecao = resultado.selecionados ?? estadoAtual.selecionados;
+    const modo = OPERACOES_DE_MALHA[qual] && qual !== 'apagar' ? 'face' : estadoAtual.modo;
+
+    reconstruirMalhaEditada(resultado.neutro, {
+      partes,
+      desenharMalha: edicaoDeMalha.desenhaMalha,
+      modo: qual === 'criarFace' ? 'face' : modo,
+      selecionados: selecao,
+    });
+    historicoParametros.registrar('__edicao_de_malha__', fotografarMalha(edicaoDeMalha.malha()));
+    historicoParametros.separar();
+    return true;
+  }
+
+  /* A malha mudou de faces, então o modelo inteiro é refeito. É o mesmo caminho
+     do ajuste por junta, e o custo é uma execução de `adaptarThree` por
+     operação — não por quadro. */
+  function reconstruirMalhaEditada(novoNeutro, { partes, desenharMalha, modo, selecionados }) {
+    const rotulo = modeloAtual?.rotulo ?? nomePecaAtual;
+    const { caixas, facesSemParte } = caixasPorParte(novoNeutro);
+    const adaptado = adaptarThree(novoNeutro, { nome: rotulo, materiais: materiaisDaPeca });
+    edicaoDeMalha?.destruir();
+    edicaoDeMalha = null;
+    aplicarModelo({
+      nome: modeloAtual?.nome ?? nomePecaAtual,
+      rotulo,
+      medida: { partes: caixas, facesSemParte, portas: portasPublicadas(novoNeutro) },
+      neutro: novoNeutro,
+      materiais: materiaisDaPeca,
+      ...adaptado,
+    }, { preservarCamera: true, deAjuste: true });
+
+    edicaoDeMalha = criarCamadaDeEdicao(modeloAtual, partes, { desenharMalha });
+    edicaoDeMalha.alternar();
+    edicaoDeMalha.definirModo(modo);
+    edicaoDeMalha.selecionar(selecionados);
   }
 
   function alternarEdicaoDeMalha() {
@@ -1048,7 +1139,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     });
 
     edicaoDeMalha = convertido.neutro ? criarCamadaDeEdicao(convertido, null) : null;
-    if (!deAjuste && edicaoDeMalha) origemDaMalha = edicaoDeMalha.vertices();
+    if (!deAjuste && edicaoDeMalha) origemDaMalha = fotografarMalha(edicaoDeMalha.malha());
 
     btnSelecionarConjunto.hidden = !controlador.temHierarquia();
 
@@ -1275,6 +1366,26 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       if (evento.key.toLowerCase() === 'a' && evento.altKey) { evento.preventDefault(); edicaoDeMalha.limpar(); return; }
       if (evento.key.toLowerCase() === 'a') { evento.preventDefault(); edicaoDeMalha.selecionarTudo(); return; }
       if (evento.key.toLowerCase() === 'l') { evento.preventDefault(); edicaoDeMalha.selecionarIlha(); return; }
+      /* AS TECLAS DO BLENDER. E extruda, Shift+D duplica, X apaga, F faz face,
+         R gira e S escala. Extrudar e duplicar não movem: a cópia nasce no lugar
+         e o G seguinte é que a leva, como lá. */
+      if (evento.key.toLowerCase() === 'e') { evento.preventDefault(); aplicarNaMalha('extrudar'); return; }
+      if (evento.key.toLowerCase() === 'd' && evento.shiftKey) { evento.preventDefault(); aplicarNaMalha('duplicar'); return; }
+      if (evento.key.toLowerCase() === 'x') { evento.preventDefault(); aplicarNaMalha('apagar'); return; }
+      if (evento.key.toLowerCase() === 'f') { evento.preventDefault(); aplicarNaMalha('criarFace'); return; }
+      if (evento.key.toLowerCase() === 'r') {
+        evento.preventDefault();
+        /* Um quarto de volta por toque, no eixo vertical. Girar com o ponteiro
+           pede outro gesto contínuo e o plano não pediu isso; o passo fixo já
+           cobre o que a peça precisa e é conferível. */
+        aplicarNaMalha('rotacionar', { eixo: 1, angulo: Math.PI / 2 });
+        return;
+      }
+      if (evento.key.toLowerCase() === 's') {
+        evento.preventDefault();
+        aplicarNaMalha('escalar', { fator: evento.shiftKey ? 1 / 1.1 : 1.1 });
+        return;
+      }
       if (evento.key.toLowerCase() === 'g') {
         evento.preventDefault();
         if (edicaoDeMalha.iniciarMovimento()) mostrarAviso('Mover: aponte, use X/Y/Z ou digite um valor; clique confirma.');

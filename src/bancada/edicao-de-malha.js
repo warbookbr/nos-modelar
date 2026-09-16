@@ -255,6 +255,7 @@ export function criarCamadaEdicaoDeMalha({
   canvas, cameraAtual, raiz, neutro, partes = null, desenharMalha = true,
   aoMudar = () => {}, aoConfirmarMovimento = () => {},
 }) {
+  const filtroDePartes = Array.isArray(partes) ? [...partes] : partes;
   const topologia = topologiaDaMalhaNeutra(neutro, { partes });
   const estrutura = construirTopologia(topologia);
   const estado = criarEstadoEdicaoDeMalha(topologia);
@@ -902,6 +903,9 @@ export function criarCamadaEdicaoDeMalha({
     alternar() { estado.alternar(); return atualizarVisibilidade(); },
     definirModo(modo) { estado.definirModo(modo); return atualizarVisibilidade(); },
     selecionarTudo() { estado.selecionarTudo(); return atualizarVisibilidade(); },
+    /* Escolher de fora: depois de uma operação de topologia, quem sabe o que
+       nasceu é a operação, e a camada precisa apontar para lá. */
+    selecionar(ids) { estado.limpar(); estado.selecionarMuitos(ids ?? []); return atualizarVisibilidade(); },
     limpar() { estado.limpar(); return atualizarVisibilidade(); },
     selecionarIlha() { estado.selecionarIlha(); return atualizarVisibilidade(); },
     iniciarMovimento: () => iniciarMovimentoInterno(),
@@ -931,6 +935,15 @@ export function criarCamadaEdicaoDeMalha({
     /* Quem pergunta é o teclado da bancada: no modo peça as teclas de nível e de
        seleção não valem, porque ali não existe vértice na tela para escolher. */
     get desenhaMalha() { return desenharMalha; },
+    /* AS PARTES A QUE ESTA CAMADA ESTÁ PRESA. Quem reconstrói a malha depois de
+       uma operação de topologia precisa recriar a camada com o mesmo recorte, e
+       não pode perguntar isso ao controlador de partes: aplicar o modelo novo
+       limpa a seleção de partes, e o recorte voltaria a ser a peça inteira. */
+    get partesEditadas() { return filtroDePartes; },
+    /* A malha VIVA, com as posições que o gesto já mexeu. Quem muda topologia
+       precisa dela e não do que veio do arquivo: extrudar depois de mover tem de
+       partir de onde a peça está. */
+    malha: () => ({ ...neutro, V: new Map([...neutro.V].map(([id, p]) => [id, [...p]])), F: neutro.F }),
     /* A seta tem tamanho constante na tela, então precisa reagir à câmera a cada
        quadro; quem tem o laço de quadro é a bancada. */
     acompanharCamera: () => { atualizarGizmo(); gizmo.acompanharCamera(); },

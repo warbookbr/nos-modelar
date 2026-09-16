@@ -122,6 +122,33 @@ comparar com a receita intacta devolvia `piorMm` de 0,000916, um número que
 qualquer leitura entende como "praticamente certo", enquanto um tubo inteiro
 sobrava. Só a bandeira `dentro` acusava. Agora os dois sentidos levam a infinito.
 
+## Feito na fatia 3 — topologia
+
+As operações que mudam faces moram em `src/autoria/topologia-da-malha.js`, no
+núcleo e sem Three.js: extrudar, duplicar, apagar, criar face, rotacionar e
+escalar recebem a malha neutra mais o modo e a seleção, e devolvem uma malha
+nova sem tocar a de entrada. Os dezesseis testes de unidade provam a conta, e a
+guarda de navegador prova que o resultado chegou à cena, porque uma conta certa
+que não é redesenhada não serve para quem está editando.
+
+Dois defeitos apareceram quando a guarda passou a cobrir esse caminho. O
+primeiro era a face extrudada nascer no mesmo lugar da original, o que deixava
+as paredes laterais com área zero e fazia `adaptarThree` recusar a face por não
+definir plano; a correção afasta o anel novo na direção da normal da face por um
+quarto do comprimento médio das arestas. O segundo era o recorte da edição se
+perder depois de qualquer operação de topologia: a camada era recriada lendo as
+partes selecionadas no controlador, e aplicar o modelo reconstruído limpa essa
+seleção, então a edição que valia para o tubo do selim voltava a valer para a
+peça inteira e o apagar seguinte levava as oito partes da bicicleta. A camada
+agora guarda o próprio recorte em `partesEditadas`, e quem reconstrói a malha
+pergunta a ela.
+
+O desfazer também precisou mudar de forma. Guardar só as posições dos vértices
+não devolve uma parte apagada, porque a parte sumiu junto com as faces; cada
+passo passou a guardar vértices e faces, e o desfazer escolhe entre repor as
+coordenadas na geometria desenhada, quando o conjunto de faces é o mesmo, e
+refazer o modelo inteiro, quando não é.
+
 ## Riscos e parada
 
 O risco que obriga parar é a fatia 1. Se apagar uma parte ou criar uma parte nova

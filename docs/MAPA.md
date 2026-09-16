@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-858 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -778,6 +778,8 @@
 - `servico-forma-global.js` — Fachada pura da N2. Mantém contrato, compilação, medição, render e decisão atrás de uma porta única consumível sem conhecer a implementação.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
+- `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
+- `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na bicicleta: quantas faces e vértices nascem, quem some, e o que fica no lugar.
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 - `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.
