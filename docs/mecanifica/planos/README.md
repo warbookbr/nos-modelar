@@ -2,29 +2,35 @@
 
 ## Estado
 
-**Plano ativo:** [Modo de edição de malha](2026-09-15-modo-de-edicao-de-malha.md) (2026-09-15-modo-de-edicao-de-malha.md).
+**Plano ativo:** [Topologia, mover a peça, e ler o gesto](2026-09-16-topologia-e-leitura-do-gesto.md) (2026-09-16-topologia-e-leitura-do-gesto.md).
 
-O gesto por junta move os cantos onde as partes se encontram e nada além disso, e
-o autor recusou por ser complexo demais: ele quer o que já sabe usar, que é o modo
-de edição do Blender. A restrição que justificava limitar o gesto caiu quando o
-caminho de volta ficou pronto, porque a rodada de absorção trabalha com qualquer
-malha deformada. O plano entrega selecionar e mover vértice, aresta e face, com
-as teclas de sempre, e uma medida de alvo que enxergue abaixo da caixa da parte.
-Extrudar, duplicar e apagar mudam topologia e ficam para o plano seguinte, que é
-escrito assim que este fechar.
+O modo de edição move o que já existe e nada mais, e mover a parte inteira como
+corpo não existe. Este plano traz extrudar, duplicar, apagar, criar, rotacionar e
+escalar, mais o deslocamento da peça inteira. No fim, e de propósito, duas
+ferramentas de leitura: uma que compara a malha do arquivo com a editada e
+descreve o gesto em palavras geométricas com números, em vez da nuvem de pontos
+que a rodada de absorção recebe hoje, e o mapa de qual passo da receita constrói
+qual parte. Elas vêm por último porque as operações acima decidem que vocabulário
+a descrição precisa ter.
 
+O [modo de edição de malha](encerrados/2026-09-15-modo-de-edicao-de-malha.md) foi
+**concluído** em 2026-09-16. Tab entra no modo, 1/2/3 trocam entre vértice,
+aresta e face, L pega a ilha, G move com trava de eixo e valor digitado, o gizmo
+move pelo ponteiro, Ctrl gruda no vértice mais próximo e Ctrl+Z desfaz até o
+arquivo. Provou o que faltava: variar os números que a receita declara não
+alcança uma edição livre, mas reescrever a receita alcança — com o topo do tubo
+do selim empurrado 6 mm em x, onde nenhum parâmetro chega, a reescrita fecha em
+0,236 mm. Seis defeitos de interface foram achados e medidos, entre eles o clique
+tremido que limpava a seleção e o realce que era apagado pela ordem de desenho.
 
 O [ajuste da bancada volta como receita](encerrados/2026-09-14-ajuste-da-bancada-volta-como-receita.md)
 foi **concluído** em 2026-09-15. A bancada exigia que todo gesto caísse num
 parâmetro nomeado no instante do arrasto, e num quadro em treliça nenhum número
-empurra um tubo inteiro sem descolar as juntas: arrastar a seta do balanço
-esticava os quatro balanços de uma vez. Os dois momentos foram separados. Agora a
-pessoa arrasta os cantos onde as partes se encontram, a malha deforma sem tocar na
-receita, e o que ela salva é a peça medida por nome de parte, sem vértice nem
-índice de passo. A skill `absorver-ajuste-da-bancada` traduz isso de volta, com
-`npm run absorver` dizendo em milímetro o que falta e `origens:check` impedindo
-que a tradução invente número para fechar a conta. O editor de malha completo
-continua adiado, agora sobre um caminho de volta provado.
+empurra um tubo inteiro sem descolar as juntas. Os dois momentos foram separados:
+a pessoa desenha, e a tradução vira uma rodada com dono. Dali saíram o alvo
+medido por parte, a skill `absorver-ajuste-da-bancada`, o comando
+`npm run absorver` e o gate `origens:check`, que impede a tradução de inventar
+número para fechar a conta.
 
 A [seta move de verdade](encerrados/2026-09-12-a-seta-move-de-verdade.md) foi
 **concluída** em 2026-09-12. O gesto direto da bancada tinha quatro defeitos ao mesmo tempo, todos medidos: a

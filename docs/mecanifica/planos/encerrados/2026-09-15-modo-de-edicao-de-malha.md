@@ -1,8 +1,6 @@
 # Modo de edição de malha — vértice, aresta e face
 
-**Estado:** ativo
-
-**PARADO na fatia 1** pela cláusula de parada abaixo; a decisão de escopo é do autor.
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -148,4 +146,36 @@ afrouxada depois para fazer uma rodada passar.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-16.** Commits `827bc21`, `36c7464`, `532a575`, `8c0fb0c`,
+`091831b`, `661fcce`, `566d1d8`, `dd8c073` e `a47be13`, na main. Trinta e um
+gates verdes, com dois novos: `guarda:edicao`, que afirma o modo no navegador, e
+`bancada:fronteira:check`, que impede o núcleo e as ferramentas da IA de
+dependerem da bancada.
+
+O que passou a ser possível: `Tab` entra no modo de edição — só nas partes
+selecionadas, se houver —, `1`, `2` e `3` trocam entre vértice, aresta e face,
+`L` pega a ilha, `G` move com trava de eixo e valor digitado, o gizmo de três
+setas move pelo ponteiro, `Ctrl` gruda no vértice mais próximo, e `Ctrl+Z`
+desfaz até o estado do arquivo. O que a pessoa desenhou vira alvo medido, e a
+rodada de absorção reescreve a receita a partir dele.
+
+A pergunta que quase derrubou o plano, e a resposta. Variar os números que a
+receita já declara não alcança uma edição livre: mover um vértice 5 mm deixa a
+melhor busca sobre os vinte e nove parâmetros a 2,531 mm, cinco vezes a
+tolerância. Mas a rodada não procura número, ela reescreve a receita. Provado no
+caso que nenhum número alcança — o triângulo do quadro é simétrico e nada
+desloca o tubo do selim para o lado: com o anel de cima empurrado 6 mm em x, a
+receita fica 6,000 mm fora e a reescrita chega a 0,236 mm, na primeira
+tentativa.
+
+Seis defeitos de interface foram achados pela guarda ou pelo autor e corrigidos,
+cada um medido: digitar o valor do movimento trocava de nível; a edição valia
+para a peça inteira em vez da parte selecionada; a câmera ficava presa porque a
+camada parava todos os botões; o clique tremido virava caixa vazia e limpava a
+seleção (25 de 42 vértices respondiam com 8 px de tremida); o gizmo engolia o
+clique de seleção e trazia outro vértice (42,7 px de erro, hoje 2,8); e o realce
+era apagado pelos pontos normais por ordem de fila de desenho (o pixel vinha
+âmbar em toda posição de câmera, hoje vem branco).
+
+Devolvido à fila, e não ao backlog: extrudar, duplicar, apagar, criar,
+rotacionar e escalar, mais mover a parte inteira, que o autor pediu ao testar.
