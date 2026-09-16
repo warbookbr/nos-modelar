@@ -673,9 +673,16 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   }
 
   function refletirSetas(selecionadas) {
-    /* Uma parte por vez: com duas selecionadas não existe centro nem parâmetro
-       comum, e uma seta que aparece no meio de duas peças diria uma ligação que
-       ninguém mediu. */
+    /* AS SETAS DE PARÂMETRO SAÍRAM DA CENA. Elas e o gizmo de mover apareciam
+       juntas na parte selecionada, em tamanhos diferentes, e não havia como
+       saber qual gesto cada uma fazia — o autor relatou a confusão com as duas
+       na tela. Escolher a peça passa a mostrar UM punho, o de mover, que é o que
+       ele espera ao clicar. Os números declarados continuam inteiros na aba de
+       parâmetros, com campo e arrasto; o que se perdeu foi a duplicata na cena. */
+    return setasDeParametro.esconder();
+  }
+
+  function refletirSetasDeParametro(selecionadas) {
     if (!receitaAberta || selecionadas.length !== 1) return setasDeParametro.esconder();
 
     const ligacao = garantirLigacao();
@@ -886,6 +893,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       linha.querySelector('.check').textContent = ativa ? '✓' : '';
     }
     refletirSetas(estado.selecionadas);
+    prepararMoverParte(estado.selecionadas);
     const temSelecao = estado.selecionadas.length > 0;
     resumo.textContent = temSelecao
       ? estado.selecionadas.length === 1
@@ -1128,18 +1136,35 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      eixo travado, o valor digitado e o Ctrl+Z valem igual, e o que sai é o mesmo
      alvo medido.
      `G` sem estar no modo de edição é o que o Blender faz no modo objeto. */
+  /* O GIZMO DE MOVER APARECE AO ESCOLHER A PEÇA, e não só depois do `G`. Era o
+     que o autor esperava do clique: escolher a peça e ter o punho ali. O `G`
+     continua valendo para quem prefere teclado, e arrastar a seta faz o mesmo. */
+  function prepararMoverParte(selecionadas) {
+    if (edicaoDeMalha?.estado?.().ativo && edicaoDeMalha.desenhaMalha) return;
+    if (edicaoDeMalha?.movendo) return;
+    if (!modeloAtual?.neutro || !selecionadas?.length) {
+      if (edicaoDeMalha && !edicaoDeMalha.desenhaMalha) {
+        edicaoDeMalha.destruir();
+        edicaoDeMalha = null;
+      }
+      return;
+    }
+    edicaoDeMalha?.destruir();
+    edicaoDeMalha = criarCamadaDeEdicao(modeloAtual, [...selecionadas], { desenharMalha: false });
+    edicaoDeMalha.alternar();
+    edicaoDeMalha.selecionarTudo();
+  }
+
   function moverParteInteira() {
     const selecionadas = controlador ? [...controlador.selecionadas] : [];
     if (!modeloAtual?.neutro || selecionadas.length === 0) {
       mostrarAviso('Selecione uma parte antes de mover.');
       return false;
     }
-    edicaoDeMalha?.destruir();
-    edicaoDeMalha = criarCamadaDeEdicao(modeloAtual, selecionadas, { desenharMalha: false });
-    edicaoDeMalha.alternar();
-    edicaoDeMalha.selecionarTudo();
-    if (!edicaoDeMalha.iniciarMovimento()) {
-      edicaoDeMalha.alternar();
+    if (!edicaoDeMalha?.estado?.().ativo || edicaoDeMalha.desenhaMalha) {
+      prepararMoverParte(selecionadas);
+    }
+    if (!edicaoDeMalha?.iniciarMovimento()) {
       return false;
     }
     mostrarAviso(`Movendo ${selecionadas.join(', ')}. X/Y/Z travam o eixo, Ctrl gruda, Esc cancela.`);

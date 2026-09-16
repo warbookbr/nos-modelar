@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 /**
- * guarda-seta-de-parametro.mjs — a seta move a parte na medida do arrasto, e só
- * ela.
+ * guarda-seta-de-parametro.mjs — mexer num parâmetro não faz a peça escorregar.
  *
- * Por que existe: o gesto direto da bancada tinha quatro defeitos ao mesmo
- * tempo, e cada um escondia o outro. A escolha da seta comparava as BORDAS da
- * caixa da parte, então o raio de um tubo, que engorda e não anda, ganhava a
- * seta. Toda prévia reencaixava a peça no estúdio, então as oito partes
- * escorregavam juntas. A reconstrução da prévia chamava `esconder`, que jogava
- * fora o arrasto em curso, e o gesto morria no primeiro movimento do ponteiro.
- * E a conversão do arrasto ignorava a escala do estúdio, então o avanço saía
- * multiplicado pela ampliação da peça.
+ * ESTA GUARDA ENCOLHEU. Ela nasceu afirmando que a seta de parâmetro movia a
+ * parte na medida do arrasto, e essa seta saiu da cena em 2026-09-16: ela
+ * aparecia junto com o gizmo de mover, em tamanhos diferentes, e não havia como
+ * saber qual gesto cada punho fazia. O caminho por número continua inteiro no
+ * painel de parâmetros, e é o que sobra aqui.
  *
- * Nenhum deles aparece em teste de unidade: todos moram no encontro entre
- * medida, cena e ponteiro. A afirmação aqui é o que se vê depois de um arrasto
- * de verdade sobre o pacote construído.
+ * O que continua sendo afirmado, e é o defeito que mais custou: toda prévia
+ * reencaixava a peça no estúdio, e engordar um tubo fazia as oito partes
+ * escorregarem juntas. Isso não aparece em teste de unidade — mora no encontro
+ * entre medida, cena e reexecução.
  *
  *   npm run guarda:seta
  *
@@ -168,60 +165,6 @@ try {
   }
 
 
-  await pagina.click('.aba-btn[data-aba="inspecao"]');
-  await pagina.waitForTimeout(400);
-
-  const antes = await ler();
-  const seta = antes.setas.find((s) => !s.inerte);
-  ok('a parte selecionada oferece pelo menos uma seta arrastável', Boolean(seta),
-    antes.setas.map((s) => `${s.eixo}${s.inerte ? ' (inerte)' : ''}`).join(', ') || 'nenhuma');
-  if (!seta) throw new Error('sem seta para arrastar');
-
-  const dx = seta.ponta.x - seta.base.x;
-  const dy = seta.ponta.y - seta.base.y;
-  const comprimento = Math.hypot(dx, dy);
-  const ux = dx / comprimento;
-  const uy = dy / comprimento;
-  /* PONTO DE PARTIDA FORA DA HASTE DESENHADA, de propósito: a haste tem treze
-     milímetros na cena, e o que esta guarda afirma é que pegar a seta não exige
-     pontaria. Doze pixels ao lado dela é erro de mira comum e tem de funcionar. */
-  const meio = {
-    x: (seta.base.x + seta.ponta.x) / 2 - uy * 12,
-    y: (seta.base.y + seta.ponta.y) / 2 + ux * 12,
-  };
-  await pagina.mouse.move(meio.x, meio.y);
-  await pagina.mouse.down();
-  for (let passo = 1; passo <= 10; passo += 1) {
-    await pagina.mouse.move(meio.x + ux * PIXELS * passo / 10, meio.y + uy * PIXELS * passo / 10);
-  }
-  await pagina.mouse.up();
-  await pagina.waitForTimeout(1500);
-  const depois = await ler();
-
-  const andou = (nome) => {
-    const a = antes.centros[nome];
-    const d = depois.centros[nome];
-    if (!a || !d) return Infinity;
-    return Math.hypot(d[0] - a[0], d[1] - a[1], d[2] - a[2]);
-  };
-
-  /* O avanço PEDIDO pelo gesto, em unidades do mundo: fração da seta percorrida
-     pelo ponteiro vezes o comprimento da seta. É contra isto que o movimento
-     obtido é comparado — é o que significa a peça seguir o ponteiro. */
-  const pedido = (PIXELS / comprimento) * antes.escalaDaSeta;
-  const obtido = andou(PARTE);
-  ok('a parte segue o ponteiro, na medida do arrasto',
-    Math.abs(obtido - pedido) <= pedido * TOLERANCIA,
-    `pediu ${pedido.toFixed(4)}, andou ${obtido.toFixed(4)}`);
-
-  const outras = Object.keys(antes.centros).filter((nome) => nome !== PARTE);
-  const escorregaram = outras.filter((nome) => andou(nome) > pedido * 0.01);
-  ok('nenhuma outra parte escorrega junto', escorregaram.length === 0,
-    escorregaram.map((n) => `${n} ${andou(n).toFixed(4)}`).join(', '));
-
-  ok('o arrasto sobrevive às prévias e não morre no primeiro movimento',
-    obtido > pedido * 0.5, `andou ${obtido.toFixed(4)} de ${pedido.toFixed(4)} pedidos`);
-
   ok('a página não emitiu erro', erros.length === 0, erros[0] ?? '');
 } catch (erro) {
   ok('a execução chega ao fim sem exceção', false, String(erro?.message ?? erro));
@@ -234,4 +177,4 @@ if (falhas.length) {
   console.error(`guarda:seta FALHOU — ${falhas.length}: ${falhas.join(', ')}`);
   process.exit(1);
 }
-console.log('guarda:seta ok — o gesto direto move a parte selecionada na medida do arrasto.');
+console.log('guarda:seta ok — mexer num parâmetro não faz a peça escorregar no estúdio.');
