@@ -1,7 +1,12 @@
 /* estado-local.js — preferências persistentes e locais da apresentação da bancada. */
 
 const CHAVE_PREFERENCIAS = 'mecanifica.bancada.preferencias';
-const PADRAO = Object.freeze({ grade: true, chao: true });
+/* O CHÃO NASCE DESLIGADO. Ele é um plano opaco em y=0, e a imagem de referência
+   é outro plano: vista de cima, a foto fica de perfil e o chão cobre o pouco que
+   dela apareceria. Quem abre a bancada para conferir a peça contra uma foto
+   perdia tempo descobrindo que o interruptor existia. A grade continua ligada
+   porque ela é linha, não superfície, e não esconde nada. */
+const PADRAO = Object.freeze({ grade: true, chao: false });
 
 function normalizar(valor) {
   if (!valor || typeof valor !== 'object') return { ...PADRAO };
