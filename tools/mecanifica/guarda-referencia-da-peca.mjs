@@ -107,6 +107,39 @@ try {
     imagens.filter((i) => i.status !== 200).map((i) => `${i.status} ${i.pathname}`).join(', '));
   /* `public/referencias/` não existe mais, e a prova falha se alguém a
      recriar: cópia em `public/` é o estado que esta mudança desfez. */
+  /* A MINIATURA E O PUNHO. O painel tinha um botão solto de apagar e nada
+     dizendo qual imagem sumiria, e a posição da foto só se ajustava por três
+     barras num canto da tela — procurar o encaixe olhando o número em vez da
+     cena. Os dois são de tela, então nenhum teste de unidade os enxerga. */
+  await pagina.click('.aba-btn[data-aba="referencias"]');
+  await pagina.waitForTimeout(700);
+  const painel = await pagina.evaluate(() => {
+    const itens = [...document.querySelectorAll('.item-referencia')];
+    const ambiente = window.__mecanificaBancada.ambiente();
+    const punho = ambiente.scene.getObjectByName('__gizmo_da_imagem__');
+    return {
+      quantos: itens.length,
+      comMiniatura: itens.filter((i) => {
+        const img = i.querySelector('img.miniatura-referencia');
+        return Boolean(img?.src) && img.naturalWidth > 0;
+      }).length,
+      comApagar: itens.filter((i) => i.querySelector('.apagar-referencia')).length,
+      botaoSolto: [...document.querySelectorAll('button')]
+        .some((b) => b.textContent.trim() === 'Deletar imagem referência'),
+      punhoVisivel: Boolean(punho?.visible),
+      setasDoPunho: punho?.children?.length ?? 0,
+    };
+  });
+
+  ok('a imagem carregada aparece como miniatura, e a miniatura carregou',
+    painel.quantos === 1 && painel.comMiniatura === 1,
+    `${painel.quantos} item(ns), ${painel.comMiniatura} com imagem visível`);
+  ok('cada miniatura leva o apagar dela', painel.comApagar === painel.quantos);
+  ok('o botão solto de deletar não existe mais', painel.botaoSolto === false);
+  ok('a imagem tem punho na cena, com as três setas',
+    painel.punhoVisivel && painel.setasDoPunho === 3,
+    `visível ${painel.punhoVisivel}, ${painel.setasDoPunho} setas`);
+
   ok('não há cópia de referência em `public/`', !existsSync(join(REPO, 'public/referencias')));
 
   /* A foto é de quem confere no olho, então ela precisa enquadrar o que a

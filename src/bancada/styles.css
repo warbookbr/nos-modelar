@@ -1804,3 +1804,53 @@ body.auditoria .recolher { display: none; }
 .cena-preferencias {
   margin: 10px 0 14px;
 }
+
+/* As imagens de referência carregadas, cada uma com o apagar dela. Antes havia
+   um botão solto de deletar e nada dizendo qual imagem sumiria. O scroll existe
+   porque a lista cresce quando a peça declara mais de uma referência. */
+.lista-referencias {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 10px 0 4px;
+  scrollbar-color: var(--amarelo) transparent;
+}
+
+.item-referencia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.miniatura-referencia {
+  width: 52px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  flex: 0 0 auto;
+}
+
+.nome-referencia {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 11px/1.3 ui-monospace, monospace;
+  color: #c7d3cd;
+}
+
+.apagar-referencia {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  line-height: 1;
+}

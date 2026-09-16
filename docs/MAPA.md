@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+858 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -806,6 +806,7 @@
 
 - `atalhos.js` — atalhos.js — catálogo de comandos de teclado da bancada, com persistência local e recusa de colisão.
 - `atalhos.test.js` — atalhos.test.js — registro de atalhos de teclado da bancada.
+- `gizmo-de-setas.js` — gizmo-de-setas.js — as três setas por eixo, desenhadas e clicáveis.
 - `historico-parametros.js` — historico-parametros.js — o desfazer da sessão, limitado ao que a pessoa mexeu depois de abrir a peça.
 - `historico-parametros.test.js` — historico-parametros.test.js — desfazer da sessão.
 - `punhos-de-junta.js` — punhos-de-junta.js — o punho no canto onde as partes se encontram.
@@ -827,6 +828,7 @@
 - `painel-referencias.js` — painel-referencias.js — interface lateral para visualização de critérios de engenharia, intenção da IA e toggles de pranchas 2D.
 - `prancha-overlay.js` — prancha-overlay.js — projeta pranchas técnicas 2D, contornos e blueprints como planos no espaço 3D.
 - `prancha-overlay.test.js` — prancha-overlay.test.js — plano de foto é apresentação, não modelo procedural.
+- `punho-da-imagem.js` — punho-da-imagem.js — arrastar a imagem de referência na cena.
 
 ## src/bancada/sessao/
 

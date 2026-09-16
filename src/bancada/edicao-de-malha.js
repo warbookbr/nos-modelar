@@ -6,6 +6,7 @@
  * medida geométrica, nunca a seleção da interface. */
 
 import * as THREE from 'three';
+import { criarGizmoDeSetas } from './controles/gizmo-de-setas.js';
 
 const MODOS = new Set(['vertice', 'aresta', 'face']);
 /* O vértice desenhado, em pixels na tela. Dois e meio era o valor inicial e o
@@ -336,77 +337,18 @@ export function criarCamadaEdicaoDeMalha({
      descobre. As setas dizem o eixo antes do gesto e dão um segundo caminho para
      quem prefere o ponteiro. Elas convivem com o G — arrastar a seta abre o
      mesmo movimento que a tecla abre, com o eixo já travado.
-     Tamanho constante na tela pela mesma conta das setas de parâmetro, e alvo de
-     clique invisível bem mais grosso que a haste desenhada, porque o autor já
-     relatou não conseguir acertar uma haste fina. */
-  const EIXOS_DO_GIZMO = [
-    { eixo: 0, direcao: new THREE.Vector3(1, 0, 0), cor: 0xff5a52 },
-    { eixo: 1, direcao: new THREE.Vector3(0, 1, 0), cor: 0x46d67f },
-    { eixo: 2, direcao: new THREE.Vector3(0, 0, 1), cor: 0x5a8bff },
-  ];
-  /* Um oitavo da distância é o tamanho da seta de parâmetro, que aponta para uma
-     peça inteira. Aqui ela aponta para um vértice, e nesse tamanho cobria a
-     região que a pessoa está tentando enxergar. Um dezesseis avos mantém a seta
-     legível sem engolir a malha. */
-  const FRACAO_DO_GIZMO = 1 / 16;
-  /* O alvo de clique é o DOBRO do que seria proporcional à haste. A seta
-     encolheu pela metade para não engolir a malha, e o alvo encolheria junto:
-     pegar a seta voltaria a exigir pontaria, que é a queixa que ela veio
-     resolver. Como ele é invisível, engrossar não muda nada na imagem. */
-  const RAIO_DO_ALVO_DO_GIZMO = 0.18;
-  const gizmo = new THREE.Group();
-  gizmo.name = '__gizmo_de_edicao__';
-  gizmo.visible = false;
-  gizmo.renderOrder = 1000;
-  raiz.add(gizmo);
-  const materiaisDoGizmo = [];
-  for (const { eixo, direcao, cor } of EIXOS_DO_GIZMO) {
-    const material = new THREE.MeshBasicMaterial({ color: cor, depthTest: false, transparent: true });
-    materiaisDoGizmo.push(material);
-    const braco = new THREE.Group();
-    const haste = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.8, 8), material);
-    haste.position.y = 0.4;
-    const ponta = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.2, 10), material);
-    ponta.position.y = 0.9;
-    /* O ALVO NÃO COBRE O CENTRO. Ele ia da base à ponta, e a base fica em cima da
-       própria seleção: clicar num vértice vizinho pegava a seta e começava um
-       movimento em vez de selecionar, e a seleção antiga continuava lá. Era o
-       "clico em um e vem outro". A haste continua desenhada inteira; só a área
-       que rouba o clique começa depois do centro. */
-    const alvo = new THREE.Mesh(
-      new THREE.CylinderGeometry(RAIO_DO_ALVO_DO_GIZMO, RAIO_DO_ALVO_DO_GIZMO, 0.75, 8),
-      new THREE.MeshBasicMaterial({ visible: false }),
-    );
-    alvo.position.y = 0.65;
-    braco.add(haste, ponta, alvo);
-    braco.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direcao);
-    braco.userData.eixoDoGizmo = eixo;
-    gizmo.add(braco);
-  }
+     O desenho e o teste de clique moram em `gizmo-de-setas.js`, porque a imagem
+     de referência precisa do mesmo punho e duas cópias envelheceriam separadas. */
+  const gizmo = criarGizmoDeSetas({ pai: raiz, canvas, cameraAtual, nome: '__gizmo_de_edicao__' });
 
   function atualizarGizmo() {
     const atual = estado.estado();
     const centro = atual.ativo && atual.selecionados.length ? centroDaSelecao() : null;
-    gizmo.visible = Boolean(centro);
-    if (!centro) return;
-    gizmo.position.fromArray(centro);
-    const camera = cameraAtual();
-    const naCena = gizmo.position.clone().applyMatrix4(raiz.matrixWorld);
-    const distancia = camera.position.distanceTo(naCena);
-    const escala = raiz.scale.x || 1;
-    gizmo.scale.setScalar(Math.max((distancia * FRACAO_DO_GIZMO) / escala, 1e-4));
+    if (!centro) return gizmo.esconder();
+    return gizmo.mostrar(centro);
   }
 
-  function eixoDoGizmoSobOPonteiro(evento) {
-    if (!gizmo.visible) return null;
-    raio(evento);
-    for (const item of raycaster.intersectObject(gizmo, true)) {
-      let no = item.object;
-      while (no && no.userData.eixoDoGizmo === undefined) no = no.parent;
-      if (no) return no.userData.eixoDoGizmo;
-    }
-    return null;
-  }
+  const eixoDoGizmoSobOPonteiro = (evento) => gizmo.eixoSobOPonteiro(evento);
 
   const caixa = document.createElement('div');
   caixa.className = 'caixa-selecao-malha';
@@ -991,7 +933,7 @@ export function criarCamadaEdicaoDeMalha({
     get desenhaMalha() { return desenharMalha; },
     /* A seta tem tamanho constante na tela, então precisa reagir à câmera a cada
        quadro; quem tem o laço de quadro é a bancada. */
-    acompanharCamera: atualizarGizmo,
+    acompanharCamera: () => { atualizarGizmo(); gizmo.acompanharCamera(); },
     destruir() {
       canvas.removeEventListener('pointerdown', aoPressionar, true);
       canvas.removeEventListener('pointermove', aoMover, true);
@@ -1002,9 +944,7 @@ export function criarCamadaEdicaoDeMalha({
       geometriaPontosSel.dispose(); materialPontosSel.dispose();
       geometriaArestasSel.dispose(); materialArestasSel.dispose();
       geometriaContornoFace.dispose(); materialContornoFace.dispose();
-      for (const material of materiaisDoGizmo) material.dispose();
-      gizmo.traverse((no) => no.geometry?.dispose());
-      gizmo.removeFromParent();
+      gizmo.destruir();
       caixa.remove();
       grupo.removeFromParent();
     },

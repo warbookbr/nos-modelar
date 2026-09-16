@@ -17,6 +17,7 @@ import { criarCamadaEdicaoDeMalha } from './edicao-de-malha.js';
 import { criarSincronizadorSessao } from './sessao/sincronizador.js';
 import { criarGerenciadorReferencias3D } from './referencias/prancha-overlay.js';
 import { criarPainelReferencias } from './referencias/painel-referencias.js';
+import { criarPunhoDaImagem } from './referencias/punho-da-imagem.js';
 import { criarArmazenamentoImagem } from './referencias/armazenamento-imagem.js';
 import { criarAlinhamentoInicial, normalizarImagemReferencia } from './referencias/imagem-referencia.js';
 import { urlDaReferencia } from './referencias/imagens-da-peca.js';
@@ -262,24 +263,52 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     if (!textura) return null;
     textura.colorSpace = THREE.SRGBColorSpace;
     gerenciadorReferencias3D.definirImagemReferencia(descritor, { textura, possuiTextura: true });
+    /* O painel e o punho só sabem da foto quando alguém avisa. A imagem também
+       chega sozinha, declarada pela peça, e sem este aviso a miniatura ficava
+       vazia numa bancada que já estava mostrando a referência na cena. */
+    painelReferencias?.refletirAlinhamento?.(descritor.alinhamento);
+    punhoDaImagem.refletir();
     await armazenamentoImagem.salvar(alvoReferenciaAtual, descritor);
     return descritor;
   }
+  /* UMA PORTA SÓ para o alinhamento da imagem. O painel e o punho escrevem a
+     mesma coisa, e duas escritas separadas sairiam de sincronia: o número no
+     campo diria uma posição e a foto estaria em outra. */
+  async function aplicarAlinhamentoDaImagem(alinhamento) {
+    const atual = gerenciadorReferencias3D.obterImagemReferencia();
+    if (!atual || !alvoReferenciaAtual) return;
+    const atualizado = { ...atual.alinhamento, ...alinhamento };
+    gerenciadorReferencias3D.atualizarImagemReferencia(atualizado);
+    painelReferencias?.refletirAlinhamento?.(atualizado);
+    await armazenamentoImagem.salvar(alvoReferenciaAtual, { ...atual, alinhamento: atualizado });
+  }
+
   const painelReferencias = criarPainelReferencias({
     container: document.getElementById('containerReferencias'),
     aoAlternarPrancha: (id, visivel) => gerenciadorReferencias3D.alternarVisibilidade(id, visivel),
     aoGerarPlano: gerarPlanoReferencia,
-    aoAtualizarAlinhamento: async (alinhamento) => {
+    aoAtualizarAlinhamento: aplicarAlinhamentoDaImagem,
+    imagensCarregadas: () => {
       const atual = gerenciadorReferencias3D.obterImagemReferencia();
-      if (!atual || !alvoReferenciaAtual) return;
-      const atualizado = { ...atual.alinhamento, ...alinhamento };
-      gerenciadorReferencias3D.atualizarImagemReferencia(atualizado);
-      await armazenamentoImagem.salvar(alvoReferenciaAtual, { ...atual, alinhamento: atualizado });
+      return atual?.url ? [atual] : [];
     },
     aoRemoverImagem: async () => {
       gerenciadorReferencias3D.removerImagemReferencia();
+      punhoDaImagem.refletir();
       if (alvoReferenciaAtual) await armazenamentoImagem.remover(alvoReferenciaAtual);
     },
+  });
+
+  /* O PUNHO DA IMAGEM. As três barras de posição no painel fazem a pessoa
+     procurar às cegas: ela olha o modelo e arrasta um número no canto da tela.
+     O punho põe o gesto onde ela está olhando, e o painel continua refletindo o
+     número — os dois escrevem o mesmo alinhamento. */
+  const punhoDaImagem = criarPunhoDaImagem({
+    cena: ambiente.scene,
+    canvas,
+    cameraAtual: () => ambiente.camera,
+    alinhamentoAtual: () => gerenciadorReferencias3D.obterImagemReferencia()?.alinhamento ?? null,
+    aoArrastar: (parcial) => { aplicarAlinhamentoDaImagem(parcial); },
   });
 
   let sincronizador = null;
@@ -486,6 +515,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   (function acompanharCamera() {
     punhosDeJunta.atualizarEscala();
     edicaoDeMalha?.acompanharCamera?.();
+    punhoDaImagem.acompanharCamera();
     requestAnimationFrame(acompanharCamera);
   }());
 

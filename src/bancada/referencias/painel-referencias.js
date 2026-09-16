@@ -8,6 +8,10 @@ export function criarPainelReferencias({
   aoGerarPlano = async () => null,
   aoAtualizarAlinhamento = () => {},
   aoRemoverImagem = async () => {},
+  /* O que está carregado agora, para o painel desenhar a miniatura. Uma lista,
+     e não um descritor: hoje a bancada guarda uma imagem por peça, e a lista
+     deixa o painel pronto para mais de uma sem trocar a forma da chamada. */
+  imagensCarregadas = () => [],
 }) {
   if (!container) return null;
 
@@ -98,9 +102,14 @@ export function criarPainelReferencias({
     url.type = 'url'; url.placeholder = 'URL da imagem para a IA'; url.className = 'campo-url-referencia';
     const gerar = document.createElement('button');
     gerar.type = 'button'; gerar.className = 'botao primaria'; gerar.textContent = 'Gerar objeto imagem referência';
-    const apagar = document.createElement('button');
-    apagar.type = 'button'; apagar.className = 'botao'; apagar.textContent = 'Deletar imagem referência';
     const status = document.createElement('p'); status.className = 'resumo-ia';
+
+    /* AS MINIATURAS. Antes havia um botão solto de apagar e nada dizendo QUAL
+       imagem estava carregada: a pessoa via cinco barras de posição e um botão
+       de deletar sem saber o que ia sumir. A miniatura mostra a imagem e leva o
+       apagar dela junto, então o botão solto deixou de existir. */
+    const lista = document.createElement('div');
+    lista.className = 'lista-referencias';
     gerar.addEventListener('click', async () => {
       const fonte = fonteSelecionada ?? (url.value.trim() ? { fonte: 'url', url: url.value.trim(), rotulo: 'Imagem por URL' } : null);
       if (!fonte) { status.textContent = 'Escolha uma imagem ou informe uma URL.'; return; }
@@ -108,7 +117,45 @@ export function criarPainelReferencias({
       if (descritor) { alinhamento = { ...descritor.alinhamento }; refletirControles(); status.textContent = 'Imagem posicionada na bancada.'; }
       else status.textContent = 'Não foi possível carregar esta imagem.';
     });
-    apagar.addEventListener('click', async () => { await aoRemoverImagem(); fonteSelecionada = null; status.textContent = 'Imagem de referência removida.'; });
+    function desenharMiniaturas() {
+      lista.replaceChildren();
+      const carregadas = imagensCarregadas() ?? [];
+      if (carregadas.length === 0) {
+        const vazio = document.createElement('p');
+        vazio.className = 'resumo-ia';
+        vazio.textContent = 'Nenhuma imagem carregada.';
+        lista.append(vazio);
+        return;
+      }
+      for (const imagem of carregadas) {
+        const item = document.createElement('div');
+        item.className = 'item-referencia';
+        const figura = document.createElement('img');
+        figura.className = 'miniatura-referencia';
+        figura.src = imagem.url;
+        figura.alt = imagem.rotulo ?? 'Imagem de referência';
+        const nome = document.createElement('span');
+        nome.className = 'nome-referencia';
+        nome.textContent = imagem.rotulo ?? 'Imagem de referência';
+        const apagarEsta = document.createElement('button');
+        apagarEsta.type = 'button';
+        apagarEsta.className = 'botao apagar-referencia';
+        apagarEsta.title = `Apagar ${nome.textContent}`;
+        apagarEsta.setAttribute('aria-label', apagarEsta.title);
+        apagarEsta.textContent = '✕';
+        apagarEsta.addEventListener('click', async () => {
+          await aoRemoverImagem(imagem);
+          fonteSelecionada = null;
+          status.textContent = 'Imagem de referência removida.';
+          desenharMiniaturas();
+        });
+        item.append(figura, nome, apagarEsta);
+        lista.append(item);
+      }
+    }
+    desenharMiniaturas();
+    const desenharAnterior = refletirControles;
+    refletirControles = () => { desenharAnterior(); desenharMiniaturas(); };
     const ajuste = document.createElement('div');
     ajuste.className = 'ajuste-imagem-referencia';
     const tituloAjuste = document.createElement('h4');
@@ -125,7 +172,7 @@ export function criarPainelReferencias({
       criarCampoIntervalo('Escala', 'escala', { min: 0.1, max: 3, step: 0.01, unidade: 'fator, 1 é o tamanho original' }),
       criarCampoIntervalo('Opacidade', 'opacidade', { min: 0.05, max: 1, step: 0.05, unidade: '1 é opaca' }),
     );
-    bloco.append(titulo, ajuda, arquivo, url, gerar, apagar, status, ajuste);
+    bloco.append(titulo, ajuda, arquivo, url, gerar, status, lista, ajuste);
     container.appendChild(bloco);
   }
 
@@ -262,5 +309,12 @@ export function criarPainelReferencias({
 
   return {
     renderizar,
+    /* O punho na cena e os campos do painel escrevem o mesmo alinhamento, então
+       o painel precisa ouvir quando a escrita veio do outro lado — senão o campo
+       mostra um número e a foto está noutro lugar. */
+    refletirAlinhamento(novo) {
+      alinhamento = { ...alinhamento, ...novo };
+      refletirControles();
+    },
   };
 }
