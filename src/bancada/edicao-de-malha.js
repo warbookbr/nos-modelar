@@ -278,8 +278,15 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
      mesmo num aglomerado de vértices. */
   const geometriaPontosSel = new THREE.BufferGeometry();
   geometriaPontosSel.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
+  /* TRANSPARENTE DE PROPÓSITO, com opacidade cheia. O Three desenha a fila
+     opaca inteira antes da transparente, e `renderOrder` só ordena dentro da
+     mesma fila: um realce opaco era desenhado ANTES dos pontos normais, que são
+     transparentes, e apagado por eles. O pixel medido em cima do vértice
+     selecionado vinha âmbar, a cor dos outros pontos, em toda posição de câmera.
+     Na mesma fila, a ordem volta a valer. */
   const materialPontosSel = new THREE.PointsMaterial({
-    color: '#ffffff', size: TAMANHO_PONTO_EM_EDICAO * 2.2, sizeAttenuation: false, depthTest: false,
+    color: '#ffffff', size: TAMANHO_PONTO_EM_EDICAO * 2.2, sizeAttenuation: false,
+    depthTest: false, depthWrite: false, transparent: true, opacity: 1,
   });
   const desenhoPontosSel = new THREE.Points(geometriaPontosSel, materialPontosSel);
   desenhoPontosSel.renderOrder = 1001;
@@ -291,7 +298,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
      pontos. */
   const geometriaArestasSel = new THREE.BufferGeometry();
   geometriaArestasSel.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
-  const materialArestasSel = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false });
+  const materialArestasSel = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false, depthWrite: false, transparent: true, opacity: 1 });
   const desenhoArestasSel = new THREE.LineSegments(geometriaArestasSel, materialArestasSel);
   desenhoArestasSel.renderOrder = 1001;
   desenhoArestasSel.visible = false;
@@ -307,7 +314,7 @@ export function criarCamadaEdicaoDeMalha({ canvas, cameraAtual, raiz, neutro, pa
      peça clara; a borda branca diz onde a face começa e termina. */
   const geometriaContornoFace = new THREE.BufferGeometry();
   geometriaContornoFace.setAttribute('position', new THREE.Float32BufferAttribute([], 3));
-  const materialContornoFace = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false });
+  const materialContornoFace = new THREE.LineBasicMaterial({ color: '#ffffff', depthTest: false, depthWrite: false, transparent: true, opacity: 1 });
   const desenhoContornoFace = new THREE.LineSegments(geometriaContornoFace, materialContornoFace);
   desenhoContornoFace.renderOrder = 1001;
   desenhoContornoFace.visible = false;

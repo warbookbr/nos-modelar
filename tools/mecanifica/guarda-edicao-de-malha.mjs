@@ -23,6 +23,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { decodePng } from '../bancadas/bench/pngstats.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -294,24 +295,66 @@ try {
     acertou === disputados.length,
     `${acertou} de ${disputados.length}, pior erro ${piorEmPixels.toFixed(1)}px`);
 
-  /* O REALCE. Trocar a cor de um ponto de sete pixels não diz onde a pessoa
-     clicou. O selecionado é redesenhado por cima, maior e em branco. */
-  const realce = await pagina.evaluate(() => {
-    const ambiente = window.__mecanificaBancada.ambiente();
-    const grupo = ambiente.scene.getObjectByName('__edicao_de_malha__');
-    const desenhos = (grupo?.children ?? []).filter((no) => no.isPoints && no.visible);
-    const base = desenhos.find((no) => no.geometry.getAttribute('color'));
-    const destaque = desenhos.find((no) => no !== base);
-    return {
-      temDestaque: Boolean(destaque),
-      tamanhoBase: base?.material?.size ?? 0,
-      tamanhoDestaque: destaque?.material?.size ?? 0,
-      quantos: destaque?.geometry?.getAttribute('position')?.count ?? 0,
-    };
-  });
-  ok('o vértice selecionado é desenhado por cima, bem maior que os outros',
-    realce.temDestaque && realce.quantos > 0 && realce.tamanhoDestaque >= realce.tamanhoBase * 2,
-    `base ${realce.tamanhoBase}px, destaque ${realce.tamanhoDestaque}px, ${realce.quantos} ponto(s)`);
+  /* O REALCE PRECISA APARECER NA IMAGEM, e não só existir na cena. O autor
+     relatou que, dependendo de onde a câmera está, o realce some. Afirmar que o
+     objeto de destaque existe e é maior não enxerga isso: ele pode existir,
+     estar do tamanho certo, e ser pintado por cima pelos pontos normais.
+     Aqui a prova lê o PIXEL. A cor do destaque é branca e a dos outros pontos é
+     âmbar, então onde o vértice selecionado está desenhado a imagem tem de ser
+     bem mais clara e bem menos saturada que o resto da malha. Repetido em
+     quatro posições de câmera, porque foi assim que o defeito apareceu. */
+  async function realceAparece() {
+    const onde = await pagina.evaluate(() => {
+      const ambiente = window.__mecanificaBancada.ambiente();
+      const grupo = ambiente.scene.getObjectByName('__edicao_de_malha__');
+      const destaque = (grupo?.children ?? [])
+        .find((no) => no.isPoints && no.visible && !no.geometry.getAttribute('color'));
+      const p = destaque?.geometry?.getAttribute('position');
+      if (!p || p.count !== 1) return null;
+      const rect = document.getElementById('cenaBancada').getBoundingClientRect();
+      const V = ambiente.camera.position.constructor;
+      const v = new V(p.getX(0), p.getY(0), p.getZ(0));
+      destaque.localToWorld(v);
+      const pr = v.project(ambiente.camera);
+      if (Math.abs(pr.x) > 1 || Math.abs(pr.y) > 1) return null;
+      return {
+        x: Math.round((pr.x * 0.5 + 0.5) * rect.width + rect.left),
+        y: Math.round((-pr.y * 0.5 + 0.5) * rect.height + rect.top),
+      };
+    });
+    if (!onde) return null;
+    const { W: largura, ch: canais, pixels: dados } = decodePng(await pagina.screenshot());
+    /* O pixel mais branco numa janela de três por três: o ponto tem sete pixels
+       de raio, e um pixel isolado pode cair na borda serrilhada. */
+    let melhor = 0;
+    for (let dy = -1; dy <= 1; dy += 1) {
+      for (let dx = -1; dx <= 1; dx += 1) {
+        const i = (((onde.y + dy) * largura) + (onde.x + dx)) * canais;
+        const [r, g, b] = [dados[i], dados[i + 1], dados[i + 2]];
+        if (r === undefined) continue;
+        const claro = Math.min(r, g, b);
+        const saturacao = Math.max(r, g, b) - Math.min(r, g, b);
+        if (claro > melhor && saturacao < 30) melhor = claro;
+      }
+    }
+    return melhor;
+  }
+
+  const angulos = [
+    ['de frente', 'frontal'],
+    ['de lado', 'direita'],
+    ['de cima', 'superior'],
+    ['de tras', 'traseira'],
+  ];
+  for (const [comoEstaOlhando, vista] of angulos) {
+    await pagina.evaluate((v) => window.__mecanificaBancada.ambiente().definirVista(v), vista);
+    await pagina.waitForTimeout(900);
+    const branco = await realceAparece();
+    ok(`o vértice selecionado aparece branco na imagem, ${comoEstaOlhando}`,
+      branco !== null && branco >= 200, branco === null ? 'fora do quadro' : `canal mais escuro ${branco}`);
+  }
+  await pagina.evaluate(() => window.__mecanificaBancada.ambiente().definirVista('isometrica'));
+  await pagina.waitForTimeout(900);
 
   /* CLICAR DE LONGE. O ponto é desenhado com tamanho constante na tela e o
      alcance do raio é medido no mundo, então um número fixo encolheria a área
