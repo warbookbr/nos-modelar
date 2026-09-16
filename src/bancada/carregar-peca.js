@@ -2,7 +2,7 @@
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
 import { executarReceita } from '../autoria/executar-receita.js';
-import { CATALOGO_HOMOLOGADO, entradaDoCatalogo } from './catalogo-pecas.js';
+import { CATALOGO_HOMOLOGADO, entradaDoCatalogo } from '../autoria/catalogo-pecas.js';
 
 /**
  * Constrói uma peça da Oficina e a converte para Three.js.

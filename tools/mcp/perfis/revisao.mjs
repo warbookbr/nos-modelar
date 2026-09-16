@@ -13,7 +13,7 @@ import {
   RAIZ_PACOTES, REVISOES, caminhoDentro, caminhoPacote,
 } from '../../modelagem/formato-pacote.mjs';
 import { ErroDePacote } from '../../modelagem/formato-pacote.mjs';
-import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../../src/bancada/catalogo-pecas.js';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../../src/autoria/catalogo-pecas.js';
 import {
   compararEntrada, compararSaida, descreverEntrada, descreverSaida,
   erroAcionavel, renderizarEntrada, renderizarSaida, respostaErro, respostaOk,

@@ -2,7 +2,7 @@
 import './styles.css';
 import * as THREE from 'three';
 import { carregarPeca } from './carregar-peca.js';
-import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from './catalogo-pecas.js';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
 import { listarAcervo } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
 import { parametroDeclarado } from '../autoria/parametros-declarados.js';

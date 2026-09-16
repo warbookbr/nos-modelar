@@ -86,7 +86,8 @@
     "guarda:junta": "node tools/mecanifica/guarda-junta-da-bancada.mjs",
     "origens:check": "node tools/mecanifica/origens-check.mjs",
     "absorver": "node tools/mecanifica/absorver-ajuste.mjs",
-    "guarda:edicao": "node tools/mecanifica/guarda-edicao-de-malha.mjs"
+    "guarda:edicao": "node tools/mecanifica/guarda-edicao-de-malha.mjs",
+    "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",

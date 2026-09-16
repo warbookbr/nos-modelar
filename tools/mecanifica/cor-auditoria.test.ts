@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 // mesma convenção que oficina.test.ts já usa para o motor v3.
 import { corDeAuditoria } from '../../src/bancada/controlar-partes.js';
 // @ts-expect-error — mesma convenção da linha acima: módulo .js sem tipos.
-import { LIMIAR_DISTINCAO, distanciaDeCor } from '../../src/bancada/cor-de-auditoria.js';
+import { LIMIAR_DISTINCAO, distanciaDeCor } from '../../src/autoria/cor-de-auditoria.js';
 
 /* O cinza claro sobre o qual a auditoria desenha. */
 const FUNDO_DA_BANCADA = '#f2f2f2';

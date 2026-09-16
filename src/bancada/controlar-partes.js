@@ -7,7 +7,7 @@ import {
   normalizarSelecao,
 } from './estado-bancada.js';
 import { nomesDaSubarvore } from '../autoria/hierarquia-partes.js';
-import { hslDeAuditoria } from './cor-de-auditoria.js';
+import { hslDeAuditoria } from '../autoria/cor-de-auditoria.js';
 
 const VERDE_DESTAQUE = new THREE.Color('#35c98a');
 

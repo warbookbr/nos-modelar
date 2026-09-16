@@ -27,7 +27,7 @@ import { pathToFileURL } from 'node:url';
    exatamente o buraco que ele existe para tapar. */
 export const GATES = [
   'typecheck', 'test', 'mcp:check', 'mcp:visual:check', 'build',
-  'arquitetura:check', 'arquitetura:motor:check', 'autoria:schemas:check',
+  'arquitetura:check', 'arquitetura:motor:check', 'bancada:fronteira:check', 'autoria:schemas:check',
   'bancada:vazia:check', 'porteiro', 'exportar:check',
   'guarda:portas', 'guarda:camera', 'guarda:par', 'guarda:referencia', 'guarda:escolha', 'guarda:seta', 'guarda:junta', 'guarda:edicao', 'guarda:acervo', 'origens:check',
   'mapa:check', 'reguas:check',

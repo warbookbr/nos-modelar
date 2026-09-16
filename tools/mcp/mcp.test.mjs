@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { descreverPecaReutilizavel, PECAS_DISPONIVEIS } from '../mecanifica/descrever-peca.mjs';
-import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../src/bancada/catalogo-pecas.js';
+import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../../src/autoria/catalogo-pecas.js';
 
 /* O que a bancada PUBLICA, que é o que uma prova visual pode renderizar. */
 const PECAS_PUBLICADAS = idsDoCatalogo(CATALOGO_HOMOLOGADO);

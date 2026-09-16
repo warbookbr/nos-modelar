@@ -14,7 +14,7 @@ import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado 
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
-import { paresIndistinguiveis } from '../../src/bancada/cor-de-auditoria.js';
+import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';

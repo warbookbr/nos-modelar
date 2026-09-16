@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo JavaScript puro do contrato de bancada.
-import { CATALOGO_HOMOLOGADO, entradaDoCatalogo, idsDoCatalogo, validarCatalogo } from '../../src/bancada/catalogo-pecas.js';
+import { CATALOGO_HOMOLOGADO, entradaDoCatalogo, idsDoCatalogo, validarCatalogo } from '../../src/autoria/catalogo-pecas.js';
 
 describe('catálogo explícito', () => {
   it('aceita publicação vazia sem inventar peça padrão', () => {

@@ -99,6 +99,12 @@ jobs:
       - name: Mapa do motor procedural em dia
         run: npm run arquitetura:motor:check
 
+      # A bancada e do humano e o nucleo e da IA. Sem regra, o motor procedural
+      # acabaria exigindo Three.js e document para rodar, e o CLI, o MCP e os
+      # testes headless parariam por causa de uma interface.
+      - name: A bancada e modulo, nao dependencia de quem roda sem navegador
+        run: npm run bancada:fronteira:check
+
       - name: Schemas de autoria 3D em dia
         run: npm run autoria:schemas:check
 
