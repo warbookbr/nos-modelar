@@ -98,6 +98,30 @@ interface ser construída.
    mudar.
 5. **Fechar.** Guarda de navegador, documentação, gates completos.
 
+## Medido na fatia 1 — o risco não se confirmou
+
+A rodada de absorção sabe lidar com peça que ganhou ou perdeu parte, e o plano
+segue.
+
+Apagando o tubo superior da malha, a régua acusa `sobrando: ['tuboSuperior']` e
+reprova; a receita reescrita sem aquela parte chega no alvo. Batizando as faces
+do tubo superior como parte nova, ela acusa `ausentes: ['reforcoNovo']` junto com
+o `sobrando`, e a receita reescrita também chega. Nenhum dos dois quebra a
+medida.
+
+O que a medida cobrou, e é requisito e não defeito: a peça declara em `PLANO` o
+que promete ser e declara os `contatos` entre partes. Removendo o tubo superior
+dos passos sem tirá-lo dessas duas listas, `guarda:acervo` reprova com
+"contatos[5]: a peça não tem parte 'tuboSuperior'". Então operação de topologia
+que muda o número de partes obriga a rodada de absorção a revisar o plano e os
+contatos junto com os passos — é trabalho a mais, não impedimento.
+
+Uma fraqueza real foi achada e corrigida na própria régua. Parte AUSENTE já
+levava `piorMm` a infinito, mas parte SOBRANDO não: apagar o tubo superior e
+comparar com a receita intacta devolvia `piorMm` de 0,000916, um número que
+qualquer leitura entende como "praticamente certo", enquanto um tubo inteiro
+sobrava. Só a bandeira `dentro` acusava. Agora os dois sentidos levam a infinito.
+
 ## Riscos e parada
 
 O risco que obriga parar é a fatia 1. Se apagar uma parte ou criar uma parte nova

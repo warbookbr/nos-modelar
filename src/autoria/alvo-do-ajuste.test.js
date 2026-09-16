@@ -130,3 +130,41 @@ describe('compararComAlvo', () => {
     for (const v of parteTubo.dimensaoMm) expect(Math.abs(v)).toBeLessThan(0.001);
   });
 });
+
+/* PARTE A MAIS OU A MENOS. É a pergunta da fatia 1 do plano "Topologia, mover a
+   peça, e ler o gesto": a rodada de absorção sabe lidar com peça que ganhou ou
+   perdeu parte? Sabe, e a régua acusa nos dois sentidos — depois de uma
+   correção, porque parte sobrando saía com `piorMm` de 0,000916. */
+describe('peça que ganhou ou perdeu parte', () => {
+  const semUmaParte = (neutro, parte) => ({
+    ...neutro,
+    F: new Map([...neutro.F].filter(([, face]) => face.parte !== parte)),
+  });
+  const renomeando = (neutro, de, para) => ({
+    ...neutro,
+    F: new Map([...neutro.F].map(([id, face]) => [id, face.parte === de ? { ...face, parte: para } : face])),
+  });
+
+  it('parte sobrando reprova, e não passa por diferença pequena', () => {
+    const alvo = capturarAlvo(semUmaParte(executar(), 'tuboSuperior'), { peca: 'bicicleta-quadro' });
+    const veredito = compararComAlvo(executar(), alvo);
+    expect(veredito.dentro).toBe(false);
+    expect(veredito.sobrando).toEqual(['tuboSuperior']);
+    expect(veredito.piorMm).toBe(Infinity);
+  });
+
+  it('a receita que também perdeu a parte chega no alvo', () => {
+    const editada = semUmaParte(executar(), 'tuboSuperior');
+    const alvo = capturarAlvo(editada, { peca: 'bicicleta-quadro' });
+    expect(compararComAlvo(editada, alvo).dentro).toBe(true);
+  });
+
+  it('parte nova é acusada como ausente na receita antiga, e alcançada pela nova', () => {
+    const editada = renomeando(executar(), 'tuboSuperior', 'reforcoNovo');
+    const alvo = capturarAlvo(editada, { peca: 'bicicleta-quadro' });
+    const antiga = compararComAlvo(executar(), alvo);
+    expect(antiga.ausentes).toEqual(['reforcoNovo']);
+    expect(antiga.sobrando).toEqual(['tuboSuperior']);
+    expect(compararComAlvo(editada, alvo).dentro).toBe(true);
+  });
+});

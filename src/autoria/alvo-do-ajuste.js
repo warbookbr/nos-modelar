@@ -156,9 +156,13 @@ function centroEDimensao({ min, max }) {
  * pontos): é o número único que decide se a receita reescrita chegou onde a
  * pessoa deixou.
  *
- * Parte que o alvo declara e a receita não produz mais é falha, não empate:
- * some da lista e leva `piorMm` a infinito, porque uma reescrita que apaga uma
- * parte não acertou o alvo por mais perto que as outras tenham ficado.
+ * Parte a mais ou a menos é falha, não empate, e nos DOIS sentidos. Parte que o
+ * alvo declara e a receita não produz leva `piorMm` a infinito; parte que a
+ * receita produz e o alvo não declara também. Medido: apagar o tubo superior na
+ * bancada e comparar com a receita intacta dava `piorMm` de 0,000916 — um número
+ * que qualquer leitura entende como "praticamente certo" — enquanto um tubo
+ * inteiro sobrava. Só `dentro` acusava, e quem olha o número antes da bandeira
+ * era enganado.
  */
 export function compararComAlvo(neutro, alvo) {
   if (alvo?.formato !== FORMATO_DO_ALVO) throw new Error(`compararComAlvo: formato desconhecido: ${alvo?.formato}`);
@@ -192,7 +196,9 @@ export function compararComAlvo(neutro, alvo) {
   const declaradas = new Set(alvo.partes.map((p) => p.parte));
   const sobrando = [...atual.keys()].filter((nome) => !declaradas.has(nome)).sort();
 
-  const piorMm = ausentes.length ? Infinity : Math.max(0, ...partes.map((p) => p.piorMm));
+  const piorMm = (ausentes.length || sobrando.length)
+    ? Infinity
+    : Math.max(0, ...partes.map((p) => p.piorMm));
   const dentro = ausentes.length === 0 && sobrando.length === 0 && piorMm <= tolerancia;
   return { dentro, piorMm, toleranciaMm: tolerancia, partes, ausentes, sobrando };
 }
