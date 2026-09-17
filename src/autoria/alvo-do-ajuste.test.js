@@ -17,9 +17,13 @@ describe('capturarAlvo', () => {
     expect(alvo.toleranciaMm).toBe(TOLERANCIA_PADRAO_MM);
     expect(alvo.partes.length).toBeGreaterThan(0);
     for (const parte of alvo.partes) {
-      expect(Object.keys(parte).sort()).toEqual(['max', 'min', 'parte', 'pontos']);
+      expect(Object.keys(parte).sort()).toEqual(['faces', 'max', 'min', 'parte', 'pontos']);
       expect(typeof parte.parte).toBe('string');
       expect(Array.isArray(parte.pontos)).toBe(true);
+      /* `faces` é CONTAGEM, e não identidade: um número, nunca uma lista de
+         ids. É o que deixa a rodada de absorção enxergar duplicar e criar face,
+         que não movem ponto nenhum. */
+      expect(Number.isInteger(parte.faces)).toBe(true);
     }
     const texto = JSON.stringify(alvo);
     expect(texto).not.toMatch(/\b(vertice|vértice|face|passo|indice|índice)\b/i);

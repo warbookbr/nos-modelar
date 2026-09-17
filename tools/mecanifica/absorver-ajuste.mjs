@@ -61,6 +61,15 @@ for (const parte of veredito.partes) {
   const marca = parte.dentro ? '  ' : '->';
   console.log(`${marca} ${parte.parte.padEnd(24)} ${parte.piorMm.toFixed(2).padStart(6)} ${desvio}  ${centro}  ${dimensao}`);
 }
+/* FORMA IGUAL, TOPOLOGIA DIFERENTE. A nuvem de pontos é cega para o que não
+   move ninguém: duplicar face cria vértice em cima de vértice que já existia, e
+   criar face não cria vértice nenhum. Sem este aviso, essas duas operações
+   saíam do alvo com desvio de 0,000916 mm e a rodada daria a receita por certa.
+   Ele não reprova: tesselação diferente com a mesma forma é receita válida. */
+for (const parte of veredito.topologiaDiferente ?? []) {
+  const d = veredito.partes.find((p) => p.parte === parte);
+  console.log(`   ${parte}: a forma bate, mas o alvo tem ${d.facesAlvo} face(s) e a receita produz ${d.facesObtidas}`);
+}
 for (const nome of veredito.ausentes) console.log(`-> ${nome}: o alvo declara esta parte e a receita não a produz`);
 for (const nome of veredito.sobrando) console.log(`-> ${nome}: a receita produz esta parte e o alvo não a declara`);
 
@@ -82,5 +91,13 @@ if (origens.declara && !origens.ok) {
   process.exitCode = 1;
 }
 
+const diferencaDeTopologia = veredito.topologiaDiferente ?? [];
 console.log(`\n${veredito.dentro ? 'CHEGOU' : 'NÃO CHEGOU'} — pior diferença ${veredito.piorMm.toFixed(3)} mm de ${veredito.toleranciaMm} mm.`);
+/* O veredito é de FORMA, e a forma pode bater com a topologia diferente. Dizer
+   só "CHEGOU" nesse caso esconderia o que a rodada ainda tem para decidir, e a
+   linha fica embaixo do veredito porque é onde a leitura termina. */
+if (veredito.dentro && diferencaDeTopologia.length) {
+  console.log(`A forma chegou com contagem de faces diferente em ${diferencaDeTopologia.join(', ')}. `
+    + 'Decida se a receita deve reproduzir essa topologia ou se a diferença é tesselação.');
+}
 if (!veredito.dentro) process.exitCode = 1;

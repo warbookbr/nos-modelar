@@ -267,14 +267,27 @@ function centroDe(neutro, alcancados) {
  * seleção, e não da origem da peça, é o que mantém o gesto no lugar onde a
  * pessoa está olhando.
  */
+/* O EIXO ACEITA AS DUAS FORMAS, índice 0/1/2 e nome 'x'/'y'/'z', e um valor que
+   não é nenhuma das duas devolve motivo em vez de silêncio. Antes, chamar com
+   'y' caía num `undefined` e a função respondia que nada mudou, que é a resposta
+   idêntica à de um ângulo nulo: o erro de chamada ficava indistinguível de um
+   gesto sem efeito, e quem chamasse errado nunca saberia. */
+const EIXO_POR_NOME = { x: 0, y: 1, z: 2 };
+function indiceDoEixo(eixo) {
+  if (eixo === 0 || eixo === 1 || eixo === 2) return eixo;
+  if (typeof eixo === 'string' && eixo in EIXO_POR_NOME) return EIXO_POR_NOME[eixo];
+  return null;
+}
+
 export function rotacionar(neutro, estado, { eixo, angulo }) {
   const alcancados = verticesAlcancados(neutro, estado);
   const centro = centroDe(neutro, alcancados);
   if (!centro || !Number.isFinite(angulo) || Math.abs(angulo) < MINIMO) {
     return { neutro, mudou: false };
   }
-  const [a, b] = [[1, 2], [2, 0], [0, 1]][eixo] ?? [];
-  if (a === undefined) return { neutro, mudou: false };
+  const indice = indiceDoEixo(eixo);
+  if (indice === null) return { neutro, mudou: false, motivo: `eixo desconhecido: ${eixo}` };
+  const [a, b] = [[1, 2], [2, 0], [0, 1]][indice];
 
   const proximo = clonar(neutro);
   const cos = Math.cos(angulo);
@@ -301,12 +314,16 @@ export function escalar(neutro, estado, { fator, eixo = null }) {
   if (!centro || !Number.isFinite(fator) || Math.abs(fator - 1) < MINIMO) {
     return { neutro, mudou: false };
   }
+  const indice = eixo === null ? null : indiceDoEixo(eixo);
+  if (eixo !== null && indice === null) {
+    return { neutro, mudou: false, motivo: `eixo desconhecido: ${eixo}` };
+  }
   const proximo = clonar(neutro);
   for (const v of alcancados) {
     const ponto = proximo.V.get(v);
     if (!ponto) continue;
     for (const i of [0, 1, 2]) {
-      if (eixo !== null && eixo !== i) continue;
+      if (indice !== null && indice !== i) continue;
       ponto[i] = centro[i] + (ponto[i] - centro[i]) * fator;
     }
   }

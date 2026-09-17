@@ -43,6 +43,25 @@ const arredondar = (v) => {
 };
 const emMilimetro = (v) => v * 1000;
 
+/* QUANTAS FACES CADA PARTE TEM. Contagem, e não identidade: nenhum id de face
+   entra aqui. Ela existe porque a nuvem de pontos é cega para mudança que não
+   move ninguém — medido na bicicleta, duplicar quatro faces do tubo do selim
+   cria seis vértices em cima de vértices que já estavam ali, e criar face não
+   cria vértice nenhum; nos dois casos o alvo saía idêntico ao da receita
+   intacta, com 0,000916 mm de desvio, e a rodada de absorção não tinha como
+   saber que algo tinha sido feito. A contagem não entra no veredito de
+   tolerância, porque tesselação diferente com a mesma forma é receita válida;
+   ela entra como aviso de que houve mudança de topologia. */
+function contarFacesPorParte(neutro) {
+  const contagem = new Map();
+  if (!neutro?.F) return contagem;
+  for (const face of neutro.F.values()) {
+    if (typeof face.parte !== 'string' || !face.parte) continue;
+    contagem.set(face.parte, (contagem.get(face.parte) ?? 0) + 1);
+  }
+  return contagem;
+}
+
 function medirPorNome(neutro) {
   const partes = descreverPeca(neutro).partes;
   return new Map(partes.map((p) => [p.nome, p]));
@@ -130,6 +149,7 @@ export function capturarAlvo(neutro, { peca, base = null, toleranciaMm = TOLERAN
   if (!(toleranciaMm > 0)) throw new Error('capturarAlvo: `toleranciaMm` precisa ser positivo');
 
   const pontosPorNome = extrairPontosPorParte(neutro);
+  const facesPorNome = contarFacesPorParte(neutro);
   const medidas = [...medirPorNome(neutro).values()]
     .sort((a, b) => (a.nome < b.nome ? -1 : a.nome > b.nome ? 1 : 0))
     .map((p) => ({
@@ -137,6 +157,7 @@ export function capturarAlvo(neutro, { peca, base = null, toleranciaMm = TOLERAN
       min: p.min.map(arredondar),
       max: p.max.map(arredondar),
       pontos: pontosPorNome.get(p.nome) ?? [],
+      faces: facesPorNome.get(p.nome) ?? 0,
     }));
 
   return { formato: FORMATO_DO_ALVO, peca, base, toleranciaMm, partes: medidas };
@@ -168,6 +189,7 @@ export function compararComAlvo(neutro, alvo) {
   if (alvo?.formato !== FORMATO_DO_ALVO) throw new Error(`compararComAlvo: formato desconhecido: ${alvo?.formato}`);
   const atual = medirPorNome(neutro);
   const pontosAtuais = extrairPontosPorParte(neutro);
+  const facesAtuais = contarFacesPorParte(neutro);
   const tolerancia = alvo.toleranciaMm ?? TOLERANCIA_PADRAO_MM;
 
   const partes = [];
@@ -183,6 +205,11 @@ export function compararComAlvo(neutro, alvo) {
       ? arredondar(emMilimetro(desvioEntrePontos(esperada.pontos, pontosAtuais.get(esperada.parte) ?? [])))
       : 0;
     const pior = Math.max(...centroMm.map(Math.abs), ...dimensaoMm.map(Math.abs), desvioMm);
+    /* Alvo salvo antes de a contagem existir não declara faces, e nesse caso
+       não há o que comparar: a resposta é `null`, e não um zero que faria toda
+       parte parecer ter perdido as faces todas. */
+    const facesAlvo = Number.isFinite(esperada.faces) ? esperada.faces : null;
+    const facesObtidas = facesAtuais.get(esperada.parte) ?? 0;
     partes.push({
       parte: esperada.parte,
       centroMm,
@@ -190,6 +217,9 @@ export function compararComAlvo(neutro, alvo) {
       desvioMm,
       piorMm: pior,
       dentro: pior <= tolerancia,
+      facesAlvo,
+      facesObtidas,
+      mesmasFaces: facesAlvo === null ? null : facesAlvo === facesObtidas,
     });
   }
 
@@ -200,5 +230,12 @@ export function compararComAlvo(neutro, alvo) {
     ? Infinity
     : Math.max(0, ...partes.map((p) => p.piorMm));
   const dentro = ausentes.length === 0 && sobrando.length === 0 && piorMm <= tolerancia;
-  return { dentro, piorMm, toleranciaMm: tolerancia, partes, ausentes, sobrando };
+  /* Parte cuja forma bate e cuja contagem de faces não bate: a rodada precisa
+     saber, e isso não reprova sozinho. */
+  const topologiaDiferente = partes
+    .filter((p) => p.mesmasFaces === false)
+    .map((p) => p.parte);
+  return {
+    dentro, piorMm, toleranciaMm: tolerancia, partes, ausentes, sobrando, topologiaDiferente,
+  };
 }

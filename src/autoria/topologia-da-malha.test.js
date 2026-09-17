@@ -192,3 +192,39 @@ describe('a malha de entrada nunca é tocada', () => {
     expect(JSON.stringify([...neutro.V.entries()])).toBe(antes);
   });
 });
+
+describe('o eixo de girar e escalar', () => {
+  const comUmCubo = base;
+
+  it('aceita o nome do eixo e o índice, com o mesmo resultado', () => {
+    const neutro = comUmCubo();
+    const estado = { modo: 'vertice', selecionados: [...neutro.V.keys()] };
+    const porNome = rotacionar(neutro, estado, { eixo: 'y', angulo: 0.4 }).neutro;
+    const porIndice = rotacionar(neutro, estado, { eixo: 1, angulo: 0.4 }).neutro;
+    for (const [id, p] of porNome.V) {
+      expect(porIndice.V.get(id)).toEqual(p);
+    }
+  });
+
+  it('eixo que não existe devolve motivo, e não um silencioso "nada mudou"', () => {
+    const neutro = comUmCubo();
+    const estado = { modo: 'vertice', selecionados: [...neutro.V.keys()] };
+    const girado = rotacionar(neutro, estado, { eixo: 'w', angulo: 0.4 });
+    expect(girado.mudou).toBe(false);
+    expect(girado.motivo).toContain('eixo desconhecido');
+    const escalado = escalar(neutro, estado, { fator: 2, eixo: 'w' });
+    expect(escalado.mudou).toBe(false);
+    expect(escalado.motivo).toContain('eixo desconhecido');
+  });
+
+  it('escalar pelo nome do eixo mexe só naquele eixo', () => {
+    const neutro = comUmCubo();
+    const estado = { modo: 'vertice', selecionados: [...neutro.V.keys()] };
+    const depois = escalar(neutro, estado, { fator: 3, eixo: 'z' }).neutro;
+    for (const [id, p] of neutro.V) {
+      const d = depois.V.get(id);
+      expect(d[0]).toBeCloseTo(p[0], 9);
+      expect(d[1]).toBeCloseTo(p[1], 9);
+    }
+  });
+});

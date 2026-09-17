@@ -93,8 +93,11 @@ describe('absorver uma edição de malha', () => {
   it('o alvo salvo não carrega id de vértice, índice de array nem posição de passo', () => {
     const { alvo } = alvoDaEdicao();
     for (const parte of alvo.partes) {
-      expect(Object.keys(parte).sort()).toEqual(['max', 'min', 'parte', 'pontos']);
+      expect(Object.keys(parte).sort()).toEqual(['faces', 'max', 'min', 'parte', 'pontos']);
       expect(typeof parte.parte).toBe('string');
+      /* `faces` é quantas faces a parte tem, e não quais: contagem não é
+         identidade, e é o que faz a régua enxergar duplicar e criar face. */
+      expect(Number.isInteger(parte.faces)).toBe(true);
       for (const ponto of parte.pontos) expect(ponto).toHaveLength(3);
     }
     expect(JSON.stringify(alvo)).not.toMatch(/"(vertice|vértice|face|passo|indice|índice|id)"/i);

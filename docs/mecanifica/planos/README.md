@@ -2,16 +2,21 @@
 
 ## Estado
 
-**Plano ativo:** [Topologia, mover a peça, e ler o gesto](2026-09-16-topologia-e-leitura-do-gesto.md) (2026-09-16-topologia-e-leitura-do-gesto.md).
+**Plano ativo:** nenhum.
 
-O modo de edição move o que já existe e nada mais, e mover a parte inteira como
-corpo não existe. Este plano traz extrudar, duplicar, apagar, criar, rotacionar e
-escalar, mais o deslocamento da peça inteira. No fim, e de propósito, duas
-ferramentas de leitura: uma que compara a malha do arquivo com a editada e
-descreve o gesto em palavras geométricas com números, em vez da nuvem de pontos
-que a rodada de absorção recebe hoje, e o mapa de qual passo da receita constrói
-qual parte. Elas vêm por último porque as operações acima decidem que vocabulário
-a descrição precisa ter.
+A [topologia, mover a peça, e ler o gesto](encerrados/2026-09-16-topologia-e-leitura-do-gesto.md)
+foi **concluída** em 2026-09-17. Extrudar, duplicar, apagar, criar face, girar e
+escalar vivem no núcleo sem Three.js; mover a parte inteira é `G` sem entrar no
+modo de edição; `npm run descrever:gesto` diz por parte se o movimento foi
+translação, rotação, escala, esticão com uma ponta presa, dobra ou nenhum desses,
+e aponta o passo da receita que constrói aquela parte. A descrição nasce na
+bancada, onde as duas malhas ainda têm os mesmos vértices, porque emparelhar duas
+nuvens por posição falha quando o gesto tem o tamanho do espaçamento entre
+pontos. Três defeitos sérios apareceram no caminho e foram corrigidos: quem
+editava a malha não tinha como salvar, porque a base de comparação era a própria
+malha viva; duplicar e criar face saíam do alvo indistinguíveis da receita
+intacta, e o alvo passou a guardar a contagem de faces por parte; e girar e
+escalar respondiam "nada mudou" quando recebiam o eixo pelo nome.
 
 O [modo de edição de malha](encerrados/2026-09-15-modo-de-edicao-de-malha.md) foi
 **concluído** em 2026-09-16. Tab entra no modo, 1/2/3 trocam entre vértice,

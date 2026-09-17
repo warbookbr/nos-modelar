@@ -80,6 +80,18 @@ O que ainda não existe: extrudar, duplicar, apagar, criar geometria, rotacionar
 escalar. Todas mudam a topologia ou o número de partes, e a rodada de absorção
 ainda não sabe reescrever receita que ganhou ou perdeu parte.
 
+## Forma igual, topologia diferente
+
+O alvo mede a forma por caixa e por nuvem de pontos, e isso é cego para operação
+que não move ninguém: duplicar faces cria vértices em cima de vértices que já
+estavam ali, e criar face não cria vértice nenhum. Medido na bicicleta, os dois
+saíam com desvio de 0,000916 mm, indistinguível da receita intacta. Por isso o
+alvo também guarda quantas faces cada parte tem, e o `absorver` avisa quando a
+forma bate e a contagem não bate. A contagem é número, não identidade: nenhum id
+de face entra no arquivo. Ela também não reprova sozinha, porque tesselação
+diferente com a mesma forma é receita válida; quem decide se a receita deve
+reproduzir aquela topologia é a rodada.
+
 ## Quando o botão de salvar aparece
 
 Sempre que a malha na tela deixa de ser igual à que veio do arquivo, seja por
