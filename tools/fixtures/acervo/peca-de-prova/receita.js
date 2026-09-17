@@ -30,15 +30,23 @@ export const TABELA = {
   /* Lados de cada tubo. Dezoito põe os vértices próximos o bastante para a
      prova de precisão de clique ter o que disputar na tela. */
   ladosDoTubo: 18,
-  /* Comprimento e raio dão à peça tamanho comparável ao de uma peça real, para
-     o enquadramento da bancada não precisar de caso especial. */
-  comprimentoDoTubo: 400,
-  raioDoTubo: 18,
+  /* Comprimento e raio dão à peça tamanho comparável ao de uma peça real, e
+     isso é requisito e não estética: o estúdio amplia peça pequena para
+     enquadrá-la, e com 400 mm o avanço de 0,2 que as guardas digitam movia a
+     seleção 1,16 na cena e a jogava para fora do quadro. Com um metro, a escala
+     da cena fica perto de um e as constantes de pixel e de avanço das guardas
+     mantêm o significado que tinham. */
+  comprimentoDoTubo: 1000,
+  /* O raio fica na faixa de um tubo de quadro porque `detectarJuntas` declara
+     raio de junta de 20 mm, dimensionado para a solda de um tubo desses. Com
+     45 mm o mesmo canto passava a render três juntas fragmentadas, e a guarda
+     de junta deixava de ter um punho por canto. */
+  raioDoTubo: 22,
   /* O cubo onde três tubos se encontram: é o que cria junta com mais de duas
      partes, que a guarda de junta usa para conferir que só quem passa pelo
      canto se move. */
-  raioDoCubo: 22,
-  larguraDoCubo: 60,
+  raioDoCubo: 28,
+  larguraDoCubo: 90,
   /* Abertura entre os dois tubos que sobem, em grau. Diferente de zero para as
      partes não ficarem coincidentes na projeção lateral. */
   aberturaEmGrau: 28,
@@ -142,7 +150,7 @@ export const receitaPecaDeProva = {
   PLANO: {
     objeto: 'peça de prova das guardas de navegador',
     referencias: ['referencias/prova.png'],
-    escala: { medida: 'comprimento do tubo que sobe', milimetros: 400 },
+    escala: { medida: 'comprimento do tubo que sobe', milimetros: 1000 },
     partes: [
       { nome: 'cuboCentral', forma: 'cilindro curto transversal onde três tubos se encontram', tecnica: 'cilindro com tampas' },
       { nome: 'tuboEsquerdo', forma: 'tubo que sobe do cubo e se afasta em z', tecnica: 'loft' },

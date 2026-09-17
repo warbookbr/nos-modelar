@@ -29,7 +29,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
-const PECA = 'bicicleta-quadro';
+const PECA = 'peca-de-prova';
 /* O valor digitado no movimento, em unidades da peça. Grande o bastante para a
    medida não se confundir com ruído de arredondamento da malha. */
 const AVANCO = 0.2;
@@ -105,12 +105,16 @@ const ler = () => pagina.evaluate(() => {
       const distancia = ambiente.camera.position.distanceTo(p);
       const projetado = p.project(ambiente.camera);
       if (Math.abs(projetado.x) > 1 || Math.abs(projetado.y) > 1 || projetado.z > 1) continue;
-      naTela.push({
-        indice: i,
-        distancia,
-        x: (projetado.x * 0.5 + 0.5) * rect.width + rect.left,
-        y: (-projetado.y * 0.5 + 0.5) * rect.height + rect.top,
-      });
+      const x = (projetado.x * 0.5 + 0.5) * rect.width + rect.left;
+      const y = (-projetado.y * 0.5 + 0.5) * rect.height + rect.top;
+      /* PONTO COBERTO NÃO É PONTO CLICÁVEL. O rodapé do salvar e o aviso ficam
+         sobre o canvas, e um vértice atrás deles recebe o clique no painel, não
+         na cena: a guarda mirava certo, o ponteiro caía a zero pixel do vértice
+         e nada era selecionado. Perguntar quem está por cima é o que separa
+         "clicar não funciona" de "ali não é a cena". */
+      const porCima = document.elementFromPoint(x, y);
+      if (porCima && porCima.tagName !== 'CANVAS') continue;
+      naTela.push({ indice: i, distancia, x, y });
     }
   }
 
@@ -192,10 +196,10 @@ try {
     (depoisDeGirar.edicao?.selecionados?.length ?? 0) === (antesDeGirar.edicao?.selecionados?.length ?? 0));
 
   /* O RECORTE PELA PEÇA. Entrar no modo com uma parte selecionada edita só ela;
-     sem seleção, a peça inteira. Sem isto, mexer num tubo punha os 502 vértices
+     sem seleção, a peça inteira. Sem isto, mexer num tubo punha todos os vértices
      da bicicleta na tela e um clique podia cair em vértice de outra peça. */
   await tecla('Tab');
-  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSelim']));
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboDeitado']));
   await pagina.waitForTimeout(500);
   await tecla('Tab');
   const recortado = await ler();
@@ -413,11 +417,16 @@ try {
   await tecla('Enter');
   const depoisDoMovimento = await ler();
 
-  const subiu = depoisDoMovimento.caixaDaCena && antesDoMovimento.caixaDaCena
-    ? depoisDoMovimento.caixaDaCena.max[1] - antesDoMovimento.caixaDaCena.max[1]
+  /* O QUE SE MEDE É O CENTRO DA SELEÇÃO, e não o topo da caixa da cena. A caixa
+     só se mexe quando o que andou estava na borda da peça: mover uma parte
+     interior subia zero e a afirmação reprovava um movimento que tinha
+     acontecido. Na bicicleta ela passava porque a seleção calhava de ficar no
+     alto. */
+  const subiu = depoisDoMovimento.centroDaSelecao && antesDoMovimento.centroDaSelecao
+    ? depoisDoMovimento.centroDaSelecao[1] - antesDoMovimento.centroDaSelecao[1]
     : 0;
   ok('G com eixo travado e valor digitado move a malha desenhada',
-    Math.abs(subiu) > 1e-3, `a caixa da cena subiu ${subiu.toFixed(4)}`);
+    Math.abs(subiu) > 1e-3, `o centro da seleção subiu ${subiu.toFixed(4)}`);
 
   /* O GIZMO. Ele aparece com a seleção e arrastar uma seta move no eixo dela,
      que é o segundo caminho pedido depois do teste: a trava por tecla funciona,
@@ -497,9 +506,9 @@ try {
   /* MOVER A PARTE INTEIRA. O autor pediu depois de testar: escolher uma parte e
      deslocá-la como corpo, sem entrar na malha. O que se afirma é o que separa
      mover de deformar — a parte anda inteira, com a caixa do MESMO tamanho, e as
-     outras sete ficam paradas. */
+     outras ficam paradas. */
   await tecla('Escape');
-  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSuperior']));
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['travessa']));
   await pagina.waitForTimeout(600);
 
   const caixasDe = () => pagina.evaluate(() => {
@@ -540,12 +549,12 @@ try {
     return Math.max(...[0, 1, 2].map((i) => Math.abs(d.tamanho[i] - a.tamanho[i])));
   };
 
-  ok('G fora do modo de edição move a parte selecionada', andou('tuboSuperior') > 0.01,
-    `andou ${andou('tuboSuperior').toFixed(4)}`);
-  ok('a parte anda inteira, sem mudar de tamanho', mudouDeTamanho('tuboSuperior') < 1e-3,
-    `a caixa mudou ${mudouDeTamanho('tuboSuperior').toFixed(5)}`);
+  ok('G fora do modo de edição move a parte selecionada', andou('travessa') > 0.01,
+    `andou ${andou('travessa').toFixed(4)}`);
+  ok('a parte anda inteira, sem mudar de tamanho', mudouDeTamanho('travessa') < 1e-3,
+    `a caixa mudou ${mudouDeTamanho('travessa').toFixed(5)}`);
   const outrasQueAndaram = Object.keys(antesDeMover)
-    .filter((nome) => nome !== 'tuboSuperior' && andou(nome) > 1e-4);
+    .filter((nome) => nome !== 'travessa' && andou(nome) > 1e-4);
   ok('as outras partes ficam paradas', outrasQueAndaram.length === 0, outrasQueAndaram.join(', '));
 
   await tecla('Control+z');
@@ -573,18 +582,37 @@ try {
   });
 
   await tecla('Escape');
-  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboSelim']));
+  await pagina.evaluate(() => window.__mecanificaBancada.selecionar(['tuboDeitado']));
   await pagina.waitForTimeout(500);
   await tecla('Tab');
   /* A escolha é feita em modo VÉRTICE e depois convertida: em modo face os
      pontos não são desenhados, e é por eles que a guarda sabe onde clicar. */
   await tecla('1');
-  await pagina.waitForTimeout(400);
+  /* A câmera ainda está se acomodando depois da reconstrução do desfazer, e as
+     posições de tela lidas cedo demais já não valem quando o clique acontece.
+     Esperar o quadro assentar é o que faz a escolha ser sobre onde o vértice
+     ESTÁ, e não sobre onde ele estava. */
+  await pagina.waitForTimeout(1400);
   const pontosDoTubo = (await ler()).pontosNaTela;
-  ok('o tubo do selim abre com vértices para escolher', pontosDoTubo.length > 0,
+  ok('o tubo deitado abre com vértices para escolher', pontosDoTubo.length > 0,
     `${pontosDoTubo.length} vértices`);
-  await pagina.mouse.click(pontosDoTubo[Math.floor(pontosDoTubo.length / 2)].x, pontosDoTubo[Math.floor(pontosDoTubo.length / 2)].y);
+  const alvoDoTubo = pontosDoTubo[Math.floor(pontosDoTubo.length / 2)];
+  await pagina.mouse.click(alvoDoTubo.x, alvoDoTubo.y);
   await pagina.waitForTimeout(400);
+  const depoisDoClique = await ler();
+  const maisPerto = depoisDoClique.pontosNaTela.reduce((menor, p) => {
+    const d = Math.hypot(p.x - alvoDoTubo.x, p.y - alvoDoTubo.y);
+    return d < menor ? d : menor;
+  }, Infinity);
+  console.log(`    [diagnostico] clique em ${Math.round(alvoDoTubo.x)},${Math.round(alvoDoTubo.y)}; `
+    + `vértice mais perto agora ${maisPerto.toFixed(1)}px; ${depoisDoClique.pontosNaTela.length} na tela`);
+  /* O clique antes do L é afirmado à parte: sem isto, um clique que não pega
+     nada saía como "0 face para extrudar", e a falha apontava para a extrusão
+     em vez de apontar para a escolha. */
+  const doClique = await ler();
+  ok('clicar num vértice do tubo escolhido seleciona',
+    (doClique.edicao?.selecionados?.length ?? 0) > 0,
+    `${doClique.edicao?.selecionados?.length ?? 0} selecionado(s), modo ${doClique.edicao?.modo}`);
   await tecla('l');
   await tecla('3');
   await pagina.waitForTimeout(500);

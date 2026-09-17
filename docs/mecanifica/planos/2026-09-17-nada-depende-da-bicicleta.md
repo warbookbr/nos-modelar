@@ -93,29 +93,24 @@ conteúdo. Adiar tem custo crescente, porque cada guarda nova nasce acoplada.
 
 ## Medido na fatia 1 — o requisito lido do código
 
-O acoplamento, contado: cinco guardas de navegador com `const PECA` no topo, e
-três delas pedindo a parte `tuboSelim` ou `tuboSuperior` pelo nome.
-`guarda:junta` vai além e fixa o nome do canto,
-`balancoInferiorEsq+balancoSuperiorEsq`, com a lista das partes que passam por
-ele. Nos testes, sete arquivos citam partes da bicicleta por nome, e dois citam
-parâmetros da `TABELA`: `balancoTraseiro` e `quedaDoMovimentoCentral`.
+O acoplamento, contado: cinco guardas com `const PECA` no topo, três pedindo
+parte pelo nome, e `guarda:junta` fixando até o nome do canto com as partes que
+passam por ele. Nos testes, sete arquivos citam partes por nome e dois citam
+parâmetros da `TABELA`.
 
-`tools/fixtures/requisitos-da-peca-de-prova.js` transforma isso em régua. Cinco
-requisitos, cada um com a guarda que o exige escrita junto: três partes no
-mínimo, porque `guarda:edicao` afirma que as OUTRAS partes ficam paradas e com
-menos de três isso fala de uma só; oito vértices disputando o mesmo lugar, que é
-o que a própria guarda já exigia em pixel; ilha conectada de vinte e quatro
-vértices, porque `L` pega a ilha e a guarda mede o que vem; ao menos uma junta; e
-referência visual declarada, senão `guarda:referencia` fica sem objeto.
+`tools/fixtures/requisitos-da-peca-de-prova.js` transforma isso em régua, com a
+guarda que exige cada item escrita junto: três partes no mínimo, porque
+`guarda:edicao` afirma que as OUTRAS ficam paradas; oito vértices disputando o
+mesmo lugar; ilha conectada de vinte e quatro vértices, que é o que `L` pega; ao
+menos uma junta; e referência visual declarada.
 
-Medir contra a bicicleta primeiro pagou. Duas das medidas que escrevi estavam
-erradas e ela as derrubou. A primeira procurava um anel contando vértices na
-mesma altura, e o tubo do selim é inclinado, então o anel de dezoito lados
-aparecia como quatro; virou tamanho de ilha conectada, que é o que a guarda
-realmente usa. A segunda definia junta como vértice compartilhado por duas
-partes, e a bicicleta não tem nenhum: junta é vértice de partes diferentes a
-menos de um raio, e quem sabe isso é `detectarJuntas`. A régua passou a chamar a
-própria função do produto em vez de reimplementar o critério.
+Medir contra a bicicleta primeiro pagou: duas medidas que escrevi estavam erradas
+e ela as derrubou. Uma procurava anel contando vértices na mesma altura, e o tubo
+do selim é inclinado, então o anel de dezoito lados aparecia como quatro; virou
+tamanho de ilha conectada. A outra definia junta como vértice compartilhado, e a
+bicicleta não tem nenhum: junta é vértice de partes diferentes a menos de um
+raio, e quem sabe isso é `detectarJuntas`, que a régua passou a chamar em vez de
+reimplementar o critério.
 
 O que a régua mede na bicicleta hoje: oito partes, 484 vértices disputados, ilha
 de 266 e seis juntas. Os dois últimos números são exatamente os que
@@ -155,6 +150,34 @@ recém-aberta, sem nada para salvar. Medido nas duas peças, o atributo dizia
 escondido enquanto a tela mostrava. Uma regra mais específica corrige, e agora o
 rodapé some com a malha intocada e sobe com "malha editada" depois do primeiro
 gesto.
+
+## Feito na fatia 3 — as guardas migradas
+
+As cinco guardas de navegador abrem a peça de prova. Trocar a peça expôs quatro
+coisas que a bicicleta escondia, e três delas eram fraqueza de guarda.
+
+O clique da guarda caía num vértice a zero pixel de distância e nada era
+selecionado: o ponto estava atrás do rodapé do salvar, que fica sobre o canvas.
+A leitura de pontos passou a perguntar `elementFromPoint` quem está por cima e a
+descartar o que não é a cena, o que torna honestas todas as afirmações por
+clique, e não só esta.
+
+A afirmação do movimento por `G` media o topo da caixa da cena inteira. Caixa só
+se mexe quando o que andou está na borda, então mover uma parte interior subia
+zero e reprovava um movimento que tinha acontecido; na bicicleta ela passava
+porque a seleção calhava de ficar no alto. Passou a medir o centro da seleção.
+
+A imagem de referência de 1,2 KB era embutida como data URI pelo empacotador, e
+a afirmação de que o arquivo é SERVIDO pelo pacote nunca acontecia. A imagem
+passou dos 100 KB, e a requisição voltou a existir.
+
+A quarta é dimensionamento e não fraqueza. Com a peça a 400 mm, o estúdio a
+ampliava e o avanço de 0,2 que as guardas digitam movia a seleção 1,16 na cena,
+jogando-a para fora do quadro; com um metro a escala fica perto de um. E com
+tubo de 45 mm de raio o mesmo canto rendia três juntas fragmentadas, porque
+`detectarJuntas` declara raio de 20 mm dimensionado para solda de tubo de
+quadro. O raio da peça de prova voltou para 22 mm, dentro do contrato declarado
+da função, e as juntas voltaram a ser uma por canto.
 
 ## Riscos e parada
 

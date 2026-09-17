@@ -29,11 +29,11 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
-const PECA = 'bicicleta-quadro';
+const PECA = 'peca-de-prova';
 /* A ponteira esquerda: onde o balanço inferior e o superior do lado esquerdo se
    encontram. É o canto que o autor tentou mover. */
-const JUNTA = 'balancoInferiorEsq+balancoSuperiorEsq';
-const PASSAM_PELA_JUNTA = ['balancoInferiorEsq', 'balancoSuperiorEsq'];
+const JUNTA = 'travessa+tuboEsquerdo';
+const PASSAM_PELA_JUNTA = ['travessa', 'tuboEsquerdo'];
 const PIXELS = 110;
 /* O punho anda no plano que encara a câmera, então o deslocamento no mundo é o
    que o ponteiro percorreu naquele plano. Dez por cento cobre a diferença entre
@@ -126,11 +126,11 @@ try {
   await pagina.waitForTimeout(800);
 
   const antes = await ler();
-  ok('o modo de junta desenha um punho por canto do quadro', antes.punhos.length === 6,
+  ok('o modo de junta desenha um punho por canto da peça', antes.punhos.length === 3,
     `${antes.punhos.length} punhos: ${antes.punhos.map((p) => p.junta).join(', ')}`);
 
   const punho = antes.punhos.find((p) => p.junta === JUNTA);
-  ok('a ponteira esquerda tem punho', Boolean(punho), JUNTA);
+  ok('o topo do tubo esquerdo tem punho', Boolean(punho), JUNTA);
   if (!punho) throw new Error('sem punho para arrastar');
 
   /* Arrasto para trás na tela. A direção exata não importa para a afirmação:

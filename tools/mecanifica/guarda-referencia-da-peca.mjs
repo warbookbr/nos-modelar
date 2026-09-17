@@ -34,7 +34,7 @@ const REPO = resolve(HERE, '../..');
 const DIST = join(REPO, 'dist');
 const OUT = join(REPO, 'tools/bancadas/out');
 const BASE = '/nos-mecanifica/';
-const PECA = 'bicicleta-quadro';
+const PECA = 'peca-de-prova';
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css',
@@ -88,7 +88,7 @@ try {
   await pagina.locator(`#listaAcervo [data-receita="${PECA}"]`).click({ timeout: 10000 });
   await pagina.waitForTimeout(4000);
 
-  const sobreposicao = imagens.find((i) => /sobreposicao/i.test(i.pathname));
+  const sobreposicao = imagens.find((i) => /prova/i.test(i.pathname));
   const naCena = await pagina.evaluate(() => window.__mecanificaBancada?.imagemReferencia ?? null);
   ok('a página não emitiu erro', errosDaPagina.length === 0, errosDaPagina[0] ?? '');
   ok('a bancada pediu a sobreposição da peça', Boolean(sobreposicao), sobreposicao?.pathname ?? 'nenhuma imagem de peça foi pedida');
@@ -101,7 +101,7 @@ try {
   ok('o plano carrega a textura', naCena?.comTextura === true);
   ok('o plano tem tamanho', (naCena?.largura ?? 0) > 0 && (naCena?.altura ?? 0) > 0,
     `${naCena?.largura} x ${naCena?.altura}`);
-  ok('a referência na cena é a declarada pela peça', /sobreposicao/i.test(naCena?.rotulo ?? ''),
+  ok('a referência na cena é a declarada pela peça', /prova/i.test(naCena?.rotulo ?? ''),
     naCena?.rotulo ?? '—');
   ok('nenhuma imagem da peça faltou', imagens.every((i) => i.status === 200),
     imagens.filter((i) => i.status !== 200).map((i) => `${i.status} ${i.pathname}`).join(', '));

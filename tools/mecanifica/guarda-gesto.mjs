@@ -31,8 +31,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
-const PECA = 'bicicleta-quadro';
-const PARTE = 'tuboSelim';
+const PECA = 'peca-de-prova';
+const PARTE = 'tuboDeitado';
 /* O quanto a parte anda, em unidades da peça, e o mesmo número em milímetro.
    Escolhido grande o bastante para não se confundir com arredondamento e
    pequeno o bastante para não jogar a peça para fora do enquadramento. */
