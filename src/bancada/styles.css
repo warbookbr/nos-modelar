@@ -159,6 +159,15 @@ kbd {
   overflow-y: auto;
 }
 
+/* CADA BLOCO DA ABA MANTÉM A ALTURA QUE PEDE, e quem passa do espaço é a aba,
+   que rola. Sem isto o padrão do flex encolhe os filhos antes de a rolagem
+   entrar, e o bloco mais baixo é o primeiro a desaparecer: acrescentar um bloco
+   no fim da aba de inspeção esmagou Grade e Chão de vinte e um para dois
+   pixels, com os dois interruptores ainda no documento e ilegíveis na tela. */
+.painel-inspecao > .aba-conteudo:not([hidden]) > * {
+  flex-shrink: 0;
+}
+
 .painel-cabecalho {
   display: flex;
   align-items: start;
@@ -326,6 +335,17 @@ h2 {
   grid-template-columns: 1fr 1fr;
   gap: 7px;
   margin-top: 14px;
+}
+
+/* O bloco de editar tem um título em cima e os botões embaixo, ocupando a
+   largura toda: são modos que ligam e desligam, e alinhá-los em duas colunas
+   com as ações de uma vez só faria os dois tipos parecerem a mesma coisa. */
+.acoes-editar {
+  grid-template-columns: 1fr;
+}
+
+.acoes-editar > .rotulo {
+  margin-bottom: 2px;
 }
 
 .diagnostico {
@@ -1765,10 +1785,13 @@ body.auditoria .recolher { display: none; }
 #resumoEstado .linha { align-items: baseline; gap: 10px; }
 #resumoEstado .linha kbd { white-space: normal; text-align: right; }
 
-/* Botão de modo ligado na barra: o "Juntas" fica aceso enquanto os punhos
-   estão na cena, senão não há como saber qual gesto o ponteiro vai fazer. */
+/* Botão de modo ligado: o "Juntas" fica aceso enquanto os punhos estão na cena,
+   senão não há como saber qual gesto o ponteiro vai fazer. Vale na barra e na
+   aba de inspeção, que é onde ele passou a morar. */
 .botao-barra[aria-pressed='true'],
-.botao-barra.ativo {
+.botao-barra.ativo,
+.acoes-editar .botao[aria-pressed='true'],
+.acoes-editar .botao.ativo {
   background: var(--amarelo);
   color: #1b1206;
   border-color: var(--amarelo);

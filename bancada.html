@@ -26,7 +26,6 @@
       <div class="barra-controles">
         <button id="btnMenuAbrir" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Abrir</button>
         <button id="btnMenuAtalhos" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Controles</button>
-        <button id="btnJuntas" class="botao-barra" type="button" aria-pressed="false" title="Arrastar os cantos onde as partes se encontram">Juntas</button>
         <button id="btnMenuEstado" class="botao-barra" type="button" aria-haspopup="dialog" aria-expanded="false">Estado<span id="selo-estado" class="selo-estado" hidden></span></button>
       </div>
 
@@ -175,6 +174,18 @@
             <button id="btnSelecionarConjunto" class="botao" type="button" disabled>Selecionar conjunto</button>
             <button id="btnFocarSelecao" class="botao primaria" type="button" disabled>Focar seleção</button>
             <button id="btnCopiarEstado" class="botao" type="button">Copiar vista</button>
+          </div>
+
+          <!-- Juntas morava na barra de botões, ao lado de Abrir, Controles e
+               Estado, que são portas para janelas. Ele não abre janela nenhuma:
+               liga um modo que põe punhos nos cantos onde as partes se
+               encontram e deixa arrastá-los, que é ação sobre a peça olhada.
+               Por isso desce para junto das outras ações desta aba, com título
+               próprio para não se confundir com os botões de uma vez só. -->
+          <div class="acoes-inspecao acoes-editar">
+            <span class="rotulo">EDITAR A PEÇA</span>
+            <button id="btnJuntas" class="botao" type="button" aria-pressed="false"
+              title="Arrastar os cantos onde as partes se encontram">Juntas</button>
           </div>
 
           <div id="diagnostico" class="diagnostico">
