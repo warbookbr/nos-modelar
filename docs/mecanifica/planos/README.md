@@ -4,6 +4,14 @@
 
 **Plano ativo:** nenhum.
 
+O [vocabulário poligonal da bancada](congelados/2026-09-17-vocabulario-poligonal-da-bancada.md)
+— subdivisão, bisel, loop cut e proportional editing — nasceu **congelado** em
+2026-09-17. A frente que precisa melhorar agora é a da IA, e acrescentar
+vocabulário de desenho antes disso aumenta o que a pessoa consegue fazer sem
+aumentar o que a IA consegue devolver. Modificadores nem entram nele sem uma
+medida antes: são não destrutivos e esbarram na regra de que conteúdo salvo é
+determinístico e reexecutável.
+
 A [topologia, mover a peça, e ler o gesto](encerrados/2026-09-16-topologia-e-leitura-do-gesto.md)
 foi **concluída** em 2026-09-17. Extrudar, duplicar, apagar, criar face, girar e
 escalar vivem no núcleo sem Three.js; mover a parte inteira é `G` sem entrar no

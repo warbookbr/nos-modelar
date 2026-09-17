@@ -179,12 +179,12 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Não há plano ativo. O modelador inverso está congelado: nova geometria, corpus
-  de priors, fitting e MCP de edição seguem dependendo dos gates dele.
+- Não há plano ativo. Dois estão [congelados](planos/congelados/README.md): o
+  modelador inverso, de que dependem nova geometria, corpus de priors, fitting e
+  MCP de edição; e o vocabulário poligonal da bancada — subdivisão, bisel, loop
+  cut e proportional editing —, porque a frente a melhorar é a da IA.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `docs/mecanifica/planos/BACKLOG.md`.
-- Subdivisão, bisel, loop cut, proportional editing e modificadores ficaram fora
-  da bancada. São o plano seguinte, já encaminhado, e não backlog aberto.
 
 Nenhuma pendência desta lista autoriza implementação automática.
 

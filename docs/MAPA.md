@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-867 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+868 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -498,6 +498,7 @@
 - `2026-08-25-modelador-inverso-priors-familia-p0.md` — Modelador inverso com priors por família — execução do P0
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
+- `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
 - `README.md` — Planos congelados
 
 ## docs/mecanifica/planos/encerrados/
