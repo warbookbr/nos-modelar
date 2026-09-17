@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-869 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+871 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -897,6 +897,11 @@
 
 - `coord.mjs` — coord.mjs — caixa postal local, econômica e sem dependências para coordenar agentes em repositórios diferentes sem carregar histórico ou diffs inteiros.
 - `coord.test.mjs` — coord.test.mjs — prova mensagens imutáveis, leitura econômica, confirmações independentes e bloqueio de reservas sobrepostas do canal entre agentes.
+
+## tools/fixtures/
+
+- `requisitos-da-peca-de-prova.js` — requisitos-da-peca-de-prova.js — o que uma peça precisa TER para as guardas provarem o que dizem provar.
+- `requisitos-da-peca-de-prova.test.mjs` — requisitos-da-peca-de-prova.test.mjs — a régua da peça de prova mede o que as guardas realmente exigem, e reprova quando falta.
 
 ## tools/fixtures/acervo/
 

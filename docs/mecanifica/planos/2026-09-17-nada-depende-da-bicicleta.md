@@ -91,6 +91,37 @@ conteúdo. Adiar tem custo crescente, porque cada guarda nova nasce acoplada.
 4. **A moto.** Segunda peça de acervo, pelo laço de modelagem normal.
 5. **Apagar a bicicleta.** É o gate, e vem por último de propósito.
 
+## Medido na fatia 1 — o requisito lido do código
+
+O acoplamento, contado: cinco guardas de navegador com `const PECA` no topo, e
+três delas pedindo a parte `tuboSelim` ou `tuboSuperior` pelo nome.
+`guarda:junta` vai além e fixa o nome do canto,
+`balancoInferiorEsq+balancoSuperiorEsq`, com a lista das partes que passam por
+ele. Nos testes, sete arquivos citam partes da bicicleta por nome, e dois citam
+parâmetros da `TABELA`: `balancoTraseiro` e `quedaDoMovimentoCentral`.
+
+`tools/fixtures/requisitos-da-peca-de-prova.js` transforma isso em régua. Cinco
+requisitos, cada um com a guarda que o exige escrita junto: três partes no
+mínimo, porque `guarda:edicao` afirma que as OUTRAS partes ficam paradas e com
+menos de três isso fala de uma só; oito vértices disputando o mesmo lugar, que é
+o que a própria guarda já exigia em pixel; ilha conectada de vinte e quatro
+vértices, porque `L` pega a ilha e a guarda mede o que vem; ao menos uma junta; e
+referência visual declarada, senão `guarda:referencia` fica sem objeto.
+
+Medir contra a bicicleta primeiro pagou. Duas das medidas que escrevi estavam
+erradas e ela as derrubou. A primeira procurava um anel contando vértices na
+mesma altura, e o tubo do selim é inclinado, então o anel de dezoito lados
+aparecia como quatro; virou tamanho de ilha conectada, que é o que a guarda
+realmente usa. A segunda definia junta como vértice compartilhado por duas
+partes, e a bicicleta não tem nenhum: junta é vértice de partes diferentes a
+menos de um raio, e quem sabe isso é `detectarJuntas`. A régua passou a chamar a
+própria função do produto em vez de reimplementar o critério.
+
+O que a régua mede na bicicleta hoje: oito partes, 484 vértices disputados, ilha
+de 266 e seis juntas. Os dois últimos números são exatamente os que
+`guarda:edicao` e `guarda:junta` imprimem quando rodam, e bater com eles é o que
+prova que a régua mede a condição certa em vez de uma grandeza parecida.
+
 ## Riscos e parada
 
 `guarda:acervo` sai com código 1 quando o acervo está vazio, então a bicicleta
