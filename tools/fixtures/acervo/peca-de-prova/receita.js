@@ -156,7 +156,14 @@ export const receitaPecaDeProva = {
   },
   PLANO: {
     objeto: 'peça de prova das guardas de navegador',
-    referencias: ['referencias/prova.png'],
+    referencias: [
+      'referencias/prova.png',
+      /* A silhueta desenhada a partir da própria malha, e as âncoras dela: é o
+         objeto da régua de conferência contra referência, que sem isto teria de
+         medir uma foto de peça do acervo. */
+      'referencias/silhueta-lateral.png',
+      'referencias/ancoras-silhueta.json',
+    ],
     escala: { medida: 'comprimento do tubo que sobe', milimetros: 1000 },
     partes: [
       { nome: 'cuboCentral', forma: 'cilindro curto transversal onde três tubos se encontram', tecnica: 'cilindro com tampas' },
@@ -165,14 +172,27 @@ export const receitaPecaDeProva = {
       { nome: 'tuboDeitado', forma: 'tubo que sai do cubo para a frente', tecnica: 'loft' },
       { nome: 'travessa', forma: 'tubo mais fino ligando os dois topos', tecnica: 'loft' },
     ],
-    contatos: [
-      { entre: ['cuboCentral', 'tuboEsquerdo'], onde: 'o tubo nasce na superfície do cubo' },
-      { entre: ['cuboCentral', 'tuboDireito'], onde: 'o tubo nasce na superfície do cubo' },
-      { entre: ['cuboCentral', 'tuboDeitado'], onde: 'o tubo nasce na superfície do cubo' },
-      { entre: ['tuboEsquerdo', 'travessa'], onde: 'a travessa encosta no topo do tubo' },
-      { entre: ['tuboDireito', 'travessa'], onde: 'a travessa encosta no topo do tubo' },
+    /* O que reprova esta peça é ela deixar de servir às guardas, e não
+       proporção ou caráter: ela não tem referência visual a imitar. */
+    criteriosDeReprovacao: [
+      'menos de tres partes, porque a guarda afirma que as OUTRAS ficam paradas',
+      'sem vertices disputando o mesmo lugar na tela, e a prova de clique deixa de valer',
+      'ilha conectada pequena demais para o L ter o que pegar',
+      'sem junta entre partes, e a guarda de junta fica sem canto para arrastar',
+      'sem referencia visual declarada, e a guarda de referencia fica sem objeto',
     ],
   },
+
+  /* OS CONTATOS FICAM FORA DO PLANO, e não dentro dele: o esquema do plano de
+     modelagem recusa a chave ali, porque `contatos-da-peca` já lê e cobra esta
+     lista na raiz da receita, e duas listas em dois lugares divergem. */
+  contatos: [
+    { par: ['cuboCentral', 'tuboEsquerdo'], motivo: 'o tubo nasce na superficie do cubo' },
+    { par: ['cuboCentral', 'tuboDireito'], motivo: 'o tubo nasce na superficie do cubo' },
+    { par: ['cuboCentral', 'tuboDeitado'], motivo: 'o tubo nasce na superficie do cubo' },
+    { par: ['tuboEsquerdo', 'travessa'], motivo: 'a travessa encosta no topo do tubo' },
+    { par: ['tuboDireito', 'travessa'], motivo: 'a travessa encosta no topo do tubo' },
+  ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 

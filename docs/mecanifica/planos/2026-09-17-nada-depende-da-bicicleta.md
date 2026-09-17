@@ -71,7 +71,8 @@ conteúdo. Adiar tem custo crescente, porque cada guarda nova nasce acoplada.
    referência dela também não;
 2. `grep` por `bicicleta-quadro` em `tools/`, `src/` e `.github/` não acha
    citação em teste nem em guarda; exemplo em texto de ajuda é reescrito para a
-   peça que existir;
+   peça que existir, e ferramenta que existe só para a bicicleta —
+   `prancha-bicicleta-29.mjs` — sai junto com ela;
 3. os 31 gates verdes, com cada guarda de navegador conferida desfazendo a
    correção que ela protege, como as desta linha já foram;
 4. as propriedades que a peça de prova precisa ter estão declaradas em um lugar
@@ -171,13 +172,11 @@ A imagem de referência de 1,2 KB era embutida como data URI pelo empacotador, e
 a afirmação de que o arquivo é SERVIDO pelo pacote nunca acontecia. A imagem
 passou dos 100 KB, e a requisição voltou a existir.
 
-A quarta é dimensionamento e não fraqueza. Com a peça a 400 mm, o estúdio a
-ampliava e o avanço de 0,2 que as guardas digitam movia a seleção 1,16 na cena,
-jogando-a para fora do quadro; com um metro a escala fica perto de um. E com
-tubo de 45 mm de raio o mesmo canto rendia três juntas fragmentadas, porque
-`detectarJuntas` declara raio de 20 mm dimensionado para solda de tubo de
-quadro. O raio da peça de prova voltou para 22 mm, dentro do contrato declarado
-da função, e as juntas voltaram a ser uma por canto.
+A quarta é dimensionamento. A 400 mm o estúdio ampliava a peça e o avanço de 0,2
+movia a seleção 1,16 na cena, para fora do quadro; com um metro a escala fica
+perto de um. E com tubo de 45 mm de raio o mesmo canto rendia três juntas, porque
+`detectarJuntas` declara raio de 20 mm para solda de tubo de quadro. O raio
+voltou para 22 mm, dentro do contrato da função.
 
 ## Riscos e parada
 

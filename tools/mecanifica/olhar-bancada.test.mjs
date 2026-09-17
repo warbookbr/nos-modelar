@@ -61,7 +61,7 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
     };
 
     const resultado = await olharBancada({
-      peca: 'bicicleta-quadro',
+      peca: 'peca-de-prova',
       vistas: ['isometrica'],
       capturarEmMemoria: true,
       dependencias: {
@@ -80,9 +80,9 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
     });
 
     /* O alvo é a receita resolvida, e a bicicleta virou pasta: o que a ativação
-       recebe é `bicicleta-quadro/receita.js`. Afirmar o nome do arquivo sozinho
+       recebe é `peca-de-prova/receita.js`. Afirmar o nome do arquivo sozinho
        voltaria a amarrar a prova à forma antiga. */
-    expect(ativouComAlvo?.replaceAll('\\', '/')).toContain('bicicleta-quadro/receita.js');
+    expect(ativouComAlvo?.replaceAll('\\', '/')).toContain('peca-de-prova/receita.js');
     expect(resultado.ok).toBe(false);
     expect(resultado.erro.mensagem).toContain('Interrompido propositalmente');
   });

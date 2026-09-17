@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
+import { pecasDoAcervo } from './guarda-acervo.mjs';
 
 let area;
 const ler = (peca) => lerRodadas(peca, { pasta: join(area, peca) });
@@ -88,10 +89,15 @@ describe('registro de rodadas', () => {
   });
 
   it('a rodada mora DENTRO da pasta da peça quando a peça é uma pasta', () => {
-    /* A bicicleta migrou: o registro dela fica ao lado da receita que ele
-       julgou, e não numa árvore de documentação que quem abre a peça não vê. */
-    expect(pastaDeRodadas('bicicleta-quadro').replaceAll('\\', '/'))
-      .toMatch(/prototipos\/procedural\/v3\/pecas\/bicicleta-quadro\/rodadas$/);
+    /* O registro fica ao lado da receita que ele julgou, e não numa árvore de
+       documentação que quem abre a peça não vê. A peça usada é a que estiver no
+       acervo, e não um nome escrito aqui: nome escrito faz o teste cair no
+       caminho de fallback quando aquela peça sair, e aí ele afirma o contrário
+       do que promete sem ninguém notar. */
+    const [peca] = pecasDoAcervo();
+    expect(peca, 'o acervo está vazio').toBeDefined();
+    expect(pastaDeRodadas(peca).replaceAll('\\', '/'))
+      .toMatch(new RegExp(`prototipos/procedural/v3/pecas/${peca}/rodadas$`));
   });
 
   it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {

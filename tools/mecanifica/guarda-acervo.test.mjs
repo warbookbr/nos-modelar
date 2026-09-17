@@ -103,7 +103,10 @@ describe('veredito de contato do acervo', () => {
     expect(medida.ok).toBe(true);
     expect(medida.resultado.plano).toBe(null);
 
-    const { reprovadas } = await conferirAcervo(['bicicleta-quadro']);
+    /* O ACERVO É LIDO, E NÃO NOMEADO. Fixar o nome de uma peça aqui faz este
+       teste depender de conteúdo: o dia em que essa peça sair do acervo, o teste
+       quebra por um motivo que nada tem a ver com o que ele afirma. */
+    const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
   });
 
@@ -146,8 +149,8 @@ describe('veredito de contato do acervo', () => {
     }
   });
 
-  it('a bicicleta, que já é pasta, não é acusada de forma antiga', () => {
-    expect(emArquivoSolto('bicicleta-quadro')).toBe(false);
+  it('peça em pasta não é acusada de forma antiga', () => {
+    for (const peca of pecasDoAcervo()) expect(emArquivoSolto(peca), peca).toBe(false);
     /* Peça que não existe não é acusada: quem reclama de nome inexistente é o
        resolvedor, com a mensagem dele. */
     expect(emArquivoSolto('peca-que-nunca-existiu')).toBe(false);
@@ -155,7 +158,9 @@ describe('veredito de contato do acervo', () => {
 
   it('a guarda varre o acervo e o acervo de hoje passa', async () => {
     const pecas = pecasDoAcervo();
-    expect(pecas).toContain('bicicleta-quadro');
+    /* O acervo não pode estar vazio, e a guarda sai com código 1 quando está.
+       Quantas peças e quais é assunto do acervo, não deste teste. */
+    expect(pecas.length).toBeGreaterThan(0);
     const { reprovadas } = await conferirAcervo(pecas);
     expect(reprovadas).toEqual([]);
   });

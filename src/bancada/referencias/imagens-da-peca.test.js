@@ -11,22 +11,22 @@ import { describe, expect, it } from 'vitest';
 import { imagensDaPeca, urlDaReferencia } from './imagens-da-peca.js';
 
 const ENTRADAS = {
-  '../../../prototipos/procedural/v3/pecas/bicicleta-quadro/referencias/lateral.png': '/assets/lateral-a1b2.png',
-  '../../../prototipos/procedural/v3/pecas/bicicleta-quadro/referencias/sobreposicao.jpg': '/assets/sobre-c3d4.jpg',
+  '../../../prototipos/procedural/v3/pecas/peca-em-pasta/referencias/lateral.png': '/assets/lateral-a1b2.png',
+  '../../../prototipos/procedural/v3/pecas/peca-em-pasta/referencias/sobreposicao.jpg': '/assets/sobre-c3d4.jpg',
   '../../../prototipos/procedural/v3/pecas/outra-peca/referencias/frontal.png': '/assets/frontal-e5f6.png',
   '../../../prototipos/procedural/v3/pecas/solta.png': '/assets/solta.png',
 };
 
 describe('imagens da pasta da peça', () => {
   it('a chave é o caminho como a receita declara, a partir da pasta da peça', () => {
-    expect(urlDaReferencia('bicicleta-quadro', 'referencias/sobreposicao.jpg', ENTRADAS))
+    expect(urlDaReferencia('peca-em-pasta', 'referencias/sobreposicao.jpg', ENTRADAS))
       .toBe('/assets/sobre-c3d4.jpg');
-    expect(urlDaReferencia('bicicleta-quadro', 'referencias/lateral.png', ENTRADAS))
+    expect(urlDaReferencia('peca-em-pasta', 'referencias/lateral.png', ENTRADAS))
       .toBe('/assets/lateral-a1b2.png');
   });
 
   it('cada peça enxerga só as imagens dela', () => {
-    expect([...imagensDaPeca('bicicleta-quadro', ENTRADAS).keys()].sort())
+    expect([...imagensDaPeca('peca-em-pasta', ENTRADAS).keys()].sort())
       .toEqual(['referencias/lateral.png', 'referencias/sobreposicao.jpg']);
     expect([...imagensDaPeca('outra-peca', ENTRADAS).keys()]).toEqual(['referencias/frontal.png']);
   });
@@ -35,7 +35,7 @@ describe('imagens da pasta da peça', () => {
     /* Referência ausente já reprova em `guarda:acervo`; a bancada não emite um
        segundo veredito sobre o mesmo arquivo. */
     expect(urlDaReferencia('peca-de-arquivo', 'referencias/x.png', ENTRADAS)).toBe(null);
-    expect(urlDaReferencia('bicicleta-quadro', 'referencias/nao-existe.png', ENTRADAS)).toBe(null);
+    expect(urlDaReferencia('peca-em-pasta', 'referencias/nao-existe.png', ENTRADAS)).toBe(null);
     expect(imagensDaPeca('peca-de-arquivo', ENTRADAS).size).toBe(0);
   });
 
@@ -44,9 +44,11 @@ describe('imagens da pasta da peça', () => {
     expect(imagensDaPeca('solta.png', ENTRADAS).size).toBe(0);
   });
 
-  it('o acervo de verdade publica a sobreposição da bicicleta', () => {
+  it('a referência da peça de prova é publicada de verdade', () => {
     /* Sem passar entradas, o glob real do Vite responde — é o que prova que o
-       arquivo foi emitido, e não apenas que a função sabe indexar. */
-    expect(urlDaReferencia('bicicleta-quadro', 'referencias/sobreposicao.jpg')).toBeTruthy();
+       arquivo foi emitido, e não apenas que a função sabe indexar. A peça usada
+       é a de ensaio, e não conteúdo do acervo: assim a prova continua existindo
+       depois de qualquer peça sair. */
+    expect(urlDaReferencia('peca-de-prova', 'referencias/prova.png')).toBeTruthy();
   });
 });

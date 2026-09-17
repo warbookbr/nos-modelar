@@ -13,26 +13,29 @@ import { materialDaPeca, PAPEIS } from '../../src/autoria/material-da-peca.js';
 import { porConvencao, retratoDaPeca } from './material-da-peca.mjs';
 
 describe('material de uma peça', () => {
-  it('a bicicleta mora numa árvore, e o gerador de prancha na outra', async () => {
-    /* O retrato de 2026-09-11, antes da pasta da peça, era de quatro árvores:
-       `docs/mecanifica`, `prototipos/procedural`, `public` e `tools`. Duas
-       sumiram — a foto saiu de `public/` e as referências saíram de `docs/`.
-       A que resta fora é `tools/`, e é assim de propósito: o gerador de prancha
-       é código, e o plano excluiu mover ferramenta. */
-    const retrato = await retratoDaPeca('bicicleta-quadro');
-    expect(retrato.arvores).toEqual(['prototipos/procedural', 'tools']);
-    expect(retrato.espalhamento).toBe(2);
+  it('a peça de prova mora numa árvore só', async () => {
+    /* A medida existe porque o material de uma peça já esteve em quatro árvores
+       do repositório, e nada dizia que pertencia à mesma peça. A peça de prova
+       nasceu depois dessa correção: receita, referência e teste no mesmo lugar,
+       espalhamento um. */
+    const retrato = await retratoDaPeca('peca-de-prova');
+    expect(retrato.arvores).toEqual(['tools']);
+    expect(retrato.espalhamento).toBe(1);
   });
 
-  it('todo material da peça é declarado, menos a ferramenta que é código', async () => {
-    const retrato = await retratoDaPeca('bicicleta-quadro');
+  it('todo material da peça é declarado, menos o teste que é código', async () => {
+    const retrato = await retratoDaPeca('peca-de-prova');
     const soltos = retrato.material.filter((m) => !m.declarado);
-    expect(soltos.map((m) => m.papel)).toEqual(['ferramenta']);
-    /* A foto que a bancada sobrepõe é declarada pelo plano desde que saiu de
-       `public/`: antes disso o único arquivo que a citava não era versionado. */
+    /* O único solto é o arquivo de teste da própria receita, que é código e não
+       material declarável. O retrato o classifica como `rodada`, o que é rótulo
+       errado — rodada é registro do laço de modelagem —, e isso fica anotado
+       aqui em vez de ser escondido por uma afirmação vaga. */
+    expect(soltos.map((m) => m.caminho)).toEqual(['tools/fixtures/acervo/peca-de-prova/receita.test.mjs']);
+    /* A referência é declarada pelo plano: material de peça que ninguém declara
+       é material que ninguém sabe de quem é. */
     const declarados = retrato.material.filter((m) => m.declarado).map((m) => m.caminho);
-    expect(declarados).toContain('prototipos/procedural/v3/pecas/bicicleta-quadro/referencias/sobreposicao.jpg');
-    expect(declarados).toContain('prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js');
+    expect(declarados).toContain('tools/fixtures/acervo/peca-de-prova/referencias/prova.png');
+    expect(declarados).toContain('tools/fixtures/acervo/peca-de-prova/receita.js');
   });
 
   it('o que a receita declara entra como declarado, e a ordem não muda o retrato', () => {

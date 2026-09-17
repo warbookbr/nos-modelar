@@ -45,7 +45,7 @@ export function porConvencao(peca, { raiz = REPO } = {}) {
   for (const arquivo of arquivosDe(rodadas)) achados.push({ papel: 'rodada', caminho: rel(arquivo) });
 
   /* A ferramenta específica da peça: `prancha-<algo>.mjs` cujo nome comece pelo
-     primeiro termo do nome da peça. `bicicleta-quadro` acha
+     primeiro termo do nome da peça. `peca-de-prova` acha
      `prancha-bicicleta-29.mjs`, que é dela e de mais ninguém. */
   const termo = peca.split('-')[0];
   const ferramentas = join(raiz, 'tools/mecanifica');

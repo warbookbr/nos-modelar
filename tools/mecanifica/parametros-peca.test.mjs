@@ -220,7 +220,11 @@ describe('acervo real', () => {
        Os dez inertes de verdade são outra coisa: `garfoEixoACoroa`,
        `garfoAvanco`, `meiaLarguraGuidao` e companhia estão declarados neste
        módulo para os módulos do garfo e do guidão, que ainda não existem. */
-    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 29, vivos: 19, inertes: 10 });
+    /* A PEÇA DE PROVA É O ALVO NOMEADO, e não conteúdo do acervo: os sete
+       números dela existem para atender requisito de guarda, e cada um move
+       geometria, então os sete são vivos e nenhum é inerte. Peça de acervo entra
+       na conta total acima, sem precisar ser nomeada aqui. */
+    expect(porAlvo['peca-de-prova']).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
     expect(r.resultado.registros.every((x) => x.determinismo.estavel)).toBe(true);

@@ -59,7 +59,9 @@ describe('acervo de receitas da bancada', () => {
 
   it('a bancada enxerga o acervo real e a peça de prova', async () => {
     const lista = listarParaBancada();
-    expect(lista.map((e) => e.id)).toContain('bicicleta-quadro');
+    /* O acervo é conferido por contagem e não por nome: nomear uma peça aqui
+       faz a bancada depender de conteúdo, que é o que este trabalho desfaz. */
+    expect(lista.filter((e) => !e.ensaio).length).toBeGreaterThan(0);
     expect(lista.map((e) => e.id)).toContain('peca-de-prova');
     const prova = await lista.find((e) => e.id === 'peca-de-prova').carregar();
     expect(Array.isArray(prova.PASSOS)).toBe(true);

@@ -23,7 +23,7 @@ const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/**/*.js')
 const ENSAIOS = import.meta.glob('../../tools/fixtures/acervo/**/*.js');
 
 /* Três formas convivem no acervo: peça de arquivo único, `quadro.js`, peça em
-   pasta, `bicicleta-quadro/receita.js`, e montagem em pasta,
+   pasta, `peca-de-prova/receita.js`, e montagem em pasta,
    `prensa/montagem.js`. Nos três casos o nome que a pessoa reconhece é o mesmo
    que o resolvedor de receita aceita, e nos dois últimos ele é o nome da PASTA
    — a identidade da peça deixa de ser o nome do arquivo. */
