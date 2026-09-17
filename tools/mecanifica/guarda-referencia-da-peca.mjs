@@ -142,6 +142,33 @@ try {
 
   ok('não há cópia de referência em `public/`', !existsSync(join(REPO, 'public/referencias')));
 
+  /* O GIRO CHEGA À CENA, e não só ao descritor. Mexer o controle deslizante e
+     conferir o número guardado provaria só que o painel escreve onde ele mesmo
+     lê; o que decide é a rotação da malha desenhada, que é o que a pessoa vê. */
+  const antesDoGiro = await pagina.evaluate(() => {
+    const malha = window.__mecanificaBancada.ambiente().scene.getObjectByName('__imagem_referencia__');
+    return malha?.rotation?.x ?? null;
+  });
+  const mexeuOGiro = await pagina.evaluate(() => {
+    const campos = [...document.querySelectorAll('.controle-imagem-referencia input[type="range"]')];
+    const rotulos = [...document.querySelectorAll('.controle-imagem-referencia .campo-controle')];
+    const alvo = rotulos.find((c) => /giro/i.test(c.textContent ?? ''));
+    const entrada = alvo?.querySelector('input[type="range"]') ?? campos.find((c) => c.min === '-180');
+    if (!entrada) return null;
+    entrada.value = '45';
+    entrada.dispatchEvent(new Event('input', { bubbles: true }));
+    return Number(entrada.value);
+  });
+  await pagina.waitForTimeout(500);
+  const depoisDoGiro = await pagina.evaluate(() => {
+    const malha = window.__mecanificaBancada.ambiente().scene.getObjectByName('__imagem_referencia__');
+    return malha?.rotation?.x ?? null;
+  });
+  ok('a aba tem um controle deslizante de giro', mexeuOGiro === 45, String(mexeuOGiro));
+  ok('girar o controle gira o plano da imagem na cena',
+    antesDoGiro === 0 && Math.abs((depoisDoGiro ?? 0) - Math.PI / 4) < 1e-6,
+    `${antesDoGiro} → ${depoisDoGiro} rad, esperado ${Math.PI / 4}`);
+
   /* A foto é de quem confere no olho, então ela precisa enquadrar o que a
      afirmação mede. Em perspectiva o plano fica de lado e sai do quadro; a
      vista lateral é a que mostra a sobreposição sobre o modelo. */

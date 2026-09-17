@@ -26,6 +26,11 @@ export function criarGerenciadorReferencias3D({ cena }) {
     const { malha } = imagemReferencia;
     malha.position.set(segura.x, segura.y, segura.z);
     malha.scale.setScalar(segura.escala);
+    /* A geometria já nasce virada para o eixo X, então girar a malha em torno de
+       X é girar a imagem dentro do próprio plano dela — que é o giro de quem
+       endireita uma foto tirada torta, e não uma mudança de qual lado ela
+       encara. */
+    malha.rotation.x = ((segura.giro ?? 0) * Math.PI) / 180;
     malha.material.opacity = segura.opacidade;
     malha.material.needsUpdate = true;
     return imagemReferencia.descritor;

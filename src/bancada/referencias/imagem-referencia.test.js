@@ -23,3 +23,36 @@ describe('imagem de referência', () => {
       .toMatchObject({ fonte: 'url', alinhamento: { opacidade: 1 } });
   });
 });
+
+describe('giro da imagem de referência', () => {
+  const base = { fonte: 'url', url: 'http://exemplo/ref.png' };
+
+  it('nasce em zero quando ninguém declara', () => {
+    expect(normalizarImagemReferencia(base).alinhamento.giro).toBe(0);
+  });
+
+  it('guarda o grau declarado', () => {
+    expect(normalizarImagemReferencia({ ...base, alinhamento: { giro: -37 } }).alinhamento.giro).toBe(-37);
+  });
+
+  it('dobra volta inteira para o intervalo de meia volta para cada lado', () => {
+    const dobrado = (g) => normalizarImagemReferencia({ ...base, alinhamento: { giro: g } }).alinhamento.giro;
+    expect(dobrado(370)).toBe(10);
+    expect(dobrado(-370)).toBe(-10);
+    expect(dobrado(540)).toBe(-180);
+    expect(dobrado(0)).toBe(0);
+  });
+
+  it('valor que não é número vira zero, e não NaN na cena', () => {
+    expect(normalizarImagemReferencia({ ...base, alinhamento: { giro: 'torto' } }).alinhamento.giro).toBe(0);
+  });
+
+  it('o alinhamento inicial da peça também traz o giro', () => {
+    const inicial = criarAlinhamentoInicial({
+      caixa: { min: { x: -1, y: 0, z: -1 }, max: { x: 1, y: 2, z: 1 } },
+      larguraImagem: 100,
+      alturaImagem: 50,
+    });
+    expect(inicial.giro).toBe(0);
+  });
+});

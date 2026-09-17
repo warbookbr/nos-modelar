@@ -17,7 +17,7 @@ export function criarPainelReferencias({
 
   const modalReferencia = criarModalReferencia();
   let fonteSelecionada = null;
-  let alinhamento = { x: null, y: null, z: null, escala: 1, opacidade: 1, lado: 'direita' };
+  let alinhamento = { x: null, y: null, z: null, escala: 1, opacidade: 1, giro: 0, lado: 'direita' };
   /* Quem gera a imagem recebe de volta o alinhamento que a cena assumiu, que
      pode não ser o que estava nos controles. Sem reflexão os controles passam a
      mostrar número que não corresponde ao plano desenhado. */
@@ -170,6 +170,7 @@ export function criarPainelReferencias({
       criarCampoIntervalo('Posição Y', 'y', { min: -5, max: 5, step: 0.01, unidade: 'unidades da cena' }),
       criarCampoIntervalo('Posição Z', 'z', { min: -5, max: 5, step: 0.01, unidade: 'unidades da cena' }),
       criarCampoIntervalo('Escala', 'escala', { min: 0.1, max: 3, step: 0.01, unidade: 'fator, 1 é o tamanho original' }),
+      criarCampoIntervalo('Giro', 'giro', { min: -180, max: 180, step: 1, unidade: 'graus, no plano da própria imagem' }),
       criarCampoIntervalo('Opacidade', 'opacidade', { min: 0.05, max: 1, step: 0.05, unidade: '1 é opaca' }),
     );
     bloco.append(titulo, ajuda, arquivo, url, gerar, status, lista, ajuste);
