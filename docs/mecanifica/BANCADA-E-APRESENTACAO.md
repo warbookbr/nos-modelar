@@ -2,23 +2,78 @@
 
 ## Papel atual
 
-`bancada.html` é a superfície visual da autoria. Hoje ela abre uma peça isolada,
-mede o neutro, mostra vistas canônicas e registra uma URL reproduzível.
+`bancada.html` é a única aplicação publicada deste repositório, e ela tem dois
+papéis que convivem. Para a IA, é superfície de inspeção: abre uma peça, mede o
+neutro, mostra vistas canônicas e registra uma URL reproduzível. Para a pessoa,
+é editor: ela abre a peça, mexe onde quiser, salva, e o que sai dali volta para
+a IA como medida.
 
-Sua função é ajudar a IA a observar, localizar, comparar e criticar o resultado
-do núcleo. Ela não é uma vitrine, uma cena narrativa nem uma interface de
-modelagem humana.
+O segundo papel é decisão de produto, e ele nasceu de um limite medido. A
+bancada exigia que todo gesto caísse num parâmetro nomeado no instante do
+arrasto, e num quadro em treliça nenhum número empurra um tubo inteiro sem
+descolar as juntas: a seta de z de `balancoInferiorEsq` movia o centro da caixa
+0,0126 e fazia a parte crescer 0,0252, o dobro exato, porque uma ponta estava
+presa e a outra esticava. O gesto que a pessoa quer fazer não cabe no parâmetro
+no momento em que ela o faz. Os dois momentos foram separados: a pessoa desenha
+livremente, e traduzir o desenho em receita organizada virou uma rodada com dono,
+com tempo de perguntar o que ficou ambíguo.
 
-## Consulta atual
+## Os dois lados e a fronteira entre eles
 
-A bancada mostra hierarquia informativa, partes, grupos e portas da peça
-carregada. Seleção semântica, isolamento, contexto fantasma, explosão e consulta
-de subárvore já existem. A régua e o painel de portas respondem ao conteúdo
-executado, não a uma constante global.
+O código vive em dois lugares, e a separação é conferida por gate.
 
-O isolamento atual reduz ruído visual, mas não deve ser interpretado como modelo
-de montagem persistida. A bancada ainda não possui um mapa canônico de carro,
-motor ou sistema composto.
+`src/bancada/` é o que só existe para a pessoa e para o navegador: o modo de
+edição de malha, os punhos de junta, os gizmos de seta, o painel de referências,
+as preferências de cena e o salvamento. Nada disso é importado por quem roda em
+terminal.
+
+`src/autoria/` é o que a IA usa sem navegador nenhum. `topologia-da-malha.js`
+faz extrudar, duplicar, apagar, criar face, girar e escalar sobre a malha neutra,
+sem Three.js. `alvo-do-ajuste.js` escreve e confere o alvo. `ajuste-de-junta.js`
+deforma por junta. `descricao-do-gesto.js` classifica o que foi feito.
+`mapa-parte-passo.js` liga parte a passo da receita. `origem-de-parametro.js`
+cobra que parâmetro novo diga de onde veio.
+
+`npm run bancada:fronteira:check` proíbe `src/autoria/`, `tools/mecanifica/`,
+`tools/mcp/` e `tools/autoria/` de importarem `src/bancada/`. Sem essa régua, o
+motor procedural passaria a exigir Three.js, `document` e `window` para rodar, e
+o CLI, o MCP e os testes headless parariam por causa de uma interface. Quando um
+módulo de `src/bancada/` for preciso dos dois lados, a saída não é abrir exceção:
+é tirá-lo de lá, como já aconteceu com o catálogo de peças e as cores de
+auditoria.
+
+## O laço: desenhar, salvar, ler, absorver
+
+A pessoa seleciona uma parte e aperta `G` para movê-la como corpo, ou `Tab` para
+entrar no modo de edição, onde `1`, `2` e `3` trocam entre vértice, aresta e
+face, `L` pega a ilha sob o ponteiro, o gizmo move pelo arrasto, `Ctrl` gruda no
+vértice mais próximo, e `E`, `Shift+D`, `X`, `F`, `R` e `S` mudam a malha.
+`Ctrl+Z` desfaz um gesto por vez e para no estado que veio do arquivo.
+
+Quando a malha deixa de ser igual à do arquivo, o botão de salvar aparece e baixa
+um `ajuste-<peça>.json`. Ele guarda, por parte, os dois cantos da caixa, a nuvem
+canônica de pontos, quantas faces a parte tem, de qual receita a peça veio, as
+juntas puxadas, e a descrição do gesto. Não guarda id de vértice, id de face,
+índice de array nem posição de passo: a identidade ali é o nome da parte.
+
+A descrição do gesto é calculada na bancada, no instante do salvamento, e isso é
+arquitetura e não conveniência. Ali as duas malhas ainda têm os mesmos vértices.
+Fora dali só existem duas nuvens de pontos, e descobrir qual ponto virou qual por
+posição falha quando o movimento tem o tamanho do espaçamento entre pontos: no
+tubo do selim da bicicleta os pontos ficam a 5,9 mm um do outro, e num gesto de
+6 mm o pareamento por ordem lexicográfica atribuiu 422 mm de movimento e o
+pareamento por menor distância atribuiu 32,6 mm.
+
+Do outro lado, `npm run descrever:gesto` diz por parte se o movimento foi
+translação, rotação em torno de um eixo de coordenada, escala, esticão com uma
+ponta presa, dobra ou nenhum desses, e aponta o passo da receita que constrói
+aquela parte. `npm run absorver` mede se a receita reescrita chega onde a pessoa
+deixou a peça, com tolerância de meio milímetro. A skill que conduz a tradução é
+`absorver-ajuste-da-bancada`, e o procedimento está em
+[`AJUSTE-DA-BANCADA.md`](./usar/AJUSTE-DA-BANCADA.md).
+
+A bancada nunca escreve receita. Ela salva medida, e quem escreve receita é quem
+escreve receita.
 
 ## Direção para sistemas compostos
 
@@ -105,7 +160,13 @@ A bancada ainda não:
 - resolve encaixes;
 - valida movimento ou espaço varrido;
 - distingue formalmente alvo editável de contexto somente leitura;
-- publica alterações de receita ou montagem.
+- edita mais de uma peça por vez.
+
+Ela também não publica alteração de receita, e isso não é limite a vencer: é a
+separação que faz o laço funcionar.
+
+Do vocabulário de modelagem poligonal, ficaram de fora subdivisão, bisel, loop
+cut, proportional editing e modificadores.
 
 O visor legado resolve o import bare `earcut` por import map também nos
 servidores estáticos de `porteiro`, `criar`, `peca` e `gabarito`. Uma regressão

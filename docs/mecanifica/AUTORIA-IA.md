@@ -216,9 +216,11 @@ esconder a carroceria para enxergar roda e eixo, mas o sistema continua sabendo
 que ambos pertencem a montagens maiores e que certas relações precisam ser
 preservadas.
 
-A bancada deve ser entendida como uma superfície de atenção e inspeção. Ela
-ajuda a IA a escolher o que ver, não como a fonte única da verdade sobre o que
-está montado.
+Para a IA, a bancada é superfície de atenção e inspeção: ajuda a escolher o que
+ver, e não é a fonte da verdade sobre o que está montado. Para a pessoa, ela é
+também editor, e o que a pessoa desenha sai de lá como medida, num arquivo de
+ajuste que a rodada de absorção traduz em receita. As duas leituras convivem, e a
+fronteira entre elas é conferida por gate.
 
 ## O papel dos testes e experimentos
 
@@ -309,8 +311,9 @@ trabalha em alvos reduzidos, escolhe quais componentes ver juntos e mantém aces
 ao contexto estrutural e às dependências. O sistema registra relações como dado,
 revalida o impacto de mudanças e combina medição automática com inspeção visual.
 
-O núcleo cria a geometria. A bancada permite observar e selecionar contexto. O
-mapa mantém composição e dependências. As validações verificam peças e relações.
+O núcleo cria a geometria. A bancada permite observar, selecionar contexto e, do
+lado da pessoa, desenhar o ajuste que a rodada de absorção traduz. O mapa mantém
+composição e dependências. As validações verificam peças e relações.
 MCP pode expor essas capacidades, mas não as define.
 
 ## O contrato de autoria saiu daqui

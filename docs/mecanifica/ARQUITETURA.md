@@ -12,6 +12,17 @@ narrativa, jogo e apresentação externa não definem esta arquitetura.
 
 A Oficina humana, a aplicação jogável e o som não existem nesta árvore.
 
+## A fronteira da bancada é conferível
+
+`src/bancada/` existe para a pessoa e para o navegador; `src/autoria/` roda
+headless, em terminal e em integração contínua. `npm run bancada:fronteira:check`
+proíbe `src/autoria/`, `tools/mecanifica/`, `tools/mcp/` e `tools/autoria/` de
+importarem a bancada. Sem essa régua, o motor procedural passaria a exigir
+Three.js, `document` e `window`, e o CLI, o MCP e os testes headless parariam por
+causa de uma interface. Quando um módulo da bancada for preciso dos dois lados, a
+saída é tirá-lo de lá, e não abrir exceção. Detalhe em
+[`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md).
+
 ## Camadas que existem hoje
 
 1. **Receita**: módulos em `prototipos/procedural/v3/pecas/` exportam `meta` e
@@ -21,14 +32,23 @@ A Oficina humana, a aplicação jogável e o som não existem nesta árvore.
    conhecer Three.js.
 3. **Adaptadores de inspeção**: convertem o neutro para visualização sem mudar o
    formato persistido da autoria.
-4. **Bancada**: `bancada.html` oferece seleção semântica, isolamento, contexto
-   fantasma, explosão, hierarquia, subárvore e URLs reproduzíveis.
-5. **Medição e revisão**: serviços em `tools/` descrevem peças, renderizam
+4. **Bancada**: `bancada.html` tem dois papéis. Para a IA, oferece seleção
+   semântica, isolamento, contexto fantasma, explosão, hierarquia, subárvore e
+   URLs reproduzíveis. Para a pessoa, é editor: move a parte como corpo, edita
+   vértice, aresta e face, arrasta punho de junta, e salva o que desenhou. Ela
+   nunca escreve receita — o que sai dali é medida.
+5. **Alvo e absorção**: o arquivo que a bancada salva descreve, por nome de
+   parte, onde a peça ficou, e traz a descrição do gesto em palavras
+   geométricas. `npm run descrever:gesto` lê, `npm run absorver` mede se a
+   receita reescrita chega, e quem reescreve é quem escreve receita. Separar o
+   desenho da tradução é decisão de arquitetura: nenhum parâmetro nomeado
+   comporta o gesto no instante do arrasto.
+6. **Medição e revisão**: serviços em `tools/` descrevem peças, renderizam
    vistas, validam pacotes, preservam revisões e comparam resultados.
-6. **Exportação resolvida**: `tools/mecanifica/exportar.mjs` valida e produz uma
+7. **Exportação resolvida**: `tools/mecanifica/exportar.mjs` valida e produz uma
    representação derivada da receita, útil para provas e consumidores sem
    carregar o núcleo procedural.
-7. **Acesso MCP atual**: o perfil padrão expõe leitura, auditoria, comparação e
+8. **Acesso MCP atual**: o perfil padrão expõe leitura, auditoria, comparação e
    vistas; o perfil de autoria, opt-in do host, materializa receitas
    declarativas e montagens em catálogo autorizado. Nenhum perfil é o núcleo
    de autoria nem abre escrita irrestrita.
