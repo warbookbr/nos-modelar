@@ -79,13 +79,46 @@ O que ainda não existe: extrudar, duplicar, apagar, criar geometria, rotacionar
 escalar. Todas mudam a topologia ou o número de partes, e a rodada de absorção
 ainda não sabe reescrever receita que ganhou ou perdeu parte.
 
+## Quando o botão de salvar aparece
+
+Sempre que a malha na tela deixa de ser igual à que veio do arquivo, seja por
+junta puxada, seja por vértice, aresta ou face editada no modo de edição. O
+rodapé com o botão sobe sozinho nesse momento e some quando um Ctrl+Z devolve a
+peça ao estado do arquivo.
+
 ## O que o arquivo salvo contém
 
-Nome de cada parte com os dois cantos da caixa que ela passou a ocupar, a
-tolerância de aceite, e a lista de juntas puxadas com o deslocamento de cada uma.
-Não contém vértice, face, id interno nem posição de passo: a identidade ali é o
-nome da parte e o nome da junta, que é formado pelos nomes das partes que se
-encontram nela.
+Nome de cada parte com os dois cantos da caixa que ela passou a ocupar e a nuvem
+de pontos que ela passou a ocupar, a tolerância de aceite, a lista de juntas
+puxadas com o deslocamento de cada uma, o nome da receita de onde a peça veio, e
+a descrição do gesto. Não contém vértice, face, id interno nem posição de passo:
+a identidade ali é o nome da parte e o nome da junta, que é formado pelos nomes
+das partes que se encontram nela.
+
+## Ler o gesto antes de reescrever
+
+O `absorver` responde se a receita chega onde a peça ficou. Antes dele vem a
+pergunta do que a pessoa fez, e quem responde é:
+
+```bash
+npm run descrever:gesto -- <ajuste.json>
+```
+
+Ele diz, por parte, se o movimento é translação, rotação em torno de um eixo de
+coordenada, escala, esticão com uma ponta presa, dobra, ou nenhum desses, com os
+números de cada caso em milímetro e em grau. Junto vai o passo da receita que
+constrói aquela parte, que é onde a reescrita vai mexer. Ele não reescreve nada
+e não aprova nada, então não achar padrão não é falha: é resposta.
+
+A descrição nasce na bancada, no instante do salvamento, porque ali as duas
+malhas ainda têm os mesmos vértices e ninguém precisa descobrir qual virou qual.
+Para um arquivo salvo antes disso existir, o comando reconstrói a descrição
+emparelhando as duas nuvens de pontos por posição, e avisa que fez isso: quando
+o movimento tem o tamanho do espaçamento entre os pontos, o emparelhamento fica
+ambíguo e a resposta sai como "sem padrão". Medido na bicicleta, o anel do tubo
+do selim tem dezoito lados a dezessete milímetros de raio, o que põe os pontos a
+cinco milímetros e nove um do outro, e um gesto de seis milímetros já cai nesse
+caso.
 
 ## A rodada de absorção
 

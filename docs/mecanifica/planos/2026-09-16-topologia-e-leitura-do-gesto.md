@@ -126,28 +126,61 @@ sobrava. Só a bandeira `dentro` acusava. Agora os dois sentidos levam a infinit
 
 As operações que mudam faces moram em `src/autoria/topologia-da-malha.js`, no
 núcleo e sem Three.js: extrudar, duplicar, apagar, criar face, rotacionar e
-escalar recebem a malha neutra mais o modo e a seleção, e devolvem uma malha
-nova sem tocar a de entrada. Os dezesseis testes de unidade provam a conta, e a
-guarda de navegador prova que o resultado chegou à cena, porque uma conta certa
-que não é redesenhada não serve para quem está editando.
+escalar recebem a malha neutra mais o modo e a seleção, e devolvem uma malha nova
+sem tocar a de entrada. Os dezesseis testes provam a conta, e a guarda de
+navegador prova que o resultado chegou à cena.
 
 Dois defeitos apareceram quando a guarda passou a cobrir esse caminho. O
-primeiro era a face extrudada nascer no mesmo lugar da original, o que deixava
-as paredes laterais com área zero e fazia `adaptarThree` recusar a face por não
-definir plano; a correção afasta o anel novo na direção da normal da face por um
-quarto do comprimento médio das arestas. O segundo era o recorte da edição se
-perder depois de qualquer operação de topologia: a camada era recriada lendo as
-partes selecionadas no controlador, e aplicar o modelo reconstruído limpa essa
-seleção, então a edição que valia para o tubo do selim voltava a valer para a
-peça inteira e o apagar seguinte levava as oito partes da bicicleta. A camada
-agora guarda o próprio recorte em `partesEditadas`, e quem reconstrói a malha
-pergunta a ela.
+primeiro era a face extrudada nascer no mesmo lugar da original, deixando as
+paredes com área zero e fazendo `adaptarThree` recusar a face por não definir
+plano; o anel novo passa a nascer afastado na direção da normal por um quarto do
+comprimento médio das arestas. O segundo era o recorte da edição se perder depois
+de qualquer operação de topologia: a camada era recriada lendo as partes
+selecionadas no controlador, e aplicar o modelo reconstruído limpa essa seleção,
+então a edição que valia para o tubo do selim voltava a valer para a peça inteira
+e o apagar seguinte levava as oito partes. A camada agora guarda o próprio
+recorte em `partesEditadas`.
 
-O desfazer também precisou mudar de forma. Guardar só as posições dos vértices
-não devolve uma parte apagada, porque a parte sumiu junto com as faces; cada
-passo passou a guardar vértices e faces, e o desfazer escolhe entre repor as
-coordenadas na geometria desenhada, quando o conjunto de faces é o mesmo, e
-refazer o modelo inteiro, quando não é.
+O desfazer passou a guardar vértices e faces, e não só posições: guardar só
+posições não devolve uma parte apagada, porque a parte sumiu junto com as faces.
+Ele escolhe entre repor as coordenadas na geometria desenhada, quando o conjunto
+de faces é o mesmo, e refazer o modelo inteiro, quando não é.
+
+## Feito na fatia 4 — ler o gesto
+
+`src/autoria/descricao-do-gesto.js` compara a malha do arquivo com a editada e
+classifica, por parte, o que aconteceu: translação, rotação em torno de um eixo
+de coordenada, escala em torno do centro, esticão com uma ponta presa, dobra, ou
+nenhum desses. A detecção de rotação e de escala procura eixo de coordenada e
+nada além disso, porque é o que as operações da bancada produzem, e um giro em
+torno de eixo oblíquo sai como sem padrão em vez de virar classificação
+aproximada. `src/autoria/mapa-parte-passo.js` liga cada parte ao passo que a
+nomeia e aos passos que constroem a geometria selecionada, seguindo
+alias quando existe, e `npm run descrever:gesto` põe os dois lado a lado.
+
+A descrição é calculada na bancada, no instante do salvamento, e a razão é
+medível: fora dali só existem duas nuvens de pontos sem identificador, e
+descobrir qual ponto virou qual por posição falha quando o movimento tem o
+tamanho do espaçamento entre pontos. No tubo do selim, com dezoito lados a
+dezessete milímetros de raio, os pontos ficam a 5,9 mm um do outro; num gesto de
+6 mm o pareamento por ordem lexicográfica atribuiu 422 mm de movimento, e o
+pareamento completo por menor distância atribuiu 32,6 mm. O comando mantém a
+reconstrução por posição para arquivo salvo antes desta descrição existir, e diz
+na saída qual das duas leituras está mostrando.
+
+Escrever a guarda desta fatia descobriu que o caminho do salvamento não existia
+para quem edita a malha. Salvar exigia ter puxado uma junta, o rodapé com o botão
+só aparecia no modo de junta, e a base guardada como a peça como veio do arquivo
+era a mesma malha viva que a edição altera, então os dois lados mudavam juntos e
+nenhuma diferença era detectável. Uma sessão inteira de edição terminava sem
+produzir arquivo. O botão passa a depender de a malha ter mudado, o rodapé sobe
+quando há o que salvar, a base passa a ser uma cópia, e o alvo passa a gravar de
+qual receita a peça veio pelo nome que resolve um arquivo, sem o que nem
+`descrever:gesto` nem `absorver` achavam receita para reexecutar.
+
+A guarda `guarda:gesto` afirma esse caminho no navegador e foi conferida
+desfazendo cada correção: sem a cópia da base o botão fica desativado depois do
+movimento, e sem a descrição no salvamento o arquivo sai sem ela.
 
 ## Riscos e parada
 

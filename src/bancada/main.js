@@ -8,6 +8,7 @@ import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js
 import { criarPunhosDeJunta } from './controles/punhos-de-junta.js';
 import { aplicarAjusteDeJunta, detectarJuntas } from '../autoria/ajuste-de-junta.js';
 import { capturarAlvo } from '../autoria/alvo-do-ajuste.js';
+import { descreverGesto } from '../autoria/descricao-do-gesto.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
 import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
@@ -370,6 +371,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
         selecionados: [],
       });
     }
+    refletirAjusteDeJunta();
     mostrarAviso(historicoParametros.vazio
       ? 'Desfeito: a malha voltou ao que veio do arquivo.'
       : 'Desfeito o último movimento.');
@@ -456,16 +458,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   function refletirAjusteDeJunta() {
     const quantas = listaDeAjustes().length;
+    const mudou = malhaMudouDesdeOArquivo(malhaParaSalvar());
     if (rodapeJuntas) {
-      rodapeJuntas.hidden = !modoJuntas;
+      /* O rodapé é o único lugar com o botão de salvar, então ele aparece
+         sempre que existe algo a salvar, e não só no modo de junta. */
+      rodapeJuntas.hidden = !modoJuntas && !mudou;
       rodapeJuntas.classList.toggle('tem-pendencia', quantas > 0);
     }
     if (resumoJuntas) {
-      resumoJuntas.textContent = quantas === 0
-        ? 'nenhuma junta movida'
-        : `${quantas} ${quantas === 1 ? 'junta movida' : 'juntas movidas'}`;
+      resumoJuntas.textContent = quantas > 0
+        ? `${quantas} ${quantas === 1 ? 'junta movida' : 'juntas movidas'}`
+        : (mudou ? 'malha editada' : 'nenhuma junta movida');
     }
-    if (btnSalvarAjusteDeJunta) btnSalvarAjusteDeJunta.disabled = quantas === 0;
+    /* Salvar depende da malha ter mudado, e não de ter junta puxada: editar
+       vértice, aresta ou face é mudança tanto quanto arrastar um punho, e
+       enquanto a contagem de juntas governava este botão a edição livre não
+       tinha como sair da bancada. */
+    if (btnSalvarAjusteDeJunta) btnSalvarAjusteDeJunta.disabled = !mudou;
     if (btnDescartarAjusteDeJunta) btnDescartarAjusteDeJunta.disabled = quantas === 0;
     if (modoJuntas && juntasDaPeca && modeloAtual && !punhosDeJunta.arrastando) {
       modeloAtual.raiz.updateMatrixWorld(true);
@@ -502,15 +511,54 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     refletirAjusteDeJunta();
   }
 
+  /* O QUE VAI PARA O ARQUIVO é a malha que está na tela, e não só a que os
+     punhos de junta deformaram. Enquanto esta função lia apenas
+     `neutroAjustado`, uma sessão inteira de edição de vértice, aresta e face
+     não chegava ao alvo: salvar exigia ter puxado uma junta, e quem editasse a
+     malha livremente saía sem arquivo nenhum. `modeloAtual.neutro` é a malha
+     viva — a camada de edição escreve nela, e a reconstrução por topologia a
+     substitui — então é dela que o alvo sai. */
+  function malhaParaSalvar() {
+    return modeloAtual?.neutro ?? neutroAjustado();
+  }
+
+  function malhaMudouDesdeOArquivo(malha) {
+    if (!neutroDoArquivo || !malha) return false;
+    if (malha.F.size !== neutroDoArquivo.F.size || malha.V.size !== neutroDoArquivo.V.size) return true;
+    for (const [id, ponto] of malha.V) {
+      const original = neutroDoArquivo.V.get(id);
+      if (!original) return true;
+      for (let i = 0; i < 3; i += 1) if (Math.abs(ponto[i] - original[i]) > 1e-9) return true;
+    }
+    for (const id of malha.F.keys()) if (!neutroDoArquivo.F.has(id)) return true;
+    return false;
+  }
+
   function salvarAlvoDoAjuste() {
-    const deformado = neutroAjustado();
-    if (!deformado || !listaDeAjustes().length) return;
+    const deformado = malhaParaSalvar();
+    if (!deformado || !malhaMudouDesdeOArquivo(deformado)) {
+      mostrarAviso('Nada para salvar: a malha está como veio do arquivo.');
+      return;
+    }
     const alvo = {
       ...capturarAlvo(deformado, { peca: nomePecaAtual, base: modeloAtual?.rotulo ?? nomePecaAtual }),
       /* O que a pessoa fez, ao lado de onde ela chegou. A rodada de absorção
          mede pelo alvo; os gestos existem para ela saber o que perguntar quando
          duas leituras couberem na mesma medida. */
       gestos: listaDeAjustes(),
+      /* DE QUAL RECEITA A PEÇA VEIO, pelo nome que resolve um arquivo. O campo
+         `peca` guarda o nome do modelo carregado, que pode ser o rótulo em
+         prosa da peça, e com ele `descrever:gesto` e `absorver` não acham
+         receita nenhuma para reexecutar. */
+      receitaDeOrigem: pecaPedida ?? nomePecaAtual,
+      /* A DESCRIÇÃO NASCE AQUI, e não em quem lê o arquivo depois, porque aqui
+         as duas malhas ainda têm os mesmos vértices e ninguém precisa adivinhar
+         qual virou qual. Fora daqui só sobram duas nuvens de pontos, e quando o
+         movimento tem o tamanho do espaçamento entre pontos — o que acontece na
+         bicicleta, com o anel de dezoito lados a dezessete milímetros de raio —
+         nenhum emparelhamento por posição resolve a ambiguidade.
+         Ela guarda palavras e números, e nenhum identificador de vértice. */
+      descricaoDoGesto: neutroDoArquivo ? descreverGesto(neutroDoArquivo, deformado) : null,
     };
     const texto = JSON.stringify(alvo, null, 2);
     const url = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
@@ -519,7 +567,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     ligacao.download = `ajuste-${nomePecaAtual}.json`;
     ligacao.click();
     URL.revokeObjectURL(url);
-    registroDeEventos.registrar('informacao', 'Ajuste salvo', `${alvo.gestos.length} juntas`);
+    registroDeEventos.registrar('informacao', 'Ajuste salvo',
+      `${alvo.gestos.length} junta(s), ${alvo.descricaoDoGesto?.mexidas.length ?? 0} parte(s) mexida(s)`);
     mostrarAviso('Ajuste salvo. Leve o arquivo para a rodada de absorção.');
   }
 
@@ -943,6 +992,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
         historicoParametros.registrar('__edicao_de_malha__', { V: depois, F: modelo.neutro.F });
         historicoParametros.separar();
         mostrarAviso('Movimento de malha confirmado. Ctrl+Z desfaz.');
+        refletirAjusteDeJunta();
       },
     });
   }
@@ -1035,6 +1085,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     });
     historicoParametros.registrar('__edicao_de_malha__', fotografarMalha(edicaoDeMalha.malha()));
     historicoParametros.separar();
+    refletirAjusteDeJunta();
     return true;
   }
 
@@ -1106,7 +1157,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
        movimento do ponteiro passaria a contar a partir do movimento anterior e
        o deslocamento acumulado dobraria a cada quadro. */
     if (!deAjuste) {
-      neutroDoArquivo = convertido.neutro ?? null;
+      /* CÓPIA, e não a mesma malha. Guardar a referência viva fazia desta base
+         e da malha editada o mesmo objeto: a camada de edição escreve nos
+         vértices, os dois lados mudavam juntos, e comparar um com o outro
+         nunca acusava diferença nenhuma. Com isso o botão de salvar ficava
+         desativado por mais que a pessoa editasse, e a descrição do gesto sairia
+         comparando a malha consigo mesma. */
+      neutroDoArquivo = convertido.neutro ? fotografarMalha(convertido.neutro) : null;
       materiaisDaPeca = convertido.materiais ?? {};
       juntasDaPeca = null;
       ajustesDeJunta.clear();

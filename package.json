@@ -85,6 +85,8 @@
     "guarda:junta": "node tools/mecanifica/guarda-junta-da-bancada.mjs",
     "origens:check": "node tools/mecanifica/origens-check.mjs",
     "absorver": "node tools/mecanifica/absorver-ajuste.mjs",
+    "descrever:gesto": "node tools/mecanifica/descrever-gesto.mjs",
+    "guarda:gesto": "node tools/mecanifica/guarda-gesto.mjs",
     "guarda:edicao": "node tools/mecanifica/guarda-edicao-de-malha.mjs",
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs"
   },
