@@ -193,7 +193,14 @@ try {
   ok('o ajuste fica disponível para salvar', await salvar.isEnabled(),
     await pagina.locator('#resumoJuntas').textContent());
 
-  await pagina.click('#btnDescartarAjusteDeJunta');
+  /* CTRL+Z DESFAZ O ARRASTO DA JUNTA, que é o mesmo comando que desfaz a edição
+     de malha. Antes disto o punho não registrava passo nenhum e só um botão de
+     Descartar voltava atrás, jogando fora todos os arrastos de uma vez; o botão
+     saiu, então esta prova também afirma que ele não voltou. */
+  ok('o rodapé não tem mais um botão de descartar',
+    await pagina.locator('#btnDescartarAjusteDeJunta').count() === 0);
+
+  await pagina.keyboard.press('Control+z');
   await pagina.waitForTimeout(1000);
   const descartado = await ler();
   const voltou = Object.keys(antes.centros).every((nome) => {
@@ -201,7 +208,9 @@ try {
     const d = descartado.centros[nome];
     return d && Math.hypot(d[0] - a[0], d[1] - a[1], d[2] - a[2]) < 1e-4;
   });
-  ok('descartar devolve a peça ao que veio do arquivo', voltou);
+  ok('Ctrl+Z devolve a peça ao que veio do arquivo', voltou);
+  ok('depois de desfazer não sobra ajuste para salvar', await salvar.isDisabled(),
+    await pagina.locator('#resumoJuntas').textContent());
 
   ok('a página não emitiu erro', erros.length === 0, erros[0] ?? '');
 } catch (erro) {

@@ -346,7 +346,13 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      devolvido na saída. */
   const BOTOES_DE_CAMERA_PADRAO = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
   const historicoParametros = criarHistoricoParametros({
-    valorDeOrigem: (chave) => (chave === '__edicao_de_malha__' ? origemDaMalha : undefined),
+    valorDeOrigem: (chave) => {
+      if (chave === '__edicao_de_malha__') return origemDaMalha;
+      /* Sem junta puxada é o fundo da pilha do ajuste por junta: desfazer além
+         daí não inventa deslocamento que ninguém fez. */
+      if (chave === '__ajuste_de_junta__') return ORIGEM_DAS_JUNTAS;
+      return undefined;
+    },
   });
 
   /* Ctrl+Z devolve o que esta sessão desenhou na malha e para no estado que veio
@@ -354,7 +360,20 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      anterior. */
   function desfazerDesenho() {
     const passo = historicoParametros.desfazer();
-    if (!passo || passo.chave !== '__edicao_de_malha__' || !edicaoDeMalha || !passo.valor) return false;
+    if (!passo) return false;
+    /* O ajuste por junta é um estado só — o mapa inteiro de deslocamentos — e
+       voltar a ele é repor o mapa e reconstruir. Antes ele não passava por aqui:
+       arrastar um punho não registrava nada, Ctrl+Z não tinha o que desfazer, e
+       o único jeito de voltar era um botão de descartar que jogava fora todos os
+       arrastos de uma vez. */
+    if (passo.chave === '__ajuste_de_junta__') {
+      reporAjustesDeJunta(passo.valor ?? ORIGEM_DAS_JUNTAS);
+      mostrarAviso(passo.naOrigem || !(passo.valor ?? []).length
+        ? 'Desfeito: as juntas voltaram ao que veio do arquivo.'
+        : 'Desfeito o último arrasto de junta.');
+      return true;
+    }
+    if (passo.chave !== '__edicao_de_malha__' || !edicaoDeMalha || !passo.valor) return false;
     /* Duas formas de voltar, e a diferença é o custo. Se só as posições mudaram,
        trocar coordenadas na geometria desenhada basta e é instantâneo. Se as
        FACES mudaram, a malha desenhada tem outra forma e precisa ser refeita. */
@@ -392,13 +411,14 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
   let juntasDaPeca = null;
   let materiaisDaPeca = {};
   const ajustesDeJunta = new Map();
+  /* O fundo da pilha do desfazer para as juntas: nenhuma puxada. */
+  const ORIGEM_DAS_JUNTAS = [];
   let arrastoDeJunta = null;
   let modoJuntas = false;
   const btnJuntas = document.getElementById('btnJuntas');
   const rodapeJuntas = document.getElementById('rodapeJuntas');
   const resumoJuntas = document.getElementById('resumoJuntas');
   const btnSalvarAjusteDeJunta = document.getElementById('btnSalvarAjusteDeJunta');
-  const btnDescartarAjusteDeJunta = document.getElementById('btnDescartarAjusteDeJunta');
 
   const somar = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 
@@ -419,9 +439,21 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     },
     aoSoltar() {
       arrastoDeJunta = null;
+      /* UM PASSO POR ARRASTO, e não um por quadro: o registro acontece quando o
+         ponteiro sobe, então cada Ctrl+Z desfaz um arrasto inteiro. */
+      historicoParametros.registrar('__ajuste_de_junta__', listaDeAjustes());
+      historicoParametros.separar();
       refletirAjusteDeJunta();
     },
   });
+
+  function reporAjustesDeJunta(lista) {
+    ajustesDeJunta.clear();
+    for (const { junta, deslocamento } of lista ?? []) ajustesDeJunta.set(junta, [...deslocamento]);
+    arrastoDeJunta = null;
+    reconstruirComAjuste();
+    refletirAjusteDeJunta();
+  }
 
   function listaDeAjustes() {
     return [...ajustesDeJunta]
@@ -475,7 +507,6 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
        enquanto a contagem de juntas governava este botão a edição livre não
        tinha como sair da bancada. */
     if (btnSalvarAjusteDeJunta) btnSalvarAjusteDeJunta.disabled = !mudou;
-    if (btnDescartarAjusteDeJunta) btnDescartarAjusteDeJunta.disabled = quantas === 0;
     if (modoJuntas && juntasDaPeca && modeloAtual && !punhosDeJunta.arrastando) {
       modeloAtual.raiz.updateMatrixWorld(true);
       /* O punho tem de ficar onde o canto está AGORA, e não onde ele estava no
@@ -572,16 +603,8 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
     mostrarAviso('Ajuste salvo. Leve o arquivo para a rodada de absorção.');
   }
 
-  function descartarAjusteDeJunta() {
-    ajustesDeJunta.clear();
-    arrastoDeJunta = null;
-    reconstruirComAjuste();
-    mostrarAviso('Ajuste descartado: a peça voltou ao que veio do arquivo.');
-  }
-
   btnJuntas?.addEventListener('click', () => definirModoJuntas(!modoJuntas));
   btnSalvarAjusteDeJunta?.addEventListener('click', salvarAlvoDoAjuste);
-  btnDescartarAjusteDeJunta?.addEventListener('click', descartarAjusteDeJunta);
 
   /* O punho tem tamanho constante na tela, então ele precisa reagir à câmera a
      cada quadro. O ambiente não publica gancho de quadro, e abrir um só para

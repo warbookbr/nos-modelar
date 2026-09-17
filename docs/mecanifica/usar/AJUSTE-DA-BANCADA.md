@@ -33,8 +33,9 @@ O punho anda no plano que encara a câmera, porque o ponteiro tem duas liberdade
 e o canto tem três. Para mexer na dimensão que ficou de fora, gire a câmera e
 arraste de novo.
 
-Nada disso escreve parâmetro. `Descartar` devolve a peça ao que veio do arquivo;
-`Salvar ajuste` baixa um `ajuste-<peça>.json`.
+Nada disso escreve parâmetro. `Ctrl+Z` desfaz um arrasto de junta por vez, pelo
+mesmo comando que desfaz a edição de malha, e para quando a peça volta ao que
+veio do arquivo. `Salvar ajuste` baixa um `ajuste-<peça>.json`.
 
 ## Mover a parte inteira
 
