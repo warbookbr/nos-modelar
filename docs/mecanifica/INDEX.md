@@ -179,10 +179,10 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Não há plano ativo. Dois estão [congelados](planos/congelados/README.md): o
-  modelador inverso, de que dependem nova geometria, corpus de priors, fitting e
-  MCP de edição; e o vocabulário poligonal da bancada — subdivisão, bisel, loop
-  cut e proportional editing —, porque a frente a melhorar é a da IA.
+- Plano ativo: [nada depende da bicicleta](planos/2026-09-17-nada-depende-da-bicicleta.md).
+  Dois estão [congelados](planos/congelados/README.md): o modelador inverso, de
+  que dependem nova geometria, corpus de priors, fitting e MCP de edição; e o
+  vocabulário poligonal da bancada.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
   Medida e critérios em `docs/mecanifica/planos/BACKLOG.md`.
 

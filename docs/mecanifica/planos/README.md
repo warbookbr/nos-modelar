@@ -2,7 +2,16 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [Nada depende da bicicleta](2026-09-17-nada-depende-da-bicicleta.md).
+
+As cinco guardas de navegador e cerca de quinze testes dependem de
+`bicicleta-quadro`, e não do nome dela apenas: dependem de propriedades que essa
+receita tem por acaso, como vértices que se sobrepõem na tela e um anel de
+dezoito lados. Mudar a peça arrisca a bateria de gates. Este plano cria uma peça
+de prova governada pelas ferramentas, com essas propriedades declaradas, move
+guardas e testes para ela, traz a moto como segunda peça de acervo e apaga a
+bicicleta. A remoção é o gate: enquanto ela estiver lá, ninguém sabe quem
+dependia dela.
 
 O [vocabulário poligonal da bancada](congelados/2026-09-17-vocabulario-poligonal-da-bancada.md)
 — subdivisão, bisel, loop cut e proportional editing — nasceu **congelado** em
