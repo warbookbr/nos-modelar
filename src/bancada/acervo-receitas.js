@@ -13,6 +13,15 @@
 
 const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/**/*.js');
 
+/* AS RECEITAS DE ENSAIO TAMBÉM ENTRAM, e é por elas que as guardas de navegador
+   abrem a bancada. O resolvedor da CLI já busca em `tools/fixtures/acervo/` pelo
+   mesmo motivo escrito lá: essas receitas existem para dar assunto estável aos
+   testes, e ficam fora do acervo justamente para que trabalho de peça não mexa
+   no que a suíte mede. A varredura da bancada não as via, então guarda de
+   navegador só tinha conteúdo do acervo para abrir, e passou a depender dele.
+   Elas vêm marcadas, para quem listar poder separar ensaio de acervo. */
+const ENSAIOS = import.meta.glob('../../tools/fixtures/acervo/**/*.js');
+
 /* Três formas convivem no acervo: peça de arquivo único, `quadro.js`, peça em
    pasta, `bicicleta-quadro/receita.js`, e montagem em pasta,
    `prensa/montagem.js`. Nos três casos o nome que a pessoa reconhece é o mesmo
@@ -29,18 +38,32 @@ function identificar(caminho) {
   return { id: arquivo, montagem: false };
 }
 
-export function listarAcervo(modulos = MODULOS) {
+/* DUAS LISTAS, E NÃO UMA. `listarAcervo` continua sendo o ACERVO, porque é o
+   que as ferramentas que medem o acervo esperam dela — juntar ensaio aqui fez a
+   varredura de parâmetros saltar de 96 declarados para 102, contando requisito
+   de fixture como parâmetro de peça. Quem precisa dos dois é só a bancada, que
+   tem de poder abrir a peça de prova, e por isso quem junta é
+   `listarParaBancada`. */
+export function listarParaBancada(modulos = MODULOS, ensaios = ENSAIOS) {
+  return ordenar([...listarAcervo(modulos), ...listarAcervo(ensaios, { ensaio: true })]);
+}
+
+function ordenar(entradas) {
+  return entradas.sort((a, b) => a.id.localeCompare(b.id, 'pt-BR'));
+}
+
+export function listarAcervo(modulos = MODULOS, { ensaio = false } = {}) {
   const entradas = [];
-  for (const [caminho, importar] of Object.entries(modulos)) {
+  for (const [caminho, importar] of Object.entries(modulos ?? {})) {
     if (/\.(test|spec)\.js$/.test(caminho)) continue;
     const { id, montagem } = identificar(caminho);
     entradas.push({
       id,
       montagem,
+      ensaio,
       caminho,
       carregar: () => importar().then((modulo) => modulo.default ?? modulo),
     });
   }
-  entradas.sort((a, b) => a.id.localeCompare(b.id, 'pt-BR'));
-  return entradas;
+  return ordenar(entradas);
 }

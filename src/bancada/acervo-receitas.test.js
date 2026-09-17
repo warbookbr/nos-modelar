@@ -5,7 +5,7 @@
  * entender o motivo. E montagem em pasta precisa aparecer com o nome da pasta,
  * que é o nome pelo qual todo o resto do repositório a chama. */
 import { describe, expect, it, vi } from 'vitest';
-import { listarAcervo } from './acervo-receitas.js';
+import { listarAcervo, listarParaBancada } from './acervo-receitas.js';
 
 describe('acervo de receitas da bancada', () => {
   it('nomeia peça pelo arquivo, montagem pela pasta, e ordena', () => {
@@ -37,10 +37,31 @@ describe('acervo de receitas da bancada', () => {
     expect(importar).toHaveBeenCalledTimes(1);
   });
 
-  it('enxerga o acervo real do repositório', async () => {
-    const acervo = listarAcervo();
-    expect(acervo.map((e) => e.id)).toContain('bicicleta-quadro');
-    const receita = await acervo.find((e) => e.id === 'bicicleta-quadro').carregar();
-    expect(Array.isArray(receita.PASSOS)).toBe(true);
+  /* DUAS LISTAS, E NÃO UMA. `listarAcervo` é o acervo, porque é o que as
+     ferramentas que medem o acervo esperam: juntar ensaio ali fez a varredura
+     de parâmetros saltar de 96 declarados para 102, contando requisito de
+     fixture como parâmetro de peça. Quem precisa dos dois é a bancada, que tem
+     de poder abrir a peça de prova das guardas. */
+  it('o acervo não traz ensaio, mesmo com o ensaio existindo no disco', () => {
+    expect(listarAcervo().map((e) => e.id)).not.toContain('peca-de-prova');
+    expect(listarAcervo().every((e) => e.ensaio === false)).toBe(true);
+  });
+
+  it('a lista da bancada junta os dois, marcando qual é qual', () => {
+    const lista = listarParaBancada(
+      { '../../prototipos/procedural/v3/pecas/quadro.js': async () => ({}) },
+      { '../../tools/fixtures/acervo/peca-de-prova/receita.js': async () => ({}) },
+    );
+    expect(lista.map((e) => e.id)).toEqual(['peca-de-prova', 'quadro']);
+    expect(lista.find((e) => e.id === 'peca-de-prova').ensaio).toBe(true);
+    expect(lista.find((e) => e.id === 'quadro').ensaio).toBe(false);
+  });
+
+  it('a bancada enxerga o acervo real e a peça de prova', async () => {
+    const lista = listarParaBancada();
+    expect(lista.map((e) => e.id)).toContain('bicicleta-quadro');
+    expect(lista.map((e) => e.id)).toContain('peca-de-prova');
+    const prova = await lista.find((e) => e.id === 'peca-de-prova').carregar();
+    expect(Array.isArray(prova.PASSOS)).toBe(true);
   });
 });

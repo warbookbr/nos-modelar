@@ -172,7 +172,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 96 declarados e 32 vivos', async () => {
+  it('trava o retrato do acervo: 102 declarados e 38 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Caiu de 267/114 para 90/26 quando o acervo publicado passou a ser só o
@@ -188,10 +188,17 @@ describe('acervo real', () => {
        Subiu de 90/26 para 96/32 quando a leitura passou a descer em coordenada:
        lista de NÚMEROS é ponto medido e cada casa é liberdade, lista de LISTAS
        é curva e continua fora. Os seis números novos são os três pontos de
-       solda da bicicleta, e os seis são VIVOS — nenhum ruído entrou. */
+       solda da bicicleta, e os seis são VIVOS — nenhum ruído entrou.
+
+       Subiu de 96/32 para 102/38 quando a peça de prova das guardas entrou em
+       `tools/fixtures/acervo/`. Os seis números novos são a TABELA dela, e os
+       seis são vivos: cada um move geometria, que é justamente o requisito de
+       guarda que ele existe para atender. Ela é fixture e não conteúdo, então
+       não entra em `guarda:acervo`; entra aqui porque este retrato mede tudo
+       que é receita executável no repositório, e sempre mediu as fixtures. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 96, vivos: 32, inertes: 64 });
+    expect(r.resultado.totais).toEqual({ declarados: 102, vivos: 38, inertes: 64 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });

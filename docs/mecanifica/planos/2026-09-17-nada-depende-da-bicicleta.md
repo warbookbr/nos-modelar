@@ -122,6 +122,40 @@ de 266 e seis juntas. Os dois últimos números são exatamente os que
 `guarda:edicao` e `guarda:junta` imprimem quando rodam, e bater com eles é o que
 prova que a régua mede a condição certa em vez de uma grandeza parecida.
 
+## Feito na fatia 2 — a peça de prova
+
+`tools/fixtures/acervo/peca-de-prova/` é uma peça cujo projeto são os requisitos:
+quatro tubos e um cubo, com cinco partes, 178 vértices disputando o mesmo lugar,
+ilha de 38 e três juntas. Cada linha da `TABELA` declara em `ORIGENS` para que
+requisito de guarda ela existe, e o teste ao lado prova que reduzir os lados do
+tubo derruba a régua — a peça não passa por sorte.
+
+Ela mora com as outras receitas de ensaio, fora do acervo publicado, porque o
+resolvedor da CLI já buscava ali pelo motivo escrito lá: essas receitas dão
+assunto estável aos testes e ficam de fora para que trabalho de peça não mexa no
+que a suíte mede. `guarda:acervo` não a varre.
+
+Faltavam dois caminhos para a bancada conseguir abri-la, e os dois foram
+abertos com a mesma regra: `acervo-receitas.js` ganhou `listarParaBancada`, que
+junta acervo e ensaio marcando qual é qual, e `imagens-da-peca.js` passou a
+indexar as duas raízes. A separação entre as duas listas não é enfeite: juntar
+ensaio dentro de `listarAcervo` fez a varredura de parâmetros saltar de 96
+declarados para 102 contando requisito de fixture como parâmetro de peça, e foi
+o teste que trava esse retrato que acusou.
+
+O retrato subiu mesmo assim, de 96/32 para 102/38, e está certo: a varredura lê
+`PASTAS_BUSCA` e sempre mediu as fixtures. Os seis números novos são a `TABELA`
+da peça de prova, e os seis são vivos, porque cada um move geometria — que é o
+requisito de guarda que ele existe para atender.
+
+Abrir a peça nova achou um defeito que a bicicleta escondia. O rodapé com o
+botão de salvar tem `display: flex` na classe, e isso vence o atributo `hidden`:
+esconder o rodapé por JavaScript nunca funcionou, e ele aparecia em peça
+recém-aberta, sem nada para salvar. Medido nas duas peças, o atributo dizia
+escondido enquanto a tela mostrava. Uma regra mais específica corrige, e agora o
+rodapé some com a malha intocada e sobe com "malha editada" depois do primeiro
+gesto.
+
 ## Riscos e parada
 
 `guarda:acervo` sai com código 1 quando o acervo está vazio, então a bicicleta

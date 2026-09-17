@@ -3,7 +3,7 @@ import './styles.css';
 import * as THREE from 'three';
 import { carregarPeca } from './carregar-peca.js';
 import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js';
-import { listarAcervo } from './acervo-receitas.js';
+import { listarParaBancada } from './acervo-receitas.js';
 import { comCaminho, receitaComParametros } from '../autoria/parametros-vivos.js';
 import { criarPunhosDeJunta } from './controles/punhos-de-junta.js';
 import { aplicarAjusteDeJunta, detectarJuntas } from '../autoria/ajuste-de-junta.js';
@@ -1550,7 +1550,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
 
   function desenharAcervo() {
     if (!listaAcervo) return;
-    const entradas = listarAcervo();
+    const entradas = listarParaBancada();
     if (!entradas.length) {
       const vazio = document.createElement('div');
       vazio.className = 'linha';
@@ -1915,7 +1915,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
      `Abrir` tira a lista: sem isso o endereço copiado depois de abrir uma peça
      não devolveria a mesma peça ao recarregar. O catálogo homologado continua
      valendo como segunda tentativa. */
-  const noAcervo = pecaPedida ? listarAcervo().find((entrada) => entrada.id === pecaPedida) : null;
+  const noAcervo = pecaPedida ? listarParaBancada().find((entrada) => entrada.id === pecaPedida) : null;
   if (noAcervo) {
     await abrirDoAcervo(noAcervo);
   } else if (pecaPedida && catalogo.length > 0) {

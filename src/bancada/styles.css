@@ -1822,6 +1822,14 @@ body.auditoria .recolher { display: none; }
   border-color: var(--amarelo);
 }
 
+/* `display: flex` na classe vence o atributo `hidden`, então o rodapé
+   continuava na tela depois de alguém o esconder por JavaScript: o botão de
+   salvar aparecia numa peça recém-aberta, sem nada para salvar. A regra precisa
+   ser mais específica que a da classe para ganhar dela. */
+.rodape-juntas[hidden] {
+  display: none;
+}
+
 /* Grade e chão dentro da aba de inspeção, onde antes havia um modal só para
    eles. Margem em cima para não colar no resumo da seleção. */
 .cena-preferencias {

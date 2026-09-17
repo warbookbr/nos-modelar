@@ -42,10 +42,12 @@ describe('porta MCP da varredura', () => {
        para 90/26 quando o acervo publicado ficou só com o quadro da bicicleta e
        cadeira, chapa e prensas viraram fixture de ferramenta, e subiu para
        96/32 quando a leitura passou a descer em coordenada — os seis números
-       novos são os três pontos de solda da bicicleta, todos vivos. Os dois
-       números têm de andar juntos, porque a porta MCP e a CLI leem a mesma
-       varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 96, vivos: 32, inertes: 64 });
+       novos são os três pontos de solda da bicicleta, todos vivos — e para
+       102/38 quando a peça de prova das guardas entrou em
+       `tools/fixtures/acervo/`, com os seis números da TABELA dela também
+       vivos. Os dois números têm de andar juntos, porque a porta MCP e a CLI
+       leem a mesma varredura. */
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 102, vivos: 38, inertes: 64 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

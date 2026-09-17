@@ -20,15 +20,28 @@ const IMAGENS = import.meta.glob(
   { query: '?url', import: 'default', eager: true },
 );
 
-const RAIZ_ACERVO = '../../../prototipos/procedural/v3/pecas/';
+/* AS RECEITAS DE ENSAIO TAMBÉM TÊM IMAGEM, e precisam ter: `guarda:referencia`
+   confere que a imagem declarada pela peça vira plano na cena, com textura e
+   tamanho, e sem uma peça de ensaio com imagem própria essa guarda só teria
+   conteúdo do acervo para provar em cima. Duas raízes, a mesma regra de chave. */
+const IMAGENS_DE_ENSAIO = import.meta.glob(
+  '../../../tools/fixtures/acervo/**/referencias/*.{png,jpg,jpeg,webp,svg}',
+  { query: '?url', import: 'default', eager: true },
+);
+
+const RAIZES = [
+  '../../../prototipos/procedural/v3/pecas/',
+  '../../../tools/fixtures/acervo/',
+];
 
 /* A chave é o caminho da imagem a partir da PASTA DA PEÇA, que é exatamente
    como a receita a declara em `PLANO.referencias`. */
 function indexar(entradas) {
   const porPeca = new Map();
   for (const [caminho, url] of Object.entries(entradas)) {
-    if (!caminho.startsWith(RAIZ_ACERVO)) continue;
-    const resto = caminho.slice(RAIZ_ACERVO.length);
+    const raiz = RAIZES.find((r) => caminho.startsWith(r));
+    if (!raiz) continue;
+    const resto = caminho.slice(raiz.length);
     const barra = resto.indexOf('/');
     if (barra < 0) continue;
     const peca = resto.slice(0, barra);
@@ -39,7 +52,13 @@ function indexar(entradas) {
   return porPeca;
 }
 
-export function imagensDaPeca(peca, entradas = IMAGENS) {
+/* As duas raízes juntas, e num lugar só: deixar cada função montar a sua fazia
+   `urlDaReferencia` continuar enxergando apenas o acervo depois de
+   `imagensDaPeca` já enxergar as duas, e a peça de ensaio abria sem imagem sem
+   ninguém errar nada visível. */
+const TODAS = { ...IMAGENS, ...IMAGENS_DE_ENSAIO };
+
+export function imagensDaPeca(peca, entradas = TODAS) {
   return indexar(entradas).get(peca) ?? new Map();
 }
 
@@ -49,6 +68,6 @@ export function imagensDaPeca(peca, entradas = IMAGENS) {
  * proposital: referência ausente já reprova em `guarda:acervo`, e a bancada não
  * deve inventar um segundo veredito sobre o mesmo arquivo.
  */
-export function urlDaReferencia(peca, referencia, entradas = IMAGENS) {
+export function urlDaReferencia(peca, referencia, entradas = TODAS) {
   return imagensDaPeca(peca, entradas).get(String(referencia ?? '').trim()) ?? null;
 }

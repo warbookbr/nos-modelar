@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-871 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+873 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -907,6 +907,11 @@
 
 - `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
 - `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
+
+## tools/fixtures/acervo/peca-de-prova/
+
+- `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
+- `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
 
 ## tools/fixtures/acervo/prensa-hidraulica/
 
