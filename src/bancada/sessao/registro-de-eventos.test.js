@@ -12,10 +12,10 @@ function relogio(inicio = 0) {
 describe('registro de eventos da bancada', () => {
   it('guarda assunto, detalhe e instante de cada evento', () => {
     const registro = criarRegistroDeEventos({ agora: relogio() });
-    registro.registrar('informacao', 'Peça aberta', 'bicicleta-quadro');
+    registro.registrar('informacao', 'Peça aberta', 'peca-de-prova');
     const [evento] = registro.listar();
     expect(evento.assunto).toBe('Peça aberta');
-    expect(evento.detalhe).toBe('bicicleta-quadro');
+    expect(evento.detalhe).toBe('peca-de-prova');
     expect(evento.quando).toBe('2026-01-01T00:00:00.000Z');
     expect(evento.repeticoes).toBe(1);
   });

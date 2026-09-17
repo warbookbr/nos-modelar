@@ -2,13 +2,13 @@
    inventar número para fechar a conta. */
 import { describe, expect, it } from 'vitest';
 import { conferirAbsorcao, conferirOrigens, parametrosNovos } from './origem-de-parametro.js';
-import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import * as prova from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
-const receita = bicicleta.default ?? bicicleta;
+const receita = prova.default ?? prova;
 const comParams = (PARAMS, ORIGENS) => ({ PARAMS, ...(ORIGENS ? { ORIGENS } : {}), PASSOS: [] });
 
 describe('conferirOrigens', () => {
-  it('a bicicleta declara de onde veio cada número', () => {
+  it('a receita declara de onde veio cada número', () => {
     const veredito = conferirOrigens(receita);
     expect(veredito.declara).toBe(true);
     expect(veredito.semOrigem).toEqual([]);

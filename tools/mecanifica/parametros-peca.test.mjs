@@ -172,7 +172,7 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 102 declarados e 38 vivos', async () => {
+  it('trava o retrato do acervo: 103 declarados e 39 vivos', async () => {
     /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
        ligado uma receita aos seus parâmetros de propósito, algo regrediu.
        Caiu de 267/114 para 90/26 quando o acervo publicado passou a ser só o
@@ -190,6 +190,10 @@ describe('acervo real', () => {
        é curva e continua fora. Os seis números novos são os três pontos de
        solda da bicicleta, e os seis são VIVOS — nenhum ruído entrou.
 
+       Subiu para 103/39 com o sétimo número da peça de prova: o tubo deitado
+       ganhou comprimento próprio porque um parâmetro que move duas coisas não
+       serve para provar que um gesto de junta equivale a um número.
+
        Subiu de 96/32 para 102/38 quando a peça de prova das guardas entrou em
        `tools/fixtures/acervo/`. Os seis números novos são a TABELA dela, e os
        seis são vivos: cada um move geometria, que é justamente o requisito de
@@ -198,7 +202,7 @@ describe('acervo real', () => {
        que é receita executável no repositório, e sempre mediu as fixtures. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 102, vivos: 38, inertes: 64 });
+    expect(r.resultado.totais).toEqual({ declarados: 103, vivos: 39, inertes: 64 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });

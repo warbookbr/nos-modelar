@@ -7,13 +7,13 @@ import { descreverGesto } from './descricao-do-gesto.js';
 import {
   apagar, criarFace, duplicar, escalar, extrudar, rotacionar,
 } from './topologia-da-malha.js';
-import receitaDaBicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import receitaDeProva from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
-const PECA = 'bicicleta-quadro';
-const PARTE = 'tuboSelim';
+const PECA = 'peca-de-prova';
+const PARTE = 'tuboDeitado';
 
-function malhaDaBicicleta() {
-  return executarReceita(receitaDaBicicleta).neutro;
+function malhaDeProva() {
+  return executarReceita(receitaDeProva).neutro;
 }
 
 function facesDaParte(neutro, parte) {
@@ -47,7 +47,7 @@ const OPERACOES = [
 describe('o alvo que cada operação de topologia produz', () => {
   for (const [nome, aplicar] of OPERACOES) {
     describe(nome, () => {
-      const original = malhaDaBicicleta();
+      const original = malhaDeProva();
       const resultado = aplicar(original);
 
       it('a operação muda a malha', () => {
@@ -89,7 +89,7 @@ describe('o alvo que cada operação de topologia produz', () => {
 
       it('capturar duas vezes a mesma malha dá exatamente o mesmo alvo', () => {
         const a = JSON.stringify(capturarAlvo(resultado.neutro, { peca: PECA }));
-        const b = JSON.stringify(capturarAlvo(aplicar(malhaDaBicicleta()).neutro, { peca: PECA }));
+        const b = JSON.stringify(capturarAlvo(aplicar(malhaDeProva()).neutro, { peca: PECA }));
         expect(a).toBe(b);
       });
 
@@ -102,7 +102,7 @@ describe('o alvo que cada operação de topologia produz', () => {
   }
 
   it('apagar a parte inteira é o caso que muda a contagem, e a régua acusa', () => {
-    const original = malhaDaBicicleta();
+    const original = malhaDeProva();
     const { neutro } = apagar(original, { modo: 'face', selecionados: facesDaParte(original, PARTE) });
     const alvo = capturarAlvo(neutro, { peca: PECA });
     const veredito = compararComAlvo(original, alvo);

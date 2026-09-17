@@ -5,14 +5,14 @@ import { capturarAlvo, compararComAlvo, FORMATO_DO_ALVO, TOLERANCIA_PADRAO_MM } 
 import { descreverPeca } from './descrever-partes.js';
 import { executarReceita } from './executar-receita.js';
 import { receitaComParametros } from './parametros-vivos.js';
-import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import * as prova from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
-const receita = bicicleta.default ?? bicicleta;
+const receita = prova.default ?? prova;
 const executar = (params) => executarReceita(params ? receitaComParametros(receita, params) : receita).neutro;
 
 describe('capturarAlvo', () => {
   it('escreve parte por NOME, sem vértice, face nem índice de passo', () => {
-    const alvo = capturarAlvo(executar(), { peca: 'bicicleta-quadro' });
+    const alvo = capturarAlvo(executar(), { peca: 'peca-de-prova' });
     expect(alvo.formato).toBe(FORMATO_DO_ALVO);
     expect(alvo.toleranciaMm).toBe(TOLERANCIA_PADRAO_MM);
     expect(alvo.partes.length).toBeGreaterThan(0);
@@ -30,8 +30,8 @@ describe('capturarAlvo', () => {
   });
 
   it('é determinístico: a mesma peça escreve o mesmo alvo', () => {
-    const a = capturarAlvo(executar(), { peca: 'bicicleta-quadro' });
-    const b = capturarAlvo(executar(), { peca: 'bicicleta-quadro' });
+    const a = capturarAlvo(executar(), { peca: 'peca-de-prova' });
+    const b = capturarAlvo(executar(), { peca: 'peca-de-prova' });
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
   });
 
@@ -43,7 +43,7 @@ describe('capturarAlvo', () => {
 
 describe('compararComAlvo', () => {
   it('a peça contra o alvo dela mesma dá diferença zero', () => {
-    const alvo = capturarAlvo(executar(), { peca: 'bicicleta-quadro' });
+    const alvo = capturarAlvo(executar(), { peca: 'peca-de-prova' });
     const veredito = compararComAlvo(executar(), alvo);
     expect(veredito.dentro).toBe(true);
     /* Não é zero exato porque o alvo guarda metro com seis casas, e um milésimo
@@ -52,32 +52,32 @@ describe('compararComAlvo', () => {
     expect(veredito.piorMm).toBeLessThan(0.002);
   });
 
-  /* O CASO QUE FALHA HOJE. O alvo abaixo é a bicicleta com o balanço 12 mm mais
+  /* O CASO QUE FALHA HOJE. O alvo abaixo é a peça com o tubo 12 mm mais
      longo — o mesmo ajuste que o autor tentou fazer com a seta e que a bancada
      não comportou. Nada no repositório sabe partir deste alvo e devolver a
      receita que chega nele; o que existe é a régua que reprova a receita antiga
      e aprova a nova. A rodada de absorção é o que falta no meio. */
   it('reprova a receita antiga contra um alvo ajustado, com a diferença medida', () => {
-    const ajustada = executar({ ...receita.PARAMS, balancoTraseiro: receita.PARAMS.balancoTraseiro + 12 });
-    const alvo = capturarAlvo(ajustada, { peca: 'bicicleta-quadro', base: 'balancoTraseiro=502' });
+    const ajustada = executar({ ...receita.PARAMS, comprimentoDoTubo: receita.PARAMS.comprimentoDoTubo + 12 });
+    const alvo = capturarAlvo(ajustada, { peca: 'peca-de-prova', base: 'comprimentoDoTubo=1000' });
 
     const veredito = compararComAlvo(executar(), alvo);
     expect(veredito.dentro).toBe(false);
     expect(veredito.piorMm).toBeGreaterThan(TOLERANCIA_PADRAO_MM);
 
-    const balanco = veredito.partes.find((p) => p.parte === 'balancoInferiorEsq');
+    const balanco = veredito.partes.find((p) => p.parte === 'tuboEsquerdo');
     expect(balanco.dentro).toBe(false);
   });
 
   it('aprova a receita que chega no alvo', () => {
-    const params = { ...receita.PARAMS, balancoTraseiro: receita.PARAMS.balancoTraseiro + 12 };
-    const alvo = capturarAlvo(executar(params), { peca: 'bicicleta-quadro' });
+    const params = { ...receita.PARAMS, comprimentoDoTubo: receita.PARAMS.comprimentoDoTubo + 12 };
+    const alvo = capturarAlvo(executar(params), { peca: 'peca-de-prova' });
     const veredito = compararComAlvo(executar(params), alvo);
     expect(veredito.dentro).toBe(true);
   });
 
   it('parte que sumiu na reescrita reprova, por mais perto que as outras fiquem', () => {
-    const alvo = capturarAlvo(executar(), { peca: 'bicicleta-quadro' });
+    const alvo = capturarAlvo(executar(), { peca: 'peca-de-prova' });
     alvo.partes.push({ parte: 'parteQueNaoExiste', min: [0, 0, 0], max: [1, 1, 1] });
     const veredito = compararComAlvo(executar(), alvo);
     expect(veredito.dentro).toBe(false);
@@ -96,37 +96,45 @@ describe('compararComAlvo', () => {
   it('reprova vértice movido no meio de um tubo que a caixa envolvente não enxerga', () => {
     const neutroOriginal = executar();
     const partesOrig = descreverPeca(neutroOriginal).partes;
-    const caixaTubo = partesOrig.find((p) => p.nome === 'tuboSuperior');
-    const facesTubo = [...neutroOriginal.F.values()].filter((f) => f.parte === 'tuboSuperior');
+    const caixaTubo = partesOrig.find((p) => p.nome === 'travessa');
+    const facesTubo = [...neutroOriginal.F.values()].filter((f) => f.parte === 'travessa');
     const idsTubo = [...new Set(facesTubo.flatMap((f) => f.vs))];
 
-    const idInterno = idsTubo.find((id) => {
+    /* O VÉRTICE ESCOLHIDO É O MAIS PRÓXIMO DO CENTRO DA CAIXA, e ele é movido na
+       direção desse centro. Procurar um vértice estritamente dentro da caixa nos
+       três eixos funcionava no tubo curvo da bicicleta e não funciona num tubo
+       reto, onde todo anel toca as bordas; o que o caso precisa é de um
+       movimento que a caixa não enxergue, e mover para dentro garante isso sem
+       depender da forma da peça. */
+    const centroDaCaixa = [0, 1, 2].map((i) => (caixaTubo.min[i] + caixaTubo.max[i]) / 2);
+    const distanciaAoCentro = (id) => {
       const pt = neutroOriginal.V.get(id);
-      return pt[0] > caixaTubo.min[0] + 0.005 && pt[0] < caixaTubo.max[0] - 0.005
-        && pt[1] > caixaTubo.min[1] + 0.005 && pt[1] < caixaTubo.max[1] - 0.005
-        && pt[2] > caixaTubo.min[2] + 0.005 && pt[2] < caixaTubo.max[2] - 0.005;
-    });
+      return Math.hypot(...[0, 1, 2].map((i) => pt[i] - centroDaCaixa[i]));
+    };
+    const idInterno = [...idsTubo].sort((a, b) => distanciaAoCentro(a) - distanciaAoCentro(b))[0];
     expect(idInterno).toBeDefined();
 
     const ptOrig = neutroOriginal.V.get(idInterno);
     const deslocamentoM = 0.005; // 5 mm
+    const paraDentro = [0, 1, 2].map((i) => centroDaCaixa[i] - ptOrig[i]);
+    const norma = Math.hypot(...paraDentro) || 1;
     const novoV = new Map(neutroOriginal.V);
-    novoV.set(idInterno, [ptOrig[0] + deslocamentoM, ptOrig[1], ptOrig[2]]);
+    novoV.set(idInterno, [0, 1, 2].map((i) => ptOrig[i] + (paraDentro[i] / norma) * deslocamentoM));
     const neutroDeformado = { ...neutroOriginal, V: novoV };
 
     const partesDeform = descreverPeca(neutroDeformado).partes;
-    const caixaDeform = partesDeform.find((p) => p.nome === 'tuboSuperior');
+    const caixaDeform = partesDeform.find((p) => p.nome === 'travessa');
     expect(caixaDeform.min).toEqual(caixaTubo.min);
     expect(caixaDeform.max).toEqual(caixaTubo.max);
 
-    const alvoDeformado = capturarAlvo(neutroDeformado, { peca: 'bicicleta-quadro' });
+    const alvoDeformado = capturarAlvo(neutroDeformado, { peca: 'peca-de-prova' });
     const veredito = compararComAlvo(neutroOriginal, alvoDeformado);
 
     expect(veredito.dentro).toBe(false);
     expect(veredito.piorMm).toBeGreaterThanOrEqual(4.99);
     expect(veredito.piorMm).toBeLessThanOrEqual(5.01);
 
-    const parteTubo = veredito.partes.find((p) => p.parte === 'tuboSuperior');
+    const parteTubo = veredito.partes.find((p) => p.parte === 'travessa');
     expect(parteTubo.dentro).toBe(false);
     expect(parteTubo.desvioMm).toBeGreaterThanOrEqual(4.99);
     expect(parteTubo.desvioMm).toBeLessThanOrEqual(5.01);
@@ -150,25 +158,25 @@ describe('peça que ganhou ou perdeu parte', () => {
   });
 
   it('parte sobrando reprova, e não passa por diferença pequena', () => {
-    const alvo = capturarAlvo(semUmaParte(executar(), 'tuboSuperior'), { peca: 'bicicleta-quadro' });
+    const alvo = capturarAlvo(semUmaParte(executar(), 'travessa'), { peca: 'peca-de-prova' });
     const veredito = compararComAlvo(executar(), alvo);
     expect(veredito.dentro).toBe(false);
-    expect(veredito.sobrando).toEqual(['tuboSuperior']);
+    expect(veredito.sobrando).toEqual(['travessa']);
     expect(veredito.piorMm).toBe(Infinity);
   });
 
   it('a receita que também perdeu a parte chega no alvo', () => {
-    const editada = semUmaParte(executar(), 'tuboSuperior');
-    const alvo = capturarAlvo(editada, { peca: 'bicicleta-quadro' });
+    const editada = semUmaParte(executar(), 'travessa');
+    const alvo = capturarAlvo(editada, { peca: 'peca-de-prova' });
     expect(compararComAlvo(editada, alvo).dentro).toBe(true);
   });
 
   it('parte nova é acusada como ausente na receita antiga, e alcançada pela nova', () => {
-    const editada = renomeando(executar(), 'tuboSuperior', 'reforcoNovo');
-    const alvo = capturarAlvo(editada, { peca: 'bicicleta-quadro' });
+    const editada = renomeando(executar(), 'travessa', 'reforcoNovo');
+    const alvo = capturarAlvo(editada, { peca: 'peca-de-prova' });
     const antiga = compararComAlvo(executar(), alvo);
     expect(antiga.ausentes).toEqual(['reforcoNovo']);
-    expect(antiga.sobrando).toEqual(['tuboSuperior']);
+    expect(antiga.sobrando).toEqual(['travessa']);
     expect(compararComAlvo(editada, alvo).dentro).toBe(true);
   });
 });

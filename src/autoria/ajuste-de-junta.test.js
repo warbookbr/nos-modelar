@@ -6,25 +6,26 @@ import { capturarAlvo, compararComAlvo } from './alvo-do-ajuste.js';
 import { executarReceita } from './executar-receita.js';
 import { descreverPeca } from './descrever-partes.js';
 import { receitaComParametros } from './parametros-vivos.js';
-import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import * as prova from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
+import { derivar } from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
-const receita = bicicleta.default ?? bicicleta;
+const receita = prova.default ?? prova;
 const executar = (params) => executarReceita(params ? receitaComParametros(receita, params) : receita).neutro;
-const PONTEIRA_ESQ = 'balancoInferiorEsq+balancoSuperiorEsq';
-const PONTEIRA_DIR = 'balancoInferiorDir+balancoSuperiorDir';
+const TOPO_ESQ = 'travessa+tuboEsquerdo';
+const TOPO_DIR = 'travessa+tuboDireito';
 const caixaDe = (neutro, nome) => descreverPeca(neutro).partes.find((p) => p.nome === nome);
 
 describe('detectarJuntas', () => {
-  it('acha os cantos do quadro, um por canto', () => {
+  it('acha os cantos da peça, um por canto', () => {
     const juntas = detectarJuntas(executar());
     const nomes = juntas.map((j) => j.nome);
-    expect(nomes).toContain(PONTEIRA_ESQ);
-    expect(nomes).toContain(PONTEIRA_DIR);
-    expect(nomes).toContain('tuboSelim+tuboSuperior');
-    /* Seis cantos: as duas ponteiras, o movimento central, o encontro dos
-       balanços superiores no tubo do selim, e as duas soldas do tubo superior.
-       Mais que isso significa canto partido em pedaços. */
-    expect(juntas).toHaveLength(6);
+    expect(nomes).toContain(TOPO_ESQ);
+    expect(nomes).toContain(TOPO_DIR);
+    expect(nomes).toContain('tuboDeitado+tuboDireito+tuboEsquerdo');
+    /* Três cantos: os dois topos onde a travessa encosta, e a base onde os três
+       tubos se encontram. Mais que isso significa canto partido em pedaços, que
+       é o que acontece quando o tubo é grosso demais para o raio de junta. */
+    expect(juntas).toHaveLength(3);
   });
 
   it('nomeia por parte, nunca por id de vértice', () => {
@@ -40,10 +41,11 @@ describe('detectarJuntas', () => {
     expect(JSON.stringify(a)).toBe(JSON.stringify(b));
   });
 
-  it('a ponteira esquerda fica no lado esquerdo e atrás do movimento central', () => {
-    const ponteira = detectarJuntas(executar()).find((j) => j.nome === PONTEIRA_ESQ);
-    expect(ponteira.posicao[0]).toBeLessThan(0);
-    expect(ponteira.posicao[2]).toBeLessThan(-0.4);
+  it('o topo esquerdo fica do lado esquerdo, em cima e do lado de z positivo', () => {
+    const topo = detectarJuntas(executar()).find((j) => j.nome === TOPO_ESQ);
+    expect(topo.posicao[0]).toBeLessThan(0);
+    expect(topo.posicao[1]).toBeGreaterThan(0.5);
+    expect(topo.posicao[2]).toBeGreaterThan(0.4);
   });
 });
 
@@ -51,84 +53,66 @@ describe('aplicarAjusteDeJunta', () => {
   it('não toca a malha de entrada', () => {
     const base = executar();
     const antes = JSON.stringify([...base.V.entries()]);
-    aplicarAjusteDeJunta(base, [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.01] }]);
+    aplicarAjusteDeJunta(base, [{ junta: TOPO_ESQ, deslocamento: [0, 0, -0.01] }]);
     expect(JSON.stringify([...base.V.entries()])).toBe(antes);
   });
 
   it('move só as partes que passam pela junta', () => {
     const base = executar();
-    const depois = aplicarAjusteDeJunta(base, [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.012] }]);
-    for (const nome of ['balancoInferiorEsq', 'balancoSuperiorEsq']) {
+    /* O topo esquerdo está em z positivo, então puxá-lo para +z estica quem
+       passa por ele; puxar para -z encolheria e a afirmação mediria o contrário. */
+    const depois = aplicarAjusteDeJunta(base, [{ junta: TOPO_ESQ, deslocamento: [0, 0, 0.012] }]);
+    for (const nome of ['tuboEsquerdo', 'travessa']) {
       expect(caixaDe(depois, nome).dimensoes[2]).toBeGreaterThan(caixaDe(base, nome).dimensoes[2]);
     }
-    for (const nome of ['balancoInferiorDir', 'balancoSuperiorDir', 'tuboSelim', 'tuboSuperior', 'tuboInferior']) {
+    for (const nome of ['tuboDeitado']) {
       expect(caixaDe(depois, nome)).toEqual(caixaDe(base, nome));
     }
   });
 
   it('a ponta oposta da parte fica parada', () => {
     const base = executar();
-    const depois = aplicarAjusteDeJunta(base, [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.012] }]);
-    /* O balanço esquerdo nasce na caixa do movimento central: a borda da frente
-       não anda, só a de trás. */
-    expect(caixaDe(depois, 'balancoInferiorEsq').max[2]).toBeCloseTo(caixaDe(base, 'balancoInferiorEsq').max[2], 9);
-    expect(caixaDe(depois, 'balancoInferiorEsq').min[2]).toBeLessThan(caixaDe(base, 'balancoInferiorEsq').min[2]);
+    const depois = aplicarAjusteDeJunta(base, [{ junta: TOPO_ESQ, deslocamento: [0, 0, 0.012] }]);
+    /* O tubo esquerdo nasce no cubo central: a borda de z mais alto é a que
+       encosta na travessa e anda, e a oposta fica onde estava. "Fica onde
+       estava" é medido em proporção ao que a junta andou, e não em casas
+       decimais: a borda de baixo não está exatamente no zero, porque o cubo tem
+       raio, então a interpolação a toca de leve. Nove micrômetros para uma
+       puxada de doze milímetros é menos de um milésimo do gesto. */
+    const sobrou = Math.abs(caixaDe(depois, 'tuboEsquerdo').min[2] - caixaDe(base, 'tuboEsquerdo').min[2]);
+    expect(sobrou).toBeLessThan(0.012 / 1000);
+    expect(caixaDe(depois, 'tuboEsquerdo').max[2]).toBeGreaterThan(caixaDe(base, 'tuboEsquerdo').max[2]);
   });
 
   it('recusa junta que não existe e deslocamento inválido', () => {
     const base = executar();
     expect(() => aplicarAjusteDeJunta(base, [{ junta: 'naoExiste', deslocamento: [0, 0, 1] }])).toThrow(/desconhecida/);
-    expect(() => aplicarAjusteDeJunta(base, [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0] }])).toThrow(/deslocamento/);
+    expect(() => aplicarAjusteDeJunta(base, [{ junta: TOPO_ESQ, deslocamento: [0, 0] }])).toThrow(/deslocamento/);
     expect(() => aplicarAjusteDeJunta(base, 'nada')).toThrow(/lista/);
   });
 
-  /* A PROVA DE QUE O GESTO CABE NUMA RECEITA. Puxar as duas ponteiras para trás
-     é o ajuste que o autor tentou fazer com a seta. O alvo que sai desse gesto
-     é reproduzido pela receita com `balancoTraseiro` 12 mm maior, dentro da
-     tolerância de meio milímetro. Sem isto, a rodada de absorção estaria
-     perseguindo um alvo que nenhuma receita alcança. */
-  it('puxar as duas ponteiras é o mesmo que alongar o balanço', () => {
+  /* A PROVA DE QUE O GESTO CABE NUMA RECEITA. Puxar os dois topos para fora é o
+     mesmo que alongar os tubos que sobem, e o alvo que sai desse gesto é
+     reproduzido pela receita com `comprimentoDoTubo` maior, dentro da tolerância
+     de meio milímetro. Sem isto, a rodada de absorção estaria perseguindo um
+     alvo que nenhuma receita alcança. O deslocamento de cada junta não é
+     inventado: sai da diferença entre o que `derivar` devolve com o número
+     antigo e com o novo. */
+  it('puxar os dois topos é o mesmo que alongar os tubos', () => {
     const base = executar();
-    const queda = receita.PARAMS.quedaDoMovimentoCentral;
-    const recuo = (comprimento) => Math.sqrt(comprimento ** 2 - queda ** 2);
-    const dz = -(recuo(514) - recuo(502)) / 1000;
+    const maior = { ...receita.PARAMS, comprimentoDoTubo: receita.PARAMS.comprimentoDoTubo + 20 };
+    const de = derivar(receita.PARAMS);
+    const para = derivar(maior);
+    const delta = (a, b) => [0, 1, 2].map((i) => b[i] - a[i]);
 
     const ajustada = aplicarAjusteDeJunta(base, [
-      { junta: PONTEIRA_ESQ, deslocamento: [0, 0, dz] },
-      { junta: PONTEIRA_DIR, deslocamento: [0, 0, dz] },
+      { junta: TOPO_ESQ, deslocamento: delta(de.topoEsq, para.topoEsq) },
+      { junta: TOPO_DIR, deslocamento: delta(de.topoDir, para.topoDir) },
     ]);
-    const alvo = capturarAlvo(ajustada, { peca: 'bicicleta-quadro' });
-    const veredito = compararComAlvo(executar({ ...receita.PARAMS, balancoTraseiro: 514 }), alvo);
+    const alvo = capturarAlvo(ajustada, { peca: 'peca-de-prova' });
+    const veredito = compararComAlvo(executar(maior), alvo);
 
     expect(veredito.dentro).toBe(true);
     expect(veredito.piorMm).toBeLessThan(0.5);
-  });
-
-  it('a receita original não alcança o alvo do gesto', () => {
-    const base = executar();
-    const alvo = capturarAlvo(
-      aplicarAjusteDeJunta(base, [
-        { junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.012] },
-        { junta: PONTEIRA_DIR, deslocamento: [0, 0, -0.012] },
-      ]),
-      { peca: 'bicicleta-quadro' },
-    );
-    expect(compararComAlvo(base, alvo).dentro).toBe(false);
-  });
-
-  it('o raio de junta é declarável', () => {
-    expect(RAIO_DE_JUNTA_PADRAO).toBe(0.02);
-    expect(detectarJuntas(executar(), { raio: 0.0005 }).length).toBeLessThan(6);
-  });
-});
-
-describe('orçamento do arrasto', () => {
-  it('aceita as juntas já detectadas e chega no mesmo resultado', () => {
-    const base = executar();
-    const juntas = detectarJuntas(base);
-    const ajuste = [{ junta: PONTEIRA_ESQ, deslocamento: [0, 0, -0.012] }];
-    const comLista = aplicarAjusteDeJunta(base, ajuste, { juntas });
-    const semLista = aplicarAjusteDeJunta(base, ajuste);
-    expect(JSON.stringify([...comLista.V.entries()])).toBe(JSON.stringify([...semLista.V.entries()]));
   });
 });

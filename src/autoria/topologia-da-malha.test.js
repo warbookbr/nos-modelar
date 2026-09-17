@@ -1,12 +1,14 @@
-/* topologia-da-malha.test.js — as operações que mudam a malha, medidas na
-   bicicleta: quantas faces e vértices nascem, quem some, e o que fica no lugar. */
+/* topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça
+   de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar.
+   A peça é fixture de ferramenta, e não conteúdo: assim mexer numa peça do
+   acervo não muda o que estes números afirmam. */
 import { describe, expect, it } from 'vitest';
 import { apagar, criarFace, duplicar, escalar, extrudar, rotacionar, verticesAlcancados } from './topologia-da-malha.js';
 import { executarReceita } from './executar-receita.js';
 import { descreverPeca } from './descrever-partes.js';
-import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import * as prova from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
-const receita = bicicleta.default ?? bicicleta;
+const receita = prova.default ?? prova;
 const base = () => executarReceita(receita).neutro;
 const umaFaceDe = (neutro, parte) => [...neutro.F.values()].find((f) => f.parte === parte);
 const partesDe = (neutro) => new Set([...neutro.F.values()].map((f) => f.parte));
@@ -14,7 +16,7 @@ const partesDe = (neutro) => new Set([...neutro.F.values()].map((f) => f.parte))
 describe('verticesAlcancados', () => {
   it('a face alcança os vértices dela', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const alcancados = verticesAlcancados(neutro, { modo: 'face', selecionados: [String(face.id)] });
     expect([...alcancados].sort()).toEqual([...face.vs].sort());
   });
@@ -23,7 +25,7 @@ describe('verticesAlcancados', () => {
 describe('extrudar', () => {
   it('a face vira uma casca: topo novo, paredes, e o fundo sai', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const antes = neutro.F.size;
     const { neutro: depois, selecionados, mudou } = extrudar(neutro, { modo: 'face', selecionados: [String(face.id)] });
 
@@ -32,7 +34,7 @@ describe('extrudar', () => {
     expect(depois.F.size).toBe(antes + face.vs.length);
     expect(depois.F.has(face.id)).toBe(false);
     expect(selecionados).toHaveLength(1);
-    expect(depois.F.get(Number(selecionados[0])).parte).toBe('tuboSelim');
+    expect(depois.F.get(Number(selecionados[0])).parte).toBe('tuboDeitado');
   });
 
   /* A face nova nasce AFASTADA, e não em cima da antiga: parede de área zero é
@@ -40,7 +42,7 @@ describe('extrudar', () => {
      face, então a mesma operação serve num tubo grande e num pequeno. */
   it('a face nova nasce afastada pela normal, com as paredes tendo área', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const { neutro: depois, selecionados } = extrudar(neutro, { modo: 'face', selecionados: [String(face.id)] });
     const nova = depois.F.get(Number(selecionados[0]));
 
@@ -59,7 +61,7 @@ describe('extrudar', () => {
 
   it('a extrusão não cria parte nova: a casca fica no tubo do selim', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const { neutro: depois } = extrudar(neutro, { modo: 'face', selecionados: [String(face.id)] });
     expect(partesDe(depois)).toEqual(partesDe(neutro));
   });
@@ -73,7 +75,7 @@ describe('extrudar', () => {
 describe('duplicar', () => {
   it('a cópia nasce solta, no mesmo lugar, sem parede ligando', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const { neutro: depois, selecionados, mudou } = duplicar(neutro, { modo: 'face', selecionados: [String(face.id)] });
     expect(mudou).toBe(true);
     expect(depois.F.size).toBe(neutro.F.size + 1);
@@ -86,7 +88,7 @@ describe('duplicar', () => {
 describe('apagar', () => {
   it('apagar a face tira só ela', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const { neutro: depois } = apagar(neutro, { modo: 'face', selecionados: [String(face.id)] });
     expect(depois.F.size).toBe(neutro.F.size - 1);
     expect(depois.F.has(face.id)).toBe(false);
@@ -94,7 +96,7 @@ describe('apagar', () => {
 
   it('apagar vértice leva junto toda face que o usava', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const vertice = face.vs[0];
     const quantasUsavam = [...neutro.F.values()].filter((f) => f.vs.includes(vertice)).length;
     const { neutro: depois } = apagar(neutro, { modo: 'vertice', selecionados: [String(vertice)] });
@@ -104,22 +106,22 @@ describe('apagar', () => {
 
   it('apagar a peça inteira faz a parte sumir, que é o caso que a absorção precisa tratar', () => {
     const neutro = base();
-    const doTubo = [...neutro.F.values()].filter((f) => f.parte === 'tuboSuperior').map((f) => String(f.id));
+    const doTubo = [...neutro.F.values()].filter((f) => f.parte === 'travessa').map((f) => String(f.id));
     const { neutro: depois } = apagar(neutro, { modo: 'face', selecionados: doTubo });
-    expect(partesDe(depois).has('tuboSuperior')).toBe(false);
-    expect(descreverPeca(depois).partes.map((p) => p.nome)).not.toContain('tuboSuperior');
+    expect(partesDe(depois).has('travessa')).toBe(false);
+    expect(descreverPeca(depois).partes.map((p) => p.nome)).not.toContain('travessa');
   });
 });
 
 describe('criarFace', () => {
   it('três vértices viram face, herdando a parte de quem já os usava', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const { neutro: depois, selecionados, mudou } = criarFace(neutro, {
       modo: 'vertice', selecionados: face.vs.slice(0, 3).map(String),
     });
     expect(mudou).toBe(true);
-    expect(depois.F.get(Number(selecionados[0])).parte).toBe('tuboSelim');
+    expect(depois.F.get(Number(selecionados[0])).parte).toBe('tuboDeitado');
     expect(depois.F.size).toBe(neutro.F.size + 1);
   });
 
@@ -134,7 +136,7 @@ describe('criarFace', () => {
 describe('rotacionar e escalar', () => {
   it('girar meia volta em y devolve a peça ao mesmo lugar depois de duas vezes', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const estado = { modo: 'face', selecionados: [String(face.id)] };
     const meia = rotacionar(neutro, estado, { eixo: 1, angulo: Math.PI }).neutro;
     const inteira = rotacionar(meia, estado, { eixo: 1, angulo: Math.PI }).neutro;
@@ -145,7 +147,7 @@ describe('rotacionar e escalar', () => {
 
   it('girar mexe só na seleção', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const alcancados = verticesAlcancados(neutro, { modo: 'face', selecionados: [String(face.id)] });
     const depois = rotacionar(neutro, { modo: 'face', selecionados: [String(face.id)] }, { eixo: 1, angulo: 0.3 }).neutro;
     for (const [id, ponto] of neutro.V) {
@@ -156,7 +158,7 @@ describe('rotacionar e escalar', () => {
 
   it('escalar por dois dobra a distância ao centro da seleção', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const estado = { modo: 'face', selecionados: [String(face.id)] };
     const depois = escalar(neutro, estado, { fator: 2 }).neutro;
     const centro = [0, 1, 2].map((i) => face.vs.reduce((s, v) => s + neutro.V.get(v)[i], 0) / face.vs.length);
@@ -169,7 +171,7 @@ describe('rotacionar e escalar', () => {
 
   it('escalar num eixo só não mexe nos outros dois', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const depois = escalar(neutro, { modo: 'face', selecionados: [String(face.id)] }, { fator: 3, eixo: 1 }).neutro;
     for (const v of face.vs) {
       expect(depois.V.get(v)[0]).toBeCloseTo(neutro.V.get(v)[0], 12);
@@ -181,7 +183,7 @@ describe('rotacionar e escalar', () => {
 describe('a malha de entrada nunca é tocada', () => {
   it('cada operação devolve malha nova', () => {
     const neutro = base();
-    const face = umaFaceDe(neutro, 'tuboSelim');
+    const face = umaFaceDe(neutro, 'tuboDeitado');
     const antes = JSON.stringify([...neutro.V.entries()]);
     const estado = { modo: 'face', selecionados: [String(face.id)] };
     extrudar(neutro, estado);

@@ -47,6 +47,12 @@ export const TABELA = {
      canto se move. */
   raioDoCubo: 28,
   larguraDoCubo: 90,
+  /* O tubo deitado tem comprimento PRÓPRIO, e não uma fração do que sobe. Com
+     um número só governando os dois, puxar os topos deixava de equivaler a
+     alongar os tubos: a ponta do deitado andava junto e o alvo ficava 19,3 mm
+     fora. Parâmetro que move mais de uma coisa não serve para provar que um
+     gesto cabe numa receita. */
+  comprimentoDoDeitado: 950,
   /* Abertura entre os dois tubos que sobem, em grau. Diferente de zero para as
      partes não ficarem coincidentes na projeção lateral. */
   aberturaEmGrau: 28,
@@ -63,7 +69,7 @@ export function derivar(t = TABELA) {
     topoEsq: [-meia, comprimento * Math.cos(radianos), comprimento * Math.sin(radianos)],
     topoDir: [meia, comprimento * Math.cos(radianos), -comprimento * Math.sin(radianos)],
     /* O tubo que deita, para dar terceira e quarta parte e um segundo canto. */
-    frente: [0, comprimento * 0.35, comprimento * 0.9],
+    frente: [0, m(t.comprimentoDoDeitado) * 0.37, m(t.comprimentoDoDeitado) * 0.93],
   };
 }
 
@@ -142,6 +148,7 @@ export const receitaPecaDeProva = {
   ORIGENS: {
     ladosDoTubo: 'requisito das guardas: põe vértices próximos na tela para a prova de precisão de clique',
     comprimentoDoTubo: 'requisito das guardas: tamanho comparável ao de peça real, para o enquadramento não virar caso especial',
+    comprimentoDoDeitado: 'requisito das guardas: cada número move uma coisa só, para um gesto de junta poder equivaler a um parâmetro',
     raioDoTubo: 'requisito das guardas: secção que mantém os vértices do anel disputando o mesmo lugar na projeção',
     raioDoCubo: 'requisito das guardas: encontro de três tubos, para haver junta com mais de duas partes',
     larguraDoCubo: 'requisito das guardas: largura que separa os tubos em x sem desfazer o encontro',

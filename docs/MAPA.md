@@ -786,7 +786,7 @@
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `texto-parametro.js` — texto-parametro.js — a troca do número no TEXTO da receita, sem tocar em disco.
 - `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
-- `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na bicicleta: quantas faces e vértices nascem, quem some, e o que fica no lugar.
+- `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar. A p…
 - `transformacao-rigida.js` — transformacao-rigida.js — contrato neutro de transformações rígidas.
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 - `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.

@@ -1,7 +1,7 @@
 /* mapa-parte-passo.test.js — o mapa acha o passo que constrói cada parte. */
 import { describe, it, expect } from 'vitest';
 import { mapearParteParaPasso } from './mapa-parte-passo.js';
-import receitaDaBicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import receitaDeProva from '../../tools/fixtures/acervo/peca-de-prova/receita.js';
 
 describe('mapearParteParaPasso', () => {
   it('liga a parte ao passo que criou a geometria que ela seleciona', () => {
@@ -40,9 +40,9 @@ describe('mapearParteParaPasso', () => {
     expect(mapa.semConstrutor).toEqual(['fantasma']);
   });
 
-  it('na bicicleta, toda parte nomeada tem passo que a constrói', () => {
-    const mapa = mapearParteParaPasso(receitaDaBicicleta);
-    expect(mapa.partes.length).toBeGreaterThan(5);
+  it('numa receita real, toda parte nomeada tem passo que a constrói', () => {
+    const mapa = mapearParteParaPasso(receitaDeProva);
+    expect(mapa.partes.length).toBe(5);
     expect(mapa.semConstrutor).toEqual([]);
   });
 });
