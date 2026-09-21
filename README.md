@@ -143,7 +143,7 @@ npm ci
 npm run dev
 npm run build
 npm test
-npm run criar -- cadeira-de-madeira
+npm run criar -- braco-robotico
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 
