@@ -44,7 +44,13 @@ const DBG = { normais: 1, flat: 2 }[P.get('debug')] || (parseInt(P.get('debug'))
 
 const hudNome = document.getElementById('nome'), hudFps = document.getElementById('fps'), hudDev = document.getElementById('dev');
 try {
-  const mod = await import(`./pecas/${nome}.js`);
+  /* A PEÇA PODE SER PASTA OU ARQUIVO SOLTO, e o visor tenta a pasta primeiro.
+     Quando o acervo migrou para `pecas/<nome>/receita.js`, este import continuou
+     apontando para a forma antiga e o visor parou de abrir qualquer peça do
+     acervo. Ninguém notou porque nada exercitava o visor, e a auditoria visual
+     voltada para a IA ficou morta enquanto a bancada, que desenha a interface
+     inteira em volta, continuava respondendo. */
+  const mod = await import(`./pecas/${nome}/receita.js`).catch(() => import(`./pecas/${nome}.js`));
   const receita = mod.default ?? Object.values(mod).find((v) => v && typeof v === 'object' && Array.isArray(v.PASSOS)) ?? mod;
   const meta = receita.meta ?? mod.meta ?? {};
   const nomeExibicao = meta.nome ?? nome;

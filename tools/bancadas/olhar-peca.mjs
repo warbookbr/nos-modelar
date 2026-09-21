@@ -34,9 +34,17 @@ const geo = /^--geo=(normais|flat)$/.exec(args.find((a) => a.startsWith('--geo='
 const giro = parseInt(/^--giro=(\d+)$/.exec(args.find((a) => a.startsWith('--giro=')) || '')?.[1] || '0', 10);
 const RES = parseInt(res, 10), VW = Math.max(900, RES), VH = Math.round(VW * 9 / 16);   // viewport ACOMPANHA res -> foto nítida em alta
 
-const peçaPath = join(REPO, 'prototipos/procedural/v3/pecas', `${nome}.js`);
+/* A PEÇA É PASTA OU ARQUIVO SOLTO. O acervo migrou para
+   `pecas/<nome>/receita.js` e esta checagem continuou exigindo `<nome>.js`,
+   então a ferramenta passou a responder "peça desconhecida" para TODAS as peças
+   do acervo, inclusive a bicicleta. É a foto limpa, sem a interface da bancada
+   em volta, que o crítico visual precisa receber; enquanto ela esteve morta, a
+   revisão foi feita sobre a captura da bancada, com painéis e botões ocupando
+   três quartos da imagem. */
+const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const caminhosDaPeca = (id) => [join(PECAS, id, 'receita.js'), join(PECAS, `${id}.js`)];
 if (!nome) { console.error('informe explicitamente o id da peça (veja prototipos/procedural/v3/pecas/)'); process.exit(2); }
-if (!existsSync(peçaPath)) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(1); }
+if (!caminhosDaPeca(nome).some((c) => existsSync(c))) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(1); }
 
 /* server estático mínimo (só o que o visor precisa) */
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
