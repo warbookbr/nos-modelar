@@ -44,6 +44,7 @@
     "guarda:referencia": "node tools/mecanifica/guarda-referencia-da-peca.mjs",
     "guarda:escolha": "node tools/mecanifica/guarda-escolha-da-peca.mjs",
     "guarda:acervo": "node tools/mecanifica/guarda-acervo.mjs",
+    "guarda:referencial": "node tools/mecanifica/guarda-referencial.mjs",
     "material": "node tools/mecanifica/material-da-peca.mjs",
     "descrever": "node tools/mecanifica/descrever-peca.mjs",
     "parametros": "node tools/mecanifica/parametros-peca.mjs",

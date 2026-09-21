@@ -145,6 +145,13 @@ jobs:
       - name: O acervo cumpre o plano e os contatos que declara
         run: npm run guarda:acervo
 
+      # Um braço robótico passou em tudo deitado no chão: os pontos declarados
+      # ficaram a 2 mm do alvo e a peça estava virada noventa graus, porque
+      # cada régua compara a peça contra a declaração dela mesma. Só a
+      # comparação entre peças acusa referencial trocado.
+      - name: Toda peça do acervo usa o mesmo referencial
+        run: npm run guarda:referencial
+
       # A rodada de absorção acerta o desenho da pessoa reescrevendo a receita,
       # e acertaria mais fácil inventando termos até a conta fechar. Quem
       # declara de onde vieram os números, declara todos.

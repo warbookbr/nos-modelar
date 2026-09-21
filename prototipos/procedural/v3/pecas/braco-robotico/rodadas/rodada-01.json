@@ -1,0 +1,11 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico",
+  "numero": 1,
+  "medidas": {
+    "passou": false,
+    "relatorio": "descrever: 6 partes, 116 faces, 0 sem identidade, os 5 contatos declarados interpenetram. conferir-pontos: PASSOU, os 6 pontos entre 0 e 2 mm. guarda:acervo: ok. guarda:referencial: REPROVOU — a peca declara 'z para cima' e o acervo usa 'y para cima', e o braco foi construido deitado. O gate de referencial nasceu desta rodada e nao existia quando a geometria foi escrita."
+  },
+  "veredito": null
+}

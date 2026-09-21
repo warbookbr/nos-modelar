@@ -57,10 +57,10 @@ export function derivar(t = TABELA) {
   /* Os centros de junta são a verdade dimensional desta peça, e cada um sai da
      soma dos elos anteriores. Nenhuma coordenada é digitada à mão: mexer num
      comprimento tem que arrastar tudo o que vem depois dele. */
-  const junta2 = [0, 0, m(t.baseAltura + t.colunaAltura)];
-  const junta3 = [0, 0, junta2[2] + m(t.bracoComprimento)];
-  const punho = [m(t.antebracoComprimento), m(t.cotoveloDesvio), junta3[2]];
-  const flange = [punho[0] + m(t.punhoComprimento), punho[1], punho[2]];
+  const junta2 = [0, m(t.baseAltura + t.colunaAltura), 0];
+  const junta3 = [0, junta2[1] + m(t.bracoComprimento), 0];
+  const punho = [m(t.cotoveloDesvio), junta3[1], m(t.antebracoComprimento)];
+  const flange = [punho[0], punho[1], punho[2] + m(t.punhoComprimento)];
   const alcance = m(t.bracoComprimento + t.antebracoComprimento + t.punhoComprimento);
   return { junta2, junta3, punho, flange, alcance };
 }
@@ -245,17 +245,17 @@ function pontosDeclarados(t = TABELA) {
   const meioRaiz = t.antebracoDiametroRaiz / 2;
   return [
     { nome: 'baseCentro', parte: 'base', medida: 'centro',
-      em: [0, 0, t.baseAltura / 2], toleranciaMm: 3 },
+      em: [0, t.baseAltura / 2, 0], toleranciaMm: 3 },
     { nome: 'junta1', entre: ['base', 'coluna'],
-      em: [0, 0, juntaUm], toleranciaMm: 5 },
+      em: [0, juntaUm, 0], toleranciaMm: 5 },
     { nome: 'junta2', entre: ['coluna', 'braco'],
-      em: [0, 0, juntaDois], toleranciaMm: 5 },
+      em: [0, juntaDois, 0], toleranciaMm: 5 },
     { nome: 'bracoTopo', parte: 'braco', medida: 'maximo',
-      em: [t.bracoLargura / 2, t.bracoProfundidade / 2, juntaTres], toleranciaMm: 5 },
+      em: [t.bracoLargura / 2, juntaTres, t.bracoProfundidade / 2], toleranciaMm: 5 },
     { nome: 'antebracoPonta', parte: 'antebraco', medida: 'maximo',
-      em: [t.antebracoComprimento, t.cotoveloDesvio + meioRaiz, juntaTres + meioRaiz], toleranciaMm: 5 },
+      em: [t.cotoveloDesvio + meioRaiz, juntaTres + meioRaiz, t.antebracoComprimento], toleranciaMm: 5 },
     { nome: 'flangeCentro', parte: 'flange', medida: 'centro',
-      em: [t.antebracoComprimento + t.punhoComprimento, t.cotoveloDesvio, juntaTres], toleranciaMm: 5 },
+      em: [t.cotoveloDesvio, juntaTres, t.antebracoComprimento + t.punhoComprimento], toleranciaMm: 5 },
   ];
 }
 
@@ -290,10 +290,10 @@ export const receitaBracoRobotico = {
       { nome: 'flange', forma: 'disco chato de 90 de diametro e 12 de espessura, com oito furos e um furo central', tecnica: 'cilindro com furos booleanos' },
     ],
     criteriosDeReprovacao: [
-      'centro da junta 2 fora de (0, 0, 330), tolerancia de 5 mm',
-      'centro da junta 3 fora de (0, 0, 710), tolerancia de 5 mm',
-      'centro do punho fora de (370, 90, 710), tolerancia de 5 mm',
-      'centro do flange fora de (470, 90, 710), tolerancia de 5 mm',
+      'centro da junta 2 fora de (0, 330, 0) em x, y, z, tolerancia de 5 mm',
+      'centro da junta 3 fora de (0, 710, 0) em x, y, z, tolerancia de 5 mm',
+      'centro do punho fora de (90, 710, 370) em x, y, z, tolerancia de 5 mm',
+      'centro do flange fora de (90, 710, 470) em x, y, z, tolerancia de 5 mm',
       'base com diametro diferente de 180 mm, tolerancia de 3 mm',
     ],
   },
@@ -310,7 +310,7 @@ export const receitaBracoRobotico = {
   ],
 
   TOPO: {
-    origem: 'centro da base no chao; x para a frente, y para a esquerda, z para cima',
+    origem: 'centro da base no chao; z para a frente, y para cima, x para o lado',
     simetria: 'nenhuma: o desvio do cotovelo quebra a simetria bilateral de proposito',
     modulo: 'peça inteira; nenhum módulo separado',
   },
