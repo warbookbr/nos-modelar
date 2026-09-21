@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-861 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -711,10 +711,6 @@
 ## prototipos/procedural/v3/pecas/bicicleta-quadro/
 
 - `receita.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
-
-## prototipos/procedural/v3/pecas/braco-robotico/
-
-- `receita.js` — braco-robotico.js — braço industrial fictício de 6 eixos, alcance 850 mm, classe de 5 kg de carga. Peça inteira, e não módulo de um conjunto maior.
 
 ## prototipos/procedural/v3/servicos/
 

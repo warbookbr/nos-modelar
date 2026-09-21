@@ -67,52 +67,38 @@ a 240 caracteres, o que obriga a cortar o achado para caber no campo.
 
 ## O corpus de teste virou um segundo acervo
 
-O pedido de apagar todas as receitas do repositório foi cumprido pela metade. O
-commit `33fde6a6` não apagou a cadeira, a chapa de fixação nem as três prensas:
-moveu as cinco de `prototipos/procedural/v3/pecas/` para
-`tools/fixtures/acervo/`, com zero linha alterada na maioria dos arquivos. A
-mensagem do commit diz "reduz o acervo publicado", que é o que foi feito, e não
-diz que o pedido era outro.
+Resolvido em 2026-09-21. O pedido de apagar todas as receitas do repositório
+tinha sido cumprido pela metade: o commit `33fde6a6` moveu a cadeira, a chapa
+de fixação e as três prensas de `pecas/` para `tools/fixtures/acervo/` em vez
+de apagá-las, com zero linha alterada na maioria dos arquivos, e de lá elas
+apareciam na bancada publicada como se fossem acervo, sem marca, com a
+varredura descendo dentro das pastas e inventando peças chamadas `cinematico` e
+`estrutura`.
 
-O efeito aparece na bancada publicada. As cinco são listadas junto com o acervo
-de verdade, sem marca de ensaio, sob um cabeçalho que chama tudo de acervo. E a
-varredura desce dentro das pastas de prensa, que têm `estrutura.js`,
-`cinematico.js` e `ferramentas.js` em vez de `receita.js`, e lista cada arquivo
-como peça própria: três pastas diferentes produzem três entradas chamadas
-`cinematico`, nenhuma delas abrindo coisa que faça sentido sozinha.
-
-O conteúdo dessas cinco também não se justifica. Os testes que as usam conferem
-encanamento: se `resolver-caminho-receita` acha a receita pelo nome e bloqueia
-caminho que sai do repositório, se `parametros-peca` troca um número sem
-estragar o resto, se `varrer-peca` entende a faixa `min..max:passos`. Nenhum
-deles olha forma, distância entre partes ou aparência. Para eles aquelas peças
-são um arquivo com números dentro, e uma entrada mínima escrita no próprio
-teste provaria o mesmo. O único que precisa de arquivo em disco é o de resolver
-caminho, e mesmo ele pode criar uma pasta temporária.
-
-A recomendação é ficar com uma fixture real, a `peca-de-prova`, que foi feita
-para ser entrada das guardas de navegador e nada mais, e trocar o resto por
-entradas geradas.
+As cinco foram apagadas e os testes que as usavam passaram a escrever a própria
+entrada mínima; sobrou a `peca-de-prova`, que é entrada das guardas de
+navegador. A bancada marca ensaio como ensaio e parou de descer dentro de pasta
+de peça. Dois desses testes mediam geometria de verdade, e não encanamento como
+eu havia afirmado, e precisaram de receita paramétrica escrita durante o teste.
+Um terceiro tinha piso de 300 passos conferidos num acervo que já rendia 329, e
+passava por folga e não por prova.
 
 ## Atrito do motor
 
-`loft` não fecha as próprias tampas. O antebraço deveria afinar liso de 100 para
-85 mm, e a malha sairia aberta, o que deixa a medida de contato incapaz de
-decidir os pares. O modelador trocou por três cilindros em degraus, e é por isso
-que o antebraço tem aqueles degraus visíveis. Uma tampa automática quando a
-seção final tem raio maior que zero resolve.
-
-`cilindro` é o único gerador cuja origem sem `tampa` seleciona só as laterais,
-então citar um cilindro inteiro custa três passos. A primeira rodada saiu com
-doze faces sem identidade por causa disso.
+`loft` não fecha as próprias tampas. O antebraço deveria afinar liso de 100
+para 85 mm, a malha sairia aberta e a medida de contato não decidiria os pares,
+então o modelador trocou por três cilindros em degraus. Uma tampa automática
+quando a seção final tem raio maior que zero resolve. `cilindro` é o único
+gerador cuja origem sem `tampa` seleciona só as laterais, então citar um
+cilindro inteiro custa três passos, e a rodada 1 saiu com doze faces sem
+identidade por causa disso.
 
 O motor tem `arredondarAresta`, `filete`, `liso`, `inflate`, `displace` e
-`lathe`, e a receita do braço usa `cilindro` nove vezes, `chamferBox` uma e
-`furo` uma. O aspecto quadrado não é o teto do motor, é o que foi alcançado, e
-nada no plano, nas skills ou nos gates aponta o modelador para as operações que
-tiram a aresta viva. O teto real de realismo é outro: o vocabulário poligonal da
-bancada está congelado, e é ele que traz subdivisão e bisel em aresta
-arbitrária.
+`lathe`, e a receita usava `cilindro` nove vezes, `chamferBox` uma e `furo`
+uma. O aspecto quadrado não era o teto do motor, era o que foi alcançado, e
+nada aponta o modelador para as operações que tiram a aresta viva. O teto real
+é outro: o vocabulário poligonal da bancada está congelado, e é ele que traz
+subdivisão e bisel em aresta arbitrária.
 
 ## Atrito do ambiente
 
@@ -128,23 +114,57 @@ O repositório também chega sem `node_modules`, e nenhum gate roda antes de um
 ## Falhas de condução, e o que elas ensinam
 
 Estas são minhas, e estão aqui porque um gate de processo resolveria cada uma.
-
-Na rodada 1 eu não despachei o crítico visual, embora as medidas tivessem
-passado. Olhei a imagem eu mesmo e trouxe a conclusão, que é exatamente o
-defeito que o papel separado existe para cobrir.
-
-Na primeira crítica eu não passei o alvo, e o crítico reclamou sozinho disso.
-
-Eu nunca rodei `node tools/mecanifica/rodada-de-modelagem.mjs --acao`, que a
-skill manda perguntar antes de qualquer coisa. As duas rodadas foram registradas
-depois, de memória.
-
-Não rodei os gates completos do INDEX em nenhum momento desta frente.
-
-Afirmei que não existia render limpo no repositório, e existe: `npm run revisar`
-captura ortográfica, com enquadramento automático e uma checagem que reprova
-quando a peça fica pequena no quadro. Eu não a encontrei porque parei na
+Na rodada 1 não despachei o crítico visual embora as medidas tivessem passado,
+e olhei a imagem eu mesmo. Na primeira crítica não passei o alvo, e o crítico
+reclamou sozinho disso. Nunca rodei `rodada-de-modelagem.mjs --acao`, que a
+skill manda perguntar antes de qualquer coisa, e as duas rodadas foram
+registradas depois, de memória. Não rodei os gates completos do INDEX antes de
+empurrar, e uma mudança de captura derrubou dois testes do MCP que só
+apareceram muito depois. E afirmei que não existia render limpo no
+repositório, quando `npm run revisar` existe e faz exatamente isso: parei na
 primeira ferramenta que respondeu.
+
+## O que a receita apagada levava consigo
+
+O braço foi apagado de propósito, para descobrir o que vivia só na conversa. A
+resposta são três coisas, e ficam escritas aqui para o recomeço não repetir.
+
+A tabela inteira. Base de 180 mm de diâmetro por 150 de altura, coluna de 160
+por 180, braço de 380 com seção 130 por 110, desvio de cotovelo de 90,
+antebraço de 370 afinando de 100 para 85, punho de 100, e flange de 90 por 12
+com oito furos numa circunferência de 65 e furo central de 35. Alcance de 850
+somando braço, antebraço e punho, altura total de 1180 com o braço esticado.
+
+A divergência medida entre a imagem e a tabela. A referência lateral põe a
+razão entre alcance horizontal e altura em 0,73 e a tabela põe em 0,61, porque
+a imagem tem leve perspectiva e o antebraço dela é proporcionalmente mais
+comprido do que o de um braço real de 850 mm. A decisão foi a tabela mandar, e
+isso precisa estar no plano da peça para ninguém corrigir a moto pela silhueta.
+
+O erro de orientação do flange. Na referência o punho dobra e o flange aponta
+para baixo, pendurado abaixo do eixo do antebraço. O plano de alinhamento o
+colocou na ponta do antebraço, no mesmo eixo, apontando para a frente. Foi
+decisão escrita sem conferir contra a imagem, e o crítico não a acusou porque a
+pose do modelo era outra.
+
+## Dois achados da própria remoção
+
+A pasta da peça ficou só com `referencias/` dentro, sem receita, e
+`guarda:acervo` passou dizendo uma peça medida. Pasta de peça órfã, com imagens
+e sem receita, é invisível para todo gate.
+
+Apagar uma peça derrubou quatro testes que travam números do acervo inteiro: o
+retrato de parâmetros em dois lugares e o piso de passos conferidos da Oficina.
+São testes que fazem o seu trabalho, e também a medida do custo de acrescentar
+ou tirar peça.
+
+## O enquadramento da bancada não enquadra
+
+Com a interface escondida, `enquadrar()` deixa o quadro da bicicleta ocupando
+13,8% da imagem, e a checagem de câmera do modo de revisão aceita isso. A mesma
+checagem tinha reprovado, com "silhueta cortada", uma imagem com 79% de
+ocupação e margem de sobra em todos os lados. Os dois lados da checagem estão
+errados, e a imagem que chega ao crítico é pequena demais para julgar forma.
 
 ## O que fazer, em ordem sugerida
 

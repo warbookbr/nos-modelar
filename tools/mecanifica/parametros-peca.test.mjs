@@ -225,16 +225,17 @@ describe('acervo real', () => {
        publicado que o commit `33fde6a6` moveu para `tools/fixtures/acervo/`
        em vez de apagar; de lá a bancada publicada passou a listá-las como
        acervo real. A remoção delas devolve este retrato ao que sobrou de
-       receita executável no repositório — `bicicleta-quadro`, `braco-robotico`
-       e a fixture das guardas `peca-de-prova` —, medido de novo depois da
-       remoção, e não copiado do número que a suíte tinha antes dela. */
+       receita executável no repositório — `bicicleta-quadro` e a fixture das
+       guardas `peca-de-prova` —, medido de novo a cada mudança do acervo, e não
+       copiado do número que a suíte tinha antes dela. O braço robótico entrou e
+       saiu daqui no mesmo dia: este retrato é o preço de travar o estado do
+       acervo, e ele se paga quando uma peça some sem ninguém perceber. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 63, vivos: 46, inertes: 17 });
+    expect(r.resultado.totais).toEqual({ declarados: 36, vivos: 26, inertes: 10 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
     expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 29, vivos: 19, inertes: 10 });
-    expect(porAlvo['braco-robotico']).toEqual({ declarados: 27, vivos: 20, inertes: 7 });
     /* A PEÇA DE PROVA É O ALVO NOMEADO, e não conteúdo do acervo: os sete
        números dela existem para atender requisito de guarda, e cada um move
        geometria, então os sete são vivos e nenhum é inerte. */

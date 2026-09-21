@@ -68,6 +68,10 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
       selecionadas: parte,
       modo: 'isolar',
       focar: true,
+      /* Modo de auditoria também aqui: estas imagens vão para o crítico junto
+         com as do conjunto, e o modo de revisão, que já o liga sozinho, não
+         aceita vista escolhida à mão. */
+      auditoria: true,
       projecao: 'ortografica',
       vistas: VISTAS_DA_PARTE,
       res: RES_PARTE,

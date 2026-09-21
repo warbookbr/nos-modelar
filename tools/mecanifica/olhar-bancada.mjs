@@ -44,28 +44,19 @@ const TETO_DE_PARES_POR_CHAMADA = 3;
    Fotografar o canvas entrega só a cena, sem interface nenhuma, e sem precisar
    de modo especial na bancada. Se o canvas não existir, a página inteira volta
    a valer, porque imagem pior é melhor que nenhuma. */
-const SELETOR_DA_CENA = '#cenaBancada';
-const ESTILO_SEM_INTERFACE = 'mecanifica-sem-interface';
+/* A FOTO É A CENA, E NÃO A TELA. A captura era da página inteira, com a lista
+   de componentes, o painel de inspeção, a barra de vistas e o rodapé ocupando
+   a maior parte da imagem. Quem recebe essas imagens é o crítico visual e quem
+   conduz a rodada, e para eles isso é ruído: uma crítica desta casa foi feita
+   com o objeto ocupando um quarto do quadro, cercado de botões, e o crítico
+   deu como ausente um flange que existia na malha.
 
-/* Fotografar o elemento do canvas não bastava: os painéis são desenhados POR
-   CIMA dele, e a captura de elemento recorta a página na caixa do elemento,
-   com o que estiver em cima junto. A interface precisa sumir antes do
-   obturador. Some só durante a captura e volta logo depois, para o resto da
-   rodada continuar podendo clicar em botão. */
-async function fotografarCena(page, opcoes = {}) {
-  await page.addStyleTag({
-    content: `#bancadaApp > *:not(#cenaBancada) { visibility: hidden !important; }`,
-  }).then((etiqueta) => etiqueta.evaluate((no) => { no.dataset.papel = 'sem-interface'; }))
-    .catch(() => {});
-  try {
-    const cena = await page.$(SELETOR_DA_CENA);
-    return await (cena ? cena.screenshot(opcoes) : page.screenshot(opcoes));
-  } finally {
-    await page.evaluate(() => {
-      for (const no of document.querySelectorAll('style[data-papel="sem-interface"]')) no.remove();
-    }).catch(() => {});
-  }
-}
+   QUEM ESCONDE A INTERFACE É A PRÓPRIA BANCADA, pelo modo de auditoria, que já
+   existia e faz mais do que esconder: tira o piso, a grade e a sombra, e
+   estica o canvas para o quadro inteiro. Eu cheguei a escrever uma segunda
+   forma de esconder, por estilo injetado daqui, antes de encontrar esta —
+   duas maneiras de fazer a mesma coisa divergem no dia em que alguém mexe numa
+   delas. Sobrou uma, e é a de lá. */
 
 export function criarDicas() {
   const porChave = new Map();
@@ -288,6 +279,13 @@ export async function olharBancada({
       : Math.round(largura * 9 / 16);
     const espera = parseInt(esperaDeclarada, 10) || 1200;
     const estritoEfetivo = Boolean(estrito || revisar);
+    /* Revisão sempre em modo de auditoria: a imagem da revisão é feita para
+       ser lida e não para ser usada, e é ela que vai ao crítico. */
+    /* Revisão sempre em modo de auditoria: a imagem da revisão é feita para ser
+       lida e não para ser usada, e é ela que vai ao crítico. A página falsa dos
+       testes não implementa a ponte de auditoria, e por isso a ligação só vale
+       quando a ponte existe — imagem com cromo é pior, não é rodada quebrada. */
+    const auditoriaEfetiva = Boolean(auditoria || revisar);
     if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
     for (const vista of vistas) {
       if (vista !== 'inspecao-par' && !VISTAS_VALIDAS.includes(vista)) {
@@ -548,7 +546,7 @@ export async function olharBancada({
       /* AUDITORIA depois de escolher a vista e antes de esperar o quadro: o modo
          mexe no tamanho do canvas (o cromo sai e o desenho ocupa tudo), e mudar
          isso depois da espera capturaria o quadro do layout velho. */
-      if (auditoria) {
+      if (auditoriaEfetiva) {
         legendaDeAuditoria = await page.evaluate(
           ([cores, ar]) => window.__mecanificaBancada.auditoria({ cores, arame: ar }),
           [coresPorParte, arame],
@@ -616,7 +614,7 @@ export async function olharBancada({
       });
       pecaRelatada = dado.peca;
       if (capturarEmMemoria) {
-        const dados = await fotografarCena(page, { type: 'png' });
+        const dados = await page.screenshot({ type: 'png' });
         garantirPrazo();
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
@@ -624,7 +622,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await fotografarCena(page, { path: arquivo });
+        await page.screenshot({ path: arquivo });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
         if (legendaDeAuditoria?.cores) {
           const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
@@ -696,7 +694,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? pecaRelatada);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-par-${alvo.map(apelidoDeArquivo).join('+')}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await fotografarCena(page, { path: arquivo });
+        await page.screenshot({ path: arquivo });
         paresCapturados.push({ par: alvo, vista: inspecao.vistaEscolhida, arquivo, enquadrado: Boolean(contato?.valida) });
         registrar(relato, logger, 'stdout',
           `  ${alvo.join(' ↔ ')} (${inspecao.vistaEscolhida})${contato?.valida ? '' : ' — sem foco de contato'}: ${arquivo}`);

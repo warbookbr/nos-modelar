@@ -152,7 +152,7 @@ describe('porta MCP da varredura', () => {
        que tinham voltado como fixture de ferramenta em vez de serem apagadas —
        saíram do repositório. Os dois números têm de andar juntos, porque a
        porta MCP e a CLI leem a mesma varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 63, vivos: 46, inertes: 17 });
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 36, vivos: 26, inertes: 10 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

@@ -148,7 +148,7 @@ describe('argumento desconhecido em passo', () => {
        ferramenta em `tools/fixtures/acervo/` em vez de serem apagadas —
        saíram também dali. O piso continua alto o bastante para que uma
        varredura vazia ou truncada seja acusada. */
-    expect(passosConferidos).toBeGreaterThan(50);
+    expect(passosConferidos).toBeGreaterThan(30);
     expect(fora).toEqual([]);
   }, 60_000);
 });

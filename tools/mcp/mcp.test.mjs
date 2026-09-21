@@ -1180,6 +1180,12 @@ describe('servidor MCP local — perfil revisao', () => {
         };
         if (fonte.includes('.url()')) return 'http://127.0.0.1:4173/nos-mecanifica/bancada.html';
         if (fonte.includes('.enquadramento()')) return { valida: true, area: 0.5, largura: 0.7, altura: 0.7, cortado: false };
+        /* O MODO DE REVISÃO LIGA A AUDITORIA, porque é a imagem da revisão que
+           vai ao crítico e ela não leva a interface junto. A página falsa
+           precisa conhecer as duas chamadas que isso acrescenta, senão o teste
+           reprova a mudança por não a ter previsto, e não por ela estar errada. */
+        if (fonte.includes('.auditoria(')) return { auditoria: true, cores: false, arame: false, legenda: [] };
+        if (fonte.includes('.enquadrar()')) return undefined;
         throw new Error(`evaluate inesperado: ${fonte}`);
       },
       async screenshot(opcoes) {
@@ -1226,6 +1232,10 @@ describe('servidor MCP local — perfil revisao', () => {
           selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
           estatisticas: { facesNeutras: 12, triangulos: 12 }, estado: {},
         };
+        /* O modo de revisão liga a auditoria antes da espera que estoura o
+           tempo, então a página falsa precisa conhecer as duas chamadas. */
+        if (fonte.includes('.auditoria(')) return { auditoria: true, cores: false, arame: false, legenda: [] };
+        if (fonte.includes('.enquadrar()')) return undefined;
         throw new Error(`evaluate inesperado antes do timeout: ${fonte}`);
       },
     };
