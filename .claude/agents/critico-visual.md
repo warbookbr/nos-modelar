@@ -85,7 +85,14 @@ lado:
 - **espessura** — a seção está errada, o caminho não: `maior`, `menor`;
 - **ausencia** — a parte não existe: `faltando`;
 - **uniao** — duas partes que deveriam se encontrar não se encontram:
-  `afastado`, `atravessando`.
+  `afastado`, `atravessando`;
+- **superficie** — a forma da superfície está errada, e não a medida dela:
+  `anguloso` para aresta viva onde a referência mostra raio, `segmentado` para
+  corpo em degraus onde devia ser contínuo, `facetado` para revolução com lados
+  de menos, que lê como prisma. Este tipo existe porque faltava: um braço saiu
+  com carcaça de caixa onde a referência mostra volume arredondado, e o único
+  jeito de dizer isso era `espessura` ou `ausencia`, que mandam engrossar seção
+  e acrescentar parte quando o conserto é trocar a técnica.
 
 **`angulo` e `posicao` não trocam de sentido de propósito.** Um trecho inclinado
 errado não é um trecho deslocado, e dizer "está para trás" quando o defeito é de

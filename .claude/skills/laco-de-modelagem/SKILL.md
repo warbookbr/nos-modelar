@@ -95,7 +95,8 @@ devolveu, sem edição sua:
 cat > /tmp/rodada.json <<'JSON'
 {
   "medidas": { "passou": true, "relatorio": "guarda:acervo ok" },
-  "veredito": { "alvo": "...", "nota": 6, "defeitos": [], "observacao": "..." }
+  "veredito": { "alvo": "...", "nota": 6, "defeitos": [], "observacao": "..." },
+  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"]
 }
 JSON
 node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
@@ -119,7 +120,8 @@ outra árvore. Peça que ainda é arquivo solto não tem pasta, e aí a rodada c
 Cada rodada é também uma amostra de onde o trabalho dói. Pergunte ao modelador,
 no despacho, o que faltou: operação que o motor não tem, coisa que só saiu
 porque ele fez à mão, medida que não existia, documentação que estava errada.
-Guarde isso junto da rodada.
+O registro da rodada tem campo `atrito` para isso, uma lista de frases curtas,
+vazia quando a rodada não doeu em nada.
 
 Sem isso, o atrito vive na conversa e morre com ela. Uma peça inteira desta
 casa foi modelada como sonda, para levantar exatamente essa lista, e ela só

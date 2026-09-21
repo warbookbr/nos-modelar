@@ -36,7 +36,7 @@ function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}
  * vem antes do veredito de propósito: peça que nem cumpre o plano não merece
  * olho humano nem de agente.
  */
-export function registrarRodada({ peca, numero, veredito, medidas }) {
+export function registrarRodada({ peca, numero, veredito, medidas, atrito = [] }) {
   if (typeof peca !== 'string' || peca.trim() === '') falhar('a rodada precisa dizer de que peça é.');
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
@@ -51,7 +51,28 @@ export function registrarRodada({ peca, numero, veredito, medidas }) {
     /* Sem veredito quando as medidas reprovaram: não se gasta revisão em peça
        que já falhou no que é contável. */
     veredito: veredito ? normalizarVeredito(veredito) : null,
+    /* O ATRITO DA RODADA: operação que faltou no motor, coisa que só saiu
+       porque alguém fez à mão, medida que não existia, documento errado. A
+       skill do laço mandava registrar isso e não havia campo onde cair, então
+       a lista vivia na conversa e morria com ela. Lista de frases curtas, e
+       vazia quando a rodada não doeu em nada. */
+    atrito: normalizarAtrito(atrito),
   };
+}
+
+const LIMITE_ATRITO = 16;
+const LIMITE_FRASE_DE_ATRITO = 240;
+
+function normalizarAtrito(valor) {
+  if (valor === undefined || valor === null) return [];
+  if (!Array.isArray(valor)) falhar("'atrito' precisa ser lista de frases.");
+  if (valor.length > LIMITE_ATRITO) falhar(`'atrito' não passa de ${LIMITE_ATRITO} itens.`);
+  return valor.map((item, i) => {
+    if (typeof item !== 'string' || item.trim() === '') falhar(`'atrito[${i}]' precisa ser texto não vazio.`);
+    const limpo = item.trim();
+    if (limpo.length > LIMITE_FRASE_DE_ATRITO) falhar(`'atrito[${i}]' excede ${LIMITE_FRASE_DE_ATRITO} caracteres.`);
+    return limpo;
+  });
 }
 
 /**

@@ -63,10 +63,10 @@ export function lerRodadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {
     .map((nome) => JSON.parse(readFileSync(join(pasta, nome), 'utf8')));
 }
 
-export function gravarRodada(peca, { veredito = null, medidas }, { pasta = pastaDeRodadas(peca) } = {}) {
+export function gravarRodada(peca, { veredito = null, medidas, atrito = [] }, { pasta = pastaDeRodadas(peca) } = {}) {
   exigirNome(peca);
   const anteriores = lerRodadas(peca, { pasta });
-  const rodada = registrarRodada({ peca, numero: anteriores.length + 1, veredito, medidas });
+  const rodada = registrarRodada({ peca, numero: anteriores.length + 1, veredito, medidas, atrito });
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
   /* Rodada gravada não é reescrita. O registro é evidência do que aconteceu, e

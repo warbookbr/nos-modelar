@@ -33,6 +33,13 @@ contrato de autoria que ela aponta. Além dele, três regras deste papel:
 
 - **Toda parte do plano vira uma parte da peça, com o mesmo nome.** Parte
   prometida e não entregue reprova, e parte entregue sem promessa também.
+- **O referencial é o do acervo, e não o que parecer natural.** Y aponta para
+  cima, o chão é `y` igual a zero e nenhum vértice fica abaixo dele; a tabela é
+  em milímetro e a malha em metro, com a conversão num lugar só. Uma peça desta
+  casa foi construída com z para cima, ficou deitada no chão, e passou em todos
+  os pontos declarados e em todos os contatos, porque cada régua compara a peça
+  contra a declaração da própria peça. Quem pega isso hoje é
+  `guarda:referencial`, depois da geometria escrita.
 - **Nenhuma posição é digitada à mão.** A tabela carrega a medida e a derivação
   calcula a posição. Número solto no passo deixa de corresponder à tabela assim
   que ela muda, e o acervo já tem um caso desses medido.
@@ -85,6 +92,12 @@ Cada defeito diz a parte, o tipo e o sentido do erro. Corrija pelo tipo:
 - **ausencia** acrescenta a parte que falta, com o nome que o plano deu.
 - **uniao** aproxima duas partes até se tocarem de verdade, e não até parecerem
   tocar na imagem.
+- **superficie** troca a TÉCNICA que gera a forma, e não a medida dela.
+  `anguloso` pede aresta quebrada, com `arredondarAresta` ou `filete`;
+  `segmentado` pede corpo contínuo no lugar de degraus encaixados, com `loft` ou
+  `lathe`; `facetado` pede mais lados na revolução, e `liso` para a sombra não
+  denunciar a faceta. Engrossar seção ou acrescentar parte não conserta nenhum
+  dos três.
 
 Corrija mexendo no parâmetro da tabela que governa aquela medida, não na
 geometria resolvida. Se nenhum parâmetro governar o que o veredito pede, diga

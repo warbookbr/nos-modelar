@@ -27,6 +27,15 @@ export const TIPOS_DE_DEFEITO = Object.freeze({
   espessura: ['maior', 'menor'],
   ausencia: ['faltando'],
   uniao: ['afastado', 'atravessando'],
+  /* SUPERFÍCIE entrou pelo caminho que o cabeçalho prescreve: um defeito real
+     não cabia em tipo nenhum e o revisor o reportou torto. Um braço robótico
+     saiu com carcaça de caixa onde a referência mostra volume arredondado, e o
+     revisor só tinha `espessura` e `ausencia` para dizer isso — dois tipos que
+     mandam engrossar seção e acrescentar parte, quando o conserto é trocar a
+     técnica que gera a superfície. `anguloso` é aresta viva onde devia haver
+     raio; `segmentado` é corpo em degraus onde devia ser contínuo; `facetado` é
+     revolução com lados de menos, que lê como prisma. */
+  superficie: ['anguloso', 'segmentado', 'facetado'],
 });
 
 export const CAMPOS_DEFEITO = Object.freeze(['parte', 'tipo', 'onde', 'sentido', 'evidencia']);
