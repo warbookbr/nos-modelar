@@ -36,6 +36,37 @@ const TETO_DE_PARES_POR_CHAMADA = 3;
    tela e parou de ser lida. Aqui cada dica tem chave, junta as vistas em que
    apareceu e sai uma vez só. Sem achado, `listar()` devolve lista vazia e nada
    é impresso: dica que sempre aparece não é dica, é cabeçalho. */
+/* A FOTO É A CENA, E NÃO A TELA. Até aqui a captura era da página inteira, com
+   a lista de componentes, o painel de inspeção, a barra de vistas e o rodapé
+   ocupando a maior parte da imagem. Quem recebe essas imagens é o crítico
+   visual e a IA que conduz a rodada, e para eles tudo isso é ruído: chegaram a
+   julgar forma com o objeto ocupando um quarto do quadro, cercado de botões.
+   Fotografar o canvas entrega só a cena, sem interface nenhuma, e sem precisar
+   de modo especial na bancada. Se o canvas não existir, a página inteira volta
+   a valer, porque imagem pior é melhor que nenhuma. */
+const SELETOR_DA_CENA = '#cenaBancada';
+const ESTILO_SEM_INTERFACE = 'mecanifica-sem-interface';
+
+/* Fotografar o elemento do canvas não bastava: os painéis são desenhados POR
+   CIMA dele, e a captura de elemento recorta a página na caixa do elemento,
+   com o que estiver em cima junto. A interface precisa sumir antes do
+   obturador. Some só durante a captura e volta logo depois, para o resto da
+   rodada continuar podendo clicar em botão. */
+async function fotografarCena(page, opcoes = {}) {
+  await page.addStyleTag({
+    content: `#bancadaApp > *:not(#cenaBancada) { visibility: hidden !important; }`,
+  }).then((etiqueta) => etiqueta.evaluate((no) => { no.dataset.papel = 'sem-interface'; }))
+    .catch(() => {});
+  try {
+    const cena = await page.$(SELETOR_DA_CENA);
+    return await (cena ? cena.screenshot(opcoes) : page.screenshot(opcoes));
+  } finally {
+    await page.evaluate(() => {
+      for (const no of document.querySelectorAll('style[data-papel="sem-interface"]')) no.remove();
+    }).catch(() => {});
+  }
+}
+
 export function criarDicas() {
   const porChave = new Map();
   return {
@@ -585,7 +616,7 @@ export async function olharBancada({
       });
       pecaRelatada = dado.peca;
       if (capturarEmMemoria) {
-        const dados = await page.screenshot({ type: 'png' });
+        const dados = await fotografarCena(page, { type: 'png' });
         garantirPrazo();
         capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
@@ -593,7 +624,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-${vista}${sufixo}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await page.screenshot({ path: arquivo });
+        await fotografarCena(page, { path: arquivo });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} ${arquivo}`);
         if (legendaDeAuditoria?.cores) {
           const legenda = legendaDeAuditoria.legenda.map((e) => `${e.parte}=${e.cor}`).join(' ');
@@ -665,7 +696,7 @@ export async function olharBancada({
         const apelidoEfetivo = apelidoDeArquivo(peca ?? pecaRelatada);
         const arquivo = join(saida, `bancada-${apelidoEfetivo}-par-${alvo.map(apelidoDeArquivo).join('+')}.png`);
         verificarCaminhoConfinado(arquivo, { raiz: REPO });
-        await page.screenshot({ path: arquivo });
+        await fotografarCena(page, { path: arquivo });
         paresCapturados.push({ par: alvo, vista: inspecao.vistaEscolhida, arquivo, enquadrado: Boolean(contato?.valida) });
         registrar(relato, logger, 'stdout',
           `  ${alvo.join(' ↔ ')} (${inspecao.vistaEscolhida})${contato?.valida ? '' : ' — sem foco de contato'}: ${arquivo}`);
