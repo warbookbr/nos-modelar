@@ -1568,6 +1568,16 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       const tipo = document.createElement('kbd');
       tipo.textContent = entrada.montagem ? 'montagem' : 'peça';
       linha.append(nome, tipo);
+      /* ENSAIO APARECE COMO ENSAIO. As receitas de `tools/fixtures/acervo/`
+         entram nesta lista para as guardas de navegador terem o que abrir, e
+         vinham sem marca nenhuma, sob um cabeçalho que chama tudo de acervo:
+         não havia como distinguir material de teste de peça de verdade. */
+      if (entrada.ensaio) {
+        const marca = document.createElement('kbd');
+        marca.className = 'marca-ensaio';
+        marca.textContent = 'ensaio';
+        linha.append(marca);
+      }
       linha.addEventListener('click', () => {
         fecharJanelas();
         abrirDoAcervo(entrada);

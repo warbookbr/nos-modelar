@@ -1885,3 +1885,11 @@ body.auditoria .recolher { display: none; }
   padding: 0;
   line-height: 1;
 }
+
+/* A marca de ensaio distingue material de teste de peça de acervo na lista de
+   abrir. Sem ela, as receitas de `tools/fixtures/acervo/` apareciam como peça
+   de verdade sob um cabeçalho que chamava tudo de acervo. */
+.linha .marca-ensaio {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  opacity: 0.75;
+}
