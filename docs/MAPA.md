@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-873 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+877 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -467,6 +467,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-17-nada-depende-da-bicicleta.md` — Nada depende da bicicleta
+- `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -710,6 +711,10 @@
 ## prototipos/procedural/v3/pecas/bicicleta-quadro/
 
 - `receita.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
+
+## prototipos/procedural/v3/pecas/braco-robotico/
+
+- `receita.js` — braco-robotico.js — braço industrial fictício de 6 eixos, alcance 850 mm, classe de 5 kg de carga. Peça inteira, e não módulo de um conjunto maior.
 
 ## prototipos/procedural/v3/servicos/
 
@@ -1019,6 +1024,7 @@
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
+- `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.
@@ -1062,6 +1068,7 @@
 - `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.
 - `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
 - `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
+- `guarda-referencial.mjs` — guarda-referencial.mjs — confere que toda peça do acervo usa o MESMO referencial e está apoiada acima do chão.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.

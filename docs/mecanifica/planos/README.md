@@ -13,6 +13,17 @@ guardas e testes para ela, traz a moto como segunda peça de acervo e apaga a
 bicicleta. A remoção é o gate: enquanto ela estiver lá, ninguém sabe quem
 dependia dela.
 
+O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
+**rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como
+peça, e duas rodadas bastaram para levantar a lista: o corpus de teste virou um
+segundo acervo visível na bancada, o visor morreu na migração para pasta sem
+nada exercitá-lo, o `loft` não fecha tampa própria, o registro de rodada exige
+nota que o crítico sem alvo não tem, e a skill de alinhamento nunca pergunta
+qual eixo aponta para cima. Esse último produziu o achado que governa os
+outros: o braço passou em todas as medidas deitado no chão, porque toda régua
+compara a peça contra a declaração da própria peça. `guarda:referencial` saiu
+daí e já está na main.
+
 O [vocabulário poligonal da bancada](congelados/2026-09-17-vocabulario-poligonal-da-bancada.md)
 — subdivisão, bisel, loop cut e proportional editing — nasceu **congelado** em
 2026-09-17. A frente que precisa melhorar agora é a da IA, e acrescentar
