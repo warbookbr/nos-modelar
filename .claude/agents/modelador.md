@@ -43,8 +43,33 @@ Prove com os comandos do repositório antes de devolver:
 
 ```bash
 npm run descrever -- <peça>
+node tools/mecanifica/conferir-pontos.mjs <peça>
 npm run guarda:acervo
+npm run guarda:referencial
 ```
+
+## Confira parte por parte antes de devolver
+
+Medida nenhuma confere se a parte tem a forma que o plano prometeu. Um punho
+prometido com rasgo passante de lado a lado saiu maciço nesta casa e passou em
+tudo: os pontos declarados ficaram a 2 mm do alvo, os cinco contatos se
+tocavam, e `guarda:acervo` deu ok.
+
+Gere as vistas isoladas e olhe uma por uma:
+
+```bash
+npm run vistas:critica -- <peça>
+```
+
+Devolva, junto com as medidas, uma linha por parte dizendo se a forma e a
+técnica entregues são as que o `PLANO` promete, e onde não são. Isso é conferir
+entrega contra promessa escrita, e não julgar o resultado: você responde sim ou
+não contra um texto, não dá nota e não diz se ficou bom.
+
+Essa é a fronteira, e ela é estreita de propósito. Você olha a referência de
+forma e olha as suas partes contra o texto do plano. Você não julga se o
+conjunto ficou parecido, se a proporção convence ou se a peça lê como o objeto
+que deveria ser: isso é do crítico, que não viu como você construiu.
 
 ## Como responder a um veredito
 

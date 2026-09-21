@@ -33,6 +33,23 @@ vistas renderizadas e os critérios de reprovação do plano. Nunca mande a
 receita, os passos, o histórico, nem o que mudou desde a rodada anterior. Ele
 julga o que vê; contar como foi feito é o que faz revisão virar concordância.
 
+As vistas saem de um comando só, e é este:
+
+```bash
+npm run vistas:critica -- <peça>
+```
+
+Ele devolve as quatro vistas ortográficas do conjunto e duas vistas isoladas de
+cada parte declarada no plano. Mande o pacote inteiro, dizendo o nome da parte
+e a forma e a técnica que o plano promete para ela. Não monte o pacote com
+`npm run bancada`: aquela captura serve à inspeção dirigida e já entregou ao
+crítico uma tela com o objeto ocupando um quarto do quadro, e ele deu como
+ausente um flange que existia na malha.
+
+**Sem alvo não há rodada.** O crítico que não recebe a imagem de referência
+responde com nota nula, corretamente, e o registro recusa nota ausente. Busque
+o alvo e despache de novo; não invente número para caber no campo.
+
 **parar-fechou** — a peça passou nas medidas e o revisor não apontou defeito com
 nota suficiente. Encerre e mostre o registro.
 
@@ -46,8 +63,16 @@ Depois de cada entrega do modelador, rode as medidas antes de chamar o revisor:
 
 ```bash
 npm run descrever -- <peça>
+node tools/mecanifica/conferir-pontos.mjs <peça>
 npm run guarda:acervo
+npm run guarda:referencial
 ```
+
+`conferir-pontos` devolve o desvio em milímetro de cada ponto que a receita
+declara, e é a medida mais direta de posição. `guarda:referencial` confere que
+a peça usa o mesmo referencial do acervo e não afunda no chão: uma peça
+construída com o eixo vertical trocado passa em todas as outras medidas, porque
+cada régua compara a peça contra a declaração dela mesma.
 
 Peça que não cumpre o plano nem os contatos volta direto ao modelador. Gastar
 revisão em peça que já falhou no que é contável é desperdiçar rodada e ensinar
@@ -68,6 +93,10 @@ JSON
 node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
 ```
 
+O formato cobra duas coisas que já custaram tentativa aqui: `nota` precisa ser
+número de 0 a 10, e `observacao` não passa de 240 caracteres. Escreva a
+observação curta desde o começo, em vez de cortar depois.
+
 Quando as medidas reprovarem, grave com `"veredito": null` e o relatório da
 falha. Rodada gravada não se reescreve: o registro é evidência do que aconteceu,
 e evidência que muda depois não responde por que a peça ficou assim.
@@ -76,6 +105,17 @@ O arquivo cai em `rodadas/` DENTRO da pasta da peça, ao lado da receita que ele
 julgou. Quem abre a peça encontra o registro sem saber de cor um caminho em
 outra árvore. Peça que ainda é arquivo solto não tem pasta, e aí a rodada cai em
 `docs/mecanifica/historico/rodadas/`.
+
+## Registre o atrito, e não só o resultado
+
+Cada rodada é também uma amostra de onde o trabalho dói. Pergunte ao modelador,
+no despacho, o que faltou: operação que o motor não tem, coisa que só saiu
+porque ele fez à mão, medida que não existia, documentação que estava errada.
+Guarde isso junto da rodada.
+
+Sem isso, o atrito vive na conversa e morre com ela. Uma peça inteira desta
+casa foi modelada como sonda, para levantar exatamente essa lista, e ela só
+sobreviveu porque foi escrita antes de a sessão acabar.
 
 ## O que você nunca faz
 
