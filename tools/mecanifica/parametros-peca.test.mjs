@@ -1,7 +1,19 @@
 /* Prova de R00: liberdade declarada não é liberdade real, e a diferença é
    conferível. O número do acervo fica travado aqui de propósito — se alguém
-   ligar uma receita aos seus parâmetros, ou desligar, o teste avisa. */
-import { describe, expect, it } from 'vitest';
+   ligar uma receita aos seus parâmetros, ou desligar, o teste avisa.
+
+   O alvo nomeado do describe "acervo real" já não é `cadeira-de-madeira`: essa
+   peça (e chapa-de-fixacao, e as três prensas) era acervo publicado que o
+   commit `33fde6a6` moveu para `tools/fixtures/acervo/` em vez de apagar, e de
+   lá passou a aparecer na bancada como se fosse acervo. Este teste mede
+   ENCANAMENTO — se `diagnosticarParametros` acha vivo o que deriva PASSOS e
+   inerte o que fica ao lado — e não a forma de nenhuma peça, então o alvo
+   nomeado é a menor receita paramétrica escrita aqui mesmo, e o retrato do
+   acervo inteiro é medido de novo depois da remoção, não copiado do que a
+   suíte dizia antes dela. */
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { afterAll, describe, expect, it } from 'vitest';
 import {
   caminhosNumericos,
   comCaminho,
@@ -11,6 +23,7 @@ import {
   receitaComParametros,
 } from '../../src/autoria/parametros-vivos.js';
 import { parametrosReutilizavel } from './parametros-peca.mjs';
+import { REPO } from './resolver-caminho-receita.mjs';
 
 /* Receita mínima paramétrica: os passos DERIVAM dos parâmetros. */
 function receitaViva() {
@@ -161,69 +174,70 @@ describe('diagnóstico de parâmetro vivo', () => {
   });
 });
 
+/* Entrada mínima, visível na mesma tela das asserções que a usam: dois
+   parâmetros vivos (`corpo.larg`, `corpo.alt`, usados em PASSOS) e três
+   inertes (`decorativo`, e as duas casas de `coord`, declarados mas nunca
+   lidos). Precisa existir como arquivo de verdade porque `parametrosReutilizavel`
+   resolve o alvo por caminho, então fica sob `tmp/`, escrita e apagada só por
+   esta suíte. */
+function fonteReceitaMinima() {
+  return `
+export const receita = {
+  meta: { nome: 'Fixture Parâmetros Mínima', versao: '1.0.0' },
+  PARAMS: { corpo: { larg: 0.2, alt: 0.1 }, decorativo: 0.05, coord: [1, 2] },
+  MATERIAIS: { aco: { cor: '#888888' } },
+  get PASSOS() {
+    const { larg, alt } = this.PARAMS.corpo;
+    return [
+      ['cubo', { origemId: 1, larg, alt, prof: 0.1, em: [0, 0, 0] }],
+      ['parte', { nome: 'corpo', sel: { tudo: true } }],
+      ['material', { usa: 'aco', sel: { grupo: 'corpo' } }],
+    ];
+  },
+};
+export default receita;
+`;
+}
+
+mkdirSync(resolve(REPO, 'tmp'), { recursive: true });
+const AREA_MINIMA = mkdtempSync(resolve(REPO, 'tmp', 'teste-parametros-peca-'));
+const CAMINHO_MINIMA = resolve(AREA_MINIMA, 'minima.js');
+writeFileSync(CAMINHO_MINIMA, fonteReceitaMinima(), 'utf8');
+const MINIMA = CAMINHO_MINIMA.slice(REPO.length + 1).replace(/\\/g, '/');
+
 describe('acervo real', () => {
-  it('mede a cadeira: 21 declarados, 13 vivos, e a saída cabe numa tela', async () => {
-    const r = await parametrosReutilizavel({ alvo: 'cadeira-de-madeira' });
+  afterAll(() => {
+    rmSync(AREA_MINIMA, { recursive: true, force: true });
+  });
+
+  it('mede a fixture mínima: 5 declarados, 2 vivos, e a saída cabe numa tela', async () => {
+    const r = await parametrosReutilizavel({ alvo: MINIMA });
     expect(r.ok).toBe(true);
-    expect(r.resultado.registro.totais).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
+    expect(r.resultado.registro.totais).toEqual({ declarados: 5, vivos: 2, inertes: 3 });
     expect(r.resultado.registro.determinismo.estavel).toBe(true);
-    expect(r.resultado.registro.parametros.find((p) => p.caminho === 'perna.secaoTopo').estado)
+    expect(r.resultado.registro.parametros.find((p) => p.caminho === 'corpo.larg').estado)
       .toBe('vivo');
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo: 103 declarados e 39 vivos', async () => {
-    /* Este número é a razão de existir do plano. Se ele mudar sem alguém ter
-       ligado uma receita aos seus parâmetros de propósito, algo regrediu.
-       Caiu de 267/114 para 90/26 quando o acervo publicado passou a ser só o
-       quadro da bicicleta: cadeira, chapa e as três prensas saíram de
-       `prototipos/procedural/v3/` e viraram fixture de ferramenta em
-       `tools/fixtures/acervo/`, e as armas, a barricada, as duas outras
-       bicicletas e o resto foram apagados. A varredura continua alcançando as
-       fixtures porque ela lê `PASTAS_BUSCA`, então o retrato mede tudo que
-       ainda é receita executável no repositório. A queda não é regressão de
-       autoria: nenhuma receita perdeu parâmetro vivo, o conjunto é que
-       encolheu.
-
-       Subiu de 90/26 para 96/32 quando a leitura passou a descer em coordenada:
-       lista de NÚMEROS é ponto medido e cada casa é liberdade, lista de LISTAS
-       é curva e continua fora. Os seis números novos são os três pontos de
-       solda da bicicleta, e os seis são VIVOS — nenhum ruído entrou.
-
-       Subiu para 103/39 com o sétimo número da peça de prova: o tubo deitado
-       ganhou comprimento próprio porque um parâmetro que move duas coisas não
-       serve para provar que um gesto de junta equivale a um número.
-
-       Subiu de 96/32 para 102/38 quando a peça de prova das guardas entrou em
-       `tools/fixtures/acervo/`. Os seis números novos são a TABELA dela, e os
-       seis são vivos: cada um move geometria, que é justamente o requisito de
-       guarda que ele existe para atender. Ela é fixture e não conteúdo, então
-       não entra em `guarda:acervo`; entra aqui porque este retrato mede tudo
-       que é receita executável no repositório, e sempre mediu as fixtures. */
+  it('trava o retrato do acervo depois da remoção das cinco receitas de ensaio', async () => {
+    /* `cadeira-de-madeira`, `chapa-de-fixacao` e as três prensas eram acervo
+       publicado que o commit `33fde6a6` moveu para `tools/fixtures/acervo/`
+       em vez de apagar; de lá a bancada publicada passou a listá-las como
+       acervo real. A remoção delas devolve este retrato ao que sobrou de
+       receita executável no repositório — `bicicleta-quadro`, `braco-robotico`
+       e a fixture das guardas `peca-de-prova` —, medido de novo depois da
+       remoção, e não copiado do número que a suíte tinha antes dela. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 103, vivos: 39, inertes: 64 });
+    expect(r.resultado.totais).toEqual({ declarados: 63, vivos: 46, inertes: 17 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
-    expect(porAlvo['cadeira-de-madeira']).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
-    expect(porAlvo['prensa-mecanica-industrial']).toEqual({ declarados: 14, vivos: 0, inertes: 14 });
-    expect(porAlvo['prensa-progressiva']).toEqual({ declarados: 15, vivos: 0, inertes: 15 });
-    /* O quadro é a única receita do acervo publicado, e dezenove dos seus vinte
-       e nove declarados movem geometria.
-
-       A explicação anterior aqui estava ERRADA, e a leitura por coordenada a
-       desmentiu: dizia que os pontos de solda eram inertes porque coordenada
-       lida da referência não seria parâmetro. Eles nunca foram inertes — eles
-       eram INVISÍVEIS, porque a busca não descia em lista. Assim que passou a
-       descer, os seis números dos três pontos apareceram e os seis são vivos.
-
-       Os dez inertes de verdade são outra coisa: `garfoEixoACoroa`,
-       `garfoAvanco`, `meiaLarguraGuidao` e companhia estão declarados neste
-       módulo para os módulos do garfo e do guidão, que ainda não existem. */
+    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 29, vivos: 19, inertes: 10 });
+    expect(porAlvo['braco-robotico']).toEqual({ declarados: 27, vivos: 20, inertes: 7 });
     /* A PEÇA DE PROVA É O ALVO NOMEADO, e não conteúdo do acervo: os sete
        números dela existem para atender requisito de guarda, e cada um move
-       geometria, então os sete são vivos e nenhum é inerte. Peça de acervo entra
-       na conta total acima, sem precisar ser nomeada aqui. */
+       geometria, então os sete são vivos e nenhum é inerte. */
     expect(porAlvo['peca-de-prova']).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
 
     expect(r.resultado.registros.every((x) => x.carregou)).toBe(true);
@@ -232,7 +246,7 @@ describe('acervo real', () => {
 
   it('recusa uso ambíguo em vez de escolher por conta própria', async () => {
     expect((await parametrosReutilizavel({})).codigo).toBe(2);
-    expect((await parametrosReutilizavel({ alvo: 'cadeira-de-madeira', acervo: true })).codigo).toBe(2);
+    expect((await parametrosReutilizavel({ alvo: MINIMA, acervo: true })).codigo).toBe(2);
     const inexistente = await parametrosReutilizavel({ alvo: 'peca-que-nao-existe' });
     expect(inexistente.codigo).toBe(1);
     expect(inexistente.stderr).toContain('não encontrada');

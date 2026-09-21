@@ -142,10 +142,13 @@ describe('argumento desconhecido em passo', () => {
         }
       }
     }
-    /* Eram 593 passos com o acervo antigo inteiro; sobraram 329 depois que a
-       cadeira, as prensas e as armas sairam do acervo. O piso continua alto o
-       bastante para que uma varredura vazia ou truncada seja acusada. */
-    expect(passosConferidos).toBeGreaterThan(300);
+    /* Eram 593 passos com o acervo antigo inteiro; caiu para 329 quando a
+       cadeira, as prensas e as armas sairam do acervo publicado, e para 83
+       quando essas mesmas cinco receitas — que tinham voltado como fixture de
+       ferramenta em `tools/fixtures/acervo/` em vez de serem apagadas —
+       saíram também dali. O piso continua alto o bastante para que uma
+       varredura vazia ou truncada seja acusada. */
+    expect(passosConferidos).toBeGreaterThan(50);
     expect(fora).toEqual([]);
   }, 60_000);
 });

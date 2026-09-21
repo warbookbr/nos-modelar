@@ -140,11 +140,11 @@ describe('ativar-bancada: grito do motor é recusa', () => {
      pasta errada. Por isso o caso do nome curto usa peça real, e o caso do
      caminho, logo abaixo, usa a fixture. */
   it('aceita argumento posicional com nome curto de peça do acervo', () => {
-    const proc = execFileSync('node', [ATIVAR, 'chapa-de-fixacao', `--raiz-sessao=${AREA_SESSAO}`], {
+    const proc = execFileSync('node', [ATIVAR, 'bicicleta-quadro', `--raiz-sessao=${AREA_SESSAO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
-    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain('chapa-de-fixacao');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain('bicicleta-quadro');
   });
 
   it('aceita argumento posicional com caminho relativo à raiz', () => {
@@ -163,7 +163,20 @@ describe('perfil não vaza entre ativações no mesmo processo', () => {
      depois sem perfil devolvia o perfil da chamada anterior — invisível numa
      CLI, que morre a cada execução, e permanente no servidor MCP, que não. */
   it('ativa com perfil e depois sem perfil, e a segunda não herda a primeira', async () => {
-    const alvo = 'tools/fixtures/acervo/cadeira-de-madeira.js';
+    /* Entrada mínima: só precisa de PARAMS.perfil, que é o único campo que
+       `ativar-bancada.mjs` lê para decidir o perfil quando nenhum é passado. */
+    const COM_PERFIL = `export const receita = {
+  meta: { nome: 'Fixture Perfil', versao: '1.0.0' },
+  PARAMS: { perfil: 'jogo' },
+  MATERIAIS: { aco: { cor: '#2b2f33', metalicidade: 0.72, aspereza: 0.44 } },
+  PASSOS: [
+    ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1 }],
+    ['parte', { nome: 'bloco', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ['material', { usa: 'aco', sel: { grupo: 'bloco' } }],
+  ],
+};
+`;
+    const alvo = receitaTemporaria('perfil', COM_PERFIL);
     const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO });
     expect(comPerfil.payload.alvo.perfil).toBe('marcenaria');
 

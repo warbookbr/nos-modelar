@@ -3,9 +3,21 @@
  * Um agente que fala com o Mecanifica por MCP não roda `npm run`. Se a porta
  * não anunciar estas duas, ele continua alterando número no escuro — que é o
  * desperdício que elas cortam. Este arquivo prova que ela anuncia, que elas
- * respondem, e que não escrevem nada. */
-import { describe, expect, it } from 'vitest';
+ * respondem, e que não escrevem nada.
+ *
+ * `cadeira-de-madeira` não é mais alvo válido: era acervo publicado que o
+ * commit `33fde6a6` moveu para `tools/fixtures/acervo/` em vez de apagar, e de
+ * lá passou a aparecer na bancada como se fosse acervo real. Os testes abaixo
+ * medem a PORTA MCP — que ela devolve a mesma estrutura que a CLI, que a
+ * unidade anunciada bate com o número, que `mostrar` limita a estrutura e não
+ * só o texto — e não a forma de nenhuma peça, então os alvos são as duas
+ * menores receitas que reproduzem isso, escritas e escritas em disco só aqui,
+ * sob `tmp/`, e apagadas ao final. */
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { afterAll, describe, expect, it } from 'vitest';
 import { criarFerramentasParametros } from './parametros.mjs';
+import { REPO } from '../../mecanifica/resolver-caminho-receita.mjs';
 
 const ferramentas = criarFerramentasParametros();
 const pegar = (nome) => ferramentas.find((f) => f.nome === nome);
@@ -15,6 +27,103 @@ async function chamar(nome, entrada) {
   const executado = await f.executar(entrada);
   return { executado, estruturado: f.estruturar(executado), conteudo: f.conteudo(executado) };
 }
+
+/* Receita viva: um parâmetro compartilhado (`w`) recua seis pares
+   `haste/hub` pelo mesmo tanto — encolher fecha os seis pares e o mínimo
+   salta para um sétimo par (`trackA`/`trackB`), que também reage a `w` e a
+   `esp`. Ver o mesmo desenho, com a mesma explicação, em
+   `tools/mecanifica/varrer-peca.test.mjs`. */
+const WREF = 0.040;
+const ESPREF = 0.020;
+const OFFSET = 0.017;
+const N_FRAGEIS = 6;
+const TRACKBASE = 0.050;
+
+function fonteReceitaViva() {
+  return `
+export const receita = {
+  meta: { nome: 'Fixture MCP Viva', versao: '1.0.0' },
+  PARAMS: { w: ${WREF}, esp: ${ESPREF}, inerte: 0.300 },
+  MATERIAIS: { aco: { cor: '#888888' } },
+  get PASSOS() {
+    const p = this.PARAMS;
+    const WREF = ${WREF};
+    const ESPREF = ${ESPREF};
+    const OFFSET = ${OFFSET};
+    const N = ${N_FRAGEIS};
+    const TRACKBASE = ${TRACKBASE};
+    const chain = p.inerte + p.inerte * 0.3 - p.inerte * 0.3;
+    const ruido = chain - p.inerte;
+    const acoplamento = (WREF - p.w) * 5 + ruido;
+    const trackGap = TRACKBASE - (p.w - WREF) * 5 - (p.esp - ESPREF) * 5;
+    const passos = [
+      ['cubo', { origemId: 1, larg: 0.02, alt: 0.02, prof: 0.02, em: [-1, 0, 0] }],
+      ['parte', { nome: 'trackA', sel: { origem: { op: 'cubo', id: 1 } } }],
+      ['cubo', { origemId: 2, larg: 0.02, alt: 0.02, prof: 0.02, em: [-1, 0.02 + trackGap, 0] }],
+      ['parte', { nome: 'trackB', sel: { origem: { op: 'cubo', id: 2 } } }],
+    ];
+    let id = 10;
+    for (let i = 0; i < N; i++) {
+      passos.push(['cubo', { origemId: id, larg: 0.02, alt: 0.02, prof: 0.02, em: [0.1 * i, 0, 0] }]);
+      passos.push(['parte', { nome: \`haste\${i}\`, sel: { origem: { op: 'cubo', id } } }]);
+      id += 1;
+      passos.push(['cubo', { origemId: id, larg: 0.02, alt: 0.02, prof: 0.02, em: [0.1 * i + 0.02 + OFFSET - acoplamento, 0, 0] }]);
+      passos.push(['parte', { nome: \`hub\${i}\`, sel: { origem: { op: 'cubo', id } } }]);
+      id += 1;
+    }
+    passos.push(['material', { usa: 'aco', sel: { grupo: 'trackA' } }]);
+    passos.push(['material', { usa: 'aco', sel: { grupo: 'trackB' } }]);
+    for (let i = 0; i < N; i++) {
+      passos.push(['material', { usa: 'aco', sel: { grupo: \`haste\${i}\` } }]);
+      passos.push(['material', { usa: 'aco', sel: { grupo: \`hub\${i}\` } }]);
+    }
+    return passos;
+  },
+};
+export default receita;
+`;
+}
+
+/* Receita "PASSOS literais": um par que interpenetra (p1/p2) e um par com
+   folga limpa de 25 mm (trackA/trackB) — o mínimo para provar que a unidade
+   anunciada bate com o número, nos dois critérios que convertem diferente. */
+function fonteReceitaLiteral() {
+  return `
+export const receita = {
+  meta: { nome: 'Fixture MCP Literal', versao: '1.0.0' },
+  PARAMS: { dummy: 0.1 },
+  MATERIAIS: { aco: { cor: '#888888' } },
+  PASSOS: [
+    ['cubo', { origemId: 1, larg: 0.02, alt: 0.02, prof: 0.02, em: [0, 0, 0] }],
+    ['parte', { nome: 'p1', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ['cubo', { origemId: 2, larg: 0.02, alt: 0.02, prof: 0.02, em: [0.01, 0, 0] }],
+    ['parte', { nome: 'p2', sel: { origem: { op: 'cubo', id: 2 } } }],
+    ['cubo', { origemId: 3, larg: 0.02, alt: 0.02, prof: 0.02, em: [-1, 0, 0] }],
+    ['parte', { nome: 'trackA', sel: { origem: { op: 'cubo', id: 3 } } }],
+    ['cubo', { origemId: 4, larg: 0.02, alt: 0.02, prof: 0.02, em: [-1, 0.045, 0] }],
+    ['parte', { nome: 'trackB', sel: { origem: { op: 'cubo', id: 4 } } }],
+    ['material', { usa: 'aco', sel: { grupo: 'p1' } }],
+    ['material', { usa: 'aco', sel: { grupo: 'p2' } }],
+    ['material', { usa: 'aco', sel: { grupo: 'trackA' } }],
+    ['material', { usa: 'aco', sel: { grupo: 'trackB' } }],
+  ],
+};
+export default receita;
+`;
+}
+
+mkdirSync(resolve(REPO, 'tmp'), { recursive: true });
+const AREA = mkdtempSync(resolve(REPO, 'tmp', 'teste-mcp-parametros-'));
+const CAMINHO_VIVA = resolve(AREA, 'viva.js');
+const CAMINHO_LITERAL = resolve(AREA, 'literal.js');
+writeFileSync(CAMINHO_VIVA, fonteReceitaViva(), 'utf8');
+writeFileSync(CAMINHO_LITERAL, fonteReceitaLiteral(), 'utf8');
+const VIVA = CAMINHO_VIVA.slice(REPO.length + 1).replace(/\\/g, '/');
+const LITERAL = CAMINHO_LITERAL.slice(REPO.length + 1).replace(/\\/g, '/');
+
+afterAll(() => {
+  rmSync(AREA, { recursive: true, force: true });
+});
 
 describe('porta MCP da varredura', () => {
   it('anuncia as duas como somente leitura', () => {
@@ -31,39 +140,35 @@ describe('porta MCP da varredura', () => {
   });
 
   it('diagnostica um alvo e o acervo, com a mesma resposta da CLI', async () => {
-    const um = await chamar('diagnosticar_parametros', { alvo: 'cadeira-de-madeira' });
+    const um = await chamar('diagnosticar_parametros', { alvo: VIVA });
     expect(um.estruturado.ok).toBe(true);
-    expect(um.estruturado.resultado.totais).toEqual({ declarados: 21, vivos: 13, inertes: 8 });
-    expect(um.estruturado.resultado.vivos).toContain('perna.secaoTopo');
-    expect(um.conteudo[0].text).toContain('PARÂMETROS DE cadeira-de-madeira');
+    expect(um.estruturado.resultado.totais).toEqual({ declarados: 3, vivos: 3, inertes: 0 });
+    expect(um.estruturado.resultado.vivos).toContain('w');
+    expect(um.conteudo[0].text).toContain(`PARÂMETROS DE ${VIVA}`);
 
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
-    /* O mesmo retrato travado em `parametros-peca.test.mjs`: caiu de 267/114
-       para 90/26 quando o acervo publicado ficou só com o quadro da bicicleta e
-       cadeira, chapa e prensas viraram fixture de ferramenta, e subiu para
-       96/32 quando a leitura passou a descer em coordenada — os seis números
-       novos são os três pontos de solda da bicicleta, todos vivos — e para
-       103/39 quando a peça de prova das guardas entrou em
-       `tools/fixtures/acervo/`, com os seis números da TABELA dela também
-       vivos. Os dois números têm de andar juntos, porque a porta MCP e a CLI
-       leem a mesma varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 103, vivos: 39, inertes: 64 });
+    /* O mesmo retrato travado em `parametros-peca.test.mjs`, medido de novo
+       depois que `cadeira-de-madeira`, `chapa-de-fixacao` e as três prensas —
+       que tinham voltado como fixture de ferramenta em vez de serem apagadas —
+       saíram do repositório. Os dois números têm de andar juntos, porque a
+       porta MCP e a CLI leem a mesma varredura. */
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 63, vivos: 46, inertes: 17 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {
-    const r = await chamar('varrer_parametros', { alvo: 'cadeira-de-madeira', criterio: 'menor-folga' });
+    const r = await chamar('varrer_parametros', { alvo: VIVA, criterio: 'menor-folga' });
     expect(r.estruturado.ok).toBe(true);
-    expect(r.estruturado.resultado.movem).toEqual(['perna.secaoTopo']);
-    expect(r.estruturado.resultado.variantes).toBe(42);
+    expect(r.estruturado.resultado.movem).toEqual(['w']);
+    expect(r.estruturado.resultado.variantes).toBe(6);
     expect(r.estruturado.resultado.ondeOlhar.length).toBeGreaterThan(0);
     expect(r.conteudo[0].text).toContain('nada foi aplicado');
   }, 90_000);
 
   it('no lote, entrega o custo junto do número — não só o número', async () => {
     const r = await chamar('varrer_parametros', {
-      alvo: 'cadeira-de-madeira',
-      criterio: 'folga:saiaLateral,saiaTraseira',
-      livres: ['perna.secaoTopo:0.04..0.08:11', 'saia.esp:0.02..0.05:11'],
+      alvo: VIVA,
+      criterio: 'folga:trackA,trackB',
+      livres: ['w:0.040..0.060:11', 'esp:0.008..0.028:11'],
       objetivo: 'minimizar',
     });
     const primeiro = r.estruturado.resultado.candidatos[0];
@@ -77,8 +182,8 @@ describe('porta MCP da varredura', () => {
     expect(semAlvo.estruturado.erro.acao).toContain('acervo:true');
 
     const semValor = await chamar('varrer_parametros', {
-      alvo: 'cadeira-de-madeira',
-      livres: ['perna.secaoTopo:0.04..0.05:3'],
+      alvo: VIVA,
+      livres: ['w:0.040..0.050:3'],
       objetivo: 'alvo',
     });
     expect(semValor.estruturado.ok).toBe(false);
@@ -99,28 +204,28 @@ describe('a estrutura não pode mentir onde o texto acerta', () => {
        0.014142135623730944 metros. Quem lê o texto acerta; quem lê a estrutura
        erra por mil, e erra com confiança porque o campo promete milímetro. */
     const r = await chamar('varrer_parametros', {
-      alvo: 'cadeira-de-madeira',
-      criterio: 'folga:saiaLateral,saiaTraseira',
+      alvo: LITERAL,
+      criterio: 'folga:trackA,trackB',
     });
     expect(r.estruturado.resultado.unidade).toBe('mm');
-    expect(r.estruturado.resultado.base).toBeCloseTo(14.14, 1);
-    expect(r.conteudo[0].text).toContain('14.14 mm');
+    expect(r.estruturado.resultado.base).toBeCloseTo(25, 1);
+    expect(r.conteudo[0].text).toContain('25.00 mm');
   }, 90_000);
 
   it('critério que conta pares não é convertido', async () => {
     const r = await chamar('varrer_parametros', {
-      alvo: 'cadeira-de-madeira',
+      alvo: LITERAL,
       criterio: 'interpenetracoes',
     });
     expect(r.estruturado.resultado.unidade).toBe('par(es)');
-    expect(r.estruturado.resultado.base).toBe(4);
+    expect(r.estruturado.resultado.base).toBe(1);
   }, 90_000);
 
   it('honra `mostrar` na estrutura, não só no texto', async () => {
     const r = await chamar('varrer_parametros', {
-      alvo: 'cadeira-de-madeira',
+      alvo: VIVA,
       criterio: 'menor-folga',
-      livres: ['perna.secaoTopo:0.036..0.05:8'],
+      livres: ['w:0.036..0.044:8'],
       objetivo: 'maximizar',
       mostrar: 3,
     });

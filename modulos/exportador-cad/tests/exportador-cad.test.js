@@ -10,7 +10,23 @@ import {
   validarOpcoes,
 } from '../src/index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
-import { receitaEstrutura } from '../../../tools/fixtures/acervo/prensa-progressiva/estrutura.js';
+
+/* Entrada mínima com duas partes, escrita aqui mesmo: o que R04 prova é a ida
+   e volta receita → malha neutra → STEP → reimportação, e não a forma de
+   nenhuma peça real. Duas caixas afastadas bastam para exercitar múltiplos
+   corpos, do mesmo jeito que a estrutura real da prensa fazia. */
+const receitaEstrutura = {
+  meta: { nome: 'Fixture Estrutura', versao: '1.0.0' },
+  MATERIAIS: { aco: { cor: '#2b2f33', metalicidade: 0.72, aspereza: 0.44 } },
+  PASSOS: [
+    ['cubo', { origemId: 1, larg: 0.1, alt: 0.1, prof: 0.1, em: [0, 0, 0] }],
+    ['parte', { nome: 'base', sel: { origem: { op: 'cubo', id: 1 } } }],
+    ['cubo', { origemId: 2, larg: 0.05, alt: 0.3, prof: 0.05, em: [0.2, 0, 0] }],
+    ['parte', { nome: 'coluna', sel: { origem: { op: 'cubo', id: 2 } } }],
+    ['material', { usa: 'aco', sel: { grupo: 'base' } }],
+    ['material', { usa: 'aco', sel: { grupo: 'coluna' } }],
+  ],
+};
 
 const pontosCubo = [
   [0, 0, 0],

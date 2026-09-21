@@ -43,8 +43,8 @@ function rodar(args, env) {
 
 describe('diário da oficina', () => {
   it('ligado e desligado produzem exatamente a mesma saída e o mesmo código', () => {
-    const ligado = rodar(['cadeira-de-madeira', '--estrito'], { MECANIFICA_DIARIO: '1' });
-    const desligado = rodar(['cadeira-de-madeira', '--estrito'], { MECANIFICA_DIARIO: '0' });
+    const ligado = rodar(['bicicleta-quadro', '--estrito'], { MECANIFICA_DIARIO: '1' });
+    const desligado = rodar(['bicicleta-quadro', '--estrito'], { MECANIFICA_DIARIO: '0' });
     expect(desligado.saida).toBe(ligado.saida);
     expect(desligado.codigo).toBe(ligado.codigo);
   });
@@ -59,12 +59,12 @@ describe('diário da oficina', () => {
   it('falha ao gravar não derruba quem está sendo medido', () => {
     /* Caminho impossível: o diário tenta, falha e engole. Se ele lançasse, a
        ferramenta morreria por causa do observador. */
-    const fechar = iniciarRegistro('teste', 'cadeira-de-madeira', { destino: DIARIO });
+    const fechar = iniciarRegistro('teste', 'bicicleta-quadro', { destino: DIARIO });
     expect(() => fechar({ codigo: 0, prometeu: ['\0invalido'] })).not.toThrow();
   });
 
   it('separa o que foi PROMETIDO do que está no disco', () => {
-    const fechar = iniciarRegistro('promessa', 'cadeira-de-madeira', { destino: DIARIO });
+    const fechar = iniciarRegistro('promessa', 'bicicleta-quadro', { destino: DIARIO });
     fechar({ codigo: 0, prometeu: ['package.json', 'tools/bancadas/out/nunca-existiu.png'] });
     /* Filtra pelo comando em vez de pegar a última linha: o mesmo arquivo recebe
        linhas dos subprocessos, e depender da ordem faria este teste falhar por
@@ -78,8 +78,8 @@ describe('diário da oficina', () => {
   it('nome curto e caminho completo caem na MESMA rodada', () => {
     /* Sem isto, o mesmo trabalho apareceria como dois alvos distintos e a
        contagem de repetição — o sinal de "emperrou" — nunca acusaria nada. */
-    iniciarRegistro('rodada-curta', 'cadeira-de-madeira', { destino: DIARIO })({ codigo: 0 });
-    iniciarRegistro('rodada-longa', 'tools/fixtures/acervo/cadeira-de-madeira.js', { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-curta', 'bicicleta-quadro', { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-longa', 'prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js', { destino: DIARIO })({ codigo: 0 });
     const curta = linhasDoDiario().findLast((l) => l.comando === 'rodada-curta');
     const longa = linhasDoDiario().findLast((l) => l.comando === 'rodada-longa');
     expect(longa.alvo).toBe(curta.alvo);

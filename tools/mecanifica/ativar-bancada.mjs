@@ -27,7 +27,7 @@ export async function ativarReceitaBancada({
    * está na bancada de quem está trabalhando. Dois arquivos de teste tentaram
    * remediar isso guardando e devolvendo o conteúdo, e não resolve: rodando em
    * paralelo, cada um devolve o que capturou, e vence quem terminar por último.
-   * Medido: a sessão saía de `cadeira-de-madeira` e voltava como outra peça.
+   * Medido: a sessão saía de `bicicleta-quadro` e voltava como outra peça.
    *
    * Separar os dois deixa o teste apontar a ESCRITA para uma pasta temporária
    * enquanto a BUSCA continua no acervo real, que é o que ele precisa exercitar.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-877 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -908,39 +908,10 @@
 - `requisitos-da-peca-de-prova.js` — requisitos-da-peca-de-prova.js — o que uma peça precisa TER para as guardas provarem o que dizem provar.
 - `requisitos-da-peca-de-prova.test.mjs` — requisitos-da-peca-de-prova.test.mjs — a régua da peça de prova mede o que as guardas realmente exigem, e reprova quando falta.
 
-## tools/fixtures/acervo/
-
-- `cadeira-de-madeira.js` — cadeira-de-madeira.js — cadeira de jantar em madeira, realista e econômica.
-- `chapa-de-fixacao.js` — chapa-de-fixacao.js — chapa de fixação em L com furos passantes.
-
 ## tools/fixtures/acervo/peca-de-prova/
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
-
-## tools/fixtures/acervo/prensa-hidraulica/
-
-- `cinematico.js` — cinematico.js — conjunto do atuador hidraulico: camisa do cilindro, haste cromada, sapata e mesa movel da prensa hidraulica.
-- `estrutura.js` — estrutura.js — chassi H-frame, colunas verticais, travessao superior, pes e pinos da prensa hidraulica.
-- `ferramentas.js` — ferramentas.js — bolster plate, estampo, unidade hidraulica de potencia, motor, manometro e tubulacoes da prensa hidraulica.
-- `montagem.js` — montagem.js — montagem integrada da prensa hidráulica industrial H-frame com unidade de potência.
-
-## tools/fixtures/acervo/prensa-mecanica-industrial/
-
-- `cinematico.js` — cinematico.js — conjunto cinematico da prensa mecanica: motor eletrico, volante com protecao amarela, eixo excentrico, biela forjada e martelo deslizante com…
-- `estrutura.js` — estrutura.js — chassi estatico da prensa mecanica industrial: base fundida, mesa bolster, 4 colunas guia e cabecote superior com mancais.
-- `ferramentas.js` — ferramentas.js — estampo progressivo industrial de 4 estagios: base inferior, 4 colunas de guia com buchas, matriz inferior, guias de tira e puncoes superiores.
-- `montagem.js` — montagem.js — montagem integrada da prensa mecanica industrial realista de 4 colunas com estampo progressivo.
-
-## tools/fixtures/acervo/prensa-progressiva/
-
-- `README.md` — Prensa Mecânica com Estampo Progressivo
-- `cinematico.js` — cinematico.js — acionamento da prensa: excêntrico, volante de inércia, biela e martelo deslizante.
-- `estrutura.js` — estrutura.js — chassi estático da prensa mecânica: mesa, colunas guia e cabeçote superior.
-- `ferramentas.js` — ferramentas.js — estampo progressivo: porta-matriz, estações de punção e placa extratora.
-- `index.js` — index.js — ponto de entrada do módulo de prensa progressiva.
-- `montagem.js` — montagem.js — montagem integrada da prensa mecânica com estampo progressivo.
-- `prensa.test.js` — prensa.test.js — suíte de testes da prensa progressiva procedural.
 
 ## tools/mapa/
 
