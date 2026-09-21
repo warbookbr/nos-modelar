@@ -28,6 +28,14 @@ comando imprimiu. Não mande junto a sua opinião sobre o que fazer: o veredito
 já diz parte, tipo e sentido, e acrescentar palpite é reintroduzir o autor que
 o laço tirou.
 
+Nomeie no despacho as operações de superfície que o motor tem, quando o grau de
+realismo combinado no plano as pedir: `arredondarAresta` e `filete` quebram
+aresta viva, `liso` sombreia sem faceta, `lathe` faz volume de revolução com
+perfil. Isso não é palpite sobre forma, é dizer o que existe. Uma peça desta
+casa saiu com aparência de caixa usando `cilindro` nove vezes e `chamferBox`
+uma, com as seis operações acima disponíveis e nenhuma citada em lugar nenhum
+que o modelador leia.
+
 **revisar** — despache o agente `critico-visual` com a imagem de referência, as
 vistas renderizadas e os critérios de reprovação do plano. Nunca mande a
 receita, os passos, o histórico, nem o que mudou desde a rodada anterior. Ele

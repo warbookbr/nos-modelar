@@ -20,7 +20,7 @@ ser conselho, e conselho é ignorado sob pressão de terminar.
 
 Uma rodada inteira já respondida está em
 [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md):
-as sete perguntas com as respostas de uma peça real, as decisões que não cabem
+as perguntas fixas com as respostas de uma peça real, as decisões que não cabem
 em campo nenhum, e as duas falhas que motivaram o plano a existir.
 
 ## Como conduzir
@@ -33,6 +33,27 @@ opções concretas e deixe ela escolher.
 Não comece a modelar no meio da rodada, nem proponha operações do motor: a
 técnica de cada parte entra como descrição curta, e a escolha fina é do
 modelador depois, com o plano na mão.
+
+## Antes das partes: leia a referência junto com a pessoa
+
+Abra as imagens com `Read` e olhe você mesmo. A skill não mandava isso, e o
+resultado foi um plano escrito sem ninguém ter enumerado o que a foto mostra.
+
+Percorra a imagem e diga em voz alta o que vê, corpo por corpo, e peça à pessoa
+que corrija e complete. **Todo corpo que se distingue na referência vira parte
+declarada.** Num braço robótico, os anéis escuros entre carcaças são corpos
+próprios e salientes, e não pintura; num plano que não os enumerou eles viraram
+degrau entre cilindros, o objeto perdeu o que o fazia ler como robô, e nenhuma
+medida acusou porque parte não prometida não é cobrada.
+
+Enumere também o que não é estrutura e aparece: cabo externo e suas presilhas,
+caixa de motor colada à base, tampa aparafusada. Se for ficar de fora, que fique
+por decisão escrita, e não por ninguém ter reparado.
+
+Depois confira a orientação de cada extremidade contra a imagem, e não contra o
+que parece natural. O flange de ferramenta deste acervo foi declarado saindo
+reto na ponta do antebraço, e na referência ele pende para baixo, porque o punho
+dobra.
 
 ## Perguntas fixas
 
@@ -51,13 +72,22 @@ Valem para qualquer objeto, e o plano não fecha sem elas.
    no passo `parte` da receita e o mesmo que a medida devolve: letras e
    dígitos, sem espaço nem acento. Nome diferente aqui e lá produz parte
    "ausente" a cada conferência.
-5. **Que forma cada parte tem, e por qual técnica.** Uma frase que um estranho
+5. **Qual o grau de realismo, e você diz o que vê antes de perguntar.** Olhe a
+   referência e proponha: "vejo carcaça de superfície dura, com aresta quebrada
+   e anel de junta saliente, e não volume simples de poucas faces". Ofereça duas
+   opções concretas — silhueta correta com volumes simples, ou todos os corpos
+   visíveis da referência com aresta trabalhada — e deixe a pessoa escolher. A
+   resposta governa a próxima pergunta: pedir realismo e declarar técnica de
+   volume simples produz o objeto quadrado que a técnica pediu, e foi o que
+   aconteceu aqui.
+6. **Que forma cada parte tem, e por qual técnica.** Uma frase que um estranho
    entenda — "tubo achatado e arqueado, da caixa até o tubo de direção" — e a
-   técnica em duas ou três palavras.
-6. **Que pares devem se tocar, e por quê.** Esta é a lista que vira `contatos`
+   técnica em duas ou três palavras. A técnica tem de corresponder ao grau de
+   realismo combinado: carcaça arredondada não sai de "cilindro com tampas".
+7. **Que pares devem se tocar, e por quê.** Esta é a lista que vira `contatos`
    na receita, com motivo escrito. Ela é cobrada por medida: par declarado que
    não se toca reprova, e par que se toca sem ter sido declarado também.
-7. **O que faz reprovar este objeto.** Defeitos que um revisor deve procurar
+8. **O que faz reprovar este objeto.** Defeitos que um revisor deve procurar
    nesta peça específica, cada um em uma frase verificável olhando a
    referência. "Balanços assimétricos entre o lado esquerdo e o direito"
    serve; "ficou feio" não.

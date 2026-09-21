@@ -11,7 +11,11 @@ Esse recorte não é um detalhe do exemplo: decidir onde a peça termina é a
 primeira coisa que a rodada faz, e uma rodada que não decide isso entrega ao
 modelador um alvo sem borda.
 
-## As sete perguntas, respondidas
+## As perguntas fixas, respondidas
+
+> Este exemplo é de antes de a rodada ganhar o passo de ler a referência junto
+> com a pessoa e a pergunta do grau de realismo. Ele continua valendo para as
+> perguntas que mostra; as duas que faltam estão na skill.
 
 **1. Qual é o objeto, e qual módulo dele.** Quadro de MTB hardtail 29
 polegadas, tamanho M, módulo 1 de 5. Termina onde começa o garfo, a roda, o
