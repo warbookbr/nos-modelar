@@ -78,6 +78,38 @@ export const ORIGENS = {
 
 function gerarPassos() { return []; }
 
+/* PONTOS DECLARADOS — os critérios do plano escritos como coordenada e
+   tolerância, para que `conferir-pontos` os confira por conta a cada rodada.
+   Todos saem da tabela por aritmética; nenhum é digitado, porque coordenada
+   digitada deixa de corresponder à tabela assim que ela muda.
+
+   SÓ ENTRA AQUI O QUE A CAIXA DE CADA PARTE DEFINE SEM AMBIGUIDADE. O centro
+   da junta 3 ficou de fora de propósito: o antebraço entra pelo flanco da
+   carcaça do cotovelo, e o centro da sobreposição das duas caixas não cai no
+   eixo da junta. Declarar ali um número que a medida não sabe produzir seria
+   ensinar que o ponto é decorativo. No lugar dele vai a ponta do antebraço,
+   que a caixa define exatamente e que erra junto se o cotovelo sair do lugar. */
+function pontosDeclarados(t = TABELA) {
+  const juntaUm = t.baseAltura;
+  const juntaDois = juntaUm + t.colunaAltura;
+  const juntaTres = juntaDois + t.bracoComprimento;
+  const meioRaiz = t.antebracoDiametroRaiz / 2;
+  return [
+    { nome: 'baseCentro', parte: 'base', medida: 'centro',
+      em: [0, 0, t.baseAltura / 2], toleranciaMm: 3 },
+    { nome: 'junta1', entre: ['base', 'coluna'],
+      em: [0, 0, juntaUm], toleranciaMm: 5 },
+    { nome: 'junta2', entre: ['coluna', 'braco'],
+      em: [0, 0, juntaDois], toleranciaMm: 5 },
+    { nome: 'bracoTopo', parte: 'braco', medida: 'maximo',
+      em: [t.bracoLargura / 2, t.bracoProfundidade / 2, juntaTres], toleranciaMm: 5 },
+    { nome: 'antebracoPonta', parte: 'antebraco', medida: 'maximo',
+      em: [t.antebracoComprimento, t.cotoveloDesvio + meioRaiz, juntaTres + meioRaiz], toleranciaMm: 5 },
+    { nome: 'flangeCentro', parte: 'flange', medida: 'centro',
+      em: [t.antebracoComprimento + t.punhoComprimento, t.cotoveloDesvio, juntaTres], toleranciaMm: 5 },
+  ];
+}
+
 export const receitaBracoRobotico = {
   meta: {
     nome: 'Braço robótico de 6 eixos',
@@ -89,6 +121,8 @@ export const receitaBracoRobotico = {
   PARAMS: TABELA,
 
   ORIGENS,
+
+  PONTOS: pontosDeclarados(),
 
   PLANO: {
     objeto: 'braco robotico industrial ficticio de 6 eixos, alcance 850 mm, classe de 5 kg, peca inteira',
