@@ -42,6 +42,15 @@ export const TABELA = {
   flangeFuros: 8,
   flangeCircunferenciaDeFuros: 65,
   flangeFuroCentral: 35,
+
+  sobreposicaoJunta: 4,
+  bracoChanfro: 10,
+  punhoDiametro: 85,
+  punhoDiametroDegrau: 65,
+  punhoCilindroDiametro: 50,
+  punhoRasgoLargura: 18,
+  punhoSobreposicao: 8,
+  flangeSobreposicao: 4,
 };
 
 export function derivar(t = TABELA) {
@@ -74,9 +83,149 @@ export const ORIGENS = {
   flangeFuros: 'padrao de flange de ferramenta da mesma classe',
   flangeCircunferenciaDeFuros: 'padrao de flange de ferramenta da mesma classe',
   flangeFuroCentral: 'padrao de flange de ferramenta da mesma classe',
+
+  sobreposicaoJunta: 'sobreposicao minima entre elos consecutivos, para que a junta encoste de verdade e nao so tangencie a caixa vizinha',
+  bracoChanfro: 'chanfro suave da carcaca retangular do braco, dentro do limite que a secao permite',
+  punhoDiametro: 'continuidade com o diametro de ponta do antebraco, onde a carcaca do punho comeca',
+  punhoDiametroDegrau: 'diametro mais estreito do punho junto ao flange, formando o degrau visto na referencia de punho',
+  punhoCilindroDiametro: 'diametro do bloco cilindrico interno visivel na forquilha, menor que a carcaca do punho',
+  punhoRasgoLargura: 'largura do rasgo passante da forquilha, visto na referencia de punho',
+  punhoSobreposicao: 'sobreposicao entre a carcaca do punho e a ponta do antebraco, para que a junta encoste de verdade',
+  flangeSobreposicao: 'sobreposicao entre o flange e o degrau do punho, para que a junta encoste de verdade',
 };
 
-function gerarPassos() { return []; }
+/* GEOMETRIA. Z para cima (TOPO.origem). `cilindro`/`cone`/`lathe` nascem com a
+   base em y=0 e o topo em y=altura (chao embaixo); `eixo:'z'` gira essa base
+   para o plano XY e `em` posiciona onde a base cai, já depois do giro (pose de
+   criacao). `eixo:'x'` deita o mesmo cilindro no eixo X, base em `em`, topo em
+   `em + [altura,0,0]` — é assim que braco, antebraco, punho e flange, que
+   correm ao longo de X, sao encadeados sem uma coordenada calculada a mao: a
+   base de cada elo é a ponta do elo anterior.
+
+   `chamferBox` nao tem `eixo` (nao é gerada por revolucao), entao o braco
+   nasce deitado (y=0..altura) e precisa de um `rotaciona x 90` com pivo na
+   origem para erguer o mesmo y=altura para z=altura, seguido de um
+   `transladar` até a base da coluna — a mesma regra da tabela de orientacao da
+   skill, só que aplicada a Y->Z em vez de Y->X.
+
+   Cada junta recebe `sobreposicaoJunta` (ou a sobreposicao propria da peca,
+   `punhoSobreposicao`/`flangeSobreposicao`) puxando o elo de cima para dentro
+   do elo de baixo, sem mexer no topo: o comprimento cresce pela mesma
+   sobreposicao, entao o topo continua exatamente na junta derivada e o
+   contato deixa de ser tangencia de caixa para virar volume que realmente se
+   cruza — a diferenca que este plano de contatos exige. */
+function gerarPassos(t = TABELA) {
+  const ov = t.sobreposicaoJunta;
+
+  const z1 = t.baseAltura;                    // topo da base = fundo da coluna (junta 1)
+  const z2 = z1 + t.colunaAltura;              // topo da coluna = fundo do braco (junta 2)
+  const z3 = z2 + t.bracoComprimento;          // topo do braco = raiz do antebraco (junta 3)
+  const xAntebracoRaiz = 0;
+  const xAntebracoPonta = t.antebracoComprimento;
+  const yCotovelo = t.cotoveloDesvio;
+
+  const meioPunho = (t.punhoComprimento - t.punhoRasgoLargura) / 2;
+  const xCheekRaiz = xAntebracoPonta - t.punhoSobreposicao;
+  const xCheekPonta = xAntebracoPonta + meioPunho + t.punhoRasgoLargura;
+  const xFlangeCentro = xAntebracoPonta + t.punhoComprimento;
+
+  const segAntebraco = t.antebracoComprimento / 3;
+  const diamAntebracoMeio = (t.antebracoDiametroRaiz + t.antebracoDiametroPonta) / 2;
+
+  const BASE = 1, COLUNA = 2, BRACO = 3;
+  const ANTEBRACO_RAIZ = 4, ANTEBRACO_MEIO = 5, ANTEBRACO_PONTA = 6;
+  const PUNHO_CHEEK_RAIZ = 7, PUNHO_CILINDRO = 8, PUNHO_CHEEK_PONTA = 9, FLANGE = 10;
+
+  /* O cilindro, sozinho entre os geradores, publica `origem` sem `lado` nem
+     `tampa` como só as LATERAIS — as duas tampas ficam sem identidade se o
+     `parte` citar só isso. Um cilindro inteiro é a união dos três termos;
+     como `sel.origem` aqui não aceita lista, a peça marca a parte em três
+     passos por cilindro em vez de um só. */
+  const parteCilindroInteiro = (nome, id) => ([
+    ['parte', { nome, sel: { origem: { op: 'cilindro', id } } }],
+    ['parte', { nome, sel: { origem: { op: 'cilindro', id, tampa: 'fundo' } } }],
+    ['parte', { nome, sel: { origem: { op: 'cilindro', id, tampa: 'topo' } } }],
+  ]);
+
+  return [
+    // ---------- base ----------
+    ['cilindro', {
+      origemId: BASE, eixo: 'z', em: [0, 0, 0],
+      raio: m(t.baseDiametro) / 2, altura: m(t.baseAltura),
+    }],
+    ...parteCilindroInteiro('base', BASE),
+
+    // ---------- coluna (desce `ov` dentro da base, mantendo o topo em z2) ----------
+    ['cilindro', {
+      origemId: COLUNA, eixo: 'z', em: [0, 0, m(z1 - ov)],
+      raio: m(t.colunaDiametro) / 2, altura: m(t.colunaAltura + ov),
+    }],
+    ...parteCilindroInteiro('coluna', COLUNA),
+
+    // ---------- braco: carcaca retangular chanfrada, deitada em Y e erguida para Z ----------
+    ['chamferBox', {
+      origemId: BRACO,
+      larg: m(t.bracoLargura), alt: m(t.bracoComprimento + ov), prof: m(t.bracoProfundidade),
+      chanfro: m(t.bracoChanfro),
+    }],
+    ['rotaciona', { sel: { origem: { op: 'chamferBox', id: BRACO } }, eixo: 'x', graus: 90, pivo: [0, 0, 0] }],
+    ['transladar', { sel: { origem: { op: 'chamferBox', id: BRACO } }, d: [0, 0, m(z2 - ov)] }],
+    ['parte', { nome: 'braco', sel: { origem: { op: 'chamferBox', id: BRACO } } }],
+
+    /* antebraco: afinar de raizD para pontaD pede o loft, mas o loft não fecha
+       as duas pontas (não tem tampa própria — GEOMETRIA AINDA AGRAVA) e a
+       malha aberta resultante deixou a medida de contato sem decidir
+       antebraco↔braco e antebraco↔punho (dois pares que a receita declara e
+       precisam fechar). Substituído por três cilindros fechados encadeados,
+       cada um com diâmetro constante, afinando em degraus em vez de suave —
+       ATRITO registrado: falta um jeito de fechar as pontas de um loft (ou um
+       loft com tampa automática) para este afinamento sair liso. */
+    ['cilindro', {
+      origemId: ANTEBRACO_RAIZ, eixo: 'x', em: [m(xAntebracoRaiz), m(yCotovelo), m(z3)],
+      raio: m(t.antebracoDiametroRaiz) / 2, altura: m(segAntebraco),
+    }],
+    ...parteCilindroInteiro('antebraco', ANTEBRACO_RAIZ),
+
+    ['cilindro', {
+      origemId: ANTEBRACO_MEIO, eixo: 'x', em: [m(segAntebraco - ov), m(yCotovelo), m(z3)],
+      raio: m(diamAntebracoMeio) / 2, altura: m(segAntebraco + ov),
+    }],
+    ...parteCilindroInteiro('antebraco', ANTEBRACO_MEIO),
+
+    ['cilindro', {
+      origemId: ANTEBRACO_PONTA, eixo: 'x', em: [m(2 * segAntebraco - ov), m(yCotovelo), m(z3)],
+      raio: m(t.antebracoDiametroPonta) / 2, altura: m(segAntebraco + ov),
+    }],
+    ...parteCilindroInteiro('antebraco', ANTEBRACO_PONTA),
+
+    // ---------- punho: forquilha vazada (dois topos) mais o bloco cilindrico interno ----------
+    ['cilindro', {
+      origemId: PUNHO_CHEEK_RAIZ, eixo: 'x', em: [m(xCheekRaiz), m(yCotovelo), m(z3)],
+      raio: m(t.punhoDiametro) / 2, altura: m(meioPunho + t.punhoSobreposicao),
+    }],
+    ...parteCilindroInteiro('punho', PUNHO_CHEEK_RAIZ),
+
+    ['cilindro', {
+      origemId: PUNHO_CILINDRO, eixo: 'x', em: [m(xAntebracoPonta), m(yCotovelo), m(z3)],
+      raio: m(t.punhoCilindroDiametro) / 2, altura: m(t.punhoComprimento),
+    }],
+    ...parteCilindroInteiro('punho', PUNHO_CILINDRO),
+
+    ['cilindro', {
+      origemId: PUNHO_CHEEK_PONTA, eixo: 'x', em: [m(xCheekPonta), m(yCotovelo), m(z3)],
+      raio: m(t.punhoDiametroDegrau) / 2, altura: m(meioPunho + t.flangeSobreposicao),
+    }],
+    ...parteCilindroInteiro('punho', PUNHO_CHEEK_PONTA),
+
+    // ---------- flange: disco de ferramenta, centrado exatamente na junta derivada ----------
+    ['cilindro', {
+      origemId: FLANGE, eixo: 'x',
+      em: [m(xFlangeCentro - t.flangeEspessura / 2), m(yCotovelo), m(z3)],
+      raio: m(t.flangeDiametro) / 2, altura: m(t.flangeEspessura),
+    }],
+    ...parteCilindroInteiro('flange', FLANGE),
+  ];
+}
 
 /* PONTOS DECLARADOS — os critérios do plano escritos como coordenada e
    tolerância, para que `conferir-pontos` os confira por conta a cada rodada.
