@@ -1330,9 +1330,16 @@ describe('servidor MCP local — perfil revisao', () => {
   testeVisualReal('consumidor zerado descobre, consulta e vê uma montagem sem escrita', async () => {
     const antes = spawnSync('git', ['status', '--porcelain'], { cwd: RAIZ, encoding: 'utf8' }).stdout;
     const client = new Client({ name: 'consumidor-visual-montagem', version: '1' });
+    /* O AMBIENTE PASSA INTEIRO, e o que o consumidor não aprende continua sendo
+       caminho do repositório, que é o que "zerado" quer dizer. Antes só a
+       variável do catálogo era passada, e o servidor subia sem PATH, sem HOME e
+       sem PLAYWRIGHT_BROWSERS_PATH; `renderizar_montagem` então procurava o
+       navegador no diretório padrão e falhava onde ele mora em outro lugar. No
+       CI passava porque lá o padrão é onde o navegador está, e a prova
+       dependia da coincidência entre as duas máquinas. */
     const transport = new StdioClientTransport({
       command: process.execPath, args: [SERVIDOR], cwd: RAIZ, stderr: 'pipe',
-      env: { [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
+      env: { ...process.env, [VARIAVEL_CATALOGO_MCP_MONTAGENS]: CONFIGURACAO_MONTAGENS },
     });
     try {
       await client.connect(transport);
@@ -1344,7 +1351,7 @@ describe('servidor MCP local — perfil revisao', () => {
       const visual = await client.callTool({
         name: 'renderizar_montagem', arguments: { id, vistas: ['isometrica', 'direita'] },
       });
-      expect(visual.isError).not.toBe(true);
+      expect(visual.isError, JSON.stringify(visual.content)).not.toBe(true);
       renderizarMontagemSaida.parse(visual.structuredContent);
       expect(visual.content.filter(({ type }) => type === 'image')).toHaveLength(2);
       for (const imagem of visual.content.filter(({ type }) => type === 'image')) {

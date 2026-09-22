@@ -91,8 +91,9 @@ e repetidos em `.github/workflows/ci.yml`, rodados de uma vez por `npm run
 gates`. `reguas:check` reprova quando os dois não batem, então gate que existe
 só no script local não existe. Eles vão de tipo e teste a nove guardas de
 navegador que dirigem a bancada de verdade, mais a varredura do acervo, os
-limites de documentação e o teto de leitura obrigatória. `mcp:visual:check`
-está vermelho na main hoje, num caso que renderiza montagem pelo servidor MCP.
+limites de documentação e o teto de leitura obrigatória. Gate que passa aqui e
+falha no CI, ou o contrário, está medindo a máquina e não o repositório, e isso
+é defeito do gate.
 
 **O que existe além da peça.** Montagem persistida com contexto consultável em
 JSON, mapa canônico de dependências e revalidação em cascata; a direção e os

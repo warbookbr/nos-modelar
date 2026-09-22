@@ -18,17 +18,28 @@
  *
  * Roda sobre o pacote construído, servindo um `sessao-ativa.json` com o nome
  * trocado: sem nomes distintos a prova passaria sem provar nada.
+ *
+ * A SESSÃO É FABRICADA AQUI, e não lida de `dist/`. Antes a guarda exigia
+ * `dist/sessao-ativa.json`, que só existe quando quem construiu tinha uma peça
+ * aberta na bancada — arquivo não versionado. Na máquina de quem trabalha ele
+ * está lá e a guarda passa; no CI nunca esteve, e ela saía com código 1 sem que
+ * nada no repositório estivesse errado. Guarda que depende de estado local não
+ * mede o repositório, mede quem a rodou. A sessão nasce da peça de prova, pela
+ * mesma CLI que a bancada usa, numa pasta temporária.
  */
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { ativarReceitaBancada } from './ativar-bancada.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
 const NOME_DO_ARQUIVO = 'PEÇA DA SESSÃO';
+const RECEITA_DA_SESSAO = 'tools/fixtures/acervo/peca-de-prova/receita.js';
 const INTERVALO_DE_LEITURA = 1500;
 
 const TIPOS = {
@@ -47,19 +58,26 @@ if (!existsSync(join(DIST, 'bancada.html'))) {
   console.error('guarda:escolha — `dist/` não existe. Rode `npm run build` antes.');
   process.exit(1);
 }
-if (!existsSync(join(DIST, 'sessao-ativa.json'))) {
-  console.error('guarda:escolha — `dist/sessao-ativa.json` não existe. Rode `npm run build` com uma sessão ativa.');
-  process.exit(1);
-}
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci'); process.exit(1); }
+
+const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'guarda-escolha-'));
+await ativarReceitaBancada({ alvo: RECEITA_DA_SESSAO, raizSessao: AREA_SESSAO });
+const ARQUIVO_DE_SESSAO = join(AREA_SESSAO, 'public/sessao-ativa.json');
+if (!existsSync(ARQUIVO_DE_SESSAO)) {
+  console.error(`guarda:escolha — ativar-bancada não gravou a sessão em ${ARQUIVO_DE_SESSAO}.`);
+  process.exit(1);
+}
 
 const servidor = createServer((req, res) => {
   const pedido = decodeURIComponent(req.url.split('?')[0]).replace(BASE, '/');
   const caminho = join(DIST, pedido.replace(/^\//, '') || 'bancada.html');
-  if (!caminho.startsWith(DIST) || !existsSync(caminho)) { res.writeHead(404); res.end(); return; }
+  /* A sessão não vem de `dist/`: ela é servida da pasta temporária logo abaixo,
+     então não passa por esta checagem de existência. */
+  if (!pedido.endsWith('sessao-ativa.json')
+    && (!caminho.startsWith(DIST) || !existsSync(caminho))) { res.writeHead(404); res.end(); return; }
   if (pedido.endsWith('sessao-ativa.json')) {
-    const dados = JSON.parse(readFileSync(caminho, 'utf8'));
+    const dados = JSON.parse(readFileSync(ARQUIVO_DE_SESSAO, 'utf8'));
     dados.alvo.nome = NOME_DO_ARQUIVO;
     dados.receita.meta.nome = NOME_DO_ARQUIVO;
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -111,6 +129,7 @@ try {
 } finally {
   await navegador.close();
   servidor.close();
+  rmSync(AREA_SESSAO, { recursive: true, force: true });
 }
 
 if (falhas.length) {
