@@ -15,8 +15,8 @@ import { receitaDoModulo } from '../mecanifica/importar-receita.mjs';
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 /* As duas raizes que guardam receita: o acervo publicado e as fixtures de
    ferramenta. A varredura precisa das duas porque o contrato de argumento vale
-   para qualquer receita executavel, e porque o acervo encolheu para uma peca
-   quando a bicicleta virou o unico assunto publicado. */
+   para qualquer receita executavel, e porque o acervo publicado pode ficar sem
+   peca entre uma modelagem e a seguinte. */
 const RAIZES_RECEITAS = [
   { raiz: join(REPO, 'prototipos/procedural/v3'), pastas: ['pecas', 'maquinas', 'armas', 'extensoes'] },
   { raiz: join(REPO, 'tools/fixtures'), pastas: ['acervo'] },
@@ -102,13 +102,14 @@ describe('argumento desconhecido em passo', () => {
     /* Este é o gate da mudança, não uma curiosidade. Se alguém escrever uma
        chave inventada numa receita, este teste acusa antes de a peça sair torta
        em silêncio. O piso já foi 15 receitas, quando o acervo publicado tinha
-       cadeira, prensas e armas; hoje o acervo é só a bicicleta e o resto virou
-       fixture de ferramenta. O piso agora é a existência da varredura: uma
-       raiz que não devolve receita nenhuma quer dizer que o caminho quebrou, e
-       um teste que varre zero arquivo passa sem provar nada. */
+       cadeira, prensas e armas; depois o resto virou fixture de ferramenta e o
+       acervo ficou sem peça. O piso não pode ser por raiz, então: a raiz do
+       acervo devolve zero enquanto não houver peça, e isso é estado declarado e
+       não caminho quebrado. O piso é a varredura inteira — se NENHUMA raiz
+       devolver receita, o caminho quebrou, e um teste que varre zero arquivo
+       passa sem provar nada. */
     const alvos = [];
     for (const { raiz, pastas } of RAIZES_RECEITAS) {
-      const antes = alvos.length;
       for (const pasta of pastas) {
         let entradas;
         try { entradas = readdirSync(join(raiz, pasta), { withFileTypes: true }); } catch { continue; }
@@ -125,8 +126,8 @@ describe('argumento desconhecido em passo', () => {
           }
         }
       }
-      expect(alvos.length, `nenhuma receita encontrada em ${raiz}`).toBeGreaterThan(antes);
     }
+    expect(alvos.length, 'nenhuma receita encontrada em raiz nenhuma').toBeGreaterThan(0);
 
     const fora = [];
     let passosConferidos = 0;
@@ -146,9 +147,11 @@ describe('argumento desconhecido em passo', () => {
        cadeira, as prensas e as armas sairam do acervo publicado, e para 83
        quando essas mesmas cinco receitas — que tinham voltado como fixture de
        ferramenta em `tools/fixtures/acervo/` em vez de serem apagadas —
-       saíram também dali. O piso continua alto o bastante para que uma
-       varredura vazia ou truncada seja acusada. */
-    expect(passosConferidos).toBeGreaterThan(30);
+       saíram também dali; hoje são 10, porque a bicicleta saiu do acervo e a
+       fixture das guardas é a única receita executável que restou. Com uma
+       receita só, o piso é a contagem inteira dela: varredura truncada perde
+       passo e é acusada, e receita nova só faz o número subir. */
+    expect(passosConferidos).toBeGreaterThanOrEqual(10);
     expect(fora).toEqual([]);
   }, 60_000);
 });

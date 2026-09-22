@@ -3,30 +3,31 @@
 import { describe, expect, it } from 'vitest';
 import { conferirRequisitos, REQUISITOS } from './requisitos-da-peca-de-prova.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import * as bicicleta from '../../prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js';
+import * as prova from './acervo/peca-de-prova/receita.js';
 
-const receita = bicicleta.default ?? bicicleta;
+const receita = prova.default ?? prova;
 const malha = () => executarReceita(receita).neutro;
 
 describe('requisitos da peça de prova', () => {
-  /* A BICICLETA É O CALIBRADOR, e não o alvo. Ela é a peça contra a qual as
-     guardas foram escritas, então uma régua que a reprova está medindo um ideal
-     e não o que as guardas precisam. Quando a peça de prova existir e as guardas
-     forem movidas, esta aferição sai junto com a bicicleta. */
-  it('a peça contra a qual as guardas foram escritas passa na régua', () => {
+  /* O SUJEITO DA RÉGUA É A PRÓPRIA FIXTURE. Antes era a bicicleta, a peça de
+     acervo contra a qual as guardas tinham sido escritas, e a régua servia para
+     aferir que ela não pedia mais do que aquela peça oferecia. A bicicleta saiu
+     do repositório e as guardas passaram a rodar sobre esta peça, então é esta
+     que precisa passar: régua que reprova a fixture que ela governa deixa toda
+     a bateria de navegador sem objeto. */
+  it('a peça que as guardas exercitam passa na régua', () => {
     const veredito = conferirRequisitos(malha(), { referenciasDeclaradas: 1 });
     expect(veredito.faltas).toEqual([]);
     expect(veredito.ok).toBe(true);
   });
 
-  /* Os números medidos aqui são os MESMOS que as guardas imprimem: a guarda de
-     edição diz "L pega a ilha inteira — 266 selecionado(s)" e a de junta diz "6
-     punhos". Bater é o que prova que a régua mede a condição certa, e não uma
-     grandeza parecida. */
+  /* Os números medidos aqui são os MESMOS que as guardas imprimem quando rodam
+     sobre esta peça. Bater é o que prova que a régua mede a condição certa, e
+     não uma grandeza parecida. */
   it('a ilha e as juntas medidas são as que as guardas relatam', () => {
     const { medido } = conferirRequisitos(malha(), { referenciasDeclaradas: 1 });
-    expect(medido.maiorIlha).toBe(266);
-    expect(medido.juntas).toBe(6);
+    expect(medido.maiorIlha).toBe(38);
+    expect(medido.juntas).toBe(3);
   });
 
   it('peça sem referência declarada reprova, porque a guarda de referência fica sem objeto', () => {
@@ -45,12 +46,12 @@ describe('requisitos da peça de prova', () => {
 
   it('peça sem parte vizinha reprova por falta de junta', () => {
     const neutro = malha();
-    const F = new Map([...neutro.F].filter(([, f]) => f.parte === 'tuboSuperior'
-      || f.parte === 'balancoSuperiorEsq' || f.parte === 'tuboSelim'));
+    const F = new Map([...neutro.F].filter(([, f]) => f.parte === 'tuboEsquerdo'
+      || f.parte === 'tuboDireito'));
     /* Afastar uma das partes para longe desfaz o encontro sem mudar a contagem. */
     const V = new Map([...neutro.V].map(([id, p]) => [id, [...p]]));
     for (const [, f] of F) {
-      if (f.parte !== 'tuboSuperior') continue;
+      if (f.parte !== 'tuboEsquerdo') continue;
       for (const v of f.vs) V.get(v)[0] += 5;
     }
     const veredito = conferirRequisitos({ ...neutro, V, F }, { referenciasDeclaradas: 1 });

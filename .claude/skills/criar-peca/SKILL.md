@@ -122,13 +122,12 @@ e limites da operação, e é essa a fonte.
 Abrir uma receita do acervo continua útil para VER uma operação em uso, e aí a
 escolha é pela forma, não pelo tema:
 
-O acervo publicado hoje tem uma receita, o quadro da bicicleta em
-`prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js`, onde ver tubo de
-seção que muda ao longo do comprimento e tubo descrito pelas duas bordas
-medidas em vez de eixo mais seção. A única fixture é
-`tools/fixtures/acervo/peca-de-prova/`, que existe para as guardas de navegador
-terem o que abrir, com requisitos declarados em
-`tools/fixtures/requisitos-da-peca-de-prova.js`.
+O acervo publicado hoje não tem receita nenhuma, estado declarado em
+`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. A receita executável que
+resta é `tools/fixtures/acervo/peca-de-prova/`, que existe para as guardas de
+navegador terem o que abrir, com requisitos declarados em
+`tools/fixtures/requisitos-da-peca-de-prova.js`. Ela é peça de ferramenta e não
+exemplo de forma: para ver uma operação em uso, leia o catálogo.
 
 Rode
 `npm run descrever` nela antes de copiar qualquer ideia: o que reprovar ali não

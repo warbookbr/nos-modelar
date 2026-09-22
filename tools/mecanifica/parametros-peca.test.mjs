@@ -220,22 +220,19 @@ describe('acervo real', () => {
     expect(Buffer.byteLength(r.stdout)).toBeLessThan(2_000);
   }, 30_000);
 
-  it('trava o retrato do acervo depois da remoção das cinco receitas de ensaio', async () => {
+  it('trava o retrato do que o repositório tem de receita executável', async () => {
     /* `cadeira-de-madeira`, `chapa-de-fixacao` e as três prensas eram acervo
        publicado que o commit `33fde6a6` moveu para `tools/fixtures/acervo/`
        em vez de apagar; de lá a bancada publicada passou a listá-las como
-       acervo real. A remoção delas devolve este retrato ao que sobrou de
-       receita executável no repositório — `bicicleta-quadro` e a fixture das
-       guardas `peca-de-prova` —, medido de novo a cada mudança do acervo, e não
-       copiado do número que a suíte tinha antes dela. O braço robótico entrou e
-       saiu daqui no mesmo dia: este retrato é o preço de travar o estado do
+       acervo real. Depois disso saíram o braço robótico e a bicicleta, e o
+       acervo ficou sem peça: o que resta de receita executável é a fixture das
+       guardas, `peca-de-prova`. Este retrato é o preço de travar o estado do
        acervo, e ele se paga quando uma peça some sem ninguém perceber. */
     const r = await parametrosReutilizavel({ acervo: true });
     expect(r.ok).toBe(true);
-    expect(r.resultado.totais).toEqual({ declarados: 36, vivos: 26, inertes: 10 });
+    expect(r.resultado.totais).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
 
     const porAlvo = Object.fromEntries(r.resultado.registros.map((x) => [x.alvo, x.totais]));
-    expect(porAlvo['bicicleta-quadro']).toEqual({ declarados: 29, vivos: 19, inertes: 10 });
     /* A PEÇA DE PROVA É O ALVO NOMEADO, e não conteúdo do acervo: os sete
        números dela existem para atender requisito de guarda, e cada um move
        geometria, então os sete são vivos e nenhum é inerte. */

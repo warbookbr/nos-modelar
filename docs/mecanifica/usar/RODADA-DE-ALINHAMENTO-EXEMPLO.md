@@ -3,7 +3,13 @@
 Este documento é um caso, não uma regra. As regras moram na skill
 `alinhar-modelagem`; aqui está uma rodada inteira respondida, para quem nunca
 conduziu uma saber o que sai dela. A peça escolhida é o quadro de bicicleta
-porque ela existe inteira, com plano, contatos declarados e medidas verdes.
+porque a rodada dela foi conduzida inteira, com plano, contatos declarados e
+medidas verdes.
+
+A peça e as imagens citadas aqui saíram do repositório em 2026-09-22, porque a
+modelagem dela parou pela metade e não vai ser retomada. O que este documento
+mostra são as respostas de uma rodada real, e elas continuam servindo de modelo;
+os caminhos de arquivo não resolvem mais.
 
 A bicicleta completa NÃO existe no acervo. O quadro é o módulo 1 de 5, e rodas,
 garfo, guidão e transmissão são peças próprias que ainda não foram modeladas.

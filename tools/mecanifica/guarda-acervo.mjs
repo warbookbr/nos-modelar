@@ -89,6 +89,20 @@ export function emArquivoSolto(peca, { raiz = REPO } = {}) {
   }
 }
 
+/* ACERVO SEM PEÇA PRECISA SER DECLARADO. A guarda saía com código 1 quando não
+   achava peça nenhuma, porque acervo vazio e listagem quebrada produzem a mesma
+   varredura vazia, e passar calada no segundo caso é gate que aprova sem medir.
+   Só que o repositório fica legitimamente sem peça entre uma modelagem e a
+   seguinte: todas as peças de acervo já foram apagadas de propósito quando
+   deixaram de provar alguma coisa. Inferir qual dos dois casos é o de hoje não
+   dá; por isso quem esvazia o acervo escreve este arquivo, e quem põe peça nova
+   apaga. Sem ele, varredura vazia continua reprovando. */
+export const DECLARACAO_DE_VAZIO = 'ACERVO-SEM-PECA.md';
+
+export function vazioDeclarado({ raiz = ACERVO } = {}) {
+  return existsSync(join(raiz, DECLARACAO_DE_VAZIO));
+}
+
 export async function conferirAcervo(pecas = pecasDoAcervo()) {
   const reprovadas = [];
   for (const peca of pecas) {
@@ -131,7 +145,20 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
 if (process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
   const { pecas, reprovadas } = await conferirAcervo();
   if (pecas.length === 0) {
-    console.error('guarda:acervo — o acervo está vazio; nada foi medido.');
+    if (!vazioDeclarado()) {
+      console.error(`guarda:acervo — o acervo está vazio e nada foi medido.\n`
+        + `  Se ficar sem peça é o estado pretendido, declare em '${DECLARACAO_DE_VAZIO}'\n`
+        + '  dentro da pasta do acervo, dizendo por que e o que entra a seguir.\n'
+        + '  Sem essa declaração, listagem quebrada e acervo vazio são a mesma varredura.');
+      process.exit(1);
+    }
+    console.log(`guarda:acervo ok — acervo sem peça, declarado em ${DECLARACAO_DE_VAZIO}.`);
+    process.exit(0);
+  }
+  if (vazioDeclarado()) {
+    console.error(`guarda:acervo — ${DECLARACAO_DE_VAZIO} diz que o acervo está vazio,`
+      + ` e há ${pecas.length} peça(s): ${pecas.join(', ')}.\n`
+      + '  Apague a declaração.');
     process.exit(1);
   }
   for (const { peca, motivo } of reprovadas) {

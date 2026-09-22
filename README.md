@@ -66,11 +66,10 @@ resto:
 
 ## Estado
 
-- **Plano ativo:** [nada depende da
-  bicicleta](docs/mecanifica/planos/2026-09-17-nada-depende-da-bicicleta.md).
-  Guardas de navegador e testes dependem hoje de propriedades que a peça de
-  acervo tem por acaso, e o plano move essa dependência para uma peça de prova
-  governada pelas ferramentas, em `tools/fixtures/`.
+- **Nenhum plano ativo.** O último fechou com a remoção da peça de acervo que as
+  guardas de navegador e os testes exercitavam, e o acervo ficou sem peça,
+  declarado em `prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. As
+  ferramentas se provam contra a peça de prova em `tools/fixtures/acervo/`.
 - O núcleo, as receitas, o visor compatível, a bancada e as ferramentas de
   medição e validação estão ativos e cobertos por gates.
 - Montagem persistida, contexto consultável em JSON, mapa canônico de
@@ -97,11 +96,13 @@ Tudo em `prototipos/procedural/v3/pecas/` é exemplo. Cada peça existe para exe
 provar uma capacidade do núcleo, e nada mais. Nenhuma é referência de
 engenharia, componente aprovado ou ponto de partida de produto.
 
-Os nomes enganam de propósito pouco: `bicicleta-quadro` soa definitivo, e não
-é. Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
-falhar, e não para descrever um componente real. O acervo já teve cinquenta
-peças com nomes assim — `roda-dianteira`, `freio-disco`, `moto` — e todas foram
-apagadas quando deixaram de provar alguma coisa.
+Os nomes enganam de propósito pouco: um nome como `roda-dianteira` soa
+definitivo, e não é. Medidas e proporções são escolhidas para fazer uma
+capacidade passar ou falhar, e não para descrever um componente real. O acervo
+já teve cinquenta peças com nomes assim, e todas foram apagadas quando deixaram
+de provar alguma coisa. Hoje ele está sem peça, declarado em
+`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`, e as ferramentas se provam
+contra a peça de prova em `tools/fixtures/acervo/`.
 
 O que este repositório sustenta é **o núcleo e as capacidades provadas**. A
 geometria das peças pode mudar ou ser removida a qualquer momento, sem aviso e
@@ -142,7 +143,7 @@ npm ci
 npm run dev
 npm run build
 npm test
-npm run criar -- bicicleta-quadro
+npm run criar -- <nome-da-peca>
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 

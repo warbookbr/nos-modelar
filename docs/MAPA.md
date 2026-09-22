@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-860 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+858 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -466,7 +466,6 @@
 - `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
-- `2026-09-17-nada-depende-da-bicicleta.md` — Nada depende da bicicleta
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -564,6 +563,7 @@
 - `2026-09-14-ajuste-da-bancada-volta-como-receita.md` — Ajuste da bancada volta como receita — o caminho de volta existe
 - `2026-09-15-modo-de-edicao-de-malha.md` — Modo de edição de malha — vértice, aresta e face
 - `2026-09-16-topologia-e-leitura-do-gesto.md` — Topologia, mover a peça, e ler o gesto
+- `2026-09-17-nada-depende-da-bicicleta.md` — Nada depende da bicicleta
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 
@@ -579,10 +579,6 @@
 
 - `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
 - `README.md` — Referências de forma
-
-## docs/mecanifica/referencias/bicicleta-29/
-
-- `README.md` — Bicicleta 29": vistas de referência, uma por arquivo
 
 ## docs/mecanifica/usar/
 
@@ -708,9 +704,9 @@
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 
-## prototipos/procedural/v3/pecas/bicicleta-quadro/
+## prototipos/procedural/v3/pecas/
 
-- `receita.js` — bicicleta-quadro.js — quadro de MTB hardtail 29", tamanho M. Módulo 1 de 5.
+- `ACERVO-SEM-PECA.md` — O acervo está sem peça
 
 ## prototipos/procedural/v3/servicos/
 
@@ -1066,7 +1062,6 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
-- `prancha-bicicleta-29.mjs` — prancha-bicicleta-29.mjs — imprime a tabela e o derivado da bicicleta 29".
 - `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
 - `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…

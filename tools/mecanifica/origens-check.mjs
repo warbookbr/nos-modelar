@@ -17,12 +17,20 @@
  */
 import { pathToFileURL } from 'node:url';
 import { conferirOrigens } from '../../src/autoria/origem-de-parametro.js';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const problemas = [];
 let declarantes = 0;
 const pecas = pecasDoAcervo();
+
+/* Varredura vazia aprovava calada, dizendo "0 de 0 peça(s)", que é a mesma
+   frase para acervo sem peça e para listagem quebrada. */
+if (pecas.length === 0 && !vazioDeclarado()) {
+  console.error('origens:check FALHOU — o acervo está vazio e nada foi conferido.\n'
+    + `  Declare em '${DECLARACAO_DE_VAZIO}' se ficar sem peça é o estado pretendido.`);
+  process.exit(1);
+}
 
 for (const nome of pecas) {
   let receita;

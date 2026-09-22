@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
@@ -117,8 +117,13 @@ export async function conferirReferencial(pecas = pecasDoAcervo(ACERVO)) {
 if (process.argv[1] && process.argv[1].endsWith('guarda-referencial.mjs')) {
   const { pecas, reprovadas } = await conferirReferencial();
   if (pecas.length === 0) {
-    console.error('guarda:referencial — o acervo está vazio; nada foi conferido.');
-    process.exit(1);
+    if (!vazioDeclarado()) {
+      console.error('guarda:referencial — o acervo está vazio e nada foi conferido.\n'
+        + `  Declare em '${DECLARACAO_DE_VAZIO}' se ficar sem peça é o estado pretendido.`);
+      process.exit(1);
+    }
+    console.log(`guarda:referencial ok — acervo sem peça, declarado em ${DECLARACAO_DE_VAZIO}.`);
+    process.exit(0);
   }
   for (const { peca, motivo } of reprovadas) {
     console.error(`guarda:referencial — ${peca} REPROVOU\n${motivo}\n`);

@@ -55,8 +55,8 @@ export async function varrerReutilizavel({
   if (!alvo) {
     return erroDeUso(
       'diga qual receita varrer.'
-      + '\n  ex.: npm run varrer -- bicicleta-quadro --criterio=menor-folga'
-      + '\n       npm run varrer -- bicicleta-quadro --livres=entreEixos:1000..1200:5 --maximizar',
+      + '\n  ex.: npm run varrer -- <peca> --criterio=menor-folga'
+      + '\n       npm run varrer -- <peca> --livres=entreEixos:1000..1200:5 --maximizar',
     );
   }
   let caminho;

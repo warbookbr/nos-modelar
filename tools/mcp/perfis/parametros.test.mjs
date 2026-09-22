@@ -148,11 +148,10 @@ describe('porta MCP da varredura', () => {
 
     const todos = await chamar('diagnosticar_parametros', { acervo: true });
     /* O mesmo retrato travado em `parametros-peca.test.mjs`, medido de novo
-       depois que `cadeira-de-madeira`, `chapa-de-fixacao` e as três prensas —
-       que tinham voltado como fixture de ferramenta em vez de serem apagadas —
-       saíram do repositório. Os dois números têm de andar juntos, porque a
-       porta MCP e a CLI leem a mesma varredura. */
-    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 36, vivos: 26, inertes: 10 });
+       depois que o acervo ficou sem peça e a única receita executável que
+       sobrou passou a ser a fixture das guardas. Os dois números têm de andar
+       juntos, porque a porta MCP e a CLI leem a mesma varredura. */
+    expect(todos.estruturado.resultado.totais).toEqual({ declarados: 7, vivos: 7, inertes: 0 });
   }, 90_000);
 
   it('varre sensibilidade e devolve onde olhar', async () => {

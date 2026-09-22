@@ -19,8 +19,8 @@ npm run conferir:referencia -- <peça> --imagem=<png> --ancoras=<json>
 ```
 
 O arquivo de âncoras carrega os padrões, e bandeira na linha de comando vence o
-que está nele. Exemplo publicado:
-`docs/mecanifica/referencias/bicicleta-29/ancoras-lateral.json`.
+que está nele. Ele mora ao lado da imagem que descreve, dentro da pasta de
+referências da peça.
 
 ```json
 {

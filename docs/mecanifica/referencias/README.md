@@ -16,26 +16,21 @@ a prancha em mãos.
 
 ## A exceção escrita: imagem gerada entra, e não vale como dimensão
 
-`bicicleta-29-vistas-geradas.png` está versionada aqui, e a regra acima continua
-de pé. Ela não é prancha de terceiro: foi gerada por IA a pedido do dono do
-repositório, que autorizou a inclusão. Entra porque é o alvo de CARÁTER da
-rodada da bicicleta — que peças existem e que forma têm, o garfo com coroa e
-dois tubos, o guidão reto com manetes, a ponteira do triângulo traseiro.
+Imagem gerada por IA a pedido do dono do repositório pode ser versionada aqui, e
+a regra acima continua de pé, porque ela não é prancha de terceiro. Ela entra
+como alvo de CARÁTER de uma rodada de modelagem: que partes existem e que forma
+cada uma tem. Quando há mais de uma vista, cada uma fica em seu arquivo, para que
+a parte isolada na bancada tenha a vista correspondente sem procurar na folha.
 
-Ela está recortada em uma vista por arquivo em
-[`bicicleta-29/`](bicicleta-29/README.md), para que cada parte isolada na
-bancada tenha a sua vista correspondente sem procurar na folha.
+**Imagem gerada não vale como fonte dimensional.** Medir proporção nela é medir
+o que outro modelo inventou. A dimensão vem da `TABELA` medida da receita, e
+quando as duas divergirem, a tabela manda.
 
-**Ela não vale como fonte dimensional.** Medir proporção numa imagem gerada é
-medir o que outro modelo inventou. A dimensão da bicicleta vem da tabela em
-`tools/mecanifica/prancha-bicicleta-29.mjs`, e quando as duas divergirem, a
-tabela manda.
-
-Como ela chegou ao disco também vale registrar, porque custou uma conclusão
-errada: anexo de sessão vive em base64 dentro da transcrição do projeto, em
-`~/.claude/projects/**/**.jsonl`, e sai de lá por decodificação. Procurar por
-arquivo de imagem recente não acha nada e leva a concluir que a imagem não
-existe.
+Como uma imagem dessas chega ao disco também vale registrar, porque custou uma
+conclusão errada: anexo de sessão vive em base64 dentro da transcrição do
+projeto, em `~/.claude/projects/**/**.jsonl`, e sai de lá por decodificação.
+Procurar por arquivo de imagem recente não acha nada e leva a concluir que a
+imagem não existe.
 
 ## Como um derivado é produzido
 
@@ -66,9 +61,6 @@ Não conclua nada sobre caráter de superfície a partir da curvatura dela.
 - `fastback-1965-silhueta.json` — silhueta lateral, topo e base, de um cupê
   fastback de 1965. Calibrada por entre-eixos de 2743 mm; resíduo de −1,9% no
   comprimento e +1,8% na altura.
-- `bicicleta-29/` — a folha da bicicleta 29", em três resoluções da lateral
-  mais frontal, garfo, guidão e triângulo traseiro, com os arquivos de âncoras
-  que dão escala e origem a cada uma. É o único conjunto de imagem que o
-  repositório guarda hoje: o alvo visual da roda dianteira e as evidências
-  geradas pelos experimentos antigos foram apagados, e o que eles ensinaram
-  continua nos relatórios de texto.
+O repositório guarda hoje um conjunto derivado e nenhuma folha de peça: as
+imagens de alvo visual das peças já modeladas foram apagadas junto com elas, e o
+que cada rodada ensinou continua nos relatórios de texto.

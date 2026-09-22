@@ -6,12 +6,15 @@
  * bicicleta saiu com os balancos soltos no ar sem nada acusar. Declarar um
  * contato é prometer geometria; promessa não cumprida é defeito, não folga.
  */
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { descreverPecaReutilizavel } from './descrever-peca.mjs';
-import { conferirAcervo, emArquivoSolto, pecasDoAcervo } from './guarda-acervo.mjs';
+import {
+  conferirAcervo, DECLARACAO_DE_VAZIO, emArquivoSolto, pecasDoAcervo, vazioDeclarado,
+} from './guarda-acervo.mjs';
 
 const MOTIVO = 'as duas metades são soldadas uma na outra';
 const ACERVO = resolve(fileURLToPath(new URL('../..', import.meta.url)), 'prototipos/procedural/v3/pecas');
@@ -157,11 +160,30 @@ describe('veredito de contato do acervo', () => {
   });
 
   it('a guarda varre o acervo e o acervo de hoje passa', async () => {
-    const pecas = pecasDoAcervo();
-    /* O acervo não pode estar vazio, e a guarda sai com código 1 quando está.
-       Quantas peças e quais é assunto do acervo, não deste teste. */
-    expect(pecas.length).toBeGreaterThan(0);
-    const { reprovadas } = await conferirAcervo(pecas);
+    /* Quantas peças e quais é assunto do acervo, não deste teste: com peça ou
+       sem, o que ele afirma é que nada do que está lá reprova. */
+    const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
+  });
+
+  /* ACERVO VAZIO PRECISA SER DECLARADO. Varredura vazia sai igual quando o
+     acervo está sem peça de propósito e quando a listagem quebrou, e aprovar
+     calada no segundo caso é gate que passa sem medir. Quem esvazia declara;
+     quem põe peça nova apaga a declaração, senão ela mente em silêncio. */
+  it('recusa acervo vazio sem declaração e aceita com ela', () => {
+    const declaracao = join(ACERVO, DECLARACAO_DE_VAZIO);
+    const tinha = existsSync(declaracao);
+    const vazio = mkdtempSync(join(tmpdir(), 'acervo-vazio-'));
+    try {
+      expect(pecasDoAcervo(vazio)).toEqual([]);
+      expect(vazioDeclarado({ raiz: vazio })).toBe(false);
+      writeFileSync(join(vazio, DECLARACAO_DE_VAZIO), 'sem peça\n', 'utf8');
+      expect(vazioDeclarado({ raiz: vazio })).toBe(true);
+    } finally {
+      rmSync(vazio, { recursive: true, force: true });
+    }
+    /* O acervo de verdade: ou tem peça e não declara vazio, ou está sem peça e
+       declara. Os dois ao mesmo tempo é a declaração mentindo. */
+    expect(tinha).toBe(pecasDoAcervo().length === 0);
   });
 });

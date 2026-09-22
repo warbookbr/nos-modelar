@@ -1,6 +1,6 @@
 # Nada depende da bicicleta
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -9,13 +9,10 @@
 ## Problema observado
 
 O acervo tem uma peça, `bicicleta-quadro`, com 518 linhas, e as ferramentas
-foram provadas contra ela. Vinte e seis arquivos a citam. O código de produção
-não depende dela — `olhar-bancada.mjs`, `material-da-peca.mjs`,
-`ativar-bancada.mjs` e `acervo-receitas.js` só a mencionam como exemplo em texto
-de ajuda e comentário. Quem depende são as cinco guardas de navegador, cada uma
-com `const PECA = 'bicicleta-quadro'` no topo, e cerca de quinze testes que
-importam a receita; `alvo-do-ajuste.test.js` a cita doze vezes. Três guardas vão
-além do nome da peça e pedem a parte `tuboSelim`.
+foram provadas contra ela. Vinte e seis arquivos a citam, e o código de produção
+não é um deles: quem depende são as cinco guardas de navegador, cada uma com
+`const PECA = 'bicicleta-quadro'` no topo, e cerca de quinze testes que importam
+a receita. Três guardas vão além do nome e pedem a parte `tuboSelim`.
 
 O defeito não é depender de uma receita. É depender de propriedades que essa
 receita tem por acaso. A `guarda:edicao` precisa de peça com várias partes, com
@@ -26,11 +23,9 @@ peça tem vértices que se sobrepõem na tela, senão a prova não vale". Mudar 
 `TABELA` da bicicleta hoje ou quebra a bateria de gates, ou a deixa verde
 provando menos do que o texto promete.
 
-O padrão certo já existe e não foi usado: `tools/fixtures/acervo/` guarda
-`cadeira-de-madeira.js` e `chapa-de-fixacao.js`. Ferramenta se prova contra
-fixture que ela governa; conteúdo do acervo é o que o produto entrega. As
-guardas escritas nesta linha de trabalho, inclusive `guarda:gesto` e
-`guarda:edicao`, foram direto no conteúdo.
+O padrão certo já existe em `tools/fixtures/acervo/` e não foi usado: ferramenta
+se prova contra fixture que ela governa, e conteúdo do acervo é o que o produto
+entrega. As guardas desta linha de trabalho foram direto no conteúdo.
 
 ## Resultado
 
@@ -41,9 +36,9 @@ remoção: enquanto ela estiver lá, ninguém sabe quem dependia dela.
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova aqui. O que muda é de que objeto a prova
-depende, e isso baixa o custo de toda rodada futura: hoje qualquer mudança de
-conteúdo arrisca a bateria de gates, e qualquer mudança de gate arrisca o
-conteúdo. Adiar tem custo crescente, porque cada guarda nova nasce acoplada.
+depende, e isso baixa o custo de toda rodada futura: hoje mudança de conteúdo
+arrisca a bateria de gates e mudança de gate arrisca o conteúdo. Adiar tem custo
+crescente, porque cada guarda nova nasce acoplada.
 
 ## Incluído
 
@@ -126,31 +121,26 @@ ilha de 38 e três juntas. Cada linha da `TABELA` declara em `ORIGENS` para que
 requisito de guarda ela existe, e o teste ao lado prova que reduzir os lados do
 tubo derruba a régua — a peça não passa por sorte.
 
-Ela mora com as outras receitas de ensaio, fora do acervo publicado, porque o
-resolvedor da CLI já buscava ali pelo motivo escrito lá: essas receitas dão
-assunto estável aos testes e ficam de fora para que trabalho de peça não mexa no
-que a suíte mede. `guarda:acervo` não a varre.
+Ela mora com as outras receitas de ensaio, fora do acervo publicado, pelo motivo
+escrito lá: essas receitas dão assunto estável aos testes e ficam de fora para
+que trabalho de peça não mexa no que a suíte mede.
 
 Faltavam dois caminhos para a bancada conseguir abri-la, e os dois foram
 abertos com a mesma regra: `acervo-receitas.js` ganhou `listarParaBancada`, que
 junta acervo e ensaio marcando qual é qual, e `imagens-da-peca.js` passou a
 indexar as duas raízes. A separação entre as duas listas não é enfeite: juntar
-ensaio dentro de `listarAcervo` fez a varredura de parâmetros saltar de 96
-declarados para 102 contando requisito de fixture como parâmetro de peça, e foi
-o teste que trava esse retrato que acusou.
-
-O retrato subiu mesmo assim, de 96/32 para 102/38, e está certo: a varredura lê
-`PASTAS_BUSCA` e sempre mediu as fixtures. Os seis números novos são a `TABELA`
-da peça de prova, e os seis são vivos, porque cada um move geometria — que é o
-requisito de guarda que ele existe para atender.
+ensaio dentro de `listarAcervo` fez a varredura de parâmetros contar requisito
+de fixture como parâmetro de peça, e foi o teste que trava esse retrato que
+acusou. O retrato subiu de 96/32 para 102/38 mesmo assim, e está certo: a
+varredura lê `PASTAS_BUSCA` e sempre mediu as fixtures. Os seis números novos
+são a `TABELA` da peça de prova, e os seis são vivos, porque cada um move
+geometria — que é o requisito de guarda que ele existe para atender.
 
 Abrir a peça nova achou um defeito que a bicicleta escondia. O rodapé com o
 botão de salvar tem `display: flex` na classe, e isso vence o atributo `hidden`:
 esconder o rodapé por JavaScript nunca funcionou, e ele aparecia em peça
-recém-aberta, sem nada para salvar. Medido nas duas peças, o atributo dizia
-escondido enquanto a tela mostrava. Uma regra mais específica corrige, e agora o
-rodapé some com a malha intocada e sobe com "malha editada" depois do primeiro
-gesto.
+recém-aberta, sem nada para salvar. Uma regra mais específica corrige, e agora
+ele some com a malha intocada e sobe depois do primeiro gesto.
 
 ## Feito na fatia 3 — as guardas migradas
 
@@ -161,12 +151,12 @@ O clique da guarda caía num vértice a zero pixel de distância e nada era
 selecionado: o ponto estava atrás do rodapé do salvar, que fica sobre o canvas.
 A leitura de pontos passou a perguntar `elementFromPoint` quem está por cima e a
 descartar o que não é a cena, o que torna honestas todas as afirmações por
-clique, e não só esta.
+clique.
 
-A afirmação do movimento por `G` media o topo da caixa da cena inteira. Caixa só
-se mexe quando o que andou está na borda, então mover uma parte interior subia
-zero e reprovava um movimento que tinha acontecido; na bicicleta ela passava
-porque a seleção calhava de ficar no alto. Passou a medir o centro da seleção.
+A afirmação do movimento por `G` media o topo da caixa da cena inteira, que só
+se mexe quando o que andou está na borda: mover uma parte interior subia zero e
+reprovava um movimento que tinha acontecido, e na bicicleta ela passava porque a
+seleção calhava de ficar no alto. Passou a medir o centro da seleção.
 
 A imagem de referência de 1,2 KB era embutida como data URI pelo empacotador, e
 a afirmação de que o arquivo é SERVIDO pelo pacote nunca acontecia. A imagem
@@ -175,8 +165,8 @@ passou dos 100 KB, e a requisição voltou a existir.
 A quarta é dimensionamento. A 400 mm o estúdio ampliava a peça e o avanço de 0,2
 movia a seleção 1,16 na cena, para fora do quadro; com um metro a escala fica
 perto de um. E com tubo de 45 mm de raio o mesmo canto rendia três juntas, porque
-`detectarJuntas` declara raio de 20 mm para solda de tubo de quadro. O raio
-voltou para 22 mm, dentro do contrato da função.
+`detectarJuntas` declara raio de 20 mm para solda de tubo; o raio voltou para
+22 mm, dentro do contrato da função.
 
 ## Riscos e parada
 
@@ -190,10 +180,21 @@ guarda em questão está medindo algo que só existe naquele conteúdo, e a saí
 decidir se ela vira teste de unidade ou se deixa de existir — e não manter a
 bicicleta por causa dela.
 
-A moto é peça de acervo de verdade, com forma a julgar, então ela pode consumir
-rodadas de modelagem sem relação com este plano. Se isso ameaçar o plano, a moto
-vira plano próprio e este fecha com a peça de prova e o desacoplamento feitos.
-
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-22.** A bicicleta saiu com a receita, as referências dela,
+a folha de vistas e `prancha-bicicleta-29.mjs`, que existia só para ela. As
+guardas e os testes já se provavam contra a peça de prova desde a fatia 3; a
+remoção acusou oito arquivos que ainda dependiam do conteúdo, e todos passaram a
+ler o acervo em vez de nomear peça.
+
+A moto da fatia 4 não entrou: foi apagada antes, e o braço que veio depois foi
+apagado de propósito. O acervo ficou sem peça, estado que a seção de riscos dava
+por impossível, e isso mudou a decisão sobre varredura vazia: acervo sem peça e
+listagem quebrada produzem a mesma varredura, e aprovar calada no segundo caso é
+gate que passa sem medir. Agora os dois se distinguem por declaração.
+`ACERVO-SEM-PECA.md` na pasta do acervo diz que ficar sem peça é o pretendido, e
+a guarda reprova tanto a varredura vazia sem declaração quanto a declaração com
+peça, para que ela não sobreviva à própria validade. `guarda:referencial` e
+`origens:check` leem a mesma declaração; o segundo aprovava calado. O gate de
+saída 5 cai com a moto, e os outros quatro estão cumpridos.

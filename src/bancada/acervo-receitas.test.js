@@ -6,6 +6,7 @@
  * que é o nome pelo qual todo o resto do repositório a chama. */
 import { describe, expect, it, vi } from 'vitest';
 import { listarAcervo, listarParaBancada } from './acervo-receitas.js';
+import { pecasDoAcervo } from '../../tools/mecanifica/guarda-acervo.mjs';
 
 describe('acervo de receitas da bancada', () => {
   it('nomeia peça pelo arquivo, montagem pela pasta, e ordena', () => {
@@ -59,9 +60,12 @@ describe('acervo de receitas da bancada', () => {
 
   it('a bancada enxerga o acervo real e a peça de prova', async () => {
     const lista = listarParaBancada();
-    /* O acervo é conferido por contagem e não por nome: nomear uma peça aqui
-       faz a bancada depender de conteúdo, que é o que este trabalho desfaz. */
-    expect(lista.filter((e) => !e.ensaio).length).toBeGreaterThan(0);
+    /* O acervo é conferido por CONTAGEM CONTRA A PASTA, e não por nome nem por
+       piso: nomear uma peça faz a bancada depender de conteúdo, e exigir pelo
+       menos uma faz este caso morrer no dia em que o acervo fica legitimamente
+       sem peça. O que ele afirma é que a bancada mostra o acervo inteiro e nem
+       uma peça a mais. */
+    expect(lista.filter((e) => !e.ensaio).length).toBe(pecasDoAcervo().length);
     expect(lista.map((e) => e.id)).toContain('peca-de-prova');
     const prova = await lista.find((e) => e.id === 'peca-de-prova').carregar();
     expect(Array.isArray(prova.PASSOS)).toBe(true);

@@ -12,6 +12,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { iniciarRegistro } from './diario.mjs';
+import { pecasDoAcervo } from './guarda-acervo.mjs';
 import { resumir } from './ler-diario.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -43,8 +44,8 @@ function rodar(args, env) {
 
 describe('diário da oficina', () => {
   it('ligado e desligado produzem exatamente a mesma saída e o mesmo código', () => {
-    const ligado = rodar(['bicicleta-quadro', '--estrito'], { MECANIFICA_DIARIO: '1' });
-    const desligado = rodar(['bicicleta-quadro', '--estrito'], { MECANIFICA_DIARIO: '0' });
+    const ligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MECANIFICA_DIARIO: '1' });
+    const desligado = rodar(['tools/fixtures/acervo/peca-de-prova/receita.js', '--estrito'], { MECANIFICA_DIARIO: '0' });
     expect(desligado.saida).toBe(ligado.saida);
     expect(desligado.codigo).toBe(ligado.codigo);
   });
@@ -59,12 +60,12 @@ describe('diário da oficina', () => {
   it('falha ao gravar não derruba quem está sendo medido', () => {
     /* Caminho impossível: o diário tenta, falha e engole. Se ele lançasse, a
        ferramenta morreria por causa do observador. */
-    const fechar = iniciarRegistro('teste', 'bicicleta-quadro', { destino: DIARIO });
+    const fechar = iniciarRegistro('teste', 'tools/fixtures/acervo/peca-de-prova/receita.js', { destino: DIARIO });
     expect(() => fechar({ codigo: 0, prometeu: ['\0invalido'] })).not.toThrow();
   });
 
   it('separa o que foi PROMETIDO do que está no disco', () => {
-    const fechar = iniciarRegistro('promessa', 'bicicleta-quadro', { destino: DIARIO });
+    const fechar = iniciarRegistro('promessa', 'tools/fixtures/acervo/peca-de-prova/receita.js', { destino: DIARIO });
     fechar({ codigo: 0, prometeu: ['package.json', 'tools/bancadas/out/nunca-existiu.png'] });
     /* Filtra pelo comando em vez de pegar a última linha: o mesmo arquivo recebe
        linhas dos subprocessos, e depender da ordem faria este teste falhar por
@@ -75,11 +76,17 @@ describe('diário da oficina', () => {
     expect(linha.cumpriu).toBe(false);
   });
 
-  it('nome curto e caminho completo caem na MESMA rodada', () => {
+  /* O par curto/longo só existe contra o ACERVO: o nome curto é o resolvedor
+     procurando em `prototipos/procedural/v3/{pecas,maquinas}/`, e a fixture mora
+     fora dessas pastas. A peça é lida e não nomeada; com o acervo sem peça — o
+     que `guarda:acervo` só aceita declarado — não há nome curto para equiparar,
+     e o caso volta sozinho com a próxima peça. */
+  const [PECA_DO_ACERVO] = pecasDoAcervo();
+  it.skipIf(!PECA_DO_ACERVO)('nome curto e caminho completo caem na MESMA rodada', () => {
     /* Sem isto, o mesmo trabalho apareceria como dois alvos distintos e a
        contagem de repetição — o sinal de "emperrou" — nunca acusaria nada. */
-    iniciarRegistro('rodada-curta', 'bicicleta-quadro', { destino: DIARIO })({ codigo: 0 });
-    iniciarRegistro('rodada-longa', 'prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js', { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-curta', PECA_DO_ACERVO, { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-longa', `prototipos/procedural/v3/pecas/${PECA_DO_ACERVO}/receita.js`, { destino: DIARIO })({ codigo: 0 });
     const curta = linhasDoDiario().findLast((l) => l.comando === 'rodada-curta');
     const longa = linhasDoDiario().findLast((l) => l.comando === 'rodada-longa');
     expect(longa.alvo).toBe(curta.alvo);

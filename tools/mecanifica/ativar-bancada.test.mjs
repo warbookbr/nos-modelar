@@ -14,6 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { pecasDoAcervo } from './guarda-acervo.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
@@ -138,13 +139,20 @@ describe('ativar-bancada: grito do motor é recusa', () => {
      `prototipos/procedural/v3/{pecas,maquinas}/`. Uma fixture temporária mora
      fora dessas pastas de propósito — usá-la aqui provaria o resolvedor com a
      pasta errada. Por isso o caso do nome curto usa peça real, e o caso do
-     caminho, logo abaixo, usa a fixture. */
-  it('aceita argumento posicional com nome curto de peça do acervo', () => {
-    const proc = execFileSync('node', [ATIVAR, 'bicicleta-quadro', `--raiz-sessao=${AREA_SESSAO}`], {
+     caminho, logo abaixo, usa a fixture.
+
+     A peça é LIDA do acervo, e não escrita aqui: escrever no acervo durante o
+     teste é o que o comentário do topo recusa, e nomear uma peça faz este caso
+     morrer junto com ela. Quando o acervo está sem peça — estado que
+     `guarda:acervo` só aceita declarado —, não existe nome curto para resolver
+     e o caso não tem sujeito; ele volta sozinho com a próxima peça. */
+  const [PECA_DO_ACERVO] = pecasDoAcervo();
+  it.skipIf(!PECA_DO_ACERVO)('aceita argumento posicional com nome curto de peça do acervo', () => {
+    const proc = execFileSync('node', [ATIVAR, PECA_DO_ACERVO, `--raiz-sessao=${AREA_SESSAO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
-    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain('bicicleta-quadro');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain(PECA_DO_ACERVO);
   });
 
   it('aceita argumento posicional com caminho relativo à raiz', () => {

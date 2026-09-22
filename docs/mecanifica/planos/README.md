@@ -2,16 +2,12 @@
 
 ## Estado
 
-**Plano ativo:** [Nada depende da bicicleta](2026-09-17-nada-depende-da-bicicleta.md).
+**Plano ativo:** nenhum.
 
-As cinco guardas de navegador e cerca de quinze testes dependem de
-`bicicleta-quadro`, e não do nome dela apenas: dependem de propriedades que essa
-receita tem por acaso, como vértices que se sobrepõem na tela e um anel de
-dezoito lados. Mudar a peça arrisca a bateria de gates. Este plano cria uma peça
-de prova governada pelas ferramentas, com essas propriedades declaradas, move
-guardas e testes para ela, traz a moto como segunda peça de acervo e apaga a
-bicicleta. A remoção é o gate: enquanto ela estiver lá, ninguém sabe quem
-dependia dela.
+[Nada depende da
+bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
+2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado em
+`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`.
 
 O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como

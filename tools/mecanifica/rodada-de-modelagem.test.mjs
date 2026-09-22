@@ -88,14 +88,16 @@ describe('registro de rodadas', () => {
     expect(() => pastaDeRodadas('../fora')).toThrow(/não é nome de peça/);
   });
 
-  it('a rodada mora DENTRO da pasta da peça quando a peça é uma pasta', () => {
+  /* A peça é lida do acervo e não nomeada; com o acervo sem peça — o que
+     `guarda:acervo` só aceita declarado — não há pasta de peça para apontar, e
+     o caso volta sozinho com a próxima peça. */
+  it.skipIf(pecasDoAcervo().length === 0)('a rodada mora DENTRO da pasta da peça quando a peça é uma pasta', () => {
     /* O registro fica ao lado da receita que ele julgou, e não numa árvore de
        documentação que quem abre a peça não vê. A peça usada é a que estiver no
        acervo, e não um nome escrito aqui: nome escrito faz o teste cair no
        caminho de fallback quando aquela peça sair, e aí ele afirma o contrário
        do que promete sem ninguém notar. */
     const [peca] = pecasDoAcervo();
-    expect(peca, 'o acervo está vazio').toBeDefined();
     expect(pastaDeRodadas(peca).replaceAll('\\', '/'))
       .toMatch(new RegExp(`prototipos/procedural/v3/pecas/${peca}/rodadas$`));
   });
