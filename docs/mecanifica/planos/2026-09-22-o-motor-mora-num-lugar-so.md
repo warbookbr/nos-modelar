@@ -63,6 +63,8 @@ verde em cada fatia, e não o julgamento de quem moveu.
 - tirar o núcleo de `prototipos/` e renomear a pasta `motor` para `nucleo`, na
   mesma fatia, porque as duas mudanças tocam exatamente os mesmos imports e
   separá-las custaria o dobro por nenhum ganho de revisão;
+- na mesma fatia, os nomes de arquivo que a fatia 2 deixou visíveis ao pôr tudo
+  lado a lado, listados em "Nomes a corrigir na fatia 4";
 - um gate que reprove teste do núcleo escrito fora da pasta dele, para a
   arrumação não desfazer sozinha na semana seguinte;
 - o mapa gerado (`npm run mapa`) e o INDEX atualizados a cada fatia.
@@ -117,30 +119,16 @@ mais barato e reversível para o mais caro.
 ## Medido na fatia 1 — quem prova o núcleo
 
 Dos 46 arquivos de teste em `tools/mecanifica` e `tools/oficina`, 24 importam
-somente de `prototipos/procedural/v3/`. Os outros 22 importam ferramenta junto e
-ficam até a fatia 3 decidir o que cada um é. Dois dos 24 não são de núcleo
-apesar do import: `conferir-juntas` e `exportar-peca` testam a ferramenta ao
-lado e usam o núcleo só para fabricar a malha de entrada.
+somente de `prototipos/procedural/v3/`; os outros 22 importam ferramenta junto e
+ficam até a fatia 3. Dois dos 24 não são de núcleo apesar do import:
+`conferir-juntas` e `exportar-peca` testam a ferramenta ao lado e usam o núcleo
+só para fabricar a malha de entrada.
 
 **A contagem automática de operações não serve para decidir o destino.** Medi
 quantas vezes cada teste cita cada operação e o resultado põe `encostar` em
 `primitivas-basicas`, porque ele constrói dezoito cubos para ter o que encostar.
-O que um teste prova é o assunto dele, não a operação que ele usa de andaime. O
-destino abaixo é por assunto, lido arquivo por arquivo.
-
-Oito têm nome igual ao de um arquivo do núcleo e foram para o lado dele:
-`referencia-posicional`, `artefatos-procedencia`, `composicoes-procedurais`,
-`expressoes`, `lacunas-capacidade`, `registro-operacoes`, `catalogo-capacidades`
-e `extensoes-nativas`.
-
-Sete provam uma operação e foram para o módulo que a define. Em
-`operacoes/estruturais.js`: `encostar`, `arranja-contrato`, `nome-de-copia`,
-`arredondar-aresta` e `furo-raio-por-grupo`. Em
-`operacoes/geradores-avancados.js`: `lathe-fechado` e `loft-fechado`.
-
-Sete atravessam operações ou guardam a linha de base, e ficaram na raiz do
-núcleo: `pose-de-criacao`, `ponto-nomeado`, `nomes-de-face`, `lados-por-desvio`,
-`concordancia-por-ponto`, `canon-linha-de-base` e `corpus-motor-r00`.
+O que um teste prova é o assunto dele, não a operação que usa de andaime. O
+destino foi lido arquivo por arquivo e hoje está no repositório.
 
 Cinco testes ficam em `operacoes/estruturais.js`, que já tem seis operações
 dentro. Se ler esse arquivo tiver ficado pior, a resposta é uma pasta por
@@ -149,14 +137,11 @@ já ao lado.
 
 ## Feito na fatia 2 — os testes ao lado do que provam
 
-Os 22 entraram na pasta do núcleo pelo destino da tabela acima. Foram junto o
-`corpus-motor-r00.mjs`, que é dado de linha de base e não ferramenta, e o
-arquivo de base que ele lê.
-
-O nome do teste ficou como estava, em vez de derivar do arquivo provado como a
-seção "Incluído" dizia: cinco provam `estruturais.js` e virariam cinco arquivos
-de mesmo nome. Achar a prova abrindo a pasta é o que o resultado pede, e a pasta
-já entrega isso.
+Os 22 entraram na pasta do núcleo, junto com `corpus-motor-r00.mjs`, que é dado
+de linha de base e não ferramenta, e o arquivo de base que ele lê. O nome do
+teste ficou como estava, em vez de derivar do arquivo provado como a seção
+"Incluído" dizia: cinco provam `estruturais.js` e virariam cinco arquivos de
+mesmo nome.
 
 Três coisas quebraram, e as três eram acoplamento que só a mudança revela.
 
@@ -174,6 +159,29 @@ ser independente de Three.js. Ficou em `tools/oficina/`, com os três apontando
 para lá; é dívida declarada e não resolvida aqui.
 
 E `docs:citacoes:check` acusou uma skill citando o caminho antigo de um teste.
+
+## Nomes a corrigir na fatia 4
+
+A fatia 2 pôs teste e módulo na mesma pasta, e isso revelou nome que antes
+passava. Entram junto com a reescrita de import, que é a mesma linha.
+
+`oficina.js` é a porta de entrada do núcleo e quase todo teste importa dele. A
+Oficina era a aplicação para pessoas, removida do repositório, e o acordo de
+trabalho registra a remoção: o nome aponta para o que não existe. Vira
+`entrada.js`.
+
+`canon-linha-de-base.test.ts` e `corpus-motor-r00.test.mjs` guardam os dois uma
+fotografia do resultado para acusar mudança. Uma usa "canon", anglicismo, e a
+outra "r00", número de rodada de um plano encerrado em agosto; dois nomes para a
+mesma função escondem que é a mesma função. Viram `linha-de-base-*.test.*`.
+
+Seis testes carregam sufixo que era necessário quando moravam longe do módulo e
+agora repete o vizinho: `artefatos-procedencia`, `catalogo-capacidades`,
+`composicoes-procedurais`, `lacunas-capacidade`, `registro-operacoes` e
+`extensoes-nativas`. O sufixo sai e fica o nome do módulo provado.
+
+`tex.js`, `geo.js` e `mat4.js` ficam: são abreviações que precisam de comentário
+no topo, mas são convenção de computação gráfica e trocar não se paga.
 
 ## Riscos e parada
 

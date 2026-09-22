@@ -38,6 +38,18 @@ function contarLinhas(texto) {
   return normal ? normal.split('\n').length : 0;
 }
 
+/* O TETO SUBIU DE 200 PARA 300 EM 2026-09-22. Um plano que vai sendo executado
+   carrega duas coisas: o que ele pretende e o que cada fatia achou. A segunda
+   cresce e é a parte que não se pode inventar depois, porque é medida. Com 200
+   linhas, três fatias seguidas de um plano só gastaram mais tempo cortando
+   frase do que executando, e o corte começou a sair de conteúdo em vez de
+   repetição — que é o mesmo defeito já registrado sobre `leitura:obrigatoria`:
+   teto por número não sabe distinguir o que importa do que sobra.
+
+   Continua havendo teto porque plano é para ser lido inteiro antes de começar,
+   e plano que ninguém lê não governa nada. */
+const TETO_DE_LINHAS = 300;
+
 export function conferirPlanos({
   pasta = join(RAIZ, 'docs/mecanifica/planos'),
   indice = join(pasta, 'README.md'),
@@ -50,7 +62,9 @@ export function conferirPlanos({
     const texto = readFileSync(caminho, 'utf8');
     const linhas = contarLinhas(texto);
     const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/mi)?.[1]?.toLowerCase();
-    if (linhas > 200) problemas.push(`${nome}: ${linhas} linhas; o limite é 200`);
+    if (linhas > TETO_DE_LINHAS) {
+      problemas.push(`${nome}: ${linhas} linhas; o limite é ${TETO_DE_LINHAS}`);
+    }
     if (!estado || !ESTADOS.has(estado)) problemas.push(`${nome}: estado ausente ou inválido`);
     if (!naRaiz && estado && ESTADOS_EM_JOGO.has(estado)) {
       problemas.push(

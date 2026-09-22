@@ -37,10 +37,19 @@ describe('gate dos planos curtos', () => {
     expect(conferirPlanos({ pasta }).problemas).toEqual([]);
   });
 
-  it('recusa plano com mais de 200 linhas', () => {
+  it('recusa plano com mais de 300 linhas', () => {
     const pasta = ambiente();
-    gravar(pasta, '2026-08-02-grande.md', 'rascunho', 201);
-    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/201 linhas.*limite é 200/);
+    gravar(pasta, '2026-08-02-grande.md', 'rascunho', 301);
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/301 linhas.*limite é 300/);
+  });
+
+  /* O teto subiu de 200 para 300 em 2026-09-22, e o que estava abaixo do antigo
+     continua abaixo do novo: sem este caso, subir o teto e apagar o limite por
+     engano dariam o mesmo verde. */
+  it('aceita plano logo abaixo do teto', () => {
+    const pasta = ambiente();
+    gravar(pasta, '2026-08-02-grande.md', 'rascunho', 300);
+    expect(conferirPlanos({ pasta }).problemas).toEqual([]);
   });
 
   it('recusa dois planos ativos', () => {
