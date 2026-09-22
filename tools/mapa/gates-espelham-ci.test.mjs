@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { GATES } from '../gates.mjs';
+import { DEPENDE_DE, GATES, RECURSOS_DO_GATE } from '../gates.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -53,6 +53,25 @@ describe('npm run gates espelha o CI', () => {
 
   it('o script existe e não está vazio', () => {
     expect(comandosDoGates().size).toBeGreaterThan(10);
+  });
+
+  /* AS DECLARAÇÕES DE CONCORRÊNCIA APONTAM PARA GATES QUE EXISTEM. Recurso
+     declarado para um nome que saiu da lista não trava nada, e a proteção some
+     calada: os gates voltam a rodar juntos e a falha aparece longe daqui. */
+  it('recurso e dependência só nomeiam gates da lista', () => {
+    const fora = [
+      ...Object.keys(RECURSOS_DO_GATE),
+      ...Object.keys(DEPENDE_DE),
+      ...Object.values(DEPENDE_DE),
+    ].filter((nome) => !GATES.includes(nome));
+    expect(fora, `nome fora da lista de gates: ${fora.join(', ')}`).toEqual([]);
+  });
+
+  it('nenhum gate depende de si mesmo nem de quem depende dele', () => {
+    for (const [gate, anterior] of Object.entries(DEPENDE_DE)) {
+      expect(gate, 'um gate não pode esperar por si mesmo').not.toBe(anterior);
+      expect(DEPENDE_DE[anterior], `${gate} e ${anterior} esperam um pelo outro`).not.toBe(gate);
+    }
   });
 
   it('o passo `gates` do package.json aponta para o runner', () => {
