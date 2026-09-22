@@ -178,9 +178,10 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Nenhum plano ativo. Rascunho aberto: [o que o braço robótico
-  achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo resto é tudo
-  código. Dois estão [congelados](planos/congelados/README.md):
+- Plano ativo: [o motor mora num lugar
+  só](planos/2026-09-22-o-motor-mora-num-lugar-so.md). Rascunho aberto: [o que o
+  braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
+  resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
   e MCP de edição, e o vocabulário poligonal da bancada.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
