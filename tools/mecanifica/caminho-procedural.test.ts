@@ -22,7 +22,7 @@ describe('raiz procedural neutra', () => {
       try {
         encontrados = execFileSync(
           'git',
-          ['grep', '-n', '-I', antigo, '--', 'src', 'tools', 'autoria-assistida', '.github', '.claude'],
+          ['grep', '-n', '-I', antigo, '--', 'src', 'tools', '.github', '.claude'],
           { cwd: REPO, encoding: 'utf8' },
         ).trim();
       } catch (erro: any) {

@@ -1,5 +1,6 @@
-/* Experimento confinado — anel que assenta no suporte e referencia a folga. */
-import { executar, colisaoDe } from '../../../../procedural/nucleo/entrada.js';
+/* anel-tampa.js — anel que assenta no suporte, do conjunto de prova descrito
+   em `eixo-guia.js`. */
+import { executar, colisaoDe } from '../../../procedural/nucleo/entrada.js';
 export const PARAMS = { raioInterno: 0.040, raioExterno: 0.070, inicio: 0.025, fim: 0.040 };
 export const TOPO = { lados: 24 };
 export const MATERIAIS = { aluminio: { cor: '#b38a61', aspereza: 0.5, metalness: 0.42 } };

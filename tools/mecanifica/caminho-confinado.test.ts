@@ -23,22 +23,22 @@ function lstatDe(entradas: Map<string, unknown>) {
 
 describe('confinamento de caminhos de artefato', () => {
   it('aceita ancestral novo sem tentar realpath do destino inexistente', () => {
-    const entradas = new Map([[RAIZ, diretorio()], [caminho('autoria-assistida'), diretorio()]]);
-    expect(() => verificarCaminhoConfinado(caminho('autoria-assistida', 'novo', 'relatorio.json'), {
+    const entradas = new Map([[RAIZ, diretorio()], [caminho('pasta-qualquer'), diretorio()]]);
+    expect(() => verificarCaminhoConfinado(caminho('pasta-qualquer', 'novo', 'relatorio.json'), {
       raiz: RAIZ, lstat: lstatDe(entradas),
     })).not.toThrow();
   });
 
   it('recusa link/junction em qualquer ancestral já existente', () => {
-    const entradas = new Map([[RAIZ, diretorio()], [caminho('autoria-assistida'), diretorio()], [caminho('autoria-assistida', 'saidas'), vinculo()]]);
-    expect(() => verificarCaminhoConfinado(caminho('autoria-assistida', 'saidas', 'foto.png'), {
+    const entradas = new Map([[RAIZ, diretorio()], [caminho('pasta-qualquer'), diretorio()], [caminho('pasta-qualquer', 'saidas'), vinculo()]]);
+    expect(() => verificarCaminhoConfinado(caminho('pasta-qualquer', 'saidas', 'foto.png'), {
       raiz: RAIZ, lstat: lstatDe(entradas),
     })).toThrow(ErroDeConfinamento);
   });
 
   it('recusa reparse point mesmo quando o runtime não o chama de symlink', () => {
-    const entradas = new Map([[RAIZ, diretorio()], [caminho('autoria-assistida'), reparse()]]);
-    expect(() => verificarCaminhoConfinado(caminho('autoria-assistida', 'relatorio.json'), {
+    const entradas = new Map([[RAIZ, diretorio()], [caminho('pasta-qualquer'), reparse()]]);
+    expect(() => verificarCaminhoConfinado(caminho('pasta-qualquer', 'relatorio.json'), {
       raiz: RAIZ, lstat: lstatDe(entradas),
     })).toThrow(/reparse point/);
   });

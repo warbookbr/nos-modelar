@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-858 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+859 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -180,13 +180,6 @@
 
 - `auditar-visual.mjs` — Captura duas vistas reais da fixture confinada, sem tocar na bancada publicada.
 - `executar-estudo.mjs` — Executor reproduzível da fixture, sem publicar receitas no catálogo.
-- `materializar-catalogo.mjs` — Materializa JSONs descartáveis para o catálogo MCP local do experimento.
-
-## autoria-assistida/rascunhos-defeituosos/autoria-geometrica-do-zero/receitas/
-
-- `anel-tampa.js` — Experimento confinado — anel que assenta no suporte e referencia a folga.
-- `eixo-guia.js` — Experimento confinado — eixo cujo comprimento provoca a falha direcional.
-- `suporte-de-eixo.js` — Experimento confinado — suporte com alojamento, piloto e assento anular.
 
 ## autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/
 
@@ -913,6 +906,13 @@
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
 
+## tools/fixtures/conjunto-do-eixo/
+
+- `anel-tampa.js` — anel-tampa.js — anel que assenta no suporte, do conjunto de prova descrito em `eixo-guia.js`.
+- `eixo-guia.js` — eixo-guia.js — a receita declarativa pequena que os testes de autoria usam. Ela tem o mínimo de que eles precisam: um cilindro, um comprimento dado por parâm…
+- `materializar-catalogo.mjs` — Materializa o conjunto do eixo como catálogo MCP descartável, na pasta passada como argumento. O destino é obrigatório: gravar dentro do repositório por omis…
+- `suporte-de-eixo.js` — suporte-de-eixo.js — suporte com alojamento, piloto e assento anular, do conjunto de prova descrito em `eixo-guia.js`.
+
 ## tools/mapa/
 
 - `citacoes.mjs` — citacoes.mjs — documento de leitura obrigatória não pode mandar abrir arquivo que não existe.
@@ -1179,3 +1179,7 @@
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
 - `plataforma-procedural-campo-r10.test.mjs` — Campo R10: três famílias, composição, extensão, montagem e duas vistas por alvo.
 - `sonda-supercarro-1-0.test.mjs` — Sonda de escala 1.0: sistema exterior ficcional, privado e recursivo.
+
+## tools/testes/
+
+- `nenhum-teste-desligado.test.mjs` — nenhum-teste-desligado.test.mjs — recusa teste desligado para sempre.

@@ -115,6 +115,27 @@ duas raízes são definidas uma vez em `formato-pacote.mjs`, e os dois testes qu
 montavam o caminho à mão passaram a importar `RAIZ_PACOTES`. Os pacotes não
 guardam caminho nenhum dentro deles, então a mudança não alterou o conteúdo.
 
+## Feito na fatia 2
+
+`eixo-guia.js` não era uma receita qualquer: os quatro testes precisam de uma
+receita declarativa com porta publicada e comprimento por parâmetro, e a peça
+de prova do acervo não tem esse formato. Por isso ela virou fixture, junto com
+as outras duas peças e a montagem do mesmo conjunto, em
+`tools/fixtures/conjunto-do-eixo/`. Nenhuma afirmação dos quatro mudou.
+`caminho-confinado` passou a usar `pasta-qualquer` e `caminho-procedural`
+deixou de procurar dentro da pasta.
+
+A leitura achou um décimo sétimo consumidor que a fatia 1 não viu, porque o
+caminho estava montado em pedaços. Um teste de `mcp.test.mjs` publicava esse
+conjunto pelo servidor e estava desligado com `it.skip` desde 2026-08-31, quando
+um commit apagou as duas definições de que ele dependia. Ele voltou a rodar e
+passa. O processo não teria pego: teste pulado não reprova. Agora
+`tools/testes/nenhum-teste-desligado.test.mjs` recusa `skip` e `todo` escritos
+direto, e aceita pular só com a condição escrita no código.
+
+Os scripts de experimento que ficaram na pasta e importavam essas receitas
+quebraram, e nenhum teste os executa. Saem na fatia 5.
+
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova. O que muda é de que objeto a prova

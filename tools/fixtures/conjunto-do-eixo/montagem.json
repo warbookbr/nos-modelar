@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.montagem",
   "versao": 3,
-  "id": "autoria-geometrica-do-zero",
+  "id": "conjunto-do-eixo",
   "instancias": [
     { "id": "suporte", "alvo": { "tipo": "peca", "ref": "suporte-de-eixo" } },
     { "id": "eixo", "alvo": { "tipo": "peca", "ref": "eixo-guia" } },

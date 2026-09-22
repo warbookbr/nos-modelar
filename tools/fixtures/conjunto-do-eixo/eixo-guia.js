@@ -1,5 +1,16 @@
-/* Experimento confinado — eixo cujo comprimento provoca a falha direcional. */
-import { executar, colisaoDe } from '../../../../procedural/nucleo/entrada.js';
+/* eixo-guia.js — a receita declarativa pequena que os testes de autoria
+   usam. Ela tem o mínimo de que eles precisam: um cilindro, um comprimento
+   dado por parâmetro, uma parte nomeada e uma porta publicada. Os testes de
+   publicação, revisão e revalidação mudam o comprimento e conferem o que
+   acontece com a porta.
+
+   Até 2026-09-22 ela morava em `autoria-assistida/`, como sobra de um
+   experimento, e quatro testes a importavam de lá. Mudar esta receita muda o
+   que eles provam: `autoria-receita`, `autoria-ativa`,
+   `estudo-campo-revalidacao` e o perfil MCP `autoria-receitas`. Com `suporte-de-eixo.js`, `anel-tampa.js`
+   e `montagem.json`, ela forma o conjunto que `mcp.test.mjs` publica pelo
+   servidor para provar a correção declarativa de ponta a ponta. */
+import { executar, colisaoDe } from '../../../procedural/nucleo/entrada.js';
 export const PARAMS = { raio: 0.019, inicio: -0.040, comprimento: 0.055, fim: 0.015 };
 export const TOPO = { lados: 24 };
 export const MATERIAIS = { aco: { cor: '#a3adb6', aspereza: 0.42, metalness: 0.76 } };

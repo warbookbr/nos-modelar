@@ -32,6 +32,7 @@ import {
   carregarCatalogoMontagens, VARIAVEL_CATALOGO_MCP_MONTAGENS,
 } from './catalogo-montagens.mjs';
 import { VARIAVEL_UNIVERSO_MCP_DEPENDENCIAS } from './universo-dependencias.mjs';
+import * as EIXO_AUTORIA from '../fixtures/conjunto-do-eixo/eixo-guia.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SERVIDOR = join(RAIZ, 'tools/mcp/servidor.mjs');
@@ -40,6 +41,19 @@ const CONFIGURACAO_UNIVERSO = join(RAIZ, 'tools/mcp/fixtures/universo-dependenci
 const CONFIGURACAO_CATALOGO_MAPA = join(RAIZ, 'tools/mcp/fixtures/catalogo-mapa-dependencias.json');
 const MONTAGEM_AUTORIA = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/montagens-persistidas/v3-separacao-direcional.json'), 'utf8'));
 const MONTAGEM_SISTEMA_A = JSON.parse(readFileSync(join(RAIZ, 'tools/mecanifica/fixtures/mapa-dependencias/montagens/sistema-a.json'), 'utf8'));
+/* O conjunto do eixo mora em `tools/fixtures/conjunto-do-eixo/`. Até
+   2026-09-22 ele ficava em `autoria-assistida/`, e o teste que o publica ficou
+   desligado com `it.skip` de 2026-08-31 a 2026-09-22 porque um commit apagou
+   estas duas definições e deixou o uso. `nenhum-teste-desligado.test.mjs`
+   passou a recusar esse desligamento. */
+const MATERIALIZAR_CATALOGO_AUTORIA = fileURLToPath(new URL('../fixtures/conjunto-do-eixo/materializar-catalogo.mjs', import.meta.url));
+const receitaEixo = (fim) => ({
+  formato: 'mecanifica.receita-declarativa', versao: 1, id: 'eixo-guia',
+  params: { ...EIXO_AUTORIA.PARAMS, fim, comprimento: fim - EIXO_AUTORIA.PARAMS.inicio },
+  topo: EIXO_AUTORIA.TOPO, passos: EIXO_AUTORIA.PASSOS,
+  materiais: EIXO_AUTORIA.MATERIAIS, aliases: EIXO_AUTORIA.ALIASES,
+  meta: { nome: 'eixo-guia', desc: 'eixo declarativo do conjunto de prova' },
+});
 const CATALOGO_MONTAGENS = carregarCatalogoMontagens(CONFIGURACAO_MONTAGENS);
 const tamanhosStructured = {};
 let configuracaoAnterior;
@@ -786,7 +800,7 @@ describe('servidor MCP local — perfil revisao', () => {
     }
   }, 180_000);
 
-  it.skip('consumidor MCP recusa eixo inválido e publica a correção declarativa', async () => {
+  it('consumidor MCP recusa eixo inválido e publica a correção declarativa', async () => {
     const temporario = mkdtempSync(join(tmpdir(), 'mecanifica-mcp-receita-r01-'));
     const catalogoLocal = join(temporario, 'catalogo');
     const repositorio = join(temporario, 'repositorio');
@@ -823,7 +837,7 @@ describe('servidor MCP local — perfil revisao', () => {
       expect(aplicada.structuredContent).toMatchObject({ ok: true, resultado: { estado: 'aplicado' } });
       const relida = await client.callTool({ name: 'observar_autoria_receita', arguments: { id: idReceita } });
       expect(relida.structuredContent.resultado.revisao).toBe(aplicada.structuredContent.resultado.revisao);
-      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+      const descritaAtiva = await client.callTool({ name: 'descrever_montagem', arguments: { id: 'conjunto-do-eixo' } });
       const eixoAtivo = descritaAtiva.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
       expect(eixoAtivo.caixaMundo.max[0]).toBeCloseTo(0.010);
       const autoriaAtiva = await client.readResource({ uri: 'mecanifica://autoria' });
@@ -845,7 +859,7 @@ describe('servidor MCP local — perfil revisao', () => {
         await clienteNovo.connect(transporteNovo);
         const estadoNovo = await clienteNovo.readResource({ uri: 'mecanifica://estado' });
         expect(JSON.parse(estadoNovo.contents[0].text)).toMatchObject({ perfil: 'revisao', autoriaAtivaConfigurada: true });
-        const descritaNova = await clienteNovo.callTool({ name: 'descrever_montagem', arguments: { id: 'autoria-geometrica-do-zero' } });
+        const descritaNova = await clienteNovo.callTool({ name: 'descrever_montagem', arguments: { id: 'conjunto-do-eixo' } });
         const eixoNovo = descritaNova.structuredContent.resultado.contexto.instancias.find(({ caminho }) => caminho.join('/') === 'eixo');
         expect(eixoNovo.caixaMundo.max[0]).toBeCloseTo(0.010);
       } finally { await clienteNovo.close(); }
