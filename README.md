@@ -66,23 +66,49 @@ resto:
 
 ## Estado
 
-- **Nenhum plano ativo.** O último fechou com a remoção da peça de acervo que as
-  guardas de navegador e os testes exercitavam, e o acervo ficou sem peça,
-  declarado em `prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. As
-  ferramentas se provam contra a peça de prova em `tools/fixtures/acervo/`.
-- O núcleo, as receitas, o visor compatível, a bancada e as ferramentas de
-  medição e validação estão ativos e cobertos por gates.
-- Montagem persistida, contexto consultável em JSON, mapa canônico de
-  dependências e revalidação em cascata existem.
-- Escrita para IA existe como **perfil MCP opt-in do host**: autoria de montagem
-  e de receita declarativa, com transação, revalidação condicionante, alteração
-  por campo semântico, histórico e restauração. Ela não é ligada por padrão.
-- Na autoria de peça, o núcleo expressa rasgo (`furo` com `ate`), perfil e
-  caminho fechados (`lathe` e `loft`), posição e eixo na criação (`em`/`eixo`),
-  contato derivado (`encostar`), ponto nomeado e nome de cópia no `arranja`.
-- **Ainda não existem:** solver geral de encaixe, colisão geral, contrato
-  genérico de materiais, revalidação automática de dependentes e vocabulário
-  poligonal aberto para subdivisão e bisel em aresta arbitrária.
+Cada afirmação aqui tem endereço. Se uma delas não puder ser conferida pelo
+comando ou arquivo citado, ela está desatualizada e vale o que o comando diz.
+
+**O que o motor sabe fazer.** Trinta e duas operações, listadas com intenção,
+schema de argumentos e custo em
+[`docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md`](docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
+que é gerado do registro do motor por `npm run catalogo:gerar` e conferido por
+`catalogo:check`. O catálogo é a fonte da convenção de cada operação; receita de
+exemplo não é. Para autoria de peça isso inclui rasgo passante (`furo` com
+`ate`), perfil de revolução e caminho fechado (`lathe` e `loft`), posição e eixo
+na criação (`em`/`eixo`), contato derivado em vez de coordenada digitada
+(`encostar`), ponto nomeado e nome de cópia no `arranja`.
+
+**O que nunca entra numa receita.** Solver geral de encaixe, colisão geral e
+contrato genérico de materiais não existem, e o vocabulário poligonal está
+congelado, o que quer dizer sem subdivisão e sem bisel em aresta arbitrária.
+Intenção que o catálogo não resolve vira registro de lacuna pelo formato de
+[`LACUNAS-DE-CAPACIDADE-V1.md`](docs/mecanifica/LACUNAS-DE-CAPACIDADE-V1.md);
+ela não autoriza inventar operação dentro da receita.
+
+**O que segura a qualidade.** Trinta e dois gates, listados em `tools/gates.mjs`
+e repetidos em `.github/workflows/ci.yml`, rodados de uma vez por `npm run
+gates`. `reguas:check` reprova quando os dois não batem, então gate que existe
+só no script local não existe. Eles vão de tipo e teste a nove guardas de
+navegador que dirigem a bancada de verdade, mais a varredura do acervo, os
+limites de documentação e o teto de leitura obrigatória. `mcp:visual:check`
+está vermelho na main hoje, num caso que renderiza montagem pelo servidor MCP.
+
+**O que existe além da peça.** Montagem persistida com contexto consultável em
+JSON, mapa canônico de dependências e revalidação em cascata; a direção e os
+formatos estão em `docs/mecanifica/MONTAGEM-PERSISTIDA-V1.md` a `V4.md` e
+`CONTEXTO-MONTAGEM-IA.md`. A escrita por IA existe como perfil MCP opt-in do
+host, em `tools/mcp/perfis/`, com transação, revalidação condicionante,
+alteração por campo semântico, histórico e restauração. Nenhum perfil de escrita
+é ligado por padrão.
+
+**O que o acervo tem agora.** Nenhuma peça. O estado é declarado em
+`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`, e `guarda:acervo` reprova
+tanto varredura vazia sem essa declaração quanto a declaração com peça na pasta.
+A receita executável que resta é a peça de prova em `tools/fixtures/acervo/`,
+que existe para as guardas de navegador terem o que abrir e não é exemplo de
+forma. Não há plano ativo; `planos:check` confere isso contra
+`docs/mecanifica/planos/README.md`.
 
 O que já foi decidido, aprovado ou interrompido em rodadas anteriores está em
 `docs/mecanifica/planos/encerrados/` e em `docs/mecanifica/historico/`, e não é
