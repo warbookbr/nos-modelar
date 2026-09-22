@@ -23,12 +23,12 @@ marcou o toro sintético como falso negativo por 0,068° acima do corte inicial
 de 18°; a segunda fixou o corte em 19°. Essas rodadas não equivalem a aceite
 visual; o aceite anterior foi revogado. A revalidação abriu os 42 arquivos
 obrigatórios individualmente e registrou o novo aceite em
-[`inspecao-individual.json`](../../../autoria-assistida/experimentos/canal-percepcao-n3/evidencias/inspecao-individual.json).
+`inspecao-individual.json`.
 
 ## Corpus e gate
 
 O corpus gerado em
-[`autoria-assistida/experimentos/canal-percepcao-n3/`](../../../autoria-assistida/experimentos/canal-percepcao-n3/)
+`autoria-assistida/experimentos/canal-percepcao-n3/`
 tem três controles sadios por construção e quatro negativos. As evidências
 antigas em painel são obsoletas e não podem ser usadas como aceite.
 
@@ -46,7 +46,7 @@ O cupê livre é recompilado da receita isolada pelo mesmo loft de carroceria us
 na tentativa, com o mesmo recorte de arcos de roda; cabine, rodas e detalhes
 não entram porque não são a pele primária. O R2B e o quarto usam suas malhas
 históricas. As evidências individuais e o resultado serializado estão
-em [`evidencias/`](../../../autoria-assistida/experimentos/canal-percepcao-n3/evidencias/).
+em `evidencias/`.
 O `resultado-c1.json` só passa se a impressão do manifesto ainda corresponder
 ao aceite; uma imagem nova ou alterada invalida automaticamente esse vínculo.
 
@@ -61,7 +61,7 @@ ou preferência humana.
 origem `medido`, `derivado`, `resolvido` ou `declarado`, limita o último a um
 quinto e veta `declarado` nos campos estruturais de veículo. Valor resolvido
 precisa citar apenas fontes medidas/derivadas. O corpus válido está em
-[`fonte-veiculo-valida.json`](../../../autoria-assistida/experimentos/canal-percepcao-n3/fonte-veiculo-valida.json).
+`fonte-veiculo-valida.json`.
 
 Esse é um gate de fonte normalizada N3; ele não reescreve schemas N1/N2 nem
 finge que valores legados já ganharam procedência retroativamente.
@@ -82,7 +82,7 @@ npm run procedencia:check -- autoria-assistida/experimentos/canal-percepcao-n3/f
 ## N3.5 — sonda de suavização
 
 A sonda isolada em
-[`sonda-suavizacao-n3-5/`](../../../autoria-assistida/experimentos/sonda-suavizacao-n3-5/)
+`sonda-suavizacao-n3-5/`
 aplicou seis iterações fixas de Laplaciano somente através de arestas C1 abaixo
 de 25°; bordas e quinas ficaram congeladas, a fonte permaneceu imutável e a
 topologia foi preservada. As doze imagens antes/depois foram abertas
@@ -109,3 +109,7 @@ evidência `repo://modelador-alvo.svg` ausente. Os testes específicos N3, build
 typecheck, porteiro, guards da bancada, documentação, exportação, catálogo e
 schemas passaram. Os ensaios MCP ultrapassaram a janela de 30 s do executor e
 foram encerrados junto com seus servidores de teste, sem alteração de MCP.
+
+Os arquivos citados aqui dentro de `autoria-assistida/` foram apagados em
+2026-09-22 com a pasta. As conclusões ficam neste relatório; as evidências
+brutas podem ser recuperadas pelo histórico do git.

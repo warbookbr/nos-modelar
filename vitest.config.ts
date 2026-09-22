@@ -10,12 +10,7 @@ export default defineConfig({
 
        Aquele arquivo mudou de casa para warbookbr/mecanica junto com o produto,
        mas a regra continua servindo a seis outros, entre eles
-       `tools/bancadas/criar-aliases.test.mjs` e `tools/coordenacao/coord.test.mjs`.
-
-       A zona de experimentos entrou pelo mesmo motivo: a prova P2 do chassi
-       nasce em `autoria-assistida/` e o gate dela exige teste. Deixar o teste
-       fora do include repetiria exatamente o defeito de cima — arquivo que
-       existe, nunca roda, e dá impressão de cobertura. */
+       `tools/bancadas/criar-aliases.test.mjs` e `tools/coordenacao/coord.test.mjs`. */
     include: [
       'src/**/*.test.js', 'src/**/*.test.mjs',
       /* `.test.ts` entrou aqui em 2026-09-22, quando os testes do núcleo vieram
@@ -23,7 +18,6 @@ export default defineConfig({
          deixariam de rodar em silêncio, que é o mesmo defeito descrito acima. */
       'procedural/**/*.test.js', 'procedural/**/*.test.mjs', 'procedural/**/*.test.ts',
       'tools/**/*.test.ts', 'tools/**/*.test.mjs',
-      'autoria-assistida/**/*.test.mjs',
       'modulos/**/*.test.js', 'modulos/**/*.test.mjs',
     ],
     watch: false,

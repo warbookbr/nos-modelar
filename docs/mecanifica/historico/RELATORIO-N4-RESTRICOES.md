@@ -38,7 +38,7 @@ agora exige também diedro máximo de até 19°, não só P95/parcela abrupta.
 
 As doze imagens obrigatórias foram abertas individualmente: zebra nas quatro
 vistas, isófota e curvatura por seção. O aceite em
-[`inspecao-individual.json`](../../../autoria-assistida/experimentos/sonda-restricoes-n4/evidencias/inspecao-individual.json)
+`inspecao-individual.json`
 é vinculado por SHA-256 ao manifesto; uma regeneração diferente retorna o gate
 para pendente. Procedência estrutural passou sem usar `declarado`.
 
@@ -63,3 +63,7 @@ node autoria-assistida/experimentos/sonda-restricoes-n4/gerar-evidencias.mjs
 npm run procedencia:check -- autoria-assistida/experimentos/sonda-restricoes-n4/fonte-n4.json
 # passa
 ```
+
+Os arquivos citados aqui dentro de `autoria-assistida/` foram apagados em
+2026-09-22 com a pasta. As conclusões ficam neste relatório; as evidências
+brutas podem ser recuperadas pelo histórico do git.

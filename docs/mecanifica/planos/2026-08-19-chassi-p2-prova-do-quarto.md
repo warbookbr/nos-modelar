@@ -16,8 +16,10 @@ contrato em [`../CHASSI-P1-CONTRATO-DA-CAGE.md`](../historico/CHASSI-P1-CONTRATO
 
 ## O que esta prova é, e o que ela não é
 
-É **descartável e privada**. Vive em
-`autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/`, não entra no
+É **descartável e privada**. Vivia em
+`autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/`, que foi
+apagada em 2026-09-22 junto com a pasta inteira; quem retomar este plano começa
+a prova do zero, como o próprio critério de descarte já previa. Ela não entra no
 núcleo, não vira peça publicada e não altera receita existente. Se o critério de
 descarte disparar, o diretório inteiro é jogado fora e a decisão de representação
 reabre — esse é o ponto de uma prova descartável.

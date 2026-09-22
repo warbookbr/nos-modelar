@@ -2,7 +2,7 @@
 
 **Data:** 2026-08-14
 **Natureza:** evidência experimental; não autoriza implementação
-**Artefatos:** [experimento reproduzível](../../../autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/README.md)
+**Artefatos:** experimento reproduzível
 
 ## Resultado
 
@@ -101,7 +101,7 @@ esse contexto. Revalidação automática e MCP continuam separados: primeiro
 precisam de contrato transacional e de política explícita para falhas.
 
 O registro cronológico, comandos, medidas e atritos completos estão em
-[`REGISTRO.md`](../../../autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/REGISTRO.md).
+`REGISTRO.md`.
 
 ## Repetição R06 — autoria segura
 
@@ -118,3 +118,7 @@ visual real passou 42/42; não houve shell ou caminho local na interface do
 consumidor. A decisão do plano de materialização é **aprovar**. Isso habilita
 autoria de montagem no perfil opt-in, não autoria de receitas nem inferência de
 dependências fora do catálogo.
+
+Os arquivos citados aqui dentro de `autoria-assistida/` foram apagados em
+2026-09-22 com a pasta. As conclusões ficam neste relatório; as evidências
+brutas podem ser recuperadas pelo histórico do git.

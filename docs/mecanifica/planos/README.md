@@ -2,13 +2,13 @@
 
 ## Estado
 
-**Plano ativo:** [O teste carrega o que ele prova](2026-09-22-o-teste-carrega-o-que-ele-prova.md).
+**Plano ativo:** nenhum.
 
-Dezesseis testes carregam material de `autoria-assistida/`, uma pasta que não
-pertence a nenhum deles, para provar coisas que uma primitiva criada dentro do
-próprio teste provaria. O plano troca esse material por fixture ao lado de cada
-teste, lê os documentos que sobram para guardar a lição que ainda não estiver no
-histórico e apaga a pasta.
+[O teste carrega o que ele
+prova](encerrados/2026-09-22-o-teste-carrega-o-que-ele-prova.md) fechou em
+2026-09-22 apagando `autoria-assistida/`. O que estava em uso mudou para
+`tools/mcp/` e `tools/fixtures/`, e um teste novo recusa teste desligado sem
+condição escrita.
 
 [O núcleo mora num lugar
 só](encerrados/2026-09-22-o-motor-mora-num-lugar-so.md) fechou em 2026-09-22.

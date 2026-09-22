@@ -1,6 +1,6 @@
 # O teste carrega o que ele prova
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -15,7 +15,7 @@ pertence a nenhum deles. O teste mora num lugar e o que ele mede mora em outro,
 sem que nada ligue os dois além do caminho escrito dentro do teste.
 
 É o mesmo defeito que o plano
-[nada depende da bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md)
+[nada depende da bicicleta](2026-09-17-nada-depende-da-bicicleta.md)
 encontrou no acervo e a regra que ele deixou escrita já cobre este caso:
 ferramenta se prova contra fixture que ela governa. Esses dezesseis não
 cumprem.
@@ -249,4 +249,22 @@ aprendeu pagando caro.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-22.** `autoria-assistida/` não existe mais: saíram 228
+arquivos rastreados e 2 MB, depois de o que estava em uso ter mudado de casa.
+Os guias e pacotes de modelagem foram para `tools/mcp/`, as receitas e
+montagens que os testes executam viraram fixtures em `tools/fixtures/`, e a
+calibração do crítico grava fora do repositório. Nenhuma afirmação de teste
+mudou. Os dezessete testes internos, que provavam experimentos encerrados,
+saíram com a pasta.
+
+O gate de saída pedia que a busca pelo nome não achasse nada em `tools/`,
+`src/`, `package.json` e configuração. O que ela acha hoje são comentários de
+cabeçalho que dizem de onde cada fixture veio; nenhum é caminho usado.
+
+A leitura achou três coisas que o processo não teria pego. Um teste do MCP
+estava desligado com `it.skip` havia três semanas, e agora
+`tools/testes/nenhum-teste-desligado.test.mjs` recusa isso. A calibração
+reescrevia arquivos rastreados a cada rodada da suíte. E o plano pronto
+`2026-08-19-chassi-p2-prova-do-quarto.md` descrevia uma prova que morava na
+pasta; ele ganhou uma nota dizendo que a prova recomeça do zero se for
+retomado.

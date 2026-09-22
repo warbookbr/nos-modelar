@@ -88,7 +88,6 @@ o núcleo nem define o modelo de autoria.
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
 | `tools/mecanifica/` | gates da bancada, revisão e contratos |
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
-| `autoria-assistida/` | pacotes e evidências de homologação de peças |
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
 
@@ -178,8 +177,7 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o teste carrega o que ele
-  prova](planos/2026-09-22-o-teste-carrega-o-que-ele-prova.md). Rascunho aberto: [o que o
+- Sem plano ativo. Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting

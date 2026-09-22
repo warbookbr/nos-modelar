@@ -9,7 +9,7 @@ reconhecimento do veículo.
 A origem é uma prancha de conceito de cupê esportivo fictício, gerada sem marca
 ou modelo existente e aprovada explicitamente pelo usuário. Ela está versionada
 em `autoria-assistida/alvos/n6-cupe-esportivo/prancha-origem.png`; o
-[`manifesto.json`](../../../autoria-assistida/alvos/n6-cupe-esportivo/manifesto.json)
+`manifesto.json`
 guarda o hash da origem, a decisão e os hashes dos cinco recortes.
 
 O alvo fixa direção visual e relações de forma, não medidas absolutas em
@@ -78,3 +78,7 @@ referências não permite trocar carro, enquadramento ou escala silenciosamente.
 As três faixas de sobreposição declaradas no manifesto são gates próprios:
 dianteira↔cabine, cabine↔entrada lateral e entrada↔ombros/deck precisam
 continuar coerentes antes de uma região poder ser dada como corrigida.
+
+Os arquivos citados aqui dentro de `autoria-assistida/` foram apagados em
+2026-09-22 com a pasta. As conclusões ficam neste relatório; as evidências
+brutas podem ser recuperadas pelo histórico do git.

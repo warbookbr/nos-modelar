@@ -163,5 +163,5 @@ executivo ativo.
 O Módulo 1 do MCP foi aprovado para leitura e auditoria. A primeira tentativa de
 autoria controlada foi encerrada com decisão `interromper`; o PR #25 foi fechado
 sem merge. Protocolos e resultados encerrados estão em
-`docs/mecanifica/historico/`, `docs/mecanifica/planos/` e nos pacotes de
-`autoria-assistida/`.
+`docs/mecanifica/historico/` e `docs/mecanifica/planos/`; os pacotes dos casos
+estão em `tools/mcp/pacotes/`.
