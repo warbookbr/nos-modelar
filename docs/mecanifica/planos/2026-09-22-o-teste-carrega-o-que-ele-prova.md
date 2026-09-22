@@ -70,6 +70,45 @@ Se está, o arquivo é cópia e sai. Se não está, a conclusão vira um parágr
 relatório existente, e não um arquivo novo. Mover tudo seria trocar uma pasta
 que ninguém lê por uma pasta maior que ninguém lê.
 
+## Medido na fatia 1 — quem depende da pasta
+
+A contagem de dezesseis estava incompleta. Quem depende de `autoria-assistida/`
+hoje são dezesseis testes de fora, dezessete testes que moram dentro dela, um
+script do `package.json` e, fora dos testes, o servidor MCP em funcionamento.
+
+Quatro testes só precisam de uma receita qualquer. `autoria-receitas`,
+`autoria-ativa`, `autoria-receita` e `estudo-campo-revalidacao` importam
+`eixo-guia.js` para provar publicação, revisão e revalidação; nenhuma
+afirmação depende da forma do eixo. Trocam pela peça de prova.
+
+Dois usam o nome só como texto. `caminho-confinado` monta um disco falso e usa
+`autoria-assistida` como nome de pasta qualquer, e `caminho-procedural` a põe
+na lista de pastas onde procura raiz antiga. Troca o nome no primeiro e tira
+da lista no segundo.
+
+Quatro são da calibração do crítico: `gerar-canario-geometrico-p0`,
+`gerar-corpus-p0`, `validar-corpus-avaliacao` e `calibracao-critico-cli`. O
+material é gerado por código e só é gravado dentro da pasta; muda o lugar de
+gravação para junto da ferramenta.
+
+Quatro são estudos de montagem inteiros, carregados por `carregar-estudo.mjs`:
+`ensaio-ponta-a-ponta-dobradica`, `plataforma-procedural-campo-r10`,
+`sonda-supercarro-1-0` e `contexto-montagem-estudo`. Provam montagem,
+auditoria de pares e vistas. Viram fixture de montagem pequena ao lado do
+teste, e travas de número de conteúdo, como os 1428 vértices, saem registradas.
+
+Os dezessete testes internos provam experimentos encerrados (cage, sondas,
+captura, percepção) cujo código mora na mesma pasta, e saem junto com ela. O
+script `percepcao:n3:evidencias` é desse mesmo experimento.
+
+O que o plano não sabia: `guias/` e `pacotes/` são dados em uso. O servidor MCP
+lista os pacotes e o perfil de revisão lê e valida pacote a partir de
+`autoria-assistida/pacotes`, por `tools/modelagem/formato-pacote.mjs`; os
+comandos `preparar:modelagem`, `validar:modelagem`, `revisar:modelagem` e
+`fechar:aceite:visual` também. `mcp.test` e `fechar-aceite-visual` testam esse
+fluxo com os pacotes oficiais. Apagar a pasta quebra esse fluxo, e decidir se
+ele continua vivo ou se muda de casa é decisão fora do escopo escrito.
+
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova. O que muda é de que objeto a prova
