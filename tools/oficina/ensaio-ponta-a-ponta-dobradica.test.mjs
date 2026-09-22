@@ -10,8 +10,8 @@ import {
   hipergrafoDeCapacidades,
   nucleo,
   planejarCapacidades,
-} from '../../prototipos/procedural/v3/motor/oficina.js';
-import { PASSOS as PASSOS_PRISMA } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/fixture.js';
+} from '../../procedural/nucleo/entrada.js';
+import { PASSOS as PASSOS_PRISMA } from '../../procedural/extensoes/prisma-triangular/fixture.js';
 import { auditarIntersecoesMontagem } from '../../src/autoria/auditar-intersecoes-montagem.js';
 import { descreverMontagemResolvida } from '../../src/autoria/descrever-montagem-resolvida.js';
 import { capturarMontagem } from '../mecanifica/capturar-montagem.mjs';

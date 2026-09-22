@@ -11,10 +11,10 @@ import { describe, expect, it } from 'vitest';
 import { imagensDaPeca, urlDaReferencia } from './imagens-da-peca.js';
 
 const ENTRADAS = {
-  '../../../prototipos/procedural/v3/pecas/peca-em-pasta/referencias/lateral.png': '/assets/lateral-a1b2.png',
-  '../../../prototipos/procedural/v3/pecas/peca-em-pasta/referencias/sobreposicao.jpg': '/assets/sobre-c3d4.jpg',
-  '../../../prototipos/procedural/v3/pecas/outra-peca/referencias/frontal.png': '/assets/frontal-e5f6.png',
-  '../../../prototipos/procedural/v3/pecas/solta.png': '/assets/solta.png',
+  '../../../procedural/pecas/peca-em-pasta/referencias/lateral.png': '/assets/lateral-a1b2.png',
+  '../../../procedural/pecas/peca-em-pasta/referencias/sobreposicao.jpg': '/assets/sobre-c3d4.jpg',
+  '../../../procedural/pecas/outra-peca/referencias/frontal.png': '/assets/frontal-e5f6.png',
+  '../../../procedural/pecas/solta.png': '/assets/solta.png',
 };
 
 describe('imagens da pasta da peça', () => {

@@ -299,7 +299,7 @@ export async function olharBancada({
        trabalhando, que por definição ainda não está no catálogo publicado.
        Se --peca for informada, pode ser:
        1. Uma fixture de teste privada do harness ('fixture-visual', etc.).
-       2. Uma receita procedural do repositório (ex.: 'peca-de-prova', 'prototipos/.../peca.js').
+       2. Uma receita procedural do repositório (ex.: 'peca-de-prova', 'procedural/.../peca.js').
        Se for receita, auto-ativamos a sessão ativa para ela e carregamos a bancada via sessão,
        evitando timeout do Playwright. Se não existir em nenhum dos dois, falha rápido. */
     const FIXTURES_HARNESS = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas'];
@@ -312,7 +312,7 @@ export async function olharBancada({
         caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
         caminhoDaReceita = caminhoReceita;
       } catch {
-        erroDeUso(`Peça '${peca}' não encontrada no catálogo de fixtures nem em prototipos/procedural/v3/{pecas,maquinas}/.`);
+        erroDeUso(`Peça '${peca}' não encontrada no catálogo de fixtures nem em procedural/{pecas,maquinas}/.`);
       }
 
       if (caminhoReceita) {

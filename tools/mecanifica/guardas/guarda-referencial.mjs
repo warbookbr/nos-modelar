@@ -36,7 +36,7 @@ import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
-const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
+const ACERVO = join(REPO, 'procedural/pecas');
 
 /* Tolerância do chão, em metro. Um micrômetro abaixo de zero é ruído de ponto
    flutuante acumulado numa rotação, e não peça afundada; um milímetro já é

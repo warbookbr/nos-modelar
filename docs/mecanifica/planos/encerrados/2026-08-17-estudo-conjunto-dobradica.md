@@ -39,7 +39,7 @@ evidência, impacto e classificação.
 
 ## Excluído
 
-- publicar peças em `prototipos/procedural/v3/pecas/` ou no catálogo;
+- publicar peças em `procedural/pecas/` ou no catálogo;
 - alterar núcleo, bancada, câmera, materiais, MCP ou contratos de montagem;
 - implementar capacidades encontradas durante o estudo;
 - alegar engenharia ou homologação da geometria criada.

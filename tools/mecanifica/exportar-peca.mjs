@@ -33,13 +33,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
    de ida-e-volta pegar as duas pontas de uma vez. */
 import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { neutroCanonico } from '../../procedural/nucleo/entrada.js';
 import { importarReceita } from './importar-receita.mjs';
 export { FORMATO, VERSAO, lerPecaResolvida, parteDaFace };
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const PECAS = join(REPO, 'procedural/pecas');
 
 /* A LISTA É DECLARADA, e não "todas as peças". São 42 peças no acervo e o
    produto usa duas. Exportar as 42 encheria o repositório de arquivo que

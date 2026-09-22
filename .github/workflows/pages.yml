@@ -6,7 +6,7 @@ on:
     paths:
       - "bancada.html"
       - "src/**"
-      - "prototipos/procedural/v3/**"
+      - "procedural/**"
       - "package.json"
       - "package-lock.json"
       - "vite.config.js"

@@ -45,10 +45,10 @@ Ao receber um pedido de criação de máquina (ex: *"Gere uma prensa modelo X"*)
    que pode não existir no ambiente não pode ser o passo 1 de um fluxo: a skill
    começava por um comando que falha, e quem a seguisse parava na primeira linha.
 2. **Criar Diretório da Máquina:**
-   Crie a pasta correspondente em `prototipos/procedural/v3/maquinas/<nome-da-maquina>/`.
+   Crie a pasta correspondente em `procedural/maquinas/<nome-da-maquina>/`.
 3. **Fixar Imagem de Referência:**
    Crie a subpasta `referencias/` dentro da pasta da máquina e copie o artefato de imagem gerado para:
-   `prototipos/procedural/v3/maquinas/<nome-da-maquina>/referencias/<nome-da-maquina>_conceito.png`.
+   `procedural/maquinas/<nome-da-maquina>/referencias/<nome-da-maquina>_conceito.png`.
 4. **Extrair Landmarks e Dimensões Principais:**
    Defina o envelope dimensional base (comprimento, largura, altura, curso de trabalho, vão livre) em metros.
 
@@ -96,14 +96,14 @@ Siga o padrão da skill `criar-peca`:
 
 1. **Ativação Rápida na Bancada 3D:**
    - **Via Ferramenta MCP (`ativar_bancada`):**
-     Invoque `ativar_bancada` com `arquivo: "prototipos/procedural/v3/maquinas/<nome-da-maquina>/montagem.js"`, opcionalmente passando `focar` e `modo: "isolar"`.
+     Invoque `ativar_bancada` com `arquivo: "procedural/maquinas/<nome-da-maquina>/montagem.js"`, opcionalmente passando `focar` e `modo: "isolar"`.
    - **Via CLI (`npm run ativar:bancada`):**
      ```powershell
-     npm run ativar:bancada -- --arquivo=prototipos/procedural/v3/maquinas/<nome-da-maquina>/montagem.js
+     npm run ativar:bancada -- --arquivo=procedural/maquinas/<nome-da-maquina>/montagem.js
      ```
      Para focar e isolar um componente específico:
      ```powershell
-     npm run ativar:bancada -- --arquivo=prototipos/procedural/v3/maquinas/<nome-da-maquina>/montagem.js --focar=nomeDaParte --modo=isolar
+     npm run ativar:bancada -- --arquivo=procedural/maquinas/<nome-da-maquina>/montagem.js --focar=nomeDaParte --modo=isolar
      ```
 
 2. **Execução Neutra sem Órfãos:**
@@ -138,10 +138,10 @@ verificadores e relata todos numa execução.
 Quando solicitado pelo usuário:
 
 - **Via Ferramenta MCP (`exportar_step`):**
-  Invoque `exportar_step` com `arquivo: "prototipos/procedural/v3/maquinas/<nome-da-maquina>/montagem.js"`, `saida: "exportacoes/cad/<nome-da-maquina>.step"`, `unidade: "mm"`, `sobrescrever: true`.
+  Invoque `exportar_step` com `arquivo: "procedural/maquinas/<nome-da-maquina>/montagem.js"`, `saida: "exportacoes/cad/<nome-da-maquina>.step"`, `unidade: "mm"`, `sobrescrever: true`.
 - **Via CLI:**
   ```powershell
-  npm run exportar:step -- --arquivo=prototipos/procedural/v3/maquinas/<nome-da-maquina>/montagem.js --sobrescrever
+  npm run exportar:step -- --arquivo=procedural/maquinas/<nome-da-maquina>/montagem.js --sobrescrever
   ```
 
 A CLI/MCP converte automaticamente as medidas de metros para milímetros (escala `1000`) e gera um arquivo `.step` com todos os sólidos identificados na pasta `exportacoes/cad/`.

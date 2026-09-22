@@ -19,8 +19,8 @@ comparação, crítica ou decisão do usuário mantém o item incompleto.
 
 | ID | Objetivo verificável | Capacidade e estado | Fonte canônica | Teste/evidência | Gate e decisão |
 |---|---|---|---|---|---|
-| RT-01 | preservar a base semântica | peça, montagem, identidade e revisão — existente/provado | `prototipos/procedural/v3/`, `src/autoria/`, `docs/mecanifica/ARQUITETURA.md` | `npm test`, typecheck, build, round-trip | G11; regressão bloqueia |
-| RT-02 | descobrir capacidade antes de inventar operação | catálogo, combinação, lacunas e adaptador — N1 provado | `docs/mecanifica/gerado/`, `prototipos/procedural/v3/servicos/provedor-autoria.js` | testes N1, `npm run catalogo:check` | N1 concluída; promover ou registrar lacuna |
+| RT-01 | preservar a base semântica | peça, montagem, identidade e revisão — existente/provado | `procedural/`, `src/autoria/`, `docs/mecanifica/ARQUITETURA.md` | `npm test`, typecheck, build, round-trip | G11; regressão bloqueia |
+| RT-02 | descobrir capacidade antes de inventar operação | catálogo, combinação, lacunas e adaptador — N1 provado | `docs/mecanifica/gerado/`, `procedural/servicos/provedor-autoria.js` | testes N1, `npm run catalogo:check` | N1 concluída; promover ou registrar lacuna |
 | RT-03 | definir referência e rejeições antes da malha | alvo, landmarks, silhuetas e comparação — N2 provado tecnicamente | `src/autoria/forma-global.js`, `CONTRATO-FORMA-GLOBAL-N2.md` | alvo independente, sobreposição, métricas e corpus adversarial | G01 aprovado; G02 pendente |
 | RT-04 | modelar objeto inteiro reconhecível | andaime global, blocagem e vistas — N2 implementado; reconhecimento pendente | `src/autoria/forma-global.js`, `src/autoria/renderizar-forma-global-svg.js` | quatro vistas, pacote cego, crítica e aceite do usuário | G01 aprovado; G02 bloqueado sem crítico/usuário |
 | RT-05 | editar superfície por intenção/região | tipo de fonte e separação fonte/derivado — N1 provado; executor — proposto | `src/autoria/contrato-autoria-3d.js`, `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` | testes N1; depois prova de representações e edição local | G02/G07; escolher, corrigir ou descartar |

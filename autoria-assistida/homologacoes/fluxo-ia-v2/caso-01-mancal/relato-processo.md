@@ -52,17 +52,17 @@ Arquivos do pacote e guias:
 
 Exemplos consultados para aprender a API, sem copiar a fonte alvo:
 
-- `prototipos/procedural/v3/pecas/_prateleira-furada.js`: furo passante, origem
+- `procedural/pecas/_prateleira-furada.js`: furo passante, origem
   semântica, partes e aliases;
-- `prototipos/procedural/v3/pecas/_tampa-de-caixa.js`: forma ponto a ponto de
+- `procedural/pecas/_tampa-de-caixa.js`: forma ponto a ponto de
   `centros` para dois furos no mesmo passo;
-- `prototipos/procedural/v3/pecas/roda-dianteira.js`: porta cilíndrica interna e
+- `procedural/pecas/roda-dianteira.js`: porta cilíndrica interna e
   orientação no eixo X;
-- `prototipos/procedural/v3/pecas/freio-disco.js`: cilindro no eixo X, furo múltiplo e
+- `procedural/pecas/freio-disco.js`: cilindro no eixo X, furo múltiplo e
   porta cilíndrica externa;
-- `prototipos/procedural/v3/montagens/pino-e-luva.js`: sintaxe neutra de interfaces e
+- `procedural/montagens/pino-e-luva.js`: sintaxe neutra de interfaces e
   relação `encaixaCilindrico`;
-- `prototipos/procedural/v3/montagens/roda-no-freio.js`: forma atual da especificação
+- `procedural/montagens/roda-no-freio.js`: forma atual da especificação
   nominal, tolerância de fabricação e tolerância numérica.
 
 Fontes de ferramenta consultadas para esclarecer contratos antes da fonte:

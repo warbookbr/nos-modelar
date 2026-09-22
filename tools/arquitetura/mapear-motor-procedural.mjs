@@ -6,8 +6,8 @@ import { relative, resolve } from 'node:path';
 
 const raiz = resolve(import.meta.dirname, '../..');
 const rel = (arquivo) => relative(raiz, arquivo).replaceAll('\\', '/');
-const arquivoFachada = resolve(raiz, 'prototipos/procedural/v3/motor/oficina.js');
-const arquivoNucleo = resolve(raiz, 'prototipos/procedural/v3/motor/nucleo.js');
+const arquivoFachada = resolve(raiz, 'procedural/nucleo/entrada.js');
+const arquivoNucleo = resolve(raiz, 'procedural/nucleo/nucleo.js');
 const ignorados = new Set(['.git', 'node_modules', 'dist', 'coverage']);
 
 function arquivosSob(dir) {
@@ -52,11 +52,11 @@ function exportsDaFachada(texto) {
 export function mapearMotorProcedural() {
   const fonte = readFileSync(arquivoNucleo, 'utf8');
   const fachada = readFileSync(arquivoFachada, 'utf8');
-  const arquivosDoMotor = arquivosSob(resolve(raiz, 'prototipos/procedural/v3/motor'));
+  const arquivosDoMotor = arquivosSob(resolve(raiz, 'procedural/nucleo'));
   const moduloMotor = arquivosDoMotor.map(rel).sort();
   const consumidores = arquivosSob(raiz)
     .filter((arquivo) => arquivo !== arquivoNucleo && /\.(?:[cm]?[jt]sx?)$/.test(arquivo))
-    .filter((arquivo) => readFileSync(arquivo, 'utf8').includes('motor/oficina.js'))
+    .filter((arquivo) => readFileSync(arquivo, 'utf8').includes('nucleo/entrada.js'))
     .map((arquivo) => rel(arquivo)).sort();
   return {
     formato: 'mecanifica.mapa-motor-procedural',

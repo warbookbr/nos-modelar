@@ -3,7 +3,7 @@
  * Isto NÃO é o catálogo homologado. `catalogo-pecas.js` guarda o que foi
  * validado e publicado, e continua sendo decisão escrita à mão. O acervo é o
  * que está em trabalho: toda receita que existe em
- * `prototipos/procedural/v3/pecas/`, que é justamente o que alguém quer abrir
+ * `procedural/pecas/`, que é justamente o que alguém quer abrir
  * enquanto modela. Peça nova aparece aqui sozinha, sem ninguém registrar.
  *
  * A varredura é do Vite e acontece na construção, então cada receita vira um
@@ -11,7 +11,7 @@
  * é baixada quando alguém escolhe abri-la.
  */
 
-const MODULOS = import.meta.glob('../../prototipos/procedural/v3/pecas/**/*.js');
+const MODULOS = import.meta.glob('../../procedural/pecas/**/*.js');
 
 /* AS RECEITAS DE ENSAIO TAMBÉM ENTRAM, e é por elas que as guardas de navegador
    abrem a bancada. O resolvedor da CLI já busca em `tools/fixtures/acervo/` pelo

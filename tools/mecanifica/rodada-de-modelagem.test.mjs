@@ -99,7 +99,7 @@ describe('registro de rodadas', () => {
        do que promete sem ninguém notar. */
     const [peca] = pecasDoAcervo();
     expect(pastaDeRodadas(peca).replaceAll('\\', '/'))
-      .toMatch(new RegExp(`prototipos/procedural/v3/pecas/${peca}/rodadas$`));
+      .toMatch(new RegExp(`procedural/pecas/${peca}/rodadas$`));
   });
 
   it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {

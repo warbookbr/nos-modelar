@@ -21,7 +21,7 @@ export default defineConfig({
       /* `.test.ts` entrou aqui em 2026-09-22, quando os testes do núcleo vieram
          de `tools/` para a pasta dele: sem esta linha, quinze arquivos movidos
          deixariam de rodar em silêncio, que é o mesmo defeito descrito acima. */
-      'prototipos/**/*.test.js', 'prototipos/**/*.test.mjs', 'prototipos/**/*.test.ts',
+      'procedural/**/*.test.js', 'procedural/**/*.test.mjs', 'procedural/**/*.test.ts',
       'tools/**/*.test.ts', 'tools/**/*.test.mjs',
       'autoria-assistida/**/*.test.mjs',
       'modulos/**/*.test.js', 'modulos/**/*.test.mjs',

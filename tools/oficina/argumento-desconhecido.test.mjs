@@ -9,7 +9,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { usoDaOperacao } from '../../prototipos/procedural/v3/motor/uso-operacoes.js';
+import { usoDaOperacao } from '../../procedural/nucleo/uso-operacoes.js';
 import { receitaDoModulo } from '../mecanifica/importar-receita.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -18,7 +18,7 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
    para qualquer receita executavel, e porque o acervo publicado pode ficar sem
    peca entre uma modelagem e a seguinte. */
 const RAIZES_RECEITAS = [
-  { raiz: join(REPO, 'prototipos/procedural/v3'), pastas: ['pecas', 'maquinas', 'armas', 'extensoes'] },
+  { raiz: join(REPO, 'procedural'), pastas: ['pecas', 'maquinas', 'armas', 'extensoes'] },
   { raiz: join(REPO, 'tools/fixtures'), pastas: ['acervo'] },
 ];
 

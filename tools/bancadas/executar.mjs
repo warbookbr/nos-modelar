@@ -19,14 +19,14 @@ const REPO = resolve(HERE, '../..');
 const args = process.argv.slice(2);
 const nome = (args.find((a) => !a.startsWith('--')) || '_tampa-de-caixa').replace(/[^a-z0-9_-]/gi, '');
 const arquivoArg = args.find((a) => a.startsWith('--arquivo='))?.slice('--arquivo='.length);
-const caminho = resolve(REPO, arquivoArg || `prototipos/procedural/v3/pecas/${nome}.js`);
+const caminho = resolve(REPO, arquivoArg || `procedural/pecas/${nome}.js`);
 const dentroRepo = !relative(REPO, caminho).startsWith('..') && !/^[A-Za-z]:/.test(relative(REPO, caminho));
 if (!existsSync(caminho) || !dentroRepo) {
   console.error(`executar: arquivo de receita não encontrado ou fora do repositório: ${arquivoArg || nome}`);
   process.exit(2);
 }
 
-const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'prototipos/procedural/v3/motor/oficina.js')).href);
+const { nucleo, neutroCanonico, colisaoDe } = await import(pathToFileURL(join(REPO, 'procedural/nucleo/entrada.js')).href);
 const peca = await import(pathToFileURL(caminho).href);
 /* MATERIAIS, ESQUELETO e ALIASES entram no núcleo junto com o resto do envelope. Ficaram
    de fora daqui até 2026-07-29, e o efeito era um ÓRFÃO FALSO: a op `material`

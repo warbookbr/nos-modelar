@@ -16,7 +16,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { criarServicoAutoria3DNativa } from '../../prototipos/procedural/v3/servicos/fluxo-autoria.js';
+import { criarServicoAutoria3DNativa } from '../../procedural/servicos/fluxo-autoria.js';
 
 const raiz = process.cwd();
 const pastaFixture = path.join(raiz, 'tools', 'mecanifica', 'fixtures', 'autoria-n2');

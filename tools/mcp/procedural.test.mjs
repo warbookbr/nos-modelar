@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { Client, LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { describe, expect, it } from 'vitest';
-import { criarServicoDescobertaProcedural } from '../../prototipos/procedural/v3/servicos/descoberta.js';
+import { criarServicoDescobertaProcedural } from '../../procedural/servicos/descoberta.js';
 import {
   buscarCapacidadesSaida, combinarCapacidadesSaida, diagnosticarExtensaoSaida,
   validarComposicaoEntrada,
@@ -23,7 +23,7 @@ const composicao = {
 
 describe('serviço procedural e MCP — R09', () => {
   it('mantém descoberta fora de MCP, filesystem e visor', () => {
-    const fonte = readFileSync(new URL('../../prototipos/procedural/v3/servicos/descoberta.js', import.meta.url), 'utf8');
+    const fonte = readFileSync(new URL('../../procedural/servicos/descoberta.js', import.meta.url), 'utf8');
     expect(fonte).not.toMatch(/node:fs|node:path|@modelcontextprotocol|three|readFile|writeFile/i);
     const servico = criarServicoDescobertaProcedural();
     expect(servico.buscar({ texto: 'cubo' }).operacoes).toHaveLength(1);

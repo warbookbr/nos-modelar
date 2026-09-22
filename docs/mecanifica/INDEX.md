@@ -81,8 +81,8 @@ o núcleo nem define o modelo de autoria.
 
 | Caminho | Papel |
 |---|---|
-| `prototipos/procedural/v3/motor/` | núcleo procedural e adaptadores compatíveis |
-| `prototipos/procedural/v3/pecas/` | uma pasta por peça: receita, referências, plano e rodadas |
+| `procedural/nucleo/` | núcleo procedural e adaptadores compatíveis |
+| `procedural/pecas/` | uma pasta por peça: receita, referências, plano e rodadas |
 | `bancada.html`, `src/bancada/` | bancada: inspeção para a IA, edição para a pessoa |
 | `src/autoria/` | núcleo headless: topologia, alvo, descrição do gesto, adaptadores |
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |

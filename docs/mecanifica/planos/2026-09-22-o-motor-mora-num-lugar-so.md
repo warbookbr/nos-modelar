@@ -20,7 +20,7 @@ dela, e quem escreve uma operação nova escolhe a pasta por conveniência, que 
 como as três se formaram.
 
 Há três agravantes medidos. O primeiro é o caminho: ele mora em
-`prototipos/procedural/v3/`, e o projeto inteiro depende dele, com 30 arquivos
+`procedural/`, e o projeto inteiro depende dele, com 30 arquivos
 de produção e 38 de teste importando por aí. O nome da pasta afirma que é
 experimento e o uso afirma o contrário.
 
@@ -119,7 +119,7 @@ mais barato e reversível para o mais caro.
 ## Medido na fatia 1 — quem prova o núcleo
 
 Dos 46 arquivos de teste em `tools/mecanifica` e `tools/oficina`, 24 importam
-somente de `prototipos/procedural/v3/`; os outros 22 importam ferramenta junto e
+somente de `procedural/`; os outros 22 importam ferramenta junto e
 ficam até a fatia 3. Dois dos 24 não são de núcleo apesar do import:
 `conferir-juntas` e `exportar-peca` testam a ferramenta ao lado e usam o núcleo
 só para fabricar a malha de entrada.

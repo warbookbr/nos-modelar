@@ -4,7 +4,7 @@
    perfis de revolução fechados e ocos; o pino passa pela cavidade com folga
    radial e ultrapassa o conjunto nas duas extremidades. Toda seleção usa
    identidade estrutural ou parte semântica, sem ids posicionais. */
-import { executar, colisaoDe } from '../motor/oficina.js';
+import { executar, colisaoDe } from '../nucleo/entrada.js';
 
 export const PARAMS = {
   folhaAltura: 1.20,

@@ -3,9 +3,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { REGISTRO_OPERACOES } from '../../prototipos/procedural/v3/motor/oficina.js';
-import { catalogoDeCapacidades, hipergrafoDeCapacidades } from '../../prototipos/procedural/v3/motor/catalogo.js';
-import { schemaDaLacunaCapacidade } from '../../prototipos/procedural/v3/motor/lacunas.js';
+import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
+import { catalogoDeCapacidades, hipergrafoDeCapacidades } from '../../procedural/nucleo/catalogo.js';
+import { schemaDaLacunaCapacidade } from '../../procedural/nucleo/lacunas.js';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const DESTINO = join(RAIZ, 'docs/mecanifica/gerado');

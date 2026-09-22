@@ -17,7 +17,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const PECAS = join(REPO, 'procedural/pecas');
 
 function calcularNormal(vs, V) {
   if (vs.length < 3) return [0, 1, 0];

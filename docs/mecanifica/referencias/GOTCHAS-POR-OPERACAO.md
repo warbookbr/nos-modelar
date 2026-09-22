@@ -5,7 +5,7 @@ Consulta. Os limites curtos de cada operação chegam por
 originou cada um — a peça, o número medido, a rodada perdida. O limite diz o que
 evitar; o caso diz por quê.
 
-Fonte dos limites: `prototipos/procedural/v3/motor/uso-operacoes.js`. Alterar um
+Fonte dos limites: `procedural/nucleo/uso-operacoes.js`. Alterar um
 limite aqui não muda nada: mude lá, rode `npm run catalogo:gerar`, e o gate
 `catalogo:check` confere.
 

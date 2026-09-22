@@ -2,7 +2,7 @@
 
 ## Papel
 
-`prototipos/procedural/v3/servicos/descoberta.js` é a porta neutra para a IA
+`procedural/servicos/descoberta.js` é a porta neutra para a IA
 descobrir e avaliar o vocabulário procedural. Ela recebe uma configuração de
 registro explícita, não lê disco, não inicia MCP, não renderiza e não executa
 receitas. MCP, CLI ou API devem chamar este serviço, nunca copiar sua lógica.

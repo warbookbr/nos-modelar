@@ -25,9 +25,9 @@ saída é tirá-lo de lá, e não abrir exceção. Detalhe em
 
 ## Camadas que existem hoje
 
-1. **Receita**: módulos em `prototipos/procedural/v3/pecas/` exportam `meta` e
+1. **Receita**: módulos em `procedural/pecas/` exportam `meta` e
    `construir`, ou `PASSOS`, `PARAMS`, `TOPO` e contratos auxiliares.
-2. **Núcleo**: `prototipos/procedural/v3/motor/oficina.js` resolve parâmetros,
+2. **Núcleo**: `procedural/nucleo/oficina.js` resolve parâmetros,
    topologia, identidades, portas, materiais declarados e malha neutra sem
    conhecer Three.js.
 3. **Adaptadores de inspeção**: convertem o neutro para visualização sem mudar o

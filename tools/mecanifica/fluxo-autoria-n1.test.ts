@@ -5,7 +5,7 @@ import { criarRegistroProvedoresAutoria, FORMATO_OBJETIVO_AUTORIA, FORMATO_PROVE
 // @ts-expect-error — orquestrador JavaScript puro da N1.
 import { criarExecucaoFluxoAutoria, planejarFluxoAutoria, registrarResultadoEtapa } from '../../src/autoria/orquestrar-fluxo-autoria.js';
 // @ts-expect-error — adaptador puro do serviço procedural existente.
-import { criarProvedorProceduralAutoria } from '../../prototipos/procedural/v3/servicos/provedor-autoria.js';
+import { criarProvedorProceduralAutoria } from '../../procedural/servicos/provedor-autoria.js';
 
 const classesFluxo = [
   'objetivo', 'referencia', 'forma-global', 'semantica', 'montagem',

@@ -341,7 +341,7 @@ export async function renderizar(input, {
   let pecaRelatada = argumentos.peca;
   let vistasRelatadas;
   /* A decisão é do CATÁLOGO PUBLICADO da bancada, não dos arquivos-fonte.
-     `PECAS_DISPONIVEIS` lista `prototipos/procedural/v3/pecas/*.js` — o que
+     `PECAS_DISPONIVEIS` lista `procedural/pecas/*.js` — o que
      EXISTE como receita — enquanto `olhar({peca})` pede à bancada uma peça
      PUBLICADA. Os dois eram o mesmo conjunto até o acervo não homologado ser
      removido e o catálogo publicado ficar deliberadamente vazio; desde então

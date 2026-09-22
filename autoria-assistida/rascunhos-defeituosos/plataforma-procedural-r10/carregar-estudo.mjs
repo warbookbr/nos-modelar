@@ -7,9 +7,9 @@ import {
   expandirChamadasDeComposicao,
   neutroCanonico,
   nucleo,
-} from '../../../prototipos/procedural/v3/motor/oficina.js';
-import { MANIFESTO } from '../../../prototipos/procedural/v3/extensoes/prisma-triangular/manifesto.js';
-import { implementar } from '../../../prototipos/procedural/v3/extensoes/prisma-triangular/implementacao.js';
+} from '../../../procedural/nucleo/entrada.js';
+import { MANIFESTO } from '../../../procedural/extensoes/prisma-triangular/manifesto.js';
+import { implementar } from '../../../procedural/extensoes/prisma-triangular/implementacao.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { COMPOSICOES } from './composicoes.js';

@@ -62,7 +62,7 @@ calibração do crítico. Nada em P0 gera carroceria nem altera o núcleo proced
 - [ ] Reproduzir a falha e inventariar se cada entrada é diretório legado,
   junction, compatibilidade intencional ou conteúdo órfão.
 - [ ] Não apagar nem mover por suposição. Definir no teste a fronteira correta:
-  implementação canônica em `prototipos/procedural/v3`, compatibilidade legada
+  implementação canônica em `procedural`, compatibilidade legada
   somente se documentada e sem segunda implementação.
 - [ ] Aplicar a menor correção coerente e provar que não há executor duplicado.
 - [ ] Anexar comando, árvore relevante e veredito ao relatório P0.

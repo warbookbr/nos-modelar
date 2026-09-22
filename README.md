@@ -104,7 +104,7 @@ alteração por campo semântico, histórico e restauração. Nenhum perfil de e
 é ligado por padrão.
 
 **O que o acervo tem agora.** Nenhuma peça. O estado é declarado em
-`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`, e `guarda:acervo` reprova
+`procedural/pecas/ACERVO-SEM-PECA.md`, e `guarda:acervo` reprova
 tanto varredura vazia sem essa declaração quanto a declaração com peça na pasta.
 A receita executável que resta é a peça de prova em `tools/fixtures/acervo/`,
 que existe para as guardas de navegador terem o que abrir e não é exemplo de
@@ -119,7 +119,7 @@ estado atual.
 
 **Nenhuma peça deste repositório é homologada, e nenhuma serve de base.**
 
-Tudo em `prototipos/procedural/v3/pecas/` é exemplo. Cada peça existe para exercitar e
+Tudo em `procedural/pecas/` é exemplo. Cada peça existe para exercitar e
 provar uma capacidade do núcleo, e nada mais. Nenhuma é referência de
 engenharia, componente aprovado ou ponto de partida de produto.
 
@@ -128,7 +128,7 @@ definitivo, e não é. Medidas e proporções são escolhidas para fazer uma
 capacidade passar ou falhar, e não para descrever um componente real. O acervo
 já teve cinquenta peças com nomes assim, e todas foram apagadas quando deixaram
 de provar alguma coisa. Hoje ele está sem peça, declarado em
-`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`, e as ferramentas se provam
+`procedural/pecas/ACERVO-SEM-PECA.md`, e as ferramentas se provam
 contra a peça de prova em `tools/fixtures/acervo/`.
 
 O que este repositório sustenta é **o núcleo e as capacidades provadas**. A

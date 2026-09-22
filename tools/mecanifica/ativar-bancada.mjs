@@ -196,7 +196,7 @@ async function main() {
     console.log(`
 Uso:
   npm run ativar:bancada -- <peca>
-  npm run ativar:bancada -- --arquivo=prototipos/.../montagem.js
+  npm run ativar:bancada -- --arquivo=procedural/.../montagem.js
 
 Opcoes:
   --arquivo=<path>   Caminho ou nome da receita

@@ -22,7 +22,7 @@ import {
   PERFIL, TRANSPORTE, VERSAO_CONTRATO_MCP,
 } from './contratos.mjs';
 import { listarCatalogoDePacotes } from '../modelagem/formato-pacote.mjs';
-import { criarServicoDescobertaProcedural } from '../../prototipos/procedural/v3/servicos/descoberta.js';
+import { criarServicoDescobertaProcedural } from '../../procedural/servicos/descoberta.js';
 
 const IDENTIDADE = Object.freeze({ name: 'mecanifica-mcp', version: '0.6.0' });
 export const INSTRUCOES_AGENTE = [

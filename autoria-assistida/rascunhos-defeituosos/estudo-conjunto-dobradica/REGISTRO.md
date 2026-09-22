@@ -27,7 +27,7 @@ fixou outra direção visual.
   não produziria evidência nova.
 - A dobradiça foi escolhida porque exige três peças físicas separáveis,
   repetição de olhais, um eixo comum e inspeção clara em vistas ortogonais.
-- O experimento permanece fora do catálogo e de `prototipos/procedural/v3/pecas/`.
+- O experimento permanece fora do catálogo e de `procedural/pecas/`.
 
 ## Achados
 
@@ -98,7 +98,7 @@ npm run descrever -- folha-fixa --estrito
 ```
 
 Resultado: código 2, porque `descrever-peca.mjs` aceita somente nomes em
-`prototipos/procedural/v3/pecas/`. A bancada de peça segue o mesmo catálogo. Para não
+`procedural/pecas/`. A bancada de peça segue o mesmo catálogo. Para não
 publicar a fixture por localização, o estudo precisou repetir o adaptador já
 usado pelo experimento anterior: importar módulo, executar `nucleo`, montar a
 forma resolvida e chamar a captura de montagem em memória.
@@ -111,7 +111,7 @@ formato resolvido.
 
 **Recomendação:** extrair um serviço puro “descrever módulo/receita em memória”
 e permitir raiz explícita confinada nas CLIs experimentais. O catálogo padrão
-pode continuar fechado em `prototipos/procedural/v3/pecas/`.
+pode continuar fechado em `procedural/pecas/`.
 
 ### A5 — o template indicado para peça procedural é o template errado
 

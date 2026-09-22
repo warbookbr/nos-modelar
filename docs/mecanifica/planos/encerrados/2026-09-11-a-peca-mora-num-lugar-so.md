@@ -9,7 +9,7 @@
 ## Problema observado
 
 O material de uma peça está espalhado por seis pastas que não são vizinhas. Para
-a bicicleta: a receita em `prototipos/procedural/v3/pecas/`, os recortes de
+a bicicleta: a receita em `procedural/pecas/`, os recortes de
 referência com âncoras em `docs/mecanifica/referencias/bicicleta-29/`, a foto de
 sobreposição da bancada em `public/referencias/`, o gerador de prancha em
 `tools/mecanifica/`, os atritos medidos em `docs/mecanifica/historico/`, e, desde
@@ -39,7 +39,7 @@ caminho em vez de seis.
 
 ## Filtro Agent-First
 
-Glob do acervo (`prototipos/procedural/v3/pecas/**/*.js`): **REFATORAR**. Ele já
+Glob do acervo (`procedural/pecas/**/*.js`): **REFATORAR**. Ele já
 é recursivo em `listarAcervo` e em `pecasDoAcervo`, então pasta por peça cabe;
 o que muda é o nome do arquivo deixar de ser a identidade e passar a ser a pasta.
 

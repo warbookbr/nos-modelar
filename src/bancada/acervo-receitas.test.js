@@ -11,9 +11,9 @@ import { pecasDoAcervo } from '../../tools/mecanifica/guardas/guarda-acervo.mjs'
 describe('acervo de receitas da bancada', () => {
   it('nomeia peça pelo arquivo, montagem pela pasta, e ordena', () => {
     const acervo = listarAcervo({
-      '../../prototipos/procedural/v3/pecas/quadro.js': async () => ({}),
-      '../../prototipos/procedural/v3/pecas/prensa/montagem.js': async () => ({}),
-      '../../prototipos/procedural/v3/pecas/aro.js': async () => ({}),
+      '../../procedural/pecas/quadro.js': async () => ({}),
+      '../../procedural/pecas/prensa/montagem.js': async () => ({}),
+      '../../procedural/pecas/aro.js': async () => ({}),
     });
     expect(acervo.map((e) => e.id)).toEqual(['aro', 'prensa', 'quadro']);
     expect(acervo.find((e) => e.id === 'prensa').montagem).toBe(true);
@@ -22,9 +22,9 @@ describe('acervo de receitas da bancada', () => {
 
   it('deixa de fora arquivo de teste que mora junto da peça', () => {
     const acervo = listarAcervo({
-      '../../prototipos/procedural/v3/pecas/quadro.js': async () => ({}),
-      '../../prototipos/procedural/v3/pecas/quadro.test.js': async () => ({}),
-      '../../prototipos/procedural/v3/pecas/quadro.spec.js': async () => ({}),
+      '../../procedural/pecas/quadro.js': async () => ({}),
+      '../../procedural/pecas/quadro.test.js': async () => ({}),
+      '../../procedural/pecas/quadro.spec.js': async () => ({}),
     });
     expect(acervo.map((e) => e.id)).toEqual(['quadro']);
   });
@@ -32,7 +32,7 @@ describe('acervo de receitas da bancada', () => {
   it('carrega preguiçosamente e devolve a receita sem o invólucro do módulo', async () => {
     const receita = { PASSOS: [] };
     const importar = vi.fn(async () => ({ default: receita }));
-    const acervo = listarAcervo({ '../../prototipos/procedural/v3/pecas/quadro.js': importar });
+    const acervo = listarAcervo({ '../../procedural/pecas/quadro.js': importar });
     expect(importar).not.toHaveBeenCalled();
     expect(await acervo[0].carregar()).toBe(receita);
     expect(importar).toHaveBeenCalledTimes(1);
@@ -50,7 +50,7 @@ describe('acervo de receitas da bancada', () => {
 
   it('a lista da bancada junta os dois, marcando qual é qual', () => {
     const lista = listarParaBancada(
-      { '../../prototipos/procedural/v3/pecas/quadro.js': async () => ({}) },
+      { '../../procedural/pecas/quadro.js': async () => ({}) },
       { '../../tools/fixtures/acervo/peca-de-prova/receita.js': async () => ({}) },
     );
     expect(lista.map((e) => e.id)).toEqual(['peca-de-prova', 'quadro']);

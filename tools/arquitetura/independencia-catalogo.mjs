@@ -33,11 +33,11 @@ function ocorrencias(arquivos, padrao, regra) {
 }
 
 export function verificarIndependencia() {
-  const motor = arquivosJs(join(REPO, 'prototipos/procedural/v3/motor'));
+  const motor = arquivosJs(join(REPO, 'procedural/nucleo'));
   const autoriaPura = [join(REPO, 'src/autoria/executar-receita.js')];
   return [
     ...ocorrencias(motor, /(?:from\s+['"]|import\s*\()([^'"]*)(?:three|pecas\/)/i, 'motor importa catálogo/renderizador'),
-    ...ocorrencias(autoriaPura, /node:(?:fs|path|url)|prototipos\/procedural\/v3\/pecas|src\/bancada|tools\//i, 'serviço puro conhece porta ou disco'),
+    ...ocorrencias(autoriaPura, /node:(?:fs|path|url)|procedural\/pecas|src\/bancada|tools\//i, 'serviço puro conhece porta ou disco'),
   ];
 }
 

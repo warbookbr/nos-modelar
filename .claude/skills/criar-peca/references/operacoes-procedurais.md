@@ -12,8 +12,8 @@ uma receita concreta e produzir recusas ligadas ao estado real da malha.
 
 As peças citadas como exemplo nesta referência foram removidas do acervo em
 `c78961f`. As lições continuam medidas e válidas — o que não existe mais é o
-arquivo para abrir. O acervo atual está em `prototipos/procedural/v3/pecas/` e
-`prototipos/procedural/v3/armas/`; a tabela "Contrato mínimo" da skill diz qual
+arquivo para abrir. O acervo atual está em `procedural/pecas/` e
+`procedural/armas/`; a tabela "Contrato mínimo" da skill diz qual
 receita ler para cada forma.
 
 ## Navegação
@@ -60,7 +60,7 @@ espalha a posição para longe da forma.
 - A ordem é **gira e depois move**, e o giro é em torno da origem.
 
 O resultado é idêntico, vértice por vértice, a escrever os passos separados —
-é isso que `prototipos/procedural/v3/motor/pose-de-criacao.test.ts` afirma. Use os passos
+é isso que `procedural/nucleo/pose-de-criacao.test.ts` afirma. Use os passos
 separados quando o pivô do giro **não** for a origem, ou quando precisar mover
 algo que já existe.
 

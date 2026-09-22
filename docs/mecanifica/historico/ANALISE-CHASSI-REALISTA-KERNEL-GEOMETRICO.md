@@ -76,14 +76,14 @@ validação de fabricação e exportação CAD. Essa exclusão não é provisór
 
 Esta versão não se apoia só em relatórios. Os fatos abaixo foram lidos na fonte:
 
-- `prototipos/procedural/v3/motor/nucleo.js`: `BLOCO = 1000`, o bloco de ids por
+- `procedural/nucleo/nucleo.js`: `BLOCO = 1000`, o bloco de ids por
   passo, aplicado a vértices e a faces;
-- `prototipos/procedural/v3/motor/operacoes/geradores-avancados.js`: `loft`,
+- `procedural/nucleo/operacoes/geradores-avancados.js`: `loft`,
   `inflate` e a semântica de `orientacao`;
-- `prototipos/procedural/v3/motor/operacoes/primitivas-superficie.js`: geradores
+- `procedural/nucleo/operacoes/primitivas-superficie.js`: geradores
   fechados e o contrato `faixas × lados` de `origemId`;
-- `prototipos/procedural/v3/motor/extensoes.js`: SDK de extensão nativa;
-- `prototipos/procedural/v3/motor/composicoes.js`: subgrafos declarativos;
+- `procedural/nucleo/extensoes.js`: SDK de extensão nativa;
+- `procedural/nucleo/composicoes.js`: subgrafos declarativos;
 - `autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/receitas/carroceria.js`;
 - `autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/perfil-autoria.js`;
 - `package.json`: dependências atuais.

@@ -6,8 +6,8 @@ próximas rodadas.
 
 ## Evidência
 
-- Fachada pública: `prototipos/procedural/v3/motor/oficina.js`.
-- Implementação única: `prototipos/procedural/v3/motor/nucleo.js`.
+- Fachada pública: `procedural/nucleo/oficina.js`.
+- Implementação única: `procedural/nucleo/nucleo.js`.
 - Foto após R08: 2.683 linhas no núcleo, SHA-256
   `2e1b2ce59a8edc023df5de9857e3c37da206c58263a83f1c486b48aff98497e4`,
   fachada de 18 linhas, 24 módulos no diretório e 61 consumidores de código.

@@ -2,8 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import { auditarIntersecoesMontagem } from '../../src/autoria/auditar-intersecoes-montagem.js';
 import { descreverMontagemResolvida } from '../../src/autoria/descrever-montagem-resolvida.js';
-import { diagnosticarExtensaoAusente, nucleo, REGISTRO_OPERACOES } from '../../prototipos/procedural/v3/motor/oficina.js';
-import { PASSOS as PASSOS_PRISMA } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/fixture.js';
+import { diagnosticarExtensaoAusente, nucleo, REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
+import { PASSOS as PASSOS_PRISMA } from '../../procedural/extensoes/prisma-triangular/fixture.js';
 import { capturarMontagem } from '../mecanifica/capturar-montagem.mjs';
 import { carregarEstudoR10 } from '../../autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/carregar-estudo.mjs';
 

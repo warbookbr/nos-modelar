@@ -41,10 +41,10 @@ const RES = parseInt(res, 10), VW = Math.max(900, RES), VH = Math.round(VW * 9 /
    em volta, que o crítico visual precisa receber; enquanto ela esteve morta, a
    revisão foi feita sobre a captura da bancada, com painéis e botões ocupando
    três quartos da imagem. */
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const PECAS = join(REPO, 'procedural/pecas');
 const caminhosDaPeca = (id) => [join(PECAS, id, 'receita.js'), join(PECAS, `${id}.js`)];
-if (!nome) { console.error('informe explicitamente o id da peça (veja prototipos/procedural/v3/pecas/)'); process.exit(2); }
-if (!caminhosDaPeca(nome).some((c) => existsSync(c))) { console.error(`peça desconhecida: ${nome} (veja prototipos/procedural/v3/pecas/)`); process.exit(1); }
+if (!nome) { console.error('informe explicitamente o id da peça (veja procedural/pecas/)'); process.exit(2); }
+if (!caminhosDaPeca(nome).some((c) => existsSync(c))) { console.error(`peça desconhecida: ${nome} (veja procedural/pecas/)`); process.exit(1); }
 
 /* server estático mínimo (só o que o visor precisa) */
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
@@ -55,7 +55,7 @@ const server = createServer((req, res2) => {
   res2.end(readFileSync(p));
 });
 await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-const base = `http://127.0.0.1:${server.address().port}/prototipos/procedural/v3/visor.html`;
+const base = `http://127.0.0.1:${server.address().port}/procedural/visor.html`;
 
 const PW = join(REPO, 'node_modules/playwright/index.js');
 if (!existsSync(PW)) { console.error('Playwright não encontrado. Rode: npm ci (na raiz)'); process.exit(1); }

@@ -62,7 +62,7 @@ crescente, porque cada guarda nova nasce acoplada.
 
 ## Gate de saída
 
-1. `prototipos/procedural/v3/pecas/bicicleta-quadro/` não existe, e a imagem de
+1. `procedural/pecas/bicicleta-quadro/` não existe, e a imagem de
    referência dela também não;
 2. `grep` por `bicicleta-quadro` em `tools/`, `src/` e `.github/` não acha
    citação em teste nem em guarda; exemplo em texto de ajuda é reescrito para a

@@ -5,11 +5,11 @@ import { tmpdir } from 'node:os';
 // @ts-expect-error — serviço MJS exercitado pelo contrato de exportação.
 import { conferirPublicadas, exportarPeca, gravarPublicadas, lerPecaResolvida, FORMATO, VERSAO } from './exportar-peca.mjs';
 // @ts-expect-error — SDK nativo de prova exercitado pela porta oficial.
-import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes } from '../../procedural/nucleo/entrada.js';
 // @ts-expect-error — extensão nativa de prova.
-import { MANIFESTO } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/manifesto.js';
+import { MANIFESTO } from '../../procedural/extensoes/prisma-triangular/manifesto.js';
 // @ts-expect-error — extensão nativa de prova.
-import { implementar } from '../../prototipos/procedural/v3/extensoes/prisma-triangular/implementacao.js';
+import { implementar } from '../../procedural/extensoes/prisma-triangular/implementacao.js';
 
 const receita = {
   meta: { nome: 'fixture-exportacao', tipo: 'objeto', desc: 'fixture privada', fechada: true },

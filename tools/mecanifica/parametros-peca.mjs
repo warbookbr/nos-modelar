@@ -158,7 +158,7 @@ export async function parametrosReutilizavel({ alvo = null, acervo = false, comp
   }
   if (!acervo && !alvo) {
     return erroDeUso(
-      'diga qual receita diagnosticar, pelo nome em prototipos/procedural/v3/{pecas,maquinas,armas,extensoes}/.'
+      'diga qual receita diagnosticar, pelo nome em procedural/{pecas,maquinas,armas,extensoes}/.'
       + '\n  ex.: npm run parametros -- <peca>   (ou --acervo para todas)',
     );
   }

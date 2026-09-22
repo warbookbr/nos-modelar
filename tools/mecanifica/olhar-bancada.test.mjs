@@ -19,7 +19,7 @@ describe('olhar-bancada — validação rápida e mitigação de timeout', () =>
     expect(resultado.ok).toBe(false);
     expect(resultado.codigo).toBe(2);
     expect(resultado.erro.categoria).toBe('uso');
-    expect(resultado.erro.mensagem).toMatch(/não encontrada no catálogo de fixtures nem em prototipos/i);
+    expect(resultado.erro.mensagem).toMatch(/não encontrada no catálogo de fixtures nem em procedural/i);
     expect(iniciouServidor).toBe(false);
   });
 

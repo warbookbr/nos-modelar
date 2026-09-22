@@ -13,7 +13,7 @@ Ao receber um pedido de criação ou modificação geométrica:
 
 ## 2. Anatomia Canônica de uma Receita Procedural
 
-Uma receita de peça reside em `prototipos/procedural/v3/pecas/<nome-da-peca>.js` (ou `prototipos/procedural/v3/maquinas/<nome-maquina>/montagem.js`) e deve exportar um objeto com:
+Uma receita de peça reside em `procedural/pecas/<nome-da-peca>.js` (ou `procedural/maquinas/<nome-maquina>/montagem.js`) e deve exportar um objeto com:
 
 ```javascript
 export const receita = {

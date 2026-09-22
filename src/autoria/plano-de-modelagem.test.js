@@ -77,9 +77,9 @@ describe('plano de modelagem', () => {
   });
 
   it('a referência é procurada na pasta da peça antes da raiz do repositório', () => {
-    expect(caminhosDaReferencia('referencias/lateral.png', 'prototipos/procedural/v3/pecas/bicicleta'))
+    expect(caminhosDaReferencia('referencias/lateral.png', 'procedural/pecas/bicicleta'))
       .toEqual([
-        'prototipos/procedural/v3/pecas/bicicleta/referencias/lateral.png',
+        'procedural/pecas/bicicleta/referencias/lateral.png',
         'referencias/lateral.png',
       ]);
     /* Peça sem pasta própria só tem a forma antiga, e caminho repetido não

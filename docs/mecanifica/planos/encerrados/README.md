@@ -57,7 +57,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
 - O [plano de migração estrutural de `fps` para `procedural`](./2026-08-17-migracao-fps-para-procedural.md)
   (`docs/mecanifica/planos/encerrados/2026-08-17-migracao-fps-para-procedural.md`) foi
   concluído e aprovado: a raiz canônica agora é
-  `prototipos/procedural/v3/`, sem mudança geométrica ou de contrato.
+  `procedural/`, sem mudança geométrica ou de contrato.
 - O [plano de independência entre núcleo, validação e catálogo](./2026-08-17-desacoplamento-catalogo-validacao.md)
   (`docs/mecanifica/planos/encerrados/2026-08-17-desacoplamento-catalogo-validacao.md`)
   foi concluído e aprovado. Ele deixou o catálogo homologado vazio, fixtures

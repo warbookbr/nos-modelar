@@ -127,7 +127,7 @@ receita e as imagens dentro, e copie para lá as referências que a rodada
 escolheu:
 
 ```
-prototipos/procedural/v3/pecas/<peça>/
+procedural/pecas/<peça>/
   receita.js
   referencias/
     sobreposicao.jpg     ← a que a bancada põe sobre o modelo

@@ -24,7 +24,7 @@ beforeEach(() => { area = mkdtempSync(join(tmpdir(), 'pasta-peca-')); });
 afterEach(() => rmSync(area, { recursive: true, force: true }));
 
 function acervoDeMentira() {
-  const acervo = join(area, 'prototipos/procedural/v3/pecas');
+  const acervo = join(area, 'procedural/pecas');
   mkdirSync(join(acervo, 'peca-em-pasta/referencias'), { recursive: true });
   writeFileSync(join(acervo, 'peca-em-pasta/receita.js'), RECEITA, 'utf8');
   writeFileSync(join(acervo, 'peca-em-pasta/referencias/lateral.png'), 'png', 'utf8');
@@ -45,15 +45,15 @@ describe('pasta da peça', () => {
     expect(caminho.replaceAll('\\', '/').endsWith('peca-em-pasta/receita.js')).toBe(true);
     /* O caminho completo da pasta também resolve, para quem copiou da saída de
        um comando em vez de digitar o nome. */
-    expect(resolverCaminhoReceita('prototipos/procedural/v3/pecas/peca-em-pasta', { raiz: area }))
+    expect(resolverCaminhoReceita('procedural/pecas/peca-em-pasta', { raiz: area }))
       .toBe(caminho);
   });
 
   it('a bancada nomeia a peça pela PASTA, não pelo arquivo', () => {
     const entradas = listarAcervo({
-      '../../prototipos/procedural/v3/pecas/peca-em-pasta/receita.js': async () => ({ default: {} }),
-      '../../prototipos/procedural/v3/pecas/peca-de-arquivo.js': async () => ({ default: {} }),
-      '../../prototipos/procedural/v3/pecas/prensa/montagem.js': async () => ({ default: {} }),
+      '../../procedural/pecas/peca-em-pasta/receita.js': async () => ({ default: {} }),
+      '../../procedural/pecas/peca-de-arquivo.js': async () => ({ default: {} }),
+      '../../procedural/pecas/prensa/montagem.js': async () => ({ default: {} }),
     });
     expect(entradas.map((e) => e.id)).toEqual(['peca-de-arquivo', 'peca-em-pasta', 'prensa']);
     /* Peça em pasta não é montagem: quem abre precisa saber a diferença. */
@@ -71,7 +71,7 @@ describe('pasta da peça', () => {
 
   it('a forma antiga de referência, relativa à raiz, continua valendo', () => {
     const acervo = acervoDeMentira();
-    const plano = { referencias: ['prototipos/procedural/v3/pecas/peca-em-pasta/referencias/lateral.png'] };
+    const plano = { referencias: ['procedural/pecas/peca-em-pasta/referencias/lateral.png'] };
     expect(referenciasAusentes('peca-em-pasta', plano, { raiz: area })).toEqual([]);
     expect(referenciasAusentes('peca-de-arquivo', plano, { raiz: area })).toEqual([]);
     expect(acervo).toBeTruthy();
@@ -84,7 +84,7 @@ describe('pasta da peça', () => {
   });
 
   it('pasta sem entrada de receita continua sendo varrida por dentro', () => {
-    const acervo = join(area, 'prototipos/procedural/v3/pecas');
+    const acervo = join(area, 'procedural/pecas');
     mkdirSync(join(acervo, 'familia'), { recursive: true });
     writeFileSync(join(acervo, 'familia/uma.js'), RECEITA, 'utf8');
     writeFileSync(join(acervo, 'familia/outra.js'), RECEITA, 'utf8');

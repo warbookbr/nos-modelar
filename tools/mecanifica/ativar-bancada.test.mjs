@@ -19,10 +19,10 @@ import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
 const ATIVAR = join(AQUI, 'ativar-bancada.mjs');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const PECAS = join(REPO, 'procedural/pecas');
 
 /* A receita precisa morar dentro do repositório para o importador enxergá-la —
- * mas NÃO em `prototipos/procedural/v3/pecas/`. Escrever ali punha fixtures de
+ * mas NÃO em `procedural/pecas/`. Escrever ali punha fixtures de
  * teste dentro do acervo real durante a execução, e `descrever-peca.mjs` monta
  * `PECAS_DISPONIVEIS` lendo essa pasta NO MOMENTO DO IMPORT. Com os arquivos de
  * teste rodando em paralelo, `tools/mcp/mcp.test.mjs` podia enxergar uma peça
@@ -136,7 +136,7 @@ describe('ativar-bancada: grito do motor é recusa', () => {
   });
 
   /* Nome curto só tem sentido contra o ACERVO: é o resolvedor procurando em
-     `prototipos/procedural/v3/{pecas,maquinas}/`. Uma fixture temporária mora
+     `procedural/{pecas,maquinas}/`. Uma fixture temporária mora
      fora dessas pastas de propósito — usá-la aqui provaria o resolvedor com a
      pasta errada. Por isso o caso do nome curto usa peça real, e o caso do
      caminho, logo abaixo, usa a fixture.

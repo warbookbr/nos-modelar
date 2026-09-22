@@ -27,8 +27,8 @@ aprova o trilho que impede essas capacidades de serem presumidas.
 | `src/autoria/schemas-autoria-3d.js` | schemas públicos e índice descobrível |
 | `src/autoria/provedor-contratos-autoria.js` | planejamento real do briefing |
 | `src/autoria/servico-fluxo-autoria.js` | fachada neutra sem I/O |
-| `prototipos/procedural/v3/servicos/provedor-autoria.js` | adaptação da descoberta procedural existente |
-| `prototipos/procedural/v3/servicos/fluxo-autoria.js` | configuração nativa atual |
+| `procedural/servicos/provedor-autoria.js` | adaptação da descoberta procedural existente |
+| `procedural/servicos/fluxo-autoria.js` | configuração nativa atual |
 
 O artefato estático dos schemas fica em
 [`gerado/schemas-autoria-3d.json`](../gerado/schemas-autoria-3d.json) e é conferido

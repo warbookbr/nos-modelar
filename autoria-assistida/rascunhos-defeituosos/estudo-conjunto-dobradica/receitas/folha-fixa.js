@@ -1,5 +1,5 @@
 /* Experimento confinado — folha fixa de uma dobradiça didática. */
-import { executar, colisaoDe } from '../../../../prototipos/procedural/v3/motor/oficina.js';
+import { executar, colisaoDe } from '../../../../procedural/nucleo/entrada.js';
 
 export const PERFIL_AUTORIA = {
   visual: 'tecnicoDidatico',

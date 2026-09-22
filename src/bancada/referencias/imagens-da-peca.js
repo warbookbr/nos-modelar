@@ -16,7 +16,7 @@
  */
 
 const IMAGENS = import.meta.glob(
-  '../../../prototipos/procedural/v3/pecas/**/referencias/*.{png,jpg,jpeg,webp,svg}',
+  '../../../procedural/pecas/**/referencias/*.{png,jpg,jpeg,webp,svg}',
   { query: '?url', import: 'default', eager: true },
 );
 
@@ -30,7 +30,7 @@ const IMAGENS_DE_ENSAIO = import.meta.glob(
 );
 
 const RAIZES = [
-  '../../../prototipos/procedural/v3/pecas/',
+  '../../../procedural/pecas/',
   '../../../tools/fixtures/acervo/',
 ];
 

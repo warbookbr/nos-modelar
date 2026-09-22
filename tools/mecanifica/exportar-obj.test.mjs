@@ -26,13 +26,13 @@ describe('CLI exportar-obj', () => {
 
   it('faz parse correto dos argumentos da linha de comando', () => {
     const opcoes = parseArgs([
-      '--arquivo=prototipos/procedural/v3/pecas/_modelo.js',
+      '--arquivo=procedural/pecas/_modelo.js',
       '--saida=exportacoes/obj/saida.obj',
       '--unidade=cm',
       '--sobrescrever',
     ]);
 
-    expect(opcoes.arquivo).toBe('prototipos/procedural/v3/pecas/_modelo.js');
+    expect(opcoes.arquivo).toBe('procedural/pecas/_modelo.js');
     expect(opcoes.saida).toBe('exportacoes/obj/saida.obj');
     expect(opcoes.unidade).toBe('cm');
     expect(opcoes.escala).toBe(100);

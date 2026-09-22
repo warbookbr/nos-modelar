@@ -28,7 +28,7 @@ if (!nome || !montagens.has(nome)) {
 
 try {
   const escolha = montagens.get(nome);
-  const modulo = await importarReceita(join(repo, 'prototipos/procedural/v3/montagens', escolha.arquivo));
+  const modulo = await importarReceita(join(repo, 'procedural/montagens', escolha.arquivo));
   const montagem = modulo[escolha.fabrica]();
   const portas = resolverPortasDeMontagem(montagem.instancias);
   if (montagem.relacao.tipo === 'assentaAnular') {

@@ -24,7 +24,7 @@ import { iniciarRegistro } from './diario.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
-const PECAS = join(REPO, 'prototipos/procedural/v3/pecas');
+const PECAS = join(REPO, 'procedural/pecas');
 const DISPONIVEIS = Object.freeze(readdirSync(PECAS)
   .filter((arquivo) => arquivo.endsWith('.js'))
   .map((arquivo) => arquivo.slice(0, -'.js'.length))
@@ -111,7 +111,7 @@ export async function descreverPecaReutilizavel({
   }
   if (!peca) {
     return erroDeUso(
-      'diga qual peça medir, pelo nome do arquivo em prototipos/procedural/v3/pecas/.'
+      'diga qual peça medir, pelo nome do arquivo em procedural/pecas/.'
       + '\n  ex.: npm run descrever -- <id-da-peca>   (use --listar para ver todas)',
     );
   }

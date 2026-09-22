@@ -77,7 +77,7 @@ describe('diário da oficina', () => {
   });
 
   /* O par curto/longo só existe contra o ACERVO: o nome curto é o resolvedor
-     procurando em `prototipos/procedural/v3/{pecas,maquinas}/`, e a fixture mora
+     procurando em `procedural/{pecas,maquinas}/`, e a fixture mora
      fora dessas pastas. A peça é lida e não nomeada; com o acervo sem peça — o
      que `guarda:acervo` só aceita declarado — não há nome curto para equiparar,
      e o caso volta sozinho com a próxima peça. */
@@ -86,7 +86,7 @@ describe('diário da oficina', () => {
     /* Sem isto, o mesmo trabalho apareceria como dois alvos distintos e a
        contagem de repetição — o sinal de "emperrou" — nunca acusaria nada. */
     iniciarRegistro('rodada-curta', PECA_DO_ACERVO, { destino: DIARIO })({ codigo: 0 });
-    iniciarRegistro('rodada-longa', `prototipos/procedural/v3/pecas/${PECA_DO_ACERVO}/receita.js`, { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-longa', `procedural/pecas/${PECA_DO_ACERVO}/receita.js`, { destino: DIARIO })({ codigo: 0 });
     const curta = linhasDoDiario().findLast((l) => l.comando === 'rodada-curta');
     const longa = linhasDoDiario().findLast((l) => l.comando === 'rodada-longa');
     expect(longa.alvo).toBe(curta.alvo);
@@ -101,9 +101,9 @@ describe('leitura do diário', () => {
        como três linhas de 1x porque o nome da peça entrava na chave, e a
        contagem escondia exatamente o que existe para mostrar. */
     const { erros } = resumir([
-      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'cabo-de-pa' não encontrada como arquivo direto ou em prototipos/procedural/v3/{pecas,maquinas}/." },
-      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'peca-inventada' não encontrada como arquivo direto ou em prototipos/procedural/v3/{pecas,maquinas}/." },
-      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'outra' não encontrada como arquivo direto ou em prototipos/procedural/v3/{pecas,maquinas}/." },
+      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'cabo-de-pa' não encontrada como arquivo direto ou em procedural/{pecas,maquinas}/." },
+      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'peca-inventada' não encontrada como arquivo direto ou em procedural/{pecas,maquinas}/." },
+      { comando: 'descrever', duracaoMs: 1, codigo: 2, erro: "Receita 'outra' não encontrada como arquivo direto ou em procedural/{pecas,maquinas}/." },
     ]);
     expect([...erros.values()]).toHaveLength(1);
     expect([...erros.values()][0].vezes).toBe(3);

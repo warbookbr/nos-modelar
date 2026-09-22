@@ -13,7 +13,7 @@
      npm run bancada -- _dobradica-de-portao --vistas=isometrica,frontal,direita,superior
      npm run bancada -- _dobradica-de-portao --selecionadas=barrilFixo,barrisMoveis,pino --modo=isolar --focar
 */
-import { executar, colisaoDe } from '../motor/oficina.js';
+import { executar, colisaoDe } from '../nucleo/entrada.js';
 
 export const TOPO = {
   ladosBarril: 24,

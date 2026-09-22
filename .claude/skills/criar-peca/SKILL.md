@@ -11,7 +11,7 @@ e escreva o `PLANO` da receita. Sem ele, parte prometida e não entregue é
 invisível para toda medida, e `npm run guarda:acervo` reprova a peça na entrada
 do acervo.
 
-A peça é uma PASTA: `prototipos/procedural/v3/pecas/<peça>/receita.js`, com as
+A peça é uma PASTA: `procedural/pecas/<peça>/receita.js`, com as
 imagens em `referencias/` ao lado e as rodadas do laço em `rodadas/`. Peça em
 arquivo solto reprova, porque o material dela não tem onde morar junto e volta a
 se espalhar pelo repositório. Documento que descreve a peça mora aí dentro
@@ -98,7 +98,7 @@ esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecan
 
 `npm run peca` e `porteiro` permanecem diagnósticos do mesmo visor legado do
 item 6; não substituem a descrição nem as vistas da bancada. A peça mora em
-`prototipos/procedural/v3/pecas/`; prefixo `_` indica exemplo/fixture.
+`procedural/pecas/`; prefixo `_` indica exemplo/fixture.
 
 Receita anterior é evidência do que foi feito, e o alvo autorizado é a fonte
 dos nomes. Crie uma receita quando houver alvo e pacote de modelagem
@@ -114,7 +114,7 @@ inteira dentro do vocabulário do motor.
 ## Contrato mínimo
 
 **A convenção vem do catálogo, não do acervo.** As receitas de
-`prototipos/procedural/v3/` são exemplo e não passaram por homologação: em
+`procedural/` são exemplo e não passaram por homologação: em
 2026-09-08 a varredura com o veredito de contato ligado achou defeito real em
 duas delas, uma tratando `em` como canto mínimo do cubo quando é translação de
 um cubo centrado e outra com tubo atravessando pneu. Aprender convenção lendo
@@ -122,7 +122,7 @@ receita defeituosa propaga o defeito. `descrever_capacidade` devolve schema,
 exemplo, pré-condições e limites da operação, e é essa a fonte.
 
 O acervo publicado hoje não tem receita nenhuma, estado declarado em
-`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. A executável que resta é
+`procedural/pecas/ACERVO-SEM-PECA.md`. A executável que resta é
 `tools/fixtures/acervo/peca-de-prova/`, peça de ferramenta e não exemplo de
 forma: para ver uma operação em uso, leia o catálogo. Se um dia abrir uma
 receita de acervo, rode `npm run descrever` nela antes de copiar qualquer ideia,

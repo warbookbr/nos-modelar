@@ -17,7 +17,7 @@ import {
 } from './guarda-acervo.mjs';
 
 const MOTIVO = 'as duas metades são soldadas uma na outra';
-const ACERVO = resolve(fileURLToPath(new URL('../../..', import.meta.url)), 'prototipos/procedural/v3/pecas');
+const ACERVO = resolve(fileURLToPath(new URL('../../..', import.meta.url)), 'procedural/pecas');
 
 /* Dois cubos no eixo x, com a distância entre eles como parâmetro: em 0.4 eles
    se encostam, em 3 há um vão de um metro. */

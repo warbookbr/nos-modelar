@@ -9,7 +9,7 @@
 Recorte histórico de `docs/oficina.md` com o formato salvo, a identidade de
 vértice, o vocabulário de operações e a restrição de como a IA emite peça. É
 verificável contra o núcleo
-(`prototipos/procedural/v3/motor/oficina.js`) — a tabela de operações é gateada por
+(`procedural/nucleo/oficina.js`) — a tabela de operações é gateada por
 `npm run criar`.
 
 O registro de projeto (por que cada coisa ficou assim, o que já foi construído)

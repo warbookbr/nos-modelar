@@ -2,7 +2,7 @@
  * O catálogo publicado pode estar vazio; a régua recebe um módulo explícito. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, nucleo } from '../../procedural/nucleo/entrada.js';
 // @ts-expect-error — serviço JavaScript exercitado pelo contrato headless.
 import { caixaDaParte, caixasPorParte, corposDaParte, descreverPeca, formatarDescricao, portasPublicadas, relacaoEntreCaixas } from '../../src/autoria/descrever-partes.js';
 // @ts-expect-error — contrato JavaScript de revisão exercitado pela descrição pública.

@@ -96,7 +96,7 @@ A receita foi atualizada (`v1.2.0`) para incorporar o conceito de perfil semânt
 ### 5.4 Ativação na Bancada
 A CLI `tools/mecanifica/ativar-bancada.mjs` agora aceita `--perfil`:
 ```powershell
-npm run ativar:bancada -- --arquivo=prototipos/procedural/v3/pecas/cadeira-de-madeira.js --perfil=jogo
+npm run ativar:bancada -- --arquivo=procedural/pecas/cadeira-de-madeira.js --perfil=jogo
 A sessão ativa [`public/sessao-ativa.json`](file:///c:/Users/micro/Desktop/mecanifica/public/sessao-ativa.json) registra o perfil selecionado e atualiza a cena 3D na bancada instantaneamente.
 
 ---

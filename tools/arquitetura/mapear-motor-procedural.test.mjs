@@ -1,7 +1,7 @@
 /* Guarda que o mapa R00 continue descrevendo a fachada procedural real. */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { OPS } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { OPS } from '../../procedural/nucleo/entrada.js';
 import { mapearMotorProcedural } from './mapear-motor-procedural.mjs';
 
 describe('mapa estático do motor procedural', () => {
@@ -21,7 +21,7 @@ describe('mapa estático do motor procedural', () => {
   });
 
   it('não deixa corpo de operação no núcleo após a R03', () => {
-    const fonte = readFileSync(new URL('../../prototipos/procedural/v3/motor/nucleo.js', import.meta.url), 'utf8');
+    const fonte = readFileSync(new URL('../../procedural/nucleo/nucleo.js', import.meta.url), 'utf8');
     expect(fonte).not.toMatch(/^  [A-Za-z]\w*\(st, a, i\) \{/m);
   });
 });

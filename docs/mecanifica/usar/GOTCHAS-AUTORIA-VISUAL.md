@@ -36,7 +36,7 @@ anunciar êxito, solicitar aprovação ou abrir a etapa seguinte.
 | Coordenadas soltas sem cadeia de apoio | Cada parte recebe posição independente; nada denuncia que o conjunto não se sustenta. | Declarar cadeia verificável do plano de apoio até a peça, e medir contra ela. |
 | Resolução escolhida sem olhar a silhueta | Receita válida e curva facetada: 16 lados passam no teste e aparecem na vista. | Lados escolhidos por raio, curvatura e peso na silhueta; toda curva protagonista inspecionada em ortográfica e em aproximação. |
 | Detalhe antes do envelope funcional | Detalhe dá sensação de avanço enquanto a proporção ainda está errada, e depois trava a correção. | Ordem obrigatória: envelope e escala, volumes estruturais, interfaces, só então detalhe. |
-| ~~`npm run criar` com receita v3~~ | `criar.mjs` e `visor.html` tentavam `mod.construir` e `mod.meta.tipo` legados, falhando com `Cannot read properties of undefined` em receitas v3 (`export const receita = { PASSOS, ... }`). | **Resolvido**: `criar.mjs` e `visor.html` foram atualizados para desempacotar receitas v3 e carregar a malha via `prototipos/procedural/v3/motor/executor.js`, funcionando de ponta a ponta (núcleo, porteiro e renders de evidência). |
+| ~~`npm run criar` com receita v3~~ | `criar.mjs` e `visor.html` tentavam `mod.construir` e `mod.meta.tipo` legados, falhando com `Cannot read properties of undefined` em receitas v3 (`export const receita = { PASSOS, ... }`). | **Resolvido**: `criar.mjs` e `visor.html` foram atualizados para desempacotar receitas v3 e carregar a malha via `procedural/nucleo/executor.js`, funcionando de ponta a ponta (núcleo, porteiro e renders de evidência). |
 ## Pipeline mínimo que vem antes de modelar
 
 1. **Contrato da família.** Declarar os componentes que tornam o objeto
@@ -134,7 +134,7 @@ Uma autoria concluída entrega, além da receita executável:
 
 As armadilhas de `loft`, `inflate`, `cilindro`, `arranja` e `furo` deixaram de
 viver aqui e passaram a ser os `limites` de cada operação, em
-`prototipos/procedural/v3/motor/uso-operacoes.js`. Quem consulta
+`procedural/nucleo/uso-operacoes.js`. Quem consulta
 `descrever_capacidade('loft')` recebe as dela junto com o schema, no momento em
 que escolhe a operação — antes vinham num documento lido no começo da sessão, ou
 não lido.

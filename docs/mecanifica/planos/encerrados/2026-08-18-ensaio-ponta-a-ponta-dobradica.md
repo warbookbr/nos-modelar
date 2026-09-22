@@ -83,7 +83,7 @@ responsabilidade nem causalidade.
 
 ## Invariantes
 
-- nenhuma peça entra em `prototipos/procedural/v3/pecas/` ou no catálogo público;
+- nenhuma peça entra em `procedural/pecas/` ou no catálogo público;
 - nenhuma geometria é homologada nem apresentada como engenharia real;
 - núcleo não recebe domínio de dobradiça, Three.js, MCP ou filesystem;
 - identidade persistida é semântica; não usa UUID, índice ou posição de passo;

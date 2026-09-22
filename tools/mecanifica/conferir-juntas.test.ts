@@ -1,7 +1,7 @@
 /* conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — JS legado.
-import { nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { nucleo } from '../../procedural/nucleo/entrada.js';
 // @ts-expect-error — módulo JS sem tipos.
 import { analisarJuntas } from './conferir-juntas.mjs';
 

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import {
   REGISTRO_OPERACOES,
   criarRegistroComposicoes,
-} from '../../../prototipos/procedural/v3/motor/oficina.js';
+} from '../../../procedural/nucleo/entrada.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { descreverPecaReutilizavel } from '../../../tools/mecanifica/descrever-peca.mjs';
 import { exportarPeca, lerPecaResolvida } from '../../../tools/mecanifica/exportar-peca.mjs';

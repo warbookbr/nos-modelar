@@ -32,9 +32,9 @@ const PASTAS = ['docs/mecanifica/usar', '.claude/skills'];
 
 /* Pastas onde uma receita citada pelo nome curto pode morar. */
 const PASTAS_RECEITA = [
-  'prototipos/procedural/v3/pecas',
-  'prototipos/procedural/v3/armas',
-  'prototipos/procedural/v3/maquinas',
+  'procedural/pecas',
+  'procedural/armas',
+  'procedural/maquinas',
 ];
 
 /* Nomes que as skills mandam CRIAR, não abrir. `modelar-maquina` diz para

@@ -5,7 +5,7 @@ import {
   catalogoDeCapacidades,
   hipergrafoDeCapacidades,
   planejarCapacidades,
-} from '../../../prototipos/procedural/v3/motor/oficina.js';
+} from '../../../procedural/nucleo/entrada.js';
 import { auditarIntersecoesMontagem } from '../../../src/autoria/auditar-intersecoes-montagem.js';
 import { descreverMontagemResolvida } from '../../../src/autoria/descrever-montagem-resolvida.js';
 import { carregarEstudoDobradica } from './carregar-estudo.mjs';

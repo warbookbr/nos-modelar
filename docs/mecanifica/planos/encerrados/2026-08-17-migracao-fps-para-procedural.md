@@ -10,7 +10,7 @@ as correções locais do estudo de dobradiça ainda não commitadas.
 ## Objetivo verificável
 
 Renomear a árvore canônica
-`prototipos/fps/v3/` para `prototipos/procedural/v3/`, removendo do caminho a
+`prototipos/fps/v3/` para `procedural/`, removendo do caminho a
 identidade histórica de jogo/FPS sem acoplar a estrutura ao nome do repositório,
 do produto ou ao domínio automotivo.
 
@@ -64,7 +64,7 @@ git grep -n -I -E 'prototipos/fps|/fps/v3|fps/v3|\bfps\b'
 
 ## Decisões de migração
 
-1. Destino canônico: `prototipos/procedural/v3/`.
+1. Destino canônico: `procedural/`.
 2. Mover, não copiar; nunca manter dois núcleos/duas fontes de receitas.
 3. Não criar symlink: é frágil em Windows, empacotamento e Pages.
 4. Não criar alias ou redirect permanente por precaução. Se a busca externa
@@ -77,7 +77,7 @@ git grep -n -I -E 'prototipos/fps|/fps/v3|fps/v3|\bfps\b'
 ## Política para dados e história
 
 Campos atuais que identificam o arquivo de autoria, como `alvo.caminho` em
-briefings, passam a usar `prototipos/procedural/v3/pecas/<id>.js`. Antes da
+briefings, passam a usar `procedural/pecas/<id>.js`. Antes da
 troca, o executor deve verificar se esse campo participa de assinatura ou
 imutabilidade de revisão:
 
@@ -173,7 +173,7 @@ reprova a migração.
 
 A migração termina quando:
 
-1. `prototipos/procedural/v3/` é a única árvore canônica;
+1. `procedural/` é a única árvore canônica;
 2. nenhum consumidor executável ou instrução vigente depende de
    `prototipos/fps/v3/`;
 3. consumidor externo e dados imutáveis foram verificados, não presumidos;

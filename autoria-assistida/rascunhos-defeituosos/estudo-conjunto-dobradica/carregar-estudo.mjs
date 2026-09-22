@@ -1,6 +1,6 @@
 /* carregar-estudo.mjs — adaptador confinado das receitas para montagem resolvida. */
 import { readFileSync } from 'node:fs';
-import { neutroCanonico } from '../../../prototipos/procedural/v3/motor/oficina.js';
+import { neutroCanonico } from '../../../procedural/nucleo/entrada.js';
 import { FORMATO, VERSAO, parteDaFace } from '../../../src/autoria/ler-peca-resolvida.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { descreverPecaReutilizavel } from '../../../tools/mecanifica/descrever-peca.mjs';

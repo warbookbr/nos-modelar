@@ -279,7 +279,7 @@ Clientes MCP (como agentes de IA) exportam arquivos STEP sob demanda explícita:
 
 ```powershell
 npm run exportar:step -- `
-  --arquivo=prototipos/procedural/v3/pecas/suporte-eixo.js `
+  --arquivo=procedural/pecas/suporte-eixo.js `
   --unidade=mm `
   --tolerancia=0.001 `
   --saida=exportacoes/cad/suporte-eixo.step

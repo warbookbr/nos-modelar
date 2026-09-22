@@ -25,7 +25,7 @@ import { caminhosDaReferencia } from '../../../src/autoria/plano-de-modelagem.js
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
-const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
+const ACERVO = join(REPO, 'procedural/pecas');
 
 /* O nome da peça é o caminho relativo sem extensão, que é o mesmo endereço que
    `descrever-peca` aceita. Arquivo de teste não é peça.

@@ -14,7 +14,7 @@ arrumação não desfazer sozinha.
 [Nada depende da
 bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
 2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado em
-`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`.
+`procedural/pecas/ACERVO-SEM-PECA.md`.
 
 O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como
@@ -348,7 +348,7 @@ concluído com catálogo vazio e rollout coordenado com `warbookbr/mecanica`.
 **Plano concluído anterior à auditoria:**
 [`2026-08-17-migracao-fps-para-procedural.md`](./encerrados/2026-08-17-migracao-fps-para-procedural.md).
 
-Ele moveu a raiz canônica para `prototipos/procedural/v3/`, preservando
+Ele moveu a raiz canônica para `procedural/`, preservando
 comportamento, geometria e contratos, após verificar o consumidor externo.
 
 **Plano concluído anterior:**

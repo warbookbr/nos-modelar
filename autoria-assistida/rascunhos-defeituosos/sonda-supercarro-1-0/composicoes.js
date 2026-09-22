@@ -1,5 +1,5 @@
 /* Bloco privado reutilizável: volume facetado com identidade e aparência. */
-import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../../procedural/nucleo/entrada.js';
 
 const MALHA = 'mecanifica.malha-poligonal@1';
 const PARTE = 'mecanifica.parte@1';

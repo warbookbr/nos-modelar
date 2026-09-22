@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
-import { criarServicoAutoria3DNativa } from '../../prototipos/procedural/v3/servicos/fluxo-autoria.js';
+import { criarServicoAutoria3DNativa } from '../../procedural/servicos/fluxo-autoria.js';
 
 const ler = (nome) => JSON.parse(readFileSync(new URL(`./fixtures/autoria-n2/${nome}`, import.meta.url), 'utf8'));
 

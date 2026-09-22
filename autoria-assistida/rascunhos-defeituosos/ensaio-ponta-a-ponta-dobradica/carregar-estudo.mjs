@@ -4,9 +4,9 @@ import {
   REGISTRO_OPERACOES,
   criarRegistroComExtensoes,
   criarRegistroComposicoes,
-} from '../../../prototipos/procedural/v3/motor/oficina.js';
-import { MANIFESTO } from '../../../prototipos/procedural/v3/extensoes/prisma-triangular/manifesto.js';
-import { implementar } from '../../../prototipos/procedural/v3/extensoes/prisma-triangular/implementacao.js';
+} from '../../../procedural/nucleo/entrada.js';
+import { MANIFESTO } from '../../../procedural/extensoes/prisma-triangular/manifesto.js';
+import { implementar } from '../../../procedural/extensoes/prisma-triangular/implementacao.js';
 import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montagem-persistida.js';
 import { descreverPecaReutilizavel } from '../../../tools/mecanifica/descrever-peca.mjs';
 import { exportarPeca, lerPecaResolvida } from '../../../tools/mecanifica/exportar-peca.mjs';

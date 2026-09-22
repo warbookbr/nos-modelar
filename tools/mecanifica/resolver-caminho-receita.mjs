@@ -7,7 +7,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, '../..');
 
 /* Toda pasta de receita do repositorio, nao so as duas primeiras que alguem
-   precisou. O acervo publicado vive em `prototipos/procedural/v3/`; as receitas
+   precisou. O acervo publicado vive em `procedural/`; as receitas
    de `tools/fixtures/acervo/` existem para dar assunto estavel aos testes de
    ferramenta, que precisam de cadeira parametrizada, chapa furada e prensa
    montada para provar sensibilidade, resolucao por nome e exportacao
@@ -16,10 +16,10 @@ export const REPO = resolve(HERE, '../..');
    varios desses testes exercitam a propria resolucao por nome. */
 export const PASTAS_BUSCA = [
   '',
-  'prototipos/procedural/v3/pecas',
-  'prototipos/procedural/v3/maquinas',
-  'prototipos/procedural/v3/armas',
-  'prototipos/procedural/v3/extensoes',
+  'procedural/pecas',
+  'procedural/maquinas',
+  'procedural/armas',
+  'procedural/extensoes',
   'tools/fixtures/acervo',
 ];
 
@@ -72,5 +72,5 @@ export function resolverCaminhoReceita(alvo, { raiz = REPO } = {}) {
     }
   }
 
-  throw new Error(`Receita '${alvo}' não encontrada como arquivo direto ou em prototipos/procedural/v3/{pecas,maquinas}/.`);
+  throw new Error(`Receita '${alvo}' não encontrada como arquivo direto ou em procedural/{pecas,maquinas}/.`);
 }

@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { conferirMalha } from './conferir-malha.js';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error — módulo .js do motor v3 (sem tipos; roda puro no vitest/esbuild)
-import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { nucleo, neutroCanonico, adaptarV3, executar, colisaoDe, BLOCO, montarAnimar, avaliarChaves, bindPoseOssos } from '../../procedural/nucleo/entrada.js';
 // @ts-expect-error — módulo .js neutro de medição (a régua que a bancada e o CLI compartilham)
 import { caixasPorParte } from '../../src/autoria/descrever-partes.js';
 

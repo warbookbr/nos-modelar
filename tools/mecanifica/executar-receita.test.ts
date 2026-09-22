@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 // @ts-expect-error — serviço JavaScript puro da fronteira de autoria.
 import { entradaDaReceita, executarReceita, validarReceita } from '../../src/autoria/executar-receita.js';
 // @ts-expect-error — contratos procedurais JavaScript exercitados pela fronteira.
-import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes } from '../../procedural/nucleo/entrada.js';
 
 const receita = {
   PARAMS: { lado: 1 },

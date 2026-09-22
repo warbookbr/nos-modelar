@@ -8,7 +8,7 @@
 import {
   expandirChamadasDeComposicao,
   nucleo,
-} from '../../prototipos/procedural/v3/motor/oficina.js';
+} from '../../procedural/nucleo/entrada.js';
 import { normalizarIntencaoPeca } from './intencao-peca.js';
 
 export function validarReceita(modulo) {

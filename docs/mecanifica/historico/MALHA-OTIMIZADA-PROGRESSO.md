@@ -254,7 +254,7 @@ O modo `'grade'` **não** ganhou endereço, e isso é dito em vez de silenciado:
 faces dele vêm de varredura de voxels, e numerá-las pela ordem da varredura
 seria identidade posicional, proibida aqui.
 
-Prova: `prototipos/procedural/v3/pecas/chapa-de-fixacao.js`, com dois furos
+Prova: `procedural/pecas/chapa-de-fixacao.js`, com dois furos
 passantes, aprovada em `conferirMalha` (sem órfão, polígono simples, casca
 fechada, desenha).
 

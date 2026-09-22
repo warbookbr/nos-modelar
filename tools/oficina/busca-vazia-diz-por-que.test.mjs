@@ -7,7 +7,7 @@
  * nada. Zero é resposta legítima; zero sem motivo, quando a ferramenta sabe o
  * motivo, é a mesma família do no-op silencioso. */
 import { describe, expect, it } from 'vitest';
-import { criarServicoDescobertaProcedural } from '../../prototipos/procedural/v3/servicos/descoberta.js';
+import { criarServicoDescobertaProcedural } from '../../procedural/servicos/descoberta.js';
 
 const servico = criarServicoDescobertaProcedural();
 

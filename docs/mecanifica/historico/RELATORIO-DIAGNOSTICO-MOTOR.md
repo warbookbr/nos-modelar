@@ -37,8 +37,8 @@ do formato exportado.
 
 ### Núcleo e auxiliares
 
-- `prototipos/procedural/v3/motor/oficina.js`;
-- `prototipos/procedural/v3/motor/expressoes.js`;
+- `procedural/nucleo/oficina.js`;
+- `procedural/nucleo/expressoes.js`;
 - operações, identidade, origens, aliases, partes, portas e diagnósticos;
 - `nucleo`, `neutroCanonico`, `adaptarV3` e `executar`.
 

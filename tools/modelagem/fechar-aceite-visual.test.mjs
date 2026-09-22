@@ -21,7 +21,7 @@ function fixtureCompletaV2() {
   mkdirSync(join(pacote, 'revisoes', 'r001'), { recursive: true }); mkdirSync(join(repositorio, 'evidencias'), { recursive: true });
   const briefing = {
     aceiteVisual: { rejeicoes: ['arco'] }, aceiteVisualRegional: { recortes: ['arco-dianteiro'] },
-    alvo: { caminho: 'prototipos/procedural/v3/pecas/_caixote-filetado.js', modo: 'criacao', peca: '_caixote-filetado' },
+    alvo: { caminho: 'procedural/pecas/_caixote-filetado.js', modo: 'criacao', peca: '_caixote-filetado' },
     checklist: [{ criterio: 'O arco acompanha o alvo regional.', estado: 'aberto', id: 'arco', prioridade: 1 }],
     formato: 'mecanifica.pacote-modelagem', guias: ['forma/silhueta-e-transicoes'], id,
     objetivo: 'Prova positiva do fechamento visual regional.', partesEsperadas: ['caixote'],
