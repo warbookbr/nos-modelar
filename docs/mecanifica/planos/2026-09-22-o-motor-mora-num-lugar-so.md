@@ -120,6 +120,59 @@ mais barato e reversível para o mais caro.
    esteja fora da pasta dele, e reprova a palavra `motor` como nome de pasta de
    programa. Entra depois de a árvore estar limpa, senão nasce vermelho.
 
+## Medido na fatia 1 — quem prova o núcleo
+
+Dos 46 arquivos de teste em `tools/mecanifica` e `tools/oficina`, 24 importam
+somente de `prototipos/procedural/v3/` e nada mais do repositório. Esses são os
+que provam o núcleo e os que a fatia 2 move. Os outros 22 importam ferramenta
+junto, e ficam onde estão até a fatia 3 decidir o que cada um é.
+
+Dois desses 24 não são de núcleo apesar do import: `conferir-juntas` e
+`exportar-peca` testam a ferramenta ao lado e usam o núcleo só para fabricar a
+malha de entrada. Eles ficam.
+
+**A contagem automática de operações não serve para decidir o destino.** Medi
+quantas vezes cada teste cita cada operação e o resultado põe `encostar` em
+`primitivas-basicas`, porque ele constrói dezoito cubos para ter o que encostar.
+O que um teste prova é o assunto dele, não a operação que ele usa de andaime. A
+tabela abaixo é por assunto, lida arquivo por arquivo.
+
+Oito testes têm nome igual ao de um arquivo do núcleo, e esses são os de destino
+óbvio:
+
+| teste | vai para |
+| --- | --- |
+| `referencia-posicional` | `motor/referencia-posicional.js` |
+| `artefatos-procedencia` | `motor/artefatos.js` |
+| `composicoes-procedurais` | `motor/composicoes.js` |
+| `expressoes` | `motor/expressoes.js` |
+| `lacunas-capacidade` | `motor/lacunas.js` |
+| `registro-operacoes` | `motor/registro.js` |
+| `catalogo-capacidades` | `motor/catalogo.js` |
+| `extensoes-nativas` | `motor/extensoes.js` |
+
+Sete provam uma operação e vão para o módulo que a define:
+
+| teste | operação provada | vai para |
+| --- | --- | --- |
+| `encostar` | `encostar` | `operacoes/estruturais.js` |
+| `arranja-contrato` | `arranja` | `operacoes/estruturais.js` |
+| `nome-de-copia` | `arranja` | `operacoes/estruturais.js` |
+| `arredondar-aresta` | `arredondarAresta` | `operacoes/estruturais.js` |
+| `furo-raio-por-grupo` | `furo` | `operacoes/estruturais.js` |
+| `lathe-fechado` | `lathe` | `operacoes/geradores-avancados.js` |
+| `loft-fechado` | `loft` | `operacoes/geradores-avancados.js` |
+
+E sete atravessam operações ou guardam a linha de base inteira, e ficam na raiz
+do núcleo: `pose-de-criacao`, `ponto-nomeado`, `nomes-de-face`,
+`lados-por-desvio`, `concordancia-por-ponto`, `canon-linha-de-base` e
+`corpus-motor-r00`.
+
+Cinco arquivos de teste vão parar em `operacoes/estruturais.js`, que já tem seis
+operações dentro. Se a fatia 2 mostrar que ler esse arquivo ficou pior, e não
+melhor, a resposta é uma pasta por operação em vez de um arquivo por grupo —
+decisão que só faz sentido tomar com os testes já ao lado.
+
 ## Riscos e parada
 
 O risco principal é a refatoração revelar acoplamento escondido, como já
