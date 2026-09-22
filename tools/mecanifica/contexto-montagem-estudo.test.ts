@@ -1,11 +1,10 @@
 /* Repete R001/R002 no descritor de contexto e mede a economia Agent-First. */
 import { execFileSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const ESTUDO = resolve(REPO, 'autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/executar-estudo.mjs');
+const REPO = fileURLToPath(new URL('../..', import.meta.url));
+const ESTUDO = fileURLToPath(new URL('../fixtures/conjunto-com-submontagens/executar-estudo.mjs', import.meta.url));
 const executar = (args: string[]) => execFileSync('node', [ESTUDO, ...args], { encoding: 'utf8' });
 
 describe('contexto de montagem no estudo de campo — R04', () => {

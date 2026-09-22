@@ -1,11 +1,11 @@
 /* O corpus P0 só fica elegível após cobertura, isolamento e quatro julgamentos cegos. */
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { validarCorpusAvaliacaoP0 } from './validar-corpus-avaliacao.mjs';
 import { gerarCorpusP0 } from './gerar-corpus-p0.mjs';
 
-const raiz = resolve(import.meta.dirname, '..', '..');
 const hash = (n) => `sha256:${n.toString(16).padStart(64, '0')}`;
 function item(n, tipo, severidade = 'normal') {
   return {
@@ -29,8 +29,9 @@ function corpusCongelado() {
 
 describe('validador do corpus de avaliação P0', () => {
   it('aceita o manifesto gerado somente quando os controles existem', () => {
-    gerarCorpusP0();
-    const manifesto = JSON.parse(readFileSync(resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0/manifesto.json'), 'utf8'));
+    const pasta = mkdtempSync(join(tmpdir(), 'corpus-p0-'));
+    gerarCorpusP0({ pasta });
+    const manifesto = JSON.parse(readFileSync(join(pasta, 'manifesto.json'), 'utf8'));
     expect(validarCorpusAvaliacaoP0(manifesto)).toMatchObject({ prontoParaCritico: true, estado: 'congelado', itensHoldout: 80 });
   });
 

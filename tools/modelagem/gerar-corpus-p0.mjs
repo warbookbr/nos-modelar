@@ -5,7 +5,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const pasta = resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0');
+/* O corpus é gerado por código e sai igual toda vez, então não é versionado.
+   Até 2026-09-22 ele era gravado em `autoria-assistida/avaliacao/`, dentro do
+   repositório, e cada rodada da suíte reescrevia arquivos rastreados. */
+export const PASTA_PADRAO_CORPUS = resolve(raiz, 'dist', 'calibracao', 'corpus-p0');
 const hash = (conteudo) => `sha256:${createHash('sha256').update(conteudo).digest('hex')}`;
 const holdout = [
   'esfera-regular', 'toro-regular', 'patch-justo', 'prisma-cunha', 'bloco-filetado',
@@ -62,7 +65,7 @@ function escrever(arquivo, conteudo) {
   const atual = (() => { try { return readFileSync(arquivo, 'utf8'); } catch { return null; } })();
   if (atual !== conteudo) writeFileSync(arquivo, conteudo);
 }
-function item(base, indiceBase, indiceProva, split, contador) {
+function item(pasta, base, indiceBase, indiceProva, split, contador) {
   const prova = provas[indiceProva];
   const id = `${split}-${base}-${indiceProva + 1}`;
   const criarEvidencia = (papel, variante) => {
@@ -79,13 +82,13 @@ function item(base, indiceBase, indiceProva, split, contador) {
   };
 }
 
-export function gerarCorpusP0() {
+export function gerarCorpusP0({ pasta = PASTA_PADRAO_CORPUS } = {}) {
   const itens = [];
   for (const [indiceBase, base] of holdout.entries()) for (let indiceProva = 0; indiceProva < provas.length; indiceProva += 1) {
-    itens.push(item(base, indiceBase, indiceProva, 'holdout', itens.length + 1));
+    itens.push(item(pasta, base, indiceBase, indiceProva, 'holdout', itens.length + 1));
   }
   for (const [indiceBase, base] of calibracao.entries()) for (let indiceProva = 0; indiceProva < provas.length; indiceProva += 1) {
-    itens.push(item(base, indiceBase + holdout.length, indiceProva, 'calibracao', itens.length + 1));
+    itens.push(item(pasta, base, indiceBase + holdout.length, indiceProva, 'calibracao', itens.length + 1));
   }
   const manifesto = {
     formato: 'mecanifica.corpus-avaliacao-p0@1', estado: 'congelado',

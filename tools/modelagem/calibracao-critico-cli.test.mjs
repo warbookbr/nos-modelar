@@ -1,13 +1,12 @@
 /* CLI offline: separa lote público, chave local e respostas para auditoria. */
 import { describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { gerarCorpusP0 } from './gerar-corpus-p0.mjs';
 import { assinarJulgamentoCritico } from './contrato-julgamento-critico.mjs';
 import { executarCalibracaoCriticoCLI } from './calibracao-critico-cli.mjs';
 
-const raiz = resolve(import.meta.dirname, '..', '..');
 const sha = (n) => `sha256:${n.toString(16).padStart(64, '0')}`;
 
 function resposta(apresentacao, lote) {
@@ -17,10 +16,10 @@ function resposta(apresentacao, lote) {
 
 describe('CLI da calibração crítica', () => {
   it('exporta estímulo e chave em arquivos distintos e normaliza a resposta sem rede', () => {
-    gerarCorpusP0();
     const pasta = mkdtempSync(join(tmpdir(), 'mecanifica-critico-cli-'));
     try {
-      const manifesto = resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0/manifesto.json');
+      gerarCorpusP0({ pasta: join(pasta, 'corpus') });
+      const manifesto = join(pasta, 'corpus', 'manifesto.json');
       const lote = join(pasta, 'lote-publico.json'); const chave = join(pasta, 'chave-local.json'); const respostas = join(pasta, 'respostas.json'); const normalizado = join(pasta, 'normalizado.json');
       expect(executarCalibracaoCriticoCLI(['exportar', manifesto, lote, chave])).toMatchObject({ comando: 'exportar', apresentacoes: 400 });
       const lotePublico = JSON.parse(readFileSync(lote, 'utf8'));

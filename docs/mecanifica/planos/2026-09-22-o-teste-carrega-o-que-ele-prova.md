@@ -136,6 +136,27 @@ direto, e aceita pular só com a condição escrita no código.
 Os scripts de experimento que ficaram na pasta e importavam essas receitas
 quebraram, e nenhum teste os executa. Saem na fatia 5.
 
+## Feito na fatia 3
+
+Os quatro testes da calibração do crítico gravavam o corpus e o canário dentro
+do repositório a cada rodada da suíte, reescrevendo arquivos rastreados. Os dois
+geradores passaram a receber a pasta de destino; os testes usam pasta
+temporária, e a linha de comando grava em `dist/calibracao/`, que não é
+versionada. As cópias geradas que estavam versionadas saíram.
+
+Os quatro estudos de montagem viraram fixture em `tools/fixtures/`, cada uma
+com o nome do que prova: `dobradica-com-extensao`,
+`tres-familias-com-extensao`, `montagem-com-instancias-repetidas` e
+`conjunto-com-submontagens`. Foram só os arquivos que os testes executam; os
+scripts de auditoria visual e as evidências ficaram para a fatia 4. Nenhuma
+afirmação mudou. Reescrever os estudos como fixture mínima trocaria o que os
+testes provam, e isso é o que o plano exclui.
+
+Travas de número de conteúdo que ficaram, para decidir depois fora deste plano:
+`montagem-com-instancias-repetidas` trava doze peças, 1428 vértices e 1434
+faces, e `conjunto-com-submontagens` trava seis peças, duas montagens e cinco
+relações. Elas não provam comportamento, e sim que a fixture não mudou.
+
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova. O que muda é de que objeto a prova

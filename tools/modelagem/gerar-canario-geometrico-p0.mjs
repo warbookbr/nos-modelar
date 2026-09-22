@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { FORMATO_QUALIFICACAO_ALVO, validarQualificacaoAlvo } from '../../src/autoria/qualificacao-alvo.js';
 
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const pasta = resolve(raiz, 'autoria-assistida', 'alvos', 'canario-geometrico-p0');
+/* O canário é gerado por código e sai igual toda vez, então não é versionado.
+   Até 2026-09-22 ele era gravado em `autoria-assistida/alvos/`, dentro do
+   repositório, e cada rodada da suíte reescrevia arquivos rastreados. */
+export const PASTA_PADRAO_CANARIO = resolve(raiz, 'dist', 'calibracao', 'canario-geometrico-p0');
 const hash = (conteudo) => createHash('sha256').update(conteudo).digest('hex');
 const objeto = 'prisma-cunha-sintetico-p0';
 const malha = Object.freeze({
@@ -44,7 +47,7 @@ export function qualificarConjuntoDeVistasCanario(manifesto) {
   return validarQualificacaoAlvo(manifesto.qualificacao);
 }
 
-export function gerarCanarioGeometricoP0() {
+export function gerarCanarioGeometricoP0({ pasta = PASTA_PADRAO_CANARIO } = {}) {
   const origemHash = `sha256:${hash(JSON.stringify(malha))}`;
   const vistas = vistasBase.map((vista) => {
     const arquivo = `vistas/${vista.id}.svg`;

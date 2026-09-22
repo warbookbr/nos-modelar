@@ -184,30 +184,12 @@
 ## autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/
 
 - `auditar-visual.mjs` — Captura isolada e do conjunto; imagens ficam confinadas ao experimento.
-- `carregar-estudo.mjs` — Adaptador privado que usa somente portas oficiais de autoria e leitura.
-- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
 - `executar-estudo.mjs` — Resumo causal e reproduzível da primeira sonda 1.0.
-
-## autoria-assistida/rascunhos-defeituosos/ensaio-ponta-a-ponta-dobradica/receitas/
-
-- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
-- `folha-porta.js` — Receita privada: folha da porta com olhal central.
-- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
 
 ## autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/
 
 - `README.md` — Estudo de campo — conjunto dianteiro mínimo
 - `REGISTRO.md` — Registro de campo
-- `executar-estudo.mjs` — Executa a montagem do estudo sem criar uma porta nova no produto.
-
-## autoria-assistida/rascunhos-defeituosos/estudo-campo-conjunto-dianteiro/receitas/
-
-- `_estudo-aro-dianteiro.js` — ESTUDO DE CAMPO — aro simplificado, separado do pneu e do cubo para testar composição e relações entre peças independentes.
-- `_estudo-cubo-dianteiro.js` — ESTUDO DE CAMPO — cubo escalonado e vazado do conjunto dianteiro mínimo. A peça prova perfil de revolução e três interfaces semânticas.
-- `_estudo-disco-dianteiro.js` — ESTUDO DE CAMPO — disco anular simplificado. O raio externo será alterado na segunda rodada para testar propagação de impacto até a pinça.
-- `_estudo-eixo-dianteiro.js` — ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é evidência descartável de autoria e montagem; não é ativo automotivo.
-- `_estudo-pinca-dianteira.js` — ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a folga radial com o disco sem fingir um tipo de relação ainda inexistente.
-- `_estudo-pneu-dianteiro.js` — ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar assentamento anular e inspeção visual individual.
 
 ## autoria-assistida/rascunhos-defeituosos/estudo-conjunto-dobradica/
 
@@ -225,15 +207,7 @@
 ## autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/
 
 - `auditar-visual.mjs` — Captura duas vistas de cada peça e do conjunto, sem usar a bancada publicada.
-- `carregar-estudo.mjs` — Adaptador confinado do estudo R10. Nenhuma fixture entra no catálogo público.
-- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
 - `executar-estudo.mjs` — Resumo reproduzível do estudo privado R10.
-
-## autoria-assistida/rascunhos-defeituosos/plataforma-procedural-r10/receitas/
-
-- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
-- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
-- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
 
 ## autoria-assistida/rascunhos-defeituosos/prova-cage-quarto-dianteiro/
 
@@ -308,25 +282,7 @@
 ## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/
 
 - `auditar-visual.mjs` — Capturas privadas, globais e isoladas, para crítica visual iterativa.
-- `carregar-estudo.mjs` — Adaptador privado pelas portas oficiais de autoria, exportação e montagem.
-- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
 - `executar-estudo.mjs` — Resumo mensurável da sonda, sem depender da bancada publicada.
-- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
-
-## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/receitas/
-
-- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
-- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
-- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
-- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
-- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
-- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
-- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
-- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
-- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
-- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
-- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
-- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
 
 ## autoria-assistida/rascunhos-defeituosos/sonda-supercarro-1-0/referencias/
 
@@ -906,12 +862,68 @@
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
 
+## tools/fixtures/conjunto-com-submontagens/
+
+- `executar-estudo.mjs` — Fixture de teste: um conjunto de seis peças em duas submontagens, com relações diretas e indiretas. Quem a usa é `tools/mecanifica/contexto-montagem-estudo.t…
+
+## tools/fixtures/conjunto-com-submontagens/receitas/
+
+- `_estudo-aro-dianteiro.js` — ESTUDO DE CAMPO — aro simplificado, separado do pneu e do cubo para testar composição e relações entre peças independentes.
+- `_estudo-cubo-dianteiro.js` — ESTUDO DE CAMPO — cubo escalonado e vazado do conjunto dianteiro mínimo. A peça prova perfil de revolução e três interfaces semânticas.
+- `_estudo-disco-dianteiro.js` — ESTUDO DE CAMPO — disco anular simplificado. O raio externo será alterado na segunda rodada para testar propagação de impacto até a pinça.
+- `_estudo-eixo-dianteiro.js` — ESTUDO DE CAMPO — eixo simples do conjunto dianteiro mínimo. Esta peça é evidência descartável de autoria e montagem; não é ativo automotivo.
+- `_estudo-pinca-dianteira.js` — ESTUDO DE CAMPO — pinça em três volumes, suficiente para tornar visível a folga radial com o disco sem fingir um tipo de relação ainda inexistente.
+- `_estudo-pneu-dianteiro.js` — ESTUDO DE CAMPO — pneu simplificado, uma peça separada do aro para provar assentamento anular e inspeção visual individual.
+
 ## tools/fixtures/conjunto-do-eixo/
 
 - `anel-tampa.js` — anel-tampa.js — anel que assenta no suporte, do conjunto de prova descrito em `eixo-guia.js`.
 - `eixo-guia.js` — eixo-guia.js — a receita declarativa pequena que os testes de autoria usam. Ela tem o mínimo de que eles precisam: um cilindro, um comprimento dado por parâm…
 - `materializar-catalogo.mjs` — Materializa o conjunto do eixo como catálogo MCP descartável, na pasta passada como argumento. O destino é obrigatório: gravar dentro do repositório por omis…
 - `suporte-de-eixo.js` — suporte-de-eixo.js — suporte com alojamento, piloto e assento anular, do conjunto de prova descrito em `eixo-guia.js`.
+
+## tools/fixtures/dobradica-com-extensao/
+
+- `carregar-estudo.mjs` — Fixture de teste: uma dobradiça de três receitas compostas que usa a extensão `prisma-triangular`. Quem a usa é `tools/oficina/ensaio-ponta-a-ponta-dobradica…
+- `composicoes.js` — Subgrafos privados e paramétricos do ensaio 1.0.
+
+## tools/fixtures/dobradica-com-extensao/receitas/
+
+- `folha-batente.js` — Receita privada: folha do batente com dois olhais.
+- `folha-porta.js` — Receita privada: folha da porta com olhal central.
+- `parafuso-central.js` — Receita privada: pino/parafuso passante, sem promessa de rosca helicoidal.
+
+## tools/fixtures/montagem-com-instancias-repetidas/
+
+- `carregar-estudo.mjs` — Fixture de teste: uma montagem de doze peças com uma submontagem de roda instanciada quatro vezes. Quem a usa é `tools/oficina/sonda-supercarro-1-0.test.mjs`…
+- `composicoes.js` — Bloco privado reutilizável: volume facetado com identidade e aparência.
+- `perfil-autoria.js` — Perfil privado da sonda para orçamento e tolerância de autoria visual.
+
+## tools/fixtures/montagem-com-instancias-repetidas/receitas/
+
+- `aerodinamica.js` — Subconjunto externo com identidades separadas de splitter, difusor e asa.
+- `aro.js` — Aro com anel e oito raios, uma definição reutilizada em quatro posições.
+- `cabine.js` — Canópia contínua por loft, separável da carroceria e de baixo perfil.
+- `carroceria.js` — Envelope principal por seções: x=largura, y=altura, z=frente positiva.
+- `disco-freio.js` — Disco visível sem prometer sistema de freio interno funcional.
+- `entrada-frontal.js` — Entrada de ar frontal compartilhada; volume visual, não duto funcional.
+- `espelho.js` — Espelho externo facetado da sonda privada de supercarro.
+- `farol.js` — Farol emissivo dianteiro da sonda privada de supercarro.
+- `lanterna.js` — Lanterna emissiva traseira da sonda privada de supercarro.
+- `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
+- `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
+- `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
+
+## tools/fixtures/tres-familias-com-extensao/
+
+- `carregar-estudo.mjs` — Fixture de teste: três famílias de peça numa montagem, uma delas feita com a extensão `prisma-triangular`. Quem a usa é `tools/oficina/plataforma-procedural-…
+- `composicoes.js` — Subgrafos privados do estudo R10. Não entram no catálogo de peças.
+
+## tools/fixtures/tres-familias-com-extensao/receitas/
+
+- `apoio-prismatico.js` — Família prismática, produzida por subgrafo declarativo privado.
+- `nervura-triangular.js` — Família triangular, produzida pelo subgrafo que usa a extensão nativa.
+- `pino-circular.js` — Família de revolução, executada pelo registro explícito completo da R10.
 
 ## tools/mapa/
 

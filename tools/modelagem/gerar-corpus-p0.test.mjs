@@ -1,19 +1,19 @@
 /* Corpus sintético P0: estímulos rastreáveis para calibrar crítico, não modelos de produto. */
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
-import { resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { gerarCorpusP0 } from './gerar-corpus-p0.mjs';
 import { validarCorpusAvaliacaoP0 } from './validar-corpus-avaliacao.mjs';
 import { exportarLoteCritico } from './orquestrar-calibracao-critico.mjs';
 
-const raiz = resolve(import.meta.dirname, '..', '..');
-const pasta = resolve(raiz, 'autoria-assistida/avaliacao/corpus-p0');
+const pasta = mkdtempSync(join(tmpdir(), 'corpus-p0-'));
 const sha256 = (arquivo) => `sha256:${createHash('sha256').update(readFileSync(arquivo)).digest('hex')}`;
 
 describe('gerador do corpus sintético P0', () => {
   it('produz 20 objetos holdout, calibração separada e 80 comparações balanceadas', () => {
-    const manifesto = gerarCorpusP0();
+    const manifesto = gerarCorpusP0({ pasta });
     expect(validarCorpusAvaliacaoP0(manifesto)).toMatchObject({ prontoParaCritico: true, itensHoldout: 80, objetosHoldout: 20, defeitosGrosseiros: 20 });
     expect(manifesto.itens.filter(({ split }) => split === 'calibracao')).toHaveLength(20);
     expect(new Set(manifesto.itens.filter(({ split }) => split === 'holdout').map(({ objeto }) => objeto)).size).toBe(20);
