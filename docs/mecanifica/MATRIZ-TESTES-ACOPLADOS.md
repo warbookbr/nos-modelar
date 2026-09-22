@@ -18,6 +18,7 @@ Esta matriz separa cobertura do motor de dependência acidental de receita.
 | Publicação | `exportar-peca`, `mcp/mcp` | manifesto vazio e serviços explícitos | migrado |
 | Revisão MCP | `mcp/ensaio-ponta-a-ponta` | peças privadas válidas, encaixe correto e caso desalinhado | migrado |
 | Integridade | provas nomeadas do acervo | conteúdo removido; capacidades gerais preservadas | removido |
+| Guardas de navegador | `guarda:edicao`, `guarda:escolha`, `guarda:gesto`, `guarda:junta`, `guarda:referencia` | fixture `peca-de-prova`, com os requisitos declarados e conferidos | migrado |
 | Arranjo | `oficina/arranja-contrato`, `portas-espelho-arranja` | fixtures e contratos neutros | migrado |
 | Referência | `referencia-posicional`, aliases e oficina | regra única e provas inline | migrado |
 | Modelagem | serviços e contratos sob `tools/modelagem` | pacote explícito; provas de conteúdo removidas | migrado |
@@ -29,6 +30,15 @@ receita de `prototipos/procedural/v3/pecas`.
 Os testes que só afirmavam contagem, aparência ou medidas de receitas removidas
 foram apagados. O único teste condicional restante é a rodada visual real do
 MCP, que depende de navegador/ambiente externo e não é um gate de catálogo.
+
+Em 2026-09-22 a última peça de acervo saiu e o acervo ficou sem peça, declarado
+em `prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. A remoção acusou oito
+arquivos que ainda dependiam de conteúdo: quatro travavam censo do acervo por
+número, três pediam a peça pelo nome e a régua da própria fixture usava a peça
+de acervo como calibrador. Todos passaram a LER o acervo em vez de nomear peça,
+e os dois casos que só existem contra nome curto de acervo ficam suspensos com o
+motivo escrito até a próxima peça entrar. Ler o acervo é o padrão: o teste
+continua verdadeiro com uma peça, com cinco ou com nenhuma.
 
 ## Regra de saída
 
