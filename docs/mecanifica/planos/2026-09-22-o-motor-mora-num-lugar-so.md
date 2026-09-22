@@ -14,10 +14,10 @@ em `tools/mecanifica`, 22 em `tools/oficina` e 1 em `src/autoria`. Nada diz
 onde procurar. Para saber se a operação `furo` está protegida, é preciso varrer
 as três pastas e ler o conteúdo de cada arquivo, porque o nome também não diz.
 
-O efeito é o mesmo que a peça sofria antes de 2026-09-11, e a solução conhecida
-é a mesma. Quem vai mexer numa operação precisa descobrir a cada sessão onde
-mora a prova dela, e quem escreve uma operação nova não tem onde pôr a prova
-sem escolher uma pasta por conveniência, que foi como as três se formaram.
+O efeito é o mesmo que a peça sofria antes de 2026-09-11, com a mesma solução
+conhecida. Quem mexe numa operação descobre a cada sessão onde mora a prova
+dela, e quem escreve uma operação nova escolhe a pasta por conveniência, que foi
+como as três se formaram.
 
 Há três agravantes medidos. O primeiro é o caminho: ele mora em
 `prototipos/procedural/v3/`, e o projeto inteiro depende dele, com 30 arquivos
@@ -25,19 +25,17 @@ de produção e 38 de teste importando por aí. O nome da pasta afirma que é
 experimento e o uso afirma o contrário.
 
 O segundo é o nome. A pasta se chama `motor`, e a palavra já nomeia três coisas
-distintas aqui: este programa, o "motor de prancha" que desenha contorno em 2D,
-e a peça mecânica que vai dentro de um carro — sentido que o próprio README usou
-até 2026-09-22. Num repositório de modelagem mecânica, a terceira acepção é a
-que qualquer leitor encontra primeiro, e uma peça chamada `motor` no acervo
-colidiria com a pasta do programa. O projeto já tem outro nome para a mesma
-coisa e o usa dezessete vezes nos documentos de entrada: núcleo. O `CLAUDE.md`
-escreve "o núcleo de autoria é independente de Three.js", e dentro da pasta
-`motor/` existe um `nucleo.js`. A pasta tem um nome, a documentação usa outro, e
-o da pasta é o ambíguo.
+aqui: este programa, o "motor de prancha" que desenha contorno em 2D, e a peça
+mecânica que vai dentro de um carro — sentido que o próprio README usou até
+2026-09-22. Num repositório de modelagem mecânica a terceira é a que o leitor
+encontra primeiro, e uma peça chamada `motor` no acervo colidiria com a pasta do
+programa. O projeto já usa outro nome para a mesma coisa, dezessete vezes nos
+documentos de entrada: núcleo. O `CLAUDE.md` escreve "o núcleo de autoria é
+independente de Three.js", e dentro de `motor/` existe um `nucleo.js`.
 
 O terceiro é que `tools/mecanifica` acumulou 144 arquivos com 74 testes,
 misturando ferramenta de linha de comando, guarda de navegador e prova do núcleo
-na mesma pasta, sem que o nome distinga qual é qual.
+sem que o nome distinga qual é qual.
 
 ## Resultado
 
@@ -48,16 +46,13 @@ nomear programa, ficando livre para a peça mecânica.
 
 ## Filtro Agent-First
 
-**REFATORAR.** Não há capacidade nova aqui, e é a decisão certa mesmo assim
-porque o custo que ela baixa é de contexto, que é o recurso mais caro de quem
-trabalha neste repositório por sessão. Hoje responder "o que protege esta
-operação" exige ler três árvores; depois exige abrir uma pasta. Adiar tem custo
-crescente: cada operação nova nasce com a prova em mais um lugar arbitrário.
-
-O risco de refatoração pura é conhecido e é o motivo de este plano existir por
-escrito: mover arquivo não muda comportamento, então a prova de que nada
-quebrou é a bateria inteira verde em cada fatia, e não o julgamento de quem
-moveu.
+**REFATORAR.** Não há capacidade nova aqui, e mesmo assim é a decisão certa
+porque o custo que ela baixa é de contexto, o recurso mais caro de quem trabalha
+aqui por sessão: responder "o que protege esta operação" exigia ler três
+árvores, e passa a exigir abrir uma pasta. Adiar tem custo crescente, porque
+cada operação nova nasce com a prova em mais um lugar arbitrário. Mover arquivo
+não muda comportamento, então a prova de que nada quebrou é a bateria inteira
+verde em cada fatia, e não o julgamento de quem moveu.
 
 ## Incluído
 
@@ -81,9 +76,8 @@ moveu.
   diff de 68 arquivos;
 - reorganizar `src/autoria` e `src/bancada`, que têm outro dono de problema e
   merecem plano próprio;
-- reduzir a quantidade de testes, ou substituir peça de rascunho por peça
-  gerada. É trabalho real e separado, e misturar com mudança de lugar torna
-  impossível dizer qual das duas quebrou algo;
+- reduzir a quantidade de testes ou substituir peça de rascunho por peça gerada:
+  misturar com mudança de lugar torna impossível dizer qual das duas quebrou;
 - mexer em `autoria-assistida/`, pelo mesmo motivo.
 
 ## Gate de saída
@@ -123,70 +117,48 @@ mais barato e reversível para o mais caro.
 ## Medido na fatia 1 — quem prova o núcleo
 
 Dos 46 arquivos de teste em `tools/mecanifica` e `tools/oficina`, 24 importam
-somente de `prototipos/procedural/v3/` e nada mais do repositório. Esses são os
-que provam o núcleo e os que a fatia 2 move. Os outros 22 importam ferramenta
-junto, e ficam onde estão até a fatia 3 decidir o que cada um é.
-
-Dois desses 24 não são de núcleo apesar do import: `conferir-juntas` e
-`exportar-peca` testam a ferramenta ao lado e usam o núcleo só para fabricar a
-malha de entrada. Eles ficam.
+somente de `prototipos/procedural/v3/`. Os outros 22 importam ferramenta junto e
+ficam até a fatia 3 decidir o que cada um é. Dois dos 24 não são de núcleo
+apesar do import: `conferir-juntas` e `exportar-peca` testam a ferramenta ao
+lado e usam o núcleo só para fabricar a malha de entrada.
 
 **A contagem automática de operações não serve para decidir o destino.** Medi
 quantas vezes cada teste cita cada operação e o resultado põe `encostar` em
 `primitivas-basicas`, porque ele constrói dezoito cubos para ter o que encostar.
-O que um teste prova é o assunto dele, não a operação que ele usa de andaime. A
-tabela abaixo é por assunto, lida arquivo por arquivo.
+O que um teste prova é o assunto dele, não a operação que ele usa de andaime. O
+destino abaixo é por assunto, lido arquivo por arquivo.
 
-Oito testes têm nome igual ao de um arquivo do núcleo, e esses são os de destino
-óbvio:
+Oito têm nome igual ao de um arquivo do núcleo e foram para o lado dele:
+`referencia-posicional`, `artefatos-procedencia`, `composicoes-procedurais`,
+`expressoes`, `lacunas-capacidade`, `registro-operacoes`, `catalogo-capacidades`
+e `extensoes-nativas`.
 
-| teste | vai para |
-| --- | --- |
-| `referencia-posicional` | `motor/referencia-posicional.js` |
-| `artefatos-procedencia` | `motor/artefatos.js` |
-| `composicoes-procedurais` | `motor/composicoes.js` |
-| `expressoes` | `motor/expressoes.js` |
-| `lacunas-capacidade` | `motor/lacunas.js` |
-| `registro-operacoes` | `motor/registro.js` |
-| `catalogo-capacidades` | `motor/catalogo.js` |
-| `extensoes-nativas` | `motor/extensoes.js` |
+Sete provam uma operação e foram para o módulo que a define. Em
+`operacoes/estruturais.js`: `encostar`, `arranja-contrato`, `nome-de-copia`,
+`arredondar-aresta` e `furo-raio-por-grupo`. Em
+`operacoes/geradores-avancados.js`: `lathe-fechado` e `loft-fechado`.
 
-Sete provam uma operação e vão para o módulo que a define:
+Sete atravessam operações ou guardam a linha de base, e ficaram na raiz do
+núcleo: `pose-de-criacao`, `ponto-nomeado`, `nomes-de-face`, `lados-por-desvio`,
+`concordancia-por-ponto`, `canon-linha-de-base` e `corpus-motor-r00`.
 
-| teste | operação provada | vai para |
-| --- | --- | --- |
-| `encostar` | `encostar` | `operacoes/estruturais.js` |
-| `arranja-contrato` | `arranja` | `operacoes/estruturais.js` |
-| `nome-de-copia` | `arranja` | `operacoes/estruturais.js` |
-| `arredondar-aresta` | `arredondarAresta` | `operacoes/estruturais.js` |
-| `furo-raio-por-grupo` | `furo` | `operacoes/estruturais.js` |
-| `lathe-fechado` | `lathe` | `operacoes/geradores-avancados.js` |
-| `loft-fechado` | `loft` | `operacoes/geradores-avancados.js` |
-
-E sete atravessam operações ou guardam a linha de base inteira, e ficam na raiz
-do núcleo: `pose-de-criacao`, `ponto-nomeado`, `nomes-de-face`,
-`lados-por-desvio`, `concordancia-por-ponto`, `canon-linha-de-base` e
-`corpus-motor-r00`.
-
-Cinco arquivos de teste vão parar em `operacoes/estruturais.js`, que já tem seis
-operações dentro. Se a fatia 2 mostrar que ler esse arquivo ficou pior, e não
-melhor, a resposta é uma pasta por operação em vez de um arquivo por grupo —
-decisão que só faz sentido tomar com os testes já ao lado.
+Cinco testes ficam em `operacoes/estruturais.js`, que já tem seis operações
+dentro. Se ler esse arquivo tiver ficado pior, a resposta é uma pasta por
+operação em vez de um arquivo por grupo — decisão que só se toma com os testes
+já ao lado.
 
 ## Feito na fatia 2 — os testes ao lado do que provam
 
-Os 22 saíram de `tools/` e entraram na pasta do núcleo: quinze na raiz e sete em
-`operacoes/`, ao lado do arquivo que define a operação provada. Foram junto o
+Os 22 entraram na pasta do núcleo pelo destino da tabela acima. Foram junto o
 `corpus-motor-r00.mjs`, que é dado de linha de base e não ferramenta, e o
 arquivo de base que ele lê.
 
-O nome do teste ficou como estava, em vez de derivar do arquivo provado como
-este plano dizia na seção "Incluído". A regra não sobrevive a dois testes do
-mesmo módulo: cinco provam `estruturais.js` e virariam cinco arquivos de mesmo
-nome. O que o resultado pede é achar a prova abrindo a pasta, e isso a pasta já
-entrega; derivar o nome só acrescentaria colisão.
+O nome do teste ficou como estava, em vez de derivar do arquivo provado como a
+seção "Incluído" dizia: cinco provam `estruturais.js` e virariam cinco arquivos
+de mesmo nome. Achar a prova abrindo a pasta é o que o resultado pede, e a pasta
+já entrega isso.
 
-Três coisas quebraram, e as três eram acoplamento que só a mudança revela:
+Três coisas quebraram, e as três eram acoplamento que só a mudança revela.
 
 `vitest.config.ts` incluía `prototipos/**/*.test.js` e `.test.mjs`, e não
 `.test.ts`. Quinze dos arquivos movidos são `.test.ts`, e teriam parado de rodar
@@ -194,25 +166,21 @@ em silêncio — o próprio arquivo tem um comentário dizendo que isso já acon
 uma vez. A extensão entrou.
 
 `corpus-motor-r00.mjs` resolve o arquivo de base por caminho montado à mão a
-partir de `import.meta.dirname`, e não por import. Mover o arquivo quebrou o
-caminho. É o risco que a seção abaixo previu, e o único do tipo achado.
+partir de `import.meta.dirname`, e mover quebrou o caminho: é o risco previsto.
 
-`conferir-malha.ts`, usado por três testes do núcleo, importa
-`src/autoria/adaptar-three.js`. Ele não pode morar no núcleo, porque o acordo de
-trabalho diz que o núcleo é independente de Three.js. Ficou em `tools/oficina/`,
-e os três testes movidos apontam para lá. Isso é dívida declarada e não resolvida
-aqui: três provas do núcleo dependem de um auxiliar que traz Three.js junto.
+E `conferir-malha.ts`, usado por três testes do núcleo, importa
+`src/autoria/adaptar-three.js`, contra o acordo de trabalho, que manda o núcleo
+ser independente de Three.js. Ficou em `tools/oficina/`, com os três apontando
+para lá; é dívida declarada e não resolvida aqui.
 
-`docs:citacoes:check` acusou uma skill citando o caminho antigo de um dos testes
-como prova de uma afirmação. É o gate fazendo o que o caso das folhas de peça
-apagadas mostrou faltar em texto corrido.
+E `docs:citacoes:check` acusou uma skill citando o caminho antigo de um teste.
 
 ## Riscos e parada
 
-O risco principal é a refatoração revelar acoplamento escondido, como já
-aconteceu três vezes ao paralelizar os gates em 2026-09-22. Um teste pode
-depender da posição relativa do arquivo, por caminho montado à mão em vez de
-import. A fatia 1 existe para encontrar isso antes de mover qualquer coisa.
+O risco principal é a refatoração revelar acoplamento escondido, como aconteceu
+três vezes ao paralelizar os gates em 2026-09-22 e mais três na fatia 2. Um
+teste pode depender da posição do arquivo por caminho montado à mão em vez de
+import.
 
 O risco que obriga parar: se mover um teste mudar o que ele afirma, o plano
 parou de ser neutro e virou mudança de comportamento disfarçada. Nesse caso a
@@ -223,10 +191,9 @@ reescreve caminho em 68 arquivos e vai gerar um diff enorme e ilegível. Ela dev
 ser um commit sozinho, sem nenhuma outra mudança junto, para que revisar seja
 possível.
 
-Um risco do renome: `motor` aparece em texto corrido de documento, comentário e
-mensagem de commit, com os três sentidos misturados. Trocar tudo por busca e
-substituição renomearia também a peça mecânica e o motor de prancha. A troca é
-só de caminho de import e de nome de pasta; texto corrido é lido um a um.
+Um risco do renome: `motor` aparece em texto corrido com os três sentidos
+misturados, então trocar tudo por busca e substituição renomearia também a peça
+mecânica e o motor de prancha. A troca é só de caminho e nome de pasta.
 
 ## Fechamento
 
