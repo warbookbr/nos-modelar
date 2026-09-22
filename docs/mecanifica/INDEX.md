@@ -179,22 +179,22 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [nada depende da bicicleta](planos/2026-09-17-nada-depende-da-bicicleta.md).
-  Dois estão [congelados](planos/congelados/README.md): o modelador inverso, de
-  que dependem nova geometria, corpus de priors, fitting e MCP de edição; e o
-  vocabulário poligonal da bancada.
+- Plano ativo: [nada depende da bicicleta](planos/2026-09-17-nada-depende-da-bicicleta.md);
+  rascunho aberto: [o que o braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md),
+  cujo resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
+  o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
+  e MCP de edição, e o vocabulário poligonal da bancada.
 - `alinhar` e variantes nomeadas seguem recusados; `loft` fechado já existe.
-  Medida e critérios em `docs/mecanifica/planos/BACKLOG.md`.
+  Medida e critérios em `planos/BACKLOG.md`.
 
 Nenhuma pendência desta lista autoriza implementação automática.
 
 ## Histórico e inventário
 
-Resultados encerrados da Mecanifica ficam em
-[`historico/README.md`](historico/README.md) e os planos já fechados em
-[`planos/encerrados/README.md`](planos/encerrados/README.md). Decisões do NÓS
-ficam em `docs/nos-herdado/`. Nenhuma dessas zonas autoriza trabalho novo.
+Resultados encerrados ficam em [`historico/README.md`](historico/README.md), os
+planos fechados em [`planos/encerrados/README.md`](planos/encerrados/README.md) e
+as decisões do NÓS em `docs/nos-herdado/`. Nenhuma delas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em
-[`INVENTARIO.md`](INVENTARIO.md) (`docs/mecanifica/INVENTARIO.md`); o
-inventário mecânico é gerado em [`../MAPA.md`](../MAPA.md), nunca à mão.
+[`INVENTARIO.md`](INVENTARIO.md); o inventário mecânico é gerado em
+[`../MAPA.md`](../MAPA.md), nunca à mão.

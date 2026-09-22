@@ -100,10 +100,11 @@ Tudo em `prototipos/procedural/v3/pecas/` é exemplo. Cada peça existe para exe
 provar uma capacidade do núcleo, e nada mais. Nenhuma é referência de
 engenharia, componente aprovado ou ponto de partida de produto.
 
-Os nomes enganam de propósito pouco: `roda-dianteira`, `freio-disco`, `moto` e
-`drone-inspecao` soam definitivos, e não são. Medidas e proporções foram
-escolhidas para fazer uma capacidade passar ou falhar, não para descrever um
-componente real.
+Os nomes enganam de propósito pouco: `bicicleta-quadro` soa definitivo, e não
+é. Medidas e proporções foram escolhidas para fazer uma capacidade passar ou
+falhar, e não para descrever um componente real. O acervo já teve cinquenta
+peças com nomes assim — `roda-dianteira`, `freio-disco`, `moto` — e todas foram
+apagadas quando deixaram de provar alguma coisa.
 
 O que este repositório sustenta é **o núcleo e as capacidades provadas**. A
 geometria das peças pode mudar ou ser removida a qualquer momento, sem aviso e
@@ -112,9 +113,10 @@ refaça a peça — ela nunca foi o contrato.
 
 ### O consumidor externo não governa este repositório
 
-Duas peças são exportadas para `pecas-resolvidas/` e lidas pelo repositório do
-produto. Isso as torna dado de integração, e **não** dá a elas poder de veto
-aqui.
+Peças exportadas para `pecas-resolvidas/` são lidas pelo repositório do
+produto, o que as torna dado de integração e **não** lhes dá poder de veto
+aqui. Hoje o manifesto está vazio e nenhuma peça é exportada; a regra vale para
+quando voltar a haver.
 
 Nenhuma decisão deste repositório precisa ser adiada, reduzida ou recusada
 porque mudaria um arquivo exportado. O foco é o trabalho da IA ao criar,
@@ -143,7 +145,7 @@ npm ci
 npm run dev
 npm run build
 npm test
-npm run criar -- braco-robotico
+npm run criar -- bicicleta-quadro
 npm run descrever:montagem:persistida -- --arquivo=<raiz.json> --raiz-montagens=<dir> --raiz-pecas=<dir>
 ```
 
