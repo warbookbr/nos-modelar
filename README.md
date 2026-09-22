@@ -66,32 +66,28 @@ resto:
 
 ## Estado
 
-- O **fluxo de autoria** foi homologado nos Casos 1 e 2, e a série foi encerrada
-  aí. O que esses casos aprovam é o processo — briefing, execução na bancada,
-  medição e revisão. A peça usada em cada caso continua sendo exemplo, como
-  todas as outras: homologar o fluxo nunca homologou geometria.
-- **Plano executivo ativo:** [plataforma procedural extensível e
-  descobrível](docs/mecanifica/planos/encerrados/2026-08-18-plataforma-procedural-extensivel.md).
-  A R00 está mapeando a linha de base e as dependências do motor antes da
-  extração modular. O plano cria núcleo pequeno, registro tipado, módulos,
-  grafo de capacidades, subgrafos reutilizáveis, extensões verificáveis e
-  descoberta Agent-First, sem manter cópia `legacy` ou segundo executor.
-- O núcleo, as receitas, o visor compatível, a bancada e as ferramentas continuam
-  ativos.
-- Montagem persistida v1/v2/v3, contexto JSON consultável, mapa canônico de
-  dependências e revalidação em cascata persistida existem e foram aprovados.
+- **Plano ativo:** [nada depende da
+  bicicleta](docs/mecanifica/planos/2026-09-17-nada-depende-da-bicicleta.md).
+  Guardas de navegador e testes dependem hoje de propriedades que a peça de
+  acervo tem por acaso, e o plano move essa dependência para uma peça de prova
+  governada pelas ferramentas, em `tools/fixtures/`.
+- O núcleo, as receitas, o visor compatível, a bancada e as ferramentas de
+  medição e validação estão ativos e cobertos por gates.
+- Montagem persistida, contexto consultável em JSON, mapa canônico de
+  dependências e revalidação em cascata existem.
 - Escrita para IA existe como **perfil MCP opt-in do host**: autoria de montagem
   e de receita declarativa, com transação, revalidação condicionante, alteração
   por campo semântico, histórico e restauração. Ela não é ligada por padrão.
-- O Módulo 1 do MCP, de leitura e auditoria, foi aprovado. A primeira tentativa
-  de autoria controlada de pacotes foi encerrada com decisão `interromper`; o
-  PR #25 foi fechado sem merge.
 - Na autoria de peça, o núcleo expressa rasgo (`furo` com `ate`), perfil e
   caminho fechados (`lathe` e `loft`), posição e eixo na criação (`em`/`eixo`),
   contato derivado (`encostar`), ponto nomeado e nome de cópia no `arranja`.
 - **Ainda não existem:** solver geral de encaixe, colisão geral, contrato
-  genérico de materiais e revalidação automática de dependentes.
-- O visor legado resolve `earcut` também nos servidores estáticos locais.
+  genérico de materiais, revalidação automática de dependentes e vocabulário
+  poligonal aberto para subdivisão e bisel em aresta arbitrária.
+
+O que já foi decidido, aprovado ou interrompido em rodadas anteriores está em
+`docs/mecanifica/planos/encerrados/` e em `docs/mecanifica/historico/`, e não é
+estado atual.
 
 ## Peças são exemplos
 
