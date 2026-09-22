@@ -30,7 +30,7 @@ import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(HERE, '../..');
+const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
 const OUT = join(REPO, 'tools/bancadas/out');
 const BASE = '/nos-mecanifica/';

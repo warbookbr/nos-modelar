@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { listarAcervo } from '../../src/bancada/acervo-receitas.js';
-import { pecasDoAcervo, referenciasAusentes } from './guarda-acervo.mjs';
+import { pecasDoAcervo, referenciasAusentes } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const RECEITA = 'export default { meta: { nome: "ensaio" }, PASSOS: [] };\n';

@@ -6,7 +6,7 @@
  * que é o nome pelo qual todo o resto do repositório a chama. */
 import { describe, expect, it, vi } from 'vitest';
 import { listarAcervo, listarParaBancada } from './acervo-receitas.js';
-import { pecasDoAcervo } from '../../tools/mecanifica/guarda-acervo.mjs';
+import { pecasDoAcervo } from '../../tools/mecanifica/guardas/guarda-acervo.mjs';
 
 describe('acervo de receitas da bancada', () => {
   it('nomeia peça pelo arquivo, montagem pela pasta, e ordena', () => {

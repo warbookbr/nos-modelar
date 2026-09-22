@@ -15,7 +15,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { filete } from './prancha-geometria.mjs';
+import { filete } from './prancha/prancha-geometria.mjs';
 import * as ALVO from './alvo-chassi-p0.mjs';
 
 /* Só a PELE EXTERIOR entra na silhueta. Incluir tudo punha a caixa da grelha e

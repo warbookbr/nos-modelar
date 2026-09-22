@@ -1037,18 +1037,6 @@
 - `forma-global-n2-caixa-preta.test.mjs` — Prova N2 por uma única fachada pública, sem importar a implementação.
 - `gerar-evidencias-forma-global-n2.mjs` — Gera o pacote reexecutável da prova N2 a partir de duas fontes versionadas. SVG/PNG são derivados; alvo e andaime continuam sendo a autoria.
 - `gerar-schemas-autoria-3d.mjs` — Gera ou confere o índice estático dos schemas públicos da autoria 3D N1.
-- `guarda-acervo.mjs` — guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
-- `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
-- `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
-- `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
-- `guarda-edicao-de-malha.mjs` — guarda-edicao-de-malha.mjs — o modo de edição existe na tela e responde.
-- `guarda-escolha-da-peca.mjs` — guarda-escolha-da-peca.mjs — a escolha de quem está na bancada não é desfeita pelo relógio.
-- `guarda-gesto.mjs` — guarda-gesto.mjs — o que a pessoa desenhou sai da bancada e chega legível.
-- `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
-- `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.
-- `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
-- `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
-- `guarda-referencial.mjs` — guarda-referencial.mjs — confere que toda peça do acervo usa o MESMO referencial e está apoiada acima do chão.
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
@@ -1073,16 +1061,6 @@
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
-- `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
-- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
-- `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
-- `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
-- `prancha-r4-independente.mjs` — Prancha R4, escrita sem reutilizar as receitas P0 ou cupê. É um briefing ficcional completo: o arquivo é a autoria declarativa, não uma malha.
-- `prancha-r4-independente.test.mjs` — prancha-r4-independente.test.mjs — prova fria e mutações da prancha R4.
-- `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
-- `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
-- `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
-- `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `qualificacao-alvo.test.mjs` — qualificacao-alvo.test.mjs — contrato que separa intenção de medição 3D.
@@ -1119,6 +1097,34 @@
 - `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
+
+## tools/mecanifica/guardas/
+
+- `guarda-acervo.mjs` — guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
+- `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
+- `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.
+- `guarda-camera-livre.mjs` — guarda-camera-livre.mjs — prova real: uma órbita da bancada vira URL e a URL volta igual.
+- `guarda-edicao-de-malha.mjs` — guarda-edicao-de-malha.mjs — o modo de edição existe na tela e responde.
+- `guarda-escolha-da-peca.mjs` — guarda-escolha-da-peca.mjs — a escolha de quem está na bancada não é desfeita pelo relógio.
+- `guarda-gesto.mjs` — guarda-gesto.mjs — o que a pessoa desenhou sai da bancada e chega legível.
+- `guarda-inspecao-par.mjs` — guarda-inspecao-par.mjs — prova real de que duas partes recebem vista legível e URL reproduzível.
+- `guarda-junta-da-bancada.mjs` — guarda-junta-da-bancada.mjs — arrastar o canto deforma só quem passa por ele.
+- `guarda-portas-bancada.mjs` — guarda-portas-bancada.mjs — a PROVA PELO OLHO DA BANCADA do painel de PORTAS: abrir `bancada.html` numa peça que publica portas mostra as portas na tela, e a…
+- `guarda-referencia-da-peca.mjs` — guarda-referencia-da-peca.mjs — a PROVA PELO OLHO de que a imagem da peça chega ao navegador a partir da PASTA DA PEÇA.
+- `guarda-referencial.mjs` — guarda-referencial.mjs — confere que toda peça do acervo usa o MESMO referencial e está apoiada acima do chão.
+
+## tools/mecanifica/prancha/
+
+- `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
+- `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
+- `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
+- `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
+- `prancha-r4-independente.mjs` — Prancha R4, escrita sem reutilizar as receitas P0 ou cupê. É um briefing ficcional completo: o arquivo é a autoria declarativa, não uma malha.
+- `prancha-r4-independente.test.mjs` — prancha-r4-independente.test.mjs — prova fria e mutações da prancha R4.
+- `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
+- `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
+- `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
+- `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
 
 ## tools/modelagem/
 

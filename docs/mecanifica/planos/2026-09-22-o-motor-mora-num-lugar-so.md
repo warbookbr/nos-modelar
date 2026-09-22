@@ -160,6 +160,31 @@ para lá; é dívida declarada e não resolvida aqui.
 
 E `docs:citacoes:check` acusou uma skill citando o caminho antigo de um teste.
 
+## Feito na fatia 3 — `tools/mecanifica` separada por papel
+
+A pasta tinha 133 arquivos soltos. Saíram duas famílias inteiras:
+
+`guardas/` com os onze guardas de navegador e o teste de um deles. São os que
+sobem a bancada de verdade, e cada um tem comando próprio no `package.json`.
+
+`prancha/` com os oito arquivos do motor de prancha e os três testes deles. É um
+subsistema fechado, que desenha contorno em 2D antes de existir geometria 3D.
+
+O que ficou na raiz é ferramenta de linha de comando — 36 arquivos com comando
+próprio — e as bibliotecas que elas importam. A distinção entre essas duas ainda
+não está no nome da pasta, e fica para quando doer.
+
+Quebrou o de sempre: caminho montado à mão. Os onze guardas calculam a raiz do
+repositório contando pastas para trás, com `resolve(AQUI, '../..')`, e descer um
+nível quebrou os onze de uma vez. `guarda:gesto` chamava um arquivo irmão por
+`join(HERE, ...)`, e o irmão deixou de ser irmão. `guarda:edicao` importava com
+um `..` só, caso que a substituição automática não pegou porque ela tratou `./`
+e `../../`. E `docs:citacoes:check` acusou quatro citações à pasta de prancha na
+skill que a usa.
+
+Em três fatias seguidas, o que quebrou foi sempre caminho montado à mão em vez
+de import. Os gates pegaram os três, e nenhum seria pego por leitura.
+
 ## Nomes a corrigir na fatia 4
 
 A fatia 2 pôs teste e módulo na mesma pasta, e isso revelou nome que antes

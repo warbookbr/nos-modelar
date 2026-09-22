@@ -1,6 +1,6 @@
 # Contrato de autoria de prancha v1
 
-Uma prancha não é apenas SVG bem-formado. Antes de o motor desenhar, a especificação declara de onde veio o alvo, o quanto ele é confiável e se pode orientar uma modelagem precisa. O contrato é `mecanifica.prancha-autoria@1` e é validado por `tools/mecanifica/prancha-autoria.mjs`.
+Uma prancha não é apenas SVG bem-formado. Antes de o motor desenhar, a especificação declara de onde veio o alvo, o quanto ele é confiável e se pode orientar uma modelagem precisa. O contrato é `mecanifica.prancha-autoria@1` e é validado por `tools/mecanifica/prancha/prancha-autoria.mjs`.
 
 ## Bloco obrigatório
 

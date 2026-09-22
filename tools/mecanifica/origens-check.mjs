@@ -17,7 +17,7 @@
  */
 import { pathToFileURL } from 'node:url';
 import { conferirOrigens } from '../../src/autoria/origem-de-parametro.js';
-import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
+import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const problemas = [];

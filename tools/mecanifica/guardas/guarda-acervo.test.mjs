@@ -11,13 +11,13 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { descreverPecaReutilizavel } from './descrever-peca.mjs';
+import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
 import {
   conferirAcervo, DECLARACAO_DE_VAZIO, emArquivoSolto, pecasDoAcervo, vazioDeclarado,
 } from './guarda-acervo.mjs';
 
 const MOTIVO = 'as duas metades são soldadas uma na outra';
-const ACERVO = resolve(fileURLToPath(new URL('../..', import.meta.url)), 'prototipos/procedural/v3/pecas');
+const ACERVO = resolve(fileURLToPath(new URL('../../..', import.meta.url)), 'prototipos/procedural/v3/pecas');
 
 /* Dois cubos no eixo x, com a distância entre eles como parâmetro: em 0.4 eles
    se encostam, em 3 há um vão de um metro. */

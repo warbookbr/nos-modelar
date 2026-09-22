@@ -10,9 +10,9 @@ medida. Não produz malha, não toca o núcleo procedural e não substitui a
 bancada.
 
 Ferramentas:
-`tools/mecanifica/prancha.mjs` (motor) e
-`tools/mecanifica/prancha-geometria.mjs` (traçado e medida).
-Exemplo: `tools/mecanifica/prancha-chassi-p0.mjs` — leia como uso do motor, não
+`tools/mecanifica/prancha/prancha.mjs` (motor) e
+`tools/mecanifica/prancha/prancha-geometria.mjs` (traçado e medida).
+Exemplo: `tools/mecanifica/prancha/prancha-chassi-p0.mjs` — leia como uso do motor, não
 como alvo. Os landmarks daquele P0 estão marcados NÃO VINCULANTES no próprio
 documento: eles foram inventados e usados como alvo por rodadas, e o perfil
 medido de um cupê real põe o alto do nariz 321 mm abaixo do que o P0 declarava
@@ -168,7 +168,7 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
 ## 8. Comparar com a referência por número
 
 Se existe prancha de referência rasterizada, pare de comparar de olho. Use
-`tools/mecanifica/prancha-referencia.mjs`:
+`tools/mecanifica/prancha/prancha-referencia.mjs`:
 
 ```js
 const img = lerPng(caminho);

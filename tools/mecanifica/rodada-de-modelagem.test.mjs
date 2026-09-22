@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
 let area;
 const ler = (peca) => lerRodadas(peca, { pasta: join(area, peca) });

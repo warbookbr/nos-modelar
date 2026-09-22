@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prancha, imprimirRelatorio } from './prancha.mjs';
-import * as ALVO from './alvo-chassi-p0.mjs';
+import * as ALVO from '../alvo-chassi-p0.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SAIDA = path.join(REPO, 'docs', 'mecanifica', 'img', 'chassi-p0-prancha.svg');

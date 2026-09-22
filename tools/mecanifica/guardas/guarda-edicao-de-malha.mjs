@@ -23,10 +23,10 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { decodePng } from '../bancadas/bench/pngstats.mjs';
+import { decodePng } from '../../bancadas/bench/pngstats.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(HERE, '../..');
+const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
 const PECA = 'peca-de-prova';

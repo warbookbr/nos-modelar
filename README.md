@@ -53,7 +53,7 @@ Duas ferramentas que vale nomear aqui porque não são óbvias pelo nome do
 arquivo, e `docs/mecanifica/INDEX.md` (ver "Desenvolvimento" abaixo) tem o
 resto:
 
-- **motor de prancha** (`tools/mecanifica/prancha.mjs`, skill
+- **motor de prancha** (`tools/mecanifica/prancha/prancha.mjs`, skill
   `desenhar-prancha`) — desenha o CONTORNO de referência de um invólucro em 2D
   (vistas lateral, frontal, traseira, superior), antes de existir geometria 3D,
   e mede a própria saída (contorno fechado, curvatura, landmarks).

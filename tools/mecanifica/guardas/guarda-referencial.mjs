@@ -30,12 +30,12 @@
 import { readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { executarReceita } from '../../../src/autoria/executar-receita.js';
+import { importarReceita, receitaDoModulo } from '../importar-receita.mjs';
+import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
 
-const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
+const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'prototipos/procedural/v3/pecas');
 
 /* Tolerância do chão, em metro. Um micrômetro abaixo de zero é ruído de ponto

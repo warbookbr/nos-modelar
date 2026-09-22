@@ -5,7 +5,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(AQUI, '../..');
+const REPO = resolve(AQUI, '../../..');
 const SAIDA = join(REPO, 'tools/bancadas/out');
 const PLAYWRIGHT = join(REPO, 'node_modules/playwright/index.js');
 const falhas = [];

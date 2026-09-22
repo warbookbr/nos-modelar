@@ -11,7 +11,7 @@ import { existsSync, renameSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
+const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const vite = await import('vite');
 const playwright = await import(pathToFileURL(join(REPO, 'node_modules/playwright/index.js')).href);
 

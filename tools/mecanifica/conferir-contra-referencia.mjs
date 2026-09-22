@@ -39,7 +39,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { lerPng, envelope } from './prancha-referencia.mjs';
+import { lerPng, envelope } from './prancha/prancha-referencia.mjs';
 import { lerArgumentos } from './argumentos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';

@@ -41,7 +41,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(HERE, '../..');
+const REPO = resolve(HERE, '../../..');
 const OUT = join(REPO, 'tools/bancadas/out');
 
 const COM_PORTAS = 'fixture-portas';

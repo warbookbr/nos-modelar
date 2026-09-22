@@ -12,7 +12,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { iniciarRegistro } from './diario.mjs';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resumir } from './ler-diario.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));

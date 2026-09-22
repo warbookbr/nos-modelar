@@ -28,7 +28,7 @@ import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = resolve(HERE, '../..');
+const REPO = resolve(HERE, '../../..');
 const DIST = join(REPO, 'dist');
 const BASE = '/nos-mecanifica/';
 const PECA = 'peca-de-prova';
@@ -149,7 +149,7 @@ try {
 if (existsSync(caminhoDoAlvo)) {
   let saida = '';
   try {
-    saida = execFileSync(process.execPath, [join(HERE, 'descrever-gesto.mjs'), caminhoDoAlvo],
+    saida = execFileSync(process.execPath, [join(HERE, '..', 'descrever-gesto.mjs'), caminhoDoAlvo],
       { cwd: REPO, encoding: 'utf8' });
   } catch (erro) {
     saida = String(erro.stdout ?? '') + String(erro.stderr ?? '');

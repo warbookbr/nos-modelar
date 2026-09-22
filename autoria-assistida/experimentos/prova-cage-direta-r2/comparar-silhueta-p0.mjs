@@ -3,7 +3,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { filete } from '../../../tools/mecanifica/prancha-geometria.mjs';
+import { filete } from '../../../tools/mecanifica/prancha/prancha-geometria.mjs';
 import { FRONTAL, PLANTA, TOPO } from '../../../tools/mecanifica/alvo-chassi-p0.mjs';
 import { capturarVistas, mascaraDaSilhueta } from '../prova-captura-r1b/renderizador-profundo.mjs';
 import { criarCageDireta, espelharCage } from './cage-direta.mjs';

@@ -14,7 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
-import { pecasDoAcervo } from './guarda-acervo.mjs';
+import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
