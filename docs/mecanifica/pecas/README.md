@@ -16,20 +16,26 @@ Uma folha aqui **não** é citada por skill, e não deveria ser: skill é genér
 e mandar `criar-peca` ler a folha do freio dianteiro seria dobrar a skill ao
 conteúdo. Ela é consultada quando a peça em questão entra na tarefa.
 
-## Folhas existentes
+## Não há folha aqui hoje
 
-| peça | receita | folha |
-| --- | --- | --- |
-| freio a disco dianteiro | `prototipos/procedural/v3/pecas/freio-disco.js` | [`PRANCHA-FREIO-DISCO.md`](PRANCHA-FREIO-DISCO.md) |
-| roda dianteira | `prototipos/procedural/v3/pecas/roda-dianteira.js` | [`PRANCHA-RODA-DIANTEIRA.md`](PRANCHA-RODA-DIANTEIRA.md) |
+As duas que existiam, do freio a disco dianteiro e da roda dianteira, saíram em
+2026-09-22 junto com a pasta ficar sem assunto: as receitas que elas descreviam
+foram apagadas em `c78961f6`, e desde então elas apontavam para arquivos que não
+existem.
 
-As duas usam a mesma convenção de eixos, definida na folha do freio: `X` é o
-eixo da roda, `Y` é raio a partir da linha de centro, `Z` é tangente. Tudo em
-metros.
+Elas não eram só texto velho. As duas declaravam que `X` é o eixo da roda, `Y` é
+raio a partir da linha de centro e `Z` é tangente, com tudo em metros. A
+convenção do acervo é outra: `y` é a vertical, o chão fica em `y = 0`, a
+`TABELA` é medida em milímetros e a conversão acontece num lugar só. Quem lesse
+uma dessas folhas para descobrir a convenção adotaria o referencial errado, que
+foi exatamente como uma peça inteira saiu deitada no chão passando em todas as
+medidas. Folha de peça apagada é referencial solto esperando alguém.
 
 ## Regra de arquivo
 
 Uma folha nova nasce junto com a peça que ela documenta, aponta a receita pelo
-caminho, e declara a convenção de eixos ou diz de qual folha a herda. PNG de
+caminho, e declara a convenção de eixos ou diz de qual folha a herda. Ela sai
+junto com a peça: folha sem receita descreve uma peça que ninguém pode abrir, e
+a convenção que ela declara continua valendo para quem ler. PNG de
 vista não é versionado: é evidência regenerável, e cada vista traz o comando
 que a reproduz.

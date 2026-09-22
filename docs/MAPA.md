@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-858 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -456,8 +456,6 @@
 
 ## docs/mecanifica/pecas/
 
-- `PRANCHA-FREIO-DISCO.md` — Prancha de referência — freio a disco dianteiro
-- `PRANCHA-RODA-DIANTEIRA.md` — Prancha de referência — roda dianteira
 - `README.md` — Referência por peça
 
 ## docs/mecanifica/planos/
