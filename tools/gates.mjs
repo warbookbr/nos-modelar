@@ -89,12 +89,16 @@ export const GATES = [
 const CONCORRENCIA_PADRAO = Math.max(2, Math.min(4, availableParallelism()));
 
 /* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada.
-   `test` aparece nos dois porque a suíte inteira roda a de MCP e também sobe
-   servidor de desenvolvimento, em `capturar-montagem.mjs`. */
+   Os três de MCP aparecem nos dois grupos: além de rodarem os mesmos arquivos
+   de teste, a promoção de autoria de montagem faz inspeção visual, que sobe
+   servidor de desenvolvimento por `capturar-montagem.mjs`. Isso foi medido:
+   com `mcp:check` só em `suite-mcp`, ele rodou ao lado de um gate de navegador
+   e a inspeção visual falhou, e a promoção saiu `recusado` em vez de
+   `aprovado` — a falha aponta para a promoção e a causa estava no cache. */
 export const RECURSOS_DO_GATE = {
   test: ['suite-mcp', 'cache-vite'],
-  'mcp:check': ['suite-mcp'],
-  'mcp:visual:check': ['suite-mcp'],
+  'mcp:check': ['suite-mcp', 'cache-vite'],
+  'mcp:visual:check': ['suite-mcp', 'cache-vite'],
   porteiro: ['cache-vite'],
   'bancada:vazia:check': ['cache-vite'],
   'guarda:camera': ['cache-vite'],

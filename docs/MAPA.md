@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+855 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -453,10 +453,6 @@
 - `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
 - `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
 - `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
-
-## docs/mecanifica/pecas/
-
-- `README.md` — Referência por peça
 
 ## docs/mecanifica/planos/
 

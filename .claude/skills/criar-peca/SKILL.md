@@ -14,7 +14,10 @@ do acervo.
 A peça é uma PASTA: `prototipos/procedural/v3/pecas/<peça>/receita.js`, com as
 imagens em `referencias/` ao lado e as rodadas do laço em `rodadas/`. Peça em
 arquivo solto reprova, porque o material dela não tem onde morar junto e volta a
-se espalhar pelo repositório.
+se espalhar pelo repositório. Documento que descreve a peça mora aí dentro
+também, e não em `docs/`: quando a peça for apagada ele sai junto com ela, em
+vez de ficar descrevendo uma receita que ninguém pode abrir e declarando um
+referencial que já não vale.
 
 Use esta skill quando o alvo for uma peça geométrica editável. Se o alvo for
 uma árvore de composição, relações entre peças ou revalidação de conjunto,
@@ -113,25 +116,17 @@ inteira dentro do vocabulário do motor.
 **A convenção vem do catálogo, não do acervo.** As receitas de
 `prototipos/procedural/v3/` são exemplo e não passaram por homologação: em
 2026-09-08 a varredura com o veredito de contato ligado achou defeito real em
-duas delas — `barricada-de-sucata`, que trata `em` como canto mínimo do cubo
-quando é translação de um cubo centrado, e `bicicleta-urbana`, com o tubo
-inferior atravessando o pneu. Aprender convenção lendo receita defeituosa
-propaga o defeito. `descrever_capacidade` devolve schema, exemplo, pré-condições
-e limites da operação, e é essa a fonte.
-
-Abrir uma receita do acervo continua útil para VER uma operação em uso, e aí a
-escolha é pela forma, não pelo tema:
+duas delas, uma tratando `em` como canto mínimo do cubo quando é translação de
+um cubo centrado e outra com tubo atravessando pneu. Aprender convenção lendo
+receita defeituosa propaga o defeito. `descrever_capacidade` devolve schema,
+exemplo, pré-condições e limites da operação, e é essa a fonte.
 
 O acervo publicado hoje não tem receita nenhuma, estado declarado em
-`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. A receita executável que
-resta é `tools/fixtures/acervo/peca-de-prova/`, que existe para as guardas de
-navegador terem o que abrir, com requisitos declarados em
-`tools/fixtures/requisitos-da-peca-de-prova.js`. Ela é peça de ferramenta e não
-exemplo de forma: para ver uma operação em uso, leia o catálogo.
-
-Rode
-`npm run descrever` nela antes de copiar qualquer ideia: o que reprovar ali não
-deve entrar na sua peça.
+`prototipos/procedural/v3/pecas/ACERVO-SEM-PECA.md`. A executável que resta é
+`tools/fixtures/acervo/peca-de-prova/`, peça de ferramenta e não exemplo de
+forma: para ver uma operação em uso, leia o catálogo. Se um dia abrir uma
+receita de acervo, rode `npm run descrever` nela antes de copiar qualquer ideia,
+porque o que reprovar ali não deve entrar na sua peça.
 
 Para peças bilaterais com curvas ou arcos contínuos (como o encosto esculpido da cadeira), use `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` para garantir simetria matemática e eliminar frestas de tangência angular nas pontas. O estudo de caso e notas técnicas estão em [`docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md`](../../../docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md).
 

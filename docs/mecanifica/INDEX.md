@@ -82,7 +82,7 @@ o núcleo nem define o modelo de autoria.
 | Caminho | Papel |
 |---|---|
 | `prototipos/procedural/v3/motor/` | núcleo procedural e adaptadores compatíveis |
-| `prototipos/procedural/v3/pecas/` | receitas determinísticas de peças |
+| `prototipos/procedural/v3/pecas/` | uma pasta por peça: receita, referências, plano e rodadas |
 | `bancada.html`, `src/bancada/` | bancada: inspeção para a IA, edição para a pessoa |
 | `src/autoria/` | núcleo headless: topologia, alvo, descrição do gesto, adaptadores |
 | `tools/bancadas/` | porteiro, criação, exportação e gabaritos |
@@ -90,7 +90,6 @@ o núcleo nem define o modelo de autoria.
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
 | `autoria-assistida/` | pacotes e evidências de homologação de peças |
 | `docs/mecanifica/planos/` | contrato de planos, programas e backlog aberto |
-| `docs/mecanifica/pecas/` | folha de referência por peça pronta ([índice](pecas/README.md)) |
 | `docs/mecanifica/historico/` | evidências encerradas, sem autoridade nova |
 
 Montagem persistida v1 tem contrato e resolvedor em `src/autoria/` e provas em
