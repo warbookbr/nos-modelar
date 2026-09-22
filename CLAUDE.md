@@ -44,4 +44,6 @@ novo — nem por citação, nem por analogia.
   envelhece mal".
 - Rode os gates completos do INDEX.
 - Não edite `docs/MAPA.md` à mão; rode `npm run mapa`.
+- Todo achado responde se o processo o teria pego sozinho. Quando não, o que
+  falta vira gate, campo ou instrução antes de a correção ser dada por pronta.
 - Histórico e evidências encerradas não governam trabalho novo.

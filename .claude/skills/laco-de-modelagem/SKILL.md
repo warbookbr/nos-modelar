@@ -149,8 +149,22 @@ saiu deitada no chão e a causa era plano, não modelagem; saiu quadrada e a cau
 era a técnica que o plano declarou; e o crítico deu um flange como ausente
 porque a imagem que recebeu tinha a interface da bancada ocupando o quadro.
 
-Escreva a atribuição no `atrito` da rodada. É dela que sai o que consertar no
-processo, e não só na peça.
+Depois de nomear o culpado, responda a segunda pergunta, que é a que dá
+consequência à primeira: **o processo teria pego isso sozinho, sem ninguém
+reparar?**
+
+Quando a resposta for sim, conserte e siga. Quando for não, o que falta vira
+gate, campo ou instrução, e isso fica escrito ANTES de a correção ser dada por
+pronta. Sem essa segunda pergunta, conserta-se a ocorrência e deixa-se a causa
+viva, e o mesmo defeito volta na peça seguinte com outra roupa.
+
+Ela também serve de defesa contra a leitura errada do laço. Se algo só foi
+achado porque a pessoa perguntou a coisa certa, a resposta é não: o processo
+não pegou, a pessoa pegou. Resultado que depende de quem está conduzindo é
+defeito de processo, e não habilidade a treinar.
+
+Escreva a atribuição e essa resposta no `atrito` da rodada. É de lá que sai o
+que consertar no processo, e não só na peça.
 
 ## O que você nunca faz
 

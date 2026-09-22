@@ -122,19 +122,12 @@ e limites da operação, e é essa a fonte.
 Abrir uma receita do acervo continua útil para VER uma operação em uso, e aí a
 escolha é pela forma, não pelo tema:
 
-O acervo publicado hoje tem duas receitas. O quadro da bicicleta em
-`prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js` é onde ver tubo de
+O acervo publicado hoje tem uma receita, o quadro da bicicleta em
+`prototipos/procedural/v3/pecas/bicicleta-quadro/receita.js`, onde ver tubo de
 seção que muda ao longo do comprimento e tubo descrito pelas duas bordas
-medidas em vez de eixo mais seção. O braço robótico em
-`prototipos/procedural/v3/pecas/braco-robotico/receita.js` é onde ver cadeia de
-elos com centro de junta derivado por soma, furo em padrão circular no flange e
-pontos declarados conferidos por `conferir-pontos`.
-
-As receitas de exemplo que moravam em `tools/fixtures/acervo/` foram apagadas
-em 2026-09-21. Elas serviam de assunto para testes que conferem encanamento e
-não forma, e cada teste passou a escrever a própria entrada mínima. Sobrou uma
-fixture só, `tools/fixtures/acervo/peca-de-prova/`, que existe para as guardas
-de navegador terem o que abrir e cujos requisitos são declarados em
+medidas em vez de eixo mais seção. A única fixture é
+`tools/fixtures/acervo/peca-de-prova/`, que existe para as guardas de navegador
+terem o que abrir, com requisitos declarados em
 `tools/fixtures/requisitos-da-peca-de-prova.js`.
 
 Rode
