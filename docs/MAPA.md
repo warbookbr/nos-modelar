@@ -164,18 +164,6 @@
 - `sonda-suavizacao-n3-5.test.mjs` — Provas de isolamento, preservação e leitura C1 da sonda N3.5.
 - `suavizar-c1.mjs` — Sonda N3.5: suavização local guiada exclusivamente por continuidade C1. É isolada: não importa o núcleo nem reescreve a receita do quarto dianteiro.
 
-## autoria-assistida/guias/forma/
-
-- `silhueta-e-transicoes.md` — Silhueta e transições
-
-## autoria-assistida/guias/material/
-
-- `leitura-de-material.md` — Leitura de material
-
-## autoria-assistida/guias/processo/
-
-- `evidencia-e-iteracao.md` — Evidência e iteração
-
 ## autoria-assistida/homologacoes/fluxo-ia-v2/caso-01-mancal/
 
 - `relato-processo.md` — Relato de processo — Caso 01: mancal de mesa
@@ -957,6 +945,18 @@
 - `pino-guia.mjs` — Receita procedural privada do pino usado no ensaio MCP.
 - `placa-base.mjs` — Receita procedural privada da placa base usada no ensaio MCP.
 - `suporte-portas.mjs` — Receita procedural privada do suporte usado no ensaio MCP.
+
+## tools/mcp/guias/forma/
+
+- `silhueta-e-transicoes.md` — Silhueta e transições
+
+## tools/mcp/guias/material/
+
+- `leitura-de-material.md` — Leitura de material
+
+## tools/mcp/guias/processo/
+
+- `evidencia-e-iteracao.md` — Evidência e iteração
 
 ## tools/mcp/perfis/
 

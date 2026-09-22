@@ -6,7 +6,7 @@ import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { fecharAceiteVisual, verificarAceiteParaFechamento } from './fechar-aceite-visual.mjs';
 import { FORMATO_ACEITE_VISUAL_REGIONAL } from './aceite-visual-regional.mjs';
-import { serializarCanonico } from './formato-pacote.mjs';
+import { RAIZ_PACOTES, serializarCanonico } from './formato-pacote.mjs';
 
 const assinaturaModelo = `sha256:${'a'.repeat(64)}`; const assinaturaBriefing = `sha256:${'b'.repeat(64)}`;
 const opcoesV2 = { assinaturaModelo, assinaturaBriefing, rejeicoesObrigatorias: ['arco'], recortesObrigatorios: ['arco-dianteiro'] };
@@ -29,8 +29,8 @@ function fixtureCompletaV2() {
     provas: ['descricao-headless'], versao: 1,
   };
   writeFileSync(join(pacote, 'briefing.json'), serializarCanonico(briefing));
-  writeFileSync(join(pacote, 'referencias.json'), readFileSync('autoria-assistida/pacotes/prova-caixote/referencias.json'));
-  writeFileSync(join(pacote, 'revisoes', 'r001', 'revisao.json'), readFileSync('autoria-assistida/pacotes/prova-caixote/revisoes/r003/revisao.json'));
+  writeFileSync(join(pacote, 'referencias.json'), readFileSync(join(RAIZ_PACOTES, 'prova-caixote/referencias.json')));
+  writeFileSync(join(pacote, 'revisoes', 'r001', 'revisao.json'), readFileSync(join(RAIZ_PACOTES, 'prova-caixote/revisoes/r003/revisao.json')));
   const modelo = JSON.parse(readFileSync(join(pacote, 'revisoes', 'r001', 'revisao.json'))).assinaturaModelo;
   const provaRegional = (papel, classe) => {
     const nome = `${papel}-${classe}.svg`; const conteudo = `${nome}-bytes`; writeFileSync(join(repositorio, 'evidencias', nome), conteudo);

@@ -109,6 +109,12 @@ comandos `preparar:modelagem`, `validar:modelagem`, `revisar:modelagem` e
 fluxo com os pacotes oficiais. Apagar a pasta quebra esse fluxo, e decidir se
 ele continua vivo ou se muda de casa é decisão fora do escopo escrito.
 
+Decidido em 2026-09-22: o fluxo continua, e `guias/` e `pacotes/` mudaram para
+`tools/mcp/guias/` e `tools/mcp/pacotes/`, junto do servidor que os usa. As
+duas raízes são definidas uma vez em `formato-pacote.mjs`, e os dois testes que
+montavam o caminho à mão passaram a importar `RAIZ_PACOTES`. Os pacotes não
+guardam caminho nenhum dentro deles, então a mudança não alterou o conteúdo.
+
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova. O que muda é de que objeto a prova

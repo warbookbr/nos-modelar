@@ -15,7 +15,7 @@ const PECAS_PUBLICADAS = idsDoCatalogo(CATALOGO_HOMOLOGADO);
 import { olharBancada } from '../mecanifica/olhar-bancada.mjs';
 import { validarPacoteNoDisco } from '../modelagem/validar-pacote.mjs';
 import { compararRevisoes } from '../modelagem/revisao-modelagem.mjs';
-import { listarCatalogoDePacotes, serializarCanonico } from '../modelagem/formato-pacote.mjs';
+import { listarCatalogoDePacotes, RAIZ_PACOTES, serializarCanonico } from '../modelagem/formato-pacote.mjs';
 import {
   comparar, conteudoRenderizacao, descrever, LIMITES_VISTAS, renderizar,
   resumoComparacao, resumoDescricao, resumoTotais, validar,
@@ -221,8 +221,8 @@ describe('servidor MCP local — perfil revisao', () => {
 
   it('compara revisões oficiais reais pelo comparador existente', async () => {
     const pacote = 'prova-caixote';
-    const anterior = JSON.parse(readFileSync(join(RAIZ, 'autoria-assistida/pacotes', pacote, 'revisoes/r001/revisao.json')));
-    const posterior = JSON.parse(readFileSync(join(RAIZ, 'autoria-assistida/pacotes', pacote, 'revisoes/r002/revisao.json')));
+    const anterior = JSON.parse(readFileSync(join(RAIZ_PACOTES, pacote, 'revisoes/r001/revisao.json')));
+    const posterior = JSON.parse(readFileSync(join(RAIZ_PACOTES, pacote, 'revisoes/r002/revisao.json')));
     const esperado = compararRevisoes(anterior, posterior);
     const { cliente } = await conectado();
     try {
@@ -902,7 +902,7 @@ describe('servidor MCP local — perfil revisao', () => {
        modelagem`/`mecanifica.referencias-modelagem` — as mesmas chaves e
        formato de um pacote oficial real (ex.: homologacao-mancal), só que
        reduzida a um item por lista onde o contrato permite. `guias` aponta
-       para um guia que de fato existe em `autoria-assistida/guias/`, porque
+       para um guia que de fato existe em `tools/mcp/guias/`, porque
        `validarPacote` confere isso contra a raiz real do repositório. */
     function briefingValido(id) {
       return {

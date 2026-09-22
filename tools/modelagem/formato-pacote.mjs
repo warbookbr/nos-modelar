@@ -10,8 +10,12 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const RAIZ_REPOSITORIO = resolve(AQUI, '../..');
-export const RAIZ_GUIAS = join(RAIZ_REPOSITORIO, 'autoria-assistida/guias');
-export const RAIZ_PACOTES = join(RAIZ_REPOSITORIO, 'autoria-assistida/pacotes');
+/* Os guias e os pacotes são dados do servidor MCP e moram com ele desde
+   2026-09-22; antes ficavam em `autoria-assistida/`, pasta que não era de
+   ninguém. Todo consumidor importa estas duas constantes em vez de montar o
+   caminho. */
+export const RAIZ_GUIAS = join(RAIZ_REPOSITORIO, 'tools/mcp/guias');
+export const RAIZ_PACOTES = join(RAIZ_REPOSITORIO, 'tools/mcp/pacotes');
 export const REVISOES = 'revisoes';
 export const LIMITE_PACOTE_BYTES = 24 * 1024;
 export const LIMITE_REFERENCIAS = 4;
@@ -124,7 +128,7 @@ function validarGuias(guias, { raizGuias = RAIZ_GUIAS } = {}) {
       falhar(`briefing.guias[${indice}] precisa apontar para forma/, material/ ou processo/ por slug.`);
     }
     const arquivo = join(raizGuias, `${id}.md`);
-    if (!existsSync(arquivo)) falhar(`guia '${id}' não existe em autoria-assistida/guias/.`);
+    if (!existsSync(arquivo)) falhar(`guia '${id}' não existe em tools/mcp/guias/.`);
     return id;
   });
   unicos(normalizados, 'briefing.guias');
