@@ -80,13 +80,12 @@ modelador declara a convenção; perguntar antes ainda seria mais barato.
 ## O corpus de teste virou um segundo acervo
 
 Resolvido em 2026-09-21. O pedido de apagar todas as receitas tinha sido
-cumprido pela metade: o commit `33fde6a6` moveu a cadeira, a chapa de fixação e
-as três prensas para `tools/fixtures/acervo/` em vez de apagá-las, e de lá elas
-apareciam na bancada publicada como se fossem acervo. As cinco saíram, os
-testes que as usavam passaram a escrever a própria entrada, e sobrou a
-`peca-de-prova`. Dois daqueles testes mediam geometria de verdade e não
-encanamento como eu havia afirmado, e um terceiro tinha piso de 300 passos num
-acervo que já rendia 329, passando por folga e não por prova.
+cumprido pela metade: `33fde6a6` moveu a cadeira, a chapa e as três prensas para
+`tools/fixtures/acervo/` em vez de apagá-las, e de lá elas apareciam na bancada
+publicada como se fossem acervo. As cinco saíram, os testes passaram a escrever
+a própria entrada, e sobrou a `peca-de-prova`. Dois daqueles testes mediam
+geometria e não encanamento como eu havia afirmado, e um terceiro tinha piso de
+300 passos num acervo que já rendia 329, passando por folga e não por prova.
 
 ## Atrito do motor
 
@@ -107,12 +106,12 @@ subdivisão e bisel em aresta arbitrária.
 
 ## Atrito do ambiente
 
-A sessão remota clonou o repositório raso, com 57 commits. Perguntar ao git
-quais commits apagaram receitas devolvia vazio, e vazio é indistinguível de
-"nunca aconteceu"; a história inteira tem 1420 e só apareceu depois de um
-`git fetch --unshallow`. É o mesmo padrão que esta frente já encontrou três
-vezes: devolver silêncio em vez de recusar alto. O repositório também chega sem
-`node_modules`, e nenhum gate roda antes de um `npm ci`.
+A sessão remota clonou o repositório raso, com 57 commits, e perguntar ao git
+quais commits apagaram receitas devolvia vazio, que é indistinguível de "nunca
+aconteceu"; a história tem 1420 e só apareceu depois de um
+`git fetch --unshallow`. É o mesmo padrão que esta frente encontrou três vezes:
+silêncio em vez de recusa alta. O repositório também chega sem `node_modules`, e
+nenhum gate roda antes de um `npm ci`.
 
 ## Falhas de condução, e o que elas ensinam
 
@@ -129,39 +128,38 @@ na primeira ferramenta que respondeu.
 ## O que a receita apagada levava consigo
 
 O braço foi apagado de propósito, para descobrir o que vivia só na conversa. As
-três imagens de referência ficaram, porque são a entrada do alinhamento e não a
-receita, e por elas a próxima rodada regenera a leitura de forma. O que não se
-regenera está aqui.
+três imagens ficaram, porque são a entrada do alinhamento e não a receita, e por
+elas a próxima rodada regenera a leitura de forma. O que não se regenera é isto.
 
 A tabela: base de 180 mm de diâmetro por 150 de altura, coluna de 160 por 180,
 braço de 380 com seção 130 por 110, desvio de cotovelo de 90, antebraço de 370
 afinando de 100 para 85, punho de 100, flange de 90 por 12 com oito furos numa
-circunferência de 65 e furo central de 35. Alcance de 850 e altura total de
-1180 com o braço esticado.
+circunferência de 65 e furo central de 35. Alcance de 850, altura total 1180.
 
-A divergência medida: a referência lateral põe a razão entre alcance horizontal
-e altura em 0,73 e a tabela em 0,61, porque a imagem tem leve perspectiva e o
-antebraço dela é proporcionalmente mais comprido que o de um braço real de 850
-mm. A tabela manda, e isso precisa estar no plano da peça.
+A divergência: a lateral põe a razão entre alcance horizontal e altura em 0,73 e
+a tabela em 0,61, porque a imagem tem leve perspectiva e o antebraço dela é
+proporcionalmente mais comprido que o de um braço real de 850 mm. A tabela manda.
 
-O erro de orientação do flange: na referência o punho dobra e o flange pende
-para baixo; o plano o colocou saindo reto na ponta do antebraço, por decisão
-escrita sem conferir contra a imagem.
+O erro do flange: na referência o punho dobra e o flange pende para baixo; o
+plano o colocou saindo reto na ponta do antebraço, sem conferir contra a imagem.
 
 ## Dois achados da própria remoção
 
 A pasta ficou só com `referencias/` dentro, sem receita, e `guarda:acervo`
 passou dizendo uma peça medida: pasta de peça órfã é invisível para todo gate.
-E quatro testes que travam números do acervo inteiro caíram junto, que é o
-custo medido de acrescentar ou tirar peça.
+E quatro testes que travam números do acervo inteiro caíram junto, que é o custo
+medido de acrescentar ou tirar peça.
 
-## O enquadramento da bancada não enquadra
+## O teto da leitura obrigatória não sabe o que é importante
 
-Com a interface escondida, `enquadrar()` deixa o quadro da bicicleta ocupando
-13,8% da imagem e a checagem de câmera aceita, enquanto a mesma checagem
-reprovava por "silhueta cortada" uma imagem com 79% e margem de sobra em todos
-os lados. Os dois lados da checagem estão errados, e a imagem que chega ao
-crítico é pequena demais para julgar forma.
+`leitura:obrigatoria` trata todo byte como igual, e não distingue a regra mais
+importante do projeto de um parágrafo morno. A pressão de cortar cai sobre o que
+está sendo escrito agora, e não sobre o que ocupa espaço há meses. Quando a
+segunda pergunta entrou no acordo de trabalho o gate reprovou, e o conjunto já
+estava 206 bytes acima do teto antes dela, vermelho na main sem ninguém ter
+rodado. Desta vez o corte saiu de lixo real; da próxima pode não haver lixo.
+O conserto não é gate, porque ninguém mede importância por número: é revisão
+periódica do conjunto, perguntando o que ali já virou histórico.
 
 ## O que fazer, em ordem sugerida
 

@@ -2,8 +2,9 @@
 
 Este repositório mantém o núcleo procedural, as receitas, o visor compatível,
 a bancada e as ferramentas que sustentam a autoria da Mecanifica. A aplicação
-jogável, a Oficina humana e o som foram removidos. `bancada.html` é a única
-aplicação publicada aqui. O produto do cliente vive em
+jogável, a Oficina humana e o som foram removidos; sobraram o visor simples de
+peça e a ferramenta que o fotografa, que servem à inspeção da IA.
+`bancada.html` é a única aplicação publicada aqui. O produto do cliente vive em
 [`warbookbr/mecanica`](https://github.com/warbookbr/mecanica).
 
 ## Entrada de contexto — escolha pela tarefa, não leia tudo
