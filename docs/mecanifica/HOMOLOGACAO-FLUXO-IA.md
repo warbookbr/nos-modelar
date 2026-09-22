@@ -34,14 +34,28 @@ capacidade; não é simulada com pintura ou JavaScript.
 
 O fluxo não cria contrato genérico de materiais nem solver de montagem. A
 abertura oblonga deixou de ser limite depois deste registro: `furo` passou a
-expressar rasgo por `ate`, sem operação nova. Pacotes, imagens e relatos ficam em `autoria-assistida/`; experimentos
-encerrados ficam em `docs/mecanifica/historico/`. Nenhum relato histórico governa
-um caso novo.
+expressar rasgo por `ate`, sem operação nova. Os pacotes dos dois casos moram
+em `tools/mcp/pacotes/`, junto do servidor que os lê.
 
-Os relatos da v2 estão em `autoria-assistida/homologacoes/fluxo-ia-v2/`:
-[caso 01, mancal de mesa](../../autoria-assistida/homologacoes/fluxo-ia-v2/caso-01-mancal/relato-processo.md),
-que terminou bloqueado antes de promover uma revisão válida, e
-[caso 02, placa](../../autoria-assistida/homologacoes/fluxo-ia-v2/caso-02-placa/relato-processo.md).
-Eles não eram apontados por documento nenhum até 2026-09-11 — o contrato dizia
-onde relatos moram e não dizia quais existiam, e relato que ninguém alcança não
-serve de evidência.
+## O que os dois relatos da v2 ensinaram
+
+Os relatos de processo dos casos 1 e 2 foram apagados em 2026-09-22 com a pasta
+`autoria-assistida/`. O que eles registravam de durável está aqui; o resto era
+diário de comandos de uma execução encerrada.
+
+No caso 1, o mancal, o revisor recusava a `interface` que o descritor oficial
+já emitia nas portas cilíndricas, e isso impedia qualquer peça com porta
+mensurável de gerar revisão. O formato de revisão passou a aceitar a
+interface. O mesmo caso mostrou que a peça declarava `fechada: true` com duas
+costuras soltas em cada anel de `lathe`: descrição estrita, gabarito e revisão
+visual aceitaram a promessa, e só o gate do acervo a confrontou. A costura hoje
+é provada em `procedural/nucleo/operacoes/lathe-fechado.test.ts`.
+
+No caso 2, a placa, a câmera recusava a vista frontal de uma chapa de 18 mm
+porque exigia área mínima, e uma chapa fina tem área pequena de verdade. A regra
+passou a pedir 32% no lado longo e 4% no curto, em `src/bancada/criar-ambiente.js`.
+O caso deixou uma lição para quem escreve briefing: pedir que os furos sejam
+distinguíveis nas quatro vistas é pedido impossível para uma chapa fina, porque
+a vista de espessura não mostra furo nenhum. O critério certo nomeia as vistas
+em que o detalhe aparece. O endereço único para uma fileira linear de furos
+continua aberto no `BACKLOG.md` dos planos.

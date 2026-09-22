@@ -157,6 +157,28 @@ Travas de número de conteúdo que ficaram, para decidir depois fora deste plano
 faces, e `conjunto-com-submontagens` trava seis peças, duas montagens e cinco
 relações. Elas não provam comportamento, e sim que a fixture não mudou.
 
+## Feito na fatia 4
+
+Os 55 documentos que sobraram foram conferidos contra o histórico. Os diários
+`ITERACAO-*.md` da cage R2 e da prova de superfície são rastro de iteração e
+saem sem absorção. Os resumos de experimento já têm relatório próprio no
+histórico: A/B do fluxo em `EXPERIMENTO-AB-FLUXO-IA.md`, N3 a N5 e a suavização
+em `RELATORIO-N3-CANAL-PERCEPCAO.md` e `RELATORIO-N4-RESTRICOES.md`, o casco N6
+em `RELATORIO-N6-CANARIO-CASCO-VISUAL.md`, as seções por medida como V-28 em
+`REGISTRO-FALHAS-AUTORIA-V.md`, o estudo de campo em
+`RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` e a dobradiça no fechamento do
+plano encerrado de 2026-08-17.
+
+Só os dois relatos de homologação da v2 tinham lição escrita em nenhum outro
+lugar. Ela passou para `HOMOLOGACAO-FLUXO-IA.md`, que deixou de apontar para os
+relatos: a interface recusada pelo revisor, a promessa de casca fechada que só
+o gate do acervo confrontou, a regra de enquadramento de chapa fina e o critério
+de briefing que pede furo visível em vista de espessura.
+
+Ficam para a fatia 5 os links que relatórios do histórico fazem para
+evidências dentro da pasta. Eles viram texto dizendo que a evidência foi
+apagada, porque link quebrado reprova `docs:links:check`.
+
 ## Filtro Agent-First
 
 **REFATORAR.** Não há capacidade nova. O que muda é de que objeto a prova
