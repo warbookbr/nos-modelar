@@ -63,10 +63,10 @@ governa trabalho novo.
 ## Direção estabelecida
 
 A unidade geométrica editável é a **peça**. A unidade de composição é a
-**montagem**. Montagens podem conter outras montagens e formar sistemas, carros
-completos e, depois que esse modelo estiver maduro, robôs.
+**montagem**. Montagens podem conter outras montagens e formar sistemas e
+máquinas inteiras, sem limite declarado de profundidade.
 
-Carro e motor não são receitas monolíticas. A IA deve trabalhar em alvos
+Máquina composta não é receita monolítica. A IA deve trabalhar em alvos
 reduzidos, escolher quais componentes observar juntos, manter o contexto
 estrutural e revalidar as montagens afetadas depois de uma alteração.
 
@@ -119,7 +119,7 @@ fontes é inventário, não porta de entrada.
   [canário de casco](./historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md), a
   evidência negativa mais recente. Rodada gasta redescobrindo algo já medido é
   falha V-31.
-- Peças versus montagens, carro, motor e dependências:
+- Peças versus montagens, composição e dependências:
   `MONTAGENS-SEMANTICAS.md` e `ARQUITETURA.md`.
 - Montagem persistida e contexto para IA: `MONTAGEM-PERSISTIDA-V1.md` a
   `MONTAGEM-PERSISTIDA-V3.md` e `CONTEXTO-MONTAGEM-IA.md`.

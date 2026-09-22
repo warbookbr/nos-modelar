@@ -2,7 +2,7 @@
 
 > **Definição de direção, não plano de implementação.** Este documento registra
 > como a autoria deve funcionar quando a Mecanifica crescer de peças isoladas
-> para sistemas compostos, carros completos e, depois, robôs. As seções de
+> para máquinas compostas inteiras. As seções de
 > estado atual dizem o que existe hoje. As seções de direção definem o modelo a
 > preservar, sem afirmar que todas as capacidades já estão implementadas.
 ## Objetivo
@@ -10,11 +10,10 @@
 A Mecanifica deve permitir que uma IA crie, refine, inspecione e corrija objetos
 3D mecânicos de complexidade crescente:
 
-1. peças automotivas isoladas;
+1. peças isoladas;
 2. conjuntos formados por várias peças;
-3. sistemas automotivos completos;
-4. um carro inteiro, organizado como composição de sistemas e conjuntos;
-5. depois que esse modelo estiver maduro, robôs e outras máquinas compostas.
+3. sistemas completos;
+4. uma máquina inteira, organizada como composição de sistemas e conjuntos.
 
 A IA não deve apenas produzir uma malha final ou alterar alguns números de um
 molde preparado por humano. Ela deve conseguir construir e alterar a definição
@@ -26,7 +25,7 @@ Quando o vocabulário existente não expressar a intenção, a IA também deve
 conseguir consultar a lacuna, compor uma capacidade reutilizável ou implementar
 uma extensão nativa por contrato e gates. Essa extensão pertence à plataforma
 procedural versionada; não vira código oculto dentro da receita nem caso
-especial de carro ou robô.
+especial de um domínio.
 
 O ciclo desejado é:
 
@@ -69,10 +68,10 @@ descobrem dependências fora dele nem corrigem ou promovem dependentes
 automaticamente. Solver geral de encaixe, materiais canônicos, cinemática e
 autoria compatível com todo módulo JavaScript histórico continuam fora.
 
-## Decisão já estabelecida: carro e motor não são receitas monolíticas
+## Decisão já estabelecida: máquina composta não é receita monolítica
 
-Um carro inteiro não deve ser produzido por uma única receita que concentre
-carroceria, rodas, motor, suspensão, portas, vidros e todos os detalhes.
+Uma máquina inteira não deve ser produzida por uma única receita que concentre
+invólucro, estrutura, mecanismos, articulações e todos os detalhes.
 
 Mesmo que uma receita monolítica consiga produzir uma imagem convincente, ela
 seria inadequada para o objetivo de autoria contínua porque dificultaria:
@@ -87,13 +86,13 @@ seria inadequada para o objetivo de autoria contínua porque dificultaria:
 - continuar o trabalho com outra IA;
 - evoluir o objeto por meses ou anos.
 
-O mesmo vale para um motor. O motor é um sistema composto por conjuntos e peças,
-não uma única unidade razoável de autoria. Bloco, cabeçote, virabrequim, pistões,
-bielas, admissão, escape, distribuição, acessórios e fixações podem exigir
-níveis diferentes de decomposição.
+O mesmo vale para cada subsistema dessa máquina, que costuma ser ele próprio
+composto por conjuntos e peças e não é uma única unidade razoável de autoria.
+Partes diferentes do mesmo subsistema podem exigir níveis diferentes de
+decomposição.
 
-Essa conclusão não depende de um teste comparando um carro monolítico com um
-carro composto. Ela decorre dos requisitos de manutenção, isolamento,
+Essa conclusão não depende de um teste comparando um objeto monolítico com um
+objeto composto. Ela decorre dos requisitos de manutenção, isolamento,
 reutilização e validação local.
 
 ## Estrutura recursiva
@@ -155,7 +154,7 @@ O mapa precisa responder pelo menos:
 - quais relações ligam dois componentes;
 - quais montagens dependem de uma peça;
 - quais validações devem ser repetidas depois de uma alteração;
-- qual caminho leva do carro inteiro até o alvo de edição;
+- qual caminho leva da máquina inteira até o alvo de edição;
 - quais componentes podem ser mostrados juntos para avaliar uma relação.
 
 Relações possíveis incluem, sem fechar agora o formato final:
@@ -174,7 +173,7 @@ Relações possíveis incluem, sem fechar agora o formato final:
 
 ## Contexto de trabalho da IA
 
-A IA não deve carregar nem observar o carro inteiro para toda tarefa. Ela deve
+A IA não deve carregar nem observar a máquina inteira para toda tarefa. Ela deve
 poder declarar um contexto de trabalho reduzido.
 
 Um contexto de trabalho possui quatro conjuntos diferentes:
@@ -212,9 +211,9 @@ validações:
 ```
 
 Isolar visualmente uma peça não pode apagar seu contexto estrutural. A IA pode
-esconder a carroceria para enxergar roda e eixo, mas o sistema continua sabendo
-que ambos pertencem a montagens maiores e que certas relações precisam ser
-preservadas.
+esconder o invólucro para enxergar duas peças internas, mas o sistema continua
+sabendo que ambas pertencem a montagens maiores e que certas relações precisam
+ser preservadas.
 
 Para a IA, a bancada é superfície de atenção e inspeção: ajuda a escolher o que
 ver, e não é a fonte da verdade sobre o que está montado. Para a pessoa, ela é
@@ -225,7 +224,7 @@ fronteira entre elas é conferida por gate.
 ## O papel dos testes e experimentos
 
 Testes não são necessários para decidir princípios que já decorrem logicamente
-dos requisitos. Não é preciso construir um carro inteiro em uma receita única
+dos requisitos. Não é preciso construir uma máquina inteira em uma receita única
 para descobrir que isso prejudica manutenção, isolamento e reutilização.
 
 Testes e experimentos são úteis nas decisões que continuam ambíguas, por
@@ -306,7 +305,7 @@ A Mecanifica deve permitir que uma IA construa máquinas complexas sem tratá-la
 como uma massa única.
 
 A unidade geométrica editável é a peça. A unidade de composição é a montagem.
-Montagens são recursivas e formam sistemas, carros e, futuramente, robôs. A IA
+Montagens são recursivas e formam sistemas e máquinas inteiras. A IA
 trabalha em alvos reduzidos, escolhe quais componentes ver juntos e mantém acesso
 ao contexto estrutural e às dependências. O sistema registra relações como dado,
 revalida o impacto de mudanças e combina medição automática com inspeção visual.

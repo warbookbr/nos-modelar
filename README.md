@@ -3,7 +3,7 @@
 Oficina procedural para IA criar, organizar, inspecionar, medir e corrigir
 objetos 3D mecânicos. O repositório reúne o núcleo geométrico, receitas
 determinísticas, bancada de inspeção e ferramentas de validação necessárias para
-a IA evoluir peças, montagens, carros e, futuramente, robôs.
+a IA evoluir peças e montagens de qualquer domínio mecânico.
 
 ## Acesso
 
@@ -30,12 +30,13 @@ entender o alvo
 ```
 
 A unidade geométrica editável é a **peça**. A unidade de composição é a
-**montagem**. Montagens podem conter outras montagens e formar sistemas, carros
-completos e, depois que esse modelo estiver maduro, robôs.
+**montagem**. Montagens podem conter outras montagens e formar sistemas e
+máquinas inteiras, sem limite declarado de profundidade.
 
-Carro e motor não devem ser receitas monolíticas. A IA deve conseguir trabalhar
-em um alvo reduzido, escolher quais componentes observar juntos, manter acesso
-às dependências e revalidar as montagens afetadas depois de uma alteração.
+Nenhuma máquina composta deve ser uma receita monolítica, por maior que seja o
+conjunto. A IA deve conseguir trabalhar em um alvo reduzido, escolher quais
+componentes observar juntos, manter acesso às dependências e revalidar as
+montagens afetadas depois de uma alteração.
 
 O mapa de composição, relações e dependências deve ser dado estruturado do
 sistema, não apenas documentação manual. MCP, CLI e API são possíveis portas de
@@ -53,9 +54,9 @@ arquivo, e `docs/mecanifica/INDEX.md` (ver "Desenvolvimento" abaixo) tem o
 resto:
 
 - **motor de prancha** (`tools/mecanifica/prancha.mjs`, skill
-  `desenhar-prancha`) — desenha o CONTORNO de referência de uma carroceria em
-  2D (vistas lateral, frontal, traseira, superior), antes de existir geometria
-  3D, e mede a própria saída (contorno fechado, curvatura, landmarks).
+  `desenhar-prancha`) — desenha o CONTORNO de referência de um invólucro em 2D
+  (vistas lateral, frontal, traseira, superior), antes de existir geometria 3D,
+  e mede a própria saída (contorno fechado, curvatura, landmarks).
   `tools/mecanifica/comparar-alvo.mjs` sobrepõe esse desenho ao resultado
   modelado, para checar se um bate com o outro;
 - **crítico visual** (`.claude/agents/critico-visual.md`) — agente sem contexto
