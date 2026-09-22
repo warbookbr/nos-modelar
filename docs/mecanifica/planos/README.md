@@ -4,6 +4,12 @@
 
 **Plano ativo:** nenhum.
 
+[A peça nasce encaixada](2026-09-22-a-peca-nasce-encaixada.md) é **rascunho**
+aberto em 2026-09-22. A montagem vira o lugar de trabalho: cada parte nova é
+criada ao lado das que já existem e deriva as medidas das portas delas, em vez
+de digitar números que só se conferem no fim. O braço robótico é o primeiro
+usuário, depois de o mecanismo ser provado numa fixture neutra.
+
 [O teste carrega o que ele
 prova](encerrados/2026-09-22-o-teste-carrega-o-que-ele-prova.md) fechou em
 2026-09-22 apagando `autoria-assistida/`. O que estava em uso mudou para
