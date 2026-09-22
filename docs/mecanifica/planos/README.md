@@ -16,6 +16,12 @@ bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
 2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado em
 `procedural/pecas/ACERVO-SEM-PECA.md`.
 
+O [teste carrega o que ele prova](2026-09-22-o-teste-carrega-o-que-ele-prova.md)
+é **rascunho** aberto em 2026-09-22. Dezesseis testes carregam material de
+`autoria-assistida/`, uma pasta que não pertence a nenhum deles, para provar
+coisas que uma primitiva criada dentro do próprio teste provaria. É a mesma
+regra do plano da bicicleta, ainda não aplicada aqui.
+
 O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como
 peça, e duas rodadas bastaram para levantar a lista: o corpus de teste virou um
