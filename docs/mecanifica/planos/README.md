@@ -2,25 +2,24 @@
 
 ## Estado
 
-**Plano ativo:** [O núcleo mora num lugar só](2026-09-22-o-motor-mora-num-lugar-so.md).
+**Plano ativo:** [O teste carrega o que ele prova](2026-09-22-o-teste-carrega-o-que-ele-prova.md).
 
-O núcleo tem 26 arquivos e nenhum teste dentro dele; as provas do que ele
-garante estão espalhadas por três outras árvores, e nada diz onde procurar. A
-pasta ainda se chama `motor`, palavra que já nomeia o desenhista de prancha e a
-peça mecânica. O plano leva cada teste para junto da operação que ele prova,
-tira a pasta de `prototipos/`, renomeia para `nucleo` e põe um gate para a
-arrumação não desfazer sozinha.
+Dezesseis testes carregam material de `autoria-assistida/`, uma pasta que não
+pertence a nenhum deles, para provar coisas que uma primitiva criada dentro do
+próprio teste provaria. O plano troca esse material por fixture ao lado de cada
+teste, lê os documentos que sobram para guardar a lição que ainda não estiver no
+histórico e apaga a pasta.
+
+[O núcleo mora num lugar
+só](encerrados/2026-09-22-o-motor-mora-num-lugar-so.md) fechou em 2026-09-22.
+O núcleo está em `procedural/nucleo/` com os testes dele, e
+`procedural/nucleo/arrumacao.test.mjs` recusa teste que prova só o núcleo fora
+dessa pasta e recusa pasta chamada `motor`.
 
 [Nada depende da
 bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
 2026-09-22 com a remoção da peça, e o acervo ficou sem peça, declarado em
 `procedural/pecas/ACERVO-SEM-PECA.md`.
-
-O [teste carrega o que ele prova](2026-09-22-o-teste-carrega-o-que-ele-prova.md)
-é **rascunho** aberto em 2026-09-22. Dezesseis testes carregam material de
-`autoria-assistida/`, uma pasta que não pertence a nenhum deles, para provar
-coisas que uma primitiva criada dentro do próprio teste provaria. É a mesma
-regra do plano da bicicleta, ainda não aplicada aqui.
 
 O [que o braço robótico achou](2026-09-21-o-que-o-braco-robotico-achou.md) é
 **rascunho** aberto em 2026-09-21. O braço foi modelado como sonda, e não como

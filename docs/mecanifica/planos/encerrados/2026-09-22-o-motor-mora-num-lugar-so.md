@@ -1,6 +1,6 @@
 # O núcleo mora num lugar só, e se chama núcleo
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -230,4 +230,22 @@ mecânica e o motor de prancha. A troca é só de caminho e nome de pasta.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-22.** O núcleo mora em `procedural/nucleo/`, se chama
+núcleo e tem os testes dele ao lado das operações que eles provam. As quatro
+primeiras fatias moveram os testes, separaram guardas de prancha em
+`tools/mecanifica` e tiraram a pasta de `prototipos/`. Cada uma revelou caminho
+montado à mão que só quebrava quando o arquivo mudava de lugar.
+
+A fatia 5 entrou como teste, `procedural/nucleo/arrumacao.test.mjs`, que roda
+dentro do gate `test`. A regra escrita na fatia, "teste que importe o núcleo
+fora da pasta dele", reprovaria dezesseis testes legítimos: ferramentas usam o
+núcleo para montar a entrada do que elas provam. O critério medido é outro. É
+recusado o teste fora do núcleo cujos imports locais apontam todos para
+`procedural/` e que não lê arquivo nenhum, porque esse prova só o núcleo. Hoje
+nenhum teste cai nisso. O teste também recusa pasta chamada `motor` e recusa
+em voz alta varredura vazia ou raiz errada. Foi provado com uma isca: um teste
+falso em `tools/oficina` e uma pasta `tools/motor` fizeram as duas recusas
+dispararem.
+
+Fica de fora, como já estava: `conferir-malha.ts` continua em `tools/oficina`
+porque importa Three.js, e o motor de prancha ainda leva a palavra no nome.

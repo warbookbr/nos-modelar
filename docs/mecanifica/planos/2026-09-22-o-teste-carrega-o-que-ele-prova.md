@@ -1,6 +1,6 @@
 # O teste carrega o que ele prova
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
