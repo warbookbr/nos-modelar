@@ -2,12 +2,14 @@
 
 ## Estado
 
-**Plano ativo:** [O motor mora num lugar só](2026-09-22-o-motor-mora-num-lugar-so.md).
+**Plano ativo:** [O núcleo mora num lugar só](2026-09-22-o-motor-mora-num-lugar-so.md).
 
-O motor tem 26 arquivos e nenhum teste dentro dele; as provas do que ele
-garante estão espalhadas por três outras árvores, e nada diz onde procurar. O
-plano leva cada teste para junto da operação que ele prova, tira o motor de
-`prototipos/` e põe um gate para a arrumação não desfazer sozinha.
+O núcleo tem 26 arquivos e nenhum teste dentro dele; as provas do que ele
+garante estão espalhadas por três outras árvores, e nada diz onde procurar. A
+pasta ainda se chama `motor`, palavra que já nomeia o desenhista de prancha e a
+peça mecânica. O plano leva cada teste para junto da operação que ele prova,
+tira a pasta de `prototipos/`, renomeia para `nucleo` e põe um gate para a
+arrumação não desfazer sozinha.
 
 [Nada depende da
 bicicleta](encerrados/2026-09-17-nada-depende-da-bicicleta.md) fechou em
