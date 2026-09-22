@@ -173,6 +173,40 @@ operações dentro. Se a fatia 2 mostrar que ler esse arquivo ficou pior, e não
 melhor, a resposta é uma pasta por operação em vez de um arquivo por grupo —
 decisão que só faz sentido tomar com os testes já ao lado.
 
+## Feito na fatia 2 — os testes ao lado do que provam
+
+Os 22 saíram de `tools/` e entraram na pasta do núcleo: quinze na raiz e sete em
+`operacoes/`, ao lado do arquivo que define a operação provada. Foram junto o
+`corpus-motor-r00.mjs`, que é dado de linha de base e não ferramenta, e o
+arquivo de base que ele lê.
+
+O nome do teste ficou como estava, em vez de derivar do arquivo provado como
+este plano dizia na seção "Incluído". A regra não sobrevive a dois testes do
+mesmo módulo: cinco provam `estruturais.js` e virariam cinco arquivos de mesmo
+nome. O que o resultado pede é achar a prova abrindo a pasta, e isso a pasta já
+entrega; derivar o nome só acrescentaria colisão.
+
+Três coisas quebraram, e as três eram acoplamento que só a mudança revela:
+
+`vitest.config.ts` incluía `prototipos/**/*.test.js` e `.test.mjs`, e não
+`.test.ts`. Quinze dos arquivos movidos são `.test.ts`, e teriam parado de rodar
+em silêncio — o próprio arquivo tem um comentário dizendo que isso já aconteceu
+uma vez. A extensão entrou.
+
+`corpus-motor-r00.mjs` resolve o arquivo de base por caminho montado à mão a
+partir de `import.meta.dirname`, e não por import. Mover o arquivo quebrou o
+caminho. É o risco que a seção abaixo previu, e o único do tipo achado.
+
+`conferir-malha.ts`, usado por três testes do núcleo, importa
+`src/autoria/adaptar-three.js`. Ele não pode morar no núcleo, porque o acordo de
+trabalho diz que o núcleo é independente de Three.js. Ficou em `tools/oficina/`,
+e os três testes movidos apontam para lá. Isso é dívida declarada e não resolvida
+aqui: três provas do núcleo dependem de um auxiliar que traz Three.js junto.
+
+`docs:citacoes:check` acusou uma skill citando o caminho antigo de um dos testes
+como prova de uma afirmação. É o gate fazendo o que o caso das folhas de peça
+apagadas mostrou faltar em texto corrido.
+
 ## Riscos e parada
 
 O risco principal é a refatoração revelar acoplamento escondido, como já

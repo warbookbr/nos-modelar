@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { neutroCanonico, nucleo, OPS, REGISTRO_OPERACOES } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { neutroCanonico, nucleo, OPS, REGISTRO_OPERACOES } from './oficina.js';
 
 /* Os exemplos executáveis do registro são a fonte única do corpus. A ordem
    histórica de OPS é preservada para que a baseline continue comparável. */

@@ -10,7 +10,7 @@
    que ainda importa aqui: o gate usa a regra única e ela classifica certo. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — módulo do motor v3, em JS sem tipos.
-import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from '../../prototipos/procedural/v3/motor/referencia-posicional.js';
+import { contarIdCru, ocorrenciasPosicionais, origemEstrutural, rotularOcorrencias, totalDe } from './referencia-posicional.js';
 
 /* Fixture mínima: a prova precisa de oito portas com origem estrutural, não da
    geometria ou do nome de uma jardineira. Oito entradas preserva o caso que

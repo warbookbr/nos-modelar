@@ -3,8 +3,8 @@
    semântico para a origem citar sem depender de posição na expansão. */
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — núcleo legado em JavaScript, exercitado pela API pública.
-import { nucleo, neutroCanonico } from '../../prototipos/procedural/v3/motor/oficina.js';
-import { conferirMalha } from './conferir-malha.js';
+import { nucleo, neutroCanonico } from '../oficina.js';
+import { conferirMalha } from '../../../../../tools/oficina/conferir-malha.js';
 
 const L = 12;
 const PASSANTE = (centros: any, raio: any = 0.0055) => [

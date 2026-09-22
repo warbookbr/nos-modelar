@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   FORMATO_CATALOGO, FORMATO_LACUNA_CAPACIDADE, classificarLacunaCapacidade,
   criarLacunaCapacidade, planejarCapacidades, schemaDaLacunaCapacidade,
-} from '../../prototipos/procedural/v3/motor/oficina.js';
+} from './oficina.js';
 
 const operacao = (id, entra, sai, interfaces = { entra: [], sai: [] }, requisitos = []) => ({ id, nome: id.split('.').at(-1), versao: '1.0.0', categoria: 'prova', artefatos: { entra, sai }, interfaces, requisitos, efeitos: [], identidade: 'prova' });
 const catalogo = {
@@ -57,7 +57,7 @@ describe('lacunas de capacidade — R08', () => {
   });
 
   it('permanece separado de execução, visor, MCP e filesystem', () => {
-    const fonte = readFileSync(new URL('../../prototipos/procedural/v3/motor/lacunas.js', import.meta.url), 'utf8');
+    const fonte = readFileSync(new URL('./lacunas.js', import.meta.url), 'utf8');
     expect(fonte).not.toMatch(/node:fs|three|mcp|readFile|writeFile/i);
   });
 });

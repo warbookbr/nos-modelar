@@ -1,6 +1,6 @@
 /* artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais. */
 import { describe, expect, it } from 'vitest';
-import { TIPO_MALHA_POLIGONAL, grafoDaProcedencia, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { TIPO_MALHA_POLIGONAL, grafoDaProcedencia, nucleo } from './oficina.js';
 
 describe('artefato neutro e procedência — R04', () => {
   it('tipa a malha sem mudar sua representação compatível', () => {

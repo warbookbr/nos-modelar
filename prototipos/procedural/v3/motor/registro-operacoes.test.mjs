@@ -1,6 +1,6 @@
 /* registro-operacoes.test.mjs — prova configuração explícita e despacho determinístico da R02. */
 import { describe, expect, it } from 'vitest';
-import { OPS, REGISTRO_OPERACOES, criarContratoUsoOperacao, criarRegistroOperacoes, ErroRegistroOperacoes, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { OPS, REGISTRO_OPERACOES, criarContratoUsoOperacao, criarRegistroOperacoes, ErroRegistroOperacoes, nucleo } from './oficina.js';
 
 const op = (id, nome = id, versao = '1.0.0') => ({ id, nome, versao, executar() {} });
 const modulo = (id, operacoes, requer = []) => ({ id, versao: '1.0.0', requer, operacoes });

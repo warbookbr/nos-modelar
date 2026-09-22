@@ -1,9 +1,9 @@
 /* catálogo-capacidades.test.mjs — R05: descoberta deriva do registro, sem tabela paralela. */
 import { describe, expect, it } from 'vitest';
 import Ajv2020 from 'ajv/dist/2020.js';
-import { OPS, REGISTRO_OPERACOES, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
-import { buscarCapacidades, catalogoDeCapacidades, explicarCapacidade, hipergrafoDeCapacidades } from '../../prototipos/procedural/v3/motor/catalogo.js';
-import { sha256Hex } from '../../prototipos/procedural/v3/motor/sha256.js';
+import { OPS, REGISTRO_OPERACOES, nucleo } from './oficina.js';
+import { buscarCapacidades, catalogoDeCapacidades, explicarCapacidade, hipergrafoDeCapacidades } from './catalogo.js';
+import { sha256Hex } from './sha256.js';
 
 describe('catálogo de capacidades — R05', () => {
   const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);

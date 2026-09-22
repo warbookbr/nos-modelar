@@ -60,7 +60,7 @@ espalha a posição para longe da forma.
 - A ordem é **gira e depois move**, e o giro é em torno da origem.
 
 O resultado é idêntico, vértice por vértice, a escrever os passos separados —
-é isso que `tools/mecanifica/pose-de-criacao.test.ts` afirma. Use os passos
+é isso que `prototipos/procedural/v3/motor/pose-de-criacao.test.ts` afirma. Use os passos
 separados quando o pivô do giro **não** for a origem, ou quando precisar mover
 algo que já existe.
 

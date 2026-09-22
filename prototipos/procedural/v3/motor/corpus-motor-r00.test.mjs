@@ -1,7 +1,7 @@
 /* Guarda determinismo e compatibilidade da linha de base R00 do núcleo. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { OPS } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { OPS } from './oficina.js';
 import { baselineMotorR00, casosMotorR00, executarCorpusMotorR00 } from './corpus-motor-r00.mjs';
 
 describe('corpus sintético do motor — R00', () => {

@@ -18,7 +18,10 @@ export default defineConfig({
        existe, nunca roda, e dá impressão de cobertura. */
     include: [
       'src/**/*.test.js', 'src/**/*.test.mjs',
-      'prototipos/**/*.test.js', 'prototipos/**/*.test.mjs',
+      /* `.test.ts` entrou aqui em 2026-09-22, quando os testes do núcleo vieram
+         de `tools/` para a pasta dele: sem esta linha, quinze arquivos movidos
+         deixariam de rodar em silêncio, que é o mesmo defeito descrito acima. */
+      'prototipos/**/*.test.js', 'prototipos/**/*.test.mjs', 'prototipos/**/*.test.ts',
       'tools/**/*.test.ts', 'tools/**/*.test.mjs',
       'autoria-assistida/**/*.test.mjs',
       'modulos/**/*.test.js', 'modulos/**/*.test.mjs',

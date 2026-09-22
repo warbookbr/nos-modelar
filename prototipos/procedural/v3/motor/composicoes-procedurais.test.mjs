@@ -1,7 +1,7 @@
 /* composicoes-procedurais.test.mjs — R06: subgrafos declarativos e reutilizáveis. */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { ErroComposicaoProcedural, FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, expandirChamadasDeComposicao, expandirComposicao, nucleo } from '../../prototipos/procedural/v3/motor/oficina.js';
+import { ErroComposicaoProcedural, FORMATO_COMPOSICAO_PROCEDURAL, REGISTRO_OPERACOES, criarRegistroComposicoes, expandirChamadasDeComposicao, expandirComposicao, nucleo } from './oficina.js';
 
 const MESH = 'mecanifica.malha-poligonal@1';
 const composicao = (id, parametros, nos) => ({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0', parametros, artefatos: { entra: [], sai: [MESH] }, nos });
@@ -20,7 +20,7 @@ const registro = () => criarRegistroComposicoes({ resolverOperacao: REGISTRO_OPE
 
 describe('composições procedurais — R06', () => {
   it('mantém o serviço puro fora de Three.js, MCP e filesystem', () => {
-    const fonte = readFileSync(new URL('../../prototipos/procedural/v3/motor/composicoes.js', import.meta.url), 'utf8');
+    const fonte = readFileSync(new URL('./composicoes.js', import.meta.url), 'utf8');
     expect(fonte).not.toMatch(/from ['"](?:three|node:fs|node:path|@modelcontextprotocol)/);
   });
 
