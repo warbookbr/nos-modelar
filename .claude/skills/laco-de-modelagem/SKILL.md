@@ -127,6 +127,31 @@ Sem isso, o atrito vive na conversa e morre com ela. Uma peça inteira desta
 casa foi modelada como sonda, para levantar exatamente essa lista, e ela só
 sobreviveu porque foi escrita antes de a sessão acabar.
 
+## Depois da entrega, atribua o defeito antes de corrigir
+
+Rodada que termina mal tem seis culpados possíveis, e corrigir o errado gasta a
+rodada seguinte. Antes de despachar de novo, diga qual é, com a evidência na
+mão:
+
+- **o modelador**, quando o plano dizia o que fazer e a entrega não cumpre;
+- **o plano**, quando o que ele pede não é o que a referência mostra — e aí o
+  conserto é rodada de alinhamento nova, não recado ao modelador;
+- **a skill**, quando ninguém tinha como saber: a instrução não existe, ou
+  existe e não diz qual comando, qual campo, qual convenção;
+- **a ferramenta**, quando a medida não alcança o defeito, ou a imagem que
+  chegou ao crítico não deixava ver;
+- **o crítico**, quando ele viu e não soube dizer, ou disse no tipo errado;
+- **quem conduz**, quando pulou um passo do laço, não passou o alvo, ou não
+  rodou o que devia.
+
+Nem sempre é o modelador, e na prática raramente é só ele. Nesta casa uma peça
+saiu deitada no chão e a causa era plano, não modelagem; saiu quadrada e a causa
+era a técnica que o plano declarou; e o crítico deu um flange como ausente
+porque a imagem que recebeu tinha a interface da bancada ocupando o quadro.
+
+Escreva a atribuição no `atrito` da rodada. É dela que sai o que consertar no
+processo, e não só na peça.
+
 ## O que você nunca faz
 
 - Editar o veredito do crítico, "traduzindo" ou suavizando defeito.

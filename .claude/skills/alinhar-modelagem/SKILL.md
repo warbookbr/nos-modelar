@@ -80,10 +80,23 @@ Valem para qualquer objeto, e o plano não fecha sem elas.
    resposta governa a próxima pergunta: pedir realismo e declarar técnica de
    volume simples produz o objeto quadrado que a técnica pediu, e foi o que
    aconteceu aqui.
-6. **Que forma cada parte tem, e por qual técnica.** Uma frase que um estranho
-   entenda — "tubo achatado e arqueado, da caixa até o tubo de direção" — e a
-   técnica em duas ou três palavras. A técnica tem de corresponder ao grau de
-   realismo combinado: carcaça arredondada não sai de "cilindro com tampas".
+6. **Que forma cada parte tem, e por qual técnica.** A frase de `forma`
+   responde três coisas, sempre: se o corpo é revolução ou perfil varrido, onde
+   a seção varia ao longo dele, e onde a aresta é quebrada. A técnica tem de
+   corresponder ao grau de realismo combinado, e sai de duas ou três palavras.
+
+   Ruim: `forma: 'carcaça do braço'`, `tecnica: 'cilindro com tampas'`. Não diz
+   nenhuma das três, e produziu uma caixa onde a referência mostra volume
+   arredondado.
+
+   Bom: `forma: 'perfil varrido na vertical, seção retangular que afina de 130
+   para 90 de largura do ombro ao cotovelo, arestas longitudinais em raio de
+   18'`, `tecnica: 'loft de superelipse com aresta arredondada'`.
+
+   **Corpo que se repete é família, e não seis frases iguais.** As seis juntas
+   deste braço são o mesmo disco saliente entre duas carcaças, e declarar seis
+   vezes a mesma coisa convida a seis resultados diferentes. Diga uma vez como a
+   família é e quantas instâncias existem, e deixe a receita parametrizar.
 7. **Que pares devem se tocar, e por quê.** Esta é a lista que vira `contatos`
    na receita, com motivo escrito. Ela é cobrada por medida: par declarado que
    não se toca reprova, e par que se toca sem ter sido declarado também.
