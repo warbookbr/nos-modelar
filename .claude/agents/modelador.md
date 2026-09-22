@@ -73,6 +73,11 @@ técnica entregues são as que o `PLANO` promete, e onde não são. Isso é conf
 entrega contra promessa escrita, e não julgar o resultado: você responde sim ou
 não contra um texto, não dá nota e não diz se ficou bom.
 
+Essa lista é campo obrigatório do registro da rodada, uma entrada por parte
+declarada, e a rodada não fecha sem ela. Até 2026-09-22 a instrução existia e
+nada conferia que alguém tinha olhado: entregar sem olhar produzia uma rodada
+idêntica à de quem olhou. Parte que não confere precisa dizer onde difere.
+
 Essa é a fronteira, e ela é estreita de propósito. Você olha a referência de
 forma e olha as suas partes contra o texto do plano. Você não julga se o
 conjunto ficou parecido, se a proporção convence ou se a peça lê como o objeto

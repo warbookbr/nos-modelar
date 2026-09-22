@@ -34,9 +34,12 @@ beforeEach(() => { area = mkdtempSync(join(tmpdir(), 'rodadas-')); });
 
 afterEach(() => rmSync(area, { recursive: true, force: true }));
 
+const CONFERIDAS = [{ nome: 'corpo', confere: true }];
+
 describe('registro de rodadas', () => {
   it('grava cada rodada num arquivo próprio, numerado e não reescrito', () => {
     const { arquivo } = gravar('peca-de-ensaio', {
+      partes: CONFERIDAS,
       medidas: { passou: true, relatorio: 'guarda:acervo ok' },
       veredito: veredito(2),
     });
@@ -45,7 +48,7 @@ describe('registro de rodadas', () => {
     const gravado = JSON.parse(readFileSync(arquivo, 'utf8'));
     expect(gravado.veredito.defeitos).toHaveLength(2);
 
-    gravar('peca-de-ensaio', { medidas: { passou: false, relatorio: 'contato aberto' } });
+    gravar('peca-de-ensaio', { partes: CONFERIDAS, medidas: { passou: false, relatorio: 'contato aberto' } });
     expect(ler('peca-de-ensaio').map((r) => r.numero)).toEqual([1, 2]);
   });
 
@@ -54,24 +57,24 @@ describe('registro de rodadas', () => {
     expect(proximaAcao(ler(peca)).acao).toBe('modelar');
 
     /* Rodada 1: as medidas reprovam, então nem se chama revisão. */
-    gravar(peca, { medidas: { passou: false, relatorio: 'contato declarado que nao acontece' } });
+    gravar(peca, { partes: CONFERIDAS, medidas: { passou: false, relatorio: 'contato declarado que nao acontece' } });
     expect(proximaAcao(ler(peca))).toMatchObject({ acao: 'modelar' });
 
     /* Rodada 2: medidas passam e ainda não houve julgamento. */
-    gravar(peca, { medidas: { passou: true, relatorio: 'guarda:acervo ok' } });
+    gravar(peca, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'guarda:acervo ok' } });
     expect(proximaAcao(ler(peca)).acao).toBe('revisar');
 
     /* Rodada 3: três defeitos apontados; volta a modelar com eles na mão. */
-    gravar(peca, { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(3) });
+    gravar(peca, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(3) });
     expect(proximaAcao(ler(peca)).acao).toBe('modelar');
     expect(ler(peca).at(-1).veredito.defeitos).toHaveLength(3);
 
     /* Rodada 4: um defeito restante. Ainda não fecha. */
-    gravar(peca, { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) });
+    gravar(peca, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) });
     expect(proximaAcao(ler(peca)).acao).toBe('modelar');
 
     /* Rodada 5: nenhum defeito e nota alta. Só aqui o laço fecha. */
-    gravar(peca, { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(0, 9) });
+    gravar(peca, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(0, 9) });
     const fim = proximaAcao(ler(peca));
     expect(fim.acao).toBe('parar-fechou');
     expect(fim.motivo).toMatch(/nota 9/);
@@ -83,7 +86,7 @@ describe('registro de rodadas', () => {
 
   it('recusa nome de peça que não serve de pasta, mesmo com a pasta injetada', () => {
     expect(() => ler('../fora')).toThrow(/não é nome de peça/);
-    expect(() => gravar('Peça Com Espaço', { medidas: { passou: true } }))
+    expect(() => gravar('Peça Com Espaço', { partes: CONFERIDAS, medidas: { passou: true } }))
       .toThrow(/não é nome de peça/);
     expect(() => pastaDeRodadas('../fora')).toThrow(/não é nome de peça/);
   });

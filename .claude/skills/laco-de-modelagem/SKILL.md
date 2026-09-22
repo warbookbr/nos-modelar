@@ -89,18 +89,28 @@ que o veredito é decorativo.
 ## Registrando a rodada
 
 Monte o arquivo da rodada e grave. O veredito é o bloco JSON que o crítico
-devolveu, sem edição sua:
+devolveu, sem edição sua, e `partes` é a conferência que o modelador devolveu,
+uma entrada por parte declarada:
 
 ```bash
 cat > /tmp/rodada.json <<'JSON'
 {
   "medidas": { "passou": true, "relatorio": "guarda:acervo ok" },
+  "partes": [
+    { "nome": "base", "confere": true },
+    { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
+  ],
   "veredito": { "alvo": "...", "nota": 6, "defeitos": [], "observacao": "..." },
   "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"]
 }
 JSON
 node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
 ```
+
+A rodada não fecha sem `partes`, e parte que não confere precisa dizer onde
+difere. O contrato do modelador já mandava gerar as vistas e responder por
+parte; o que faltava era a rodada recusar fechar quando ninguém olhou, porque
+entregar sem olhar produzia um registro idêntico ao de quem olhou.
 
 O formato cobra duas coisas que já custaram tentativa aqui: `nota` precisa ser
 número de 0 a 10, e `observacao` não passa de 240 caracteres. Escreva a

@@ -21,12 +21,15 @@ const veredito = (quantos, nota = 6) => ({
   observacao: 'a silhueta geral bate e alguns trechos saem da linha do alvo',
 });
 
-const rodada = (numero, { passou = true, quantos = null, nota = 6 } = {}) => registrarRodada({
+const rodada = (numero, { passou = true, quantos = null, nota = 6, partes = CONFERIDAS } = {}) => registrarRodada({
   peca: 'peca-de-ensaio',
   numero,
   medidas: { passou, relatorio: passou ? 'guarda:acervo ok' : 'contato declarado que nao acontece' },
   veredito: quantos === null ? null : veredito(quantos, nota),
+  partes,
 });
+
+const CONFERIDAS = [{ nome: 'corpo', confere: true }, { nome: 'tampa', confere: true }];
 
 describe('laço de modelagem', () => {
   it('sem rodada nenhuma, a ação é modelar', () => {
@@ -76,6 +79,34 @@ describe('laço de modelagem', () => {
     expect(defeitosAbertos([r])).toHaveLength(2);
     expect(() => registrarRodada({ peca: 'x', numero: 1 })).toThrow(/medidas/);
     expect(() => registrarRodada({ peca: 'x', numero: 0, medidas: { passou: true } })).toThrow(/começa em 1/);
+  });
+
+  /* A CONFERÊNCIA PARTE POR PARTE É OBRIGATÓRIA. O contrato do modelador já
+     mandava gerar as vistas e responder por parte, e nada conferia que alguém
+     tinha olhado: a rodada de quem olhou era idêntica à de quem não olhou. */
+  it('recusa rodada sem a conferência de partes, e diz o que rodar', () => {
+    const base = { peca: 'x', numero: 1, medidas: { passou: true } };
+    expect(() => registrarRodada(base)).toThrow(/vistas:critica/);
+    expect(() => registrarRodada({ ...base, partes: [] })).toThrow(/vazia não é conferência/);
+  });
+
+  it('parte que não confere precisa dizer onde difere', () => {
+    const base = { peca: 'x', numero: 1, medidas: { passou: true } };
+    expect(() => registrarRodada({ ...base, partes: [{ nome: 'punho', confere: false }] }))
+      .toThrow(/não confere e não diz onde/);
+    const aceita = registrarRodada({
+      ...base,
+      partes: [{ nome: 'punho', confere: false, observacao: 'saiu maciço; o plano promete rasgo passante' }],
+    });
+    expect(aceita.partes).toEqual([
+      { nome: 'punho', confere: false, observacao: 'saiu maciço; o plano promete rasgo passante' },
+    ]);
+  });
+
+  it('exige nome e resposta booleana em cada parte', () => {
+    const base = { peca: 'x', numero: 1, medidas: { passou: true } };
+    expect(() => registrarRodada({ ...base, partes: [{ confere: true }] })).toThrow(/nome/);
+    expect(() => registrarRodada({ ...base, partes: [{ nome: 'corpo' }] })).toThrow(/booleano/);
   });
 
   it('rodada com medida reprovada não carrega veredito, e a próxima lê os defeitos da última julgada', () => {

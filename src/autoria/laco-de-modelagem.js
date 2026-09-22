@@ -36,7 +36,7 @@ function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}
  * vem antes do veredito de propósito: peça que nem cumpre o plano não merece
  * olho humano nem de agente.
  */
-export function registrarRodada({ peca, numero, veredito, medidas, atrito = [] }) {
+export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [] }) {
   if (typeof peca !== 'string' || peca.trim() === '') falhar('a rodada precisa dizer de que peça é.');
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
@@ -51,6 +51,16 @@ export function registrarRodada({ peca, numero, veredito, medidas, atrito = [] }
     /* Sem veredito quando as medidas reprovaram: não se gasta revisão em peça
        que já falhou no que é contável. */
     veredito: veredito ? normalizarVeredito(veredito) : null,
+    /* A CONFERÊNCIA PARTE POR PARTE, do modelador. O contrato dele manda gerar
+       as vistas e responder, por parte, se a forma e a técnica entregues são as
+       que o `PLANO` promete. A instrução existia e nada conferia que alguém
+       tinha olhado: entregar sem ter olhado produzia uma rodada idêntica à de
+       quem olhou. Instrumento que nenhum gate exercita volta a ser conselho, e
+       conselho cede sob pressão de terminar.
+
+       Lista com uma entrada por parte declarada. `confere` falso é resposta
+       legítima e pede `observacao` dizendo onde a entrega difere da promessa. */
+    partes: normalizarConferenciaDePartes(partes),
     /* O ATRITO DA RODADA: operação que faltou no motor, coisa que só saiu
        porque alguém fez à mão, medida que não existia, documento errado. A
        skill do laço mandava registrar isso e não havia campo onde cair, então
@@ -58,6 +68,34 @@ export function registrarRodada({ peca, numero, veredito, medidas, atrito = [] }
        vazia quando a rodada não doeu em nada. */
     atrito: normalizarAtrito(atrito),
   };
+}
+
+const LIMITE_OBSERVACAO_DE_PARTE = 240;
+
+function normalizarConferenciaDePartes(valor) {
+  if (valor === undefined || valor === null) {
+    falhar("a rodada precisa trazer 'partes': uma entrada por parte declarada, dizendo se a forma"
+      + ' e a técnica entregues são as que o PLANO promete. Rode `npm run vistas:critica` e olhe'
+      + ' antes de responder.');
+  }
+  if (!Array.isArray(valor)) falhar("'partes' precisa ser lista.");
+  if (valor.length === 0) falhar("'partes' vazia não é conferência; a peça tem partes declaradas.");
+  return Object.freeze(valor.map((item, indice) => {
+    if (!item || typeof item !== 'object') falhar(`'partes[${indice}]' precisa ser objeto.`);
+    const nome = String(item.nome ?? '').trim();
+    if (nome === '') falhar(`'partes[${indice}].nome' precisa nomear a parte do PLANO.`);
+    if (typeof item.confere !== 'boolean') {
+      falhar(`'partes[${indice}].confere' precisa ser booleano: a entrega bate com a promessa ou não.`);
+    }
+    const observacao = String(item.observacao ?? '').trim();
+    if (!item.confere && observacao === '') {
+      falhar(`'partes[${indice}]' não confere e não diz onde: escreva a diferença em 'observacao'.`);
+    }
+    if (observacao.length > LIMITE_OBSERVACAO_DE_PARTE) {
+      falhar(`'partes[${indice}].observacao' não passa de ${LIMITE_OBSERVACAO_DE_PARTE} caracteres.`);
+    }
+    return Object.freeze({ nome, confere: item.confere, observacao });
+  }));
 }
 
 const LIMITE_ATRITO = 16;
