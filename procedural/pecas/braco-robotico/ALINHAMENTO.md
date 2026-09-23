@@ -119,7 +119,11 @@ volume que a foto mostra atrás da coluna e onde o `braco` se prende. O pescoço
 aumenta a alavanca sobre a cintura; o tambor é grosso porque guarda o motor e a
 redução da junta. A parte de trás do ombro não aparece em nenhuma das três
 imagens, então essa forma é decisão da pessoa, e não leitura da referência: um
-cilindro em pé com outro deitado por cima daria a mesma foto de lado.
+cilindro em pé com outro deitado por cima daria a mesma foto de lado. O
+rascunho dela está em `referencias/ombro-rascunho-lado.png`,
+`ombro-rascunho-tras.png`, `ombro-rascunho-frente.png` e
+`ombro-rascunho-perspectiva.png`, e é o alvo para a parte que a foto não
+mostra.
 
 O `ombro` publica embaixo o encaixe no assento do `anelCintura`, no eixo
 vertical, e na face do tambor uma porta cilíndrica de eixo horizontal, onde o
