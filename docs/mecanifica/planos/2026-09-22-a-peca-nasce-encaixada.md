@@ -73,6 +73,8 @@ atual digita números que depois precisam ser conferidos um contra o outro.
 - a resolução dos vínculos no resolvedor de montagem, antes da conferência das
   relações;
 - o registro de etapa: parte, juntas medidas na entrada, estado fixo;
+- a diferença da receita entre rodadas, gravada no registro de rodada pela
+  ferramenta, e a nota de passagem do modelador ao fim de cada etapa;
 - a fixture neutra que prova o mecanismo: dois blocos, o segundo derivando o
   furo do pino do primeiro, e um terceiro derivando do segundo;
 - a mudança nas instruções para conduzir uma parte por vez e declarar a ordem
@@ -128,7 +130,12 @@ e `procedural/pecas/braco-robotico/`.
    para as etapas seguintes o que entendeu errado na primeira. Modelador e
    crítico podem repetir a etapa entre si, e ao fim dela o orquestrador para e
    mostra à pessoa as vistas da parte, as medidas da junta e o veredito. A etapa
-   só fica fixa com o aceite dela.
+   só fica fixa com o aceite dela. Para o modelador novo saber o que foi tentado
+   e o que deu errado, o registro de cada rodada passa a guardar a diferença da
+   receita para a rodada anterior, gerada pela ferramenta ao registrar, ao lado
+   das medidas e do veredito que já guarda. O modelador fecha cada etapa com uma
+   nota curta dizendo por que escolheu o que escolheu, que é a única parte que a
+   ferramenta não consegue gerar sozinha.
 5. **O primeiro usuário.** Terminar a rodada de alinhamento do braço, que parou
    na escala, e construir as três primeiras partes pelo mecanismo. O que der
    atrito volta para as fatias 1 a 4 e é consertado de forma genérica, provado
