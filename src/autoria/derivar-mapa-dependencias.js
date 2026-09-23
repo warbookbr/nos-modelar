@@ -203,16 +203,19 @@ export function derivarMapaDependencias(snapshot) {
      muda em cadeia. Só entram no mapa quando alguma montagem as declara, para
      o mapa de universos sem vínculo continuar idêntico ao de antes. */
   const vinculos = [];
+  const posicoes = [];
   const construcao = [];
   for (const montagem of universo.montagens) {
     const documento = montagens.get(montagem.id).documento;
     if (!documento.vinculos) continue;
     construcao.push({ montagem: montagem.id, etapas: [...documento.etapas] });
     for (const vinculo of documento.vinculos) {
-      vinculos.push({ montagem: montagem.id, id: vinculo.id, alvo: copiar(vinculo.alvo), de: copiar(vinculo.de), acrescimo: vinculo.acrescimo });
+      vinculos.push({ montagem: montagem.id, id: vinculo.id, alvo: copiar(vinculo.alvo), de: copiar(vinculo.de), unidade: vinculo.unidade, acrescimo: vinculo.acrescimo });
     }
+    for (const posicao of documento.posicoes ?? []) posicoes.push({ montagem: montagem.id, ...copiar(posicao) });
   }
   vinculos.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.id, b.id));
+  posicoes.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.id, b.id));
   construcao.sort((a, b) => comparar(a.montagem, b.montagem));
 
   composicao.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.instancia, b.instancia));
@@ -237,7 +240,7 @@ export function derivarMapaDependencias(snapshot) {
     ocorrencias,
     usos,
     relacoes,
-    ...(construcao.length ? { vinculos, construcao } : {}),
+    ...(construcao.length ? { vinculos, posicoes, construcao } : {}),
     cobertura: {
       completa: true,
       entidades: entidades.length,

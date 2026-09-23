@@ -25,7 +25,60 @@
       }
     }
   ],
-  "relacoes": [],
+  "relacoes": [
+    {
+      "id": "meioNoPinoDaBase",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "base"
+        ],
+        "porta": "pino"
+      },
+      "movel": {
+        "caminho": [
+          "meio"
+        ],
+        "porta": "furo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.0002,
+          "toleranciaFabricacao": {
+            "menos": 1e-05,
+            "mais": 1e-05
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "topoNoPinoDoMeio",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "meio"
+        ],
+        "porta": "pino"
+      },
+      "movel": {
+        "caminho": [
+          "topo"
+        ],
+        "porta": "furo"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 0.0002,
+          "toleranciaFabricacao": {
+            "menos": 1e-05,
+            "mais": 1e-05
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    }
+  ],
   "etapas": [
     "base",
     "meio",
@@ -73,6 +126,30 @@
       },
       "unidade": "mm",
       "acrescimo": 0.2
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "meioSobreABase",
+      "instancia": "meio",
+      "porta": "furo",
+      "em": {
+        "instancia": "base",
+        "porta": "pino"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "topoSobreOMeio",
+      "instancia": "topo",
+      "porta": "furo",
+      "em": {
+        "instancia": "meio",
+        "porta": "pino"
+      },
+      "unidade": "mm",
+      "afastamento": 0
     }
   ]
 }

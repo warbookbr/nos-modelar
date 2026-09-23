@@ -3,9 +3,10 @@
 import { lerMontagemPersistida, VERSAO_RELACOES } from './ler-montagem-persistida.js';
 import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { validarSeparacaoDirecional } from './separacao-direcional.js';
-import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
+import { identidadeTransformacaoRigida, comporTransformacoesRigidas, localDaTransformacaoRigida } from './transformacao-rigida.js';
 import { resolverPortasDeMontagem, validarEncaixeCilindrico, validarAssentamentoAnular } from './interfaces-montagem.js';
-import { ErroVinculoDeMedida, valorDoVinculo } from './vinculos-de-medida.js';
+import { ErroVinculoDeMedida, UNIDADES_DE_PARAMETRO, valorDoVinculo } from './vinculos-de-medida.js';
+import { interfaceNoMundo, poseQueEncaixa } from './posicao-por-porta.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem, trilha) {
@@ -392,10 +393,10 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
       const indice = indices.get(id);
       const instancia = { ...montagem.instancias[indice], indice };
       const trilha = [...caminhoPai, instancia.id];
-      const poseLocalCompleta = { escala: 1, ...instancia.pose };
-      const poseMundoCompleta = comporTransformacoesRigidas(posePai, poseLocalCompleta);
-      const poseLocal = poseSemEscala(poseLocalCompleta);
-      const poseMundo = poseSemEscala(poseMundoCompleta);
+      let poseLocalCompleta = { escala: 1, ...instancia.pose };
+      let poseMundoCompleta = comporTransformacoesRigidas(posePai, poseLocalCompleta);
+      let poseLocal = poseSemEscala(poseLocalCompleta);
+      let poseMundo = poseSemEscala(poseMundoCompleta);
       const caminho = trilha.slice();
       if (instancia.alvo.tipo === 'peca') {
         const derivados = parametrosDerivados(montagem, instancia.id, prontas, trilha);
@@ -407,6 +408,27 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
             trilha,
           )
           : await obterPeca(instancia.alvo.ref, instancia, trilha);
+        const posicao = (montagem.posicoes ?? []).find((item) => item.instancia === instancia.id);
+        let posicaoDerivada;
+        if (posicao) {
+          const caminhoPosicao = `posicoes.${posicao.id}`;
+          const propria = definicao.neutro.portas.get(posicao.porta);
+          if (!propria) falhar('posicao-porta-ausente', caminhoPosicao, `a peça '${instancia.id}' não publica a porta '${posicao.porta}'.`, trilha);
+          const vizinha = prontas.get(posicao.em.instancia);
+          const portaVizinha = vizinha?.definicao?.neutro?.portas?.get(posicao.em.porta);
+          if (!portaVizinha) falhar('posicao-porta-ausente', caminhoPosicao, `a peça '${posicao.em.instancia}' não publica a porta '${posicao.em.porta}'.`, trilha);
+          const afastamento = posicao.afastamento / UNIDADES_DE_PARAMETRO[posicao.unidade];
+          const { pose, giroDefinido } = poseQueEncaixa(
+            propria.interface,
+            interfaceNoMundo(portaVizinha.interface, vizinha.poseMundo),
+            afastamento,
+          );
+          poseMundoCompleta = pose;
+          poseLocalCompleta = localDaTransformacaoRigida(posePai, pose);
+          poseLocal = poseSemEscala(poseLocalCompleta);
+          poseMundo = poseSemEscala(poseMundoCompleta);
+          posicaoDerivada = { posicao: posicao.id, em: { ...posicao.em }, porta: posicao.porta, giroDefinido };
+        }
         prontas.set(instancia.id, {
           id: instancia.id,
           caminho,
@@ -415,6 +437,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
           poseMundo,
           definicao,
           ...(derivados.length ? { parametrosDerivados: derivados } : {}),
+          ...(posicaoDerivada ? { posicaoDerivada } : {}),
         });
       } else {
         const filha = await obterMontagem(instancia.alvo.ref, instancia, trilha, pilha);

@@ -2,6 +2,7 @@
 
 import { identidadeTransformacaoRigida, validarTransformacaoRigida } from './transformacao-rigida.js';
 import { ErroVinculoDeMedida, lerEtapas, lerVinculos } from './vinculos-de-medida.js';
+import { ErroPosicaoPorPorta, lerPosicoes } from './posicao-por-porta.js';
 
 export const FORMATO = 'mecanifica.montagem';
 export const VERSAO = 1;
@@ -288,16 +289,24 @@ function lerV4(dado) {
 }
 
 function lerV5(dado) {
-  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'auditoriaIntersecoes'], '$');
-  const { etapas: etapasBrutas, vinculos: vinculosBrutos, auditoriaIntersecoes, ...base } = dado;
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes'], '$');
+  const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, ...base } = dado;
   const lida = lerV3({ ...base, versao: VERSAO_ATUAL });
+  const posesDeclaradas = new Set(dado.instancias
+    .filter((instancia) => ehObjetoSimples(instancia) && instancia.pose !== undefined)
+    .map((instancia) => instancia.id));
   let etapas;
   let vinculos;
+  let posicoes;
   try {
     etapas = lerEtapas(etapasBrutas, new Set(lida.instancias.map((instancia) => instancia.id)));
-    vinculos = lerVinculos(vinculosBrutos, lida.instancias, etapas);
+    posicoes = lerPosicoes(posicoesBrutas, lida.instancias, posesDeclaradas);
+    const arestasDePosicao = posicoes.map((item) => ({ id: `posicoes.${item.id}`, de: { instancia: item.em.instancia }, alvo: { instancia: item.instancia } }));
+    vinculos = lerVinculos(vinculosBrutos, lida.instancias, etapas, arestasDePosicao);
   } catch (erro) {
-    if (erro instanceof ErroVinculoDeMedida) falhar(erro.codigo, erro.caminho, erro.message.slice(erro.caminho.length + 2));
+    if (erro instanceof ErroVinculoDeMedida || erro instanceof ErroPosicaoPorPorta) {
+      falhar(erro.codigo, erro.caminho, erro.message.slice(erro.caminho.length + 2));
+    }
     throw erro;
   }
   return {
@@ -305,6 +314,7 @@ function lerV5(dado) {
     versao: VERSAO_VINCULOS,
     etapas,
     vinculos,
+    posicoes,
     ...(auditoriaIntersecoes !== undefined ? { auditoriaIntersecoes: lerAuditoriaIntersecoes(auditoriaIntersecoes) } : {}),
   };
 }

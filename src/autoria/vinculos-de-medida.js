@@ -136,8 +136,11 @@ export function ordemPorVinculos(vinculos, instanciaIds) {
 }
 
 /* Lê os vínculos de uma montagem v5 contra as instâncias e a ordem declarada.
-   `instancias` é a lista já lida pela montagem. */
-export function lerVinculos(valor, instancias, etapas) {
+   `instancias` é a lista já lida pela montagem. `arestasExtras` traz as outras
+   dependências entre instâncias, como as posições derivadas de porta, no mesmo
+   formato `{ id, de: { instancia }, alvo: { instancia } }`: a ordem e o ciclo
+   valem para todas juntas, porque qualquer uma delas exige a vizinha pronta. */
+export function lerVinculos(valor, instancias, etapas, arestasExtras = []) {
   if (!Array.isArray(valor)) falhar('vinculo-invalido', 'vinculos', 'precisa ser lista, mesmo que vazia.');
   const porId = new Map(instancias.map((instancia) => [instancia.id, instancia]));
   const vinculos = valor.map((item, indice) => lerVinculo(item, indice, porId));
@@ -152,12 +155,13 @@ export function lerVinculos(valor, instancias, etapas) {
     if (destinos.has(destino)) falhar('vinculo-duplicado', `vinculos[${indice}].alvo`, `o parâmetro '${destino}' já tem origem.`);
     destinos.add(destino);
   }
-  ordemPorVinculos(vinculos, new Set(porId.keys()));
+  const arestas = [...vinculos, ...arestasExtras];
+  ordemPorVinculos(arestas, new Set(porId.keys()));
   const posicao = new Map(etapas.map((id, indice) => [id, indice]));
-  for (const [indice, vinculo] of vinculos.entries()) {
-    if (posicao.get(vinculo.de.instancia) > posicao.get(vinculo.alvo.instancia)) {
-      falhar('vinculo-fora-de-ordem', `vinculos[${indice}]`,
-        `'${vinculo.alvo.instancia}' deriva de '${vinculo.de.instancia}', que só é construída depois nas etapas.`);
+  for (const aresta of arestas) {
+    if (posicao.get(aresta.de.instancia) > posicao.get(aresta.alvo.instancia)) {
+      falhar('vinculo-fora-de-ordem', aresta.id,
+        `'${aresta.alvo.instancia}' depende de '${aresta.de.instancia}', que só é construída depois nas etapas.`);
     }
   }
   return vinculos.sort((a, b) => comparar(a.id, b.id));

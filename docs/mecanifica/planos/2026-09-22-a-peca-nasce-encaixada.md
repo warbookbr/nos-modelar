@@ -255,6 +255,17 @@ blocos, com os raios vinculados de propósito errados na receita, para a prova
 só passar se o valor vier da vizinha. O meio deriva o furo e o pino da base, e
 o topo deriva o furo do meio; aumentar o pino da base muda os três.
 
+## Feito na fatia 2b
+
+A montagem v5 ganhou `posicoes`: a porta de uma instância no eixo da porta de
+outra, com afastamento na unidade declarada. `src/autoria/posicao-por-porta.js`
+calcula a pose alinhando os eixos e, quando as duas portas publicam
+`referencia`, o giro em torno dele; sem ela, o resultado diz `giroDefinido:
+false`. Posição junto com `pose` é recusada, e a ordem e o ciclo valem para
+posições e vínculos juntos. Na fixture ninguém digita coordenada: o meio e o
+topo se empilham pelo encaixe, as relações de encaixe cilíndrico passam, girar
+a base leva os dois junto, e um vínculo de folga errado reprova a junta.
+
 ## Riscos e parada
 
 O risco que obriga parar: descobrir que a derivação direta não basta, e que as

@@ -1,4 +1,4 @@
-/* vinculos-de-medida.test.mjs — fatias 1 e 2 do plano "a peça nasce
+/* vinculos-de-medida.test.mjs — fatias 1, 2 e 2b do plano "a peça nasce
    encaixada": formato v5 da montagem, ordem de construção, arestas de medida no
    mapa, e a resolução que leva a medida real de uma peça para a vizinha.
    Tudo provado na fixture neutra `tools/fixtures/tres-blocos-vinculados/`. */
@@ -187,10 +187,12 @@ describe('montagem v5 — resolução dos vínculos', () => {
     const mapa = derivarMapaDependencias(snapshot);
     const impacto = consultarImpactoGlobal(mapa, { tipo: 'peca', id: 'bloco-com-pino' });
     expect(impacto.roteiroRevalidacao.map(({ id }) => id)).toEqual(['tres-blocos']);
-    expect(impacto.instanciasDerivadas.map(({ instancia, param, de }) => `${de} -> ${instancia}.${param}`)).toEqual([
+    expect(impacto.instanciasDerivadas.map(({ instancia, param, tipo, de }) => `${de} -> ${instancia}.${param ?? tipo}`)).toEqual([
       'base -> meio.raioDoFuro',
+      'base -> meio.posicao',
       'base -> meio.raioDoPino',
       'meio -> topo.raioDoFuro',
+      'meio -> topo.posicao',
     ]);
     expect(consultarImpactoGlobal(mapa, { tipo: 'peca', id: 'bloco-com-furo' }).instanciasDerivadas).toEqual([]);
   });
@@ -198,5 +200,72 @@ describe('montagem v5 — resolução dos vínculos', () => {
   it('exige o carregador com parâmetros quando há vínculo', async () => {
     const { carregarPeca } = carregadoresDeReceitas(RECEITAS);
     await recusarResolucao(resolverMontagemPersistida(montagem(), { carregarPeca }), 'carregador-invalido');
+  });
+});
+
+/* Fatia 2b. Nenhuma instância da fixture declara `pose`, e o meio e o topo não
+   têm coordenada nenhuma: a posição sai do encaixe da porta de cada um na porta
+   da vizinha. As relações de encaixe cilíndrico são as que já existiam, e
+   passam porque a peça nasceu no lugar. */
+const deslocamento = (resolvida, id) => porId(resolvida, id).poseMundo.deslocamento;
+const relacao = (resolvida, id) => resolvida.relacoes.find((item) => item.id === id);
+
+describe('montagem v5 — posição vinda da porta', () => {
+  it('empilha os blocos pelo encaixe, e as juntas passam sem coordenada digitada', async () => {
+    const resolvida = await resolver();
+    expect(deslocamento(resolvida, 'base')).toEqual([0, 0, 0]);
+    deslocamento(resolvida, 'meio').forEach((valor, i) => expect(valor).toBeCloseTo([0, 0.02, 0][i], 9));
+    deslocamento(resolvida, 'topo').forEach((valor, i) => expect(valor).toBeCloseTo([0, 0.04, 0][i], 9));
+    expect(relacao(resolvida, 'meioNoPinoDaBase').satisfeita).toBe(true);
+    expect(relacao(resolvida, 'topoNoPinoDoMeio').satisfeita).toBe(true);
+    expect(porId(resolvida, 'meio').posicaoDerivada).toEqual({
+      posicao: 'meioSobreABase', em: { instancia: 'base', porta: 'pino' }, porta: 'furo', giroDefinido: false,
+    });
+  });
+
+  it('girar a base leva o meio e o topo junto, e as juntas continuam passando', async () => {
+    const dado = montagem();
+    dado.instancias[0].pose = { rotacao: [[0, -1, 0], [1, 0, 0], [0, 0, 1]], deslocamento: [0.1, 0, 0] };
+    const resolvida = await resolver(RECEITAS, dado);
+    deslocamento(resolvida, 'meio').forEach((valor, i) => expect(valor).toBeCloseTo([0.08, 0, 0][i], 9));
+    deslocamento(resolvida, 'topo').forEach((valor, i) => expect(valor).toBeCloseTo([0.06, 0, 0][i], 9));
+    expect(relacao(resolvida, 'meioNoPinoDaBase').satisfeita).toBe(true);
+    expect(relacao(resolvida, 'topoNoPinoDoMeio').satisfeita).toBe(true);
+  });
+
+  it('o afastamento vem na unidade declarada', async () => {
+    const dado = montagem();
+    dado.posicoes[0].afastamento = 5;
+    const resolvida = await resolver(RECEITAS, dado);
+    expect(deslocamento(resolvida, 'meio')[1]).toBeCloseTo(0.025, 9);
+  });
+
+  it('um encaixe errado aparece na junta, e não passa calado', async () => {
+    const dado = montagem();
+    dado.vinculos.find((v) => v.id === 'furoDoMeioNoPinoDaBase').acrescimo = 1;
+    const resolvida = await resolver(RECEITAS, dado);
+    expect(relacao(resolvida, 'meioNoPinoDaBase').satisfeita).toBe(false);
+  });
+
+  it('recusa posição junto com pose, duas posições para a mesma instância e posição fora de ordem', () => {
+    const comPose = montagem();
+    comPose.instancias[1].pose = { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 0, 0] };
+    recusar(comPose, 'posicao-com-pose');
+    const dupla = montagem();
+    dupla.posicoes.push({ ...dupla.posicoes[0], id: 'outra' });
+    recusar(dupla, 'posicao-duplicada');
+    const foraDeOrdem = montagem();
+    foraDeOrdem.vinculos = [];
+    foraDeOrdem.etapas = ['meio', 'base', 'topo'];
+    recusar(foraDeOrdem, 'vinculo-fora-de-ordem');
+    const semUnidade = montagem();
+    delete semUnidade.posicoes[0].unidade;
+    recusar(semUnidade, 'posicao-invalida');
+  });
+
+  it('recusa porta que não existe na hora de posicionar', async () => {
+    const dado = montagem();
+    dado.posicoes[0].em.porta = 'fantasma';
+    await recusarResolucao(resolver(RECEITAS, dado), 'posicao-porta-ausente');
   });
 });
