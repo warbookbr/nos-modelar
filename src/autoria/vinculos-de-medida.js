@@ -19,6 +19,13 @@
    um parâmetro de receita vinculado é um número. */
 export const MEDIDAS_DE_PORTA = Object.freeze(['fim', 'inicio', 'raio', 'raioExterno', 'raioInterno']);
 
+/* A unidade do parâmetro que recebe o valor. A medida da porta vem sempre em
+   metro, porque sai da malha; o parâmetro pode estar em milímetro, que é o
+   padrão da `TABELA`, ou em metro, no estilo antigo em que os passos citam o
+   parâmetro pelo nome. Adivinhar a unidade erraria por mil, então o vínculo a
+   declara, e o acréscimo vem nela. */
+export const UNIDADES_DE_PARAMETRO = Object.freeze({ mm: 1000, m: 1 });
+
 export class ErroVinculoDeMedida extends Error {
   constructor(codigo, caminho, mensagem) {
     super(`${caminho}: ${mensagem}`);
@@ -72,7 +79,7 @@ export function lerEtapas(valor, instanciaIds) {
 function lerVinculo(valor, indice, instancias) {
   const caminho = `vinculos[${indice}]`;
   if (!objetoSimples(valor)) falhar('vinculo-invalido', caminho, 'precisa ser objeto simples.');
-  chavesExatas(valor, ['id', 'alvo', 'de', 'acrescimo'], caminho);
+  chavesExatas(valor, ['id', 'alvo', 'de', 'unidade', 'acrescimo'], caminho);
   const id = texto(valor.id, `${caminho}.id`);
 
   if (!objetoSimples(valor.alvo)) falhar('vinculo-invalido', `${caminho}.alvo`, 'precisa ser objeto simples.');
@@ -97,11 +104,17 @@ function lerVinculo(valor, indice, instancias) {
     falhar('vinculo-invalido', `${caminho}.de.medida`, `aceita somente ${MEDIDAS_DE_PORTA.join(', ')}.`);
   }
 
+  if (!Object.hasOwn(UNIDADES_DE_PARAMETRO, valor.unidade)) {
+    falhar('vinculo-invalido', `${caminho}.unidade`, `aceita somente ${Object.keys(UNIDADES_DE_PARAMETRO).join(', ')}.`);
+  }
   /* O acréscimo é obrigatório e explícito, mesmo quando é zero: folga e
      sobreposição são decisões, e um vínculo sem elas esconderia a decisão. */
   if (!Number.isFinite(valor.acrescimo)) falhar('vinculo-invalido', `${caminho}.acrescimo`, 'precisa ser número finito, mesmo que zero.');
   const acrescimo = Object.is(valor.acrescimo, -0) ? 0 : valor.acrescimo;
-  return { id, alvo: { instancia: alvoInstancia, param }, de: { instancia: deInstancia, porta, medida }, acrescimo };
+  return {
+    id, alvo: { instancia: alvoInstancia, param }, de: { instancia: deInstancia, porta, medida },
+    unidade: valor.unidade, acrescimo,
+  };
 }
 
 /* Ordem topológica pelos vínculos, com desempate alfabético para ser
@@ -148,4 +161,13 @@ export function lerVinculos(valor, instancias, etapas) {
     }
   }
   return vinculos.sort((a, b) => comparar(a.id, b.id));
+}
+
+/* O valor que o parâmetro recebe: a medida da porta, em metro, levada para a
+   unidade do parâmetro, mais o acréscimo declarado nessa mesma unidade. */
+export function valorDoVinculo(vinculo, medidaEmMetros) {
+  if (!Number.isFinite(medidaEmMetros)) {
+    throw new ErroVinculoDeMedida('vinculo-medida-ausente', `vinculos.${vinculo.id}`, 'a medida da porta não é número finito.');
+  }
+  return medidaEmMetros * UNIDADES_DE_PARAMETRO[vinculo.unidade] + vinculo.acrescimo;
 }

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-721 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+723 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -691,6 +691,10 @@
 
 - `README.md` — Três blocos vinculados
 
+## tools/fixtures/tres-blocos-vinculados/receitas/
+
+- `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
+
 ## tools/fixtures/tres-familias-com-extensao/
 
 - `carregar-estudo.mjs` — Fixture de teste: três famílias de peça numa montagem, uma delas feita com a extensão `prisma-triangular`. Quem a usa é `tools/oficina/plataforma-procedural-…
@@ -849,6 +853,7 @@
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
 - `parametros-peca.test.mjs` — Prova de R00: liberdade declarada não é liberdade real, e a diferença é conferível. O número do acervo fica travado aqui de propósito — se alguém ligar uma r…
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
+- `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `percepcao-superficie.mjs` — Canal C1: diagnostico de continuidade de superficie, sem dependencia do motor. Ele nao julga se algo "parece um carro"; apenas torna variacao de normal visiv…
 - `percepcao-superficie.test.mjs` — Provas unitárias do canal C1 de percepção de superfície.
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
@@ -872,7 +877,7 @@
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
-- `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatia 1 do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção e arestas de medida no mapa. Tudo provad…
+- `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatias 1 e 2 do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção, arestas de medida no mapa, e a res…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote de imagens que a crítica visual precisa receber.

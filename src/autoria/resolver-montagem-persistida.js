@@ -5,6 +5,7 @@ import { lerPecaResolvida } from './ler-peca-resolvida.js';
 import { validarSeparacaoDirecional } from './separacao-direcional.js';
 import { identidadeTransformacaoRigida, comporTransformacoesRigidas } from './transformacao-rigida.js';
 import { resolverPortasDeMontagem, validarEncaixeCilindrico, validarAssentamentoAnular } from './interfaces-montagem.js';
+import { ErroVinculoDeMedida, valorDoVinculo } from './vinculos-de-medida.js';
 
 export class ErroResolucaoMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem, trilha) {
@@ -267,10 +268,65 @@ function resolverRelacoes(montagem, montagemResolvida, trilhaMontagem, poseMonta
   };
 }
 
-export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem } = {}) {
+/* `carregarPecaComParametros(ref, params)` só é exigido quando uma montagem v5
+   declara vínculos: ele executa a receita da peça com os parâmetros derivados
+   das vizinhas e devolve a peça resolvida. As peças sem vínculo continuam
+   vindo de `carregarPeca`, como antes. */
+export async function resolverMontagemPersistida(dado, { carregarPeca, carregarMontagem, carregarPecaComParametros } = {}) {
   const montagemRaiz = lerMontagemPersistida(dado);
   const pecas = new Map();
+  const pecasComParametros = new Map();
   const montagens = new Map();
+
+  async function obterPecaComParametros(ref, parametros, instancia, trilha) {
+    if (typeof carregarPecaComParametros !== 'function') {
+      falhar('carregador-invalido', caminhoDaReferencia(instancia),
+        'a montagem declara vínculos e carregarPecaComParametros precisa ser função.', trilha);
+    }
+    /* A mesma receita com parâmetros diferentes é outra peça: a chave inclui os
+       valores, em ordem de nome, para a reexecução ser determinística. */
+    const chave = `${ref}\u0000${JSON.stringify(Object.entries(parametros).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))}`;
+    if (pecasComParametros.has(chave)) return pecasComParametros.get(chave);
+    let bruto;
+    try {
+      bruto = await carregarPecaComParametros(ref, { ...parametros });
+    } catch (erro) {
+      falhar('vinculo-execucao-falhou', caminhoDaReferencia(instancia), mensagemDoErro(erro, `peça '${ref}' não executou com os parâmetros derivados.`), trilha);
+    }
+    let neutro;
+    try {
+      neutro = lerPecaResolvida(bruto);
+    } catch (erro) {
+      falhar('peca-invalida', caminhoDaReferencia(instancia), mensagemDoErro(erro, `peça '${ref}' inválida.`), trilha);
+    }
+    const definicao = { ref, neutro, parametros: { ...parametros } };
+    pecasComParametros.set(chave, definicao);
+    return definicao;
+  }
+
+  function parametrosDerivados(montagem, instanciaId, prontas, trilha) {
+    const derivados = [];
+    for (const vinculo of montagem.vinculos ?? []) {
+      if (vinculo.alvo.instancia !== instanciaId) continue;
+      const caminho = `vinculos.${vinculo.id}`;
+      const origem = prontas.get(vinculo.de.instancia);
+      const porta = origem?.definicao?.neutro?.portas?.get(vinculo.de.porta);
+      if (!porta) {
+        falhar('vinculo-porta-ausente', caminho, `a peça '${vinculo.de.instancia}' não publica a porta '${vinculo.de.porta}'.`, trilha);
+      }
+      const medida = porta.interface?.[vinculo.de.medida];
+      if (medida === undefined) {
+        falhar('vinculo-medida-ausente', caminho, `a porta '${vinculo.de.porta}' não tem a medida '${vinculo.de.medida}'.`, trilha);
+      }
+      let valor;
+      try { valor = valorDoVinculo(vinculo, medida); } catch (erro) {
+        if (erro instanceof ErroVinculoDeMedida) falhar(erro.codigo, caminho, erro.message, trilha);
+        throw erro;
+      }
+      derivados.push({ vinculo: vinculo.id, param: vinculo.alvo.param, valor, unidade: vinculo.unidade });
+    }
+    return derivados;
+  }
 
   async function obterPeca(ref, instancia, trilha) {
     if (typeof carregarPeca !== 'function') {
@@ -326,9 +382,15 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
   }
 
   async function resolverMontagem(montagem, posePai, caminhoPai, pilha) {
-    const instancias = [];
-    for (const [indice, instanciaBase] of montagem.instancias.entries()) {
-      const instancia = { ...instanciaBase, indice };
+    /* Na v5 as instâncias são construídas na ordem das etapas, para que cada
+       vínculo encontre a vizinha já pronta. A lista devolvida mantém a ordem da
+       montagem, que é a que os consumidores já conhecem. */
+    const indices = new Map(montagem.instancias.map((instancia, indice) => [instancia.id, indice]));
+    const ordem = montagem.etapas ?? montagem.instancias.map((instancia) => instancia.id);
+    const prontas = new Map();
+    for (const id of ordem) {
+      const indice = indices.get(id);
+      const instancia = { ...montagem.instancias[indice], indice };
       const trilha = [...caminhoPai, instancia.id];
       const poseLocalCompleta = { escala: 1, ...instancia.pose };
       const poseMundoCompleta = comporTransformacoesRigidas(posePai, poseLocalCompleta);
@@ -336,14 +398,23 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
       const poseMundo = poseSemEscala(poseMundoCompleta);
       const caminho = trilha.slice();
       if (instancia.alvo.tipo === 'peca') {
-        const definicao = await obterPeca(instancia.alvo.ref, instancia, trilha);
-        instancias.push({
+        const derivados = parametrosDerivados(montagem, instancia.id, prontas, trilha);
+        const definicao = derivados.length
+          ? await obterPecaComParametros(
+            instancia.alvo.ref,
+            Object.fromEntries(derivados.map(({ param, valor }) => [param, valor])),
+            instancia,
+            trilha,
+          )
+          : await obterPeca(instancia.alvo.ref, instancia, trilha);
+        prontas.set(instancia.id, {
           id: instancia.id,
           caminho,
           alvo: { tipo: 'peca', ref: instancia.alvo.ref },
           poseLocal,
           poseMundo,
           definicao,
+          ...(derivados.length ? { parametrosDerivados: derivados } : {}),
         });
       } else {
         const filha = await obterMontagem(instancia.alvo.ref, instancia, trilha, pilha);
@@ -353,7 +424,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
           caminho,
           [...pilha, instancia.alvo.ref],
         );
-        instancias.push({
+        prontas.set(instancia.id, {
           id: instancia.id,
           caminho,
           alvo: { tipo: 'montagem', ref: instancia.alvo.ref },
@@ -363,6 +434,7 @@ export async function resolverMontagemPersistida(dado, { carregarPeca, carregarM
         });
       }
     }
+    const instancias = montagem.instancias.map((instancia) => prontas.get(instancia.id));
     return resolverRelacoes(montagem, { id: montagem.id, instancias }, caminhoPai, poseSemEscala(posePai));
   }
 

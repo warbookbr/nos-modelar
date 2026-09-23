@@ -117,6 +117,34 @@ function relacaoAtingida(relacao, alvo, mapa, passos, subarvore) {
     || endpointAtinge(relacao.movel, ocorrencia, alvo, passos));
 }
 
+/* Vínculos de medida da montagem v5: quando uma peça muda, as instâncias que
+   derivam parâmetros dela mudam também, e as que derivam dessas, em cadeia.
+   A entidade peça não muda, mas a geometria de cada uma dessas instâncias sim,
+   e a revalidação precisa saber quais são. */
+function cascataDeVinculos(mapa, alvo) {
+  if (alvo.tipo !== 'peca' || !Array.isArray(mapa.vinculos)) return null;
+  const afetadas = [];
+  for (const { montagem } of mapa.construcao ?? []) {
+    const vinculos = mapa.vinculos.filter((vinculo) => vinculo.montagem === montagem);
+    const origem = mapa.composicao
+      .filter((item) => item.montagem === montagem && item.alvo.tipo === 'peca' && item.alvo.id === alvo.id)
+      .map((item) => item.instancia);
+    const vistas = new Set(origem);
+    const fila = [...origem];
+    while (fila.length) {
+      const atual = fila.shift();
+      for (const vinculo of vinculos.filter((item) => item.de.instancia === atual)) {
+        afetadas.push({ montagem, instancia: vinculo.alvo.instancia, param: vinculo.alvo.param, vinculo: vinculo.id, de: atual });
+        if (!vistas.has(vinculo.alvo.instancia)) {
+          vistas.add(vinculo.alvo.instancia);
+          fila.push(vinculo.alvo.instancia);
+        }
+      }
+    }
+  }
+  return afetadas.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.instancia, b.instancia) || comparar(a.vinculo, b.vinculo));
+}
+
 export function consultarImpactoGlobal(mapa, alvo) {
   const entidade = validarEntrada(mapa, alvo);
   const entidades = mapaDeEntidades(mapa);
@@ -157,6 +185,7 @@ export function consultarImpactoGlobal(mapa, alvo) {
   const raizesAfetadas = new Set(caminhos.map((item) => item.raiz));
   for (const item of roteiro) for (const caminho of item.caminhos) raizesAfetadas.add(caminho.raiz);
   const raizes = (mapa.raizes ?? []).map((item) => item.id).sort(comparar);
+  const cascata = cascataDeVinculos(mapa, alvo);
 
   return copiar({
     formato: FORMATO,
@@ -169,6 +198,7 @@ export function consultarImpactoGlobal(mapa, alvo) {
     caminhos,
     relacoes,
     roteiroRevalidacao: roteiro,
+    ...(cascata ? { instanciasDerivadas: cascata } : {}),
     cobertura: {
       completa: mapa.cobertura.completa,
       universo: mapa.universo?.id ?? null,

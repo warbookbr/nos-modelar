@@ -125,6 +125,14 @@ atual digita números que depois precisam ser conferidos um contra o outro.
 2. **A resolução.** O resolvedor aplica os vínculos na ordem e entrega a
    montagem com as medidas derivadas. A mudança de uma parte do começo propaga
    e a revalidação existente dispara.
+2b. **A posição vem da porta.** O vínculo da fatia 2 resolve o tamanho, e a
+   `pose` de cada instância continua digitada: o furo tem o raio do pino, mas
+   alguém escreve onde a peça fica. Esta fatia declara o encaixe de posição,
+   "a porta `furo` desta instância no mesmo eixo da porta `pino` daquela, com
+   tal afastamento", e a pose sai alinhando as duas portas. É derivação direta,
+   como o vínculo de tamanho, e não solver. Entra antes da fatia 3 porque medir
+   a junta na entrada não diz nada se a posição da peça foi chutada. Incluída
+   em 2026-09-23, com o aceite da pessoa.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
 4. **As instruções.** As skills e o contrato do modelador conduzindo uma
@@ -155,11 +163,16 @@ Combinado com a pessoa em 2026-09-23, depois de reler as skills.
 
 As skills se contradiziam em três pontos, e os três são corrigidos. A cadeia da
 receita é escrita uma vez, em `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, e as
-skills apontam para ela: a `TABELA` em milímetros é o que se mede e se edita,
-`derivar()` converte e calcula, os `PARAMS` em metros são o que o núcleo
-executa, e `gerarPassos()` produz os passos. Metro é a unidade da malha, do
-visor e dos formatos 3D; milímetro é a unidade em que peça mecânica se mede.
-Hoje nenhum gate confere essa cadeia, e as duas fixtures usam só `PARAMS`. A
+skills apontam para ela: a `TABELA`, em milímetros, é o que se mede e se edita,
+e a receita a exporta como `PARAMS`; `derivar()` converte para metro e calcula
+as posições, e `gerarPassos()` produz os passos já em metros. Metro é a unidade
+da malha, do visor e dos formatos 3D; milímetro é a unidade em que peça mecânica
+se mede. Um estilo mais antigo, o da fixture do eixo, põe `PARAMS` em metros e
+cita os parâmetros pelo nome dentro dos passos; os dois convivem, e o contrato
+diz qual é o padrão. Hoje nenhum gate confere essa cadeia. Na primeira versão
+deste texto a cadeia estava descrita errada, com a conversão entre `TABELA` e
+`PARAMS`; a leitura da peça de prova na fatia 2 mostrou que `PARAMS` é a própria
+`TABELA`. A
 peça mora em `procedural/pecas/<peça>/`; `modelar-maquina` e a pasta
 `procedural/maquinas/` que ela mandava criar saem. O nome `pecas` é decidido na
 fatia 5: quando o braço virar várias receitas e uma montagem, a pasta guarda um
@@ -214,6 +227,33 @@ O mapa de dependências ganhou `vinculos` e `construcao`, presentes só quando
 alguma montagem os declara, para o mapa dos universos sem vínculo continuar
 idêntico. A fixture neutra é `tools/fixtures/tres-blocos-vinculados/`, e a prova
 é `tools/mecanifica/vinculos-de-medida.test.mjs`.
+
+## Feito na fatia 2
+
+A leitura da peça de prova mostrou que `PARAMS` é a própria `TABELA`, em
+milímetros, e que a conversão para metro acontece dentro de `derivar()`. A
+medida da porta vem da malha, em metro, e o parâmetro que a recebe pode estar
+em milímetro ou em metro conforme o estilo da receita. Por isso o vínculo
+ganhou `unidade`, obrigatória, `mm` ou `m`, e o acréscimo vem nela; adivinhar
+erraria por mil.
+
+O resolvedor constrói as instâncias na ordem das etapas e, quando uma peça tem
+vínculo, pede a receita executada com os parâmetros derivados por um carregador
+novo, `carregarPecaComParametros`. A mesma receita com parâmetros diferentes é
+outra peça, e o cache usa os valores na chave. Cada instância derivada traz
+`parametrosDerivados`, com o vínculo, o valor e a unidade. O resolvedor recusa
+porta que a vizinha não publica, medida que a porta não tem, parâmetro que a
+receita não declara e montagem com vínculo sem o carregador.
+
+`tools/mecanifica/peca-com-parametros.mjs` é esse carregador. Ele copia a
+receita por descritores, porque `PASSOS` é getter e a cópia por espalhamento
+congelaria a tabela velha, e recusa parâmetro que a receita não declara.
+
+A consulta de impacto ganhou `instanciasDerivadas`: mudar uma peça lista as
+instâncias que derivam dela, em cadeia. A fixture ganhou as receitas dos três
+blocos, com os raios vinculados de propósito errados na receita, para a prova
+só passar se o valor vier da vizinha. O meio deriva o furo e o pino da base, e
+o topo deriva o furo do meio; aumentar o pino da base muda os três.
 
 ## Riscos e parada
 
