@@ -12,9 +12,8 @@ uma receita concreta e produzir recusas ligadas ao estado real da malha.
 
 As peças citadas como exemplo nesta referência foram removidas do acervo em
 `c78961f`. As lições continuam medidas e válidas — o que não existe mais é o
-arquivo para abrir. O acervo atual está em `procedural/pecas/` e
-`procedural/armas/`; a tabela "Contrato mínimo" da skill diz qual
-receita ler para cada forma.
+arquivo para abrir. O acervo mora em `procedural/pecas/`, e hoje não tem
+receita; a convenção de cada operação vem do catálogo, e não de receita antiga.
 
 ## Navegação
 

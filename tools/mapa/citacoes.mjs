@@ -33,7 +33,6 @@ const PASTAS = ['docs/mecanifica/usar', '.claude/skills'];
 /* Pastas onde uma receita citada pelo nome curto pode morar. */
 const PASTAS_RECEITA = [
   'procedural/pecas',
-  'procedural/armas',
 ];
 
 /* Nomes que as skills mandam CRIAR, não abrir: gabaritos de nome, não citações.
