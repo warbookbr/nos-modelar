@@ -30,7 +30,17 @@ etapas leva para as seguintes o que entendeu errado na primeira.
 Ao fim de cada etapa, pare e mostre à pessoa as vistas da parte, as medidas da
 junta e o veredito do crítico. A etapa só fica fixa com o aceite dela, e só
 depois disso a próxima começa. Etapa fixa que uma mudança anterior quebrou
-volta na frente de todas.
+volta na frente de todas. O estado e a próxima etapa saem de:
+
+```bash
+npm run etapas -- <montagem.json>
+npm run etapas -- <montagem.json> --fixar <instância> --por <quem aceitou>
+```
+
+O segundo comando recusa fixar fora de ordem, sem o crítico ter fechado a peça
+da etapa, sem nota de passagem na última rodada, com junta reprovada ou sem
+aceite. Não contorne a recusa: ela é o motivo de o laço não virar bola de
+neve.
 
 ## O ciclo de uma etapa
 
@@ -85,14 +95,18 @@ cat > /tmp/rodada.json <<'JSON'
     { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
   ],
   "veredito": { "alvo": "...", "nota": 6, "defeitos": [], "observacao": "..." },
-  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"]
+  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"],
+  "notaDePassagem": "folga de 0,2 no furo porque o pino e retificado"
 }
 JSON
 node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
 ```
 
 A rodada não fecha sem `partes`; `nota` é número de 0 a 10 e `observacao` não
-passa de 240 caracteres. Quando as medidas reprovarem, grave com
+passa de 240 caracteres. `notaDePassagem` é o porquê das escolhas do
+modelador, e a última rodada da etapa precisa dela. A ferramenta grava sozinha
+o que a receita mudou desde a rodada anterior, em `receita.diferenca`; é isso
+que o modelador da etapa seguinte lê para não repetir tentativa. Quando as medidas reprovarem, grave com
 `"veredito": null` e o relatório da falha. Rodada gravada não se reescreve, e o
 arquivo cai em `rodadas/` dentro da pasta da peça.
 

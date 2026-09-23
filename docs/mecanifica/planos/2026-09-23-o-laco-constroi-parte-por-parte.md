@@ -139,6 +139,16 @@ instruções e das listas de busca. `npm run bancada` sai sem interface, e
 apagada, foi de `usar/` para o histórico. O gate `docs:estrutura` pegou sozinho
 os documentos que a skill curta deixou de citar.
 
+## Feito na fatia 2
+
+A rodada ganhou `notaDePassagem` e `receita`: a ferramenta grava a impressão do
+texto julgado e a diferença linha a linha para a rodada anterior, contra uma
+cópia guardada em `rodadas/`, e não contra o git, porque importa o que o
+crítico julgou. `npm run etapas` grava o registro de etapas ao lado da montagem
+e é a única porta para fixar etapa: recusa fora de ordem, sem o crítico ter
+fechado a peça, sem nota de passagem, com junta reprovada e sem aceite, cada
+recusa com teste. Registrar sem medida e fechar sem crítico já eram recusados.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não

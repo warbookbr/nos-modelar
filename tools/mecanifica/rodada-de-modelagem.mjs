@@ -15,10 +15,12 @@
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
  */
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
+import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -63,15 +65,37 @@ export function lerRodadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {
     .map((nome) => JSON.parse(readFileSync(join(pasta, nome), 'utf8')));
 }
 
+/* O texto da receita julgado nesta rodada. Por padrão é lido do disco; o teste
+   passa o texto direto. Peça sem receita resolvível grava a rodada sem
+   diferença, como antes. */
+function textoDaReceita(peca, { raiz = REPO } = {}) {
+  try { return readFileSync(resolverCaminhoReceita(peca, { raiz }), 'utf8'); } catch { return null; }
+}
+
+const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
+
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [] },
-  { pasta = pastaDeRodadas(peca) } = {},
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem },
+  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca) } = {},
 ) {
   exigirNome(peca);
   const anteriores = lerRodadas(peca, { pasta });
+  const numero = anteriores.length + 1;
+  /* A diferença é contra a cópia que a rodada anterior guardou, e não contra
+     o git: o que importa é o que o crítico julgou em cada rodada, commitado ou
+     não. */
+  let receita;
+  if (receitaTexto !== null) {
+    const anterior = numero > 1 && existsSync(copiaDaReceita(pasta, numero - 1))
+      ? readFileSync(copiaDaReceita(pasta, numero - 1), 'utf8') : null;
+    receita = {
+      sha256: `sha256:${createHash('sha256').update(receitaTexto).digest('hex')}`,
+      diferenca: diferencaDeTexto(anterior, receitaTexto),
+    };
+  }
   const rodada = registrarRodada({
-    peca, numero: anteriores.length + 1, veredito, medidas, partes, atrito,
+    peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita,
   });
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
@@ -80,6 +104,7 @@ export function gravarRodada(
      assim. */
   if (existsSync(arquivo)) throw new Error(`a rodada ${rodada.numero} de '${peca}' já foi gravada.`);
   writeFileSync(arquivo, `${JSON.stringify(rodada, null, 2)}\n`, 'utf8');
+  if (receitaTexto !== null) writeFileSync(copiaDaReceita(pasta, numero), receitaTexto, 'utf8');
   return { rodada, arquivo };
 }
 

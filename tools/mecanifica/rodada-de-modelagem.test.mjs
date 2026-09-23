@@ -112,3 +112,30 @@ describe('registro de rodadas', () => {
       .toMatch(/docs\/mecanifica\/historico\/rodadas\/peca-que-nunca-existiu$/);
   });
 });
+
+/* O que a rodada TENTOU e POR QUÊ. A receita mostra só o estado final; o
+   modelador da etapa seguinte é outro agente e precisa ler o que mudou em cada
+   rodada e o motivo, sem depender de ninguém lembrar de escrever. */
+describe('diferença da receita e nota de passagem', () => {
+  const entrada = (extra = {}) => ({ partes: CONFERIDAS, medidas: { passou: false, relatorio: 'junta reprovada' }, ...extra });
+  const gravarCom = (texto, extra) => gravarRodada('peca-de-ensaio', entrada(extra), { pasta: join(area, 'peca-de-ensaio'), receitaTexto: texto });
+
+  it('a ferramenta grava o que mudou na receita desde a rodada anterior', () => {
+    const primeira = gravarCom('const TABELA = {\n  raioDoFuro: 20,\n};\n').rodada;
+    expect(primeira.receita.diferenca.primeira).toBe(true);
+    const segunda = gravarCom('const TABELA = {\n  raioDoFuro: 20.5,\n};\n').rodada;
+    expect(segunda.receita.sha256).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(segunda.receita.sha256).not.toBe(primeira.receita.sha256);
+    expect(segunda.receita.diferenca).toMatchObject({ primeira: false, removidas: 1, acrescentadas: 1, cortada: false });
+    expect(segunda.receita.diferenca.linhas).toEqual([
+      { tipo: '-', linha: 2, texto: '  raioDoFuro: 20,' },
+      { tipo: '+', linha: 2, texto: '  raioDoFuro: 20.5,' },
+    ]);
+  });
+
+  it('guarda a nota de passagem e recusa nota vazia', () => {
+    const { rodada } = gravarCom('x', { notaDePassagem: '  folga de 0,2 porque o pino é retificado  ' });
+    expect(rodada.notaDePassagem).toBe('folga de 0,2 porque o pino é retificado');
+    expect(() => gravarCom('x', { notaDePassagem: '   ' })).toThrow(/notaDePassagem/);
+  });
+});

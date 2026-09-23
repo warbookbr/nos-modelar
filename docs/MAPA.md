@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-727 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -474,6 +474,8 @@
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
 - `descricao-do-gesto.js` — descricao-do-gesto.js — o que a pessoa fez na bancada, dito em palavras geométricas com números.
 - `descricao-do-gesto.test.js` — Uma caixa de 1 m de lado com um anel no meio da altura, numa parte só. O anel existe porque sem ele a caixa tem dois níveis em y, e com dois níveis um arquei…
+- `diferenca-de-texto.js` — diferenca-de-texto.js — a diferença entre duas versões de um texto, linha a linha, para o registro de rodada guardar o que foi TENTADO.
+- `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
@@ -819,6 +821,8 @@
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
+- `etapas-da-montagem.mjs` — etapas-da-montagem.mjs — o registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa.
+- `etapas-da-montagem.test.mjs` — etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as juntas pas…
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exportar-obj.mjs` — exportar-obj.mjs — CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj).

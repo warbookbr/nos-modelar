@@ -36,7 +36,7 @@ function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}
  * vem antes do veredito de propósito: peça que nem cumpre o plano não merece
  * olho humano nem de agente.
  */
-export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [] }) {
+export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [], notaDePassagem, receita }) {
   if (typeof peca !== 'string' || peca.trim() === '') falhar('a rodada precisa dizer de que peça é.');
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
@@ -67,7 +67,33 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
        a lista vivia na conversa e morria com ela. Lista de frases curtas, e
        vazia quando a rodada não doeu em nada. */
     atrito: normalizarAtrito(atrito),
+    /* A NOTA DE PASSAGEM: por que o modelador escolheu o que escolheu. O que
+       ele fez fica na receita, o que tentou fica em `receita.diferenca`; o
+       porquê só existe se ele escrever, e o modelador da etapa seguinte é
+       outro agente, que não viu nada disto. Fixar uma etapa exige a nota na
+       última rodada dela. */
+    ...(notaDePassagem !== undefined && notaDePassagem !== null
+      ? { notaDePassagem: normalizarNota(notaDePassagem) } : {}),
+    /* O QUE ESTA RODADA MUDOU NA RECEITA, gerado pela ferramenta ao gravar:
+       a impressão do texto julgado e a diferença para a rodada anterior. */
+    ...(receita ? { receita: normalizarReceita(receita) } : {}),
   };
+}
+
+const LIMITE_NOTA_DE_PASSAGEM = 600;
+
+function normalizarNota(valor) {
+  if (typeof valor !== 'string' || valor.trim() === '') falhar("'notaDePassagem' precisa ser texto não vazio.");
+  const limpa = valor.trim();
+  if (limpa.length > LIMITE_NOTA_DE_PASSAGEM) falhar(`'notaDePassagem' não passa de ${LIMITE_NOTA_DE_PASSAGEM} caracteres.`);
+  return limpa;
+}
+
+function normalizarReceita(valor) {
+  if (!valor || typeof valor !== 'object') falhar("'receita' precisa ser objeto gerado pela ferramenta.");
+  if (!/^sha256:[0-9a-f]{64}$/.test(valor.sha256 ?? '')) falhar("'receita.sha256' precisa ser a impressão sha256 do texto.");
+  if (!valor.diferenca || !Array.isArray(valor.diferenca.linhas)) falhar("'receita.diferenca' precisa trazer as linhas.");
+  return { sha256: valor.sha256, diferenca: valor.diferenca };
 }
 
 const LIMITE_OBSERVACAO_DE_PARTE = 240;
