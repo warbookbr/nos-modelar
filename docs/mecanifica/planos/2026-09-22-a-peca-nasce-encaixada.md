@@ -1,6 +1,6 @@
 # A peça nasce encaixada
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -75,9 +75,11 @@ atual digita números que depois precisam ser conferidos um contra o outro.
 - o registro de etapa: parte, juntas medidas na entrada, estado fixo;
 - a fixture neutra que prova o mecanismo: dois blocos, o segundo derivando o
   furo do pino do primeiro, e um terceiro derivando do segundo;
-- a mudança em `.claude/skills/laco-de-modelagem/SKILL.md`,
-  `.claude/agents/modelador.md` e `.claude/skills/alinhar-modelagem/SKILL.md`
-  para conduzir uma parte por vez e declarar a ordem das etapas no `PLANO`;
+- a mudança nas instruções para conduzir uma parte por vez e declarar a ordem
+  das etapas no `PLANO`: `laco-de-modelagem`, que é a skill do orquestrador,
+  `alinhar-modelagem`, `modelar-maquina`, `criar-peca`, `auditar-montagem` e o
+  contrato em `.claude/agents/modelador.md`. O crítico visual não muda: ele
+  continua sem saber como a peça foi feita;
 - as três primeiras partes do braço robótico como primeiro usuário real.
 
 ## Excluído
@@ -102,6 +104,13 @@ atual digita números que depois precisam ser conferidos um contra o outro.
    entrada por etapa;
 5. os 32 gates verdes ao fim de cada fatia.
 
+## Arquivos reservados
+
+`src/autoria/ler-montagem-persistida.js`, `resolver-montagem-persistida.js`,
+`derivar-mapa-dependencias.js`, `consultar-impacto-global.js`, a fixture nova em
+`tools/fixtures/`, as cinco skills e `.claude/agents/modelador.md` citados acima,
+e `procedural/pecas/braco-robotico/`.
+
 ## Fatias
 
 1. **O formato e o grafo.** Vínculo de medida na montagem persistida, validação
@@ -112,8 +121,8 @@ atual digita números que depois precisam ser conferidos um contra o outro.
    e a revalidação existente dispara.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
-4. **As instruções.** Skills e contrato do modelador conduzindo uma parte por
-   vez; o `PLANO` da receita declara a ordem das etapas.
+4. **As instruções.** As cinco skills e o contrato do modelador conduzindo uma
+   parte por vez; o `PLANO` da receita declara a ordem das etapas.
 5. **O primeiro usuário.** Terminar a rodada de alinhamento do braço, que parou
    na escala, e construir as três primeiras partes pelo mecanismo. O que der
    atrito volta para as fatias 1 a 4 e é consertado de forma genérica, provado

@@ -177,7 +177,7 @@ enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Sem plano ativo. Rascunho aberto: [o que o
+- Plano ativo: [a peça nasce encaixada](planos/2026-09-22-a-peca-nasce-encaixada.md). Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting

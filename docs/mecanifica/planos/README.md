@@ -2,10 +2,9 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [A peça nasce encaixada](2026-09-22-a-peca-nasce-encaixada.md).
 
-[A peça nasce encaixada](2026-09-22-a-peca-nasce-encaixada.md) é **rascunho**
-aberto em 2026-09-22. A montagem vira o lugar de trabalho: cada parte nova é
+A montagem vira o lugar de trabalho: cada parte nova é
 criada ao lado das que já existem e deriva as medidas das portas delas, em vez
 de digitar números que só se conferem no fim. O braço robótico é o primeiro
 usuário, depois de o mecanismo ser provado numa fixture neutra.
