@@ -1,6 +1,6 @@
 # A peça nasce encaixada
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -77,14 +77,8 @@ atual digita números que depois precisam ser conferidos um contra o outro.
   ferramenta, e a nota de passagem do modelador ao fim de cada etapa;
 - a fixture neutra que prova o mecanismo: dois blocos, o segundo derivando o
   furo do pino do primeiro, e um terceiro derivando do segundo;
-- a mudança nas instruções para conduzir uma parte por vez e declarar a ordem
-  das etapas no `PLANO`: `laco-de-modelagem`, que é a skill do orquestrador,
-  `alinhar-modelagem`, `criar-peca`, `auditar-montagem` e o contrato em
-  `.claude/agents/modelador.md`. `modelar-maquina` é apagada. O crítico visual
-  não muda: ele continua sem saber como a peça foi feita;
-- a captura da bancada sem interface por padrão, descrita em "Alinhado para a
-  fatia 4";
-- as três primeiras partes do braço robótico como primeiro usuário real.
+- as instruções, a ferramenta do laço e o braço como primeiro usuário, que
+  seguiram para o plano sucessor citado nas fatias.
 
 ## Excluído
 
@@ -102,11 +96,8 @@ atual digita números que depois precisam ser conferidos um contra o outro.
    recusa de porta inexistente e propagação de mudança;
 2. um teste recusa vínculo que aponte para parte ainda não construída na ordem
    declarada;
-3. as três primeiras partes do braço nascem por vínculo, sem nenhum número de
-   encaixe digitado, e as juntas passam na hora em que cada parte entra;
-4. as skills conduzem o laço etapa por etapa, e o registro de rodada tem uma
-   entrada por etapa;
-5. os 32 gates verdes ao fim de cada fatia.
+3. os itens de instrução e de braço seguem no plano sucessor;
+4. os 32 gates verdes ao fim de cada fatia.
 
 ## Arquivos reservados
 
@@ -135,73 +126,11 @@ atual digita números que depois precisam ser conferidos um contra o outro.
    em 2026-09-23, com o aceite da pessoa.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
-4. **As instruções.** As skills e o contrato do modelador conduzindo uma
-   parte por vez, com tudo o que está em "Alinhado para a fatia 4"; o `PLANO` da receita declara a ordem das etapas. Cada etapa
-   despacha um modelador novo, que lê do disco as partes já fixas e o parecer
-   da etapa anterior: o estado mora nos arquivos, e um agente longo carregaria
-   para as etapas seguintes o que entendeu errado na primeira. Modelador e
-   crítico podem repetir a etapa entre si, e ao fim dela o orquestrador para e
-   mostra à pessoa as vistas da parte, as medidas da junta e o veredito. A etapa
-   só fica fixa com o aceite dela. Para o modelador novo saber o que foi tentado
-   e o que deu errado, o registro de cada rodada passa a guardar a diferença da
-   receita para a rodada anterior, gerada pela ferramenta ao registrar, ao lado
-   das medidas e do veredito que já guarda. O modelador fecha cada etapa com uma
-   nota curta dizendo por que escolheu o que escolheu, que é a única parte que a
-   ferramenta não consegue gerar sozinha.
-5. **O primeiro usuário.** Terminar a rodada de alinhamento do braço, que parou
-   na escala, e construir as três primeiras partes pelo mecanismo. O que der
-   atrito volta para as fatias 1 a 4 e é consertado de forma genérica, provado
-   de novo na fixture neutra.
-
-A fatia 5 começa só depois das quatro primeiras verdes. O braço nunca é a única
-prova do mecanismo: se ele fosse, o mecanismo seria moldado ao braço, e uma
-falha não diria se o erro está no mecanismo ou na peça.
-
-## Alinhado para a fatia 4
-
-Combinado com a pessoa em 2026-09-23, depois de reler as skills.
-
-As skills se contradiziam em três pontos, e os três são corrigidos. A cadeia da
-receita é escrita uma vez, em `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, e as
-skills apontam para ela: a `TABELA`, em milímetros, é o que se mede e se edita,
-e a receita a exporta como `PARAMS`; `derivar()` converte para metro e calcula
-as posições, e `gerarPassos()` produz os passos já em metros. Metro é a unidade
-da malha, do visor e dos formatos 3D; milímetro é a unidade em que peça mecânica
-se mede. Um estilo mais antigo, o da fixture do eixo, põe `PARAMS` em metros e
-cita os parâmetros pelo nome dentro dos passos; os dois convivem, e o contrato
-diz qual é o padrão. Hoje nenhum gate confere essa cadeia. Na primeira versão
-deste texto a cadeia estava descrita errada, com a conversão entre `TABELA` e
-`PARAMS`; a leitura da peça de prova na fatia 2 mostrou que `PARAMS` é a própria
-`TABELA`. A
-peça mora em `procedural/pecas/<peça>/`; `modelar-maquina` e a pasta
-`procedural/maquinas/` que ela mandava criar saem. O nome `pecas` é decidido na
-fatia 5: quando o braço virar várias receitas e uma montagem, a pasta guarda um
-objeto e não uma peça, e só o primeiro caso real diz que forma ela terá.
-
-A bancada serve para investigar e `vistas:critica` para julgar, e as duas skills
-dizem isso. `npm run bancada` passa a sair sem interface por padrão, que é o que
-a IA quase sempre quer; `npm run bancada:tela` mostra a tela como a pessoa vê,
-para quando o assunto é a própria interface. A skill de modelagem só cita o
-primeiro, e o segundo é documentado onde se fala de mexer na bancada. Até aqui o
-padrão era com interface, e a imagem limpa dependia de lembrar da opção.
-
-`auditar-montagem` continua sendo a auditoria da montagem pronta, no fim ou de
-uma que já existe, e ganha uma linha dizendo isso. A etapa de montagem do laço
-usa as ferramentas dela, de relação, interseção e impacto, em cada junta.
-
-As skills são reescritas como método curto, e o porquê de cada regra vai para
-uma referência consultada quando preciso. Elas cresceram por acúmulo de avisos
-sobre falhas antigas, e citam receitas que já não existem.
-
-O alinhamento começa por como o objeto funciona e como uma pessoa o montaria, e
-só depois por como ele parece. A ordem das etapas segue a ordem real de
-montagem. Com isso o trabalho não desmorona quando não há imagem de referência,
-e a medida de cada parte sai da função que ela cumpre ao lado da vizinha.
-
-A ferramenta de rodada recusa passo fora de ordem: registrar sem medida, fechar
-sem crítico, fixar etapa sem o aceite da pessoa. A skill passa a mandar
-perguntar à ferramenta qual é o próximo passo, em vez de descrever a sequência e
-depender de quem conduz segui-la.
+4 e 5. **As instruções e o primeiro usuário.** Movidas em 2026-09-23 para o
+   plano [o laço constrói parte por parte](../2026-09-23-o-laco-constroi-parte-por-parte.md),
+   com o que foi alinhado para elas. Este plano passou do teto de linhas com os
+   registros das fatias, e o que falta é de outro tipo: instrução, ferramenta
+   do laço e peça real, e não o mecanismo.
 
 ## Lido antes da fatia 1
 
@@ -287,10 +216,16 @@ A fatia 5 registra se isso aparece; se aparecer, a proporção entre partes vira
 campo do `PLANO` e conferência da etapa.
 
 O rascunho [o que o braço robótico
-achou](2026-09-21-o-que-o-braco-robotico-achou.md) lista seis achados de código
+achou](../2026-09-21-o-que-o-braco-robotico-achou.md) lista seis achados de código
 levantados pelo braço. Os que tocarem montagem ou laço são lidos antes da fatia
 1, para não construir em cima de defeito conhecido.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-23 com o mecanismo pronto.** A montagem v5 declara a
+ordem de construção, os parâmetros que uma peça deriva das portas das vizinhas
+e a posição que sai do encaixe de porta; o resolvedor constrói na ordem e leva
+as medidas reais adiante; o mapa e a consulta de impacto seguem a cadeia; e o
+registro de etapas só fixa em ordem, com junta passando e aceite. Tudo provado
+na fixture neutra de três blocos, sem palavra de domínio. As fatias 4 e 5
+seguiram para o plano sucessor.

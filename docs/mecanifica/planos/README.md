@@ -2,12 +2,16 @@
 
 ## Estado
 
-**Plano ativo:** [A peça nasce encaixada](2026-09-22-a-peca-nasce-encaixada.md).
+**Plano ativo:** [O laço constrói parte por parte](2026-09-23-o-laco-constroi-parte-por-parte.md).
 
-A montagem vira o lugar de trabalho: cada parte nova é
-criada ao lado das que já existem e deriva as medidas das portas delas, em vez
-de digitar números que só se conferem no fim. O braço robótico é o primeiro
-usuário, depois de o mecanismo ser provado numa fixture neutra.
+O laço de modelagem passa a construir uma parte por vez sobre a montagem v5, a
+ferramenta de rodada recusa passo fora de ordem, as skills são reescritas curtas
+e sem contradição, e as três primeiras partes do braço robótico são o primeiro
+uso real.
+
+[A peça nasce encaixada](encerrados/2026-09-22-a-peca-nasce-encaixada.md)
+fechou em 2026-09-23 com o mecanismo pronto: etapas, vínculos de medida e
+posição por porta na montagem v5, provados numa fixture neutra.
 
 [O teste carrega o que ele
 prova](encerrados/2026-09-22-o-teste-carrega-o-que-ele-prova.md) fechou em
