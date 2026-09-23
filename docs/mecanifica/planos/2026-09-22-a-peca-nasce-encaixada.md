@@ -266,6 +266,14 @@ posições e vínculos juntos. Na fixture ninguém digita coordenada: o meio e o
 topo se empilham pelo encaixe, as relações de encaixe cilíndrico passam, girar
 a base leva os dois junto, e um vínculo de folga errado reprova a junta.
 
+## Feito na fatia 3
+
+`src/autoria/etapas-de-construcao.js` põe cada junta na etapa em que a segunda
+parte entra e só fixa etapa em ordem, com juntas passando e com aceite de
+quem aceitou. Etapa fixa que uma mudança anterior quebra vira `quebrada`, passa
+na frente e, consertada, volta a aberta pedindo aceite novo. Gravar em disco e
+perguntar à pessoa fica para a ferramenta do laço, na fatia 4.
+
 ## Riscos e parada
 
 O risco que obriga parar: descobrir que a derivação direta não basta, e que as
