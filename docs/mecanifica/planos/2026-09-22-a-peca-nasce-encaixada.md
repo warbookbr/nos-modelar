@@ -79,9 +79,11 @@ atual digita números que depois precisam ser conferidos um contra o outro.
   furo do pino do primeiro, e um terceiro derivando do segundo;
 - a mudança nas instruções para conduzir uma parte por vez e declarar a ordem
   das etapas no `PLANO`: `laco-de-modelagem`, que é a skill do orquestrador,
-  `alinhar-modelagem`, `modelar-maquina`, `criar-peca`, `auditar-montagem` e o
-  contrato em `.claude/agents/modelador.md`. O crítico visual não muda: ele
-  continua sem saber como a peça foi feita;
+  `alinhar-modelagem`, `criar-peca`, `auditar-montagem` e o contrato em
+  `.claude/agents/modelador.md`. `modelar-maquina` é apagada. O crítico visual
+  não muda: ele continua sem saber como a peça foi feita;
+- a captura da bancada sem interface por padrão, descrita em "Alinhado para a
+  fatia 4";
 - as três primeiras partes do braço robótico como primeiro usuário real.
 
 ## Excluído
@@ -110,8 +112,10 @@ atual digita números que depois precisam ser conferidos um contra o outro.
 
 `src/autoria/ler-montagem-persistida.js`, `resolver-montagem-persistida.js`,
 `derivar-mapa-dependencias.js`, `consultar-impacto-global.js`, a fixture nova em
-`tools/fixtures/`, as cinco skills e `.claude/agents/modelador.md` citados acima,
-e `procedural/pecas/braco-robotico/`.
+`tools/fixtures/`, as skills e `.claude/agents/modelador.md` citados acima,
+`tools/mecanifica/olhar-bancada.mjs`, `tools/mecanifica/rodada-de-modelagem.mjs`,
+`src/autoria/laco-de-modelagem.js`, `docs/mecanifica/usar/AUTORIA-DE-PECA.md`,
+`package.json` e `procedural/pecas/braco-robotico/`.
 
 ## Fatias
 
@@ -123,8 +127,8 @@ e `procedural/pecas/braco-robotico/`.
    e a revalidação existente dispara.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
-4. **As instruções.** As cinco skills e o contrato do modelador conduzindo uma
-   parte por vez; o `PLANO` da receita declara a ordem das etapas. Cada etapa
+4. **As instruções.** As skills e o contrato do modelador conduzindo uma
+   parte por vez, com tudo o que está em "Alinhado para a fatia 4"; o `PLANO` da receita declara a ordem das etapas. Cada etapa
    despacha um modelador novo, que lê do disco as partes já fixas e o parecer
    da etapa anterior: o estado mora nos arquivos, e um agente longo carregaria
    para as etapas seguintes o que entendeu errado na primeira. Modelador e
@@ -144,6 +148,47 @@ e `procedural/pecas/braco-robotico/`.
 A fatia 5 começa só depois das quatro primeiras verdes. O braço nunca é a única
 prova do mecanismo: se ele fosse, o mecanismo seria moldado ao braço, e uma
 falha não diria se o erro está no mecanismo ou na peça.
+
+## Alinhado para a fatia 4
+
+Combinado com a pessoa em 2026-09-23, depois de reler as skills.
+
+As skills se contradiziam em três pontos, e os três são corrigidos. A cadeia da
+receita é escrita uma vez, em `docs/mecanifica/usar/AUTORIA-DE-PECA.md`, e as
+skills apontam para ela: a `TABELA` em milímetros é o que se mede e se edita,
+`derivar()` converte e calcula, os `PARAMS` em metros são o que o núcleo
+executa, e `gerarPassos()` produz os passos. Metro é a unidade da malha, do
+visor e dos formatos 3D; milímetro é a unidade em que peça mecânica se mede.
+Hoje nenhum gate confere essa cadeia, e as duas fixtures usam só `PARAMS`. A
+peça mora em `procedural/pecas/<peça>/`; `modelar-maquina` e a pasta
+`procedural/maquinas/` que ela mandava criar saem. O nome `pecas` é decidido na
+fatia 5: quando o braço virar várias receitas e uma montagem, a pasta guarda um
+objeto e não uma peça, e só o primeiro caso real diz que forma ela terá.
+
+A bancada serve para investigar e `vistas:critica` para julgar, e as duas skills
+dizem isso. `npm run bancada` passa a sair sem interface por padrão, que é o que
+a IA quase sempre quer; `npm run bancada:tela` mostra a tela como a pessoa vê,
+para quando o assunto é a própria interface. A skill de modelagem só cita o
+primeiro, e o segundo é documentado onde se fala de mexer na bancada. Até aqui o
+padrão era com interface, e a imagem limpa dependia de lembrar da opção.
+
+`auditar-montagem` continua sendo a auditoria da montagem pronta, no fim ou de
+uma que já existe, e ganha uma linha dizendo isso. A etapa de montagem do laço
+usa as ferramentas dela, de relação, interseção e impacto, em cada junta.
+
+As skills são reescritas como método curto, e o porquê de cada regra vai para
+uma referência consultada quando preciso. Elas cresceram por acúmulo de avisos
+sobre falhas antigas, e citam receitas que já não existem.
+
+O alinhamento começa por como o objeto funciona e como uma pessoa o montaria, e
+só depois por como ele parece. A ordem das etapas segue a ordem real de
+montagem. Com isso o trabalho não desmorona quando não há imagem de referência,
+e a medida de cada parte sai da função que ela cumpre ao lado da vizinha.
+
+A ferramenta de rodada recusa passo fora de ordem: registrar sem medida, fechar
+sem crítico, fixar etapa sem o aceite da pessoa. A skill passa a mandar
+perguntar à ferramenta qual é o próximo passo, em vez de descrever a sequência e
+depender de quem conduz segui-la.
 
 ## Lido antes da fatia 1
 
