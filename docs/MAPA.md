@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-731 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+732 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -434,6 +434,10 @@
 ## procedural/pecas/
 
 - `ACERVO-SEM-PECA.md` — O acervo está sem peça
+
+## procedural/pecas/braco-robotico/
+
+- `ALINHAMENTO.md` — Braço robótico — rodada de alinhamento
 
 ## procedural/servicos/
 
