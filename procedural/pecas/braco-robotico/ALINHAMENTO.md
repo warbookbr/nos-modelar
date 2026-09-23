@@ -87,6 +87,26 @@ delas; qual porta dela encaixa em qual porta da vizinha, e com que folga; e o
 que reprova a parte, em frases verificáveis olhando. O plano não traz passo a
 passo de operações, coordenadas de posição nem código.
 
+## Forma das três primeiras partes
+
+As medidas são lidas na vista lateral pela escala, cerca de 1,76 mm por pixel,
+e têm erro de uns 10% por causa da perspectiva. Trocar um valor na tabela da
+receita ajusta o resto.
+
+`base`: corpo cilíndrico de revolução em torno do eixo vertical, com 180 mm de
+diâmetro e cerca de 200 mm de altura, apoiado no centro de um pé que é uma
+placa quadrada de cantos arredondados, com cerca de 200 mm de lado e 20 mm de
+altura; as pontas do pé aparecem nos dois lados da vista lateral. Quinas com
+filete no topo do corpo e na borda do pé. Publica em cima o assento onde o
+`anelCintura` encaixa.
+
+`caixaLateral`, na mesma etapa da base: caixa de cantos arredondados colada no
+lado esquerdo do corpo, apoiada no pé, com cerca de 190 mm de altura e 50 mm de
+saída, e um pequeno detalhe (botão ou conector) na face de fora.
+
+`anelCintura`: o anel escuro entre o topo da base e o ombro, em parte escondido
+atrás do ombro nas três imagens; por ser de revolução, a parte visível basta.
+
 ## Ainda em aberto nesta rodada
 
 A forma e a técnica de cada uma das três primeiras partes, os encaixes entre
