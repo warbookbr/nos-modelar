@@ -122,7 +122,13 @@ e `procedural/pecas/braco-robotico/`.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
 4. **As instruções.** As cinco skills e o contrato do modelador conduzindo uma
-   parte por vez; o `PLANO` da receita declara a ordem das etapas.
+   parte por vez; o `PLANO` da receita declara a ordem das etapas. Cada etapa
+   despacha um modelador novo, que lê do disco as partes já fixas e o parecer
+   da etapa anterior: o estado mora nos arquivos, e um agente longo carregaria
+   para as etapas seguintes o que entendeu errado na primeira. Modelador e
+   crítico podem repetir a etapa entre si, e ao fim dela o orquestrador para e
+   mostra à pessoa as vistas da parte, as medidas da junta e o veredito. A etapa
+   só fica fixa com o aceite dela.
 5. **O primeiro usuário.** Terminar a rodada de alinhamento do braço, que parou
    na escala, e construir as três primeiras partes pelo mecanismo. O que der
    atrito volta para as fatias 1 a 4 e é consertado de forma genérica, provado
