@@ -151,7 +151,24 @@ um pouco antes do topo; sem fresta.
 A porta que fica pronta para a etapa seguinte é a face do tambor do `ombro`, de
 eixo horizontal, com o diâmetro do tambor, onde o `braco` se prende.
 
+## O que reprova cada parte
+
+`base`, com a `caixaLateral`: o corpo não é redondo visto de cima, ou o pé não
+é quadrado de cantos arredondados; alguma quina viva no topo do corpo ou na
+borda do pé; a caixa solta do corpo, com fresta, ou flutuando acima do pé; a
+caixa do lado errado, porque na vista lateral da foto ela fica à esquerda.
+
+`anelCintura`: diâmetro diferente do da base, formando degrau na junção; sem a
+ranhura entre as duas faixas, ou com as bordas vivas, sem o chanfro estreito;
+fresta visível entre o anel e a base; o anel na cor da carcaça, quando ele é
+escuro e as carcaças são cinza-claras.
+
+`ombro`: tambor fino como chapa, em vez de grosso; pescoço alto, deixando o
+tambor visivelmente afastado do anel; face do tambor que não aponta para a
+frente, com o eixo do ombro fora da horizontal ou girado para o lado errado;
+curva de 90° com canto vivo por fora; ombro fora do eixo vertical da cintura.
+
 ## Ainda em aberto nesta rodada
 
-Os critérios de reprovação das três primeiras partes, e escrever o `PLANO`
-das receitas e a montagem v5 a partir deste registro.
+Escrever o `PLANO` das receitas e a montagem v5 a partir deste registro, e ler
+o resultado para a pessoa confirmar.
