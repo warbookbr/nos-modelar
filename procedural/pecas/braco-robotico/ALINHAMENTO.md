@@ -130,7 +130,28 @@ vertical, e na face do tambor uma porta cilíndrica de eixo horizontal, onde o
 `braco` se prende e gira. A coluna fica, por isso, deslocada para a frente do
 eixo da cintura, e não em cima dele, como a foto mostra.
 
+## Encaixes das três primeiras partes
+
+Nas fotos as peças encostam sem fresta visível, então nenhum encaixe tem folga
+de aparência. Cada medida de encaixe vem da porta da peça anterior, por vínculo
+da montagem v5, e a posição vem do encaixe de porta; nenhum desses números é
+digitado na receita.
+
+`anelCintura` na `base`: senta no topo da base, no mesmo eixo vertical, com o
+mesmo diâmetro dela, acréscimo zero, sem fresta.
+
+`ombro` no `anelCintura`: o pescoço sai de cima do anel, no mesmo eixo vertical,
+com diâmetro 20 mm menor que o do anel, cerca de 160 mm, sem fresta. A medida
+vem mais do rascunho da pessoa do que da foto, onde quase não aparece pescoço.
+
+`caixaLateral` na `base`: encostada no corpo cilíndrico, no lado esquerdo,
+apoiada no pé, com altura 10 mm menor que a do corpo, porque na foto ela termina
+um pouco antes do topo; sem fresta.
+
+A porta que fica pronta para a etapa seguinte é a face do tambor do `ombro`, de
+eixo horizontal, com o diâmetro do tambor, onde o `braco` se prende.
+
 ## Ainda em aberto nesta rodada
 
-A forma e a técnica de cada uma das três primeiras partes, os encaixes entre
-elas e os critérios de reprovação.
+Os critérios de reprovação das três primeiras partes, e escrever o `PLANO`
+das receitas e a montagem v5 a partir deste registro.
