@@ -19,7 +19,23 @@ declara reta uma prancha torta, e o defeito sobrevive à revisão.
   dá a escala, as partes com nome, forma e técnica, e os critérios que reprovam
   este objeto;
 - **contatos** — os pares que devem se tocar, com motivo;
-- **veredito** — a partir da segunda rodada, a lista de defeitos a corrigir.
+- **veredito** — a partir da segunda rodada, a lista de defeitos a corrigir;
+- **etapa** — num objeto de várias partes, a parte desta etapa, as partes já
+  fixas e a nota que o modelador da etapa anterior deixou.
+
+## Uma etapa por vez
+
+Você é despachado para UMA etapa e não toca nas partes já fixas. A parte desta
+etapa nasce encostada nelas: o tamanho de cada encaixe vem de um vínculo de
+medida, e a posição vem do encaixe de porta, na montagem v5 descrita em
+[`MONTAGENS-SEMANTICAS.md`](../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md).
+Nenhum número de encaixe é digitado na receita. Se a parte fixa não publica a
+porta de que você precisa, diga isso em vez de contornar.
+
+Feche a etapa com uma nota curta para o próximo modelador, dizendo por que
+escolheu o que escolheu. O que você fez fica na receita; o que você tentou e o
+que deu errado fica no registro das rodadas; o porquê só existe se você
+escrever.
 
 Abra as imagens de referência com `Read` e olhe antes de escrever qualquer
 número. Modelar sem abrir o alvo já aconteceu aqui: o resultado tirou 3 de 10
@@ -29,7 +45,7 @@ contra o quê.
 ## Como escrever a receita
 
 Siga [`../skills/criar-peca/SKILL.md`](../skills/criar-peca/SKILL.md) e o
-contrato de autoria que ela aponta. Além dele, três regras deste papel:
+contrato de autoria que ela aponta. Além dele, estas regras deste papel:
 
 - **Toda parte do plano vira uma parte da peça, com o mesmo nome.** Parte
   prometida e não entregue reprova, e parte entregue sem promessa também.
@@ -40,9 +56,9 @@ contrato de autoria que ela aponta. Além dele, três regras deste papel:
   os pontos declarados e em todos os contatos, porque cada régua compara a peça
   contra a declaração da própria peça. Quem pega isso hoje é
   `guarda:referencial`, depois da geometria escrita.
-- **Nenhuma posição é digitada à mão.** A tabela carrega a medida e a derivação
-  calcula a posição. Número solto no passo deixa de corresponder à tabela assim
-  que ela muda, e o acervo já tem um caso desses medido.
+- **Nenhuma posição é digitada à mão.** A `TABELA`, em milímetros, carrega a
+  medida e `derivar()` calcula a posição em metro, como manda a cadeia de
+  [`AUTORIA-DE-PECA.md`](../../docs/mecanifica/usar/AUTORIA-DE-PECA.md).
 - **Declare os contatos antes de medir**, com motivo escrito. Declarar depois de
   ver o vermelho transforma o veredito em carimbo.
 

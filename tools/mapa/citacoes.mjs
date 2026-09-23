@@ -34,13 +34,12 @@ const PASTAS = ['docs/mecanifica/usar', '.claude/skills'];
 const PASTAS_RECEITA = [
   'procedural/pecas',
   'procedural/armas',
-  'procedural/maquinas',
 ];
 
-/* Nomes que as skills mandam CRIAR, não abrir. `modelar-maquina` diz para
-   escrever `estrutura.js`, `cinematico.js`, `ferramentas.js` e `montagem.js`
-   dentro da pasta da máquina nova: são gabaritos de nome, não citações. */
-const NOMES_A_CRIAR = new Set(['estrutura.js', 'cinematico.js', 'ferramentas.js', 'montagem.js', 'index.js']);
+/* Nomes que as skills mandam CRIAR, não abrir: gabaritos de nome, não citações.
+   `estrutura.js`, `cinematico.js`, `ferramentas.js` e `montagem.js` vinham da
+   skill `modelar-maquina`, apagada em 2026-09-23. */
+const NOMES_A_CRIAR = new Set(['index.js']);
 
 const RE_CAMINHO = /`((?:[A-Za-z0-9_.-]+\/)+[A-Za-z0-9_.-]+\.(?:js|mjs|ts|tsx|json|html|css|py|svg|png))`/g;
 const RE_RECEITA = /`(_?[a-z][a-z0-9-]*\.js)`/g;

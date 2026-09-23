@@ -33,6 +33,17 @@ describe('vocabulário dos CLIs', () => {
     expect(() => lerArgumentos(['a', 'b'], VOCABULARIO)).toThrow(/recebi 2 valores/);
   });
 
+  /* A bancada sai sem interface por padrão desde 2026-09-23, e `--tela` é o
+     único jeito de pedir a interface. Misturar com um modo de imagem limpa é
+     pedido contraditório, recusado antes de abrir o navegador. */
+  it('a bancada recusa --tela junto com --cores, --arame ou --auditoria', () => {
+    for (const outra of ['--cores', '--arame', '--auditoria']) {
+      const { saida, codigo } = correr(['qualquer', '--tela', outra]);
+      expect(codigo).not.toBe(0);
+      expect(saida).toMatch(/--tela mostra a interface/);
+    }
+  });
+
   it('não deixa consultar opção ou bandeira não declarada', () => {
     const lido = lerArgumentos([], VOCABULARIO);
     expect(() => lido.opcao('vistas')).toThrow(/não foi declarado/);

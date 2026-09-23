@@ -350,15 +350,15 @@ As leis, todas conferidas no núcleo:
   recusado com `oficina: alias 'X' inválido: só origem ou unir de origens`
   (e há uma segunda guarda na citação, `aliases não encadeiam e só aceitam
   origem`). Para compor alias de alias, componha em JS na própria peça — um
-  helper que devolve a LISTA de termos, como `cilindroInteiro(id)` no freio; o
-  formato salvo continua plano.
+  helper que devolve a LISTA de termos, como um `cilindroInteiro(id)` que reúne
+  corpo e tampas; o formato salvo continua plano.
 - **`ALIASES` é validado ANTES do primeiro passo, e por `throw`** (não `grita`):
   lista malformada, nome duplicado (`alias duplicado 'X'`) ou origem inválida
   matam a peça inteira em vez de deixá-la executar pela metade.
 - **É resolvido NO MOMENTO DA CITAÇÃO, não no fim da lista.** Um alias que reúne
   duas primitivas, citado antes de a segunda existir, vira ÓRFÃO (`origem
-  cilindro:302 inexistente ou ainda não criada`) — custou 6 órfãos na rodada do
-  freio. O autor pensa "o disco" como uma coisa só; o alias só é conjunto depois
+  cilindro:302 inexistente ou ainda não criada`) — custou 6 órfãos numa peça
+  já removida do acervo. O autor pensa "o disco" como uma coisa só; o alias só é conjunto depois
   do último passo que o compõe. **Padrão que funciona:** um alias POR PRIMITIVA
   para os passos intermediários (`discoPistaInteira`, `discoChapeuInteiro`) e o
   alias agregado (`discoInteiro`) só no `parte`, quando tudo já existe.

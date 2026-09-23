@@ -5,7 +5,7 @@ Este guia orienta o agente de inteligência artificial a conceber, estruturar, m
 ## 1. Documentos e Skills Governança
 
 Ao receber um pedido de criação ou modificação geométrica:
-1. **Skill de Autoria**: Consulte a skill `criar-peca` (ou `modelar-maquina` para equipamentos complexos).
+1. **Skill de Autoria**: Consulte a skill `criar-peca`; um objeto de várias partes é construído parte por parte pelo laço de modelagem.
 2. **Contrato Conceitual**: Leia [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md) e [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md).
 3. **Armadilhas Visuais**: Consulte [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md) antes de definir a geometria.
 
@@ -13,7 +13,7 @@ Ao receber um pedido de criação ou modificação geométrica:
 
 ## 2. Anatomia Canônica de uma Receita Procedural
 
-Uma receita de peça reside em `procedural/pecas/<nome-da-peca>.js` (ou `procedural/maquinas/<nome-maquina>/montagem.js`) e deve exportar um objeto com:
+Uma receita de peça reside em `procedural/pecas/<nome-da-peca>/receita.js`, na pasta da peça, e deve exportar um objeto com:
 
 ```javascript
 export const receita = {

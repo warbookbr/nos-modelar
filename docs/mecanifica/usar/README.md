@@ -18,7 +18,6 @@ hora certa. Os documentos abaixo são o contrato que as skills aplicam.
 | conferir uma peça pronta | `auditar-peca` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | conferir um conjunto montado | `auditar-montagem` | [`REFERENCIA-E-CRITICA-VISUAL.md`](REFERENCIA-E-CRITICA-VISUAL.md) |
 | desenhar a prancha alvo | `desenhar-prancha` | [`CONTRATO-AUTORIA-PRANCHA.md`](CONTRATO-AUTORIA-PRANCHA.md) |
-| modelar máquina ou equipamento | `modelar-maquina` | [`AUTORIA-RECEITA-DECLARATIVA.md`](AUTORIA-RECEITA-DECLARATIVA.md) |
 | trazer de volta um ajuste feito na bancada | `absorver-ajuste-da-bancada` | [`AJUSTE-DA-BANCADA.md`](AJUSTE-DA-BANCADA.md) |
 
 ## Leitura obrigatória antes de gerar forma
@@ -46,9 +45,6 @@ de inclinação de erro de altura.
 
 [`PARAMETROS-VIVOS.md`](PARAMETROS-VIVOS.md): antes de alterar um número, saber
 se aquele parâmetro está ligado em algo. `npm run parametros`.
-
-[`CADEIRA-REALISTA-NOTAS.md`](CADEIRA-REALISTA-NOTAS.md) documenta a modelagem de
-uma cadeira contra referência fotográfica, com os limites de motor e ferramenta.
 
 ## Regras que valem em qualquer tarefa daqui
 

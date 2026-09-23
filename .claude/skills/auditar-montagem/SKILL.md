@@ -5,9 +5,12 @@ description: Auditar uma montagem persistida da Mecanifica por contexto semânti
 
 # Auditar montagem
 
-Use esta skill quando o alvo for uma árvore de composição. A unidade geométrica
-editável continua sendo a peça; a montagem organiza peças e relações. Esta
-skill audita o estado existente e não transforma a montagem em receita de peça.
+Use esta skill quando o alvo for uma árvore de composição pronta: no fim da
+construção, ou numa montagem que já existe. A unidade geométrica editável
+continua sendo a peça; a montagem organiza peças e relações. Esta skill audita
+o estado existente e não constrói: construir parte por parte é o laço de
+[`laco-de-modelagem`](../laco-de-modelagem/SKILL.md), que usa as mesmas
+medidas de relação, interseção e impacto em cada junta.
 
 O contrato que ela aplica é
 [`MONTAGENS-SEMANTICAS.md`](../../../docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md):

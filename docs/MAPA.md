@@ -46,6 +46,7 @@
 ## .claude/skills/criar-peca/references/
 
 - `operacoes-procedurais.md` — Referência de operações procedurais
+- `por-que.md` — Por que cada regra da skill `criar-peca` existe
 
 ## .claude/skills/desenhar-prancha/
 
@@ -54,10 +55,6 @@
 ## .claude/skills/laco-de-modelagem/
 
 - `SKILL.md` — Conduzir o laço de modelagem de uma peça — despachar o modelador com o plano, rodar as medidas, despachar o crítico sem a história da construção, levar o ver…
-
-## .claude/skills/modelar-maquina/
-
-- `SKILL.md` — Conceber, planejar e modelar uma máquina ou equipamento 3D procedural da Mecanifica a partir de briefing ou conceito visual, decompondo em módulos estruturai…
 
 ## docs/
 
@@ -112,6 +109,7 @@
 - `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
 - `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
 - `BICICLETA-REALISTA-ATRITOS.md` — Bicicleta realista: diário de atrito da rodada
+- `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
 - `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
 - `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
@@ -292,7 +290,6 @@
 - `ATIVACAO-BANCADA-SESSAO-ATIVA.md` — Ativação de Peças e Montagens na Bancada 3D (Sessão Ativa)
 - `AUTORIA-DE-PECA.md` — Autoria de peça — o contrato
 - `AUTORIA-RECEITA-DECLARATIVA.md` — Autoria de receita declarativa
-- `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
 - `CONFERIR-CONTRA-REFERENCIA.md` — Conferir a peça contra uma foto de referência
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados

@@ -50,7 +50,6 @@ export const SOB_DEMANDA = [
      investigação travada não é leitura de partida. */
   'docs/mecanifica/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md',
   'docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md',
-  'docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md',
   'docs/mecanifica/usar/MONTAGENS-SEMANTICAS.md',
   'docs/mecanifica/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md',
   'docs/mecanifica/usar/CONTRATO-AUTORIA-PRANCHA.md',

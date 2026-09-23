@@ -780,13 +780,20 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
-      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'cores', 'arame', 'wireframe'],
+      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
   }
   const arame = lido.bandeira('arame') || lido.bandeira('wireframe');
+  const tela = lido.bandeira('tela');
+  if (tela && (lido.bandeira('cores') || arame || lido.bandeira('auditoria'))) {
+    return Promise.resolve(erroEstruturado({
+      relato: novoRelato(),
+      erro: new ErroDeUso('--tela mostra a interface da bancada; não se mistura com --cores, --arame ou --auditoria.'),
+    }));
+  }
   return olharBancada({
     peca: lido.opcao('peca') ?? lido.posicional,
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
@@ -794,9 +801,13 @@ function comoCLI(argv) {
     res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
-    /* --cores ou --arame implicam --auditoria: pedir cor ou arame e receber a imagem com
-       painel em cima seria entregar metade do que foi pedido. */
-    auditoria: lido.bandeira('auditoria') || lido.bandeira('cores') || arame,
+    /* SEM INTERFACE POR PADRÃO desde 2026-09-23. Quem usa este comando é quase
+       sempre a IA olhando a peça, e a imagem com painéis, cabeçalho, piso e
+       grade deixava a peça numa faixa estreita no meio; a imagem limpa
+       dependia de lembrar de `--auditoria`. `--tela` (ou `npm run
+       bancada:tela`) mostra a interface, para quando o assunto é a própria
+       bancada. `--auditoria` continua aceito e não muda nada. */
+    auditoria: !tela,
     coresPorParte: lido.bandeira('cores'),
     arame,
   });

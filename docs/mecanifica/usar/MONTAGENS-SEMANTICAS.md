@@ -204,6 +204,40 @@ mas ainda não existe como capacidade geral de montagem. Os níveis 6 a 8 possue
 o recorte acima; seus limites permanecem direção estabelecida, não promessa de
 generalização automática.
 
+## Construção parte por parte (montagem v5)
+
+A montagem v5 é o lugar onde um objeto de várias partes é construído, uma parte
+por vez, e cada parte nasce encaixada nas que já estão prontas. Ela acrescenta
+três campos à v3:
+
+- `etapas`: a ordem de construção, com cada instância uma vez. É a ordem em que
+  uma pessoa montaria o objeto.
+- `vinculos`: um parâmetro da receita de uma instância é a medida de uma porta
+  de outra (`raio`, `raioInterno`, `raioExterno`, `inicio` ou `fim`), mais um
+  `acrescimo`, na `unidade` do parâmetro (`mm` ou `m`). A folga é o acréscimo,
+  e é obrigatória mesmo quando é zero.
+- `posicoes`: a porta de uma instância no eixo da porta de outra, com
+  `afastamento` na `unidade` declarada. A pose da instância sai desse encaixe, e
+  instância com posição derivada não declara `pose`.
+
+```json
+{ "id": "furoDoMeio", "alvo": { "instancia": "meio", "param": "raioDoFuro" },
+  "de": { "instancia": "base", "porta": "pino", "medida": "raio" },
+  "unidade": "mm", "acrescimo": 0.2 }
+{ "id": "meioSobreABase", "instancia": "meio", "porta": "furo",
+  "em": { "instancia": "base", "porta": "pino" }, "unidade": "mm", "afastamento": 0 }
+```
+
+O leitor recusa ciclo, dependência de instância construída depois, medida que
+porta não publica, parâmetro com duas origens e unidade ausente. O resolvedor
+constrói na ordem das etapas, executa a receita com os parâmetros derivados e
+recusa porta ausente e parâmetro que a receita não declara. O giro em torno do
+eixo só fica definido quando as duas portas publicam `referencia`; sem ela o
+resultado diz `giroDefinido: false`. O registro de etapas põe cada junta na
+etapa em que a segunda parte entra e só fixa etapa em ordem, com juntas
+passando e com o aceite da pessoa. A prova mínima está em
+`tools/fixtures/tres-blocos-vinculados/`.
+
 ## O que não existe
 
 Ainda não há:

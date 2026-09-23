@@ -17,7 +17,6 @@ export const REPO = resolve(HERE, '../..');
 export const PASTAS_BUSCA = [
   '',
   'procedural/pecas',
-  'procedural/maquinas',
   'procedural/armas',
   'procedural/extensoes',
   'tools/fixtures/acervo',

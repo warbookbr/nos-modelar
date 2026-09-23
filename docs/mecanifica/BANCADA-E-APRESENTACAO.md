@@ -120,6 +120,11 @@ PNGs e conferir:
 - detalhes escondidos;
 - coerência com referências visuais.
 
+`npm run bancada` fotografa sem a interface desde 2026-09-23: a imagem é para
+ler a peça, e com painéis, cabeçalho, piso e grade a peça ficava numa faixa
+estreita no meio. Quem mexe na própria interface usa `npm run bancada:tela`,
+que fotografa a tela como a pessoa a vê.
+
 `porteiro` verifica abertura, erros de página e quadro degenerado.
 `revisar:modelagem` conserva tentativas e revisões sem criação manual de
 evidência.

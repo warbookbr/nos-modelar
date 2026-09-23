@@ -93,6 +93,28 @@ A fronteira pode mudar conforme a fidelidade aumenta. Uma peça simples de
 prova pode começar agregada e depois ser decomposta, desde que a identidade e as
 relações permitam a migração sem transformar referências em números frágeis.
 
+## A receita: da tabela à malha
+
+Toda receita nova segue a mesma cadeia, e as skills apontam para cá em vez de
+repetir:
+
+1. a `TABELA`, em milímetros, é o que se mede e se edita; a receita a exporta
+   como `PARAMS`;
+2. `derivar(tabela)` converte para metro e calcula posições, ângulos e
+   comprimentos que dependem de mais de uma medida;
+3. `gerarPassos(tabela)` escreve os passos já em metro, sem nenhum número que
+   não venha de `derivar`;
+4. `get PASSOS() { return gerarPassos(this.PARAMS); }` liga a lista de passos à
+   tabela, para mudar a tabela mudar a peça.
+
+Milímetro é a unidade em que peça mecânica se mede e se desenha. Metro é a
+unidade da malha, do visor e dos formatos 3D, e a conversão acontece num lugar
+só, dentro de `derivar`. Um estilo mais antigo põe `PARAMS` em metro e cita o
+parâmetro pelo nome dentro do passo; ele ainda existe em fixtures, e não é o
+padrão de receita nova. Quando uma montagem v5 deriva um parâmetro da porta de
+uma vizinha, o vínculo declara a unidade do parâmetro, porque a medida da porta
+vem sempre em metro. Hoje nenhum gate confere esta cadeia.
+
 ## Identidade estável
 
 Toda peça, montagem, instância, parte relevante, porta e relação precisa de

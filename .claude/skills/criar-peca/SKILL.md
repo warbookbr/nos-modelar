@@ -5,217 +5,58 @@ description: Criar ou refinar uma peça 3D procedural da Mecanifica como IA, esc
 
 # Criar peça
 
-Antes de escrever o primeiro passo de uma peça NOVA, conduza a rodada de
-alinhamento em [`../alinhar-modelagem/SKILL.md`](../alinhar-modelagem/SKILL.md)
-e escreva o `PLANO` da receita. Sem ele, parte prometida e não entregue é
-invisível para toda medida, e `npm run guarda:acervo` reprova a peça na entrada
-do acervo.
+Esta skill diz como escrever UMA receita. Um objeto de várias partes é
+construído parte por parte pelo laço, em
+[`../laco-de-modelagem/SKILL.md`](../laco-de-modelagem/SKILL.md), sobre uma
+montagem que deriva medida e posição de cada parte das vizinhas. O porquê de
+cada regra abaixo está em [`references/por-que.md`](references/por-que.md), para
+consultar quando uma regra parecer arbitrária.
 
-A peça é uma PASTA: `procedural/pecas/<peça>/receita.js`, com as
-imagens em `referencias/` ao lado e as rodadas do laço em `rodadas/`. Peça em
-arquivo solto reprova, porque o material dela não tem onde morar junto e volta a
-se espalhar pelo repositório. Documento que descreve a peça mora aí dentro
-também, e não em `docs/`: quando a peça for apagada ele sai junto com ela, em
-vez de ficar descrevendo uma receita que ninguém pode abrir e declarando um
-referencial que já não vale.
+## Antes do primeiro passo
 
-Use esta skill quando o alvo for uma peça geométrica editável. Se o alvo for
-uma árvore de composição, relações entre peças ou revalidação de conjunto,
-use também `../auditar-montagem/SKILL.md`: cada peça é uma receita, e o conjunto
-é uma montagem que as relaciona.
+1. A peça nova passa pela rodada de alinhamento,
+   [`../alinhar-modelagem/SKILL.md`](../alinhar-modelagem/SKILL.md), e só então
+   tem `PLANO`.
+2. A peça é uma pasta: `procedural/pecas/<peça>/receita.js`, com `referencias/`
+   e `rodadas/` ao lado.
+3. A receita segue a cadeia do contrato
+   [`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
+   `TABELA` em milímetros exportada como `PARAMS`, `derivar()` que converte
+   para metro, `gerarPassos()` que escreve os passos, e
+   `get PASSOS() { return gerarPassos(this.PARAMS); }`. Nenhuma posição é
+   digitada no passo; `npm run parametros -- <peça>` diz quais parâmetros
+   estão ligados.
+4. Toda operação usada vem do
+   [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md),
+   lida por `descrever_capacidade` no MCP procedural. Receita antiga não é
+   molde: o acervo hoje não tem receita, e a peça de prova em
+   `tools/fixtures/acervo/peca-de-prova/` é ferramenta de teste, não exemplo de
+   forma.
 
-O contrato que esta skill executa é
-[`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
-o que conta como peça e não montagem, identidade estável, isolamento, limites
-do controle, propagação de alteração, validação em camadas, invariantes e
-desvios a evitar. A skill diz **como fazer**; o contrato diz **o que vale**.
-Para a anatomia de receitas procedurais, armadilhas conhecidas de sintaxe e
-esteira de comandos para IA, consulte [`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md).
+## Identidade
 
-## Caminho curto
-
-1. Descubra capacidades no [catálogo gerado](../../../docs/mecanifica/gerado/CATALOGO-CAPACIDADES.md)
-   ou, pelo MCP procedural, em `mecanifica://procedural/catalogo` e
-   `mecanifica://procedural/schemas`. Busque em modo resumido e use
-   `descrever_capacidade` para obter schema, exemplo, pré-condições, limites e
-   diagnósticos somente da operação escolhida. Combine/valide a cadeia antes
-   de definir o alvo, `PARAMS`, `TOPO` e `PASSOS`. Toda operação usada vem do
-   catálogo, lida por `descrever_capacidade`.
-2. Escreva nomes semânticos (`origemId`, `ALIASES`, `parte`, `publicarPorta`)
-   quando o contrato permitir: identidade persistida é sempre semântica.
-3. Rode a descrição e obtenha vistas por uma bancada/harness privado
-   explicitamente configurado. Esse é o laço oficial de inspeção visual:
-
-   ```bash
-   npm run descrever -- <peça>
-   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
-   ```
-
-   **Capture sempre com `--cores`, ou ao menos com `--auditoria`.** Sem isso a
-   imagem sai como a pessoa vê a bancada — painel à esquerda, inspeção à
-   direita, cabeçalho, barra de vistas, piso, grade e sombra —, e a peça fica
-   numa tira estreita no meio. `--auditoria` tira o cromo, o piso, a grade e a
-   sombra, e a peça ocupa o quadro inteiro; `--cores` faz o mesmo e ainda pinta
-   uma cor por parte, imprimindo a legenda. Numa peça de mais de uma parte
-   `--cores` é obrigatório: partes do mesmo material leem como um borrão só, e a
-   junção entre elas fica invisível.
-
-   O catálogo publicado está vazio de propósito: a peça em trabalho é ativada
-   na sessão e capturada pelo nome curto.
-
-4. **Cada imagem responde uma pergunta.** Escolha o modo pela pergunta que
-   você precisa responder agora. A bancada tem três, e cada um responde uma
-   coisa diferente:
-
-   ```bash
-   npm run bancada -- <peça> --selecionadas=carroceria --modo=isolar --focar --cores
-   npm run bancada -- <peça> --selecionadas=carroceria --modo=contexto --cores
-   npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
-   ```
-
-   | modo | pergunta | o que avaliar |
-   |---|---|---|
-   | `isolar` | a superfície está boa? | continuidade, vinco, transição entre regiões, ondulação, faceteamento onde deveria ser liso |
-   | `contexto` (o resto vira fantasma) | cabe e encaixa? | folga, interferência, proporção contra o vizinho, alinhamento de eixo |
-   | `todas` | lê como o objeto certo? | leitura geral — e aqui **você não decide sozinho** |
-
-   **`isolar` sozinho aprova coisa impossível.** Um arco de roda que não cabe na
-   própria roda passa isolado e só aparece em `contexto`. Regra: peça com
-   vizinho conclui em `contexto`.
-
-   `--par a,b` isola exatamente duas peças e já enquadra, para julgar um encaixe.
-
-5. Registre pelo menos uma medida ou gate por rodada e itere sobre defeitos
-   concretos. `npm run malha:conferir -- <peça>` pega fechamento e face de área
-   nula, que o olho não vê e o `descrever` não cobre. `npm run diario` diz onde o
-   tempo foi e o que você repetiu sem a receita mudar — as ferramentas registram
-   sozinhas, você não relata nada. A bancada confirma enquadramento; não decide
-   se a forma atende ao briefing.
-6. Rode `npm run criar -- minha-peca` para o estado do núcleo, manifesto,
-   compatibilidade e gabarito, quando a receita local e esses artefatos forem
-   autorizados. Esse visor legado é diagnóstico; não transforma a peça em
-   entrada publicada.
-
-`npm run peca` e `porteiro` permanecem diagnósticos do mesmo visor legado do
-item 6; não substituem a descrição nem as vistas da bancada. A peça mora em
-`procedural/pecas/`; prefixo `_` indica exemplo/fixture.
-
-Receita anterior é evidência do que foi feito, e o alvo autorizado é a fonte
-dos nomes. Crie uma receita quando houver alvo e pacote de modelagem
-autorizados; o
-catálogo de **capacidades** continua disponível mesmo sem peça publicada.
-
-Quando uma capacidade faltar, consulte primeiro `buscar_capacidades`,
-`descrever_capacidade`, `combinar_capacidades`, `validar_composicao` e
-`analisar_lacuna` pela descoberta procedural. Só depois diagnostique uma
-extensão, que é a via declarada para capacidade ausente e mantém a receita
-inteira dentro do vocabulário do motor.
-
-## Contrato mínimo
-
-**A convenção vem do catálogo, não do acervo.** As receitas de
-`procedural/` são exemplo e não passaram por homologação: em
-2026-09-08 a varredura com o veredito de contato ligado achou defeito real em
-duas delas, uma tratando `em` como canto mínimo do cubo quando é translação de
-um cubo centrado e outra com tubo atravessando pneu. Aprender convenção lendo
-receita defeituosa propaga o defeito. `descrever_capacidade` devolve schema,
-exemplo, pré-condições e limites da operação, e é essa a fonte.
-
-O acervo publicado hoje não tem receita nenhuma, estado declarado em
-`procedural/pecas/ACERVO-SEM-PECA.md`. A executável que resta é
-`tools/fixtures/acervo/peca-de-prova/`, peça de ferramenta e não exemplo de
-forma: para ver uma operação em uso, leia o catálogo. Se um dia abrir uma
-receita de acervo, rode `npm run descrever` nela antes de copiar qualquer ideia,
-porque o que reprovar ali não deve entrar na sua peça.
-
-Para peças bilaterais com curvas ou arcos contínuos (como o encosto esculpido da cadeira), use `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` para garantir simetria matemática e eliminar frestas de tangência angular nas pontas. O estudo de caso e notas técnicas estão em [`docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md`](../../../docs/mecanifica/usar/CADEIRA-REALISTA-NOTAS.md).
-
-Ler é para entender a operação e a convenção; **copiar uma receita histórica
-como molde, não**. Para uma receita nova, use o contrato declarativo em
-`docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md`, declare que ela é exemplo e
-não referência de engenharia, e registre o pacote que autorizou a modelagem.
-
-`PARAMS` guarda dimensões; `TOPO` guarda decisões que podem reconstruir a
-topologia; `PASSOS` é a lista `[['op', {...}], ...]`. O núcleo calcula o bloco pela posição
-do passo (`BLOCO=1000`), então o passo dispensa `id:`. `origemId` é identidade
-estrutural, outra coisa, e essa o autor escolhe.
-
-**Derive `PASSOS` de `PARAMS`** (`get PASSOS() { return gerarPassos(this.PARAMS); }`);
-lista de literais congela os números e faz `PARAMS` virar enfeite, sem aviso.
-`npm run parametros -- <peça>` diz quais estão ligados.
-
-Como `PASSOS` é getter, **não copie a receita com `{...receita}`** para testar um
-parâmetro diferente: o espalhamento AVALIA o getter uma vez com a tabela velha e
-guarda o resultado como valor fixo, então o número novo não tem efeito e a peça
-parece insensível ao parâmetro. Copie por descritores
-(`Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita))`) e só
-então troque `PARAMS`. Vale em qualquer código que copie uma receita.
-
-Quando a função pretendida não for óbvia pela geometria, exporte o contrato
-opcional `INTENCAO` descrito em `docs/mecanifica/usar/INTENCAO-PECA-V1.md`. Declare
-função, família, significado dos eixos locais, invariantes e critérios visuais.
-A descrição headless e a revisão preservam e comparam essa intenção; ela soma às
-medidas, interfaces, relações e à inspeção das imagens. Grave nela só o que
-sobrevive a uma reexecução em outra máquina.
-
-Números precisam ser finitos e pontos precisam ter exatamente `[x,y,z]`.
-`NaN`, `Infinity` e aridade errada devem lançar erro. Determinismo exige
-semente explícita: todo sorteio parte dela, e a receita reexecuta igual.
-
-`meta.colisao`, `colisaoDe` e `solido` são compatibilidade opcionais para
-consumidores v3, não requisitos universais da bancada atual. Quando a peça
-exportar `ALIASES`, encaminhe-os tanto a `colisaoDe` quanto a `executar`; caso
-contrário, as citações podem virar órfãs mesmo quando a definição está correta.
-
-## Quando existe referência fotográfica
-
-Foto de produto de terceiro NUNCA entra no repositório; só coordenadas
-derivadas dela, em `docs/mecanifica/referencias/`. Com uma foto em mãos, o alvo
-vem antes da geometria: a skill `../desenhar-prancha/SKILL.md` produz a prancha
-ortográfica, e ela é o que transforma "está coerente?" em desvio medido por
-região. Sem alvo, a única coisa que sobra para julgar a peça é a opinião de quem
-a fez. A comparação e seus limites estão em
-[`REFERENCIA-E-CRITICA-VISUAL.md`](../../../docs/mecanifica/usar/REFERENCIA-E-CRITICA-VISUAL.md).
-
-Quando a prancha não existe e a foto é o que há, `npm run conferir:referencia`
-devolve o desvio em milímetro entre a borda da peça e a borda da foto, por
-estação, e reprova acima da tolerância declarada. Média perto de zero com máximo
-alto é erro de inclinação; média igual ao máximo é erro de altura. O contrato
-está em
-[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md).
-
-## Seleção e operações
-
-A referência completa de operações, argumentos e armadilhas está em
-[`references/operacoes-procedurais.md`](references/operacoes-procedurais.md).
-Leia-a quando precisar escolher uma operação ou depurar uma seleção; não
-carregue a tabela inteira para uma tarefa simples.
+Nomes semânticos sempre: `origemId`, `ALIASES`, `parte`, `publicarPorta`.
+Identidade persistida nunca é índice nem posição de passo. `sel:{alias:...}` é
+nome de seleção, não nome de parte.
 
 <!-- operacoes-com-origem: arranja, arredondarAresta, chamferBox, cilindro, cone, cubo, esfera, espelha, filete, furo, inflate, lathe, loft, plano -->
 
-As operações que publicam `origem` aceitam endereçamento estrutural conforme a
-referência. `sel:{alias:...}` é nome de seleção, não nome de parte. Alias não
-encadeia, é resolvido no momento da citação e falha de forma total; componha
-listas de origens em JavaScript quando necessário.
-
-As operações `moveV`, `moveF`, `moveA`, `vira`, `extruda`, `mescla` e `pesar`
-continuam endereçadas por ID literal. Escolher uma delas é assumir essa dívida
-posicional e ela deve ser relatada:
+As operações que publicam `origem` aceitam endereçamento estrutural conforme
+[`references/operacoes-procedurais.md`](references/operacoes-procedurais.md),
+que é consulta, e não leitura de partida.
 
 **ID LITERAL:** `moveV`, `moveF`, `moveA`, `vira`, `extruda`, `mescla` e
 `pesar` não aceitam `sel`; `sel` não é atalho e deve falhar de forma explícita.
-Para identidade estável, prefira uma primitiva com
-`origemId` seguida de `transladar`, `rotaciona`, `espelha` ou outra operação
-semântica documentada.
+Escolher uma delas é assumir dívida posicional, e ela é relatada. Para
+identidade estável, prefira uma primitiva com `origemId` seguida de
+`transladar`, `rotaciona` ou `espelha`.
 
-`apagaFace` é a exceção importante: aceita `sel: {...}`, exige exatamente uma face e é
-a forma semântica de abrir um vão. Cada passo endereça por `face` ou por `sel`,
-um dos dois.
+`apagaFace` é a exceção importante: aceita `sel: {...}`, exige exatamente uma
+face e é a forma semântica de abrir um vão.
 
-## Orientação e casos recorrentes
+## Orientação
 
-Rotação usa a regra destrógira medida pelo núcleo. Com pivô explícito em
-`[0,0,0]`, a tabela abaixo é a referência rápida:
+Rotação usa a regra destrógira medida pelo núcleo. Com pivô em `[0,0,0]`:
 
 | eixo | `graus` | leva | para |
 |---|---:|---|---|
@@ -226,49 +67,67 @@ Rotação usa a regra destrógira medida pelo núcleo. Com pivô explícito em
 | `z` | `+90` | `+Y` | `-X` |
 | `z` | `-90` | `+Y` | `+X` |
 
-`cilindro`, `cone` e `lathe` nascem em torno de Y. Para pôr disco, eixo ou
-pistão no eixo X, prefira `eixo:'x'` no próprio gerador; quando o pivô não for
-a origem, use `rotaciona z -90` com pivô explícito. O pivô padrão é o centroide
-da seleção e pode girar a peça no próprio lugar.
+`cilindro`, `cone` e `lathe` nascem em torno de Y; para o eixo X, prefira
+`eixo:'x'` no gerador. O pivô padrão é o centroide da seleção. No `loft`,
+`orientacao` diz para onde aponta o `+u` de cada seção, e não o eixo do
+caminho: confira frente, lateral e superior, porque trocar `u` e `w` preserva
+uma vista e estraga as outras.
 
-No `loft`, `orientacao` declara para onde aponta o eixo local `+u` de cada
-seção — não o eixo do caminho. Em caminho ao longo de Z, use `[1,0,0]` quando
-o primeiro componente do `contorno:[u,w]` deve ser a largura X. Sempre confira
-frente, lateral e superior: trocar `u` e `w` pode preservar a lateral e deixar
-a peça estreita ou alta nas outras vistas sem produzir órfão.
+## Duas armadilhas de código
 
-Prefira `PASSOS` para peças determinísticas e editáveis. Use `construir(ctx)`
-com `ctx.{TS,tex,geo,m4}` apenas quando o vocabulário não cobrir a forma e
-registre essa lacuna como evidência para uma futura operação.
+`PASSOS` é getter. Para testar outro valor, copie a receita por descritores
+(`Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita))`) e só
+então troque `PARAMS`; `{...receita}` avalia o getter com a tabela velha e o
+número novo não tem efeito.
 
-## Entrega e gates
+`meta.colisao`, `colisaoDe` e `solido` são compatibilidade opcionais para
+consumidores v3, e não requisito. Quando a peça exporta `ALIASES`, eles vão para
+`colisaoDe` e para `executar`.
 
-Peça nova precisa de cabeçalho no primeiro comentário, pois `mapa:check` o
-exige. Para uma iteração local, execute descrição, bancada e `criar`. Antes de
-publicar uma mudança:
+## Ver e medir
+
+A bancada é o laço oficial de inspeção, e sai sem interface por padrão:
 
 ```bash
-npm run gates
+npm run descrever -- <peça>
+npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
 ```
 
-Roda todos e relata todos numa execução, com saída não-zero se algum falhar.
-Esta seção listava os gates um a um; era a terceira cópia da mesma lista, e
-lista repetida em três lugares envelhece em três velocidades. A fonte é
-`tools/gates.mjs`, conferida contra o `ci.yml` nos dois sentidos.
+Cada imagem responde uma pergunta: `--modo=isolar` para a superfície,
+`--modo=contexto` para caber e encaixar, `--par a,b` para uma junta, e todas as
+partes para a leitura geral, que você não decide sozinho. A bancada serve para
+investigar; o pacote que vai ao crítico sai de `npm run vistas:critica`.
+`npm run malha:conferir -- <peça>` pega fechamento e face de área nula, e
+`npm run conferir:referencia` mede a borda da peça contra a foto quando não há
+prancha.
 
-Enquanto conserta um gate específico: `npm run gates -- --parar-no-primeiro`.
+Foto de produto de terceiro nunca entra no repositório; entra a prancha
+desenhada com `desenhar-prancha` ou as coordenadas derivadas dela.
 
-O fluxo de commit e decisão segue `AGENTS.md` e `docs/mecanifica/INDEX.md`.
+`npm run peca` e `porteiro` permanecem diagnósticos do visor legado; não
+substituem a descrição nem as vistas da bancada.
 
-## O laço visual — obrigatório, e mora num lugar só
+O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto)
+mora em [`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md).
 
-Olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto e reconhecer o
-limite do método diagnóstico valem em toda tarefa que produz forma. As quatro
-regras estão em
-[`LACO-VISUAL.md`](../../../docs/mecanifica/usar/LACO-VISUAL.md), e estavam
-copiadas palavra por palavra aqui e na outra skill — regra duplicada envelhece
-em lugares diferentes.
+## Consulta
 
-Para EMITIR um achado em formato reexecutável, o contrato está em
-[`CRITICA-VISUAL-CONTRATO-E-CASOS.md`](../../../docs/mecanifica/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md).
-É consulta, não leitura de partida.
+Documentos para quando a tarefa pedir, e não para ler de partida:
+[`GUIA-AUTORIA-IA.md`](../../../docs/mecanifica/usar/GUIA-AUTORIA-IA.md), a
+anatomia da receita e a esteira de comandos;
+[`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/mecanifica/usar/GOTCHAS-AUTORIA-VISUAL.md),
+o que já falhou ao gerar forma;
+[`INTENCAO-PECA-V1.md`](../../../docs/mecanifica/usar/INTENCAO-PECA-V1.md), o
+contrato opcional `INTENCAO` para quando a função não é óbvia pela geometria;
+[`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/mecanifica/usar/AUTORIA-RECEITA-DECLARATIVA.md),
+a receita como dado JSON, usada pela autoria por MCP; e
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/mecanifica/usar/CONFERIR-CONTRA-REFERENCIA.md),
+o desvio medido entre a borda da peça e a foto. Para curva bilateral contínua,
+`criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` garante a
+simetria sem fresta nas pontas.
+
+## Entrega
+
+A peça nova tem cabeçalho no primeiro comentário, porque `mapa:check` o exige.
+Antes de publicar, `npm run gates`, que roda todos e relata todos; enquanto
+conserta um gate, `npm run gates -- --parar-no-primeiro`.

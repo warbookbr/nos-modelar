@@ -30,6 +30,7 @@
     "test:watch": "vitest",
     "coord": "node tools/coordenacao/coord.mjs",
     "bancada": "node tools/mecanifica/olhar-bancada.mjs",
+    "bancada:tela": "node tools/mecanifica/olhar-bancada.mjs --tela",
     "revisar": "node tools/mecanifica/olhar-bancada.mjs --revisar",
     "preparar:modelagem": "node tools/modelagem/preparar-pacote.mjs",
     "validar:modelagem": "node tools/modelagem/validar-pacote.mjs",

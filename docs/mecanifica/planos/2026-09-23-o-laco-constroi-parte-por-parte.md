@@ -124,6 +124,21 @@ As skills e o contrato citados, `docs/mecanifica/usar/AUTORIA-DE-PECA.md`,
    `pecas`. O que der atrito volta para o mecanismo e é consertado de forma
    genérica.
 
+## Feito na fatia 1
+
+`criar-peca` caiu de 15.021 para cerca de 6.000 bytes: método curto, o porquê de
+cada regra em `references/por-que.md`, e uma seção de consulta com os
+documentos de uso. `alinhar-modelagem` começa por como o objeto funciona e se
+monta, e a ordem vira `etapas`. `laco-de-modelagem` conduz etapa por etapa, com
+modelador novo e parada para a pessoa. O contrato do modelador ganhou a etapa e
+a nota de passagem, e `auditar-montagem` diz que é para montagem pronta. A
+cadeia da receita está em `AUTORIA-DE-PECA.md`, e a montagem v5 em
+`MONTAGENS-SEMANTICAS.md`. `modelar-maquina` e `procedural/maquinas` saíram das
+instruções e das listas de busca. `npm run bancada` sai sem interface, e
+`bancada:tela` está em `BANCADA-E-APRESENTACAO.md`. O diário da cadeira, receita
+apagada, foi de `usar/` para o histórico. O gate `docs:estrutura` pegou sozinho
+os documentos que a skill curta deixou de citar.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não
