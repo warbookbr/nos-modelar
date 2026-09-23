@@ -106,6 +106,25 @@ saída, e um pequeno detalhe (botão ou conector) na face de fora.
 
 `anelCintura`: o anel escuro entre o topo da base e o ombro, em parte escondido
 atrás do ombro nas três imagens; por ser de revolução, a parte visível basta.
+Continua parte própria, e o ombro começa em cima dele.
+
+`ombro`: a peça que assenta em cima do `anelCintura`, gira com ele em volta do
+eixo vertical e carrega a junta do ombro, de eixo horizontal. A forma é a de um
+cotovelo de cano, proposta pela pessoa num rascunho feito no Blender: um
+pescoço cilíndrico vertical, baixo, que sai do anel e faz uma curva de 90° até
+ficar horizontal, com o lado de fora da curva arredondado; na ponta
+horizontal, um tambor grosso, bem mais largo que o tubo, cuja face redonda é o
+volume que a foto mostra atrás da coluna e onde o `braco` se prende. O pescoço
+é baixo porque na foto o tambor quase encosta no anel, e porque distância maior
+aumenta a alavanca sobre a cintura; o tambor é grosso porque guarda o motor e a
+redução da junta. A parte de trás do ombro não aparece em nenhuma das três
+imagens, então essa forma é decisão da pessoa, e não leitura da referência: um
+cilindro em pé com outro deitado por cima daria a mesma foto de lado.
+
+O `ombro` publica embaixo o encaixe no assento do `anelCintura`, no eixo
+vertical, e na face do tambor uma porta cilíndrica de eixo horizontal, onde o
+`braco` se prende e gira. A coluna fica, por isso, deslocada para a frente do
+eixo da cintura, e não em cima dele, como a foto mostra.
 
 ## Ainda em aberto nesta rodada
 
