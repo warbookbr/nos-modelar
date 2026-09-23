@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-718 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+721 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -485,7 +485,7 @@
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
 - `laco-de-modelagem.js` — laco-de-modelagem.js — quem decide se a modelagem continua, e por quê.
 - `laco-de-modelagem.test.js` — laco-de-modelagem.test.js — a decisão de parar sai dos números, não de quem modelou.
-- `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3.
+- `ler-montagem-persistida.js` — ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1 a v5.
 - `ler-peca-resolvida.js` — ler-peca-resolvida.js — a metade LEITORA do formato `mecanifica.peca-resolvida`.
 - `ler-universo-autoria.js` — ler-universo-autoria.js — contrato e prova estrutural do universo v1.
 - `mapa-parte-passo.js` — mapa-parte-passo.js — qual passo da receita constrói qual parte.
@@ -517,6 +517,7 @@
 - `varrer-parametros.js` — varrer-parametros.js — mede o que cada parâmetro faz, em vez de adivinhar.
 - `veredito-de-forma.js` — veredito-de-forma.js — a saída do revisor, em vocabulário fechado.
 - `veredito-de-forma.test.js` — veredito-de-forma.test.js — o veredito que não deixa a correção para o chute.
+- `vinculos-de-medida.js` — vinculos-de-medida.js — o grafo de "esta medida vem daquela porta" dentro de uma montagem, e a ordem de construção que ele impõe.
 
 ## src/bancada/
 
@@ -685,6 +686,10 @@
 - `painel-lateral.js` — Painel de entrada de ar lateral da sonda privada de supercarro.
 - `pneu.js` — Pneu fechado de revolução, compartilhado pelas quatro rodas.
 - `porta-lateral.js` — Porta externa facetada da sonda privada de supercarro.
+
+## tools/fixtures/tres-blocos-vinculados/
+
+- `README.md` — Três blocos vinculados
 
 ## tools/fixtures/tres-familias-com-extensao/
 
@@ -867,6 +872,7 @@
 - `universo-autoria.test.ts` — universo-autoria.test.ts — contrato estrutural e fixture adversarial da R00.
 - `varrer-peca.mjs` — varrer-peca.mjs — CLI da varredura paramétrica.
 - `varrer-peca.test.mjs` — Prova de R01: a varredura reproduz, sem dica nenhuma, o achado que motivou o plano — e nunca aplica o vencedor que encontra.
+- `vinculos-de-medida.test.mjs` — vinculos-de-medida.test.mjs — fatia 1 do plano "a peça nasce encaixada": formato v5 da montagem, ordem de construção e arestas de medida no mapa. Tudo provad…
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote de imagens que a crítica visual precisa receber.

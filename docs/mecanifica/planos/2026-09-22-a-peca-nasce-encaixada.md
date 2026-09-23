@@ -132,6 +132,31 @@ A fatia 5 começa só depois das quatro primeiras verdes. O braço nunca é a ú
 prova do mecanismo: se ele fosse, o mecanismo seria moldado ao braço, e uma
 falha não diria se o erro está no mecanismo ou na peça.
 
+## Lido antes da fatia 1
+
+Do rascunho do braço, três achados tocam este plano. `conferir-pontos` mede a
+junta como o centro da sobreposição das caixas, que erra quando uma parte entra
+pelo flanco da outra; a fatia 3 mede a junta pela porta, e não pela caixa.
+`guarda:acervo` para no primeiro contato e nunca confere o `PLANO` de peça sem
+geometria; a fatia 4 precisa que a ordem das etapas seja conferível antes da
+malha. E a pasta do braço existe só com imagens e nenhum gate a vê; a fatia 5
+cria a receita e fecha isso de passagem.
+
+## Feito na fatia 1
+
+A montagem ganhou a versão 5, com `etapas`, a ordem de construção, e
+`vinculos`, cada um dizendo que um parâmetro de uma peça é a medida de uma porta
+de outra mais um acréscimo explícito. A validação fica em
+`src/autoria/vinculos-de-medida.js`, módulo puro: recusa ciclo, recusa vínculo
+para instância construída depois, recusa medida que porta não publica,
+parâmetro com duas origens, acréscimo ausente e etapa faltando ou repetida. Se a
+porta existe na peça é pergunta da fatia 2, que tem a peça em mãos.
+
+O mapa de dependências ganhou `vinculos` e `construcao`, presentes só quando
+alguma montagem os declara, para o mapa dos universos sem vínculo continuar
+idêntico. A fixture neutra é `tools/fixtures/tres-blocos-vinculados/`, e a prova
+é `tools/mecanifica/vinculos-de-medida.test.mjs`.
+
 ## Riscos e parada
 
 O risco que obriga parar: descobrir que a derivação direta não basta, e que as

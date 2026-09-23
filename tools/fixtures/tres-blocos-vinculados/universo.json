@@ -1,0 +1,12 @@
+{
+  "formato": "mecanifica.universo-autoria",
+  "versao": 1,
+  "id": "tres-blocos-vinculados",
+  "pecas": [
+    { "id": "bloco-com-pino", "ref": "bloco-com-pino" },
+    { "id": "bloco-com-furo-e-pino", "ref": "bloco-com-furo-e-pino" },
+    { "id": "bloco-com-furo", "ref": "bloco-com-furo" }
+  ],
+  "montagens": [{ "id": "tres-blocos", "ref": "tres-blocos" }],
+  "raizes": ["tres-blocos"]
+}

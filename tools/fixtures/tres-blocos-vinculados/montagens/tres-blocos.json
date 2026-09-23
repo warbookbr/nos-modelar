@@ -1,0 +1,26 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "tres-blocos",
+  "instancias": [
+    { "id": "base", "alvo": { "tipo": "peca", "ref": "bloco-com-pino" } },
+    { "id": "meio", "alvo": { "tipo": "peca", "ref": "bloco-com-furo-e-pino" } },
+    { "id": "topo", "alvo": { "tipo": "peca", "ref": "bloco-com-furo" } }
+  ],
+  "relacoes": [],
+  "etapas": ["base", "meio", "topo"],
+  "vinculos": [
+    {
+      "id": "furoDoMeioNoPinoDaBase",
+      "alvo": { "instancia": "meio", "param": "raioDoFuro" },
+      "de": { "instancia": "base", "porta": "pino", "medida": "raio" },
+      "acrescimo": 0.0002
+    },
+    {
+      "id": "furoDoTopoNoPinoDoMeio",
+      "alvo": { "instancia": "topo", "param": "raioDoFuro" },
+      "de": { "instancia": "meio", "porta": "pino", "medida": "raio" },
+      "acrescimo": 0.0002
+    }
+  ]
+}

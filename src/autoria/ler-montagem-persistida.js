@@ -1,13 +1,17 @@
-/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1/v2/v3. */
+/* ler-montagem-persistida.js — leitor/validador fail-closed da montagem v1 a v5. */
 
 import { identidadeTransformacaoRigida, validarTransformacaoRigida } from './transformacao-rigida.js';
+import { ErroVinculoDeMedida, lerEtapas, lerVinculos } from './vinculos-de-medida.js';
 
 export const FORMATO = 'mecanifica.montagem';
 export const VERSAO = 1;
 export const VERSAO_RELACOES = 2;
 export const VERSAO_ATUAL = 3;
 export const VERSAO_AUDITORIA_INTERSECOES = 4;
-export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_RELACOES, VERSAO_ATUAL, VERSAO_AUDITORIA_INTERSECOES]);
+/* v5: a montagem declara a ordem de construção (`etapas`) e os parâmetros que
+   uma peça deriva das portas de outra (`vinculos`). Ver `vinculos-de-medida.js`. */
+export const VERSAO_VINCULOS = 5;
+export const VERSOES_SUPORTADAS = Object.freeze([VERSAO, VERSAO_RELACOES, VERSAO_ATUAL, VERSAO_AUDITORIA_INTERSECOES, VERSAO_VINCULOS]);
 
 export class ErroMontagemPersistida extends Error {
   constructor(codigo, caminho, mensagem) {
@@ -283,6 +287,28 @@ function lerV4(dado) {
   };
 }
 
+function lerV5(dado) {
+  chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'auditoriaIntersecoes'], '$');
+  const { etapas: etapasBrutas, vinculos: vinculosBrutos, auditoriaIntersecoes, ...base } = dado;
+  const lida = lerV3({ ...base, versao: VERSAO_ATUAL });
+  let etapas;
+  let vinculos;
+  try {
+    etapas = lerEtapas(etapasBrutas, new Set(lida.instancias.map((instancia) => instancia.id)));
+    vinculos = lerVinculos(vinculosBrutos, lida.instancias, etapas);
+  } catch (erro) {
+    if (erro instanceof ErroVinculoDeMedida) falhar(erro.codigo, erro.caminho, erro.message.slice(erro.caminho.length + 2));
+    throw erro;
+  }
+  return {
+    ...lida,
+    versao: VERSAO_VINCULOS,
+    etapas,
+    vinculos,
+    ...(auditoriaIntersecoes !== undefined ? { auditoriaIntersecoes: lerAuditoriaIntersecoes(auditoriaIntersecoes) } : {}),
+  };
+}
+
 export function lerMontagemPersistida(dado) {
   if (!ehObjetoSimples(dado)) falhar('estrutura-invalida', '$', 'precisa ser objeto simples.');
   if (dado.formato !== FORMATO) falhar('formato-desconhecido', 'formato', `esperado '${FORMATO}'.`);
@@ -292,5 +318,6 @@ export function lerMontagemPersistida(dado) {
   if (dado.versao === VERSAO) return lerV1(dado);
   if (dado.versao === VERSAO_RELACOES) return lerV2(dado);
   if (dado.versao === VERSAO_ATUAL) return lerV3(dado);
-  return lerV4(dado);
+  if (dado.versao === VERSAO_AUDITORIA_INTERSECOES) return lerV4(dado);
+  return lerV5(dado);
 }

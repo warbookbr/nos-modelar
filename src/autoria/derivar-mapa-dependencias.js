@@ -198,6 +198,23 @@ export function derivarMapaDependencias(snapshot) {
     }
   }
 
+  /* Arestas de medida da montagem v5: "este parâmetro desta instância vem
+     desta porta daquela". Com elas o mapa diz em que ordem construir e o que
+     muda em cadeia. Só entram no mapa quando alguma montagem as declara, para
+     o mapa de universos sem vínculo continuar idêntico ao de antes. */
+  const vinculos = [];
+  const construcao = [];
+  for (const montagem of universo.montagens) {
+    const documento = montagens.get(montagem.id).documento;
+    if (!documento.vinculos) continue;
+    construcao.push({ montagem: montagem.id, etapas: [...documento.etapas] });
+    for (const vinculo of documento.vinculos) {
+      vinculos.push({ montagem: montagem.id, id: vinculo.id, alvo: copiar(vinculo.alvo), de: copiar(vinculo.de), acrescimo: vinculo.acrescimo });
+    }
+  }
+  vinculos.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.id, b.id));
+  construcao.sort((a, b) => comparar(a.montagem, b.montagem));
+
   composicao.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.instancia, b.instancia));
   ocorrencias.sort(ordenarCaminho);
   for (const lista of usosPorAlvo.values()) lista.sort((a, b) => comparar(a.montagem, b.montagem) || comparar(a.instancia, b.instancia));
@@ -220,6 +237,7 @@ export function derivarMapaDependencias(snapshot) {
     ocorrencias,
     usos,
     relacoes,
+    ...(construcao.length ? { vinculos, construcao } : {}),
     cobertura: {
       completa: true,
       entidades: entidades.length,
