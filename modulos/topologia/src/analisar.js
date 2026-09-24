@@ -25,6 +25,9 @@ export const FORMATO = 'mecanifica.topologia@1';
 
 const EPS_AREA = 1e-12;
 const EPS_POS = 1e-9;
+/* Distância, em unidade da malha, abaixo da qual um vértice está sobre a aresta. */
+const EPS_EM_ARESTA = 1e-6;
+export const LIMITE_DE_FACE_FINA = 0.003;
 
 export class ErroTopologia extends Error {
   constructor(codigo, mensagem, detalhes = null) {
@@ -69,6 +72,10 @@ function normalizarMalha(malha) {
   return { vertices, faces };
 }
 
+function distancia(p, q) {
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+}
+
 function areaDaFace(vertices, vs) {
   /* Área por Newell: funciona em polígono de qualquer aridade e não assume
      planaridade, ao contrário de somar produtos vetoriais de um leque. */
@@ -87,7 +94,7 @@ function chaveAresta(a, b) {
   return a < b ? `${a}:${b}` : `${b}:${a}`;
 }
 
-export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxima = 4 } = {}) {
+export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxima = 4, limiteDeFace = LIMITE_DE_FACE_FINA } = {}) {
   const { vertices, faces } = normalizarMalha(malhaBruta);
   const achados = [];
   const anota = (severidade, codigo, mensagem, onde) => achados.push({ severidade, codigo, mensagem, onde });
@@ -176,19 +183,79 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
     }
   }
   const visto = new Set();
+  const componenteDe = new Map();
   let componentes = 0;
   for (const v of adj.keys()) {
     if (visto.has(v)) continue;
     componentes++;
     const fila = [v];
     visto.add(v);
+    componenteDe.set(v, componentes);
     while (fila.length) {
       const atual = fila.pop();
-      for (const w of adj.get(atual) ?? []) if (!visto.has(w)) { visto.add(w); fila.push(w); }
+      for (const w of adj.get(atual) ?? []) if (!visto.has(w)) { visto.add(w); componenteDe.set(w, componentes); fila.push(w); }
     }
   }
   if (componentes > 1) {
     anota('alerta', 'ilhas', `A malha tem ${componentes} componentes desconexos.`, { componentes });
+  }
+
+  /* --- face fina demais ---
+     Mede cada face pela razão entre a área e o quadrado da maior aresta: um
+     triângulo equilátero dá 0,43, e uma lasca comprida e estreita tende a zero.
+     No ombro do braço robótico um leque de faces assim, saindo de um vértice
+     só, fazia a sombra variar sem regra e o `malha:conferir` aprovava, porque só
+     media plano e casca. O limite reprova lasca de verdade (abaixo de 0,003)
+     e deixa passar faixa estreita legítima, como o chanfro de um anel, que
+     mede perto de 0,05. */
+  for (const f of faces) {
+    if (new Set(f.vs).size !== f.vs.length) continue;
+    const pontos = f.vs.map((v) => vertices.get(v));
+    let maior = 0;
+    for (let k = 0; k < pontos.length; k++) maior = Math.max(maior, distancia(pontos[k], pontos[(k + 1) % pontos.length]));
+    if (maior <= EPS_POS) continue;
+    const razao = areaDaFace(vertices, f.vs) / (maior * maior);
+    if (razao > EPS_AREA && razao < limiteDeFace) {
+      anota('reprova', 'face-fina', `Face ${f.id} é uma lasca: área / maior aresta² = ${razao.toExponential(2)} (limite ${limiteDeFace}).`, { face: f.id, razao });
+    }
+  }
+
+  /* --- vértice no meio de aresta ---
+     Um vértice que cai sobre uma aresta da MESMA superfície sem ser ponta dela
+     deixa a malha com um encontro em "T": as faces dos dois lados não
+     compartilham esse vértice, e a sombra ou a própria casca rasga ali. Só vale
+     dentro do mesmo componente: o centro da tampa do pé da base cai sobre uma
+     aresta do fundo do corpo, e são duas partes separadas, sem defeito. */
+  const pontasDeAresta = new Map();
+  for (const f of faces) {
+    for (let k = 0; k < f.vs.length; k++) {
+      const a = f.vs[k];
+      const b = f.vs[(k + 1) % f.vs.length];
+      if (a !== b) pontasDeAresta.set(a < b ? `${a}|${b}` : `${b}|${a}`, [a, b]);
+    }
+  }
+  const porComponente = new Map();
+  for (const [v, c] of componenteDe) {
+    if (!porComponente.has(c)) porComponente.set(c, []);
+    porComponente.get(c).push(v);
+  }
+  for (const [a, b] of pontasDeAresta.values()) {
+    const A = vertices.get(a);
+    const B = vertices.get(b);
+    const d = [B[0] - A[0], B[1] - A[1], B[2] - A[2]];
+    const L2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
+    if (L2 <= EPS_POS * EPS_POS) continue;
+    for (const v of porComponente.get(componenteDe.get(a)) ?? []) {
+      if (v === a || v === b) continue;
+      const P = vertices.get(v);
+      const ap = [P[0] - A[0], P[1] - A[1], P[2] - A[2]];
+      const s = (ap[0] * d[0] + ap[1] * d[1] + ap[2] * d[2]) / L2;
+      if (s <= 1e-6 || s >= 1 - 1e-6) continue;
+      const fora = [ap[0] - s * d[0], ap[1] - s * d[1], ap[2] - s * d[2]];
+      if (Math.hypot(fora[0], fora[1], fora[2]) < EPS_EM_ARESTA) {
+        anota('reprova', 'vertice-em-aresta', `Vértice ${v} cai no meio da aresta ${a}-${b} sem ser ponta dela.`, { vertice: v, aresta: [a, b] });
+      }
+    }
   }
 
   /* --- vértice sem uso ---

@@ -225,3 +225,12 @@ diâmetro e 40 mm de espessura, encostado na face plana do bloco com o eixo a
 fica 20 mm além do colar, a 125 mm do eixo da cintura. As medidas foram
 conferidas num esboço montado sobre a base e o anel. A técnica prevista para o
 corpo é `inflate`, o cruzamento da planta com a silhueta lateral.
+
+Na rodada 3 do ombro novo, as quinas de baixo da face do bloco apareciam
+embaixo do tambor, porque 300 mm de diâmetro com o eixo a 135 mm cobria a quina
+por só 2 mm. Por recomendação aceita pela pessoa, o tambor passa a 320 mm, e o
+bloco continua avançando 20 mm além do colar, como no rascunho. Foi testado
+também um ombro em "T" no estilo dos braços colaborativos, com um cilindro
+deitado sobre o colar; a pessoa ficou com o próprio desenho, porque o "T" deixa
+uma linha de divisão muito visível no encontro dos dois cilindros e lê como uma
+bola sobre um tubo.

@@ -19,7 +19,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
+import { LIMITE_DE_RODADAS, defeitosAbertos, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -110,6 +110,27 @@ export function gravarRodada(
   return { rodada, arquivo };
 }
 
+/* EXTENSÃO DO LIMITE, SÓ POR ESCRITO. O laço para no limite de rodadas e
+   quem conduz não estende sozinho. Quando a pessoa decide dar mais rodadas a
+   uma peça, a decisão mora num arquivo ao lado das rodadas, com quem decidiu
+   e por quê: `rodadas/limite.json`, `{ "limite": 7, "por": "...", "motivo":
+   "..." }`. Sem o arquivo vale o limite de sempre. */
+export function limiteDaPeca(peca, { pasta = pastaDeRodadas(peca) } = {}) {
+  const arquivo = join(pasta, 'limite.json');
+  if (!existsSync(arquivo)) return LIMITE_DE_RODADAS;
+  const dado = JSON.parse(readFileSync(arquivo, 'utf8'));
+  const limite = dado?.limite;
+  if (!Number.isInteger(limite) || limite <= LIMITE_DE_RODADAS) {
+    throw new Error(`${arquivo}: 'limite' precisa ser inteiro maior que ${LIMITE_DE_RODADAS}.`);
+  }
+  for (const campo of ['por', 'motivo']) {
+    if (typeof dado[campo] !== 'string' || dado[campo].trim().length < 3) {
+      throw new Error(`${arquivo}: '${campo}' precisa dizer quem decidiu e por quê.`);
+    }
+  }
+  return limite;
+}
+
 function comoCLI(argv) {
   const peca = argv.find((a) => !a.startsWith('--'));
   const registrar = argv.indexOf('--registrar');
@@ -118,7 +139,7 @@ function comoCLI(argv) {
   if (registrar >= 0) {
     const entrada = JSON.parse(readFileSync(argv[registrar + 1], 'utf8'));
     const { rodada, arquivo } = gravarRodada(peca, entrada);
-    const decisao = proximaAcao(lerRodadas(peca));
+    const decisao = proximaAcao(lerRodadas(peca), { limite: limiteDaPeca(peca) });
     return {
       codigo: 0,
       texto: `rodada ${rodada.numero} gravada em ${arquivo.replace(`${REPO}/`, '')}\n`
@@ -127,7 +148,7 @@ function comoCLI(argv) {
   }
 
   const rodadas = lerRodadas(peca);
-  const decisao = proximaAcao(rodadas);
+  const decisao = proximaAcao(rodadas, { limite: limiteDaPeca(peca) });
   const abertos = defeitosAbertos(rodadas);
   return {
     codigo: 0,

@@ -1,0 +1,60 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 6,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 0 órfão, 2 portas; guarda:acervo ok; guarda:referencial ok; malha:conferir com face-fina e vertice-em-aresta, só alertas; micropolígono aprova; etapas: ombroSentaNoAnel passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png + ombro-rascunho2-*.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "corpo",
+        "tipo": "superficie",
+        "onde": "rampa de trás e costas redondas, perto do pé da rampa",
+        "sentido": "facetado",
+        "evidencia": "traseira-orto-arame: faces da rampa e das costas convergem em leque para um ponto abaixo do centro (x~550, y~820); isometrica-orto-arame: diagonais longas cruzam a rampa, sem grade regular"
+      }
+    ],
+    "observacao": "A silhueta do conjunto bate com o alvo: o disco esconde a face quadrada na vista frontal, a planta é em D, o topo é plano e a rampa é convexa; o único achado é a malha do corpo, que está em leque no lugar da grade regular prometida."
+  },
+  "partes": [
+    {
+      "nome": "colar",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": "loft ao longo de Z de seções retangulares de 24 pontos"
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": "108 lados"
+    }
+  ],
+  "atrito": [
+    "quem conduz: segundo crítico da mesma geometria, com o critério restrito às superfícies curvas do corpo; o primeiro apontou as tampas planas por erro do critério",
+    "ferramenta: o arame da bancada é transparente, e as tampas da frente, as do tambor e o bico de trás se sobrepõem na vista de trás; o crítico não separa o que está na frente do que está atrás",
+    "modelador: o bico de trás do D fecha num leque pequeno, cerca de 18 por 90 mm, porque o loft só fecha ponta com polo",
+    "crítico: a primeira resposta passou de 240 caracteres na evidência e foi reenviada curta"
+  ],
+  "notaDePassagem": "O corpo é um loft em Z de retângulos de 24 pontos: a meia-largura vem da planta em D e a altura de yRampa(z), então a quina entre rampa e parede é a linha dos cantos de cima. Caminho e polos em y = 75 mm. anguloDoBico em 5 graus. O tambor tem 108 lados, perto do teto de 1000 ids. A porta juntaDoOmbro é um cilindro de eixo +Z com centro em (0,135,165) mm e raio 160.",
+  "receita": {
+    "sha256": "sha256:2ae117e17bfccd65e29a1df7406f4c329f235b6051198b0e42835de27f713174",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  }
+}

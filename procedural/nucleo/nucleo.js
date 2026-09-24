@@ -2820,7 +2820,9 @@ export function neutroCanonico(neutro) {
       return row;
     }),
     F: [...neutro.F.values()].sort((a, b) => a.id - b.id).map((f) => {
-      const row = [f.id, f.vs.slice(), f.cor ?? null, f.material ?? null, !!f.liso, !!f.solido];
+      /* liso com ângulo entra como o número no lugar do booleano; liso sem ângulo
+         continua `true`, e a linha fica byte-idêntica à de antes. */
+      const row = [f.id, f.vs.slice(), f.cor ?? null, f.material ?? null, typeof f.liso === 'number' ? f.liso : !!f.liso, !!f.solido];
       /* tinta (pincel macio, 11b): só entra quando a face TEM dab. Assim toda peça
          sem pincel livre (o passo 1..11a inteiro, incl. o toco) canoniza BYTE-idêntico
          ao de antes — a compat pra trás é inegociável. Forma fixa [a,b,cor,raio,dureza]

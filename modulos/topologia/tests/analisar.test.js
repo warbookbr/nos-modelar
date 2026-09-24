@@ -132,3 +132,46 @@ describe('analisador de topologia', () => {
     expect(verticesCoincidentes(cuboSao())).toHaveLength(0);
   });
 });
+
+describe('face fina e vértice no meio de aresta', () => {
+  it('o cubo são não dispara nenhuma das duas', () => {
+    const c = cods(analisarTopologia(cuboSao()));
+    expect(c).not.toContain('face-fina');
+    expect(c).not.toContain('vertice-em-aresta');
+  });
+
+  it('reprova a lasca: face comprida e quase sem largura', () => {
+    const vertices = new Map([[0, [0, 0, 0]], [1, [1, 0, 0]], [2, [1, 0.001, 0]], [3, [0, 0.001, 0]]]);
+    const faces = new Map([[0, { vs: [0, 1, 2, 3] }]]);
+    expect(cods(analisarTopologia({ vertices, faces }))).toContain('face-fina');
+  });
+
+  it('deixa passar faixa estreita legítima, como o chanfro de um anel', () => {
+    const vertices = new Map([[0, [0, 0, 0]], [1, [1, 0, 0]], [2, [1, 0.05, 0]], [3, [0, 0.05, 0]]]);
+    const faces = new Map([[0, { vs: [0, 1, 2, 3] }]]);
+    expect(cods(analisarTopologia({ vertices, faces }))).not.toContain('face-fina');
+  });
+
+  it('reprova o encontro em T dentro da mesma superfície', () => {
+    /* Dois quadrados de baixo e um retângulo em cima: o vértice 4, entre os
+       de baixo, cai no meio da aresta de baixo do retângulo. */
+    const vertices = new Map([
+      [0, [0, 0, 0]], [4, [1, 0, 0]], [1, [2, 0, 0]],
+      [5, [0, 1, 0]], [6, [1, 1, 0]], [7, [2, 1, 0]],
+      [8, [0, 2, 0]], [9, [2, 2, 0]],
+    ]);
+    const faces = new Map([
+      [0, { vs: [0, 4, 6, 5] }], [1, { vs: [4, 1, 7, 6] }],
+      [2, { vs: [5, 7, 9, 8] }],
+    ]);
+    const achado = analisarTopologia({ vertices, faces }).achados.find((a) => a.codigo === 'vertice-em-aresta');
+    expect(achado?.onde.vertice).toBe(6);
+  });
+
+  it('não acusa vértice de outro corpo que só encosta na aresta', () => {
+    const { vertices, faces } = cuboSao();
+    vertices.set(10, [0.5, 0, 0]); vertices.set(11, [0.5, -1, 0]); vertices.set(12, [0.5, -1, -1]);
+    faces.set(6, { vs: [10, 11, 12] });
+    expect(cods(analisarTopologia({ vertices, faces }))).not.toContain('vertice-em-aresta');
+  });
+});

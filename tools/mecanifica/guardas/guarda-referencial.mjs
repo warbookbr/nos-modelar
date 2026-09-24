@@ -27,7 +27,7 @@
  * quem toca o chão são as rodas, que são outra peça. Afundar, porém, nenhuma
  * peça do acervo tem motivo para fazer.
  */
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
@@ -60,6 +60,17 @@ export function fundoDaPeca(neutro, eixo = 1) {
   return fundo;
 }
 
+export function primeiraEtapaOuSolta(peca, { raiz = ACERVO } = {}) {
+  const [objeto, parte] = peca.split('/');
+  if (!parte) return true;
+  const arquivo = join(raiz, objeto, 'montagem.json');
+  if (!existsSync(arquivo)) return true;
+  const montagem = JSON.parse(readFileSync(arquivo, 'utf8'));
+  const instancia = (montagem.instancias ?? []).find((item) => item.alvo?.ref === peca);
+  if (!instancia || !(montagem.etapas ?? []).includes(instancia.id)) return true;
+  return montagem.etapas[0] === instancia.id;
+}
+
 export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
   const receita = receitaDoModulo(await importarReceita(resolverCaminhoReceita(peca, { raiz })));
   const declarada = verticalDeclarada(receita.TOPO);
@@ -88,6 +99,14 @@ export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
      conferido acima, e o chão só pode ser medido quando houver geometria. A
      dispensa é a mesma de `guarda:acervo`. */
   if (receita.PASSOS?.length === 0 && etapaQueEspera(peca)) return null;
+
+  /* PARTE QUE SE ENCAIXA EM OUTRA NÃO TEM O CHÃO NA ORIGEM. Numa montagem, a
+     origem de cada parte depois da primeira é o encaixe dela na parte de
+     baixo, e não o chão: o tambor do ombro desce 15 mm abaixo da face do
+     colar, à frente do anel, e reprovava aqui sem tocar em nada. O chão
+     continua cobrado na peça solta e na primeira etapa de cada montagem, que
+     é a que se apoia nele. */
+  if (!primeiraEtapaOuSolta(peca)) return null;
 
   const { neutro } = executarReceita(receita);
   const fundo = fundoDaPeca(neutro);

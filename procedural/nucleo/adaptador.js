@@ -1,5 +1,6 @@
 /* adaptador.js — projeção visual do neutro; não conhece receitas nem execução. */
 import { N_INFLU, norm3, normalDaFace, temNomeDeParte } from './nucleo.js';
+import { normalLisaDoCanto } from './liso-por-angulo.js';
 
 /* ----------------------------------------------------------------------------
    ADAPTADOR v3: neutro -> formato do motor. É a ÚNICA peça que muda de mundo
@@ -63,6 +64,12 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
   for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const s = acc.get(v) || [0, 0, 0]; acc.set(v, [s[0] + n[0], s[1] + n[1], s[2] + n[2]]); } }
   const nSuave = new Map();
   for (const [v, s] of acc) nSuave.set(v, norm3(s[0], s[1], s[2]));
+  /* liso com ângulo: a média muda por face, e sai de `normalLisaDoCanto`. */
+  const lisasPorVertice = new Map();
+  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { if (!lisasPorVertice.has(v)) lisasPorVertice.set(v, []); lisasPorVertice.get(v).push({ u: n, n }); } }
+  const normalLisa = (f, v) => (typeof f.liso === 'number'
+    ? normalLisaDoCanto(nFace.get(f.id), f.liso, lisasPorVertice.get(v) ?? [])
+    : nSuave.get(v));
 
   /* GRADE de ilhas: uma por face (ordem por id), quadriculado ~quadrado. Cada
      ilha ocupa um bloco TILE×TILE; o UV endereça só o retângulo INTERNO (inset
@@ -195,7 +202,7 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
       for (const v of [c0, f.vs[k], f.vs[k + 1]]) {
         const p = V.get(v);
         const uv = projeta(p);
-        const n = f.liso && nSuave.has(v) ? nSuave.get(v) : nf;
+        const n = (f.liso && normalLisa(f, v)) || nf;
         g.mesh.v.push(p[0], p[1], p[2], uv[0], uv[1], n[0], n[1], n[2]);   // 8 floats — INTOCADO (byte-idêntico sem esqueleto)
         if (skin) { const iw = infoV(v); g.mesh.v.push(iw.idx[0], iw.idx[1], iw.idx[2], iw.idx[3], iw.w[0], iw.w[1], iw.w[2], iw.w[3]); }   // +8 floats de OSSO (índice×4, peso×4)
       }

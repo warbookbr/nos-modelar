@@ -1,0 +1,675 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 0 órfão, 2 portas; guarda:acervo ok; guarda:referencial ok; malha:conferir só alertas; etapas: ombroSentaNoAnel passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "colar",
+        "tipo": "uniao",
+        "onde": "cantos inferiores esquerdo e direito, abaixo do contorno do tambor",
+        "sentido": "atravessando",
+        "evidencia": "ombro-frontal-orto: duas pontas retas do colar/corpo saem para fora do circulo do tambor em x~378 e x~720, y~925-945"
+      },
+      {
+        "parte": "corpo",
+        "tipo": "superficie",
+        "onde": "parede traseira, lateral esquerda",
+        "sentido": "segmentado",
+        "evidencia": "ombro-traseira-orto: faixa vertical escura em x~500-560, assimetrica em relacao ao lado direito, lendo como degrade escuro nas costas"
+      },
+      {
+        "parte": "tambor",
+        "tipo": "superficie",
+        "onde": "borda circular",
+        "sentido": "facetado",
+        "evidencia": "ombro-frontal-orto: contorno do disco com segmentos retos visiveis, principalmente nos quadrantes inferiores"
+      }
+    ],
+    "observacao": "A silhueta do conjunto bate com a foto e com o rascunho; os achados estao nas bordas do tambor e no sombreamento das costas, nao na proporcao."
+  },
+  "partes": [
+    {
+      "nome": "colar",
+      "confere": true,
+      "observacao": "chanfro de cima de 1,5 mm"
+    },
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": "loft de fatias horizontais da planta em D cortadas pela rampa; liso com ângulo de 20 graus"
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": "320 x 40 mm"
+    }
+  ],
+  "atrito": [
+    "modelador: o corpo passou de inflate a loft de fatias horizontais, porque as seções do inflate em z davam o V, o sulco sobre o colar e a ponta plana; ele também reescreveu o campo tecnica do PLANO, que o contrato não deixava",
+    "ferramenta: o liso fazia média das normais atravessando quinas de 90 graus e deixava degradê escuro; ganhou ângulo limite no núcleo, com teste, e a tira de 0,3 mm na quina do V saiu",
+    "pessoa: aceitou a quina do V sumindo perto do pé, onde rampa e parede se encontram quase tangentes; nenhum ângulo de liso a separa ali",
+    "ferramenta: não há grupo de suavização nem op que separe vértices; foi a falta que levou ao liso por ângulo"
+  ],
+  "notaDePassagem": "O ombro tem um liso com ângulo por parte (anguloDoLiso 20). A quina do V some perto do pé porque ali a rampa encontra a parede quase tangente; é forma, não sombra. A porta juntaDoOmbro é um cilindro de eixo +Z com centro em (0,135,165) mm e raio 160, e segue a TABELA. O corpo é loft em +Y com fatias em D cortadas pela rampa; o mesmo vértice é a quina entre parede e rampa em todas as fatias.",
+  "receita": {
+    "sha256": "sha256:b7a7db58a3bfbfdcd27f5fde57d0b3dc93742d3edab06eaf430760759d2cb3b8",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 40,
+      "acrescentadas": 80,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "  raioDoTambor: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  raioDoTambor: 160,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* O chanfro de cima é pequeno, para o topo do colar quase ter o raio do"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "     corpo e a linha do encontro continuar legível sem degrau. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  chanfroDeCimaDoColar: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  suaveDoChanfroDeCima: 0.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "  /* Recuo da estação de trás do corpo, para a ponta do D não virar seção de"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "     largura nula. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  recuoDaPonta: 1,"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "  expoenteSecao: 14,"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "  ladosDaSecao: 32,"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  estacoesDoArco: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  /* Meio ângulo, visto de cima a partir do eixo -Z, da corda de baixo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     rampa. Com zero a fatia de baixo da rampa teria largura nula. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  anguloDoPeDaRampa: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  /* Vértices da fatia: divisões de cada lado curvo e da corda de trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  divisoesDoLado: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  divisoesDaCorda: 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  fatiasDaRampa: 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  /* Limite do sombreado liso, em graus: quinas mais fechadas que isto (o V"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "     da rampa com a parede, a frente com os lados, as tampas) ficam nítidas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  anguloDoLiso: 20,"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "    s: m(t.suaveDoChanfro), ft: m(t.filDoTambor), recuo: m(t.recuoDaPonta),"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    s: m(t.suaveDoChanfro), ft: m(t.filDoTambor),"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    c2: m(t.chanfroDeCimaDoColar), s2: m(t.suaveDoChanfroDeCima),"
+        },
+        {
+          "tipo": "-",
+          "linha": 70,
+          "texto": "  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, recuo } = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, c2, s2 } = derivar(t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 72,
+          "texto": "  const n = t.estacoesDoArco;"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  const zTras = -(R - recuo);"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  /* Estações do arco de trás em passos iguais de ângulo, medido do eixo -Z,"
+        },
+        {
+          "tipo": "-",
+          "linha": 75,
+          "texto": "     da ponta recuada até o eixo; passo igual de ângulo deixa a faceta do arco"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "     do mesmo tamanho em toda a volta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  const phi0 = Math.acos(-zTras / R);"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "  const zArco = Array.from({ length: n + 1 }, (_, k) => -R * Math.cos(phi0 + (k / n) * (Math.PI / 2 - phi0)));"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "  zArco[n] = 0;"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "  const xArco = (z) => Math.sqrt(Math.max(R * R - z * z, 0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "  const yRampa = (z) => yr + (yt - yr) * Math.pow(Math.max(1 - Math.pow(Math.abs(z) / R, p), 0), 1 / p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const psi0 = (t.anguloDoPeDaRampa * Math.PI) / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  const Rr = R * Math.cos(psi0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  const yRampa = (z) => yr + (yt - yr) * Math.pow(Math.max(1 - Math.pow(Math.abs(z) / Rr, p), 0), 1 / p);"
+        },
+        {
+          "tipo": "-",
+          "linha": 85,
+          "texto": "     com o chanfro de cima do anel. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "     com o chanfro de cima do anel, o de cima a linha do encontro com o corpo. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "    perfil: [[0, 0], [R - c, 0, s], [R, c, s], [R, hc - c, s], [R - c, hc, s], [0, hc]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    perfil: [[0, 0], [R - c, 0, s], [R, c, s], [R, hc - c2, s2], [R - c2, hc, s2], [0, hc]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "  /* corpo: silhueta lateral (z×y) cruzada com a planta em D (z×x). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "  const lado = [[zTras, hc], [zf, hc], [zf, yt], [0, yt]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 94,
+          "texto": "  for (let k = n - 1; k >= 0; k--) lado.push([zArco[k], yRampa(zArco[k])]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "  const topo = [[zf, -R], [zf, R], [0, R]];"
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  for (let k = n - 1; k >= 0; k--) topo.push([zArco[k], xArco(zArco[k])]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "  for (let k = 0; k < n; k++) topo.push([zArco[k], -xArco(zArco[k])]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 98,
+          "texto": "  topo.push([0, -R]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "  const vao = zf - zTras;"
+        },
+        {
+          "tipo": "-",
+          "linha": 100,
+          "texto": "  const estacoes = zArco.map((z) => (z - zTras) / vao);"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "  estacoes.push((zf / 2 - zTras) / vao, 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 102,
+          "texto": "  passos.push(['inflate', {"
+        },
+        {
+          "tipo": "-",
+          "linha": 103,
+          "texto": "    origemId: ID.corpo, modo: 'secoes', contornoLado: lado, contornoTopo: topo,"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "    estacoes, lados: t.ladosDaSecao, expoenteSecao: t.expoenteSecao,"
+        },
+        {
+          "tipo": "-",
+          "linha": 105,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 106,
+          "texto": "  passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'inflate', id: ID.corpo } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  /* corpo: loft de fatias horizontais subindo em +Y. Cada fatia é a planta em"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "     D, frente reta em z = zf e semicírculo de raio R atrás, cortada pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "     rampa numa corda horizontal. O mesmo vértice é sempre a quina entre o"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "     lado curvo e a corda, então a quina segue a curva onde a rampa encontra"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "     a parede, a rampa é feita só de faixas retas em X e a parede de trás é o"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "     semicírculo. Abaixo da rampa a corda vira o arco que ela corta. As"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "     tampas são leques de polos 0,01 mm além do fundo e do topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  const nl = t.divisoesDoLado, nc = t.divisoesDaCorda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  const zc = zf / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const noArco = (th) => [-R * Math.cos(th), -R * Math.sin(th)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  /* psi: meio ângulo da corda; naRampa: corda reta ou arco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const fatia = (psi, naRampa) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    const thq = Math.PI / 2 - psi;"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    const esq = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    for (let k = 0; k <= nl; k++) esq.push(noArco((k / nl) * thq));"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    const [xq, zq] = esq[nl];"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    const corda = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    for (let k = 1; k < nc; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      const f = k / nc;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      corda.push(naRampa ? [xq + (-2 * xq) * f, zq] : noArco(thq + f * 2 * psi));"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    const dir = esq.slice().reverse().map(([x, z]) => [-x, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    return montar(esq, corda, dir);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  const montar = (esq, corda, dir) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    const pts = [...esq, ...corda, ...dir];"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    return [[R, zf - zc], [-R, zf - zc], ...pts.map(([x, z]) => [x, z - zc])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  /* Na fatia do topo a rampa chega a z = 0 e os lados curvos somem; os"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "     vértices deles se espalham pela aresta de trás do topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  const topo = () => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    const nTot = 2 * nl + nc;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "    const xs = Array.from({ length: nTot + 1 }, (_, k) => [-R + (2 * R * k) / nTot, 0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "    return montar(xs.slice(0, nl + 1), xs.slice(nl + 1, nl + nc), xs.slice(nl + nc));"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  const eps = 0.00001;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  const secoes = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    { pos: [0, hc - eps, zc], raio: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    { pos: [0, hc, zc], contorno: fatia(psi0, false) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    { pos: [0, yr, zc], contorno: fatia(psi0, true) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  for (let k = 1; k < t.fatiasDaRampa; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    const psi = psi0 + (k / t.fatiasDaRampa) * (Math.PI / 2 - psi0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    secoes.push({ pos: [0, yRampa(-R * Math.cos(psi)), zc], contorno: fatia(psi, true) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  secoes.push({ pos: [0, yt, zc], contorno: topo() });"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  secoes.push({ pos: [0, yt + eps, zc], raio: 0 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  passos.push(['loft', { origemId: ID.corpo, lados: secoes[1].contorno.length, orientacao: [1, 0, 0], secoes }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'loft', id: ID.corpo } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 127,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.colar } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 128,
+          "texto": "  passos.push(['liso', { sel: selT }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  /* Um liso com ângulo por parte: a sombra atravessa só as quinas mais"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "     abertas que o limite, e a malha é a mesma. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  const angulo = t.anguloDoLiso;"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.colar } }, angulo }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.corpo } }, angulo }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  passos.push(['liso', { sel: selT, angulo }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 152,
+          "texto": "      { nome: 'corpo', forma: 'bloco com planta em D, reto na frente e redondo atrás no raio do colar; topo plano, face da frente plana 20 mm além do colar, rampa abaulada descendo atrás', tecnica: 'cruzamento de silhueta lateral e planta' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 153,
+          "texto": "      { nome: 'tambor', forma: 'disco de eixo Z encostado na face plana do corpo, 300 mm de diâmetro e 40 mm de espessura, cobrindo a face quadrada inteira vista de frente', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "      { nome: 'corpo', forma: 'bloco com planta em D, reto na frente e redondo atrás no raio do colar; topo plano, face da frente plana 20 mm além do colar, rampa abaulada descendo atrás', tecnica: 'loft de fatias horizontais da planta em D cortadas pela rampa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "      { nome: 'tambor', forma: 'disco de eixo Z encostado na face plana do corpo, 320 mm de diâmetro e 40 mm de espessura, cobrindo a face quadrada inteira vista de frente', tecnica: 'revolução com perfil' },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

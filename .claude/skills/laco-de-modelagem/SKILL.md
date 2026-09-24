@@ -58,7 +58,7 @@ node tools/mecanifica/rodada-de-modelagem.mjs <peça> --acao
 rodada em diante, só os defeitos em aberto que o comando imprimiu. Não mande
 sua opinião sobre o que fazer. Nomeie as operações de superfície que o motor
 tem quando o realismo combinado pedir: `arredondarAresta` e `filete` quebram
-aresta, `liso` sombreia sem faceta, `lathe` faz revolução com perfil. Isso é
+aresta, `liso` sombreia sem faceta (com `angulo`, em graus, deixa nítida a quina mais fechada que ele, como o smooth by angle do Blender), `lathe` faz revolução com perfil. Isso é
 dizer o que existe, e não palpite. Peça também, no despacho, o que faltou: é
 o `atrito` da rodada.
 
@@ -75,7 +75,7 @@ Peça que falha no que é contável volta direto ao modelador; gastar crítico
 nela ensina que o veredito é decorativo.
 
 **revisar** — despache o `critico-visual` com a referência, o pacote de
-`npm run vistas:critica -- <peça>` e os critérios de reprovação, dizendo a forma
+`npm run vistas:critica -- <peça>`, que inclui vistas em arame, e os critérios de reprovação, dizendo a forma
 e a técnica que o plano promete para cada parte. Nunca mande a receita, os
 passos, o histórico nem o que mudou: contar como foi feito faz revisão virar
 concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem

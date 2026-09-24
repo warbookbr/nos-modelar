@@ -217,6 +217,23 @@ parecer uma peça só e a conferência de que uma parte escondida não aparece.
 Os dois entram em plano próprio, depois do braço ou quando uma etapa parar
 por falta deles.
 
+O `liso` ganhou ângulo limite dentro deste plano, porque o ombro parou por
+falta dele: sem o limite, a média das normais atravessava quinas de quase 90°
+e as costas saíam com degradê escuro, e a quina do "V" precisou de uma tira de
+0,3 mm só para separar vértices. Fica pedido para depois o exportador OBJ
+gravar as normais suaves com a mesma regra por ângulo; hoje ele grava uma
+normal por triângulo e a peça abre facetada, e o STEP facetado não carrega
+sombra nenhuma, então a suavização só existe na bancada.
+
+Dois limites do motor fizeram o modelador refazer trabalho no ombro e ficam
+para o estudo das ferramentas de forma. Uma operação só tem um bloco de 1000
+ids: um lathe com muitos lados e bordas arredondadas, ou um tambor com mais de
+108 lados, estoura o bloco e é recusado sem aviso antecipado no catálogo. E a
+medida de contato chama de degenerado todo triângulo abaixo de cerca de
+0,5 mm², porque o limite é absoluto: chanfro fino, bico estreito ou suavização
+de 0,2 mm derrubam os contatos e o `descrever` diz só "malha aberta", sem
+apontar a face.
+
 ## Plano candidato a seguir este
 
 [O contorno sai da imagem](congelados/2026-09-24-o-contorno-sai-da-imagem.md)

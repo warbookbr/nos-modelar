@@ -64,12 +64,46 @@ function restaurarMaterial(material) {
   material.transparent = base.transparent;
   material.depthWrite = base.depthWrite;
   material.wireframe = base.wireframe ?? false;
+  material.polygonOffset = false;
+  material.polygonOffsetFactor = 0;
+  material.polygonOffsetUnits = 0;
+}
+
+const NOME_DA_CAMADA_DE_ARAME = '__arame_opaco__';
+
+/* Liga ou desliga, em cada malha do grupo, a camada de linhas do arame. As
+   linhas são as arestas dos triângulos, desenhadas por cima do sólido; o teste
+   de profundidade contra o sólido esconde as que ficam atrás. */
+export function sincronizarArame(grupo, ligado) {
+  grupo.traverse((objeto) => {
+    if (!objeto.isMesh || objeto.name === NOME_DA_CAMADA_DE_ARAME) return;
+    const existente = objeto.children.find((filho) => filho.name === NOME_DA_CAMADA_DE_ARAME);
+    if (!ligado) { if (existente) { objeto.remove(existente); existente.geometry.dispose(); existente.material.dispose(); } return; }
+    if (existente) return;
+    const linhas = new THREE.LineSegments(
+      new THREE.WireframeGeometry(objeto.geometry),
+      new THREE.LineBasicMaterial({ color: '#2f3b36' }),
+    );
+    linhas.name = NOME_DA_CAMADA_DE_ARAME;
+    linhas.raycast = () => {};
+    objeto.add(linhas);
+  });
 }
 
 function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false, apresentacaoSelecao = null, semTinta = false) {
   restaurarMaterial(material);
-  if (arame) {
+  if (arame === 'raio-x') {
     material.wireframe = true;
+  } else if (arame) {
+    /* ARAME QUE ESCONDE O QUE FICA ATRÁS. O material continua sólido, empurrado
+       um pouco para trás na profundidade, e as arestas vêm de uma camada de
+       linhas por cima (`sincronizarArame`). Com `wireframe` no próprio material
+       a malha ficava transparente: na vista de trás do ombro, as tampas da
+       frente e o tambor se sobrepunham às costas, e o crítico apontou um leque
+       que parecia muito maior do que era. */
+    material.polygonOffset = true;
+    material.polygonOffsetFactor = 1;
+    material.polygonOffsetUnits = 1;
   }
   /* A cor de auditoria entra ANTES dos estados de seleção, para que destaque e
      fantasma continuem funcionando por cima dela. Se entrasse depois, isolar uma
@@ -167,6 +201,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       const grupo = partes.get(nome);
       const visual = estados[nome];
       grupo.visible = visual !== 'oculto';
+      sincronizarArame(grupo, arame && arame !== 'raio-x');
       const cor = coresPorParte ? corDeAuditoria(nomes.indexOf(nome)) : null;
       const apresentacaoSelecao = selecionadas.includes(nome)
         ? { wireframe: wireframeSelecao, opacidade: opacidadeSelecao }
@@ -276,7 +311,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
       return auditoria;
     },
     definirArame(ligado) {
-      arame = Boolean(ligado);
+      arame = ligado === 'raio-x' ? 'raio-x' : Boolean(ligado);
       aplicarVisual();
       return arame;
     },

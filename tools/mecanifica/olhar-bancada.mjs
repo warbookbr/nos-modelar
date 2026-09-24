@@ -335,7 +335,7 @@ export async function olharBancada({
       explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
       par ? 'par' : null,
       focar ? 'focado' : null,
-      arame ? 'arame' : null,
+      arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
     if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
@@ -780,13 +780,16 @@ function comoCLI(argv) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
-      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe'],
+      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
   }
-  const arame = lido.bandeira('arame') || lido.bandeira('wireframe');
+  /* `--raio-x` é o arame transparente, com o que fica atrás à vista; `--arame`
+     sozinho é o arame opaco, que esconde o de trás. Os dois servem: o opaco
+     mostra a malha da superfície que se vê, o raio X o que está escondido. */
+  const arame = lido.bandeira('raio-x') ? 'raio-x' : (lido.bandeira('arame') || lido.bandeira('wireframe'));
   const tela = lido.bandeira('tela');
   if (tela && (lido.bandeira('cores') || arame || lido.bandeira('auditoria'))) {
     return Promise.resolve(erroEstruturado({

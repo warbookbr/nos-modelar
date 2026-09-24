@@ -1,5 +1,6 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
+import { normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
 
 const COR_PADRAO = '#77817d';
 
@@ -179,19 +180,30 @@ function prepararFaces(neutro) {
  */
 function normaisSuaves(neutro, preparo) {
   const soma = new Map();
+  const porVertice = new Map();
   for (const face of neutro.F.values()) {
     if (!face.liso) continue;
-    const { pontos, tris } = preparo.get(face.id);
+    const { pontos, tris, normal: uFace } = preparo.get(face.id);
+    const somaDaFace = new Map();
     for (const [ia, ib, ic] of tris) {
       const n = normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]);
       for (const k of [ia, ib, ic]) {
         const id = face.vs[k];
         const acc = soma.get(id);
         if (acc) { acc[0] += n[0]; acc[1] += n[1]; acc[2] += n[2]; } else soma.set(id, [n[0], n[1], n[2]]);
+        const daFace = somaDaFace.get(id);
+        if (daFace) { daFace[0] += n[0]; daFace[1] += n[1]; daFace[2] += n[2]; } else somaDaFace.set(id, [n[0], n[1], n[2]]);
       }
+    }
+    for (const [id, n] of somaDaFace) {
+      if (!porVertice.has(id)) porVertice.set(id, []);
+      porVertice.get(id).push({ u: uFace, n });
     }
   }
   const suaves = new Map();
+  /* liso com ângulo: além da média global, guarda por vértice cada face lisa
+     que o toca, para a média filtrada por ângulo em `triangularFace`. */
+  suaves.porVertice = porVertice;
   for (const [id, acc] of soma) {
     const n = normalizar(acc);
     /* soma degenerada (normais opostas se cancelando) não vira normal nula
@@ -224,7 +236,10 @@ function triangularFace(face, preparo, destino, destinoNormais, destinoOrigens, 
       destinoVertices.push(face.vs[k]);
     }
     for (const k of cantos) {
-      const suave = face.liso ? suaves.get(face.vs[k]) : null;
+      const suave = !face.liso ? null
+        : typeof face.liso === 'number'
+          ? normalLisaDoCanto(normal, face.liso, suaves.porVertice.get(face.vs[k]) ?? [])
+          : suaves.get(face.vs[k]);
       destinoNormais.push(...(suave ?? chapada));
     }
   }

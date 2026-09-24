@@ -1,0 +1,1084 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 0 órfão, 2 portas; guarda:acervo ok; guarda:referencial ok depois de a regra do chão valer só para a primeira etapa; malha:conferir só alertas; etapas: ombroSentaNoAnel passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "colar",
+        "tipo": "posicao",
+        "onde": "borda da frente do colar",
+        "sentido": "atrasada",
+        "evidencia": "ombro-direita-orto: o colar começa em x≈405 e a face da frente do corpo está em x≈365, o corpo avança cerca de 40 px sobre o colar e forma degrau"
+      },
+      {
+        "parte": "colar",
+        "tipo": "superficie",
+        "onde": "borda de cima",
+        "sentido": "anguloso",
+        "evidencia": "ombro-direita-orto e ombro-isometrica-orto: a borda de cima do colar não mostra o chanfro prometido e lê como aresta reta"
+      },
+      {
+        "parte": "colar",
+        "tipo": "uniao",
+        "onde": "junção entre o topo do colar e a base do corpo",
+        "sentido": "afastado",
+        "evidencia": "ombro-direita-orto: faixa escura na base do corpo (y≈915–925) seguida de uma linha clara antes do topo do colar (y≈930); a vista não distingue se é fresta ou chanfro"
+      },
+      {
+        "parte": "corpo",
+        "tipo": "posicao",
+        "onde": "cantos inferiores da face frontal quadrada",
+        "sentido": "baixa",
+        "evidencia": "ombro-frontal-orto: abas retangulares com quinas vivas à esquerda e à direita da base do tambor, x≈365–430 e x≈680–735, y≈910–960; etapas-frontal-orto: faixa do corpo visível dos dois lados abaixo do tambor, x≈565–590 e 715–740, y≈360–383"
+      }
+    ],
+    "observacao": "Corpo em D, topo plano, rampa convexa e tambor largo de eixo horizontal estão certos; reprovam as quinas abaixo do tambor na vista de frente e o colar desalinhado da frente do corpo."
+  },
+  "partes": [
+    {
+      "nome": "colar",
+      "confere": true,
+      "observacao": "lathe de 30 mm com chanfro de 3 mm em cima e embaixo"
+    },
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": "inflate em secoes, expoente 14, planta em D e rampa convexa; ponta de trás recuada 1 mm"
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": "lathe de raio 150 e 40 mm, filete de 6 mm só na frente"
+    }
+  ],
+  "atrito": [
+    "forma nova: o ombro foi replanejado pelo segundo rascunho da pessoa; as rodadas 1 e 2 são do cotovelo de cano reprovado",
+    "ferramenta: guarda:referencial reprovava o tambor 15 mm abaixo da origem do ombro; a origem de parte encaixada não é o chão, e a regra passou a valer só para peça solta e primeira etapa",
+    "modelador: inflate em secoes com estação de ponta estreita gera triângulo degenerado, e o descrever diz que o contato não acontece sem apontar a causa",
+    "modelador: lathe com 64 lados e segmentosCurva 3 estoura o bloco de 1000 ids",
+    "plano: raio 150 com eixo a 135 cobre as quinas da face do bloco por 2 mm; com o filete do tambor as quinas aparecem; volta para a pessoa",
+    "crítico: a primeira resposta passou do limite de 240 caracteres na observação e o registro recusou; o crítico reenviou o mesmo veredito com a observação curta"
+  ],
+  "notaDePassagem": "A porta juntaDoOmbro é um cilindro de eixo +Z, centro em (0, 135, 165) mm na origem do ombro, que é a face da frente do tambor, e raio 150. O braço encosta nessa face. O corpo é um inflate com seções quase retangulares (expoente 14), e a ponta de trás fica recuada 1 mm para não gerar triângulo degenerado. Se o raio ou o eixo do tambor mudarem, a porta acompanha pela TABELA.",
+  "receita": {
+    "sha256": "sha256:7a107cb7a93b57a848274f695ea73eaa4d74243dbae0a252bf2aa94997d8eb3d",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 87,
+      "acrescentadas": 117,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de"
+        },
+        {
+          "tipo": "-",
+          "linha": 2,
+          "texto": " * cano, sobre o anel da cintura."
+        },
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura:"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * um colar redondo, um corpo com planta em \"D\" e o tambor da junta."
+        },
+        {
+          "tipo": "-",
+          "linha": 6,
+          "texto": " * `../../referencias/ombro-rascunho-*.png`; os passos são escritos pelo"
+        },
+        {
+          "tipo": "-",
+          "linha": 7,
+          "texto": " * modelador. O raio do pescoço vem da porta `topo` do anel, por vínculo da"
+        },
+        {
+          "tipo": "-",
+          "linha": 8,
+          "texto": " * montagem."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * `../../referencias/ombro-rascunho2-*.png`; os passos são escritos pelo"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * modelador. O raio do colar vem da porta `topo` do anel, por vínculo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * montagem, e o corpo segue esse raio."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * A forma anterior, um cotovelo de cano, foi reprovada pela pessoa depois de"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * três rodadas; as duas julgadas estão em `rodadas/` como histórico."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "-",
+          "linha": 11,
+          "texto": " *   apoio        — anel que ocupa, eixo +Y, centro no meio da boca de baixo"
+        },
+        {
+          "tipo": "-",
+          "linha": 12,
+          "texto": " *                  do pescoço, borda de baixo do pescoço. Senta no `topo`"
+        },
+        {
+          "tipo": "-",
+          "linha": 13,
+          "texto": " *                  do anel."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " *   apoio        — anel que ocupa, eixo +Y, centro no meio da face de baixo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *                  colar, borda de baixo do colar. Senta no `topo` do anel."
+        },
+        {
+          "tipo": "-",
+          "linha": 25,
+          "texto": "  raioDoPescoco: 105,"
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  /* Trecho reto do pescoço, acima do anel, antes da curva. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": "  alturaReta: 30,"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  /* Altura do eixo do tambor acima da boca de baixo do pescoço. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": "  alturaDoEixo: 120,"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  raioDoTambor: 120,"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  espessuraDoTambor: 80,"
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "  /* Distância, em Z, do eixo vertical da cintura até a face da frente do"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "     tambor. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 34,
+          "texto": "  avancoDaFace: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  raioDoColar: 105,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  alturaDoColar: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* Distância, em Z, do eixo vertical da cintura até a face plana do bloco"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "     da frente do corpo, onde o tambor encosta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  frenteDoBloco: 125,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* Altura do topo plano do corpo, medida da face de baixo do colar. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  alturaDoTopo: 240,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* A rampa de trás começa no eixo vertical e desce, abaulada, até esta"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "     altura na borda de trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  alturaDaRampaAtras: 120,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  raioDoTambor: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  espessuraDoTambor: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* Altura do eixo do tambor, no meio da face do bloco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  alturaDoEixo: 135,"
+        },
+        {
+          "tipo": "-",
+          "linha": 36,
+          "texto": "  /* Chanfro da borda de baixo do pescoço; com o chanfro do anel forma a linha"
+        },
+        {
+          "tipo": "-",
+          "linha": 37,
+          "texto": "     escura de divisão. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 38,
+          "texto": "  chanfroDoPescoco: 2,"
+        },
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": "  /* Quanto o pescoço entra nas costas do tambor depois da curva. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "  entradaNoTambor: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "  /* Filete só na borda da face da frente; a borda de trás fica viva. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "  fileteDoTambor: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "  estacoesDaCurva: 12,"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "  lados: 48,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  chanfroDoColar: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  suaveDoChanfro: 0.8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  filDoTambor: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* Expoente da superelipse da rampa: 2 é quarto de elipse, acima de 1 é"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "     sempre convexa; 1,7 desce sem chegar a parede vertical atrás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  curvaDaRampa: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  /* Recuo da estação de trás do corpo, para a ponta do D não virar seção de"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "     largura nula. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  recuoDaPonta: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  expoenteSecao: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  ladosDaSecao: 32,"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  estacoesDoArco: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  lados: 40,"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "const ID = { pescoco: 100, tambor: 200 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "const ID = { colar: 100, corpo: 200, tambor: 300 };"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "  const R = m(t.raioDoPescoco);"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "  const a = m(t.alturaReta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  /* Raio da linha de centro da curva, derivado: o trecho reto mais a curva"
+        },
+        {
+          "tipo": "-",
+          "linha": 54,
+          "texto": "     fecham na altura do eixo do tambor (alturaReta + raio = alturaDoEixo)."
+        },
+        {
+          "tipo": "-",
+          "linha": 55,
+          "texto": "     Sai menor que o raio do pescoço, e a dobra da parede de dentro fica"
+        },
+        {
+          "tipo": "-",
+          "linha": 56,
+          "texto": "     enterrada no tambor. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 57,
+          "texto": "  const Rc = m(t.alturaDoEixo - t.alturaReta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "  const yEixo = m(t.alturaDoEixo);"
+        },
+        {
+          "tipo": "-",
+          "linha": 59,
+          "texto": "  const Rt = m(t.raioDoTambor);"
+        },
+        {
+          "tipo": "-",
+          "linha": 60,
+          "texto": "  const e = m(t.espessuraDoTambor);"
+        },
+        {
+          "tipo": "-",
+          "linha": 61,
+          "texto": "  const zFace = m(t.avancoDaFace);"
+        },
+        {
+          "tipo": "-",
+          "linha": 62,
+          "texto": "  const zCostas = zFace - e;"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "  const c = m(t.chanfroDoPescoco);"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  const f = m(t.fileteDoTambor);"
+        },
+        {
+          "tipo": "-",
+          "linha": 65,
+          "texto": "  /* Centro da curva: o trecho reto sobe até a, a curva gira 90 graus em torno"
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "     de um eixo X em (y = a, z = Rc); a boca de cima fica em y = a + Rc. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "  const yBoca = a + Rc;"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "  const zFim = Rc + m(t.entradaNoTambor);"
+        },
+        {
+          "tipo": "-",
+          "linha": 69,
+          "texto": "  return { R, a, Rc, yEixo, Rt, e, zFace, zCostas, c, f, yBoca, zFim };"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    R: m(t.raioDoColar), hc: m(t.alturaDoColar), zf: m(t.frenteDoBloco),"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    yt: m(t.alturaDoTopo), yr: m(t.alturaDaRampaAtras), Rt: m(t.raioDoTambor),"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    et: m(t.espessuraDoTambor), ye: m(t.alturaDoEixo), c: m(t.chanfroDoColar),"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    s: m(t.suaveDoChanfro), ft: m(t.filDoTambor), recuo: m(t.recuoDaPonta),"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  const P = derivar(t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 74,
+          "texto": "  const { R, a, Rc, Rt, e, zFace, zCostas, c, f, yBoca, zFim, yEixo } = P;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, recuo } = derivar(t);"
+        },
+        {
+          "tipo": "-",
+          "linha": 76,
+          "texto": "  const secoes = ["
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "    { pos: [0, 0, 0], raio: 0 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "    { pos: [0, 0.0004, 0], raio: R - c },"
+        },
+        {
+          "tipo": "-",
+          "linha": 79,
+          "texto": "    { pos: [0, c, 0], raio: R },"
+        },
+        {
+          "tipo": "-",
+          "linha": 80,
+          "texto": "    { pos: [0, a, 0], raio: R },"
+        },
+        {
+          "tipo": "-",
+          "linha": 81,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "-",
+          "linha": 82,
+          "texto": "  const n = t.estacoesDaCurva;"
+        },
+        {
+          "tipo": "-",
+          "linha": 83,
+          "texto": "  for (let i = 1; i <= n; i++) {"
+        },
+        {
+          "tipo": "-",
+          "linha": 84,
+          "texto": "    const th = (Math.PI / 2) * (i / n);"
+        },
+        {
+          "tipo": "-",
+          "linha": 85,
+          "texto": "    secoes.push({ pos: [0, a + Rc * Math.sin(th), Rc - Rc * Math.cos(th)], raio: R });"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "  }"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "  secoes.push({ pos: [0, yBoca, zFim], raio: R });"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "  secoes.push({ pos: [0, yBoca, zFim + 0.0004], raio: 0 });"
+        },
+        {
+          "tipo": "-",
+          "linha": 89,
+          "texto": "  passos.push(['loft', { origemId: ID.pescoco, secoes, lados: t.lados, orientacao: [1, 0, 0] }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 90,
+          "texto": "  passos.push(['parte', { nome: 'pescoco', sel: { origem: { op: 'loft', id: ID.pescoco } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const n = t.estacoesDoArco;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const zTras = -(R - recuo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  /* Estações do arco de trás em passos iguais de ângulo, medido do eixo -Z,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "     da ponta recuada até o eixo; passo igual de ângulo deixa a faceta do arco"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "     do mesmo tamanho em toda a volta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const phi0 = Math.acos(-zTras / R);"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const zArco = Array.from({ length: n + 1 }, (_, k) => -R * Math.cos(phi0 + (k / n) * (Math.PI / 2 - phi0)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  zArco[n] = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const xArco = (z) => Math.sqrt(Math.max(R * R - z * z, 0));"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  const p = t.curvaDaRampa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  const yRampa = (z) => yr + (yt - yr) * Math.pow(Math.max(1 - Math.pow(Math.abs(z) / R, p), 0), 1 / p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  /* colar: faixa com chanfro nas duas bordas; o de baixo forma a linha escura"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "     com o chanfro de cima do anel. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "    origemId: ID.tambor, eixo: 'z', lados: t.lados, segmentosCurva: 4, em: [0, yEixo, zCostas],"
+        },
+        {
+          "tipo": "-",
+          "linha": 93,
+          "texto": "    perfil: [[0, 0], [Rt, 0], [Rt, e, f], [0, e]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    origemId: ID.colar, lados: t.lados, segmentosCurva: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    perfil: [[0, 0], [R - c, 0, s], [R, c, s], [R, hc - c, s], [R - c, hc, s], [0, hc]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 95,
+          "texto": "  passos.push(['parte', { nome: 'tambor', sel: { origem: { op: 'lathe', id: ID.tambor } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  passos.push(['parte', { nome: 'colar', sel: { origem: { op: 'lathe', id: ID.colar } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  /* corpo: silhueta lateral (z×y) cruzada com a planta em D (z×x). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const lado = [[zTras, hc], [zf, hc], [zf, yt], [0, yt]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  for (let k = n - 1; k >= 0; k--) lado.push([zArco[k], yRampa(zArco[k])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  const topo = [[zf, -R], [zf, R], [0, R]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  for (let k = n - 1; k >= 0; k--) topo.push([zArco[k], xArco(zArco[k])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  for (let k = 0; k < n; k++) topo.push([zArco[k], -xArco(zArco[k])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  topo.push([0, -R]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  const vao = zf - zTras;"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "  const estacoes = zArco.map((z) => (z - zTras) / vao);"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  estacoes.push((zf / 2 - zTras) / vao, 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  passos.push(['inflate', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    origemId: ID.corpo, modo: 'secoes', contornoLado: lado, contornoTopo: topo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    estacoes, lados: t.ladosDaSecao, expoenteSecao: t.expoenteSecao,"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'inflate', id: ID.corpo } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  /* tambor: disco de eixo Y com filete só na borda de cima, girado para +Z"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "     e levado ao eixo, encostado na face plana do corpo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    origemId: ID.tambor, lados: t.lados, segmentosCurva: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    perfil: [[0, 0], [Rt, 0, s], [Rt, et, ft], [0, et]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  const selT = { origem: { op: 'lathe', id: ID.tambor } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  passos.push(['rotaciona', { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: selT }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  passos.push(['transladar', { d: [0, ye, zf], sel: selT }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  passos.push(['parte', { nome: 'tambor', sel: selT }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "    nome: 'apoio', de: { op: 'loft', id: ID.pescoco },"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    nome: 'apoio', de: { op: 'lathe', id: ID.colar },"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "    nome: 'juntaDoOmbro', de: { op: 'lathe', id: ID.tambor },"
+        },
+        {
+          "tipo": "-",
+          "linha": 102,
+          "texto": "    interface: { forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [0, yEixo, zFace], raio: Rt, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    nome: 'juntaDoOmbro', de: selT.origem,"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    interface: { forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [0, ye, zf + et], raio: Rt, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.pescoco } } }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 105,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.tambor } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.colar } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  passos.push(['liso', { sel: selT }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 110,
+          "texto": "  meta: { nome: 'braco-robotico/ombro', desc: 'ombro em cotovelo de cano do braço robótico' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  meta: { nome: 'braco-robotico/ombro', desc: 'ombro do braço robótico: colar, corpo em D e tambor' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "  TOPO: { origem: 'centro da boca de baixo do pescoço; y para cima, a face do tambor para +Z' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  TOPO: { origem: 'centro da face de baixo do colar; y para cima, a face do tambor para +Z' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 117,
+          "texto": "      '../../referencias/ombro-rascunho-frente.png',"
+        },
+        {
+          "tipo": "-",
+          "linha": 118,
+          "texto": "      '../../referencias/ombro-rascunho-lado.png',"
+        },
+        {
+          "tipo": "-",
+          "linha": 119,
+          "texto": "      '../../referencias/ombro-rascunho-perspectiva.png',"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "      '../../referencias/ombro-rascunho-tras.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "      '../../referencias/ombro-rascunho2-arame-costas.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "      '../../referencias/ombro-rascunho2-arame-lado.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      '../../referencias/ombro-rascunho2-arame-perspectiva.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      '../../referencias/ombro-rascunho2-arame-tras.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      '../../referencias/ombro-rascunho2-colar-e-corpo.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      '../../referencias/ombro-rascunho2-corpo-cima.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "      '../../referencias/ombro-rascunho2-corpo-frente.png',"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "      '../../referencias/ombro-rascunho2-corpo-lado.png',"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "    escala: { medida: 'diâmetro do anel da cintura, onde o pescoço assenta', milimetros: 180 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    escala: { medida: 'diâmetro do anel da cintura, onde o colar assenta', milimetros: 210 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "      { nome: 'pescoco', forma: 'cilindro com o diâmetro do anel que sobe reto uns 30 mm e faz uma curva de 90 graus para +Z com o lado de fora arredondado', tecnica: 'tubo por caminho curvo' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 125,
+          "texto": "      { nome: 'tambor', forma: 'disco grosso de eixo Z na ponta da curva, 240 mm de diâmetro e 80 mm de espessura, quase encostando no anel, face da frente plana com filete na borda', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "      { nome: 'colar', forma: 'cilindro baixo, 30 mm, com o diâmetro do anel e chanfro na borda de cima; o topo tem o diâmetro do corpo e os dois parecem uma peça só', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "      { nome: 'corpo', forma: 'bloco com planta em D, reto na frente e redondo atrás no raio do colar; topo plano, face da frente plana 20 mm além do colar, rampa abaulada descendo atrás', tecnica: 'cruzamento de silhueta lateral e planta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "      { nome: 'tambor', forma: 'disco de eixo Z encostado na face plana do corpo, 300 mm de diâmetro e 40 mm de espessura, cobrindo a face quadrada inteira vista de frente', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 128,
+          "texto": "      'tambor fino como chapa, em vez de grosso',"
+        },
+        {
+          "tipo": "-",
+          "linha": 129,
+          "texto": "      'pescoço alto, deixando o tambor visivelmente afastado do anel',"
+        },
+        {
+          "tipo": "-",
+          "linha": 130,
+          "texto": "      'face do tambor que não aponta para +Z, com o eixo fora da horizontal',"
+        },
+        {
+          "tipo": "-",
+          "linha": 131,
+          "texto": "      'curva de 90 graus com canto vivo por fora',"
+        },
+        {
+          "tipo": "-",
+          "linha": 132,
+          "texto": "      'ombro fora do eixo vertical da cintura',"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "      'quinas da face quadrada do corpo aparecendo atrás do tambor na vista de frente',"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "      'colar com diâmetro diferente do anel ou do corpo, formando degrau na junção',"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "      'corpo redondo na frente, ou quadrado atrás, invertendo a planta em D',"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "      'rampa de trás reta ou côncava, ou topo do corpo que não é plano',"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "      'face do tambor que não aponta para +Z, ou eixo fora da horizontal',"
+        }
+      ],
+      "cortada": true
+    }
+  }
+}

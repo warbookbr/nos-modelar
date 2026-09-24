@@ -1,4 +1,5 @@
 /* atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
+import { valorDoLiso } from '../liso-por-angulo.js';
 export function criarOperacoesAtributos(servicos) {
   const { FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico } = servicos;
   return {
@@ -30,7 +31,11 @@ export function criarOperacoesAtributos(servicos) {
     return grita(st, i, 'pincel', modo, `modo '${modo}' desconhecido (só 'face' e 'livre')`);
   },
   solido(st, a, i) { for (const fid of resolverAlvosF(st, a, 'solido', i)) st.F.get(fid).solido = true; },
-  liso(st, a, i) { for (const fid of resolverAlvosF(st, a, 'liso', i)) st.F.get(fid).liso = true; },
+  liso(st, a, i) {
+    let valor;
+    try { valor = valorDoLiso(a.angulo); } catch (erro) { return grita(st, i, 'liso', a.angulo, erro.message); }
+    for (const fid of resolverAlvosF(st, a, 'liso', i)) st.F.get(fid).liso = valor;
+  },
 
   /* material (passo 12a): seta f.material = NOME de um material DECLARADO em
      MATERIAIS (a peça-nível, como PARAMS/TOPO). Só o NOME entra na face — mudar o

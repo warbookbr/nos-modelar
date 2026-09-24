@@ -33,7 +33,7 @@ import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { capturarMontagem } from './capturar-montagem.mjs';
 import { carregadoresDeReceitas } from './peca-com-parametros.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
-import { lerRodadas } from './rodada-de-modelagem.mjs';
+import { lerRodadas, limiteDaPeca } from './rodada-de-modelagem.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 export const arquivoDoRegistro = (arquivoMontagem) => arquivoMontagem.replace(/\.json$/, '.etapas.json');
@@ -108,10 +108,10 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
    injetável para o teste; por padrão lê a pasta de rodadas da peça. */
-export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) => lerRodadas(ref)) {
+export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) => lerRodadas(ref), limiteDe = (ref) => limiteDaPeca(ref)) {
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const rodadas = ref ? rodadasDe(ref) : [];
-  const decisao = proximaAcao(rodadas);
+  const decisao = proximaAcao(rodadas, { limite: ref ? limiteDe(ref) : undefined });
   if (decisao.acao !== 'parar-fechou') {
     throw new ErroEtapaDeConstrucao('etapa-sem-critico', `'${instancia}' ainda não foi fechada pelo crítico: ${decisao.acao} — ${decisao.motivo}`);
   }

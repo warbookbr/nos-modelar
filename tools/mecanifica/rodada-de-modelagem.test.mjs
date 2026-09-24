@@ -140,3 +140,16 @@ describe('diferença da receita e nota de passagem', () => {
     expect(() => gravarCom('x', { notaDePassagem: '   ' })).toThrow(/notaDePassagem/);
   });
 });
+
+describe('limite de rodadas estendido por escrito', () => {
+  it('sem arquivo vale o limite de sempre; com arquivo válido vale o escrito; sem autor ou motivo recusa', async () => {
+    const { limiteDaPeca } = await import('./rodada-de-modelagem.mjs');
+    const { LIMITE_DE_RODADAS } = await import('../../src/autoria/laco-de-modelagem.js');
+    const { writeFileSync } = await import('node:fs');
+    expect(limiteDaPeca('peca-x', { pasta: area })).toBe(LIMITE_DE_RODADAS);
+    writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7, por: 'pessoa', motivo: 'fechar o bico de trás' }));
+    expect(limiteDaPeca('peca-x', { pasta: area })).toBe(7);
+    writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7 }));
+    expect(() => limiteDaPeca('peca-x', { pasta: area })).toThrow(/quem decidiu/);
+  });
+});

@@ -67,3 +67,19 @@ describe('parte planejada que espera a etapa', () => {
     expect(etapaQueEspera('objeto-de-prova/anel-cintura', { raiz: pecas })).toBe(null);
   });
 });
+
+describe('chão só na primeira etapa', () => {
+  it('a primeira etapa e a peça solta respondem pelo chão; a parte encaixada não', async () => {
+    const { primeiraEtapaOuSolta } = await import('./guardas/guarda-referencial.mjs');
+    writeFileSync(join(pecas, 'objeto-de-prova/montagem.json'), JSON.stringify({
+      instancias: [
+        { id: 'base', alvo: { tipo: 'peca', ref: 'objeto-de-prova/base' } },
+        { id: 'anel', alvo: { tipo: 'peca', ref: 'objeto-de-prova/anel-cintura' } },
+      ],
+      etapas: ['base', 'anel'],
+    }));
+    expect(primeiraEtapaOuSolta('objeto-de-prova/base', { raiz: pecas })).toBe(true);
+    expect(primeiraEtapaOuSolta('objeto-de-prova/anel-cintura', { raiz: pecas })).toBe(false);
+    expect(primeiraEtapaOuSolta('peca-solta', { raiz: pecas })).toBe(true);
+  });
+});

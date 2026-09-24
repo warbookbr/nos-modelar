@@ -69,8 +69,51 @@
     {
       "instancia": "ombro",
       "estado": "aberta",
-      "juntas": [],
-      "receita": "55d75d03a1efc90408c871d028129e4b1ba3ae02970e0afce711a4f23e48884d"
+      "juntas": [
+        {
+          "relacao": "ombroSentaNoAnel",
+          "com": "anelCintura",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "receita": "a87ee8b9e7044227069f79eb3291e37e1ab38c3347590da574ae86f9c8100847"
     }
   ]
 }

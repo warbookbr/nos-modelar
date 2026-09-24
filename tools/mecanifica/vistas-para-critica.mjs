@@ -38,6 +38,7 @@ export const RES_CONJUNTO = '1100x1450';
 export const RES_PARTE = '900x900';
 export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
+export const VISTAS_DO_ARAME = 'isometrica,traseira';
 
 export function partesDoPlano(receita) {
   const partes = receita?.PLANO?.partes;
@@ -61,6 +62,20 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
   const conjunto = await olharBancada({ peca, revisar: true, res: RES_CONJUNTO, logger });
   exigirCaptura(conjunto, 'conjunto');
 
+  /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
+     mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
+     leque de lascas saindo de um vértice só. Sombra esconde topologia. */
+  const arame = await olharBancada({
+    peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO, logger,
+  });
+  exigirCaptura(arame, 'arame');
+  /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
+     que só aparece do outro lado da peça. */
+  const raioX = await olharBancada({
+    peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
+  });
+  exigirCaptura(raioX, 'raio X');
+
   const porParte = [];
   for (const parte of partes) {
     const resultado = await olharBancada({
@@ -81,7 +96,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
     porParte.push({ parte, resultado });
   }
 
-  return { peca, partes, conjunto, porParte };
+  return { peca, partes, conjunto, arame, raioX, porParte };
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
@@ -108,6 +123,9 @@ function arquivosDe(resposta) {
 function imprimir(resultado) {
   const linhas = [`vistas:critica — ${resultado.peca}`, '', 'CONJUNTO (proporção e silhueta):'];
   for (const arquivo of arquivosDe(resultado.conjunto)) linhas.push(`  ${arquivo}`);
+  linhas.push('', 'ARAME (a malha, que a sombra esconde):');
+  for (const arquivo of arquivosDe(resultado.arame)) linhas.push(`  ${arquivo}`);
+  for (const arquivo of arquivosDe(resultado.raioX)) linhas.push(`  ${arquivo} (raio X)`);
   linhas.push('', 'POR PARTE (a forma e a técnica que o plano prometeu):');
   if (!resultado.partes.length) {
     linhas.push('  a receita não declara partes no PLANO; nenhuma vista isolada foi feita.');

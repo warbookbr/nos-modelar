@@ -45,3 +45,35 @@ describe('controlador de partes', () => {
     expect(`#${malha.material.color.getHexString()}`).toBe('#4a4d52');
   });
 });
+
+describe('arame opaco', () => {
+  it('liga linhas por cima do sólido, sem deixar o material transparente, e desliga limpo', () => {
+    const raiz = new THREE.Group();
+    const grupo = new THREE.Group();
+    grupo.userData.identidadeParte = 'a';
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+    grupo.add(malha);
+    raiz.add(grupo);
+    const controlador = criarControladorPartes({ raiz, partes: new Map([['a', grupo]]) });
+    controlador.definirArame(true);
+    expect(malha.material.wireframe).toBe(false);
+    expect(malha.material.polygonOffset).toBe(true);
+    expect(malha.children.filter((f) => f.isLineSegments)).toHaveLength(1);
+    controlador.definirArame(false);
+    expect(malha.children).toHaveLength(0);
+    expect(malha.material.polygonOffset).toBe(false);
+  });
+
+  it('no modo raio X o arame fica transparente, sem camada de linhas', () => {
+    const raiz = new THREE.Group();
+    const grupo = new THREE.Group();
+    grupo.userData.identidadeParte = 'a';
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+    grupo.add(malha);
+    raiz.add(grupo);
+    const controlador = criarControladorPartes({ raiz, partes: new Map([['a', grupo]]) });
+    controlador.definirArame('raio-x');
+    expect(malha.material.wireframe).toBe(true);
+    expect(malha.children).toHaveLength(0);
+  });
+});

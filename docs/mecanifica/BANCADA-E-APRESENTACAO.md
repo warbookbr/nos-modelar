@@ -194,3 +194,8 @@ está implementada.
 
 A definição ampla está em [`AUTORIA-IA.md`](AUTORIA-IA.md), e a direção das
 montagens em [`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md).
+
+`--arame` desenha a malha por cima da peça sólida, e as arestas que ficam atrás
+somem; `--raio-x` desenha a malha transparente, com as arestas de trás à vista.
+O opaco responde como é a malha da superfície que se vê, e o raio X o que está
+escondido do outro lado. O pacote de `vistas:critica` leva as duas.
