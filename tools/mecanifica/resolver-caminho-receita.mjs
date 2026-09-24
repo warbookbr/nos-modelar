@@ -51,6 +51,12 @@ export function resolverCaminhoReceita(alvo, { raiz = REPO } = {}) {
 
   const limpo = alvo.trim();
   const variacoesNome = limpo.endsWith('.js') ? [limpo] : [limpo, `${limpo}.js`];
+  /* Objeto de várias partes: `braco-robotico/base` aponta para
+     `braco-robotico/partes/base`. O objeto é uma pasta com a montagem e as
+     referências, e cada parte é uma receita dentro de `partes/`; o nome curto
+     esconde o `partes/` para a montagem, a rodada e a bancada usarem o mesmo. */
+  const parteDeObjeto = /^([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)$/.exec(limpo);
+  if (parteDeObjeto) variacoesNome.push(`${parteDeObjeto[1]}/partes/${parteDeObjeto[2]}`);
 
   for (const pasta of PASTAS_BUSCA) {
     for (const nome of variacoesNome) {

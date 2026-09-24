@@ -94,7 +94,14 @@ etapa com uma nota curta dizendo por que escolheu o que escolheu.
 - mudar o mecanismo da montagem v5, salvo o que o braço mostrar que falta,
   consertado de forma genérica e provado de novo na fixture neutra;
 - as onze partes restantes do braço;
-- o tato, que entra em plano próprio.
+- o tato, que entra em plano próprio;
+- exportar um objeto de várias partes. Os três exportadores, `exportar`,
+  `exportar:step` e `exportar:obj`, recebem uma receita de cada vez e não leem
+  montagem, então as partes sairiam sozinhas, todas na origem. O conserto é o
+  exportador pedir ao resolvedor da montagem as partes já posicionadas e gravar
+  tudo junto, e decidir com o produto se o braço vai como peça única ou como
+  partes com a posição de cada uma. Fica para plano próprio, depois de as
+  primeiras partes do braço estarem aceitas, para ser provado com elas.
 
 ## Gate de saída
 
@@ -148,6 +155,19 @@ crítico julgou. `npm run etapas` grava o registro de etapas ao lado da montagem
 e é a única porta para fixar etapa: recusa fora de ordem, sem o crítico ter
 fechado a peça, sem nota de passagem, com junta reprovada e sem aceite, cada
 recusa com teste. Registrar sem medida e fechar sem crítico já eram recusados.
+
+## Andamento da fatia 3
+
+A rodada de alinhamento do braço terminou e está em
+`procedural/pecas/braco-robotico/ALINHAMENTO.md`. Com a pessoa ficou decidido
+que o objeto é uma pasta só, com a montagem e as referências, e que cada parte
+é uma receita própria em `partes/<parte>/`, porque cada etapa tem modelador,
+rodadas e aceite próprios e a montagem liga receitas diferentes. As
+ferramentas chamam a parte pelo nome curto `braco-robotico/base`: o resolvedor
+procura também em `partes/`, a rodada aceita uma barra entre objeto e parte, e
+`guarda:acervo` lista a parte pelo mesmo nome, com teste. A pasta `pecas`
+mantém o nome; trocar por `objetos` mexe em muitos caminhos sem ser preciso
+para o braço, e se for feito será em plano próprio.
 
 ## Riscos e parada
 

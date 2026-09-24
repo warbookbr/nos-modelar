@@ -18,7 +18,9 @@ consultar quando uma regra parecer arbitrária.
    [`../alinhar-modelagem/SKILL.md`](../alinhar-modelagem/SKILL.md), e só então
    tem `PLANO`.
 2. A peça é uma pasta: `procedural/pecas/<peça>/receita.js`, com `referencias/`
-   e `rodadas/` ao lado.
+   e `rodadas/` ao lado. A parte de um objeto de várias partes mora em
+   `procedural/pecas/<objeto>/partes/<parte>/`, com a montagem na pasta do
+   objeto, e os comandos a chamam por `<objeto>/<parte>`.
 3. A receita segue a cadeia do contrato
    [`AUTORIA-DE-PECA.md`](../../../docs/mecanifica/usar/AUTORIA-DE-PECA.md):
    `TABELA` em milímetros exportada como `PARAMS`, `derivar()` que converte

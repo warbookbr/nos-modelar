@@ -31,7 +31,9 @@ const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
    numa arrumação nova. */
 export const PASTA_RODADAS = join(REPO, 'docs/mecanifica/historico/rodadas');
 
-const NOME_DE_PECA = /^[a-z0-9][a-z0-9-]*$/;
+/* Uma barra só, para a parte de um objeto (`braco-robotico/base`); `..` e
+   segunda barra continuam recusados. */
+const NOME_DE_PECA = /^[a-z0-9][a-z0-9-]*(\/[a-z0-9][a-z0-9-]*)?$/;
 
 /* A rodada grava DENTRO da pasta da peça, ao lado da receita que ela julgou.
    Enquanto ficava em `docs/`, responder "por que esta peça está assim" exigia
@@ -40,7 +42,7 @@ const NOME_DE_PECA = /^[a-z0-9][a-z0-9-]*$/;
    no lugar antigo. */
 function exigirNome(peca) {
   if (!NOME_DE_PECA.test(peca ?? '')) {
-    throw new Error(`'${peca}' não é nome de peça; use letras minúsculas, dígitos e hífen.`);
+    throw new Error(`'${peca}' não é nome de peça; use letras minúsculas, dígitos e hífen, e no máximo uma barra entre objeto e parte.`);
   }
 }
 

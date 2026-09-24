@@ -45,7 +45,9 @@ export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
     const caminho = join(pasta, entrada.name);
     if (entrada.isDirectory()) {
       const porta = ENTRADAS_DE_PASTA.find((nome) => existsSync(join(caminho, nome)));
-      if (porta) achadas.push(relative(base, caminho).replaceAll('\\', '/'));
+      /* Parte de objeto sai pelo nome curto, sem `partes/`, que é o nome que a
+         montagem e a rodada usam. */
+      if (porta) achadas.push(relative(base, caminho).replaceAll('\\', '/').replace(/\/partes\//, '/'));
       else achadas.push(...pecasDoAcervo(caminho, { base }));
       continue;
     }
