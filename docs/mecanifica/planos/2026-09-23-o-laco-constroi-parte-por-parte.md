@@ -200,6 +200,14 @@ montagem. Modelar ao mesmo tempo partes que não dependem uma da outra, e aceita
 partes pequenas em grupo em vez de uma parada por etapa, ficam para depois de o
 braço mostrar se fazem falta.
 
+## Plano candidato a seguir este
+
+[O contorno sai da imagem](congelados/2026-09-24-o-contorno-sai-da-imagem.md)
+ficou congelado em 2026-09-24 como candidato a vir depois deste. A prancha da
+lateral do braço, traçada à mão, não serviu para medir proporção nem posição;
+ele testa Potrace e OpenCV, e pesquisa outros, para tirar o contorno de cada
+parte da própria imagem.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não
