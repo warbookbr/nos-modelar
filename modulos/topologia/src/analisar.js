@@ -258,6 +258,23 @@ export function analisarTopologia(malhaBruta, { limiteValencia = 6, aridadeMaxim
     }
   }
 
+  /* --- dobra: duas faces que dividem duas arestas ---
+     Duas faces de uma casca sã dividem no máximo uma aresta. Quando dividem
+     duas, o vértice entre elas tem só essas duas faces em volta, e uma face
+     fica dobrada sobre a outra: a casca parece fechada para as regras de
+     aresta acima, mas o sólido não tem interior ali. A primeira seção-aresta
+     do loft fazia isso nas pontas da aresta e só o preparo de contato pegava. */
+  const paresDeFace = new Map();
+  for (const lista of incidencias.values()) {
+    if (lista.length !== 2 || lista[0].face === lista[1].face) continue;
+    const [f, g] = [lista[0].face, lista[1].face].sort((x, y) => (x < y ? -1 : 1));
+    const ch = `${f}|${g}`;
+    paresDeFace.set(ch, (paresDeFace.get(ch) ?? 0) + 1);
+  }
+  for (const [ch, n] of paresDeFace) {
+    if (n >= 2) anota('reprova', 'dobra', `Faces ${ch.replace('|', ' e ')} dividem ${n} arestas e dobram uma sobre a outra.`, { faces: ch.split('|') });
+  }
+
   /* --- vértice sem uso ---
      Não quebra nada e infla arquivo; entra como alerta porque some sozinho na
      otimização de saída. */

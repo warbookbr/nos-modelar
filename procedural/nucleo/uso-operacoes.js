@@ -141,7 +141,7 @@ const definicoes = {
   },
   loft: {
     intencao: 'Conectar seções ao longo de um caminho 3D.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), secoes: ['lista', 'Ao menos duas seções {pos, raio} ou {pos, contorno}.'], lados: ['inteiro', 'Pontos por seção.'], orientacao: ['vetor3', 'Referência explícita do frame local.'], segmentosCurva: ['inteiro', 'Discretização de concordâncias.'] },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), secoes: ['lista', 'Ao menos duas seções {pos, raio}, {pos, contorno} ou, só na ponta, {pos, aresta: [[u0,w0],[u1,w1]]}, que fecha a ponta numa linha em vez de num ponto.'], lados: ['inteiro', 'Pontos por seção.'], orientacao: ['vetor3', 'Referência explícita do frame local.'], segmentosCurva: ['inteiro', 'Discretização de concordâncias.'] },
     obrigatorios: ['secoes'], passos: [['loft', { secoes: [{ pos: [0, 0, 0], raio: 0.2 }, { pos: [0, 1, 0], raio: 0.2 }], lados: 8 }]],
     precondicoes: ['Seções devem ser ordenadas, válidas e compatíveis com lados.'],
     limites: [

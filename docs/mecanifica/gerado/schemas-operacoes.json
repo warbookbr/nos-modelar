@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:122d1663561800002b4ed3d2c6538585e3e18e9d672d8f77fae001c470a773b0",
+  "assinatura": "sha256:91b4e5e8a2efd080bd85c49e6ef624f1828780b6276f378b4186cfba74daac8f",
   "total": 32,
   "operacoes": [
     {
@@ -1978,7 +1978,7 @@
             },
             "secoes": {
               "type": "array",
-              "description": "Ao menos duas seções {pos, raio} ou {pos, contorno}."
+              "description": "Ao menos duas seções {pos, raio}, {pos, contorno} ou, só na ponta, {pos, aresta: [[u0,w0],[u1,w1]]}, que fecha a ponta numa linha em vez de num ponto."
             },
             "lados": {
               "anyOf": [

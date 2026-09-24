@@ -23,7 +23,6 @@
  * borda inteira está sobre a face, sem fresta e no mesmo eixo.
  */
 
-import { BLOCO } from '../../../../nucleo/entrada.js';
 
 export const TABELA = {
   raioDoColar: 105,
@@ -112,7 +111,7 @@ export function gerarPassos(t = TABELA) {
      linha dos cantos de cima. Todos os retângulos têm os mesmos pontos, e as
      estações atrás são iguais em ângulo na parede, com uma estação exata no
      pé da rampa. A face da frente fecha em retângulos concêntricos e o bico
-     de trás numa aresta vertical em z = -R, logo atrás da última estação. */
+     de trás numa seção-aresta vertical em z = -R, logo atrás da última estação. */
   const nb = t.divisoesDaLargura, nv = t.divisoesDaAltura;
   /* Altura do caminho: o meio do retângulo do bico, que fica dentro de todos
      os retângulos; os dois polos ficam nela e os anéis da frente encolhem
@@ -126,7 +125,11 @@ export function gerarPassos(t = TABELA) {
     for (let k = 0; k < nv; k++) pts.push([-w, y1 - ((y1 - y0) * k) / nv]);
     /* frame do loft em +Z com u = +X dá w = -Y; as seções ficam todas na
        altura ym, a mesma dos polos, para o caminho ser reto em Z. */
-    return pts.map(([x, y]) => [x, ym - y]).reverse();
+    /* o ponto 0 é o meio da base e o ponto lados/2 o meio do topo, para a
+       seção-aresta do bico casar as pontas com eles. */
+    const inv = pts.map(([x, y]) => [x, ym - y]).reverse();
+    const i0 = inv.length - 1 - nb / 2;
+    return inv.slice(i0).concat(inv.slice(0, i0));
   };
   const grau = Math.PI / 180;
   const th0 = t.anguloDoBico * grau;
@@ -134,37 +137,11 @@ export function gerarPassos(t = TABELA) {
   for (let k = 0; k < t.estacoesDoBico; k++) thetas.push(th0 + (k / t.estacoesDoBico) * (psi0 - th0));
   for (let k = 0; k <= t.estacoesDaRampa; k++) thetas.push(psi0 + (k / t.estacoesDaRampa) * (Math.PI / 2 - psi0));
   const secao = (z, w, y1) => ({ pos: [0, ym, z], contorno: ret(w, hc, y1) });
-  const zBico = -R * Math.cos(th0);
   const eps = 0.00001;
   /* bico de trás: a primeira seção é a aresta vertical x = 0 em z = -R, de
-     hc à rampa. Cada ponto do retângulo sobe ou desce para ela pela
-     distância, em pontos, ao meio da base, e os dois lados do D chegam às
-     mesmas alturas. O loft recusa contorno de área nula, então os lados
-     ficam a meio mícron do plano x = 0 e o passo mescla, logo após o loft,
-     junta cada par na aresta; a costura fica em quads, sem leque. */
-  const nl = nb + nv;
+     hc à rampa; o loft liga as duas metades do anel vizinho a ela por quads. */
   const yBico = yRampa(-R);
-  const meioMicron = 5e-7;
-  const pares = [];
-  /* altura na aresta proporcional ao caminho, pelo contorno da estação do
-     bico, desde o meio da base: as células de baixo e de cima ficam curtas. */
-  const wB = R * Math.sin(th0), hB = yRampa(zBico) - hc;
-  const passoDoContorno = (d) => (d <= nb / 2 ? d * (2 * wB / nb)
-    : d <= nb / 2 + nv ? wB + (d - nb / 2) * (hB / nv) : wB + hB + (d - nb / 2 - nv) * (2 * wB / nb)) / (2 * wB + hB);
-  /* os pontos do meio da base e do meio do topo se juntam aos vizinhos: sem
-     isso cada um fica com duas faces dobradas uma sobre a outra, vértice que
-     não é variedade. Os vizinhos ocupam então as pontas da aresta. */
-  const s1 = passoDoContorno(1), sN = passoDoContorno(nl - 1);
-  const bico = ret(wB, hc, yBico).map(([u], i) => {
-    const d = (i + nb / 2 + 1) % (2 * nl);
-    const dd = d <= nl ? d : 2 * nl - d;
-    const f = Math.min(Math.max((passoDoContorno(dd) - s1) / (sN - s1), 0), 1);
-    if (d > 0 && d < nl) pares.push([i, (i + 2 * (nl - d)) % (2 * nl)]);
-    if (d === 1 || d === nl - 1) pares.push([i, (i + (d === 1 ? -1 : 1) + 2 * nl) % (2 * nl)]);
-    const lado = d === 0 || d === nl ? 0 : Math.sign(u) * meioMicron;
-    return [lado, ym - (hc + (yBico - hc) * f)];
-  });
-  const secoes = [{ pos: [0, ym, -R], contorno: bico }];
+  const secoes = [{ pos: [0, ym, -R], aresta: [[0, ym - hc], [0, ym - yBico]] }];
   for (const th of thetas) {
     const z = th >= Math.PI / 2 - 1e-12 ? 0 : -R * Math.cos(th);
     secoes.push(secao(z, R * Math.sin(th), yRampa(z)));
@@ -180,10 +157,6 @@ export function gerarPassos(t = TABELA) {
   }
   secoes.push({ pos: [0, ym, zf], raio: 0 });
   passos.push(['loft', { origemId: ID.corpo, lados: 2 * (nb + nv), orientacao: [1, 0, 0], secoes }]);
-  /* a primeira seção do loft é anel: os ids dela são a base do passo mais
-     o índice no contorno (numeração do loft, formato salvo). */
-  const baseDoLoft = (passos.length - 1) * BLOCO;
-  for (const [i, j] of pares) passos.push(['mescla', { de: [baseDoLoft + j], para: baseDoLoft + i }]);
   passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'loft', id: ID.corpo } } }]);
 
   /* tambor: disco de eixo Y com filete só na borda de cima, girado para +Z

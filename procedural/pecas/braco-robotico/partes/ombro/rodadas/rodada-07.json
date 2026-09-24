@@ -1,0 +1,265 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 7,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 0 órfão, 2 portas, variedade fechada; guarda:acervo ok; guarda:referencial ok; malha:conferir sem face fina nem vértice em aresta; micropolígono alerta, 5 faces tortas na ponta; etapas passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/ombro-rascunho2-corpo-lado.png",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "corpo",
+        "tipo": "superficie",
+        "onde": "base das costas, logo acima do colar, no eixo central",
+        "sentido": "segmentado",
+        "evidencia": "arame opaco traseira-orto: segundo ^ solto em (545,895), junto da divisão com o colar"
+      },
+      {
+        "parte": "corpo",
+        "tipo": "superficie",
+        "onde": "pé do V da rampa, no eixo central das costas",
+        "sentido": "segmentado",
+        "evidencia": "arame opaco traseira-orto: triângulo dobrado em forma de ^ em (545,750) e grade que converge para o centro em volta dele"
+      },
+      {
+        "parte": "corpo",
+        "tipo": "superficie",
+        "onde": "ponta de baixo do V da rampa e faixa esquerda das costas",
+        "sentido": "segmentado",
+        "evidencia": "traseira-orto sombreada: ponta do V borrada em (620,370) e faixa escura em x≈495-545 bem mais escura que o lado direito, sem causa de forma visível"
+      }
+    ],
+    "observacao": "Silhueta, planta em D, rampa e tambor batem com o rascunho e com a decisão da pessoa; os defeitos estão na malha e no sombreado do centro das costas do corpo."
+  },
+  "partes": [
+    {
+      "nome": "colar",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": "bico de trás fecha em aresta vertical com 13 passos mescla"
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "modelador: o loft recusa seção de área nula; fechar o bico numa aresta exigiu contorno de meio mícron e 13 mescla por id posicional, dívida posicional registrada",
+    "modelador: as células de canto da aresta ficaram torcidas; o micropolígono passou de aprova para alerta, e o crítico viu dois triângulos dobrados nas pontas da aresta",
+    "modelador: rodou git stash e stash pop na árvore compartilhada para medir a versão anterior; nada se perdeu, mas medir versão anterior pede comando próprio",
+    "ferramenta: arame opaco por padrão e raio X à parte, pedido da pessoa; o crítico não abriu o raio X"
+  ],
+  "notaDePassagem": "O bico de trás do corpo fecha numa aresta vertical em z = -R: a primeira seção do loft tem os lados a meio mícron de x = 0, e passos mescla juntam os pares; os pontos do meio da base e do topo juntam-se aos vizinhos para a malha seguir variedade. As pontas de cima e de baixo dessa aresta ficaram com triângulos dobrados. Se o loft ganhar seção-aresta nativa, os mescla saem.",
+  "receita": {
+    "sha256": "sha256:a87ee8b9e7044227069f79eb3291e37e1ab38c3347590da574ae86f9c8100847",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 2,
+      "acrescentadas": 36,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "import { BLOCO } from '../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 113,
+          "texto": "     de trás num polo em z = -R, logo atrás da última estação. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "     de trás numa aresta vertical em z = -R, logo atrás da última estação. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "  const secoes = [{ pos: [0, ym, -R], raio: 0 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "  /* bico de trás: a primeira seção é a aresta vertical x = 0 em z = -R, de"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "     hc à rampa. Cada ponto do retângulo sobe ou desce para ela pela"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "     distância, em pontos, ao meio da base, e os dois lados do D chegam às"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "     mesmas alturas. O loft recusa contorno de área nula, então os lados"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "     ficam a meio mícron do plano x = 0 e o passo mescla, logo após o loft,"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "     junta cada par na aresta; a costura fica em quads, sem leque. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  const nl = nb + nv;"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  const yBico = yRampa(-R);"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  const meioMicron = 5e-7;"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  const pares = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  /* altura na aresta proporcional ao caminho, pelo contorno da estação do"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "     bico, desde o meio da base: as células de baixo e de cima ficam curtas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const wB = R * Math.sin(th0), hB = yRampa(zBico) - hc;"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const passoDoContorno = (d) => (d <= nb / 2 ? d * (2 * wB / nb)"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "    : d <= nb / 2 + nv ? wB + (d - nb / 2) * (hB / nv) : wB + hB + (d - nb / 2 - nv) * (2 * wB / nb)) / (2 * wB + hB);"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  /* os pontos do meio da base e do meio do topo se juntam aos vizinhos: sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "     isso cada um fica com duas faces dobradas uma sobre a outra, vértice que"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "     não é variedade. Os vizinhos ocupam então as pontas da aresta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "  const s1 = passoDoContorno(1), sN = passoDoContorno(nl - 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  const bico = ret(wB, hc, yBico).map(([u], i) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    const d = (i + nb / 2 + 1) % (2 * nl);"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    const dd = d <= nl ? d : 2 * nl - d;"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    const f = Math.min(Math.max((passoDoContorno(dd) - s1) / (sN - s1), 0), 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    if (d > 0 && d < nl) pares.push([i, (i + 2 * (nl - d)) % (2 * nl)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    if (d === 1 || d === nl - 1) pares.push([i, (i + (d === 1 ? -1 : 1) + 2 * nl) % (2 * nl)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    const lado = d === 0 || d === nl ? 0 : Math.sign(u) * meioMicron;"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    return [lado, ym - (hc + (yBico - hc) * f)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  });"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  const secoes = [{ pos: [0, ym, -R], contorno: bico }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  /* a primeira seção do loft é anel: os ids dela são a base do passo mais"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "     o índice no contorno (numeração do loft, formato salvo). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "  const baseDoLoft = (passos.length - 1) * BLOCO;"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "  for (const [i, j] of pares) passos.push(['mescla', { de: [baseDoLoft + j], para: baseDoLoft + i }]);"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

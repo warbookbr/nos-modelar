@@ -74,6 +74,10 @@ function textoDaReceita(peca, { raiz = REPO } = {}) {
   try { return readFileSync(resolverCaminhoReceita(peca, { raiz }), 'utf8'); } catch { return null; }
 }
 
+/* A cópia fica em rodadas/, um nível abaixo da receita, e um import relativo
+   copiado sem ajuste deixa de achar o arquivo e quebra o build. A cópia do
+   ombro na rodada 7 quebrou assim. */
+export const ajustarImportsDaCopia = (texto) => texto.replace(/(\bfrom\s*|\bimport\s*\(?\s*)(['"])(\.\.?\/)/g, '$1$2../$3');
 const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
 
 export function gravarRodada(
@@ -93,7 +97,7 @@ export function gravarRodada(
       ? readFileSync(copiaDaReceita(pasta, numero - 1), 'utf8') : null;
     receita = {
       sha256: `sha256:${createHash('sha256').update(receitaTexto).digest('hex')}`,
-      diferenca: diferencaDeTexto(anterior, receitaTexto),
+      diferenca: diferencaDeTexto(anterior, ajustarImportsDaCopia(receitaTexto)),
     };
   }
   const rodada = registrarRodada({
@@ -106,7 +110,7 @@ export function gravarRodada(
      assim. */
   if (existsSync(arquivo)) throw new Error(`a rodada ${rodada.numero} de '${peca}' já foi gravada.`);
   writeFileSync(arquivo, `${JSON.stringify(rodada, null, 2)}\n`, 'utf8');
-  if (receitaTexto !== null) writeFileSync(copiaDaReceita(pasta, numero), receitaTexto, 'utf8');
+  if (receitaTexto !== null) writeFileSync(copiaDaReceita(pasta, numero), ajustarImportsDaCopia(receitaTexto), 'utf8');
   return { rodada, arquivo };
 }
 

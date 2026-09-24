@@ -174,4 +174,13 @@ describe('face fina e vértice no meio de aresta', () => {
     faces.set(6, { vs: [10, 11, 12] });
     expect(cods(analisarTopologia({ vertices, faces }))).not.toContain('vertice-em-aresta');
   });
+  it('reprova a dobra: duas faces que dividem duas arestas', () => {
+    const vertices = new Map([[0, [0, 0, 0]], [1, [1, 0, 0]], [2, [1, 1, 0]], [3, [0, 1, 0]], [4, [0.5, 0.5, 1]]]);
+    const faces = new Map([[0, { vs: [0, 1, 2, 3] }], [1, { vs: [2, 1, 0, 4] }]]);
+    expect(cods(analisarTopologia({ vertices, faces }))).toContain('dobra');
+  });
+
+  it('o cubo são não tem dobra', () => {
+    expect(cods(analisarTopologia(cuboSao()))).not.toContain('dobra');
+  });
 });

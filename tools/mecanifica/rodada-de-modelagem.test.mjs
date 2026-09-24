@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
+import { ajustarImportsDaCopia, gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -151,5 +151,12 @@ describe('limite de rodadas estendido por escrito', () => {
     expect(limiteDaPeca('peca-x', { pasta: area })).toBe(7);
     writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7 }));
     expect(() => limiteDaPeca('peca-x', { pasta: area })).toThrow(/quem decidiu/);
+  });
+});
+
+describe('cópia da receita em rodadas/', () => {
+  it('desce um nível nos imports relativos e deixa os de pacote como estão', () => {
+    const texto = "import { BLOCO } from '../../../../nucleo/entrada.js';\nimport x from './vizinho.js';\nimport * as T from 'three';\n";
+    expect(ajustarImportsDaCopia(texto)).toBe("import { BLOCO } from '../../../../../nucleo/entrada.js';\nimport x from '.././vizinho.js';\nimport * as T from 'three';\n");
   });
 });

@@ -298,6 +298,24 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (!Array.isArray(s.pos) || s.pos.length !== 3) { grita(st, i, 'loft', j, `pos da seção ${j} precisa ser [x,y,z] (3 elementos); recebido ${JSON.stringify(s.pos)}`); invalido = true; return { pos: [0, 0, 0], raio: 0, contorno: null, polo: true }; }
       const pos = st.vec(s.pos);
       const temRaio = Object.hasOwn(s, 'raio'), temContorno = Object.hasOwn(s, 'contorno');
+      /* SEÇÃO-ARESTA: a ponta fecha numa linha, e não num ponto. O polo de raio
+         0 afina a ponta até virar bico e fecha em leque; numa peça que termina
+         em quina reta (a ponta de trás de um D, o gume de uma lâmina) o leque
+         vira lascas saindo de um vértice só. Aqui o anel vizinho se divide nas
+         duas metades — do ponto 0 ao ponto lados/2 e de volta — e cada metade
+         se liga à mesma fila de pontos da aresta por quads: cada segmento da
+         aresta fica com exatamente duas faces e a malha continua fechada. Só
+         vale na primeira ou na última seção, com `lados` par. */
+      if (Object.hasOwn(s, 'aresta')) {
+        if (temRaio || temContorno) { grita(st, i, 'loft', j, `seção ${j} tem 'aresta' junto com 'raio' ou 'contorno' — escolha um`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+        if (j !== 0 && j !== secoesArg.length - 1) { grita(st, i, 'loft', j, `seção ${j}: 'aresta' só fecha uma PONTA do loft (primeira ou última seção)`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+        if (L % 2 !== 0) { grita(st, i, 'loft', j, `seção ${j}: 'aresta' exige 'lados' par (tem ${L}), para o anel se dividir em duas metades iguais`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+        const ar = s.aresta;
+        if (!Array.isArray(ar) || ar.length !== 2 || ar.some((pt) => !Array.isArray(pt) || pt.length !== 2)) { grita(st, i, 'loft', j, `seção ${j}: 'aresta' precisa ser [[u0,w0],[u1,w1]]`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+        const p0 = [st.num(ar[0][0]), st.num(ar[0][1])], p1 = [st.num(ar[1][0]), st.num(ar[1][1])];
+        if (Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) <= 1e-9) { grita(st, i, 'loft', j, `seção ${j}: as duas pontas da 'aresta' coincidem — use raio 0 para fechar num ponto`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
+        return { pos, raio: 0, contorno: null, polo: false, aresta: [p0, p1] };
+      }
       if (temRaio && temContorno) { grita(st, i, 'loft', j, `seção ${j} tem 'raio' E 'contorno' — ambíguo, escolha um (círculo OU contorno explícito)`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
       if (!temRaio && !temContorno) { grita(st, i, 'loft', j, `seção ${j} sem 'raio' nem 'contorno'`); invalido = true; return { pos, raio: 0, contorno: null, polo: true }; }
 
@@ -355,7 +373,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
     if (comprimentoZero) return;
 
     // guarda de overflow (D3): soma EXATA — segmento polo<->polo não soma face — ANTES de montar frame/inserir
-    let nV = 0; for (const s of secoes) nV += s.polo ? 1 : L;
+    let nV = 0; for (const s of secoes) nV += s.polo ? 1 : s.aresta ? L / 2 + 1 : L;
     let nF = 0; for (let idx = 0; idx < secoes.length - 1; idx++) if (!(secoes[idx].polo && secoes[idx + 1].polo)) nF += L;
     if (nV > BLOCO || nF > BLOCO) throw new Error(`oficina: loft com ${secoes.length} seções × lados=${L} estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`);
 
@@ -375,7 +393,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
        de um lado só e os dois anéis se encontrariam girados — no anel de 12
        seções, exatamente os 30° de um segmento. */
     const mesmaSecao = (a1, b1) => a1.pos.every((n, k) => n === b1.pos[k])
-      && !a1.polo && !b1.polo
+      && !a1.polo && !b1.polo && !a1.aresta && !b1.aresta
       && (a1.contorno ? JSON.stringify(a1.contorno) === JSON.stringify(b1.contorno) : a1.raio === b1.raio);
     const fechado = secoes.length >= 3 && mesmaSecao(secoes[0], secoes[ultimo]);
     const tangenteDaEmenda = fechado
@@ -456,6 +474,32 @@ export function criarOperacoesGeradoresAvancados(servicos) {
         continue;
       }
       const fr = frames[idx];
+      if (s.aresta) {
+        /* Cada ponto do anel vizinho vai para o ponto da aresta mais perto da
+           PROJEÇÃO dele sobre a linha da aresta, numa fila de lados/2 + 1
+           posições. Assim a base do anel converge para a ponta de baixo, a
+           lateral sobe pela aresta e o topo converge para a ponta de cima. A
+           primeira versão ligava em passos iguais pela ordem do anel, e as duas
+           faces de cada ponta dividiam as mesmas duas arestas e dobravam uma
+           sobre a outra. Só os pontos da fila que alguém usa viram vértice. */
+        const [p0, p1] = s.aresta;
+        const meia = L / 2;
+        const viz = secoes[idx === 0 ? 1 : idx - 1];
+        const planos = viz.contorno ?? Array.from({ length: L }, (_, j) => [Math.cos((j / L) * Math.PI * 2) * viz.raio, Math.sin((j / L) * Math.PI * 2) * viz.raio]);
+        const d = [p1[0] - p0[0], p1[1] - p0[1]];
+        const d2 = d[0] * d[0] + d[1] * d[1];
+        const posicao = planos.map(([u, w]) => Math.round(Math.max(0, Math.min(1, ((u - p0[0]) * d[0] + (w - p0[1]) * d[1]) / d2)) * meia));
+        const fila = new Map();
+        for (const k of [...new Set(posicao)].sort((x, y) => x - y)) {
+          const ca = p0[0] + (d[0] * k) / meia, sa = p0[1] + (d[1] * k) / meia;
+          const id = b + cursor + k;
+          addV(st, id, [s.pos[0] + fr.u[0] * ca + fr.w[0] * sa, s.pos[1] + fr.u[1] * ca + fr.w[1] * sa, s.pos[2] + fr.u[2] * ca + fr.w[2] * sa]);
+          fila.set(k, id);
+        }
+        cursor += meia + 1;
+        info.push({ polo: false, aresta: true, posicao, fila });
+        continue;
+      }
       const ids = [];
       for (let j = 0; j < L; j++) {
         /* CONTORNO explícito (P5) usa o ponto [u,w] direto no lugar de
@@ -476,7 +520,23 @@ export function criarOperacoesGeradoresAvancados(servicos) {
     for (let idx = 0; idx < info.length - 1; idx++) {
       const A = info[idx], B = info[idx + 1];
       if (A.polo && B.polo) { grita(st, i, 'loft', idx, 'polo↔polo adjacente — seção degenerada, sem face neste segmento'); continue; }   // 0 faces, cursor não avança
-      if (!A.polo && !B.polo) {
+      if (A.aresta || B.aresta) {
+        /* aresta<->anel: a faixa de quads do anel<->anel, com o lado da aresta
+           trocado pelos pontos da fila entre as posições de j e de j+1. Quando
+           as duas posições coincidem a face vira triângulo. */
+        const E = A.aresta ? A : B, R = A.aresta ? B : A;
+        for (let j = 0; j < L; j++) {
+          const n = (j + 1) % L, fid = b + fCursor + j;
+          const kj = E.posicao[j], kn = E.posicao[n], passo = kn >= kj ? 1 : -1;
+          const naFila = [];
+          for (let k = kj; k !== kn + passo; k += passo) if (E.fila.has(k)) naFila.push(E.fila.get(k));
+          const face = A.aresta
+            ? [naFila[0], R.ids[j], R.ids[n], ...naFila.slice(1).reverse()]
+            : [R.ids[j], ...naFila, R.ids[n]];
+          addF(st, fid, face);
+          faixas[idx].push(fid);
+        }
+      } else if (!A.polo && !B.polo) {
         for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.ids[j], B.ids[j], B.ids[n], A.ids[n]]); faixas[idx].push(fid); }   // anel<->anel: quads (a faixa da esfera)
       } else if (A.polo) {
         for (let j = 0; j < L; j++) { const n = (j + 1) % L, fid = b + fCursor + j; addF(st, fid, [A.id, B.ids[j], B.ids[n]]); faixas[idx].push(fid); }   // polo atrás -> anel na frente: leque SUL
