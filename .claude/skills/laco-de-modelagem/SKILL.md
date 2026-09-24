@@ -27,8 +27,12 @@ fixas, o registro das rodadas anteriores e a nota que o modelador da etapa
 anterior deixou. O estado mora nos arquivos; um agente que atravessa várias
 etapas leva para as seguintes o que entendeu errado na primeira.
 
-Ao fim de cada etapa, pare e mostre à pessoa as vistas da parte, as medidas da
-junta e o veredito do crítico. A etapa só fica fixa com o aceite dela, e só
+Ao fim de cada etapa, pare e mostre à pessoa as vistas da parte montada sobre
+as já fixas, as medidas da junta e o veredito do crítico. A parte sozinha não
+basta: a pessoa não julga a altura de um anel sem vê-lo sobre a base. As vistas
+montadas, em ortográfica, saem de
+`npm run etapas -- <montagem.json> --olhar`, e entram também no pacote do
+crítico, junto das de `vistas:critica`. A etapa só fica fixa com o aceite dela, e só
 depois disso a próxima começa. Etapa fixa que uma mudança anterior quebrou
 volta na frente de todas. O estado e a próxima etapa saem de:
 

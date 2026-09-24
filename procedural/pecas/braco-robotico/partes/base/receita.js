@@ -19,9 +19,9 @@
  */
 
 export const TABELA = {
-  raioDoCorpo: 90,
+  raioDoCorpo: 105,
   alturaDoCorpo: 200,
-  ladoDoPe: 200,
+  ladoDoPe: 230,
   alturaDoPe: 20,
   saidaDaCaixa: 50,
   larguraDaCaixa: 120,
@@ -134,16 +134,16 @@ const receita = {
   PLANO: {
     objeto: 'base do braço robótico industrial, presa no chão, com uma caixa colada no lado esquerdo',
     referencias: ['../../referencias/lateral.png'],
-    escala: { medida: 'diâmetro do corpo da base', milimetros: 180 },
+    escala: { medida: 'diâmetro do corpo da base', milimetros: 210 },
     partes: [
-      { nome: 'corpo', forma: 'cilindro de revolução em pé, 180 mm de diâmetro e 200 mm de altura, com filete na quina do topo', tecnica: 'revolução com perfil' },
-      { nome: 'pe', forma: 'placa quadrada de 200 mm de lado e 20 mm de altura, cantos arredondados vistos de cima e filete na borda', tecnica: 'placa com cantos e bordas arredondados' },
+      { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura; a quina do topo leva só um chanfro pequeno, sem sulco na junção com o anel', tecnica: 'revolução com perfil' },
+      { nome: 'pe', forma: 'placa de 20 mm de altura, 230 mm de lado, que avança à esquerda por baixo da caixa até o meio dela; cantos e borda arredondados', tecnica: 'placa com cantos e bordas arredondados' },
       { nome: 'caixaLateral', forma: 'caixa de cantos arredondados encostada no corpo em -X, 50 mm de saída, apoiada no pé só onde ele existe, 10 mm mais baixa que o corpo, com um botão ou conector na face de fora', tecnica: 'caixa com bordas arredondadas' },
     ],
     criteriosDeReprovacao: [
       'o corpo não é redondo visto de cima',
       'o pé não é quadrado de cantos arredondados visto de cima',
-      'quina viva no topo do corpo ou na borda do pé',
+      'sulco visível entre o topo do corpo e o anel, ou quina viva na borda do pé',
       'a caixa solta do corpo, com fresta, ou flutuando acima do pé',
       'a caixa do lado errado: na vista frontal ela fica à esquerda, em -X',
     ],

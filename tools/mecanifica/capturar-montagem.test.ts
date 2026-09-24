@@ -74,6 +74,25 @@ describe('captura importável de montagem', () => {
     expect(fechamentos).toEqual({ browser: 1, vite: 1 });
   });
 
+  it('passa a projeção pedida ao visor, e perspectiva quando ninguém pede', async () => {
+    const pedidas: string[] = [];
+    const page = {
+      on() {}, async goto() {}, async waitForFunction() {}, async waitForTimeout() {},
+      async evaluate(_fn: unknown, [, vista, projecao]: [unknown, string, string]) {
+        pedidas.push(projecao);
+        return { id: 'x', vista, instancias: [], enquadramento: { valida: true, area: 0.25, largura: 0.5, altura: 0.5, cortado: false } };
+      },
+      async screenshot() { return Buffer.from('89504e470d0a1a0a', 'hex'); },
+    };
+    const dependencias = {
+      criarServidor: async () => ({ httpServer: { address: () => ({ port: 4173 }) }, async listen() {}, async close() {} }),
+      carregarPlaywright: async () => ({ chromium: { launch: async () => ({ async newPage() { return page; }, async close() {} }) } }),
+    };
+    await capturarMontagem({ montagem: await resolvida(), vistas: ['frontal'], projecao: 'ortografica', espera: 0, dependencias });
+    await capturarMontagem({ montagem: await resolvida(), vistas: ['frontal'], espera: 0, dependencias });
+    expect(pedidas).toEqual(['ortografica', 'perspectiva']);
+  });
+
   it('recusa caminho ausente antes de subir infraestrutura visual', async () => {
     let iniciou = false;
     const resultado = await capturarMontagem({

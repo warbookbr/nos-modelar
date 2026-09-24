@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { descreverVersao, lerVersaoPublicada } from './tools/bancadas/versao-publicada.mjs';
+import { semSessaoNoPacote } from './tools/bancadas/sem-sessao-no-pacote.mjs';
 
 /* A versão entra como texto fixo no pacote: a página publicada não tem git para
    consultar, e sem isto quem abre a bancada não sabe se está vendo a construção
@@ -18,7 +19,7 @@ export default defineConfig({
   define: { __VERSAO_DA_BANCADA__: JSON.stringify(VERSAO_DA_BANCADA) },
   /* Só no servidor de desenvolvimento: a página publicada não escreve arquivo
      nenhum, e quem a abre não tem o repositório para escrever nele. */
-  plugins: [],
+  plugins: [semSessaoNoPacote({ saida: resolve(import.meta.dirname, 'dist') })],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

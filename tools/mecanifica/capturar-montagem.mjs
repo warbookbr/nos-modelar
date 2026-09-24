@@ -92,6 +92,7 @@ export async function capturarMontagem({
   montagem,
   caminho = [],
   vistas = ['isometrica', 'direita'],
+  projecao = 'perspectiva',
   largura = 1280,
   espera = 100,
   timeoutMs = 45_000,
@@ -153,7 +154,7 @@ export async function capturarMontagem({
     garantirPrazo();
     const capturas = [];
     for (const vista of vistas) {
-      const metadados = await page.evaluate(([entrada, nome]) => window.__mecanificaVisorMontagem(entrada, nome), [dados, vista]);
+      const metadados = await page.evaluate(([entrada, nome, proj]) => window.__mecanificaVisorMontagem(entrada, nome, proj), [dados, vista, projecao]);
       if (espera > 0) await page.waitForTimeout(espera);
       garantirPrazo();
       const dadosPng = await page.screenshot({ type: 'png' });

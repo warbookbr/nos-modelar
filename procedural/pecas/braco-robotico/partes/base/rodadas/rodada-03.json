@@ -1,0 +1,111 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/base",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, assento r 0,105; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova; etapas: anelSentaNaBase passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "pe",
+        "tipo": "comprimento",
+        "onde": "extremidade esquerda",
+        "sentido": "menor",
+        "evidencia": "no alvo o pé avança para a esquerda por baixo de parte da caixa (canto inferior esquerdo da base); na vista frontal do modelo o pé é simétrico e termina antes da caixa, deixando um vão com a espessura do pé entre a base da caixa e o chão"
+      }
+    ],
+    "observacao": "Base coerente com o alvo em silhueta, lado da caixa e superfícies arredondadas; a única divergência é o apoio da caixa no canto inferior esquerdo."
+  },
+  "partes": [
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaLateral",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "pessoa: vendo base e anel montados achou o conjunto estreito; corpo passou a 210 mm e pé a 230 mm",
+    "ferramenta: o registro de etapas não via receita mudada depois do aceite quando as juntas continuavam passando; agora guarda a impressão da receita ao fixar",
+    "modelador: conferir que a caixa cabe na largura do corpo em Z foi feito à mão; nenhuma medida reprova caixa sobrando para fora do corpo",
+    "plano: o vão sob a caixa segue a decisão da pessoa de apoiar a caixa só onde há pé; o crítico lê o pé passando por baixo da caixa no alvo; volta para a pessoa"
+  ],
+  "notaDePassagem": "Nesta rodada só mudaram raioDoCorpo, que passou a 105 (diâmetro 210), e ladoDoPe, que passou a 230, por decisão da pessoa, que achou o conjunto estreito. A caixa deriva do raio: com entrada de 30 mm, a face de dentro fica em x=-75, dentro do corpo em toda a largura de 120 em Z. Se o raio diminuir, confira isso de novo. A porta assento publica raioExterno 0,105 em y=0,220, e o anel acompanha por vínculo.",
+  "receita": {
+    "sha256": "sha256:cdf65d8d569d83b29bcb0e3af9380da943b26b1c3a79aaffeb005f26b03bda70",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 5,
+      "acrescentadas": 5,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 22,
+          "texto": "  raioDoCorpo: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  raioDoCorpo: 105,"
+        },
+        {
+          "tipo": "-",
+          "linha": 24,
+          "texto": "  ladoDoPe: 200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  ladoDoPe: 230,"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "    escala: { medida: 'diâmetro do corpo da base', milimetros: 180 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    escala: { medida: 'diâmetro do corpo da base', milimetros: 210 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "      { nome: 'corpo', forma: 'cilindro de revolução em pé, 180 mm de diâmetro e 200 mm de altura, com filete na quina do topo', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "      { nome: 'pe', forma: 'placa quadrada de 200 mm de lado e 20 mm de altura, cantos arredondados vistos de cima e filete na borda', tecnica: 'placa com cantos e bordas arredondados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "      { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura, com filete na quina do topo', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "      { nome: 'pe', forma: 'placa quadrada de 230 mm de lado e 20 mm de altura, cantos arredondados vistos de cima e filete na borda', tecnica: 'placa com cantos e bordas arredondados' },"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

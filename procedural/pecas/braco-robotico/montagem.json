@@ -36,16 +36,16 @@
     {
       "id": "anelComORaioDaBase",
       "alvo": { "instancia": "anelCintura", "param": "raio" },
-      "de": { "instancia": "base", "porta": "assento", "medida": "raio" },
+      "de": { "instancia": "base", "porta": "assento", "medida": "raioExterno" },
       "unidade": "mm",
       "acrescimo": 0
     },
     {
-      "id": "pescocoMaisEstreitoQueOAnel",
+      "id": "pescocoComORaioDoAnel",
       "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
-      "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raio" },
+      "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raioExterno" },
       "unidade": "mm",
-      "acrescimo": -10
+      "acrescimo": 0
     }
   ],
   "posicoes": [

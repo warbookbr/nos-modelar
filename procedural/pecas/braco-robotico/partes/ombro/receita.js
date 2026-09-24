@@ -22,7 +22,9 @@
  */
 
 export const TABELA = {
-  raioDoPescoco: 80,
+  raioDoPescoco: 105,
+  /* Trecho reto do pescoço, acima do anel, antes da curva. */
+  alturaReta: 30,
   /* Altura do eixo do tambor acima da boca de baixo do pescoço. */
   alturaDoEixo: 95,
   raioDoTambor: 95,
@@ -47,7 +49,7 @@ const receita = {
     ],
     escala: { medida: 'diâmetro do anel da cintura, onde o pescoço assenta', milimetros: 180 },
     partes: [
-      { nome: 'pescoco', forma: 'cilindro vertical baixo que sai do anel, 20 mm mais estreito que ele, e faz uma curva de 90 graus para +Z com o lado de fora arredondado', tecnica: 'tubo por caminho curvo' },
+      { nome: 'pescoco', forma: 'cilindro com o diâmetro do anel que sobe reto uns 30 mm e faz uma curva de 90 graus para +Z com o lado de fora arredondado', tecnica: 'tubo por caminho curvo' },
       { nome: 'tambor', forma: 'disco grosso de eixo Z na ponta do pescoço, bem mais largo que o tubo, face da frente plana com filete na borda', tecnica: 'revolução com perfil' },
     ],
     criteriosDeReprovacao: [

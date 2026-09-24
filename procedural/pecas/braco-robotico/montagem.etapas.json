@@ -5,22 +5,64 @@
   "etapas": [
     {
       "instancia": "base",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "aceite": {
-        "por": "pessoa",
-        "observacao": "aprovou a vista de cima com a caixa em 120 mm; manteve corpo de 200 mm e pé centrado"
-      }
+      "receita": "4cf94ee30436b76ae0d8329e16fea11fef4485e6bc2e52952f6256f913924b32"
     },
     {
       "instancia": "anelCintura",
       "estado": "aberta",
-      "juntas": []
+      "juntas": [
+        {
+          "relacao": "anelSentaNaBase",
+          "com": "base",
+          "satisfeita": true,
+          "medidas": {
+            "disponiveis": true,
+            "alinhamento": 1,
+            "descentro": 0,
+            "sobreposicaoRadial": 0.009999999999999995,
+            "sobreposicaoAxial": 0,
+            "separacaoAxial": 0,
+            "tolerancia": 0.000001,
+            "toleranciaNumerica": 0.000001,
+            "radialEsperado": {
+              "minimo": 0.01,
+              "maximo": 0.01,
+              "nominal": 0.01,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "axialEsperado": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": {
+                "menos": 0,
+                "mais": 0
+              },
+              "formato": "nominal-fabricacao"
+            },
+            "frestaEsperada": {
+              "minimo": 0,
+              "maximo": 0,
+              "nominal": 0,
+              "toleranciaFabricacao": null,
+              "formato": "sem-fresta"
+            }
+          }
+        }
+      ],
+      "receita": "e9a6cda1955979d864031a4c4964de2dbe96052a668ec08a587a5d4162043f37"
     },
     {
       "instancia": "ombro",
       "estado": "aberta",
-      "juntas": []
+      "juntas": [],
+      "receita": "f5c3ac2e5bf2712d51f92f7634d7c4173734da17d864b909b50bd9a388ce56a5"
     }
   ]
 }

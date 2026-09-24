@@ -1,0 +1,551 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/anel-cintura",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 1 parte, portas apoio e topo; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova; etapas: anelSentaNaBase passa depois de o vínculo pedir raioExterno"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "anel",
+        "tipo": "comprimento",
+        "onde": "extremidade superior da altura do anel",
+        "sentido": "menor",
+        "evidencia": "frontal orto: 118 px de altura para 528 px de largura (0,22); alvo lateral: cerca de 28 px de altura para 104 px de largura (0,27) no anel logo acima da base, x 333-437, y 390-418"
+      }
+    ],
+    "observacao": "Revolução escura com duas faixas, ranhura e chanfro estreito, como prometido; a única diferença de forma é a altura um pouco menor em relação ao diâmetro."
+  },
+  "partes": [
+    {
+      "nome": "anel",
+      "confere": true,
+      "observacao": "um lathe com chanfro de 2 mm de bordas suavizadas e ranhura de 3 x 2 mm; material anelEscuro"
+    }
+  ],
+  "atrito": [
+    "quem conduz: a montagem pedia a medida 'raio' a portas em anel, que publicam raioExterno; só etapas pegou, descrever e as guardas não. Corrigido na montagem",
+    "modelador: lathe com 10 pontos, 4 arredondados e 64 lados estourou o bloco de 1000 ids; o limite só aparece como recusa do núcleo e o catálogo não o antecipa",
+    "ferramenta: com --cores a bancada pinta pela legenda e esconde o material; só as vistas de vistas:critica mostram o anel escuro",
+    "plano: a altura de 40 mm veio de ler 45 mm na foto e arredondar para baixo; o crítico mede cerca de 48 mm"
+  ],
+  "notaDePassagem": "O anel é um único lathe. O chanfro de 2 mm, com bordas de raio 0,8, fica em cima e embaixo, e a ranhura de 3 x 2 mm fica no meio. O material anelEscuro está em MATERIAIS. A porta topo publica a face inteira em y=altura, com raioExterno igual ao raio do vínculo; o vínculo do pescoço pede raioExterno menos 10 mm. O lathe está perto do teto de ids (40 lados x segmentosCurva 3): se usar lathe com muitos vértices arredondados, conte os pontos antes.",
+  "receita": {
+    "sha256": "sha256:49d402ce343f399746f6cf378afbce2591031568513f86cb174cce55ff44950f",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 100,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Segunda etapa da montagem `braco-robotico/montagem.json`. O combinado com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * pessoa está em `../../ALINHAMENTO.md`; os passos são escritos pelo modelador."
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * O raio vem da porta `assento` da base, por vínculo da montagem; o valor da"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * TABELA só vale para ver a parte sozinha."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Portas que a receita publica:"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *   apoio — anel que ocupa, eixo +Y, centro no meio da face de baixo, borda"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *           de baixo do anel. Senta no `assento` da base."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *   topo  — anel que recebe, eixo +Y, centro no meio da face de cima, face"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *           inteira. O `ombro` sai daqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * Regra das portas de apoio do braço: quem recebe publica a face inteira,"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * de raio interno zero ao raio da face, numa faixa de 5 mm para dentro da"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * peça; quem se apoia publica só a borda de baixo, uma faixa de 10 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * largura até o raio dela e 5 mm para dentro dela. A montagem confere que a"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * borda inteira está sobre a face, sem fresta e no mesmo eixo."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  raio: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  altura: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  /* Acabamento, escolhido pelo modelador. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  suaveDoChanfro: 0.8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  larguraDaRanhura: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  fundoDaRanhura: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  lados: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "export const MATERIAIS = { anelEscuro: { cor: '#4a4d52', aspereza: 0.45 } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "const ID = { anel: 100 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  const R = m(t.raio);"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  const h = m(t.altura);"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  const c = m(t.chanfro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  const s = m(t.suaveDoChanfro);"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  const meio = h / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  const w = m(t.larguraDaRanhura) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  return { R, h, c, s, meio, w, rRanhura: R - m(t.fundoDaRanhura) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const P = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const { R, h, c, s, meio, w, rRanhura } = P;"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  /* Perfil: chanfro estreito embaixo e em cima, com as duas bordas do chanfro"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     suavizadas pelo raio do vértice; ranhura retangular no meio da altura"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "     separando as duas faixas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    origemId: ID.anel, lados: t.lados, segmentosCurva: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    perfil: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "      [0, 0], [R - c, 0, s], [R, c, s],"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "      [R, meio - w], [rRanhura, meio - w], [rRanhura, meio + w], [R, meio + w],"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "      [R, h - c, s], [R - c, h, s], [0, h],"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  passos.push(['parte', { nome: 'anel', sel: { origem: { op: 'lathe', id: ID.anel } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  passos.push(['publicarPorta', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    nome: 'apoio', de: { op: 'lathe', id: ID.anel },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    interface: { forma: 'anel', papel: 'ocupa', eixo: [0, 1, 0], centro: [0, 0, 0], raioInterno: R - 0.010, raioExterno: R, inicio: 0, fim: 0.005 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  passos.push(['publicarPorta', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    nome: 'topo', de: { op: 'lathe', id: ID.anel },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    interface: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, h, 0], raioInterno: 0, raioExterno: R, inicio: -0.005, fim: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  passos.push(['material', { usa: 'anelEscuro', sel: { origem: { op: 'lathe', id: ID.anel } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.anel } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  meta: { nome: 'braco-robotico/anel-cintura', desc: 'anel escuro da cintura do braço robótico' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  TOPO: { origem: 'centro da face de baixo do anel; y para cima' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    objeto: 'anel de giro da cintura do braço robótico, entre o topo da base e o ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    referencias: ['../../referencias/lateral.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    escala: { medida: 'diâmetro do anel, igual ao da base', milimetros: 180 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "      { nome: 'anel', forma: 'anel de revolução escuro, 40 mm de altura, duas faixas separadas por uma ranhura, bordas com chanfro estreito de bordas suavizadas', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      'diâmetro diferente do da base, formando degrau na junção',"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "      'sem a ranhura entre as duas faixas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "      'bordas vivas, sem o chanfro estreito',"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "      'fresta visível entre o anel e a base',"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      'anel na cor cinza-clara da carcaça, quando ele é escuro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

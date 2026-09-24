@@ -75,3 +75,15 @@ describe('registro de etapas', () => {
     recusa(() => juntasPorEtapa({ relacoes: [] }, undefined), 'etapas-ausentes');
   });
 });
+
+describe('receita que muda depois do aceite', () => {
+  it('a etapa fixa vira quebrada quando a receita muda, mesmo com a junta passando', () => {
+    const medidas = (receita) => [{ instancia: 'base', juntas: [], receita }];
+    const fixado = fixarEtapa(atualizarRegistro('m', medidas('aaa')), 'base', { por: 'pessoa' });
+    expect(atualizarRegistro('m', medidas('aaa'), fixado).etapas[0].estado).toBe('fixa');
+    const mudou = atualizarRegistro('m', medidas('bbb'), fixado);
+    expect(mudou.etapas[0]).toMatchObject({ estado: 'quebrada', motivo: 'a receita mudou depois do aceite' });
+    /* Na leitura seguinte ela reabre, e só volta a fixa com aceite novo. */
+    expect(atualizarRegistro('m', medidas('bbb'), mudou).etapas[0].estado).toBe('aberta');
+  });
+});

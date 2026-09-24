@@ -181,3 +181,20 @@ não declarada.
 
 Na rodada 1 da base o crítico leu o corpo um pouco alto e o pé sobrando à
 direita. A pessoa manteve as duas medidas: corpo de 200 mm e pé centrado.
+
+Vendo a base e o anel montados, em vista ortográfica, a pessoa achou o conjunto
+estreito e decidiu alargar: o corpo da base passa de 180 para 210 mm de
+diâmetro, e o pé de 200 para 230 mm de lado. O anel acompanha pelo vínculo, e a
+caixa acompanha o raio do corpo. A escala do braço continua sendo o diâmetro da
+base, agora 210 mm.
+
+Vendo a montagem ao lado de recortes da referência, a pessoa corrigiu três
+leituras. O anel da cintura é só a faixa escura fina logo acima da base, com
+cerca de 25 mm, uma faixa só; a faixa lisa acima dele, depois de uma divisão
+escura, já é o pescoço do ombro. O pescoço tem o mesmo diâmetro do anel, e não
+20 mm a menos como estava combinado, e sobe reto uns 30 mm antes da curva; o
+tambor e a posição do eixo do ombro serão lidos de novo com a pessoa quando a
+etapa do ombro começar, porque os números de antes supunham um pescoço mais
+fino. Na base, a quina do topo abria um sulco na junção com o anel e passa a
+ter só um chanfro pequeno, e o pé avança à esquerda por baixo da caixa até o
+meio dela, que é o que a referência mostra.

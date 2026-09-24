@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-741 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+745 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -440,6 +440,10 @@
 
 - `receita.js` — braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base.
 
+## procedural/pecas/braco-robotico/partes/anel-cintura/rodadas/
+
+- `receita-01.js` — braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base.
+
 ## procedural/pecas/braco-robotico/partes/base/
 
 - `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
@@ -448,6 +452,7 @@
 
 - `receita-01.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 - `receita-02.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+- `receita-03.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
@@ -623,6 +628,8 @@
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
 - `olhar-peca.mjs` — olhar-peca.mjs — o olho da OFICINA (D-55).
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
+- `sem-sessao-no-pacote.mjs` — sem-sessao-no-pacote.mjs — a sessão ativa não vai para `dist/`.
+- `sem-sessao-no-pacote.test.mjs` — sem-sessao-no-pacote.test.mjs — o pacote sai sem a sessão de quem construiu.
 - `skill-criar-peca.test.ts` — skill-criar-peca.test.ts — a skill de autoria é MEDIDA contra o núcleo, não revisada no olho. Duas afirmações da `.claude/skills/criar-peca/SKILL.md` custam …
 - `versao-publicada.mjs` — versao-publicada.mjs — de qual commit veio a página que está aberta.
 - `versao-publicada.test.mjs` — versao-publicada.test.mjs — prova que a versão na tela diz a verdade sobre a construção, inclusive quando não há git, não há commit ou a árvore está suja.

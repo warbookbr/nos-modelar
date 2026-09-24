@@ -64,14 +64,22 @@ export function atualizarRegistro(montagemId, medidas, anterior = null) {
     formato: FORMATO_REGISTRO_DE_ETAPAS,
     versao: VERSAO_REGISTRO_DE_ETAPAS,
     montagem: montagemId,
-    etapas: medidas.map(({ instancia, juntas }) => {
+    etapas: medidas.map(({ instancia, juntas, receita }) => {
       const passou = juntas.every((junta) => junta.satisfeita);
       const fixa = fixas.get(instancia);
-      if (!fixa) return { instancia, estado: 'aberta', juntas };
+      const comReceita = receita ? { receita } : {};
+      if (!fixa) return { instancia, estado: 'aberta', juntas, ...comReceita };
+      /* RECEITA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
+         desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
+         etapa continuava fixa com um aceite dado a outra peça. A impressão da
+         receita é guardada ao fixar e comparada a cada leitura. */
+      if (fixa.receita && receita && fixa.receita !== receita) {
+        return { instancia, estado: 'quebrada', juntas, ...comReceita, motivo: 'a receita mudou depois do aceite' };
+      }
       /* Quebrada que voltou a passar não se refixa sozinha com o aceite
          antigo: a pessoa aceitou outra coisa, e precisa olhar de novo. */
-      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas };
-      return { instancia, estado: passou ? 'fixa' : 'quebrada', juntas, aceite: fixa.aceite };
+      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comReceita };
+      return { instancia, estado: passou ? 'fixa' : 'quebrada', juntas, aceite: fixa.aceite, ...(fixa.receita ? { receita: fixa.receita } : comReceita) };
     }),
   };
 }

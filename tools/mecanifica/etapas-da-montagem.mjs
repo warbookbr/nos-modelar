@@ -14,9 +14,15 @@
  * Uso:
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json>
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --fixar <instância> --por <quem> [--observacao <texto>]
+ *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --olhar [--vistas frontal,direita,isometrica]
+ *
+ * `--olhar` desenha juntas, em vista ortográfica, as etapas que já têm
+ * geometria. A parte de cada etapa era mostrada sozinha, e a pessoa não
+ * conseguia julgar o anel da cintura sem vê-lo sobre a base.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
@@ -24,7 +30,9 @@ import {
   ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, proximaEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
+import { capturarMontagem } from './capturar-montagem.mjs';
 import { carregadoresDeReceitas } from './peca-com-parametros.mjs';
+import { REPO } from './resolver-caminho-receita.mjs';
 import { lerRodadas } from './rodada-de-modelagem.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -32,7 +40,7 @@ export const arquivoDoRegistro = (arquivoMontagem) => arquivoMontagem.replace(/\
 
 /* As receitas que a montagem cita, carregadas pelo nome curto. Uma receita
    exporta o objeto como `default` ou como `receita`. */
-async function receitasDaMontagem(montagem) {
+export async function receitasDaMontagem(montagem) {
   const receitas = {};
   for (const { alvo } of montagem.instancias) {
     if (alvo.tipo !== 'peca' || receitas[alvo.ref]) continue;
@@ -71,7 +79,16 @@ export function montagemAteAGeometria(dado, montagem, receitas) {
   };
 }
 
-export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior } = {}) {
+/* A impressão do texto de cada receita, por instância. Injetável no teste. */
+function impressoesDasReceitas(montagem, impressoes, emMemoria) {
+  if (impressoes) return impressoes;
+  if (emMemoria) return {};
+  return Object.fromEntries(montagem.instancias.filter((item) => item.alvo.tipo === 'peca').map((item) => [
+    item.id, createHash('sha256').update(readFileSync(resolverCaminhoReceita(item.alvo.ref))).digest('hex'),
+  ]));
+}
+
+export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, impressoes } = {}) {
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
   const todas = receitas ?? await receitasDaMontagem(montagem);
@@ -80,6 +97,10 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior } = 
     ? juntasPorEtapa(await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)), construidas)
     : [];
   const semGeometria = montagem.etapas.slice(construidas.length).map((instancia) => ({ instancia, juntas: [] }));
+  const impressao = impressoesDasReceitas(montagem, impressoes, Boolean(receitas));
+  for (const medida of [...medidas, ...semGeometria]) {
+    if (impressao[medida.instancia]) medida.receita = impressao[medida.instancia];
+  }
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior) };
@@ -108,6 +129,26 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
   return fixarEtapa(registro, instancia, aceite);
 }
 
+export const SAIDA_DAS_VISTAS = join(REPO, 'tools/bancadas/out');
+
+export async function olharEtapas(arquivoMontagem, { vistas = ['frontal', 'direita', 'isometrica'], saida = SAIDA_DAS_VISTAS } = {}) {
+  const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
+  const montagem = lerMontagemPersistida(dado);
+  const receitas = await receitasDaMontagem(montagem);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, receitas);
+  if (!construidas.length) throw new Error('nenhuma etapa tem geometria ainda; não há o que olhar.');
+  const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
+  const captura = await capturarMontagem({ montagem: resolvida, vistas, projecao: 'ortografica' });
+  if (!captura.ok) throw new Error(captura.erro.mensagem);
+  mkdirSync(saida, { recursive: true });
+  const arquivos = captura.resultado.capturas.map((vista) => {
+    const arquivo = join(saida, `etapas-${montagem.id}-${vista.nome}-orto.png`);
+    writeFileSync(arquivo, vista.dados);
+    return arquivo;
+  });
+  return { construidas, arquivos };
+}
+
 function gravar(arquivoMontagem, registro) {
   writeFileSync(arquivoDoRegistro(arquivoMontagem), `${JSON.stringify(registro, null, 2)}\n`, 'utf8');
 }
@@ -122,6 +163,10 @@ async function comoCLI(argv) {
   if (!arquivo) return { codigo: 1, texto: 'diga a montagem: etapas-da-montagem.mjs <montagem.json> [--fixar <instância> --por <quem>]' };
   const caminho = resolve(arquivo);
   const valor = (nome) => { const i = argv.indexOf(nome); return i >= 0 ? argv[i + 1] : undefined; };
+  if (argv.includes('--olhar')) {
+    const { construidas, arquivos } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean) });
+    return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
+  }
   const instancia = valor('--fixar');
   const registro = instancia
     ? await fixar(caminho, instancia, { por: valor('--por'), observacao: valor('--observacao') })

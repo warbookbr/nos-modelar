@@ -12,7 +12,12 @@ scene.add(new THREE.HemisphereLight('#ffffff', '#718078', 2.2));
 const luz = new THREE.DirectionalLight('#fff8ec', 4);
 luz.position.set(4, 7, 5);
 scene.add(luz);
-const camera = new THREE.PerspectiveCamera(38, 16 / 9, 0.01, 1000);
+const perspectiva = new THREE.PerspectiveCamera(38, 16 / 9, 0.01, 1000);
+/* Ortográfica para comparar com referência de lado, que é vista técnica: em
+   perspectiva a câmera vê o topo e o fundo das peças e o tamanho muda com a
+   distância. */
+const ortografica = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.001, 1000);
+let camera = perspectiva;
 
 function reconstituir(montagem) {
   return {
@@ -104,7 +109,7 @@ function enquadramento(caixa) {
   };
 }
 
-window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
+window.__mecanificaVisorMontagem = (dados, vista = 'isometrica', projecao = 'perspectiva') => {
   while (scene.children.length > 2) scene.remove(scene.children.at(-1));
   const visual = adaptarMontagemThree(reconstituir(dados));
   scene.add(visual.raiz);
@@ -116,9 +121,18 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   const centro = caixa.getCenter(new THREE.Vector3());
   const vetor = new THREE.Vector3(...direcao(vista)).normalize();
   renderer.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth / innerHeight;
   const envelope = envelopeProjetado(caixa, vetor, vista);
-  camera.position.copy(centro).addScaledVector(vetor, distanciaParaEnquadrar(envelope));
+  if (projecao === 'ortografica') {
+    camera = ortografica;
+    const aspecto = innerWidth / innerHeight;
+    const meiaAltura = Math.max(envelope.altura / 2 / 0.62, envelope.largura / 2 / 0.58 / aspecto, 0.01);
+    Object.assign(camera, { top: meiaAltura, bottom: -meiaAltura, left: -meiaAltura * aspecto, right: meiaAltura * aspecto });
+    camera.position.copy(centro).addScaledVector(vetor, envelope.profundidadeDianteira + 1);
+  } else {
+    camera = perspectiva;
+    camera.aspect = innerWidth / innerHeight;
+    camera.position.copy(centro).addScaledVector(vetor, distanciaParaEnquadrar(envelope));
+  }
   camera.up.set(0, 1, 0);
   if (vista === 'superior') camera.up.set(0, 0, -1);
   if (vista === 'inferior') camera.up.set(0, 0, 1);
@@ -128,6 +142,7 @@ window.__mecanificaVisorMontagem = (dados, vista = 'isometrica') => {
   return {
     id: dados.id,
     vista,
+    projecao,
     instancias: [...visual.instancias.values()].map((item) => item.caminho).sort(),
     enquadramento: enquadramento(caixa),
   };

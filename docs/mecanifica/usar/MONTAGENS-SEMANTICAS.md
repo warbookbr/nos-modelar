@@ -251,6 +251,10 @@ com a montagem em `procedural/pecas/<objeto>/montagem.json`, e é citada por
 `<objeto>/<parte>`. Enquanto a etapa dela não está fixa, a receita pode ter o
 `PLANO` e nenhum passo; `guarda:acervo` avisa e não reprova.
 
+`npm run etapas -- <montagem.json> --olhar` desenha juntas, em vista
+ortográfica, as etapas que já têm geometria, e grava as imagens em
+`tools/bancadas/out/etapas-<montagem>-<vista>-orto.png`.
+
 ## O que não existe
 
 Ainda não há:
