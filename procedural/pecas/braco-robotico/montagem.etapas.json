@@ -1,0 +1,22 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 1,
+  "montagem": "braco-robotico",
+  "etapas": [
+    {
+      "instancia": "base",
+      "estado": "aberta",
+      "juntas": []
+    },
+    {
+      "instancia": "anelCintura",
+      "estado": "aberta",
+      "juntas": []
+    },
+    {
+      "instancia": "ombro",
+      "estado": "aberta",
+      "juntas": []
+    }
+  ]
+}

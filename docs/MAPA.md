@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+739 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -443,6 +443,10 @@
 
 - `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 
+## procedural/pecas/braco-robotico/partes/base/rodadas/
+
+- `receita-01.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+
 ## procedural/pecas/braco-robotico/partes/ombro/
 
 - `receita.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
@@ -538,6 +542,8 @@
 
 - `acervo-receitas.js` — acervo-receitas.js — lista as receitas do acervo para a bancada abrir.
 - `acervo-receitas.test.js` — acervo-receitas.test.js — a lista que a bancada abre vem do acervo inteiro.
+- `caixa-do-visivel.js` — caixa-do-visivel.js — a caixa do que a câmera de fato mostra.
+- `caixa-do-visivel.test.js` — caixa-do-visivel.test.js — o enquadramento mede só o que aparece.
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
 - `controlar-partes.js` — controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual.
 - `controlar-partes.test.js` — controlar-partes.test.js — apresentação temporária apenas da seleção.

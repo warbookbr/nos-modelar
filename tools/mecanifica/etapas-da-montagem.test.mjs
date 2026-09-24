@@ -36,6 +36,26 @@ async function recusa(promessa, codigo) {
   expect(erro.codigo).toBe(codigo);
 }
 
+describe('etapas ainda sem geometria', () => {
+  /* O plano de todas as partes existe antes da geometria delas. O registro tem
+     de sair para a etapa em trabalho mesmo com as seguintes vazias. */
+  const comTopoVazio = () => ({ ...RECEITAS, 'bloco-com-furo': { ...RECEITAS['bloco-com-furo'], PASSOS: [] } });
+
+  it('resolve até antes da primeira receita vazia e deixa as seguintes abertas sem junta', async () => {
+    const { registro } = await estadoDasEtapas(arquivo, { receitas: comTopoVazio(), anterior: null });
+    expect(registro.etapas.map((e) => [e.instancia, e.estado, e.juntas.length])).toEqual([
+      ['base', 'aberta', 0], ['meio', 'aberta', 1], ['topo', 'aberta', 0],
+    ]);
+  });
+
+  it('a etapa sem geometria não pode ser fixada', async () => {
+    const receitas = comTopoVazio();
+    let registro = await fixar(arquivo, 'base', aceite, { receitas, anterior: null, rodadasDe: todasFechadas });
+    registro = await fixar(arquivo, 'meio', aceite, { receitas, anterior: registro, rodadasDe: todasFechadas });
+    await recusa(fixar(arquivo, 'topo', aceite, { receitas, anterior: registro, rodadasDe: () => [] }), 'etapa-sem-critico');
+  });
+});
+
 describe('etapas da montagem em disco', () => {
   it('mostra as etapas abertas e aponta a primeira', async () => {
     const { registro } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: null });

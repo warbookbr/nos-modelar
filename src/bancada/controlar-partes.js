@@ -1,5 +1,6 @@
 /* controlar-partes.js — seleção múltipla, contexto fantasma, isolamento e explosão visual. */
 import * as THREE from 'three';
+import { caixaDoVisivel } from './caixa-do-visivel.js';
 import {
   alternarSelecao,
   calcularVetoresExplosao,
@@ -129,7 +130,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
   let animacaoExplosao = 0;
 
   raiz.updateWorldMatrix(true, true);
-  const caixaRaiz = new THREE.Box3().setFromObject(raiz);
+  const caixaRaiz = caixaDoVisivel([raiz]);
   const centroMundo = caixaRaiz.getCenter(new THREE.Vector3());
   const centroLocal = raiz.worldToLocal(centroMundo.clone());
   const escalaMundo = raiz.getWorldScale(new THREE.Vector3());

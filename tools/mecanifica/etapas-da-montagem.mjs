@@ -44,14 +44,45 @@ async function receitasDaMontagem(montagem) {
   return receitas;
 }
 
+/* AS ETAPAS AINDA SEM GEOMETRIA. O plano de todas as partes nasce no
+   alinhamento, e a geometria de cada uma só na etapa dela. Resolver a montagem
+   inteira falhava na primeira porta que uma parte ainda vazia não publica, e o
+   registro não saía nem para a etapa em trabalho. Aqui a montagem é resolvida
+   até a última etapa antes da primeira receita sem passo; as seguintes entram
+   no registro abertas e sem junta, e não podem ser fixadas, porque fixar exige
+   o crítico ter fechado a peça. */
+export function montagemAteAGeometria(dado, montagem, receitas) {
+  const refDe = new Map(montagem.instancias.map((item) => [item.id, item.alvo.ref]));
+  const primeiraVazia = montagem.etapas.findIndex((id) => (receitas[refDe.get(id)]?.PASSOS ?? []).length === 0);
+  if (primeiraVazia < 0) return { dado, construidas: montagem.etapas };
+  const construidas = montagem.etapas.slice(0, primeiraVazia);
+  const fica = new Set(construidas);
+  const topo = (lado) => lado?.caminho?.[0];
+  return {
+    construidas,
+    dado: {
+      ...dado,
+      instancias: dado.instancias.filter((item) => fica.has(item.id)),
+      etapas: construidas,
+      relacoes: (dado.relacoes ?? []).filter((r) => fica.has(topo(r.referencia)) && fica.has(topo(r.movel))),
+      vinculos: (dado.vinculos ?? []).filter((v) => fica.has(v.alvo.instancia) && fica.has(v.de.instancia)),
+      posicoes: (dado.posicoes ?? []).filter((p) => fica.has(p.instancia) && fica.has(p.em.instancia)),
+    },
+  };
+}
+
 export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior } = {}) {
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
-  const carregadores = carregadoresDeReceitas(receitas ?? await receitasDaMontagem(montagem));
-  const resolvida = await resolverMontagemPersistida(dado, carregadores);
+  const todas = receitas ?? await receitasDaMontagem(montagem);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, todas);
+  const medidas = construidas.length
+    ? juntasPorEtapa(await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)), construidas)
+    : [];
+  const semGeometria = montagem.etapas.slice(construidas.length).map((instancia) => ({ instancia, juntas: [] }));
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
-  return { montagem, registro: atualizarRegistro(montagem.id, juntasPorEtapa(resolvida, montagem.etapas), registroAnterior) };
+  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior) };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é

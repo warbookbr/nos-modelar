@@ -11,7 +11,7 @@ import { capturarAlvo } from '../autoria/alvo-do-ajuste.js';
 import { descreverGesto } from '../autoria/descricao-do-gesto.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import { caixasPorParte, portasPublicadas } from '../autoria/descrever-partes.js';
-import { criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
+import { caixaDoVisivel, criarAmbienteBancada, posicionarNoEstudio } from './criar-ambiente.js';
 import { criarControladorPartes } from './controlar-partes.js';
 import { criarSelecaoBancada } from './criar-selecao.js';
 import { criarCamadaEdicaoDeMalha } from './edicao-de-malha.js';
@@ -256,7 +256,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       elemento.src = url;
     }).catch(() => null);
     if (!imagem) return null;
-    const caixa = new THREE.Box3().setFromObject(modeloAtual.raiz);
+    const caixa = caixaDoVisivel([modeloAtual.raiz]);
     const inicial = criarAlinhamentoInicial({ caixa, larguraImagem: imagem.naturalWidth, alturaImagem: imagem.naturalHeight, lado: entrada.alinhamento?.lado });
     const ajustes = Object.fromEntries(Object.entries(entrada.alinhamento ?? {}).filter(([, valor]) => valor !== null));
     const descritor = normalizarImagemReferencia({ ...entrada, url, alinhamento: { ...inicial, ...ajustes } });

@@ -71,3 +71,15 @@ describe('acervo de receitas da bancada', () => {
     expect(Array.isArray(prova.PASSOS)).toBe(true);
   });
 });
+
+describe('objeto de várias partes na bancada', () => {
+  it('a parte aparece pelo nome curto, e a cópia guardada pela rodada não vira peça', () => {
+    const importar = () => Promise.resolve({ default: {} });
+    const lista = listarAcervo({
+      '../../procedural/pecas/objeto/partes/base/receita.js': importar,
+      '../../procedural/pecas/objeto/partes/base/rodadas/receita-01.js': importar,
+      '../../procedural/pecas/solta/receita.js': importar,
+    });
+    expect(lista.map((e) => e.id)).toEqual(['objeto/base', 'solta']);
+  });
+});

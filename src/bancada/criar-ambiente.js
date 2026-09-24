@@ -2,6 +2,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VISTAS_BANCADA } from './estado-bancada.js';
+import { caixaDoVisivel } from './caixa-do-visivel.js';
+
+export { caixaDoVisivel };
 
 const COR_FUNDO = '#dce2df';
 const DURACAO_TRANSICAO = 280;
@@ -11,11 +14,7 @@ function suavizar(t) {
 }
 
 function caixaValida(objetos) {
-  const caixa = new THREE.Box3();
-  for (const objeto of objetos.filter(Boolean)) {
-    objeto.updateWorldMatrix(true, true);
-    caixa.expandByObject(objeto);
-  }
+  const caixa = caixaDoVisivel(objetos);
   return caixa.isEmpty() ? null : caixa;
 }
 
@@ -78,12 +77,12 @@ export function posicionarNoEstudio(objeto, { tamanhoMaximo = 3.4, piso = 0.08 }
   objeto.position.set(0, 0, 0);
   objeto.scale.setScalar(1);
   objeto.updateMatrixWorld(true);
-  const caixa = new THREE.Box3().setFromObject(objeto);
+  let caixa = caixaDoVisivel([objeto]);
   const tamanho = caixa.getSize(new THREE.Vector3());
   const maior = Math.max(tamanho.x, tamanho.y, tamanho.z, 0.001);
   objeto.scale.setScalar(tamanhoMaximo / maior);
   objeto.updateMatrixWorld(true);
-  caixa.setFromObject(objeto);
+  caixa = caixaDoVisivel([objeto]);
   const centro = caixa.getCenter(new THREE.Vector3());
   objeto.position.set(-centro.x, piso - caixa.min.y, -centro.z);
   objeto.updateMatrixWorld(true);
@@ -411,7 +410,7 @@ export function criarAmbienteBancada(canvas, { aoMudarVista, aoMudarCameraLivre 
     const maximo = new THREE.Vector2(-Infinity, -Infinity);
     let pontos = 0;
     for (const objeto of objetos.filter(Boolean)) {
-      objeto.traverse((filho) => {
+      objeto.traverseVisible((filho) => {
         const posicao = filho.geometry?.getAttribute?.('position');
         if (!posicao) return;
         const p = new THREE.Vector3();

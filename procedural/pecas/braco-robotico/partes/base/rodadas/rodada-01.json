@@ -1,0 +1,862 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/base",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 1 porta (assento), 3 contatos acontecem; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova com alertas de polo alto e 4 ilhas"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "corpo",
+        "tipo": "comprimento",
+        "onde": "extremidade superior",
+        "sentido": "maior",
+        "evidencia": "frontal-orto: o corpo tem cerca de 385 px de largura por 428 px de altura (razao perto de 1,11); no alvo, o bloco entre o anel escuro e o pe e aproximadamente quadrado (cerca de 105 por 105 px)"
+      },
+      {
+        "parte": "pe",
+        "tipo": "comprimento",
+        "onde": "extremidade direita",
+        "sentido": "maior",
+        "evidencia": "frontal-orto: a direita, o pe passa do corpo por cerca de 22 px (x 790 a 812); no alvo, a borda direita do pe fica praticamente rente ao corpo (x perto de 440)"
+      },
+      {
+        "parte": "pe",
+        "tipo": "superficie",
+        "onde": "borda esquerda",
+        "sentido": "segmentado",
+        "evidencia": "frontal-orto: a ponta esquerda do pe (x 383 a 410, y 920 a 960) mostra faixas verticais em degrau onde a borda arredondada deveria ser continua"
+      }
+    ],
+    "observacao": "O conjunto tem a leitura do alvo, com o corpo redondo, o pe quadrado arredondado e a caixa com botao a esquerda; os desvios sao de proporcao leve e de um acabamento em degraus na borda do pe."
+  },
+  "partes": [
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "loft de retângulos arredondados; não há operação de placa arredondada"
+    },
+    {
+      "nome": "caixaLateral",
+      "confere": true,
+      "observacao": "botão na face -X como segundo corpo da parte"
+    }
+  ],
+  "atrito": [
+    "ferramenta: a bancada enquadrava o gizmo escondido, 5x maior que a peça; desde 15/09 a peça saía pequena num canto e a checagem aprovava. Corrigido (caixaDoVisivel); o veredito sobre essas imagens foi descartado",
+    "ferramenta: npm run etapas falhava com etapas seguintes sem geometria; agora resolve até a primeira receita vazia",
+    "modelador: não há operação de placa ou caixa arredondada; foi loft, e a tampa do loft fica 0,4 mm fora do plano",
+    "modelador: a porta assento aponta para a faixa 10 do lathe, número que muda com segmentosCurva; aceitar 'ultima' como faixa resolveria",
+    "quem conduz: o despacho do crítico reescreveu o formato de resposta sem 'evidencia' e o registro recusou; o despacho não deve reescrever o formato da definição",
+    "plano: corpo de 200 mm e pé de 200 mm sobrando dos dois lados vieram do alinhamento; o crítico lê corpo quase quadrado e pé rente à direita; volta para a pessoa"
+  ],
+  "notaDePassagem": "O corpo é um lathe com concordância no topo. O assento publica a tampa, faixa 10, num número que só vale enquanto segmentosCurva for 8 e fileteDoTopo tiver concordância. O pé e a caixa são loft de retângulos arredondados com seções recuadas em arco, porque não existe caixa arredondada no catálogo. A caixa entra 30 mm no corpo para não deixar fresta contra a curva e afunda 1 mm no pé, porque a tampa do loft fica 0,4 mm abaixo da face. O anel da cintura deve sentar em y=0,220 com raio de 0,090.",
+  "receita": {
+    "sha256": "sha256:8021f86b72b1e34a2d1926a463891f945667f4e08912c828ed135919e22ebb5b",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 157,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-robotico/base — a base do braço robótico, com a caixa lateral."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Primeira etapa da montagem `braco-robotico/montagem.json`. O combinado com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * pessoa está em `../../ALINHAMENTO.md`; este arquivo traz o PLANO, a TABELA e"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * os contatos, e os passos são escritos pelo modelador."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * Direções: Y para cima; a vista frontal da bancada, que olha de +Z, é a vista"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * lateral da foto; o braço alcança para +X e a caixa fica em -X."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * Porta que a receita publica, porque a etapa seguinte nasce dela:"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *   assento — anel que recebe, eixo +Y, centro no meio do topo do corpo, face"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *             inteira do topo. O `anelCintura` senta aqui."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * Regra das portas de apoio do braço: quem recebe publica a face inteira,"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * de raio interno zero ao raio da face, numa faixa de 5 mm para dentro da"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * peça; quem se apoia publica só a borda de baixo, uma faixa de 10 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * largura até o raio dela e 5 mm para dentro dela. A montagem confere que a"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * borda inteira está sobre a face, sem fresta e no mesmo eixo."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  raioDoCorpo: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  alturaDoCorpo: 200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  ladoDoPe: 200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  alturaDoPe: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  saidaDaCaixa: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  larguraDaCaixa: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* A caixa termina este tanto abaixo do topo do corpo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  caixaAbaixoDoTopo: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Acabamento, escolhido pelo modelador. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  fileteDoTopo: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  fileteDoPe: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  cantoDoPe: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  cantoDaCaixa: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  fileteDaCaixa: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  /* Quanto a caixa entra no corpo para encostar sem fresta na curva dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  entradaDaCaixa: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  /* A tampa do loft é um leque quase plano, 0,4 mm abaixo da face: a caixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "     afunda este tanto no pé para o apoio ser contato de verdade. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  afundoDaCaixa: 1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  raioDoBotao: 9,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  saidaDoBotao: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  alturaDoBotao: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  ladosDoCorpo: 64,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "const ID = { corpo: 100, pe: 200, caixa: 300, botao: 400 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "/* Retângulo de cantos arredondados em [u,w], encolhido `recuo` de cada lado. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "function retangulo(meioU, meioW, canto, recuo) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const u = meioU - recuo, w = meioW - recuo, c = Math.max(canto - recuo, 0.0005);"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  return [[u, w, c], [-u, w, c], [-u, -w, c], [u, -w, c]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "/* Placa de bordas arredondadas: loft vertical de seções retangulares, com a"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "   quina de cima e de baixo aproximada por seções recuadas num quarto de arco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "function placa(origemId, centroX, centroZ, y0, y1, meioU, meioW, canto, filete) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  const secoes = [{ pos: [centroX, y0, centroZ], raio: 0 }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  /* O ponto do arco no próprio fundo fica de fora: a seção coincidiria com o polo, e o loft"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "     recusa segmento de comprimento zero. A tampa vira leque quase plano. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const arco = [0.3827, 0.7071, 0.9239, 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  for (const k of arco) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    const a = Math.acos(k);"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    secoes.push({ pos: [centroX, y0 + filete * (1 - Math.sin(a)), centroZ], contorno: retangulo(meioU, meioW, canto, filete * (1 - Math.cos(a))) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  for (const k of [...arco].reverse()) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    const a = Math.acos(k);"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    secoes.push({ pos: [centroX, y1 - filete * (1 - Math.sin(a)), centroZ], contorno: retangulo(meioU, meioW, canto, filete * (1 - Math.cos(a))) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  secoes.push({ pos: [centroX, y1, centroZ], raio: 0 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  return ['loft', { origemId, secoes, lados: 4 * 9, segmentosCurva: 8, orientacao: [1, 0, 0] }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  const R = m(t.raioDoCorpo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  const yPe = m(t.alturaDoPe);"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  const yTopo = yPe + m(t.alturaDoCorpo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  const xFora = -(R + m(t.saidaDaCaixa));"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const xDentro = -(R - m(t.entradaDaCaixa));"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    R, yPe, yTopo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    meioPe: m(t.ladoDoPe) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "    caixa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "      centroX: (xFora + xDentro) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "      meioU: (xDentro - xFora) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "      meioW: m(t.larguraDaCaixa) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "      y0: yPe - m(t.afundoDaCaixa),"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      y1: yTopo - m(t.caixaAbaixoDoTopo),"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "      xFora,"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    botao: { x: xFora, y: yPe + m(t.alturaDoBotao) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  const P = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    origemId: ID.corpo, lados: t.ladosDoCorpo, segmentosCurva: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    perfil: [[0, P.yPe], [P.R, P.yPe], [P.R, P.yTopo, m(t.fileteDoTopo)], [0, P.yTopo]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'lathe', id: ID.corpo } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  passos.push(placa(ID.pe, 0, 0, 0, P.yPe, P.meioPe, P.meioPe, m(t.cantoDoPe), m(t.fileteDoPe)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  passos.push(['parte', { nome: 'pe', sel: { origem: { op: 'loft', id: ID.pe } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const C = P.caixa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  passos.push(placa(ID.caixa, C.centroX, 0, C.y0, C.y1, C.meioU, C.meioW, m(t.cantoDaCaixa), m(t.fileteDaCaixa)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  passos.push(['lathe', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    origemId: ID.botao, eixo: 'x', lados: 24, segmentosCurva: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    perfil: [[0, -m(t.saidaDoBotao)], [m(t.raioDoBotao), -m(t.saidaDoBotao), m(2)], [m(t.raioDoBotao), m(1)], [0, m(1)]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    em: [P.botao.x, P.botao.y, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "  passos.push(['parte', { nome: 'caixaLateral', sel: { origem: { op: 'loft', id: ID.caixa } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "  passos.push(['parte', { nome: 'caixaLateral', sel: { origem: { op: 'lathe', id: ID.botao } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  passos.push(['publicarPorta', {"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 10 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    interface: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "      forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, P.yTopo, 0],"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "      raioInterno: 0, raioExterno: P.R, inicio: -0.005, fim: 0,"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    },"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "  }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.corpo } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  meta: { nome: 'braco-robotico/base', desc: 'base do braço robótico com a caixa lateral' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  TOPO: { origem: 'centro do fundo do pé no chão; y para cima, a caixa em -X' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    objeto: 'base do braço robótico industrial, presa no chão, com uma caixa colada no lado esquerdo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    referencias: ['../../referencias/lateral.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    escala: { medida: 'diâmetro do corpo da base', milimetros: 180 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "      { nome: 'corpo', forma: 'cilindro de revolução em pé, 180 mm de diâmetro e 200 mm de altura, com filete na quina do topo', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "      { nome: 'pe', forma: 'placa quadrada de 200 mm de lado e 20 mm de altura, cantos arredondados vistos de cima e filete na borda', tecnica: 'placa com cantos e bordas arredondados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "      { nome: 'caixaLateral', forma: 'caixa de cantos arredondados encostada no corpo em -X, 50 mm de saída, apoiada no pé só onde ele existe, 10 mm mais baixa que o corpo, com um botão ou conector na face de fora', tecnica: 'caixa com bordas arredondadas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "      'o corpo não é redondo visto de cima',"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "      'o pé não é quadrado de cantos arredondados visto de cima',"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "      'quina viva no topo do corpo ou na borda do pé',"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "      'a caixa solta do corpo, com fresta, ou flutuando acima do pé',"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "      'a caixa do lado errado: na vista frontal ela fica à esquerda, em -X',"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    { par: ['corpo', 'pe'], motivo: 'o corpo nasce no centro do pé' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "    { par: ['caixaLateral', 'corpo'], motivo: 'a caixa encosta no corpo sem fresta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "    { par: ['caixaLateral', 'pe'], motivo: 'a caixa se apoia no pé' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

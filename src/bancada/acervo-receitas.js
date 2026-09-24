@@ -33,6 +33,12 @@ function identificar(caminho) {
   const partes = caminho.split('/');
   const arquivo = partes[partes.length - 1].replace(/\.js$/, '');
   if (ENTRADAS_DE_PASTA.has(arquivo) && partes.length >= 2) {
+    /* Parte de objeto de várias partes, `<objeto>/partes/<parte>/receita.js`:
+       o nome é o mesmo que o resolvedor aceita, `<objeto>/<parte>`. Só o nome
+       da pasta repetiria `base` em cada objeto que tivesse uma. */
+    if (partes.length >= 4 && partes[partes.length - 3] === 'partes') {
+      return { id: `${partes[partes.length - 4]}/${partes[partes.length - 2]}`, montagem: arquivo === 'montagem' };
+    }
     return { id: partes[partes.length - 2], montagem: arquivo === 'montagem' };
   }
   return { id: arquivo, montagem: false };
@@ -82,6 +88,10 @@ export function listarAcervo(modulos = MODULOS, { ensaio = false } = {}) {
     const { id, montagem } = identificar(caminho);
     const arquivo = caminho.split('/').pop().replace(/\.js$/, '');
     if (!ENTRADAS_DE_PASTA.has(arquivo) && comEntrada.has(pastaDe(caminho))) continue;
+    /* Nem o que mora em subpasta de uma pasta de peça: a rodada guarda em
+       `rodadas/receita-NN.js` a cópia da receita que o crítico julgou, e ela
+       aparecia na lista como peça chamada `receita-01`. */
+    if ([...comEntrada].some((pasta) => caminho.startsWith(`${pasta}/`) && pastaDe(caminho) !== pasta)) continue;
     entradas.push({
       id,
       montagem,
