@@ -43,6 +43,9 @@ novo — nem por citação, nem por analogia.
   negrito no meio do texto. Descreva o fato, não a analogia: diga "o valor fixo
   deixa de corresponder ao parâmetro e as partes se atravessam", não "o número
   envelhece mal".
+- Responda curto. Diga cada fato uma vez, sem repetir com outras palavras,
+  sem recapitular o que o usuário já sabe e sem justificar além do que a
+  decisão pede. Um erro se reconhece em uma frase.
 - Rode os gates do INDEX com `npm run gates` antes de enviar. Ele escolhe sozinho a bateria curta quando só mudou peça ou documento e a completa em qualquer outro caso; durante o trabalho bastam os testes do que foi tocado. `--completo` força todos.
 - Não edite `docs/MAPA.md` à mão; rode `npm run mapa`.
 - Todo achado responde se o processo o teria pego sozinho. Quando não, o que
