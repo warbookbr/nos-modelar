@@ -52,6 +52,12 @@ export function lerPosicoes(valor, instancias, posesDeclaradas) {
   const porId = new Map(instancias.map((instancia) => [instancia.id, instancia]));
   const ids = new Set();
   const posicionadas = new Set();
+  /* PORTA OCUPADA. Duas partes mandadas para a mesma porta ficam no mesmo
+     lugar, e nada acusava: a montagem conferia só que cada parte tem uma
+     posição. Porta que recebe várias peças de propósito, como arruelas no mesmo
+     parafuso, ainda não tem caso real; quando tiver, entra como declaração
+     explícita, e não como silêncio. */
+  const ocupadas = new Map();
   const posicoes = valor.map((item, indice) => {
     const caminho = `posicoes[${indice}]`;
     if (!objetoSimples(item)) falhar('posicao-invalida', caminho, 'precisa ser objeto simples.');
@@ -71,6 +77,11 @@ export function lerPosicoes(valor, instancias, posesDeclaradas) {
     if (porId.get(emInstancia)?.alvo.tipo !== 'peca') falhar('posicao-invalida', `${caminho}.em.instancia`, `'${emInstancia}' precisa ser peça da montagem.`);
     if (emInstancia === instancia) falhar('vinculo-ciclo', caminho, `'${instancia}' não pode se posicionar em si mesma.`);
     const emPorta = texto(item.em.porta, `${caminho}.em.porta`);
+    const vaga = `${emInstancia}.${emPorta}`;
+    if (ocupadas.has(vaga)) {
+      falhar('porta-ocupada', `${caminho}.em`, `a porta '${emPorta}' de '${emInstancia}' já recebe '${ocupadas.get(vaga)}'; '${instancia}' não pode ir no mesmo lugar.`);
+    }
+    ocupadas.set(vaga, instancia);
     if (!Object.hasOwn(UNIDADES_DE_PARAMETRO, item.unidade)) {
       falhar('posicao-invalida', `${caminho}.unidade`, `aceita somente ${Object.keys(UNIDADES_DE_PARAMETRO).join(', ')}.`);
     }

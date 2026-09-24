@@ -169,6 +169,37 @@ procura também em `partes/`, a rodada aceita uma barra entre objeto e parte, e
 mantém o nome; trocar por `objetos` mexe em muitos caminhos sem ser preciso
 para o braço, e se for feito será em plano próprio.
 
+O `PLANO` das três primeiras partes e a montagem v5 delas estão escritos. Para
+isso o mecanismo recebeu quatro consertos genéricos, cada um com teste fora do
+braço. `guarda:acervo` aceita, com aviso, a parte que tem plano e nenhum passo
+enquanto a etapa dela não está fixa, porque o plano de todas as partes nasce no
+alinhamento e a geometria só na etapa de cada uma. `assentaAnular` passa a
+reprovar fresta entre as faces, que antes era medida e não cobrada, e aceita
+fresta só quando a relação declara `separacaoAxial`. A montagem recusa duas
+partes posicionadas na mesma porta, que antes ficavam no mesmo lugar sem
+aviso. E três testes que dependiam de peça no acervo, pulados enquanto ele
+estava vazio, supunham que toda peça mora direto em `pecas/<nome>/`; com o
+braço eles voltaram a rodar e foram corrigidos para usar o caminho resolvido.
+Nenhum desses quatro seria pego pelo processo sozinho: a fresta e a porta
+ocupada apareceram em perguntas da pessoa, e os testes só porque o acervo
+deixou de estar vazio.
+
+## Pendências anotadas para depois do braço
+
+Nada confere se a porta que a receita declara bate com a forma da peça: o
+resolvedor encaixa no centro e no eixo declarados, e a relação compara porta
+com porta. Uma porta posta alguns milímetros fora da face passa, e só o crítico
+a pegaria, se aparecer na imagem. A proposta é medir, na peça executada, se a
+face de onde a porta sai está no plano, no centro e no raio que a porta
+declara, e reprovar a diferença; entra em plano próprio antes de a segunda
+leva de partes do braço começar.
+
+Porta que recebe várias peças de propósito, como arruelas no mesmo parafuso,
+hoje é recusada; quando houver caso real, entra como declaração explícita na
+montagem. Modelar ao mesmo tempo partes que não dependem uma da outra, e aceitar
+partes pequenas em grupo em vez de uma parada por etapa, ficam para depois de o
+braço mostrar se fazem falta.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não

@@ -17,9 +17,10 @@
  * volta a ter ausência invisível, que foi como um pneu saiu maciço sem nada
  * acusar.
  */
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modelagem.js';
 import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
 import { caminhosDaReferencia } from '../../../src/autoria/plano-de-modelagem.js';
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
@@ -105,9 +106,56 @@ export function vazioDeclarado({ raiz = ACERVO } = {}) {
   return existsSync(join(raiz, DECLARACAO_DE_VAZIO));
 }
 
+/* PARTE PLANEJADA QUE ESPERA A VEZ. Num objeto de várias partes, o plano de
+   todas é escrito na rodada de alinhamento, e a geometria de cada uma só na
+   etapa dela. Entre uma coisa e outra a receita tem plano e nenhum passo, e os
+   contatos citam partes que ainda não existem. Reprovar isso obrigaria a
+   escrever o plano só na hora de modelar, longe do alinhamento.
+
+   A dispensa é estreita: a receita não tem passo nenhum, é citada numa
+   montagem do objeto (`<objeto>/montagem.json`), e a etapa dela não está fixa.
+   O plano continua validado e as referências continuam cobradas. Parte fixa
+   sem passo não existe, porque fixar exige o crítico ter fechado a peça. */
+export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
+  const [objeto, parte] = peca.split('/');
+  if (!parte) return null;
+  const arquivo = join(raiz, objeto, 'montagem.json');
+  if (!existsSync(arquivo)) return null;
+  const montagem = JSON.parse(readFileSync(arquivo, 'utf8'));
+  const instancia = (montagem.instancias ?? []).find((item) => item.alvo?.ref === peca);
+  if (!instancia || !(montagem.etapas ?? []).includes(instancia.id)) return null;
+  const registro = arquivo.replace(/\.json$/, '.etapas.json');
+  const estado = existsSync(registro)
+    ? JSON.parse(readFileSync(registro, 'utf8')).etapas?.find((e) => e.instancia === instancia.id)?.estado
+    : null;
+  return estado === 'fixa' ? null : { montagem: relative(raiz, arquivo).replaceAll('\\', '/'), instancia: instancia.id };
+}
+
+async function receitaSemPasso(peca) {
+  const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
+  const receita = modulo.default ?? modulo.receita;
+  return receita && Array.isArray(receita.PASSOS) && receita.PASSOS.length === 0 ? receita : null;
+}
+
 export async function conferirAcervo(pecas = pecasDoAcervo()) {
   const reprovadas = [];
+  const esperando = [];
   for (const peca of pecas) {
+    const espera = etapaQueEspera(peca);
+    const vazia = espera && await receitaSemPasso(peca);
+    if (vazia) {
+      try {
+        const plano = normalizarPlanoDeModelagem(vazia.PLANO);
+        if (!plano) throw new Error('a receita não exporta `PLANO`.');
+        const faltando = referenciasAusentes(peca, plano);
+        if (faltando.length) throw new Error(`referência(s) declarada(s) e ausente(s): ${faltando.join(', ')}.`);
+      } catch (erro) {
+        reprovadas.push({ peca, motivo: `PARTE PLANEJADA COM PLANO INVÁLIDO\n  ${erro.message}` });
+        continue;
+      }
+      esperando.push({ peca, ...espera });
+      continue;
+    }
     if (emArquivoSolto(peca)) {
       reprovadas.push({
         peca,
@@ -141,11 +189,11 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
       });
     }
   }
-  return { pecas, reprovadas };
+  return { pecas, reprovadas, esperando };
 }
 
 if (process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
-  const { pecas, reprovadas } = await conferirAcervo();
+  const { pecas, reprovadas, esperando } = await conferirAcervo();
   if (pecas.length === 0) {
     if (!vazioDeclarado()) {
       console.error(`guarda:acervo — o acervo está vazio e nada foi medido.\n`
@@ -166,6 +214,11 @@ if (process.argv[1] && process.argv[1].endsWith('guarda-acervo.mjs')) {
   for (const { peca, motivo } of reprovadas) {
     console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
   }
+  for (const { peca, montagem, instancia } of esperando) {
+    console.log(`guarda:acervo — ${peca} planejada, sem geometria: espera a etapa '${instancia}' de ${montagem}.`);
+  }
   if (reprovadas.length) process.exit(1);
-  console.log(`guarda:acervo ok — ${pecas.length} peça(s) do acervo medida(s): ${pecas.join(', ')}.`);
+  const medidas = pecas.filter((peca) => !esperando.some((e) => e.peca === peca));
+  console.log(`guarda:acervo ok — ${medidas.length} peça(s) medida(s)${medidas.length ? `: ${medidas.join(', ')}` : ''}`
+    + `${esperando.length ? `; ${esperando.length} planejada(s) esperando a etapa` : ''}.`);
 }

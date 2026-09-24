@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from '../importar-receita.mjs';
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
-import { DECLARACAO_DE_VAZIO, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
+import { DECLARACAO_DE_VAZIO, etapaQueEspera, pecasDoAcervo, vazioDeclarado } from './guarda-acervo.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -83,6 +83,11 @@ export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
         + '  dela mesma; só a comparação entre peças acusa.',
     };
   }
+
+  /* Parte planejada que espera a etapa: o referencial declarado já foi
+     conferido acima, e o chão só pode ser medido quando houver geometria. A
+     dispensa é a mesma de `guarda:acervo`. */
+  if (receita.PASSOS?.length === 0 && etapaQueEspera(peca)) return null;
 
   const { neutro } = executarReceita(receita);
   const fundo = fundoDaPeca(neutro);

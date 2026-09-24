@@ -179,6 +179,7 @@ function declararAssentamentoAnular(relacao) {
     movel: `movel.${relacao.movel.porta}`,
     sobreposicaoRadial: relacao.especificacao.sobreposicaoRadial,
     sobreposicaoAxial: relacao.especificacao.sobreposicaoAxial,
+    ...(relacao.especificacao.separacaoAxial ? { separacaoAxial: relacao.especificacao.separacaoAxial } : {}),
     toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
   };
 }

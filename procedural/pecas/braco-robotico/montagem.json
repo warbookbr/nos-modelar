@@ -1,0 +1,69 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "braco-robotico",
+  "instancias": [
+    { "id": "base", "alvo": { "tipo": "peca", "ref": "braco-robotico/base" } },
+    { "id": "anelCintura", "alvo": { "tipo": "peca", "ref": "braco-robotico/anel-cintura" } },
+    { "id": "ombro", "alvo": { "tipo": "peca", "ref": "braco-robotico/ombro" } }
+  ],
+  "relacoes": [
+    {
+      "id": "anelSentaNaBase",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["base"], "porta": "assento" },
+      "movel": { "caminho": ["anelCintura"], "porta": "apoio" },
+      "especificacao": {
+        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "toleranciaNumerica": 0.000001
+      }
+    },
+    {
+      "id": "ombroSentaNoAnel",
+      "tipo": "assentaAnular",
+      "referencia": { "caminho": ["anelCintura"], "porta": "topo" },
+      "movel": { "caminho": ["ombro"], "porta": "apoio" },
+      "especificacao": {
+        "sobreposicaoRadial": { "nominal": 0.01, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "sobreposicaoAxial": { "nominal": 0, "toleranciaFabricacao": { "menos": 0, "mais": 0 } },
+        "toleranciaNumerica": 0.000001
+      }
+    }
+  ],
+  "etapas": ["base", "anelCintura", "ombro"],
+  "vinculos": [
+    {
+      "id": "anelComORaioDaBase",
+      "alvo": { "instancia": "anelCintura", "param": "raio" },
+      "de": { "instancia": "base", "porta": "assento", "medida": "raio" },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "pescocoMaisEstreitoQueOAnel",
+      "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
+      "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raio" },
+      "unidade": "mm",
+      "acrescimo": -10
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "anelSobreABase",
+      "instancia": "anelCintura",
+      "porta": "apoio",
+      "em": { "instancia": "base", "porta": "assento" },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "ombroSobreOAnel",
+      "instancia": "ombro",
+      "porta": "apoio",
+      "em": { "instancia": "anelCintura", "porta": "topo" },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ]
+}

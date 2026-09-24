@@ -238,6 +238,19 @@ etapa em que a segunda parte entra e só fixa etapa em ordem, com juntas
 passando e com o aceite da pessoa. A prova mínima está em
 `tools/fixtures/tres-blocos-vinculados/`.
 
+O leitor também recusa duas instâncias posicionadas na mesma porta, porque
+elas ficariam no mesmo lugar. Peça apoiada sobre peça usa a relação
+`assentaAnular`, com portas em forma de anel: quem recebe publica a face, quem
+se apoia publica a borda. Ela confere o eixo, a sobreposição radial e a axial,
+e reprova qualquer fresta entre as faces; fresta só é aceita quando a
+especificação traz `separacaoAxial`, com a mesma forma de faixa das outras
+medidas.
+
+Parte de objeto de várias partes mora em `procedural/pecas/<objeto>/partes/<parte>/`,
+com a montagem em `procedural/pecas/<objeto>/montagem.json`, e é citada por
+`<objeto>/<parte>`. Enquanto a etapa dela não está fixa, a receita pode ter o
+`PLANO` e nenhum passo; `guarda:acervo` avisa e não reprova.
+
 ## O que não existe
 
 Ainda não há:

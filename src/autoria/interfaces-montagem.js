@@ -545,6 +545,13 @@ export function validarAssentamentoAnular(declaracao, portas) {
   const tolerancia = toleranciaNumericaDe(declaracao, `${quem}.${id}`);
   const radialEsperado = faixaDeEspecificacao(declaracao, 'sobreposicaoRadial', `${quem}.${id}`);
   const axialEsperado = faixaDeEspecificacao(declaracao, 'sobreposicaoAxial', `${quem}.${id}`);
+  /* FRESTA SÓ QUANDO DECLARADA. A separação entre as faces era medida e não
+     cobrada: uma peça posta alguns milímetros acima da outra passava. Sem
+     `separacaoAxial` na declaração, a fresta permitida é zero; quem quer folga
+     entre faces escreve a faixa, e ela fica visível na montagem. */
+  const frestaEsperada = declaracao.separacaoAxial === undefined
+    ? { minimo: 0, maximo: 0, nominal: 0, toleranciaFabricacao: null, formato: 'sem-fresta' }
+    : faixaDeEspecificacao(declaracao, 'separacaoAxial', `${quem}.${id}`);
   const referencia = portaDo(portas, declaracao.referencia, quem);
   const movel = portaDo(portas, declaracao.movel, quem);
   const diagnosticos = [];
@@ -581,10 +588,13 @@ export function validarAssentamentoAnular(declaracao, portas) {
   if (sobreposicaoAxial < axialEsperado.minimo - tolerancia || sobreposicaoAxial > axialEsperado.maximo + tolerancia) {
     diagnosticos.push({ codigo: 'faixa-axial-fora', observado: sobreposicaoAxial, ...axialEsperado, tolerancia });
   }
+  if (separacaoAxial < frestaEsperada.minimo - tolerancia || separacaoAxial > frestaEsperada.maximo + tolerancia) {
+    diagnosticos.push({ codigo: 'fresta-fora', observado: separacaoAxial, ...frestaEsperada, tolerancia });
+  }
   return {
     id, tipo: 'assentaAnular', satisfeita: diagnosticos.length === 0,
     referencia: referencia.id, movel: movel.id,
-    medidas: { disponiveis: true, alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado },
+    medidas: { disponiveis: true, alinhamento, descentro, sobreposicaoRadial, sobreposicaoAxial, separacaoAxial, tolerancia, toleranciaNumerica: tolerancia, radialEsperado, axialEsperado, frestaEsperada },
     diagnosticos,
   };
 }

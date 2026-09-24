@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
-import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { etapaQueEspera, pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
 let raiz;
 let pecas;
@@ -44,5 +44,26 @@ describe('parte de objeto', () => {
 
   it('o acervo lista a parte pelo mesmo nome curto', () => {
     expect(pecasDoAcervo(pecas)).toEqual(['objeto-de-prova/anel-cintura', 'objeto-de-prova/base']);
+  });
+});
+
+describe('parte planejada que espera a etapa', () => {
+  const montagem = (etapas) => JSON.stringify({
+    instancias: [{ id: 'base', alvo: { tipo: 'peca', ref: 'objeto-de-prova/base' } }], etapas,
+  });
+
+  it('espera quando está numa etapa ainda não fixa', () => {
+    writeFileSync(join(pecas, 'objeto-de-prova/montagem.json'), montagem(['base']));
+    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas }))
+      .toEqual({ montagem: 'objeto-de-prova/montagem.json', instancia: 'base' });
+  });
+
+  it('não espera quando a etapa já está fixa, nem quando nenhuma etapa a cita', () => {
+    writeFileSync(join(pecas, 'objeto-de-prova/montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'base', estado: 'fixa' }] }));
+    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas })).toBe(null);
+    rmSync(join(pecas, 'objeto-de-prova/montagem.etapas.json'));
+    writeFileSync(join(pecas, 'objeto-de-prova/montagem.json'), montagem([]));
+    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas })).toBe(null);
+    expect(etapaQueEspera('objeto-de-prova/anel-cintura', { raiz: pecas })).toBe(null);
   });
 });

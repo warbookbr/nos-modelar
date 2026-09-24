@@ -168,7 +168,13 @@ tambor visivelmente afastado do anel; face do tambor que não aponta para a
 frente, com o eixo do ombro fora da horizontal ou girado para o lado errado;
 curva de 90° com canto vivo por fora; ombro fora do eixo vertical da cintura.
 
-## Ainda em aberto nesta rodada
+## Depois da rodada
 
-Escrever o `PLANO` das receitas e a montagem v5 a partir deste registro, e ler
-o resultado para a pessoa confirmar.
+O pé passa só 10 mm além do corpo, e a caixa sai 50 mm; a pessoa decidiu que a
+caixa se apoia no pé só na parte que está sobre ele e passa da borda do resto.
+
+O `PLANO` de cada parte está na receita dela, em `partes/`, e a montagem v5 em
+`montagem.json`. A largura da caixa, 90 mm, não aparece em nenhuma imagem e foi
+escolhida; a altura do anel e as medidas do tambor foram lidas na foto com o
+erro dito acima. As junções de apoio usam `assentaAnular`, que reprova fresta
+não declarada.

@@ -8,11 +8,12 @@
  */
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { gravarRodada, lerRodadas, pastaDeRodadas } from './rodada-de-modelagem.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 let area;
 const ler = (peca) => lerRodadas(peca, { pasta: join(area, peca) });
@@ -101,8 +102,8 @@ describe('registro de rodadas', () => {
        caminho de fallback quando aquela peça sair, e aí ele afirma o contrário
        do que promete sem ninguém notar. */
     const [peca] = pecasDoAcervo();
-    expect(pastaDeRodadas(peca).replaceAll('\\', '/'))
-      .toMatch(new RegExp(`procedural/pecas/${peca}/rodadas$`));
+    expect(pastaDeRodadas(peca)).toBe(join(dirname(resolverCaminhoReceita(peca)), 'rodadas'));
+    expect(pastaDeRodadas(peca).replaceAll('\\', '/')).toMatch(/procedural\/pecas\//);
   });
 
   it('peça que não existe, ou que é arquivo solto, grava no lugar antigo', () => {

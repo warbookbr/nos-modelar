@@ -128,7 +128,7 @@ function lerEspecificacao(valor, tipo, caminho) {
   if (!ehObjetoSimples(valor)) falhar('especificacao-invalida', caminho, 'precisa ser objeto simples.');
   const chaves = tipo === 'encaixaCilindrico'
     ? ['folgaRadial', 'toleranciaNumerica']
-    : ['sobreposicaoRadial', 'sobreposicaoAxial', 'toleranciaNumerica'];
+    : ['sobreposicaoRadial', 'sobreposicaoAxial', 'separacaoAxial', 'toleranciaNumerica'];
   chavesExatas(valor, chaves, caminho);
   const especificacao = {
     ...(tipo === 'encaixaCilindrico'
@@ -136,6 +136,9 @@ function lerEspecificacao(valor, tipo, caminho) {
       : {
         sobreposicaoRadial: lerFaixa(valor.sobreposicaoRadial, `${caminho}.sobreposicaoRadial`),
         sobreposicaoAxial: lerFaixa(valor.sobreposicaoAxial, `${caminho}.sobreposicaoAxial`),
+        /* A fresta entre as faces só é aceita quando escrita aqui; sem o
+           campo, a validação exige fresta zero. */
+        ...(valor.separacaoAxial === undefined ? {} : { separacaoAxial: lerFaixa(valor.separacaoAxial, `${caminho}.separacaoAxial`) }),
       }),
     toleranciaNumerica: numeroFinitoNaoNegativo(valor.toleranciaNumerica, `${caminho}.toleranciaNumerica`),
   };

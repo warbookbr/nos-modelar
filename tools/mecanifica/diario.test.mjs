@@ -8,11 +8,12 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { iniciarRegistro } from './diario.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { resumir } from './ler-diario.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -86,7 +87,7 @@ describe('diário da oficina', () => {
     /* Sem isto, o mesmo trabalho apareceria como dois alvos distintos e a
        contagem de repetição — o sinal de "emperrou" — nunca acusaria nada. */
     iniciarRegistro('rodada-curta', PECA_DO_ACERVO, { destino: DIARIO })({ codigo: 0 });
-    iniciarRegistro('rodada-longa', `procedural/pecas/${PECA_DO_ACERVO}/receita.js`, { destino: DIARIO })({ codigo: 0 });
+    iniciarRegistro('rodada-longa', relative(REPO, resolverCaminhoReceita(PECA_DO_ACERVO)), { destino: DIARIO })({ codigo: 0 });
     const curta = linhasDoDiario().findLast((l) => l.comando === 'rodada-curta');
     const longa = linhasDoDiario().findLast((l) => l.comando === 'rodada-longa');
     expect(longa.alvo).toBe(curta.alvo);

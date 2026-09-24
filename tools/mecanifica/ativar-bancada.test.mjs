@@ -10,11 +10,12 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { ativarReceitaBancada } from './ativar-bancada.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(AQUI, '../..');
@@ -152,7 +153,11 @@ describe('ativar-bancada: grito do motor é recusa', () => {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
-    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain(PECA_DO_ACERVO);
+    /* O id sai do caminho da receita, e a parte de um objeto mora em
+       `<objeto>/partes/<parte>`: compara-se com o caminho resolvido, e não com
+       o nome curto. */
+    const semExtensao = relative(REPO, resolverCaminhoReceita(PECA_DO_ACERVO)).replace(/\.js$/, '');
+    expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.id).toContain(semExtensao.replace(/[\\/]/g, '-'));
   });
 
   it('aceita argumento posicional com caminho relativo à raiz', () => {

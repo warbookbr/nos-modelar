@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-733 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+736 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -431,13 +431,21 @@
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 
-## procedural/pecas/
-
-- `ACERVO-SEM-PECA.md` — O acervo está sem peça
-
 ## procedural/pecas/braco-robotico/
 
 - `ALINHAMENTO.md` — Braço robótico — rodada de alinhamento
+
+## procedural/pecas/braco-robotico/partes/anel-cintura/
+
+- `receita.js` — braco-robotico/anel-cintura — o anel escuro da cintura, sobre a base.
+
+## procedural/pecas/braco-robotico/partes/base/
+
+- `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+
+## procedural/pecas/braco-robotico/partes/ombro/
+
+- `receita.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
 
 ## procedural/servicos/
 
@@ -485,6 +493,7 @@
 - `forma-da-parte.js` — forma-da-parte — a peça saiu com a forma que a receita prometeu?
 - `forma-da-parte.test.mjs` — forma-da-parte.test.mjs — a promessa de forma só vale se ela reprovar.
 - `forma-global.js` — Contrato e executor neutros da N2. A fonte é um andaime de volumes semânticos; a malha e as projeções são produtos derivados sem identidade. Este módulo não …
+- `fresta-e-porta-ocupada.test.js` — fresta-e-porta-ocupada.test.js — duas coisas que a montagem deixava passar em silêncio: fresta entre faces apoiadas e duas partes na mesma porta.
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações cilíndricas/anulares e deriva uma prévia cilíndrica sem Three.js, hierarquia ou s…
