@@ -24,7 +24,7 @@ export const TABELA = {
   ladoDoPe: 200,
   alturaDoPe: 20,
   saidaDaCaixa: 50,
-  larguraDaCaixa: 90,
+  larguraDaCaixa: 120,
   /* A caixa termina este tanto abaixo do topo do corpo. */
   caixaAbaixoDoTopo: 10,
   /* Acabamento, escolhido pelo modelador. */
@@ -120,6 +120,9 @@ export function gerarPassos(t = TABELA) {
     },
   }]);
   passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.corpo } } }]);
+  /* O pé é loft de seções recuadas em arco; sem liso a sombra marca cada seção como degrau. */
+  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.pe } } }]);
+  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.caixa } } }]);
   return passos;
 }
 

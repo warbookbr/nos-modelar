@@ -174,7 +174,10 @@ O pé passa só 10 mm além do corpo, e a caixa sai 50 mm; a pessoa decidiu que 
 caixa se apoia no pé só na parte que está sobre ele e passa da borda do resto.
 
 O `PLANO` de cada parte está na receita dela, em `partes/`, e a montagem v5 em
-`montagem.json`. A largura da caixa, 90 mm, não aparece em nenhuma imagem e foi
-escolhida; a altura do anel e as medidas do tambor foram lidas na foto com o
+`montagem.json`. A largura da caixa na direção Z não aparece em nenhuma imagem;
+começou em 90 mm e, vista de cima na rodada 1, a pessoa decidiu 120 mm; a altura do anel e as medidas do tambor foram lidas na foto com o
 erro dito acima. As junções de apoio usam `assentaAnular`, que reprova fresta
 não declarada.
+
+Na rodada 1 da base o crítico leu o corpo um pouco alto e o pé sobrando à
+direita. A pessoa manteve as duas medidas: corpo de 200 mm e pé centrado.

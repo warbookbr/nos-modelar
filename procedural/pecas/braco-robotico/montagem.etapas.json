@@ -5,8 +5,12 @@
   "etapas": [
     {
       "instancia": "base",
-      "estado": "aberta",
-      "juntas": []
+      "estado": "fixa",
+      "juntas": [],
+      "aceite": {
+        "por": "pessoa",
+        "observacao": "aprovou a vista de cima com a caixa em 120 mm; manteve corpo de 200 mm e pé centrado"
+      }
     },
     {
       "instancia": "anelCintura",

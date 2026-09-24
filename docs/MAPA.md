@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-739 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+740 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -446,6 +446,7 @@
 ## procedural/pecas/braco-robotico/partes/base/rodadas/
 
 - `receita-01.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+- `receita-02.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 

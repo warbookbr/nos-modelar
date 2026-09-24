@@ -1,0 +1,77 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/base",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, porta assento, 3 contatos acontecem; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova com alertas de polo alto e 4 ilhas, 2720 triângulos"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Corpo redondo com filete, pé quadrado de cantos e borda arredondados e caixa à esquerda apoiada no pé e sem fresta reproduzem a silhueta da base do alvo; posição do conector não confirmável na escala."
+  },
+  "partes": [
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "loft com liso; borda sem faixas na frontal"
+    },
+    {
+      "nome": "caixaLateral",
+      "confere": true,
+      "observacao": "120 mm em Z por decisão da pessoa"
+    }
+  ],
+  "atrito": [
+    "modelador: o efeito do liso sobre os degraus do loft só aparece na imagem; nenhuma medida diz se uma parte ficou sem normal suavizada",
+    "modelador: liso precisa de um passo por origem; um passo por parte evitaria esquecer um loft, como aconteceu com o pé na rodada 1",
+    "pessoa: aprovou a vista de cima antes do crítico e manteve corpo de 200 mm e pé centrado; a caixa passou a 120 mm em Z"
+  ],
+  "notaDePassagem": "Nesta rodada só mudou o acabamento e a largura da caixa. Pé e caixa, loft de seções em arco, receberam liso, porque sem isso a sombra mostrava cada seção como degrau. A caixa tem 120 mm em Z por decisão da pessoa. A porta assento não mudou (faixa 10, que depende de segmentosCurva 8); o anel da cintura senta em y=0,220 com raio 0,090. Corpo de 200 mm e pé centrado são decisão da pessoa e não devem ser corrigidos.",
+  "receita": {
+    "sha256": "sha256:ad298aad2948aefead3048901e064bb638689af6ea3daa5499450213c9dd9136",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 1,
+      "acrescentadas": 4,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": "  larguraDaCaixa: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  larguraDaCaixa: 120,"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "  /* O pé é loft de seções recuadas em arco; sem liso a sombra marca cada seção como degrau. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.pe } } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "  passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.caixa } } }]);"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
