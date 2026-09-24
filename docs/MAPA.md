@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-758 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+759 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -931,6 +931,7 @@
 - `visor-montagem.html` — visor-montagem.html — superfície privada para evidência visual de montagem.
 - `visor-montagem.js` — visor-montagem.js — renderizador privado, derivado de montagem já resolvida.
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote de imagens que a crítica visual precisa receber.
+- `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o prefixo que apaga as imagens velhas pega só as da peça pedida.
 
 ## tools/mecanifica/fixtures/
 

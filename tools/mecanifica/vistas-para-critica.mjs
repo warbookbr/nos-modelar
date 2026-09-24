@@ -21,7 +21,7 @@
  * malha entregaria só o que existe, que é justamente o que não se quer
  * perguntar.
  */
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { olharBancada } from './olhar-bancada.mjs';
@@ -39,6 +39,21 @@ export const RES_PARTE = '900x900';
 export const VISTAS_DO_CONJUNTO = 'isometrica,frontal,direita,superior';
 export const VISTAS_DA_PARTE = 'direita,isometrica';
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
+
+/* As imagens velhas da peça saem antes de cada pacote. A vista de trás sem
+   arame não era gerada aqui, e a de uma captura antiga ficava na pasta com o
+   mesmo nome: em 2026-09-24 três ajustes do ombro foram julgados sobre ela sem
+   ninguém perceber que era mais velha que a receita. */
+export function prefixoDaPeca(peca) {
+  return `bancada-${peca.replace(/[\\/]/g, '-')}-`;
+}
+
+function apagarImagensAntigas(peca) {
+  const prefixo = prefixoDaPeca(peca);
+  for (const nome of readdirSync(SAIDA_PADRAO)) {
+    if (nome.startsWith(prefixo) && nome.endsWith('.png')) rmSync(join(SAIDA_PADRAO, nome));
+  }
+}
 
 export function partesDoPlano(receita) {
   const partes = receita?.PLANO?.partes;
@@ -58,9 +73,16 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
   const receita = receitaDoModulo(await importarReceita(caminho));
   const partes = partesDoPlano(receita);
   mkdirSync(SAIDA_PADRAO, { recursive: true });
+  apagarImagensAntigas(peca);
 
   const conjunto = await olharBancada({ peca, revisar: true, res: RES_CONJUNTO, logger });
   exigirCaptura(conjunto, 'conjunto');
+  /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
+     sai numa captura própria. */
+  const traseira = await olharBancada({
+    peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO, logger,
+  });
+  exigirCaptura(traseira, 'traseira');
 
   /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
      mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
@@ -96,7 +118,7 @@ export async function vistasParaCritica(peca, { logger = null } = {}) {
     porParte.push({ parte, resultado });
   }
 
-  return { peca, partes, conjunto, arame, raioX, porParte };
+  return { peca, partes, conjunto, traseira, arame, raioX, porParte };
 }
 
 /* Captura que não produziu arquivo recusa alto. A bancada devolve `ok:false` e
@@ -123,6 +145,7 @@ function arquivosDe(resposta) {
 function imprimir(resultado) {
   const linhas = [`vistas:critica — ${resultado.peca}`, '', 'CONJUNTO (proporção e silhueta):'];
   for (const arquivo of arquivosDe(resultado.conjunto)) linhas.push(`  ${arquivo}`);
+  for (const arquivo of arquivosDe(resultado.traseira)) linhas.push(`  ${arquivo}`);
   linhas.push('', 'ARAME (a malha, que a sombra esconde):');
   for (const arquivo of arquivosDe(resultado.arame)) linhas.push(`  ${arquivo}`);
   for (const arquivo of arquivosDe(resultado.raioX)) linhas.push(`  ${arquivo} (raio X)`);
