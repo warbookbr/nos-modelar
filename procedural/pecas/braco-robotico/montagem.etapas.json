@@ -60,17 +60,17 @@
           }
         }
       ],
-      "receita": "c496ba222445cf570e109902f47e7164ff356a600a86b33c3415450eeb91c14a",
       "aceite": {
         "por": "pessoa",
         "observacao": "aceitou a rodada 2: faixa única de 25 mm"
-      }
+      },
+      "receita": "c496ba222445cf570e109902f47e7164ff356a600a86b33c3415450eeb91c14a"
     },
     {
       "instancia": "ombro",
       "estado": "aberta",
       "juntas": [],
-      "receita": "f5c3ac2e5bf2712d51f92f7634d7c4173734da17d864b909b50bd9a388ce56a5"
+      "receita": "55d75d03a1efc90408c871d028129e4b1ba3ae02970e0afce711a4f23e48884d"
     }
   ]
 }

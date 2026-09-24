@@ -200,6 +200,23 @@ montagem. Modelar ao mesmo tempo partes que não dependem uma da outra, e aceita
 partes pequenas em grupo em vez de uma parada por etapa, ficam para depois de o
 braço mostrar se fazem falta.
 
+## Ferramentas de forma a estudar
+
+No ombro, o modelador levou três rodadas num tubo curvo feito por `loft`, e
+os erros vieram de montar a lista de seções à mão: a parede de dentro dobrou
+sobre si mesma porque o raio da curva ficou menor que o raio do tubo, as
+pontas fecharam com um polo de 0,4 mm digitado fora da tabela, o trecho reto
+somado ao raio da curva não fechou na altura do tambor, e nenhuma medida
+acusou a dobra. A ferramenta sugerida é um gerador de tubo por caminho, do
+mesmo tipo de `criarCaminhoSimetrico`: a receita diz o raio, os trechos retos
+e as curvas, e o gerador calcula seções, orientação e pontas, e recusa curva
+mais fechada que o tubo. Junto dele fica pedido um estudo de outras
+ferramentas que resolvam forma de maneira concreta, cada uma justificada por
+um tropeço registrado em rodada, como o encontro de duas partes que precisam
+parecer uma peça só e a conferência de que uma parte escondida não aparece.
+Os dois entram em plano próprio, depois do braço ou quando uma etapa parar
+por falta deles.
+
 ## Plano candidato a seguir este
 
 [O contorno sai da imagem](congelados/2026-09-24-o-contorno-sai-da-imagem.md)

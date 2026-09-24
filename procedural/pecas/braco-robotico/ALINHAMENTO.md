@@ -199,3 +199,29 @@ etapa do ombro começar, porque os números de antes supunham um pescoço mais
 fino. Na base, a quina do topo abria um sulco na junção com o anel e passa a
 ter só um chanfro pequeno, e o pé avança à esquerda por baixo da caixa até o
 meio dela, que é o que a referência mostra.
+
+Os números do ombro foram relidos com a pessoa na escala nova e conferidos num
+esboço de cilindros montado sobre a base e o anel: tambor de 240 mm de diâmetro
+e 80 mm de espessura, eixo do tambor 120 mm acima do topo do anel, face da
+frente 150 mm à frente do eixo da cintura, apontando para +Z. A pessoa chegou a
+pedir o tambor virado para a direita e voltou atrás ao ver que a foto mostra a
+face dele como círculo e que a junta gira o braço no plano da foto.
+
+O ombro em cotovelo de cano foi reprovado pela pessoa depois de três rodadas.
+A curva do tubo, com raio menor que o do próprio tubo, dobrava a parede de
+dentro, e o pescoço aparecia por baixo do tambor perto do anel; a rodada 3
+achou isso e aparou a parede, mas sobraram degrau e lâmina à vista. A pessoa
+também achou a traseira toda curva lisa demais para um braço industrial.
+
+A forma nova vem de um segundo rascunho da pessoa, em
+`referencias/ombro-rascunho2-*.png`, validada como plausível: um colar
+cilíndrico de 30 mm com o diâmetro do anel e chanfro no topo, que se funde
+visualmente com o corpo; um corpo com planta em D, reto e plano na frente,
+onde a junta se monta, e redondo atrás no raio do colar, para não varrer área
+fora da cintura ao girar; topo plano a 240 mm e uma rampa abaulada descendo
+atrás até 120 mm. O tambor passou a ser um disco fino e largo, 300 mm de
+diâmetro e 40 mm de espessura, encostado na face plana do bloco com o eixo a
+135 mm, para cobrir as quinas da face quadrada vista de frente. A face do bloco
+fica 20 mm além do colar, a 125 mm do eixo da cintura. As medidas foram
+conferidas num esboço montado sobre a base e o anel. A técnica prevista para o
+corpo é `inflate`, o cruzamento da planta com a silhueta lateral.

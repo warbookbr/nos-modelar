@@ -41,8 +41,8 @@
       "acrescimo": 0
     },
     {
-      "id": "pescocoComORaioDoAnel",
-      "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
+      "id": "colarComORaioDoAnel",
+      "alvo": { "instancia": "ombro", "param": "raioDoColar" },
       "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raioExterno" },
       "unidade": "mm",
       "acrescimo": 0
