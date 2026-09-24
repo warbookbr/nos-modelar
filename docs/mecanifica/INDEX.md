@@ -169,11 +169,12 @@ repete e o que saiu 0 sem entregar. Desligar: `MECANIFICA_DIARIO=0`.
 npm run gates
 ```
 
-Roda TODOS e relata TODOS, com saída não-zero se algum falhar; a lista vive em
-`tools/gates.mjs` e é conferida contra o `ci.yml` nos dois sentidos. Esta seção
-era uma terceira cópia da lista, escrita à mão, e já tinha ficado para trás —
-lista repetida em três lugares envelhece em três velocidades. Para um laço curto
-enquanto se conserta um gate: `npm run gates -- --parar-no-primeiro`.
+Relata todos, com saída não-zero se algum falhar; a lista vive em
+`tools/gates.mjs` e é conferida contra o `ci.yml` nos dois sentidos. Quando só
+mudou peça (`procedural/pecas/`) ou documento desde o ramo remoto, roda a
+bateria curta `GATES_CURTOS`, sem os gates de navegador e de MCP; qualquer outro
+arquivo roda todos, e `--completo` força todos. O CI roda sempre a lista
+inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 

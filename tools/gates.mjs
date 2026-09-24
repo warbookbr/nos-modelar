@@ -106,6 +106,51 @@ export const RECURSOS_DO_GATE = {
   'guarda:portas': ['cache-vite'],
 };
 
+/* BATERIA CURTA QUANDO SÓ MUDOU PEÇA OU DOCUMENTO.
+ *
+ * Contado em 2026-09-24: numa conversa de autoria do braço robótico a bateria
+ * completa rodou cerca de 270 vezes, a quatro minutos cada, e a maior parte
+ * dessas rodadas vinha de mudança só em receita ou em documento. Os gates que
+ * abrem navegador e os de MCP conferem bancada, gesto, câmera e o servidor de
+ * autoria, e nenhum arquivo de peça ou de documento chega a eles.
+ *
+ * Por isso a bateria olha o que mudou desde o ramo remoto, commitado ou não.
+ * Se tudo cabe em PASTAS_LEVES roda GATES_CURTOS; qualquer outro arquivo, ou
+ * não conseguir saber o que mudou, roda todos. `--completo` força todos. O
+ * build e a suíte de testes ficam na curta: a cópia da receita da rodada 7 do
+ * ombro, com import relativo errado, só foi pega pelo build. */
+export const PASTAS_LEVES = [/^procedural\/pecas\//, /^docs\//, /^[^/]+\.md$/];
+
+export const GATES_CURTOS = [
+  'typecheck', 'test', 'build', 'exportar:check', 'autoria:schemas:check',
+  'guarda:acervo', 'guarda:referencial', 'origens:check',
+  'mapa:check', 'reguas:check',
+  'docs:toc:check', 'docs:links:check', 'planos:check', 'docs:estrutura:check',
+  'docs:citacoes:check', 'leitura:obrigatoria', 'catalogo:check',
+];
+
+export function escolherBateria(alterados) {
+  if (!alterados || !alterados.length) return { bateria: GATES, motivo: alterados ? 'nada mudou desde o ramo remoto, roda tudo' : 'não deu para saber o que mudou, roda tudo' };
+  const pesado = alterados.find((f) => !PASTAS_LEVES.some((re) => re.test(f)));
+  return pesado
+    ? { bateria: GATES, motivo: `'${pesado}' está fora de peça e documento, roda tudo` }
+    : { bateria: GATES_CURTOS, motivo: `${alterados.length} arquivo(s) só de peça ou documento, bateria curta` };
+}
+
+function arquivosAlterados() {
+  const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
+  const base = git(['rev-parse', '--abbrev-ref', '@{u}']);
+  if (base.status !== 0) return null;
+  const commitados = git(['diff', '--name-only', `${base.stdout.trim()}...HEAD`]);
+  const soltos = git(['status', '--porcelain', '--untracked-files=all']);
+  if (commitados.status !== 0 || soltos.status !== 0) return null;
+  const lista = [
+    ...commitados.stdout.split('\n'),
+    ...soltos.stdout.split('\n').map((l) => l.slice(3).split(' -> ').pop()),
+  ].map((f) => f.trim().replace(/^"|"$/g, '')).filter(Boolean);
+  return [...new Set(lista)];
+}
+
 /* Quem lê `dist/` só pode começar depois de quem escreve. */
 export const DEPENDE_DE = Object.fromEntries(
   ['guarda:edicao', 'guarda:escolha', 'guarda:gesto', 'guarda:junta', 'guarda:referencia']
@@ -149,8 +194,13 @@ async function executar() {
   const silencioso = process.argv.includes('--silencioso');
   const concorrencia = pararNoPrimeiro ? 1 : limiteDeConcorrencia();
 
+  const { bateria, motivo } = process.argv.includes('--completo')
+    ? { bateria: GATES, motivo: '--completo' }
+    : escolherBateria(arquivosAlterados());
+  console.log(`gates — ${motivo}.`);
+
   const porGate = new Map();
-  const fila = [...GATES];
+  const fila = [...bateria];
   const ocupados = new Set();
   let abortado = false;
 
@@ -189,7 +239,7 @@ async function executar() {
   /* A ORDEM DO RELATÓRIO É A DA LISTA, e não a de quem terminou primeiro: a
      lista é a mesma do `ci.yml`, e comparar as duas a olho exige que sejam
      legíveis na mesma sequência. */
-  const resultados = GATES.filter((gate) => porGate.has(gate)).map((gate) => porGate.get(gate));
+  const resultados = bateria.filter((gate) => porGate.has(gate)).map((gate) => porGate.get(gate));
 
   const falhos = resultados.filter((r) => r.codigo !== 0);
   const total = resultados.reduce((soma, r) => soma + r.duracao, 0);
@@ -199,10 +249,10 @@ async function executar() {
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s`);
   }
-  const naoRodados = GATES.length - resultados.length;
+  const naoRodados = bateria.length - resultados.length;
   console.log('─'.repeat(52));
   console.log(
-    `${resultados.length - falhos.length}/${GATES.length} gates verdes em ${Math.round(decorrido / 1000)}s`
+    `${resultados.length - falhos.length}/${bateria.length} gates verdes${bateria === GATES ? '' : ` (curta de ${GATES.length})`} em ${Math.round(decorrido / 1000)}s`
     + (concorrencia > 1 ? ` (${Math.round(total / 1000)}s somados, ${concorrencia} de cada vez)` : '')
     + (falhos.length ? ` — falharam: ${falhos.map((r) => r.gate).join(', ')}` : '')
     + (naoRodados ? ` — ${naoRodados} não rodaram (--parar-no-primeiro)` : ''),
