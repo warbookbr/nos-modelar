@@ -30,6 +30,10 @@ export const TABELA = {
   /* Acabamento, escolhido pelo modelador. */
   fileteDoTopo: 12,
   fileteDoPe: 5,
+  /* O pé avança este tanto além da face do corpo em -X, por baixo da caixa até o meio dela. */
+  avancoDoPe: 25,
+  /* Chanfro da quina do topo do corpo; substitui o filete, que abria sulco sob o anel. */
+  chanfroDoTopo: 1.5,
   cantoDoPe: 25,
   cantoDaCaixa: 10,
   fileteDaCaixa: 5,
@@ -81,6 +85,10 @@ export function derivar(t = TABELA) {
   return {
     R, yPe, yTopo,
     meioPe: m(t.ladoDoPe) / 2,
+    pe: {
+      centroX: (m(t.ladoDoPe) / 2 - (R + m(t.avancoDoPe))) / 2,
+      meioU: (m(t.ladoDoPe) / 2 + R + m(t.avancoDoPe)) / 2,
+    },
     caixa: {
       centroX: (xFora + xDentro) / 2,
       meioU: (xDentro - xFora) / 2,
@@ -98,10 +106,10 @@ export function gerarPassos(t = TABELA) {
   const passos = [];
   passos.push(['lathe', {
     origemId: ID.corpo, lados: t.ladosDoCorpo, segmentosCurva: 8,
-    perfil: [[0, P.yPe], [P.R, P.yPe], [P.R, P.yTopo, m(t.fileteDoTopo)], [0, P.yTopo]],
+    perfil: [[0, P.yPe], [P.R, P.yPe], [P.R, P.yTopo - m(t.chanfroDoTopo)], [P.R - m(t.chanfroDoTopo), P.yTopo], [0, P.yTopo]],
   }]);
   passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'lathe', id: ID.corpo } } }]);
-  passos.push(placa(ID.pe, 0, 0, 0, P.yPe, P.meioPe, P.meioPe, m(t.cantoDoPe), m(t.fileteDoPe)));
+  passos.push(placa(ID.pe, P.pe.centroX, 0, 0, P.yPe, P.pe.meioU, P.meioPe, m(t.cantoDoPe), m(t.fileteDoPe)));
   passos.push(['parte', { nome: 'pe', sel: { origem: { op: 'loft', id: ID.pe } } }]);
   const C = P.caixa;
   passos.push(placa(ID.caixa, C.centroX, 0, C.y0, C.y1, C.meioU, C.meioW, m(t.cantoDaCaixa), m(t.fileteDaCaixa)));
@@ -113,7 +121,7 @@ export function gerarPassos(t = TABELA) {
   passos.push(['parte', { nome: 'caixaLateral', sel: { origem: { op: 'loft', id: ID.caixa } } }]);
   passos.push(['parte', { nome: 'caixaLateral', sel: { origem: { op: 'lathe', id: ID.botao } } }]);
   passos.push(['publicarPorta', {
-    nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 10 },
+    nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 3 },
     interface: {
       forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: [0, P.yTopo, 0],
       raioInterno: 0, raioExterno: P.R, inicio: -0.005, fim: 0,

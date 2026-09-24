@@ -2035,6 +2035,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       ambiente.definirAuditoria(true);
       const legenda = controlador?.definirCoresPorParte(cores) ?? [];
       controlador?.definirArame?.(arame);
+      controlador?.definirAuditoria?.(true);
       ambiente.redimensionar?.();
       return { auditoria: true, cores: Boolean(cores), arame: Boolean(arame), legenda };
     },
@@ -2043,6 +2044,7 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO } = {}) {
       ambiente.definirAuditoria(false);
       controlador?.definirCoresPorParte(false);
       controlador?.definirArame?.(false);
+      controlador?.definirAuditoria?.(false);
       ambiente.redimensionar?.();
       return { auditoria: false };
     },

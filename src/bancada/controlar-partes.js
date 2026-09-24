@@ -66,7 +66,7 @@ function restaurarMaterial(material) {
   material.wireframe = base.wireframe ?? false;
 }
 
-function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false, apresentacaoSelecao = null) {
+function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = false, apresentacaoSelecao = null, semTinta = false) {
   restaurarMaterial(material);
   if (arame) {
     material.wireframe = true;
@@ -87,7 +87,9 @@ function aplicarEstadoMaterial(material, estado, corDaParte = null, arame = fals
        apaga justamente a informação que a imagem foi feita para carregar — três
        partes selecionadas viravam três verdes iguais. Aqui a seleção já se lê
        pelo fantasma das outras. */
-    if (!corDaParte) {
+    /* Em auditoria a peça também não tinge: a imagem vai para o crítico julgar
+       cor e forma, e o verde clareava o topo do anel escuro. */
+    if (!corDaParte && !semTinta) {
       material.emissive?.copy(VERDE_DESTAQUE);
       material.emissiveIntensity = 0.55;
       material.color?.lerp(VERDE_DESTAQUE, 0.46);
@@ -114,6 +116,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
   const nomes = [...partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   let coresPorParte = false;
   let arame = false;
+  let auditoria = false;
   let wireframeSelecao = false;
   let opacidadeSelecao = 1;
   const permitidos = new Set(nomes);
@@ -169,7 +172,7 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
         ? { wireframe: wireframeSelecao, opacidade: opacidadeSelecao }
         : null;
       for (const material of materiaisDoGrupo(grupo)) {
-        aplicarEstadoMaterial(material, visual, cor, arame, apresentacaoSelecao);
+        aplicarEstadoMaterial(material, visual, cor, arame, apresentacaoSelecao, auditoria);
       }
     }
     aoMudar?.(estado());
@@ -266,6 +269,11 @@ export function criarControladorPartes({ raiz, partes, hierarquia = [], aoMudar,
         parte: nome,
         cor: coresPorParte ? `#${corDeAuditoria(i).getHexString()}` : null,
       }));
+    },
+    definirAuditoria(ligado) {
+      auditoria = Boolean(ligado);
+      aplicarVisual();
+      return auditoria;
     },
     definirArame(ligado) {
       arame = Boolean(ligado);

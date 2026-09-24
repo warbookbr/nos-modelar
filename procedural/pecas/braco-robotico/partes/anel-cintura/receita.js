@@ -20,12 +20,10 @@
 
 export const TABELA = {
   raio: 90,
-  altura: 40,
+  altura: 25,
   /* Acabamento, escolhido pelo modelador. */
   chanfro: 2,
   suaveDoChanfro: 0.8,
-  larguraDaRanhura: 3,
-  fundoDaRanhura: 2,
   lados: 40,
 };
 
@@ -39,23 +37,19 @@ export function derivar(t = TABELA) {
   const h = m(t.altura);
   const c = m(t.chanfro);
   const s = m(t.suaveDoChanfro);
-  const meio = h / 2;
-  const w = m(t.larguraDaRanhura) / 2;
-  return { R, h, c, s, meio, w, rRanhura: R - m(t.fundoDaRanhura) };
+  return { R, h, c, s };
 }
 
 export function gerarPassos(t = TABELA) {
   const P = derivar(t);
-  const { R, h, c, s, meio, w, rRanhura } = P;
+  const { R, h, c, s } = P;
   const passos = [];
-  /* Perfil: chanfro estreito embaixo e em cima, com as duas bordas do chanfro
-     suavizadas pelo raio do vértice; ranhura retangular no meio da altura
-     separando as duas faixas. */
+  /* Perfil: uma faixa só, com chanfro estreito embaixo e em cima e as duas
+     bordas de cada chanfro suavizadas pelo raio do vértice. */
   passos.push(['lathe', {
     origemId: ID.anel, lados: t.lados, segmentosCurva: 3,
     perfil: [
       [0, 0], [R - c, 0, s], [R, c, s],
-      [R, meio - w], [rRanhura, meio - w], [rRanhura, meio + w], [R, meio + w],
       [R, h - c, s], [R - c, h, s], [0, h],
     ],
   }]);

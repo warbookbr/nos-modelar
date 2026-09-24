@@ -345,7 +345,10 @@ export function criarCamadaEdicaoDeMalha({
   function atualizarGizmo() {
     const atual = estado.estado();
     const centro = atual.ativo && atual.selecionados.length ? centroDaSelecao() : null;
-    if (!centro) return gizmo.esconder();
+    /* Na imagem de auditoria o punho não aparece: ele é comando da tela, e a
+       imagem vai para o crítico. Com o gizmo à vista a peça isolada saía com as
+       setas por cima e pequena no quadro. */
+    if (!centro || document.body.classList.contains('auditoria')) return gizmo.esconder();
     return gizmo.mostrar(centro);
   }
 

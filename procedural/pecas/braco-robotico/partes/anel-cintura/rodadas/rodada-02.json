@@ -1,0 +1,144 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/anel-cintura",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 1 parte, 1 corpo, portas apoio e topo; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova; etapas: anelSentaNaBase passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Anel escuro com o diâmetro da base, faixa única estreita de cerca de 1/8 do diâmetro e chanfro suave nas duas bordas, sem degrau nem fresta visível."
+  },
+  "partes": [
+    {
+      "nome": "anel",
+      "confere": true,
+      "observacao": "faixa única de 25 mm, sem ranhura, chanfro de 2 mm com raio 0,8 nas duas bordas"
+    }
+  ],
+  "atrito": [
+    "pessoa: com recortes da referência mostrou que o anel é só a faixa escura de baixo e que a faixa lisa de cima já é o pescoço do ombro",
+    "modelador: descrever mede a parte sozinha com o raio da TABELA (90 mm); o raio real de 105 mm, vindo do vínculo, só aparece em etapas",
+    "modelador: malha:conferir alerta polo alto em toda revolução fechada no eixo; alerta que não aponta defeito acostuma a ignorar alerta",
+    "quem conduz: o critério do anel no ALINHAMENTO ainda citava a ranhura depois da decisão da pessoa; corrigido",
+    "ferramenta: a vista isolada da parte leva o realce e o texto da seleção de vértices, que o crítico precisou descontar"
+  ],
+  "notaDePassagem": "O anel é um lathe de uma faixa só, com 25 mm de altura e o raio vindo da base por vínculo (105 mm). As duas bordas têm chanfro de 2 mm com raio 0,8. A borda de cima, encontrando o pescoço, deve formar a linha escura de divisão: o pescoço precisa ter o mesmo diâmetro do anel e uma borda de baixo com chanfro próprio, senão a linha some. A porta topo publica a face inteira em y=altura, com raioExterno igual a R. O vínculo do pescoço já pede raioExterno com acréscimo zero.",
+  "receita": {
+    "sha256": "sha256:c496ba222445cf570e109902f47e7164ff356a600a86b33c3415450eeb91c14a",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 13,
+      "acrescentadas": 7,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 23,
+          "texto": "  altura: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  altura: 25,"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": "  larguraDaRanhura: 3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  fundoDaRanhura: 2,"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "  const meio = h / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "  const w = m(t.larguraDaRanhura) / 2;"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "  return { R, h, c, s, meio, w, rRanhura: R - m(t.fundoDaRanhura) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  return { R, h, c, s };"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  const { R, h, c, s, meio, w, rRanhura } = P;"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  const { R, h, c, s } = P;"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "  /* Perfil: chanfro estreito embaixo e em cima, com as duas bordas do chanfro"
+        },
+        {
+          "tipo": "-",
+          "linha": 52,
+          "texto": "     suavizadas pelo raio do vértice; ranhura retangular no meio da altura"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "     separando as duas faixas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  /* Perfil: uma faixa só, com chanfro estreito embaixo e em cima e as duas"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "     bordas de cada chanfro suavizadas pelo raio do vértice. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "      [R, meio - w], [rRanhura, meio - w], [rRanhura, meio + w], [R, meio + w],"
+        },
+        {
+          "tipo": "-",
+          "linha": 86,
+          "texto": "      { nome: 'anel', forma: 'anel de revolução escuro, 40 mm de altura, duas faixas separadas por uma ranhura, bordas com chanfro estreito de bordas suavizadas', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "      { nome: 'anel', forma: 'anel de revolução escuro, cerca de 25 mm de altura, uma faixa só, bordas com chanfro estreito de bordas suavizadas', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 90,
+          "texto": "      'sem a ranhura entre as duas faixas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "      'mais alto que uma faixa estreita, ou com ranhura no meio',"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

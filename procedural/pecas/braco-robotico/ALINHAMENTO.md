@@ -158,10 +158,11 @@ eixo horizontal, com o diâmetro do tambor, onde o `braco` se prende.
 borda do pé; a caixa solta do corpo, com fresta, ou flutuando acima do pé; a
 caixa do lado errado, porque na vista lateral da foto ela fica à esquerda.
 
-`anelCintura`: diâmetro diferente do da base, formando degrau na junção; sem a
-ranhura entre as duas faixas, ou com as bordas vivas, sem o chanfro estreito;
-fresta visível entre o anel e a base; o anel na cor da carcaça, quando ele é
-escuro e as carcaças são cinza-claras.
+`anelCintura`: diâmetro diferente do da base, formando degrau na junção;
+mais alto que uma faixa estreita, ou com ranhura no meio, que era a leitura
+antiga, corrigida pela pessoa; bordas vivas, sem o chanfro estreito; fresta
+visível entre o anel e a base; o anel na cor da carcaça, quando ele é escuro e
+as carcaças são cinza-claras.
 
 `ombro`: tambor fino como chapa, em vez de grosso; pescoço alto, deixando o
 tambor visivelmente afastado do anel; face do tambor que não aponta para a

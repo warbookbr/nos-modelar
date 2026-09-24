@@ -1424,7 +1424,8 @@ body.auditoria .vistas,
 body.auditoria .painel,
 body.auditoria .referencia-metrica,
 body.auditoria .dicas,
-body.auditoria .aviso-sessao {
+body.auditoria .aviso-sessao,
+body.auditoria .aviso {
   display: none !important;
 }
 body.auditoria #cenaBancada {

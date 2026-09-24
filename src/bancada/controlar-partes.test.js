@@ -29,4 +29,19 @@ describe('controlador de partes', () => {
     expect(a.material).toMatchObject({ wireframe: false, transparent: false, opacity: 1 });
     expect(b.material).toMatchObject({ wireframe: false, transparent: false, opacity: 1 });
   });
+
+  it('em auditoria a parte selecionada não é tingida de verde', () => {
+    const raiz = new THREE.Group();
+    const grupo = new THREE.Group();
+    grupo.userData.identidadeParte = 'anel';
+    const malha = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ color: '#4a4d52' }));
+    grupo.add(malha);
+    raiz.add(grupo);
+    const controlador = criarControladorPartes({ raiz, partes: new Map([['anel', grupo]]) });
+    controlador.selecionar('anel');
+    expect(malha.material.emissive.getHex()).not.toBe(0);
+    controlador.definirAuditoria(true);
+    expect(malha.material.emissive.getHex()).toBe(0);
+    expect(`#${malha.material.color.getHexString()}`).toBe('#4a4d52');
+  });
 });

@@ -1,0 +1,153 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/base",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 3 partes, 0 órfão, assento r 0,105 na faixa 3; guarda:acervo ok; guarda:referencial ok; malha:conferir aprova; etapas: anelSentaNaBase passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Base fiel ao alvo em silhueta e proporção, com corpo de revolução, pé arredondado passando sob parte da caixa e caixa colada à esquerda com botão."
+  },
+  "partes": [
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": "chanfro de 1,5 mm no topo no lugar do filete"
+    },
+    {
+      "nome": "pe",
+      "confere": true,
+      "observacao": "245 x 20 x 230 mm, avança 25 mm à esquerda por baixo da caixa"
+    },
+    {
+      "nome": "caixaLateral",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "modelador: trocar o filete pelo chanfro mudou o número de faixas do lathe e deixou a porta assento órfã; o índice de faixa é número digitado que depende do perfil, e só o órfão no descrever denunciou",
+    "modelador: a porta declara raio 105 mm e a face plana do topo vai até 103,5 mm por causa do chanfro; nenhuma medida compara o raio declarado com a face real, que é a pendência da porta contra a forma",
+    "modelador: fileteDoTopo ficou na TABELA sem uso; nenhum gate acusa parâmetro morto",
+    "pessoa: com recortes da referência corrigiu a leitura do pé, do topo da base, do anel e do pescoço do ombro"
+  ],
+  "notaDePassagem": "O pé deixou de ser centrado: vai de -(R+avancoDoPe) a +ladoDoPe/2 em X e fica em ±ladoDoPe/2 em Z; se mudar o raio ou o lado, confira que a sobra de +X continua em 10 mm. O topo do corpo tem chanfro de 1,5 mm (chanfroDoTopo) no lugar do filete, e o perfil ficou com 4 faixas: a porta assento cita a faixa 3, a da face do topo. Se o perfil ganhar ou perder pontos, o número da faixa muda e a porta fica órfã. A interface da porta continua com r 0,105 em y 0,220.",
+  "receita": {
+    "sha256": "sha256:341346d9c9e5e1fe2520911617a9d69c96ac8b549dc6f842d7d78e3219758808",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 6,
+      "acrescentadas": 14,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* O pé avança este tanto além da face do corpo em -X, por baixo da caixa até o meio dela. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  avancoDoPe: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* Chanfro da quina do topo do corpo; substitui o filete, que abria sulco sob o anel. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  chanfroDoTopo: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    pe: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      centroX: (m(t.ladoDoPe) / 2 - (R + m(t.avancoDoPe))) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "      meioU: (m(t.ladoDoPe) / 2 + R + m(t.avancoDoPe)) / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    },"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "    perfil: [[0, P.yPe], [P.R, P.yPe], [P.R, P.yTopo, m(t.fileteDoTopo)], [0, P.yTopo]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    perfil: [[0, P.yPe], [P.R, P.yPe], [P.R, P.yTopo - m(t.chanfroDoTopo)], [P.R - m(t.chanfroDoTopo), P.yTopo], [0, P.yTopo]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 104,
+          "texto": "  passos.push(placa(ID.pe, 0, 0, 0, P.yPe, P.meioPe, P.meioPe, m(t.cantoDoPe), m(t.fileteDoPe)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "  passos.push(placa(ID.pe, P.pe.centroX, 0, 0, P.yPe, P.pe.meioU, P.meioPe, m(t.cantoDoPe), m(t.fileteDoPe)));"
+        },
+        {
+          "tipo": "-",
+          "linha": 116,
+          "texto": "    nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 10 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 3 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 139,
+          "texto": "      { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura, com filete na quina do topo', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "      { nome: 'pe', forma: 'placa quadrada de 230 mm de lado e 20 mm de altura, cantos arredondados vistos de cima e filete na borda', tecnica: 'placa com cantos e bordas arredondados' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "      { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura; a quina do topo leva só um chanfro pequeno, sem sulco na junção com o anel', tecnica: 'revolução com perfil' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "      { nome: 'pe', forma: 'placa de 20 mm de altura, 230 mm de lado, que avança à esquerda por baixo da caixa até o meio dela; cantos e borda arredondados', tecnica: 'placa com cantos e bordas arredondados' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 146,
+          "texto": "      'quina viva no topo do corpo ou na borda do pé',"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "      'sulco visível entre o topo do corpo e o anel, ou quina viva na borda do pé',"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

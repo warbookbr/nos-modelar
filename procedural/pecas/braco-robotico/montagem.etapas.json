@@ -5,13 +5,17 @@
   "etapas": [
     {
       "instancia": "base",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "receita": "4cf94ee30436b76ae0d8329e16fea11fef4485e6bc2e52952f6256f913924b32"
+      "aceite": {
+        "por": "pessoa",
+        "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
+      },
+      "receita": "341346d9c9e5e1fe2520911617a9d69c96ac8b549dc6f842d7d78e3219758808"
     },
     {
       "instancia": "anelCintura",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "anelSentaNaBase",
@@ -56,7 +60,11 @@
           }
         }
       ],
-      "receita": "e9a6cda1955979d864031a4c4964de2dbe96052a668ec08a587a5d4162043f37"
+      "receita": "c496ba222445cf570e109902f47e7164ff356a600a86b33c3415450eeb91c14a",
+      "aceite": {
+        "por": "pessoa",
+        "observacao": "aceitou a rodada 2: faixa única de 25 mm"
+      }
     },
     {
       "instancia": "ombro",
