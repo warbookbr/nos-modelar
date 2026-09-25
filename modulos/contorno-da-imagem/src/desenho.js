@@ -9,6 +9,7 @@
  * achou pedindo o zoom. Por isso o zoom é passo fixo do pacote. */
 import { PNG } from 'pngjs';
 import { carregarOpenCV } from './opencv.js';
+import { empilharColuna } from './colunas.js';
 
 /* Matiz pelo ângulo de ouro: dois índices seguidos caem longe um do outro no
    círculo de cores. Com a divisão igual do círculo, partes vizinhas na ordem
@@ -35,31 +36,99 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
     saida.data[o + 3] = 255;
   }
   if (!rotular) return PNG.sync.write(saida);
+  /* Os nomes vão fora da silhueta, numa etiqueta branca com borda preta, e
+     uma linha fina liga cada um a um ponto dentro da parte. Na versão
+     anterior a etiqueta ficava sobre a semente e cobria a pintura que o
+     crítico precisa ver. A tela cresce para caber as colunas. */
+  const arranjo = etiquetasFora(segmentacao);
   const { cv } = await carregarOpenCV();
+  const tela = new cv.Mat(arranjo.altura, arranjo.largura, cv.CV_8UC4, new cv.Scalar(255, 255, 255, 255));
   const img = cv.matFromImageData({ data: saida.data, width: png.width, height: png.height });
   try {
-    const postas = [];
-    for (const nome of nomes) {
-      const [x] = regioes[nome].semente[0];
-      let [, y] = regioes[nome].semente[0];
-      /* O nome vai numa etiqueta branca com borda preta, para ser lido sobre
-         qualquer cor de região ou do original. */
-      const largura = Math.round(nome.length * 7.2) + 6;
-      /* Etiqueta que cobriria outra desce até ficar livre. */
-      const cruza = (a) => postas.some((b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1);
-      while (cruza({ x0: x - 23, x1: x - 23 + largura, y0: y - 12, y1: y + 4 })) y += 17;
-      postas.push({ x0: x - 23, x1: x - 23 + largura, y0: y - 12, y1: y + 4 });
-      const canto = new cv.Point(x - 23, y - 12);
-      const fim = new cv.Point(x - 23 + largura, y + 4);
-      cv.rectangle(img, canto, fim, new cv.Scalar(255, 255, 255, 255), cv.FILLED);
-      cv.rectangle(img, canto, fim, new cv.Scalar(0, 0, 0, 255), 1);
-      cv.putText(img, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
+    img.copyTo(tela.roi(new cv.Rect(arranjo.dx, arranjo.dy, png.width, png.height)));
+    const preto = new cv.Scalar(0, 0, 0, 255);
+    for (const { marca, ponta } of arranjo.etiquetas) {
+      cv.line(tela, new cv.Point(marca[0], marca[1]), new cv.Point(ponta[0], ponta[1]), preto, 1, cv.LINE_AA);
+      cv.circle(tela, new cv.Point(marca[0], marca[1]), 2, preto, cv.FILLED);
     }
-    saida.data = Buffer.from(img.data);
-    return PNG.sync.write(saida);
+    for (const { nome, caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
+      cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), new cv.Scalar(255, 255, 255, 255), cv.FILLED);
+      cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), preto, 1);
+      cv.putText(tela, nome, new cv.Point(x0 + 3, y1 - 4), cv.FONT_HERSHEY_SIMPLEX, 0.4, preto, 1);
+    }
+    const final = new PNG({ width: arranjo.largura, height: arranjo.altura });
+    final.data = Buffer.from(tela.data);
+    return PNG.sync.write(final);
   } finally {
-    img.delete();
+    img.delete(); tela.delete();
   }
+}
+
+/* Um ponto dentro da parte: o meio do trecho mais largo da linha da parte
+   mais perto da altura do centro. O centro de uma parte côncava pode cair
+   fora dela; o meio de um trecho de pixels dela, não. */
+function pontoDentro(segmentacao, rotulo) {
+  const { largura, altura, rotulos } = segmentacao;
+  let soma = 0; let n = 0;
+  for (let p = 0; p < rotulos.length; p += 1) if (rotulos[p] === rotulo) { soma += Math.floor(p / largura); n += 1; }
+  if (!n) return null;
+  const yc = Math.round(soma / n);
+  for (let d = 0; d < altura; d += 1) {
+    for (const y of [yc - d, yc + d]) {
+      if (y < 0 || y >= altura) continue;
+      let melhor = null; let ini = -1;
+      for (let x = 0; x <= largura; x += 1) {
+        const dentro = x < largura && rotulos[y * largura + x] === rotulo;
+        if (dentro && ini < 0) ini = x;
+        if (!dentro && ini >= 0) { if (!melhor || x - ini > melhor[1] - melhor[0]) melhor = [ini, x]; ini = -1; }
+      }
+      if (melhor) return [Math.floor((melhor[0] + melhor[1] - 1) / 2), y];
+    }
+  }
+  return null;
+}
+
+export const ALTURA_DA_ETIQUETA = 16;
+const PASSO_DA_ETIQUETA = ALTURA_DA_ETIQUETA + 3;
+const FOLGA = 12;
+const larguraDaEtiqueta = (nome) => Math.round(nome.length * 7.2) + 6;
+
+/* O arranjo dos nomes, em coordenada da tela final: `dx`, `dy` é onde a
+   imagem original começa nela, e cada etiqueta traz a caixa [x0, y0, x1, y1],
+   a marca dentro da parte e a ponta da chamada na borda da caixa. As partes
+   se dividem pela marca: a metade mais à esquerda vai para a coluna da
+   esquerda. Assim toda chamada da esquerda fica à esquerda de toda chamada da
+   direita, e chamadas de colunas diferentes não se cruzam. */
+export function etiquetasFora(segmentacao) {
+  const { largura, altura, silhueta, regioes } = segmentacao;
+  let sx0 = largura; let sx1 = -1;
+  for (let p = 0; p < silhueta.length; p += 1) if (silhueta[p]) { const x = p % largura; if (x < sx0) sx0 = x; if (x > sx1) sx1 = x; }
+  const itens = Object.keys(regioes).map((nome) => {
+    const marca = pontoDentro(segmentacao, regioes[nome].rotulo) ?? regioes[nome].semente[0];
+    return { nome, marca, alvo: marca[1] };
+  });
+  const porX = itens.slice().sort((a, b) => a.marca[0] - b.marca[0] || a.marca[1] - b.marca[1] || a.nome.localeCompare(b.nome));
+  const metade = Math.ceil(porX.length / 2);
+  const colunas = { esquerda: porX.slice(0, metade), direita: porX.slice(metade) };
+  const xColuna = { esquerda: sx0 - FOLGA, direita: sx1 + FOLGA };
+  for (const col of ['esquerda', 'direita']) empilharColuna(colunas[col], xColuna[col], { passo: PASSO_DA_ETIQUETA });
+  const meia = ALTURA_DA_ETIQUETA / 2;
+  const larguraMax = (col) => Math.max(0, ...colunas[col].map((i) => larguraDaEtiqueta(i.nome)));
+  const dx = Math.max(0, larguraMax('esquerda') + 4 - xColuna.esquerda);
+  const direita = Math.max(largura, xColuna.direita + larguraMax('direita') + 4);
+  const ys = itens.map((i) => i.ty);
+  const dy = Math.max(0, Math.ceil(meia + 2 - Math.min(Infinity, ...ys)));
+  const baixo = Math.max(altura, Math.ceil(Math.max(0, ...ys) + meia + 3));
+  const etiquetas = [];
+  for (const col of ['esquerda', 'direita']) {
+    for (const i of colunas[col]) {
+      const w = larguraDaEtiqueta(i.nome);
+      const xc = xColuna[col] + dx; const y = Math.round(i.ty) + dy;
+      const caixa = col === 'esquerda' ? [xc - w, y - meia, xc, y + meia] : [xc, y - meia, xc + w, y + meia];
+      etiquetas.push({ nome: i.nome, coluna: col, caixa, marca: [i.marca[0] + dx, i.marca[1] + dy], ponta: [xc, y] });
+    }
+  }
+  return { dx, dy, largura: dx + direita, altura: dy + baixo, etiquetas };
 }
 
 /* Cada par de partes vizinhas, com a caixa que cobre a divisa entre elas. */

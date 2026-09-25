@@ -4,7 +4,7 @@
    limite das rodadas. */
 import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
-import { segmentar, sobreposicao, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada } from '../src/index.js';
+import { segmentar, sobreposicao, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada } from '../src/index.js';
 
 /* Fundo branco, dois retângulos do mesmo cinza encostados, com uma linha um
    pouco mais escura entre eles, como a costura de duas partes. */
@@ -49,6 +49,39 @@ describe('contorno da imagem', () => {
     const par = PNG.sync.read(recorte.png);
     const [x0, , x1] = recorte.caixa;
     expect(par.width).toBe((x1 - x0 + 1) * 3 * 2 + 6);
+  });
+
+  it('põe os nomes fora da silhueta, sem etiqueta sobreposta nem chamada cruzada', async () => {
+    /* Uma parte em U, côncava, e seis partes em fila: nomes demais para a
+       altura de cada coluna, que obriga o empilhamento e as trocas. */
+    const png = new PNG({ width: 160, height: 80 });
+    for (let y = 0; y < 80; y += 1) for (let x = 0; x < 160; x += 1) {
+      const o = (y * 160 + x) * 4;
+      const u = x >= 2 && x < 40 && y >= 5 && y < 75 && !(x >= 12 && x < 30 && y < 55);
+      const fila = x >= 44 && x < 158 && y >= 30 && y < 50;
+      const v = !(u || fila) ? 250 : ((x - 44) % 19 === 0 && fila ? 110 : 150);
+      png.data[o] = v; png.data[o + 1] = v; png.data[o + 2] = v; png.data[o + 3] = 255;
+    }
+    const buf = PNG.sync.write(png);
+    const regioes = { u: [5, 70] };
+    for (let k = 0; k < 6; k += 1) regioes[`parte${k}`] = [54 + 19 * k, 40];
+    const seg = await segmentar(buf, { limiar: 225, regioes });
+    const arranjo = etiquetasFora(seg);
+    const final = PNG.sync.read(await sobreposicao(buf, seg));
+    expect([final.width, final.height]).toEqual([arranjo.largura, arranjo.altura]);
+    expect(arranjo.etiquetas).toHaveLength(7);
+    const naSilhueta = (x, y) => { const ox = x - arranjo.dx; const oy = y - arranjo.dy; return ox >= 0 && oy >= 0 && ox < seg.largura && oy < seg.altura && seg.silhueta[oy * seg.largura + ox]; };
+    for (const { nome, caixa: [x0, y0, x1, y1], marca } of arranjo.etiquetas) {
+      for (let y = y0; y <= y1; y += 1) for (let x = x0; x <= x1; x += 1) expect(naSilhueta(x, y)).toBeFalsy();
+      /* A marca cai num pixel da própria parte, também na parte côncava. */
+      expect(seg.rotulos[(marca[1] - arranjo.dy) * seg.largura + marca[0] - arranjo.dx]).toBe(seg.regioes[nome].rotulo);
+    }
+    const E = arranjo.etiquetas;
+    for (let a = 0; a < E.length; a += 1) for (let b = a + 1; b < E.length; b += 1) {
+      const [p, q] = [E[a].caixa, E[b].caixa];
+      expect(p[0] <= q[2] && q[0] <= p[2] && p[1] <= q[3] && q[1] <= p[3]).toBe(false);
+      expect(segmentosSeCruzam(E[a].marca, E[a].ponta, E[b].marca, E[b].ponta)).toBe(false);
+    }
   });
 
   it('mede quanto do contorno segue uma borda da imagem', async () => {

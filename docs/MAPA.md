@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-793 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+794 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -327,6 +327,7 @@
 
 ## modulos/contorno-da-imagem/src/
 
+- `colunas.js` — colunas.js — nomes em duas colunas fora do desenho, com chamada até a parte.
 - `desenho.js` — desenho.js — o que o crítico e a pessoa olham.
 - `index.js` — index.js — a porta do módulo contorno-da-imagem: segmentação, desenho, medida e rodadas.
 - `medida.js` — medida.js — o contorno de cada parte contra as bordas da própria imagem. Para cada parte, a fração do perímetro que fica a até `distancia` pixels de uma bord…

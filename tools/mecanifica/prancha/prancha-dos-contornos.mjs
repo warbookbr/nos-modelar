@@ -38,9 +38,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { prancha, imprimirRelatorio, colisoesDoDesenho, segmentosSeCruzam } from './prancha.mjs';
+import { prancha, imprimirRelatorio, colisoesDoDesenho } from './prancha.mjs';
 import { lerRodadas, registrarRodada, novaSerie } from '../rodadas-com-critico.mjs';
-import { proximaAcao } from '../../../modulos/contorno-da-imagem/src/index.js';
+import { proximaAcao, empilharColuna } from '../../../modulos/contorno-da-imagem/src/index.js';
 
 const TELA = { largura: 1200, altura: 900 };
 const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
@@ -261,20 +261,9 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
   });
   const colunas = { esquerda: [], direita: [] };
   for (const col of ['esquerda', 'direita']) {
-    const alvo = (i) => sy(i.nivel ?? i.marca[1]) + 3;
-    const lista = itens.filter((i) => i.coluna === col).sort((a, b) => alvo(a) - alvo(b) || a.nome.localeCompare(b.nome));
-    let ultimo = -Infinity;
-    for (const i of lista) { i.ty = Math.max(alvo(i), ultimo + PASSO_DOS_NOMES); ultimo = i.ty; }
-    const seg = (i) => [[sx(i.marca[0]), sy(i.marca[1])], [colunaX[col], i.ty - 3]];
-    for (let volta = 0; volta < 10000; volta += 1) {
-      let trocou = false;
-      for (let a = 0; a < lista.length && !trocou; a += 1) {
-        for (let b = a + 1; b < lista.length && !trocou; b += 1) {
-          if (segmentosSeCruzam(...seg(lista[a]), ...seg(lista[b]))) { [lista[a].ty, lista[b].ty] = [lista[b].ty, lista[a].ty]; trocou = true; }
-        }
-      }
-      if (!trocou) break;
-    }
+    const lista = itens.filter((i) => i.coluna === col);
+    for (const i of lista) i.alvo = sy(i.nivel ?? i.marca[1]) + 3;
+    empilharColuna(lista, colunaX[col], { passo: PASSO_DOS_NOMES, desvio: -3, ponto: (i) => [sx(i.marca[0]), sy(i.marca[1])] });
     colunas[col] = lista.slice().sort((a, b) => a.ty - b.ty).map((i) => i.nome);
   }
   const larguraMax = (col) => Math.max(0, ...itens.filter((i) => i.coluna === col).map((i) => larguraDoNome(i.nome)));
