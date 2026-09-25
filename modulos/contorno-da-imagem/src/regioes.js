@@ -25,7 +25,8 @@ export function tracosDaSemente(semente) {
 
 /* Devolve, para cada nome, a semente, o contorno externo em pixel e a área, e
    também o rótulo de cada pixel (`rotulos`, -1 na divisa, 1 no fundo, 2 em
-   diante nas partes na ordem de `nomes`) e os pixels da silhueta sem dono. */
+   diante nas partes na ordem de `nomes`), a máscara da silhueta e os pixels
+   dela sem dono. */
 export async function segmentar(pngBuffer, { limiar = 225, regioes = {} } = {}) {
   const nomes = Object.keys(regioes).sort();
   if (!nomes.length) throw new Error('o arquivo de regiões não nomeia nenhuma região.');
@@ -77,7 +78,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {} } = {}) 
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
-    return { largura, altura, regioes: resultado, rotulos, semDono };
+    return { largura, altura, regioes: resultado, rotulos, silhueta: Uint8Array.from(silhueta.data), semDono };
   } finally {
     mats.forEach((m) => m.delete());
   }

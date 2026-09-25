@@ -176,8 +176,13 @@ medida de borda e as rodadas. A skill `contorno-da-imagem` conduz o agente
 nota: 9 ou mais fecha, abaixo disso volta ao desenhador, até três rodadas, e
 depois a decisão é da pessoa. O zoom por divisa entrou porque três críticos
 olhando a imagem inteira não viram uma ponta de 3 px da carcaça dentro do
-antebraço, e a pessoa a achou pedindo o zoom. Falta ligar o arquivo ao
-`conferir:referencia` e à prancha.
+antebraço, e a pessoa a achou pedindo o zoom. A primeira série de rodadas
+na `lateral.png` parou em 8, 8 e 7 e foi à pessoa, e mostrou dois furos: o
+crítico não lista pasta e abriu 2 e depois 9 dos 19 recortes, e a pintura
+pelo polígono enchia de cor o fundo que uma região envolve. Os recortes
+passaram a ir numa folha só, `divisas.png`, e a pintura passou a seguir a
+máscara de cada região. A segunda série fechou com nota 9 na primeira
+rodada. Falta ligar o arquivo ao `conferir:referencia` e à prancha.
 
 ## Riscos e parada
 

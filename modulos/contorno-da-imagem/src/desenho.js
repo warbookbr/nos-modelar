@@ -19,35 +19,33 @@ function corDe(i) {
   return [f(5), f(3), f(1)];
 }
 
+/* A pintura vai pela máscara de cada região, pixel a pixel, e não pelo
+   polígono do contorno: o polígono enche o vão de fundo que uma região envolve,
+   e na lateral do braço o pescoço do punho saía pintando fundo branco. */
 export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, rotular = true } = {}) {
-  const { cv } = await carregarOpenCV();
   const png = PNG.sync.read(pngBuffer);
-  const img = cv.matFromImageData({ data: png.data, width: png.width, height: png.height });
-  /* `clone` desta versão do OpenCV divide a memória com a original, e a pintura
-     saía opaca qualquer que fosse a opacidade; a cópia tem de ser explícita. */
-  const tinta = new cv.Mat(); img.copyTo(tinta);
-  const mistura = new cv.Mat();
+  const { rotulos, silhueta, regioes } = segmentacao;
+  const nomes = Object.keys(regioes);
+  const corPor = new Map(nomes.map((nome, i) => [regioes[nome].rotulo, corDe(i)]));
+  const saida = new PNG({ width: png.width, height: png.height });
+  for (let p = 0; p < rotulos.length; p += 1) {
+    const o = p * 4;
+    const cor = silhueta[p] ? corPor.get(rotulos[p]) : null;
+    for (let c = 0; c < 3; c += 1) saida.data[o + c] = cor ? Math.round(png.data[o + c] * (1 - opacidade) + cor[c] * opacidade) : png.data[o + c];
+    saida.data[o + 3] = 255;
+  }
+  if (!rotular) return PNG.sync.write(saida);
+  const { cv } = await carregarOpenCV();
+  const img = cv.matFromImageData({ data: saida.data, width: png.width, height: png.height });
   try {
-    const nomes = Object.keys(segmentacao.regioes);
-    nomes.forEach((nome, i) => {
-      const r = segmentacao.regioes[nome];
-      const pontos = cv.matFromArray(r.contornoPx.length, 1, cv.CV_32SC2, r.contornoPx.flat());
-      const lista = new cv.MatVector(); lista.push_back(pontos);
-      cv.fillPoly(tinta, lista, new cv.Scalar(...corDe(i), 255));
-      pontos.delete(); lista.delete();
-    });
-    cv.addWeighted(tinta, opacidade, img, 1 - opacidade, 0, mistura);
-    if (rotular) {
-      for (const nome of nomes) {
-        const [x, y] = segmentacao.regioes[nome].semente[0];
-        cv.putText(mistura, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
-      }
+    for (const nome of nomes) {
+      const [x, y] = regioes[nome].semente[0];
+      cv.putText(img, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
     }
-    const saida = new PNG({ width: png.width, height: png.height });
-    saida.data = Buffer.from(mistura.data);
+    saida.data = Buffer.from(img.data);
     return PNG.sync.write(saida);
   } finally {
-    img.delete(); tinta.delete(); mistura.delete();
+    img.delete();
   }
 }
 
@@ -115,4 +113,31 @@ export function recortesDasDivisas(pngBuffer, sobreposicaoBuffer, segmentacao, {
     PNG.bitblt(dir, par, 0, 0, dir.width, dir.height, esq.width + vao, 0);
     return { a, b, caixa: [x0, y0, x1, y1], png: PNG.sync.write(par) };
   });
+}
+
+/* Todos os recortes numa folha só, com o nome do par em cima de cada um. O
+   crítico só lê arquivo, não lista pasta, e na lateral do braço ele abriu 2 e
+   depois 9 dos 19 recortes soltos; numa folha ele vê todos de uma vez. */
+export async function folhaDasDivisas(recortes, { colunas = 3, largura = 420, altura = 230, titulo = 18 } = {}) {
+  const { cv } = await carregarOpenCV();
+  const linhas = Math.max(1, Math.ceil(recortes.length / colunas));
+  const folha = new cv.Mat(linhas * (altura + titulo), colunas * largura, cv.CV_8UC4, new cv.Scalar(255, 255, 255, 255));
+  try {
+    recortes.forEach(({ a, b, png }, i) => {
+      const lido = PNG.sync.read(png);
+      const m = cv.matFromImageData({ data: lido.data, width: lido.width, height: lido.height });
+      const escala = Math.min((largura - 6) / lido.width, (altura - 6) / lido.height);
+      const w = Math.max(1, Math.floor(lido.width * escala)); const h = Math.max(1, Math.floor(lido.height * escala));
+      const menor = new cv.Mat(); cv.resize(m, menor, new cv.Size(w, h), 0, 0, cv.INTER_AREA);
+      const x = (i % colunas) * largura + 3; const y = Math.floor(i / colunas) * (altura + titulo);
+      menor.copyTo(folha.roi(new cv.Rect(x, y + titulo, w, h)));
+      cv.putText(folha, `${a} / ${b}`, new cv.Point(x, y + 13), cv.FONT_HERSHEY_SIMPLEX, 0.45, new cv.Scalar(0, 0, 0, 255), 1);
+      m.delete(); menor.delete();
+    });
+    const saida = new PNG({ width: folha.cols, height: folha.rows });
+    saida.data = Buffer.from(folha.data);
+    return PNG.sync.write(saida);
+  } finally {
+    folha.delete();
+  }
 }

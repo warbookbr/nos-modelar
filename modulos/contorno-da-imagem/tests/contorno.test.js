@@ -67,3 +67,15 @@ describe('contorno da imagem', () => {
     expect(() => validarRodada({ numero: 1, regioes: {}, veredito: { nota: 6, defeitos: [] } })).toThrow(/sem defeito/);
   });
 });
+
+describe('folha das divisas', () => {
+  it('junta todos os recortes numa imagem só', async () => {
+    const { folhaDasDivisas } = await import('../src/index.js');
+    const png = imagem();
+    const seg = await segmentar(png, config);
+    const recortes = recortesDasDivisas(png, await sobreposicao(png, seg, { rotular: false }), seg);
+    const folha = PNG.sync.read(await folhaDasDivisas(recortes, { colunas: 3, largura: 200, altura: 100, titulo: 10 }));
+    expect(folha.width).toBe(600);
+    expect(folha.height).toBe(110);
+  });
+});

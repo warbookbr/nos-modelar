@@ -85,6 +85,30 @@
     42
    ],
    [
+    341,
+    45
+   ],
+   [
+    343,
+    42
+   ],
+   [
+    347,
+    40
+   ],
+   [
+    353,
+    38
+   ],
+   [
+    362,
+    37
+   ],
+   [
+    347,
+    40
+   ],
+   [
     346,
     58
    ],
@@ -131,9 +155,69 @@
    [
     579,
     122
+   ],
+   [
+    583,
+    115
+   ],
+   [
+    586,
+    122
+   ],
+   [
+    589,
+    124
    ]
   ],
   "carcacaPunho": [
+   [
+    600,
+    95
+   ],
+   [
+    589,
+    100
+   ],
+   [
+    590,
+    106
+   ],
+   [
+    592,
+    112
+   ],
+   [
+    594,
+    117
+   ],
+   [
+    597,
+    121
+   ],
+   [
+    600,
+    124
+   ],
+   [
+    597,
+    121
+   ],
+   [
+    594,
+    117
+   ],
+   [
+    592,
+    112
+   ],
+   [
+    590,
+    106
+   ],
+   [
+    589,
+    100
+   ],
    [
     600,
     95
@@ -160,6 +244,18 @@
    ]
   ],
   "aneisPunho": [
+   [
+    673,
+    130
+   ],
+   [
+    716,
+    130
+   ],
+   [
+    716,
+    140
+   ],
    [
     675,
     140
@@ -201,6 +297,26 @@
    [
     708,
     225
+   ],
+   [
+    712,
+    214
+   ],
+   [
+    716,
+    212
+   ],
+   [
+    719,
+    210
+   ],
+   [
+    719,
+    204
+   ],
+   [
+    719,
+    198
    ]
   ],
   "flange": [
@@ -214,6 +330,26 @@
    ]
   ],
   "cabo": [
+   [
+    320,
+    419
+   ],
+   [
+    323,
+    420
+   ],
+   [
+    326,
+    419
+   ],
+   [
+    323,
+    418
+   ],
+   [
+    324,
+    414
+   ],
    [
     324,
     400
@@ -385,28 +521,41 @@
    [
     728,
     204
+   ],
+   [
+    724,
+    207
+   ],
+   [
+    723,
+    202
+   ],
+   [
+    731,
+    201
+   ],
+   [
+    732,
+    207
+   ],
+   [
+    728,
+    209
    ]
   ]
  },
  "veredito": {
   "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
-  "nota": 8,
+  "nota": 9,
   "defeitos": [
    {
-    "parte": "cotovelo",
-    "tipo": "ausencia",
-    "onde": "canto superior esquerdo do topo arredondado",
-    "sentido": "faltando",
-    "evidencia": "divisas/cabo--cotovelo.png, lado direito: o canto superior esquerdo do volume lilás mostra um pedaço cinza sem cor logo abaixo do cabo"
-   },
-   {
-    "parte": "carcacaPunho",
-    "tipo": "posicao",
-    "onde": "trecho inferior da divisa com o antebraco",
-    "sentido": "atrasada",
-    "evidencia": "divisas/antebraco--carcacaPunho.png, metade inferior do lado direito: a fronteira verde/azul sai do arco da carcaça e forma um degrau serrilhado para a esquerda"
+    "parte": "garfoPunho",
+    "tipo": "comprimento",
+    "onde": "extremidade inferior, encontro com a flange",
+    "sentido": "maior",
+    "evidencia": "folha de divisas, recorte flange/garfoPunho, centro inferior: o azul desce em degraus sobre a face superior do disco, e no original o toco termina reto na flange; baixa confiança"
    }
   ],
-  "observacao": "A segmentação cobre as 14 partes sem invadir fundo nem parte vizinha. O que resta são um canto sem cor no cotovelo e um trecho serrilhado na divisa antebraço/carcaça, e fica em aberto se o colar escuro acima do anelCintura pertence ao ombro ou ao anel."
+  "observacao": "Todas as regiões cobrem a parte nomeada e seguem as divisas do alvo; o único encontro duvidoso é garfoPunho/flange, e o toco lateral pintado como cabo é ambíguo no alvo."
  }
 }

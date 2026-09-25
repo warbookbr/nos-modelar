@@ -40,10 +40,10 @@ regra do que aparece e os critérios: região que pega outra parte ou o fundo,
 parte com pedaço sem cor, divisa fora do lugar onde a imagem mostra a
 separação. Peça atenção aos recortes: cada um mostra o original à esquerda e a
 pintura à direita, ampliados, e foi num recorte assim que apareceu o defeito
-que três críticos olhando a imagem inteira não viram. Mande o caminho de cada
-recorte, um por linha, tirado de `medidas.json`: o crítico só lê arquivo e não
-lista pasta, e na primeira rodada da lateral do braço ele abriu dois recortes
-de dezenove porque recebeu só o nome da pasta. Nunca mande as sementes nem o
+que três críticos olhando a imagem inteira não viram. Mande a folha
+`divisas.png`, que junta todos os recortes numa imagem só: o crítico só lê
+arquivo e não lista pasta, e na lateral do braço ele abriu 2 e depois 9 dos
+19 recortes soltos. Nunca mande as sementes nem o
 que mudou.
 
 **Registre** o veredito sem editar:
@@ -55,7 +55,9 @@ npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
 Nota 9 ou mais fecha. Abaixo disso a ação volta a ser **desenhar**, até três
 rodadas. Depois da terceira sem nota 9 a ação é **humano**: mostre à pessoa a
 sobreposição, os recortes e os defeitos em aberto, e ela decide. Nenhum
-agente estende o limite nem aceita defeito por conta própria.
+agente estende o limite nem aceita defeito por conta própria. Se a pessoa decidir
+corrigir a ferramenta e tentar de novo, arquive a série com
+`npm run contorno -- --regioes=<json> --nova-serie --por=<quem decidiu>`.
 
 ## Ao fechar
 

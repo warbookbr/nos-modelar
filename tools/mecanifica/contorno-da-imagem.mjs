@@ -13,11 +13,16 @@
  *     [--pacote=<pasta>] [--opacidade=0.2]
  *   npm run contorno -- --regioes=<regioes.json> --acao
  *   npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
+ *   npm run contorno -- --regioes=<regioes.json> --nova-serie --por=<quem decidiu>
+ *
+ * `--nova-serie` só vale quando a série parou na decisão humana: as rodadas
+ * dela vão para `serie-NN/`, com quem autorizou, e a contagem recomeça.
  *
  * `--pacote` grava, para o crítico e a pessoa, a sobreposição com a opacidade
  * pedida (20% por padrão), um recorte ampliado de cada divisa entre partes
- * vizinhas, com o original ao lado, e `medidas.json` com a fração do contorno
- * de cada parte que segue uma borda da imagem.
+ * vizinhas, com o original ao lado, a folha `divisas.png` com todos os
+ * recortes juntos e `medidas.json` com a fração do contorno de cada parte que
+ * segue uma borda da imagem.
  *
  * O ARQUIVO DE REGIÕES
  *   { "ancoras": [ { "nome": "...", "px": [x, y], "mm": [z, y] }, { ... } ],
@@ -28,11 +33,11 @@
  * julgadas e o veredito do crítico. A saída do contorno é
  * `<imagem>.contornos.json`, igual a cada execução. */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, sobreposicao, recortesDasDivisas, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
+  segmentar, sobreposicao, recortesDasDivisas, folhaDasDivisas, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
@@ -75,6 +80,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
   const recortes = recortesDasDivisas(pngBuffer, semNome, segmentacao);
   for (const { a, b, png } of recortes) writeFileSync(join(pasta, 'divisas', `${a}--${b}.png`), png);
+  writeFileSync(join(pasta, 'divisas.png'), await folhaDasDivisas(recortes));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
   const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
@@ -106,6 +112,20 @@ export function registrarRodada(arquivoRegioes, veredito) {
   return { rodada, arquivo, proxima: proximaAcao([...rodadas, rodada]) };
 }
 
+export function novaSerie(arquivoRegioes, por) {
+  if (!por || !String(por).trim()) throw new Error('nova série exige --por com quem decidiu.');
+  const rodadas = lerRodadas(arquivoRegioes);
+  const decisao = proximaAcao(rodadas);
+  if (decisao.acao !== 'humano') throw new Error(`nova série só depois da decisão humana; a ação agora é ${decisao.acao}.`);
+  const pasta = pastaDasRodadas(arquivoRegioes);
+  const numero = readdirSync(pasta).filter((n) => /^serie-\d+$/.test(n)).length + 1;
+  const destino = join(pasta, `serie-${String(numero).padStart(2, '0')}`);
+  mkdirSync(destino);
+  for (const n of readdirSync(pasta).filter((x) => /^rodada-\d+\.json$/.test(x))) renameSync(join(pasta, n), join(destino, n));
+  writeFileSync(join(destino, 'decisao.json'), `${JSON.stringify({ por: String(por).trim(), acao: 'nova-serie' }, null, 1)}\n`);
+  return destino;
+}
+
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
   const valor = (nome) => argv.find((a) => a.startsWith(`--${nome}=`))?.split('=').slice(1).join('=');
@@ -117,6 +137,10 @@ async function principal(argv) {
   if (argv.includes('--acao')) {
     const d = proximaAcao(lerRodadas(regioes));
     process.stdout.write(`próxima ação: ${d.acao} — ${d.motivo}\n${(d.defeitos ?? []).map((x) => `  ${JSON.stringify(x)}`).join('\n')}\n`);
+    return 0;
+  }
+  if (argv.includes('--nova-serie')) {
+    process.stdout.write(`série arquivada em ${novaSerie(regioes, valor('por'))}\n`);
     return 0;
   }
   if (valor('registrar')) {
