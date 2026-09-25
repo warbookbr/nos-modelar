@@ -1,0 +1,283 @@
+{
+ "numero": 2,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura",
+    "em": 60
+   },
+   {
+    "parte": "base",
+    "medida": "altura",
+    "em": 60
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "largura",
+    "em": 150
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura",
+    "em": 90,
+    "afasta": 60
+   },
+   {
+    "parte": "ombro",
+    "medida": "largura",
+    "em": 380
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "o topo some atrás do braço",
+    "notaEm": [
+     160,
+     330
+    ]
+   },
+   {
+    "parte": "braco",
+    "medida": "largura",
+    "em": 600
+   },
+   {
+    "parte": "braco",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "o pé some atrás do ombro",
+    "notaEm": [
+     160,
+     560
+    ]
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura",
+    "em": -50,
+    "afasta": -100
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "altura",
+    "em": -50,
+    "afasta": -100
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura",
+    "em": 1000
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura",
+    "em": 900
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "altura",
+    "em": 180,
+    "afasta": 0
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura",
+    "em": 920
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura",
+    "em": 300
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura",
+    "em": 990
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura",
+    "em": 650
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "largura",
+    "em": 830
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura",
+    "em": 740,
+    "afasta": 60
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura",
+    "em": 720
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura",
+    "em": 740,
+    "afasta": 60
+   },
+   {
+    "parte": "flange",
+    "medida": "largura",
+    "em": 630,
+    "afasta": -70
+   },
+   {
+    "parte": "flange",
+    "medida": "altura",
+    "em": 770,
+    "afasta": 45
+   }
+  ],
+  "nomes": {
+   "cotovelo": {
+    "em": [
+     -60,
+     1060
+    ],
+    "marca": [
+     -60,
+     1045
+    ]
+   },
+   "anelCotovelo": {
+    "em": [
+     160,
+     800
+    ]
+   },
+   "braco": {
+    "em": [
+     160,
+     650
+    ]
+   },
+   "ombro": {
+    "em": [
+     160,
+     400
+    ]
+   },
+   "anelCintura": {
+    "em": [
+     200,
+     225
+    ]
+   },
+   "base": {
+    "em": [
+     160,
+     150
+    ],
+    "marca": [
+     -60,
+     190
+    ]
+   },
+   "caixaLateral": {
+    "em": [
+     -185,
+     -45
+    ],
+    "marca": [
+     -145,
+     60
+    ]
+   },
+   "anelAntebraco": {
+    "em": [
+     150,
+     1110
+    ],
+    "marca": [
+     150,
+     950
+    ]
+   },
+   "antebraco": {
+    "em": [
+     330,
+     850
+    ]
+   },
+   "carcacaPunho": {
+    "em": [
+     450,
+     850
+    ]
+   },
+   "aneisPunho": {
+    "em": [
+     470,
+     780
+    ]
+   },
+   "garfoPunho": {
+    "em": [
+     470,
+     720
+    ]
+   },
+   "flange": {
+    "em": [
+     470,
+     640
+    ]
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "trecho vertical, do ombro ao anelCotovelo",
+    "sentido": "faltando",
+    "evidencia": "prancha lateral, centro-esquerda: há só a largura 178 e a nota em itálico 'braco altura: o pé some atrás do ombro', sem cota vertical"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "trecho vertical, do anelCintura ao braço",
+    "sentido": "faltando",
+    "evidencia": "prancha lateral, y≈585: há só a largura 229 e a nota 'ombro altura: o topo some atrás do braço'"
+   },
+   {
+    "parte": "garfoPunho",
+    "tipo": "cota",
+    "onde": "linha da cota 108",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, direita, y≈342: a linha da cota 108 coincide com a linha de chamada do nome garfoPunho"
+   },
+   {
+    "parte": "braco",
+    "tipo": "superficie",
+    "onde": "borda esquerda, trecho médio",
+    "sentido": "segmentado",
+    "evidencia": "prancha, x≈140–150 e y≈330–375: o contorno sai serrilhado, e no alvo a borda é lisa"
+   },
+   {
+    "parte": "caixaLateral",
+    "tipo": "comprimento",
+    "onde": "extremidade inferior esquerda",
+    "sentido": "maior",
+    "evidencia": "prancha, canto inferior esquerdo (≈92, 800): um bico sai para fora do contorno, e o alvo não tem isso"
+   }
+  ],
+  "observacao": "A silhueta do conjunto segue o alvo, e as maiores falhas estão nas cotas: faltam as alturas do braço e do ombro, e há anotação sobreposta no punho."
+ }
+}
