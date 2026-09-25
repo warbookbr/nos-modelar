@@ -42,7 +42,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, contornoDaSilhueta, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, proximaAcao,
+  segmentar, contornoDaSilhueta, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, proximaAcao,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 import { lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
@@ -88,10 +88,37 @@ export async function contornosDaImagem(pngBuffer, config) {
 
 /* O pacote que o crítico recebe. A pasta é refeita a cada chamada, para
    nenhum recorte de uma rodada anterior sobrar com cara de atual. */
+/* O mapa de partes com nomes em fonte de verdade. O navegador mede cada
+   texto na fonte do SVG, o módulo arruma as caixas com essa largura e o
+   navegador rasteriza o SVG no tamanho exato da tela. O módulo fica sem
+   playwright; a composição mora aqui. */
+export async function mapaRotulado(pngBuffer, segmentacao, { opacidade = 0.2 } = {}) {
+  const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
+  const { chromium } = (await import('playwright')).default;
+  const navegador = await chromium.launch();
+  try {
+    const pagina = await navegador.newPage();
+    const ordem = (segmentacao.ordem ?? Object.keys(segmentacao.regioes)).filter((n) => segmentacao.regioes[n]);
+    const textos = ordem.map((nome, n) => `${n + 1}- ${nome}`);
+    const fonte = `${FONTE_DA_ETIQUETA.tamanho}px ${FONTE_DA_ETIQUETA.familia}`;
+    const larguras = await pagina.evaluate(([ts, f]) => {
+      const c = document.createElement('canvas').getContext('2d'); c.font = f;
+      return ts.map((t) => c.measureText(t).width);
+    }, [textos, fonte]);
+    const medida = new Map(textos.map((t, i) => [t, larguras[i]]));
+    const arranjo = etiquetasFora(segmentacao, { larguraDoTexto: (t) => medida.get(t) });
+    await pagina.setViewportSize({ width: arranjo.largura, height: arranjo.altura });
+    await pagina.setContent(`<body style="margin:0">${svgDoMapa(semNome, arranjo)}</body>`);
+    return await pagina.screenshot({ clip: { x: 0, y: 0, width: arranjo.largura, height: arranjo.altura } });
+  } finally {
+    await navegador.close();
+  }
+}
+
 export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2, imagemAlvo = '(imagem alvo)' } = {}) {
   rmSync(pasta, { recursive: true, force: true });
   mkdirSync(join(pasta, 'divisas'), { recursive: true });
-  const pintada = await sobreposicao(pngBuffer, segmentacao, { opacidade });
+  const pintada = await mapaRotulado(pngBuffer, segmentacao, { opacidade });
   writeFileSync(join(pasta, 'mapa-de-partes.png'), pintada);
   /* Nos recortes vai a pintura sem os nomes, que cobririam a divisa. */
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });

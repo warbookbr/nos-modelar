@@ -36,10 +36,9 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
     saida.data[o + 3] = 255;
   }
   if (!rotular) return PNG.sync.write(saida);
-  /* Os nomes vão fora da silhueta, numa etiqueta branca com borda preta, e
-     uma linha fina liga cada um a um ponto dentro da parte. Na versão
-     anterior a etiqueta ficava sobre a semente e cobria a pintura que o
-     crítico precisa ver. A tela cresce para caber as colunas. */
+  /* Sem medida de texto, o módulo ainda desenha as etiquetas pelo OpenCV,
+     para uso sem navegador. A ferramenta mede o texto na fonte de verdade e
+     compõe o mapa por `svgDoMapa`, que é o que vai para o pacote. */
   const arranjo = etiquetasFora(segmentacao);
   const { cv } = await carregarOpenCV();
   const tela = new cv.Mat(arranjo.altura, arranjo.largura, cv.CV_8UC4, new cv.Scalar(255, 255, 255, 255));
@@ -47,24 +46,10 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
   try {
     img.copyTo(tela.roi(new cv.Rect(arranjo.dx, arranjo.dy, png.width, png.height)));
     const preto = new cv.Scalar(0, 0, 0, 255);
-    for (const { marca, ponta } of arranjo.etiquetas) {
-      cv.line(tela, new cv.Point(marca[0], marca[1]), new cv.Point(ponta[0], ponta[1]), preto, 1, cv.LINE_AA);
-    }
-    /* O número vai também sobre o ponto da parte, num círculo branco. Quando
-       várias marcas ficam na mesma altura, a chamada de uma passa sobre as
-       outras e o olho liga o nome à parte errada; com o número no ponto, a
-       parte se lê sem seguir a linha. */
-    for (const { texto, marca } of arranjo.etiquetas) {
-      const numero = texto.split('-')[0];
-      const centro = new cv.Point(marca[0], marca[1]);
-      cv.circle(tela, centro, 8, new cv.Scalar(255, 255, 255, 255), cv.FILLED);
-      cv.circle(tela, centro, 8, preto, 1, cv.LINE_AA);
-      cv.putText(tela, numero, new cv.Point(marca[0] - (numero.length > 1 ? 7 : 4), marca[1] + 4), cv.FONT_HERSHEY_SIMPLEX, 0.35, preto, 1);
-    }
-    for (const { texto, caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
+    for (const { marca, ponta } of arranjo.etiquetas) cv.line(tela, new cv.Point(marca[0], marca[1]), new cv.Point(ponta[0], ponta[1]), preto, 1, cv.LINE_AA);
+    for (const { caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
       cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), new cv.Scalar(255, 255, 255, 255), cv.FILLED);
       cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), preto, 1);
-      cv.putText(tela, texto, new cv.Point(x0 + 3, y1 - 4), cv.FONT_HERSHEY_SIMPLEX, 0.4, preto, 1);
     }
     const final = new PNG({ width: arranjo.largura, height: arranjo.altura });
     final.data = Buffer.from(tela.data);
@@ -72,6 +57,39 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
   } finally {
     img.delete(); tela.delete();
   }
+}
+
+/* A fonte das etiquetas. A Hershey do OpenCV saía serrilhada e pequena; o
+   mapa agora é SVG com fonte de verdade, rasterizado pela ferramenta. */
+export const FONTE_DA_ETIQUETA = { familia: "'DejaVu Sans', 'Liberation Sans', sans-serif", tamanho: 13, tamanhoDoNumero: 11 };
+export const RAIO_DO_NUMERO = 9;
+
+const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* O mapa rotulado em SVG: a pintura sem nome embutida como PNG, as chamadas,
+   o número em negrito num círculo sobre o ponto da parte e cada nome numa
+   caixa branca. O número vai sobre o ponto porque, quando várias marcas ficam
+   na mesma altura, a chamada de uma passa sobre as outras e o olho liga o
+   nome à parte errada. */
+export function svgDoMapa(pinturaPng, arranjo) {
+  const { largura: W, altura: H, dx, dy, etiquetas } = arranjo;
+  const { width, height } = PNG.sync.read(pinturaPng);
+  const f = FONTE_DA_ETIQUETA;
+  const L = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="${f.familia}">`,
+    `<rect width="${W}" height="${H}" fill="#fff"/>`,
+    `<image x="${dx}" y="${dy}" width="${width}" height="${height}" href="data:image/png;base64,${pinturaPng.toString('base64')}" style="image-rendering:pixelated"/>`];
+  for (const { marca, ponta } of etiquetas) L.push(`<line x1="${marca[0] + 0.5}" y1="${marca[1] + 0.5}" x2="${ponta[0] + 0.5}" y2="${ponta[1] + 0.5}" stroke="#000" stroke-width="1"/>`);
+  for (const { texto, marca } of etiquetas) {
+    const [cx, cy] = [marca[0] + 0.5, marca[1] + 0.5];
+    L.push(`<circle cx="${cx}" cy="${cy}" r="${RAIO_DO_NUMERO}" fill="#fff" stroke="#000" stroke-width="1"/>`,
+      `<text x="${cx}" y="${cy}" font-size="${f.tamanhoDoNumero}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${esc(texto.split('-')[0])}</text>`);
+  }
+  for (const { texto, caixa: [x0, y0, x1, y1] } of etiquetas) {
+    L.push(`<rect x="${x0 + 0.5}" y="${y0 + 0.5}" width="${x1 - x0}" height="${y1 - y0}" fill="#fff" stroke="#000" stroke-width="1"/>`,
+      `<text x="${x0 + MARGEM_DO_TEXTO}" y="${(y0 + y1) / 2 + 0.5}" font-size="${f.tamanho}" dominant-baseline="central">${esc(texto)}</text>`);
+  }
+  L.push('</svg>');
+  return L.join('\n');
 }
 
 /* Um ponto dentro da parte: o meio do trecho mais largo da linha da parte
@@ -98,10 +116,13 @@ function pontoDentro(segmentacao, rotulo) {
   return null;
 }
 
-export const ALTURA_DA_ETIQUETA = 16;
+export const ALTURA_DA_ETIQUETA = 20;
 const PASSO_DA_ETIQUETA = ALTURA_DA_ETIQUETA + 3;
 const FOLGA = 12;
-const larguraDaEtiqueta = (nome) => Math.round(nome.length * 7.2) + 6;
+const MARGEM_DO_TEXTO = 5;
+/* Largura estimada do texto a 13 px quando ninguém mediu; a ferramenta passa
+   a largura medida na fonte do SVG em `larguraDoTexto`. */
+const estimativa = (texto) => texto.length * 8;
 
 /* O arranjo dos nomes, em coordenada da tela final: `dx`, `dy` é onde a
    imagem original começa nela, e cada etiqueta traz a caixa [x0, y0, x1, y1],
@@ -109,7 +130,8 @@ const larguraDaEtiqueta = (nome) => Math.round(nome.length * 7.2) + 6;
    se dividem pela marca: a metade mais à esquerda vai para a coluna da
    esquerda. Assim toda chamada da esquerda fica à esquerda de toda chamada da
    direita, e chamadas de colunas diferentes não se cruzam. */
-export function etiquetasFora(segmentacao) {
+export function etiquetasFora(segmentacao, { larguraDoTexto = estimativa } = {}) {
+  const larguraDaEtiqueta = (texto) => Math.ceil(larguraDoTexto(texto)) + 2 * MARGEM_DO_TEXTO;
   const { largura, altura, silhueta, regioes } = segmentacao;
   let sx0 = largura; let sx1 = -1;
   for (let p = 0; p < silhueta.length; p += 1) if (silhueta[p]) { const x = p % largura; if (x < sx0) sx0 = x; if (x > sx1) sx1 = x; }

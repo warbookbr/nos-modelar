@@ -4,7 +4,7 @@
    limite das rodadas. */
 import { describe, expect, it } from 'vitest';
 import { PNG } from 'pngjs';
-import { segmentar, sobreposicao, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada } from '../src/index.js';
+import { segmentar, sobreposicao, svgDoMapa, etiquetasFora, segmentosSeCruzam, divisas, recortesDasDivisas, proximidadeDaBorda, proximaAcao, validarRodada } from '../src/index.js';
 
 /* Fundo branco, dois retângulos do mesmo cinza encostados, com uma linha um
    pouco mais escura entre eles, como a costura de duas partes. */
@@ -84,6 +84,11 @@ describe('contorno da imagem', () => {
     const arranjo = etiquetasFora(seg);
     const final = PNG.sync.read(await sobreposicao(buf, seg));
     expect([final.width, final.height]).toEqual([arranjo.largura, arranjo.altura]);
+    /* O SVG que a ferramenta rasteriza tem o tamanho do arranjo e um texto
+       por nome e por número. */
+    const svg = svgDoMapa(await sobreposicao(buf, seg, { rotular: false }), arranjo);
+    expect(svg).toContain(`viewBox="0 0 ${arranjo.largura} ${arranjo.altura}"`);
+    expect(svg.match(/<text /g)).toHaveLength(14);
     expect(arranjo.etiquetas).toHaveLength(7);
     /* O número segue a ordem do arquivo de regiões, e não a alfabética. */
     const porNome = Object.fromEntries(arranjo.etiquetas.map((e) => [e.nome, e.texto]));

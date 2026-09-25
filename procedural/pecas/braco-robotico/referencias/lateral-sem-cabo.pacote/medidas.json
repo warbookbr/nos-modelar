@@ -8,7 +8,7 @@
   "base": 1,
   "braco": 0.99,
   "caixaLateral": 0.992,
-  "carcacaPunho": 0.908,
+  "carcacaPunho": 0.925,
   "cotovelo": 1,
   "flange": 0.914,
   "garfoPunho": 0.978,
@@ -16,7 +16,7 @@
  },
  "minimo": 0.8,
  "abaixo": [],
- "semDonoPx": 189,
+ "semDonoPx": 190,
  "divisas": [
   {
    "a": "anelAntebraco",
@@ -52,10 +52,10 @@
    "a": "aneisPunho",
    "b": "carcacaPunho",
    "caixa": [
-    667,
-    120,
+    659,
+    108,
     744,
-    159
+    147
    ]
   },
   {
