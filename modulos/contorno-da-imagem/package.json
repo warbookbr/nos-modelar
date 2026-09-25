@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "@mecanifica/contorno-da-imagem",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Separa as partes de uma imagem de referência por watershed com sementes nomeadas, desenha a sobreposição e o zoom de cada divisa, mede o contorno contra as bordas da imagem e conduz as rodadas entre desenhador e crítico."
+}

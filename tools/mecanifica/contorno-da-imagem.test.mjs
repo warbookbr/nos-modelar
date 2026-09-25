@@ -10,8 +10,8 @@ const regioes = JSON.parse(readFileSync(new URL('lateral.regioes.json', pasta), 
 
 describe('contorno da imagem', () => {
   it('é igual nas duas execuções e bate com o arquivo gravado', async () => {
-    const a = await contornosDaImagem(imagem, regioes);
-    const b = await contornosDaImagem(imagem, regioes);
+    const { resultado: a } = await contornosDaImagem(imagem, regioes);
+    const { resultado: b } = await contornosDaImagem(imagem, regioes);
     expect(a).toEqual(b);
     expect(a).toEqual(JSON.parse(readFileSync(new URL('lateral.contornos.json', pasta), 'utf8')));
   }, 60000);
@@ -22,7 +22,7 @@ describe('contorno da imagem', () => {
   }, 60000);
 
   it('separa o ombro da coluna, que têm o mesmo cinza', async () => {
-    const { regioes: r } = await contornosDaImagem(imagem, regioes);
+    const { resultado: { regioes: r } } = await contornosDaImagem(imagem, regioes);
     expect(r.ombro.areaMm2).toBeGreaterThan(5000);
     expect(r.braco.areaMm2).toBeGreaterThan(r.ombro.areaMm2);
   }, 60000);

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-764 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+773 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -19,6 +19,7 @@
 ## .claude/agents/
 
 - `critico-visual.md` — Crítico visual sem contexto da Mecanifica. Recebe o DESENHO ALVO e as vistas do MODELO e responde se o segundo bate com o primeiro. Use antes de fechar qualq…
+- `desenhador-de-contorno.md` — Põe as sementes que separam as partes de uma imagem de referência no arquivo de regiões e gera o pacote do crítico com `npm run contorno`. Nas rodadas seguin…
 - `implementador.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
 - `modelador.md` — Escreve e corrige a receita procedural de UMA peça a partir de um plano de modelagem e, nas rodadas seguintes, de um veredito de defeitos. Não julga o própri…
 - `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
@@ -38,6 +39,10 @@
 ## .claude/skills/auditar-peca/
 
 - `SKILL.md` — Verificar uma peça da Mecanifica pelo fluxo atual de descrição, bancada neutra, revisão do pacote e gates do repositório.
+
+## .claude/skills/contorno-da-imagem/
+
+- `SKILL.md` — Separar as partes de uma imagem de referência por watershed com sementes nomeadas e tirar o contorno de cada uma em milímetro, com um desenhador que põe as s…
 
 ## .claude/skills/criar-peca/
 
@@ -313,6 +318,19 @@
 - `oficina-projeto.md` — Oficina — o registro de projeto
 - `oficina-referencia.md` — Oficina — aviso de compatibilidade
 - `playground.md` — O Playground — o épico da criação por IA
+
+## modulos/contorno-da-imagem/src/
+
+- `desenho.js` — desenho.js — o que o crítico e a pessoa olham.
+- `index.js` — **SEM CABEÇALHO**
+- `medida.js` — medida.js — o contorno de cada parte contra as bordas da própria imagem. Para cada parte, a fração do perímetro que fica a até `distancia` pixels de uma bord…
+- `opencv.js` — opencv.js — carrega o OpenCV uma vez. Carregado por require, e só quando usado: importado como módulo ES, o pacote quebra dentro do vitest. E o módulo volta …
+- `regioes.js` — regioes.js — as partes da imagem, separadas por watershed com sementes.
+- `rodadas.js` — rodadas.js — a conversa entre o desenhador e o crítico, com limite.
+
+## modulos/contorno-da-imagem/tests/
+
+- `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
 
 ## modulos/exportador-cad/src/
 
@@ -851,7 +869,7 @@
 - `conferir-malha.mjs` — conferir-malha.mjs — um comando que responde as três perguntas de malha sobre uma receita: o traçado está bom, sobra alguma coisa, e ela sai para um motor de…
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
-- `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — o contorno de cada parte, tirado da própria imagem.
+- `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `cor-auditoria.test.ts` — cor-auditoria.test.ts — a cor de auditoria é ENDEREÇO, não enfeite.
 - `derivar-campanha-revalidacao.mjs` — derivar-campanha-revalidacao.mjs — ponte R02 entre impacto global e R01.

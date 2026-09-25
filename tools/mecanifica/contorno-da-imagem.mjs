@@ -1,207 +1,145 @@
 #!/usr/bin/env node
-/* contorno-da-imagem.mjs — o contorno de cada parte, tirado da própria imagem.
+/* contorno-da-imagem.mjs — a porta de linha de comando do módulo
+ * `modulos/contorno-da-imagem`, que separa as partes de uma imagem de
+ * referência por watershed com sementes nomeadas.
  *
- * A prancha da lateral do braço robótico foi traçada à mão com retângulos
- * lidos a olho, e a pessoa julgou que ela não serve para conferir proporção
- * nem posição: o contorno carregava o erro de quem leu a imagem. Aqui o
- * contorno sai da imagem, por medida.
- *
- * COMO. A silhueta é o que fica abaixo do limiar do fundo claro. Quem conhece
- * o objeto semeia cada parte no arquivo de regiões, com um ponto ou uma linha
- * traçada dentro dela, e o watershed do OpenCV faz cada semente crescer até
- * encontrar a vizinha, com a divisa onde a imagem muda mais. Assim partes do
- * mesmo cinza sem borda forte entre elas, como o ombro atrás da coluna, saem
- * separadas. Parte que não é do modelo, como o cabo, também precisa de semente,
- * senão a vizinha a engole. O contorno sai em pixel e em milímetro, pela
- * calibração por duas âncoras do `conferir:referencia`.
- *
- * Ensaio de 2026-09-25 na `lateral.png`: Potrace e OpenCV traçam a silhueta a
- * até 2 px da borda, mas o Potrace só separa por limiar de cor e é GPL. O corte
- * só por bordas de sombra (Canny) juntava antebraço e carcaça do punho e
- * deixava o ombro dentro da coluna; o watershed com sementes separa as 13
- * partes e o cabo.
+ * Aqui entram o que o módulo não sabe: a calibração por duas âncoras do
+ * `conferir:referencia`, que leva o contorno de pixel a milímetro, os arquivos
+ * em disco e as rodadas entre desenhador e crítico. O fluxo está na skill
+ * `.claude/skills/contorno-da-imagem`.
  *
  * USO
- *   npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>] [--desenho=<png>]
+ *   npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>]
+ *     [--pacote=<pasta>] [--opacidade=0.2]
+ *   npm run contorno -- --regioes=<regioes.json> --acao
+ *   npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
  *
- * `--desenho` grava a imagem com cada região pintada por cima e o nome dela,
- * para a pessoa julgar se a divisa segue a parte; `--opacidade=0.2` deixa a
- * pintura mais fraca, de 0 a 1, e o padrão é 0.5.
+ * `--pacote` grava, para o crítico e a pessoa, a sobreposição com a opacidade
+ * pedida (20% por padrão), um recorte ampliado de cada divisa entre partes
+ * vizinhas, com o original ao lado, e `medidas.json` com a fração do contorno
+ * de cada parte que segue uma borda da imagem.
  *
  * O ARQUIVO DE REGIÕES
  *   { "ancoras": [ { "nome": "...", "px": [x, y], "mm": [z, y] }, { ... } ],
  *     "limiar": 225,
  *     "regioes": { "base": [390, 470], "anelCintura": [[345, 405], [430, 405]] } }
  *
- * A saída padrão é `<imagem>.contornos.json` ao lado da imagem. Rodar duas
- * vezes na mesma imagem e no mesmo arquivo de regiões dá o mesmo arquivo. */
+ * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
+ * julgadas e o veredito do crítico. A saída do contorno é
+ * `<imagem>.contornos.json`, igual a cada execução. */
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { basename, resolve } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createRequire } from 'node:module';
-import { PNG } from 'pngjs';
+import {
+  segmentar, sobreposicao, recortesDasDivisas, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
+} from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
 export const FORMATO = 'mecanifica.contornos@1';
-
-/* Devolve o módulo dentro de um objeto: o módulo do OpenCV tem `then` próprio,
-   e um `await` direto nele tenta tratá-lo como promessa e quebra no vitest. */
-async function carregarOpenCV() {
-  /* Carregado por require, e só quando usado: importado como módulo ES, o
-     pacote quebra dentro do vitest. */
-  const base = createRequire(import.meta.url)('@techstark/opencv-js');
-  if (base instanceof Promise) return { cv: await base };
-  if (base.Mat) return { cv: base };
-  return new Promise((pronto) => { base.onRuntimeInitialized = () => pronto({ cv: base }); });
-}
-
 const arred = (x) => (Math.round(x * 100) / 100) || 0;
 
-/* Uma semente é um ponto `[x, y]` ou uma linha `[[x, y], [x, y], ...]` traçada
-   dentro da parte; a linha serve a parte estreita, como um anel escuro. */
-export function tracosDaSemente(semente) {
-  const lista = Array.isArray(semente?.[0]) ? semente : [semente];
-  if (!lista.length || lista.some((p) => !Array.isArray(p) || p.length !== 2 || !p.every(Number.isFinite))) {
-    throw new Error(`semente inválida: ${JSON.stringify(semente)}; use [x, y] ou [[x, y], ...].`);
-  }
-  return lista;
-}
-
-/* Regiões da imagem por watershed. O fundo é semente de tudo o que está fora
-   da silhueta; cada parte nomeada é semente dos pontos dela. Cada semente
-   cresce até encontrar a vizinha, e a divisa fica onde a imagem muda mais,
-   mesmo quando a borda entre duas partes do mesmo cinza é fraca. */
-export async function regioesDaImagem(pngBuffer, { limiar = 225, sementes = [] } = {}) {
-  const { cv } = await carregarOpenCV();
-  const png = PNG.sync.read(pngBuffer);
-  const mats = [];
-  const novo = (m) => { mats.push(m); return m; };
-  try {
-    const src = novo(cv.matFromImageData({ data: png.data, width: png.width, height: png.height }));
-    const cor = novo(new cv.Mat()); cv.cvtColor(src, cor, cv.COLOR_RGBA2RGB);
-    const cinza = novo(new cv.Mat()); cv.cvtColor(src, cinza, cv.COLOR_RGBA2GRAY);
-    const silhueta = novo(new cv.Mat()); cv.threshold(cinza, silhueta, limiar, 255, cv.THRESH_BINARY_INV);
-    const nucleo = novo(cv.Mat.ones(3, 3, cv.CV_8U));
-    const larga = novo(new cv.Mat()); cv.dilate(silhueta, larga, nucleo, new cv.Point(-1, -1), 3);
-    const marcas = novo(new cv.Mat(png.height, png.width, cv.CV_32S, new cv.Scalar(0)));
-    const largura = png.width;
-    for (let p = 0; p < larga.data.length; p += 1) if (!larga.data[p]) marcas.data32S[p] = 1;
-    const dentro = ([x, y]) => silhueta.data[Math.round(y) * largura + Math.round(x)] > 0;
-    sementes.forEach(({ nome, tracos }, i) => {
-      for (const ponto of tracos) {
-        if (!dentro(ponto)) throw new Error(`o ponto ${JSON.stringify(ponto)} de '${nome}' cai fora da silhueta; mova o ponto para dentro da parte.`);
-      }
-      const rotulo = new cv.Scalar(i + 2);
-      if (tracos.length === 1) cv.circle(marcas, new cv.Point(tracos[0][0], tracos[0][1]), 2, rotulo, -1);
-      for (let k = 1; k < tracos.length; k += 1) {
-        cv.line(marcas, new cv.Point(tracos[k - 1][0], tracos[k - 1][1]), new cv.Point(tracos[k][0], tracos[k][1]), rotulo, 2);
-      }
-    });
-    cv.watershed(cor, marcas);
-    const contornoDe = (rotulo) => {
-      const so = novo(new cv.Mat(png.height, png.width, cv.CV_8U, new cv.Scalar(0)));
-      for (let p = 0; p < marcas.data32S.length; p += 1) if (marcas.data32S[p] === rotulo && silhueta.data[p]) so.data[p] = 255;
-      const contornos = novo(new cv.MatVector()); const hierarquia = novo(new cv.Mat());
-      cv.findContours(so, contornos, hierarquia, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE);
-      let maior = null; let area = -1;
-      for (let i = 0; i < contornos.size(); i += 1) {
-        const c = contornos.get(i); const a = cv.contourArea(c);
-        if (a > area) { if (maior) maior.delete(); area = a; maior = c; } else c.delete();
-      }
-      if (!maior) return { pontos: [], areaPx: 0 };
-      const simples = novo(new cv.Mat()); cv.approxPolyDP(maior, simples, 1, true);
-      const pontos = [];
-      for (let k = 0; k < simples.data32S.length; k += 2) pontos.push([simples.data32S[k], simples.data32S[k + 1]]);
-      maior.delete();
-      return { pontos, areaPx: area };
-    };
-    return { largura: png.width, altura: png.height, contornoDe, liberar: () => mats.forEach((m) => m.delete()) };
-  } catch (erro) {
-    mats.forEach((m) => m.delete());
-    throw erro;
-  }
-}
-
 export async function contornosDaImagem(pngBuffer, config) {
-  if (!config?.regioes || !Object.keys(config.regioes).length) throw new Error('o arquivo de regiões não nomeia nenhuma região.');
   const calibracao = calibrarPorAncoras(config.ancoras);
-  const nomes = Object.keys(config.regioes).sort();
-  const sementes = nomes.map((nome) => ({ nome, tracos: tracosDaSemente(config.regioes[nome]) }));
-  const imagem = await regioesDaImagem(pngBuffer, { limiar: config.limiar, sementes });
-  try {
-    const regioes = {};
-    const mm2 = calibracao.mmPorPx ** 2;
-    sementes.forEach(({ nome, tracos }, i) => {
-      const { pontos, areaPx } = imagem.contornoDe(i + 2);
-      if (!pontos.length) throw new Error(`'${nome}' não ficou com região nenhuma; a semente foi engolida pelas vizinhas.`);
-      regioes[nome] = {
-        semente: tracos,
-        areaMm2: Math.round(areaPx * mm2),
-        contornoPx: pontos,
-        contornoMm: pontos.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
-      };
-    });
-    return {
+  const seg = await segmentar(pngBuffer, config);
+  const mm2 = calibracao.mmPorPx ** 2;
+  const regioes = {};
+  for (const [nome, r] of Object.entries(seg.regioes)) {
+    regioes[nome] = {
+      semente: r.semente,
+      areaMm2: Math.round(r.areaPx * mm2),
+      contornoPx: r.contornoPx,
+      contornoMm: r.contornoPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+    };
+  }
+  return {
+    resultado: {
       formato: FORMATO,
-      imagem: { sha256: createHash('sha256').update(pngBuffer).digest('hex'), largura: imagem.largura, altura: imagem.altura },
+      imagem: { sha256: createHash('sha256').update(pngBuffer).digest('hex'), largura: seg.largura, altura: seg.altura },
       mmPorPx: Number(calibracao.mmPorPx.toFixed(5)),
       residuo: calibracao.residuo,
       regioes,
-    };
-  } finally {
-    imagem.liberar();
-  }
+    },
+    segmentacao: seg,
+  };
 }
 
-/* A imagem original com cada região pintada por cima, meio transparente, com
-   uma cor por região e o nome dela. */
-export async function desenharContornos(pngBuffer, resultado, { opacidade = 0.5 } = {}) {
-  const { cv } = await carregarOpenCV();
-  const png = PNG.sync.read(pngBuffer);
-  const img = cv.matFromImageData({ data: png.data, width: png.width, height: png.height });
-  const tinta = new cv.Mat(); img.copyTo(tinta);
-  const nomes = Object.keys(resultado.regioes);
-  const corDe = (i) => {
-    const h = (i * 360) / nomes.length; const f = (n) => { const k = (n + h / 60) % 6; return Math.round(255 * (1 - Math.max(0, Math.min(k, 4 - k, 1)))); };
-    return new cv.Scalar(f(5), f(3), f(1), 255);
-  };
-  nomes.forEach((nome, i) => {
-    const r = resultado.regioes[nome];
-    const pontos = cv.matFromArray(r.contornoPx.length, 1, cv.CV_32SC2, r.contornoPx.flat());
-    const lista = new cv.MatVector(); lista.push_back(pontos);
-    cv.fillPoly(tinta, lista, corDe(i));
-    pontos.delete(); lista.delete();
+/* O pacote que o crítico recebe. A pasta é refeita a cada chamada, para
+   nenhum recorte de uma rodada anterior sobrar com cara de atual. */
+export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2 } = {}) {
+  rmSync(pasta, { recursive: true, force: true });
+  mkdirSync(join(pasta, 'divisas'), { recursive: true });
+  const pintada = await sobreposicao(pngBuffer, segmentacao, { opacidade });
+  writeFileSync(join(pasta, 'sobreposicao.png'), pintada);
+  /* Nos recortes vai a pintura sem os nomes, que cobririam a divisa. */
+  const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
+  const recortes = recortesDasDivisas(pngBuffer, semNome, segmentacao);
+  for (const { a, b, png } of recortes) writeFileSync(join(pasta, 'divisas', `${a}--${b}.png`), png);
+  const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
+  const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
+  const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
+  writeFileSync(join(pasta, 'medidas.json'), `${JSON.stringify(medidas, null, 1)}\n`);
+  return medidas;
+}
+
+const pastaDasRodadas = (arquivoRegioes) => arquivoRegioes.replace(/\.json$/i, '.rodadas');
+export function lerRodadas(arquivoRegioes) {
+  const pasta = pastaDasRodadas(arquivoRegioes);
+  if (!existsSync(pasta)) return [];
+  return readdirSync(pasta).filter((n) => /^rodada-\d+\.json$/.test(n)).sort()
+    .map((n) => JSON.parse(readFileSync(join(pasta, n), 'utf8')));
+}
+
+export function registrarRodada(arquivoRegioes, veredito) {
+  const rodadas = lerRodadas(arquivoRegioes);
+  const decisao = proximaAcao(rodadas);
+  if (decisao.acao !== 'desenhar') throw new Error(`não cabe rodada nova: ${decisao.acao} — ${decisao.motivo}`);
+  const rodada = validarRodada({
+    numero: rodadas.length + 1,
+    regioes: JSON.parse(readFileSync(arquivoRegioes, 'utf8')).regioes,
+    veredito,
   });
-  const mistura = new cv.Mat();
-  cv.addWeighted(tinta, opacidade, img, 1 - opacidade, 0, mistura);
-  mistura.copyTo(img); mistura.delete();
-  nomes.forEach((nome, i) => {
-    const [x, y] = resultado.regioes[nome].semente[0];
-    cv.putText(img, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
-  });
-  const saida = new PNG({ width: png.width, height: png.height });
-  saida.data = Buffer.from(img.data);
-  img.delete(); tinta.delete();
-  return PNG.sync.write(saida);
+  const pasta = pastaDasRodadas(arquivoRegioes);
+  mkdirSync(pasta, { recursive: true });
+  const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
+  writeFileSync(arquivo, `${JSON.stringify(rodada, null, 1)}\n`);
+  return { rodada, arquivo, proxima: proximaAcao([...rodadas, rodada]) };
 }
 
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
   const valor = (nome) => argv.find((a) => a.startsWith(`--${nome}=`))?.split('=').slice(1).join('=');
-  if (!alvo || !valor('regioes')) {
-    process.stderr.write('uso: npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>]\n');
+  const regioes = valor('regioes') && resolve(valor('regioes'));
+  if (!regioes) {
+    process.stderr.write('uso: npm run contorno -- <imagem.png> --regioes=<regioes.json> [--pacote=<pasta>] | --regioes=<json> --acao | --regioes=<json> --registrar=<veredito.json>\n');
     return 2;
   }
+  if (argv.includes('--acao')) {
+    const d = proximaAcao(lerRodadas(regioes));
+    process.stdout.write(`próxima ação: ${d.acao} — ${d.motivo}\n${(d.defeitos ?? []).map((x) => `  ${JSON.stringify(x)}`).join('\n')}\n`);
+    return 0;
+  }
+  if (valor('registrar')) {
+    const veredito = JSON.parse(readFileSync(resolve(valor('registrar')), 'utf8'));
+    const { arquivo, proxima } = registrarRodada(regioes, veredito);
+    process.stdout.write(`rodada gravada em ${arquivo}\npróxima ação: ${proxima.acao} — ${proxima.motivo}\n`);
+    return 0;
+  }
+  if (!alvo) { process.stderr.write('diga a imagem.\n'); return 2; }
   const imagem = resolve(alvo);
-  const config = JSON.parse(readFileSync(resolve(valor('regioes')), 'utf8'));
-  const resultado = await contornosDaImagem(readFileSync(imagem), config);
+  const png = readFileSync(imagem);
+  const config = JSON.parse(readFileSync(regioes, 'utf8'));
+  const { resultado, segmentacao } = await contornosDaImagem(png, config);
   const saida = valor('saida') ? resolve(valor('saida')) : imagem.replace(/\.png$/i, '.contornos.json');
   writeFileSync(saida, `${JSON.stringify(resultado, null, 1)}\n`, 'utf8');
-  if (valor('desenho')) writeFileSync(resolve(valor('desenho')), await desenharContornos(readFileSync(imagem), resultado, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined }));
-  process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n`);
-  for (const [nome, r] of Object.entries(resultado.regioes)) process.stdout.write(`  ${nome.padEnd(16)} ${String(r.contornoMm.length).padStart(4)} pontos  ${r.areaMm2} mm²\n`);
-  process.stdout.write(`  gravado em ${saida}\n`);
+  process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n  gravado em ${saida}\n`);
+  if (valor('pacote')) {
+    const pasta = resolve(valor('pacote'));
+    const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined });
+    process.stdout.write(`  pacote em ${pasta}: sobreposição, ${medidas.divisas.length} divisa(s), medidas\n`);
+    if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
+    if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);
+  }
   return 0;
 }
 

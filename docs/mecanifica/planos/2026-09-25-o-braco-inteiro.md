@@ -168,8 +168,16 @@ recebe a imagem e um arquivo de regiões com duas âncoras e uma semente, ponto
 ou linha, dentro de cada parte, e cada semente cresce até a vizinha. Na
 `lateral.png` as 13 partes e o cabo saem separados, com 81% a 100% do
 perímetro a até 2 px da borda da imagem, e o resultado é igual a cada
-execução. As sementes foram postas pela IA olhando a imagem. Falta ligar o
-arquivo ao `conferir:referencia` e à prancha, e a pessoa julgar o desenho.
+execução. As sementes foram postas pela IA olhando a imagem. Com a pessoa ficou decidido em 2026-09-25 que o corte vira módulo, com fluxo
+próprio. `modulos/contorno-da-imagem` faz a segmentação, a sobreposição com
+opacidade de 20%, o recorte ampliado de cada divisa com o original ao lado, a
+medida de borda e as rodadas. A skill `contorno-da-imagem` conduz o agente
+`desenhador-de-contorno`, que põe as sementes, e o `critico-visual`, que dá
+nota: 9 ou mais fecha, abaixo disso volta ao desenhador, até três rodadas, e
+depois a decisão é da pessoa. O zoom por divisa entrou porque três críticos
+olhando a imagem inteira não viram uma ponta de 3 px da carcaça dentro do
+antebraço, e a pessoa a achou pedindo o zoom. Falta ligar o arquivo ao
+`conferir:referencia` e à prancha.
 
 ## Riscos e parada
 
