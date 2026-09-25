@@ -1,0 +1,115 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever: 2 partes, portas iguais; guarda:acervo ok; guarda:referencial ok; malha:conferir só alertas; etapas: ombroSentaNoAnel passa"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "tambor",
+        "tipo": "superficie",
+        "onde": "borda inferior traseira, na junção com o miolo do cotovelo",
+        "sentido": "anguloso",
+        "evidencia": "bancada-braco-robotico-ombro-direita-orto.png, região x≈385-450 y≈910-970: aresta diagonal viva entre a face de trás do disco e o cotovelo"
+      }
+    ],
+    "observacao": "Nenhuma das condições de reprovação aparece: o pescoço tem o diâmetro do anel, o cotovelo é arredondado, e o tambor é grosso, horizontal, voltado para a frente e rente ao anel."
+  },
+  "partes": [
+    {
+      "nome": "pescoco",
+      "confere": true,
+      "observacao": "raio da curva derivado: alturaDoEixo - alturaReta = 90 mm"
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": "filete só na borda da frente"
+    }
+  ],
+  "atrito": [
+    "modelador: raio da curva 90 menor que o do tubo 105 dobra a parede de dentro; a dobra ficou sem tratamento e malha:conferir não mede autointerseção",
+    "modelador: na montagem vista da direita sobra uma diagonal no canto de baixo e de trás do tambor que a vista isolada do tambor não tem; nenhuma régua diz se é sombra ou geometria de outra parte",
+    "quem conduz: a diagonal persiste nas duas rodadas e o modelador atribui à dobra do pescoço, e não ao filete do tambor; o despacho da rodada 3 aponta a dobra"
+  ],
+  "notaDePassagem": "A porta juntaDoOmbro é um cilindro externo de eixo +Z, centro em y=120 mm sobre a face em z=150 mm, raio 120 mm, faixa 0 a 5 mm; a face é plana até uns 112 mm do centro. O raio da curva sai de alturaDoEixo - alturaReta. A dobra de dentro do pescoço só fica escondida enquanto o tambor a cobrir.",
+  "receita": {
+    "sha256": "sha256:2c99bdfaceb09b4b60e5ea040d9e31f310eb881e52864c62d22825a49218814f",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 5,
+      "acrescentadas": 7,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 39,
+          "texto": "  /* Raio da linha de centro da curva; menor que o raio do pescoço, a dobra de"
+        },
+        {
+          "tipo": "-",
+          "linha": 40,
+          "texto": "     dentro fica enterrada no tambor. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "  raioDaCurva: 100,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  /* Filete só na borda da face da frente; a borda de trás fica viva. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 55,
+          "texto": "  const Rc = m(t.raioDaCurva);"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  /* Raio da linha de centro da curva, derivado: o trecho reto mais a curva"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "     fecham na altura do eixo do tambor (alturaReta + raio = alturaDoEixo)."
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "     Sai menor que o raio do pescoço, e a dobra da parede de dentro fica"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "     enterrada no tambor. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  const Rc = m(t.alturaDoEixo - t.alturaReta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 91,
+          "texto": "    perfil: [[0, 0], [Rt, 0, f], [Rt, e, f], [0, e]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "    perfil: [[0, 0], [Rt, 0], [Rt, e, f], [0, e]],"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}

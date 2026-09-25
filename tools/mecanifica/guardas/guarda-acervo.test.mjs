@@ -111,7 +111,9 @@ describe('veredito de contato do acervo', () => {
        quebra por um motivo que nada tem a ver com o que ele afirma. */
     const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
-  });
+  /* O tempo cresce com o acervo, que é lido inteiro: com a bateria em paralelo
+     passou de 20 s quando o ombro ganhou uma variação. */
+  }, 90000);
 
   it('REPROVA peça do acervo que não exporta plano nenhum', async () => {
     /* A peça é escrita no acervo de verdade e apagada depois: a guarda mede o

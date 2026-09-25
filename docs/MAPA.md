@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-783 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+792 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -486,6 +486,21 @@
 ## procedural/pecas/braco-robotico/partes/ombro/
 
 - `receita.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+
+## procedural/pecas/braco-robotico/partes/ombro-tambor/
+
+- `receita.js` — braco-robotico/ombro-tambor — variação guardada do ombro: o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e …
+
+## procedural/pecas/braco-robotico/partes/ombro-tambor/rodadas/
+
+- `receita-01.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
+- `receita-02.js` — braco-robotico/ombro — o ombro do braço robótico, em forma de cotovelo de cano, sobre o anel da cintura.
+- `receita-03.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita-04.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita-05.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita-06.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 
 ## procedural/pecas/braco-robotico/partes/ombro/rodadas/
 

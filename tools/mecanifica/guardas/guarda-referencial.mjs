@@ -105,8 +105,9 @@ export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
      baixo, e não o chão: o tambor do ombro desce 15 mm abaixo da face do
      colar, à frente do anel, e reprovava aqui sem tocar em nada. O chão
      continua cobrado na peça solta e na primeira etapa de cada montagem, que
-     é a que se apoia nele. */
-  if (!primeiraEtapaOuSolta(peca)) return null;
+     é a que se apoia nele. Uma variação guardada de uma parte (`meta.variacaoDe`)
+     tem o mesmo encaixe da parte, e segue a etapa dela. */
+  if (!primeiraEtapaOuSolta(receita.meta?.variacaoDe ?? peca)) return null;
 
   const { neutro } = executarReceita(receita);
   const fundo = fundoDaPeca(neutro);

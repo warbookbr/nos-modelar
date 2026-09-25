@@ -82,4 +82,9 @@ describe('chão só na primeira etapa', () => {
     expect(primeiraEtapaOuSolta('objeto-de-prova/anel-cintura', { raiz: pecas })).toBe(false);
     expect(primeiraEtapaOuSolta('peca-solta', { raiz: pecas })).toBe(true);
   });
+
+  it('a variação guardada segue a etapa da parte de que é variação', async () => {
+    const { conferirUmaPeca } = await import('./guardas/guarda-referencial.mjs');
+    expect(await conferirUmaPeca('braco-robotico/ombro-tambor')).toBeNull();
+  });
 });

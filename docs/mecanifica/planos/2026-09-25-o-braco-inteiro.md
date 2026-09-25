@@ -196,6 +196,18 @@ precisam entrar na montagem antes do laço delas. Ligar os contornos ao
 `conferir:referencia` foi para a fatia 5, porque comparar parte a parte pede as
 partes posicionadas pela montagem, que a exportação também precisa.
 
+## O ombro novo
+
+Decidido com a pessoa em 2026-09-25. A vista frontal do braço inteiro
+(`referencias/frontal.png`) mostra o ombro mais simples que o fixado, um bloco
+de topo arredondado com um anel, e mais coerente com o resto do desenho. O
+ombro será refeito por essa vista, e a etapa `ombro` volta a ficar aberta
+quando o laço dela começar. O ombro fixado fica guardado como variação em
+`partes/ombro-tambor`, com as rodadas dele, e a montagem continua apontando
+para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pela
+separação e pela prancha, e dela saem também as alturas do ombro e do braço
+que a lateral esconde.
+
 ## Feito na fatia 1
 
 `src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde

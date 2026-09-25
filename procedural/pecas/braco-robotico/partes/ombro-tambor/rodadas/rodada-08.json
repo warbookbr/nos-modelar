@@ -1,0 +1,302 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-robotico/ombro",
+  "numero": 8,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever ok; guarda:acervo ok; guarda:referencial ok; malha:conferir sem reprova"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/ombro-rascunho2-corpo-frente.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "colar",
+        "tipo": "uniao",
+        "onde": "borda superior do colar, na junção com a base do corpo",
+        "sentido": "afastado",
+        "evidencia": "bancada-braco-robotico-ombro-direita-orto.png: linha clara horizontal entre colar e corpo em y≈930, lendo como duas peças"
+      },
+      {
+        "parte": "tambor",
+        "tipo": "posicao",
+        "onde": "borda inferior do disco em relação às quinas de baixo da face do corpo",
+        "sentido": "alta",
+        "evidencia": "bancada-braco-robotico-ombro-frontal-orto.png: quinas retangulares visíveis fora do disco em x≈380 e x≈720, y≈930-945"
+      }
+    ],
+    "observacao": "Planta em D, topo plano e rampa convexa conferem com o alvo; restam as quinas do corpo aparecendo por baixo do tambor na frente e a junção visível entre colar e corpo."
+  },
+  "partes": [
+    {
+      "nome": "colar",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "corpo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tambor",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "quem conduz: a conferência por parte desta rodada foi escrita pelo condutor, porque a receita final juntou o trabalho do modelador com três ajustes pedidos pela pessoa (liso 10, tambor sem arredondamento atrás, loft com seção-aresta)",
+    "ferramenta: vistas:critica não gerava a traseira com sombra e deixava imagem velha com o mesmo nome; três ajustes foram julgados sobre imagem antiga. Corrigido em 78215605, o processo não pegaria sozinho",
+    "ferramenta: a primeira seção-aresta do loft dobrava faces nas pontas e nenhum gate pegou; a topologia agora reprova dobra"
+  ],
+  "notaDePassagem": "a borda de trás do tambor ficou sem arredondamento porque ela encosta no corpo e a faixa de 0,8 mm saía pontilhada; liso em 10 graus para a quina do V da rampa ficar nítida até o pé",
+  "receita": {
+    "sha256": "sha256:e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 37,
+      "acrescentadas": 10,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "import { BLOCO } from '../../../../../nucleo/entrada.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 73,
+          "texto": "  anguloDoLiso: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  anguloDoLiso: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 115,
+          "texto": "     de trás numa aresta vertical em z = -R, logo atrás da última estação. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "     de trás numa seção-aresta vertical em z = -R, logo atrás da última estação. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 129,
+          "texto": "    return pts.map(([x, y]) => [x, ym - y]).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    /* o ponto 0 é o meio da base e o ponto lados/2 o meio do topo, para a"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "       seção-aresta do bico casar as pontas com eles. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    const inv = pts.map(([x, y]) => [x, ym - y]).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    const i0 = inv.length - 1 - nb / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    return inv.slice(i0).concat(inv.slice(0, i0));"
+        },
+        {
+          "tipo": "-",
+          "linha": 137,
+          "texto": "  const zBico = -R * Math.cos(th0);"
+        },
+        {
+          "tipo": "-",
+          "linha": 140,
+          "texto": "     hc à rampa. Cada ponto do retângulo sobe ou desce para ela pela"
+        },
+        {
+          "tipo": "-",
+          "linha": 141,
+          "texto": "     distância, em pontos, ao meio da base, e os dois lados do D chegam às"
+        },
+        {
+          "tipo": "-",
+          "linha": 142,
+          "texto": "     mesmas alturas. O loft recusa contorno de área nula, então os lados"
+        },
+        {
+          "tipo": "-",
+          "linha": 143,
+          "texto": "     ficam a meio mícron do plano x = 0 e o passo mescla, logo após o loft,"
+        },
+        {
+          "tipo": "-",
+          "linha": 144,
+          "texto": "     junta cada par na aresta; a costura fica em quads, sem leque. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 145,
+          "texto": "  const nl = nb + nv;"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "     hc à rampa; o loft liga as duas metades do anel vizinho a ela por quads. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 147,
+          "texto": "  const meioMicron = 5e-7;"
+        },
+        {
+          "tipo": "-",
+          "linha": 148,
+          "texto": "  const pares = [];"
+        },
+        {
+          "tipo": "-",
+          "linha": 149,
+          "texto": "  /* altura na aresta proporcional ao caminho, pelo contorno da estação do"
+        },
+        {
+          "tipo": "-",
+          "linha": 150,
+          "texto": "     bico, desde o meio da base: as células de baixo e de cima ficam curtas. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 151,
+          "texto": "  const wB = R * Math.sin(th0), hB = yRampa(zBico) - hc;"
+        },
+        {
+          "tipo": "-",
+          "linha": 152,
+          "texto": "  const passoDoContorno = (d) => (d <= nb / 2 ? d * (2 * wB / nb)"
+        },
+        {
+          "tipo": "-",
+          "linha": 153,
+          "texto": "    : d <= nb / 2 + nv ? wB + (d - nb / 2) * (hB / nv) : wB + hB + (d - nb / 2 - nv) * (2 * wB / nb)) / (2 * wB + hB);"
+        },
+        {
+          "tipo": "-",
+          "linha": 154,
+          "texto": "  /* os pontos do meio da base e do meio do topo se juntam aos vizinhos: sem"
+        },
+        {
+          "tipo": "-",
+          "linha": 155,
+          "texto": "     isso cada um fica com duas faces dobradas uma sobre a outra, vértice que"
+        },
+        {
+          "tipo": "-",
+          "linha": 156,
+          "texto": "     não é variedade. Os vizinhos ocupam então as pontas da aresta. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 157,
+          "texto": "  const s1 = passoDoContorno(1), sN = passoDoContorno(nl - 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 158,
+          "texto": "  const bico = ret(wB, hc, yBico).map(([u], i) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 159,
+          "texto": "    const d = (i + nb / 2 + 1) % (2 * nl);"
+        },
+        {
+          "tipo": "-",
+          "linha": 160,
+          "texto": "    const dd = d <= nl ? d : 2 * nl - d;"
+        },
+        {
+          "tipo": "-",
+          "linha": 161,
+          "texto": "    const f = Math.min(Math.max((passoDoContorno(dd) - s1) / (sN - s1), 0), 1);"
+        },
+        {
+          "tipo": "-",
+          "linha": 162,
+          "texto": "    if (d > 0 && d < nl) pares.push([i, (i + 2 * (nl - d)) % (2 * nl)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 163,
+          "texto": "    if (d === 1 || d === nl - 1) pares.push([i, (i + (d === 1 ? -1 : 1) + 2 * nl) % (2 * nl)]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 164,
+          "texto": "    const lado = d === 0 || d === nl ? 0 : Math.sign(u) * meioMicron;"
+        },
+        {
+          "tipo": "-",
+          "linha": 165,
+          "texto": "    return [lado, ym - (hc + (yBico - hc) * f)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 166,
+          "texto": "  });"
+        },
+        {
+          "tipo": "-",
+          "linha": 167,
+          "texto": "  const secoes = [{ pos: [0, ym, -R], contorno: bico }];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  const secoes = [{ pos: [0, ym, -R], aresta: [[0, ym - hc], [0, ym - yBico]] }];"
+        },
+        {
+          "tipo": "-",
+          "linha": 183,
+          "texto": "  /* a primeira seção do loft é anel: os ids dela são a base do passo mais"
+        },
+        {
+          "tipo": "-",
+          "linha": 184,
+          "texto": "     o índice no contorno (numeração do loft, formato salvo). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 185,
+          "texto": "  const baseDoLoft = (passos.length - 1) * BLOCO;"
+        },
+        {
+          "tipo": "-",
+          "linha": 186,
+          "texto": "  for (const [i, j] of pares) passos.push(['mescla', { de: [baseDoLoft + j], para: baseDoLoft + i }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 193,
+          "texto": "    perfil: [[0, 0], [Rt, 0, s], [Rt, et, ft], [0, et]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    perfil: [[0, 0], [Rt, 0], [Rt, et, ft], [0, et]],"
+        }
+      ],
+      "cortada": false
+    }
+  }
+}
