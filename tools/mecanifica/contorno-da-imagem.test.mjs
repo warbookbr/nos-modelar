@@ -1,5 +1,5 @@
 /* contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas
-   execuções, e recusa ponto fora de parte ou duas partes na mesma região. */
+   execuções, separa partes do mesmo cinza e recusa semente fora da parte. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contornosDaImagem } from './contorno-da-imagem.mjs';
@@ -16,8 +16,14 @@ describe('contorno da imagem', () => {
     expect(a).toEqual(JSON.parse(readFileSync(new URL('lateral.contornos.json', pasta), 'utf8')));
   }, 60000);
 
-  it('recusa ponto fora da silhueta e duas partes na mesma região', async () => {
+  it('recusa ponto fora da silhueta e semente mal escrita', async () => {
     await expect(contornosDaImagem(imagem, { ...regioes, regioes: { fundo: [20, 20] } })).rejects.toThrow(/fora da silhueta/);
-    await expect(contornosDaImagem(imagem, { ...regioes, regioes: { a: [380, 250], b: [381, 260] } })).rejects.toThrow(/mesma região/);
+    await expect(contornosDaImagem(imagem, { ...regioes, regioes: { a: [380] } })).rejects.toThrow(/semente inválida/);
+  }, 60000);
+
+  it('separa o ombro da coluna, que têm o mesmo cinza', async () => {
+    const { regioes: r } = await contornosDaImagem(imagem, regioes);
+    expect(r.ombro.areaMm2).toBeGreaterThan(5000);
+    expect(r.braco.areaMm2).toBeGreaterThan(r.ombro.areaMm2);
   }, 60000);
 });
