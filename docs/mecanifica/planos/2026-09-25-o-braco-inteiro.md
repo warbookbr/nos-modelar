@@ -180,6 +180,22 @@ O contrato fica em `docs/mecanifica/usar/`, e cada etapa tem saída em arquivo
 na pasta do objeto, para a ferramenta da próxima etapa ler do disco o estado
 em que o objeto está.
 
+## Andamento da fatia 3
+
+A pessoa julgou a prancha nova melhor que a traçada à mão para a IA ver a
+forma e as partes de maneira limpa, e ela entrou como segunda imagem do
+pacote. O contrato está em `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, e
+`npm run objeto` lê cada etapa no disco, aponta a próxima e lista o pacote de
+referência. A prancha ganhou `<imagem>.prancha.json` com as cotas por parte,
+PNG e rodadas com a mesma regra da separação, que passaram a ser uma
+ferramenta só (`rodadas-com-critico.mjs`); a etapa é conduzida pela skill
+`prancha-dos-contornos` com o agente `desenhista-de-prancha`. O laço de
+modelagem entrega o pacote ao modelador e ao crítico. A ferramenta só conhece
+as etapas que a montagem declara, então as nove partes restantes do braço
+precisam entrar na montagem antes do laço delas. Ligar os contornos ao
+`conferir:referencia` foi para a fatia 5, porque comparar parte a parte pede as
+partes posicionadas pela montagem, que a exportação também precisa.
+
 ## Feito na fatia 1
 
 `src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-775 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+782 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -20,6 +20,7 @@
 
 - `critico-visual.md` — Crítico visual sem contexto da Mecanifica. Recebe o DESENHO ALVO e as vistas do MODELO e responde se o segundo bate com o primeiro. Use antes de fechar qualq…
 - `desenhador-de-contorno.md` — Põe as sementes que separam as partes de uma imagem de referência no arquivo de regiões e gera o pacote do crítico com `npm run contorno`. Nas rodadas seguin…
+- `desenhista-de-prancha.md` — Decide o que a prancha feita pelos contornos da imagem não sabe decidir sozinha — as cotas de cada parte, a conferência da calibração e o que a imagem escond…
 - `implementador.md` — Implementa mudanças delimitadas na Mecanifica, especialmente no núcleo procedural, receitas, bancada e validação, sempre provadas por medição. Use para um br…
 - `modelador.md` — Escreve e corrige a receita procedural de UMA peça a partir de um plano de modelagem e, nas rodadas seguintes, de um veredito de defeitos. Não julga o própri…
 - `revisor-adversarial.md` — Revisor adversarial por risco da Mecanifica — tenta quebrar mudanças de núcleo, formato salvo, autoria, montagem ou julgamento antes da integração. Use quand…
@@ -60,6 +61,10 @@
 ## .claude/skills/laco-de-modelagem/
 
 - `SKILL.md` — Conduzir o laço de modelagem de uma peça — despachar o modelador com o plano, rodar as medidas, despachar o crítico sem a história da construção, levar o ver…
+
+## .claude/skills/prancha-dos-contornos/
+
+- `SKILL.md` — Fazer a prancha lateral de um objeto a partir dos contornos que a separação tirou da imagem, com o desenhista de prancha escolhendo as cotas e um crítico dan…
 
 ## docs/
 
@@ -299,6 +304,7 @@
 - `CONFERIR-CONTRA-REFERENCIA.md` — Conferir a peça contra uma foto de referência
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados
+- `FLUXO-DO-OBJETO.md` — Fluxo do objeto
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
@@ -326,7 +332,7 @@
 - `medida.js` — medida.js — o contorno de cada parte contra as bordas da própria imagem. Para cada parte, a fração do perímetro que fica a até `distancia` pixels de uma bord…
 - `opencv.js` — opencv.js — carrega o OpenCV uma vez. Carregado por require, e só quando usado: importado como módulo ES, o pacote quebra dentro do vitest. E o módulo volta …
 - `regioes.js` — regioes.js — as partes da imagem, separadas por watershed com sementes.
-- `rodadas.js` — rodadas.js — a conversa entre o desenhador e o crítico, com limite.
+- `rodadas.js` — rodadas.js — a conversa entre quem produz e o crítico, com limite. Vale para a separação das partes e para a prancha.
 
 ## modulos/contorno-da-imagem/tests/
 
@@ -491,6 +497,10 @@
 - `receita-06.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+
+## procedural/pecas/braco-robotico/referencias/lateral.pacote/
+
+- `roteiro.md` — Roteiro da análise
 
 ## procedural/servicos/
 
@@ -916,6 +926,8 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
+- `objeto.mjs` — objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
+- `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
@@ -943,6 +955,7 @@
 - `revalidacao-resultados.test.ts` — Provas R03: resultado vinculado, histórico, obsolescência e CAS persistidos.
 - `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.test.mjs` — rodada-de-modelagem.test.mjs — o registro do laço, de ponta a ponta.
+- `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.

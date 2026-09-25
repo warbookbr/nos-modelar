@@ -39,7 +39,7 @@ npm run contorno -- --regioes=<regioes.json> --acao
 da segunda rodada em diante, só os defeitos que o comando imprimiu.
 
 **Meça antes do crítico.** Rode
-`npm run contorno -- <imagem> --regioes=<json> --pacote=<pasta>`. Parte
+`npm run contorno -- <imagem> --regioes=<json> --pacote=<imagem>.pacote`, com o pacote ao lado da imagem, onde `npm run objeto` o procura. Parte
 listada abaixo do mínimo na borda volta ao desenhador sem passar pelo crítico.
 
 **Crítico.** Despache o `critico-visual` sempre pelo roteiro: mande o caminho

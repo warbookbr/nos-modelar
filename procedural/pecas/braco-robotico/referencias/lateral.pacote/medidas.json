@@ -1,0 +1,213 @@
+{
+ "naBorda": {
+  "aneisPunho": 1,
+  "anelAntebraco": 1,
+  "anelCintura": 1,
+  "anelCotovelo": 1,
+  "antebraco": 0.885,
+  "base": 0.812,
+  "braco": 1,
+  "cabo": 1,
+  "caixaLateral": 0.993,
+  "carcacaPunho": 0.932,
+  "cotovelo": 1,
+  "flange": 1,
+  "garfoPunho": 0.984,
+  "ombro": 1
+ },
+ "minimo": 0.8,
+ "abaixo": [],
+ "semDonoPx": 195,
+ "divisas": [
+  {
+   "a": "cabo",
+   "b": "cotovelo",
+   "caixa": [
+    326,
+    22,
+    431,
+    65
+   ]
+  },
+  {
+   "a": "anelAntebraco",
+   "b": "cotovelo",
+   "caixa": [
+    420,
+    45,
+    459,
+    143
+   ]
+  },
+  {
+   "a": "anelAntebraco",
+   "b": "antebraco",
+   "caixa": [
+    456,
+    48,
+    495,
+    140
+   ]
+  },
+  {
+   "a": "cabo",
+   "b": "carcacaPunho",
+   "caixa": [
+    581,
+    44,
+    735,
+    83
+   ]
+  },
+  {
+   "a": "antebraco",
+   "b": "cabo",
+   "caixa": [
+    482,
+    42,
+    605,
+    81
+   ]
+  },
+  {
+   "a": "antebraco",
+   "b": "carcacaPunho",
+   "caixa": [
+    569,
+    51,
+    608,
+    138
+   ]
+  },
+  {
+   "a": "aneisPunho",
+   "b": "carcacaPunho",
+   "caixa": [
+    643,
+    100,
+    735,
+    140
+   ]
+  },
+  {
+   "a": "anelCotovelo",
+   "b": "cotovelo",
+   "caixa": [
+    328,
+    119,
+    437,
+    158
+   ]
+  },
+  {
+   "a": "anelCotovelo",
+   "b": "braco",
+   "caixa": [
+    328,
+    144,
+    438,
+    183
+   ]
+  },
+  {
+   "a": "aneisPunho",
+   "b": "garfoPunho",
+   "caixa": [
+    663,
+    147,
+    730,
+    186
+   ]
+  },
+  {
+   "a": "cabo",
+   "b": "garfoPunho",
+   "caixa": [
+    702,
+    166,
+    741,
+    221
+   ]
+  },
+  {
+   "a": "braco",
+   "b": "cabo",
+   "caixa": [
+    320,
+    204,
+    359,
+    330
+   ]
+  },
+  {
+   "a": "flange",
+   "b": "garfoPunho",
+   "caixa": [
+    669,
+    211,
+    723,
+    250
+   ]
+  },
+  {
+   "a": "braco",
+   "b": "ombro",
+   "caixa": [
+    325,
+    305,
+    441,
+    401
+   ]
+  },
+  {
+   "a": "cabo",
+   "b": "ombro",
+   "caixa": [
+    314,
+    306,
+    353,
+    356
+   ]
+  },
+  {
+   "a": "anelCintura",
+   "b": "ombro",
+   "caixa": [
+    322,
+    381,
+    446,
+    420
+   ]
+  },
+  {
+   "a": "anelCintura",
+   "b": "base",
+   "caixa": [
+    322,
+    396,
+    446,
+    435
+   ]
+  },
+  {
+   "a": "cabo",
+   "b": "caixaLateral",
+   "caixa": [
+    303,
+    401,
+    342,
+    440
+   ]
+  },
+  {
+   "a": "base",
+   "b": "caixaLateral",
+   "caixa": [
+    315,
+    408,
+    354,
+    536
+   ]
+  }
+ ]
+}

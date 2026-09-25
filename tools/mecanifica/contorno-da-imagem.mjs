@@ -38,13 +38,14 @@
  * julgadas e o veredito do crítico. A saída do contorno é
  * `<imagem>.contornos.json`, igual a cada execução. */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, contornoDaSilhueta, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
+  segmentar, contornoDaSilhueta, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, proximaAcao,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
+import { lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
 
 export const FORMATO = 'mecanifica.contornos@1';
 const arred = (x) => (Math.round(x * 100) / 100) || 0;
@@ -112,42 +113,11 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
 }
 
 const pastaDasRodadas = (arquivoRegioes) => arquivoRegioes.replace(/\.json$/i, '.rodadas');
-export function lerRodadas(arquivoRegioes) {
-  const pasta = pastaDasRodadas(arquivoRegioes);
-  if (!existsSync(pasta)) return [];
-  return readdirSync(pasta).filter((n) => /^rodada-\d+\.json$/.test(n)).sort()
-    .map((n) => JSON.parse(readFileSync(join(pasta, n), 'utf8')));
-}
-
-export function registrarRodada(arquivoRegioes, veredito) {
-  const rodadas = lerRodadas(arquivoRegioes);
-  const decisao = proximaAcao(rodadas);
-  if (decisao.acao !== 'desenhar') throw new Error(`não cabe rodada nova: ${decisao.acao} — ${decisao.motivo}`);
-  const rodada = validarRodada({
-    numero: rodadas.length + 1,
-    regioes: JSON.parse(readFileSync(arquivoRegioes, 'utf8')).regioes,
-    veredito,
-  });
-  const pasta = pastaDasRodadas(arquivoRegioes);
-  mkdirSync(pasta, { recursive: true });
-  const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
-  writeFileSync(arquivo, `${JSON.stringify(rodada, null, 1)}\n`);
-  return { rodada, arquivo, proxima: proximaAcao([...rodadas, rodada]) };
-}
-
-export function novaSerie(arquivoRegioes, por) {
-  if (!por || !String(por).trim()) throw new Error('nova série exige --por com quem decidiu.');
-  const rodadas = lerRodadas(arquivoRegioes);
-  const decisao = proximaAcao(rodadas);
-  if (decisao.acao !== 'humano') throw new Error(`nova série só depois da decisão humana; a ação agora é ${decisao.acao}.`);
-  const pasta = pastaDasRodadas(arquivoRegioes);
-  const numero = readdirSync(pasta).filter((n) => /^serie-\d+$/.test(n)).length + 1;
-  const destino = join(pasta, `serie-${String(numero).padStart(2, '0')}`);
-  mkdirSync(destino);
-  for (const n of readdirSync(pasta).filter((x) => /^rodada-\d+\.json$/.test(x))) renameSync(join(pasta, n), join(destino, n));
-  writeFileSync(join(destino, 'decisao.json'), `${JSON.stringify({ por: String(por).trim(), acao: 'nova-serie' }, null, 1)}\n`);
-  return destino;
-}
+export const lerRodadas = (arquivoRegioes) => lerRodadasDaPasta(pastaDasRodadas(arquivoRegioes));
+export const registrarRodada = (arquivoRegioes, veredito) => registrarNaPasta(
+  pastaDasRodadas(arquivoRegioes), { campo: 'regioes', julgado: JSON.parse(readFileSync(arquivoRegioes, 'utf8')).regioes }, veredito,
+);
+export const novaSerie = (arquivoRegioes, por) => novaSerieDaPasta(pastaDasRodadas(arquivoRegioes), por);
 
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));

@@ -93,7 +93,8 @@
     "guarda:edicao": "node tools/mecanifica/guardas/guarda-edicao-de-malha.mjs",
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
     "contorno": "node tools/mecanifica/contorno-da-imagem.mjs",
-    "contorno:prancha": "node tools/mecanifica/prancha/prancha-dos-contornos.mjs"
+    "contorno:prancha": "node tools/mecanifica/prancha/prancha-dos-contornos.mjs",
+    "objeto": "node tools/mecanifica/objeto.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
