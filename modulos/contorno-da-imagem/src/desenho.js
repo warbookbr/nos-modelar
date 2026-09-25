@@ -38,8 +38,21 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
   const { cv } = await carregarOpenCV();
   const img = cv.matFromImageData({ data: saida.data, width: png.width, height: png.height });
   try {
+    const postas = [];
     for (const nome of nomes) {
-      const [x, y] = regioes[nome].semente[0];
+      const [x] = regioes[nome].semente[0];
+      let [, y] = regioes[nome].semente[0];
+      /* O nome vai numa etiqueta branca com borda preta, para ser lido sobre
+         qualquer cor de região ou do original. */
+      const largura = Math.round(nome.length * 7.2) + 6;
+      /* Etiqueta que cobriria outra desce até ficar livre. */
+      const cruza = (a) => postas.some((b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1);
+      while (cruza({ x0: x - 23, x1: x - 23 + largura, y0: y - 12, y1: y + 4 })) y += 17;
+      postas.push({ x0: x - 23, x1: x - 23 + largura, y0: y - 12, y1: y + 4 });
+      const canto = new cv.Point(x - 23, y - 12);
+      const fim = new cv.Point(x - 23 + largura, y + 4);
+      cv.rectangle(img, canto, fim, new cv.Scalar(255, 255, 255, 255), cv.FILLED);
+      cv.rectangle(img, canto, fim, new cv.Scalar(0, 0, 0, 255), 1);
       cv.putText(img, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
     }
     saida.data = Buffer.from(img.data);
