@@ -208,6 +208,12 @@ para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pelo
 mapa de partes e pela prancha, e dela saem também as alturas do ombro e do braço
 que a lateral esconde.
 
+Nos mapas de partes da frontal e da lateral sem cabo a pessoa apontou três
+peças que a lista não tinha: `juntaCotovelo`, o volume arredondado ao lado do
+cotovelo de onde sai o antebraço, e, na ponta da carcaça do punho vista de
+frente, `anelTampaPunho` e `tampaPunho`. Elas entram na ordem de montagem
+junto das vizinhas, e o `anelOmbro` também, que nasceu na frontal.
+
 A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
 (`referencias/lateral-sem-cabo.png`). Ela passa a ser a lateral das partes
 que faltam e do ombro refeito. A `lateral.png` fica como está, porque as
