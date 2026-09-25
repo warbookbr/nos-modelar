@@ -167,7 +167,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-09-23-o-laco-constroi-parte-por-parte.md` — O laço constrói parte por parte
+- `2026-09-25-o-braco-inteiro.md` — O braço inteiro
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -201,7 +201,6 @@
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
-- `2026-09-24-o-contorno-sai-da-imagem.md` — O contorno sai da imagem
 - `README.md` — Planos congelados
 
 ## docs/mecanifica/planos/encerrados/
@@ -269,6 +268,7 @@
 - `2026-09-22-a-peca-nasce-encaixada.md` — A peça nasce encaixada
 - `2026-09-22-o-motor-mora-num-lugar-so.md` — O núcleo mora num lugar só, e se chama núcleo
 - `2026-09-22-o-teste-carrega-o-que-ele-prova.md` — O teste carrega o que ele prova
+- `2026-09-23-o-laco-constroi-parte-por-parte.md` — O laço constrói parte por parte
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

@@ -1,6 +1,6 @@
 # O laço constrói parte por parte
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -8,7 +8,7 @@
 
 ## Problema observado
 
-O plano [a peça nasce encaixada](encerrados/2026-09-22-a-peca-nasce-encaixada.md)
+O plano [a peça nasce encaixada](2026-09-22-a-peca-nasce-encaixada.md)
 deixou pronto o mecanismo: a montagem v5 com etapas, vínculos de medida e
 posição por porta, o resolvedor que constrói na ordem e o registro de etapas que
 só fixa em ordem, com junta passando e aceite. Nada disso chega ao trabalho de
@@ -236,8 +236,8 @@ apontar a face.
 
 ## Plano candidato a seguir este
 
-[O contorno sai da imagem](congelados/2026-09-24-o-contorno-sai-da-imagem.md)
-ficou congelado em 2026-09-24 como candidato a vir depois deste. A prancha da
+O contorno sai da imagem ficou congelado em 2026-09-24 como candidato a vir
+depois deste, e em 2026-09-25 foi levado para o plano sucessor. A prancha da
 lateral do braço, traçada à mão, não serviu para medir proporção nem posição;
 ele testa Potrace e OpenCV, e pesquisa outros, para tirar o contorno de cada
 parte da própria imagem.
@@ -252,4 +252,17 @@ próprio.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-25 com as três primeiras partes do braço fixas.** Base,
+anel da cintura e ombro nasceram por vínculo e posição de porta, com as juntas
+passando na entrada de cada uma, e os 32 gates verdes. O ombro parou no limite
+de 8 rodadas com dois defeitos pequenos em aberto, e foi fixado por aceite
+humano: `npm run etapas -- --fixar ... --aceite-humano` grava quem aceitou e os
+defeitos, e só vale quando o laço parou. Para chegar lá o `loft` ganhou seção
+que fecha a ponta numa aresta, a topologia passou a reprovar dobra, a
+`vistas:critica` passou a gerar a traseira com sombra e a apagar imagens velhas
+da peça, e `npm run gates` passou a rodar a bateria curta quando só mudou peça
+ou documento.
+
+O plano sucessor é [o braço inteiro](../2026-09-25-o-braco-inteiro.md), que
+leva as partes restantes, as pendências anotadas aqui para depois do braço, a
+exportação do objeto montado e o plano congelado do contorno.

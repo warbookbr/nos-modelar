@@ -127,7 +127,7 @@ atual digita números que depois precisam ser conferidos um contra o outro.
 3. **A etapa.** O registro da etapa com as juntas medidas na entrada, e a recusa
    de avançar com junta reprovada.
 4 e 5. **As instruções e o primeiro usuário.** Movidas em 2026-09-23 para o
-   plano [o laço constrói parte por parte](../2026-09-23-o-laco-constroi-parte-por-parte.md),
+   plano [o laço constrói parte por parte](2026-09-23-o-laco-constroi-parte-por-parte.md),
    com o que foi alinhado para elas. Este plano passou do teto de linhas com os
    registros das fatias, e o que falta é de outro tipo: instrução, ferramenta
    do laço e peça real, e não o mecanismo.

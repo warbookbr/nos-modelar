@@ -2,12 +2,18 @@
 
 ## Estado
 
-**Plano ativo:** [O laço constrói parte por parte](2026-09-23-o-laco-constroi-parte-por-parte.md).
+**Plano ativo:** [O braço inteiro](2026-09-25-o-braco-inteiro.md).
 
-O laço de modelagem passa a construir uma parte por vez sobre a montagem v5, a
-ferramenta de rodada recusa passo fora de ordem, as skills são reescritas curtas
-e sem contradição, e as três primeiras partes do braço robótico são o primeiro
-uso real.
+As partes restantes do braço robótico nascem pelo laço, parte por parte, depois
+de a porta de cada receita ser conferida contra a forma dela e de o contorno das
+referências sair da própria imagem; ao fim, o braço montado é exportado com
+cada parte na posição. O plano congelado do contorno foi trazido para dentro
+dele.
+
+[O laço constrói parte por
+parte](encerrados/2026-09-23-o-laco-constroi-parte-por-parte.md) fechou em
+2026-09-25 com base, anel da cintura e ombro fixos; o ombro passou por aceite
+humano com dois defeitos pequenos em aberto.
 
 [A peça nasce encaixada](encerrados/2026-09-22-a-peca-nasce-encaixada.md)
 fechou em 2026-09-23 com o mecanismo pronto: etapas, vínculos de medida e
