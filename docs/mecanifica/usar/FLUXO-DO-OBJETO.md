@@ -25,7 +25,13 @@ depois a pessoa decide. Skill `contorno-da-imagem`. Entra a imagem em
 parte, confere a calibração e anota o que a imagem esconde, e o
 `critico-visual` julga com a mesma regra. Skill `prancha-dos-contornos`. Entra
 `<imagem>.contornos.json`. Saem `<imagem>.prancha.json` com as escolhas,
-`<imagem>.prancha.svg` e `<imagem>.prancha.png`, e `<imagem>.prancha.rodadas/`.
+`<imagem>.prancha.svg` e `<imagem>.prancha.png`, `<imagem>.prancha.pacote/roteiro.md`
+com uma etapa por parte para o crítico, e `<imagem>.prancha.rodadas/`. O
+desenhista só corrige defeito do tipo `cota`; defeito de forma de contorno
+(`superficie`, `comprimento` e os outros tipos de geometria) apontado na
+prancha volta para a separação, porque o contorno vem dela. Medida que a vista
+esconde vem de outra imagem de referência do mesmo objeto, com contornos
+próprios; nota de texto sem número deixa a medida em falta.
 
 **4. Modelagem por etapa.** Cada parte, na ordem da montagem, passa pelo laço
 de modelagem, com um modelador novo e o crítico. Skill `laco-de-modelagem`.

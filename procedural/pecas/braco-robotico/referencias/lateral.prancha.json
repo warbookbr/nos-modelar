@@ -13,7 +13,7 @@
     {
       "parte": "caixaLateral",
       "medida": "altura",
-      "lado": "esquerda"
+      "em": -125
     },
     {
       "parte": "caixaLateral",
@@ -113,7 +113,7 @@
       "parte": "aneisPunho",
       "medida": "altura",
       "em": 740,
-      "afasta": 60
+      "afasta": -150
     },
     {
       "parte": "garfoPunho",
@@ -124,7 +124,7 @@
       "parte": "garfoPunho",
       "medida": "altura",
       "em": 740,
-      "afasta": 60
+      "afasta": -150
     },
     {
       "parte": "flange",
@@ -136,103 +136,60 @@
       "parte": "flange",
       "medida": "altura",
       "em": 770,
-      "afasta": 45
+      "afasta": -175
     }
   ],
   "nomes": {
     "cotovelo": {
-      "em": [
-        -60,
-        1060
-      ],
       "marca": [
         -60,
-        1045
-      ]
-    },
-    "anelCotovelo": {
-      "em": [
-        160,
-        800
-      ]
-    },
-    "braco": {
-      "em": [
-        160,
-        650
-      ]
-    },
-    "ombro": {
-      "em": [
-        160,
-        400
-      ]
-    },
-    "anelCintura": {
-      "em": [
-        200,
-        225
-      ]
+        1080
+      ],
+      "coluna": "esquerda",
+      "nivel": 1140
     },
     "base": {
-      "em": [
-        160,
-        150
-      ],
       "marca": [
         -60,
-        190
+        235
       ]
     },
     "caixaLateral": {
-      "em": [
-        -185,
-        -45
-      ],
       "marca": [
         -145,
         60
       ]
     },
     "anelAntebraco": {
-      "em": [
-        150,
-        1110
-      ],
       "marca": [
-        150,
-        950
-      ]
+        155,
+        1035
+      ],
+      "coluna": "esquerda",
+      "nivel": 1115
+    },
+    "anelCotovelo": {
+      "marca": [
+        -60,
+        815
+      ],
+      "nivel": 780
     },
     "antebraco": {
-      "em": [
-        330,
-        850
-      ]
+      "marca": [
+        400,
+        1025
+      ],
+      "coluna": "direita",
+      "nivel": 1090
     },
     "carcacaPunho": {
-      "em": [
-        450,
-        850
-      ]
-    },
-    "aneisPunho": {
-      "em": [
-        470,
-        780
-      ]
-    },
-    "garfoPunho": {
-      "em": [
-        470,
-        720
-      ]
-    },
-    "flange": {
-      "em": [
-        470,
-        640
-      ]
+      "marca": [
+        700,
+        960
+      ],
+      "coluna": "direita",
+      "nivel": 1000
     }
   }
 }

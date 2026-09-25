@@ -334,7 +334,8 @@ export function prancha(spec) {
   put(`<text x="40" y="53" class="sub">${spec.subtitulo}</text>`);
 
   for (const vista of Object.values(spec.vistas)) {
-    if (vista.rotulo) put(`<text x="${vista.x}" y="${vista.y - 12}" class="rot">${vista.rotulo}</text>`);
+    const [rx, ry] = vista.rotuloEm ?? [vista.x, vista.y - 12];
+    if (vista.rotulo) put(`<text x="${rx}" y="${ry}" class="rot">${vista.rotulo}</text>`);
   }
 
   for (const c of camadas) {
@@ -350,7 +351,7 @@ export function prancha(spec) {
   const desenho = { textos: [], linhas: [] };
   const caixaTexto = (x, y, texto, corpo, { ancora = 'start', vertical = false } = {}) => {
     const L = String(texto).length * corpo * 0.58;
-    const a0 = ancora === 'middle' ? -L / 2 : 0;
+    const a0 = ancora === 'middle' ? -L / 2 : ancora === 'end' ? -L : 0;
     return vertical
       ? [x - corpo * 0.8, y - a0 - L, x + corpo * 0.2, y - a0]
       : [x + a0, y - corpo * 0.8, x + a0 + L, y + corpo * 0.2];
@@ -359,7 +360,8 @@ export function prancha(spec) {
   desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: spec.titulo, caixa: caixaTexto(40, 34, spec.titulo, 15) });
   desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: spec.subtitulo, caixa: caixaTexto(40, 53, spec.subtitulo, 11) });
   for (const vista of Object.values(spec.vistas)) {
-    if (vista.rotulo) desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: vista.rotulo, caixa: caixaTexto(vista.x, vista.y - 12, vista.rotulo, 10.5) });
+    const [rx, ry] = vista.rotuloEm ?? [vista.x, vista.y - 12];
+    if (vista.rotulo) desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: vista.rotulo, caixa: caixaTexto(rx, ry, vista.rotulo, 10.5) });
   }
   for (const c of camadas) {
     const p = proj[c.vista];
@@ -412,8 +414,9 @@ export function prancha(spec) {
        linha de chamada do marcador até a caixa do nome. */
     if (l.rotuloEm) {
       const [tx, ty] = proj[l.vista](l.rotuloEm);
-      put(`<text class="lmt" x="${n(tx)}" y="${n(ty)}">${l.id}</text>`);
-      const caixa = caixaTexto(tx, ty, l.id, 9.5);
+      const ancora = l.rotuloAncora === 'end' ? 'end' : 'start';
+      put(`<text class="lmt" x="${n(tx)}" y="${n(ty)}"${ancora === 'end' ? ' text-anchor="end"' : ''}>${l.id}</text>`);
+      const caixa = caixaTexto(tx, ty, l.id, 9.5, { ancora });
       desenho.textos.push({ dono, tipo: 'nome', texto: l.id, caixa });
       const alvo = pontoMaisPerto(caixa, [x, y]);
       put(`<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M ${n(x)} ${n(y)} L ${n(alvo[0])} ${n(alvo[1])}"/>`);
@@ -477,11 +480,35 @@ export function colisoesDoDesenho(desenho) {
     for (const l of desenho.linhas) {
       if (l.tipo !== 'contorno' && l.dono === t.dono) continue;
       if (l.pts.some((p, k) => k > 0 && segmentoCruzaCaixa(l.pts[k - 1], p, t.caixa))) {
-        colisoes.push({ tipo: 'linha sobre texto', a: `${t.tipo} "${t.texto}" (${t.dono})`, b: `${l.tipo} de ${l.dono}` });
+        colisoes.push({ tipo: t.tipo === 'cota' ? 'linha sobre número' : 'linha sobre texto', a: `${t.tipo} "${t.texto}" (${t.dono})`, b: `${l.tipo} de ${l.dono}` });
       }
     }
   }
+  /* Linha contra linha: chamada cruzando chamada, cota passando sobre
+     chamada ou sobre outra cota. Contorno fica de fora, porque toda chamada
+     sai de dentro de uma parte e atravessa bordas por construção; o que se
+     confunde na leitura é uma linha de anotação cruzando outra. */
+  const anot = desenho.linhas.filter((l) => l.tipo !== 'contorno');
+  for (let i = 0; i < anot.length; i += 1) {
+    for (let j = i + 1; j < anot.length; j += 1) {
+      const A = anot[i]; const B = anot[j];
+      if (A.dono === B.dono) continue;
+      /* A largura e a altura da mesma parte se cruzam dentro dela como
+         qualquer par de cotas de desenho técnico; entre partes diferentes, não. */
+      if (A.tipo === 'cota' && B.tipo === 'cota' && A.dono.split('.')[0] === B.dono.split('.')[0]) continue;
+      const cruza = A.pts.some((p, k) => k > 0 && B.pts.some((q, m) => m > 0 && segmentosSeCruzam(A.pts[k - 1], p, B.pts[m - 1], q)));
+      if (cruza) colisoes.push({ tipo: A.tipo === 'chamada' && B.tipo === 'chamada' ? 'chamada sobre chamada' : 'linha sobre linha', a: `${A.tipo} de ${A.dono}`, b: `${B.tipo} de ${B.dono}` });
+    }
+  }
   return colisoes;
+}
+
+/* Cruzamento próprio de dois segmentos; tocar na ponta não conta. */
+export function segmentosSeCruzam(a, b, c, d) {
+  const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+  const e = 1e-9;
+  const d1 = o(c, d, a); const d2 = o(c, d, b); const d3 = o(a, b, c); const d4 = o(a, b, d);
+  return ((d1 > e && d2 < -e) || (d1 < -e && d2 > e)) && ((d3 > e && d4 < -e) || (d3 < -e && d4 > e));
 }
 
 /* Relatório legível no terminal: é ele que eu leio ANTES de olhar o desenho. */

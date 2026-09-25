@@ -28,24 +28,42 @@ O que você decide e grava em `<imagem>.prancha.json`:
   a linha em mm para fora da parte; `numero` é o deslocamento [dz, dy] em mm
   do número, com linha de chamada. Meça a seção que o modelador precisa, e não
   a borda de uma parte vizinha.
-- onde vai o nome de cada parte, em `"nomes": { "<parte>": { "em": [z, y],
-  "marca": [z, y] } }`: `em` põe o nome fora da parte, num espaço livre, com
-  linha de chamada até `marca`, que fica dentro dela.
-- o que não se mede na imagem. Quando uma parte esconde outra, como o braço e
-  o ombro, a medida visível engana; declare a cota com `"medivel": false`,
-  `"motivo"` e, se quiser, `"notaEm": [z, y]`, e a prancha escreve o motivo
-  como nota no lugar do número.
+- de onde sai a chamada do nome de cada parte. Os nomes ficam em duas colunas
+  fora da silhueta e de toda cota, uma de cada lado, na ordem da altura da
+  marca, e o comando troca de lugar qualquer par de chamadas que se cruze. Em
+  `"nomes": { "<parte>": { "marca": [z, y], "coluna": "esquerda",
+  "nivel": y } }` você declara `marca`, o ponto dentro da parte de onde a
+  chamada sai, `coluna`, o lado (sem ela vai para o lado mais perto), e
+  `nivel`, a altura y em mm do nome, para a chamada inclinar e passar por cima
+  ou por baixo de uma cota que estaria no caminho. O antigo `em` não posiciona
+  mais o nome.
+- o que não se mede nesta imagem. Quando uma parte esconde outra, como o braço
+  e o ombro, a medida visível engana. Se outra imagem de referência do mesmo
+  objeto mostra a medida e já tem contornos, declare
+  `"origem": { "imagem": "frontal", "parte": "ombro", "medida": "altura" }`
+  (`parte` e `medida` são opcionais e valem os da cota), e a prancha desenha a
+  cota com o número dela e a vista de origem ao lado; se a outra vista ainda
+  não tiver contornos, o comando para e diz qual falta. Sem outra vista,
+  declare `"medivel": false` com `"motivo"` e, se quiser, `"notaEm": [z, y]`;
+  a prancha escreve o motivo como nota, mas o comando lista a medida como
+  FALTA, porque nota sem número não dá a medida ao modelador.
 
 Rode `npm run contorno:prancha -- <imagem>.contornos.json` depois de editar.
 O relatório do motor não pode trazer ponto fora do contorno, e o comando
 lista cada texto que se sobrepõe a outro ou que uma linha alheia atravessa e
-sai com código 3 enquanto houver algum. Só devolva com zero colisões. Depois,
+sai com código 3 enquanto houver algum. Também conta como colisão linha
+cruzando linha: chamada sobre chamada, cota sobre chamada e cotas de partes
+diferentes cruzadas. Só devolva com zero colisões. Depois,
 abra um recorte ampliado da região de cada cota no SVG e confira que o número
 mede a parte certa e se lê sem ambiguidade; a contagem de colisões não vê
 número posto na parte errada.
 
-Na rodada seguinte você recebe os defeitos que o crítico apontou. Corrija
-exatamente esses, mexendo só em `<imagem>.prancha.json`. Não edite o comando,
+Na rodada seguinte você recebe os defeitos que o crítico apontou. Você só
+trata defeito do tipo `cota`, e corrige exatamente esses, mexendo só em
+`<imagem>.prancha.json`. Defeito de forma de contorno (`superficie`,
+`comprimento`, `espessura`, `angulo`, `posicao`, `ausencia`, `uniao`) apontado
+na prancha não é seu: o contorno vem da separação, e o conserto é lá. Liste-os
+na devolução como pendência da separação, sem tentar disfarçá-los com cota. Não edite o comando,
 o motor de prancha nem os contornos, e não rode `git stash` nem nada que mexa
 na pasta de trabalho.
 

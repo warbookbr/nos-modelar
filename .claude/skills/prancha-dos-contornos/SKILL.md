@@ -24,15 +24,23 @@ npm run contorno:prancha -- <imagem>.contornos.json --acao
 
 **desenhar** — despache o `desenhista-de-prancha` com o caminho dos
 contornos, o alinhamento do objeto e, da segunda rodada em diante, só os
-defeitos que o comando imprimiu. O desenhista declara a posição de cada cota
+defeitos do tipo `cota` que o comando imprimiu. Defeito de forma de contorno
+(`superficie`, `comprimento` e os outros tipos de geometria) apontado na
+prancha não vai ao desenhista: leve-o à separação (skill
+`contorno-da-imagem`), porque o contorno vem de lá, e refaça a prancha depois.
+Os nomes das partes ficam em duas colunas fora da silhueta; medida escondida
+nesta vista vem de outra imagem de referência com contornos (`origem`), e
+nota de texto sem número sai na lista de FALTA. O desenhista declara a posição de cada cota
 e de cada nome em `<imagem>.prancha.json`, usa `medivel: false` com motivo
 onde uma parte esconde a outra e confere em recorte ampliado a região de cada
 cota. Não aceite a devolução se `npm run contorno:prancha` sair com código
 diferente de zero: ele sai com 3 enquanto houver texto sobreposto ou cruzado
 por linha que não é a dele, e o crítico não recebe prancha com colisão.
 
-**Crítico.** Despache o `critico-visual` com a imagem de referência como alvo
-e `<imagem>.prancha.png` como modelo. Pergunte se a silhueta e cada parte da
+**Crítico.** Despache o `critico-visual` com a imagem de referência como alvo,
+`<imagem>.prancha.png` como modelo e o roteiro
+`<imagem>.prancha.pacote/roteiro.md`, que o comando grava a cada prancha e
+tem uma etapa por parte: largura, altura, nome e linhas livres. Pergunte se a silhueta e cada parte da
 prancha seguem a imagem, se as cotas estão nas partes que o modelador precisa
 e se alguma medida contradiz o alinhamento. Nunca mande as escolhas do agente
 nem o que mudou.

@@ -14,14 +14,25 @@ você — e é exatamente por isso que você é útil.
 
 ## O que você vai receber
 
-Até quatro coisas, sempre nomeadas por quem chamou:
+Até cinco coisas, sempre nomeadas por quem chamou:
 
 - **alvo** — o desenho de referência: prancha ortográfica, blueprint ou croqui;
 - **modelo** — as vistas renderizadas da geometria que alguém construiu;
 - **partes** — uma vista isolada de cada parte, com o nome da parte dito por
   quem chamou, e a forma e a técnica que o plano prometeu para ela;
 - **sobreposição** — alvo e modelo no mesmo sistema de coordenadas, em cima um
-  do outro, quando existir.
+  do outro, quando existir;
+- **roteiro** — as etapas que você segue na ordem, quando existir. Ele é o
+  único arquivo que não é imagem que você lê.
+
+Quando vier um **roteiro** (a prancha dos contornos grava um em
+`<imagem>.prancha.pacote/roteiro.md`, a separação em `<imagem>.pacote/`), siga
+as etapas na ordem, sem pular nenhuma, e cite a etapa em cada defeito. Na
+prancha, cada etapa é uma parte: confira a largura, a altura, o nome e se as
+linhas dela passam livres. Medida marcada EM FALTA é `cota` com sentido
+`faltando`. Defeito de forma de contorno vai com o tipo de geometria dele,
+e não como `cota`: quem desenha a prancha só trata `cota`, e a forma se
+corrige na separação.
 
 Quando vierem as **partes**, responda por parte também: a forma que você vê é a
 que foi prometida. Isto não é detalhe de acabamento — um punho prometido com
