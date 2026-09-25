@@ -27,7 +27,8 @@ A ordem de montagem é a ordem das etapas de construção: `base` com
 
 ## Escala
 
-O diâmetro da base, 180 mm. A base aparece inteira na vista lateral e é a
+O diâmetro da base, 210 mm (180 mm até a pessoa alargar a base, como está
+registrado em "Depois da rodada"). A base aparece inteira na vista lateral e é a
 primeira etapa, então a escala sai de onde a construção começa. O alcance
 horizontal ficou de fora como escala porque, na tentativa anterior, a leve
 perspectiva da imagem o fez divergir da tabela.
@@ -93,9 +94,9 @@ As medidas são lidas na vista lateral pela escala, cerca de 1,76 mm por pixel,
 e têm erro de uns 10% por causa da perspectiva. Trocar um valor na tabela da
 receita ajusta o resto.
 
-`base`: corpo cilíndrico de revolução em torno do eixo vertical, com 180 mm de
+`base`: corpo cilíndrico de revolução em torno do eixo vertical, com 210 mm de
 diâmetro e cerca de 200 mm de altura, apoiado no centro de um pé que é uma
-placa quadrada de cantos arredondados, com cerca de 200 mm de lado e 20 mm de
+placa quadrada de cantos arredondados, com cerca de 230 mm de lado e 20 mm de
 altura; as pontas do pé aparecem nos dois lados da vista lateral. Quinas com
 filete no topo do corpo e na borda do pé. Publica em cima o assento onde o
 `anelCintura` encaixa.
