@@ -11,16 +11,16 @@ Abra o alvo (/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referenci
 Abra /home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png.pacote/divisas-01.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:
 
 - antebraco / carcacaPunho
-- antebraco / cotovelo
-- anelAntebraco / antebraco
+- carcacaPunho / cotovelo
+- anelAntebraco / carcacaPunho
 
 ## Etapa 3 — divisas, folha 2 de 5
 
 Abra /home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png.pacote/divisas-02.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:
 
 - anelAntebraco / cotovelo
-- aneisPunho / carcacaPunho
 - aneisPunho / antebraco
+- aneisPunho / carcacaPunho
 
 ## Etapa 4 — divisas, folha 3 de 5
 

@@ -14,13 +14,18 @@
 import { PNG } from 'pngjs';
 import { carregarOpenCV } from './opencv.js';
 
-/* Uma semente é um ponto `[x, y]` ou uma linha `[[x, y], [x, y], ...]`. */
+/* Uma semente é um ponto `[x, y]`, uma linha `[[x, y], [x, y], ...]` ou várias
+   linhas `[[[x, y], ...], [[x, y], ...]]`. Várias linhas servem à parte que a
+   imagem mostra em pedaços separados por outra, como a carcaça do punho vista
+   de frente, dos dois lados do antebraço: uma linha só atravessaria a vizinha.
+   Devolve a lista de linhas. */
 export function tracosDaSemente(semente) {
-  const lista = Array.isArray(semente?.[0]) ? semente : [semente];
-  if (!lista.length || lista.some((p) => !Array.isArray(p) || p.length !== 2 || !p.every(Number.isFinite))) {
-    throw new Error(`semente inválida: ${JSON.stringify(semente)}; use [x, y] ou [[x, y], ...].`);
+  const linhas = Array.isArray(semente?.[0]?.[0]) ? semente : [Array.isArray(semente?.[0]) ? semente : [semente]];
+  const ponto = (p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
+  if (!linhas.length || linhas.some((l) => !Array.isArray(l) || !l.length || !l.every(ponto))) {
+    throw new Error(`semente inválida: ${JSON.stringify(semente)}; use [x, y], [[x, y], ...] ou [[[x, y], ...], ...].`);
   }
-  return lista;
+  return linhas;
 }
 
 /* Devolve, para cada nome, a semente, o contorno externo em pixel e a área, e
@@ -69,13 +74,15 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     for (let p = 0; p < larga.data.length; p += 1) if (!larga.data[p]) marcas.data32S[p] = 1;
     const dentro = ([x, y]) => silhueta.data[Math.round(y) * largura + Math.round(x)] > 0;
     sementes.forEach(({ nome, tracos }, i) => {
-      for (const ponto of tracos) {
+      for (const ponto of tracos.flat()) {
         if (!dentro(ponto)) throw new Error(`o ponto ${JSON.stringify(ponto)} de '${nome}' cai fora da silhueta; mova o ponto para dentro da parte.`);
       }
       const rotulo = new cv.Scalar(i + 2);
-      if (tracos.length === 1) cv.circle(marcas, new cv.Point(tracos[0][0], tracos[0][1]), 2, rotulo, -1);
-      for (let k = 1; k < tracos.length; k += 1) {
-        cv.line(marcas, new cv.Point(tracos[k - 1][0], tracos[k - 1][1]), new cv.Point(tracos[k][0], tracos[k][1]), rotulo, 2);
+      for (const linha of tracos) {
+        if (linha.length === 1) cv.circle(marcas, new cv.Point(linha[0][0], linha[0][1]), 2, rotulo, -1);
+        for (let k = 1; k < linha.length; k += 1) {
+          cv.line(marcas, new cv.Point(linha[k - 1][0], linha[k - 1][1]), new cv.Point(linha[k][0], linha[k][1]), rotulo, 2);
+        }
       }
     });
     cv.watershed(realce ? realcar(cv, cor, novo, realce) : cor, marcas);
@@ -96,7 +103,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
       const contornoPx = [];
       for (let k = 0; k < simples.data32S.length; k += 2) contornoPx.push([simples.data32S[k], simples.data32S[k + 1]]);
       maior.delete();
-      resultado[nome] = { semente: tracos, rotulo: i + 2, areaPx: area, contornoPx };
+      resultado[nome] = { semente: tracos.flat(), rotulo: i + 2, areaPx: area, contornoPx };
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;

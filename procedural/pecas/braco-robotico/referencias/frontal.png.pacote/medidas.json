@@ -5,10 +5,10 @@
   "anelCintura": 1,
   "anelCotovelo": 1,
   "anelOmbro": 0.992,
-  "antebraco": 0.955,
+  "antebraco": 0.982,
   "base": 1,
   "braco": 1,
-  "carcacaPunho": 0.998,
+  "carcacaPunho": 0.987,
   "cotovelo": 0.979,
   "flange": 0.988,
   "garfoPunho": 1,
@@ -22,14 +22,14 @@
    "a": "antebraco",
    "b": "carcacaPunho",
    "caixa": [
-    647,
+    652,
     52,
-    686,
+    759,
     179
    ]
   },
   {
-   "a": "antebraco",
+   "a": "carcacaPunho",
    "b": "cotovelo",
    "caixa": [
     625,
@@ -40,7 +40,7 @@
   },
   {
    "a": "anelAntebraco",
-   "b": "antebraco",
+   "b": "carcacaPunho",
    "caixa": [
     633,
     135,
@@ -60,22 +60,22 @@
   },
   {
    "a": "aneisPunho",
-   "b": "carcacaPunho",
+   "b": "antebraco",
    "caixa": [
     655,
-    144,
-    761,
-    183
+    143,
+    758,
+    182
    ]
   },
   {
    "a": "aneisPunho",
-   "b": "antebraco",
+   "b": "carcacaPunho",
    "caixa": [
-    647,
-    151,
-    686,
-    190
+    654,
+    150,
+    761,
+    189
    ]
   },
   {

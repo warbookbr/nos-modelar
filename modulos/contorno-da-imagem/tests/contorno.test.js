@@ -21,6 +21,21 @@ function imagem() {
 const config = { limiar: 225, regioes: { esquerda: [30, 30], direita: [90, 30] } };
 
 describe('contorno da imagem', () => {
+  it('uma parte em dois pedaços, um de cada lado da vizinha, com duas linhas de semente', async () => {
+    const png = new PNG({ width: 120, height: 60 });
+    for (let y = 0; y < 60; y += 1) for (let x = 0; x < 120; x += 1) {
+      const o = (y * 120 + x) * 4;
+      const dentro = x >= 10 && x < 110 && y >= 15 && y < 45;
+      const v = !dentro ? 250 : (x === 40 || x === 80 ? 110 : 150);
+      png.data[o] = v; png.data[o + 1] = v; png.data[o + 2] = v; png.data[o + 3] = 255;
+    }
+    const seg = await segmentar(PNG.sync.write(png), { limiar: 225, regioes: { lados: [[[20, 25], [20, 35]], [[100, 25], [100, 35]]], meio: [60, 30] } });
+    const dono = (x, y) => seg.rotulos[y * 120 + x];
+    expect(dono(15, 30)).toBe(seg.regioes.lados.rotulo);
+    expect(dono(105, 30)).toBe(seg.regioes.lados.rotulo);
+    expect(dono(60, 30)).toBe(seg.regioes.meio.rotulo);
+  });
+
   it('separa duas partes do mesmo cinza na costura entre elas', async () => {
     const seg = await segmentar(imagem(), config);
     const xs = (nome) => seg.regioes[nome].contornoPx.map(([x]) => x);
