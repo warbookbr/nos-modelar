@@ -322,7 +322,7 @@
 ## modulos/contorno-da-imagem/src/
 
 - `desenho.js` — desenho.js — o que o crítico e a pessoa olham.
-- `index.js` — **SEM CABEÇALHO**
+- `index.js` — index.js — a porta do módulo contorno-da-imagem: segmentação, desenho, medida e rodadas.
 - `medida.js` — medida.js — o contorno de cada parte contra as bordas da própria imagem. Para cada parte, a fração do perímetro que fica a até `distancia` pixels de uma bord…
 - `opencv.js` — opencv.js — carrega o OpenCV uma vez. Carregado por require, e só quando usado: importado como módulo ES, o pacote quebra dentro do vitest. E o módulo volta …
 - `regioes.js` — regioes.js — as partes da imagem, separadas por watershed com sementes.
