@@ -1,6 +1,6 @@
 /* colunas.js — nomes em duas colunas fora do desenho, com chamada até a parte.
  *
- * Serve à sobreposição da separação (em pixel) e à prancha dos contornos (em
+ * Serve ao mapa de partes (em pixel) e à prancha dos contornos (em
  * pixel de tela). Em cada coluna os nomes seguem a ordem da altura do alvo,
  * com passo mínimo entre eles, e depois qualquer par de chamadas que se cruze
  * troca de lugar: a troca encurta a soma das chamadas, então o laço termina, e

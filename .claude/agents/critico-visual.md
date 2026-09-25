@@ -26,13 +26,13 @@ Até cinco coisas, sempre nomeadas por quem chamou:
   único arquivo que não é imagem que você lê.
 
 Quando vier um **roteiro** (a prancha dos contornos grava um em
-`<imagem>.prancha.pacote/roteiro.md`, a separação em `<imagem>.pacote/`), siga
+`<imagem>.prancha.pacote/roteiro.md`, o do mapa de partes em `<imagem>.pacote/`), siga
 as etapas na ordem, sem pular nenhuma, e cite a etapa em cada defeito. Na
 prancha, cada etapa é uma parte: confira a largura, a altura, o nome e se as
 linhas dela passam livres. Medida marcada EM FALTA é `cota` com sentido
 `faltando`. Defeito de forma de contorno vai com o tipo de geometria dele,
 e não como `cota`: quem desenha a prancha só trata `cota`, e a forma se
-corrige na separação.
+corrige no mapa de partes.
 
 Quando vierem as **partes**, responda por parte também: a forma que você vê é a
 que foi prometida. Isto não é detalhe de acabamento — um punho prometido com

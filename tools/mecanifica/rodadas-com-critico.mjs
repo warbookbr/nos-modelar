@@ -1,6 +1,6 @@
 /* rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas
  * em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo
- * volta, até três rodadas, e depois a pessoa decide. Servem à separação das
+ * volta, até três rodadas, e depois a pessoa decide. Servem a mapear as
  * partes (pasta `<imagem>.regioes.rodadas/`) e à prancha
  * (`<imagem>.prancha.rodadas/`). */
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';

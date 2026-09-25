@@ -1,6 +1,6 @@
 /* desenho.js — o que o crítico e a pessoa olham.
  *
- * A sobreposição pinta cada parte por cima da imagem original, com opacidade
+ * O mapa de partes pinta cada parte por cima da imagem original, com opacidade
  * baixa (20% por padrão), para a sombra e o volume da parte continuarem
  * visíveis através da cor. O zoom por divisa recorta cada encontro entre duas
  * partes vizinhas e mostra, lado a lado e ampliados, o original e o mesmo
@@ -255,17 +255,17 @@ export async function folhasDasDivisas(recortes, sobreposicaoBuffer, { porFolha 
 }
 
 /* O roteiro que o crítico segue, com uma etapa por folha. `arquivos` traz o
-   caminho do alvo, da sobreposição e de cada folha, na ordem das folhas. */
-export function roteiroDoCritico({ alvo, sobreposicao: pintura, folhas }) {
+   caminho do alvo, do mapa de partes e de cada folha, na ordem das folhas. */
+export function roteiroDoCritico({ alvo, mapaDePartes: pintura, folhas }) {
   const linhas = [
     '# Roteiro da análise', '',
     'Siga as etapas na ordem e não pule nenhuma. Em cada etapa, abra os arquivos dela.', '',
     '## Etapa 1 — visão geral', '',
-    `Abra o alvo (${alvo}) e a sobreposição (${pintura}). Confira se cada parte tem cor, se nenhuma região pega o fundo e se cada cor está na parte que o nome diz.`, '',
+    `Abra o alvo (${alvo}) e o mapa de partes (${pintura}). Confira se cada parte tem cor, se nenhuma região pega o fundo e se cada cor está na parte que o nome diz.`, '',
   ];
   folhas.forEach(({ arquivo, pares }, i) => {
     linhas.push(`## Etapa ${i + 2} — divisas, folha ${i + 1} de ${folhas.length}`, '',
-      `Abra ${arquivo}. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:`, '',
+      `Abra ${arquivo}. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a divisa entre as partes:`, '',
       ...pares.map(([a, b]) => `- ${a} / ${b}`), '');
   });
   linhas.push(`## Etapa ${folhas.length + 2} — fechamento`, '',

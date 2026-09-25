@@ -18,14 +18,14 @@ describe('estado do objeto', () => {
     expect(estadoDoObjeto('coisa', { acervo }).proxima.etapa).toBe('alinhamento');
   });
 
-  it('segue a ordem: separação, prancha e modelagem', () => {
+  it('segue a ordem: mapear as partes, prancha e modelagem', () => {
     const pasta = join(acervo, 'coisa'); const refs = join(pasta, 'referencias');
     mkdirSync(join(refs, 'lateral.regioes.rodadas'), { recursive: true });
     writeFileSync(join(pasta, 'ALINHAMENTO.md'), '# coisa\n');
     writeFileSync(join(pasta, 'montagem.json'), JSON.stringify({ etapas: ['a', 'b'] }));
     writeFileSync(join(refs, 'lateral.regioes.json'), '{}');
     writeFileSync(join(refs, 'lateral.regioes.rodadas', 'rodada-01.json'), JSON.stringify(rodada(1, 7)));
-    expect(estadoDoObjeto('coisa', { acervo }).proxima.etapa).toBe('separação de lateral');
+    expect(estadoDoObjeto('coisa', { acervo }).proxima.etapa).toBe('mapear as partes de lateral');
 
     writeFileSync(join(refs, 'lateral.regioes.rodadas', 'rodada-02.json'), JSON.stringify(rodada(2, 9)));
     expect(estadoDoObjeto('coisa', { acervo }).proxima.etapa).toBe('prancha de lateral');

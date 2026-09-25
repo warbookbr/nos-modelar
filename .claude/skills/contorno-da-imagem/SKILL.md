@@ -1,6 +1,6 @@
 ---
 name: contorno-da-imagem
-description: Separar as partes de uma imagem de referência por watershed com sementes nomeadas e tirar o contorno de cada uma em milímetro, com um desenhador que põe as sementes e um crítico que dá nota, até três rodadas. Use quando uma referência precisar de contorno por parte para prancha ou conferência. Não use para modelar a peça.
+description: Mapear as partes de uma imagem de referência por watershed com sementes nomeadas, gerar o mapa de partes e tirar o contorno de cada uma em milímetro, com um desenhador que põe as sementes e um crítico que dá nota, até três rodadas. Use quando uma referência precisar de contorno por parte para prancha ou conferência. Não use para modelar a peça.
 ---
 
 # Contorno da imagem
@@ -44,7 +44,7 @@ listada abaixo do mínimo na borda volta ao desenhador sem passar pelo crítico.
 
 **Crítico.** Despache o `critico-visual` sempre pelo roteiro: mande o caminho
 de `roteiro.md` do pacote e peça que ele siga as etapas na ordem. O roteiro
-tem uma etapa de visão geral, com o alvo e a sobreposição, uma etapa para
+tem uma etapa de visão geral, com o alvo e o mapa de partes, uma etapa para
 cada folha de divisas e o fechamento. Cada folha leva os recortes no tamanho em
 que foram gerados. Com até seis divisas, cada divisa tem uma etapa só dela,
 porque o crítico olha melhor uma coisa de cada vez; com mais, elas se
@@ -53,7 +53,7 @@ recortes por folha. Cada linha da folha mostra o original, a pintura e a imagem
 inteira em miniatura com a divisa marcada. Junto do roteiro vão a lista das
 partes, a regra do que aparece e os critérios: região que pega outra parte
 ou o fundo, parte com pedaço sem cor, divisa fora do lugar onde a imagem
-mostra a separação. O roteiro existe porque o crítico só lê arquivo e não
+mostra a divisa. O roteiro existe porque o crítico só lê arquivo e não
 lista pasta: na lateral do braço ele abriu 2 e depois 9 de 19 recortes
 soltos, e numa folha única de 19 o zoom caía à metade. Foi num recorte
 ampliado que apareceu o defeito que três críticos olhando a imagem inteira
@@ -66,13 +66,14 @@ npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
 ```
 
 Nota 9 ou mais fecha. Abaixo disso a ação volta a ser **desenhar**, até três
-rodadas. Depois da terceira sem nota 9 a ação é **humano**: mostre à pessoa a
-sobreposição, os recortes e os defeitos em aberto, e ela decide. Nenhum
+rodadas. Depois da terceira sem nota 9 a ação é **humano**: mostre à pessoa o
+mapa de partes, os recortes e os defeitos em aberto, e ela decide. Nenhum
 agente estende o limite nem aceita defeito por conta própria. Se a pessoa decidir
 corrigir a ferramenta e tentar de novo, arquive a série com
 `npm run contorno -- --regioes=<json> --nova-serie --por=<quem decidiu>`.
 
 ## Ao fechar
 
-O contorno em milímetro fica em `<imagem>.contornos.json`, e a sobreposição
-com opacidade de 20% vai à pessoa junto com a nota.
+O contorno em milímetro fica em `<imagem>.contornos.json`, e o mapa de partes
+(`<imagem>.pacote/mapa-de-partes.png`, cada parte pintada a 20% por cima da
+imagem, com número e nome) vai à pessoa junto com a nota.

@@ -12,13 +12,13 @@ partes, a escala, a ordem de montagem e o que fica fora do modelo. Skill
 `alinhar-modelagem`. Sai `ALINHAMENTO.md`, a `montagem.json` com as etapas e o
 `PLANO` de cada parte.
 
-**2. Separação das partes.** O agente `desenhador-de-contorno` semeia cada
+**2. Mapear as partes.** O agente `desenhador-de-contorno` semeia cada
 parte na imagem de referência, e o `critico-visual` julga o pacote pelo
 roteiro, divisa por divisa. Nota 9 fecha, abaixo volta, até três rodadas, e
 depois a pessoa decide. Skill `contorno-da-imagem`. Entra a imagem em
 `referencias/`. Saem, ao lado dela, `<imagem>.regioes.json` com as sementes,
 `<imagem>.contornos.json` com o contorno de cada parte em milímetro,
-`<imagem>.pacote/` com a sobreposição a 20% e as folhas de divisa, e
+`<imagem>.pacote/` com o mapa de partes (`mapa-de-partes.png`, cada parte pintada a 20% por cima da imagem, com número e nome) e as folhas de divisa, e
 `<imagem>.regioes.rodadas/`.
 
 **3. Prancha.** O agente `desenhista-de-prancha` escolhe as cotas de cada
@@ -29,7 +29,7 @@ parte, confere a calibração e anota o que a imagem esconde, e o
 com uma etapa por parte para o crítico, e `<imagem>.prancha.rodadas/`. O
 desenhista só corrige defeito do tipo `cota`; defeito de forma de contorno
 (`superficie`, `comprimento` e os outros tipos de geometria) apontado na
-prancha volta para a separação, porque o contorno vem dela. Medida que a vista
+prancha volta para o mapa de partes, porque o contorno vem dela. Medida que a vista
 esconde vem de outra imagem de referência do mesmo objeto, com contornos
 próprios; nota de texto sem número deixa a medida em falta.
 
@@ -48,13 +48,13 @@ O modelador e o crítico da modelagem recebem as mesmas três imagens, nesta
 ordem:
 
 1. a imagem de referência, como ela é;
-2. a prancha limpa (`<imagem>.prancha.png`), com a silhueta, as partes e as
+2. a prancha (`<imagem>.prancha.png`), o desenho limpo sem a foto, com a silhueta, as partes e as
    cotas em milímetro, que dá a forma e a proporção;
-3. a sobreposição a 20% (`<imagem>.pacote/sobreposicao.png`) e as folhas de
-   divisa, que dão a separação entre as partes e o detalhe.
+3. o mapa de partes (`<imagem>.pacote/mapa-de-partes.png`) e as folhas de
+   divisa, que dão a divisa entre as partes e o detalhe.
 
 A ordem de entrega é diferente da de produção, porque a prancha sai dos
-contornos da separação. Entregar as três ao crítico não fere a regra de não
+contornos do mapa de partes. Entregar as três ao crítico não fere a regra de não
 contar como a peça foi feita: elas vêm da referência, e não da construção.
 `npm run objeto` lista o caminho de cada uma.
 

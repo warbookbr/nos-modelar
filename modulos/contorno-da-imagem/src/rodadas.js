@@ -1,5 +1,5 @@
 /* rodadas.js — a conversa entre quem produz e o crítico, com limite. Vale
-   para a separação das partes e para a prancha.
+   para o mapa de partes e para a prancha.
  *
  * O desenhador põe as sementes e gera o pacote; o crítico, sem saber como as
  * sementes foram postas, compara o pacote com a imagem e dá nota de 0 a 10.
@@ -13,7 +13,7 @@ export const LIMITE_DE_RODADAS = 3;
 export function validarRodada(rodada) {
   if (!rodada || typeof rodada !== 'object') throw new Error('a rodada é um objeto.');
   if (!Number.isInteger(rodada.numero) || rodada.numero < 1) throw new Error("'numero' é inteiro a partir de 1.");
-  /* O que foi julgado fica guardado: as sementes na separação (`regioes`), as
+  /* O que foi julgado fica guardado: as sementes no mapa de partes (`regioes`), as
      escolhas do agente na prancha (`julgado`). */
   const julgado = rodada.regioes ?? rodada.julgado;
   if (!julgado || typeof julgado !== 'object') throw new Error("'regioes' ou 'julgado' guarda o que foi julgado.");

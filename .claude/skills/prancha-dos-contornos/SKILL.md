@@ -1,6 +1,6 @@
 ---
 name: prancha-dos-contornos
-description: Fazer a prancha lateral de um objeto a partir dos contornos que a separação tirou da imagem, com o desenhista de prancha escolhendo as cotas e um crítico dando nota, até três rodadas. Use depois de a separação da imagem fechar, antes da modelagem. Não use para prancha de carroceria desenhada por medida declarada; essa é a skill desenhar-prancha.
+description: Fazer a prancha lateral de um objeto a partir dos contornos que o mapa de partes tirou da imagem, com o desenhista de prancha escolhendo as cotas e um crítico dando nota, até três rodadas. Use depois de mapear as partes da imagem, antes da modelagem. Não use para prancha de carroceria desenhada por medida declarada; essa é a skill desenhar-prancha.
 ---
 
 # Prancha dos contornos
@@ -9,7 +9,7 @@ Você conduz e não desenha. Quem escolhe é o agente `desenhista-de-prancha`, e
 quem julga é o `critico-visual`. O comando é `npm run contorno:prancha`, e a
 etapa faz parte do fluxo descrito em `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`.
 
-A prancha só começa com a separação fechada (`npm run objeto -- <objeto>`
+A prancha só começa com o mapa de partes fechado (`npm run objeto -- <objeto>`
 mostra). Ela sai inteira dos contornos, e o que o agente decide é o que o
 comando não sabe: as cotas de cada parte, a conferência da calibração e o que
 a imagem esconde. Sem esse trabalho o crítico aprovaria uma cópia do contorno.
@@ -26,7 +26,7 @@ npm run contorno:prancha -- <imagem>.contornos.json --acao
 contornos, o alinhamento do objeto e, da segunda rodada em diante, só os
 defeitos do tipo `cota` que o comando imprimiu. Defeito de forma de contorno
 (`superficie`, `comprimento` e os outros tipos de geometria) apontado na
-prancha não vai ao desenhista: leve-o à separação (skill
+prancha não vai ao desenhista: leve-o ao mapa de partes (skill
 `contorno-da-imagem`), porque o contorno vem de lá, e refaça a prancha depois.
 Os nomes das partes ficam em duas colunas fora da silhueta; medida escondida
 nesta vista vem de outra imagem de referência com contornos (`origem`), e

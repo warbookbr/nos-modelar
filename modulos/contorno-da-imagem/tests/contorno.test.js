@@ -137,7 +137,7 @@ describe('folhas das divisas e roteiro', () => {
     expect(folhas.map((f) => f.pares.length)).toEqual([6, 1]);
     const largura = PNG.sync.read(recortes[0].png).width;
     expect(PNG.sync.read(folhas[0].png).width).toBeGreaterThanOrEqual(largura);
-    const roteiro = roteiroDoCritico({ alvo: 'a.png', sobreposicao: 's.png', folhas: folhas.map((f, i) => ({ arquivo: `f${i}.png`, pares: f.pares })) });
+    const roteiro = roteiroDoCritico({ alvo: 'a.png', mapaDePartes: 's.png', folhas: folhas.map((f, i) => ({ arquivo: `f${i}.png`, pares: f.pares })) });
     expect(roteiro).toMatch(/Etapa 1 — visão geral/);
     expect(roteiro).toMatch(/Etapa 3 — divisas, folha 2 de 2/);
     expect(roteiro).toMatch(/Etapa 4 — fechamento/);

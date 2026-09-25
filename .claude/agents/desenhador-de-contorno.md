@@ -1,6 +1,6 @@
 ---
 name: desenhador-de-contorno
-description: Põe as sementes que separam as partes de uma imagem de referência no arquivo de regiões e gera o pacote do crítico com `npm run contorno`. Nas rodadas seguintes recebe os defeitos do crítico e corrige só as sementes. Não julga o próprio resultado. Use dentro da skill contorno-da-imagem.
+description: Põe as sementes que mapeiam as partes de uma imagem de referência no arquivo de regiões e gera o pacote do crítico com `npm run contorno`. Nas rodadas seguintes recebe os defeitos do crítico e corrige só as sementes. Não julga o próprio resultado. Use dentro da skill contorno-da-imagem.
 model: opus
 ---
 
@@ -27,7 +27,7 @@ Como trabalhar:
 Depois de mexer nas sementes, rode
 `npm run contorno -- <imagem> --regioes=<json> --pacote=<pasta>` e confira
 `medidas.json`: nenhuma parte pode ficar abaixo do mínimo na borda, e
-`semDonoPx` precisa ser pequeno. Olhe a sobreposição e os recortes de divisa
+`semDonoPx` precisa ser pequeno. Olhe o mapa de partes (`mapa-de-partes.png`) e os recortes de divisa
 antes de devolver.
 
 Na rodada seguinte você recebe os defeitos que o crítico apontou. Corrija

@@ -18,7 +18,7 @@
  * `--nova-serie` só vale quando a série parou na decisão humana: as rodadas
  * dela vão para `serie-NN/`, com quem autorizou, e a contagem recomeça.
  *
- * `--pacote` grava, para o crítico e a pessoa, a sobreposição com a opacidade
+ * `--pacote` grava, para o crítico e a pessoa, o mapa de partes com a opacidade
  * pedida (20% por padrão), um recorte ampliado de cada divisa entre partes
  * vizinhas, com o original ao lado, as folhas `divisas-NN.png`, uma divisa por
  * folha em objeto de poucas partes e até seis nos maiores, e o `roteiro.md`
@@ -92,7 +92,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   rmSync(pasta, { recursive: true, force: true });
   mkdirSync(join(pasta, 'divisas'), { recursive: true });
   const pintada = await sobreposicao(pngBuffer, segmentacao, { opacidade });
-  writeFileSync(join(pasta, 'sobreposicao.png'), pintada);
+  writeFileSync(join(pasta, 'mapa-de-partes.png'), pintada);
   /* Nos recortes vai a pintura sem os nomes, que cobririam a divisa. */
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
   const recortes = recortesDasDivisas(pngBuffer, semNome, segmentacao);
@@ -104,7 +104,7 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
     writeFileSync(arquivo, f.png);
     return { arquivo, pares: f.pares };
   });
-  writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, sobreposicao: join(pasta, 'sobreposicao.png'), folhas }));
+  writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, mapaDePartes: join(pasta, 'mapa-de-partes.png'), folhas }));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
   const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
@@ -153,7 +153,7 @@ async function principal(argv) {
   if (valor('pacote')) {
     const pasta = resolve(valor('pacote'));
     const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined, imagemAlvo: imagem });
-    process.stdout.write(`  pacote em ${pasta}: sobreposição, ${medidas.divisas.length} divisa(s), medidas\n`);
+    process.stdout.write(`  pacote em ${pasta}: mapa de partes, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
     if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);
   }

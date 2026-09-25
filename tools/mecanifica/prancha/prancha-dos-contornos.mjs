@@ -34,7 +34,7 @@
  *
  * Grava `<imagem>.prancha.svg` e `<imagem>.prancha.png` ao lado do arquivo de
  * contornos. As rodadas entre o agente e o crítico ficam em
- * `<imagem>.prancha.rodadas/`, com a mesma regra da separação. */
+ * `<imagem>.prancha.rodadas/`, com a mesma regra do mapa de partes. */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -277,7 +277,7 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
   return { landmarks, x, largura: largura + 40, colunas, direitaDosNomes: colunaX.direita + larguraMax('direita'), topoDosNomes: Math.min(0, ...itens.map((i) => i.ty - CORPO_DO_NOME)) };
 }
 
-/* O roteiro que o crítico da prancha segue, no espírito do da separação: uma
+/* O roteiro que o crítico da prancha segue, no espírito do mapa de partes: uma
    etapa por parte, com a largura, a altura, o nome e as linhas dela, porque
    quem olha a prancha inteira de uma vez aprova número na parte errada. */
 export function roteiroDaPrancha({ alvo, prancha: png, spec }) {

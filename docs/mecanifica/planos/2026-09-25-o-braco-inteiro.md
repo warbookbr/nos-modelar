@@ -149,14 +149,14 @@ montagem no que a exportação precisar.
 
 ## O fluxo do objeto
 
-Decidido com a pessoa em 2026-09-25. As ferramentas de separação, prancha e
+Decidido com a pessoa em 2026-09-25. As ferramentas de mapa de partes, prancha e
 modelagem nasceram uma de cada vez, cada uma numa conversa, e nada diz em que
 ordem entram nem quem recebe o quê. As etapas, na ordem em que o objeto é
 produzido:
 
 1. **Alinhamento.** Partes, escala, ordem de montagem e o que fica fora do
    modelo, com a pessoa (`alinhar-modelagem`).
-2. **Separação.** O `desenhador-de-contorno` põe as sementes e o
+2. **Mapear as partes.** O `desenhador-de-contorno` põe as sementes e o
    `critico-visual` julga pelo roteiro: nota 9 fecha, abaixo volta, até três
    rodadas, e depois a pessoa decide (`contorno-da-imagem`).
 3. **Prancha.** Um agente de prancha decide o que o comando não sabe: as cotas
@@ -170,9 +170,9 @@ produzido:
 
 O pacote de referência é entregue ao modelador e ao crítico em três imagens,
 nesta ordem: a imagem de referência, a prancha limpa, que dá a forma e as
-partes com medida, e a sobreposição a 20% com as folhas de divisa, que dá a
-separação e o detalhe. A ordem de entrega é diferente da de produção, porque
-a prancha sai dos contornos da separação, e o contrato registra as duas.
+partes com medida, e o mapa de partes com as folhas de divisa, que dá a
+divisa entre as partes e o detalhe. A ordem de entrega é diferente da de produção, porque
+a prancha sai dos contornos do mapa de partes, e o contrato registra as duas.
 Entregar as três ao crítico não fere a regra de não contar como a peça foi
 feita: elas vêm da referência, e não da construção.
 
@@ -187,7 +187,7 @@ forma e as partes de maneira limpa, e ela entrou como segunda imagem do
 pacote. O contrato está em `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, e
 `npm run objeto` lê cada etapa no disco, aponta a próxima e lista o pacote de
 referência. A prancha ganhou `<imagem>.prancha.json` com as cotas por parte,
-PNG e rodadas com a mesma regra da separação, que passaram a ser uma
+PNG e rodadas com a mesma regra do mapa de partes, que passaram a ser uma
 ferramenta só (`rodadas-com-critico.mjs`); a etapa é conduzida pela skill
 `prancha-dos-contornos` com o agente `desenhista-de-prancha`. O laço de
 modelagem entrega o pacote ao modelador e ao crítico. A ferramenta só conhece
@@ -204,8 +204,8 @@ de topo arredondado com um anel, e mais coerente com o resto do desenho. O
 ombro será refeito por essa vista, e a etapa `ombro` volta a ficar aberta
 quando o laço dela começar. O ombro fixado fica guardado como variação em
 `partes/ombro-tambor`, com as rodadas dele, e a montagem continua apontando
-para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pela
-separação e pela prancha, e dela saem também as alturas do ombro e do braço
+para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pelo
+mapa de partes e pela prancha, e dela saem também as alturas do ombro e do braço
 que a lateral esconde.
 
 A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
@@ -238,7 +238,7 @@ ou linha, dentro de cada parte, e cada semente cresce até a vizinha. Na
 `lateral.png` as 13 partes e o cabo saem separados, com 81% a 100% do
 perímetro a até 2 px da borda da imagem, e o resultado é igual a cada
 execução. As sementes foram postas pela IA olhando a imagem. Com a pessoa ficou decidido em 2026-09-25 que o corte vira módulo, com fluxo
-próprio. `modulos/contorno-da-imagem` faz a segmentação, a sobreposição com
+próprio. `modulos/contorno-da-imagem` faz a segmentação, o mapa de partes com
 opacidade de 20%, o recorte ampliado de cada divisa com o original ao lado, a
 medida de borda e as rodadas. A skill `contorno-da-imagem` conduz o agente
 `desenhador-de-contorno`, que põe as sementes, e o `critico-visual`, que dá

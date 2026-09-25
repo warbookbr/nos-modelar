@@ -2,13 +2,13 @@
 /* objeto.mjs — em que etapa do fluxo um objeto está, e o que vem a seguir.
  *
  * O fluxo tem cinco etapas, na ordem em que o objeto é produzido: alinhamento,
- * separação das partes, prancha, modelagem por etapa e aceite. Cada uma deixa
+ * mapear as partes, prancha, modelagem por etapa e aceite. Cada uma deixa
  * arquivo na pasta do objeto, e esta ferramenta lê o estado do disco, como
  * `rodada-de-modelagem --acao` faz para uma peça. O contrato está em
  * `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`.
  *
  * Também lista o pacote de referência que o modelador e o crítico recebem,
- * nesta ordem: a imagem de referência, a prancha limpa e a sobreposição a 20%
+ * nesta ordem: a imagem de referência, a prancha limpa e o mapa de partes
  * com as folhas de divisa.
  *
  * USO
@@ -41,22 +41,22 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   const imagens = existsSync(refs) ? readdirSync(refs).filter((n) => n.endsWith('.regioes.json')).sort().map((n) => n.replace(/\.regioes\.json$/, '')) : [];
   const pacotes = [];
   if (!imagens.length) {
-    etapas.push({ etapa: 'separação', estado: 'a fazer', como: 'skill contorno-da-imagem' });
+    etapas.push({ etapa: 'mapear as partes', estado: 'a fazer', como: 'skill contorno-da-imagem' });
     etapas.push({ etapa: 'prancha', estado: 'a fazer', como: 'skill prancha-dos-contornos' });
   }
   for (const img of imagens) {
     const base = join(refs, img);
     const separacao = estadoDasRodadas(`${base}.regioes.rodadas`);
-    etapas.push({ etapa: `separação de ${img}`, estado: separacao, como: 'skill contorno-da-imagem' });
+    etapas.push({ etapa: `mapear as partes de ${img}`, estado: separacao, como: 'skill contorno-da-imagem' });
     const temPrancha = existsSync(`${base}.prancha.png`);
-    const prancha = separacao !== 'feito' ? 'espera a separação' : (temPrancha ? estadoDasRodadas(`${base}.prancha.rodadas`) : 'a fazer');
+    const prancha = separacao !== 'feito' ? 'espera o mapa de partes' : (temPrancha ? estadoDasRodadas(`${base}.prancha.rodadas`) : 'a fazer');
     etapas.push({ etapa: `prancha de ${img}`, estado: prancha, como: 'skill prancha-dos-contornos' });
     const pacote = join(refs, `${img}.pacote`);
     const folhas = existsSync(pacote) ? readdirSync(pacote).filter((n) => /^divisas-\d+\.png$/.test(n)).sort().map((n) => rel(join(pacote, n))) : [];
     pacotes.push({
       imagem: rel(`${base}.png`),
       prancha: temPrancha ? rel(`${base}.prancha.png`) : null,
-      sobreposicao: existsSync(join(pacote, 'sobreposicao.png')) ? rel(join(pacote, 'sobreposicao.png')) : null,
+      mapaDePartes: existsSync(join(pacote, 'mapa-de-partes.png')) ? rel(join(pacote, 'mapa-de-partes.png')) : null,
       divisas: folhas,
       pronto: separacao === 'feito' && prancha === 'feito',
     });
@@ -87,7 +87,7 @@ function imprimir({ objeto, etapas, proxima, pacotes }) {
   for (const e of etapas) linhas.push(`  ${e.etapa.padEnd(34)} ${e.estado}`);
   linhas.push('', proxima ? `próxima: ${proxima.etapa} (${proxima.como})` : 'próxima: nada; o objeto está completo.');
   for (const p of pacotes) {
-    linhas.push('', `pacote de referência${p.pronto ? '' : ' (incompleto)'}:`, `  1. ${p.imagem}`, `  2. ${p.prancha ?? '(prancha ainda não feita)'}`, `  3. ${p.sobreposicao ?? '(sobreposição ainda não feita)'}`);
+    linhas.push('', `pacote de referência${p.pronto ? '' : ' (incompleto)'}:`, `  1. ${p.imagem}`, `  2. ${p.prancha ?? '(prancha ainda não feita)'}`, `  3. ${p.mapaDePartes ?? '(mapa de partes ainda não feito)'}`);
     for (const f of p.divisas) linhas.push(`     ${f}`);
   }
   return `${linhas.join('\n')}\n`;

@@ -69,9 +69,9 @@ aresta, `liso` sombreia sem faceta (com `angulo`, em graus, deixa nítida a quin
 dizer o que existe, e não palpite. Peça também, no despacho, o que faltou: é
 o `atrito` da rodada.
 
-**O pacote de referência.** Quando o objeto passou pela separação e pela
+**O pacote de referência.** Quando o objeto passou pelo mapa de partes e pela
 prancha, o modelador e o crítico recebem as mesmas três imagens, nesta ordem:
-a imagem de referência, a prancha limpa com as cotas e a sobreposição a 20%
+a imagem de referência, a prancha com as cotas e o mapa de partes
 com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
 uma, e `docs/mecanifica/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
