@@ -1,0 +1,327 @@
+{
+ "numero": 1,
+ "regioes": {
+  "base": [
+   [
+    360,
+    470
+   ],
+   [
+    430,
+    470
+   ],
+   [
+    345,
+    529
+   ],
+   [
+    447,
+    529
+   ]
+  ],
+  "caixaLateral": [
+   [
+    326,
+    430
+   ],
+   [
+    336,
+    470
+   ],
+   [
+    326,
+    515
+   ]
+  ],
+  "anelCintura": [
+   [
+    350,
+    405
+   ],
+   [
+    440,
+    405
+   ]
+  ],
+  "ombro": [
+   [
+    [
+     352,
+     312
+    ],
+    [
+     352,
+     370
+    ]
+   ],
+   [
+    [
+     356,
+     308
+    ],
+    [
+     440,
+     308
+    ]
+   ],
+   [
+    [
+     390,
+     355
+    ],
+    [
+     440,
+     330
+    ]
+   ],
+   [
+    [
+     390,
+     385
+    ],
+    [
+     440,
+     360
+    ]
+   ]
+  ],
+  "braco": [
+   [
+    [
+     354,
+     176
+    ],
+    [
+     354,
+     298
+    ]
+   ],
+   [
+    [
+     393,
+     175
+    ],
+    [
+     393,
+     295
+    ]
+   ],
+   [
+    [
+     430,
+     176
+    ],
+    [
+     430,
+     298
+    ]
+   ],
+   [
+    [
+     356,
+     302
+    ],
+    [
+     428,
+     302
+    ]
+   ],
+   [
+    [
+     356,
+     174
+    ],
+    [
+     428,
+     174
+    ]
+   ]
+  ],
+  "anelCotovelo": [
+   [
+    352,
+    156
+   ],
+   [
+    430,
+    156
+   ]
+  ],
+  "cotovelo": [
+   [
+    355,
+    60
+   ],
+   [
+    390,
+    55
+   ],
+   [
+    428,
+    70
+   ],
+   [
+    390,
+    130
+   ]
+  ],
+  "anelAntebraco": [
+   [
+    466,
+    70
+   ],
+   [
+    466,
+    135
+   ]
+  ],
+  "antebraco": [
+   [
+    [
+     490,
+     100
+    ],
+    [
+     588,
+     100
+    ]
+   ],
+   [
+    [
+     488,
+     74
+    ],
+    [
+     588,
+     74
+    ]
+   ],
+   [
+    [
+     488,
+     128
+    ],
+    [
+     588,
+     128
+    ]
+   ]
+  ],
+  "carcacaPunho": [
+   [
+    [
+     615,
+     100
+    ],
+    [
+     720,
+     95
+    ]
+   ],
+   [
+    [
+     615,
+     76
+    ],
+    [
+     715,
+     76
+    ]
+   ],
+   [
+    [
+     615,
+     128
+    ],
+    [
+     705,
+     128
+    ]
+   ],
+   [
+    [
+     700,
+     125
+    ],
+    [
+     728,
+     110
+    ]
+   ]
+  ],
+  "aneisPunho": [
+   [
+    684,
+    150
+   ],
+   [
+    728,
+    150
+   ],
+   [
+    728,
+    165
+   ],
+   [
+    684,
+    165
+   ]
+  ],
+  "garfoPunho": [
+   [
+    686,
+    190
+   ],
+   [
+    726,
+    190
+   ],
+   [
+    706,
+    215
+   ],
+   [
+    706,
+    234
+   ]
+  ],
+  "flange": [
+   [
+    672,
+    249
+   ],
+   [
+    740,
+    249
+   ]
+  ]
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "carcacaPunho",
+    "tipo": "uniao",
+    "onde": "borda esquerda arredondada da tampa, junto ao antebraco",
+    "sentido": "atravessando",
+    "evidencia": "etapa 3, folha divisas-02, par antebraco/carcacaPunho: o marrom passa da borda da tampa com franja serrilhada que entra no tubo azul; na borda de cima, uma tira azul cobre o que no original ja e tampa"
+   },
+   {
+    "parte": "garfoPunho",
+    "tipo": "uniao",
+    "onde": "pe do pescoco, onde encontra o disco da flange",
+    "sentido": "atravessando",
+    "evidencia": "etapa 5, folha divisas-04, par flange/garfoPunho: o verde desce para dentro do disco roxo no centro e a esquerda; no original a divisa e reta no topo do disco"
+   },
+   {
+    "parte": "base",
+    "tipo": "uniao",
+    "onde": "topo da base, embaixo e a esquerda do centro do anelCintura",
+    "sentido": "atravessando",
+    "evidencia": "etapa 6, folha divisas-05, par anelCintura/ombro, e etapa 7, folha divisas-06, par anelCintura/base: uma lingua rosa sobe para dentro do anel roxo, onde o original mostra so o anel metalico"
+   }
+  ],
+  "observacao": "As 13 partes estao presentes, nomeadas e sem pegar o fundo; os erros estao em tres divisas que nao seguem a borda do original, e ha uma marca preta a esquerda do anelCintura que aparece nos recortes do pacote e que eu nao vejo no alvo."
+ }
+}
