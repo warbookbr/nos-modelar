@@ -35,13 +35,14 @@ Abra /home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/front
 Abra /home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png.pacote/divisas-04.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:
 
 - flange / garfoPunho
-- braco / ombro
-- anelCintura / ombro
+- anelOmbro / braco
+- anelOmbro / ombro
 
 ## Etapa 6 — divisas, folha 5 de 5
 
 Abra /home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png.pacote/divisas-05.png. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:
 
+- anelCintura / ombro
 - anelCintura / base
 
 ## Etapa 7 — fechamento
