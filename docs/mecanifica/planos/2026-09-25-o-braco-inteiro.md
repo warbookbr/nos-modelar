@@ -138,11 +138,47 @@ montagem no que a exportação precisar.
 2. **O contorno sai da imagem.** Pesquisa dos candidatos, ensaio medido na
    `lateral.png`, comando e uso pela prancha e por `conferir:referencia`, com a
    pessoa julgando a prancha nova ao lado da antiga.
-3. **As partes restantes.** Rodada de alinhamento e laço de cada parte, na
-   ordem de montagem, com o contorno da fatia 2 servindo à medida de
-   proporção.
-4. **O braço sai montado.** Decisão com a pessoa sobre peça única ou partes
+3. **O fluxo do objeto.** Um contrato único de como um objeto é
+   desenvolvido, com cada etapa declarando quem faz, o que entra, o que sai e
+   em que pasta fica, e uma ferramenta que diz a próxima etapa do objeto, como
+   `rodada-de-modelagem --acao` já diz a da peça. Descrito abaixo.
+4. **As partes restantes.** Rodada de alinhamento e laço de cada parte, na
+   ordem de montagem, já pelo fluxo da fatia 3.
+5. **O braço sai montado.** Decisão com a pessoa sobre peça única ou partes
    posicionadas, e o exportador lendo a montagem.
+
+## O fluxo do objeto
+
+Decidido com a pessoa em 2026-09-25. As ferramentas de separação, prancha e
+modelagem nasceram uma de cada vez, cada uma numa conversa, e nada diz em que
+ordem entram nem quem recebe o quê. As etapas, na ordem em que o objeto é
+produzido:
+
+1. **Alinhamento.** Partes, escala, ordem de montagem e o que fica fora do
+   modelo, com a pessoa (`alinhar-modelagem`).
+2. **Separação.** O `desenhador-de-contorno` põe as sementes e o
+   `critico-visual` julga pelo roteiro: nota 9 fecha, abaixo volta, até três
+   rodadas, e depois a pessoa decide (`contorno-da-imagem`).
+3. **Prancha.** Um agente de prancha decide o que o comando não sabe: as cotas
+   que importam em cada parte, a conferência da calibração e se parte escondida
+   aparece tracejada. Um crítico julga com a mesma regra de nota 9 e três
+   rodadas. Sem esse trabalho definido, o crítico aprovaria uma cópia do
+   contorno.
+4. **Modelagem por etapa.** O laço de modelagem de cada parte, com o
+   modelador e o crítico recebendo o mesmo pacote de referência.
+5. **Aceite da pessoa.** Por crítico ou por aceite humano, como hoje.
+
+O pacote de referência é entregue ao modelador e ao crítico em três imagens,
+nesta ordem: a imagem de referência, a prancha limpa, que dá a forma e as
+partes com medida, e a sobreposição a 20% com as folhas de divisa, que dá a
+separação e o detalhe. A ordem de entrega é diferente da de produção, porque
+a prancha sai dos contornos da separação, e o contrato registra as duas.
+Entregar as três ao crítico não fere a regra de não contar como a peça foi
+feita: elas vêm da referência, e não da construção.
+
+O contrato fica em `docs/mecanifica/usar/`, e cada etapa tem saída em arquivo
+na pasta do objeto, para a ferramenta da próxima etapa ler do disco o estado
+em que o objeto está.
 
 ## Feito na fatia 1
 
