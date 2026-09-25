@@ -15,12 +15,15 @@ import { PNG } from 'pngjs';
 import { carregarOpenCV } from './opencv.js';
 
 /* Uma semente é um ponto `[x, y]`, uma linha `[[x, y], [x, y], ...]` ou várias
-   linhas `[[[x, y], ...], [[x, y], ...]]`. Várias linhas servem à parte que a
+   linhas `[[[x, y], ...], [[x, y], ...]]`, com pontos soltos `[x, y]` no meio se preciso. Várias linhas servem à parte que a
    imagem mostra em pedaços separados por outra, como a carcaça do punho vista
    de frente, dos dois lados do antebraço: uma linha só atravessaria a vizinha.
    Devolve a lista de linhas. */
 export function tracosDaSemente(semente) {
-  const linhas = Array.isArray(semente?.[0]?.[0]) ? semente : [Array.isArray(semente?.[0]) ? semente : [semente]];
+  /* Com pelo menos uma linha na lista, cada ponto solto vira uma semente de um
+     ponto só: o desenhador pode misturar os dois sem converter. */
+  const temLinha = Array.isArray(semente) && semente.some((e) => Array.isArray(e?.[0]));
+  const linhas = temLinha ? semente.map((e) => (Array.isArray(e?.[0]) ? e : [e])) : [Array.isArray(semente?.[0]) ? semente : [semente]];
   const ponto = (p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
   if (!linhas.length || linhas.some((l) => !Array.isArray(l) || !l.length || !l.every(ponto))) {
     throw new Error(`semente inválida: ${JSON.stringify(semente)}; use [x, y], [[x, y], ...] ou [[[x, y], ...], ...].`);

@@ -9,9 +9,10 @@
   "braco": 0.99,
   "caixaLateral": 0.992,
   "carcacaPunho": 0.925,
-  "cotovelo": 1,
+  "cotovelo": 0.958,
   "flange": 0.914,
   "garfoPunho": 0.978,
+  "juntaCotovelo": 0.956,
   "ombro": 0.99
  },
  "minimo": 0.8,
@@ -22,10 +23,10 @@
    "a": "anelAntebraco",
    "b": "cotovelo",
    "caixa": [
-    430,
-    53,
-    469,
-    151
+    429,
+    49,
+    468,
+    88
    ]
   },
   {
@@ -46,6 +47,26 @@
     59,
     621,
     147
+   ]
+  },
+  {
+   "a": "cotovelo",
+   "b": "juntaCotovelo",
+   "caixa": [
+    422,
+    60,
+    461,
+    152
+   ]
+  },
+  {
+   "a": "anelAntebraco",
+   "b": "juntaCotovelo",
+   "caixa": [
+    430,
+    61,
+    469,
+    151
    ]
   },
   {

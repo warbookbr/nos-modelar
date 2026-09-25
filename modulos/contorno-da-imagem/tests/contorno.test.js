@@ -21,6 +21,12 @@ function imagem() {
 const config = { limiar: 225, regioes: { esquerda: [30, 30], direita: [90, 30] } };
 
 describe('contorno da imagem', () => {
+  it('aceita pontos soltos misturados com linhas na mesma semente', async () => {
+    const { tracosDaSemente } = await import('../src/index.js');
+    expect(tracosDaSemente([[1, 2], [[3, 4], [5, 6]]])).toEqual([[[1, 2]], [[3, 4], [5, 6]]]);
+    expect(tracosDaSemente([[1, 2], [3, 4]])).toEqual([[[1, 2], [3, 4]]]);
+  });
+
   it('uma parte em dois pedaços, um de cada lado da vizinha, com duas linhas de semente', async () => {
     const png = new PNG({ width: 120, height: 60 });
     for (let y = 0; y < 60; y += 1) for (let x = 0; x < 120; x += 1) {
