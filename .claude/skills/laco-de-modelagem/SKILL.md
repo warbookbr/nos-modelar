@@ -46,6 +46,13 @@ da etapa, sem nota de passagem na última rodada, com junta reprovada ou sem
 aceite. Não contorne a recusa: ela é o motivo de o laço não virar bola de
 neve.
 
+Uma etapa só passa com defeito em aberto por aceite humano. Quando o laço
+para no limite ou sem convergência e a pessoa diz, com as palavras dela, que
+aceita a etapa como está, fixe com `--aceite-humano` e ponha em `--por` quem
+aceitou. Os defeitos entram no aceite gravado. Nenhum agente usa essa opção por
+conta própria, nem por achar o defeito pequeno, e ela é recusada no meio do
+laço.
+
 ## O ciclo de uma etapa
 
 Pergunte a ação antes de qualquer coisa, sempre:

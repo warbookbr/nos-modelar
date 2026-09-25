@@ -82,3 +82,21 @@ describe('etapas da montagem em disco', () => {
     expect(seguinte.etapas.map((e) => e.estado)).toEqual(['fixa', 'fixa', 'aberta']);
   });
 });
+
+describe('aceite humano com defeito em aberto', () => {
+  const comDefeito = (peca) => [registrarRodada({
+    peca, numero: 1, medidas: { passou: true, relatorio: 'ok' }, partes: [{ nome: 'corpo', confere: true }],
+    veredito: { alvo: 'referencias/x.png', nota: 7, defeitos: [{ parte: 'corpo', tipo: 'posicao', onde: 'canto de baixo', sentido: 'alta', evidencia: 'frente-orto.png: canto visível fora do disco em x≈380, y≈930' }], observacao: 'a peça bate com a referência, menos o canto de baixo' },
+    notaDePassagem: 'o canto ficou assim porque o colar é mais largo',
+  })];
+
+  it('só vale quando o laço parou, e grava os defeitos aceitos', async () => {
+    const noMeio = { receitas: RECEITAS, anterior: null, rodadasDe: comDefeito, limiteDe: () => 6 };
+    await recusa(fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, noMeio), 'etapa-sem-critico');
+    const parado = { ...noMeio, limiteDe: () => 1 };
+    await recusa(fixar(arquivo, 'base', aceite, parado), 'etapa-sem-critico');
+    const registro = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, parado);
+    expect(registro.etapas[0]).toMatchObject({ estado: 'fixa', aceite: { por: 'pessoa', defeitosAceitos: ['corpo: posicao em canto de baixo'] } });
+  });
+});
+

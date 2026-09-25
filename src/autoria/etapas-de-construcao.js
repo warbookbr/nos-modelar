@@ -108,10 +108,11 @@ export function fixarEtapa(registro, instancia, aceite) {
   const por = typeof aceite?.por === 'string' ? aceite.por.trim() : '';
   if (!por) falhar('etapa-sem-aceite', `fixar '${instancia}' exige o aceite da pessoa, com quem aceitou.`);
   const observacao = typeof aceite.observacao === 'string' ? aceite.observacao.trim() : '';
+  const defeitosAceitos = Array.isArray(aceite.defeitosAceitos) ? aceite.defeitosAceitos : [];
   return {
     ...registro,
     etapas: registro.etapas.map((item, i) => (i === indice
-      ? { ...item, estado: 'fixa', aceite: { por, ...(observacao ? { observacao } : {}) } }
+      ? { ...item, estado: 'fixa', aceite: { por, ...(observacao ? { observacao } : {}), ...(defeitosAceitos.length ? { defeitosAceitos } : {}) } }
       : item)),
   };
 }

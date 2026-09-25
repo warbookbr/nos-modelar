@@ -68,7 +68,7 @@
     },
     {
       "instancia": "ombro",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
@@ -113,7 +113,15 @@
           }
         }
       ],
-      "receita": "9fe583d7b38a1f2132e088ccb48f2c850ff9092dd4a785253497c3b59d8e55b2"
+      "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4",
+      "aceite": {
+        "por": "pessoa, 2026-09-25",
+        "observacao": "aceita no limite da rodada 8",
+        "defeitosAceitos": [
+          "colar: uniao em borda superior do colar, na junção com a base do corpo",
+          "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
+        ]
+      }
     }
   ]
 }
