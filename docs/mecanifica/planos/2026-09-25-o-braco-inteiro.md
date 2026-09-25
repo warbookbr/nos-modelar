@@ -154,6 +154,22 @@ porta. `guarda:acervo` roda a conferência em toda peça do acervo e reprova
 porta fora da forma. O teste reprova a porta 3 mm fora do plano e a de raio
 2 mm maior, e as portas da base, do anel da cintura e do ombro passam.
 
+## Andamento da fatia 2
+
+Ensaio de 2026-09-25 na `lateral.png`: o Potrace e o OpenCV traçam a silhueta
+a até 2 px da borda em 99,9% e 100% do perímetro, mas o Potrace só separa por
+limiar de cor, não distingue partes do mesmo cinza e é GPL. O escolhido foi o
+OpenCV, que separa as partes pelas bordas de sombra da imagem.
+`npm run contorno` (`tools/mecanifica/contorno-da-imagem.mjs`) recebe a imagem
+e um arquivo de regiões com duas âncoras e um ponto dentro de cada parte, e
+grava o contorno de cada parte em pixel e em milímetro, igual a cada execução.
+Na `lateral.png`, base, caixa lateral, braço, cotovelo e antebraço ficam a até
+2 px da borda em 99,6% a 100% do perímetro. A imagem não separa as partes que
+não têm borda entre si: o antebraço sai junto da carcaça do punho, o topo do
+cotovelo sai separado da faixa de baixo dele, o ombro fica dentro do braço e
+os anéis escuros se partem em pedaços pequenos. Falta ligar o arquivo ao
+`conferir:referencia` e à prancha, e a pessoa julgar o desenho.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não

@@ -91,7 +91,8 @@
     "descrever:gesto": "node tools/mecanifica/descrever-gesto.mjs",
     "guarda:gesto": "node tools/mecanifica/guardas/guarda-gesto.mjs",
     "guarda:edicao": "node tools/mecanifica/guardas/guarda-edicao-de-malha.mjs",
-    "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs"
+    "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
+    "contorno": "node tools/mecanifica/contorno-da-imagem.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
@@ -103,8 +104,10 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "2.0.0",
+    "@techstark/opencv-js": "5.0.0-release.1",
     "@types/node": "^26.1.1",
     "playwright": "1.56.0",
+    "pngjs": "7.0.0",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",

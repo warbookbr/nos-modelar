@@ -1,0 +1,15 @@
+{
+  "ancoras": [
+    { "nome": "borda esquerda do corpo da base, meia altura", "px": [341, 470], "mm": [-105, 120] },
+    { "nome": "borda direita do corpo da base, meia altura", "px": [435, 470], "mm": [105, 120] }
+  ],
+  "limiar": 225,
+  "canny": [20, 60],
+  "regioes": {
+    "base": [390, 470],
+    "caixaLateral": [322, 470],
+    "braco": [380, 250],
+    "cotovelo": [385, 100],
+    "antebraco": [600, 95]
+  }
+}
