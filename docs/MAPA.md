@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-792 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+793 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -512,6 +512,10 @@
 - `receita-06.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+
+## procedural/pecas/braco-robotico/referencias/frontal.png.pacote/
+
+- `roteiro.md` — Roteiro da análise
 
 ## procedural/pecas/braco-robotico/referencias/lateral.pacote/
 
