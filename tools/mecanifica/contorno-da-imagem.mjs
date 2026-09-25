@@ -25,7 +25,8 @@
  *   npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>] [--desenho=<png>]
  *
  * `--desenho` grava a imagem com cada região pintada por cima e o nome dela,
- * para a pessoa julgar se a divisa segue a parte.
+ * para a pessoa julgar se a divisa segue a parte; `--opacidade=0.2` deixa a
+ * pintura mais fraca, de 0 a 1, e o padrão é 0.5.
  *
  * O ARQUIVO DE REGIÕES
  *   { "ancoras": [ { "nome": "...", "px": [x, y], "mm": [z, y] }, { ... } ],
@@ -155,11 +156,11 @@ export async function contornosDaImagem(pngBuffer, config) {
 
 /* A imagem original com cada região pintada por cima, meio transparente, com
    uma cor por região e o nome dela. */
-export async function desenharContornos(pngBuffer, resultado) {
+export async function desenharContornos(pngBuffer, resultado, { opacidade = 0.5 } = {}) {
   const { cv } = await carregarOpenCV();
   const png = PNG.sync.read(pngBuffer);
   const img = cv.matFromImageData({ data: png.data, width: png.width, height: png.height });
-  const tinta = img.clone();
+  const tinta = new cv.Mat(); img.copyTo(tinta);
   const nomes = Object.keys(resultado.regioes);
   const corDe = (i) => {
     const h = (i * 360) / nomes.length; const f = (n) => { const k = (n + h / 60) % 6; return Math.round(255 * (1 - Math.max(0, Math.min(k, 4 - k, 1)))); };
@@ -172,7 +173,9 @@ export async function desenharContornos(pngBuffer, resultado) {
     cv.fillPoly(tinta, lista, corDe(i));
     pontos.delete(); lista.delete();
   });
-  cv.addWeighted(tinta, 0.5, img, 0.5, 0, img);
+  const mistura = new cv.Mat();
+  cv.addWeighted(tinta, opacidade, img, 1 - opacidade, 0, mistura);
+  mistura.copyTo(img); mistura.delete();
   nomes.forEach((nome, i) => {
     const [x, y] = resultado.regioes[nome].semente[0];
     cv.putText(img, nome, new cv.Point(x - 20, y), cv.FONT_HERSHEY_SIMPLEX, 0.4, new cv.Scalar(0, 0, 0, 255), 1);
@@ -195,7 +198,7 @@ async function principal(argv) {
   const resultado = await contornosDaImagem(readFileSync(imagem), config);
   const saida = valor('saida') ? resolve(valor('saida')) : imagem.replace(/\.png$/i, '.contornos.json');
   writeFileSync(saida, `${JSON.stringify(resultado, null, 1)}\n`, 'utf8');
-  if (valor('desenho')) writeFileSync(resolve(valor('desenho')), await desenharContornos(readFileSync(imagem), resultado));
+  if (valor('desenho')) writeFileSync(resolve(valor('desenho')), await desenharContornos(readFileSync(imagem), resultado, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined }));
   process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n`);
   for (const [nome, r] of Object.entries(resultado.regioes)) process.stdout.write(`  ${nome.padEnd(16)} ${String(r.contornoMm.length).padStart(4)} pontos  ${r.areaMm2} mm²\n`);
   process.stdout.write(`  gravado em ${saida}\n`);
