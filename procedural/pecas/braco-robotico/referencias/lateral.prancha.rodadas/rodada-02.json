@@ -1,0 +1,192 @@
+{
+ "numero": 2,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura"
+   },
+   {
+    "parte": "base",
+    "medida": "altura"
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura"
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura"
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura"
+   },
+   {
+    "parte": "braco",
+    "medida": "altura"
+   },
+   {
+    "parte": "braco",
+    "medida": "largura"
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura"
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura"
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura"
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura"
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura"
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura"
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura"
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura"
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "largura"
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura"
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura"
+   },
+   {
+    "parte": "flange",
+    "medida": "altura"
+   },
+   {
+    "parte": "flange",
+    "medida": "largura"
+   }
+  ]
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+  "nota": 6,
+  "defeitos": [
+   {
+    "parte": "flange",
+    "tipo": "cota",
+    "onde": "cota de diâmetro",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, x≈640 y≈390: o número (17?) está coberto pelo rótulo 'flange' e pelo ponto do marcador"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "altura do volume",
+    "sentido": "faltando",
+    "evidencia": "prancha, x≈130-275 y≈500-610: nenhuma cota vertical cobre o volume inteiro do ombro"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "cota 47 junto ao colar",
+    "sentido": "mal_posta",
+    "evidencia": "prancha, x≈275 y≈595-620: cobre só uma faixa de cerca de 25 px e não o volume do ombro"
+   },
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "cota 485, extremidade inferior",
+    "sentido": "mal_posta",
+    "evidencia": "prancha, x≈275 y≈290-620: a linha desce até o colar da cintura e engole a altura do ombro"
+   },
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "cota 194",
+    "sentido": "mal_posta",
+    "evidencia": "prancha, y≈500: mede a coluna no topo do ombro, e não a largura do ombro"
+   },
+   {
+    "parte": "cotovelo",
+    "tipo": "cota",
+    "onde": "altura do topo arredondado",
+    "sentido": "faltando",
+    "evidencia": "prancha, x≈140-280 y≈110-250: só há a cota de largura 221"
+   },
+   {
+    "parte": "anelAntebraco",
+    "tipo": "cota",
+    "onde": "altura do anel",
+    "sentido": "faltando",
+    "evidencia": "prancha, x≈280-330 y≈140-245: só há a cota de largura 77"
+   },
+   {
+    "parte": "antebraco",
+    "tipo": "cota",
+    "onde": "cota 140 na junta com a carcaça",
+    "sentido": "mal_posta",
+    "evidencia": "prancha, x≈497 y≈150-235: cota de altura dentro da peça, e não do lado de fora à direita"
+   },
+   {
+    "parte": "caixaLateral",
+    "tipo": "cota",
+    "onde": "largura da caixa",
+    "sentido": "faltando",
+    "evidencia": "prancha, x≈90-145 y≈650-800: nenhuma cota horizontal na caixa"
+   },
+   {
+    "parte": "caixaLateral",
+    "tipo": "cota",
+    "onde": "cota 223",
+    "sentido": "mal_posta",
+    "evidencia": "prancha, x≈145 y≈655-790: altura posta à esquerda, dentro da base; não dá para saber se pertence à caixa ou à base"
+   },
+   {
+    "parte": "carcacaPunho",
+    "tipo": "cota",
+    "onde": "cota de largura 310",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, x≈585 y≈199: o número está atravessado pelo ponto do marcador"
+   },
+   {
+    "parte": "carcacaPunho",
+    "tipo": "cota",
+    "onde": "cota de altura 143",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, x≈688 y≈190: o número está sobre o contorno da carcaça"
+   },
+   {
+    "parte": "anelCotovelo",
+    "tipo": "cota",
+    "onde": "cota de altura 53",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, x≈263 y≈268: o número colide com o fim do rótulo 'anelCotovelo'"
+   },
+   {
+    "parte": "garfoPunho",
+    "tipo": "cota",
+    "onde": "cota de altura 136",
+    "sentido": "sobreposta",
+    "evidencia": "prancha, x≈680 y≈335: o número se sobrepõe ao rótulo 'garfoPunho'"
+   }
+  ],
+  "observacao": "A silhueta e os contornos por parte seguem o alvo sem defeito de forma; a nota cai pelas cotas, e pesa mais o diâmetro ilegível da flange."
+ }
+}

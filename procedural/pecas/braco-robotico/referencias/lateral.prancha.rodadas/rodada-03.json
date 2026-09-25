@@ -1,0 +1,156 @@
+{
+ "numero": 3,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura"
+   },
+   {
+    "parte": "base",
+    "medida": "altura"
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "largura",
+    "lado": "acima"
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura"
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura"
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura"
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura"
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura"
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "altura"
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura",
+    "lado": "direita"
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura",
+    "lado": "abaixo"
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura"
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "largura"
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura",
+    "lado": "esquerda"
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura"
+   },
+   {
+    "parte": "flange",
+    "medida": "altura"
+   },
+   {
+    "parte": "flange",
+    "medida": "largura",
+    "lado": "abaixo"
+   }
+  ]
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral.png",
+  "nota": 5,
+  "defeitos": [
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "trecho entre anelCotovelo e ombro",
+    "sentido": "faltando",
+    "evidencia": "coluna vertical no meio-esquerda da prancha (x 140-265, y 290-500) sem nenhuma cota de largura nem de altura"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "volume arredondado na base da coluna",
+    "sentido": "faltando",
+    "evidencia": "região x 125-275, y 500-610 sem cota de largura nem de altura"
+   },
+   {
+    "parte": "anelAntebraco",
+    "tipo": "cota",
+    "onde": "junção cotovelo/antebraço",
+    "sentido": "sobreposta",
+    "evidencia": "números 140, 77 e 165 e rótulos anelAntebraco/antebraco atropelados em x 285-360, y 150-205"
+   },
+   {
+    "parte": "caixaLateral",
+    "tipo": "cota",
+    "onde": "rótulo no alto da caixa",
+    "sentido": "sobreposta",
+    "evidencia": "rótulos caixaLateral e base sobrepostos em x 100-170, y 670"
+   },
+   {
+    "parte": "carcacaPunho",
+    "tipo": "cota",
+    "onde": "borda inferior e lateral direita",
+    "sentido": "mal_posta",
+    "evidencia": "310 sobre a borda inferior da carcaça em x 575-600, y 243, e 145 e 82 cruzados por linhas em x 685-690, y 185-265; o 310 não diz a que parte pertence"
+   },
+   {
+    "parte": "cotovelo",
+    "tipo": "superficie",
+    "onde": "topo",
+    "sentido": "anguloso",
+    "evidencia": "topo do cotovelo quase reto no alto à esquerda da prancha (y 108-125), e no alvo é cúpula arredondada"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "superficie",
+    "onde": "laterais do volume",
+    "sentido": "segmentado",
+    "evidencia": "contorno do ombro em x 125-275, y 500-610 com degraus nas laterais, e no alvo é curva contínua"
+   }
+  ],
+  "observacao": "Silhueta e proporções seguem o alvo; a prancha falha por deixar a coluna e o ombro sem cota e por ter rótulos e números sobrepostos na junção do cotovelo, na base e no punho."
+ }
+}

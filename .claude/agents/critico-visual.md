@@ -74,7 +74,7 @@ acompanha. Veredito em prosa é recusado pelo validador e a rodada se perde.
 }
 ```
 
-O `tipo` só aceita estas seis palavras, e cada uma aceita só os sentidos ao
+O `tipo` só aceita estas oito palavras, e cada uma aceita só os sentidos ao
 lado:
 
 - **angulo** — a direção do trecho está errada: `maior`, `menor`;
@@ -93,6 +93,11 @@ lado:
   com carcaça de caixa onde a referência mostra volume arredondado, e o único
   jeito de dizer isso era `espessura` ou `ausencia`, que mandam engrossar seção
   e acrescentar parte quando o conserto é trocar a técnica.
+- **cota** — só em prancha: a anotação está errada, e não a geometria:
+  `faltando` para medida essencial sem cota, `mal_posta` para cota na parte
+  errada ou medindo a coisa errada, `sobreposta` para número que não dá para
+  ler. Existe porque problema de cota registrado como `ausencia` ou `posicao`
+  manda acrescentar ou mover parte que está certa.
 
 **`angulo` e `posicao` não trocam de sentido de propósito.** Um trecho inclinado
 errado não é um trecho deslocado, e dizer "está para trás" quando o defeito é de

@@ -45,6 +45,8 @@ describe('veredito de forma', () => {
   it('ÂNGULO e POSIÇÃO não compartilham sentido: apontar um não permite corrigir o outro', () => {
     expect(TIPOS_DE_DEFEITO.angulo).toEqual(['maior', 'menor']);
     expect(TIPOS_DE_DEFEITO.posicao).not.toContain('maior');
+    expect(TIPOS_DE_DEFEITO.cota).toEqual(['faltando', 'mal_posta', 'sobreposta']);
+    expect(() => comDefeito({ tipo: 'cota', sentido: 'menor' })).toThrow(/para tipo 'cota'/);
     expect(() => comDefeito({ tipo: 'angulo', sentido: 'adiantada' }))
       .toThrow(/para tipo 'angulo' precisa ser um de: maior, menor/);
     expect(() => comDefeito({ tipo: 'posicao', sentido: 'menor' }))

@@ -119,6 +119,9 @@ Cada defeito diz a parte, o tipo e o sentido do erro. Corrija pelo tipo:
   `lathe`; `facetado` pede mais lados na revolução, e `liso` para a sombra não
   denunciar a faceta. Engrossar seção ou acrescentar parte não conserta nenhum
   dos três.
+- **cota** é defeito de anotação da prancha, e não da peça: só aparece nas
+  rodadas da prancha. Se chegar a você, é engano de quem conduz; não mexa na
+  receita por ele e diga isso na devolução.
 
 Corrija mexendo no parâmetro da tabela que governa aquela medida, não na
 geometria resolvida. Se nenhum parâmetro governar o que o veredito pede, diga

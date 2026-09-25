@@ -1,0 +1,23 @@
+{ "cotas": [
+  { "parte": "base", "medida": "largura" },
+  { "parte": "base", "medida": "altura" },
+  { "parte": "caixaLateral", "medida": "altura", "lado": "esquerda" },
+  { "parte": "caixaLateral", "medida": "largura", "lado": "acima" },
+  { "parte": "anelCintura", "medida": "altura" },
+  { "parte": "ombro", "medida": "altura" },
+  { "parte": "cotovelo", "medida": "largura" },
+  { "parte": "cotovelo", "medida": "altura", "lado": "esquerda" },
+  { "parte": "anelCotovelo", "medida": "altura", "lado": "esquerda" },
+  { "parte": "antebraco", "medida": "largura" },
+  { "parte": "antebraco", "medida": "altura", "lado": "esquerda" },
+  { "parte": "anelAntebraco", "medida": "largura" },
+  { "parte": "anelAntebraco", "medida": "altura" },
+  { "parte": "carcacaPunho", "medida": "altura", "lado": "direita" },
+  { "parte": "carcacaPunho", "medida": "largura", "lado": "abaixo" },
+  { "parte": "aneisPunho", "medida": "altura" },
+  { "parte": "aneisPunho", "medida": "largura" },
+  { "parte": "garfoPunho", "medida": "altura", "lado": "esquerda" },
+  { "parte": "garfoPunho", "medida": "largura" },
+  { "parte": "flange", "medida": "altura" },
+  { "parte": "flange", "medida": "largura", "lado": "abaixo" }
+] }

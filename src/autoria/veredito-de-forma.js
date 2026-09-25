@@ -36,6 +36,14 @@ export const TIPOS_DE_DEFEITO = Object.freeze({
      raio; `segmentado` é corpo em degraus onde devia ser contínuo; `facetado` é
      revolução com lados de menos, que lê como prisma. */
   superficie: ['anguloso', 'segmentado', 'facetado'],
+  /* COTA entrou pelo mesmo caminho, na prancha dos contornos do braço: o
+     crítico achou cotas faltando, postas na parte errada e com texto
+     sobreposto, e recusou registrá-las como `ausencia` ou `posicao`, que
+     mandam acrescentar ou mover uma parte que estava certa. Cota é anotação da
+     prancha, e não geometria: `faltando` é medida essencial sem cota,
+     `mal_posta` é cota na parte errada ou medindo a coisa errada,
+     `sobreposta` é número que não dá para ler. */
+  cota: ['faltando', 'mal_posta', 'sobreposta'],
 });
 
 export const CAMPOS_DEFEITO = Object.freeze(['parte', 'tipo', 'onde', 'sentido', 'evidencia']);
