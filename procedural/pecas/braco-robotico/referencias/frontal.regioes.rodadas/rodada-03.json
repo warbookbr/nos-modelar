@@ -1,0 +1,362 @@
+{
+ "numero": 3,
+ "regioes": {
+  "base": [
+   [
+    697,
+    575
+   ],
+   [
+    697,
+    690
+   ],
+   [
+    632,
+    712
+   ],
+   [
+    762,
+    712
+   ]
+  ],
+  "anelCintura": [
+   [
+    636,
+    545
+   ],
+   [
+    758,
+    545
+   ]
+  ],
+  "ombro": [
+   [
+    650,
+    435
+   ],
+   [
+    750,
+    435
+   ],
+   [
+    750,
+    515
+   ],
+   [
+    660,
+    515
+   ],
+   [
+    654,
+    440
+   ],
+   [
+    654,
+    505
+   ]
+  ],
+  "anelOmbro": [
+   [
+    633,
+    425
+   ],
+   [
+    633,
+    470
+   ],
+   [
+    633,
+    515
+   ]
+  ],
+  "braco": [
+   [
+    590,
+    470
+   ],
+   [
+    535,
+    470
+   ],
+   [
+    590,
+    300
+   ],
+   [
+    590,
+    232
+   ]
+  ],
+  "anelCotovelo": [
+   [
+    540,
+    206
+   ],
+   [
+    632,
+    206
+   ]
+  ],
+  "cotovelo": [
+   [
+    545,
+    80
+   ],
+   [
+    600,
+    120
+   ],
+   [
+    636,
+    72
+   ],
+   [
+    640,
+    110
+   ],
+   [
+    640,
+    150
+   ],
+   [
+    600,
+    175
+   ]
+  ],
+  "anelAntebraco": [
+   [
+    648,
+    154
+   ],
+   [
+    648,
+    172
+   ],
+   [
+    654,
+    172
+   ]
+  ],
+  "antebraco": [
+   [
+    651,
+    75
+   ],
+   [
+    651,
+    110
+   ],
+   [
+    652,
+    145
+   ],
+   [
+    660,
+    145
+   ],
+   [
+    660,
+    72
+   ]
+  ],
+  "carcacaPunho": [
+   [
+    685,
+    75
+   ],
+   [
+    740,
+    110
+   ],
+   [
+    700,
+    150
+   ],
+   [
+    778,
+    95
+   ],
+   [
+    778,
+    155
+   ],
+   [
+    674,
+    150
+   ],
+   [
+    705,
+    151
+   ],
+   [
+    735,
+    151
+   ]
+  ],
+  "aneisPunho": [
+   [
+    675,
+    172
+   ],
+   [
+    740,
+    172
+   ],
+   [
+    740,
+    192
+   ],
+   [
+    675,
+    192
+   ],
+   [
+    673,
+    170
+   ],
+   [
+    680,
+    164
+   ],
+   [
+    705,
+    162
+   ],
+   [
+    730,
+    163
+   ],
+   [
+    737,
+    168
+   ],
+   [
+    680,
+    205
+   ],
+   [
+    695,
+    205
+   ],
+   [
+    710,
+    205
+   ],
+   [
+    725,
+    205
+   ],
+   [
+    738,
+    205
+   ],
+   [
+    700,
+    208
+   ],
+   [
+    720,
+    208
+   ]
+  ],
+  "garfoPunho": [
+   [
+    680,
+    215
+   ],
+   [
+    735,
+    215
+   ],
+   [
+    680,
+    265
+   ],
+   [
+    735,
+    265
+   ],
+   [
+    700,
+    214
+   ],
+   [
+    720,
+    214
+   ]
+  ],
+  "flange": [
+   [
+    660,
+    315
+   ],
+   [
+    760,
+    315
+   ],
+   [
+    708,
+    300
+   ],
+   [
+    708,
+    340
+   ],
+   [
+    662,
+    292
+   ],
+   [
+    690,
+    285
+   ],
+   [
+    708,
+    278
+   ],
+   [
+    726,
+    285
+   ],
+   [
+    754,
+    292
+   ]
+  ]
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png",
+  "nota": 8,
+  "defeitos": [
+   {
+    "parte": "carcacaPunho",
+    "tipo": "ausencia",
+    "onde": "extremidade direita, tampa lateral arredondada",
+    "sentido": "faltando",
+    "evidencia": "Etapa 1, sobreposicao.png, x de 770 a 795 e y de 85 a 160: o original mostra um disco escuro separado, e a pintura o engole no marrom da carcaça sem região própria (achado incerto)"
+   },
+   {
+    "parte": "anelAntebraco",
+    "tipo": "superficie",
+    "onde": "borda esquerda, divisa com cotovelo",
+    "sentido": "segmentado",
+    "evidencia": "Etapas 2 e 3, divisas-01 linha 3 e divisas-02 linha 1 (anelAntebraco / antebraco e anelAntebraco / cotovelo): a borda do verde tem degraus de pixels onde a faixa do original é reta"
+   },
+   {
+    "parte": "anelCotovelo",
+    "tipo": "superficie",
+    "onde": "borda superior, metade direita",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 4, divisas-03 linha 1 (anelCotovelo / cotovelo): a divisa tem pequenos degraus, e a borda do original é reta"
+   },
+   {
+    "parte": "aneisPunho",
+    "tipo": "superficie",
+    "onde": "borda superior, divisa com carcacaPunho",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 3, divisas-02 linha 2 (aneisPunho / carcacaPunho): a divisa ondula sobre a aresta superior do anel, que no original é curva lisa"
+   }
+  ],
+  "observacao": "As 17 divisas caem nas separações do original. O que resta é borda serrilhada em quatro divisas e uma tampa lateral do punho possivelmente não separada."
+ }
+}
