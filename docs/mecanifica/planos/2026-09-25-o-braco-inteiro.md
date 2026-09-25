@@ -208,6 +208,11 @@ para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pela
 separação e pela prancha, e dela saem também as alturas do ombro e do braço
 que a lateral esconde.
 
+A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
+(`referencias/lateral-sem-cabo.png`). Ela passa a ser a lateral das partes
+que faltam e do ombro refeito. A `lateral.png` fica como está, porque as
+receitas já fixas e a variação `ombro-tambor` a citam.
+
 ## Feito na fatia 1
 
 `src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde
