@@ -163,7 +163,7 @@ export function gerarPassos(t = TABELA) {
      e levado ao eixo, encostado na face plana do corpo. */
   passos.push(['lathe', {
     origemId: ID.tambor, lados: t.ladosDoTambor, segmentosCurva: 3,
-    perfil: [[0, 0], [Rt, 0, s], [Rt, et, ft], [0, et]],
+    perfil: [[0, 0], [Rt, 0], [Rt, et, ft], [0, et]],
   }]);
   const selT = { origem: { op: 'lathe', id: ID.tambor } };
   passos.push(['rotaciona', { eixo: 'x', graus: 90, pivo: [0, 0, 0], sel: selT }]);
