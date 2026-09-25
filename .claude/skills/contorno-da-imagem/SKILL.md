@@ -19,6 +19,14 @@ nome de cada parte. A lista das partes e uma frase sobre cada uma vêm do
 alinhamento da peça. A regra que vale para todos: a região é o que aparece, e
 parte escondida atrás de outra fica só com o pedaço visível.
 
+O arquivo de regiões aceita `"realce": true`, que realça contraste local e
+nitidez só para o watershed; a silhueta e as medidas ficam na imagem original.
+Use quando a divisa entre partes do mesmo cinza exigir muitas sementes: na
+lateral do braço, com uma semente por parte, o realce levou o ombro e o anel
+da cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
+O ajuste é sensível, e ligar ou não o realce é decisão que o crítico julga
+pelo resultado.
+
 ## O ciclo
 
 Pergunte a ação, sempre:

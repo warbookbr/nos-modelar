@@ -187,7 +187,14 @@ um roteiro gerado no pacote: uma etapa de visão geral, uma por folha de
 divisas e o fechamento. Com até seis divisas cada uma tem etapa própria; com
 mais, elas se agrupam para ficar perto de seis etapas, até seis por folha.
 Pelo roteiro, o crítico conferiu as 19 divisas da lateral e deu nota 9.
-Falta ligar o arquivo ao `conferir:referencia` e à prancha.
+Com a pessoa, em 2026-09-25, entrou o realce da divisa: contraste local e
+nitidez aplicados só à imagem que o watershed usa, ligados por `realce` no
+arquivo de regiões. Com uma semente por parte, ele levou o ombro e o anel da
+cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
+Aumentar a resolução ficou pesquisado e não feito: a recomendação é ensaiar
+interpolação Lanczos com nitidez leve e, depois, FSRCNN por `onnxruntime-node`,
+evitando modelo generativo, que inventa borda. Falta ligar o arquivo ao
+`conferir:referencia` e à prancha.
 
 ## Riscos e parada
 

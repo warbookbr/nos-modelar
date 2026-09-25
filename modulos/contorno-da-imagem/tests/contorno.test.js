@@ -91,3 +91,19 @@ describe('folhas das divisas e roteiro', () => {
     expect(roteiro).toMatch(/Etapa 4 — fechamento/);
   });
 });
+
+describe('realce da divisa', () => {
+  it('com realce, a costura fraca entre duas partes do mesmo cinza continua achada', async () => {
+    const png = new PNG({ width: 120, height: 60 });
+    for (let y = 0; y < 60; y += 1) for (let x = 0; x < 120; x += 1) {
+      const o = (y * 120 + x) * 4;
+      const dentro = x >= 10 && x < 110 && y >= 15 && y < 45;
+      const v = !dentro ? 250 : (x === 60 ? 144 : 150);
+      png.data[o] = v; png.data[o + 1] = v; png.data[o + 2] = v; png.data[o + 3] = 255;
+    }
+    const seg = await segmentar(PNG.sync.write(png), { ...config, realce: true });
+    const xs = seg.regioes.esquerda.contornoPx.map(([x]) => x);
+    expect(Math.max(...xs)).toBeGreaterThanOrEqual(57);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(62);
+  });
+});

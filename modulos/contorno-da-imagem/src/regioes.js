@@ -27,7 +27,29 @@ export function tracosDaSemente(semente) {
    também o rótulo de cada pixel (`rotulos`, -1 na divisa, 1 no fundo, 2 em
    diante nas partes na ordem de `nomes`), a máscara da silhueta e os pixels
    dela sem dono. */
-export async function segmentar(pngBuffer, { limiar = 225, regioes = {} } = {}) {
+/* Realce para o watershed, que é onde a divisa é escolhida. O contraste local
+   (CLAHE na luminância) puxa a diferença pequena entre duas partes do mesmo
+   cinza, e a nitidez (máscara de desfoque) afina a costura entre elas. A
+   silhueta e a medida de borda continuam na imagem original: o realce só
+   decide por onde a semente cresce. `realce: true` usa os valores padrão. */
+export const REALCE_PADRAO = { contraste: 3, grade: 16, nitidez: 1, raio: 1.5 };
+
+function realcar(cv, cor, novo, realce) {
+  const { contraste, grade, nitidez, raio } = { ...REALCE_PADRAO, ...(realce === true ? {} : realce) };
+  const lab = novo(new cv.Mat()); cv.cvtColor(cor, lab, cv.COLOR_RGB2Lab);
+  const canais = novo(new cv.MatVector()); cv.split(lab, canais);
+  const l = canais.get(0); const l2 = novo(new cv.Mat());
+  const clahe = new cv.CLAHE(contraste, new cv.Size(grade, grade));
+  clahe.apply(l, l2); clahe.delete();
+  l2.copyTo(l); canais.set(0, l); l.delete();
+  const junto = novo(new cv.Mat()); cv.merge(canais, junto);
+  const volta = novo(new cv.Mat()); cv.cvtColor(junto, volta, cv.COLOR_Lab2RGB);
+  const borrada = novo(new cv.Mat()); cv.GaussianBlur(volta, borrada, new cv.Size(0, 0), raio);
+  const saida = novo(new cv.Mat()); cv.addWeighted(volta, 1 + nitidez, borrada, -nitidez, 0, saida);
+  return saida;
+}
+
+export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce = false } = {}) {
   const nomes = Object.keys(regioes).sort();
   if (!nomes.length) throw new Error('o arquivo de regiões não nomeia nenhuma região.');
   const sementes = nomes.map((nome) => ({ nome, tracos: tracosDaSemente(regioes[nome]) }));
@@ -56,7 +78,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {} } = {}) 
         cv.line(marcas, new cv.Point(tracos[k - 1][0], tracos[k - 1][1]), new cv.Point(tracos[k][0], tracos[k][1]), rotulo, 2);
       }
     });
-    cv.watershed(cor, marcas);
+    cv.watershed(realce ? realcar(cv, cor, novo, realce) : cor, marcas);
     const rotulos = Int32Array.from(marcas.data32S);
     const resultado = {};
     sementes.forEach(({ nome, tracos }, i) => {

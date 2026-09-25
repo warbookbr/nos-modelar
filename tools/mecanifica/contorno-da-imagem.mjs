@@ -28,8 +28,9 @@
  *
  * O ARQUIVO DE REGIÕES
  *   { "ancoras": [ { "nome": "...", "px": [x, y], "mm": [z, y] }, { ... } ],
- *     "limiar": 225,
+ *     "limiar": 225, "realce": false,
  *     "regioes": { "base": [390, 470], "anelCintura": [[345, 405], [430, 405]] } }
+ *   `realce` liga o realce de contraste e nitidez do módulo para o watershed.
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
