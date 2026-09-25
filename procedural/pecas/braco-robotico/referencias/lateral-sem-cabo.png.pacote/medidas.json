@@ -1,0 +1,142 @@
+{
+ "naBorda": {
+  "aneisPunho": 1,
+  "anelAntebraco": 1,
+  "anelCintura": 0.993,
+  "anelCotovelo": 1,
+  "antebraco": 0.937,
+  "base": 0.998,
+  "braco": 0.838,
+  "caixaLateral": 0.996,
+  "carcacaPunho": 0.897,
+  "cotovelo": 1,
+  "flange": 0.985,
+  "garfoPunho": 0.997,
+  "ombro": 0.805
+ },
+ "minimo": 0.8,
+ "abaixo": [],
+ "semDonoPx": 193,
+ "divisas": [
+  {
+   "a": "anelAntebraco",
+   "b": "cotovelo",
+   "caixa": [
+    430,
+    53,
+    469,
+    151
+   ]
+  },
+  {
+   "a": "anelAntebraco",
+   "b": "antebraco",
+   "caixa": [
+    465,
+    56,
+    504,
+    148
+   ]
+  },
+  {
+   "a": "antebraco",
+   "b": "carcacaPunho",
+   "caixa": [
+    577,
+    59,
+    730,
+    146
+   ]
+  },
+  {
+   "a": "aneisPunho",
+   "b": "carcacaPunho",
+   "caixa": [
+    667,
+    120,
+    744,
+    159
+   ]
+  },
+  {
+   "a": "anelCotovelo",
+   "b": "cotovelo",
+   "caixa": [
+    337,
+    122,
+    446,
+    161
+   ]
+  },
+  {
+   "a": "anelCotovelo",
+   "b": "braco",
+   "caixa": [
+    337,
+    148,
+    446,
+    187
+   ]
+  },
+  {
+   "a": "aneisPunho",
+   "b": "garfoPunho",
+   "caixa": [
+    672,
+    155,
+    739,
+    194
+   ]
+  },
+  {
+   "a": "flange",
+   "b": "garfoPunho",
+   "caixa": [
+    671,
+    223,
+    752,
+    262
+   ]
+  },
+  {
+   "a": "braco",
+   "b": "ombro",
+   "caixa": [
+    339,
+    284,
+    443,
+    323
+   ]
+  },
+  {
+   "a": "anelCintura",
+   "b": "ombro",
+   "caixa": [
+    335,
+    373,
+    455,
+    412
+   ]
+  },
+  {
+   "a": "anelCintura",
+   "b": "base",
+   "caixa": [
+    334,
+    393,
+    455,
+    432
+   ]
+  },
+  {
+   "a": "base",
+   "b": "caixaLateral",
+   "caixa": [
+    327,
+    408,
+    366,
+    537
+   ]
+  }
+ ]
+}
