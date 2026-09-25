@@ -49,7 +49,17 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
     const preto = new cv.Scalar(0, 0, 0, 255);
     for (const { marca, ponta } of arranjo.etiquetas) {
       cv.line(tela, new cv.Point(marca[0], marca[1]), new cv.Point(ponta[0], ponta[1]), preto, 1, cv.LINE_AA);
-      cv.circle(tela, new cv.Point(marca[0], marca[1]), 2, preto, cv.FILLED);
+    }
+    /* O número vai também sobre o ponto da parte, num círculo branco. Quando
+       várias marcas ficam na mesma altura, a chamada de uma passa sobre as
+       outras e o olho liga o nome à parte errada; com o número no ponto, a
+       parte se lê sem seguir a linha. */
+    for (const { texto, marca } of arranjo.etiquetas) {
+      const numero = texto.split('-')[0];
+      const centro = new cv.Point(marca[0], marca[1]);
+      cv.circle(tela, centro, 8, new cv.Scalar(255, 255, 255, 255), cv.FILLED);
+      cv.circle(tela, centro, 8, preto, 1, cv.LINE_AA);
+      cv.putText(tela, numero, new cv.Point(marca[0] - (numero.length > 1 ? 7 : 4), marca[1] + 4), cv.FONT_HERSHEY_SIMPLEX, 0.35, preto, 1);
     }
     for (const { texto, caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
       cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), new cv.Scalar(255, 255, 255, 255), cv.FILLED);
