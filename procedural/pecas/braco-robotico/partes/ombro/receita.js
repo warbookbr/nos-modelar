@@ -69,7 +69,7 @@ export const TABELA = {
   anguloDoBico: 5,
   /* Limite do sombreado liso, em graus: quinas mais fechadas que isto (o V
      da rampa com a parede, a frente com os lados, as tampas) ficam nítidas. */
-  anguloDoLiso: 20,
+  anguloDoLiso: 10,
   lados: 40,
   /* O tambor tem mais lados que o colar, para o contorno ficar liso de frente. */
   ladosDoTambor: 108,
