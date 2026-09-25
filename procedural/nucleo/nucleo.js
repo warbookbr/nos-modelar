@@ -2797,7 +2797,17 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      aspereza mudou a peça. O núcleo continua sem saber de renderizador; ele
      apenas preserva a declaração já usada pela op `material`. */
   const neutro = { V: st.V, F: st.F, orfaos: st.orfaos, merges: st.merges, partes: st.partes, esqueleto: st.esqueleto, pesos: st.pesos, portas: portasDoNucleo(st.portas), materiais: st.materiais };
-  return { ...neutro, artefato: artefatoDaMalha(neutro), procedencia: procedenciaCanonica(st.procedencia) };
+  /* As faces de onde cada porta sai, na geometria final, para a conferência
+     da porta contra a forma (`src/autoria/porta-confere-forma.js`). Fica fora
+     da enumeração para não mudar nada do que o núcleo serializa. */
+  const facesDasPortas = new Map();
+  for (const [id, porta] of st.portas) {
+    const r = resolverOrigem(st, porta.de);
+    if (!r.erro) facesDasPortas.set(id, [...new Set(r.faces)].filter((f) => st.F.has(f)));
+  }
+  const saida = { ...neutro, artefato: artefatoDaMalha(neutro), procedencia: procedenciaCanonica(st.procedencia) };
+  Object.defineProperty(saida, 'facesDasPortas', { value: facesDasPortas, enumerable: false });
+  return saida;
 }
 
 /* forma canônica e ORDENADA do neutro — a base de toda comparação (replay da

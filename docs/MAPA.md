@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-760 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+762 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -540,6 +540,8 @@
 - `parametros-vivos.js` — parametros-vivos.js — separa liberdade DECLARADA de liberdade REAL.
 - `plano-de-modelagem.js` — plano-de-modelagem.js — o que a peça PROMETE ser, escrito antes da geometria.
 - `plano-de-modelagem.test.js` — plano-de-modelagem.test.js — o contrato do que a peça promete ser.
+- `porta-confere-forma.js` — porta-confere-forma.js — a porta que a receita declara está na forma da peça.
+- `porta-confere-forma.test.js` — porta-confere-forma.test.js — a porta no lugar passa, a porta deslocada do plano e a de raio errado reprovam, e as portas das partes fixas do braço passam.
 - `posicao-por-porta.js` — posicao-por-porta.js — a pose de uma instância derivada do encaixe de uma porta dela numa porta de outra instância já construída.
 - `protocolo-revalidacao.js` — protocolo-revalidacao.js — contrato puro da R00, sem persistência ou efeitos.
 - `provedor-contratos-autoria.js` — Provedor N1 do briefing: transforma o objetivo já validado em plano puro. Não alega validar prancha, forma, superfície, montagem, revisão ou promoção.

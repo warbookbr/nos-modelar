@@ -144,6 +144,16 @@ montagem no que a exportação precisar.
 4. **O braço sai montado.** Decisão com a pessoa sobre peça única ou partes
    posicionadas, e o exportador lendo a montagem.
 
+## Feito na fatia 1
+
+`src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde
+cada porta sai está no plano declarado e se a parte chega ao raio declarado
+junto desse plano, numa faixa de 10 mm que deixa passar chanfro e filete de
+borda. O núcleo passou a devolver, fora da serialização, as faces de cada
+porta. `guarda:acervo` roda a conferência em toda peça do acervo e reprova
+porta fora da forma. O teste reprova a porta 3 mm fora do plano e a de raio
+2 mm maior, e as portas da base, do anel da cintura e do ombro passam.
+
 ## Riscos e parada
 
 Partes corretas sozinhas e erradas juntas: a etapa confere encaixe, e não

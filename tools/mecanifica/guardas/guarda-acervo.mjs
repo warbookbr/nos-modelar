@@ -24,6 +24,8 @@ import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modela
 import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
 import { caminhosDaReferencia } from '../../../src/autoria/plano-de-modelagem.js';
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
+import { nucleo } from '../../../procedural/nucleo/nucleo.js';
+import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -187,6 +189,15 @@ export async function conferirAcervo(pecas = pecasDoAcervo()) {
         motivo: 'SEM PLANO DE MODELAGEM\n  A receita não exporta `PLANO`, então ninguém sabe que partes'
           + '\n  ela deveria ter, e parte que falta não pode ser acusada por medida nenhuma.',
       });
+      continue;
+    }
+    /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
+       porta e nunca olha a malha. */
+    const modulo = await import(pathToFileURL(resolverCaminhoReceita(peca)).href);
+    const receita = modulo.default ?? modulo.receita;
+    const portas = conferirPortasNaForma(nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []));
+    if (portas.length) {
+      reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
     }
   }
   return { pecas, reprovadas, esperando };
