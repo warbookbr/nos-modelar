@@ -191,9 +191,15 @@ Com a pessoa, em 2026-09-25, entrou o realce da divisa: contraste local e
 nitidez aplicados só à imagem que o watershed usa, ligados por `realce` no
 arquivo de regiões. Com uma semente por parte, ele levou o ombro e o anel da
 cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
-Aumentar a resolução ficou pesquisado e não feito: a recomendação é ensaiar
-interpolação Lanczos com nitidez leve e, depois, FSRCNN por `onnxruntime-node`,
-evitando modelo generativo, que inventa borda. Falta ligar o arquivo ao
+Aumentar a resolução foi ensaiado e não adotado. Na `lateral.png` aumentada
+3 vezes, o ESPCN do catálogo ONNX (240 KB, `onnxruntime-web` em CPU, 3,8 s)
+foi o mais fiel, com 43,4 dB ao reduzir de volta e 0,9% de borda falsa, contra
+39,4 dB e 1,2% do Lanczos com nitidez; a nitidez, sozinha ou depois do ESPCN,
+piorou a separação por criar halo. Nenhuma versão aumentada separou melhor
+que a original com realce (83,4% de concordância com uma semente por parte).
+O ESPCN fica como candidato se aparecer referência de resolução bem menor; o
+FSRCNN não foi achado em ONNX, e o `onnxruntime-node` não instalou porque
+baixa binário na instalação. Falta ligar o arquivo ao
 `conferir:referencia` e à prancha.
 
 ## Riscos e parada
