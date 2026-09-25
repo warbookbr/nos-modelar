@@ -514,11 +514,11 @@
 - `receita-07.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 - `receita-08.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
 
-## procedural/pecas/braco-robotico/referencias/frontal.png.pacote/
+## procedural/pecas/braco-robotico/referencias/frontal.pacote/
 
 - `roteiro.md` — Roteiro da análise
 
-## procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.png.pacote/
+## procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.pacote/
 
 - `roteiro.md` — Roteiro da análise
 

@@ -10,7 +10,7 @@
  *
  * USO
  *   npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>]
- *     [--pacote=<pasta>] [--opacidade=0.2]
+ *     [--opacidade=0.2]
  *   npm run contorno -- --regioes=<regioes.json> --acao
  *   npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
  *   npm run contorno -- --regioes=<regioes.json> --nova-serie --por=<quem decidiu>
@@ -18,7 +18,7 @@
  * `--nova-serie` só vale quando a série parou na decisão humana: as rodadas
  * dela vão para `serie-NN/`, com quem autorizou, e a contagem recomeça.
  *
- * `--pacote` grava, para o crítico e a pessoa, o mapa de partes com a opacidade
+ * O comando grava sempre, em `<nome>.pacote` ao lado da imagem, para o crítico e a pessoa, o mapa de partes com a opacidade
  * pedida (20% por padrão), um recorte ampliado de cada divisa entre partes
  * vizinhas, com o original ao lado, as folhas `divisas-NN.png`, uma divisa por
  * folha em objeto de poucas partes e até seis nos maiores, e o `roteiro.md`
@@ -124,7 +124,7 @@ async function principal(argv) {
   const valor = (nome) => argv.find((a) => a.startsWith(`--${nome}=`))?.split('=').slice(1).join('=');
   const regioes = valor('regioes') && resolve(valor('regioes'));
   if (!regioes) {
-    process.stderr.write('uso: npm run contorno -- <imagem.png> --regioes=<regioes.json> [--pacote=<pasta>] | --regioes=<json> --acao | --regioes=<json> --registrar=<veredito.json>\n');
+    process.stderr.write('uso: npm run contorno -- <imagem.png> --regioes=<regioes.json> | --regioes=<json> --acao | --regioes=<json> --registrar=<veredito.json>\n');
     return 2;
   }
   if (argv.includes('--acao')) {
@@ -150,8 +150,16 @@ async function principal(argv) {
   const saida = valor('saida') ? resolve(valor('saida')) : imagem.replace(/\.png$/i, '.contornos.json');
   writeFileSync(saida, `${JSON.stringify(resultado, null, 1)}\n`, 'utf8');
   process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n  gravado em ${saida}\n`);
-  if (valor('pacote')) {
-    const pasta = resolve(valor('pacote'));
+  /* O pacote mora sempre ao lado da imagem, em `<nome>.pacote`, que é onde
+     `npm run objeto` o procura. A pasta era escolhida por quem chamava, e a
+     mesma imagem chegou a ter dois pacotes, um em `lateral-sem-cabo.pacote` e
+     outro em `lateral-sem-cabo.png.pacote`, com rodadas diferentes. */
+  const pasta = imagem.replace(/\.png$/i, '.pacote');
+  if (valor('pacote') && resolve(valor('pacote')) !== pasta) {
+    process.stderr.write(`o pacote desta imagem é ${pasta}; não passe --pacote com outra pasta.\n`);
+    return 2;
+  }
+  {
     const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined, imagemAlvo: imagem });
     process.stdout.write(`  pacote em ${pasta}: mapa de partes, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);

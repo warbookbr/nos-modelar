@@ -25,7 +25,7 @@ Como trabalhar:
   linha fina, amostre os pixels dela em vez de ligar dois pontos distantes.
 
 Depois de mexer nas sementes, rode
-`npm run contorno -- <imagem> --regioes=<json> --pacote=<pasta>` e confira
+`npm run contorno -- <imagem> --regioes=<json>`, que grava o pacote em `<nome>.pacote`, e confira
 `medidas.json`: nenhuma parte pode ficar abaixo do mínimo na borda, e
 `semDonoPx` precisa ser pequeno. Olhe o mapa de partes (`mapa-de-partes.png`) e os recortes de divisa
 antes de devolver.
