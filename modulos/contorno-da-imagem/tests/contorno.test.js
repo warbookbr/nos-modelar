@@ -70,6 +70,10 @@ describe('contorno da imagem', () => {
     const final = PNG.sync.read(await sobreposicao(buf, seg));
     expect([final.width, final.height]).toEqual([arranjo.largura, arranjo.altura]);
     expect(arranjo.etiquetas).toHaveLength(7);
+    /* O número segue a ordem do arquivo de regiões, e não a alfabética. */
+    const porNome = Object.fromEntries(arranjo.etiquetas.map((e) => [e.nome, e.texto]));
+    expect(porNome.u).toBe('1- u');
+    expect(porNome.parte5).toBe('7- parte5');
     const naSilhueta = (x, y) => { const ox = x - arranjo.dx; const oy = y - arranjo.dy; return ox >= 0 && oy >= 0 && ox < seg.largura && oy < seg.altura && seg.silhueta[oy * seg.largura + ox]; };
     for (const { nome, caixa: [x0, y0, x1, y1], marca } of arranjo.etiquetas) {
       for (let y = y0; y <= y1; y += 1) for (let x = x0; x <= x1; x += 1) expect(naSilhueta(x, y)).toBeFalsy();

@@ -100,7 +100,7 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     });
     let semDono = 0;
     for (let p = 0; p < rotulos.length; p += 1) if (silhueta.data[p] && rotulos[p] === 1) semDono += 1;
-    return { largura, altura, regioes: resultado, rotulos, silhueta: Uint8Array.from(silhueta.data), semDono };
+    return { largura, altura, regioes: resultado, ordem: Object.keys(regioes), rotulos, silhueta: Uint8Array.from(silhueta.data), semDono };
   } finally {
     mats.forEach((m) => m.delete());
   }

@@ -51,10 +51,10 @@ export async function sobreposicao(pngBuffer, segmentacao, { opacidade = 0.2, ro
       cv.line(tela, new cv.Point(marca[0], marca[1]), new cv.Point(ponta[0], ponta[1]), preto, 1, cv.LINE_AA);
       cv.circle(tela, new cv.Point(marca[0], marca[1]), 2, preto, cv.FILLED);
     }
-    for (const { nome, caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
+    for (const { texto, caixa: [x0, y0, x1, y1] } of arranjo.etiquetas) {
       cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), new cv.Scalar(255, 255, 255, 255), cv.FILLED);
       cv.rectangle(tela, new cv.Point(x0, y0), new cv.Point(x1, y1), preto, 1);
-      cv.putText(tela, nome, new cv.Point(x0 + 3, y1 - 4), cv.FONT_HERSHEY_SIMPLEX, 0.4, preto, 1);
+      cv.putText(tela, texto, new cv.Point(x0 + 3, y1 - 4), cv.FONT_HERSHEY_SIMPLEX, 0.4, preto, 1);
     }
     const final = new PNG({ width: arranjo.largura, height: arranjo.altura });
     final.data = Buffer.from(tela.data);
@@ -103,9 +103,12 @@ export function etiquetasFora(segmentacao) {
   const { largura, altura, silhueta, regioes } = segmentacao;
   let sx0 = largura; let sx1 = -1;
   for (let p = 0; p < silhueta.length; p += 1) if (silhueta[p]) { const x = p % largura; if (x < sx0) sx0 = x; if (x > sx1) sx1 = x; }
-  const itens = Object.keys(regioes).map((nome) => {
+  /* O número segue a ordem em que o arquivo de regiões as escreve, que é a de
+     montagem, para a pessoa citar a parte pelo número. */
+  const ordem = (segmentacao.ordem ?? Object.keys(regioes)).filter((nome) => regioes[nome]);
+  const itens = ordem.map((nome, n) => {
     const marca = pontoDentro(segmentacao, regioes[nome].rotulo) ?? regioes[nome].semente[0];
-    return { nome, marca, alvo: marca[1] };
+    return { nome, texto: `${n + 1}- ${nome}`, marca, alvo: marca[1] };
   });
   const porX = itens.slice().sort((a, b) => a.marca[0] - b.marca[0] || a.marca[1] - b.marca[1] || a.nome.localeCompare(b.nome));
   const metade = Math.ceil(porX.length / 2);
@@ -113,7 +116,7 @@ export function etiquetasFora(segmentacao) {
   const xColuna = { esquerda: sx0 - FOLGA, direita: sx1 + FOLGA };
   for (const col of ['esquerda', 'direita']) empilharColuna(colunas[col], xColuna[col], { passo: PASSO_DA_ETIQUETA });
   const meia = ALTURA_DA_ETIQUETA / 2;
-  const larguraMax = (col) => Math.max(0, ...colunas[col].map((i) => larguraDaEtiqueta(i.nome)));
+  const larguraMax = (col) => Math.max(0, ...colunas[col].map((i) => larguraDaEtiqueta(i.texto)));
   const dx = Math.max(0, larguraMax('esquerda') + 4 - xColuna.esquerda);
   const direita = Math.max(largura, xColuna.direita + larguraMax('direita') + 4);
   const ys = itens.map((i) => i.ty);
@@ -122,10 +125,10 @@ export function etiquetasFora(segmentacao) {
   const etiquetas = [];
   for (const col of ['esquerda', 'direita']) {
     for (const i of colunas[col]) {
-      const w = larguraDaEtiqueta(i.nome);
+      const w = larguraDaEtiqueta(i.texto);
       const xc = xColuna[col] + dx; const y = Math.round(i.ty) + dy;
       const caixa = col === 'esquerda' ? [xc - w, y - meia, xc, y + meia] : [xc, y - meia, xc + w, y + meia];
-      etiquetas.push({ nome: i.nome, coluna: col, caixa, marca: [i.marca[0] + dx, i.marca[1] + dy], ponta: [xc, y] });
+      etiquetas.push({ nome: i.nome, texto: i.texto, coluna: col, caixa, marca: [i.marca[0] + dx, i.marca[1] + dy], ponta: [xc, y] });
     }
   }
   return { dx, dy, largura: dx + direita, altura: dy + baixo, etiquetas };
