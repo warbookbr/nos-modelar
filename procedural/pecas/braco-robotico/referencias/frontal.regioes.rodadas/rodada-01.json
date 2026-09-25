@@ -1,0 +1,257 @@
+{
+ "numero": 1,
+ "regioes": {
+  "base": [
+   [
+    697,
+    575
+   ],
+   [
+    697,
+    690
+   ],
+   [
+    632,
+    712
+   ],
+   [
+    762,
+    712
+   ]
+  ],
+  "anelCintura": [
+   [
+    636,
+    545
+   ],
+   [
+    758,
+    545
+   ]
+  ],
+  "ombro": [
+   [
+    650,
+    435
+   ],
+   [
+    750,
+    435
+   ],
+   [
+    750,
+    515
+   ],
+   [
+    660,
+    515
+   ],
+   [
+    633,
+    440
+   ],
+   [
+    633,
+    505
+   ]
+  ],
+  "braco": [
+   [
+    590,
+    470
+   ],
+   [
+    535,
+    470
+   ],
+   [
+    590,
+    300
+   ],
+   [
+    590,
+    232
+   ]
+  ],
+  "anelCotovelo": [
+   [
+    540,
+    206
+   ],
+   [
+    632,
+    206
+   ]
+  ],
+  "cotovelo": [
+   [
+    545,
+    80
+   ],
+   [
+    600,
+    120
+   ],
+   [
+    636,
+    72
+   ],
+   [
+    640,
+    110
+   ],
+   [
+    640,
+    150
+   ],
+   [
+    600,
+    175
+   ]
+  ],
+  "anelAntebraco": [
+   [
+    648,
+    154
+   ],
+   [
+    648,
+    172
+   ],
+   [
+    654,
+    172
+   ]
+  ],
+  "antebraco": [
+   [
+    651,
+    75
+   ],
+   [
+    651,
+    110
+   ],
+   [
+    652,
+    145
+   ],
+   [
+    660,
+    145
+   ],
+   [
+    660,
+    72
+   ]
+  ],
+  "carcacaPunho": [
+   [
+    685,
+    75
+   ],
+   [
+    740,
+    110
+   ],
+   [
+    700,
+    150
+   ],
+   [
+    778,
+    95
+   ],
+   [
+    778,
+    155
+   ]
+  ],
+  "aneisPunho": [
+   [
+    675,
+    172
+   ],
+   [
+    740,
+    172
+   ],
+   [
+    740,
+    192
+   ],
+   [
+    675,
+    192
+   ]
+  ],
+  "garfoPunho": [
+   [
+    680,
+    215
+   ],
+   [
+    735,
+    215
+   ],
+   [
+    680,
+    265
+   ],
+   [
+    735,
+    265
+   ],
+   [
+    708,
+    275
+   ]
+  ],
+  "flange": [
+   [
+    660,
+    315
+   ],
+   [
+    760,
+    315
+   ],
+   [
+    708,
+    300
+   ],
+   [
+    708,
+    340
+   ]
+  ]
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/frontal.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "flange",
+    "tipo": "posicao",
+    "onde": "borda superior do disco",
+    "sentido": "baixa",
+    "evidencia": "Etapa 5, divisas-04.png, par flange / garfoPunho: a faixa rosa do garfoPunho cobre a borda superior do disco da flange, dos dois lados, que no original já é disco"
+   },
+   {
+    "parte": "anelOmbro",
+    "tipo": "ausencia",
+    "onde": "anel vertical entre braco e ombro",
+    "sentido": "faltando",
+    "evidencia": "Etapa 1, sobreposicao.png perto de x=622-645 e y=420-525, e Etapa 5, divisas-04.png, par braco / ombro: o anel escuro do original foi pintado como ombro"
+   },
+   {
+    "parte": "aneisPunho",
+    "tipo": "superficie",
+    "onde": "borda superior esquerda, na divisa com carcacaPunho",
+    "sentido": "segmentado",
+    "evidencia": "Etapa 3, divisas-02.png, par aneisPunho / carcacaPunho, e Etapa 2, divisas-01.png, par antebraco / carcacaPunho: a borda tem pontas serrilhadas onde o original mostra um arco liso"
+   }
+  ],
+  "observacao": "A divisão acompanha o original em 11 dos 13 pares. Os erros estão na flange cortada baixa e no anel do ombro sem parte própria."
+ }
+}
