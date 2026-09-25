@@ -343,22 +343,86 @@ export function prancha(spec) {
     put(`<path class="${c.classe ?? 'contorno'}" d="${d}"/>`);
   }
 
-  for (const c of spec.cotas ?? []) {
+  /* O desenho guarda a caixa estimada de cada texto e cada linha traçada, com o
+     dono de cada uma, para `colisoesDoDesenho` medir sobreposição em vez de o
+     olho procurar. A largura do texto é estimada em 0,58 do corpo por
+     caractere, que cobre a fonte sem serifa do SVG com folga pequena. */
+  const desenho = { textos: [], linhas: [] };
+  const caixaTexto = (x, y, texto, corpo, { ancora = 'start', vertical = false } = {}) => {
+    const L = String(texto).length * corpo * 0.58;
+    const a0 = ancora === 'middle' ? -L / 2 : 0;
+    return vertical
+      ? [x - corpo * 0.8, y - a0 - L, x + corpo * 0.2, y - a0]
+      : [x + a0, y - corpo * 0.8, x + a0 + L, y + corpo * 0.2];
+  };
+  const linha = (dono, tipo, pts) => desenho.linhas.push({ dono, tipo, pts });
+  desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: spec.titulo, caixa: caixaTexto(40, 34, spec.titulo, 15) });
+  desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: spec.subtitulo, caixa: caixaTexto(40, 53, spec.subtitulo, 11) });
+  for (const vista of Object.values(spec.vistas)) {
+    if (vista.rotulo) desenho.textos.push({ dono: 'moldura', tipo: 'titulo', texto: vista.rotulo, caixa: caixaTexto(vista.x, vista.y - 12, vista.rotulo, 10.5) });
+  }
+  for (const c of camadas) {
+    const p = proj[c.vista];
+    linha(c.nome ?? 'contorno', 'contorno', c.pl.map((q) => p(q)));
+  }
+
+  for (const [i, c] of (spec.cotas ?? []).entries()) {
+    const dono = c.dono ?? `cota ${i}`;
     const p = proj[c.vista];
     const [ax, ay] = p(c.de); const [bx, by] = p(c.ate);
     const dx = c.desloca?.[0] ?? 0; const dy = c.desloca?.[1] ?? 0;
     put(`<path class="cota" d="M ${n(ax + dx)} ${n(ay + dy)} L ${n(bx + dx)} ${n(by + dy)}"/>`);
+    linha(dono, 'cota', [[ax + dx, ay + dy], [bx + dx, by + dy]]);
     const mx = (ax + bx) / 2 + dx; const my = (ay + by) / 2 + dy;
     const vert = Math.abs(bx - ax) < Math.abs(by - ay);
-    put(vert
-      ? `<text x="${n(mx - 6)}" y="${n(my)}" class="cotat" text-anchor="middle" transform="rotate(-90 ${n(mx - 6)} ${n(my)})">${c.texto}</text>`
-      : `<text x="${n(mx)}" y="${n(my - 6)}" class="cotat" text-anchor="middle">${c.texto}</text>`);
+    /* `numero` tira o número do meio da linha, em pixel de tela, com uma
+       linha de chamada até ela; sem ele o número fica colado na linha. */
+    if (c.numero) {
+      const [tx, ty] = [mx + c.numero[0], my + c.numero[1]];
+      put(`<text x="${n(tx)}" y="${n(ty)}" class="cotat" text-anchor="middle">${c.texto}</text>`);
+      const caixa = caixaTexto(tx, ty, c.texto, 11, { ancora: 'middle' });
+      desenho.textos.push({ dono, tipo: 'cota', texto: c.texto, caixa });
+      const alvo = pontoMaisPerto(caixa, [mx, my]);
+      put(`<path class="cota" stroke-dasharray="2 2" d="M ${n(mx)} ${n(my)} L ${n(alvo[0])} ${n(alvo[1])}"/>`);
+      linha(dono, 'chamada', [[mx, my], alvo]);
+    } else if (vert) {
+      put(`<text x="${n(mx - 6)}" y="${n(my)}" class="cotat" text-anchor="middle" transform="rotate(-90 ${n(mx - 6)} ${n(my)})">${c.texto}</text>`);
+      desenho.textos.push({ dono, tipo: 'cota', texto: c.texto, caixa: caixaTexto(mx - 6, my, c.texto, 11, { ancora: 'middle', vertical: true }) });
+    } else {
+      put(`<text x="${n(mx)}" y="${n(my - 6)}" class="cotat" text-anchor="middle">${c.texto}</text>`);
+      desenho.textos.push({ dono, tipo: 'cota', texto: c.texto, caixa: caixaTexto(mx, my - 6, c.texto, 11, { ancora: 'middle' }) });
+    }
+  }
+
+  /* Anotação é texto solto na vista, como a nota que diz por que uma medida
+     não se tira da imagem. */
+  for (const [i, a] of (spec.anotacoes ?? []).entries()) {
+    const [x, y] = proj[a.vista](a.em);
+    put(`<text x="${n(x)}" y="${n(y)}" class="cotat" font-style="italic">${a.texto}</text>`);
+    desenho.textos.push({ dono: a.dono ?? `anotação ${i}`, tipo: 'nota', texto: a.texto, caixa: caixaTexto(x, y, a.texto, 11) });
   }
 
   for (const l of spec.landmarks ?? []) {
     const [x, y] = proj[l.vista](l.em);
+    const dono = l.dono ?? l.id;
     put(`<circle class="lm" cx="${n(x)}" cy="${n(y)}" r="2.6"/>`);
-    if (l.id) put(`<text class="lmt" x="${n(x + 6)}" y="${n(y + (l.abaixo ? 14 : -6))}">${l.id}</text>`);
+    desenho.textos.push({ dono, tipo: 'marcador', texto: '•', caixa: [x - 2.6, y - 2.6, x + 2.6, y + 2.6] });
+    if (!l.id) continue;
+    /* `rotuloEm` põe o nome em outro ponto da vista, fora da parte, com uma
+       linha de chamada do marcador até a caixa do nome. */
+    if (l.rotuloEm) {
+      const [tx, ty] = proj[l.vista](l.rotuloEm);
+      put(`<text class="lmt" x="${n(tx)}" y="${n(ty)}">${l.id}</text>`);
+      const caixa = caixaTexto(tx, ty, l.id, 9.5);
+      desenho.textos.push({ dono, tipo: 'nome', texto: l.id, caixa });
+      const alvo = pontoMaisPerto(caixa, [x, y]);
+      put(`<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M ${n(x)} ${n(y)} L ${n(alvo[0])} ${n(alvo[1])}"/>`);
+      linha(dono, 'chamada', [[x, y], alvo]);
+    } else {
+      const ty = y + (l.abaixo ? 14 : -6);
+      put(`<text class="lmt" x="${n(x + 6)}" y="${n(ty)}">${l.id}</text>`);
+      desenho.textos.push({ dono, tipo: 'nome', texto: l.id, caixa: caixaTexto(x + 6, ty, l.id, 9.5) });
+    }
   }
 
   if (spec.legenda) {
@@ -373,7 +437,51 @@ export function prancha(spec) {
   }
 
   put(`</svg>`);
-  return { svg: O.join('\n') + '\n', relatorio };
+  return { svg: O.join('\n') + '\n', relatorio, desenho };
+}
+
+function pontoMaisPerto([x0, y0, x1, y1], [x, y]) {
+  return [Math.min(Math.max(x, x0), x1), Math.min(Math.max(y, y0), y1)];
+}
+
+/* Segmento contra retângulo por recorte de Liang-Barsky. */
+function segmentoCruzaCaixa([ax, ay], [bx, by], [x0, y0, x1, y1]) {
+  let t0 = 0; let t1 = 1;
+  const dx = bx - ax; const dy = by - ay;
+  for (const [p, q] of [[-dx, ax - x0], [dx, x1 - ax], [-dy, ay - y0], [dy, y1 - ay]]) {
+    if (p === 0) { if (q < 0) return false; continue; }
+    const r = q / p;
+    if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+  }
+  return true;
+}
+
+/* Mede o desenho que `prancha` devolveu: todo par de textos cujas caixas se
+   sobrepõem e todo texto que uma linha de outro dono atravessa. A linha de
+   chamada de um nome e a linha de uma cota são do mesmo dono que o texto
+   delas; contorno de parte nunca é, porque número em cima de borda não se
+   lê. O marcador de uma parte não colide com o nome dela. */
+export function colisoesDoDesenho(desenho) {
+  const colisoes = [];
+  const T = desenho.textos;
+  const sobrepoe = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  for (let i = 0; i < T.length; i += 1) {
+    for (let j = i + 1; j < T.length; j += 1) {
+      if (T[i].dono === T[j].dono) continue;
+      if (T[i].tipo === 'marcador' && T[j].tipo === 'marcador') continue;
+      if (sobrepoe(T[i].caixa, T[j].caixa)) colisoes.push({ tipo: 'texto sobre texto', a: `${T[i].tipo} "${T[i].texto}" (${T[i].dono})`, b: `${T[j].tipo} "${T[j].texto}" (${T[j].dono})` });
+    }
+  }
+  for (const t of T) {
+    if (t.tipo === 'marcador') continue;
+    for (const l of desenho.linhas) {
+      if (l.tipo !== 'contorno' && l.dono === t.dono) continue;
+      if (l.pts.some((p, k) => k > 0 && segmentoCruzaCaixa(l.pts[k - 1], p, t.caixa))) {
+        colisoes.push({ tipo: 'linha sobre texto', a: `${t.tipo} "${t.texto}" (${t.dono})`, b: `${l.tipo} de ${l.dono}` });
+      }
+    }
+  }
+  return colisoes;
 }
 
 /* Relatório legível no terminal: é ele que eu leio ANTES de olhar o desenho. */

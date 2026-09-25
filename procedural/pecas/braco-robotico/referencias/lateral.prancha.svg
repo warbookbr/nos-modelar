@@ -38,72 +38,90 @@
 <text x="393.62" y="840" class="cotat" text-anchor="middle">largura 965</text>
 <path class="cota" d="M 731.23 810 L 731.23 110"/>
 <text x="725.23" y="460" class="cotat" text-anchor="middle" transform="rotate(-90 725.23 460)">altura 1113</text>
-<path class="cota" d="M 143.84 754.79 L 272.73 754.79"/>
-<text x="208.29" y="748.79" class="cotat" text-anchor="middle">205</text>
-<path class="cota" d="M 291.76 808.6 L 291.76 647.34"/>
-<text x="285.76" y="727.97" class="cotat" text-anchor="middle" transform="rotate(-90 285.76 727.97)">256</text>
+<path class="cota" d="M 143.79 759.2 L 272.73 759.2"/>
+<text x="208.26" y="753.2" class="cotat" text-anchor="middle">205</text>
+<path class="cota" d="M 245.82 808.6 L 245.82 647.04"/>
+<text x="239.82" y="727.82" class="cotat" text-anchor="middle" transform="rotate(-90 239.82 727.82)">257</text>
 <path class="cota" d="M 77.4 793.14 L 77.4 652.57"/>
 <text x="71.4" y="722.86" class="cotat" text-anchor="middle" transform="rotate(-90 71.4 722.86)">223</text>
-<path class="cota" d="M 97.03 639.17 L 141.11 639.17"/>
-<text x="119.07" y="633.17" class="cotat" text-anchor="middle">70</text>
-<path class="cota" d="M 284.73 645.01 L 284.73 626.25"/>
-<text x="278.73" y="635.63" class="cotat" text-anchor="middle" transform="rotate(-90 278.73 635.63)">30</text>
-<path class="cota" d="M 286.14 623.44 L 286.14 594.17"/>
-<text x="280.14" y="608.8" class="cotat" text-anchor="middle" transform="rotate(-90 280.14 608.8)">47</text>
-<path class="cota" d="M 140.61 207.94 L 279.76 207.94"/>
-<text x="210.18" y="201.94" class="cotat" text-anchor="middle">221</text>
-<path class="cota" d="M 126.61 254.03 L 126.61 114.32"/>
-<text x="120.61" y="184.17" class="cotat" text-anchor="middle" transform="rotate(-90 120.61 184.17)">222</text>
-<path class="cota" d="M 126.61 288.47 L 126.61 254.91"/>
-<text x="120.61" y="271.69" class="cotat" text-anchor="middle" transform="rotate(-90 120.61 271.69)">53</text>
-<path class="cota" d="M 332.71 209.18 L 486.49 209.18"/>
-<text x="409.6" y="203.18" class="cotat" text-anchor="middle">244</text>
-<path class="cota" d="M 317.77 236.51 L 317.77 148.72"/>
-<text x="311.77" y="192.61" class="cotat" text-anchor="middle" transform="rotate(-90 311.77 192.61)">140</text>
-<path class="cota" d="M 281.63 210.62 L 329.92 210.62"/>
-<text x="305.77" y="204.62" class="cotat" text-anchor="middle">77</text>
-<path class="cota" d="M 342.36 244.94 L 342.36 140.92"/>
-<text x="336.36" y="192.93" class="cotat" text-anchor="middle" transform="rotate(-90 336.36 192.93)">165</text>
-<path class="cota" d="M 699.39 237.91 L 699.39 147.7"/>
-<text x="693.39" y="192.81" class="cotat" text-anchor="middle" transform="rotate(-90 693.39 192.81)">143</text>
-<path class="cota" d="M 488.57 253.32 L 683.51 253.32"/>
-<text x="586.04" y="247.32" class="cotat" text-anchor="middle">310</text>
-<path class="cota" d="M 690.96 291.32 L 690.96 239.67"/>
-<text x="684.96" y="265.5" class="cotat" text-anchor="middle" transform="rotate(-90 684.96 265.5)">82</text>
-<path class="cota" d="M 603.06 270.5 L 678.96 270.5"/>
-<text x="641.01" y="264.5" class="cotat" text-anchor="middle">121</text>
-<path class="cota" d="M 591.86 379.53 L 591.86 294.14"/>
-<text x="585.86" y="336.83" class="cotat" text-anchor="middle" transform="rotate(-90 585.86 336.83)">136</text>
-<path class="cota" d="M 607.24 359.12 L 675.61 359.12"/>
-<text x="641.43" y="353.12" class="cotat" text-anchor="middle">109</text>
-<path class="cota" d="M 709.23 408.67 L 709.23 383.31"/>
-<text x="703.23" y="395.99" class="cotat" text-anchor="middle" transform="rotate(-90 703.23 395.99)">40</text>
-<path class="cota" d="M 589 424.81 L 697.23 424.81"/>
-<text x="643.12" y="418.81" class="cotat" text-anchor="middle">172</text>
-<circle class="lm" cx="597.32" cy="234.82" r="2.6"/>
-<text class="lmt" x="603.32" y="228.82">aneisPunho</text>
-<circle class="lm" cx="287.07" cy="161.73" r="2.6"/>
-<text class="lmt" x="293.07" y="155.73">anelAntebraco</text>
-<circle class="lm" cx="149.04" cy="628.68" r="2.6"/>
-<text class="lmt" x="155.04" y="622.68">anelCintura</text>
-<circle class="lm" cx="155.11" cy="262.37" r="2.6"/>
-<text class="lmt" x="161.11" y="256.37">anelCotovelo</text>
-<circle class="lm" cx="351.51" cy="164.26" r="2.6"/>
-<text class="lmt" x="357.51" y="158.26">antebraco</text>
-<circle class="lm" cx="141.22" cy="678.15" r="2.6"/>
-<text class="lmt" x="147.22" y="672.15">base</text>
-<circle class="lm" cx="152.97" cy="353.18" r="2.6"/>
-<text class="lmt" x="158.97" y="347.18">braco</text>
-<circle class="lm" cx="97.48" cy="680.12" r="2.6"/>
-<text class="lmt" x="103.48" y="674.12">caixaLateral</text>
-<circle class="lm" cx="509.27" cy="165.1" r="2.6"/>
-<text class="lmt" x="515.27" y="159.1">carcacaPunho</text>
-<circle class="lm" cx="157.3" cy="139.24" r="2.6"/>
-<text class="lmt" x="163.3" y="133.24">cotovelo</text>
-<circle class="lm" cx="601.99" cy="386.07" r="2.6"/>
-<text class="lmt" x="607.99" y="380.07">flange</text>
-<circle class="lm" cx="614.47" cy="313.54" r="2.6"/>
-<text class="lmt" x="620.47" y="307.54">garfoPunho</text>
-<circle class="lm" cx="146.73" cy="532.25" r="2.6"/>
-<text class="lmt" x="152.73" y="526.25">ombro</text>
+<path class="cota" d="M 91.4 702.57 L 141.62 702.57"/>
+<text x="116.51" y="696.57" class="cotat" text-anchor="middle">80</text>
+<path class="cota" d="M 302.45 643.62 L 302.45 625.96"/>
+<text x="296.45" y="634.79" class="cotat" text-anchor="middle" transform="rotate(-90 296.45 634.79)">28</text>
+<path class="cota" d="M 129.92 557.86 L 273.8 557.86"/>
+<text x="201.86" y="551.86" class="cotat" text-anchor="middle">229</text>
+<path class="cota" d="M 144.42 419.44 L 256.23 419.44"/>
+<text x="200.32" y="413.44" class="cotat" text-anchor="middle">178</text>
+<path class="cota" d="M 113.7 287.4 L 113.7 254.78"/>
+<text x="107.7" y="271.09" class="cotat" text-anchor="middle" transform="rotate(-90 107.7 271.09)">52</text>
+<path class="cota" d="M 113.7 251.97 L 113.7 110.07"/>
+<text x="107.7" y="181.02" class="cotat" text-anchor="middle" transform="rotate(-90 107.7 181.02)">226</text>
+<path class="cota" d="M 140.61 167.77 L 279.76 167.77"/>
+<text x="210.18" y="161.77" class="cotat" text-anchor="middle">221</text>
+<path class="cota" d="M 281.36 230.68 L 330.21 230.68"/>
+<text x="305.79" y="224.68" class="cotat" text-anchor="middle">78</text>
+<path class="cota" d="M 321.33 244.94 L 321.33 140.92"/>
+<text x="321.33" y="117.43" class="cotat" text-anchor="middle">165</text>
+<path class="cota" stroke-dasharray="2 2" d="M 321.33 192.93 L 321.33 119.63"/>
+<path class="cota" d="M 332.84 218.1 L 490.54 218.1"/>
+<text x="411.69" y="212.1" class="cotat" text-anchor="middle">251</text>
+<path class="cota" d="M 396.83 236.51 L 396.83 148.59"/>
+<text x="390.83" y="192.55" class="cotat" text-anchor="middle" transform="rotate(-90 390.83 192.55)">140</text>
+<path class="cota" d="M 486.25 174.06 L 684.9 174.06"/>
+<text x="585.58" y="168.06" class="cotat" text-anchor="middle">316</text>
+<path class="cota" d="M 617.04 230.55 L 617.04 147.43"/>
+<text x="611.04" y="188.99" class="cotat" text-anchor="middle" transform="rotate(-90 611.04 188.99)">132</text>
+<path class="cota" d="M 603.06 274.73 L 678.96 274.73"/>
+<text x="641.01" y="268.73" class="cotat" text-anchor="middle">121</text>
+<path class="cota" d="M 711.42 290.34 L 711.42 225.24"/>
+<text x="705.42" y="257.79" class="cotat" text-anchor="middle" transform="rotate(-90 705.42 257.79)">103</text>
+<path class="cota" d="M 606.85 343.94 L 674.54 343.94"/>
+<text x="640.7" y="337.94" class="cotat" text-anchor="middle">108</text>
+<path class="cota" d="M 711.42 363.64 L 711.42 298.11"/>
+<text x="705.42" y="330.87" class="cotat" text-anchor="middle" transform="rotate(-90 705.42 330.87)">104</text>
+<path class="cota" d="M 589 444.61 L 697.23 444.61"/>
+<text x="643.12" y="438.61" class="cotat" text-anchor="middle">172</text>
+<path class="cota" d="M 720.86 404.29 L 720.86 387.38"/>
+<text x="714.86" y="395.83" class="cotat" text-anchor="middle" transform="rotate(-90 714.86 395.83)">27</text>
+<text x="308.74" y="589.32" class="cotat" font-style="italic">ombro altura: o topo some atrás do braço</text>
+<text x="308.74" y="444.61" class="cotat" font-style="italic">braco altura: o pé some atrás do ombro</text>
+<circle class="lm" cx="631.17" cy="254.4" r="2.6"/>
+<text class="lmt" x="503.79" y="306.19">aneisPunho</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 631.17 254.4 L 558.89 298.59"/>
+<circle class="lm" cx="311.15" cy="192.93" r="2.6"/>
+<text class="lmt" x="333.91" y="268.44">anelAntebraco</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 311.15 192.93 L 333.91 260.84"/>
+<circle class="lm" cx="197.36" cy="636.94" r="2.6"/>
+<text class="lmt" x="333.91" y="655.38">anelCintura</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 197.36 636.94 L 333.91 647.78"/>
+<circle class="lm" cx="196.39" cy="275.22" r="2.6"/>
+<text class="lmt" x="308.74" y="293.6">anelCotovelo</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 196.39 275.22 L 308.74 286"/>
+<circle class="lm" cx="439.34" cy="178.21" r="2.6"/>
+<text class="lmt" x="415.7" y="262.14">antebraco</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 439.34 178.21 L 439.34 254.54"/>
+<circle class="lm" cx="170.32" cy="677.41" r="2.6"/>
+<text class="lmt" x="308.74" y="702.57">base</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 170.32 677.41 L 308.74 694.97"/>
+<circle class="lm" cx="188.91" cy="441.09" r="2.6"/>
+<text class="lmt" x="308.74" y="387.98">braco</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 188.91 441.09 L 308.74 389.88"/>
+<circle class="lm" cx="116.84" cy="759.2" r="2.6"/>
+<text class="lmt" x="91.67" y="825.26">caixaLateral</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 116.84 759.2 L 116.84 817.66"/>
+<circle class="lm" cx="582.17" cy="199.96" r="2.6"/>
+<text class="lmt" x="491.21" y="262.14">carcacaPunho</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 582.17 199.96 L 557.33 254.54"/>
+<circle class="lm" cx="170.32" cy="139.45" r="2.6"/>
+<text class="lmt" x="170.32" y="130.01">cotovelo</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 170.32 139.45 L 170.32 131.91"/>
+<circle class="lm" cx="641.92" cy="393.94" r="2.6"/>
+<text class="lmt" x="503.79" y="394.27">flange</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 641.92 393.94 L 536.85 393.94"/>
+<circle class="lm" cx="643.31" cy="342.83" r="2.6"/>
+<text class="lmt" x="503.79" y="343.94">garfoPunho</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 643.31 342.83 L 558.89 342.83"/>
+<circle class="lm" cx="202.61" cy="578.64" r="2.6"/>
+<text class="lmt" x="308.74" y="545.28">ombro</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 202.61 578.64 L 308.74 547.18"/>
 </svg>

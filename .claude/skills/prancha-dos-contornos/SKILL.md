@@ -24,7 +24,12 @@ npm run contorno:prancha -- <imagem>.contornos.json --acao
 
 **desenhar** — despache o `desenhista-de-prancha` com o caminho dos
 contornos, o alinhamento do objeto e, da segunda rodada em diante, só os
-defeitos que o comando imprimiu.
+defeitos que o comando imprimiu. O desenhista declara a posição de cada cota
+e de cada nome em `<imagem>.prancha.json`, usa `medivel: false` com motivo
+onde uma parte esconde a outra e confere em recorte ampliado a região de cada
+cota. Não aceite a devolução se `npm run contorno:prancha` sair com código
+diferente de zero: ele sai com 3 enquanto houver texto sobreposto ou cruzado
+por linha que não é a dele, e o crítico não recebe prancha com colisão.
 
 **Crítico.** Despache o `critico-visual` com a imagem de referência como alvo
 e `<imagem>.prancha.png` como modelo. Pergunte se a silhueta e cada parte da
