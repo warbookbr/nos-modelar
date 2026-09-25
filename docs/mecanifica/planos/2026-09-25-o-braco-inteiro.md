@@ -182,7 +182,12 @@ crítico não lista pasta e abriu 2 e depois 9 dos 19 recortes, e a pintura
 pelo polígono enchia de cor o fundo que uma região envolve. Os recortes
 passaram a ir numa folha só, `divisas.png`, e a pintura passou a seguir a
 máscara de cada região. A segunda série fechou com nota 9 na primeira
-rodada. Falta ligar o arquivo ao `conferir:referencia` e à prancha.
+rodada. A folha única reduzia o zoom à metade, e o crítico passou a seguir
+um roteiro gerado no pacote: uma etapa de visão geral, uma por folha de
+divisas e o fechamento. Com até seis divisas cada uma tem etapa própria; com
+mais, elas se agrupam para ficar perto de seis etapas, até seis por folha.
+Pelo roteiro, o crítico conferiu as 19 divisas da lateral e deu nota 9.
+Falta ligar o arquivo ao `conferir:referencia` e à prancha.
 
 ## Riscos e parada
 

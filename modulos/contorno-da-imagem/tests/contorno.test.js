@@ -68,14 +68,26 @@ describe('contorno da imagem', () => {
   });
 });
 
-describe('folha das divisas', () => {
-  it('junta todos os recortes numa imagem só', async () => {
-    const { folhaDasDivisas } = await import('../src/index.js');
+describe('folhas das divisas e roteiro', () => {
+  it('poucas divisas vão uma por etapa, muitas se agrupam até seis por folha', async () => {
+    const { recortesPorFolha } = await import('../src/index.js');
+    expect([1, 5, 6, 7, 12, 19, 36, 50].map(recortesPorFolha)).toEqual([1, 1, 1, 2, 2, 4, 6, 6]);
+  });
+
+  it('o número de folhas acompanha o número de divisas, sem reduzir o recorte', async () => {
+    const { folhasDasDivisas, roteiroDoCritico } = await import('../src/index.js');
     const png = imagem();
     const seg = await segmentar(png, config);
-    const recortes = recortesDasDivisas(png, await sobreposicao(png, seg, { rotular: false }), seg);
-    const folha = PNG.sync.read(await folhaDasDivisas(recortes, { colunas: 3, largura: 200, altura: 100, titulo: 10 }));
-    expect(folha.width).toBe(600);
-    expect(folha.height).toBe(110);
+    const pintada = await sobreposicao(png, seg, { rotular: false });
+    const recortes = recortesDasDivisas(png, pintada, seg);
+    const repetidos = Array.from({ length: 7 }, () => recortes[0]);
+    const folhas = await folhasDasDivisas(repetidos, pintada, { porFolha: 6 });
+    expect(folhas.map((f) => f.pares.length)).toEqual([6, 1]);
+    const largura = PNG.sync.read(recortes[0].png).width;
+    expect(PNG.sync.read(folhas[0].png).width).toBeGreaterThanOrEqual(largura);
+    const roteiro = roteiroDoCritico({ alvo: 'a.png', sobreposicao: 's.png', folhas: folhas.map((f, i) => ({ arquivo: `f${i}.png`, pares: f.pares })) });
+    expect(roteiro).toMatch(/Etapa 1 — visão geral/);
+    expect(roteiro).toMatch(/Etapa 3 — divisas, folha 2 de 2/);
+    expect(roteiro).toMatch(/Etapa 4 — fechamento/);
   });
 });

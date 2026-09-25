@@ -115,29 +115,75 @@ export function recortesDasDivisas(pngBuffer, sobreposicaoBuffer, segmentacao, {
   });
 }
 
-/* Todos os recortes numa folha só, com o nome do par em cima de cada um. O
-   crítico só lê arquivo, não lista pasta, e na lateral do braço ele abriu 2 e
-   depois 9 dos 19 recortes soltos; numa folha ele vê todos de uma vez. */
-export async function folhaDasDivisas(recortes, { colunas = 3, largura = 420, altura = 230, titulo = 18 } = {}) {
+/* Quantos recortes vão em cada folha. Objeto com poucas divisas tem uma
+   divisa por etapa, porque o crítico olha melhor uma coisa de cada vez; com
+   mais divisas, elas se agrupam para o roteiro ficar perto de seis etapas de
+   divisa, e nenhuma folha passa de seis recortes. */
+export const ETAPAS_DE_DIVISA = 6;
+export const MAXIMO_POR_FOLHA = 6;
+export function recortesPorFolha(divisas) {
+  return Math.min(MAXIMO_POR_FOLHA, Math.max(1, Math.ceil(divisas / ETAPAS_DE_DIVISA)));
+}
+
+/* As folhas de divisas e o roteiro do crítico.
+ *
+ * Cada folha leva `recortesPorFolha` recortes, no tamanho em que foram
+ * gerados, sem reduzir o zoom, e o número de folhas sai do número de divisas
+ * do objeto. Cada recorte vai numa linha: o par lado a lado e, à direita, a
+ * imagem inteira em miniatura com a caixa da divisa marcada, para o crítico
+ * saber onde está olhando. O crítico só lê arquivo e não lista pasta: na
+ * lateral do braço ele abriu 2 e depois 9 de 19 recortes soltos, e numa folha
+ * única de 19 o zoom caía à metade. */
+export async function folhasDasDivisas(recortes, sobreposicaoBuffer, { porFolha = recortesPorFolha(recortes.length), miniatura = 180, titulo = 20, vao = 10 } = {}) {
   const { cv } = await carregarOpenCV();
-  const linhas = Math.max(1, Math.ceil(recortes.length / colunas));
-  const folha = new cv.Mat(linhas * (altura + titulo), colunas * largura, cv.CV_8UC4, new cv.Scalar(255, 255, 255, 255));
-  try {
-    recortes.forEach(({ a, b, png }, i) => {
-      const lido = PNG.sync.read(png);
-      const m = cv.matFromImageData({ data: lido.data, width: lido.width, height: lido.height });
-      const escala = Math.min((largura - 6) / lido.width, (altura - 6) / lido.height);
-      const w = Math.max(1, Math.floor(lido.width * escala)); const h = Math.max(1, Math.floor(lido.height * escala));
-      const menor = new cv.Mat(); cv.resize(m, menor, new cv.Size(w, h), 0, 0, cv.INTER_AREA);
-      const x = (i % colunas) * largura + 3; const y = Math.floor(i / colunas) * (altura + titulo);
-      menor.copyTo(folha.roi(new cv.Rect(x, y + titulo, w, h)));
-      cv.putText(folha, `${a} / ${b}`, new cv.Point(x, y + 13), cv.FONT_HERSHEY_SIMPLEX, 0.45, new cv.Scalar(0, 0, 0, 255), 1);
-      m.delete(); menor.delete();
-    });
-    const saida = new PNG({ width: folha.cols, height: folha.rows });
-    saida.data = Buffer.from(folha.data);
-    return PNG.sync.write(saida);
-  } finally {
-    folha.delete();
+  const inteira = PNG.sync.read(sobreposicaoBuffer);
+  const escalaMini = miniatura / inteira.width;
+  const alturaMini = Math.round(inteira.height * escalaMini);
+  const folhas = [];
+  for (let inicio = 0; inicio < recortes.length; inicio += porFolha) {
+    const grupo = recortes.slice(inicio, inicio + porFolha).map((r) => ({ ...r, lido: PNG.sync.read(r.png) }));
+    const largura = Math.max(...grupo.map((r) => r.lido.width)) + vao + miniatura;
+    const altura = grupo.reduce((soma, r) => soma + titulo + Math.max(r.lido.height, alturaMini) + vao, 0);
+    const folha = new cv.Mat(altura, largura, cv.CV_8UC4, new cv.Scalar(255, 255, 255, 255));
+    const base = cv.matFromImageData({ data: inteira.data, width: inteira.width, height: inteira.height });
+    try {
+      let y = 0;
+      for (const { a, b, caixa, lido } of grupo) {
+        cv.putText(folha, `${a} / ${b}`, new cv.Point(2, y + 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, new cv.Scalar(0, 0, 0, 255), 1);
+        const par = cv.matFromImageData({ data: lido.data, width: lido.width, height: lido.height });
+        par.copyTo(folha.roi(new cv.Rect(0, y + titulo, lido.width, lido.height)));
+        const mini = new cv.Mat(); cv.resize(base, mini, new cv.Size(miniatura, alturaMini), 0, 0, cv.INTER_AREA);
+        const [x0, y0, x1, y1] = caixa.map((v) => Math.round(v * escalaMini));
+        cv.rectangle(mini, new cv.Point(x0, y0), new cv.Point(Math.max(x1, x0 + 2), Math.max(y1, y0 + 2)), new cv.Scalar(220, 0, 0, 255), 2);
+        mini.copyTo(folha.roi(new cv.Rect(largura - miniatura, y + titulo, miniatura, alturaMini)));
+        par.delete(); mini.delete();
+        y += titulo + Math.max(lido.height, alturaMini) + vao;
+      }
+      const saida = new PNG({ width: folha.cols, height: folha.rows });
+      saida.data = Buffer.from(folha.data);
+      folhas.push({ pares: grupo.map(({ a, b }) => [a, b]), png: PNG.sync.write(saida) });
+    } finally {
+      folha.delete(); base.delete();
+    }
   }
+  return folhas;
+}
+
+/* O roteiro que o crítico segue, com uma etapa por folha. `arquivos` traz o
+   caminho do alvo, da sobreposição e de cada folha, na ordem das folhas. */
+export function roteiroDoCritico({ alvo, sobreposicao: pintura, folhas }) {
+  const linhas = [
+    '# Roteiro da análise', '',
+    'Siga as etapas na ordem e não pule nenhuma. Em cada etapa, abra os arquivos dela.', '',
+    '## Etapa 1 — visão geral', '',
+    `Abra o alvo (${alvo}) e a sobreposição (${pintura}). Confira se cada parte tem cor, se nenhuma região pega o fundo e se cada cor está na parte que o nome diz.`, '',
+  ];
+  folhas.forEach(({ arquivo, pares }, i) => {
+    linhas.push(`## Etapa ${i + 2} — divisas, folha ${i + 1} de ${folhas.length}`, '',
+      `Abra ${arquivo}. Cada linha da folha mostra o original à esquerda, a pintura à direita e, no canto, a imagem inteira com a divisa marcada em vermelho. Para cada divisa abaixo, diga se ela está no lugar onde o original mostra a separação:`, '',
+      ...pares.map(([a, b]) => `- ${a} / ${b}`), '');
+  });
+  linhas.push(`## Etapa ${folhas.length + 2} — fechamento`, '',
+    'Dê a nota e os defeitos no seu formato de sempre, citando a folha e o par de cada defeito.', '');
+  return linhas.join('\n');
 }

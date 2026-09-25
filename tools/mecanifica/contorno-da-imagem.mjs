@@ -20,9 +20,11 @@
  *
  * `--pacote` grava, para o crítico e a pessoa, a sobreposição com a opacidade
  * pedida (20% por padrão), um recorte ampliado de cada divisa entre partes
- * vizinhas, com o original ao lado, a folha `divisas.png` com todos os
- * recortes juntos e `medidas.json` com a fração do contorno de cada parte que
- * segue uma borda da imagem.
+ * vizinhas, com o original ao lado, as folhas `divisas-NN.png`, uma divisa por
+ * folha em objeto de poucas partes e até seis nos maiores, e o `roteiro.md`
+ * que o crítico segue, uma etapa por folha, e
+ * `medidas.json` com a fração do contorno de cada parte que segue uma borda
+ * da imagem.
  *
  * O ARQUIVO DE REGIÕES
  *   { "ancoras": [ { "nome": "...", "px": [x, y], "mm": [z, y] }, { ... } ],
@@ -37,7 +39,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, w
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, sobreposicao, recortesDasDivisas, folhaDasDivisas, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
+  segmentar, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
@@ -71,7 +73,7 @@ export async function contornosDaImagem(pngBuffer, config) {
 
 /* O pacote que o crítico recebe. A pasta é refeita a cada chamada, para
    nenhum recorte de uma rodada anterior sobrar com cara de atual. */
-export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2 } = {}) {
+export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 0.2, imagemAlvo = '(imagem alvo)' } = {}) {
   rmSync(pasta, { recursive: true, force: true });
   mkdirSync(join(pasta, 'divisas'), { recursive: true });
   const pintada = await sobreposicao(pngBuffer, segmentacao, { opacidade });
@@ -80,7 +82,14 @@ export async function gravarPacote(pngBuffer, segmentacao, pasta, { opacidade = 
   const semNome = await sobreposicao(pngBuffer, segmentacao, { opacidade, rotular: false });
   const recortes = recortesDasDivisas(pngBuffer, semNome, segmentacao);
   for (const { a, b, png } of recortes) writeFileSync(join(pasta, 'divisas', `${a}--${b}.png`), png);
-  writeFileSync(join(pasta, 'divisas.png'), await folhaDasDivisas(recortes));
+  /* As folhas e o roteiro saem sempre: é por eles que o crítico passa por
+     todas as divisas. */
+  const folhas = (await folhasDasDivisas(recortes, semNome)).map((f, i) => {
+    const arquivo = join(pasta, `divisas-${String(i + 1).padStart(2, '0')}.png`);
+    writeFileSync(arquivo, f.png);
+    return { arquivo, pares: f.pares };
+  });
+  writeFileSync(join(pasta, 'roteiro.md'), roteiroDoCritico({ alvo: imagemAlvo, sobreposicao: join(pasta, 'sobreposicao.png'), folhas }));
   const naBorda = await proximidadeDaBorda(pngBuffer, segmentacao);
   const abaixo = Object.entries(naBorda).filter(([, v]) => v < MINIMO_NA_BORDA).map(([nome]) => nome);
   const medidas = { naBorda, minimo: MINIMO_NA_BORDA, abaixo, semDonoPx: segmentacao.semDono, divisas: recortes.map(({ a, b, caixa }) => ({ a, b, caixa })) };
@@ -159,7 +168,7 @@ async function principal(argv) {
   process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n  gravado em ${saida}\n`);
   if (valor('pacote')) {
     const pasta = resolve(valor('pacote'));
-    const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined });
+    const medidas = await gravarPacote(png, segmentacao, pasta, { opacidade: valor('opacidade') ? Number(valor('opacidade')) : undefined, imagemAlvo: imagem });
     process.stdout.write(`  pacote em ${pasta}: sobreposição, ${medidas.divisas.length} divisa(s), medidas\n`);
     if (medidas.abaixo.length) process.stdout.write(`  ABAIXO DO MÍNIMO NA BORDA (${medidas.minimo}): ${medidas.abaixo.join(', ')} — volta ao desenhador antes do crítico\n`);
     if (medidas.semDonoPx > 0) process.stdout.write(`  ${medidas.semDonoPx} pixel(s) da silhueta sem dono\n`);

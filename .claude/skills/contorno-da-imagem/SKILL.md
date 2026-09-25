@@ -34,17 +34,22 @@ da segunda rodada em diante, só os defeitos que o comando imprimiu.
 `npm run contorno -- <imagem> --regioes=<json> --pacote=<pasta>`. Parte
 listada abaixo do mínimo na borda volta ao desenhador sem passar pelo crítico.
 
-**Crítico.** Despache o `critico-visual` com a imagem original como alvo, a
-`sobreposicao.png` e todos os recortes de `divisas/`, a lista das partes, a
-regra do que aparece e os critérios: região que pega outra parte ou o fundo,
-parte com pedaço sem cor, divisa fora do lugar onde a imagem mostra a
-separação. Peça atenção aos recortes: cada um mostra o original à esquerda e a
-pintura à direita, ampliados, e foi num recorte assim que apareceu o defeito
-que três críticos olhando a imagem inteira não viram. Mande a folha
-`divisas.png`, que junta todos os recortes numa imagem só: o crítico só lê
-arquivo e não lista pasta, e na lateral do braço ele abriu 2 e depois 9 dos
-19 recortes soltos. Nunca mande as sementes nem o
-que mudou.
+**Crítico.** Despache o `critico-visual` sempre pelo roteiro: mande o caminho
+de `roteiro.md` do pacote e peça que ele siga as etapas na ordem. O roteiro
+tem uma etapa de visão geral, com o alvo e a sobreposição, uma etapa para
+cada folha de divisas e o fechamento. Cada folha leva os recortes no tamanho em
+que foram gerados. Com até seis divisas, cada divisa tem uma etapa só dela,
+porque o crítico olha melhor uma coisa de cada vez; com mais, elas se
+agrupam para o roteiro ficar perto de seis etapas, com no máximo seis
+recortes por folha. Cada linha da folha mostra o original, a pintura e a imagem
+inteira em miniatura com a divisa marcada. Junto do roteiro vão a lista das
+partes, a regra do que aparece e os critérios: região que pega outra parte
+ou o fundo, parte com pedaço sem cor, divisa fora do lugar onde a imagem
+mostra a separação. O roteiro existe porque o crítico só lê arquivo e não
+lista pasta: na lateral do braço ele abriu 2 e depois 9 de 19 recortes
+soltos, e numa folha única de 19 o zoom caía à metade. Foi num recorte
+ampliado que apareceu o defeito que três críticos olhando a imagem inteira
+não viram. Nunca mande as sementes nem o que mudou.
 
 **Registre** o veredito sem editar:
 
