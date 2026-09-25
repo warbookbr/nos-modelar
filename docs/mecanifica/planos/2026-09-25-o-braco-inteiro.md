@@ -199,8 +199,13 @@ piorou a separação por criar halo. Nenhuma versão aumentada separou melhor
 que a original com realce (83,4% de concordância com uma semente por parte).
 O ESPCN fica como candidato se aparecer referência de resolução bem menor; o
 FSRCNN não foi achado em ONNX, e o `onnxruntime-node` não instalou porque
-baixa binário na instalação. Falta ligar o arquivo ao
-`conferir:referencia` e à prancha.
+baixa binário na instalação. A prancha passou a sair dos contornos:
+`npm run contorno:prancha` desenha a vista lateral com a silhueta e cada
+parte, sem coordenada digitada, e o motor de prancha mede o que desenhou. O
+arquivo de regiões ganhou `foraDoModelo`, para a parte que só tem semente para
+não ser engolida, como o cabo, sair da silhueta e da prancha. Falta ligar o
+arquivo ao `conferir:referencia` e a pessoa julgar a prancha nova ao lado da
+antiga.
 
 ## Riscos e parada
 

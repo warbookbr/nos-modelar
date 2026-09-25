@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-773 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+775 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -989,6 +989,8 @@
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
 - `prancha-chassi-p0.mjs` — prancha-chassi-p0.mjs — especificação da prancha ortográfica ALVO da rodada P0 do chassi realista, desenhada por tools/mecanifica/prancha.mjs. Não é a projeç…
 - `prancha-cupe-cunha.mjs` — prancha-cupe-cunha.mjs — prova R5 do plano do motor de prancha: uma carroceria ficcional desenhada do zero com âncora proporcional, traçado por filete e julg…
+- `prancha-dos-contornos.mjs` — prancha-dos-contornos.mjs — a prancha lateral desenhada com os contornos que `npm run contorno` tirou da imagem de referência, em milímetro.
+- `prancha-dos-contornos.test.mjs` — prancha-dos-contornos.test.mjs — a prancha da lateral do braço sai dos contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo.
 - `prancha-geometria.mjs` — prancha-geometria.mjs — traçado 2D em milímetros para as pranchas ortográficas. Tudo aqui devolve POLILINHA AMOSTRADA, nunca comando de SVG: é essa decisão q…
 - `prancha-r4-independente.mjs` — Prancha R4, escrita sem reutilizar as receitas P0 ou cupê. É um briefing ficcional completo: o arquivo é a autoria declarativa, não uma malha.
 - `prancha-r4-independente.test.mjs` — prancha-r4-independente.test.mjs — prova fria e mutações da prancha R4.

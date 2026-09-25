@@ -31,6 +31,8 @@
  *     "limiar": 225, "realce": false,
  *     "regioes": { "base": [390, 470], "anelCintura": [[345, 405], [430, 405]] } }
  *   `realce` liga o realce de contraste e nitidez do módulo para o watershed.
+ *   `foraDoModelo` lista as partes que têm semente só para a vizinha não as
+ *   engolir, como um cabo: elas saem da silhueta e da prancha.
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
@@ -40,7 +42,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, w
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
+  segmentar, contornoDaSilhueta, sobreposicao, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, validarRodada, proximaAcao,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
 
@@ -50,22 +52,33 @@ const arred = (x) => (Math.round(x * 100) / 100) || 0;
 export async function contornosDaImagem(pngBuffer, config) {
   const calibracao = calibrarPorAncoras(config.ancoras);
   const seg = await segmentar(pngBuffer, config);
+  const foraDoModelo = config.foraDoModelo ?? [];
   const mm2 = calibracao.mmPorPx ** 2;
   const regioes = {};
   for (const [nome, r] of Object.entries(seg.regioes)) {
     regioes[nome] = {
+      ...(foraDoModelo.includes(nome) ? { foraDoModelo: true } : {}),
       semente: r.semente,
       areaMm2: Math.round(r.areaPx * mm2),
       contornoPx: r.contornoPx,
       contornoMm: r.contornoPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
     };
   }
+  const silhuetaPx = await contornoDaSilhueta(seg, { sem: foraDoModelo });
+  const linhaDeForaPx = await contornoDaSilhueta(seg, { folga: 1, sem: foraDoModelo });
   return {
     resultado: {
       formato: FORMATO,
       imagem: { sha256: createHash('sha256').update(pngBuffer).digest('hex'), largura: seg.largura, altura: seg.altura },
       mmPorPx: Number(calibracao.mmPorPx.toFixed(5)),
       residuo: calibracao.residuo,
+      /* `contornoMm` é a silhueta medida; `linhaDeForaMm` passa um pixel além
+         dela, para a prancha desenhar as partes por dentro. */
+      silhueta: {
+        contornoPx: silhuetaPx,
+        contornoMm: silhuetaPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+        linhaDeForaMm: linhaDeForaPx.map(([x, y]) => calibracao.paraMm(x, y).map(arred)),
+      },
       regioes,
     },
     segmentacao: seg,

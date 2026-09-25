@@ -105,3 +105,38 @@ export async function segmentar(pngBuffer, { limiar = 225, regioes = {}, realce 
     mats.forEach((m) => m.delete());
   }
 }
+
+/* O contorno externo da silhueta inteira, em pixel. É o que a prancha desenha
+   como linha de fora; as partes vão por dentro dele. Com `folga`, a máscara é
+   crescida esse número de pixels antes: as partes tocam a borda da silhueta
+   pixel a pixel, e sem folga caíam em cima da linha e contavam como fora. */
+export async function contornoDaSilhueta(segmentacao, { folga = 0, sem = [] } = {}) {
+  const { cv } = await carregarOpenCV();
+  const { largura, altura, silhueta } = segmentacao;
+  const mascara = new cv.Mat(altura, largura, cv.CV_8U, new cv.Scalar(0));
+  const contornos = new cv.MatVector(); const hierarquia = new cv.Mat(); const simples = new cv.Mat();
+  try {
+    mascara.data.set(silhueta);
+    /* Parte fora do modelo, como um cabo, sai da silhueta: ela tem semente só
+       para a vizinha não a engolir. */
+    const fora = new Set(sem.map((nome) => segmentacao.regioes[nome]?.rotulo).filter(Boolean));
+    if (fora.size) for (let p = 0; p < mascara.data.length; p += 1) if (fora.has(segmentacao.rotulos[p]) || segmentacao.rotulos[p] === -1) mascara.data[p] = 0;
+    if (folga > 0) {
+      const nucleo = cv.Mat.ones(3, 3, cv.CV_8U);
+      cv.dilate(mascara, mascara, nucleo, new cv.Point(-1, -1), folga);
+      nucleo.delete();
+    }
+    cv.findContours(mascara, contornos, hierarquia, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE);
+    let maior = -1; let area = -1;
+    for (let k = 0; k < contornos.size(); k += 1) { const a = cv.contourArea(contornos.get(k)); if (a > area) { area = a; maior = k; } }
+    /* Sem folga, sem simplificar: simplificada, a silhueta corta os cantos por
+       um pixel e as partes, que vêm de dentro dela, apareciam como pontos fora
+       dela. Com folga, a simplificação de 1 px cabe dentro da folga. */
+    const bruto = folga > 0 ? (cv.approxPolyDP(contornos.get(maior), simples, 1, true), simples.data32S) : contornos.get(maior).data32S;
+    const pontos = [];
+    for (let k = 0; k < bruto.length; k += 2) pontos.push([bruto[k], bruto[k + 1]]);
+    return pontos;
+  } finally {
+    mascara.delete(); contornos.delete(); hierarquia.delete(); simples.delete();
+  }
+}
