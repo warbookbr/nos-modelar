@@ -82,10 +82,7 @@
       "parte": "anelAntebraco",
       "medida": "altura",
       "em": 180,
-      "numero": [
-        0,
-        120
-      ]
+      "afasta": 0
     },
     {
       "parte": "antebraco",
@@ -199,8 +196,12 @@
     },
     "anelAntebraco": {
       "em": [
-        200,
-        840
+        150,
+        1110
+      ],
+      "marca": [
+        150,
+        950
       ]
     },
     "antebraco": {

@@ -61,8 +61,7 @@
 <path class="cota" d="M 281.36 230.68 L 330.21 230.68"/>
 <text x="305.79" y="224.68" class="cotat" text-anchor="middle">78</text>
 <path class="cota" d="M 321.33 244.94 L 321.33 140.92"/>
-<text x="321.33" y="117.43" class="cotat" text-anchor="middle">165</text>
-<path class="cota" stroke-dasharray="2 2" d="M 321.33 192.93 L 321.33 119.63"/>
+<text x="315.33" y="192.93" class="cotat" text-anchor="middle" transform="rotate(-90 315.33 192.93)">165</text>
 <path class="cota" d="M 332.84 218.1 L 490.54 218.1"/>
 <text x="411.69" y="212.1" class="cotat" text-anchor="middle">251</text>
 <path class="cota" d="M 396.83 236.51 L 396.83 148.59"/>
@@ -88,9 +87,9 @@
 <circle class="lm" cx="631.17" cy="254.4" r="2.6"/>
 <text class="lmt" x="503.79" y="306.19">aneisPunho</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 631.17 254.4 L 558.89 298.59"/>
-<circle class="lm" cx="311.15" cy="192.93" r="2.6"/>
-<text class="lmt" x="333.91" y="268.44">anelAntebraco</text>
-<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 311.15 192.93 L 333.91 260.84"/>
+<circle class="lm" cx="302.45" cy="199.22" r="2.6"/>
+<text class="lmt" x="302.45" y="98.56">anelAntebraco</text>
+<path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 302.45 199.22 L 302.45 100.46"/>
 <circle class="lm" cx="197.36" cy="636.94" r="2.6"/>
 <text class="lmt" x="333.91" y="655.38">anelCintura</text>
 <path class="lm" stroke="#1f6f5c" stroke-width="0.8" fill="none" d="M 197.36 636.94 L 333.91 647.78"/>
