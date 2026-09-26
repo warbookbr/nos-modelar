@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { prancha, colisoesDoDesenho, examinarDesenho } from './prancha.mjs';
-import { specDosContornos, roteiroDaPrancha, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
+import { specDosContornos, roteiroDaPrancha, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
 
 const escolhasDoBraco = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.prancha.json', import.meta.url), 'utf8'));
 const contornos = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.contornos.json', import.meta.url), 'utf8'));
@@ -147,6 +147,23 @@ describe('prancha dos contornos', () => {
     expect(() => cota({ em: 0 })).toThrow(/sairia da parte e cobriria a vizinha/);
     /* Menor que a parte inteira ao lado dela também engana: não diz onde começa. */
     expect(() => specDosContornos(contornos, { escolhas: { cotas: [{ parte: 'ombro', medida: 'altura', em: 150, origem: { imagem: 'frontal' } }] }, lerVista: () => alt(160) })).toThrow(/não bate com a parte/);
+  });
+
+  it('prevalece com motivo aceita a medida da outra vista que discorda, e sem motivo recusa', () => {
+    const alt = (h) => ({ regioes: { ombro: { contornoMm: [[-50, 0], [50, 0], [50, h], [-50, h]] } } });
+    const faz = (extra) => specDosContornos(contornos, { escolhas: { cotas: [{ parte: 'ombro', medida: 'altura', em: 0, origem: { imagem: 'frontal' }, ...extra }] }, lerVista: () => alt(200) });
+    expect(() => faz({})).toThrow(/vistas discordam/);
+    expect(() => faz({ prevalece: '' })).toThrow(/prevalece sem motivo/);
+    expect(() => faz({ prevalece: '   ' })).toThrow(/prevalece sem motivo/);
+    const spec = faz({ prevalece: 'a pessoa decidiu em 2026-09-26 que a frontal vale para a altura do ombro' });
+    const c = spec.cotas.find((x) => x.dono === 'ombro.altura');
+    expect(c.ate[1] - c.de[1]).toBeCloseTo(200, 6);
+    expect(c.texto).toBe('200 (frontal, prevalece)');
+    /* A linha vai por fora da parte, depois da borda direita, sem cruzar a vizinha. */
+    const xs = contornos.regioes.ombro.contornoMm.map((q) => q[0]);
+    expect(c.de[0]).toBeGreaterThan(Math.max(...xs));
+    expect(spec.resumo.prevalencias).toHaveLength(1);
+    expect(linhasDePrevalencia(spec.resumo.prevalencias)).toEqual(['  PREVALECE ombro.altura: vista frontal dá 200 mm e esta mostra 183 mm; motivo: a pessoa decidiu em 2026-09-26 que a frontal vale para a altura do ombro']);
   });
 
   it('de escolhe onde a cota de outra vista começa, e recusa a linha que não cabe', () => {

@@ -52,7 +52,13 @@ O que você decide e grava em `<imagem>.prancha.json`:
   `"fim"` (termina no topo) ou a posição em mm. Quando as vistas discordam
   ou a linha sairia da parte, o comando recusa com código 1 e diz os dois
   números; aí a medida não se desenha nesta vista, e o caminho é
-  `medivel: false` com motivo. Sem outra vista,
+  `medivel: false` com motivo. A exceção é `"prevalece": "<motivo>"`, que
+  só entra quando a pessoa decidiu qual vista vale para aquela medida, com o
+  motivo citando a decisão (quem, quando e por quê); nunca a declare por
+  conta própria para calar a recusa. Com ela, a cota sai externa, afastada
+  da parte, com o número da origem e o texto "(frontal, prevalece)", e o
+  relatório traz uma linha PREVALECE com as duas medidas e o motivo; motivo
+  vazio é recusado e o detector de colisões continua valendo. Sem outra vista,
   declare `"medivel": false` com `"motivo"` e, se quiser, `"notaEm": [z, y]`;
   a prancha escreve o motivo como nota, mas o comando lista a medida como
   FALTA, porque nota sem número não dá a medida ao modelador.

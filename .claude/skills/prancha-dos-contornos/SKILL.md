@@ -42,7 +42,12 @@ parte tendo saída livre, e o crítico não recebe prancha com colisão. Chamada
 de parte cercada dos dois lados sai como aviso. Cota com `origem` cuja
 medida discorda desta vista além de 3% ou 5 mm, ou cuja linha sairia da
 parte, é recusada com código 1 antes de desenhar; o desenhista escolhe outro
-`em`, declara `de` ou passa a `medivel: false`.
+`em`, declara `de` ou passa a `medivel: false`. Quando a pessoa decidiu qual
+vista vale para aquela medida, a cota leva `prevalece: "<motivo>"` citando a
+decisão; aí ela é aceita, sai externa com o número da origem e a marca
+"(<vista>, prevalece)", e o relatório imprime uma linha PREVALECE com as duas
+medidas e o motivo. Motivo vazio é recusado, e sem decisão da pessoa o campo
+não entra.
 
 **Crítico.** Despache o `critico-visual` com a imagem de referência como alvo,
 `<imagem>.prancha.png` como modelo e o roteiro

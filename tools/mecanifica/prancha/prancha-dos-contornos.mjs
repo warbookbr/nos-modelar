@@ -98,6 +98,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
   /* Medida que esta vista não mostra e que só uma nota de texto explica fica
      em falta: a nota diz por que falta, mas não dá o número ao modelador. */
   const faltas = [];
+  const prevalencias = [];
   /* Cota com `origem: { imagem, parte?, medida? }` tira o número dos
      contornos (ou das regiões) de outra imagem de referência do mesmo objeto
      e o desenha nesta vista com a origem escrita ao lado. Altura se lê em
@@ -105,8 +106,9 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
      parte na outra vista. A linha sai da borda de baixo (altura) ou da
      esquerda (largura) da parte visível, em `em` quando declarado. */
   const cotaDeOutraVista = (cota, [bz0, bz1, by0, by1], pts) => {
-    const { parte, medida, origem, em, afasta, numero, de } = cota;
+    const { parte, medida, origem, em, afasta, numero, de, prevalece } = cota;
     const dono = `${parte}.${medida}`;
+    if (prevalece !== undefined && (typeof prevalece !== 'string' || !prevalece.trim())) throw new Error(`a cota '${dono}' declara prevalece sem motivo; escreva a decisão da pessoa sobre qual vista vale para esta medida.`);
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a cota '${dono}' com origem em outra vista mede largura ou altura.`);
     if (!origem.imagem) throw new Error(`a cota '${dono}' declara origem e precisa de origem.imagem.`);
     const outra = lerVista ? lerVista(origem.imagem) : null;
@@ -132,27 +134,46 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
        da parte, e a altura de 477 mm do braço na frontal passou do topo dele
        na lateral, onde ele mostra uns 456 mm, cobrindo ombro e anelCintura. */
     const vert = medida === 'altura';
-    const pos = em ?? (vert ? bz1 : by0);
+    let pos = em ?? (vert ? bz1 : by0);
     const eixoNome = vert ? 'z' : 'y';
     /* `em` fora da parte põe a cota ao lado dela, como cota externa que
        mede a parte de ponta a ponta; aí a medida de fora tem de bater com a
        extensão inteira que esta vista mostra, nos dois sentidos. `em` dentro
        mede a seção ali, e a linha só precisa caber nela. */
-    const corte = secao(pts, vert ? 'z' : 'y', pos);
-    const externa = !corte;
-    const [s0, s1] = corte ?? (vert ? [by0, by1] : [bz0, bz1]);
-    const visivel = s1 - s0;
-    const tol = Math.max(TOLERANCIA_ENTRE_VISTAS.fracao * valor, TOLERANCIA_ENTRE_VISTAS.mm);
+    const tolDe = (v) => Math.max(TOLERANCIA_ENTRE_VISTAS.fracao * v, TOLERANCIA_ENTRE_VISTAS.mm);
+    const medir = (p) => {
+      const corte = secao(pts, vert ? 'z' : 'y', p);
+      const [s0, s1] = corte ?? (vert ? [by0, by1] : [bz0, bz1]);
+      return { externa: !corte, s0, s1, visivel: s1 - s0 };
+    };
+    let { externa, s0, s1, visivel } = medir(pos);
+    const tol = tolDe(valor);
+    const discorda = visivel + tol < valor || (externa && valor + tol < visivel);
+    /* `prevalece: "<motivo>"` é a decisão escrita da pessoa sobre qual vista
+       vale para esta medida quando as vistas discordam. A cota passa a ser
+       externa, afastada da parte, para a linha com o número da origem não
+       invadir a vizinha (o detector de colisões continua valendo), e o texto
+       diz que a origem prevalece. */
+    let prevaleceu = null;
+    if (discorda && prevalece) {
+      const inteira = medir(vert ? bz1 + 1e9 : by0 - 1e9);
+      prevaleceu = { dono, origem: origem.imagem, deFora: valor, daqui: inteira.visivel, motivo: prevalece.trim() };
+      if (!externa) pos = vert ? bz1 + tol : by0 - tol;
+      ({ externa, s0, s1, visivel } = inteira);
+    }
     const inicio = de === undefined || de === 'inicio' ? s0 : de === 'fim' ? s1 - valor : de;
     if (!Number.isFinite(inicio)) throw new Error(`o de da cota '${dono}' é 'inicio', 'fim' ou a posição em mm, e veio '${de}'.`);
     const fim = inicio + valor;
     const onde = externa ? `de ponta a ponta (cota externa em ${eixoNome} = ${mm(pos)})` : `em ${eixoNome} = ${mm(pos)}`;
-    const recusa = (porque) => new Error(`a cota '${dono}' tirada da vista '${origem.imagem}' ${porque}. Use medivel: false com motivo, ou meça em outro lugar.`);
-    if (visivel + tol < valor) throw recusa(`sairia da parte e cobriria a vizinha: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(valor - visivel)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam ou a parte está escondida em parte aqui`);
-    if (externa && valor + tol < visivel) throw recusa(`não bate com a parte: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(visivel - valor)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam, e a cota ao lado da parte não diz onde ela começa`);
-    if (inicio < s0 - tol || fim > s1 + tol) throw recusa(`sairia da parte: a linha iria de ${mm(inicio)} a ${mm(fim)} mm e '${parte}' vai de ${mm(s0)} a ${mm(s1)} mm ${onde}; declare de (inicio, fim ou a posição em mm) para ela caber`);
-    if (vert) return { vista: 'lateral', dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto, origem: origem.imagem, ...extra };
-    return { vista: 'lateral', dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto, origem: origem.imagem, ...extra };
+    const recusa = (porque) => new Error(`a cota '${dono}' tirada da vista '${origem.imagem}' ${porque}. Use medivel: false com motivo, meça em outro lugar ou, se a pessoa decidiu qual vista vale, declare prevalece com o motivo.`);
+    if (!prevaleceu) {
+      if (visivel + tol < valor) throw recusa(`sairia da parte e cobriria a vizinha: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(valor - visivel)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam ou a parte está escondida em parte aqui`);
+      if (externa && valor + tol < visivel) throw recusa(`não bate com a parte: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(visivel - valor)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam, e a cota ao lado da parte não diz onde ela começa`);
+      if (inicio < s0 - tol || fim > s1 + tol) throw recusa(`sairia da parte: a linha iria de ${mm(inicio)} a ${mm(fim)} mm e '${parte}' vai de ${mm(s0)} a ${mm(s1)} mm ${onde}; declare de (inicio, fim ou a posição em mm) para ela caber`);
+    } else prevalencias.push(prevaleceu);
+    const txt = prevaleceu ? `${mm(valor)} (${origem.imagem}, prevalece)` : texto;
+    if (vert) return { vista: 'lateral', dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto: txt, origem: origem.imagem, ...extra };
+    return { vista: 'lateral', dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto: txt, origem: origem.imagem, ...extra };
   };
   const cotasDasPartes = (escolhas.cotas ?? []).flatMap((cota) => {
     const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem } = cota;
@@ -226,7 +247,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     landmarks,
   };
   /* Fora do contrato do motor: o que o roteiro do crítico e o relatório leem. */
-  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, partes: nomes, colunas: layout.colunas } });
+  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, prevalencias, partes: nomes, colunas: layout.colunas } });
   return spec;
 }
 
@@ -349,6 +370,12 @@ export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
 }
 
 /* O PNG é o que o crítico e o modelador abrem: eles só leem imagem. */
+/* Uma linha PREVALECE por cota em que a pessoa decidiu qual vista vale, com
+   as duas medidas e o motivo, para o relatório não esconder a discordância. */
+export function linhasDePrevalencia(prevalencias = []) {
+  return prevalencias.map((p) => `  PREVALECE ${p.dono}: vista ${p.origem} dá ${Math.round(p.deFora)} mm e esta mostra ${Math.round(p.daqui)} mm; motivo: ${p.motivo}`);
+}
+
 async function svgParaPng(svg, destino) {
   const { chromium } = (await import('playwright')).default;
   const navegador = await chromium.launch();
@@ -411,6 +438,7 @@ async function principal(argv) {
   const imagemAlvo = ['png', 'jpg', 'jpeg', 'webp'].map((e) => `${base}.${e}`).find((f) => existsSync(f)) ?? `${base}.png`;
   writeFileSync(join(pacote, 'roteiro.md'), roteiroDaPrancha({ alvo: imagemAlvo, prancha: `${base}.prancha.png`, spec }));
   const { faltas } = spec.resumo;
+  const textoPrevalencias = linhasDePrevalencia(spec.resumo.prevalencias).map((l) => `${l}\n`).join('');
   const textoFaltas = faltas.length ? `${faltas.length} medida(s) em falta, com nota e sem número:\n${faltas.map((f) => `  FALTA ${f.dono}: ${f.motivo}`).join('\n')}\n  declare origem: { imagem: '<outra vista>' } quando outra referência mostrar a medida.\n` : '';
   /* A prancha só se entrega com zero colisões: o código de saída 3 impede o
      agente de devolver texto atropelado achando que está pronto. */
@@ -419,7 +447,7 @@ async function principal(argv) {
     ...colisoes.map((c) => `  COLISÃO ${c.tipo}: ${c.a} × ${c.b}${c.px ? ` (${c.px} px)` : ''}`),
     ...avisos.map((c) => `  AVISO ${c.tipo}: ${c.a} × ${c.b} — ${c.motivo}`),
   ].join('\n');
-  process.stdout.write(`${imprimirRelatorio(relatorio)}\n${colisoes.length} colisão(ões), ${avisos.length} aviso(s)${lista ? `\n${lista}` : ''}\n${textoFaltas}prancha gravada em ${base}.prancha.svg e ${base}.prancha.png\nroteiro do crítico em ${join(pacote, 'roteiro.md')}\n`);
+  process.stdout.write(`${imprimirRelatorio(relatorio)}\n${colisoes.length} colisão(ões), ${avisos.length} aviso(s)${lista ? `\n${lista}` : ''}\n${textoFaltas}${textoPrevalencias}prancha gravada em ${base}.prancha.svg e ${base}.prancha.png\nroteiro do crítico em ${join(pacote, 'roteiro.md')}\n`);
   return colisoes.length ? 3 : 0;
 }
 
