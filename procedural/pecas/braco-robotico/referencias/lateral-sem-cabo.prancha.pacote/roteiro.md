@@ -20,82 +20,82 @@ Abra o alvo (/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referenci
 - nome: "anelCotovelo" fica na coluna da esquerda. A chamada termina dentro de anelCotovelo, e não numa vizinha?
 - linhas livres: a chamada e as cotas de anelCotovelo não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 4 — braco
-
-- largura: cota 158. A linha atravessa a seção que o modelador precisa, dentro de braco?
-- altura: cota 477 (frontal, prevalece), tirada da vista frontal. A linha mede braco de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "braco" fica na coluna da esquerda. A chamada termina dentro de braco, e não numa vizinha?
-- linhas livres: a chamada e as cotas de braco não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 5 — ombro
-
-- largura: cota 202 (frontal), tirada da vista frontal. A linha atravessa a seção que o modelador precisa, dentro de ombro?
-- altura: cota 177 (frontal, prevalece), tirada da vista frontal. A linha mede ombro de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "ombro" fica na coluna da esquerda. A chamada termina dentro de ombro, e não numa vizinha?
-- linhas livres: a chamada e as cotas de ombro não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 6 — anelCintura
+## Etapa 4 — anelCintura
 
 - largura: cota 199. A linha atravessa a seção que o modelador precisa, dentro de anelCintura?
 - altura: cota 57. A linha mede anelCintura de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "anelCintura" fica na coluna da esquerda. A chamada termina dentro de anelCintura, e não numa vizinha?
 - linhas livres: a chamada e as cotas de anelCintura não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 7 — caixaLateral
+## Etapa 5 — caixaLateral
 
 - largura: cota 65. A linha atravessa a seção que o modelador precisa, dentro de caixaLateral?
 - altura: cota 209. A linha mede caixaLateral de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "caixaLateral" fica na coluna da esquerda. A chamada termina dentro de caixaLateral, e não numa vizinha?
 - linhas livres: a chamada e as cotas de caixaLateral não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 8 — anelAntebraco
-
-- largura: cota 69. A linha atravessa a seção que o modelador precisa, dentro de anelAntebraco?
-- altura: sem cota. A linha mede anelAntebraco de ponta a ponta na vertical, sem pegar parte vizinha?
-- nome: "anelAntebraco" fica na coluna da direita. A chamada termina dentro de anelAntebraco, e não numa vizinha?
-- linhas livres: a chamada e as cotas de anelAntebraco não cruzam outra linha nem passam sobre número ou nome?
-
-## Etapa 9 — juntaCotovelo
+## Etapa 6 — juntaCotovelo
 
 - largura: cota 24. A linha atravessa a seção que o modelador precisa, dentro de juntaCotovelo?
 - altura: sem cota. A linha mede juntaCotovelo de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "juntaCotovelo" fica na coluna da direita. A chamada termina dentro de juntaCotovelo, e não numa vizinha?
 - linhas livres: a chamada e as cotas de juntaCotovelo não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 10 — antebraco
+## Etapa 7 — anelAntebraco
+
+- largura: cota 69. A linha atravessa a seção que o modelador precisa, dentro de anelAntebraco?
+- altura: sem cota. A linha mede anelAntebraco de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "anelAntebraco" fica na coluna da direita. A chamada termina dentro de anelAntebraco, e não numa vizinha?
+- linhas livres: a chamada e as cotas de anelAntebraco não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 8 — antebraco
 
 - largura: cota 253. A linha atravessa a seção que o modelador precisa, dentro de antebraco?
 - altura: cota 129. A linha mede antebraco de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "antebraco" fica na coluna da direita. A chamada termina dentro de antebraco, e não numa vizinha?
 - linhas livres: a chamada e as cotas de antebraco não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 11 — carcacaPunho
+## Etapa 9 — carcacaPunho
 
 - largura: cota 262. A linha atravessa a seção que o modelador precisa, dentro de carcacaPunho?
 - altura: cota 135. A linha mede carcacaPunho de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "carcacaPunho" fica na coluna da direita. A chamada termina dentro de carcacaPunho, e não numa vizinha?
 - linhas livres: a chamada e as cotas de carcacaPunho não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 12 — aneisPunho
+## Etapa 10 — aneisPunho
 
-- largura: sem cota. A linha atravessa a seção que o modelador precisa, dentro de aneisPunho?
+- largura: cota 111. A linha atravessa a seção que o modelador precisa, dentro de aneisPunho?
 - altura: cota 74. A linha mede aneisPunho de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "aneisPunho" fica na coluna da direita. A chamada termina dentro de aneisPunho, e não numa vizinha?
 - linhas livres: a chamada e as cotas de aneisPunho não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 13 — garfoPunho
+## Etapa 11 — garfoPunho
 
 - largura: cota 102. A linha atravessa a seção que o modelador precisa, dentro de garfoPunho?
 - altura: cota 129. A linha mede garfoPunho de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "garfoPunho" fica na coluna da direita. A chamada termina dentro de garfoPunho, e não numa vizinha?
 - linhas livres: a chamada e as cotas de garfoPunho não cruzam outra linha nem passam sobre número ou nome?
 
-## Etapa 14 — flange
+## Etapa 12 — flange
 
 - largura: cota 154. A linha atravessa a seção que o modelador precisa, dentro de flange?
 - altura: cota 43. A linha mede flange de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "flange" fica na coluna da direita. A chamada termina dentro de flange, e não numa vizinha?
 - linhas livres: a chamada e as cotas de flange não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 13 — braco
+
+- largura: cota 158. A linha atravessa a seção que o modelador precisa, dentro de braco?
+- altura: cota 477 (frontal, prevalece), tirada da vista frontal. A linha mede braco de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "braco" fica na coluna da direita. A chamada termina dentro de braco, e não numa vizinha?
+- linhas livres: a chamada e as cotas de braco não cruzam outra linha nem passam sobre número ou nome?
+
+## Etapa 14 — ombro
+
+- largura: cota 202 (frontal, prevalece), tirada da vista frontal. A linha atravessa a seção que o modelador precisa, dentro de ombro?
+- altura: cota 177 (frontal, prevalece), tirada da vista frontal. A linha mede ombro de ponta a ponta na vertical, sem pegar parte vizinha?
+- nome: "ombro" fica na coluna da direita. A chamada termina dentro de ombro, e não numa vizinha?
+- linhas livres: a chamada e as cotas de ombro não cruzam outra linha nem passam sobre número ou nome?
 
 ## Etapa 15 — base
 

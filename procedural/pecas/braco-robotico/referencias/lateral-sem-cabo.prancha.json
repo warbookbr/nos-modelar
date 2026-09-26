@@ -23,16 +23,21 @@
   {
    "parte": "ombro",
    "medida": "largura",
-   "em": -200,
+   "em": 286,
    "origem": {
     "imagem": "frontal"
    },
-   "prevalece": "pessoa, 2026-09-26: a frontal vale; na lateral o braço cobre o topo do ombro e o ombro cobre o pé do braço"
+   "numero": [
+    230,
+    30
+   ],
+   "prevalece": "pessoa, 2026-09-26: a frontal vale; na lateral o braço cobre o topo do ombro e o ombro cobre o pé do braço",
+   "afasta": 16
   },
   {
    "parte": "ombro",
    "medida": "altura",
-   "em": 170,
+   "em": -190,
    "origem": {
     "imagem": "frontal"
    },
@@ -46,7 +51,7 @@
   {
    "parte": "braco",
    "medida": "altura",
-   "em": 250,
+   "em": -230,
    "origem": {
     "imagem": "frontal"
    },
@@ -127,8 +132,8 @@
    "medida": "largura",
    "em": 830,
    "numero": [
-    0,
-    -90
+    30,
+    -50
    ]
   },
   {
@@ -159,6 +164,15 @@
     -70,
     0
    ]
+  },
+  {
+   "parte": "aneisPunho",
+   "medida": "largura",
+   "em": 760,
+   "numero": [
+    100,
+    0
+   ]
   }
  ],
  "nomes": {
@@ -184,23 +198,23 @@
     260
    ],
    "coluna": "esquerda",
-   "nivel": 260
+   "nivel": 240
   },
   "ombro": {
    "marca": [
-    -93,
-    400
+    90,
+    345
    ],
-   "coluna": "esquerda",
-   "nivel": 400
+   "coluna": "direita",
+   "nivel": 345
   },
   "braco": {
    "marca": [
-    -40,
-    480
+    40,
+    540
    ],
-   "coluna": "esquerda",
-   "nivel": 480
+   "coluna": "direita",
+   "nivel": 500
   },
   "anelCotovelo": {
    "marca": [
@@ -224,15 +238,15 @@
     925
    ],
    "coluna": "direita",
-   "nivel": 1080
+   "nivel": 1300
   },
   "anelAntebraco": {
    "marca": [
-    145,
-    940
+    150,
+    930
    ],
    "coluna": "direita",
-   "nivel": 1210
+   "nivel": 1200
   },
   "antebraco": {
    "marca": [
@@ -240,7 +254,7 @@
     930
    ],
    "coluna": "direita",
-   "nivel": 1010
+   "nivel": 1100
   },
   "carcacaPunho": {
    "marca": [
