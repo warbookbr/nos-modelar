@@ -1,0 +1,313 @@
+{
+ "numero": 3,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura",
+    "em": 60
+   },
+   {
+    "parte": "base",
+    "medida": "altura",
+    "em": -60
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura",
+    "em": -120
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura",
+    "em": 130
+   },
+   {
+    "parte": "ombro",
+    "medida": "largura",
+    "em": 330
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura",
+    "em": 125,
+    "origem": {
+     "imagem": "frontal"
+    }
+   },
+   {
+    "parte": "braco",
+    "medida": "largura",
+    "em": 600
+   },
+   {
+    "parte": "braco",
+    "medida": "altura",
+    "origem": {
+     "imagem": "frontal"
+    },
+    "em": 175
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura",
+    "em": 40
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura",
+    "em": 850
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "altura",
+    "em": -140
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura",
+    "em": 965
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura",
+    "em": 805,
+    "numero": [
+     0,
+     -30
+    ]
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura",
+    "em": 250,
+    "numero": [
+     0,
+     40
+    ]
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura",
+    "em": 955
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura",
+    "em": 630
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura",
+    "em": 575
+   },
+   {
+    "parte": "flange",
+    "medida": "largura",
+    "em": 575,
+    "numero": [
+     -120,
+     0
+    ]
+   },
+   {
+    "parte": "juntaCotovelo",
+    "medida": "largura",
+    "em": 880,
+    "numero": [
+     0,
+     0
+    ]
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "largura",
+    "em": 240
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura",
+    "em": 650,
+    "numero": [
+     130,
+     0
+    ]
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura",
+    "em": 500
+   }
+  ],
+  "nomes": {
+   "base": {
+    "marca": [
+     60,
+     120
+    ],
+    "coluna": "direita",
+    "nivel": 120
+   },
+   "caixaLateral": {
+    "marca": [
+     -145,
+     60
+    ],
+    "coluna": "esquerda",
+    "nivel": 60
+   },
+   "anelCintura": {
+    "marca": [
+     -40,
+     260
+    ],
+    "coluna": "esquerda",
+    "nivel": 260
+   },
+   "ombro": {
+    "marca": [
+     0,
+     380
+    ],
+    "coluna": "esquerda",
+    "nivel": 380
+   },
+   "braco": {
+    "marca": [
+     -40,
+     480
+    ],
+    "coluna": "esquerda",
+    "nivel": 480
+   },
+   "anelCotovelo": {
+    "marca": [
+     -80,
+     770
+    ],
+    "coluna": "esquerda",
+    "nivel": 770
+   },
+   "cotovelo": {
+    "marca": [
+     -60,
+     960
+    ],
+    "coluna": "esquerda",
+    "nivel": 1060
+   },
+   "juntaCotovelo": {
+    "marca": [
+     95,
+     935
+    ],
+    "coluna": "esquerda",
+    "nivel": 1080
+   },
+   "anelAntebraco": {
+    "marca": [
+     145,
+     950
+    ],
+    "coluna": "esquerda",
+    "nivel": 1130
+   },
+   "antebraco": {
+    "marca": [
+     300,
+     930
+    ],
+    "coluna": "esquerda",
+    "nivel": 1030
+   },
+   "carcacaPunho": {
+    "marca": [
+     600,
+     920
+    ],
+    "coluna": "direita",
+    "nivel": 930
+   },
+   "aneisPunho": {
+    "marca": [
+     660,
+     790
+    ],
+    "coluna": "direita",
+    "nivel": 790
+   },
+   "garfoPunho": {
+    "marca": [
+     660,
+     670
+    ],
+    "coluna": "direita",
+    "nivel": 670
+   },
+   "flange": {
+    "marca": [
+     700,
+     595
+    ],
+    "coluna": "direita",
+    "nivel": 595
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.png",
+  "nota": 6,
+  "defeitos": [
+   {
+    "parte": "antebraco",
+    "tipo": "cota",
+    "onde": "chamada do nome, trecho entre a coluna esquerda e o ponto",
+    "sentido": "sobreposta",
+    "evidencia": "Etapa 2: a chamada de antebraco cruza as chamadas de anelAntebraco e juntaCotovelo e a linha da cota 70, perto de x≈300-340 e y≈215-235"
+   },
+   {
+    "parte": "anelAntebraco",
+    "tipo": "cota",
+    "onde": "etiqueta do nome, coluna esquerda",
+    "sentido": "sobreposta",
+    "evidencia": "Etapa 3: as etiquetas anelAntebraco (y≈151) e juntaCotovelo (y≈165) ficam coladas e as chamadas correm juntas até x≈300-335"
+   },
+   {
+    "parte": "juntaCotovelo",
+    "tipo": "cota",
+    "onde": "número da largura 24",
+    "sentido": "sobreposta",
+    "evidencia": "Etapa 4: o número 24 (x≈298, y≈287) fica sobre a linha de contorno entre cotovelo e juntaCotovelo"
+   },
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "altura 477 (frontal)",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 7: a linha vertical em x≈354 vai de y≈368 a y≈700 e passa do fim do braço na lateral (y≈580), cobrindo ombro e anelCintura"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "altura 177 (frontal)",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 8: a linha em x≈320 vai de y≈587 a y≈740 e não coincide com os limites laterais do ombro, invadindo anelCintura"
+   },
+   {
+    "parte": "garfoPunho",
+    "tipo": "cota",
+    "onde": "linha da largura 103",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 13: a linha pontilhada de 103 sai do garfo pela direita até x≈755, sobre o contorno, e o número fica fora da parte, junto à chamada"
+   },
+   {
+    "parte": "flange",
+    "tipo": "cota",
+    "onde": "altura do disco",
+    "sentido": "faltando",
+    "evidencia": "Etapa 14: a flange (y≈483-512) não tem cota vertical, e a espessura do disco é medida essencial"
+   }
+  ],
+  "observacao": "O contorno segue o alvo sem desvio de forma visível, e os defeitos estão na anotação: chamadas cruzadas no canto superior esquerdo e alturas tiradas da vista frontal que não medem a parte na vista lateral."
+ }
+}
