@@ -1,0 +1,330 @@
+{
+ "numero": 3,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura",
+    "em": 60
+   },
+   {
+    "parte": "base",
+    "medida": "altura",
+    "em": -60
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura",
+    "em": -120
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura",
+    "em": 130
+   },
+   {
+    "parte": "ombro",
+    "medida": "largura",
+    "em": 286,
+    "origem": {
+     "imagem": "frontal"
+    },
+    "numero": [
+     230,
+     30
+    ],
+    "prevalece": "pessoa, 2026-09-26: a frontal vale; na lateral o braço cobre o topo do ombro e o ombro cobre o pé do braço",
+    "afasta": 16
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura",
+    "em": -190,
+    "origem": {
+     "imagem": "frontal"
+    },
+    "prevalece": "pessoa, 2026-09-26: a frontal vale; na lateral o braço cobre o topo do ombro e o ombro cobre o pé do braço"
+   },
+   {
+    "parte": "braco",
+    "medida": "largura",
+    "em": 600
+   },
+   {
+    "parte": "braco",
+    "medida": "altura",
+    "em": -230,
+    "origem": {
+     "imagem": "frontal"
+    },
+    "prevalece": "pessoa, 2026-09-26: a frontal vale; na lateral o braço cobre o topo do ombro e o ombro cobre o pé do braço"
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura",
+    "em": 40
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura",
+    "em": 850,
+    "numero": [
+     60,
+     0
+    ]
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "altura",
+    "em": -140
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura",
+    "em": 880
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura",
+    "em": 805,
+    "numero": [
+     0,
+     -30
+    ]
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura",
+    "em": 250,
+    "numero": [
+     0,
+     40
+    ]
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura",
+    "em": 840,
+    "numero": [
+     100,
+     0
+    ]
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura",
+    "em": 630
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura",
+    "em": 575
+   },
+   {
+    "parte": "flange",
+    "medida": "largura",
+    "em": 575,
+    "numero": [
+     0,
+     -40
+    ]
+   },
+   {
+    "parte": "juntaCotovelo",
+    "medida": "largura",
+    "em": 830,
+    "numero": [
+     30,
+     -50
+    ]
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "largura",
+    "em": 240
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura",
+    "em": 660
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura",
+    "em": 450
+   },
+   {
+    "parte": "flange",
+    "medida": "altura",
+    "em": 530
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "largura",
+    "em": 190,
+    "numero": [
+     -70,
+     0
+    ]
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "largura",
+    "em": 760,
+    "numero": [
+     100,
+     0
+    ]
+   }
+  ],
+  "nomes": {
+   "base": {
+    "marca": [
+     60,
+     120
+    ],
+    "coluna": "direita",
+    "nivel": 120
+   },
+   "caixaLateral": {
+    "marca": [
+     -145,
+     60
+    ],
+    "coluna": "esquerda",
+    "nivel": 60
+   },
+   "anelCintura": {
+    "marca": [
+     -40,
+     260
+    ],
+    "coluna": "esquerda",
+    "nivel": 240
+   },
+   "ombro": {
+    "marca": [
+     90,
+     345
+    ],
+    "coluna": "direita",
+    "nivel": 345
+   },
+   "braco": {
+    "marca": [
+     40,
+     540
+    ],
+    "coluna": "direita",
+    "nivel": 500
+   },
+   "anelCotovelo": {
+    "marca": [
+     -80,
+     770
+    ],
+    "coluna": "esquerda",
+    "nivel": 770
+   },
+   "cotovelo": {
+    "marca": [
+     -60,
+     960
+    ],
+    "coluna": "esquerda",
+    "nivel": 1100
+   },
+   "juntaCotovelo": {
+    "marca": [
+     97,
+     925
+    ],
+    "coluna": "direita",
+    "nivel": 1300
+   },
+   "anelAntebraco": {
+    "marca": [
+     150,
+     930
+    ],
+    "coluna": "direita",
+    "nivel": 1200
+   },
+   "antebraco": {
+    "marca": [
+     300,
+     930
+    ],
+    "coluna": "direita",
+    "nivel": 1100
+   },
+   "carcacaPunho": {
+    "marca": [
+     600,
+     920
+    ],
+    "coluna": "direita",
+    "nivel": 930
+   },
+   "aneisPunho": {
+    "marca": [
+     660,
+     790
+    ],
+    "coluna": "direita",
+    "nivel": 790
+   },
+   "garfoPunho": {
+    "marca": [
+     660,
+     700
+    ],
+    "coluna": "direita",
+    "nivel": 700
+   },
+   "flange": {
+    "marca": [
+     700,
+     595
+    ],
+    "coluna": "direita",
+    "nivel": 595
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "anelAntebraco",
+    "tipo": "cota",
+    "onde": "altura (diâmetro vertical do anel)",
+    "sentido": "faltando",
+    "evidencia": "Etapa 7: prancha, anel entre x 367-416, y 355-460; só existe a largura 69 em y≈409, nenhuma linha vertical"
+   },
+   {
+    "parte": "juntaCotovelo",
+    "tipo": "cota",
+    "onde": "altura",
+    "sentido": "faltando",
+    "evidencia": "Etapa 6: faixa estreita x 347-365, y 365-462; só a largura 24 com pontilhado até (377,475), sem medida vertical"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "largura 202 (frontal, prevalece)",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 14: linha da 202 corre sobre a aresta superior de anelCintura em y≈821, x 222-360, e lê como largura de anelCintura, cuja cota 199 está logo abaixo"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "altura 177 (frontal, prevalece)",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 14: linha vertical em x≈158, y 703-828, paralela e colada à 477 de braco na coluna esquerda e longe do ombro (x≈345-360); não fica claro a qual parte pertence"
+   }
+  ],
+  "observacao": "O contorno segue o alvo em todas as partes; as falhas estão nas cotas, com duas alturas de anel/junta ausentes e as duas cotas frontais do ombro ambíguas por estarem junto de partes vizinhas."
+ }
+}
