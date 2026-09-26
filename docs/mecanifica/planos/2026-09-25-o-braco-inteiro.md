@@ -219,6 +219,14 @@ A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
 que faltam e do ombro refeito. A `lateral.png` fica como está, porque as
 receitas já fixas e a variação `ombro-tambor` a citam.
 
+Em 2026-09-26 a ampliação por rede treinada foi medida em CPU sobre a frontal
+e a lateral sem cabo. O Real-ESRGAN general-x4v3 levou 9 s e o x4plus cerca
+de 3 min por imagem. Nenhum dos dois superou a ampliação por vizinho mais
+próximo na proximidade da borda: melhoraram os anéis do punho e pioraram o
+antebraço e a junta do cotovelo, que caiu de 0,89 para 0,70–0,80, porque a
+rede inventa traço na tampa e na carcaça. A ampliação não entrou na
+ferramenta; peça de 16 px pede referência de resolução maior.
+
 ## Feito na fatia 1
 
 `src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde
