@@ -227,6 +227,16 @@ antebraço e a junta do cotovelo, que caiu de 0,89 para 0,70–0,80, porque a
 rede inventa traço na tampa e na carcaça. A ampliação não entrou na
 ferramenta; peça de 16 px pede referência de resolução maior.
 
+No mesmo dia a pessoa liberou por algumas horas uma chave do Gemini, e o
+redesenho em 4x foi medido pela silhueta reduzida à escala original. A
+imagem inteira reprovou nos dois modelos (pro e flash): o objeto encolheu
+cerca de 1% e bordas andaram até 20 px. Em recorte pequeno a silhueta ficou
+a até 1 px, e o flash deu a melhor proximidade de borda nas peças pequenas,
+mas os dois inventaram costuras, aletas e parafusos que a imagem não tem.
+Custou cerca de R$ 10. Não entrou na ferramenta; se voltar, entra só em
+recorte, com a silhueta a até 1 px como gate, e as linhas internas continuam
+vindo da imagem original.
+
 ## Feito na fatia 1
 
 `src/autoria/porta-confere-forma.js` mede, na peça executada, se a face de onde
