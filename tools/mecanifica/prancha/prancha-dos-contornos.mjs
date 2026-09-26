@@ -39,11 +39,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { prancha, imprimirRelatorio, colisoesDoDesenho } from './prancha.mjs';
+import { prancha, imprimirRelatorio, examinarDesenho } from './prancha.mjs';
 import { acaoDaPasta, aceitar, registrarRodada, novaSerie } from '../rodadas-com-critico.mjs';
 import { empilharColuna } from '../../../modulos/contorno-da-imagem/src/index.js';
 
 const TELA = { largura: 1200, altura: 900 };
+/* Quanto a medida de outra vista pode passar da seção que esta vista mostra
+   da parte: 3% da medida ou 5 mm, o que for maior. É a folga do contorno
+   tirado da imagem, que erra alguns pixels em cada borda. */
+export const TOLERANCIA_ENTRE_VISTAS = { fracao: 0.03, mm: 5 };
 const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
 
 export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos contornos da imagem', fonte = 'imagem de referência', escolhas = {}, lerVista = null } = {}) {
@@ -100,8 +104,8 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
      qualquer vista de frente ou de lado; largura é a extensão horizontal da
      parte na outra vista. A linha sai da borda de baixo (altura) ou da
      esquerda (largura) da parte visível, em `em` quando declarado. */
-  const cotaDeOutraVista = (cota, [bz0, bz1, by0, by1]) => {
-    const { parte, medida, origem, em, afasta, numero } = cota;
+  const cotaDeOutraVista = (cota, [bz0, bz1, by0, by1], pts) => {
+    const { parte, medida, origem, em, afasta, numero, de } = cota;
     const dono = `${parte}.${medida}`;
     if (medida !== 'largura' && medida !== 'altura') throw new Error(`a cota '${dono}' com origem em outra vista mede largura ou altura.`);
     if (!origem.imagem) throw new Error(`a cota '${dono}' declara origem e precisa de origem.imagem.`);
@@ -116,12 +120,39 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     const valor = Math.max(...vs) - Math.min(...vs);
     const texto = `${mm(valor)} (${origem.imagem})`;
     const extra = numero ? { numero: px(numero) } : {};
-    if (medida === 'altura') {
-      const zc = em ?? bz1;
-      return { vista: 'lateral', dono, de: [zc, by0], ate: [zc, by0 + valor], desloca: [(afasta ?? 0) * escala, 0], texto, origem: origem.imagem, ...extra };
-    }
-    const yc = em ?? by0;
-    return { vista: 'lateral', dono, de: [bz0, yc], ate: [bz0 + valor, yc], desloca: [0, -(afasta ?? 0) * escala], texto, origem: origem.imagem, ...extra };
+    /* Antes de desenhar, a medida de fora é conferida contra o que esta vista
+       mostra da parte na linha onde a cota vai. A linha começa em `de` (a
+       posição em mm ao longo da medida, 'inicio' ou 'fim' da seção; padrão
+       'inicio') e tem de caber na seção da parte com a tolerância de
+       TOLERANCIA_ENTRE_VISTAS. Quando a seção desta vista é maior ou igual
+       à medida de fora, as vistas só concordam se a linha cabe; quando é
+       menor, a parte aparece inteira aqui com outro tamanho ou está
+       escondida em parte, e nos dois casos a linha sairia da parte e
+       cobriria a vizinha. A primeira versão desenhava sempre a partir do pé
+       da parte, e a altura de 477 mm do braço na frontal passou do topo dele
+       na lateral, onde ele mostra uns 456 mm, cobrindo ombro e anelCintura. */
+    const vert = medida === 'altura';
+    const pos = em ?? (vert ? bz1 : by0);
+    const eixoNome = vert ? 'z' : 'y';
+    /* `em` fora da parte põe a cota ao lado dela, como cota externa que
+       mede a parte de ponta a ponta; aí a medida de fora tem de bater com a
+       extensão inteira que esta vista mostra, nos dois sentidos. `em` dentro
+       mede a seção ali, e a linha só precisa caber nela. */
+    const corte = secao(pts, vert ? 'z' : 'y', pos);
+    const externa = !corte;
+    const [s0, s1] = corte ?? (vert ? [by0, by1] : [bz0, bz1]);
+    const visivel = s1 - s0;
+    const tol = Math.max(TOLERANCIA_ENTRE_VISTAS.fracao * valor, TOLERANCIA_ENTRE_VISTAS.mm);
+    const inicio = de === undefined || de === 'inicio' ? s0 : de === 'fim' ? s1 - valor : de;
+    if (!Number.isFinite(inicio)) throw new Error(`o de da cota '${dono}' é 'inicio', 'fim' ou a posição em mm, e veio '${de}'.`);
+    const fim = inicio + valor;
+    const onde = externa ? `de ponta a ponta (cota externa em ${eixoNome} = ${mm(pos)})` : `em ${eixoNome} = ${mm(pos)}`;
+    const recusa = (porque) => new Error(`a cota '${dono}' tirada da vista '${origem.imagem}' ${porque}. Use medivel: false com motivo, ou meça em outro lugar.`);
+    if (visivel + tol < valor) throw recusa(`sairia da parte e cobriria a vizinha: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(valor - visivel)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam ou a parte está escondida em parte aqui`);
+    if (externa && valor + tol < visivel) throw recusa(`não bate com a parte: a vista '${origem.imagem}' dá ${mm(valor)} mm e esta mostra ${mm(visivel)} mm de '${parte}' ${onde}, diferença de ${mm(visivel - valor)} mm acima da tolerância de ${mm(tol)} mm; as vistas discordam, e a cota ao lado da parte não diz onde ela começa`);
+    if (inicio < s0 - tol || fim > s1 + tol) throw recusa(`sairia da parte: a linha iria de ${mm(inicio)} a ${mm(fim)} mm e '${parte}' vai de ${mm(s0)} a ${mm(s1)} mm ${onde}; declare de (inicio, fim ou a posição em mm) para ela caber`);
+    if (vert) return { vista: 'lateral', dono, de: [pos, inicio], ate: [pos, fim], desloca: [(afasta ?? 0) * escala, 0], texto, origem: origem.imagem, ...extra };
+    return { vista: 'lateral', dono, de: [inicio, pos], ate: [fim, pos], desloca: [0, -(afasta ?? 0) * escala], texto, origem: origem.imagem, ...extra };
   };
   const cotasDasPartes = (escolhas.cotas ?? []).flatMap((cota) => {
     const { parte, medida, lado, em, de, ate, afasta, numero, medivel, motivo, notaEm, origem } = cota;
@@ -130,7 +161,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     const dono = `${parte}.${medida}`;
     const zs = pts.map(([z]) => z); const ys = pts.map(([, y]) => y);
     const [bz0, bz1, by0, by1] = [Math.min(...zs), Math.max(...zs), Math.min(...ys), Math.max(...ys)];
-    if (origem) return [cotaDeOutraVista(cota, [bz0, bz1, by0, by1])];
+    if (origem) return [cotaDeOutraVista(cota, [bz0, bz1, by0, by1], pts)];
     if (medivel === false) {
       faltas.push({ dono, motivo: motivo ?? '' });
       if (!motivo) throw new Error(`a cota '${dono}' diz medivel: false e precisa de motivo.`);
@@ -212,6 +243,12 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
    marca, para a chamada inclinar e passar por cima ou por baixo de uma cota.
    O `em` da versão anterior deixou de posicionar o nome e é ignorado. */
 export const PASSO_DOS_NOMES = 13;
+/* Quando duas marcas da mesma coluna ficam a menos de MARCAS_PROXIMAS px
+   uma da outra, as chamadas saem quase do mesmo ponto e, com nomes a 13 px,
+   correm coladas até a coluna; a coluna inteira passa então ao passo
+   PASSO_DOS_NOMES_PROXIMOS, que abre o leque. */
+export const PASSO_DOS_NOMES_PROXIMOS = 20;
+export const MARCAS_PROXIMAS = 40;
 const CORPO_DO_NOME = 9.5;
 const larguraDoNome = (nome) => nome.length * CORPO_DO_NOME * 0.58;
 
@@ -264,7 +301,9 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
   for (const col of ['esquerda', 'direita']) {
     const lista = itens.filter((i) => i.coluna === col);
     for (const i of lista) i.alvo = sy(i.nivel ?? i.marca[1]) + 3;
-    empilharColuna(lista, colunaX[col], { passo: PASSO_DOS_NOMES, desvio: -3, ponto: (i) => [sx(i.marca[0]), sy(i.marca[1])] });
+    const ponto = (i) => [sx(i.marca[0]), sy(i.marca[1])];
+    const proximas = lista.some((a, k) => lista.slice(k + 1).some((b) => Math.hypot(ponto(a)[0] - ponto(b)[0], ponto(a)[1] - ponto(b)[1]) < MARCAS_PROXIMAS));
+    empilharColuna(lista, colunaX[col], { passo: proximas ? PASSO_DOS_NOMES_PROXIMOS : PASSO_DOS_NOMES, desvio: -3, ponto });
     colunas[col] = lista.slice().sort((a, b) => a.ty - b.ty).map((i) => i.nome);
   }
   const larguraMax = (col) => Math.max(0, ...itens.filter((i) => i.coluna === col).map((i) => larguraDoNome(i.nome)));
@@ -375,9 +414,12 @@ async function principal(argv) {
   const textoFaltas = faltas.length ? `${faltas.length} medida(s) em falta, com nota e sem número:\n${faltas.map((f) => `  FALTA ${f.dono}: ${f.motivo}`).join('\n')}\n  declare origem: { imagem: '<outra vista>' } quando outra referência mostrar a medida.\n` : '';
   /* A prancha só se entrega com zero colisões: o código de saída 3 impede o
      agente de devolver texto atropelado achando que está pronto. */
-  const colisoes = colisoesDoDesenho(desenho);
-  const lista = colisoes.map((c) => `  COLISÃO ${c.tipo}: ${c.a} × ${c.b}`).join('\n');
-  process.stdout.write(`${imprimirRelatorio(relatorio)}\n${colisoes.length} colisão(ões) de texto${lista ? `\n${lista}` : ''}\n${textoFaltas}prancha gravada em ${base}.prancha.svg e ${base}.prancha.png\nroteiro do crítico em ${join(pacote, 'roteiro.md')}\n`);
+  const { colisoes, avisos } = examinarDesenho(desenho);
+  const lista = [
+    ...colisoes.map((c) => `  COLISÃO ${c.tipo}: ${c.a} × ${c.b}${c.px ? ` (${c.px} px)` : ''}`),
+    ...avisos.map((c) => `  AVISO ${c.tipo}: ${c.a} × ${c.b} — ${c.motivo}`),
+  ].join('\n');
+  process.stdout.write(`${imprimirRelatorio(relatorio)}\n${colisoes.length} colisão(ões), ${avisos.length} aviso(s)${lista ? `\n${lista}` : ''}\n${textoFaltas}prancha gravada em ${base}.prancha.svg e ${base}.prancha.png\nroteiro do crítico em ${join(pacote, 'roteiro.md')}\n`);
   return colisoes.length ? 3 : 0;
 }
 

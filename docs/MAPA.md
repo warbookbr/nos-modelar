@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-797 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+798 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -522,6 +522,10 @@
 ## procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.pacote/
 
 - `roteiro.md` — Roteiro da análise
+
+## procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.prancha.pacote/
+
+- `roteiro.md` — Roteiro da crítica da prancha
 
 ## procedural/pecas/braco-robotico/referencias/lateral.pacote/
 

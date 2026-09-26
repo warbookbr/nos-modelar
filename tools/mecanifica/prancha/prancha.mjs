@@ -365,7 +365,9 @@ export function prancha(spec) {
   }
   for (const c of camadas) {
     const p = proj[c.vista];
-    linha(c.nome ?? 'contorno', 'contorno', c.pl.map((q) => p(q)));
+    /* `parte` marca o contorno de uma parte com nome, que o detector usa para
+       saber por onde passa cada cota e cada chamada; a silhueta não é parte. */
+    desenho.linhas.push({ dono: c.nome ?? 'contorno', tipo: 'contorno', pts: c.pl.map((q) => p(q)), ...(c.nome && !c.contorno && c.fechado ? { parte: true } : {}) });
   }
 
   for (const [i, c] of (spec.cotas ?? []).entries()) {
@@ -374,7 +376,7 @@ export function prancha(spec) {
     const [ax, ay] = p(c.de); const [bx, by] = p(c.ate);
     const dx = c.desloca?.[0] ?? 0; const dy = c.desloca?.[1] ?? 0;
     put(`<path class="cota" d="M ${n(ax + dx)} ${n(ay + dy)} L ${n(bx + dx)} ${n(by + dy)}"/>`);
-    linha(dono, 'cota', [[ax + dx, ay + dy], [bx + dx, by + dy]]);
+    desenho.linhas.push({ dono, tipo: 'cota', pts: [[ax + dx, ay + dy], [bx + dx, by + dy]], ...(dx || dy ? { deslocada: true } : {}) });
     const mx = (ax + bx) / 2 + dx; const my = (ay + by) / 2 + dy;
     const vert = Math.abs(bx - ax) < Math.abs(by - ay);
     /* `numero` tira o número do meio da linha, em pixel de tela, com uma
@@ -463,10 +465,55 @@ function segmentoCruzaCaixa([ax, ay], [bx, by], [x0, y0, x1, y1]) {
    sobrepõem e todo texto que uma linha de outro dono atravessa. A linha de
    chamada de um nome e a linha de uma cota são do mesmo dono que o texto
    delas; contorno de parte nunca é, porque número em cima de borda não se
-   lê. O marcador de uma parte não colide com o nome dela. */
+   lê. O marcador de uma parte não colide com o nome dela. Devolve só as
+   colisões; `examinarDesenho` devolve também os avisos. */
 export function colisoesDoDesenho(desenho) {
+  return examinarDesenho(desenho).colisoes;
+}
+
+/* Limiares do detector, em pixel de tela. Número de cota ganha folga em
+   volta da caixa estimada contra contorno, porque a caixa é estimativa e o
+   crítico acusou um "24" encostado na borda entre duas partes que a caixa
+   exata não tocava. Duas chamadas a menos de CHAMADA_COLADA uma da outra
+   ao longo de mais de TRECHO_COLADO correm juntas e se confundem. A marca
+   de um nome a menos de MARCA_NA_BORDA da borda da parte fica sobre a linha
+   que divide duas partes. Uma cota ou chamada que passa mais de
+   INVASAO_MIN por dentro de outra parte invade essa parte. Chamadas quase
+   paralelas (menos de PARALELAS_GRAUS entre elas) a menos de
+   PARALELAS_DIST uma da outra ao longo de mais de PARALELAS_TRECHO também
+   correm juntas: na lateral do braço, anelAntebraco e juntaCotovelo
+   saíam a 14 a 23 px, com 3 graus entre si, e o crítico as leu como uma. */
+export const DETECTOR = { FOLGA_DO_NUMERO: 2, CHAMADA_COLADA: 5, TRECHO_COLADO: 12, MARCA_NA_BORDA: 3, INVASAO_MIN: 4, PARALELAS_GRAUS: 8, PARALELAS_DIST: 16, PARALELAS_TRECHO: 40 };
+
+const direcao = (pts) => Math.atan2(pts[pts.length - 1][1] - pts[0][1], pts[pts.length - 1][0] - pts[0][0]);
+const anguloEntre = (a, b) => { let d = Math.abs(direcao(a) - direcao(b)) % Math.PI; if (d > Math.PI / 2) d = Math.PI - d; return (d * 180) / Math.PI; };
+
+const distPontoSeg = ([px, py], [ax, ay], [bx, by]) => {
+  const dx = bx - ax; const dy = by - ay; const L = dx * dx + dy * dy;
+  const t = L ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L)) : 0;
+  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
+};
+const distPontoPoli = (p, pts) => { let d = Infinity; for (let k = 1; k < pts.length; k += 1) d = Math.min(d, distPontoSeg(p, pts[k - 1], pts[k])); return d; };
+/* Pontos da polilinha a cada `passo` px, com o comprimento que cada um representa. */
+function amostrarLinha(pts, passo = 1) {
+  const saida = [];
+  for (let k = 1; k < pts.length; k += 1) {
+    const [ax, ay] = pts[k - 1]; const [bx, by] = pts[k];
+    const L = Math.hypot(bx - ax, by - ay); const m = Math.max(1, Math.ceil(L / passo));
+    for (let i = 0; i < m; i += 1) saida.push({ p: [ax + ((i + 0.5) / m) * (bx - ax), ay + ((i + 0.5) / m) * (by - ay)], l: L / m });
+  }
+  return saida;
+}
+/* Comprimento da linha que corre por dentro da parte, longe da borda dela. */
+const trechoDentro = (amostras, poli, folga) => amostras.reduce((s, { p, l }) => s + (G.dentro(p, poli) && distPontoPoli(p, poli) > folga ? l : 0), 0);
+
+export function examinarDesenho(desenho) {
   const colisoes = [];
+  const avisos = [];
   const T = desenho.textos;
+  const D = DETECTOR;
+  const partes = desenho.linhas.filter((l) => l.parte);
+  const parteDe = (dono) => partes.find((q) => q.dono === String(dono).split('.')[0]);
   const sobrepoe = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
   for (let i = 0; i < T.length; i += 1) {
     for (let j = i + 1; j < T.length; j += 1) {
@@ -479,15 +526,17 @@ export function colisoesDoDesenho(desenho) {
     if (t.tipo === 'marcador') continue;
     for (const l of desenho.linhas) {
       if (l.tipo !== 'contorno' && l.dono === t.dono) continue;
-      if (l.pts.some((p, k) => k > 0 && segmentoCruzaCaixa(l.pts[k - 1], p, t.caixa))) {
-        colisoes.push({ tipo: t.tipo === 'cota' ? 'linha sobre número' : 'linha sobre texto', a: `${t.tipo} "${t.texto}" (${t.dono})`, b: `${l.tipo} de ${l.dono}` });
+      const f = t.tipo === 'cota' && l.tipo === 'contorno' ? D.FOLGA_DO_NUMERO : 0;
+      const caixa = [t.caixa[0] - f, t.caixa[1] - f, t.caixa[2] + f, t.caixa[3] + f];
+      if (l.pts.some((p, k) => k > 0 && segmentoCruzaCaixa(l.pts[k - 1], p, caixa))) {
+        colisoes.push({ tipo: t.tipo === 'cota' ? (l.parte ? 'número sobre contorno' : 'linha sobre número') : 'linha sobre texto', a: `${t.tipo} "${t.texto}" (${t.dono})`, b: `${l.tipo} de ${l.dono}` });
       }
     }
   }
   /* Linha contra linha: chamada cruzando chamada, cota passando sobre
-     chamada ou sobre outra cota. Contorno fica de fora, porque toda chamada
-     sai de dentro de uma parte e atravessa bordas por construção; o que se
-     confunde na leitura é uma linha de anotação cruzando outra. */
+     chamada ou sobre outra cota. Contorno fica de fora aqui, porque toda
+     chamada sai de dentro de uma parte e atravessa bordas por construção; a
+     passagem por dentro de outra parte é medida adiante. */
   const anot = desenho.linhas.filter((l) => l.tipo !== 'contorno');
   for (let i = 0; i < anot.length; i += 1) {
     for (let j = i + 1; j < anot.length; j += 1) {
@@ -497,10 +546,57 @@ export function colisoesDoDesenho(desenho) {
          qualquer par de cotas de desenho técnico; entre partes diferentes, não. */
       if (A.tipo === 'cota' && B.tipo === 'cota' && A.dono.split('.')[0] === B.dono.split('.')[0]) continue;
       const cruza = A.pts.some((p, k) => k > 0 && B.pts.some((q, m) => m > 0 && segmentosSeCruzam(A.pts[k - 1], p, B.pts[m - 1], q)));
-      if (cruza) colisoes.push({ tipo: A.tipo === 'chamada' && B.tipo === 'chamada' ? 'chamada sobre chamada' : 'linha sobre linha', a: `${A.tipo} de ${A.dono}`, b: `${B.tipo} de ${B.dono}` });
+      if (cruza) { colisoes.push({ tipo: A.tipo === 'chamada' && B.tipo === 'chamada' ? 'chamada sobre chamada' : 'linha sobre linha', a: `${A.tipo} de ${A.dono}`, b: `${B.tipo} de ${B.dono}` }); continue; }
+      /* Chamadas que não se cruzam mas correm coladas, quase paralelas, se
+         leem como uma linha só. */
+      if (A.tipo === 'chamada' && B.tipo === 'chamada') {
+        const amostras = amostrarLinha(A.pts);
+        const colado = amostras.reduce((s, { p, l }) => s + (distPontoPoli(p, B.pts) < D.CHAMADA_COLADA ? l : 0), 0);
+        const paralelo = anguloEntre(A.pts, B.pts) < D.PARALELAS_GRAUS
+          ? amostras.reduce((s, { p, l }) => s + (distPontoPoli(p, B.pts) < D.PARALELAS_DIST ? l : 0), 0) : 0;
+        if (colado > D.TRECHO_COLADO || paralelo > D.PARALELAS_TRECHO) colisoes.push({ tipo: 'chamadas coladas', a: `chamada de ${A.dono}`, b: `chamada de ${B.dono}`, px: n(Math.max(colado, paralelo)) });
+      }
     }
   }
-  return colisoes;
+  /* Cota e chamada contra as partes. A cota de uma parte que passa por
+     dentro de outra mede a vizinha junto; a chamada de um nome que atravessa
+     outra parte aponta para ela no caminho. Cota geral e de dono sem parte
+     desenhada ficam de fora. */
+  for (const l of anot) {
+    const propria = parteDe(l.dono);
+    if (!propria) continue;
+    const amostras = amostrarLinha(l.pts);
+    const invadidas = partes.filter((q) => q !== propria && trechoDentro(amostras, q.pts, 1.5) > D.INVASAO_MIN).map((q) => q.dono);
+    if (l.tipo === 'cota') {
+      /* Cota desenhada onde mede, sem afastamento, que sai da própria parte
+         e corre colada ao contorno de outra ou da silhueta se confunde com a
+         borda; o trecho que só atravessa um vão da parte côncava não conta. */
+      if (!l.deslocada) {
+        const outras = desenho.linhas.filter((q) => q.tipo === 'contorno' && q !== propria);
+        const sobre = amostras.reduce((s, { p, l: c }) => s + (!G.dentro(p, propria.pts) && distPontoPoli(p, propria.pts) > D.MARCA_NA_BORDA && outras.some((q) => distPontoPoli(p, q.pts) < D.CHAMADA_COLADA / 2) ? c : 0), 0);
+        if (sobre > D.TRECHO_COLADO) colisoes.push({ tipo: 'cota sai da parte sobre contorno', a: `cota de ${l.dono}`, b: `${n(sobre)} px fora de ${propria.dono}, colada a outro contorno`, px: n(sobre) });
+      }
+      if (invadidas.length) colisoes.push({ tipo: 'cota sobre outra parte', a: `cota de ${l.dono}`, b: invadidas.join(', ') });
+      continue;
+    }
+    const ehNome = !String(l.dono).includes('.');
+    if (ehNome) {
+      const marca = l.pts[0];
+      const borda = distPontoPoli(marca, propria.pts);
+      if (!G.dentro(marca, propria.pts) || borda < D.MARCA_NA_BORDA) colisoes.push({ tipo: 'marca fora da parte', a: `chamada de ${l.dono}`, b: G.dentro(marca, propria.pts) ? `a ${n(borda)} px da borda` : 'marca fora do contorno' });
+    }
+    if (!invadidas.length) continue;
+    /* Parte cercada por outras dos dois lados não tem saída limpa: a
+       chamada atravessa alguém de qualquer jeito, e isso fica como aviso. A
+       prova é a reta horizontal da marca até cada lado do desenho. */
+    const marca = l.pts[0];
+    const xs = partes.flatMap((q) => q.pts.map(([x]) => x));
+    const saida = (x) => amostrarLinha([marca, [x, marca[1]]]);
+    const livre = [Math.min(...xs) - 10, Math.max(...xs) + 10].some((x) => partes.every((q) => q === propria || trechoDentro(saida(x), q.pts, 1.5) <= D.INVASAO_MIN));
+    const registro = { tipo: 'chamada atravessa parte', a: `chamada de ${l.dono}`, b: invadidas.join(', ') };
+    if (livre || !ehNome) colisoes.push(registro); else avisos.push({ ...registro, motivo: `${l.dono} não tem saída horizontal livre para nenhum dos lados` });
+  }
+  return { colisoes, avisos };
 }
 
 /* Cruzamento próprio de dois segmentos; tocar na ponta não conta. */

@@ -35,7 +35,14 @@ e de cada nome em `<imagem>.prancha.json`, usa `medivel: false` com motivo
 onde uma parte esconde a outra e confere em recorte ampliado a região de cada
 cota. Não aceite a devolução se `npm run contorno:prancha` sair com código
 diferente de zero: ele sai com 3 enquanto houver texto sobreposto ou cruzado
-por linha que não é a dele, e o crítico não recebe prancha com colisão.
+por linha que não é a dele, número sobre contorno de parte, chamadas coladas
+ou quase paralelas juntas, cota que invade outra parte ou sai da sua sobre
+outro contorno, marca de nome na borda da parte e chamada que atravessa outra
+parte tendo saída livre, e o crítico não recebe prancha com colisão. Chamada
+de parte cercada dos dois lados sai como aviso. Cota com `origem` cuja
+medida discorda desta vista além de 3% ou 5 mm, ou cuja linha sairia da
+parte, é recusada com código 1 antes de desenhar; o desenhista escolhe outro
+`em`, declara `de` ou passa a `medivel: false`.
 
 **Crítico.** Despache o `critico-visual` com a imagem de referência como alvo,
 `<imagem>.prancha.png` como modelo e o roteiro

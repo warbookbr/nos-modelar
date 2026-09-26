@@ -2,8 +2,8 @@
    contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { prancha, colisoesDoDesenho } from './prancha.mjs';
-import { specDosContornos, roteiroDaPrancha } from './prancha-dos-contornos.mjs';
+import { prancha, colisoesDoDesenho, examinarDesenho } from './prancha.mjs';
+import { specDosContornos, roteiroDaPrancha, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
 
 const escolhasDoBraco = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.prancha.json', import.meta.url), 'utf8'));
 const contornos = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.contornos.json', import.meta.url), 'utf8'));
@@ -111,14 +111,16 @@ describe('prancha dos contornos', () => {
   });
 
   it('medida de outra vista vira cota com a origem, e a nota sem medida fica em falta', () => {
-    const frontal = { regioes: { ombro: { contornoMm: [[-50, 280], [50, 280], [50, 470], [-50, 470]] } } };
+    const frontal = { regioes: { ombro: { contornoMm: [[-50, 280], [50, 280], [50, 460], [-50, 460]] } } };
     const spec = specDosContornos(contornos, { escolhas: { cotas: [
-      { parte: 'ombro', medida: 'altura', origem: { imagem: 'frontal' } },
+      { parte: 'ombro', medida: 'altura', em: 150, origem: { imagem: 'frontal' } },
       { parte: 'braco', medida: 'altura', medivel: false, motivo: 'escondido' },
     ] }, lerVista: (n) => (n === 'frontal' ? frontal : null) });
     const c = spec.cotas.find((x) => x.dono === 'ombro.altura');
-    expect(c.texto).toBe('190 (frontal)');
-    expect(c.ate[1] - c.de[1]).toBeCloseTo(190, 6);
+    expect(c.texto).toBe('180 (frontal)');
+    expect(c.ate[1] - c.de[1]).toBeCloseTo(180, 6);
+    /* Cota externa (em fora da parte) começa no pé da parte visível. */
+    expect(c.de[1]).toBeCloseTo(Math.min(...contornos.regioes.ombro.contornoMm.map(([, y]) => y)), 6);
     expect(spec.resumo.faltas).toEqual([{ dono: 'braco.altura', motivo: 'escondido' }]);
   });
 
@@ -137,8 +139,84 @@ describe('prancha dos contornos', () => {
     expect(r).toMatch(/linhas livres/);
   });
 
-  it('a prancha declarada do braço sai com zero colisões', () => {
+  it('recusa a medida de outra vista que discorda desta além da tolerância', () => {
+    const alt = (h) => ({ regioes: { ombro: { contornoMm: [[-50, 0], [50, 0], [50, h], [-50, h]] } } });
+    const cota = (extra) => specDosContornos(contornos, { escolhas: { cotas: [{ parte: 'ombro', medida: 'altura', origem: { imagem: 'frontal' }, ...extra }] }, lerVista: () => alt(200) });
+    /* 200 contra os 183 da lateral, como os 477 contra 456 do braço: externa ou na seção, a linha sairia da parte. */
+    expect(() => cota({ em: 150 })).toThrow(/dá 200 mm e esta mostra 183 mm de 'ombro' de ponta a ponta.*vistas discordam/);
+    expect(() => cota({ em: 0 })).toThrow(/sairia da parte e cobriria a vizinha/);
+    /* Menor que a parte inteira ao lado dela também engana: não diz onde começa. */
+    expect(() => specDosContornos(contornos, { escolhas: { cotas: [{ parte: 'ombro', medida: 'altura', em: 150, origem: { imagem: 'frontal' } }] }, lerVista: () => alt(160) })).toThrow(/não bate com a parte/);
+  });
+
+  it('de escolhe onde a cota de outra vista começa, e recusa a linha que não cabe', () => {
+    const frontal = { regioes: { ombro: { contornoMm: [[-50, 0], [50, 0], [50, 100], [-50, 100]] } } };
+    /* Em z = 90 a lateral mostra o ombro de 276 a 457 mm. */
+    const y1 = 457;
+    const faz = (de) => specDosContornos(contornos, { escolhas: { cotas: [{ parte: 'ombro', medida: 'altura', em: 90, de, origem: { imagem: 'frontal' } }] }, lerVista: () => frontal }).cotas.find((x) => x.dono === 'ombro.altura');
+    const fim = faz('fim');
+    expect(fim.ate[1] - fim.de[1]).toBeCloseTo(100, 6);
+    expect(fim.ate[1]).toBeCloseTo(y1, 0);
+    expect(faz(330).de[1]).toBe(330);
+    expect(() => faz(420)).toThrow(/sairia da parte: a linha iria de 420 a 520/);
+  });
+
+  it('acusa chamadas coladas, número sobre contorno, cota sobre outra parte, marca na borda e chamada que atravessa parte', () => {
+    const quad = (dono, x0, y0, x1, y1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]] });
+    const desenho = {
+      textos: [{ dono: 'a.largura', tipo: 'cota', texto: '24', caixa: [96, 40, 104, 49] }],
+      linhas: [
+        quad('a', 0, 0, 100, 100), quad('b', 100, 0, 200, 100), quad('c', 0, 100, 200, 200),
+        { dono: 'x', tipo: 'chamada', pts: [[300, 10], [500, 20]] },
+        { dono: 'y', tipo: 'chamada', pts: [[300, 20], [500, 32]] },
+        { dono: 'a.altura', tipo: 'cota', pts: [[50, 10], [50, 150]] },
+        { dono: 'a', tipo: 'chamada', pts: [[50, 1], [-60, 1]] },
+        { dono: 'b', tipo: 'chamada', pts: [[150, 50], [-60, 50]] },
+      ],
+    };
+    const { colisoes } = examinarDesenho(desenho);
+    const tipos = colisoes.map((c) => c.tipo);
+    expect(tipos).toContain('chamadas coladas');
+    expect(tipos).toContain('número sobre contorno');
+    expect(colisoes.find((c) => c.tipo === 'cota sobre outra parte')).toMatchObject({ a: 'cota de a.altura', b: 'c' });
+    expect(colisoes.find((c) => c.tipo === 'marca fora da parte')).toMatchObject({ a: 'chamada de a' });
+    /* b tem saída livre pela direita, então atravessar a é colisão. */
+    expect(colisoes.find((c) => c.tipo === 'chamada atravessa parte')).toMatchObject({ a: 'chamada de b', b: 'a' });
+  });
+
+  it('chamada de parte cercada dos dois lados fica como aviso, e largura com altura da mesma parte segue permitida', () => {
+    const quad = (dono, x0, x1) => ({ dono, tipo: 'contorno', parte: true, pts: [[x0, 0], [x1, 0], [x1, 100], [x0, 100], [x0, 0]] });
+    const desenho = {
+      textos: [],
+      linhas: [
+        quad('esq', 0, 100), quad('meio', 100, 200), quad('dir', 200, 300),
+        { dono: 'meio', tipo: 'chamada', pts: [[150, 50], [-40, 20]] },
+        { dono: 'meio.largura', tipo: 'cota', pts: [[110, 30], [190, 30]] },
+        { dono: 'meio.altura', tipo: 'cota', pts: [[170, 5], [170, 95]] },
+      ],
+    };
+    const { colisoes, avisos } = examinarDesenho(desenho);
+    expect(colisoes).toEqual([]);
+    expect(avisos).toHaveLength(1);
+    expect(avisos[0]).toMatchObject({ tipo: 'chamada atravessa parte', a: 'chamada de meio', b: 'esq' });
+  });
+
+  it('abre o passo da coluna quando as marcas estão próximas', () => {
+    const spec = specDosContornos(contornos, { escolhas: { nomes: {
+      anelAntebraco: { marca: [155, 950], coluna: 'esquerda', nivel: 1000 },
+      antebraco: { marca: [170, 945], coluna: 'esquerda', nivel: 1000 },
+    } } });
+    const ys = ['anelAntebraco', 'antebraco'].map((id) => spec.landmarks.find((l) => l.id === id).rotuloEm[1]);
+    expect(Math.abs(ys[0] - ys[1]) * spec.escala).toBeGreaterThanOrEqual(PASSO_DOS_NOMES_PROXIMOS - 1e-6);
+  });
+
+  /* A prancha da série anterior do braço saía com zero colisões e o crítico
+     achava defeitos nela; o detector agora acusa esses defeitos sozinho. Ela
+     não é consertada aqui: será refeita numa série nova. */
+  it('a prancha declarada do braço da série anterior agora acusa os defeitos que só o crítico achava', () => {
     const { desenho } = prancha(specDosContornos(contornos, { escolhas: escolhasDoBraco }));
-    expect(colisoesDoDesenho(desenho)).toEqual([]);
+    const tipos = new Set(colisoesDoDesenho(desenho).map((c) => c.tipo));
+    for (const t of ['cota sobre outra parte', 'chamada atravessa parte', 'marca fora da parte', 'chamadas coladas']) expect(tipos).toContain(t);
+    expect([...tipos].filter((t) => t === 'texto sobre texto')).toEqual([]);
   });
 });
