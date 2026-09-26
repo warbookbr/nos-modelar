@@ -1,0 +1,317 @@
+{
+ "numero": 1,
+ "julgado": {
+  "cotas": [
+   {
+    "parte": "base",
+    "medida": "largura",
+    "em": 60
+   },
+   {
+    "parte": "base",
+    "medida": "altura",
+    "em": -60
+   },
+   {
+    "parte": "caixaLateral",
+    "medida": "altura",
+    "em": -120
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "altura",
+    "em": 130
+   },
+   {
+    "parte": "ombro",
+    "medida": "largura",
+    "medivel": false,
+    "motivo": "ombro só aparece em duas frestas dos lados do braço; a linha de largura cruzaria o braço",
+    "notaEm": [
+     -500,
+     -270
+    ]
+   },
+   {
+    "parte": "ombro",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "ombro fica atrás do braço nesta vista; a frontal dá 177 mm contra 187 mm aqui",
+    "notaEm": [
+     -500,
+     -170
+    ]
+   },
+   {
+    "parte": "braco",
+    "medida": "largura",
+    "em": 600
+   },
+   {
+    "parte": "braco",
+    "medida": "altura",
+    "medivel": false,
+    "motivo": "braço cobre o ombro e some sob o cotovelo; a frontal dá 477 mm contra 456 mm aqui",
+    "notaEm": [
+     -500,
+     -220
+    ]
+   },
+   {
+    "parte": "anelCotovelo",
+    "medida": "altura",
+    "em": 40
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "largura",
+    "em": 850,
+    "numero": [
+     60,
+     0
+    ]
+   },
+   {
+    "parte": "cotovelo",
+    "medida": "altura",
+    "em": -140
+   },
+   {
+    "parte": "anelAntebraco",
+    "medida": "largura",
+    "em": 880
+   },
+   {
+    "parte": "antebraco",
+    "medida": "largura",
+    "em": 805,
+    "numero": [
+     0,
+     -30
+    ]
+   },
+   {
+    "parte": "antebraco",
+    "medida": "altura",
+    "em": 250,
+    "numero": [
+     0,
+     40
+    ]
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "largura",
+    "em": 840,
+    "numero": [
+     100,
+     0
+    ]
+   },
+   {
+    "parte": "aneisPunho",
+    "medida": "altura",
+    "em": 630
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "altura",
+    "em": 575
+   },
+   {
+    "parte": "flange",
+    "medida": "largura",
+    "em": 575,
+    "numero": [
+     0,
+     -40
+    ]
+   },
+   {
+    "parte": "juntaCotovelo",
+    "medida": "largura",
+    "em": 870,
+    "numero": [
+     40,
+     -110
+    ]
+   },
+   {
+    "parte": "anelCintura",
+    "medida": "largura",
+    "em": 240
+   },
+   {
+    "parte": "garfoPunho",
+    "medida": "largura",
+    "em": 660
+   },
+   {
+    "parte": "carcacaPunho",
+    "medida": "altura",
+    "em": 450
+   },
+   {
+    "parte": "flange",
+    "medida": "altura",
+    "em": 530
+   }
+  ],
+  "nomes": {
+   "base": {
+    "marca": [
+     60,
+     120
+    ],
+    "coluna": "direita",
+    "nivel": 120
+   },
+   "caixaLateral": {
+    "marca": [
+     -145,
+     60
+    ],
+    "coluna": "esquerda",
+    "nivel": 60
+   },
+   "anelCintura": {
+    "marca": [
+     -40,
+     260
+    ],
+    "coluna": "esquerda",
+    "nivel": 260
+   },
+   "ombro": {
+    "marca": [
+     -93,
+     400
+    ],
+    "coluna": "esquerda",
+    "nivel": 400
+   },
+   "braco": {
+    "marca": [
+     -40,
+     480
+    ],
+    "coluna": "esquerda",
+    "nivel": 480
+   },
+   "anelCotovelo": {
+    "marca": [
+     -80,
+     770
+    ],
+    "coluna": "esquerda",
+    "nivel": 770
+   },
+   "cotovelo": {
+    "marca": [
+     -60,
+     960
+    ],
+    "coluna": "esquerda",
+    "nivel": 1100
+   },
+   "juntaCotovelo": {
+    "marca": [
+     96,
+     900
+    ],
+    "coluna": "esquerda",
+    "nivel": 1170
+   },
+   "anelAntebraco": {
+    "marca": [
+     145,
+     940
+    ],
+    "coluna": "direita",
+    "nivel": 1130
+   },
+   "antebraco": {
+    "marca": [
+     300,
+     930
+    ],
+    "coluna": "direita",
+    "nivel": 1010
+   },
+   "carcacaPunho": {
+    "marca": [
+     600,
+     920
+    ],
+    "coluna": "direita",
+    "nivel": 930
+   },
+   "aneisPunho": {
+    "marca": [
+     660,
+     790
+    ],
+    "coluna": "direita",
+    "nivel": 790
+   },
+   "garfoPunho": {
+    "marca": [
+     660,
+     700
+    ],
+    "coluna": "direita",
+    "nivel": 700
+   },
+   "flange": {
+    "marca": [
+     700,
+     595
+    ],
+    "coluna": "direita",
+    "nivel": 595
+   }
+  }
+ },
+ "veredito": {
+  "alvo": "/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referencias/lateral-sem-cabo.png",
+  "nota": 7,
+  "defeitos": [
+   {
+    "parte": "braco",
+    "tipo": "cota",
+    "onde": "altura, extremo superior ao inferior",
+    "sentido": "faltando",
+    "evidencia": "Etapa 5: altura EM FALTA; na prancha não há cota vertical na coluna do braço (centro-esquerda, y 430-730)"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "largura",
+    "sentido": "faltando",
+    "evidencia": "Etapa 6: largura EM FALTA; nenhuma cota horizontal nas frestas do ombro (x 160-300, y 605-730)"
+   },
+   {
+    "parte": "ombro",
+    "tipo": "cota",
+    "onde": "altura",
+    "sentido": "faltando",
+    "evidencia": "Etapa 6: altura EM FALTA; nenhuma cota vertical no ombro"
+   },
+   {
+    "parte": "caixaLateral",
+    "tipo": "cota",
+    "onde": "largura, saliência da face esquerda",
+    "sentido": "faltando",
+    "evidencia": "Etapa 8: só há a altura 209 em x=150; a profundidade da caixa (x 123-172, y 770-935) não tem cota"
+   },
+   {
+    "parte": "juntaCotovelo",
+    "tipo": "cota",
+    "onde": "chamada do nome e cota 24",
+    "sentido": "mal_posta",
+    "evidencia": "Etapa 2: a chamada sai de (100,118) e atravessa o corpo do cotovelo até (300,305); o 24 fica fora da parte, em (325,398), com tracejado que cruza o anelCotovelo"
+   }
+  ],
+  "observacao": "O contorno segue o alvo em todas as partes; os defeitos estão nas cotas do braço, do ombro e da caixa lateral e na chamada da junta do cotovelo."
+ }
+}
