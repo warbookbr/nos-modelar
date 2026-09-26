@@ -78,11 +78,18 @@ export function svgDoMapa(pinturaPng, arranjo) {
   const L = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="${f.familia}">`,
     `<rect width="${W}" height="${H}" fill="#fff"/>`,
     `<image x="${dx}" y="${dy}" width="${width}" height="${height}" href="data:image/png;base64,${pinturaPng.toString('base64')}" style="image-rendering:pixelated"/>`];
-  for (const { marca, ponta } of etiquetas) L.push(`<line x1="${marca[0] + 0.5}" y1="${marca[1] + 0.5}" x2="${ponta[0] + 0.5}" y2="${ponta[1] + 0.5}" stroke="#000" stroke-width="1"/>`);
+  /* O círculo do número não tem fundo, para a pintura aparecer por trás; a
+     chamada para na borda dele, senão atravessaria o número. */
+  for (const { marca, ponta } of etiquetas) {
+    const d = Math.hypot(ponta[0] - marca[0], ponta[1] - marca[1]) || 1;
+    const k = Math.min(1, RAIO_DO_NUMERO / d);
+    const x1 = marca[0] + (ponta[0] - marca[0]) * k; const y1 = marca[1] + (ponta[1] - marca[1]) * k;
+    L.push(`<line x1="${x1 + 0.5}" y1="${y1 + 0.5}" x2="${ponta[0] + 0.5}" y2="${ponta[1] + 0.5}" stroke="#000" stroke-width="1"/>`);
+  }
   for (const { texto, marca } of etiquetas) {
     const [cx, cy] = [marca[0] + 0.5, marca[1] + 0.5];
-    L.push(`<circle cx="${cx}" cy="${cy}" r="${RAIO_DO_NUMERO}" fill="#fff" stroke="#000" stroke-width="1"/>`,
-      `<text x="${cx}" y="${cy}" font-size="${f.tamanhoDoNumero}" font-weight="bold" text-anchor="middle" dominant-baseline="central">${esc(texto.split('-')[0])}</text>`);
+    L.push(`<circle cx="${cx}" cy="${cy}" r="${RAIO_DO_NUMERO}" fill="none" stroke="#000" stroke-width="1"/>`,
+      `<text x="${cx}" y="${cy}" font-size="${f.tamanhoDoNumero}" font-weight="bold" text-anchor="middle" dominant-baseline="central" stroke="#fff" stroke-width="2.5" paint-order="stroke">${esc(texto.split('-')[0])}</text>`);
   }
   for (const { texto, caixa: [x0, y0, x1, y1] } of etiquetas) {
     L.push(`<rect x="${x0 + 0.5}" y="${y0 + 0.5}" width="${x1 - x0}" height="${y1 - y0}" fill="#fff" stroke="#000" stroke-width="1"/>`,

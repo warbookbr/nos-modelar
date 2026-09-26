@@ -208,34 +208,21 @@ para `braco-robotico/ombro`. Antes do laço, a vista frontal passa pelo
 mapa de partes e pela prancha, e dela saem também as alturas do ombro e do braço
 que a lateral esconde.
 
-Nos mapas de partes da frontal e da lateral sem cabo a pessoa apontou três
-peças que a lista não tinha: `juntaCotovelo`, o volume arredondado ao lado do
-cotovelo de onde sai o antebraço, e, na ponta da carcaça do punho vista de
-frente, `anelTampaPunho` e `tampaPunho`. Elas entram na ordem de montagem
-junto das vizinhas, e o `anelOmbro` também, que nasceu na frontal.
+A pessoa apontou nos mapas peças que a lista não tinha: `anelOmbro`,
+`juntaCotovelo` (ao lado do cotovelo, de onde sai o antebraço),
+`anelTampaPunho` e `tampaPunho`, que entram na ordem de montagem.
 
 A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
 (`referencias/lateral-sem-cabo.png`). Ela passa a ser a lateral das partes
 que faltam e do ombro refeito. A `lateral.png` fica como está, porque as
 receitas já fixas e a variação `ombro-tambor` a citam.
 
-Em 2026-09-26 a ampliação por rede treinada foi medida em CPU sobre a frontal
-e a lateral sem cabo. O Real-ESRGAN general-x4v3 levou 9 s e o x4plus cerca
-de 3 min por imagem. Nenhum dos dois superou a ampliação por vizinho mais
-próximo na proximidade da borda: melhoraram os anéis do punho e pioraram o
-antebraço e a junta do cotovelo, que caiu de 0,89 para 0,70–0,80, porque a
-rede inventa traço na tampa e na carcaça. A ampliação não entrou na
-ferramenta; peça de 16 px pede referência de resolução maior.
-
-No mesmo dia a pessoa liberou por algumas horas uma chave do Gemini, e o
-redesenho em 4x foi medido pela silhueta reduzida à escala original. A
-imagem inteira reprovou nos dois modelos (pro e flash): o objeto encolheu
-cerca de 1% e bordas andaram até 20 px. Em recorte pequeno a silhueta ficou
-a até 1 px, e o flash deu a melhor proximidade de borda nas peças pequenas,
-mas os dois inventaram costuras, aletas e parafusos que a imagem não tem.
-Custou cerca de R$ 10. Não entrou na ferramenta; se voltar, entra só em
-recorte, com a silhueta a até 1 px como gate, e as linhas internas continuam
-vindo da imagem original.
+Em 2026-09-26 a ampliação foi medida pela proximidade da borda e pela
+silhueta reduzida à escala original. O Real-ESRGAN em CPU não superou a
+ampliação por vizinho mais próximo. O Gemini, com chave liberada por algumas
+horas (cerca de R$ 10), deslocou bordas em até 20 px na imagem inteira; em
+recorte manteve a silhueta a até 1 px, mas inventou costuras, aletas e
+parafusos. Nenhum entrou na ferramenta; peça de 16 px pede referência maior.
 
 ## Feito na fatia 1
 
