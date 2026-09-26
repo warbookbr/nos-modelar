@@ -14,6 +14,7 @@
  *   npm run contorno -- --regioes=<regioes.json> --acao
  *   npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
  *   npm run contorno -- --regioes=<regioes.json> --nova-serie --por=<quem decidiu>
+ *   npm run contorno -- --regioes=<regioes.json> --aceite-humano --por="<quem, data: motivo>" --pendencias="<texto>"
  *
  * `--nova-serie` só vale quando a série parou na decisão humana: as rodadas
  * dela vão para `serie-NN/`, com quem autorizou, e a contagem recomeça.
@@ -42,10 +43,10 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  segmentar, contornoDaSilhueta, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA, proximaAcao,
+  segmentar, contornoDaSilhueta, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA,
 } from '../../modulos/contorno-da-imagem/src/index.js';
 import { calibrarPorAncoras } from './conferir-contra-referencia.mjs';
-import { lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
+import { acaoDaPasta, aceitar, lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
 
 export const FORMATO = 'mecanifica.contornos@1';
 const arred = (x) => (Math.round(x * 100) / 100) || 0;
@@ -155,8 +156,13 @@ async function principal(argv) {
     return 2;
   }
   if (argv.includes('--acao')) {
-    const d = proximaAcao(lerRodadas(regioes));
+    const d = acaoDaPasta(pastaDasRodadas(regioes));
     process.stdout.write(`próxima ação: ${d.acao} — ${d.motivo}\n${(d.defeitos ?? []).map((x) => `  ${JSON.stringify(x)}`).join('\n')}\n`);
+    return 0;
+  }
+  if (argv.includes('--aceite-humano')) {
+    const { arquivo: gravadoAceite, proxima } = aceitar(pastaDasRodadas(regioes), { por: valor('por'), pendencias: valor('pendencias') });
+    process.stdout.write(`aceite gravado em ${gravadoAceite}\npróxima ação: ${proxima.acao} — ${proxima.motivo}\n`);
     return 0;
   }
   if (argv.includes('--nova-serie')) {

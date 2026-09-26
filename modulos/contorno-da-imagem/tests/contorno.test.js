@@ -129,6 +129,13 @@ describe('contorno da imagem', () => {
     expect(proximaAcao([rodada(1, 7), rodada(2, 8), rodada(3, 8)]).acao).toBe('humano');
     expect(() => validarRodada({ numero: 1, regioes: {}, veredito: { nota: 6, defeitos: [] } })).toThrow(/sem defeito/);
   });
+
+  it('o aceite humano fecha a série com os defeitos e as pendências que ficaram', () => {
+    const rodada = validarRodada({ numero: 1, regioes: {}, veredito: { nota: 7, defeitos: [{ parte: 'a' }] } });
+    const d = proximaAcao([rodada], { por: 'pessoa', defeitos: [{ parte: 'a' }], pendencias: 'borda' });
+    expect(d).toMatchObject({ acao: 'fechou', aceite: true, pendencias: 'borda', defeitos: [{ parte: 'a' }] });
+    expect(d.motivo).toMatch(/aceite humano/);
+  });
 });
 
 describe('folhas das divisas e roteiro', () => {

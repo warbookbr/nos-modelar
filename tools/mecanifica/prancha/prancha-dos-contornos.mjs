@@ -31,6 +31,7 @@
  *   npm run contorno:prancha -- <imagem>.contornos.json --acao
  *   npm run contorno:prancha -- <imagem>.contornos.json --registrar=<veredito.json>
  *   npm run contorno:prancha -- <imagem>.contornos.json --nova-serie --por=<quem decidiu>
+ *   npm run contorno:prancha -- <imagem>.contornos.json --aceite-humano --por="<quem, data: motivo>" --pendencias="<texto>"
  *
  * Grava `<imagem>.prancha.svg` e `<imagem>.prancha.png` ao lado do arquivo de
  * contornos. As rodadas entre o agente e o crítico ficam em
@@ -39,8 +40,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { prancha, imprimirRelatorio, colisoesDoDesenho } from './prancha.mjs';
-import { lerRodadas, registrarRodada, novaSerie } from '../rodadas-com-critico.mjs';
-import { proximaAcao, empilharColuna } from '../../../modulos/contorno-da-imagem/src/index.js';
+import { acaoDaPasta, aceitar, registrarRodada, novaSerie } from '../rodadas-com-critico.mjs';
+import { empilharColuna } from '../../../modulos/contorno-da-imagem/src/index.js';
 
 const TELA = { largura: 1200, altura: 900 };
 const MARGEM = { esquerda: 90, topo: 110, direita: 260, baixo: 90 };
@@ -331,7 +332,7 @@ async function principal(argv) {
   const arquivoEscolhas = `${base}.prancha.json`;
   const pastaRodadas = `${base}.prancha.rodadas`;
   if (argv.includes('--acao')) {
-    const d = proximaAcao(lerRodadas(pastaRodadas));
+    const d = acaoDaPasta(pastaRodadas);
     process.stdout.write(`próxima ação: ${d.acao} — ${d.motivo}\n${(d.defeitos ?? []).map((x) => `  ${JSON.stringify(x)}`).join('\n')}\n`);
     return 0;
   }
@@ -339,6 +340,11 @@ async function principal(argv) {
     const julgado = existsSync(arquivoEscolhas) ? JSON.parse(readFileSync(arquivoEscolhas, 'utf8')) : {};
     const { arquivo: gravado, proxima } = registrarRodada(pastaRodadas, { campo: 'julgado', julgado }, JSON.parse(readFileSync(resolve(valor('registrar')), 'utf8')));
     process.stdout.write(`rodada gravada em ${gravado}\npróxima ação: ${proxima.acao} — ${proxima.motivo}\n`);
+    return 0;
+  }
+  if (argv.includes('--aceite-humano')) {
+    const { arquivo: gravadoAceite, proxima } = aceitar(pastaRodadas, { por: valor('por'), pendencias: valor('pendencias') });
+    process.stdout.write(`aceite gravado em ${gravadoAceite}\npróxima ação: ${proxima.acao} — ${proxima.motivo}\n`);
     return 0;
   }
   if (argv.includes('--nova-serie')) {

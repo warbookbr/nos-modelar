@@ -63,5 +63,10 @@ contar como a peça foi feita: elas vêm da referência, e não da construção.
 Quem produz não julga o próprio resultado, e o crítico não recebe a história
 da construção. Toda conversa com crítico tem limite de rodadas, e depois dele
 a decisão é da pessoa. Etapa com defeito em aberto só passa por aceite
-humano. A saída de cada etapa fica em arquivo na pasta do objeto, para a
+humano. No mapa de partes e na prancha o aceite é gravado com
+`--aceite-humano --por="<quem, data: motivo>" --pendencias="<texto>"`, que
+guarda em `aceite.json` na pasta de rodadas quem aceitou, quando, a última
+nota, os defeitos em aberto e as pendências; nas etapas da montagem é o
+`--aceite-humano` de `etapas-da-montagem`. Nenhum agente usa o aceite por
+conta própria. A saída de cada etapa fica em arquivo na pasta do objeto, para a
 seguinte ler do disco em vez de depender de quem conduz lembrar.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-796 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+797 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -985,6 +985,7 @@
 - `rodada-de-modelagem.mjs` — rodada-de-modelagem.mjs — registra uma rodada do laço e diz o que vem agora.
 - `rodada-de-modelagem.test.mjs` — rodada-de-modelagem.test.mjs — o registro do laço, de ponta a ponta.
 - `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…
+- `rodadas-com-critico.test.mjs` — rodadas-com-critico.test.mjs — o aceite humano grava quem, quando, a última nota, os defeitos abertos e as pendências, fecha a série, recusa aceite sem autor…
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
 - `snapshot-universo-autoria.test.ts` — snapshot-universo-autoria.test.ts — provas da R01.
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.

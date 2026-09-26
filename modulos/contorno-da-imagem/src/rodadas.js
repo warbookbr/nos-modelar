@@ -24,7 +24,11 @@ export function validarRodada(rodada) {
   return rodada;
 }
 
-export function proximaAcao(rodadas) {
+/* O aceite humano fecha a série seja qual for a nota: só a pessoa o dá, com
+   quem, quando, os defeitos que ficaram abertos e as pendências escritas.
+   Nenhum agente o usa por conta própria. */
+export function proximaAcao(rodadas, aceite = null) {
+  if (aceite) return { acao: 'fechou', motivo: `aceite humano (${aceite.por}).`, aceite: true, pendencias: aceite.pendencias ?? '', defeitos: aceite.defeitos ?? [] };
   if (!rodadas.length) return { acao: 'desenhar', motivo: 'nenhuma rodada ainda.' };
   const ultima = rodadas.at(-1);
   if (ultima.veredito.nota >= NOTA_MINIMA) return { acao: 'fechou', motivo: `nota ${ultima.veredito.nota} na rodada ${ultima.numero}.` };

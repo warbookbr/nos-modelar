@@ -13,9 +13,36 @@ export function lerRodadas(pasta) {
     .map((n) => JSON.parse(readFileSync(join(pasta, n), 'utf8')));
 }
 
+export function lerAceite(pasta) {
+  const arquivo = join(pasta, 'aceite.json');
+  return existsSync(arquivo) ? JSON.parse(readFileSync(arquivo, 'utf8')) : null;
+}
+
+export const acaoDaPasta = (pasta) => proximaAcao(lerRodadas(pasta), lerAceite(pasta));
+
+/* Aceite humano: só a pessoa fecha uma série com defeito aberto, e o faz por
+   escrito. Grava `aceite.json` com quem, quando, a última nota, os defeitos
+   abertos do último veredito e as pendências. Vale também sobre série que já
+   fechou com nota 9, para registrar o que a pessoa reabriu. Um aceite por
+   série; outro exige `--nova-serie`. */
+export function aceitar(pasta, { por, pendencias = '', quando = new Date().toISOString() } = {}) {
+  if (!por || !String(por).trim()) throw new Error('aceite humano exige --por="<quem, data: motivo>".');
+  const rodadas = lerRodadas(pasta);
+  if (!rodadas.length) throw new Error('aceite humano exige ao menos uma rodada registrada.');
+  if (lerAceite(pasta)) throw new Error('esta série já tem aceite; outro só depois de --nova-serie.');
+  const ultima = rodadas.at(-1);
+  const aceite = {
+    por: String(por).trim(), quando, rodada: ultima.numero, nota: ultima.veredito.nota,
+    defeitos: ultima.veredito.defeitos, pendencias: String(pendencias).trim(),
+  };
+  const arquivo = join(pasta, 'aceite.json');
+  writeFileSync(arquivo, `${JSON.stringify(aceite, null, 1)}\n`);
+  return { aceite, arquivo, proxima: proximaAcao(rodadas, aceite) };
+}
+
 export function registrarRodada(pasta, { campo, julgado }, veredito) {
   const rodadas = lerRodadas(pasta);
-  const decisao = proximaAcao(rodadas);
+  const decisao = proximaAcao(rodadas, lerAceite(pasta));
   if (decisao.acao !== 'desenhar') throw new Error(`não cabe rodada nova: ${decisao.acao} — ${decisao.motivo}`);
   const rodada = validarRodada({ numero: rodadas.length + 1, [campo]: julgado, veredito });
   mkdirSync(pasta, { recursive: true });
@@ -28,12 +55,14 @@ export function registrarRodada(pasta, { campo, julgado }, veredito) {
    autorizou, e a contagem recomeça. */
 export function novaSerie(pasta, por) {
   if (!por || !String(por).trim()) throw new Error('nova série exige --por com quem decidiu.');
+  const aceite = lerAceite(pasta);
   const decisao = proximaAcao(lerRodadas(pasta));
-  if (decisao.acao !== 'humano') throw new Error(`nova série só depois da decisão humana; a ação agora é ${decisao.acao}.`);
+  if (decisao.acao !== 'humano' && !aceite) throw new Error(`nova série só depois da decisão humana ou de um aceite; a ação agora é ${decisao.acao}.`);
   const numero = readdirSync(pasta).filter((n) => /^serie-\d+$/.test(n)).length + 1;
   const destino = join(pasta, `serie-${String(numero).padStart(2, '0')}`);
   mkdirSync(destino);
   for (const n of readdirSync(pasta).filter((x) => /^rodada-\d+\.json$/.test(x))) renameSync(join(pasta, n), join(destino, n));
+  if (aceite) renameSync(join(pasta, 'aceite.json'), join(destino, 'aceite.json'));
   writeFileSync(join(destino, 'decisao.json'), `${JSON.stringify({ por: String(por).trim(), acao: 'nova-serie' }, null, 1)}\n`);
   return destino;
 }

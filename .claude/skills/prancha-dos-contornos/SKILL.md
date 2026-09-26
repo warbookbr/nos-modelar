@@ -54,3 +54,13 @@ npm run contorno:prancha -- <imagem>.contornos.json --registrar=<veredito.json>
 Nota 9 ou mais fecha. Abaixo disso volta ao agente, até três rodadas; depois
 a decisão é da pessoa, e nenhum agente estende o limite. Se a pessoa decidir
 tentar de novo, arquive a série com `--nova-serie --por=<quem decidiu>`.
+
+Quando a pessoa decidir aceitar a série com defeito em aberto, ou registrar o
+que ela reabriu numa série que já fechou com nota 9, grave o aceite com
+`npm run contorno:prancha -- <imagem>.contornos.json --aceite-humano --por="<quem, data: motivo>" --pendencias="<texto>"`.
+O aceite vai para `aceite.json` na pasta de rodadas, com quem, quando, a
+última nota, os defeitos em aberto do último veredito e as pendências, e a
+ação passa a ser fechou com motivo aceite humano. A ferramenta recusa aceite
+sem `--por` ou sem rodada registrada, e `--nova-serie` arquiva o aceite junto
+com as rodadas. Nenhum agente usa `--aceite-humano` por conta própria; só com
+o aceite dito pela pessoa, com as palavras dela em `--por`.

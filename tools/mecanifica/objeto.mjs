@@ -16,15 +16,14 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { proximaAcao } from '../../modulos/contorno-da-imagem/src/index.js';
-import { lerRodadas } from './rodadas-com-critico.mjs';
+import { acaoDaPasta } from './rodadas-com-critico.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
 
 /* O estado de uma conversa com crítico, na moeda do fluxo. */
 function estadoDasRodadas(pasta) {
-  const d = proximaAcao(lerRodadas(pasta));
+  const d = acaoDaPasta(pasta);
   return { fechou: 'feito', desenhar: 'em andamento', humano: 'decisão da pessoa' }[d.acao] ?? d.acao;
 }
 

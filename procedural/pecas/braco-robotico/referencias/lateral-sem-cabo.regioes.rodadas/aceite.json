@@ -1,0 +1,16 @@
+{
+ "por": "pessoa, 2026-09-26: aceita com a borda serrilhada entre antebraço e carcaça em aberto",
+ "quando": "2026-09-26T15:29:56.404Z",
+ "rodada": 1,
+ "nota": 8,
+ "defeitos": [
+  {
+   "parte": "carcacaPunho",
+   "tipo": "superficie",
+   "onde": "divisa com antebraco, metade superior do arco da costura",
+   "sentido": "segmentado",
+   "evidencia": "Etapa 2, divisas-01.png, par antebraco/carcacaPunho: a borda entre azul e marrom sai em degraus serrilhados no terço superior da pintura, com o azul avançando sobre o marrom perto da aresta de cima, enquanto no original a costura é um arco liso"
+  }
+ ],
+ "pendencias": "borda serrilhada antebraco/carcacaPunho"
+}

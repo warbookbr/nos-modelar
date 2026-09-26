@@ -72,6 +72,16 @@ agente estende o limite nem aceita defeito por conta própria. Se a pessoa decid
 corrigir a ferramenta e tentar de novo, arquive a série com
 `npm run contorno -- --regioes=<json> --nova-serie --por=<quem decidiu>`.
 
+Quando a pessoa decidir aceitar a série com defeito em aberto, ou registrar o
+que ela reabriu numa série que já fechou com nota 9, grave o aceite com
+`npm run contorno -- --regioes=<json> --aceite-humano --por="<quem, data: motivo>" --pendencias="<texto>"`.
+O aceite vai para `aceite.json` na pasta de rodadas, com quem, quando, a
+última nota, os defeitos em aberto do último veredito e as pendências, e a
+ação passa a ser fechou com motivo aceite humano. A ferramenta recusa aceite
+sem `--por` ou sem rodada registrada, e `--nova-serie` arquiva o aceite junto
+com as rodadas. Nenhum agente usa `--aceite-humano` por conta própria; só com
+o aceite dito pela pessoa, com as palavras dela em `--por`.
+
 ## Ao fechar
 
 O contorno em milímetro fica em `<imagem>.contornos.json`, e o mapa de partes
