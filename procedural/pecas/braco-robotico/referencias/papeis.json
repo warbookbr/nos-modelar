@@ -1,0 +1,7 @@
+{
+  "imagens": {
+    "lateral-sem-cabo": { "papel": "principal" },
+    "frontal": { "papel": "apoio", "motivo": "dá as alturas que a lateral esconde (ombro e braço); o punho dela é incerto" },
+    "lateral": { "papel": "substituida", "por": "lateral-sem-cabo", "motivo": "mostra o ombro antigo e o cabo" }
+  }
+}

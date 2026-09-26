@@ -27,6 +27,13 @@ da cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
 O ajuste é sensível, e ligar ou não o realce é decisão que o crítico julga
 pelo resultado.
 
+Quando o objeto tem mais de uma imagem, declare o papel de cada uma em
+`papeis.json` da pasta `referencias/` (`{ "imagens": { "<imagem>": { "papel": ..., "motivo": ..., "por": ... } } }`):
+`principal` passa por mapa e prancha, `apoio` passa só pelo mapa e dá medidas
+à prancha principal por `origem`, e `substituida` sai das etapas com `por`
+(a imagem que a substitui) e `motivo`. Apoio e substituída exigem motivo.
+Sem o arquivo, toda imagem com regiões é principal.
+
 ## O ciclo
 
 Pergunte a ação, sempre:

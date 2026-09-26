@@ -39,4 +39,30 @@ describe('estado do objeto', () => {
     expect(estado.proxima.estado).toMatch(/próxima b/);
     expect(estado.pacotes[0].pronto).toBe(true);
   });
+
+  it('papeis.json tira a prancha da imagem de apoio e a substituída das etapas', () => {
+    const pasta = join(acervo, 'coisa'); const refs = join(pasta, 'referencias');
+    for (const img of ['nova', 'frente', 'velha']) {
+      mkdirSync(join(refs, `${img}.regioes.rodadas`), { recursive: true });
+      writeFileSync(join(refs, `${img}.regioes.json`), '{}');
+      writeFileSync(join(refs, `${img}.regioes.rodadas`, 'rodada-01.json'), JSON.stringify(rodada(1, 9)));
+    }
+    writeFileSync(join(pasta, 'ALINHAMENTO.md'), '# coisa\n');
+    writeFileSync(join(pasta, 'montagem.json'), JSON.stringify({ etapas: ['a'] }));
+    const semArquivo = estadoDoObjeto('coisa', { acervo }).etapas.map((e) => e.etapa);
+    expect(semArquivo).toContain('prancha de velha');
+    writeFileSync(join(refs, 'papeis.json'), JSON.stringify({ imagens: {
+      nova: { papel: 'principal' },
+      frente: { papel: 'apoio', motivo: 'alturas' },
+      velha: { papel: 'substituida', por: 'nova', motivo: 'ombro antigo' },
+    } }));
+    const estado = estadoDoObjeto('coisa', { acervo });
+    const nomes = estado.etapas.map((e) => e.etapa);
+    expect(nomes).toContain('mapear as partes de frente (apoio)');
+    expect(nomes.filter((n) => /velha|prancha de frente/.test(n))).toEqual([]);
+    expect(estado.proxima.etapa).toBe('prancha de nova');
+    expect(estado.substituidas).toEqual([{ imagem: 'velha', por: 'nova', motivo: 'ombro antigo' }]);
+    writeFileSync(join(refs, 'papeis.json'), JSON.stringify({ imagens: { velha: { papel: 'substituida', motivo: 'x' } } }));
+    expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/por qual imagem/);
+  });
 });

@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { prancha, colisoesDoDesenho, examinarDesenho } from './prancha.mjs';
-import { specDosContornos, roteiroDaPrancha, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
+import { specDosContornos, roteiroDaPrancha, cotasDaPrancha, linhasDeCotasEmFalta, linhasDePrevalencia, PASSO_DOS_NOMES_PROXIMOS } from './prancha-dos-contornos.mjs';
 
 const escolhasDoBraco = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.prancha.json', import.meta.url), 'utf8'));
 const contornos = JSON.parse(readFileSync(new URL('../../../procedural/pecas/braco-robotico/referencias/lateral.contornos.json', import.meta.url), 'utf8'));
@@ -235,5 +235,25 @@ describe('prancha dos contornos', () => {
     const tipos = new Set(colisoesDoDesenho(desenho).map((c) => c.tipo));
     for (const t of ['cota sobre outra parte', 'chamada atravessa parte', 'marca fora da parte', 'chamadas coladas']) expect(tipos).toContain(t);
     expect([...tipos].filter((t) => t === 'texto sobre texto')).toEqual([]);
+  });
+
+  it('toda parte tem largura e altura obrigatórias, cada uma num estado, e a falta sai listada por parte', () => {
+    const escolhas = { cotas: [
+      { parte: 'a', medida: 'largura' },
+      { parte: 'a', medida: 'altura', origem: { imagem: 'frontal' } },
+      { parte: 'b', medida: 'largura', origem: { imagem: 'frontal' }, prevalece: 'pessoa decidiu' },
+      { parte: 'b', medida: 'altura', medivel: false, motivo: 'escondida' },
+      { parte: 'c', medida: 'altura', medivel: false },
+    ] };
+    const { lista, faltas } = cotasDaPrancha(['a', 'b', 'c'], escolhas);
+    expect(lista.map((x) => x.estado)).toEqual(['medida aqui', 'da vista frontal', 'da vista frontal, prevalece', 'não medível: escondida', 'em falta', 'em falta (medivel: false sem motivo)']);
+    expect(linhasDeCotasEmFalta(faltas)).toEqual(['  FALTA COTA c: largura e altura']);
+  });
+
+  it('o roteiro lista por parte as duas cotas esperadas e o estado de cada uma', () => {
+    const spec = specDosContornos(contornos, { escolhas: escolhasDoBraco });
+    const r = roteiroDaPrancha({ alvo: 'a.png', prancha: 'p.png', spec });
+    expect((r.match(/- cotas esperadas: largura \(.+\) e altura \(.+\)/g) ?? []).length).toBe(spec.resumo.partes.length);
+    expect(r).toMatch(/— ombro\n\n- cotas esperadas: largura \([^)]*\) e altura \(não medível/);
   });
 });

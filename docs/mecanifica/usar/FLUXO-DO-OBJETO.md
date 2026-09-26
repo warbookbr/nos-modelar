@@ -31,7 +31,19 @@ desenhista só corrige defeito do tipo `cota`; defeito de forma de contorno
 (`superficie`, `comprimento` e os outros tipos de geometria) apontado na
 prancha volta para o mapa de partes, porque o contorno vem dela. Medida que a vista
 esconde vem de outra imagem de referência do mesmo objeto, com contornos
-próprios; nota de texto sem número deixa a medida em falta.
+próprios; nota de texto sem número deixa a medida em falta. Toda parte
+declara largura e altura, medida, por `origem` ou `medivel: false` com
+motivo; faltando alguma, o comando para com código 4 e lista as faltas por
+parte, e o roteiro do crítico traz as duas cotas esperadas de cada parte.
+
+**Papel de cada imagem.** Com mais de uma imagem de referência, o arquivo
+`papeis.json` da pasta `referencias/` declara o papel de cada uma:
+`{ "imagens": { "<imagem>": { "papel": "principal" | "apoio" | "substituida", "motivo": "...", "por": "..." } } }`.
+A `principal` passa pelas etapas 2 e 3. A de `apoio` passa só pela etapa 2 e
+dá medidas à prancha principal por `origem`. A `substituida` fica fora das
+etapas e declara `por` qual imagem e o `motivo`. Apoio e substituída exigem
+motivo. Sem o arquivo, ou para imagem que ele não cita, toda imagem com
+regiões é principal. `npm run objeto` lê esse arquivo.
 
 **4. Modelagem por etapa.** Cada parte, na ordem da montagem, passa pelo laço
 de modelagem, com um modelador novo e o crítico. Skill `laco-de-modelagem`.

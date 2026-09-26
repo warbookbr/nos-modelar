@@ -11,6 +11,12 @@
  * nesta ordem: a imagem de referência, a prancha limpa e o mapa de partes
  * com as folhas de divisa.
  *
+ * O papel de cada imagem vem de `referencias/papeis.json`, quando existe:
+ * `principal` passa por mapa e prancha, `apoio` só pelo mapa (dá medidas à
+ * prancha principal por `origem`) e `substituida` fica fora das etapas, com
+ * `por` e `motivo`. Imagem que o arquivo não cita, ou pasta sem o arquivo,
+ * segue como principal.
+ *
  * USO
  *   npm run objeto -- <objeto>          por exemplo braco-robotico */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -27,6 +33,21 @@ function estadoDasRodadas(pasta) {
   return { fechou: 'feito', desenhar: 'em andamento', humano: 'decisão da pessoa' }[d.acao] ?? d.acao;
 }
 
+const PAPEIS = ['principal', 'apoio', 'substituida'];
+
+/* Lê e valida `referencias/papeis.json`; sem o arquivo, devolve vazio. */
+export function papeisDasReferencias(refs) {
+  const arquivo = join(refs, 'papeis.json');
+  if (!existsSync(arquivo)) return {};
+  const imagens = JSON.parse(readFileSync(arquivo, 'utf8')).imagens ?? {};
+  for (const [img, p] of Object.entries(imagens)) {
+    if (!PAPEIS.includes(p.papel)) throw new Error(`papeis.json: a imagem '${img}' tem papel '${p.papel}', e o papel é ${PAPEIS.join(', ')}.`);
+    if (p.papel !== 'principal' && !p.motivo) throw new Error(`papeis.json: a imagem '${img}' é ${p.papel} e precisa de motivo.`);
+    if (p.papel === 'substituida' && !p.por) throw new Error(`papeis.json: a imagem '${img}' é substituida e precisa dizer por qual imagem.`);
+  }
+  return imagens;
+}
+
 export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   const pasta = join(acervo, objeto);
   if (!existsSync(pasta)) throw new Error(`o objeto '${objeto}' não existe em ${relative(REPO, acervo) || acervo}.`);
@@ -39,20 +60,25 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
 
   const imagens = existsSync(refs) ? readdirSync(refs).filter((n) => n.endsWith('.regioes.json')).sort().map((n) => n.replace(/\.regioes\.json$/, '')) : [];
   const pacotes = [];
+  const papeis = existsSync(refs) ? papeisDasReferencias(refs) : {};
+  const substituidas = [];
   if (!imagens.length) {
     etapas.push({ etapa: 'mapear as partes', estado: 'a fazer', como: 'skill contorno-da-imagem' });
     etapas.push({ etapa: 'prancha', estado: 'a fazer', como: 'skill prancha-dos-contornos' });
   }
   for (const img of imagens) {
     const base = join(refs, img);
+    const papel = papeis[img]?.papel ?? 'principal';
+    if (papel === 'substituida') { substituidas.push({ imagem: img, por: papeis[img].por, motivo: papeis[img].motivo }); continue; }
     const separacao = estadoDasRodadas(`${base}.regioes.rodadas`);
-    etapas.push({ etapa: `mapear as partes de ${img}`, estado: separacao, como: 'skill contorno-da-imagem' });
-    const temPrancha = existsSync(`${base}.prancha.png`);
-    const prancha = separacao !== 'feito' ? 'espera o mapa de partes' : (temPrancha ? estadoDasRodadas(`${base}.prancha.rodadas`) : 'a fazer');
-    etapas.push({ etapa: `prancha de ${img}`, estado: prancha, como: 'skill prancha-dos-contornos' });
+    etapas.push({ etapa: `mapear as partes de ${img}${papel === 'apoio' ? ' (apoio)' : ''}`, estado: separacao, como: 'skill contorno-da-imagem' });
+    const temPrancha = papel === 'principal' && existsSync(`${base}.prancha.png`);
+    const prancha = papel === 'apoio' ? 'feito' : separacao !== 'feito' ? 'espera o mapa de partes' : (temPrancha ? estadoDasRodadas(`${base}.prancha.rodadas`) : 'a fazer');
+    if (papel === 'principal') etapas.push({ etapa: `prancha de ${img}`, estado: prancha, como: 'skill prancha-dos-contornos' });
     const pacote = join(refs, `${img}.pacote`);
     const folhas = existsSync(pacote) ? readdirSync(pacote).filter((n) => /^divisas-\d+\.png$/.test(n)).sort().map((n) => rel(join(pacote, n))) : [];
     pacotes.push({
+      papel,
       imagem: rel(`${base}.png`),
       prancha: temPrancha ? rel(`${base}.prancha.png`) : null,
       mapaDePartes: existsSync(join(pacote, 'mapa-de-partes.png')) ? rel(join(pacote, 'mapa-de-partes.png')) : null,
@@ -78,15 +104,16 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   etapas.push({ etapa: 'aceite', estado: 'a cada etapa', como: 'npm run etapas -- --fixar' });
 
   const pendente = etapas.find((e) => !e.estado.startsWith('feito') && e.estado !== 'a cada etapa');
-  return { objeto, etapas, proxima: pendente ?? null, pacotes };
+  return { objeto, etapas, proxima: pendente ?? null, pacotes, substituidas };
 }
 
-function imprimir({ objeto, etapas, proxima, pacotes }) {
+function imprimir({ objeto, etapas, proxima, pacotes, substituidas = [] }) {
   const linhas = [`objeto ${objeto}`, ''];
-  for (const e of etapas) linhas.push(`  ${e.etapa.padEnd(34)} ${e.estado}`);
+  for (const e of etapas) linhas.push(`  ${e.etapa.padEnd(40)} ${e.estado}`);
+  for (const s of substituidas) linhas.push(`  ${s.imagem} substituída por ${s.por}: ${s.motivo}`);
   linhas.push('', proxima ? `próxima: ${proxima.etapa} (${proxima.como})` : 'próxima: nada; o objeto está completo.');
   for (const p of pacotes) {
-    linhas.push('', `pacote de referência${p.pronto ? '' : ' (incompleto)'}:`, `  1. ${p.imagem}`, `  2. ${p.prancha ?? '(prancha ainda não feita)'}`, `  3. ${p.mapaDePartes ?? '(mapa de partes ainda não feito)'}`);
+    linhas.push('', `pacote de referência${p.papel === 'apoio' ? ' de apoio' : ''}${p.pronto ? '' : ' (incompleto)'}:`, `  1. ${p.imagem}`, `  2. ${p.prancha ?? (p.papel === 'apoio' ? '(sem prancha: imagem de apoio)' : '(prancha ainda não feita)')}`, `  3. ${p.mapaDePartes ?? '(mapa de partes ainda não feito)'}`);
     for (const f of p.divisas) linhas.push(`     ${f}`);
   }
   return `${linhas.join('\n')}\n`;

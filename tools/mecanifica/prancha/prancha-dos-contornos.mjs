@@ -23,7 +23,10 @@
  * fora da silhueta (`nomesEmColunas`). As cotas gerais da silhueta saem
  * sempre, por fora dos nomes. O comando mede a caixa de cada texto, lista
  * cada sobreposição, cada linha alheia que cruza um texto e cada linha de
- * anotação que cruza outra, e sai com código 3 quando houver alguma. Grava
+ * anotação que cruza outra, e sai com código 3 quando houver alguma. Toda
+ * parte precisa declarar largura e altura (medida, `origem` ou `medivel:
+ * false` com motivo); faltando alguma, para antes de desenhar com código 4 e
+ * lista as faltas por parte (`cotasDaPrancha`). Grava
  * também `<imagem>.prancha.pacote/roteiro.md`, o roteiro do crítico.
  *
  * USO
@@ -247,7 +250,7 @@ export function specDosContornos(contornos, { titulo = 'Prancha lateral pelos co
     landmarks,
   };
   /* Fora do contrato do motor: o que o roteiro do crítico e o relatório leem. */
-  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, prevalencias, partes: nomes, colunas: layout.colunas } });
+  Object.defineProperty(spec, 'resumo', { enumerable: false, value: { faltas, prevalencias, partes: nomes, colunas: layout.colunas, escolhas } });
   return spec;
 }
 
@@ -338,6 +341,32 @@ function nomesEmColunas({ contornos, nomes, escolhas, cotas, zMin, zMax, yMin, y
   return { landmarks, x, largura: largura + 40, colunas, direitaDosNomes: colunaX.direita + larguraMax('direita'), topoDosNomes: Math.min(0, ...itens.map((i) => i.ty - CORPO_DO_NOME)) };
 }
 
+/* Toda parte da prancha declara as duas cotas, largura e altura, e cada uma
+   fica num de quatro estados: medida aqui, vinda de outra vista, vinda de
+   outra vista que prevalece, ou não medível com motivo. Sem essa lista cada
+   crítico cobrava cotas diferentes; o desenhista e o crítico seguem esta. */
+export const MEDIDAS_OBRIGATORIAS = ['largura', 'altura'];
+export const CODIGO_COTAS_EM_FALTA = 4;
+export function cotasDaPrancha(partes, escolhas = {}) {
+  const cotas = escolhas.cotas ?? [];
+  const lista = partes.flatMap((parte) => MEDIDAS_OBRIGATORIAS.map((medida) => {
+    const c = cotas.find((x) => x.parte === parte && x.medida === medida);
+    let estado = 'em falta';
+    if (c?.origem) estado = typeof c.prevalece === 'string' && c.prevalece.trim() ? `da vista ${c.origem.imagem}, prevalece` : `da vista ${c.origem.imagem}`;
+    else if (c?.medivel === false) estado = c.motivo ? `não medível: ${c.motivo}` : 'em falta (medivel: false sem motivo)';
+    else if (c) estado = 'medida aqui';
+    return { parte, medida, estado, falta: estado.startsWith('em falta') };
+  }));
+  return { lista, faltas: lista.filter((x) => x.falta) };
+}
+
+/* Uma linha por parte com o que falta, para o relatório do comando. */
+export function linhasDeCotasEmFalta(faltas) {
+  const porParte = new Map();
+  for (const f of faltas) porParte.set(f.parte, [...(porParte.get(f.parte) ?? []), f.medida]);
+  return [...porParte].map(([parte, medidas]) => `  FALTA COTA ${parte}: ${medidas.join(' e ')}`);
+}
+
 /* O roteiro que o crítico da prancha segue, no espírito do mapa de partes: uma
    etapa por parte, com a largura, a altura, o nome e as linhas dela, porque
    quem olha a prancha inteira de uma vez aprova número na parte errada. */
@@ -350,6 +379,8 @@ export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
     return f ? `EM FALTA: só há a nota "${f.motivo}", que não dá número` : 'sem cota';
   };
   const ordem = [...colunas.esquerda, ...colunas.direita].filter((p) => partes.includes(p));
+  const { lista } = cotasDaPrancha(partes, spec.resumo.escolhas);
+  const estadoDe = (parte, medida) => lista.find((x) => x.parte === parte && x.medida === medida).estado;
   const L = [
     '# Roteiro da crítica da prancha', '',
     'Siga as etapas na ordem e não pule nenhuma. Abra o alvo e a prancha em cada etapa e olhe só a parte da etapa.', '',
@@ -359,6 +390,7 @@ export function roteiroDaPrancha({ alvo, prancha: png, spec }) {
   ordem.forEach((parte, i) => {
     const col = colunas.esquerda.includes(parte) ? 'esquerda' : 'direita';
     L.push(`## Etapa ${i + 2} — ${parte}`, '',
+      `- cotas esperadas: largura (${estadoDe(parte, 'largura')}) e altura (${estadoDe(parte, 'altura')}). Cobre só estas duas; cota em falta é \`cota\` com sentido \`faltando\`.`,
       `- largura: ${cotaDe(parte, 'largura')}. A linha atravessa a seção que o modelador precisa, dentro de ${parte}?`,
       `- altura: ${cotaDe(parte, 'altura')}. A linha mede ${parte} de ponta a ponta na vertical, sem pegar parte vizinha?`,
       `- nome: "${parte}" fica na coluna da ${col}. A chamada termina dentro de ${parte}, e não numa vizinha?`,
@@ -429,6 +461,12 @@ async function principal(argv) {
     }
     return null;
   };
+  const partesDaPrancha = Object.keys(contornos.regioes ?? {}).filter((n) => !contornos.regioes[n].foraDoModelo);
+  const obrigatorias = cotasDaPrancha(partesDaPrancha, escolhas);
+  if (obrigatorias.faltas.length) {
+    process.stderr.write(`contorno:prancha: ${obrigatorias.faltas.length} cota(s) obrigatória(s) sem declaração em ${basename(arquivoEscolhas)}; toda parte declara largura e altura, medida, com origem (e prevalece, se for o caso) ou medivel: false com motivo:\n${linhasDeCotasEmFalta(obrigatorias.faltas).join('\n')}\n`);
+    return CODIGO_COTAS_EM_FALTA;
+  }
   const spec = specDosContornos(contornos, { titulo: valor('titulo'), fonte: basename(arquivo), escolhas, lerVista });
   const { svg, relatorio, desenho } = prancha(spec);
   writeFileSync(`${base}.prancha.svg`, svg);

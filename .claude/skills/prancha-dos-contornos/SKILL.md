@@ -49,6 +49,17 @@ decisão; aí ela é aceita, sai externa com o número da origem e a marca
 medidas e o motivo. Motivo vazio é recusado, e sem decisão da pessoa o campo
 não entra.
 
+Toda parte da prancha declara as duas cotas, largura e altura, e cada uma
+fica medida nesta vista, vinda de outra vista por `origem` (com ou sem
+`prevalece`) ou `medivel: false` com motivo. Faltando alguma, o comando para
+antes de desenhar com código 4 e lista as faltas por parte (`FALTA COTA
+<parte>: largura e altura`). O roteiro do crítico abre cada etapa com as duas
+cotas esperadas e o estado de cada uma; o crítico cobra essas duas e não
+outras, e o desenhista trabalha pela mesma lista. A prancha se faz só das
+imagens de papel `principal` em `papeis.json` da pasta `referencias/`; imagem de `apoio`
+tem só mapa de partes e entra aqui por `origem`, e imagem `substituida` não
+entra.
+
 **Crítico.** Despache o `critico-visual` com a imagem de referência como alvo,
 `<imagem>.prancha.png` como modelo e o roteiro
 `<imagem>.prancha.pacote/roteiro.md`, que o comando grava a cada prancha e

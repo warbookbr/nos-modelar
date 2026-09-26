@@ -50,6 +50,23 @@ Duas melhorias do mapa de partes foram propostas e ainda não aprovadas: alisar
 as divisas, para tirar o serrilhado, e dar cores distintas a partes vizinhas.
 Nenhuma entra sem a pessoa aprovar.
 
+## Andamento
+
+Em 2026-09-26 a pessoa aceitou os mapas de partes da frontal e da lateral sem
+cabo com pendências. A frontal prevalece para a altura e a largura do ombro e
+para a altura do braço (177, 202 e 477 mm), porque na lateral o braço cobre o
+topo do ombro e o ombro cobre o pé do braço. A prancha da lateral sem cabo foi
+aceita com quatro pendências de anotação, registradas em `aceite.json`.
+`referencias/papeis.json` declara a lateral sem cabo como principal, a frontal
+como apoio e a lateral antiga como substituída. A prancha passou a exigir
+largura e altura de toda parte, e a do braço ainda não declara a altura de
+`anelAntebraco` e `juntaCotovelo` nem a largura de `anelCotovelo`.
+
+A próxima etapa é a do ombro novo pela montagem. `npm run objeto` ainda mostra
+a modelagem como feita porque a montagem só declara `base`, `anelCintura` e
+`ombro`; reabrir a etapa do ombro e declarar as peças novas fica para a
+próxima conversa com a pessoa.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,
