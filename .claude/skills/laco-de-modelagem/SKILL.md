@@ -53,6 +53,13 @@ aceitou. Os defeitos entram no aceite gravado. Nenhum agente usa essa opção po
 conta própria, nem por achar o defeito pequeno, e ela é recusada no meio do
 laço.
 
+Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
+`npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`.
+A etapa volta a aberta e o aceite e a receita que ela tinha ficam em
+`reaberturas` no registro. O comando recusa sem `--por` completo, etapa que não
+está fixa e etapa que tem posterior fixa ou quebrada; nesse caso reabra da
+última para a primeira, cada uma com o motivo dela.
+
 ## O ciclo de uma etapa
 
 Pergunte a ação antes de qualquer coisa, sempre:

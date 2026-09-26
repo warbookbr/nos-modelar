@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { estadoDasEtapas, fixar } from './etapas-da-montagem.mjs';
+import { estadoDasEtapas, fixar, reabrir } from './etapas-da-montagem.mjs';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
 
 const ORIGEM = fileURLToPath(new URL('../fixtures/tres-blocos-vinculados/montagens/tres-blocos.json', import.meta.url));
@@ -100,3 +100,35 @@ describe('aceite humano com defeito em aberto', () => {
   });
 });
 
+
+describe('reabrir etapa fixa', () => {
+  const opcoes = { receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas };
+  const POR = 'pessoa, 2026-09-26: refazer pelo desenho novo';
+  async function duasFixas() {
+    const r = await fixar(arquivo, 'base', { por: 'pessoa', observacao: 'ok' }, opcoes);
+    return fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: r });
+  }
+
+  it('recusa sem --por completo e recusa etapa que não está fixa', async () => {
+    const registro = await duasFixas();
+    await recusa(reabrir(arquivo, 'meio', undefined, { ...opcoes, anterior: registro }), 'reabertura-sem-autor');
+    await recusa(reabrir(arquivo, 'meio', 'pessoa', { ...opcoes, anterior: registro }), 'reabertura-sem-autor');
+    await recusa(reabrir(arquivo, 'topo', POR, { ...opcoes, anterior: registro }), 'etapa-nao-fixa');
+    await recusa(reabrir(arquivo, 'nada', POR, { ...opcoes, anterior: registro }), 'etapa-inexistente');
+  });
+
+  it('recusa reabrir etapa com posterior fixa, e reabre de trás para frente guardando o histórico', async () => {
+    let registro = await duasFixas();
+    await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, anterior: registro }), 'etapa-com-posteriores-fixas');
+    registro = await reabrir(arquivo, 'meio', POR, { ...opcoes, anterior: registro });
+    expect(registro.etapas.map((e) => e.estado)).toEqual(['fixa', 'aberta', 'aberta']);
+    expect(registro.etapas[1].aceite).toBeUndefined();
+    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa' } }]);
+    /* A releitura mantém a etapa aberta e o histórico. */
+    const { registro: relido } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: registro });
+    expect(relido.etapas[1]).toMatchObject({ estado: 'aberta', reaberturas: registro.etapas[1].reaberturas });
+    /* Refixar acumula, sem apagar a reabertura. */
+    const refixado = await fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: relido });
+    expect(refixado.etapas[1]).toMatchObject({ estado: 'fixa', reaberturas: [{ motivo: 'refazer pelo desenho novo' }] });
+  });
+});

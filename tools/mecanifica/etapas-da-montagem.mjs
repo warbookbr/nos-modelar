@@ -14,6 +14,7 @@
  * Uso:
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json>
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --fixar <instância> --por <quem> [--observacao <texto>] [--aceite-humano]
+ *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"
  *   node tools/mecanifica/etapas-da-montagem.mjs <montagem.json> --olhar [--vistas frontal,direita,isometrica]
  *
  * `--olhar` desenha juntas, em vista ortográfica, as etapas que já têm
@@ -27,7 +28,7 @@ import { pathToFileURL } from 'node:url';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import {
-  ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, proximaEtapa,
+  ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { capturarMontagem } from './capturar-montagem.mjs';
@@ -148,6 +149,14 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
   return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos });
 }
 
+/* Reabrir é decisão da pessoa, como o aceite humano: `por` traz
+   "<quem, data: motivo>" e nenhum agente reabre por conta própria. */
+export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
+  const autor = lerAutorDaReabertura(por);
+  const { registro } = await estadoDasEtapas(arquivoMontagem, opcoes);
+  return reabrirEtapa(registro, instancia, autor);
+}
+
 export const SAIDA_DAS_VISTAS = join(REPO, 'tools/bancadas/out');
 
 export async function olharEtapas(arquivoMontagem, { vistas = ['frontal', 'direita', 'isometrica'], saida = SAIDA_DAS_VISTAS } = {}) {
@@ -185,6 +194,13 @@ async function comoCLI(argv) {
   if (argv.includes('--olhar')) {
     const { construidas, arquivos } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean) });
     return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
+  }
+  const reaberta = valor('--reabrir');
+  if (reaberta) {
+    const registro = await reabrir(caminho, reaberta, valor('--por'));
+    gravar(caminho, registro);
+    const proxima = proximaEtapa(registro);
+    return { codigo: 0, texto: `etapa '${reaberta}' reaberta.\n${descrever(registro)}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}` };
   }
   const instancia = valor('--fixar');
   const registro = instancia

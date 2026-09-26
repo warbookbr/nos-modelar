@@ -52,7 +52,11 @@ receita da parte e as rodadas dela.
 
 **5. Aceite.** A pessoa aceita cada etapa, fechada pelo crítico ou, com
 defeito em aberto, por aceite humano. `npm run etapas -- --fixar`. Sai o
-registro `montagem.etapas.json`.
+registro `montagem.etapas.json`. Só a pessoa reabre uma etapa fixa, com
+`npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`;
+a etapa volta a aberta, o aceite e a receita antigos ficam em `reaberturas`, e o
+comando recusa etapa não fixa e etapa com posterior fixa, que se reabre antes,
+da última para a primeira.
 
 ## O pacote de referência
 

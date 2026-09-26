@@ -68,7 +68,7 @@
     },
     {
       "instancia": "ombro",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
@@ -114,14 +114,22 @@
         }
       ],
       "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4",
-      "aceite": {
-        "por": "pessoa, 2026-09-25",
-        "observacao": "aceita no limite da rodada 8",
-        "defeitosAceitos": [
-          "colar: uniao em borda superior do colar, na junção com a base do corpo",
-          "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
-        ]
-      }
+      "reaberturas": [
+        {
+          "por": "pessoa",
+          "quando": "2026-09-26",
+          "motivo": "refazer o ombro pelo desenho novo; o antigo fica como variação ombro-tambor",
+          "aceite": {
+            "por": "pessoa, 2026-09-25",
+            "observacao": "aceita no limite da rodada 8",
+            "defeitosAceitos": [
+              "colar: uniao em borda superior do colar, na junção com a base do corpo",
+              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
+            ]
+          },
+          "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
+        }
+      ]
     }
   ]
 }

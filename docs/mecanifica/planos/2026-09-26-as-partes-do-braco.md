@@ -67,6 +67,8 @@ a modelagem como feita porque a montagem só declara `base`, `anelCintura` e
 `ombro`; reabrir a etapa do ombro e declarar as peças novas fica para a
 próxima conversa com a pessoa.
 
+Em 2026-09-26 a pessoa reabriu a etapa `ombro` com `npm run etapas -- --reabrir`, que guarda o aceite e a receita antigos em `reaberturas`; `npm run objeto` mostra 2 de 3 fixas com o ombro como próxima, e as peças novas seguem fora da montagem até a pessoa confirmar a ordem.
+
 ## Incluído
 
 - fechar os mapas de partes e as pranchas da frontal e da lateral sem cabo,
