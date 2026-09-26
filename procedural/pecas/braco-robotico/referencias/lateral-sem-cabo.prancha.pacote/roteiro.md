@@ -22,7 +22,7 @@ Abra o alvo (/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referenci
 
 ## Etapa 4 — juntaCotovelo
 
-- largura: cota 29. A linha atravessa a seção que o modelador precisa, dentro de juntaCotovelo?
+- largura: cota 24. A linha atravessa a seção que o modelador precisa, dentro de juntaCotovelo?
 - altura: sem cota. A linha mede juntaCotovelo de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "juntaCotovelo" fica na coluna da esquerda. A chamada termina dentro de juntaCotovelo, e não numa vizinha?
 - linhas livres: a chamada e as cotas de juntaCotovelo não cruzam outra linha nem passam sobre número ou nome?
@@ -72,7 +72,7 @@ Abra o alvo (/home/user/nos-mecanifica/procedural/pecas/braco-robotico/referenci
 ## Etapa 11 — carcacaPunho
 
 - largura: cota 294. A linha atravessa a seção que o modelador precisa, dentro de carcacaPunho?
-- altura: sem cota. A linha mede carcacaPunho de ponta a ponta na vertical, sem pegar parte vizinha?
+- altura: cota 135. A linha mede carcacaPunho de ponta a ponta na vertical, sem pegar parte vizinha?
 - nome: "carcacaPunho" fica na coluna da direita. A chamada termina dentro de carcacaPunho, e não numa vizinha?
 - linhas livres: a chamada e as cotas de carcacaPunho não cruzam outra linha nem passam sobre número ou nome?
 

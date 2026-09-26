@@ -111,10 +111,10 @@
   {
    "parte": "juntaCotovelo",
    "medida": "largura",
-   "em": 790,
+   "em": 880,
    "numero": [
     0,
-    -30
+    0
    ]
   },
   {
@@ -130,6 +130,11 @@
     130,
     0
    ]
+  },
+  {
+   "parte": "carcacaPunho",
+   "medida": "altura",
+   "em": 500
   }
  ],
  "nomes": {
@@ -183,11 +188,11 @@
   },
   "cotovelo": {
    "marca": [
-    -90,
-    810
+    -60,
+    960
    ],
    "coluna": "esquerda",
-   "nivel": 745
+   "nivel": 1060
   },
   "juntaCotovelo": {
    "marca": [
