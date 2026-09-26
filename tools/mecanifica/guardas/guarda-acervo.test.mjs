@@ -166,7 +166,9 @@ describe('veredito de contato do acervo', () => {
        sem, o que ele afirma é que nada do que está lá reprova. */
     const { reprovadas } = await conferirAcervo(pecasDoAcervo());
     expect(reprovadas).toEqual([]);
-  });
+  /* Lê o acervo inteiro, como o teste de peça de ensaio acima: com a bateria
+     em paralelo passa de 20 s. */
+  }, 90000);
 
   /* ACERVO VAZIO PRECISA SER DECLARADO. Varredura vazia sai igual quando o
      acervo está sem peça de propósito e quando a listagem quebrou, e aprovar
