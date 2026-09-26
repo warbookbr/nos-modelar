@@ -23,15 +23,22 @@
   {
    "parte": "ombro",
    "medida": "largura",
-   "em": 330
+   "medivel": false,
+   "motivo": "ombro só aparece em duas frestas dos lados do braço; a linha de largura cruzaria o braço",
+   "notaEm": [
+    -500,
+    -270
+   ]
   },
   {
    "parte": "ombro",
    "medida": "altura",
-   "em": 125,
-   "origem": {
-    "imagem": "frontal"
-   }
+   "medivel": false,
+   "motivo": "ombro fica atrás do braço nesta vista; a frontal dá 177 mm contra 187 mm aqui",
+   "notaEm": [
+    -500,
+    -170
+   ]
   },
   {
    "parte": "braco",
@@ -41,10 +48,12 @@
   {
    "parte": "braco",
    "medida": "altura",
-   "origem": {
-    "imagem": "frontal"
-   },
-   "em": 175
+   "medivel": false,
+   "motivo": "braço cobre o ombro e some sob o cotovelo; a frontal dá 477 mm contra 456 mm aqui",
+   "notaEm": [
+    -500,
+    -220
+   ]
   },
   {
    "parte": "anelCotovelo",
@@ -54,7 +63,11 @@
   {
    "parte": "cotovelo",
    "medida": "largura",
-   "em": 850
+   "em": 850,
+   "numero": [
+    60,
+    0
+   ]
   },
   {
    "parte": "cotovelo",
@@ -64,7 +77,7 @@
   {
    "parte": "anelAntebraco",
    "medida": "largura",
-   "em": 965
+   "em": 880
   },
   {
    "parte": "antebraco",
@@ -87,7 +100,11 @@
   {
    "parte": "carcacaPunho",
    "medida": "largura",
-   "em": 955
+   "em": 840,
+   "numero": [
+    100,
+    0
+   ]
   },
   {
    "parte": "aneisPunho",
@@ -104,17 +121,17 @@
    "medida": "largura",
    "em": 575,
    "numero": [
-    -120,
-    0
+    0,
+    -40
    ]
   },
   {
    "parte": "juntaCotovelo",
    "medida": "largura",
-   "em": 880,
+   "em": 870,
    "numero": [
-    0,
-    0
+    40,
+    -110
    ]
   },
   {
@@ -125,16 +142,17 @@
   {
    "parte": "garfoPunho",
    "medida": "largura",
-   "em": 650,
-   "numero": [
-    130,
-    0
-   ]
+   "em": 660
   },
   {
    "parte": "carcacaPunho",
    "medida": "altura",
-   "em": 500
+   "em": 450
+  },
+  {
+   "parte": "flange",
+   "medida": "altura",
+   "em": 530
   }
  ],
  "nomes": {
@@ -164,11 +182,11 @@
   },
   "ombro": {
    "marca": [
-    0,
-    380
+    -93,
+    400
    ],
    "coluna": "esquerda",
-   "nivel": 380
+   "nivel": 400
   },
   "braco": {
    "marca": [
@@ -192,22 +210,22 @@
     960
    ],
    "coluna": "esquerda",
-   "nivel": 1060
+   "nivel": 1100
   },
   "juntaCotovelo": {
    "marca": [
-    95,
-    935
+    96,
+    900
    ],
    "coluna": "esquerda",
-   "nivel": 1080
+   "nivel": 1170
   },
   "anelAntebraco": {
    "marca": [
     145,
-    950
+    940
    ],
-   "coluna": "esquerda",
+   "coluna": "direita",
    "nivel": 1130
   },
   "antebraco": {
@@ -215,8 +233,8 @@
     300,
     930
    ],
-   "coluna": "esquerda",
-   "nivel": 1030
+   "coluna": "direita",
+   "nivel": 1010
   },
   "carcacaPunho": {
    "marca": [
@@ -237,10 +255,10 @@
   "garfoPunho": {
    "marca": [
     660,
-    670
+    700
    ],
    "coluna": "direita",
-   "nivel": 670
+   "nivel": 700
   },
   "flange": {
    "marca": [
