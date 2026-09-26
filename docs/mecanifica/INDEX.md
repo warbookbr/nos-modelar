@@ -178,7 +178,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: [o braço inteiro](planos/2026-09-25-o-braco-inteiro.md). Rascunho aberto: [o que o
+- Plano ativo: [as partes do braço](planos/2026-09-26-as-partes-do-braco.md). Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting

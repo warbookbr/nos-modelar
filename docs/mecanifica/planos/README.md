@@ -2,13 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** [O braço inteiro](2026-09-25-o-braco-inteiro.md).
+**Plano ativo:** [As partes do braço](2026-09-26-as-partes-do-braco.md).
 
-As partes restantes do braço robótico nascem pelo laço, parte por parte, depois
-de a porta de cada receita ser conferida contra a forma dela e de o contorno das
-referências sair da própria imagem; ao fim, o braço montado é exportado com
-cada parte na posição. O plano congelado do contorno foi trazido para dentro
-dele.
+As partes restantes do braço robótico, com o ombro refeito pela vista frontal,
+nascem pelo fluxo do objeto, e o braço montado sai exportado com cada parte na
+posição e conferida contra o contorno da referência.
+
+[O braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou em
+2026-09-26 no limite de tamanho, com a porta conferida contra a forma, o
+contorno tirado da imagem por watershed e o fluxo do objeto com mapa de
+partes, prancha e rodadas com crítico; as partes restantes e a exportação
+passaram ao plano novo.
 
 [O laço constrói parte por
 parte](encerrados/2026-09-23-o-laco-constroi-parte-por-parte.md) fechou em

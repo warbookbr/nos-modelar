@@ -1,6 +1,6 @@
 # O braço inteiro
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -9,7 +9,7 @@
 ## Problema observado
 
 O plano [o laço constrói parte por
-parte](encerrados/2026-09-23-o-laco-constroi-parte-por-parte.md) fechou com as
+parte](2026-09-23-o-laco-constroi-parte-por-parte.md) fechou com as
 três primeiras partes do braço robótico fixas: base, anel da cintura e ombro.
 As outras partes da rodada de alinhamento
 (`procedural/pecas/braco-robotico/ALINHAMENTO.md`) ainda não existem, e três
@@ -88,13 +88,8 @@ contornos de cada região da imagem, em milímetros, traçados pela própria
 imagem, com a região nomeada pela pessoa ou pelo modelador. A prancha e a
 conferência do modelo contra a referência passam a usar esse arquivo.
 
-Os candidatos a testar são Potrace, que transforma imagem de duas cores em
-contornos vetoriais e tem porte em JavaScript no npm, e OpenCV, que separa a
-imagem por cor e contraste e acha o contorno de cada região, com versão em
-JavaScript (`opencv.js`). Segment Anything recorta objetos quando a cor não
-basta, mas é modelo pesado e só entra se o corte por cor falhar. A pesquisa
-também levanta outros, como autotrace e os traçadores de bitmap de bibliotecas
-de desenho.
+Os candidatos eram Potrace e OpenCV (`opencv.js`), com Segment Anything só se
+o corte por cor falhasse, e a pesquisa levantaria outros.
 
 O trabalho é comparar os candidatos na `lateral.png`, com a mesma pergunta
 para todos: o contorno de cada parte bate com a borda da imagem, em pixels
@@ -180,22 +175,6 @@ O contrato fica em `docs/mecanifica/usar/`, e cada etapa tem saída em arquivo
 na pasta do objeto, para a ferramenta da próxima etapa ler do disco o estado
 em que o objeto está.
 
-## Andamento da fatia 3
-
-A pessoa julgou a prancha nova melhor que a traçada à mão para a IA ver a
-forma e as partes de maneira limpa, e ela entrou como segunda imagem do
-pacote. O contrato está em `docs/mecanifica/usar/FLUXO-DO-OBJETO.md`, e
-`npm run objeto` lê cada etapa no disco, aponta a próxima e lista o pacote de
-referência. A prancha ganhou `<imagem>.prancha.json` com as cotas por parte,
-PNG e rodadas com a mesma regra do mapa de partes, que passaram a ser uma
-ferramenta só (`rodadas-com-critico.mjs`); a etapa é conduzida pela skill
-`prancha-dos-contornos` com o agente `desenhista-de-prancha`. O laço de
-modelagem entrega o pacote ao modelador e ao crítico. A ferramenta só conhece
-as etapas que a montagem declara, então as nove partes restantes do braço
-precisam entrar na montagem antes do laço delas. Ligar os contornos ao
-`conferir:referencia` foi para a fatia 5, porque comparar parte a parte pede as
-partes posicionadas pela montagem, que a exportação também precisa.
-
 ## O ombro novo
 
 Decidido com a pessoa em 2026-09-25. A vista frontal do braço inteiro
@@ -217,12 +196,9 @@ A pessoa trouxe também uma vista lateral sem o cabo e já com o ombro novo
 que faltam e do ombro refeito. A `lateral.png` fica como está, porque as
 receitas já fixas e a variação `ombro-tambor` a citam.
 
-Em 2026-09-26 a ampliação foi medida pela proximidade da borda e pela
-silhueta reduzida à escala original. O Real-ESRGAN em CPU não superou a
-ampliação por vizinho mais próximo. O Gemini, com chave liberada por algumas
-horas (cerca de R$ 10), deslocou bordas em até 20 px na imagem inteira; em
-recorte manteve a silhueta a até 1 px, mas inventou costuras, aletas e
-parafusos. Nenhum entrou na ferramenta; peça de 16 px pede referência maior.
+Em 2026-09-26 a ampliação foi medida pela borda e pela silhueta reduzida à
+escala original. O Real-ESRGAN em CPU não superou o vizinho mais próximo, e o
+Gemini deslocou bordas em até 20 px ou inventou detalhe; nenhum foi adotado.
 
 ## Feito na fatia 1
 
@@ -236,10 +212,9 @@ porta fora da forma. O teste reprova a porta 3 mm fora do plano e a de raio
 
 ## Andamento da fatia 2
 
-Ensaio de 2026-09-25 na `lateral.png`: o Potrace e o OpenCV traçam a silhueta
-a até 2 px da borda em 99,9% e 100% do perímetro, mas o Potrace só separa por
-limiar de cor, não distingue partes do mesmo cinza e é GPL. O escolhido foi o
-OpenCV, que separa as partes pelas bordas de sombra da imagem.
+Ensaio de 2026-09-25 na `lateral.png`: Potrace e OpenCV traçam a silhueta a
+até 2 px da borda em quase todo o perímetro, mas o Potrace só separa por cor e
+é GPL, e o escolhido foi o OpenCV.
 O primeiro corte, só por bordas de sombra, separou cinco partes e a pessoa o
 julgou melhor em parte: juntava antebraço e carcaça do punho, deixava o ombro
 dentro da coluna e partia os anéis escuros. O corte passou a ser por
@@ -271,15 +246,10 @@ Com a pessoa, em 2026-09-25, entrou o realce da divisa: contraste local e
 nitidez aplicados só à imagem que o watershed usa, ligados por `realce` no
 arquivo de regiões. Com uma semente por parte, ele levou o ombro e o anel da
 cintura de cerca de 62% para 90% de concordância com o contorno aprovado.
-Aumentar a resolução foi ensaiado e não adotado. Na `lateral.png` aumentada
-3 vezes, o ESPCN do catálogo ONNX (240 KB, `onnxruntime-web` em CPU, 3,8 s)
-foi o mais fiel, com 43,4 dB ao reduzir de volta e 0,9% de borda falsa, contra
-39,4 dB e 1,2% do Lanczos com nitidez; a nitidez, sozinha ou depois do ESPCN,
-piorou a separação por criar halo. Nenhuma versão aumentada separou melhor
-que a original com realce (83,4% de concordância com uma semente por parte).
-O ESPCN fica como candidato se aparecer referência de resolução bem menor; o
-FSRCNN não foi achado em ONNX, e o `onnxruntime-node` não instalou porque
-baixa binário na instalação. A prancha passou a sair dos contornos:
+Aumentar a resolução 3 vezes foi ensaiado e não adotado: o ESPCN em ONNX foi
+o mais fiel (43,4 dB), mas nenhuma versão aumentada separou melhor que a
+original com realce (83,4% de concordância).
+A prancha passou a sair dos contornos:
 `npm run contorno:prancha` desenha a vista lateral com a silhueta e cada
 parte, sem coordenada digitada, e o motor de prancha mede o que desenhou. O
 arquivo de regiões ganhou `foraDoModelo`, para a parte que só tem semente para
@@ -297,4 +267,32 @@ isso é solver, e vira plano próprio.
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+**Concluído em 2026-09-26 com as fatias 1, 2 e 3 entregues e o braço dividido
+em outro plano.** O plano chegou ao limite de 300 linhas do `planos:check`, e a
+pessoa decidiu fechá-lo aqui e levar as fatias 4 e 5 para um plano novo.
+
+A fatia 1 entregou `src/autoria/porta-confere-forma.js`, que reprova a porta
+fora do plano ou do raio declarado, rodando em toda peça do acervo por
+`guarda:acervo`. A fatia 2 entregou `npm run contorno` e o módulo
+`modulos/contorno-da-imagem`, que tiram o contorno de cada parte da imagem por
+watershed com sementes nomeadas, e `npm run contorno:prancha`, que desenha a
+prancha a partir desses contornos. A fatia 3 entregou o contrato
+`docs/mecanifica/usar/FLUXO-DO-OBJETO.md` e `npm run objeto`: o mapa de
+partes e a prancha passam por rodadas com crítico (`rodadas-com-critico.mjs`,
+nota 9 fecha, até três rodadas), o mapa ganhou etiquetas, fonte e numeração, o
+pacote de referência de cada imagem fica em `<nome>.pacote`, e o arquivo de
+regiões aceita várias linhas de semente por parte. A pessoa julgou a prancha
+tirada dos contornos melhor que a traçada à mão, e ela entrou como segunda
+imagem do pacote. Ligar os contornos ao `conferir:referencia` foi adiado,
+porque comparar parte a parte pede as partes posicionadas pela montagem.
+
+As referências ganharam a frontal e a lateral sem cabo, o ombro fixado virou
+a variação `ombro-tambor` e quatro peças novas entraram na lista, como
+descrito em [o ombro novo](#o-ombro-novo).
+
+## Plano sucessor
+
+Iniciar [as partes do braço](../2026-09-26-as-partes-do-braco.md), que parte
+dos mapas de partes da frontal e da lateral sem cabo e leva as fatias 4 e 5:
+as partes restantes com o ombro refeito, a exportação do braço montado e a
+ligação dos contornos ao `conferir:referencia`.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-795 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+796 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -177,7 +177,7 @@
 - `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
 - `2026-08-20-validacao-integrada-mecanifica.md` — Validação integrada da Mecanifica — valor Agent-First
 - `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-09-25-o-braco-inteiro.md` — O braço inteiro
+- `2026-09-26-as-partes-do-braco.md` — As partes do braço
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos da Mecanifica
@@ -279,6 +279,7 @@
 - `2026-09-22-o-motor-mora-num-lugar-so.md` — O núcleo mora num lugar só, e se chama núcleo
 - `2026-09-22-o-teste-carrega-o-que-ele-prova.md` — O teste carrega o que ele prova
 - `2026-09-23-o-laco-constroi-parte-por-parte.md` — O laço constrói parte por parte
+- `2026-09-25-o-braco-inteiro.md` — O braço inteiro
 - `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
 - `README.md` — Planos encerrados
 

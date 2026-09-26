@@ -263,6 +263,6 @@ que fecha a ponta numa aresta, a topologia passou a reprovar dobra, a
 da peça, e `npm run gates` passou a rodar a bateria curta quando só mudou peça
 ou documento.
 
-O plano sucessor é [o braço inteiro](../2026-09-25-o-braco-inteiro.md), que
+O plano sucessor é [o braço inteiro](2026-09-25-o-braco-inteiro.md), que
 leva as partes restantes, as pendências anotadas aqui para depois do braço, a
 exportação do objeto montado e o plano congelado do contorno.
