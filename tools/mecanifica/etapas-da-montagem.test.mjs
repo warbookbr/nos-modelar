@@ -90,9 +90,17 @@ describe('aceite humano com defeito em aberto', () => {
     notaDePassagem: 'o canto ficou assim porque o colar é mais largo',
   })];
 
-  it('só vale quando o laço parou, e grava os defeitos aceitos', async () => {
+  it('no meio do laço, grava que o crítico não fechou junto dos defeitos', async () => {
     const noMeio = { receitas: RECEITAS, anterior: null, rodadasDe: comDefeito, limiteDe: () => 6 };
-    await recusa(fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, noMeio), 'etapa-sem-critico');
+    await recusa(fixar(arquivo, 'base', aceite, noMeio), 'etapa-sem-critico');
+    const registro = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, noMeio);
+    const aceitos = registro.etapas[0].aceite.defeitosAceitos;
+    expect(aceitos[0]).toMatch(/^crítico não fechou: /);
+    expect(aceitos.slice(1)).toEqual(['corpo: posicao em canto de baixo']);
+  });
+
+  it('com o laço parado, grava os defeitos aceitos', async () => {
+    const noMeio = { receitas: RECEITAS, anterior: null, rodadasDe: comDefeito, limiteDe: () => 6 };
     const parado = { ...noMeio, limiteDe: () => 1 };
     await recusa(fixar(arquivo, 'base', aceite, parado), 'etapa-sem-critico');
     const registro = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, parado);

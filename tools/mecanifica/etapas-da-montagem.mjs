@@ -109,24 +109,23 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
    injetável para o teste; por padrão lê a pasta de rodadas da peça. */
-/* ACEITE HUMANO COM DEFEITO EM ABERTO. Etapa com defeito em aberto só passa
-   por aceite humano: quando o laço para no limite ou sem convergência, a
-   pessoa, e nunca um agente, pode aceitar a etapa como está. `--aceite-humano`
-   só vale nesses dois casos, nunca no meio do laço, e os defeitos que o crítico
-   deixou em aberto entram no aceite gravado, para ninguém ler a etapa como
-   fechada pelo crítico. O ombro do braço parou assim em 2026-09-25, com dois
-   defeitos pequenos que a pessoa aceitou. */
+/* ACEITE HUMANO COM DEFEITO EM ABERTO. Só a pessoa, e nunca um agente, fixa
+   uma etapa que o crítico não fechou. `--aceite-humano` vale em qualquer ponto
+   do laço, porque a escolha da forma é dela: em 2026-09-28 ela escolheu o
+   ombro em L comparando duas opções sobre a base, e a última rodada ainda era
+   do desenho antigo. Os defeitos que o crítico deixou em aberto e o estado do
+   laço entram no aceite gravado, para ninguém ler a etapa como fechada pelo
+   crítico. */
 const PARADAS_ACEITAVEIS = new Set(['parar-limite', 'parar-sem-convergencia']);
 
 export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) => lerRodadas(ref), limiteDe = (ref) => limiteDaPeca(ref), { aceiteHumano = false } = {}) {
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const rodadas = ref ? rodadasDe(ref) : [];
   const decisao = proximaAcao(rodadas, { limite: ref ? limiteDe(ref) : undefined });
-  if (aceiteHumano && PARADAS_ACEITAVEIS.has(decisao.acao)) {
-    if (!rodadas.at(-1).notaDePassagem) {
-      throw new ErroEtapaDeConstrucao('etapa-sem-nota', `a última rodada de '${instancia}' não traz 'notaDePassagem' para o modelador seguinte.`);
-    }
-    return (rodadas.at(-1).veredito?.defeitos ?? []).map((d) => `${d.parte}: ${d.tipo} em ${d.onde}`);
+  if (aceiteHumano && decisao.acao !== 'parar-fechou') {
+    const defeitos = (rodadas.at(-1)?.veredito?.defeitos ?? []).map((d) => `${d.parte}: ${d.tipo} em ${d.onde}`);
+    return PARADAS_ACEITAVEIS.has(decisao.acao) ? defeitos
+      : [`crítico não fechou: ${decisao.acao} — ${decisao.motivo}`, ...defeitos];
   }
   if (decisao.acao !== 'parar-fechou') {
     throw new ErroEtapaDeConstrucao('etapa-sem-critico', `'${instancia}' ainda não foi fechada pelo crítico: ${decisao.acao} — ${decisao.motivo}`);
