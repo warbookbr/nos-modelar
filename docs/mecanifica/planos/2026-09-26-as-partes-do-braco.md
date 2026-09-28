@@ -135,3 +135,9 @@ o punho para e volta à pessoa.
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
+
+Em 2026-09-28 a pessoa comparou, em esboço, o ombro em pé e o deitado com o
+ombro de tambor já modelado, e escolheu voltar a ele: o anel do ombro tem o
+diâmetro do próprio ombro, como no tambor. A etapa `ombro` foi fixada de novo
+por aceite humano, com os dois defeitos aceitos antes. O trabalho do ombro em
+pé ficou na branch `claude/revisar-plano-ativo-cyj8c3`.
