@@ -128,6 +128,19 @@
             ]
           },
           "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
+        },
+        {
+          "por": "pessoa",
+          "quando": "2026-09-28",
+          "motivo": "arredondar a borda de cima do corpo do ombro",
+          "aceite": {
+            "por": "pessoa, 2026-09-28: volta ao ombro com tambor, que ela escolheu vendo a imagem; os dois defeitos aceitos antes continuam aceitos",
+            "defeitosAceitos": [
+              "colar: uniao em borda superior do colar, na junção com a base do corpo",
+              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
+            ]
+          },
+          "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
         }
       ]
     }

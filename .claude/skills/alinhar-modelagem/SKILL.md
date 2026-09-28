@@ -12,7 +12,9 @@ cobrado por `npm run guarda:acervo`. Uma rodada inteira respondida está em
 [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/mecanifica/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md).
 
 Pergunte uma coisa por vez e escreva o que for decidido. Resposta vaga não
-avança: se a pessoa não souber, ofereça duas opções concretas. Não modele no
+avança: se a pessoa não souber, ofereça duas opções concretas. Quando a escolha
+for de forma, mostre as opções desenhadas lado a lado com a skill
+[esbocar-opcoes](../esbocar-opcoes/SKILL.md), junto da foto. Não modele no
 meio da rodada nem escolha operação do motor; a técnica entra como descrição
 curta, e a escolha fina é do modelador.
 
