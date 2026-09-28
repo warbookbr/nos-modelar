@@ -5,7 +5,7 @@
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
-const SEGMENTOS = 64;
+const SEGMENTOS = 128;
 const PAINEL_L = 620;
 const PAINEL_A = 560;
 const TOPO = 70;
@@ -276,6 +276,38 @@ function normalizar(v) { const n = Math.hypot(...v) || 1; return v.map((c) => c 
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
 /* Decompõe uma forma em blocos/fatias axiais discretas para Z-sorting robusto. */
+function extrairArcosBorda(anel, normais, olho, mundo, w) {
+  const N = anel.length;
+  const vis = normais.map((n) => (!olho || dot(n, olho) > 1e-6));
+  const arcos = [];
+
+  let inicio = 0;
+  while (inicio < N && vis[inicio]) inicio++;
+
+  if (inicio === N) {
+    const pts = anel.map((p) => mundo(p[0], p[1], w));
+    pts.push(mundo(anel[0][0], anel[0][1], w));
+    arcos.push(pts);
+    return arcos;
+  }
+
+  for (let count = 0; count < N; count++) {
+    const idx = (inicio + count) % N;
+    if (vis[idx]) {
+      const run = [anel[idx]];
+      let j = idx;
+      while (count < N && vis[j]) {
+        run.push(anel[(j + 1) % N]);
+        count++;
+        j = (inicio + count) % N;
+      }
+      arcos.push(run.map((p) => mundo(p[0], p[1], w)));
+    }
+  }
+
+  return arcos;
+}
+
 export function fatiarForma(r, olho) {
   const { b, perfil, furos, furo, comprimento } = r.prisma;
   const furosLista = furos ?? (furo ? [furo] : []);
@@ -307,6 +339,7 @@ export function fatiarForma(r, olho) {
     const lados = [];
     const dentro = [];
     const linhas = [];
+    const arcos = [];
 
     const procLateral = (anel, para, destino) => {
       const N = anel.length;
@@ -344,11 +377,14 @@ export function fatiarForma(r, olho) {
 
         if (silA || vincA) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
         if (silD || vincD) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
-        if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
-          linhas.push([mundo(a[0], a[1], w0), mundo(d[0], d[1], w0)]);
-        }
 
         destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts });
+      }
+
+      if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) {
+          arcos.push(arc);
+        }
       }
     };
 
@@ -366,6 +402,7 @@ export function fatiarForma(r, olho) {
           lados: [],
           dentro: [],
           linhas: [],
+          arcos: [],
           tampas: [{
             papel: 'tampa',
             n,
@@ -377,7 +414,7 @@ export function fatiarForma(r, olho) {
       }
     }
 
-    chunks.push({ r, prof, lados, dentro, linhas, tampas: [] });
+    chunks.push({ r, prof, lados, dentro, linhas, arcos, tampas: [] });
 
     if (j === fatias - 1) {
       const n = eixoN(1);
@@ -388,6 +425,7 @@ export function fatiarForma(r, olho) {
           lados: [],
           dentro: [],
           linhas: [],
+          arcos: [],
           tampas: [{
             papel: 'tampa',
             n,
@@ -462,6 +500,7 @@ function distPoligono(p, poly) {
 
 const f1 = (x) => Math.round(x * 10) / 10;
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
+const caminhoAberto = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}`;
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /* Quebra a frase em linhas de até n caracteres. */
@@ -641,6 +680,11 @@ export function desenharEsboco(esboco) {
       for (const l of ch.linhas) {
         const [p1, p2] = l.map(V.p).map(tela);
         partes.push(`<line x1="${f1(p1[0])}" y1="${f1(p1[1])}" x2="${f1(p2[0])}" y2="${f1(p2[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+      }
+
+      for (const arc of ch.arcos ?? []) {
+        if (arc.length < 2) continue;
+        partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
       }
 
       for (const t of ch.tampas) {
