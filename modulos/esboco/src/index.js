@@ -294,7 +294,7 @@ export function fatiarForma(r, olho) {
   const pe = anti(perfil);
   const fus = furosLista.map((fu) => anti(fu));
 
-  const fatias = comprimento <= 15 ? 1 : Math.max(1, Math.min(24, Math.ceil(comprimento / 12)));
+  const fatias = comprimento <= 10 ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
   const chunks = [];
 
   for (let j = 0; j < fatias; j++) {
@@ -307,7 +307,6 @@ export function fatiarForma(r, olho) {
     const lados = [];
     const dentro = [];
     const linhas = [];
-    const tampas = [];
 
     const procLateral = (anel, para, destino) => {
       const N = anel.length;
@@ -361,29 +360,44 @@ export function fatiarForma(r, olho) {
     if (j === 0) {
       const n = eixoN(-1);
       if (!olho || dot(n, olho) > 1e-6) {
-        tampas.push({
-          papel: 'tampa',
-          n,
-          pts: perfil.map((p) => mundo(p[0], p[1], w0)),
-          furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w0))),
-          furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w0)) : null,
-        });
-      }
-    }
-    if (j === fatias - 1) {
-      const n = eixoN(1);
-      if (!olho || dot(n, olho) > 1e-6) {
-        tampas.push({
-          papel: 'tampa',
-          n,
-          pts: perfil.map((p) => mundo(p[0], p[1], w1)),
-          furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w1))),
-          furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w1)) : null,
+        chunks.push({
+          r,
+          prof: dot(mundo(0, 0, w0), olho),
+          lados: [],
+          dentro: [],
+          linhas: [],
+          tampas: [{
+            papel: 'tampa',
+            n,
+            pts: perfil.map((p) => mundo(p[0], p[1], w0)),
+            furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w0))),
+            furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w0)) : null,
+          }],
         });
       }
     }
 
-    chunks.push({ r, prof, lados, dentro, linhas, tampas });
+    chunks.push({ r, prof, lados, dentro, linhas, tampas: [] });
+
+    if (j === fatias - 1) {
+      const n = eixoN(1);
+      if (!olho || dot(n, olho) > 1e-6) {
+        chunks.push({
+          r,
+          prof: dot(mundo(0, 0, w1), olho),
+          lados: [],
+          dentro: [],
+          linhas: [],
+          tampas: [{
+            papel: 'tampa',
+            n,
+            pts: perfil.map((p) => mundo(p[0], p[1], w1)),
+            furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w1))),
+            furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w1)) : null,
+          }],
+        });
+      }
+    }
   }
 
   return chunks;
@@ -505,6 +519,9 @@ export function desenharEsboco(esboco) {
     const todosChunks = p.itens.flatMap((it) => it.chunks);
     todosChunks.sort((a, b) => {
       if (Math.abs(a.prof - b.prof) > 1e-3) return a.prof - b.prof;
+      const aTemFuro = (a.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
+      const bTemFuro = (b.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
+      if (aTemFuro !== bTemFuro) return aTemFuro ? 1 : -1;
       const rA = a.r.forma.diametro ?? a.r.forma.diametroInterno ?? 0;
       const rB = b.r.forma.diametro ?? b.r.forma.diametroInterno ?? 0;
       if (rA !== rB) return rA - rB;
