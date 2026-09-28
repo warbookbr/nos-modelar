@@ -1,6 +1,24 @@
 # As partes do braço
 
-**Estado:** ativo
+**Estado:** congelado
+**Congelado em:** 2026-09-28, por decisão da pessoa · **Base:** branch `claude/revisar-plano-ativo-cyj8c3`
+
+**Por que foi congelado:** o ombro com o canto reto da foto frontal pede dois
+sólidos fundidos numa peça só, e o núcleo não sabe fazer isso. O cotovelo, o
+punho e o garfo vão pedir o mesmo. A rota passou a ser dar essa capacidade ao
+núcleo antes de seguir parte por parte.
+
+**Condição de descongelamento:** o plano [união de
+sólidos](../2026-09-28-uniao-de-solidos.md) fechar com o passo `unir` no
+núcleo. Este plano é o candidato principal para vir em seguida.
+
+**Levado para o plano novo:** o ombro com canto reto, como prova da união.
+
+**Fica parado:** base, anel da cintura e ombro em L fixos na montagem; o
+ombro de tambor em `partes/ombro-tambor`; as partes restantes, na ordem
+anelOmbro, braco, anelCotovelo, cotovelo, juntaCotovelo, anelAntebraco,
+antebraco, carcacaPunho, anelTampaPunho, tampaPunho, aneisPunho, garfoPunho e
+flange; e a exportação do braço montado.
 
 **Responsável:** Tiago (autoria) e a IA da sessão (implementação)
 
@@ -8,7 +26,7 @@
 
 ## Problema observado
 
-O plano [o braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou com
+O plano [o braço inteiro](../encerrados/2026-09-25-o-braco-inteiro.md) fechou com
 a porta conferida contra a forma, o contorno tirado da imagem e o fluxo do
 objeto escrito, mas o braço robótico ainda tem só base e anel da cintura
 fixos. O ombro será refeito pela vista frontal, as outras partes da rodada de

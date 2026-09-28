@@ -2,11 +2,15 @@
 
 ## Estado
 
-**Plano ativo:** [As partes do braço](2026-09-26-as-partes-do-braco.md).
+**Plano ativo:** [União de sólidos](2026-09-28-uniao-de-solidos.md).
 
-As partes restantes do braço robótico, com o ombro refeito pela vista frontal,
-nascem pelo fluxo do objeto, e o braço montado sai exportado com cada parte na
-posição e conferida contra o contorno da referência.
+Uma receita junta, subtrai ou intersecta dois sólidos com um passo só, e a
+malha sai fechada, sem face interna e com a origem de cada face. A prova é o
+ombro do braço com o canto reto da foto frontal, sem vinco.
+
+[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md) foi
+congelado em 2026-09-28 para dar lugar à união, e é o candidato principal
+para voltar depois dela.
 
 [O braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou em
 2026-09-26 no limite de tamanho, com a porta conferida contra a forma, o
