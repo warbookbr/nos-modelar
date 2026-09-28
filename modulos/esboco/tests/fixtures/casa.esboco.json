@@ -1,0 +1,122 @@
+{
+  "vista": "isometrica",
+  "linhasCentro": false,
+  "opcoes": [
+    {
+      "id": "casa_unifamiliar",
+      "titulo": "Casa Simples Unifamiliar",
+      "nota": "Residência unifamiliar com fundação rasa, alvenaria estrutural, esquadrias, alpendre e telhado cerâmico de duas águas com chaminé.",
+      "formas": [
+        {
+          "id": "fundacao",
+          "tipo": "caixa",
+          "largura": 150,
+          "altura": 8,
+          "profundidade": 130,
+          "centro": [0, 4, 0],
+          "cor": "#94a3b8",
+          "rotulo": "fundacao"
+        },
+        {
+          "id": "paredes",
+          "tipo": "caixa",
+          "largura": 110,
+          "altura": 70,
+          "profundidade": 90,
+          "centro": [0, 43, 0],
+          "cor": "#f1f5f9",
+          "rotulo": "alvenaria"
+        },
+        {
+          "id": "porta",
+          "tipo": "caixa",
+          "largura": 24,
+          "altura": 46,
+          "profundidade": 4,
+          "centro": [-20, 31, 46],
+          "cor": "#d97706",
+          "rotulo": "porta_social"
+        },
+        {
+          "id": "pilar_esq",
+          "tipo": "cilindro",
+          "diametro": 6,
+          "comprimento": 50,
+          "eixo": "y",
+          "centro": [-32, 33, 56],
+          "cor": "#94a3b8"
+        },
+        {
+          "id": "pilar_dir",
+          "tipo": "cilindro",
+          "diametro": 6,
+          "comprimento": 50,
+          "eixo": "y",
+          "centro": [-8, 33, 56],
+          "cor": "#94a3b8"
+        },
+        {
+          "id": "marquise_entrada",
+          "tipo": "caixa",
+          "largura": 32,
+          "altura": 4,
+          "profundidade": 16,
+          "centro": [-20, 59, 53],
+          "cor": "#c2410c",
+          "rotulo": "alpendre"
+        },
+        {
+          "id": "janela_frente",
+          "tipo": "caixa",
+          "largura": 26,
+          "altura": 24,
+          "profundidade": 4,
+          "centro": [24, 48, 46],
+          "cor": "#38bdf8",
+          "rotulo": "janela_frontal"
+        },
+        {
+          "id": "janela_lateral",
+          "tipo": "caixa",
+          "largura": 4,
+          "altura": 24,
+          "profundidade": 30,
+          "centro": [56, 48, 0],
+          "cor": "#38bdf8",
+          "rotulo": "janela_lateral"
+        },
+        {
+          "id": "chamine",
+          "tipo": "caixa",
+          "largura": 16,
+          "altura": 48,
+          "profundidade": 16,
+          "centro": [26, 114, -15],
+          "cor": "#b91c1c",
+          "rotulo": "chamine"
+        },
+        {
+          "id": "telhado_esq",
+          "tipo": "caixa",
+          "largura": 78,
+          "altura": 6,
+          "profundidade": 106,
+          "centro": [-32.5, 90, 0],
+          "rotacao": [0, 0, 32.87],
+          "cor": "#c2410c",
+          "rotulo": "telhado_duas_aguas"
+        },
+        {
+          "id": "telhado_dir",
+          "tipo": "caixa",
+          "largura": 78,
+          "altura": 6,
+          "profundidade": 106,
+          "centro": [32.5, 90, 0],
+          "rotacao": [0, 0, -32.87],
+          "cor": "#c2410c"
+        }
+      ]
+    }
+  ]
+}
