@@ -105,4 +105,19 @@ describe('esboço', () => {
     const r = desenharEsboco(esb);
     expect(r.svg).toContain('<svg');
   });
+
+  it('gera linhas de centro técnicas (traço-ponto) com fusão colinear em corpos de revolução e furos', () => {
+    const esb = {
+      opcoes: [{
+        linhasCentro: true,
+        formas: [
+          { id: 'alojamento', tipo: 'anel', diametroExterno: 40, diametroInterno: 20, espessura: 30, eixo: 'z', centro: [0, 0, 0] },
+          { id: 'eixo', tipo: 'cilindro', diametro: 18, comprimento: 80, eixo: 'z', ponta: ['alojamento', '-z'], desloca: [0, 0, 50] },
+          { id: 'base', tipo: 'caixa', largura: 60, altura: 15, profundidade: 40, centro: [0, -30, 0], furos: [{ diametro: 8, centro: [20, 0] }] },
+        ],
+      }],
+    };
+    const r = desenharEsboco(esb);
+    expect(r.svg).toContain('stroke-dasharray="14,3,2,3"');
+  });
 });

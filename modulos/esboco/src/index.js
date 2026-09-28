@@ -517,18 +517,119 @@ export function desenharEsboco(esboco) {
     partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
 
     const todosChunks = p.itens.flatMap((it) => it.chunks);
+
+    /* Linhas de centro: eixos de rotação (cilindros/anéis) e furos passantes. */
+    const querLinhasCentroGeral = Boolean(p.opcao.linhasCentro);
+    const segmentosCentro = [];
+
+    for (const it of p.itens) {
+      const f = it.r.forma;
+      const querCentro = f.linhaCentro !== undefined ? Boolean(f.linhaCentro) : querLinhasCentroGeral;
+      if (!querCentro) continue;
+
+      const ext = typeof f.linhaCentro === 'object' && typeof f.linhaCentro.extensao === 'number'
+        ? f.linhaCentro.extensao
+        : 8;
+
+      const mundoDe = (u, v, w) => {
+        const pl = ponto3(it.r.prisma.b, u, v, w);
+        const pr = aplicarMatriz(pl, it.r.matriz);
+        return [pr[0] + it.r.centro[0], pr[1] + it.r.centro[1], pr[2] + it.r.centro[2]];
+      };
+
+      if (f.tipo === 'cilindro' || f.tipo === 'anel') {
+        const L = it.r.prisma.comprimento;
+        const p1 = mundoDe(0, 0, -L / 2);
+        const p2 = mundoDe(0, 0, L / 2);
+        segmentosCentro.push({ p1, p2, ext, ehEixo: true });
+      } else if (f.tipo === 'caixa') {
+        const L = it.r.prisma.comprimento;
+        const centrosFuros = [];
+        if (Array.isArray(f.furos)) {
+          for (const item of f.furos) centrosFuros.push(item.centro ?? [0, 0]);
+        } else if (f.furo && typeof f.furo === 'object') {
+          centrosFuros.push(f.furo.centro ?? [0, 0]);
+        }
+        for (const cf of centrosFuros) {
+          const p1 = mundoDe(cf[0], cf[1], -L / 2);
+          const p2 = mundoDe(cf[0], cf[1], L / 2);
+          segmentosCentro.push({ p1, p2, ext, ehEixo: false });
+        }
+      }
+    }
+
+    // Fusão de segmentos colineares (mesmo eixo geométrico 3D)
+    const gruposColineares = new Map();
+    for (const seg of segmentosCentro) {
+      const v = [seg.p2[0] - seg.p1[0], seg.p2[1] - seg.p1[1], seg.p2[2] - seg.p1[2]];
+      const len = Math.hypot(...v);
+      if (len < 1e-4) continue;
+      let d = [v[0] / len, v[1] / len, v[2] / len];
+      if (d[0] < -1e-4 || (Math.abs(d[0]) <= 1e-4 && (d[1] < -1e-4 || (Math.abs(d[1]) <= 1e-4 && d[2] < -1e-4)))) {
+        d = [-d[0], -d[1], -d[2]];
+      }
+      const proj = seg.p1[0] * d[0] + seg.p1[1] * d[1] + seg.p1[2] * d[2];
+      const p0 = [seg.p1[0] - proj * d[0], seg.p1[1] - proj * d[1], seg.p1[2] - proj * d[2]];
+      const chave = `${d.map((n) => Math.round(n * 100)).join(',')}|${p0.map((n) => Math.round(n * 2)).join(',')}`;
+      if (!gruposColineares.has(chave)) {
+        gruposColineares.set(chave, { d, p0, tMin: Infinity, tMax: -Infinity, extMax: 0, ehEixo: false });
+      }
+      const g = gruposColineares.get(chave);
+      const t1 = seg.p1[0] * d[0] + seg.p1[1] * d[1] + seg.p1[2] * d[2];
+      const t2 = seg.p2[0] * d[0] + seg.p2[1] * d[1] + seg.p2[2] * d[2];
+      g.tMin = Math.min(g.tMin, t1, t2);
+      g.tMax = Math.max(g.tMax, t1, t2);
+      g.extMax = Math.max(g.extMax, seg.ext);
+      if (seg.ehEixo) g.ehEixo = true;
+    }
+
+    for (const g of gruposColineares.values()) {
+      const pIni = [
+        g.p0[0] + (g.tMin - g.extMax) * g.d[0],
+        g.p0[1] + (g.tMin - g.extMax) * g.d[1],
+        g.p0[2] + (g.tMin - g.extMax) * g.d[2],
+      ];
+      const pFim = [
+        g.p0[0] + (g.tMax + g.extMax) * g.d[0],
+        g.p0[1] + (g.tMax + g.extMax) * g.d[1],
+        g.p0[2] + (g.tMax + g.extMax) * g.d[2],
+      ];
+      const q1 = tela(V.p(pIni));
+      const q2 = tela(V.p(pFim));
+      const prof = g.ehEixo
+        ? Math.max(dot(pIni, olho), dot(pFim, olho)) + 0.5
+        : dot([(pIni[0] + pFim[0]) / 2, (pIni[1] + pFim[1]) / 2, (pIni[2] + pFim[2]) / 2], olho);
+
+      todosChunks.push({
+        tipo: 'linhaCentro',
+        prof,
+        q1,
+        q2,
+        r: { min: [0, 0, 0], forma: {} },
+        lados: [],
+        dentro: [],
+        linhas: [],
+        tampas: [],
+      });
+    }
+
     todosChunks.sort((a, b) => {
       if (Math.abs(a.prof - b.prof) > 1e-3) return a.prof - b.prof;
       const aTemFuro = (a.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
       const bTemFuro = (b.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
       if (aTemFuro !== bTemFuro) return aTemFuro ? 1 : -1;
-      const rA = a.r.forma.diametro ?? a.r.forma.diametroInterno ?? 0;
-      const rB = b.r.forma.diametro ?? b.r.forma.diametroInterno ?? 0;
+      const rA = a.r?.forma?.diametro ?? a.r?.forma?.diametroInterno ?? 0;
+      const rB = b.r?.forma?.diametro ?? b.r?.forma?.diametroInterno ?? 0;
       if (rA !== rB) return rA - rB;
-      return a.r.min[1] - b.r.min[1];
+      return (a.r?.min?.[1] ?? 0) - (b.r?.min?.[1] ?? 0);
     });
 
     for (const ch of todosChunks) {
+      if (ch.tipo === 'linhaCentro') {
+        partes.push(`<line x1="${f1(ch.q1[0])}" y1="${f1(ch.q1[1])}" x2="${f1(ch.q2[0])}" y2="${f1(ch.q2[1])}" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>`);
+        continue;
+      }
+
       const base = hexDe(ch.r.forma.cor);
       const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
 
@@ -554,6 +655,7 @@ export function desenharEsboco(esboco) {
         partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
       }
     }
+
     /* Rótulos: fora do desenho, à esquerda ou à direita, empilhados sem colidir. */
     const esquerda = x0 + 20;
     const direita = x0 + PAINEL_L - 20;

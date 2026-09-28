@@ -4,6 +4,7 @@
     {
       "titulo": "Opção A: Mancal Básico",
       "nota": "Alojamento cilíndrico central com eixo passante e ponta achatada",
+      "linhasCentro": true,
       "formas": [
         {
           "id": "base",
