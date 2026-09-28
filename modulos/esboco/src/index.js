@@ -510,28 +510,73 @@ export function desenharEsboco(esboco) {
     const esquerda = x0 + 20;
     const direita = x0 + PAINEL_L - 20;
     const meio = x0 + PAINEL_L / 2;
-    const rotulados = p.itens.filter((it) => it.r.forma.rotulo).map((it) => {
-      const cs = it.casco.map(tela);
-      const centro = [cs.reduce((s, q) => s + q[0], 0) / cs.length, cs.reduce((s, q) => s + q[1], 0) / cs.length];
-      const lado = centro[0] < meio ? 'e' : 'd';
-      /* A âncora fica na borda da silhueta voltada para o rótulo, que é a
-         parte que as outras formas menos cobrem; entra 8 px para dentro. */
-      const extremo = lado === 'e' ? Math.min(...cs.map((q) => q[0])) : Math.max(...cs.map((q) => q[0]));
-      const naBorda = cs.filter((q) => Math.abs(q[0] - extremo) < 3).sort((a, b) => Math.abs(a[1] - centro[1]) - Math.abs(b[1] - centro[1]))[0];
-      const ancora = [naBorda[0] + (lado === 'e' ? 8 : -8), naBorda[1]];
-      return { it, ancora, lado };
-    });
+    const contagemLados = { e: 0, d: 0 };
+    const rotulados = p.itens
+      .filter((it) => it.r.forma.rotulo)
+      .map((it, idx) => {
+        const rotInfo = typeof it.r.forma.rotulo === 'object'
+          ? it.r.forma.rotulo
+          : { texto: it.r.forma.rotulo };
+        const cTela = tela(V.p(it.r.centro));
+        let lado;
+        if (rotInfo.lado) {
+          lado = String(rotInfo.lado).startsWith('d') ? 'd' : 'e';
+        } else {
+          const diffX = cTela[0] - meio;
+          if (Math.abs(diffX) < 25) {
+            lado = contagemLados.e <= contagemLados.d ? 'e' : 'd';
+          } else {
+            lado = diffX < 0 ? 'e' : 'd';
+          }
+        }
+        contagemLados[lado]++;
+
+        const corPeca = hexDe(it.r.forma.cor);
+        const ptsPeca = it.fs.flatMap((f) => f.pts).map(V.p).map(tela);
+        const fForma = it.r.forma;
+        const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
+        const raioTela = Math.max(12, (dimMm / 2) * escala * 0.75);
+        const alvoX = cTela[0] + (lado === 'e' ? -raioTela : raioTela);
+        const alvoY = cTela[1];
+
+        let melhorPt = ptsPeca[0] ?? cTela;
+        let melhorDist = Infinity;
+        for (const pt of ptsPeca) {
+          const penalidadeLado = lado === 'e' ? (pt[0] > cTela[0] ? 60 : 0) : (pt[0] < cTela[0] ? 60 : 0);
+          const d = Math.hypot(pt[0] - alvoX, pt[1] - alvoY) + penalidadeLado;
+          if (d < melhorDist) {
+            melhorDist = d;
+            melhorPt = pt;
+          }
+        }
+        const dx = melhorPt[0] - cTela[0];
+        const dy = melhorPt[1] - cTela[1];
+        const distC = Math.hypot(dx, dy) || 1;
+        const ancora = [melhorPt[0] - (dx / distC) * 4, melhorPt[1] - (dy / distC) * 4];
+
+        return {
+          it,
+          texto: rotInfo.texto,
+          numero: idx + 1,
+          ancora,
+          lado,
+          corPeca,
+        };
+      });
+
     for (const lado of ['e', 'd']) {
       const grupo = rotulados.filter((r) => r.lado === lado).sort((a, b) => a.ancora[1] - b.ancora[1]);
       let ultimo = TOPO + 10;
       for (const r of grupo) {
-        const linhas = quebrar(r.it.r.forma.rotulo, 15);
+        const textoCompleto = `${r.numero}. ${r.texto}`;
+        const linhas = quebrar(textoCompleto, 20);
         const y = Math.max(r.ancora[1], ultimo + 12);
         ultimo = y + linhas.length * 20;
         const xt = lado === 'e' ? esquerda : direita;
-        const xl = lado === 'e' ? esquerda + 135 : direita - 135;
-        partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/><circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="4" fill="#222222"/>`);
-        linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="16" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
+        const xl = lado === 'e' ? esquerda + 145 : direita - 145;
+        partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/>`);
+        partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
+        linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="15" font-weight="${i === 0 ? 'bold' : 'normal'}" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
       }
     }
     quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
