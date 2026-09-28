@@ -499,7 +499,7 @@
 
 ## procedural/pecas/braco-robotico/partes/ombro/
 
-- `receita.js` — braco-robotico/ombro — o ombro do braço robótico, sobre o anel da cintura: um colar redondo, um corpo com planta em "D" e o tambor da junta.
+- `receita.js` — braco-robotico/ombro — ombro escolhido pela pessoa em 2026-09-28, partindo da rodada 2 (cotovelo de cano), depois de comparar com o ombro de tambor sobre a b…
 
 ## procedural/pecas/braco-robotico/partes/ombro-tambor/
 

@@ -42,7 +42,7 @@
     },
     {
       "id": "colarComORaioDoAnel",
-      "alvo": { "instancia": "ombro", "param": "raioDoColar" },
+      "alvo": { "instancia": "ombro", "param": "raioDoPescoco" },
       "de": { "instancia": "anelCintura", "porta": "topo", "medida": "raioExterno" },
       "unidade": "mm",
       "acrescimo": 0
