@@ -70,6 +70,49 @@ function ponto3(b, u, v, w) {
   return p;
 }
 
+function matrizRotacao(rot) {
+  if (!rot) return null;
+  let rx = 0, ry = 0, rz = 0;
+  if (Array.isArray(rot)) {
+    [rx = 0, ry = 0, rz = 0] = rot;
+  } else if (typeof rot === 'object') {
+    if (rot.eixo && rot.angulo !== undefined) {
+      if (rot.eixo === 'x') rx = rot.angulo;
+      else if (rot.eixo === 'y') ry = rot.angulo;
+      else if (rot.eixo === 'z') rz = rot.angulo;
+    } else {
+      rx = rot.x ?? 0;
+      ry = rot.y ?? 0;
+      rz = rot.z ?? 0;
+    }
+  } else if (typeof rot === 'number') {
+    ry = rot;
+  }
+  if (!rx && !ry && !rz) return null;
+  const radX = (rx * Math.PI) / 180;
+  const radY = (ry * Math.PI) / 180;
+  const radZ = (rz * Math.PI) / 180;
+
+  const cx = Math.cos(radX), sx = Math.sin(radX);
+  const cy = Math.cos(radY), sy = Math.sin(radY);
+  const cz = Math.cos(radZ), sz = Math.sin(radZ);
+
+  return [
+    [cz * cy, cz * sy * sx - sz * cx, cz * sy * cx + sz * sx],
+    [sz * cy, sz * sy * sx + cz * cx, sz * sy * cx - cz * sx],
+    [-sy,     cy * sx,                cy * cx],
+  ];
+}
+
+function aplicarMatriz(v, m) {
+  if (!m) return v;
+  return [
+    m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
+    m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+    m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
+  ];
+}
+
 /* Converte uma forma declarada em prisma local centrado na origem. */
 function prisma(f, onde) {
   const tipo = f.tipo;
@@ -90,7 +133,7 @@ function prisma(f, onde) {
       const n = k === b.u ? [s, 0] : [0, s];
       perfil = cortar(perfil, n, f.diametro / 2 - profundidade);
     }
-    return { b, perfil, furo: null, comprimento: f.comprimento };
+    return { b, perfil, furos: [], furo: null, comprimento: f.comprimento };
   }
   if (tipo === 'anel') {
     exigir(numPos(f.diametroExterno), `${onde}: anel precisa de "diametroExterno" positivo em mm`);
@@ -99,22 +142,61 @@ function prisma(f, onde) {
     exigir(numPos(f.espessura), `${onde}: anel precisa de "espessura" positiva em mm`);
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
-    return { b: base(eixo), perfil: circulo(f.diametroExterno / 2), furo: f.diametroInterno > 0 ? circulo(f.diametroInterno / 2) : null, comprimento: f.espessura };
+    const furos = f.diametroInterno > 0 ? [circulo(f.diametroInterno / 2)] : [];
+    return { b: base(eixo), perfil: circulo(f.diametroExterno / 2), furos, furo: furos[0] ?? null, comprimento: f.espessura };
   }
   if (tipo === 'caixa') {
     exigir(numPos(f.largura) && numPos(f.altura) && numPos(f.profundidade), `${onde}: caixa precisa de "largura", "altura" e "profundidade" positivas em mm`);
     /* u = x (largura), v = z (profundidade), extrusão em y (altura). */
-    return { b: base('y'), perfil: retanguloArredondado(f.largura, f.profundidade, f.raio), furo: null, comprimento: f.altura };
+    const furos = [];
+    if (Array.isArray(f.furos)) {
+      for (const [idx, item] of f.furos.entries()) {
+        exigir(numPos(item.diametro), `${onde}: furos[${idx}] precisa de "diametro" positivo em mm`);
+        const cf = item.centro ?? [0, 0];
+        exigir(Array.isArray(cf) && cf.length === 2 && cf.every((n) => typeof n === 'number'),
+          `${onde}: furos[${idx}] precisa de "centro" [x, z] numérico`);
+        const r = item.diametro / 2;
+        furos.push(circulo(r).map(([u, v]) => [u + cf[0], v + cf[1]]));
+      }
+    } else if (f.furo && typeof f.furo === 'object') {
+      exigir(numPos(f.furo.diametro), `${onde}: furo precisa de "diametro" positivo em mm`);
+      const cf = f.furo.centro ?? [0, 0];
+      exigir(Array.isArray(cf) && cf.length === 2 && cf.every((n) => typeof n === 'number'),
+        `${onde}: furo precisa de "centro" [x, z] numérico`);
+      const r = f.furo.diametro / 2;
+      furos.push(circulo(r).map(([u, v]) => [u + cf[0], v + cf[1]]));
+    }
+    return { b: base('y'), perfil: retanguloArredondado(f.largura, f.profundidade, f.raio), furos, furo: furos[0] ?? null, comprimento: f.altura };
   }
   throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel ou caixa`);
 }
 
-function caixaLocal(pr) {
-  const min = [0, 0, 0];
-  const max = [0, 0, 0];
-  min[pr.b.e] = -pr.comprimento / 2; max[pr.b.e] = pr.comprimento / 2;
-  min[pr.b.u] = Math.min(...pr.perfil.map((p) => p[0])); max[pr.b.u] = Math.max(...pr.perfil.map((p) => p[0]));
-  min[pr.b.v] = Math.min(...pr.perfil.map((p) => p[1])); max[pr.b.v] = Math.max(...pr.perfil.map((p) => p[1]));
+function caixaLocal(pr, m) {
+  if (!m) {
+    const min = [0, 0, 0];
+    const max = [0, 0, 0];
+    min[pr.b.e] = -pr.comprimento / 2; max[pr.b.e] = pr.comprimento / 2;
+    min[pr.b.u] = Math.min(...pr.perfil.map((p) => p[0])); max[pr.b.u] = Math.max(...pr.perfil.map((p) => p[0]));
+    min[pr.b.v] = Math.min(...pr.perfil.map((p) => p[1])); max[pr.b.v] = Math.max(...pr.perfil.map((p) => p[1]));
+    return { min, max };
+  }
+  const vertices = [];
+  const half = pr.comprimento / 2;
+  for (const w of [-half, half]) {
+    for (const [u, v] of pr.perfil) {
+      vertices.push(aplicarMatriz(ponto3(pr.b, u, v, w), m));
+    }
+  }
+  const min = [
+    Math.min(...vertices.map((p) => p[0])),
+    Math.min(...vertices.map((p) => p[1])),
+    Math.min(...vertices.map((p) => p[2])),
+  ];
+  const max = [
+    Math.max(...vertices.map((p) => p[0])),
+    Math.max(...vertices.map((p) => p[1])),
+    Math.max(...vertices.map((p) => p[2])),
+  ];
   return { min, max };
 }
 
@@ -142,7 +224,8 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
     exigir(!visitando.has(id), `${onde}: referência circular em sobre/ponta`);
     visitando.add(id);
     const pr = prisma(f, onde);
-    const local = caixaLocal(pr);
+    const m = matrizRotacao(f.rotacao);
+    const local = caixaLocal(pr, m);
     const modos = ['centro', 'sobre', 'ponta'].filter((k) => f[k] !== undefined);
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     let centro = [0, 0, 0];
@@ -167,9 +250,9 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
       centro = centro.map((c, i) => c + f.desloca[i]);
     }
     const r = {
-      id, forma: f, prisma: pr, centro,
-      min: local.min.map((m, i) => m + centro[i]),
-      max: local.max.map((m, i) => m + centro[i]),
+      id, forma: f, prisma: pr, centro, matriz: m,
+      min: local.min.map((val, i) => val + centro[i]),
+      max: local.max.map((val, i) => val + centro[i]),
     };
     visitando.delete(id);
     prontas.set(id, r);
@@ -192,36 +275,123 @@ const LUZ = normalizar([-0.35, 1, 0.55]);
 function normalizar(v) { const n = Math.hypot(...v) || 1; return v.map((c) => c / n); }
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
-/* Faces 3D de uma forma já posicionada, cada uma com normal e papel. */
-function faces(r) {
-  const { b, perfil, furo, comprimento } = r.prisma;
+/* Decompõe uma forma em blocos/fatias axiais discretas para Z-sorting robusto. */
+export function fatiarForma(r, olho) {
+  const { b, perfil, furos, furo, comprimento } = r.prisma;
+  const furosLista = furos ?? (furo ? [furo] : []);
   const c = r.centro;
-  const mundo = (u, v, w) => ponto3(b, u, v, w).map((x, i) => x + c[i]);
-  const eixoN = (s) => ponto3(b, 0, 0, s);
-  const lista = [];
-  const lateral = (anel, para) => {
-    for (let i = 0; i < anel.length; i++) {
-      const a = anel[i];
-      const d = anel[(i + 1) % anel.length];
-      const du = d[0] - a[0];
-      const dv = d[1] - a[1];
-      /* Perfil anti-horário: a normal externa é (dv, -du) no plano (u, v),
-         e a mesma direção vale no espaço porque u e v são eixos do mundo. */
-      const s = para === 'fora' ? 1 : -1;
-      const n = normalizar(ponto3(b, s * dv, -s * du, 0));
-      lista.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts: [mundo(a[0], a[1], -comprimento / 2), mundo(d[0], d[1], -comprimento / 2), mundo(d[0], d[1], comprimento / 2), mundo(a[0], a[1], comprimento / 2)] });
-    }
+  const m = r.matriz;
+  const mundo = (u, v, w) => {
+    const pl = ponto3(b, u, v, w);
+    const pr = aplicarMatriz(pl, m);
+    return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]];
   };
-  /* A orientação do perfil depende da base; garante anti-horário em (u, v). */
+  const rotNormal = (nl) => normalizar(aplicarMatriz(nl, m));
+  const eixoN = (s) => rotNormal(ponto3(b, 0, 0, s));
+
   const area = (pl) => pl.reduce((s, p, i) => s + p[0] * pl[(i + 1) % pl.length][1] - pl[(i + 1) % pl.length][0] * p[1], 0);
   const anti = (pl) => (area(pl) >= 0 ? pl : [...pl].reverse());
   const pe = anti(perfil);
-  lateral(pe, 'fora');
-  if (furo) lateral(anti(furo), 'dentro');
-  for (const s of [-1, 1]) {
-    lista.push({ papel: 'tampa', n: eixoN(s), pts: perfil.map((p) => mundo(p[0], p[1], (s * comprimento) / 2)), furo: furo ? furo.map((p) => mundo(p[0], p[1], (s * comprimento) / 2)) : null });
+  const fus = furosLista.map((fu) => anti(fu));
+
+  const fatias = comprimento <= 15 ? 1 : Math.max(1, Math.min(24, Math.ceil(comprimento / 12)));
+  const chunks = [];
+
+  for (let j = 0; j < fatias; j++) {
+    const w0 = -comprimento / 2 + (j * comprimento) / fatias;
+    const w1 = -comprimento / 2 + ((j + 1) * comprimento) / fatias;
+    const wMid = (w0 + w1) / 2;
+    const centroChunk = mundo(0, 0, wMid);
+    const prof = dot(centroChunk, olho);
+
+    const lados = [];
+    const dentro = [];
+    const linhas = [];
+    const tampas = [];
+
+    const procLateral = (anel, para, destino) => {
+      const N = anel.length;
+      const s = para === 'fora' ? 1 : -1;
+      const normais = [];
+      for (let i = 0; i < N; i++) {
+        const a = anel[i];
+        const d = anel[(i + 1) % N];
+        const du = d[0] - a[0];
+        const dv = d[1] - a[1];
+        normais.push(rotNormal(ponto3(b, s * dv, -s * du, 0)));
+      }
+
+      for (let i = 0; i < N; i++) {
+        const a = anel[i];
+        const d = anel[(i + 1) % N];
+        const n = normais[i];
+        if (olho && dot(n, olho) <= 1e-6) continue;
+
+        const nPrev = normais[(i - 1 + N) % N];
+        const nNext = normais[(i + 1) % N];
+
+        const silA = olho ? dot(n, olho) > 0 && dot(nPrev, olho) <= 0 : false;
+        const silD = olho ? dot(n, olho) > 0 && dot(nNext, olho) <= 0 : false;
+        const cos25 = Math.cos((25 * Math.PI) / 180);
+        const vincA = dot(n, nPrev) < cos25 && (!olho || dot(n, olho) >= dot(nPrev, olho));
+        const vincD = dot(n, nNext) < cos25 && (!olho || dot(n, olho) > dot(nNext, olho));
+
+        const pts = [
+          mundo(a[0], a[1], w0),
+          mundo(d[0], d[1], w0),
+          mundo(d[0], d[1], w1),
+          mundo(a[0], a[1], w1),
+        ];
+
+        if (silA || vincA) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
+        if (silD || vincD) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
+        if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+          linhas.push([mundo(a[0], a[1], w0), mundo(d[0], d[1], w0)]);
+        }
+
+        destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts });
+      }
+    };
+
+    procLateral(pe, 'fora', lados);
+    for (const fu of fus) {
+      procLateral(fu, 'dentro', dentro);
+    }
+
+    if (j === 0) {
+      const n = eixoN(-1);
+      if (!olho || dot(n, olho) > 1e-6) {
+        tampas.push({
+          papel: 'tampa',
+          n,
+          pts: perfil.map((p) => mundo(p[0], p[1], w0)),
+          furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w0))),
+          furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w0)) : null,
+        });
+      }
+    }
+    if (j === fatias - 1) {
+      const n = eixoN(1);
+      if (!olho || dot(n, olho) > 1e-6) {
+        tampas.push({
+          papel: 'tampa',
+          n,
+          pts: perfil.map((p) => mundo(p[0], p[1], w1)),
+          furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w1))),
+          furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w1)) : null,
+        });
+      }
+    }
+
+    chunks.push({ r, prof, lados, dentro, linhas, tampas });
   }
-  return lista;
+
+  return chunks;
+}
+
+export function faces(r, olho) {
+  const chunks = fatiarForma(r, olho);
+  return chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
 }
 
 function cor(hex, fator) {
@@ -275,9 +445,10 @@ export function desenharEsboco(esboco) {
   const olho = normalizar(V.olho);
   const projetadas = opcoes.map(({ opcao, formas }) => {
     const itens = formas.map((r) => {
-      const fs = faces(r).filter((f) => dot(f.n, olho) > 1e-6);
-      const todos = faces(r).flatMap((f) => f.pts).map(V.p);
-      return { r, fs, casco: casco(todos), prof: dot(r.centro, olho) };
+      const chunks = fatiarForma(r, olho);
+      const fs = chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
+      const todos = fs.flatMap((f) => f.pts).map(V.p);
+      return { r, chunks, fs, casco: casco(todos), prof: dot(r.centro, olho) };
     });
     const pts = itens.flatMap((i) => i.casco);
     const min = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
@@ -299,31 +470,41 @@ export function desenharEsboco(esboco) {
     const tela = (q) => [cx + q[0] * escala, cy + q[1] * escala];
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
-    const ordem = [...p.itens].sort((a, b) => a.prof - b.prof || a.r.min[1] - b.r.min[1]);
-    for (const it of ordem) {
-      const base = hexDe(it.r.forma.cor);
+
+    const todosChunks = p.itens.flatMap((it) => it.chunks);
+    todosChunks.sort((a, b) => {
+      if (Math.abs(a.prof - b.prof) > 1e-3) return a.prof - b.prof;
+      const rA = a.r.forma.diametro ?? a.r.forma.diametroInterno ?? 0;
+      const rB = b.r.forma.diametro ?? b.r.forma.diametroInterno ?? 0;
+      if (rA !== rB) return rA - rB;
+      return a.r.min[1] - b.r.min[1];
+    });
+
+    for (const ch of todosChunks) {
+      const base = hexDe(ch.r.forma.cor);
       const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
-      const dentro = it.fs.filter((f) => f.papel === 'dentro');
-      const lados = it.fs.filter((f) => f.papel === 'lado');
-      const tampas = it.fs.filter((f) => f.papel === 'tampa');
-      for (const f of [...dentro, ...lados]) {
+
+      for (const f of [...ch.dentro, ...ch.lados]) {
         const c = tint(f.n);
         partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
       }
-      /* Aresta viva entre faces laterais vizinhas (achatado, canto de caixa). */
-      const todasLados = faces(it.r).filter((f) => f.papel === 'lado');
-      todasLados.forEach((f, i) => {
-        const g = todasLados[(i + 1) % todasLados.length];
-        if (dot(f.n, g.n) < Math.cos((25 * Math.PI) / 180) && (dot(f.n, olho) > 0 || dot(g.n, olho) > 0)) {
-          const [a, b2] = [V.p(f.pts[1]), V.p(f.pts[2])].map(tela);
-          partes.push(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b2[0])}" y2="${f1(b2[1])}" stroke="#111111" stroke-width="2"/>`);
-        }
-      });
-      for (const f of tampas) {
-        const d = caminho(f.pts.map(V.p).map(tela)) + (f.furo ? caminho(f.furo.map(V.p).map(tela)) : '');
-        partes.push(`<path d="${d}" fill="${tint(f.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+
+      for (const l of ch.linhas) {
+        const [p1, p2] = l.map(V.p).map(tela);
+        partes.push(`<line x1="${f1(p1[0])}" y1="${f1(p1[1])}" x2="${f1(p2[0])}" y2="${f1(p2[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
       }
-      partes.push(`<path d="${caminho(it.casco.map(tela))}" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round"/>`);
+
+      for (const t of ch.tampas) {
+        let d = caminho(t.pts.map(V.p).map(tela));
+        if (t.furos && t.furos.length > 0) {
+          for (const f of t.furos) {
+            d += ' ' + caminho(f.map(V.p).map(tela));
+          }
+        } else if (t.furo) {
+          d += ' ' + caminho(t.furo.map(V.p).map(tela));
+        }
+        partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+      }
     }
     /* Rótulos: fora do desenho, à esquerda ou à direita, empilhados sem colidir. */
     const esquerda = x0 + 20;

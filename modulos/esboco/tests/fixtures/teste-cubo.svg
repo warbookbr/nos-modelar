@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 720" width="620" height="720" font-family="Helvetica, Arial, sans-serif">
+<rect width="620" height="720" fill="#ffffff"/>
+<text x="310" y="44" font-size="26" font-weight="bold" text-anchor="middle">Cubo 100mm</text>
+<path d="M450,435.9L449.6,438.2L449.6,266.5L450,264.1Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M449.6,438.2L448.4,440.5L448.4,268.8L449.6,266.5Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M448.4,440.5L446.5,442.6L446.5,270.9L448.4,268.8Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M446.5,442.6L443.8,444.4L443.8,272.7L446.5,270.9Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M443.8,444.4L324.9,513.1L324.9,341.4L443.8,272.7Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M324.9,513.1L321.7,514.6L321.7,342.9L324.9,341.4Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M321.7,514.6L318,515.8L318,344L321.7,342.9Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M318,515.8L314.1,516.5L314.1,344.7L318,344Z" fill="#223d64" stroke="#223d64" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M314.1,516.5L310,516.7L310,345L314.1,344.7Z" fill="#244169" stroke="#244169" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M310,516.7L305.9,516.5L305.9,344.7L310,345Z" fill="#274673" stroke="#274673" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M305.9,516.5L302,515.8L302,344L305.9,344.7Z" fill="#2a4c7c" stroke="#2a4c7c" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M302,515.8L298.3,514.6L298.3,342.9L302,344Z" fill="#2c5184" stroke="#2c5184" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M298.3,514.6L295.1,513.1L295.1,341.4L298.3,342.9Z" fill="#2f558a" stroke="#2f558a" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M295.1,513.1L176.2,444.4L176.2,272.7L295.1,341.4Z" fill="#30578d" stroke="#30578d" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M176.2,444.4L173.5,442.6L173.5,270.9L176.2,272.7Z" fill="#305890" stroke="#305890" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M173.5,442.6L171.6,440.5L171.6,268.8L173.5,270.9Z" fill="#325a93" stroke="#325a93" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M171.6,440.5L170.4,438.2L170.4,266.5L171.6,268.8Z" fill="#325b95" stroke="#325b95" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M170.4,438.2L170,435.9L170,264.1L170.4,266.5Z" fill="#325b95" stroke="#325b95" stroke-width="0.8" stroke-linejoin="round"/>
+<path d="M443.8,255.6L446.5,257.4L448.4,259.5L449.6,261.8L450,264.1L449.6,266.5L448.4,268.8L446.5,270.9L443.8,272.7L324.9,341.4L321.7,342.9L318,344L314.1,344.7L310,345L305.9,344.7L302,344L298.3,342.9L295.1,341.4L176.2,272.7L173.5,270.9L171.6,268.8L170.4,266.5L170,264.1L170.4,261.8L171.6,259.5L173.5,257.4L176.2,255.6L295.1,186.9L298.3,185.4L302,184.2L305.9,183.5L310,183.3L314.1,183.5L318,184.2L321.7,185.4L324.9,186.9Z" fill="#3b6caf" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>
+<path d="M170,264.1L170.4,261.8L171.6,259.5L173.5,257.4L176.2,255.6L295.1,186.9L298.3,185.4L302,184.2L305.9,183.5L310,183.3L314.1,183.5L318,184.2L321.7,185.4L324.9,186.9L443.8,255.6L446.5,257.4L448.4,259.5L449.6,261.8L450,264.1L450,435.9L449.6,438.2L448.4,440.5L446.5,442.6L443.8,444.4L324.9,513.1L321.7,514.6L318,515.8L314.1,516.5L310,516.7L305.9,516.5L302,515.8L298.3,514.6L295.1,513.1L176.2,444.4L173.5,442.6L171.6,440.5L170.4,438.2L170,435.9Z" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round"/>
+<polyline points="465,264.1 442,264.1" fill="none" stroke="#222222" stroke-width="1.5"/><circle cx="442" cy="264.1" r="4" fill="#222222"/>
+<text x="600" y="270.1" font-size="16" text-anchor="end">cubo_base</text>
+<text x="310" y="656" font-size="19" text-anchor="middle">Cubo simples 100x100x100 mm com raio de 10mm nos cantos</text>
+<line x1="20" y1="706" x2="191.7" y2="706" stroke="#111111" stroke-width="3"/><text x="199.7" y="711" font-size="14">100 mm</text>
+</svg>

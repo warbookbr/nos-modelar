@@ -1,0 +1,143 @@
+{
+  "vista": "isometrica",
+  "opcoes": [
+    {
+      "titulo": "Opção A: Mancal Básico",
+      "nota": "Alojamento cilíndrico central com eixo passante e ponta achatada",
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "caixa",
+          "largura": 140,
+          "altura": 20,
+          "profundidade": 80,
+          "raio": 8,
+          "centro": [0, 10, 0],
+          "furos": [
+            { "diametro": 12, "centro": [-52, 0] },
+            { "diametro": 12, "centro": [52, 0] }
+          ],
+          "cor": "cinza",
+          "rotulo": "base_fixacao"
+        },
+        {
+          "id": "alojamento",
+          "tipo": "anel",
+          "diametroExterno": 70,
+          "diametroInterno": 40,
+          "espessura": 40,
+          "eixo": "z",
+          "sobre": "base",
+          "cor": "azul",
+          "rotulo": "alojamento"
+        },
+        {
+          "id": "eixo",
+          "tipo": "cilindro",
+          "diametro": 36,
+          "comprimento": 120,
+          "eixo": "z",
+          "ponta": ["alojamento", "-z"],
+          "desloca": [0, 0, 80],
+          "cor": "laranja",
+          "rotulo": "eixo_passante"
+        },
+        {
+          "id": "ponta_chaveta",
+          "tipo": "cilindro",
+          "diametro": 24,
+          "comprimento": 30,
+          "eixo": "z",
+          "ponta": ["eixo", "+z"],
+          "achatado": {
+            "lado": "+y",
+            "profundidade": 5
+          },
+          "cor": "vermelho",
+          "rotulo": "ponta_rebaixada"
+        }
+      ]
+    },
+    {
+      "titulo": "Opção B: Mancal com Flange",
+      "nota": "Alojamento reforçado com flange frontal, eixo longo e acoplamento lateral",
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "caixa",
+          "largura": 160,
+          "altura": 20,
+          "profundidade": 80,
+          "raio": 8,
+          "centro": [0, 10, 0],
+          "furos": [
+            { "diametro": 10, "centro": [-62, -22] },
+            { "diametro": 10, "centro": [62, -22] },
+            { "diametro": 10, "centro": [-62, 22] },
+            { "diametro": 10, "centro": [62, 22] }
+          ],
+          "cor": "cinza",
+          "rotulo": "base_reforcada"
+        },
+        {
+          "id": "alojamento",
+          "tipo": "anel",
+          "diametroExterno": 80,
+          "diametroInterno": 44,
+          "espessura": 45,
+          "eixo": "z",
+          "sobre": "base",
+          "cor": "verde",
+          "rotulo": "alojamento_verde"
+        },
+        {
+          "id": "flange",
+          "tipo": "anel",
+          "diametroExterno": 96,
+          "diametroInterno": 44,
+          "espessura": 12,
+          "eixo": "z",
+          "ponta": ["alojamento", "+z"],
+          "cor": "amarelo",
+          "rotulo": "flange_frontal"
+        },
+        {
+          "id": "eixo",
+          "tipo": "cilindro",
+          "diametro": 40,
+          "comprimento": 140,
+          "eixo": "z",
+          "ponta": ["alojamento", "-z"],
+          "desloca": [0, 0, 95],
+          "cor": "laranja",
+          "rotulo": "eixo_robusto"
+        },
+        {
+          "id": "ponta_acoplamento",
+          "tipo": "cilindro",
+          "diametro": 28,
+          "comprimento": 30,
+          "eixo": "z",
+          "ponta": ["eixo", "+z"],
+          "achatado": {
+            "lado": "+x",
+            "profundidade": 7
+          },
+          "cor": "roxo",
+          "rotulo": "acoplamento_chavetado"
+        },
+        {
+          "id": "bico_graxeiro",
+          "tipo": "cilindro",
+          "diametro": 12,
+          "comprimento": 28,
+          "eixo": "y",
+          "rotacao": [0, 0, -35],
+          "centro": [24, 96, 0],
+          "cor": "vermelho",
+          "rotulo": "bico_lubrificador"
+        }
+      ]
+    }
+  ]
+}

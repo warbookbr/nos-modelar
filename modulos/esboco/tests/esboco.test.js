@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { desenharEsboco, resolverOpcao, ErroDeEsboco } from '../src/index.js';
+import { desenharEsboco, resolverOpcao, ErroDeEsboco, faces } from '../src/index.js';
 import { gerarEsboco } from '../../../tools/mecanifica/esboco.mjs';
 
 const deitadoSobreAnel = {
@@ -59,5 +59,50 @@ describe('esboço', () => {
     const png = readFileSync(r.png);
     expect(png.readUInt32BE(16)).toBe(620);
     expect(png.readUInt32BE(20)).toBe(720);
+  });
+
+  it('fatía formas longas em múltiplos segmentos para Z-sorting fino', () => {
+    const forma = { id: 'eixo', tipo: 'cilindro', diametro: 20, comprimento: 100, eixo: 'z', centro: [0, 0, 0] };
+    const [resolvida] = resolverOpcao({ formas: [forma] });
+    const fs = faces(resolvida, [1, 1, 1]);
+    expect(fs.length).toBeGreaterThan(10);
+    expect(fs.some((f) => f.papel === 'tampa')).toBe(true);
+    expect(fs.some((f) => f.papel === 'lado')).toBe(true);
+  });
+
+  it('suporta múltiplos furos passantes na caixa', () => {
+    const esb = {
+      opcoes: [{
+        formas: [{
+          id: 'base', tipo: 'caixa', largura: 100, altura: 20, profundidade: 80,
+          furos: [
+            { diametro: 10, centro: [-30, -20] },
+            { diametro: 10, centro: [30, 20] },
+          ],
+        }],
+      }],
+    };
+    const r = desenharEsboco(esb);
+    expect(r.svg).toContain('fill-rule="evenodd"');
+    const [resolvida] = resolverOpcao(esb.opcoes[0]);
+    expect(resolvida.prisma.furos.length).toBe(2);
+    const fs = faces(resolvida, [1, 1, 1]);
+    expect(fs.some((f) => f.papel === 'dentro')).toBe(true);
+  });
+
+  it('suporta rotação angular 3D em componentes', () => {
+    const esb = {
+      opcoes: [{
+        formas: [
+          { id: 'haste', tipo: 'cilindro', diametro: 20, comprimento: 100, eixo: 'z', rotacao: [0, 45, 0] },
+        ],
+      }],
+    };
+    const [resolvida] = resolverOpcao(esb.opcoes[0]);
+    expect(resolvida.matriz).not.toBeNull();
+    const fs = faces(resolvida, [1, 1, 1]);
+    expect(fs.length).toBeGreaterThan(0);
+    const r = desenharEsboco(esb);
+    expect(r.svg).toContain('<svg');
   });
 });
