@@ -554,13 +554,20 @@ export function desenharEsboco(esboco) {
         const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
         const raioTela = Math.max(14, (dimMm / 2) * escala * 0.75);
 
-        // Pontos de amostragem da peça (vértices e centros das faces)
-        const ptsVertices = it.fs.flatMap((f) => f.pts).map(V.p).map(tela);
-        const ptsCentros = it.fs.map((f) => {
+        // Pontos de amostragem da peça nas faces externas (exclui paredes internas de furos)
+        const facesExternas = it.chunks.flatMap((ch) => [...ch.lados, ...ch.tampas]);
+        const ptsVertices = facesExternas.flatMap((f) => f.pts).map(V.p).map(tela);
+        const ptsCentros = facesExternas.map((f) => {
           const m = f.pts.reduce((acc, p) => [acc[0] + p[0] / f.pts.length, acc[1] + p[1] / f.pts.length, acc[2] + p[2] / f.pts.length], [0, 0, 0]);
           return tela(V.p(m));
         });
         const todosPontos = [...ptsVertices, ...ptsCentros];
+
+        // Furos da própria peça projetados na tela
+        const furosTela = it.chunks
+          .flatMap((ch) => ch.tampas)
+          .flatMap((t) => t.furos ?? (t.furo ? [t.furo] : []))
+          .map((fu) => fu.map(V.p).map(tela));
 
         // Peças que estão na frente desta (profundidade maior no espaço isométrico)
         const pecasNaFrente = p.itens.filter((o) => o !== it && o.prof > it.prof - 5);
@@ -589,8 +596,19 @@ export function desenharEsboco(esboco) {
               }
             }
 
+            // Penalidade de proximidade a furos da própria peça (evita ancorar no furo)
+            let penalidadeFuro = 0;
+            for (const fTela of furosTela) {
+              const distF = distPoligono(pt, fTela);
+              if (distF === 0) {
+                penalidadeFuro += 6000;
+              } else if (distF < 16) {
+                penalidadeFuro += (16 - distF) * 250;
+              }
+            }
+
             const distAlvo = Math.hypot(pt[0] - alvoX, pt[1] - alvoY);
-            const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao;
+            const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao + penalidadeFuro;
             if (scoreTotal < melhorScore) {
               melhorScore = scoreTotal;
               melhor = pt;

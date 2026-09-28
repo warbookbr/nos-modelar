@@ -1053,9 +1053,9 @@
 <polyline points="455,288.5 394.3,288.5" fill="none" stroke="#222222" stroke-width="1.5"/>
 <circle cx="394.3" cy="288.5" r="5" fill="#e0892b" stroke="#111111" stroke-width="1.5"/>
 <text x="600" y="294.5" font-size="15" font-weight="bold" text-anchor="end">3. eixo_passante</text>
-<polyline points="455,393 381.5,393" fill="none" stroke="#222222" stroke-width="1.5"/>
-<circle cx="381.5" cy="393" r="5" fill="#9aa3ad" stroke="#111111" stroke-width="1.5"/>
-<text x="600" y="399" font-size="15" font-weight="bold" text-anchor="end">1. base_fixacao</text>
+<polyline points="455,419.6 400.4,419.6" fill="none" stroke="#222222" stroke-width="1.5"/>
+<circle cx="400.4" cy="419.6" r="5" fill="#9aa3ad" stroke="#111111" stroke-width="1.5"/>
+<text x="600" y="425.6" font-size="15" font-weight="bold" text-anchor="end">1. base_fixacao</text>
 <text x="310" y="656" font-size="19" text-anchor="middle">Alojamento cilíndrico central com eixo passante e ponta</text>
 <text x="310" y="680" font-size="19" text-anchor="middle">achatada</text>
 <line x1="20" y1="706" x2="173.5" y2="706" stroke="#111111" stroke-width="3"/><text x="181.5" y="711" font-size="14">100 mm</text>
