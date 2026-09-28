@@ -57,19 +57,29 @@ export const TABELA = {
      em D por altura até a rampa). Cada retângulo tem divisoesDaLargura
      pontos em cima e embaixo e divisoesDaAltura em cada lado. */
   divisoesDaLargura: 6,
-  divisoesDaAltura: 6,
+  divisoesDaAltura: 4,
   /* Estações na parede de trás, iguais em ângulo: do bico ao pé da rampa e
      do pé da rampa ao eixo; e estações iguais no bloco da frente. */
   estacoesDoBico: 1,
   estacoesDaRampa: 16,
   estacoesDaFrente: 8,
   /* Ângulo, a partir do eixo -Z, da última estação de trás. Atrás dela o
-     polo fica em z = -R, 0,4 mm além dela com 5 graus. Com menos, as faces
-     do bico saem com menos de 0,5 mm² e a medida de contato as recusa. */
-  anguloDoBico: 5,
+     polo fica em z = -R, 1 mm além dela com 8 graus. Com menos, as faces
+     do bico saem com menos de 0,5 mm² e a medida de contato as recusa; com 5
+     graus bastava sem o arredondado do topo, que estreita a faixa plana de
+     cima da última estação. */
+  anguloDoBico: 8,
   /* Limite do sombreado liso, em graus: quinas mais fechadas que isto (o V
      da rampa com a parede, a frente com os lados, as tampas) ficam nítidas. */
   anguloDoLiso: 10,
+  /* Raio da borda de cima do corpo, em frente, lados e trás: cada seção do
+     loft tem os cantos de cima em arco com este raio (limitado à metade da
+     largura e da altura da seção), e as últimas estações da frente descem o
+     topo num quarto de círculo até a face plana. */
+  raioDoTopo: 20,
+  /* Pontos de cada arco de canto da seção e estações do arco da frente. */
+  pontosDoArcoDoTopo: 3,
+  estacoesDoArcoDaFrente: 5,
   lados: 40,
   /* O tambor tem mais lados que o colar, para o contorno ficar liso de frente. */
   ladosDoTambor: 108,
@@ -85,11 +95,12 @@ export function derivar(t = TABELA) {
     et: m(t.espessuraDoTambor), ye: m(t.alturaDoEixo), c: m(t.chanfroDoColar),
     s: m(t.suaveDoChanfro), ft: m(t.filDoTambor),
     c2: m(t.chanfroDeCimaDoColar), s2: m(t.suaveDoChanfroDeCima),
+    rt: m(t.raioDoTopo),
   };
 }
 
 export function gerarPassos(t = TABELA) {
-  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, c2, s2 } = derivar(t);
+  const { R, hc, zf, yt, yr, Rt, et, ye, c, s, ft, c2, s2, rt } = derivar(t);
   const passos = [];
   const p = t.curvaDaRampa;
   const psi0 = (t.anguloDoPeDaRampa * Math.PI) / 180;
@@ -112,7 +123,7 @@ export function gerarPassos(t = TABELA) {
      estações atrás são iguais em ângulo na parede, com uma estação exata no
      pé da rampa. A face da frente fecha em retângulos concêntricos e o bico
      de trás numa seção-aresta vertical em z = -R, logo atrás da última estação. */
-  const nb = t.divisoesDaLargura, nv = t.divisoesDaAltura;
+  const nb = t.divisoesDaLargura, nv = t.divisoesDaAltura, na = t.pontosDoArcoDoTopo;
   /* Altura do caminho: o meio do retângulo do bico, que fica dentro de todos
      os retângulos; os dois polos ficam nela e os anéis da frente encolhem
      para ela. */
@@ -120,9 +131,14 @@ export function gerarPassos(t = TABELA) {
   const ret = (w, y0, y1) => {
     const pts = [];
     for (let k = 0; k < nb; k++) pts.push([-w + (2 * w * k) / nb, y0]);
-    for (let k = 0; k < nv; k++) pts.push([w, y0 + ((y1 - y0) * k) / nv]);
-    for (let k = 0; k < nb; k++) pts.push([w - (2 * w * k) / nb, y1]);
-    for (let k = 0; k < nv; k++) pts.push([-w, y1 - ((y1 - y0) * k) / nv]);
+    /* cantos de cima em arco de raio rr, centro em (±(w - rr), y1 - rr) */
+    const rr = Math.min(rt, w / 2, (y1 - y0) / 2);
+    const yc = y1 - rr, xc = w - rr;
+    for (let k = 0; k < nv; k++) pts.push([w, y0 + ((yc - y0) * k) / nv]);
+    for (let k = 0; k < na; k++) { const a = (k / na) * Math.PI / 2; pts.push([xc + rr * Math.cos(a), yc + rr * Math.sin(a)]); }
+    for (let k = 0; k < nb; k++) pts.push([xc - (2 * xc * k) / nb, y1]);
+    for (let k = 0; k < na; k++) { const a = Math.PI / 2 + (k / na) * Math.PI / 2; pts.push([-xc + rr * Math.cos(a), yc + rr * Math.sin(a)]); }
+    for (let k = 0; k < nv; k++) pts.push([-w, yc - ((yc - y0) * k) / nv]);
     /* frame do loft em +Z com u = +X dá w = -Y; as seções ficam todas na
        altura ym, a mesma dos polos, para o caminho ser reto em Z. */
     /* o ponto 0 é o meio da base e o ponto lados/2 o meio do topo, para a
@@ -150,13 +166,21 @@ export function gerarPassos(t = TABELA) {
      o polo em z = zf; a última estação do bloco recua o que eles ocupam. */
   const aneis = Math.round(nb / 2);
   const zFace = zf - aneis * eps;
-  for (let k = 1; k <= t.estacoesDaFrente; k++) secoes.push(secao((zFace * k) / t.estacoesDaFrente, R, yt));
+  /* bloco reto até zFace - rt; dali o topo desce em quarto de círculo até
+     yt - rt na face plana. */
+  const zArco = zFace - rt;
+  for (let k = 1; k <= t.estacoesDaFrente; k++) secoes.push(secao((zArco * k) / t.estacoesDaFrente, R, yt));
+  for (let k = 1; k <= t.estacoesDoArcoDaFrente; k++) {
+    const a = (k / t.estacoesDoArcoDaFrente) * Math.PI / 2;
+    secoes.push(secao(zArco + rt * Math.sin(a), R, yt - rt + rt * Math.cos(a)));
+  }
+  const ytFace = yt - rt;
   for (let k = 1; k < aneis; k++) {
     const f = 1 - k / aneis;
-    secoes.push({ pos: [0, ym, zFace + k * eps], contorno: ret(R * f, ym + (hc - ym) * f, ym + (yt - ym) * f) });
+    secoes.push({ pos: [0, ym, zFace + k * eps], contorno: ret(R * f, ym + (hc - ym) * f, ym + (ytFace - ym) * f) });
   }
   secoes.push({ pos: [0, ym, zf], raio: 0 });
-  passos.push(['loft', { origemId: ID.corpo, lados: 2 * (nb + nv), orientacao: [1, 0, 0], secoes }]);
+  passos.push(['loft', { origemId: ID.corpo, lados: 2 * (nb + nv + na), orientacao: [1, 0, 0], secoes }]);
   passos.push(['parte', { nome: 'corpo', sel: { origem: { op: 'loft', id: ID.corpo } } }]);
 
   /* tambor: disco de eixo Y com filete só na borda de cima, girado para +Z
