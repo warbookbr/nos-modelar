@@ -375,13 +375,13 @@ export function fatiarForma(r, olho) {
           mundo(a[0], a[1], w1),
         ];
 
-        if (silA || vincA) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
-        if (silD || vincD) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
+        if (para === 'fora' && (silA || vincA)) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
+        if (para === 'fora' && (silD || vincD)) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
 
         destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts });
       }
 
-      if (j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+      if (para === 'fora' && j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
         for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) {
           arcos.push(arc);
         }
@@ -555,7 +555,62 @@ export function desenharEsboco(esboco) {
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
 
-    const todosChunks = p.itens.flatMap((it) => it.chunks);
+    // 1. Spans de formas (mantém fatias contíguas e divide apenas penetrações em furos)
+    const splitPoints = new Map();
+    for (const itA of p.itens) {
+      for (const itB of p.itens) {
+        if (itA === itB) continue;
+        const bTemFuro = itB.r.forma.diametroInterno !== undefined || itB.r.forma.furo !== undefined;
+        if (bTemFuro) {
+          const distEixo = Math.hypot(itA.r.centro[0] - itB.r.centro[0], itA.r.centro[1] - itB.r.centro[1]);
+          const rFuro = (itB.r.forma.diametroInterno ?? 0) / 2;
+          const minA = Math.min(...itA.chunks.map((c) => c.prof));
+          const maxA = Math.max(...itA.chunks.map((c) => c.prof));
+          const minB = Math.min(...itB.chunks.map((c) => c.prof));
+          const maxB = Math.max(...itB.chunks.map((c) => c.prof));
+          if (distEixo < rFuro && minA < minB && maxA > maxB) {
+            if (!splitPoints.has(itA.r.forma.id)) splitPoints.set(itA.r.forma.id, []);
+            splitPoints.get(itA.r.forma.id).push(maxB);
+          }
+        }
+      }
+    }
+
+    const gruposChunks = [];
+    for (const it of p.itens) {
+      const splits = (splitPoints.get(it.r.forma.id) ?? []).sort((a, b) => a - b);
+      if (splits.length === 0) {
+        const minP = Math.min(...it.chunks.map((c) => c.prof));
+        const maxP = Math.max(...it.chunks.map((c) => c.prof));
+        gruposChunks.push({ tipo: 'forma', r: it.r, chunks: it.chunks, profMedia: (minP + maxP) / 2 });
+      } else {
+        let curr = [];
+        let splitIdx = 0;
+        for (const ch of it.chunks) {
+          if (splitIdx < splits.length && ch.prof > splits[splitIdx] + 0.1) {
+            if (curr.length > 0) {
+              gruposChunks.push({
+                tipo: 'forma',
+                r: it.r,
+                chunks: curr,
+                profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+              });
+              curr = [];
+            }
+            splitIdx++;
+          }
+          curr.push(ch);
+        }
+        if (curr.length > 0) {
+          gruposChunks.push({
+            tipo: 'forma',
+            r: it.r,
+            chunks: curr,
+            profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+          });
+        }
+      }
+    }
 
     /* Linhas de centro: eixos de rotação (cilindros/anéis) e furos passantes. */
     const querLinhasCentroGeral = Boolean(p.opcao.linhasCentro);
@@ -639,64 +694,108 @@ export function desenharEsboco(esboco) {
         ? Math.max(dot(pIni, olho), dot(pFim, olho)) + 0.5
         : dot([(pIni[0] + pFim[0]) / 2, (pIni[1] + pFim[1]) / 2, (pIni[2] + pFim[2]) / 2], olho);
 
-      todosChunks.push({
+      gruposChunks.push({
         tipo: 'linhaCentro',
-        prof,
-        q1,
-        q2,
-        r: { min: [0, 0, 0], forma: {} },
-        lados: [],
-        dentro: [],
-        linhas: [],
-        tampas: [],
+        profMedia: prof,
+        ch: { q1, q2 },
       });
     }
 
-    todosChunks.sort((a, b) => {
-      if (Math.abs(a.prof - b.prof) > 1e-3) return a.prof - b.prof;
-      const aTemFuro = (a.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
-      const bTemFuro = (b.tampas ?? []).some((t) => (t.furos && t.furos.length > 0) || t.furo);
-      if (aTemFuro !== bTemFuro) return aTemFuro ? 1 : -1;
-      const rA = a.r?.forma?.diametro ?? a.r?.forma?.diametroInterno ?? 0;
-      const rB = b.r?.forma?.diametro ?? b.r?.forma?.diametroInterno ?? 0;
-      if (rA !== rB) return rA - rB;
-      return (a.r?.min?.[1] ?? 0) - (b.r?.min?.[1] ?? 0);
-    });
+    gruposChunks.sort((a, b) => a.profMedia - b.profMedia);
 
-    for (const ch of todosChunks) {
-      if (ch.tipo === 'linhaCentro') {
-        partes.push(`<line x1="${f1(ch.q1[0])}" y1="${f1(ch.q1[1])}" x2="${f1(ch.q2[0])}" y2="${f1(ch.q2[1])}" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>`);
+    function encadearLinhas(linhas2d) {
+      const segs = linhas2d.map(([p1, p2]) => [p1, p2]);
+      const cadeias = [];
+      const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+      while (segs.length > 0) {
+        let cadeia = segs.pop();
+        let expandiu = true;
+        while (expandiu) {
+          expandiu = false;
+          const head = cadeia[0];
+          const tail = cadeia[cadeia.length - 1];
+
+          for (let i = 0; i < segs.length; i++) {
+            const [p1, p2] = segs[i];
+            if (dist(tail, p1) < 0.5) {
+              cadeia.push(p2);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(tail, p2) < 0.5) {
+              cadeia.push(p1);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(head, p2) < 0.5) {
+              cadeia.unshift(p1);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(head, p1) < 0.5) {
+              cadeia.unshift(p2);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            }
+          }
+        }
+        cadeias.push(cadeia);
+      }
+      return cadeias;
+    }
+
+    for (const g of gruposChunks) {
+      if (g.tipo === 'linhaCentro') {
+        partes.push(`<line x1="${f1(g.ch.q1[0])}" y1="${f1(g.ch.q1[1])}" x2="${f1(g.ch.q2[0])}" y2="${f1(g.ch.q2[1])}" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>`);
         continue;
       }
 
-      const base = hexDe(ch.r.forma.cor);
+      const base = hexDe(g.r.forma.cor);
       const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
 
-      for (const f of [...ch.dentro, ...ch.lados]) {
-        const c = tint(f.n);
-        partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
-      }
-
-      for (const l of ch.linhas) {
-        const [p1, p2] = l.map(V.p).map(tela);
-        partes.push(`<line x1="${f1(p1[0])}" y1="${f1(p1[1])}" x2="${f1(p2[0])}" y2="${f1(p2[1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
-      }
-
-      for (const arc of ch.arcos ?? []) {
-        if (arc.length < 2) continue;
-        partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
-      }
-
-      for (const t of ch.tampas) {
-        let d = caminho(t.pts.map(V.p).map(tela));
-        if (t.furos && t.furos.length > 0) {
-          for (const f of t.furos) {
-            d += ' ' + caminho(f.map(V.p).map(tela));
-          }
-        } else if (t.furo) {
-          d += ' ' + caminho(t.furo.map(V.p).map(tela));
+      // 1. Faces coloridas
+      for (const ch of g.chunks) {
+        for (const f of [...ch.dentro, ...ch.lados]) {
+          const c = tint(f.n);
+          partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
         }
-        partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+      }
+
+      // 2. Tampas
+      for (const ch of g.chunks) {
+        for (const t of ch.tampas) {
+          let d = caminho(t.pts.map(V.p).map(tela));
+          if (t.furos && t.furos.length > 0) {
+            for (const f of t.furos) {
+              d += ' ' + caminho(f.map(V.p).map(tela));
+            }
+          } else if (t.furo) {
+            d += ' ' + caminho(t.furo.map(V.p).map(tela));
+          }
+          partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+        }
+      }
+
+      // 3. Arcos de borda traseira
+      for (const ch of g.chunks) {
+        for (const arc of ch.arcos ?? []) {
+          if (arc.length < 2) continue;
+          partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+        }
+      }
+
+      // 4. Silhuetas axiais contínuas encadeadas
+      const todasLinhas2d = g.chunks.flatMap((ch) => ch.linhas.map((l) => l.map(V.p).map(tela)));
+      const cadeias = encadearLinhas(todasLinhas2d);
+      for (const cadeia of cadeias) {
+        if (cadeia.length < 2) continue;
+        if (cadeia.length === 2) {
+          partes.push(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+        } else {
+          partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+        }
       }
     }
 
