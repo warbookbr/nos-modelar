@@ -68,7 +68,7 @@
     },
     {
       "instancia": "ombro",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [
         {
           "relacao": "ombroSentaNoAnel",
@@ -142,7 +142,15 @@
           },
           "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
         }
-      ]
+      ],
+      "aceite": {
+        "por": "a pessoa, 2026-09-28: escolheu a curva em L comparando com o tambor sobre a base",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 8.",
+          "colar: uniao em borda superior do colar, na junção com a base do corpo",
+          "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
+        ]
+      }
     }
   ]
 }
