@@ -415,6 +415,37 @@ function casco(pts) {
   return inf.slice(0, -1).concat(sup.slice(0, -1));
 }
 
+function pontoEmPoligono(p, poly) {
+  let dentro = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1];
+    const xj = poly[j][0], yj = poly[j][1];
+    const intersect = ((yi > p[1]) !== (yj > p[1])) &&
+      (p[0] < ((xj - xi) * (p[1] - yi)) / (yj - yi) + xi);
+    if (intersect) dentro = !dentro;
+  }
+  return dentro;
+}
+
+function distSegmento(p, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const l2 = dx * dx + dy * dy;
+  if (l2 === 0) return Math.hypot(p[0] - a[0], p[1] - a[1]);
+  let t = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+
+function distPoligono(p, poly) {
+  if (pontoEmPoligono(p, poly)) return 0;
+  let minD = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    const d = distSegmento(p, poly[i], poly[(i + 1) % poly.length]);
+    if (d < minD) minD = d;
+  }
+  return minD;
+}
+
 const f1 = (x) => Math.round(x * 10) / 10;
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -518,41 +549,85 @@ export function desenharEsboco(esboco) {
           ? it.r.forma.rotulo
           : { texto: it.r.forma.rotulo };
         const cTela = tela(V.p(it.r.centro));
+        const corPeca = hexDe(it.r.forma.cor);
+        const fForma = it.r.forma;
+        const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
+        const raioTela = Math.max(14, (dimMm / 2) * escala * 0.75);
+
+        // Pontos de amostragem da peça (vértices e centros das faces)
+        const ptsVertices = it.fs.flatMap((f) => f.pts).map(V.p).map(tela);
+        const ptsCentros = it.fs.map((f) => {
+          const m = f.pts.reduce((acc, p) => [acc[0] + p[0] / f.pts.length, acc[1] + p[1] / f.pts.length, acc[2] + p[2] / f.pts.length], [0, 0, 0]);
+          return tela(V.p(m));
+        });
+        const todosPontos = [...ptsVertices, ...ptsCentros];
+
+        // Peças que estão na frente desta (profundidade maior no espaço isométrico)
+        const pecasNaFrente = p.itens.filter((o) => o !== it && o.prof > it.prof - 5);
+
+        // Avalia o melhor ponto de âncora para cada lado ('e' ou 'd')
+        const avaliarLado = (ladoCand) => {
+          const alvoX = cTela[0] + (ladoCand === 'e' ? -raioTela : raioTela);
+          const alvoY = cTela[1];
+          let melhor = todosPontos[0] ?? cTela;
+          let melhorScore = Infinity;
+          let menorOclusao = Infinity;
+
+          for (const pt of todosPontos) {
+            // Penaliza pontos que apontam no sentido oposto ao rótulo
+            const penalidadeLado = ladoCand === 'e' ? (pt[0] > cTela[0] ? 80 : 0) : (pt[0] < cTela[0] ? 80 : 0);
+            
+            // Penalidade de oclusão por peças que estão na frente
+            let penalidadeOclusao = 0;
+            for (const frente of pecasNaFrente) {
+              const poly = frente.casco.map(tela);
+              const dist = distPoligono(pt, poly);
+              if (dist === 0) {
+                penalidadeOclusao += 5000;
+              } else if (dist < 18) {
+                penalidadeOclusao += (18 - dist) * 150;
+              }
+            }
+
+            const distAlvo = Math.hypot(pt[0] - alvoX, pt[1] - alvoY);
+            const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao;
+            if (scoreTotal < melhorScore) {
+              melhorScore = scoreTotal;
+              melhor = pt;
+              menorOclusao = penalidadeOclusao;
+            }
+          }
+          return { pt: melhor, score: melhorScore, oclusao: menorOclusao };
+        };
+
+        const resE = avaliarLado('e');
+        const resD = avaliarLado('d');
+
         let lado;
         if (rotInfo.lado) {
           lado = String(rotInfo.lado).startsWith('d') ? 'd' : 'e';
         } else {
-          const diffX = cTela[0] - meio;
-          if (Math.abs(diffX) < 25) {
-            lado = contagemLados.e <= contagemLados.d ? 'e' : 'd';
+          // Se um lado tiver oclusão severa e o outro não, escolhe o lado livre
+          if (resE.oclusao > 100 && resD.oclusao <= 100) {
+            lado = 'd';
+          } else if (resD.oclusao > 100 && resE.oclusao <= 100) {
+            lado = 'e';
           } else {
-            lado = diffX < 0 ? 'e' : 'd';
+            // Ambos os lados livres ou equivalentes: balanceia número de rótulos
+            if (contagemLados.e !== contagemLados.d) {
+              lado = contagemLados.e < contagemLados.d ? 'e' : 'd';
+            } else {
+              lado = cTela[0] < meio ? 'e' : 'd';
+            }
           }
         }
         contagemLados[lado]++;
 
-        const corPeca = hexDe(it.r.forma.cor);
-        const ptsPeca = it.fs.flatMap((f) => f.pts).map(V.p).map(tela);
-        const fForma = it.r.forma;
-        const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
-        const raioTela = Math.max(12, (dimMm / 2) * escala * 0.75);
-        const alvoX = cTela[0] + (lado === 'e' ? -raioTela : raioTela);
-        const alvoY = cTela[1];
-
-        let melhorPt = ptsPeca[0] ?? cTela;
-        let melhorDist = Infinity;
-        for (const pt of ptsPeca) {
-          const penalidadeLado = lado === 'e' ? (pt[0] > cTela[0] ? 60 : 0) : (pt[0] < cTela[0] ? 60 : 0);
-          const d = Math.hypot(pt[0] - alvoX, pt[1] - alvoY) + penalidadeLado;
-          if (d < melhorDist) {
-            melhorDist = d;
-            melhorPt = pt;
-          }
-        }
+        const melhorPt = (lado === 'e' ? resE : resD).pt;
         const dx = melhorPt[0] - cTela[0];
         const dy = melhorPt[1] - cTela[1];
         const distC = Math.hypot(dx, dy) || 1;
-        const ancora = [melhorPt[0] - (dx / distC) * 4, melhorPt[1] - (dy / distC) * 4];
+        const ancora = [melhorPt[0] - (dx / distC) * 3, melhorPt[1] - (dy / distC) * 3];
 
         return {
           it,
