@@ -1,0 +1,23 @@
+{
+  "vista": "isometrica",
+  "opcoes": [
+    {
+      "titulo": "Opção 1: ombro em pé",
+      "nota": "Cilindro em pé com uma face achatada no lado; o anel verde encosta nela e sobra para fora da face.",
+      "formas": [
+        { "id": "cintura", "tipo": "anel", "diametroExterno": 210, "diametroInterno": 120, "espessura": 30, "eixo": "y", "centro": [0, 0, 0], "cor": "roxo", "rotulo": "anel da cintura Ø210 x 30" },
+        { "id": "ombro", "tipo": "cilindro", "diametro": 200, "comprimento": 177, "eixo": "y", "sobre": "cintura", "achatado": { "lado": "+x", "profundidade": 20 }, "cor": "cinza", "rotulo": "ombro Ø200 x 177, face achatada" },
+        { "id": "anel", "tipo": "anel", "diametroExterno": 164, "diametroInterno": 110, "espessura": 20, "eixo": "x", "ponta": { "id": "ombro", "lado": "+x" }, "cor": "verde", "rotulo": "anel verde Ø164" }
+      ]
+    },
+    {
+      "titulo": "Opção 2: ombro deitado",
+      "nota": "Cilindro deitado com o eixo na horizontal; o anel verde encosta inteiro na ponta dele.",
+      "formas": [
+        { "id": "cintura", "tipo": "anel", "diametroExterno": 210, "diametroInterno": 120, "espessura": 30, "eixo": "y", "centro": [0, 0, 0], "cor": "roxo", "rotulo": "anel da cintura Ø210 x 30" },
+        { "id": "ombro", "tipo": "cilindro", "diametro": 177, "comprimento": 194, "eixo": "x", "sobre": "cintura", "cor": "cinza", "rotulo": "ombro Ø177 x 194, deitado" },
+        { "id": "anel", "tipo": "anel", "diametroExterno": 164, "diametroInterno": 110, "espessura": 20, "eixo": "x", "ponta": { "id": "ombro", "lado": "+x" }, "cor": "verde", "rotulo": "anel verde Ø164" }
+      ]
+    }
+  ]
+}

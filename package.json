@@ -93,6 +93,7 @@
     "guarda:edicao": "node tools/mecanifica/guardas/guarda-edicao-de-malha.mjs",
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
     "contorno": "node tools/mecanifica/contorno-da-imagem.mjs",
+    "esboco": "node tools/mecanifica/esboco.mjs",
     "contorno:prancha": "node tools/mecanifica/prancha/prancha-dos-contornos.mjs",
     "objeto": "node tools/mecanifica/objeto.mjs"
   },
