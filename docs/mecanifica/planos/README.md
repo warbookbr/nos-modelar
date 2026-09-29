@@ -2,11 +2,12 @@
 
 ## Estado
 
-**Plano ativo:** [As partes do braço](2026-09-26-as-partes-do-braco.md).
+**Plano ativo:** [O esboço sem conta à mão](2026-09-29-o-esboco-sem-conta-a-mao.md).
 
-O braço robótico segue parte por parte pelo fluxo do objeto, com o ombro de
-coluna unida ao braço já fixo, e sai exportado montado. Cada etapa cumpre o
-passo [Pare e analise](../usar/PARE-E-ANALISE.md) antes de pedir o aceite.
+O esboço passa a ser descrito por relações e parâmetros, e não por coordenadas
+calculadas à mão, com a sobreposição na projeção medida por vista e o gate
+propondo o conserto. [As partes do braço](congelados/2026-09-26-as-partes-do-braco.md)
+foram congeladas em 2026-09-29 para dar lugar a ele, e voltam depois.
 
 [União de sólidos](encerrados/2026-09-28-uniao-de-solidos.md) fechou em
 2026-09-29 com `unir`, `subtrair` e `intersectar` no núcleo, o arredondamento

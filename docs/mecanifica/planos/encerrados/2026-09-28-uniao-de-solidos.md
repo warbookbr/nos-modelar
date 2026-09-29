@@ -227,6 +227,6 @@ e zoom com antes e depois, foi levado para
 ## Depois deste plano
 
 O candidato principal para vir em seguida é [as partes do
-braço](../2026-09-26-as-partes-do-braco.md), congelado em 2026-09-28
+braço](../congelados/2026-09-26-as-partes-do-braco.md), congelado em 2026-09-28
 para dar lugar a este. Ele volta com o ombro de canto reto já feito pela união
 e segue com as partes restantes do braço.

@@ -1,20 +1,28 @@
 # As partes do braço
 
-**Estado:** ativo
-**Descongelado em:** 2026-09-29, por decisão da pessoa, depois de o plano [união
-de sólidos](encerrados/2026-09-28-uniao-de-solidos.md) fechar com `unir`,
-`subtrair`, `intersectar`, o arredondamento da costura e o ombro refeito e
-fixado. Ficou congelado de 2026-09-28 a 2026-09-29.
+**Estado:** congelado
+**Congelado em:** 2026-09-29, por decisão da pessoa · **Base:** branch `claude/revisar-plano-ativo-cyj8c3`
+
+**Por que foi congelado:** a pessoa abriu o plano [o esboço sem conta à
+mão](../2026-09-29-o-esboco-sem-conta-a-mao.md), que melhora a ferramenta de
+esboço, para o esboço deixar de custar coordenadas calculadas à mão antes de a
+modelagem do braço seguir. O plano das partes do braço tinha sido descongelado
+no mesmo dia, depois de o plano [união de sólidos](../encerrados/2026-09-28-uniao-de-solidos.md)
+fechar com `unir`, `subtrair`, `intersectar`, o arredondamento da costura e o
+ombro refeito e fixado.
+
+**Condição de descongelamento:** o plano do esboço fechar, ou a pessoa decidir
+antes. Este plano é o candidato principal para vir em seguida.
 
 **O que a união deixou para este plano:** o ombro de coluna unida ao braço está
 fixo na montagem. O inventário do que cada parte restante pede ao núcleo está no
 fechamento do plano da união, e a lacuna que ele apontou, o arredondamento das
 bordas convexas e internas, foi resolvida com limitações escritas em
 `docs/mecanifica/referencias/GOTCHAS-POR-OPERACAO.md`. Cada etapa passa a
-cumprir o passo [Pare e analise](../usar/PARE-E-ANALISE.md) antes de ser dada
+cumprir o passo [Pare e analise](../../usar/PARE-E-ANALISE.md) antes de ser dada
 por boa e antes de pedir o aceite da pessoa.
 
-**Falta fazer:** as partes restantes, na ordem anelOmbro, braco, anelCotovelo,
+**Fica parado:** as partes restantes, na ordem anelOmbro, braco, anelCotovelo,
 cotovelo, juntaCotovelo, anelAntebraco, antebraco, carcacaPunho,
 anelTampaPunho, tampaPunho, aneisPunho, garfoPunho e flange; e a exportação do
 braço montado. O ombro de tambor segue em `partes/ombro-tambor`.
@@ -25,7 +33,7 @@ braço montado. O ombro de tambor segue em `partes/ombro-tambor`.
 
 ## Problema observado
 
-O plano [o braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou com
+O plano [o braço inteiro](../encerrados/2026-09-25-o-braco-inteiro.md) fechou com
 a porta conferida contra a forma, o contorno tirado da imagem e o fluxo do
 objeto escrito, mas o braço robótico ainda tem só base e anel da cintura
 fixos. O ombro será refeito pela vista frontal, as outras partes da rodada de

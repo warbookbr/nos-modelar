@@ -292,7 +292,7 @@ descrito em [o ombro novo](#o-ombro-novo).
 
 ## Plano sucessor
 
-Iniciar [as partes do braço](../2026-09-26-as-partes-do-braco.md), que parte
+Iniciar [as partes do braço](../congelados/2026-09-26-as-partes-do-braco.md), que parte
 dos mapas de partes da frontal e da lateral sem cabo e leva as fatias 4 e 5:
 as partes restantes com o ombro refeito, a exportação do braço montado e a
 ligação dos contornos ao `conferir:referencia`.
