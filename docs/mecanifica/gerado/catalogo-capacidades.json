@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:4db9e3684d9f919fcf7ba42dc69cf7ec26669f0920e3fd8b5325184eb82d4294",
+  "assinatura": "sha256:cae5deb397219e88c9aff79bdd66c49c69e09bd729e9eb740c334e06be35f498",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -127,7 +127,7 @@
           ],
           "identidade": "preserva-ou-deriva",
           "uso": {
-            "intencao": "Arredondar com raio declarado o encontro côncavo que uma booleana criou.",
+            "intencao": "Arredondar com raio declarado as arestas de uma booleana: o encontro côncavo, a borda convexa e as arestas internas da ferramenta.",
             "schema": "mecanifica.argumentos.arredondarCostura@1",
             "obrigatorios": [
               "origemId",
@@ -1223,7 +1223,7 @@
       ],
       "identidade": "preserva-ou-deriva",
       "uso": {
-        "intencao": "Arredondar com raio declarado o encontro côncavo que uma booleana criou.",
+        "intencao": "Arredondar com raio declarado as arestas de uma booleana: o encontro côncavo, a borda convexa e as arestas internas da ferramenta.",
         "schema": "mecanifica.argumentos.arredondarCostura@1",
         "obrigatorios": [
           "origemId",

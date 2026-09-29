@@ -2818,7 +2818,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia() };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), procedencia: criarEstadoDeProcedencia() };
 
   PASSOS.forEach((passo, i) => {
     const [op, args = {}] = passo;
@@ -2869,6 +2869,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   }
   const saida = { ...neutro, artefato: artefatoDaMalha(neutro), procedencia: procedenciaCanonica(st.procedencia) };
   Object.defineProperty(saida, 'facesDasPortas', { value: facesDasPortas, enumerable: false });
+  /* avisos: o que um passo fez de diferente do pedido sem falhar (o raio que o `arredondarCostura` reduziu com `raioMinimo`). Fora da enumeração, como `facesDasPortas`: não entra na forma canônica. */
+  Object.defineProperty(saida, 'avisos', { value: st.avisos, enumerable: false });
   return saida;
 }
 

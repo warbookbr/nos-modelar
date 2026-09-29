@@ -148,3 +148,36 @@ malha fechada. Na dúvida, veja em arame (`--auditoria --arame`): faixas
 regulares longe da costura e leques compridos perto dela denunciam o
 problema. O erro foi atribuído primeiro ao núcleo, sem medir; medir o ângulo
 entre as superfícies na costura teria mostrado a causa de saída.
+
+## `arredondarCostura`: borda de rebaixo e fundo de rasgo não são o encontro côncavo
+
+Em 2026-09-29 uma sonda com um rebaixo cego numa placa e um rasgo passante num
+bloco mostrou que o `arredondarCostura` recusava os dois com "não tem aresta
+côncava". A borda de cima do rebaixo é convexa, e o fundo e os cantos dele são
+o encontro de duas faces da mesma ferramenta, que a booleana não conta como
+costura. O padrão continua sendo o encontro côncavo; a borda pede
+`arestas: 'convexas'` e o fundo pede `arestas: 'internas'`, num `subtrair`, e as
+classes de um passo saem juntas porque um segundo passo sobre a mesma origem
+recusa (`'todas'` ou uma lista).
+
+A regra da receita é que os raios de classes diferentes numa mesma parede
+precisam caber juntos. Num rebaixo de 0,05 de profundidade, borda e fundo de
+0,03 somam 0,06 e se sobrepõem; o passo grita em vez de entregar uma forma que
+não é nenhuma das duas. Onde o raio não cabe numa superfície curva, a mensagem
+diz a distância até a quina e oferece `raioMinimo`, que faz o raio local cair
+só ali, e `regiao`, que deixa o trecho de fora. Três arestas do mesmo tipo num
+canto do fundo saem como a união de três cilindros, com pontas retas, e não como
+uma esfera.
+
+Duas limitações do `arredondarCostura` com classes diferentes, vistas na
+revisão de 2026-09-29. No rasgo em U com `'todas'` e raio 0,03, o tubo côncavo
+do piso termina reto contra a borda convexa da parede, sem esfera nem
+meia-esquadria comum, e a faixa vertical da borda parede/ponta começa numa
+tampa oblíqua de 45°. A malha é fechada e manifold, mas a forma mostra uma
+cunha escura nos dois cantos de baixo do rasgo e uma faixa de borda que
+termina em diagonal perto de um quarto da altura da parede. Se o canto precisa
+sair liso, use raio pequeno perto dele ou arredonde só uma das classes. A
+segunda: num rebaixo girado, o modo plano falha a casca e o modo por fatias
+deixa os vértices do canto do fundo a 22% a 41% do raio do eixo esperado; o
+passo grita quando sobra lasca, e os raios que passam mudam a contagem de
+faces de dezenas para milhares de um valor para o vizinho.

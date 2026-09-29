@@ -887,8 +887,20 @@ export function criarOperacoesBooleanas(servicos) {
       ].filter(([, P]) => new Set(P).size >= 3 && areaDe(pos, P) < piso * 1e-3);
       if (semArea.length) {
         const [fid, P] = semArea[0];
-        return grita(st, i, op, extra ? extra.ref : 'solidos', `o resultado teria ${semArea.length} face(s) degenerada(s) (área zero: os cantos ficam colineares), a primeira vinda da face ${fid} com ${P.length} cantos; laterais coplanares entre os sólidos costumam causar isto. Afaste as laterais (uma delas 1 mm menor) ou una os sólidos por outra partição; nada foi alterado`);
+        if (extra) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${semArea.length} face(s) sem área (cantos colineares), a primeira vinda da face ${fid}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
+        return grita(st, i, op, 'solidos', `o resultado teria ${semArea.length} face(s) degenerada(s) (área zero: os cantos ficam colineares), a primeira vinda da face ${fid} com ${P.length} cantos; laterais coplanares entre os sólidos costumam causar isto. Afaste as laterais (uma delas 1 mm menor) ou una os sólidos por outra partição; nada foi alterado`);
       }
+    }
+
+    /* ---- PORTÃO DE LASCA (só nas classes novas do arredondamento) ----
+       O triângulo do leque de uma face de saída com área abaixo de 1e-9·escala²
+       (o piso do `conferirMalha`, com o tamanho da caixa no lugar do maior |v|) cintila na tela. O portão
+       de cima só pega a face inteira sem área; aqui a lasca dentro de uma face
+       com área também grita. */
+    if (extra?.estrito) {
+      const escala = escalaDaPeca;   // o tamanho da peça, e não a distância à origem: a peça deslocada tem as mesmas lascas
+      const lasca = [...cortadas, ...pedacosNovos].filter(([, P]) => { for (let k = 1; k < P.length - 1; k++) if (areaDe(pos, [P[0], P[k], P[k + 1]]) < 1e-9 * escala * escala) return true; return false; });
+      if (lasca.length) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${lasca.length} face(s) com triângulo sem área (lasca que cintila na tela), a primeira vinda da face ${lasca[0][0]}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
     }
 
     /* ---- PORTÃO DE CASCA FECHADA ----
@@ -927,7 +939,15 @@ export function criarOperacoesBooleanas(servicos) {
       faces.push(fid);
     }
     const facesAux = [], pedacosDeEntrada = [];
+    /* qual operando (índice em `solidos`) deu cada face final: o
+       `arredondarCostura` com `arestas:'internas'` precisa saber que duas
+       faces são da MESMA ferramenta. Vale só para a booleana; o registro do
+       arredondamento não tem operandos. */
+    const operandoDaFace = new Map(entradas.map((fid, e) => [fid, operandoDaEntrada[e]]));
+    const donos = {};
+    if (!extra) for (const fid of [...mantidas, ...cortadas.map((c) => c[0])]) donos[fid] = operandoDaFace.get(fid);
     pedacosNovos.forEach(([fid, P, aux], k) => {
+      if (!extra && !aux) donos[idDoPasso(i, k)] = operandoDaFace.get(fid);
       const id = idDoPasso(i, k), f = st.F.get(fid);
       addF(st, id, P.map(idFinal));
       const nf = st.F.get(id);
@@ -961,6 +981,7 @@ export function criarOperacoesBooleanas(servicos) {
       costura: facesDaCostura.sort((x, y) => x - y),
       arestas,
       passo: i,
+      ...(extra ? {} : { donos }),
       ...(extra?.registroExtra ?? {}),
     });
   }
@@ -994,9 +1015,62 @@ export function criarOperacoesBooleanas(servicos) {
      LIMITE, dito e não escondido: onde a costura dobra em torno de uma quina
      CONVEXA de um dos sólidos (a quina do braço que entra na coluna), a bola
      rolando faria um pedaço de toro; aqui os dois prismas se encontram em
-     meia-esquadria, e fica um vinco no plano bissetor. Aresta convexa da
-     costura não ganha material. O raio também não é conferido contra o
-     tamanho das faces vizinhas: raio maior que a face faz o prisma sair dela.
+     meia-esquadria, e fica um vinco no plano bissetor. O raio também não é
+     conferido contra o tamanho das faces vizinhas: raio maior que a face faz
+     o prisma sair dela.
+
+     ARESTAS (fatia 7b do plano): `arestas` escolhe o que ganha raio, e o
+     padrão, 'concavas', é tudo o que está dito acima, sem mudar nada.
+       'convexas'  a borda CONVEXA da costura (a beira de um rebaixo, de um
+                   rasgo, de um corte, de um intersectar). O prisma é o mesmo,
+                   com o centro do arco do lado de dentro do sólido, e ele é
+                   SUBTRAÍDO: o arredondamento tira o material entre a quina
+                   e o arco;
+       'internas'  só em `subtrair`: as arestas CÔNCAVAS entre duas faces da
+                   mesma ferramenta que a booleana deixou na peça (o fundo e
+                   os cantos de um rebaixo), fora da costura e com dobra de
+                   45° ou mais (abaixo disso é o facetamento de uma parede
+                   curva). Ganham material, como as côncavas;
+       'todas'     as três classes, cada uma só onde a dobra é de 45° ou mais;
+       lista       as classes nomeadas, sem esse corte (['convexas',
+                   'internas']).
+     As classes de um passo saem no MESMO cálculo (primeiro o que enche, depois
+     o que tira), porque um segundo passo sobre a mesma origem recusa: a origem
+     `de` só tem as faces da booleana, e as do primeiro arredondamento são de
+     outra origem. Duas concordâncias de tipos diferentes numa face, em arestas
+     paralelas, que se sobrepõem ou se encostam (a borda e o fundo de um
+     rebaixo mais raso que a soma dos raios) gritam.
+     No modo plano os prismas de classes diferentes têm meia-esquadria só com
+     os da mesma classe. Onde três arestas do mesmo tipo se encontram (o canto
+     do fundo de um rebaixo) as pontas ficam retas, e o canto sai como a união
+     de três cilindros, sem esfera.
+
+     MODO POR FATIAS nas classes novas. O modo plano recusa quando a tangência
+     sai da face; nas classes novas isso manda para o modo por fatias, que
+     também é o único que aceita `regiao`. Nele a costura vira um grafo:
+     trechos entre vértices de valência diferente de dois, e laços. Onde o
+     trecho dobra mais de 20° (uma quina do laço) ou termina, o anel da última
+     estação da aresta é DESLIZADO ao longo dela até o plano de corte do
+     vértice, o mesmo da meia-esquadria do modo plano (corte reto na ponta); os
+     dois trechos de uma quina partem do MESMO anel, e as duas tampas
+     coincidem. A superfície de transição entre esse anel e o da estação
+     seguinte não é de nenhum dos dois cilindros: dentro de um raio de cada
+     quina o raio medido pode diferir: 3,5e-3 (7%) num corte a 53° do cilindro,
+     e, medido num rebaixo girado, cerca de 22% a 24% do raio a 15° e 41% a 33°.
+     Rebaixo girado também produz lascas nos cantos do fundo, e o portão de
+     lasca (triângulo do leque abaixo de 1e-9·escala²) grita nas classes
+     novas em vez de entregá-las; a contagem de faces varia muito com o raio
+     porque o modo plano falha a casca e cai no modo por fatias Nas classes novas o
+     círculo do Newton também tem de ENCOSTAR: se o ponto mais perto é uma
+     quina que dobra mais de 45° (a parede de um rebaixo mais curta que o
+     raio), ou as duas faces se fecham em cunha, o passo grita. Onde o raio não
+     cabe, `raioMinimo` (PARAM em (0, raio]) faz o raio local cair em passos de
+     3/4 até esse mínimo, e o tubo afina só ali; sem ele a recusa é a de
+     sempre, e a mensagem diz a distância, o raio que a face comporta e as
+     duas saídas (`raioMinimo` e `regiao`). A redução é DECLARADA em
+     `neutro.avisos` (propriedade fora da enumeração: `raioPedido`, `raioMenor`,
+     `estacoes`); com costura plana `raioMinimo` não tem efeito e o aviso diz
+     isso. A checagem de sobreposição entre classes usa sempre o raio pleno.
 
      ARGUMENTOS
        `origemId`   OBRIGATÓRIO: a origem das faces novas do arredondamento;
@@ -1005,14 +1079,23 @@ export function criarOperacoesBooleanas(servicos) {
                     dessa origem, e precisa continuar fechado;
        `raio`       PARAM dimensional > 0;
        `paineis`    TOPO, inteiro de 2 a 64, padrão 8: faixas do arco. Muda a
-                    contagem de faces, então renumera.
+                    contagem de faces, então renumera;
+       `arestas`    'concavas' (padrão), 'convexas', 'internas', 'todas' ou
+                    lista dessas;
+       `raioMinimo` opcional, em (0, raio], só tem efeito no modo por fatias;
+       `regiao`     caixa {min,max} do mundo: só os vértices e estações dentro
+                    dela. Na costura côncava de sempre só vale no modo por
+                    fatias e grita no plano; nas classes novas leva ao modo por
+                    fatias.
 
      IDENTIDADE: a mesma do `unir`. As faces do sólido que o prisma encosta
      mantêm o id no maior pedaço; as faces do arredondamento são todas novas,
-     no bloco do passo, e herdam cor, material e parte da primeira face da
-     costura; o `liso` delas é 45° (o arco fica liso e a quina com a face plana
-     vizinha continua nítida). A origem `{op:'arredondarCostura', id}` devolve
-     as faces do arredondamento. Costura sem aresta côncava grita. */
+     no bloco do passo (ou na faixa estendida, se passarem dele), e herdam cor,
+     material e parte da primeira face da costura; o `liso` delas é 45° (o arco
+     fica liso e a quina com a face plana vizinha continua nítida). A origem
+     `{op:'arredondarCostura', id}` devolve as faces do arredondamento. Classe
+     sem aresta grita, e a mensagem diz quais classes a costura tem. O registro
+     da booleana guarda `donos` (face → índice do operando) para o 'internas'. */
   function arredondarCostura(st, a, i) {
     const op = 'arredondarCostura';
     const wasm = abertura(st, a, i, op);
@@ -1028,7 +1111,7 @@ export function criarOperacoesBooleanas(servicos) {
        costura, ou depois de um passo que cortou faces dessa origem, deixava o
        sólido aberto, e o passo gritava "não é fechado" com o conselho do
        cilindro, que não tinha nada a ver (achado da revisão de 2026-09-29). */
-    if (registro.arredondadaEm != null) return grita(st, i, op, 'de', `a costura de ${de.op}:${de.id} já foi arredondada pelo arredondarCostura do passo ${registro.arredondadaEm}; mude o raio daquele passo em vez de arredondar de novo`);
+    if (registro.arredondadaEm != null) return grita(st, i, op, 'de', `a costura de ${de.op}:${de.id} já foi arredondada pelo arredondarCostura do passo ${registro.arredondadaEm}; mude o raio daquele passo, ou peça as outras classes de arestas nele (arestas:'todas' ou uma lista), em vez de arredondar de novo`);
     for (const f of registro.faces) {
       if (st.F.has(f)) continue;
       const c = st.consumidas.get(f);
@@ -1070,7 +1153,35 @@ export function criarOperacoesBooleanas(servicos) {
       if (regiao.min.some((c, k) => !(c <= regiao.max[k]))) return grita(st, i, op, 'regiao', 'regiao: min não pode passar de max');
     }
 
-    // ---- arestas côncavas da costura, com as duas faces de cada uma ----
+    /* `arestas`: quais arestas ganham raio. 'concavas' (padrão) é o encontro
+       côncavo da costura, como sempre foi; 'convexas' é a borda convexa da
+       costura (a beira do rebaixo, do rasgo, do corte); 'internas' é o
+       encontro côncavo entre duas faces da MESMA ferramenta de um `subtrair`
+       (o fundo e os cantos do rebaixo). 'todas' junta as três, e uma lista
+       junta as que ela nomear: as classes de um passo saem no mesmo cálculo,
+       porque um segundo passo sobre a mesma origem recusa. */
+    const CLASSES = ['concavas', 'internas', 'convexas'];
+    let classes;
+    const soQuinas = a.arestas === 'todas';   // 'todas' só pega quina franca (dobra de 45° ou mais); a lista e o nome de uma classe pegam qualquer dobra
+    {
+      const pedido = a.arestas ?? 'concavas';
+      const lista = pedido === 'todas' ? CLASSES : Array.isArray(pedido) ? pedido : [pedido];
+      if (!lista.length || lista.some((c) => !CLASSES.includes(c)) || new Set(lista).size !== lista.length) {
+        return grita(st, i, op, 'arestas', `arestas precisa ser 'concavas', 'convexas', 'internas', 'todas' ou uma lista sem repetição dessas (recebido ${JSON.stringify(pedido)})`);
+      }
+      classes = CLASSES.filter((c) => lista.includes(c));
+    }
+    const restrito = !(classes.length === 1 && classes[0] === 'concavas');   // as classes novas ganham as recusas novas; a costura côncava de sempre não muda
+    let raioMinimo = null;
+    if (a.raioMinimo != null) {
+      try { raioMinimo = st.num(a.raioMinimo); } catch (e) { return grita(st, i, op, 'raioMinimo', e.message); }
+      if (!(raioMinimo > 0) || !(raioMinimo <= raio)) return grita(st, i, op, 'raioMinimo', `raioMinimo precisa estar em (0, raio] (recebido ${raioMinimo}, com raio ${raio})`);
+    }
+    if (classes.includes('internas') && de.op !== 'subtrair') {
+      return grita(st, i, op, 'arestas', `arestas:'internas' só vale num subtrair, onde a ferramenta deixa faces próprias na peça; ${de.op}:${de.id} não tem ferramenta (tire 'internas' da lista, ou arredonde as arestas do operando antes da booleana)`);
+    }
+
+    // ---- as arestas de cada classe, com as duas faces de cada uma ----
     const noSolido = new Set(faces);
     const facesDaAresta = new Map();
     for (const fid of faces) {
@@ -1086,13 +1197,16 @@ export function criarOperacoesBooleanas(servicos) {
       const vs = st.F.get(fid).vs;
       return [0, 1, 2].map((c) => vs.reduce((s, v) => s + st.V.get(v)[c], 0) / vs.length);
     };
-    const concavas = [];
-    for (const [x, y] of registro.arestas) {
+    /* `sinal` +1: aresta côncava, o arredondamento ACRESCENTA material (une o
+       prisma); -1: aresta convexa, o arredondamento TIRA material (subtrai o
+       prisma). A seção, os recuos e o centro do arco são os mesmos nos dois:
+       o bissetor entra no vazio numa e no sólido na outra. */
+    const arestaDe = (x, y, sinal, quina = false) => {
       const fs = facesDaAresta.get(`${x}-${y}`) ?? [];
-      if (fs.length !== 2 || !fs.every((f) => noSolido.has(f))) continue;
+      if (fs.length !== 2 || !fs.every((f) => noSolido.has(f))) return null;
       const P = st.V.get(x), Q = st.V.get(y);
       const e = sub(Q, P), l = tamanho(e);
-      if (!(l > 0)) continue;
+      if (!(l > 0)) return null;
       const u = e.map((c) => c / l);
       const para = (fid) => {       // direção dentro da face, perpendicular à aresta
         const d = sub(centroide(fid), P), s = ponto(d, u);
@@ -1102,12 +1216,67 @@ export function criarOperacoesBooleanas(servicos) {
       const [fA, fB] = fs;
       const dA = para(fA), dB = para(fB);
       const nA = normalDaFace(st.V, st.F.get(fA).vs);
-      if (!(ponto(nA, dB) > 1e-9)) continue;                  // convexa ou plana: sem material
+      const frente = ponto(nA, dB);
+      if (sinal > 0 ? !(frente > 1e-9) : !(frente < -1e-9)) return null;   // do outro tipo, ou plana
       const theta = Math.acos(Math.max(-1, Math.min(1, ponto(dA, dB))));
-      if (!(theta > 1e-6 && theta < Math.PI - 1e-6)) continue;
-      concavas.push({ x, y, u, dA, dB, theta, nA, nB: normalDaFace(st.V, st.F.get(fB).vs), pA: ponto(nA, P), pB: ponto(normalDaFace(st.V, st.F.get(fB).vs), P) });
+      if (!(theta > 1e-6 && theta < Math.PI - 1e-6)) return null;
+      const nB = normalDaFace(st.V, st.F.get(fB).vs);
+      if (quina && !(ponto(nA, nB) <= Math.SQRT1_2 + 1e-9)) return null;
+      return { x, y, u, dA, dB, theta, nA, nB, pA: ponto(nA, P), pB: ponto(nB, P), sinal, fA, fB };
+    };
+    const arestasDaCostura = registro.arestas;
+    const naCostura = new Set(arestasDaCostura.map(([x, y]) => `${x}-${y}`));
+    /* aresta INTERNA: fora da costura, entre duas faces do mesmo operando que
+       é ferramenta (índice 1 em diante) e com dobra franca. Abaixo de 45° a
+       aresta é o facetamento de uma parede curva (o cilindro que faz o fundo
+       de um rasgo), e não um canto: arredondá-la não tem sentido. */
+    const internas = [];
+    if (de.op === 'subtrair') {
+      const donos = registro.donos ?? {};
+      for (const [chave, fs] of facesDaAresta) {
+        if (naCostura.has(chave) || fs.length !== 2) continue;
+        const [d1, d2] = fs.map((f) => donos[f]);
+        if (d1 == null || d1 !== d2 || d1 < 1) continue;
+        if (!(ponto(normalDaFace(st.V, st.F.get(fs[0]).vs), normalDaFace(st.V, st.F.get(fs[1]).vs)) <= Math.SQRT1_2 + 1e-9)) continue;
+        internas.push(chave.split('-').map(Number));
+      }
+      internas.sort((p, q) => p[0] - q[0] || p[1] - q[1]);
     }
-    if (!concavas.length) return grita(st, i, op, 'de', `a costura de ${de.op}:${de.id} não tem aresta côncava: não há encontro a arredondar`);
+    const porClasse = {
+      concavas: arestasDaCostura.map(([x, y]) => arestaDe(x, y, 1, soQuinas)).filter(Boolean),
+      convexas: arestasDaCostura.map(([x, y]) => arestaDe(x, y, -1, soQuinas)).filter(Boolean),
+      internas: internas.map(([x, y]) => arestaDe(x, y, 1)).filter(Boolean),
+    };
+    const concavas = classes.flatMap((c) => porClasse[c]);   // todas as arestas a arredondar, de qualquer classe
+    if (!concavas.length) {
+      const existe = { concavas: porClasse.concavas.length, convexas: porClasse.convexas.length, internas: porClasse.internas.length };
+      const outras = CLASSES.filter((c) => !classes.includes(c) && existe[c] > 0).map((c) => `${existe[c]} ${c === 'concavas' ? 'côncava(s) da costura' : c === 'convexas' ? 'convexa(s) da costura' : 'interna(s) da ferramenta'} (arestas:'${c}')`);
+      const rotulo = classes.map((c) => (c === 'concavas' ? 'côncava' : c === 'convexas' ? 'convexa' : 'interna')).join(' nem ');
+      return grita(st, i, op, 'de', `a costura de ${de.op}:${de.id} não tem aresta ${rotulo}: não há encontro a arredondar${outras.length ? `; ela tem ${outras.join(' e ')}; peça essas em arestas, ou 'todas'` : "; confira que a booleana deixou costura (os sólidos se cruzam) e, para 'internas', que é um subtrair de ferramenta com paredes próprias"}`);
+    }
+
+    /* Duas concordâncias de tipos diferentes na MESMA face, em arestas
+       paralelas (a borda e o fundo de um rebaixo, na parede dele), se
+       sobrepõem quando os dois recuos somam mais que a distância entre as
+       arestas: a borda tira material do que o fundo acabou de pôr, e a forma
+       sai sem ser nenhuma das duas. Grita em vez de sair assim. */
+    {
+      const rChecado = raio;   // a concordância que a geometria constrói é a de raio pleno; raioMinimo só afina onde a face não comporta, e não resolve sobreposição
+      const recuoDe = (c) => rChecado / Math.tan(c.theta / 2);
+      for (let p = 0; p < concavas.length; p++) for (let q = p + 1; q < concavas.length; q++) {
+        const c = concavas[p], d = concavas[q];
+        if (c.sinal === d.sinal) continue;
+        /* a face em comum pode estar partida em pedaços de ids diferentes:
+           vale o plano, e não o id */
+        const comum = [[c.nA, c.pA, c.fA], [c.nB, c.pB, c.fB]].find(([n1, p1]) => [[d.nA, d.pA], [d.nB, d.pB]].some(([n2, p2]) => ponto(n1, n2) > 1 - 1e-9 && Math.abs(p1 - p2) < 1e-9 * Math.max(1, Math.abs(p1))))?.[2];
+        if (comum == null || tamanho(cruz(c.u, d.u)) > 1e-6) continue;
+        const w = sub(st.V.get(d.x), st.V.get(c.x)), s0 = ponto(w, c.u);
+        const dist = tamanho([w[0] - s0 * c.u[0], w[1] - s0 * c.u[1], w[2] - s0 * c.u[2]]);
+        if (dist <= (recuoDe(c) + recuoDe(d)) * (1 + 1e-6)) {   // encostar já deixa a face entre elas sem altura
+          return grita(st, i, op, 'raio', `o raio ${rChecado} faz a concordância da aresta ${c.sinal < 0 ? c.x + '-' + c.y : d.x + '-' + d.y} (convexa) e a da aresta ${c.sinal < 0 ? d.x + '-' + d.y : c.x + '-' + c.y} (côncava) se sobreporem ou se encostarem na face ${comum}: as duas ficam a ${dist} uma da outra e os recuos somam ${recuoDe(c) + recuoDe(d)}; diminua o raio (raioMinimo não resolve isto), ou arredonde só uma das classes em arestas`);
+        }
+      }
+    }
 
     /* RAIO MÍNIMO, LOCAL: 1/64 da meia-extensão da própria costura (a caixa dos
        vértices das arestas côncavas), e não da caixa do sólido inteiro. Abaixo
@@ -1146,7 +1315,7 @@ export function criarOperacoesBooleanas(servicos) {
     const mesmoPlano = (n1, p1, n2, p2) => ponto(n1, n2) > 1 - 1e-9 && Math.abs(p1 - p2) < 1e-9 * Math.max(1, Math.abs(p1));
     const corte = (c, v) => {
       const reto = { m: c.u, X: st.V.get(v) };
-      const outras = vizinhas.get(v).filter((o) => o !== c);
+      const outras = vizinhas.get(v).filter((o) => o !== c && o.sinal === c.sinal);   // o corte é entre prismas da mesma classe: um enche e o outro tira
       if (outras.length !== 1) return reto;
       const o = outras[0];
       const planosC = [[c.nA, c.pA], [c.nB, c.pB]], planosO = [[o.nA, o.pA], [o.nB, o.pB]];
@@ -1231,7 +1400,7 @@ export function criarOperacoesBooleanas(servicos) {
        Recusas, com a causa: a tangência passar do trecho percorrido da fatia
        (o raio não cabe), ou a fatia dobrar mais de 45° entre P e a tangência
        (a bola teria de passar por uma quina, e isso não é concordância). */
-    const tuboCurvo = () => {
+    const tuboCurvo = (lista, sinal) => {
       /* tolerâncias da fatia pelo TAMANHO do sólido (diagonal da caixa), não
          pela distância à origem: a mesma peça de 5 mm em x = 500 m tinha eps
          de 0,5 mm, maior que a própria costura, e o passo gritava (achado da
@@ -1250,7 +1419,7 @@ export function criarOperacoesBooleanas(servicos) {
       const eps = 1e-9 * escalaP;
       const chaveP = (q) => q.map((c) => Math.round(c / (1e3 * eps))).join(',');   // em coordenada local: transladar não muda a chave
       const vizinhosDaCostura = new Map();
-      for (const [x, y] of registro.arestas) {
+      for (const [x, y] of lista) {
         if (!st.V.has(x) || !st.V.has(y)) continue;
         for (const [p0, p1] of [[x, y], [y, x]]) { if (!vizinhosDaCostura.has(p0)) vizinhosDaCostura.set(p0, []); vizinhosDaCostura.get(p0).push(p1); }
       }
@@ -1325,7 +1494,7 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
       /* Seção num ponto P da costura (local), com a direção u da costura ali. */
-      const secaoEm = (P, u, onde) => {
+      const secaoComRaio = (P, u, onde, raio) => {
         const adj = fatia(P, u);
         const saidas = adj.get(chaveP(P)) ?? [];
         if (saidas.length !== 2) return { pula: true };
@@ -1337,7 +1506,7 @@ export function criarOperacoesBooleanas(servicos) {
         const bis = [dA[0] + dB[0], dA[1] + dB[1], dA[2] + dB[2]];
         if (!(tamanho(bis) > 1e-9) || theta > Math.PI - Math.PI / 90) return { pula: true };   // acima de 178° o encontro é plano: a concordância termina ali, com recuo de 2% do raio
         const b = bis.map((c) => c / tamanho(bis));
-        if (!(ponto(b, A.n) > 0 && ponto(b, B.n) > 0)) return { pula: true };   // o bissetor entra no sólido: encontro convexo
+        if (sinal > 0 ? !(ponto(b, A.n) > 0 && ponto(b, B.n) > 0) : !(ponto(b, A.n) < 0 && ponto(b, B.n) < 0)) return { pula: true };   // o bissetor entra no sólido (encontro convexo) ao arredondar côncavo, ou sai dele (encontro côncavo) ao arredondar convexo
         const recuo = raio / Math.tan(theta / 2);
         const comprimento = 3 * recuo + 2 * raio;
         const cA = caminhar(adj, P, A, comprimento), cB = caminhar(adj, P, B, comprimento);
@@ -1357,16 +1526,50 @@ export function criarOperacoesBooleanas(servicos) {
           const x1 = (-fa * j22 + fb * j12) / det, x2 = (-fb * j11 + fa * j21) / det;
           C = C.map((c, j) => c + x1 * e1[j] + x2 * e2[j]);
         }
-        if (!ok) return { erro: `o arredondamento de raio ${raio} não achou o círculo tangente às duas superfícies ${onde}` };
+        if (!ok) {
+          if (restrito) {
+            const ate = (curva) => { let d = 0; for (let k = 0; k < curva.pts.length - 1; k++) { d += tamanho(sub(curva.pts[k + 1], curva.pts[k])); if (k + 2 < curva.pts.length && ponto(sub(curva.pts[k + 1], curva.pts[k]), sub(curva.pts[k + 2], curva.pts[k + 1])) < Math.cos(Math.PI / 4) * tamanho(sub(curva.pts[k + 1], curva.pts[k])) * tamanho(sub(curva.pts[k + 2], curva.pts[k + 1]))) return d; } return null; };
+            const dA = ate(cA), dB = ate(cB), pede = recuo + raio;
+            const lado = (d) => (d == null ? 'sem dobra dentro do trecho medido' : `dobra mais de 45° a ${d}`);
+            return { erro: `o raio ${raio} não cabe ${onde}: não existe círculo desse raio tangente às duas superfícies; uma ${lado(dA)} e a outra ${lado(dB)} do canto, e o círculo pede ${pede} (recuo mais raio) de cada lado; diminua o raio, declare raioMinimo para ele diminuir onde não cabe, ou restrinja o trecho com regiao:{min,max}` };
+          }
+          return { erro: `o arredondamento de raio ${raio} não achou o círculo tangente às duas superfícies ${onde}` };
+        }
         for (const [curva, perto] of [[cA, na], [cB, nb]]) {
-          if (perto.k === curva.pts.length - 2 && perto.t > 1 - 1e-9) return { erro: `o raio ${raio} não cabe ${onde}: a tangência passa do fim da superfície fatiada (${curva.total} percorridos)` };
+          if (perto.k === curva.pts.length - 2 && perto.t > 1 - 1e-9) return { erro: `o raio ${raio} não cabe ${onde}: a tangência passa do fim da superfície fatiada (${curva.total} percorridos); diminua o raio, declare raioMinimo para ele diminuir só onde não cabe, ou restrinja o trecho com regiao:{min,max}` };
           for (let k = 1; k <= perto.k && k < curva.pts.length - 1; k++) {
             const e0 = sub(curva.pts[k], curva.pts[k - 1]), e1b = sub(curva.pts[k + 1], curva.pts[k]);
-            if (ponto(e0, e1b) < Math.cos(Math.PI / 4) * tamanho(e0) * tamanho(e1b)) return { erro: `o raio ${raio} não cabe ${onde}: entre o canto e a tangência a superfície dobra mais de 45°, e a bola teria de passar por uma quina; restrinja o trecho com regiao:{min,max}` };
+            if (ponto(e0, e1b) < Math.cos(Math.PI / 4) * tamanho(e0) * tamanho(e1b)) return { erro: `o raio ${raio} não cabe ${onde}: entre o canto e a tangência a superfície dobra mais de 45°, e a bola teria de passar por uma quina; restrinja o trecho com regiao:{min,max}, ou declare raioMinimo para o raio diminuir onde não cabe` };
+          }
+        }
+        /* Nas classes novas, o círculo tem de ENCOSTAR na superfície, e não
+           passar por uma quina dela: se o ponto mais perto é o vértice entre
+           dois segmentos que dobram mais de 45° (a parede de um rebaixo mais
+           curta que o raio, e o fundo logo depois), o círculo do Newton
+           tangencia outra coisa e o arredondamento sairia errado. */
+        if (restrito) {
+          for (const [curva, perto] of [[cA, na], [cB, nb]]) {
+            const seg = (k) => sub(curva.pts[k + 1], curva.pts[k]);
+            const cos45 = Math.cos(Math.PI / 4);
+            const quina = (k) => ponto(seg(k - 1), seg(k)) < cos45 * tamanho(seg(k - 1)) * tamanho(seg(k));
+            const noFim = perto.t >= 1 - 1e-9 && perto.k + 1 < curva.pts.length - 1 && quina(perto.k + 1);
+            const noComeco = perto.t <= 1e-9 && perto.k > 0 && quina(perto.k);
+            if (noFim || noComeco) {
+              const k = noFim ? perto.k + 1 : perto.k;
+              let dist = 0; for (let q = 0; q < k; q++) dist += tamanho(seg(q));
+              return { erro: `o raio ${raio} não cabe ${onde}: a bola encostaria numa quina da superfície (dobra de mais de 45°) a ${dist} do canto, em vez de rolar sobre ela; diminua o raio, declare raioMinimo para ele diminuir onde não cabe, ou restrinja o trecho com regiao:{min,max}` };
+            }
           }
         }
         const rA = sub(na.q, C).map((c) => c / raio), rB = sub(nb.q, C).map((c) => c / raio);
         const phi = Math.acos(Math.max(-1, Math.min(1, ponto(rA, rB)))), sp = Math.sin(phi);
+        /* cunha: as duas faces se fecham num ângulo tão agudo que o círculo
+           tangente nas duas fica longe do canto (recuo r/tan(θ/2)), e o Newton
+           acaba num círculo que encosta no próprio canto, com as duas
+           tangências no mesmo ponto: o arco sairia sem extensão */
+        if (!(sp > 1e-6) || (restrito && (tamanho(sub(na.q, P)) < 0.25 * recuo || tamanho(sub(nb.q, P)) < 0.25 * recuo))) {
+          return { erro: `o raio ${raio} não cabe ${onde}: as duas superfícies se fecham em ${(theta * 180 / Math.PI).toFixed(1)}° (uma cunha), e o círculo tangente às duas pediria recuo de ${recuo} do canto; diminua o raio, declare raioMinimo, ou restrinja o trecho com regiao:{min,max}` };
+        }
         /* o arco desce MERGULHO na direção do canto: a bola tangente só
            encosta na casca, e a Manifold separa o contato tangente em cantos
            duplicados, com vértice de vínculo não-manifold (o teste de contato
@@ -1384,6 +1587,23 @@ export function criarOperacoesBooleanas(servicos) {
         const atras = sub(P, Cm).map((c) => c / tamanho(sub(P, Cm)));
         const Q = P.map((c, j) => c + atras[j] * raio);
         return { anel: [Q, ...arco], C: C.map((c, j) => c + centroT[j]) };   // anel local, centro no mundo
+      };
+
+      /* onde o raio pedido não cabe (a tangência passa do fim da superfície,
+         ou ela dobra mais de 45° antes dela), com `raioMinimo` o raio LOCAL
+         cai em passos de 3/4 até o mínimo, e o tubo afina naquele trecho; sem
+         ele a recusa é a de sempre. */
+      const reducoes = [];   // as estações em que o raio caiu, para o aviso do passo
+      const secaoEm = (P, u, onde) => {
+        const primeira = secaoComRaio(P, u, onde, raio);
+        if (!primeira.erro || raioMinimo == null) return primeira;
+        for (let r = raio * 0.75; ; r *= 0.75) {
+          const rr = Math.max(r, raioMinimo);
+          const sec = secaoComRaio(P, u, onde, rr);
+          if (!sec.erro) { reducoes.push({ onde, raio: rr }); return sec; }
+          if (rr <= raioMinimo) break;
+        }
+        return { erro: `${primeira.erro}; nem o raioMinimo ${raioMinimo} coube` };
       };
 
       /* ESTAÇÕES: além dos vértices da costura, pontos no meio de cada aresta
@@ -1410,42 +1630,162 @@ export function criarOperacoesBooleanas(servicos) {
         const fechado = lista.length > 2 && (vizinhosDaCostura.get(lista[lista.length - 1]) ?? []).includes(lista[0]) && (vizinhosDaCostura.get(lista[0]) ?? []).length === 2;
         componentes.push({ lista, fechado });
       }
+      /* Nas classes novas a costura é um GRAFO de arestas e não uma cadeia
+         só: um canto de rebaixo tem três arestas do mesmo tipo. Os trechos
+         são os caminhos entre vértices de valência diferente de dois (cada
+         aresta em um trecho só) e, sobrando aresta, os laços puros. */
+      if (restrito) {
+        componentes.length = 0;
+        const usada = new Set();
+        const chaveA = (p0, p1) => (p0 < p1 ? `${p0}-${p1}` : `${p1}-${p0}`);
+        const vizinhosOrdenados = (v) => [...(vizinhosDaCostura.get(v) ?? [])].sort((x, y) => x - y);
+        const anda = (v0, w0) => {
+          const lista = [v0, w0];
+          usada.add(chaveA(v0, w0));
+          let ant = v0, cur = w0;
+          while (vizinhosOrdenados(cur).length === 2 && cur !== v0) {
+            const prox = vizinhosOrdenados(cur).find((w) => w !== ant);
+            if (usada.has(chaveA(cur, prox))) break;
+            usada.add(chaveA(cur, prox));
+            lista.push(prox); ant = cur; cur = prox;
+          }
+          return lista;
+        };
+        const chaves = [...vizinhosDaCostura.keys()].sort((x, y) => x - y);
+        for (const v of chaves) {
+          if (vizinhosOrdenados(v).length === 2) continue;
+          for (const w of vizinhosOrdenados(v)) if (!usada.has(chaveA(v, w))) componentes.push({ lista: anda(v, w), fechado: false });
+        }
+        for (const v of chaves) {
+          for (const w of vizinhosOrdenados(v)) {
+            if (usada.has(chaveA(v, w))) continue;
+            const lista = anda(v, w);
+            const fim = lista.pop();   // o laço volta ao começo: o último vértice repete o primeiro
+            componentes.push({ lista: fim === v ? lista : [...lista, fim], fechado: fim === v });
+          }
+        }
+      }
       const cadeias = [];
-      for (const { lista, fechado } of componentes) {
+      const porPar = new Map(concavas.map((c) => [`${c.x}-${c.y}`, c]));
+      const registroDaAresta = (v, w) => porPar.get(v < w ? `${v}-${w}` : `${w}-${v}`);
+      /* QUINA e PONTA (só nas classes novas). Onde a costura dobra mais de 20°
+         num vértice, ou termina (a borda de um bloco, a junção com três
+         arestas), a fatia perpendicular à média das arestas cortaria o tubo em
+         viés e o arco sairia com raio menor que o declarado. Ali a cadeia se
+         parte: cada trecho termina com o anel da última estação da aresta
+         DESLIZADO ao longo dela até o plano de corte do vértice (a meia-
+         esquadria do modo plano, ou o corte reto na ponta). Os dois trechos de
+         uma quina compartilham o plano, e no canto plano os dois anéis são o
+         mesmo. */
+      const deslizar = (sec, dir, plano) => {
+        const den = ponto(plano.m, dir);
+        if (!(Math.abs(den) > 1e-9)) return null;
+        const desloca = (q) => { const t = -ponto(plano.m, sub(q, plano.X)) / den; return q.map((c, j) => c + dir[j] * t); };
+        return { anel: sec.anel.map(desloca), C: sec.C };
+      };
+      const planoDoCorte = (rec, v) => {
+        const { m, X } = corte(rec, v);
+        return { m, X: pl(v), mundo: X };
+      };
+      for (const comp of componentes) {
+        let { lista, fechado } = comp;
+        const n0 = lista.length;
+        const posL = lista.map((v) => pl(v));
+        const dobraEm = (k) => {
+          const antes = k > 0 ? posL[k - 1] : fechado ? posL[n0 - 1] : null;
+          const depois = k < n0 - 1 ? posL[k + 1] : fechado ? posL[0] : null;
+          if (!antes || !depois) return null;
+          const a1 = sub(posL[k], antes), a2 = sub(depois, posL[k]);
+          return Math.acos(Math.max(-1, Math.min(1, ponto(a1, a2) / (tamanho(a1) * tamanho(a2))))) * 180 / Math.PI;
+        };
+        // tipo de cada vértice do percurso: 'liso' (estação de fatia), 'quina' ou 'ponta' (fim de trecho)
+        let seq = lista.map((v, k) => ({ v, tipo: restrito ? (dobraEm(k) == null ? 'ponta' : dobraEm(k) > 20 ? 'quina' : 'liso') : 'liso', k }));
+        let aberto = !fechado;
+        if (restrito && fechado && seq.some((q) => q.tipo === 'quina')) {
+          // laço com quina: começa numa quina e volta a ela no fim, e o percurso vira aberto
+          const k0 = seq.findIndex((q) => q.tipo === 'quina');
+          seq = [...seq.slice(k0), ...seq.slice(0, k0), seq[k0]];
+          aberto = true;
+        }
+        const nSeq = seq.length, arestas = aberto ? nSeq - 1 : nSeq;
+        const posDe = (q) => pl(q.v);
         const estacoes = [];
-        const n = lista.length, arestas = fechado ? n : n - 1;
-        for (let k = 0; k < n; k++) {
-          const v = lista[k], P = pl(v);
-          const antes = k > 0 ? pl(lista[k - 1]) : fechado ? pl(lista[n - 1]) : null;
-          const depois = k < n - 1 ? pl(lista[k + 1]) : fechado ? pl(lista[0]) : null;
-          let u = [0, 0, 0];
-          if (antes) { const a1 = sub(P, antes); u = u.map((c, j) => c + a1[j] / tamanho(a1)); }
-          if (depois) { const a2 = sub(depois, P); u = u.map((c, j) => c + a2[j] / tamanho(a2)); }
-          estacoes.push({ P, u, mundo: st.V.get(v), onde: `no vértice ${v} da costura, em ${JSON.stringify(st.V.get(v))}` });
+        for (let k = 0; k < nSeq; k++) {
+          const q = seq[k], v = q.v, P = posDe(q);
+          const ant = k > 0 ? seq[k - 1] : !aberto ? seq[nSeq - 1] : null, dep = k < nSeq - 1 ? seq[k + 1] : !aberto ? seq[0] : null;
+          const antes = ant ? posDe(ant) : null, depois = dep ? posDe(dep) : null;
+          const mundoV = st.V.get(v);
+          if (q.tipo !== 'liso') {
+            const chegada = ant ? { dir: sub(P, antes).map((c, j, w) => c / tamanho(w)), rec: registroDaAresta(ant.v, v) } : null;
+            const saida = dep ? { dir: sub(depois, P).map((c, j, w) => c / tamanho(w)), rec: registroDaAresta(v, dep.v) } : null;
+            estacoes.push({ fim: true, v, mundo: mundoV, chegada, saida, P });
+          } else {
+            let u = [0, 0, 0];
+            if (antes) { const a1 = sub(P, antes); u = u.map((c, j) => c + a1[j] / tamanho(a1)); }
+            if (depois) { const a2 = sub(depois, P); u = u.map((c, j) => c + a2[j] / tamanho(a2)); }
+            estacoes.push({ P, u, mundo: mundoV, onde: `no vértice ${v} da costura, em ${JSON.stringify(mundoV)}` });
+          }
           if (k < arestas) {
-            const Q2 = depois, L = tamanho(sub(Q2, P)), partes = Math.min(64, Math.ceil(L / raio));
+            const Q2 = depois, L = tamanho(sub(Q2, P));
+            const nasPontas = q.tipo !== 'liso' || dep.tipo !== 'liso';
+            const partes = Math.min(64, Math.max(nasPontas ? 2 : 1, Math.ceil(L / raio)));
             const dir = sub(Q2, P).map((c) => c / L);
             for (let j = 1; j < partes; j++) {
               const t = j / partes, Pj = P.map((c, w) => c + (Q2[w] - c) * t);
-              estacoes.push({ P: Pj, u: dir, mundo: Pj.map((c, w) => c + centroT[w]), onde: `no meio da aresta ${v}-${lista[(k + 1) % n]} da costura` });
+              estacoes.push({ P: Pj, u: dir, mundo: Pj.map((c, w) => c + centroT[w]), onde: `no meio da aresta ${v}-${dep.v} da costura` });
             }
           }
         }
-        let atual = [];
-        const fecharCadeia = (laco) => { if (atual.length >= 2) cadeias.push({ aneis: atual.map((e) => e.anel), centros: atual.map((e) => e.C), fechada: laco }); atual = []; };
+        let atual = [], pendente = null, deV = null, ateV = null;
+        const criadas = [];
+        const fecharCadeia = (laco) => {
+          if (atual.length >= 2) { const c = { aneis: atual.map((e) => e.anel), centros: atual.map((e) => e.C), fechada: laco, sinal, deV, ateV }; cadeias.push(c); criadas.push(c); }
+          atual = []; deV = null; ateV = null;
+        };
         let todas = true;
+        const semCorte = (v, mundo) => ({ erro: `o corte do vértice ${v} da costura, em ${JSON.stringify(mundo)}, não é transversal à aresta; use regiao:{min,max} para deixar esse trecho de fora` });
         for (const e of estacoes) {
-          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) { todas = false; fecharCadeia(false); continue; }   // a caixa é do mundo
-          if (!(tamanho(e.u) > 0)) { todas = false; fecharCadeia(false); continue; }
+          if (e.fim) {
+            const dentro = !regiao || e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k]);
+            /* o anel do fim do trecho que chega é o anel DE PARTIDA do trecho que
+               sai (o mesmo objeto): as duas tampas da quina coincidem bit a
+               bit, e a Manifold funde a face comum sem deixar lasca */
+            let anelDaQuina = null;
+            if (atual.length && e.chegada && e.chegada.rec && dentro) {
+              const desl = deslizar(atual[atual.length - 1], e.chegada.dir, planoDoCorte(e.chegada.rec, e.v));
+              if (!desl) return semCorte(e.v, e.mundo);
+              atual.push(desl);
+              anelDaQuina = desl;
+              ateV = e.v;
+            }
+            todas = false; fecharCadeia(false);
+            pendente = dentro && e.saida && e.saida.rec ? { dir: e.saida.dir, plano: planoDoCorte(e.saida.rec, e.v), v: e.v, mundo: e.mundo, anel: anelDaQuina } : null;
+            continue;
+          }
+          if (regiao && !e.mundo.every((c, k) => c >= regiao.min[k] && c <= regiao.max[k])) { todas = false; pendente = null; fecharCadeia(false); continue; }   // a caixa é do mundo
+          if (!(tamanho(e.u) > 0)) { todas = false; pendente = null; fecharCadeia(false); continue; }
           const sec = secaoEm(e.P, e.u.map((c) => c / tamanho(e.u)), e.onde);
           if (sec.erro) return sec;
-          if (sec.pula) { todas = false; fecharCadeia(false); continue; }
+          if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); continue; }
+          if (pendente && !atual.length) {
+            const desl = pendente.anel ?? deslizar(sec, pendente.dir, pendente.plano);
+            if (!desl) return semCorte(pendente.v, pendente.mundo);
+            atual.push(desl);
+            deV = pendente.v;
+          }
+          pendente = null;
           atual.push(sec);
         }
         fecharCadeia(fechado && todas);
+        /* laço com quina que recomeça na mesma quina em que termina: o
+           primeiro trecho parte do anel em que o último chega */
+        if (restrito && fechado && aberto && criadas.length >= 2) {
+          const primeira = criadas[0], ultima = criadas[criadas.length - 1];
+          if (primeira.deV != null && primeira.deV === ultima.ateV) primeira.aneis[0] = ultima.aneis[ultima.aneis.length - 1];
+        }
       }
-      if (!cadeias.length) return { erro: `a costura de ${de.op}:${de.id} não tem encontro côncavo a arredondar` };
-      return { cadeias, centro: centroT, grade: gradeT };
+      if (!cadeias.length) return { vazio: `a costura de ${de.op}:${de.id} não tem aresta ${classes.map((c) => (c === 'concavas' ? 'côncava' : c === 'convexas' ? 'convexa' : 'interna')).join(' nem ')} a arredondar dentro da regiao pedida ou com o raio pedido; confira arestas, regiao e raio` };
+      return { cadeias, centro: centroT, grade: gradeT, reducoes };
     };
 
     /* O RAIO PRECISA CABER: nas duas tampas de cada prisma (já cortadas em
@@ -1497,12 +1837,32 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
     }
+    /* nas classes novas, onde o modo plano recusa (a tangência sai da face) ou
+       não aceita a regiao, o modo por fatias é a saída, e ele diz por que não
+       coube, se não couber */
+    const recusaDoPlano = recusa;
+    if (restrito && modo === 'plano' && (recusa || regiao)) modo = 'curvo';
     if (modo === 'plano' && recusa) return grita(st, i, op, 'raio', recusa);
     if (modo === 'plano' && regiao) return grita(st, i, op, 'regiao', 'regiao só vale na costura curva; na costura plana o arredondamento é por aresta inteira');
+    /* o modo curvo por classe de sinal: as arestas que enchem (côncavas e
+       internas) numa cadeia de tubos, as que tiram (convexas) noutra */
+    const construirCurvo = () => {
+      const partes = [];
+      for (const sinal of [1, -1]) {
+        const lista = concavas.filter((c) => c.sinal === sinal).map((c) => [c.x, c.y]);
+        if (!lista.length) continue;
+        const r = tuboCurvo(lista, sinal);
+        if (r.erro) return r;
+        partes.push(r);
+      }
+      const cheias = partes.filter((p) => !p.vazio);
+      if (!cheias.length) return { erro: partes[0].vazio };
+      return { cadeias: cheias.flatMap((p) => p.cadeias), centro: cheias[0].centro, grade: cheias[0].grade, reducoes: cheias.flatMap((p) => p.reducoes) };
+    };
     let curvo = null;
     if (modo === 'curvo') {
-      curvo = tuboCurvo();
-      if (curvo.erro) return grita(st, i, op, 'raio', curvo.erro);
+      curvo = construirCurvo();
+      if (curvo.erro) return grita(st, i, op, 'raio', `${curvo.erro}${recusaDoPlano ? `; no modo plano: ${recusaDoPlano}` : ''}`);
     }
     const herdaDe = registro.costura.find((f) => st.F.has(f)) ?? faces[0];
 
@@ -1530,6 +1890,8 @@ export function criarOperacoesBooleanas(servicos) {
          com 1149 pedaços. Com o agrupamento, 978 (medido na rodada do ombro). */
       const idsAux = new Set();
       let faixa = 0;
+      const enchem = [], tiram = [];   // sólidos auxiliares: os que se unem à peça e os que se subtraem dela
+      const apaga = () => { for (const p of [...enchem, ...tiram]) p.delete(); };
       if (curvo) for (const [n, cad] of curvo.cadeias.entries()) {
         const m = cad.aneis[0].length, N = cad.aneis.length;
         const props = new Float32Array(N * m * 4);
@@ -1545,14 +1907,9 @@ export function criarOperacoesBooleanas(servicos) {
           for (let k = 1; k < m - 1; k++) { tri.push((N - 1) * m, (N - 1) * m + k, (N - 1) * m + k + 1); fids.push(faixa); } faixa++;
         }
         const r = fechar(props, tri, `o tubo ${n} do arredondamento`, fids);
-        if (r.erro) { for (const p of prismas) p.delete(); return r; }
+        if (r.erro) { apaga(); return r; }
         idsAux.add(r.idReservado);
-        prismas.push(r.solido);
-      }
-      if (curvo) {
-        const resultado = M.union([S, ...prismas]);
-        for (const p of prismas) p.delete();
-        return { resultado, auxID: idsAux };
+        (cad.sinal > 0 ? enchem : tiram).push(r.solido);
       }
       if (!curvo) for (const c of concavas) {
         const s0 = ponta(c, c.x), s1 = ponta(c, c.y), m = s0.length;
@@ -1566,20 +1923,36 @@ export function criarOperacoesBooleanas(servicos) {
           prisma.delete();
           for (let k = 0; k < tri.length; k += 3) [tri[k + 1], tri[k + 2]] = [tri[k + 2], tri[k + 1]];
           try { prisma = new M(new wasm.Mesh({ numProp: 3, vertProperties: props, triVerts: Uint32Array.from(tri) })); }
-          catch (e) { for (const p of prismas) p.delete(); return { erro: `o prisma da aresta ${c.x}-${c.y} não fechou: ${e?.message ?? e}` }; }
+          catch (e) { apaga(); return { erro: `o prisma da aresta ${c.x}-${c.y} não fechou: ${e?.message ?? e}` }; }
         }
-        prismas.push(prisma);
+        (c.sinal > 0 ? enchem : tiram).push(prisma);
       }
-      const juntos = M.union(prismas);
-      for (const p of prismas) p.delete();
-      const marcado = juntos.setProperties(4, (novo, pos) => { novo[0] = pos[0]; novo[1] = pos[1]; novo[2] = pos[2]; novo[3] = -1; });
-      juntos.delete();
-      const auxiliar = marcado.asOriginal();
-      marcado.delete();
-      const auxID = auxiliar.originalID();
-      const resultado = M.union([S, auxiliar]);
-      auxiliar.delete();
-      return { resultado, auxID };
+      /* Os prismas do plano (união deles, marcada como sólido auxiliar: as
+         faces dele nascem todas com id novo) e os tubos do modo curvo (já
+         marcados, um id reservado cada) entram do mesmo jeito: primeiro o que
+         enche, depois o que tira. A Manifold devolve as faces do sólido
+         subtraído com a mesma marca de origem. */
+      const marcar = (lista) => {
+        if (curvo) return lista;
+        const juntos = M.union(lista);
+        for (const p of lista) p.delete();
+        const marcado = juntos.setProperties(4, (novo, pos) => { novo[0] = pos[0]; novo[1] = pos[1]; novo[2] = pos[2]; novo[3] = -1; });
+        juntos.delete();
+        const auxiliar = marcado.asOriginal();
+        marcado.delete();
+        idsAux.add(auxiliar.originalID());
+        return [auxiliar];
+      };
+      const encher = enchem.length ? marcar(enchem) : [], tirar = tiram.length ? marcar(tiram) : [];
+      let resultado = M.union([S, ...encher]);
+      for (const p of encher) p.delete();
+      if (tirar.length) {
+        const menos = M.difference([resultado, ...tirar]);
+        resultado.delete();
+        for (const p of tirar) p.delete();
+        resultado = menos;
+      }
+      return { resultado, auxID: idsAux };
     };
     const antes = st.orfaos.length;
     /* O arredondamento continua sendo o MESMO sólido da origem que ele
@@ -1593,7 +1966,7 @@ export function criarOperacoesBooleanas(servicos) {
       registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada].sort((x, y) => x - y);
       registro.costura = registro.costura.filter((f) => !fora.has(f));
     };
-    const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
+    const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
     /* Os prismas em meia-esquadria são exatos no canto reto, mas no canto
        torto as tampas vizinhas não coincidem e podem deixar a casca aberta
        (o braço inclinado a 20° com raio 0,01). O portão de casca fechada
@@ -1601,11 +1974,24 @@ export function criarOperacoesBooleanas(servicos) {
        inteira pelo modo curvo, por fatias, que acompanha qualquer canto. */
     const r1 = rodar(!curvo);
     if (r1?.falhouCasca) {
-      curvo = tuboCurvo();
+      curvo = construirCurvo();
       if (curvo.erro) return grita(st, i, op, 'raio', curvo.erro);
       rodar(false);
     }
-    if (st.orfaos.length === antes) registro.arredondadaEm = i;
+    if (st.orfaos.length === antes) {
+      registro.arredondadaEm = i;
+      /* o raio reduzido por `raioMinimo` é DECLARADO: o passo entrega o que
+         coube, e o aviso diz quanto (fora da forma canônica, em `neutro.avisos`) */
+      if (!curvo && raioMinimo != null) {
+        st.avisos.push({ passo: i, op, ref: 'raioMinimo', raioPedido: raio, raioMinimo, raioMenor: raio, estacoes: 0,
+          motivo: `raioMinimo não teve efeito: a costura é plana, cada aresta cabe no raio pedido ${raio} e todas saíram com ele` });
+      }
+      if (curvo?.reducoes?.length) {
+        const menor = Math.min(...curvo.reducoes.map((q) => q.raio));
+        st.avisos.push({ passo: i, op, ref: 'raioMinimo', raioPedido: raio, raioMinimo, raioMenor: menor, estacoes: curvo.reducoes.length,
+          motivo: `o raio ${raio} não coube em ${curvo.reducoes.length} estação(ões) da costura e foi reduzido, no mínimo a ${menor} (raioMinimo ${raioMinimo}); o resto da costura saiu com o raio pedido` });
+      }
+    }
   }
 
   /* a forma `nome(st, a, i)` é a que o mapa estático do motor

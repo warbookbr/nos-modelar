@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:4db9e3684d9f919fcf7ba42dc69cf7ec26669f0920e3fd8b5325184eb82d4294",
+  "assinatura": "sha256:cae5deb397219e88c9aff79bdd66c49c69e09bd729e9eb740c334e06be35f498",
   "total": 36,
   "operacoes": [
     {
@@ -372,7 +372,7 @@
       "nome": "arredondarCostura",
       "uso": {
         "formato": "mecanifica.uso-operacao@1",
-        "intencao": "Arredondar com raio declarado o encontro côncavo que uma booleana criou.",
+        "intencao": "Arredondar com raio declarado as arestas de uma booleana: o encontro côncavo, a borda convexa e as arestas internas da ferramenta.",
         "schemaArgumentos": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "$id": "mecanifica.argumentos.arredondarCostura@1",
@@ -424,6 +424,36 @@
             "regiao": {
               "type": "object",
               "description": "Caixa {min,max}: só o trecho da costura curva dentro dela."
+            },
+            "arestas": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              ],
+              "description": "'concavas' (padrão), 'convexas', 'internas' (só subtrair), 'todas' ou lista delas."
+            },
+            "raioMinimo": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Onde o raio não cabe (modo curvo), ele diminui até este mínimo."
             }
           }
         },
@@ -493,8 +523,9 @@
         },
         "precondicoes": [],
         "limites": [
-          "Só costura côncava ganha material; costura convexa grita.",
-          "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano."
+          "Sem arestas, só a costura côncava; classe sem aresta grita e diz qual classe existe.",
+          "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano e recusa quina da própria costura nas classes novas.",
+          "Onde três arestas do mesmo tipo se encontram a ponta fica reta."
         ],
         "diagnosticos": []
       }
