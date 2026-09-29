@@ -131,12 +131,31 @@ describe('reabrir etapa fixa', () => {
     registro = await reabrir(arquivo, 'meio', POR, { ...opcoes, anterior: registro });
     expect(registro.etapas.map((e) => e.estado)).toEqual(['fixa', 'aberta', 'aberta']);
     expect(registro.etapas[1].aceite).toBeUndefined();
-    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa' } }]);
+    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa', analise: 'ausente' } }]);
     /* A releitura mantém a etapa aberta e o histórico. */
     const { registro: relido } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: registro });
     expect(relido.etapas[1]).toMatchObject({ estado: 'aberta', reaberturas: registro.etapas[1].reaberturas });
     /* Refixar acumula, sem apagar a reabertura. */
     const refixado = await fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: relido });
     expect(refixado.etapas[1]).toMatchObject({ estado: 'fixa', reaberturas: [{ motivo: 'refazer pelo desenho novo' }] });
+  });
+});
+
+describe('campo analise no aceite', () => {
+  const opcoes = (manifesto) => ({
+    receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas,
+    analise: { lerManifestoDe: () => manifesto, hashDe: () => 'hash-atual' },
+  });
+
+  it('grava feita quando o manifesto traz o hash da receita atual', async () => {
+    const registro = await fixar(arquivo, 'base', aceite, opcoes({ receita: 'hash-atual' }));
+    expect(registro.etapas[0].aceite.analise).toBe('feita');
+  });
+
+  it('grava ausente com hash errado ou sem manifesto, sem bloquear o aceite', async () => {
+    const velho = await fixar(arquivo, 'base', aceite, opcoes({ receita: 'hash-velho' }));
+    expect(velho.etapas[0]).toMatchObject({ estado: 'fixa', aceite: { analise: 'ausente' } });
+    const sem = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, opcoes(null));
+    expect(sem.etapas[0].aceite.analise).toBe('ausente');
   });
 });

@@ -31,6 +31,7 @@ import {
   ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
+import { estadoDaAnalise } from './analise-da-peca.mjs';
 import { capturarMontagem } from './capturar-montagem.mjs';
 import { carregadoresDeReceitas } from './peca-com-parametros.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
@@ -145,7 +146,11 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
   if (proxima?.instancia === instancia) {
     defeitosAceitos = conferirRodadasDaEtapa(montagem, instancia, opcoes.rodadasDe, opcoes.limiteDe, { aceiteHumano: Boolean(aceite?.aceiteHumano) });
   }
-  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos });
+  /* O passo "Pare e analise" fica registrado no aceite, sem bloquear: aceite
+     humano vale em qualquer ponto. 'feita' = manifesto com o hash da receita de agora. */
+  const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
+  const analise = ref ? estadoDaAnalise(ref, opcoes.analise ?? {}) : 'ausente';
+  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise });
 }
 
 /* Reabrir é decisão da pessoa, como o aceite humano: `por` traz

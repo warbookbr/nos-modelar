@@ -12,6 +12,10 @@ montagem que deriva medida e posição de cada parte das vizinhas. O porquê de
 cada regra abaixo está em [`references/por-que.md`](references/por-que.md), para
 consultar quando uma regra parecer arbitrária.
 
+Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
+[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+
+
 ## Antes do primeiro passo
 
 1. A peça nova passa pela rodada de alinhamento,

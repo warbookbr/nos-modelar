@@ -2,15 +2,17 @@
 
 ## Estado
 
-**Plano ativo:** [União de sólidos](2026-09-28-uniao-de-solidos.md).
+**Plano ativo:** nenhum.
 
-Uma receita junta, subtrai ou intersecta dois sólidos com um passo só, e a
-malha sai fechada, sem face interna e com a origem de cada face. A prova é o
-ombro do braço com o canto reto da foto frontal, sem vinco.
+Sem plano ativo, o backlog não autoriza implementação.
 
-[As partes do braço](congelados/2026-09-26-as-partes-do-braco.md) foi
-congelado em 2026-09-28 para dar lugar à união, e é o candidato principal
-para voltar depois dela.
+[União de sólidos](encerrados/2026-09-28-uniao-de-solidos.md) fechou em
+2026-09-29 com `unir`, `subtrair` e `intersectar` no núcleo, o arredondamento
+da costura côncava, convexa e interna, o `liso` com ângulo e o ombro refeito
+como coluna unida ao braço, fixado pela pessoa. O candidato principal para
+vir em seguida é [as partes do braço](congelados/2026-09-26-as-partes-do-braco.md),
+congelado em 2026-09-28 e pronto para voltar, com o inventário do que as partes
+restantes pedem no fechamento do plano da união.
 
 [O braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou em
 2026-09-26 no limite de tamanho, com a porta conferida contra a forma, o

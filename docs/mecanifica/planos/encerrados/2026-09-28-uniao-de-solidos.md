@@ -1,6 +1,6 @@
 # União de sólidos — dois sólidos viram uma peça só
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Responsável:** Claude, com o aceite visual da pessoa
 
@@ -179,11 +179,54 @@ visível) e instrução para o crítico visual, e fica no backlog do processo.
 
 ## Fechamento
 
-A preencher.
+Fechado em 2026-09-29. O núcleo ganhou `unir`, `subtrair` e `intersectar` sobre
+a Manifold (3.5.4), com identidade posicional herdada, faces consumidas
+registradas e uma faixa de ids estendida no lugar de aumentar o `BLOCO`; o
+`arredondarCostura`, no modo plano e no curvo, para o encontro côncavo, a borda
+convexa e as arestas internas da ferramenta; e o `liso` com ângulo, que a
+pessoa também usou por região no ombro. A triangulação das faces planas grandes
+saiu do leque no visor e no adaptador. O ombro foi refeito como uma coluna
+unida a um braço, com o canto de cima reto, o fim redondo e o anel de arestas
+vivas, e a pessoa o fixou em 2026-09-29 olhando as vistas.
+
+O gate de saída ficou provado assim. A fixture dos dois cubos sai fechada, com
+volume dentro de 0,1%, e sem face dentro do outro sólido em
+`procedural/nucleo/operacoes/booleanas.test.ts`, que também prova a mesma malha
+byte a byte em duas execuções e a origem de cada face. O raio medido na malha
+está em `arredondar-costura.test.ts`, `arredondar-costura-convexa.test.ts` e
+`tools/mecanifica/ombro-uniao.test.ts`. `descrever`, portas, contatos, guardas,
+bancada e exportação passam sobre a malha unida em
+`tools/mecanifica/ferramentas-sobre-uniao.test.ts` e no `porteiro`. O ombro em
+isométrica a 1600 px foi visto e aceito pela pessoa, e o inventário está na
+seção acima.
+
+Três revisões adversariais na união, uma na costura curva e uma na costura
+convexa acharam defeitos que passavam em silêncio: operando sumindo em Float32,
+casca aberta em costura mista, `intersectar` que apagava a peça, estouro de
+bloco, `raioMinimo` que mudava o raio sem declarar. Todos foram corrigidos e
+têm teste.
+
+Ficou como limitação, escrita em `GOTCHAS-POR-OPERACAO.md`. Onde uma borda
+convexa e um encontro côncavo se encontram, como no fundo do rasgo em U, o canto
+sai com uma cunha escura de sombra. O arredondamento em recesso inclinado
+mantém o raio 22% a 41% fora do esperado, e agora grita quando sobra lasca. O
+`arredondarCostura` recusa uma costura que dobra mais de 45° com o raio pedido,
+e por isso o ombro tem a coluna 1 mm menor que o braço no desenho anterior e
+raio do encontro zero no atual. A tampa de loft com `raio: 0` sai em leque, que
+não afeta o visual. O `liso` com ângulo mistura as normais na fronteira entre
+duas regiões de ângulos diferentes. Tudo isso vai ao backlog com a parte que
+pede, junto do cabo com abraçadeiras. A porta `apoio` do ombro passou a
+declarar o raio do pé quadrado, `√2 × 110 mm`, e não mais o do anel da cintura.
+
+Este plano deixou uma falta de processo. A IA deu como resolvidos, sem olhar de
+perto, o degrau do pé, os vincos e o leque, e só a pessoa os viu. O passo
+"Pare e analise", com vistas em vários ângulos, wireframe, raio X, peça isolada
+e zoom com antes e depois, foi levado para
+`docs/mecanifica/usar/PARE-E-ANALISE.md` e para `--analise` na bancada.
 
 ## Depois deste plano
 
 O candidato principal para vir em seguida é [as partes do
-braço](congelados/2026-09-26-as-partes-do-braco.md), congelado em 2026-09-28
+braço](../congelados/2026-09-26-as-partes-do-braco.md), congelado em 2026-09-28
 para dar lugar a este. Ele volta com o ombro de canto reto já feito pela união
 e segue com as partes restantes do braço.

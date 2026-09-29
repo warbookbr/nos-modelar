@@ -13,6 +13,10 @@ O laço começa depois da rodada de
 [`alinhar-modelagem`](../alinhar-modelagem/SKILL.md). Sem plano, não há o que
 cumprir nem contra o que julgar.
 
+Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de declarar pronto ou pedir o aceite, faça o passo de
+[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md) (`olhar-bancada --analise`) e abra as imagens.
+
+
 ## Parte por parte
 
 Um objeto de várias partes é construído uma etapa por vez, na ordem de

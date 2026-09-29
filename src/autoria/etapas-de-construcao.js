@@ -119,7 +119,7 @@ export function fixarEtapa(registro, instancia, aceite) {
   return {
     ...registro,
     etapas: registro.etapas.map((item, i) => (i === indice
-      ? { ...item, estado: 'fixa', aceite: { por, ...(observacao ? { observacao } : {}), ...(defeitosAceitos.length ? { defeitosAceitos } : {}) } }
+      ? { ...item, estado: 'fixa', aceite: { por, ...(observacao ? { observacao } : {}), ...(defeitosAceitos.length ? { defeitosAceitos } : {}), ...(aceite.analise ? { analise: aceite.analise } : {}) } }
       : item)),
   };
 }

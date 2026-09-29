@@ -17,6 +17,7 @@ import { ativarReceitaBancada } from './ativar-bancada.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { analisarPeca } from './analise-da-peca.mjs';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -779,8 +780,8 @@ function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio'],
-      bandeiras: ['listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'],
+      opcoes: ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes'],
+      bandeiras: ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -791,6 +792,16 @@ function comoCLI(argv) {
      mostra a malha da superfície que se vê, o raio X o que está escondido. */
   const arame = lido.bandeira('raio-x') ? 'raio-x' : (lido.bandeira('arame') || lido.bandeira('wireframe'));
   const tela = lido.bandeira('tela');
+  /* `--analise`: o passo "Pare e analise" (docs/mecanifica/usar/PARE-E-ANALISE.md). */
+  if (lido.bandeira('analise')) {
+    const peca = lido.opcao('peca') ?? lido.posicional;
+    return analisarPeca({
+      peca, parte: lido.opcao('parte'), zoom: lido.opcao('zoom'), zoomAntes: lido.opcao('zoom-antes'),
+      saida: lido.opcao('saida'), res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), olhar: olharBancada,
+    }).then((r) => (r.ok
+      ? { ok: true, codigo: 0, stdout: `análise de ${peca}:\n${r.arquivos.map((a) => `  ${a}`).join('\n')}\n`, stderr: '', resultado: { arquivos: r.arquivos } }
+      : r), (erro) => erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso(erro.message) }));
+  }
   if (tela && (lido.bandeira('cores') || arame || lido.bandeira('auditoria'))) {
     return Promise.resolve(erroEstruturado({
       relato: novoRelato(),

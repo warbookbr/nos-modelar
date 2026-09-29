@@ -9,7 +9,7 @@ punho e o garfo vão pedir o mesmo. A rota passou a ser dar essa capacidade ao
 núcleo antes de seguir parte por parte.
 
 **Condição de descongelamento:** o plano [união de
-sólidos](../2026-09-28-uniao-de-solidos.md) fechar com o passo `unir` no
+sólidos](../encerrados/2026-09-28-uniao-de-solidos.md) fechar com o passo `unir` no
 núcleo. Este plano é o candidato principal para vir em seguida.
 
 **Levado para o plano novo:** o ombro com canto reto, como prova da união.
