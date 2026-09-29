@@ -104,17 +104,28 @@ aresta viva no lugar deles é defeito visível.
 7. O inventário das partes restantes do braço.
 8. Fechamento.
 
-## Riscos e parada
+## Riscos e desvios
 
-A Manifold carrega WebAssembly de forma assíncrona, e o núcleo hoje executa as
+A união é capacidade de base, e o plano só fecha com ela funcionando. Cada
+risco tem o desvio já escolhido, e nenhum deles encerra o plano.
+
+A Manifold carrega WebAssembly de forma assíncrona, e o núcleo executa as
 receitas de forma síncrona. O caminho previsto é carregar a biblioteca uma vez,
-quando cada ferramenta abre. Se isso não bastar em algum lugar, a pessoa já
-autorizou em 2026-09-28 tornar o executor assíncrono, desde que cada ferramenta
-afetada ganhe teste provando que continua dando o mesmo resultado. Também paro se a malha que o núcleo gera
-não for fechada o bastante para a Manifold aceitar sem reparo, e nesse caso
-consertar o `loft` vem antes. Paro ainda se os pedaços novos de uma união
-passarem de 1000, porque aumentar o `BLOCO` renumera todo conteúdo salvo e
-isso é decisão da pessoa.
+quando cada ferramenta abre. Onde isso não bastar, o executor passa a ser
+assíncrono, com a autorização que a pessoa deu em 2026-09-28, e cada
+ferramenta afetada ganha teste provando que continua dando o mesmo resultado.
+
+Se a malha do núcleo não estiver fechada o bastante para a Manifold aceitar,
+os vértices repetidos são soldados antes da união; se isso não bastar, o
+`loft` é consertado primeiro.
+
+Se a Manifold falhar num caso sem conserto, entra outra biblioteca de
+booleanas e, em último caso, uma versão escrita no núcleo, restrita aos casos
+que as peças pedem.
+
+Se uma união passar de 1000 pedaços novos, ela é dividida em passos menores.
+Aumentar o `BLOCO` é a única decisão que volta para a pessoa, porque renumera
+todo conteúdo salvo, e ela chega com a alternativa já testada.
 
 ## Fechamento
 
