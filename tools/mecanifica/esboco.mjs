@@ -8,6 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
+import { descreverProjecao, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -31,7 +32,13 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
 export const VISTAS_DA_ANALISE = Object.keys(VISTAS);
 export const AMPLIACAO_DO_ZOOM = 3;
 
-export function variante(esboco, { vista, legendas, centros }) {
+/* Opacidade das formas na variante "transparente" da análise. */
+export const OPACIDADE_TRANSPARENTE = 0.55;
+
+/* `explosoes` (uma entrada por opção: { eixo, fator } ou nula) e `transparente` só valem quando
+   pedidos: a análise sempre tira a `explosao` do arquivo das variantes normais, para mostrar a
+   geometria como ela é, e a devolve só na variante "explodida". */
+export function variante(esboco, { vista, legendas, centros, explosoes, transparente = false }) {
   const impor = (lista) => {
     if (lista === undefined) return undefined;
     const s = new Set(lista);
@@ -44,12 +51,16 @@ export function variante(esboco, { vista, legendas, centros }) {
   v.vista = vista;
   v.linhasCentro = centros;
   v.ocultar = impor(v.ocultar ?? []);
-  for (const o of v.opcoes ?? []) {
+  delete v.explosao;
+  for (const [i, o] of (v.opcoes ?? []).entries()) {
     delete o.linhasCentro;
+    delete o.explosao;
+    if (explosoes?.[i]) o.explosao = { eixo: explosoes[i].eixo, fator: explosoes[i].fator };
     if (o.ocultar !== undefined) o.ocultar = impor(o.ocultar);
     for (const f of o.formas ?? []) {
       if (f.ocultar !== undefined) f.ocultar = impor(f.ocultar);
       if (centros && f.linhaCentro === false) delete f.linhaCentro;
+      if (transparente) f.opacidade = OPACIDADE_TRANSPARENTE;
     }
   }
   return v;
@@ -64,11 +75,14 @@ export function lerZoomDoEsboco(texto) {
   return { vista, caixa: [x0, y0, x1, y1] };
 }
 
+const declaraExplosao = (esboco) => esboco.explosao !== undefined || (esboco.opcoes ?? []).some((o) => o.explosao !== undefined);
+
 export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros = false } = {}) {
   const caminho = resolve(arquivo);
   const texto = readFileSync(caminho, 'utf8');
   const esboco = JSON.parse(texto);
   const contato = verificarContato(esboco);
+  const projecao = verificarProjecao(esboco, { forcar: true, sugerir: true });
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
   const pasta = caminho.replace(/(\.esboco)?\.json$/i, '') + '-analise';
   mkdirSync(pasta, { recursive: true });
@@ -81,6 +95,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
   const navegador = await chromium.launch();
   const arquivos = [];
   const escalas = {};
+  const variantes = [];
   try {
     for (const vista of VISTAS_DA_ANALISE) {
       for (const legendas of [true, false]) {
@@ -91,6 +106,25 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
           arquivos.push(nome);
           escalas[vista] = escala;
         }
+      }
+    }
+    /* Variantes para ler o que se cobre, só quando há achado de projeção ou `explosao` declarada (um esboço sem
+       sobreposição gera as mesmas 8 imagens de sempre): "explodida" e "transparente" (todas as formas a
+       OPACIDADE_TRANSPARENTE), nas quatro vistas, com legendas e sem centros. */
+    const explosoes = (esboco.opcoes ?? []).map((_, i) => {
+      const e = projecao.explosao.find((x) => x.indice === i);
+      return e ? { eixo: e.eixo, fator: e.fator } : null;
+    });
+    const modos = [];
+    if (projecao.explosao.length > 0) modos.push(['explodida', { explosoes }]);
+    if (projecao.explosao.length > 0 || projecao.achados.length > 0) modos.push(['transparente', { transparente: true }]);
+    for (const [modo, extra] of modos) {
+      for (const vista of VISTAS_DA_ANALISE) {
+        const { svg, largura, altura } = desenharEsboco(variante(esboco, { vista, legendas: true, centros: false, ...extra }));
+        const nome = `${vista}-${modo}-legendas.png`;
+        await svgParaPng(svg, largura, altura, join(pasta, nome), navegador);
+        arquivos.push(nome);
+        variantes.push(nome);
       }
     }
   } finally {
@@ -111,9 +145,10 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     vistas: VISTAS_DA_ANALISE,
     zoom: pedidoDeZoom,
     centros: comCentros,
-    forcado: comCentros ? {} : { linhasCentro: false },
+    forcado: { ...(comCentros ? {} : { linhasCentro: false }), ...(declaraExplosao(esboco) ? { explosao: false } : {}) },
     plano: typeof esboco.plano === 'string' ? esboco.plano : null,
     contato,
+    projecao: { usar: projecao.usar, limiar: projecao.limiar, reprova: projecao.reprova, resultado: projecao.resultado, porVista: projecao.porVista, explosao: projecao.explosao, variantes },
     escalaPxPorMm: escalas,
     arquivos,
   };
@@ -127,9 +162,10 @@ export async function gerarEsboco(arquivo) {
   const esboco = JSON.parse(readFileSync(caminho, 'utf8'));
   const { svg, largura, altura, escala } = desenharEsboco(esboco);
   const contato = verificarContato(esboco);
+  const projecao = verificarProjecao(esboco);
   writeFileSync(`${base}.svg`, svg);
   await svgParaPng(svg, largura, altura, `${base}.png`);
-  return { png: `${base}.png`, svg: `${base}.svg`, largura, altura, escala, contato };
+  return { png: `${base}.png`, svg: `${base}.svg`, largura, altura, escala, contato, projecao };
 }
 
 function relatarContato(c) {
@@ -141,6 +177,14 @@ function relatarContato(c) {
   return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}${silenciados.length ? `pares silenciados:\n${silenciados.join('\n')}\n` : ''}`;
 }
 
+/* Achados de projeção junto do relato do contato: informativos, a menos que `contato.projecao.reprova` seja true. */
+function relatarProjecao(p) {
+  if (!p.usar) return '';
+  const linhas = Object.values(p.porVista).flat().map((a) => `  ${descreverProjecao(a)}`);
+  const explosao = p.explosao.map((e) => `  explosão ${e.origem} [${e.opcao}]: eixo ${e.eixo}, fator ${String(e.fator).replace('.', ',')}; com ela os ${e.achados_antes} achados de projeção viram ${e.achados_depois}${e.origem === 'sugerida' ? ' (imagens *-explodida-legendas.png; declare "explosao" no JSON para desenhar assim)' : ''}`);
+  return `sobreposição na projeção (limiar ${Math.round(p.limiar * 100)}%${p.reprova ? ', reprova' : ', informativo'}): ${p.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${explosao.length ? `${explosao.join('\n')}\n` : ''}`;
+}
+
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
   if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
@@ -149,12 +193,12 @@ async function principal(argv) {
     if (argv.includes('--analise')) {
       const z = argv.find((a) => a.startsWith('--zoom='));
       const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null, centros: argv.includes('--centros') });
-      process.stdout.write(`análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n${relatarContato(manifesto.contato)}`);
-      return estrito && manifesto.contato.resultado === 'reprovado' ? 1 : 0;
+      process.stdout.write(`análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n${relatarContato(manifesto.contato)}${relatarProjecao(manifesto.projecao)}`);
+      return estrito && (manifesto.contato.resultado === 'reprovado' || manifesto.projecao.resultado === 'reprovado') ? 1 : 0;
     }
     const r = await gerarEsboco(alvo);
-    process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm\n  ${r.png}\n  ${r.svg}\n${relatarContato(r.contato)}`);
-    return estrito && r.contato.resultado === 'reprovado' ? 1 : 0;
+    process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm\n  ${r.png}\n  ${r.svg}\n${relatarContato(r.contato)}${relatarProjecao(r.projecao)}`);
+    return estrito && (r.contato.resultado === 'reprovado' || r.projecao.resultado === 'reprovado') ? 1 : 0;
   } catch (e) {
     if (e.code === 'ENOENT') { process.stderr.write(`esboço recusado: arquivo não encontrado (${alvo})\n`); return 1; }
     if (e instanceof ErroDeEsboco || e instanceof SyntaxError) { process.stderr.write(`esboço recusado: ${e.message}\n`); return 1; }

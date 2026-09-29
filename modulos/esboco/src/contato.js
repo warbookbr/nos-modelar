@@ -81,7 +81,7 @@ function prismaConvexo(r, poligono) {
 }
 
 /* Peças convexas de uma forma resolvida. */
-function pecasDe(r) {
+export function pecasDe(r) {
   const { perfil, furos } = r.prisma;
   if (furos.length === 0) return [prismaConvexo(r, perfil)];
   if (r.forma.tipo === 'anel') {
@@ -216,7 +216,7 @@ const numMm = (v, onde) => {
   return v;
 };
 
-function lerContato(c, onde) {
+export function lerContato(c, onde) {
   if (c === undefined) return null;
   if (!c || typeof c !== 'object' || Array.isArray(c)) throw new ErroDeEsboco(`${onde}: "contato" deve ser um objeto { usar, tolerancia, penetracao, folga, pares }`);
   if (c.usar !== undefined && typeof c.usar !== 'boolean') throw new ErroDeEsboco(`${onde}: "contato.usar" deve ser true ou false`);
@@ -260,6 +260,17 @@ function exigirDeclaracao(p, onde) {
   }
 }
 
+/* Limiares padrão, proporcionais à dimensão do conjunto: a maior aresta da caixa que
+   envolve todas as formas visíveis de cada opção. */
+export function padroesDoContato(resolvidas) {
+  let dimensao = 0;
+  for (const rs of resolvidas) {
+    if (rs.length === 0) continue;
+    for (let e = 0; e < 3; e++) dimensao = Math.max(dimensao, Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e])));
+  }
+  return { padraoTol: Math.max(1, dimensao * 0.01), padraoPen: Math.max(1, dimensao * 0.003), padraoFolga: dimensao * 0.1 };
+}
+
 /* Verifica o contato de todas as opções. Devolve
    { usar, tolerancia, penetracao, folga, achados, atravessamentos, silenciados, resultado, opcoes }.
    `tolerancia` é a folga máxima para ligar duas peças (e para `encosta`);
@@ -290,15 +301,7 @@ export function verificarContato(esboco) {
      opção ativa; os da opção, só nela. */
   for (const p of raiz?.pares ?? []) exigirDeclaracao(p, 'esboço');
   opcoes.forEach((_, i) => { if (ativa(i)) for (const p of lidas[i]?.pares ?? []) exigirDeclaracao(p, `opção ${i + 1}`); });
-  /* dimensão do conjunto: a maior aresta da caixa que envolve todas as formas visíveis */
-  let dimensao = 0;
-  for (const rs of resolvidas) {
-    if (rs.length === 0) continue;
-    for (let e = 0; e < 3; e++) dimensao = Math.max(dimensao, Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e])));
-  }
-  const padraoTol = Math.max(1, dimensao * 0.01);
-  const padraoPen = Math.max(1, dimensao * 0.003);
-  const padraoFolga = dimensao * 0.1;
+  const { padraoTol, padraoPen, padraoFolga } = padroesDoContato(resolvidas);
   const tolRaiz = raiz?.tolerancia ?? padraoTol;
   const penRaiz = raiz?.penetracao ?? padraoPen;
   const folgaRaiz = raiz?.folga ?? padraoFolga;

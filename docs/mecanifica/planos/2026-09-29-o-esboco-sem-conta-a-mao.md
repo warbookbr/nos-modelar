@@ -92,7 +92,10 @@ README dele.
 
 - a leitura em texto, `--descrever`, com cada forma resolvida (centro, extensões,
   eixo), o grafo de quem toca quem, as âncoras livres, as sobreposições em
-  três dimensões e por vista;
+  três dimensões e por vista, e o `--descrever --mudou`, que mostra só o que
+  mudou desde a última execução (o que passou a tocar em quê, o que ficou solto,
+  o que apareceu de novo), para a IA editar o JSON em passos pequenos e ler a
+  diferença em milissegundos, sem despejar o estado inteiro;
 - a sobreposição na projeção por vista: cada par cujas silhuetas se cobrem
   além de um limiar, quem está na frente, e o que resolve (outra vista, vista
   explodida por eixo, arestas ocultas tracejadas, opacidade), sem a IA declarar
@@ -152,6 +155,12 @@ do naked por `parametros` na opção.
 - as portas com raio, as relações `assentaAnular` e `encaixaCilindrico`, a
   montagem v5 com o resolvedor, os `vinculos`, as `etapas` e o `PLANO`
   estruturado do Mecanifica, e a chamada a `auditar-intersecoes-montagem`;
+- uma linguagem de comandos incrementais (`adiciona`, `encosta`, `espelha`),
+  ADIADA: ela seria uma camada fina sobre as relações e as âncoras das fatias 2,
+  4 e 5, e o `--descrever --mudou` já dá a leitura passo a passo. Volta se, depois
+  dessas fatias, a IA ainda errar por escrever o esboço todo de uma vez; nesse
+  caso os comandos gravam a relação no JSON (não as coordenadas), o gate só roda
+  no comando `verificar`, e o vocabulário sai do mesmo esquema do JSON;
 - importar a malha de uma peça real dentro do esboço;
 - render tridimensional com sombreamento e cotas dimensionais na imagem, que
   são o fluxo da prancha;
@@ -183,7 +192,7 @@ do naked por `parametros` na opção.
    `PLANO-ESTADO-DA-ARTE.md`, e o contrato de declaração do gate (`motivo`,
    `max` obrigatório, `livre` restrito) com o formato do JSON e a compatibilidade
    escritos.
-2. `--descrever` e as âncoras nomeadas.
+2. `--descrever`, o `--descrever --mudou` e as âncoras nomeadas.
 3. A sobreposição na projeção por vista, com vista explodida e arestas ocultas
    tracejadas.
 4. `tubo`, `encostar` e `alinhar`.

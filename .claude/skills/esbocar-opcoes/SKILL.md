@@ -61,7 +61,7 @@ disputa e divida em vários esboços quando ainda assim ficar cheio.
 ## Conferir antes de mostrar
 
 Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode
-`npm run esboco -- <arquivo> --analise` (8 imagens, sem linhas de centro; acrescente `--centros` só se a pessoa quiser vê-las, o que gera 16) e leia as imagens conforme a seção
+`npm run esboco -- <arquivo> --analise` (8 imagens, sem linhas de centro, mais 8 quando há sobreposição na projeção; acrescente `--centros` só se a pessoa quiser vê-las, o que gera 16 e as variantes) e leia as imagens conforme a seção
 Esboço de
 [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md):
 legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e
@@ -79,6 +79,10 @@ foi conferido.
 ```
 
 O `livre` continua ignorando o par, mas o relato o lista em "pares silenciados:" com o motivo; leia essa lista e apague o `livre` que esconde uma peça mal posicionada. Os padrões são tolerância de 1% (folga máxima para ligar duas peças), penetração de 0,3% (sobreposição aceita entre peças que não são `atravessa`) e folga de 10% da maior dimensão. `npm run esboco` imprime `colisao`, `longe`, `voando`, `par-nao-encosta` e `atravessa-excedido` por opção, com peças e mm, e o resultado `aprovado` ou `reprovado`, seguido de "atravessamentos declarados:" com a profundidade de cada par `atravessa` e de "pares silenciados:" com o motivo de cada `livre`; a imagem sai igual, e `--estrito` termina com código 1 se reprovado. Leia cada achado contra a imagem: peça `voando` costuma ser posição errada, e colisão de peças que devem se cruzar pede o par `atravessa` com o `max` esperado e o `motivo`, porque o `max` é o que faz uma peça enterrada demais reprovar. Leia também cada atravessamento: profundidade que a imagem mostra como peça dentro da outra, e não como encaixe, indica peça mal posicionada. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+
+## Sobreposição na projeção
+
+O gate mede em três dimensões, e uma peça a 10 mm de outra pode parecer sobre ela numa vista. Com `contato.usar` ligado (e sempre na `--analise`), `npm run esboco` imprime "sobreposição na projeção" depois do relato do contato: cada par cujas silhuetas se cobrem acima de `contato.projecao.limiar` (padrão 0,15, na raiz ou na opção), sem penetração 3D e sem ser `atravessa`, com a vista, quem cobre quem, a porcentagem da menor silhueta coberta, a folga real em mm e a vista em que o par não se cobre. É informativo (`aviso`); `contato.projecao.reprova: true` o faz reprovar e `--estrito` sair com código 1. Não decida camadas à mão: leia o achado, abra a vista que ele indica como alternativa e as imagens `<vista>-explodida-legendas.png` e `<vista>-transparente-legendas.png` que a análise gera quando há achado. Se a folga real é a que você quer, o achado só informa que a vista engana e nada muda no JSON. Se a folga é pequena demais para ler na imagem, mova a peça. Para mostrar a peça separada à pessoa, declare `explosao: { "eixo": "z", "fator": 2.5 }` na raiz ou na opção, que afasta as formas do centro do conjunto só no desenho (o gate não muda), com a sugestão que a análise imprime em "explosão sugerida"; `opacidade` de 0 a 1 numa forma a torna translúcida. O achado só vale como conferência e não substitui olhar a imagem. Arestas ocultas tracejadas não existem: use a variante transparente.
 
 ## Como mostrar
 

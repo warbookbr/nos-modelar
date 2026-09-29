@@ -542,6 +542,41 @@ function lerModoLegendas(v, onde) {
   return v;
 }
 
+/* Explosão: afasta as formas do centro do conjunto ao longo de um eixo, só no desenho.
+   `{ eixo: "x" | "y" | "z", fator }`, com fator >= 1 (padrão 1,6). */
+export const FATOR_DA_EXPLOSAO = 1.6;
+
+export function lerExplosao(v, onde) {
+  if (v === undefined) return undefined;
+  const dica = '"explosao" deve ser { "eixo": "x" | "y" | "z", "fator": número maior ou igual a 1, por exemplo 1.6 }';
+  exigir(v && typeof v === 'object' && !Array.isArray(v), `${onde}: ${dica}`);
+  exigir(EIXOS.includes(v.eixo), `${onde}: ${dica}; o eixo "${v.eixo}" não existe`);
+  const fator = v.fator ?? FATOR_DA_EXPLOSAO;
+  exigir(typeof fator === 'number' && Number.isFinite(fator) && fator >= 1, `${onde}: ${dica}; o fator ${JSON.stringify(v.fator)} não serve`);
+  return { eixo: v.eixo, fator };
+}
+
+/* Formas resolvidas com o centro afastado do centro do conjunto (a caixa que envolve todas
+   elas) ao longo do eixo. Devolve cópias; as originais, e a geometria do gate, não mudam. */
+export function explodir(formas, explosao) {
+  if (!explosao || formas.length === 0) return formas;
+  const k = EIXOS.indexOf(explosao.eixo);
+  const c = (Math.min(...formas.map((r) => r.min[k])) + Math.max(...formas.map((r) => r.max[k]))) / 2;
+  return formas.map((r) => {
+    const delta = (r.centro[k] - c) * (explosao.fator - 1);
+    if (delta === 0) return r;
+    const desloca = (v) => v.map((x, i) => (i === k ? x + delta : x));
+    return { ...r, centro: desloca(r.centro), min: desloca(r.min), max: desloca(r.max) };
+  });
+}
+
+/* Opacidade da forma, de 0 a 1 (padrão 1, que não muda o desenho). */
+function lerOpacidade(v, onde) {
+  if (v === undefined) return undefined;
+  exigir(typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1, `${onde}: "opacidade" deve ser um número de 0 a 1`);
+  return v;
+}
+
 export function validarEsboco(esboco) {
   exigir(esboco && typeof esboco === 'object', 'o esboço precisa ser um objeto JSON');
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
@@ -549,16 +584,21 @@ export function validarEsboco(esboco) {
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
   const topo = lerOcultar(esboco.ocultar, 'esboço');
   const modoTopo = lerModoLegendas(esboco.legendas, 'esboço');
+  const explosaoTopo = lerExplosao(esboco.explosao, 'esboço');
   return {
     vista,
     opcoes: esboco.opcoes.map((o, i) => {
       const onde = `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
       const daOpcao = lerOcultar(o.ocultar, onde);
       const todas = resolverOpcao(o, onde);
-      for (const r of todas) r.ocultar = lerOcultar(r.forma.ocultar, `${onde}, forma "${r.id}"`);
-      const formas = todas.filter((r) => r.forma.oculto !== true);
-      exigir(formas.length > 0, `${onde}: todas as formas estão com "oculto": true`);
+      for (const r of todas) {
+        r.ocultar = lerOcultar(r.forma.ocultar, `${onde}, forma "${r.id}"`);
+        r.opacidade = lerOpacidade(r.forma.opacidade, `${onde}, forma "${r.id}"`);
+      }
+      const visiveis = todas.filter((r) => r.forma.oculto !== true);
+      exigir(visiveis.length > 0, `${onde}: todas as formas estão com "oculto": true`);
       const modo = lerModoLegendas(o.legendas, onde) ?? modoTopo ?? 'colunas';
+      const formas = explodir(visiveis, lerExplosao(o.explosao, onde) ?? explosaoTopo);
       return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo), modo };
     }),
   };
@@ -1086,6 +1126,9 @@ export function desenharEsboco(esboco) {
 
       const base = hexDe(g.r.forma.cor);
       const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
+      /* opacidade: o grupo inteiro da forma é composto de uma vez, sem escurecer onde suas faces se tocam */
+      const translucida = g.r.opacidade !== undefined && g.r.opacidade < 1;
+      if (translucida) partes.push(`<g opacity="${g.r.opacidade}">`);
 
       // 1. Faces coloridas
       for (const ch of g.chunks) {
@@ -1129,6 +1172,7 @@ export function desenharEsboco(esboco) {
           partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
         }
       }
+      if (translucida) partes.push('</g>');
     }
 
     if (ehLista) {
