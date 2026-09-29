@@ -46,9 +46,18 @@ aresta viva no lugar deles é defeito visível.
 
 - os passos `unir`, `subtrair` e `intersectar` no núcleo, com a mesma forma de
   seleção por origem que os outros passos usam, aceitando dois ou mais sólidos;
-- a identidade: cada face que sai herda a origem, a parte e o material do
-  sólido de onde veio, e a costura fica selecionável como aresta nomeada pela
-  operação que a criou;
+- a identidade, desenhada contra a regra do núcleo de que cada passo só
+  numera dentro do seu bloco de 1000 ids (`BLOCO` em `nucleo.js`). A face que
+  a união não toca fica com o id, a origem, a parte e o material que já tinha.
+  A face cortada pela costura fica com o id dela, na parte que sobra. Só os
+  pedaços a mais de uma face cortada ganham id novo, no bloco do passo da
+  união. A face que fica dentro do outro sólido é consumida e registrada em
+  `st.consumidas`, como o `furo` já faz, para quem a citar depois receber o
+  erro com o conserto. A Manifold devolve triângulos com o número da face de
+  origem, e esse número reagrupa os triângulos no polígono de antes. Por isso
+  a união de dois lofts de 1000 faces não estoura o bloco, porque quase todas
+  as faces continuam com o id que já tinham;
+- a costura selecionável como aresta nomeada pela operação que a criou;
 - o arredondamento da costura com raio declarado;
 - o `liso` respeitando o ângulo na costura, para não borrar a sombra do
   encontro;
@@ -102,8 +111,10 @@ receitas de forma síncrona. O caminho previsto é carregar a biblioteca uma vez
 quando cada ferramenta abre. Se isso não bastar em algum lugar, a pessoa já
 autorizou em 2026-09-28 tornar o executor assíncrono, desde que cada ferramenta
 afetada ganhe teste provando que continua dando o mesmo resultado. Também paro se a malha que o núcleo gera
-não for fechada o bastante para a Manifold aceitar sem reparo. Nesse caso,
-consertar o `loft` vem antes.
+não for fechada o bastante para a Manifold aceitar sem reparo, e nesse caso
+consertar o `loft` vem antes. Paro ainda se os pedaços novos de uma união
+passarem de 1000, porque aumentar o `BLOCO` renumera todo conteúdo salvo e
+isso é decisão da pessoa.
 
 ## Fechamento
 
