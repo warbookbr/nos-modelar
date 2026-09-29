@@ -115,3 +115,36 @@ faces órfãs, e diz esta causa.
 **4. Repetição radial é UMA descrição.** Seis abas de maça saem de um `arranja`
 `modo: 'radial'` com `volta: 360` e `total: 6`. Descrever seis abas é seis
 lugares para errar. Nomeie as cópias: posição não é identidade.
+
+## `unir`: laterais quase rentes fazem a costura em zigue-zague
+
+Em 2026-09-29 o ombro do braço robótico foi refeito com `unir`, para ter o
+canto de cima reto da foto frontal. A coluna era um `loft` vertical e o braço
+um `loft` ao longo de Z, os dois com a mesma superelipse de 105 mm de meia
+largura e o topo no mesmo plano. A malha saiu fechada e o `descrever` saiu
+verde, mas o zoom a 1600 px mostrou um degrau no topo e manchas de sombra nas
+laterais. Os degraus e as manchas não vinham do núcleo, vinham do jeito como
+o ombro foi montado. A coluna e o braço tinham laterais quase rentes, e as duas
+superfícies se cruzavam em zigue-zague.
+
+A lateral da coluna é x = s(z) e a do braço é x = s(y). São superfícies
+diferentes que quase coincidem perto do meio: o ângulo entre elas na costura
+era 0,6° a 20 mm do meio, 9° a 50 mm, 43° a 80 mm e 75° a 95 mm. A costura
+pulava entre as facetas verticais de uma e as horizontais da outra, e o que
+sobrava das tiras longas do braço saía em leques de triângulos compridos. O
+`liso` a 45° misturava as duas facetações onde o encontro tinha menos de 45°,
+e daí as manchas. O degrau era a mesma coisa vista do topo: o topo da coluna é
+plano até a borda, e o do braço cai pela superelipse, 35 mm abaixo a 100 mm do
+meio.
+
+O conserto foi na receita. A coluna passou a terminar dentro do braço, na
+altura do eixo, e o braço a atravessar o topo de ponta a ponta. O topo virou
+uma superfície só, e o encontro ficou côncavo em volta toda, sem trecho rente.
+
+A regra: **nas booleanas, as superfícies que se encontram têm de se cruzar
+com ângulo franco ou uma ficar inteira por dentro da outra**. Superfície rente
+ou quase rente gera costura instável, leques e sombra manchada, mesmo com a
+malha fechada. Na dúvida, veja em arame (`--auditoria --arame`): faixas
+regulares longe da costura e leques compridos perto dela denunciam o
+problema. O erro foi atribuído primeiro ao núcleo, sem medir; medir o ângulo
+entre as superfícies na costura teria mostrado a causa de saída.
