@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-803 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+807 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -443,6 +443,7 @@
 - `liso-por-angulo.js` — liso-por-angulo.js — a normal suave de um canto de face, com ângulo limite.
 - `liso-por-angulo.test.js` — liso-por-angulo.test.js — o valor gravado e a média filtrada por ângulo.
 - `loft-aresta.test.js` — loft-aresta.test.js — a ponta do loft fecha numa linha, com malha fechada e sem leque nem triângulo dobrado.
+- `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `mat4.js` — mat4 mínimo do motor v3 (D-55) — colunas-major, como o WebGL espera
 - `nomes-de-face.test.ts` — nomes-de-face.test.ts — os NOMES publicados por `origem` são formato salvo, e este arquivo é a única coisa que os prende à geometria.
 - `nucleo.js` — nucleo.js — implementação única da OFICINA procedural (passo 1). Executa a lista de PASSOS de uma peça-objeto e devolve o objeto pronto pro visor. Duas camad…
@@ -462,6 +463,9 @@
 - `arranja-contrato.test.ts` — arranja-contrato.test.ts — o que a op `arranja` PROMETE no comentário e não estava afirmado em lugar nenhum.
 - `arredondar-aresta.test.ts` — arredondar-aresta.test.ts — contrato de aceitação do Escopo A do filete v2. Escrito antes da op: uma aresta simples de cubo ganha uma faixa de arco com vário…
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `booleanas-sem-manifold.test.ts` — booleanas-sem-manifold.test.ts — o executor é síncrono e a Manifold carrega de forma assíncrona. Quem executa sem chamar `carregarManifold()` recebe o grito …
+- `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
+- `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/mecanifica/planos/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cubos de lado …
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.

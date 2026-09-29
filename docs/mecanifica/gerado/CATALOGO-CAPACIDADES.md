@@ -2,9 +2,9 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:91b4e5e8a2efd080bd85c49e6ef624f1828780b6276f378b4186cfba74daac8f`.
+Assinatura do registro: `sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a`.
 
-Há 32 operações em 1 módulo(s).
+Há 35 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
@@ -23,6 +23,7 @@ Há 32 operações em 1 módulo(s).
 | `filete` | Criar chanfro plano compatível com o filete v1. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.filete@1` |
 | `furo` | Abrir um ou vários furos estruturais passantes ou cegos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.furo@1` |
 | `inflate` | Construir volume fechado pelo cruzamento de uma silhueta lateral e uma planta. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.inflate@1` |
+| `intersectar` | Manter só o volume comum a todos os sólidos. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.intersectar@1` |
 | `lathe` | Revolucionar perfil [raio,y] em torno de um eixo. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.lathe@1` |
 | `liso` | Marcar faces para sombreamento liso. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.liso@1` |
 | `loft` | Conectar seções ao longo de um caminho 3D. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.loft@1` |
@@ -38,7 +39,9 @@ Há 32 operações em 1 módulo(s).
 | `publicarPorta` | Publicar interface semântica endereçável de uma origem existente. | `mecanifica.malha-poligonal@1` → `mecanifica.porta@1` | — → — | 1 | `mecanifica.argumentos.publicarPorta@1` |
 | `rotaciona` | Rotacionar malha ou seleção em convenção destra. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.rotaciona@1` |
 | `solido` | Marcar faces para renderização sólida. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.solido@1` |
+| `subtrair` | Tirar do primeiro sólido o volume dos demais. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.subtrair@1` |
 | `transladar` | Transladar malha inteira ou seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.transladar@1` |
+| `unir` | Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.unir@1` |
 | `vira` | Inverter o winding de uma face posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.vira@1` |
 
 ## Como usar

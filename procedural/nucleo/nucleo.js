@@ -21,6 +21,8 @@ import { criarOperacoesGeradoresAvancados } from './operacoes/geradores-avancado
 import { criarOperacoesTransformacoes } from './operacoes/transformacoes.js';
 import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
+import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
+import { manifoldCarregada } from './manifold.js';
 import earcut from 'earcut';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
@@ -1436,6 +1438,34 @@ const CONTRATOS_ORIGEM = {
   },
 };
 
+/* unir / subtrair / intersectar — a origem que a booleana publica (ver
+   `operacoes/booleanas.js`). `{op,id}` sozinho são TODAS as faces do resultado;
+   `costura: true` são só as faces que tocam a costura, a aresta onde um sólido
+   encontra o outro. `costura` só aceita o literal true: um valor estranho
+   aceito em silêncio devolveria a peça inteira no lugar da costura. */
+function contratoBooleana(op) {
+  return {
+    validar(origem) {
+      const msg = `${op} usa op, id e costura opcional (só o literal true: as faces que tocam a costura)`;
+      if (!Object.keys(origem).every((k) => k === 'op' || k === 'id' || k === 'costura')) return msg;
+      if (origem.costura != null && origem.costura !== true) return msg;
+      return null;
+    },
+    resolver(st, registro, origem) {
+      const lista = origem.costura ? registro.costura : registro.faces;
+      for (const f of lista) {
+        const consumo = conferirConsumo(st, f, `a face ${f} da origem ${op}:${origem.id}`);
+        if (consumo) return { erro: consumo };
+      }
+      const faces = lista.filter((f) => st.F.has(f));
+      return faces.length ? { faces } : { erro: `origem ${op}:${origem.id}${origem.costura ? ' não tem face viva na costura' : ' não tem nenhuma face viva'}` };
+    },
+  };
+}
+CONTRATOS_ORIGEM.unir = contratoBooleana('unir');
+CONTRATOS_ORIGEM.subtrair = contratoBooleana('subtrair');
+CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
+
 /* Fonte canônica curta para ferramentas e documentação de autoria. A lista é
    derivada dos contratos que `sel:{origem}` realmente resolve; não é uma
    segunda tabela mantida à mão. */
@@ -2500,6 +2530,7 @@ const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, n
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
 const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
+const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
@@ -2510,6 +2541,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesEstruturais,
   ...operacoesTransformacoes,
   ...operacoesAtributos,
+  ...operacoesBooleanas,
 
 };
 
@@ -2519,7 +2551,8 @@ const NOMES_DAS_OPERACOES = [
   'cubo', 'cilindro', 'esfera', 'cone', 'plano', 'chamferBox', 'lathe', 'loft',
   'inflate', 'publicarPorta', 'moveV', 'extruda', 'mescla', 'moveF', 'moveA',
   'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
-  'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'pincel',
+  'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
+  'subtrair', 'intersectar', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));

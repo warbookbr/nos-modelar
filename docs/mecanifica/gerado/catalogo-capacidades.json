@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:91b4e5e8a2efd080bd85c49e6ef624f1828780b6276f378b4186cfba74daac8f",
+  "assinatura": "sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -458,6 +458,38 @@
           }
         },
         {
+          "id": "mecanifica.operacao.intersectar",
+          "nome": "intersectar",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Manter só o volume comum a todos os sólidos.",
+            "schema": "mecanifica.argumentos.intersectar@1",
+            "obrigatorios": [
+              "origemId",
+              "solidos"
+            ]
+          }
+        },
+        {
           "id": "mecanifica.operacao.lathe",
           "nome": "lathe",
           "versao": "1.0.0",
@@ -911,6 +943,38 @@
           }
         },
         {
+          "id": "mecanifica.operacao.subtrair",
+          "nome": "subtrair",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Tirar do primeiro sólido o volume dos demais.",
+            "schema": "mecanifica.argumentos.subtrair@1",
+            "obrigatorios": [
+              "origemId",
+              "solidos"
+            ]
+          }
+        },
+        {
           "id": "mecanifica.operacao.transladar",
           "nome": "transladar",
           "versao": "1.0.0",
@@ -937,6 +1001,38 @@
             "intencao": "Transladar malha inteira ou seleção semântica.",
             "schema": "mecanifica.argumentos.transladar@1",
             "obrigatorios": []
+          }
+        },
+        {
+          "id": "mecanifica.operacao.unir",
+          "nome": "unir",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna.",
+            "schema": "mecanifica.argumentos.unir@1",
+            "obrigatorios": [
+              "origemId",
+              "solidos"
+            ]
           }
         },
         {
@@ -1425,6 +1521,38 @@
       }
     },
     {
+      "id": "mecanifica.operacao.intersectar",
+      "nome": "intersectar",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Manter só o volume comum a todos os sólidos.",
+        "schema": "mecanifica.argumentos.intersectar@1",
+        "obrigatorios": [
+          "origemId",
+          "solidos"
+        ]
+      }
+    },
+    {
       "id": "mecanifica.operacao.lathe",
       "nome": "lathe",
       "versao": "1.0.0",
@@ -1878,6 +2006,38 @@
       }
     },
     {
+      "id": "mecanifica.operacao.subtrair",
+      "nome": "subtrair",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Tirar do primeiro sólido o volume dos demais.",
+        "schema": "mecanifica.argumentos.subtrair@1",
+        "obrigatorios": [
+          "origemId",
+          "solidos"
+        ]
+      }
+    },
+    {
       "id": "mecanifica.operacao.transladar",
       "nome": "transladar",
       "versao": "1.0.0",
@@ -1904,6 +2064,38 @@
         "intencao": "Transladar malha inteira ou seleção semântica.",
         "schema": "mecanifica.argumentos.transladar@1",
         "obrigatorios": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.unir",
+      "nome": "unir",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna.",
+        "schema": "mecanifica.argumentos.unir@1",
+        "obrigatorios": [
+          "origemId",
+          "solidos"
+        ]
       }
     },
     {

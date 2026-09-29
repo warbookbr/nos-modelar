@@ -12,7 +12,7 @@ describe('mapa estático do motor procedural', () => {
     expect(mapa.exportacoes).toContain('nucleo');
     expect(mapa.exportacoes).toContain('neutroCanonico');
     expect(mapa.dependenciasDiretas).toEqual([
-      './artefatos.js', './expressoes.js', './operacoes/atributos.js', './operacoes/edicao-direta.js',
+      './artefatos.js', './expressoes.js', './manifold.js', './operacoes/atributos.js', './operacoes/booleanas.js', './operacoes/edicao-direta.js',
       './operacoes/estruturais.js', './operacoes/geradores-avancados.js',
       './operacoes/primitivas-basicas.js', './operacoes/primitivas-superficie.js',
       './operacoes/transformacoes.js', './registro.js', './uso-operacoes.js', 'earcut',

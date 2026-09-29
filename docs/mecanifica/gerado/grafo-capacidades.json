@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.hipergrafo-capacidades@1",
-  "assinatura": "sha256:91b4e5e8a2efd080bd85c49e6ef624f1828780b6276f378b4186cfba74daac8f",
+  "assinatura": "sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a",
   "nos": [
     {
       "id": "artefato:mecanifica.malha-poligonal@1",
@@ -98,6 +98,11 @@
       "nome": "inflate"
     },
     {
+      "id": "mecanifica.operacao.intersectar",
+      "tipo": "operacao",
+      "nome": "intersectar"
+    },
+    {
       "id": "mecanifica.operacao.lathe",
       "tipo": "operacao",
       "nome": "lathe"
@@ -173,9 +178,19 @@
       "nome": "solido"
     },
     {
+      "id": "mecanifica.operacao.subtrair",
+      "tipo": "operacao",
+      "nome": "subtrair"
+    },
+    {
       "id": "mecanifica.operacao.transladar",
       "tipo": "operacao",
       "nome": "transladar"
+    },
+    {
+      "id": "mecanifica.operacao.unir",
+      "tipo": "operacao",
+      "nome": "unir"
     },
     {
       "id": "mecanifica.operacao.vira",
@@ -318,6 +333,16 @@
       "id": "contrato:mecanifica.operacao.inflate",
       "operacao": "mecanifica.operacao.inflate",
       "entra": [],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.intersectar",
+      "operacao": "mecanifica.operacao.intersectar",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
       "sai": [
         "artefato:mecanifica.malha-poligonal@1"
       ]
@@ -467,8 +492,28 @@
       ]
     },
     {
+      "id": "contrato:mecanifica.operacao.subtrair",
+      "operacao": "mecanifica.operacao.subtrair",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
       "id": "contrato:mecanifica.operacao.transladar",
       "operacao": "mecanifica.operacao.transladar",
+      "entra": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ],
+      "sai": [
+        "artefato:mecanifica.malha-poligonal@1"
+      ]
+    },
+    {
+      "id": "contrato:mecanifica.operacao.unir",
+      "operacao": "mecanifica.operacao.unir",
       "entra": [
         "artefato:mecanifica.malha-poligonal@1"
       ],

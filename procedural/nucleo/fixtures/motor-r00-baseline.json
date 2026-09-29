@@ -28,6 +28,9 @@
     "furo",
     "arredondarAresta",
     "filete",
+    "unir",
+    "subtrair",
+    "intersectar",
     "pincel",
     "solido",
     "liso",
@@ -294,6 +297,36 @@
       "hashCanonico": "88bdd3f315b91d85db56aeec2aac7483bc6caf7984f00fd0471bdf17dace0c3d",
       "vertices": 10,
       "faces": 7,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/unir",
+      "operacoes": [
+        "unir"
+      ],
+      "hashCanonico": "fe31b8ce42bf2e15d82c395e0ad5a2d494ce352ef9c6ff2c749fccdf60675b53",
+      "vertices": 20,
+      "faces": 21,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/subtrair",
+      "operacoes": [
+        "subtrair"
+      ],
+      "hashCanonico": "fa82e588a89e839b6bfdd121a0a921df39e95ad82874cb611c5bf85f2fb1e3d6",
+      "vertices": 14,
+      "faces": 15,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/intersectar",
+      "operacoes": [
+        "intersectar"
+      ],
+      "hashCanonico": "db59565e3df52bf62e97504c4f52794650671588e0b53629e73c170408165fdc",
+      "vertices": 8,
+      "faces": 6,
       "diagnosticos": 0
     },
     {

@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:91b4e5e8a2efd080bd85c49e6ef624f1828780b6276f378b4186cfba74daac8f",
-  "total": 32,
+  "assinatura": "sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a",
+  "total": 35,
   "operacoes": [
     {
       "id": "mecanifica.operacao.apagaFace",
@@ -1767,6 +1767,94 @@
       }
     },
     {
+      "id": "mecanifica.operacao.intersectar",
+      "nome": "intersectar",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Manter só o volume comum a todos os sólidos.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.intersectar@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "solidos"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do resultado e da costura."
+            },
+            "solidos": {
+              "type": "array",
+              "description": "Duas ou mais seleções, uma por sólido."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              }
+            ],
+            [
+              "intersectar",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
+          "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
+        ],
+        "limites": [
+          "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
+          "Cite a costura com {op:'intersectar', id, costura:true}.",
+          "Resultado vazio grita."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
       "id": "mecanifica.operacao.lathe",
       "nome": "lathe",
       "uso": {
@@ -3097,6 +3185,94 @@
       }
     },
     {
+      "id": "mecanifica.operacao.subtrair",
+      "nome": "subtrair",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Tirar do primeiro sólido o volume dos demais.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.subtrair@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "solidos"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do resultado e da costura."
+            },
+            "solidos": {
+              "type": "array",
+              "description": "Duas ou mais seleções: a primeira é a peça, as demais são tiradas dela."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              }
+            ],
+            [
+              "subtrair",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
+          "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
+        ],
+        "limites": [
+          "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
+          "Cite a costura com {op:'subtrair', id, costura:true}.",
+          "Resultado vazio grita."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
       "id": "mecanifica.operacao.transladar",
       "nome": "transladar",
       "uso": {
@@ -3166,6 +3342,94 @@
         },
         "precondicoes": [],
         "limites": [],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.unir",
+      "nome": "unir",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.unir@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "solidos"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade obrigatória do resultado e da costura."
+            },
+            "solidos": {
+              "type": "array",
+              "description": "Duas ou mais seleções, uma por sólido."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "lado": 1
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "lado": 1,
+                "em": [
+                  0.5,
+                  0.5,
+                  0.5
+                ]
+              }
+            ],
+            [
+              "unir",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [
+          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
+          "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
+        ],
+        "limites": [
+          "Face não tocada mantém id e cantos; face cortada mantém o id no maior pedaço convexo; pedaço a mais ganha id novo no bloco do passo; face que some é consumida e a citação dela grita.",
+          "Cite a costura com {op:'unir', id, costura:true}.",
+          "Resultado vazio grita."
+        ],
         "diagnosticos": []
       }
     },

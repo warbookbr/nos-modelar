@@ -16,3 +16,4 @@ export { ErroLacunaCapacidade, FORMATO_CLASSIFICACAO_LACUNA, FORMATO_LACUNA_CAPA
 export { adaptarV3 } from './adaptador.js';
 export { avaliarChaves, bindPoseOssos, montarAnimar } from './animacao.js';
 export { colisaoDe, executar } from './executor.js';
+export { carregarManifold, manifoldCarregada } from './manifold.js';
