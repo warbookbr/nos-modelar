@@ -1,5 +1,5 @@
 /* primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global. */
-export function criarOperacoesPrimitivasBasicas({ BLOCO, confereId, grita, resolverLados, addV, addF, registraOrigem }) {
+export function criarOperacoesPrimitivasBasicas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem }) {
   return {
   cubo(st, a, i) {
     const b = confereId(st, i, 'cubo', a);
@@ -23,28 +23,28 @@ export function criarOperacoesPrimitivasBasicas({ BLOCO, confereId, grita, resol
   },
 
   cilindro(st, a, i) {
-    const b = confereId(st, i, 'cilindro', a);
+    confereId(st, i, 'cilindro', a);
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'cilindro', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const h = st.num(a.altura ?? 1);
     const resolucao = resolverLados(st, a.lados, r);
     if (resolucao.erro) return grita(st, i, 'cilindro', 'lados', resolucao.erro);
     const L = resolucao.lados;   // TOPO: número explícito ou derivado de {desvio}
-    if (2 * L > BLOCO) {
-      const motivo = `cilindro com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${(BLOCO / 2) | 0}`;
+    if (2 * L > BLOCO + FAIXA_ESTENDIDA) {
+      const motivo = `cilindro com ${L} lados estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}); máx ${((BLOCO + FAIXA_ESTENDIDA) / 2) | 0}`;
       if (resolucao.derivado) return grita(st, i, 'cilindro', 'lados', `${motivo} — aumente o desvio`);
       throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
     }
-    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + k, [Math.cos(t) * r, 0, Math.sin(t) * r]); }
-    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + L + k, [Math.cos(t) * r, h, Math.sin(t) * r]); }
+    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, idDoPasso(i, k), [Math.cos(t) * r, 0, Math.sin(t) * r]); }
+    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, idDoPasso(i, L + k), [Math.cos(t) * r, h, Math.sin(t) * r]); }
     const laterais = [];
-    for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, b + k, [b + k, b + L + k, b + L + n, b + n]); laterais.push(b + k); } // lados (normal radial pra fora)
+    for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, idDoPasso(i, k), [idDoPasso(i, k), idDoPasso(i, L + k), idDoPasso(i, L + n), idDoPasso(i, n)]); laterais.push(idDoPasso(i, k)); } // lados (normal radial pra fora)
     // tampas: MESMO winding do cubo (fundo pra-frente -> normal -y; topo revertido -> +y). Inverter apaga a luz da tampa — era o bug D1.
-    const fundo = []; for (let k = 0; k < L; k++) fundo.push(b + k); addF(st, b + L, fundo);          // -y
-    const topo = []; for (let k = L - 1; k >= 0; k--) topo.push(b + L + k); addF(st, b + L + 1, topo); // +y
+    const fundo = []; for (let k = 0; k < L; k++) fundo.push(idDoPasso(i, k)); addF(st, idDoPasso(i, L), fundo);          // -y
+    const topo = []; for (let k = L - 1; k >= 0; k--) topo.push(idDoPasso(i, L + k)); addF(st, idDoPasso(i, L + 1), topo); // +y
     /* origemId (Fase 4): `laterais[k]` é a face lateral k (0..L-1), o eixo
        numérico `lado`; `tampas` dá as duas faces nominais `fundo`/`topo`. */
-    if (a.origemId != null) registraOrigem(st, i, 'cilindro', a.origemId, { laterais, tampas: { fundo: b + L, topo: b + L + 1 } });
+    if (a.origemId != null) registraOrigem(st, i, 'cilindro', a.origemId, { laterais, tampas: { fundo: idDoPasso(i, L), topo: idDoPasso(i, L + 1) } });
   },
 
   /* ---- P1 do playground: esfera / cone / plano — geradores novos, mesmas leis ----

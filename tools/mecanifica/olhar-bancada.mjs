@@ -302,7 +302,7 @@ export async function olharBancada({
        2. Uma receita procedural do repositório (ex.: 'peca-de-prova', 'procedural/.../peca.js').
        Se for receita, auto-ativamos a sessão ativa para ela e carregamos a bancada via sessão,
        evitando timeout do Playwright. Se não existir em nenhum dos dois, falha rápido. */
-    const FIXTURES_HARNESS = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas', 'fixture-uniao'];
+    const FIXTURES_HARNESS = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas', 'fixture-uniao', 'fixture-ombro-uniao'];
     const ehFixtureHarness = Boolean(peca && FIXTURES_HARNESS.includes(peca));
 
     let caminhoDaReceita = null;

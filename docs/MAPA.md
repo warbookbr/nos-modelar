@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-810 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+814 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -465,10 +465,12 @@
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
+- `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
 - `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/mecanifica/planos/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cubos de lado …
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
+- `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `furo-raio-por-grupo.test.ts` — furo-raio-por-grupo.test.ts — contrato da F1: cada grupo de centros pode declarar raio e, em furo cego, profundidade próprios, e receber um nome semântico pa…
 - `geradores-avancados.js` — geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo.
@@ -985,6 +987,7 @@
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.
 - `olhar.mjs` — olhar.mjs — rasteriza SVGs para PNG, para que a IA OLHE o desenho.
+- `ombro-uniao.test.ts` — ombro-uniao.test.ts — a rodada do ombro do plano "União de sólidos": a união e o arredondamento sobre superfícies CURVAS facetadas. A fixture (`fixtures/fixt…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.
@@ -1027,6 +1030,7 @@
 
 - `fixture-cubo.js` — fixture-cubo.js — receita procedural de teste para exportação CAD/STEP.
 - `fixture-erro.js` — fixture-erro.js — receita procedural propositalmente sem partes para teste de falha.
+- `fixture-ombro-uniao.js` — fixture-ombro-uniao.js — fixture neutra copiada em 2026-09-29 do ombro do braço robótico (procedural/pecas/braco-robotico/partes/ombro/receita.js), para os t…
 - `fixture-uniao.js` — fixture-uniao.js — fixture neutra da fatia 5 do plano "União de sólidos": uma coluna e um braço unidos por `unir`, pousados numa base. Prova que as ferrament…
 
 ## tools/mecanifica/fixtures/contatos/

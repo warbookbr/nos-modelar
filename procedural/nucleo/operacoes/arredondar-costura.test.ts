@@ -143,14 +143,24 @@ describe('arredondarCostura com o braço inclinado', () => {
          pelo menos uma ponta de cada canto do arco (4 arestas × 9 cantos; na meia-esquadria os prismas vizinhos dividem cantos)
          estão no raio. Com o canto que não é reto, as tampas dos prismas
          vizinhos não coincidem, e o pedaço de tampa que aparece (o vinco da
-         meia-esquadria) fica por dentro do cilindro: medido 0,79·r a 20° e
-         0,58·r a 35°; o piso do teste é 0,5·r. */
+         meia-esquadria) vai do cilindro até o canto da costura: medido de
+         0,58·r a r·√2; o piso do teste é 0,5·r e o teto r·√2. */
       const vs = new Set<number>();
       for (const f of n.F.values()) if (f.cor === "#ff0000") for (const v of f.vs) if (v >= 4000) vs.add(v);   // só os cantos deste passo (o canto da costura é do unir)
-      const d = [...vs].map((v) => aoEixoInclinado(g, n.V.get(v)));
-      expect(Math.max(...d)).toBeLessThan(r * (1 + 1e-3));   // corda de um arco vizinho no vinco
+      /* fora os cantos que caem nos planos das faces do sólido (a coluna em
+         x = 0,2, os lados do braço em |z| = 0,15, o fundo e o topo do braço):
+         ali ficam as tangências e a borda do vinco da meia-esquadria, que
+         encosta na face plana e não é ponto do arco */
+      const s = Math.sin((g * Math.PI) / 180), c = Math.cos((g * Math.PI) / 180);
+      const noPlano = (p: number[]) => Math.abs(p[0] - 0.2) < 1e-9 || Math.abs(Math.abs(p[2]) - 0.15) < 1e-9
+        || Math.abs(s * p[0] - c * p[1] - (s * 0.15 * s - c * (0.75 - 0.15 * c))) < 1e-9
+        || Math.abs(-s * p[0] + c * p[1] - (s * 0.15 * s + c * (0.75 + 0.15 * c))) < 1e-9;
+      const d = [...vs].map((v) => n.V.get(v)).filter((p: number[]) => !noPlano(p)).map((p: number[]) => aoEixoInclinado(g, p));
+      expect(Math.max(...d)).toBeLessThan(r * Math.SQRT2 * (1 + 1e-3));   // o vinco da meia-esquadria chega até o canto da costura, a r·√2 do eixo
       expect(Math.min(...d)).toBeGreaterThan(0.5 * r);
-      expect(d.filter((x) => Math.abs(x - r) < 1e-6).length).toBeGreaterThanOrEqual(4 * 9);
+      /* no raio: 1e-6 nos prismas; quando o portão manda para o modo por
+         fatias (a 10°, os prismas deixavam lasca), o arco mergulha 1e-3·r */
+      expect(d.filter((x) => Math.abs(x - r) < 2e-3 * r).length).toBeGreaterThanOrEqual(4 * 7);
       for (const id of [0, 2, 5]) expect(n.F.get(id).vs).toEqual(antes.F.get(id).vs);
     });
   }

@@ -1,6 +1,6 @@
 /* estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 export function criarOperacoesEstruturais(servicos) {
-  const { BLOCO, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
+  const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta } = servicos;
   return {
   publicarPorta(st, a, i) {
     const usaNomeLegado = a.nome !== undefined;
@@ -161,9 +161,8 @@ export function criarOperacoesEstruturais(servicos) {
     // guarda de overflow (D3): conta ANTES de inserir — vértice no eixo não consome id
     const nVPorCopia = vertsOrdenados.filter((v) => !noEixo(st.V.get(v))).length;
     const nVNovos = nVPorCopia * nCopias, nFNovos = faceIds.length * nCopias;
-    if (nVNovos > BLOCO || nFNovos > BLOCO) throw new Error(`oficina: arranja estoura o bloco de ids (${BLOCO}): ${nVNovos} vértice(s) novo(s) / ${nFNovos} face(s) nova(s)`);
+    if (nVNovos > BLOCO + FAIXA_ESTENDIDA || nFNovos > BLOCO + FAIXA_ESTENDIDA) throw new Error(`oficina: arranja estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nVNovos} vértice(s) novo(s) / ${nFNovos} face(s) nova(s)`);
 
-    const b = baseDoPasso(i);
     let cursorV = 0, cursorF = 0;
     const copias = [];
     for (let k = 0; k < nCopias; k++) {
@@ -175,14 +174,14 @@ export function criarOperacoesEstruturais(servicos) {
         const p = st.V.get(v);
         if (noEixo(p)) { mapa.set(v, v); continue; }   // sobre o eixo: soldado, sem id novo
         const q = modo === 'radial' ? giraPonto(p, pivo, ax, c, s) : [p[0] + (k + 1) * d[0], p[1] + (k + 1) * d[1], p[2] + (k + 1) * d[2]];
-        const novo = b + cursorV; cursorV++;
+        const novo = idDoPasso(i, cursorV); cursorV++;
         addV(st, novo, q);
         mapa.set(v, novo);
       }
       const copiaDaFace = new Map();
       for (const fid of faceIds) {
         const f = st.F.get(fid);
-        const novo = b + cursorF; cursorF++;
+        const novo = idDoPasso(i, cursorF); cursorF++;
         addF(st, novo, f.vs.map((v) => mapa.get(v)));   // sem reverter: rotação e translação preservam a mão
         copiaDaFace.set(fid, novo);
         const nf = st.F.get(novo);
@@ -320,7 +319,6 @@ export function criarOperacoesEstruturais(servicos) {
      a causa e o passo inteiro aborta com 0 V/0 F. Nunca sobra meio furo, e
      dois furos sobrepostos nunca viram um furo em oito. */
   furo(st, a, i) {
-    const b = baseDoPasso(i);
 
     // ---- identidade estrutural: obrigatória, conferida antes de tocar na malha ----
     if (a.origemId == null) return grita(st, i, 'furo', 'origemId', 'furo é sempre estrutural: origemId é obrigatório (sem ele as faces do corte nasceriam anônimas)');
@@ -545,8 +543,9 @@ export function criarOperacoesEstruturais(servicos) {
        acrescentar preenchimento, nunca reduzir estes vértices/faces. */
     const nVMin = 2 * L * M;
     const nFMin = M * (temSaida ? 3 * L : 2 * L + 1);
-    if (resolucao.derivado && (nVMin > BLOCO || nFMin > BLOCO)) {
-      return grita(st, i, 'furo', 'lados', `o desvio ${resolucao.desvio} deriva ${L} lados para o maior raio (${maiorRaio}): no mínimo ${nVMin} vértices / ${nFMin} faces estouram o bloco de ids (${BLOCO}) — aumente o desvio`);
+    if (nVMin > BLOCO + FAIXA_ESTENDIDA || nFMin > BLOCO + FAIXA_ESTENDIDA) {
+      if (!resolucao.derivado) throw new Error(`oficina: furo com ${M} anel(éis) de ${L} lados estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): no mínimo ${nVMin} vértices / ${nFMin} faces`);   // forma numérica preserva o contrato histórico
+      return grita(st, i, 'furo', 'lados', `o desvio ${resolucao.desvio} deriva ${L} lados para o maior raio (${maiorRaio}): no mínimo ${nVMin} vértices / ${nFMin} faces estouram o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}) — aumente o desvio`);
     }
     const profsPorFuro = [];
     if (temSaida) {
@@ -709,8 +708,8 @@ export function criarOperacoesEstruturais(servicos) {
 
     // guarda de overflow (D3), contada antes de inserir
     const nV = 2 * L * M, nF = M * (temSaida ? 3 * L : 2 * L + 1) + cheioE.length + cheioS.length;
-    if (nV > BLOCO || nF > BLOCO) {
-      const motivo = `furo com ${M} anel(éis) de ${L} lados estoura o bloco de ids (${BLOCO}): ${nV} vértices / ${nF} faces`;
+    if (nV > BLOCO + FAIXA_ESTENDIDA || nF > BLOCO + FAIXA_ESTENDIDA) {
+      const motivo = `furo com ${M} anel(éis) de ${L} lados estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nV} vértices / ${nF} faces`;
       if (resolucao.derivado) return grita(st, i, 'furo', 'lados', `${motivo} — aumente o desvio`);
       throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
     }
@@ -719,8 +718,8 @@ export function criarOperacoesEstruturais(servicos) {
     const E = [], S = [];
     for (let k = 0; k < M; k++) {
       const e = [], s = [];
-      for (let j = 0; j < L; j++) { addV(st, b + 2 * L * k + j, aneisEntrada[k][j]); e.push(b + 2 * L * k + j); }
-      for (let j = 0; j < L; j++) { addV(st, b + 2 * L * k + L + j, aneisOutro[k][j]); s.push(b + 2 * L * k + L + j); }
+      for (let j = 0; j < L; j++) { addV(st, idDoPasso(i, 2 * L * k + j), aneisEntrada[k][j]); e.push(idDoPasso(i, 2 * L * k + j)); }
+      for (let j = 0; j < L; j++) { addV(st, idDoPasso(i, 2 * L * k + L + j), aneisOutro[k][j]); s.push(idDoPasso(i, 2 * L * k + L + j)); }
       E.push(e); S.push(s);
     }
 
@@ -733,17 +732,17 @@ export function criarOperacoesEstruturais(servicos) {
 
     const furos = [];
     for (let k = 0; k < M; k++) {
-      const base = b + 3 * L * k;
+      const base = 3 * L * k;   // índice local; o id sai de idDoPasso
       const bordas = [], paredes = [];
       bordaE[k].forEach((desc, j) => {
         const vs = M === 1
           ? [...desc.externos.map((m) => fEntrada.vs[m]), ...desc.anel.map((m) => E[k][m])]
           : desc.cantos.map(cantoEntrada);
-        addF(st, base + j, vs); bordas.push(base + j); herda(base + j, fEntrada);
+        addF(st, idDoPasso(i, base + j), vs); bordas.push(idDoPasso(i, base + j)); herda(idDoPasso(i, base + j), fEntrada);
       });
       for (let j = 0; j < L; j++) {
         const n = (j + 1) % L;
-        addF(st, base + L + j, [E[k][j], E[k][n], S[k][n], S[k][j]]); paredes.push(base + L + j); herda(base + L + j, fEntrada);
+        addF(st, idDoPasso(i, base + L + j), [E[k][j], E[k][n], S[k][n], S[k][j]]); paredes.push(idDoPasso(i, base + L + j)); herda(idDoPasso(i, base + L + j), fEntrada);
       }
       let saidas = null, fundo = null;
       if (temSaida) {
@@ -752,18 +751,18 @@ export function criarOperacoesEstruturais(servicos) {
           const vs = M === 1
             ? [...desc.externos.map((q) => fSaida.vs[q]), ...desc.anel.map((q) => S[k][ordemSaida[q]])]
             : desc.cantos.map(cantoSaida);
-          addF(st, base + 2 * L + m, vs); saidas.push(base + 2 * L + m); herda(base + 2 * L + m, fSaida);
+          addF(st, idDoPasso(i, base + 2 * L + m), vs); saidas.push(idDoPasso(i, base + 2 * L + m)); herda(idDoPasso(i, base + 2 * L + m), fSaida);
         });
       } else {
-        fundo = base + 2 * L;
+        fundo = idDoPasso(i, base + 2 * L);
         addF(st, fundo, S[k].slice()); herda(fundo, fEntrada);
       }
       furos.push({ bordas, paredes, saidas, fundo });
     }
-    let cursor = b + 3 * L * M;
+    let cursor = 3 * L * M;   // índice local
     const preenchimento = [], preenchimentoDaSaida = [];
-    for (const desc of cheioE) { addF(st, cursor, desc.cantos.map(cantoEntrada)); preenchimento.push(cursor); herda(cursor, fEntrada); cursor++; }
-    for (const desc of cheioS) { addF(st, cursor, desc.cantos.map(cantoSaida)); preenchimentoDaSaida.push(cursor); herda(cursor, fSaida); cursor++; }
+    for (const desc of cheioE) { const id = idDoPasso(i, cursor); addF(st, id, desc.cantos.map(cantoEntrada)); preenchimento.push(id); herda(id, fEntrada); cursor++; }
+    for (const desc of cheioS) { const id = idDoPasso(i, cursor); addF(st, id, desc.cantos.map(cantoSaida)); preenchimentoDaSaida.push(id); herda(id, fSaida); cursor++; }
 
     // as faces cortadas SOMEM da malha e ENTRAM no registro de consumo
     st.F.delete(entradaId);

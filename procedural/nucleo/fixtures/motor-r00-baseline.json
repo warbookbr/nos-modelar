@@ -305,7 +305,7 @@
       "operacoes": [
         "unir"
       ],
-      "hashCanonico": "ceea2ba22a7077bb8ac18a41bb0bb91c0071ab40eccb5c9f2b899b735f63e2db",
+      "hashCanonico": "7983d2662c265f06fc611d79ca6ae8d8503ef3928cf993b355d2d4374fc63b4c",
       "vertices": 20,
       "faces": 24,
       "diagnosticos": 0
@@ -315,7 +315,7 @@
       "operacoes": [
         "subtrair"
       ],
-      "hashCanonico": "fa82e588a89e839b6bfdd121a0a921df39e95ad82874cb611c5bf85f2fb1e3d6",
+      "hashCanonico": "36579f6a039345203a8728b0d36a8d47d0695fc7bbbb7b6ff46932ed7a488047",
       "vertices": 14,
       "faces": 15,
       "diagnosticos": 0
@@ -325,7 +325,7 @@
       "operacoes": [
         "intersectar"
       ],
-      "hashCanonico": "db59565e3df52bf62e97504c4f52794650671588e0b53629e73c170408165fdc",
+      "hashCanonico": "440022788685890bb4481f5e803052e3a0e1f96363effdc4ade0deb1202b908c",
       "vertices": 8,
       "faces": 6,
       "diagnosticos": 0
@@ -335,7 +335,7 @@
       "operacoes": [
         "arredondarCostura"
       ],
-      "hashCanonico": "81444612f14b46738320e0dbf5d7a30b29bfb9ce638ac49435be0cbf2b24a39b",
+      "hashCanonico": "6ac296bbedbea13fecdeffe672203a56edc840153606117371a1608affb3f199",
       "vertices": 52,
       "faces": 54,
       "diagnosticos": 0

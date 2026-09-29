@@ -31,7 +31,9 @@ export const FORMATO = { v: 1, tipo: 'objeto' };
    [i*BLOCO, i*BLOCO+BLOCO) — tanto no espaço de VÉRTICE quanto no de FACE (dois
    espaços independentes: pode existir vértice 12 e face 12 ao mesmo tempo). É
    isto que torna a numeração POSICIONAL: o passo 4 começa a numerar no mesmo
-   lugar hoje ou daqui a um ano, e nenhum PARAM mexe nisso. */
+   lugar hoje ou daqui a um ano, e nenhum PARAM mexe nisso. Passo que precisa
+   de mais de BLOCO ids continua na FAIXA ESTENDIDA dele (`idDoPasso`, logo
+   abaixo), sem renumerar ninguém. */
 export const BLOCO = 1000;
 
 /* base posicional de um passo (vértice e face partem do mesmo número, espaços
@@ -39,6 +41,29 @@ export const BLOCO = 1000;
    escrito à mão pra ficar legível; se divergir da posição, vira aviso (nunca
    uma segunda-verdade silenciosa). */
 function baseDoPasso(i) { return i * BLOCO; }
+
+/* FAIXA ESTENDIDA (plano "União de sólidos", 2026-09-29). Um passo que gera
+   mais de BLOCO ids (uma união ou um arredondamento sobre superfície curva:
+   o ombro de 48 lados pede perto de 1000 só na concordância) continua
+   numerando no seu bloco até BLOCO-1 e, dali em diante, numa faixa própria,
+   longe de todo bloco normal:
+
+     id local k < BLOCO   ->  i·BLOCO + k                 (o de sempre)
+     id local k ≥ BLOCO   ->  2^40 + i·2^20 + (k − BLOCO)
+
+   A faixa também só depende da POSIÇÃO do passo e da ordem local, então a
+   identidade continua posicional e determinística. Nenhum conteúdo salvo
+   renumera: só usa a faixa quem antes gritava por estourar o bloco. Cabe em
+   inteiro seguro (2^40 + 4096·2^20 < 2^53), com até 2^20 − BLOCO ids a mais
+   por passo. Aumentar o BLOCO global foi medido e recusado: renumeraria toda
+   peça de mais de um passo e mudaria 29 hashes congelados, entre eles as
+   rodadas do acervo, que são evidência. */
+export const BASE_ESTENDIDA = 2 ** 40;
+export const FAIXA_ESTENDIDA = 2 ** 20;
+export function idDoPasso(i, k) {
+  if (!Number.isSafeInteger(k) || k < 0 || k >= BLOCO + FAIXA_ESTENDIDA) throw new RangeError(`id local ${k} fora do passo (máximo ${BLOCO + FAIXA_ESTENDIDA - 1})`);
+  return k < BLOCO ? i * BLOCO + k : BASE_ESTENDIDA + i * FAIXA_ESTENDIDA + (k - BLOCO);
+}
 
 /* ----------------------------------------------------------------------------
    Vetores mínimos (puros, sem dependência do motor — o núcleo roda headless).
@@ -2525,16 +2550,16 @@ function expandirConcordancias(st, i, op, pontosBrutos, { fechado, segmentosCurv
    nunca precisa ser copiada à mão num doc que pode desatualizar. A bancada
    `criar.mjs` cruza isso contra a tabela da skill `criar-peca` e avisa se
    divergir (op no núcleo sem doc, ou doc citando op que não existe mais). */
-const operacoesPrimitivasBasicas = criarOperacoesPrimitivasBasicas({ BLOCO, confereId, grita, resolverLados, addV, addF, registraOrigem });
+const operacoesPrimitivasBasicas = criarOperacoesPrimitivasBasicas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem });
 
-const operacoesPrimitivasSuperficie = criarOperacoesPrimitivasSuperficie({ BLOCO, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace });
+const operacoesPrimitivasSuperficie = criarOperacoesPrimitivasSuperficie({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace });
 
 const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, normalDaFace, addV, addF, colapsaCiclo, distintos, resolverSelecao });
 
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
-const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
-const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
-const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
+const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
+const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
+const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {

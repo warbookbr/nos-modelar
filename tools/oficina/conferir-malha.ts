@@ -67,6 +67,37 @@ export function arestasSemPar(neutro: any) {
 }
 
 /**
+ * Vértices cujo VÍNCULO não é um laço só: o leque de faces em volta do vértice
+ * tem de fechar uma volta, sem ramos nem duas voltas presas no mesmo ponto. A
+ * checagem de aresta sem par não pega isso (uma aresta usada por quatro faces
+ * tem par), e o teste de contato recusa. Foi o que passou em silêncio no
+ * arredondamento do braço inclinado até a revisão de 2026-09-29.
+ */
+export function vinculosNaoManifold(neutro: any) {
+  const vinculo = new Map<number, [number, number][]>();
+  for (const f of neutro.F.values()) {
+    const vs = f.vs;
+    for (let k = 0; k < vs.length; k++) {
+      const a = vs[k];
+      if (!vinculo.has(a)) vinculo.set(a, []);
+      vinculo.get(a)!.push([vs[(k + vs.length - 1) % vs.length], vs[(k + 1) % vs.length]]);
+    }
+  }
+  const ruins: string[] = [];
+  for (const [v, lista] of vinculo) {
+    const prox = new Map(lista.map(([p, q]) => [q, p]));
+    let ok = prox.size === lista.length && lista.length >= 3;
+    if (ok) {
+      let c = lista[0][1], passos = 0;
+      do { c = prox.get(c)!; passos++; } while (c !== undefined && c !== lista[0][1] && passos <= lista.length);
+      ok = passos === lista.length;
+    }
+    if (!ok) ruins.push(`vértice ${v}: vínculo de ${lista.length} face(s) não fecha um laço só`);
+  }
+  return ruins;
+}
+
+/**
  * Cantos que caem EM CIMA de uma aresta da própria face. Zero é o que se
  * espera; qualquer um é um bico de espessura zero, e é o que quebra na tela.
  * A tolerância é RELATIVA ao tamanho da face, para valer igual num parafuso de
@@ -127,6 +158,7 @@ export function conferirMalha(neutro: any, { fechada = false, rotulo = 'a malha'
   expect(cantosSobreAresta(neutro), `${rotulo}: polígono com bico de espessura zero`).toEqual([]);
   if (fechada) {
     expect(arestasSemPar(neutro), `${rotulo}: casca declarada FECHADA, mas com borda solta`).toEqual([]);
+    expect(vinculosNaoManifold(neutro), `${rotulo}: casca declarada FECHADA, mas não-manifold num vértice`).toEqual([]);
   }
 
   /* e por fim a prova que faltava: a malha atravessa o adaptador. Ele é quem

@@ -1,6 +1,6 @@
 /* transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 export function criarOperacoesTransformacoes(servicos) {
-  const { FORMATO, BLOCO, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF } = servicos;
+  const { FORMATO, BLOCO, FAIXA_ESTENDIDA, idDoPasso, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF } = servicos;
   return {
   displace(st, a, i) {
     const alvos = resolverAlvosV(st, a.sel, 'displace', i);
@@ -233,7 +233,6 @@ export function criarOperacoesTransformacoes(servicos) {
     const ax = indiceDeAxi(eixo);
     if (ax < 0) return grita(st, i, 'espelha', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
     const pos = st.num(a.pos ?? 0);
-    const b = baseDoPasso(i);
     const estrutural = a.origemId != null || a.derivaDe != null;
     let derivaDe = null;
     let faceIdsEstruturais = null;
@@ -278,7 +277,7 @@ export function criarOperacoesTransformacoes(servicos) {
     // guarda de overflow (D3): conta ANTES de inserir — só vértice NÃO-soldado consome id novo
     let nVNovos = 0;
     for (const v of vertsOrdenados) { const p = st.V.get(v); if (p && p[ax] !== pos) nVNovos++; }
-    if (nVNovos > BLOCO || faceIds.length > BLOCO) throw new Error(`oficina: espelha estoura o bloco de ids (${BLOCO}): ${nVNovos} vértice(s) novo(s) / ${faceIds.length} face(s) nova(s)`);
+    if (nVNovos > BLOCO + FAIXA_ESTENDIDA || faceIds.length > BLOCO + FAIXA_ESTENDIDA) throw new Error(`oficina: espelha estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}): ${nVNovos} vértice(s) novo(s) / ${faceIds.length} face(s) nova(s)`);
 
     // mapa orig -> espelho (soldado = mapeia pra si mesmo; fora = novo id do bloco, em ordem)
     const mapa = new Map();
@@ -288,7 +287,7 @@ export function criarOperacoesTransformacoes(servicos) {
       if (!p) { mapa.set(v, v); continue; }              // defensivo (canto sem posição — nunca corrompe)
       if (p[ax] === pos) { mapa.set(v, v); continue; }   // NO plano: soldado, sem id novo
       const q = p.slice(); q[ax] = 2 * pos - p[ax];
-      const novo = b + cursorV; cursorV++;
+      const novo = idDoPasso(i, cursorV); cursorV++;
       addV(st, novo, q);
       mapa.set(v, novo);
     }
@@ -304,7 +303,7 @@ export function criarOperacoesTransformacoes(servicos) {
       // o mesmo tratamento do `polo↔polo` degenerado do lathe.
       if (!estrutural && f.vs.every((v) => mapa.get(v) === v)) { grita(st, i, 'espelha', fid, 'face inteiramente no plano do espelho — degenerado (a espelhada seria coincidente), pulada'); continue; }
       const vs = f.vs.map((v) => mapa.get(v)).reverse();
-      const novo = b + cursorF; cursorF++;
+      const novo = idDoPasso(i, cursorF); cursorF++;
       addF(st, novo, vs);
       if (estrutural) copias.set(fid, novo);
       const nf = st.F.get(novo);

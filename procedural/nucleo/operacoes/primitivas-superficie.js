@@ -1,5 +1,5 @@
 /* primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo. */
-export function criarOperacoesPrimitivasSuperficie({ BLOCO, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace }) {
+export function criarOperacoesPrimitivasSuperficie({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, resolverLados, addV, addF, registraOrigem, norm3, normalDaFace }) {
   return {
   esfera(st, a, i) {
     const b = confereId(st, i, 'esfera', a);
@@ -35,26 +35,26 @@ export function criarOperacoesPrimitivasSuperficie({ BLOCO, confereId, grita, re
      no MESMO winding da tampa de fundo do cilindro (ângulo crescente — normal -y).
      Total: lados+1. */
   cone(st, a, i) {
-    const b = confereId(st, i, 'cone', a);
+    confereId(st, i, 'cone', a);
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'cone', 'origemId', 'origemId precisa ser inteiro não-negativo');
     const r = st.num(a.raio ?? 0.5);
     const h = st.num(a.altura ?? 1);
     const resolucao = resolverLados(st, a.lados, r);
     if (resolucao.erro) return grita(st, i, 'cone', 'lados', resolucao.erro);
     const L = resolucao.lados;   // TOPO: número explícito ou derivado de {desvio}
-    if (L + 1 > BLOCO) {
-      const motivo = `cone com ${L} lados estoura o bloco de ids (${BLOCO}); máx ${BLOCO - 1}`;
+    if (L + 1 > BLOCO + FAIXA_ESTENDIDA) {
+      const motivo = `cone com ${L} lados estoura o bloco e a faixa estendida de ids (${BLOCO + FAIXA_ESTENDIDA}); máx ${BLOCO + FAIXA_ESTENDIDA - 1}`;
       if (resolucao.derivado) return grita(st, i, 'cone', 'lados', `${motivo} — aumente o desvio`);
       throw new Error(`oficina: ${motivo}`);   // forma numérica preserva o contrato histórico
     }
-    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, b + k, [Math.cos(t) * r, 0, Math.sin(t) * r]); }
-    addV(st, b + L, [0, h, 0]);                                                                       // ápice
-    for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, b + k, [b + k, b + L, b + n]); }    // laterais (normal pra fora)
-    const fundo = []; for (let k = 0; k < L; k++) fundo.push(b + k); addF(st, b + L, fundo);          // tampa da base (-y, o winding do fundo do cilindro)
+    for (let k = 0; k < L; k++) { const t = (k / L) * Math.PI * 2; addV(st, idDoPasso(i, k), [Math.cos(t) * r, 0, Math.sin(t) * r]); }
+    addV(st, idDoPasso(i, L), [0, h, 0]);                                                                       // ápice
+    for (let k = 0; k < L; k++) { const n = (k + 1) % L; addF(st, idDoPasso(i, k), [idDoPasso(i, k), idDoPasso(i, L), idDoPasso(i, n)]); }    // laterais (normal pra fora)
+    const fundo = []; for (let k = 0; k < L; k++) fundo.push(idDoPasso(i, k)); addF(st, idDoPasso(i, L), fundo);          // tampa da base (-y, o winding do fundo do cilindro)
     /* origemId (A-18): a MESMA forma do cilindro — `laterais[k]` é a face
        lateral k (0..L-1, o eixo numérico `lado`) e `tampas` tem a única face
        nominal do cone, a base ('fundo'). O ápice não entra: é vértice. */
-    if (a.origemId != null) registraOrigem(st, i, 'cone', a.origemId, { laterais: Array.from({ length: L }, (_, k) => b + k), tampas: { fundo: b + L } });
+    if (a.origemId != null) registraOrigem(st, i, 'cone', a.origemId, { laterais: Array.from({ length: L }, (_, k) => idDoPasso(i, k)), tampas: { fundo: idDoPasso(i, L) } });
   },
 
   /* plano — grade no plano XZ, y=0, CENTRADA na origem (o chão). `largura` (eixo x)

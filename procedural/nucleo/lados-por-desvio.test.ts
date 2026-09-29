@@ -147,7 +147,7 @@ describe('A-34 — recusas automáticas são fechadas', () => {
   });
 
   it('estouro derivado grita e recomenda aumentar o desvio', () => {
-    const n = nucleo(CILINDRO({ desvio: 1e-9 }, 1) as any, {}, {});
+    const n = nucleo(CILINDRO({ desvio: 1e-14 }, 1) as any, {}, {});   // passa até da faixa estendida (BLOCO + 2^20 ids)
     expect(n.orfaos).toHaveLength(1);
     expect(n.orfaos[0].motivo).toMatch(/estoura o bloco.*aumente o desvio/);
     expect(n.V.size).toBe(0);
@@ -155,11 +155,11 @@ describe('A-34 — recusas automáticas são fechadas', () => {
   });
 
   it('estouro numérico conserva o throw histórico', () => {
-    expect(() => nucleo(CILINDRO(BLOCO) as any, {}, {})).toThrow(/estoura o bloco de ids/);
+    expect(() => nucleo(CILINDRO(2 ** 20) as any, {}, {})).toThrow(/estoura o bloco/);
   });
 
   it('furo derivado que excede o bloco preserva as faces de entrada e saída', () => {
-    const n = nucleo(FURO({ desvio: 1e-9 }) as any, {}, {});
+    const n = nucleo(FURO({ desvio: 1e-14 }) as any, {}, {});
     expect(n.orfaos.some((o: any) => /no mínimo .* estouram o bloco/.test(o.motivo))).toBe(true);
     expect(idsDoBloco(n.V, 1)).toEqual([]);
     expect(idsDoBloco(n.F, 1)).toEqual([]);

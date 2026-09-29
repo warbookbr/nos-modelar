@@ -309,7 +309,7 @@ describe('regressões do revisor adversarial (D1/D2/D3)', () => {
   });
 
   it('D3: cilindro com lados demais pro bloco de ids falha ALTO (throw), não vaza pro bloco seguinte', () => {
-    expect(() => nucleo([['cilindro', { id: 0, raio: 'r', altura: 'h', lados: 'l' }]], { r: 1, h: 1 }, { l: 600 })).toThrow(/estoura o bloco/);
+    expect(() => nucleo([['cilindro', { id: 0, raio: 'r', altura: 'h', lados: 'l' }]], { r: 1, h: 1 }, { l: 2 ** 20 })).toThrow(/estoura o bloco/);   // 600 lados agora cabem na faixa estendida; só passa da faixa inteira lança
   });
 
   /* 2º achado adversarial do P4, mas a rede é do NÚCLEO INTEIRO (todo `st.num`/
@@ -1048,7 +1048,8 @@ describe('P1 — primitivas esfera/cone/plano', () => {
     expect(() => nucleo([['esfera', { id: 0, aneis: 200, lados: 10 }]], {}, {})).toThrow(/estoura o bloco/);   // 2000 faces
     expect(() => nucleo([['esfera', { id: 0, aneis: 2, lados: 501 }]], {}, {})).toThrow(/estoura o bloco/);    // 503 vértices MAS 1002 faces — a guarda de FACE pega
     expect(() => nucleo([['esfera', { id: 0, aneis: 125, lados: 8 }]], {}, {})).not.toThrow();                 // 994 V / 1000 F: no limite, passa
-    expect(() => nucleo([['cone', { id: 0, lados: 1000 }]], {}, {})).toThrow(/estoura o bloco/);               // 1001 vértices/faces
+    expect(() => nucleo([['cone', { id: 0, lados: 1000 }]], {}, {})).not.toThrow();                            // 1001 vértices/faces: continua na faixa estendida
+    expect(() => nucleo([['cone', { id: 0, lados: 2 ** 21 }]], {}, {})).toThrow(/estoura o bloco/);             // passa da faixa inteira
     expect(() => nucleo([['cone', { id: 0, lados: 999 }]], {}, {})).not.toThrow();                             // 1000: no limite, passa
     expect(() => nucleo([['plano', { id: 0, seg: 31 }]], {}, {})).toThrow(/estoura o bloco/);                  // 32² = 1024 vértices
     expect(() => nucleo([['plano', { id: 0, seg: 30 }]], {}, {})).not.toThrow();                               // 31² = 961: passa
@@ -1530,12 +1531,12 @@ describe('P3 — espelha + rotaciona (seleção transformada)', () => {
       expect([...noLimite.V.keys()].filter((id) => id >= 1000 * 1000)).toHaveLength(0);       // 0 vértice novo (100% soldado)
       expect([...noLimite.F.keys()].filter((id) => id >= 1000 * 1000)).toHaveLength(0);       // 0 face nova — todas degeneradas, puladas (B1)
       expect(noLimite.orfaos.filter((o: any) => o.op === 'espelha').length).toBe(1000);       // cada face degenerada GRITOU
-      expect(() => nucleo(muitosPlanos(1001), {}, {})).toThrow(/estoura o bloco/);            // 1001: a guarda de FACE estoura (antes de qualquer skip)
+      expect(() => nucleo(muitosPlanos(1001), {}, {})).not.toThrow();                          // 1001: passa do bloco, mas cabe na faixa estendida
 
       // VÉRTICE isolado: 1 plano grande, eixo=x pos=0 (nada solda: seg ÍMPAR não tem coluna central em x=0).
       // seg=30 (900 faces, <1000 vértices novos) passa; seg=31 (961 faces, 1024 vértices novos) estoura SÓ por vértice.
       expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 30 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).not.toThrow();
-      expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 31 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).toThrow(/estoura o bloco/);
+      expect(() => nucleo([['plano', { id: 0, largura: 10, profundidade: 10, seg: 30 }], ['plano', { id: 1000, largura: 10, profundidade: 10, seg: 30 }], ['espelha', { eixo: 'x', pos: 0 }]], {}, {})).not.toThrow();   // 1922 vértices novos: passa do bloco, cabe na faixa estendida
     }, 20_000);
 
   });
@@ -4506,7 +4507,8 @@ describe('O-13 — arranja (arranjo radial e linear)', () => {
       ['arranja', { modo: 'linear', d: [2, 0, 0], total, origemId: 50, derivaDe: { op: 'plano', id: 30 }, sel: { origem: { op: 'plano', id: 30 } } }],
     ];
     expect(() => nucleo(grande(11), {}, {})).not.toThrow();     // 10 cópias × 100 vértices = 1000 = BLOCO
-    expect(() => nucleo(grande(12), {}, {})).toThrow(/arranja estoura o bloco/);
+    expect(() => nucleo(grande(12), {}, {})).not.toThrow();     // 1100 vértices: continua na faixa estendida
+    expect(() => nucleo(grande(12000), {}, {})).toThrow(/arranja estoura o bloco/);   // passa da faixa inteira
   });
 
   it('determinístico: re-rodar e ida-e-volta por JSON dão o mesmo neutro canônico', () => {
@@ -4702,7 +4704,7 @@ describe('furo — numeração é formato salvo', () => {
   });
 
   it('um furo que estouraria o bloco de ids GRITA ALTO (throw), como as outras primitivas', () => {
-    expect(() => nucleo(PLACA({ ...PASSANTE, lados: BLOCO }) as any, {}, {})).toThrow(/estoura o bloco de ids/);
+    expect(() => nucleo(PLACA({ ...PASSANTE, lados: 2 ** 20 }) as any, {}, {})).toThrow(/estoura o bloco/);
   });
 
   it('o mesmo passo roda duas vezes com o neutro idêntico', () => {

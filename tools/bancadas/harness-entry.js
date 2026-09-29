@@ -3,6 +3,7 @@
  */
 import { iniciar } from '../../src/bancada/main.js';
 import { hierarquia, portas, semPortas, uniao, visual } from './fixtures/catalogo-visual.js';
+import ombroUniao from '../mecanifica/fixtures/fixture-ombro-uniao.js';
 
 const catalogo = [
   { id: 'fixture-visual', carregar: async () => visual },
@@ -10,6 +11,8 @@ const catalogo = [
   { id: 'fixture-portas', carregar: async () => portas },
   { id: 'fixture-sem-portas', carregar: async () => semPortas },
   { id: 'fixture-uniao', carregar: async () => uniao },
+  /* superfície curva facetada unida (plano união de sólidos, rodada do ombro) */
+  { id: 'fixture-ombro-uniao', carregar: async () => ombroUniao },
 ];
 
 iniciar({ catalogo }).catch((erro) => {

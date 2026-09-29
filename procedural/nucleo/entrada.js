@@ -2,7 +2,7 @@
    A implementação é separada por responsabilidade; esta entrada preserva o
    contrato usado por receitas, bancada, ferramentas e consumidores externos. */
 export {
-  BLOCO, FORMATO, OPERACOES_COM_ORIGEM, OPS,
+  BASE_ESTENDIDA, BLOCO, FAIXA_ESTENDIDA, FORMATO, OPERACOES_COM_ORIGEM, OPS, idDoPasso,
   contagemPorDesvio, flechaDoAnel, flechaDoArco, ladosPorDesvio,
   neutroCanonico, nucleo, REGISTRO_OPERACOES,
 } from './nucleo.js';

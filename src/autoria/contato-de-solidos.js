@@ -82,13 +82,13 @@ function normalDaFace(pontos) {
   return normal;
 }
 
-function triangulacaoDaFace(pontos, caminho) {
+function triangulacaoDaFace(pontos, caminho, piso2 = EPS) {
   if (pontos.length === 3) return [[pontos[0], pontos[1], pontos[2]]];
   const normal = normalDaFace(pontos);
   const eixo = normal.reduce((melhor, valor, indice) => (
     Math.abs(normal[indice]) > Math.abs(normal[melhor]) ? indice : melhor
   ), 0);
-  if (comprimento2(normal) <= EPS) throw new Error(`${caminho}: face degenerada não permite triangulação.`);
+  if (comprimento2(normal) <= piso2) throw new Error(`${caminho}: face degenerada não permite triangulação.`);
   const eixos = [[1, 2], [0, 2], [0, 1]][eixo];
   const plano = pontos.flatMap((ponto) => [ponto[eixos[0]], ponto[eixos[1]]]);
   /* Earcut já é dependência direta e neutra do projeto; esta é a mesma porta
@@ -128,6 +128,22 @@ export function prepararSolido(neutro, pose, rotulo) {
     exigirPonto(ponto, `${nome}.V[${id}]`);
     vertices.set(id, transformar(ponto, pose));
   }
+  /* PISO DE ÁREA RELATIVO AO TAMANHO. O piso era 1e-12 no quadrado do
+     produto vetorial, absoluto: numa peça em metros ele chama de degenerado
+     todo triângulo com menos de 0,5 mm² de área. A união de sólidos deixa
+     triângulos assim, legítimos, junto da costura, e o ombro unido saía
+     "inconclusivo" em todo par (achado da rodada do ombro, 2026-09-29). O
+     piso passa a ser o da guarda de malha, 1e-9·escala² de área, com a
+     escala medida pela meia diagonal da caixa do sólido; numa peça de escala 1
+     ele é mais fino que o antigo, e nunca mais grosso. */
+  const caixaDoSolido = caixaDosPontos([...vertices.values()]);
+  const escalaDoSolido = Math.hypot(...[0, 1, 2].map((e) => caixaDoSolido.max[e] - caixaDoSolido.min[e]));
+  /* meia diagonal: a mesma ordem de grandeza do |p| máximo da guarda de
+     malha numa peça centrada, para as duas medidas não discordarem sobre o
+     mesmo triângulo (o ombro arredondado tinha um de 1,7e-10 que a guarda
+     aceitava e o contato recusava) */
+  const meiaDiagonal = escalaDoSolido / 2;
+  const piso2 = Math.min(EPS, (2e-9 * meiaDiagonal * meiaDiagonal) ** 2);
   const triangulos = [];
   const arestas = new Map();
   const vizinhancaDosVertices = new Map();
@@ -150,11 +166,11 @@ export function prepararSolido(neutro, pose, rotulo) {
       vizinhos.get(anterior).add(b);
       vizinhos.get(b).add(anterior);
     }
-    try { triangulos.push(...triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`)); }
+    try { triangulos.push(...triangulacaoDaFace(pontos, `${nome}.F[${face.id}]`, piso2)); }
     catch (erro) { invalida = erro.message; break; }
   }
   if (invalida || triangulos.length === 0) return { rotulo, inconclusivo: invalida ?? 'malha-vazia' };
-  const degenerada = triangulos.some(([a, b, c]) => comprimento2(cross(sub(b, a), sub(c, a))) <= EPS);
+  const degenerada = triangulos.some(([a, b, c]) => comprimento2(cross(sub(b, a), sub(c, a))) <= piso2);
   const arestasFechadas = [...arestas.values()].every((contagem) => contagem === 2);
   const verticesSemUso = [...vertices.keys()].some((id) => !verticesUsados.has(id));
   const linksDeVerticeValidos = [...vizinhancaDosVertices.values()].every((vizinhos) => {

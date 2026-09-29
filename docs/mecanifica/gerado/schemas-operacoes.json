@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:4a7d6f2638b1d2d7e1eaad7f8baa994552026bc9d210e34e8688ce5d1ed6bd0a",
+  "assinatura": "sha256:4db9e3684d9f919fcf7ba42dc69cf7ec26669f0920e3fd8b5325184eb82d4294",
   "total": 36,
   "operacoes": [
     {
@@ -420,6 +420,10 @@
                 }
               ],
               "description": "Faixas do arco, de 2 a 64 (padrão 8)."
+            },
+            "regiao": {
+              "type": "object",
+              "description": "Caixa {min,max}: só o trecho da costura curva dentro dela."
             }
           }
         },
@@ -490,7 +494,7 @@
         "precondicoes": [],
         "limites": [
           "Só costura côncava ganha material; costura convexa grita.",
-          "Na quina convexa por onde a costura dobra, os prismas se encontram em meia-esquadria."
+          "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano."
         ],
         "diagnosticos": []
       }
