@@ -102,6 +102,9 @@ aresta viva no lugar deles é defeito visível.
 5. As ferramentas de leitura conferidas sobre a malha unida.
 6. O ombro com canto reto refeito com `unir`, mostrado à pessoa.
 7. O inventário das partes restantes do braço.
+7b. O arredondamento das arestas convexas de uma booleana e das arestas internas
+   da ferramenta de corte, que o inventário apontou como a lacuna que mais
+   partes pedem.
 8. Fechamento.
 
 ## Riscos e desvios
@@ -129,6 +132,50 @@ em 2026-09-29 essa decisão com a IA, que é quem trabalha com a numeração. Co
 aumentar o `BLOCO` renumera todo conteúdo salvo, a mudança vem com a migração
 das receitas e dos alvos salvos e com testes provando que cada peça do acervo
 reexecuta igual.
+
+## Inventário das partes restantes do braço
+
+Feito em 2026-09-29, olhando `referencias/cotovelo.png`, `punho.png`, `frontal.png`
+e `lateral.png`, e sondando o núcleo no que as fotos pedem e ainda não estava
+provado.
+
+O ombro já saiu com `unir`, `arredondarCostura` e `liso` com ângulo por região.
+O braço e o antebraço são tubos com um painel oval em relevo na lateral: o tubo e
+o painel saem de `loft`, a fusão de `unir` e o encontro côncavo de
+`arredondarCostura`, todos existentes. O cotovelo é um tambor cilíndrico com a
+borda de cima arredondada e uma linha de partição inclinada perto do topo, com
+dois anéis escuros e uma ranhura entre eles: os anéis saem de `lathe`, o corte
+inclinado de `subtrair` ou `intersectar` com uma caixa grande, e a ranhura de
+`subtrair` de uma fatia fina. O punho tem um garfo em U com o fundo do rasgo
+semicircular, um cilindro entre as pernas, parafusos e uma flange de oito furos
+com furo central: o garfo sai de `subtrair`, o parafuso e os furos de `arranja`
+radial com `furo`, tudo existente. O cabo com abraçadeiras é acessório e fica
+fora deste plano.
+
+A sonda com um rebaixo cego numa placa e um rasgo passante num bloco mostrou a
+lacuna. O `arredondarCostura` só arredonda o encontro entre faces de sólidos
+diferentes, e recusa nos dois casos com "a costura não tem aresta côncava". A
+borda de cima do rebaixo e do rasgo é convexa, e o fundo dele é o encontro de
+duas faces da mesma ferramenta, então nenhum dos dois é costura no sentido da
+operação. Essas arestas aparecem no painel do braço e do antebraço (borda do
+relevo), no cotovelo (borda do corte inclinado) e no garfo (borda do rasgo e
+fundo semicircular), e sem elas o defeito do ombro volta: quina viva onde a foto
+tem raio. Isso entra neste plano como a fatia 7b.
+
+Vão para o backlog, cada um com a parte que o pede. A tampa de loft em leque
+(`raio: 0`) dá triângulos longos e finos na tampa plana, visíveis no ombro; a
+correção fecha a tampa com uma face poligonal, muda os ids das tampas de todo
+loft e o baseline R00, e não afeta o visual. O `liso` com ângulo é propriedade
+da face, então na fronteira entre duas regiões de ângulos diferentes os vértices
+compartilhados misturam as normais, como se viu na quina do L do ombro; a
+correção é um grupo de suavização por região. O `arredondarCostura` recusa uma
+costura em que a superfície dobra mais de 45° e obrigou o ombro a deixar a
+coluna 1 mm menor que o braço e o raio do encontro em zero; o pedaço da costura
+recusado precisa de um modo que o resolva. Por fim, o processo não tem passo
+obrigatório de zoom e wireframe nas regiões de encontro antes de uma forma ser
+dada por boa, e três defeitos do ombro só apareceram porque a pessoa os apontou;
+isso vira gate de malha (grau máximo de vértice e triângulos finos em face
+visível) e instrução para o crítico visual, e fica no backlog do processo.
 
 ## Fechamento
 
