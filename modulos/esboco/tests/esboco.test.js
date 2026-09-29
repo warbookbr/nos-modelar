@@ -5,6 +5,7 @@ import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, resolverOpcao, ErroDeEsboco, faces } from '../src/index.js';
+import { fileURLToPath } from 'node:url';
 import { gerarEsboco, analisarEsboco, variante, lerZoomDoEsboco, VISTAS_DA_ANALISE } from '../../../tools/mecanifica/esboco.mjs';
 
 const deitadoSobreAnel = {
@@ -282,4 +283,102 @@ describe('esboço', () => {
       expect(desenharEsboco({ ...base, plano: 'texto' }).svg).toBe(desenharEsboco(base).svg);
     });
   });
+});
+
+describe('legendas em lista', () => {
+  const fixture = (nome) => JSON.parse(readFileSync(fileURLToPath(new URL(`./fixtures/${nome}`, import.meta.url)), 'utf8'));
+  /* Vista frontal: a (fundo, 100 x 100), b (à frente, 20 x 40) e c (atrás de a, sem cobrir b, totalmente oculta). */
+  const tres = (extra = {}) => ({
+    vista: 'frontal',
+    legendas: 'lista',
+    opcoes: [{
+      titulo: 'T', nota: 'n',
+      formas: [
+        { id: 'a', tipo: 'caixa', largura: 100, altura: 100, profundidade: 40, centro: [0, 50, -40], cor: 'azul', rotulo: 'placa de fundo' },
+        { id: 'b', tipo: 'caixa', largura: 20, altura: 40, profundidade: 20, centro: [0, 40, 20], cor: 'laranja', rotulo: 'pino' },
+        { id: 'c', tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro: [30, 80, -100], cor: 'verde', rotulo: 'peça escondida' },
+      ],
+    }],
+    ...extra,
+  });
+  const dentro = (x, y, [x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+
+  it('o modo padrão fica idêntico byte a byte ao svg gravado antes do modo lista', () => {
+    const casa = fixture('casa.esboco.json');
+    const svgAntes = readFileSync(fileURLToPath(new URL('./fixtures/casa.svg', import.meta.url)), 'utf8');
+    expect(desenharEsboco(casa).svg).toBe(svgAntes);
+    expect(desenharEsboco({ ...casa, legendas: 'colunas' }).svg).toBe(svgAntes);
+    expect(desenharEsboco(casa).baloes).toBeUndefined();
+  });
+
+  it('recusa valor desconhecido de legendas', () => {
+    expect(() => desenharEsboco(tres({ legendas: 'nuvem' }))).toThrow(/"legendas" deve ser "colunas" ou "lista"/);
+  });
+
+  it('a chave sai em ordem crescente, sem linha de chamada e sem colunas laterais', () => {
+    const { svg } = desenharEsboco(tres());
+    expect(svg).not.toContain('<polyline');
+    const numeros = [...svg.matchAll(/font-size="14" font-weight="bold">(\d+)</g)].map((m) => Number(m[1]));
+    expect(numeros).toEqual([1, 2, 3]);
+    expect(svg).toContain('>placa de fundo<');
+    expect(svg).toContain('>pino<');
+  });
+
+  it('cada balão cai no polígono visível da própria peça', () => {
+    const { baloes, escala } = desenharEsboco(tres());
+    const porId = Object.fromEntries(baloes.map((b) => [b.id, { x: b.u, y: -b.v }]));
+    const A = [-50, 0, 50, 100];
+    const B = [-10, 20, 10, 60];
+    expect(dentro(porId.b.x, porId.b.y, B)).toBe(true);
+    expect(dentro(porId.a.x, porId.a.y, A)).toBe(true);
+    expect(dentro(porId.a.x, porId.a.y, B)).toBe(false);
+    expect(escala).toBeGreaterThan(0);
+  });
+
+  it('peça totalmente oculta ganha balão tracejado na borda de quem a oculta e marca na chave', () => {
+    const { baloes, svg, escala } = desenharEsboco(tres());
+    const c = baloes.find((b) => b.id === 'c');
+    expect(c.oculta).toBe(true);
+    expect(baloes.filter((b) => b.oculta)).toHaveLength(1);
+    expect(svg).toMatch(/<circle data-balao="3"[^>]*stroke-dasharray/);
+    expect(svg).toContain('peça escondida (oculta nesta vista)');
+    expect(svg).not.toContain('placa de fundo (oculta');
+    const x = c.u;
+    const y = -c.v;
+    const distBorda = Math.min(Math.abs(x + 50), Math.abs(x - 50), Math.abs(y), Math.abs(y - 100));
+    expect(distBorda).toBeLessThan(3 / escala);
+    expect(dentro(x, y, [-52, -2, 52, 102])).toBe(true);
+  });
+
+  it('os balões não se sobrepõem', () => {
+    const moto = { ...fixture('moto.esboco.json'), legendas: 'lista' };
+    for (const vista of ['isometrica', 'lateral', 'frontal', 'superior']) {
+      const { baloes } = desenharEsboco({ ...moto, vista });
+      expect(baloes.length).toBeGreaterThan(8);
+      for (let i = 0; i < baloes.length; i++) {
+        for (let j = i + 1; j < baloes.length; j++) expect(Math.hypot(baloes[i].x - baloes[j].x, baloes[i].y - baloes[j].y)).toBeGreaterThanOrEqual(18);
+      }
+    }
+  }, 60000);
+
+  it('respeita ocultar: legendas, numeracao e marcadores', () => {
+    const tudo = desenharEsboco({ ...tres(), ocultar: ['legendas'] });
+    expect(tudo.svg).not.toContain('data-balao');
+    expect(tudo.svg).not.toContain('placa de fundo');
+    const semNum = desenharEsboco({ ...tres(), ocultar: ['numeracao'] }).svg;
+    expect(semNum).toContain('data-balao');
+    expect(semNum).not.toMatch(/font-weight="bold">\d</);
+    const semMarc = desenharEsboco({ ...tres(), ocultar: ['marcadores'] }).svg;
+    expect(semMarc).not.toContain('data-balao');
+    expect(semMarc).toContain('>placa de fundo<');
+  });
+
+  it('na moto a escala em px/mm é maior que a do modo padrão (isométrica e lateral)', () => {
+    for (const vista of ['isometrica', 'lateral']) {
+      const moto = { ...fixture('moto.esboco.json'), vista };
+      const padrao = desenharEsboco(moto);
+      const lista = desenharEsboco({ ...moto, legendas: 'lista' });
+      expect(lista.escala).toBeGreaterThan(padrao.escala * 1.5);
+    }
+  }, 60000);
 });

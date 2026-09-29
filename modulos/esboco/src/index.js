@@ -532,12 +532,23 @@ function ocultosDe(...niveis) {
   return new Set();
 }
 
+/* Modos de legenda: "colunas" (padrão: linha de chamada até colunas laterais) e
+   "lista" (balão numerado sobre a peça e chave numerada abaixo do desenho). */
+export const MODOS_LEGENDAS = ['colunas', 'lista'];
+
+function lerModoLegendas(v, onde) {
+  if (v === undefined) return undefined;
+  exigir(MODOS_LEGENDAS.includes(v), `${onde}: "legendas" deve ser ${MODOS_LEGENDAS.map((m) => `"${m}"`).join(' ou ')}`);
+  return v;
+}
+
 export function validarEsboco(esboco) {
   exigir(esboco && typeof esboco === 'object', 'o esboço precisa ser um objeto JSON');
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
   const topo = lerOcultar(esboco.ocultar, 'esboço');
+  const modoTopo = lerModoLegendas(esboco.legendas, 'esboço');
   return {
     vista,
     opcoes: esboco.opcoes.map((o, i) => {
@@ -547,9 +558,326 @@ export function validarEsboco(esboco) {
       for (const r of todas) r.ocultar = lerOcultar(r.forma.ocultar, `${onde}, forma "${r.id}"`);
       const formas = todas.filter((r) => r.forma.oculto !== true);
       exigir(formas.length > 0, `${onde}: todas as formas estão com "oculto": true`);
-      return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo) };
+      const modo = lerModoLegendas(o.legendas, onde) ?? modoTopo ?? 'colunas';
+      return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo), modo };
     }),
   };
+}
+
+/* Grupos de fatias na ordem de itens (fatias contíguas; divide só penetrações em furos). */
+function gruposDeFormas(p) {
+  // 1. Spans de formas (mantém fatias contíguas e divide apenas penetrações em furos)
+  const splitPoints = new Map();
+  for (const itA of p.itens) {
+    for (const itB of p.itens) {
+      if (itA === itB) continue;
+      const bTemFuro = itB.r.forma.diametroInterno !== undefined || itB.r.forma.furo !== undefined;
+      if (bTemFuro) {
+        const distEixo = Math.hypot(itA.r.centro[0] - itB.r.centro[0], itA.r.centro[1] - itB.r.centro[1]);
+        const rFuro = (itB.r.forma.diametroInterno ?? 0) / 2;
+        const minA = Math.min(...itA.chunks.map((c) => c.prof));
+        const maxA = Math.max(...itA.chunks.map((c) => c.prof));
+        const minB = Math.min(...itB.chunks.map((c) => c.prof));
+        const maxB = Math.max(...itB.chunks.map((c) => c.prof));
+        if (distEixo < rFuro && minA < minB && maxA > maxB) {
+          if (!splitPoints.has(itA.r.forma.id)) splitPoints.set(itA.r.forma.id, []);
+          splitPoints.get(itA.r.forma.id).push(maxB);
+        }
+      }
+    }
+  }
+
+  const gruposChunks = [];
+  for (const it of p.itens) {
+    const splits = (splitPoints.get(it.r.forma.id) ?? []).sort((a, b) => a - b);
+    if (splits.length === 0) {
+      const minP = Math.min(...it.chunks.map((c) => c.prof));
+      const maxP = Math.max(...it.chunks.map((c) => c.prof));
+      gruposChunks.push({ tipo: 'forma', r: it.r, chunks: it.chunks, profMedia: (minP + maxP) / 2 });
+    } else {
+      let curr = [];
+      let splitIdx = 0;
+      for (const ch of it.chunks) {
+        if (splitIdx < splits.length && ch.prof > splits[splitIdx] + 0.1) {
+          if (curr.length > 0) {
+            gruposChunks.push({
+              tipo: 'forma',
+              r: it.r,
+              chunks: curr,
+              profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+            });
+            curr = [];
+          }
+          splitIdx++;
+        }
+        curr.push(ch);
+      }
+      if (curr.length > 0) {
+        gruposChunks.push({
+          tipo: 'forma',
+          r: it.r,
+          chunks: curr,
+          profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+        });
+      }
+    }
+  }
+  return gruposChunks;
+}
+
+/* ---- Modo "lista": balão numerado sobre a peça e chave numerada abaixo do desenho ---- */
+const CELULA = 2;
+const RAIO_BALAO = 9;
+const SEPARACAO_BALAO = 2 * RAIO_BALAO + 3;
+const MARGEM_LISTA = 48;
+const RESERVA_FOLGA = 16;
+const NUMERO_PROPRIO = /^\s*\d+\s*[.\-–)]/;
+
+/* Formas com rótulo e sem "legendas" oculto, na ordem do desenho. */
+function entradasDaLista(p) {
+  return p.itens
+    .filter((it) => it.r.forma.rotulo && !ocultosDe(it.r.ocultar, p.ocultosOpcao).has('legendas'))
+    .map((it, idx) => {
+      const oc = ocultosDe(it.r.ocultar, p.ocultosOpcao);
+      const texto = String(typeof it.r.forma.rotulo === 'object' ? it.r.forma.rotulo.texto : it.r.forma.rotulo);
+      const proprio = NUMERO_PROPRIO.test(texto);
+      return {
+        it, texto, numero: idx + 1, proprio,
+        exibido: proprio ? parseInt(texto, 10) : idx + 1,
+        semNumero: oc.has('numeracao'), semMarcador: oc.has('marcadores'),
+      };
+    });
+}
+
+/* Chave em colunas (1 a 3), preenchidas de cima para baixo na ordem dos números. */
+function layoutChave(entradas, ocultas) {
+  const n = entradas.length;
+  if (!n) return { altura: 0, colunas: 0, itens: [] };
+  const colunas = n <= 4 ? 1 : n <= 10 ? 2 : 3;
+  const porColuna = Math.ceil(n / colunas);
+  const larguraColuna = (PAINEL_L - 40) / colunas;
+  const chars = Math.max(10, Math.floor((larguraColuna - 32) / 7.4));
+  const somas = new Array(colunas).fill(0);
+  const itens = entradas.map((e, i) => {
+    const c = Math.floor(i / porColuna);
+    const comNumero = !e.semNumero && !e.proprio;
+    const linhas = quebrar(e.texto + (ocultas.has(e.it) ? ' (oculta nesta vista)' : ''), comNumero ? chars : chars + 3);
+    const y = somas[c];
+    somas[c] += Math.max(1, linhas.length) * 17 + 4;
+    return { e, c, y, linhas, comNumero, larguraColuna };
+  });
+  return { altura: Math.max(...somas), colunas, itens };
+}
+
+/* Preenche as células cujo centro está dentro dos anéis (par-ímpar) com o id. */
+function preencherCelulas(alvo, W, H, x0, aneis, id) {
+  let ymin = Infinity;
+  let ymax = -Infinity;
+  for (const a of aneis) for (const q of a) { if (q[1] < ymin) ymin = q[1]; if (q[1] > ymax) ymax = q[1]; }
+  const j0 = Math.max(0, Math.ceil(ymin / CELULA - 0.5));
+  const j1 = Math.min(H - 1, Math.floor(ymax / CELULA - 0.5));
+  let n = 0;
+  for (let j = j0; j <= j1; j++) {
+    const y = (j + 0.5) * CELULA;
+    const xs = [];
+    for (const a of aneis) {
+      for (let k = 0; k < a.length; k++) {
+        const p1 = a[k];
+        const p2 = a[(k + 1) % a.length];
+        if ((p1[1] <= y) !== (p2[1] <= y)) xs.push(p1[0] + ((y - p1[1]) * (p2[0] - p1[0])) / (p2[1] - p1[1]));
+      }
+    }
+    xs.sort((a, b) => a - b);
+    for (let m = 0; m + 1 < xs.length; m += 2) {
+      const i0 = Math.max(0, Math.ceil((xs[m] - x0) / CELULA - 0.5));
+      const i1 = Math.min(W - 1, Math.floor((xs[m + 1] - x0) / CELULA - 0.5));
+      for (let i = i0; i <= i1; i++) { alvo[j * W + i] = id; n++; }
+    }
+  }
+  if (n === 0 && aneis[0]?.length) {
+    /* Face mais fina que uma célula: marca a célula do centróide. */
+    const c = aneis[0].reduce((acc, q) => [acc[0] + q[0] / aneis[0].length, acc[1] + q[1] / aneis[0].length], [0, 0]);
+    const i = Math.floor((c[0] - x0) / CELULA);
+    const j = Math.floor(c[1] / CELULA);
+    if (i >= 0 && i < W && j >= 0 && j < H) { alvo[j * W + i] = id; n = 1; }
+  }
+  return n;
+}
+
+/* Pinta os grupos na ordem do desenho (mesma oclusão: o último a pintar fica por cima). */
+function pintarGrupos(alvo, W, H, x0, grupos, idxDe, V, tela) {
+  const proj = (pts) => pts.map(V.p).map(tela);
+  for (const g of grupos) {
+    const id = idxDe.get(g.r);
+    for (const ch of g.chunks) for (const f of [...ch.dentro, ...ch.lados]) preencherCelulas(alvo, W, H, x0, [proj(f.pts)], id);
+    for (const ch of g.chunks) {
+      for (const t of ch.tampas) {
+        const furos = t.furos && t.furos.length > 0 ? t.furos : t.furo ? [t.furo] : [];
+        preencherCelulas(alvo, W, H, x0, [proj(t.pts), ...furos.map(proj)], id);
+      }
+    }
+  }
+}
+
+/* Distância (em células) de cada célula do id até a célula de outro dono, ou até a borda do painel. */
+function folgaInterna(dono, W, H, id) {
+  const d = new Float32Array(W * H);
+  for (let i = 0; i < d.length; i++) d[i] = dono[i] === id ? 1e9 : 0;
+  const R2 = Math.SQRT2;
+  const viz = (i, j, v) => (i < 0 || j < 0 || i >= W || j >= H ? 0 : d[j * W + i]) + v;
+  for (let j = 0; j < H; j++) {
+    for (let i = 0; i < W; i++) {
+      const k = j * W + i;
+      if (d[k] === 0) continue;
+      d[k] = Math.min(d[k], viz(i - 1, j, 1), viz(i, j - 1, 1), viz(i - 1, j - 1, R2), viz(i + 1, j - 1, R2));
+    }
+  }
+  for (let j = H - 1; j >= 0; j--) {
+    for (let i = W - 1; i >= 0; i--) {
+      const k = j * W + i;
+      if (d[k] === 0) continue;
+      d[k] = Math.min(d[k], viz(i + 1, j, 1), viz(i, j + 1, 1), viz(i + 1, j + 1, R2), viz(i - 1, j + 1, R2));
+    }
+  }
+  return d;
+}
+
+/* Escolhe o ponto de cada balão sobre a região visível da peça (mesma oclusão do desenho).
+   Devolve { baloes: [{ id, numero, exibido, x, y, oculta, semNumero, semMarcador, u, v }], ocultas: Set(item) }. */
+function planejarLista(p, entradas, geo, escala, V) {
+  const { x0, tela } = geo;
+  const W = Math.ceil(PAINEL_L / CELULA);
+  const H = Math.ceil((TOPO + PAINEL_A) / CELULA);
+  const grupos = gruposDeFormas(p).sort((a, b) => a.profMedia - b.profMedia);
+  const idxDe = new Map(p.itens.map((it, i) => [it.r, i]));
+  const dono = new Int16Array(W * H).fill(-1);
+  pintarGrupos(dono, W, H, x0, grupos, idxDe, V, tela);
+
+  const centroDe = (i, j) => [x0 + (i + 0.5) * CELULA, (j + 0.5) * CELULA];
+  const celulasDe = new Map();
+  for (let k = 0; k < dono.length; k++) {
+    if (dono[k] < 0) continue;
+    if (!celulasDe.has(dono[k])) celulasDe.set(dono[k], []);
+    celulasDe.get(dono[k]).push(k);
+  }
+  const ocupados = [];
+  const livre = (x, y) => ocupados.every((o) => Math.hypot(o[0] - x, o[1] - y) >= SEPARACAO_BALAO);
+  const ocultas = new Set();
+  const escolhidos = new Map();
+  const idxItem = (e) => idxDe.get(e.it.r);
+
+  /* Peças visíveis: das menores para as maiores, para as finas ficarem com o melhor ponto. */
+  const visiveis = entradas.filter((e) => celulasDe.has(idxItem(e)));
+  visiveis.sort((a, b) => celulasDe.get(idxItem(a)).length - celulasDe.get(idxItem(b)).length || a.numero - b.numero);
+  for (const e of visiveis) {
+    const id = idxItem(e);
+    const cel = celulasDe.get(id);
+    const folga = folgaInterna(dono, W, H, id);
+    const mc = cel.reduce((acc, k) => [acc[0] + (k % W) / cel.length, acc[1] + Math.floor(k / W) / cel.length], [0, 0]);
+    let melhor = cel[0];
+    let notaMelhor = -Infinity;
+    for (const k of cel) {
+      const nota = folga[k] * 1000 - Math.hypot((k % W) - mc[0], Math.floor(k / W) - mc[1]);
+      if (nota > notaMelhor) { notaMelhor = nota; melhor = k; }
+    }
+    const [bx, by] = centroDe(melhor % W, Math.floor(melhor / W));
+    let escolha = melhor;
+    let pos = [bx, by];
+    if (!e.semMarcador && !livre(bx, by)) {
+      /* Colide com outro balão: afasta do ponto ideal até a célula visível livre mais próxima. */
+      let notaAfasta = Infinity;
+      for (const k of cel) {
+        const [x, y] = centroDe(k % W, Math.floor(k / W));
+        if (!livre(x, y)) continue;
+        const nota = Math.hypot(x - bx, y - by) - 0.5 * folga[k] * CELULA;
+        if (nota < notaAfasta) { notaAfasta = nota; escolha = k; pos = [x, y]; }
+      }
+    }
+    if (!e.semMarcador) ocupados.push(pos);
+    escolhidos.set(e, { pos, oculta: false });
+  }
+
+  /* Peças sem nenhum ponto visível: balão tracejado na borda da silhueta de quem as oculta. */
+  for (const e of entradas.filter((x) => !celulasDe.has(idxItem(x)))) {
+    const id = idxItem(e);
+    ocultas.add(e.it);
+    const pegada = new Int16Array(W * H).fill(-1);
+    pintarGrupos(pegada, W, H, x0, grupos.filter((g) => g.r === e.it.r), idxDe, V, tela);
+    const contagem = new Map();
+    let sx = 0; let sy = 0; let n = 0;
+    for (let k = 0; k < pegada.length; k++) {
+      if (pegada[k] < 0) continue;
+      sx += k % W; sy += Math.floor(k / W); n++;
+      if (dono[k] >= 0 && dono[k] !== id) contagem.set(dono[k], (contagem.get(dono[k]) ?? 0) + 1);
+    }
+    const alvo = n ? centroDe(sx / n - 0.5, sy / n - 0.5) : tela(V.p(e.it.r.centro));
+    let oclusor = -1;
+    let mais = 0;
+    for (const [c, q] of [...contagem].sort((a, b) => a[0] - b[0])) if (q > mais) { mais = q; oclusor = c; }
+    if (oclusor < 0) { /* sem cobertura identificável: usa a peça visível mais próxima do ponto */
+      let dmin = Infinity;
+      for (const [c, cel] of celulasDe) {
+        for (const k of cel) { const [x, y] = centroDe(k % W, Math.floor(k / W)); const d = Math.hypot(x - alvo[0], y - alvo[1]); if (d < dmin) { dmin = d; oclusor = c; } }
+      }
+    }
+    const cel = celulasDe.get(oclusor) ?? [];
+    const dv = (i, j) => (i < 0 || j < 0 || i >= W || j >= H ? -1 : dono[j * W + i]);
+    const bordaCom = (k, aceita) => {
+      const i = k % W; const j = Math.floor(k / W);
+      return [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => aceita(dv(i + a, j + b)));
+    };
+    let borda = cel.filter((k) => bordaCom(k, (o) => o === -1));
+    if (!borda.length) borda = cel.filter((k) => bordaCom(k, (o) => o !== oclusor));
+    let pos = alvo;
+    let dmin = Infinity;
+    for (const k of borda) {
+      const [x, y] = centroDe(k % W, Math.floor(k / W));
+      if (!livre(x, y)) continue;
+      const d = Math.hypot(x - alvo[0], y - alvo[1]);
+      if (d < dmin) { dmin = d; pos = [x, y]; }
+    }
+    if (!e.semMarcador) ocupados.push(pos);
+    escolhidos.set(e, { pos, oculta: true });
+  }
+
+  const inversa = (x, y) => {
+    /* Coordenadas no plano da vista (mm), para conferência. */
+    const a = tela([0, 0]);
+    const b = tela([1, 1]);
+    return [(x - a[0]) / (b[0] - a[0]), (y - a[1]) / (b[1] - a[1])];
+  };
+  const baloes = entradas.map((e) => {
+    const { pos, oculta } = escolhidos.get(e);
+    const [u, v] = inversa(pos[0], pos[1]);
+    return { id: e.it.r.id, numero: e.numero, exibido: e.exibido, x: pos[0], y: pos[1], u, v, oculta, semNumero: e.semNumero, semMarcador: e.semMarcador };
+  });
+  return { baloes, ocultas };
+}
+
+/* Chave numerada abaixo do desenho e balões sobre as peças. */
+function desenharLegendasLista(partes, chave, plano, x0) {
+  if (chave.itens.length) {
+    const topo = TOPO + PAINEL_A + 6;
+    partes.push(`<line x1="${x0 + 24}" y1="${topo - 10}" x2="${x0 + PAINEL_L - 24}" y2="${topo - 10}" stroke="#dddddd" stroke-width="1.5"/>`);
+    for (const it of chave.itens) {
+      const xc = x0 + 20 + it.c * it.larguraColuna;
+      it.linhas.forEach((l, i) => {
+        const y = topo + it.y + 13 + i * 17;
+        if (it.comNumero) {
+          if (i === 0) partes.push(`<text x="${f1(xc)}" y="${f1(y)}" font-size="14" font-weight="bold">${it.e.exibido}</text>`);
+          partes.push(`<text x="${f1(xc + 26)}" y="${f1(y)}" font-size="14">${esc(l)}</text>`);
+        } else {
+          partes.push(`<text x="${f1(xc)}" y="${f1(y)}" font-size="14" font-weight="${i === 0 ? 'bold' : 'normal'}">${esc(l)}</text>`);
+        }
+      });
+    }
+  }
+  for (const b of plano.baloes) {
+    if (b.semMarcador) continue;
+    const tracejado = b.oculta ? ' stroke-dasharray="3,2.5"' : '';
+    partes.push(`<circle data-balao="${b.exibido}" cx="${f1(b.x)}" cy="${f1(b.y)}" r="${RAIO_BALAO}" fill="#ffffff" stroke="#111111" stroke-width="1.5"${tracejado}/>`);
+    if (!b.semNumero) partes.push(`<text x="${f1(b.x)}" y="${f1(b.y + 4)}" font-size="12" font-weight="bold" text-anchor="middle">${b.exibido}</text>`);
+  }
 }
 
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
@@ -557,7 +885,7 @@ export function desenharEsboco(esboco) {
   const { vista, opcoes } = validarEsboco(esboco);
   const V = VISTAS[vista];
   const olho = normalizar(V.olho);
-  const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao }) => {
+  const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao, modo }) => {
     const itens = formas.map((r) => {
       const chunks = fatiarForma(r, olho);
       const fs = chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
@@ -567,80 +895,49 @@ export function desenharEsboco(esboco) {
     const pts = itens.flatMap((i) => i.casco);
     const min = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
     const max = [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
-    return { opcao, itens, min, max, ocultosOpcao };
+    return { opcao, itens, min, max, ocultosOpcao, modo };
   });
   /* Mesma escala para todas: a maior opção cabe no painel, com folga para rótulos. */
   const larg = Math.max(...projetadas.map((p) => p.max[0] - p.min[0]));
   const alt = Math.max(...projetadas.map((p) => p.max[1] - p.min[1]));
-  const escala = Math.min((PAINEL_L - 340) / larg, (PAINEL_A - 40) / alt);
+  const temLista = projetadas.some((p) => p.modo === 'lista');
+  const temColunas = projetadas.some((p) => p.modo !== 'lista');
+  const escalaColunas = Math.min((PAINEL_L - 340) / larg, (PAINEL_A - 40) / alt);
+  /* Modo lista: sem colunas laterais o desenho usa a largura toda; a chave ganha uma faixa
+     própria abaixo do desenho, e o quadro cresce em altura o que a chave ocupa. */
+  let escala = escalaColunas;
+  const planos = new Map();
+  let extra = 0;
+  const geometria = (p, k, esc) => {
+    const x0 = k * PAINEL_L;
+    const cx = x0 + PAINEL_L / 2 - ((p.min[0] + p.max[0]) / 2) * esc;
+    const cy = TOPO + PAINEL_A / 2 - ((p.min[1] + p.max[1]) / 2) * esc;
+    return { x0, cx, cy, tela: (q) => [cx + q[0] * esc, cy + q[1] * esc] };
+  };
+  if (temLista) {
+    escala = Math.min((PAINEL_L - 2 * MARGEM_LISTA) / larg, (PAINEL_A - 40) / alt);
+    if (temColunas) escala = Math.min(escala, escalaColunas);
+    projetadas.forEach((p, k) => {
+      if (p.modo !== 'lista') return;
+      const entradas = entradasDaLista(p);
+      const plano = planejarLista(p, entradas, geometria(p, k, escala), escala, V);
+      planos.set(p, { entradas, plano, chave: layoutChave(entradas, plano.ocultas) });
+    });
+    const alturaChave = Math.max(0, ...[...planos.values()].map((q) => q.chave.altura));
+    if (alturaChave > 0) extra = alturaChave + RESERVA_FOLGA;
+  }
+  const baloes = [];
   const largura = PAINEL_L * opcoes.length;
-  const altura = TOPO + PAINEL_A + RODAPE;
+  const altura = TOPO + PAINEL_A + extra + RODAPE;
   const partes = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${largura} ${altura}" width="${largura}" height="${altura}" font-family="Helvetica, Arial, sans-serif">`,
     `<rect width="${largura}" height="${altura}" fill="#ffffff"/>`];
   projetadas.forEach((p, k) => {
-    const x0 = k * PAINEL_L;
-    const cx = x0 + PAINEL_L / 2 - ((p.min[0] + p.max[0]) / 2) * escala;
-    const cy = TOPO + PAINEL_A / 2 - ((p.min[1] + p.max[1]) / 2) * escala;
-    const tela = (q) => [cx + q[0] * escala, cy + q[1] * escala];
+    const ehLista = p.modo === 'lista';
+    const { x0, tela } = geometria(p, k, escala);
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
 
-    // 1. Spans de formas (mantém fatias contíguas e divide apenas penetrações em furos)
-    const splitPoints = new Map();
-    for (const itA of p.itens) {
-      for (const itB of p.itens) {
-        if (itA === itB) continue;
-        const bTemFuro = itB.r.forma.diametroInterno !== undefined || itB.r.forma.furo !== undefined;
-        if (bTemFuro) {
-          const distEixo = Math.hypot(itA.r.centro[0] - itB.r.centro[0], itA.r.centro[1] - itB.r.centro[1]);
-          const rFuro = (itB.r.forma.diametroInterno ?? 0) / 2;
-          const minA = Math.min(...itA.chunks.map((c) => c.prof));
-          const maxA = Math.max(...itA.chunks.map((c) => c.prof));
-          const minB = Math.min(...itB.chunks.map((c) => c.prof));
-          const maxB = Math.max(...itB.chunks.map((c) => c.prof));
-          if (distEixo < rFuro && minA < minB && maxA > maxB) {
-            if (!splitPoints.has(itA.r.forma.id)) splitPoints.set(itA.r.forma.id, []);
-            splitPoints.get(itA.r.forma.id).push(maxB);
-          }
-        }
-      }
-    }
-
-    const gruposChunks = [];
-    for (const it of p.itens) {
-      const splits = (splitPoints.get(it.r.forma.id) ?? []).sort((a, b) => a - b);
-      if (splits.length === 0) {
-        const minP = Math.min(...it.chunks.map((c) => c.prof));
-        const maxP = Math.max(...it.chunks.map((c) => c.prof));
-        gruposChunks.push({ tipo: 'forma', r: it.r, chunks: it.chunks, profMedia: (minP + maxP) / 2 });
-      } else {
-        let curr = [];
-        let splitIdx = 0;
-        for (const ch of it.chunks) {
-          if (splitIdx < splits.length && ch.prof > splits[splitIdx] + 0.1) {
-            if (curr.length > 0) {
-              gruposChunks.push({
-                tipo: 'forma',
-                r: it.r,
-                chunks: curr,
-                profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
-              });
-              curr = [];
-            }
-            splitIdx++;
-          }
-          curr.push(ch);
-        }
-        if (curr.length > 0) {
-          gruposChunks.push({
-            tipo: 'forma',
-            r: it.r,
-            chunks: curr,
-            profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
-          });
-        }
-      }
-    }
+    const gruposChunks = gruposDeFormas(p);
 
     /* Linhas de centro: eixos de rotação (cilindros/anéis) e furos passantes. */
     const ocultosDaForma = (r) => ocultosDe(r.ocultar, p.ocultosOpcao);
@@ -834,148 +1131,156 @@ export function desenharEsboco(esboco) {
       }
     }
 
-    /* Rótulos: fora do desenho, à esquerda ou à direita, empilhados sem colidir. */
-    const esquerda = x0 + 20;
-    const direita = x0 + PAINEL_L - 20;
-    const meio = x0 + PAINEL_L / 2;
-    const contagemLados = { e: 0, d: 0 };
-    const rotulados = p.itens
-      .filter((it) => it.r.forma.rotulo && !ocultosDaForma(it.r).has('legendas'))
-      .map((it, idx) => {
-        const rotInfo = typeof it.r.forma.rotulo === 'object'
-          ? it.r.forma.rotulo
-          : { texto: it.r.forma.rotulo };
-        const cTela = tela(V.p(it.r.centro));
-        const corPeca = hexDe(it.r.forma.cor);
-        const fForma = it.r.forma;
-        const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
-        const raioTela = Math.max(14, (dimMm / 2) * escala * 0.75);
+    if (ehLista) {
+      const { plano, chave } = planos.get(p);
+      for (const b of plano.baloes) baloes.push({ opcao: k, ...b });
+      desenharLegendasLista(partes, chave, plano, x0);
+    } else {
+      /* Rótulos: fora do desenho, à esquerda ou à direita, empilhados sem colidir. */
+      const esquerda = x0 + 20;
+      const direita = x0 + PAINEL_L - 20;
+      const meio = x0 + PAINEL_L / 2;
+      const contagemLados = { e: 0, d: 0 };
+      const rotulados = p.itens
+        .filter((it) => it.r.forma.rotulo && !ocultosDaForma(it.r).has('legendas'))
+        .map((it, idx) => {
+          const rotInfo = typeof it.r.forma.rotulo === 'object'
+            ? it.r.forma.rotulo
+            : { texto: it.r.forma.rotulo };
+          const cTela = tela(V.p(it.r.centro));
+          const corPeca = hexDe(it.r.forma.cor);
+          const fForma = it.r.forma;
+          const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
+          const raioTela = Math.max(14, (dimMm / 2) * escala * 0.75);
 
-        // Pontos de amostragem da peça nas faces externas (exclui paredes internas de furos)
-        const facesExternas = it.chunks.flatMap((ch) => [...ch.lados, ...ch.tampas]);
-        const ptsVertices = facesExternas.flatMap((f) => f.pts).map(V.p).map(tela);
-        const ptsCentros = facesExternas.map((f) => {
-          const m = f.pts.reduce((acc, p) => [acc[0] + p[0] / f.pts.length, acc[1] + p[1] / f.pts.length, acc[2] + p[2] / f.pts.length], [0, 0, 0]);
-          return tela(V.p(m));
-        });
-        const todosPontos = [...ptsVertices, ...ptsCentros];
+          // Pontos de amostragem da peça nas faces externas (exclui paredes internas de furos)
+          const facesExternas = it.chunks.flatMap((ch) => [...ch.lados, ...ch.tampas]);
+          const ptsVertices = facesExternas.flatMap((f) => f.pts).map(V.p).map(tela);
+          const ptsCentros = facesExternas.map((f) => {
+            const m = f.pts.reduce((acc, p) => [acc[0] + p[0] / f.pts.length, acc[1] + p[1] / f.pts.length, acc[2] + p[2] / f.pts.length], [0, 0, 0]);
+            return tela(V.p(m));
+          });
+          const todosPontos = [...ptsVertices, ...ptsCentros];
 
-        // Furos da própria peça projetados na tela
-        const furosTela = it.chunks
-          .flatMap((ch) => ch.tampas)
-          .flatMap((t) => t.furos ?? (t.furo ? [t.furo] : []))
-          .map((fu) => fu.map(V.p).map(tela));
+          // Furos da própria peça projetados na tela
+          const furosTela = it.chunks
+            .flatMap((ch) => ch.tampas)
+            .flatMap((t) => t.furos ?? (t.furo ? [t.furo] : []))
+            .map((fu) => fu.map(V.p).map(tela));
 
-        // Peças que estão na frente desta (profundidade maior no espaço isométrico)
-        const pecasNaFrente = p.itens.filter((o) => o !== it && o.prof > it.prof - 5);
+          // Peças que estão na frente desta (profundidade maior no espaço isométrico)
+          const pecasNaFrente = p.itens.filter((o) => o !== it && o.prof > it.prof - 5);
 
-        // Avalia o melhor ponto de âncora para cada lado ('e' ou 'd')
-        const avaliarLado = (ladoCand) => {
-          const alvoX = cTela[0] + (ladoCand === 'e' ? -raioTela : raioTela);
-          const alvoY = cTela[1];
-          let melhor = todosPontos[0] ?? cTela;
-          let melhorScore = Infinity;
-          let menorOclusao = Infinity;
+          // Avalia o melhor ponto de âncora para cada lado ('e' ou 'd')
+          const avaliarLado = (ladoCand) => {
+            const alvoX = cTela[0] + (ladoCand === 'e' ? -raioTela : raioTela);
+            const alvoY = cTela[1];
+            let melhor = todosPontos[0] ?? cTela;
+            let melhorScore = Infinity;
+            let menorOclusao = Infinity;
 
-          for (const pt of todosPontos) {
-            // Penaliza pontos que apontam no sentido oposto ao rótulo
-            const penalidadeLado = ladoCand === 'e' ? (pt[0] > cTela[0] ? 80 : 0) : (pt[0] < cTela[0] ? 80 : 0);
-            
-            // Penalidade de oclusão por peças que estão na frente
-            let penalidadeOclusao = 0;
-            for (const frente of pecasNaFrente) {
-              const poly = frente.casco.map(tela);
-              const dist = distPoligono(pt, poly);
-              if (dist === 0) {
-                penalidadeOclusao += 5000;
-              } else if (dist < 18) {
-                penalidadeOclusao += (18 - dist) * 150;
+            for (const pt of todosPontos) {
+              // Penaliza pontos que apontam no sentido oposto ao rótulo
+              const penalidadeLado = ladoCand === 'e' ? (pt[0] > cTela[0] ? 80 : 0) : (pt[0] < cTela[0] ? 80 : 0);
+              
+              // Penalidade de oclusão por peças que estão na frente
+              let penalidadeOclusao = 0;
+              for (const frente of pecasNaFrente) {
+                const poly = frente.casco.map(tela);
+                const dist = distPoligono(pt, poly);
+                if (dist === 0) {
+                  penalidadeOclusao += 5000;
+                } else if (dist < 18) {
+                  penalidadeOclusao += (18 - dist) * 150;
+                }
+              }
+
+              // Penalidade de proximidade a furos da própria peça (evita ancorar no furo)
+              let penalidadeFuro = 0;
+              for (const fTela of furosTela) {
+                const distF = distPoligono(pt, fTela);
+                if (distF === 0) {
+                  penalidadeFuro += 6000;
+                } else if (distF < 16) {
+                  penalidadeFuro += (16 - distF) * 250;
+                }
+              }
+
+              const distAlvo = Math.hypot(pt[0] - alvoX, pt[1] - alvoY);
+              const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao + penalidadeFuro;
+              if (scoreTotal < melhorScore) {
+                melhorScore = scoreTotal;
+                melhor = pt;
+                menorOclusao = penalidadeOclusao;
               }
             }
+            return { pt: melhor, score: melhorScore, oclusao: menorOclusao };
+          };
 
-            // Penalidade de proximidade a furos da própria peça (evita ancorar no furo)
-            let penalidadeFuro = 0;
-            for (const fTela of furosTela) {
-              const distF = distPoligono(pt, fTela);
-              if (distF === 0) {
-                penalidadeFuro += 6000;
-              } else if (distF < 16) {
-                penalidadeFuro += (16 - distF) * 250;
-              }
-            }
+          const resE = avaliarLado('e');
+          const resD = avaliarLado('d');
 
-            const distAlvo = Math.hypot(pt[0] - alvoX, pt[1] - alvoY);
-            const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao + penalidadeFuro;
-            if (scoreTotal < melhorScore) {
-              melhorScore = scoreTotal;
-              melhor = pt;
-              menorOclusao = penalidadeOclusao;
-            }
-          }
-          return { pt: melhor, score: melhorScore, oclusao: menorOclusao };
-        };
-
-        const resE = avaliarLado('e');
-        const resD = avaliarLado('d');
-
-        let lado;
-        if (rotInfo.lado) {
-          lado = String(rotInfo.lado).startsWith('d') ? 'd' : 'e';
-        } else {
-          // Se um lado tiver oclusão severa e o outro não, escolhe o lado livre
-          if (resE.oclusao > 100 && resD.oclusao <= 100) {
-            lado = 'd';
-          } else if (resD.oclusao > 100 && resE.oclusao <= 100) {
-            lado = 'e';
+          let lado;
+          if (rotInfo.lado) {
+            lado = String(rotInfo.lado).startsWith('d') ? 'd' : 'e';
           } else {
-            // Ambos os lados livres ou equivalentes: balanceia número de rótulos
-            if (contagemLados.e !== contagemLados.d) {
-              lado = contagemLados.e < contagemLados.d ? 'e' : 'd';
+            // Se um lado tiver oclusão severa e o outro não, escolhe o lado livre
+            if (resE.oclusao > 100 && resD.oclusao <= 100) {
+              lado = 'd';
+            } else if (resD.oclusao > 100 && resE.oclusao <= 100) {
+              lado = 'e';
             } else {
-              lado = cTela[0] < meio ? 'e' : 'd';
+              // Ambos os lados livres ou equivalentes: balanceia número de rótulos
+              if (contagemLados.e !== contagemLados.d) {
+                lado = contagemLados.e < contagemLados.d ? 'e' : 'd';
+              } else {
+                lado = cTela[0] < meio ? 'e' : 'd';
+              }
             }
           }
+          contagemLados[lado]++;
+
+          const melhorPt = (lado === 'e' ? resE : resD).pt;
+          const dx = melhorPt[0] - cTela[0];
+          const dy = melhorPt[1] - cTela[1];
+          const distC = Math.hypot(dx, dy) || 1;
+          const ancora = [melhorPt[0] - (dx / distC) * 3, melhorPt[1] - (dy / distC) * 3];
+
+          return {
+            it,
+            texto: rotInfo.texto,
+            numero: idx + 1,
+            semNumero: ocultosDaForma(it.r).has('numeracao'),
+            semMarcador: ocultosDaForma(it.r).has('marcadores'),
+            ancora,
+            lado,
+            corPeca,
+          };
+        });
+
+      for (const lado of ['e', 'd']) {
+        const grupo = rotulados.filter((r) => r.lado === lado).sort((a, b) => a.ancora[1] - b.ancora[1]);
+        let ultimo = TOPO + 10;
+        for (const r of grupo) {
+          const textoCompleto = r.semNumero || /^\s*\d+\s*[.\-–)]/.test(r.texto) ? r.texto : `${r.numero}. ${r.texto}`;
+          const linhas = quebrar(textoCompleto, 20);
+          const y = Math.max(r.ancora[1], ultimo + 12);
+          ultimo = y + linhas.length * 20;
+          const xt = lado === 'e' ? esquerda : direita;
+          const xl = lado === 'e' ? esquerda + 145 : direita - 145;
+          partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/>`);
+          if (!r.semMarcador) partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
+          linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="15" font-weight="${i === 0 ? 'bold' : 'normal'}" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
         }
-        contagemLados[lado]++;
-
-        const melhorPt = (lado === 'e' ? resE : resD).pt;
-        const dx = melhorPt[0] - cTela[0];
-        const dy = melhorPt[1] - cTela[1];
-        const distC = Math.hypot(dx, dy) || 1;
-        const ancora = [melhorPt[0] - (dx / distC) * 3, melhorPt[1] - (dy / distC) * 3];
-
-        return {
-          it,
-          texto: rotInfo.texto,
-          numero: idx + 1,
-          semNumero: ocultosDaForma(it.r).has('numeracao'),
-          semMarcador: ocultosDaForma(it.r).has('marcadores'),
-          ancora,
-          lado,
-          corPeca,
-        };
-      });
-
-    for (const lado of ['e', 'd']) {
-      const grupo = rotulados.filter((r) => r.lado === lado).sort((a, b) => a.ancora[1] - b.ancora[1]);
-      let ultimo = TOPO + 10;
-      for (const r of grupo) {
-        const textoCompleto = r.semNumero || /^\s*\d+\s*[.\-–)]/.test(r.texto) ? r.texto : `${r.numero}. ${r.texto}`;
-        const linhas = quebrar(textoCompleto, 20);
-        const y = Math.max(r.ancora[1], ultimo + 12);
-        ultimo = y + linhas.length * 20;
-        const xt = lado === 'e' ? esquerda : direita;
-        const xl = lado === 'e' ? esquerda + 145 : direita - 145;
-        partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/>`);
-        if (!r.semMarcador) partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
-        linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="15" font-weight="${i === 0 ? 'bold' : 'normal'}" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
       }
     }
-    if (!p.ocultosOpcao.has('nota')) quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
+    if (!p.ocultosOpcao.has('nota')) quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + extra + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
   });
   /* Barra de escala de 100 mm, igual para todas as opções. */
   const barra = 100 * escala;
   if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
   partes.push('</svg>');
-  return { svg: partes.join('\n'), largura, altura, escala };
+  const saida = { svg: partes.join('\n'), largura, altura, escala };
+  if (temLista) saida.baloes = baloes;
+  return saida;
 }

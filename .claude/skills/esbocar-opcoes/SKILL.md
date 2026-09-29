@@ -14,7 +14,7 @@ diz como usá-la no alinhamento.
 
 ## Pare e planeje
 
-Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores). E se o conjunto vira um esboço só ou vários. E as regras de contato: usar ou não o gate `contato`, com a tolerância e as exceções declaradas (`atravessa`, `encosta`, `livre`). O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção no modo de legendas padrão; com mais que isso, escolha `legendas: "lista"`. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores) e, com mais de uns 6 formas por opção, o modo `legendas: "lista"`. E se o conjunto vira um esboço só ou vários. E as regras de contato: usar ou não o gate `contato`, com a tolerância e as exceções declaradas (`atravessa`, `encosta`, `livre`). O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
 
 ## Escrever e rodar
 
@@ -27,7 +27,7 @@ A raiz tem `opcoes` e, opcionalmente, `vista`: `isometrica` (padrão, a que a
 pessoa entende melhor), `frontal`, `lateral` ou `superior`. Cada opção tem
 `titulo`, `nota` (uma frase curta) e `formas`, e todas saem na mesma escala,
 com barra de 100 mm. Cada forma tem `id`, `tipo`, `cor` e `rotulo` opcional,
-que sai fora do desenho como legenda numerada com linha de chamada.
+que sai fora do desenho como legenda numerada com linha de chamada. Com `legendas: "lista"` (raiz ou opção) o rótulo vira balão numerado sobre a peça e chave numerada abaixo do desenho, sem linha de chamada nem colunas laterais; a peça totalmente atrás de outra ganha balão tracejado na borda de quem a cobre e "(oculta nesta vista)" na chave.
 
 Os tipos são `caixa` (`largura` x, `altura` y, `profundidade` z, `raio` de
 canto e `furos: [{ diametro, centro: [x, z] }]`), `cilindro` (`diametro`,
@@ -52,11 +52,11 @@ começa com número ("1. base") não recebe outro.
 
 ## Limites
 
-Com mais de uns 6 formas por opção o desenho degrada: numa moto de 11 formas as
-legendas se cruzam, a escala cai para 0,15 px/mm, as linhas de chamada cortam o
-desenho e o SVG passa de 2,6 MB em vários segundos. Esboce só o que está em
-disputa, use `ocultar: ["legendas"]` quando o conjunto for grande e
-ilustrativo, e divida em vários esboços.
+No modo de legendas padrão, com mais de uns 6 formas por opção o desenho degrada: numa moto de 10 formas as
+legendas se cruzam, a escala cai para 0,15 px/mm e as linhas de chamada cortam o
+desenho. Com mais de uns 6 formas use `legendas: "lista"`, que sobe a escala
+(na mesma moto, 0,28 px/mm na isométrica) e tira as linhas de chamada. Esboce só o que está em
+disputa e divida em vários esboços quando ainda assim ficar cheio.
 
 ## Conferir antes de mostrar
 

@@ -1,0 +1,225 @@
+{
+  "vista": "isometrica",
+  "plano": "Nível: conceito de proporção da moto naked, para escolher entre duas atitudes (A naked, B café racer). Peças: rodas, motor, quadro (caixa superior e braço oscilante), coluna de direção, tanque, banco, garfo duplo e guidão; o farol, o escape e os cubos ficam de fora. Detalhe: caixa, cilindro e anel; tubos do quadro viram caixas finas. Sem linhas de centro. Com legendas numeradas. Regras de contato ligadas, com os dois braços do balancim (um de cada lado da roda) presos ao motor e a presilha do guidão nos garfos declarados como atravessa.",
+  "linhasCentro": false,
+  "contato": {
+    "usar": true,
+    "pares": [
+      {
+        "a": "balancimE",
+        "b": "motor",
+        "tipo": "atravessa"
+      },
+      {
+        "a": "balancimD",
+        "b": "motor",
+        "tipo": "atravessa"
+      },
+      {
+        "a": "guidao",
+        "b": "garfoE",
+        "tipo": "atravessa"
+      },
+      {
+        "a": "guidao",
+        "b": "garfoD",
+        "tipo": "atravessa"
+      },
+      {
+        "a": "coluna",
+        "b": "tanque",
+        "tipo": "atravessa"
+      }
+    ]
+  },
+  "opcoes": [
+    {
+      "id": "naked",
+      "titulo": "A. Naked",
+      "nota": "Guidão alto e banco reto",
+      "formas": [
+        {
+          "id": "rodaTras",
+          "tipo": "anel",
+          "diametroExterno": 620,
+          "diametroInterno": 420,
+          "espessura": 140,
+          "eixo": "x",
+          "centro": [
+            0,
+            310,
+            -700
+          ],
+          "cor": "preto",
+          "rotulo": "1. roda_traseira"
+        },
+        {
+          "id": "rodaFrente",
+          "tipo": "anel",
+          "diametroExterno": 600,
+          "diametroInterno": 420,
+          "espessura": 110,
+          "eixo": "x",
+          "centro": [
+            0,
+            300,
+            700
+          ],
+          "cor": "preto",
+          "rotulo": "2. roda_frente"
+        },
+        {
+          "id": "motor",
+          "tipo": "caixa",
+          "largura": 260,
+          "altura": 300,
+          "profundidade": 380,
+          "raio": 30,
+          "centro": [
+            0,
+            380,
+            0
+          ],
+          "cor": "cinza",
+          "rotulo": "3. motor"
+        },
+        {
+          "id": "quadro",
+          "tipo": "caixa",
+          "largura": 80,
+          "altura": 60,
+          "profundidade": 560,
+          "centro": [
+            0,
+            560,
+            20
+          ],
+          "cor": "cinza",
+          "rotulo": "4. quadro"
+        },
+        {
+          "id": "coluna",
+          "tipo": "caixa",
+          "largura": 140,
+          "altura": 240,
+          "profundidade": 240,
+          "centro": [
+            0,
+            720,
+            440
+          ],
+          "cor": "cinza",
+          "rotulo": "5. coluna"
+        },
+        {
+          "id": "tanque",
+          "tipo": "caixa",
+          "largura": 300,
+          "altura": 200,
+          "profundidade": 420,
+          "raio": 80,
+          "centro": [
+            0,
+            690,
+            130
+          ],
+          "cor": "vermelho",
+          "rotulo": "6. tanque"
+        },
+        {
+          "id": "banco",
+          "tipo": "caixa",
+          "largura": 240,
+          "altura": 90,
+          "profundidade": 520,
+          "raio": 40,
+          "centro": [
+            0,
+            650,
+            -330
+          ],
+          "cor": "preto",
+          "rotulo": "7. banco"
+        },
+        {
+          "id": "balancimE",
+          "tipo": "caixa",
+          "largura": 40,
+          "altura": 70,
+          "profundidade": 520,
+          "centro": [
+            -105,
+            330,
+            -420
+          ],
+          "cor": "azul",
+          "rotulo": "8. balancim"
+        },
+        {
+          "id": "balancimD",
+          "tipo": "caixa",
+          "largura": 40,
+          "altura": 70,
+          "profundidade": 520,
+          "centro": [
+            105,
+            330,
+            -420
+          ],
+          "cor": "azul"
+        },
+        {
+          "id": "garfoE",
+          "tipo": "cilindro",
+          "diametro": 46,
+          "comprimento": 660,
+          "eixo": "y",
+          "centro": [
+            -90,
+            599,
+            561
+          ],
+          "rotacao": [
+            -25,
+            0,
+            0
+          ],
+          "cor": "laranja",
+          "rotulo": "9. garfo"
+        },
+        {
+          "id": "garfoD",
+          "tipo": "cilindro",
+          "diametro": 46,
+          "comprimento": 660,
+          "eixo": "y",
+          "centro": [
+            90,
+            599,
+            561
+          ],
+          "rotacao": [
+            -25,
+            0,
+            0
+          ],
+          "cor": "laranja"
+        },
+        {
+          "id": "guidao",
+          "tipo": "cilindro",
+          "diametro": 26,
+          "comprimento": 760,
+          "eixo": "x",
+          "centro": [
+            0,
+            898,
+            421
+          ],
+          "cor": "cinza",
+          "rotulo": "10. guidao"
+        }
+      ]
+    }
+  ]
+}
