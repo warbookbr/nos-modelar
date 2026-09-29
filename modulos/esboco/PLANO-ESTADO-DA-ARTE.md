@@ -1,6 +1,7 @@
 # Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
 
-> **Status:** Proposta de Planejamento / Aguardando Aprovação  
+> **Status:** Substituído por [docs/mecanifica/planos/2026-09-29-o-esboco-sem-conta-a-mao.md](../../docs/mecanifica/planos/2026-09-29-o-esboco-sem-conta-a-mao.md) em 2026-09-29. O plano ativo absorve `de`/`para` (`tubo`), âncoras, espelho e o polígono; o texto abaixo fica como histórico e não governa trabalho novo.  
+> **Estado anterior:** Proposta de Planejamento / Aguardando Aprovação  
 > **Objetivo:** Tornar o motor de esboço declarativo capaz de modelar equipamentos complexos (ex: motocicletas, veículos e maquinários industriais) de forma rápida, robusta e ergonômica para agentes de IA, eliminando o cálculo manual de trigonometria 3D.  
 > **Stack:** Node.js (ESM), SVG vetorial, Playwright (rasterização PNG), Vitest.  
 > **Arquivo Alvo:** [`modulos/esboco/src/index.js`](file:///C:/Users/tiago.marcondes.adm/Desktop/criar%203D_IA/modulos/esboco/src/index.js)

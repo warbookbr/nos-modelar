@@ -8,27 +8,37 @@
       {
         "a": "balancimE",
         "b": "motor",
-        "tipo": "atravessa"
+        "tipo": "atravessa",
+        "max": 32,
+        "motivo": "o braço do balancim entra no motor no pivô do braço oscilante"
       },
       {
         "a": "balancimD",
         "b": "motor",
-        "tipo": "atravessa"
+        "tipo": "atravessa",
+        "max": 32,
+        "motivo": "o braço do balancim entra no motor no pivô do braço oscilante"
       },
       {
         "a": "guidao",
         "b": "garfoE",
-        "tipo": "atravessa"
+        "tipo": "atravessa",
+        "max": 15,
+        "motivo": "a presilha do guidão abraça a bengala do garfo"
       },
       {
         "a": "guidao",
         "b": "garfoD",
-        "tipo": "atravessa"
+        "tipo": "atravessa",
+        "max": 15,
+        "motivo": "a presilha do guidão abraça a bengala do garfo"
       },
       {
         "a": "coluna",
         "b": "tanque",
-        "tipo": "atravessa"
+        "tipo": "atravessa",
+        "max": 22,
+        "motivo": "a coluna de direção entra no tanque; 20 mm medidos, a corrigir na moto de prova"
       }
     ]
   },

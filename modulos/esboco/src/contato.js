@@ -16,6 +16,11 @@ import earcut from 'earcut';
 import { ErroDeEsboco, resolverOpcao } from './index.js';
 
 export const TIPOS_DE_PAR = ['atravessa', 'encosta', 'livre'];
+/* Contrato de declaração herdado do Mecanifica (`MINIMO_DO_MOTIVO` em
+   src/autoria/contatos-da-peca.js): toda exceção declara POR QUE, e um motivo curto
+   é declaração que ninguém confere. O valor é copiado em número porque este módulo
+   não importa o núcleo. */
+export const MINIMO_DO_MOTIVO = 15;
 const SETORES = 32;
 const EPS = 1e-9;
 
@@ -217,12 +222,13 @@ function lerContato(c, onde) {
   if (c.usar !== undefined && typeof c.usar !== 'boolean') throw new ErroDeEsboco(`${onde}: "contato.usar" deve ser true ou false`);
   const pares = [];
   if (c.pares !== undefined) {
-    if (!Array.isArray(c.pares)) throw new ErroDeEsboco(`${onde}: "contato.pares" deve ser uma lista de { a, b, tipo, max }`);
+    if (!Array.isArray(c.pares)) throw new ErroDeEsboco(`${onde}: "contato.pares" deve ser uma lista de { a, b, tipo, max, motivo }`);
     for (const [i, p] of c.pares.entries()) {
       if (!p || typeof p.a !== 'string' || typeof p.b !== 'string' || p.a === p.b) throw new ErroDeEsboco(`${onde}: contato.pares[${i}] precisa de "a" e "b", ids diferentes`);
       if (!TIPOS_DE_PAR.includes(p.tipo)) throw new ErroDeEsboco(`${onde}: contato.pares[${i}].tipo deve ser um de ${TIPOS_DE_PAR.join(', ')}`);
       if (p.max !== undefined && p.tipo !== 'atravessa') throw new ErroDeEsboco(`${onde}: contato.pares[${i}].max só vale para o tipo atravessa`);
-      pares.push({ a: p.a, b: p.b, tipo: p.tipo, max: numMm(p.max, `${onde}: contato.pares[${i}].max`) });
+      if (p.motivo !== undefined && typeof p.motivo !== 'string') throw new ErroDeEsboco(`${onde}: contato.pares[${i}].motivo deve ser um texto`);
+      pares.push({ a: p.a, b: p.b, tipo: p.tipo, max: numMm(p.max, `${onde}: contato.pares[${i}].max`), motivo: p.motivo });
     }
   }
   return {
@@ -236,13 +242,34 @@ function lerContato(c, onde) {
 
 const arred = (x) => Math.round(x * 10) / 10;
 
+/* Contrato de declaração: `atravessa` e `livre` são exceções e exigem `motivo` de
+   pelo menos MINIMO_DO_MOTIVO caracteres; `atravessa` exige também `max` (mm), pois
+   sem ele o par nunca reprova. `encosta` não é exceção e não exige nada. Só é
+   chamada com o contato ligado. A mensagem diz o par, o campo e um exemplo. */
+function exigirDeclaracao(p, onde) {
+  if (p.tipo === 'encosta') return;
+  const par = `${p.a} ↔ ${p.b}`;
+  const exemplo = `{ "a": "${p.a}", "b": "${p.b}", "tipo": "${p.tipo}"${p.tipo === 'atravessa' ? ', "max": 15' : ''}, "motivo": "a presilha do guidão abraça a bengala" }`;
+  const motivo = typeof p.motivo === 'string' ? p.motivo.trim() : '';
+  if (motivo.length < MINIMO_DO_MOTIVO) {
+    const falta = p.motivo === undefined ? 'falta o campo "motivo"' : `o "motivo" tem ${motivo.length} caractere${motivo.length === 1 ? '' : 's'} e o mínimo é ${MINIMO_DO_MOTIVO}`;
+    throw new ErroDeEsboco(`${onde}: o par ${par} (tipo ${p.tipo}) precisa dizer por que a exceção existe: ${falta}. Exemplo: ${exemplo}`);
+  }
+  if (p.tipo === 'atravessa' && p.max === undefined) {
+    throw new ErroDeEsboco(`${onde}: o par ${par} (tipo atravessa) precisa de "max", a penetração máxima em mm que a passagem justifica; sem ele o par nunca reprova. Exemplo: ${exemplo}`);
+  }
+}
+
 /* Verifica o contato de todas as opções. Devolve
-   { usar, tolerancia, penetracao, folga, achados, atravessamentos, resultado, opcoes }.
+   { usar, tolerancia, penetracao, folga, achados, atravessamentos, silenciados, resultado, opcoes }.
    `tolerancia` é a folga máxima para ligar duas peças (e para `encosta`);
    `penetracao` é a sobreposição máxima aceita entre peças que não são `atravessa`.
    Pares `atravessa` não reprovam, mas cada sobreposição medida vai em
    `atravessamentos` (do maior para o menor) e, se o par declara `max`, passar dele
-   é o achado `atravessa-excedido`. Sem `contato` no JSON (ou com `usar` falso em
+   é o achado `atravessa-excedido`. Pares `livre` continuam ignorados, mas cada um vai
+   em `silenciados` com o motivo declarado. Com o contato ligado, `atravessa` e `livre`
+   sem `motivo` (mínimo MINIMO_DO_MOTIVO caracteres) e `atravessa` sem `max` são
+   recusados com ErroDeEsboco. Sem `contato` no JSON (ou com `usar` falso em
    todas as opções) devolve `resultado: 'desligado'` sem medir. */
 export function verificarContato(esboco) {
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -259,6 +286,10 @@ export function verificarContato(esboco) {
       if (!todosIds.has(id)) throw new ErroDeEsboco(`${onde}: contato.pares cita "${id}", que não é uma forma visível (ids: ${[...todosIds].join(', ')})`);
     }
   }
+  /* declaração das exceções: só vale com o contato ligado. Os pares da raiz valem em toda
+     opção ativa; os da opção, só nela. */
+  for (const p of raiz?.pares ?? []) exigirDeclaracao(p, 'esboço');
+  opcoes.forEach((_, i) => { if (ativa(i)) for (const p of lidas[i]?.pares ?? []) exigirDeclaracao(p, `opção ${i + 1}`); });
   /* dimensão do conjunto: a maior aresta da caixa que envolve todas as formas visíveis */
   let dimensao = 0;
   for (const rs of resolvidas) {
@@ -274,6 +305,7 @@ export function verificarContato(esboco) {
 
   const achados = [];
   const atravessamentos = [];
+  const silenciados = [];
   const resumo = [];
   opcoes.forEach((o, i) => {
     const titulo = o.titulo ?? `Opção ${i + 1}`;
@@ -284,21 +316,27 @@ export function verificarContato(esboco) {
     const tipos = new Map();
     const chave = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
     const maximos = new Map();
+    const motivos = new Map();
     for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) {
       tipos.set(chave(p.a, p.b), p.tipo);
       maximos.set(chave(p.a, p.b), p.max);
+      motivos.set(chave(p.a, p.b), p.motivo?.trim());
     }
     const rs = resolvidas[i];
     const pecas = rs.map(pecasDe);
     const n = rs.length;
     const achadosDaOpcao = [];
     const atravessamentosDaOpcao = [];
+    const silenciadosDaOpcao = [];
     const ligados = Array.from({ length: n }, () => []);
     const menorFolga = Array(n).fill(Infinity);
     const folgas = Array.from({ length: n }, () => Array(n).fill(Infinity));
     for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) {
       const tipo = tipos.get(chave(rs[a].id, rs[b].id));
-      if (tipo === 'livre') continue;
+      if (tipo === 'livre') {
+        silenciadosDaOpcao.push({ opcao: titulo, a: rs[a].id, b: rs[b].id, motivo: motivos.get(chave(rs[a].id, rs[b].id)) });
+        continue;
+      }
       const { folga, penetracao } = medirPar(pecas[a], pecas[b]);
       folgas[a][b] = folgas[b][a] = folga;
       if (folga < menorFolga[a]) menorFolga[a] = folga;
@@ -343,11 +381,12 @@ export function verificarContato(esboco) {
     }
     achados.push(...achadosDaOpcao);
     atravessamentos.push(...atravessamentosDaOpcao);
+    silenciados.push(...silenciadosDaOpcao);
     resumo.push({ opcao: titulo, usar: true, tolerancia: arred(tol), penetracao: arred(penMax), folga: arred(folgaMax), resultado: achadosDaOpcao.length ? 'reprovado' : 'aprovado' });
   });
   atravessamentos.sort((x, y) => y.penetracao_mm - x.penetracao_mm);
   return {
-    usar: true, tolerancia: arred(tolRaiz), penetracao: arred(penRaiz), folga: arred(folgaRaiz), achados, atravessamentos, resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
+    usar: true, tolerancia: arred(tolRaiz), penetracao: arred(penRaiz), folga: arred(folgaRaiz), achados, atravessamentos, silenciados, resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
   };
 }
 
@@ -368,4 +407,9 @@ export function descreverAchado(a) {
 /* Linha legível de um atravessamento declarado. */
 export function descreverAtravessamento(t) {
   return `[${t.opcao}] ${t.a} e ${t.b} se atravessam ${mm(t.penetracao_mm)} mm${t.max_mm === undefined ? '' : ` (máximo declarado ${mm(t.max_mm)} mm)`}`;
+}
+
+/* Linha legível de um par silenciado (`livre`). */
+export function descreverSilenciado(t) {
+  return `[${t.opcao}] ${t.a} e ${t.b} ignorados (livre): ${t.motivo}`;
 }
