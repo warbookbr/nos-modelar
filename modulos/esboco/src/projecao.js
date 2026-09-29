@@ -7,7 +7,7 @@
    O achado `sobreposicao-na-projecao` é o par acima do limiar, sem penetração 3D acima da
    `penetracao` e que não é `atravessa`; ele diz a folga real e a vista em que o par não se cobre.
    A medida sai da geometria real: a `explosao` só afasta as formas no desenho. */
-import { ErroDeEsboco, FATOR_DA_EXPLOSAO, VISTAS, explodir, fatiarForma, lerExplosao, resolverOpcao } from './index.js';
+import { ErroDeEsboco, VISTAS, explodir, fatiarForma, lerExplosao, resolverOpcao } from './index.js';
 import { lerContato, medirPar, padroesDoContato, pecasDe } from './contato.js';
 
 export const LIMIAR_PADRAO = 0.15;
@@ -170,28 +170,36 @@ function achadosDaOpcao(ctx, formas) {
     }
     saida.push({ p, folga, alternativa });
   }
+  saida.total = cruas.reduce((t, p) => t + p.fracao, 0);
   return saida;
 }
 
-/* Fatores que a sugestão de explosão experimenta, do mais discreto ao mais aberto. */
-export const FATORES_DA_SUGESTAO = [FATOR_DA_EXPLOSAO, 2.5, 4];
-/* Custo, por unidade de fator acima do menor, que desempata a favor da explosão mais discreta. */
-const PESO_DO_FATOR = 0.05;
+/* Fatores que a sugestão experimenta, do mais discreto ao teto: de 1,2 em passos de 0,2 até 2,4, e 2,5. */
+export const FATORES_DA_SUGESTAO = [1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.5];
 
-/* Explosão sugerida: o eixo e o fator que mais reduzem a soma das frações acima do limiar nas quatro vistas. */
+/* Explosão sugerida: em cada eixo, o MENOR fator que zera os achados de projeção; entre os eixos que
+   zeram, o de menor fator (empate: a menor sobreposição total nas quatro vistas). Se nenhum fator até o
+   teto zera, vale o par eixo/fator com menos achados e, empatando, o de menor fator e, com o mesmo fator, o de menor soma das frações. */
 function sugerirExplosao(ctx) {
   const { formas } = ctx;
-  const soma = (fs) => achadosDaOpcao(ctx, fs).reduce((s, x) => s + x.p.fracao, 0);
   const extensao = (k) => Math.max(...formas.map((r) => r.max[k])) - Math.min(...formas.map((r) => r.min[k]));
   const ordem = [0, 1, 2].sort((x, y) => extensao(y) - extensao(x) || x - y);
+  const menos = (a, b) => a.n !== b.n ? a.n < b.n : Math.abs(a.fator - b.fator) > 1e-9 ? a.fator < b.fator : a.total < b.total - 1e-9;
+  let zera = null;
   let melhor = null;
   for (const k of ordem) {
     for (const fator of FATORES_DA_SUGESTAO) {
-      const nota = soma(explodir(formas, { eixo: EIXOS[k], fator })) + PESO_DO_FATOR * (fator - FATORES_DA_SUGESTAO[0]);
-      if (!melhor || nota < melhor.nota - 1e-9) melhor = { eixo: EIXOS[k], fator, nota };
+      const r = achadosDaOpcao(ctx, explodir(formas, { eixo: EIXOS[k], fator }));
+      const c = { eixo: EIXOS[k], fator, n: r.length, total: r.total };
+      if (c.n === 0) {
+        if (!zera || c.fator < zera.fator - 1e-9 || (Math.abs(c.fator - zera.fator) < 1e-9 && c.total < zera.total - 1e-9)) zera = c;
+        break;
+      }
+      if (!melhor || menos(c, melhor)) melhor = c;
     }
   }
-  return { eixo: melhor.eixo, fator: melhor.fator };
+  const e = zera ?? melhor;
+  return { eixo: e.eixo, fator: e.fator };
 }
 
 /* Verifica a sobreposição na projeção de todas as opções. Devolve

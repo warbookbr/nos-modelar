@@ -32,13 +32,19 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
 export const VISTAS_DA_ANALISE = Object.keys(VISTAS);
 export const AMPLIACAO_DO_ZOOM = 3;
 
+/* Escala mínima da explodida em relação à normal da mesma vista. */
+export const ESCALA_RELATIVA_MINIMA = 0.6;
+const PASSO_DO_FATOR = 0.2;
+const FATOR_MINIMO = 1.2;
+const arred3 = (x) => Math.round(x * 1000) / 1000;
+
 /* Opacidade das formas na variante "transparente" da análise. */
 export const OPACIDADE_TRANSPARENTE = 0.55;
 
 /* `explosoes` (uma entrada por opção: { eixo, fator } ou nula) e `transparente` só valem quando
    pedidos: a análise sempre tira a `explosao` do arquivo das variantes normais, para mostrar a
    geometria como ela é, e a devolve só na variante "explodida". */
-export function variante(esboco, { vista, legendas, centros, explosoes, transparente = false }) {
+export function variante(esboco, { vista, legendas, centros, explosoes, transparente = false, lista = false }) {
   const impor = (lista) => {
     if (lista === undefined) return undefined;
     const s = new Set(lista);
@@ -52,6 +58,7 @@ export function variante(esboco, { vista, legendas, centros, explosoes, transpar
   v.linhasCentro = centros;
   v.ocultar = impor(v.ocultar ?? []);
   delete v.explosao;
+  if (lista) { v.legendas = 'lista'; for (const o of v.opcoes ?? []) delete o.legendas; }
   for (const [i, o] of (v.opcoes ?? []).entries()) {
     delete o.linhasCentro;
     delete o.explosao;
@@ -115,12 +122,40 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
       const e = projecao.explosao.find((x) => x.indice === i);
       return e ? { eixo: e.eixo, fator: e.fator } : null;
     });
+    /* A escala da explodida não pode cair abaixo de ESCALA_RELATIVA_MINIMA da normal: a sugerida perde
+       0,2 de fator por vez até caber; a declarada fica como está e só ganha o aviso. */
+    const relativas = () => {
+      const r = {};
+      for (const vista of VISTAS_DA_ANALISE) r[vista] = arred3(desenharEsboco(variante(esboco, { vista, legendas: true, centros: false, explosoes, lista: true })).escala / escalas[vista]);
+      return r;
+    };
+    let relativa = {};
+    if (projecao.explosao.length > 0) {
+      relativa = relativas();
+      const sugeridas = () => projecao.explosao.filter((e) => e.origem === 'sugerida' && explosoes[e.indice].fator - PASSO_DO_FATOR >= FATOR_MINIMO - 1e-9);
+      while (Math.min(...Object.values(relativa)) < ESCALA_RELATIVA_MINIMA && sugeridas().length > 0) {
+        for (const e of sugeridas()) explosoes[e.indice].fator = arred3(explosoes[e.indice].fator - PASSO_DO_FATOR);
+        relativa = relativas();
+      }
+      for (const e of projecao.explosao) {
+        e.fator_sugerido = e.fator;
+        e.fator = explosoes[e.indice].fator;
+        if (e.fator !== e.fator_sugerido) {
+          const cop = JSON.parse(texto);
+          cop.opcoes[e.indice].explosao = { eixo: e.eixo, fator: e.fator };
+          e.achados_depois = verificarProjecao(cop, { forcar: true }).explosao.find((x) => x.indice === e.indice).achados_depois;
+        }
+        e.escala_relativa = relativa;
+        const menor = Math.min(...Object.values(relativa));
+        if (menor < ESCALA_RELATIVA_MINIMA) e.aviso = `a escala da explodida cai a ${Math.round(menor * 100)}% da normal, abaixo de ${Math.round(ESCALA_RELATIVA_MINIMA * 100)}%${e.origem === 'declarada' ? ' (explosão declarada, mantida)' : ' mesmo com o menor fator'}`;
+      }
+    }
     const modos = [];
     if (projecao.explosao.length > 0) modos.push(['explodida', { explosoes }]);
     if (projecao.explosao.length > 0 || projecao.achados.length > 0) modos.push(['transparente', { transparente: true }]);
     for (const [modo, extra] of modos) {
       for (const vista of VISTAS_DA_ANALISE) {
-        const { svg, largura, altura } = desenharEsboco(variante(esboco, { vista, legendas: true, centros: false, ...extra }));
+        const { svg, largura, altura } = desenharEsboco(variante(esboco, { vista, legendas: true, centros: false, lista: true, ...extra }));
         const nome = `${vista}-${modo}-legendas.png`;
         await svgParaPng(svg, largura, altura, join(pasta, nome), navegador);
         arquivos.push(nome);
@@ -145,7 +180,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     vistas: VISTAS_DA_ANALISE,
     zoom: pedidoDeZoom,
     centros: comCentros,
-    forcado: { ...(comCentros ? {} : { linhasCentro: false }), ...(declaraExplosao(esboco) ? { explosao: false } : {}) },
+    forcado: { ...(comCentros ? {} : { linhasCentro: false }), ...(declaraExplosao(esboco) ? { explosao: false } : {}), ...(variantes.length > 0 ? { legendasExplodidaTransparente: 'lista' } : {}) },
     plano: typeof esboco.plano === 'string' ? esboco.plano : null,
     contato,
     projecao: { usar: projecao.usar, limiar: projecao.limiar, reprova: projecao.reprova, resultado: projecao.resultado, porVista: projecao.porVista, explosao: projecao.explosao, variantes },
@@ -181,7 +216,7 @@ function relatarContato(c) {
 function relatarProjecao(p) {
   if (!p.usar) return '';
   const linhas = Object.values(p.porVista).flat().map((a) => `  ${descreverProjecao(a)}`);
-  const explosao = p.explosao.map((e) => `  explosão ${e.origem} [${e.opcao}]: eixo ${e.eixo}, fator ${String(e.fator).replace('.', ',')}; com ela os ${e.achados_antes} achados de projeção viram ${e.achados_depois}${e.origem === 'sugerida' ? ' (imagens *-explodida-legendas.png; declare "explosao" no JSON para desenhar assim)' : ''}`);
+  const explosao = p.explosao.map((e) => `  explosão ${e.origem} [${e.opcao}]: eixo ${e.eixo}, fator ${String(e.fator).replace('.', ',')}; com ela os ${e.achados_antes} achados de projeção viram ${e.achados_depois}${e.achados_depois > 0 ? ' (resíduo)' : ''}${e.escala_relativa ? `; escala ${Math.round(Math.min(...Object.values(e.escala_relativa)) * 100)}% da normal no mínimo${e.fator_sugerido !== e.fator ? `, fator reduzido de ${String(e.fator_sugerido).replace('.', ',')} para caber` : ''}` : ''}${e.aviso ? `; AVISO: ${e.aviso}` : ''}${e.origem === 'sugerida' ? ' (imagens *-explodida-legendas.png; declare "explosao" no JSON para desenhar assim)' : ''}`);
   return `sobreposição na projeção (limiar ${Math.round(p.limiar * 100)}%${p.reprova ? ', reprova' : ', informativo'}): ${p.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${explosao.length ? `${explosao.join('\n')}\n` : ''}`;
 }
 

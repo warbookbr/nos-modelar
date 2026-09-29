@@ -6,8 +6,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco, explodir, resolverOpcao } from '../src/index.js';
 import { verificarContato } from '../src/contato.js';
-import { descreverProjecao, medirProjecaoDaOpcao, TIPO_DO_ACHADO, verificarProjecao } from '../src/projecao.js';
-import { analisarEsboco } from '../../../tools/mecanifica/esboco.mjs';
+import { descreverProjecao, FATORES_DA_SUGESTAO, medirProjecaoDaOpcao, TIPO_DO_ACHADO, verificarProjecao } from '../src/projecao.js';
+import { analisarEsboco, ESCALA_RELATIVA_MINIMA, variante } from '../../../tools/mecanifica/esboco.mjs';
 
 const caixa = (id, centro, extra = {}) => ({ id, tipo: 'caixa', largura: 20, altura: 20, profundidade: 20, centro, ...extra });
 const esboco = (formas, contato = {}, extra = {}) => ({ opcoes: [{ titulo: 'T', formas }], contato: { usar: true, folga: 500, ...contato }, ...extra });
@@ -140,15 +140,20 @@ describe('sobreposição na projeção', () => {
     expect(() => desenharEsboco({ ...e, explosao: 'x' })).toThrow(/explosao/);
   });
 
-  it('a explosão sugerida separa o que a normal cobre, medido, e a declarada é reportada', () => {
-    /* a e b se cobrem em 56% na lateral e em 19% na isométrica; afastar 4 vezes em y as separa na lateral
-       (e a isométrica continua acima do limiar, o que a medida mostra em vez de esconder) */
+  it('a explosão sugerida é o menor fator que zera os achados (ou o que mais reduz), no eixo que separa com o menor fator', () => {
+    /* a e b se cobrem em 56% na lateral e em 19% na isométrica; nenhum fator até 2,5 zera os dois achados
+       (a isométrica resiste), e o que mais reduz, de 2 para 1, com o menor fator, é 1,2 no eixo x */
     const e = esboco(ladoALado(30, 5, 5));
     const r = verificarProjecao(e, { sugerir: true });
     expect(r.explosao).toHaveLength(1);
-    expect(r.explosao[0]).toMatchObject({ opcao: 'T', indice: 0, origem: 'sugerida', fator: 4 });
-    expect(['y', 'z']).toContain(r.explosao[0].eixo);
-    expect(r.explosao[0]).toMatchObject({ achados_antes: 2, achados_depois: 1 });
+    expect(r.explosao[0]).toMatchObject({ opcao: 'T', indice: 0, origem: 'sugerida', fator: 1.2, achados_antes: 2, achados_depois: 1 });
+    expect(r.explosao[0].eixo).toBe('x');
+    const restantes = (eixo, fator) => verificarProjecao({ ...e, explosao: { eixo, fator } }, { sugerir: true }).explosao[0].achados_depois;
+    for (const eixo of ['x', 'y', 'z']) expect(restantes(eixo, 1), eixo).toBe(2);
+    expect(Math.min(...FATORES_DA_SUGESTAO)).toBe(1.2);
+    expect(restantes(r.explosao[0].eixo, 1.2)).toBe(1);
+    for (const fator of FATORES_DA_SUGESTAO.filter((f) => f > 1.2)) expect(restantes(r.explosao[0].eixo, fator)).toBeGreaterThanOrEqual(1);
+    expect(Math.max(...FATORES_DA_SUGESTAO)).toBe(2.5);
     expect(verificarProjecao(e).explosao).toEqual([]);
     const declarada = verificarProjecao({ ...e, explosao: { eixo: 'y', fator: 4 } }, { sugerir: true });
     expect(declarada.explosao[0]).toMatchObject({ origem: 'declarada', eixo: 'y', fator: 4, achados_antes: 2, achados_depois: 1 });
@@ -196,7 +201,9 @@ describe('sobreposição na projeção', () => {
     expect(daVista(r, 'frontal').filter((x) => x.pecas.some((p) => /garfo|balancim/.test(p)) && x.pecas.some((p) => /roda/.test(p)))).toEqual([]);
     expect(r.achados.some(par('balancimE', 'motor'))).toBe(false);
     expect(r.achados.some(par('garfoE', 'guidao'))).toBe(false);
-    expect(r.explosao[0]).toMatchObject({ origem: 'sugerida', achados_depois: 0 });
+    expect(r.explosao[0]).toMatchObject({ origem: 'sugerida', eixo: 'z' });
+    expect(r.explosao[0].fator).toBeLessThanOrEqual(2.5);
+    expect(r.explosao[0].achados_depois).toBeLessThan(r.achados.length);
     expect(r.explosao[0].achados_antes).toBe(r.achados.length);
   }, 60000);
 
@@ -226,22 +233,52 @@ describe('sobreposição na projeção', () => {
     const { pasta: saida, manifesto } = await analisarEsboco(arq);
     expect(manifesto.projecao).toMatchObject({ usar: true, limiar: 0.15, reprova: false, resultado: 'aviso' });
     expect(manifesto.projecao.porVista.lateral[0]).toMatchObject({ pecas: ['a', 'b'], cobre: 'b', fracao: expect.any(Number), folga_mm: expect.any(Number), alternativa: expect.any(Object) });
-    expect(manifesto.projecao.explosao[0]).toMatchObject({ origem: 'sugerida', achados_antes: 2, achados_depois: 1 });
+    expect(manifesto.projecao.explosao[0]).toMatchObject({ origem: 'sugerida', fator: 1.2, achados_antes: 2, achados_depois: 1 });
+    expect(Math.min(...Object.values(manifesto.projecao.explosao[0].escala_relativa))).toBeGreaterThanOrEqual(ESCALA_RELATIVA_MINIMA);
     const esperadas = ['explodida', 'transparente'].flatMap((m) => ['isometrica', 'frontal', 'lateral', 'superior'].map((v) => `${v}-${m}-legendas.png`));
     expect(manifesto.projecao.variantes).toEqual(esperadas);
     for (const nome of esperadas) { expect(manifesto.arquivos).toContain(nome); expect(existsSync(join(saida, nome))).toBe(true); }
     expect(manifesto.arquivos).toHaveLength(8 + 8);
-    expect(manifesto.forcado).toEqual({ linhasCentro: false });
+    expect(manifesto.forcado).toEqual({ linhasCentro: false, legendasExplodidaTransparente: 'lista' });
     expect(readFileSync(arq, 'utf8')).toBe(origem);
     /* uma explosão declarada fica de fora das variantes normais e vale na explodida */
     writeFileSync(arq, JSON.stringify(esboco(ladoALado(30, 5, 5), {}, { explosao: { eixo: 'y', fator: 3 } })));
     const dec = (await analisarEsboco(arq)).manifesto;
-    expect(dec.forcado).toEqual({ linhasCentro: false, explosao: false });
+    expect(dec.forcado).toEqual({ linhasCentro: false, explosao: false, legendasExplodidaTransparente: 'lista' });
     expect(dec.projecao.explosao[0]).toMatchObject({ origem: 'declarada', eixo: 'y', fator: 3 });
     /* sem sobreposição nem explosão: as 8 imagens de sempre */
     writeFileSync(arq, JSON.stringify({ opcoes: [{ formas: [caixa('a', [0, 0, 0]), caixa('b', [100, 0, 0])] }] }));
     const limpo = (await analisarEsboco(arq)).manifesto;
     expect(limpo.arquivos).toHaveLength(8);
+    expect(limpo.forcado).toEqual({ linhasCentro: false });
     expect(limpo.projecao).toMatchObject({ usar: true, resultado: 'aprovado', variantes: [], explosao: [] });
   }, 180000);
+
+  it('as variantes explodida e transparente forçam legendas em lista; a normal fica como o arquivo', () => {
+    const e = esboco(ladoALado(30, 5, 5), {}, { legendas: 'colunas' });
+    e.opcoes[0].legendas = 'colunas';
+    const normal = variante(e, { vista: 'isometrica', legendas: true, centros: false });
+    expect(normal.legendas).toBe('colunas');
+    expect(normal.opcoes[0].legendas).toBe('colunas');
+    for (const extra of [{ explosoes: [{ eixo: 'y', fator: 2 }] }, { transparente: true }]) {
+      const v = variante(e, { vista: 'isometrica', legendas: true, centros: false, lista: true, ...extra });
+      expect(v.legendas).toBe('lista');
+      expect(v.opcoes[0].legendas).toBeUndefined();
+    }
+    expect(JSON.stringify(variante(e, { vista: 'lateral', legendas: false, centros: true, lista: false }))).toBe(JSON.stringify(variante(e, { vista: 'lateral', legendas: false, centros: true })));
+  });
+
+  it('a explodida da moto fica com pelo menos 60% da escala da normal em toda vista e reduz o fator para caber', async () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'projecao-'));
+    const arq = join(pasta, 'moto.esboco.json');
+    writeFileSync(arq, readFileSync(new URL('./fixtures/moto.esboco.json', import.meta.url)));
+    const { manifesto } = await analisarEsboco(arq);
+    const ex = manifesto.projecao.explosao[0];
+    expect(ex.origem).toBe('sugerida');
+    expect(ex.fator).toBeLessThanOrEqual(ex.fator_sugerido);
+    expect(ex.fator_sugerido).toBeLessThanOrEqual(2.5);
+    expect(Math.min(...Object.values(ex.escala_relativa))).toBeGreaterThanOrEqual(ESCALA_RELATIVA_MINIMA);
+    expect(ex.aviso).toBeUndefined();
+    expect(manifesto.forcado.legendasExplodidaTransparente).toBe('lista');
+  }, 240000);
 });
