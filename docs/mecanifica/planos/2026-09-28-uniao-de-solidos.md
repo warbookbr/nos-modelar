@@ -124,8 +124,11 @@ booleanas e, em último caso, uma versão escrita no núcleo, restrita aos casos
 que as peças pedem.
 
 Se uma união passar de 1000 pedaços novos, ela é dividida em passos menores.
-Aumentar o `BLOCO` é a única decisão que volta para a pessoa, porque renumera
-todo conteúdo salvo, e ela chega com a alternativa já testada.
+Se isso ficar ruim de usar no dia a dia, o `BLOCO` é aumentado. A pessoa deixou
+em 2026-09-29 essa decisão com a IA, que é quem trabalha com a numeração. Como
+aumentar o `BLOCO` renumera todo conteúdo salvo, a mudança vem com a migração
+das receitas e dos alvos salvos e com testes provando que cada peça do acervo
+reexecuta igual.
 
 ## Fechamento
 
