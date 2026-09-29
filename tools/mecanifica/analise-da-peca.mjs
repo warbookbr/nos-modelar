@@ -65,7 +65,7 @@ export function lerZoom(texto) {
   return { vista, caixa: [x0, y0, x1, y1] };
 }
 
-function recortarAmpliado(png, [x0, y0, x1, y1], k = AMPLIACAO_DO_ZOOM) {
+export function recortarAmpliado(png, [x0, y0, x1, y1], k = AMPLIACAO_DO_ZOOM) {
   if (x1 > png.width || y1 > png.height) {
     throw new Error(`recorte ${x0},${y0},${x1},${y1} sai da imagem de ${png.width}x${png.height}.`);
   }

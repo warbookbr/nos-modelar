@@ -21,3 +21,13 @@ O relato lista os defeitos por região e vista, cada um com a imagem em que foi 
 ## Registro
 
 Ao fixar uma etapa, `etapas-da-montagem.mjs --fixar` grava no aceite o campo `analise`, com `feita` se existe manifesto com o hash da receita atual e `ausente` no resto, inclusive quando a receita mudou depois da análise. O campo não bloqueia o aceite humano, que vale em qualquer ponto; ele só torna visível se a etapa foi aceita sem o passo.
+
+## Esboço
+
+O mesmo passo vale para o esboço de opções antes de mostrá-lo à pessoa. Um esboço com legenda que cruza a peça, balão no elemento errado, escala pequena demais, peça na frente de outra que deveria estar atrás ou rotação no sentido oposto induz a escolha errada, e a imagem parece boa à primeira vista.
+
+`npm run esboco -- <arquivo.esboco.json> --analise` gera a matriz de uma vez: as vistas isometrica, frontal, lateral e superior, cada uma com e sem legendas e com e sem linhas de centro (16 imagens), em `<arquivo>-analise/`, com um `manifesto.json` que traz o hash do JSON, a data, a escala por vista e a lista de arquivos. Com `--zoom=<vista>:<x0,y0,x1,y1>` recorta esse retângulo em pixels, amplia 3 vezes e grava o par com tudo ligado e com tudo desligado, para olhar um ponto de encontro. Gerar não basta: o passo só vale depois de abrir as imagens.
+
+A leitura procura, em cada vista: linha de chamada que atravessa outra peça ou outra legenda; balão sobre a peça errada, comparado com o nome do rótulo; escala pequena a ponto de a peça menor ficar ilegível (a barra de 100 mm dá a referência, e o manifesto traz px/mm); oclusão errada, com a peça de trás por cima da da frente, que se confere comparando a vista sem legendas com a frontal e a lateral; rotação no sentido errado, que se confere na vista em que o ângulo aparece contra o eixo, sabendo que ângulo positivo gira pela regra da mão direita em torno do eixo de mundo; e linha de centro curta, fora do eixo ou ausente.
+
+O relato usa o mesmo formato do restante deste documento: os defeitos por vista e região, cada um com a imagem em que foi visto, e o que não foi conferido, com o motivo. Sem ter aberto a imagem, o relato diz que ela foi gerada e não foi lida.

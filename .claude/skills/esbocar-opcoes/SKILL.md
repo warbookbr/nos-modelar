@@ -8,38 +8,65 @@ description: Mostrar à pessoa, em imagem, as opções de forma em disputa duran
 A pessoa entende forma vendo, e não lendo medidas. Sempre que o alinhamento
 chegar a uma escolha de forma (em pé ou deitado, encostado na face ou na ponta,
 redondo ou achatado), desenhe as opções com esta ferramenta em vez de
-descrevê-las em texto.
+descrevê-las em texto. A referência completa do JSON está em
+[`modulos/esboco/README.md`](../../../modulos/esboco/README.md); esta skill
+diz como usá-la no alinhamento.
+
+## Escrever e rodar
 
 Escreva `<peça>/referencias/<assunto>.esboco.json` e rode
-`npm run esboco -- <arquivo>`. Ele grava `<assunto>.png` e `<assunto>.svg` ao
+`npm run esboco -- <arquivo>`, que grava `<assunto>.png` e `<assunto>.svg` ao
 lado. O exemplo de referência é
 [`ombro-opcoes.esboco.json`](../../../procedural/pecas/braco-robotico/referencias/ombro-opcoes.esboco.json).
 
-## O arquivo
+A raiz tem `opcoes` e, opcionalmente, `vista`: `isometrica` (padrão, a que a
+pessoa entende melhor), `frontal`, `lateral` ou `superior`. Cada opção tem
+`titulo`, `nota` (uma frase curta) e `formas`, e todas saem na mesma escala,
+com barra de 100 mm. Cada forma tem `id`, `tipo`, `cor` e `rotulo` opcional,
+que sai fora do desenho como legenda numerada com linha de chamada.
 
-A raiz tem `opcoes` e, opcionalmente, `vista` (`isometrica`, o padrão, ou
-`frontal`, `lateral`, `superior`). Cada opção tem `titulo`, `nota` (uma frase
-curta) e `formas`, e todas saem na mesma escala, com barra de 100 mm.
+Os tipos são `caixa` (`largura` x, `altura` y, `profundidade` z, `raio` de
+canto e `furos: [{ diametro, centro: [x, z] }]`), `cilindro` (`diametro`,
+`comprimento`, `eixo`, `achatado`) e `anel` (`diametroExterno`,
+`diametroInterno`, `espessura`, `eixo`). Não há tubo, perfil nem esfera.
 
-Cada forma tem `id`, `tipo`, `cor` (hex ou roxo, verde, azul, vermelho,
-laranja, amarelo, cinza, preto, branco) e `rotulo` opcional, que sai fora do
-desenho com linha de chamada. Medidas em milímetro. O `cilindro` usa
-`diametro`, `comprimento`, `eixo` (`x`, `y` vertical ou `z`) e, se precisar,
-`achatado: { lado: "+x", profundidade }` para uma face plana lateral. O `anel`
-usa `diametroExterno`, `diametroInterno`, `espessura` e `eixo`. A `caixa` usa
-`largura` (x), `altura` (y), `profundidade` (z) e `raio` de canto opcional.
+Posicione pela relação e não por coordenada: a primeira forma leva
+`centro: [0, 0, 0]`; as demais usam `sobre: "<id>"` (base no topo daquela) ou
+`ponta: { id, lado: "+x" }` (encosta na face daquele lado), com `desloca` para
+o ajuste fino. `rotacao: [rx, ry, rz]` em graus gira pela regra da mão direita
+em torno do eixo de mundo: rx=+90 leva +y para +z, ry=+90 leva +z para +x e
+rz=+90 leva +x para +y.
 
-Posicione pela relação e não por coordenada. A primeira forma leva
-`centro: [0, 0, 0]`; as demais usam `sobre: "<id>"`, que apoia a base no topo
-daquela forma, centrada nela, ou `ponta: { id, lado: "+x" }`, que encosta a
-forma na face daquele lado, respeitando o achatado. `desloca: [dx, dy, dz]`
-ajusta depois, quando precisar. Referência a id inexistente é recusada com a
-lista de ids válidos.
+## Limpar o desenho
+
+`linhasCentro: true` no topo ou na opção traça os eixos de cilindros, anéis e
+furos. `ocultar` (topo, opção ou forma; o nível mais interno vence, `[]` religa)
+desliga `linhasCentro`, `legendas`, `numeracao`, `marcadores`, `escala`,
+`titulo` ou `nota`. `oculto: true` numa forma a tira do desenho sem apagá-la,
+e ela segue valendo como referência de `sobre` e `ponta`. Um rótulo que já
+começa com número ("1. base") não recebe outro.
+
+## Limites
+
+Com mais de uns 6 formas por opção o desenho degrada: numa moto de 11 formas as
+legendas se cruzam, a escala cai para 0,15 px/mm, as linhas de chamada cortam o
+desenho e o SVG passa de 2,6 MB em vários segundos. Esboce só o que está em
+disputa, use `ocultar: ["legendas"]` quando o conjunto for grande e
+ilustrativo, e divida em vários esboços.
+
+## Conferir antes de mostrar
+
+Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode
+`npm run esboco -- <arquivo> --analise` e leia as imagens conforme a seção
+Esboço de
+[`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md):
+legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e
+rotação no sentido errado. Relate os defeitos por vista e região e o que não
+foi conferido.
 
 ## Como mostrar
 
-Abra o PNG com `Read` antes de mostrar e confira que cada opção corresponde ao
-que foi dito. Mostre à pessoa a foto de referência e o esboço juntos, uma
-frase curta por opção dizendo o que muda entre elas, e termine com a pergunta
-"qual se parece mais com o objeto?". A resposta vira decisão escrita no PLANO,
-como na skill [alinhar-modelagem](../alinhar-modelagem/SKILL.md).
+Mostre à pessoa a foto de referência e o esboço juntos, uma frase curta por
+opção dizendo o que muda entre elas, e termine com a pergunta "qual se parece
+mais com o objeto?". A resposta vira decisão escrita no PLANO, como na skill
+[alinhar-modelagem](../alinhar-modelagem/SKILL.md).

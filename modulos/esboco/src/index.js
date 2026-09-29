@@ -514,12 +514,42 @@ function quebrar(texto, n) {
   return linhas;
 }
 
+/* Elementos do desenho que "ocultar" pode desligar. */
+export const OCULTAVEIS = ['linhasCentro', 'legendas', 'numeracao', 'marcadores', 'escala', 'titulo', 'nota'];
+
+function lerOcultar(lista, onde) {
+  if (lista === undefined) return undefined;
+  exigir(Array.isArray(lista), `${onde}: "ocultar" deve ser uma lista de nomes (válidos: ${OCULTAVEIS.join(', ')})`);
+  for (const n of lista) {
+    exigir(OCULTAVEIS.includes(n), `${onde}: "ocultar" não conhece "${n}" (válidos: ${OCULTAVEIS.join(', ')})`);
+  }
+  return new Set(lista);
+}
+
+/* Nível mais interno que declara "ocultar" vence; [] religa tudo. */
+function ocultosDe(...niveis) {
+  for (const n of niveis) if (n !== undefined) return n;
+  return new Set();
+}
+
 export function validarEsboco(esboco) {
   exigir(esboco && typeof esboco === 'object', 'o esboço precisa ser um objeto JSON');
   exigir(Array.isArray(esboco.opcoes) && esboco.opcoes.length > 0, 'o esboço precisa de "opcoes": [{ titulo, nota, formas }]');
   const vista = esboco.vista ?? 'isometrica';
   exigir(VISTAS[vista], `"vista" deve ser uma de ${Object.keys(VISTAS).join(', ')}`);
-  return { vista, opcoes: esboco.opcoes.map((o, i) => ({ opcao: o, formas: resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`) })) };
+  const topo = lerOcultar(esboco.ocultar, 'esboço');
+  return {
+    vista,
+    opcoes: esboco.opcoes.map((o, i) => {
+      const onde = `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`;
+      const daOpcao = lerOcultar(o.ocultar, onde);
+      const todas = resolverOpcao(o, onde);
+      for (const r of todas) r.ocultar = lerOcultar(r.forma.ocultar, `${onde}, forma "${r.id}"`);
+      const formas = todas.filter((r) => r.forma.oculto !== true);
+      exigir(formas.length > 0, `${onde}: todas as formas estão com "oculto": true`);
+      return { opcao: o, formas, ocultosOpcao: ocultosDe(daOpcao, topo) };
+    }),
+  };
 }
 
 /* Desenha o esboço inteiro; devolve { svg, largura, altura, escala }. */
@@ -527,7 +557,7 @@ export function desenharEsboco(esboco) {
   const { vista, opcoes } = validarEsboco(esboco);
   const V = VISTAS[vista];
   const olho = normalizar(V.olho);
-  const projetadas = opcoes.map(({ opcao, formas }) => {
+  const projetadas = opcoes.map(({ opcao, formas, ocultosOpcao }) => {
     const itens = formas.map((r) => {
       const chunks = fatiarForma(r, olho);
       const fs = chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
@@ -537,7 +567,7 @@ export function desenharEsboco(esboco) {
     const pts = itens.flatMap((i) => i.casco);
     const min = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
     const max = [Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
-    return { opcao, itens, min, max };
+    return { opcao, itens, min, max, ocultosOpcao };
   });
   /* Mesma escala para todas: a maior opção cabe no painel, com folga para rótulos. */
   const larg = Math.max(...projetadas.map((p) => p.max[0] - p.min[0]));
@@ -553,7 +583,7 @@ export function desenharEsboco(esboco) {
     const cy = TOPO + PAINEL_A / 2 - ((p.min[1] + p.max[1]) / 2) * escala;
     const tela = (q) => [cx + q[0] * escala, cy + q[1] * escala];
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
-    partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
+    if (!p.ocultosOpcao.has('titulo')) partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
 
     // 1. Spans de formas (mantém fatias contíguas e divide apenas penetrações em furos)
     const splitPoints = new Map();
@@ -613,17 +643,20 @@ export function desenharEsboco(esboco) {
     }
 
     /* Linhas de centro: eixos de rotação (cilindros/anéis) e furos passantes. */
-    const querLinhasCentroGeral = Boolean(p.opcao.linhasCentro);
+    const ocultosDaForma = (r) => ocultosDe(r.ocultar, p.ocultosOpcao);
+    const querLinhasCentroGeral = p.opcao.linhasCentro !== undefined
+      ? Boolean(p.opcao.linhasCentro)
+      : Boolean(esboco.linhasCentro);
     const segmentosCentro = [];
 
     for (const it of p.itens) {
       const f = it.r.forma;
       const querCentro = f.linhaCentro !== undefined ? Boolean(f.linhaCentro) : querLinhasCentroGeral;
-      if (!querCentro) continue;
+      if (!querCentro || ocultosDaForma(it.r).has('linhasCentro')) continue;
 
       const ext = typeof f.linhaCentro === 'object' && typeof f.linhaCentro.extensao === 'number'
         ? f.linhaCentro.extensao
-        : 8;
+        : Math.max(8, 0.12 * (f.diametroExterno ?? f.diametro ?? 0));
 
       const mundoDe = (u, v, w) => {
         const pl = ponto3(it.r.prisma.b, u, v, w);
@@ -748,6 +781,8 @@ export function desenharEsboco(esboco) {
 
     for (const g of gruposChunks) {
       if (g.tipo === 'linhaCentro') {
+        /* Contorno claro sob o traço: mantém a linha legível sobre peças escuras. */
+        partes.push(`<line x1="${f1(g.ch.q1[0])}" y1="${f1(g.ch.q1[1])}" x2="${f1(g.ch.q2[0])}" y2="${f1(g.ch.q2[1])}" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round"/>`);
         partes.push(`<line x1="${f1(g.ch.q1[0])}" y1="${f1(g.ch.q1[1])}" x2="${f1(g.ch.q2[0])}" y2="${f1(g.ch.q2[1])}" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>`);
         continue;
       }
@@ -805,7 +840,7 @@ export function desenharEsboco(esboco) {
     const meio = x0 + PAINEL_L / 2;
     const contagemLados = { e: 0, d: 0 };
     const rotulados = p.itens
-      .filter((it) => it.r.forma.rotulo)
+      .filter((it) => it.r.forma.rotulo && !ocultosDaForma(it.r).has('legendas'))
       .map((it, idx) => {
         const rotInfo = typeof it.r.forma.rotulo === 'object'
           ? it.r.forma.rotulo
@@ -913,6 +948,8 @@ export function desenharEsboco(esboco) {
           it,
           texto: rotInfo.texto,
           numero: idx + 1,
+          semNumero: ocultosDaForma(it.r).has('numeracao'),
+          semMarcador: ocultosDaForma(it.r).has('marcadores'),
           ancora,
           lado,
           corPeca,
@@ -923,22 +960,22 @@ export function desenharEsboco(esboco) {
       const grupo = rotulados.filter((r) => r.lado === lado).sort((a, b) => a.ancora[1] - b.ancora[1]);
       let ultimo = TOPO + 10;
       for (const r of grupo) {
-        const textoCompleto = `${r.numero}. ${r.texto}`;
+        const textoCompleto = r.semNumero || /^\s*\d+\s*[.\-–)]/.test(r.texto) ? r.texto : `${r.numero}. ${r.texto}`;
         const linhas = quebrar(textoCompleto, 20);
         const y = Math.max(r.ancora[1], ultimo + 12);
         ultimo = y + linhas.length * 20;
         const xt = lado === 'e' ? esquerda : direita;
         const xl = lado === 'e' ? esquerda + 145 : direita - 145;
         partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/>`);
-        partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
+        if (!r.semMarcador) partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
         linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="15" font-weight="${i === 0 ? 'bold' : 'normal'}" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
       }
     }
-    quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
+    if (!p.ocultosOpcao.has('nota')) quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
   });
   /* Barra de escala de 100 mm, igual para todas as opções. */
   const barra = 100 * escala;
-  partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
+  if (!projetadas.every((p) => p.ocultosOpcao.has('escala'))) partes.push(`<line x1="20" y1="${altura - 14}" x2="${f1(20 + barra)}" y2="${altura - 14}" stroke="#111111" stroke-width="3"/><text x="${f1(28 + barra)}" y="${altura - 9}" font-size="14">100 mm</text>`);
   partes.push('</svg>');
   return { svg: partes.join('\n'), largura, altura, escala };
 }

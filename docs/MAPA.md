@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-821 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+823 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -345,6 +345,11 @@
 ## modulos/contorno-da-imagem/tests/
 
 - `contorno.test.js` — contorno.test.js — cada peça do módulo vista num caso construído de propósito: duas partes do mesmo cinza separadas pela semente, a pintura com a opacidade p…
+
+## modulos/esboco/
+
+- `PLANO-ESTADO-DA-ARTE.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@mecanifica/esboco`
+- `README.md` — @mecanifica/esboco
 
 ## modulos/esboco/src/
 
