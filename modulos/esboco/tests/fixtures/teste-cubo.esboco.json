@@ -1,0 +1,22 @@
+{
+  "vista": "isometrica",
+  "opcoes": [
+    {
+      "titulo": "Cubo 100mm",
+      "nota": "Cubo simples 100x100x100 mm com raio de 10mm nos cantos",
+      "formas": [
+        {
+          "id": "cubo",
+          "tipo": "caixa",
+          "largura": 100,
+          "altura": 100,
+          "profundidade": 100,
+          "raio": 10,
+          "centro": [0, 50, 0],
+          "cor": "azul",
+          "rotulo": "cubo_base"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "vista": "isometrica",
+  "opcoes": [
+    {
+      "titulo": "Opção A: Mancal Básico",
+      "nota": "Alojamento cilíndrico central com eixo passante e ponta achatada",
+      "linhasCentro": true,
+      "formas": [
+        {
+          "id": "base",
+          "tipo": "caixa",
+          "largura": 140,
+          "altura": 20,
+          "profundidade": 80,
+          "raio": 8,
+          "centro": [0, 10, 0],
+          "furos": [
+            { "diametro": 12, "centro": [-52, 0] },
+            { "diametro": 12, "centro": [52, 0] }
+          ],
+          "cor": "cinza",
+          "rotulo": "base_fixacao"
+        },
+        {
+          "id": "alojamento",
+          "tipo": "anel",
+          "diametroExterno": 70,
+          "diametroInterno": 40,
+          "espessura": 40,
+          "eixo": "z",
+          "sobre": "base",
+          "cor": "azul",
+          "rotulo": "alojamento"
+        },
+        {
+          "id": "eixo",
+          "tipo": "cilindro",
+          "diametro": 36,
+          "comprimento": 120,
+          "eixo": "z",
+          "ponta": ["alojamento", "-z"],
+          "desloca": [0, 0, 80],
+          "cor": "laranja",
+          "rotulo": "eixo_passante"
+        },
+        {
+          "id": "ponta_chaveta",
+          "tipo": "cilindro",
+          "diametro": 24,
+          "comprimento": 30,
+          "eixo": "z",
+          "ponta": ["eixo", "+z"],
+          "achatado": {
+            "lado": "+y",
+            "profundidade": 5
+          },
+          "cor": "vermelho",
+          "rotulo": "ponta_rebaixada"
+        }
+      ]
+    }
+  ]
+}

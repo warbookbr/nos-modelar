@@ -5,7 +5,7 @@
 
 const EIXOS = ['x', 'y', 'z'];
 const LADOS = ['+x', '-x', '+y', '-y', '+z', '-z'];
-const SEGMENTOS = 64;
+const SEGMENTOS = 128;
 const PAINEL_L = 620;
 const PAINEL_A = 560;
 const TOPO = 70;
@@ -70,6 +70,49 @@ function ponto3(b, u, v, w) {
   return p;
 }
 
+function matrizRotacao(rot) {
+  if (!rot) return null;
+  let rx = 0, ry = 0, rz = 0;
+  if (Array.isArray(rot)) {
+    [rx = 0, ry = 0, rz = 0] = rot;
+  } else if (typeof rot === 'object') {
+    if (rot.eixo && rot.angulo !== undefined) {
+      if (rot.eixo === 'x') rx = rot.angulo;
+      else if (rot.eixo === 'y') ry = rot.angulo;
+      else if (rot.eixo === 'z') rz = rot.angulo;
+    } else {
+      rx = rot.x ?? 0;
+      ry = rot.y ?? 0;
+      rz = rot.z ?? 0;
+    }
+  } else if (typeof rot === 'number') {
+    ry = rot;
+  }
+  if (!rx && !ry && !rz) return null;
+  const radX = (rx * Math.PI) / 180;
+  const radY = (ry * Math.PI) / 180;
+  const radZ = (rz * Math.PI) / 180;
+
+  const cx = Math.cos(radX), sx = Math.sin(radX);
+  const cy = Math.cos(radY), sy = Math.sin(radY);
+  const cz = Math.cos(radZ), sz = Math.sin(radZ);
+
+  return [
+    [cz * cy, cz * sy * sx - sz * cx, cz * sy * cx + sz * sx],
+    [sz * cy, sz * sy * sx + cz * cx, sz * sy * cx - cz * sx],
+    [-sy,     cy * sx,                cy * cx],
+  ];
+}
+
+function aplicarMatriz(v, m) {
+  if (!m) return v;
+  return [
+    m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
+    m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+    m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
+  ];
+}
+
 /* Converte uma forma declarada em prisma local centrado na origem. */
 function prisma(f, onde) {
   const tipo = f.tipo;
@@ -90,7 +133,7 @@ function prisma(f, onde) {
       const n = k === b.u ? [s, 0] : [0, s];
       perfil = cortar(perfil, n, f.diametro / 2 - profundidade);
     }
-    return { b, perfil, furo: null, comprimento: f.comprimento };
+    return { b, perfil, furos: [], furo: null, comprimento: f.comprimento };
   }
   if (tipo === 'anel') {
     exigir(numPos(f.diametroExterno), `${onde}: anel precisa de "diametroExterno" positivo em mm`);
@@ -99,22 +142,61 @@ function prisma(f, onde) {
     exigir(numPos(f.espessura), `${onde}: anel precisa de "espessura" positiva em mm`);
     const eixo = f.eixo ?? 'y';
     exigir(EIXOS.includes(eixo), `${onde}: "eixo" deve ser "x", "y" ou "z"`);
-    return { b: base(eixo), perfil: circulo(f.diametroExterno / 2), furo: f.diametroInterno > 0 ? circulo(f.diametroInterno / 2) : null, comprimento: f.espessura };
+    const furos = f.diametroInterno > 0 ? [circulo(f.diametroInterno / 2)] : [];
+    return { b: base(eixo), perfil: circulo(f.diametroExterno / 2), furos, furo: furos[0] ?? null, comprimento: f.espessura };
   }
   if (tipo === 'caixa') {
     exigir(numPos(f.largura) && numPos(f.altura) && numPos(f.profundidade), `${onde}: caixa precisa de "largura", "altura" e "profundidade" positivas em mm`);
     /* u = x (largura), v = z (profundidade), extrusão em y (altura). */
-    return { b: base('y'), perfil: retanguloArredondado(f.largura, f.profundidade, f.raio), furo: null, comprimento: f.altura };
+    const furos = [];
+    if (Array.isArray(f.furos)) {
+      for (const [idx, item] of f.furos.entries()) {
+        exigir(numPos(item.diametro), `${onde}: furos[${idx}] precisa de "diametro" positivo em mm`);
+        const cf = item.centro ?? [0, 0];
+        exigir(Array.isArray(cf) && cf.length === 2 && cf.every((n) => typeof n === 'number'),
+          `${onde}: furos[${idx}] precisa de "centro" [x, z] numérico`);
+        const r = item.diametro / 2;
+        furos.push(circulo(r).map(([u, v]) => [u + cf[0], v + cf[1]]));
+      }
+    } else if (f.furo && typeof f.furo === 'object') {
+      exigir(numPos(f.furo.diametro), `${onde}: furo precisa de "diametro" positivo em mm`);
+      const cf = f.furo.centro ?? [0, 0];
+      exigir(Array.isArray(cf) && cf.length === 2 && cf.every((n) => typeof n === 'number'),
+        `${onde}: furo precisa de "centro" [x, z] numérico`);
+      const r = f.furo.diametro / 2;
+      furos.push(circulo(r).map(([u, v]) => [u + cf[0], v + cf[1]]));
+    }
+    return { b: base('y'), perfil: retanguloArredondado(f.largura, f.profundidade, f.raio), furos, furo: furos[0] ?? null, comprimento: f.altura };
   }
   throw new ErroDeEsboco(`${onde}: tipo "${tipo}" desconhecido; use cilindro, anel ou caixa`);
 }
 
-function caixaLocal(pr) {
-  const min = [0, 0, 0];
-  const max = [0, 0, 0];
-  min[pr.b.e] = -pr.comprimento / 2; max[pr.b.e] = pr.comprimento / 2;
-  min[pr.b.u] = Math.min(...pr.perfil.map((p) => p[0])); max[pr.b.u] = Math.max(...pr.perfil.map((p) => p[0]));
-  min[pr.b.v] = Math.min(...pr.perfil.map((p) => p[1])); max[pr.b.v] = Math.max(...pr.perfil.map((p) => p[1]));
+function caixaLocal(pr, m) {
+  if (!m) {
+    const min = [0, 0, 0];
+    const max = [0, 0, 0];
+    min[pr.b.e] = -pr.comprimento / 2; max[pr.b.e] = pr.comprimento / 2;
+    min[pr.b.u] = Math.min(...pr.perfil.map((p) => p[0])); max[pr.b.u] = Math.max(...pr.perfil.map((p) => p[0]));
+    min[pr.b.v] = Math.min(...pr.perfil.map((p) => p[1])); max[pr.b.v] = Math.max(...pr.perfil.map((p) => p[1]));
+    return { min, max };
+  }
+  const vertices = [];
+  const half = pr.comprimento / 2;
+  for (const w of [-half, half]) {
+    for (const [u, v] of pr.perfil) {
+      vertices.push(aplicarMatriz(ponto3(pr.b, u, v, w), m));
+    }
+  }
+  const min = [
+    Math.min(...vertices.map((p) => p[0])),
+    Math.min(...vertices.map((p) => p[1])),
+    Math.min(...vertices.map((p) => p[2])),
+  ];
+  const max = [
+    Math.max(...vertices.map((p) => p[0])),
+    Math.max(...vertices.map((p) => p[1])),
+    Math.max(...vertices.map((p) => p[2])),
+  ];
   return { min, max };
 }
 
@@ -142,7 +224,8 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
     exigir(!visitando.has(id), `${onde}: referência circular em sobre/ponta`);
     visitando.add(id);
     const pr = prisma(f, onde);
-    const local = caixaLocal(pr);
+    const m = matrizRotacao(f.rotacao);
+    const local = caixaLocal(pr, m);
     const modos = ['centro', 'sobre', 'ponta'].filter((k) => f[k] !== undefined);
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     let centro = [0, 0, 0];
@@ -167,9 +250,9 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
       centro = centro.map((c, i) => c + f.desloca[i]);
     }
     const r = {
-      id, forma: f, prisma: pr, centro,
-      min: local.min.map((m, i) => m + centro[i]),
-      max: local.max.map((m, i) => m + centro[i]),
+      id, forma: f, prisma: pr, centro, matriz: m,
+      min: local.min.map((val, i) => val + centro[i]),
+      max: local.max.map((val, i) => val + centro[i]),
     };
     visitando.delete(id);
     prontas.set(id, r);
@@ -192,36 +275,175 @@ const LUZ = normalizar([-0.35, 1, 0.55]);
 function normalizar(v) { const n = Math.hypot(...v) || 1; return v.map((c) => c / n); }
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
-/* Faces 3D de uma forma já posicionada, cada uma com normal e papel. */
-function faces(r) {
-  const { b, perfil, furo, comprimento } = r.prisma;
-  const c = r.centro;
-  const mundo = (u, v, w) => ponto3(b, u, v, w).map((x, i) => x + c[i]);
-  const eixoN = (s) => ponto3(b, 0, 0, s);
-  const lista = [];
-  const lateral = (anel, para) => {
-    for (let i = 0; i < anel.length; i++) {
-      const a = anel[i];
-      const d = anel[(i + 1) % anel.length];
-      const du = d[0] - a[0];
-      const dv = d[1] - a[1];
-      /* Perfil anti-horário: a normal externa é (dv, -du) no plano (u, v),
-         e a mesma direção vale no espaço porque u e v são eixos do mundo. */
-      const s = para === 'fora' ? 1 : -1;
-      const n = normalizar(ponto3(b, s * dv, -s * du, 0));
-      lista.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts: [mundo(a[0], a[1], -comprimento / 2), mundo(d[0], d[1], -comprimento / 2), mundo(d[0], d[1], comprimento / 2), mundo(a[0], a[1], comprimento / 2)] });
+/* Decompõe uma forma em blocos/fatias axiais discretas para Z-sorting robusto. */
+function extrairArcosBorda(anel, normais, olho, mundo, w) {
+  const N = anel.length;
+  const vis = normais.map((n) => (!olho || dot(n, olho) > 1e-6));
+  const arcos = [];
+
+  let inicio = 0;
+  while (inicio < N && vis[inicio]) inicio++;
+
+  if (inicio === N) {
+    const pts = anel.map((p) => mundo(p[0], p[1], w));
+    pts.push(mundo(anel[0][0], anel[0][1], w));
+    arcos.push(pts);
+    return arcos;
+  }
+
+  for (let count = 0; count < N; count++) {
+    const idx = (inicio + count) % N;
+    if (vis[idx]) {
+      const run = [anel[idx]];
+      let j = idx;
+      while (count < N && vis[j]) {
+        run.push(anel[(j + 1) % N]);
+        count++;
+        j = (inicio + count) % N;
+      }
+      arcos.push(run.map((p) => mundo(p[0], p[1], w)));
     }
+  }
+
+  return arcos;
+}
+
+export function fatiarForma(r, olho) {
+  const { b, perfil, furos, furo, comprimento } = r.prisma;
+  const furosLista = furos ?? (furo ? [furo] : []);
+  const c = r.centro;
+  const m = r.matriz;
+  const mundo = (u, v, w) => {
+    const pl = ponto3(b, u, v, w);
+    const pr = aplicarMatriz(pl, m);
+    return [pr[0] + c[0], pr[1] + c[1], pr[2] + c[2]];
   };
-  /* A orientação do perfil depende da base; garante anti-horário em (u, v). */
+  const rotNormal = (nl) => normalizar(aplicarMatriz(nl, m));
+  const eixoN = (s) => rotNormal(ponto3(b, 0, 0, s));
+
   const area = (pl) => pl.reduce((s, p, i) => s + p[0] * pl[(i + 1) % pl.length][1] - pl[(i + 1) % pl.length][0] * p[1], 0);
   const anti = (pl) => (area(pl) >= 0 ? pl : [...pl].reverse());
   const pe = anti(perfil);
-  lateral(pe, 'fora');
-  if (furo) lateral(anti(furo), 'dentro');
-  for (const s of [-1, 1]) {
-    lista.push({ papel: 'tampa', n: eixoN(s), pts: perfil.map((p) => mundo(p[0], p[1], (s * comprimento) / 2)), furo: furo ? furo.map((p) => mundo(p[0], p[1], (s * comprimento) / 2)) : null });
+  const fus = furosLista.map((fu) => anti(fu));
+
+  const fatias = comprimento <= 10 ? 1 : Math.max(1, Math.min(36, Math.ceil(comprimento / 5)));
+  const chunks = [];
+
+  for (let j = 0; j < fatias; j++) {
+    const w0 = -comprimento / 2 + (j * comprimento) / fatias;
+    const w1 = -comprimento / 2 + ((j + 1) * comprimento) / fatias;
+    const wMid = (w0 + w1) / 2;
+    const centroChunk = mundo(0, 0, wMid);
+    const prof = dot(centroChunk, olho);
+
+    const lados = [];
+    const dentro = [];
+    const linhas = [];
+    const arcos = [];
+
+    const procLateral = (anel, para, destino) => {
+      const N = anel.length;
+      const s = para === 'fora' ? 1 : -1;
+      const normais = [];
+      for (let i = 0; i < N; i++) {
+        const a = anel[i];
+        const d = anel[(i + 1) % N];
+        const du = d[0] - a[0];
+        const dv = d[1] - a[1];
+        normais.push(rotNormal(ponto3(b, s * dv, -s * du, 0)));
+      }
+
+      for (let i = 0; i < N; i++) {
+        const a = anel[i];
+        const d = anel[(i + 1) % N];
+        const n = normais[i];
+        if (olho && dot(n, olho) <= 1e-6) continue;
+
+        const nPrev = normais[(i - 1 + N) % N];
+        const nNext = normais[(i + 1) % N];
+
+        const silA = olho ? dot(n, olho) > 0 && dot(nPrev, olho) <= 0 : false;
+        const silD = olho ? dot(n, olho) > 0 && dot(nNext, olho) <= 0 : false;
+        const cos25 = Math.cos((25 * Math.PI) / 180);
+        const vincA = dot(n, nPrev) < cos25 && (!olho || dot(n, olho) >= dot(nPrev, olho));
+        const vincD = dot(n, nNext) < cos25 && (!olho || dot(n, olho) > dot(nNext, olho));
+
+        const pts = [
+          mundo(a[0], a[1], w0),
+          mundo(d[0], d[1], w0),
+          mundo(d[0], d[1], w1),
+          mundo(a[0], a[1], w1),
+        ];
+
+        if (para === 'fora' && (silA || vincA)) linhas.push([mundo(a[0], a[1], w0), mundo(a[0], a[1], w1)]);
+        if (para === 'fora' && (silD || vincD)) linhas.push([mundo(d[0], d[1], w0), mundo(d[0], d[1], w1)]);
+
+        destino.push({ papel: para === 'fora' ? 'lado' : 'dentro', n, pts });
+      }
+
+      if (para === 'fora' && j === 0 && olho && dot(eixoN(-1), olho) <= 0) {
+        for (const arc of extrairArcosBorda(anel, normais, olho, mundo, w0)) {
+          arcos.push(arc);
+        }
+      }
+    };
+
+    procLateral(pe, 'fora', lados);
+    for (const fu of fus) {
+      procLateral(fu, 'dentro', dentro);
+    }
+
+    if (j === 0) {
+      const n = eixoN(-1);
+      if (!olho || dot(n, olho) > 1e-6) {
+        chunks.push({
+          r,
+          prof: dot(mundo(0, 0, w0), olho),
+          lados: [],
+          dentro: [],
+          linhas: [],
+          arcos: [],
+          tampas: [{
+            papel: 'tampa',
+            n,
+            pts: perfil.map((p) => mundo(p[0], p[1], w0)),
+            furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w0))),
+            furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w0)) : null,
+          }],
+        });
+      }
+    }
+
+    chunks.push({ r, prof, lados, dentro, linhas, arcos, tampas: [] });
+
+    if (j === fatias - 1) {
+      const n = eixoN(1);
+      if (!olho || dot(n, olho) > 1e-6) {
+        chunks.push({
+          r,
+          prof: dot(mundo(0, 0, w1), olho),
+          lados: [],
+          dentro: [],
+          linhas: [],
+          arcos: [],
+          tampas: [{
+            papel: 'tampa',
+            n,
+            pts: perfil.map((p) => mundo(p[0], p[1], w1)),
+            furos: fus.map((fu) => fu.map((p) => mundo(p[0], p[1], w1))),
+            furo: fus[0] ? fus[0].map((p) => mundo(p[0], p[1], w1)) : null,
+          }],
+        });
+      }
+    }
   }
-  return lista;
+
+  return chunks;
+}
+
+export function faces(r, olho) {
+  const chunks = fatiarForma(r, olho);
+  return chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
 }
 
 function cor(hex, fator) {
@@ -245,8 +467,40 @@ function casco(pts) {
   return inf.slice(0, -1).concat(sup.slice(0, -1));
 }
 
+function pontoEmPoligono(p, poly) {
+  let dentro = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1];
+    const xj = poly[j][0], yj = poly[j][1];
+    const intersect = ((yi > p[1]) !== (yj > p[1])) &&
+      (p[0] < ((xj - xi) * (p[1] - yi)) / (yj - yi) + xi);
+    if (intersect) dentro = !dentro;
+  }
+  return dentro;
+}
+
+function distSegmento(p, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const l2 = dx * dx + dy * dy;
+  if (l2 === 0) return Math.hypot(p[0] - a[0], p[1] - a[1]);
+  let t = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+
+function distPoligono(p, poly) {
+  if (pontoEmPoligono(p, poly)) return 0;
+  let minD = Infinity;
+  for (let i = 0; i < poly.length; i++) {
+    const d = distSegmento(p, poly[i], poly[(i + 1) % poly.length]);
+    if (d < minD) minD = d;
+  }
+  return minD;
+}
+
 const f1 = (x) => Math.round(x * 10) / 10;
 const caminho = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}Z`;
+const caminhoAberto = (pts) => `M${pts.map((p) => `${f1(p[0])},${f1(p[1])}`).join('L')}`;
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /* Quebra a frase em linhas de até n caracteres. */
@@ -275,9 +529,10 @@ export function desenharEsboco(esboco) {
   const olho = normalizar(V.olho);
   const projetadas = opcoes.map(({ opcao, formas }) => {
     const itens = formas.map((r) => {
-      const fs = faces(r).filter((f) => dot(f.n, olho) > 1e-6);
-      const todos = faces(r).flatMap((f) => f.pts).map(V.p);
-      return { r, fs, casco: casco(todos), prof: dot(r.centro, olho) };
+      const chunks = fatiarForma(r, olho);
+      const fs = chunks.flatMap((ch) => [...ch.lados, ...ch.dentro, ...ch.tampas]);
+      const todos = fs.flatMap((f) => f.pts).map(V.p);
+      return { r, chunks, fs, casco: casco(todos), prof: dot(r.centro, olho) };
     });
     const pts = itens.flatMap((i) => i.casco);
     const min = [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))];
@@ -299,58 +554,384 @@ export function desenharEsboco(esboco) {
     const tela = (q) => [cx + q[0] * escala, cy + q[1] * escala];
     if (k > 0) partes.push(`<line x1="${x0}" y1="20" x2="${x0}" y2="${altura - 20}" stroke="#cccccc" stroke-width="2"/>`);
     partes.push(`<text x="${x0 + PAINEL_L / 2}" y="44" font-size="26" font-weight="bold" text-anchor="middle">${esc(p.opcao.titulo ?? `Opção ${k + 1}`)}</text>`);
-    const ordem = [...p.itens].sort((a, b) => a.prof - b.prof || a.r.min[1] - b.r.min[1]);
-    for (const it of ordem) {
-      const base = hexDe(it.r.forma.cor);
-      const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
-      const dentro = it.fs.filter((f) => f.papel === 'dentro');
-      const lados = it.fs.filter((f) => f.papel === 'lado');
-      const tampas = it.fs.filter((f) => f.papel === 'tampa');
-      for (const f of [...dentro, ...lados]) {
-        const c = tint(f.n);
-        partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
-      }
-      /* Aresta viva entre faces laterais vizinhas (achatado, canto de caixa). */
-      const todasLados = faces(it.r).filter((f) => f.papel === 'lado');
-      todasLados.forEach((f, i) => {
-        const g = todasLados[(i + 1) % todasLados.length];
-        if (dot(f.n, g.n) < Math.cos((25 * Math.PI) / 180) && (dot(f.n, olho) > 0 || dot(g.n, olho) > 0)) {
-          const [a, b2] = [V.p(f.pts[1]), V.p(f.pts[2])].map(tela);
-          partes.push(`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b2[0])}" y2="${f1(b2[1])}" stroke="#111111" stroke-width="2"/>`);
+
+    // 1. Spans de formas (mantém fatias contíguas e divide apenas penetrações em furos)
+    const splitPoints = new Map();
+    for (const itA of p.itens) {
+      for (const itB of p.itens) {
+        if (itA === itB) continue;
+        const bTemFuro = itB.r.forma.diametroInterno !== undefined || itB.r.forma.furo !== undefined;
+        if (bTemFuro) {
+          const distEixo = Math.hypot(itA.r.centro[0] - itB.r.centro[0], itA.r.centro[1] - itB.r.centro[1]);
+          const rFuro = (itB.r.forma.diametroInterno ?? 0) / 2;
+          const minA = Math.min(...itA.chunks.map((c) => c.prof));
+          const maxA = Math.max(...itA.chunks.map((c) => c.prof));
+          const minB = Math.min(...itB.chunks.map((c) => c.prof));
+          const maxB = Math.max(...itB.chunks.map((c) => c.prof));
+          if (distEixo < rFuro && minA < minB && maxA > maxB) {
+            if (!splitPoints.has(itA.r.forma.id)) splitPoints.set(itA.r.forma.id, []);
+            splitPoints.get(itA.r.forma.id).push(maxB);
+          }
         }
-      });
-      for (const f of tampas) {
-        const d = caminho(f.pts.map(V.p).map(tela)) + (f.furo ? caminho(f.furo.map(V.p).map(tela)) : '');
-        partes.push(`<path d="${d}" fill="${tint(f.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
       }
-      partes.push(`<path d="${caminho(it.casco.map(tela))}" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round"/>`);
     }
+
+    const gruposChunks = [];
+    for (const it of p.itens) {
+      const splits = (splitPoints.get(it.r.forma.id) ?? []).sort((a, b) => a - b);
+      if (splits.length === 0) {
+        const minP = Math.min(...it.chunks.map((c) => c.prof));
+        const maxP = Math.max(...it.chunks.map((c) => c.prof));
+        gruposChunks.push({ tipo: 'forma', r: it.r, chunks: it.chunks, profMedia: (minP + maxP) / 2 });
+      } else {
+        let curr = [];
+        let splitIdx = 0;
+        for (const ch of it.chunks) {
+          if (splitIdx < splits.length && ch.prof > splits[splitIdx] + 0.1) {
+            if (curr.length > 0) {
+              gruposChunks.push({
+                tipo: 'forma',
+                r: it.r,
+                chunks: curr,
+                profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+              });
+              curr = [];
+            }
+            splitIdx++;
+          }
+          curr.push(ch);
+        }
+        if (curr.length > 0) {
+          gruposChunks.push({
+            tipo: 'forma',
+            r: it.r,
+            chunks: curr,
+            profMedia: (curr[0].prof + curr[curr.length - 1].prof) / 2,
+          });
+        }
+      }
+    }
+
+    /* Linhas de centro: eixos de rotação (cilindros/anéis) e furos passantes. */
+    const querLinhasCentroGeral = Boolean(p.opcao.linhasCentro);
+    const segmentosCentro = [];
+
+    for (const it of p.itens) {
+      const f = it.r.forma;
+      const querCentro = f.linhaCentro !== undefined ? Boolean(f.linhaCentro) : querLinhasCentroGeral;
+      if (!querCentro) continue;
+
+      const ext = typeof f.linhaCentro === 'object' && typeof f.linhaCentro.extensao === 'number'
+        ? f.linhaCentro.extensao
+        : 8;
+
+      const mundoDe = (u, v, w) => {
+        const pl = ponto3(it.r.prisma.b, u, v, w);
+        const pr = aplicarMatriz(pl, it.r.matriz);
+        return [pr[0] + it.r.centro[0], pr[1] + it.r.centro[1], pr[2] + it.r.centro[2]];
+      };
+
+      if (f.tipo === 'cilindro' || f.tipo === 'anel') {
+        const L = it.r.prisma.comprimento;
+        const p1 = mundoDe(0, 0, -L / 2);
+        const p2 = mundoDe(0, 0, L / 2);
+        segmentosCentro.push({ p1, p2, ext, ehEixo: true });
+      } else if (f.tipo === 'caixa') {
+        const L = it.r.prisma.comprimento;
+        const centrosFuros = [];
+        if (Array.isArray(f.furos)) {
+          for (const item of f.furos) centrosFuros.push(item.centro ?? [0, 0]);
+        } else if (f.furo && typeof f.furo === 'object') {
+          centrosFuros.push(f.furo.centro ?? [0, 0]);
+        }
+        for (const cf of centrosFuros) {
+          const p1 = mundoDe(cf[0], cf[1], -L / 2);
+          const p2 = mundoDe(cf[0], cf[1], L / 2);
+          segmentosCentro.push({ p1, p2, ext, ehEixo: false });
+        }
+      }
+    }
+
+    // Fusão de segmentos colineares (mesmo eixo geométrico 3D)
+    const gruposColineares = new Map();
+    for (const seg of segmentosCentro) {
+      const v = [seg.p2[0] - seg.p1[0], seg.p2[1] - seg.p1[1], seg.p2[2] - seg.p1[2]];
+      const len = Math.hypot(...v);
+      if (len < 1e-4) continue;
+      let d = [v[0] / len, v[1] / len, v[2] / len];
+      if (d[0] < -1e-4 || (Math.abs(d[0]) <= 1e-4 && (d[1] < -1e-4 || (Math.abs(d[1]) <= 1e-4 && d[2] < -1e-4)))) {
+        d = [-d[0], -d[1], -d[2]];
+      }
+      const proj = seg.p1[0] * d[0] + seg.p1[1] * d[1] + seg.p1[2] * d[2];
+      const p0 = [seg.p1[0] - proj * d[0], seg.p1[1] - proj * d[1], seg.p1[2] - proj * d[2]];
+      const chave = `${d.map((n) => Math.round(n * 100)).join(',')}|${p0.map((n) => Math.round(n * 2)).join(',')}`;
+      if (!gruposColineares.has(chave)) {
+        gruposColineares.set(chave, { d, p0, tMin: Infinity, tMax: -Infinity, extMax: 0, ehEixo: false });
+      }
+      const g = gruposColineares.get(chave);
+      const t1 = seg.p1[0] * d[0] + seg.p1[1] * d[1] + seg.p1[2] * d[2];
+      const t2 = seg.p2[0] * d[0] + seg.p2[1] * d[1] + seg.p2[2] * d[2];
+      g.tMin = Math.min(g.tMin, t1, t2);
+      g.tMax = Math.max(g.tMax, t1, t2);
+      g.extMax = Math.max(g.extMax, seg.ext);
+      if (seg.ehEixo) g.ehEixo = true;
+    }
+
+    for (const g of gruposColineares.values()) {
+      const pIni = [
+        g.p0[0] + (g.tMin - g.extMax) * g.d[0],
+        g.p0[1] + (g.tMin - g.extMax) * g.d[1],
+        g.p0[2] + (g.tMin - g.extMax) * g.d[2],
+      ];
+      const pFim = [
+        g.p0[0] + (g.tMax + g.extMax) * g.d[0],
+        g.p0[1] + (g.tMax + g.extMax) * g.d[1],
+        g.p0[2] + (g.tMax + g.extMax) * g.d[2],
+      ];
+      const q1 = tela(V.p(pIni));
+      const q2 = tela(V.p(pFim));
+      const prof = g.ehEixo
+        ? Math.max(dot(pIni, olho), dot(pFim, olho)) + 0.5
+        : dot([(pIni[0] + pFim[0]) / 2, (pIni[1] + pFim[1]) / 2, (pIni[2] + pFim[2]) / 2], olho);
+
+      gruposChunks.push({
+        tipo: 'linhaCentro',
+        profMedia: prof,
+        ch: { q1, q2 },
+      });
+    }
+
+    gruposChunks.sort((a, b) => a.profMedia - b.profMedia);
+
+    function encadearLinhas(linhas2d) {
+      const segs = linhas2d.map(([p1, p2]) => [p1, p2]);
+      const cadeias = [];
+      const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+      while (segs.length > 0) {
+        let cadeia = segs.pop();
+        let expandiu = true;
+        while (expandiu) {
+          expandiu = false;
+          const head = cadeia[0];
+          const tail = cadeia[cadeia.length - 1];
+
+          for (let i = 0; i < segs.length; i++) {
+            const [p1, p2] = segs[i];
+            if (dist(tail, p1) < 0.5) {
+              cadeia.push(p2);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(tail, p2) < 0.5) {
+              cadeia.push(p1);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(head, p2) < 0.5) {
+              cadeia.unshift(p1);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            } else if (dist(head, p1) < 0.5) {
+              cadeia.unshift(p2);
+              segs.splice(i, 1);
+              expandiu = true;
+              break;
+            }
+          }
+        }
+        cadeias.push(cadeia);
+      }
+      return cadeias;
+    }
+
+    for (const g of gruposChunks) {
+      if (g.tipo === 'linhaCentro') {
+        partes.push(`<line x1="${f1(g.ch.q1[0])}" y1="${f1(g.ch.q1[1])}" x2="${f1(g.ch.q2[0])}" y2="${f1(g.ch.q2[1])}" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>`);
+        continue;
+      }
+
+      const base = hexDe(g.r.forma.cor);
+      const tint = (n) => cor(base, 0.55 + 0.5 * Math.max(0, dot(n, LUZ)));
+
+      // 1. Faces coloridas
+      for (const ch of g.chunks) {
+        for (const f of [...ch.dentro, ...ch.lados]) {
+          const c = tint(f.n);
+          partes.push(`<path d="${caminho(f.pts.map(V.p).map(tela))}" fill="${c}" stroke="${c}" stroke-width="0.8" stroke-linejoin="round"/>`);
+        }
+      }
+
+      // 2. Tampas
+      for (const ch of g.chunks) {
+        for (const t of ch.tampas) {
+          let d = caminho(t.pts.map(V.p).map(tela));
+          if (t.furos && t.furos.length > 0) {
+            for (const f of t.furos) {
+              d += ' ' + caminho(f.map(V.p).map(tela));
+            }
+          } else if (t.furo) {
+            d += ' ' + caminho(t.furo.map(V.p).map(tela));
+          }
+          partes.push(`<path d="${d}" fill="${tint(t.n)}" fill-rule="evenodd" stroke="#111111" stroke-width="2" stroke-linejoin="round"/>`);
+        }
+      }
+
+      // 3. Arcos de borda traseira
+      for (const ch of g.chunks) {
+        for (const arc of ch.arcos ?? []) {
+          if (arc.length < 2) continue;
+          partes.push(`<path d="${caminhoAberto(arc.map(V.p).map(tela))}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+        }
+      }
+
+      // 4. Silhuetas axiais contínuas encadeadas
+      const todasLinhas2d = g.chunks.flatMap((ch) => ch.linhas.map((l) => l.map(V.p).map(tela)));
+      const cadeias = encadearLinhas(todasLinhas2d);
+      for (const cadeia of cadeias) {
+        if (cadeia.length < 2) continue;
+        if (cadeia.length === 2) {
+          partes.push(`<line x1="${f1(cadeia[0][0])}" y1="${f1(cadeia[0][1])}" x2="${f1(cadeia[1][0])}" y2="${f1(cadeia[1][1])}" stroke="#111111" stroke-width="2" stroke-linecap="round"/>`);
+        } else {
+          partes.push(`<path d="${caminhoAberto(cadeia)}" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+        }
+      }
+    }
+
     /* Rótulos: fora do desenho, à esquerda ou à direita, empilhados sem colidir. */
     const esquerda = x0 + 20;
     const direita = x0 + PAINEL_L - 20;
     const meio = x0 + PAINEL_L / 2;
-    const rotulados = p.itens.filter((it) => it.r.forma.rotulo).map((it) => {
-      const cs = it.casco.map(tela);
-      const centro = [cs.reduce((s, q) => s + q[0], 0) / cs.length, cs.reduce((s, q) => s + q[1], 0) / cs.length];
-      const lado = centro[0] < meio ? 'e' : 'd';
-      /* A âncora fica na borda da silhueta voltada para o rótulo, que é a
-         parte que as outras formas menos cobrem; entra 8 px para dentro. */
-      const extremo = lado === 'e' ? Math.min(...cs.map((q) => q[0])) : Math.max(...cs.map((q) => q[0]));
-      const naBorda = cs.filter((q) => Math.abs(q[0] - extremo) < 3).sort((a, b) => Math.abs(a[1] - centro[1]) - Math.abs(b[1] - centro[1]))[0];
-      const ancora = [naBorda[0] + (lado === 'e' ? 8 : -8), naBorda[1]];
-      return { it, ancora, lado };
-    });
+    const contagemLados = { e: 0, d: 0 };
+    const rotulados = p.itens
+      .filter((it) => it.r.forma.rotulo)
+      .map((it, idx) => {
+        const rotInfo = typeof it.r.forma.rotulo === 'object'
+          ? it.r.forma.rotulo
+          : { texto: it.r.forma.rotulo };
+        const cTela = tela(V.p(it.r.centro));
+        const corPeca = hexDe(it.r.forma.cor);
+        const fForma = it.r.forma;
+        const dimMm = fForma.diametro ?? fForma.diametroExterno ?? fForma.largura ?? 40;
+        const raioTela = Math.max(14, (dimMm / 2) * escala * 0.75);
+
+        // Pontos de amostragem da peça nas faces externas (exclui paredes internas de furos)
+        const facesExternas = it.chunks.flatMap((ch) => [...ch.lados, ...ch.tampas]);
+        const ptsVertices = facesExternas.flatMap((f) => f.pts).map(V.p).map(tela);
+        const ptsCentros = facesExternas.map((f) => {
+          const m = f.pts.reduce((acc, p) => [acc[0] + p[0] / f.pts.length, acc[1] + p[1] / f.pts.length, acc[2] + p[2] / f.pts.length], [0, 0, 0]);
+          return tela(V.p(m));
+        });
+        const todosPontos = [...ptsVertices, ...ptsCentros];
+
+        // Furos da própria peça projetados na tela
+        const furosTela = it.chunks
+          .flatMap((ch) => ch.tampas)
+          .flatMap((t) => t.furos ?? (t.furo ? [t.furo] : []))
+          .map((fu) => fu.map(V.p).map(tela));
+
+        // Peças que estão na frente desta (profundidade maior no espaço isométrico)
+        const pecasNaFrente = p.itens.filter((o) => o !== it && o.prof > it.prof - 5);
+
+        // Avalia o melhor ponto de âncora para cada lado ('e' ou 'd')
+        const avaliarLado = (ladoCand) => {
+          const alvoX = cTela[0] + (ladoCand === 'e' ? -raioTela : raioTela);
+          const alvoY = cTela[1];
+          let melhor = todosPontos[0] ?? cTela;
+          let melhorScore = Infinity;
+          let menorOclusao = Infinity;
+
+          for (const pt of todosPontos) {
+            // Penaliza pontos que apontam no sentido oposto ao rótulo
+            const penalidadeLado = ladoCand === 'e' ? (pt[0] > cTela[0] ? 80 : 0) : (pt[0] < cTela[0] ? 80 : 0);
+            
+            // Penalidade de oclusão por peças que estão na frente
+            let penalidadeOclusao = 0;
+            for (const frente of pecasNaFrente) {
+              const poly = frente.casco.map(tela);
+              const dist = distPoligono(pt, poly);
+              if (dist === 0) {
+                penalidadeOclusao += 5000;
+              } else if (dist < 18) {
+                penalidadeOclusao += (18 - dist) * 150;
+              }
+            }
+
+            // Penalidade de proximidade a furos da própria peça (evita ancorar no furo)
+            let penalidadeFuro = 0;
+            for (const fTela of furosTela) {
+              const distF = distPoligono(pt, fTela);
+              if (distF === 0) {
+                penalidadeFuro += 6000;
+              } else if (distF < 16) {
+                penalidadeFuro += (16 - distF) * 250;
+              }
+            }
+
+            const distAlvo = Math.hypot(pt[0] - alvoX, pt[1] - alvoY);
+            const scoreTotal = distAlvo + penalidadeLado + penalidadeOclusao + penalidadeFuro;
+            if (scoreTotal < melhorScore) {
+              melhorScore = scoreTotal;
+              melhor = pt;
+              menorOclusao = penalidadeOclusao;
+            }
+          }
+          return { pt: melhor, score: melhorScore, oclusao: menorOclusao };
+        };
+
+        const resE = avaliarLado('e');
+        const resD = avaliarLado('d');
+
+        let lado;
+        if (rotInfo.lado) {
+          lado = String(rotInfo.lado).startsWith('d') ? 'd' : 'e';
+        } else {
+          // Se um lado tiver oclusão severa e o outro não, escolhe o lado livre
+          if (resE.oclusao > 100 && resD.oclusao <= 100) {
+            lado = 'd';
+          } else if (resD.oclusao > 100 && resE.oclusao <= 100) {
+            lado = 'e';
+          } else {
+            // Ambos os lados livres ou equivalentes: balanceia número de rótulos
+            if (contagemLados.e !== contagemLados.d) {
+              lado = contagemLados.e < contagemLados.d ? 'e' : 'd';
+            } else {
+              lado = cTela[0] < meio ? 'e' : 'd';
+            }
+          }
+        }
+        contagemLados[lado]++;
+
+        const melhorPt = (lado === 'e' ? resE : resD).pt;
+        const dx = melhorPt[0] - cTela[0];
+        const dy = melhorPt[1] - cTela[1];
+        const distC = Math.hypot(dx, dy) || 1;
+        const ancora = [melhorPt[0] - (dx / distC) * 3, melhorPt[1] - (dy / distC) * 3];
+
+        return {
+          it,
+          texto: rotInfo.texto,
+          numero: idx + 1,
+          ancora,
+          lado,
+          corPeca,
+        };
+      });
+
     for (const lado of ['e', 'd']) {
       const grupo = rotulados.filter((r) => r.lado === lado).sort((a, b) => a.ancora[1] - b.ancora[1]);
       let ultimo = TOPO + 10;
       for (const r of grupo) {
-        const linhas = quebrar(r.it.r.forma.rotulo, 15);
+        const textoCompleto = `${r.numero}. ${r.texto}`;
+        const linhas = quebrar(textoCompleto, 20);
         const y = Math.max(r.ancora[1], ultimo + 12);
         ultimo = y + linhas.length * 20;
         const xt = lado === 'e' ? esquerda : direita;
-        const xl = lado === 'e' ? esquerda + 135 : direita - 135;
-        partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/><circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="4" fill="#222222"/>`);
-        linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="16" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
+        const xl = lado === 'e' ? esquerda + 145 : direita - 145;
+        partes.push(`<polyline points="${f1(xl)},${f1(y)} ${f1(r.ancora[0])},${f1(r.ancora[1])}" fill="none" stroke="#222222" stroke-width="1.5"/>`);
+        partes.push(`<circle cx="${f1(r.ancora[0])}" cy="${f1(r.ancora[1])}" r="5" fill="${r.corPeca}" stroke="#111111" stroke-width="1.5"/>`);
+        linhas.forEach((l, i) => partes.push(`<text x="${xt}" y="${f1(y + 6 + i * 20)}" font-size="15" font-weight="${i === 0 ? 'bold' : 'normal'}" text-anchor="${lado === 'e' ? 'start' : 'end'}">${esc(l)}</text>`));
       }
     }
     quebrar(p.opcao.nota, 58).slice(0, 3).forEach((l, i) => partes.push(`<text x="${x0 + PAINEL_L / 2}" y="${TOPO + PAINEL_A + 26 + i * 24}" font-size="19" text-anchor="middle">${esc(l)}</text>`));
