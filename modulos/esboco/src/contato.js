@@ -213,27 +213,37 @@ const numMm = (v, onde) => {
 
 function lerContato(c, onde) {
   if (c === undefined) return null;
-  if (!c || typeof c !== 'object' || Array.isArray(c)) throw new ErroDeEsboco(`${onde}: "contato" deve ser um objeto { usar, tolerancia, folga, pares }`);
+  if (!c || typeof c !== 'object' || Array.isArray(c)) throw new ErroDeEsboco(`${onde}: "contato" deve ser um objeto { usar, tolerancia, penetracao, folga, pares }`);
   if (c.usar !== undefined && typeof c.usar !== 'boolean') throw new ErroDeEsboco(`${onde}: "contato.usar" deve ser true ou false`);
   const pares = [];
   if (c.pares !== undefined) {
-    if (!Array.isArray(c.pares)) throw new ErroDeEsboco(`${onde}: "contato.pares" deve ser uma lista de { a, b, tipo }`);
+    if (!Array.isArray(c.pares)) throw new ErroDeEsboco(`${onde}: "contato.pares" deve ser uma lista de { a, b, tipo, max }`);
     for (const [i, p] of c.pares.entries()) {
       if (!p || typeof p.a !== 'string' || typeof p.b !== 'string' || p.a === p.b) throw new ErroDeEsboco(`${onde}: contato.pares[${i}] precisa de "a" e "b", ids diferentes`);
       if (!TIPOS_DE_PAR.includes(p.tipo)) throw new ErroDeEsboco(`${onde}: contato.pares[${i}].tipo deve ser um de ${TIPOS_DE_PAR.join(', ')}`);
-      pares.push({ a: p.a, b: p.b, tipo: p.tipo });
+      if (p.max !== undefined && p.tipo !== 'atravessa') throw new ErroDeEsboco(`${onde}: contato.pares[${i}].max só vale para o tipo atravessa`);
+      pares.push({ a: p.a, b: p.b, tipo: p.tipo, max: numMm(p.max, `${onde}: contato.pares[${i}].max`) });
     }
   }
   return {
-    usar: c.usar, tolerancia: numMm(c.tolerancia, `${onde}: contato.tolerancia`), folga: numMm(c.folga, `${onde}: contato.folga`), pares,
+    usar: c.usar,
+    tolerancia: numMm(c.tolerancia, `${onde}: contato.tolerancia`),
+    penetracao: numMm(c.penetracao, `${onde}: contato.penetracao`),
+    folga: numMm(c.folga, `${onde}: contato.folga`),
+    pares,
   };
 }
 
 const arred = (x) => Math.round(x * 10) / 10;
 
 /* Verifica o contato de todas as opções. Devolve
-   { usar, tolerancia, folga, achados, resultado, opcoes }. Sem `contato` no JSON
-   (ou com `usar` falso em todas as opções) devolve `resultado: 'desligado'` sem medir. */
+   { usar, tolerancia, penetracao, folga, achados, atravessamentos, resultado, opcoes }.
+   `tolerancia` é a folga máxima para ligar duas peças (e para `encosta`);
+   `penetracao` é a sobreposição máxima aceita entre peças que não são `atravessa`.
+   Pares `atravessa` não reprovam, mas cada sobreposição medida vai em
+   `atravessamentos` (do maior para o menor) e, se o par declara `max`, passar dele
+   é o achado `atravessa-excedido`. Sem `contato` no JSON (ou com `usar` falso em
+   todas as opções) devolve `resultado: 'desligado'` sem medir. */
 export function verificarContato(esboco) {
   const raiz = lerContato(esboco?.contato, 'esboço');
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
@@ -256,24 +266,33 @@ export function verificarContato(esboco) {
     for (let e = 0; e < 3; e++) dimensao = Math.max(dimensao, Math.max(...rs.map((r) => r.max[e])) - Math.min(...rs.map((r) => r.min[e])));
   }
   const padraoTol = Math.max(1, dimensao * 0.01);
+  const padraoPen = Math.max(1, dimensao * 0.003);
   const padraoFolga = dimensao * 0.1;
   const tolRaiz = raiz?.tolerancia ?? padraoTol;
+  const penRaiz = raiz?.penetracao ?? padraoPen;
   const folgaRaiz = raiz?.folga ?? padraoFolga;
 
   const achados = [];
+  const atravessamentos = [];
   const resumo = [];
   opcoes.forEach((o, i) => {
     const titulo = o.titulo ?? `Opção ${i + 1}`;
     if (!ativa(i)) { resumo.push({ opcao: titulo, usar: false, resultado: 'desligado' }); return; }
     const tol = lidas[i]?.tolerancia ?? tolRaiz;
+    const penMax = lidas[i]?.penetracao ?? penRaiz;
     const folgaMax = lidas[i]?.folga ?? folgaRaiz;
     const tipos = new Map();
     const chave = (a, b) => (a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`);
-    for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) tipos.set(chave(p.a, p.b), p.tipo);
+    const maximos = new Map();
+    for (const p of [...(raiz?.pares ?? []), ...(lidas[i]?.pares ?? [])]) {
+      tipos.set(chave(p.a, p.b), p.tipo);
+      maximos.set(chave(p.a, p.b), p.max);
+    }
     const rs = resolvidas[i];
     const pecas = rs.map(pecasDe);
     const n = rs.length;
     const achadosDaOpcao = [];
+    const atravessamentosDaOpcao = [];
     const ligados = Array.from({ length: n }, () => []);
     const menorFolga = Array(n).fill(Infinity);
     const folgas = Array.from({ length: n }, () => Array(n).fill(Infinity));
@@ -288,8 +307,14 @@ export function verificarContato(esboco) {
       const par = [rs[a].id, rs[b].id];
       if (tipo === 'encosta') {
         if (folga > tol) achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(folga), detalhe: 'folga' });
-        else if (penetracao > tol) achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), detalhe: 'penetracao' });
-      } else if (tipo !== 'atravessa' && penetracao > tol) {
+        else if (penetracao > penMax) achadosDaOpcao.push({ opcao: titulo, tipo: 'par-nao-encosta', pecas: par, mm: arred(penetracao), detalhe: 'penetracao' });
+      } else if (tipo === 'atravessa') {
+        const max = maximos.get(chave(rs[a].id, rs[b].id));
+        if (arred(penetracao) > 0) {
+          atravessamentosDaOpcao.push({ opcao: titulo, a: par[0], b: par[1], penetracao_mm: arred(penetracao), ...(max === undefined ? {} : { max_mm: arred(max) }) });
+        }
+        if (max !== undefined && penetracao > max) achadosDaOpcao.push({ opcao: titulo, tipo: 'atravessa-excedido', pecas: par, mm: arred(penetracao), max: arred(max) });
+      } else if (penetracao > penMax) {
         achadosDaOpcao.push({ opcao: titulo, tipo: 'colisao', pecas: par, mm: arred(penetracao) });
       }
     }
@@ -317,14 +342,16 @@ export function verificarContato(esboco) {
       achadosDaOpcao.push({ opcao: titulo, tipo: 'voando', pecas: [rs[a].id], mm: Number.isFinite(ate) ? arred(ate) : null });
     }
     achados.push(...achadosDaOpcao);
-    resumo.push({ opcao: titulo, usar: true, tolerancia: arred(tol), folga: arred(folgaMax), resultado: achadosDaOpcao.length ? 'reprovado' : 'aprovado' });
+    atravessamentos.push(...atravessamentosDaOpcao);
+    resumo.push({ opcao: titulo, usar: true, tolerancia: arred(tol), penetracao: arred(penMax), folga: arred(folgaMax), resultado: achadosDaOpcao.length ? 'reprovado' : 'aprovado' });
   });
+  atravessamentos.sort((x, y) => y.penetracao_mm - x.penetracao_mm);
   return {
-    usar: true, tolerancia: arred(tolRaiz), folga: arred(folgaRaiz), achados, resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
+    usar: true, tolerancia: arred(tolRaiz), penetracao: arred(penRaiz), folga: arred(folgaRaiz), achados, atravessamentos, resultado: achados.length ? 'reprovado' : 'aprovado', opcoes: resumo,
   };
 }
 
-const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta' };
+const NOMES = { colisao: 'colisão', longe: 'longe', voando: 'voando', 'par-nao-encosta': 'par não encosta', 'atravessa-excedido': 'atravessa excedido' };
 const mm = (x) => x.toFixed(1).replace('.', ',');
 
 /* Linha legível de um achado. */
@@ -332,7 +359,13 @@ export function descreverAchado(a) {
   const p = a.pecas;
   const base = `[${a.opcao}] ${NOMES[a.tipo]}: `;
   if (a.tipo === 'colisao') return `${base}${p[0]} e ${p[1]} se penetram ${mm(a.mm)} mm`;
+  if (a.tipo === 'atravessa-excedido') return `${base}${p[0]} e ${p[1]} se atravessam ${mm(a.mm)} mm, acima do máximo declarado de ${mm(a.max)} mm`;
   if (a.tipo === 'longe') return `${base}${p[0]} fica a ${mm(a.mm)} mm da peça mais próxima`;
   if (a.tipo === 'voando') return `${base}${p[0]} fora do grupo conectado${a.mm === null ? '' : `, a ${mm(a.mm)} mm dele`}`;
   return `${base}${p[0]} e ${p[1]} deviam encostar, ${a.detalhe === 'penetracao' ? `mas se penetram ${mm(a.mm)} mm` : `mas há ${mm(a.mm)} mm de folga`}`;
+}
+
+/* Linha legível de um atravessamento declarado. */
+export function descreverAtravessamento(t) {
+  return `[${t.opcao}] ${t.a} e ${t.b} se atravessam ${mm(t.penetracao_mm)} mm${t.max_mm === undefined ? '' : ` (máximo declarado ${mm(t.max_mm)} mm)`}`;
 }

@@ -7,7 +7,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
-import { descreverAchado, verificarContato } from '../../modulos/esboco/src/contato.js';
+import { descreverAchado, descreverAtravessamento, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -135,7 +135,9 @@ export async function gerarEsboco(arquivo) {
 function relatarContato(c) {
   if (!c.usar) return '';
   const linhas = c.achados.map((a) => `  ${descreverAchado(a)}`);
-  return `contato (tolerância ${String(c.tolerancia).replace(".", ",")} mm, folga ${String(c.folga).replace(".", ",")} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}`;
+  const atravessa = c.atravessamentos.map((t) => `  ${descreverAtravessamento(t)}`);
+  const v = (x) => String(x).replace('.', ',');
+  return `contato (tolerância ${v(c.tolerancia)} mm, penetração ${v(c.penetracao)} mm, folga ${v(c.folga)} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${atravessa.length ? `atravessamentos declarados:\n${atravessa.join('\n')}\n` : ''}`;
 }
 
 async function principal(argv) {

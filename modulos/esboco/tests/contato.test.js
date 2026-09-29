@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { desenharEsboco, ErroDeEsboco } from '../src/index.js';
-import { descreverAchado, verificarContato } from '../src/contato.js';
+import { descreverAchado, descreverAtravessamento, verificarContato } from '../src/contato.js';
 import { analisarEsboco } from '../../../tools/mecanifica/esboco.mjs';
 
 const caixa = (id, centro, l = 20, a = 20, p = 20, extra = {}) => ({ id, tipo: 'caixa', largura: l, altura: a, profundidade: p, centro, ...extra });
@@ -42,12 +42,67 @@ describe('contato do esboço', () => {
     expect(verificarContato(esboco([caixa('a', [0, 0, 0]), caixa('b', [19.2, 0, 0])])).resultado).toBe('aprovado');
   });
 
-  it('padrões: tolerância 1% e folga 10% da maior dimensão, mínimo 1 mm', () => {
+  it('padrões: tolerância 1%, penetração 0,3% e folga 10% da maior dimensão, mínimo 1 mm', () => {
     const r = verificarContato({ opcoes: [{ formas: [caixa('a', [0, 0, 0], 1000), caixa('b', [1000, 0, 0], 1000)] }], contato: { usar: true } });
     expect(r.tolerancia).toBe(20);
+    /* antes a penetração aceita era a própria tolerância (20 mm); agora é 0,3% de 2000 mm */
+    expect(r.penetracao).toBe(6);
     expect(r.folga).toBe(200);
     const p = verificarContato({ opcoes: [{ formas: [caixa('a', [0, 0, 0]), caixa('b', [20, 0, 0])] }], contato: { usar: true } });
     expect(p.tolerancia).toBe(1);
+    expect(p.penetracao).toBe(1);
+  });
+
+  it('penetração: 10 mm reprova com o padrão pequeno e aprova quando declarada maior', () => {
+    /* conjunto de 2000 mm: penetração padrão 6 mm, tolerância 20 mm. Antes 10 mm passava pela tolerância. */
+    const f = [caixa('a', [0, 0, 0], 1000), caixa('b', [990, 0, 0], 1000)];
+    const base = { opcoes: [{ titulo: 'T', formas: f }], contato: { usar: true } };
+    const r = verificarContato(base);
+    expect(tipos(r)).toEqual(['colisao:a+b']);
+    expect(r.achados[0].mm).toBe(10);
+    const maior = verificarContato({ ...base, contato: { usar: true, penetracao: 12 } });
+    expect(maior.resultado).toBe('aprovado');
+    expect(maior.penetracao).toBe(12);
+    /* a opção sobrepõe a raiz */
+    const opcao = verificarContato({ opcoes: [{ titulo: 'T', formas: f, contato: { penetracao: 12 } }], contato: { usar: true } });
+    expect(opcao.resultado).toBe('aprovado');
+    expect(opcao.opcoes[0].penetracao).toBe(12);
+    /* a tolerância continua só ligando peças: folga de 15 mm liga, penetração declarada não a altera */
+    expect(verificarContato({ opcoes: [{ formas: [caixa('a', [0, 0, 0], 1000), caixa('b', [1015, 0, 0], 1000)] }], contato: { usar: true } }).resultado).toBe('aprovado');
+    /* encosta usa a penetração para a sobreposição */
+    const encosta = { pares: [{ a: 'a', b: 'b', tipo: 'encosta' }] };
+    expect(verificarContato({ ...base, contato: { usar: true, ...encosta } }).achados[0]).toMatchObject({ tipo: 'par-nao-encosta', detalhe: 'penetracao', mm: 10 });
+    expect(verificarContato({ ...base, contato: { usar: true, penetracao: 12, ...encosta } }).resultado).toBe('aprovado');
+  });
+
+  it('atravessa sem max aprova e reporta a profundidade, do maior para o menor', () => {
+    const f = [caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0]), caixa('c', [-5, 0, 0])];
+    const pares = [{ a: 'a', b: 'b', tipo: 'atravessa' }, { a: 'a', b: 'c', tipo: 'atravessa' }, { a: 'b', b: 'c', tipo: 'atravessa' }];
+    const r = verificarContato(esboco(f, { pares }));
+    expect(r.resultado).toBe('aprovado');
+    expect(r.atravessamentos).toEqual([
+      { opcao: 'T', a: 'a', b: 'c', penetracao_mm: 15 },
+      { opcao: 'T', a: 'a', b: 'b', penetracao_mm: 10 },
+      { opcao: 'T', a: 'b', b: 'c', penetracao_mm: 5 },
+    ]);
+    expect(descreverAtravessamento(r.atravessamentos[0])).toBe('[T] a e c se atravessam 15,0 mm');
+    /* par declarado que apenas encosta não aparece */
+    expect(verificarContato(esboco([caixa('a', [0, 0, 0]), caixa('b', [20, 0, 0])], { pares: [{ a: 'a', b: 'b', tipo: 'atravessa' }] })).atravessamentos).toEqual([]);
+  });
+
+  it('atravessa com max: passar do máximo reprova, ficar dentro aprova e informa', () => {
+    const f = [caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0])];
+    const par = (max) => ({ pares: [{ a: 'a', b: 'b', tipo: 'atravessa', max }] });
+    const estoura = verificarContato(esboco(f, par(8)));
+    expect(estoura.resultado).toBe('reprovado');
+    expect(estoura.achados).toEqual([{ opcao: 'T', tipo: 'atravessa-excedido', pecas: ['a', 'b'], mm: 10, max: 8 }]);
+    expect(descreverAchado(estoura.achados[0])).toBe('[T] atravessa excedido: a e b se atravessam 10,0 mm, acima do máximo declarado de 8,0 mm');
+    expect(estoura.atravessamentos).toEqual([{ opcao: 'T', a: 'a', b: 'b', penetracao_mm: 10, max_mm: 8 }]);
+    const cabe = verificarContato(esboco(f, par(10)));
+    expect(cabe.resultado).toBe('aprovado');
+    expect(cabe.atravessamentos[0]).toMatchObject({ penetracao_mm: 10, max_mm: 10 });
+    expect(() => verificarContato(esboco(f, { pares: [{ a: 'a', b: 'b', tipo: 'encosta', max: 5 }] }))).toThrow(/atravessa/);
+    expect(() => verificarContato(esboco(f, par(-1)))).toThrow(/max/);
   });
 
   it('anel: eixo no furo não colide, eixo no aro colide, e atravessa declara a ligação', () => {
@@ -141,12 +196,19 @@ describe('contato do esboço', () => {
     writeFileSync(sem, JSON.stringify({ opcoes: e.opcoes.slice(0, 1) }));
     expect((await analisarEsboco(sem)).manifesto.contato).toMatchObject({ usar: false, resultado: 'desligado', achados: [] });
     expect(JSON.parse(readFileSync(join(pasta, 's-analise', 'manifesto.json'), 'utf8')).contato.resultado).toBe('desligado');
+    /* sem "contato" o bloco do manifesto é exatamente o de antes do limiar de penetração */
+    expect(JSON.stringify((await analisarEsboco(sem)).manifesto.contato)).toBe('{"usar":false,"tolerancia":null,"folga":null,"achados":[],"resultado":"desligado","opcoes":[]}');
+    /* com "contato", o manifesto traz penetração e atravessamentos */
+    const com = join(pasta, 'a.esboco.json');
+    writeFileSync(com, JSON.stringify({ contato: { usar: true, pares: [{ a: 'a', b: 'b', tipo: 'atravessa' }] }, opcoes: [{ titulo: 'A', formas: [caixa('a', [0, 0, 0]), caixa('b', [10, 0, 0])] }] }));
+    expect((await analisarEsboco(com)).manifesto.contato).toMatchObject({ resultado: 'aprovado', penetracao: 1, atravessamentos: [{ opcao: 'A', a: 'a', b: 'b', penetracao_mm: 10 }] });
   }, 60000);
 
   it('recusa configuração inválida', () => {
     const f = [caixa('a', [0, 0, 0]), caixa('b', [20, 0, 0])];
     expect(() => verificarContato(esboco(f, { pares: [{ a: 'a', b: 'b', tipo: 'toca' }] }))).toThrow(/tipo/);
     expect(() => verificarContato(esboco(f, { tolerancia: -1 }))).toThrow(/tolerancia/);
+    expect(() => verificarContato(esboco(f, { penetracao: -1 }))).toThrow(/penetracao/);
     expect(() => verificarContato(esboco(f, { pares: [{ a: 'a', b: 'zz', tipo: 'livre' }] }))).toThrow(/zz/);
   });
 });

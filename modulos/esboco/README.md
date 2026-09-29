@@ -99,16 +99,19 @@ Gate opt-in, feito em `src/contato.js` (`verificarContato`). Na raiz, e por opç
 "contato": {
   "usar": true,
   "tolerancia": 2,
+  "penetracao": 2,
   "folga": 30,
   "pares": [
-    { "a": "alojamento", "b": "eixo", "tipo": "atravessa" },
+    { "a": "alojamento", "b": "eixo", "tipo": "atravessa", "max": 25 },
     { "a": "base", "b": "alojamento", "tipo": "encosta" },
     { "a": "base", "b": "enfeite", "tipo": "livre" }
   ]
 }
 ```
 
-Sem `usar: true` nada muda. Os padrões são `tolerancia` de 1% da maior dimensão do conjunto (mínimo 1 mm) e `folga` de 10% dela, ambas em mm. `atravessa` permite sobreposição e conta como ligação; `encosta` exige folga e penetração dentro da tolerância; `livre` ignora o par (nem colisão, nem ligação, nem folga). Peças `oculto` não entram. Achados por opção: `colisao`, `longe`, `voando` (fora do maior grupo em que duas peças são vizinhas se a folga é no máximo a tolerância ou o par é `atravessa`) e `par-nao-encosta`. `npm run esboco` imprime os achados e `aprovado` ou `reprovado`, `--estrito` termina com código 1 se reprovado e o manifesto da `--analise` ganha `contato`. A imagem não muda.
+Sem `usar: true` nada muda. Há três limiares, todos em mm. `tolerancia` é a folga máxima para duas peças contarem como ligadas e para `encosta`; o padrão é 1% da maior dimensão do conjunto (mínimo 1 mm). `penetracao` é a sobreposição máxima aceita entre peças que não são `atravessa`, e também a de `encosta`; o padrão é 0,3% da maior dimensão (mínimo 1 mm), pois uma sobreposição de 1% já se vê na imagem como uma peça dentro da outra. `folga` é a distância máxima até a peça mais próxima; o padrão é 10% da maior dimensão. Cada um pode ser declarado na raiz e na opção, que sobrepõe a raiz. Um JSON que dependia de a tolerância aceitar penetração passa a reprovar até declarar `penetracao` maior ou desenhar as peças encostadas.
+
+`atravessa` isenta o par de reprovação e conta como ligação, mas a profundidade da sobreposição é sempre medida e reportada em `atravessamentos` (`{ opcao, a, b, penetracao_mm }`, do maior para o menor, com `max_mm` quando o par declara `max`). Um par `atravessa` que só encosta não entra. Se o par traz `max` (mm, só vale em `atravessa`) e a penetração medida passa dele, o achado é `atravessa-excedido` e reprova; sem `max` o par só informa. `encosta` exige folga dentro da tolerância e penetração dentro de `penetracao`; `livre` ignora o par (nem colisão, nem ligação, nem folga, nem atravessamento). Peças `oculto` não entram. Achados por opção: `colisao`, `longe`, `voando` (fora do maior grupo em que duas peças são vizinhas se a folga é no máximo a tolerância ou o par é `atravessa`), `par-nao-encosta` e `atravessa-excedido`. `npm run esboco` imprime os achados, `aprovado` ou `reprovado` e, quando houver, a lista "atravessamentos declarados:"; `--estrito` termina com código 1 se reprovado e o manifesto da `--analise` ganha `contato` (`usar`, `tolerancia`, `penetracao`, `folga`, `achados`, `atravessamentos`, `resultado`, `opcoes`). Sem `contato` o bloco do manifesto é o mesmo de antes. A imagem não muda.
 
 A geometria vem do prisma que o desenho monta. Caixa (com `raio`), cilindro e `achatado` são prismas convexos exatos, com o círculo de 128 lados; a distância é exata (GJK) e a penetração é a menor sobreposição entre eixos de separação (SAT). O anel é cortado em 32 setores convexos com a face interna tangente ao furo (um cilindro menor no furo não colide; um que cruza o aro sim), e a caixa com furos em triângulos. Numa forma cortada em peças a penetração é a maior entre elas, o que subestima um cruzamento que atravessa várias fatias do aro, e o raio externo do anel fica até 0,5% menor.
 
