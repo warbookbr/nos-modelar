@@ -2,17 +2,18 @@
 
 ## Estado
 
-**Plano ativo:** nenhum.
+**Plano ativo:** [As partes do braço](2026-09-26-as-partes-do-braco.md).
 
-Sem plano ativo, o backlog não autoriza implementação.
+O braço robótico segue parte por parte pelo fluxo do objeto, com o ombro de
+coluna unida ao braço já fixo, e sai exportado montado. Cada etapa cumpre o
+passo [Pare e analise](../usar/PARE-E-ANALISE.md) antes de pedir o aceite.
 
 [União de sólidos](encerrados/2026-09-28-uniao-de-solidos.md) fechou em
 2026-09-29 com `unir`, `subtrair` e `intersectar` no núcleo, o arredondamento
 da costura côncava, convexa e interna, o `liso` com ângulo e o ombro refeito
-como coluna unida ao braço, fixado pela pessoa. O candidato principal para
-vir em seguida é [as partes do braço](congelados/2026-09-26-as-partes-do-braco.md),
-congelado em 2026-09-28 e pronto para voltar, com o inventário do que as partes
-restantes pedem no fechamento do plano da união.
+como coluna unida ao braço, fixado pela pessoa. As partes do braço voltaram do
+congelamento no mesmo dia, com o inventário do que elas pedem ao núcleo no
+fechamento desse plano.
 
 [O braço inteiro](encerrados/2026-09-25-o-braco-inteiro.md) fechou em
 2026-09-26 no limite de tamanho, com a porta conferida contra a forma, o

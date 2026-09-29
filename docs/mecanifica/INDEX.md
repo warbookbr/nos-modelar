@@ -178,7 +178,7 @@ inteira. Para consertar um gate: `npm run gates -- --parar-no-primeiro`.
 
 ## Pendências atuais
 
-- Plano ativo: nenhum. [União de sólidos](planos/encerrados/2026-09-28-uniao-de-solidos.md) fechou em 2026-09-29; [as partes do braço](planos/congelados/2026-09-26-as-partes-do-braco.md) é o candidato principal para vir em seguida. Rascunho aberto: [o que o
+- Plano ativo: [as partes do braço](planos/2026-09-26-as-partes-do-braco.md), descongelado em 2026-09-29 depois de a [união de sólidos](planos/encerrados/2026-09-28-uniao-de-solidos.md) fechar. Rascunho aberto: [o que o
   braço robótico achou](planos/2026-09-21-o-que-o-braco-robotico-achou.md), cujo
   resto é tudo código. Dois estão [congelados](planos/congelados/README.md):
   o modelador inverso, de que dependem nova geometria, corpus de priors, fitting
