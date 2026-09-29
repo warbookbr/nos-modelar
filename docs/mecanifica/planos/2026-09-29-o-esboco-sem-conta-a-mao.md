@@ -50,14 +50,43 @@ contato opt-in com `tolerancia`, `penetracao`, `folga`, pares `atravessa`,
 `encosta` e `livre` e `atravessamentos` com profundidade. Esta seção é o que este
 plano não refaz.
 
+## O que o estudo do Mecanifica decidiu
+
+Um estudo de leitura, feito em 2026-09-29, mediu cada mecanismo contra o esboço.
+Só dois arquivos entram como estão: `procedural/nucleo/expressoes.js`, que
+aceita número, nome de parâmetro e `"=a+b*c"`, tem 92 linhas, nenhum import e
+teste, e a função `poseQueEncaixa` de `src/autoria/posicao-por-porta.js`, pura,
+que já calcula o centro e o ângulo de uma haste entre dois pontos (o garfo da
+moto saiu em 24,97°, contra os −25° digitados à mão). O resto se reimplementa
+dentro do módulo, sobre os prismas do esboço: `encostar` com direção e folga
+(cerca de 10 linhas sobre o `apoio()` do gate), `espelha` (cerca de 30, com a
+regra de nome explícito da cópia que o núcleo já usa) e o ponto nomeado (cerca
+de 8). Não servem, e ficam fora do plano: as interfaces de porta e as relações
+`assentaAnular` e `encaixaCilindrico`, que são validadores coaxiais em metro;
+o resolvedor e a montagem v5, que exigem peças com malha e portas resolvidas;
+os `vinculos` e as `etapas`; o `PLANO` estruturado com `criteriosDeReprovacao`;
+e `auditar-intersecoes-montagem`, que devolve estado sem milímetros e roda sete
+vezes mais devagar. O gate do esboço fica no módulo, porque mede distância e
+penetração em mm.
+
+O que o esboço deve herdar é o contrato de declaração do Mecanifica: toda
+exceção declara `motivo` de pelo menos 15 caracteres, `atravessa` exige `max`, e
+`livre`, que hoje cala o par por completo, deixa de existir como saída livre.
+Hoje a moto tem cinco pares `atravessa` sem `max`, que nunca reprovam, e a
+coluna e o tanque se atravessam 20 mm sem alarme. Em `modulos/esboco/` já existe
+uma proposta, `PLANO-ESTADO-DA-ARTE.md`, fora de `planos/` e aguardando
+aprovação, que propõe `de` e `para` e espelho; este plano a absorve, e ela é
+apagada ou marcada como substituída na fatia 1.
+
 ## Filtro Agent-First
 
-A operação é ENVOLVER onde o Mecanifica já tem o mecanismo (`encostar`, `espelha`,
-`arranja`, `TABELA` e `derivar`, portas e relações, `auditar-intersecoes-montagem`)
-e escrever dentro do esboço só o que ele não tem: a projeção por vista e as
-formas novas. Escrever um resolvedor de restrições geral é ADIADO, porque
-encostar, alinhar e espelhar cobrem o que as fotos pedem. Importar a malha de
-uma peça real dentro do esboço também é ADIADO.
+A operação é ENVOLVER onde o estudo achou arquivo puro para importar
+(`expressoes.js` e `poseQueEncaixa`) e reimplementar a ideia onde o mecanismo
+do Mecanifica exige malha, metro ou montagem. Escrever um resolvedor de
+restrições geral é ADIADO, porque encostar, alinhar e espelhar cobrem o que as
+fotos pedem. Importar a malha de uma peça real dentro do esboço também é
+ADIADO. O módulo continua independente do núcleo, e isso é registrado no
+README dele.
 
 ## Incluído
 
@@ -81,8 +110,13 @@ uma peça real dentro do esboço também é ADIADO.
   cone e tronco, extrusão de polígono, chanfro;
 - o gate propondo o conserto (mova X em Y mm para encostar em Z) e `--ajustar`
   gravando um arquivo novo com o deslocamento aplicado, sem sobrescrever;
-- a decisão sobre unificar o gate de contato com `auditar-intersecoes-montagem`
-  ou mantê-lo dentro do módulo, e o que apagar de duplicado;
+- o contrato de declaração do gate herdado do Mecanifica: `motivo` de pelo menos
+  15 caracteres em toda exceção, `max` obrigatório em `atravessa`, o par do
+  espelho herdando a declaração do original, e a decisão de política de a skill
+  ligar o gate por padrão a partir de umas quatro formas;
+- o registro, no README do módulo, de que ele é independente do núcleo e só
+  importa `expressoes.js` e `poseQueEncaixa`, e a substituição do
+  `PLANO-ESTADO-DA-ARTE.md` por este plano;
 - validação do JSON por esquema, com mensagem que diz o campo e o valor
   válido, e um resumo compacto do formato para a IA na skill;
 - desempenho: SVG e tempo menores, e um modo rápido sem PNG;
@@ -91,8 +125,33 @@ uma peça real dentro do esboço também é ADIADO.
 - fixtures com resultado esperado: a moto de prova, o mancal e a casa, com o
   gate e as imagens de referência.
 
+## Formato proposto
+
+O trecho abaixo é a proposta do estudo para a moto, e não está implementado. A
+haste sai de `de` e `para`, o lado direito do espelho, e o café racer diferiria
+do naked por `parametros` na opção.
+
+```json
+{
+  "parametros": { "entreEixos": 1400, "raioFrente": 300, "raioTras": 310 },
+  "pontos": { "cabecote": [0, 898, 421.5] },
+  "opcoes": [{ "titulo": "A. Naked", "formas": [
+    { "id": "rodaFrente", "tipo": "anel", "diametroExterno": "=2*raioFrente", "diametroInterno": 420, "espessura": 110, "eixo": "x", "centro": [0, "raioFrente", "=entreEixos/2"] },
+    { "id": "garfoE", "tipo": "cilindro", "diametro": 46, "de": "rodaFrente.centro", "para": "cabecote", "desloca": [-90, 0, 0] },
+    { "id": "garfoD", "espelha": { "forma": "garfoE", "eixo": "x", "pos": 0 } },
+    { "id": "tanque", "tipo": "caixa", "largura": 300, "altura": 200, "profundidade": 420, "encosta": { "referencia": "motor", "direcao": [0, -1, 0] }, "desloca": [0, 0, 110] }
+  ] }],
+  "contato": { "usar": true, "pares": [
+    { "a": "garfoE", "b": "guidao", "tipo": "atravessa", "max": 15, "motivo": "a presilha do guidão abraça a bengala" }
+  ] }
+}
+```
+
 ## Excluído
 
+- as portas com raio, as relações `assentaAnular` e `encaixaCilindrico`, a
+  montagem v5 com o resolvedor, os `vinculos`, as `etapas` e o `PLANO`
+  estruturado do Mecanifica, e a chamada a `auditar-intersecoes-montagem`;
 - importar a malha de uma peça real dentro do esboço;
 - render tridimensional com sombreamento e cotas dimensionais na imagem, que
   são o fluxo da prancha;
@@ -119,8 +178,11 @@ uma peça real dentro do esboço também é ADIADO.
 
 ## Fatias
 
-1. O estudo do que reaproveitar do Mecanifica, as decisões de acoplamento e o
-   formato do JSON com a compatibilidade escrita.
+1. As decisões do estudo postas em código e texto: importar `expressoes.js` e
+   `poseQueEncaixa`, registrar a independência no README, absorver ou apagar o
+   `PLANO-ESTADO-DA-ARTE.md`, e o contrato de declaração do gate (`motivo`,
+   `max` obrigatório, `livre` restrito) com o formato do JSON e a compatibilidade
+   escritos.
 2. `--descrever` e as âncoras nomeadas.
 3. A sobreposição na projeção por vista, com vista explodida e arestas ocultas
    tracejadas.
