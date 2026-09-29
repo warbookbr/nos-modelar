@@ -1,6 +1,7 @@
 /* adaptador.js — projeção visual do neutro; não conhece receitas nem execução. */
 import { N_INFLU, norm3, normalDaFace, temNomeDeParte } from './nucleo.js';
 import { normalLisaDoCanto } from './liso-por-angulo.js';
+import { triangularFace } from './triangulacao-face.js';
 
 /* ----------------------------------------------------------------------------
    ADAPTADOR v3: neutro -> formato do motor. É a ÚNICA peça que muda de mundo
@@ -197,9 +198,9 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
     if (!g) { g = { parte: f.parte || null, mat: f.material || null, mesh: { v: [] } }; grupos.set(ch, g); }
     const projeta = atlasFace.get(f.id).projeta;
     const nf = nFace.get(f.id);
-    const c0 = f.vs[0];
-    for (let k = 1; k < f.vs.length - 1; k++) {   // leque a partir do primeiro canto
-      for (const v of [c0, f.vs[k], f.vs[k + 1]]) {
+    /* triangulação da face: leque nas pequenas e nas côncavas, subdivisão equilibrada nas convexas grandes (triangulacao-face.js) */
+    for (const [ia, ib, ic] of triangularFace(f.vs.map((v) => V.get(v)))) {
+      for (const v of [f.vs[ia], f.vs[ib], f.vs[ic]]) {
         const p = V.get(v);
         const uv = projeta(p);
         const n = (f.liso && normalLisa(f, v)) || nf;

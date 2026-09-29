@@ -1,6 +1,7 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
 import { normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { triangularConvexa } from '../../procedural/nucleo/triangulacao-face.js';
 
 const COR_PADRAO = '#77817d';
 
@@ -102,9 +103,16 @@ function dentroDoTriangulo(a, b, c, p) {
  * degenerado) para a conversão com diagnóstico; nunca vira face faltando em
  * silêncio.
  */
+const quad2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2;
+
 function triangularPoligono(pontos, normal, rotulo) {
   const n = pontos.length;
   if (n === 3) return [[0, 1, 2]];
+  /* face convexa grande: subdivisão equilibrada em vez de orelhas em sequência,
+     que num polígono convexo cortam sempre o mesmo canto e refazem o leque
+     (dezenas de triângulos finos saindo de um vértice). */
+  const equilibrada = triangularConvexa(pontos);
+  if (equilibrada) return equilibrada;
   /* quadro 2D com (u, w, normal) destro: assim o contorno, que já é CCW em
      torno da normal, sai CCW em (u,w) e a área assinada é positiva. */
   const eixo = Math.abs(normal[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
@@ -123,9 +131,16 @@ function triangularPoligono(pontos, normal, rotulo) {
 
   const restantes = uv.map((_, i) => i);
   const tris = [];
+  const grau = new Array(n).fill(0);
+  /* Face de 8 cantos ou mais: entre as orelhas livres corta a de melhor forma
+     (soma dos lados ao quadrado sobre a área, ponderada pelos triângulos que os
+     três cantos já têm). Cortar sempre a primeira orelha livre refaz o leque
+     num polígono côncavo grande, como o pedaço de uma união. Face pequena
+     continua cortando a primeira, o que mantém a malha de sempre. */
+  const escolhe = n >= 8;
   let guarda = 2 * n;
   while (restantes.length > 3 && guarda-- > 0) {
-    let cortou = false;
+    let cortou = -1, melhorNota = Infinity;
     for (let k = 0; k < restantes.length; k++) {
       const ia = restantes[(k + restantes.length - 1) % restantes.length];
       const ib = restantes[k];
@@ -138,14 +153,21 @@ function triangularPoligono(pontos, normal, rotulo) {
         if (dentroDoTriangulo(uv[ia], uv[ib], uv[ic], uv[j])) { livre = false; break; }
       }
       if (!livre) continue;
-      tris.push([ia, ib, ic]);
-      restantes.splice(k, 1);
-      cortou = true;
-      break;
+      if (!escolhe) { cortou = k; break; }
+      const q = (quad2(uv[ia], uv[ib]) + quad2(uv[ib], uv[ic]) + quad2(uv[ic], uv[ia])) / area;
+      const nota = q * (1 + 0.25 * (grau[ia] + grau[ib] + grau[ic]));
+      /* empate a menos de 1e-9 fica com a primeira orelha: a conta muda na última casa quando a peça é transladada */
+      if (cortou < 0 || nota < melhorNota * (1 - 1e-9)) { cortou = k; melhorNota = nota; }
     }
-    if (!cortou) {
+    if (cortou < 0) {
       throw new Error(`adaptarThree: ${rotulo} não fecha em orelhas (${n} cantos): contorno auto-interseccionado ou degenerado`);
     }
+    const ia = restantes[(cortou + restantes.length - 1) % restantes.length];
+    const ib = restantes[cortou];
+    const ic = restantes[(cortou + 1) % restantes.length];
+    tris.push([ia, ib, ic]);
+    grau[ia]++; grau[ib]++; grau[ic]++;
+    restantes.splice(cortou, 1);
   }
   if (restantes.length === 3) tris.push([restantes[0], restantes[1], restantes[2]]);
   return tris;

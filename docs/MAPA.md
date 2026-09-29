@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-815 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+817 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -456,6 +456,7 @@
 - `render.js` — O VISOR do motor v3 (D-55) — o ambiente PADRÃO onde toda peça é criada e auditada: framebuffer fixo (?res) com upscale NEAREST (pixel art, custo independente…
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `tex.js` — helpers de TEXTURA do motor v3 (D-55) — paleta Resurrect64, ruído, dither e o gerador de canvas. Uma peça pode devolver índice da paleta OU [r,g,b] direto (m…
+- `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
 
 ## procedural/nucleo/operacoes/
@@ -480,6 +481,7 @@
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
 - `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …
 
 ## procedural/pecas/braco-robotico/
