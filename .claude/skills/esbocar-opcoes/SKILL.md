@@ -12,6 +12,10 @@ descrevê-las em texto. A referência completa do JSON está em
 [`modulos/esboco/README.md`](../../../modulos/esboco/README.md); esta skill
 diz como usá-la no alinhamento.
 
+## Pare e planeje
+
+Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores). E se o conjunto vira um esboço só ou vários. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+
 ## Escrever e rodar
 
 Escreva `<peça>/referencias/<assunto>.esboco.json` e rode
@@ -57,7 +61,7 @@ ilustrativo, e divida em vários esboços.
 ## Conferir antes de mostrar
 
 Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode
-`npm run esboco -- <arquivo> --analise` e leia as imagens conforme a seção
+`npm run esboco -- <arquivo> --analise` (8 imagens, sem linhas de centro; acrescente `--centros` só se a pessoa quiser vê-las, o que gera 16) e leia as imagens conforme a seção
 Esboço de
 [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md):
 legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e

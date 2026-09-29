@@ -248,16 +248,38 @@ describe('esboço', () => {
       expect(() => lerZoomDoEsboco('frontal:30,2,1,40')).toThrow(ErroDeEsboco);
     });
 
-    it('gera 16 imagens, o zoom e um manifesto com o hash do esboço', async () => {
+    it('gera 8 imagens sem centros, o zoom e um manifesto com o hash e o plano, sem alterar o JSON', async () => {
       const dir = mkdtempSync(join(tmpdir(), 'analise-esboco-'));
       const arquivo = join(dir, 'peca.esboco.json');
-      writeFileSync(arquivo, JSON.stringify(cru));
+      const origem = JSON.stringify({ ...cru, linhasCentro: true, plano: 'nível: conceito' });
+      writeFileSync(arquivo, origem);
       const { pasta, manifesto } = await analisarEsboco(arquivo, { zoom: 'frontal:100,150,300,300' });
-      expect(manifesto.arquivos.filter((a) => !a.startsWith('zoom-')).length).toBe(VISTAS_DA_ANALISE.length * 4);
+      const imagens = manifesto.arquivos.filter((a) => !a.startsWith('zoom-'));
+      expect(imagens.length).toBe(VISTAS_DA_ANALISE.length * 2);
+      expect(imagens.some((a) => /-centros\.png$/.test(a) && !/sem-centros/.test(a))).toBe(false);
       expect(manifesto.arquivos.filter((a) => a.startsWith('zoom-')).length).toBe(2);
       for (const a of manifesto.arquivos) expect(existsSync(join(pasta, a))).toBe(true);
       expect(manifesto.esboco).toMatch(/^[0-9a-f]{64}$/);
+      expect(manifesto.centros).toBe(false);
+      expect(manifesto.forcado).toEqual({ linhasCentro: false });
+      expect(manifesto.plano).toBe('nível: conceito');
+      expect(readFileSync(arquivo, 'utf8')).toBe(origem);
       expect(JSON.parse(readFileSync(join(pasta, 'manifesto.json'), 'utf8')).arquivos).toEqual(manifesto.arquivos);
     }, 60000);
+
+    it('com centros gera as 16 imagens', async () => {
+      const dir = mkdtempSync(join(tmpdir(), 'analise-esboco-'));
+      const arquivo = join(dir, 'peca.esboco.json');
+      writeFileSync(arquivo, JSON.stringify(cru));
+      const { manifesto } = await analisarEsboco(arquivo, { centros: true });
+      expect(manifesto.arquivos.length).toBe(VISTAS_DA_ANALISE.length * 4);
+      expect(manifesto.arquivos.filter((a) => /-centros\.png$/.test(a) && !/sem-centros/.test(a)).length).toBe(VISTAS_DA_ANALISE.length * 2);
+      expect(manifesto.forcado).toEqual({});
+    }, 60000);
+
+    it('o campo plano é aceito e não muda o desenho', () => {
+      const base = { opcoes: [{ formas: [{ id: 'a', tipo: 'caixa', largura: 10, altura: 10, profundidade: 10, cor: 'cinza' }] }] };
+      expect(desenharEsboco({ ...base, plano: 'texto' }).svg).toBe(desenharEsboco(base).svg);
+    });
   });
 });

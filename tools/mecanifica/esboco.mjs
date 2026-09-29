@@ -9,7 +9,7 @@ import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
-/* `navegador` opcional: a análise abre um só para as 16 imagens. */
+/* `navegador` opcional: a análise abre um só para as imagens. */
 export async function svgParaPng(svg, largura, altura, destino, navegador = null) {
   const proprio = !navegador;
   if (proprio) navegador = (await (await import('playwright')).default.chromium.launch());
@@ -23,8 +23,9 @@ export async function svgParaPng(svg, largura, altura, destino, navegador = null
   }
 }
 
-/* Matriz de conferência: cada vista, com e sem legendas, com e sem linhas de
-   centro. O `ocultar` do arquivo é preservado nos outros elementos; só os
+/* Matriz de conferência: cada vista, com e sem legendas; sem linhas de centro
+   por padrão (linhasCentro forçado a false em todos os níveis, sem editar o
+   JSON) e, com `--centros`, também com elas. O `ocultar` do arquivo é preservado nos outros elementos; só os
    nomes `legendas` e `linhasCentro` são impostos em todos os níveis. */
 export const VISTAS_DA_ANALISE = Object.keys(VISTAS);
 export const AMPLIACAO_DO_ZOOM = 3;
@@ -62,7 +63,7 @@ export function lerZoomDoEsboco(texto) {
   return { vista, caixa: [x0, y0, x1, y1] };
 }
 
-export async function analisarEsboco(arquivo, { zoom = null } = {}) {
+export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros = false } = {}) {
   const caminho = resolve(arquivo);
   const texto = readFileSync(caminho, 'utf8');
   const esboco = JSON.parse(texto);
@@ -81,7 +82,7 @@ export async function analisarEsboco(arquivo, { zoom = null } = {}) {
   try {
     for (const vista of VISTAS_DA_ANALISE) {
       for (const legendas of [true, false]) {
-        for (const centros of [true, false]) {
+        for (const centros of (comCentros ? [true, false] : [false])) {
           const { svg, largura, altura, escala } = desenharEsboco(variante(esboco, { vista, legendas, centros }));
           const nome = `${vista}-${legendas ? 'legendas' : 'sem-legendas'}-${centros ? 'centros' : 'sem-centros'}.png`;
           await svgParaPng(svg, largura, altura, join(pasta, nome), navegador);
@@ -94,7 +95,7 @@ export async function analisarEsboco(arquivo, { zoom = null } = {}) {
     await navegador.close();
   }
   if (pedidoDeZoom) {
-    for (const [legendas, centros] of [[true, true], [false, false]]) {
+    for (const [legendas, centros] of comCentros ? [[true, true], [false, false]] : [[true, false], [false, false]]) {
       const base = `${pedidoDeZoom.vista}-${legendas ? 'legendas' : 'sem-legendas'}-${centros ? 'centros' : 'sem-centros'}.png`;
       const recorte = recortarAmpliado(PNG.sync.read(readFileSync(join(pasta, base))), pedidoDeZoom.caixa, AMPLIACAO_DO_ZOOM);
       const nome = `zoom-${base}`;
@@ -107,6 +108,9 @@ export async function analisarEsboco(arquivo, { zoom = null } = {}) {
     data: new Date().toISOString(),
     vistas: VISTAS_DA_ANALISE,
     zoom: pedidoDeZoom,
+    centros: comCentros,
+    forcado: comCentros ? {} : { linhasCentro: false },
+    plano: typeof esboco.plano === 'string' ? esboco.plano : null,
     escalaPxPorMm: escalas,
     arquivos,
   };
@@ -125,11 +129,11 @@ export async function gerarEsboco(arquivo) {
 
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--analise [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
   try {
     if (argv.includes('--analise')) {
       const z = argv.find((a) => a.startsWith('--zoom='));
-      const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null });
+      const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null, centros: argv.includes('--centros') });
       process.stdout.write(`análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n`);
       return 0;
     }

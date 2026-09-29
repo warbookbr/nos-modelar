@@ -4,7 +4,7 @@ Desenha esboços de forma a partir de um JSON declarativo: caixas, cilindros e a
 
 ## Como escrever
 
-O arquivo se chama `<assunto>.esboco.json`. A raiz tem `opcoes` (obrigatório), `vista` (`isometrica`, o padrão, `frontal`, `lateral` ou `superior`), `linhasCentro` e `ocultar`. Cada opção tem `titulo`, `nota` (uma frase curta) e `formas`. Todas as opções saem na mesma escala, com uma barra de 100 mm. Medidas em milímetro, y para cima, z para a frente da vista frontal.
+O arquivo se chama `<assunto>.esboco.json`. A raiz tem `opcoes` (obrigatório), `plano` (texto livre opcional com as decisões do "Pare e planeje", ignorado no desenho e copiado para o manifesto da análise), `vista` (`isometrica`, o padrão, `frontal`, `lateral` ou `superior`), `linhasCentro` e `ocultar`. Cada opção tem `titulo`, `nota` (uma frase curta) e `formas`. Todas as opções saem na mesma escala, com uma barra de 100 mm. Medidas em milímetro, y para cima, z para a frente da vista frontal.
 
 ```json
 {
@@ -26,11 +26,11 @@ O arquivo se chama `<assunto>.esboco.json`. A raiz tem `opcoes` (obrigatório), 
 
 ```bash
 npm run esboco -- <arquivo.esboco.json>
-npm run esboco -- <arquivo.esboco.json> --analise [--zoom=<vista>:x0,y0,x1,y1]
+npm run esboco -- <arquivo.esboco.json> --analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]
 npx vitest run modulos/esboco
 ```
 
-O primeiro comando grava `<arquivo>.svg` e `<arquivo>.png` ao lado do JSON e imprime o tamanho e a escala em px/mm. O segundo gera a matriz de conferência descrita em [`PARE-E-ANALISE.md`](../../docs/mecanifica/usar/PARE-E-ANALISE.md): as quatro vistas, cada uma com e sem legendas e com e sem linhas de centro, 16 imagens em `<arquivo>-analise/` com um `manifesto.json` (hash do JSON, data, escala por vista, lista de arquivos). Com `--zoom`, recorta o retângulo em pixels da vista pedida, amplia 3 vezes e grava o par com tudo ligado e com tudo desligado. Um erro no JSON sai como "esboço recusado" com a causa.
+O primeiro comando grava `<arquivo>.svg` e `<arquivo>.png` ao lado do JSON e imprime o tamanho e a escala em px/mm. O segundo gera a matriz de conferência descrita em [`PARE-E-ANALISE.md`](../../docs/mecanifica/usar/PARE-E-ANALISE.md): as quatro vistas, cada uma com e sem legendas, 8 imagens em `<arquivo>-analise/`, sempre sem linhas de centro: a geração força `linhasCentro: false` em todas as opções e formas sem editar o JSON. Com `--centros` gera também as variações com linhas de centro, 16 imagens. O `manifesto.json` traz o hash do JSON, a data, a escala por vista, `centros`, `forcado` (`{ "linhasCentro": false }` no padrão, vazio com `--centros`), o `plano` do esboço quando existe e a lista de arquivos. Com `--zoom`, recorta o retângulo em pixels da vista pedida, amplia 3 vezes e grava o par com legendas e sem legendas (com centros ligados no primeiro e desligados no segundo quando há `--centros`). Um erro no JSON sai como "esboço recusado" com a causa.
 
 ## Formas
 
