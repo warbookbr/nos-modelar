@@ -80,7 +80,7 @@ log(`  ${catalogo.operacoes.length} operações registradas; assinatura=${catalo
 ok("catálogo deriva diretamente do registro do núcleo; npm run catalogo:check confere os artefatos publicados");
 
 /* 3 · BROWSER (uma vez só) — porteiro, renders (evidência), gabarito */
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.wasm': 'application/wasm' };
 const server = createServer((req, res2) => {
   const p = join(REPO, decodeURIComponent(new URL(req.url, 'http://x').pathname));
   if (!p.startsWith(REPO) || !existsSync(p)) { res2.writeHead(404); res2.end(); return; }

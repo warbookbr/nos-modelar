@@ -31,11 +31,11 @@ describe('Mecanifica 1.0 — ensaio ponta a ponta da dobradiça', () => {
 
   it('descobre e planeja capacidades pela configuração explícita', () => {
     const catalogo = catalogoDeCapacidades(estudo.configuracao.registroOperacoes);
-    expect(catalogo.operacoes).toHaveLength(36);
+    expect(catalogo.operacoes).toHaveLength(37);
     expect(buscarCapacidades(catalogo, { efeito: 'publica-porta' }).operacoes)
       .toEqual([expect.objectContaining({ nome: 'publicarPorta' })]);
     const hipergrafo = hipergrafoDeCapacidades(catalogo);
-    expect(hipergrafo.hiperarestas).toHaveLength(36);
+    expect(hipergrafo.hiperarestas).toHaveLength(37);
     const plano = planejarCapacidades(catalogo, {
       artefatos: { entra: [], sai: ['mecanifica.porta@1'] },
       interfaces: { entra: [], sai: [] },

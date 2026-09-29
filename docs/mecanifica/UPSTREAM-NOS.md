@@ -10,7 +10,7 @@ autoriza implementação ou alteração no repositório original.
 | portas | entregue, 8 portas provadas | `guarda-portas-bancada.mjs` | cópia de arranjo endereçável por `nomes` |
 | arranjo radial/linear | entregue, provado por teste | `portas-espelho-arranja.test.ts`, `nome-de-copia.test.ts` | origem copia uma fonte |
 | furo e centros | entregue, provado por teste | `pose-de-criacao.test.ts`, `normais-lisas.test.ts` | não é booleana geral |
-| booleanas `unir`, `subtrair`, `intersectar` | entregue no núcleo, provado por teste; costura arredondada e ferramentas ainda no plano ativo | `procedural/nucleo/operacoes/booleanas.js`, `manifold.js`, `booleanas.test.ts` | depende de `manifold-3d` (WebAssembly) carregado antes por `carregarManifold()`; só sólido fechado |
+| booleanas `unir`, `subtrair`, `intersectar` e `arredondarCostura` | entregue no núcleo, provado por teste; ferramentas conferidas sobre a malha unida | `procedural/nucleo/operacoes/booleanas.js`, `manifold.js`, `booleanas.test.ts`, `arredondar-costura.test.ts`, `ferramentas-sobre-uniao.test.ts` | depende de `manifold-3d` (WebAssembly), que o núcleo carrega sozinho por await no topo do módulo; só sólido fechado; arredondamento só em aresta côncava, com meia-esquadria na quina convexa |
 | orientação de seção | entregue em `loft` | `loft-fechado.test.ts`, núcleo | costura de `lathe` continua aberta |
 | revisão visual | entregue em quatro vistas | `olhar-bancada.mjs` | visor legado mantém import map para `earcut` |
 | exportação resolvida | entregue e gateada | `exportar.mjs` | produto lê dados, não receita |

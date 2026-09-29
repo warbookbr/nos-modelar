@@ -23,4 +23,12 @@ describe('imports do visor legado servido sem transformação', () => {
     expect(existsSync(resolve(RAIZ, alvo.slice(1)))).toBe(true);
     expect(html.indexOf('type="importmap"')).toBeLessThan(html.indexOf('type="module"'));
   });
+
+  it('resolve manifold-3d, que o núcleo carrega sozinho para as booleanas', () => {
+    const { mapa } = importMapDoVisor();
+    const alvo = mapa.imports?.['manifold-3d'];
+    expect(alvo).toBe('/node_modules/manifold-3d/manifold.js');
+    expect(existsSync(resolve(RAIZ, alvo.slice(1)))).toBe(true);
+    expect(existsSync(resolve(RAIZ, 'node_modules/manifold-3d/manifold.wasm'))).toBe(true);
+  });
 });

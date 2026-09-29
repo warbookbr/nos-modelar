@@ -47,7 +47,7 @@ if (!nome) { console.error('informe explicitamente o id da peça (veja procedura
 if (!caminhosDaPeca(nome).some((c) => existsSync(c))) { console.error(`peça desconhecida: ${nome} (veja procedural/pecas/)`); process.exit(1); }
 
 /* server estático mínimo (só o que o visor precisa) */
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.wasm': 'application/wasm' };
 const server = createServer((req, res2) => {
   const p = join(REPO, decodeURIComponent(new URL(req.url, 'http://x').pathname));
   if (!p.startsWith(REPO) || !existsSync(p)) { res2.writeHead(404); res2.end(); return; }

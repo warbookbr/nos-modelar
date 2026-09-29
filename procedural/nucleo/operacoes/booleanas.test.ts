@@ -3,11 +3,9 @@
    dois cubos de lado 1 que se cruzam num cubo de 0,5 de lado. O primeiro
    bloco é a LINHA DE BASE: sem a operação, cada cubo tem face dentro do
    outro, que é o vinco que o render mostrou no ombro. */
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo herdado em JavaScript.
 import { nucleo, neutroCanonico } from '../entrada.js';
-// @ts-expect-error — núcleo herdado em JavaScript.
-import { carregarManifold } from '../manifold.js';
 
 type N = any;
 const A = { op: 'cubo', id: 1 };
@@ -66,7 +64,6 @@ function faceDentro(n: N, f: any, caixa: any) {
 }
 const facesDentro = (n: N, caixa: any) => [...n.F.values()].filter((f) => faceDentro(n, f, caixa)).length;
 
-beforeAll(async () => { await carregarManifold(); });
 
 describe('linha de base — dois cubos cruzados sem booleana', () => {
   it('cada cubo tem faces dentro do outro, e a soma dos volumes conta o encontro duas vezes', () => {

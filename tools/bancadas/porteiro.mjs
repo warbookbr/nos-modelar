@@ -13,7 +13,7 @@ import { pngStats } from './bench/pngstats.mjs';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
 let alvos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-if (!alvos.length) alvos = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas'];
+if (!alvos.length) alvos = ['fixture-visual', 'fixture-hierarquia', 'fixture-portas', 'fixture-sem-portas', 'fixture-uniao'];
 
 const { createServer } = await import('vite');
 const vite = await createServer({
@@ -35,13 +35,20 @@ for (const nome of alvos) {
   const page = await browser.newPage({ viewport: { width: 640, height: 360 } });
   const erros = [];
   page.on('pageerror', (e) => erros.push(e.message));
-  page.on('console', (m) => { if (m.type() === 'error') erros.push('console: ' + m.text()); });
+  /* órfão também reprova: uma receita cujo passo gritou (a booleana sem a
+     Manifold carregada no navegador, por exemplo) ainda desenha o resto da
+     peça, e o quadro sairia plausível. */
+  page.on('console', (m) => { if (m.type() === 'error' || /órfão/.test(m.text())) erros.push('console: ' + m.text()); });
   const motivos = [];
   try {
     await page.goto(`${base}?peca=${nome}&res=640`, { waitUntil: 'load' });
     await page.waitForTimeout(1200);
     const ready = await page.evaluate(() => window.__mecanificaBancada?.ready === true);
     if (!ready) motivos.push('window.__mecanificaBancada.ready ≠ true (fixture não abriu)');
+    if (nome === 'fixture-uniao') {
+      const partes = await page.evaluate(() => window.__mecanificaBancada?.partes ?? []);
+      if (!partes.includes('ombro')) motivos.push(`a união não chegou à cena: partes = ${JSON.stringify(partes)}`);
+    }
     const buf = await page.screenshot();
     try {
       const s = pngStats(buf);

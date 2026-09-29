@@ -1,16 +1,14 @@
 /* catálogo-capacidades.test.mjs — R05: descoberta deriva do registro, sem tabela paralela. */
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import Ajv2020 from 'ajv/dist/2020.js';
-import { OPS, REGISTRO_OPERACOES, carregarManifold, nucleo } from './entrada.js';
+import { OPS, REGISTRO_OPERACOES, nucleo } from './entrada.js';
 import { buscarCapacidades, catalogoDeCapacidades, explicarCapacidade, hipergrafoDeCapacidades } from './catalogo.js';
 import { sha256Hex } from './sha256.js';
 
 describe('catálogo de capacidades — R05', () => {
-  /* os exemplos das booleanas precisam da Manifold carregada */
-  beforeAll(async () => { await carregarManifold(); });
   const catalogo = catalogoDeCapacidades(REGISTRO_OPERACOES);
 
-  it('deriva as 35 operações do registro, em ordem e com assinatura reproduzível', () => {
+  it('deriva as 36 operações do registro, em ordem e com assinatura reproduzível', () => {
     expect(sha256Hex('abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
     expect(catalogo.operacoes.map(({ nome }) => nome).sort()).toEqual(Object.keys(OPS).sort());
     expect(catalogo.assinatura).toBe(REGISTRO_OPERACOES.assinatura);
@@ -30,9 +28,14 @@ describe('catálogo de capacidades — R05', () => {
       const exemplo = registrada.uso.exemplo;
       expect(nucleo(exemplo.PASSOS, exemplo.PARAMS, exemplo.TOPO, exemplo.MATERIAIS, exemplo.ESQUELETO, exemplo.ALIASES).orfaos).toEqual([]);
     }
-    /* 30 000 cabiam 32 operações; as três booleanas (plano união de sólidos)
-       somam ~1 500 bytes, e o teto sobe na mesma proporção, ~480 por operação. */
-    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(32_000);
+    /* O teto mede crescimento, não um número redondo. Medido em 2026-09-29:
+       36 operações somam 32 574 bytes, e cada operação nova custa ~1 050 bytes,
+       porque o formato @1 do catálogo a repete inteira em `modulos[].operacoes`
+       e em `operacoes` (a maior, arredondarCostura, tem 523 bytes em cada
+       lista). Tirar a repetição seria um formato @2, com os consumidores do
+       MCP junto; fica registrado como atrito, e o teto deixa folga para quatro
+       operações do tamanho da maior: 32 574 + 4 × 1 100 ≈ 37 000. */
+    expect(Buffer.byteLength(JSON.stringify(catalogo))).toBeLessThan(37_000);
     expect(Buffer.byteLength(JSON.stringify(hipergrafoDeCapacidades(catalogo)))).toBeLessThan(10_000);
   });
 
@@ -57,7 +60,7 @@ describe('catálogo de capacidades — R05', () => {
     expect(buscarCapacidades(catalogo, { texto: 'revolucionar' }).operacoes.map(({ nome }) => nome)).toContain('lathe');
     const primeira = buscarCapacidades(catalogo, { limite: 3 });
     const segunda = buscarCapacidades(catalogo, { limite: 3, cursor: primeira.proximoCursor });
-    expect(primeira).toMatchObject({ total: 35, retornadas: 3, truncado: true, omitidas: 32 });
+    expect(primeira).toMatchObject({ total: 36, retornadas: 3, truncado: true, omitidas: 33 });
     expect(segunda.operacoes.map(({ id }) => id)).not.toEqual(expect.arrayContaining(primeira.operacoes.map(({ id }) => id)));
   });
 

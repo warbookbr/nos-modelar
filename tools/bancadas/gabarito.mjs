@@ -50,7 +50,7 @@ try {
   for (const a of angulos) CONTORNOS[a] = validarContorno(CONTORNOS[a], `CONTORNOS['${a}']`);
 } catch (e) { console.error(`✗ ${nome}: gabarito malformado — ${e.message}`); process.exit(2); }
 
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.wasm': 'application/wasm' };
 const server = createServer((req, res2) => {
   const p = join(REPO, decodeURIComponent(new URL(req.url, 'http://x').pathname));
   if (!p.startsWith(REPO) || !existsSync(p)) { res2.writeHead(404); res2.end(); return; }

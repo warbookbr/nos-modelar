@@ -31,6 +31,7 @@
     "unir",
     "subtrair",
     "intersectar",
+    "arredondarCostura",
     "pincel",
     "solido",
     "liso",
@@ -304,9 +305,9 @@
       "operacoes": [
         "unir"
       ],
-      "hashCanonico": "fe31b8ce42bf2e15d82c395e0ad5a2d494ce352ef9c6ff2c749fccdf60675b53",
+      "hashCanonico": "ceea2ba22a7077bb8ac18a41bb0bb91c0071ab40eccb5c9f2b899b735f63e2db",
       "vertices": 20,
-      "faces": 21,
+      "faces": 24,
       "diagnosticos": 0
     },
     {
@@ -327,6 +328,16 @@
       "hashCanonico": "db59565e3df52bf62e97504c4f52794650671588e0b53629e73c170408165fdc",
       "vertices": 8,
       "faces": 6,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/arredondarCostura",
+      "operacoes": [
+        "arredondarCostura"
+      ],
+      "hashCanonico": "81444612f14b46738320e0dbf5d7a30b29bfb9ce638ac49435be0cbf2b24a39b",
+      "vertices": 52,
+      "faces": 54,
       "diagnosticos": 0
     },
     {

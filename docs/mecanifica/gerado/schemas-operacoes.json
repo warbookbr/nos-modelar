@@ -1,7 +1,7 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a",
-  "total": 35,
+  "assinatura": "sha256:4a7d6f2638b1d2d7e1eaad7f8baa994552026bc9d210e34e8688ce5d1ed6bd0a",
+  "total": 36,
   "operacoes": [
     {
       "id": "mecanifica.operacao.apagaFace",
@@ -363,6 +363,134 @@
         "precondicoes": [],
         "limites": [
           "Escopo atual exige duas faces convexas manifold."
+        ],
+        "diagnosticos": []
+      }
+    },
+    {
+      "id": "mecanifica.operacao.arredondarCostura",
+      "nome": "arredondarCostura",
+      "uso": {
+        "formato": "mecanifica.uso-operacao@1",
+        "intencao": "Arredondar com raio declarado o encontro côncavo que uma booleana criou.",
+        "schemaArgumentos": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$id": "mecanifica.argumentos.arredondarCostura@1",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origemId",
+            "de",
+            "raio"
+          ],
+          "properties": {
+            "origemId": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identidade das faces do arredondamento."
+            },
+            "de": {
+              "type": "object",
+              "description": "Origem {op,id} de unir, subtrair ou intersectar."
+            },
+            "raio": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Raio positivo."
+            },
+            "paineis": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Faixas do arco, de 2 a 64 (padrão 8)."
+            }
+          }
+        },
+        "exemplo": {
+          "formato": "mecanifica.exemplo-operacao@1",
+          "PASSOS": [
+            [
+              "cubo",
+              {
+                "origemId": 1,
+                "larg": 0.4,
+                "alt": 1.2,
+                "prof": 0.6
+              }
+            ],
+            [
+              "cubo",
+              {
+                "origemId": 2,
+                "larg": 1,
+                "alt": 0.3,
+                "prof": 0.3,
+                "em": [
+                  0.3,
+                  0.6,
+                  0
+                ]
+              }
+            ],
+            [
+              "unir",
+              {
+                "origemId": 9,
+                "solidos": [
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 1
+                    }
+                  },
+                  {
+                    "origem": {
+                      "op": "cubo",
+                      "id": 2
+                    }
+                  }
+                ]
+              }
+            ],
+            [
+              "arredondarCostura",
+              {
+                "origemId": 10,
+                "de": {
+                  "op": "unir",
+                  "id": 9
+                },
+                "raio": 0.1
+              }
+            ]
+          ],
+          "PARAMS": {},
+          "TOPO": {},
+          "MATERIAIS": {},
+          "ESQUELETO": null,
+          "ALIASES": []
+        },
+        "precondicoes": [],
+        "limites": [
+          "Só costura côncava ganha material; costura convexa grita.",
+          "Na quina convexa por onde a costura dobra, os prismas se encontram em meia-esquadria."
         ],
         "diagnosticos": []
       }
@@ -1843,7 +1971,6 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
           "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
         ],
         "limites": [
@@ -3261,7 +3388,6 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
           "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
         ],
         "limites": [
@@ -3422,7 +3548,6 @@
           "ALIASES": []
         },
         "precondicoes": [
-          "Chame await carregarManifold() (procedural/nucleo/manifold.js) antes de executar a receita; sem isso o passo grita.",
           "Cada seleção precisa formar um sólido fechado e orientado depois de soldar cantos coincidentes; duas seleções não dividem face."
         ],
         "limites": [

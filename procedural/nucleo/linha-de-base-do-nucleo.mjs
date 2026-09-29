@@ -4,11 +4,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { carregarManifold, neutroCanonico, nucleo, OPS, REGISTRO_OPERACOES } from './entrada.js';
-
-/* As booleanas envolvem a Manifold, que carrega de forma assíncrona; o
-   corpus executa os exemplos de forma síncrona, então carrega antes. */
-await carregarManifold();
+import { neutroCanonico, nucleo, OPS, REGISTRO_OPERACOES } from './entrada.js';
 
 /* Os exemplos executáveis do registro são a fonte única do corpus. A ordem
    histórica de OPS é preservada para que a baseline continue comparável. */

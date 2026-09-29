@@ -2,15 +2,16 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
 
-Assinatura do registro: `sha256:50e4b8f2edd53f0f7f1469baccad043da12ab37839ca13f221901a510405023a`.
+Assinatura do registro: `sha256:4a7d6f2638b1d2d7e1eaad7f8baa994552026bc9d210e34e8688ce5d1ed6bd0a`.
 
-Há 35 operações em 1 módulo(s).
+Há 36 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
 | `apagaFace` | Remover exatamente uma face, preferencialmente por seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.apagaFace@1` |
 | `arranja` | Criar cópias lineares ou radiais com identidade estrutural. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arranja@1` |
 | `arredondarAresta` | Substituir uma aresta convexa por múltiplos painéis de raio geométrico. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arredondarAresta@1` |
+| `arredondarCostura` | Arredondar com raio declarado o encontro côncavo que uma booleana criou. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.arredondarCostura@1` |
 | `chamferBox` | Criar caixa de faces planas com quinas chanfradas. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.chamferBox@1` |
 | `cilindro` | Criar cilindro fechado com laterais e duas tampas endereçáveis. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.cilindro@1` |
 | `cone` | Criar cone fechado com base circular. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.cone@1` |

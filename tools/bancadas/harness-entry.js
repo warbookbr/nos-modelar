@@ -2,13 +2,14 @@
  * carregado por harness.html; não participa da entrada publicada da bancada.
  */
 import { iniciar } from '../../src/bancada/main.js';
-import { hierarquia, portas, semPortas, visual } from './fixtures/catalogo-visual.js';
+import { hierarquia, portas, semPortas, uniao, visual } from './fixtures/catalogo-visual.js';
 
 const catalogo = [
   { id: 'fixture-visual', carregar: async () => visual },
   { id: 'fixture-hierarquia', carregar: async () => hierarquia },
   { id: 'fixture-portas', carregar: async () => portas },
   { id: 'fixture-sem-portas', carregar: async () => semPortas },
+  { id: 'fixture-uniao', carregar: async () => uniao },
 ];
 
 iniciar({ catalogo }).catch((erro) => {

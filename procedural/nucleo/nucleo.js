@@ -22,7 +22,7 @@ import { criarOperacoesTransformacoes } from './operacoes/transformacoes.js';
 import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
-import { manifoldCarregada } from './manifold.js';
+import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import earcut from 'earcut';
 
 export const FORMATO = { v: 1, tipo: 'objeto' };
@@ -1465,6 +1465,10 @@ function contratoBooleana(op) {
 CONTRATOS_ORIGEM.unir = contratoBooleana('unir');
 CONTRATOS_ORIGEM.subtrair = contratoBooleana('subtrair');
 CONTRATOS_ORIGEM.intersectar = contratoBooleana('intersectar');
+/* arredondarCostura — as faces novas do arredondamento, sem sub-endereço:
+   elas saem de uma bola poliédrica, e um índice pela ordem da saída seria
+   identidade posicional. */
+CONTRATOS_ORIGEM.arredondarCostura = contratoFaces('arredondarCostura');
 
 /* Fonte canônica curta para ferramentas e documentação de autoria. A lista é
    derivada dos contratos que `sel:{origem}` realmente resolve; não é uma
@@ -2530,7 +2534,7 @@ const operacoesEdicaoDireta = criarOperacoesEdicaoDireta({ baseDoPasso, grita, n
 const operacoesGeradoresAvancados = criarOperacoesGeradoresAvancados({ BLOCO, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias });
 const operacoesTransformacoes = criarOperacoesTransformacoes({ FORMATO, BLOCO, baseDoPasso, norm3, indiceDeAxi, giraPonto, normalDaFace, ruido3, Face, addV, addF, grita, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, resolverSelecao, resolverAlvosV, resolverAlvosF });
 const operacoesEstruturais = criarOperacoesEstruturais({ BLOCO, baseDoPasso, norm3, resolverLados, indiceDeAxi, giraPonto, transformarInterfaceDaPorta, transformacoesDaOrigemDaPorta, Face, addV, addF, grita, nomeDeParteInvalido, registraOrigem, origensIguais, CONTRATOS_ORIGEM, validarOrigem, textoDeclaracoes, resolverOrigem, faceUnicaEstrutural, resolverAlvosV, poligonoPlano, convexoCCW, margemDentro, bordaAnular, aneisSeSobrepoem, particionar, operacoesEdicaoDireta, resolverInterfaceCilindricaDaPorta });
-const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada });
+const operacoesBooleanas = criarOperacoesBooleanas({ BLOCO, baseDoPasso, normalDaFace, addV, addF, grita, registraOrigem, textoDeclaracoes, resolverSelecao, manifoldCarregada, erroDaCargaDaManifold });
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF, neutroCanonico });
 
 const OPS_IMPLEMENTADAS = {
@@ -2552,7 +2556,7 @@ const NOMES_DAS_OPERACOES = [
   'inflate', 'publicarPorta', 'moveV', 'extruda', 'mescla', 'moveF', 'moveA',
   'vira', 'apagaFace', 'displace', 'encostar', 'transladar', 'rotaciona',
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
-  'subtrair', 'intersectar', 'pincel',
+  'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));

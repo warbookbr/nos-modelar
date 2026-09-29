@@ -73,3 +73,19 @@ export const semPortas = {
     parte('anteparo', { op: 'cubo', id: 121 }),
   ],
 };
+
+/* União de sólidos (plano 2026-09-28, fatia 5): prova que a bancada no
+   navegador carrega a Manifold (WebAssembly servido pelo Vite) e desenha a
+   malha unida. Se o .wasm não chegar, o `unir` grita e a fixture não abre. */
+export const uniao = {
+  meta: { nome: 'Fixture de união' },
+  PASSOS: [
+    ['cubo', { origemId: 120, larg: 0.4, alt: 1, prof: 0.4, em: [0, 0.2, 0] }],
+    ['cubo', { origemId: 121, larg: 1, alt: 0.3, prof: 0.3, em: [0.3, 0.9, 0] }],
+    ['unir', { origemId: 129, solidos: [{ origem: { op: 'cubo', id: 120 } }, { origem: { op: 'cubo', id: 121 } }] }],
+    parte('ombro', { op: 'unir', id: 129 }),
+    publicar('costura', { op: 'unir', id: 129, costura: true }),
+    ['cubo', { origemId: 122, larg: 1.2, alt: 0.2, prof: 0.8 }],
+    parte('base', { op: 'cubo', id: 122 }),
+  ],
+};
