@@ -872,6 +872,25 @@ export function criarOperacoesBooleanas(servicos) {
     for (const item of [...cortadas, ...pedacosNovos]) item[1] = melhorInicio(pos, item[1]);
     if (pedacosNovos.length > BLOCO + FAIXA_ESTENDIDA) return grita(st, i, op, 'solidos', `a costura partiu faces em ${pedacosNovos.length} pedaços a mais, mais que os ${BLOCO + FAIXA_ESTENDIDA} ids do passo (bloco mais faixa estendida); divida a operação em passos menores`);
 
+    /* ---- PORTÃO DE FACE DEGENERADA ----
+       Face que sai com área zero (três cantos colineares, ou um polígono
+       que a retirada de cantos colineares fechou sobre si) o adaptador do
+       visor recusa, e a receita já teria sido aceita. Tudo o que o acabamento
+       acima podia consertar já foi consertado (pedaço sem área funde-se ao
+       vizinho pela aresta mais longa); o que sobra aqui não tem conserto local
+       e grita com a face de origem, em vez de seguir para a tela. O limite é
+       mil vezes menor que o piso das lascas: só pega área que é ruído. */
+    {
+      const semArea = [
+        ...mantidas.map((fid) => [fid, cicloRep(st.F.get(fid).vs)]),
+        ...cortadas, ...pedacosNovos.map((c) => [c[0], c[1]]),
+      ].filter(([, P]) => new Set(P).size >= 3 && areaDe(pos, P) < piso * 1e-3);
+      if (semArea.length) {
+        const [fid, P] = semArea[0];
+        return grita(st, i, op, extra ? extra.ref : 'solidos', `o resultado teria ${semArea.length} face(s) degenerada(s) (área zero: os cantos ficam colineares), a primeira vinda da face ${fid} com ${P.length} cantos; laterais coplanares entre os sólidos costumam causar isto. Afaste as laterais (uma delas 1 mm menor) ou una os sólidos por outra partição; nada foi alterado`);
+      }
+    }
+
     /* ---- PORTÃO DE CASCA FECHADA ----
        O resultado (faces mantidas, cortadas e pedaços) tem de ser uma casca
        fechada e manifold: toda aresta dirigida com exatamente uma oposta, e o

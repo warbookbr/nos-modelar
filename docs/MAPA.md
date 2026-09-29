@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-814 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+815 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -480,6 +480,7 @@
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
+- `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …
 
 ## procedural/pecas/braco-robotico/
 
