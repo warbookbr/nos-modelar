@@ -14,7 +14,7 @@ diz como usá-la no alinhamento.
 
 ## Pare e planeje
 
-Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores). E se o conjunto vira um esboço só ou vários. O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
+Antes de escrever qualquer JSON, pare e decida por escrito, em um parágrafo curto por decisão, o que segue. O nível de detalhe que a pessoa pediu: conceito de proporção, peça reconhecível ou detalhe funcional. Quais peças serão esboçadas e quais ficam de fora, respeitando o limite de cerca de 6 formas por opção. Como cada peça será detalhada com caixa, cilindro e anel, dizendo o que não dá para representar (tubo, perfil, esfera). Se as linhas de centro ficam visíveis. Se há marcações (legendas, numeração, marcadores). E se o conjunto vira um esboço só ou vários. E as regras de contato: usar ou não o gate `contato`, com a tolerância e as exceções declaradas (`atravessa`, `encosta`, `livre`). O texto pode ir no campo opcional `plano` da raiz do JSON, que o desenho ignora e a análise copia para o manifesto. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
 
 ## Escrever e rodar
 
@@ -67,6 +67,10 @@ Esboço de
 legenda que cruza, balão no elemento errado, escala pequena, oclusão errada e
 rotação no sentido errado. Relate os defeitos por vista e região e o que não
 foi conferido.
+
+## Regras de contato
+
+`contato: { "usar": true, "tolerancia": mm, "folga": mm, "pares": [{ "a": "id", "b": "id", "tipo": "atravessa" }] }` na raiz (a opção sobrepõe a raiz) liga o gate. Sem `usar` nada muda. Os padrões são tolerância de 1% e folga de 10% da maior dimensão. `npm run esboco` imprime `colisao`, `longe`, `voando` e `par-nao-encosta` por opção, com peças e mm, e o resultado `aprovado` ou `reprovado`; a imagem sai igual, e `--estrito` termina com código 1 se reprovado. Leia cada achado contra a imagem: peça `voando` costuma ser posição errada, e colisão de peças que devem se cruzar pede o par `atravessa`. Detalhes em [`PARE-E-ANALISE.md`](../../../docs/mecanifica/usar/PARE-E-ANALISE.md).
 
 ## Como mostrar
 

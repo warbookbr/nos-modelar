@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-823 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+825 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -353,10 +353,12 @@
 
 ## modulos/esboco/src/
 
+- `contato.js` — Contato do esboço: gate opt-in de colisão, folga e conjunto conectado entre as formas de cada opção. A geometria é a que o desenho já monta (`resolverOpcao`:…
 - `index.js` — Esboço de opções de forma: lê a declaração de cilindros, anéis e caixas em milímetro, resolve as posições relativas (sobre, ponta) e desenha as opções lado a…
 
 ## modulos/esboco/tests/
 
+- `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.
 
 ## modulos/exportador-cad/src/

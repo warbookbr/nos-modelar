@@ -85,6 +85,27 @@ Referência a id inexistente ou circular é recusada com a lista de ids da opç�
 }
 ```
 
+## Contato
+
+Gate opt-in, feito em `src/contato.js` (`verificarContato`). Na raiz, e por opção (que sobrepõe a raiz):
+
+```json
+"contato": {
+  "usar": true,
+  "tolerancia": 2,
+  "folga": 30,
+  "pares": [
+    { "a": "alojamento", "b": "eixo", "tipo": "atravessa" },
+    { "a": "base", "b": "alojamento", "tipo": "encosta" },
+    { "a": "base", "b": "enfeite", "tipo": "livre" }
+  ]
+}
+```
+
+Sem `usar: true` nada muda. Os padrões são `tolerancia` de 1% da maior dimensão do conjunto (mínimo 1 mm) e `folga` de 10% dela, ambas em mm. `atravessa` permite sobreposição e conta como ligação; `encosta` exige folga e penetração dentro da tolerância; `livre` ignora o par (nem colisão, nem ligação, nem folga). Peças `oculto` não entram. Achados por opção: `colisao`, `longe`, `voando` (fora do maior grupo em que duas peças são vizinhas se a folga é no máximo a tolerância ou o par é `atravessa`) e `par-nao-encosta`. `npm run esboco` imprime os achados e `aprovado` ou `reprovado`, `--estrito` termina com código 1 se reprovado e o manifesto da `--analise` ganha `contato`. A imagem não muda.
+
+A geometria vem do prisma que o desenho monta. Caixa (com `raio`), cilindro e `achatado` são prismas convexos exatos, com o círculo de 128 lados; a distância é exata (GJK) e a penetração é a menor sobreposição entre eixos de separação (SAT). O anel é cortado em 32 setores convexos com a face interna tangente ao furo (um cilindro menor no furo não colide; um que cruza o aro sim), e a caixa com furos em triângulos. Numa forma cortada em peças a penetração é a maior entre elas, o que subestima um cruzamento que atravessa várias fatias do aro, e o raio externo do anel fica até 0,5% menor.
+
 ## Limites conhecidos
 
 O esboço só conhece caixa, cilindro e anel. Com muitas formas o desenho degrada: numa moto de exemplo com 11 formas as legendas se cruzam, a escala fica pequena (0,15 px/mm) e as linhas de chamada atravessam o desenho; o SVG passou de 2,6 MB e o desenho levou 6 a 11 s. Use poucas formas por opção (até uns 6), esboce só o que está em disputa e olhe a imagem antes de mostrá-la. O painel de cada opção tem 620 x 720 px fixos. A posição da legenda é heurística e pode cair no elemento errado numa vista de topo ou frontal, onde muitas peças se sobrepõem; a matriz de `--analise` existe para pegar isso.

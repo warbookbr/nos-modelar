@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
+import { descreverAchado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -67,6 +68,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
   const caminho = resolve(arquivo);
   const texto = readFileSync(caminho, 'utf8');
   const esboco = JSON.parse(texto);
+  const contato = verificarContato(esboco);
   const pedidoDeZoom = zoom ? lerZoomDoEsboco(zoom) : null;
   const pasta = caminho.replace(/(\.esboco)?\.json$/i, '') + '-analise';
   mkdirSync(pasta, { recursive: true });
@@ -111,6 +113,7 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
     centros: comCentros,
     forcado: comCentros ? {} : { linhasCentro: false },
     plano: typeof esboco.plano === 'string' ? esboco.plano : null,
+    contato,
     escalaPxPorMm: escalas,
     arquivos,
   };
@@ -121,25 +124,34 @@ export async function analisarEsboco(arquivo, { zoom = null, centros: comCentros
 export async function gerarEsboco(arquivo) {
   const caminho = resolve(arquivo);
   const base = caminho.replace(/(\.esboco)?\.json$/i, '');
-  const { svg, largura, altura, escala } = desenharEsboco(JSON.parse(readFileSync(caminho, 'utf8')));
+  const esboco = JSON.parse(readFileSync(caminho, 'utf8'));
+  const { svg, largura, altura, escala } = desenharEsboco(esboco);
+  const contato = verificarContato(esboco);
   writeFileSync(`${base}.svg`, svg);
   await svgParaPng(svg, largura, altura, `${base}.png`);
-  return { png: `${base}.png`, svg: `${base}.svg`, largura, altura, escala };
+  return { png: `${base}.png`, svg: `${base}.svg`, largura, altura, escala, contato };
+}
+
+function relatarContato(c) {
+  if (!c.usar) return '';
+  const linhas = c.achados.map((a) => `  ${descreverAchado(a)}`);
+  return `contato (tolerância ${String(c.tolerancia).replace(".", ",")} mm, folga ${String(c.folga).replace(".", ",")} mm): ${c.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}`;
 }
 
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
+  const estrito = argv.includes('--estrito');
   try {
     if (argv.includes('--analise')) {
       const z = argv.find((a) => a.startsWith('--zoom='));
       const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null, centros: argv.includes('--centros') });
-      process.stdout.write(`análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n`);
-      return 0;
+      process.stdout.write(`análise do esboço: ${manifesto.arquivos.length} imagens em ${pasta}\n${manifesto.arquivos.map((a) => `  ${a}`).join('\n')}\nAbra cada imagem antes de dar o esboço por bom (docs/mecanifica/usar/PARE-E-ANALISE.md).\n${relatarContato(manifesto.contato)}`);
+      return estrito && manifesto.contato.resultado === 'reprovado' ? 1 : 0;
     }
     const r = await gerarEsboco(alvo);
-    process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm\n  ${r.png}\n  ${r.svg}\n`);
-    return 0;
+    process.stdout.write(`esboço ${r.largura}x${r.altura} px, ${r.escala.toFixed(3)} px/mm\n  ${r.png}\n  ${r.svg}\n${relatarContato(r.contato)}`);
+    return estrito && r.contato.resultado === 'reprovado' ? 1 : 0;
   } catch (e) {
     if (e.code === 'ENOENT') { process.stderr.write(`esboço recusado: arquivo não encontrado (${alvo})\n`); return 1; }
     if (e instanceof ErroDeEsboco || e instanceof SyntaxError) { process.stderr.write(`esboço recusado: ${e.message}\n`); return 1; }
