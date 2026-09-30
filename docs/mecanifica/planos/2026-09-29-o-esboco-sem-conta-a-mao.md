@@ -183,7 +183,21 @@ do naked por `parametros` na opção.
    metade contra o de hoje (medido no arquivo).
 8. A pessoa confirma, olhando a moto e um segundo objeto, que o esboço ficou mais
    fácil de descrever e de ler.
-9. `npm run gates --completo` passa.
+9. A leitura padrão do `--descrever` mostra só o total de formas, os parâmetros
+   e as divergências em ordem de gravidade, e a moto detalhada cabe em menos de
+   40 linhas quando o gate aprova; âncoras, caixas e vizinhos só saem sob
+   pedido, por exemplo `--forma garfoE.perna`.
+10. Todo achado do gate vem com uma imagem própria: o par envolvido colorido, o
+    resto em cinza, sem legenda numerada e com zoom no ponto.
+11. O contrato de relações (o que deve tocar, o que deve ficar livre, o que deve
+    ser simétrico) é declarado no JSON e conferido pelo gate contra o medido.
+12. A conferência contra a foto mede, por vista e por parte, o desvio da
+    silhueta em milímetros e a razão entre interseção e união, e reprova acima
+    da tolerância declarada.
+13. A skill proíbe a IA de auditar por imagem com legenda numerada e descreve o
+    fluxo contrato, medidas da referência, construção por subsistema, montagem,
+    conferência numérica, crítico sem contexto e pessoa.
+14. `npm run gates --completo` passa.
 
 ## Fatias
 
@@ -206,8 +220,20 @@ do naked por `parametros` na opção.
    `chanfro` na caixa, com gate, espelho, arranjo e `--ajustar`. A moto de prova
    `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
    escritos à mão.
-8. Desempenho, esquema do JSON e conferência contra referência.
-9. A moto de prova, as fixtures e o fechamento.
+8. A auditoria feita por máquina. O contrato de relações no JSON, conferido
+   pelo gate contra o medido; a leitura padrão do `--descrever` reduzida às
+   divergências, com o detalhe por forma só sob pedido; a imagem por achado, com
+   o par colorido e sem legenda; o esquema do JSON com mensagem que diz o campo
+   e o valor válido; e o desempenho (SVG menor, sugestão de explosão que hoje
+   leva cerca de 46 s na moto, modo rápido sem PNG).
+9. A referência e o fluxo. A conferência numérica contra a foto, reaproveitando
+   `conferir:referencia`, com o desvio por parte e por vista; a extração das
+   medidas da foto para parâmetros, com a origem de cada número; o fluxo na
+   skill, com o construtor por subsistema, o montador, o leitor de referência e o
+   crítico visual sem contexto recebendo só imagens limpas; e a proibição de
+   auditar por legenda numerada. Depois, a moto detalhada de prova sem centro
+   calculado à mão, as fixtures com resultado esperado (moto, mancal e casa) e o
+   fechamento do plano.
 
 ## Riscos e desvios
 
