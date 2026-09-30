@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-852 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+856 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -371,6 +371,7 @@
 - `parecido.js` — "Quis dizer": o nome válido mais parecido com o que foi escrito, para as mensagens de recusa do esquema, do plano e do Condutor. Puro.
 - `plano.js` — O `plano` estruturado do esboço: nível de detalhe, medidas nomeadas conferidas contra o esboço e contrato de relações (o que deve tocar, o que deve ficar liv…
 - `projecao.js` — Sobreposição na projeção: o gate de contato mede colisão, folga e ligação em três dimensões, e a pessoa vê o que ele não mede: duas peças sem penetração algu…
+- `referencia.js` — Conferência contra a referência: compara, por vista, a silhueta do esboço com a silhueta de uma referência (o contorno de uma foto, em milímetro) e, por part…
 
 ## modulos/esboco/tests/
 
@@ -382,12 +383,14 @@
 - `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `desempenho.test.js` — Desempenho do esboço: a projeção reaproveita as faces de cada forma, só mede os pares cujas caixas na tela se cruzam, o desenho tem a opção de menos lados no…
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.
+- `esperado.test.js` — Fixtures com resultado esperado: a moto de prova (com o Condutor completo), o mancal e a casa, cada uma com o seu `<nome>.esperado.json` ao lado (contagem de…
 - `formas.test.js` — Formas novas: esfera, cone e tronco, extrusão de polígono, chanfro em caixa e tubo por pontos, em desenho, âncoras, gate de contato, espelho e arranjo, leitu…
 - `leitura.test.js` — Leitura padrão do `--descrever` (só divergências), detalhe por forma, leitura completa idêntica à antiga e imagem por achado.
 - `parametros.test.js` — Parâmetros e expressões, formas herdadas da raiz, `espelha` e `arranja`, e o legado byte a byte.
 - `plano.test.js` — O `plano` estruturado: medidas nomeadas conferidas contra o esboço, contrato de relações e o esquema do JSON.
 - `posicao.test.js` — Posicionar sem calcular coordenada: haste `de`/`para`, `encosta`, `alinha` e pontos nomeados.
 - `projecao.test.js` — Sobreposição na projeção: silhuetas que se cobrem sem penetração 3D, explosão e opacidade.
+- `referencia.test.js` — Conferência contra a referência: a silhueta do esboço contra um contorno (gerado aqui, sem foto), por vista e por parte, com a razão interseção/união e o des…
 - `relacoes.test.js` — Contrato de relações da fatia 8: `contato.juntas`, pontos-guia nomeados no `caminho` do tubo, âncora com deslocamento e `<instancia>.<parte>` em todo campo q…
 - `skill.test.js` — A skill `esbocar-opcoes` e o `PARE-E-ANALISE.md` dizem o fluxo, o nível de detalhe e a proibição de auditar por imagem com legenda numerada, sem citar objeto…
 
@@ -993,6 +996,7 @@
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
+- `esboco-referencia.mjs` — Lê as referências do esboço para o módulo `modulos/esboco`, que não lê arquivo: um JSON de contornos da imagem (`mecanifica.contornos@1`, o que `npm run cont…
 - `esboco.mjs` — Linha de comando do esboço: lê `<nome>.esboco.json`, desenha as opções lado a lado com modulos/esboco e grava `<nome>.svg` e `<nome>.png` ao lado. Uso: npm r…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.

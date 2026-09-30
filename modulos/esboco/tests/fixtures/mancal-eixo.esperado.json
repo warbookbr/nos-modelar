@@ -1,0 +1,35 @@
+{
+  "arquivo": "mancal-eixo.esboco.json",
+  "nota": "Fixture anterior ao gate de contato: sem `contato.usar` nada é cobrado. O eixo e a ponta se tocam e formam um grupo à parte: o eixo de 36 mm passa pelo furo de 40 mm do anel com 2 mm de folga radial, acima da tolerância padrão de 1,5 mm, e por isso a leitura aponta os dois como soltos em relação à base e ao alojamento; o componente `mancal` declara o par atravessa que resolve isso.",
+  "formas": {
+    "Opção A: Mancal Básico": 4
+  },
+  "divergencias": [
+    {
+      "n": 1,
+      "opcao": "Opção A: Mancal Básico",
+      "classe": "solto",
+      "pecas": [
+        "eixo"
+      ],
+      "texto": "eixo fora do maior grupo conectado"
+    },
+    {
+      "n": 2,
+      "opcao": "Opção A: Mancal Básico",
+      "classe": "solto",
+      "pecas": [
+        "ponta_chaveta"
+      ],
+      "texto": "ponta_chaveta fora do maior grupo conectado"
+    }
+  ],
+  "leitura": [
+    "opção 1 (Opção A: Mancal Básico): 4 formas",
+    "sem gate declarado (padrões do gate: tolerância 1,5 mm, penetração 1 mm)",
+    "divergências (2, da mais grave para a menos):",
+    "  [1] solto: eixo fora do maior grupo conectado",
+    "  [2] solto: ponta_chaveta fora do maior grupo conectado",
+    "detalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo"
+  ]
+}

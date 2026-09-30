@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 720" width="620" height="720" font-family="Helvetica, Arial, sans-serif">
 <rect width="620" height="720" fill="#ffffff"/>
 <text x="310" y="44" font-size="26" font-weight="bold" text-anchor="middle">Opção A: Mancal Básico</text>
+<line x1="240.9" y1="362.6" x2="240.9" y2="307.4" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round"/>
 <line x1="240.9" y1="362.6" x2="240.9" y2="307.4" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>
 <path d="M229.6,350.4L229.6,350L229.6,342.4L229.6,342.7Z" fill="#555a5f" stroke="#555a5f" stroke-width="0.8" stroke-linejoin="round"/>
 <path d="M229.6,350L229.6,349.7L229.6,342L229.6,342.4Z" fill="#555a5f" stroke="#555a5f" stroke-width="0.8" stroke-linejoin="round"/>
@@ -2645,6 +2646,7 @@
 <path d="M369.5,347.5L371.1,346.5L372.6,345.3L374,344.1L375.3,342.7L376.5,341.2L377.6,339.5L378.6,337.7L379.6,335.9L380.4,333.9L381.1,331.8L381.7,329.6L382.2,327.3L382.6,324.9L382.9,322.5L383.1,320L383.1,317.4L383.1,314.7L382.9,312L382.6,309.2L382.2,306.4L381.7,303.5L381.1,300.6L380.4,297.7L379.6,294.7L378.6,291.8L377.6,288.9L376.5,285.9L375.3,283L374,280.1L372.6,277.2L371.1,274.3L369.5,271.5L367.8,268.7L366.1,266L364.3,263.3L362.4,260.7L360.5,258.2L358.5,255.8L356.5,253.4L354.4,251.1L352.3,249L350.1,246.9L347.9,244.9L345.7,243L343.4,241.3L341.1,239.7L338.9,238.1L336.6,236.8L334.3,235.5L332,234.4L329.8,233.4L327.5,232.6L325.3,231.8L323.1,231.3L320.9,230.9L318.8,230.6L316.7,230.4L314.7,230.4L312.7,230.6L310.7,230.9L308.9,231.3L307.1,231.9L305.3,232.6L303.7,233.5" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M369.5,347.5L362.8,351.3L356.2,355.1L349.5,359L342.9,362.8L336.3,366.7L329.6,370.5L323,374.3L316.3,378.2" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M303.7,233.5L297,237.3L290.4,241.2L283.7,245L277.1,248.9L270.5,252.7L263.8,256.5L257.2,260.4L250.5,264.2" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="379.1" y1="442.5" x2="379.1" y2="387.2" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round"/>
 <line x1="379.1" y1="442.5" x2="379.1" y2="387.2" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>
 <path d="M307.3,335L307.3,333.6L300.7,337.5L300.7,338.8Z" fill="#7b4b18" stroke="#7b4b18" stroke-width="0.8" stroke-linejoin="round"/>
 <path d="M307.3,333.6L307.2,332.2L300.6,336.1L300.7,337.5Z" fill="#7b4b18" stroke="#7b4b18" stroke-width="0.8" stroke-linejoin="round"/>
@@ -3346,7 +3348,8 @@
 <path d="M241.5,371.4L234.9,375.3L228.2,379.1L221.6,382.9L214.9,386.8L208.3,390.6L201.6,394.5" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M217.3,333.7L210.6,337.5L204,341.3L197.3,345.2L190.7,349L184.1,352.9L177.4,356.7" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M243.2,348.6L236.5,352.5L229.9,356.3L223.2,360.1L216.6,364L210,367.8L203.3,371.6" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="400.4" y1="253.6" x2="179.7" y2="381.1" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>
+<line x1="400.9" y1="253.3" x2="179.2" y2="381.4" stroke="#ffffff" stroke-opacity="0.75" stroke-width="3.2" stroke-linecap="round"/>
+<line x1="400.9" y1="253.3" x2="179.2" y2="381.4" stroke="#2d3748" stroke-width="1.2" stroke-dasharray="14,3,2,3" stroke-linecap="round"/>
 <polyline points="165,287.5 240.3,287.5" fill="none" stroke="#222222" stroke-width="1.5"/>
 <circle cx="240.3" cy="287.5" r="5" fill="#3d6fb5" stroke="#111111" stroke-width="1.5"/>
 <text x="20" y="293.5" font-size="15" font-weight="bold" text-anchor="start">2. alojamento</text>

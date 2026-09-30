@@ -30,7 +30,7 @@ const arred = (x) => Math.round(x * 10) / 10;
 const arred3 = (x) => Math.round(x * 1000) / 1000;
 
 /* Ajusta a profundidade de uma face plana como função afim da posição na tela. */
-function profundidadeAfim(pts3, V, olho) {
+export function profundidadeAfim(pts3, V, olho) {
   const s = pts3.map((p) => V.p(p));
   const d = pts3.map((p) => dot(p, olho));
   let ib = 0;
@@ -50,7 +50,7 @@ function profundidadeAfim(pts3, V, olho) {
 
 /* Preenche as células cujo centro está dentro dos anéis (par-ímpar) com a profundidade da face. A grade da
    forma é só a caixa dela: as colunas I0..I0+W-1 e as linhas J0..J0+H-1 da grade global. */
-function preencher(prof, I0, J0, W, H, u0, v0, cel, aneis, plano) {
+export function preencher(prof, I0, J0, W, H, u0, v0, cel, aneis, plano) {
   let vmin = Infinity;
   let vmax = -Infinity;
   for (const an of aneis) for (const q of an) { if (q[1] < vmin) vmin = q[1]; if (q[1] > vmax) vmax = q[1]; }
@@ -93,7 +93,7 @@ function preencher(prof, I0, J0, W, H, u0, v0, cel, aneis, plano) {
    da forma original e da vista: as cópias deslocadas pela explosão reaproveitam as faces, somando o deslocamento
    aos pontos. */
 const facesEmCache = new WeakMap();
-function facesDaVista(r, vista, olho) {
+export function facesDaVista(r, vista, olho) {
   const origem = origemDoDeslocamento(r);
   const base = origem ? origem.base : r;
   let porVista = facesEmCache.get(base);

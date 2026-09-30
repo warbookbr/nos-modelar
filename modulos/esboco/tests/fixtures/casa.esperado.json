@@ -1,0 +1,59 @@
+{
+  "arquivo": "casa.esboco.json",
+  "nota": "Fixture anterior ao gate de contato: sem `contato.usar` as sobreposições de cada água do telhado com as paredes (5,1 mm), da chaminé com o telhado direito (10,9 mm) e das duas águas entre si (3,2 mm) são lidas como atravessamentos não declarados.",
+  "formas": {
+    "Casa Simples Unifamiliar": 11
+  },
+  "divergencias": [
+    {
+      "n": 1,
+      "opcao": "Casa Simples Unifamiliar",
+      "classe": "atravessa",
+      "pecas": [
+        "paredes",
+        "telhado_esq"
+      ],
+      "texto": "paredes e telhado_esq se atravessam 5,1 mm"
+    },
+    {
+      "n": 2,
+      "opcao": "Casa Simples Unifamiliar",
+      "classe": "atravessa",
+      "pecas": [
+        "paredes",
+        "telhado_dir"
+      ],
+      "texto": "paredes e telhado_dir se atravessam 5,1 mm"
+    },
+    {
+      "n": 3,
+      "opcao": "Casa Simples Unifamiliar",
+      "classe": "atravessa",
+      "pecas": [
+        "chamine",
+        "telhado_dir"
+      ],
+      "texto": "chamine e telhado_dir se atravessam 10,9 mm"
+    },
+    {
+      "n": 4,
+      "opcao": "Casa Simples Unifamiliar",
+      "classe": "atravessa",
+      "pecas": [
+        "telhado_esq",
+        "telhado_dir"
+      ],
+      "texto": "telhado_esq e telhado_dir se atravessam 3,2 mm"
+    }
+  ],
+  "leitura": [
+    "opção 1 (Casa Simples Unifamiliar): 11 formas",
+    "sem gate declarado (padrões do gate: tolerância 1,5 mm, penetração 1 mm)",
+    "divergências (4, da mais grave para a menos):",
+    "  [1] atravessa: paredes e telhado_esq se atravessam 5,1 mm",
+    "  [2] atravessa: paredes e telhado_dir se atravessam 5,1 mm",
+    "  [3] atravessa: chamine e telhado_dir se atravessam 10,9 mm",
+    "  [4] atravessa: telhado_esq e telhado_dir se atravessam 3,2 mm",
+    "detalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo"
+  ]
+}

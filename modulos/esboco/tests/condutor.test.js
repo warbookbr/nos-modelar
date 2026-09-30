@@ -4,7 +4,7 @@ import { copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } fr
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { ErroDeEsboco } from '../src/index.js';
-import { avancar, criarEstado, custoDe, ESTAGIOS_POR_NIVEL, formatarSituacao, marcarFeito, moverForma, planoDeDetalhe, portaoDoEstagio, replanejar } from '../src/condutor.js';
+import { avancar, conferirEnvelope, criarEstado, custoDe, ESTAGIOS_POR_NIVEL, formatarEnvelope, formatarSituacao, marcarFeito, moverForma, planoDeDetalhe, portaoDoEstagio, registrarEnvelope, replanejar, textoDoEnvelope } from '../src/condutor.js';
 import { condutorArquivo } from '../../../tools/mecanifica/esboco.mjs';
 
 const pasta = new URL('./fixtures/', import.meta.url);
@@ -239,4 +239,149 @@ describe('o Condutor na linha de comando, na moto de formas curvas', () => {
     expect(r.texto).toContain('b foi para a unidade a');
     expect(JSON.parse(readFileSync(`${arq}.condutor.json`, 'utf8')).alteracoes[0].motivo).toBe('a e b são a mesma peça usinada');
   });
+});
+
+/* O Envelope: a caixa e as portas de cada Unidade de detalhe, e a conferência da versão detalhada contra ele. */
+describe('o Envelope de cada Unidade de detalhe', () => {
+  const moto = fixture('moto-curvas.esboco.json');
+  const unidade = (id) => planoDeDetalhe(moto).unidades.find((u) => u.id === id);
+  /* a versão detalhada de uma unidade é um esboço à parte: as formas das outras unidades ficam ocultas, só como referência */
+  const detalhe = (id, mexer = () => {}) => {
+    const d = JSON.parse(JSON.stringify(moto));
+    for (const f of d.formas) if (f.id !== id) f.oculto = true;
+    mexer(d.formas.find((f) => f.id === id), d);
+    return d;
+  };
+
+  it('cada unidade ganha a caixa que envolve as formas dela na maquete, em mm', () => {
+    const p = planoDeDetalhe(moto);
+    expect(p.unidades.every((u) => u.envelope !== undefined)).toBe(true);
+    expect(unidade('rodaFrente').envelope.caixa).toEqual({ x: [-62.5, 62.5], y: [0, 610], z: [395, 1005] });
+    expect(unidade('motor').envelope.caixa).toEqual({ x: [-130, 130], y: [230, 530], z: [-190, 190] });
+    expect(unidade('tanque').envelope.caixa.z).toEqual([-140, 280]);
+    /* a caixa de uma unidade com várias formas é a de todas elas: o guidão passa dos dois garfos */
+    expect(unidade('garfoE+garfoD+guidao').envelope.caixa.x).toEqual([-380, 380]);
+  });
+
+  it('as portas são as âncoras da unidade que outras unidades usam, com o ponto e quem usa', () => {
+    const portas = (id) => unidade(id).envelope.portas.map((q) => `${q.forma}.${q.ancora} [${q.ponto.join(' ')}] <- ${q.usadaPor.join(',')}`);
+    expect(portas('motor')).toEqual(['motor.+y [0 530 0] <- quadro', 'motor.-x [-130 380 0] <- balancimE', 'motor.-z [0 380 -190] <- balancimE']);
+    expect(portas('tanque')).toEqual(['tanque.-z [0 690.8 -140] <- banco']);
+    expect(portas('carenagem')).toEqual(['carenagem.+z [0 710 720] <- farol', 'carenagem.nariz [0 698 720] <- farol']);
+    /* a âncora que o garfo cita é a do quadro, e a que o quadro cita é a face do motor */
+    expect(portas('quadro')).toContain('quadro.coluna.+y [0 830 400] <- garfoE+garfoD+guidao');
+    /* quem só é usado por citação de id, sem âncora, não tem porta; quem ninguém usa também não */
+    expect(portas('farol')).toEqual([]);
+    expect(portas('banco')).toEqual([]);
+    expect(textoDoEnvelope(unidade('tanque').envelope)).toBe('envelope: x -155..155 y 590..791,5 z -140..280; portas tanque.-z [0 690,8 -140] (usada por banco)');
+  });
+
+  it('o envelope é determinístico e segue o agrupamento quando a forma muda de unidade', () => {
+    expect(JSON.stringify(planoDeDetalhe(moto).unidades)).toBe(JSON.stringify(planoDeDetalhe(moto).unidades));
+    const e = fila();
+    const s = passar(e, estadoNaMaquete(e), 2);
+    expect(s.unidades.map((u) => u.envelope.caixa.x)).toEqual([[0, 20], [20, 40], [40, 60], [60, 80]]);
+    const novo = moverForma(e, s, { forma: 'b', para: 'a', motivo });
+    expect(novo.unidades[0].envelope.caixa.x).toEqual([0, 40]);
+    expect(novo.unidades.map((u) => u.id)).toEqual(['a', 'c', 'd']);
+  });
+
+  it('a versão detalhada igual cabe e mantém as portas', () => {
+    const r = conferirEnvelope(moto, null, 'tanque', detalhe('tanque'));
+    expect(r).toMatchObject({ unidade: 'tanque', ok: true, falta: [], tolerancia_declarada: false });
+    expect(r.tolerancia_mm).toBe(4.2);
+    expect(r.portas).toEqual([{ forma: 'tanque', ancora: '-z', esperado: [0, 690.8, -140], medido: [0, 690.8, -140], desvio_mm: 0, ok: true }]);
+    expect(formatarEnvelope(r, 'tanque.esboco.json')).toBe('envelope da unidade tanque contra tanque.esboco.json: cabe (tolerância 4,2 mm, padrão de 1% da maior dimensão)\n  caixa: x cabe; y cabe; z cabe\n  portas: tanque.-z no lugar (0 mm)\n');
+  });
+
+  it('a versão detalhada maior que o envelope não cabe, com o excesso em mm', () => {
+    const r = conferirEnvelope(moto, null, 'tanque', detalhe('tanque', (t) => { t.secoes[2].tamanho = [330, 200]; }));
+    expect(r.ok).toBe(false);
+    expect(r.caixa.x).toMatchObject({ envelope: [-155, 155], detalhe: [-165, 165], excesso_mm: 10, ok: false });
+    expect(r.caixa.y.ok).toBe(true);
+    expect(r.falta).toEqual(['a versão detalhada passa 10 mm do Envelope em x (detalhe -165..165, envelope -155..155, tolerância 4,2 mm)']);
+  });
+
+  it('a tolerância declarada em plano.envelope vale, e um detalhe menor que o envelope cabe', () => {
+    const maior = detalhe('tanque', (t) => { t.secoes[2].tamanho = [330, 200]; });
+    const com = (tolerancia) => ({ ...moto, plano: { ...moto.plano, envelope: { tolerancia } } });
+    expect(conferirEnvelope(com(12), null, 'tanque', maior)).toMatchObject({ ok: true, tolerancia_mm: 12, tolerancia_declarada: true });
+    expect(conferirEnvelope(com(5), null, 'tanque', maior).ok).toBe(false);
+    expect(conferirEnvelope(moto, null, 'tanque', detalhe('tanque', (t) => { t.secoes[2].tamanho = [250, 170]; })).ok).toBe(true);
+  });
+
+  it('a porta que sai do lugar ou que some da versão detalhada reprova, com o ponto esperado e o medido', () => {
+    const movida = conferirEnvelope(moto, null, 'tanque', detalhe('tanque', (t) => { t.desloca = [0, 0, 30]; }));
+    expect(movida.ok).toBe(false);
+    expect(movida.portas[0]).toMatchObject({ forma: 'tanque', ancora: '-z', esperado: [0, 690.8, -140], medido: [0, 690.8, -110], desvio_mm: 30, ok: false });
+    expect(movida.falta.some((f) => f.startsWith('a porta tanque.-z (usada por banco) saiu do lugar: [0 690,8 -110] na versão detalhada e [0 690,8 -140] na maquete, 30 mm de diferença'))).toBe(true);
+    /* uma versão detalhada sem a forma da porta (aqui o tanque tem outro nome) não mantém a porta */
+    const r = conferirEnvelope(moto, null, 'tanque', { opcoes: [{ titulo: 'A. Naked', formas: [caixa('tanqueDetalhado', [0, 690, 70], 300, 200, 400)] }] });
+    expect(r.portas[0]).toMatchObject({ medido: null, ok: false });
+    expect(r.falta.some((f) => f.includes('a porta tanque.-z (usada por banco) não existe na versão detalhada'))).toBe(true);
+  });
+
+  it('uma unidade inexistente é recusada com o "quis dizer"', () => {
+    expect(() => conferirEnvelope(moto, null, 'tanqe', moto)).toThrow(/"tanqe" não é uma unidade de detalhe \(quis dizer "tanque"\?\)/);
+  });
+
+  describe('com plano.envelope declarado o Portão do Detalhe exige a conferência', () => {
+    const e = () => ({ ...fila(), plano: { ...fila().plano, envelope: { tolerancia: 1 } } });
+    const noDetalhe = () => passar(e(), estadoNaMaquete(e()), 3);
+
+    it('--feito só vale depois do Envelope conferido, e o Portão lista as unidades sem conferência', () => {
+      const s = noDetalhe();
+      expect(s.atual).toBe('detalhe-por-unidade');
+      expect(() => marcarFeito(e(), s, 'a')).toThrow(/só vira feita depois de o Envelope conferir a versão detalhada dela \(plano.envelope está declarado\): rode --envelope a <arquivo-detalhado.esboco.json>/);
+      const portao = portaoDoEstagio(e(), s);
+      expect(portao.envelopeDeclarado).toBe(true);
+      expect(portao.falta).toContain('4 unidades sem o Envelope conferido (--envelope <unidade> <arquivo-detalhado.esboco.json>): a, b, c, d');
+      const maior = JSON.parse(JSON.stringify(e()));
+      maior.opcoes[0].formas = [caixa('a', [10, 10, 0], 20, 20, 24), ...['b', 'c', 'd'].map((id, k) => caixa(id, [30 + 20 * k, 10, 0], 20, 20, 20, { oculto: true }))];
+      const ruim = conferirEnvelope(e(), s, 'a', maior);
+      expect(ruim.ok).toBe(false);
+      const falhou = registrarEnvelope(s, ruim, 'a.esboco.json');
+      expect(falhou.unidades[0].envelopeConferido).toMatchObject({ ok: false, arquivo: 'a.esboco.json', tolerancia_mm: 1 });
+      expect(() => marcarFeito(e(), falhou, 'a')).toThrow(/a última conferência falhou: a versão detalhada passa 2 mm do Envelope em z \(detalhe -12..12, envelope -10..10, tolerância 1 mm\)/);
+      let ok = s;
+      const so = (id) => ({ ...e(), opcoes: [{ titulo: 'T', formas: e().opcoes[0].formas.map((f) => (f.id === id ? f : { ...f, oculto: true })) }] });
+      for (const u of s.unidades) ok = registrarEnvelope(ok, conferirEnvelope(e(), ok, u.id, so(u.id)), 'mesmo.esboco.json');
+      for (const u of s.unidades) ok = marcarFeito(e(), ok, u.id).estado;
+      expect(portaoDoEstagio(e(), ok).passa).toBe(true);
+      expect(formatarSituacao(s, portao)).toContain('     envelope: x 0..20 y 0..20 z -10..10; sem portas [envelope a conferir]');
+    });
+
+    it('sem plano.envelope o Condutor é o de antes: nada pede a conferência e a situação não mostra o envelope', () => {
+      const s = passar(fila(), estadoNaMaquete(fila()), 3);
+      expect(marcarFeito(fila(), s, 'a').estado.unidades[0].feito).toBe(true);
+      expect(portaoDoEstagio(fila(), s).envelopeDeclarado).toBeUndefined();
+      expect(formatarSituacao(s, portaoDoEstagio(fila(), s))).not.toContain('envelope');
+    });
+  });
+
+  it('pela linha de comando --envelope confere, grava o resultado no estado e sai com 1 quando não cabe', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'envelope-'));
+    const arq = join(dir, 'moto-curvas.esboco.json');
+    writeFileSync(arq, JSON.stringify({ ...moto, plano: { ...moto.plano, envelope: { tolerancia: 2 } } }));
+    const bom = join(dir, 'tanque.esboco.json');
+    writeFileSync(bom, JSON.stringify(detalhe('tanque')));
+    const largo = join(dir, 'tanque-largo.esboco.json');
+    writeFileSync(largo, JSON.stringify(detalhe('tanque', (t) => { t.secoes[2].tamanho = [330, 200]; })));
+    /* sem estado a conferência é só lida, e não cria o arquivo de estado */
+    let r = condutorArquivo(arq, { envelope: { unidade: 'tanque', arquivo: bom } });
+    expect(r.codigo).toBe(0);
+    expect(r.texto).toContain('o estado do Condutor não existe');
+    expect(existsSync(`${arq}.condutor.json`)).toBe(false);
+    for (let i = 0; i < 3; i++) condutorArquivo(arq, { proximo: true });
+    condutorArquivo(arq, { proximo: true });
+    r = condutorArquivo(arq, { envelope: { unidade: 'tanque', arquivo: largo } });
+    expect(r.codigo).toBe(1);
+    expect(r.texto).toContain('envelope da unidade tanque contra tanque-largo.esboco.json: não cabe (tolerância 2 mm)');
+    expect(JSON.parse(readFileSync(`${arq}.condutor.json`, 'utf8')).unidades.find((u) => u.id === 'tanque').envelopeConferido).toMatchObject({ ok: false, arquivo: 'tanque-largo.esboco.json' });
+    expect(() => condutorArquivo(arq, { feito: 'tanque' })).toThrow(/a última conferência falhou/);
+    r = condutorArquivo(arq, { envelope: { unidade: 'tanque', arquivo: bom } });
+    expect(r.codigo).toBe(0);
+    expect(condutorArquivo(arq, { feito: 'tanque' }).texto).toContain('unidade tanque marcada como feita');
+    expect(condutorArquivo(arq).texto).toContain('envelope: x -155..155 y 590..791,5 z -140..280; portas tanque.-z [0 690,8 -140] (usada por banco) [envelope conferido com tanque.esboco.json]');
+  }, 120000);
 });

@@ -6,7 +6,7 @@
    cumprido (mais o que o estágio pede). O nível de detalhe do plano (`plano.nivel`) liga ou desliga estágios. A cada 25%
    do custo estimado (o número de formas das unidades) o Marco registra "chamar o crítico" no estado; o despacho do
    crítico é da skill. Puro e determinístico: sem data nem sorteio, e sem ler nem gravar arquivo. */
-import { ErroDeEsboco } from './index.js';
+import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { expandirEsboco } from './expandir.js';
 import { herdarDoEspelho, lerContato } from './contato.js';
 import { medirEsboco } from './descrever.js';
@@ -103,10 +103,97 @@ function dependenciasDasUnidades(unidades, formas) {
   return dependeDe;
 }
 
-function montarUnidades(unidades, formas) {
+const OPOSTO = { '+x': '-x', '-x': '+x', '+y': '-y', '-y': '+y', '+z': '-z', '-z': '+z' };
+const EIXOS = ['x', 'y', 'z'];
+const r1 = (x) => Math.round(x * 10) / 10;
+
+/* O lado da forma de referência que fica encostado quando a forma anda em `direcao`: ela anda e para do lado oposto. */
+function ladoDaDirecao(d) {
+  if (typeof d === 'string') return OPOSTO[d] ?? null;
+  if (Array.isArray(d) && d.length === 3 && d.every(Number.isFinite)) {
+    const k = d.map((v, i) => [v, i]).filter(([v]) => Math.abs(v) > 1e-9);
+    if (k.length === 1) return OPOSTO[`${k[0][0] > 0 ? '+' : '-'}${EIXOS[k[0][1]]}`];
+  }
+  return null;
+}
+
+/* As âncoras de outras formas que uma forma usa para se posicionar: [{ forma, ancora }]. `sobre`, `ponta` e `encosta` usam a
+   face da referência (a de cima, o lado pedido, a oposta ao movimento); as demais citam "<id>.<ancora>" ou uma âncora com
+   deslocamento. Uma citação de id sem âncora é só dependência, e não porta. */
+function ancorasCitadas(f, ids) {
+  const saida = [];
+  const texto = (b) => {
+    if (typeof b !== 'string' || ids.has(b)) return;
+    const i = b.lastIndexOf('.');
+    if (i > 0 && ids.has(b.slice(0, i))) saida.push({ forma: b.slice(0, i), ancora: b.slice(i + 1) });
+  };
+  const ponto = (v) => {
+    if (typeof v === 'string') texto(v);
+    else if (v && typeof v === 'object' && Array.isArray(v.entre)) v.entre.forEach(ponto);
+    else if (v && typeof v === 'object' && typeof v.ancora === 'string') texto(v.ancora);
+    else if (v && typeof v === 'object' && v.ponto !== undefined && v.nome !== undefined) ponto(v.ponto);
+  };
+  if (typeof f.sobre === 'string' && ids.has(f.sobre)) saida.push({ forma: f.sobre, ancora: '+y' });
+  const ponta = Array.isArray(f.ponta) ? { id: f.ponta[0], lado: f.ponta[1] } : (f.ponta && typeof f.ponta === 'object' ? f.ponta : null);
+  if (ponta && ids.has(ponta.id) && OPOSTO[ponta.lado]) saida.push({ forma: ponta.id, ancora: ponta.lado });
+  if (f.encosta && ids.has(f.encosta.referencia) && ladoDaDirecao(f.encosta.direcao)) saida.push({ forma: f.encosta.referencia, ancora: ladoDaDirecao(f.encosta.direcao) });
+  if (f.alinha) ponto(f.alinha.com);
+  for (const k of ['centro', 'de', 'para']) if (f[k] !== undefined) ponto(f[k]);
+  if (Array.isArray(f.caminho)) f.caminho.forEach(ponto);
+  return saida;
+}
+
+/* O Envelope de cada unidade: a caixa que envolve as formas dela na maquete e as portas, que são as âncoras das formas dela
+   que outras unidades usam. A versão detalhada da unidade cabe na caixa e mantém as portas nos mesmos pontos. */
+function envelopesDasUnidades(unidades, formas, resolvidas) {
+  if (!resolvidas) return new Map();
+  const ids = new Set(formas.map((f) => f.id));
+  const porId = new Map(formas.map((f) => [f.id, f]));
+  const resolvida = new Map(resolvidas.map((r) => [r.id, r]));
+  const unidadeDe = new Map();
+  for (const u of unidades) for (const m of u.membros) unidadeDe.set(m, u.id);
+  const portas = new Map(unidades.map((u) => [u.id, new Map()]));
+  for (const u of unidades) {
+    for (const m of u.membros) {
+      for (const c of ancorasCitadas(porId.get(m) ?? {}, ids)) {
+        const dono = unidadeDe.get(c.forma);
+        if (!dono || dono === u.id) continue;
+        const r = resolvida.get(c.forma);
+        const ancoras = r ? ancorasDe(r) : null;
+        if (!ancoras || !Object.hasOwn(ancoras, c.ancora)) continue;
+        const chave = `${c.forma}\u0000${c.ancora}`;
+        const mapa = portas.get(dono);
+        if (!mapa.has(chave)) mapa.set(chave, { forma: c.forma, ancora: c.ancora, ponto: ancoras[c.ancora].map(r1), usadaPor: [] });
+        const p = mapa.get(chave);
+        if (!p.usadaPor.includes(u.id)) p.usadaPor.push(u.id);
+      }
+    }
+  }
+  const ordem = new Map(formas.map((f, i) => [f.id, i]));
+  return new Map(unidades.map((u) => {
+    const rs = u.membros.map((m) => resolvida.get(m)).filter(Boolean);
+    const caixa = Object.fromEntries(EIXOS.map((e, k) => [e, rs.length ? [r1(Math.min(...rs.map((r) => r.min[k]))), r1(Math.max(...rs.map((r) => r.max[k])))] : [0, 0]]));
+    const lista = [...portas.get(u.id).values()].sort((a, b) => ordem.get(a.forma) - ordem.get(b.forma) || (a.ancora < b.ancora ? -1 : a.ancora > b.ancora ? 1 : 0));
+    return [u.id, { caixa, portas: lista }];
+  }));
+}
+
+function montarUnidades(unidades, formas, resolvidas) {
   const dependeDe = dependenciasDasUnidades(unidades, formas);
   const ordenadas = ordenar(unidades.map((u) => ({ ...u })), dependeDe);
-  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.membros.length, feito: u.feito === true, ...(u.ciclo ? { ciclo: true } : {}) }));
+  const envelopes = envelopesDasUnidades(ordenadas, formas, resolvidas);
+  return ordenadas.map((u) => ({ id: u.id, membros: u.membros, depende: [...dependeDe.get(u.id)], custo: u.membros.length, feito: u.feito === true, ...(u.ciclo ? { ciclo: true } : {}), envelope: envelopes.get(u.id) }));
+}
+
+/* As formas resolvidas e visíveis de uma opção, ou null se a geometria não resolve (o agrupamento não depende dela; só o
+   Envelope, que fica sem caixa, e o Portão é quem recusa o esboço que não resolve). */
+function resolverVisiveis(opcao, onde, pontos) {
+  try {
+    return resolverOpcao(opcao, onde, pontos).filter((r) => r.forma.oculto !== true);
+  } catch (e) {
+    if (e instanceof ErroDeEsboco) return null;
+    throw e;
+  }
 }
 
 /* As formas visíveis da opção (a primeira, por padrão) e o mapa de acoplamento apertado: `atravessa` declarado (o eixo no
@@ -137,13 +224,20 @@ export function planoDeDetalhe(bruto, { opcao = 0 } = {}) {
     if (!g.chaves.includes(chaveDe(f))) g.chaves.push(chaveDe(f));
     g.membros.push(f.id);
   }
-  const unidades = montarUnidades([...grupos.values()].map((g) => ({ id: g.chaves.join('+'), membros: g.membros })), formas);
+  const resolvidas = resolverVisiveis(o, `opção ${opcao + 1}`, esboco.pontos);
+  const unidades = montarUnidades([...grupos.values()].map((g) => ({ id: g.chaves.join('+'), membros: g.membros })), formas, resolvidas);
   return { opcao: o.titulo ?? `Opção ${opcao + 1}`, unidades, formas: formas.map((f) => f.id) };
 }
 
 /* Mede o esboço para o Portão: divergências (gate, soltas, atravessamentos, medidas, contrato) e o que o nível pede do plano. */
-function medirParaOPortao(bruto, nivel) {
-  const { descricao, divergencias, plano } = medirEsboco(bruto, { projecao: false });
+function medirParaOPortao(bruto, estado, referencias) {
+  const nivel = estado.nivel;
+  const medido = medirEsboco(bruto, { projecao: false, referencias });
+  const { descricao, plano } = medido;
+  /* a silhueta contra a referência é coisa da Conferência da maquete: na Maquete ainda se constrói, a menos que o nível
+     não tenha Conferência (o esquemático) */
+  const cobraReferencia = estado.atual !== 'maquete' || !estado.estagios.includes('conferencia-da-maquete');
+  const divergencias = cobraReferencia ? medido.divergencias : medido.divergencias.filter((d) => d.classe !== 'referencia');
   const falta = [];
   for (const o of descricao.opcoes) if (!o.gate.declarado && o.formas.length >= 4) falta.push(`o gate de contato não está ligado na opção "${o.titulo}" (contato.usar: true; a política liga a partir de 4 formas)`);
   for (const d of divergencias) falta.push(`[${d.n}] ${d.classe}: ${d.texto}`);
@@ -187,10 +281,10 @@ function sincronizarNivel(estado, bruto) {
 }
 
 /* O Portão do estágio atual: { estagio, passa, falta }. `falta` diz, em frases, o que impede o próximo estágio. */
-export function portaoDoEstagio(bruto, estadoBruto) {
+export function portaoDoEstagio(bruto, estadoBruto, { referencias } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
   if (estado.atual === CONCLUIDO) return { estagio: CONCLUIDO, passa: true, falta: [] };
-  const { falta, divergencias, resumo } = medirParaOPortao(bruto, estado.nivel);
+  const { falta, divergencias, resumo } = medirParaOPortao(bruto, estado, referencias);
   if (['plano-de-detalhe', 'detalhe-por-unidade', 'montagem'].includes(estado.atual)) {
     const atuais = planoDeDetalhe(bruto).formas;
     const nas = new Set(estado.unidades.flatMap((u) => u.membros));
@@ -198,17 +292,23 @@ export function portaoDoEstagio(bruto, estadoBruto) {
     const saidas = [...nas].filter((id) => !atuais.includes(id));
     if (novas.length || saidas.length) falta.push(`as formas mudaram desde o Plano de detalhe (${novas.length ? `sem unidade: ${novas.join(', ')}` : ''}${novas.length && saidas.length ? '; ' : ''}${saidas.length ? `que não existem mais: ${saidas.join(', ')}` : ''}); refaça o agrupamento com --replanejar e um "motivo" de pelo menos ${MINIMO_DO_MOTIVO} caracteres`);
   }
+  const envelopeDeclarado = lerPlano(bruto?.plano)?.envelope !== undefined;
   if (estado.atual === 'detalhe-por-unidade') {
     const pendentes = estado.unidades.filter((u) => !u.feito).map((u) => u.id);
     if (pendentes.length) falta.push(`${pendentes.length} ${pendentes.length === 1 ? 'unidade' : 'unidades'} de detalhe sem marcar como feita (--feito <unidade>): ${pendentes.join(', ')}`);
+    /* com `plano.envelope` declarado, a versão detalhada de cada unidade tem de caber no Envelope e manter as portas */
+    if (envelopeDeclarado) {
+      const sem = estado.unidades.filter((u) => !u.envelopeConferido?.ok).map((u) => u.id);
+      if (sem.length) falta.push(`${sem.length} ${sem.length === 1 ? 'unidade' : 'unidades'} sem o Envelope conferido (--envelope <unidade> <arquivo-detalhado.esboco.json>): ${sem.join(', ')}`);
+    }
   }
-  return { estagio: estado.atual, passa: falta.length === 0, falta, divergencias, resumo };
+  return { estagio: estado.atual, passa: falta.length === 0, falta, divergencias, resumo, ...(envelopeDeclarado ? { envelopeDeclarado: true } : {}) };
 }
 
 /* Avança se o Portão passa. Devolve { ok, estado, portao }; sem passar o estado não muda e `portao.falta` diz o que falta. */
-export function avancar(bruto, estadoBruto) {
+export function avancar(bruto, estadoBruto, { referencias } = {}) {
   const estado = sincronizarNivel(estadoBruto, bruto);
-  const portao = portaoDoEstagio(bruto, estado);
+  const portao = portaoDoEstagio(bruto, estado, { referencias });
   if (estado.atual === CONCLUIDO) return { ok: false, estado, portao, concluido: true };
   if (!portao.passa) return { ok: false, estado, portao };
   const novo = clone(estado);
@@ -248,9 +348,11 @@ export function moverForma(bruto, estadoBruto, { forma, para, motivo }) {
   const brutas = estado.unidades.map((u) => ({ id: u.id, membros: u.membros.filter((x) => x !== forma), feito: u.feito }));
   const destino = brutas.find((u) => u.id === para);
   if (destino) destino.membros.push(forma); else brutas.push({ id: para, membros: [forma], feito: false });
-  const visiveis = expandirEsboco(bruto).opcoes[0].formas.filter((f) => f.oculto !== true);
+  const expandido = expandirEsboco(bruto);
+  const visiveis = expandido.opcoes[0].formas.filter((f) => f.oculto !== true);
+  const resolvidas = resolverVisiveis(expandido.opcoes[0], 'opção 1', expandido.pontos);
   const novo = clone(estado);
-  novo.unidades = montarUnidades(brutas.filter((u) => u.membros.length > 0), visiveis);
+  novo.unidades = montarUnidades(brutas.filter((u) => u.membros.length > 0), visiveis, resolvidas);
   novo.alteracoes.push({ forma, de, para, motivo: m });
   return novo;
 }
@@ -263,7 +365,11 @@ export function replanejar(bruto, estadoBruto, { motivo }) {
   const p = planoDeDetalhe(bruto);
   const feitas = new Set(estado.unidades.filter((u) => u.feito).map((u) => u.id));
   const novo = clone(estado);
-  novo.unidades = p.unidades.map((u) => ({ ...u, feito: feitas.has(u.id) }));
+  novo.unidades = p.unidades.map((u) => {
+    const antiga = estado.unidades.find((x) => x.id === u.id);
+    const igual = antiga?.envelopeConferido && JSON.stringify(antiga.envelope) === JSON.stringify(u.envelope);
+    return { ...u, feito: feitas.has(u.id), ...(igual ? { envelopeConferido: antiga.envelopeConferido } : {}) };
+  });
   novo.alteracoes.push({ replanejado: true, motivo: m });
   return novo;
 }
@@ -274,6 +380,10 @@ export function marcarFeito(bruto, estadoBruto, unidade) {
   exigir(estado.atual === 'detalhe-por-unidade', `condutor: --feito vale no estágio Detalhe por unidade (o estágio atual é ${nomeDoEstagio(estado.atual)})`);
   const ids = estado.unidades.map((u) => u.id);
   exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.join(', ')})`);
+  if (lerPlano(bruto?.plano)?.envelope !== undefined) {
+    const conferida = estado.unidades.find((x) => x.id === unidade).envelopeConferido;
+    exigir(conferida?.ok === true, `condutor: a unidade "${unidade}" só vira feita depois de o Envelope conferir a versão detalhada dela (plano.envelope está declarado): rode --envelope ${unidade} <arquivo-detalhado.esboco.json>${conferida ? `; a última conferência falhou: ${conferida.falta.join('; ')}` : ''}`);
+  }
   const novo = clone(estado);
   const u = novo.unidades.find((x) => x.id === unidade);
   const novosMarcos = [];
@@ -302,7 +412,10 @@ export function formatarSituacao(estado, portao) {
   if (estado.unidades.length > 0) {
     const c = custoDe(estado);
     L.push(`unidades de detalhe (${estado.unidades.length}, custo estimado ${c.total} formas, feito ${c.feito}, ${n(c.percentual)}%), na ordem de dependência:`);
-    estado.unidades.forEach((u, i) => L.push(`  ${i + 1}. ${u.id}: ${u.custo} ${u.custo === 1 ? 'forma' : 'formas'}${u.depende.length ? `, depende de ${u.depende.join(', ')}` : ''}${u.feito ? ' [feita]' : ''}${u.ciclo ? ' [ciclo]' : ''}`));
+    estado.unidades.forEach((u, i) => {
+      L.push(`  ${i + 1}. ${u.id}: ${u.custo} ${u.custo === 1 ? 'forma' : 'formas'}${u.depende.length ? `, depende de ${u.depende.join(', ')}` : ''}${u.feito ? ' [feita]' : ''}${u.ciclo ? ' [ciclo]' : ''}`);
+      if (portao?.envelopeDeclarado && u.envelope) L.push(`     ${textoDoEnvelope(u.envelope)}${u.envelopeConferido ? (u.envelopeConferido.ok ? ` [envelope conferido com ${u.envelopeConferido.arquivo}]` : ` [envelope reprovado com ${u.envelopeConferido.arquivo}]`) : ' [envelope a conferir]'}`);
+    });
   }
   for (const m of estado.marcos ?? []) L.push(`marco de ${m.limiar}%: chamar o crítico visual sem contexto, com imagens limpas (registrado; o despacho é da skill)`);
   for (const a of estado.alteracoes ?? []) if (!a.replanejado) L.push(`agrupamento alterado: ${a.forma} de ${a.de} para ${a.para} (${a.motivo})`);
@@ -310,3 +423,74 @@ export function formatarSituacao(estado, portao) {
   return `${L.join('\n')}\n`;
 }
 
+const faixa = (f) => `${n1(f[0])}..${n1(f[1])}`;
+const n1 = (x) => String(r1(x)).replace('.', ',');
+
+/* Uma linha com a caixa e as portas de um Envelope. */
+export function textoDoEnvelope(e) {
+  return `envelope: x ${faixa(e.caixa.x)} y ${faixa(e.caixa.y)} z ${faixa(e.caixa.z)}; ${e.portas.length === 0 ? 'sem portas' : `portas ${e.portas.map((p) => `${p.forma}.${p.ancora} [${p.ponto.map(n1).join(' ')}] (usada por ${p.usadaPor.join(', ')})`).join('; ')}`}`;
+}
+
+/* Confere que a versão detalhada de uma unidade (um esboço à parte, `detalhado`) cabe no Envelope que a maquete deu a ela e
+   mantém as portas nos mesmos pontos. A tolerância é `plano.envelope.tolerancia` da maquete (em mm) ou, sem ela, 1% da maior
+   dimensão da caixa (no mínimo 1 mm). A versão detalhada usa a opção de mesmo título da maquete (ou a primeira) e precisa ter
+   as formas e as âncoras das portas com os mesmos nomes. Devolve { unidade, ok, tolerancia_mm, tolerancia_declarada, caixa,
+   portas, falta }; não lê nem grava arquivo. */
+export function conferirEnvelope(bruto, estadoBruto, unidade, detalhado) {
+  const unidades = estadoBruto?.unidades?.length ? estadoBruto.unidades : planoDeDetalhe(bruto).unidades;
+  const ids = unidades.map((u) => u.id);
+  exigir(ids.includes(unidade), `condutor: "${unidade}" não é uma unidade de detalhe${quisDizer(unidade, ids)} (unidades: ${ids.join(', ')})`);
+  const u = unidades.find((x) => x.id === unidade);
+  exigir(u.envelope, `condutor: a unidade "${unidade}" não tem Envelope gravado (o estado é de antes do Envelope): refaça o Plano de detalhe com --replanejar e um motivo`);
+  const plano = lerPlano(bruto?.plano);
+  const maior = Math.max(...EIXOS.map((e) => u.envelope.caixa[e][1] - u.envelope.caixa[e][0]), 0);
+  const declarada = plano?.envelope?.tolerancia;
+  const tolerancia = declarada ?? Math.max(1, 0.01 * maior);
+  const expandido = expandirEsboco(detalhado);
+  const opcoes = Array.isArray(expandido.opcoes) ? expandido.opcoes : [];
+  exigir(opcoes.length > 0, 'condutor: a versão detalhada não tem opção');
+  const titulo = estadoBruto?.opcao;
+  const k = Math.max(0, opcoes.findIndex((o, i) => (o.titulo ?? `Opção ${i + 1}`) === titulo));
+  const rs = resolverOpcao(opcoes[k], `opção ${k + 1}`, expandido.pontos).filter((r) => r.forma.oculto !== true);
+  exigir(rs.length > 0, 'condutor: a versão detalhada não tem forma visível');
+  const falta = [];
+  const caixa = {};
+  EIXOS.forEach((e, i) => {
+    const d = [Math.min(...rs.map((r) => r.min[i])), Math.max(...rs.map((r) => r.max[i]))];
+    const env = u.envelope.caixa[e];
+    const excesso = Math.max(env[0] - d[0], d[1] - env[1], 0);
+    caixa[e] = { envelope: env, detalhe: [r1(d[0]), r1(d[1])], excesso_mm: r1(excesso), ok: excesso <= tolerancia + 1e-9 };
+    if (!caixa[e].ok) falta.push(`a versão detalhada passa ${n1(excesso)} mm do Envelope em ${e} (detalhe ${faixa(caixa[e].detalhe)}, envelope ${faixa(env)}, tolerância ${n1(tolerancia)} mm)`);
+  });
+  const portas = u.envelope.portas.map((p) => {
+    const r = rs.find((q) => q.id === p.forma);
+    const ancoras = r ? ancorasDe(r) : null;
+    if (!ancoras || !Object.hasOwn(ancoras, p.ancora)) {
+      falta.push(`a porta ${p.forma}.${p.ancora} (usada por ${p.usadaPor.join(', ')}) não existe na versão detalhada: ela precisa ter a forma "${p.forma}" com a âncora "${p.ancora}"`);
+      return { forma: p.forma, ancora: p.ancora, esperado: p.ponto, medido: null, desvio_mm: null, ok: false };
+    }
+    const medido = ancoras[p.ancora].map(r1);
+    const desvio = Math.hypot(...medido.map((v, i) => v - p.ponto[i]));
+    const ok = desvio <= tolerancia + 1e-9;
+    if (!ok) falta.push(`a porta ${p.forma}.${p.ancora} (usada por ${p.usadaPor.join(', ')}) saiu do lugar: [${medido.map(n1).join(' ')}] na versão detalhada e [${p.ponto.map(n1).join(' ')}] na maquete, ${n1(desvio)} mm de diferença, com tolerância de ${n1(tolerancia)} mm`);
+    return { forma: p.forma, ancora: p.ancora, esperado: p.ponto, medido, desvio_mm: r1(desvio), ok };
+  });
+  return { unidade, ok: falta.length === 0, tolerancia_mm: r1(tolerancia), tolerancia_declarada: declarada !== undefined, caixa, portas, falta };
+}
+
+/* Texto do resultado de `conferirEnvelope`. */
+export function formatarEnvelope(r, arquivo) {
+  const L = [`envelope da unidade ${r.unidade} contra ${arquivo}: ${r.ok ? 'cabe' : 'não cabe'} (tolerância ${n1(r.tolerancia_mm)} mm${r.tolerancia_declarada ? '' : ', padrão de 1% da maior dimensão'})`];
+  L.push(`  caixa: ${EIXOS.map((e) => (r.caixa[e].ok ? `${e} cabe` : `${e} passa ${n1(r.caixa[e].excesso_mm)} mm`)).join('; ')}`);
+  L.push(r.portas.length === 0 ? '  portas: nenhuma (nenhuma outra unidade usa uma âncora desta)' : `  portas: ${r.portas.map((p) => `${p.forma}.${p.ancora} ${p.ok ? `no lugar (${n1(p.desvio_mm)} mm)` : p.medido === null ? 'ausente' : `fora do lugar (${n1(p.desvio_mm)} mm)`}`).join('; ')}`);
+  for (const f of r.falta) L.push(`  - ${f}`);
+  return `${L.join('\n')}\n`;
+}
+
+/* Grava no estado o resultado da conferência do Envelope da unidade (só o resultado, sem data). */
+export function registrarEnvelope(estado, resultado, arquivo) {
+  const novo = clone(estado);
+  const u = novo.unidades.find((x) => x.id === resultado.unidade);
+  if (u) u.envelopeConferido = { ok: resultado.ok, arquivo, tolerancia_mm: resultado.tolerancia_mm, falta: resultado.falta };
+  return novo;
+}

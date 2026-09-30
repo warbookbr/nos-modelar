@@ -7,13 +7,15 @@
 import { ancorasDe, ErroDeEsboco, resolverOpcao } from './index.js';
 import { lerContato, medirPar, padroesDoContato, pecasDe } from './contato.js';
 import { quisDizer } from './parecido.js';
+import { conferirReferencia, exigirVista } from './referencia.js';
 
 export const NIVEIS = ['esquematico', 'medio', 'detalhado'];
-export const ORIGENS = ['ficha', 'foto', 'ia'];
+export const ORIGENS = ['ficha', 'foto', 'ia', 'referencia'];
 export const UNIDADES = { mm: 1, cm: 10, m: 1000 };
 export const MEDIDAS_TOTAIS = { alturaTotal: 'y', larguraTotal: 'x', profundidadeTotal: 'z' };
 const EIXOS = ['x', 'y', 'z'];
-const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato'];
+const CHAVES_DO_PLANO = ['texto', 'nivel', 'medidas', 'contrato', 'referencia', 'envelope'];
+const CHAVES_DA_REFERENCIA = ['arquivo', 'vista', 'tolerancia', 'iou_min', 'partes', 'opcoes', 'ancoras', 'recorte', 'limiar'];
 const CHAVES_DA_MEDIDA = ['nome', 'valor', 'unidade', 'origem', 'tolerancia', 'mede', 'opcoes'];
 const CHAVES_DO_CONTRATO = ['tocam', 'livres', 'simetricas'];
 const CHAVES_DA_SIMETRIA = ['a', 'b', 'eixo', 'pos', 'tolerancia'];
@@ -69,7 +71,7 @@ function lerPar(p, onde) {
 /* O `plano` do esboço lido e validado: { texto, nivel, medidas, contrato }, ou null sem plano. Aceita o texto de sempre. */
 export function lerPlano(plano) {
   if (plano === undefined || plano === null) return null;
-  if (typeof plano === 'string') return { texto: plano, nivel: undefined, medidas: [], contrato: null, estruturado: false };
+  if (typeof plano === 'string') return { texto: plano, nivel: undefined, medidas: [], contrato: null, referencia: [], estruturado: false };
   exigir(objeto(plano), 'esboço: "plano" deve ser um texto ou um objeto { texto, nivel, medidas, contrato }');
   campos(plano, CHAVES_DO_PLANO, 'esboço: plano');
   exigir(plano.texto === undefined || typeof plano.texto === 'string', 'esboço: "plano.texto" deve ser um texto');
@@ -87,7 +89,7 @@ export function lerPlano(plano) {
       nomes.add(m.nome);
       exigir(typeof m.valor === 'number' && Number.isFinite(m.valor) && m.valor > 0, `${onde}: "valor" com o valor ${JSON.stringify(m.valor)} deve ser um número positivo`);
       exigir(Object.hasOwn(UNIDADES, m.unidade), `${onde}: "unidade" com o valor ${JSON.stringify(m.unidade)} deve ser uma de ${Object.keys(UNIDADES).join(', ')}${quisDizer(m.unidade, Object.keys(UNIDADES))}`);
-      exigir(ORIGENS.includes(m.origem), `${onde}: "origem" com o valor ${JSON.stringify(m.origem)} deve ser uma de ${ORIGENS.join(', ')} (ficha técnica, foto ou conhecimento da IA)${quisDizer(m.origem, ORIGENS)}`);
+      exigir(ORIGENS.includes(m.origem), `${onde}: "origem" com o valor ${JSON.stringify(m.origem)} deve ser uma de ${ORIGENS.join(', ')} (ficha técnica, foto, conhecimento da IA ou medida tirada de um contorno de referência)${quisDizer(m.origem, ORIGENS)}`);
       exigir(m.tolerancia === undefined || (typeof m.tolerancia === 'number' && Number.isFinite(m.tolerancia) && m.tolerancia >= 0), `${onde}: "tolerancia" (em mm) deve ser um número maior ou igual a zero`);
       exigir(m.mede !== undefined, `${onde}: falta "mede", a expressão que mede o esboço (por exemplo "alturaTotal"). Exemplo: ${EXEMPLO_DA_MEDIDA}`);
       exigir(m.opcoes === undefined || (Array.isArray(m.opcoes) && m.opcoes.length > 0 && m.opcoes.every((q) => typeof q === 'string' || Number.isInteger(q))), `${onde}: "opcoes" deve listar títulos ou números (a partir de 1) das opções a que a medida vale`);
@@ -118,7 +120,37 @@ export function lerPlano(plano) {
       contrato.simetricas.push({ a: p.a, b: p.b, ...(p.eixo ? { eixo: p.eixo } : {}), ...(p.pos !== undefined ? { pos: p.pos } : {}), ...(p.tolerancia !== undefined ? { tolerancia: p.tolerancia } : {}) });
     });
   }
-  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, estruturado: true };
+  const referencia = plano.referencia === undefined ? [] : (Array.isArray(plano.referencia) ? plano.referencia : [plano.referencia]).map((r, i) => lerReferencia(r, `esboço: plano.referencia${Array.isArray(plano.referencia) ? `[${i}]` : ''}`));
+  let envelope;
+  if (plano.envelope !== undefined) {
+    exigir(objeto(plano.envelope), 'esboço: "plano.envelope" deve ser um objeto { tolerancia } (o objeto vazio liga a conferência com a tolerância padrão)');
+    campos(plano.envelope, ['tolerancia'], 'esboço: plano.envelope');
+    exigir(plano.envelope.tolerancia === undefined || (Number.isFinite(plano.envelope.tolerancia) && plano.envelope.tolerancia >= 0), 'esboço: "plano.envelope.tolerancia" deve ser um número em mm, maior ou igual a zero');
+    envelope = { ...(plano.envelope.tolerancia === undefined ? {} : { tolerancia: plano.envelope.tolerancia }) };
+  }
+  return { texto: plano.texto, nivel: plano.nivel, medidas, contrato, referencia, ...(envelope ? { envelope } : {}), estruturado: true };
+}
+
+const EXEMPLO_DA_REFERENCIA = '{ "arquivo": "referencias/lateral.contornos.json", "vista": "lateral", "tolerancia": 25, "iou_min": 0.85 }';
+
+/* Uma entrada de `plano.referencia`: o arquivo (um JSON de contornos ou uma imagem com `ancoras`), a vista que ele mostra e
+   os limites da conferência. */
+function lerReferencia(r, onde) {
+  exigir(objeto(r), `${onde} deve ser um objeto. Exemplo: ${EXEMPLO_DA_REFERENCIA}`);
+  campos(r, CHAVES_DA_REFERENCIA, onde);
+  exigir(typeof r.arquivo === 'string' && r.arquivo, `${onde}: falta o "arquivo" (o caminho do JSON de contornos ou da imagem, relativo ao esboço). Exemplo: ${EXEMPLO_DA_REFERENCIA}`);
+  exigir(typeof r.vista === 'string', `${onde}: falta a "vista" que o arquivo mostra (frontal, lateral ou superior). Exemplo: ${EXEMPLO_DA_REFERENCIA}`);
+  exigirVista(r.vista, onde);
+  exigir(r.tolerancia === undefined || (Number.isFinite(r.tolerancia) && r.tolerancia > 0), `${onde}: "tolerancia" (em mm) deve ser um número maior que zero`);
+  exigir(r.iou_min === undefined || (Number.isFinite(r.iou_min) && r.iou_min > 0 && r.iou_min <= 1), `${onde}: "iou_min" deve ser uma fração maior que 0 e no máximo 1, por exemplo 0.85`);
+  if (r.partes !== undefined) {
+    exigir(objeto(r.partes) && Object.values(r.partes).every((l) => Array.isArray(l) && l.length > 0 && l.every((q) => typeof q === 'string' && q)), `${onde}: "partes" deve ser { "<região do arquivo>": ["id", "padrão.*"] }, cada região com as formas do esboço que a representam`);
+  }
+  exigir(r.opcoes === undefined || (Array.isArray(r.opcoes) && r.opcoes.length > 0 && r.opcoes.every((q) => typeof q === 'string' || Number.isInteger(q))), `${onde}: "opcoes" deve listar títulos ou números (a partir de 1) das opções a que a referência vale`);
+  exigir(r.ancoras === undefined || (typeof r.ancoras === 'string' && r.ancoras), `${onde}: "ancoras" deve ser o caminho do JSON de âncoras (as duas âncoras de pixel para milímetro, o formato de conferir:referencia), só para imagem`);
+  exigir(r.recorte === undefined || (Array.isArray(r.recorte) && r.recorte.length === 4 && r.recorte.every(Number.isFinite)), `${onde}: "recorte" deve ser [x0, y0, x1, y1] em pixels`);
+  exigir(r.limiar === undefined || Number.isFinite(r.limiar), `${onde}: "limiar" deve ser um número de 0 a 255 (a imagem mais escura que ele é silhueta)`);
+  return { arquivo: r.arquivo, vista: r.vista, ...(r.tolerancia === undefined ? {} : { tolerancia: r.tolerancia }), ...(r.iou_min === undefined ? {} : { iou_min: r.iou_min }), ...(r.partes ? { partes: r.partes } : {}), ...(r.opcoes ? { opcoes: r.opcoes } : {}), ...(r.ancoras ? { ancoras: r.ancoras } : {}), ...(r.recorte ? { recorte: r.recorte } : {}), ...(r.limiar === undefined ? {} : { limiar: r.limiar }) };
 }
 
 /* Texto do `plano` (o de sempre, ou `plano.texto`), para o manifesto. */
@@ -193,7 +225,7 @@ export function assimetriaDoPar(a, b, eixo, pos) {
    { nivel, opcoes: [{ titulo, medidas, contrato }], achados, resumo }. Cada achado traz `tipo` (`medida-fora`,
    `contrato-toca`, `contrato-livre`, `assimetria`), `opcao`, `pecas` e `texto`. Sem plano estruturado só confere os espelhos
    deslocados. */
-export function conferirPlano(esboco, visiveis) {
+export function conferirPlano(esboco, visiveis, { referencias } = {}) {
   const lido = lerPlano(esboco?.plano);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -261,11 +293,36 @@ export function conferirPlano(esboco, visiveis) {
       if (contrato.some((q) => q.relacao === 'simetrica' && ((q.a === r.id && q.b === e.forma) || (q.b === r.id && q.a === e.forma)))) continue;
       novo({ tipo: 'assimetria', pecas: [e.forma, r.id], mm: r1(d), texto: `${r.id} é o espelho de ${e.forma} no eixo ${e.eixo}, mas foi deslocado ${mm1(d)} mm depois de refletir` });
     }
-    porOpcao.push({ titulo, medidas, contrato });
+    /* a silhueta contra a referência, por vista e por parte */
+    const conferencias = [];
+    for (const entrada of lido?.referencia ?? []) {
+      if (!valeParaOpcao(entrada, titulo, i)) continue;
+      const ref = referencias?.get(entrada.arquivo);
+      if (!ref) {
+        novo({ tipo: 'referencia-fora', pecas: [], mm: 0, texto: `a referência "${entrada.arquivo}" (vista ${entrada.vista}) não foi carregada: o esboço a declara em plano.referencia e ninguém a leu (a linha de comando lê o arquivo; pela API, passe { referencias })` });
+        continue;
+      }
+      const c = conferirReferenciaNaOpcao(entrada, ref, esboco, visiveis, i);
+      conferencias.push({ arquivo: entrada.arquivo, ...c });
+      for (const r of c.resultados.filter((x) => !x.ok)) novo({ tipo: 'referencia-fora', pecas: r.parte === null ? [] : r.formas, mm: r.desvio_mm ?? 0, vista: c.vista, parte: r.parte, texto: r.texto });
+    }
+    porOpcao.push({ titulo, medidas, contrato, ...(conferencias.length ? { referencia: conferencias } : {}) });
   });
   const totalMedidas = lido?.medidas?.length ?? 0;
   const relacoes = lido?.contrato ? lido.contrato.tocam.length + lido.contrato.livres.length + lido.contrato.simetricas.length : 0;
-  return { nivel: lido?.nivel, opcoes: porOpcao, achados, resumo: { medidas: totalMedidas, relacoes } };
+  return { nivel: lido?.nivel, opcoes: porOpcao, achados, resumo: { medidas: totalMedidas, relacoes, ...((lido?.referencia?.length ?? 0) > 0 ? { referencias: lido.referencia.length } : {}) } };
+}
+
+/* Confere uma entrada de `plano.referencia` contra a opção `i` do esboço já expandido (`visiveis` são as formas resolvidas e
+   visíveis de cada opção). Ver `conferirReferencia`. */
+export function conferirReferenciaNaOpcao(entrada, ref, esboco, visiveis, i) {
+  const o = esboco.opcoes[i];
+  const titulo = o.titulo ?? `Opção ${i + 1}`;
+  const rs = visiveis[i] ?? [];
+  const brutos = new Map((o.formas ?? []).filter((f) => f && typeof f.id === 'string').map((f) => [f.id, f]));
+  const onde = `opção ${i + 1} (${titulo}): plano.referencia "${entrada.arquivo}"`;
+  const tentar = (q) => rs.filter((r) => (q.includes('*') ? casa(q, r.id) : (r.id === q || brutos.get(r.id)?.daInstancia?.id === q)));
+  return conferirReferencia(entrada, ref, rs, { selecionar: (q) => selecionar(q, rs, onde, brutos), tentar });
 }
 
 /* Formas resolvidas e visíveis de cada opção do esboço já expandido. */

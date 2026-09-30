@@ -39,11 +39,11 @@ function descreverForma(r) {
 }
 
 /* Gravidade das divergências, da mais grave para a menos: forma solta, atravessamento além do declarado, relação
-   declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho e medida do plano
-   fora da tolerância. */
-export const GRAVIDADES = { solto: 1, atravessa: 2, contrato: 3, assimetria: 4, medida: 5 };
+   declarada que não se cumpre (par que devia encostar, contrato de contato), assimetria de espelho, medida do plano
+   fora da tolerância e silhueta fora da referência. */
+export const GRAVIDADES = { solto: 1, atravessa: 2, contrato: 3, assimetria: 4, medida: 5, referencia: 6 };
 const CLASSE_DO_ACHADO = { colisao: 'atravessa', 'atravessa-excedido': 'atravessa', longe: 'solto', voando: 'solto', 'par-nao-encosta': 'contrato' };
-const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', assimetria: 'assimetria' };
+const CLASSE_DO_PLANO = { 'medida-fora': 'medida', 'referencia-fora': 'referencia', 'contrato-toca': 'contrato', 'contrato-livre': 'contrato', assimetria: 'assimetria' };
 
 /* { opcoes, ... } a partir do JSON já lido. */
 export function descreverEsboco(bruto) {
@@ -53,7 +53,7 @@ export function descreverEsboco(bruto) {
 /* A leitura e, junto dela, a lista numerada de divergências (`n` global, na ordem em que a leitura padrão as imprime:
    por opção, da mais grave para a menos). `projecao: false` pula a medida de sobreposição na vista, que não entra nas
    divergências (só a leitura completa a mostra). Devolve { descricao, divergencias, plano }. */
-export function medirEsboco(bruto, { projecao: comProjecao = true } = {}) {
+export function medirEsboco(bruto, { projecao: comProjecao = true, referencias } = {}) {
   const esboco = expandirEsboco(bruto);
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
@@ -63,7 +63,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true } = {}) {
   const visiveis = todas.map((rs) => rs.filter((r) => r.forma.oculto !== true));
   const gate = opcoes.some((_, i) => ativa(i)) ? verificarContato(esboco, { resolvidas: visiveis }) : null;
   const projecao = comProjecao ? verificarProjecao(esboco, { forcar: true, resolvidas: visiveis }) : { achados: [] };
-  const plano = conferirPlano(esboco, visiveis);
+  const plano = conferirPlano(esboco, visiveis, { referencias });
   const padrao = padroesDoContato(visiveis);
   const divergencias = [];
   const resultado = opcoes.map((o, i) => {
@@ -117,7 +117,7 @@ export function medirEsboco(bruto, { projecao: comProjecao = true } = {}) {
     for (const a of plano.achados.filter((x) => x.opcao === titulo)) somar(CLASSE_DO_PLANO[a.tipo], a.texto, a.pecas, null, { tipo: a.tipo, mm: a.mm });
     divs.sort((x, y) => x.gravidade - y.gravidade);
     divergencias.push(...divs);
-    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'assimetria');
+    const doPlano = divs.filter((x) => x.classe === 'medida' || x.tipo === 'contrato-toca' || x.tipo === 'contrato-livre' || x.tipo === 'assimetria' || x.tipo === 'referencia-fora');
     return {
       titulo,
       ...(o.parametros && Object.keys(o.parametros).length ? { parametros: o.parametros } : {}),

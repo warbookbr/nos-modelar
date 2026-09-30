@@ -42,6 +42,14 @@ describe('a skill esbocar-opcoes', () => {
     expect(f).toMatch(/motivo de pelo menos 15 caracteres/);
   });
 
+  it('manda conferir contra a referência quando há foto e despachar o crítico visual cego no Marco, sem citar objeto', () => {
+    const f = secao(skill, 'O fluxo de um esboço grande');
+    for (const termo of ['--medidas-da-referencia', 'origem: "referencia"', '--referencia', 'plano.referencia', '--envelope', 'plano.envelope', 'agente `critico-visual` cego', 'sem o JSON, o plano nem o histórico']) expect(f, termo).toContain(termo);
+    expect(f).toMatch(/nesse Marco esta skill despacha/);
+    for (const termo of ['--referencia', '--medidas-da-referencia', '--envelope', 'crítico visual cego']) expect(pare, termo).toContain(termo);
+    expect(pare).not.toMatch(/--referencia[^.]*\b(moto|garfo|roda|tanque|banco)\b/i);
+  });
+
   it('proíbe auditar por imagem com legenda numerada, na skill e no Pare e analise', () => {
     expect(skill).toContain('Não audite um esboço por imagem com legenda numerada');
     expect(pare).toContain('É proibido auditar um esboço por imagem com legenda numerada');

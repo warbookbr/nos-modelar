@@ -1,0 +1,360 @@
+{
+  "arquivo": "moto-curvas.esboco.json",
+  "nota": "Gate de contato ligado e aprovado nas duas opções, sem divergência. O Condutor percorre os cinco estágios (com `plano.envelope` declarado e o Envelope de cada unidade conferido) em 11 unidades e 24 formas.",
+  "formas": {
+    "A. Naked": 24,
+    "B. Café racer": 24
+  },
+  "divergencias": [],
+  "leitura": [
+    "opção 1 (A. Naked): 24 formas",
+    "parâmetros: entreEixos 1400; raioRoda 305; diametroRoda 610; alturaMotor 380; alturaColuna 240; larguraGuidao 760",
+    "gate de contato declarado: tolerância 20,1 mm, penetração 6 mm",
+    "divergências: nenhuma",
+    "opção 2 (B. Café racer): 24 formas",
+    "parâmetros: entreEixos 1400; raioRoda 305; diametroRoda 610; alturaMotor 380; alturaColuna 180; larguraGuidao 540",
+    "gate de contato declarado: tolerância 20,1 mm, penetração 6 mm",
+    "divergências: nenhuma",
+    "detalhe de uma forma: --forma <id>; imagem de uma divergência: --achado <n>; leitura completa: --completo"
+  ],
+  "contato": {
+    "resultado": "aprovado",
+    "achados": 0,
+    "atravessamentos": [
+      "B. Café racer: garfoE.coroa + guidao 2.1 de no máximo 20 mm",
+      "B. Café racer: garfoD.coroa + guidao 2.1 de no máximo 20 mm",
+      "A. Naked: garfoE.coroa + guidao 1.7 de no máximo 20 mm",
+      "A. Naked: garfoD.coroa + guidao 1.7 de no máximo 20 mm"
+    ]
+  },
+  "svg": {
+    "sha256": "2563ec0ca824718436936940d6a011eaf6a38d62c5d366883c10c1088b41c8a9"
+  },
+  "numerosAMao": {
+    "total": 98,
+    "formasCurvas": {
+      "formas": [
+        "tanque",
+        "banco",
+        "carenagem",
+        "farol"
+      ],
+      "numeros": 71
+    },
+    "semFormasCurvas": 27,
+    "centrosComLiteralNaoNulo": 0,
+    "deslocamentosNaoNulos": 1,
+    "moto_original": 83,
+    "moto_com_parametros": 41
+  },
+  "condutor": {
+    "estagios": [
+      "maquete",
+      "conferencia-da-maquete",
+      "plano-de-detalhe",
+      "detalhe-por-unidade",
+      "montagem"
+    ],
+    "percurso": [
+      "maquete > conferencia-da-maquete",
+      "conferencia-da-maquete > plano-de-detalhe",
+      "plano-de-detalhe > detalhe-por-unidade",
+      "detalhe-por-unidade > montagem",
+      "montagem > concluido"
+    ],
+    "portoes": [
+      {
+        "estagio": "maquete",
+        "passa": true,
+        "falta": 0
+      },
+      {
+        "estagio": "conferencia-da-maquete",
+        "passa": true,
+        "falta": 0
+      },
+      {
+        "estagio": "plano-de-detalhe",
+        "passa": true,
+        "falta": 0
+      },
+      {
+        "estagio": "detalhe-por-unidade",
+        "passa": true,
+        "falta": 0
+      },
+      {
+        "estagio": "montagem",
+        "passa": true,
+        "falta": 0
+      }
+    ],
+    "marcos": [
+      25,
+      50,
+      75,
+      100
+    ],
+    "concluido": true,
+    "unidades": [
+      {
+        "id": "rodaTras",
+        "formas": 4,
+        "depende": [],
+        "caixa": {
+          "x": [
+            -70,
+            70
+          ],
+          "y": [
+            0,
+            610
+          ],
+          "z": [
+            -1005,
+            -395
+          ]
+        },
+        "portas": [
+          "rodaTras.pneu.+y <- banco",
+          "rodaTras.pneu.centro <- balancimE"
+        ]
+      },
+      {
+        "id": "rodaFrente",
+        "formas": 4,
+        "depende": [],
+        "caixa": {
+          "x": [
+            -62.5,
+            62.5
+          ],
+          "y": [
+            0,
+            610
+          ],
+          "z": [
+            395,
+            1005
+          ]
+        },
+        "portas": [
+          "rodaFrente.pneu.centro <- garfoE+garfoD+guidao"
+        ]
+      },
+      {
+        "id": "motor",
+        "formas": 1,
+        "depende": [],
+        "caixa": {
+          "x": [
+            -130,
+            130
+          ],
+          "y": [
+            230,
+            530
+          ],
+          "z": [
+            -190,
+            190
+          ]
+        },
+        "portas": [
+          "motor.+y <- quadro",
+          "motor.-x <- balancimE",
+          "motor.-z <- balancimE"
+        ]
+      },
+      {
+        "id": "quadro",
+        "formas": 2,
+        "depende": [
+          "motor"
+        ],
+        "caixa": {
+          "x": [
+            -70,
+            70
+          ],
+          "y": [
+            530,
+            830
+          ],
+          "z": [
+            -280,
+            520
+          ]
+        },
+        "portas": [
+          "quadro.viga.+y <- tanque",
+          "quadro.coluna.+y <- garfoE+garfoD+guidao",
+          "quadro.coluna.+z <- carenagem",
+          "quadro.coluna.-z <- tanque"
+        ]
+      },
+      {
+        "id": "tanque",
+        "formas": 1,
+        "depende": [
+          "quadro"
+        ],
+        "caixa": {
+          "x": [
+            -155,
+            155
+          ],
+          "y": [
+            590,
+            791.5
+          ],
+          "z": [
+            -140,
+            280
+          ]
+        },
+        "portas": [
+          "tanque.-z <- banco"
+        ]
+      },
+      {
+        "id": "banco",
+        "formas": 1,
+        "depende": [
+          "rodaTras",
+          "tanque"
+        ],
+        "caixa": {
+          "x": [
+            -120,
+            120
+          ],
+          "y": [
+            610,
+            722
+          ],
+          "z": [
+            -700,
+            -140
+          ]
+        },
+        "portas": []
+      },
+      {
+        "id": "balancimE",
+        "formas": 1,
+        "depende": [
+          "motor",
+          "rodaTras"
+        ],
+        "caixa": {
+          "x": [
+            -150,
+            -110
+          ],
+          "y": [
+            270,
+            340
+          ],
+          "z": [
+            -710,
+            -190
+          ]
+        },
+        "portas": []
+      },
+      {
+        "id": "balancimD",
+        "formas": 1,
+        "depende": [
+          "balancimE"
+        ],
+        "caixa": {
+          "x": [
+            110,
+            150
+          ],
+          "y": [
+            270,
+            340
+          ],
+          "z": [
+            -710,
+            -190
+          ]
+        },
+        "portas": []
+      },
+      {
+        "id": "garfoE+garfoD+guidao",
+        "formas": 7,
+        "depende": [
+          "rodaFrente",
+          "quadro"
+        ],
+        "caixa": {
+          "x": [
+            -380,
+            380
+          ],
+          "y": [
+            291.6,
+            856
+          ],
+          "z": [
+            375.7,
+            723.4
+          ]
+        },
+        "portas": []
+      },
+      {
+        "id": "carenagem",
+        "formas": 1,
+        "depende": [
+          "quadro"
+        ],
+        "caixa": {
+          "x": [
+            -70,
+            70
+          ],
+          "y": [
+            620,
+            800
+          ],
+          "z": [
+            520,
+            720
+          ]
+        },
+        "portas": [
+          "carenagem.+z <- farol",
+          "carenagem.nariz <- farol"
+        ]
+      },
+      {
+        "id": "farol",
+        "formas": 1,
+        "depende": [
+          "carenagem"
+        ],
+        "caixa": {
+          "x": [
+            -46,
+            46
+          ],
+          "y": [
+            652,
+            744
+          ],
+          "z": [
+            720,
+            776
+          ]
+        },
+        "portas": []
+      }
+    ]
+  }
+}

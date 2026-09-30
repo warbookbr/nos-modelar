@@ -91,7 +91,7 @@ describe('o esquema do plano diz o campo e o valor válido', () => {
     recusa({ medida: [] }, /o campo "medida" não existe \(quis dizer "medidas"\?\); campos válidos: texto, nivel, medidas, contrato/);
     recusa({ nivel: 'detalhdo' }, /"plano.nivel" com o valor "detalhdo" deve ser um de esquematico, medio, detalhado \(quis dizer "detalhado"\?\)/);
     recusa({ medidas: [medida({ unidade: 'milimetros' })] }, /"unidade" com o valor "milimetros" deve ser uma de mm, cm, m/);
-    recusa({ medidas: [medida({ origem: 'fotos' })] }, /"origem" com o valor "fotos" deve ser uma de ficha, foto, ia .*\(quis dizer "foto"\?\)/);
+    recusa({ medidas: [medida({ origem: 'fotos' })] }, /"origem" com o valor "fotos" deve ser uma de ficha, foto, ia, referencia .*\(quis dizer "foto"\?\)/);
     recusa({ medidas: [medida({ mede: 'alturaTotl' })] }, /"mede" com o valor "alturaTotl" não é uma expressão de medida \(quis dizer "alturaTotal"\?\)/);
     recusa({ medidas: [medida({ mede: { caixa: 'w' } })] }, /"mede.caixa" com o valor "w" deve ser um eixo/);
     recusa({ medidas: [medida({ valor: 'cem' })] }, /"valor" com o valor "cem" deve ser um número positivo/);

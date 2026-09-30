@@ -86,12 +86,10 @@ README dele.
 
 ## Incluído
 
-- feitas nas fatias 2 a 7: a leitura em texto `--descrever` (e `--mudou`), a
-  sobreposição na projeção por vista com vista explodida e arestas ocultas,
-  âncoras nomeadas com `tubo`, `encostar` e `alinhar`, `espelho` e `arranja`,
-  `params` e expressões, o gate propondo o conserto com `--ajustar`, os
-  componentes parametrizados (`roda`, `garfo`, `quadro`, `mancal`) e as formas
-  novas (tubo, esfera, cone, extrusão, chanfro);
+- feitas nas fatias 2 a 7: `--descrever` (e `--mudou`), a sobreposição na
+  projeção por vista com vista explodida, âncoras nomeadas, `tubo`, `encostar`,
+  `alinhar`, `espelho`, `arranja`, `params` e expressões, `--ajustar`, os
+  componentes parametrizados e as formas novas (tubo, esfera, cone, extrusão);
 - o contrato de declaração do gate herdado do Mecanifica: `motivo` de pelo menos
   15 caracteres em toda exceção, `max` obrigatório em `atravessa`, o par do
   espelho herdando a declaração do original, e a decisão de política de a skill
@@ -102,10 +100,8 @@ README dele.
 - validação do JSON por esquema, com mensagem que diz o campo e o valor
   válido, e um resumo compacto do formato para a IA na skill;
 - desempenho: SVG e tempo menores, e um modo rápido sem PNG;
-- a conferência contra referência: a silhueta do esboço sobreposta à foto na
-  mesma escala, reaproveitando `conferir:referencia`;
-- fixtures com resultado esperado: a moto de prova, o mancal e a casa, com o
-  gate e as imagens de referência.
+- a conferência contra referência, reaproveitando `conferir:referencia`, e
+  fixtures com resultado esperado: a moto de prova, o mancal e a casa.
 
 ## Formato proposto
 
@@ -134,6 +130,9 @@ módulo, que é a referência do formato.
 
 1. A moto de doze formas sai descrita com relações, `tubo`, `espelho` e
    `params`, sem nenhum centro calculado à mão, e passa no gate de contato.
+   Atendido em 2026-09-30 por `moto-curvas.esboco.json`: nenhum literal não nulo
+   em `centro`, `de` e `para`, um só `desloca` (o garfo ao lado da roda, -100
+   mm) e o gate aprovado nas duas opções (`tests/esperado.test.js`).
 2. `--descrever` lista o grafo de contatos e as sobreposições, e a moto de prova
    confere com a imagem.
 3. O gate mede a sobreposição na projeção e diz quem cobre quem, com teste: o
@@ -143,7 +142,11 @@ módulo, que é a referência do formato.
 5. O naked e o café racer diferem só por `params`.
 6. Todo `.esboco.json` existente gera o mesmo SVG, byte a byte.
 7. O número de valores escritos à mão no JSON da moto cai pelo menos pela
-   metade contra o de hoje (medido no arquivo).
+   metade contra o de hoje (medido no arquivo). Atendido só em parte, medido em
+   2026-09-30: a moto de 12 formas tem 41 números contra 83 da original, mas a
+   moto curva tem 98, porque o perfil de tanque, banco, carenagem e farol são
+   71 números de desenho que a original não tem; sem eles são 27. Não cumpre
+   contada inteira, e o número fica em `moto-curvas.esperado.json`.
 8. A pessoa confirma, olhando a moto e um segundo objeto, que o esboço ficou mais
    fácil de descrever e de ler.
 9. A leitura padrão do `--descrever` mostra só o total de formas, os parâmetros
@@ -161,12 +164,16 @@ módulo, que é a referência do formato.
     Atendido em 2026-09-30 por `plano.contrato` (`tests/plano.test.js`).
 12. A conferência contra a foto mede, por vista e por parte, o desvio da
     silhueta em milímetros e a razão entre interseção e união, e reprova acima
-    da tolerância declarada.
+    da tolerância declarada. Atendido em 2026-09-30 por `plano.referencia` e
+   `--referencia` (`src/referencia.js`): IoU e desvio máximo em mm por vista e
+   por parte, reprovação na leitura padrão e no Portão da Conferência; o teste
+   usa contornos sintéticos: o esboço igual dá IoU 1,00, e o deslocado 30 mm
+   reprova com 30 mm em seis casos (`tests/referencia.test.js`).
 13. A skill proíbe a IA de auditar por imagem com legenda numerada e descreve o
     fluxo contrato, medidas da referência, construção por subsistema, montagem,
     conferência numérica, crítico sem contexto e pessoa. O fluxo e a proibição
-    estão escritos na skill e no `PARE-E-ANALISE.md` (`tests/skill.test.js`); a
-    conferência numérica contra a foto é o item 12, ainda aberto.
+    estão escritos na skill e no `PARE-E-ANALISE.md` (`tests/skill.test.js`), com
+    a conferência contra a foto (item 12) e o crítico cego no Marco.
 14. O `plano` do JSON ganha um campo estruturado e genérico de medidas nomeadas,
     cada uma com valor, unidade e origem (ficha técnica, foto ou conhecimento da
     IA), e o gate confere o esboço contra elas, sem conhecer o assunto: uma
@@ -200,9 +207,11 @@ módulo, que é a referência do formato.
     os dois garfos numa unidade só, e `--mover` sem motivo é recusado.
 19. O Envelope de cada unidade (o volume da maquete e as portas) é conferido
     contra a versão detalhada, e o Marco chama o crítico visual sem contexto a
-    cada 25% do custo estimado das unidades feitas, com imagens limpas. Parcial:
-    o Marco registra "chamar crítico" no estado a cada 25% do custo (o despacho
-    do crítico é da skill); o Envelope não foi feito.
+    cada 25% do custo estimado das unidades feitas, com imagens limpas. Atendido
+    em 2026-09-30: o Marco registra "chamar crítico" (o despacho é da skill, que
+    manda o crítico cego), e cada unidade guarda caixa e portas (na moto curva,
+    11 unidades e 13 portas). `--envelope <unidade> <detalhado>` confere caixa
+    e portas, e com `plano.envelope` o Portão do Detalhe o exige.
 20. `npm run gates --completo` passa.
 
 ## Fatias
@@ -219,13 +228,10 @@ módulo, que é a referência do formato.
 5. `espelho`, `arranja`, `params` e expressões.
 6. O gate propondo o conserto e `--ajustar`.
 7. Componentes e as formas novas. Feita em 2026-09-30: `usa` com `roda`, `garfo`,
-   `quadro` e `mancal` em `modulos/esboco/componentes/`, expandidos em
-   `src/componentes.js` (ids prefixados, parâmetros no escopo do componente,
-   âncoras `<instancia>.<ancora>`, pares do gate, espelho de instância), o ponto
-   `entre`, e as formas `tubo`, `esfera`, `cone` (com tronco), `extrusao` e
-   `chanfro` na caixa, com gate, espelho, arranjo e `--ajustar`. A moto de prova
-   `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
-   escritos à mão.
+   `quadro` e `mancal` (`modulos/esboco/componentes/`, expandidos em
+   `src/componentes.js`), o ponto `entre` e as formas `tubo`, `esfera`, `cone`,
+   `extrusao` e `chanfro`, com gate, espelho, arranjo e `--ajustar`. A moto
+   `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números.
 8. A validação da moto detalhada (2026-09-30) mostrou o que faltava, e tudo foi
    feito no mesmo dia. Formas curvas: `extrusao` de perfil côncavo, `loft` e
    `revolucao`, com gate por partes convexas. Desempenho, na moto de 66 formas:
@@ -248,13 +254,14 @@ módulo, que é a referência do formato.
    desta fatia: o Envelope e o despacho do crítico pelo Condutor. O módulo
    passou de 299 para 367 testes, e `npm run gates` fecha com 32/32 verdes.
 9. A referência e o fluxo. Feito em 2026-09-30: o fluxo na skill e no
-   `PARE-E-ANALISE.md`, a proibição de auditar por legenda numerada, e o Pare e
-   planeje produzindo `plano.nivel`, `plano.medidas` (com origem) e
-   `plano.contrato`, lidos pelo gate. Falta a conferência numérica contra a foto,
-   reaproveitando `conferir:referencia`, com o desvio por parte e por vista, a
-   extração das medidas da foto para parâmetros, a moto detalhada de prova sem
-   centro calculado à mão, as fixtures com resultado esperado (moto, mancal e
-   casa) e o fechamento do plano.
+   `PARE-E-ANALISE.md`, a proibição de auditar por legenda numerada, o Pare e
+   planeje produzindo `plano.nivel`, `plano.medidas` e `plano.contrato`; e, nesta
+   parte, a conferência contra a foto (`plano.referencia`, `--referencia`, com a
+   sobreposição em imagem), `--medidas-da-referencia` (origem `referencia`), o
+   Envelope e o `--envelope`, as fixtures com `.esperado.json` (moto curva com o
+   Condutor completo, mancal e casa) e o SVG e PNG regenerados de `mancal-eixo` e
+   `teste-cubo`. O módulo passou de 367 para 419 testes. Falta o fechamento: o
+   aceite da pessoa (item 8), o Fechamento e mover o plano para encerrados.
 
 ## Riscos e desvios
 
