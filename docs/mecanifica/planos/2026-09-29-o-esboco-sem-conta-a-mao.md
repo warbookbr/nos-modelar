@@ -197,7 +197,18 @@ do naked por `parametros` na opção.
 13. A skill proíbe a IA de auditar por imagem com legenda numerada e descreve o
     fluxo contrato, medidas da referência, construção por subsistema, montagem,
     conferência numérica, crítico sem contexto e pessoa.
-14. `npm run gates --completo` passa.
+14. O `plano` do JSON ganha um campo estruturado e genérico de medidas nomeadas,
+    cada uma com valor, unidade e origem (ficha técnica, foto ou conhecimento da
+    IA), e o gate confere o esboço contra elas, sem conhecer o assunto: uma
+    medida fora da tolerância vira achado com o desvio em milímetros.
+15. O Pare e planeje fixa o nível de detalhe a partir do pedido (esquemático,
+    médio ou detalhado), e o nível decide quanto se planeja e quanto se confere:
+    um esboço rápido pede poucas medidas, e um objeto detalhado pede medidas por
+    subsistema, contrato de relações e conferência contra a referência. A skill
+    não cita nenhum objeto específico.
+16. Tanque, banco e carenagem da moto de prova saem com forma curva (perfil
+    côncavo, afunilamento ou loft), e não como caixa ou extrusão convexa.
+17. `npm run gates --completo` passa.
 
 ## Fatias
 
@@ -242,7 +253,9 @@ do naked por `parametros` na opção.
    medidas da foto para parâmetros, com a origem de cada número; o fluxo na
    skill, com o construtor por subsistema, o montador, o leitor de referência e o
    crítico visual sem contexto recebendo só imagens limpas; e a proibição de
-   auditar por legenda numerada. Depois, a moto detalhada de prova sem centro
+   auditar por legenda numerada. O Pare e planeje passa a produzir o campo de
+   medidas nomeadas (genérico, com origem) e a escolher o nível de detalhe pelo
+   pedido, e o gate lê esse campo. Depois, a moto detalhada de prova sem centro
    calculado à mão, as fixtures com resultado esperado (moto, mancal e casa) e o
    fechamento do plano.
 
