@@ -220,12 +220,23 @@ do naked por `parametros` na opção.
    `chanfro` na caixa, com gate, espelho, arranjo e `--ajustar`. A moto de prova
    `moto-componentes.esboco.json` passa no gate nas duas opções com 35 números
    escritos à mão.
-8. A auditoria feita por máquina. O contrato de relações no JSON, conferido
-   pelo gate contra o medido; a leitura padrão do `--descrever` reduzida às
-   divergências, com o detalhe por forma só sob pedido; a imagem por achado, com
-   o par colorido e sem legenda; o esquema do JSON com mensagem que diz o campo
-   e o valor válido; e o desempenho (SVG menor, sugestão de explosão que hoje
-   leva cerca de 46 s na moto, modo rápido sem PNG).
+8. A validação da moto detalhada (2026-09-30) mostrou o que falta, na ordem em
+   que entra: primeiro as formas curvas (perfil côncavo, afunilamento, loft por
+   seções e superfície de revolução), porque tanque, banco e carenagem saíram
+   como caixas e extrusões convexas e a moto ficou sem cara de moto; depois o
+   desempenho (o `--analise` levou 6 min com uma opção e 11 min com duas, quase
+   tudo na sugestão de explosão; meta de menos de 20 s por moto, com cache de
+   silhuetas, filtro de pares por caixa envolvente e `sugerir` fora do padrão);
+   depois o contrato de relações no JSON, com `junta {pecas, max, motivo}` no
+   lugar de dezenas de pares `atravessa` (a moto teve 26), pontos-guia nomeados
+   no `caminho` do tubo e âncora com deslocamento; a leitura padrão do
+   `--descrever` reduzida às divergências, com o detalhe por forma só sob
+   pedido; a projeção agrupada por componente, sem espelhos nem contatos abaixo
+   de 10 mm, com os N achados mais graves (a moto teve 107); a imagem por
+   achado, com o par colorido e sem legenda; e o esquema do JSON com mensagem
+   que diz o campo e o valor válido, junto dos bugs achados (`r.pneu` visível na
+   leitura e recusado em `alinha`, concordância de `arranja.nomes`, "volume"
+   que é caixa envolvente).
 9. A referência e o fluxo. A conferência numérica contra a foto, reaproveitando
    `conferir:referencia`, com o desvio por parte e por vista; a extração das
    medidas da foto para parâmetros, com a origem de cada número; o fluxo na
