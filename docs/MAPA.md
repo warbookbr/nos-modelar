@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-828 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+830 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -355,12 +355,14 @@
 ## modulos/esboco/src/
 
 - `contato.js` — Contato do esboço: gate opt-in de colisão, folga e conjunto conectado entre as formas de cada opção. A geometria é a que o desenho já monta (`resolverOpcao`:…
+- `descrever.js` — Leitura do esboço em texto: cada forma resolvida, as âncoras, o grafo de contatos 3D, as formas soltas e as sobreposições (3D e por vista), sem desenhar nada…
 - `index.js` — Esboço de opções de forma: lê a declaração de cilindros, anéis e caixas em milímetro, resolve as posições relativas (sobre, ponta) e desenha as opções lado a…
 - `projecao.js` — Sobreposição na projeção: o gate de contato mede colisão, folga e ligação em três dimensões, e a pessoa vê o que ele não mede: duas peças sem penetração algu…
 
 ## modulos/esboco/tests/
 
 - `contato.test.js` — Gate de contato do esboço: colisão, folga, voando e pares declarados.
+- `descrever.test.js` — Leitura do esboço em texto (`--descrever`, `--descrever --mudou`) e âncoras nomeadas.
 - `esboco.test.js` — Contrato do esboço: posição relativa por sobre/ponta, recusa de referência inexistente e PNG no tamanho que o desenho declara.
 - `projecao.test.js` — Sobreposição na projeção: silhuetas que se cobrem sem penetração 3D, explosão e opacidade.
 

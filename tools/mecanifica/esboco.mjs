@@ -9,6 +9,7 @@ import { PNG } from 'pngjs';
 import { desenharEsboco, ErroDeEsboco, VISTAS } from '../../modulos/esboco/src/index.js';
 import { descreverAchado, descreverAtravessamento, descreverSilenciado, verificarContato } from '../../modulos/esboco/src/contato.js';
 import { descreverProjecao, verificarProjecao } from '../../modulos/esboco/src/projecao.js';
+import { descreverEsboco, diferenca, formatarDescricao } from '../../modulos/esboco/src/descrever.js';
 import { recortarAmpliado } from './analise-da-peca.mjs';
 
 /* `navegador` opcional: a análise abre um só para as imagens. */
@@ -220,11 +221,34 @@ function relatarProjecao(p) {
   return `sobreposição na projeção (limiar ${Math.round(p.limiar * 100)}%${p.reprova ? ', reprova' : ', informativo'}): ${p.resultado}\n${linhas.length ? `${linhas.join('\n')}\n` : ''}${explosao.length ? `${explosao.join('\n')}\n` : ''}`;
 }
 
+/* `--descrever`: leitura em texto (ou JSON), sem imagem. Com `mudou`, compara com a leitura gravada em
+   `<arquivo>.descrever.json` ao lado do esboço, imprime só a diferença e regrava o arquivo. */
+export function descreverArquivo(arquivo, { mudou = false, json = false } = {}) {
+  const caminho = resolve(arquivo);
+  const atual = descreverEsboco(JSON.parse(readFileSync(caminho, 'utf8')));
+  if (!mudou) return { texto: json ? `${JSON.stringify(atual, null, 2)}\n` : formatarDescricao(atual), descricao: atual };
+  const memoria = `${caminho}.descrever.json`;
+  let anterior = null;
+  try { anterior = JSON.parse(readFileSync(memoria, 'utf8')); } catch { /* sem execução anterior, ou ilegível */ }
+  writeFileSync(memoria, `${JSON.stringify(atual, null, 2)}\n`);
+  if (!anterior) {
+    return { texto: json ? `${JSON.stringify({ anterior: false, descricao: atual }, null, 2)}\n` : `sem execução anterior de --descrever --mudou (gravada em ${memoria}); estado completo:\n${formatarDescricao(atual)}`, descricao: atual, primeira: true };
+  }
+  const d = diferenca(anterior, atual);
+  const texto = json ? `${JSON.stringify({ anterior: true, mudancas: d.mudancas, linhas: d.linhas }, null, 2)}\n` : `${d.linhas.length ? d.linhas.join('\n') : 'sem mudanças'}\n`;
+  return { texto, descricao: atual, diferenca: d };
+}
+
 async function principal(argv) {
   const alvo = argv.find((a) => !a.startsWith('--'));
-  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: npm run esboco -- <arquivo.esboco.json> [--estrito] [--descrever [--mudou] [--json]] [--analise [--centros] [--zoom=<vista>:x0,y0,x1,y1]]\n'); return 2; }
   const estrito = argv.includes('--estrito');
   try {
+    if (argv.includes('--mudou') && !argv.includes('--descrever')) throw new ErroDeEsboco('--mudou só vale junto de --descrever.');
+    if (argv.includes('--descrever')) {
+      process.stdout.write(descreverArquivo(alvo, { mudou: argv.includes('--mudou'), json: argv.includes('--json') }).texto);
+      return 0;
+    }
     if (argv.includes('--analise')) {
       const z = argv.find((a) => a.startsWith('--zoom='));
       const { pasta, manifesto } = await analisarEsboco(alvo, { zoom: z ? z.slice(7) : null, centros: argv.includes('--centros') });

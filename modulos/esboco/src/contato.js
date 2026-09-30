@@ -82,6 +82,16 @@ function prismaConvexo(r, poligono) {
 
 /* Peças convexas de uma forma resolvida. */
 export function pecasDe(r) {
+  if (!memoPecas.has(r)) memoPecas.set(r, pecasSemMemoria(r));
+  return memoPecas.get(r);
+}
+
+/* Uma forma resolvida (e a lista de peças dela) é imutável depois de resolvida: a leitura em texto
+   reaproveita as peças e as medidas entre o gate de contato, a projeção e o grafo. */
+const memoPecas = new WeakMap();
+const memoPares = new WeakMap();
+
+function pecasSemMemoria(r) {
   const { perfil, furos } = r.prisma;
   if (furos.length === 0) return [prismaConvexo(r, perfil)];
   if (r.forma.tipo === 'anel') {
@@ -198,6 +208,13 @@ function folgaAABB(a, b) {
 
 /* { folga, penetracao } entre duas formas (listas de peças convexas). */
 export function medirPar(pecasA, pecasB) {
+  let doA = memoPares.get(pecasA);
+  if (!doA) { doA = new WeakMap(); memoPares.set(pecasA, doA); }
+  if (!doA.has(pecasB)) doA.set(pecasB, medirParSemMemoria(pecasA, pecasB));
+  return doA.get(pecasB);
+}
+
+function medirParSemMemoria(pecasA, pecasB) {
   let folga = Infinity; let penetracao = 0;
   for (const a of pecasA) for (const b of pecasB) {
     if (folgaAABB(a, b) >= folga && folga > 0) continue;
@@ -282,7 +299,7 @@ export function padroesDoContato(resolvidas) {
    sem `motivo` (mínimo MINIMO_DO_MOTIVO caracteres) e `atravessa` sem `max` são
    recusados com ErroDeEsboco. Sem `contato` no JSON (ou com `usar` falso em
    todas as opções) devolve `resultado: 'desligado'` sem medir. */
-export function verificarContato(esboco) {
+export function verificarContato(esboco, { resolvidas: prontas } = {}) {
   const raiz = lerContato(esboco?.contato, 'esboço');
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
@@ -290,7 +307,7 @@ export function verificarContato(esboco) {
   const desligado = { usar: false, tolerancia: null, folga: null, achados: [], resultado: 'desligado', opcoes: [] };
   if (!opcoes.some((_, i) => ativa(i))) return desligado;
 
-  const resolvidas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
+  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
   const todosIds = new Set(resolvidas.flat().map((r) => r.id));
   for (const [c, onde] of [[raiz, 'esboço'], ...lidas.map((l, i) => [l, `opção ${i + 1}`])]) {
     for (const p of c?.pares ?? []) for (const id of [p.a, p.b]) {

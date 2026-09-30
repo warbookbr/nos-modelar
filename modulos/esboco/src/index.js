@@ -206,6 +206,42 @@ function lerPonta(f) {
   return { id: f.ponta, lado: f.lado };
 }
 
+/* Âncoras nomeadas: `centro`; `inicio` e `fim` nas pontas do eixo (cilindro e anel); e o centro
+   de cada face da caixa mínima (`+x` ... `-z`), na orientação do mundo depois da rotação. */
+export function nomesDeAncoras(tipo) {
+  return ['centro', ...(tipo === 'cilindro' || tipo === 'anel' ? ['inicio', 'fim'] : []), ...LADOS];
+}
+
+export function ancorasDe(r) {
+  const a = { centro: [...r.centro] };
+  if (r.forma.tipo === 'cilindro' || r.forma.tipo === 'anel') {
+    const h = r.prisma.comprimento / 2;
+    for (const [nome, w] of [['inicio', -h], ['fim', h]]) {
+      const d = aplicarMatriz(ponto3(r.prisma.b, 0, 0, w), r.matriz);
+      a[nome] = [r.centro[0] + d[0], r.centro[1] + d[1], r.centro[2] + d[2]];
+    }
+  }
+  const meio = r.min.map((v, i) => (v + r.max[i]) / 2);
+  for (const lado of LADOS) {
+    const k = EIXOS.indexOf(lado[1]);
+    a[lado] = meio.map((v, i) => (i === k ? (lado[0] === '+' ? r.max[k] : r.min[k]) : v));
+  }
+  return a;
+}
+
+/* Resolve `"<id>.<ancora>"` no lugar do vetor de `centro`. */
+function ancoraDe(ref, onde, porId, resolver, visitando) {
+  const ponto = ref.lastIndexOf('.');
+  const id = ponto > 0 ? ref.slice(0, ponto) : ref;
+  const nome = ponto > 0 ? ref.slice(ponto + 1) : '';
+  exigir(ponto > 0, `${onde}: "centro" como referência "${ref}" deve ter a forma "<id>.<ancora>", por exemplo "${id}.centro"`);
+  exigir(porId.has(id), `${onde}: "centro" aponta para "${ref}", mas a forma "${id}" não existe nesta opção (ids: ${[...porId.keys()].join(', ')})`);
+  const validas = nomesDeAncoras(porId.get(id).tipo);
+  exigir(validas.includes(nome), `${onde}: "centro" aponta para "${ref}", mas a forma "${id}" (${porId.get(id).tipo}) não tem a âncora "${nome}" (válidas: ${validas.join(', ')})`);
+  exigir(!visitando.has(id), `${onde}: referência circular em "centro": "${ref}" volta a depender desta forma (âncoras válidas de "${id}": ${validas.join(', ')})`);
+  return ancorasDe(resolver(id))[nome];
+}
+
 /* Resolve a posição de cada forma. Devolve formas com centro e caixa no mundo. */
 export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
   exigir(Array.isArray(opcao.formas) && opcao.formas.length > 0, `${rotuloOpcao}: "formas" precisa ser uma lista não vazia`);
@@ -229,7 +265,9 @@ export function resolverOpcao(opcao, rotuloOpcao = 'opção') {
     const modos = ['centro', 'sobre', 'ponta'].filter((k) => f[k] !== undefined);
     exigir(modos.length <= 1, `${onde}: use só um entre "centro", "sobre" e "ponta"`);
     let centro = [0, 0, 0];
-    if (f.centro !== undefined) {
+    if (typeof f.centro === 'string') {
+      centro = [...ancoraDe(f.centro, onde, porId, resolver, visitando)];
+    } else if (f.centro !== undefined) {
       exigir(Array.isArray(f.centro) && f.centro.length === 3 && f.centro.every(Number.isFinite), `${onde}: "centro" deve ser [x, y, z] em mm`);
       centro = [...f.centro];
     } else if (f.sobre !== undefined) {

@@ -49,9 +49,10 @@ function preencher(prof, W, H, u0, v0, cel, aneis, plano) {
   for (const an of aneis) for (const q of an) { if (q[1] < vmin) vmin = q[1]; if (q[1] > vmax) vmax = q[1]; }
   const j0 = Math.max(0, Math.ceil((vmin - v0) / cel - 0.5));
   const j1 = Math.min(H - 1, Math.floor((vmax - v0) / cel - 0.5));
+  const xs = [];
   for (let j = j0; j <= j1; j++) {
     const y = v0 + (j + 0.5) * cel;
-    const xs = [];
+    xs.length = 0;
     for (const an of aneis) {
       for (let k = 0; k < an.length; k++) {
         const p1 = an[k];
@@ -208,7 +209,7 @@ function sugerirExplosao(ctx) {
    contrário devolve `resultado: 'desligado'` sem medir. `contato.projecao` ({ limiar, reprova })
    pode ser declarado na raiz e na opção, que sobrepõe a raiz. Com `sugerir`, cada opção com
    achado e sem `explosao` declarada ganha em `explosao` o eixo que mais separa o que se cobre. */
-export function verificarProjecao(esboco, { forcar = false, sugerir = false } = {}) {
+export function verificarProjecao(esboco, { forcar = false, sugerir = false, resolvidas: prontas } = {}) {
   const opcoes = Array.isArray(esboco?.opcoes) ? esboco.opcoes : [];
   const raiz = lerContato(esboco?.contato, 'esboço');
   const lidas = opcoes.map((o, i) => lerContato(o.contato, `opção ${i + 1}`));
@@ -218,7 +219,7 @@ export function verificarProjecao(esboco, { forcar = false, sugerir = false } = 
   const desligado = { usar: false, limiar: null, reprova: false, resultado: 'desligado', achados: [], porVista: {}, explosao: [], opcoes: [] };
   if (!opcoes.some((_, i) => ativa(i))) return desligado;
 
-  const resolvidas = opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
+  const resolvidas = prontas ?? opcoes.map((o, i) => resolverOpcao(o, `opção ${i + 1}${o.titulo ? ` (${o.titulo})` : ''}`).filter((r) => r.forma.oculto !== true));
   const { padraoPen, padraoTol } = padroesDoContato(resolvidas);
   const limiarRaiz = projRaiz.limiar ?? LIMIAR_PADRAO;
   const reprovaRaiz = projRaiz.reprova === true;

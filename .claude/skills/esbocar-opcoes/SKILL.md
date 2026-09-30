@@ -58,6 +58,10 @@ desenho. Com mais de uns 6 formas use `legendas: "lista"`, que sobe a escala
 (na mesma moto, 0,28 px/mm na isométrica) e tira as linhas de chamada. Esboce só o que está em
 disputa e divida em vários esboços quando ainda assim ficar cheio.
 
+## Ler em texto antes da imagem
+
+Antes de gerar qualquer imagem, rode `npm run esboco -- <arquivo> --descrever`: em milissegundos imprime cada forma resolvida (centro, extensão, eixo, caixa mínima e âncoras), o grafo de quem toca quem com a folga ou a penetração em mm, as formas soltas e as sobreposições 3D e por vista. A cada edição do JSON rode `npm run esboco -- <arquivo> --descrever --mudou`, que grava a leitura em `<arquivo>.descrever.json` e imprime só o que mudou (formas movidas, pares que passaram a tocar ou a se afastar, formas soltas, achados novos ou resolvidos). Para posicionar uma forma em relação a outra sem calcular, escreva `centro` como `"<id>.<ancora>"` (`centro`, `inicio`, `fim`, `+x`, `-x`, `+y`, `-y`, `+z`, `-z`), por exemplo `"rodaFrente.centro"` ou `"garfo.fim"`, e o `desloca` soma depois. Só gere a imagem quando a leitura em texto estiver como você quer.
+
 ## Conferir antes de mostrar
 
 Abra o PNG com `Read`. Para qualquer esboço que vá à pessoa, rode

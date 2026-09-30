@@ -54,3 +54,6 @@ public/sessao-ativa.json
 .agent/
 .mcp.json
 .diario/
+
+# Memória do `esboco --descrever --mudou` (artefato gerado ao lado do esboço)
+*.descrever.json

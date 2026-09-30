@@ -32,6 +32,8 @@ O nível de detalhe pedido: conceito de proporção, peça reconhecível ou deta
 
 ### Análise
 
+Antes de qualquer imagem, rode `npm run esboco -- <arquivo.esboco.json> --descrever`, que imprime em texto, sem desenhar, cada forma resolvida com as âncoras, o grafo de contatos, as formas soltas e as sobreposições 3D e por vista, e a cada edição do JSON rode `--descrever --mudou`, que grava `<arquivo>.descrever.json` e mostra só a diferença (formas movidas, pares que passaram a tocar ou a se afastar, achados novos ou resolvidos). No "Pare e planeje" prefira posicionar por âncora (`centro: "<id>.<ancora>"`) a calcular coordenadas à mão.
+
 O mesmo passo vale para o esboço de opções antes de mostrá-lo à pessoa. Um esboço com legenda que cruza a peça, balão no elemento errado, escala pequena demais, peça na frente de outra que deveria estar atrás ou rotação no sentido oposto induz a escolha errada, e a imagem parece boa à primeira vista.
 
 `npm run esboco -- <arquivo.esboco.json> --analise` gera a matriz de uma vez: as vistas isometrica, frontal, lateral e superior, cada uma com e sem legendas (8 imagens), em `<arquivo>-analise/`, sempre sem linhas de centro: a geração força `linhasCentro: false` em todas as opções e formas sem editar o JSON. Com `--centros` gera também as variações com linhas de centro (16 imagens). O `manifesto.json` traz o hash do JSON, a data, a escala por vista, o que foi forçado, o `plano` quando existe, o bloco `projecao` e a lista de arquivos. Com `--zoom=<vista>:<x0,y0,x1,y1>` recorta esse retângulo em pixels, amplia 3 vezes e grava o par com legendas e sem legendas, para olhar um ponto de encontro. Gerar não basta: o passo só vale depois de abrir as imagens.
